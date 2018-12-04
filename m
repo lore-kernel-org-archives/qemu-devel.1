@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gUBGQ-0001NA-S4
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:01:29 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gUBGe-0001To-Px
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:01:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gUBGI-00030R-Ug
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:01:25 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:43690)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gUBGG-0002ya-UG
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:01:17 -0500
-Received: by mail-ot1-x344.google.com with SMTP id a11so15190763otr.10
-	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 06:01:15 -0800 (PST)
-References: <20181204132952.2601-1-peter.maydell@linaro.org>
-	<20181204132952.2601-6-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <2961450d-063e-5037-b8ce-fc9881e48014@linaro.org>
-Date: Tue, 4 Dec 2018 08:01:11 -0600
+	(envelope-from <imammedo@redhat.com>) id 1gUBGb-0003FP-JG
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:01:40 -0500
+Date: Tue, 4 Dec 2018 15:01:18 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181204150118.6d4a1c09@redhat.com>
+In-Reply-To: <20181130130032.11835-8-sameo@linux.intel.com>
+References: <20181130130032.11835-1-sameo@linux.intel.com>
+	<20181130130032.11835-8-sameo@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20181204132952.2601-6-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 5/5] target/arm: Create timers in realize,
- not init
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 7/8] hw: acpi: Export and share the ARM
+ RSDP build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,24 +24,226 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Samuel Ortiz <sameo@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org, Ben Warren <ben@skyportsystems.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>
 
-On 12/4/18 7:29 AM, Peter Maydell wrote:
-> The timer_new() function allocates memory; this means that
-> if we call it in the CPU's init method we would need
-> to provide an instance_finalize method to free it. Defer
-> the timer creation to the realize function instead.
-> 
-> This fixes a memory leak spotted by clang LeakSanitizer
-> when a CPU object is created for introspection.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On Fri, 30 Nov 2018 14:00:31 +0100
+Samuel Ortiz <sameo@linux.intel.com> wrote:
+
+> Now that build_rsdp() supports building both legacy and current RSDP
+> tables, we can move it to a generic folder (hw/acpi) and have the i386
+> ACPI code reuse it in order to reduce code duplication.
+>=20
+> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 > ---
->  target/arm/cpu.c | 17 +++++++++--------
->  1 file changed, 9 insertions(+), 8 deletions(-)
+>  include/hw/acpi/aml-build.h |  2 ++
+>  hw/acpi/aml-build.c         | 68 +++++++++++++++++++++++++++++++++++++
+>  hw/arm/virt-acpi-build.c    | 66 -----------------------------------
+>  hw/i386/acpi-build.c        | 39 +++++----------------
+>  4 files changed, 79 insertions(+), 96 deletions(-)
+>=20
+> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+> index 6c36903c0a..1a563ad756 100644
+> --- a/include/hw/acpi/aml-build.h
+> +++ b/include/hw/acpi/aml-build.h
+> @@ -388,6 +388,8 @@ void acpi_add_table(GArray *table_offsets, GArray *ta=
+ble_data);
+>  void acpi_build_tables_init(AcpiBuildTables *tables);
+>  void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre);
+>  void
+> +build_rsdp(GArray *tbl, BIOSLinker *linker, AcpiRsdpData *rsdp_data);
+> +void
+>  build_rsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
+>             const char *oem_id, const char *oem_table_id);
+>  void
+> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+> index 1e43cd736d..555c24f21d 100644
+> --- a/hw/acpi/aml-build.c
+> +++ b/hw/acpi/aml-build.c
+> @@ -1589,6 +1589,74 @@ void acpi_build_tables_cleanup(AcpiBuildTables *ta=
+bles, bool mfre)
+>      g_array_free(tables->vmgenid, mfre);
+>  }
+> =20
+> +/*
+> + * ACPI spec 5.2.5.3 Root System Description Pointer (RSDP).
+> + * (Revision 1.0 or later)
+> + */
+> +void
+> +build_rsdp(GArray *tbl, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
+> +{
+> +    int tbl_off =3D tbl->len; /* Table offset in the RSDP file */
+> +
+> +    switch (rsdp_data->revision) {
+> +    case 0:
+> +        /* With ACPI 1.0, we must have an RSDT pointer */
+> +        g_assert(rsdp_data->rsdt_tbl_offset);
+> +        break;
+> +    case 2:
+> +        /* With ACPI 2.0+, we must have an XSDT pointer */
+> +        g_assert(rsdp_data->xsdt_tbl_offset);
+> +        break;
+> +    default:
+> +        /* Only revisions 0 (ACPI 1.0) and 2 (ACPI 2.0+) are valid for R=
+SDP */
+> +        g_assert_not_reached();
+> +    }
+> +
+> +    bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, tbl, 16,
+> +                             true /* fseg memory */);
+> +
+> +    g_array_append_vals(tbl, "RSD PTR ", 8); /* Signature */
+> +    build_append_int_noprefix(tbl, 0, 1); /* Checksum */
+> +    g_array_append_vals(tbl, rsdp_data->oem_id, 6); /* OEMID */
+> +    build_append_int_noprefix(tbl, rsdp_data->revision, 1); /* Revision =
+*/
+> +    build_append_int_noprefix(tbl, 0, 4); /* RsdtAddress */
+> +    if (rsdp_data->rsdt_tbl_offset) {
+> +        /* RSDT address to be filled by guest linker */
+> +        bios_linker_loader_add_pointer(linker, ACPI_BUILD_RSDP_FILE,
+> +                                       tbl_off + 16, 4,
+> +                                       ACPI_BUILD_TABLE_FILE,
+> +                                       *rsdp_data->rsdt_tbl_offset);
+> +    }
+> +
+> +    /* Checksum to be filled by guest linker */
+> +    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+> +                                    tbl_off, 20, /* ACPI rev 1.0 RSDP si=
+ze */
+> +                                    8);
+> +
+> +    if (rsdp_data->revision =3D=3D 0) {
+> +        /* ACPI 1.0 RSDP, we're done */
+> +        return;
+> +    }
+> +
+> +    build_append_int_noprefix(tbl, 36, 4); /* Length */
+> +
+> +    /* XSDT address to be filled by guest linker */
+> +    build_append_int_noprefix(tbl, 0, 8); /* XsdtAddress */
+> +    /* We already validated our xsdt pointer */
+> +    bios_linker_loader_add_pointer(linker, ACPI_BUILD_RSDP_FILE,
+> +                                   tbl_off + 24, 8,
+> +                                   ACPI_BUILD_TABLE_FILE,
+> +                                   *rsdp_data->xsdt_tbl_offset);
+> +
+> +    build_append_int_noprefix(tbl, 0, 1); /* Extended Checksum */
+> +    build_append_int_noprefix(tbl, 0, 3); /* Reserved */
+> +
+> +    /* Extended checksum to be filled by Guest linker */
+> +    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+> +                                    tbl_off, 36, /* ACPI rev 2.0 RSDP si=
+ze */
+> +                                    32);
+> +}
+> +
+>  /* Build rsdt table */
+>  void
+>  build_rsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 4b212fa44c..95fad6f0ce 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -366,72 +366,6 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+>      aml_append(scope, dev);
+>  }
+> =20
+> -/* RSDP */
+> -static void
+> -build_rsdp(GArray *tbl, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
+> -{
+> -
+> -    int tbl_off =3D tbl->len; /* Table offset in the RSDP file */
+> -
+> -    switch (rsdp_data->revision) {
+> -    case 0:
+> -        /* With ACPI 1.0, we must have an RSDT pointer */
+> -        g_assert(rsdp_data->rsdt_tbl_offset);
+> -        break;
+> -    case 2:
+> -        /* With ACPI 2.0+, we must have an XSDT pointer */
+> -        g_assert(rsdp_data->xsdt_tbl_offset);
+> -        break;
+> -    default:
+> -        /* Only revisions 0 (ACPI 1.0) and 2 (ACPI 2.0+) are valid for R=
+SDP */
+> -        g_assert_not_reached();
+> -    }
+> -
+> -    bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, tbl, 16,
+> -                             true /* fseg memory */);
+> -
+> -    g_array_append_vals(tbl, "RSD PTR ", 8); /* Signature */
+> -    build_append_int_noprefix(tbl, 0, 1); /* Checksum */
+> -    g_array_append_vals(tbl, rsdp_data->oem_id, 6); /* OEMID */
+> -    build_append_int_noprefix(tbl, rsdp_data->revision, 1); /* Revision =
+*/
+> -    build_append_int_noprefix(tbl, 0, 4); /* RsdtAddress */
+> -    if (rsdp_data->rsdt_tbl_offset) {
+> -        /* RSDT address to be filled by guest linker */
+> -        bios_linker_loader_add_pointer(linker, ACPI_BUILD_RSDP_FILE,
+> -                                       tbl_off + 16, 4,
+> -                                       ACPI_BUILD_TABLE_FILE,
+> -                                       *rsdp_data->rsdt_tbl_offset);
+> -    }
+> -
+> -    /* Checksum to be filled by guest linker */
+> -    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+> -                                    tbl_off, 20, /* ACPI rev 1.0 RSDP si=
+ze */
+> -                                    8);
+> -
+> -    if (rsdp_data->revision =3D=3D 0) {
+> -        /* ACPI 1.0 RSDP, we're done */
+> -        return;
+> -    }
+[...]
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> -static void
+> -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_off=
+set)
+> -{
+> -    /* AcpiRsdpDescriptor describes revision 2 RSDP table and as result =
+we
+> -     * allocate extra 16 bytes for pc/q35 RSDP rev1 as well. Keep extra =
+16 bytes
+> -     * wasted to make sure we won't breake migration for machine types o=
+lder
+> -     * than 2.3 due to size mismatch.
+> -     */
+Removing this part here and not moving it somewhere else doesn't look right.
+[...]
 
+>  typedef
+>  struct AcpiBuildState {
+>      /* Copy of table in RAM (for patching). */
+> @@ -2732,7 +2703,15 @@ void acpi_build(AcpiBuildTables *tables, MachineSt=
+ate *machine)
+>                 slic_oem.id, slic_oem.table_id);
+> =20
+>      /* RSDP is in FSEG memory, so allocate it separately */
+> -    build_rsdp(tables->rsdp, tables->linker, rsdt);
+> +    {
+> +        AcpiRsdpData rsdp_data =3D {
+> +            .revision =3D 0,
+> +            .oem_id =3D ACPI_BUILD_APPNAME6,
+> +            .xsdt_tbl_offset =3D NULL,
+> +            .rsdt_tbl_offset =3D &rsdt,
+> +        };
+> +        build_rsdp(tables->rsdp, tables->linker, &rsdp_data);
+I'd suggest to keep build_rsdp() clean, move comment above comment
+and add an extra padding for machine versions 2.2 and older here.
+See pc_i440fx_2_2_machine_options() we probably can use pcmc->rsdp_in_ram as
+condition for padding.
 
-r~
+And test migration (pingpong) from this QEMU build to 2.2 and 2.3 builds,
+in case something else was missed.
+
+> +    }
+> =20
+>      /* We'll expose it all to Guest so we want to reduce
+>       * chance of size changes.
