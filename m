@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46225)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gUFbd-0004vr-6C
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 13:39:38 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gUFfk-0001b2-CM
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 13:43:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gUFN1-0005Zw-TI
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 13:24:32 -0500
-Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:41036)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gUFN1-0005ZV-GD
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 13:24:31 -0500
-Received: by mail-oi1-x229.google.com with SMTP id j21so15129756oii.8
-	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 10:24:31 -0800 (PST)
+	(envelope-from <ehabkost@redhat.com>) id 1gUFfj-0007ZX-Bq
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 13:43:52 -0500
+Date: Tue, 4 Dec 2018 16:43:35 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181204184335.GF18284@habkost.net>
+References: <20181127125644.GB18284@habkost.net>
+	<CAMxuvaySoJ2TokV8M81CVU3Hp4dC25c+PW_p2kk+V88-88U-CQ@mail.gmail.com>
+	<20181127133527.GI18284@habkost.net>
+	<20181128184027.7d584eaa@redhat.com>
+	<CAJ+F1CK5NkgsJWFGZ7kvR81KyeOPE_ytk=tOjKqTUGtbfywmJQ@mail.gmail.com>
+	<20181129175055.GQ18284@habkost.net>
+	<CAJ+F1CJBKVibRrgjiNKjSJ5ufK=CUodx26aHnKzeL3Cs7adbeA@mail.gmail.com>
+	<20181130115526.5974ca7a@redhat.com>
+	<20181130114142.GV18284@habkost.net>
+	<20181204141724.5f06bd1b@redhat.com>
 MIME-Version: 1.0
-References: <20181123091729.29921-1-luc.michel@greensocs.com>
-	<20181123091729.29921-2-luc.michel@greensocs.com>
-	<20181123181059.GN18284@habkost.net>
-	<65d3a572-9a80-f332-1f88-69e43e8a3663@redhat.com>
-	<20181126132731.GJ18284@habkost.net>
-	<CAFEAcA8D7ZjO059Sgrx-4i0iT+V3gxT4f=DvdmUAJS7KomtyOg@mail.gmail.com>
-	<b8e20686-e5d1-a844-48f7-a4ae471e3fd5@greensocs.com>
-	<CAFEAcA8j4xTiS3_ktiA0hm2N4cu5RvxAtYqUHgvY-bUXgcwbjQ@mail.gmail.com>
-	<50645862-a638-ad2a-bafe-1b46be42aec4@greensocs.com>
-	<20181204180607.GB18284@habkost.net>
-In-Reply-To: <20181204180607.GB18284@habkost.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 4 Dec 2018 18:24:19 +0000
-Message-ID: <CAFEAcA9JXeRGfKzouYJQKxgXuw_Z-up0a1ijZX9hZvXbdkwiuA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v7 01/16] hw/cpu: introduce CPU clusters
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181204141724.5f06bd1b@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v4 16/28] hw: apply machine compat
+ properties without touching globals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,32 +33,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Luc Michel <luc.michel@greensocs.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Alistair Francis <alistair@alistair23.me>, Mark Burton <mark.burton@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, QEMU <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Qemu-s390x list <qemu-s390x@nongnu.org>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:sPAPR pseries" <qemu-ppc@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
 
-On Tue, 4 Dec 2018 at 18:06, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> In either case, I'm still missing a clear description of what a
-> cluster is supposed to represent, exactly (see my previous reply
-> on this thread).
+On Tue, Dec 04, 2018 at 02:17:24PM +0100, Igor Mammedov wrote:
+> On Fri, 30 Nov 2018 09:41:42 -0200
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+>=20
+> > On Fri, Nov 30, 2018 at 11:55:26AM +0100, Igor Mammedov wrote:
+> > > On Fri, 30 Nov 2018 01:36:03 +0400
+> > > Marc-Andr=E9 Lureau <marcandre.lureau@gmail.com> wrote:
+> > >  =20
+> > > > Hi
+> > > >=20
+> > > > On Thu, Nov 29, 2018 at 9:51 PM Eduardo Habkost <ehabkost@redhat.=
+com> wrote: =20
+> > > > >
+> > > > > On Thu, Nov 29, 2018 at 02:32:18PM +0400, Marc-Andr=E9 Lureau w=
+rote:   =20
+> > > > > > Hi
+> > > > > > On Wed, Nov 28, 2018 at 9:53 PM Igor Mammedov <imammedo@redha=
+t.com> wrote:   =20
+> > > > > > >
+> > > > > > > On Tue, 27 Nov 2018 11:35:27 -0200
+> > > > > > > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > > > > > >   =20
+> > > > > > > > On Tue, Nov 27, 2018 at 05:10:05PM +0400, Marc-Andr=E9 Lu=
+reau wrote:   =20
+> > > > > > > > > On Tue, Nov 27, 2018 at 4:57 PM Eduardo Habkost <ehabko=
+st@redhat.com> wrote:   =20
+> > > > > > > > > >
+> > > > > > > > > > On Tue, Nov 27, 2018 at 01:27:49PM +0400, Marc-Andr=E9=
+ Lureau wrote:   =20
+> > > > > > > > > > > Similarly to accel properties, move compat properti=
+es out of globals
+> > > > > > > > > > > registration, and apply the machine compat properti=
+es during
+> > > > > > > > > > > device_post_init().
+> > > > > > > > > > >
+> > > > > > > > > > > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lurea=
+u@redhat.com>   =20
+> > > > > > > > > > [...]   =20
+> > > > > > > > > > > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> > > > > > > > > > > index 7066d28271..3b31b2c025 100644
+> > > > > > > > > > > --- a/hw/core/qdev.c
+> > > > > > > > > > > +++ b/hw/core/qdev.c
+> > > > > > > > > > > @@ -971,17 +971,26 @@ static void device_initfn(Obj=
+ect *obj)
+> > > > > > > > > > >  }
+> > > > > > > > > > >
+> > > > > > > > > > >  static const GPtrArray *ac_compat_props;
+> > > > > > > > > > > +static const GPtrArray *mc_compat_props;   =20
+> > > > > > > why you didn't use just 'compat_props' for both?
+> > > > > > > (it would be cleaner have single registry for compat
+> > > > > > > properties, and the place that takes care of registration
+> > > > > > > will take care of necessary ordering)   =20
+> > > > > >
+> > > > > > There are two arrays, one from the accelerator class, the oth=
+er from
+> > > > > > the machine class. We can't make it a singleton (all compats =
+props for
+> > > > > > the various machines would be mixed).
+> > > > > >
+> > > > > > We could create a third array that would be the set of both, =
+but that
+> > > > > > would require more copy/allocation.   =20
+> > > > >
+> > > > > I am failing to see the advantage of replacing the `global_prop=
+s`
+> > > > > static variable from qdev-properties.c with a collection of
+> > > > > separate static variables scattered around the code.  I thought
+> > > > > the main point of the changes was to reduce the amount of
+> > > > > duplicate data stored in static variables. =20
+> > > Main point was to use compats for backends then on top of that=20
+> > > we added split global from compat properties goal.
+> > >  =20
+> > > > > I was expecting something like this:
+> > > > >
+> > > > > accel.c:
+> > > > >
+> > > > >   void accel_apply_compat_props(AccelState *accel, Object *obj)
+> > > > >   {
+> > > > >       object_apply_global_props(obj, ACCEL_GET_CLASS(accel)->co=
+mpat_props, &error_abort);
+> > > > >   }
+> > > > >
+> > > > > machine.c:
+> > > > >
+> > > > >   /* Apply compat properties and global properties to an object=
+ */
+> > > > >   void machine_apply_compat_props(MachineState *ms, Object *obj=
+)
+> > > > >   {
+> > > > >       accel_apply_compat_props(ms->accel, obj);
+> > > > >       object_apply_global_props(obj, MACHINE_GET_CLASS(ms)->com=
+pat_props, &error_abort);
+> > > > >   }
+> > > > >
+> > > > > compat-props.c:
+> > > > >
+> > > > >   static void object_apply_compat_props(Object *obj)
+> > > > >   {
+> > > > >       MachineState *machine =3D MACHINE(qdev_get_machine());
+> > > > >       machine_apply_compat_props(machine, obj);
+> > > > >   }
+> > > > >
+> > > > > qdev.c:
+> > > > >
+> > > > >   static void device_post_init(Object *obj)
+> > > > >   {
+> > > > >       object_apply_compat_props(obj);
+> > > > >       apply_user_provided_globals(obj);
+> > > > >   }
+> > > > >
+> > > > > object_interface.c:
+> > > > >
+> > > > >   void user_creatable_complete(Object *obj, Error **errp)
+> > > > >   {
+> > > > >       object_apply_compat_props(obj);
+> > > > >       ...
+> > > > >       ucc->complete(...)
+> > > > >   }
+> > > > >   =20
+> > > >=20
+> > > > I like that solution too (which you also proposed in the other
+> > > > thread). But we have to decide whether it's acceptable to referen=
+ce
+> > > > MachineState, or if the compat properties should be registered. =20
+> > > I dislike pulling in machine into basic object code and
+> > > I think a separate compats would be cleaner interface without
+> > > layer violation. But to unstuck, lets go with qdev_get_machine()
+> > > for now. =20
+> >=20
+> > Which basic object code?  The only reference to machine above is
+> > at compat-props.c.  I don't see any layering violation here.
+> I see compat properties as just a set of arbitrary properties
+> that's applied to objects depending on configuration.
+> Which currently includes machine version and accel type
+> but in no way inherently tied to them.
 
-Here's my attempt:
+I understand you want to have a more generic abstraction layer,
+but my question is: why do we need it?  I still don't see which
+problems it would solve.
 
-A cluster is a group of CPUs which are all identical and have
-the same view of the rest of the system.
-If CPUs are not identical (for example, Cortex-A53 and
-Cortex-A57 CPUs in an Arm big.LITTLE system) they should be
-in different clusters.
-If the CPUs do not have the same view of memory (for example
-the main CPU and a management controller processor) they should
-be in different clusters.
+>=20
+> As for layering violation, we do it in device model cases
+> as it's machine related (ugly 'acceptable' but helps to cut corners)
+> and with new interface it will be used wit backends which are not
+> machine related at all.
 
-I agree that this is slightly confusing, because the concept
-is on the boundary between something that's real in hardware
-(eg in a big.LITTLE setup the CPUs are in separate hardware
-clusters, and of coures a BMC processor and the main CPU
-are definitely different things) and something that we're
-defining for its effects on the GDB UI and so we can make
-sure we don't share TCG translated code where we shouldn't.
+I don't see why it's ugly to have QEMU backend object code use
+machine core code.  What problems does it cause?
 
-thanks
--- PMM
+
+>=20
+> Doing like you suggest would make it usable with current machine
+> initialization order (with some fixes) but if one would consider
+> a bit earlier time (preconfig time) and creating machine step by
+> step from there it might be less usable (as it needs machine instance,
+> it still would be possible but probably more tricky (pure speculation))=
+.
+
+I agree that this is a problem: we really have a
+backend -> compat_props -> current_machine dependency chain here.
+
+Using a registration mechanism that copies data, the dependency
+would still exists, but be implicit in the initialization
+ordering.  Then the system would silently break as soon as we
+reorder the code.
+
+>=20
+> So I'd vote for abstracted from machine compat props that could be
+> called from any object that implements interface and explicit
+> compats registration (like we do now) and explicit registration failure
+> if compats happend to be applied to any object. But in case of this
+> series I'm fine with any approach just to get compat properties work
+> with backends for now.
+
+Thanks.  I agree we'll want to refactor this later.  We may want
+to be able to apply compat properties to backend objects before
+creating machine and accel instances.
+
+Or maybe we will want to apply only MachineClass::compat_props to
+backend objects, and not AccelClass::compat_props?  This is not
+clear to me yet.
+
+--=20
+Eduardo
