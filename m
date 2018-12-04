@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gU9tI-0006Xt-5e
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 07:33:31 -0500
+	(envelope-from <prvs=869086d29=anthony.perard@citrix.com>)
+	id 1gU9tn-0006oS-81
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 07:34:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gU9tE-00034q-V0
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 07:33:28 -0500
-Received: from 3.mo179.mail-out.ovh.net ([178.33.251.175]:44947)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gU9tE-00033A-ON
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 07:33:24 -0500
-Received: from player715.ha.ovh.net (unknown [10.109.160.153])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 2CAB010A074
-	for <qemu-devel@nongnu.org>; Tue,  4 Dec 2018 13:33:22 +0100 (CET)
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-28-clg@kaod.org>
-	<20181129040917.GF14697@umbus.fritz.box>
-	<CAFEAcA8=xJCoTmXmygpK2yVdq5Viqi-dQoiTJrML=goutzKujQ@mail.gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <f92e8c2c-3384-ba88-3d85-0c168441b052@kaod.org>
-Date: Tue, 4 Dec 2018 13:33:16 +0100
+	(envelope-from <prvs=869086d29=anthony.perard@citrix.com>)
+	id 1gU9tm-0003Ko-3L
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 07:33:59 -0500
+Date: Tue, 4 Dec 2018 12:33:49 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20181204123349.GU14786@perard.uk.xensource.com>
+References: <20181121151211.15997-1-paul.durrant@citrix.com>
+	<20181121151211.15997-15-paul.durrant@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8=xJCoTmXmygpK2yVdq5Viqi-dQoiTJrML=goutzKujQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 27/36] sysbus: add a sysbus_mmio_unmap()
- helper
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20181121151211.15997-15-paul.durrant@citrix.com>
+Subject: Re: [Qemu-devel] [PATCH 14/18] xen: add implementations of
+ xen-qdisk connect and disconnect functions...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,71 +26,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Paul Durrant <paul.durrant@citrix.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Hello Peter,
+On Wed, Nov 21, 2018 at 03:12:07PM +0000, Paul Durrant wrote:
+> diff --git a/hw/block/xen-qdisk.c b/hw/block/xen-qdisk.c
+> index 35f7b70480..8c88393832 100644
+> --- a/hw/block/xen-qdisk.c
+> +++ b/hw/block/xen-qdisk.c
+>  static void xen_qdisk_connect(XenQdiskDevice *qdiskdev, Error **errp)
+>  {
+>      XenQdiskVdev *vdev = &qdiskdev->vdev;
+> +    XenDevice *xendev = XEN_DEVICE(qdiskdev);
+> +    unsigned int order, nr_ring_ref, *ring_ref, event_channel, protocol;
+> +    char *str;
+>  
+>      trace_xen_qdisk_connect(vdev->disk, vdev->partition);
+> +
+> +    if (xen_device_frontend_scanf(xendev, "ring-page-order", "%u",
+> +                                  &order) != 1) {
+> +        nr_ring_ref = 1;
+> +        ring_ref = g_new(unsigned int, nr_ring_ref);
+> +
+> +        if (xen_device_frontend_scanf(xendev, "ring-ref", "%u",
+> +                                      &ring_ref[0]) != 1) {
+> +            error_setg(errp, "failed to read ring-ref");
 
-On 12/3/18 6:48 PM, Peter Maydell wrote:
-> On Thu, 29 Nov 2018 at 04:55, David Gibson <david@gibson.dropbear.id.au=
-> wrote:
->>
->> On Fri, Nov 16, 2018 at 11:57:20AM +0100, C=C3=A9dric Le Goater wrote:
->>> This will be used to remove the MMIO regions of the POWER9 XIVE
->>> interrupt controller when the sPAPR machine is reseted.
->>>
->>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->>
->> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->>
->> Since the code looks sane.
->>
->> Hoever, I think using memory_region_set_enabled() would be a better
->> idea for our purposes than actually adding/deleting the subregion.
->=20
-> The other approach I've used in the past is to use
-> sysbus_mmio_get_region() and then just map and unmap
-> that directly, rather than using the sysbus_mmio_map()
-> convenience function. (Often the kind of device that's
-> doing complicated things like this will be working in
-> a setup where it doesn't necessarily want to be mapping
-> directly into system memory rather than an SoC or similar
-> container MemoryRegion anyway.)
+Don't you need to free `ring_ref`?
 
-Thanks for chiming in on that patch. Here is some background on=20
-what we are trying to model. May be you have some suggestions.
+> +            return;
+> +        }
+[...]
 
-A completely new interrupt controller was introduced on the POWER9=20
-processor and it uses MMIO regions for interrupt management. These
-regions are backed by simple MRs in QEMU, when using TCG, and backed
-by ram_device_ptr MRs under KVM.
+> diff --git a/include/hw/xen/xen-qdisk.h b/include/hw/xen/xen-qdisk.h
+> index ade0866037..d7dd2bf0ee 100644
+> --- a/include/hw/xen/xen-qdisk.h
+> +++ b/include/hw/xen/xen-qdisk.h
+> @@ -6,7 +6,15 @@
+>  #ifndef HW_XEN_QDISK_H
+>  #define HW_XEN_QDISK_H
+>  
+> +#include "hw/xen/xen.h"
+>  #include "hw/xen/xen-bus.h"
+> +#include "hw/block/block.h"
+> +#include "hw/block/xen_blkif.h"
+> +#include "hw/block/dataplane/xen-qdisk.h"
+> +#include "sysemu/blockdev.h"
+> +#include "sysemu/iothread.h"
+> +#include "sysemu/block-backend.h"
+> +#include "sysemu/iothread.h"
 
-Difficulties arise with the fact that POWER9 pseries guests need
-to support the old mode (XICS, no MMIOs) and the new mode XIVE.
-The interrupt mode is negotiated at boot between the hypervisor
-and the guest and a reset is generated to take into account=20
-the changes. Which means that, at reset, we may need to disconnect=20
-from a KVM IC device and reconnect to another.=20
+You don't need that many includes, especially not iothread.h twice ;-).
 
-When switching from XICS to XIVE mode :=20
+I think those new includes would be enough:
+#include "hw/block/block.h"; for BlockConf
+#include "sysemu/iothread.h"
+#include "hw/block/dataplane/xen-qdisk.h"
 
-  if kvm
-    - destroy KVM XICS device
-    - create KVM XIVE device=20
-    - get fd, mmap, init ram_device_ptr MRs
-    - map mmio
-  - enable MMIOs
+>  
+>  typedef enum XenQdiskVdevType {
+>      XEN_QDISK_VDEV_TYPE_DP,
+> @@ -33,6 +41,10 @@ typedef struct XenQdiskDevice XenQdiskDevice;
+>  struct XenQdiskDevice {
+>      XenDevice xendev;
+>      XenQdiskVdev vdev;
+> +    BlockConf conf;
+> +    unsigned int max_ring_page_order;
+> +    IOThread *iothread;
+> +    XenQdiskDataPlane *dataplane;
+>  };
+>  
+>  #endif /* HW_XEN_QDISK_H */
 
-When switching from XIVE to XICS  :=20
- =20
-  - disable MMIOs=20
-  if kvm
-    - delete MRs
-    - munmap
-    - destroy KVM XIVE device
-    - create KVM XICS device=20
-
-
-Thanks,
-
-C.
+-- 
+Anthony PERARD
