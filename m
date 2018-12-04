@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gU1n7-0006q9-VE
+	(envelope-from <jasowang@redhat.com>) id 1gU1n7-0006q4-Ru
 	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 22:54:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gU1n5-0005gr-EZ
+	(envelope-from <jasowang@redhat.com>) id 1gU1n4-0005fG-DM
 	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 22:54:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37102)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gU1n3-0005ZP-SX
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 22:54:30 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Tue,  4 Dec 2018 11:53:43 +0800
-Message-Id: <20181204035347.6148-2-jasowang@redhat.com>
+Date: Tue,  4 Dec 2018 11:53:45 +0800
+Message-Id: <20181204035347.6148-4-jasowang@redhat.com>
 In-Reply-To: <20181204035347.6148-1-jasowang@redhat.com>
 References: <20181204035347.6148-1-jasowang@redhat.com>
-Subject: [Qemu-devel] [PATCH V5 for 3.1 1/5] net: drop too large packet early
+Subject: [Qemu-devel] [PATCH V5 for 3.1 3/5] virtio-net-test: accept
+ variable length argument in pci_test_start()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,131 +25,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: mst@redhat.com, ppandit@redhat.com, liq3ea@163.com, liq3ea@gmail.com, pbonzini@redhat.com, thuth@redhat.com, eblake@redhat.com, Jason Wang <jasowang@redhat.com>, qemu-stable@nongnu.org
+Cc: mst@redhat.com, ppandit@redhat.com, liq3ea@163.com, liq3ea@gmail.com, pbonzini@redhat.com, thuth@redhat.com, eblake@redhat.com, Jason Wang <jasowang@redhat.com>
 
-We try to detect and drop too large packet (>INT_MAX) in 1592a9947036
-("net: ignore packet size greater than INT_MAX") during packet
-delivering. Unfortunately, this is not sufficient as we may hit
-another integer overflow when trying to queue such large packet in
-qemu_net_queue_append_iov():
+This allows flexibility to be reused for all kinds of command line
+used by other tests.
 
-- size of the allocation may overflow on 32bit
-- packet->size is integer which may overflow even on 64bit
-
-Fixing this by moving the check to qemu_sendv_packet_async() which is
-the entrance of all networking codes and reduce the limit to
-NET_BUFSIZE to be more conservative. This works since:
-
-- For the callers that call qemu_sendv_packet_async() directly, they
-  only care about if zero is returned to determine whether to prevent
-  the source from producing more packets. A callback will be triggered
-  if peer can accept more then source could be enabled. This is
-  usually used by high speed networking implementation like virtio-net
-  or netmap.
-- For the callers that call qemu_sendv_packet() that calls
-  qemu_sendv_packet_async() indirectly, they often ignore the return
-  value. In this case qemu will just the drop packets if peer can't
-  receive.
-
-Qemu will copy the packet if it was queued. So it was safe for both
-kinds of the callers to assume the packet was sent.
-
-Since we move the check from qemu_deliver_packet_iov() to
-qemu_sendv_packet_async(), it would be safer to make
-qemu_deliver_packet_iov() static to prevent any external user in the
-future.
-
-This is a revised patch of CVE-2018-17963.
-
-Cc: qemu-stable@nongnu.org
-Cc: Li Qiang <liq3ea@163.com>
-Fixes: 1592a9947036 ("net: ignore packet size greater than INT_MAX")
-Reported-by: Li Qiang <liq3ea@gmail.com>
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- include/net/net.h |  6 ------
- net/net.c         | 28 +++++++++++++++++-----------
- 2 files changed, 17 insertions(+), 17 deletions(-)
+ tests/virtio-net-test.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
-diff --git a/include/net/net.h b/include/net/net.h
-index 7936d53d2f..ec13702dbf 100644
---- a/include/net/net.h
-+++ b/include/net/net.h
-@@ -169,12 +169,6 @@ void qemu_check_nic_model(NICInfo *nd, const char *model);
- int qemu_find_nic_model(NICInfo *nd, const char * const *models,
-                         const char *default_model);
- 
--ssize_t qemu_deliver_packet_iov(NetClientState *sender,
--                            unsigned flags,
--                            const struct iovec *iov,
--                            int iovcnt,
--                            void *opaque);
--
- void print_net_client(Monitor *mon, NetClientState *nc);
- void hmp_info_network(Monitor *mon, const QDict *qdict);
- void net_socket_rs_init(SocketReadState *rs,
-diff --git a/net/net.c b/net/net.c
-index 07c194a8f6..1f7d626197 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -231,6 +231,11 @@ static void qemu_net_client_destructor(NetClientState *nc)
- {
-     g_free(nc);
- }
-+static ssize_t qemu_deliver_packet_iov(NetClientState *sender,
-+                                       unsigned flags,
-+                                       const struct iovec *iov,
-+                                       int iovcnt,
-+                                       void *opaque);
- 
- static void qemu_net_client_setup(NetClientState *nc,
-                                   NetClientInfo *info,
-@@ -705,22 +710,18 @@ static ssize_t nc_sendv_compat(NetClientState *nc, const struct iovec *iov,
-     return ret;
+diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
+index dcb87a8b6e..587a043e67 100644
+--- a/tests/virtio-net-test.c
++++ b/tests/virtio-net-test.c
+@@ -52,17 +52,21 @@ static QVirtioPCIDevice *virtio_net_pci_init(QPCIBus *bus, int slot)
+     return dev;
  }
  
--ssize_t qemu_deliver_packet_iov(NetClientState *sender,
--                                unsigned flags,
--                                const struct iovec *iov,
--                                int iovcnt,
--                                void *opaque)
-+static ssize_t qemu_deliver_packet_iov(NetClientState *sender,
-+                                       unsigned flags,
-+                                       const struct iovec *iov,
-+                                       int iovcnt,
-+                                       void *opaque)
+-static QOSState *pci_test_start(int socket)
++GCC_FMT_ATTR(1, 2)
++static QOSState *pci_test_start(const char *cmd, ...)
  {
-     NetClientState *nc = opaque;
--    size_t size = iov_size(iov, iovcnt);
-     int ret;
+     QOSState *qs;
++    va_list ap;
+     const char *arch = qtest_get_arch();
+-    const char *cmd = "-netdev socket,fd=%d,id=hs0 -device "
+-                      "virtio-net-pci,netdev=hs0";
  
--    if (size > INT_MAX) {
--        return size;
--    }
+     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+-        qs = qtest_pc_boot(cmd, socket);
++        va_start(ap, cmd);
++        qs = qtest_pc_vboot(cmd, ap);
++        va_end(ap);
+     } else if (strcmp(arch, "ppc64") == 0) {
+-        qs = qtest_spapr_boot(cmd, socket);
++        va_start(ap, cmd);
++        qs = qtest_spapr_vboot(cmd, ap);
++        va_end(ap);
+     } else {
+         g_printerr("virtio-net tests are only available on x86 or ppc64\n");
+         exit(EXIT_FAILURE);
+@@ -223,7 +227,8 @@ static void pci_basic(gconstpointer data)
+     ret = socketpair(PF_UNIX, SOCK_STREAM, 0, sv);
+     g_assert_cmpint(ret, !=, -1);
  
-     if (nc->link_down) {
--        return size;
-+        return iov_size(iov, iovcnt);
-     }
+-    qs = pci_test_start(sv[1]);
++    qs = pci_test_start("-netdev socket,fd=%d,id=hs0 -device "
++                        "virtio-net-pci,netdev=hs0", sv[1]);
+     dev = virtio_net_pci_init(qs->pcibus, PCI_SLOT);
  
-     if (nc->receive_disabled) {
-@@ -745,10 +746,15 @@ ssize_t qemu_sendv_packet_async(NetClientState *sender,
-                                 NetPacketSent *sent_cb)
- {
-     NetQueue *queue;
-+    size_t size = iov_size(iov, iovcnt);
-     int ret;
- 
-+    if (size > NET_BUFSIZE) {
-+        return size;
-+    }
-+
-     if (sender->link_down || !sender->peer) {
--        return iov_size(iov, iovcnt);
-+        return size;
-     }
- 
-     /* Let filters handle the packet first */
+     rx = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, qs->alloc, 0);
 -- 
 2.17.1
