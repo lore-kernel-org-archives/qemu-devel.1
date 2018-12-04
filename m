@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gUEEl-000350-KW
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:12:03 -0500
+	(envelope-from <fwsgonzo@hotmail.com>) id 1gUEFA-0002Ct-Vi
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:12:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gUE5s-0008FJ-0Y
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:02:48 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:34616)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gUE5r-0008Ee-Qt
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:02:43 -0500
-Received: by mail-wr1-f67.google.com with SMTP id j2so16768262wrw.1
-	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 09:02:43 -0800 (PST)
-References: <154393964026.28192.13536237934563059985.stgit@gimli.home>
-	<154394076572.28192.17922483382108051842.stgit@gimli.home>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <4d705555-4d3f-5db9-f58c-ad18ef2e1348@redhat.com>
-Date: Tue, 4 Dec 2018 18:02:39 +0100
-MIME-Version: 1.0
-In-Reply-To: <154394076572.28192.17922483382108051842.stgit@gimli.home>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <fwsgonzo@hotmail.com>) id 1gUDz1-0004Hu-Rr
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:55:44 -0500
+Received: from mail-oln040092072060.outbound.protection.outlook.com
+	([40.92.72.60]:39712
+	helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fwsgonzo@hotmail.com>)
+	id 1gUDz1-0004GB-Gt
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:55:39 -0500
+From: Gonzo FWS <fwsgonzo@hotmail.com>
+Date: Tue, 4 Dec 2018 16:55:34 +0000
+Message-ID: <HE1P190MB00739AD5A654DAA3FE9B4662DEAF0@HE1P190MB0073.EURP190.PROD.OUTLOOK.COM>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [for-4.0 PATCH v3 1/9] pcie: Create enums for link
- speed and width
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel]  i386: don't require elf64 for multiboot kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,95 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
-Cc: Geoffrey McRae <geoff@hostfission.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Thomas Huth <huth@tuxfamily.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 4/12/18 17:26, Alex Williamson wrote:
-> In preparation for reporting higher virtual link speeds and widths,
-> create enums and macros to help us manage them.
-> 
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> Tested-by: Geoffrey McRae <geoff@hostfission.com>
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+Right now IncludeOS on x86_64 must use a chainloader for multiboot support.=
+ The chainloader is an ELF32 kernel that loads the real ELF64 kernel and ju=
+mps to it. As long as the ELF has the .multiboot section and conforms to th=
+e spec, meaning _start is be a 32-bit entry, it should be fine.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+By removing the extra check in multiboot.c, we can also boot ELF64 files. A=
+s can be seen here:
+https://cloud.fwsnet.net/index.php/s/XrkBkC8zy7MLa9p
 
-> ---
->  hw/pci/pcie.c              |    7 ++++---
->  hw/vfio/pci.c              |    3 ++-
->  include/hw/pci/pcie_regs.h |   23 +++++++++++++++++++++--
->  3 files changed, 27 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-> index 6c91bd44a0a5..914a5261a79b 100644
-> --- a/hw/pci/pcie.c
-> +++ b/hw/pci/pcie.c
-> @@ -68,11 +68,12 @@ pcie_cap_v1_fill(PCIDevice *dev, uint8_t port, uint8_t type, uint8_t version)
->      pci_set_long(exp_cap + PCI_EXP_LNKCAP,
->                   (port << PCI_EXP_LNKCAP_PN_SHIFT) |
->                   PCI_EXP_LNKCAP_ASPMS_0S |
-> -                 PCI_EXP_LNK_MLW_1 |
-> -                 PCI_EXP_LNK_LS_25);
-> +                 QEMU_PCI_EXP_LNKCAP_MLW(QEMU_PCI_EXP_LNK_X1) |
-> +                 QEMU_PCI_EXP_LNKCAP_MLS(QEMU_PCI_EXP_LNK_2_5GT));
->  
->      pci_set_word(exp_cap + PCI_EXP_LNKSTA,
-> -                 PCI_EXP_LNK_MLW_1 | PCI_EXP_LNK_LS_25);
-> +                 QEMU_PCI_EXP_LNKSTA_NLW(QEMU_PCI_EXP_LNK_X1) |
-> +                 QEMU_PCI_EXP_LNKSTA_CLS(QEMU_PCI_EXP_LNK_2_5GT));
->  
->      if (dev->cap_present & QEMU_PCIE_LNKSTA_DLLLA) {
->          pci_word_test_and_set_mask(exp_cap + PCI_EXP_LNKSTA,
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 5c7bd9698496..74f9a46b4be0 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -1897,7 +1897,8 @@ static int vfio_setup_pcie_cap(VFIOPCIDevice *vdev, int pos, uint8_t size,
->                                     PCI_EXP_TYPE_ENDPOINT << 4,
->                                     PCI_EXP_FLAGS_TYPE);
->              vfio_add_emulated_long(vdev, pos + PCI_EXP_LNKCAP,
-> -                                   PCI_EXP_LNK_MLW_1 | PCI_EXP_LNK_LS_25, ~0);
-> +                           QEMU_PCI_EXP_LNKCAP_MLW(QEMU_PCI_EXP_LNK_X1) |
-> +                           QEMU_PCI_EXP_LNKCAP_MLS(QEMU_PCI_EXP_LNK_2_5GT), ~0);
->              vfio_add_emulated_word(vdev, pos + PCI_EXP_LNKCTL, 0, ~0);
->          }
->  
-> diff --git a/include/hw/pci/pcie_regs.h b/include/hw/pci/pcie_regs.h
-> index a95522a13b04..ad4e7808b8ac 100644
-> --- a/include/hw/pci/pcie_regs.h
-> +++ b/include/hw/pci/pcie_regs.h
-> @@ -34,10 +34,29 @@
->  
->  /* PCI_EXP_LINK{CAP, STA} */
->  /* link speed */
-> -#define PCI_EXP_LNK_LS_25               1
-> +typedef enum PCIExpLinkSpeed {
-> +    QEMU_PCI_EXP_LNK_2_5GT = 1,
-> +    QEMU_PCI_EXP_LNK_5GT,
-> +    QEMU_PCI_EXP_LNK_8GT,
-> +    QEMU_PCI_EXP_LNK_16GT,
-> +} PCIExpLinkSpeed;
-> +
-> +#define QEMU_PCI_EXP_LNKCAP_MLS(speed)  (speed)
-> +#define QEMU_PCI_EXP_LNKSTA_CLS         QEMU_PCI_EXP_LNKCAP_MLS
-> +
-> +typedef enum PCIExpLinkWidth {
-> +    QEMU_PCI_EXP_LNK_X1 = 1,
-> +    QEMU_PCI_EXP_LNK_X2 = 2,
-> +    QEMU_PCI_EXP_LNK_X4 = 4,
-> +    QEMU_PCI_EXP_LNK_X8 = 8,
-> +    QEMU_PCI_EXP_LNK_X12 = 12,
-> +    QEMU_PCI_EXP_LNK_X16 = 16,
-> +    QEMU_PCI_EXP_LNK_X32 = 32,
-> +} PCIExpLinkWidth;
->  
->  #define PCI_EXP_LNK_MLW_SHIFT           ctz32(PCI_EXP_LNKCAP_MLW)
-> -#define PCI_EXP_LNK_MLW_1               (1 << PCI_EXP_LNK_MLW_SHIFT)
-> +#define QEMU_PCI_EXP_LNKCAP_MLW(width)  (width << PCI_EXP_LNK_MLW_SHIFT)
-> +#define QEMU_PCI_EXP_LNKSTA_NLW         QEMU_PCI_EXP_LNKCAP_MLW
->  
->  /* PCI_EXP_LINKCAP */
->  #define PCI_EXP_LNKCAP_ASPMS_SHIFT      ctz32(PCI_EXP_LNKCAP_ASPMS)
-> 
-> 
+Signed-off-by: Alf-Andr=E9 Walla <fwsgonzo@hotmail.com>
+---
+ hw/i386/multiboot.c | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
+index 1a4344f5fc..d07ebf3361 100644
+--- a/hw/i386/multiboot.c
++++ b/hw/i386/multiboot.c
+@@ -194,11 +194,6 @@ int load_multiboot(FWCfgState *fw_cfg,
+         int kernel_size;
+         fclose(f);
+
+-        if (((struct elf64_hdr*)header)->e_machine =3D=3D EM_X86_64) {
+-            error_report("Cannot load x86-64 image, give a 32bit one.");
+-            exit(1);
+-        }
+-
+         kernel_size =3D load_elf(kernel_filename, NULL, NULL, &elf_entry,
+                                &elf_low, &elf_high, 0, I386_ELF_MACHINE,
+                                0, 0);
+--
+2.17.1
