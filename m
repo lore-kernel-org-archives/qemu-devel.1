@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58747)
+Received: from eggs.gnu.org ([208.118.235.92]:39786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gUC0H-000158-5C
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:48:51 -0500
+	(envelope-from <drjones@redhat.com>) id 1gUC15-0001dj-HZ
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:49:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gUC0C-0006xZ-3j
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:48:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:30529)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gUC0B-0006wx-Aj
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:48:43 -0500
-References: <CAFEAcA8rx-ZzHfb5ABcGBHOWDcDwxOejxp_SW9LLuOf1-_cxdg@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <321187aa-69e8-ed78-7402-89026e1e9558@redhat.com>
-Date: Tue, 4 Dec 2018 15:48:38 +0100
+	(envelope-from <drjones@redhat.com>) id 1gUC13-0007Sw-Kg
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:49:39 -0500
+Date: Tue, 4 Dec 2018 15:49:13 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20181204144913.2awwajttbtu2cjur@kamzik.brq.redhat.com>
+References: <20181130130032.11835-1-sameo@linux.intel.com>
+	<20181130130032.11835-5-sameo@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8rx-ZzHfb5ABcGBHOWDcDwxOejxp_SW9LLuOf1-_cxdg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] hax_enabled() cannot be called in vl.c
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181130130032.11835-5-sameo@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v3 4/8] hw: arm: Carry RSDP specific data
+ through AcpiRsdpData
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,21 +24,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Vincent Palatin <vpalatin@chromium.org>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Samuel Ortiz <sameo@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 04/12/18 15:45, Peter Maydell wrote:
-> kvm_enabled() does a similar thing to what hax_enabled() does,
-> but this works out OK because it takes care to avoid
-> providing the #define-to-0 implementation except in the
-> case where it is building a target-specific file for a
-> target where KVM is not enabled; for common files it
-> will provide the function prototype which will end up
-> linking to a stub implementation. So we could handle hax
-> like that too.
+On Fri, Nov 30, 2018 at 02:00:28PM +0100, Samuel Ortiz wrote:
+> That will allow us to generalize the ARM build_rsdp() routine to support
+> both legacy RSDP (The current i386 implementation) and extended RSDP
+> (The ARM implementation).
+> 
+> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  include/hw/acpi/acpi-defs.h |  8 ++++++++
+>  hw/arm/virt-acpi-build.c    | 18 +++++++++++++-----
+>  2 files changed, 21 insertions(+), 5 deletions(-)
+>
 
-Yes, the KVM one is the correct way to do it.  The #define-to-0
-implementation is used so that the compiler can optimize out more code,
-the function acts as a fallback.
-
-Paolo
+Reviewed-by: Andrew Jones <drjones@redhat.com>
