@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gUAJ2-0003qa-Fs
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:00:05 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gUANd-0005Wc-IA
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:04:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gUAJ1-0003b2-E1
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:00:04 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:39017)
+	(envelope-from <peter.maydell@linaro.org>) id 1gUANc-0006Vg-3D
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:04:49 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:37322)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gUAJ1-0003a1-8V
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:00:03 -0500
-Received: by mail-ot1-x341.google.com with SMTP id n8so11185269otl.6
-	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 05:00:03 -0800 (PST)
+	id 1gUANa-0006NL-Sv
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:04:47 -0500
+Received: by mail-oi1-x241.google.com with SMTP id y23so14171081oia.4
+	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 05:04:46 -0800 (PST)
 MIME-Version: 1.0
-References: <1543865209-50994-1-git-send-email-peng.hao2@zte.com.cn>
-	<CAFEAcA-oFFz-NtfwHmORxQd4rHsfKa1=tV1kyvPuGQoOZwDB3A@mail.gmail.com>
-	<20181204124739.GA17825@redhat.com>
-In-Reply-To: <20181204124739.GA17825@redhat.com>
+References: <20181116105729.23240-1-clg@kaod.org>
+	<20181116105729.23240-28-clg@kaod.org>
+	<20181129040917.GF14697@umbus.fritz.box>
+	<CAFEAcA8=xJCoTmXmygpK2yVdq5Viqi-dQoiTJrML=goutzKujQ@mail.gmail.com>
+	<f92e8c2c-3384-ba88-3d85-0c168441b052@kaod.org>
+In-Reply-To: <f92e8c2c-3384-ba88-3d85-0c168441b052@kaod.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 4 Dec 2018 12:59:51 +0000
-Message-ID: <CAFEAcA_ovMgKPPjtYVASFqhzM7MX79EJYMZuFY4-FGRh4oqN8A@mail.gmail.com>
+Date: Tue, 4 Dec 2018 13:04:34 +0000
+Message-ID: <CAFEAcA_3Qy1R8uOT_QayXfUneQT0_rL3J3Rv_uTG0DDFSCyRvQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V11 0/8] add pvpanic mmio support
+Subject: Re: [Qemu-devel] [PATCH v5 27/36] sysbus: add a sysbus_mmio_unmap()
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +34,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Peng Hao <peng.hao2@zte.com.cn>, Andrew Jones <drjones@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, 4 Dec 2018 at 12:47, Daniel P. Berrang=C3=A9 <berrange@redhat.com> =
-wrote:
-> After it had merged there were some changes and the question of turning
-> it into a PCI device was raised. Paolo was concerned that the guest OS
-> is in an unknown state (arbitrary locks held, data structures corrupt,
-> etc) when panic is fired, so simplicity of the I/O port was desirable:
+On Tue, 4 Dec 2018 at 12:33, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> A completely new interrupt controller was introduced on the POWER9
+> processor and it uses MMIO regions for interrupt management. These
+> regions are backed by simple MRs in QEMU, when using TCG, and backed
+> by ram_device_ptr MRs under KVM.
 >
->   https://lists.gnu.org/archive/html/qemu-devel/2013-08/msg03309.html
+> Difficulties arise with the fact that POWER9 pseries guests need
+> to support the old mode (XICS, no MMIOs) and the new mode XIVE.
+> The interrupt mode is negotiated at boot between the hypervisor
+> and the guest and a reset is generated to take into account
+> the changes. Which means that, at reset, we may need to disconnect
+> from a KVM IC device and reconnect to another.
+
+This is a painful API for QEMU to implement, incidentally,
+because we don't have any concept really of a warm reset. In
+theory reset should get you back to exactly the same state
+as if you'd just started QEMU. You can probably bodge something
+together, though.
+
+> When switching from XICS to XIVE mode :
 >
-> Anthony countered that even a PCI device could simply do an outb() in
-> config space:
+>   if kvm
+>     - destroy KVM XICS device
+>     - create KVM XIVE device
+>     - get fd, mmap, init ram_device_ptr MRs
+>     - map mmio
+>   - enable MMIOs
 >
->   https://lists.gnu.org/archive/html/qemu-devel/2013-08/msg03325.html
+> When switching from XIVE to XICS  :
 >
-> So it is not clear using a PCI device is in fact a problem in terms of
-> reliability at time of firing.
+>   - disable MMIOs
+>   if kvm
+>     - delete MRs
+>     - munmap
+>     - destroy KVM XIVE device
+>     - create KVM XICS device
 
-...and if we'd done it that way in the first place for x86 then
-we wouldn't be having to do anything at all now for Arm.
-That suggests to me that we should do it that way now, and then we
-can avoid having to do a bunch of extra development work for the
-next architecture, or the next interesting Arm board model.
-
-> Perhaps more relevant is the question of how easily it can be initialized=
-,
-> as that affects whether it can be used for panics during very early boot,
-> or from firmware:
->
->   https://lists.gnu.org/archive/html/qemu-devel/2013-08/msg03296.html
-
-Mmm, firmware and early boot panic is potentially an interesting
-use case. Does UEFI actually make use of it, though? A quick look
-at the kernel source for the x86 pvpanic driver suggests it doesn't
-take any particular steps to ensure that it is initialized early,
-though I guess acpi drivers probably init before PCI.
-
-I notice also that there's a mention in that thread that the pvpanic
-ACPI table entry on x86 resulted in unhelpful Windows notifications
-about new devices it didn't understand. Is that going to be an issue
-for Arm with this mmio pvpanic ?
-
-> Finally, there is also the point that PCI slots are precious, and this
-> is something to be enabled out of the box on all VMs, so you'd be removin=
-g
-> one extra PCI slot from general usage. Thus mgmt apps would need to start
-> adding PCI bridges sooner. Not a blocker but something to bear in mind
-> when weighing up options.
-
-Space in the 'virt' memory map for random MMIO devices is also a limited
-resource, especially if you want something in the <4GB space.
+This seems basically OK, I think.
 
 thanks
 -- PMM
