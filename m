@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gUB47-0005zj-Ay
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:48:44 -0500
+	(envelope-from <renyime@gmail.com>) id 1gUB5J-0007We-7i
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:49:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gUB46-000140-8u
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:48:43 -0500
-Date: Tue, 4 Dec 2018 13:48:30 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181204134830.GB17825@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1543865209-50994-1-git-send-email-peng.hao2@zte.com.cn>
-	<CAFEAcA-oFFz-NtfwHmORxQd4rHsfKa1=tV1kyvPuGQoOZwDB3A@mail.gmail.com>
-	<20181204124739.GA17825@redhat.com>
-	<CAFEAcA_ovMgKPPjtYVASFqhzM7MX79EJYMZuFY4-FGRh4oqN8A@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_ovMgKPPjtYVASFqhzM7MX79EJYMZuFY4-FGRh4oqN8A@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V11 0/8] add pvpanic mmio support
+	(envelope-from <renyime@gmail.com>) id 1gUB5F-0001ve-85
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:49:57 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:43345)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <renyime@gmail.com>) id 1gUB5E-0001rS-Si
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:49:53 -0500
+Received: by mail-pg1-x542.google.com with SMTP id v28so7394670pgk.10
+	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 05:49:47 -0800 (PST)
+From: Ivan Ren <renyime@gmail.com>
+Date: Tue,  4 Dec 2018 21:49:40 +0800
+Message-Id: <1543931380-1773-1-git-send-email-ivanren@tencent.com>
+Subject: [Qemu-devel] [PATCH] permit dynamic adjust compress level when
+ migration running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,62 +24,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Peng Hao <peng.hao2@zte.com.cn>, Andrew Jones <drjones@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: quintela@redhat.com, dgilbert@redhat.com
+Cc: qemu-devel@nongnu.org
 
-On Tue, Dec 04, 2018 at 12:59:51PM +0000, Peter Maydell wrote:
-> On Tue, 4 Dec 2018 at 12:47, Daniel P. Berrang=C3=A9 <berrange@redhat.c=
-om> wrote:
-> > After it had merged there were some changes and the question of turni=
-ng
-> > it into a PCI device was raised. Paolo was concerned that the guest O=
-S
-> > is in an unknown state (arbitrary locks held, data structures corrupt=
-,
-> > etc) when panic is fired, so simplicity of the I/O port was desirable=
-:
-> >
-> >   https://lists.gnu.org/archive/html/qemu-devel/2013-08/msg03309.html
-> >
-> > Anthony countered that even a PCI device could simply do an outb() in
-> > config space:
-> >
-> >   https://lists.gnu.org/archive/html/qemu-devel/2013-08/msg03325.html
-> >
-> > So it is not clear using a PCI device is in fact a problem in terms o=
-f
-> > reliability at time of firing.
->=20
-> ...and if we'd done it that way in the first place for x86 then
-> we wouldn't be having to do anything at all now for Arm.
-> That suggests to me that we should do it that way now, and then we
-> can avoid having to do a bunch of extra development work for the
-> next architecture, or the next interesting Arm board model.
+After commit dcaf446ebda5d87e05eb41cdbafb7ae4a7cc4a62, we can't
+dynamic adjust the compress level when migration running.
+For some scenes, dynamic adjust the compress level to change the
+compress behavior without restart a new migration is useful.
 
-On s390 there's always a panic notifier mechanism as it is a
-integral part of the architecture.
+Signed-off-by: Ivan Ren <ivanren@tencent.com>
+---
+ migration/ram.c | 32 ++++++++++++++++++++++++++++++--
+ 1 file changed, 30 insertions(+), 2 deletions(-)
 
-On PowerPC, pSeries guests have access to a panic notifier provided
-by the firmware.
-
-On x86, as well as pvpanic, there is also a paravirtualized
-option defined by the HyperV extensions "hv_crash"
-
-IIUC a PCI based solution would be usable on x86, s390, powerpc (pseries)=
-,
-aarch64 (virt) and eventually riscv (virt). Of those, it is only
-aarch64 and riscv that lack a panic notifier solution today.
-
-I feel like we've already lost from the pov of a standardized solution,
-but that doesn't mean we shouldn't still consider using PCI if it does
-look like the best otion for arm/riscv.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+diff --git a/migration/ram.c b/migration/ram.c
+index 7e7deec..653a484 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -361,6 +361,7 @@ struct CompressParam {
+ 
+     /* internally used fields */
+     z_stream stream;
++    int current_compress_level;
+     uint8_t *originbuf;
+ };
+ typedef struct CompressParam CompressParam;
+@@ -394,6 +395,27 @@ static QemuThread *decompress_threads;
+ static QemuMutex decomp_done_lock;
+ static QemuCond decomp_done_cond;
+ 
++static int initial_compress_stream(CompressParam *param)
++{
++    int ret = -1;
++    int current_compress_level = 0;
++
++    if (param == NULL) {
++        goto exit;
++    }
++
++    current_compress_level = migrate_compress_level();
++    if (deflateInit(&(param->stream), current_compress_level) != Z_OK) {
++        goto exit;
++    }
++
++    param->current_compress_level = current_compress_level;
++    return 0;
++
++exit:
++    return ret;
++}
++
+ static bool do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
+                                  ram_addr_t offset, uint8_t *source_buf);
+ 
+@@ -410,6 +432,12 @@ static void *do_data_compress(void *opaque)
+             block = param->block;
+             offset = param->offset;
+             param->block = NULL;
++            if (param->current_compress_level != migrate_compress_level()) {
++                if (initial_compress_stream(param) != 0) {
++                    qemu_file_set_error(migrate_get_current()->to_dst_file, -1);
++                    error_report("fail to update compress stream!");
++                }
++            }
+             qemu_mutex_unlock(&param->mutex);
+ 
+             zero_page = do_compress_ram_page(param->file, &param->stream,
+@@ -488,8 +516,8 @@ static int compress_threads_save_setup(void)
+             goto exit;
+         }
+ 
+-        if (deflateInit(&comp_param[i].stream,
+-                        migrate_compress_level()) != Z_OK) {
++        if (initial_compress_stream(&comp_param[i]) != 0) {
++            error_report("fail to initial compress stream!");
+             g_free(comp_param[i].originbuf);
+             goto exit;
+         }
+-- 
+1.8.3.1
