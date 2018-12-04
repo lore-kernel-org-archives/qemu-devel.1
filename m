@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maran.wilson@oracle.com>) id 1gUJRw-0004CN-6i
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 17:45:57 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gUKI5-0006eU-0s
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 18:39:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maran.wilson@oracle.com>) id 1gUJRl-0005Uh-Lv
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 17:45:46 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:43936)
+	(envelope-from <no-reply@patchew.org>) id 1gUKHz-0005Sb-D6
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 18:39:44 -0500
+Resent-Message-Id: <E1gUKHz-0005Sb-D6@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21765)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maran.wilson@oracle.com>)
-	id 1gUJRk-0005P2-O7
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 17:45:41 -0500
-References: <CAGxU2F7+NZUS-BQ1hCnKynVxfsVUYTHRCWQvJwBA12bYmg0ZJA@mail.gmail.com>
-	<938a2f54426dc059428fcfe1882bbb3b2d5cbc99.camel@intel.com>
-	<CAGxU2F50U=NH8fGDXygcYycjoveNpdbKnnG3H0soCvub_Ea5cw@mail.gmail.com>
-	<CAGxU2F7SA-kc0gsLNaUzbiinytJ2DF_r5UpB1JzRy-Su1_WOLw@mail.gmail.com>
-	<a1ca57134a970fb3282afb36c0e3b5647b104ff8.camel@intel.com>
-	<CAGxU2F7Sg0JaxyPQw_FhSc6MzYu+YzZpv9=VHp8qvwfTWpf_MQ@mail.gmail.com>
-From: Maran Wilson <maran.wilson@oracle.com>
-Message-ID: <59cc9e47-3c2a-2417-9e89-e7ade92fdf2d@oracle.com>
-Date: Tue, 4 Dec 2018 14:44:33 -0800
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gUKHx-00056o-VA
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 18:39:38 -0500
+In-Reply-To: <20181204184657.78028-1-vsementsov@virtuozzo.com>
+Message-ID: <154396583118.19757.9923366898015277531@c26723477dc9>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <CAGxU2F7Sg0JaxyPQw_FhSc6MzYu+YzZpv9=VHp8qvwfTWpf_MQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] QEMU/NEMU boot time with several x86 firmwares
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 4 Dec 2018 15:23:52 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/5] crypto threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,107 +28,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>, Rob Bradford <robert.bradford@intel.com>
-Cc: Samuel Ortiz <sameo@linux.intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Liam Merwick <liam.merwick@oracle.com>
+To: vsementsov@virtuozzo.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
 
-On 12/3/2018 8:35 AM, Stefano Garzarella wrote:
-> On Mon, Dec 3, 2018 at 4:44 PM Rob Bradford <robert.bradford@intel.com> wrote:
->> Hi Stefano, thanks for capturing all these numbers,
->>
->> On Mon, 2018-12-03 at 15:27 +0100, Stefano Garzarella wrote:
->>> Hi Rob,
->>> I continued to investigate the boot time, and as you suggested I
->>> looked also at qemu-lite 2.11.2
->>> (https://github.com/kata-containers/qemu) and NEMU "virt" machine. I
->>> did the following tests using the Kata kernel configuration
->>> (
->>> https://github.com/kata-containers/packaging/blob/master/kernel/configs/x86_64_kata_kvm_4.14.x
->>> )
->>>
->>> To compare the results with qemu-lite direct kernel load, I added
->>> another tracepoint:
->>> - linux_start_kernel: first entry of the Linux kernel
->>> (start_kernel())
->>>
->> Great, do you have a set of patches available that all these trace
->> points. It would be great for reproduction.
-> For sure! I'm attaching a set of patches for qboot, seabios, ovmf,
-> nemu/qemu/qemu-lite and linux 4.14 whit the tracepoints.
-> I'm also sharing a python script that I'm using with perf to extract
-> the numbers in this way:
->
-> $ perf record -a -e kvm:kvm_entry -e kvm:kvm_pio -e
-> sched:sched_process_exec -o /tmp/qemu_perf.data &
-> $ # start qemu/nemu multiple times
-> $ killall perf
-> $ perf script -s qemu-perf-script.py -i /tmp/qemu_perf.data
->
->>> As you can see, NEMU is faster to jump to the kernel
->>> (linux_start_kernel) than qemu-lite when uses qboot or seabios with
->>> virt support, but the time to the user space is strangely high, maybe
->>> the kernel configuration that I used is not the best one.
->>> Do you suggest another kernel configuration?
->>>
->> This looks very bad. This isn't the kernel configuration we normally
->> test with in our automated test system but is definitely one we support
->> as part of our partnernship with the Kata team. It's a high priority
->> for me to try and investigate that. Have you saved the kernel messages
->> as they might be helpful?
-> Yes, I'm attaching the dmesg output with nemu and qemu.
->
->>> Anyway, I obtained the best boot time with qemu-lite and direct
->>> kernel
->>> load (vmlinux ELF image). I think because the kernel was not
->>> compressed. Indeed, looking to the others test, the kernel
->>> decompression (bzImage) takes about 80 ms (linux_start_kernel -
->>> linux_start_boot). (I'll investigate better)
->>>
->> Yup being able to load an uncompressed kernel is one of the big
->> advantages of qemu-lite. I wonder if we could bring that feature into
->> qemu itself to supplement the existing firmware based kernel loading.
-> I think so, I'll try to understand if we can merge the qemu-lite
-> direct kernel loading in qemu.
-
-An attempt was made a long time ago to push the qemu-lite stuff (from 
-the Intel Clear Containers project) upstream. As I understand it, the 
-main stumbling block that seemed to derail the effort was that it 
-involved adding Linux OS specific code to Qemu so that Qemu could do 
-things like create and populate the zero page that Linux expects when 
-entering startup_64().
-
-That ends up being a lot of very low-level, operating specific knowledge 
-about Linux that ends up getting baked into Qemu code. And 
-understandably, a number of folks saw problems with going down a path 
-like that.
-
-Since then, we have put together an alternative solution that would 
-allow Qemu to boot an uncompressed Linux binary via the x86/HVM direct 
-boot ABI (https://xenbits.xen.org/docs/unstable/misc/pvh.html). The 
-solution involves first making changes to both the ABI as well as Linux, 
-and then updating Qemu to take advantage of the updated ABI which is 
-already supported by both Linux and Free BSD for booting VMs. As such, 
-Qemu can remain OS agnostic, and just be programmed to the published ABI.
-
-The canonical definition for the HVM direct boot ABI is in the Xen tree 
-and we needed to make some minor changes to the ABI definition to allow 
-KVM guests to also use the same structure and entry point. Those changes 
-were accepted to the Xen tree already:
-https://lists.xenproject.org/archives/html/xen-devel/2018-04/msg00057.html
-
-The corresponding Linux changes that would allow KVM guests to be booted 
-via this PVH entry point have already been posted and reviewed:
-https://lkml.org/lkml/2018/4/16/1002
-
-The final part is the set of Qemu changes to take advantage of the above 
-and boot a KVM guest via an uncompressed kernel binary using the entry 
-point defined by the ABI. Liam Merwick will be posting some RFC patches 
-very soon to allow this.
-
-Thanks,
--Maran
-
->
-> Thanks,
-> Stefano
->
->
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIwNDE4NDY1Ny43ODAy
+OC0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQg
+dGhlIGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0
+aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBp
+bnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVT
+VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlj
+a0BjZW50b3M3IFNIT1dfRU5WPTEgSj04Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpsaWJwbWVt
+IHN1cHBvcnQgICBubwpsaWJ1ZGV2ICAgICAgICAgICBubwoKV0FSTklORzogVXNlIG9mIFNETCAx
+LjIgaXMgZGVwcmVjYXRlZCBhbmQgd2lsbCBiZSByZW1vdmVkIGluCldBUk5JTkc6IGZ1dHVyZSBy
+ZWxlYXNlcy4gUGxlYXNlIHN3aXRjaCB0byB1c2luZyBTREwgMi4wCgpOT1RFOiBjcm9zcy1jb21w
+aWxlcnMgZW5hYmxlZDogICdjYycKICBHRU4gICAgIHg4Nl82NC1zb2Z0bW11L2NvbmZpZy1kZXZp
+Y2VzLm1hay50bXAKLS0tCiAgQ0MgICAgICB0ZXN0cy91c2ItaGNkLXVoY2ktdGVzdC5vCiAgQ0Mg
+ICAgICB0ZXN0cy91c2ItaGNkLXhoY2ktdGVzdC5vCi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90
+ZXN0LWNyeXB0by1ibG9jay5jOiBJbiBmdW5jdGlvbiAndGVzdF9ibG9jayc6Ci90bXAvcWVtdS10
+ZXN0L3NyYy90ZXN0cy90ZXN0LWNyeXB0by1ibG9jay5jOjMxMDozMDogZXJyb3I6IHBhc3Npbmcg
+YXJndW1lbnQgNiBvZiAncWNyeXB0b19ibG9ja19vcGVuJyBtYWtlcyBpbnRlZ2VyIGZyb20gcG9p
+bnRlciB3aXRob3V0IGEgY2FzdCBbLVdlcnJvcl0KICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgTlVMTCk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KSW4gZmlsZSBpbmNsdWRl
+ZCBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LWNyeXB0by1ibG9jay5jOjI0OjA6
+Ci90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL2NyeXB0by9ibG9jay5oOjEwNzoxNTogbm90ZTog
+ZXhwZWN0ZWQgJ2ludCcgYnV0IGFyZ3VtZW50IGlzIG9mIHR5cGUgJ3ZvaWQgKicKIFFDcnlwdG9C
+bG9jayAqcWNyeXB0b19ibG9ja19vcGVuKFFDcnlwdG9CbG9ja09wZW5PcHRpb25zICpvcHRpb25z
+LAogICAgICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LWNyeXB0by1i
+bG9jay5jOjMxMDozMDogZXJyb3I6IHRvbyBmZXcgYXJndW1lbnRzIHRvIGZ1bmN0aW9uICdxY3J5
+cHRvX2Jsb2NrX29wZW4nCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE5VTEwpOwogICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBeCkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdG1wL3Fl
+bXUtdGVzdC9zcmMvdGVzdHMvdGVzdC1jcnlwdG8tYmxvY2suYzoyNDowOgovdG1wL3FlbXUtdGVz
+dC9zcmMvaW5jbHVkZS9jcnlwdG8vYmxvY2suaDoxMDc6MTU6IG5vdGU6IGRlY2xhcmVkIGhlcmUK
+IFFDcnlwdG9CbG9jayAqcWNyeXB0b19ibG9ja19vcGVuKFFDcnlwdG9CbG9ja09wZW5PcHRpb25z
+ICpvcHRpb25zLAogICAgICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0
+LWNyeXB0by1ibG9jay5jOjMxODozMDogZXJyb3I6IHBhc3NpbmcgYXJndW1lbnQgNiBvZiAncWNy
+eXB0b19ibG9ja19vcGVuJyBtYWtlcyBpbnRlZ2VyIGZyb20gcG9pbnRlciB3aXRob3V0IGEgY2Fz
+dCBbLVdlcnJvcl0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJmVycm9yX2Fib3J0KTsK
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Rt
+cC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtY3J5cHRvLWJsb2NrLmM6MjQ6MDoKL3RtcC9xZW11
+LXRlc3Qvc3JjL2luY2x1ZGUvY3J5cHRvL2Jsb2NrLmg6MTA3OjE1OiBub3RlOiBleHBlY3RlZCAn
+aW50JyBidXQgYXJndW1lbnQgaXMgb2YgdHlwZSAnc3RydWN0IEVycm9yICoqJwogUUNyeXB0b0Js
+b2NrICpxY3J5cHRvX2Jsb2NrX29wZW4oUUNyeXB0b0Jsb2NrT3Blbk9wdGlvbnMgKm9wdGlvbnMs
+CiAgICAgICAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtY3J5cHRvLWJs
+b2NrLmM6MzE4OjMwOiBlcnJvcjogdG9vIGZldyBhcmd1bWVudHMgdG8gZnVuY3Rpb24gJ3Fjcnlw
+dG9fYmxvY2tfb3BlbicKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJmVycm9yX2Fib3J0
+KTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgpJbiBmaWxlIGluY2x1ZGVkIGZyb20g
+L3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtY3J5cHRvLWJsb2NrLmM6MjQ6MDoKL3RtcC9x
+ZW11LXRlc3Qvc3JjL2luY2x1ZGUvY3J5cHRvL2Jsb2NrLmg6MTA3OjE1OiBub3RlOiBkZWNsYXJl
+ZCBoZXJlCiBRQ3J5cHRvQmxvY2sgKnFjcnlwdG9fYmxvY2tfb3BlbihRQ3J5cHRvQmxvY2tPcGVu
+T3B0aW9ucyAqb3B0aW9ucywKICAgICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvdGVz
+dHMvdGVzdC1jcnlwdG8tYmxvY2suYzozMzI6MzA6IGVycm9yOiBwYXNzaW5nIGFyZ3VtZW50IDYg
+b2YgJ3FjcnlwdG9fYmxvY2tfb3BlbicgbWFrZXMgaW50ZWdlciBmcm9tIHBvaW50ZXIgd2l0aG91
+dCBhIGNhc3QgWy1XZXJyb3JdCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICZlcnJvcl9h
+Ym9ydCk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KSW4gZmlsZSBpbmNsdWRlZCBm
+cm9tIC90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LWNyeXB0by1ibG9jay5jOjI0OjA6Ci90
+bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL2NyeXB0by9ibG9jay5oOjEwNzoxNTogbm90ZTogZXhw
+ZWN0ZWQgJ2ludCcgYnV0IGFyZ3VtZW50IGlzIG9mIHR5cGUgJ3N0cnVjdCBFcnJvciAqKicKIFFD
+cnlwdG9CbG9jayAqcWNyeXB0b19ibG9ja19vcGVuKFFDcnlwdG9CbG9ja09wZW5PcHRpb25zICpv
+cHRpb25zLAogICAgICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LWNy
+eXB0by1ibG9jay5jOjMzMjozMDogZXJyb3I6IHRvbyBmZXcgYXJndW1lbnRzIHRvIGZ1bmN0aW9u
+ICdxY3J5cHRvX2Jsb2NrX29wZW4nCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICZlcnJv
+cl9hYm9ydCk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KSW4gZmlsZSBpbmNsdWRl
+ZCBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LWNyeXB0by1ibG9jay5jOjI0OjA6
+CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8y
+MDE4MTIwNDE4NDY1Ny43ODAyOC0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbS90ZXN0aW5nLmRv
+Y2tlci1xdWlja0BjZW50b3M3Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
+b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
+eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
