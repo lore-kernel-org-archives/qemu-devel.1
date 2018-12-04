@@ -1,35 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56964)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1gTyh6-0002jr-Mn
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 19:36:09 -0500
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gTyms-0005JW-Nq
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 19:42:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1gTyh3-0005q8-Gh
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 19:36:08 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42544
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1gTyh3-0005pE-9a
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 19:36:05 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wB40YWl9022120
-	for <qemu-devel@nongnu.org>; Mon, 3 Dec 2018 19:36:04 -0500
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2p5dcubk4h-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 19:36:04 -0500
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
-	Tue, 4 Dec 2018 00:36:03 -0000
-From: Farhan Ali <alifm@linux.ibm.com>
-Date: Mon,  3 Dec 2018 19:35:57 -0500
-In-Reply-To: <cover.1543883650.git.alifm@linux.ibm.com>
-References: <cover.1543883650.git.alifm@linux.ibm.com>
-Message-Id: <390c0b08c7beb83da3a8ef5b880db223a096d525.1543883650.git.alifm@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH for 3.1? or 4 v4 1/1] qemu-iotests: Don't run
- the test when user is root
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gTymq-0003eg-QT
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 19:42:06 -0500
+Date: Tue, 4 Dec 2018 08:41:51 +0800 (CST)
+Message-ID: <201812040841510784684@zte.com.cn>
+In-Reply-To: <CAFEAcA-oFFz-NtfwHmORxQd4rHsfKa1=tV1kyvPuGQoOZwDB3A@mail.gmail.com>
+References: 1543865209-50994-1-git-send-email-peng.hao2@zte.com.cn,
+	CAFEAcA-oFFz-NtfwHmORxQd4rHsfKa1=tV1kyvPuGQoOZwDB3A@mail.gmail.com
+Mime-Version: 1.0
+From: <peng.hao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH_V11_0/8=5D_add_pvpanic_mmio_supp?=
+ =?utf-8?q?ort?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,37 +26,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, kwolf@redhat.com, eblake@redhat.com, alifm@linux.ibm.com
+To: peter.maydell@linaro.org
+Cc: drjones@redhat.com, philmd@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-Test 232 creates image files with read-only permission and
-expects an error message when trying to access the image
-files with read-only and auto-read-only turned off.
-
-Don't run as root user, since root can open files with read/write
-access for read-only files.
-
-Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- tests/qemu-iotests/232 | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/tests/qemu-iotests/232 b/tests/qemu-iotests/232
-index 0708b8b..1d34242 100755
---- a/tests/qemu-iotests/232
-+++ b/tests/qemu-iotests/232
-@@ -92,6 +92,11 @@ echo
- 
- chmod a-w $TEST_IMG
- 
-+if [ -w $TEST_IMG ]
-+then
-+    _notrun "Cannot run this test as root user"
-+fi
-+
- run_qemu_info_block -drive driver=file,file="$TEST_IMG",if=none,read-only=on,auto-read-only=off
- run_qemu_info_block -drive driver=file,file="$TEST_IMG",if=none,read-only=on,auto-read-only=on
- run_qemu_info_block -drive driver=file,file="$TEST_IMG",if=none,read-only=on
--- 
-2.7.4
+Pk9uIE1vbiwgMyBEZWMgMjAxOCBhdCAxMTowNCwgUGVuZyBIYW8gPHBlbmcuaGFvMkB6dGUuY29t
+LmNuPiB3cm90ZToKPj4KPj4gVGhlIGZpcnN0IHBhdGNoZXMgYXJlIHNpbXBsZSBjbGVhbnVwczoK
+Pj4gICAgICAtIHBhdGNoIDEgbW92ZSB0aGUgcHZwYW5pYyBkZXZpY2Ugd2l0aCB0aGUgJ29jbW1v
+biBvYmplY3RzJyBzbyB3ZSBjb21waWxlCj4+ICAgICAgICAgICAgICAgIGl0IG9uY2UgZm9yIHRo
+ZSB4ODYvYXJtL2FhcmNoNjQgYXJjaHMsCj4+ICAgICAgLSBwYXRjaCAyIHNpbXBseSByZW5hbWVz
+IElTQSBmaWVsZHMvZGVmaW5pdGlvbnMgdG8gZ2VuZXJpYyBvbmVzLgo+Pgo+PiAgICAgIFRoZW4g
+aW5zdGVhZCBvZiBhZGQvdXNlIHRoZSBNTUlPIHB2cGFuaWMgZGV2aWNlIGluIHRoZSB2aXJ0IG1h
+Y2hpbmUgaW4gYW4KPj4gICAgICB1bmlxdWUgcGF0Y2gsIEkgc3BsaXQgaXQgaW4gdHdvIGRpc3Rp
+bmN0IHBhdGNoZXM6Cj4+ICAgICAgLSBwYXRjaCAzIHVzZXMgUGVuZyBIYW8ncyB3b3JrLCBidXQg
+YWRkIHRoZSBNTUlPIGludGVyZmFjZSB0byB0aGUgZXhpc3RpbmcKPj4gICAgICAgICBkZXZpY2Ug
+KG5vIGxvZ2ljYWwgY2hhbmdlKS4KPj4gICAgICAtIHBhdGNoIDQgaXMgUGVuZyBIYW8ncyB3b3Jr
+IGluIHRoZSB2aXJ0IG1hY2hpbmUgKG5vIGxvZ2ljYWwgY2hhbmdlKS4KPj4gICAgICAtIHBhdGNo
+IDUgYWRkIHB2cGFuaWMgZGV2aWNlIGluIGFjcGkgdGFibGUgaW4gdmlydCBtYWNoaW5lCj4+ICAg
+ICAgdjIgZnJvbSBQZW5nIEhhbyBpczoKPj4gICAgICBodHRwczovL2xpc3RzLmdudS5vcmcvYXJj
+aGl2ZS9odG1sL3FlbXUtZGV2ZWwvMjAxOC0xMC9tc2cwMzQzMy5odG1sCj4KPkkgd291bGQgc3Rp
+bGwgcHJlZmVyIHRvIHNlZSBhIG1vcmUgZGV0YWlsZWQgZXhhbWluYXRpb24gb2Ygd2hldGhlcgo+
+d2UgY2FuIGRvIHRoaXMgd2l0aCBhIFBDSSBkZXZpY2UgYmVmb3JlIHdlIGNvbW1pdCB0byB0YWtp
+bmcgdGhlCj5NTUlPIHZlcnNpb24gaW50byB0aGUgdmlydCBib2FyZC4KCkknbSBzb3JyeSBJIHRo
+b3VnaHQgSSBoYWQgc2VudCBhbiBlbWFpbC4geWVzdGVyZGF5IHdoZW4gSSB3cm90ZSBhbiBlbWFp
+bCB0byAKZXhwbGFpbiB0aGUgcmVhc29uLCBJIHdhcyBpbnRlcnJ1cHRlZCBhbmQgZm9yZ290IHRv
+IHNlbmQgaXQgb3V0LgoKTm93IHRoZSBwdnBhbmljIGRldmljZSBpcyBpbXBsZW1lbnRlZCBhcyBh
+IG1taW8gZGV2aWNlIG9yIGFuIEFDUEkgZGV2aWNlIGluIHRoZSBrZXJuZWwsIAphbmQgb25seSBv
+bmUgZGV2aWNlIGNhbiBiZSBzZWVuIGF0IHRoZSBzYW1lIHRpbWUuIElmIHRoZSBrZXJuZWwgcGFy
+c2VzIEZEVCBmaXJzdCwgdGhlbiBwdnBhbmljICAKaXMgYSBtbWlvIGRldmljZS4gVGhlIGtlcm5l
+bCBwYXJzZXMgQUNQSSB0YWJsZSBmaXJzdChhbmQgdmlydHVhbCBtYWNoaW5lIGlzIGNvbmZpZ3Vy
+ZWQgd2l0aCBBQ1BJKSwgCmFuZCBwdnBhbmljICBpcyBhbiBBQ1BJIGRldmljZS4KSWYgcHZwYW5p
+YyBpcyBpbXBsZW1lbnRlZCBhcyBhIFBDSSBkZXZpY2UsIHRoZW4gdGhlIFBDSSBkZXZpY2UgbXVz
+dCBzdGlsbCBiZSBzZWVuIHdoZW4gdGhlIEFDUEkgdGFibGUgCmlzIGZpcnN0IHBhcnNlZCBieSB0
+aGUga2VybmVsLCBiZWNhdXNlIEFDUEkgZGV2aWNlIHJlbGllcyBvbiB0aGUgbW1pbyBzcGFjZSBv
+ZiB0aGUgUENJIGRldmljZS4KTW1pbyBkZXZpY2VzIGNhbiBiZSB0aG91Z2h0IG9mIGFzIGp1c3Qg
+YW4gYWRkcmVzcyBzcGFjZSByYXRoZXIgdGhhbiBhIGRldmljZSBpbiB0aGUgc3RyaWN0IHNlbnNl
+LgoKU2Vjb25kbHksIEkgZG9uJ3Qgd2FudCBpdCB0byBiZSBhIHBsdWdnYWJsZSBkZXZpY2UuIElm
+IHRoZSB1c2VyIGRlbGV0ZXMgdGhlIGRldmljZSBieSBtaXN0YWtlLCBpdCBtYXkgbGVhZCB0byB1
+bnByZWRpY3RhYmxlIHJlc3VsdHMuCgp0aGFua3MuCj50aGFua3MKPi0tIFBNTQ==
