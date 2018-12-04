@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gUDnL-0001Zo-Dh
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:43:36 -0500
+	(envelope-from <philmd@redhat.com>) id 1gUED0-00026K-Es
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:10:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gUDnJ-0001ZI-Tk
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:43:35 -0500
-Date: Tue, 4 Dec 2018 17:43:05 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181204174305.34a8644d@redhat.com>
-In-Reply-To: <20181204151052.otrsahh4dqehiwif@kamzik.brq.redhat.com>
-References: <20181130130032.11835-1-sameo@linux.intel.com>
-	<20181130130032.11835-9-sameo@linux.intel.com>
-	<20181204151052.otrsahh4dqehiwif@kamzik.brq.redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1gUEBf-0003Ku-TK
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:08:48 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:39916)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gUEBf-0003I6-Gu
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:08:43 -0500
+Received: by mail-wr1-f68.google.com with SMTP id t27so16774541wra.6
+	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 09:08:38 -0800 (PST)
+References: <20181204132952.2601-1-peter.maydell@linaro.org>
+	<20181204132952.2601-5-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <4485390f-5c05-d9f8-b43b-c8811519e638@redhat.com>
+Date: Tue, 4 Dec 2018 18:08:33 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 8/8] hw: acpi: Remove AcpiRsdpDescriptor
- and fix tests
+In-Reply-To: <20181204132952.2601-5-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 4/5] tests/test-arm-mptimer: Don't leak
+ string memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,209 +31,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: Samuel Ortiz <sameo@linux.intel.com>, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On Tue, 4 Dec 2018 16:10:52 +0100
-Andrew Jones <drjones@redhat.com> wrote:
+On 4/12/18 14:29, Peter Maydell wrote:
+> The test-arm-mptimer setup creates a lot of test names using
+> g_strdup_printf() and never frees them. This is entirely
+> harmless since it's one-shot test code, but it clutters
+> up the output from clang's LeakSanitizer. Refactor to
+> use a helper function so we can free the memory.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-> On Fri, Nov 30, 2018 at 02:00:32PM +0100, Samuel Ortiz wrote:
-> > The only remaining AcpiRsdpDescriptor users are the ACPI utils for the
-> > BIOS table tests.
-> > We remove that dependency and can thus remove the structure itself.
-> > 
-> > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> > ---
-> >  include/hw/acpi/acpi-defs.h | 13 -----------
-> >  tests/acpi-utils.h          |  4 +++-
-> >  tests/acpi-utils.c          | 46 ++++++++++++++++++++++++++++++-------
-> >  tests/bios-tables-test.c    | 21 +++++++++++++----
-> >  tests/vmgenid-test.c        |  8 ++++---
-> >  5 files changed, 62 insertions(+), 30 deletions(-)
-> > 
-> > diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-> > index 8425ecb8c6..5021cb9e79 100644
-> > --- a/include/hw/acpi/acpi-defs.h
-> > +++ b/include/hw/acpi/acpi-defs.h
-> > @@ -40,19 +40,6 @@ enum {
-> >      ACPI_FADT_F_LOW_POWER_S0_IDLE_CAPABLE,
-> >  };
-> >  
-> > -struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
-> > -    uint64_t signature;              /* ACPI signature, contains "RSD PTR " */
-> > -    uint8_t  checksum;               /* To make sum of struct == 0 */
-> > -    uint8_t  oem_id [6];             /* OEM identification */
-> > -    uint8_t  revision;               /* Must be 0 for 1.0, 2 for 2.0 */
-> > -    uint32_t rsdt_physical_address;  /* 32-bit physical address of RSDT */
-> > -    uint32_t length;                 /* XSDT Length in bytes including hdr */
-> > -    uint64_t xsdt_physical_address;  /* 64-bit physical address of XSDT */
-> > -    uint8_t  extended_checksum;      /* Checksum of entire table */
-> > -    uint8_t  reserved [3];           /* Reserved field must be 0 */
-> > -} QEMU_PACKED;
-> > -typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
-> > -
-> >  typedef struct AcpiRsdpData {
-> >      uint8_t oem_id[6]; /* OEM identification */
-> >      uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
-> > diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
-> > index ac52abd0dd..4f4899deb5 100644
-> > --- a/tests/acpi-utils.h
-> > +++ b/tests/acpi-utils.h
-> > @@ -82,6 +82,8 @@ typedef struct {
-> >  
-> >  uint8_t acpi_calc_checksum(const uint8_t *data, int len);
-> >  uint32_t acpi_find_rsdp_address(void);
-> > -void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table);
-> > +uint32_t acpi_get_rsdt_address(uint8_t *rsdp_table);
-> > +uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table);
-> > +void acpi_parse_rsdp_table(uint32_t addr, uint8_t *rsdp_table);
-> >  
-> >  #endif  /* TEST_ACPI_UTILS_H */
-> > diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
-> > index 41dc1ea9b4..d07f7487e2 100644
-> > --- a/tests/acpi-utils.c
-> > +++ b/tests/acpi-utils.c
-> > @@ -52,14 +52,44 @@ uint32_t acpi_find_rsdp_address(void)
-> >      return off;
-> >  }
-> >  
-> > -void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table)
-> > +uint32_t acpi_get_rsdt_address(uint8_t *rsdp_table)
-> >  {
-> > -    ACPI_READ_FIELD(rsdp_table->signature, addr);
-> > -    ACPI_ASSERT_CMP64(rsdp_table->signature, "RSD PTR ");
-> > +    uint32_t rsdt_physical_address;
-> >  
-> > -    ACPI_READ_FIELD(rsdp_table->checksum, addr);
-> > -    ACPI_READ_ARRAY(rsdp_table->oem_id, addr);
-> > -    ACPI_READ_FIELD(rsdp_table->revision, addr);
-> > -    ACPI_READ_FIELD(rsdp_table->rsdt_physical_address, addr);
-> > -    ACPI_READ_FIELD(rsdp_table->length, addr);
-> > +    memcpy(&rsdt_physical_address, &rsdp_table[16 /* RsdtAddress offset */], 4);
-> > +    return le32_to_cpu(rsdt_physical_address);
-> > +}
-> > +
-> > +uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table)
-> > +{
-> > +    uint64_t xsdt_physical_address;
-> > +    uint8_t revision = rsdp_table[15 /* Revision offset */];
-> > +
-> > +    /* We must have revision 2 if we're looking for an XSDT pointer */
-> > +    g_assert(revision == 2);
-> > +
-> > +    memcpy(&xsdt_physical_address, &rsdp_table[24 /* XsdtAddress offset */], 8);
-> > +    return le64_to_cpu(xsdt_physical_address);
-> > +}
-> > +
-> > +void acpi_parse_rsdp_table(uint32_t addr, uint8_t *rsdp_table)
-> > +{
-> > +    uint8_t revision;
-> > +
-> > +    /* Read mandatory revision 0 table data (20 bytes) first */
-> > +    memread(addr, rsdp_table, 20);
-> > +    revision = rsdp_table[15 /* Revision offset */];
-> > +
-> > +    switch (revision) {
-> > +    case 0: /* ACPI 1.0 RSDP */
-> > +        break;
-> > +    case 2: /* ACPI 2.0+ RSDP */
-> > +        /* Read the rest of the RSDP table */
-> > +        memread(addr + 20, rsdp_table + 20, 16);
-> > +        break;
-> > +    default:
-> > +        g_assert_not_reached();
-> > +    }
-> > +
-> > +    ACPI_ASSERT_CMP64(*((uint64_t *)(rsdp_table)), "RSD PTR ");
-> >  }
-> > diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-> > index d661d9be62..8749b77b36 100644
-> > --- a/tests/bios-tables-test.c
-> > +++ b/tests/bios-tables-test.c
-> > @@ -27,7 +27,7 @@ typedef struct {
-> >      const char *machine;
-> >      const char *variant;
-> >      uint32_t rsdp_addr;
-> > -    AcpiRsdpDescriptor rsdp_table;
-> > +    uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
-> >      AcpiRsdtDescriptorRev1 rsdt_table;
-> >      uint32_t dsdt_addr;
-> >      uint32_t facs_addr;
-> > @@ -85,19 +85,30 @@ static void test_acpi_rsdp_address(test_data *data)
-> >  
-> >  static void test_acpi_rsdp_table(test_data *data)
-> >  {
-> > -    AcpiRsdpDescriptor *rsdp_table = &data->rsdp_table;
-> > +    uint8_t *rsdp_table = data->rsdp_table, revision;
-> >      uint32_t addr = data->rsdp_addr;
-> >  
-> >      acpi_parse_rsdp_table(addr, rsdp_table);
-> > +    revision = rsdp_table[15 /* Revision offset */];
-> >  
-> > -    /* rsdp checksum is not for the whole table, but for the first 20 bytes */
-> > -    g_assert(!acpi_calc_checksum((uint8_t *)rsdp_table, 20));
-> > +    switch (revision) {
-> > +    case 0: /* ACPI 1.0 RSDP */
-> > +        /* With rev 1, checksum is only for the first 20 bytes */
-> > +        g_assert(!acpi_calc_checksum(rsdp_table,  20));
-> > +        break;
-> > +    case 2: /* ACPI 2.0+ RSDP */
-> > +        /* With revision 2, we have 2 checksums */
-> > +        g_assert(!acpi_calc_checksum(rsdp_table, 20));
-> > +        g_assert(!acpi_calc_checksum(rsdp_table, 36));  
-> 
-> Missing break. I guess this wasn't yet tested with ACPI 2.0+?
-> Are we going to extend the tests to do that?
-I'm working on adding arm/virt board to these tests,
-so that will use this 2.0 path
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
+> ---
+>  tests/test-arm-mptimer.c | 153 ++++++++++++++++++---------------------
+>  1 file changed, 69 insertions(+), 84 deletions(-)
 > 
-> > +    default:
-> > +        g_assert_not_reached();
-> > +    }
-> >  }
-> >  
-> >  static void test_acpi_rsdt_table(test_data *data)
-> >  {
-> >      AcpiRsdtDescriptorRev1 *rsdt_table = &data->rsdt_table;
-> > -    uint32_t addr = le32_to_cpu(data->rsdp_table.rsdt_physical_address);
-> > +    uint32_t addr = acpi_get_rsdt_address(data->rsdp_table);
-> >      uint32_t *tables;
-> >      int tables_nr;
-> >      uint8_t checksum;
-> > diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-> > index 0a6fb55f2e..97219ae86c 100644
-> > --- a/tests/vmgenid-test.c
-> > +++ b/tests/vmgenid-test.c
-> > @@ -35,7 +35,7 @@ static uint32_t acpi_find_vgia(void)
-> >  {
-> >      uint32_t rsdp_offset;
-> >      uint32_t guid_offset = 0;
-> > -    AcpiRsdpDescriptor rsdp_table;
-> > +    uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
-> >      uint32_t rsdt, rsdt_table_length;
-> >      AcpiRsdtDescriptorRev1 rsdt_table;
-> >      size_t tables_nr;
-> > @@ -52,9 +52,11 @@ static uint32_t acpi_find_vgia(void)
-> >  
-> >      g_assert_cmphex(rsdp_offset, <, RSDP_ADDR_INVALID);
-> >  
-> > -    acpi_parse_rsdp_table(rsdp_offset, &rsdp_table);
-> > +    acpi_parse_rsdp_table(rsdp_offset, rsdp_table);
-> > +
-> > +    rsdt = acpi_get_rsdt_address(rsdp_table);
-> > +    g_assert(rsdt);
-> >  
-> > -    rsdt = le32_to_cpu(rsdp_table.rsdt_physical_address);
-> >      /* read the header */
-> >      ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
-> >      ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
-> > -- 
-> > 2.19.2
-> > 
-> >  
-> 
-> Besides the missing break
-> 
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> diff --git a/tests/test-arm-mptimer.c b/tests/test-arm-mptimer.c
+> index cb8f2df9141..156a39f50dd 100644
+> --- a/tests/test-arm-mptimer.c
+> +++ b/tests/test-arm-mptimer.c
+> @@ -991,10 +991,25 @@ static void test_timer_zero_load_nonscaled_periodic_to_prescaled_oneshot(void)
+>      g_assert_cmpuint(timer_get_and_clr_int_sts(), ==, 0);
+>  }
+>  
+> +/*
+> + * Add a qtest test that comes in two versions: one with
+> + * a timer scaler setting, and one with the timer nonscaled.
+> + */
+> +static void add_scaler_test(const char *str, bool scale,
+> +                            void (*fn)(const void *))
+> +{
+> +    char *name;
+> +    int *scaler = scale ? &scaled : &nonscaled;
+> +
+> +    name = g_strdup_printf("%s=%d", str, *scaler);
+> +    qtest_add_data_func(name, scaler, fn);
+> +    g_free(name);
+> +}
+> +
+>  int main(int argc, char **argv)
+>  {
+> -    int *scaler = &nonscaled;
+>      int ret;
+> +    int scale;
+>  
+>      g_test_init(&argc, &argv, NULL);
+>  
+> @@ -1012,89 +1027,59 @@ int main(int argc, char **argv)
+>      qtest_add_func("mptimer/prescaler", test_timer_prescaler);
+>      qtest_add_func("mptimer/prescaler_on_the_fly", test_timer_prescaler_on_the_fly);
+>  
+> -tests_with_prescaler_arg:
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/oneshot scaler=%d", *scaler),
+> -                        scaler, test_timer_oneshot);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/pause scaler=%d", *scaler),
+> -                        scaler, test_timer_pause);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/reload scaler=%d", *scaler),
+> -                        scaler, test_timer_reload);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/periodic scaler=%d", *scaler),
+> -                        scaler, test_timer_periodic);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/oneshot_to_periodic scaler=%d", *scaler),
+> -                        scaler, test_timer_oneshot_to_periodic);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/periodic_to_oneshot scaler=%d", *scaler),
+> -                        scaler, test_timer_periodic_to_oneshot);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/set_oneshot_counter_to_0 scaler=%d", *scaler),
+> -                        scaler, test_timer_set_oneshot_counter_to_0);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/set_periodic_counter_to_0 scaler=%d", *scaler),
+> -                        scaler, test_timer_set_periodic_counter_to_0);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/noload_oneshot scaler=%d", *scaler),
+> -                        scaler, test_timer_noload_oneshot);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/noload_periodic scaler=%d", *scaler),
+> -                        scaler, test_timer_noload_periodic);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/zero_load_oneshot scaler=%d", *scaler),
+> -                        scaler, test_timer_zero_load_oneshot);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/zero_load_periodic scaler=%d", *scaler),
+> -                        scaler, test_timer_zero_load_periodic);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/zero_load_oneshot_to_nonzero scaler=%d", *scaler),
+> -                        scaler, test_timer_zero_load_oneshot_to_nonzero);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/zero_load_periodic_to_nonzero scaler=%d", *scaler),
+> -                        scaler, test_timer_zero_load_periodic_to_nonzero);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/nonzero_load_oneshot_to_zero scaler=%d", *scaler),
+> -                        scaler, test_timer_nonzero_load_oneshot_to_zero);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/nonzero_load_periodic_to_zero scaler=%d", *scaler),
+> -                        scaler, test_timer_nonzero_load_periodic_to_zero);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/set_periodic_counter_on_the_fly scaler=%d", *scaler),
+> -                        scaler, test_timer_set_periodic_counter_on_the_fly);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/enable_and_set_counter scaler=%d", *scaler),
+> -                        scaler, test_timer_enable_and_set_counter);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/set_counter_and_enable scaler=%d", *scaler),
+> -                        scaler, test_timer_set_counter_and_enable);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/oneshot_with_counter_0_on_start scaler=%d", *scaler),
+> -                        scaler, test_timer_oneshot_with_counter_0_on_start);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/periodic_with_counter_0_on_start scaler=%d", *scaler),
+> -                        scaler, test_timer_periodic_with_counter_0_on_start);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/periodic_counter scaler=%d", *scaler),
+> -                        scaler, test_periodic_counter);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/set_counter_periodic_with_zero_load scaler=%d", *scaler),
+> -                        scaler, test_timer_set_counter_periodic_with_zero_load);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/set_oneshot_load_to_0 scaler=%d", *scaler),
+> -                        scaler, test_timer_set_oneshot_load_to_0);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/set_periodic_load_to_0 scaler=%d", *scaler),
+> -                        scaler, test_timer_set_periodic_load_to_0);
+> -    qtest_add_data_func(
+> -        g_strdup_printf("mptimer/zero_load_mode_switch scaler=%d", *scaler),
+> -                        scaler, test_timer_zero_load_mode_switch);
+> -
+> -    if (scaler == &nonscaled) {
+> -        scaler = &scaled;
+> -        goto tests_with_prescaler_arg;
+> +    for (scale = 0; scale < 2; scale++) {
+> +        add_scaler_test("mptimer/oneshot scaler",
+> +                        scale, test_timer_oneshot);
+> +        add_scaler_test("mptimer/pause scaler",
+> +                        scale, test_timer_pause);
+> +        add_scaler_test("mptimer/reload scaler",
+> +                        scale, test_timer_reload);
+> +        add_scaler_test("mptimer/periodic scaler",
+> +                        scale, test_timer_periodic);
+> +        add_scaler_test("mptimer/oneshot_to_periodic scaler",
+> +                        scale, test_timer_oneshot_to_periodic);
+> +        add_scaler_test("mptimer/periodic_to_oneshot scaler",
+> +                        scale, test_timer_periodic_to_oneshot);
+> +        add_scaler_test("mptimer/set_oneshot_counter_to_0 scaler",
+> +                        scale, test_timer_set_oneshot_counter_to_0);
+> +        add_scaler_test("mptimer/set_periodic_counter_to_0 scaler",
+> +                        scale, test_timer_set_periodic_counter_to_0);
+> +        add_scaler_test("mptimer/noload_oneshot scaler",
+> +                        scale, test_timer_noload_oneshot);
+> +        add_scaler_test("mptimer/noload_periodic scaler",
+> +                        scale, test_timer_noload_periodic);
+> +        add_scaler_test("mptimer/zero_load_oneshot scaler",
+> +                        scale, test_timer_zero_load_oneshot);
+> +        add_scaler_test("mptimer/zero_load_periodic scaler",
+> +                        scale, test_timer_zero_load_periodic);
+> +        add_scaler_test("mptimer/zero_load_oneshot_to_nonzero scaler",
+> +                        scale, test_timer_zero_load_oneshot_to_nonzero);
+> +        add_scaler_test("mptimer/zero_load_periodic_to_nonzero scaler",
+> +                        scale, test_timer_zero_load_periodic_to_nonzero);
+> +        add_scaler_test("mptimer/nonzero_load_oneshot_to_zero scaler",
+> +                        scale, test_timer_nonzero_load_oneshot_to_zero);
+> +        add_scaler_test("mptimer/nonzero_load_periodic_to_zero scaler",
+> +                        scale, test_timer_nonzero_load_periodic_to_zero);
+> +        add_scaler_test("mptimer/set_periodic_counter_on_the_fly scaler",
+> +                        scale, test_timer_set_periodic_counter_on_the_fly);
+> +        add_scaler_test("mptimer/enable_and_set_counter scaler",
+> +                        scale, test_timer_enable_and_set_counter);
+> +        add_scaler_test("mptimer/set_counter_and_enable scaler",
+> +                        scale, test_timer_set_counter_and_enable);
+> +        add_scaler_test("mptimer/oneshot_with_counter_0_on_start scaler",
+> +                        scale, test_timer_oneshot_with_counter_0_on_start);
+> +        add_scaler_test("mptimer/periodic_with_counter_0_on_start scaler",
+> +                        scale, test_timer_periodic_with_counter_0_on_start);
+> +        add_scaler_test("mptimer/periodic_counter scaler",
+> +                        scale, test_periodic_counter);
+> +        add_scaler_test("mptimer/set_counter_periodic_with_zero_load scaler",
+> +                        scale, test_timer_set_counter_periodic_with_zero_load);
+> +        add_scaler_test("mptimer/set_oneshot_load_to_0 scaler",
+> +                        scale, test_timer_set_oneshot_load_to_0);
+> +        add_scaler_test("mptimer/set_periodic_load_to_0 scaler",
+> +                        scale, test_timer_set_periodic_load_to_0);
+> +        add_scaler_test("mptimer/zero_load_mode_switch scaler",
+> +                        scale, test_timer_zero_load_mode_switch);
+>      }
+>  
+>      qtest_start("-machine vexpress-a9");
 > 
