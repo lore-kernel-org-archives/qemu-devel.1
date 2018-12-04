@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gU8Kt-0000T9-JM
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 05:53:52 -0500
+	(envelope-from <thuth@redhat.com>) id 1gU8NG-0001sD-7W
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 05:56:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gU8Kp-00071I-Hx
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 05:53:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42312)
+	(envelope-from <thuth@redhat.com>) id 1gU8NC-0001M9-F6
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 05:56:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33392)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gU8Kp-00070V-CS
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 05:53:47 -0500
-Date: Tue, 4 Dec 2018 11:53:33 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181204115333.6d33c6a9.cohuck@redhat.com>
-In-Reply-To: <20181127125248.01ef3e86@x1.home>
-References: <1542746383-18288-1-git-send-email-kwankhede@nvidia.com>
-	<1542746383-18288-2-git-send-email-kwankhede@nvidia.com>
-	<20181127125248.01ef3e86@x1.home>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gU8NB-0001Ld-Tu
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 05:56:14 -0500
+References: <20181203164105.29858-1-berrange@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <08d36eda-e8e7-4ece-edc5-ef436d25e6b7@redhat.com>
+Date: Tue, 4 Dec 2018 11:56:04 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/5] VFIO KABI for migration interface
+In-Reply-To: <20181203164105.29858-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-web PATCH] Import historical documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +27,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Kirti Wankhede <kwankhede@nvidia.com>, cjia@nvidia.com, kevin.tian@intel.com, ziye.yang@intel.com, changpeng.liu@intel.com, yi.l.liu@intel.com, mlevitsk@redhat.com, eskultet@redhat.com, dgilbert@redhat.com, jonathan.davies@nutanix.com, eauger@redhat.com, aik@ozlabs.ru, pasic@linux.ibm.com, felipe@nutanix.com, Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com, Ken.Xue@amd.com, zhi.a.wang@intel.com, qemu-devel@nongnu.org
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Weil <sw@weilnetz.de>, Jeff Cody <codyprime@gmail.com>
 
-On Tue, 27 Nov 2018 12:52:48 -0700
-Alex Williamson <alex.williamson@redhat.com> wrote:
+On 2018-12-03 17:41, Daniel P. Berrang=C3=A9 wrote:
+> The files included are taken from formal builds of previous versions
+> of QEMU, going back to 2.0.0
+>=20
+>   - qemu-doc.html
+>   - qemu-qmp-ref.html
+>   - qemu-ga-ref.html
+>=20
+> To import them all content outside of <body></body> is stripped and
+> replaced by a trivial jekyll header. This causes the rendered docs
+> to get consistent styling and navbar heading.
+>=20
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>=20
+> This patch shows what it would be like if we just copied the
+> pre-rendered QEMU docs into qemu-web for each major release....
+>=20
+> ...it would be large. 2.0.0 was only 300 KB in size, but latest
+> 3.0.0 release has 1.3 MB of docs. So we'd be adding about 4 MB
+> of docs to qemu-web each year if we committed them.
+>=20
+> This feels undesirable as a strategy.
 
-> Actually I'm wondering if we can distill everything down to two bits,
-> STOPPED and LOGGING.
-> 
-> We start at RUNNING, the user can optionally enable LOGGING when
-> supported by the device to cover the SETUP and PRECOPY states
-> proposed.  The device stays running, but activates any sort of
-> dirtly page tracking that's necessary to activate those interfaces.
-> LOGGING can also be cleared to handle the CANCELLED state.  The user
-> would set STOPPED which should quiesce the device and make the full
-> device state available through the device data section.  Clearing
-> STOPPED and LOGGING would handle the FAILED state below.  Likewise on
-> the migration target, QEMU would set the device top STOPPED in order to
-> write the incoming data via the data section and clear STOPPED to
-> indicate the device returns to RUNNING (aka RESUME/RESUME_COMPLETED).
+I also dislike the idea to store data in the git repo that is generated
+automatically from other sources (qemu-doc.texi and friends in this case)=
+.
 
-This idea sounds like something that can be more easily adapted to
-other device types as well. The LOGGING bit is probably more flexible
-if you reframe it as a PREPARATION bit: That would also cover devices
-or device types that don't do dirty logging, but need some other kind
-of preparation prior to moving over.
+> At least in terms of the end result for users, I think it is
+> positive.
 
-This model would also be simple enough to allow e.g. a vendor driver
-for mdev to implement its own, specialized backend while still fitting
-into the general framework. Non-pci mdevs are probably different enough
-from pci devices so that many of the states proposed don't really match
-their needs.
+Agreed, for the users it might be helpful to have access to all
+different versions of the documenation.
+
+> Other ideas
+>=20
+>  1. Upload built docs to a lookaside directory on the download
+>     site when making a release, then have a jekyll plugin to
+>     pull them in. Extra work for the person making releases
+>     principally.
+>=20
+>  2. Have a jekyll plugin that uses docker env to build each
+>     release docs from pristine tarballs. Would need caching
+>     to avoid burning CPU cycles in each web update. Reliably
+>     building older QEMU versions gets increasingly troublesome
+
+We'd also need to discuss how new docs get added after a release
+anyway... automatically? Manually? In the latter case, who does that job?
+
+I think it would be best if we find a way to automate this process, e.g.
+when a new release is tagged, a script generates the docs and puts them
+somewhere on the web server, into the right new folder based on the name
+of the tag. However, I don't know the qemu server well enough to know
+whether that's possible or not ... maybe Jeff or Paolo can comment on
+this...
+
+ Thomas
