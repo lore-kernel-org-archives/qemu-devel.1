@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gUGdc-0004tX-3U
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 14:45:44 -0500
+	(envelope-from <cota@braap.org>) id 1gUH19-0005xZ-M1
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 15:10:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gUGdb-0001dN-9e
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 14:45:43 -0500
-Date: Tue, 4 Dec 2018 17:45:32 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181204194532.GJ18284@habkost.net>
-References: <65d3a572-9a80-f332-1f88-69e43e8a3663@redhat.com>
-	<20181126132731.GJ18284@habkost.net>
-	<CAFEAcA8D7ZjO059Sgrx-4i0iT+V3gxT4f=DvdmUAJS7KomtyOg@mail.gmail.com>
-	<b8e20686-e5d1-a844-48f7-a4ae471e3fd5@greensocs.com>
-	<CAFEAcA8j4xTiS3_ktiA0hm2N4cu5RvxAtYqUHgvY-bUXgcwbjQ@mail.gmail.com>
-	<50645862-a638-ad2a-bafe-1b46be42aec4@greensocs.com>
-	<20181204180607.GB18284@habkost.net>
-	<CAFEAcA9JXeRGfKzouYJQKxgXuw_Z-up0a1ijZX9hZvXbdkwiuA@mail.gmail.com>
-	<20181204190548.GH18284@habkost.net>
-	<CAFEAcA9M3akT7sF-kjCg41ucuUhv2PxKaCBmkN3eacvqvf_w9Q@mail.gmail.com>
+	(envelope-from <cota@braap.org>) id 1gUGya-0001CZ-BL
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 15:07:27 -0500
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:46849)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gUGyZ-0001C8-Vb
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 15:07:24 -0500
+Date: Tue, 4 Dec 2018 15:07:20 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181204200720.GA6478@flamenco>
+References: <20181124235553.17371-1-cota@braap.org>
+	<20181124235553.17371-9-cota@braap.org> <87bm612lat.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA9M3akT7sF-kjCg41ucuUhv2PxKaCBmkN3eacvqvf_w9Q@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v7 01/16] hw/cpu: introduce CPU clusters
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87bm612lat.fsf@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v6 08/13] hardfloat: implement float32/64
+ addition and subtraction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Luc Michel <luc.michel@greensocs.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Alistair Francis <alistair@alistair23.me>, Mark Burton <mark.burton@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
 
-On Tue, Dec 04, 2018 at 07:16:39PM +0000, Peter Maydell wrote:
-> On Tue, 4 Dec 2018 at 19:05, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > On Tue, Dec 04, 2018 at 06:24:19PM +0000, Peter Maydell wrote:
-> > > A cluster is a group of CPUs which are all identical and have
-> > > the same view of the rest of the system.
+On Tue, Dec 04, 2018 at 18:34:18 +0000, Alex Bennée wrote:
 > 
-> > With that definition in mind, why can't QEMU cluster CPUs
-> > automatically by looking at CPU models and address space objects?
+> Emilio G. Cota <cota@braap.org> writes:
+(snip)
+> > Note that the IBM and ARM machines benefit from having
+> > HARDFLOAT_2F{32,64}_USE_FP set to 0. Otherwise their performance
+> > can suffer significantly:
 > 
-> That sounds like it is in theory feasible and in practice
-> quite tricky. You would have to look not just at the CPU
-> model name but also introspect all its properties for
-> ones which change features of the CPU and are set differently
-> on different CPUs (and I don't think there's any way to
-> automatically tell which properties are ones which make
-> the CPU different for which-cluster purposes and which aren't).
-> And if we automatically checked whether address space objects
-> were the same it would rule out implementing devices with
-> per-cpu banked memory mapped registers by mapping different
-> things into the AS for each CPU (though that's a hypothetical
-> at the moment -- I've thought about implementing stuff that
-> way but we tend to implement that sort of thing by looking
-> at current_cpu->cpu_index at the moment).
+> Is this just the latency of pushing the number into a SIMD register and
+> checking the flags compared to a bitmask check?
 
-I see.
+That's the case in the generated x86 assembly, so I presume
+the same it's happening in the other ISAs (I didn't check
+the assembly there).
 
-Can't we at least do something to make sure the cluster objects
-make sense?  e.g. by ensuring at least QOM CPU type is the same,
-and that cpu->address_space somehow points to
-cpu->cluster->address_space?
+(snip)
+> 
+> Hmm the diff is confusing but the changes look fine in the final code:
+> 
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
-CCing Paolo, so he can correct me if this doesn't make sense.
+Thanks!
 
--- 
-Eduardo
+		E.
