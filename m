@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gUFfv-0001kX-OI
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 13:44:04 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUFiv-00041M-EC
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 13:47:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gUFfu-0007nR-Ia
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 13:44:03 -0500
-Date: Tue, 4 Dec 2018 16:43:55 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181204184355.GG18284@habkost.net>
-References: <20181204172535.2799-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181204172535.2799-1-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] Clean up includes
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUFip-0001Dg-UQ
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 13:47:08 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue,  4 Dec 2018 21:46:54 +0300
+Message-Id: <20181204184657.78028-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20181204184657.78028-1-vsementsov@virtuozzo.com>
+References: <20181204184657.78028-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 2/5] crypto/block: refactor
+ qcrypto_block_*crypt_helper functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,33 +20,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Viktor Prutyanov <viktor.prutyanov@phystech.edu>, Yuval Shaia <yuval.shaia@oracle.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Cornelia Huck <cohuck@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Tony Krowiak <akrowiak@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Stefan Berger <stefanb@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-riscv@nongnu.org
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: berrange@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-On Tue, Dec 04, 2018 at 06:25:35PM +0100, Markus Armbruster wrote:
-> Clean up includes so that osdep.h is included first and headers
-> which it implies are not included manually.
-> 
-> This commit was created with scripts/clean-includes, with the changes
-> to the following files manually reverted:
-> 
->     contrib/libvhost-user/libvhost-user-glib.h
->     contrib/libvhost-user/libvhost-user.c
->     contrib/libvhost-user/libvhost-user.h
->     linux-user/mips64/cpu_loop.c
->     linux-user/mips64/signal.c
->     linux-user/sparc64/cpu_loop.c
->     linux-user/sparc64/signal.c
->     linux-user/x86_64/cpu_loop.c
->     linux-user/x86_64/signal.c
->     target/s390x/gen-features.c
->     tests/migration/s390x/a-b-bios.c
->     tests/test-rcu-simpleq.c
->     tests/test-rcu-tailq.c
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+qcrypto_block_encrypt_helper and qcrypto_block_decrypt_helper are
+almost identical, let's reduce code duplication and simplify further
+improvements.
 
-Acked-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ crypto/block.c | 81 +++++++++++++++++++-------------------------------
+ 1 file changed, 31 insertions(+), 50 deletions(-)
 
+diff --git a/crypto/block.c b/crypto/block.c
+index e59d1140fe..f4101f0841 100644
+--- a/crypto/block.c
++++ b/crypto/block.c
+@@ -190,14 +190,21 @@ void qcrypto_block_free(QCryptoBlock *block)
+ }
+ 
+ 
+-int qcrypto_block_decrypt_helper(QCryptoCipher *cipher,
+-                                 size_t niv,
+-                                 QCryptoIVGen *ivgen,
+-                                 int sectorsize,
+-                                 uint64_t offset,
+-                                 uint8_t *buf,
+-                                 size_t len,
+-                                 Error **errp)
++typedef int (*QCryptoCipherEncryptFunc)(QCryptoCipher *cipher,
++                                        const void *in,
++                                        void *out,
++                                        size_t len,
++                                        Error **errp);
++
++static int do_qcrypto_block_encrypt(QCryptoCipher *cipher,
++                                    size_t niv,
++                                    QCryptoIVGen *ivgen,
++                                    int sectorsize,
++                                    uint64_t offset,
++                                    uint8_t *buf,
++                                    size_t len,
++                                    QCryptoCipherEncryptFunc func,
++                                    Error **errp)
+ {
+     uint8_t *iv;
+     int ret = -1;
+@@ -226,8 +233,7 @@ int qcrypto_block_decrypt_helper(QCryptoCipher *cipher,
+         }
+ 
+         nbytes = len > sectorsize ? sectorsize : len;
+-        if (qcrypto_cipher_decrypt(cipher, buf, buf,
+-                                   nbytes, errp) < 0) {
++        if (func(cipher, buf, buf, nbytes, errp) < 0) {
+             goto cleanup;
+         }
+ 
+@@ -243,7 +249,7 @@ int qcrypto_block_decrypt_helper(QCryptoCipher *cipher,
+ }
+ 
+ 
+-int qcrypto_block_encrypt_helper(QCryptoCipher *cipher,
++int qcrypto_block_decrypt_helper(QCryptoCipher *cipher,
+                                  size_t niv,
+                                  QCryptoIVGen *ivgen,
+                                  int sectorsize,
+@@ -252,45 +258,20 @@ int qcrypto_block_encrypt_helper(QCryptoCipher *cipher,
+                                  size_t len,
+                                  Error **errp)
+ {
+-    uint8_t *iv;
+-    int ret = -1;
+-    uint64_t startsector = offset / sectorsize;
+-
+-    assert(QEMU_IS_ALIGNED(offset, sectorsize));
+-    assert(QEMU_IS_ALIGNED(len, sectorsize));
+-
+-    iv = niv ? g_new0(uint8_t, niv) : NULL;
+-
+-    while (len > 0) {
+-        size_t nbytes;
+-        if (niv) {
+-            if (qcrypto_ivgen_calculate(ivgen,
+-                                        startsector,
+-                                        iv, niv,
+-                                        errp) < 0) {
+-                goto cleanup;
+-            }
+-
+-            if (qcrypto_cipher_setiv(cipher,
+-                                     iv, niv,
+-                                     errp) < 0) {
+-                goto cleanup;
+-            }
+-        }
+-
+-        nbytes = len > sectorsize ? sectorsize : len;
+-        if (qcrypto_cipher_encrypt(cipher, buf, buf,
+-                                   nbytes, errp) < 0) {
+-            goto cleanup;
+-        }
++    return do_qcrypto_block_encrypt(cipher, niv, ivgen, sectorsize, offset,
++                                    buf, len, qcrypto_cipher_decrypt, errp);
++}
+ 
+-        startsector++;
+-        buf += nbytes;
+-        len -= nbytes;
+-    }
+ 
+-    ret = 0;
+- cleanup:
+-    g_free(iv);
+-    return ret;
++int qcrypto_block_encrypt_helper(QCryptoCipher *cipher,
++                                 size_t niv,
++                                 QCryptoIVGen *ivgen,
++                                 int sectorsize,
++                                 uint64_t offset,
++                                 uint8_t *buf,
++                                 size_t len,
++                                 Error **errp)
++{
++    return do_qcrypto_block_encrypt(cipher, niv, ivgen, sectorsize, offset,
++                                    buf, len, qcrypto_cipher_encrypt, errp);
+ }
 -- 
-Eduardo
+2.18.0
