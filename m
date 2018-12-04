@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gUDj0-0002mB-Ea
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:39:09 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1gUDjA-0002wM-CB
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:39:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gUDb3-0000LP-QL
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:30:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:3165)
+	(envelope-from <alex.williamson@redhat.com>) id 1gUDXL-0005tm-Q3
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:27:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38800)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gUDb3-0000Cv-JR
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:30:53 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 159F03082DDB
-	for <qemu-devel@nongnu.org>; Tue,  4 Dec 2018 16:30:51 +0000 (UTC)
-References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
-	<20180706105753.26700-6-marcandre.lureau@redhat.com>
-	<877egpwc1z.fsf@dusky.pond.sub.org>
-	<CAMxuvaxCAXHDXvDSH9rsWxU12CLGmVpCJD+M_bWFuMUMJx8ZQg@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <087549a9-a28e-0f3d-f710-8c2be0abfe69@redhat.com>
-Date: Tue, 4 Dec 2018 10:30:45 -0600
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1gUDXL-0005sp-Jm
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:27:03 -0500
+From: Alex Williamson <alex.williamson@redhat.com>
+Date: Tue, 04 Dec 2018 09:26:46 -0700
+Message-ID: <154394080640.28192.18238093186084385391.stgit@gimli.home>
+In-Reply-To: <154393964026.28192.13536237934563059985.stgit@gimli.home>
+References: <154393964026.28192.13536237934563059985.stgit@gimli.home>
 MIME-Version: 1.0
-In-Reply-To: <CAMxuvaxCAXHDXvDSH9rsWxU12CLGmVpCJD+M_bWFuMUMJx8ZQg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 05/27] qapi: include osdep.h in type
- headers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [for-4.0 PATCH v3 6/9] pcie: Allow generic PCIe root
+ port to specify link speed and width
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,52 +28,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, "Armbruster, Markus" <armbru@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Geoffrey McRae <geoff@hostfission.com>
 
-On 12/4/18 9:32 AM, Marc-Andr=C3=A9 Lureau wrote:
+Allow users to experimentally specify speed and width values for the
+generic PCIe root port.  Defaults remain at 2.5GT/s & x1 for
+compatiblity with the intent to only support changing defaults via
+machine types for now.
 
->>> +++ b/scripts/qapi/types.py
->>> @@ -201,6 +201,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularC=
-Visitor):
->>>   ''',
->>>                                         types=3Dtypes, visit=3Dvisit)=
-)
->>>           self._genh.preamble_add(mcgen('''
->>> +#include "qemu/osdep.h"
->>>   #include "qapi/qapi-builtin-types.h"
->>>   '''))
->>
->> No.  Every .c must include qemu/osdep.h first.  No .h may include it.
->> We clean this up periodically.  scripts/clean-includes can help with
->> that.  We currently have a few offenders in the tree.
->=20
-> Ok, I don't know the reason an internal header couldn't include osdep,
-> could you explain?
+Note for libvirt testing that pcie-root-port controllers are given
+default names like "pci.7" which don't play well with using the
+"-set device.$name.$prop=$value" options accessible to us via
+<qemu:commandline> options.  The solution is to add an <alias> to the
+pcie-root-port <controller>, for example:
 
-Per HACKING:
+    <controller type='pci' index='7' model='pcie-root-port'>
+      <model name='pcie-root-port'/>
+      <target chassis='7' port='0x15'/>
+      <alias name='ua-gfx0'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x5'/>
+    </controller>
 
->> Do not include "qemu/osdep.h" from header files since the .c file will=
- have
->> already included it.
+The "ua-" here is a mandatory prefix.  We can then use:
 
+  <qemu:commandline>
+    <qemu:arg value='-set'/>
+    <qemu:arg value='device.ua-gfx0.x-speed=8'/>
+    <qemu:arg value='-set'/>
+    <qemu:arg value='device.ua-gfx0.x-width=16'/>
+  </qemu:commandline>
 
-That is, if we follow the rule that every .c file included osdep.h=20
-before anything else, then by the time any other internal .h is included=20
-(necessarily second or later) from a .c, then osdep.h is already active,=20
-so no .h needs to reproduce the effort that has already occurred.
+or, without an alias, set globals such as:
 
->=20
-> I think we can replace osdep.h by config-host.h for the same result,
-> I'd have to check.
+  <qemu:commandline>
+    <qemu:arg value='-global'/>
+    <qemu:arg value='pcie-root-port.x-speed=8'/>
+    <qemu:arg value='-global'/>
+    <qemu:arg value='pcie-root-port.x-width=16'/>
+  </qemu:commandline>
 
-osdep.h includes config-host.h, so you don't need that either.
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Tested-by: Geoffrey McRae <geoff@hostfission.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
+ hw/pci-bridge/gen_pcie_root_port.c |    4 ++++
+ 1 file changed, 4 insertions(+)
 
-What are you really trying to accomplish by including a header from=20
-another header?  And why isn't it already happening by our coding rule=20
-that all .c files include osdep.h first?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
+index 299de429ec1e..ca5418a89dd2 100644
+--- a/hw/pci-bridge/gen_pcie_root_port.c
++++ b/hw/pci-bridge/gen_pcie_root_port.c
+@@ -124,6 +124,10 @@ static Property gen_rp_props[] = {
+                      res_reserve.mem_pref_32, -1),
+     DEFINE_PROP_SIZE("pref64-reserve", GenPCIERootPort,
+                      res_reserve.mem_pref_64, -1),
++    DEFINE_PROP_PCIE_LINK_SPEED("x-speed", PCIESlot,
++                                speed, PCIE_LINK_SPEED_2_5),
++    DEFINE_PROP_PCIE_LINK_WIDTH("x-width", PCIESlot,
++                                width, PCIE_LINK_WIDTH_1),
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
