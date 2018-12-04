@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gU7sK-0002s8-4r
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 05:24:20 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gU7wI-0002TX-Rp
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 05:28:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gU7sF-0008I0-9i
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 05:24:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55002)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gU7sF-0008HW-43
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 05:24:15 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 450BB58E36
-	for <qemu-devel@nongnu.org>; Tue,  4 Dec 2018 10:24:14 +0000 (UTC)
-Date: Tue, 4 Dec 2018 10:24:09 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181204102409.GD20360@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <f60b8f1e-979b-4af9-7b48-a691c1937f6a@redhat.com>
-	<4dd4e70a-7129-722c-971a-1b9f8b9aa349@redhat.com>
-	<87wooql7c9.fsf@dusky.pond.sub.org>
-	<de1686a3-1981-442d-a82a-704bca834922@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gU7wH-00041Q-VX
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 05:28:26 -0500
+Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:38926)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gU7wH-00040u-QG
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 05:28:25 -0500
+Received: by mail-oi1-x235.google.com with SMTP id i6so13782550oia.6
+	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 02:28:25 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <de1686a3-1981-442d-a82a-704bca834922@redhat.com>
-Subject: Re: [Qemu-devel] QMP accepts double dict keys
+References: <20181102171638.24069-1-peter.maydell@linaro.org>
+	<20181102171638.24069-11-peter.maydell@linaro.org>
+In-Reply-To: <20181102171638.24069-11-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 4 Dec 2018 10:28:13 +0000
+Message-ID: <CAFEAcA_Fp8r7HPY6hORagGo=1ypAn-U_wqq7e3HkouUHJAQW5A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 10/10] hw/arm: versal: Add a virtual Xilinx
+ Versal board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,41 +30,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
-On Mon, Dec 03, 2018 at 01:57:13PM -0600, Eric Blake wrote:
-> On 12/3/18 1:48 PM, Markus Armbruster wrote:
-> > Eric Blake <eblake@redhat.com> writes:
-> > 
-> > > On 12/3/18 10:30 AM, Max Reitz wrote:
-> > > > Hi,
-> > > > 
-> > > > QMP accepts double keys in dicts without complaining.  The value it is
-> > > > using is apparently the last one specified:
-> > > 
-> > > JSON says it is undefined what happens when a client passes double
-> > > keys. We are probably best off if we teach our parser to be strict and
-> > > reject doubled keys in QMP as invalid.
-> > 
-> > Not bug-compatible.  Do we care?
-> 
-> I don't think so. Such a client was already invoking undefined behavior.
-> Relying on first- or last-past-the-post to win is not portable, since JSON
-> parsers are allowed to use hash tables with non-deterministic lookups. I
-> think erroring out is nicer than silently accepting one thing, especially if
-> that might have been different than what the client (incorrectly) expected.
-> I'm not even sure that we would want a deprecation period.
+On Fri, 2 Nov 2018 at 17:24, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+>
+> Add a virtual Xilinx Versal board.
+>
+> This board is based on the Xilinx Versal SoC. The exact
+> details of what peripherals are attached to this board
+> will remain in control of QEMU. QEMU will generate an
+> FDT on the fly for Linux and other software to auto-discover
+> peripherals.
+>
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> Message-id: 20181102131913.1535-3-edgar.iglesias@xilinx.com
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Erroring out immediately, without any deprecation period sounds fine
-to me, as this is simply a bug fix.
+Hi Edgar -- I've been running the clang-7 leak sanitizer
+on "make check", and it spotted a couple of minor memory
+leaks in the versal board code:
 
-IMHO the ABI/API compatibility stability only applies to things that
-are intended behaviour / correct usage.
+> +static void fdt_add_gic_nodes(VersalVirt *s)
+> +{
+> +    char *nodename;
+> +
+> +    nodename = g_strdup_printf("/gic@%x", MM_GIC_APU_DIST_MAIN);
+> +    qemu_fdt_add_subnode(s->fdt, nodename);
+> +    qemu_fdt_setprop_cell(s->fdt, nodename, "phandle", s->phandle.gic);
+> +    qemu_fdt_setprop_cells(s->fdt, nodename, "interrupts",
+> +                           GIC_FDT_IRQ_TYPE_PPI, VERSAL_GIC_MAINT_IRQ,
+> +                           GIC_FDT_IRQ_FLAGS_LEVEL_HI);
+> +    qemu_fdt_setprop(s->fdt, nodename, "interrupt-controller", NULL, 0);
+> +    qemu_fdt_setprop_sized_cells(s->fdt, nodename, "reg",
+> +                                 2, MM_GIC_APU_DIST_MAIN,
+> +                                 2, MM_GIC_APU_DIST_MAIN_SIZE,
+> +                                 2, MM_GIC_APU_REDIST_0,
+> +                                 2, MM_GIC_APU_REDIST_0_SIZE);
+> +    qemu_fdt_setprop_cell(s->fdt, nodename, "#interrupt-cells", 3);
+> +    qemu_fdt_setprop_string(s->fdt, nodename, "compatible", "arm,gic-v3");
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+nodename is allocated but never freed here.
+
+> +}
+
+
+> +#define NUM_VIRTIO_TRANSPORT 32
+> +static void create_virtio_regions(VersalVirt *s)
+> +{
+> +    int virtio_mmio_size = 0x200;
+> +    int i;
+> +
+> +    for (i = 0; i < NUM_VIRTIO_TRANSPORT; i++) {
+> +        char *name = g_strdup_printf("virtio%d", i);;
+> +        hwaddr base = MM_TOP_RSVD + i * virtio_mmio_size;
+> +        int irq = VERSAL_RSVD_HIGH_IRQ_FIRST + i;
+> +        MemoryRegion *mr;
+> +        DeviceState *dev;
+> +        qemu_irq pic_irq;
+> +
+> +        pic_irq = qdev_get_gpio_in(DEVICE(&s->soc.fpd.apu.gic), irq);
+> +        dev = qdev_create(NULL, "virtio-mmio");
+> +        object_property_add_child(OBJECT(&s->soc), name, OBJECT(dev),
+> +                                  &error_fatal);
+> +        qdev_init_nofail(dev);
+> +        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic_irq);
+> +        mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
+> +        memory_region_add_subregion(&s->soc.mr_ps, base, mr);
+> +        sysbus_create_simple("virtio-mmio", base, pic_irq);
+
+The body of this loop allocates name but forgets to free it.
+
+> +    }
+
+thanks
+-- PMM
