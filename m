@@ -1,46 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jl4312@columbia.edu>) id 1gUFaS-0002nt-VY
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 13:38:28 -0500
+	(envelope-from <danielhb413@gmail.com>) id 1gUFad-0003D2-7e
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 13:38:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jl4312@columbia.edu>) id 1gUFZS-0003Pj-7G
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 13:37:24 -0500
-Received: from outprodmail02.cc.columbia.edu ([128.59.72.51]:39410)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jl4312@columbia.edu>) id 1gUFZS-0003LU-3p
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 13:37:22 -0500
-Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
-	by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
-	wB4IalD8032944
-	for <qemu-devel@nongnu.org>; Tue, 4 Dec 2018 13:37:16 -0500
-Received: from hazelnut (localhost.localdomain [127.0.0.1])
-	by hazelnut (Postfix) with ESMTP id 6A5926D
-	for <qemu-devel@nongnu.org>; Tue,  4 Dec 2018 13:37:16 -0500 (EST)
-Received: from sendprodmail01.cc.columbia.edu (sendprodmail01.cc.columbia.edu
-	[128.59.72.13]) by hazelnut (Postfix) with ESMTP id 4DCA17E
-	for <qemu-devel@nongnu.org>; Tue,  4 Dec 2018 13:37:16 -0500 (EST)
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
-	[209.85.208.71])
-	by sendprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
-	wB4IbFCS020459
-	(version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 4 Dec 2018 13:37:16 -0500
-Received: by mail-ed1-f71.google.com with SMTP id x15so8662714edd.2
-	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 10:37:15 -0800 (PST)
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com.
-	[209.85.128.46]) by smtp.gmail.com with ESMTPSA id
-	h51sm5382513edh.17.2018.12.04.10.37.12 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 04 Dec 2018 10:37:13 -0800 (PST)
-Received: by mail-wm1-f46.google.com with SMTP id r11-v6so10644487wmb.2
-	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 10:37:12 -0800 (PST)
+	(envelope-from <danielhb413@gmail.com>) id 1gUFZ8-00037x-Hb
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 13:37:05 -0500
+Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:37371)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+	id 1gUFZ8-00037f-CL
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 13:37:02 -0500
+Received: by mail-qt1-x843.google.com with SMTP id z16so19261193qtq.4
+	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 10:37:02 -0800 (PST)
+References: <20181109173309.25212-1-danielhb413@gmail.com>
+	<20181109173309.25212-4-danielhb413@gmail.com>
+	<87bm689ien.fsf@dusky.pond.sub.org> <87va4f4st9.fsf@dusky.pond.sub.org>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-ID: <2883a083-81a4-f29c-7c3c-df80853ce06b@gmail.com>
+Date: Tue, 4 Dec 2018 16:36:56 -0200
 MIME-Version: 1.0
-From: Jintack Lim <jintack@cs.columbia.edu>
-Date: Tue, 4 Dec 2018 13:37:02 -0500
-Message-ID: <CAHyh4xgZhGnEvkD5RiUazZ9Eq_jzr4=bXHfwBvCBkbOLN2UyKA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Logging dirty pages from vhost-net in-kernel with
- vIOMMU
+In-Reply-To: <87va4f4st9.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v10 3/3] qmp hmp: Make
+ system_wakeup check wake-up support and run state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,23 +33,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Devel Mailing List <qemu-devel@nongnu.org>
-Cc: Jason Wang <jasowang@redhat.com>, "\\ Michael S . Tsirkin \\" <mst@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, mst@redhat.com, mdroth@linux.vnet.ibm.com, imammedo@redhat.com
 
-Hi,
 
-I'm wondering how the current implementation works when logging dirty
-pages during migration from vhost-net (in kernel) when used vIOMMU.
 
-I understand how vhost-net logs GPAs when not using vIOMMU. But when
-we use vhost with vIOMMU, then shouldn't vhost-net need to log the
-translated address (GPA) instead of the address written in the
-descriptor (IOVA) ? The current implementation looks like vhost-net
-just logs IOVA without translation in vhost_get_vq_desc() in
-drivers/vhost/net.c. It seems like QEMU doesn't do any further
-translation of the dirty log when syncing.
+On 11/29/18 4:55 PM, Markus Armbruster wrote:
+> One more thing...
+>
+> Markus Armbruster <armbru@redhat.com> writes:
+>
+>> Daniel Henrique Barboza <danielhb413@gmail.com> writes:
+>>
+>>> The qmp/hmp command 'system_wakeup' is simply a direct call to
+>>> 'qemu_system_wakeup_request' from vl.c. This function verifies if
+>>> runstate is SUSPENDED and if the wake up reason is valid before
+>>> proceeding. However, no error or warning is thrown if any of those
+>>> pre-requirements isn't met. There is no way for the caller to
+>>> differentiate between a successful wakeup or an error state caused
+>>> when trying to wake up a guest that wasn't suspended.
+>>>
+>>> This means that system_wakeup is silently failing, which can be
+>>> considered a bug. Adding error handling isn't an API break in this
+>>> case - applications that didn't check the result will remain broken,
+>>> the ones that check it will have a chance to deal with it.
+>>>
+>>> Adding to that, the commit before previous created a new QMP API called
+>>> query-current-machine, with a new flag called wakeup-suspend-support,
+>>> that indicates if the guest has the capability of waking up from suspended
+>>> state. Although such guest will never reach SUSPENDED state and erroring
+>>> it out in this scenario would suffice, it is more informative for the user
+>>> to differentiate between a failure because the guest isn't suspended versus
+>>> a failure because the guest does not have support for wake up at all.
+>>>
+>>> All this considered, this patch changes qmp_system_wakeup to check if
+>>> the guest is capable of waking up from suspend, and if it is suspended.
+>>> After this patch, this is the output of system_wakeup in a guest that
+>>> does not have wake-up from suspend support (ppc64):
+>>>
+>>> (qemu) system_wakeup
+>>> wake-up from suspend is not supported by this guest
+>>> (qemu)
+>>>
+>>> And this is the output of system_wakeup in a x86 guest that has the
+>>> support but isn't suspended:
+>>>
+>>> (qemu) system_wakeup
+>>> Unable to wake up: guest is not in suspended state
+>>> (qemu)
+>>>
+>>> Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+>>> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+>>> ---
+>>>   hmp.c                   |  5 ++++-
+>>>   hw/acpi/core.c          |  4 +++-
+>>>   hw/char/serial.c        |  3 ++-
+>>>   hw/input/ps2.c          |  9 ++++++---
+>>>   hw/timer/mc146818rtc.c  |  3 ++-
+>>>   include/sysemu/sysemu.h |  3 ++-
+>>>   migration/migration.c   |  7 +++++--
+>>>   qapi/misc.json          |  8 +++++++-
+>>>   qmp.c                   | 13 ++++++++++++-
+>>>   vl.c                    |  6 ++++--
+>>>   10 files changed, 47 insertions(+), 14 deletions(-)
+>>>
+>>> diff --git a/hmp.c b/hmp.c
+>>> index 7828f93a39..0f5d943413 100644
+>>> --- a/hmp.c
+>>> +++ b/hmp.c
+>>> @@ -1220,7 +1220,10 @@ void hmp_cont(Monitor *mon, const QDict *qdict)
+>>>   
+>>>   void hmp_system_wakeup(Monitor *mon, const QDict *qdict)
+>>>   {
+>>> -    qmp_system_wakeup(NULL);
+>>> +    Error *err = NULL;
+>>> +
+>>> +    qmp_system_wakeup(&err);
+>>> +    hmp_handle_error(mon, &err);
+>>>   }
+>>>   
+>>>   void hmp_nmi(Monitor *mon, const QDict *qdict)
+>>> diff --git a/hw/acpi/core.c b/hw/acpi/core.c
+>>> index 52e18d7810..a7073dd435 100644
+>>> --- a/hw/acpi/core.c
+>>> +++ b/hw/acpi/core.c
+>>> @@ -514,7 +514,9 @@ static uint32_t acpi_pm_tmr_get(ACPIREGS *ar)
+>>>   static void acpi_pm_tmr_timer(void *opaque)
+>>>   {
+>>>       ACPIREGS *ar = opaque;
+>>> -    qemu_system_wakeup_request(QEMU_WAKEUP_REASON_PMTIMER);
+>>> +    Error *err = NULL;
+>>> +
+>>> +    qemu_system_wakeup_request(QEMU_WAKEUP_REASON_PMTIMER, &err);
+>>>       ar->tmr.update_sci(ar);
+>>>   }
+> Leaks the error object when qemu_system_wakeup_request() fails.
+>
+> If it cannot fail here, pass &error_abort.
+>
+> If it can fail, but you want to ignore failure, pass NULL.
 
-I might be missing something. Could somebody shed some light on this?
+Good point. I'll simply pass NULL to all callers that didn't care
+for the error prior to this change.
+
+
 
 Thanks,
-Jintack
+
+
+Daniel
+
+
+>
+> More of the same elsewhere.
+>
+> [...]
