@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gUBb3-0005hP-Am
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:22:46 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gUBbJ-0005wf-8s
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:23:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gUBay-0007mm-BQ
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:22:45 -0500
-Received: from mail-qt1-f171.google.com ([209.85.160.171]:33746)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gUBay-0007l7-57
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:22:40 -0500
-Received: by mail-qt1-f171.google.com with SMTP id l11so18198749qtp.0
-	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 06:22:39 -0800 (PST)
-MIME-Version: 1.0
-References: <20181204142023.15982-1-marcandre.lureau@redhat.com>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gUBbI-00085v-HT
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:23:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45594)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1gUBbI-00084g-B7
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:23:00 -0500
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue,  4 Dec 2018 18:20:19 +0400
+Message-Id: <20181204142023.15982-16-marcandre.lureau@redhat.com>
 In-Reply-To: <20181204142023.15982-1-marcandre.lureau@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Tue, 4 Dec 2018 18:22:27 +0400
-Message-ID: <CAMxuvaxR9MX_bo-K0i2vk3mYOTXSqTry7dGvhCHF8VfjoQrgcA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v5 00/19] Generalize machine
- compatibility properties
+References: <20181204142023.15982-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH for-3.2 v5 15/19] qom: add
+ object_class_get_class_data()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,7 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: imammedo@redhat.com, ehabkost@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
 
-Sorry, I forgot to change the subject prefix, it should read for-4.0 :)
+Add a simple function to retrieve the associated class data.
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ include/qom/object.h | 9 +++++++++
+ qom/object.c         | 5 +++++
+ 2 files changed, 14 insertions(+)
+
+diff --git a/include/qom/object.h b/include/qom/object.h
+index 5183c587f3..d5266405da 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -916,6 +916,15 @@ ObjectClass *object_class_dynamic_cast(ObjectClass *=
+klass,
+  */
+ ObjectClass *object_class_get_parent(ObjectClass *klass);
+=20
++
++/**
++ * object_class_get_class_data:
++ * @klass: The class to obtain associated data.
++ *
++ * Returns: the class_data given when registering the type.
++ */
++void *object_class_get_class_data(ObjectClass *klass);
++
+ /**
+  * object_class_get_name:
+  * @klass: The class to obtain the QOM typename for.
+diff --git a/qom/object.c b/qom/object.c
+index aa6f3a2a71..bbc6fbbc01 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -867,6 +867,11 @@ const char *object_class_get_name(ObjectClass *klass=
+)
+     return klass->type->name;
+ }
+=20
++void *object_class_get_class_data(ObjectClass *klass)
++{
++    return klass->type->class_data;
++}
++
+ ObjectClass *object_class_by_name(const char *typename)
+ {
+     TypeImpl *type =3D type_get_by_name(typename);
+--=20
+2.20.0.rc1
