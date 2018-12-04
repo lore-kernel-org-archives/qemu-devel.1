@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gUDjD-0002iF-8U
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:39:20 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1gUDjA-0002cI-5d
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:39:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gUDWX-0005J2-Gt
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:26:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:29569)
+	(envelope-from <alex.williamson@redhat.com>) id 1gUDXh-0006C5-3I
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:27:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49766)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gUDWX-0005IG-9H
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:26:13 -0500
+	id 1gUDXg-0006AM-P1
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:27:25 -0500
 From: Alex Williamson <alex.williamson@redhat.com>
-Date: Tue, 04 Dec 2018 09:26:11 -0700
-Message-ID: <154394077152.28192.11886427713872503309.stgit@gimli.home>
+Date: Tue, 04 Dec 2018 09:27:16 -0700
+Message-ID: <154394083644.28192.8501647946108201466.stgit@gimli.home>
 In-Reply-To: <154393964026.28192.13536237934563059985.stgit@gimli.home>
 References: <154393964026.28192.13536237934563059985.stgit@gimli.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [for-4.0 PATCH v3 2/9] pci: Sync PCIe downstream port
- LNKSTA on read
+Subject: [Qemu-devel] [for-4.0 PATCH v3 8/9] q35/440fx/arm/spapr: Add QEMU
+ 4.0 machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,139 +29,211 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Geoffrey McRae <geoff@hostfission.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-The PCIe link speed and width between a downstream device and its
-upstream port is negotiated on real hardware and susceptible to
-dynamic changes due to signal issues and power management.  In the
-emulated device case there is no real hardware link, but we still
-might wish to have some consistency between endpoint and downstream
-port via a virtual negotiation.  There is of course a real link for
-assigned devices and this same virtual negotiation allows the
-downstream port to match the endpoint, synchronizing on every read
-to support underlying physical hardware dynamically adjusting the
-link.
+Including all machine types that might have a pcie-root-port.
 
-This negotiation is intentionally unidirectional for compatibility.
-If the endpoint exceeds the capabilities of the downstream port or
-there is no endpoint device, the downstream port reports negotiation
-to its maximum speed and width, matching the previous case where
-negotiation was absent.  De-tuning the endpoint to match a virtual
-link doesn't seem to benefit anyone and is a condition we've thus
-far reported without functional issues.
-
-Note that PCI_EXP_LNKSTA is already ignored for migration
-compatibility via pcie_cap_v1_fill().
-
+Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: Michael S. Tsirkin <mst@redhat.com>
 Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Tested-by: Geoffrey McRae <geoff@hostfission.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- hw/pci/pci.c          |    4 ++++
- hw/pci/pcie.c         |   39 +++++++++++++++++++++++++++++++++++++++
- include/hw/pci/pci.h  |   13 +++++++++++++
- include/hw/pci/pcie.h |    1 +
- 4 files changed, 57 insertions(+)
+ hw/arm/virt.c        |   19 +++++++++++++++++--
+ hw/i386/pc_piix.c    |   15 ++++++++++++---
+ hw/i386/pc_q35.c     |   13 +++++++++++--
+ hw/ppc/spapr.c       |   25 ++++++++++++++++++++++---
+ include/hw/compat.h  |    3 +++
+ include/hw/i386/pc.h |    3 +++
+ 6 files changed, 68 insertions(+), 10 deletions(-)
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 56b13b3320ec..495db3b9e18a 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -1353,6 +1353,10 @@ uint32_t pci_default_read_config(PCIDevice *d,
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index f69e7eb39977..beaf6bc43905 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1797,7 +1797,7 @@ static void machvirt_machine_init(void)
+ }
+ type_init(machvirt_machine_init);
+ 
+-static void virt_3_1_instance_init(Object *obj)
++static void virt_4_0_instance_init(Object *obj)
  {
-     uint32_t val = 0;
- 
-+    if (pci_is_express_downstream_port(d) &&
-+        ranges_overlap(address, len, d->exp.exp_cap + PCI_EXP_LNKSTA, 2)) {
-+        pcie_sync_bridge_lnk(d);
-+    }
-     memcpy(&val, d->config + address, len);
-     return le32_to_cpu(val);
- }
-diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-index 914a5261a79b..61b7b96c52cd 100644
---- a/hw/pci/pcie.c
-+++ b/hw/pci/pcie.c
-@@ -729,6 +729,45 @@ void pcie_add_capability(PCIDevice *dev,
-     memset(dev->cmask + offset, 0xFF, size);
+     VirtMachineState *vms = VIRT_MACHINE(obj);
+     VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+@@ -1867,10 +1867,25 @@ static void virt_3_1_instance_init(Object *obj)
+     vms->irqmap = a15irqmap;
  }
  
++static void virt_machine_4_0_options(MachineClass *mc)
++{
++}
++DEFINE_VIRT_MACHINE_AS_LATEST(4, 0)
++
++#define VIRT_COMPAT_3_1 \
++    HW_COMPAT_3_1
++
++static void virt_3_1_instance_init(Object *obj)
++{
++    virt_4_0_instance_init(obj);
++}
++
+ static void virt_machine_3_1_options(MachineClass *mc)
+ {
++    virt_machine_4_0_options(mc);
++    SET_MACHINE_COMPAT(mc, VIRT_COMPAT_3_1);
+ }
+-DEFINE_VIRT_MACHINE_AS_LATEST(3, 1)
++DEFINE_VIRT_MACHINE(3, 1)
+ 
+ #define VIRT_COMPAT_3_0 \
+     HW_COMPAT_3_0
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 7092d6d13f66..cfaa83ee2fad 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -428,21 +428,30 @@ static void pc_i440fx_machine_options(MachineClass *m)
+     machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
+ }
+ 
+-static void pc_i440fx_3_1_machine_options(MachineClass *m)
++static void pc_i440fx_4_0_machine_options(MachineClass *m)
+ {
+     pc_i440fx_machine_options(m);
+     m->alias = "pc";
+     m->is_default = 1;
+ }
+ 
++DEFINE_I440FX_MACHINE(v4_0, "pc-i440fx-4.0", NULL,
++                      pc_i440fx_4_0_machine_options);
++
++static void pc_i440fx_3_1_machine_options(MachineClass *m)
++{
++    pc_i440fx_4_0_machine_options(m);
++    m->is_default = 0;
++    m->alias = NULL;
++    SET_MACHINE_COMPAT(m, PC_COMPAT_3_1);
++}
++
+ DEFINE_I440FX_MACHINE(v3_1, "pc-i440fx-3.1", NULL,
+                       pc_i440fx_3_1_machine_options);
+ 
+ static void pc_i440fx_3_0_machine_options(MachineClass *m)
+ {
+     pc_i440fx_3_1_machine_options(m);
+-    m->is_default = 0;
+-    m->alias = NULL;
+     SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
+ }
+ 
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 4702bb13c472..e245db096dc1 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -311,19 +311,28 @@ static void pc_q35_machine_options(MachineClass *m)
+     m->max_cpus = 288;
+ }
+ 
+-static void pc_q35_3_1_machine_options(MachineClass *m)
++static void pc_q35_4_0_machine_options(MachineClass *m)
+ {
+     pc_q35_machine_options(m);
+     m->alias = "q35";
+ }
+ 
++DEFINE_Q35_MACHINE(v4_0, "pc-q35-4.0", NULL,
++                   pc_q35_4_0_machine_options);
++
++static void pc_q35_3_1_machine_options(MachineClass *m)
++{
++    pc_q35_4_0_machine_options(m);
++    m->alias = NULL;
++    SET_MACHINE_COMPAT(m, PC_COMPAT_3_1);
++}
++
+ DEFINE_Q35_MACHINE(v3_1, "pc-q35-3.1", NULL,
+                    pc_q35_3_1_machine_options);
+ 
+ static void pc_q35_3_0_machine_options(MachineClass *m)
+ {
+     pc_q35_3_1_machine_options(m);
+-    m->alias = NULL;
+     SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
+ }
+ 
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 7afd1a175bf2..80d8498867a6 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3956,19 +3956,38 @@ static const TypeInfo spapr_machine_info = {
+     }                                                                \
+     type_init(spapr_machine_register_##suffix)
+ 
+- /*
 +/*
-+ * Sync the PCIe Link Status negotiated speed and width of a bridge with the
-+ * downstream device.  If downstream device is not present, re-write with the
-+ * Link Capability fields.  Limit width and speed to bridge capabilities for
-+ * compatibility.  Use config_read to access the downstream device since it
-+ * could be an assigned device with volatile link information.
++ * pseries-4.0
 + */
-+void pcie_sync_bridge_lnk(PCIDevice *bridge_dev)
++static void spapr_machine_4_0_instance_options(MachineState *machine)
 +{
-+    PCIBridge *br = PCI_BRIDGE(bridge_dev);
-+    PCIBus *bus = pci_bridge_get_sec_bus(br);
-+    PCIDevice *target = bus->devices[0];
-+    uint8_t *exp_cap = bridge_dev->config + bridge_dev->exp.exp_cap;
-+    uint16_t lnksta, lnkcap = pci_get_word(exp_cap + PCI_EXP_LNKCAP);
-+
-+    if (!target || !target->exp.exp_cap) {
-+        lnksta = lnkcap;
-+    } else {
-+        lnksta = target->config_read(target,
-+                                     target->exp.exp_cap + PCI_EXP_LNKSTA,
-+                                     sizeof(lnksta));
-+
-+        if ((lnksta & PCI_EXP_LNKSTA_NLW) > (lnkcap & PCI_EXP_LNKCAP_MLW)) {
-+            lnksta &= ~PCI_EXP_LNKSTA_NLW;
-+            lnksta |= lnkcap & PCI_EXP_LNKCAP_MLW;
-+        }
-+
-+        if ((lnksta & PCI_EXP_LNKSTA_CLS) > (lnkcap & PCI_EXP_LNKCAP_SLS)) {
-+            lnksta &= ~PCI_EXP_LNKSTA_CLS;
-+            lnksta |= lnkcap & PCI_EXP_LNKCAP_SLS;
-+        }
-+    }
-+
-+    pci_word_test_and_clear_mask(exp_cap + PCI_EXP_LNKSTA,
-+                                 PCI_EXP_LNKSTA_CLS | PCI_EXP_LNKSTA_NLW);
-+    pci_word_test_and_set_mask(exp_cap + PCI_EXP_LNKSTA, lnksta &
-+                               (PCI_EXP_LNKSTA_CLS | PCI_EXP_LNKSTA_NLW));
 +}
 +
- /**************************************************************************
-  * pci express extended capability helper functions
++static void spapr_machine_4_0_class_options(MachineClass *mc)
++{
++    /* Defaults for the latest behaviour inherited from the base class */
++}
++
++DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
++
++/*
+  * pseries-3.1
   */
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index e6514bba23aa..eb12fa112ed2 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -737,6 +737,19 @@ static inline int pci_is_express(const PCIDevice *d)
-     return d->cap_present & QEMU_PCI_CAP_EXPRESS;
++#define SPAPR_COMPAT_3_1                                              \
++    HW_COMPAT_3_1
++
+ static void spapr_machine_3_1_instance_options(MachineState *machine)
+ {
++    spapr_machine_4_0_instance_options(machine);
  }
  
-+static inline int pci_is_express_downstream_port(const PCIDevice *d)
-+{
-+    uint8_t type;
-+
-+    if (!pci_is_express(d) || !d->exp.exp_cap) {
-+        return 0;
-+    }
-+
-+    type = pcie_cap_get_type(d);
-+
-+    return type == PCI_EXP_TYPE_DOWNSTREAM || type == PCI_EXP_TYPE_ROOT_PORT;
-+}
-+
- static inline uint32_t pci_config_size(const PCIDevice *d)
+ static void spapr_machine_3_1_class_options(MachineClass *mc)
  {
-     return pci_is_express(d) ? PCIE_CONFIG_SPACE_SIZE : PCI_CONFIG_SPACE_SIZE;
-diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
-index b71e36970345..1976909ab4c8 100644
---- a/include/hw/pci/pcie.h
-+++ b/include/hw/pci/pcie.h
-@@ -126,6 +126,7 @@ uint16_t pcie_find_capability(PCIDevice *dev, uint16_t cap_id);
- void pcie_add_capability(PCIDevice *dev,
-                          uint16_t cap_id, uint8_t cap_ver,
-                          uint16_t offset, uint16_t size);
-+void pcie_sync_bridge_lnk(PCIDevice *dev);
+-    /* Defaults for the latest behaviour inherited from the base class */
++    spapr_machine_3_1_class_options(mc);
++    SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_3_1);
+ }
  
- void pcie_ari_init(PCIDevice *dev, uint16_t offset, uint16_t nextfn);
- void pcie_dev_ser_num_init(PCIDevice *dev, uint16_t offset, uint64_t ser_num);
+-DEFINE_SPAPR_MACHINE(3_1, "3.1", true);
++DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
+ 
+ /*
+  * pseries-3.0
+diff --git a/include/hw/compat.h b/include/hw/compat.h
+index 6f4d5fc64704..70958328fe7a 100644
+--- a/include/hw/compat.h
++++ b/include/hw/compat.h
+@@ -1,6 +1,9 @@
+ #ifndef HW_COMPAT_H
+ #define HW_COMPAT_H
+ 
++#define HW_COMPAT_3_1 \
++    /* empty */
++
+ #define HW_COMPAT_3_0 \
+     /* empty */
+ 
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 136fe497b6b2..cb645bf368a3 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -294,6 +294,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
+ int e820_get_num_entries(void);
+ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+ 
++#define PC_COMPAT_3_1 \
++    HW_COMPAT_3_1 \
++
+ #define PC_COMPAT_3_0 \
+     HW_COMPAT_3_0 \
+     {\
