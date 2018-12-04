@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gUCYD-0001RB-Cx
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 10:23:54 -0500
+	(envelope-from <david@redhat.com>) id 1gUCYD-0001RC-DJ
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 10:23:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gUCYB-00080Z-M2
+	(envelope-from <david@redhat.com>) id 1gUCYB-00080N-GL
 	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 10:23:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34548)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gUCYB-0007u4-DT
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 10:23:51 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BEED8804E5
-	for <qemu-devel@nongnu.org>; Tue,  4 Dec 2018 15:23:44 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
-	<20180706105753.26700-6-marcandre.lureau@redhat.com>
-Date: Tue, 04 Dec 2018 16:23:36 +0100
-In-Reply-To: <20180706105753.26700-6-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Fri, 6 Jul 2018 12:57:31 +0200")
-Message-ID: <877egpwc1z.fsf@dusky.pond.sub.org>
+References: <20181128145455.11733-1-david@redhat.com>
+	<20181204143345.10fea90e@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <fb895afc-ffc1-7cfb-0cf5-97097eaaba9c@redhat.com>
+Date: Tue, 4 Dec 2018 16:23:43 +0100
 MIME-Version: 1.0
+In-Reply-To: <20181204143345.10fea90e@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 05/27] qapi: include osdep.h in type
- headers
+Subject: Re: [Qemu-devel] [PATCH RFC] qdev: Let the hotplug_unplug() caller
+ delete the device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,34 +25,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Greg Kurz <groug@kaod.org>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+On 04.12.18 14:33, Igor Mammedov wrote:
+> On Wed, 28 Nov 2018 15:54:55 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+>=20
+>> When unplugging a device, at one point the device will be destroyed
+>> via object_unparent(). This will, one the one hand, unrealize the
+>> device hierarchy to be removed, and on the other hand, destroy/free th=
+e
+>> device hierarchy.
+>>
+>> When chaining interrupt handlers, we want to overwrite a bus hotplug
+>> handler by the machine hotplug handler, to be able to perform
+>> some part of the plug/unplug and to forward the calls to the bus hotpl=
+ug
+>> handler.
+>>
+>> For now, the bus hotplug handler would trigger an object_unparent(), n=
+ot
+>> allowing us to perform some unplug action on a device after we forward=
+ed
+>> the call to the bus hotplug handler. The device would be gone at that
+>> point.
+>>
+>> hotplug_handler_unplug(dev) -> calls machine_unplug_handler()
+>>     machine_unplug_handler(dev) {
+>>         /* eventually do unplug stuff */
+>>         bus_unplug_handler(dev) -> calls object_unparent(dev)
+>>         /* dev is gone, we can't do more unplug stuff */
+>>     }
+>>
+>> So move the object_unparent() to the original caller of the unplug. Fo=
+r
+>> now, keep the unrealize() at the original places of the
+>> object_unparent().
+>>
+>> hotplug_handler_unplug(dev) -> calls machine_unplug_handler()
+>>     machine_unplug_handler(dev) {
+>>         /* eventually do unplug stuff */
+>>         bus_unplug_handler(dev) -> calls unrealize(dev)
+>>         /* we can do more unplug stuff but device already unrealized *=
+/
+>>     }
+>> object_unparent(dev)
+>>
+>> In the long run, every unplug action should be factored out of the
+>> unrealize() function into the unplug handler (especially for PCI). The=
+n
+>> we can get rid of the additonal unrealize() calls and object_unparent(=
+)
+>> will properly unrealize the device hierarchy after the device has been
+>> unplugged.
+>>
+>> hotplug_handler_unplug(dev) -> calls machine_unplug_handler()
+>>     machine_unplug_handler(dev) {
+>>         /* eventually do unplug stuff */
+>>         bus_unplug_handler(dev) -> only unplugs, does not unrealize
+>>         /* we can do more unplug stuff */
+>>     }
+>> object_unparent(dev) -> will unrealize
+>>
+>>
+>> The original approach was suggested by Igor Mammedov for the PCI
+>> part, but I extended it to all hotplug handlers. I consider this one
+>> step into the right direction.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+> Sorry but I've lost track of all hotplug patches that where
+> reviewed and pending form merge.
+> Lets revisit this patch once those are merged to have a coherent
+> view on how things stand.
 
-> Now that the schema can be configured, it is crucial that all types
-> are configured the same. Make sure config-host.h is included, so
-> build-sys tracks the dependency and rebuilds the types, by including
-> osdep.h first.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qapi/types.py | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
-> index fd7808103c..91f87d0b8f 100644
-> --- a/scripts/qapi/types.py
-> +++ b/scripts/qapi/types.py
-> @@ -201,6 +201,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVisi=
-tor):
->  ''',
->                                        types=3Dtypes, visit=3Dvisit))
->          self._genh.preamble_add(mcgen('''
-> +#include "qemu/osdep.h"
->  #include "qapi/qapi-builtin-types.h"
->  '''))
+At least from my side, there is only
+ [PATCH v3 00/11] pci: hotplug handler reworks=E2=80=8B
 
-No.  Every .c must include qemu/osdep.h first.  No .h may include it.
-We clean this up periodically.  scripts/clean-includes can help with
-that.  We currently have a few offenders in the tree.
+--=20
+
+Thanks,
+
+David / dhildenb
