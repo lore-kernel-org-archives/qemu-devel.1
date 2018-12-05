@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gUWKW-0000xe-BW
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:31:05 -0500
+	(envelope-from <pkrempa@redhat.com>) id 1gUWN7-0003sE-B9
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:33:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gUWKT-00087N-42
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:31:04 -0500
-Received: from indium.canonical.com ([91.189.90.7]:35044)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gUWKS-00086K-SJ
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:31:01 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gUWKR-0005zG-Fn
-	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 12:30:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5B0F72E80CC
-	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 12:30:59 +0000 (UTC)
+	(envelope-from <pkrempa@redhat.com>) id 1gUWN4-0000z9-4m
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:33:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48440)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1gUWN3-0000yN-UR
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:33:42 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7BE01315485E
+	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 12:33:40 +0000 (UTC)
+Date: Wed, 5 Dec 2018 13:33:37 +0100
+From: Peter Krempa <pkrempa@redhat.com>
+Message-ID: <20181205123337.GI799@angien.pipo.sk>
+References: <1f7db2e27758f26d4c10f7a8ed1d8232635f6909.1536044449.git.pkrempa@redhat.com>
+	<20181004113412.GI21448@angien.pipo.sk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 05 Dec 2018 12:16:17 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-Reply-To: Bug 1803160 <1803160@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154212865934.10800.13528910091420823354.malonedeb@wampee.canonical.com>
-Message-Id: <154401217710.25401.15871917286657766920.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1803160] Re: qemu-3.1.0-rc0: tcg.c crash in
- temp_load
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="M0YLxmUXciMpOLPE"
+Content-Disposition: inline
+In-Reply-To: <20181004113412.GI21448@angien.pipo.sk>
+Subject: Re: [Qemu-devel] [PATCH] qapi: Add vim magic modelines for qapi
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,104 +36,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-
-Can you please re-test on the current master, I think this was fixed by:
-
-commit e84fcd7f662a0d8198703f6f89416d7ac2c32767
-Author: Richard Henderson <richard.henderson@linaro.org>
-Date:   Tue Nov 13 20:35:10 2018 +0100
-
-    target/i386: Generate #UD when applying LOCK to a register
-destination
-
-Testing on my box:
-
-12:14:20 [alex@idun:~/l/qemu.git] master + ./i386-linux-user/qemu-i386 ~/tc=
-g_crash.elf
-qemu: uncaught target signal 4 (Illegal instruction) - core dumped
-fish: =E2=80=9C./i386-linux-user/qemu-i386 ~/t=E2=80=A6=E2=80=9D terminated=
- by signal SIGILL (Illegal instruction)
+Cc: Markus Armbruster <armbru@redhat.com>
 
 
-** Changed in: qemu
-       Status: New =3D> Fix Committed
+--M0YLxmUXciMpOLPE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On Thu, Oct 04, 2018 at 13:34:12 +0200, Peter Krempa wrote:
+> On Tue, Sep 04, 2018 at 09:03:10 +0200, Peter Krempa wrote:
+> > The files have a json suffix but look terrible with json syntax
+> > hilighting enabled. Add a magic modeline for vim to switch to python
+> > file format for hilighting similarly to the emacs modeline already
+> > present.
+> >=20
+> > Signed-off-by: Peter Krempa <pkrempa@redhat.com>
+> > ---
+>=20
+> Ping?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1803160
+Ping 2. It looks like no new json files were added meanwhile.
 
-Title:
-  qemu-3.1.0-rc0: tcg.c crash in temp_load
+--M0YLxmUXciMpOLPE
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Status in QEMU:
-  Fix Committed
+-----BEGIN PGP SIGNATURE-----
 
-Bug description:
-  QEMU version:
-  -------------
+iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAlwHxZwACgkQHGwCByjY
+1Gprlw/7B/nHEK0LiPHNQv6hjU/+95b8InnLEg2+qv9T3XmP+xYzczSqN9I5iobn
+sN7gjGi1WL/mYxLIJ9rlcy17jKgTqLe9xSdIB+/1Uh55PbPde8bmuFUjBuZEnwCY
+SCKLkUzrl2PePlkC2h3NT2K+8pkTqF1zelBcjqO1pK91wRXRiPqCAOIp3Y9zOyVb
+E4aFqE34kTqWt5/uBgEf8mBAwYW26GX2k9o0OTKJ7aZxInCYJg8cybO3Aylu9K+B
+msXnxlg+lxa+dfdP/QBatCs4CH0vXwLhRgTKpbyTpHF1Qqzn2znFAdvGxMAMHGYn
+GENEQc7DXYZBhJFo1pg9LNAuLM1lmVjjZWqQnylbI7ryO5/hLWr0y5i3sTB0fnr7
+fx9oZyqHkoUHJgxAwjFADSf0SldKKftpkToGj3e2r5Aew5kaHOifEi1A0D5h1eC4
+PXyNE2W+rVKTgq5Dn4AFRzxwyZmZEm9UV0cdqo2LJ02vXXrABmTwq1RU5PO0ijwp
+Yx1kj4GNQXZpdnwl6S9BpZh+m7fQGLz2AnUpq47p31djyFDcYGmd2h4wbhtyrW0u
+NdiV9tS7/89+E34UAqvpqh2+bvttPfe5cn46Z7VbJsxuWRdU/zn08qEF0EJlNDSe
+9ee7eVrZlxPSyMtQwdWapqNDzCaJXpHLesGR01A/W78CWGjaZqg=
+=5M1u
+-----END PGP SIGNATURE-----
 
-  qemu-3.1.0-rc0 compiled from sources (earlier versions also affected)
-
-  Summary:
-  --------
-
-  TCG crashes in i386 and x86_64 when it tries to execute some specific
-  illegal instructions. When running full OS emulation, both the guest
-  system and QEMU crash.
-
-  The issue has been reproduced in two scenarios:
-
-  Ubuntu x64 host running Debian x86 guest with the following command
-  line: qemu-system-x86_64 -m 4G debian.qcow
-
-  When the attached ELF file is executed inside the guest, QEMU crashes.
-
-  It can also be reproduced from the command line:
-
-  $ qemu-i386 tcg_crash.elf
-  /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:2863: tcg fatal error
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-  zsh: segmentation fault (core dumped)  ../qemu-3.1.0-rc0/build/i386-linux=
--user/qemu-i386 tcg_crash.elf
-
-  GDB backtrace:
-
-  (gdb) bt
-  #0  0x0000000060206488 in raise ()
-  #1  0x0000000060206b8a in abort ()
-  #2  0x0000000060007016 in temp_load (s=3Ds@entry=3D0x607a2780 <tcg_init_c=
-tx>, ts=3Dts@entry=3D0x607a3178 <tcg_init_ctx+2552>, desired_regs=3D<optimi=
-zed out>, allocated_regs=3Dallocated_regs@entry=3D16400)
-  =C2=A0=C2=A0=C2=A0=C2=A0at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg=
-.c:2863
-  #3  0x000000006000a4d9 in tcg_reg_alloc_op (op=3D0x62808c20, s=3D<optimiz=
-ed out>) at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:3070
-  #4  tcg_gen_code (s=3D<optimized out>, tb=3Dtb@entry=3D0x607ac040 <static=
-_code_gen_buffer+4144>) at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c=
-:3598
-  #5  0x000000006003ef9a in tb_gen_code (cpu=3Dcpu@entry=3D0x627e0010, pc=
-=3Dpc@entry=3D134512724, cs_base=3Dcs_base@entry=3D0, flags=3Dflags@entry=
-=3D4194483, cflags=3Dcflags@entry=3D0)
-  =C2=A0=C2=A0=C2=A0=C2=A0at /home/alberto/Documents/qemu-3.1.0-rc0/accel/t=
-cg/translate-all.c:1752
-  #6  0x000000006003d979 in tb_find (cf_mask=3D0, tb_exit=3D0, last_tb=3D0x=
-0, cpu=3D0x0) at /home/alberto/Documents/qemu-3.1.0-rc0/accel/tcg/cpu-exec.=
-c:404
-  #7  cpu_exec (cpu=3Dcpu@entry=3D0x627e0010) at /home/alberto/Documents/qe=
-mu-3.1.0-rc0/accel/tcg/cpu-exec.c:724
-  #8  0x000000006006e1a0 in cpu_loop (env=3Denv@entry=3D0x627e82c0) at /hom=
-e/alberto/Documents/qemu-3.1.0-rc0/linux-user/i386/cpu_loop.c:93
-  #9  0x00000000600037c5 in main (argc=3D2, argv=3D0x7fffffffdd28, envp=3D<=
-optimized out>) at /home/alberto/Documents/qemu-3.1.0-rc0/linux-user/main.c=
-:819
-  (gdb)
-
-  Testcase:
-  ---------
-
-  Find ELF file attached.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1803160/+subscriptions
+--M0YLxmUXciMpOLPE--
