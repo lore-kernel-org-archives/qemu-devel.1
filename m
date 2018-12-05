@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gUTqV-0006rp-4r
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 04:51:57 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gUTxr-0002Sp-FI
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 04:59:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gUTqT-00023G-97
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 04:51:55 -0500
-Date: Wed, 5 Dec 2018 11:51:01 +0200
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20181205095100.GA2888@lap1>
-References: <20181204172535.2799-1-armbru@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1gUTxn-00024p-Cx
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 04:59:31 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46099)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gUTxn-00023f-0A
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 04:59:27 -0500
+Received: by mail-wr1-x443.google.com with SMTP id l9so18962429wrt.13
+	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 01:59:26 -0800 (PST)
+Date: Wed, 5 Dec 2018 09:59:23 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20181205095923.GE20933@stefanha-x1.localdomain>
+References: <cover.1541425595.git.yi.z.zhang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="RpqchZ26BWispMcB"
 Content-Disposition: inline
-In-Reply-To: <20181204172535.2799-1-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] Clean up includes
+In-Reply-To: <cover.1541425595.git.yi.z.zhang@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v5 0/7] nvdimm: support MAP_SYNC for
+ memory-backend-file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,287 +30,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Viktor Prutyanov <viktor.prutyanov@phystech.edu>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Cornelia Huck <cohuck@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Tony Krowiak <akrowiak@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Stefan Berger <stefanb@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-riscv@nongnu.org, yuval.shaia@oracle.com
+To: Zhang Yi <yi.z.zhang@linux.intel.com>
+Cc: xiaoguangrong.eric@gmail.com, dan.j.williams@intel.com, stefanha@redhat.com, pbonzini@redhat.com, yu.c.zhang@linux.intel.com, imammedo@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com, mst@redhat.com
 
-On Tue, Dec 04, 2018 at 06:25:35PM +0100, Markus Armbruster wrote:
-> Clean up includes so that osdep.h is included first and headers
-> which it implies are not included manually.
-> 
-> This commit was created with scripts/clean-includes, with the changes
-> to the following files manually reverted:
-> 
->     contrib/libvhost-user/libvhost-user-glib.h
->     contrib/libvhost-user/libvhost-user.c
->     contrib/libvhost-user/libvhost-user.h
->     linux-user/mips64/cpu_loop.c
->     linux-user/mips64/signal.c
->     linux-user/sparc64/cpu_loop.c
->     linux-user/sparc64/signal.c
->     linux-user/x86_64/cpu_loop.c
->     linux-user/x86_64/signal.c
->     target/s390x/gen-features.c
->     tests/migration/s390x/a-b-bios.c
->     tests/test-rcu-simpleq.c
->     tests/test-rcu-tailq.c
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  contrib/elf2dmp/pdb.h                     | 2 --
->  contrib/elf2dmp/pe.h                      | 1 -
->  contrib/elf2dmp/qemu_elf.h                | 1 -
->  contrib/vhost-user-blk/vhost-user-blk.c   | 1 -
->  contrib/vhost-user-scsi/vhost-user-scsi.c | 1 -
 
-For the rdma part:
+--RpqchZ26BWispMcB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->  hw/rdma/rdma_utils.c                      | 1 +
->  hw/rdma/rdma_utils.h                      | 1 -
->  hw/rdma/vmw/pvrdma_dev_ring.h             | 1 -
+On Mon, Nov 05, 2018 at 04:07:50PM +0800, Zhang Yi wrote:
+> Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
+> guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
+> files on ext4/xfs file system mounted with '-o dax').
+>=20
 
-Acked-by: Yuval Shaia <yuval.shaia@oracle.com>
+Hi,
+There are a lot of people on CC so probably no one felt responsible to
+review this series quickly.  Feel free to send a "ping" email if your
+patches aren't receiving attention.
 
-Thanks.
+Overall this feature looks fine.  I left a few small comments.
 
->  hw/vfio/ap.c                              | 2 +-
->  include/qemu/vfio-helpers.h               | 1 -
->  include/sysemu/whpx.h                     | 1 -
->  target/i386/sev.c                         | 3 ++-
->  target/i386/whp-dispatch.h                | 1 -
->  target/riscv/fpu_helper.c                 | 1 -
->  tests/fp/platform.h                       | 1 -
->  tests/tpm-util.h                          | 1 -
->  tests/vhost-user-bridge.c                 | 2 +-
->  util/qemu-thread-common.h                 | 1 -
->  18 files changed, 5 insertions(+), 18 deletions(-)
-> 
-> diff --git a/contrib/elf2dmp/pdb.h b/contrib/elf2dmp/pdb.h
-> index 4351a2dd61..a3a3cac2c1 100644
-> --- a/contrib/elf2dmp/pdb.h
-> +++ b/contrib/elf2dmp/pdb.h
-> @@ -8,8 +8,6 @@
->  #ifndef PDB_H
->  #define PDB_H
->  
-> -#include <stdint.h>
-> -#include <stdlib.h>
->  
->  typedef struct GUID {
->      unsigned int Data1;
-> diff --git a/contrib/elf2dmp/pe.h b/contrib/elf2dmp/pe.h
-> index 374e06a9c5..dafb26afbb 100644
-> --- a/contrib/elf2dmp/pe.h
-> +++ b/contrib/elf2dmp/pe.h
-> @@ -8,7 +8,6 @@
->  #ifndef PE_H
->  #define PE_H
->  
-> -#include <stdint.h>
->  
->  typedef struct IMAGE_DOS_HEADER {
->      uint16_t  e_magic;      /* 0x00: MZ Header signature */
-> diff --git a/contrib/elf2dmp/qemu_elf.h b/contrib/elf2dmp/qemu_elf.h
-> index d85d6558fa..86e6e688fb 100644
-> --- a/contrib/elf2dmp/qemu_elf.h
-> +++ b/contrib/elf2dmp/qemu_elf.h
-> @@ -8,7 +8,6 @@
->  #ifndef QEMU_ELF_H
->  #define QEMU_ELF_H
->  
-> -#include <stdint.h>
->  #include <elf.h>
->  
->  typedef struct QEMUCPUSegment {
-> diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user-blk/vhost-user-blk.c
-> index 571f114a56..858221ad95 100644
-> --- a/contrib/vhost-user-blk/vhost-user-blk.c
-> +++ b/contrib/vhost-user-blk/vhost-user-blk.c
-> @@ -20,7 +20,6 @@
->  #include "contrib/libvhost-user/libvhost-user-glib.h"
->  #include "contrib/libvhost-user/libvhost-user.h"
->  
-> -#include <glib.h>
->  
->  struct virtio_blk_inhdr {
->      unsigned char status;
-> diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-user-scsi/vhost-user-scsi.c
-> index 02c29019d1..496dd6e693 100644
-> --- a/contrib/vhost-user-scsi/vhost-user-scsi.c
-> +++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
-> @@ -16,7 +16,6 @@
->  #include "contrib/libvhost-user/libvhost-user-glib.h"
->  #include "standard-headers/linux/virtio_scsi.h"
->  
-> -#include <glib.h>
->  
->  #define VUS_ISCSI_INITIATOR "iqn.2016-11.com.nutanix:vhost-user-scsi"
->  
-> diff --git a/hw/rdma/rdma_utils.c b/hw/rdma/rdma_utils.c
-> index dc23f158f3..4fbea8cde2 100644
-> --- a/hw/rdma/rdma_utils.c
-> +++ b/hw/rdma/rdma_utils.c
-> @@ -13,6 +13,7 @@
->   *
->   */
->  
-> +#include "qemu/osdep.h"
->  #include "rdma_utils.h"
->  
->  #ifdef PVRDMA_DEBUG
-> diff --git a/hw/rdma/rdma_utils.h b/hw/rdma/rdma_utils.h
-> index 04c7c2ef5b..c4f96c4f2a 100644
-> --- a/hw/rdma/rdma_utils.h
-> +++ b/hw/rdma/rdma_utils.h
-> @@ -17,7 +17,6 @@
->  #ifndef RDMA_UTILS_H
->  #define RDMA_UTILS_H
->  
-> -#include "qemu/osdep.h"
->  #include "hw/pci/pci.h"
->  #include "sysemu/dma.h"
->  
-> diff --git a/hw/rdma/vmw/pvrdma_dev_ring.h b/hw/rdma/vmw/pvrdma_dev_ring.h
-> index 411d244603..5f2a0cf9b9 100644
-> --- a/hw/rdma/vmw/pvrdma_dev_ring.h
-> +++ b/hw/rdma/vmw/pvrdma_dev_ring.h
-> @@ -16,7 +16,6 @@
->  #ifndef PVRDMA_DEV_RING_H
->  #define PVRDMA_DEV_RING_H
->  
-> -#include "qemu/typedefs.h"
->  
->  #define MAX_RING_NAME_SZ 32
->  
-> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-> index 65de952f44..32b880213d 100644
-> --- a/hw/vfio/ap.c
-> +++ b/hw/vfio/ap.c
-> @@ -10,9 +10,9 @@
->   * directory.
->   */
->  
-> +#include "qemu/osdep.h"
->  #include <linux/vfio.h>
->  #include <sys/ioctl.h>
-> -#include "qemu/osdep.h"
->  #include "qapi/error.h"
->  #include "hw/sysbus.h"
->  #include "hw/vfio/vfio.h"
-> diff --git a/include/qemu/vfio-helpers.h b/include/qemu/vfio-helpers.h
-> index ce7e7b057f..1f057c2b9e 100644
-> --- a/include/qemu/vfio-helpers.h
-> +++ b/include/qemu/vfio-helpers.h
-> @@ -12,7 +12,6 @@
->  
->  #ifndef QEMU_VFIO_HELPERS_H
->  #define QEMU_VFIO_HELPERS_H
-> -#include "qemu/typedefs.h"
->  
->  typedef struct QEMUVFIOState QEMUVFIOState;
->  
-> diff --git a/include/sysemu/whpx.h b/include/sysemu/whpx.h
-> index 89592ae4fa..d200ee01d0 100644
-> --- a/include/sysemu/whpx.h
-> +++ b/include/sysemu/whpx.h
-> @@ -13,7 +13,6 @@
->  #ifndef QEMU_WHPX_H
->  #define QEMU_WHPX_H
->  
-> -#include "config-host.h"
->  #include "qemu-common.h"
->  
->  int whpx_init_vcpu(CPUState *cpu);
-> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> index 2395171acf..20b2d325d8 100644
-> --- a/target/i386/sev.c
-> +++ b/target/i386/sev.c
-> @@ -11,12 +11,13 @@
->   *
->   */
->  
-> +#include "qemu/osdep.h"
-> +
->  #include <linux/kvm.h>
->  #include <linux/psp-sev.h>
->  
->  #include <sys/ioctl.h>
->  
-> -#include "qemu/osdep.h"
->  #include "qapi/error.h"
->  #include "qom/object_interfaces.h"
->  #include "qemu/base64.h"
-> diff --git a/target/i386/whp-dispatch.h b/target/i386/whp-dispatch.h
-> index d8d3485976..4ae3cc8fa5 100644
-> --- a/target/i386/whp-dispatch.h
-> +++ b/target/i386/whp-dispatch.h
-> @@ -1,5 +1,4 @@
->  #include "windows.h"
-> -#include <stdbool.h>
->  
->  #include <WinHvPlatform.h>
->  #include <WinHvEmulation.h>
-> diff --git a/target/riscv/fpu_helper.c b/target/riscv/fpu_helper.c
-> index fdb87d8d82..01b45ca0ae 100644
-> --- a/target/riscv/fpu_helper.c
-> +++ b/target/riscv/fpu_helper.c
-> @@ -17,7 +17,6 @@
->   */
->  
->  #include "qemu/osdep.h"
-> -#include <stdlib.h>
->  #include "cpu.h"
->  #include "qemu/host-utils.h"
->  #include "exec/exec-all.h"
-> diff --git a/tests/fp/platform.h b/tests/fp/platform.h
-> index c20ba70baa..f8c423dde3 100644
-> --- a/tests/fp/platform.h
-> +++ b/tests/fp/platform.h
-> @@ -29,7 +29,6 @@
->   * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
->   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
->   */
-> -#include "config-host.h"
->  
->  #ifndef HOST_WORDS_BIGENDIAN
->  #define LITTLEENDIAN 1
-> diff --git a/tests/tpm-util.h b/tests/tpm-util.h
-> index 9e98bc5124..5755698ad2 100644
-> --- a/tests/tpm-util.h
-> +++ b/tests/tpm-util.h
-> @@ -13,7 +13,6 @@
->  #ifndef TESTS_TPM_UTIL_H
->  #define TESTS_TPM_UTIL_H
->  
-> -#include "qemu/osdep.h"
->  #include "io/channel-socket.h"
->  
->  typedef void (tx_func)(QTestState *s,
-> diff --git a/tests/vhost-user-bridge.c b/tests/vhost-user-bridge.c
-> index 0cf8d0baca..0033b61f2e 100644
-> --- a/tests/vhost-user-bridge.c
-> +++ b/tests/vhost-user-bridge.c
-> @@ -29,8 +29,8 @@
->  
->  #define _FILE_OFFSET_BITS 64
->  
-> -#include "qemu/atomic.h"
->  #include "qemu/osdep.h"
-> +#include "qemu/atomic.h"
->  #include "qemu/iov.h"
->  #include "standard-headers/linux/virtio_net.h"
->  #include "contrib/libvhost-user/libvhost-user.h"
-> diff --git a/util/qemu-thread-common.h b/util/qemu-thread-common.h
-> index a0ea7c0d92..2af6b12085 100644
-> --- a/util/qemu-thread-common.h
-> +++ b/util/qemu-thread-common.h
-> @@ -13,7 +13,6 @@
->  #ifndef QEMU_THREAD_COMMON_H
->  #define QEMU_THREAD_COMMON_H
->  
-> -#include "qemu/typedefs.h"
->  #include "qemu/thread.h"
->  #include "trace.h"
->  
-> -- 
-> 2.17.2
-> 
+Thanks,
+Stefan
+
+> A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
+>     https://patchwork.kernel.org/patch/10028151/
+>=20
+> In order to make sure that the file metadata is in sync after a fault=20
+> while we are writing a shared DAX supporting backend files, this
+> patch-set enables QEMU to use MAP_SYNC flag for memory-backend-dax-file.
+>=20
+> As the DAX vs DMA truncated issue was solved, we refined the code and
+> send out this feature for the v5 version.
+>=20
+> A new auto on/off option 'sync' is added to memory-backend-file:
+>  - on:  try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
+>         'share=3Doff', QEMU will abort
+>  - off: never pass MAP_SYNC to mmap(2)
+>  - auto (default): if MAP_SYNC is supported and 'share=3Don', work as if
+>         'sync=3Don'; otherwise, work as if 'sync=3Doff'
+>=20
+> Changes in v5:
+>  * Add patch 1 to fix a memory leak issue.
+>  * Refine the patch 4-6
+>  * Remove the patch 3 as we already change the parameter from "shared" to
+>    "flags"
+>=20
+> Changes in v4:
+>  * Add patch 1-3 to switch some functions to a single 'flags'
+>    parameters. (Michael S. Tsirkin)
+>  * v3 patch 1-3 become v4 patch 4-6.
+>  * Patch 4: move definitions of MAP_SYNC and MAP_SHARED_VALIDATE to a
+>    new header file under include/standard-headers/linux/. (Michael S. Tsi=
+rkin)
+>  * Patch 6: refine the description of the 'sync' option. (Michael S. Tsir=
+kin)
+>=20
+> Changes in v3:
+>  * Patch 1: add MAP_SHARED_VALIDATE in both sync=3Don and sync=3Dauto
+>    cases, and add back the retry mechanism. MAP_SYNC will be ignored
+>    by Linux kernel 4.15 if MAP_SHARED_VALIDATE is missed.
+>  * Patch 1: define MAP_SYNC and MAP_SHARED_VALIDATE as 0 on non-Linux
+>    platforms in order to make qemu_ram_mmap() compile on those platforms.
+>  * Patch 2&3: include more information in error messages of
+>    memory-backend in hope to help user to identify the error.
+>    (Dr. David Alan Gilbert)
+>  * Patch 3: fix typo in the commit message. (Dr. David Alan Gilbert)
+>=20
+> Changes in v2:
+>  * Add 'sync' option to control the use of MAP_SYNC. (Eduardo Habkost)
+>  * Remove the unnecessary set of MAP_SHARED_VALIDATE in some cases and
+>    the retry mechanism in qemu_ram_mmap(). (Michael S. Tsirkin)
+>  * Move OS dependent definitions of MAP_SYNC and MAP_SHARED_VALIDATE
+>    to osdep.h. (Michael S. Tsirkin)
+>=20
+> Zhang Yi (7):
+>   numa: Fixed the memory leak of numa error message
+>   util/mmap-alloc: switch qemu_ram_mmap() to 'flags' parameter
+>   exec: switch qemu_ram_alloc_from_{file, fd} to the 'flags' parameter
+>   util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
+>   util/mmap-alloc: Switch the RAM_SYNC flags to OnOffAuto
+>   hostmem: add more information in error messages
+>   hostmem-file: add 'sync' option
+>=20
+>  backends/hostmem-file.c               | 45 +++++++++++++++++++++++++++++=
+++++--
+>  backends/hostmem.c                    |  8 ++++---
+>  docs/nvdimm.txt                       | 20 +++++++++++++++-
+>  exec.c                                |  9 +++----
+>  include/exec/memory.h                 | 18 ++++++++++++++
+>  include/exec/ram_addr.h               |  1 +
+>  include/qemu/mmap-alloc.h             | 20 +++++++++++++++-
+>  include/standard-headers/linux/mman.h | 44 +++++++++++++++++++++++++++++=
++++++
+>  numa.c                                |  1 +
+>  qemu-options.hx                       | 22 ++++++++++++++++-
+>  util/mmap-alloc.c                     | 26 ++++++++++++++++----
+>  util/oslib-posix.c                    |  4 +++-
+>  12 files changed, 200 insertions(+), 18 deletions(-)
+>  create mode 100644 include/standard-headers/linux/mman.h
+>=20
+> --=20
+> 2.7.4
+>=20
+>=20
+
+--RpqchZ26BWispMcB
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcB6F7AAoJEJykq7OBq3PIQFUH/ipmqnJu3CMXwD1CcOssrKTN
+Xk53mK9aMDiQQ7JBX8/isCCM6Kr1BPncihsP4FyUjutbX/XhtFBtvLwdUhSvTwK6
+Rzz5uEllY9vvgaaTpXyFo9+ToBq/xWIil882oxd7dZSS7W96ieAZg87apPyHAgkX
+EfoFKSIZ8JyxQoWUVBTWae0HqQ5qWcTR3kzZCXbTcz0Kfgt+HvqWGx9QRQlbDmXg
+xEREc8qgLzb3LUV71buDlTFVyT1PtofiGoiWB5VD7x/wlrpu6uLE/tqgF6eemlna
+/g0P8s3VxRDfMrrM7anTsQ1Il1sYlXqe4PK+3CRzKWhJWSGrNzrqC8azhvdApys=
+=pfLz
+-----END PGP SIGNATURE-----
+
+--RpqchZ26BWispMcB--
