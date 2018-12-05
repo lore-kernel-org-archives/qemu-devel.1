@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gUaw9-0002PL-NA
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:26:15 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUawG-0002Uq-Mx
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:26:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gUaw3-0004O6-Qe
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:26:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:27440)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gUaw1-0004Md-Vm
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:26:06 -0500
-Date: Wed, 5 Dec 2018 12:26:02 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181205122332-mutt-send-email-mst@kernel.org>
-References: <20181025140631.634922-1-sameeh@daynix.com>
-	<20181205171818.GA1136@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUawF-0004Xs-HX
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:26:20 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 5 Dec 2018 17:26:05 +0000
+Message-ID: <4a709a5d-eb8c-5bb6-8fb6-46f7037a2990@virtuozzo.com>
+References: <20181130220344.3350618-1-eblake@redhat.com>
+	<20181130220344.3350618-7-eblake@redhat.com>
+In-Reply-To: <20181130220344.3350618-7-eblake@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <CEB2DB68DE4C1F4E9E8ECBCC0C21BA35@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20181205171818.GA1136@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 0/2] Attempt to implement the standby feature
- for assigned network devices
+Subject: Re: [Qemu-devel] [PATCH 06/14] nbd/client: Move export name into
+ NBDExportInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,185 +26,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Sameeh Jubran <sameeh@daynix.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Yan Vugenfirer <yan@daynix.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Wed, Dec 05, 2018 at 05:18:18PM +0000, Daniel P. Berrang=E9 wrote:
-> On Thu, Oct 25, 2018 at 05:06:29PM +0300, Sameeh Jubran wrote:
-> > From: Sameeh Jubran <sjubran@redhat.com>
-> >=20
-> > Hi all,
-> >=20
-> > Background:
-> >=20
-> > There has been a few attempts to implement the standby feature for vf=
-io
-> > assigned devices which aims to enable the migration of such devices. =
-This
-> > is another attempt.
-> >=20
-> > The series implements an infrastructure for hiding devices from the b=
-us
-> > upon boot. What it does is the following:
-> >=20
-> > * In the first patch the infrastructure for hiding the device is adde=
-d
-> >   for the qbus and qdev APIs. A "hidden" boolean is added to the devi=
-ce
-> >   state and it is set based on a callback to the standby device which
-> >   registers itself for handling the assessment: "should the primary d=
-evice
-> >   be hidden?" by cross validating the ids of the devices.
-> >=20
-> > * In the second patch the virtio-net uses the API to hide the vfio
-> >   device and unhides it when the feature is acked.
->=20
-> IIUC, the general idea is that we want to provide a pair of associated =
-NIC
-> devices to the guest, one emulated, one physical PCI device. The guest =
-would
-> put them in a bonded pair. Before migration the PCI device is unplugged=
- & a
-> new PCI device plugged on target after migration. The guest traffic con=
-tinues
-> without interuption due to the emulate device.
->=20
-> This kind of conceptual approach can already be implemented today by ma=
-nagement
-> apps. The only hard problem that exists today is how the guest OS can f=
-igure
-> out that a particular pair of devices it has are intended to be used to=
-gether.=20
->=20
-> With this series, IIUC, the virtio-net device is getting a given proper=
-ty which
-> defines the qdev ID of the associated VFIO device. When the guest OS ac=
-tivates
-> the virtio-net device and acknowledges the STANDBY feature bit, qdev th=
-en
-> unhides the associated VFIO device.
->=20
-> AFAICT the guest has to infer that the device which suddenly appears is=
- the one
-> associated with the virtio-net device it just initialized, for purposes=
- of
-> setting up the NIC bonding. There doesn't appear to be any explicit ass=
-ocation
-> between the devices exposed to the guest.
->=20
-> This feels pretty fragile for a guest needing to match up devices when =
-there
-> are many pairs of devices exposed to a single guest.
->=20
-> Unless I'm mis-reading the patches, it looks like the VFIO device alway=
-s has
-> to be available at the time QEMU is started. There's no way to boot a g=
-uest
-> and then later hotplug a VFIO device to accelerate the existing virtio-=
-net NIC.
-
-That should be supported.
-
-> Or similarly after migration there might not be any VFIO device availab=
-le
-> initially when QEMU is started to accept the incoming migration. So it =
-might
-> need to run in degraded mode for an extended period of time until one b=
-ecomes
-> available for hotplugging.
-
-That should work too.
-
-> The use of qdev IDs makes this troublesome, as the
-> qdev ID of the future VFIO device would need to be decided upfront befo=
-re it
-> even exists.
-
-I agree this sounds problematic.
-
->=20
-> So overall I'm not really a fan of the dynamic hiding/unhiding of devic=
-es.
-
-Dynamic hiding is an orthogonal issue though. It's needed for
-error handling in case of migration failure: we do not
-want to close the VFIO device but we do need to
-hide it from guest. libvirt should not be involved in
-this aspect though.
-
-> I
-> would much prefer to see some way to expose an explicit relationship be=
-tween
-> the devices to the guest.
->=20
-> > Disclaimers:
-> >=20
-> > * I have only scratch tested this and from qemu side, it seems to be
-> >   working.
-> > * This is an RFC so it lacks some proper error handling in few cases
-> >   and proper resource freeing. I wanted to get some feedback first
-> >   before it is finalized.
-> >=20
-> > Command line example:
-> >=20
-> > /home/sameeh/Builds/failover/qemu/x86_64-softmmu/qemu-system-x86_64 \
-> > -netdev tap,id=3Dhostnet0,script=3Dworld_bridge_standalone.sh,downscr=
-ipt=3Dno,ifname=3Dcc1_71 \
-> > -netdev tap,vhost=3Don,id=3Dhostnet1,script=3Dworld_bridge_standalone=
-.sh,downscript=3Dno,ifname=3Dcc1_72,queues=3D4 \
-> > -device virtio-net,host_mtu=3D1500,netdev=3Dhostnet1,id=3Dcc1_72,vect=
-ors=3D10,mq=3Don,primary=3Dcc1_71 \
-> > -device e1000,netdev=3Dhostnet0,id=3Dcc1_71,standby=3Dcc1_72 \
-> >=20
-> > Migration support:
-> >=20
-> > Pre migration or during setup phase of the migration we should send a=
-n
-> > unplug request to the guest to unplug the primary device. I haven't h=
-ad
-> > the chance to implement that part yet but should do soon. Do you know
-> > what's the best approach to do so? I wanted to have a callback to the
-> > virtio-net device which tries to send an unplug request to the guest =
-and
-> > if succeeds then the migration continues. It needs to handle the case=
- where
-> > the migration fails and then it has to replug the primary device back=
-.
->=20
-> Having QEMU do this internally gets into a world of pain when you have
-> multiple devices in the guest.
->=20
-> Consider if we have 2 pairs of devices. We unplug one VFIO device, but
-> unplugging the second VFIO device fails, thus we try to replug the firs=
-t
-> VFIO device but this now fails too. We don't even get as far as startin=
-g
-> the migration before we have to return an error.
->=20
-> The mgmt app will just see that the migration failed, but it will not
-> be sure which devices are now actually exposed to the guest OS correctl=
-y.
->=20
-> The similar problem hits if we started the migration data stream, but
-> then had to abort and so need to tear try to replug in the source but
-> failed for some reasons.
->=20
-> Doing the VFIO device plugging/unplugging explicitly from the mgmt app
-> gives that mgmt app direct information about which devices have been
-> successfully made available to the guest at all time, becuase the mgmt
-> app can see the errors from each step of the process.  Trying to do
-> this inside QEMU doesn't achieve anything the mgmt app can't already
-> do, but it obscures what happens during failures.  The same applies at
-> the libvirt level too, which is why mgmt apps today will do the VFIO
-> unplug/replug either side of migration themselves.
->=20
->=20
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
+MDEuMTIuMjAxOCAxOjAzLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBSZWZhY3RvciB0aGUgJ25hbWUn
+IHBhcmFtZXRlciBvZiBuYmRfcmVjZWl2ZV9uZWdvdGlhdGUoKSBmcm9tDQo+IGJlaW5nIGEgc2Vw
+YXJhdGUgcGFyYW1ldGVyIGludG8gYmVpbmcgcGFydCBvZiB0aGUgaW4tb3V0ICdpbmZvJy4NCj4g
+VGhpcyBhbHNvIHNwaWxscyBvdmVyIHRvIGEgc2ltcGxpZmljYXRpb24gb2YgbmJkX29wdF9nbygp
+Lg0KPiANCj4gVGhlIG1haW4gZHJpdmVyIGZvciB0aGlzIHJlZmFjdG9yaW5nIGlzIHRoYXQgYW4g
+dXBjb21pbmcgcGF0Y2gNCj4gd291bGQgbGlrZSB0byBhZGQgc3VwcG9ydCB0byBxZW11LW5iZCB0
+byBsaXN0IGluZm9ybWF0aW9uIGFib3V0DQo+IGFsbCBleHBvcnRzIGF2YWlsYWJsZSBvbiBhIHNl
+cnZlciwgd2hlcmUgdGhlIG5hbWUocykgd2lsbCBiZQ0KPiBwcm92aWRlZCBieSB0aGUgc2VydmVy
+IGluc3RlYWQgb2YgdGhlIGNsaWVudC4gIEJ1dCBhbm90aGVyIGJlbmVmaXQNCj4gaXMgdGhhdCB3
+ZSBjYW4gbm93IGFsbG93IHRoZSBjbGllbnQgdG8gZXhwbGljaXRseSBzcGVjaWZ5IHRoZQ0KPiBl
+bXB0eSBleHBvcnQgbmFtZSAiIiBldmVuIHdoZW4gY29ubmVjdGluZyB0byBhbiBvbGRzdHlsZSBz
+ZXJ2ZXINCj4gKGV2ZW4gaWYgcWVtdSBpcyBubyBsb25nZXIgc3VjaCBhIHNlcnZlciBhZnRlciBj
+b21taXQgN2Y3ZGZlMmEpLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogRXJpYyBCbGFrZSA8ZWJsYWtl
+QHJlZGhhdC5jb20+DQoNClsuLi5dDQoNCj4gQEAgLTg3Nyw4ICs4NzQsOCBAQCBpbnQgbmJkX3Jl
+Y2VpdmVfbmVnb3RpYXRlKFFJT0NoYW5uZWwgKmlvYywgY29uc3QgY2hhciAqbmFtZSwNCj4gICAg
+ICAgfSBlbHNlIGlmIChtYWdpYyA9PSBOQkRfQ0xJRU5UX01BR0lDKSB7DQo+ICAgICAgICAgICB1
+aW50MzJfdCBvbGRmbGFnczsNCj4gDQo+IC0gICAgICAgIGlmIChuYW1lKSB7DQo+IC0gICAgICAg
+ICAgICBlcnJvcl9zZXRnKGVycnAsICJTZXJ2ZXIgZG9lcyBub3Qgc3VwcG9ydCBleHBvcnQgbmFt
+ZXMiKTsNCj4gKyAgICAgICAgaWYgKCppbmZvLT5uYW1lKSB7DQo+ICsgICAgICAgICAgICBlcnJv
+cl9zZXRnKGVycnAsICJTZXJ2ZXIgZG9lcyBub3Qgc3VwcG9ydCBub24tZW1wdHkgZXhwb3J0IG5h
+bWVzIik7DQoNCmhtLCBvbGQgbWVzc2FnZSBpcyBhIGJpdCBuZWFyZXIgdG8gbmJkIHNwZWMsIHRo
+ZSBuZXcgbWF5IGJlIGEgYml0IG1vcmUNCnVuZGVyc3RhbmRhYmxlIGluIGNvbnRleHQgb2YgY3Vy
+cmVudCBxZW11LW5iZCBoZWxwOg0KIi14LCAtLWV4cG9ydC1uYW1lPU5BTUUgICAgZXhwb3NlIGV4
+cG9ydCBieSBuYW1lIChkZWZhdWx0IGlzIGVtcHR5IHN0cmluZykiDQoNCnNvLCBJJ20gT0sgd2l0
+aCBlaXRoZXIgb25lLg0KDQo+ICAgICAgICAgICAgICAgZ290byBmYWlsOw0KPiAgICAgICAgICAg
+fQ0KPiAgICAgICAgICAgaWYgKHRsc2NyZWRzKSB7DQo+IGRpZmYgLS1naXQgYS9xZW11LW5iZC5j
+IGIvcWVtdS1uYmQuYw0KPiBpbmRleCA4NjZlNjQ3NzlmMS4uYzU3MDUzYTA3OTUgMTAwNjQ0DQo+
+IC0tLSBhL3FlbXUtbmJkLmMNCj4gKysrIGIvcWVtdS1uYmQuYw0KPiBAQCAtMjYzLDcgKzI2Myw3
+IEBAIHN0YXRpYyB2b2lkICpzaG93X3BhcnRzKHZvaWQgKmFyZykNCj4gICBzdGF0aWMgdm9pZCAq
+bmJkX2NsaWVudF90aHJlYWQodm9pZCAqYXJnKQ0KPiAgIHsNCj4gICAgICAgY2hhciAqZGV2aWNl
+ID0gYXJnOw0KPiAtICAgIE5CREV4cG9ydEluZm8gaW5mbyA9IHsgLnJlcXVlc3Rfc2l6ZXMgPSBm
+YWxzZSwgfTsNCj4gKyAgICBOQkRFeHBvcnRJbmZvIGluZm8gPSB7IC5yZXF1ZXN0X3NpemVzID0g
+ZmFsc2UsIC5uYW1lID0gZ19zdHJkdXAoIiIpIH07DQo+ICAgICAgIFFJT0NoYW5uZWxTb2NrZXQg
+KnNpb2M7DQo+ICAgICAgIGludCBmZDsNCj4gICAgICAgaW50IHJldDsNCj4gQEAgLTI3OCw3ICsy
+NzgsNyBAQCBzdGF0aWMgdm9pZCAqbmJkX2NsaWVudF90aHJlYWQodm9pZCAqYXJnKQ0KPiAgICAg
+ICAgICAgZ290byBvdXQ7DQo+ICAgICAgIH0NCj4gDQo+IC0gICAgcmV0ID0gbmJkX3JlY2VpdmVf
+bmVnb3RpYXRlKFFJT19DSEFOTkVMKHNpb2MpLCBOVUxMLA0KPiArICAgIHJldCA9IG5iZF9yZWNl
+aXZlX25lZ290aWF0ZShRSU9fQ0hBTk5FTChzaW9jKSwNCj4gICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIE5VTEwsIE5VTEwsIE5VTEwsICZpbmZvLCAmbG9jYWxfZXJyb3IpOw0KPiAg
+ICAgICBpZiAocmV0IDwgMCkgew0KPiAgICAgICAgICAgaWYgKGxvY2FsX2Vycm9yKSB7DQo+IEBA
+IC0zMTcsNiArMzE3LDcgQEAgc3RhdGljIHZvaWQgKm5iZF9jbGllbnRfdGhyZWFkKHZvaWQgKmFy
+ZykNCj4gICAgICAgfQ0KPiAgICAgICBjbG9zZShmZCk7DQo+ICAgICAgIG9iamVjdF91bnJlZihP
+QkpFQ1Qoc2lvYykpOw0KPiArICAgIGZyZWUoaW5mby5uYW1lKTsNCg0KZ19mcmVlDQoNCj4gICAg
+ICAga2lsbChnZXRwaWQoKSwgU0lHVEVSTSk7DQo+ICAgICAgIHJldHVybiAodm9pZCAqKSBFWElU
+X1NVQ0NFU1M7DQo+IA0KPiBAQCAtMzI1LDYgKzMyNiw3IEBAIG91dF9mZDoNCj4gICBvdXRfc29j
+a2V0Og0KPiAgICAgICBvYmplY3RfdW5yZWYoT0JKRUNUKHNpb2MpKTsNCj4gICBvdXQ6DQo+ICsg
+ICAgZnJlZShpbmZvLm5hbWUpOw0KDQphbmQgaGVyZQ0KDQo+ICAgICAgIGtpbGwoZ2V0cGlkKCks
+IFNJR1RFUk0pOw0KPiAgICAgICByZXR1cm4gKHZvaWQgKikgRVhJVF9GQUlMVVJFOw0KPiAgIH0N
+Cj4gZGlmZiAtLWdpdCBhL25iZC90cmFjZS1ldmVudHMgYi9uYmQvdHJhY2UtZXZlbnRzDQo+IGlu
+ZGV4IDVlMWQ0YWZlOGU2Li4yODkzMzdkMGRjMyAxMDA2NDQNCj4gLS0tIGEvbmJkL3RyYWNlLWV2
+ZW50cw0KPiArKysgYi9uYmQvdHJhY2UtZXZlbnRzDQo+IEBAIC0xNSw3ICsxNSw3IEBAIG5iZF9v
+cHRfbWV0YV9yZXBseShjb25zdCBjaGFyICpjb250ZXh0LCB1aW50MzJfdCBpZCkgIlJlY2VpdmVk
+IG1hcHBpbmcgb2YgY29udGV4DQo+ICAgbmJkX3JlY2VpdmVfbmVnb3RpYXRlKHZvaWQgKnRsc2Ny
+ZWRzLCBjb25zdCBjaGFyICpob3N0bmFtZSkgIlJlY2VpdmluZyBuZWdvdGlhdGlvbiB0bHNjcmVk
+cz0lcCBob3N0bmFtZT0lcyINCj4gICBuYmRfcmVjZWl2ZV9uZWdvdGlhdGVfbWFnaWModWludDY0
+X3QgbWFnaWMpICJNYWdpYyBpcyAweCUiIFBSSXg2NA0KPiAgIG5iZF9yZWNlaXZlX25lZ290aWF0
+ZV9zZXJ2ZXJfZmxhZ3ModWludDMyX3QgZ2xvYmFsZmxhZ3MpICJHbG9iYWwgZmxhZ3MgYXJlIDB4
+JSIgUFJJeDMyDQo+IC1uYmRfcmVjZWl2ZV9uZWdvdGlhdGVfZGVmYXVsdF9uYW1lKHZvaWQpICJV
+c2luZyBkZWZhdWx0IE5CRCBleHBvcnQgbmFtZSBcIlwiIg0KPiArbmJkX3JlY2VpdmVfbmVnb3Rp
+YXRlX25hbWUoY29uc3QgY2hhciAqbmFtZSkgIlJlcXVlc3RpbmcgTkJEIGV4cG9ydCBuYW1lIFwi
+JXNcIiINCg0KT3RoZXIgdHJhY2UgcG9pbnRzIHByZWZlcnMgdG8gdXNlIHNpbmdsZSBxdW90ZXMg
+d2l0aCBleHBvcnQgbmFtZSAob3Igd2l0aG91dCBxdW90ZXMpLA0KdGhpcyBtYXkgYmUgY2hhbmdl
+ZCB0b28uIE9oLCB0b28gZGVlcCBuaXQtcGlja2luZyBvXzANCg0KPiAgIG5iZF9yZWNlaXZlX25l
+Z290aWF0ZV9zaXplX2ZsYWdzKHVpbnQ2NF90IHNpemUsIHVpbnQxNl90IGZsYWdzKSAiU2l6ZSBp
+cyAlIiBQUkl1NjQgIiwgZXhwb3J0IGZsYWdzIDB4JSIgUFJJeDE2DQo+ICAgbmJkX2luaXRfc2V0
+X3NvY2tldCh2b2lkKSAiU2V0dGluZyBOQkQgc29ja2V0Ig0KPiAgIG5iZF9pbml0X3NldF9ibG9j
+a19zaXplKHVuc2lnbmVkIGxvbmcgYmxvY2tfc2l6ZSkgIlNldHRpbmcgYmxvY2sgc2l6ZSB0byAl
+bHUiDQo+IA0KDQp3aXRoIGZpeGVkIHMvZnJlZS9nX2ZyZWU6DQpSZXZpZXdlZC1ieTogVmxhZGlt
+aXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KDQoNCi0t
+IA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
