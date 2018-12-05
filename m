@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gUYyQ-0001NG-R9
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:20:27 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gUZ0T-0002Oe-Hz
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:22:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gUYyP-0002lS-Se
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:20:26 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 5 Dec 2018 15:20:01 +0000
-Message-ID: <f501db97-f802-5211-2155-5ba4ca31f329@virtuozzo.com>
-References: <20181130220344.3350618-1-eblake@redhat.com>
-	<20181130220344.3350618-4-eblake@redhat.com>
-In-Reply-To: <20181130220344.3350618-4-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <33CDBCFC49FE03459B208A95F4B8BBFC@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <cohuck@redhat.com>) id 1gUZ0Q-00052Z-9a
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:22:33 -0500
+Date: Wed, 5 Dec 2018 16:22:21 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181205162221.5f537ce7.cohuck@redhat.com>
+In-Reply-To: <cdc9ce9e-18fb-5152-ba7d-33326d46a05d@linux.ibm.com>
+References: <1543961939-2419-1-git-send-email-walling@linux.ibm.com>
+	<76a5ccbc-69db-7876-478e-fba565b3a126@de.ibm.com>
+	<cdc9ce9e-18fb-5152-ba7d-33326d46a05d@linux.ibm.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 03/14] qemu-nbd: Fail earlier for -c/-d on
- non-linux
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] s390: guest support for diagnose 318
+ and limit max VCPUs to 247
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,48 +25,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Collin Walling <walling@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, david@redhat.com, mimu@linux.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com
 
-MDEuMTIuMjAxOCAxOjAzLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBDb25uZWN0aW5nIHRvIGEgL2Rl
-di9uYmROIGRldmljZSBpcyBhIExpbnV4LXNwZWNpZmljIGFjdGlvbi4NCj4gV2Ugd2VyZSBhbHJl
-YWR5IG1hc2tpbmcgLWMgYW5kIC1kIGZyb20gJ3FlbXUtbmJkIC0taGVscCcgb24NCj4gbm9uLWxp
-bnV4LiAgSG93ZXZlciwgd2hpbGUgLWQgZmFpbHMgd2l0aCBhIHNlbnNpYmxlIGVycm9yDQo+IG1l
-c3NhZ2UsIGl0IHRvb2sgaHVudGluZyB0aHJvdWdoIGEgY291cGxlIG9mIGZpbGVzIHRvIHByb3Zl
-DQo+IHRoYXQuICBXaGF0J3MgbW9yZSwgdGhlIGNvZGUgZm9yIC1jIGRvZXNuJ3QgZmFpbCB1bnRp
-bCBhZnRlcg0KPiBpdCBoYXMgY3JlYXRlZCBhIHB0aHJlYWQgYW5kIHRyaWVkIHRvIG9wZW4gYSBk
-ZXZpY2UgLSBwb3NzaWJseQ0KPiBldmVuIHByaW50aW5nIGFuIGVycm9yIG1lc3NhZ2Ugd2l0aCAl
-bSBvbiBhIG5vbi1MaW51eCBwbGF0Zm9ybQ0KPiBpbiBzcGl0ZSBvZiB0aGUgY29tbWVudCB0aGF0
-ICVtIGlzIGdsaWJjLXNwZWNpZmljLiAgTWFrZSB0aGUNCj4gZmFpbHVyZSBoYXBwZW4gc29vbmVy
-LCB0aGVuIGdldCByaWQgb2Ygc3R1YnMgdGhhdCBhcmUgbm8NCj4gbG9uZ2VyIG5lZWRlZCBiZWNh
-dXNlIG9mIHRoZSBlYXJseSBleGl0cy4NCj4gDQo+IFdoaWxlIGF0IGl0OiB0d2VhayB0aGUgYmxh
-bmsgbmV3bGluZXMgaW4gLS1oZWxwIG91dHB1dCB0byBiZQ0KPiBjb25zaXN0ZW50LCB3aGV0aGVy
-IG9yIG5vdCBidWlsdCBvbiBMaW51eC4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEVyaWMgQmxha2Ug
-PGVibGFrZUByZWRoYXQuY29tPg0KPiAtLS0NClsuLi5dDQoNCj4gQEAgLTgxNSw2ICs4MjMsNyBA
-QCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3YpDQo+ICAgICAgIH0NCj4gDQo+ICAgICAg
-IGlmIChkaXNjb25uZWN0KSB7DQo+ICsjaWYgSEFWRV9OQkRfREVWSUNFDQo+ICAgICAgICAgICBp
-bnQgbmJkZmQgPSBvcGVuKGFyZ3Zbb3B0aW5kXSwgT19SRFdSKTsNCj4gICAgICAgICAgIGlmIChu
-YmRmZCA8IDApIHsNCj4gICAgICAgICAgICAgICBlcnJvcl9yZXBvcnQoIkNhbm5vdCBvcGVuICVz
-OiAlcyIsIGFyZ3Zbb3B0aW5kXSwNCj4gQEAgLTgyOCw2ICs4MzcsMTAgQEAgaW50IG1haW4oaW50
-IGFyZ2MsIGNoYXIgKiphcmd2KQ0KPiAgICAgICAgICAgcHJpbnRmKCIlcyBkaXNjb25uZWN0ZWRc
-biIsIGFyZ3Zbb3B0aW5kXSk7DQo+IA0KPiAgICAgICAgICAgcmV0dXJuIDA7DQo+ICsjZWxzZQ0K
-PiArICAgICAgICBlcnJvcl9yZXBvcnQoIktlcm5lbCAvZGV2L25iZE4gc3VwcG9ydCBub3QgYXZh
-aWxhYmxlIik7DQo+ICsgICAgICAgIGV4aXQoRVhJVF9GQUlMVVJFKTsNCj4gKyNlbmRpZg0KPiAg
-ICAgICB9DQo+IA0KPiAgICAgICBpZiAoKGRldmljZSAmJiAhdmVyYm9zZSkgfHwgZm9ya19wcm9j
-ZXNzKSB7DQo+IEBAIC0xMDA2LDYgKzEwMTksNyBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAq
-KmFyZ3YpDQo+ICAgICAgIG5iZF9leHBvcnRfc2V0X2Rlc2NyaXB0aW9uKGV4cCwgZXhwb3J0X2Rl
-c2NyaXB0aW9uKTsNCj4gDQo+ICAgICAgIGlmIChkZXZpY2UpIHsNCj4gKyNpZiBIQVZFX05CRF9E
-RVZJQ0UNCj4gICAgICAgICAgIGludCByZXQ7DQo+IA0KPiAgICAgICAgICAgcmV0ID0gcHRocmVh
-ZF9jcmVhdGUoJmNsaWVudF90aHJlYWQsIE5VTEwsIG5iZF9jbGllbnRfdGhyZWFkLCBkZXZpY2Up
-Ow0KPiBAQCAtMTAxMyw2ICsxMDI3LDEwIEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJn
-dikNCj4gICAgICAgICAgICAgICBlcnJvcl9yZXBvcnQoIkZhaWxlZCB0byBjcmVhdGUgY2xpZW50
-IHRocmVhZDogJXMiLCBzdHJlcnJvcihyZXQpKTsNCj4gICAgICAgICAgICAgICBleGl0KEVYSVRf
-RkFJTFVSRSk7DQo+ICAgICAgICAgICB9DQo+ICsjZWxzZQ0KPiArICAgICAgICBlcnJvcl9yZXBv
-cnQoIktlcm5lbCAvZGV2L25iZE4gc3VwcG9ydCBub3QgYXZhaWxhYmxlIik7DQo+ICsgICAgICAg
-IGV4aXQoRVhJVF9GQUlMVVJFKTsNCg0KaG1tLCB3ZSBoYXZlIHNvbWUgaWYgKGRldmljZSAuLi4p
-IGNvbmRpdGlvbnMgd2l0aCBleHRyYSBsb2dpYyBhYm92ZSB0aGlzIHBvaW50Lg0KSSB0aGluayBp
-dCdzIGJldHRlciB0byBmYWlsIGVhcmxpZXIgaW4gdGhpcyBjYXNlLiBGb3IgZXhhbXBsZSwgZXhh
-Y3RseSBhZnRlcg0KZGlzY29ubmVjdCBodW5rDQoNCj4gKyNlbmRpZg0KPiAgICAgICB9IGVsc2Ug
-ew0KPiAgICAgICAgICAgLyogU2h1dCB1cCBHQ0Mgd2FybmluZ3MuICAqLw0KPiAgICAgICAgICAg
-bWVtc2V0KCZjbGllbnRfdGhyZWFkLCAwLCBzaXplb2YoY2xpZW50X3RocmVhZCkpOw0KPiANCg0K
-DQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+On Wed, 5 Dec 2018 09:59:54 -0500
+Collin Walling <walling@linux.ibm.com> wrote:
+
+> On 12/5/18 3:29 AM, Christian Borntraeger wrote:
+> > You should clearly review your email list.....
+> > 
+> > Adding the "new" Conny, removing Carsten.
+> >   
+> 
+> Thanks for taking care of that. I'll be more careful when using the
+> addresses at the top of the files. 
+
+scripts/get_maintainer.pl -f <file> is probably more useful to get
+current addresses :)
