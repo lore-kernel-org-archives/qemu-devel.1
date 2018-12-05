@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gUWGZ-0004FW-QN
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:27:03 -0500
+	(envelope-from <bounces@canonical.com>) id 1gUWGo-0004C0-Du
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:27:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gUW7i-0000PB-CZ
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:17:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51580)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gUW7i-0000OA-6L
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:17:50 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8904FC070E0B
-	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 12:17:48 +0000 (UTC)
-Date: Wed, 5 Dec 2018 12:17:39 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181205121737.GA2391@work-vm>
-References: <f60b8f1e-979b-4af9-7b48-a691c1937f6a@redhat.com>
-	<4dd4e70a-7129-722c-971a-1b9f8b9aa349@redhat.com>
-	<87wooql7c9.fsf@dusky.pond.sub.org>
-	<de1686a3-1981-442d-a82a-704bca834922@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1gUW15-0001X7-9K
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:11:03 -0500
+Received: from indium.canonical.com ([91.189.90.7]:58572)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gUW15-0001Wb-2R
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:10:59 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gUW13-0003RG-VI
+	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 12:10:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E2F432E80CB
+	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 12:10:57 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <de1686a3-1981-442d-a82a-704bca834922@redhat.com>
-Subject: Re: [Qemu-devel] QMP accepts double dict keys
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 05 Dec 2018 11:57:23 -0000
+From: GH Cao <1804961@bugs.launchpad.net>
+Reply-To: Bug 1804961 <1804961@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154309137717.32238.5287661827417174062.malonedeb@wampee.canonical.com>
+Message-Id: <tencent_D95BAB3184D4445BB0029741B659C213AB09@qq.com>
+Errors-To: bounces@canonical.com
+Subject: Re: [Qemu-devel] [Bug 1804961] Re: qemu-system-aarch64: Windows 10
+ ARM64 BSoD on boot while using virt-3.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,59 +37,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
 
-* Eric Blake (eblake@redhat.com) wrote:
-> On 12/3/18 1:48 PM, Markus Armbruster wrote:
-> > Eric Blake <eblake@redhat.com> writes:
-> > 
-> > > On 12/3/18 10:30 AM, Max Reitz wrote:
-> > > > Hi,
-> > > > 
-> > > > QMP accepts double keys in dicts without complaining.  The value it is
-> > > > using is apparently the last one specified:
-> > > 
-> > > JSON says it is undefined what happens when a client passes double
-> > > keys. We are probably best off if we teach our parser to be strict and
-> > > reject doubled keys in QMP as invalid.
-> > 
-> > Not bug-compatible.  Do we care?
-> 
-> I don't think so. Such a client was already invoking undefined behavior.
-> Relying on first- or last-past-the-post to win is not portable, since JSON
-> parsers are allowed to use hash tables with non-deterministic lookups. I
-> think erroring out is nicer than silently accepting one thing, especially if
-> that might have been different than what the client (incorrectly) expected.
-> I'm not even sure that we would want a deprecation period.
+Yeah it seems to be. Windows boots fine after I disable hi ECAM region.
 
-Agreed, because it's the type of thing that ends up being potentially
-dangerous, since if you had some form of security check that was looking
-at QMP messages it might check one version of the field and not the
-other.
 
-Dave
+ =
 
-> > 
-> > > Hmm - can a client abuse QMP with duplicate keys to cause qemu to leak
-> > > memory?
-> > 
-> > No.  parse_pair() inserts with qdict_put_obj(), which replaces the old
-> > value without leaking it.
-> 
-> Good to know.
-> 
-> > > > 
-> > > > Another test case is iotest 229 which specifies both mode=absolute-paths
-> > > > and mode=existing (it wants the latter).
-> 
-> We'll have to fix such broken clients, of course. If it is just our iotests
-> (and not libvirt), I'm less worried about the change in behavior.
-> 
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+---Original---
+From: "Alex Benn=C3=A9e"<alex.bennee@linaro.org>
+Date: 2018/12/5 19:41:40
+To: "driver1998"<driver1998@foxmail.com>;
+Subject: [Bug 1804961] Re: qemu-system-aarch64: Windows 10 ARM64 BSoD on bo=
+ot while using virt-3.0
+
+
+Could it be related to:
+
+commit 17ec075a651a3f9613429c2d97018fce459ed943
+Author: Eric Auger <eric.auger@redhat.com>
+Date:   Fri Jun 22 13:28:37 2018 +0100
+
+    hw/arm/virt: Use 256MB ECAM region by default
+
+    With this patch, virt-3.0 machine uses a new 256MB ECAM region
+    by default instead of the legacy 16MB one, if highmem is set
+    (LPAE supported by the guest) and (!firmware_loaded || aarch64).
+
+    Indeed aarch32 mode FW may not support this high ECAM region.
+
+As far as I can tell the only real differences between virt-2.12 and
+later at the size of the ECAM region and the max number of CPUs it
+supports:
+
+static void virt_machine_2_12_options(MachineClass *mc)
+{
+    VirtMachineClass *vmc =3D VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
+
+    virt_machine_3_0_options(mc);
+    SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_12);
+    vmc->no_highmem_ecam =3D true;
+    mc->max_cpus =3D 255;
+}
+
+
+** Tags added: aarch64 acpi
+
+-- =
+
+You received this bug notification because you are subscribed to the bug
+report.
+https://bugs.launchpad.net/bugs/1804961
+
+Title:
+  qemu-system-aarch64: Windows 10 ARM64 BSoD on boot while using
+  virt-3.0
+
+Status in QEMU:
+  New
+
+Bug description:
+  When I emulate a virt-3.0 machine, Windows 10 BSoD on boot, with the
+  error code being ACPI_BIOS_ERROR(0x000000A5), virt-2.12 boots fine.
+
+  Windows Build: 10.0.17134.1
+  QEMU version: 3.0.0
+  Commandline: qemu-system-aarch64 -M virt -accel tcg,thread=3Dmulti -cpu c=
+ortex-a57 -smp 2 -m 2048 -bios QEMU_EFI.fd -device ramfb -device nec-usb-xh=
+ci -device usb-kbd -device usb-tablet -hda disk.vhd -vnc :0
+
+  By the way, the patch to add DBG2 table discussed here
+  https://lists.gnu.org/archive/html/qemu-devel/2015-09/msg01719.html
+  works (although minor change is required to adapt to the qemu 3.0.0
+  code), the table is accepted by Windows (Windows require both DBG2 and
+  SPCR to be valid for serial kernel debugging to work), so it may help
+  further diagnosing this issue.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1804961/+subscriptions
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1804961
+
+Title:
+  qemu-system-aarch64: Windows 10 ARM64 BSoD on boot while using
+  virt-3.0
+
+Status in QEMU:
+  New
+
+Bug description:
+  When I emulate a virt-3.0 machine, Windows 10 BSoD on boot, with the
+  error code being ACPI_BIOS_ERROR(0x000000A5), virt-2.12 boots fine.
+
+  Windows Build: 10.0.17134.1
+  QEMU version: 3.0.0
+  Commandline: qemu-system-aarch64 -M virt -accel tcg,thread=3Dmulti -cpu c=
+ortex-a57 -smp 2 -m 2048 -bios QEMU_EFI.fd -device ramfb -device nec-usb-xh=
+ci -device usb-kbd -device usb-tablet -hda disk.vhd -vnc :0
+
+  By the way, the patch to add DBG2 table discussed here
+  https://lists.gnu.org/archive/html/qemu-devel/2015-09/msg01719.html
+  works (although minor change is required to adapt to the qemu 3.0.0
+  code), the table is accepted by Windows (Windows require both DBG2 and
+  SPCR to be valid for serial kernel debugging to work), so it may help
+  further diagnosing this issue.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1804961/+subscriptions
