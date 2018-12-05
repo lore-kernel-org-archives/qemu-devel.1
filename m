@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gUZuo-0001og-DN
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:20:48 -0500
+	(envelope-from <armbru@redhat.com>) id 1gUZvo-0002HY-Iu
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:21:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gUZuj-0001rD-GB
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:20:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54612)
+	(envelope-from <armbru@redhat.com>) id 1gUZvj-0004PB-LW
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:21:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34736)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gUZuj-0001ji-9K
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:20:41 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gUZvj-0004OQ-FE
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:21:43 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <1f7db2e27758f26d4c10f7a8ed1d8232635f6909.1536044449.git.pkrempa@redhat.com>
-	<20181004113412.GI21448@angien.pipo.sk>
-	<20181205123337.GI799@angien.pipo.sk>
-	<CAJ+F1CLr5_nB2hpXJrhMeJnsXjME8k+0s90wZHw-H_qsQht63A@mail.gmail.com>
-Date: Wed, 05 Dec 2018 17:20:31 +0100
-In-Reply-To: <CAJ+F1CLr5_nB2hpXJrhMeJnsXjME8k+0s90wZHw-H_qsQht63A@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 5 Dec 2018
-	18:09:52 +0400")
-Message-ID: <87tvjsq71s.fsf@dusky.pond.sub.org>
+References: <154393964026.28192.13536237934563059985.stgit@gimli.home>
+	<154394077749.28192.1229512133780284321.stgit@gimli.home>
+	<83c490a2-7565-b95c-563f-fb73476e874f@redhat.com>
+	<87d0qgrrd0.fsf@dusky.pond.sub.org>
+	<3821b727-a0ec-5f92-4ec9-f858322457bc@redhat.com>
+Date: Wed, 05 Dec 2018 17:21:41 +0100
+In-Reply-To: <3821b727-a0ec-5f92-4ec9-f858322457bc@redhat.com> (Auger Eric's
+	message of "Wed, 5 Dec 2018 15:27:17 +0100")
+Message-ID: <87pnugq6zu.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qapi: Add vim magic modelines for qapi
- definitions
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [for-4.0 PATCH v3 3/9] qapi: Define PCIe link
+ speed and width properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,49 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Peter Krempa <pkrempa@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Geoffrey McRae <geoff@hostfission.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+Auger Eric <eric.auger@redhat.com> writes:
 
-> Hi
+> Hi Markus,
 >
-> On Wed, Dec 5, 2018 at 4:34 PM Peter Krempa <pkrempa@redhat.com> wrote:
->>
->> On Thu, Oct 04, 2018 at 13:34:12 +0200, Peter Krempa wrote:
->> > On Tue, Sep 04, 2018 at 09:03:10 +0200, Peter Krempa wrote:
->> > > The files have a json suffix but look terrible with json syntax
->> > > hilighting enabled. Add a magic modeline for vim to switch to python
->> > > file format for hilighting similarly to the emacs modeline already
->> > > present.
->> > >
->> > > Signed-off-by: Peter Krempa <pkrempa@redhat.com>
->> > > ---
->> >
->> > Ping?
->>
->> Ping 2. It looks like no new json files were added meanwhile.
+> On 12/5/18 3:16 PM, Markus Armbruster wrote:
+>> Auger Eric <eric.auger@redhat.com> writes:
+[...]
+>>> nit: g_assert_not_reached() here and below.
+>> 
+>> In my opinion, g_assert_not_reached() & friends are an overly ornate
+>> reinvention of an old and perfectly adequate wheel.
+>> 
+>> A long time ago for reasons since forgotten, the maintainers in charge
+>> back then demanded abort() instead of assert(0).  Either is fine with
+>> me.
+>> 
+>> I tolerate g_assert_not_reached() in files that already use g_assert().
+>> This one doesn't.
+>> 
+>> In any case, I'd drop the comment.
 >
-> I use both emacs and vim. We solved this for me with emacs .editorconf
-> file_type_emacs.
->
-> The vim plugin doesn't have an equivalent, however, the documentation
-> suggest vim_filetype, but you need to add
-> to .vimrc:
->
-> function! FiletypeHook(config)
->     if has_key(a:config, 'vim_filetype')
->         let &filetype =3D a:config['vim_filetype']
->     endif
->
->     return 0   " Return 0 to show no error happened
-> endfunction
->
-> call editorconfig#AddNewHook(function('FiletypeHook'))
->
-> I think this is a better solution than having to add modelines
-> everywhere, what do you think?
+> OK I did not know. In the past I was encouraged to use it.
 
-These .json files are not valid JSON.  They *are* valid Python (except
-for a few tests, which could perhaps be fixed).  Makes me wonder why on
-earth we insist on naming them .json and create all this trouble.
+Some maintainers like ornate ;)
+
+> Thanks
+>
+> Eric
+>> 
+>> Note that I'm not this file's maintainer.
+>> 
+>> [...]
