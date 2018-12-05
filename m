@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44642)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gUgXl-0007ar-IA
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:25:29 -0500
+	(envelope-from <clg@kaod.org>) id 1gUgY4-0007pn-9F
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:25:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gUgXZ-0003xb-Nu
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:25:19 -0500
-Received: from 7.mo177.mail-out.ovh.net ([46.105.61.149]:50641)
+	(envelope-from <clg@kaod.org>) id 1gUgXo-00048j-Ke
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:25:35 -0500
+Received: from 4.mo68.mail-out.ovh.net ([46.105.59.63]:38745)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gUgXT-0003nC-3z
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:25:09 -0500
-Received: from player714.ha.ovh.net (unknown [10.109.160.93])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id AABB0D5C4D
-	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 00:25:03 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gUgXl-0003rm-Ud
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:25:26 -0500
+Received: from player714.ha.ovh.net (unknown [10.109.146.32])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id DD52F1082FA
+	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 00:25:08 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu,  6 Dec 2018 00:22:36 +0100
-Message-Id: <20181205232251.10446-23-clg@kaod.org>
+Date: Thu,  6 Dec 2018 00:22:37 +0100
+Message-Id: <20181205232251.10446-24-clg@kaod.org>
 In-Reply-To: <20181205232251.10446-1-clg@kaod.org>
 References: <20181205232251.10446-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 22/37] spapr: add a 'pseries-3.1-xive'
- machine type
+Subject: [Qemu-devel] [PATCH v6 23/37] linux-headers: update to 4.20-rc5
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,167 +32,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-The interrupt mode is statically defined to XIVE only for this machine.
-The guest OS is required to have support for the XIVE exploitation
-mode of the POWER9 interrupt controller.
+These changes provide the initial interface with the KVM device
+implementing the XIVE native exploitation interrupt mode. Also used to
+retrieve the state of the KVM device for the monitor usage and for
+migration.
+
+Available from :
+
+  https://github.com/legoater/linux/commits/xive-4.20
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- include/hw/ppc/spapr.h     |  6 ++++++
- include/hw/ppc/spapr_irq.h |  1 +
- hw/ppc/spapr.c             | 36 +++++++++++++++++++++++++++++++-----
- hw/ppc/spapr_irq.c         |  3 +++
- 4 files changed, 41 insertions(+), 5 deletions(-)
+ linux-headers/asm-powerpc/kvm.h | 46 +++++++++++++++++++++++++++++++++
+ linux-headers/linux/kvm.h       |  6 +++++
+ 2 files changed, 52 insertions(+)
 
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 6bf028a02fe2..daced428a42c 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -824,5 +824,11 @@ int spapr_caps_post_migration(sPAPRMachineState *spa=
-pr);
+diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-powerpc/=
+kvm.h
+index 8c876c166ef2..10fe86c21e8f 100644
+--- a/linux-headers/asm-powerpc/kvm.h
++++ b/linux-headers/asm-powerpc/kvm.h
+@@ -480,6 +480,8 @@ struct kvm_ppc_cpu_char {
+ #define  KVM_REG_PPC_ICP_PPRI_SHIFT	16	/* pending irq priority */
+ #define  KVM_REG_PPC_ICP_PPRI_MASK	0xff
 =20
- void spapr_check_pagesize(sPAPRMachineState *spapr, hwaddr pagesize,
-                           Error **errp);
-+/*
-+ * XIVE definitions
-+ */
-+#define SPAPR_OV5_XIVE_LEGACY   0x0
-+#define SPAPR_OV5_XIVE_EXPLOIT  0x40
-+#define SPAPR_OV5_XIVE_BOTH     0x80
-=20
- #endif /* HW_SPAPR_H */
-diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-index bdb1c66125c9..26727a7263a5 100644
---- a/include/hw/ppc/spapr_irq.h
-+++ b/include/hw/ppc/spapr_irq.h
-@@ -33,6 +33,7 @@ void spapr_irq_msi_reset(sPAPRMachineState *spapr);
- typedef struct sPAPRIrq {
-     uint32_t    nr_irqs;
-     uint32_t    nr_msis;
-+    uint8_t     ov5;
-=20
-     void (*init)(sPAPRMachineState *spapr, int nr_irqs, Error **errp);
-     int (*claim)(sPAPRMachineState *spapr, int irq, bool lsi, Error **er=
-rp);
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 530aee8d143d..817dd1b2c442 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1097,12 +1097,14 @@ static void spapr_dt_rtas(sPAPRMachineState *spap=
-r, void *fdt)
-     spapr_dt_rtas_tokens(fdt, rtas);
- }
-=20
--/* Prepare ibm,arch-vec-5-platform-support, which indicates the MMU feat=
-ures
-- * that the guest may request and thus the valid values for bytes 24..26=
- of
-- * option vector 5: */
--static void spapr_dt_ov5_platform_support(void *fdt, int chosen)
-+/* Prepare ibm,arch-vec-5-platform-support, which indicates the MMU
-+ * and the XIVE features that the guest may request and thus the valid
-+ * values for bytes 23..26 of option vector 5: */
-+static void spapr_dt_ov5_platform_support(sPAPRMachineState *spapr, void=
- *fdt,
-+                                          int chosen)
- {
-     PowerPCCPU *first_ppc_cpu =3D POWERPC_CPU(first_cpu);
-+    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-=20
-     char val[2 * 4] =3D {
-         23, 0x00, /* Xive mode, filled in below. */
-@@ -1123,7 +1125,11 @@ static void spapr_dt_ov5_platform_support(void *fd=
-t, int chosen)
-         } else {
-             val[3] =3D 0x00; /* Hash */
-         }
-+        /* No KVM support */
-+        val[1] =3D SPAPR_OV5_XIVE_LEGACY;
-     } else {
-+        val[1] =3D smc->irq->ov5;
++#define KVM_REG_PPC_NVT_STATE	(KVM_REG_PPC | KVM_REG_SIZE_U256 | 0x8d)
 +
-         /* V3 MMU supports both hash and radix in tcg (with dynamic swit=
-ching) */
-         val[3] =3D 0xC0;
-     }
-@@ -1191,7 +1197,7 @@ static void spapr_dt_chosen(sPAPRMachineState *spap=
-r, void *fdt)
-         _FDT(fdt_setprop_string(fdt, chosen, "stdout-path", stdout_path)=
-);
-     }
+ /* Device control API: PPC-specific devices */
+ #define KVM_DEV_MPIC_GRP_MISC		1
+ #define   KVM_DEV_MPIC_BASE_ADDR	0	/* 64-bit */
+@@ -675,4 +677,48 @@ struct kvm_ppc_cpu_char {
+ #define  KVM_XICS_PRESENTED		(1ULL << 43)
+ #define  KVM_XICS_QUEUED		(1ULL << 44)
 =20
--    spapr_dt_ov5_platform_support(fdt, chosen);
-+    spapr_dt_ov5_platform_support(spapr, fdt, chosen);
-=20
-     g_free(stdout_path);
-     g_free(bootlist);
-@@ -2624,6 +2630,11 @@ static void spapr_machine_init(MachineState *machi=
-ne)
-     /* advertise support for ibm,dyamic-memory-v2 */
-     spapr_ovec_set(spapr->ov5, OV5_DRMEM_V2);
-=20
-+    /* advertise XIVE */
-+    if (smc->irq->ov5 =3D=3D SPAPR_OV5_XIVE_EXPLOIT) {
-+        spapr_ovec_set(spapr->ov5, OV5_XIVE_EXPLOIT);
-+    }
++/* POWER9 XIVE Native Interrupt Controller */
++#define KVM_DEV_XIVE_GRP_CTRL		1
++#define   KVM_DEV_XIVE_GET_ESB_FD	1
++#define   KVM_DEV_XIVE_GET_TIMA_FD	2
++#define   KVM_DEV_XIVE_VC_BASE		3
++#define   KVM_DEV_XIVE_SAVE_EQ_PAGES	4
++#define KVM_DEV_XIVE_GRP_SOURCES	2	/* 64-bit source attributes */
++#define KVM_DEV_XIVE_GRP_SYNC		3	/* 64-bit source attributes */
++#define KVM_DEV_XIVE_GRP_EAS		4	/* 64-bit eas attributes */
++#define KVM_DEV_XIVE_GRP_EQ		5	/* 64-bit eq attributes */
 +
-     /* init CPUs */
-     spapr_init_cpus(spapr);
++/* Layout of 64-bit XIVE source attribute values */
++#define KVM_XIVE_LEVEL_SENSITIVE	(1ULL << 0)
++#define KVM_XIVE_LEVEL_ASSERTED		(1ULL << 1)
++
++/* Layout of 64-bit eas attribute values */
++#define KVM_XIVE_EAS_PRIORITY_SHIFT	0
++#define KVM_XIVE_EAS_PRIORITY_MASK	0x7
++#define KVM_XIVE_EAS_SERVER_SHIFT	3
++#define KVM_XIVE_EAS_SERVER_MASK	0xfffffff8ULL
++#define KVM_XIVE_EAS_MASK_SHIFT		32
++#define KVM_XIVE_EAS_MASK_MASK		0x100000000ULL
++#define KVM_XIVE_EAS_EISN_SHIFT		33
++#define KVM_XIVE_EAS_EISN_MASK		0xfffffffe00000000ULL
++
++/* Layout of 64-bit eq attribute */
++#define KVM_XIVE_EQ_PRIORITY_SHIFT	0
++#define KVM_XIVE_EQ_PRIORITY_MASK	0x7
++#define KVM_XIVE_EQ_SERVER_SHIFT	3
++#define KVM_XIVE_EQ_SERVER_MASK		0xfffffff8ULL
++
++/* Layout of 64-bit eq attribute values */
++struct kvm_ppc_xive_eq {
++	__u32 flags;
++	__u32 qsize;
++	__u64 qpage;
++	__u32 qtoggle;
++	__u32 qindex;
++};
++
++#define KVM_XIVE_EQ_FLAG_ENABLED	0x00000001
++#define KVM_XIVE_EQ_FLAG_ALWAYS_NOTIFY	0x00000002
++#define KVM_XIVE_EQ_FLAG_ESCALATE	0x00000004
++
+ #endif /* __LINUX_KVM_POWERPC_H */
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index f11a7eb49cfa..b7a74c58d0db 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -965,6 +965,8 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_COALESCED_PIO 162
+ #define KVM_CAP_HYPERV_ENLIGHTENED_VMCS 163
+ #define KVM_CAP_EXCEPTION_PAYLOAD 164
++#define KVM_CAP_ARM_VM_IPA_SIZE 165
++#define KVM_CAP_PPC_IRQ_XIVE 166
 =20
-@@ -3973,6 +3984,21 @@ static void spapr_machine_3_1_class_options(Machin=
-eClass *mc)
+ #ifdef KVM_CAP_IRQ_ROUTING
 =20
- DEFINE_SPAPR_MACHINE(3_1, "3.1", true);
+@@ -1188,6 +1190,8 @@ enum kvm_device_type {
+ #define KVM_DEV_TYPE_ARM_VGIC_V3	KVM_DEV_TYPE_ARM_VGIC_V3
+ 	KVM_DEV_TYPE_ARM_VGIC_ITS,
+ #define KVM_DEV_TYPE_ARM_VGIC_ITS	KVM_DEV_TYPE_ARM_VGIC_ITS
++	KVM_DEV_TYPE_XIVE,
++#define KVM_DEV_TYPE_XIVE		KVM_DEV_TYPE_XIVE
+ 	KVM_DEV_TYPE_MAX,
+ };
 =20
-+static void spapr_machine_3_1_xive_instance_options(MachineState *machin=
+@@ -1305,6 +1309,8 @@ struct kvm_s390_ucas_mapping {
+ #define KVM_GET_DEVICE_ATTR	  _IOW(KVMIO,  0xe2, struct kvm_device_attr)
+ #define KVM_HAS_DEVICE_ATTR	  _IOW(KVMIO,  0xe3, struct kvm_device_attr)
+=20
++#define KVM_DESTROY_DEVICE	  _IOWR(KVMIO,  0xf0, struct kvm_create_devic=
 e)
-+{
-+    spapr_machine_3_1_instance_options(machine);
-+}
-+
-+static void spapr_machine_3_1_xive_class_options(MachineClass *mc)
-+{
-+    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-+
-+    spapr_machine_3_1_class_options(mc);
-+    smc->irq =3D &spapr_irq_xive;
-+}
-+
-+DEFINE_SPAPR_MACHINE(3_1_xive, "3.1-xive", false);
 +
  /*
-  * pseries-3.0
+  * ioctls for vcpu fds
   */
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 58ce124c1501..8eead17c8f36 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -220,6 +220,7 @@ static void spapr_irq_reset_xics(sPAPRMachineState *s=
-papr, Error **errp)
- sPAPRIrq spapr_irq_xics =3D {
-     .nr_irqs     =3D SPAPR_IRQ_XICS_NR_IRQS,
-     .nr_msis     =3D SPAPR_IRQ_XICS_NR_MSIS,
-+    .ov5         =3D SPAPR_OV5_XIVE_LEGACY,
-=20
-     .init        =3D spapr_irq_init_xics,
-     .claim       =3D spapr_irq_claim_xics,
-@@ -357,6 +358,7 @@ static void spapr_irq_reset_xive(sPAPRMachineState *s=
-papr, Error **errp)
- sPAPRIrq spapr_irq_xive =3D {
-     .nr_irqs     =3D SPAPR_IRQ_XIVE_NR_IRQS,
-     .nr_msis     =3D SPAPR_IRQ_XIVE_NR_MSIS,
-+    .ov5         =3D SPAPR_OV5_XIVE_EXPLOIT,
-=20
-     .init        =3D spapr_irq_init_xive,
-     .claim       =3D spapr_irq_claim_xive,
-@@ -481,6 +483,7 @@ int spapr_irq_find(sPAPRMachineState *spapr, int num,=
- bool align, Error **errp)
- sPAPRIrq spapr_irq_xics_legacy =3D {
-     .nr_irqs     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
-     .nr_msis     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
-+    .ov5         =3D SPAPR_OV5_XIVE_LEGACY,
-=20
-     .init        =3D spapr_irq_init_xics,
-     .claim       =3D spapr_irq_claim_xics,
 --=20
 2.17.2
