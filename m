@@ -1,41 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1gUYu0-0002lz-Ns
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:15:55 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUYyQ-0001NG-R9
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:20:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1gUYef-0007hG-45
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:00:07 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36510
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
-	id 1gUYee-0007gy-Tl
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:00:01 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wB5EuQjt047256
-	for <qemu-devel@nongnu.org>; Wed, 5 Dec 2018 10:00:00 -0500
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2p6gvgg4v3-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 10:00:00 -0500
-Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
-	Wed, 5 Dec 2018 14:59:59 -0000
-References: <1543961939-2419-1-git-send-email-walling@linux.ibm.com>
-	<76a5ccbc-69db-7876-478e-fba565b3a126@de.ibm.com>
-From: Collin Walling <walling@linux.ibm.com>
-Date: Wed, 5 Dec 2018 09:59:54 -0500
-MIME-Version: 1.0
-In-Reply-To: <76a5ccbc-69db-7876-478e-fba565b3a126@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUYyP-0002lS-Se
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:20:26 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 5 Dec 2018 15:20:01 +0000
+Message-ID: <f501db97-f802-5211-2155-5ba4ca31f329@virtuozzo.com>
+References: <20181130220344.3350618-1-eblake@redhat.com>
+	<20181130220344.3350618-4-eblake@redhat.com>
+In-Reply-To: <20181130220344.3350618-4-eblake@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <cdc9ce9e-18fb-5152-ba7d-33326d46a05d@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v1] s390: guest support for diagnose 318
- and limit max VCPUs to 247
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <33CDBCFC49FE03459B208A95F4B8BBFC@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 03/14] qemu-nbd: Fail earlier for -c/-d on
+ non-linux
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,392 +26,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, david@redhat.com, mimu@linux.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: thuth@redhat.com
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-On 12/5/18 3:29 AM, Christian Borntraeger wrote:
-> You should clearly review your email list.....
-> 
-> Adding the "new" Conny, removing Carsten.
-> 
-
-Thanks for taking care of that. I'll be more careful when using the
-addresses at the top of the files. 
-
-> 
-> On 04.12.2018 23:18, Collin Walling wrote:
->> Add migration and reset support for diagnose 318. This is a new z14 GA2 
->> hardware feature, but we can provide guest support starting with the 
->> zEC12-full CPU model.
->>
->> Because new hardware introduces a new facility-availability byte in 
->> the Read SCP Info block, we lose one byte in the CPU entries list 
->> and must limit the maximum VCPUs to 247 (down from 248).
->>
->> Signed-off-by: Collin Walling <walling@linux.ibm.com>
->> ---
->>
->> Changelog
->>
->>     RFC -> v1
->>         - introduced kvm stubs for set/get cpc
->>         - s/fac134/byte_134
->>         - moved diag318 vmstate description to diag.c
->>         - reduced S390_VCPU_MAX to 247
->>
->>  hw/s390x/ipl.c                  |  3 +++
->>  hw/s390x/s390-virtio-ccw.c      |  3 +++
->>  hw/s390x/sclp.c                 |  2 ++
->>  include/hw/s390x/sclp.h         |  2 ++
->>  linux-headers/asm-s390/kvm.h    |  5 ++++
->>  target/s390x/cpu.h              |  2 +-
->>  target/s390x/cpu_features.c     |  3 +++
->>  target/s390x/cpu_features.h     |  1 +
->>  target/s390x/cpu_features_def.h |  3 +++
->>  target/s390x/diag.c             | 53 +++++++++++++++++++++++++++++++++++++++++
->>  target/s390x/gen-features.c     |  1 +
->>  target/s390x/internal.h         |  4 +++-
->>  target/s390x/kvm-stub.c         | 10 ++++++++
->>  target/s390x/kvm.c              | 23 ++++++++++++++++++
->>  target/s390x/kvm_s390x.h        |  3 +++
->>  15 files changed, 116 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
->> index 21f64ad..6e3af65 100644
->> --- a/hw/s390x/ipl.c
->> +++ b/hw/s390x/ipl.c
->> @@ -27,6 +27,7 @@
->>  #include "qemu/cutils.h"
->>  #include "qemu/option.h"
->>  #include "exec/exec-all.h"
->> +#include "internal.h"
->>  
->>  #define KERN_IMAGE_START                0x010000UL
->>  #define LINUX_MAGIC_ADDR                0x010008UL
->> @@ -230,6 +231,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
->>      ipl->compat_start_addr = ipl->start_addr;
->>      ipl->compat_bios_start_addr = ipl->bios_start_addr;
->>      qemu_register_reset(qdev_reset_all_fn, dev);
->> +
->> +    diag318_register();
->>  error:
->>      error_propagate(errp, err);
->>  }
->> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index a0615a8..2c670fc 100644
->> --- a/hw/s390x/s390-virtio-ccw.c
->> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -37,6 +37,7 @@
->>  #include "cpu_models.h"
->>  #include "hw/nmi.h"
->>  #include "hw/s390x/tod.h"
->> +#include "internal.h"
->>  
->>  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
->>  {
->> @@ -357,6 +358,7 @@ static void s390_machine_reset(void)
->>          }
->>          subsystem_reset();
->>          s390_crypto_reset();
->> +        diag318_reset();
->>          run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
->>          break;
->>      case S390_RESET_LOAD_NORMAL:
->> @@ -364,6 +366,7 @@ static void s390_machine_reset(void)
->>              run_on_cpu(t, s390_do_cpu_reset, RUN_ON_CPU_NULL);
->>          }
->>          subsystem_reset();
->> +        diag318_reset();
->>          run_on_cpu(cs, s390_do_cpu_initial_reset, RUN_ON_CPU_NULL);
->>          run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
->>          break;
->> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
->> index 4510a80..183c627 100644
->> --- a/hw/s390x/sclp.c
->> +++ b/hw/s390x/sclp.c
->> @@ -73,6 +73,8 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
->>                           read_info->conf_char);
->>      s390_get_feat_block(S390_FEAT_TYPE_SCLP_CONF_CHAR_EXT,
->>                           read_info->conf_char_ext);
->> +    /* Read Info byte 134 */
->> +    s390_get_feat_block(S390_FEAT_TYPE_SCLP_BYTE_134, read_info->byte_134);
->>  
->>      read_info->facilities = cpu_to_be64(SCLP_HAS_CPU_INFO |
->>                                          SCLP_HAS_IOA_RECONFIG);
->> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
->> index f9db243..eb12ba2 100644
->> --- a/include/hw/s390x/sclp.h
->> +++ b/include/hw/s390x/sclp.h
->> @@ -133,6 +133,8 @@ typedef struct ReadInfo {
->>      uint16_t highest_cpu;
->>      uint8_t  _reserved5[124 - 122];     /* 122-123 */
->>      uint32_t hmfai;
->> +    uint8_t  _reserved7[134 - 128];     /* 128-133 */
->> +    uint8_t  byte_134[1];
->>      struct CPUEntry entries[0];
->>  } QEMU_PACKED ReadInfo;
->>  
->> diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
->> index 0265482..8c206d2 100644
->> --- a/linux-headers/asm-s390/kvm.h
->> +++ b/linux-headers/asm-s390/kvm.h
->> @@ -74,6 +74,7 @@ struct kvm_s390_io_adapter_req {
->>  #define KVM_S390_VM_CRYPTO		2
->>  #define KVM_S390_VM_CPU_MODEL		3
->>  #define KVM_S390_VM_MIGRATION		4
->> +#define KVM_S390_VM_MISC		5
->>  
->>  /* kvm attributes for mem_ctrl */
->>  #define KVM_S390_VM_MEM_ENABLE_CMMA	0
->> @@ -130,6 +131,7 @@ struct kvm_s390_vm_cpu_machine {
->>  #define KVM_S390_VM_CPU_FEAT_PFMFI	11
->>  #define KVM_S390_VM_CPU_FEAT_SIGPIF	12
->>  #define KVM_S390_VM_CPU_FEAT_KSS	13
->> +#define KVM_S390_VM_CPU_FEAT_DIAG318	14
->>  struct kvm_s390_vm_cpu_feat {
->>  	__u64 feat[16];
->>  };
->> @@ -168,6 +170,9 @@ struct kvm_s390_vm_cpu_subfunc {
->>  #define KVM_S390_VM_MIGRATION_START	1
->>  #define KVM_S390_VM_MIGRATION_STATUS	2
->>  
->> +/* kvm attributes for KVM_S390_VM_MISC */
->> +#define KVM_S390_VM_MISC_CPC		0
->> +
->>  /* for KVM_GET_REGS and KVM_SET_REGS */
->>  struct kvm_regs {
->>  	/* general purpose regs for s390 */
->> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
->> index 8c2320e..594b4a4 100644
->> --- a/target/s390x/cpu.h
->> +++ b/target/s390x/cpu.h
->> @@ -52,7 +52,7 @@
->>  
->>  #define MMU_USER_IDX 0
->>  
->> -#define S390_MAX_CPUS 248
->> +#define S390_MAX_CPUS 247
->>  
->>  typedef struct PSW {
->>      uint64_t mask;
->> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
->> index 60cfeba..d05afa5 100644
->> --- a/target/s390x/cpu_features.c
->> +++ b/target/s390x/cpu_features.c
->> @@ -121,6 +121,9 @@ static const S390FeatDef s390_features[] = {
->>      FEAT_INIT("pfmfi", S390_FEAT_TYPE_SCLP_CONF_CHAR_EXT, 9, "SIE: PFMF interpretation facility"),
->>      FEAT_INIT("ibs", S390_FEAT_TYPE_SCLP_CONF_CHAR_EXT, 10, "SIE: Interlock-and-broadcast-suppression facility"),
->>  
->> +    /* SCLP SCCB Byte 134 */
->> +    FEAT_INIT("diag318", S390_FEAT_TYPE_SCLP_BYTE_134, 0, "SIE: Diagnose 318"),
->> +
->>      FEAT_INIT("sief2", S390_FEAT_TYPE_SCLP_CPU, 4, "SIE: interception format 2 (Virtual SIE)"),
->>      FEAT_INIT("skey", S390_FEAT_TYPE_SCLP_CPU, 5, "SIE: Storage-key facility"),
->>      FEAT_INIT("gpereh", S390_FEAT_TYPE_SCLP_CPU, 10, "SIE: Guest-PER enhancement facility"),
->> diff --git a/target/s390x/cpu_features.h b/target/s390x/cpu_features.h
->> index effe790..e7248df 100644
->> --- a/target/s390x/cpu_features.h
->> +++ b/target/s390x/cpu_features.h
->> @@ -23,6 +23,7 @@ typedef enum {
->>      S390_FEAT_TYPE_STFL,
->>      S390_FEAT_TYPE_SCLP_CONF_CHAR,
->>      S390_FEAT_TYPE_SCLP_CONF_CHAR_EXT,
->> +    S390_FEAT_TYPE_SCLP_BYTE_134,
->>      S390_FEAT_TYPE_SCLP_CPU,
->>      S390_FEAT_TYPE_MISC,
->>      S390_FEAT_TYPE_PLO,
->> diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
->> index 5fc7e7b..d99da1d 100644
->> --- a/target/s390x/cpu_features_def.h
->> +++ b/target/s390x/cpu_features_def.h
->> @@ -109,6 +109,9 @@ typedef enum {
->>      S390_FEAT_SIE_PFMFI,
->>      S390_FEAT_SIE_IBS,
->>  
->> +    /* Read Info Byte 134 */
->> +    S390_FEAT_DIAG318,
->> +
->>      /* Sclp Cpu */
->>      S390_FEAT_SIE_F2,
->>      S390_FEAT_SIE_SKEY,
->> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
->> index acb0f3d..2207c08 100644
->> --- a/target/s390x/diag.c
->> +++ b/target/s390x/diag.c
->> @@ -20,6 +20,8 @@
->>  #include "sysemu/cpus.h"
->>  #include "hw/s390x/ipl.h"
->>  #include "hw/s390x/s390-virtio-ccw.h"
->> +#include "kvm_s390x.h"
->> +#include "sysemu/kvm.h"
->>  
->>  int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3)
->>  {
->> @@ -134,3 +136,54 @@ out:
->>          break;
->>      }
->>  }
->> +
->> +typedef struct Diag318Data {
->> +    uint64_t cpc;
->> +} Diag318Data;
->> +static Diag318Data diag318data;
->> +
->> +void diag318_reset(void)
->> +{
->> +    if (s390_has_feat(S390_FEAT_DIAG318)) {
->> +        kvm_s390_set_cpc(0);
->> +    }
->> +}
->> +
->> +static int diag318_post_load(void *opaque, int version_id)
->> +{
->> +    Diag318Data *d = opaque;
->> +
->> +    kvm_s390_set_cpc(d->cpc);
->> +    return 0;
->> +}
->> +
->> +static int diag318_pre_save(void *opaque)
->> +{
->> +    Diag318Data *d = opaque;
->> +
->> +    kvm_s390_get_cpc(&d->cpc);
->> +    return 0;
->> +}
->> +
->> +static bool diag318_needed(void *opaque)
->> +{
->> +    return s390_has_feat(S390_FEAT_DIAG318);
->> +}
->> +
->> +const VMStateDescription vmstate_diag318 = {
->> +    .name = "diag318",
->> +    .post_load = diag318_post_load,
->> +    .pre_save = diag318_pre_save,
->> +    .version_id = 1,
->> +    .minimum_version_id = 1,
->> +    .needed = diag318_needed,
->> +    .fields = (VMStateField[]) {
->> +        VMSTATE_UINT64(cpc, Diag318Data),
->> +        VMSTATE_END_OF_LIST()
->> +    }
->> +};
->> +
->> +void diag318_register(void)
->> +{
->> +    vmstate_register(NULL, 0, &vmstate_diag318, &diag318data);
->> +}
->> \ No newline at end of file
->> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
->> index 70015ea..a3d1457 100644
->> --- a/target/s390x/gen-features.c
->> +++ b/target/s390x/gen-features.c
->> @@ -450,6 +450,7 @@ static uint16_t full_GEN12_GA1[] = {
->>      S390_FEAT_AP_QUERY_CONFIG_INFO,
->>      S390_FEAT_AP_FACILITIES_TEST,
->>      S390_FEAT_AP,
->> +    S390_FEAT_DIAG318,
->>  };
->>  
->>  static uint16_t full_GEN12_GA2[] = {
->> diff --git a/target/s390x/internal.h b/target/s390x/internal.h
->> index f2a771e..d53b1d0 100644
->> --- a/target/s390x/internal.h
->> +++ b/target/s390x/internal.h
->> @@ -383,10 +383,12 @@ int mmu_translate_real(CPUS390XState *env, target_ulong raddr, int rw,
->>                         target_ulong *addr, int *flags);
->>  
->>  
->> -/* misc_helper.c */
->> +/* diag.c */
->>  int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3);
->>  void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3,
->>                       uintptr_t ra);
->> +void diag318_register(void);
->> +void diag318_reset(void);
->>  
->>  
->>  /* translate.c */
->> diff --git a/target/s390x/kvm-stub.c b/target/s390x/kvm-stub.c
->> index bf7795e..1f0bee3 100644
->> --- a/target/s390x/kvm-stub.c
->> +++ b/target/s390x/kvm-stub.c
->> @@ -104,3 +104,13 @@ void kvm_s390_stop_interrupt(S390CPU *cpu)
->>  void kvm_s390_restart_interrupt(S390CPU *cpu)
->>  {
->>  }
->> +
->> +int kvm_s390_get_cpc(uint64_t *cpc)
->> +{
->> +    return 0;
->> +}
->> +
->> +int kvm_s390_set_cpc(uint64_t cpc)
->> +{
->> +    return 0;
->> +}
->> \ No newline at end of file
->> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
->> index 2ebf26a..9ed4cea 100644
->> --- a/target/s390x/kvm.c
->> +++ b/target/s390x/kvm.c
->> @@ -749,6 +749,28 @@ int kvm_s390_set_clock_ext(uint8_t tod_high, uint64_t tod_low)
->>      return kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
->>  }
->>  
->> +int kvm_s390_get_cpc(uint64_t *cpc)
->> +{
->> +    struct kvm_device_attr attr = {
->> +        .group = KVM_S390_VM_MISC,
->> +        .attr = KVM_S390_VM_MISC_CPC,
->> +        .addr = (uint64_t)cpc,
->> +    };
->> +
->> +    return kvm_vm_ioctl(kvm_state, KVM_GET_DEVICE_ATTR, &attr);
->> +}
->> +
->> +int kvm_s390_set_cpc(uint64_t cpc)
->> +{
->> +    struct kvm_device_attr attr = {
->> +        .group = KVM_S390_VM_MISC,
->> +        .attr = KVM_S390_VM_MISC_CPC,
->> +        .addr = (uint64_t)&cpc,
->> +    };
->> +
->> +    return kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
->> +}
->> +
->>  /**
->>   * kvm_s390_mem_op:
->>   * @addr:      the logical start address in guest memory
->> @@ -2142,6 +2164,7 @@ static int kvm_to_feat[][2] = {
->>      { KVM_S390_VM_CPU_FEAT_PFMFI, S390_FEAT_SIE_PFMFI},
->>      { KVM_S390_VM_CPU_FEAT_SIGPIF, S390_FEAT_SIE_SIGPIF},
->>      { KVM_S390_VM_CPU_FEAT_KSS, S390_FEAT_SIE_KSS},
->> +    { KVM_S390_VM_CPU_FEAT_DIAG318, S390_FEAT_DIAG318},
->>  };
->>  
->>  static int query_cpu_feat(S390FeatBitmap features)
->> diff --git a/target/s390x/kvm_s390x.h b/target/s390x/kvm_s390x.h
->> index 6e52287..53f165f 100644
->> --- a/target/s390x/kvm_s390x.h
->> +++ b/target/s390x/kvm_s390x.h
->> @@ -29,6 +29,9 @@ int kvm_s390_get_clock(uint8_t *tod_high, uint64_t *tod_clock);
->>  int kvm_s390_get_clock_ext(uint8_t *tod_high, uint64_t *tod_clock);
->>  int kvm_s390_set_clock(uint8_t tod_high, uint64_t tod_clock);
->>  int kvm_s390_set_clock_ext(uint8_t tod_high, uint64_t tod_clock);
->> +int kvm_s390_get_cpc(uint64_t *cpc);
->> +int kvm_s390_set_cpc(uint64_t cpc);
->> +bool kvm_s390_has_diag318(void);
->>  void kvm_s390_enable_css_support(S390CPU *cpu);
->>  int kvm_s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t sch,
->>                                      int vq, bool assign);
->>
-> 
-> 
-
-
--- 
-Respectfully,
-- Collin Walling
+MDEuMTIuMjAxOCAxOjAzLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBDb25uZWN0aW5nIHRvIGEgL2Rl
+di9uYmROIGRldmljZSBpcyBhIExpbnV4LXNwZWNpZmljIGFjdGlvbi4NCj4gV2Ugd2VyZSBhbHJl
+YWR5IG1hc2tpbmcgLWMgYW5kIC1kIGZyb20gJ3FlbXUtbmJkIC0taGVscCcgb24NCj4gbm9uLWxp
+bnV4LiAgSG93ZXZlciwgd2hpbGUgLWQgZmFpbHMgd2l0aCBhIHNlbnNpYmxlIGVycm9yDQo+IG1l
+c3NhZ2UsIGl0IHRvb2sgaHVudGluZyB0aHJvdWdoIGEgY291cGxlIG9mIGZpbGVzIHRvIHByb3Zl
+DQo+IHRoYXQuICBXaGF0J3MgbW9yZSwgdGhlIGNvZGUgZm9yIC1jIGRvZXNuJ3QgZmFpbCB1bnRp
+bCBhZnRlcg0KPiBpdCBoYXMgY3JlYXRlZCBhIHB0aHJlYWQgYW5kIHRyaWVkIHRvIG9wZW4gYSBk
+ZXZpY2UgLSBwb3NzaWJseQ0KPiBldmVuIHByaW50aW5nIGFuIGVycm9yIG1lc3NhZ2Ugd2l0aCAl
+bSBvbiBhIG5vbi1MaW51eCBwbGF0Zm9ybQ0KPiBpbiBzcGl0ZSBvZiB0aGUgY29tbWVudCB0aGF0
+ICVtIGlzIGdsaWJjLXNwZWNpZmljLiAgTWFrZSB0aGUNCj4gZmFpbHVyZSBoYXBwZW4gc29vbmVy
+LCB0aGVuIGdldCByaWQgb2Ygc3R1YnMgdGhhdCBhcmUgbm8NCj4gbG9uZ2VyIG5lZWRlZCBiZWNh
+dXNlIG9mIHRoZSBlYXJseSBleGl0cy4NCj4gDQo+IFdoaWxlIGF0IGl0OiB0d2VhayB0aGUgYmxh
+bmsgbmV3bGluZXMgaW4gLS1oZWxwIG91dHB1dCB0byBiZQ0KPiBjb25zaXN0ZW50LCB3aGV0aGVy
+IG9yIG5vdCBidWlsdCBvbiBMaW51eC4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEVyaWMgQmxha2Ug
+PGVibGFrZUByZWRoYXQuY29tPg0KPiAtLS0NClsuLi5dDQoNCj4gQEAgLTgxNSw2ICs4MjMsNyBA
+QCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3YpDQo+ICAgICAgIH0NCj4gDQo+ICAgICAg
+IGlmIChkaXNjb25uZWN0KSB7DQo+ICsjaWYgSEFWRV9OQkRfREVWSUNFDQo+ICAgICAgICAgICBp
+bnQgbmJkZmQgPSBvcGVuKGFyZ3Zbb3B0aW5kXSwgT19SRFdSKTsNCj4gICAgICAgICAgIGlmIChu
+YmRmZCA8IDApIHsNCj4gICAgICAgICAgICAgICBlcnJvcl9yZXBvcnQoIkNhbm5vdCBvcGVuICVz
+OiAlcyIsIGFyZ3Zbb3B0aW5kXSwNCj4gQEAgLTgyOCw2ICs4MzcsMTAgQEAgaW50IG1haW4oaW50
+IGFyZ2MsIGNoYXIgKiphcmd2KQ0KPiAgICAgICAgICAgcHJpbnRmKCIlcyBkaXNjb25uZWN0ZWRc
+biIsIGFyZ3Zbb3B0aW5kXSk7DQo+IA0KPiAgICAgICAgICAgcmV0dXJuIDA7DQo+ICsjZWxzZQ0K
+PiArICAgICAgICBlcnJvcl9yZXBvcnQoIktlcm5lbCAvZGV2L25iZE4gc3VwcG9ydCBub3QgYXZh
+aWxhYmxlIik7DQo+ICsgICAgICAgIGV4aXQoRVhJVF9GQUlMVVJFKTsNCj4gKyNlbmRpZg0KPiAg
+ICAgICB9DQo+IA0KPiAgICAgICBpZiAoKGRldmljZSAmJiAhdmVyYm9zZSkgfHwgZm9ya19wcm9j
+ZXNzKSB7DQo+IEBAIC0xMDA2LDYgKzEwMTksNyBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAq
+KmFyZ3YpDQo+ICAgICAgIG5iZF9leHBvcnRfc2V0X2Rlc2NyaXB0aW9uKGV4cCwgZXhwb3J0X2Rl
+c2NyaXB0aW9uKTsNCj4gDQo+ICAgICAgIGlmIChkZXZpY2UpIHsNCj4gKyNpZiBIQVZFX05CRF9E
+RVZJQ0UNCj4gICAgICAgICAgIGludCByZXQ7DQo+IA0KPiAgICAgICAgICAgcmV0ID0gcHRocmVh
+ZF9jcmVhdGUoJmNsaWVudF90aHJlYWQsIE5VTEwsIG5iZF9jbGllbnRfdGhyZWFkLCBkZXZpY2Up
+Ow0KPiBAQCAtMTAxMyw2ICsxMDI3LDEwIEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJn
+dikNCj4gICAgICAgICAgICAgICBlcnJvcl9yZXBvcnQoIkZhaWxlZCB0byBjcmVhdGUgY2xpZW50
+IHRocmVhZDogJXMiLCBzdHJlcnJvcihyZXQpKTsNCj4gICAgICAgICAgICAgICBleGl0KEVYSVRf
+RkFJTFVSRSk7DQo+ICAgICAgICAgICB9DQo+ICsjZWxzZQ0KPiArICAgICAgICBlcnJvcl9yZXBv
+cnQoIktlcm5lbCAvZGV2L25iZE4gc3VwcG9ydCBub3QgYXZhaWxhYmxlIik7DQo+ICsgICAgICAg
+IGV4aXQoRVhJVF9GQUlMVVJFKTsNCg0KaG1tLCB3ZSBoYXZlIHNvbWUgaWYgKGRldmljZSAuLi4p
+IGNvbmRpdGlvbnMgd2l0aCBleHRyYSBsb2dpYyBhYm92ZSB0aGlzIHBvaW50Lg0KSSB0aGluayBp
+dCdzIGJldHRlciB0byBmYWlsIGVhcmxpZXIgaW4gdGhpcyBjYXNlLiBGb3IgZXhhbXBsZSwgZXhh
+Y3RseSBhZnRlcg0KZGlzY29ubmVjdCBodW5rDQoNCj4gKyNlbmRpZg0KPiAgICAgICB9IGVsc2Ug
+ew0KPiAgICAgICAgICAgLyogU2h1dCB1cCBHQ0Mgd2FybmluZ3MuICAqLw0KPiAgICAgICAgICAg
+bWVtc2V0KCZjbGllbnRfdGhyZWFkLCAwLCBzaXplb2YoY2xpZW50X3RocmVhZCkpOw0KPiANCg0K
+DQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
