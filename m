@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gUSQy-0001s0-Fb
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 03:21:31 -0500
+	(envelope-from <armbru@redhat.com>) id 1gUSRW-0001yU-Ix
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 03:22:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gUSMv-0004yb-Ks
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 03:17:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:20783)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gUSMv-0004xm-Cd
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 03:17:17 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 41B0881129
-	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 08:17:15 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1gUSDK-00078n-A3
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 03:07:26 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <20181204131802.16885-1-marcandre.lureau@redhat.com>
-	<20181204131802.16885-3-marcandre.lureau@redhat.com>
-Date: Wed, 05 Dec 2018 09:17:06 +0100
-In-Reply-To: <20181204131802.16885-3-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Tue, 4 Dec 2018 17:17:58 +0400")
-Message-ID: <87lg541j7h.fsf@dusky.pond.sub.org>
+References: <20181204172535.2799-1-armbru@redhat.com>
+	<ae25db42-74e7-0870-46f8-7def27e5cf43@redhat.com>
+Date: Wed, 05 Dec 2018 09:07:13 +0100
+In-Reply-To: <ae25db42-74e7-0870-46f8-7def27e5cf43@redhat.com> (Eric Blake's
+	message of "Tue, 4 Dec 2018 11:46:01 -0600")
+Message-ID: <874lbs2y8e.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 2/6] monitor: accept chardev input from
- iothread
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] Clean up includes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,35 +23,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Tony Krowiak <akrowiak@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-riscv@nongnu.org, Pierre Morel <pmorel@linux.ibm.com>, Viktor Prutyanov <viktor.prutyanov@phystech.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Richard Henderson <rth@twiddle.net>, Palmer Dabbelt <palmer@sifive.com>, Alex Williamson <alex.williamson@redhat.com>, Yuval Shaia <yuval.shaia@oracle.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Michael Clark <mjc@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+Eric Blake <eblake@redhat.com> writes:
 
-> Chardev backends may not handle safely IO events from concurrent
-> threads (they are not thread-safe in general, only the write path is
-
-Suggest "may not handle I/O events from concurrent threads safely".
-
-> since commit > 9005b2a7589540a3733b3abdcfbccfe7746cd1a1). Better to
-> wake up the chardev from the monitor IO thread if it's being used as
-> the chardev context.
+> On 12/4/18 11:25 AM, Markus Armbruster wrote:
+>> Clean up includes so that osdep.h is included first and headers
+>> which it implies are not included manually.
+>>
+>> This commit was created with scripts/clean-includes, with the changes
+>> to the following files manually reverted:
+>>
+>>      contrib/libvhost-user/libvhost-user-glib.h
+>>      contrib/libvhost-user/libvhost-user.c
+>>      contrib/libvhost-user/libvhost-user.h
 >
-> Unify code paths by using a BH in all cases.
+> The script should probably auto-exclude contrib/ if none of those
+> files make it into our final binary, and especially if they are meant
+> to be compiled as stand-alone examples.
+
+
+
+>>      linux-user/mips64/cpu_loop.c
+>>      linux-user/mips64/signal.c
+>>      linux-user/sparc64/cpu_loop.c
+>>      linux-user/sparc64/signal.c
+>>      linux-user/x86_64/cpu_loop.c
+>>      linux-user/x86_64/signal.c
+>>      target/s390x/gen-features.c
+>>      tests/migration/s390x/a-b-bios.c
+>>      tests/test-rcu-simpleq.c
+>>      tests/test-rcu-tailq.c
 >
-> Drop the now redundant aio_notify() call.
+> Should any of these files be renamed *.c.inc to match their usage?
+> (Presuming that you excluded them because they are pulled in via
+> another .c file?)
+
+The linux-user/T64/N.c contain nothing but
+
+    #include "../T/N.c"
+
+plus sometimes a #define T_TARGET_SINGAL_H thrown in to suppress
+inclusion of a header.
+
+Perhaps moving the actual meat into a common .inc.c would be cleaner.
+
+Similarly, tests/test-rcu-simpleq.c contains nothing but
+
+    #define TEST_LIST_TYPE 2
+    #include "test-rcu-list.c"
+
+and tests/test-rcu-tailq.c is the same with 3 instead of 2.
+
+Again, we could move the actual meat into a common .inc.c.  But I'd
+first investigate compiling the test three times with the appropriate
+-DTEST_LIST_TYPE, using GNU Make's target-specific variable values.
+
+target/s390x/gen-features.c is a standalone program that is compiled in
+a way that breaks when we include osdep.h.  If that's fixable, fixing it
+would be nice.  Aside: not sure I'd have written this in C.
+
+tests/migration/s390x/ is a s390x guest firmware program for
+migration-test.c.  It's compiled as a freestanding application.  I guess
+osdep.h just gets in the way there.
+
+All of the above is well beyond the scope of this simple cleanup patch.
+
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>   contrib/elf2dmp/pdb.h                     | 2 --
+>>   contrib/elf2dmp/pe.h                      | 1 -
+>>   contrib/elf2dmp/qemu_elf.h                | 1 -
+>>   contrib/vhost-user-blk/vhost-user-blk.c   | 1 -
+>>   contrib/vhost-user-scsi/vhost-user-scsi.c | 1 -
 >
-> Simplify the condition, based on mon->use_io_thread (only QMP so far).
+> Hmm - my earlier question about auto-excluding contrib/ gets
+> trickier. What's the rationale for including some files in here?
 
-Suggest
+These are standalone programs that already include osdep.h.  My patch
+simply drops superfluous include directives.
 
-  Clean up control flow not to rely on mon->use_io_thread implying
-  monitor_is_qmp(mon).
+>>   hw/rdma/rdma_utils.c                      | 1 +
+>>   hw/rdma/rdma_utils.h                      | 1 -
+>>   hw/rdma/vmw/pvrdma_dev_ring.h             | 1 -
+>>   hw/vfio/ap.c                              | 2 +-
+>>   include/qemu/vfio-helpers.h               | 1 -
+>>   include/sysemu/whpx.h                     | 1 -
+>>   target/i386/sev.c                         | 3 ++-
+>>   target/i386/whp-dispatch.h                | 1 -
+>>   target/riscv/fpu_helper.c                 | 1 -
+>>   tests/fp/platform.h                       | 1 -
+>>   tests/tpm-util.h                          | 1 -
+>>   tests/vhost-user-bridge.c                 | 2 +-
+>>   util/qemu-thread-common.h                 | 1 -
+>>   18 files changed, 5 insertions(+), 18 deletions(-)
+>
+> The remainder of these files look reasonable.
 
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Peter Xu <peterx@redhat.com>
-
-Happy to improve the commit message in my tree.
-
-Preferably with commit message improvements:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Thanks!
