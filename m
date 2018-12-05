@@ -1,32 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gUYtx-0002ji-AL
+	(envelope-from <walling@linux.ibm.com>) id 1gUYu0-0002lz-Ns
 	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:15:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gUYfY-0000Aa-Lf
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:01:02 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:47050)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gUYfY-00009y-6O
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:00:56 -0500
-Received: by mail-oi1-x244.google.com with SMTP id x202so17719360oif.13
-	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 07:00:56 -0800 (PST)
+	(envelope-from <walling@linux.ibm.com>) id 1gUYef-0007hG-45
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:00:07 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36510
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+	id 1gUYee-0007gy-Tl
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:00:01 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wB5EuQjt047256
+	for <qemu-devel@nongnu.org>; Wed, 5 Dec 2018 10:00:00 -0500
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2p6gvgg4v3-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 10:00:00 -0500
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
+	Wed, 5 Dec 2018 14:59:59 -0000
+References: <1543961939-2419-1-git-send-email-walling@linux.ibm.com>
+	<76a5ccbc-69db-7876-478e-fba565b3a126@de.ibm.com>
+From: Collin Walling <walling@linux.ibm.com>
+Date: Wed, 5 Dec 2018 09:59:54 -0500
 MIME-Version: 1.0
-References: <20181120212553.8480-1-aaron@os.amperecomputing.com>
-	<20181120212553.8480-8-aaron@os.amperecomputing.com>
-	<CAFEAcA92+6NdqpB+L42cu1Ba7qvvHoLkjSDgcEDLvR=iqpd4gg@mail.gmail.com>
-	<20181203204452.GB5549@quinoa.localdomain>
-	<CAFEAcA900U3amGOGRKGNu+-j9EDhdrZ1U1U5MtoW5BeTo74iOQ@mail.gmail.com>
-	<05205391-27bf-c6be-bc71-648eee127c47@linaro.org>
-	<20181205130047.GC5549@quinoa.localdomain>
-In-Reply-To: <20181205130047.GC5549@quinoa.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 5 Dec 2018 15:00:43 +0000
-Message-ID: <CAFEAcA8bz20d4LrtEs=iRSJSZ_x5ERU0H0BiYvz4z=+c4v_WvA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v8 07/13] target-arm: Make PMCEID[01]_EL0
- 64 bit registers, add PMCEID[23]
+In-Reply-To: <76a5ccbc-69db-7876-478e-fba565b3a126@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <cdc9ce9e-18fb-5152-ba7d-33326d46a05d@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v1] s390: guest support for diagnose 318
+ and limit max VCPUs to 247
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,33 +44,392 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aaron Lindsay <aaron@os.amperecomputing.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, david@redhat.com, mimu@linux.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: thuth@redhat.com
 
-On Wed, 5 Dec 2018 at 13:00, Aaron Lindsay <aaron@os.amperecomputing.com> wrote:
->
-> On Dec 03 16:57, Richard Henderson wrote:
-> > Yes.  It would appear that this feature should be controlled by
-> > ID_DFR0.PerfMon.  So,
-> >
-> >   if (FIELD_EX32(cpu->id_dfr0, ID_DFR0, PERFMON) >= 4)
-> >
-> > once the appropriate FIELDs are added to cpu.h.
-> >
-> > Since this test is not used within translate*.c, there is no need to move
-> > id_dfr* into ARMISARegisters.  Since these are only aliases, they do not affect
-> > migration, and so do not (yet) need to be filled in by kvm.
->
-> Sounds reasonable to me. One clarification - do we also need to guard
-> against the 0b1111 value for ID_DFR0.PerfMon, which implies an
-> implementation-defined, non-PMUv3 PMU, or is it safe to assume no one
-> will attempt that flavor in QEMU?
+On 12/5/18 3:29 AM, Christian Borntraeger wrote:
+> You should clearly review your email list.....
+> 
+> Adding the "new" Conny, removing Carsten.
+> 
 
-We should check for 0xf, yes, following the recommended check
-logic described in the Arm ARM section "Alternative ID scheme used
-for the Performance Monitors Extension version". It doesn't
-seem likely that we'll end up with the 0xf case but we might
-as well avoid the question in advance...
+Thanks for taking care of that. I'll be more careful when using the
+addresses at the top of the files. 
 
-thanks
--- PMM
+> 
+> On 04.12.2018 23:18, Collin Walling wrote:
+>> Add migration and reset support for diagnose 318. This is a new z14 GA2 
+>> hardware feature, but we can provide guest support starting with the 
+>> zEC12-full CPU model.
+>>
+>> Because new hardware introduces a new facility-availability byte in 
+>> the Read SCP Info block, we lose one byte in the CPU entries list 
+>> and must limit the maximum VCPUs to 247 (down from 248).
+>>
+>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+>> ---
+>>
+>> Changelog
+>>
+>>     RFC -> v1
+>>         - introduced kvm stubs for set/get cpc
+>>         - s/fac134/byte_134
+>>         - moved diag318 vmstate description to diag.c
+>>         - reduced S390_VCPU_MAX to 247
+>>
+>>  hw/s390x/ipl.c                  |  3 +++
+>>  hw/s390x/s390-virtio-ccw.c      |  3 +++
+>>  hw/s390x/sclp.c                 |  2 ++
+>>  include/hw/s390x/sclp.h         |  2 ++
+>>  linux-headers/asm-s390/kvm.h    |  5 ++++
+>>  target/s390x/cpu.h              |  2 +-
+>>  target/s390x/cpu_features.c     |  3 +++
+>>  target/s390x/cpu_features.h     |  1 +
+>>  target/s390x/cpu_features_def.h |  3 +++
+>>  target/s390x/diag.c             | 53 +++++++++++++++++++++++++++++++++++++++++
+>>  target/s390x/gen-features.c     |  1 +
+>>  target/s390x/internal.h         |  4 +++-
+>>  target/s390x/kvm-stub.c         | 10 ++++++++
+>>  target/s390x/kvm.c              | 23 ++++++++++++++++++
+>>  target/s390x/kvm_s390x.h        |  3 +++
+>>  15 files changed, 116 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+>> index 21f64ad..6e3af65 100644
+>> --- a/hw/s390x/ipl.c
+>> +++ b/hw/s390x/ipl.c
+>> @@ -27,6 +27,7 @@
+>>  #include "qemu/cutils.h"
+>>  #include "qemu/option.h"
+>>  #include "exec/exec-all.h"
+>> +#include "internal.h"
+>>  
+>>  #define KERN_IMAGE_START                0x010000UL
+>>  #define LINUX_MAGIC_ADDR                0x010008UL
+>> @@ -230,6 +231,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+>>      ipl->compat_start_addr = ipl->start_addr;
+>>      ipl->compat_bios_start_addr = ipl->bios_start_addr;
+>>      qemu_register_reset(qdev_reset_all_fn, dev);
+>> +
+>> +    diag318_register();
+>>  error:
+>>      error_propagate(errp, err);
+>>  }
+>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+>> index a0615a8..2c670fc 100644
+>> --- a/hw/s390x/s390-virtio-ccw.c
+>> +++ b/hw/s390x/s390-virtio-ccw.c
+>> @@ -37,6 +37,7 @@
+>>  #include "cpu_models.h"
+>>  #include "hw/nmi.h"
+>>  #include "hw/s390x/tod.h"
+>> +#include "internal.h"
+>>  
+>>  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
+>>  {
+>> @@ -357,6 +358,7 @@ static void s390_machine_reset(void)
+>>          }
+>>          subsystem_reset();
+>>          s390_crypto_reset();
+>> +        diag318_reset();
+>>          run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
+>>          break;
+>>      case S390_RESET_LOAD_NORMAL:
+>> @@ -364,6 +366,7 @@ static void s390_machine_reset(void)
+>>              run_on_cpu(t, s390_do_cpu_reset, RUN_ON_CPU_NULL);
+>>          }
+>>          subsystem_reset();
+>> +        diag318_reset();
+>>          run_on_cpu(cs, s390_do_cpu_initial_reset, RUN_ON_CPU_NULL);
+>>          run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
+>>          break;
+>> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+>> index 4510a80..183c627 100644
+>> --- a/hw/s390x/sclp.c
+>> +++ b/hw/s390x/sclp.c
+>> @@ -73,6 +73,8 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+>>                           read_info->conf_char);
+>>      s390_get_feat_block(S390_FEAT_TYPE_SCLP_CONF_CHAR_EXT,
+>>                           read_info->conf_char_ext);
+>> +    /* Read Info byte 134 */
+>> +    s390_get_feat_block(S390_FEAT_TYPE_SCLP_BYTE_134, read_info->byte_134);
+>>  
+>>      read_info->facilities = cpu_to_be64(SCLP_HAS_CPU_INFO |
+>>                                          SCLP_HAS_IOA_RECONFIG);
+>> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
+>> index f9db243..eb12ba2 100644
+>> --- a/include/hw/s390x/sclp.h
+>> +++ b/include/hw/s390x/sclp.h
+>> @@ -133,6 +133,8 @@ typedef struct ReadInfo {
+>>      uint16_t highest_cpu;
+>>      uint8_t  _reserved5[124 - 122];     /* 122-123 */
+>>      uint32_t hmfai;
+>> +    uint8_t  _reserved7[134 - 128];     /* 128-133 */
+>> +    uint8_t  byte_134[1];
+>>      struct CPUEntry entries[0];
+>>  } QEMU_PACKED ReadInfo;
+>>  
+>> diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
+>> index 0265482..8c206d2 100644
+>> --- a/linux-headers/asm-s390/kvm.h
+>> +++ b/linux-headers/asm-s390/kvm.h
+>> @@ -74,6 +74,7 @@ struct kvm_s390_io_adapter_req {
+>>  #define KVM_S390_VM_CRYPTO		2
+>>  #define KVM_S390_VM_CPU_MODEL		3
+>>  #define KVM_S390_VM_MIGRATION		4
+>> +#define KVM_S390_VM_MISC		5
+>>  
+>>  /* kvm attributes for mem_ctrl */
+>>  #define KVM_S390_VM_MEM_ENABLE_CMMA	0
+>> @@ -130,6 +131,7 @@ struct kvm_s390_vm_cpu_machine {
+>>  #define KVM_S390_VM_CPU_FEAT_PFMFI	11
+>>  #define KVM_S390_VM_CPU_FEAT_SIGPIF	12
+>>  #define KVM_S390_VM_CPU_FEAT_KSS	13
+>> +#define KVM_S390_VM_CPU_FEAT_DIAG318	14
+>>  struct kvm_s390_vm_cpu_feat {
+>>  	__u64 feat[16];
+>>  };
+>> @@ -168,6 +170,9 @@ struct kvm_s390_vm_cpu_subfunc {
+>>  #define KVM_S390_VM_MIGRATION_START	1
+>>  #define KVM_S390_VM_MIGRATION_STATUS	2
+>>  
+>> +/* kvm attributes for KVM_S390_VM_MISC */
+>> +#define KVM_S390_VM_MISC_CPC		0
+>> +
+>>  /* for KVM_GET_REGS and KVM_SET_REGS */
+>>  struct kvm_regs {
+>>  	/* general purpose regs for s390 */
+>> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+>> index 8c2320e..594b4a4 100644
+>> --- a/target/s390x/cpu.h
+>> +++ b/target/s390x/cpu.h
+>> @@ -52,7 +52,7 @@
+>>  
+>>  #define MMU_USER_IDX 0
+>>  
+>> -#define S390_MAX_CPUS 248
+>> +#define S390_MAX_CPUS 247
+>>  
+>>  typedef struct PSW {
+>>      uint64_t mask;
+>> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+>> index 60cfeba..d05afa5 100644
+>> --- a/target/s390x/cpu_features.c
+>> +++ b/target/s390x/cpu_features.c
+>> @@ -121,6 +121,9 @@ static const S390FeatDef s390_features[] = {
+>>      FEAT_INIT("pfmfi", S390_FEAT_TYPE_SCLP_CONF_CHAR_EXT, 9, "SIE: PFMF interpretation facility"),
+>>      FEAT_INIT("ibs", S390_FEAT_TYPE_SCLP_CONF_CHAR_EXT, 10, "SIE: Interlock-and-broadcast-suppression facility"),
+>>  
+>> +    /* SCLP SCCB Byte 134 */
+>> +    FEAT_INIT("diag318", S390_FEAT_TYPE_SCLP_BYTE_134, 0, "SIE: Diagnose 318"),
+>> +
+>>      FEAT_INIT("sief2", S390_FEAT_TYPE_SCLP_CPU, 4, "SIE: interception format 2 (Virtual SIE)"),
+>>      FEAT_INIT("skey", S390_FEAT_TYPE_SCLP_CPU, 5, "SIE: Storage-key facility"),
+>>      FEAT_INIT("gpereh", S390_FEAT_TYPE_SCLP_CPU, 10, "SIE: Guest-PER enhancement facility"),
+>> diff --git a/target/s390x/cpu_features.h b/target/s390x/cpu_features.h
+>> index effe790..e7248df 100644
+>> --- a/target/s390x/cpu_features.h
+>> +++ b/target/s390x/cpu_features.h
+>> @@ -23,6 +23,7 @@ typedef enum {
+>>      S390_FEAT_TYPE_STFL,
+>>      S390_FEAT_TYPE_SCLP_CONF_CHAR,
+>>      S390_FEAT_TYPE_SCLP_CONF_CHAR_EXT,
+>> +    S390_FEAT_TYPE_SCLP_BYTE_134,
+>>      S390_FEAT_TYPE_SCLP_CPU,
+>>      S390_FEAT_TYPE_MISC,
+>>      S390_FEAT_TYPE_PLO,
+>> diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
+>> index 5fc7e7b..d99da1d 100644
+>> --- a/target/s390x/cpu_features_def.h
+>> +++ b/target/s390x/cpu_features_def.h
+>> @@ -109,6 +109,9 @@ typedef enum {
+>>      S390_FEAT_SIE_PFMFI,
+>>      S390_FEAT_SIE_IBS,
+>>  
+>> +    /* Read Info Byte 134 */
+>> +    S390_FEAT_DIAG318,
+>> +
+>>      /* Sclp Cpu */
+>>      S390_FEAT_SIE_F2,
+>>      S390_FEAT_SIE_SKEY,
+>> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
+>> index acb0f3d..2207c08 100644
+>> --- a/target/s390x/diag.c
+>> +++ b/target/s390x/diag.c
+>> @@ -20,6 +20,8 @@
+>>  #include "sysemu/cpus.h"
+>>  #include "hw/s390x/ipl.h"
+>>  #include "hw/s390x/s390-virtio-ccw.h"
+>> +#include "kvm_s390x.h"
+>> +#include "sysemu/kvm.h"
+>>  
+>>  int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3)
+>>  {
+>> @@ -134,3 +136,54 @@ out:
+>>          break;
+>>      }
+>>  }
+>> +
+>> +typedef struct Diag318Data {
+>> +    uint64_t cpc;
+>> +} Diag318Data;
+>> +static Diag318Data diag318data;
+>> +
+>> +void diag318_reset(void)
+>> +{
+>> +    if (s390_has_feat(S390_FEAT_DIAG318)) {
+>> +        kvm_s390_set_cpc(0);
+>> +    }
+>> +}
+>> +
+>> +static int diag318_post_load(void *opaque, int version_id)
+>> +{
+>> +    Diag318Data *d = opaque;
+>> +
+>> +    kvm_s390_set_cpc(d->cpc);
+>> +    return 0;
+>> +}
+>> +
+>> +static int diag318_pre_save(void *opaque)
+>> +{
+>> +    Diag318Data *d = opaque;
+>> +
+>> +    kvm_s390_get_cpc(&d->cpc);
+>> +    return 0;
+>> +}
+>> +
+>> +static bool diag318_needed(void *opaque)
+>> +{
+>> +    return s390_has_feat(S390_FEAT_DIAG318);
+>> +}
+>> +
+>> +const VMStateDescription vmstate_diag318 = {
+>> +    .name = "diag318",
+>> +    .post_load = diag318_post_load,
+>> +    .pre_save = diag318_pre_save,
+>> +    .version_id = 1,
+>> +    .minimum_version_id = 1,
+>> +    .needed = diag318_needed,
+>> +    .fields = (VMStateField[]) {
+>> +        VMSTATE_UINT64(cpc, Diag318Data),
+>> +        VMSTATE_END_OF_LIST()
+>> +    }
+>> +};
+>> +
+>> +void diag318_register(void)
+>> +{
+>> +    vmstate_register(NULL, 0, &vmstate_diag318, &diag318data);
+>> +}
+>> \ No newline at end of file
+>> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+>> index 70015ea..a3d1457 100644
+>> --- a/target/s390x/gen-features.c
+>> +++ b/target/s390x/gen-features.c
+>> @@ -450,6 +450,7 @@ static uint16_t full_GEN12_GA1[] = {
+>>      S390_FEAT_AP_QUERY_CONFIG_INFO,
+>>      S390_FEAT_AP_FACILITIES_TEST,
+>>      S390_FEAT_AP,
+>> +    S390_FEAT_DIAG318,
+>>  };
+>>  
+>>  static uint16_t full_GEN12_GA2[] = {
+>> diff --git a/target/s390x/internal.h b/target/s390x/internal.h
+>> index f2a771e..d53b1d0 100644
+>> --- a/target/s390x/internal.h
+>> +++ b/target/s390x/internal.h
+>> @@ -383,10 +383,12 @@ int mmu_translate_real(CPUS390XState *env, target_ulong raddr, int rw,
+>>                         target_ulong *addr, int *flags);
+>>  
+>>  
+>> -/* misc_helper.c */
+>> +/* diag.c */
+>>  int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3);
+>>  void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3,
+>>                       uintptr_t ra);
+>> +void diag318_register(void);
+>> +void diag318_reset(void);
+>>  
+>>  
+>>  /* translate.c */
+>> diff --git a/target/s390x/kvm-stub.c b/target/s390x/kvm-stub.c
+>> index bf7795e..1f0bee3 100644
+>> --- a/target/s390x/kvm-stub.c
+>> +++ b/target/s390x/kvm-stub.c
+>> @@ -104,3 +104,13 @@ void kvm_s390_stop_interrupt(S390CPU *cpu)
+>>  void kvm_s390_restart_interrupt(S390CPU *cpu)
+>>  {
+>>  }
+>> +
+>> +int kvm_s390_get_cpc(uint64_t *cpc)
+>> +{
+>> +    return 0;
+>> +}
+>> +
+>> +int kvm_s390_set_cpc(uint64_t cpc)
+>> +{
+>> +    return 0;
+>> +}
+>> \ No newline at end of file
+>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+>> index 2ebf26a..9ed4cea 100644
+>> --- a/target/s390x/kvm.c
+>> +++ b/target/s390x/kvm.c
+>> @@ -749,6 +749,28 @@ int kvm_s390_set_clock_ext(uint8_t tod_high, uint64_t tod_low)
+>>      return kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
+>>  }
+>>  
+>> +int kvm_s390_get_cpc(uint64_t *cpc)
+>> +{
+>> +    struct kvm_device_attr attr = {
+>> +        .group = KVM_S390_VM_MISC,
+>> +        .attr = KVM_S390_VM_MISC_CPC,
+>> +        .addr = (uint64_t)cpc,
+>> +    };
+>> +
+>> +    return kvm_vm_ioctl(kvm_state, KVM_GET_DEVICE_ATTR, &attr);
+>> +}
+>> +
+>> +int kvm_s390_set_cpc(uint64_t cpc)
+>> +{
+>> +    struct kvm_device_attr attr = {
+>> +        .group = KVM_S390_VM_MISC,
+>> +        .attr = KVM_S390_VM_MISC_CPC,
+>> +        .addr = (uint64_t)&cpc,
+>> +    };
+>> +
+>> +    return kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
+>> +}
+>> +
+>>  /**
+>>   * kvm_s390_mem_op:
+>>   * @addr:      the logical start address in guest memory
+>> @@ -2142,6 +2164,7 @@ static int kvm_to_feat[][2] = {
+>>      { KVM_S390_VM_CPU_FEAT_PFMFI, S390_FEAT_SIE_PFMFI},
+>>      { KVM_S390_VM_CPU_FEAT_SIGPIF, S390_FEAT_SIE_SIGPIF},
+>>      { KVM_S390_VM_CPU_FEAT_KSS, S390_FEAT_SIE_KSS},
+>> +    { KVM_S390_VM_CPU_FEAT_DIAG318, S390_FEAT_DIAG318},
+>>  };
+>>  
+>>  static int query_cpu_feat(S390FeatBitmap features)
+>> diff --git a/target/s390x/kvm_s390x.h b/target/s390x/kvm_s390x.h
+>> index 6e52287..53f165f 100644
+>> --- a/target/s390x/kvm_s390x.h
+>> +++ b/target/s390x/kvm_s390x.h
+>> @@ -29,6 +29,9 @@ int kvm_s390_get_clock(uint8_t *tod_high, uint64_t *tod_clock);
+>>  int kvm_s390_get_clock_ext(uint8_t *tod_high, uint64_t *tod_clock);
+>>  int kvm_s390_set_clock(uint8_t tod_high, uint64_t tod_clock);
+>>  int kvm_s390_set_clock_ext(uint8_t tod_high, uint64_t tod_clock);
+>> +int kvm_s390_get_cpc(uint64_t *cpc);
+>> +int kvm_s390_set_cpc(uint64_t cpc);
+>> +bool kvm_s390_has_diag318(void);
+>>  void kvm_s390_enable_css_support(S390CPU *cpu);
+>>  int kvm_s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t sch,
+>>                                      int vq, bool assign);
+>>
+> 
+> 
+
+
+-- 
+Respectfully,
+- Collin Walling
