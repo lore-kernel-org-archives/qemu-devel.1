@@ -1,41 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1gUavM-0001pQ-5a
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:25:25 -0500
+	(envelope-from <mst@redhat.com>) id 1gUaw9-0002PL-NA
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:26:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1gUavF-0003GZ-Li
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:25:23 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34944)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1gUavE-0003F0-VC
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:25:17 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wB5HOLA1018144
-	for <qemu-devel@nongnu.org>; Wed, 5 Dec 2018 12:25:15 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2p6har5t1p-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 12:25:15 -0500
-Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 5 Dec 2018 17:25:13 -0000
-References: <20181205145131.28467-1-cohuck@redhat.com>
-	<0d97dcf5-de40-3f18-64fc-7b2eb1799a84@redhat.com>
-	<20181205174508.3e2452af.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 5 Dec 2018 18:25:08 +0100
+	(envelope-from <mst@redhat.com>) id 1gUaw3-0004O6-Qe
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:26:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:27440)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gUaw1-0004Md-Vm
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:26:06 -0500
+Date: Wed, 5 Dec 2018 12:26:02 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181205122332-mutt-send-email-mst@kernel.org>
+References: <20181025140631.634922-1-sameeh@daynix.com>
+	<20181205171818.GA1136@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181205174508.3e2452af.cohuck@redhat.com>
-Content-Language: en-US
-Message-Id: <55928716-cd64-735b-ae66-64b370997e22@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH RFC] vfio-ap: flag as compatible with
- balloon
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181205171818.GA1136@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 0/2] Attempt to implement the standby feature
+ for assigned network devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,70 +29,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
-Cc: Tony Krowiak <akrowiak@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Sameeh Jubran <sameeh@daynix.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Yan Vugenfirer <yan@daynix.com>, Eduardo Habkost <ehabkost@redhat.com>
 
+On Wed, Dec 05, 2018 at 05:18:18PM +0000, Daniel P. Berrang=E9 wrote:
+> On Thu, Oct 25, 2018 at 05:06:29PM +0300, Sameeh Jubran wrote:
+> > From: Sameeh Jubran <sjubran@redhat.com>
+> >=20
+> > Hi all,
+> >=20
+> > Background:
+> >=20
+> > There has been a few attempts to implement the standby feature for vf=
+io
+> > assigned devices which aims to enable the migration of such devices. =
+This
+> > is another attempt.
+> >=20
+> > The series implements an infrastructure for hiding devices from the b=
+us
+> > upon boot. What it does is the following:
+> >=20
+> > * In the first patch the infrastructure for hiding the device is adde=
+d
+> >   for the qbus and qdev APIs. A "hidden" boolean is added to the devi=
+ce
+> >   state and it is set based on a callback to the standby device which
+> >   registers itself for handling the assessment: "should the primary d=
+evice
+> >   be hidden?" by cross validating the ids of the devices.
+> >=20
+> > * In the second patch the virtio-net uses the API to hide the vfio
+> >   device and unhides it when the feature is acked.
+>=20
+> IIUC, the general idea is that we want to provide a pair of associated =
+NIC
+> devices to the guest, one emulated, one physical PCI device. The guest =
+would
+> put them in a bonded pair. Before migration the PCI device is unplugged=
+ & a
+> new PCI device plugged on target after migration. The guest traffic con=
+tinues
+> without interuption due to the emulate device.
+>=20
+> This kind of conceptual approach can already be implemented today by ma=
+nagement
+> apps. The only hard problem that exists today is how the guest OS can f=
+igure
+> out that a particular pair of devices it has are intended to be used to=
+gether.=20
+>=20
+> With this series, IIUC, the virtio-net device is getting a given proper=
+ty which
+> defines the qdev ID of the associated VFIO device. When the guest OS ac=
+tivates
+> the virtio-net device and acknowledges the STANDBY feature bit, qdev th=
+en
+> unhides the associated VFIO device.
+>=20
+> AFAICT the guest has to infer that the device which suddenly appears is=
+ the one
+> associated with the virtio-net device it just initialized, for purposes=
+ of
+> setting up the NIC bonding. There doesn't appear to be any explicit ass=
+ocation
+> between the devices exposed to the guest.
+>=20
+> This feels pretty fragile for a guest needing to match up devices when =
+there
+> are many pairs of devices exposed to a single guest.
+>=20
+> Unless I'm mis-reading the patches, it looks like the VFIO device alway=
+s has
+> to be available at the time QEMU is started. There's no way to boot a g=
+uest
+> and then later hotplug a VFIO device to accelerate the existing virtio-=
+net NIC.
 
+That should be supported.
 
-On 05.12.2018 17:45, Cornelia Huck wrote:
-> On Wed, 5 Dec 2018 17:38:22 +0100
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> On 05.12.18 15:51, Cornelia Huck wrote:
->>> vfio-ap devices do not pin any pages in the host. Therefore, they
->>> are belived to be compatible with memory ballooning.
->>>
->>> Flag them as compatible, so both vfio-ap and a balloon can be
->>> used simultaneously.
->>>
->>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->>> ---
->>>
->>> As briefly discussed on IRC. RFC as I do not have easy access to
->>> hardware I can test this with.
->>>
->>> ---
->>>  hw/vfio/ap.c | 8 ++++++++
->>>  1 file changed, 8 insertions(+)
->>>
->>> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
->>> index 65de952f44..3bf48eed28 100644
->>> --- a/hw/vfio/ap.c
->>> +++ b/hw/vfio/ap.c
->>> @@ -104,6 +104,14 @@ static void vfio_ap_realize(DeviceState *dev, Error **errp)
->>>      vapdev->vdev.name = g_strdup_printf("%s", mdevid);
->>>      vapdev->vdev.dev = dev;
->>>  
->>> +    /*
->>> +     * vfio-ap devices are believed to operate in a way compatible with
->>> +     * memory ballooning, as no pages are pinned in the host.
->>> +     * This needs to be set before vfio_get_device() for vfio common to
->>> +     * handle the balloon inhibitor.
->>> +     */
->>> +    vapdev->vdev.balloon_allowed = true;
->>> +
->>>      ret = vfio_get_device(vfio_group, mdevid, &vapdev->vdev, &local_err);
->>>      if (ret) {
->>>          goto out_get_dev_err;
->>>   
->>
->> What happens if this ever changes? Shouldn't we have an API to at least
->> check what the vfio device can guarantee?
->>
->> "are believed to operate" doesn't sound like guarantees to me :)
+> Or similarly after migration there might not be any VFIO device availab=
+le
+> initially when QEMU is started to accept the incoming migration. So it =
+might
+> need to run in degraded mode for an extended period of time until one b=
+ecomes
+> available for hotplugging.
 
-I would actually remove that comment or fix it. We either know or we dont.
-In the way vfio-works I see no reason to disallow balloon. Even if the guest does
-something wrong (e.g. crypto I/O on freed pages) the host would handle that the
-same as it would for normal page accesses. From a host point of view the crypto
-instructions are just CISC instructions with load/store semantics.
+That should work too.
 
-> 
-> It's the same for ccw :)
-> 
-> While such an API definitely sounds like a good idea, it is probably
-> overkill to introduce it for this case (do we envision changing the way
-> vfio-ap operates in the future to make that statement non-true?)
+> The use of qdev IDs makes this troublesome, as the
+> qdev ID of the future VFIO device would need to be decided upfront befo=
+re it
+> even exists.
 
-agreed. 
-> 
+I agree this sounds problematic.
+
+>=20
+> So overall I'm not really a fan of the dynamic hiding/unhiding of devic=
+es.
+
+Dynamic hiding is an orthogonal issue though. It's needed for
+error handling in case of migration failure: we do not
+want to close the VFIO device but we do need to
+hide it from guest. libvirt should not be involved in
+this aspect though.
+
+> I
+> would much prefer to see some way to expose an explicit relationship be=
+tween
+> the devices to the guest.
+>=20
+> > Disclaimers:
+> >=20
+> > * I have only scratch tested this and from qemu side, it seems to be
+> >   working.
+> > * This is an RFC so it lacks some proper error handling in few cases
+> >   and proper resource freeing. I wanted to get some feedback first
+> >   before it is finalized.
+> >=20
+> > Command line example:
+> >=20
+> > /home/sameeh/Builds/failover/qemu/x86_64-softmmu/qemu-system-x86_64 \
+> > -netdev tap,id=3Dhostnet0,script=3Dworld_bridge_standalone.sh,downscr=
+ipt=3Dno,ifname=3Dcc1_71 \
+> > -netdev tap,vhost=3Don,id=3Dhostnet1,script=3Dworld_bridge_standalone=
+.sh,downscript=3Dno,ifname=3Dcc1_72,queues=3D4 \
+> > -device virtio-net,host_mtu=3D1500,netdev=3Dhostnet1,id=3Dcc1_72,vect=
+ors=3D10,mq=3Don,primary=3Dcc1_71 \
+> > -device e1000,netdev=3Dhostnet0,id=3Dcc1_71,standby=3Dcc1_72 \
+> >=20
+> > Migration support:
+> >=20
+> > Pre migration or during setup phase of the migration we should send a=
+n
+> > unplug request to the guest to unplug the primary device. I haven't h=
+ad
+> > the chance to implement that part yet but should do soon. Do you know
+> > what's the best approach to do so? I wanted to have a callback to the
+> > virtio-net device which tries to send an unplug request to the guest =
+and
+> > if succeeds then the migration continues. It needs to handle the case=
+ where
+> > the migration fails and then it has to replug the primary device back=
+.
+>=20
+> Having QEMU do this internally gets into a world of pain when you have
+> multiple devices in the guest.
+>=20
+> Consider if we have 2 pairs of devices. We unplug one VFIO device, but
+> unplugging the second VFIO device fails, thus we try to replug the firs=
+t
+> VFIO device but this now fails too. We don't even get as far as startin=
+g
+> the migration before we have to return an error.
+>=20
+> The mgmt app will just see that the migration failed, but it will not
+> be sure which devices are now actually exposed to the guest OS correctl=
+y.
+>=20
+> The similar problem hits if we started the migration data stream, but
+> then had to abort and so need to tear try to replug in the source but
+> failed for some reasons.
+>=20
+> Doing the VFIO device plugging/unplugging explicitly from the mgmt app
+> gives that mgmt app direct information about which devices have been
+> successfully made available to the guest at all time, becuase the mgmt
+> app can see the errors from each step of the process.  Trying to do
+> this inside QEMU doesn't achieve anything the mgmt app can't already
+> do, but it obscures what happens during failures.  The same applies at
+> the libvirt level too, which is why mgmt apps today will do the VFIO
+> unplug/replug either side of migration themselves.
+>=20
+>=20
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
