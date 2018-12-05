@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gUNzL-00040L-RX
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 22:36:40 -0500
+	(envelope-from <yan.y.zhao@intel.com>) id 1gUPLx-0007Tp-3h
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 00:04:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gUNzK-00054f-Bd
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 22:36:39 -0500
-Resent-Message-Id: <E1gUNzK-00054f-Bd@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21461)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gUNzJ-00053K-Ut
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 22:36:38 -0500
-In-Reply-To: <1543961939-2419-1-git-send-email-walling@linux.ibm.com>
-Message-ID: <154396740385.19757.11762580412134936324@c26723477dc9>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <yan.y.zhao@intel.com>) id 1gUPLq-0000lP-VV
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 00:04:02 -0500
+Received: from mga05.intel.com ([192.55.52.43]:49913)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+	id 1gUPLn-0000f8-EY
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 00:03:57 -0500
+Date: Tue, 4 Dec 2018 23:59:24 -0500
+From: Zhao Yan <yan.y.zhao@intel.com>
+Message-ID: <20181205045924.GA12364@joy-OptiPlex-7040>
+References: <20181204075049.10285-1-yan.y.zhao@intel.com>
+	<20181204093018.d6vhfdwg276pf7ja@mac>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 4 Dec 2018 15:50:05 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v1] s390: guest support for diagnose 318
- and limit max VCPUs to 247
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20181204093018.d6vhfdwg276pf7ja@mac>
+Subject: Re: [Qemu-devel] [PATCH v3] xen/pt: allow passthrough of devices
+ with bogus interrupt pin
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: walling@linux.ibm.com
-Cc: famz@redhat.com, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, cotte@de.ibm.com, david@redhat.com, mimu@linux.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com
+To: Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
+Cc: qemu-devel@nongnu.org, sstabellini@kernel.org, Jan Beulich <JBeulich@suse.com>, anthony.perard@citrix.com, xen-devel@lists.xenproject.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTQzOTYxOTM5LTI0MTktMS1n
-aXQtc2VuZC1lbWFpbC13YWxsaW5nQGxpbnV4LmlibS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMg
-c2VlbXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxv
-dyBmb3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpTdWJqZWN0OiBbUWVtdS1kZXZl
-bF0gW1BBVENIIHYxXSBzMzkwOiBndWVzdCBzdXBwb3J0IGZvciBkaWFnbm9zZSAzMTggYW5kIGxp
-bWl0IG1heCBWQ1BVcyB0byAyNDcKTWVzc2FnZS1pZDogMTU0Mzk2MTkzOS0yNDE5LTEtZ2l0LXNl
-bmQtZW1haWwtd2FsbGluZ0BsaW51eC5pYm0uY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
-CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
-U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
-PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
-aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
-LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
-YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
-ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
-RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
-NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmI1MjE4YTcgczM5MDogZ3Vlc3Qgc3Vw
-cG9ydCBmb3IgZGlhZ25vc2UgMzE4IGFuZCBsaW1pdCBtYXggVkNQVXMgdG8gMjQ3Cgo9PT0gT1VU
-UFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IHMzOTA6IGd1ZXN0IHN1cHBvcnQgZm9y
-IGRpYWdub3NlIDMxOCBhbmQgbGltaXQgbWF4IFZDUFVzIHRvIDI0Ny4uLgpFUlJPUjogYWRkaW5n
-IGEgbGluZSB3aXRob3V0IG5ld2xpbmUgYXQgZW5kIG9mIGZpbGUKIzI0MzogRklMRTogdGFyZ2V0
-L3MzOTB4L2RpYWcuYzoxODk6Cit9CgpFUlJPUjogYWRkaW5nIGEgbGluZSB3aXRob3V0IG5ld2xp
-bmUgYXQgZW5kIG9mIGZpbGUKIzI5MjogRklMRTogdGFyZ2V0L3MzOTB4L2t2bS1zdHViLmM6MTE2
-OgorfQoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNDcgbGluZXMgY2hlY2tlZAoKWW91
-ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpU
-ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFi
-bGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU0Mzk2MTkzOS0yNDE5LTEtZ2l0LXNlbmQt
-ZW1haWwtd2FsbGluZ0BsaW51eC5pYm0uY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNz
-YWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDov
-L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
-bEByZWRoYXQuY29t
+On Tue, Dec 04, 2018 at 10:30:18AM +0100, Roger Pau Monné wrote:
+> On Tue, Dec 04, 2018 at 02:50:49AM -0500, Zhao Yan wrote:
+> > For some pci device, even its PCI_INTERRUPT_PIN is not 0, it actually
+> > doesn't support INTx mode, so its machine irq read from host sysfs is 0.
+> > In that case, report PCI_INTERRUPT_PIN as 0 to guest and let passthrough
+> > continue.
+> > 
+> > Cc: Roger Pau Monné <roger.pau@citrix.com>
+> > Cc: Jan Beulich <JBeulich@suse.com>
+> > Signed-off-by: Zhao Yan <yan.y.zhao@intel.com>
+> 
+> Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
+> 
+> One nit below.
+Got it. Thank you!
+:)
+> 
+> > 
+> > ---
+> > v2: fix some coding style issue
+> > v3:
+> >    1. let subject be more descriptive (roger)
+> >    2. disable INTx assertion if machine irq is 0.(roger)
+> >    3. in xen_pt_irqpin_reg_init(), drop the else branch as the default
+> > value for *data is 0. (roger)
+> > ---
+> >  hw/xen/xen_pt.c             | 7 +++++++
+> >  hw/xen/xen_pt_config_init.c | 4 +++-
+> >  2 files changed, 10 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/xen/xen_pt.c b/hw/xen/xen_pt.c
+> > index e5a6eff..b563837 100644
+> > --- a/hw/xen/xen_pt.c
+> > +++ b/hw/xen/xen_pt.c
+> > @@ -847,6 +847,13 @@ static void xen_pt_realize(PCIDevice *d, Error **errp)
+> >      }
+> >  
+> >      machine_irq = s->real_device.irq;
+> > +    if (machine_irq == 0) {
+> > +        XEN_PT_LOG(d, "machine irq is 0\n");
+> > +        cmd |= PCI_COMMAND_INTX_DISABLE;
+> > +        s->machine_irq = 0;
+> 
+> AFAICT this is already initialized to 0, so you can drop setting
+> machine_irq.
+> 
+> Thanks, Roger.
