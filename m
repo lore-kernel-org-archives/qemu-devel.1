@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gUa6g-0004K3-QQ
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:33:04 -0500
+	(envelope-from <david@redhat.com>) id 1gUaC3-0008Dm-HV
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:38:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gUa6c-0003be-RL
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:33:02 -0500
-References: <20181130220344.3350618-1-eblake@redhat.com>
-	<20181130220344.3350618-5-eblake@redhat.com>
-	<25e2852c-7bf8-dadd-8c0d-32c2229ed187@virtuozzo.com>
-	<211449a7-01ef-abcb-88c0-15d2eda67d6e@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f52a3622-6f41-0c96-2dbb-62d6ce02e810@redhat.com>
-Date: Wed, 5 Dec 2018 10:32:35 -0600
+	(envelope-from <david@redhat.com>) id 1gUaBz-0001JA-Ig
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:38:35 -0500
+References: <20181205145131.28467-1-cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <0d97dcf5-de40-3f18-64fc-7b2eb1799a84@redhat.com>
+Date: Wed, 5 Dec 2018 17:38:22 +0100
 MIME-Version: 1.0
-In-Reply-To: <211449a7-01ef-abcb-88c0-15d2eda67d6e@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20181205145131.28467-1-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 04/14] qemu-nbd: Simplify --partition
- handling
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC] vfio-ap: flag as compatible with
+ balloon
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +24,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Tony Krowiak <akrowiak@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On 12/5/18 10:26 AM, Eric Blake wrote:
+On 05.12.18 15:51, Cornelia Huck wrote:
+> vfio-ap devices do not pin any pages in the host. Therefore, they
+> are belived to be compatible with memory ballooning.
+> 
+> Flag them as compatible, so both vfio-ap and a balloon can be
+> used simultaneously.
+> 
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+> 
+> As briefly discussed on IRC. RFC as I do not have easy access to
+> hardware I can test this with.
+> 
+> ---
+>  hw/vfio/ap.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
+> index 65de952f44..3bf48eed28 100644
+> --- a/hw/vfio/ap.c
+> +++ b/hw/vfio/ap.c
+> @@ -104,6 +104,14 @@ static void vfio_ap_realize(DeviceState *dev, Error **errp)
+>      vapdev->vdev.name = g_strdup_printf("%s", mdevid);
+>      vapdev->vdev.dev = dev;
+>  
+> +    /*
+> +     * vfio-ap devices are believed to operate in a way compatible with
+> +     * memory ballooning, as no pages are pinned in the host.
+> +     * This needs to be set before vfio_get_device() for vfio common to
+> +     * handle the balloon inhibitor.
+> +     */
+> +    vapdev->vdev.balloon_allowed = true;
+> +
+>      ret = vfio_get_device(vfio_group, mdevid, &vapdev->vdev, &local_err);
+>      if (ret) {
+>          goto out_get_dev_err;
+> 
 
->> is it possible, that "char *ep" remains uninitialized, and than we acc=
-ess
->> it in check_strtox_error? I don's see in strtol spec a guarantee of=20
->> setting
->> endptr on failure path.
->=20
-> C99 7.10.1.4 P5-7 requires strtoll() and friends to assign through=20
-> 'endptr' if it is non-NULL, for both success and ERANGE failure cases.=20
-> POSIX then further requires 'endptr' to be set for EINVAL failures due=20
-> to out-of-range 'base' (not that we have any such callers), and permits=
-=20
-> (but does not require) the empty string to cause an EINVAL failure (but=
-=20
-> whether or not EINVAL happened, 'endptr' is still set).=C2=A0 There are=
- no=20
-> other possible failures, so no, we are not dereferencing an=20
-> uninitialized variable in check_strtox_error.
+What happens if this ever changes? Shouldn't we have an API to at least
+check what the vfio device can guarantee?
 
-Correction, quoting POSIX:
+"are believed to operate" doesn't sound like guarantees to me :)
 
-http://pubs.opengroup.org/onlinepubs/9699919799/functions/strtol.html
+-- 
 
-APPLICATION USAGE
+Thanks,
 
-     Since the value of *endptr is unspecified if the value of base is=20
-not supported, applications should either ensure that base has a=20
-supported value (0 or between 2 and 36) before the call, or check for an=20
-[EINVAL] error before examining *endptr.
-
-So yes, we CAN end up transferring an uninitialized variable into the=20
-caller's non-NULL endpointer if the caller passes an out-of-range base=20
-(this particular caller passes NULL for an endpointer, and an in-range=20
-base, so it's not an issue).  Might be worth a separate patch to assert=20
-that base is in range for all of the qemu_strto* helpers, if we are=20
-worried (I'm not).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+David / dhildenb
