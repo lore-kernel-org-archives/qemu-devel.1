@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gUgYN-00086z-1C
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:26:10 -0500
+	(envelope-from <clg@kaod.org>) id 1gUgYT-0008BP-Dp
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:26:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gUgYI-0004UE-8z
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:26:02 -0500
-Received: from 3.mo68.mail-out.ovh.net ([46.105.58.60]:56658)
+	(envelope-from <clg@kaod.org>) id 1gUgYN-0004Zn-FW
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:26:07 -0500
+Received: from 8.mo178.mail-out.ovh.net ([46.105.74.227]:53876)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gUgYH-0004SD-HE
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:25:58 -0500
-Received: from player714.ha.ovh.net (unknown [10.109.160.253])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 035B31075B0
-	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 00:25:56 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gUgYM-0004Xl-Qf
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:26:03 -0500
+Received: from player714.ha.ovh.net (unknown [10.109.143.109])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 3F3A24146A
+	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 00:26:01 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu,  6 Dec 2018 00:22:46 +0100
-Message-Id: <20181205232251.10446-33-clg@kaod.org>
+Date: Thu,  6 Dec 2018 00:22:47 +0100
+Message-Id: <20181205232251.10446-34-clg@kaod.org>
 In-Reply-To: <20181205232251.10446-1-clg@kaod.org>
 References: <20181205232251.10446-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 32/37] ppc/xics: introduce a
- icp_kvm_connect() routine
+Subject: [Qemu-devel] [PATCH v6 33/37] spapr/rtas: modify
+ spapr_rtas_register() to remove RTAS handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,71 +33,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-This routine gathers all the KVM initialization of the XICS KVM
-presenter. It will be useful when the initialization of the KVM XICS
-device is moved to a global routine.
+Removing RTAS handlers will become necessary when the new pseries
+machine supporting multiple interrupt mode is introduced.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/intc/xics_kvm.c | 29 ++++++++++++++++++++---------
- 1 file changed, 20 insertions(+), 9 deletions(-)
+ include/hw/ppc/spapr.h | 4 ++++
+ hw/ppc/spapr_rtas.c    | 2 +-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index e8fa9a53aeba..de86e1d0b1ab 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -123,11 +123,8 @@ static void icp_kvm_reset(DeviceState *dev)
-     icp_set_kvm_state(ICP(dev), 1);
- }
-=20
--static void icp_kvm_realize(DeviceState *dev, Error **errp)
-+static void icp_kvm_connect(ICPState *icp, Error **errp)
- {
--    ICPState *icp =3D ICP(dev);
--    ICPStateClass *icpc =3D ICP_GET_CLASS(icp);
--    Error *local_err =3D NULL;
-     CPUState *cs;
-     KVMEnabledICP *enabled_icp;
-     unsigned long vcpu_id;
-@@ -135,11 +132,6 @@ static void icp_kvm_realize(DeviceState *dev, Error =
-**errp)
-=20
-     if (kernel_xics_fd =3D=3D -1) {
-         abort();
--    }
--
--    icpc->parent_realize(dev, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-         return;
-     }
-=20
-@@ -168,6 +160,25 @@ static void icp_kvm_realize(DeviceState *dev, Error =
-**errp)
-     QLIST_INSERT_HEAD(&kvm_enabled_icps, enabled_icp, node);
- }
-=20
-+static void icp_kvm_realize(DeviceState *dev, Error **errp)
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index daced428a42c..ca38b9d9c046 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -649,6 +649,10 @@ typedef void (*spapr_rtas_fn)(PowerPCCPU *cpu, sPAPR=
+MachineState *sm,
+                               uint32_t nargs, target_ulong args,
+                               uint32_t nret, target_ulong rets);
+ void spapr_rtas_register(int token, const char *name, spapr_rtas_fn fn);
++static inline void spapr_rtas_unregister(int token)
 +{
-+    ICPStateClass *icpc =3D ICP_GET_CLASS(dev);
-+    Error *local_err =3D NULL;
-+
-+    icpc->parent_realize(dev, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    /* Connect the presenter to the VCPU (required for CPU hotplug) */
-+    icp_kvm_connect(ICP(dev), &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
++    spapr_rtas_register(token, NULL, NULL);
 +}
-+
- static void icp_kvm_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
+ target_ulong spapr_rtas_call(PowerPCCPU *cpu, sPAPRMachineState *sm,
+                              uint32_t token, uint32_t nargs, target_ulon=
+g args,
+                              uint32_t nret, target_ulong rets);
+diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+index d6a0952154ac..e005d5d08151 100644
+--- a/hw/ppc/spapr_rtas.c
++++ b/hw/ppc/spapr_rtas.c
+@@ -404,7 +404,7 @@ void spapr_rtas_register(int token, const char *name,=
+ spapr_rtas_fn fn)
+=20
+     token -=3D RTAS_TOKEN_BASE;
+=20
+-    assert(!rtas_table[token].name);
++    assert(!name || !rtas_table[token].name);
+=20
+     rtas_table[token].name =3D name;
+     rtas_table[token].fn =3D fn;
 --=20
 2.17.2
