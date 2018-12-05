@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gUbBk-0006uK-EE
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:42:21 -0500
+	(envelope-from <berrange@redhat.com>) id 1gUbDM-0000O2-Nn
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:44:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gUbBi-00051Q-RR
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:42:20 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 5 Dec 2018 17:42:06 +0000
-Message-ID: <743b0aed-10e3-d26b-b13f-81025811fef2@virtuozzo.com>
-References: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
-	<20181203101429.88735-9-anton.nefedov@virtuozzo.com>
-	<5a6d38d1-45a2-e2e3-62ef-7d80dcfd53eb@virtuozzo.com>
-	<70c2fceb-a0ae-f6a1-7f20-a4339ce37237@virtuozzo.com>
-In-Reply-To: <70c2fceb-a0ae-f6a1-7f20-a4339ce37237@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <522A999E8696DD448BB34588C6DA61FB@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <berrange@redhat.com>) id 1gUbDJ-0007iT-Dx
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:44:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47680)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gUbDJ-0007h0-5P
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:43:57 -0500
+Date: Wed, 5 Dec 2018 17:43:44 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181205174344.GG22100@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181025140631.634922-1-sameeh@daynix.com>
+	<CAKPgXcE1zoFiBgbEqn6VAdsQuR7GfCNTn+pHgekH1XwLAdq-ig@mail.gmail.com>
+	<154402670926.16620.2184992513838364109@sif>
+	<20181205170916.GK799@angien.pipo.sk>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v10 8/9] qcow2: skip writing zero buffers
- to empty COW areas
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181205170916.GK799@angien.pipo.sk>
+Subject: Re: [Qemu-devel] [libvirt] [RFC 0/2] Attempt to implement the
+ standby feature for assigned network devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,94 +31,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
+To: Peter Krempa <pkrempa@redhat.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Sameeh Jubran <sameeh@daynix.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Yan Vugenfirer <yan@daynix.com>
 
-MDUuMTIuMjAxOCAxOTo1OSwgQW50b24gTmVmZWRvdiB3cm90ZToNCj4gT24gNS8xMi8yMDE4IDU6
-MDEgUE0sIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+PiAwMy4xMi4yMDE4
-IDEzOjE0LCBBbnRvbiBOZWZlZG92IHdyb3RlOg0KPj4+IElmIENPVyBhcmVhcyBvZiB0aGUgbmV3
-bHkgYWxsb2NhdGVkIGNsdXN0ZXJzIGFyZSB6ZXJvZXMgb24gdGhlIGJhY2tpbmcgaW1hZ2UsDQo+
-Pj4gZWZmaWNpZW50IGJkcnZfd3JpdGVfemVyb2VzKGZsYWdzPUJEUlZfUkVRX0FMTE9DQVRFKSBj
-YW4gYmUgdXNlZCBvbiB0aGUgd2hvbGUNCj4+PiBjbHVzdGVyIGluc3RlYWQgb2Ygd3JpdGluZyBl
-eHBsaWNpdCB6ZXJvIGJ1ZmZlcnMgbGF0ZXIgaW4gcGVyZm9ybV9jb3coKS4NCj4+Pg0KPj4+IGlv
-dGVzdCAwNjA6DQo+Pj4gd3JpdGUgdG8gdGhlIGRpc2NhcmRlZCBjbHVzdGVyIGRvZXMgbm90IHRy
-aWdnZXIgQ09XIGFueW1vcmUuDQo+Pj4gVXNlIGEgYmFja2luZyBpbWFnZSBpbnN0ZWFkLg0KPj4+
-DQo+Pj4gU2lnbmVkLW9mZi1ieTogQW50b24gTmVmZWRvdiA8YW50b24ubmVmZWRvdkB2aXJ0dW96
-em8uY29tPg0KPj4+IFJldmlld2VkLWJ5OiBBbGJlcnRvIEdhcmNpYSA8YmVydG9AaWdhbGlhLmNv
-bT4NCj4+PiAtLS0NCj4+PiAgICAgcWFwaS9ibG9jay1jb3JlLmpzb24gICAgICAgfCAgNCArLQ0K
-Pj4+ICAgICBibG9jay9xY293Mi5oICAgICAgICAgICAgICB8ICA2ICsrKw0KPj4+ICAgICBibG9j
-ay9xY293Mi1jbHVzdGVyLmMgICAgICB8ICAyICstDQo+Pj4gICAgIGJsb2NrL3Fjb3cyLmMgICAg
-ICAgICAgICAgIHwgODAgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0NCj4+
-PiAgICAgYmxvY2svdHJhY2UtZXZlbnRzICAgICAgICAgfCAgMSArDQo+Pj4gICAgIHRlc3RzL3Fl
-bXUtaW90ZXN0cy8wNjAgICAgIHwgMjYgKysrKysrKystLS0tLQ0KPj4+ICAgICB0ZXN0cy9xZW11
-LWlvdGVzdHMvMDYwLm91dCB8ICA1ICsrLQ0KPj4+ICAgICA3IGZpbGVzIGNoYW5nZWQsIDEwOSBp
-bnNlcnRpb25zKCspLCAxNSBkZWxldGlvbnMoLSkNCj4+Pg0KPj4+IGRpZmYgLS1naXQgYS9xYXBp
-L2Jsb2NrLWNvcmUuanNvbiBiL3FhcGkvYmxvY2stY29yZS5qc29uDQo+Pj4gaW5kZXggZDRmZTcx
-MDgzNi4uNTA1OThhYThmZSAxMDA2NDQNCj4+PiAtLS0gYS9xYXBpL2Jsb2NrLWNvcmUuanNvbg0K
-Pj4+ICsrKyBiL3FhcGkvYmxvY2stY29yZS5qc29uDQo+Pj4gQEAgLTMwMDQsNiArMzAwNCw4IEBA
-DQo+Pj4gICAgICMNCj4+PiAgICAgIyBAY29yX3dyaXRlOiBhIHdyaXRlIGR1ZSB0byBjb3B5LW9u
-LXJlYWQgKHNpbmNlIDIuMTEpDQo+Pj4gICAgICMNCj4+PiArIyBAY2x1c3Rlcl9hbGxvY19zcGFj
-ZTogYW4gYWxsb2NhdGlvbiBvZiBmaWxlIHNwYWNlIGZvciBhIGNsdXN0ZXIgKHNpbmNlIDQuMCkN
-Cj4+PiArIw0KPj4+ICAgICAjIFNpbmNlOiAyLjkNCj4+PiAgICAgIyMNCj4+PiAgICAgeyAnZW51
-bSc6ICdCbGtkZWJ1Z0V2ZW50JywgJ3ByZWZpeCc6ICdCTEtEQkcnLA0KPj4+IEBAIC0zMDIyLDcg
-KzMwMjQsNyBAQA0KPj4+ICAgICAgICAgICAgICAgICAncHdyaXRldl9ybXdfdGFpbCcsICdwd3Jp
-dGV2X3Jtd19hZnRlcl90YWlsJywgJ3B3cml0ZXYnLA0KPj4+ICAgICAgICAgICAgICAgICAncHdy
-aXRldl96ZXJvJywgJ3B3cml0ZXZfZG9uZScsICdlbXB0eV9pbWFnZV9wcmVwYXJlJywNCj4+PiAg
-ICAgICAgICAgICAgICAgJ2wxX3Nocmlua193cml0ZV90YWJsZScsICdsMV9zaHJpbmtfZnJlZV9s
-Ml9jbHVzdGVycycsDQo+Pj4gLSAgICAgICAgICAgICdjb3Jfd3JpdGUnXSB9DQo+Pj4gKyAgICAg
-ICAgICAgICdjb3Jfd3JpdGUnLCAnY2x1c3Rlcl9hbGxvY19zcGFjZSddIH0NCj4+PiAgICAgDQo+
-Pj4gICAgICMjDQo+Pj4gICAgICMgQEJsa2RlYnVnSW5qZWN0RXJyb3JPcHRpb25zOg0KPj4+IGRp
-ZmYgLS1naXQgYS9ibG9jay9xY293Mi5oIGIvYmxvY2svcWNvdzIuaA0KPj4+IGluZGV4IDg2NjJi
-Njg1NzUuLjhhNjQwNzc4OTcgMTAwNjQ0DQo+Pj4gLS0tIGEvYmxvY2svcWNvdzIuaA0KPj4+ICsr
-KyBiL2Jsb2NrL3Fjb3cyLmgNCj4+PiBAQCAtMzg5LDYgKzM4OSwxMiBAQCB0eXBlZGVmIHN0cnVj
-dCBRQ293TDJNZXRhDQo+Pj4gICAgICAgICAgKi8NCj4+PiAgICAgICAgIFFjb3cyQ09XUmVnaW9u
-IGNvd19lbmQ7DQo+Pj4gICAgIA0KPj4+ICsgICAgLyoqDQo+Pj4gKyAgICAgKiBJbmRpY2F0ZXMg
-dGhhdCBDT1cgcmVnaW9ucyBhcmUgYWxyZWFkeSBoYW5kbGVkIGFuZCBkbyBub3QgcmVxdWlyZQ0K
-Pj4+ICsgICAgICogYW55IG1vcmUgcHJvY2Vzc2luZy4NCj4+PiArICAgICAqLw0KPj4+ICsgICAg
-Ym9vbCBza2lwX2NvdzsNCj4+PiArDQo+Pj4gICAgICAgICAvKioNCj4+PiAgICAgICAgICAqIFRo
-ZSBJL08gdmVjdG9yIHdpdGggdGhlIGRhdGEgZnJvbSB0aGUgYWN0dWFsIGd1ZXN0IHdyaXRlIHJl
-cXVlc3QuDQo+Pj4gICAgICAgICAgKiBJZiBub24tTlVMTCwgdGhpcyBpcyBtZWFudCB0byBiZSBt
-ZXJnZWQgdG9nZXRoZXIgd2l0aCB0aGUgZGF0YQ0KPj4+IGRpZmYgLS1naXQgYS9ibG9jay9xY293
-Mi1jbHVzdGVyLmMgYi9ibG9jay9xY293Mi1jbHVzdGVyLmMNCj4+PiBpbmRleCBkMzdmZTA4YjNk
-Li4zNjg1YzVmNjdlIDEwMDY0NA0KPj4+IC0tLSBhL2Jsb2NrL3Fjb3cyLWNsdXN0ZXIuYw0KPj4+
-ICsrKyBiL2Jsb2NrL3Fjb3cyLWNsdXN0ZXIuYw0KPj4+IEBAIC04MDYsNyArODA2LDcgQEAgc3Rh
-dGljIGludCBwZXJmb3JtX2NvdyhCbG9ja0RyaXZlclN0YXRlICpicywgUUNvd0wyTWV0YSAqbSkN
-Cj4+PiAgICAgICAgIGFzc2VydChzdGFydC0+b2Zmc2V0ICsgc3RhcnQtPm5iX2J5dGVzIDw9IGVu
-ZC0+b2Zmc2V0KTsNCj4+PiAgICAgICAgIGFzc2VydCghbS0+ZGF0YV9xaW92IHx8IG0tPmRhdGFf
-cWlvdi0+c2l6ZSA9PSBkYXRhX2J5dGVzKTsNCj4+PiAgICAgDQo+Pj4gLSAgICBpZiAoc3RhcnQt
-Pm5iX2J5dGVzID09IDAgJiYgZW5kLT5uYl9ieXRlcyA9PSAwKSB7DQo+Pj4gKyAgICBpZiAoKHN0
-YXJ0LT5uYl9ieXRlcyA9PSAwICYmIGVuZC0+bmJfYnl0ZXMgPT0gMCkgfHwgbS0+c2tpcF9jb3cp
-IHsNCj4+PiAgICAgICAgICAgICByZXR1cm4gMDsNCj4+PiAgICAgICAgIH0NCj4+PiAgICAgDQo+
-Pj4gZGlmZiAtLWdpdCBhL2Jsb2NrL3Fjb3cyLmMgYi9ibG9jay9xY293Mi5jDQo+Pj4gaW5kZXgg
-OTkxZDZhYzkxYi4uMDI3MTg4YTFhMyAxMDA2NDQNCj4+PiAtLS0gYS9ibG9jay9xY293Mi5jDQo+
-Pj4gKysrIGIvYmxvY2svcWNvdzIuYw0KPj4+IEBAIC0yMDE1LDYgKzIwMTUsMTEgQEAgc3RhdGlj
-IGJvb2wgbWVyZ2VfY293KHVpbnQ2NF90IG9mZnNldCwgdW5zaWduZWQgYnl0ZXMsDQo+Pj4gICAg
-ICAgICAgICAgICAgIGNvbnRpbnVlOw0KPj4+ICAgICAgICAgICAgIH0NCj4+PiAgICAgDQo+Pj4g
-KyAgICAgICAgLyogSWYgQ09XIHJlZ2lvbnMgYXJlIGhhbmRsZWQgYWxyZWFkeSwgc2tpcCB0aGlz
-IHRvbyAqLw0KPj4+ICsgICAgICAgIGlmIChtLT5za2lwX2Nvdykgew0KPj4+ICsgICAgICAgICAg
-ICBjb250aW51ZTsNCj4+PiArICAgICAgICB9DQo+Pj4gKw0KPj4+ICAgICAgICAgICAgIC8qIFRo
-ZSBkYXRhIChtaWRkbGUpIHJlZ2lvbiBtdXN0IGJlIGltbWVkaWF0ZWx5IGFmdGVyIHRoZQ0KPj4+
-ICAgICAgICAgICAgICAqIHN0YXJ0IHJlZ2lvbiAqLw0KPj4+ICAgICAgICAgICAgIGlmIChsMm1l
-dGFfY293X3N0YXJ0KG0pICsgbS0+Y293X3N0YXJ0Lm5iX2J5dGVzICE9IG9mZnNldCkgew0KPj4+
-IEBAIC0yMDQwLDYgKzIwNDUsNjggQEAgc3RhdGljIGJvb2wgbWVyZ2VfY293KHVpbnQ2NF90IG9m
-ZnNldCwgdW5zaWduZWQgYnl0ZXMsDQo+Pj4gICAgICAgICByZXR1cm4gZmFsc2U7DQo+Pj4gICAg
-IH0NCj4+PiAgICAgDQo+Pj4gK3N0YXRpYyBib29sIGlzX3VuYWxsb2NhdGVkKEJsb2NrRHJpdmVy
-U3RhdGUgKmJzLCBpbnQ2NF90IG9mZnNldCwgaW50NjRfdCBieXRlcykNCj4+PiArew0KPj4+ICsg
-ICAgaW50NjRfdCBucjsNCj4+PiArICAgIHJldHVybiAhYnl0ZXMgfHwNCj4+PiArICAgICAgICAo
-IWJkcnZfaXNfYWxsb2NhdGVkX2Fib3ZlKGJzLCBOVUxMLCBvZmZzZXQsIGJ5dGVzLCAmbnIpICYm
-IG5yID09IGJ5dGVzKTsNCj4+DQo+PiBiZHJ2X2lzX2FsbG9jYXRlZF9hYm92ZSBtYXkgcmV0dXJu
-IGVycm9yIDwgMA0KPj4NCj4gDQo+IFByb2JhYmx5IEkganVzdCB0b29rIGlzX3plcm8oKSBhcyBh
-biBleGFtcGxlLg0KPiBCdXQgc29tZXdoZXJlIHRoZXJlJ3MgZXZlbiBhIHJhdGlvbmFsZSAoYmRy
-dl9jb19kb19jb3B5X29uX3JlYWR2KToNCj4gDQo+ICAgICAgICAgICByZXQgPSBiZHJ2X2lzX2Fs
-bG9jYXRlZChicywgY2x1c3Rlcl9vZmZzZXQsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBNSU4oY2x1c3Rlcl9ieXRlcywgbWF4X3RyYW5zZmVyKSwgJnBudW0pOw0KPiAgICAg
-ICAgICAgaWYgKHJldCA8IDApIHsNCj4gICAgICAgICAgICAgICAvKiBTYWZlIHRvIHRyZWF0IGVy
-cm9ycyBpbiBxdWVyeWluZyBhbGxvY2F0aW9uIGFzIGlmDQo+ICAgICAgICAgICAgICAgICogdW5h
-bGxvY2F0ZWQ7IHdlJ2xsIHByb2JhYmx5IGZhaWwgYWdhaW4gc29vbiBvbiB0aGUNCj4gICAgICAg
-ICAgICAgICAgKiByZWFkLCBidXQgYXQgbGVhc3QgdGhhdCB3aWxsIHNldCBhIGRlY2VudCBlcnJu
-by4NCj4gICAgICAgICAgICAgICAgKi8NCj4gICAgICAgICAgICAgICBwbnVtID0gTUlOKGNsdXN0
-ZXJfYnl0ZXMsIG1heF90cmFuc2Zlcik7DQo+ICAgICAgICAgICB9DQoNCmFoYSwgYW55d2F5LCAh
-YmRydl9pc19hbGxvY2F0ZWRfYWJvdmUgaXMgdHJ1ZSB3aGVuIGFuZCBvbmx5IHdoZW4gdGhlIGZ1
-bmN0aW9uDQpzdWNjZXNzZnVsbHkgcmV0dXJuZWQgInVuYWxsb2NhdGVkIi4NCg0KYWhhaGEsIHRo
-aXMgcmF0aW9uYWxlIGhhcyBmdW5ueSBtaXN0YWtlOiBzL3VuYWxsb2NhdGVkL2FsbG9jYXRlZCAp
-DQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On Wed, Dec 05, 2018 at 06:09:16PM +0100, Peter Krempa wrote:
+> On Wed, Dec 05, 2018 at 10:18:29 -0600, Michael Roth wrote:
+> > Quoting Sameeh Jubran (2018-10-25 13:01:10)
+> > > On Thu, Oct 25, 2018 at 5:06 PM Sameeh Jubran <sameeh@daynix.com> wrote:
+> > > > From: Sameeh Jubran <sjubran@redhat.com>
+> > > > Migration support:
+> > > >
+> > > > Pre migration or during setup phase of the migration we should send an
+> > > > unplug request to the guest to unplug the primary device. I haven't had
+> > > > the chance to implement that part yet but should do soon. Do you know
+> > > > what's the best approach to do so? I wanted to have a callback to the
+> > > > virtio-net device which tries to send an unplug request to the guest and
+> > > > if succeeds then the migration continues. It needs to handle the case where
+> > > > the migration fails and then it has to replug the primary device back.
+> > > I think that the "add_migration_state_change_notifier" API call can be used
+> > > from within the virtio-net device to achieve this, what do you think?
+> > 
+> > I think it would be good to hear from the libvirt folks (on Cc:) on this as
+> > having QEMU unplug a device without libvirt's involvement seems like it
+> > could cause issues. Personally I think it seems cleaner to just have QEMU
+> > handle the 'hidden' aspects of the device and leave it to QMP/libvirt to do
+> > the unplug beforehand. On the libvirt side I could imagine adding an option
+> > like virsh migrate --switch-to-standby-networking or something along
+> > that line to do it automatically (if we decide doing it automatically is
+> > even needed on that end).
+> 
+> I remember talking about this approach some time ago.
+> 
+> In general the migration itself is a very complex process which has too
+> many places where it can fail. The same applies to device hotunplug.
+> This series proposes to merge those two together into an even more
+> complex behemoth.
+> 
+> Few scenarios which don't have clear solution come into my mind:
+> - Since unplug request time is actually unbounded. The guest OS may
+>   arbitrarily reject it or execute it at any later time, migration may get
+>   stuck in a halfway state without any clear rollback or failure scenario.
+
+IMHO this is the really big deal. Doing this inside QEMU can arbitrarily
+delay the start of migration, but this is opaque to mgmt apps because it
+all becomes hidden behind the migrate command. It is common for mgmt apps
+to serialize migration operations, otherwise they compete for limited
+network bandwidth making it less likely that any will complete. If we're
+waiting for a guest OS to do the unplug though, we don't want to be
+stopping other migrations from being started in the mean time. Having
+the unplugs done from the mgmt app explicitly gives it the flexibility
+to decide how to order and serialize things to suit its needs.
+
+> - After migration, device hotplug may fail for whatever reason, leaving
+>   networking crippled and again no clear single-case rollback scenario.
+
+I'd say s/crippled/degraded/. Anyway depending on the the reason that
+triggered the migration, you may not even want to rollback to the source
+host, despite the VFIO hotplug failing on the target.
+
+If the original host was being evacuated in order to upgrade it to the latest
+security patches, or due to hardware problems, it can be preferrable to just
+let the VM start running on the target host with just emulated NICs only and
+worry about getting working VFIO later.
+
+> Then there's stuff which requires libvirt/management cooperation
+> - picking of the network device on destination
+> - making sure that the device is present etc.
+> 
+> From managements point of view, bundling all this together is really not
+> a good idea since it creates a very big matrix of failure scenarios. In
+> general even libvirt will prefer that upper layer management drives this
+> externally, since any rolback scenario will result in a policy decision
+> of what to do in certain cases, and what timeouts to pick.
+
+Indeed, leaving these policies decisions to the mgmt app has been a
+better approach in general over time, as the view of what's the best
+way to approach a problem has changed over time.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
