@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gUYKK-0006FI-Fx
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 09:39:01 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUYSI-0000o7-Pu
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 09:47:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gUYKG-0003p1-OO
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 09:39:00 -0500
-Resent-Message-Id: <E1gUYKG-0003p1-OO@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21786)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gUYKG-0003hw-CE
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 09:38:56 -0500
-In-Reply-To: <154401431697.8440.845616703562380651.stgit@Misha-PC.lan02.inno>
-Message-ID: <154402070032.2019.2927893049098417370@bb8f5089e434>
-Reply-To: <qemu-devel@nongnu.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 5 Dec 2018 06:38:21 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 2 00/39] Windbg supporting
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUYSG-0003nO-7w
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 09:47:14 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed,  5 Dec 2018 17:46:57 +0300
+Message-Id: <20181205144700.26563-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20181205144700.26563-1-vsementsov@virtuozzo.com>
+References: <20181205144700.26563-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v2 2/5] crypto/block: refactor
+ qcrypto_block_*crypt_helper functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,133 +20,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mikhail.abakumov@ispras.ru
-Cc: famz@redhat.com, qemu-devel@nongnu.org, sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: berrange@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTQ0MDE0MzE2OTcuODQ0MC44
-NDU2MTY3MDM1NjIzODA2NTEuc3RnaXRATWlzaGEtUEMubGFuMDIuaW5uby8KCgoKSGksCgpUaGlz
-IHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0
-cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTU0NDAxNDMxNjk3
-Ljg0NDAuODQ1NjE2NzAzNTYyMzgwNjUxLnN0Z2l0QE1pc2hhLVBDLmxhbjAyLmlubm8KVHlwZTog
-c2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMiAwMC8zOV0gV2luZGJnIHN1cHBv
-cnRpbmcKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpu
-PTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9n
-cmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpm
-b3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDog
-JChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAt
-LWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhl
-bgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9u
-ZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVh
-OWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5j
-aCAndGVzdCcKM2FiOGY5MyB3aW5kYmc6IG1haW50YWluZXJzCjE5Mzk5ZWUgd2luZGJnOiBpbXBs
-ZW1lbnQga2RfYXBpX3F1ZXJ5X21lbW9yeQpmZWRjM2VkIHdpbmRiZzogaW1wbGVtZW50IGtkX2Fw
-aV9maWxsX21lbW9yeQoyMzI3NjYxIHdpbmRiZzogaW1wbGVtZW50IGtkX2FwaV9zZWFyY2hfbWVt
-b3J5CmIzZWJkZTQgd2luZGJnOiBpbXBsZW1lbnQga2RfYXBpX3JlYWRfbXNyIGFuZCBrZF9hcGlf
-d3JpdGVfbXNyCmJkNTYwYmMgd2luZGJnOiBpbXBsZW1lbnQga2RfYXBpX2dldF92ZXJzaW9uCjBk
-MzBiNGIgd2luZGJnOiBpbXBsZW1lbnQga2RfYXBpX3JlYWRfcGh5c2ljYWxfbWVtb3J5IGFuZCBr
-ZF9hcGlfd3JpdGVfcGh5c2ljYWxfbWVtb3J5CjVmM2QyZGEgd2luZGJnOiBpbXBsZW1lbnQga2Rf
-YXBpX3JlYWRfaW9fc3BhY2UgYW5kIGtkX2FwaV93cml0ZV9pb19zcGFjZQphOTcwYWExIHdpbmRi
-ZzogaW1wbGVtZW50IGtkX2FwaV9jb250aW51ZQplN2Y0NDMyIHdpbmRiZzogZGVidWcgZXhjZXB0
-aW9uIHN1YnNjcmliaW5nCjkyNzQ1ZWUgd2luZGJnOiBpbXBsZW1lbnQga2RfYXBpX3dyaXRlX2Jy
-ZWFrcG9pbnQgYW5kIGtkX2FwaV9yZXN0b3JlX2JyZWFrcG9pbnQKMWEyNzVjNSB3aW5kYmc6IGlt
-cGxlbWVudCBrZF9hcGlfcmVhZF9jb250cm9sX3NwYWNlIGFuZCBrZF9hcGlfd3JpdGVfY29udHJv
-bF9zcGFjZQplNzJjZjYyIHdpbmRiZzogaW1wbGVtZW50IGtkX2FwaV9nZXRfY29udGV4dF9leCBh
-bmQga2RfYXBpX3NldF9jb250ZXh0X2V4CmVlMmY0NDQgd2luZGJnOiBpbXBsZW1lbnQga2RfYXBp
-X2dldF9jb250ZXh0IGFuZCBrZF9hcGlfc2V0X2NvbnRleHQKYzEyYWRmYSB3aW5kYmc6IFtkZV1z
-ZXJpYWxpemF0aW9uIGNwdSBzcGVjIHJlZ2lzdGVycwo5MzBmMmMxIHdpbmRiZzogW2RlXXNlcmlh
-bGl6YXRpb24gY3B1IGNvbnRleHQKMTk1NjA0NCB3aW5kYmc6IGFkZCBoZWxwZXIgZnVuY3Rpb25z
-CmU5MmM1YTAgd2luZGJnOiBzb21lIGtlcm5lbCBzdHJ1Y3R1cmVzCmU0NDQ0ODYgd2luZGJnOiBp
-bXBsZW1lbnQga2RfYXBpX3JlYWRfdmlydHVhbF9tZW1vcnkgYW5kIGtkX2FwaV93cml0ZV92aXJ0
-dWFsX21lbW9yeQo4MjlhODcwIHdpbmRiZzogaW1wbGVtZW50IHdpbmRiZ19wcm9jZXNzX21hbmlw
-dWxhdGVfcGFja2V0CjNmNzNmMzEgd2luZGJnOiBpbXBsZW1lbnQgd2luZGJnX3Byb2Nlc3NfZGF0
-YV9wYWNrZXQKZmQ0MzczNyB3aW5kYmc6IGltcGxlbWVudCB3aW5kYmdfcHJvY2Vzc19jb250cm9s
-X3BhY2tldAozMTM0NzdkIHdpbmRiZzogZ2VuZXJhdGUgRXhjZXB0aW9uU3RhdGVDaGFuZ2UgYW5k
-IExvYWRTeW1ib2xzU3RhdGVDaGFuZ2UKMzBjY2ZlNSB3aW5kYmc6IGluaXQgREJHS0RfQU5ZX1dB
-SVRfU1RBVEVfQ0hBTkdFCjYyOThiYTUgd2luZGJnOiBoYW5kbGVyIG9mIHBhcnNpbmcgY29udGV4
-dApkZmU4OGJmIHdpbmRiZzogc2VuZCBkYXRhIGFuZCBjb250cm9sIHBhY2tldHMKYmM4ZWM0YyB3
-aW5kYmc6IHBhcnNpbmcgZGF0YSBzdHJlYW0KMWRlMWU4ZiB3aW5kYmc6IGltcGxlbWVudCBmaW5k
-X2tkRGVidWdnZXJEYXRhQmxvY2sKZDhjYzUwYSB3aW5kYmc6IGFkZCB3aW5kYmdfc2VhcmNoX3Zt
-YWRkcgozMWQwMmI1IHdpbmRiZzogaW1wbGVtZW50IGZpbmRfa2RWZXJzaW9uCjFkNDM2Yjggd2lu
-ZGJnOiBpbXBsZW1lbnQgZmluZF9LUENSCmI4NjIwMDUgd2luZGJnOiBpbXBsZW1lbnQgd2luZGJn
-X29uX2xvYWQKYWU3ODk2NCB3aW5kYmc6IGhvb2sgdG8gd3Jtc3Igb3BlcmF0aW9uCjJlNmU1YWQg
-d2luZGJnOiBhZGQgY2hhcmRldgo2NDcxZDE1IHdpbmRiZzogYWRkIFdpbmRiZ1N0YXRlCjQ0MzNi
-NDIgd2luZGJnOiBhZGQgaGVscGVyIGZlYXR1cmVzCjU0MTNkZTQgd2luZGJnOiBhZGQgLXdpbmRi
-ZyBvcHRpb24KZTgxMDQxNSB3aW5kYmc6IGFkZCB3aW5kYmcncyBLRCBoZWFkZXIgZmlsZQpjNmIy
-NjNkIHdpbmRiZzogYWRkIGVtcHR5IHdpbmRiZ3N0dWIgZmlsZXMKCj09PSBPVVRQVVQgQkVHSU4g
-PT09CkNoZWNraW5nIFBBVENIIDEvMzk6IHdpbmRiZzogYWRkIGVtcHR5IHdpbmRiZ3N0dWIgZmls
-ZXMuLi4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlO
-VEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzU6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6
-IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMjEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAyLzM5OiB3aW5kYmc6IGFkZCB3
-aW5kYmcncyBLRCBoZWFkZXIgZmlsZS4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRl
-ZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNDogCm5ldyBmaWxl
-IG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDkzNCBsaW5lcyBjaGVj
-a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENI
-IDMvMzk6IHdpbmRiZzogYWRkIC13aW5kYmcgb3B0aW9uLi4uCkNoZWNraW5nIFBBVENIIDQvMzk6
-IHdpbmRiZzogYWRkIGhlbHBlciBmZWF0dXJlcy4uLgpDaGVja2luZyBQQVRDSCA1LzM5OiB3aW5k
-Ymc6IGFkZCBXaW5kYmdTdGF0ZS4uLgpDaGVja2luZyBQQVRDSCA2LzM5OiB3aW5kYmc6IGFkZCBj
-aGFyZGV2Li4uCkNoZWNraW5nIFBBVENIIDcvMzk6IHdpbmRiZzogaG9vayB0byB3cm1zciBvcGVy
-YXRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggOC8zOTogd2luZGJnOiBpbXBsZW1lbnQgd2luZGJnX29u
-X2xvYWQuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8zOTogd2luZGJnOiBpbXBsZW1lbnQgZmluZF9LUENS
-Li4uCkNoZWNraW5nIFBBVENIIDEwLzM5OiB3aW5kYmc6IGltcGxlbWVudCBmaW5kX2tkVmVyc2lv
-bi4uLgpDaGVja2luZyBQQVRDSCAxMS8zOTogd2luZGJnOiBhZGQgd2luZGJnX3NlYXJjaF92bWFk
-ZHIuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMzk6IHdpbmRiZzogaW1wbGVtZW50IGZpbmRfa2REZWJ1
-Z2dlckRhdGFCbG9jay4uLgpDaGVja2luZyBQQVRDSCAxMy8zOTogd2luZGJnOiBwYXJzaW5nIGRh
-dGEgc3RyZWFtLi4uCkNoZWNraW5nIFBBVENIIDE0LzM5OiB3aW5kYmc6IHNlbmQgZGF0YSBhbmQg
-Y29udHJvbCBwYWNrZXRzLi4uCkNoZWNraW5nIFBBVENIIDE1LzM5OiB3aW5kYmc6IGhhbmRsZXIg
-b2YgcGFyc2luZyBjb250ZXh0Li4uCkNoZWNraW5nIFBBVENIIDE2LzM5OiB3aW5kYmc6IGluaXQg
-REJHS0RfQU5ZX1dBSVRfU1RBVEVfQ0hBTkdFLi4uCkNoZWNraW5nIFBBVENIIDE3LzM5OiB3aW5k
-Ymc6IGdlbmVyYXRlIEV4Y2VwdGlvblN0YXRlQ2hhbmdlIGFuZCBMb2FkU3ltYm9sc1N0YXRlQ2hh
-bmdlLi4uCkNoZWNraW5nIFBBVENIIDE4LzM5OiB3aW5kYmc6IGltcGxlbWVudCB3aW5kYmdfcHJv
-Y2Vzc19jb250cm9sX3BhY2tldC4uLgpDaGVja2luZyBQQVRDSCAxOS8zOTogd2luZGJnOiBpbXBs
-ZW1lbnQgd2luZGJnX3Byb2Nlc3NfZGF0YV9wYWNrZXQuLi4KQ2hlY2tpbmcgUEFUQ0ggMjAvMzk6
-IHdpbmRiZzogaW1wbGVtZW50IHdpbmRiZ19wcm9jZXNzX21hbmlwdWxhdGVfcGFja2V0Li4uCkNo
-ZWNraW5nIFBBVENIIDIxLzM5OiB3aW5kYmc6IGltcGxlbWVudCBrZF9hcGlfcmVhZF92aXJ0dWFs
-X21lbW9yeSBhbmQga2RfYXBpX3dyaXRlX3ZpcnR1YWxfbWVtb3J5Li4uCkNoZWNraW5nIFBBVENI
-IDIyLzM5OiB3aW5kYmc6IHNvbWUga2VybmVsIHN0cnVjdHVyZXMuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MjMvMzk6IHdpbmRiZzogYWRkIGhlbHBlciBmdW5jdGlvbnMuLi4KRVJST1I6IE1hY3JvcyB3aXRo
-IG11bHRpcGxlIHN0YXRlbWVudHMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIGEgZG8gLSB3aGlsZSBs
-b29wCiMxMjY6IEZJTEU6IHRhcmdldC9pMzg2L3dpbmRiZ3N0dWIuYzozODc6CisjZGVmaW5lIENB
-U0VfRklFTEQoc3RjdCwgZmllbGQsIGZpZWxkX3NpemUsIGJsb2NrKSAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgXAorICAgIGNhc2Ugb2Zmc2V0b2Yoc3RjdCwgZmllbGQpOiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgZmllbGRfc2l6
-ZSA9IHNpemVvZl9maWVsZChzdGN0LCBmaWVsZCk7ICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBcCisgICAgICAgIGJsb2NrOyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICBicmVhazsKCnRvdGFsOiAx
-IGVycm9ycywgMCB3YXJuaW5ncywgMTI5IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDI0LzM5OiB3aW5kYmc6IFtkZV1z
-ZXJpYWxpemF0aW9uIGNwdSBjb250ZXh0Li4uCkNoZWNraW5nIFBBVENIIDI1LzM5OiB3aW5kYmc6
-IFtkZV1zZXJpYWxpemF0aW9uIGNwdSBzcGVjIHJlZ2lzdGVycy4uLgpDaGVja2luZyBQQVRDSCAy
-Ni8zOTogd2luZGJnOiBpbXBsZW1lbnQga2RfYXBpX2dldF9jb250ZXh0IGFuZCBrZF9hcGlfc2V0
-X2NvbnRleHQuLi4KQ2hlY2tpbmcgUEFUQ0ggMjcvMzk6IHdpbmRiZzogaW1wbGVtZW50IGtkX2Fw
-aV9nZXRfY29udGV4dF9leCBhbmQga2RfYXBpX3NldF9jb250ZXh0X2V4Li4uCkNoZWNraW5nIFBB
-VENIIDI4LzM5OiB3aW5kYmc6IGltcGxlbWVudCBrZF9hcGlfcmVhZF9jb250cm9sX3NwYWNlIGFu
-ZCBrZF9hcGlfd3JpdGVfY29udHJvbF9zcGFjZS4uLgpDaGVja2luZyBQQVRDSCAyOS8zOTogd2lu
-ZGJnOiBpbXBsZW1lbnQga2RfYXBpX3dyaXRlX2JyZWFrcG9pbnQgYW5kIGtkX2FwaV9yZXN0b3Jl
-X2JyZWFrcG9pbnQuLi4KQ2hlY2tpbmcgUEFUQ0ggMzAvMzk6IHdpbmRiZzogZGVidWcgZXhjZXB0
-aW9uIHN1YnNjcmliaW5nLi4uCkNoZWNraW5nIFBBVENIIDMxLzM5OiB3aW5kYmc6IGltcGxlbWVu
-dCBrZF9hcGlfY29udGludWUuLi4KQ2hlY2tpbmcgUEFUQ0ggMzIvMzk6IHdpbmRiZzogaW1wbGVt
-ZW50IGtkX2FwaV9yZWFkX2lvX3NwYWNlIGFuZCBrZF9hcGlfd3JpdGVfaW9fc3BhY2UuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMzMvMzk6IHdpbmRiZzogaW1wbGVtZW50IGtkX2FwaV9yZWFkX3BoeXNpY2Fs
-X21lbW9yeSBhbmQga2RfYXBpX3dyaXRlX3BoeXNpY2FsX21lbW9yeS4uLgpDaGVja2luZyBQQVRD
-SCAzNC8zOTogd2luZGJnOiBpbXBsZW1lbnQga2RfYXBpX2dldF92ZXJzaW9uLi4uCkNoZWNraW5n
-IFBBVENIIDM1LzM5OiB3aW5kYmc6IGltcGxlbWVudCBrZF9hcGlfcmVhZF9tc3IgYW5kIGtkX2Fw
-aV93cml0ZV9tc3IuLi4KQ2hlY2tpbmcgUEFUQ0ggMzYvMzk6IHdpbmRiZzogaW1wbGVtZW50IGtk
-X2FwaV9zZWFyY2hfbWVtb3J5Li4uCkNoZWNraW5nIFBBVENIIDM3LzM5OiB3aW5kYmc6IGltcGxl
-bWVudCBrZF9hcGlfZmlsbF9tZW1vcnkuLi4KQ2hlY2tpbmcgUEFUQ0ggMzgvMzk6IHdpbmRiZzog
-aW1wbGVtZW50IGtkX2FwaV9xdWVyeV9tZW1vcnkuLi4KQ2hlY2tpbmcgUEFUQ0ggMzkvMzk6IHdp
-bmRiZzogbWFpbnRhaW5lcnMuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhp
-dGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3Bh
-dGNoZXcub3JnL2xvZ3MvMTU0NDAxNDMxNjk3Ljg0NDAuODQ1NjE2NzAzNTYyMzgwNjUxLnN0Z2l0
-QE1pc2hhLVBDLmxhbjAyLmlubm8vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0t
-LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hl
-dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
-dC5jb20=
+qcrypto_block_encrypt_helper and qcrypto_block_decrypt_helper are
+almost identical, let's reduce code duplication and simplify further
+improvements.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ crypto/block.c | 81 +++++++++++++++++++-------------------------------
+ 1 file changed, 31 insertions(+), 50 deletions(-)
+
+diff --git a/crypto/block.c b/crypto/block.c
+index e59d1140fe..f4101f0841 100644
+--- a/crypto/block.c
++++ b/crypto/block.c
+@@ -190,14 +190,21 @@ void qcrypto_block_free(QCryptoBlock *block)
+ }
+ 
+ 
+-int qcrypto_block_decrypt_helper(QCryptoCipher *cipher,
+-                                 size_t niv,
+-                                 QCryptoIVGen *ivgen,
+-                                 int sectorsize,
+-                                 uint64_t offset,
+-                                 uint8_t *buf,
+-                                 size_t len,
+-                                 Error **errp)
++typedef int (*QCryptoCipherEncryptFunc)(QCryptoCipher *cipher,
++                                        const void *in,
++                                        void *out,
++                                        size_t len,
++                                        Error **errp);
++
++static int do_qcrypto_block_encrypt(QCryptoCipher *cipher,
++                                    size_t niv,
++                                    QCryptoIVGen *ivgen,
++                                    int sectorsize,
++                                    uint64_t offset,
++                                    uint8_t *buf,
++                                    size_t len,
++                                    QCryptoCipherEncryptFunc func,
++                                    Error **errp)
+ {
+     uint8_t *iv;
+     int ret = -1;
+@@ -226,8 +233,7 @@ int qcrypto_block_decrypt_helper(QCryptoCipher *cipher,
+         }
+ 
+         nbytes = len > sectorsize ? sectorsize : len;
+-        if (qcrypto_cipher_decrypt(cipher, buf, buf,
+-                                   nbytes, errp) < 0) {
++        if (func(cipher, buf, buf, nbytes, errp) < 0) {
+             goto cleanup;
+         }
+ 
+@@ -243,7 +249,7 @@ int qcrypto_block_decrypt_helper(QCryptoCipher *cipher,
+ }
+ 
+ 
+-int qcrypto_block_encrypt_helper(QCryptoCipher *cipher,
++int qcrypto_block_decrypt_helper(QCryptoCipher *cipher,
+                                  size_t niv,
+                                  QCryptoIVGen *ivgen,
+                                  int sectorsize,
+@@ -252,45 +258,20 @@ int qcrypto_block_encrypt_helper(QCryptoCipher *cipher,
+                                  size_t len,
+                                  Error **errp)
+ {
+-    uint8_t *iv;
+-    int ret = -1;
+-    uint64_t startsector = offset / sectorsize;
+-
+-    assert(QEMU_IS_ALIGNED(offset, sectorsize));
+-    assert(QEMU_IS_ALIGNED(len, sectorsize));
+-
+-    iv = niv ? g_new0(uint8_t, niv) : NULL;
+-
+-    while (len > 0) {
+-        size_t nbytes;
+-        if (niv) {
+-            if (qcrypto_ivgen_calculate(ivgen,
+-                                        startsector,
+-                                        iv, niv,
+-                                        errp) < 0) {
+-                goto cleanup;
+-            }
+-
+-            if (qcrypto_cipher_setiv(cipher,
+-                                     iv, niv,
+-                                     errp) < 0) {
+-                goto cleanup;
+-            }
+-        }
+-
+-        nbytes = len > sectorsize ? sectorsize : len;
+-        if (qcrypto_cipher_encrypt(cipher, buf, buf,
+-                                   nbytes, errp) < 0) {
+-            goto cleanup;
+-        }
++    return do_qcrypto_block_encrypt(cipher, niv, ivgen, sectorsize, offset,
++                                    buf, len, qcrypto_cipher_decrypt, errp);
++}
+ 
+-        startsector++;
+-        buf += nbytes;
+-        len -= nbytes;
+-    }
+ 
+-    ret = 0;
+- cleanup:
+-    g_free(iv);
+-    return ret;
++int qcrypto_block_encrypt_helper(QCryptoCipher *cipher,
++                                 size_t niv,
++                                 QCryptoIVGen *ivgen,
++                                 int sectorsize,
++                                 uint64_t offset,
++                                 uint8_t *buf,
++                                 size_t len,
++                                 Error **errp)
++{
++    return do_qcrypto_block_encrypt(cipher, niv, ivgen, sectorsize, offset,
++                                    buf, len, qcrypto_cipher_encrypt, errp);
+ }
+-- 
+2.18.0
