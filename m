@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gUVF6-0008At-8S
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:21:26 -0500
+	(envelope-from <bounces@canonical.com>) id 1gUVKe-0002Qz-HT
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:27:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gUVF2-0005zv-A0
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:21:24 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38202)
+	(envelope-from <bounces@canonical.com>) id 1gUVKX-0001WJ-6i
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:27:06 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41886)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gUVF0-0005y1-DO
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:21:18 -0500
+	id 1gUVKW-0001Td-Vs
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:27:01 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gUVEw-0001PN-8u
-	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 11:21:14 +0000
+	id 1gUVKT-0002ka-5J
+	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 11:26:57 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 408A62E8031
-	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 11:21:14 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 7512E2E80D8
+	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 11:26:54 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 05 Dec 2018 11:15:07 -0000
+Date: Wed, 05 Dec 2018 11:06:36 -0000
 From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-Reply-To: Bug 1805913 <1805913@bugs.launchpad.net>
+Reply-To: Bug 1364501 <1364501@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <154353638253.10384.17899256838547579767.malonedeb@chaenomeles.canonical.com>
-Message-Id: <154400850785.539.6367548279463261386.launchpad@chaenomeles.canonical.com>
+References: <20140902163848.4037.99496.malonedeb@soybean.canonical.com>
+Message-Id: <154400799757.26298.14592356957580172975.launchpad@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1805913] Re: readdir() returns NULL
- (errno=EOVERFLOW) for 32-bit user-static qemu on 64-bit host
+Subject: [Qemu-devel] [Bug 1364501] Re: Gdb hangs when trying to single-step
+ after an invalid instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,65 +39,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Tags removed: linux user-static
-** Tags added: linux-user
+** Tags added: gdbstub
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805913
+https://bugs.launchpad.net/bugs/1364501
 
 Title:
-  readdir() returns NULL (errno=3DEOVERFLOW) for 32-bit user-static qemu
-  on 64-bit host
+  Gdb hangs when trying to single-step after an invalid instruction
 
 Status in QEMU:
-  New
+  Triaged
 
 Bug description:
-  This can be simply reproduced by compiling and running the attached C
-  code (readdir-bug.c) under 32-bit user-static qemu, such as qemu-arm-
-  static:
+  When using Gdb to remote-debug a program and manually setting its PC
+  to point to an address containing an invalid instruction and then
+  doing a single step, Qemu will never return control to the remote Gdb.
 
-  # Setup docker for user-static binfmt
-  docker run --rm --privileged multiarch/qemu-user-static:register --reset
-  # Compile the code and run (readdir for / is fine, so create a new direct=
-ory /test).
-  docker run -v /path/to/qemu-arm-static:/usr/bin/qemu-arm-static -v /path/=
-to/readdir-bug.c:/tmp/readdir-bug.c -it --rm arm32v7/ubuntu:18.10 bash -c '=
-{ apt update && apt install -y gcc; } >&/dev/null && mkdir -p /test && cd /=
-test && gcc /tmp/readdir-bug.c && ./a.out'
-  dir=3D0xff5b4150
-  readdir(dir)=3D(nil)
-  errno=3D75: Value too large for defined data type
+  For instance, let's say address 0x114 contains an invalid instruction.
+  On the remote Gdb, we'd do:
 
-  Do remember to replace the /path/to/qemu-arm-static and /path/to
-  /readdir-bug.c to the actual paths of the files.
+  (gdb) set $pc =3D 0x114
+  (gdb) stepi
 
-  The root cause is in glibc:
-  https://sourceware.org/git/?p=3Dglibc.git;a=3Dblob;f=3Dsysdeps/unix/sysv/=
-linux/getdents.c;h=3D6d09a5be7057e2792be9150d3a2c7b293cf6fc34;hb=3Da5275ba5=
-378c9256d18e582572b4315e8edfcbfb#l87
+  After doing that we won't get the (gdb) prompt unless we do a Ctrl-C.
+  If we do so we'll be left at 0x114 instead of going towards the
+  exception handler as we should. This happens with stepi, step and
+  next. If instead of single-stepping we used continue, the program will
+  proceed into the exception handler as it should.
 
-  By C standard, the return type of readdir() is DIR*, in which the
-  inode number and offset are 32-bit integers, therefore, glibc calls
-  getdents64() and check if the inode number and offset fits the 32-bit
-  range, and reports EOVERFLOW if not.
+  The reason this is happening is that when Qemu realizes it's about to
+  translate an instruction it doesn't recognize it'll generate a call to
+  helper_exception_with_syndrome(), which will register the exception
+  and then call cpu_loop_exit(). At the same time, because we're doing a
+  single-step, Qemu will also generate a call to
+  helper_exception_internal() passing it an EXCP_DEBUG, which lets the
+  system know it'll give control back to the remote debugger, and it
+  also ends with a call to cpu_loop_exit(). However, because the
+  syndrome exception calls cpu_loop_exit() first, the call to the
+  internal exception won't be reached and Qemu will be stuck in a loop
+  without returning control to the remote debugger.
 
-  The problem here is for 32-bit user-static qemu running on 64-bit
-  host, getdents64 simply passing through the inode number and offset
-  from underlying getdents64 syscall (from 64-bit kernel), which is very
-  likely to not fit into 32-bit range. On real hardware, the 32-bit
-  kernel creates 32-bit inode numbers, therefore works properly.
+  What makes this a bit tricky to fix is that we must call
+  cpu_loop_exit() at the end of helper_exception_with_syndrome(),
+  otherwise the target exception will go undetected and its handler
+  won't be excecuted.
 
-  The glibc code makes sense to do the check to be conformant with C
-  standard, therefore ideally it should be a fix on qemu side. I admit
-  this is difficult because qemu has to maintain a mapping between
-  underlying 64-bit inode numbers and 32-bit inode numbers, which would
-  severely hurt the performance. I don't expect this could be fix
-  anytime soon (or even there would be a fix), but it would be
-  worthwhile to surface this issue.
+  Tested on latest head by emulating a Stellaris lm3s6965 board and
+  running RTEMS 4.11:
+
+  $ qemu-system-arm -nographic -s -S -M lm3s6965evb -kernel my_rtems_app
+
+  Commit hash in qemu.git: 30eaca3acdf17d7bcbd1213eb149c02037edfb0b
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1805913/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1364501/+subscriptions
