@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gUZjP-0001qB-5P
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:09:00 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUZjm-00022d-FB
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:09:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gUZjL-0000f6-1P
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:08:58 -0500
-Date: Wed, 5 Dec 2018 11:08:52 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181205160852.GA8760@flamenco>
-References: <mailman.26358.1543950647.1282.qemu-devel@nongnu.org>
-	<BB2DCBB2-1B72-4986-BB21-3A685D68EF88@gmail.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUZji-000184-Os
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:09:22 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 5 Dec 2018 16:09:02 +0000
+Message-ID: <61995d89-db9d-ac34-0b32-aacffd49b184@virtuozzo.com>
+References: <20181203165810.14509-1-kwolf@redhat.com>
+	<20181203165810.14509-3-kwolf@redhat.com>
+	<dc86835f-65d9-cada-dc9b-1f2c708521f9@de.ibm.com>
+	<75f7e3cc-bd46-c743-84ab-cd68bcb1dcfb@de.ibm.com>
+	<d0966d94-87d4-0f25-f2e0-846a1d338be7@de.ibm.com>
+	<20181205084614.GA4018@dhcp-200-186.str.redhat.com>
+	<30858ce0-5b4b-c3c4-b846-6a214670f8d2@de.ibm.com>
+	<f91cf64b-db93-f2e5-bceb-93013592ad03@virtuozzo.com>
+	<34e1b572-41b0-ae72-6d12-283516c9218c@de.ibm.com>
+	<7d5d502b-9bba-47ed-648e-65495765c4ca@virtuozzo.com>
+	<f791fd99-4055-c308-6e62-fc3b818c7ebf@de.ibm.com>
+In-Reply-To: <f791fd99-4055-c308-6e62-fc3b818c7ebf@de.ibm.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <9E7D0A93E956C246AE7E591AA43F476C@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BB2DCBB2-1B72-4986-BB21-3A685D68EF88@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v6 07/13] fpu: introduce hardfloat
+Subject: Re: [Qemu-devel] [qemu-s390x] [PULL 2/2] iotests: simple mirror
+ test with kvm on 1G image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +35,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: Alex Benn?e <alex.bennee@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On Wed, Dec 05, 2018 at 06:07:44 -0500, Programmingkid wrote:
-> 
-> > On Dec 4, 2018, at 2:10 PM, qemu-devel-request@nongnu.org wrote:
-> > 
-> > Emilio G. Cota <cota@braap.org> writes:
-> > 
-> >> On Tue, Dec 04, 2018 at 13:52:16 +0000, Alex Benn?e wrote:
-> >>>> We could always
-> >>>> 
-> >>>> #ifdef __FAST_MATH__
-> >>>> #error "Silliness like this will get you nowhere"
-> >>>> #endif
-> >>> 
-> >>> Emilio, are you happy to add that guard with a suitable pithy comment?
-> >> 
-> >> Isn't it better to just disable hardfloat then?
-> >> 
-> >> --- a/fpu/softfloat.c
-> >> +++ b/fpu/softfloat.c
-> >> @@ -220,7 +220,7 @@ GEN_INPUT_FLUSH3(float64_input_flush3, float64)
-> >>  * the use of hardfloat, since hardfloat relies on the inexact flag being
-> >>  * already set.
-> >>  */
-> >> -#if defined(TARGET_PPC)
-> >> +#if defined(TARGET_PPC) || defined(__FAST_MATH__)
-> >> # define QEMU_NO_HARDFLOAT 1
-> >> # define QEMU_SOFTFLOAT_ATTR QEMU_FLATTEN
-> >> #else
-> 
-> Why can't PowerPC also benefit from a hardfloat? It uses IEEE754 also.  
-
-Please see this message:
-  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg04974.html
-
-Thanks,
-
-		E.
+MDUuMTIuMjAxOCAxODo1MiwgQ2hyaXN0aWFuIEJvcm50cmFlZ2VyIHdyb3RlOg0KPiANCj4gDQo+
+IE9uIDA1LjEyLjIwMTggMTQ6MzksIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6
+DQo+PiAwNS4xMi4yMDE4IDE1OjM1LCBDaHJpc3RpYW4gQm9ybnRyYWVnZXIgd3JvdGU6DQo+Pj4N
+Cj4+Pg0KPj4+IE9uIDA1LjEyLjIwMTggMTM6MDAsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNr
+aXkgd3JvdGU6DQo+Pj4+IDA1LjEyLjIwMTggMTI6MDEsIENocmlzdGlhbiBCb3JudHJhZWdlciB3
+cm90ZToNCj4+Pj4+DQo+Pj4+Pg0KPj4+Pj4gT24gMDUuMTIuMjAxOCAwOTo0NiwgS2V2aW4gV29s
+ZiB3cm90ZToNCj4+Pj4+PiBBbSAwNS4xMi4yMDE4IHVtIDA5OjIzIGhhdCBDaHJpc3RpYW4gQm9y
+bnRyYWVnZXIgZ2VzY2hyaWViZW46DQo+Pj4+Pj4+Pj4+ICsjIHByZXBhcmUgc291cmNlIGltYWdl
+DQo+Pj4+Pj4+Pj4+ICtxZW11X2ltZ19jcmVhdGUoJy1mJywgaW90ZXN0cy5pbWdmbXQsICctbycs
+ICdwcmVhbGxvY2F0aW9uPW1ldGFkYXRhJywgZGlzaywNCj4+Pj4+Pj4+Pj4gKyAgICAgICAgICAg
+ICAgICBzdHIoc2l6ZSkpDQo+Pj4+Pj4+Pj4+ICsNCj4+Pj4+Pj4+Pj4gK3ZtID0gUUVNVU1hY2hp
+bmUoaW90ZXN0cy5xZW11X3Byb2cpDQo+Pj4+Pj4+Pj4+ICt2bS5hZGRfYXJncygnLW1hY2hpbmUn
+LCAncGMsYWNjZWw9a3ZtJykNCj4+Pj4+Pj4NCj4+Pj4+Pj4gVGhpcyAocGMpIGNsZWFybHkgZG9l
+cyBub3Qgd29yayBvbiBvdGhlciBhcmNoaXRlY3R1cmVzLg0KPj4+Pj4+PiBJbiBhZGRpdGlvbiB0
+byB0aGF0LCBJIGFsc28gbmVlZCB0byBhZGQgLW5vLXNodXRkb3duIG9uIHMzOTAgKHNlZSAwNjgg
+Zm9yIGEgc2ltaWxhciBjYXNlKQ0KPj4+Pj4+DQo+Pj4+Pj4gTGVhdmluZyBvdXQgcGMgZGVmaW5p
+dGVseSBtYWtlcyBzZW5zZSwgYW5kIHRoZSBidWcgc3RpbGwgcmVwcm9kdWNlcyBmb3INCj4+Pj4+
+PiBtZSB3aXRob3V0IGl0Lg0KPj4+Pj4+DQo+Pj4+Pj4gSSBkb24ndCB1bmRlcnN0YW5kIHRoZSAt
+bm8tc2h1dGRvd24sIHRob3VnaC4gQWxyZWFkeSBmb3IgMDY4LCBuZWl0aGVyDQo+Pj4+Pj4gdGhl
+IGNvZGUgbm9yIHRoZSBjb21taXQgbWVzc2FnZSB3aGVuIGl0IHdhcyBhZGRlZCBleHBsYWluIHdo
+eSB0aGlzIGlzDQo+Pj4+Pj4gbmVlZGVkLg0KPj4+Pj4+DQo+Pj4+Pj4gQ2FuIHlvdSB0dXJuIHRo
+aXMgaW50byBhIHByb3BlciBwYXRjaCBhbmQgYWRkIGEgY29tbWVudCB3aHkgLW5vLXNodXRkb3du
+DQo+Pj4+Pj4gaXMgbmVlZGVkPw0KPj4+Pj4NCj4+Pj4+IEkgYWxyZWFkeSBzZW50IHRoaXMgcGF0
+Y2guIFRoZSByZWFzb24gaXMgdGhhdCB0aGVyZSBpcyBubyBCSU9TIGluIGEgY2xhc3NpY2FsIHNl
+bnNlDQo+Pj4+PiBvbiBzMzkweC4gSWYgbm8gYm9vdGFibGUgaW1hZ2UgKGV4dGVybmFsIGtlcm5l
+bCBvciBmcm9tIGRpc2spIGlzIGZvdW5kLCB0aGUgc21hbGwgYm9vdA0KPj4+Pj4gYmlvcyBsb2Fk
+cyBhIGRpc2FibGVkIHdhaXQgUFNXLiBUaGUgZGVmYXVsdCBhY3Rpb24gZm9yIHRoYXQgaXMgdGhl
+biBzaHV0ZG93bi4NCj4+Pj4+DQo+Pj4+DQo+Pj4+IElzIGl0IGFuIG9wdGlvbiBmb3IgeW91IGp1
+c3QgZHJvcCB0aGUgd2hvbGUgbGluZSAidm0uYWRkX2FyZ3MoJy1tYWNoaW5lJywgJ3BjLGFjY2Vs
+PWt2bScpIj8NCj4+Pj4gVGhlIHByb2JsZW0gd2l0aG91dCBpdCBmb3IgbWUgd2FzIHRoYXQgZ2Ri
+IGZhaWxlZCB0byBwcm9kdWNlIGZ1bGwgYW5kIG5pY2UgYmFja3RyYWNlLCBidXQNCj4+Pj4gdGVz
+dCB3b3JrZWQgYW55d2F5DQo+Pj4NCj4+PiBJbiB0aGUgY29tbWlkIG1lc3NhZ2UgVmxhZGltaXIg
+c2FpZCB0aGF0IGt2bSBpcyBuZWNlc3NhcnkgdG8gdHJpZ2dlciB0aGUgcHJvYmxlbS4NCj4+Pg0K
+Pj4NCj4+IE5vLCBJIGRpZG4ndCkNCj4+DQo+PiBhbmQgaXQncyBpbiB0aGUgY29tbWVudDoNCj4+
+ICMgMy4gZHJvcCBrdm0gYW5kIHVzZSBpb3Rlc3RzLlZNKCkgKG1heWJlLCBiZWNhdXNlIG9mIHF0
+ZXN0KSAoaG93ZXZlciwgaXQgc3RpbGwNCj4+ICMgICAgcmVwcm9kdWNlcywgaWYganVzdCBkcm9w
+IGt2bSwgYnV0IGdkYiBmYWlsZWQgdG8gcHJvZHVjZSBmdWxsIGJhY2t0cmFjZXMNCj4+ICMgICAg
+Zm9yIG1lKQ0KPiANCj4gT2ssIHNvIEkgd291bGQgYmUgZmluZSB3aXRoIGNvbXBsZXRlbHkgZHJv
+cHBpbmcgdGhhdCBsaW5lLg0KPiANCj4gdGhlIHBhdGNoIHdvdWxkIHRoZW4gYmUNCj4gDQo+IA0K
+PiANCj4gIi1tYWNoaW5lIHBjIiB3aWxsIG5vdCB3b3JrIGFsbCBhcmNoaXRlY3R1cmVzLiBMZXRz
+IGZhbGwgYmFjayB0byB0aGUNCj4gZGVmYXVsdCBtYWNoaW5lIGJ5IG5vdCBzcGVjaWZ5aW5nIGFu
+eXRoaW5nIGZvciB0aGUgbWFjaGluZS4NCj4gDQo+IEluIGFkZGl0aW9uIHdlIGFsc28gbmVlZCB0
+byBzcGVjaWZ5IC1uby1zaHV0ZG93biBvbiBzMzkwIGFzIHFlbXUgd2lsbA0KPiBleGl0IG9uIGd1
+ZXN0IHNodXRkb3duLiBUaGlzIGhhcHBlbnMgd2hlbiB0aGVyZSBpcyBubyBrZXJuZWwgb3IgYm9v
+dGFibGUNCj4gZGlzayBvbiBzMzkwLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogQ2hyaXN0aWFuIEJv
+cm50cmFlZ2VyIDxib3JudHJhZWdlckBkZS5pYm0uY29tPg0KPiAtLS0NCj4gICB0ZXN0cy9xZW11
+LWlvdGVzdHMvMjM1IHwgMyArKy0NCj4gICAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCsp
+LCAxIGRlbGV0aW9uKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzIz
+NSBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8yMzUNCj4gaW5kZXggZGEwNDRlZDM0ZS4uMzI5ZGE4ZjBj
+MiAxMDA3NTUNCj4gLS0tIGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzIzNQ0KPiArKysgYi90ZXN0cy9x
+ZW11LWlvdGVzdHMvMjM1DQo+IEBAIC00OSw3ICs0OSw4IEBAIHFlbXVfaW1nX2NyZWF0ZSgnLWYn
+LCBpb3Rlc3RzLmltZ2ZtdCwgJy1vJywgJ3ByZWFsbG9jYXRpb249bWV0YWRhdGEnLCBkaXNrLA0K
+PiAgICAgICAgICAgICAgICAgICBzdHIoc2l6ZSkpDQo+ICAgDQo+ICAgdm0gPSBRRU1VTWFjaGlu
+ZShpb3Rlc3RzLnFlbXVfcHJvZykNCj4gLXZtLmFkZF9hcmdzKCctbWFjaGluZScsICdwYyxhY2Nl
+bD1rdm0nKQ0KPiAraWYgaW90ZXN0cy5xZW11X2RlZmF1bHRfbWFjaGluZSA9PSAnczM5MC1jY3ct
+dmlydGlvJzoNCj4gKyAgICAgICAgdm0uYWRkX2FyZ3MoJy1uby1zaHV0ZG93bicpDQo+ICAgdm0u
+YWRkX2FyZ3MoJy1kcml2ZScsICdpZD1zcmMsZmlsZT0nICsgZGlzaykNCj4gICB2bS5sYXVuY2go
+KQ0KPiAgIA0KPiANCj4gDQo+IFNoYWxsIEkgcmVzZW5kIGEgdjI/DQo+IA0KDQpzbywgd2UgbmVl
+ZCAtbm8tc2h1dGRvd24gZXZlbiBpZiB3ZSBkcm9wIGt2bT8gSSBob3BlZCB0aGF0IG5vdC4uIEht
+bS4gZ3JlcCBwb2ludHMgb25seSB0byBvbmUgaW90ZXN0IGRvaW5nIHRoZSBzYW1lIGFib3V0IG5v
+LXNodXRkb3duIC0gMDY4Li4NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
