@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gUU9Q-0000Xr-CC
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 05:11:34 -0500
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gUUPq-0004FT-7V
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 05:28:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gUU9N-0005WL-4E
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 05:11:28 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46179)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gUU9M-0005Qy-Sr
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 05:11:25 -0500
-Received: by mail-wr1-x443.google.com with SMTP id l9so19006445wrt.13
-	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 02:11:23 -0800 (PST)
-References: <20181124235553.17371-1-cota@braap.org>
-	<20181124235553.17371-11-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181124235553.17371-11-cota@braap.org>
-Date: Wed, 05 Dec 2018 10:11:21 +0000
-Message-ID: <877ego2shi.fsf@linaro.org>
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gUUPl-0006Qg-No
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 05:28:26 -0500
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:59942
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gUUPl-0006MG-4j
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 05:28:21 -0500
+References: <1543848532-12604-1-git-send-email-lizhijian@cn.fujitsu.com>
+	<1543848532-12604-4-git-send-email-lizhijian@cn.fujitsu.com>
+	<20181203200403-mutt-send-email-mst@kernel.org>
+	<351854fc-c419-f006-8744-7f45d2701f16@cn.fujitsu.com>
+From: Li Zhijian <lizhijian@cn.fujitsu.com>
+Message-ID: <f9656fba-181c-6267-648c-95dd2380043e@cn.fujitsu.com>
+Date: Wed, 5 Dec 2018 18:28:11 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 10/13] hardfloat: implement float32/64
- division
+In-Reply-To: <351854fc-c419-f006-8744-7f45d2701f16@cn.fujitsu.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v3 3/4] i386: import bootparam.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,144 +30,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, philip.li@intel.com, zhijianx.li@intel.com
+
+Hi Michael
+
+I cooked a draft with cp_portable to import bootparam.h, could you have a look.
+
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+index 0a964fe..1beeceb 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -44,6 +44,12 @@ cp_portable() {
+                                       -e 'linux/kernel' \
+                                       -e 'linux/sysinfo' \
+                                       -e 'asm-generic/kvm_para' \
++                                     -e 'linux/screen_info.h' \
++                                     -e 'linux/apm_bios.h' \
++                                     -e 'linux/edd.h' \
++                                     -e 'video/edid.h' \
++                                     -e 'asm/ist.h' \
++                                     -e 'linux/ioctl.h' \
+                                       > /dev/null
+      then
+          echo "Unexpected #include in input file $f".
+@@ -59,6 +65,8 @@ cp_portable() {
+          -e 's/__be\([0-9][0-9]*\)/uint\1_t/g' \
+          -e 's/"\(input-event-codes\.h\)"/"standard-headers\/linux\/\1"/' \
+          -e 's/<linux\/\([^>]*\)>/"standard-headers\/linux\/\1"/' \
++        -e "s/<asm\/\([^>]*\)>/\"standard-headers\/asm-$arch\/\1\"/" \
++        -e 's/<video\/\([^>]*\)>/"standard-headers\/video\/\1"/' \
+          -e 's/__bitwise//' \
+          -e 's/__attribute__((packed))/QEMU_PACKED/' \
+          -e 's/__inline__/inline/' \
+@@ -74,6 +82,23 @@ cp_portable() {
+          "$f" > "$to/$header";
+  }
+  
++rm -rf "$output/include/standard-headers/linux"
++mkdir -p "$output/include/standard-headers/linux"
++
++cp_bootparam()
++{
++    mkdir -p $output/include/standard-headers/video
++    cp "$tmpdir"/include/linux/ioctl.h "$output/include/standard-headers/linux"
++    cp_portable "$tmpdir"/include/linux/screen_info.h "$output/include/standard-headers/linux"
++    cp_portable "$tmpdir/include/linux/apm_bios.h" "$output/include/standard-headers/linux"
++    cp_portable "$tmpdir/include/linux/edd.h" "$output/include/standard-headers/linux"
++    cp_portable "$tmpdir/include/asm/ist.h" $output/include/standard-headers/asm-$arch
++    cp_portable "$tmpdir/include/video/edid.h" $output/include/standard-headers/video
++
++    # bootparam.h includes above headers
++    cp_portable "$tmpdir/include/asm/bootparam.h" "$output/include/standard-headers/asm-$arch"
++}
++
+  # This will pick up non-directories too (eg "Kconfig") but we will
+  # ignore them in the next loop.
+  ARCHLIST=$(cd "$linux/arch" && echo *)
+@@ -120,6 +145,7 @@ for arch in $ARCHLIST; do
+          cp "$tmpdir/include/asm/unistd_x32.h" "$output/linux-headers/asm-x86/"
+          cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-x86/"
+          cp_portable "$tmpdir/include/asm/kvm_para.h" "$output/include/standard-headers/asm-$arch"
++        cp_bootparam
+      fi
+  done
+  
+@@ -163,8 +189,6 @@ cat <<EOF >$output/linux-headers/linux/virtio_ring.h
+  #include "standard-headers/linux/virtio_ring.h"
+  EOF
+  
+-rm -rf "$output/include/standard-headers/linux"
+-mkdir -p "$output/include/standard-headers/linux"
+  for i in "$tmpdir"/include/linux/*virtio*.h \
+           "$tmpdir/include/linux/qemu_fw_cfg.h" \
+           "$tmpdir/include/linux/input.h" \
+
+Thanks
+Zhijian
 
 
-Emilio G. Cota <cota@braap.org> writes:
-
-> Performance results for fp-bench:
+On 12/04/2018 04:09 PM, Li Zhijian wrote:
 >
-> 1. Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
-> - before:
-> div-single: 34.84 MFlops
-> div-double: 34.04 MFlops
-> - after:
-> div-single: 275.23 MFlops
-> div-double: 216.38 MFlops
 >
-> 2. ARM Aarch64 A57 @ 2.4GHz
-> - before:
-> div-single: 9.33 MFlops
-> div-double: 9.30 MFlops
-> - after:
-> div-single: 51.55 MFlops
-> div-double: 15.09 MFlops
 >
-> 3. IBM POWER8E @ 2.1 GHz
-> - before:
-> div-single: 25.65 MFlops
-> div-double: 24.91 MFlops
-> - after:
-> div-single: 96.83 MFlops
-> div-double: 31.01 MFlops
+> On 12/04/2018 09:06 AM, Michael S. Tsirkin wrote:
+>> On Mon, Dec 03, 2018 at 10:48:51PM +0800, Li Zhijian wrote:
+>>> It provides setup_data struct and header fields
+>>>
+>>> CC: Michael S. Tsirkin<mst@redhat.com>
+>>> Signed-off-by: Li Zhijian<lizhijian@cn.fujitsu.com>
+>> Sorry I was unclear when I said "import it from Linux".
+> Sorry, it's my fault.
 >
-> Here setting 2FP64_USE_FP to 1 pays off for x86_64:
-> [1] 215.97 vs [0] 62.15 MFlops
+>> The way to import it is to copy the header
+>> from the linux kernel by adding it to ./scripts/update-linux-headers.sh
+>> and placing a copy into include/standard-headers/
+>>
+>> Hope that helps.
+> that's really helpful.
 >
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  fpu/softfloat.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 62 insertions(+), 2 deletions(-)
+> i wonder which type copy should i use 'cp' or 'cp_portable'
+> this header includes several sub-headers
 >
-> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-> index 58e67d9b80..e35ebfaae7 100644
-> --- a/fpu/softfloat.c
-> +++ b/fpu/softfloat.c
-> @@ -1624,7 +1624,8 @@ float16 float16_div(float16 a, float16 b, float_sta=
-tus *status)
->      return float16_round_pack_canonical(pr, status);
->  }
+> $ grep include  /tmp/tmp.MBF10Z9MeS/include/asm/bootparam.h
+> #include <linux/types.h>
+> #include <linux/screen_info.h>
+> #include <linux/apm_bios.h>
+> #include <linux/edd.h>
+> #include <asm/ist.h>
+> #include <video/edid.h>
 >
-> -float32 float32_div(float32 a, float32 b, float_status *status)
-> +static float32 QEMU_SOFTFLOAT_ATTR
-> +soft_f32_div(float32 a, float32 b, float_status *status)
->  {
->      FloatParts pa =3D float32_unpack_canonical(a, status);
->      FloatParts pb =3D float32_unpack_canonical(b, status);
-> @@ -1633,7 +1634,8 @@ float32 float32_div(float32 a, float32 b, float_sta=
-tus *status)
->      return float32_round_pack_canonical(pr, status);
->  }
+> Thanks
+> Zhijian
 >
-> -float64 float64_div(float64 a, float64 b, float_status *status)
-> +static float64 QEMU_SOFTFLOAT_ATTR
-> +soft_f64_div(float64 a, float64 b, float_status *status)
->  {
->      FloatParts pa =3D float64_unpack_canonical(a, status);
->      FloatParts pb =3D float64_unpack_canonical(b, status);
-> @@ -1642,6 +1644,64 @@ float64 float64_div(float64 a, float64 b, float_st=
-atus *status)
->      return float64_round_pack_canonical(pr, status);
->  }
+>>
+>      
+>    
 >
-> +static float hard_f32_div(float a, float b)
-> +{
-> +    return a / b;
-> +}
-> +
-> +static double hard_f64_div(double a, double b)
-> +{
-> +    return a / b;
-> +}
-> +
-> +static bool f32_div_pre(union_float32 a, union_float32 b)
-> +{
-> +    if (QEMU_HARDFLOAT_2F32_USE_FP) {
-> +        return (fpclassify(a.h) =3D=3D FP_NORMAL || fpclassify(a.h) =3D=
-=3D FP_ZERO) &&
-> +               fpclassify(b.h) =3D=3D FP_NORMAL;
-> +    }
-> +    return float32_is_zero_or_normal(a.s) && float32_is_normal(b.s);
-> +}
-> +
-> +static bool f64_div_pre(union_float64 a, union_float64 b)
-> +{
-> +    if (QEMU_HARDFLOAT_2F64_USE_FP) {
-> +        return (fpclassify(a.h) =3D=3D FP_NORMAL || fpclassify(a.h) =3D=
-=3D FP_ZERO) &&
-> +               fpclassify(b.h) =3D=3D FP_NORMAL;
-> +    }
-> +    return float64_is_zero_or_normal(a.s) && float64_is_normal(b.s);
-> +}
-> +
-> +static bool f32_div_post(union_float32 a, union_float32 b)
-> +{
-> +    if (QEMU_HARDFLOAT_2F32_USE_FP) {
-> +        return fpclassify(a.h) !=3D FP_ZERO;
-> +    }
-> +    return !float32_is_zero(a.s);
-> +}
-> +
-> +static bool f64_div_post(union_float64 a, union_float64 b)
-> +{
-> +    if (QEMU_HARDFLOAT_2F64_USE_FP) {
-> +        return fpclassify(a.h) !=3D FP_ZERO;
-> +    }
-> +    return !float64_is_zero(a.s);
-> +}
-> +
-> +float32 QEMU_FLATTEN
-> +float32_div(float32 a, float32 b, float_status *s)
-> +{
-> +    return float32_gen2(a, b, s, hard_f32_div, soft_f32_div,
-> +                        f32_div_pre, f32_div_post, NULL, NULL);
-> +}
-> +
-> +float64 QEMU_FLATTEN
-> +float64_div(float64 a, float64 b, float_status *s)
-> +{
-> +    return float64_gen2(a, b, s, hard_f64_div, soft_f64_div,
-> +                        f64_div_pre, f64_div_post, NULL, NULL);
-> +}
-> +
->  /*
->   * Float to Float conversions
->   *
-
-
---
-Alex Benn=C3=A9e
+>
+>
+>
