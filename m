@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gUZUi-0006jV-F5
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:53:49 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUZaS-0003Y6-RO
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:59:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gUZUe-0001QT-BX
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:53:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55408)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gUZUe-0001Pg-5P
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:53:44 -0500
-Date: Wed, 5 Dec 2018 08:53:38 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20181205085338.358dc9bd@x1.home>
-In-Reply-To: <87y394wd9p.fsf@dusky.pond.sub.org>
-References: <154393964026.28192.13536237934563059985.stgit@gimli.home>
-	<154394077749.28192.1229512133780284321.stgit@gimli.home>
-	<87y394wd9p.fsf@dusky.pond.sub.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUZaR-000715-I2
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:59:44 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 5 Dec 2018 15:59:33 +0000
+Message-ID: <130d5198-ae09-03d6-65fc-b829b990bb29@virtuozzo.com>
+References: <20181130220344.3350618-1-eblake@redhat.com>
+	<20181130220344.3350618-6-eblake@redhat.com>
+In-Reply-To: <20181130220344.3350618-6-eblake@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <707F10368A42A945A29C31A98A056B1C@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [for-4.0 PATCH v3 3/9] qapi: Define PCIe link
- speed and width properties
+Subject: Re: [Qemu-devel] [PATCH 05/14] nbd/client: Drop pointless buf
+ variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +26,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Geoffrey McRae <geoff@hostfission.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-On Wed, 05 Dec 2018 10:09:38 +0100
-Markus Armbruster <armbru@redhat.com> wrote:
-
-> Alex Williamson <alex.williamson@redhat.com> writes:
->=20
-> > Create properties to be able to define speeds and widths for PCIe
-> > links.  The only tricky bit here is that our get and set callbacks
-> > translate from the fixed QAPI automagic enums to those we define
-> > in PCI code to represent the actual register segment value. =20
->=20
-> QAPI can only generate enumerations with values 0, 1, 2, ...  You want
-> different enumeration values, namely the actual register values.  You
-> still want QAPI to get its standard mapping to and from strings.
->=20
-> This patch's solution is to define a non-QAPI enumeration type with the
-> values you want [PATCH 1/9], then map between the enumerations in the
-> PropertyInfo methods.  Works.
->=20
-> You could instead use the encoding chosen by QAPI for the properties,
-> and map it to the register values on use.  Differently ugly.  Might be
-> simpler.  Your choice to make.
-
-As we discussed offline, I personally don't like using the magic macros
-that QAPI generates outside of QAPI code; I can't git grep for them and
-I need to remember to build the tree before using cscope in order to
-find them.  Therefore I prefer to keep the translation to standard
-macros within the QAPI code to make things more obvious, thus the
-approach chosen.  I appreciate the feedback and alternative ideas.
-
-> We could extend QAPI to permit specification of the enumeration values.
-> Marc-Andr=C3=A9's work to permit conditionals makes the syntax flexible
-> enough to support that.  Of course, adding QAPI features is worthwhile
-> only if we get sufficient mileage out of them to result in an overall
-> improvement.  Even if we decided to do it right now, I'd recommend not
-> to wait for it, but instead plan to simplify after the feature lands.
-
-Good to know.
-
-> > Cc: Eric Blake <eblake@redhat.com>
-> > Cc: Markus Armbruster <armbru@redhat.com>
-> > Tested-by: Geoffrey McRae <geoff@hostfission.com>
-> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com> =20
->=20
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-
-Thanks!
-
-Alex
+MDEuMTIuMjAxOCAxOjAzLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBUaGVyZSdzIG5vIG5lZWQgdG8g
+cmVhZCBpbnRvIGEgdGVtcG9yYXJ5IGJ1ZmZlciAob3ZlcnNpemVkDQo+IHNpbmNlIGNvbW1pdCA3
+ZDMxMjNlMSkgZm9sbG93ZWQgYnkgYSBieXRlc3dhcCBpbnRvIGEgdWludDY0X3QNCj4gdG8gY2hl
+Y2sgZm9yIGEgbWFnaWMgbnVtYmVyIHZpYSBtZW1jbXAoKSwgd2hlbiB0aGUgY29kZQ0KPiBpbW1l
+ZGlhdGVseSBiZWxvdyBkZW1vbnN0cmF0ZXMgcmVhZGluZyBpbnRvIHRoZSB1aW50NjRfdCB0aGVu
+DQo+IGJ5dGVzd2FwcGluZyBpbiBwbGFjZSBhbmQgY2hlY2tpbmcgZm9yIGEgbWFnaWMgbnVtYmVy
+IHZpYQ0KPiBpbnRlZ2VyIG1hdGguICBXaGF0J3MgbW9yZSwgaGF2aW5nIGEgZGlmZmVyZW50IGVy
+cm9yIG1lc3NhZ2UNCj4gd2hlbiB0aGUgc2VydmVyJ3MgZmlyc3QgcmVwbHkgYnl0ZSBpcyAwIGlz
+IHVudXN1YWwgLSBpdCdzIG5vDQo+IGRpZmZlcmVudCBmcm9tIGFueSBvdGhlciB3cm9uZyBtYWdp
+YyBudW1iZXIsIGFuZCB3ZSBhbHJlYWR5DQo+IGRldGVjdGVkIHNob3J0IHJlYWRzLg0KPiANCj4g
+U2lnbmVkLW9mZi1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+IC0tLQ0KPiAg
+IG5iZC9uYmQtaW50ZXJuYWwuaCB8ICAxICsNCj4gICBuYmQvY2xpZW50LmMgICAgICAgfCAxNCAr
+KystLS0tLS0tLS0tLQ0KPiAgIDIgZmlsZXMgY2hhbmdlZCwgNCBpbnNlcnRpb25zKCspLCAxMSBk
+ZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9uYmQvbmJkLWludGVybmFsLmggYi9uYmQv
+bmJkLWludGVybmFsLmgNCj4gaW5kZXggZWVmZjc4ZDNjOTguLjMwNmE1MzNkY2QxIDEwMDY0NA0K
+PiAtLS0gYS9uYmQvbmJkLWludGVybmFsLmgNCj4gKysrIGIvbmJkL25iZC1pbnRlcm5hbC5oDQo+
+IEBAIC00Niw2ICs0Niw3IEBADQo+ICAgLyogU2l6ZSBvZiBvbGRzdHlsZSBuZWdvdGlhdGlvbiAq
+Lw0KPiAgICNkZWZpbmUgTkJEX09MRFNUWUxFX05FR09USUFURV9TSVpFICg4ICsgOCArIDggKyA0
+ICsgMTI0KQ0KPiANCj4gKyNkZWZpbmUgTkJEX0lOSVRfTUFHSUMgICAgICAgICAgICAgIDB4NGU0
+MjQ0NGQ0MTQ3NDk0M0xMDQoNCldvcnRoIGFkZCBjb21tZW50IC8qICJOQkRNQUdJQyIgKi8NCg0K
+PiAgICNkZWZpbmUgTkJEX1JFUVVFU1RfTUFHSUMgICAgICAgICAgIDB4MjU2MDk1MTMNCj4gICAj
+ZGVmaW5lIE5CRF9PUFRTX01BR0lDICAgICAgICAgICAgICAweDQ5NDg0MTU2NDU0RjUwNTRMTA0K
+PiAgICNkZWZpbmUgTkJEX0NMSUVOVF9NQUdJQyAgICAgICAgICAgIDB4MDAwMDQyMDI4MTg2MTI1
+M0xMDQo+IGRpZmYgLS1naXQgYS9uYmQvY2xpZW50LmMgYi9uYmQvY2xpZW50LmMNCj4gaW5kZXgg
+MGJlODlmOWU2NDEuLjE3ZWUyNDQ5MmE0IDEwMDY0NA0KPiAtLS0gYS9uYmQvY2xpZW50LmMNCj4g
+KysrIGIvbmJkL2NsaWVudC5jDQo+IEBAIC03MzEsNyArNzMxLDYgQEAgaW50IG5iZF9yZWNlaXZl
+X25lZ290aWF0ZShRSU9DaGFubmVsICppb2MsIGNvbnN0IGNoYXIgKm5hbWUsDQo+ICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBRSU9DaGFubmVsICoqb3V0aW9jLCBOQkRFeHBvcnRJbmZvICpp
+bmZvLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRXJyb3IgKiplcnJwKQ0KPiAgIHsN
+Cj4gLSAgICBjaGFyIGJ1ZlsyNTZdOw0KPiAgICAgICB1aW50NjRfdCBtYWdpYzsNCj4gICAgICAg
+aW50IHJjOw0KPiAgICAgICBib29sIHplcm9lcyA9IHRydWU7DQo+IEBAIC03NTIsMjEgKzc1MSwx
+NCBAQCBpbnQgbmJkX3JlY2VpdmVfbmVnb3RpYXRlKFFJT0NoYW5uZWwgKmlvYywgY29uc3QgY2hh
+ciAqbmFtZSwNCj4gICAgICAgICAgIGdvdG8gZmFpbDsNCj4gICAgICAgfQ0KPiANCj4gLSAgICBp
+ZiAobmJkX3JlYWQoaW9jLCBidWYsIDgsIGVycnApIDwgMCkgew0KPiArICAgIGlmIChuYmRfcmVh
+ZChpb2MsICZtYWdpYywgc2l6ZW9mKG1hZ2ljKSwgZXJycCkgPCAwKSB7DQo+ICAgICAgICAgICBl
+cnJvcl9wcmVwZW5kKGVycnAsICJGYWlsZWQgdG8gcmVhZCBkYXRhOiAiKTsNCg0KbWF5IGJlLCBj
+aGFuZ2UgdG8gIkZhaWxlZCB0byByZWFkIG1hZ2ljOiAiLCBhcyBpbiBjb2RlIGJlbG93DQoNCj4g
+ICAgICAgICAgIGdvdG8gZmFpbDsNCj4gICAgICAgfQ0KPiAtDQo+IC0gICAgYnVmWzhdID0gJ1ww
+JzsNCj4gLSAgICBpZiAoc3RybGVuKGJ1ZikgPT0gMCkgew0KPiAtICAgICAgICBlcnJvcl9zZXRn
+KGVycnAsICJTZXJ2ZXIgY29ubmVjdGlvbiBjbG9zZWQgdW5leHBlY3RlZGx5Iik7DQo+IC0gICAg
+ICAgIGdvdG8gZmFpbDsNCj4gLSAgICB9DQo+IC0NCj4gLSAgICBtYWdpYyA9IGxkcV9iZV9wKGJ1
+Zik7DQo+ICsgICAgbWFnaWMgPSBiZTY0X3RvX2NwdShtYWdpYyk7DQoNCklzbid0IGl0IGJldHRl
+ciB0byB1c2UgYmU2NF90b19jcHVzPw0KDQo+ICAgICAgIHRyYWNlX25iZF9yZWNlaXZlX25lZ290
+aWF0ZV9tYWdpYyhtYWdpYyk7DQo+IA0KPiAtICAgIGlmIChtZW1jbXAoYnVmLCAiTkJETUFHSUMi
+LCA4KSAhPSAwKSB7DQo+ICsgICAgaWYgKG1hZ2ljICE9IE5CRF9JTklUX01BR0lDKSB7DQo+ICAg
+ICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJJbnZhbGlkIG1hZ2ljIHJlY2VpdmVkIik7DQo+ICAg
+ICAgICAgICBnb3RvIGZhaWw7DQo+ICAgICAgIH0NCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMs
+DQpWbGFkaW1pcg0K
