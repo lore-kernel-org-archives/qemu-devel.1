@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gUWGN-0004VQ-6i
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:26:48 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gUWGJ-00042Z-H6
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:26:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gUWGJ-0005Xs-QF
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:26:47 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34093)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gUWGJ-0005Wt-Gh
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:26:43 -0500
-Received: by mail-wr1-x441.google.com with SMTP id j2so19506424wrw.1
-	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 04:26:43 -0800 (PST)
-References: <20181124235553.17371-1-cota@braap.org>
-	<20181124235553.17371-13-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181124235553.17371-13-cota@braap.org>
-Date: Wed, 05 Dec 2018 12:26:40 +0000
-Message-ID: <874lbs2m7z.fsf@linaro.org>
+	(envelope-from <pbonzini@redhat.com>) id 1gUWAn-0002ZT-J6
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:21:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38228)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gUWAn-0002Yw-AX
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:21:01 -0500
+References: <HE1P190MB00739AD5A654DAA3FE9B4662DEAF0@HE1P190MB0073.EURP190.PROD.OUTLOOK.COM>
+	<a3fe5633-d031-6a58-40c2-aee43b2bec45@tuxfamily.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ced8df86-4fe3-f11e-005c-e9b8127434d6@redhat.com>
+Date: Wed, 5 Dec 2018 13:20:51 +0100
 MIME-Version: 1.0
+In-Reply-To: <a3fe5633-d031-6a58-40c2-aee43b2bec45@tuxfamily.org>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 12/13] hardfloat: implement float32/64
- square root
+Subject: Re: [Qemu-devel] i386: don't require elf64 for multiboot kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,121 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+To: Thomas Huth <huth@tuxfamily.org>, Gonzo FWS <fwsgonzo@hotmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
+On 05/12/18 06:35, Thomas Huth wrote:
+> On 2018-12-04 17:55, Gonzo FWS wrote:
+>> Right now IncludeOS on x86_64 must use a chainloader for multiboot
+>> support. The chainloader is an ELF32 kernel that loads the real
+>> ELF64 kernel and jumps to it. As long as the ELF has the .multiboot
+>> section and conforms to the spec, meaning _start is be a 32-bit
+>> entry, it should be fine.
+>>=20
+>> By removing the extra check in multiboot.c, we can also boot ELF64
+>> files. As can be seen here:=20
+>> https://cloud.fwsnet.net/index.php/s/XrkBkC8zy7MLa9p
+>>=20
+>> Signed-off-by: Alf-Andr=C3=A9 Walla <fwsgonzo@hotmail.com>
 
-Emilio G. Cota <cota@braap.org> writes:
+I think a 64-bit multiboot specification doesn't exist, but if it
+existed, it would require an EM_X86_64 ELF file to be booted already in
+long mode.  I don't think it's a good idea to allow booting into an
+EM_X86_64 ELF file with the processor in 32-bit mode.
 
-> Performance results for fp-bench:
->
-> Host: Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
-> - before:
-> sqrt-single: 42.30 MFlops
-> sqrt-double: 22.97 MFlops
-> - after:
-> sqrt-single: 311.42 MFlops
-> sqrt-double: 311.08 MFlops
->
-> Here USE_FP makes a huge difference for f64's, with throughput
-> going from ~200 MFlops to ~300 MFlops.
->
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-
-> ---
->  fpu/softfloat.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 58 insertions(+), 2 deletions(-)
->
-> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-> index e03feafb6f..4c6ecd1883 100644
-> --- a/fpu/softfloat.c
-> +++ b/fpu/softfloat.c
-> @@ -3040,20 +3040,76 @@ float16 QEMU_FLATTEN float16_sqrt(float16 a, floa=
-t_status *status)
->      return float16_round_pack_canonical(pr, status);
->  }
->
-> -float32 QEMU_FLATTEN float32_sqrt(float32 a, float_status *status)
-> +static float32 QEMU_SOFTFLOAT_ATTR
-> +soft_f32_sqrt(float32 a, float_status *status)
->  {
->      FloatParts pa =3D float32_unpack_canonical(a, status);
->      FloatParts pr =3D sqrt_float(pa, status, &float32_params);
->      return float32_round_pack_canonical(pr, status);
->  }
->
-> -float64 QEMU_FLATTEN float64_sqrt(float64 a, float_status *status)
-> +static float64 QEMU_SOFTFLOAT_ATTR
-> +soft_f64_sqrt(float64 a, float_status *status)
->  {
->      FloatParts pa =3D float64_unpack_canonical(a, status);
->      FloatParts pr =3D sqrt_float(pa, status, &float64_params);
->      return float64_round_pack_canonical(pr, status);
->  }
->
-> +float32 QEMU_FLATTEN float32_sqrt(float32 xa, float_status *s)
-> +{
-> +    union_float32 ua, ur;
-> +
-> +    ua.s =3D xa;
-> +    if (unlikely(!can_use_fpu(s))) {
-> +        goto soft;
-> +    }
-> +
-> +    float32_input_flush1(&ua.s, s);
-> +    if (QEMU_HARDFLOAT_1F32_USE_FP) {
-> +        if (unlikely(!(fpclassify(ua.h) =3D=3D FP_NORMAL ||
-> +                       fpclassify(ua.h) =3D=3D FP_ZERO) ||
-> +                     signbit(ua.h))) {
-> +            goto soft;
-> +        }
-> +    } else if (unlikely(!float32_is_zero_or_normal(ua.s) ||
-> +                        float32_is_neg(ua.s))) {
-> +        goto soft;
-> +    }
-> +    ur.h =3D sqrtf(ua.h);
-> +    return ur.s;
-> +
-> + soft:
-> +    return soft_f32_sqrt(ua.s, s);
-> +}
-> +
-> +float64 QEMU_FLATTEN float64_sqrt(float64 xa, float_status *s)
-> +{
-> +    union_float64 ua, ur;
-> +
-> +    ua.s =3D xa;
-> +    if (unlikely(!can_use_fpu(s))) {
-> +        goto soft;
-> +    }
-> +
-> +    float64_input_flush1(&ua.s, s);
-> +    if (QEMU_HARDFLOAT_1F64_USE_FP) {
-> +        if (unlikely(!(fpclassify(ua.h) =3D=3D FP_NORMAL ||
-> +                       fpclassify(ua.h) =3D=3D FP_ZERO) ||
-> +                     signbit(ua.h))) {
-> +            goto soft;
-> +        }
-> +    } else if (unlikely(!float64_is_zero_or_normal(ua.s) ||
-> +                        float64_is_neg(ua.s))) {
-> +        goto soft;
-> +    }
-> +    ur.h =3D sqrt(ua.h);
-> +    return ur.s;
-> +
-> + soft:
-> +    return soft_f64_sqrt(ua.s, s);
-> +}
-> +
->  /*----------------------------------------------------------------------=
-------
->  | The pattern for a default generated NaN.
->  *-----------------------------------------------------------------------=
------*/
-
-
---
-Alex Benn=C3=A9e
+Paolo
