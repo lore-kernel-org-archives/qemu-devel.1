@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gUXmn-00065E-Ie
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 09:04:26 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gUXqk-0000tW-LX
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 09:08:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gUXmj-0000bE-CC
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 09:04:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36238)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gUXme-0000TZ-U2
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 09:04:15 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E6E80308A953
-	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 14:04:04 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
-	<20180706105753.26700-10-marcandre.lureau@redhat.com>
-Date: Wed, 05 Dec 2018 15:04:00 +0100
-In-Reply-To: <20180706105753.26700-10-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Fri, 6 Jul 2018
-	12:57:35 +0200")
-Message-ID: <87r2ewrrxr.fsf@dusky.pond.sub.org>
+	(envelope-from <luc.michel@greensocs.com>) id 1gUXqg-0004GE-Lt
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 09:08:26 -0500
+References: <65d3a572-9a80-f332-1f88-69e43e8a3663@redhat.com>
+	<20181126132731.GJ18284@habkost.net>
+	<CAFEAcA8D7ZjO059Sgrx-4i0iT+V3gxT4f=DvdmUAJS7KomtyOg@mail.gmail.com>
+	<b8e20686-e5d1-a844-48f7-a4ae471e3fd5@greensocs.com>
+	<CAFEAcA8j4xTiS3_ktiA0hm2N4cu5RvxAtYqUHgvY-bUXgcwbjQ@mail.gmail.com>
+	<50645862-a638-ad2a-bafe-1b46be42aec4@greensocs.com>
+	<20181204180607.GB18284@habkost.net>
+	<CAFEAcA9JXeRGfKzouYJQKxgXuw_Z-up0a1ijZX9hZvXbdkwiuA@mail.gmail.com>
+	<20181204190548.GH18284@habkost.net>
+	<CAFEAcA9M3akT7sF-kjCg41ucuUhv2PxKaCBmkN3eacvqvf_w9Q@mail.gmail.com>
+	<20181204194532.GJ18284@habkost.net>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <f0a7fe11-61ff-6a60-f320-438e4e38f2da@greensocs.com>
+Date: Wed, 5 Dec 2018 15:02:45 +0100
 MIME-Version: 1.0
+In-Reply-To: <20181204194532.GJ18284@habkost.net>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 09/27] tests: print enum type members
- more like object type members
+Subject: Re: [Qemu-devel] [PATCH v7 01/16] hw/cpu: introduce CPU clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,17 +33,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Alistair Francis <alistair@alistair23.me>, Mark Burton <mark.burton@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+On 12/4/18 8:45 PM, Eduardo Habkost wrote:
+> On Tue, Dec 04, 2018 at 07:16:39PM +0000, Peter Maydell wrote:
+>> On Tue, 4 Dec 2018 at 19:05, Eduardo Habkost <ehabkost@redhat.com> wro=
+te:
+>>> On Tue, Dec 04, 2018 at 06:24:19PM +0000, Peter Maydell wrote:
+>>>> A cluster is a group of CPUs which are all identical and have
+>>>> the same view of the rest of the system.
+>>
+>>> With that definition in mind, why can't QEMU cluster CPUs
+>>> automatically by looking at CPU models and address space objects?
+>>
+>> That sounds like it is in theory feasible and in practice
+>> quite tricky. You would have to look not just at the CPU
+>> model name but also introspect all its properties for
+>> ones which change features of the CPU and are set differently
+>> on different CPUs (and I don't think there's any way to
+>> automatically tell which properties are ones which make
+>> the CPU different for which-cluster purposes and which aren't).
+>> And if we automatically checked whether address space objects
+>> were the same it would rule out implementing devices with
+>> per-cpu banked memory mapped registers by mapping different
+>> things into the AS for each CPU (though that's a hypothetical
+>> at the moment -- I've thought about implementing stuff that
+>> way but we tend to implement that sort of thing by looking
+>> at current_cpu->cpu_index at the moment).
+>=20
+> I see.
+>=20
+> Can't we at least do something to make sure the cluster objects
+> make sense?  e.g. by ensuring at least QOM CPU type is the same,
+> and that cpu->address_space somehow points to
+> cpu->cluster->address_space?
+Where such a check should be placed? Cluster realize function is not
+good since children can still be added after device realization. A good
+place would be when object_property_add_child() is called, but I'm not
+aware of a way of hooking into that with the QOM API...
 
-> Commit 93bda4dd461 changed the internal representation of enum type
-> members from str to QAPISchemaMember, but we still print only a
-> string.  Has been good enough, as the name is the member's only
-> attribute of interest, but that's about to change.  To prepare, print
-> them more like object type members.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+--=20
+Luc
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>=20
+> CCing Paolo, so he can correct me if this doesn't make sense.
+>=20
