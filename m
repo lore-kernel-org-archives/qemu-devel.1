@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gUL36-0002Lj-SR
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 19:28:21 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gUM1K-00041x-70
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 20:30:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gUL32-00089d-2B
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 19:28:20 -0500
-Date: Wed, 5 Dec 2018 08:27:45 +0800 (CST)
-Message-ID: <201812050827458661131@zte.com.cn>
-In-Reply-To: <CAFEAcA8hw_PHrBTC+v9rr8VoeU5uiV3Z6nMRknDM7WWdG1Ti5g@mail.gmail.com>
-References: CAFEAcA-oFFz-NtfwHmORxQd4rHsfKa1=tV1kyvPuGQoOZwDB3A@mail.gmail.com,
-	CAFEAcA8hw_PHrBTC+v9rr8VoeU5uiV3Z6nMRknDM7WWdG1Ti5g@mail.gmail.com
-Mime-Version: 1.0
-From: <peng.hao2@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCH_V11_0/8=5D_add_pvpanic_mmio_supp?=
- =?utf-8?q?ort?=
+	(envelope-from <jasowang@redhat.com>) id 1gUM1F-0008G7-TN
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 20:30:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55136)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gUM1F-0008Dz-7G
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 20:30:29 -0500
+References: <CAHyh4xgZhGnEvkD5RiUazZ9Eq_jzr4=bXHfwBvCBkbOLN2UyKA@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <915953bd-cc9c-9456-b619-297138f68ae6@redhat.com>
+Date: Wed, 5 Dec 2018 09:30:19 +0800
+MIME-Version: 1.0
+In-Reply-To: <CAHyh4xgZhGnEvkD5RiUazZ9Eq_jzr4=bXHfwBvCBkbOLN2UyKA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Logging dirty pages from vhost-net in-kernel with
+ vIOMMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,60 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: drjones@redhat.com, philmd@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+To: Jintack Lim <jintack@cs.columbia.edu>, QEMU Devel Mailing List <qemu-devel@nongnu.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
 
-Pk9uIFR1ZSwgNCBEZWMgMjAxOCBhdCAwMDo0MSwgPHBlbmcuaGFvMkB6dGUuY29tLmNuPiB3cm90
-ZToKPj4KPj4gPkkgd291bGQgc3RpbGwgcHJlZmVyIHRvIHNlZSBhIG1vcmUgZGV0YWlsZWQgZXhh
-bWluYXRpb24gb2Ygd2hldGhlcgo+PiA+d2UgY2FuIGRvIHRoaXMgd2l0aCBhIFBDSSBkZXZpY2Ug
-YmVmb3JlIHdlIGNvbW1pdCB0byB0YWtpbmcgdGhlCj4+ID5NTUlPIHZlcnNpb24gaW50byB0aGUg
-dmlydCBib2FyZC4KPj4KPj4gSSdtIHNvcnJ5IEkgdGhvdWdodCBJIGhhZCBzZW50IGFuIGVtYWls
-LiB5ZXN0ZXJkYXkgd2hlbiBJIHdyb3RlIGFuIGVtYWlsIHRvCj4+IGV4cGxhaW4gdGhlIHJlYXNv
-biwgSSB3YXMgaW50ZXJydXB0ZWQgYW5kIGZvcmdvdCB0byBzZW5kIGl0IG91dC4KPj4KPj4gTm93
-IHRoZSBwdnBhbmljIGRldmljZSBpcyBpbXBsZW1lbnRlZCBhcyBhIG1taW8gZGV2aWNlIG9yIGFu
-IEFDUEkgZGV2aWNlIGluIHRoZSBrZXJuZWwsCj4+IGFuZCBvbmx5IG9uZSBkZXZpY2UgY2FuIGJl
-IHNlZW4gYXQgdGhlIHNhbWUgdGltZS4gSWYgdGhlIGtlcm5lbCBwYXJzZXMgRkRUIGZpcnN0LCB0
-aGVuIHB2cGFuaWMKPj4gaXMgYSBtbWlvIGRldmljZS4gVGhlIGtlcm5lbCBwYXJzZXMgQUNQSSB0
-YWJsZSBmaXJzdChhbmQgdmlydHVhbCBtYWNoaW5lIGlzIGNvbmZpZ3VyZWQgd2l0aCBBQ1BJKSwK
-Pj4gYW5kIHB2cGFuaWMgIGlzIGFuIEFDUEkgZGV2aWNlLgo+PiBJZiBwdnBhbmljIGlzIGltcGxl
-bWVudGVkIGFzIGEgUENJIGRldmljZSwgdGhlbiB0aGUgUENJIGRldmljZSBtdXN0IHN0aWxsIGJl
-IHNlZW4gd2hlbiB0aGUgQUNQSSB0YWJsZQo+PiBpcyBmaXJzdCBwYXJzZWQgYnkgdGhlIGtlcm5l
-bCwgYmVjYXVzZSBBQ1BJIGRldmljZSByZWxpZXMgb24gdGhlIG1taW8gc3BhY2Ugb2YgdGhlIFBD
-SSBkZXZpY2UuCj4+IE1taW8gZGV2aWNlcyBjYW4gYmUgdGhvdWdodCBvZiBhcyBqdXN0IGFuIGFk
-ZHJlc3Mgc3BhY2UgcmF0aGVyIHRoYW4gYSBkZXZpY2UgaW4gdGhlIHN0cmljdCBzZW5zZS4KPgo+
-SSdtIGFmcmFpZCBJIGRvbid0IHVuZGVyc3RhbmQuIElmIGl0J3MgYSBQQ0kgZGV2aWNlIHRoZW4K
-Pml0IGRvZXMgbm90IG5lZWQgdG8gYmUgbGlzdGVkIGluIHRoZSBkZXZpY2UgdHJlZSBvciB0aGUK
-PkFDUEkgdGFibGVzIGF0IGFsbCwgYmVjYXVzZSBpdCBpcyBwcm9iZWFibGUgYnkgdGhlIGd1ZXN0
-Lgo+VGhpcyBhbHNvIHNpZ25pZmljYW50bHkgc2ltcGxpZmllcyB0aGUgY2hhbmdlcyBuZWVkZWQg
-aW4gUUVNVS4KPgoKSXQgaXMgcHJlY2lzZWx5IGJlY2F1c2UgUENJIGRldmljZXMgY2FuIG5vdCBi
-ZSBjb250cm9sbGVkIGJ5IEZEVCBvciBBQ1BJIHRhYmxlcywgCkkgZG8gbm90IHdhbnQgdG8gaW1w
-bGVtZW50IGl0IGFzIGEgcGNpIGRldmljZS4KWDg2L3B2cGFuaWMgaXMgaW1wbGVtZW50ZWQgYXMg
-SVNBIGRldmljZSBpbiBRRU1VIGFuZCBBQ1BJIGRldmljZSBpbiBrZXJuZWwuIApNeSBpbXBsZW1l
-bnRhdGlvbiBleHRlbmRzIHRoZSBpbXBsZW1lbnRhdGlvbiBvZiB4ODYvcHZwYW5pYywgYW5kIGEg
-bGFyZ2Ugb2YgeDg2L3B2cGFuaWMgCmNvZGVzIGFyZSByZXVzZWQuSWYgUENJIGRldmljZXMgYXJl
-IGltcGxlbWVudGVkIGluIHFlbXUsIHRoZW4gQUNQSSBkZXZpY2VzIGFuZCBQQ0kgCmRldmljZXMg
-bWF5IGFwcGVhciBzaW11bHRhbmVvdXNseSBpbiB0aGUga2VybmVsLiBUaGlzIHdvdWxkIGFkZCBi
-b3RoIGRldmljZXMgdG8gdGhlIApjcmFzaCBub3RpZmllciBsaXN0LCB3aGljaCBpcyBvZGQuIEkg
-d2FudCB0byBzZWUgb25seSBvbmUgZGV2aWNlIGF0IGFueSB0aW1lLiBPZiBjb3Vyc2UsIG1hbnkK
-YXJjaGl0ZWN0dXJlcyBjYW4gdXNlIFBDSSBkZXZpY2VzLCBidXQgd2UgYXJlIGN1cnJlbnRseSBy
-ZXVzaW5nIHg4Ni9wdnBhbmljIGNvZGUgYXMgbXVjaCAKYXMgcG9zc2libGUgaW4gcWVtdSBhbmQg
-a2VybmVsICwgcmF0aGVyIHRoYW4gcmVpbXBsZW1lbnRpbmcgaXQuIEF0IHRoZSBzYW1lIHRpbWUs
-IApiYWNrd2FyZCBjb21wYXRpYmlsaXR5IGFsc28gbmVlZHMgdG8gYmUgY29uc2lkZXJlZC4KCiAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBwdnBhbmljIGluIGd1ZXN0IGtlcm5l
-bApBUk06ICAgQUNQSSB0YWJsZSAgICAgICAgIGFjcGkgZGV2aWNlCiAgICAgICAgICAgIEZEVCAg
-ICAgICAgICAgICAgICAgIG1taW8gZGV2aWNlICAoc3RhcnQgZ3Vlc3QgYnlwYXNzaW5nIHVlZmkp
-Cng4NiAgICAgIEFDUEkgdGFibGUgICAgICAgICBhY3BpIGRldmljZQoKPj4gU2Vjb25kbHksIEkg
-ZG9uJ3Qgd2FudCBpdCB0byBiZSBhIHBsdWdnYWJsZSBkZXZpY2UuIElmIHRoZSB1c2VyCj4+IGRl
-bGV0ZXMgdGhlIGRldmljZSBieSBtaXN0YWtlLCBpdCBtYXkgbGVhZCB0byB1bnByZWRpY3RhYmxl
-IHJlc3VsdHMuCj4KPklmIHRoZSB1c2VyIGRlbGV0ZXMgdGhlIFBDSSBkZXZpY2UgdGhleSdyZSB1
-c2luZyBmb3IgdGhlaXIKPmRpc2sgb3IgbmV0d29ya2luZyB0aGlzIHdpbGwgYWxzbyBsZWFkIHRv
-IHVucHJlZGljdGFibGUKPnJlc3VsdHMuIFdlIGV4cGVjdCB1c2VycyBub3QgdG8gcmFuZG9tbHkg
-dW5wbHVnIHRoaW5ncyBmcm9tCj50aGVpciBzeXN0ZW0gaWYgdGhleSB3YW50IGl0IHRvIGNvbnRp
-bnVlIHRvIHdvcmsuIEluIGFueQo+Y2FzZSB5b3VyIGd1ZXN0IGRyaXZlciBjYW4gZWFzaWx5IGhh
-bmRsZSB0aGUgdW5wbHVnOiB0aGUKPmd1ZXN0IHdvdWxkIHRoZW4ganVzdCBsb3NlIHRoZSBhYmls
-aXR5IHRvIG5vdGlmeSBvbiBwYW5pYywKPmZhbGxpbmcgYmFjayB0byBhcyBpZiB0aGUgcHZwYW5p
-YyBkZXZpY2UgaGFkIG5ldmVyIGJlZW4KPnByZXNlbnQuCgpJZiB0d28gZGV2aWNlcyBjYW4gZXhp
-c3Qgc2ltdWx0YW5lb3VzbHkgYnkgbW9kaWZ5aW5nIHRoZSBjb2RlLAogdGhlbiBiZWNhdXNlIEFD
-UEkgZGV2aWNlcyByZWx5IG9uIGEgUENJIGRldmljZSwgaWYgUENJIGRldmljZXMgYXJlIGR5bmFt
-aWNhbGx5CiB1bnBsdWdnZWQsIEFDUEkgZGV2aWNlIHdpbGwgbm90IHdvcmsgd2hlbiBwYW5pYyBp
-cyB0cmlnZ2VyZWQuCgp0aGFua3MuCj4KPnRoYW5rcwo+LS0gUE1N
+
+On 2018/12/5 =E4=B8=8A=E5=8D=882:37, Jintack Lim wrote:
+> Hi,
+>
+> I'm wondering how the current implementation works when logging dirty
+> pages during migration from vhost-net (in kernel) when used vIOMMU.
+>
+> I understand how vhost-net logs GPAs when not using vIOMMU. But when
+> we use vhost with vIOMMU, then shouldn't vhost-net need to log the
+> translated address (GPA) instead of the address written in the
+> descriptor (IOVA) ? The current implementation looks like vhost-net
+> just logs IOVA without translation in vhost_get_vq_desc() in
+> drivers/vhost/net.c. It seems like QEMU doesn't do any further
+> translation of the dirty log when syncing.
+>
+> I might be missing something. Could somebody shed some light on this?
+
+
+Good catch. It looks like a bug to me. Want to post a patch for this?
+
+Thanks
+
+
+>
+> Thanks,
+> Jintack
+>
+>
