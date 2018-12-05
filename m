@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33667)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUWft-0001KW-EC
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:53:10 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUWg0-0001Xa-KX
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:53:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUWfs-0005lC-F7
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:53:09 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:50190)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUWfx-0005sJ-Fb
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:53:16 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:50220)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUWfs-0005ja-08
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:53:08 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUWfx-0005rQ-52
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:53:13 -0500
 From: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Wed, 05 Dec 2018 15:53:05 +0300
-Message-ID: <154401438514.8440.4565963360304425572.stgit@Misha-PC.lan02.inno>
+Date: Wed, 05 Dec 2018 15:53:10 +0300
+Message-ID: <154401439073.8440.13967233364016955879.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <154401431697.8440.845616703562380651.stgit@Misha-PC.lan02.inno>
 References: <154401431697.8440.845616703562380651.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 2 11/39] windbg: add windbg_search_vmaddr
+Subject: [Qemu-devel] [PATCH 2 12/39] windbg: implement
+ find_kdDebuggerDataBlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,157 +30,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
-Add function to search in virtual memory.
-Implemented Boyer-Moore search algorithm.
+It is necessary to find address on the structure kdDebuggerDataBlock,
+which is located somewhere at kernel .data section.
+
+We can find it in structure defined in kernel:
+typedef struct _DBGKD_DEBUG_DATA_HEADER
+{
+    LIST_ENTRY64 List;
+    ULONG OwnerTag;
+    ULONG Size;
+} DBGKD_DEBUG_DATA_HEADER, *PDBGKD_DEBUG_DATA_HEEADER;
+where OwnerTag == 'KDBG',
+then List == kdDebuggerDataBlock.
 
 Signed-off-by: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 ---
- include/exec/windbgstub-utils.h |    4 +
- windbgstub-utils.c              |  120 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 124 insertions(+)
+ target/i386/windbgstub.c |   47 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
-diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-index e076227b39..2760684cfb 100644
---- a/include/exec/windbgstub-utils.h
-+++ b/include/exec/windbgstub-utils.h
-@@ -59,4 +59,8 @@ const char *kd_pkt_type_name(int id);
- bool windbg_on_load(void);
- void windbg_on_reset(void);
+diff --git a/target/i386/windbgstub.c b/target/i386/windbgstub.c
+index dc58f5a8cc..f1bab10b10 100644
+--- a/target/i386/windbgstub.c
++++ b/target/i386/windbgstub.c
+@@ -14,6 +14,7 @@
  
-+InitedAddr windbg_search_vmaddr(CPUState *cs, target_ulong start,
-+                                target_ulong finish, const uint8_t *pattern,
-+                                int pLen);
+ #ifdef TARGET_X86_64
+ #define OFFSET_KPCR_SELF 0x18
++#define OFFSET_KPCR_LOCK_ARRAY 0x28
+ #else  /* TARGET_I386 */
+ #define OFFSET_KPCR_SELF 0x1C
+ #define OFFSET_KPCR_VERSION 0x34
+@@ -60,6 +61,52 @@ static bool find_KPCR(CPUState *cs)
+ #ifdef TARGET_X86_64
+ static bool find_kdDebuggerDataBlock(CPUState *cs)
+ {
++    target_ulong lockArray;
++    target_ulong dDataList;
++    const uint8_t tag[] = { 'K', 'D', 'B', 'G' };
++    target_ulong start = 0xfffff80000000000LL;
++    target_ulong finish = 0xfffff81000000000LL;
++    InitedAddr find;
 +
- #endif /* WINDBGSTUB_UTILS_H */
-diff --git a/windbgstub-utils.c b/windbgstub-utils.c
-index 968e5cb2dd..6d2bb33307 100644
---- a/windbgstub-utils.c
-+++ b/windbgstub-utils.c
-@@ -80,6 +80,126 @@ static const char *kd_packet_type_names[] = {
-     "PACKET_TYPE_MAX",
- };
- 
-+static void prep_bmbc(const uint8_t *pattern, int pLen, int bmBc[])
-+{
-+    int i;
++    /* kdDebuggerDataBlock is located in
++         - range of [0xfffff80000000000 ... 0xfffff81000000000]
++         - at offset of ('KDBG') - 0x10 */
 +
-+    for (i = 0; i < 256; ++i) {
-+        bmBc[i] = pLen;
-+    }
-+    for (i = 0; i < pLen - 1; ++i) {
-+        bmBc[pattern[i]] = pLen - i - 1;
-+    }
-+}
-+
-+static void prep_suffixes(const uint8_t *pattern, int pLen, int *suff)
-+{
-+    int f, g, i;
-+
-+    suff[pLen - 1] = pLen;
-+    f = 0;
-+    g = pLen - 1;
-+    for (i = pLen - 2; i >= 0; --i) {
-+        if (i > g && suff[i + pLen - 1 - f] < i - g) {
-+            suff[i] = suff[i + pLen - 1 - f];
-+        } else {
-+            if (i < g) {
-+                g = i;
-+            }
-+            f = i;
-+            while (g >= 0 && pattern[g] == pattern[g + pLen - 1 - f]) {
-+                --g;
-+            }
-+            suff[i] = f - g;
++    if (!kdDebuggerDataBlock.is_init && KPCR.is_init) {
++        /* At first, find lockArray. If it is NULL,
++           then kdDebuggerDataBlock is also NULL (empirically). */
++        lockArray = VMEM_ADDR(cs, KPCR.addr + OFFSET_KPCR_LOCK_ARRAY);
++        if (!lockArray) {
++            return false;
 +        }
-+    }
-+}
++        DPRINTF("find LockArray " FMT_ADDR "\n", lockArray);
 +
-+static void prep_bmgs(const uint8_t *pattern, int pLen, int bmGs[])
-+{
-+    int i, j, suff[pLen];
++        while (true) {
++            find = windbg_search_vmaddr(cs, start, finish, tag,
++                                        ARRAY_SIZE(tag));
++            if (!find.is_init) {
++                return false;
++            }
 +
-+    prep_suffixes(pattern, pLen, suff);
++            /* Valid address to 'KDBG ' is always aligned */
++            if (!(find.addr & 0xf)) {
++                dDataList = VMEM_ADDR(cs, find.addr - 0x10);
 +
-+    for (i = 0; i < pLen; ++i) {
-+        bmGs[i] = pLen;
-+    }
-+
-+    j = 0;
-+    for (i = pLen - 1; i >= 0; --i) {
-+        if (suff[i] == i + 1) {
-+            for (; j < pLen - 1 - i; ++j) {
-+                if (bmGs[j] == pLen) {
-+                    bmGs[j] = pLen - 1 - i;
++                /* Valid address to 'dDataList ' is always
++                   in range [0xfffff80000000000 ... 0xfffff8ffffffffff] */
++                if ((dDataList >> 40) == 0xfffff8) {
++                    kdDebuggerDataBlock.addr = find.addr - 0x10;
++                    kdDebuggerDataBlock.is_init = true;
++                    DPRINTF("find kdDebuggerDataBlock " FMT_ADDR "\n",
++                            kdDebuggerDataBlock.addr);
++                    break;
 +                }
 +            }
++
++            start = find.addr + 0x8; /* next addr */
 +        }
 +    }
 +
-+    for (i = 0; i <= pLen - 2; ++i) {
-+        bmGs[pLen - 1 - suff[i]] = pLen - 1 - i;
-+    }
-+}
-+
-+static int search_boyermoore(const uint8_t *data, int dLen,
-+                             const uint8_t *pattern, int pLen, int bmGs[],
-+                             int bmBc[])
-+{
-+    int i;
-+    int j = 0;
-+    while (j <= dLen - pLen) {
-+        i = pLen - 1;
-+        while (i >= 0 && pattern[i] == data[i + j]) {
-+            --i;
-+        }
-+        if (i < 0) {
-+            return j;
-+        } else {
-+            j += MAX(bmGs[i], bmBc[data[i + j]] - pLen + 1 + i);
-+        }
-+    }
-+    return -1;
-+}
-+
-+InitedAddr windbg_search_vmaddr(CPUState *cs, target_ulong start,
-+                                target_ulong finish, const uint8_t *pattern,
-+                                int pLen)
-+{
-+    InitedAddr ret = {
-+        addr = 0;
-+        is_init = false;
-+    };
-+    int bmGs[pLen], bmBc[256];
-+    int find;
-+    target_ulong offset = start;
-+    target_ulong step = MIN(MAX(finish - start, 0x10000), pLen * 2);
-+
-+    if (finish <= start || pLen > finish - start) {
-+        return ret;
-+    }
-+
-+    uint8_t *buf = g_new(uint8_t, step);
-+
-+    prep_bmgs(pattern, pLen, bmGs);
-+    prep_bmbc(pattern, pLen, bmBc);
-+
-+    while (offset < finish) {
-+        step = MIN(step, finish - offset);
-+        if (cpu_memory_rw_debug(cs, offset, buf, step, 0) == 0) {
-+            find = search_boyermoore(buf, step, pattern, pLen, bmGs, bmBc);
-+            if (find >= 0) {
-+                ret.addr = offset + find;
-+                ret.is_init = true;
-+                break;
-+            }
-+        }
-+        offset += step - pLen;
-+    }
-+
-+    g_free(buf);
-+    return ret;
-+}
-+
- const char *kd_api_name(int id)
- {
-     return (id >= DbgKdMinimumManipulate && id < DbgKdMaximumManipulate)
+     return kdDebuggerDataBlock.is_init;
+ }
+ #else  /* TARGET_I386 */
