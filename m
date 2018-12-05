@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gUald-0006Wu-5Z
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:15:26 -0500
+	(envelope-from <berrange@redhat.com>) id 1gUaor-0002UI-T2
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:18:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gUaWu-00022G-CB
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:00:18 -0500
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Wed, 5 Dec 2018 16:59:59 +0000
-Message-ID: <70c2fceb-a0ae-f6a1-7f20-a4339ce37237@virtuozzo.com>
-References: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
-	<20181203101429.88735-9-anton.nefedov@virtuozzo.com>
-	<5a6d38d1-45a2-e2e3-62ef-7d80dcfd53eb@virtuozzo.com>
-In-Reply-To: <5a6d38d1-45a2-e2e3-62ef-7d80dcfd53eb@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <640716CDD5F1584C964B31C05BF42F6E@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <berrange@redhat.com>) id 1gUaol-0006yO-No
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:18:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48278)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gUaol-0006ka-7f
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:18:35 -0500
+Date: Wed, 5 Dec 2018 17:18:18 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181205171818.GA1136@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181025140631.634922-1-sameeh@daynix.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v10 8/9] qcow2: skip writing zero buffers
- to empty COW areas
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181025140631.634922-1-sameeh@daynix.com>
+Subject: Re: [Qemu-devel] [RFC 0/2] Attempt to implement the standby feature
+ for assigned network devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,131 +28,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
+To: Sameeh Jubran <sameeh@daynix.com>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Yan Vugenfirer <yan@daynix.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-T24gNS8xMi8yMDE4IDU6MDEgUE0sIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6
-DQo+IDAzLjEyLjIwMTggMTM6MTQsIEFudG9uIE5lZmVkb3Ygd3JvdGU6DQo+PiBJZiBDT1cgYXJl
-YXMgb2YgdGhlIG5ld2x5IGFsbG9jYXRlZCBjbHVzdGVycyBhcmUgemVyb2VzIG9uIHRoZSBiYWNr
-aW5nIGltYWdlLA0KPj4gZWZmaWNpZW50IGJkcnZfd3JpdGVfemVyb2VzKGZsYWdzPUJEUlZfUkVR
-X0FMTE9DQVRFKSBjYW4gYmUgdXNlZCBvbiB0aGUgd2hvbGUNCj4+IGNsdXN0ZXIgaW5zdGVhZCBv
-ZiB3cml0aW5nIGV4cGxpY2l0IHplcm8gYnVmZmVycyBsYXRlciBpbiBwZXJmb3JtX2NvdygpLg0K
-Pj4NCj4+IGlvdGVzdCAwNjA6DQo+PiB3cml0ZSB0byB0aGUgZGlzY2FyZGVkIGNsdXN0ZXIgZG9l
-cyBub3QgdHJpZ2dlciBDT1cgYW55bW9yZS4NCj4+IFVzZSBhIGJhY2tpbmcgaW1hZ2UgaW5zdGVh
-ZC4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBBbnRvbiBOZWZlZG92IDxhbnRvbi5uZWZlZG92QHZp
-cnR1b3p6by5jb20+DQo+PiBSZXZpZXdlZC1ieTogQWxiZXJ0byBHYXJjaWEgPGJlcnRvQGlnYWxp
-YS5jb20+DQo+PiAtLS0NCj4+ICAgIHFhcGkvYmxvY2stY29yZS5qc29uICAgICAgIHwgIDQgKy0N
-Cj4+ICAgIGJsb2NrL3Fjb3cyLmggICAgICAgICAgICAgIHwgIDYgKysrDQo+PiAgICBibG9jay9x
-Y293Mi1jbHVzdGVyLmMgICAgICB8ICAyICstDQo+PiAgICBibG9jay9xY293Mi5jICAgICAgICAg
-ICAgICB8IDgwICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystDQo+PiAgICBi
-bG9jay90cmFjZS1ldmVudHMgICAgICAgICB8ICAxICsNCj4+ICAgIHRlc3RzL3FlbXUtaW90ZXN0
-cy8wNjAgICAgIHwgMjYgKysrKysrKystLS0tLQ0KPj4gICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzA2
-MC5vdXQgfCAgNSArKy0NCj4+ICAgIDcgZmlsZXMgY2hhbmdlZCwgMTA5IGluc2VydGlvbnMoKyks
-IDE1IGRlbGV0aW9ucygtKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9xYXBpL2Jsb2NrLWNvcmUuanNv
-biBiL3FhcGkvYmxvY2stY29yZS5qc29uDQo+PiBpbmRleCBkNGZlNzEwODM2Li41MDU5OGFhOGZl
-IDEwMDY0NA0KPj4gLS0tIGEvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4+ICsrKyBiL3FhcGkvYmxv
-Y2stY29yZS5qc29uDQo+PiBAQCAtMzAwNCw2ICszMDA0LDggQEANCj4+ICAgICMNCj4+ICAgICMg
-QGNvcl93cml0ZTogYSB3cml0ZSBkdWUgdG8gY29weS1vbi1yZWFkIChzaW5jZSAyLjExKQ0KPj4g
-ICAgIw0KPj4gKyMgQGNsdXN0ZXJfYWxsb2Nfc3BhY2U6IGFuIGFsbG9jYXRpb24gb2YgZmlsZSBz
-cGFjZSBmb3IgYSBjbHVzdGVyIChzaW5jZSA0LjApDQo+PiArIw0KPj4gICAgIyBTaW5jZTogMi45
-DQo+PiAgICAjIw0KPj4gICAgeyAnZW51bSc6ICdCbGtkZWJ1Z0V2ZW50JywgJ3ByZWZpeCc6ICdC
-TEtEQkcnLA0KPj4gQEAgLTMwMjIsNyArMzAyNCw3IEBADQo+PiAgICAgICAgICAgICAgICAncHdy
-aXRldl9ybXdfdGFpbCcsICdwd3JpdGV2X3Jtd19hZnRlcl90YWlsJywgJ3B3cml0ZXYnLA0KPj4g
-ICAgICAgICAgICAgICAgJ3B3cml0ZXZfemVybycsICdwd3JpdGV2X2RvbmUnLCAnZW1wdHlfaW1h
-Z2VfcHJlcGFyZScsDQo+PiAgICAgICAgICAgICAgICAnbDFfc2hyaW5rX3dyaXRlX3RhYmxlJywg
-J2wxX3Nocmlua19mcmVlX2wyX2NsdXN0ZXJzJywNCj4+IC0gICAgICAgICAgICAnY29yX3dyaXRl
-J10gfQ0KPj4gKyAgICAgICAgICAgICdjb3Jfd3JpdGUnLCAnY2x1c3Rlcl9hbGxvY19zcGFjZSdd
-IH0NCj4+ICAgIA0KPj4gICAgIyMNCj4+ICAgICMgQEJsa2RlYnVnSW5qZWN0RXJyb3JPcHRpb25z
-Og0KPj4gZGlmZiAtLWdpdCBhL2Jsb2NrL3Fjb3cyLmggYi9ibG9jay9xY293Mi5oDQo+PiBpbmRl
-eCA4NjYyYjY4NTc1Li44YTY0MDc3ODk3IDEwMDY0NA0KPj4gLS0tIGEvYmxvY2svcWNvdzIuaA0K
-Pj4gKysrIGIvYmxvY2svcWNvdzIuaA0KPj4gQEAgLTM4OSw2ICszODksMTIgQEAgdHlwZWRlZiBz
-dHJ1Y3QgUUNvd0wyTWV0YQ0KPj4gICAgICAgICAqLw0KPj4gICAgICAgIFFjb3cyQ09XUmVnaW9u
-IGNvd19lbmQ7DQo+PiAgICANCj4+ICsgICAgLyoqDQo+PiArICAgICAqIEluZGljYXRlcyB0aGF0
-IENPVyByZWdpb25zIGFyZSBhbHJlYWR5IGhhbmRsZWQgYW5kIGRvIG5vdCByZXF1aXJlDQo+PiAr
-ICAgICAqIGFueSBtb3JlIHByb2Nlc3NpbmcuDQo+PiArICAgICAqLw0KPj4gKyAgICBib29sIHNr
-aXBfY293Ow0KPj4gKw0KPj4gICAgICAgIC8qKg0KPj4gICAgICAgICAqIFRoZSBJL08gdmVjdG9y
-IHdpdGggdGhlIGRhdGEgZnJvbSB0aGUgYWN0dWFsIGd1ZXN0IHdyaXRlIHJlcXVlc3QuDQo+PiAg
-ICAgICAgICogSWYgbm9uLU5VTEwsIHRoaXMgaXMgbWVhbnQgdG8gYmUgbWVyZ2VkIHRvZ2V0aGVy
-IHdpdGggdGhlIGRhdGENCj4+IGRpZmYgLS1naXQgYS9ibG9jay9xY293Mi1jbHVzdGVyLmMgYi9i
-bG9jay9xY293Mi1jbHVzdGVyLmMNCj4+IGluZGV4IGQzN2ZlMDhiM2QuLjM2ODVjNWY2N2UgMTAw
-NjQ0DQo+PiAtLS0gYS9ibG9jay9xY293Mi1jbHVzdGVyLmMNCj4+ICsrKyBiL2Jsb2NrL3Fjb3cy
-LWNsdXN0ZXIuYw0KPj4gQEAgLTgwNiw3ICs4MDYsNyBAQCBzdGF0aWMgaW50IHBlcmZvcm1fY293
-KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBRQ293TDJNZXRhICptKQ0KPj4gICAgICAgIGFzc2VydChz
-dGFydC0+b2Zmc2V0ICsgc3RhcnQtPm5iX2J5dGVzIDw9IGVuZC0+b2Zmc2V0KTsNCj4+ICAgICAg
-ICBhc3NlcnQoIW0tPmRhdGFfcWlvdiB8fCBtLT5kYXRhX3Fpb3YtPnNpemUgPT0gZGF0YV9ieXRl
-cyk7DQo+PiAgICANCj4+IC0gICAgaWYgKHN0YXJ0LT5uYl9ieXRlcyA9PSAwICYmIGVuZC0+bmJf
-Ynl0ZXMgPT0gMCkgew0KPj4gKyAgICBpZiAoKHN0YXJ0LT5uYl9ieXRlcyA9PSAwICYmIGVuZC0+
-bmJfYnl0ZXMgPT0gMCkgfHwgbS0+c2tpcF9jb3cpIHsNCj4+ICAgICAgICAgICAgcmV0dXJuIDA7
-DQo+PiAgICAgICAgfQ0KPj4gICAgDQo+PiBkaWZmIC0tZ2l0IGEvYmxvY2svcWNvdzIuYyBiL2Js
-b2NrL3Fjb3cyLmMNCj4+IGluZGV4IDk5MWQ2YWM5MWIuLjAyNzE4OGExYTMgMTAwNjQ0DQo+PiAt
-LS0gYS9ibG9jay9xY293Mi5jDQo+PiArKysgYi9ibG9jay9xY293Mi5jDQo+PiBAQCAtMjAxNSw2
-ICsyMDE1LDExIEBAIHN0YXRpYyBib29sIG1lcmdlX2Nvdyh1aW50NjRfdCBvZmZzZXQsIHVuc2ln
-bmVkIGJ5dGVzLA0KPj4gICAgICAgICAgICAgICAgY29udGludWU7DQo+PiAgICAgICAgICAgIH0N
-Cj4+ICAgIA0KPj4gKyAgICAgICAgLyogSWYgQ09XIHJlZ2lvbnMgYXJlIGhhbmRsZWQgYWxyZWFk
-eSwgc2tpcCB0aGlzIHRvbyAqLw0KPj4gKyAgICAgICAgaWYgKG0tPnNraXBfY293KSB7DQo+PiAr
-ICAgICAgICAgICAgY29udGludWU7DQo+PiArICAgICAgICB9DQo+PiArDQo+PiAgICAgICAgICAg
-IC8qIFRoZSBkYXRhIChtaWRkbGUpIHJlZ2lvbiBtdXN0IGJlIGltbWVkaWF0ZWx5IGFmdGVyIHRo
-ZQ0KPj4gICAgICAgICAgICAgKiBzdGFydCByZWdpb24gKi8NCj4+ICAgICAgICAgICAgaWYgKGwy
-bWV0YV9jb3dfc3RhcnQobSkgKyBtLT5jb3dfc3RhcnQubmJfYnl0ZXMgIT0gb2Zmc2V0KSB7DQo+
-PiBAQCAtMjA0MCw2ICsyMDQ1LDY4IEBAIHN0YXRpYyBib29sIG1lcmdlX2Nvdyh1aW50NjRfdCBv
-ZmZzZXQsIHVuc2lnbmVkIGJ5dGVzLA0KPj4gICAgICAgIHJldHVybiBmYWxzZTsNCj4+ICAgIH0N
-Cj4+ICAgIA0KPj4gK3N0YXRpYyBib29sIGlzX3VuYWxsb2NhdGVkKEJsb2NrRHJpdmVyU3RhdGUg
-KmJzLCBpbnQ2NF90IG9mZnNldCwgaW50NjRfdCBieXRlcykNCj4+ICt7DQo+PiArICAgIGludDY0
-X3QgbnI7DQo+PiArICAgIHJldHVybiAhYnl0ZXMgfHwNCj4+ICsgICAgICAgICghYmRydl9pc19h
-bGxvY2F0ZWRfYWJvdmUoYnMsIE5VTEwsIG9mZnNldCwgYnl0ZXMsICZucikgJiYgbnIgPT0gYnl0
-ZXMpOw0KPiANCj4gYmRydl9pc19hbGxvY2F0ZWRfYWJvdmUgbWF5IHJldHVybiBlcnJvciA8IDAN
-Cj4gDQoNClByb2JhYmx5IEkganVzdCB0b29rIGlzX3plcm8oKSBhcyBhbiBleGFtcGxlLg0KQnV0
-IHNvbWV3aGVyZSB0aGVyZSdzIGV2ZW4gYSByYXRpb25hbGUgKGJkcnZfY29fZG9fY29weV9vbl9y
-ZWFkdik6DQoNCiAgICAgICAgIHJldCA9IGJkcnZfaXNfYWxsb2NhdGVkKGJzLCBjbHVzdGVyX29m
-ZnNldCwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE1JTihjbHVzdGVyX2J5dGVz
-LCBtYXhfdHJhbnNmZXIpLCAmcG51bSk7DQogICAgICAgICBpZiAocmV0IDwgMCkgew0KICAgICAg
-ICAgICAgIC8qIFNhZmUgdG8gdHJlYXQgZXJyb3JzIGluIHF1ZXJ5aW5nIGFsbG9jYXRpb24gYXMg
-aWYNCiAgICAgICAgICAgICAgKiB1bmFsbG9jYXRlZDsgd2UnbGwgcHJvYmFibHkgZmFpbCBhZ2Fp
-biBzb29uIG9uIHRoZQ0KICAgICAgICAgICAgICAqIHJlYWQsIGJ1dCBhdCBsZWFzdCB0aGF0IHdp
-bGwgc2V0IGEgZGVjZW50IGVycm5vLg0KICAgICAgICAgICAgICAqLw0KICAgICAgICAgICAgIHBu
-dW0gPSBNSU4oY2x1c3Rlcl9ieXRlcywgbWF4X3RyYW5zZmVyKTsNCiAgICAgICAgIH0NCg0KPj4g
-K30NCj4+ICsNCj4+ICtzdGF0aWMgYm9vbCBpc196ZXJvX2NvdyhCbG9ja0RyaXZlclN0YXRlICpi
-cywgUUNvd0wyTWV0YSAqbSkNCj4+ICt7DQo+PiArICAgIC8qIFRoaXMgY2hlY2sgaXMgZGVzaWdu
-ZWQgZm9yIG9wdGltaXphdGlvbiBzaG9ydGN1dCBzbyBpdCBtdXN0IGJlDQo+PiArICAgICAqIGVm
-ZmljaWVudC4NCj4+ICsgICAgICogSW5zdGVhZCBvZiBpc196ZXJvKCksIHVzZSBpc191bmFsbG9j
-YXRlZCgpIGFzIGl0IGlzIGZhc3RlciAoYnV0IG5vdA0KPj4gKyAgICAgKiBhcyBhY2N1cmF0ZSBh
-bmQgY2FuIHJlc3VsdCBpbiBmYWxzZSBuZWdhdGl2ZXMpLiAqLw0KPj4gKyAgICByZXR1cm4gaXNf
-dW5hbGxvY2F0ZWQoYnMsIG0tPm9mZnNldCArIG0tPmNvd19zdGFydC5vZmZzZXQsDQo+PiArICAg
-ICAgICAgICAgICAgICAgICAgICAgICBtLT5jb3dfc3RhcnQubmJfYnl0ZXMpICYmDQo+PiArICAg
-ICAgICAgICBpc191bmFsbG9jYXRlZChicywgbS0+b2Zmc2V0ICsgbS0+Y293X2VuZC5vZmZzZXQs
-DQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICBtLT5jb3dfZW5kLm5iX2J5dGVzKTsNCj4+
-ICt9DQo+PiArDQo+PiArc3RhdGljIGludCBoYW5kbGVfYWxsb2Nfc3BhY2UoQmxvY2tEcml2ZXJT
-dGF0ZSAqYnMsIFFDb3dMMk1ldGEgKmwybWV0YSkNCj4+ICt7DQo+PiArICAgIEJEUlZRY293MlN0
-YXRlICpzID0gYnMtPm9wYXF1ZTsNCj4+ICsgICAgUUNvd0wyTWV0YSAqbTsNCj4+ICsNCj4+ICsg
-ICAgaWYgKCEoYnMtPmZpbGUtPmJzLT5zdXBwb3J0ZWRfemVyb19mbGFncyAmIEJEUlZfUkVRX0FM
-TE9DQVRFKSkgew0KPj4gKyAgICAgICAgcmV0dXJuIDA7DQo+PiArICAgIH0NCj4+ICsNCj4+ICsg
-ICAgaWYgKGJzLT5lbmNyeXB0ZWQpIHsNCj4+ICsgICAgICAgIHJldHVybiAwOw0KPj4gKyAgICB9
-DQo+PiArDQo+PiArICAgIGZvciAobSA9IGwybWV0YTsgbSAhPSBOVUxMOyBtID0gbS0+bmV4dCkg
-ew0KPj4gKyAgICAgICAgaW50IHJldDsNCj4+ICsNCj4+ICsgICAgICAgIGlmICghbS0+Y293X3N0
-YXJ0Lm5iX2J5dGVzICYmICFtLT5jb3dfZW5kLm5iX2J5dGVzKSB7DQo+PiArICAgICAgICAgICAg
-Y29udGludWU7DQo+PiArICAgICAgICB9DQo+PiArDQo+PiArICAgICAgICBpZiAoIWlzX3plcm9f
-Y293KGJzLCBtKSkgew0KPj4gKyAgICAgICAgICAgIGNvbnRpbnVlOw0KPj4gKyAgICAgICAgfQ0K
-Pj4gKw0KPj4gKyAgICAgICAgQkxLREJHX0VWRU5UKGJzLT5maWxlLCBCTEtEQkdfQ0xVU1RFUl9B
-TExPQ19TUEFDRSk7DQo+PiArICAgICAgICAvKiBpbnN0ZWFkIG9mIHdyaXRpbmcgemVybyBDT1cg
-YnVmZmVycywNCj4+ICsgICAgICAgICAgIGVmZmljaWVudGx5IHplcm8gb3V0IHRoZSB3aG9sZSBj
-bHVzdGVycyAqLw0KPj4gKyAgICAgICAgcmV0ID0gYmRydl9jb19wd3JpdGVfemVyb2VzKGJzLT5m
-aWxlLCBtLT5hbGxvY19vZmZzZXQsDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgbS0+bmJfY2x1c3RlcnMgKiBzLT5jbHVzdGVyX3NpemUsDQo+PiArICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgQkRSVl9SRVFfQUxMT0NBVEUpOw0KPj4gKyAgICAgICAg
-aWYgKHJldCA8IDApIHsNCj4+ICsgICAgICAgICAgICBpZiAocmV0ICE9IC1FTk9UU1VQICYmIHJl
-dCAhPSAtRUFHQUlOKSB7DQo+IA0KPiB3aHkgZG8geW91IGlnbm9yZSBFTk9UU1VQPw0KPiANCg0K
-VGhpcyBtaWdodCBwYXJ0aWN1bGFybHkgaGFwcGVuIGFmdGVyIGZpcnN0IHB3cml0ZV96ZXJvZXMo
-KSB0bw0KZmlsZS1wb3NpeC4NCkl0IGdlbmVyYWxseSByZXBvcnRzIEJEUlZfUkVRX0FMTE9DQVRF
-IG9uIG9wZW4sIGJ1dCB0aGVuIGl0IG1pZ2h0IHJlc2V0DQp0aGUgZmxhZyBpZiBmYWxsb2NhdGUo
-KSByZXR1cm5zIEVOT1RTVVAuDQoNCk5ldmVybWluZCBmaWxlLXBvc2l4OyB3aXRoIGFueSBmaWxl
-IGRyaXZlciB3aGF0IGNhbiB3ZSBwb3NzaWJseSBkbyBoZXJlOg0KdGhpcyBvcGVyYXRpb24gaXMg
-bm9uLW1hbmRhdG9yeSBhbmQgdGhlIGVycm9yIGlzIG5vdCBjcml0aWNhbC4NCk5ldmVyIHRyeWlu
-ZyBhZ2FpbiBkb2Vzbid0IGxvb2sgcXVpdGUgcmlnaHQsIHRoZSBmaWxlIGRyaXZlciBjYW4gcmVz
-ZXQNCkJEUlZfUkVRX0FMTE9DQVRFIGlmIGl0IGxpa2VzIGFuZCB3ZSB3b24ndCBib3RoZXIgaXQg
-YW55bW9yZS4NCg0KDQo+IEFuZCBhbHNvLCBobW0sIHNob3VsZCBub3Qgd2UgaGF2ZSBwcm9ibGVt
-cyB3aXRoIHNlcmlhbGl6aW5nPyBJZiBhbHJlYWR5IHN0YXJ0ZWQgdW5hbGlnbmVkIHJlcXVlc3Qs
-DQo+IGl0IGlzIHNlcmlhbGl6aW5nLi4gQW5kIG5vdywgd2UgYXJlIGdvaW5nIHRvIHN0YXJ0IG5l
-c3RlZCBzZXJpYWxpemluZyByZXF1ZXN0LCB3aGljaCB3aWxsIGRlZmluaXRlbHkNCj4gcmV0dXJu
-IEVBR0FJTi4uDQo+IA0KDQpUaGUgcmVxdWVzdCB3ZSdyZSBwcm9jZXNzaW5nIGhlcmUgaXMgb24g
-cWNvdzIgbGV2ZWwgeWV0LCBpdCB3b24ndCBhZmZlY3QNCnRoZSBicy0+ZmlsZSBzZXJpYWxpemF0
-aW9uIHF1ZXVlLg0KDQpbLi5dDQo=
+On Thu, Oct 25, 2018 at 05:06:29PM +0300, Sameeh Jubran wrote:
+> From: Sameeh Jubran <sjubran@redhat.com>
+> 
+> Hi all,
+> 
+> Background:
+> 
+> There has been a few attempts to implement the standby feature for vfio
+> assigned devices which aims to enable the migration of such devices. This
+> is another attempt.
+> 
+> The series implements an infrastructure for hiding devices from the bus
+> upon boot. What it does is the following:
+> 
+> * In the first patch the infrastructure for hiding the device is added
+>   for the qbus and qdev APIs. A "hidden" boolean is added to the device
+>   state and it is set based on a callback to the standby device which
+>   registers itself for handling the assessment: "should the primary device
+>   be hidden?" by cross validating the ids of the devices.
+> 
+> * In the second patch the virtio-net uses the API to hide the vfio
+>   device and unhides it when the feature is acked.
+
+IIUC, the general idea is that we want to provide a pair of associated NIC
+devices to the guest, one emulated, one physical PCI device. The guest would
+put them in a bonded pair. Before migration the PCI device is unplugged & a
+new PCI device plugged on target after migration. The guest traffic continues
+without interuption due to the emulate device.
+
+This kind of conceptual approach can already be implemented today by management
+apps. The only hard problem that exists today is how the guest OS can figure
+out that a particular pair of devices it has are intended to be used together. 
+
+With this series, IIUC, the virtio-net device is getting a given property which
+defines the qdev ID of the associated VFIO device. When the guest OS activates
+the virtio-net device and acknowledges the STANDBY feature bit, qdev then
+unhides the associated VFIO device.
+
+AFAICT the guest has to infer that the device which suddenly appears is the one
+associated with the virtio-net device it just initialized, for purposes of
+setting up the NIC bonding. There doesn't appear to be any explicit assocation
+between the devices exposed to the guest.
+
+This feels pretty fragile for a guest needing to match up devices when there
+are many pairs of devices exposed to a single guest.
+
+Unless I'm mis-reading the patches, it looks like the VFIO device always has
+to be available at the time QEMU is started. There's no way to boot a guest
+and then later hotplug a VFIO device to accelerate the existing virtio-net NIC.
+Or similarly after migration there might not be any VFIO device available
+initially when QEMU is started to accept the incoming migration. So it might
+need to run in degraded mode for an extended period of time until one becomes
+available for hotplugging. The use of qdev IDs makes this troublesome, as the
+qdev ID of the future VFIO device would need to be decided upfront before it
+even exists.
+
+So overall I'm not really a fan of the dynamic hiding/unhiding of devices. I
+would much prefer to see some way to expose an explicit relationship between
+the devices to the guest.
+
+> Disclaimers:
+> 
+> * I have only scratch tested this and from qemu side, it seems to be
+>   working.
+> * This is an RFC so it lacks some proper error handling in few cases
+>   and proper resource freeing. I wanted to get some feedback first
+>   before it is finalized.
+> 
+> Command line example:
+> 
+> /home/sameeh/Builds/failover/qemu/x86_64-softmmu/qemu-system-x86_64 \
+> -netdev tap,id=hostnet0,script=world_bridge_standalone.sh,downscript=no,ifname=cc1_71 \
+> -netdev tap,vhost=on,id=hostnet1,script=world_bridge_standalone.sh,downscript=no,ifname=cc1_72,queues=4 \
+> -device virtio-net,host_mtu=1500,netdev=hostnet1,id=cc1_72,vectors=10,mq=on,primary=cc1_71 \
+> -device e1000,netdev=hostnet0,id=cc1_71,standby=cc1_72 \
+> 
+> Migration support:
+> 
+> Pre migration or during setup phase of the migration we should send an
+> unplug request to the guest to unplug the primary device. I haven't had
+> the chance to implement that part yet but should do soon. Do you know
+> what's the best approach to do so? I wanted to have a callback to the
+> virtio-net device which tries to send an unplug request to the guest and
+> if succeeds then the migration continues. It needs to handle the case where
+> the migration fails and then it has to replug the primary device back.
+
+Having QEMU do this internally gets into a world of pain when you have
+multiple devices in the guest.
+
+Consider if we have 2 pairs of devices. We unplug one VFIO device, but
+unplugging the second VFIO device fails, thus we try to replug the first
+VFIO device but this now fails too. We don't even get as far as starting
+the migration before we have to return an error.
+
+The mgmt app will just see that the migration failed, but it will not
+be sure which devices are now actually exposed to the guest OS correctly.
+
+The similar problem hits if we started the migration data stream, but
+then had to abort and so need to tear try to replug in the source but
+failed for some reasons.
+
+Doing the VFIO device plugging/unplugging explicitly from the mgmt app
+gives that mgmt app direct information about which devices have been
+successfully made available to the guest at all time, becuase the mgmt
+app can see the errors from each step of the process.  Trying to do
+this inside QEMU doesn't achieve anything the mgmt app can't already
+do, but it obscures what happens during failures.  The same applies at
+the libvirt level too, which is why mgmt apps today will do the VFIO
+unplug/replug either side of migration themselves.
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
