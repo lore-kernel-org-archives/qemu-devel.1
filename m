@@ -1,31 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gUWG2-0004FW-JL
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gUWG1-00042b-Km
 	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:26:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gUWFz-0005HA-6G
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:26:26 -0500
-Received: from mail-wm1-f46.google.com ([209.85.128.46]:39481)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gUWFy-0005GO-Sa
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:26:23 -0500
-Received: by mail-wm1-f46.google.com with SMTP id f81so10231650wmd.4
-	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 04:26:22 -0800 (PST)
-References: <CAGxU2F7+NZUS-BQ1hCnKynVxfsVUYTHRCWQvJwBA12bYmg0ZJA@mail.gmail.com>
-	<938a2f54426dc059428fcfe1882bbb3b2d5cbc99.camel@intel.com>
-	<CAGxU2F50U=NH8fGDXygcYycjoveNpdbKnnG3H0soCvub_Ea5cw@mail.gmail.com>
-	<CAGxU2F7SA-kc0gsLNaUzbiinytJ2DF_r5UpB1JzRy-Su1_WOLw@mail.gmail.com>
-	<a1ca57134a970fb3282afb36c0e3b5647b104ff8.camel@intel.com>
-	<CAGxU2F7Sg0JaxyPQw_FhSc6MzYu+YzZpv9=VHp8qvwfTWpf_MQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <51ea7a7e-964a-0f05-75f2-11d6acd9ab77@redhat.com>
-Date: Wed, 5 Dec 2018 13:26:19 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAGxU2F7Sg0JaxyPQw_FhSc6MzYu+YzZpv9=VHp8qvwfTWpf_MQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] QEMU/NEMU boot time with several x86 firmwares
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gUWDW-0003yd-DH
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:23:52 -0500
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Date: Wed,  5 Dec 2018 15:23:26 +0300
+Message-Id: <20181205122326.26625-1-dplotnikov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH] blk: postpone request execution on a context
+ protected with "drained section"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,51 +18,387 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>, Rob Bradford <robert.bradford@intel.com>
-Cc: Samuel Ortiz <sameo@linux.intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+To: kwolf@redhat.com, keith.busch@intel.com, jsnow@redhat.com, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@virtuozzo.com, famz@redhat.com, vsementsov@virtuozzo.com
 
-Hi Stefano,
+At the time, the "drained section" doesn't protect Block Driver State
+from the requests appearing in the vCPU threads.
+This could lead to the data loss because of request coming to
+an unexpected BDS.
 
-On 3/12/18 17:35, Stefano Garzarella wrote:
-> On Mon, Dec 3, 2018 at 4:44 PM Rob Bradford <robert.bradford@intel.com> wrote:
->>
->> Hi Stefano, thanks for capturing all these numbers,
->>
->> On Mon, 2018-12-03 at 15:27 +0100, Stefano Garzarella wrote:
->>> Hi Rob,
->>> I continued to investigate the boot time, and as you suggested I
->>> looked also at qemu-lite 2.11.2
->>> (https://github.com/kata-containers/qemu) and NEMU "virt" machine. I
->>> did the following tests using the Kata kernel configuration
->>> (
->>> https://github.com/kata-containers/packaging/blob/master/kernel/configs/x86_64_kata_kvm_4.14.x
->>> )
->>>
->>> To compare the results with qemu-lite direct kernel load, I added
->>> another tracepoint:
->>> - linux_start_kernel: first entry of the Linux kernel
->>> (start_kernel())
->>>
->>
->> Great, do you have a set of patches available that all these trace
->> points. It would be great for reproduction.
-> 
-> For sure! I'm attaching a set of patches for qboot, seabios, ovmf,
-> nemu/qemu/qemu-lite and linux 4.14 whit the tracepoints.
-> I'm also sharing a python script that I'm using with perf to extract
-> the numbers in this way:
-> 
-> $ perf record -a -e kvm:kvm_entry -e kvm:kvm_pio -e
-> sched:sched_process_exec -o /tmp/qemu_perf.data &
-> $ # start qemu/nemu multiple times
-> $ killall perf
-> $ perf script -s qemu-perf-script.py -i /tmp/qemu_perf.data
-[...]
-Good stuff. At some point I'd like to have such scripts in the QEMU
-repository to run perf tests on a regular basis (eventually keep those
-metrics somewhere) to be able to catch when we add code that add
-timeoutes and increase boot time.
+For example, when a request comes to ide controller from the guest,
+the controller creates a request coroutine and executes the coroutine
+in the vCPU thread. If another thread(iothread) has entered the
+"drained section" on a BDS with bdrv_drained_begin, which protects
+BDS' AioContext from external requests, and released the AioContext
+because of finishing some coroutine by the moment of the request
+appearing at the ide controller, the controller acquires the AioContext
+and executes its request without any respect to the entered
+"drained section" producing any kinds of data inconsistency.
 
-Regards,
+The patch prevents this case by putting requests from external threads to
+the queue on AioContext while the context is protected for external requests
+and executes those requests later on the external requests protection removing.
 
-Phil.
+Also, the patch marks requests generated in a vCPU thread as external ones
+to make use of the request postponing.
+
+How to reproduce:
+1. start vm with an ide disk and a linux guest
+2. in the guest run: dd if=... of=... bs=4K count=100000 oflag=direct
+3. (qemu) drive_mirror "disk-name"
+4. wait until block job can receive block_job_complete
+5. (qemu) block_job_complete "disk-name"
+6. blk_aio_p[read|write]v may appear in vCPU context (here is the race)
+
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+---
+ block/block-backend.c | 31 +++++++++++++++++++++++++++++++
+ block/io.c            |  3 ++-
+ dma-helpers.c         |  4 ++--
+ hw/block/nvme.c       |  8 ++++----
+ hw/block/xen_disk.c   |  8 ++++----
+ hw/ide/core.c         |  6 ++++--
+ hw/scsi/scsi-disk.c   | 10 ++++++----
+ include/block/aio.h   | 37 ++++++++++++++++++++++++++++---------
+ include/block/block.h |  8 +++++++-
+ util/async.c          |  2 ++
+ 10 files changed, 90 insertions(+), 27 deletions(-)
+
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 60d37a0c3d..10f7dd357d 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -1148,6 +1148,8 @@ static int blk_check_byte_request(BlockBackend *blk, int64_t offset,
+     return 0;
+ }
+ 
++static void coroutine_fn blk_postpone_request(BlockBackend *blk);
++
+ int coroutine_fn blk_co_preadv(BlockBackend *blk, int64_t offset,
+                                unsigned int bytes, QEMUIOVector *qiov,
+                                BdrvRequestFlags flags)
+@@ -1157,6 +1159,10 @@ int coroutine_fn blk_co_preadv(BlockBackend *blk, int64_t offset,
+ 
+     trace_blk_co_preadv(blk, bs, offset, bytes, flags);
+ 
++    if ((flags & BDRV_REQ_EXTERNAL)) {
++        blk_postpone_request(blk);
++    }
++
+     ret = blk_check_byte_request(blk, offset, bytes);
+     if (ret < 0) {
+         return ret;
+@@ -1184,6 +1190,10 @@ int coroutine_fn blk_co_pwritev(BlockBackend *blk, int64_t offset,
+ 
+     trace_blk_co_pwritev(blk, bs, offset, bytes, flags);
+ 
++    if ((flags & BDRV_REQ_EXTERNAL)) {
++        blk_postpone_request(blk);
++    }
++
+     ret = blk_check_byte_request(blk, offset, bytes);
+     if (ret < 0) {
+         return ret;
+@@ -1304,6 +1314,27 @@ static void blk_dec_in_flight(BlockBackend *blk)
+     aio_wait_kick();
+ }
+ 
++static void coroutine_fn blk_postpone_request(BlockBackend *blk)
++{
++    AioContext *ctx;
++
++    assert(qemu_in_coroutine());
++    ctx = qemu_coroutine_get_aio_context(qemu_coroutine_self());
++
++    /*
++     * Put the request to the postponed queue if
++     * external requests is not allowed currenly
++     * The request is continued when the context
++     * leaves the bdrv "drained" section allowing
++     * external requests
++     */
++    if (aio_external_disabled(ctx)) {
++        blk_dec_in_flight(blk);
++        qemu_co_queue_wait(&ctx->postponed_reqs, NULL);
++        blk_inc_in_flight(blk);
++    }
++}
++
+ static void error_callback_bh(void *opaque)
+ {
+     struct BlockBackendAIOCB *acb = opaque;
+diff --git a/block/io.c b/block/io.c
+index bd9d688f8b..019da464a2 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1318,7 +1318,8 @@ static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
+      * potential fallback support, if we ever implement any read flags
+      * to pass through to drivers.  For now, there aren't any
+      * passthrough flags.  */
+-    assert(!(flags & ~(BDRV_REQ_NO_SERIALISING | BDRV_REQ_COPY_ON_READ)));
++    assert(!(flags & ~(BDRV_REQ_NO_SERIALISING | BDRV_REQ_COPY_ON_READ |
++                       BDRV_REQ_EXTERNAL)));
+ 
+     /* Handle Copy on Read and associated serialisation */
+     if (flags & BDRV_REQ_COPY_ON_READ) {
+diff --git a/dma-helpers.c b/dma-helpers.c
+index 2d7e02d35e..53706031c5 100644
+--- a/dma-helpers.c
++++ b/dma-helpers.c
+@@ -235,7 +235,7 @@ BlockAIOCB *dma_blk_read_io_func(int64_t offset, QEMUIOVector *iov,
+                                  void *opaque)
+ {
+     BlockBackend *blk = opaque;
+-    return blk_aio_preadv(blk, offset, iov, 0, cb, cb_opaque);
++    return blk_aio_preadv(blk, offset, iov, BDRV_REQ_EXTERNAL, cb, cb_opaque);
+ }
+ 
+ BlockAIOCB *dma_blk_read(BlockBackend *blk,
+@@ -253,7 +253,7 @@ BlockAIOCB *dma_blk_write_io_func(int64_t offset, QEMUIOVector *iov,
+                                   void *opaque)
+ {
+     BlockBackend *blk = opaque;
+-    return blk_aio_pwritev(blk, offset, iov, 0, cb, cb_opaque);
++    return blk_aio_pwritev(blk, offset, iov, BDRV_REQ_EXTERNAL, cb, cb_opaque);
+ }
+ 
+ BlockAIOCB *dma_blk_write(BlockBackend *blk,
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 7c8c63e8f5..e645180e18 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -380,10 +380,10 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+     } else {
+         req->has_sg = false;
+         req->aiocb = is_write ?
+-            blk_aio_pwritev(n->conf.blk, data_offset, &req->iov, 0, nvme_rw_cb,
+-                            req) :
+-            blk_aio_preadv(n->conf.blk, data_offset, &req->iov, 0, nvme_rw_cb,
+-                           req);
++            blk_aio_pwritev(n->conf.blk, data_offset, &req->iov,
++                            BDRV_REQ_EXTERNAL, nvme_rw_cb, req) :
++            blk_aio_preadv(n->conf.blk, data_offset, &req->iov,
++                           BDRV_REQ_EXTERNAL, nvme_rw_cb, req);
+     }
+ 
+     return NVME_NO_COMPLETE;
+diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
+index 36eff94f84..8888fcd070 100644
+--- a/hw/block/xen_disk.c
++++ b/hw/block/xen_disk.c
+@@ -411,8 +411,8 @@ static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
+         block_acct_start(blk_get_stats(blkdev->blk), &ioreq->acct,
+                          ioreq->v.size, BLOCK_ACCT_READ);
+         ioreq->aio_inflight++;
+-        blk_aio_preadv(blkdev->blk, ioreq->start, &ioreq->v, 0,
+-                       qemu_aio_complete, ioreq);
++        blk_aio_preadv(blkdev->blk, ioreq->start, &ioreq->v,
++                       BDRV_REQ_EXTERNAL, qemu_aio_complete, ioreq);
+         break;
+     case BLKIF_OP_WRITE:
+     case BLKIF_OP_FLUSH_DISKCACHE:
+@@ -426,8 +426,8 @@ static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
+                          ioreq->req.operation == BLKIF_OP_WRITE ?
+                          BLOCK_ACCT_WRITE : BLOCK_ACCT_FLUSH);
+         ioreq->aio_inflight++;
+-        blk_aio_pwritev(blkdev->blk, ioreq->start, &ioreq->v, 0,
+-                        qemu_aio_complete, ioreq);
++        blk_aio_pwritev(blkdev->blk, ioreq->start, &ioreq->v,
++                        BDRV_REQ_EXTERNAL, qemu_aio_complete, ioreq);
+         break;
+     case BLKIF_OP_DISCARD:
+     {
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index 04e22e751d..ae4b715eb1 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -665,7 +665,8 @@ BlockAIOCB *ide_buffered_readv(IDEState *s, int64_t sector_num,
+     qemu_iovec_init_external(&req->qiov, &req->iov, 1);
+ 
+     aioreq = blk_aio_preadv(s->blk, sector_num << BDRV_SECTOR_BITS,
+-                            &req->qiov, 0, ide_buffered_readv_cb, req);
++                            &req->qiov, BDRV_REQ_EXTERNAL,
++                            ide_buffered_readv_cb, req);
+ 
+     QLIST_INSERT_HEAD(&s->buffered_requests, req, list);
+     return aioreq;
+@@ -1052,7 +1053,8 @@ static void ide_sector_write(IDEState *s)
+     block_acct_start(blk_get_stats(s->blk), &s->acct,
+                      n * BDRV_SECTOR_SIZE, BLOCK_ACCT_WRITE);
+     s->pio_aiocb = blk_aio_pwritev(s->blk, sector_num << BDRV_SECTOR_BITS,
+-                                   &s->qiov, 0, ide_sector_write_cb, s);
++                                   &s->qiov, BDRV_REQ_EXTERNAL,
++                                   ide_sector_write_cb, s);
+ }
+ 
+ static void ide_flush_cb(void *opaque, int ret)
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 0e9027c8f3..ad7b236e67 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -1732,7 +1732,7 @@ static void scsi_write_same_complete(void *opaque, int ret)
+         qemu_iovec_init_external(&data->qiov, &data->iov, 1);
+         r->req.aiocb = blk_aio_pwritev(s->qdev.conf.blk,
+                                        data->sector << BDRV_SECTOR_BITS,
+-                                       &data->qiov, 0,
++                                       &data->qiov, BDRV_REQ_EXTERNAL,
+                                        scsi_write_same_complete, data);
+         aio_context_release(blk_get_aio_context(s->qdev.conf.blk));
+         return;
+@@ -1804,7 +1804,7 @@ static void scsi_disk_emulate_write_same(SCSIDiskReq *r, uint8_t *inbuf)
+                      data->iov.iov_len, BLOCK_ACCT_WRITE);
+     r->req.aiocb = blk_aio_pwritev(s->qdev.conf.blk,
+                                    data->sector << BDRV_SECTOR_BITS,
+-                                   &data->qiov, 0,
++                                   &data->qiov, BDRV_REQ_EXTERNAL,
+                                    scsi_write_same_complete, data);
+ }
+ 
+@@ -2862,7 +2862,8 @@ BlockAIOCB *scsi_dma_readv(int64_t offset, QEMUIOVector *iov,
+ {
+     SCSIDiskReq *r = opaque;
+     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
+-    return blk_aio_preadv(s->qdev.conf.blk, offset, iov, 0, cb, cb_opaque);
++    return blk_aio_preadv(s->qdev.conf.blk, offset, iov, BDRV_REQ_EXTERNAL,
++                          cb, cb_opaque);
+ }
+ 
+ static
+@@ -2872,7 +2873,8 @@ BlockAIOCB *scsi_dma_writev(int64_t offset, QEMUIOVector *iov,
+ {
+     SCSIDiskReq *r = opaque;
+     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
+-    return blk_aio_pwritev(s->qdev.conf.blk, offset, iov, 0, cb, cb_opaque);
++    return blk_aio_pwritev(s->qdev.conf.blk, offset, iov, BDRV_REQ_EXTERNAL,
++                           cb, cb_opaque);
+ }
+ 
+ static void scsi_disk_base_class_initfn(ObjectClass *klass, void *data)
+diff --git a/include/block/aio.h b/include/block/aio.h
+index 0ca25dfec6..8512bda44e 100644
+--- a/include/block/aio.h
++++ b/include/block/aio.h
+@@ -19,6 +19,7 @@
+ #include "qemu/event_notifier.h"
+ #include "qemu/thread.h"
+ #include "qemu/timer.h"
++#include "qemu/coroutine.h"
+ 
+ typedef struct BlockAIOCB BlockAIOCB;
+ typedef void BlockCompletionFunc(void *opaque, int ret);
+@@ -130,6 +131,11 @@ struct AioContext {
+     QEMUTimerListGroup tlg;
+ 
+     int external_disable_cnt;
++    /* Queue to store the requests coming when the context is disabled for
++     * external requests.
++     * Don't use a separate lock for protection relying the context lock
++     */
++    CoQueue postponed_reqs;
+ 
+     /* Number of AioHandlers without .io_poll() */
+     int poll_disable_cnt;
+@@ -483,6 +489,15 @@ static inline void aio_timer_init(AioContext *ctx,
+  */
+ int64_t aio_compute_timeout(AioContext *ctx);
+ 
++/**
++ * aio_co_enter:
++ * @ctx: the context to run the coroutine
++ * @co: the coroutine to run
++ *
++ * Enter a coroutine in the specified AioContext.
++ */
++void aio_co_enter(AioContext *ctx, struct Coroutine *co);
++
+ /**
+  * aio_disable_external:
+  * @ctx: the aio context
+@@ -491,9 +506,17 @@ int64_t aio_compute_timeout(AioContext *ctx);
+  */
+ static inline void aio_disable_external(AioContext *ctx)
+ {
++    aio_context_acquire(ctx);
+     atomic_inc(&ctx->external_disable_cnt);
++    aio_context_release(ctx);
+ }
+ 
++static void run_postponed_co(void *opaque)
++{
++    AioContext *ctx = (AioContext *) opaque;
++
++    qemu_co_queue_restart_all(&ctx->postponed_reqs);
++}
+ /**
+  * aio_enable_external:
+  * @ctx: the aio context
+@@ -504,12 +527,17 @@ static inline void aio_enable_external(AioContext *ctx)
+ {
+     int old;
+ 
++    aio_context_acquire(ctx);
+     old = atomic_fetch_dec(&ctx->external_disable_cnt);
+     assert(old > 0);
+     if (old == 1) {
++        Coroutine *co = qemu_coroutine_create(run_postponed_co, ctx);
++        aio_co_enter(ctx, co);
++
+         /* Kick event loop so it re-arms file descriptors */
+         aio_notify(ctx);
+     }
++    aio_context_release(ctx);
+ }
+ 
+ /**
+@@ -564,15 +592,6 @@ void aio_co_schedule(AioContext *ctx, struct Coroutine *co);
+  */
+ void aio_co_wake(struct Coroutine *co);
+ 
+-/**
+- * aio_co_enter:
+- * @ctx: the context to run the coroutine
+- * @co: the coroutine to run
+- *
+- * Enter a coroutine in the specified AioContext.
+- */
+-void aio_co_enter(AioContext *ctx, struct Coroutine *co);
+-
+ /**
+  * Return the AioContext whose event loop runs in the current thread.
+  *
+diff --git a/include/block/block.h b/include/block/block.h
+index 7f5453b45b..0685a73975 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -83,8 +83,14 @@ typedef enum {
+      */
+     BDRV_REQ_SERIALISING        = 0x80,
+ 
++    /*
++     * marks requests comming from external sources,
++     * e.g block requests from dma running in the vCPU thread
++     */
++    BDRV_REQ_EXTERNAL   = 0x100,
++
+     /* Mask of valid flags */
+-    BDRV_REQ_MASK               = 0xff,
++    BDRV_REQ_MASK               = 0xfff,
+ } BdrvRequestFlags;
+ 
+ typedef struct BlockSizes {
+diff --git a/util/async.c b/util/async.c
+index c10642a385..ff1bafd344 100644
+--- a/util/async.c
++++ b/util/async.c
+@@ -441,6 +441,8 @@ AioContext *aio_context_new(Error **errp)
+     ctx->poll_grow = 0;
+     ctx->poll_shrink = 0;
+ 
++    qemu_co_queue_init(&ctx->postponed_reqs);
++
+     return ctx;
+ fail:
+     g_source_destroy(&ctx->source);
+-- 
+2.17.0
