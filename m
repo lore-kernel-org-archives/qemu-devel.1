@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gUYtt-0002hk-5B
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:15:48 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gUYtx-0002ji-AL
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:15:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gUYhz-0001Sv-Qc
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:03:33 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 5 Dec 2018 15:03:18 +0000
-Message-ID: <54a5b82e-f433-4624-d556-72cc9d43dab9@virtuozzo.com>
-References: <20181130220344.3350618-1-eblake@redhat.com>
-	<20181130220344.3350618-3-eblake@redhat.com>
-In-Reply-To: <20181130220344.3350618-3-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3D043480E99E764A905ADADF2827323A@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1gUYfY-0000Aa-Lf
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:01:02 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:47050)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gUYfY-00009y-6O
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:00:56 -0500
+Received: by mail-oi1-x244.google.com with SMTP id x202so17719360oif.13
+	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 07:00:56 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 02/14] nbd/client: More consistent error
- messages
+References: <20181120212553.8480-1-aaron@os.amperecomputing.com>
+	<20181120212553.8480-8-aaron@os.amperecomputing.com>
+	<CAFEAcA92+6NdqpB+L42cu1Ba7qvvHoLkjSDgcEDLvR=iqpd4gg@mail.gmail.com>
+	<20181203204452.GB5549@quinoa.localdomain>
+	<CAFEAcA900U3amGOGRKGNu+-j9EDhdrZ1U1U5MtoW5BeTo74iOQ@mail.gmail.com>
+	<05205391-27bf-c6be-bc71-648eee127c47@linaro.org>
+	<20181205130047.GC5549@quinoa.localdomain>
+In-Reply-To: <20181205130047.GC5549@quinoa.localdomain>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 5 Dec 2018 15:00:43 +0000
+Message-ID: <CAFEAcA8bz20d4LrtEs=iRSJSZ_x5ERU0H0BiYvz4z=+c4v_WvA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v8 07/13] target-arm: Make PMCEID[01]_EL0
+ 64 bit registers, add PMCEID[23]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,62 +35,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Aaron Lindsay <aaron@os.amperecomputing.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 
-MDEuMTIuMjAxOCAxOjAzLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBDb25zb2xpZGF0ZSBvbiB1c2lu
-ZyBkZWNpbWFsIChub3QgaGV4KSBhbmQgb24gb3V0cHV0dGluZyB0aGUNCj4gb3B0aW9uIHJlcGx5
-IG5hbWUgKG5vdCBqdXN0IHZhbHVlKSB3aGVuIHRoZSBjbGllbnQgcmVwb3J0cw0KPiBwcm90b2Nv
-bCBkaXNjcmVwYW5jaWVzIGZyb20gdGhlIHNlcnZlci4gIFdoaWxlIGl0IHdvbid0IGFmZmVjdA0K
-PiBub3JtYWwgb3BlcmF0aW9uLCBpdCBtYWtlcyBkZWJ1Z2dpbmcgYWRkaXRpb25zIGVhc2llci4N
-Cj4gDQo+IFNpZ25lZC1vZmYtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPg0KPiAt
-LS0NCj4gICBuYmQvY2xpZW50LmMgfCAyMSArKysrKysrKysrKystLS0tLS0tLS0NCj4gICAxIGZp
-bGUgY2hhbmdlZCwgMTIgaW5zZXJ0aW9ucygrKSwgOSBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYg
-LS1naXQgYS9uYmQvY2xpZW50LmMgYi9uYmQvY2xpZW50LmMNCj4gaW5kZXggYjRkNDU3YTE5YWQu
-LmI2NjdhMWI1NmZkIDEwMDY0NA0KPiAtLS0gYS9uYmQvY2xpZW50LmMNCj4gKysrIGIvbmJkL2Ns
-aWVudC5jDQo+IEBAIC0xMzIsOCArMTMyLDkgQEAgc3RhdGljIGludCBuYmRfcmVjZWl2ZV9vcHRp
-b25fcmVwbHkoUUlPQ2hhbm5lbCAqaW9jLCB1aW50MzJfdCBvcHQsDQo+ICAgICAgICAgICByZXR1
-cm4gLTE7DQo+ICAgICAgIH0NCj4gICAgICAgaWYgKHJlcGx5LT5vcHRpb24gIT0gb3B0KSB7DQo+
-IC0gICAgICAgIGVycm9yX3NldGcoZXJycCwgIlVuZXhwZWN0ZWQgb3B0aW9uIHR5cGUgJXggZXhw
-ZWN0ZWQgJXgiLA0KPiAtICAgICAgICAgICAgICAgICAgIHJlcGx5LT5vcHRpb24sIG9wdCk7DQo+
-ICsgICAgICAgIGVycm9yX3NldGcoZXJycCwgIlVuZXhwZWN0ZWQgb3B0aW9uIHR5cGUgJXUgKCVz
-KSBleHBlY3RlZCAldSAoJXMpIiwNCj4gKyAgICAgICAgICAgICAgICAgICByZXBseS0+b3B0aW9u
-LCBuYmRfb3B0X2xvb2t1cChyZXBseS0+b3B0aW9uKSwNCj4gKyAgICAgICAgICAgICAgICAgICBv
-cHQsIG5iZF9vcHRfbG9va3VwKG9wdCkpOw0KPiAgICAgICAgICAgbmJkX3NlbmRfb3B0X2Fib3J0
-KGlvYyk7DQo+ICAgICAgICAgICByZXR1cm4gLTE7DQo+ICAgICAgIH0NCj4gQEAgLTI2NSw4ICsy
-NjYsOSBAQCBzdGF0aWMgaW50IG5iZF9yZWNlaXZlX2xpc3QoUUlPQ2hhbm5lbCAqaW9jLCBjb25z
-dCBjaGFyICp3YW50LCBib29sICptYXRjaCwNCj4gICAgICAgICAgIH0NCj4gICAgICAgICAgIHJl
-dHVybiAwOw0KPiAgICAgICB9IGVsc2UgaWYgKHJlcGx5LnR5cGUgIT0gTkJEX1JFUF9TRVJWRVIp
-IHsNCj4gLSAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiVW5leHBlY3RlZCByZXBseSB0eXBlICUi
-IFBSSXgzMiAiIGV4cGVjdGVkICV4IiwNCj4gLSAgICAgICAgICAgICAgICAgICByZXBseS50eXBl
-LCBOQkRfUkVQX1NFUlZFUik7DQo+ICsgICAgICAgIGVycm9yX3NldGcoZXJycCwgIlVuZXhwZWN0
-ZWQgcmVwbHkgdHlwZSAldSAoJXMpIGV4cGVjdGVkICV1ICglcykiLA0KPiArICAgICAgICAgICAg
-ICAgICAgIHJlcGx5LnR5cGUsIG5iZF9yZXBfbG9va3VwKHJlcGx5LnR5cGUpLA0KPiArICAgICAg
-ICAgICAgICAgICAgIE5CRF9SRVBfU0VSVkVSLCBuYmRfcmVwX2xvb2t1cChOQkRfUkVQX1NFUlZF
-UikpOw0KPiAgICAgICAgICAgbmJkX3NlbmRfb3B0X2Fib3J0KGlvYyk7DQo+ICAgICAgICAgICBy
-ZXR1cm4gLTE7DQo+ICAgICAgIH0NCj4gQEAgLTM3OCw5ICszODAsOSBAQCBzdGF0aWMgaW50IG5i
-ZF9vcHRfZ28oUUlPQ2hhbm5lbCAqaW9jLCBjb25zdCBjaGFyICp3YW50bmFtZSwNCj4gICAgICAg
-ICAgICAgICByZXR1cm4gMTsNCj4gICAgICAgICAgIH0NCj4gICAgICAgICAgIGlmIChyZXBseS50
-eXBlICE9IE5CRF9SRVBfSU5GTykgew0KPiAtICAgICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAi
-dW5leHBlY3RlZCByZXBseSB0eXBlICUiIFBSSXUzMg0KPiAtICAgICAgICAgICAgICAgICAgICAg
-ICAiICglcyksIGV4cGVjdGVkICV1IiwNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgcmVwbHku
-dHlwZSwgbmJkX3JlcF9sb29rdXAocmVwbHkudHlwZSksIE5CRF9SRVBfSU5GTyk7DQo+ICsgICAg
-ICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJ1bmV4cGVjdGVkIHJlcGx5IHR5cGUgJXUgKCVzKSwg
-ZXhwZWN0ZWQgJXUgKCVzKSIsDQoNCmhtbSwgd2UgYXJlIGRlZmluaXRlbHkgaW5jb25zaXN0ZW50
-IGFib3V0IGhhdmluZyBjb21tYSBiZWZvcmUgImV4cGVjdGVkIiB3b3JkLi4uDQoNCmFueXdheSwN
-ClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZp
-cnR1b3p6by5jb20+DQoNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgcmVwbHkudHlwZSwgbmJk
-X3JlcF9sb29rdXAocmVwbHkudHlwZSksDQo+ICsgICAgICAgICAgICAgICAgICAgICAgIE5CRF9S
-RVBfSU5GTywgbmJkX3JlcF9sb29rdXAoTkJEX1JFUF9JTkZPKSk7DQo+ICAgICAgICAgICAgICAg
-bmJkX3NlbmRfb3B0X2Fib3J0KGlvYyk7DQo+ICAgICAgICAgICAgICAgcmV0dXJuIC0xOw0KPiAg
-ICAgICAgICAgfQ0KPiBAQCAtNzA0LDggKzcwNiw5IEBAIHN0YXRpYyBpbnQgbmJkX25lZ290aWF0
-ZV9zaW1wbGVfbWV0YV9jb250ZXh0KFFJT0NoYW5uZWwgKmlvYywNCj4gICAgICAgfQ0KPiANCj4g
-ICAgICAgaWYgKHJlcGx5LnR5cGUgIT0gTkJEX1JFUF9BQ0spIHsNCj4gLSAgICAgICAgZXJyb3Jf
-c2V0ZyhlcnJwLCAiVW5leHBlY3RlZCByZXBseSB0eXBlICUiIFBSSXgzMiAiIGV4cGVjdGVkICV4
-IiwNCj4gLSAgICAgICAgICAgICAgICAgICByZXBseS50eXBlLCBOQkRfUkVQX0FDSyk7DQo+ICsg
-ICAgICAgIGVycm9yX3NldGcoZXJycCwgIlVuZXhwZWN0ZWQgcmVwbHkgdHlwZSAldSAoJXMpIGV4
-cGVjdGVkICV1ICglcykiLA0KPiArICAgICAgICAgICAgICAgICAgIHJlcGx5LnR5cGUsIG5iZF9y
-ZXBfbG9va3VwKHJlcGx5LnR5cGUpLA0KPiArICAgICAgICAgICAgICAgICAgIE5CRF9SRVBfQUNL
-LCBuYmRfcmVwX2xvb2t1cChOQkRfUkVQX0FDSykpOw0KPiAgICAgICAgICAgbmJkX3NlbmRfb3B0
-X2Fib3J0KGlvYyk7DQo+ICAgICAgICAgICByZXR1cm4gLTE7DQo+ICAgICAgIH0NCj4gDQoNCg0K
-LS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On Wed, 5 Dec 2018 at 13:00, Aaron Lindsay <aaron@os.amperecomputing.com> wrote:
+>
+> On Dec 03 16:57, Richard Henderson wrote:
+> > Yes.  It would appear that this feature should be controlled by
+> > ID_DFR0.PerfMon.  So,
+> >
+> >   if (FIELD_EX32(cpu->id_dfr0, ID_DFR0, PERFMON) >= 4)
+> >
+> > once the appropriate FIELDs are added to cpu.h.
+> >
+> > Since this test is not used within translate*.c, there is no need to move
+> > id_dfr* into ARMISARegisters.  Since these are only aliases, they do not affect
+> > migration, and so do not (yet) need to be filled in by kvm.
+>
+> Sounds reasonable to me. One clarification - do we also need to guard
+> against the 0b1111 value for ID_DFR0.PerfMon, which implies an
+> implementation-defined, non-PMUv3 PMU, or is it safe to assume no one
+> will attempt that flavor in QEMU?
+
+We should check for 0xf, yes, following the recommended check
+logic described in the Arm ARM section "Alternative ID scheme used
+for the Performance Monitors Extension version". It doesn't
+seem likely that we'll end up with the 0xf case but we might
+as well avoid the question in advance...
+
+thanks
+-- PMM
