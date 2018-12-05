@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gUXkl-0002kG-4k
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 09:02:22 -0500
+	(envelope-from <armbru@redhat.com>) id 1gUXlb-000421-48
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 09:03:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gUXkf-0007Rn-6p
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 09:02:15 -0500
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Wed, 5 Dec 2018 14:01:51 +0000
-Message-ID: <50f8f543-f242-649b-407c-fe7c73b91177@virtuozzo.com>
-References: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
-	<20181203101429.88735-6-anton.nefedov@virtuozzo.com>
-	<c8832c65-4b52-b56f-cd0b-499597a82b11@virtuozzo.com>
-In-Reply-To: <c8832c65-4b52-b56f-cd0b-499597a82b11@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <214BE2B2CDE7844FA1CF15592411471C@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <armbru@redhat.com>) id 1gUXlR-00086p-Kr
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 09:03:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56842)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gUXlR-00085e-CS
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 09:02:57 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AA0053002315
+	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 14:02:56 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
+	<20180706105753.26700-9-marcandre.lureau@redhat.com>
+Date: Wed, 05 Dec 2018 15:02:52 +0100
+In-Reply-To: <20180706105753.26700-9-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Fri, 6 Jul 2018 12:57:34 +0200")
+Message-ID: <87va48rrzn.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v10 5/9] block: treat BDRV_REQ_ALLOCATE as
- serialising
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 08/27] qapi: change enum visitor and
+ gen_enum* to take QAPISchemaMember
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,113 +36,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-DQoNCk9uIDUvMTIvMjAxOCA0OjE0IFBNLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdy
-b3RlOg0KPiAwMy4xMi4yMDE4IDEzOjE0LCBBbnRvbiBOZWZlZG92IHdyb3RlOg0KPj4gVGhlIGlk
-ZWEgaXMgdGhhdCBBTExPQ0FURSByZXF1ZXN0cyBtYXkgb3ZlcmxhcCB3aXRoIG90aGVyIHJlcXVl
-c3RzLg0KPiANCj4gcGxlYXNlLCBkZXNjcmliZSB3aHkNCj4gDQoNCkl0IGlzIG5vdCB1c2VkIGlu
-IHRoaXMgc2VyaWVzIGZyb20gc29tZSBwb2ludCwgYnV0IHRoZSBpZGVhIGlzIHRoYXQgdGhlDQpj
-YWxsZXIgbWlnaHQgdXNlIEFMTE9DQVRFIHJlcXVlc3RzIG9uIGEgbGFyZ2VyIGV4dGVudC4NCg0K
-RGVzY3JpYmVkIGluIHRoZSBzZXJpZXMgaGVhZGVyOg0KDQogICAyLiBtb3Jlb3ZlciwgZWZmaWNp
-ZW50IHdyaXRlX3plcm9lcygpIG9wZXJhdGlvbiBjYW4gYmUgdXNlZCB0bw0KcHJlYWxsb2NhdGUN
-CiAgICAgIHNwYWNlIG1lZ2FieXRlcyAoKmNvbmZpZ3VyYWJsZSBudW1iZXIpIGFoZWFkIHdoaWNo
-IGdpdmVzIG5vdGljZWFibGUNCiAgICAgIGltcHJvdmVtZW50IG9uIHNvbWUgc3RvcmFnZSB0eXBl
-cyAoZS5nLiBkaXN0cmlidXRlZCBzdG9yYWdlKQ0KICAgICAgd2hlcmUgdGhlIHNwYWNlIGFsbG9j
-YXRpb24gb3BlcmF0aW9uIG1pZ2h0IGJlIGV4cGVuc2l2ZSkNCiAgICAgIChOb3QgaW5jbHVkZWQg
-aW4gdGhpcyBwYXRjaHNldCBzaW5jZSB2NikuDQoNClNvLCBpdCdzIHBvc3NpYmxlIHRvIGRyb3Ag
-ZnJvbSB0aGlzIHNlcmllcyBhbmQgYWRkIGxhdGVyIGJ1dCBJJ2QgbGlrZQ0KdG8gcmVjZWl2ZSBn
-ZW5lcmFsIHJlbWFya3Mgb24gd2hldGhlciB0aGlzIGlzIGFuIGFjY2VwdGFibGUgd2F5Lg0KDQo+
-PiBSZXVzZSB0aGUgZXhpc3RpbmcgYmxvY2sgbGF5ZXIgaW5mcmFzdHJ1Y3R1cmUgZm9yIHNlcmlh
-bGlzaW5nIHJlcXVlc3RzLg0KPj4gVXNlIHRoZSBmb2xsb3dpbmcgYXBwcm9hY2g6DQo+PiAgICAg
-LSBtYXJrIEFMTE9DQVRFIGFsc28gU0VSSUFMSVNJTkcsIHNvIHN1YnNlcXVlbnQgcmVxdWVzdHMg
-dG8gdGhlIGFyZWEgd2FpdA0KPj4gICAgIC0gQUxMT0NBVEUgcmVxdWVzdCBpdHNlbGYgbXVzdCBu
-ZXZlciB3YWl0IGlmIGFub3RoZXIgcmVxdWVzdCBpcyBpbiBmbGlnaHQNCj4+ICAgICAgIGFscmVh
-ZHkuIFJldHVybiBFQUdBSU4sIGxldCB0aGUgY2FsbGVyIHJlY29uc2lkZXIuDQo+Pg0KPj4gU2ln
-bmVkLW9mZi1ieTogQW50b24gTmVmZWRvdiA8YW50b24ubmVmZWRvdkB2aXJ0dW96em8uY29tPg0K
-Pj4gLS0tDQo+PiAgICBibG9jay9pby5jIHwgMzEgKysrKysrKysrKysrKysrKysrKysrKysrLS0t
-LS0tLQ0KPj4gICAgMSBmaWxlIGNoYW5nZWQsIDI0IGluc2VydGlvbnMoKyksIDcgZGVsZXRpb25z
-KC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2lvLmMgYi9ibG9jay9pby5jDQo+PiBpbmRl
-eCBkOWQ3NjQ0ODU4Li42ZmY5NDZmNjNkIDEwMDY0NA0KPj4gLS0tIGEvYmxvY2svaW8uYw0KPj4g
-KysrIGIvYmxvY2svaW8uYw0KPj4gQEAgLTcyMCwxMiArNzIwLDEzIEBAIHZvaWQgYmRydl9kZWNf
-aW5fZmxpZ2h0KEJsb2NrRHJpdmVyU3RhdGUgKmJzKQ0KPj4gICAgICAgIGJkcnZfd2FrZXVwKGJz
-KTsNCj4+ICAgIH0NCj4+ICAgIA0KPj4gLXN0YXRpYyBib29sIGNvcm91dGluZV9mbiB3YWl0X3Nl
-cmlhbGlzaW5nX3JlcXVlc3RzKEJkcnZUcmFja2VkUmVxdWVzdCAqc2VsZikNCj4+ICtzdGF0aWMg
-Ym9vbCBjb3JvdXRpbmVfZm4gZmluZF9vcl93YWl0X3NlcmlhbGlzaW5nX3JlcXVlc3RzKA0KPj4g
-KyAgICBCZHJ2VHJhY2tlZFJlcXVlc3QgKnNlbGYsIGJvb2wgd2FpdCkNCj4+ICAgIHsNCj4+ICAg
-ICAgICBCbG9ja0RyaXZlclN0YXRlICpicyA9IHNlbGYtPmJzOw0KPj4gICAgICAgIEJkcnZUcmFj
-a2VkUmVxdWVzdCAqcmVxOw0KPj4gICAgICAgIGJvb2wgcmV0cnk7DQo+PiAtICAgIGJvb2wgd2Fp
-dGVkID0gZmFsc2U7DQo+PiArICAgIGJvb2wgZm91bmQgPSBmYWxzZTsNCj4+ICAgIA0KPj4gICAg
-ICAgIGlmICghYXRvbWljX3JlYWQoJmJzLT5zZXJpYWxpc2luZ19pbl9mbGlnaHQpKSB7DQo+PiAg
-ICAgICAgICAgIHJldHVybiBmYWxzZTsNCj4+IEBAIC03NTEsMTEgKzc1MiwxNCBAQCBzdGF0aWMg
-Ym9vbCBjb3JvdXRpbmVfZm4gd2FpdF9zZXJpYWxpc2luZ19yZXF1ZXN0cyhCZHJ2VHJhY2tlZFJl
-cXVlc3QgKnNlbGYpDQo+PiAgICAgICAgICAgICAgICAgICAgICogd2lsbCB3YWl0IGZvciB1cyBh
-cyBzb29uIGFzIGl0IHdha2VzIHVwLCB0aGVuIGp1c3QgZ28gb24NCj4+ICAgICAgICAgICAgICAg
-ICAgICAgKiAoaW5zdGVhZCBvZiBwcm9kdWNpbmcgYSBkZWFkbG9jayBpbiB0aGUgZm9ybWVyIGNh
-c2UpLiAqLw0KPj4gICAgICAgICAgICAgICAgICAgIGlmICghcmVxLT53YWl0aW5nX2Zvcikgew0K
-Pj4gKyAgICAgICAgICAgICAgICAgICAgZm91bmQgPSB0cnVlOw0KPj4gKyAgICAgICAgICAgICAg
-ICAgICAgaWYgKCF3YWl0KSB7DQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgYnJlYWs7DQo+
-PiArICAgICAgICAgICAgICAgICAgICB9DQo+PiAgICAgICAgICAgICAgICAgICAgICAgIHNlbGYt
-PndhaXRpbmdfZm9yID0gcmVxOw0KPj4gICAgICAgICAgICAgICAgICAgICAgICBxZW11X2NvX3F1
-ZXVlX3dhaXQoJnJlcS0+d2FpdF9xdWV1ZSwgJmJzLT5yZXFzX2xvY2spOw0KPj4gICAgICAgICAg
-ICAgICAgICAgICAgICBzZWxmLT53YWl0aW5nX2ZvciA9IE5VTEw7DQo+PiAgICAgICAgICAgICAg
-ICAgICAgICAgIHJldHJ5ID0gdHJ1ZTsNCj4+IC0gICAgICAgICAgICAgICAgICAgIHdhaXRlZCA9
-IHRydWU7DQo+PiAgICAgICAgICAgICAgICAgICAgICAgIGJyZWFrOw0KPj4gICAgICAgICAgICAg
-ICAgICAgIH0NCj4+ICAgICAgICAgICAgICAgIH0NCj4+IEBAIC03NjMsNyArNzY3LDEyIEBAIHN0
-YXRpYyBib29sIGNvcm91dGluZV9mbiB3YWl0X3NlcmlhbGlzaW5nX3JlcXVlc3RzKEJkcnZUcmFj
-a2VkUmVxdWVzdCAqc2VsZikNCj4+ICAgICAgICAgICAgcWVtdV9jb19tdXRleF91bmxvY2soJmJz
-LT5yZXFzX2xvY2spOw0KPj4gICAgICAgIH0gd2hpbGUgKHJldHJ5KTsNCj4+ICAgIA0KPj4gLSAg
-ICByZXR1cm4gd2FpdGVkOw0KPj4gKyAgICByZXR1cm4gZm91bmQ7DQo+PiArfQ0KPj4gKw0KPj4g
-K3N0YXRpYyBib29sIGNvcm91dGluZV9mbiB3YWl0X3NlcmlhbGlzaW5nX3JlcXVlc3RzKEJkcnZU
-cmFja2VkUmVxdWVzdCAqc2VsZikNCj4+ICt7DQo+PiArICAgIHJldHVybiBmaW5kX29yX3dhaXRf
-c2VyaWFsaXNpbmdfcmVxdWVzdHMoc2VsZiwgdHJ1ZSk7DQo+PiAgICB9DQo+PiAgICANCj4+ICAg
-IHN0YXRpYyBpbnQgYmRydl9jaGVja19ieXRlX3JlcXVlc3QoQmxvY2tEcml2ZXJTdGF0ZSAqYnMs
-IGludDY0X3Qgb2Zmc2V0LA0KPj4gQEAgLTE1ODUsNyArMTU5NCw3IEBAIGJkcnZfY29fd3JpdGVf
-cmVxX3ByZXBhcmUoQmRydkNoaWxkICpjaGlsZCwgaW50NjRfdCBvZmZzZXQsIHVpbnQ2NF90IGJ5
-dGVzLA0KPj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICBCZHJ2VHJhY2tlZFJlcXVlc3Qg
-KnJlcSwgaW50IGZsYWdzKQ0KPj4gICAgew0KPj4gICAgICAgIEJsb2NrRHJpdmVyU3RhdGUgKmJz
-ID0gY2hpbGQtPmJzOw0KPj4gLSAgICBib29sIHdhaXRlZDsNCj4+ICsgICAgYm9vbCBmb3VuZDsN
-Cj4+ICAgICAgICBpbnQ2NF90IGVuZF9zZWN0b3IgPSBESVZfUk9VTkRfVVAob2Zmc2V0ICsgYnl0
-ZXMsIEJEUlZfU0VDVE9SX1NJWkUpOw0KPj4gICAgDQo+PiAgICAgICAgaWYgKGJzLT5yZWFkX29u
-bHkpIHsNCj4+IEBAIC0xNjAyLDkgKzE2MTEsMTMgQEAgYmRydl9jb193cml0ZV9yZXFfcHJlcGFy
-ZShCZHJ2Q2hpbGQgKmNoaWxkLCBpbnQ2NF90IG9mZnNldCwgdWludDY0X3QgYnl0ZXMsDQo+PiAg
-ICAgICAgICAgIG1hcmtfcmVxdWVzdF9zZXJpYWxpc2luZyhyZXEsIGJkcnZfZ2V0X2NsdXN0ZXJf
-c2l6ZShicykpOw0KPj4gICAgICAgIH0NCj4+ICAgIA0KPj4gLSAgICB3YWl0ZWQgPSB3YWl0X3Nl
-cmlhbGlzaW5nX3JlcXVlc3RzKHJlcSk7DQo+PiArICAgIGZvdW5kID0gZmluZF9vcl93YWl0X3Nl
-cmlhbGlzaW5nX3JlcXVlc3RzKHJlcSwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIShmbGFncyAmIEJEUlZfUkVRX0FMTE9DQVRFKSk7DQo+PiArICAg
-IGlmIChmb3VuZCAmJiAoZmxhZ3MgJiBCRFJWX1JFUV9BTExPQ0FURSkpIHsNCj4+ICsgICAgICAg
-IHJldHVybiAtRUFHQUlOOw0KPj4gKyAgICB9DQo+PiAgICANCj4+IC0gICAgYXNzZXJ0KCF3YWl0
-ZWQgfHwgIXJlcS0+c2VyaWFsaXNpbmcgfHwNCj4+ICsgICAgYXNzZXJ0KCFmb3VuZCB8fCAhcmVx
-LT5zZXJpYWxpc2luZyB8fA0KPj4gICAgICAgICAgICAgICBpc19yZXF1ZXN0X3NlcmlhbGlzaW5n
-X2FuZF9hbGlnbmVkKHJlcSkpOw0KPj4gICAgICAgIGFzc2VydChyZXEtPm92ZXJsYXBfb2Zmc2V0
-IDw9IG9mZnNldCk7DQo+PiAgICAgICAgYXNzZXJ0KG9mZnNldCArIGJ5dGVzIDw9IHJlcS0+b3Zl
-cmxhcF9vZmZzZXQgKyByZXEtPm92ZXJsYXBfYnl0ZXMpOw0KPj4gQEAgLTE4NjYsNiArMTg3OSwx
-MCBAQCBpbnQgY29yb3V0aW5lX2ZuIGJkcnZfY29fcHdyaXRldihCZHJ2Q2hpbGQgKmNoaWxkLA0K
-Pj4gICAgICAgIGFzc2VydCghKChmbGFncyAmIEJEUlZfUkVRX0FMTE9DQVRFKSAmJiAoZmxhZ3Mg
-JiBCRFJWX1JFUV9NQVlfVU5NQVApKSk7DQo+PiAgICAgICAgYXNzZXJ0KCEoKGZsYWdzICYgQkRS
-Vl9SRVFfQUxMT0NBVEUpICYmICEoZmxhZ3MgJiBCRFJWX1JFUV9aRVJPX1dSSVRFKSkpOw0KPj4g
-ICAgDQo+PiArICAgIGlmIChmbGFncyAmIEJEUlZfUkVRX0FMTE9DQVRFKSB7DQo+PiArICAgICAg
-ICBmbGFncyB8PSBCRFJWX1JFUV9TRVJJQUxJU0lORzsNCj4+ICsgICAgfQ0KPj4gKw0KPj4gICAg
-ICAgIHRyYWNlX2JkcnZfY29fcHdyaXRldihjaGlsZC0+YnMsIG9mZnNldCwgYnl0ZXMsIGZsYWdz
-KTsNCj4+ICAgIA0KPj4gICAgICAgIGlmICghYnMtPmRydikgew0KPj4NCj4gDQo+IHBhdGNoIGxv
-b2tzIGNvcnJlY3QgdGVjaG5pY2FsbHksIEkganVzdCBkb24ndCBrbm93IHRoZSByZWFzb25pbmcu
-Lg0KPiANCj4gdGhlIG9ubHkgdGhpbmcsIGlzIHRoYXQgaXQgd291bGQgYmUgZ29vZCB0byBhZGQg
-YSBjb21tZW50IGluIEJEUlYgZmxhZ3MgZGVmaW5pdGlvbiBzZWN0aW9uLCB0aGF0IF9BTExPQ0FU
-RSBpbXBsaWVzIF9TRVJJQUxJWkUuDQo+IA0KPiANCg0KSSBzZWUgeW91ciBwb2ludCwgYnV0IGl0
-IGRvZXMgbm90IGltcGx5IFNFUklBTElaRSBpbiBzZW5zZSB0aGF0IHRoZQ0KY2FsbGVyIG11c3Qg
-c2V0IGJvdGggKGFzIHdpdGggQUxMT0NBVEUgYW5kIFdSSVRFX1pFUk9FUykgLSBpdCdzIHNldA0K
-aW1wbGljaXRseS4NCg0KbWF5YmU6DQoNCmRpZmYgLS1naXQgYS9pbmNsdWRlL2Jsb2NrL2Jsb2Nr
-LmggYi9pbmNsdWRlL2Jsb2NrL2Jsb2NrLmgNCmluZGV4IGY1NzEwODI0MTUuLmEwYmYzZmVkOTMg
-MTAwNjQ0DQotLS0gYS9pbmNsdWRlL2Jsb2NrL2Jsb2NrLmgNCisrKyBiL2luY2x1ZGUvYmxvY2sv
-YmxvY2suaA0KQEAgLTg3LDYgKzg3LDkgQEAgdHlwZWRlZiBlbnVtIHsNCiAgICAgICAqIGVmZmlj
-aWVudGx5IGFsbG9jYXRlIHRoZSBzcGFjZSBzbyBpdCByZWFkcyBhcyB6ZXJvZXMsIG9yIHJldHVy
-biANCmFuIGVycm9yLg0KICAgICAgICogSWYgdGhpcyBmbGFnIGlzIHNldCB0aGVuIEJEUlZfUkVR
-X1pFUk9fV1JJVEUgbXVzdCBhbHNvIGJlIHNldC4NCiAgICAgICAqIFRoaXMgZmxhZyBjYW5ub3Qg
-YmUgc2V0IHRvZ2V0aGVyIHdpdGggQkRSVl9SRVFfTUFZX1VOTUFQLg0KKyAgICAgKiBUaGlzIGZs
-YWcgaW1wbGljaXRseSBiZWhhdmVzIGFzIEJEUlZfUkVRX1NFUklBTElTSU5HIGkuZS4gaXQgaXMN
-CisgICAgICogcHJvdGVjdGVkIGZyb20gY29uZmxpY3RzIHdpdGggb3ZlcmxhcHBpbmcgcmVxdWVz
-dHMuIElmIHN1Y2ggDQpjb25mbGljdCBpcw0KKyAgICAgKiBkZXRlY3RlZCwgLUVBR0FJTiBpcyBy
-ZXR1cm5lZC4NCiAgICAgICAqLw0KICAgICAgQkRSVl9SRVFfQUxMT0NBVEUgICAgICAgICAgID0g
-MHgxMDAsDQoNCg0K
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+
+> This will allow to add and access more properties associated with enum
+> values/members, like the associated 'if' condition. We may want to
+> have a specialized type QAPISchemaEnumMember, for now this will do.
+
+Well, we can add all we want without this patch.  The patch is about
+enabling access in visit_enum_type() and ...
+
+> While at it, also modify gen_enum() and gen_enum_lookup() for the
+> same reason.
+
+... these two helpers.  Worthwhile if later patches need such access.
+We'll see.
+
+> Suggested-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi/common.py         | 22 +++++++++++-----------
+>  scripts/qapi/doc.py            |  2 +-
+>  scripts/qapi/events.py         |  2 +-
+>  scripts/qapi/introspect.py     |  5 +++--
+>  scripts/qapi/types.py          |  6 +++---
+>  scripts/qapi/visit.py          |  2 +-
+>  tests/qapi-schema/test-qapi.py |  4 ++--
+>  7 files changed, 22 insertions(+), 21 deletions(-)
+>
+> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+> index 7020b88abc..a353670079 100644
+> --- a/scripts/qapi/common.py
+> +++ b/scripts/qapi/common.py
+> @@ -1063,7 +1063,7 @@ class QAPISchemaVisitor(object):
+>      def visit_builtin_type(self, name, info, json_type):
+>          pass
+>=20=20
+> -    def visit_enum_type(self, name, info, ifcond, values, prefix):
+> +    def visit_enum_type(self, name, info, ifcond, members, prefix):
+>          pass
+>=20=20
+>      def visit_array_type(self, name, info, ifcond, element_type):
+> @@ -1193,7 +1193,7 @@ class QAPISchemaEnumType(QAPISchemaType):
+>=20=20
+>      def visit(self, visitor):
+>          visitor.visit_enum_type(self.name, self.info, self.ifcond,
+> -                                self.member_names(), self.prefix)
+> +                                self.members, self.prefix)
+>=20=20
+>=20=20
+
+Just two uses of QAPISchemaType.member_names() left.  See also below.
+
+>  class QAPISchemaArrayType(QAPISchemaType):
+> @@ -2012,19 +2012,19 @@ def _wrap_ifcond(ifcond, before, after):
+>      return out
+>=20=20
+>=20=20
+> -def gen_enum_lookup(name, values, prefix=3DNone):
+> +def gen_enum_lookup(name, members, prefix=3DNone):
+>      ret =3D mcgen('''
+>=20=20
+>  const QEnumLookup %(c_name)s_lookup =3D {
+>      .array =3D (const char *const[]) {
+>  ''',
+>                  c_name=3Dc_name(name))
+> -    for value in values:
+> -        index =3D c_enum_const(name, value, prefix)
+> +    for m in members:
+> +        index =3D c_enum_const(name, m.name, prefix)
+>          ret +=3D mcgen('''
+> -        [%(index)s] =3D "%(value)s",
+> +        [%(index)s] =3D "%(name)s",
+>  ''',
+> -                     index=3Dindex, value=3Dvalue)
+> +                     index=3Dindex, name=3Dm.name)
+>=20=20
+>      ret +=3D mcgen('''
+>      },
+> @@ -2035,9 +2035,9 @@ const QEnumLookup %(c_name)s_lookup =3D {
+>      return ret
+>=20=20
+>=20=20
+> -def gen_enum(name, values, prefix=3DNone):
+> +def gen_enum(name, members, prefix=3DNone):
+>      # append automatically generated _MAX value
+> -    enum_values =3D values + ['_MAX']
+> +    enum_members =3D members + [QAPISchemaMember('_MAX')]
+>=20=20
+>      ret =3D mcgen('''
+>=20=20
+> @@ -2045,11 +2045,11 @@ typedef enum %(c_name)s {
+>  ''',
+>                  c_name=3Dc_name(name))
+>=20=20
+> -    for value in enum_values:
+> +    for m in enum_members:
+>          ret +=3D mcgen('''
+>      %(c_enum)s,
+>  ''',
+> -                     c_enum=3Dc_enum_const(name, value, prefix))
+> +                     c_enum=3Dc_enum_const(name, m.name, prefix))
+>=20=20
+>      ret +=3D mcgen('''
+>  } %(c_name)s;
+> diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
+> index 987fd3c943..76cb186ff9 100755
+> --- a/scripts/qapi/doc.py
+> +++ b/scripts/qapi/doc.py
+> @@ -206,7 +206,7 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
+isitor):
+>      def write(self, output_dir):
+>          self._gen.write(output_dir, self._prefix + 'qapi-doc.texi')
+>=20=20
+> -    def visit_enum_type(self, name, info, ifcond, values, prefix):
+> +    def visit_enum_type(self, name, info, ifcond, members, prefix):
+>          doc =3D self.cur_doc
+>          self._gen.add(TYPE_FMT(type=3D'Enum',
+>                                 name=3Ddoc.symbol,
+> diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
+> index 764ef177ab..ea4dac6a05 100644
+> --- a/scripts/qapi/events.py
+> +++ b/scripts/qapi/events.py
+> @@ -189,7 +189,7 @@ class QAPISchemaGenEventVisitor(QAPISchemaModularCVis=
+itor):
+>              self._genh.add(gen_event_send_decl(name, arg_type, boxed))
+>              self._genc.add(gen_event_send(name, arg_type, boxed,
+>                                            self._enum_name))
+> -        self._event_names.append(name)
+> +        self._event_names.append(QAPISchemaMember(name))
+>=20=20
+>=20=20
+
+Rename ._event_names to ._event_enum_members?
+
+May want to rename .enum_name to ._event_enum_name then.
+
+>  def gen_events(schema, output_dir, prefix):
+> diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+> index 71d4a779ce..3f1ca99f6d 100644
+> --- a/scripts/qapi/introspect.py
+> +++ b/scripts/qapi/introspect.py
+> @@ -160,8 +160,9 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+>      def visit_builtin_type(self, name, info, json_type):
+>          self._gen_qlit(name, 'builtin', {'json-type': json_type}, [])
+>=20=20
+> -    def visit_enum_type(self, name, info, ifcond, values, prefix):
+> -        self._gen_qlit(name, 'enum', {'values': values}, ifcond)
+> +    def visit_enum_type(self, name, info, ifcond, members, prefix):
+> +        self._gen_qlit(name, 'enum',
+> +                       {'values': [m.name for m in members]}, ifcond)
+
+Can't use QAPISchemaEnumType.member_names() here, since we don't have
+the QAPISchemaEnumType, only its .members.
+
+>=20=20
+>      def visit_array_type(self, name, info, ifcond, element_type):
+>          element =3D self._use_type(element_type)
+> diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
+> index 91f87d0b8f..2d4a70f810 100644
+> --- a/scripts/qapi/types.py
+> +++ b/scripts/qapi/types.py
+> @@ -213,10 +213,10 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVi=
+sitor):
+>          self._genh.add(gen_type_cleanup_decl(name))
+>          self._genc.add(gen_type_cleanup(name))
+>=20=20
+> -    def visit_enum_type(self, name, info, ifcond, values, prefix):
+> +    def visit_enum_type(self, name, info, ifcond, members, prefix):
+>          with ifcontext(ifcond, self._genh, self._genc):
+> -            self._genh.preamble_add(gen_enum(name, values, prefix))
+> -            self._genc.add(gen_enum_lookup(name, values, prefix))
+> +            self._genh.preamble_add(gen_enum(name, members, prefix))
+> +            self._genc.add(gen_enum_lookup(name, members, prefix))
+>=20=20
+>      def visit_array_type(self, name, info, ifcond, element_type):
+>          with ifcontext(ifcond, self._genh, self._genc):
+> diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
+> index 460cf12989..24f85a2e85 100644
+> --- a/scripts/qapi/visit.py
+> +++ b/scripts/qapi/visit.py
+> @@ -310,7 +310,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaModularCVis=
+itor):
+>  ''',
+>                                        types=3Dtypes))
+>=20=20
+> -    def visit_enum_type(self, name, info, ifcond, values, prefix):
+> +    def visit_enum_type(self, name, info, ifcond, members, prefix):
+>          with ifcontext(ifcond, self._genh, self._genc):
+>              self._genh.add(gen_visit_decl(name, scalar=3DTrue))
+>              self._genc.add(gen_visit_enum(name))
+> diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
+.py
+> index cea21c773a..27f776693e 100644
+> --- a/tests/qapi-schema/test-qapi.py
+> +++ b/tests/qapi-schema/test-qapi.py
+> @@ -23,8 +23,8 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+>      def visit_include(self, name, info):
+>          print('include %s' % name)
+>=20=20
+> -    def visit_enum_type(self, name, info, ifcond, values, prefix):
+> -        print('enum %s %s' % (name, values))
+> +    def visit_enum_type(self, name, info, ifcond, members, prefix):
+> +        print('enum %s %s' % (name, [m.name for m in members]))
+>          if prefix:
+>              print('    prefix %s' % prefix)
+>          self._print_if(ifcond)
+
+Likewise.
+
+Perhaps we can get rid of .member_names().  Not this patch's business,
+of course.
+
+Assuming later patches make use of this:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
