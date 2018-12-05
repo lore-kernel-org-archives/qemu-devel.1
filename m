@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gUZHk-0007Sm-Ba
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:40:29 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1gUZK3-0001bn-Mb
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:42:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gUZHe-0007pA-Ds
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:40:24 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 5 Dec 2018 15:40:06 +0000
-Message-ID: <25e2852c-7bf8-dadd-8c0d-32c2229ed187@virtuozzo.com>
-References: <20181130220344.3350618-1-eblake@redhat.com>
-	<20181130220344.3350618-5-eblake@redhat.com>
-In-Reply-To: <20181130220344.3350618-5-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0C9B03E553D9F144B91E92E786AE6560@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <alex.williamson@redhat.com>) id 1gUZJz-0001BG-JV
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:42:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39168)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1gUZJz-0001Au-Bl
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:42:43 -0500
+Date: Wed, 5 Dec 2018 08:42:40 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20181205084240.122d7626@x1.home>
+In-Reply-To: <20181205093221.206dc18d.cohuck@redhat.com>
+References: <154394083644.28192.8501647946108201466.stgit@gimli.home>
+	<154394987445.795.4102526920089904508.stgit@gimli.home>
+	<6bc68937-ec9e-d28f-9468-5ee9ba08ef52@de.ibm.com>
+	<20181204122647.3a560066@x1.home>
+	<CAFEAcA_5tDfoPZaPcheMGUyq_ibbvT+GE8WKgXnHf8SnxioPvA@mail.gmail.com>
+	<20181204125621.0ad30dc0@x1.home>
+	<20181205093221.206dc18d.cohuck@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 04/14] qemu-nbd: Simplify --partition
- handling
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [for-4.0 PATCH v3.1 8/9] q35/440fx/arm/spapr/ccw:
+ Add QEMU 4.0 machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,48 +34,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Christian Borntraeger <borntraeger@de.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, "Michael
+	S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@gmail.com>
 
-MDEuMTIuMjAxOCAxOjAzLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBPdXIgb3Blbi1jb2Rpbmcgb2Yg
-c3RydG9sIGhhbmRsaW5nIGZvcmdvdCB0byBoYW5kbGUgb3ZlcmZsb3cNCj4gY29uZGl0aW9ucy4g
-V2hhdCdzIG1vcmUsIHNpbmNlIHdlIGluc2lzdGUgb24gYSB1c2VyLXN1cHBsaWVkDQo+IHBhcnRp
-dGlvbiB0byBiZSBub24temVybywgd2UgY2FuIHVzZSAwIHJhdGhlciB0aGFuIC0xIGZvciBvdXIN
-Cj4gaW5pdGlhbCB2YWx1ZSB0byBkaXN0aW5ndWlzaCB3aGVuIGEgcGFydGl0aW9uIGlzIG5vdCBi
-ZWluZw0KPiBzZXJ2ZWQsIGZvciBzbGlnaHRseSBtb3JlIG9wdGltYWwgY29kZS4NCj4gDQo+IFNp
-Z25lZC1vZmYtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPg0KPiAtLS0NCj4gICBx
-ZW11LW5iZC5jIHwgMTQgKysrKystLS0tLS0tLS0NCj4gICAxIGZpbGUgY2hhbmdlZCwgNSBpbnNl
-cnRpb25zKCspLCA5IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL3FlbXUtbmJkLmMg
-Yi9xZW11LW5iZC5jDQo+IGluZGV4IDU1ZTI5YmQ5YTdlLi44NjZlNjQ3NzlmMSAxMDA2NDQNCj4g
-LS0tIGEvcWVtdS1uYmQuYw0KPiArKysgYi9xZW11LW5iZC5jDQo+IEBAIC01NDYsNyArNTQ2LDcg
-QEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KQ0KPiAgICAgICBpbnQgb3B0X2luZCA9
-IDA7DQo+ICAgICAgIGNoYXIgKmVuZDsNCj4gICAgICAgaW50IGZsYWdzID0gQkRSVl9PX1JEV1I7
-DQo+IC0gICAgaW50IHBhcnRpdGlvbiA9IC0xOw0KPiArICAgIGludCBwYXJ0aXRpb24gPSAwOw0K
-PiAgICAgICBpbnQgcmV0ID0gMDsNCj4gICAgICAgYm9vbCBzZWVuX2NhY2hlID0gZmFsc2U7DQo+
-ICAgICAgIGJvb2wgc2Vlbl9kaXNjYXJkID0gZmFsc2U7DQo+IEBAIC02ODUsMTMgKzY4NSw5IEBA
-IGludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJndikNCj4gICAgICAgICAgICAgICBmbGFncyAm
-PSB+QkRSVl9PX1JEV1I7DQo+ICAgICAgICAgICAgICAgYnJlYWs7DQo+ICAgICAgICAgICBjYXNl
-ICdQJzoNCj4gLSAgICAgICAgICAgIHBhcnRpdGlvbiA9IHN0cnRvbChvcHRhcmcsICZlbmQsIDAp
-Ow0KPiAtICAgICAgICAgICAgaWYgKCplbmQpIHsNCj4gLSAgICAgICAgICAgICAgICBlcnJvcl9y
-ZXBvcnQoIkludmFsaWQgcGFydGl0aW9uIGAlcyciLCBvcHRhcmcpOw0KPiAtICAgICAgICAgICAg
-ICAgIGV4aXQoRVhJVF9GQUlMVVJFKTsNCj4gLSAgICAgICAgICAgIH0NCj4gLSAgICAgICAgICAg
-IGlmIChwYXJ0aXRpb24gPCAxIHx8IHBhcnRpdGlvbiA+IDgpIHsNCj4gLSAgICAgICAgICAgICAg
-ICBlcnJvcl9yZXBvcnQoIkludmFsaWQgcGFydGl0aW9uICVkIiwgcGFydGl0aW9uKTsNCj4gKyAg
-ICAgICAgICAgIGlmIChxZW11X3N0cnRvaShvcHRhcmcsIE5VTEwsIDAsICZwYXJ0aXRpb24pIDwg
-MCB8fA0KDQpJIGRlY2lkZWQgdG8gbG9vayBpbnRvIHFlbXVfc3RydG9pLCBobW0uDQoNCmlzIGl0
-IHBvc3NpYmxlLCB0aGF0ICJjaGFyICplcCIgcmVtYWlucyB1bmluaXRpYWxpemVkLCBhbmQgdGhh
-biB3ZSBhY2Nlc3MNCml0IGluIGNoZWNrX3N0cnRveF9lcnJvcj8gSSBkb24ncyBzZWUgaW4gc3Ry
-dG9sIHNwZWMgYSBndWFyYW50ZWUgb2Ygc2V0dGluZw0KZW5kcHRyIG9uIGZhaWx1cmUgcGF0aC4N
-Cg0KDQo+ICsgICAgICAgICAgICAgICAgcGFydGl0aW9uIDwgMSB8fCBwYXJ0aXRpb24gPiA4KSB7
-DQoNCmRvbid0IHlvdSBsaWtlIGJyYWNlIG9uIHNlcGFyYXRlIGxpbmUgYWZ0ZXIgbXVsdGktbGlu
-ZSBjb25kaXRpb25zPw0KDQo+ICsgICAgICAgICAgICAgICAgZXJyb3JfcmVwb3J0KCJJbnZhbGlk
-IHBhcnRpdGlvbiAlcyIsIG9wdGFyZyk7DQo+ICAgICAgICAgICAgICAgICAgIGV4aXQoRVhJVF9G
-QUlMVVJFKTsNCj4gICAgICAgICAgICAgICB9DQo+ICAgICAgICAgICAgICAgYnJlYWs7DQo+IEBA
-IC0xMDA0LDcgKzEwMDAsNyBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3YpDQo+ICAg
-ICAgIH0NCj4gICAgICAgZmRfc2l6ZSAtPSBkZXZfb2Zmc2V0Ow0KPiANCj4gLSAgICBpZiAocGFy
-dGl0aW9uICE9IC0xKSB7DQo+ICsgICAgaWYgKHBhcnRpdGlvbikgew0KPiAgICAgICAgICAgcmV0
-ID0gZmluZF9wYXJ0aXRpb24oYmxrLCBwYXJ0aXRpb24sICZkZXZfb2Zmc2V0LCAmZmRfc2l6ZSk7
-DQo+ICAgICAgICAgICBpZiAocmV0IDwgMCkgew0KPiAgICAgICAgICAgICAgIGVycm9yX3JlcG9y
-dCgiQ291bGQgbm90IGZpbmQgcGFydGl0aW9uICVkOiAlcyIsIHBhcnRpdGlvbiwNCj4gDQoNClJl
-dmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1
-b3p6by5jb20+DQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+On Wed, 5 Dec 2018 09:32:21 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
+
+> On Tue, 4 Dec 2018 12:56:21 -0700
+> Alex Williamson <alex.williamson@redhat.com> wrote:
+>=20
+> > On Tue, 4 Dec 2018 19:29:25 +0000
+> > Peter Maydell <peter.maydell@linaro.org> wrote:
+> >  =20
+> > > On Tue, 4 Dec 2018 at 19:26, Alex Williamson <alex.williamson@redhat.=
+com> wrote:   =20
+> > > >
+> > > > On Tue, 4 Dec 2018 20:16:44 +0100
+> > > > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> > > >     =20
+> > > > > I think Conny has already added the s390/ccw part to her next tre=
+e.
+> > > > > From a quick glimpse both patches look identical.     =20
+> > > >
+> > > > If so then we can just use the original v3 version of this patch th=
+at
+> > > > touches all but ccw and let them come together in mainline.  My
+> > > > assumption is that Peter is only trying to make sure all versioned
+> > > > machines are updated early in this release, not necessarily that
+> > > > they need to be updated together.     =20
+> > >=20
+> > > Yes, that's the idea. I also think it's a suboptimal idea
+> > > to include the version-number-bump patch in a series that's
+> > > adding some feature, because then if the feature itself
+> > > has to go through several rounds of patch review the
+> > > version-number-bump patch is stuck unapplied (we saw that
+> > > at the end of the 3.1 cycle), or it gets bumped by some
+> > > other unrelated series and then there's a merge conflict.
+> > > But that's more of a things-for-next time remark, no need
+> > > to rearrange this now.   =20
+> >=20
+> > If you and the other stakeholders agree, you are more than welcome to
+> > pluck this patch from the series and apply it as soon as 4.0 opens.  It
+> > might make things a tiny bit easier down the road to avoid the
+> > conflicts since we seem to have multiple contenders vying for this
+> > update.  Maybe the best practice going forward is to open the merge
+> > window with such a commit.  Thanks, =20
+>=20
+> FWIW, I had planned to send a pull request with what is in my queue
+> (including the new machine type) first thing after 4.0 opens.
+>=20
+> For the next release: Should we always create a patch like this that
+> adds the new type for all machines and queue this as the first thing
+> when the tree opens again? (I'd even be willing to do that...) For this
+> release, I would prefer to use the already-existing patches instead.
+
+Ok, so we'll stick with the original v3 version that didn't include ccw
+and Marc-Andr=C3=A9's series and this one can fight it out for the rest of
+the versioned machines.  Please disregard this v3.1 patch including
+ccw.  Thanks,
+
+Alex
