@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUWgu-0002aR-GF
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:54:13 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gUWgv-0002bF-Db
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:54:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUWgr-0006SO-8o
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:54:12 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:50486)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUWgq-0006Pp-Rb
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:54:09 -0500
-From: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Wed, 05 Dec 2018 15:54:06 +0300
-Message-ID: <154401444645.8440.3305927246229082639.stgit@Misha-PC.lan02.inno>
-In-Reply-To: <154401431697.8440.845616703562380651.stgit@Misha-PC.lan02.inno>
-References: <154401431697.8440.845616703562380651.stgit@Misha-PC.lan02.inno>
+	(envelope-from <cohuck@redhat.com>) id 1gUWgs-0006U3-Rz
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:54:13 -0500
+Date: Wed, 5 Dec 2018 13:54:02 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181205135402.33c2b22d.cohuck@redhat.com>
+In-Reply-To: <20181204160236.54de2784@oc2783563651>
+References: <20181122165432.4437-1-cohuck@redhat.com>
+	<20181204133810.66e8cfe5@oc2783563651>
+	<20181204141130.06496b9b.cohuck@redhat.com>
+	<20181204160236.54de2784@oc2783563651>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 2 22/39] windbg: some kernel structures
+Subject: Re: [Qemu-devel] [PATCH 0/3] vfio-ccw: support hsch/csch (kernel
+ part)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,266 +26,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org, Farhan Ali <alifm@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Jason
+	J . Herne" <jjherne@linux.ibm.com>
 
-Signed-off-by: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
-Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
----
- target/i386/windbgstub.c |  243 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 243 insertions(+)
+On Tue, 4 Dec 2018 16:02:36 +0100
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
-diff --git a/target/i386/windbgstub.c b/target/i386/windbgstub.c
-index 37c5805818..5d47d5c9e9 100644
---- a/target/i386/windbgstub.c
-+++ b/target/i386/windbgstub.c
-@@ -30,6 +30,249 @@
- #define TARGET_SAFE(i386_obj, x86_64_obj) i386_obj
- #endif /* TARGET_I386 */
- 
-+/*
-+ * Next code copied from winnt.h
-+ */
-+#ifdef TARGET_X86_64
-+
-+#define CPU_CONTEXT_AMD64 0x100000
-+
-+#define CPU_CONTEXT_CONTROL (CPU_CONTEXT_AMD64 | 0x1)
-+#define CPU_CONTEXT_INTEGER (CPU_CONTEXT_AMD64 | 0x2)
-+#define CPU_CONTEXT_SEGMENTS (CPU_CONTEXT_AMD64 | 0x4)
-+#define CPU_CONTEXT_FLOATING_POINT (CPU_CONTEXT_AMD64 | 0x8)
-+#define CPU_CONTEXT_DEBUG_REGISTERS (CPU_CONTEXT_AMD64 | 0x10)
-+
-+#define CPU_CONTEXT_FULL \
-+    (CPU_CONTEXT_CONTROL | CPU_CONTEXT_INTEGER | CPU_CONTEXT_FLOATING_POINT)
-+#define CPU_CONTEXT_ALL \
-+    (CPU_CONTEXT_FULL | CPU_CONTEXT_SEGMENTS | CPU_CONTEXT_DEBUG_REGISTERS)
-+
-+typedef struct _CPU_DESCRIPTOR {
-+    uint16_t Pad[3];
-+    uint16_t Limit;
-+    uint64_t Base;
-+} CPU_DESCRIPTOR, *PCPU_DESCRIPTOR;
-+
-+typedef struct _CPU_KSPECIAL_REGISTERS {
-+    uint64_t Cr0;
-+    uint64_t Cr2;
-+    uint64_t Cr3;
-+    uint64_t Cr4;
-+    uint64_t KernelDr0;
-+    uint64_t KernelDr1;
-+    uint64_t KernelDr2;
-+    uint64_t KernelDr3;
-+    uint64_t KernelDr6;
-+    uint64_t KernelDr7;
-+    CPU_DESCRIPTOR Gdtr;
-+    CPU_DESCRIPTOR Idtr;
-+    uint16_t Tr;
-+    uint16_t Ldtr;
-+    uint32_t MxCsr;
-+    uint64_t DebugControl;
-+    uint64_t LastBranchToRip;
-+    uint64_t LastBranchFromRip;
-+    uint64_t LastExceptionToRip;
-+    uint64_t LastExceptionFromRip;
-+    uint64_t Cr8;
-+    uint64_t MsrGsBase;
-+    uint64_t MsrGsSwap;
-+    uint64_t MsrStar;
-+    uint64_t MsrLStar;
-+    uint64_t MsrCStar;
-+    uint64_t MsrSyscallMask;
-+    uint64_t Xcr0;
-+} CPU_KSPECIAL_REGISTERS, *PCPU_KSPECIAL_REGISTERS;
-+
-+typedef struct _CPU_M128A {
-+    uint64_t Low;
-+    int64_t High;
-+} QEMU_ALIGNED(16) CPU_M128A, *PCPU_M128A;
-+
-+typedef struct _CPU_XMM_SAVE_AREA32 {
-+    uint16_t ControlWord;
-+    uint16_t StatusWord;
-+    uint8_t TagWord;
-+    uint8_t Reserved1;
-+    uint16_t ErrorOpcode;
-+    uint32_t ErrorOffset;
-+    uint16_t ErrorSelector;
-+    uint16_t Reserved2;
-+    uint32_t DataOffset;
-+    uint16_t DataSelector;
-+    uint16_t Reserved3;
-+    uint32_t MxCsr;
-+    uint32_t MxCsr_Mask;
-+    CPU_M128A FloatRegisters[8];
-+    CPU_M128A XmmRegisters[16];
-+    uint8_t Reserved4[96];
-+} CPU_XMM_SAVE_AREA32, *PCPU_XMM_SAVE_AREA32;
-+
-+typedef struct _CPU_CONTEXT { /* sizeof = 1232 */
-+    uint64_t P1Home;
-+    uint64_t P2Home;
-+    uint64_t P3Home;
-+    uint64_t P4Home;
-+    uint64_t P5Home;
-+    uint64_t P6Home;
-+    uint32_t ContextFlags;
-+    uint32_t MxCsr;
-+    uint16_t SegCs;
-+    uint16_t SegDs;
-+    uint16_t SegEs;
-+    uint16_t SegFs;
-+    uint16_t SegGs;
-+    uint16_t SegSs;
-+    uint32_t EFlags;
-+    uint64_t Dr0;
-+    uint64_t Dr1;
-+    uint64_t Dr2;
-+    uint64_t Dr3;
-+    uint64_t Dr6;
-+    uint64_t Dr7;
-+    uint64_t Rax;
-+    uint64_t Rcx;
-+    uint64_t Rdx;
-+    uint64_t Rbx;
-+    uint64_t Rsp;
-+    uint64_t Rbp;
-+    uint64_t Rsi;
-+    uint64_t Rdi;
-+    uint64_t R8;
-+    uint64_t R9;
-+    uint64_t R10;
-+    uint64_t R11;
-+    uint64_t R12;
-+    uint64_t R13;
-+    uint64_t R14;
-+    uint64_t R15;
-+    uint64_t Rip;
-+    union {
-+        CPU_XMM_SAVE_AREA32 FltSave;
-+        CPU_XMM_SAVE_AREA32 FloatSave;
-+        struct {
-+            CPU_M128A Header[2];
-+            CPU_M128A Legacy[8];
-+            CPU_M128A Xmm0;
-+            CPU_M128A Xmm1;
-+            CPU_M128A Xmm2;
-+            CPU_M128A Xmm3;
-+            CPU_M128A Xmm4;
-+            CPU_M128A Xmm5;
-+            CPU_M128A Xmm6;
-+            CPU_M128A Xmm7;
-+            CPU_M128A Xmm8;
-+            CPU_M128A Xmm9;
-+            CPU_M128A Xmm10;
-+            CPU_M128A Xmm11;
-+            CPU_M128A Xmm12;
-+            CPU_M128A Xmm13;
-+            CPU_M128A Xmm14;
-+            CPU_M128A Xmm15;
-+        };
-+    };
-+    CPU_M128A VectorRegister[26];
-+    uint64_t VectorControl;
-+    uint64_t DebugControl;
-+    uint64_t LastBranchToRip;
-+    uint64_t LastBranchFromRip;
-+    uint64_t LastExceptionToRip;
-+    uint64_t LastExceptionFromRip;
-+} QEMU_ALIGNED(16) CPU_CONTEXT, *PCPU_CONTEXT;
-+
-+#else /* TARGET_I386 */
-+
-+#define SIZE_OF_X86_REG 80
-+#define MAX_SUP_EXT 512
-+
-+#define CPU_CONTEXT_i386 0x10000
-+
-+#define CPU_CONTEXT_CONTROL (CPU_CONTEXT_i386 | 0x1)
-+#define CPU_CONTEXT_INTEGER (CPU_CONTEXT_i386 | 0x2)
-+#define CPU_CONTEXT_SEGMENTS (CPU_CONTEXT_i386 | 0x4)
-+#define CPU_CONTEXT_FLOATING_POINT (CPU_CONTEXT_i386 | 0x8)
-+#define CPU_CONTEXT_DEBUG_REGISTERS (CPU_CONTEXT_i386 | 0x10)
-+#define CPU_CONTEXT_EXTENDED_REGISTERS (CPU_CONTEXT_i386 | 0x20)
-+
-+#define CPU_CONTEXT_FULL                                                       \
-+    (CPU_CONTEXT_CONTROL | CPU_CONTEXT_INTEGER | CPU_CONTEXT_SEGMENTS)
-+#define CPU_CONTEXT_ALL                                                        \
-+    (CPU_CONTEXT_FULL | CPU_CONTEXT_FLOATING_POINT                             \
-+     | CPU_CONTEXT_DEBUG_REGISTERS | CPU_CONTEXT_EXTENDED_REGISTERS)
-+
-+typedef struct _CPU_DESCRIPTOR {
-+    uint16_t Pad;
-+    uint16_t Limit;
-+    uint32_t Base;
-+} CPU_DESCRIPTOR, *PCPU_DESCRIPTOR;
-+
-+typedef struct _CPU_KSPECIAL_REGISTERS {
-+    uint32_t Cr0;
-+    uint32_t Cr2;
-+    uint32_t Cr3;
-+    uint32_t Cr4;
-+    uint32_t KernelDr0;
-+    uint32_t KernelDr1;
-+    uint32_t KernelDr2;
-+    uint32_t KernelDr3;
-+    uint32_t KernelDr6;
-+    uint32_t KernelDr7;
-+    CPU_DESCRIPTOR Gdtr;
-+    CPU_DESCRIPTOR Idtr;
-+    uint16_t Tr;
-+    uint16_t Ldtr;
-+    uint32_t Reserved[6];
-+} CPU_KSPECIAL_REGISTERS, *PCPU_KSPECIAL_REGISTERS;
-+
-+typedef struct _CPU_FLOATING_SAVE_AREA {
-+    uint32_t ControlWord;
-+    uint32_t StatusWord;
-+    uint32_t TagWord;
-+    uint32_t ErrorOffset;
-+    uint32_t ErrorSelector;
-+    uint32_t DataOffset;
-+    uint32_t DataSelector;
-+    uint8_t RegisterArea[SIZE_OF_X86_REG];
-+    uint32_t Cr0NpxState;
-+} CPU_FLOATING_SAVE_AREA, *PCPU_FLOATING_SAVE_AREA;
-+
-+typedef struct _CPU_CONTEXT { /* sizeof = 716 */
-+    uint32_t ContextFlags;
-+    uint32_t Dr0;
-+    uint32_t Dr1;
-+    uint32_t Dr2;
-+    uint32_t Dr3;
-+    uint32_t Dr6;
-+    uint32_t Dr7;
-+    CPU_FLOATING_SAVE_AREA FloatSave;
-+    uint32_t SegGs;
-+    uint32_t SegFs;
-+    uint32_t SegEs;
-+    uint32_t SegDs;
-+
-+    uint32_t Edi;
-+    uint32_t Esi;
-+    uint32_t Ebx;
-+    uint32_t Edx;
-+    uint32_t Ecx;
-+    uint32_t Eax;
-+    uint32_t Ebp;
-+    uint32_t Eip;
-+    uint32_t SegCs;
-+    uint32_t EFlags;
-+    uint32_t Esp;
-+    uint32_t SegSs;
-+    uint8_t ExtendedRegisters[MAX_SUP_EXT];
-+} CPU_CONTEXT, *PCPU_CONTEXT;
-+
-+#endif /* TARGET_I386 */
-+
-+typedef struct _CPU_KPROCESSOR_STATE {
-+    CPU_CONTEXT ContextFrame;
-+    CPU_KSPECIAL_REGISTERS SpecialRegisters;
-+} CPU_KPROCESSOR_STATE, *PCPU_KPROCESSOR_STATE;
-+
- static InitedAddr KPCR;
- #ifdef TARGET_X86_64
- static InitedAddr kdDebuggerDataBlock;
+> On Tue, 4 Dec 2018 14:11:30 +0100
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+> > On Tue, 4 Dec 2018 13:38:10 +0100
+> > Halil Pasic <pasic@linux.ibm.com> wrote:
+> >   
+> > > On Thu, 22 Nov 2018 17:54:29 +0100
+> > > Cornelia Huck <cohuck@redhat.com> wrote:
+> > >   
+> > > > [This is the Linux kernel part, git tree is available at
+> > > > https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw.git vfio-ccw-caps
+> > > > 
+> > > > The companion QEMU patches are available at
+> > > > https://github.com/cohuck/qemu vfio-ccw-caps]
+> > > > 
+> > > > Currently, vfio-ccw only relays START SUBCHANNEL requests to the real
+> > > > device. This tends to work well for the most common 'good path' scenarios;
+> > > > however, as we emulate {HALT,CLEAR} SUBCHANNEL in QEMU, things like
+> > > > clearing pending requests at the device is currently not supported.
+> > > > This may be a problem for e.g. error recovery.    
+> > > 
+> > > I'm wondering: what about MODIFY SUBCHANNEL? Do we plan to add MSCH
+> > > as well or is it supposed to remain 'userspace emulated'? AFAIR MSCH
+> > > may have an effect on error recovery as well.  
+> > 
+> > I think that would require a deeper change, as we have the requirement
+> > to enable the subchannel before handing it to userspace. IOW, the guest
+> > does not cause the subchannel to be enabled/disabled, but the host does.
+> >   
+> 
+> My point is, when the subchannel is disabled, 'firmware' is responsible
+> for suppressing interrupts and error conditions, and also for
+> doing the appropriate recovery procedure, so to say under the hood.
+
+I don't think there's actually much of a 'recovery' possible at a
+subchannel level (other than 'have you tried turning it off and on
+again?'); the interesting stuff is all at the device-specific level.
+
+> 
+> I think Jason has discovered some problems related to this while doing
+> his DASD IPL with vfio-ccw work, but I don't quite remember any more.
+
+cc:ing Jason, in case he remembers :)
+
+> IMHO it may be possible to emulate enable/disable, but it seems way more
+> error prone and complicated, than letting the guest enable/disable the
+> host subchannel.
+> 
+> I have no idea what was the reason for going with the initial design.
+> I would appreciate any hints or explanations, but I'm well aware that it
+> was a long time ago.
+
+I don't really remember either, and any non-public mails from that time
+are inaccessible to me :(
+
+It *might* be an artifact of the original design (which operated at the
+ccw_device rather than the subchannel level), though.
+
+> > Parameters (like for channel measurements) are a different game. It is
+> > something we should look into, but it will need a different region.  
+> 
+> Yes emulation only channel measurements seem even less likely than proper
+> enable/disable. And 'that would need a different' region helps me
+> understanding the scope of async_cmd_region. Maybe we should reconsider
+> the comment '+ * @cmd_region: MMIO region for asynchronous I/O commands
+> other than START'.
+
+What do you think is wrong with that comment?
+
+> > > BTW I would like to have the concurrency discussion sorted out before
+> > > I proceed with my review, because reviewing the stuff without a fair idea
+> > > of what exactly are we trying to achieve would yield poor results.  
+> > 
+> > I'm not sure what is unclear about what we're trying to achieve (enable
+> > the guest to issue halt/clear on real hardware)?  
+> 
+> Yeah, that is perfectly clear, but it ain't the complete story. E.g.
+> are subsequent commands blocking until the preceding command finishes
+> is part of the interface. And what is good implementation depends on the
+> answer. What I mean, I first need to understand how things are supposed
+> to work (together) so I can double check that against the
+> implementation. Otherwise all I can do is nitpicking.
+> 
+> To get more tangible: we are in the middle of processing an SSCH request
+> (e.g. doing the translation) when a HSCH comes in. What should happen?
+> Should we start processing HSCH after he instruction part of SSCH is
+> done -- which currently includes translation? Or should we -EBUSY? Or do
+> we abort START related activities and do the HALT stuff?
+
+I think most of the sorting-out-the-operations stuff should be done by
+the hardware itself, and we should not really try to enforce anything
+special in our vfio code.
+
+For your example, it might be best if a hsch is always accepted and
+send on towards the hardware. Probably best to reflect back -EAGAIN if
+we're currently processing another instruction from another vcpu, so
+that the user space caller can retry. Same for ssch, if another ssch is
+already being processed. We *could* reflect cc 2 if the fctl bit is
+already set, but that won't do for csch, so it is probably best to have
+the hardware figure that out in any case.
+
+If I read the code correctly, we currently reflect -EBUSY and not
+-EAGAIN if we get a ssch request while already processing another one.
+QEMU hands that back to the guest as a cc 2, which is not 100% correct.
+In practice, we don't see this with Linux guests due to locking.
+
+> > But yes, we need to sort out that concurrency thing; I'm currently
+> > unsure if the core should do some things as well or if it's more of
+> > a vendor-driver thing.
+> >   
+> 
+> By core you mean vfio-mdev core? If yes, I think it is a vendor-driver
+> thing: limiting concurrency for all vfio-mdev  does not make sense
+> IMHO.
+
+Also generic vfio. But I'm still unclear which guarantees we have. I
+suspect none; I'm wondering whether other vfio devices might have
+issues as well.
