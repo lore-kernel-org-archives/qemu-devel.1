@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gUX6i-0005mF-Di
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:20:53 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUXBs-0005zu-44
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:26:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gUX6e-000473-Dq
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:20:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42262)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gUX6e-00044v-3V
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:20:48 -0500
-Date: Wed, 5 Dec 2018 13:20:41 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20181205132041.GB24623@stefanha-x1.localdomain>
-References: <CAGxU2F7+NZUS-BQ1hCnKynVxfsVUYTHRCWQvJwBA12bYmg0ZJA@mail.gmail.com>
-	<938a2f54426dc059428fcfe1882bbb3b2d5cbc99.camel@intel.com>
-	<CAGxU2F50U=NH8fGDXygcYycjoveNpdbKnnG3H0soCvub_Ea5cw@mail.gmail.com>
-	<CAGxU2F7SA-kc0gsLNaUzbiinytJ2DF_r5UpB1JzRy-Su1_WOLw@mail.gmail.com>
-	<a1ca57134a970fb3282afb36c0e3b5647b104ff8.camel@intel.com>
-	<CAGxU2F7Sg0JaxyPQw_FhSc6MzYu+YzZpv9=VHp8qvwfTWpf_MQ@mail.gmail.com>
-	<59cc9e47-3c2a-2417-9e89-e7ade92fdf2d@oracle.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUXBp-0003A8-Vd
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:26:11 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 5 Dec 2018 13:25:44 +0000
+Message-ID: <7ca3779c-b552-97f1-8ce2-860db23be045@virtuozzo.com>
+References: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
+	<20181203101429.88735-7-anton.nefedov@virtuozzo.com>
+In-Reply-To: <20181203101429.88735-7-anton.nefedov@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <CBBEA6706833EA41B9AA6EA6B2B4B36B@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="WhfpMioaduB5tiZL"
-Content-Disposition: inline
-In-Reply-To: <59cc9e47-3c2a-2417-9e89-e7ade92fdf2d@oracle.com>
-Subject: Re: [Qemu-devel] QEMU/NEMU boot time with several x86 firmwares
+Subject: Re: [Qemu-devel] [PATCH v10 6/9] file-posix: support
+ BDRV_REQ_ALLOCATE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,145 +26,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maran Wilson <maran.wilson@oracle.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, Rob Bradford <robert.bradford@intel.com>, Samuel Ortiz <sameo@linux.intel.com>, qemu-devel@nongnu.org, Liam Merwick <liam.merwick@oracle.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
 
-
---WhfpMioaduB5tiZL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Dec 04, 2018 at 02:44:33PM -0800, Maran Wilson wrote:
-> On 12/3/2018 8:35 AM, Stefano Garzarella wrote:
-> > On Mon, Dec 3, 2018 at 4:44 PM Rob Bradford <robert.bradford@intel.com>=
- wrote:
-> > > Hi Stefano, thanks for capturing all these numbers,
-> > >=20
-> > > On Mon, 2018-12-03 at 15:27 +0100, Stefano Garzarella wrote:
-> > > > Hi Rob,
-> > > > I continued to investigate the boot time, and as you suggested I
-> > > > looked also at qemu-lite 2.11.2
-> > > > (https://github.com/kata-containers/qemu) and NEMU "virt" machine. I
-> > > > did the following tests using the Kata kernel configuration
-> > > > (
-> > > > https://github.com/kata-containers/packaging/blob/master/kernel/con=
-figs/x86_64_kata_kvm_4.14.x
-> > > > )
-> > > >=20
-> > > > To compare the results with qemu-lite direct kernel load, I added
-> > > > another tracepoint:
-> > > > - linux_start_kernel: first entry of the Linux kernel
-> > > > (start_kernel())
-> > > >=20
-> > > Great, do you have a set of patches available that all these trace
-> > > points. It would be great for reproduction.
-> > For sure! I'm attaching a set of patches for qboot, seabios, ovmf,
-> > nemu/qemu/qemu-lite and linux 4.14 whit the tracepoints.
-> > I'm also sharing a python script that I'm using with perf to extract
-> > the numbers in this way:
-> >=20
-> > $ perf record -a -e kvm:kvm_entry -e kvm:kvm_pio -e
-> > sched:sched_process_exec -o /tmp/qemu_perf.data &
-> > $ # start qemu/nemu multiple times
-> > $ killall perf
-> > $ perf script -s qemu-perf-script.py -i /tmp/qemu_perf.data
-> >=20
-> > > > As you can see, NEMU is faster to jump to the kernel
-> > > > (linux_start_kernel) than qemu-lite when uses qboot or seabios with
-> > > > virt support, but the time to the user space is strangely high, may=
-be
-> > > > the kernel configuration that I used is not the best one.
-> > > > Do you suggest another kernel configuration?
-> > > >=20
-> > > This looks very bad. This isn't the kernel configuration we normally
-> > > test with in our automated test system but is definitely one we suppo=
-rt
-> > > as part of our partnernship with the Kata team. It's a high priority
-> > > for me to try and investigate that. Have you saved the kernel messages
-> > > as they might be helpful?
-> > Yes, I'm attaching the dmesg output with nemu and qemu.
-> >=20
-> > > > Anyway, I obtained the best boot time with qemu-lite and direct
-> > > > kernel
-> > > > load (vmlinux ELF image). I think because the kernel was not
-> > > > compressed. Indeed, looking to the others test, the kernel
-> > > > decompression (bzImage) takes about 80 ms (linux_start_kernel -
-> > > > linux_start_boot). (I'll investigate better)
-> > > >=20
-> > > Yup being able to load an uncompressed kernel is one of the big
-> > > advantages of qemu-lite. I wonder if we could bring that feature into
-> > > qemu itself to supplement the existing firmware based kernel loading.
-> > I think so, I'll try to understand if we can merge the qemu-lite
-> > direct kernel loading in qemu.
->=20
-> An attempt was made a long time ago to push the qemu-lite stuff (from the
-> Intel Clear Containers project) upstream. As I understand it, the main
-> stumbling block that seemed to derail the effort was that it involved add=
-ing
-> Linux OS specific code to Qemu so that Qemu could do things like create a=
-nd
-> populate the zero page that Linux expects when entering startup_64().
->=20
-> That ends up being a lot of very low-level, operating specific knowledge
-> about Linux that ends up getting baked into Qemu code. And understandably=
-, a
-> number of folks saw problems with going down a path like that.
->=20
-> Since then, we have put together an alternative solution that would allow
-> Qemu to boot an uncompressed Linux binary via the x86/HVM direct boot ABI
-> (https://xenbits.xen.org/docs/unstable/misc/pvh.html). The solution invol=
-ves
-> first making changes to both the ABI as well as Linux, and then updating
-> Qemu to take advantage of the updated ABI which is already supported by b=
-oth
-> Linux and Free BSD for booting VMs. As such, Qemu can remain OS agnostic,
-> and just be programmed to the published ABI.
->=20
-> The canonical definition for the HVM direct boot ABI is in the Xen tree a=
-nd
-> we needed to make some minor changes to the ABI definition to allow KVM
-> guests to also use the same structure and entry point. Those changes were
-> accepted to the Xen tree already:
-> https://lists.xenproject.org/archives/html/xen-devel/2018-04/msg00057.html
->=20
-> The corresponding Linux changes that would allow KVM guests to be booted =
-via
-> this PVH entry point have already been posted and reviewed:
-> https://lkml.org/lkml/2018/4/16/1002
->=20
-> The final part is the set of Qemu changes to take advantage of the above =
-and
-> boot a KVM guest via an uncompressed kernel binary using the entry point
-> defined by the ABI. Liam Merwick will be posting some RFC patches very so=
-on
-> to allow this.
-
-Cool, thanks for doing this work!
-
-How do the boot times compare to qemu-lite and Firecracker's
-(https://github.com/firecracker-microvm/firecracker/) direct vmlinux ELF
-boot?
-
-I'm asking because there are several custom approaches to fast kernel
-boot and we should make sure that whatever Linux and QEMU end up
-natively supporting is likely to work for all projects (NEMU, qemu-lite,
-Firecracker) and operating systems (Linux distros, other OSes).
-
-Stefan
-
---WhfpMioaduB5tiZL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcB9CpAAoJEJykq7OBq3PIupwH+gOXuF6iAqCp42Xea5DD+ZgI
-Sxm7OEqjryjAaFZC1MYZhmH8MIfYE94XP2XwaS4ipLNuevo0W+LD+vUN3wbs7fKR
-e3r58bRqSKfrDC91f3e/lGGXbcAQ97XrqLFEpX4vllJsIIxorVB0fthWAzsqCSzL
-XE3YwRmqBam8j1FcIxm4Izqup6xYO/u9BT70Q42ZVM6dqbzsRP5/1eqRRe/fh5BV
-YaJCnoYbH5jJsVGqtq3/RN1MRj+UbXM8Qy96yl5MvDov1IxFSBPCZ2k0nVBL9CJj
-MQbOKh2v92QKVTF6KLSKryEP1Ld5VS/q7b7ppEndwabWn1lsbsKT8VTlU72e0+Q=
-=NCWq
------END PGP SIGNATURE-----
-
---WhfpMioaduB5tiZL--
+MDMuMTIuMjAxOCAxMzoxNCwgQW50b24gTmVmZWRvdiB3cm90ZToNCj4gQ3VycmVudCB3cml0ZV96
+ZXJvZXMgaW1wbGVtZW50YXRpb24gaXMgZ29vZCBlbm91Z2ggdG8gc2F0aXNmeSB0aGlzIGZsYWcg
+dG9vDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBBbnRvbiBOZWZlZG92IDxhbnRvbi5uZWZlZG92QHZp
+cnR1b3p6by5jb20+DQo+IC0tLQ0KPiAgIGJsb2NrL2ZpbGUtcG9zaXguYyB8IDggKysrKysrKy0N
+Cj4gICAxIGZpbGUgY2hhbmdlZCwgNyBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pDQo+IA0K
+PiBkaWZmIC0tZ2l0IGEvYmxvY2svZmlsZS1wb3NpeC5jIGIvYmxvY2svZmlsZS1wb3NpeC5jDQo+
+IGluZGV4IDA3YmJkYWI5NTMuLmIwYjdhYjAxNTkgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2ZpbGUt
+cG9zaXguYw0KPiArKysgYi9ibG9jay9maWxlLXBvc2l4LmMNCj4gQEAgLTYwMyw2ICs2MDMsNyBA
+QCBzdGF0aWMgaW50IHJhd19vcGVuX2NvbW1vbihCbG9ja0RyaXZlclN0YXRlICpicywgUURpY3Qg
+Km9wdGlvbnMsDQo+ICAgICAgICAgICB9IGVsc2Ugew0KPiAgICAgICAgICAgICAgIHMtPmRpc2Nh
+cmRfemVyb2VzID0gdHJ1ZTsNCj4gICAgICAgICAgICAgICBzLT5oYXNfZmFsbG9jYXRlID0gdHJ1
+ZTsNCj4gKyAgICAgICAgICAgIGJzLT5zdXBwb3J0ZWRfemVyb19mbGFncyA9IEJEUlZfUkVRX0FM
+TE9DQVRFOw0KPiAgICAgICAgICAgfQ0KPiAgICAgICB9IGVsc2Ugew0KPiAgICAgICAgICAgaWYg
+KCEoU19JU0NIUihzdC5zdF9tb2RlKSB8fCBTX0lTQkxLKHN0LnN0X21vZGUpKSkgew0KPiBAQCAt
+NjQ2LDEwICs2NDcsMTEgQEAgc3RhdGljIGludCByYXdfb3Blbl9jb21tb24oQmxvY2tEcml2ZXJT
+dGF0ZSAqYnMsIFFEaWN0ICpvcHRpb25zLA0KPiAgICNpZmRlZiBDT05GSUdfWEZTDQo+ICAgICAg
+IGlmIChwbGF0Zm9ybV90ZXN0X3hmc19mZChzLT5mZCkpIHsNCj4gICAgICAgICAgIHMtPmlzX3hm
+cyA9IHRydWU7DQo+ICsgICAgICAgIGJzLT5zdXBwb3J0ZWRfemVyb19mbGFncyA9IEJEUlZfUkVR
+X0FMTE9DQVRFOw0KDQp3aHkgd2Ugc2hvdWxkIGhhbmRsZSB4ZnMgc2VwYXJhdGVseT8gaXMgdGhl
+cmUgYSBjYXNlIHdpdGggeGZzLCBub3QgaGFuZGxlZCBieSBwcmV2aW91cyBnZW5lcmljIGlmICgp
+Pw0KDQo+ICAgICAgIH0NCj4gICAjZW5kaWYNCj4gICANCj4gLSAgICBicy0+c3VwcG9ydGVkX3pl
+cm9fZmxhZ3MgPSBCRFJWX1JFUV9NQVlfVU5NQVA7DQo+ICsgICAgYnMtPnN1cHBvcnRlZF96ZXJv
+X2ZsYWdzIHw9IEJEUlZfUkVRX01BWV9VTk1BUDsNCj4gICAgICAgcmV0ID0gMDsNCj4gICBmYWls
+Og0KPiAgICAgICBpZiAoZmlsZW5hbWUgJiYgKGJkcnZfZmxhZ3MgJiBCRFJWX09fVEVNUE9SQVJZ
+KSkgew0KPiBAQCAtMTUyMCw2ICsxNTIyLDEwIEBAIHN0YXRpYyBzc2l6ZV90IGhhbmRsZV9haW9j
+Yl93cml0ZV96ZXJvZXMoUmF3UG9zaXhBSU9EYXRhICphaW9jYikNCj4gICAgICAgICAgIH0NCj4g
+ICAgICAgICAgIHMtPmhhc19mYWxsb2NhdGUgPSBmYWxzZTsNCj4gICAgICAgfQ0KPiArDQo+ICsg
+ICAgaWYgKCFzLT5oYXNfZmFsbG9jYXRlKSB7DQo+ICsgICAgICAgIGFpb2NiLT5icy0+c3VwcG9y
+dGVkX3plcm9fZmxhZ3MgJj0gfkJEUlZfUkVRX0FMTE9DQVRFOw0KPiArICAgIH0NCj4gICAjZW5k
+aWYNCj4gICANCj4gICAgICAgcmV0dXJuIC1FTk9UU1VQOw0KPiANCg0KDQotLSANCkJlc3QgcmVn
+YXJkcywNClZsYWRpbWlyDQo=
