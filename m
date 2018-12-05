@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gUZBb-0002yP-89
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:34:04 -0500
+	(envelope-from <eblake@redhat.com>) id 1gUZCF-0003cw-28
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:34:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gUZBW-0003n1-MY
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:34:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40382)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gUZBW-0003mA-9I
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:33:58 -0500
-Date: Wed, 5 Dec 2018 10:33:55 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181205102233-mutt-send-email-mst@kernel.org>
-References: <1543848532-12604-1-git-send-email-lizhijian@cn.fujitsu.com>
-	<1543848532-12604-4-git-send-email-lizhijian@cn.fujitsu.com>
-	<20181203200403-mutt-send-email-mst@kernel.org>
-	<351854fc-c419-f006-8744-7f45d2701f16@cn.fujitsu.com>
-	<f9656fba-181c-6267-648c-95dd2380043e@cn.fujitsu.com>
+	(envelope-from <eblake@redhat.com>) id 1gUZCD-0007vr-NI
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:34:42 -0500
+References: <20181205084308.201356-1-borntraeger@de.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e8aa64c4-4bfa-05e6-9a2f-6478330a6fd7@redhat.com>
+Date: Wed, 5 Dec 2018 09:34:32 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f9656fba-181c-6267-648c-95dd2380043e@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v3 3/4] i386: import bootparam.h
+In-Reply-To: <20181205084308.201356-1-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] iotests: make 235 work on s390 (and
+ others)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,151 +24,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Zhijian <lizhijian@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, philip.li@intel.com, zhijianx.li@intel.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, qemu-block@nongnu.org, qemu-stable <qemu-stable@nongnu.org>
 
-On Wed, Dec 05, 2018 at 06:28:11PM +0800, Li Zhijian wrote:
-> Hi Michael
+On 12/5/18 2:43 AM, Christian Borntraeger wrote:
+> "-machine pc" will not work all architectures. Lets fall back to the
+> default machine by not specifying it.
 > 
-> I cooked a draft with cp_portable to import bootparam.h, could you have a look.
+> In addition we also need to specify -no-shutdown on s390 as qemu will
+> exit otherwise.
 > 
-> diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
-> index 0a964fe..1beeceb 100755
-> --- a/scripts/update-linux-headers.sh
-> +++ b/scripts/update-linux-headers.sh
-> @@ -44,6 +44,12 @@ cp_portable() {
->                                       -e 'linux/kernel' \
->                                       -e 'linux/sysinfo' \
->                                       -e 'asm-generic/kvm_para' \
-> +                                     -e 'linux/screen_info.h' \
-> +                                     -e 'linux/apm_bios.h' \
-> +                                     -e 'linux/edd.h' \
-> +                                     -e 'video/edid.h' \
-> +                                     -e 'asm/ist.h' \
-> +                                     -e 'linux/ioctl.h' \
->                                       > /dev/null
->      then
->          echo "Unexpected #include in input file $f".
-> @@ -59,6 +65,8 @@ cp_portable() {
->          -e 's/__be\([0-9][0-9]*\)/uint\1_t/g' \
->          -e 's/"\(input-event-codes\.h\)"/"standard-headers\/linux\/\1"/' \
->          -e 's/<linux\/\([^>]*\)>/"standard-headers\/linux\/\1"/' \
-> +        -e "s/<asm\/\([^>]*\)>/\"standard-headers\/asm-$arch\/\1\"/" \
-> +        -e 's/<video\/\([^>]*\)>/"standard-headers\/video\/\1"/' \
->          -e 's/__bitwise//' \
->          -e 's/__attribute__((packed))/QEMU_PACKED/' \
->          -e 's/__inline__/inline/' \
-> @@ -74,6 +82,23 @@ cp_portable() {
->          "$f" > "$to/$header";
->  }
-> 
-> +rm -rf "$output/include/standard-headers/linux"
-> +mkdir -p "$output/include/standard-headers/linux"
-> +
-> +cp_bootparam()
-> +{
-> +    mkdir -p $output/include/standard-headers/video
-> +    cp "$tmpdir"/include/linux/ioctl.h "$output/include/standard-headers/linux"
-> +    cp_portable "$tmpdir"/include/linux/screen_info.h "$output/include/standard-headers/linux"
-> +    cp_portable "$tmpdir/include/linux/apm_bios.h" "$output/include/standard-headers/linux"
-> +    cp_portable "$tmpdir/include/linux/edd.h" "$output/include/standard-headers/linux"
-> +    cp_portable "$tmpdir/include/asm/ist.h" $output/include/standard-headers/asm-$arch
-> +    cp_portable "$tmpdir/include/video/edid.h" $output/include/standard-headers/video
-> +
-> +    # bootparam.h includes above headers
-> +    cp_portable "$tmpdir/include/asm/bootparam.h" "$output/include/standard-headers/asm-$arch"
-> +}
-> +
->  # This will pick up non-directories too (eg "Kconfig") but we will
->  # ignore them in the next loop.
->  ARCHLIST=$(cd "$linux/arch" && echo *)
-> @@ -120,6 +145,7 @@ for arch in $ARCHLIST; do
->          cp "$tmpdir/include/asm/unistd_x32.h" "$output/linux-headers/asm-x86/"
->          cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-x86/"
->          cp_portable "$tmpdir/include/asm/kvm_para.h" "$output/include/standard-headers/asm-$arch"
-> +        cp_bootparam
->      fi
->  done
-> 
-> @@ -163,8 +189,6 @@ cat <<EOF >$output/linux-headers/linux/virtio_ring.h
->  #include "standard-headers/linux/virtio_ring.h"
->  EOF
-> 
-> -rm -rf "$output/include/standard-headers/linux"
-> -mkdir -p "$output/include/standard-headers/linux"
->  for i in "$tmpdir"/include/linux/*virtio*.h \
->           "$tmpdir/include/linux/qemu_fw_cfg.h" \
->           "$tmpdir/include/linux/input.h" \
-> 
-> Thanks
-> Zhijian
-> 
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
-So arch specific asm including asm doesn't work well right now :(
-You can either fix the path to ist to pull it from asm-x86,
-or if you don't actually need anything in that header the
-macros, you can just cut out everything around __ASSEMBLY__
-with a bit of e.g. sed magic. E.g. pvrdma does this.
+CC: qemu-stable
 
-Something like:
+> ---
+>   tests/qemu-iotests/235 | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
 
-# Remove everything except the macros from bootparam.h avoiding the unnecessary
-# import of several video/ist/etc headers
-sed  -e '/__ASSEMBLY__/,/__ASSEMBLY__/d' arch/x86/include/uapi/asm/bootparam.h
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-should do the job.
+Too late for 3.1; for that, we can just document that there are known 
+iotests failures under some configurations
 
-
-> 
-> On 12/04/2018 04:09 PM, Li Zhijian wrote:
-> 
-> 
-> 
-> 
->     On 12/04/2018 09:06 AM, Michael S. Tsirkin wrote:
-> 
->         On Mon, Dec 03, 2018 at 10:48:51PM +0800, Li Zhijian wrote:
-> 
->             It provides setup_data struct and header fields
-> 
->             CC: Michael S. Tsirkin <mst@redhat.com>
->             Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-> 
->         Sorry I was unclear when I said "import it from Linux".
-> 
->     Sorry, it's my fault.
-> 
-> 
->         The way to import it is to copy the header
->         from the linux kernel by adding it to ./scripts/update-linux-headers.sh
->         and placing a copy into include/standard-headers/
-> 
->         Hope that helps.
-> 
->     that's really helpful.
-> 
->     i wonder which type copy should i use 'cp' or 'cp_portable'
->     this header includes several sub-headers
-> 
->     $ grep include  /tmp/tmp.MBF10Z9MeS/include/asm/bootparam.h
->     #include <linux/types.h>
->     #include <linux/screen_info.h>
->     #include <linux/apm_bios.h>
->     #include <linux/edd.h>
->     #include <asm/ist.h>
->     #include <video/edid.h>
-> 
->     Thanks
->     Zhijian
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
