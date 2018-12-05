@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUWgm-0002QV-AW
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:54:06 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUWgp-0002VO-FQ
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:54:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUWgl-0006MP-HG
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:54:04 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:50460)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUWgj-0006Js-HK
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:54:07 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:50432)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUWgl-0006Kj-7i
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:54:03 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUWgh-0006Fq-EH
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:54:00 -0500
 From: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Wed, 05 Dec 2018 15:54:01 +0300
-Message-ID: <154401444081.8440.12026768872502273785.stgit@Misha-PC.lan02.inno>
+Date: Wed, 05 Dec 2018 15:53:55 +0300
+Message-ID: <154401443515.8440.3551572779156976136.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <154401431697.8440.845616703562380651.stgit@Misha-PC.lan02.inno>
 References: <154401431697.8440.845616703562380651.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 2 21/39] windbg: implement
- kd_api_read_virtual_memory and kd_api_write_virtual_memory
+Subject: [Qemu-devel] [PATCH 2 20/39] windbg: implement
+ windbg_process_manipulate_packet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,97 +34,76 @@ Signed-off-by: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 ---
  include/exec/windbgstub-utils.h |    2 ++
- windbgstub-utils.c              |   47 +++++++++++++++++++++++++++++++++++++++
- windbgstub.c                    |    8 +++++++
- 3 files changed, 57 insertions(+)
+ windbgstub-utils.c              |    7 +++++++
+ windbgstub.c                    |   27 +++++++++++++++++++++++++++
+ 3 files changed, 36 insertions(+)
 
 diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-index 1c577ddd49..638b2b9a6f 100644
+index 794cb387b0..1c577ddd49 100644
 --- a/include/exec/windbgstub-utils.h
 +++ b/include/exec/windbgstub-utils.h
 @@ -67,6 +67,8 @@ typedef struct PacketData {
  const char *kd_api_name(int id);
  const char *kd_pkt_type_name(int id);
  
-+void kd_api_read_virtual_memory(CPUState *cs, PacketData *pd);
-+void kd_api_write_virtual_memory(CPUState *cs, PacketData *pd);
- void kd_api_unsupported(CPUState *cs, PacketData *pd);
- 
++void kd_api_unsupported(CPUState *cs, PacketData *pd);
++
  DBGKD_ANY_WAIT_STATE_CHANGE *kd_state_change_exc(CPUState *cs);
+ DBGKD_ANY_WAIT_STATE_CHANGE *kd_state_change_ls(CPUState *cs);
+ 
 diff --git a/windbgstub-utils.c b/windbgstub-utils.c
-index 6da6eea08f..61f74dd22e 100644
+index 6d2bb33307..6da6eea08f 100644
 --- a/windbgstub-utils.c
 +++ b/windbgstub-utils.c
-@@ -200,6 +200,53 @@ InitedAddr windbg_search_vmaddr(CPUState *cs, target_ulong start,
+@@ -200,6 +200,13 @@ InitedAddr windbg_search_vmaddr(CPUState *cs, target_ulong start,
      return ret;
  }
  
-+void kd_api_read_virtual_memory(CPUState *cs, PacketData *pd)
++void kd_api_unsupported(CPUState *cs, PacketData *pd)
 +{
-+    DBGKD_READ_MEMORY64 *mem = &pd->m64.u.ReadMemory;
-+    uint32_t len;
-+    target_ulong addr;
-+    int err;
-+
-+    len = MIN(ldl_p(&mem->TransferCount),
-+              PACKET_MAX_SIZE - sizeof(DBGKD_MANIPULATE_STATE64));
-+    addr = ldtul_p(&mem->TargetBaseAddress);
-+    err = cpu_memory_rw_debug(cs, addr, pd->extra, len, 0);
-+
-+    if (err) {
-+        len = 0;
-+        pd->m64.ReturnStatus = STATUS_UNSUCCESSFUL;
-+
-+        DPRINTF("read_virtual_memory: No physical page mapped: " FMT_ADDR "\n",
-+                addr);
-+    }
-+
-+    pd->extra_size = len;
-+    stl_p(&mem->ActualBytesRead, len);
-+}
-+
-+void kd_api_write_virtual_memory(CPUState *cs, PacketData *pd)
-+{
-+    DBGKD_WRITE_MEMORY64 *mem = &pd->m64.u.WriteMemory;
-+    uint32_t len;
-+    target_ulong addr;
-+    int err;
-+
-+    len = MIN(ldl_p(&mem->TransferCount), pd->extra_size);
-+    addr = ldtul_p(&mem->TargetBaseAddress);
-+    err = cpu_memory_rw_debug(cs, addr, pd->extra, len, 1);
-+
-+    if (err) {
-+        len = 0;
-+        pd->m64.ReturnStatus = STATUS_UNSUCCESSFUL;
-+
-+        DPRINTF("read_write_memory: No physical page mapped: " FMT_ADDR "\n",
-+                addr);
-+    }
-+
++    WINDBG_ERROR("Caught unimplemented api %s", kd_api_name(pd->m64.ApiNumber));
++    pd->m64.ReturnStatus = STATUS_UNSUCCESSFUL;
 +    pd->extra_size = 0;
-+    stl_p(&mem->ActualBytesWritten, len);
 +}
 +
- void kd_api_unsupported(CPUState *cs, PacketData *pd)
+ const char *kd_api_name(int id)
  {
-     WINDBG_ERROR("Caught unimplemented api %s", kd_api_name(pd->m64.ApiNumber));
+     return (id >= DbgKdMinimumManipulate && id < DbgKdMaximumManipulate)
 diff --git a/windbgstub.c b/windbgstub.c
-index 6ed93b8ce9..46400d9bad 100644
+index 8cbece40da..6ed93b8ce9 100644
 --- a/windbgstub.c
 +++ b/windbgstub.c
-@@ -149,6 +149,14 @@ static void windbg_process_manipulate_packet(WindbgState *state)
-     }
+@@ -136,6 +136,33 @@ static void windbg_vm_stop(void)
  
-     switch (data->m64.ApiNumber) {
-+    case DbgKdReadVirtualMemoryApi:
-+        kd_api_read_virtual_memory(cs, data);
-+        break;
+ static void windbg_process_manipulate_packet(WindbgState *state)
+ {
++    CPUState *cs;
++    ParsingContext *ctx = &state->ctx;
++    PacketData *data = &ctx->data;
 +
-+    case DbgKdWriteVirtualMemoryApi:
-+        kd_api_write_virtual_memory(cs, data);
-+        break;
++    data->extra_size = ctx->packet.ByteCount - sizeof(DBGKD_MANIPULATE_STATE64);
++    data->m64.ReturnStatus = STATUS_SUCCESS;
 +
-     default:
-         kd_api_unsupported(cs, data);
-         break;
++    cs = qemu_get_cpu(data->m64.Processor);
++    if (cs == NULL) {
++        cs = qemu_get_cpu(0);
++    }
++
++    switch (data->m64.ApiNumber) {
++    default:
++        kd_api_unsupported(cs, data);
++        break;
++    }
++
++    if (data->m64.ReturnStatus == STATUS_UNSUCCESSFUL) {
++        WINDBG_ERROR("Caught error at %s", kd_api_name(data->m64.ApiNumber));
++    }
++
++    stl_p(&data->m64.ReturnStatus, data->m64.ReturnStatus);
++
++    windbg_send_data_packet(state, data->buf,
++                            data->extra_size + sizeof(DBGKD_MANIPULATE_STATE64),
++                            ctx->packet.PacketType);
+ }
+ 
+ static void windbg_process_data_packet(WindbgState *state)
