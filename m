@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gUZjm-00022d-FB
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:09:23 -0500
+	(envelope-from <bounces@canonical.com>) id 1gUZlY-00030N-3K
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:11:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gUZji-000184-Os
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:09:22 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 5 Dec 2018 16:09:02 +0000
-Message-ID: <61995d89-db9d-ac34-0b32-aacffd49b184@virtuozzo.com>
-References: <20181203165810.14509-1-kwolf@redhat.com>
-	<20181203165810.14509-3-kwolf@redhat.com>
-	<dc86835f-65d9-cada-dc9b-1f2c708521f9@de.ibm.com>
-	<75f7e3cc-bd46-c743-84ab-cd68bcb1dcfb@de.ibm.com>
-	<d0966d94-87d4-0f25-f2e0-846a1d338be7@de.ibm.com>
-	<20181205084614.GA4018@dhcp-200-186.str.redhat.com>
-	<30858ce0-5b4b-c3c4-b846-6a214670f8d2@de.ibm.com>
-	<f91cf64b-db93-f2e5-bceb-93013592ad03@virtuozzo.com>
-	<34e1b572-41b0-ae72-6d12-283516c9218c@de.ibm.com>
-	<7d5d502b-9bba-47ed-648e-65495765c4ca@virtuozzo.com>
-	<f791fd99-4055-c308-6e62-fc3b818c7ebf@de.ibm.com>
-In-Reply-To: <f791fd99-4055-c308-6e62-fc3b818c7ebf@de.ibm.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <9E7D0A93E956C246AE7E591AA43F476C@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <bounces@canonical.com>) id 1gUZlS-0003Tt-J5
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:11:12 -0500
+Received: from indium.canonical.com ([91.189.90.7]:36412)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gUZlS-0003Sr-BO
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:11:06 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gUZlQ-0004tL-7j
+	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 16:11:04 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E0A5D2E80CF
+	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 16:11:03 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [qemu-s390x] [PULL 2/2] iotests: simple mirror
- test with kvm on 1G image
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 05 Dec 2018 16:03:05 -0000
+From: Alberto Ortega <1803160@bugs.launchpad.net>
+Reply-To: Bug 1803160 <1803160@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154212865934.10800.13528910091420823354.malonedeb@wampee.canonical.com>
+Message-Id: <154402578512.26298.6583065564213182603.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1803160] Re: qemu-3.1.0-rc0: tcg.c crash in
+ temp_load
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,67 +37,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
 
-MDUuMTIuMjAxOCAxODo1MiwgQ2hyaXN0aWFuIEJvcm50cmFlZ2VyIHdyb3RlOg0KPiANCj4gDQo+
-IE9uIDA1LjEyLjIwMTggMTQ6MzksIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6
-DQo+PiAwNS4xMi4yMDE4IDE1OjM1LCBDaHJpc3RpYW4gQm9ybnRyYWVnZXIgd3JvdGU6DQo+Pj4N
-Cj4+Pg0KPj4+IE9uIDA1LjEyLjIwMTggMTM6MDAsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNr
-aXkgd3JvdGU6DQo+Pj4+IDA1LjEyLjIwMTggMTI6MDEsIENocmlzdGlhbiBCb3JudHJhZWdlciB3
-cm90ZToNCj4+Pj4+DQo+Pj4+Pg0KPj4+Pj4gT24gMDUuMTIuMjAxOCAwOTo0NiwgS2V2aW4gV29s
-ZiB3cm90ZToNCj4+Pj4+PiBBbSAwNS4xMi4yMDE4IHVtIDA5OjIzIGhhdCBDaHJpc3RpYW4gQm9y
-bnRyYWVnZXIgZ2VzY2hyaWViZW46DQo+Pj4+Pj4+Pj4+ICsjIHByZXBhcmUgc291cmNlIGltYWdl
-DQo+Pj4+Pj4+Pj4+ICtxZW11X2ltZ19jcmVhdGUoJy1mJywgaW90ZXN0cy5pbWdmbXQsICctbycs
-ICdwcmVhbGxvY2F0aW9uPW1ldGFkYXRhJywgZGlzaywNCj4+Pj4+Pj4+Pj4gKyAgICAgICAgICAg
-ICAgICBzdHIoc2l6ZSkpDQo+Pj4+Pj4+Pj4+ICsNCj4+Pj4+Pj4+Pj4gK3ZtID0gUUVNVU1hY2hp
-bmUoaW90ZXN0cy5xZW11X3Byb2cpDQo+Pj4+Pj4+Pj4+ICt2bS5hZGRfYXJncygnLW1hY2hpbmUn
-LCAncGMsYWNjZWw9a3ZtJykNCj4+Pj4+Pj4NCj4+Pj4+Pj4gVGhpcyAocGMpIGNsZWFybHkgZG9l
-cyBub3Qgd29yayBvbiBvdGhlciBhcmNoaXRlY3R1cmVzLg0KPj4+Pj4+PiBJbiBhZGRpdGlvbiB0
-byB0aGF0LCBJIGFsc28gbmVlZCB0byBhZGQgLW5vLXNodXRkb3duIG9uIHMzOTAgKHNlZSAwNjgg
-Zm9yIGEgc2ltaWxhciBjYXNlKQ0KPj4+Pj4+DQo+Pj4+Pj4gTGVhdmluZyBvdXQgcGMgZGVmaW5p
-dGVseSBtYWtlcyBzZW5zZSwgYW5kIHRoZSBidWcgc3RpbGwgcmVwcm9kdWNlcyBmb3INCj4+Pj4+
-PiBtZSB3aXRob3V0IGl0Lg0KPj4+Pj4+DQo+Pj4+Pj4gSSBkb24ndCB1bmRlcnN0YW5kIHRoZSAt
-bm8tc2h1dGRvd24sIHRob3VnaC4gQWxyZWFkeSBmb3IgMDY4LCBuZWl0aGVyDQo+Pj4+Pj4gdGhl
-IGNvZGUgbm9yIHRoZSBjb21taXQgbWVzc2FnZSB3aGVuIGl0IHdhcyBhZGRlZCBleHBsYWluIHdo
-eSB0aGlzIGlzDQo+Pj4+Pj4gbmVlZGVkLg0KPj4+Pj4+DQo+Pj4+Pj4gQ2FuIHlvdSB0dXJuIHRo
-aXMgaW50byBhIHByb3BlciBwYXRjaCBhbmQgYWRkIGEgY29tbWVudCB3aHkgLW5vLXNodXRkb3du
-DQo+Pj4+Pj4gaXMgbmVlZGVkPw0KPj4+Pj4NCj4+Pj4+IEkgYWxyZWFkeSBzZW50IHRoaXMgcGF0
-Y2guIFRoZSByZWFzb24gaXMgdGhhdCB0aGVyZSBpcyBubyBCSU9TIGluIGEgY2xhc3NpY2FsIHNl
-bnNlDQo+Pj4+PiBvbiBzMzkweC4gSWYgbm8gYm9vdGFibGUgaW1hZ2UgKGV4dGVybmFsIGtlcm5l
-bCBvciBmcm9tIGRpc2spIGlzIGZvdW5kLCB0aGUgc21hbGwgYm9vdA0KPj4+Pj4gYmlvcyBsb2Fk
-cyBhIGRpc2FibGVkIHdhaXQgUFNXLiBUaGUgZGVmYXVsdCBhY3Rpb24gZm9yIHRoYXQgaXMgdGhl
-biBzaHV0ZG93bi4NCj4+Pj4+DQo+Pj4+DQo+Pj4+IElzIGl0IGFuIG9wdGlvbiBmb3IgeW91IGp1
-c3QgZHJvcCB0aGUgd2hvbGUgbGluZSAidm0uYWRkX2FyZ3MoJy1tYWNoaW5lJywgJ3BjLGFjY2Vs
-PWt2bScpIj8NCj4+Pj4gVGhlIHByb2JsZW0gd2l0aG91dCBpdCBmb3IgbWUgd2FzIHRoYXQgZ2Ri
-IGZhaWxlZCB0byBwcm9kdWNlIGZ1bGwgYW5kIG5pY2UgYmFja3RyYWNlLCBidXQNCj4+Pj4gdGVz
-dCB3b3JrZWQgYW55d2F5DQo+Pj4NCj4+PiBJbiB0aGUgY29tbWlkIG1lc3NhZ2UgVmxhZGltaXIg
-c2FpZCB0aGF0IGt2bSBpcyBuZWNlc3NhcnkgdG8gdHJpZ2dlciB0aGUgcHJvYmxlbS4NCj4+Pg0K
-Pj4NCj4+IE5vLCBJIGRpZG4ndCkNCj4+DQo+PiBhbmQgaXQncyBpbiB0aGUgY29tbWVudDoNCj4+
-ICMgMy4gZHJvcCBrdm0gYW5kIHVzZSBpb3Rlc3RzLlZNKCkgKG1heWJlLCBiZWNhdXNlIG9mIHF0
-ZXN0KSAoaG93ZXZlciwgaXQgc3RpbGwNCj4+ICMgICAgcmVwcm9kdWNlcywgaWYganVzdCBkcm9w
-IGt2bSwgYnV0IGdkYiBmYWlsZWQgdG8gcHJvZHVjZSBmdWxsIGJhY2t0cmFjZXMNCj4+ICMgICAg
-Zm9yIG1lKQ0KPiANCj4gT2ssIHNvIEkgd291bGQgYmUgZmluZSB3aXRoIGNvbXBsZXRlbHkgZHJv
-cHBpbmcgdGhhdCBsaW5lLg0KPiANCj4gdGhlIHBhdGNoIHdvdWxkIHRoZW4gYmUNCj4gDQo+IA0K
-PiANCj4gIi1tYWNoaW5lIHBjIiB3aWxsIG5vdCB3b3JrIGFsbCBhcmNoaXRlY3R1cmVzLiBMZXRz
-IGZhbGwgYmFjayB0byB0aGUNCj4gZGVmYXVsdCBtYWNoaW5lIGJ5IG5vdCBzcGVjaWZ5aW5nIGFu
-eXRoaW5nIGZvciB0aGUgbWFjaGluZS4NCj4gDQo+IEluIGFkZGl0aW9uIHdlIGFsc28gbmVlZCB0
-byBzcGVjaWZ5IC1uby1zaHV0ZG93biBvbiBzMzkwIGFzIHFlbXUgd2lsbA0KPiBleGl0IG9uIGd1
-ZXN0IHNodXRkb3duLiBUaGlzIGhhcHBlbnMgd2hlbiB0aGVyZSBpcyBubyBrZXJuZWwgb3IgYm9v
-dGFibGUNCj4gZGlzayBvbiBzMzkwLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogQ2hyaXN0aWFuIEJv
-cm50cmFlZ2VyIDxib3JudHJhZWdlckBkZS5pYm0uY29tPg0KPiAtLS0NCj4gICB0ZXN0cy9xZW11
-LWlvdGVzdHMvMjM1IHwgMyArKy0NCj4gICAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCsp
-LCAxIGRlbGV0aW9uKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzIz
-NSBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8yMzUNCj4gaW5kZXggZGEwNDRlZDM0ZS4uMzI5ZGE4ZjBj
-MiAxMDA3NTUNCj4gLS0tIGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzIzNQ0KPiArKysgYi90ZXN0cy9x
-ZW11LWlvdGVzdHMvMjM1DQo+IEBAIC00OSw3ICs0OSw4IEBAIHFlbXVfaW1nX2NyZWF0ZSgnLWYn
-LCBpb3Rlc3RzLmltZ2ZtdCwgJy1vJywgJ3ByZWFsbG9jYXRpb249bWV0YWRhdGEnLCBkaXNrLA0K
-PiAgICAgICAgICAgICAgICAgICBzdHIoc2l6ZSkpDQo+ICAgDQo+ICAgdm0gPSBRRU1VTWFjaGlu
-ZShpb3Rlc3RzLnFlbXVfcHJvZykNCj4gLXZtLmFkZF9hcmdzKCctbWFjaGluZScsICdwYyxhY2Nl
-bD1rdm0nKQ0KPiAraWYgaW90ZXN0cy5xZW11X2RlZmF1bHRfbWFjaGluZSA9PSAnczM5MC1jY3ct
-dmlydGlvJzoNCj4gKyAgICAgICAgdm0uYWRkX2FyZ3MoJy1uby1zaHV0ZG93bicpDQo+ICAgdm0u
-YWRkX2FyZ3MoJy1kcml2ZScsICdpZD1zcmMsZmlsZT0nICsgZGlzaykNCj4gICB2bS5sYXVuY2go
-KQ0KPiAgIA0KPiANCj4gDQo+IFNoYWxsIEkgcmVzZW5kIGEgdjI/DQo+IA0KDQpzbywgd2UgbmVl
-ZCAtbm8tc2h1dGRvd24gZXZlbiBpZiB3ZSBkcm9wIGt2bT8gSSBob3BlZCB0aGF0IG5vdC4uIEht
-bS4gZ3JlcCBwb2ludHMgb25seSB0byBvbmUgaW90ZXN0IGRvaW5nIHRoZSBzYW1lIGFib3V0IG5v
-LXNodXRkb3duIC0gMDY4Li4NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+I've tested this again and I haven't been able to reproduce it anymore
+on the current master, it looks fixed.
+
+Thanks! :)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1803160
+
+Title:
+  qemu-3.1.0-rc0: tcg.c crash in temp_load
+
+Status in QEMU:
+  Fix Committed
+
+Bug description:
+  QEMU version:
+  -------------
+
+  qemu-3.1.0-rc0 compiled from sources (earlier versions also affected)
+
+  Summary:
+  --------
+
+  TCG crashes in i386 and x86_64 when it tries to execute some specific
+  illegal instructions. When running full OS emulation, both the guest
+  system and QEMU crash.
+
+  The issue has been reproduced in two scenarios:
+
+  Ubuntu x64 host running Debian x86 guest with the following command
+  line: qemu-system-x86_64 -m 4G debian.qcow
+
+  When the attached ELF file is executed inside the guest, QEMU crashes.
+
+  It can also be reproduced from the command line:
+
+  $ qemu-i386 tcg_crash.elf
+  /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:2863: tcg fatal error
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  zsh: segmentation fault (core dumped)  ../qemu-3.1.0-rc0/build/i386-linux=
+-user/qemu-i386 tcg_crash.elf
+
+  GDB backtrace:
+
+  (gdb) bt
+  #0  0x0000000060206488 in raise ()
+  #1  0x0000000060206b8a in abort ()
+  #2  0x0000000060007016 in temp_load (s=3Ds@entry=3D0x607a2780 <tcg_init_c=
+tx>, ts=3Dts@entry=3D0x607a3178 <tcg_init_ctx+2552>, desired_regs=3D<optimi=
+zed out>, allocated_regs=3Dallocated_regs@entry=3D16400)
+  =C2=A0=C2=A0=C2=A0=C2=A0at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg=
+.c:2863
+  #3  0x000000006000a4d9 in tcg_reg_alloc_op (op=3D0x62808c20, s=3D<optimiz=
+ed out>) at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:3070
+  #4  tcg_gen_code (s=3D<optimized out>, tb=3Dtb@entry=3D0x607ac040 <static=
+_code_gen_buffer+4144>) at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c=
+:3598
+  #5  0x000000006003ef9a in tb_gen_code (cpu=3Dcpu@entry=3D0x627e0010, pc=
+=3Dpc@entry=3D134512724, cs_base=3Dcs_base@entry=3D0, flags=3Dflags@entry=
+=3D4194483, cflags=3Dcflags@entry=3D0)
+  =C2=A0=C2=A0=C2=A0=C2=A0at /home/alberto/Documents/qemu-3.1.0-rc0/accel/t=
+cg/translate-all.c:1752
+  #6  0x000000006003d979 in tb_find (cf_mask=3D0, tb_exit=3D0, last_tb=3D0x=
+0, cpu=3D0x0) at /home/alberto/Documents/qemu-3.1.0-rc0/accel/tcg/cpu-exec.=
+c:404
+  #7  cpu_exec (cpu=3Dcpu@entry=3D0x627e0010) at /home/alberto/Documents/qe=
+mu-3.1.0-rc0/accel/tcg/cpu-exec.c:724
+  #8  0x000000006006e1a0 in cpu_loop (env=3Denv@entry=3D0x627e82c0) at /hom=
+e/alberto/Documents/qemu-3.1.0-rc0/linux-user/i386/cpu_loop.c:93
+  #9  0x00000000600037c5 in main (argc=3D2, argv=3D0x7fffffffdd28, envp=3D<=
+optimized out>) at /home/alberto/Documents/qemu-3.1.0-rc0/linux-user/main.c=
+:819
+  (gdb)
+
+  Testcase:
+  ---------
+
+  Find ELF file attached.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1803160/+subscriptions
