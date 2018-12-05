@@ -1,35 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gUVhu-00012n-3w
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:51:11 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gUVmD-0001hq-81
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:55:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gUVho-0006YM-Cs
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:51:09 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52808)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gUVhn-0006Wy-W2
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:51:04 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gUVhk-0000BN-7h
-	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 11:51:00 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0EA3C2E80DB
-	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 11:50:59 +0000 (UTC)
+	(envelope-from <cohuck@redhat.com>) id 1gUVlE-0004sj-PL
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:54:40 -0500
+Date: Wed, 5 Dec 2018 12:54:29 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181205125429.5134adfd.cohuck@redhat.com>
+In-Reply-To: <c5130ab3-a539-fa1b-37cc-3db3904b3053@de.ibm.com>
+References: <1543961939-2419-1-git-send-email-walling@linux.ibm.com>
+	<a49bf8e8-d5dc-5687-de65-5f4c77edd53d@redhat.com>
+	<c5130ab3-a539-fa1b-37cc-3db3904b3053@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 05 Dec 2018 11:40:02 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-Reply-To: Bug 1801073 <1801073@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154107832062.28716.3850477436321808708.malonedeb@soybean.canonical.com>
-Message-Id: <154401000305.32394.8699954030447345828.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1801073] Re: util/zbin.c:390:37: error: absolute
- value function 'abs' given an argument of type 'long int' but has parameter
- of type 'int' which may cause truncation of value [-Werror=absolute-value]
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1] s390: guest support for
+ diagnose 318 and limit max VCPUs to 247
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,56 +25,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>, Collin Walling <walling@linux.ibm.com>, cornelia.huck@de.ibm.com, cotte@de.ibm.com, mimu@linux.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com
 
-** Tags added: ipxe
+On Wed, 5 Dec 2018 09:27:44 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
--- =
+> On 05.12.2018 09:26, David Hildenbrand wrote:
+> > On 04.12.18 23:18, Collin Walling wrote:  
+> >> Add migration and reset support for diagnose 318. This is a new z14 GA2 
+> >> hardware feature, but we can provide guest support starting with the 
+> >> zEC12-full CPU model.
+> >>
+> >> Because new hardware introduces a new facility-availability byte in 
+> >> the Read SCP Info block, we lose one byte in the CPU entries list 
+> >> and must limit the maximum VCPUs to 247 (down from 248).  
+> > 
+> > This could break setups that upgrade/migrate. At least forward migration
+> > can be broken. Do we care about that?  
+> 
+> Can we maybe bind this feature and the cpu limit to the 4.0 machine?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1801073
+I think that would make sense.
 
-Title:
-  util/zbin.c:390:37: error: absolute value function 'abs' given an
-  argument of type 'long int' but has parameter of type 'int' which may
-  cause truncation of value [-Werror=3Dabsolute-value]
-
-Status in QEMU:
-  New
-
-Bug description:
-  For qemu-3.0.0 I see with GCC 9 compiler a new warning:
-
-  $ make -j1 -C roms pxerom VERBOSE=3D1 V=3D1
-  make: Entering directory '/home/abuild/rpmbuild/BUILD/qemu-3.0.0/roms'
-  make -C ipxe/src CONFIG=3Dqemu \
-  	PACKAGING_TIMESTAMP=3D1534273834 \
-  	CROSS_COMPILE=3D \
-  	bin/8086100e.rom bin/808610d3.rom bin/80861209.rom bin/10500940.rom bin/=
-10222000.rom bin/10ec8139.rom bin/1af41000.rom bin/15ad07b0.rom
-  make[1]: Entering directory '/home/abuild/rpmbuild/BUILD/qemu-3.0.0/roms/=
-ipxe/src'
-  gcc  -Wall -W -Wformat-nonliteral -O2 -g -Werror util/zbin.c -llzma -o ut=
-il/zbin
-  util/zbin.c: In function 'process_zinfo_add':
-  util/zbin.c:390:37: error: absolute value function 'abs' given an argumen=
-t of type 'long int' but has parameter of type 'int' which may cause trunca=
-tion of value [-Werror=3Dabsolute-value]
-    390 |      ( ( addend < 0 ) ? "-" : "" ), abs ( addend ), size,
-        |                                     ^~~
-  util/zbin.c:398:37: error: absolute value function 'abs' given an argumen=
-t of type 'long int' but has parameter of type 'int' which may cause trunca=
-tion of value [-Werror=3Dabsolute-value]
-    398 |      ( ( addend < 0 ) ? "-" : "" ), abs ( addend ), size,
-        |                                     ^~~
-  util/zbin.c:419:37: error: absolute value function 'abs' given an argumen=
-t of type 'long int' but has parameter of type 'int' which may cause trunca=
-tion of value [-Werror=3Dabsolute-value]
-    419 |      ( ( addend < 0 ) ? "-" : "" ), abs ( addend ),
-        |                                     ^~~
-  cc1: all warnings being treated as errors
-  make[1]: *** [Makefile.housekeeping:1368: util/zbin] Error 1
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1801073/+subscriptions
+> > 
+> > Can you split off
+> > 
+> > 1. linux-header changes
+> > 2. CPU model changes? (introduction and definition of new feature, but
+> > not when it is used?)
+> >   
+> >>
+> >> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> >> ---
