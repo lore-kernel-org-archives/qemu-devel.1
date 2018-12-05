@@ -1,32 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maran.wilson@oracle.com>) id 1gUbXS-0004j7-Of
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 13:04:48 -0500
+	(envelope-from <alifm@linux.ibm.com>) id 1gUc3i-0000WH-Vi
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 13:38:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maran.wilson@oracle.com>) id 1gUbXN-0003Ez-Nb
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 13:04:46 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:35268)
+	(envelope-from <alifm@linux.ibm.com>) id 1gUc08-0000pk-Pi
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 13:34:27 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41110)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maran.wilson@oracle.com>)
-	id 1gUbXN-0003E8-Av
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 13:04:41 -0500
-References: <CAGxU2F7+NZUS-BQ1hCnKynVxfsVUYTHRCWQvJwBA12bYmg0ZJA@mail.gmail.com>
-	<938a2f54426dc059428fcfe1882bbb3b2d5cbc99.camel@intel.com>
-	<CAGxU2F50U=NH8fGDXygcYycjoveNpdbKnnG3H0soCvub_Ea5cw@mail.gmail.com>
-	<CAGxU2F7SA-kc0gsLNaUzbiinytJ2DF_r5UpB1JzRy-Su1_WOLw@mail.gmail.com>
-	<a1ca57134a970fb3282afb36c0e3b5647b104ff8.camel@intel.com>
-	<CAGxU2F7Sg0JaxyPQw_FhSc6MzYu+YzZpv9=VHp8qvwfTWpf_MQ@mail.gmail.com>
-	<59cc9e47-3c2a-2417-9e89-e7ade92fdf2d@oracle.com>
-	<20181205132041.GB24623@stefanha-x1.localdomain>
-From: Maran Wilson <maran.wilson@oracle.com>
-Message-ID: <669ef62d-06e2-3e6d-9f27-9ae8934b5330@oracle.com>
-Date: Wed, 5 Dec 2018 10:04:36 -0800
+	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1gUc03-0000gb-HD
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 13:34:21 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wB5IUFqY059061
+	for <qemu-devel@nongnu.org>; Wed, 5 Dec 2018 13:34:17 -0500
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2p6k7vaauv-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 13:34:16 -0500
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
+	Wed, 5 Dec 2018 18:34:14 -0000
+References: <20181122165432.4437-1-cohuck@redhat.com>
+	<20181204133810.66e8cfe5@oc2783563651>
+	<20181204141130.06496b9b.cohuck@redhat.com>
+	<20181204160236.54de2784@oc2783563651>
+	<20181205135402.33c2b22d.cohuck@redhat.com>
+From: Farhan Ali <alifm@linux.ibm.com>
+Date: Wed, 5 Dec 2018 13:34:11 -0500
 MIME-Version: 1.0
-In-Reply-To: <20181205132041.GB24623@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20181205135402.33c2b22d.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Subject: Re: [Qemu-devel] QEMU/NEMU boot time with several x86 firmwares
+Content-Transfer-Encoding: 7bit
+Message-Id: <aa190e90-f832-7958-aa83-1486e570bf40@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 0/3] vfio-ccw: support hsch/csch (kernel
+ part)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,140 +45,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Samuel Ortiz <sameo@linux.intel.com>, Rob Bradford <robert.bradford@intel.com>, Stefano Garzarella <sgarzare@redhat.com>, Maran Wilson <maran.wilson@oracle.com>, Liam Merwick <liam.merwick@oracle.com>
+To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Jason J . Herne" <jjherne@linux.ibm.com>
 
-On 12/5/2018 5:20 AM, Stefan Hajnoczi wrote:
-> On Tue, Dec 04, 2018 at 02:44:33PM -0800, Maran Wilson wrote:
->> On 12/3/2018 8:35 AM, Stefano Garzarella wrote:
->>> On Mon, Dec 3, 2018 at 4:44 PM Rob Bradford <robert.bradford@intel.com> wrote:
->>>> Hi Stefano, thanks for capturing all these numbers,
->>>>
->>>> On Mon, 2018-12-03 at 15:27 +0100, Stefano Garzarella wrote:
->>>>> Hi Rob,
->>>>> I continued to investigate the boot time, and as you suggested I
->>>>> looked also at qemu-lite 2.11.2
->>>>> (https://github.com/kata-containers/qemu) and NEMU "virt" machine. I
->>>>> did the following tests using the Kata kernel configuration
->>>>> (
->>>>> https://github.com/kata-containers/packaging/blob/master/kernel/configs/x86_64_kata_kvm_4.14.x
->>>>> )
->>>>>
->>>>> To compare the results with qemu-lite direct kernel load, I added
->>>>> another tracepoint:
->>>>> - linux_start_kernel: first entry of the Linux kernel
->>>>> (start_kernel())
->>>>>
->>>> Great, do you have a set of patches available that all these trace
->>>> points. It would be great for reproduction.
->>> For sure! I'm attaching a set of patches for qboot, seabios, ovmf,
->>> nemu/qemu/qemu-lite and linux 4.14 whit the tracepoints.
->>> I'm also sharing a python script that I'm using with perf to extract
->>> the numbers in this way:
->>>
->>> $ perf record -a -e kvm:kvm_entry -e kvm:kvm_pio -e
->>> sched:sched_process_exec -o /tmp/qemu_perf.data &
->>> $ # start qemu/nemu multiple times
->>> $ killall perf
->>> $ perf script -s qemu-perf-script.py -i /tmp/qemu_perf.data
->>>
->>>>> As you can see, NEMU is faster to jump to the kernel
->>>>> (linux_start_kernel) than qemu-lite when uses qboot or seabios with
->>>>> virt support, but the time to the user space is strangely high, maybe
->>>>> the kernel configuration that I used is not the best one.
->>>>> Do you suggest another kernel configuration?
->>>>>
->>>> This looks very bad. This isn't the kernel configuration we normally
->>>> test with in our automated test system but is definitely one we support
->>>> as part of our partnernship with the Kata team. It's a high priority
->>>> for me to try and investigate that. Have you saved the kernel messages
->>>> as they might be helpful?
->>> Yes, I'm attaching the dmesg output with nemu and qemu.
->>>
->>>>> Anyway, I obtained the best boot time with qemu-lite and direct
->>>>> kernel
->>>>> load (vmlinux ELF image). I think because the kernel was not
->>>>> compressed. Indeed, looking to the others test, the kernel
->>>>> decompression (bzImage) takes about 80 ms (linux_start_kernel -
->>>>> linux_start_boot). (I'll investigate better)
->>>>>
->>>> Yup being able to load an uncompressed kernel is one of the big
->>>> advantages of qemu-lite. I wonder if we could bring that feature into
->>>> qemu itself to supplement the existing firmware based kernel loading.
->>> I think so, I'll try to understand if we can merge the qemu-lite
->>> direct kernel loading in qemu.
->> An attempt was made a long time ago to push the qemu-lite stuff (from the
->> Intel Clear Containers project) upstream. As I understand it, the main
->> stumbling block that seemed to derail the effort was that it involved adding
->> Linux OS specific code to Qemu so that Qemu could do things like create and
->> populate the zero page that Linux expects when entering startup_64().
+
+
+On 12/05/2018 07:54 AM, Cornelia Huck wrote:
+>> Yeah, that is perfectly clear, but it ain't the complete story. E.g.
+>> are subsequent commands blocking until the preceding command finishes
+>> is part of the interface. And what is good implementation depends on the
+>> answer. What I mean, I first need to understand how things are supposed
+>> to work (together) so I can double check that against the
+>> implementation. Otherwise all I can do is nitpicking.
 >>
->> That ends up being a lot of very low-level, operating specific knowledge
->> about Linux that ends up getting baked into Qemu code. And understandably, a
->> number of folks saw problems with going down a path like that.
->>
->> Since then, we have put together an alternative solution that would allow
->> Qemu to boot an uncompressed Linux binary via the x86/HVM direct boot ABI
->> (https://xenbits.xen.org/docs/unstable/misc/pvh.html). The solution involves
->> first making changes to both the ABI as well as Linux, and then updating
->> Qemu to take advantage of the updated ABI which is already supported by both
->> Linux and Free BSD for booting VMs. As such, Qemu can remain OS agnostic,
->> and just be programmed to the published ABI.
->>
->> The canonical definition for the HVM direct boot ABI is in the Xen tree and
->> we needed to make some minor changes to the ABI definition to allow KVM
->> guests to also use the same structure and entry point. Those changes were
->> accepted to the Xen tree already:
->> https://lists.xenproject.org/archives/html/xen-devel/2018-04/msg00057.html
->>
->> The corresponding Linux changes that would allow KVM guests to be booted via
->> this PVH entry point have already been posted and reviewed:
->> https://lkml.org/lkml/2018/4/16/1002
->>
->> The final part is the set of Qemu changes to take advantage of the above and
->> boot a KVM guest via an uncompressed kernel binary using the entry point
->> defined by the ABI. Liam Merwick will be posting some RFC patches very soon
->> to allow this.
-> Cool, thanks for doing this work!
->
-> How do the boot times compare to qemu-lite and Firecracker's
-> (https://github.com/firecracker-microvm/firecracker/) direct vmlinux ELF
-> boot?
+>> To get more tangible: we are in the middle of processing an SSCH request
+>> (e.g. doing the translation) when a HSCH comes in. What should happen?
+>> Should we start processing HSCH after he instruction part of SSCH is
+>> done -- which currently includes translation? Or should we -EBUSY? Or do
+>> we abort START related activities and do the HALT stuff?
+> I think most of the sorting-out-the-operations stuff should be done by
+> the hardware itself, and we should not really try to enforce anything
+> special in our vfio code.
+> 
+> For your example, it might be best if a hsch is always accepted and
+> send on towards the hardware. Probably best to reflect back -EAGAIN if
+> we're currently processing another instruction from another vcpu, so
+> that the user space caller can retry. Same for ssch, if another ssch is
+> already being processed. We*could*  reflect cc 2 if the fctl bit is
+> already set, but that won't do for csch, so it is probably best to have
+> the hardware figure that out in any case.
+> 
+> If I read the code correctly, we currently reflect -EBUSY and not
+> -EAGAIN if we get a ssch request while already processing another one.
+> QEMU hands that back to the guest as a cc 2, which is not 100% correct.
+> In practice, we don't see this with Linux guests due to locking.
+> 
 
-Boot times compare very favorably to qemu-lite, since the end result is 
-basically doing a very similar thing. For now, we are going with a QEMU 
-+ qboot solution to introduce the PVH entry support in Qemu (meaning we 
-will be posting Qemu and qboot patches and you will need both to boot an 
-uncompressed kernel binary). As such we have numbers that Liam will 
-include in the cover letter showing significant boot time improvement 
-over existing QEMU + qboot approaches involving a compressed kernel 
-binary. And as we all know, the existing qboot approach already gets 
-boot times down pretty low.
+If we have a ssch and a csch immediately afterwards from userspace, will 
+we end up issuing csch first and then ssch to the hardware?
 
-Once the patches have been posted (soon) it would be great if some other 
-folks could pick them up and run your own numbers on various test setups 
-and comparisons you already have.
+If I understand correctly, the ccw translation as part of the ssch can 
+be a slow operation so it might be possible we issue the csch first?
+In that case we won't actually clear the original start function as 
+intended.
 
-I haven't tried Firecracker, specifically. It would be good to see a 
-comparison just so we know where we stand, but it's not terribly 
-relevant to folks who want to continue using Qemu right? Meaning Qemu 
-(and all solutions built on it like kata) still needs a solution for 
-improving boot time regardless of what NEMU and Firecracker are doing.
 
-And from what I've read so far, Firecracker only supports Linux guests. 
-So one could arguably just bake in all sorts of Linux specific knowledge 
-into it and have it lay things out like zero page right in the VMM code 
-right?
-
-I don't know off-hand, but is that how Firecracker boots an uncompressed 
-Linux kernel? Anyone know?
-
-Thanks,
--Maran
-
-> I'm asking because there are several custom approaches to fast kernel
-> boot and we should make sure that whatever Linux and QEMU end up
-> natively supporting is likely to work for all projects (NEMU, qemu-lite,
-> Firecracker) and operating systems (Linux distros, other OSes).
->
-> Stefan
+Thanks
+Farhan
