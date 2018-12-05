@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gUf2g-00061Q-3J
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 16:49:14 -0500
+	(envelope-from <eblake@redhat.com>) id 1gUf96-0007Do-CW
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 16:55:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gUf2b-0004lo-9p
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 16:49:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33108)
+	(envelope-from <eblake@redhat.com>) id 1gUf91-0004ly-K5
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 16:55:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40998)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gUf2b-0004lT-3t
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 16:49:09 -0500
-References: <1f7db2e27758f26d4c10f7a8ed1d8232635f6909.1536044449.git.pkrempa@redhat.com>
-	<20181004113412.GI21448@angien.pipo.sk>
-	<20181205123337.GI799@angien.pipo.sk>
-	<CAJ+F1CLr5_nB2hpXJrhMeJnsXjME8k+0s90wZHw-H_qsQht63A@mail.gmail.com>
-	<87tvjsq71s.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gUf91-0004kh-ER
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 16:55:47 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B7DD130D0303
+	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 21:55:46 +0000 (UTC)
+References: <20181130140615.19937-1-berrange@redhat.com>
+	<20181130140615.19937-10-berrange@redhat.com>
+	<868aa668-c882-3392-ee10-2afc28a51f7e@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <c72d80b5-5996-eb78-58ca-6764278dab54@redhat.com>
-Date: Wed, 5 Dec 2018 15:49:06 -0600
+Message-ID: <5d9b6cdf-3d6b-a424-daa1-e5a498920f59@redhat.com>
+Date: Wed, 5 Dec 2018 15:55:28 -0600
 MIME-Version: 1.0
-In-Reply-To: <87tvjsq71s.fsf@dusky.pond.sub.org>
+In-Reply-To: <868aa668-c882-3392-ee10-2afc28a51f7e@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qapi: Add vim magic modelines for qapi
- definitions
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 09/11] authz: add QAuthZListFile object
+ type for a file access control list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,40 +36,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: Peter Krempa <pkrempa@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-On 12/5/18 10:20 AM, Markus Armbruster wrote:
+On 12/5/18 11:23 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 11/30/18 3:06 PM, Daniel P. Berrang=C3=A9 wrote:
+>> Add a QAuthZListFile object type that implements the QAuthZ interface.=
+ This
+>> built-in implementation is a proxy around the QAuthZList object type,
+>> initializing it from an external file, and optionally, automatically
+>> reloading it whenever it changes.
+>>
+>> To create an instance of this object via the QMP monitor, the syntax
+>> used would be:
+>>
+>>        {
+>>          "execute": "object-add",
+>>          "arguments": {
+>>            "qom-type": "authz-list-file",
+>>            "id": "authz0",
+>>            "parameters": {
+>=20
+> "parameters" -> "props"
+>=20
+>>              "filename": "/etc/qemu/vnc.acl",
+>> 	    "refresh": "yes"
+>=20
+> I had to use "refresh": yes (value unquoted) to avoid:
 
->> The vim plugin doesn't have an equivalent, however, the documentation
->> suggest vim_filetype, but you need to add
->> to .vimrc:
->>
->> function! FiletypeHook(config)
->>      if has_key(a:config, 'vim_filetype')
->>          let &filetype = a:config['vim_filetype']
->>      endif
->>
->>      return 0   " Return 0 to show no error happened
->> endfunction
->>
->> call editorconfig#AddNewHook(function('FiletypeHook'))
->>
->> I think this is a better solution than having to add modelines
->> everywhere, what do you think?
-> 
-> These .json files are not valid JSON.  They *are* valid Python (except
-> for a few tests, which could perhaps be fixed).  Makes me wonder why on
-> earth we insist on naming them .json and create all this trouble.
+Do you mean "refresh":true?  (bare yes is not valid JSON, but bare true=20
+is the correct way for a JSON bool).
 
-I've previously posted patches that bulk-renames the QAPI files from 
-.json to .qapi, but too close to a release cycle to be applied at the 
-time. I'd have to refresh them to match new files in the meantime, but 
-as long as we are arguing that editorconfig is a smart way to go, it's a 
-fairly simple tweak to editorconfig to match the preferred suffix we use 
-for QAPI files.
 
--- 
+--=20
 Eric Blake, Principal Software Engineer
 Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
