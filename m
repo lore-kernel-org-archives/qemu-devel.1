@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gUgWF-0006IX-Fi
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:23:55 -0500
+	(envelope-from <clg@kaod.org>) id 1gUgWK-0006Ni-PQ
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:24:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gUgWB-0002wm-7U
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:23:51 -0500
-Received: from 18.mo4.mail-out.ovh.net ([188.165.54.143]:37603)
+	(envelope-from <clg@kaod.org>) id 1gUgWG-00031Q-KI
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:23:56 -0500
+Received: from 2.mo3.mail-out.ovh.net ([46.105.75.36]:59059)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gUgWA-0002ua-KZ
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:23:46 -0500
-Received: from player714.ha.ovh.net (unknown [10.109.146.173])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 2C7211C3E2D
-	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 00:23:45 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gUgWG-0002zs-6D
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:23:52 -0500
+Received: from player714.ha.ovh.net (unknown [10.109.146.32])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id AE2B91EBAC2
+	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 00:23:50 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu,  6 Dec 2018 00:22:21 +0100
-Message-Id: <20181205232251.10446-8-clg@kaod.org>
+Date: Thu,  6 Dec 2018 00:22:22 +0100
+Message-Id: <20181205232251.10446-9-clg@kaod.org>
 In-Reply-To: <20181205232251.10446-1-clg@kaod.org>
 References: <20181205232251.10446-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 07/37] ppc/xive: introduce the XIVE
- interrupt thread context
+Subject: [Qemu-devel] [PATCH v6 08/37] ppc/xive: introduce a simplified XIVE
+ presenter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,674 +33,405 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Each POWER9 processor chip has a XIVE presenter that can generate four
-different exceptions to its threads:
+The last sub-engine of the XIVE architecture is the Interrupt
+Virtualization Presentation Engine (IVPE). On HW, the IVRE and the
+IVPE share elements, the Power Bus interface (CQ), the routing table
+descriptors, and they can be combined in the same HW logic. We do the
+same in QEMU and combine both engines in the XiveRouter for
+simplicity.
 
-  - hypervisor exception,
-  - O/S exception
-  - Event-Based Branch (EBB)
-  - msgsnd (doorbell).
+When the IVRE has completed its job of matching an event source with a
+Notification Virtual Target (NVT) to notify, it forwards the event
+notification to the IVPE sub-engine. The IVPE scans the thread
+interrupt contexts of the Notification Virtual Targets (NVT)
+dispatched on the HW processor threads and if a match is found, it
+signals the thread. If not, the IVPE escalates the notification to
+some other targets and records the notification in a backlog queue.
 
-Each exception has a state independent from the others called a Thread
-Interrupt Management context. This context is a set of registers which
-lets the thread handle priority management and interrupt acknowledgment
-among other things. The most important ones being :
+The IVPE maintains the thread interrupt context state for each of its
+NVTs not dispatched on HW processor threads in the Notification
+Virtual Target table (NVTT).
 
-  - Interrupt Priority Register  (PIPR)
-  - Interrupt Pending Buffer     (IPB)
-  - Current Processor Priority   (CPPR)
-  - Notification Source Register (NSR)
-
-These registers are accessible through a specific MMIO region, called
-the Thread Interrupt Management Area (TIMA), four aligned pages, each
-exposing a different view of the registers. First page (page address
-ending in 0b00) gives access to the entire context and is reserved for
-the ring 0 view for the physical thread context. The second (page
-address ending in 0b01) is for the hypervisor, ring 1 view. The third
-(page address ending in 0b10) is for the operating system, ring 2
-view. The fourth (page address ending in 0b11) is for user level, ring
-3 view.
-
-The thread interrupt context is modeled with a XiveTCTX object
-containing the values of the different exception registers. The TIMA
-region is mapped at the same address for each CPU.
+The model currently only supports single NVT notifications.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- include/hw/ppc/xive.h      |  44 ++++
- include/hw/ppc/xive_regs.h |  82 ++++++++
- hw/intc/xive.c             | 419 +++++++++++++++++++++++++++++++++++++
- 3 files changed, 545 insertions(+)
+ include/hw/ppc/xive.h      |  15 +++
+ include/hw/ppc/xive_regs.h |  24 ++++
+ hw/intc/xive.c             | 227 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 266 insertions(+)
 
 diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-index d67b0785df7c..74b547707b17 100644
+index 74b547707b17..e9b06e75fc1c 100644
 --- a/include/hw/ppc/xive.h
 +++ b/include/hw/ppc/xive.h
-@@ -368,4 +368,48 @@ typedef struct XiveENDSource {
- void xive_end_pic_print_info(XiveEND *end, uint32_t end_idx, Monitor *mo=
-n);
- void xive_end_queue_pic_print_info(XiveEND *end, uint32_t width, Monitor=
- *mon);
+@@ -327,6 +327,10 @@ typedef struct XiveRouterClass {
+                    XiveEND *end);
+     int (*write_end)(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_idx=
+,
+                      XiveEND *end, uint8_t word_number);
++    int (*get_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_idx,
++                   XiveNVT *nvt);
++    int (*write_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_idx=
+,
++                     XiveNVT *nvt, uint8_t word_number);
+ } XiveRouterClass;
 =20
-+/*
-+ * XIVE Thread interrupt Management (TM) context
-+ */
+ void xive_eas_pic_print_info(XiveEAS *eas, uint32_t lisn, Monitor *mon);
+@@ -337,6 +341,11 @@ int xive_router_get_end(XiveRouter *xrtr, uint8_t en=
+d_blk, uint32_t end_idx,
+                         XiveEND *end);
+ int xive_router_write_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t en=
+d_idx,
+                           XiveEND *end, uint8_t word_number);
++int xive_router_get_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_=
+idx,
++                        XiveNVT *nvt);
++int xive_router_write_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nv=
+t_idx,
++                          XiveNVT *nvt, uint8_t word_number);
 +
-+#define TYPE_XIVE_TCTX "xive-tctx"
-+#define XIVE_TCTX(obj) OBJECT_CHECK(XiveTCTX, (obj), TYPE_XIVE_TCTX)
-+
-+/*
-+ * XIVE Thread interrupt Management register rings :
-+ *
-+ *   QW-0  User       event-based exception state
-+ *   QW-1  O/S        OS context for priority management, interrupt acks
-+ *   QW-2  Pool       hypervisor pool context for virtual processors dis=
-patched
-+ *   QW-3  Physical   physical thread context and security context
-+ */
-+#define XIVE_TM_RING_COUNT      4
-+#define XIVE_TM_RING_SIZE       0x10
-+
-+typedef struct XiveTCTX {
-+    DeviceState parent_obj;
-+
-+    CPUState    *cs;
-+    qemu_irq    output;
-+
-+    uint8_t     regs[XIVE_TM_RING_COUNT * XIVE_TM_RING_SIZE];
-+} XiveTCTX;
-+
-+/*
-+ * XIVE Thread Interrupt Management Aera (TIMA)
-+ *
-+ * This region gives access to the registers of the thread interrupt
-+ * management context. It is four page wide, each page providing a
-+ * different view of the registers. The page with the lower offset is
-+ * the most privileged and gives access to the entire context.
-+ */
-+#define XIVE_TM_HW_PAGE         0x0
-+#define XIVE_TM_HV_PAGE         0x1
-+#define XIVE_TM_OS_PAGE         0x2
-+#define XIVE_TM_USER_PAGE       0x3
-+
-+extern const MemoryRegionOps xive_tm_ops;
-+
-+void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
+=20
+ /*
+  * XIVE END ESBs
+@@ -393,6 +402,7 @@ typedef struct XiveTCTX {
+     qemu_irq    output;
+=20
+     uint8_t     regs[XIVE_TM_RING_COUNT * XIVE_TM_RING_SIZE];
++    uint32_t    hw_cam;
+ } XiveTCTX;
+=20
+ /*
+@@ -412,4 +422,9 @@ extern const MemoryRegionOps xive_tm_ops;
+=20
+ void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
+=20
++static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nvt_i=
+dx)
++{
++    return (nvt_blk << 19) | nvt_idx;
++}
 +
  #endif /* PPC_XIVE_H */
 diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
-index 3c0ebad18b69..ede3d04c5eda 100644
+index ede3d04c5eda..85557e730cd8 100644
 --- a/include/hw/ppc/xive_regs.h
 +++ b/include/hw/ppc/xive_regs.h
-@@ -23,6 +23,88 @@
- #define XIVE_SRCNO_INDEX(srcno) ((srcno) & 0x0fffffff)
- #define XIVE_SRCNO(blk, idx)    ((uint32_t)(blk) << 28 | (idx))
+@@ -186,4 +186,28 @@ typedef struct XiveEND {
+ #define GETFIELD_BE32(m, v)       GETFIELD(m, be32_to_cpu(v))
+ #define SETFIELD_BE32(m, v, val)  cpu_to_be32(SETFIELD(m, be32_to_cpu(v)=
+, val))
 =20
-+#define TM_SHIFT                16
++/* Notification Virtual Target (NVT) */
++typedef struct XiveNVT {
++        uint32_t        w0;
++#define NVT_W0_VALID             PPC_BIT32(0)
++        uint32_t        w1;
++        uint32_t        w2;
++        uint32_t        w3;
++        uint32_t        w4;
++        uint32_t        w5;
++        uint32_t        w6;
++        uint32_t        w7;
++        uint32_t        w8;
++#define NVT_W8_GRP_VALID         PPC_BIT32(0)
++        uint32_t        w9;
++        uint32_t        wa;
++        uint32_t        wb;
++        uint32_t        wc;
++        uint32_t        wd;
++        uint32_t        we;
++        uint32_t        wf;
++} XiveNVT;
 +
-+/* TM register offsets */
-+#define TM_QW0_USER             0x000 /* All rings */
-+#define TM_QW1_OS               0x010 /* Ring 0..2 */
-+#define TM_QW2_HV_POOL          0x020 /* Ring 0..1 */
-+#define TM_QW3_HV_PHYS          0x030 /* Ring 0..1 */
++#define xive_nvt_is_valid(nvt)    (be32_to_cpu((nvt)->w0) & NVT_W0_VALID=
+)
 +
-+/* Byte offsets inside a QW             QW0 QW1 QW2 QW3 */
-+#define TM_NSR                  0x0  /*  +   +   -   +  */
-+#define TM_CPPR                 0x1  /*  -   +   -   +  */
-+#define TM_IPB                  0x2  /*  -   +   +   +  */
-+#define TM_LSMFB                0x3  /*  -   +   +   +  */
-+#define TM_ACK_CNT              0x4  /*  -   +   -   -  */
-+#define TM_INC                  0x5  /*  -   +   -   +  */
-+#define TM_AGE                  0x6  /*  -   +   -   +  */
-+#define TM_PIPR                 0x7  /*  -   +   -   +  */
-+
-+#define TM_WORD0                0x0
-+#define TM_WORD1                0x4
-+
-+/*
-+ * QW word 2 contains the valid bit at the top and other fields
-+ * depending on the QW.
-+ */
-+#define TM_WORD2                0x8
-+#define   TM_QW0W2_VU           PPC_BIT32(0)
-+#define   TM_QW0W2_LOGIC_SERV   PPC_BITMASK32(1, 31) /* XX 2,31 ? */
-+#define   TM_QW1W2_VO           PPC_BIT32(0)
-+#define   TM_QW1W2_OS_CAM       PPC_BITMASK32(8, 31)
-+#define   TM_QW2W2_VP           PPC_BIT32(0)
-+#define   TM_QW2W2_POOL_CAM     PPC_BITMASK32(8, 31)
-+#define   TM_QW3W2_VT           PPC_BIT32(0)
-+#define   TM_QW3W2_LP           PPC_BIT32(6)
-+#define   TM_QW3W2_LE           PPC_BIT32(7)
-+#define   TM_QW3W2_T            PPC_BIT32(31)
-+
-+/*
-+ * In addition to normal loads to "peek" and writes (only when invalid)
-+ * using 4 and 8 bytes accesses, the above registers support these
-+ * "special" byte operations:
-+ *
-+ *   - Byte load from QW0[NSR] - User level NSR (EBB)
-+ *   - Byte store to QW0[NSR] - User level NSR (EBB)
-+ *   - Byte load/store to QW1[CPPR] and QW3[CPPR] - CPPR access
-+ *   - Byte load from QW3[TM_WORD2] - Read VT||00000||LP||LE on thrd 0
-+ *                                    otherwise VT||0000000
-+ *   - Byte store to QW3[TM_WORD2] - Set VT bit (and LP/LE if present)
-+ *
-+ * Then we have all these "special" CI ops at these offset that trigger
-+ * all sorts of side effects:
-+ */
-+#define TM_SPC_ACK_EBB          0x800   /* Load8 ack EBB to reg*/
-+#define TM_SPC_ACK_OS_REG       0x810   /* Load16 ack OS irq to reg */
-+#define TM_SPC_PUSH_USR_CTX     0x808   /* Store32 Push/Validate user co=
-ntext */
-+#define TM_SPC_PULL_USR_CTX     0x808   /* Load32 Pull/Invalidate user
-+                                         * context */
-+#define TM_SPC_SET_OS_PENDING   0x812   /* Store8 Set OS irq pending bit=
- */
-+#define TM_SPC_PULL_OS_CTX      0x818   /* Load32/Load64 Pull/Invalidate=
- OS
-+                                         * context to reg */
-+#define TM_SPC_PULL_POOL_CTX    0x828   /* Load32/Load64 Pull/Invalidate=
- Pool
-+                                         * context to reg*/
-+#define TM_SPC_ACK_HV_REG       0x830   /* Load16 ack HV irq to reg */
-+#define TM_SPC_PULL_USR_CTX_OL  0xc08   /* Store8 Pull/Inval usr ctx to =
-odd
-+                                         * line */
-+#define TM_SPC_ACK_OS_EL        0xc10   /* Store8 ack OS irq to even lin=
-e */
-+#define TM_SPC_ACK_HV_POOL_EL   0xc20   /* Store8 ack HV evt pool to eve=
-n
-+                                         * line */
-+#define TM_SPC_ACK_HV_EL        0xc30   /* Store8 ack HV irq to even lin=
-e */
-+/* XXX more... */
-+
-+/* NSR fields for the various QW ack types */
-+#define TM_QW0_NSR_EB           PPC_BIT8(0)
-+#define TM_QW1_NSR_EO           PPC_BIT8(0)
-+#define TM_QW3_NSR_HE           PPC_BITMASK8(0, 1)
-+#define  TM_QW3_NSR_HE_NONE     0
-+#define  TM_QW3_NSR_HE_POOL     1
-+#define  TM_QW3_NSR_HE_PHYS     2
-+#define  TM_QW3_NSR_HE_LSI      3
-+#define TM_QW3_NSR_I            PPC_BIT8(2)
-+#define TM_QW3_NSR_GRP_LVL      PPC_BIT8(3, 7)
-+
- /* EAS (Event Assignment Structure)
-  *
-  * One per interrupt source. Targets an interrupt to a given Event
+ #endif /* PPC_XIVE_REGS_H */
 diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index 83686e260df5..80a965c14200 100644
+index 80a965c14200..891542920683 100644
 --- a/hw/intc/xive.c
 +++ b/hw/intc/xive.c
-@@ -16,6 +16,424 @@
- #include "hw/qdev-properties.h"
- #include "monitor/monitor.h"
- #include "hw/ppc/xive.h"
-+#include "hw/ppc/xive_regs.h"
-+
-+/*
-+ * XIVE Thread Interrupt Management context
-+ */
-+
-+static uint64_t xive_tctx_accept(XiveTCTX *tctx, uint8_t ring)
-+{
-+    return 0;
-+}
-+
-+static void xive_tctx_set_cppr(XiveTCTX *tctx, uint8_t ring, uint8_t cpp=
-r)
-+{
-+    if (cppr > XIVE_PRIORITY_MAX) {
-+        cppr =3D 0xff;
-+    }
-+
-+    tctx->regs[ring + TM_CPPR] =3D cppr;
-+}
-+
-+/*
-+ * XIVE Thread Interrupt Management Area (TIMA)
-+ */
-+
-+/*
-+ * Define an access map for each page of the TIMA that we will use in
-+ * the memory region ops to filter values when doing loads and stores
-+ * of raw registers values
-+ *
-+ * Registers accessibility bits :
-+ *
-+ *    0x0 - no access
-+ *    0x1 - write only
-+ *    0x2 - read only
-+ *    0x3 - read/write
-+ */
-+
-+static const uint8_t xive_tm_hw_view[] =3D {
-+    /* QW-0 User */   3, 0, 0, 0,   0, 0, 0, 0,   3, 3, 3, 3,   0, 0, 0,=
- 0,
-+    /* QW-1 OS   */   3, 3, 3, 3,   3, 3, 0, 3,   3, 3, 3, 3,   0, 0, 0,=
- 0,
-+    /* QW-2 POOL */   0, 0, 3, 3,   0, 0, 0, 0,   3, 3, 3, 3,   0, 0, 0,=
- 0,
-+    /* QW-3 PHYS */   3, 3, 3, 3,   0, 3, 0, 3,   3, 0, 0, 3,   3, 3, 3,=
- 0,
-+};
-+
-+static const uint8_t xive_tm_hv_view[] =3D {
-+    /* QW-0 User */   3, 0, 0, 0,   0, 0, 0, 0,   3, 3, 3, 3,   0, 0, 0,=
- 0,
-+    /* QW-1 OS   */   3, 3, 3, 3,   3, 3, 0, 3,   3, 3, 3, 3,   0, 0, 0,=
- 0,
-+    /* QW-2 POOL */   0, 0, 3, 3,   0, 0, 0, 0,   0, 3, 3, 3,   0, 0, 0,=
- 0,
-+    /* QW-3 PHYS */   3, 3, 3, 3,   0, 3, 0, 3,   3, 0, 0, 3,   0, 0, 0,=
- 0,
-+};
-+
-+static const uint8_t xive_tm_os_view[] =3D {
-+    /* QW-0 User */   3, 0, 0, 0,   0, 0, 0, 0,   3, 3, 3, 3,   0, 0, 0,=
- 0,
-+    /* QW-1 OS   */   2, 3, 2, 2,   2, 2, 0, 2,   0, 0, 0, 0,   0, 0, 0,=
- 0,
-+    /* QW-2 POOL */   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0,=
- 0,
-+    /* QW-3 PHYS */   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0,=
- 0,
-+};
-+
-+static const uint8_t xive_tm_user_view[] =3D {
-+    /* QW-0 User */   3, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0,=
- 0,
-+    /* QW-1 OS   */   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0,=
- 0,
-+    /* QW-2 POOL */   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0,=
- 0,
-+    /* QW-3 PHYS */   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0,=
- 0,
-+};
-+
-+/*
-+ * Overall TIMA access map for the thread interrupt management context
-+ * registers
-+ */
-+static const uint8_t *xive_tm_views[] =3D {
-+    [XIVE_TM_HW_PAGE]   =3D xive_tm_hw_view,
-+    [XIVE_TM_HV_PAGE]   =3D xive_tm_hv_view,
-+    [XIVE_TM_OS_PAGE]   =3D xive_tm_os_view,
-+    [XIVE_TM_USER_PAGE] =3D xive_tm_user_view,
-+};
-+
-+/*
-+ * Computes a register access mask for a given offset in the TIMA
-+ */
-+static uint64_t xive_tm_mask(hwaddr offset, unsigned size, bool write)
-+{
-+    uint8_t page_offset =3D (offset >> TM_SHIFT) & 0x3;
-+    uint8_t reg_offset =3D offset & 0x3F;
-+    uint8_t reg_mask =3D write ? 0x1 : 0x2;
-+    uint64_t mask =3D 0x0;
-+    int i;
-+
-+    for (i =3D 0; i < size; i++) {
-+        if (xive_tm_views[page_offset][reg_offset + i] & reg_mask) {
-+            mask |=3D (uint64_t) 0xff << (8 * (size - i - 1));
-+        }
-+    }
-+
-+    return mask;
-+}
-+
-+static void xive_tm_raw_write(XiveTCTX *tctx, hwaddr offset, uint64_t va=
-lue,
-+                              unsigned size)
-+{
-+    uint8_t ring_offset =3D offset & 0x30;
-+    uint8_t reg_offset =3D offset & 0x3F;
-+    uint64_t mask =3D xive_tm_mask(offset, size, true);
-+    int i;
-+
-+    /*
-+     * Only 4 or 8 bytes stores are allowed and the User ring is
-+     * excluded
-+     */
-+    if (size < 4 || !mask || ring_offset =3D=3D TM_QW0_USER) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid write access at TI=
-MA @%"
-+                      HWADDR_PRIx"\n", offset);
-+        return;
-+    }
-+
-+    /*
-+     * Use the register offset for the raw values and filter out
-+     * reserved values
-+     */
-+    for (i =3D 0; i < size; i++) {
-+        uint8_t byte_mask =3D (mask >> (8 * (size - i - 1)));
-+        if (byte_mask) {
-+            tctx->regs[reg_offset + i] =3D (value >> (8 * (size - i - 1)=
-)) &
-+                byte_mask;
-+        }
-+    }
-+}
-+
-+static uint64_t xive_tm_raw_read(XiveTCTX *tctx, hwaddr offset, unsigned=
- size)
-+{
-+    uint8_t ring_offset =3D offset & 0x30;
-+    uint8_t reg_offset =3D offset & 0x3F;
-+    uint64_t mask =3D xive_tm_mask(offset, size, false);
-+    uint64_t ret;
-+    int i;
-+
-+    /*
-+     * Only 4 or 8 bytes loads are allowed and the User ring is
-+     * excluded
-+     */
-+    if (size < 4 || !mask || ring_offset =3D=3D TM_QW0_USER) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid read access at TIM=
-A @%"
-+                      HWADDR_PRIx"\n", offset);
-+        return -1;
-+    }
-+
-+    /* Use the register offset for the raw values */
-+    ret =3D 0;
-+    for (i =3D 0; i < size; i++) {
-+        ret |=3D (uint64_t) tctx->regs[reg_offset + i] << (8 * (size - i=
- - 1));
-+    }
-+
-+    /* filter out reserved values */
-+    return ret & mask;
-+}
-+
-+/*
-+ * The TM context is mapped twice within each page. Stores and loads
-+ * to the first mapping below 2K write and read the specified values
-+ * without modification. The second mapping above 2K performs specific
-+ * state changes (side effects) in addition to setting/returning the
-+ * interrupt management area context of the processor thread.
-+ */
-+static uint64_t xive_tm_ack_os_reg(XiveTCTX *tctx, hwaddr offset, unsign=
-ed size)
-+{
-+    return xive_tctx_accept(tctx, TM_QW1_OS);
-+}
-+
-+static void xive_tm_set_os_cppr(XiveTCTX *tctx, hwaddr offset,
-+                                uint64_t value, unsigned size)
-+{
-+    xive_tctx_set_cppr(tctx, TM_QW1_OS, value & 0xff);
-+}
-+
-+/*
-+ * Define a mapping of "special" operations depending on the TIMA page
-+ * offset and the size of the operation.
-+ */
-+typedef struct XiveTmOp {
-+    uint8_t  page_offset;
-+    uint32_t op_offset;
-+    unsigned size;
-+    void     (*write_handler)(XiveTCTX *tctx, hwaddr offset, uint64_t va=
-lue,
-+                              unsigned size);
-+    uint64_t (*read_handler)(XiveTCTX *tctx, hwaddr offset, unsigned siz=
-e);
-+} XiveTmOp;
-+
-+static const XiveTmOp xive_tm_operations[] =3D {
-+    /*
-+     * MMIOs below 2K : raw values and special operations without side
-+     * effects
-+     */
-+    { XIVE_TM_OS_PAGE, TM_QW1_OS + TM_CPPR,   1, xive_tm_set_os_cppr, NU=
-LL },
-+
-+    /* MMIOs above 2K : special operations with side effects */
-+    { XIVE_TM_OS_PAGE, TM_SPC_ACK_OS_REG,     2, NULL, xive_tm_ack_os_re=
-g },
-+};
-+
-+static const XiveTmOp *xive_tm_find_op(hwaddr offset, unsigned size, boo=
-l write)
-+{
-+    uint8_t page_offset =3D (offset >> TM_SHIFT) & 0x3;
-+    uint32_t op_offset =3D offset & 0xFFF;
-+    int i;
-+
-+    for (i =3D 0; i < ARRAY_SIZE(xive_tm_operations); i++) {
-+        const XiveTmOp *xto =3D &xive_tm_operations[i];
-+
-+        /* Accesses done from a more privileged TIMA page is allowed */
-+        if (xto->page_offset >=3D page_offset &&
-+            xto->op_offset =3D=3D op_offset &&
-+            xto->size =3D=3D size &&
-+            ((write && xto->write_handler) || (!write && xto->read_handl=
-er))) {
-+            return xto;
-+        }
-+    }
-+    return NULL;
-+}
-+
-+/*
-+ * TIMA MMIO handlers
-+ */
-+static void xive_tm_write(void *opaque, hwaddr offset,
-+                          uint64_t value, unsigned size)
-+{
-+    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
-+    XiveTCTX *tctx =3D XIVE_TCTX(cpu->intc);
-+    const XiveTmOp *xto;
-+
-+    /*
-+     * TODO: check V bit in Q[0-3]W2, check PTER bit associated with CPU
-+     */
-+
-+    /*
-+     * First, check for special operations in the 2K region
-+     */
-+    if (offset & 0x800) {
-+        xto =3D xive_tm_find_op(offset, size, true);
-+        if (!xto) {
-+            qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid write access a=
-t TIMA"
-+                          "@%"HWADDR_PRIx"\n", offset);
-+        } else {
-+            xto->write_handler(tctx, offset, value, size);
-+        }
-+        return;
-+    }
-+
-+    /*
-+     * Then, for special operations in the region below 2K.
-+     */
-+    xto =3D xive_tm_find_op(offset, size, true);
-+    if (xto) {
-+        xto->write_handler(tctx, offset, value, size);
-+        return;
-+    }
-+
-+    /*
-+     * Finish with raw access to the register values
-+     */
-+    xive_tm_raw_write(tctx, offset, value, size);
-+}
-+
-+static uint64_t xive_tm_read(void *opaque, hwaddr offset, unsigned size)
-+{
-+    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
-+    XiveTCTX *tctx =3D XIVE_TCTX(cpu->intc);
-+    const XiveTmOp *xto;
-+
-+    /*
-+     * TODO: check V bit in Q[0-3]W2, check PTER bit associated with CPU
-+     */
-+
-+    /*
-+     * First, check for special operations in the 2K region
-+     */
-+    if (offset & 0x800) {
-+        xto =3D xive_tm_find_op(offset, size, false);
-+        if (!xto) {
-+            qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid read access to=
- TIMA"
-+                          "@%"HWADDR_PRIx"\n", offset);
-+            return -1;
-+        }
-+        return xto->read_handler(tctx, offset, size);
-+    }
-+
-+    /*
-+     * Then, for special operations in the region below 2K.
-+     */
-+    xto =3D xive_tm_find_op(offset, size, false);
-+    if (xto) {
-+        return xto->read_handler(tctx, offset, size);
-+    }
-+
-+    /*
-+     * Finish with raw access to the register values
-+     */
-+    return xive_tm_raw_read(tctx, offset, size);
-+}
-+
-+const MemoryRegionOps xive_tm_ops =3D {
-+    .read =3D xive_tm_read,
-+    .write =3D xive_tm_write,
-+    .endianness =3D DEVICE_BIG_ENDIAN,
-+    .valid =3D {
-+        .min_access_size =3D 1,
-+        .max_access_size =3D 8,
-+    },
-+    .impl =3D {
-+        .min_access_size =3D 1,
-+        .max_access_size =3D 8,
-+    },
-+};
-+
-+static char *xive_tctx_ring_print(uint8_t *ring)
-+{
-+    uint32_t w2 =3D be32_to_cpu(*((uint32_t *) &ring[TM_WORD2]));
-+
-+    return g_strdup_printf("%02x   %02x  %02x    %02x   %02x  "
-+                   "%02x  %02x   %02x  %08x",
-+                   ring[TM_NSR], ring[TM_CPPR], ring[TM_IPB], ring[TM_LS=
-MFB],
-+                   ring[TM_ACK_CNT], ring[TM_INC], ring[TM_AGE], ring[TM=
-_PIPR],
-+                   w2);
-+}
-+
-+static const char * const xive_tctx_ring_names[] =3D {
-+    "USER", "OS", "POOL", "PHYS",
-+};
-+
-+void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon)
-+{
-+    int cpu_index =3D tctx->cs ? tctx->cs->cpu_index : -1;
-+    int i;
-+
-+    monitor_printf(mon, "CPU[%04x]:   QW   NSR CPPR IPB LSMFB ACK# INC A=
-GE PIPR"
-+                   "  W2\n", cpu_index);
-+
-+    for (i =3D 0; i < XIVE_TM_RING_COUNT; i++) {
-+        char *s =3D xive_tctx_ring_print(&tctx->regs[i * XIVE_TM_RING_SI=
-ZE]);
-+        monitor_printf(mon, "CPU[%04x]: %4s    %s\n", cpu_index,
-+                       xive_tctx_ring_names[i], s);
-+        g_free(s);
-+    }
-+}
-+
-+static void xive_tctx_reset(void *dev)
-+{
-+    XiveTCTX *tctx =3D XIVE_TCTX(dev);
-+
-+    memset(tctx->regs, 0, sizeof(tctx->regs));
-+
-+    /* Set some defaults */
-+    tctx->regs[TM_QW1_OS + TM_LSMFB] =3D 0xFF;
-+    tctx->regs[TM_QW1_OS + TM_ACK_CNT] =3D 0xFF;
-+    tctx->regs[TM_QW1_OS + TM_AGE] =3D 0xFF;
-+}
-+
-+static void xive_tctx_realize(DeviceState *dev, Error **errp)
-+{
-+    XiveTCTX *tctx =3D XIVE_TCTX(dev);
-+    PowerPCCPU *cpu;
-+    CPUPPCState *env;
-+    Object *obj;
-+    Error *local_err =3D NULL;
-+
-+    obj =3D object_property_get_link(OBJECT(dev), "cpu", &local_err);
-+    if (!obj) {
-+        error_propagate(errp, local_err);
-+        error_prepend(errp, "required link 'cpu' not found: ");
-+        return;
-+    }
-+
-+    cpu =3D POWERPC_CPU(obj);
-+    tctx->cs =3D CPU(obj);
-+
-+    env =3D &cpu->env;
-+    switch (PPC_INPUT(env)) {
-+    case PPC_FLAGS_INPUT_POWER7:
-+        tctx->output =3D env->irq_inputs[POWER7_INPUT_INT];
-+        break;
-+
-+    default:
-+        error_setg(errp, "XIVE interrupt controller does not support "
-+                   "this CPU bus model");
-+        return;
-+    }
-+
-+    qemu_register_reset(xive_tctx_reset, dev);
-+}
-+
-+static void xive_tctx_unrealize(DeviceState *dev, Error **errp)
-+{
-+    qemu_unregister_reset(xive_tctx_reset, dev);
-+}
-+
-+static const VMStateDescription vmstate_xive_tctx =3D {
-+    .name =3D TYPE_XIVE_TCTX,
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_BUFFER(regs, XiveTCTX),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static void xive_tctx_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+
-+    dc->desc =3D "XIVE Interrupt Thread Context";
-+    dc->realize =3D xive_tctx_realize;
-+    dc->unrealize =3D xive_tctx_unrealize;
-+    dc->vmsd =3D &vmstate_xive_tctx;
-+}
-+
-+static const TypeInfo xive_tctx_info =3D {
-+    .name          =3D TYPE_XIVE_TCTX,
-+    .parent        =3D TYPE_DEVICE,
-+    .instance_size =3D sizeof(XiveTCTX),
-+    .class_init    =3D xive_tctx_class_init,
-+};
-=20
- /*
-  * XIVE ESB helpers
-@@ -875,6 +1293,7 @@ static void xive_register_types(void)
-     type_register_static(&xive_fabric_info);
-     type_register_static(&xive_router_info);
-     type_register_static(&xive_end_source_info);
-+    type_register_static(&xive_tctx_info);
+@@ -358,6 +358,25 @@ void xive_tctx_pic_print_info(XiveTCTX *tctx, Monito=
+r *mon)
+     }
  }
 =20
- type_init(xive_register_types)
++/* The HW CAM (23bits) is hardwired to :
++ *
++ *   0x000||0b1||4Bit chip number||7Bit Thread number.
++ *
++ * and when the block grouping extension is enabled :
++ *
++ *   4Bit chip number||0x001||7Bit Thread number.
++ */
++static uint32_t hw_cam_line(uint8_t chip_id, uint8_t tid)
++{
++    bool block_group =3D false; /* TODO (PowerNV) */
++
++    if (block_group) {
++        return 1 << 11 | (chip_id & 0xf) << 7 | (tid & 0x7f);
++    } else {
++        return (chip_id & 0xf) << 11 | 1 << 7 | (tid & 0x7f);
++    }
++}
++
+ static void xive_tctx_reset(void *dev)
+ {
+     XiveTCTX *tctx =3D XIVE_TCTX(dev);
+@@ -388,6 +407,12 @@ static void xive_tctx_realize(DeviceState *dev, Erro=
+r **errp)
+     cpu =3D POWERPC_CPU(obj);
+     tctx->cs =3D CPU(obj);
+=20
++    if (!tctx->hw_cam) {
++        error_setg(errp, "XIVE: HW CAM is not set for CPU %d",
++                   tctx->cs->cpu_index);
++        return;
++    }
++
+     env =3D &cpu->env;
+     switch (PPC_INPUT(env)) {
+     case PPC_FLAGS_INPUT_POWER7:
+@@ -418,11 +443,17 @@ static const VMStateDescription vmstate_xive_tctx =3D=
+ {
+     },
+ };
+=20
++static Property  xive_tctx_properties[] =3D {
++    DEFINE_PROP_UINT32("hw-cam", XiveTCTX, hw_cam, 0),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void xive_tctx_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+=20
+     dc->desc =3D "XIVE Interrupt Thread Context";
++    dc->props =3D xive_tctx_properties;
+     dc->realize =3D xive_tctx_realize;
+     dc->unrealize =3D xive_tctx_unrealize;
+     dc->vmsd =3D &vmstate_xive_tctx;
+@@ -978,6 +1009,194 @@ int xive_router_write_end(XiveRouter *xrtr, uint8_=
+t end_blk, uint32_t end_idx,
+    return xrc->write_end(xrtr, end_blk, end_idx, end, word_number);
+ }
+=20
++int xive_router_get_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_=
+idx,
++                        XiveNVT *nvt)
++{
++   XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
++
++   return xrc->get_nvt(xrtr, nvt_blk, nvt_idx, nvt);
++}
++
++int xive_router_write_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nv=
+t_idx,
++                        XiveNVT *nvt, uint8_t word_number)
++{
++   XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
++
++   return xrc->write_nvt(xrtr, nvt_blk, nvt_idx, nvt, word_number);
++}
++
++/*
++ * The thread context register words are in big-endian format.
++ */
++static int xive_presenter_tctx_match(XiveTCTX *tctx, uint8_t format,
++                                     uint8_t nvt_blk, uint32_t nvt_idx,
++                                     bool cam_ignore, uint32_t logic_ser=
+v)
++{
++    uint32_t cam =3D xive_nvt_cam_line(nvt_blk, nvt_idx);
++    uint8_t *regs;
++    uint32_t qw3w2;
++    uint32_t qw2w2;
++    uint32_t qw1w2;
++    uint32_t qw0w2;
++
++    /* TODO (PowerNV): ignore low order bits of nvt id */
++
++    regs =3D &tctx->regs[TM_QW3_HV_PHYS];
++    qw3w2 =3D be32_to_cpu(*((uint32_t *) &regs[TM_WORD2]));
++    regs =3D &tctx->regs[TM_QW2_HV_POOL];
++    qw2w2 =3D be32_to_cpu(*((uint32_t *) &regs[TM_WORD2]));
++    regs =3D &tctx->regs[TM_QW1_OS];
++    qw1w2 =3D be32_to_cpu(*((uint32_t *) &regs[TM_WORD2]));
++    regs =3D &tctx->regs[TM_QW0_USER];
++    qw0w2 =3D be32_to_cpu(*((uint32_t *) &regs[TM_WORD2]));
++
++    if (format =3D=3D 0) {
++        /* F=3D0 & i=3D1: Logical server notification */
++        if (cam_ignore =3D=3D true) {
++            qemu_log_mask(LOG_UNIMP, "XIVE: no support for LS NVT %x/%x\=
+n",
++                          nvt_blk, nvt_idx);
++             return -1;
++        }
++
++        /* F=3D0 & i=3D0: Specific NVT notification */
++
++        /* PHYS ring */
++        if ((qw3w2 & TM_QW3W2_VT) &&
++            tctx->hw_cam =3D=3D hw_cam_line(nvt_blk, nvt_idx)) {
++            return TM_QW3_HV_PHYS;
++        }
++
++        /* HV POOL ring */
++        if ((qw2w2 & TM_QW2W2_VP) &&
++            cam =3D=3D GETFIELD(TM_QW2W2_POOL_CAM, qw2w2)) {
++            return TM_QW2_HV_POOL;
++        }
++
++        /* OS ring */
++        if ((qw1w2 & TM_QW1W2_VO) &&
++            cam =3D=3D GETFIELD(TM_QW1W2_OS_CAM, qw1w2)) {
++            return TM_QW1_OS;
++        }
++    } else {
++        /* F=3D1 : User level Event-Based Branch (EBB) notification */
++
++        /* USER ring */
++        if  ((qw1w2 & TM_QW1W2_VO) &&
++             (cam =3D=3D GETFIELD(TM_QW1W2_OS_CAM, qw1w2)) &&
++             (qw0w2 & TM_QW0W2_VU) &&
++             (logic_serv =3D=3D GETFIELD(TM_QW0W2_LOGIC_SERV, qw0w2))) {
++            return TM_QW0_USER;
++        }
++    }
++    return -1;
++}
++
++typedef struct XiveTCTXMatch {
++    XiveTCTX *tctx;
++    uint8_t ring;
++} XiveTCTXMatch;
++
++static bool xive_presenter_match(XiveRouter *xrtr, uint8_t format,
++                                 uint8_t nvt_blk, uint32_t nvt_idx,
++                                 bool cam_ignore, uint8_t priority,
++                                 uint32_t logic_serv, XiveTCTXMatch *mat=
+ch)
++{
++    CPUState *cs;
++
++    /* TODO (PowerNV): handle chip_id overwrite of block field for
++     * hardwired CAM compares */
++
++    CPU_FOREACH(cs) {
++        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
++        XiveTCTX *tctx =3D XIVE_TCTX(cpu->intc);
++        int ring;
++
++        /*
++         * HW checks that the CPU is enabled in the Physical Thread
++         * Enable Register (PTER).
++         */
++
++        /*
++         * Check the thread context CAM lines and record matches. We
++         * will handle CPU exception delivery later
++         */
++        ring =3D xive_presenter_tctx_match(tctx, format, nvt_blk, nvt_id=
+x,
++                                         cam_ignore, logic_serv);
++        /*
++         * Save the context and follow on to catch duplicates, that we
++         * don't support yet.
++         */
++        if (ring !=3D -1) {
++            if (match->tctx) {
++                qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found a th=
+read "
++                              "context NVT %x/%x\n", nvt_blk, nvt_idx);
++                return false;
++            }
++
++            match->ring =3D ring;
++            match->tctx =3D tctx;
++        }
++    }
++
++    if (!match->tctx) {
++        qemu_log_mask(LOG_UNIMP, "XIVE: NVT %x/%x is not dispatched\n",
++                      nvt_blk, nvt_idx);
++        return false;
++    }
++
++    return true;
++}
++
++/*
++ * This is our simple Xive Presenter Engine model. It is merged in the
++ * Router as it does not require an extra object.
++ *
++ * It receives notification requests sent by the IVRE to find one
++ * matching NVT (or more) dispatched on the processor threads. In case
++ * of a single NVT notification, the process is abreviated and the
++ * thread is signaled if a match is found. In case of a logical server
++ * notification (bits ignored at the end of the NVT identifier), the
++ * IVPE and IVRE select a winning thread using different filters. This
++ * involves 2 or 3 exchanges on the PowerBus that the model does not
++ * support.
++ *
++ * The parameters represent what is sent on the PowerBus
++ */
++static void xive_presenter_notify(XiveRouter *xrtr, uint8_t format,
++                                  uint8_t nvt_blk, uint32_t nvt_idx,
++                                  bool cam_ignore, uint8_t priority,
++                                  uint32_t logic_serv)
++{
++    XiveNVT nvt;
++    XiveTCTXMatch match =3D { 0 };
++    bool found;
++
++    /* NVT cache lookup */
++    if (xive_router_get_nvt(xrtr, nvt_blk, nvt_idx, &nvt)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: no NVT %x/%x\n",
++                      nvt_blk, nvt_idx);
++        return;
++    }
++
++    if (!xive_nvt_is_valid(&nvt)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: NVT %x/%x is invalid\n",
++                      nvt_blk, nvt_idx);
++        return;
++    }
++
++    found =3D xive_presenter_match(xrtr, format, nvt_blk, nvt_idx, cam_i=
+gnore,
++                                 priority, logic_serv, &match);
++    if (found) {
++        return;
++    }
++
++    /* If no matching NVT is dispatched on a HW thread :
++     * - update the NVT structure if backlog is activated
++     * - escalate (ESe PQ bits and EAS in w4-5) if escalation is
++     *   activated
++     */
++}
++
+ /*
+  * An END trigger can come from an event trigger (IPI or HW) or from
+  * another chip. We don't model the PowerBus but the END trigger
+@@ -1047,6 +1266,14 @@ static void xive_router_end_notify(XiveRouter *xrt=
+r, uint8_t end_blk,
+     /*
+      * Follows IVPE notification
+      */
++    xive_presenter_notify(xrtr, format,
++                          GETFIELD_BE32(END_W6_NVT_BLOCK, end.w6),
++                          GETFIELD_BE32(END_W6_NVT_INDEX, end.w6),
++                          GETFIELD_BE32(END_W7_F0_IGNORE, end.w7),
++                          priority,
++                          GETFIELD_BE32(END_W7_F1_LOG_SERVER_ID, end.w7)=
+);
++
++    /* TODO: Auto EOI. */
+ }
+=20
+ static void xive_router_notify(XiveNotifier *xn, uint32_t lisn)
 --=20
 2.17.2
