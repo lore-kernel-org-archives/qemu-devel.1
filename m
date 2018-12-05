@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gUgVt-0005yT-BT
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:23:33 -0500
+	(envelope-from <clg@kaod.org>) id 1gUgVv-0005z1-5D
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:23:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gUgVp-0002VR-3e
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:23:29 -0500
-Received: from 3.mo179.mail-out.ovh.net ([178.33.251.175]:35317)
+	(envelope-from <clg@kaod.org>) id 1gUgVq-0002XJ-AS
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:23:30 -0500
+Received: from 3.mo177.mail-out.ovh.net ([46.105.36.172]:49790)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gUgVn-0002Te-9S
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:23:23 -0500
-Received: from player714.ha.ovh.net (unknown [10.109.143.145])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 017F510C89E
-	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 00:23:18 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gUgVp-0002VE-U9
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:23:26 -0500
+Received: from player714.ha.ovh.net (unknown [10.109.143.225])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 4A6C6D5D42
+	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 00:23:24 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu,  6 Dec 2018 00:22:16 +0100
-Message-Id: <20181205232251.10446-3-clg@kaod.org>
+Date: Thu,  6 Dec 2018 00:22:17 +0100
+Message-Id: <20181205232251.10446-4-clg@kaod.org>
 In-Reply-To: <20181205232251.10446-1-clg@kaod.org>
 References: <20181205232251.10446-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 02/37] ppc/xive: add support for the LSI
- interrupt sources
+Subject: [Qemu-devel] [PATCH v6 03/37] ppc/xive: introduce the XiveNotifier
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,191 +33,113 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-The 'sent' status of the LSI interrupt source is modeled with the 'P'
-bit of the ESB and the assertion status of the source is maintained
-with an extra bit under the main XiveSource object. The type of the
-source is stored in the same array for practical reasons.
+The XiveNotifier offers a simple interface, between the XiveSource
+object and the main interrupt controller of the machine. It will
+forward event notifications to the XIVE Interrupt Virtualization
+Routing Engine (IVRE).
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- include/hw/ppc/xive.h | 19 ++++++++++++-
- hw/intc/xive.c        | 66 +++++++++++++++++++++++++++++++++++++++----
- 2 files changed, 78 insertions(+), 7 deletions(-)
+ include/hw/ppc/xive.h | 23 +++++++++++++++++++++++
+ hw/intc/xive.c        | 25 +++++++++++++++++++++++++
+ 2 files changed, 48 insertions(+)
 
 diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-index 7aa2e3801222..7cebc32eba4c 100644
+index 7cebc32eba4c..6770cffec67d 100644
 --- a/include/hw/ppc/xive.h
 +++ b/include/hw/ppc/xive.h
-@@ -162,8 +162,9 @@ typedef struct XiveSource {
-     /* IRQs */
-     uint32_t        nr_irqs;
-     qemu_irq        *qirqs;
-+    unsigned long   *lsi_map;
+@@ -142,6 +142,27 @@
 =20
--    /* PQ bits */
-+    /* PQ bits and LSI assertion bit */
-     uint8_t         *status;
-=20
-     /* ESB memory region */
-@@ -219,6 +220,7 @@ static inline hwaddr xive_source_esb_mgmt(XiveSource =
-*xsrc, int srcno)
-  * When doing an EOI, the Q bit will indicate if the interrupt
-  * needs to be re-triggered.
-  */
-+#define XIVE_STATUS_ASSERTED  0x4  /* Extra bit for LSI */
- #define XIVE_ESB_VAL_P        0x2
- #define XIVE_ESB_VAL_Q        0x1
-=20
-@@ -257,4 +259,19 @@ static inline qemu_irq xive_source_qirq(XiveSource *=
-xsrc, uint32_t srcno)
-     return xsrc->qirqs[srcno];
- }
-=20
-+static inline bool xive_source_irq_is_lsi(XiveSource *xsrc, uint32_t src=
-no)
-+{
-+    assert(srcno < xsrc->nr_irqs);
-+    return test_bit(srcno, xsrc->lsi_map);
-+}
-+
-+static inline void xive_source_irq_set(XiveSource *xsrc, uint32_t srcno,
-+                                       bool lsi)
-+{
-+    assert(srcno < xsrc->nr_irqs);
-+    if (lsi) {
-+        bitmap_set(xsrc->lsi_map, srcno, 1);
-+    }
-+}
-+
- #endif /* PPC_XIVE_H */
-diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index 6389bd832371..11c7aac962de 100644
---- a/hw/intc/xive.c
-+++ b/hw/intc/xive.c
-@@ -89,14 +89,42 @@ uint8_t xive_source_esb_set(XiveSource *xsrc, uint32_=
-t srcno, uint8_t pq)
-     return xive_esb_set(&xsrc->status[srcno], pq);
- }
+ #include "hw/qdev-core.h"
 =20
 +/*
-+ * Returns whether the event notification should be forwarded.
++ * XIVE Fabric (Interface between Source and Router)
 + */
-+static bool xive_source_lsi_trigger(XiveSource *xsrc, uint32_t srcno)
-+{
-+    uint8_t old_pq =3D xive_source_esb_get(xsrc, srcno);
 +
-+    xsrc->status[srcno] |=3D XIVE_STATUS_ASSERTED;
++typedef struct XiveNotifier {
++    Object parent;
++} XiveNotifier;
 +
-+    switch (old_pq) {
-+    case XIVE_ESB_RESET:
-+        xive_source_esb_set(xsrc, srcno, XIVE_ESB_PENDING);
-+        return true;
-+    default:
-+        return false;
-+    }
-+}
++#define TYPE_XIVE_NOTIFIER "xive-fabric"
++#define XIVE_NOTIFIER(obj)                                     \
++    OBJECT_CHECK(XiveNotifier, (obj), TYPE_XIVE_NOTIFIER)
++#define XIVE_NOTIFIER_CLASS(klass)                                     \
++    OBJECT_CLASS_CHECK(XiveNotifierClass, (klass), TYPE_XIVE_NOTIFIER)
++#define XIVE_NOTIFIER_GET_CLASS(obj)                                   \
++    OBJECT_GET_CLASS(XiveNotifierClass, (obj), TYPE_XIVE_NOTIFIER)
++
++typedef struct XiveNotifierClass {
++    InterfaceClass parent;
++    void (*notify)(XiveNotifier *xn, uint32_t lisn);
++} XiveNotifierClass;
 +
  /*
-  * Returns whether the event notification should be forwarded.
+  * XIVE Interrupt Source
   */
- static bool xive_source_esb_trigger(XiveSource *xsrc, uint32_t srcno)
- {
-+    bool ret;
+@@ -171,6 +192,8 @@ typedef struct XiveSource {
+     uint64_t        esb_flags;
+     uint32_t        esb_shift;
+     MemoryRegion    esb_mmio;
 +
-     assert(srcno < xsrc->nr_irqs);
-=20
--    return xive_esb_trigger(&xsrc->status[srcno]);
-+    ret =3D xive_esb_trigger(&xsrc->status[srcno]);
-+
-+    if (xive_source_irq_is_lsi(xsrc, srcno) &&
-+        xive_source_esb_get(xsrc, srcno) =3D=3D XIVE_ESB_QUEUED) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "XIVE: queued an event on LSI IRQ %d\n", srcno);
-+    }
-+
-+    return ret;
- }
++    XiveNotifier    *xive;
+ } XiveSource;
 =20
  /*
-@@ -104,9 +132,22 @@ static bool xive_source_esb_trigger(XiveSource *xsrc=
-, uint32_t srcno)
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 11c7aac962de..79238eb57fae 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -155,7 +155,11 @@ static bool xive_source_esb_eoi(XiveSource *xsrc, ui=
+nt32_t srcno)
   */
- static bool xive_source_esb_eoi(XiveSource *xsrc, uint32_t srcno)
+ static void xive_source_notify(XiveSource *xsrc, int srcno)
  {
-+    bool ret;
-+
-     assert(srcno < xsrc->nr_irqs);
++    XiveNotifierClass *xnc =3D XIVE_NOTIFIER_GET_CLASS(xsrc->xive);
 =20
--    return xive_esb_eoi(&xsrc->status[srcno]);
-+    ret =3D xive_esb_eoi(&xsrc->status[srcno]);
-+
-+    /* LSI sources do not set the Q bit but they can still be
-+     * asserted, in which case we should forward a new event
-+     * notification
-+     */
-+    if (xive_source_irq_is_lsi(xsrc, srcno) &&
-+        xsrc->status[srcno] & XIVE_STATUS_ASSERTED) {
-+        ret =3D xive_source_lsi_trigger(xsrc, srcno);
++    if (xnc->notify) {
++        xnc->notify(xsrc->xive, srcno);
 +    }
-+
-+    return ret;
  }
 =20
  /*
-@@ -271,8 +312,16 @@ static void xive_source_set_irq(void *opaque, int sr=
-cno, int val)
-     XiveSource *xsrc =3D XIVE_SOURCE(opaque);
-     bool notify =3D false;
-=20
--    if (val) {
--        notify =3D xive_source_esb_trigger(xsrc, srcno);
-+    if (xive_source_irq_is_lsi(xsrc, srcno)) {
-+        if (val) {
-+            notify =3D xive_source_lsi_trigger(xsrc, srcno);
-+        } else {
-+            xsrc->status[srcno] &=3D ~XIVE_STATUS_ASSERTED;
-+        }
-+    } else {
-+        if (val) {
-+            notify =3D xive_source_esb_trigger(xsrc, srcno);
-+        }
-     }
-=20
-     /* Forward the source event notification for routing */
-@@ -292,9 +341,11 @@ void xive_source_pic_print_info(XiveSource *xsrc, ui=
-nt32_t offset, Monitor *mon)
-             continue;
-         }
-=20
--        monitor_printf(mon, "  %08x %c%c\n", i + offset,
-+        monitor_printf(mon, "  %08x %s %c%c%c\n", i + offset,
-+                       xive_source_irq_is_lsi(xsrc, i) ? "LSI" : "MSI",
-                        pq & XIVE_ESB_VAL_P ? 'P' : '-',
--                       pq & XIVE_ESB_VAL_Q ? 'Q' : '-');
-+                       pq & XIVE_ESB_VAL_Q ? 'Q' : '-',
-+                       xsrc->status[i] & XIVE_STATUS_ASSERTED ? 'A' : ' =
-');
-     }
- }
-=20
-@@ -302,6 +353,8 @@ static void xive_source_reset(void *dev)
+@@ -362,6 +366,17 @@ static void xive_source_reset(void *dev)
+ static void xive_source_realize(DeviceState *dev, Error **errp)
  {
      XiveSource *xsrc =3D XIVE_SOURCE(dev);
-=20
-+    /* Do not clear the LSI bitmap */
++    Object *obj;
++    Error *local_err =3D NULL;
 +
-     /* PQs are initialized to 0b01 (Q=3D1) which corresponds to "ints of=
-f" */
-     memset(xsrc->status, XIVE_ESB_OFF, xsrc->nr_irqs);
++    obj =3D object_property_get_link(OBJECT(dev), "xive", &local_err);
++    if (!obj) {
++        error_propagate(errp, local_err);
++        error_prepend(errp, "required link 'xive' not found: ");
++        return;
++    }
++
++    xsrc->xive =3D XIVE_NOTIFIER(obj);
+=20
+     if (!xsrc->nr_irqs) {
+         error_setg(errp, "Number of interrupt needs to be greater than 0=
+");
+@@ -428,9 +443,19 @@ static const TypeInfo xive_source_info =3D {
+     .class_init    =3D xive_source_class_init,
+ };
+=20
++/*
++ * XIVE Fabric
++ */
++static const TypeInfo xive_fabric_info =3D {
++    .name =3D TYPE_XIVE_NOTIFIER,
++    .parent =3D TYPE_INTERFACE,
++    .class_size =3D sizeof(XiveNotifierClass),
++};
++
+ static void xive_register_types(void)
+ {
+     type_register_static(&xive_source_info);
++    type_register_static(&xive_fabric_info);
  }
-@@ -324,6 +377,7 @@ static void xive_source_realize(DeviceState *dev, Err=
-or **errp)
-     }
 =20
-     xsrc->status =3D g_malloc0(xsrc->nr_irqs);
-+    xsrc->lsi_map =3D bitmap_new(xsrc->nr_irqs);
-=20
-     memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
-                           &xive_source_esb_ops, xsrc, "xive.esb",
+ type_init(xive_register_types)
 --=20
 2.17.2
