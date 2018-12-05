@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=870045bc7=Paul.Durrant@citrix.com>)
-	id 1gUY6G-0005fP-TY
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 09:24:29 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gUY9D-0006by-BO
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 09:27:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=870045bc7=Paul.Durrant@citrix.com>)
-	id 1gUY6G-00077Z-6G
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 09:24:28 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Wed, 5 Dec 2018 14:24:04 +0000
-Message-ID: <f0d21d9e49ef496f9e7c1949bbc1d473@AMSPEX02CL03.citrite.net>
-References: <20181121151211.15997-1-paul.durrant@citrix.com>
-	<20181121151211.15997-5-paul.durrant@citrix.com>
-	<20181129184841.GJ14786@perard.uk.xensource.com>
-	<589a4488f1ba4e4496775cc06bda291d@AMSPEX02CL03.citrite.net>
-	<d5bf17f689a34e69b9e3b7b92bcfe4fd@AMSPEX02CL03.citrite.net>
-	<20181205135839.GB1259@perard.uk.xensource.com>
-In-Reply-To: <20181205135839.GB1259@perard.uk.xensource.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <eric.auger@redhat.com>) id 1gUY99-0000U6-Tj
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 09:27:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47740)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1gUY99-0000QQ-3I
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 09:27:27 -0500
+References: <154393964026.28192.13536237934563059985.stgit@gimli.home>
+	<154394077749.28192.1229512133780284321.stgit@gimli.home>
+	<83c490a2-7565-b95c-563f-fb73476e874f@redhat.com>
+	<87d0qgrrd0.fsf@dusky.pond.sub.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <3821b727-a0ec-5f92-4ec9-f858322457bc@redhat.com>
+Date: Wed, 5 Dec 2018 15:27:17 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 04/18] xen: create xenstore areas for
- XenDevice-s
+In-Reply-To: <87d0qgrrd0.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [for-4.0 PATCH v3 3/9] qapi: Define PCIe link
+ speed and width properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +32,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony Perard <anthony.perard@citrix.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Geoffrey McRae <geoff@hostfission.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
 
-> -----Original Message-----
-> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
-> Sent: 05 December 2018 13:59
-> To: Paul Durrant <Paul.Durrant@citrix.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>; Stefano Stabellini
-> <sstabellini@kernel.org>; qemu-block@nongnu.org; qemu-devel@nongnu.org;
-> Max Reitz <mreitz@redhat.com>; xen-devel@lists.xenproject.org
-> Subject: Re: [PATCH 04/18] xen: create xenstore areas for XenDevice-s
->=20
-> On Wed, Dec 05, 2018 at 12:43:57PM +0000, Paul Durrant wrote:
-> > > > > +    value =3D g_strdup_vprintf(fmt, ap);
-> > > >
-> > > > Looks like g_vasprintf() would be better, since it returns the
-> lenght as
-> > > > well.
-> > > >
-> > >
-> > > Yes.
-> >
-> > I tried this and it appears not to exist in the version of glib in my
-> environment so I guess I'll stick with g_strdup_printf().
->=20
-> It's probably because you need to include "glib/gprintf.h", I've
-> suggested it because I've seen the function use elsewhere in QEMU. But
-> g_strdup_printf is fine too.
->=20
-> https://developer.gnome.org/glib/stable/glib-String-Utility-
-> Functions.html#g-vasprintf
+Hi Markus,
 
-Ah, that's what I needed. Thanks,
+On 12/5/18 3:16 PM, Markus Armbruster wrote:
+> Auger Eric <eric.auger@redhat.com> writes:
+> 
+>> Hi Alex,
+>>
+>> On 12/4/18 5:26 PM, Alex Williamson wrote:
+>>> Create properties to be able to define speeds and widths for PCIe
+>>> links.  The only tricky bit here is that our get and set callbacks
+>>> translate from the fixed QAPI automagic enums to those we define
+>>> in PCI code to represent the actual register segment value.
+>>>
+>>> Cc: Eric Blake <eblake@redhat.com>
+>>> Cc: Markus Armbruster <armbru@redhat.com>
+>>> Tested-by: Geoffrey McRae <geoff@hostfission.com>
+>>> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+>>> ---
+>>>  hw/core/qdev-properties.c    |  178 ++++++++++++++++++++++++++++++++++++++++++
+>>>  include/hw/qdev-properties.h |    8 ++
+>>>  qapi/common.json             |   42 ++++++++++
+>>>  3 files changed, 228 insertions(+)
+>>>
+>>> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+>>> index 35072dec1ecf..f5ca5b821a79 100644
+>>> --- a/hw/core/qdev-properties.c
+>>> +++ b/hw/core/qdev-properties.c
+>>> @@ -1327,3 +1327,181 @@ const PropertyInfo qdev_prop_off_auto_pcibar = {
+>>>      .set = set_enum,
+>>>      .set_default_value = set_default_value_enum,
+>>>  };
+>>> +
+>>> +/* --- PCIELinkSpeed 2_5/5/8/16 -- */
+>>> +
+>>> +static void get_prop_pcielinkspeed(Object *obj, Visitor *v, const char *name,
+>>> +                                   void *opaque, Error **errp)
+>>> +{
+>>> +    DeviceState *dev = DEVICE(obj);
+>>> +    Property *prop = opaque;
+>>> +    PCIExpLinkSpeed *p = qdev_get_prop_ptr(dev, prop);
+>>> +    PCIELinkSpeed speed;
+>>> +
+>>> +    switch (*p) {
+>>> +    case QEMU_PCI_EXP_LNK_2_5GT:
+>>> +        speed = PCIE_LINK_SPEED_2_5;
+>>> +        break;
+>>> +    case QEMU_PCI_EXP_LNK_5GT:
+>>> +        speed = PCIE_LINK_SPEED_5;
+>>> +        break;
+>>> +    case QEMU_PCI_EXP_LNK_8GT:
+>>> +        speed = PCIE_LINK_SPEED_8;
+>>> +        break;
+>>> +    case QEMU_PCI_EXP_LNK_16GT:
+>>> +        speed = PCIE_LINK_SPEED_16;
+>>> +        break;
+>>> +    default:
+>>> +        /* Unreachable */
+>>> +        abort();
+>> nit: g_assert_not_reached() here and below.
+> 
+> In my opinion, g_assert_not_reached() & friends are an overly ornate
+> reinvention of an old and perfectly adequate wheel.
+> 
+> A long time ago for reasons since forgotten, the maintainers in charge
+> back then demanded abort() instead of assert(0).  Either is fine with
+> me.
+> 
+> I tolerate g_assert_not_reached() in files that already use g_assert().
+> This one doesn't.
+> 
+> In any case, I'd drop the comment.
 
-  Paul
+OK I did not know. In the past I was encouraged to use it.
 
->=20
-> --
-> Anthony PERARD
+Thanks
+
+Eric
+> 
+> Note that I'm not this file's maintainer.
+> 
+> [...]
+> 
