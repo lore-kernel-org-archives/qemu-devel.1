@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gUX5d-0004kk-Rx
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:19:48 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gUX6i-0005mF-Di
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:20:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gUX5Z-0002sP-S6
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:19:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55272)
+	(envelope-from <stefanha@redhat.com>) id 1gUX6e-000473-Dq
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:20:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42262)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gUX5Z-0002ra-LM
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:19:41 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A446C307DAC5
-	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 13:19:40 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
-	<20180706105753.26700-7-marcandre.lureau@redhat.com>
-Date: Wed, 05 Dec 2018 14:19:35 +0100
-In-Reply-To: <20180706105753.26700-7-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Fri, 6 Jul 2018 12:57:32 +0200")
-Message-ID: <875zw8t8k8.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gUX6e-00044v-3V
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:20:48 -0500
+Date: Wed, 5 Dec 2018 13:20:41 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20181205132041.GB24623@stefanha-x1.localdomain>
+References: <CAGxU2F7+NZUS-BQ1hCnKynVxfsVUYTHRCWQvJwBA12bYmg0ZJA@mail.gmail.com>
+	<938a2f54426dc059428fcfe1882bbb3b2d5cbc99.camel@intel.com>
+	<CAGxU2F50U=NH8fGDXygcYycjoveNpdbKnnG3H0soCvub_Ea5cw@mail.gmail.com>
+	<CAGxU2F7SA-kc0gsLNaUzbiinytJ2DF_r5UpB1JzRy-Su1_WOLw@mail.gmail.com>
+	<a1ca57134a970fb3282afb36c0e3b5647b104ff8.camel@intel.com>
+	<CAGxU2F7Sg0JaxyPQw_FhSc6MzYu+YzZpv9=VHp8qvwfTWpf_MQ@mail.gmail.com>
+	<59cc9e47-3c2a-2417-9e89-e7ade92fdf2d@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 06/27] qapi: do not define enumeration
- value explicitly
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="WhfpMioaduB5tiZL"
+Content-Disposition: inline
+In-Reply-To: <59cc9e47-3c2a-2417-9e89-e7ade92fdf2d@oracle.com>
+Subject: Re: [Qemu-devel] QEMU/NEMU boot time with several x86 firmwares
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,60 +33,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Maran Wilson <maran.wilson@oracle.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, Rob Bradford <robert.bradford@intel.com>, Samuel Ortiz <sameo@linux.intel.com>, qemu-devel@nongnu.org, Liam Merwick <liam.merwick@oracle.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-> The C standard has the initial value at 0 and the subsequent values
-> incremented by 1. No need to set this explicitely.
->
-> This will prevent from artificial "gaps" when compiling out some enum
-> values and having unnecessarily large MAX values & enums arrays, or
-> simplifying iterating over valid enum values.
+--WhfpMioaduB5tiZL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Yes, gaps can be annoying, e.g. in lookup tables where gaps get confused
-with sentinels.
+On Tue, Dec 04, 2018 at 02:44:33PM -0800, Maran Wilson wrote:
+> On 12/3/2018 8:35 AM, Stefano Garzarella wrote:
+> > On Mon, Dec 3, 2018 at 4:44 PM Rob Bradford <robert.bradford@intel.com>=
+ wrote:
+> > > Hi Stefano, thanks for capturing all these numbers,
+> > >=20
+> > > On Mon, 2018-12-03 at 15:27 +0100, Stefano Garzarella wrote:
+> > > > Hi Rob,
+> > > > I continued to investigate the boot time, and as you suggested I
+> > > > looked also at qemu-lite 2.11.2
+> > > > (https://github.com/kata-containers/qemu) and NEMU "virt" machine. I
+> > > > did the following tests using the Kata kernel configuration
+> > > > (
+> > > > https://github.com/kata-containers/packaging/blob/master/kernel/con=
+figs/x86_64_kata_kvm_4.14.x
+> > > > )
+> > > >=20
+> > > > To compare the results with qemu-lite direct kernel load, I added
+> > > > another tracepoint:
+> > > > - linux_start_kernel: first entry of the Linux kernel
+> > > > (start_kernel())
+> > > >=20
+> > > Great, do you have a set of patches available that all these trace
+> > > points. It would be great for reproduction.
+> > For sure! I'm attaching a set of patches for qboot, seabios, ovmf,
+> > nemu/qemu/qemu-lite and linux 4.14 whit the tracepoints.
+> > I'm also sharing a python script that I'm using with perf to extract
+> > the numbers in this way:
+> >=20
+> > $ perf record -a -e kvm:kvm_entry -e kvm:kvm_pio -e
+> > sched:sched_process_exec -o /tmp/qemu_perf.data &
+> > $ # start qemu/nemu multiple times
+> > $ killall perf
+> > $ perf script -s qemu-perf-script.py -i /tmp/qemu_perf.data
+> >=20
+> > > > As you can see, NEMU is faster to jump to the kernel
+> > > > (linux_start_kernel) than qemu-lite when uses qboot or seabios with
+> > > > virt support, but the time to the user space is strangely high, may=
+be
+> > > > the kernel configuration that I used is not the best one.
+> > > > Do you suggest another kernel configuration?
+> > > >=20
+> > > This looks very bad. This isn't the kernel configuration we normally
+> > > test with in our automated test system but is definitely one we suppo=
+rt
+> > > as part of our partnernship with the Kata team. It's a high priority
+> > > for me to try and investigate that. Have you saved the kernel messages
+> > > as they might be helpful?
+> > Yes, I'm attaching the dmesg output with nemu and qemu.
+> >=20
+> > > > Anyway, I obtained the best boot time with qemu-lite and direct
+> > > > kernel
+> > > > load (vmlinux ELF image). I think because the kernel was not
+> > > > compressed. Indeed, looking to the others test, the kernel
+> > > > decompression (bzImage) takes about 80 ms (linux_start_kernel -
+> > > > linux_start_boot). (I'll investigate better)
+> > > >=20
+> > > Yup being able to load an uncompressed kernel is one of the big
+> > > advantages of qemu-lite. I wonder if we could bring that feature into
+> > > qemu itself to supplement the existing firmware based kernel loading.
+> > I think so, I'll try to understand if we can merge the qemu-lite
+> > direct kernel loading in qemu.
+>=20
+> An attempt was made a long time ago to push the qemu-lite stuff (from the
+> Intel Clear Containers project) upstream. As I understand it, the main
+> stumbling block that seemed to derail the effort was that it involved add=
+ing
+> Linux OS specific code to Qemu so that Qemu could do things like create a=
+nd
+> populate the zero page that Linux expects when entering startup_64().
+>=20
+> That ends up being a lot of very low-level, operating specific knowledge
+> about Linux that ends up getting baked into Qemu code. And understandably=
+, a
+> number of folks saw problems with going down a path like that.
+>=20
+> Since then, we have put together an alternative solution that would allow
+> Qemu to boot an uncompressed Linux binary via the x86/HVM direct boot ABI
+> (https://xenbits.xen.org/docs/unstable/misc/pvh.html). The solution invol=
+ves
+> first making changes to both the ABI as well as Linux, and then updating
+> Qemu to take advantage of the updated ABI which is already supported by b=
+oth
+> Linux and Free BSD for booting VMs. As such, Qemu can remain OS agnostic,
+> and just be programmed to the published ABI.
+>=20
+> The canonical definition for the HVM direct boot ABI is in the Xen tree a=
+nd
+> we needed to make some minor changes to the ABI definition to allow KVM
+> guests to also use the same structure and entry point. Those changes were
+> accepted to the Xen tree already:
+> https://lists.xenproject.org/archives/html/xen-devel/2018-04/msg00057.html
+>=20
+> The corresponding Linux changes that would allow KVM guests to be booted =
+via
+> this PVH entry point have already been posted and reviewed:
+> https://lkml.org/lkml/2018/4/16/1002
+>=20
+> The final part is the set of Qemu changes to take advantage of the above =
+and
+> boot a KVM guest via an uncompressed kernel binary using the entry point
+> defined by the ABI. Liam Merwick will be posting some RFC patches very so=
+on
+> to allow this.
 
-Avoiding gaps scares me.  You have to religiously compile the enum with
-the exact same configuration everywhere in the program, or else you end
-up with bugs that are hard to spot.  Therefore:
+Cool, thanks for doing this work!
 
-> Whenever config-host.h is changed, all the enum/types are recompiled.
->
-> (a subsequent patch will split the schema. Target-specific poisoined
-> conditionals will be added. They cannot be mixed with the common
-> schema: it is not possible to end up with enums of different values in
-> common and target builds)
+How do the boot times compare to qemu-lite and Firecracker's
+(https://github.com/firecracker-microvm/firecracker/) direct vmlinux ELF
+boot?
 
-Should we mention config-target.h here?
+I'm asking because there are several custom approaches to fast kernel
+boot and we should make sure that whatever Linux and QEMU end up
+natively supporting is likely to work for all projects (NEMU, qemu-lite,
+Firecracker) and operating systems (Linux distros, other OSes).
 
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qapi/common.py | 7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
->
-> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-> index 02c5c6767a..6f9498566e 100644
-> --- a/scripts/qapi/common.py
-> +++ b/scripts/qapi/common.py
-> @@ -2045,14 +2045,11 @@ typedef enum %(c_name)s {
->  ''',
->                  c_name=3Dc_name(name))
->=20=20
-> -    i =3D 0
->      for value in enum_values:
->          ret +=3D mcgen('''
-> -    %(c_enum)s =3D %(i)d,
-> +    %(c_enum)s,
->  ''',
-> -                     c_enum=3Dc_enum_const(name, value, prefix),
-> -                     i=3Di)
-> -        i +=3D 1
-> +                     c_enum=3Dc_enum_const(name, value, prefix))
->=20=20
->      ret +=3D mcgen('''
->  } %(c_name)s;
+Stefan
 
-I need to consider the whole series to decide whether avoiding gaps is a
-good idea.  If it is, then this patch is fine.
+--WhfpMioaduB5tiZL
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcB9CpAAoJEJykq7OBq3PIupwH+gOXuF6iAqCp42Xea5DD+ZgI
+Sxm7OEqjryjAaFZC1MYZhmH8MIfYE94XP2XwaS4ipLNuevo0W+LD+vUN3wbs7fKR
+e3r58bRqSKfrDC91f3e/lGGXbcAQ97XrqLFEpX4vllJsIIxorVB0fthWAzsqCSzL
+XE3YwRmqBam8j1FcIxm4Izqup6xYO/u9BT70Q42ZVM6dqbzsRP5/1eqRRe/fh5BV
+YaJCnoYbH5jJsVGqtq3/RN1MRj+UbXM8Qy96yl5MvDov1IxFSBPCZ2k0nVBL9CJj
+MQbOKh2v92QKVTF6KLSKryEP1Ld5VS/q7b7ppEndwabWn1lsbsKT8VTlU72e0+Q=
+=NCWq
+-----END PGP SIGNATURE-----
+
+--WhfpMioaduB5tiZL--
