@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1gUWyv-0007Kw-70
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:12:49 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUX0W-0000MP-1C
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:14:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1gUWyq-0004hZ-Q1
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:12:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38538)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1gUWyq-0004ec-K0
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:12:44 -0500
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-In-Reply-To: <20181204180808.GC18284@habkost.net>
-References: <20181126135958.20956-1-vkuznets@redhat.com>
-	<c30c335e-ca21-1179-670b-d4506ce14571@redhat.com>
-	<878t1chzj8.fsf@vitty.brq.redhat.com>
-	<20181130183608.GQ18284@habkost.net>
-	<871s6yy9st.fsf@vitty.brq.redhat.com>
-	<20181204180808.GC18284@habkost.net>
-Date: Wed, 05 Dec 2018 14:12:39 +0100
-Message-ID: <874lbsce2g.fsf@vitty.brq.redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUX0U-00065k-Lc
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:14:27 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 5 Dec 2018 13:14:03 +0000
+Message-ID: <c8832c65-4b52-b56f-cd0b-499597a82b11@virtuozzo.com>
+References: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
+	<20181203101429.88735-6-anton.nefedov@virtuozzo.com>
+In-Reply-To: <20181203101429.88735-6-anton.nefedov@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F7444E7D283978478DA554D0FE9539AF@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] i386/kvm: expose
- HV_CPUID_ENLIGHTMENT_INFO.EAX and HV_CPUID_NESTED_FEATURES.EAX as feature
- words
+Subject: Re: [Qemu-devel] [PATCH v10 5/9] block: treat BDRV_REQ_ALLOCATE as
+ serialising
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,26 +26,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Marcelo Tosatti <mtosatti@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
-
->>            [...] Some time ago when merging direct mode stimers for KVM
->> Paolo suggested we stop adding capabilities to KVM for each individulat
->> feature and replace them with something like KVM_GET_SUPPORTED_HV_CPUID
->> ioctl returning all Hyper-V related feature words. When this is done we
->> can reconsider how Qemu discoveres Hyper-V related KVM features and as
->> part of this work we can take a closer look at feature words and
->> feat_names.
->
-> Why a separate ioctl instead of extending GET_SUPPORTED_CPUID?
-
-Unfortunatelly both KVM and Hyper-V use feature leaves 0x40000000,
-0x40000001 (so it's up to the userspace - qemu in our case - what to
-expose to the guest) and GET_SUPPORTED_CPUID already returns KVM's. Not
-sure this can be changed (to e.g. returning these leaves twice with
-different flags) without breaking userspace. New ioctl is safer.
-
--- 
-Vitaly
+MDMuMTIuMjAxOCAxMzoxNCwgQW50b24gTmVmZWRvdiB3cm90ZToNCj4gVGhlIGlkZWEgaXMgdGhh
+dCBBTExPQ0FURSByZXF1ZXN0cyBtYXkgb3ZlcmxhcCB3aXRoIG90aGVyIHJlcXVlc3RzLg0KDQpw
+bGVhc2UsIGRlc2NyaWJlIHdoeQ0KDQo+IFJldXNlIHRoZSBleGlzdGluZyBibG9jayBsYXllciBp
+bmZyYXN0cnVjdHVyZSBmb3Igc2VyaWFsaXNpbmcgcmVxdWVzdHMuDQo+IFVzZSB0aGUgZm9sbG93
+aW5nIGFwcHJvYWNoOg0KPiAgICAtIG1hcmsgQUxMT0NBVEUgYWxzbyBTRVJJQUxJU0lORywgc28g
+c3Vic2VxdWVudCByZXF1ZXN0cyB0byB0aGUgYXJlYSB3YWl0DQo+ICAgIC0gQUxMT0NBVEUgcmVx
+dWVzdCBpdHNlbGYgbXVzdCBuZXZlciB3YWl0IGlmIGFub3RoZXIgcmVxdWVzdCBpcyBpbiBmbGln
+aHQNCj4gICAgICBhbHJlYWR5LiBSZXR1cm4gRUFHQUlOLCBsZXQgdGhlIGNhbGxlciByZWNvbnNp
+ZGVyLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogQW50b24gTmVmZWRvdiA8YW50b24ubmVmZWRvdkB2
+aXJ0dW96em8uY29tPg0KPiAtLS0NCj4gICBibG9jay9pby5jIHwgMzEgKysrKysrKysrKysrKysr
+KysrKysrKysrLS0tLS0tLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAyNCBpbnNlcnRpb25zKCspLCA3
+IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2lvLmMgYi9ibG9jay9pby5j
+DQo+IGluZGV4IGQ5ZDc2NDQ4NTguLjZmZjk0NmY2M2QgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2lv
+LmMNCj4gKysrIGIvYmxvY2svaW8uYw0KPiBAQCAtNzIwLDEyICs3MjAsMTMgQEAgdm9pZCBiZHJ2
+X2RlY19pbl9mbGlnaHQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+ICAgICAgIGJkcnZfd2FrZXVw
+KGJzKTsNCj4gICB9DQo+ICAgDQo+IC1zdGF0aWMgYm9vbCBjb3JvdXRpbmVfZm4gd2FpdF9zZXJp
+YWxpc2luZ19yZXF1ZXN0cyhCZHJ2VHJhY2tlZFJlcXVlc3QgKnNlbGYpDQo+ICtzdGF0aWMgYm9v
+bCBjb3JvdXRpbmVfZm4gZmluZF9vcl93YWl0X3NlcmlhbGlzaW5nX3JlcXVlc3RzKA0KPiArICAg
+IEJkcnZUcmFja2VkUmVxdWVzdCAqc2VsZiwgYm9vbCB3YWl0KQ0KPiAgIHsNCj4gICAgICAgQmxv
+Y2tEcml2ZXJTdGF0ZSAqYnMgPSBzZWxmLT5iczsNCj4gICAgICAgQmRydlRyYWNrZWRSZXF1ZXN0
+ICpyZXE7DQo+ICAgICAgIGJvb2wgcmV0cnk7DQo+IC0gICAgYm9vbCB3YWl0ZWQgPSBmYWxzZTsN
+Cj4gKyAgICBib29sIGZvdW5kID0gZmFsc2U7DQo+ICAgDQo+ICAgICAgIGlmICghYXRvbWljX3Jl
+YWQoJmJzLT5zZXJpYWxpc2luZ19pbl9mbGlnaHQpKSB7DQo+ICAgICAgICAgICByZXR1cm4gZmFs
+c2U7DQo+IEBAIC03NTEsMTEgKzc1MiwxNCBAQCBzdGF0aWMgYm9vbCBjb3JvdXRpbmVfZm4gd2Fp
+dF9zZXJpYWxpc2luZ19yZXF1ZXN0cyhCZHJ2VHJhY2tlZFJlcXVlc3QgKnNlbGYpDQo+ICAgICAg
+ICAgICAgICAgICAgICAqIHdpbGwgd2FpdCBmb3IgdXMgYXMgc29vbiBhcyBpdCB3YWtlcyB1cCwg
+dGhlbiBqdXN0IGdvIG9uDQo+ICAgICAgICAgICAgICAgICAgICAqIChpbnN0ZWFkIG9mIHByb2R1
+Y2luZyBhIGRlYWRsb2NrIGluIHRoZSBmb3JtZXIgY2FzZSkuICovDQo+ICAgICAgICAgICAgICAg
+ICAgIGlmICghcmVxLT53YWl0aW5nX2Zvcikgew0KPiArICAgICAgICAgICAgICAgICAgICBmb3Vu
+ZCA9IHRydWU7DQo+ICsgICAgICAgICAgICAgICAgICAgIGlmICghd2FpdCkgew0KPiArICAgICAg
+ICAgICAgICAgICAgICAgICAgYnJlYWs7DQo+ICsgICAgICAgICAgICAgICAgICAgIH0NCj4gICAg
+ICAgICAgICAgICAgICAgICAgIHNlbGYtPndhaXRpbmdfZm9yID0gcmVxOw0KPiAgICAgICAgICAg
+ICAgICAgICAgICAgcWVtdV9jb19xdWV1ZV93YWl0KCZyZXEtPndhaXRfcXVldWUsICZicy0+cmVx
+c19sb2NrKTsNCj4gICAgICAgICAgICAgICAgICAgICAgIHNlbGYtPndhaXRpbmdfZm9yID0gTlVM
+TDsNCj4gICAgICAgICAgICAgICAgICAgICAgIHJldHJ5ID0gdHJ1ZTsNCj4gLSAgICAgICAgICAg
+ICAgICAgICAgd2FpdGVkID0gdHJ1ZTsNCj4gICAgICAgICAgICAgICAgICAgICAgIGJyZWFrOw0K
+PiAgICAgICAgICAgICAgICAgICB9DQo+ICAgICAgICAgICAgICAgfQ0KPiBAQCAtNzYzLDcgKzc2
+NywxMiBAQCBzdGF0aWMgYm9vbCBjb3JvdXRpbmVfZm4gd2FpdF9zZXJpYWxpc2luZ19yZXF1ZXN0
+cyhCZHJ2VHJhY2tlZFJlcXVlc3QgKnNlbGYpDQo+ICAgICAgICAgICBxZW11X2NvX211dGV4X3Vu
+bG9jaygmYnMtPnJlcXNfbG9jayk7DQo+ICAgICAgIH0gd2hpbGUgKHJldHJ5KTsNCj4gICANCj4g
+LSAgICByZXR1cm4gd2FpdGVkOw0KPiArICAgIHJldHVybiBmb3VuZDsNCj4gK30NCj4gKw0KPiAr
+c3RhdGljIGJvb2wgY29yb3V0aW5lX2ZuIHdhaXRfc2VyaWFsaXNpbmdfcmVxdWVzdHMoQmRydlRy
+YWNrZWRSZXF1ZXN0ICpzZWxmKQ0KPiArew0KPiArICAgIHJldHVybiBmaW5kX29yX3dhaXRfc2Vy
+aWFsaXNpbmdfcmVxdWVzdHMoc2VsZiwgdHJ1ZSk7DQo+ICAgfQ0KPiAgIA0KPiAgIHN0YXRpYyBp
+bnQgYmRydl9jaGVja19ieXRlX3JlcXVlc3QoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIGludDY0X3Qg
+b2Zmc2V0LA0KPiBAQCAtMTU4NSw3ICsxNTk0LDcgQEAgYmRydl9jb193cml0ZV9yZXFfcHJlcGFy
+ZShCZHJ2Q2hpbGQgKmNoaWxkLCBpbnQ2NF90IG9mZnNldCwgdWludDY0X3QgYnl0ZXMsDQo+ICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBCZHJ2VHJhY2tlZFJlcXVlc3QgKnJlcSwgaW50IGZs
+YWdzKQ0KPiAgIHsNCj4gICAgICAgQmxvY2tEcml2ZXJTdGF0ZSAqYnMgPSBjaGlsZC0+YnM7DQo+
+IC0gICAgYm9vbCB3YWl0ZWQ7DQo+ICsgICAgYm9vbCBmb3VuZDsNCj4gICAgICAgaW50NjRfdCBl
+bmRfc2VjdG9yID0gRElWX1JPVU5EX1VQKG9mZnNldCArIGJ5dGVzLCBCRFJWX1NFQ1RPUl9TSVpF
+KTsNCj4gICANCj4gICAgICAgaWYgKGJzLT5yZWFkX29ubHkpIHsNCj4gQEAgLTE2MDIsOSArMTYx
+MSwxMyBAQCBiZHJ2X2NvX3dyaXRlX3JlcV9wcmVwYXJlKEJkcnZDaGlsZCAqY2hpbGQsIGludDY0
+X3Qgb2Zmc2V0LCB1aW50NjRfdCBieXRlcywNCj4gICAgICAgICAgIG1hcmtfcmVxdWVzdF9zZXJp
+YWxpc2luZyhyZXEsIGJkcnZfZ2V0X2NsdXN0ZXJfc2l6ZShicykpOw0KPiAgICAgICB9DQo+ICAg
+DQo+IC0gICAgd2FpdGVkID0gd2FpdF9zZXJpYWxpc2luZ19yZXF1ZXN0cyhyZXEpOw0KPiArICAg
+IGZvdW5kID0gZmluZF9vcl93YWl0X3NlcmlhbGlzaW5nX3JlcXVlc3RzKHJlcSwNCj4gKyAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAhKGZsYWdzICYgQkRSVl9S
+RVFfQUxMT0NBVEUpKTsNCj4gKyAgICBpZiAoZm91bmQgJiYgKGZsYWdzICYgQkRSVl9SRVFfQUxM
+T0NBVEUpKSB7DQo+ICsgICAgICAgIHJldHVybiAtRUFHQUlOOw0KPiArICAgIH0NCj4gICANCj4g
+LSAgICBhc3NlcnQoIXdhaXRlZCB8fCAhcmVxLT5zZXJpYWxpc2luZyB8fA0KPiArICAgIGFzc2Vy
+dCghZm91bmQgfHwgIXJlcS0+c2VyaWFsaXNpbmcgfHwNCj4gICAgICAgICAgICAgIGlzX3JlcXVl
+c3Rfc2VyaWFsaXNpbmdfYW5kX2FsaWduZWQocmVxKSk7DQo+ICAgICAgIGFzc2VydChyZXEtPm92
+ZXJsYXBfb2Zmc2V0IDw9IG9mZnNldCk7DQo+ICAgICAgIGFzc2VydChvZmZzZXQgKyBieXRlcyA8
+PSByZXEtPm92ZXJsYXBfb2Zmc2V0ICsgcmVxLT5vdmVybGFwX2J5dGVzKTsNCj4gQEAgLTE4NjYs
+NiArMTg3OSwxMCBAQCBpbnQgY29yb3V0aW5lX2ZuIGJkcnZfY29fcHdyaXRldihCZHJ2Q2hpbGQg
+KmNoaWxkLA0KPiAgICAgICBhc3NlcnQoISgoZmxhZ3MgJiBCRFJWX1JFUV9BTExPQ0FURSkgJiYg
+KGZsYWdzICYgQkRSVl9SRVFfTUFZX1VOTUFQKSkpOw0KPiAgICAgICBhc3NlcnQoISgoZmxhZ3Mg
+JiBCRFJWX1JFUV9BTExPQ0FURSkgJiYgIShmbGFncyAmIEJEUlZfUkVRX1pFUk9fV1JJVEUpKSk7
+DQo+ICAgDQo+ICsgICAgaWYgKGZsYWdzICYgQkRSVl9SRVFfQUxMT0NBVEUpIHsNCj4gKyAgICAg
+ICAgZmxhZ3MgfD0gQkRSVl9SRVFfU0VSSUFMSVNJTkc7DQo+ICsgICAgfQ0KPiArDQo+ICAgICAg
+IHRyYWNlX2JkcnZfY29fcHdyaXRldihjaGlsZC0+YnMsIG9mZnNldCwgYnl0ZXMsIGZsYWdzKTsN
+Cj4gICANCj4gICAgICAgaWYgKCFicy0+ZHJ2KSB7DQo+IA0KDQpwYXRjaCBsb29rcyBjb3JyZWN0
+IHRlY2huaWNhbGx5LCBJIGp1c3QgZG9uJ3Qga25vdyB0aGUgcmVhc29uaW5nLi4NCg0KdGhlIG9u
+bHkgdGhpbmcsIGlzIHRoYXQgaXQgd291bGQgYmUgZ29vZCB0byBhZGQgYSBjb21tZW50IGluIEJE
+UlYgZmxhZ3MgZGVmaW5pdGlvbiBzZWN0aW9uLCB0aGF0IF9BTExPQ0FURSBpbXBsaWVzIF9TRVJJ
+QUxJWkUuDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
