@@ -1,44 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1gUT4O-0003KU-K1
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 04:02:13 -0500
+	(envelope-from <armbru@redhat.com>) id 1gUTBk-0005F0-CC
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 04:09:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1gUT4I-0006qA-1B
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 04:02:10 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54248)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1gUT4H-0006ct-KM
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 04:02:05 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wB58xAw6095707
-	for <qemu-devel@nongnu.org>; Wed, 5 Dec 2018 04:02:04 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2p69gpwtf7-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 04:02:03 -0500
-Received: from localhost
-	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 5 Dec 2018 09:02:00 -0000
-References: <20181203165810.14509-1-kwolf@redhat.com>
-	<20181203165810.14509-3-kwolf@redhat.com>
-	<dc86835f-65d9-cada-dc9b-1f2c708521f9@de.ibm.com>
-	<75f7e3cc-bd46-c743-84ab-cd68bcb1dcfb@de.ibm.com>
-	<d0966d94-87d4-0f25-f2e0-846a1d338be7@de.ibm.com>
-	<20181205084614.GA4018@dhcp-200-186.str.redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 5 Dec 2018 10:01:55 +0100
+	(envelope-from <armbru@redhat.com>) id 1gUTBh-0005WU-3y
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 04:09:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53096)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gUTBg-0005Vc-RX
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 04:09:45 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <154393964026.28192.13536237934563059985.stgit@gimli.home>
+	<154394077749.28192.1229512133780284321.stgit@gimli.home>
+Date: Wed, 05 Dec 2018 10:09:38 +0100
+In-Reply-To: <154394077749.28192.1229512133780284321.stgit@gimli.home> (Alex
+	Williamson's message of "Tue, 04 Dec 2018 09:26:17 -0700")
+Message-ID: <87y394wd9p.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20181205084614.GA4018@dhcp-200-186.str.redhat.com>
-Content-Language: en-US
-Message-Id: <30858ce0-5b4b-c3c4-b846-6a214670f8d2@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PULL 2/2] iotests: simple mirror
- test with kvm on 1G image
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [for-4.0 PATCH v3 3/9] qapi: Define PCIe link
+ speed and width properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,33 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: peter.maydell@linaro.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, Geoffrey McRae <geoff@hostfission.com>
 
+Alex Williamson <alex.williamson@redhat.com> writes:
 
+> Create properties to be able to define speeds and widths for PCIe
+> links.  The only tricky bit here is that our get and set callbacks
+> translate from the fixed QAPI automagic enums to those we define
+> in PCI code to represent the actual register segment value.
 
-On 05.12.2018 09:46, Kevin Wolf wrote:
-> Am 05.12.2018 um 09:23 hat Christian Borntraeger geschrieben:
->>>>> +# prepare source image
->>>>> +qemu_img_create('-f', iotests.imgfmt, '-o', 'preallocation=metadata', disk,
->>>>> +                str(size))
->>>>> +
->>>>> +vm = QEMUMachine(iotests.qemu_prog)
->>>>> +vm.add_args('-machine', 'pc,accel=kvm')
->>
->> This (pc) clearly does not work on other architectures.
->> In addition to that, I also need to add -no-shutdown on s390 (see 068 for a similar case)
-> 
-> Leaving out pc definitely makes sense, and the bug still reproduces for
-> me without it.
-> 
-> I don't understand the -no-shutdown, though. Already for 068, neither
-> the code nor the commit message when it was added explain why this is
-> needed.
-> 
-> Can you turn this into a proper patch and add a comment why -no-shutdown
-> is needed?
+QAPI can only generate enumerations with values 0, 1, 2, ...  You want
+different enumeration values, namely the actual register values.  You
+still want QAPI to get its standard mapping to and from strings.
 
-I already sent this patch. The reason is that there is no BIOS in a classical sense
-on s390x. If no bootable image (external kernel or from disk) is found, the small boot
-bios loads a disabled wait PSW. The default action for that is then shutdown.
+This patch's solution is to define a non-QAPI enumeration type with the
+values you want [PATCH 1/9], then map between the enumerations in the
+PropertyInfo methods.  Works.
+
+You could instead use the encoding chosen by QAPI for the properties,
+and map it to the register values on use.  Differently ugly.  Might be
+simpler.  Your choice to make.
+
+We could extend QAPI to permit specification of the enumeration values.
+Marc-Andr=C3=A9's work to permit conditionals makes the syntax flexible
+enough to support that.  Of course, adding QAPI features is worthwhile
+only if we get sufficient mileage out of them to result in an overall
+improvement.  Even if we decided to do it right now, I'd recommend not
+to wait for it, but instead plan to simplify after the feature lands.
+
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Tested-by: Geoffrey McRae <geoff@hostfission.com>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
