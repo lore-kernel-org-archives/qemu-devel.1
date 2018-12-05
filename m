@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aaron@os.amperecomputing.com>) id 1gUZAY-00024E-7k
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:32:59 -0500
+	(envelope-from <mst@redhat.com>) id 1gUZBb-0002yP-89
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:34:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aaron@os.amperecomputing.com>) id 1gUZAX-0007hK-9Z
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:32:58 -0500
-From: Aaron Lindsay <aaron@os.amperecomputing.com>
-Date: Wed, 5 Dec 2018 15:32:47 +0000
-Message-ID: <20181205153242.GE5549@quinoa.localdomain>
-References: <20181205134243.4791-1-aaron@os.amperecomputing.com>
-	<20181205134243.4791-9-aaron@os.amperecomputing.com>
-In-Reply-To: <20181205134243.4791-9-aaron@os.amperecomputing.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <12FB09A4256A9741A986DDE93F67ED51@prod.exchangelabs.com>
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <mst@redhat.com>) id 1gUZBW-0003n1-MY
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:34:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40382)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gUZBW-0003mA-9I
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:33:58 -0500
+Date: Wed, 5 Dec 2018 10:33:55 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181205102233-mutt-send-email-mst@kernel.org>
+References: <1543848532-12604-1-git-send-email-lizhijian@cn.fujitsu.com>
+	<1543848532-12604-4-git-send-email-lizhijian@cn.fujitsu.com>
+	<20181203200403-mutt-send-email-mst@kernel.org>
+	<351854fc-c419-f006-8744-7f45d2701f16@cn.fujitsu.com>
+	<f9656fba-181c-6267-648c-95dd2380043e@cn.fujitsu.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v9 08/14] target/arm: Make PMCEID[01]_EL0
- 64 bit registers, add PMCEID[23]
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f9656fba-181c-6267-648c-95dd2380043e@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v3 3/4] i386: import bootparam.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,95 +30,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <richard.henderson@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
+To: Li Zhijian <lizhijian@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, philip.li@intel.com, zhijianx.li@intel.com
 
-On Dec 05 08:43, Aaron Lindsay wrote:
-> Signed-off-by: Aaron Lindsay <aaron@os.amperecomputing.com>
-> ---
->  target/arm/cpu.h    |  4 ++--
->  target/arm/helper.c | 18 ++++++++++++++++--
->  2 files changed, 18 insertions(+), 4 deletions(-)
->=20
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 304e6e47b3..4216fe22db 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -837,8 +837,8 @@ struct ARMCPU {
->      uint32_t id_pfr0;
->      uint32_t id_pfr1;
->      uint32_t id_dfr0;
-> -    uint32_t pmceid0;
-> -    uint32_t pmceid1;
-> +    uint64_t pmceid0;
-> +    uint64_t pmceid1;
->      uint32_t id_afr0;
->      uint32_t id_mmfr0;
->      uint32_t id_mmfr1;
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 71be6fb578..fb6939e99c 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -5256,6 +5256,20 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->      } else {
->          define_arm_cp_regs(cpu, not_v7_cp_reginfo);
->      }
-> +    if (FIELD_EX32(cpu->id_dfr0, ID_DFR0, PERFMON) >=3D 4) {
+On Wed, Dec 05, 2018 at 06:28:11PM +0800, Li Zhijian wrote:
+> Hi Michael
+> 
+> I cooked a draft with cp_portable to import bootparam.h, could you have a look.
+> 
+> diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+> index 0a964fe..1beeceb 100755
+> --- a/scripts/update-linux-headers.sh
+> +++ b/scripts/update-linux-headers.sh
+> @@ -44,6 +44,12 @@ cp_portable() {
+>                                       -e 'linux/kernel' \
+>                                       -e 'linux/sysinfo' \
+>                                       -e 'asm-generic/kvm_para' \
+> +                                     -e 'linux/screen_info.h' \
+> +                                     -e 'linux/apm_bios.h' \
+> +                                     -e 'linux/edd.h' \
+> +                                     -e 'video/edid.h' \
+> +                                     -e 'asm/ist.h' \
+> +                                     -e 'linux/ioctl.h' \
+>                                       > /dev/null
+>      then
+>          echo "Unexpected #include in input file $f".
+> @@ -59,6 +65,8 @@ cp_portable() {
+>          -e 's/__be\([0-9][0-9]*\)/uint\1_t/g' \
+>          -e 's/"\(input-event-codes\.h\)"/"standard-headers\/linux\/\1"/' \
+>          -e 's/<linux\/\([^>]*\)>/"standard-headers\/linux\/\1"/' \
+> +        -e "s/<asm\/\([^>]*\)>/\"standard-headers\/asm-$arch\/\1\"/" \
+> +        -e 's/<video\/\([^>]*\)>/"standard-headers\/video\/\1"/' \
+>          -e 's/__bitwise//' \
+>          -e 's/__attribute__((packed))/QEMU_PACKED/' \
+>          -e 's/__inline__/inline/' \
+> @@ -74,6 +82,23 @@ cp_portable() {
+>          "$f" > "$to/$header";
+>  }
+> 
+> +rm -rf "$output/include/standard-headers/linux"
+> +mkdir -p "$output/include/standard-headers/linux"
+> +
+> +cp_bootparam()
+> +{
+> +    mkdir -p $output/include/standard-headers/video
+> +    cp "$tmpdir"/include/linux/ioctl.h "$output/include/standard-headers/linux"
+> +    cp_portable "$tmpdir"/include/linux/screen_info.h "$output/include/standard-headers/linux"
+> +    cp_portable "$tmpdir/include/linux/apm_bios.h" "$output/include/standard-headers/linux"
+> +    cp_portable "$tmpdir/include/linux/edd.h" "$output/include/standard-headers/linux"
+> +    cp_portable "$tmpdir/include/asm/ist.h" $output/include/standard-headers/asm-$arch
+> +    cp_portable "$tmpdir/include/video/edid.h" $output/include/standard-headers/video
+> +
+> +    # bootparam.h includes above headers
+> +    cp_portable "$tmpdir/include/asm/bootparam.h" "$output/include/standard-headers/asm-$arch"
+> +}
+> +
+>  # This will pick up non-directories too (eg "Kconfig") but we will
+>  # ignore them in the next loop.
+>  ARCHLIST=$(cd "$linux/arch" && echo *)
+> @@ -120,6 +145,7 @@ for arch in $ARCHLIST; do
+>          cp "$tmpdir/include/asm/unistd_x32.h" "$output/linux-headers/asm-x86/"
+>          cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-x86/"
+>          cp_portable "$tmpdir/include/asm/kvm_para.h" "$output/include/standard-headers/asm-$arch"
+> +        cp_bootparam
+>      fi
+>  done
+> 
+> @@ -163,8 +189,6 @@ cat <<EOF >$output/linux-headers/linux/virtio_ring.h
+>  #include "standard-headers/linux/virtio_ring.h"
+>  EOF
+> 
+> -rm -rf "$output/include/standard-headers/linux"
+> -mkdir -p "$output/include/standard-headers/linux"
+>  for i in "$tmpdir"/include/linux/*virtio*.h \
+>           "$tmpdir/include/linux/qemu_fw_cfg.h" \
+>           "$tmpdir/include/linux/input.h" \
+> 
+> Thanks
+> Zhijian
+> 
 
-After further discussion on my last version, this should be
+So arch specific asm including asm doesn't work well right now :(
+You can either fix the path to ist to pull it from asm-x86,
+or if you don't actually need anything in that header the
+macros, you can just cut out everything around __ASSEMBLY__
+with a bit of e.g. sed magic. E.g. pvrdma does this.
 
-if (FIELD_EX32(cpu->id_dfr0, ID_DFR0, PERFMON) >=3D 4 &&
-	FIELD_EX32(cpu->id_dfr0, ID_DFR0, PERFMON) !=3D 0xf) {
+Something like:
 
-to guard against defining these registers for implementation-defined
-PMUs.
+# Remove everything except the macros from bootparam.h avoiding the unnecessary
+# import of several video/ist/etc headers
+sed  -e '/__ASSEMBLY__/,/__ASSEMBLY__/d' arch/x86/include/uapi/asm/bootparam.h
 
-> +        ARMCPRegInfo v81_pmu_regs[] =3D {
-> +            { .name =3D "PMCEID2", .state =3D ARM_CP_STATE_AA32,
-> +              .cp =3D 15, .opc1 =3D 0, .crn =3D 9, .crm =3D 14, .opc2 =
-=3D 4,
-> +              .access =3D PL0_R, .accessfn =3D pmreg_access, .type =3D A=
-RM_CP_CONST,
-> +              .resetvalue =3D extract64(cpu->pmceid0, 32, 32) },
-> +            { .name =3D "PMCEID3", .state =3D ARM_CP_STATE_AA32,
-> +              .cp =3D 15, .opc1 =3D 0, .crn =3D 9, .crm =3D 14, .opc2 =
-=3D 5,
-> +              .access =3D PL0_R, .accessfn =3D pmreg_access, .type =3D A=
-RM_CP_CONST,
-> +              .resetvalue =3D extract64(cpu->pmceid1, 32, 32) },
-> +            REGINFO_SENTINEL
-> +        };
-> +        define_arm_cp_regs(cpu, v81_pmu_regs);
-> +    }
->      if (arm_feature(env, ARM_FEATURE_V8)) {
->          /* AArch64 ID registers, which all have impdef reset values.
->           * Note that within the ID register ranges the unused slots
-> @@ -5432,7 +5446,7 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->              { .name =3D "PMCEID0", .state =3D ARM_CP_STATE_AA32,
->                .cp =3D 15, .opc1 =3D 0, .crn =3D 9, .crm =3D 12, .opc2 =
-=3D 6,
->                .access =3D PL0_R, .accessfn =3D pmreg_access, .type =3D A=
-RM_CP_CONST,
-> -              .resetvalue =3D cpu->pmceid0 },
-> +              .resetvalue =3D extract64(cpu->pmceid0, 0, 32) },
->              { .name =3D "PMCEID0_EL0", .state =3D ARM_CP_STATE_AA64,
->                .opc0 =3D 3, .opc1 =3D 3, .crn =3D 9, .crm =3D 12, .opc2 =
-=3D 6,
->                .access =3D PL0_R, .accessfn =3D pmreg_access, .type =3D A=
-RM_CP_CONST,
-> @@ -5440,7 +5454,7 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->              { .name =3D "PMCEID1", .state =3D ARM_CP_STATE_AA32,
->                .cp =3D 15, .opc1 =3D 0, .crn =3D 9, .crm =3D 12, .opc2 =
-=3D 7,
->                .access =3D PL0_R, .accessfn =3D pmreg_access, .type =3D A=
-RM_CP_CONST,
-> -              .resetvalue =3D cpu->pmceid1 },
-> +              .resetvalue =3D extract64(cpu->pmceid1, 0, 32) },
->              { .name =3D "PMCEID1_EL0", .state =3D ARM_CP_STATE_AA64,
->                .opc0 =3D 3, .opc1 =3D 3, .crn =3D 9, .crm =3D 12, .opc2 =
-=3D 7,
->                .access =3D PL0_R, .accessfn =3D pmreg_access, .type =3D A=
-RM_CP_CONST,
-> --=20
-> 2.19.1
->=20
+should do the job.
+
+
+> 
+> On 12/04/2018 04:09 PM, Li Zhijian wrote:
+> 
+> 
+> 
+> 
+>     On 12/04/2018 09:06 AM, Michael S. Tsirkin wrote:
+> 
+>         On Mon, Dec 03, 2018 at 10:48:51PM +0800, Li Zhijian wrote:
+> 
+>             It provides setup_data struct and header fields
+> 
+>             CC: Michael S. Tsirkin <mst@redhat.com>
+>             Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> 
+>         Sorry I was unclear when I said "import it from Linux".
+> 
+>     Sorry, it's my fault.
+> 
+> 
+>         The way to import it is to copy the header
+>         from the linux kernel by adding it to ./scripts/update-linux-headers.sh
+>         and placing a copy into include/standard-headers/
+> 
+>         Hope that helps.
+> 
+>     that's really helpful.
+> 
+>     i wonder which type copy should i use 'cp' or 'cp_portable'
+>     this header includes several sub-headers
+> 
+>     $ grep include  /tmp/tmp.MBF10Z9MeS/include/asm/bootparam.h
+>     #include <linux/types.h>
+>     #include <linux/screen_info.h>
+>     #include <linux/apm_bios.h>
+>     #include <linux/edd.h>
+>     #include <asm/ist.h>
+>     #include <video/edid.h>
+> 
+>     Thanks
+>     Zhijian
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
