@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gUgXQ-0007Ez-FA
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:25:08 -0500
+	(envelope-from <clg@kaod.org>) id 1gUgXl-0007ar-IA
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:25:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gUgXM-0003jD-4M
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:25:04 -0500
-Received: from 7.mo177.mail-out.ovh.net ([46.105.61.149]:36441)
+	(envelope-from <clg@kaod.org>) id 1gUgXZ-0003xb-Nu
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:25:19 -0500
+Received: from 7.mo177.mail-out.ovh.net ([46.105.61.149]:50641)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gUgXL-0003hq-Jx
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:24:59 -0500
-Received: from player714.ha.ovh.net (unknown [10.109.160.239])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 74968D5DEF
-	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 00:24:58 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gUgXT-0003nC-3z
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 18:25:09 -0500
+Received: from player714.ha.ovh.net (unknown [10.109.160.93])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id AABB0D5C4D
+	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 00:25:03 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu,  6 Dec 2018 00:22:35 +0100
-Message-Id: <20181205232251.10446-22-clg@kaod.org>
+Date: Thu,  6 Dec 2018 00:22:36 +0100
+Message-Id: <20181205232251.10446-23-clg@kaod.org>
 In-Reply-To: <20181205232251.10446-1-clg@kaod.org>
 References: <20181205232251.10446-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 21/37] spapr: add a 'reset' method to the
- sPAPR IRQ backend
+Subject: [Qemu-devel] [PATCH v6 22/37] spapr: add a 'pseries-3.1-xive'
+ machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,184 +33,167 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-For the time being, the XIVE reset handler updates the OS CAM line of
-the vCPU as it is done under a real hypervisor when a vCPU is
-scheduled to run on a HW thread.
-
-This method will become even more useful when the machine supporting
-both interrupt modes, XIVE and XICS, is introduced. In this machine,
-the interrupt mode is chosen by the CAS negotiation process and
-activated after a reset.
+The interrupt mode is statically defined to XIVE only for this machine.
+The guest OS is required to have support for the XIVE exploitation
+mode of the POWER9 interrupt controller.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- include/hw/ppc/spapr_irq.h  |  2 ++
- include/hw/ppc/spapr_xive.h |  1 +
- hw/intc/spapr_xive.c        | 24 ++++++++++++++++++++++++
- hw/ppc/spapr.c              |  5 +++++
- hw/ppc/spapr_irq.c          | 25 +++++++++++++++++++++++++
- 5 files changed, 57 insertions(+)
+ include/hw/ppc/spapr.h     |  6 ++++++
+ include/hw/ppc/spapr_irq.h |  1 +
+ hw/ppc/spapr.c             | 36 +++++++++++++++++++++++++++++++-----
+ hw/ppc/spapr_irq.c         |  3 +++
+ 4 files changed, 41 insertions(+), 5 deletions(-)
 
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 6bf028a02fe2..daced428a42c 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -824,5 +824,11 @@ int spapr_caps_post_migration(sPAPRMachineState *spa=
+pr);
+=20
+ void spapr_check_pagesize(sPAPRMachineState *spapr, hwaddr pagesize,
+                           Error **errp);
++/*
++ * XIVE definitions
++ */
++#define SPAPR_OV5_XIVE_LEGACY   0x0
++#define SPAPR_OV5_XIVE_EXPLOIT  0x40
++#define SPAPR_OV5_XIVE_BOTH     0x80
+=20
+ #endif /* HW_SPAPR_H */
 diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-index 91ac5784919c..bdb1c66125c9 100644
+index bdb1c66125c9..26727a7263a5 100644
 --- a/include/hw/ppc/spapr_irq.h
 +++ b/include/hw/ppc/spapr_irq.h
-@@ -44,6 +44,7 @@ typedef struct sPAPRIrq {
-     Object *(*cpu_intc_create)(sPAPRMachineState *spapr, Object *cpu,
-                                Error **errp);
-     int (*post_load)(sPAPRMachineState *spapr, int version_id);
-+    void (*reset)(sPAPRMachineState *spapr, Error **errp);
- } sPAPRIrq;
+@@ -33,6 +33,7 @@ void spapr_irq_msi_reset(sPAPRMachineState *spapr);
+ typedef struct sPAPRIrq {
+     uint32_t    nr_irqs;
+     uint32_t    nr_msis;
++    uint8_t     ov5;
 =20
- extern sPAPRIrq spapr_irq_xics;
-@@ -55,6 +56,7 @@ int spapr_irq_claim(sPAPRMachineState *spapr, int irq, =
-bool lsi, Error **errp);
- void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
- qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
- int spapr_irq_post_load(sPAPRMachineState *spapr, int version_id);
-+void spapr_irq_reset(sPAPRMachineState *spapr, Error **errp);
-=20
- /*
-  * XICS legacy routines
-diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-index 728a5e8dc163..7244a6231ce6 100644
---- a/include/hw/ppc/spapr_xive.h
-+++ b/include/hw/ppc/spapr_xive.h
-@@ -47,5 +47,6 @@ typedef struct sPAPRMachineState sPAPRMachineState;
- void spapr_xive_hcall_init(sPAPRMachineState *spapr);
- void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void *=
-fdt,
-                    uint32_t phandle);
-+void spapr_xive_reset_tctx(sPAPRXive *xive);
-=20
- #endif /* PPC_SPAPR_XIVE_H */
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index fd02dc6b91e4..3cddc9332acb 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -181,6 +181,30 @@ static void spapr_xive_map_mmio(sPAPRXive *xive)
-     sysbus_mmio_map(SYS_BUS_DEVICE(xive), 2, xive->tm_base);
- }
-=20
-+/*
-+ * When a Virtual Processor is scheduled to run on a HW thread, the
-+ * hypervisor pushes its identifier in the OS CAM line. Emulate the
-+ * same behavior under QEMU.
-+ */
-+void spapr_xive_reset_tctx(sPAPRXive *xive)
-+{
-+    CPUState *cs;
-+    uint8_t  nvt_blk;
-+    uint32_t nvt_idx;
-+    uint32_t nvt_cam;
-+
-+    CPU_FOREACH(cs) {
-+        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-+        XiveTCTX *tctx =3D XIVE_TCTX(cpu->intc);
-+
-+        spapr_xive_cpu_to_nvt(xive, cpu, &nvt_blk, &nvt_idx);
-+
-+        nvt_cam =3D cpu_to_be32(TM_QW1W2_VO |
-+                              xive_nvt_cam_line(nvt_blk, nvt_idx));
-+        memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &nvt_cam, 4);
-+    }
-+}
-+
- static void spapr_xive_end_reset(XiveEND *end)
- {
-     memset(end, 0, sizeof(*end));
+     void (*init)(sPAPRMachineState *spapr, int nr_irqs, Error **errp);
+     int (*claim)(sPAPRMachineState *spapr, int irq, bool lsi, Error **er=
+rp);
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 8911465e32cf..530aee8d143d 100644
+index 530aee8d143d..817dd1b2c442 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -1621,6 +1621,11 @@ static void spapr_machine_reset(void)
+@@ -1097,12 +1097,14 @@ static void spapr_dt_rtas(sPAPRMachineState *spap=
+r, void *fdt)
+     spapr_dt_rtas_tokens(fdt, rtas);
+ }
 =20
-     qemu_devices_reset();
+-/* Prepare ibm,arch-vec-5-platform-support, which indicates the MMU feat=
+ures
+- * that the guest may request and thus the valid values for bytes 24..26=
+ of
+- * option vector 5: */
+-static void spapr_dt_ov5_platform_support(void *fdt, int chosen)
++/* Prepare ibm,arch-vec-5-platform-support, which indicates the MMU
++ * and the XIVE features that the guest may request and thus the valid
++ * values for bytes 23..26 of option vector 5: */
++static void spapr_dt_ov5_platform_support(sPAPRMachineState *spapr, void=
+ *fdt,
++                                          int chosen)
+ {
+     PowerPCCPU *first_ppc_cpu =3D POWERPC_CPU(first_cpu);
++    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
 =20
-+    /* This is fixing some of the default configuration of the XIVE
-+     * devices. To be called after the reset of the machine devices.
-+     */
-+    spapr_irq_reset(spapr, &error_fatal);
+     char val[2 * 4] =3D {
+         23, 0x00, /* Xive mode, filled in below. */
+@@ -1123,7 +1125,11 @@ static void spapr_dt_ov5_platform_support(void *fd=
+t, int chosen)
+         } else {
+             val[3] =3D 0x00; /* Hash */
+         }
++        /* No KVM support */
++        val[1] =3D SPAPR_OV5_XIVE_LEGACY;
+     } else {
++        val[1] =3D smc->irq->ov5;
 +
-     /* DRC reset may cause a device to be unplugged. This will cause tro=
-ubles
-      * if this device is used by another device (eg, a running vhost bac=
-kend
-      * will crash QEMU if the DIMM holding the vring goes away). To avoi=
-d such
+         /* V3 MMU supports both hash and radix in tcg (with dynamic swit=
+ching) */
+         val[3] =3D 0xC0;
+     }
+@@ -1191,7 +1197,7 @@ static void spapr_dt_chosen(sPAPRMachineState *spap=
+r, void *fdt)
+         _FDT(fdt_setprop_string(fdt, chosen, "stdout-path", stdout_path)=
+);
+     }
+=20
+-    spapr_dt_ov5_platform_support(fdt, chosen);
++    spapr_dt_ov5_platform_support(spapr, fdt, chosen);
+=20
+     g_free(stdout_path);
+     g_free(bootlist);
+@@ -2624,6 +2630,11 @@ static void spapr_machine_init(MachineState *machi=
+ne)
+     /* advertise support for ibm,dyamic-memory-v2 */
+     spapr_ovec_set(spapr->ov5, OV5_DRMEM_V2);
+=20
++    /* advertise XIVE */
++    if (smc->irq->ov5 =3D=3D SPAPR_OV5_XIVE_EXPLOIT) {
++        spapr_ovec_set(spapr->ov5, OV5_XIVE_EXPLOIT);
++    }
++
+     /* init CPUs */
+     spapr_init_cpus(spapr);
+=20
+@@ -3973,6 +3984,21 @@ static void spapr_machine_3_1_class_options(Machin=
+eClass *mc)
+=20
+ DEFINE_SPAPR_MACHINE(3_1, "3.1", true);
+=20
++static void spapr_machine_3_1_xive_instance_options(MachineState *machin=
+e)
++{
++    spapr_machine_3_1_instance_options(machine);
++}
++
++static void spapr_machine_3_1_xive_class_options(MachineClass *mc)
++{
++    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
++
++    spapr_machine_3_1_class_options(mc);
++    smc->irq =3D &spapr_irq_xive;
++}
++
++DEFINE_SPAPR_MACHINE(3_1_xive, "3.1-xive", false);
++
+ /*
+  * pseries-3.0
+  */
 diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 8943e28fc11b..58ce124c1501 100644
+index 58ce124c1501..8eead17c8f36 100644
 --- a/hw/ppc/spapr_irq.c
 +++ b/hw/ppc/spapr_irq.c
-@@ -13,6 +13,7 @@
- #include "qapi/error.h"
- #include "hw/ppc/spapr.h"
- #include "hw/ppc/spapr_xive.h"
-+#include "hw/ppc/spapr_cpu_core.h"
- #include "hw/ppc/xics.h"
- #include "sysemu/kvm.h"
+@@ -220,6 +220,7 @@ static void spapr_irq_reset_xics(sPAPRMachineState *s=
+papr, Error **errp)
+ sPAPRIrq spapr_irq_xics =3D {
+     .nr_irqs     =3D SPAPR_IRQ_XICS_NR_IRQS,
+     .nr_msis     =3D SPAPR_IRQ_XICS_NR_MSIS,
++    .ov5         =3D SPAPR_OV5_XIVE_LEGACY,
 =20
-@@ -208,6 +209,10 @@ static int spapr_irq_post_load_xics(sPAPRMachineStat=
-e *spapr, int version_id)
-     return 0;
- }
+     .init        =3D spapr_irq_init_xics,
+     .claim       =3D spapr_irq_claim_xics,
+@@ -357,6 +358,7 @@ static void spapr_irq_reset_xive(sPAPRMachineState *s=
+papr, Error **errp)
+ sPAPRIrq spapr_irq_xive =3D {
+     .nr_irqs     =3D SPAPR_IRQ_XIVE_NR_IRQS,
+     .nr_msis     =3D SPAPR_IRQ_XIVE_NR_MSIS,
++    .ov5         =3D SPAPR_OV5_XIVE_EXPLOIT,
 =20
-+static void spapr_irq_reset_xics(sPAPRMachineState *spapr, Error **errp)
-+{
-+}
-+
- #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
- #define SPAPR_IRQ_XICS_NR_MSIS     \
-     (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
-@@ -224,6 +229,7 @@ sPAPRIrq spapr_irq_xics =3D {
-     .dt_populate =3D spapr_dt_xics,
-     .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
-     .post_load   =3D spapr_irq_post_load_xics,
-+    .reset       =3D spapr_irq_reset_xics,
- };
+     .init        =3D spapr_irq_init_xive,
+     .claim       =3D spapr_irq_claim_xive,
+@@ -481,6 +483,7 @@ int spapr_irq_find(sPAPRMachineState *spapr, int num,=
+ bool align, Error **errp)
+ sPAPRIrq spapr_irq_xics_legacy =3D {
+     .nr_irqs     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
+     .nr_msis     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
++    .ov5         =3D SPAPR_OV5_XIVE_LEGACY,
 =20
- /*
-@@ -331,6 +337,15 @@ static int spapr_irq_post_load_xive(sPAPRMachineStat=
-e *spapr, int version_id)
-     return 0;
- }
-=20
-+static void spapr_irq_reset_xive(sPAPRMachineState *spapr, Error **errp)
-+{
-+    /*
-+     * Set the OS CAM line of the cpu interrupt thread context. Needs
-+     * to come after the XiveTCTX reset handlers.
-+     */
-+    spapr_xive_reset_tctx(spapr->xive);
-+}
-+
- /*
-  * XIVE uses the full IRQ number space. Set it to 8K to be compatible
-  * with XICS.
-@@ -351,6 +366,7 @@ sPAPRIrq spapr_irq_xive =3D {
-     .dt_populate =3D spapr_dt_xive,
-     .cpu_intc_create =3D spapr_irq_cpu_intc_create_xive,
-     .post_load   =3D spapr_irq_post_load_xive,
-+    .reset       =3D spapr_irq_reset_xive,
- };
-=20
- /*
-@@ -396,6 +412,15 @@ int spapr_irq_post_load(sPAPRMachineState *spapr, in=
-t version_id)
-     return smc->irq->post_load(spapr, version_id);
- }
-=20
-+void spapr_irq_reset(sPAPRMachineState *spapr, Error **errp)
-+{
-+    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-+
-+    if (smc->irq->reset) {
-+        smc->irq->reset(spapr, errp);
-+    }
-+}
-+
- /*
-  * XICS legacy routines - to deprecate one day
-  */
+     .init        =3D spapr_irq_init_xics,
+     .claim       =3D spapr_irq_claim_xics,
 --=20
 2.17.2
