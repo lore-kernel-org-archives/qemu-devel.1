@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gUX0W-0000MP-1C
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:14:32 -0500
+	(envelope-from <armbru@redhat.com>) id 1gUX5d-0004kk-Rx
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:19:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gUX0U-00065k-Lc
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:14:27 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 5 Dec 2018 13:14:03 +0000
-Message-ID: <c8832c65-4b52-b56f-cd0b-499597a82b11@virtuozzo.com>
-References: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
-	<20181203101429.88735-6-anton.nefedov@virtuozzo.com>
-In-Reply-To: <20181203101429.88735-6-anton.nefedov@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F7444E7D283978478DA554D0FE9539AF@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <armbru@redhat.com>) id 1gUX5Z-0002sP-S6
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:19:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55272)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gUX5Z-0002ra-LM
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:19:41 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A446C307DAC5
+	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 13:19:40 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
+	<20180706105753.26700-7-marcandre.lureau@redhat.com>
+Date: Wed, 05 Dec 2018 14:19:35 +0100
+In-Reply-To: <20180706105753.26700-7-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Fri, 6 Jul 2018 12:57:32 +0200")
+Message-ID: <875zw8t8k8.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v10 5/9] block: treat BDRV_REQ_ALLOCATE as
- serialising
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 06/27] qapi: do not define enumeration
+ value explicitly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,83 +36,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-MDMuMTIuMjAxOCAxMzoxNCwgQW50b24gTmVmZWRvdiB3cm90ZToNCj4gVGhlIGlkZWEgaXMgdGhh
-dCBBTExPQ0FURSByZXF1ZXN0cyBtYXkgb3ZlcmxhcCB3aXRoIG90aGVyIHJlcXVlc3RzLg0KDQpw
-bGVhc2UsIGRlc2NyaWJlIHdoeQ0KDQo+IFJldXNlIHRoZSBleGlzdGluZyBibG9jayBsYXllciBp
-bmZyYXN0cnVjdHVyZSBmb3Igc2VyaWFsaXNpbmcgcmVxdWVzdHMuDQo+IFVzZSB0aGUgZm9sbG93
-aW5nIGFwcHJvYWNoOg0KPiAgICAtIG1hcmsgQUxMT0NBVEUgYWxzbyBTRVJJQUxJU0lORywgc28g
-c3Vic2VxdWVudCByZXF1ZXN0cyB0byB0aGUgYXJlYSB3YWl0DQo+ICAgIC0gQUxMT0NBVEUgcmVx
-dWVzdCBpdHNlbGYgbXVzdCBuZXZlciB3YWl0IGlmIGFub3RoZXIgcmVxdWVzdCBpcyBpbiBmbGln
-aHQNCj4gICAgICBhbHJlYWR5LiBSZXR1cm4gRUFHQUlOLCBsZXQgdGhlIGNhbGxlciByZWNvbnNp
-ZGVyLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogQW50b24gTmVmZWRvdiA8YW50b24ubmVmZWRvdkB2
-aXJ0dW96em8uY29tPg0KPiAtLS0NCj4gICBibG9jay9pby5jIHwgMzEgKysrKysrKysrKysrKysr
-KysrKysrKysrLS0tLS0tLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAyNCBpbnNlcnRpb25zKCspLCA3
-IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2lvLmMgYi9ibG9jay9pby5j
-DQo+IGluZGV4IGQ5ZDc2NDQ4NTguLjZmZjk0NmY2M2QgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2lv
-LmMNCj4gKysrIGIvYmxvY2svaW8uYw0KPiBAQCAtNzIwLDEyICs3MjAsMTMgQEAgdm9pZCBiZHJ2
-X2RlY19pbl9mbGlnaHQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+ICAgICAgIGJkcnZfd2FrZXVw
-KGJzKTsNCj4gICB9DQo+ICAgDQo+IC1zdGF0aWMgYm9vbCBjb3JvdXRpbmVfZm4gd2FpdF9zZXJp
-YWxpc2luZ19yZXF1ZXN0cyhCZHJ2VHJhY2tlZFJlcXVlc3QgKnNlbGYpDQo+ICtzdGF0aWMgYm9v
-bCBjb3JvdXRpbmVfZm4gZmluZF9vcl93YWl0X3NlcmlhbGlzaW5nX3JlcXVlc3RzKA0KPiArICAg
-IEJkcnZUcmFja2VkUmVxdWVzdCAqc2VsZiwgYm9vbCB3YWl0KQ0KPiAgIHsNCj4gICAgICAgQmxv
-Y2tEcml2ZXJTdGF0ZSAqYnMgPSBzZWxmLT5iczsNCj4gICAgICAgQmRydlRyYWNrZWRSZXF1ZXN0
-ICpyZXE7DQo+ICAgICAgIGJvb2wgcmV0cnk7DQo+IC0gICAgYm9vbCB3YWl0ZWQgPSBmYWxzZTsN
-Cj4gKyAgICBib29sIGZvdW5kID0gZmFsc2U7DQo+ICAgDQo+ICAgICAgIGlmICghYXRvbWljX3Jl
-YWQoJmJzLT5zZXJpYWxpc2luZ19pbl9mbGlnaHQpKSB7DQo+ICAgICAgICAgICByZXR1cm4gZmFs
-c2U7DQo+IEBAIC03NTEsMTEgKzc1MiwxNCBAQCBzdGF0aWMgYm9vbCBjb3JvdXRpbmVfZm4gd2Fp
-dF9zZXJpYWxpc2luZ19yZXF1ZXN0cyhCZHJ2VHJhY2tlZFJlcXVlc3QgKnNlbGYpDQo+ICAgICAg
-ICAgICAgICAgICAgICAqIHdpbGwgd2FpdCBmb3IgdXMgYXMgc29vbiBhcyBpdCB3YWtlcyB1cCwg
-dGhlbiBqdXN0IGdvIG9uDQo+ICAgICAgICAgICAgICAgICAgICAqIChpbnN0ZWFkIG9mIHByb2R1
-Y2luZyBhIGRlYWRsb2NrIGluIHRoZSBmb3JtZXIgY2FzZSkuICovDQo+ICAgICAgICAgICAgICAg
-ICAgIGlmICghcmVxLT53YWl0aW5nX2Zvcikgew0KPiArICAgICAgICAgICAgICAgICAgICBmb3Vu
-ZCA9IHRydWU7DQo+ICsgICAgICAgICAgICAgICAgICAgIGlmICghd2FpdCkgew0KPiArICAgICAg
-ICAgICAgICAgICAgICAgICAgYnJlYWs7DQo+ICsgICAgICAgICAgICAgICAgICAgIH0NCj4gICAg
-ICAgICAgICAgICAgICAgICAgIHNlbGYtPndhaXRpbmdfZm9yID0gcmVxOw0KPiAgICAgICAgICAg
-ICAgICAgICAgICAgcWVtdV9jb19xdWV1ZV93YWl0KCZyZXEtPndhaXRfcXVldWUsICZicy0+cmVx
-c19sb2NrKTsNCj4gICAgICAgICAgICAgICAgICAgICAgIHNlbGYtPndhaXRpbmdfZm9yID0gTlVM
-TDsNCj4gICAgICAgICAgICAgICAgICAgICAgIHJldHJ5ID0gdHJ1ZTsNCj4gLSAgICAgICAgICAg
-ICAgICAgICAgd2FpdGVkID0gdHJ1ZTsNCj4gICAgICAgICAgICAgICAgICAgICAgIGJyZWFrOw0K
-PiAgICAgICAgICAgICAgICAgICB9DQo+ICAgICAgICAgICAgICAgfQ0KPiBAQCAtNzYzLDcgKzc2
-NywxMiBAQCBzdGF0aWMgYm9vbCBjb3JvdXRpbmVfZm4gd2FpdF9zZXJpYWxpc2luZ19yZXF1ZXN0
-cyhCZHJ2VHJhY2tlZFJlcXVlc3QgKnNlbGYpDQo+ICAgICAgICAgICBxZW11X2NvX211dGV4X3Vu
-bG9jaygmYnMtPnJlcXNfbG9jayk7DQo+ICAgICAgIH0gd2hpbGUgKHJldHJ5KTsNCj4gICANCj4g
-LSAgICByZXR1cm4gd2FpdGVkOw0KPiArICAgIHJldHVybiBmb3VuZDsNCj4gK30NCj4gKw0KPiAr
-c3RhdGljIGJvb2wgY29yb3V0aW5lX2ZuIHdhaXRfc2VyaWFsaXNpbmdfcmVxdWVzdHMoQmRydlRy
-YWNrZWRSZXF1ZXN0ICpzZWxmKQ0KPiArew0KPiArICAgIHJldHVybiBmaW5kX29yX3dhaXRfc2Vy
-aWFsaXNpbmdfcmVxdWVzdHMoc2VsZiwgdHJ1ZSk7DQo+ICAgfQ0KPiAgIA0KPiAgIHN0YXRpYyBp
-bnQgYmRydl9jaGVja19ieXRlX3JlcXVlc3QoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIGludDY0X3Qg
-b2Zmc2V0LA0KPiBAQCAtMTU4NSw3ICsxNTk0LDcgQEAgYmRydl9jb193cml0ZV9yZXFfcHJlcGFy
-ZShCZHJ2Q2hpbGQgKmNoaWxkLCBpbnQ2NF90IG9mZnNldCwgdWludDY0X3QgYnl0ZXMsDQo+ICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBCZHJ2VHJhY2tlZFJlcXVlc3QgKnJlcSwgaW50IGZs
-YWdzKQ0KPiAgIHsNCj4gICAgICAgQmxvY2tEcml2ZXJTdGF0ZSAqYnMgPSBjaGlsZC0+YnM7DQo+
-IC0gICAgYm9vbCB3YWl0ZWQ7DQo+ICsgICAgYm9vbCBmb3VuZDsNCj4gICAgICAgaW50NjRfdCBl
-bmRfc2VjdG9yID0gRElWX1JPVU5EX1VQKG9mZnNldCArIGJ5dGVzLCBCRFJWX1NFQ1RPUl9TSVpF
-KTsNCj4gICANCj4gICAgICAgaWYgKGJzLT5yZWFkX29ubHkpIHsNCj4gQEAgLTE2MDIsOSArMTYx
-MSwxMyBAQCBiZHJ2X2NvX3dyaXRlX3JlcV9wcmVwYXJlKEJkcnZDaGlsZCAqY2hpbGQsIGludDY0
-X3Qgb2Zmc2V0LCB1aW50NjRfdCBieXRlcywNCj4gICAgICAgICAgIG1hcmtfcmVxdWVzdF9zZXJp
-YWxpc2luZyhyZXEsIGJkcnZfZ2V0X2NsdXN0ZXJfc2l6ZShicykpOw0KPiAgICAgICB9DQo+ICAg
-DQo+IC0gICAgd2FpdGVkID0gd2FpdF9zZXJpYWxpc2luZ19yZXF1ZXN0cyhyZXEpOw0KPiArICAg
-IGZvdW5kID0gZmluZF9vcl93YWl0X3NlcmlhbGlzaW5nX3JlcXVlc3RzKHJlcSwNCj4gKyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAhKGZsYWdzICYgQkRSVl9S
-RVFfQUxMT0NBVEUpKTsNCj4gKyAgICBpZiAoZm91bmQgJiYgKGZsYWdzICYgQkRSVl9SRVFfQUxM
-T0NBVEUpKSB7DQo+ICsgICAgICAgIHJldHVybiAtRUFHQUlOOw0KPiArICAgIH0NCj4gICANCj4g
-LSAgICBhc3NlcnQoIXdhaXRlZCB8fCAhcmVxLT5zZXJpYWxpc2luZyB8fA0KPiArICAgIGFzc2Vy
-dCghZm91bmQgfHwgIXJlcS0+c2VyaWFsaXNpbmcgfHwNCj4gICAgICAgICAgICAgIGlzX3JlcXVl
-c3Rfc2VyaWFsaXNpbmdfYW5kX2FsaWduZWQocmVxKSk7DQo+ICAgICAgIGFzc2VydChyZXEtPm92
-ZXJsYXBfb2Zmc2V0IDw9IG9mZnNldCk7DQo+ICAgICAgIGFzc2VydChvZmZzZXQgKyBieXRlcyA8
-PSByZXEtPm92ZXJsYXBfb2Zmc2V0ICsgcmVxLT5vdmVybGFwX2J5dGVzKTsNCj4gQEAgLTE4NjYs
-NiArMTg3OSwxMCBAQCBpbnQgY29yb3V0aW5lX2ZuIGJkcnZfY29fcHdyaXRldihCZHJ2Q2hpbGQg
-KmNoaWxkLA0KPiAgICAgICBhc3NlcnQoISgoZmxhZ3MgJiBCRFJWX1JFUV9BTExPQ0FURSkgJiYg
-KGZsYWdzICYgQkRSVl9SRVFfTUFZX1VOTUFQKSkpOw0KPiAgICAgICBhc3NlcnQoISgoZmxhZ3Mg
-JiBCRFJWX1JFUV9BTExPQ0FURSkgJiYgIShmbGFncyAmIEJEUlZfUkVRX1pFUk9fV1JJVEUpKSk7
-DQo+ICAgDQo+ICsgICAgaWYgKGZsYWdzICYgQkRSVl9SRVFfQUxMT0NBVEUpIHsNCj4gKyAgICAg
-ICAgZmxhZ3MgfD0gQkRSVl9SRVFfU0VSSUFMSVNJTkc7DQo+ICsgICAgfQ0KPiArDQo+ICAgICAg
-IHRyYWNlX2JkcnZfY29fcHdyaXRldihjaGlsZC0+YnMsIG9mZnNldCwgYnl0ZXMsIGZsYWdzKTsN
-Cj4gICANCj4gICAgICAgaWYgKCFicy0+ZHJ2KSB7DQo+IA0KDQpwYXRjaCBsb29rcyBjb3JyZWN0
-IHRlY2huaWNhbGx5LCBJIGp1c3QgZG9uJ3Qga25vdyB0aGUgcmVhc29uaW5nLi4NCg0KdGhlIG9u
-bHkgdGhpbmcsIGlzIHRoYXQgaXQgd291bGQgYmUgZ29vZCB0byBhZGQgYSBjb21tZW50IGluIEJE
-UlYgZmxhZ3MgZGVmaW5pdGlvbiBzZWN0aW9uLCB0aGF0IF9BTExPQ0FURSBpbXBsaWVzIF9TRVJJ
-QUxJWkUuDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+
+> The C standard has the initial value at 0 and the subsequent values
+> incremented by 1. No need to set this explicitely.
+>
+> This will prevent from artificial "gaps" when compiling out some enum
+> values and having unnecessarily large MAX values & enums arrays, or
+> simplifying iterating over valid enum values.
+
+Yes, gaps can be annoying, e.g. in lookup tables where gaps get confused
+with sentinels.
+
+Avoiding gaps scares me.  You have to religiously compile the enum with
+the exact same configuration everywhere in the program, or else you end
+up with bugs that are hard to spot.  Therefore:
+
+> Whenever config-host.h is changed, all the enum/types are recompiled.
+>
+> (a subsequent patch will split the schema. Target-specific poisoined
+> conditionals will be added. They cannot be mixed with the common
+> schema: it is not possible to end up with enums of different values in
+> common and target builds)
+
+Should we mention config-target.h here?
+
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi/common.py | 7 ++-----
+>  1 file changed, 2 insertions(+), 5 deletions(-)
+>
+> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+> index 02c5c6767a..6f9498566e 100644
+> --- a/scripts/qapi/common.py
+> +++ b/scripts/qapi/common.py
+> @@ -2045,14 +2045,11 @@ typedef enum %(c_name)s {
+>  ''',
+>                  c_name=3Dc_name(name))
+>=20=20
+> -    i =3D 0
+>      for value in enum_values:
+>          ret +=3D mcgen('''
+> -    %(c_enum)s =3D %(i)d,
+> +    %(c_enum)s,
+>  ''',
+> -                     c_enum=3Dc_enum_const(name, value, prefix),
+> -                     i=3Di)
+> -        i +=3D 1
+> +                     c_enum=3Dc_enum_const(name, value, prefix))
+>=20=20
+>      ret +=3D mcgen('''
+>  } %(c_name)s;
+
+I need to consider the whole series to decide whether avoiding gaps is a
+good idea.  If it is, then this patch is fine.
