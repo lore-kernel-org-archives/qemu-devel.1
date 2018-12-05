@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gUSkS-0006Sl-0C
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 03:41:36 -0500
+	(envelope-from <armbru@redhat.com>) id 1gUSlt-00079l-Uq
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 03:43:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gUSkR-0007Qh-AU
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 03:41:35 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55572)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gUSkR-0007Q5-2y
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 03:41:35 -0500
-Received: by mail-wm1-x343.google.com with SMTP id y139so12229429wmc.5
-	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 00:41:35 -0800 (PST)
-MIME-Version: 1.0
+	(envelope-from <armbru@redhat.com>) id 1gUSlp-0000kQ-Se
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 03:43:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45134)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gUSlp-0000hq-LI
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 03:43:01 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0682830001EF
+	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 08:43:01 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
 References: <20181204131802.16885-1-marcandre.lureau@redhat.com>
-	<20181204131802.16885-3-marcandre.lureau@redhat.com>
-	<87lg541j7h.fsf@dusky.pond.sub.org>
-In-Reply-To: <87lg541j7h.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 5 Dec 2018 12:41:20 +0400
-Message-ID: <CAJ+F1CJjpMiC60tQtM5JSagndTHkrgKKE3syFG53h6BsX=W6Hg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<20181204131802.16885-5-marcandre.lureau@redhat.com>
+Date: Wed, 05 Dec 2018 09:42:55 +0100
+In-Reply-To: <20181204131802.16885-5-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Tue, 4 Dec 2018 17:18:00 +0400")
+Message-ID: <874lbs1i0g.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 2/6] monitor: accept chardev input from
- iothread
+Subject: Re: [Qemu-devel] [PATCH v3 4/6] monitor: check if chardev can
+ switch gcontext for OOB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,46 +36,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-On Wed, Dec 5, 2018 at 12:21 PM Markus Armbruster <armbru@redhat.com> wrote=
-:
->
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->
-> > Chardev backends may not handle safely IO events from concurrent
-> > threads (they are not thread-safe in general, only the write path is
->
-> Suggest "may not handle I/O events from concurrent threads safely".
->
-> > since commit > 9005b2a7589540a3733b3abdcfbccfe7746cd1a1). Better to
-> > wake up the chardev from the monitor IO thread if it's being used as
-> > the chardev context.
-> >
-> > Unify code paths by using a BH in all cases.
-> >
-> > Drop the now redundant aio_notify() call.
-> >
-> > Simplify the condition, based on mon->use_io_thread (only QMP so far).
->
-> Suggest
->
->   Clean up control flow not to rely on mon->use_io_thread implying
->   monitor_is_qmp(mon).
->
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > Reviewed-by: Peter Xu <peterx@redhat.com>
->
-> Happy to improve the commit message in my tree.
->
-> Preferably with commit message improvements:
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
+> Not all backends are able to switch gcontext. Those backends cannot
+> drive a OOB monitor (the monitor would then be blocking on main
+> thread).
+>
+> For example, ringbuf, spice, or more esoteric input chardevs like
+> braille or MUX.
+>
+> We currently forbid MUX because not all frontends are ready to run
+> outside main loop. Extend to add a context-switching feature check.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  monitor.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/monitor.c b/monitor.c
+> index 79afe99079..25cf4223e8 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -4562,9 +4562,11 @@ void monitor_init(Chardev *chr, int flags)
+>      bool use_oob =3D flags & MONITOR_USE_OOB;
+>=20=20
+>      if (use_oob) {
+> -        if (CHARDEV_IS_MUX(chr)) {
+> +        if (CHARDEV_IS_MUX(chr) ||
+> +            !qemu_chr_has_feature(chr, QEMU_CHAR_FEATURE_GCONTEXT)) {
+>              error_report("Monitor out-of-band is not supported with "
+> -                         "MUX typed chardev backend");
+> +                         "%s typed chardev backend",
+> +                         object_get_typename(OBJECT(chr)));
+>              exit(1);
+>          }
+>          if (use_readline) {
 
-ack, thanks
+Aha, this answers my question on the previous patch: yes, it is possible
+to trip the new assertion.
 
+Are there any ways other than this one?
 
---=20
-Marc-Andr=C3=A9 Lureau
+We could squash the two patches.  But I figure you kept the previous
+patch separate on purpose.  That's okay, but it should mention the
+assertion can be tripped, and the next patch (this one) will fix it.
