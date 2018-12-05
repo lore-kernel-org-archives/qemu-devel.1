@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <d.csapak@proxmox.com>) id 1gUYtJ-0002lz-Lt
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:15:12 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUYtt-0002hk-5B
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:15:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <d.csapak@proxmox.com>) id 1gUYl7-0003ZS-OT
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:06:45 -0500
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:26120)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <d.csapak@proxmox.com>)
-	id 1gUYl5-0003Sm-Iy
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:06:39 -0500
-References: <20181205110131.23049-1-d.csapak@proxmox.com>
-	<87a7lkuptr.fsf@dusky.pond.sub.org>
-From: Dominik Csapak <d.csapak@proxmox.com>
-Message-ID: <5592d444-4527-89b8-4a0a-f32c6b5beb69@proxmox.com>
-Date: Wed, 5 Dec 2018 16:06:22 +0100
-MIME-Version: 1.0
-In-Reply-To: <87a7lkuptr.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUYhz-0001Sv-Qc
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:03:33 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 5 Dec 2018 15:03:18 +0000
+Message-ID: <54a5b82e-f433-4624-d556-72cc9d43dab9@virtuozzo.com>
+References: <20181130220344.3350618-1-eblake@redhat.com>
+	<20181130220344.3350618-3-eblake@redhat.com>
+In-Reply-To: <20181130220344.3350618-3-eblake@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] qapi: return ShutdownCause for
- events
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <3D043480E99E764A905ADADF2827323A@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 02/14] nbd/client: More consistent error
+ messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +26,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: kwolf@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-On 12/5/18 1:21 PM, Markus Armbruster wrote:
-> Dominik Csapak <d.csapak@proxmox.com> writes:
-> 
->> This series improves the QMP SHUTDOWN and RESET events by adding
->> the ShutdownCause as additional parameter and splitting
->> the HOST_QMP reason into HOST_QMP_QUIT and HOST_QMP_SYSTEM_RESET
->> to be able to detect the difference between them when using '--no-reboot'
->>
->> this is an alternative to my previous patches[1][2] which
->> added an exit-script/added a 'reset' argument to the events
->>
->>   1: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg00697.html
->>   2: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg01271.html
-> 
-> Next time, please add the Reviewed-bys you got for the previous version
-> to your commit messages, unless the commits changed enough to warrant
-> another round of review.
-
-Yes of course, sorry for that.
-
-Thank you again for the review.
-
-> 
-> For the record, series again
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> 
-> 
+MDEuMTIuMjAxOCAxOjAzLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBDb25zb2xpZGF0ZSBvbiB1c2lu
+ZyBkZWNpbWFsIChub3QgaGV4KSBhbmQgb24gb3V0cHV0dGluZyB0aGUNCj4gb3B0aW9uIHJlcGx5
+IG5hbWUgKG5vdCBqdXN0IHZhbHVlKSB3aGVuIHRoZSBjbGllbnQgcmVwb3J0cw0KPiBwcm90b2Nv
+bCBkaXNjcmVwYW5jaWVzIGZyb20gdGhlIHNlcnZlci4gIFdoaWxlIGl0IHdvbid0IGFmZmVjdA0K
+PiBub3JtYWwgb3BlcmF0aW9uLCBpdCBtYWtlcyBkZWJ1Z2dpbmcgYWRkaXRpb25zIGVhc2llci4N
+Cj4gDQo+IFNpZ25lZC1vZmYtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPg0KPiAt
+LS0NCj4gICBuYmQvY2xpZW50LmMgfCAyMSArKysrKysrKysrKystLS0tLS0tLS0NCj4gICAxIGZp
+bGUgY2hhbmdlZCwgMTIgaW5zZXJ0aW9ucygrKSwgOSBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYg
+LS1naXQgYS9uYmQvY2xpZW50LmMgYi9uYmQvY2xpZW50LmMNCj4gaW5kZXggYjRkNDU3YTE5YWQu
+LmI2NjdhMWI1NmZkIDEwMDY0NA0KPiAtLS0gYS9uYmQvY2xpZW50LmMNCj4gKysrIGIvbmJkL2Ns
+aWVudC5jDQo+IEBAIC0xMzIsOCArMTMyLDkgQEAgc3RhdGljIGludCBuYmRfcmVjZWl2ZV9vcHRp
+b25fcmVwbHkoUUlPQ2hhbm5lbCAqaW9jLCB1aW50MzJfdCBvcHQsDQo+ICAgICAgICAgICByZXR1
+cm4gLTE7DQo+ICAgICAgIH0NCj4gICAgICAgaWYgKHJlcGx5LT5vcHRpb24gIT0gb3B0KSB7DQo+
+IC0gICAgICAgIGVycm9yX3NldGcoZXJycCwgIlVuZXhwZWN0ZWQgb3B0aW9uIHR5cGUgJXggZXhw
+ZWN0ZWQgJXgiLA0KPiAtICAgICAgICAgICAgICAgICAgIHJlcGx5LT5vcHRpb24sIG9wdCk7DQo+
+ICsgICAgICAgIGVycm9yX3NldGcoZXJycCwgIlVuZXhwZWN0ZWQgb3B0aW9uIHR5cGUgJXUgKCVz
+KSBleHBlY3RlZCAldSAoJXMpIiwNCj4gKyAgICAgICAgICAgICAgICAgICByZXBseS0+b3B0aW9u
+LCBuYmRfb3B0X2xvb2t1cChyZXBseS0+b3B0aW9uKSwNCj4gKyAgICAgICAgICAgICAgICAgICBv
+cHQsIG5iZF9vcHRfbG9va3VwKG9wdCkpOw0KPiAgICAgICAgICAgbmJkX3NlbmRfb3B0X2Fib3J0
+KGlvYyk7DQo+ICAgICAgICAgICByZXR1cm4gLTE7DQo+ICAgICAgIH0NCj4gQEAgLTI2NSw4ICsy
+NjYsOSBAQCBzdGF0aWMgaW50IG5iZF9yZWNlaXZlX2xpc3QoUUlPQ2hhbm5lbCAqaW9jLCBjb25z
+dCBjaGFyICp3YW50LCBib29sICptYXRjaCwNCj4gICAgICAgICAgIH0NCj4gICAgICAgICAgIHJl
+dHVybiAwOw0KPiAgICAgICB9IGVsc2UgaWYgKHJlcGx5LnR5cGUgIT0gTkJEX1JFUF9TRVJWRVIp
+IHsNCj4gLSAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiVW5leHBlY3RlZCByZXBseSB0eXBlICUi
+IFBSSXgzMiAiIGV4cGVjdGVkICV4IiwNCj4gLSAgICAgICAgICAgICAgICAgICByZXBseS50eXBl
+LCBOQkRfUkVQX1NFUlZFUik7DQo+ICsgICAgICAgIGVycm9yX3NldGcoZXJycCwgIlVuZXhwZWN0
+ZWQgcmVwbHkgdHlwZSAldSAoJXMpIGV4cGVjdGVkICV1ICglcykiLA0KPiArICAgICAgICAgICAg
+ICAgICAgIHJlcGx5LnR5cGUsIG5iZF9yZXBfbG9va3VwKHJlcGx5LnR5cGUpLA0KPiArICAgICAg
+ICAgICAgICAgICAgIE5CRF9SRVBfU0VSVkVSLCBuYmRfcmVwX2xvb2t1cChOQkRfUkVQX1NFUlZF
+UikpOw0KPiAgICAgICAgICAgbmJkX3NlbmRfb3B0X2Fib3J0KGlvYyk7DQo+ICAgICAgICAgICBy
+ZXR1cm4gLTE7DQo+ICAgICAgIH0NCj4gQEAgLTM3OCw5ICszODAsOSBAQCBzdGF0aWMgaW50IG5i
+ZF9vcHRfZ28oUUlPQ2hhbm5lbCAqaW9jLCBjb25zdCBjaGFyICp3YW50bmFtZSwNCj4gICAgICAg
+ICAgICAgICByZXR1cm4gMTsNCj4gICAgICAgICAgIH0NCj4gICAgICAgICAgIGlmIChyZXBseS50
+eXBlICE9IE5CRF9SRVBfSU5GTykgew0KPiAtICAgICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAi
+dW5leHBlY3RlZCByZXBseSB0eXBlICUiIFBSSXUzMg0KPiAtICAgICAgICAgICAgICAgICAgICAg
+ICAiICglcyksIGV4cGVjdGVkICV1IiwNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgcmVwbHku
+dHlwZSwgbmJkX3JlcF9sb29rdXAocmVwbHkudHlwZSksIE5CRF9SRVBfSU5GTyk7DQo+ICsgICAg
+ICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJ1bmV4cGVjdGVkIHJlcGx5IHR5cGUgJXUgKCVzKSwg
+ZXhwZWN0ZWQgJXUgKCVzKSIsDQoNCmhtbSwgd2UgYXJlIGRlZmluaXRlbHkgaW5jb25zaXN0ZW50
+IGFib3V0IGhhdmluZyBjb21tYSBiZWZvcmUgImV4cGVjdGVkIiB3b3JkLi4uDQoNCmFueXdheSwN
+ClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZp
+cnR1b3p6by5jb20+DQoNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgcmVwbHkudHlwZSwgbmJk
+X3JlcF9sb29rdXAocmVwbHkudHlwZSksDQo+ICsgICAgICAgICAgICAgICAgICAgICAgIE5CRF9S
+RVBfSU5GTywgbmJkX3JlcF9sb29rdXAoTkJEX1JFUF9JTkZPKSk7DQo+ICAgICAgICAgICAgICAg
+bmJkX3NlbmRfb3B0X2Fib3J0KGlvYyk7DQo+ICAgICAgICAgICAgICAgcmV0dXJuIC0xOw0KPiAg
+ICAgICAgICAgfQ0KPiBAQCAtNzA0LDggKzcwNiw5IEBAIHN0YXRpYyBpbnQgbmJkX25lZ290aWF0
+ZV9zaW1wbGVfbWV0YV9jb250ZXh0KFFJT0NoYW5uZWwgKmlvYywNCj4gICAgICAgfQ0KPiANCj4g
+ICAgICAgaWYgKHJlcGx5LnR5cGUgIT0gTkJEX1JFUF9BQ0spIHsNCj4gLSAgICAgICAgZXJyb3Jf
+c2V0ZyhlcnJwLCAiVW5leHBlY3RlZCByZXBseSB0eXBlICUiIFBSSXgzMiAiIGV4cGVjdGVkICV4
+IiwNCj4gLSAgICAgICAgICAgICAgICAgICByZXBseS50eXBlLCBOQkRfUkVQX0FDSyk7DQo+ICsg
+ICAgICAgIGVycm9yX3NldGcoZXJycCwgIlVuZXhwZWN0ZWQgcmVwbHkgdHlwZSAldSAoJXMpIGV4
+cGVjdGVkICV1ICglcykiLA0KPiArICAgICAgICAgICAgICAgICAgIHJlcGx5LnR5cGUsIG5iZF9y
+ZXBfbG9va3VwKHJlcGx5LnR5cGUpLA0KPiArICAgICAgICAgICAgICAgICAgIE5CRF9SRVBfQUNL
+LCBuYmRfcmVwX2xvb2t1cChOQkRfUkVQX0FDSykpOw0KPiAgICAgICAgICAgbmJkX3NlbmRfb3B0
+X2Fib3J0KGlvYyk7DQo+ICAgICAgICAgICByZXR1cm4gLTE7DQo+ICAgICAgIH0NCj4gDQoNCg0K
+LS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
