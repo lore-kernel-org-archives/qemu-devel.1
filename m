@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <leif.lindholm@linaro.org>) id 1gUUXq-0007ah-O7
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 05:36:43 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gUUgt-0003Ny-SS
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 05:46:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <leif.lindholm@linaro.org>) id 1gUUXo-0006mQ-Sa
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 05:36:42 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:34518)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <leif.lindholm@linaro.org>)
-	id 1gUUXn-0006jD-Jn
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 05:36:40 -0500
-Received: by mail-wm1-x343.google.com with SMTP id y185so11452044wmd.1
-	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 02:36:38 -0800 (PST)
-Date: Wed, 5 Dec 2018 10:36:34 +0000
-From: Leif Lindholm <leif.lindholm@linaro.org>
-Message-ID: <20181205103634.cvogkgjdzq7e3feh@bivouac.eciton.net>
-References: <1539939312-19713-1-git-send-email-hongbo.zhang@linaro.org>
-	<1539939312-19713-2-git-send-email-hongbo.zhang@linaro.org>
-	<CAFEAcA-vF5orNpfGFe2sGWh=TxWL054PmCM-Yu4faJne+4CkbA@mail.gmail.com>
-	<CAHmQWvCN00LkSvmAY8nCtoGYrRDsALYRkg0x_yz6HaRgQkQn3w@mail.gmail.com>
+	(envelope-from <cohuck@redhat.com>) id 1gUUgp-0004r8-PB
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 05:46:03 -0500
+Date: Wed, 5 Dec 2018 11:45:47 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181205114547.6d1f2c2d.cohuck@redhat.com>
+In-Reply-To: <874lbs2y8e.fsf@dusky.pond.sub.org>
+References: <20181204172535.2799-1-armbru@redhat.com>
+	<ae25db42-74e7-0870-46f8-7def27e5cf43@redhat.com>
+	<874lbs2y8e.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHmQWvCN00LkSvmAY8nCtoGYrRDsALYRkg0x_yz6HaRgQkQn3w@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v4] hw/arm: Add arm SBSA reference machine
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Clean up includes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +24,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hongbo Zhang <hongbo.zhang@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Tony Krowiak <akrowiak@linux.ibm.com>, qemu-riscv@nongnu.org, Pierre Morel <pmorel@linux.ibm.com>, Viktor Prutyanov <viktor.prutyanov@phystech.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Richard Henderson <rth@twiddle.net>, Palmer Dabbelt <palmer@sifive.com>, Alex Williamson <alex.williamson@redhat.com>, Yuval Shaia <yuval.shaia@oracle.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Michael Clark <mjc@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Wed, Dec 05, 2018 at 05:50:23PM +0800, Hongbo Zhang wrote:
-> > > +static
-> > > +void sbsa_ref_machine_done(Notifier *notifier, void *data)
-> > > +{
-> > > +    VirtMachineState *vms = container_of(notifier, VirtMachineState,
-> > > +                                         machine_done);
-> > > +    ARMCPU *cpu = ARM_CPU(first_cpu);
-> > > +    struct arm_boot_info *info = &vms->bootinfo;
-> > > +    AddressSpace *as = arm_boot_address_space(cpu, info);
-> > > +
-> > > +    if (arm_load_dtb(info->dtb_start, info, info->dtb_limit, as) < 0) {
-> > > +        exit(1);
-> > > +    }
-> > > +}
-> >
-> > The virt board needs a machine-done notifier because it has
-> > to add extra things to the DTB here. You don't, so you don't
-> > need one. Don't set bootinfo.skip_dtb_autoload to true, and
-> > then the boot.c code will do the arm_load_dtb() call for you.
-> >
-> After test and check, I think we still need this machine_done callback
-> to call arm_load_dtb().
-> If only kernel loaded via -kernel but without any firmware, it should
-> work to let arm_load_kernel() call the arm_load_dtb(), while in our
-> case, we have have firmware loaded but no kernel, so the
-> arm_load_kernel() returns before calling arm_load_dtb(),  that is,
-> firmware runs and there is no chance to call arm_load_dtb(), then we
-> get error message and qemu quits.
-> Moving arm_load_dtb() to earlier place in arm_load_kernel() cannot fix
-> this issue either.
+On Wed, 05 Dec 2018 09:07:13 +0100
+Markus Armbruster <armbru@redhat.com> wrote:
 
-I don't see the value in using -kernel on the SBSA machine.
-If it causes complexity, can we drop the functionality?
+> > On 12/4/18 11:25 AM, Markus Armbruster wrote:  
+> >> Clean up includes so that osdep.h is included first and headers
+> >> which it implies are not included manually.
+> >>
+> >> This commit was created with scripts/clean-includes, with the changes
+> >> to the following files manually reverted:
 
-Regards,
+(...)
 
-Leif
+> >>      target/s390x/gen-features.c
+
+(..)
+
+> target/s390x/gen-features.c is a standalone program that is compiled in
+> a way that breaks when we include osdep.h.  If that's fixable, fixing it
+> would be nice.  Aside: not sure I'd have written this in C.
+
+Yes, that file is a bit of an oddball. Might make sense to add a
+comment there that it is standalone, so you can find that out without
+looking at the Makefile. I don't think rewriting this to something else
+is worth the effort.
