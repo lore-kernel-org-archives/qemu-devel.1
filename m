@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gUeZO-0007Wy-Fn
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 16:18:59 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1gUepJ-000478-GV
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 16:35:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gUeZL-0002Px-5W
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 16:18:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53198)
+	(envelope-from <alex.williamson@redhat.com>) id 1gUepG-0000EM-9k
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 16:35:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42718)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gUeZK-0002PA-Tv
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 16:18:55 -0500
-References: <5C07EB0A.0934FA.23346@m12-11.163.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bf0be83a-2df7-7ed1-04d3-f457ce97de53@redhat.com>
-Date: Wed, 5 Dec 2018 22:18:50 +0100
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1gUepG-0000D1-3b
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 16:35:22 -0500
+Date: Wed, 5 Dec 2018 14:35:16 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20181205143516.2badf97c@x1.home>
+In-Reply-To: <154394084810.28192.18333845343054369357.stgit@gimli.home>
+References: <154393964026.28192.13536237934563059985.stgit@gimli.home>
+	<154394084810.28192.18333845343054369357.stgit@gimli.home>
 MIME-Version: 1.0
-In-Reply-To: <5C07EB0A.0934FA.23346@m12-11.163.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Question about piix3's PIRQC register set
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [for-4.0 PATCH v3 9/9] pcie: Fast PCIe root ports
+ for new machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +29,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@163.com>, Alex Williamson <alex.l.williamson@gmail.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-On 05/12/18 16:13, Li Qiang wrote:
-> Here my question when the piix3=E2=80=99s PIRQx route control registers=
- is set
-> and by who?
->=20
-> I mean when this =E2=80=98=E2=80=98piix3->dev.config[PIIX_PIRQC + pin];=
-=E2=80=99=E2=80=99 is set?
-> =C2=A0
-> Once I think this is set by seabios.
+On Tue, 04 Dec 2018 09:27:28 -0700
+Alex Williamson <alex.williamson@redhat.com> wrote:
 
-Hi,
+> Change the default speed and width for new machine types to the
+> fastest and widest currently supported.  This should be compatible to
+> the PCIe 4.0 spec.  Pre-QEMU-4.0 machine types remain at 2.5GT/s, x1
+> width.
+> 
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+>  hw/pci-bridge/gen_pcie_root_port.c |    4 ++--
+>  include/hw/compat.h                |   10 +++++++++-
+>  2 files changed, 11 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
+> index ca5418a89dd2..9766edb44596 100644
+> --- a/hw/pci-bridge/gen_pcie_root_port.c
+> +++ b/hw/pci-bridge/gen_pcie_root_port.c
+> @@ -125,9 +125,9 @@ static Property gen_rp_props[] = {
+>      DEFINE_PROP_SIZE("pref64-reserve", GenPCIERootPort,
+>                       res_reserve.mem_pref_64, -1),
+>      DEFINE_PROP_PCIE_LINK_SPEED("x-speed", PCIESlot,
+> -                                speed, PCIE_LINK_SPEED_2_5),
+> +                                speed, PCIE_LINK_SPEED_16),
+>      DEFINE_PROP_PCIE_LINK_WIDTH("x-width", PCIESlot,
+> -                                width, PCIE_LINK_WIDTH_1),
+> +                                width, PCIE_LINK_WIDTH_32),
+>      DEFINE_PROP_END_OF_LIST()
+>  };
+>  
+> diff --git a/include/hw/compat.h b/include/hw/compat.h
+> index 70958328fe7a..702cc62277db 100644
+> --- a/include/hw/compat.h
+> +++ b/include/hw/compat.h
+> @@ -2,7 +2,15 @@
+>  #define HW_COMPAT_H
+>  
+>  #define HW_COMPAT_3_1 \
+> -    /* empty */
+> +    {\
+> +        .driver   = "pcie-root-port",\
+> +        .property = "speed",\
+> +        .value    = "2_5",\
+> +    },{\
+> +        .driver   = "pcie-root-port",\
+> +        .property = "width",\
+> +        .value    = "1",\
+> +    },
 
-it's set by the operating system via ACPI.  Search for define_link in
-SeaBIOS's src/fw/acpi-dsdt.dsl, it refers to fields called PRQ0-PRQ3
-which in turn are defined like this:
+Whoops, these should be x-speed and x-width too.  Will correct.  Thanks,
 
-            /* PIIX PCI to ISA irq remapping */
-            OperationRegion(P40C, PCI_Config, 0x60, 0x04)
+Alex
 
-	...
-        Field(PCI0.ISA.P40C, ByteAcc, NoLock, Preserve) {
-            PRQ0,   8,
-            PRQ1,   8,
-            PRQ2,   8,
-            PRQ3,   8
-        }
-
-Current QEMU doesn't use anymore the SeaBIOS copy of the DSDT, but the
-same thing can be found in build_piix4_isa_bridge and
-build_piix4_pci0_int, in hw/i386/acpi-build.c.
-
-> But seems it is not as this function is called in vfio_realize, the
-> guest dones=E2=80=99t begin.
-
-vfio also calls it (from vfio_intx_update) every time the routing
-registers are updated.  The ISA bridge calls
-pci_bus_fire_intx_routing_notifier, and then that function calls
-vfio_intx_update, because it was registered with
-pci_device_set_intx_routing_notifier.
-
-Thanks,
-
-Paolo
+>  #define HW_COMPAT_3_0 \
+>      /* empty */
+> 
