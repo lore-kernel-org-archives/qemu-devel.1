@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gUXEN-0001Kt-8j
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:28:48 -0500
+	(envelope-from <mst@redhat.com>) id 1gUXIQ-0004By-5c
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:33:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gUXEM-0006Ba-Ax
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:28:47 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 5 Dec 2018 13:28:37 +0000
-Message-ID: <60781845-5f00-650d-57e1-3bd8df56a431@virtuozzo.com>
-References: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
-	<20181203101429.88735-8-anton.nefedov@virtuozzo.com>
-In-Reply-To: <20181203101429.88735-8-anton.nefedov@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <93D44DC27C40FE4891DF9AE90CD9B2E3@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <mst@redhat.com>) id 1gUXIM-0000xR-Ts
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:32:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40702)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gUXIM-0000wp-KA
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:32:54 -0500
+Date: Wed, 5 Dec 2018 08:32:52 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181205082228-mutt-send-email-mst@kernel.org>
+References: <CAHyh4xgZhGnEvkD5RiUazZ9Eq_jzr4=bXHfwBvCBkbOLN2UyKA@mail.gmail.com>
+	<915953bd-cc9c-9456-b619-297138f68ae6@redhat.com>
+	<20181204205541-mutt-send-email-mst@kernel.org>
+	<fc1150b2-f71a-b527-cce1-9b33e0a11c6a@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v10 7/9] block: support BDRV_REQ_ALLOCATE
- in passthrough drivers
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <fc1150b2-f71a-b527-cce1-9b33e0a11c6a@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Logging dirty pages from vhost-net in-kernel with
+ vIOMMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,74 +31,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Jintack Lim <jintack@cs.columbia.edu>, QEMU Devel Mailing List <qemu-devel@nongnu.org>
 
-MDMuMTIuMjAxOCAxMzoxNCwgQW50b24gTmVmZWRvdiB3cm90ZToNCj4gU3VwcG9ydCB0aGUgZmxh
-ZyBpZiB0aGUgdW5kZXJseWluZyBCRFMgc3VwcG9ydHMgaXQNCj4gDQo+IFNpZ25lZC1vZmYtYnk6
-IEFudG9uIE5lZmVkb3YgPGFudG9uLm5lZmVkb3ZAdmlydHVvenpvLmNvbT4NCg0KUmV2aWV3ZWQt
-Ynk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNv
-bT4NCg0KPiAtLS0NCj4gICBibG9jay9ibGtkZWJ1Zy5jICAgICB8IDIgKy0NCj4gICBibG9jay9i
-bGt2ZXJpZnkuYyAgICB8IDIgKy0NCj4gICBibG9jay9jb3B5LW9uLXJlYWQuYyB8IDQgKystLQ0K
-PiAgIGJsb2NrL21pcnJvci5jICAgICAgIHwgMiArLQ0KPiAgIGJsb2NrL3Jhdy1mb3JtYXQuYyAg
-IHwgMiArLQ0KPiAgIDUgZmlsZXMgY2hhbmdlZCwgNiBpbnNlcnRpb25zKCspLCA2IGRlbGV0aW9u
-cygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsa2RlYnVnLmMgYi9ibG9jay9ibGtkZWJ1
-Zy5jDQo+IGluZGV4IDA3NTk0NTI5MjUuLmYwZmMyZWMyNzYgMTAwNjQ0DQo+IC0tLSBhL2Jsb2Nr
-L2Jsa2RlYnVnLmMNCj4gKysrIGIvYmxvY2svYmxrZGVidWcuYw0KPiBAQCAtNDAxLDcgKzQwMSw3
-IEBAIHN0YXRpYyBpbnQgYmxrZGVidWdfb3BlbihCbG9ja0RyaXZlclN0YXRlICpicywgUURpY3Qg
-Km9wdGlvbnMsIGludCBmbGFncywNCj4gICAgICAgYnMtPnN1cHBvcnRlZF93cml0ZV9mbGFncyA9
-IEJEUlZfUkVRX1dSSVRFX1VOQ0hBTkdFRCB8DQo+ICAgICAgICAgICAoQkRSVl9SRVFfRlVBICYg
-YnMtPmZpbGUtPmJzLT5zdXBwb3J0ZWRfd3JpdGVfZmxhZ3MpOw0KPiAgICAgICBicy0+c3VwcG9y
-dGVkX3plcm9fZmxhZ3MgPSBCRFJWX1JFUV9XUklURV9VTkNIQU5HRUQgfA0KPiAtICAgICAgICAo
-KEJEUlZfUkVRX0ZVQSB8IEJEUlZfUkVRX01BWV9VTk1BUCkgJg0KPiArICAgICAgICAoKEJEUlZf
-UkVRX0ZVQSB8IEJEUlZfUkVRX01BWV9VTk1BUCB8IEJEUlZfUkVRX0FMTE9DQVRFKSAmDQo+ICAg
-ICAgICAgICAgICAgYnMtPmZpbGUtPmJzLT5zdXBwb3J0ZWRfemVyb19mbGFncyk7DQo+ICAgICAg
-IHJldCA9IC1FSU5WQUw7DQo+ICAgDQo+IGRpZmYgLS1naXQgYS9ibG9jay9ibGt2ZXJpZnkuYyBi
-L2Jsb2NrL2Jsa3ZlcmlmeS5jDQo+IGluZGV4IGJiNTI1OTZjYmIuLjljYjRmOTRiNjggMTAwNjQ0
-DQo+IC0tLSBhL2Jsb2NrL2Jsa3ZlcmlmeS5jDQo+ICsrKyBiL2Jsb2NrL2Jsa3ZlcmlmeS5jDQo+
-IEBAIC0xNDYsNyArMTQ2LDcgQEAgc3RhdGljIGludCBibGt2ZXJpZnlfb3BlbihCbG9ja0RyaXZl
-clN0YXRlICpicywgUURpY3QgKm9wdGlvbnMsIGludCBmbGFncywNCj4gICAgICAgICAgICBicy0+
-ZmlsZS0+YnMtPnN1cHBvcnRlZF93cml0ZV9mbGFncyAmDQo+ICAgICAgICAgICAgcy0+dGVzdF9m
-aWxlLT5icy0+c3VwcG9ydGVkX3dyaXRlX2ZsYWdzKTsNCj4gICAgICAgYnMtPnN1cHBvcnRlZF96
-ZXJvX2ZsYWdzID0gQkRSVl9SRVFfV1JJVEVfVU5DSEFOR0VEIHwNCj4gLSAgICAgICAgKChCRFJW
-X1JFUV9GVUEgfCBCRFJWX1JFUV9NQVlfVU5NQVApICYNCj4gKyAgICAgICAgKChCRFJWX1JFUV9G
-VUEgfCBCRFJWX1JFUV9NQVlfVU5NQVAgfCBCRFJWX1JFUV9BTExPQ0FURSkgJg0KPiAgICAgICAg
-ICAgIGJzLT5maWxlLT5icy0+c3VwcG9ydGVkX3plcm9fZmxhZ3MgJg0KPiAgICAgICAgICAgIHMt
-PnRlc3RfZmlsZS0+YnMtPnN1cHBvcnRlZF96ZXJvX2ZsYWdzKTsNCj4gICANCj4gZGlmZiAtLWdp
-dCBhL2Jsb2NrL2NvcHktb24tcmVhZC5jIGIvYmxvY2svY29weS1vbi1yZWFkLmMNCj4gaW5kZXgg
-NjRkY2M0MjRiNS4uMWViOTkzNjk5YSAxMDA2NDQNCj4gLS0tIGEvYmxvY2svY29weS1vbi1yZWFk
-LmMNCj4gKysrIGIvYmxvY2svY29weS1vbi1yZWFkLmMNCj4gQEAgLTM4LDggKzM4LDggQEAgc3Rh
-dGljIGludCBjb3Jfb3BlbihCbG9ja0RyaXZlclN0YXRlICpicywgUURpY3QgKm9wdGlvbnMsIGlu
-dCBmbGFncywNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBicy0+Zmls
-ZS0+YnMtPnN1cHBvcnRlZF93cml0ZV9mbGFncyk7DQo+ICAgDQo+ICAgICAgIGJzLT5zdXBwb3J0
-ZWRfemVyb19mbGFncyA9IEJEUlZfUkVRX1dSSVRFX1VOQ0hBTkdFRCB8DQo+IC0gICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgKChCRFJWX1JFUV9GVUEgfCBCRFJWX1JFUV9NQVlfVU5NQVAp
-ICYNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJzLT5maWxlLT5icy0+
-c3VwcG9ydGVkX3plcm9fZmxhZ3MpOw0KPiArICAgICAgICAoKEJEUlZfUkVRX0ZVQSB8IEJEUlZf
-UkVRX01BWV9VTk1BUCB8IEJEUlZfUkVRX0FMTE9DQVRFKSAmDQo+ICsgICAgICAgICBicy0+Zmls
-ZS0+YnMtPnN1cHBvcnRlZF96ZXJvX2ZsYWdzKTsNCj4gICANCj4gICAgICAgcmV0dXJuIDA7DQo+
-ICAgfQ0KPiBkaWZmIC0tZ2l0IGEvYmxvY2svbWlycm9yLmMgYi9ibG9jay9taXJyb3IuYw0KPiBp
-bmRleCA1NjkwOGM5YjE5Li45ZDgzNmE2YmQzIDEwMDY0NA0KPiAtLS0gYS9ibG9jay9taXJyb3Iu
-Yw0KPiArKysgYi9ibG9jay9taXJyb3IuYw0KPiBAQCAtMTUzMSw3ICsxNTMxLDcgQEAgc3RhdGlj
-IHZvaWQgbWlycm9yX3N0YXJ0X2pvYihjb25zdCBjaGFyICpqb2JfaWQsIEJsb2NrRHJpdmVyU3Rh
-dGUgKmJzLA0KPiAgICAgICBtaXJyb3JfdG9wX2JzLT5zdXBwb3J0ZWRfd3JpdGVfZmxhZ3MgPSBC
-RFJWX1JFUV9XUklURV9VTkNIQU5HRUQgfA0KPiAgICAgICAgICAgKEJEUlZfUkVRX0ZVQSAmIGJz
-LT5zdXBwb3J0ZWRfd3JpdGVfZmxhZ3MpOw0KPiAgICAgICBtaXJyb3JfdG9wX2JzLT5zdXBwb3J0
-ZWRfemVyb19mbGFncyA9IEJEUlZfUkVRX1dSSVRFX1VOQ0hBTkdFRCB8DQo+IC0gICAgICAgICgo
-QkRSVl9SRVFfRlVBIHwgQkRSVl9SRVFfTUFZX1VOTUFQKQ0KPiArICAgICAgICAoKEJEUlZfUkVR
-X0ZVQSB8IEJEUlZfUkVRX01BWV9VTk1BUCB8IEJEUlZfUkVRX0FMTE9DQVRFKQ0KPiAgICAgICAg
-ICAgICYgYnMtPnN1cHBvcnRlZF96ZXJvX2ZsYWdzKTsNCj4gICANCj4gICAgICAgYnNfb3BhcXVl
-ID0gZ19uZXcwKE1pcnJvckJEU09wYXF1ZSwgMSk7DQo+IGRpZmYgLS1naXQgYS9ibG9jay9yYXct
-Zm9ybWF0LmMgYi9ibG9jay9yYXctZm9ybWF0LmMNCj4gaW5kZXggNmY2ZGM5OWIyYy4uYWQ3NDUz
-ZGM4MyAxMDA2NDQNCj4gLS0tIGEvYmxvY2svcmF3LWZvcm1hdC5jDQo+ICsrKyBiL2Jsb2NrL3Jh
-dy1mb3JtYXQuYw0KPiBAQCAtNDMyLDcgKzQzMiw3IEBAIHN0YXRpYyBpbnQgcmF3X29wZW4oQmxv
-Y2tEcml2ZXJTdGF0ZSAqYnMsIFFEaWN0ICpvcHRpb25zLCBpbnQgZmxhZ3MsDQo+ICAgICAgIGJz
-LT5zdXBwb3J0ZWRfd3JpdGVfZmxhZ3MgPSBCRFJWX1JFUV9XUklURV9VTkNIQU5HRUQgfA0KPiAg
-ICAgICAgICAgKEJEUlZfUkVRX0ZVQSAmIGJzLT5maWxlLT5icy0+c3VwcG9ydGVkX3dyaXRlX2Zs
-YWdzKTsNCj4gICAgICAgYnMtPnN1cHBvcnRlZF96ZXJvX2ZsYWdzID0gQkRSVl9SRVFfV1JJVEVf
-VU5DSEFOR0VEIHwNCj4gLSAgICAgICAgKChCRFJWX1JFUV9GVUEgfCBCRFJWX1JFUV9NQVlfVU5N
-QVApICYNCj4gKyAgICAgICAgKChCRFJWX1JFUV9GVUEgfCBCRFJWX1JFUV9NQVlfVU5NQVAgfCBC
-RFJWX1JFUV9BTExPQ0FURSkgJg0KPiAgICAgICAgICAgICAgIGJzLT5maWxlLT5icy0+c3VwcG9y
-dGVkX3plcm9fZmxhZ3MpOw0KPiAgIA0KPiAgICAgICBpZiAoYnMtPnByb2JlZCAmJiAhYmRydl9p
-c19yZWFkX29ubHkoYnMpKSB7DQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXIN
-Cg==
+On Wed, Dec 05, 2018 at 11:02:11AM +0800, Jason Wang wrote:
+>=20
+> On 2018/12/5 =E4=B8=8A=E5=8D=889:59, Michael S. Tsirkin wrote:
+> > On Wed, Dec 05, 2018 at 09:30:19AM +0800, Jason Wang wrote:
+> > > On 2018/12/5 =E4=B8=8A=E5=8D=882:37, Jintack Lim wrote:
+> > > > Hi,
+> > > >=20
+> > > > I'm wondering how the current implementation works when logging d=
+irty
+> > > > pages during migration from vhost-net (in kernel) when used vIOMM=
+U.
+> > > >=20
+> > > > I understand how vhost-net logs GPAs when not using vIOMMU. But w=
+hen
+> > > > we use vhost with vIOMMU, then shouldn't vhost-net need to log th=
+e
+> > > > translated address (GPA) instead of the address written in the
+> > > > descriptor (IOVA) ? The current implementation looks like vhost-n=
+et
+> > > > just logs IOVA without translation in vhost_get_vq_desc() in
+> > > > drivers/vhost/net.c. It seems like QEMU doesn't do any further
+> > > > translation of the dirty log when syncing.
+> > > >=20
+> > > > I might be missing something. Could somebody shed some light on t=
+his?
+> > >=20
+> > > Good catch. It looks like a bug to me. Want to post a patch for thi=
+s?
+> > This isn't going to be a quick fix: IOTLB UAPI is translating
+> > IOVA values directly to uaddr.
+> >=20
+> > So to fix it, we need to change IOVA messages to translate to GPA
+> > so GPA can be logged.
+> >=20
+> > for existing userspace We can try reverse translation uaddr->gpa as a
+> > hack for logging but that translation was never guaranteed to be uniq=
+ue.
+>=20
+>=20
+> We have memory table in vhost as well, so looks like we can do this in
+> kernel as well without disturbing UAPI?
+>=20
+> Thanks
+
+Let me try to rephrase.
+
+Yes, as a temporary bugfix we can do the uaddr to gpa translations.
+It is probably good enough for what QEMU does now.
+
+However it can break some legal userspace, since it is possible to
+have multiple UADDR mappings for a single GPA.
+In that setup the vhost table would only have one of these
+and it's possible that IOTLB would use another one.
+
+And generally it's a better idea security-wise to make
+iotlb talk in GPA terms. This way whoever sets the static
+GPA-to-UADDR mappings controls security, and the dynamic
+and more fragile iova mappings can not break QEMU security.
+
+So we need a UAPI extension with a feature flag.
+
+>=20
+> >=20
+> > Jason I think you'll have to work on it given the complexity.
+> >=20
+> > > Thanks
+> > >=20
+> > >=20
+> > > > Thanks,
+> > > > Jintack
+> > > >=20
+> > > >=20
