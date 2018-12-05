@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gUhAq-0007Q8-BI
+	(envelope-from <bounces@canonical.com>) id 1gUhAq-0007Q7-BB
 	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 19:05:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gUhAm-0003dO-44
+	(envelope-from <bounces@canonical.com>) id 1gUhAm-0003dW-4Q
 	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 19:05:48 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42974)
+Received: from indium.canonical.com ([91.189.90.7]:42998)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gUhAi-0003ZM-7i
+	id 1gUhAi-0003Zu-99
 	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 19:05:42 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gUhAf-0001SC-6C
-	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 00:05:37 +0000
+	id 1gUhAg-0001T7-7i
+	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 00:05:38 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 275F62E80C7
-	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 00:05:37 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 324042E805B
+	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 00:05:38 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 05 Dec 2018 23:54:56 -0000
+Date: Wed, 05 Dec 2018 23:57:36 -0000
 From: Matthew Schumacher <1807052@bugs.launchpad.net>
 Reply-To: Bug 1807052 <1807052@bugs.launchpad.net>
 Sender: bounces@canonical.com
-Message-Id: <154405409659.26070.18150716654904137665.malonedeb@gac.canonical.com>
+References: <154405409659.26070.18150716654904137665.malonedeb@gac.canonical.com>
+Message-Id: <154405425651.16660.8936083435858769169.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1807052] [NEW] Qemu hangs during migration
+Subject: [Qemu-devel] [Bug 1807052] Re: Qemu hangs during migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,170 +38,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Public bug reported:
+If I remote iothreads and writeback caching, it seems more reliable, but
+I can still get it to hang.
 
-Source server: linux 4.19.5 qemu-3.0.0 from source, libvirt 4.9
-Dest server: linux 4.18.19 qemu-3.0.0 from source, libvirt 4.9
+This time the source server shows the VM as running, backtrace looks
+like:
 
-When this VM is running on source server:
-
-/usr/bin/qemu-system-x86_64 -name guest=3Dtestvm,debug-threads=3Don -S
--object
-secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-13-=
-testvm
-/master-key.aes -machine pc-q35-3.0,accel=3Dkvm,usb=3Doff,dump-guest-
-core=3Doff -cpu Skylake-Server-
-IBRS,ss=3Don,hypervisor=3Don,tsc_adjust=3Don,clflushopt=3Don,umip=3Don,pku=
-=3Don,ssbd=3Don,xsaves=3Don,topoext=3Don,hv_time,hv_relaxed,hv_vapic,hv_spi=
-nlocks=3D0x1fff,hv_vpindex,hv_runtime,hv_synic,hv_stimer,hv_reset,hv_vendor=
-_id=3DKVM
-Hv -m 4096 -realtime mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1
--object iothread,id=3Diothread1 -uuid 3b00b788-ee91-4e45-80a6-c7319da71225
--no-user-config -nodefaults -chardev
-socket,id=3Dcharmonitor,fd=3D23,server,nowait -mon
-chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
-base=3Dlocaltime,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddelay -=
-no-
-hpet -no-shutdown -boot strict=3Don -device pcie-root-
-port,port=3D0x10,chassis=3D1,id=3Dpci.1,bus=3Dpcie.0,multifunction=3Don,add=
-r=3D0x2
--device pcie-root-
-port,port=3D0x11,chassis=3D2,id=3Dpci.2,bus=3Dpcie.0,addr=3D0x2.0x1 -device=
- pcie-
-pci-bridge,id=3Dpci.3,bus=3Dpci.1,addr=3D0x0 -device pcie-root-
-port,port=3D0x12,chassis=3D4,id=3Dpci.4,bus=3Dpcie.0,addr=3D0x2.0x2 -device=
- pcie-
-root-port,port=3D0x13,chassis=3D5,id=3Dpci.5,bus=3Dpcie.0,addr=3D0x2.0x3 -d=
-evice
-piix3-usb-uhci,id=3Dusb,bus=3Dpci.3,addr=3D0x1 -device virtio-scsi-
-pci,iothread=3Diothread1,id=3Dscsi0,bus=3Dpci.4,addr=3D0x0 -drive
-file=3D/dev/zvol/datastore/vm/testvm-vda,format=3Draw,if=3Dnone,id=3Ddrive-
-scsi0-0-0-0,cache=3Dwriteback,aio=3Dthreads -device scsi-
-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3Ddrive-
-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D2,write-cache=3Don -drive if=3Dnon=
-e,id
-=3Ddrive-sata0-0-4,media=3Dcdrom,readonly=3Don -device ide-cd,bus=3Dide.4,d=
-rive
-=3Ddrive-sata0-0-4,id=3Dsata0-0-4,bootindex=3D1 -netdev
-tap,fd=3D25,id=3Dhostnet0,vhost=3Don,vhostfd=3D26 -device virtio-net-
-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:a2:b7:a1,bus=3Dpci.2,addr=3D=
-0x0
--device usb-tablet,id=3Dinput0,bus=3Dusb.0,port=3D1 -vnc 127.0.0.1:0 -device
-cirrus-vga,id=3Dvideo0,bus=3Dpcie.0,addr=3D0x1 -s -sandbox
-on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=3D=
-deny
--msg timestamp=3Don
-
-I try to migrate it and the disks to the other side:
-
-virsh migrate --live --undefinesource --persistent --verbose --copy-
-storage-all testvm qemu+ssh://wasvirt1/system
-
-We get to 99% then hang with both sides in the pause state.
-
-Source server is stuck here:
 (gdb) bt full
-#0  0x00007f327994f3c1 in ppoll () at /lib64/libc.so.6
-#1  0x000000000086167b in qemu_poll_ns (fds=3D<optimized out>, nfds=3Dnfds@=
-entry=3D1, timeout=3D<optimized out>) at util/qemu-timer.c:322
-#2  0x0000000000863302 in aio_poll (ctx=3D0x21044e0, blocking=3Dblocking@en=
-try=3Dtrue) at util/aio-posix.c:629
-        node =3D <optimized out>
-        i =3D <optimized out>
-        ret =3D 0
-        progress =3D <optimized out>
-        timeout =3D <optimized out>
-        start =3D <optimized out>
-        __PRETTY_FUNCTION__ =3D "aio_poll"
-#3  0x00000000007e0d52 in nbd_client_close (bs=3D0x2ba2400) at block/nbd-cl=
-ient.c:62
-        waited_ =3D <optimized out>
-        wait_ =3D 0x2ba563c
-        ctx_ =3D 0x2109bb0
-        bs_ =3D 0x2ba2400
-        client =3D 0x31287e0
-        client =3D <optimized out>
-        request =3D {handle =3D 0, from =3D 0, len =3D 0, flags =3D 0, type=
- =3D 2}
-#4  0x00000000007e0d52 in nbd_client_close (bs=3D0x2ba2400) at block/nbd-cl=
-ient.c:965
-        client =3D <optimized out>
-        request =3D {handle =3D 0, from =3D 0, len =3D 0, flags =3D 0, type=
- =3D 2}
-#5  0x00000000007de5ca in nbd_close (bs=3D<optimized out>) at block/nbd.c:4=
-91
-        s =3D 0x31287e0
-#6  0x00000000007823d6 in bdrv_unref (bs=3D0x2ba2400) at block.c:3352
-        ban =3D <optimized out>
-        ban_next =3D <optimized out>
-        child =3D <optimized out>
-        next =3D <optimized out>
-#7  0x00000000007823d6 in bdrv_unref (bs=3D0x2ba2400) at block.c:3560
-#8  0x00000000007823d6 in bdrv_unref (bs=3D0x2ba2400) at block.c:4616
-#9  0x0000000000782403 in bdrv_unref (bs=3D0x2af96f0) at block.c:3359
-        ban =3D <optimized out>
-        ban_next =3D <optimized out>
-        child =3D <optimized out>
-        next =3D <optimized out>
-#10 0x0000000000782403 in bdrv_unref (bs=3D0x2af96f0) at block.c:3560
-#11 0x0000000000782403 in bdrv_unref (bs=3D0x2af96f0) at block.c:4616
-#12 0x0000000000785784 in block_job_remove_all_bdrv (job=3Djob@entry=3D0x2f=
-32570) at blockjob.c:200
-        c =3D 0x23bac30
-        l =3D 0x20dd330 =3D {0x23bac30, 0x2b89410}
-#13 0x00000000007ceb5f in mirror_exit (job=3D0x2f32570, opaque=3D0x7f326407=
-a350) at block/mirror.c:700
-        s =3D 0x2f32570
-        bjob =3D 0x2f32570
-        data =3D 0x7f326407a350
-        bs_opaque =3D 0x30d5600
-        replace_aio_context =3D <optimized out>
-        src =3D 0x2131080
-        target_bs =3D 0x2af96f0
-        mirror_top_bs =3D 0x210eb70
-        local_err =3D 0x0
-#14 0x0000000000786452 in job_defer_to_main_loop_bh (opaque=3D0x7f32640786a=
-0) at job.c:973
-        data =3D 0x7f32640786a0
-        job =3D <optimized out>
-        aio_context =3D 0x2109bb0
-#15 0x000000000085fd3f in aio_bh_poll (ctx=3Dctx@entry=3D0x21044e0) at util=
-/async.c:118
----Type <return> to continue, or q <return> to quit---
-        bh =3D <optimized out>
-        bhp =3D <optimized out>
-        next =3D 0x2ea86e0
-        ret =3D 1
-        deleted =3D false
-#16 0x00000000008631b0 in aio_dispatch (ctx=3D0x21044e0) at util/aio-posix.=
-c:436
-#17 0x000000000085fc1e in aio_ctx_dispatch (source=3D<optimized out>, callb=
-ack=3D<optimized out>, user_data=3D<optimized out>) at util/async.c:261
-        ctx =3D <optimized out>
-#18 0x00007f327f17d797 in g_main_context_dispatch () at /usr/lib64/libglib-=
-2.0.so.0
-#19 0x00000000008622ed in main_loop_wait () at util/main-loop.c:215
-        context =3D 0x2104900
-        pfds =3D <optimized out>
-        context =3D 0x2104900
+#0  0x00007f27eab0028c in __lll_lock_wait () at /lib64/libpthread.so.0
+#1  0x00007f27eaaf9d35 in pthread_mutex_lock () at /lib64/libpthread.so.0
+#2  0x0000000000865419 in qemu_mutex_lock_impl (mutex=3Dmutex@entry=3D0x115=
+b8e0 <qemu_global_mutex>, file=3Dfile@entry=3D0x8fdf14 "/tmp/qemu-3.0.0/cpu=
+s.c", line=3Dline@entry=3D1768)
+    at util/qemu-thread-posix.c:66
+        err =3D <optimized out>
+        __PRETTY_FUNCTION__ =3D "qemu_mutex_lock_impl"
+        __func__ =3D "qemu_mutex_lock_impl"
+#3  0x0000000000477578 in qemu_mutex_lock_iothread () at /tmp/qemu-3.0.0/cp=
+us.c:1768
+#4  0x00000000008622b0 in main_loop_wait (timeout=3D<optimized out>) at uti=
+l/main-loop.c:236
+        context =3D 0x1e72810
         ret =3D 1
         ret =3D 1
         timeout =3D 4294967295
         timeout_ns =3D <optimized out>
-#20 0x00000000008622ed in main_loop_wait (timeout=3D<optimized out>) at uti=
-l/main-loop.c:238
-        context =3D 0x2104900
-        ret =3D 1
-        ret =3D 1
-        timeout =3D 4294967295
-        timeout_ns =3D <optimized out>
-#21 0x00000000008622ed in main_loop_wait (nonblocking=3Dnonblocking@entry=
+#5  0x00000000008622b0 in main_loop_wait (nonblocking=3Dnonblocking@entry=
 =3D0) at util/main-loop.c:497
         ret =3D 1
         timeout =3D 4294967295
         timeout_ns =3D <optimized out>
-#22 0x0000000000595dee in main_loop () at vl.c:1866
-#23 0x000000000041f35d in main (argc=3D<optimized out>, argv=3D<optimized o=
+#6  0x0000000000595dee in main_loop () at vl.c:1866
+#7  0x000000000041f35d in main (argc=3D<optimized out>, argv=3D<optimized o=
 ut>, envp=3D<optimized out>) at vl.c:4644
         i =3D <optimized out>
         snapshot =3D 0
@@ -217,10 +86,10 @@ ut>, envp=3D<optimized out>) at vl.c:4644
         accel_opts =3D 0x0
         olist =3D <optimized out>
         optind =3D 71
-        optarg =3D 0x7ffdfc94df69 "timestamp=3Don"
+        optarg =3D 0x7fff5edcff69 "timestamp=3Don"
         loadvm =3D 0x0
         machine_class =3D 0x0
-        cpu_model =3D 0x7ffdfc94d864 "Skylake-Server-IBRS,ss=3Don,hyperviso=
+        cpu_model =3D 0x7fff5edcf88a "Skylake-Server-IBRS,ss=3Don,hyperviso=
 r=3Don,tsc_adjust=3Don,clflushopt=3Don,umip=3Don,pku=3Don,ssbd=3Don,xsaves=
 =3Don,topoext=3Don,hv_time,hv_relaxed,hv_vapic,hv_spinlocks=3D0x1fff,hv_vpi=
 ndex,hv_runtime,hv_synic,hv_stimer"...
@@ -228,9 +97,8 @@ ndex,hv_runtime,hv_synic,hv_stimer"...
         qtest_chrdev =3D 0x0
         qtest_log =3D 0x0
         pid_file =3D <optimized out>
-        incoming =3D 0x0
+        incoming =3D 0x7fff5edcff0a "defer"
         userconfig =3D <optimized out>
----Type <return> to continue, or q <return> to quit---
         nographic =3D false
         display_remote =3D <optimized out>
         log_mask =3D <optimized out>
@@ -240,41 +108,33 @@ ndex,hv_runtime,hv_synic,hv_stimer"...
         ram_slots =3D 0
         vmstate_dump_file =3D 0x0
         main_loop_err =3D 0x0
+---Type <return> to continue, or q <return> to quit---
         err =3D 0x0
         list_data_dirs =3D false
         dir =3D <optimized out>
         dirs =3D <optimized out>
-        bdo_queue =3D {sqh_first =3D 0x0, sqh_last =3D 0x7ffdfc94c170}
+        bdo_queue =3D {sqh_first =3D 0x0, sqh_last =3D 0x7fff5edcd670}
         __func__ =3D "main"
 
-Strace shows:
-ppoll([{fd=3D9, events=3DPOLLIN|POLLERR|POLLHUP}], 1, NULL, NULL, 8
 
-Which points to this:
+Dest server is paused, and looks like this:
 
-ls -al /proc/2286/fd/9
-lrwx------    1 root     users           64 Dec  5 13:04 /proc/2286/fd/9 ->=
- anon_inode:[eventfd]
-
-The dest side is stuck here:
-
-(gdb) bt full
-#0  0x00007f21f070d3c1 in ppoll () at /lib64/libc.so.6
+#0  0x00007f11c48bc3c1 in ppoll () at /lib64/libc.so.6
 #1  0x0000000000861659 in qemu_poll_ns (fds=3D<optimized out>, nfds=3D<opti=
-mized out>, timeout=3Dtimeout@entry=3D2999926258) at util/qemu-timer.c:334
-        ts =3D {tv_sec =3D 2, tv_nsec =3D 999926258}
+mized out>, timeout=3Dtimeout@entry=3D2999892383) at util/qemu-timer.c:334
+        ts =3D {tv_sec =3D 2, tv_nsec =3D 999892383}
 Python Exception <class 'gdb.error'> That operation is not available on int=
 egers of more than 8 bytes.:
 #2  0x00000000008622a4 in main_loop_wait (timeout=3D<optimized out>) at uti=
 l/main-loop.c:233
-        context =3D 0x2142900
+        context =3D 0x2342810
         ret =3D <optimized out>
-        ret =3D -1295041038
+        ret =3D -1295074913
         timeout =3D 4294967295
         timeout_ns =3D <optimized out>
 #3  0x00000000008622a4 in main_loop_wait (nonblocking=3Dnonblocking@entry=
 =3D0) at util/main-loop.c:497
-        ret =3D -1295041038
+        ret =3D -1295074913
         timeout =3D 4294967295
         timeout_ns =3D <optimized out>
 #4  0x0000000000595dee in main_loop () at vl.c:1866
@@ -294,11 +154,11 @@ ut>, envp=3D<optimized out>) at vl.c:4644
         icount_opts =3D <optimized out>
         accel_opts =3D 0x0
         olist =3D <optimized out>
-        optind =3D 73
-        optarg =3D 0x7ffdd6ee8f69 "timestamp=3Don"
+        optind =3D 71
+        optarg =3D 0x7ffe6b899f69 "timestamp=3Don"
         loadvm =3D 0x0
         machine_class =3D 0x0
-        cpu_model =3D 0x7ffdd6ee8854 "Skylake-Server-IBRS,ss=3Don,hyperviso=
+        cpu_model =3D 0x7ffe6b89988a "Skylake-Server-IBRS,ss=3Don,hyperviso=
 r=3Don,tsc_adjust=3Don,clflushopt=3Don,umip=3Don,pku=3Don,ssbd=3Don,xsaves=
 =3Don,topoext=3Don,hv_time,hv_relaxed,hv_vapic,hv_spinlocks=3D0x1fff,hv_vpi=
 ndex,hv_runtime,hv_synic,hv_stimer"...
@@ -306,7 +166,7 @@ ndex,hv_runtime,hv_synic,hv_stimer"...
         qtest_chrdev =3D 0x0
         qtest_log =3D 0x0
         pid_file =3D <optimized out>
-        incoming =3D 0x7ffdd6ee8f0a "defer"
+        incoming =3D 0x7ffe6b899f0a "defer"
         userconfig =3D <optimized out>
         nographic =3D false
         display_remote =3D <optimized out>
@@ -321,38 +181,11 @@ ndex,hv_runtime,hv_synic,hv_stimer"...
         list_data_dirs =3D false
         dir =3D <optimized out>
         dirs =3D <optimized out>
-        bdo_queue =3D {sqh_first =3D 0x0, sqh_last =3D 0x7ffdd6ee6630}
+        bdo_queue =3D {sqh_first =3D 0x0, sqh_last =3D 0x7ffe6b8988e0}
 ---Type <return> to continue, or q <return> to quit---
         __func__ =3D "main"
 
-Strace show this over and over
-ppoll([{fd=3D6, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN}, {fd=3D9, event=
-s=3DPOLLIN}, {fd=3D10, events=3DPOLLIN}, {fd=3D21, events=3DPOLLIN}, {fd=3D=
-22, events=3DPOLLIN}, {fd=3D23, events=3DPOLLIN}, {fd=3D24, events=3DPOLLIN=
-}, {fd=3D27, events=3DPOLLIN}], 9, {0, 594527977}, NULL, 8) =3D 0 (Timeout)
-
-lrwx------    1 root     users           64 Dec  5 13:15 /proc/20170/fd/10 =
--> anon_inode:[eventfd]
-lrwx------    1 root     users           64 Dec  5 13:15 /proc/20170/fd/21 =
--> socket:[42631161]
-lrwx------    1 root     users           64 Dec  5 13:15 /proc/20170/fd/22 =
--> socket:[42631165]
-lrwx------    1 root     users           64 Dec  5 13:15 /proc/20170/fd/23 =
--> socket:[42631167]
-lrwx------    1 root     users           64 Dec  5 13:15 /proc/20170/fd/24 =
--> socket:[42631168]
-lrwx------    1 root     users           64 Dec  5 13:15 /proc/20170/fd/27 =
--> socket:[42690422]
-lrwx------    1 root     users           64 Dec  5 13:15 /proc/20170/fd/6 -=
-> anon_inode:[eventfd]
-lrwx------    1 root     users           64 Dec  5 13:15 /proc/20170/fd/7 -=
-> anon_inode:[signalfd]
-lrwx------    1 root     users           64 Dec  5 13:15 /proc/20170/fd/9 -=
-> anon_inode:[eventfd]
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+Honestly looks pretty much like the same bug....
 
 -- =
 
