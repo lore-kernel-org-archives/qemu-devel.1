@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gUTBk-0005F0-CC
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 04:09:49 -0500
+	(envelope-from <armbru@redhat.com>) id 1gUTHL-0003KC-0g
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 04:15:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gUTBh-0005WU-3y
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 04:09:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53096)
+	(envelope-from <armbru@redhat.com>) id 1gUTHF-00014p-OD
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 04:15:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52846)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gUTBg-0005Vc-RX
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 04:09:45 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gUTHD-00012t-LT
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 04:15:28 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <154393964026.28192.13536237934563059985.stgit@gimli.home>
-	<154394077749.28192.1229512133780284321.stgit@gimli.home>
-Date: Wed, 05 Dec 2018 10:09:38 +0100
-In-Reply-To: <154394077749.28192.1229512133780284321.stgit@gimli.home> (Alex
-	Williamson's message of "Tue, 04 Dec 2018 09:26:17 -0700")
-Message-ID: <87y394wd9p.fsf@dusky.pond.sub.org>
+References: <20181204131802.16885-1-marcandre.lureau@redhat.com>
+	<20181204131802.16885-5-marcandre.lureau@redhat.com>
+	<874lbs1i0g.fsf@dusky.pond.sub.org>
+	<CAJ+F1CLBueWzyFJtm+GxfO1rc-KcEpcz_qwo=O3mmW68zyN0eA@mail.gmail.com>
+Date: Wed, 05 Dec 2018 10:15:21 +0100
+In-Reply-To: <CAJ+F1CLBueWzyFJtm+GxfO1rc-KcEpcz_qwo=O3mmW68zyN0eA@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 5 Dec 2018
+	12:54:45 +0400")
+Message-ID: <87a7lkwd06.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [for-4.0 PATCH v3 3/9] qapi: Define PCIe link
- speed and width properties
+Subject: Re: [Qemu-devel] [PATCH v3 4/6] monitor: check if chardev can
+ switch gcontext for OOB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +32,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, Geoffrey McRae <geoff@hostfission.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Alex Williamson <alex.williamson@redhat.com> writes:
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-> Create properties to be able to define speeds and widths for PCIe
-> links.  The only tricky bit here is that our get and set callbacks
-> translate from the fixed QAPI automagic enums to those we define
-> in PCI code to represent the actual register segment value.
+> Hi
+>
+> On Wed, Dec 5, 2018 at 12:43 PM Markus Armbruster <armbru@redhat.com> wro=
+te:
+>>
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>>
+>> > Not all backends are able to switch gcontext. Those backends cannot
+>> > drive a OOB monitor (the monitor would then be blocking on main
+>> > thread).
+>> >
+>> > For example, ringbuf, spice, or more esoteric input chardevs like
+>> > braille or MUX.
+>> >
+>> > We currently forbid MUX because not all frontends are ready to run
+>> > outside main loop. Extend to add a context-switching feature check.
+>> >
+>> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> > ---
+>> >  monitor.c | 6 ++++--
+>> >  1 file changed, 4 insertions(+), 2 deletions(-)
+>> >
+>> > diff --git a/monitor.c b/monitor.c
+>> > index 79afe99079..25cf4223e8 100644
+>> > --- a/monitor.c
+>> > +++ b/monitor.c
+>> > @@ -4562,9 +4562,11 @@ void monitor_init(Chardev *chr, int flags)
+>> >      bool use_oob =3D flags & MONITOR_USE_OOB;
+>> >
+>> >      if (use_oob) {
+>> > -        if (CHARDEV_IS_MUX(chr)) {
+>> > +        if (CHARDEV_IS_MUX(chr) ||
+>> > +            !qemu_chr_has_feature(chr, QEMU_CHAR_FEATURE_GCONTEXT)) {
+>> >              error_report("Monitor out-of-band is not supported with "
+>> > -                         "MUX typed chardev backend");
+>> > +                         "%s typed chardev backend",
+>> > +                         object_get_typename(OBJECT(chr)));
+>> >              exit(1);
+>> >          }
+>> >          if (use_readline) {
+>>
+>> Aha, this answers my question on the previous patch: yes, it is possible
+>> to trip the new assertion.
+>>
+>> Are there any ways other than this one?
+>
+> Good question, if there are, we have latent bugs if switching gcontext
+> on a non-capable chardev.
+>
+> Doing a quick review of qemu_chr_fe_set_handlers() for context !=3D NULL
+> reveals net/colo-compare.c:
+>
+> I think we should have the capability check added to find_and_check_chard=
+ev().
+>
+> I don't see other candidates. Considering the problem is pre-existing,
+> I can either update the patch or add a follow-up patch.
 
-QAPI can only generate enumerations with values 0, 1, 2, ...  You want
-different enumeration values, namely the actual register values.  You
-still want QAPI to get its standard mapping to and from strings.
+If the pre-existing bug is just as bad as an assertion failure, then I'm
+fine with turning it into an assertion failure, with a brief explanation
+in the commit message.
 
-This patch's solution is to define a non-QAPI enumeration type with the
-values you want [PATCH 1/9], then map between the enumerations in the
-PropertyInfo methods.  Works.
-
-You could instead use the encoding chosen by QAPI for the properties,
-and map it to the register values on use.  Differently ugly.  Might be
-simpler.  Your choice to make.
-
-We could extend QAPI to permit specification of the enumeration values.
-Marc-Andr=C3=A9's work to permit conditionals makes the syntax flexible
-enough to support that.  Of course, adding QAPI features is worthwhile
-only if we get sufficient mileage out of them to result in an overall
-improvement.  Even if we decided to do it right now, I'd recommend not
-to wait for it, but instead plan to simplify after the feature lands.
-
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Tested-by: Geoffrey McRae <geoff@hostfission.com>
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>> We could squash the two patches.  But I figure you kept the previous
+>> patch separate on purpose.  That's okay, but it should mention the
+>> assertion can be tripped, and the next patch (this one) will fix it.
