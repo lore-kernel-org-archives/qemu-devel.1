@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gUawk-0002uU-Cr
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:26:51 -0500
+	(envelope-from <prvs=870045bc7=Paul.Durrant@citrix.com>)
+	id 1gUazO-0005d9-4i
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:29:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gUawg-00058e-9X
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:26:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38376)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gUawg-00057y-1k
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:26:46 -0500
-Date: Wed, 5 Dec 2018 17:26:34 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181205172634.GF22100@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181025140631.634922-1-sameeh@daynix.com>
-	<CAKPgXcE1zoFiBgbEqn6VAdsQuR7GfCNTn+pHgekH1XwLAdq-ig@mail.gmail.com>
-	<154402670926.16620.2184992513838364109@sif>
-	<20181205170916.GK799@angien.pipo.sk>
-	<20181205121914-mutt-send-email-mst@kernel.org>
+	(envelope-from <prvs=870045bc7=Paul.Durrant@citrix.com>)
+	id 1gUazN-00089y-4n
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 12:29:33 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Wed, 5 Dec 2018 17:28:54 +0000
+Message-ID: <492a875458194132b54ddbe4a690b26b@AMSPEX02CL03.citrite.net>
+References: <20181121151211.15997-1-paul.durrant@citrix.com>
+	<20181121151211.15997-14-paul.durrant@citrix.com>
+	<20181204121041.GT14786@perard.uk.xensource.com>
+In-Reply-To: <20181204121041.GT14786@perard.uk.xensource.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181205121914-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [libvirt] [RFC 0/2] Attempt to implement the
- standby feature for assigned network devices
+Subject: Re: [Qemu-devel] [PATCH 13/18] xen: purge 'blk' and 'ioreq' from
+ function names in dataplane/xen-qdisk.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,35 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Peter Krempa <pkrempa@redhat.com>, Sameeh Jubran <sameeh@daynix.com>, Eduardo Habkost <ehabkost@redhat.com>, libvir-list@redhat.com, Jason Wang <jasowang@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Yan Vugenfirer <yan@daynix.com>
+To: Anthony Perard <anthony.perard@citrix.com>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Stefano Stabellini <sstabellini@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Wed, Dec 05, 2018 at 12:22:18PM -0500, Michael S. Tsirkin wrote:
-> On Wed, Dec 05, 2018 at 06:09:16PM +0100, Peter Krempa wrote:
-> > From managements point of view, bundling all this together is really not
-> > a good idea since it creates a very big matrix of failure scenarios.
-> 
-> I think this is clear. This is why we are doing it in QEMU where we can
-> actually do all the rollbacks transparently.
-> 
-> > In
-> > general even libvirt will prefer that upper layer management drives this
-> > externally, since any rolback scenario will result in a policy decision
-> > of what to do in certain cases, and what timeouts to pick.
-> 
-> Architectural ugliness of implementing what is from users perspective a
-> mechanism and not a policy aside, experience teaches that this isn't
-> going to happen.  People have been talking about the idea of doing
-> this at the upper layers for years.
+> -----Original Message-----
+> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
+> Sent: 04 December 2018 12:11
+> To: Paul Durrant <Paul.Durrant@citrix.com>
+> Cc: qemu-block@nongnu.org; qemu-devel@nongnu.org; xen-
+> devel@lists.xenproject.org; Stefano Stabellini <sstabellini@kernel.org>;
+> Stefan Hajnoczi <stefanha@redhat.com>; Kevin Wolf <kwolf@redhat.com>; Max
+> Reitz <mreitz@redhat.com>
+> Subject: Re: [PATCH 13/18] xen: purge 'blk' and 'ioreq' from function
+> names in dataplane/xen-qdisk.c
+>=20
+> On Wed, Nov 21, 2018 at 03:12:06PM +0000, Paul Durrant wrote:
+> > This is a purely cosmetic patch that purges remaining use of 'blk' and
+> > 'ioreq' in local function names.
+> >
+> > No functional change.
+> >
+> > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+>=20
+> I don't think it's a good idee to use function names that could be use
+> elsewhere, don't have a namespace. It makes it more difficult to figure
+> out which function is called by just searching for the function name.
+>=20
+> Could you had a prefix?
+> Maybe xendisk_ or xen_disk or xen_qdisk or xen_block or ..., so we can
+> have xendisk_start_request, or xendisk_request_start. I don't have a
+> preference beside staying away from generic names.
+>=20
 
-The ability to unplugg+replug VFIO devices either side of migration
-has existed in OpenStack for a long time. They also have metadata
-that can be exposed to the guest to allow it to describe which pairs
-of (emulated,vfio) devices should be used together.
+I'll add a xen_block_ prefix.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+  Paul
+
+> Thanks,
+>=20
+> --
+> Anthony PERARD
