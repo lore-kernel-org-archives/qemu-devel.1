@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gUZCF-0003cw-28
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:34:45 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUZHk-0007Sm-Ba
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:40:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gUZCD-0007vr-NI
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:34:42 -0500
-References: <20181205084308.201356-1-borntraeger@de.ibm.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e8aa64c4-4bfa-05e6-9a2f-6478330a6fd7@redhat.com>
-Date: Wed, 5 Dec 2018 09:34:32 -0600
-MIME-Version: 1.0
-In-Reply-To: <20181205084308.201356-1-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUZHe-0007pA-Ds
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:40:24 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 5 Dec 2018 15:40:06 +0000
+Message-ID: <25e2852c-7bf8-dadd-8c0d-32c2229ed187@virtuozzo.com>
+References: <20181130220344.3350618-1-eblake@redhat.com>
+	<20181130220344.3350618-5-eblake@redhat.com>
+In-Reply-To: <20181130220344.3350618-5-eblake@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] iotests: make 235 work on s390 (and
- others)
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <0C9B03E553D9F144B91E92E786AE6560@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 04/14] qemu-nbd: Simplify --partition
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,30 +26,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Max Reitz <mreitz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, qemu-block@nongnu.org, qemu-stable <qemu-stable@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-On 12/5/18 2:43 AM, Christian Borntraeger wrote:
-> "-machine pc" will not work all architectures. Lets fall back to the
-> default machine by not specifying it.
-> 
-> In addition we also need to specify -no-shutdown on s390 as qemu will
-> exit otherwise.
-> 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
-CC: qemu-stable
-
-> ---
->   tests/qemu-iotests/235 | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Too late for 3.1; for that, we can just document that there are known 
-iotests failures under some configurations
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+MDEuMTIuMjAxOCAxOjAzLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBPdXIgb3Blbi1jb2Rpbmcgb2Yg
+c3RydG9sIGhhbmRsaW5nIGZvcmdvdCB0byBoYW5kbGUgb3ZlcmZsb3cNCj4gY29uZGl0aW9ucy4g
+V2hhdCdzIG1vcmUsIHNpbmNlIHdlIGluc2lzdGUgb24gYSB1c2VyLXN1cHBsaWVkDQo+IHBhcnRp
+dGlvbiB0byBiZSBub24temVybywgd2UgY2FuIHVzZSAwIHJhdGhlciB0aGFuIC0xIGZvciBvdXIN
+Cj4gaW5pdGlhbCB2YWx1ZSB0byBkaXN0aW5ndWlzaCB3aGVuIGEgcGFydGl0aW9uIGlzIG5vdCBi
+ZWluZw0KPiBzZXJ2ZWQsIGZvciBzbGlnaHRseSBtb3JlIG9wdGltYWwgY29kZS4NCj4gDQo+IFNp
+Z25lZC1vZmYtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPg0KPiAtLS0NCj4gICBx
+ZW11LW5iZC5jIHwgMTQgKysrKystLS0tLS0tLS0NCj4gICAxIGZpbGUgY2hhbmdlZCwgNSBpbnNl
+cnRpb25zKCspLCA5IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL3FlbXUtbmJkLmMg
+Yi9xZW11LW5iZC5jDQo+IGluZGV4IDU1ZTI5YmQ5YTdlLi44NjZlNjQ3NzlmMSAxMDA2NDQNCj4g
+LS0tIGEvcWVtdS1uYmQuYw0KPiArKysgYi9xZW11LW5iZC5jDQo+IEBAIC01NDYsNyArNTQ2LDcg
+QEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KQ0KPiAgICAgICBpbnQgb3B0X2luZCA9
+IDA7DQo+ICAgICAgIGNoYXIgKmVuZDsNCj4gICAgICAgaW50IGZsYWdzID0gQkRSVl9PX1JEV1I7
+DQo+IC0gICAgaW50IHBhcnRpdGlvbiA9IC0xOw0KPiArICAgIGludCBwYXJ0aXRpb24gPSAwOw0K
+PiAgICAgICBpbnQgcmV0ID0gMDsNCj4gICAgICAgYm9vbCBzZWVuX2NhY2hlID0gZmFsc2U7DQo+
+ICAgICAgIGJvb2wgc2Vlbl9kaXNjYXJkID0gZmFsc2U7DQo+IEBAIC02ODUsMTMgKzY4NSw5IEBA
+IGludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJndikNCj4gICAgICAgICAgICAgICBmbGFncyAm
+PSB+QkRSVl9PX1JEV1I7DQo+ICAgICAgICAgICAgICAgYnJlYWs7DQo+ICAgICAgICAgICBjYXNl
+ICdQJzoNCj4gLSAgICAgICAgICAgIHBhcnRpdGlvbiA9IHN0cnRvbChvcHRhcmcsICZlbmQsIDAp
+Ow0KPiAtICAgICAgICAgICAgaWYgKCplbmQpIHsNCj4gLSAgICAgICAgICAgICAgICBlcnJvcl9y
+ZXBvcnQoIkludmFsaWQgcGFydGl0aW9uIGAlcyciLCBvcHRhcmcpOw0KPiAtICAgICAgICAgICAg
+ICAgIGV4aXQoRVhJVF9GQUlMVVJFKTsNCj4gLSAgICAgICAgICAgIH0NCj4gLSAgICAgICAgICAg
+IGlmIChwYXJ0aXRpb24gPCAxIHx8IHBhcnRpdGlvbiA+IDgpIHsNCj4gLSAgICAgICAgICAgICAg
+ICBlcnJvcl9yZXBvcnQoIkludmFsaWQgcGFydGl0aW9uICVkIiwgcGFydGl0aW9uKTsNCj4gKyAg
+ICAgICAgICAgIGlmIChxZW11X3N0cnRvaShvcHRhcmcsIE5VTEwsIDAsICZwYXJ0aXRpb24pIDwg
+MCB8fA0KDQpJIGRlY2lkZWQgdG8gbG9vayBpbnRvIHFlbXVfc3RydG9pLCBobW0uDQoNCmlzIGl0
+IHBvc3NpYmxlLCB0aGF0ICJjaGFyICplcCIgcmVtYWlucyB1bmluaXRpYWxpemVkLCBhbmQgdGhh
+biB3ZSBhY2Nlc3MNCml0IGluIGNoZWNrX3N0cnRveF9lcnJvcj8gSSBkb24ncyBzZWUgaW4gc3Ry
+dG9sIHNwZWMgYSBndWFyYW50ZWUgb2Ygc2V0dGluZw0KZW5kcHRyIG9uIGZhaWx1cmUgcGF0aC4N
+Cg0KDQo+ICsgICAgICAgICAgICAgICAgcGFydGl0aW9uIDwgMSB8fCBwYXJ0aXRpb24gPiA4KSB7
+DQoNCmRvbid0IHlvdSBsaWtlIGJyYWNlIG9uIHNlcGFyYXRlIGxpbmUgYWZ0ZXIgbXVsdGktbGlu
+ZSBjb25kaXRpb25zPw0KDQo+ICsgICAgICAgICAgICAgICAgZXJyb3JfcmVwb3J0KCJJbnZhbGlk
+IHBhcnRpdGlvbiAlcyIsIG9wdGFyZyk7DQo+ICAgICAgICAgICAgICAgICAgIGV4aXQoRVhJVF9G
+QUlMVVJFKTsNCj4gICAgICAgICAgICAgICB9DQo+ICAgICAgICAgICAgICAgYnJlYWs7DQo+IEBA
+IC0xMDA0LDcgKzEwMDAsNyBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3YpDQo+ICAg
+ICAgIH0NCj4gICAgICAgZmRfc2l6ZSAtPSBkZXZfb2Zmc2V0Ow0KPiANCj4gLSAgICBpZiAocGFy
+dGl0aW9uICE9IC0xKSB7DQo+ICsgICAgaWYgKHBhcnRpdGlvbikgew0KPiAgICAgICAgICAgcmV0
+ID0gZmluZF9wYXJ0aXRpb24oYmxrLCBwYXJ0aXRpb24sICZkZXZfb2Zmc2V0LCAmZmRfc2l6ZSk7
+DQo+ICAgICAgICAgICBpZiAocmV0IDwgMCkgew0KPiAgICAgICAgICAgICAgIGVycm9yX3JlcG9y
+dCgiQ291bGQgbm90IGZpbmQgcGFydGl0aW9uICVkOiAlcyIsIHBhcnRpdGlvbiwNCj4gDQoNClJl
+dmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1
+b3p6by5jb20+DQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
