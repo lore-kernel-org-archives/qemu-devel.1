@@ -1,31 +1,48 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gUZK3-0001bn-Mb
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:42:48 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1gUZTx-00060j-8G
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:53:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gUZJz-0001BG-JV
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:42:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39168)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gUZJz-0001Au-Bl
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:42:43 -0500
-Date: Wed, 5 Dec 2018 08:42:40 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20181205084240.122d7626@x1.home>
-In-Reply-To: <20181205093221.206dc18d.cohuck@redhat.com>
-References: <154394083644.28192.8501647946108201466.stgit@gimli.home>
-	<154394987445.795.4102526920089904508.stgit@gimli.home>
-	<6bc68937-ec9e-d28f-9468-5ee9ba08ef52@de.ibm.com>
-	<20181204122647.3a560066@x1.home>
-	<CAFEAcA_5tDfoPZaPcheMGUyq_ibbvT+GE8WKgXnHf8SnxioPvA@mail.gmail.com>
-	<20181204125621.0ad30dc0@x1.home>
-	<20181205093221.206dc18d.cohuck@redhat.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1gUZTt-0008Kv-16
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:53:01 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47006)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1gUZTs-0008I4-Lt
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:52:56 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wB5FnQPt049502
+	for <qemu-devel@nongnu.org>; Wed, 5 Dec 2018 10:52:55 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2p6gjekw14-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 10:52:55 -0500
+Received: from localhost
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 5 Dec 2018 15:52:52 -0000
+References: <20181203165810.14509-1-kwolf@redhat.com>
+	<20181203165810.14509-3-kwolf@redhat.com>
+	<dc86835f-65d9-cada-dc9b-1f2c708521f9@de.ibm.com>
+	<75f7e3cc-bd46-c743-84ab-cd68bcb1dcfb@de.ibm.com>
+	<d0966d94-87d4-0f25-f2e0-846a1d338be7@de.ibm.com>
+	<20181205084614.GA4018@dhcp-200-186.str.redhat.com>
+	<30858ce0-5b4b-c3c4-b846-6a214670f8d2@de.ibm.com>
+	<f91cf64b-db93-f2e5-bceb-93013592ad03@virtuozzo.com>
+	<34e1b572-41b0-ae72-6d12-283516c9218c@de.ibm.com>
+	<7d5d502b-9bba-47ed-648e-65495765c4ca@virtuozzo.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed, 5 Dec 2018 16:52:46 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [for-4.0 PATCH v3.1 8/9] q35/440fx/arm/spapr/ccw:
- Add QEMU 4.0 machine type
+In-Reply-To: <7d5d502b-9bba-47ed-648e-65495765c4ca@virtuozzo.com>
+Content-Language: en-US
+Message-Id: <f791fd99-4055-c308-6e62-fc3b818c7ebf@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PULL 2/2] iotests: simple mirror
+ test with kvm on 1G image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,64 +51,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Christian Borntraeger <borntraeger@de.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, "Michael
-	S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@gmail.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On Wed, 5 Dec 2018 09:32:21 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
 
-> On Tue, 4 Dec 2018 12:56:21 -0700
-> Alex Williamson <alex.williamson@redhat.com> wrote:
->=20
-> > On Tue, 4 Dec 2018 19:29:25 +0000
-> > Peter Maydell <peter.maydell@linaro.org> wrote:
-> >  =20
-> > > On Tue, 4 Dec 2018 at 19:26, Alex Williamson <alex.williamson@redhat.=
-com> wrote:   =20
-> > > >
-> > > > On Tue, 4 Dec 2018 20:16:44 +0100
-> > > > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> > > >     =20
-> > > > > I think Conny has already added the s390/ccw part to her next tre=
-e.
-> > > > > From a quick glimpse both patches look identical.     =20
-> > > >
-> > > > If so then we can just use the original v3 version of this patch th=
-at
-> > > > touches all but ccw and let them come together in mainline.  My
-> > > > assumption is that Peter is only trying to make sure all versioned
-> > > > machines are updated early in this release, not necessarily that
-> > > > they need to be updated together.     =20
-> > >=20
-> > > Yes, that's the idea. I also think it's a suboptimal idea
-> > > to include the version-number-bump patch in a series that's
-> > > adding some feature, because then if the feature itself
-> > > has to go through several rounds of patch review the
-> > > version-number-bump patch is stuck unapplied (we saw that
-> > > at the end of the 3.1 cycle), or it gets bumped by some
-> > > other unrelated series and then there's a merge conflict.
-> > > But that's more of a things-for-next time remark, no need
-> > > to rearrange this now.   =20
-> >=20
-> > If you and the other stakeholders agree, you are more than welcome to
-> > pluck this patch from the series and apply it as soon as 4.0 opens.  It
-> > might make things a tiny bit easier down the road to avoid the
-> > conflicts since we seem to have multiple contenders vying for this
-> > update.  Maybe the best practice going forward is to open the merge
-> > window with such a commit.  Thanks, =20
->=20
-> FWIW, I had planned to send a pull request with what is in my queue
-> (including the new machine type) first thing after 4.0 opens.
->=20
-> For the next release: Should we always create a patch like this that
-> adds the new type for all machines and queue this as the first thing
-> when the tree opens again? (I'd even be willing to do that...) For this
-> release, I would prefer to use the already-existing patches instead.
 
-Ok, so we'll stick with the original v3 version that didn't include ccw
-and Marc-Andr=C3=A9's series and this one can fight it out for the rest of
-the versioned machines.  Please disregard this v3.1 patch including
-ccw.  Thanks,
+On 05.12.2018 14:39, Vladimir Sementsov-Ogievskiy wrote:
+> 05.12.2018 15:35, Christian Borntraeger wrote:
+>>
+>>
+>> On 05.12.2018 13:00, Vladimir Sementsov-Ogievskiy wrote:
+>>> 05.12.2018 12:01, Christian Borntraeger wrote:
+>>>>
+>>>>
+>>>> On 05.12.2018 09:46, Kevin Wolf wrote:
+>>>>> Am 05.12.2018 um 09:23 hat Christian Borntraeger geschrieben:
+>>>>>>>>> +# prepare source image
+>>>>>>>>> +qemu_img_create('-f', iotests.imgfmt, '-o', 'preallocation=metadata', disk,
+>>>>>>>>> +                str(size))
+>>>>>>>>> +
+>>>>>>>>> +vm = QEMUMachine(iotests.qemu_prog)
+>>>>>>>>> +vm.add_args('-machine', 'pc,accel=kvm')
+>>>>>>
+>>>>>> This (pc) clearly does not work on other architectures.
+>>>>>> In addition to that, I also need to add -no-shutdown on s390 (see 068 for a similar case)
+>>>>>
+>>>>> Leaving out pc definitely makes sense, and the bug still reproduces for
+>>>>> me without it.
+>>>>>
+>>>>> I don't understand the -no-shutdown, though. Already for 068, neither
+>>>>> the code nor the commit message when it was added explain why this is
+>>>>> needed.
+>>>>>
+>>>>> Can you turn this into a proper patch and add a comment why -no-shutdown
+>>>>> is needed?
+>>>>
+>>>> I already sent this patch. The reason is that there is no BIOS in a classical sense
+>>>> on s390x. If no bootable image (external kernel or from disk) is found, the small boot
+>>>> bios loads a disabled wait PSW. The default action for that is then shutdown.
+>>>>
+>>>
+>>> Is it an option for you just drop the whole line "vm.add_args('-machine', 'pc,accel=kvm')"?
+>>> The problem without it for me was that gdb failed to produce full and nice backtrace, but
+>>> test worked anyway
+>>
+>> In the commid message Vladimir said that kvm is necessary to trigger the problem.
+>>
+> 
+> No, I didn't)
+> 
+> and it's in the comment:
+> # 3. drop kvm and use iotests.VM() (maybe, because of qtest) (however, it still
+> #    reproduces, if just drop kvm, but gdb failed to produce full backtraces
+> #    for me)
 
-Alex
+Ok, so I would be fine with completely dropping that line.
+
+the patch would then be
+
+
+
+"-machine pc" will not work all architectures. Lets fall back to the
+default machine by not specifying anything for the machine.
+
+In addition we also need to specify -no-shutdown on s390 as qemu will
+exit on guest shutdown. This happens when there is no kernel or bootable
+disk on s390.
+
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ tests/qemu-iotests/235 | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/tests/qemu-iotests/235 b/tests/qemu-iotests/235
+index da044ed34e..329da8f0c2 100755
+--- a/tests/qemu-iotests/235
++++ b/tests/qemu-iotests/235
+@@ -49,7 +49,8 @@ qemu_img_create('-f', iotests.imgfmt, '-o', 'preallocation=metadata', disk,
+                 str(size))
+ 
+ vm = QEMUMachine(iotests.qemu_prog)
+-vm.add_args('-machine', 'pc,accel=kvm')
++if iotests.qemu_default_machine == 's390-ccw-virtio':
++        vm.add_args('-no-shutdown')
+ vm.add_args('-drive', 'id=src,file=' + disk)
+ vm.launch()
+ 
+
+
+Shall I resend a v2?
