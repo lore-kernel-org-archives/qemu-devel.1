@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gUWGo-0004C0-Du
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:27:21 -0500
+	(envelope-from <bounces@canonical.com>) id 1gUWKW-0000xe-BW
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:31:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gUW15-0001X7-9K
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:11:03 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58572)
+	(envelope-from <bounces@canonical.com>) id 1gUWKT-00087N-42
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:31:04 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35044)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gUW15-0001Wb-2R
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:10:59 -0500
+	id 1gUWKS-00086K-SJ
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:31:01 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gUW13-0003RG-VI
-	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 12:10:57 +0000
+	id 1gUWKR-0005zG-Fn
+	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 12:30:59 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E2F432E80CB
-	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 12:10:57 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 5B0F72E80CC
+	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 12:30:59 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 05 Dec 2018 11:57:23 -0000
-From: GH Cao <1804961@bugs.launchpad.net>
-Reply-To: Bug 1804961 <1804961@bugs.launchpad.net>
+Date: Wed, 05 Dec 2018 12:16:17 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+Reply-To: Bug 1803160 <1803160@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <154309137717.32238.5287661827417174062.malonedeb@wampee.canonical.com>
-Message-Id: <tencent_D95BAB3184D4445BB0029741B659C213AB09@qq.com>
+References: <154212865934.10800.13528910091420823354.malonedeb@wampee.canonical.com>
+Message-Id: <154401217710.25401.15871917286657766920.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1804961] Re: qemu-system-aarch64: Windows 10
- ARM64 BSoD on boot while using virt-3.0
+Subject: [Qemu-devel] [Bug 1803160] Re: qemu-3.1.0-rc0: tcg.c crash in
+ temp_load
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,112 +39,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Yeah it seems to be. Windows boots fine after I disable hi ECAM region.
+Can you please re-test on the current master, I think this was fixed by:
+
+commit e84fcd7f662a0d8198703f6f89416d7ac2c32767
+Author: Richard Henderson <richard.henderson@linaro.org>
+Date:   Tue Nov 13 20:35:10 2018 +0100
+
+    target/i386: Generate #UD when applying LOCK to a register
+destination
+
+Testing on my box:
+
+12:14:20 [alex@idun:~/l/qemu.git] master + ./i386-linux-user/qemu-i386 ~/tc=
+g_crash.elf
+qemu: uncaught target signal 4 (Illegal instruction) - core dumped
+fish: =E2=80=9C./i386-linux-user/qemu-i386 ~/t=E2=80=A6=E2=80=9D terminated=
+ by signal SIGILL (Illegal instruction)
 
 
- =
-
----Original---
-From: "Alex Benn=C3=A9e"<alex.bennee@linaro.org>
-Date: 2018/12/5 19:41:40
-To: "driver1998"<driver1998@foxmail.com>;
-Subject: [Bug 1804961] Re: qemu-system-aarch64: Windows 10 ARM64 BSoD on bo=
-ot while using virt-3.0
-
-
-Could it be related to:
-
-commit 17ec075a651a3f9613429c2d97018fce459ed943
-Author: Eric Auger <eric.auger@redhat.com>
-Date:   Fri Jun 22 13:28:37 2018 +0100
-
-    hw/arm/virt: Use 256MB ECAM region by default
-
-    With this patch, virt-3.0 machine uses a new 256MB ECAM region
-    by default instead of the legacy 16MB one, if highmem is set
-    (LPAE supported by the guest) and (!firmware_loaded || aarch64).
-
-    Indeed aarch32 mode FW may not support this high ECAM region.
-
-As far as I can tell the only real differences between virt-2.12 and
-later at the size of the ECAM region and the max number of CPUs it
-supports:
-
-static void virt_machine_2_12_options(MachineClass *mc)
-{
-    VirtMachineClass *vmc =3D VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-
-    virt_machine_3_0_options(mc);
-    SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_12);
-    vmc->no_highmem_ecam =3D true;
-    mc->max_cpus =3D 255;
-}
-
-
-** Tags added: aarch64 acpi
-
--- =
-
-You received this bug notification because you are subscribed to the bug
-report.
-https://bugs.launchpad.net/bugs/1804961
-
-Title:
-  qemu-system-aarch64: Windows 10 ARM64 BSoD on boot while using
-  virt-3.0
-
-Status in QEMU:
-  New
-
-Bug description:
-  When I emulate a virt-3.0 machine, Windows 10 BSoD on boot, with the
-  error code being ACPI_BIOS_ERROR(0x000000A5), virt-2.12 boots fine.
-
-  Windows Build: 10.0.17134.1
-  QEMU version: 3.0.0
-  Commandline: qemu-system-aarch64 -M virt -accel tcg,thread=3Dmulti -cpu c=
-ortex-a57 -smp 2 -m 2048 -bios QEMU_EFI.fd -device ramfb -device nec-usb-xh=
-ci -device usb-kbd -device usb-tablet -hda disk.vhd -vnc :0
-
-  By the way, the patch to add DBG2 table discussed here
-  https://lists.gnu.org/archive/html/qemu-devel/2015-09/msg01719.html
-  works (although minor change is required to adapt to the qemu 3.0.0
-  code), the table is accepted by Windows (Windows require both DBG2 and
-  SPCR to be valid for serial kernel debugging to work), so it may help
-  further diagnosing this issue.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1804961/+subscriptions
+** Changed in: qemu
+       Status: New =3D> Fix Committed
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1804961
+https://bugs.launchpad.net/bugs/1803160
 
 Title:
-  qemu-system-aarch64: Windows 10 ARM64 BSoD on boot while using
-  virt-3.0
+  qemu-3.1.0-rc0: tcg.c crash in temp_load
 
 Status in QEMU:
-  New
+  Fix Committed
 
 Bug description:
-  When I emulate a virt-3.0 machine, Windows 10 BSoD on boot, with the
-  error code being ACPI_BIOS_ERROR(0x000000A5), virt-2.12 boots fine.
+  QEMU version:
+  -------------
 
-  Windows Build: 10.0.17134.1
-  QEMU version: 3.0.0
-  Commandline: qemu-system-aarch64 -M virt -accel tcg,thread=3Dmulti -cpu c=
-ortex-a57 -smp 2 -m 2048 -bios QEMU_EFI.fd -device ramfb -device nec-usb-xh=
-ci -device usb-kbd -device usb-tablet -hda disk.vhd -vnc :0
+  qemu-3.1.0-rc0 compiled from sources (earlier versions also affected)
 
-  By the way, the patch to add DBG2 table discussed here
-  https://lists.gnu.org/archive/html/qemu-devel/2015-09/msg01719.html
-  works (although minor change is required to adapt to the qemu 3.0.0
-  code), the table is accepted by Windows (Windows require both DBG2 and
-  SPCR to be valid for serial kernel debugging to work), so it may help
-  further diagnosing this issue.
+  Summary:
+  --------
+
+  TCG crashes in i386 and x86_64 when it tries to execute some specific
+  illegal instructions. When running full OS emulation, both the guest
+  system and QEMU crash.
+
+  The issue has been reproduced in two scenarios:
+
+  Ubuntu x64 host running Debian x86 guest with the following command
+  line: qemu-system-x86_64 -m 4G debian.qcow
+
+  When the attached ELF file is executed inside the guest, QEMU crashes.
+
+  It can also be reproduced from the command line:
+
+  $ qemu-i386 tcg_crash.elf
+  /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:2863: tcg fatal error
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  zsh: segmentation fault (core dumped)  ../qemu-3.1.0-rc0/build/i386-linux=
+-user/qemu-i386 tcg_crash.elf
+
+  GDB backtrace:
+
+  (gdb) bt
+  #0  0x0000000060206488 in raise ()
+  #1  0x0000000060206b8a in abort ()
+  #2  0x0000000060007016 in temp_load (s=3Ds@entry=3D0x607a2780 <tcg_init_c=
+tx>, ts=3Dts@entry=3D0x607a3178 <tcg_init_ctx+2552>, desired_regs=3D<optimi=
+zed out>, allocated_regs=3Dallocated_regs@entry=3D16400)
+  =C2=A0=C2=A0=C2=A0=C2=A0at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg=
+.c:2863
+  #3  0x000000006000a4d9 in tcg_reg_alloc_op (op=3D0x62808c20, s=3D<optimiz=
+ed out>) at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:3070
+  #4  tcg_gen_code (s=3D<optimized out>, tb=3Dtb@entry=3D0x607ac040 <static=
+_code_gen_buffer+4144>) at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c=
+:3598
+  #5  0x000000006003ef9a in tb_gen_code (cpu=3Dcpu@entry=3D0x627e0010, pc=
+=3Dpc@entry=3D134512724, cs_base=3Dcs_base@entry=3D0, flags=3Dflags@entry=
+=3D4194483, cflags=3Dcflags@entry=3D0)
+  =C2=A0=C2=A0=C2=A0=C2=A0at /home/alberto/Documents/qemu-3.1.0-rc0/accel/t=
+cg/translate-all.c:1752
+  #6  0x000000006003d979 in tb_find (cf_mask=3D0, tb_exit=3D0, last_tb=3D0x=
+0, cpu=3D0x0) at /home/alberto/Documents/qemu-3.1.0-rc0/accel/tcg/cpu-exec.=
+c:404
+  #7  cpu_exec (cpu=3Dcpu@entry=3D0x627e0010) at /home/alberto/Documents/qe=
+mu-3.1.0-rc0/accel/tcg/cpu-exec.c:724
+  #8  0x000000006006e1a0 in cpu_loop (env=3Denv@entry=3D0x627e82c0) at /hom=
+e/alberto/Documents/qemu-3.1.0-rc0/linux-user/i386/cpu_loop.c:93
+  #9  0x00000000600037c5 in main (argc=3D2, argv=3D0x7fffffffdd28, envp=3D<=
+optimized out>) at /home/alberto/Documents/qemu-3.1.0-rc0/linux-user/main.c=
+:819
+  (gdb)
+
+  Testcase:
+  ---------
+
+  Find ELF file attached.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1804961/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1803160/+subscriptions
