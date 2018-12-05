@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gUXV7-0001U1-Ib
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:46:11 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gUXWv-0002oy-9o
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:48:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gUXV6-0007Tw-JV
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:46:05 -0500
-Date: Wed, 5 Dec 2018 13:45:50 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20181205134550.GE24623@stefanha-x1.localdomain>
-References: <20181130151712.2312-1-peter.maydell@linaro.org>
+	(envelope-from <luc.michel@greensocs.com>) id 1gUXWu-0001Qz-Cm
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 08:47:57 -0500
+References: <20181123091729.29921-1-luc.michel@greensocs.com>
+	<20181123091729.29921-2-luc.michel@greensocs.com>
+	<20181123181059.GN18284@habkost.net>
+	<65d3a572-9a80-f332-1f88-69e43e8a3663@redhat.com>
+	<20181126132731.GJ18284@habkost.net>
+	<CAFEAcA8D7ZjO059Sgrx-4i0iT+V3gxT4f=DvdmUAJS7KomtyOg@mail.gmail.com>
+	<b8e20686-e5d1-a844-48f7-a4ae471e3fd5@greensocs.com>
+	<CAFEAcA8j4xTiS3_ktiA0hm2N4cu5RvxAtYqUHgvY-bUXgcwbjQ@mail.gmail.com>
+	<50645862-a638-ad2a-bafe-1b46be42aec4@greensocs.com>
+	<20181204180607.GB18284@habkost.net>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <226f1ca6-70f5-6736-bfa3-95cd272be68b@greensocs.com>
+Date: Wed, 5 Dec 2018 14:47:41 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="8vCeF2GUdMpe9ZbK"
-Content-Disposition: inline
-In-Reply-To: <20181130151712.2312-1-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 00/10] Remove deprecated load_image()
- function
+In-Reply-To: <20181204180607.GB18284@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 01/16] hw/cpu: introduce CPU clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,90 +32,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org, Eric Blake <eblake@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Philip Li <philip.li@intel.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, qemu-block@nongnu.org, qemu-ppc@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Alistair Francis <alistair@alistair23.me>, Mark Burton <mark.burton@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>
 
+On 12/4/18 7:06 PM, Eduardo Habkost wrote:
+> On Mon, Dec 03, 2018 at 03:09:14PM +0100, Luc Michel wrote:
+>>
+>>
+>> On 12/3/18 12:23 PM, Peter Maydell wrote:
+>>> On Mon, 3 Dec 2018 at 11:21, Luc Michel <luc.michel@greensocs.com> wrote:
+>>>>
+>>>> On 11/30/18 5:52 PM, Peter Maydell wrote:
+>>>>> Luc: what are the requirements on boards using CPU cluster
+>>>>> objects? I assume these are both OK:
+>>>>>  * does not use cluster objects at all
+>>>>>    (the gdbstub puts all the CPUs in one process?)
+>>>> Yes, when no clusters are found, a process with PID 1 is created and
+>>>> used for all CPUs.
+>>>>>  * all CPUs created are in some CPU cluster
+>>>>>    (the gdbstub uses one process per CPU cluster)
+>>>>> but what about
+>>>>>  * some CPUs are created in a CPU cluster, but some
+>>>>>    are "loose", not in any cluster at all> ?
+>>>>> Is that just invalid, or do the "loose" CPUs end up in
+>>>>> a default cluster (gdbstub process), or do they get
+>>>>> one cluster each?
+>>>> Currently this is valid and the "loose" CPUs end up in the first
+>>>> available process (which will be PID 1 if we are in your first case,
+>>>> i.e. no clusters in the machine).
+>>>
+>>> So if there are some defined clusters 1 and 2, and some
+>>> loose CPUs, the clusters get PID 1 and PID 2, and the
+>>> loose CPUs end up in PID 3? That seems reasonable.
+>> No sorry I was not clear, the loose CPUs would end up on PID 1 in that case.
+>>
+>> The current behaviour is as follows:
+>> During gdb stub initialization:
+>>   - A process is created per cluster.
+>>   - If no cluster are found, an unique process is created with PID 1
+>>
+>> When trying to find a CPU PID:
+>>   - If it is attached to a cluster, return the associated process,
+>>   - If it is loose, return the first available process.
+> 
+> The behavior described by Peter would be more reasonable to me.
+> Otherwise what was just an accident (getting the CPU assigned to
+> the first process) will become expected behavior of the API, and
+> it will be hard to change it later.
+Make sense, I'll change that to adopt the behaviour described by Peter.
 
---8vCeF2GUdMpe9ZbK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> 
+> In either case, I'm still missing a clear description of what a
+> cluster is supposed to represent, exactly (see my previous reply
+> on this thread).
+I'll add a description in the next re-roll, using the Peter's one as a
+starting point.
 
-On Fri, Nov 30, 2018 at 03:17:02PM +0000, Peter Maydell wrote:
-> This patchset removes the load_image() function, which we noted
-> in a comment as being deprecated in 2008 but were still using
-> in a handful of places. All the use cases are bugs of some
-> kind or another, either straightforward "no length checking
-> at all" or "doesn't cope with the file getting larger between
-> get_image_size()'s length check and the read in load_image()".
-> IRC consensus was that this doesn't rise to the level of a
-> security issue since the images being loaded should either
-> be trusted or the management layer app should be fencing things
-> off to ensure they don't change underfoot.
->=20
-> The replacement is either:
->  * g_file_get_contents(), in places where we were previously
->    explicitly g_malloc()ing a buffer to load the image
->  * load_image_size(), in places where we load the image
->    into a pre-existing buffer, MemoryRegion, etc
->=20
-> The final patch in the series adds a documentation comment
-> for load_image_size().
->=20
-> Notes:
->  * tested only with "make check"
->  * I'm not a huge fan of load_image_size()'s "truncate overlength
->    images" (as opposed to considering that an error), but I've
->    documented what we have, rather than what we might like to have
->  * some of the callsites of load_image() had no error checking;
->    I've added it as part of the changeover
->=20
-> thanks
-> -- PMM
->=20
-> Peter Maydell (10):
->   hw/ppc/mac_newworld, mac_oldworld: Don't use load_image()
->   hw/ppc/ppc405_boards: Don't use load_image()
->   hw/smbios/smbios.c: Don't use load_image()
->   hw/pci/pci.c: Don't use load_image()
->   hw/i386/pc.c: Don't use load_image()
->   hw/i386/multiboot.c: Don't use load_image()
->   hw/block/tc58128.c: Don't use load_image()
->   device_tree.c: Don't use load_image()
->   hw/core/loader.c: Remove load_image()
->   include/hw/loader.h: Document load_image_size()
->=20
->  include/hw/loader.h    | 17 ++++++++++++++++-
->  device_tree.c          |  2 +-
->  hw/block/tc58128.c     |  3 ++-
->  hw/core/loader.c       | 25 -------------------------
->  hw/i386/multiboot.c    |  6 +++++-
->  hw/i386/pc.c           | 22 ++++++++++++----------
->  hw/pci/pci.c           |  6 +++++-
->  hw/ppc/mac_newworld.c  | 10 ++++------
->  hw/ppc/mac_oldworld.c  | 10 ++++------
->  hw/ppc/ppc405_boards.c | 12 ++++++++----
->  hw/smbios/smbios.c     |  2 +-
->  11 files changed, 58 insertions(+), 57 deletions(-)
->=20
-> --=20
-> 2.19.1
->=20
+Thanks.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---8vCeF2GUdMpe9ZbK
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcB9aOAAoJEJykq7OBq3PIhgYIAKDPT2+xg3bl1GZdeW2PLMYg
-ULoLQ/j1LL/2ksy8bLl2qhg+yW2YMbXhKR71Wx88TE8koXrseqpu2ClQapToLS0u
-gDypZrq9gicW2aGj36Ci5SGDWJ5BQKKfMNZ8TA6buotQF8k77ae95nIm7SR0BE9W
-d7eNS//st+yxOBVEWrVU1527Q6Q/mDSU4YsCcfk9RFi7e/s+quH3zckMdZpXZHdb
-rw9/FVD1L/oa5Fm/8oTiJFlvhxSuHwi5l5v6q6P8BNLjY9Ih0WyD8u6qPEHl5bGm
-wL4qm4PuUbc/6fqr6NqOv9WDNovATtvhxQpx1fHVeoa/nqCW8rcDmq8TTH3Pp/c=
-=7BPI
------END PGP SIGNATURE-----
-
---8vCeF2GUdMpe9ZbK--
+-- 
+Luc
