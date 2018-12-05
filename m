@@ -1,39 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48487)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1gUZt4-0000ZL-Ti
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:18:59 -0500
+	(envelope-from <armbru@redhat.com>) id 1gUZuo-0001og-DN
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:20:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1gUZsz-0005aa-Tt
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:18:58 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47572)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1gUZsz-0005Y6-Ja
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:18:53 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wB5GIY9c147443
-	for <qemu-devel@nongnu.org>; Wed, 5 Dec 2018 11:18:52 -0500
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2p6ffp8ntx-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 11:18:49 -0500
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 5 Dec 2018 16:18:40 -0000
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <armbru@redhat.com>) id 1gUZuj-0001rD-GB
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:20:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54612)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gUZuj-0001ji-9K
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:20:41 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1f7db2e27758f26d4c10f7a8ed1d8232635f6909.1536044449.git.pkrempa@redhat.com>
+	<20181004113412.GI21448@angien.pipo.sk>
+	<20181205123337.GI799@angien.pipo.sk>
+	<CAJ+F1CLr5_nB2hpXJrhMeJnsXjME8k+0s90wZHw-H_qsQht63A@mail.gmail.com>
+Date: Wed, 05 Dec 2018 17:20:31 +0100
+In-Reply-To: <CAJ+F1CLr5_nB2hpXJrhMeJnsXjME8k+0s90wZHw-H_qsQht63A@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 5 Dec 2018
+	18:09:52 +0400")
+Message-ID: <87tvjsq71s.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <CAKPgXcE1zoFiBgbEqn6VAdsQuR7GfCNTn+pHgekH1XwLAdq-ig@mail.gmail.com>
-References: <20181025140631.634922-1-sameeh@daynix.com>
-	<CAKPgXcE1zoFiBgbEqn6VAdsQuR7GfCNTn+pHgekH1XwLAdq-ig@mail.gmail.com>
-Date: Wed, 05 Dec 2018 10:18:29 -0600
-Message-Id: <154402670926.16620.2184992513838364109@sif>
-Subject: Re: [Qemu-devel] [RFC 0/2] Attempt to implement the standby feature
- for assigned network devices
+Subject: Re: [Qemu-devel] [PATCH] qapi: Add vim magic modelines for qapi
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,110 +32,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Sameeh Jubran <sameeh@daynix.com>
-Cc: Yan Vugenfirer <yan@daynix.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Peter Krempa <pkrempa@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-Quoting Sameeh Jubran (2018-10-25 13:01:10)
-> On Thu, Oct 25, 2018 at 5:06 PM Sameeh Jubran <sameeh@daynix.com> wrote:
-> >
-> > From: Sameeh Jubran <sjubran@redhat.com>
-> >
-> > Hi all,
-> >
-> > Background:
-> >
-> > There has been a few attempts to implement the standby feature for vfio
-> > assigned devices which aims to enable the migration of such devices. Th=
-is
-> > is another attempt.
-> >
-> > The series implements an infrastructure for hiding devices from the bus
-> > upon boot. What it does is the following:
-> >
-> > * In the first patch the infrastructure for hiding the device is added
-> >   for the qbus and qdev APIs. A "hidden" boolean is added to the device
-> >   state and it is set based on a callback to the standby device which
-> >   registers itself for handling the assessment: "should the primary dev=
-ice
-> >   be hidden?" by cross validating the ids of the devices.
-> >
-> > * In the second patch the virtio-net uses the API to hide the vfio
-> >   device and unhides it when the feature is acked.
-> >
-> > Disclaimers:
-> >
-> > * I have only scratch tested this and from qemu side, it seems to be
-> >   working.
-> > * This is an RFC so it lacks some proper error handling in few cases
-> >   and proper resource freeing. I wanted to get some feedback first
-> >   before it is finalized.
-> >
-> > Command line example:
-> >
-> > /home/sameeh/Builds/failover/qemu/x86_64-softmmu/qemu-system-x86_64 \
-> > -netdev tap,id=3Dhostnet0,script=3Dworld_bridge_standalone.sh,downscrip=
-t=3Dno,ifname=3Dcc1_71 \
-> > -netdev tap,vhost=3Don,id=3Dhostnet1,script=3Dworld_bridge_standalone.s=
-h,downscript=3Dno,ifname=3Dcc1_72,queues=3D4 \
-> > -device virtio-net,host_mtu=3D1500,netdev=3Dhostnet1,id=3Dcc1_72,vector=
-s=3D10,mq=3Don,primary=3Dcc1_71 \
-> > -device e1000,netdev=3Dhostnet0,id=3Dcc1_71,standby=3Dcc1_72 \
-> >
-> > Migration support:
-> >
-> > Pre migration or during setup phase of the migration we should send an
-> > unplug request to the guest to unplug the primary device. I haven't had
-> > the chance to implement that part yet but should do soon. Do you know
-> > what's the best approach to do so? I wanted to have a callback to the
-> > virtio-net device which tries to send an unplug request to the guest and
-> > if succeeds then the migration continues. It needs to handle the case w=
-here
-> > the migration fails and then it has to replug the primary device back.
-> I think that the "add_migration_state_change_notifier" API call can be us=
-ed
-> from within the virtio-net device to achieve this, what do you think?
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-I think it would be good to hear from the libvirt folks (on Cc:) on this as
-having QEMU unplug a device without libvirt's involvement seems like it
-could cause issues. Personally I think it seems cleaner to just have QEMU
-handle the 'hidden' aspects of the device and leave it to QMP/libvirt to do
-the unplug beforehand. On the libvirt side I could imagine adding an option
-like virsh migrate --switch-to-standby-networking or something along
-that line to do it automatically (if we decide doing it automatically is
-even needed on that end).
+> Hi
+>
+> On Wed, Dec 5, 2018 at 4:34 PM Peter Krempa <pkrempa@redhat.com> wrote:
+>>
+>> On Thu, Oct 04, 2018 at 13:34:12 +0200, Peter Krempa wrote:
+>> > On Tue, Sep 04, 2018 at 09:03:10 +0200, Peter Krempa wrote:
+>> > > The files have a json suffix but look terrible with json syntax
+>> > > hilighting enabled. Add a magic modeline for vim to switch to python
+>> > > file format for hilighting similarly to the emacs modeline already
+>> > > present.
+>> > >
+>> > > Signed-off-by: Peter Krempa <pkrempa@redhat.com>
+>> > > ---
+>> >
+>> > Ping?
+>>
+>> Ping 2. It looks like no new json files were added meanwhile.
+>
+> I use both emacs and vim. We solved this for me with emacs .editorconf
+> file_type_emacs.
+>
+> The vim plugin doesn't have an equivalent, however, the documentation
+> suggest vim_filetype, but you need to add
+> to .vimrc:
+>
+> function! FiletypeHook(config)
+>     if has_key(a:config, 'vim_filetype')
+>         let &filetype =3D a:config['vim_filetype']
+>     endif
+>
+>     return 0   " Return 0 to show no error happened
+> endfunction
+>
+> call editorconfig#AddNewHook(function('FiletypeHook'))
+>
+> I think this is a better solution than having to add modelines
+> everywhere, what do you think?
 
-> >
-> > The following terms are used as interchangeable:
-> > standby - virtio-net
-> > primary - vfio-device - physical device - assigned device
-> >
-> > Please share your thoughts and suggestions,
-> > Thanks!
-> >
-> > Sameeh Jubran (2):
-> >   qdev/qbus: Add hidden device support
-> >   virtio-net: Implement VIRTIO_NET_F_STANDBY feature
-> >
-> >  hw/core/qdev.c                 | 48 +++++++++++++++++++++++++---
-> >  hw/net/virtio-net.c            | 25 +++++++++++++++
-> >  hw/pci/pci.c                   |  1 +
-> >  include/hw/pci/pci.h           |  2 ++
-> >  include/hw/qdev-core.h         | 11 ++++++-
-> >  include/hw/virtio/virtio-net.h |  5 +++
-> >  qdev-monitor.c                 | 58 ++++++++++++++++++++++++++++++++--
-> >  7 files changed, 142 insertions(+), 8 deletions(-)
-> >
-> > --
-> > 2.17.0
-> >
-> =
-
-> =
-
-> -- =
-
-> Respectfully,
-> Sameeh Jubran
-> Linkedin
-> Software Engineer @ Daynix.
->=20
+These .json files are not valid JSON.  They *are* valid Python (except
+for a few tests, which could perhaps be fixed).  Makes me wonder why on
+earth we insist on naming them .json and create all this trouble.
