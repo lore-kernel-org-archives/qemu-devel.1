@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gUR19-0006gX-BO
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 01:50:44 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gUR1n-0007KZ-9s
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 01:51:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gUR14-00083s-6d
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 01:50:43 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47554)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gUR13-0007zP-Ue
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 01:50:38 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gUR11-0000bg-DP
-	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 06:50:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 307D92E80D2
-	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 06:50:35 +0000 (UTC)
+	(envelope-from <kraxel@redhat.com>) id 1gUR1i-0000Xu-8k
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 01:51:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50260)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gUR1i-0000R6-1h
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 01:51:18 -0500
+Date: Wed, 5 Dec 2018 07:51:14 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181205065114.o77qsagqxu5w34ry@sirius.home.kraxel.org>
+References: <20181201123056.432-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 05 Dec 2018 06:43:46 -0000
-From: YVT <1806824@bugs.launchpad.net>
-Reply-To: Bug 1806824 <1806824@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154399222698.26202.11105511106314070474.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1806824] [NEW] SIE-200 (TrustZone) MPC: BLK_MAX
- returns an incorrect value
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181201123056.432-1-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [RFC 0/5] ui/cocoa: Use OSX's main loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,56 +26,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, John Arbuckle <programmingkidx@gmail.com>, Berkus Decker <berkus@gmail.com>, Roman Bolshakov <r.bolshakov@yadro.com>
 
-Public bug reported:
+  Hi,
 
-Version: =
+> NB: the code to asynchronously run code blocks on the
+> main thread uses dispatch_get_main_queue(), which is a
+> 10.10-or-later function. If we're going to go with this
+> refactoring I think the benefit in clarity-of-code is a
+> worthwhile gain for dropping support for ancient OSX versions.
+> 
+> Patchset structure:
+>  * patch 1 does the "make sure we have the iothread lock for
+>    calls into QEMU" (which is effectively a no-op initially
+>    since we'll already be holding that lock when our refresh
+>    etc callbacks are called)
+>  * patch 2 makes switchSurface directly take the pixman image
+>    (which is refcounted) rather than the DisplaySurface (which
+>    is not), so we can make the calls to it asynchronous later
+>  * patches 3 and 4 are just trivial code motion
+>  * patch 5 does the bulk of the work (and can't really be split
+>    further without the UI being broken at the intermediate point)
 
-$ qemu-system-arm --version
-QEMU emulator version 3.0.92 (v3.1.0-rc2-31-gd522fba244)
+DisplaySurface / pixman changes look sane to me.
+Can't really comment on the cocoa changes.
 
-Arm SIE-200 Technical Reference Manual describes that BLK_MAX indicates
-the maximum value of "block based index register" (BLK_IDX). For
-example, the value 1 would indicate that BLK_IDX can be 0 or 1.
-According to my experiments, the AN505 FPGA image apparently follows
-this behavior.
-
-In the current implementation of QEMU, it appears to indicate the number
-of possible values for BLK_IDX, i.e., one plus the value it's supposed
-to return.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1806824
-
-Title:
-  SIE-200 (TrustZone) MPC: BLK_MAX returns an incorrect value
-
-Status in QEMU:
-  New
-
-Bug description:
-  Version: =
-
-  $ qemu-system-arm --version
-  QEMU emulator version 3.0.92 (v3.1.0-rc2-31-gd522fba244)
-
-  Arm SIE-200 Technical Reference Manual describes that BLK_MAX
-  indicates the maximum value of "block based index register" (BLK_IDX).
-  For example, the value 1 would indicate that BLK_IDX can be 0 or 1.
-  According to my experiments, the AN505 FPGA image apparently follows
-  this behavior.
-
-  In the current implementation of QEMU, it appears to indicate the
-  number of possible values for BLK_IDX, i.e., one plus the value it's
-  supposed to return.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1806824/+subscriptions
+cheers,
+  Gerd
