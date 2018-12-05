@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gUaC3-0008Dg-CF
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:38:36 -0500
+	(envelope-from <armbru@redhat.com>) id 1gUaCR-0008Va-1F
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:39:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gUaC2-0001YD-GJ
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:38:35 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 5 Dec 2018 16:38:24 +0000
-Message-ID: <afc7270e-79d9-5655-e3ac-2b528d40942a@virtuozzo.com>
-References: <20181130220344.3350618-1-eblake@redhat.com>
-	<20181130220344.3350618-6-eblake@redhat.com>
-	<130d5198-ae09-03d6-65fc-b829b990bb29@virtuozzo.com>
-	<4477052f-329a-ee6d-034a-d76e7858ea29@redhat.com>
-In-Reply-To: <4477052f-329a-ee6d-034a-d76e7858ea29@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <81B7069C3EA2F14EA804B97197C8F1D9@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <armbru@redhat.com>) id 1gUaCN-0002ab-18
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:38:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37960)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gUaCM-0002XP-P9
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:38:54 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 07BF0307D85E
+	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 16:38:54 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
+	<20180706105753.26700-12-marcandre.lureau@redhat.com>
+Date: Wed, 05 Dec 2018 17:38:50 +0100
+In-Reply-To: <20180706105753.26700-12-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Fri, 6 Jul 2018
+	12:57:37 +0200")
+Message-ID: <87ftvcq679.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 05/14] nbd/client: Drop pointless buf
- variable
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 11/27] qapi: improve reporting of
+ unknown or missing keys
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,70 +36,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-MDUuMTIuMjAxOCAxOToyOSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMTIvNS8xOCA5OjU5IEFN
-LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gMDEuMTIuMjAxOCAxOjAz
-LCBFcmljIEJsYWtlIHdyb3RlOg0KPj4+IFRoZXJlJ3Mgbm8gbmVlZCB0byByZWFkIGludG8gYSB0
-ZW1wb3JhcnkgYnVmZmVyIChvdmVyc2l6ZWQNCj4+PiBzaW5jZSBjb21taXQgN2QzMTIzZTEpIGZv
-bGxvd2VkIGJ5IGEgYnl0ZXN3YXAgaW50byBhIHVpbnQ2NF90DQo+Pj4gdG8gY2hlY2sgZm9yIGEg
-bWFnaWMgbnVtYmVyIHZpYSBtZW1jbXAoKSwgd2hlbiB0aGUgY29kZQ0KPj4+IGltbWVkaWF0ZWx5
-IGJlbG93IGRlbW9uc3RyYXRlcyByZWFkaW5nIGludG8gdGhlIHVpbnQ2NF90IHRoZW4NCj4+PiBi
-eXRlc3dhcHBpbmcgaW4gcGxhY2UgYW5kIGNoZWNraW5nIGZvciBhIG1hZ2ljIG51bWJlciB2aWEN
-Cj4+PiBpbnRlZ2VyIG1hdGguwqAgV2hhdCdzIG1vcmUsIGhhdmluZyBhIGRpZmZlcmVudCBlcnJv
-ciBtZXNzYWdlDQo+Pj4gd2hlbiB0aGUgc2VydmVyJ3MgZmlyc3QgcmVwbHkgYnl0ZSBpcyAwIGlz
-IHVudXN1YWwgLSBpdCdzIG5vDQo+Pj4gZGlmZmVyZW50IGZyb20gYW55IG90aGVyIHdyb25nIG1h
-Z2ljIG51bWJlciwgYW5kIHdlIGFscmVhZHkNCj4+PiBkZXRlY3RlZCBzaG9ydCByZWFkcy4NCj4+
-Pg0KPj4+IFNpZ25lZC1vZmYtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPg0KPj4+
-IC0tLQ0KPj4+IMKgwqAgbmJkL25iZC1pbnRlcm5hbC5oIHzCoCAxICsNCj4+PiDCoMKgIG5iZC9j
-bGllbnQuY8KgwqDCoMKgwqDCoCB8IDE0ICsrKy0tLS0tLS0tLS0tDQo+Pj4gwqDCoCAyIGZpbGVz
-IGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygrKSwgMTEgZGVsZXRpb25zKC0pDQo+Pj4NCj4+PiBkaWZm
-IC0tZ2l0IGEvbmJkL25iZC1pbnRlcm5hbC5oIGIvbmJkL25iZC1pbnRlcm5hbC5oDQo+Pj4gaW5k
-ZXggZWVmZjc4ZDNjOTguLjMwNmE1MzNkY2QxIDEwMDY0NA0KPj4+IC0tLSBhL25iZC9uYmQtaW50
-ZXJuYWwuaA0KPj4+ICsrKyBiL25iZC9uYmQtaW50ZXJuYWwuaA0KPj4+IEBAIC00Niw2ICs0Niw3
-IEBADQo+Pj4gwqDCoCAvKiBTaXplIG9mIG9sZHN0eWxlIG5lZ290aWF0aW9uICovDQo+Pj4gwqDC
-oCAjZGVmaW5lIE5CRF9PTERTVFlMRV9ORUdPVElBVEVfU0laRSAoOCArIDggKyA4ICsgNCArIDEy
-NCkNCj4+Pg0KPj4+ICsjZGVmaW5lIE5CRF9JTklUX01BR0lDwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqAgMHg0ZTQyNDQ0ZDQxNDc0OTQzTEwNCj4+DQo+PiBXb3J0aCBhZGQgY29tbWVudCAvKiAi
-TkJETUFHSUMiICovDQo+IA0KPiBNYXliZS7CoCBCdXQgaWYgc28sDQo+IA0KPj4NCj4+PiDCoMKg
-ICNkZWZpbmUgTkJEX1JFUVVFU1RfTUFHSUPCoMKgwqDCoMKgwqDCoMKgwqDCoCAweDI1NjA5NTEz
-DQo+Pj4gwqDCoCAjZGVmaW5lIE5CRF9PUFRTX01BR0lDwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgMHg0OTQ4NDE1NjQ1NEY1MDU0TEwNCj4gDQo+IHRoaXMgc2hvdWxkIGFsc28gZ2V0IGEgY29t
-bWVudCAiSUhBVkVPUFQiLg0KPiANCj4+PiDCoMKgICNkZWZpbmUgTkJEX0NMSUVOVF9NQUdJQ8Kg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgMHgwMDAwNDIwMjgxODYxMjUzTEwNCj4+PiBkaWZmIC0tZ2l0
-IGEvbmJkL2NsaWVudC5jIGIvbmJkL2NsaWVudC5jDQo+Pj4gaW5kZXggMGJlODlmOWU2NDEuLjE3
-ZWUyNDQ5MmE0IDEwMDY0NA0KPj4+IC0tLSBhL25iZC9jbGllbnQuYw0KPj4+ICsrKyBiL25iZC9j
-bGllbnQuYw0KPj4+IEBAIC03MzEsNyArNzMxLDYgQEAgaW50IG5iZF9yZWNlaXZlX25lZ290aWF0
-ZShRSU9DaGFubmVsICppb2MsIGNvbnN0IGNoYXIgKm5hbWUsDQo+Pj4gwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgUUlPQ2hhbm5lbCAqKm91
-dGlvYywgTkJERXhwb3J0SW5mbyAqaW5mbywNCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBFcnJvciAqKmVycnApDQo+Pj4gwqDCoCB7
-DQo+Pj4gLcKgwqDCoCBjaGFyIGJ1ZlsyNTZdOw0KPj4+IMKgwqDCoMKgwqDCoCB1aW50NjRfdCBt
-YWdpYzsNCj4+PiDCoMKgwqDCoMKgwqAgaW50IHJjOw0KPj4+IMKgwqDCoMKgwqDCoCBib29sIHpl
-cm9lcyA9IHRydWU7DQo+Pj4gQEAgLTc1MiwyMSArNzUxLDE0IEBAIGludCBuYmRfcmVjZWl2ZV9u
-ZWdvdGlhdGUoUUlPQ2hhbm5lbCAqaW9jLCBjb25zdCBjaGFyICpuYW1lLA0KPj4+IMKgwqDCoMKg
-wqDCoMKgwqDCoMKgIGdvdG8gZmFpbDsNCj4+PiDCoMKgwqDCoMKgwqAgfQ0KPj4+DQo+Pj4gLcKg
-wqDCoCBpZiAobmJkX3JlYWQoaW9jLCBidWYsIDgsIGVycnApIDwgMCkgew0KPj4+ICvCoMKgwqAg
-aWYgKG5iZF9yZWFkKGlvYywgJm1hZ2ljLCBzaXplb2YobWFnaWMpLCBlcnJwKSA8IDApIHsNCj4+
-PiDCoMKgwqDCoMKgwqDCoMKgwqDCoCBlcnJvcl9wcmVwZW5kKGVycnAsICJGYWlsZWQgdG8gcmVh
-ZCBkYXRhOiAiKTsNCj4+DQo+PiBtYXkgYmUsIGNoYW5nZSB0byAiRmFpbGVkIHRvIHJlYWQgbWFn
-aWM6ICIsIGFzIGluIGNvZGUgYmVsb3cNCj4gDQo+IEFyZ3VtZW50IGZvcjogY29uc2lzdGVuY3kg
-c2FrZS4gQXJndW1lbnQgYWdhaW5zdDogaGF2aW5nIGRpc3RpbmN0IG1lc3NhZ2VzIGxldHMgeW91
-IGRlYnVnIHdoaWNoIG9mIHRoZSB0d28gbWFnaWMgc3RyaW5ncyB3YXMgd3JvbmcuwqAgSSdtIG5v
-dCBzdXJlIEkgaGF2ZSBhIHN0cm9uZyBwcmVmZXJlbmNlLg0KPiANCj4+DQo+Pj4gwqDCoMKgwqDC
-oMKgwqDCoMKgwqAgZ290byBmYWlsOw0KPj4+IMKgwqDCoMKgwqDCoCB9DQo+Pj4gLQ0KPj4+IC3C
-oMKgwqAgYnVmWzhdID0gJ1wwJzsNCj4+PiAtwqDCoMKgIGlmIChzdHJsZW4oYnVmKSA9PSAwKSB7
-DQo+Pj4gLcKgwqDCoMKgwqDCoMKgIGVycm9yX3NldGcoZXJycCwgIlNlcnZlciBjb25uZWN0aW9u
-IGNsb3NlZCB1bmV4cGVjdGVkbHkiKTsNCj4+PiAtwqDCoMKgwqDCoMKgwqAgZ290byBmYWlsOw0K
-Pj4+IC3CoMKgwqAgfQ0KPj4+IC0NCj4+PiAtwqDCoMKgIG1hZ2ljID0gbGRxX2JlX3AoYnVmKTsN
-Cj4+PiArwqDCoMKgIG1hZ2ljID0gYmU2NF90b19jcHUobWFnaWMpOw0KPj4NCj4+IElzbid0IGl0
-IGJldHRlciB0byB1c2UgYmU2NF90b19jcHVzPw0KPiANCj4gTm8uIFdlJ3JlIGludGVudGlvbmFs
-bHkgZ2V0dGluZyByaWQgb2YgdGhhdCBiZWNhdXNlIG9mIGNsYW5nOyBzZWUgY29tbWl0IDgwYzdj
-MmIwLg0KPiANCj4gDQoNCk9rLCB0aGFua3MuIEluIHRoaXMgY2FzZSBpdCBzaG91bGQgYmUgc2Fm
-ZSwgYnV0IGlmIHdlIGRlY2lkZWQgdG8gYXZvaWQgdGhlc2UgZnVuY3Rpb25zIGluIGdlbmVyYWwg
-dGhhbiBPSy4NCkhtbSwgbm90IGluIGdlbmVyYWwsIGJ1dCBvbmx5IGluIG5iZC4uIFN0cmFuZ2Us
-IHdoeSBub3QgaW4gcWNvdzIgZm9yIGV4PywgYW55d2F5LCB3aXRoIG9yIHdpdGhvdXQgb3RoZXIg
-dGlueSB0aGluZ3M6DQoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5
-IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZs
-YWRpbWlyDQo=
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+
+> Report the set of missing or unknown keys. And give a hint about the
+> accepted keys.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi/common.py                  | 23 +++++++++++++++--------
+>  tests/qapi-schema/alternate-base.err    |  1 +
+>  tests/qapi-schema/double-type.err       |  1 +
+>  tests/qapi-schema/unknown-expr-key.err  |  3 ++-
+>  tests/qapi-schema/unknown-expr-key.json |  2 +-
+>  5 files changed, 20 insertions(+), 10 deletions(-)
+>
+> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+> index 8313c478c4..cf8dab2866 100644
+> --- a/scripts/qapi/common.py
+> +++ b/scripts/qapi/common.py
+> @@ -874,14 +874,21 @@ def check_struct(expr, info):
+>=20=20
+>=20=20
+>  def check_known_keys(info, source, keys, required, optional):
+> -    for key in keys:
+> -        if key not in required and key not in optional:
+> -            raise QAPISemError(info, "Unknown key '%s' in %s" % (key, so=
+urce))
+> -
+> -    for key in required:
+> -        if key not in keys:
+> -            raise QAPISemError(info, "Key '%s' is missing from %s"
+> -                               % (key, source))
+> +
+> +    def pprint(elems):
+> +        return ', '.join("'" + e + "'" for e in sorted(elems))
+> +
+> +    missing =3D set(required) - set(keys)
+> +    if missing:
+> +        raise QAPISemError(info, "Key%s %s %s missing from %s"
+> +                           % ('s' if len(missing) > 1 else '', pprint(mi=
+ssing),
+> +                              'are' if len(missing) > 1 else 'is', sourc=
+e))
+> +    allowed =3D set(required + optional)
+> +    unknown =3D set(keys) - allowed
+> +    if unknown:
+> +        raise QAPISemError(info, "Unknown key%s %s in %s\nValid keys are=
+ %s."
+> +                           % ('s' if len(unknown) > 1 else '', pprint(un=
+known),
+> +                              source, pprint(allowed)))
+>=20=20
+>=20=20
+>  def check_keys(expr_elem, meta, required, optional=3D[]):
+
+I wouldn't habe bothered, but since you already wrote it...
+
+> diff --git a/tests/qapi-schema/alternate-base.err b/tests/qapi-schema/alt=
+ernate-base.err
+> index 30d8a34373..ebe05bc898 100644
+> --- a/tests/qapi-schema/alternate-base.err
+> +++ b/tests/qapi-schema/alternate-base.err
+> @@ -1 +1,2 @@
+>  tests/qapi-schema/alternate-base.json:4: Unknown key 'base' in alternate=
+ 'Alt'
+> +Valid keys are 'alternate', 'data', 'if'.
+> diff --git a/tests/qapi-schema/double-type.err b/tests/qapi-schema/double=
+-type.err
+> index f9613c6d6b..799193dba1 100644
+> --- a/tests/qapi-schema/double-type.err
+> +++ b/tests/qapi-schema/double-type.err
+> @@ -1 +1,2 @@
+>  tests/qapi-schema/double-type.json:2: Unknown key 'command' in struct 'b=
+ar'
+> +Valid keys are 'base', 'data', 'if', 'struct'.
+
+The error message is just as suboptimal as before in this case, and the
+hint doesn't really help.  Can't say I care.
+
+> diff --git a/tests/qapi-schema/unknown-expr-key.err b/tests/qapi-schema/u=
+nknown-expr-key.err
+> index 12f5ed5b43..83b83121e0 100644
+> --- a/tests/qapi-schema/unknown-expr-key.err
+> +++ b/tests/qapi-schema/unknown-expr-key.err
+> @@ -1 +1,2 @@
+> -tests/qapi-schema/unknown-expr-key.json:2: Unknown key 'bogus' in struct=
+ 'bar'
+> +tests/qapi-schema/unknown-expr-key.json:2: Unknown keys 'bogus', 'foo' i=
+n struct 'bar'
+> +Valid keys are 'base', 'data', 'if', 'struct'.
+> diff --git a/tests/qapi-schema/unknown-expr-key.json b/tests/qapi-schema/=
+unknown-expr-key.json
+> index 3b2be00cc4..5bcb8efd1d 100644
+> --- a/tests/qapi-schema/unknown-expr-key.json
+> +++ b/tests/qapi-schema/unknown-expr-key.json
+> @@ -1,2 +1,2 @@
+>  # we reject an expression with unknown top-level keys
+> -{ 'struct': 'bar', 'data': { 'string': 'str'}, 'bogus': { } }
+> +{ 'struct': 'bar', 'data': { 'string': 'str'}, 'bogus': { }, 'foo': { } }
+
+Let's call the second unknown key 'phony'.
