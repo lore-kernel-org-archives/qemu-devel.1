@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUWg4-0001dG-4Y
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:53:21 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUWgG-0001r2-Jm
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:53:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUWg3-0005vC-1n
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:53:20 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:50242)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUWgC-0005zt-Gd
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:53:32 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:50270)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUWg2-0005us-Kx
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:53:18 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUWg8-0005wv-QI
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 07:53:26 -0500
 From: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Wed, 05 Dec 2018 15:53:16 +0300
-Message-ID: <154401439627.8440.17361104030102649041.stgit@Misha-PC.lan02.inno>
+Date: Wed, 05 Dec 2018 15:53:22 +0300
+Message-ID: <154401440182.8440.1942830012511299931.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <154401431697.8440.845616703562380651.stgit@Misha-PC.lan02.inno>
 References: <154401431697.8440.845616703562380651.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 2 13/39] windbg: parsing data stream
+Subject: [Qemu-devel] [PATCH 2 14/39] windbg: send data and control packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,211 +29,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
-Add parsing data stream to packets from windbg client.
-
 Signed-off-by: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 ---
- include/exec/windbgstub-utils.h |   11 +++
- windbgstub.c                    |  139 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 150 insertions(+)
+ windbgstub.c |   59 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 59 insertions(+)
 
-diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-index 2760684cfb..a28068eecd 100644
---- a/include/exec/windbgstub-utils.h
-+++ b/include/exec/windbgstub-utils.h
-@@ -53,6 +53,17 @@ typedef struct InitedAddr {
-     bool is_init;
- } InitedAddr;
- 
-+typedef struct PacketData {
-+    union {
-+        struct {
-+            DBGKD_MANIPULATE_STATE64 m64;
-+            uint8_t extra[0];
-+        };
-+        uint8_t buf[PACKET_MAX_SIZE];
-+    };
-+    uint16_t extra_size;
-+} PacketData;
-+
- const char *kd_api_name(int id);
- const char *kd_pkt_type_name(int id);
- 
 diff --git a/windbgstub.c b/windbgstub.c
-index d7fadda096..2869d94389 100644
+index 2869d94389..c45faec43f 100644
 --- a/windbgstub.c
 +++ b/windbgstub.c
-@@ -19,12 +19,43 @@
- #include "exec/windbgstub.h"
- #include "exec/windbgstub-utils.h"
- 
-+typedef enum ParsingState {
-+    STATE_LEADER,
-+    STATE_PACKET_TYPE,
-+    STATE_PACKET_BYTE_COUNT,
-+    STATE_PACKET_ID,
-+    STATE_PACKET_CHECKSUM,
-+    STATE_PACKET_DATA,
-+    STATE_TRAILING_BYTE,
-+} ParsingState;
-+
-+typedef enum ParsingResult {
-+    RESULT_NONE,
-+    RESULT_BREAKIN_BYTE,
-+    RESULT_UNKNOWN_PACKET,
-+    RESULT_CONTROL_PACKET,
-+    RESULT_DATA_PACKET,
-+    RESULT_ERROR,
-+} ParsingResult;
-+
-+typedef struct ParsingContext {
-+    /* index in the current buffer,
-+       which depends on the current state */
-+    int index;
-+    ParsingState state;
-+    ParsingResult result;
-+    KD_PACKET packet;
-+    PacketData data;
-+    const char *name;
-+} ParsingContext;
-+
- typedef struct WindbgState {
-     bool is_loaded;
-     bool catched_breakin_byte;
-     uint32_t wait_packet_type;
-     uint32_t curr_packet_id;
- 
-+    ParsingContext ctx;
-     CharBackend chr;
- } WindbgState;
- 
-@@ -36,6 +67,108 @@ static void windbg_state_clean(WindbgState *state)
-     state->catched_breakin_byte = false;
-     state->wait_packet_type = 0;
-     state->curr_packet_id = INITIAL_PACKET_ID | SYNC_PACKET_ID;
-+    state->ctx.state = STATE_LEADER;
-+    state->ctx.result = RESULT_NONE;
-+}
-+
-+static void windbg_ctx_handler(WindbgState *state)
-+{
-+}
-+
-+static void windbg_read_byte(ParsingContext *ctx, uint8_t byte)
-+{
-+    switch (ctx->state) {
-+    case STATE_LEADER:
-+        ctx->result = RESULT_NONE;
-+        if (byte == PACKET_LEADER_BYTE || byte == CONTROL_PACKET_LEADER_BYTE) {
-+            if (ctx->index > 0 && byte != PTR(ctx->packet.PacketLeader)[0]) {
-+                ctx->index = 0;
-+            }
-+            PTR(ctx->packet.PacketLeader)[ctx->index] = byte;
-+            ++ctx->index;
-+            if (ctx->index == sizeof(ctx->packet.PacketLeader)) {
-+                ctx->state = STATE_PACKET_TYPE;
-+                ctx->index = 0;
-+            }
-+        } else if (byte == BREAKIN_PACKET_BYTE) {
-+            ctx->result = RESULT_BREAKIN_BYTE;
-+            ctx->index = 0;
-+        } else {
-+            ctx->index = 0;
-+        }
-+        break;
-+
-+    case STATE_PACKET_TYPE:
-+        PTR(ctx->packet.PacketType)[ctx->index] = byte;
-+        ++ctx->index;
-+        if (ctx->index == sizeof(ctx->packet.PacketType)) {
-+            ctx->packet.PacketType = lduw_p(&ctx->packet.PacketType);
-+            if (ctx->packet.PacketType >= PACKET_TYPE_MAX) {
-+                ctx->state = STATE_LEADER;
-+                ctx->result = RESULT_UNKNOWN_PACKET;
-+            } else {
-+                ctx->state = STATE_PACKET_BYTE_COUNT;
-+            }
-+            ctx->index = 0;
-+        }
-+        break;
-+
-+    case STATE_PACKET_BYTE_COUNT:
-+        PTR(ctx->packet.ByteCount)[ctx->index] = byte;
-+        ++ctx->index;
-+        if (ctx->index == sizeof(ctx->packet.ByteCount)) {
-+            ctx->packet.ByteCount = lduw_p(&ctx->packet.ByteCount);
-+            ctx->state = STATE_PACKET_ID;
-+            ctx->index = 0;
-+        }
-+        break;
-+
-+    case STATE_PACKET_ID:
-+        PTR(ctx->packet.PacketId)[ctx->index] = byte;
-+        ++ctx->index;
-+        if (ctx->index == sizeof(ctx->packet.PacketId)) {
-+            ctx->packet.PacketId = ldl_p(&ctx->packet.PacketId);
-+            ctx->state = STATE_PACKET_CHECKSUM;
-+            ctx->index = 0;
-+        }
-+        break;
-+
-+    case STATE_PACKET_CHECKSUM:
-+        PTR(ctx->packet.Checksum)[ctx->index] = byte;
-+        ++ctx->index;
-+        if (ctx->index == sizeof(ctx->packet.Checksum)) {
-+            ctx->packet.Checksum = ldl_p(&ctx->packet.Checksum);
-+            if (ctx->packet.PacketLeader == CONTROL_PACKET_LEADER) {
-+                ctx->state = STATE_LEADER;
-+                ctx->result = RESULT_CONTROL_PACKET;
-+            } else if (ctx->packet.ByteCount > PACKET_MAX_SIZE) {
-+                ctx->state = STATE_LEADER;
-+                ctx->result = RESULT_ERROR;
-+            } else {
-+                ctx->state = STATE_PACKET_DATA;
-+            }
-+            ctx->index = 0;
-+        }
-+        break;
-+
-+    case STATE_PACKET_DATA:
-+        ctx->data.buf[ctx->index] = byte;
-+        ++ctx->index;
-+        if (ctx->index == ctx->packet.ByteCount) {
-+            ctx->state = STATE_TRAILING_BYTE;
-+            ctx->index = 0;
-+        }
-+        break;
-+
-+    case STATE_TRAILING_BYTE:
-+        if (byte == PACKET_TRAILING_BYTE) {
-+            ctx->result = RESULT_DATA_PACKET;
-+        } else {
-+            ctx->result = RESULT_ERROR;
-+        }
-+        ctx->state = STATE_LEADER;
-+        break;
-+    }
+@@ -71,6 +71,65 @@ static void windbg_state_clean(WindbgState *state)
+     state->ctx.result = RESULT_NONE;
  }
  
- static int windbg_chr_can_receive(void *opaque)
-@@ -45,6 +178,11 @@ static int windbg_chr_can_receive(void *opaque)
- 
- static void windbg_chr_receive(void *opaque, const uint8_t *buf, int size)
++static uint32_t compute_checksum(uint8_t *data, uint16_t len)
++{
++    uint32_t checksum = 0;
++    while (len) {
++        --len;
++        checksum += *data++;
++    }
++    return checksum;
++}
++
++static void windbg_store_packet(KD_PACKET *packet)
++{
++    stw_p(&packet->PacketLeader, packet->PacketLeader);
++    stw_p(&packet->PacketType, packet->PacketType);
++    stw_p(&packet->ByteCount, packet->ByteCount);
++    stl_p(&packet->PacketId, packet->PacketId);
++    stl_p(&packet->Checksum, packet->Checksum);
++}
++
++__attribute__ ((unused)) /* unused yet */
++static void windbg_send_data_packet(WindbgState *state, uint8_t *data,
++                                    uint16_t byte_count, uint16_t type)
++{
++    const uint8_t trailing_byte = PACKET_TRAILING_BYTE;
++
++    KD_PACKET packet = {
++        .PacketLeader = PACKET_LEADER,
++        .PacketType = type,
++        .ByteCount = byte_count,
++        .PacketId = state->curr_packet_id,
++        .Checksum = compute_checksum(data, byte_count),
++    };
++
++    windbg_store_packet(&packet);
++
++    qemu_chr_fe_write(&state->chr, PTR(packet), sizeof(packet));
++    qemu_chr_fe_write(&state->chr, data, byte_count);
++    qemu_chr_fe_write(&state->chr, &trailing_byte, sizeof(trailing_byte));
++
++    state->wait_packet_type = PACKET_TYPE_KD_ACKNOWLEDGE;
++}
++
++__attribute__ ((unused)) /* unused yet */
++static void windbg_send_control_packet(WindbgState *state, uint16_t type,
++                                       uint32_t id)
++{
++    KD_PACKET packet = {
++        .PacketLeader = CONTROL_PACKET_LEADER,
++        .PacketType = type,
++        .ByteCount = 0,
++        .PacketId = id,
++        .Checksum = 0,
++    };
++
++    windbg_store_packet(&packet);
++
++    qemu_chr_fe_write(&state->chr, PTR(packet), sizeof(packet));
++}
++
+ static void windbg_ctx_handler(WindbgState *state)
  {
-+    int i;
-+    for (i = 0; i < size; i++) {
-+        windbg_read_byte(&windbg_state->ctx, buf[i]);
-+        windbg_ctx_handler(windbg_state);
-+    }
  }
- 
- static void windbg_exit(void)
-@@ -87,6 +225,7 @@ int windbg_server_start(const char *device)
-     }
- 
-     windbg_state = g_new0(WindbgState, 1);
-+    windbg_state->ctx.name = "Windbg";
-     windbg_state_clean(windbg_state);
- 
-     chr = qemu_chr_new_noreplay("windbg", device, true);
