@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gUaC3-0008Dm-HV
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUaC3-0008Dg-CF
 	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:38:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gUaBz-0001JA-Ig
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUaC2-0001YD-GJ
 	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:38:35 -0500
-References: <20181205145131.28467-1-cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <0d97dcf5-de40-3f18-64fc-7b2eb1799a84@redhat.com>
-Date: Wed, 5 Dec 2018 17:38:22 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181205145131.28467-1-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 5 Dec 2018 16:38:24 +0000
+Message-ID: <afc7270e-79d9-5655-e3ac-2b528d40942a@virtuozzo.com>
+References: <20181130220344.3350618-1-eblake@redhat.com>
+	<20181130220344.3350618-6-eblake@redhat.com>
+	<130d5198-ae09-03d6-65fc-b829b990bb29@virtuozzo.com>
+	<4477052f-329a-ee6d-034a-d76e7858ea29@redhat.com>
+In-Reply-To: <4477052f-329a-ee6d-034a-d76e7858ea29@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC] vfio-ap: flag as compatible with
- balloon
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <81B7069C3EA2F14EA804B97197C8F1D9@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 05/14] nbd/client: Drop pointless buf
+ variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,54 +28,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Tony Krowiak <akrowiak@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-On 05.12.18 15:51, Cornelia Huck wrote:
-> vfio-ap devices do not pin any pages in the host. Therefore, they
-> are belived to be compatible with memory ballooning.
-> 
-> Flag them as compatible, so both vfio-ap and a balloon can be
-> used simultaneously.
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
-> 
-> As briefly discussed on IRC. RFC as I do not have easy access to
-> hardware I can test this with.
-> 
-> ---
->  hw/vfio/ap.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-> index 65de952f44..3bf48eed28 100644
-> --- a/hw/vfio/ap.c
-> +++ b/hw/vfio/ap.c
-> @@ -104,6 +104,14 @@ static void vfio_ap_realize(DeviceState *dev, Error **errp)
->      vapdev->vdev.name = g_strdup_printf("%s", mdevid);
->      vapdev->vdev.dev = dev;
->  
-> +    /*
-> +     * vfio-ap devices are believed to operate in a way compatible with
-> +     * memory ballooning, as no pages are pinned in the host.
-> +     * This needs to be set before vfio_get_device() for vfio common to
-> +     * handle the balloon inhibitor.
-> +     */
-> +    vapdev->vdev.balloon_allowed = true;
-> +
->      ret = vfio_get_device(vfio_group, mdevid, &vapdev->vdev, &local_err);
->      if (ret) {
->          goto out_get_dev_err;
-> 
-
-What happens if this ever changes? Shouldn't we have an API to at least
-check what the vfio device can guarantee?
-
-"are believed to operate" doesn't sound like guarantees to me :)
-
--- 
-
-Thanks,
-
-David / dhildenb
+MDUuMTIuMjAxOCAxOToyOSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMTIvNS8xOCA5OjU5IEFN
+LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gMDEuMTIuMjAxOCAxOjAz
+LCBFcmljIEJsYWtlIHdyb3RlOg0KPj4+IFRoZXJlJ3Mgbm8gbmVlZCB0byByZWFkIGludG8gYSB0
+ZW1wb3JhcnkgYnVmZmVyIChvdmVyc2l6ZWQNCj4+PiBzaW5jZSBjb21taXQgN2QzMTIzZTEpIGZv
+bGxvd2VkIGJ5IGEgYnl0ZXN3YXAgaW50byBhIHVpbnQ2NF90DQo+Pj4gdG8gY2hlY2sgZm9yIGEg
+bWFnaWMgbnVtYmVyIHZpYSBtZW1jbXAoKSwgd2hlbiB0aGUgY29kZQ0KPj4+IGltbWVkaWF0ZWx5
+IGJlbG93IGRlbW9uc3RyYXRlcyByZWFkaW5nIGludG8gdGhlIHVpbnQ2NF90IHRoZW4NCj4+PiBi
+eXRlc3dhcHBpbmcgaW4gcGxhY2UgYW5kIGNoZWNraW5nIGZvciBhIG1hZ2ljIG51bWJlciB2aWEN
+Cj4+PiBpbnRlZ2VyIG1hdGguwqAgV2hhdCdzIG1vcmUsIGhhdmluZyBhIGRpZmZlcmVudCBlcnJv
+ciBtZXNzYWdlDQo+Pj4gd2hlbiB0aGUgc2VydmVyJ3MgZmlyc3QgcmVwbHkgYnl0ZSBpcyAwIGlz
+IHVudXN1YWwgLSBpdCdzIG5vDQo+Pj4gZGlmZmVyZW50IGZyb20gYW55IG90aGVyIHdyb25nIG1h
+Z2ljIG51bWJlciwgYW5kIHdlIGFscmVhZHkNCj4+PiBkZXRlY3RlZCBzaG9ydCByZWFkcy4NCj4+
+Pg0KPj4+IFNpZ25lZC1vZmYtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPg0KPj4+
+IC0tLQ0KPj4+IMKgwqAgbmJkL25iZC1pbnRlcm5hbC5oIHzCoCAxICsNCj4+PiDCoMKgIG5iZC9j
+bGllbnQuY8KgwqDCoMKgwqDCoCB8IDE0ICsrKy0tLS0tLS0tLS0tDQo+Pj4gwqDCoCAyIGZpbGVz
+IGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygrKSwgMTEgZGVsZXRpb25zKC0pDQo+Pj4NCj4+PiBkaWZm
+IC0tZ2l0IGEvbmJkL25iZC1pbnRlcm5hbC5oIGIvbmJkL25iZC1pbnRlcm5hbC5oDQo+Pj4gaW5k
+ZXggZWVmZjc4ZDNjOTguLjMwNmE1MzNkY2QxIDEwMDY0NA0KPj4+IC0tLSBhL25iZC9uYmQtaW50
+ZXJuYWwuaA0KPj4+ICsrKyBiL25iZC9uYmQtaW50ZXJuYWwuaA0KPj4+IEBAIC00Niw2ICs0Niw3
+IEBADQo+Pj4gwqDCoCAvKiBTaXplIG9mIG9sZHN0eWxlIG5lZ290aWF0aW9uICovDQo+Pj4gwqDC
+oCAjZGVmaW5lIE5CRF9PTERTVFlMRV9ORUdPVElBVEVfU0laRSAoOCArIDggKyA4ICsgNCArIDEy
+NCkNCj4+Pg0KPj4+ICsjZGVmaW5lIE5CRF9JTklUX01BR0lDwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgMHg0ZTQyNDQ0ZDQxNDc0OTQzTEwNCj4+DQo+PiBXb3J0aCBhZGQgY29tbWVudCAvKiAi
+TkJETUFHSUMiICovDQo+IA0KPiBNYXliZS7CoCBCdXQgaWYgc28sDQo+IA0KPj4NCj4+PiDCoMKg
+ICNkZWZpbmUgTkJEX1JFUVVFU1RfTUFHSUPCoMKgwqDCoMKgwqDCoMKgwqDCoCAweDI1NjA5NTEz
+DQo+Pj4gwqDCoCAjZGVmaW5lIE5CRF9PUFRTX01BR0lDwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqAgMHg0OTQ4NDE1NjQ1NEY1MDU0TEwNCj4gDQo+IHRoaXMgc2hvdWxkIGFsc28gZ2V0IGEgY29t
+bWVudCAiSUhBVkVPUFQiLg0KPiANCj4+PiDCoMKgICNkZWZpbmUgTkJEX0NMSUVOVF9NQUdJQ8Kg
+wqDCoMKgwqDCoMKgwqDCoMKgwqAgMHgwMDAwNDIwMjgxODYxMjUzTEwNCj4+PiBkaWZmIC0tZ2l0
+IGEvbmJkL2NsaWVudC5jIGIvbmJkL2NsaWVudC5jDQo+Pj4gaW5kZXggMGJlODlmOWU2NDEuLjE3
+ZWUyNDQ5MmE0IDEwMDY0NA0KPj4+IC0tLSBhL25iZC9jbGllbnQuYw0KPj4+ICsrKyBiL25iZC9j
+bGllbnQuYw0KPj4+IEBAIC03MzEsNyArNzMxLDYgQEAgaW50IG5iZF9yZWNlaXZlX25lZ290aWF0
+ZShRSU9DaGFubmVsICppb2MsIGNvbnN0IGNoYXIgKm5hbWUsDQo+Pj4gwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgUUlPQ2hhbm5lbCAqKm91
+dGlvYywgTkJERXhwb3J0SW5mbyAqaW5mbywNCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBFcnJvciAqKmVycnApDQo+Pj4gwqDCoCB7
+DQo+Pj4gLcKgwqDCoCBjaGFyIGJ1ZlsyNTZdOw0KPj4+IMKgwqDCoMKgwqDCoCB1aW50NjRfdCBt
+YWdpYzsNCj4+PiDCoMKgwqDCoMKgwqAgaW50IHJjOw0KPj4+IMKgwqDCoMKgwqDCoCBib29sIHpl
+cm9lcyA9IHRydWU7DQo+Pj4gQEAgLTc1MiwyMSArNzUxLDE0IEBAIGludCBuYmRfcmVjZWl2ZV9u
+ZWdvdGlhdGUoUUlPQ2hhbm5lbCAqaW9jLCBjb25zdCBjaGFyICpuYW1lLA0KPj4+IMKgwqDCoMKg
+wqDCoMKgwqDCoMKgIGdvdG8gZmFpbDsNCj4+PiDCoMKgwqDCoMKgwqAgfQ0KPj4+DQo+Pj4gLcKg
+wqDCoCBpZiAobmJkX3JlYWQoaW9jLCBidWYsIDgsIGVycnApIDwgMCkgew0KPj4+ICvCoMKgwqAg
+aWYgKG5iZF9yZWFkKGlvYywgJm1hZ2ljLCBzaXplb2YobWFnaWMpLCBlcnJwKSA8IDApIHsNCj4+
+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoCBlcnJvcl9wcmVwZW5kKGVycnAsICJGYWlsZWQgdG8gcmVh
+ZCBkYXRhOiAiKTsNCj4+DQo+PiBtYXkgYmUsIGNoYW5nZSB0byAiRmFpbGVkIHRvIHJlYWQgbWFn
+aWM6ICIsIGFzIGluIGNvZGUgYmVsb3cNCj4gDQo+IEFyZ3VtZW50IGZvcjogY29uc2lzdGVuY3kg
+c2FrZS4gQXJndW1lbnQgYWdhaW5zdDogaGF2aW5nIGRpc3RpbmN0IG1lc3NhZ2VzIGxldHMgeW91
+IGRlYnVnIHdoaWNoIG9mIHRoZSB0d28gbWFnaWMgc3RyaW5ncyB3YXMgd3JvbmcuwqAgSSdtIG5v
+dCBzdXJlIEkgaGF2ZSBhIHN0cm9uZyBwcmVmZXJlbmNlLg0KPiANCj4+DQo+Pj4gwqDCoMKgwqDC
+oMKgwqDCoMKgwqAgZ290byBmYWlsOw0KPj4+IMKgwqDCoMKgwqDCoCB9DQo+Pj4gLQ0KPj4+IC3C
+oMKgwqAgYnVmWzhdID0gJ1wwJzsNCj4+PiAtwqDCoMKgIGlmIChzdHJsZW4oYnVmKSA9PSAwKSB7
+DQo+Pj4gLcKgwqDCoMKgwqDCoMKgIGVycm9yX3NldGcoZXJycCwgIlNlcnZlciBjb25uZWN0aW9u
+IGNsb3NlZCB1bmV4cGVjdGVkbHkiKTsNCj4+PiAtwqDCoMKgwqDCoMKgwqAgZ290byBmYWlsOw0K
+Pj4+IC3CoMKgwqAgfQ0KPj4+IC0NCj4+PiAtwqDCoMKgIG1hZ2ljID0gbGRxX2JlX3AoYnVmKTsN
+Cj4+PiArwqDCoMKgIG1hZ2ljID0gYmU2NF90b19jcHUobWFnaWMpOw0KPj4NCj4+IElzbid0IGl0
+IGJldHRlciB0byB1c2UgYmU2NF90b19jcHVzPw0KPiANCj4gTm8uIFdlJ3JlIGludGVudGlvbmFs
+bHkgZ2V0dGluZyByaWQgb2YgdGhhdCBiZWNhdXNlIG9mIGNsYW5nOyBzZWUgY29tbWl0IDgwYzdj
+MmIwLg0KPiANCj4gDQoNCk9rLCB0aGFua3MuIEluIHRoaXMgY2FzZSBpdCBzaG91bGQgYmUgc2Fm
+ZSwgYnV0IGlmIHdlIGRlY2lkZWQgdG8gYXZvaWQgdGhlc2UgZnVuY3Rpb25zIGluIGdlbmVyYWwg
+dGhhbiBPSy4NCkhtbSwgbm90IGluIGdlbmVyYWwsIGJ1dCBvbmx5IGluIG5iZC4uIFN0cmFuZ2Us
+IHdoeSBub3QgaW4gcWNvdzIgZm9yIGV4PywgYW55d2F5LCB3aXRoIG9yIHdpdGhvdXQgb3RoZXIg
+dGlueSB0aGluZ3M6DQoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5
+IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZs
+YWRpbWlyDQo=
