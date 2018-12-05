@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gUaIf-0002d2-GI
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:45:26 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gUaKR-0003k1-8R
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:47:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gUaIc-00064i-ED
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:45:25 -0500
-Date: Wed, 5 Dec 2018 17:45:08 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181205174508.3e2452af.cohuck@redhat.com>
-In-Reply-To: <0d97dcf5-de40-3f18-64fc-7b2eb1799a84@redhat.com>
-References: <20181205145131.28467-1-cohuck@redhat.com>
-	<0d97dcf5-de40-3f18-64fc-7b2eb1799a84@redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1gUaKQ-000452-Ce
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 11:47:15 -0500
+Date: Wed, 5 Dec 2018 14:47:02 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181205164702.GR18284@habkost.net>
+References: <CAFEAcA8D7ZjO059Sgrx-4i0iT+V3gxT4f=DvdmUAJS7KomtyOg@mail.gmail.com>
+	<b8e20686-e5d1-a844-48f7-a4ae471e3fd5@greensocs.com>
+	<CAFEAcA8j4xTiS3_ktiA0hm2N4cu5RvxAtYqUHgvY-bUXgcwbjQ@mail.gmail.com>
+	<50645862-a638-ad2a-bafe-1b46be42aec4@greensocs.com>
+	<20181204180607.GB18284@habkost.net>
+	<CAFEAcA9JXeRGfKzouYJQKxgXuw_Z-up0a1ijZX9hZvXbdkwiuA@mail.gmail.com>
+	<20181204190548.GH18284@habkost.net>
+	<CAFEAcA9M3akT7sF-kjCg41ucuUhv2PxKaCBmkN3eacvqvf_w9Q@mail.gmail.com>
+	<20181204194532.GJ18284@habkost.net>
+	<f0a7fe11-61ff-6a60-f320-438e4e38f2da@greensocs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC] vfio-ap: flag as compatible with
- balloon
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f0a7fe11-61ff-6a60-f320-438e4e38f2da@greensocs.com>
+Subject: Re: [Qemu-devel] [PATCH v7 01/16] hw/cpu: introduce CPU clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Tony Krowiak <akrowiak@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Luc Michel <luc.michel@greensocs.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Alistair Francis <alistair@alistair23.me>, Mark Burton <mark.burton@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Wed, 5 Dec 2018 17:38:22 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On Wed, Dec 05, 2018 at 03:02:45PM +0100, Luc Michel wrote:
+> On 12/4/18 8:45 PM, Eduardo Habkost wrote:
+> > On Tue, Dec 04, 2018 at 07:16:39PM +0000, Peter Maydell wrote:
+> >> On Tue, 4 Dec 2018 at 19:05, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >>> On Tue, Dec 04, 2018 at 06:24:19PM +0000, Peter Maydell wrote:
+> >>>> A cluster is a group of CPUs which are all identical and have
+> >>>> the same view of the rest of the system.
+> >>
+> >>> With that definition in mind, why can't QEMU cluster CPUs
+> >>> automatically by looking at CPU models and address space objects?
+> >>
+> >> That sounds like it is in theory feasible and in practice
+> >> quite tricky. You would have to look not just at the CPU
+> >> model name but also introspect all its properties for
+> >> ones which change features of the CPU and are set differently
+> >> on different CPUs (and I don't think there's any way to
+> >> automatically tell which properties are ones which make
+> >> the CPU different for which-cluster purposes and which aren't).
+> >> And if we automatically checked whether address space objects
+> >> were the same it would rule out implementing devices with
+> >> per-cpu banked memory mapped registers by mapping different
+> >> things into the AS for each CPU (though that's a hypothetical
+> >> at the moment -- I've thought about implementing stuff that
+> >> way but we tend to implement that sort of thing by looking
+> >> at current_cpu->cpu_index at the moment).
+> > 
+> > I see.
+> > 
+> > Can't we at least do something to make sure the cluster objects
+> > make sense?  e.g. by ensuring at least QOM CPU type is the same,
+> > and that cpu->address_space somehow points to
+> > cpu->cluster->address_space?
+> Where such a check should be placed? Cluster realize function is not
+> good since children can still be added after device realization. A good
+> place would be when object_property_add_child() is called, but I'm not
+> aware of a way of hooking into that with the QOM API...
 
-> On 05.12.18 15:51, Cornelia Huck wrote:
-> > vfio-ap devices do not pin any pages in the host. Therefore, they
-> > are belived to be compatible with memory ballooning.
-> > 
-> > Flag them as compatible, so both vfio-ap and a balloon can be
-> > used simultaneously.
-> > 
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > ---
-> > 
-> > As briefly discussed on IRC. RFC as I do not have easy access to
-> > hardware I can test this with.
-> > 
-> > ---
-> >  hw/vfio/ap.c | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> > 
-> > diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-> > index 65de952f44..3bf48eed28 100644
-> > --- a/hw/vfio/ap.c
-> > +++ b/hw/vfio/ap.c
-> > @@ -104,6 +104,14 @@ static void vfio_ap_realize(DeviceState *dev, Error **errp)
-> >      vapdev->vdev.name = g_strdup_printf("%s", mdevid);
-> >      vapdev->vdev.dev = dev;
-> >  
-> > +    /*
-> > +     * vfio-ap devices are believed to operate in a way compatible with
-> > +     * memory ballooning, as no pages are pinned in the host.
-> > +     * This needs to be set before vfio_get_device() for vfio common to
-> > +     * handle the balloon inhibitor.
-> > +     */
-> > +    vapdev->vdev.balloon_allowed = true;
-> > +
-> >      ret = vfio_get_device(vfio_group, mdevid, &vapdev->vdev, &local_err);
-> >      if (ret) {
-> >          goto out_get_dev_err;
-> >   
-> 
-> What happens if this ever changes? Shouldn't we have an API to at least
-> check what the vfio device can guarantee?
-> 
-> "are believed to operate" doesn't sound like guarantees to me :)
+Not sure.  Maybe it can be a post-machine_init hook.  Maybe this
+can be done by a separate (avocado_qemu-based?) test script.
 
-It's the same for ccw :)
+It looks like address space info is available through HMP ("info
+mtree") and not QMP, so we'd need to fix that first.  CCing HMP
+and QMP maintainers.
 
-While such an API definitely sounds like a good idea, it is probably
-overkill to introduce it for this case (do we envision changing the way
-vfio-ap operates in the future to make that statement non-true?)
+I don't think this should block the series, but it would be a
+welcome addition.
+
+-- 
+Eduardo
