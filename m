@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gUVOv-0005K5-QT
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:31:34 -0500
+	(envelope-from <bounces@canonical.com>) id 1gUVYj-0002Iu-5t
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:41:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gUVOq-0007gq-PO
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:31:33 -0500
-Received: from indium.canonical.com ([91.189.90.7]:45726)
+	(envelope-from <bounces@canonical.com>) id 1gUVYf-0005mL-56
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:41:40 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48754)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gUVOq-0007gE-I7
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:31:28 -0500
+	id 1gUVYe-0005lZ-T0
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:41:37 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gUVOp-0004jl-1G
-	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 11:31:27 +0000
+	id 1gUVYd-0006fU-RV
+	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 11:41:35 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6561A2E80D7
-	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 11:31:25 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id A485A2E80CC
+	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 11:41:35 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 05 Dec 2018 11:20:38 -0000
-From: Daniel Berrange <1801933@bugs.launchpad.net>
-Reply-To: Bug 1801933 <1801933@bugs.launchpad.net>
+Date: Wed, 05 Dec 2018 11:33:15 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+Reply-To: Bug 1804678 <1804678@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <154151022459.20108.13605520748922076387.malonedeb@gac.canonical.com>
-Message-Id: <154400883834.616.14516855657300569326.malone@chaenomeles.canonical.com>
+References: <154290401870.17569.13384923487355075536.malonedeb@chaenomeles.canonical.com>
+Message-Id: <154400959573.5655.8885532906169079804.launchpad@wampee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1801933] Re: default memory parameter too small
- on x86_64 today
+Subject: [Qemu-devel] [Bug 1804678] Re: qemu-3.1.0-rc0: mips emulation hangs
+ when executing invalid instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,69 +39,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-IMHO, if achieving ease of use comparable to VirtualBox is your
-benchmark target, then launching QEMU directly is really the wrong way
-to approach things. QEMU is a very low level piece of infrastructure not
-a complete end user desktop solution. For that it is better to look at
-using an application such as virt-manager, or GNOME Boxes. These provide
-higher level solution over QEMU and do smart things during installation,
-using libosinfo to automatically determine the best memory, disk,
-network, etc settings for each particular guest OS rather than relying
-on some hardcoded defaults.
-
-That said all said, I don't rule out that we could change our memory
-defaults, but picking an optimal value is hard. Even 500 MB is
-considered to be unsupported from a RHEL-7 pov - the documented minimum
-for RHEL-7 is 1 GB per vCPU. The installer is quite likely to crash with
-500 MB depending on what options you select durin intsall.
+** Tags added: mips
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1801933
+https://bugs.launchpad.net/bugs/1804678
 
 Title:
-  default memory parameter too small on x86_64 today
+  qemu-3.1.0-rc0: mips emulation hangs when executing invalid
+  instructions
 
 Status in QEMU:
   New
 
 Bug description:
-  Launching a centos74 iso VM today does not work anymore on x86_64
-  without increasing the size of the memory parameter. For example with
-  this command :
+  QEMU version:
+  -------------
 
-  $ /opt/qemu-3.0.0/bin/qemu-system-x86_64 --curses   -enable-kvm -drive
-  file=3Dfile.dd,index=3D0,media=3Ddisk -drive file=3Dcentos-
-  x86_64.iso,index=3D1,media=3Dcdrom
+  qemu-3.1.0-rc0 compiled from sources (earlier versions also affected)
 
-  [    3.047614] Failed to execute /init
-  [    3.048315] Kernel panic - not syncing: No init found.  Try passing in=
-it=3D option to kernel. See Linux Documentation/init.txt for guidance.
-  [    3.049258] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 3.10.0-693.21.1.=
-el7.x86
+  Summary:
+  --------
 
-  Increasing the size from the default 128MiB to 512MiB let the VM works wi=
-thout problem.
-  So, ok, it's not a qemu problem, it's more a "User problem" and interface=
- problem for me.
-  But it push me in the end to launch VirtualBox instead of qemu, because t=
-he default parameter does not work anymore... And I had no time to investig=
-ate why it does not work because the message is not visible.
-  Debian iso with the same command line for example show a message to tell =
-me that there is not enough memory, so it help me to track the real issue b=
-ehind.
+  QEMU MIPS system emulation hangs when trying to execute the following
+  invalid instructions:
 
-  But... In the end, I think today, the default memory parameter on x86_64 =
-is too small and it can lead some people like me to switch to VirtualBox.
-  VirtualBox, in the wizard is set by default to 4MiB Ram size, which tell =
-you... Ok I need to put more. And, you know that 4MiB is not enough in the =
-end.
+  71c5a9bf       sdbbp 0x716a6
+  2c4745aa       sltiu a3, v0, 0x45aa
+  f47539fb       sdc1 f21, 0x39fb(v1)
+  5fa5e284       invalid
 
-  Regards,
+  qemu-system-mips falls under an infinite loop condition and it needs
+  to be ended.
 
-  Johann
+  The issue has been reproduced in Ubuntu x64 host running Debian MIPS
+  32-bits guest with the following command line:
+
+  qemu-system-mips -M malta -kernel vmlinux-3.2.0-4-4kc-malta -hda
+  debian_wheezy_mips_standard.qcow2 -append "root=3D/dev/sda1
+  console=3Dtty0"
+
+  It can also be reproduced using mips-linux-user, in which case throws
+  the following exception:
+
+  qemu-mips mips_loop_static.elf
+  qemu: unhandled CPU exception 0x10 - aborting
+  pc=3D0x004a9da0 HI=3D0x00000003 LO=3D0x00000002 ds 00e2 004a9da0 0
+  GPR00: r0 00000000 at fffffff8 v0 004a9da0 v1 004ad000
+  GPR04: a0 00000001 a1 7fffefc4 a2 7fffefcc a3 00000000
+  GPR08: t0 004ab854 t1 0ffffffe t2 81010100 t3 2f2f2f2f
+  GPR12: t4 7ffff1ad t5 004ab090 t6 004ab06c t7 004ab07c
+  GPR16: s0 00000000 s1 452ac505 s2 00400db4 s3 00400d38
+  GPR20: s4 00000000 s5 00000000 s6 00000000 s7 00000000
+  GPR24: t8 004ab0a8 t9 004a9da0 k0 00000000 k1 00000000
+  GPR28: gp 004b25a0 sp 7fffeec0 s8 7fffeec0 ra 0040041c
+  CP0 Status  0x24000010 Cause   0x00000000 EPC    0x00000000
+      Config0 0x80008482 Config1 0x9e190c8f LLAddr 0xffffffffffffffff
+      Config2 0x80000000 Config3 0x00000000
+      Config4 0x00000000 Config5 0x00000000
+  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x602d=
+bad8
+
+  Testcase:
+  ---------
+
+  C program to reproduce the problem:
+
+  unsigned char code[] =3D "\x71\xC5\xA9\xBF\x2C\x47\x45\xAA\xF4\x75\x39\xF=
+B\x5F\xA5\xE2\x84";
+  main()
+  {
+    int (*ret)() =3D (int(*)())code;
+    ret();
+  }
+
+  Also, find a statically compiled ELF attached.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1801933/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1804678/+subscriptions
