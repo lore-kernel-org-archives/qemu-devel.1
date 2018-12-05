@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gUVKe-0002Qz-HT
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:27:13 -0500
+	(envelope-from <bounces@canonical.com>) id 1gUVOw-0005K9-M2
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:31:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gUVKX-0001WJ-6i
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:27:06 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41886)
+	(envelope-from <bounces@canonical.com>) id 1gUVOq-0007gw-Qg
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:31:34 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45724)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gUVKW-0001Td-Vs
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:27:01 -0500
+	id 1gUVOq-0007gB-Jr
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 06:31:28 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gUVKT-0002ka-5J
-	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 11:26:57 +0000
+	id 1gUVOo-0004rz-R6
+	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 11:31:27 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7512E2E80D8
-	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 11:26:54 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id F18762E8031
+	for <qemu-devel@nongnu.org>; Wed,  5 Dec 2018 11:31:24 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 05 Dec 2018 11:06:36 -0000
+Date: Wed, 05 Dec 2018 11:20:39 -0000
 From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-Reply-To: Bug 1364501 <1364501@bugs.launchpad.net>
+Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20140902163848.4037.99496.malonedeb@soybean.canonical.com>
-Message-Id: <154400799757.26298.14592356957580172975.launchpad@gac.canonical.com>
+References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
+Message-Id: <154400883976.5431.16544699590089942046.launchpad@wampee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1364501] Re: Gdb hangs when trying to single-step
- after an invalid instruction
+Subject: [Qemu-devel] [Bug 1805256] Re: qemu-img hangs on high core count
+ ARM system
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,60 +39,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Tags added: gdbstub
+** Tags added: qemu-img
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1364501
+https://bugs.launchpad.net/bugs/1805256
 
 Title:
-  Gdb hangs when trying to single-step after an invalid instruction
+  qemu-img hangs on high core count ARM system
 
 Status in QEMU:
-  Triaged
+  New
 
 Bug description:
-  When using Gdb to remote-debug a program and manually setting its PC
-  to point to an address containing an invalid instruction and then
-  doing a single step, Qemu will never return control to the remote Gdb.
+  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
+  frequently hangs (~50% of the time) with this command:
 
-  For instance, let's say address 0x114 contains an invalid instruction.
-  On the remote Gdb, we'd do:
+  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
 
-  (gdb) set $pc =3D 0x114
-  (gdb) stepi
+  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
+  qcow2->qcow2 conversion happens to be something uvtool does every time
+  it fetches images.
 
-  After doing that we won't get the (gdb) prompt unless we do a Ctrl-C.
-  If we do so we'll be left at 0x114 instead of going towards the
-  exception handler as we should. This happens with stepi, step and
-  next. If instead of single-stepping we used continue, the program will
-  proceed into the exception handler as it should.
+  Once hung, attaching gdb gives the following backtrace:
 
-  The reason this is happening is that when Qemu realizes it's about to
-  translate an instruction it doesn't recognize it'll generate a call to
-  helper_exception_with_syndrome(), which will register the exception
-  and then call cpu_loop_exit(). At the same time, because we're doing a
-  single-step, Qemu will also generate a call to
-  helper_exception_internal() passing it an EXCP_DEBUG, which lets the
-  system know it'll give control back to the remote debugger, and it
-  also ends with a call to cpu_loop_exit(). However, because the
-  syndrome exception calls cpu_loop_exit() first, the call to the
-  internal exception won't be reached and Qemu will be stuck in a loop
-  without returning control to the remote debugger.
+  (gdb) bt
+  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
+274213760, =
 
-  What makes this a bit tricky to fix is that we must call
-  cpu_loop_exit() at the end of helper_exception_with_syndrome(),
-  otherwise the target exception will go undetected and its handler
-  won't be excecuted.
+      timeout=3D<optimized out>, timeout@entry=3D0x0, sigmask=3D0xffffc123b=
+950)
+      at ../sysdeps/unix/sysv/linux/ppoll.c:39
+  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
+ptimized out>, =
 
-  Tested on latest head by emulating a Stellaris lm3s6965 board and
-  running RTEMS 4.11:
+      __fds=3D<optimized out>) at /usr/include/aarch64-linux-gnu/bits/poll2=
+.h:77
+  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, =
 
-  $ qemu-system-arm -nographic -s -S -M lm3s6965evb -kernel my_rtems_app
+      timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.c:322
+  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
+      at util/main-loop.c:233
+  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
+  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
+g.c:1980
+  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
+img.c:2456
+  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
+-img.c:4975
 
-  Commit hash in qemu.git: 30eaca3acdf17d7bcbd1213eb149c02037edfb0b
+  Reproduced w/ latest QEMU git (@ 53744e0a182)
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1364501/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1805256/+subscriptions
