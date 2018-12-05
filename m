@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gUYsk-0002hk-4N
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:14:37 -0500
+	(envelope-from <d.csapak@proxmox.com>) id 1gUYtJ-0002lz-Lt
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:15:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gUYrY-0006T8-Vy
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:13:24 -0500
-Received: from m12-11.163.com ([220.181.12.11]:42139)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gUYrY-0006PK-1s
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:13:20 -0500
+	(envelope-from <d.csapak@proxmox.com>) id 1gUYl7-0003ZS-OT
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:06:45 -0500
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:26120)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <d.csapak@proxmox.com>)
+	id 1gUYl5-0003Sm-Iy
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 10:06:39 -0500
+References: <20181205110131.23049-1-d.csapak@proxmox.com>
+	<87a7lkuptr.fsf@dusky.pond.sub.org>
+From: Dominik Csapak <d.csapak@proxmox.com>
+Message-ID: <5592d444-4527-89b8-4a0a-f32c6b5beb69@proxmox.com>
+Date: Wed, 5 Dec 2018 16:06:22 +0100
 MIME-Version: 1.0
-From: Li Qiang <liq3ea@163.com>
-Date: Wed, 5 Dec 2018 23:13:07 +0800
-Message-Id: <5C07EB0A.0934FA.23346@m12-11.163.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Question about piix3's PIRQC register set
+In-Reply-To: <87a7lkuptr.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] qapi: return ShutdownCause for
+ events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,29 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "pbonzini@redhat.com" <pbonzini@redhat.com>, Alex Williamson <alex.l.williamson@gmail.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: kwolf@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-Hello Paolo Alex, and all,
+On 12/5/18 1:21 PM, Markus Armbruster wrote:
+> Dominik Csapak <d.csapak@proxmox.com> writes:
+> 
+>> This series improves the QMP SHUTDOWN and RESET events by adding
+>> the ShutdownCause as additional parameter and splitting
+>> the HOST_QMP reason into HOST_QMP_QUIT and HOST_QMP_SYSTEM_RESET
+>> to be able to detect the difference between them when using '--no-reboot'
+>>
+>> this is an alternative to my previous patches[1][2] which
+>> added an exit-script/added a 'reset' argument to the events
+>>
+>>   1: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg00697.html
+>>   2: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg01271.html
+> 
+> Next time, please add the Reviewed-bys you got for the previous version
+> to your commit messages, unless the commits changed enough to warrant
+> another round of review.
 
-I have a question when reading the =E2=80=98vfio_intx_enable=E2=80=99 funct=
-ion.
+Yes of course, sorry for that.
 
-There calls =E2=80=98pci_device_route_intx_to_irq=E2=80=99 to get the =E2=
-=80=98irq number=E2=80=99 from=20
-a device intx info.
+Thank you again for the review.
 
-It is read from =E2=80=98piix3->dev.config[PIIX_PIRQC + pin];=E2=80=99 in =
-=E2=80=98piix3_route_intx_pin_to_irq=E2=80=99.
-
-Here my question when the piix3=E2=80=99s PIRQx route control registers is =
-set and by who?
-I mean when this =E2=80=98=E2=80=98piix3->dev.config[PIIX_PIRQC + pin];=E2=
-=80=99=E2=80=99 is set?
-
-Once I think this is set by seabios.=20
-But seems it is not as this function is called in vfio_realize, the guest d=
-ones=E2=80=99t begin.
-
-Thanks,
-Li Qiang=20
+> 
+> For the record, series again
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> 
+> 
