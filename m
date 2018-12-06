@@ -1,15 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gUvWj-0006CZ-J6
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:25:25 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUvWs-0006Fz-Oc
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:25:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gUvQd-0007fQ-Kn
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:19:07 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Thu,  6 Dec 2018 09:18:56 -0600
-Message-Id: <20181206151856.77503-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH] cutils: Assert in-range base for
- string-to-integer conversions
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUvO5-00055Z-7n
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:16:30 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 6 Dec 2018 15:16:17 +0000
+Message-ID: <6e4074f9-99c1-3ed3-01dd-ed99018089d5@virtuozzo.com>
+References: <20181130220344.3350618-1-eblake@redhat.com>
+	<20181130220344.3350618-11-eblake@redhat.com>
+In-Reply-To: <20181130220344.3350618-11-eblake@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <3DE974DACFB6B045A86DD2F178D20F24@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 10/14] nbd/client: Split handshake into two
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,98 +26,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, qemu-trivial@nongnu.org, vsementsov@virtuozzo.com
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-POSIX states that the value of endptr is unspecified if strtol()
-fails with EINVAL due to an invalid base argument.  Since none of
-the callers to check_strtox_error() initialized endptr, we could
-end up propagating uninitialized data back to a caller on error.
-However, passing an out-of-range base is already a sign of poor
-programming, so let's just assert that base is in range, at which
-point check_strtox_error() can be tightened to assert that it is
-receiving an initialized ep that points somewhere within the
-caller's original string, regardless of whether strto*() succeeded
-or failed with ERANGE.
-
-Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
-
-Also tested that this does not negatively impact David's pending
-additions of qemu_strtod{,_finite}().  Thus:
-Based-on: <20181121164421.20780-1-david@redhat.com>
-
- util/cutils.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/util/cutils.c b/util/cutils.c
-index 91930d1bbeb..e098debdc0c 100644
---- a/util/cutils.c
-+++ b/util/cutils.c
-@@ -278,6 +278,7 @@ int qemu_strtosz_metric(const char *nptr, const char **end, uint64_t *result)
- static int check_strtox_error(const char *nptr, char *ep,
-                               const char **endptr, int libc_errno)
- {
-+    assert(ep >= nptr);
-     if (endptr) {
-         *endptr = ep;
-     }
-@@ -325,6 +326,7 @@ int qemu_strtoi(const char *nptr, const char **endptr, int base,
-     char *ep;
-     long long lresult;
-
-+    assert((unsigned) base <= 36 && base != 1);
-     if (!nptr) {
-         if (endptr) {
-             *endptr = nptr;
-@@ -377,6 +379,7 @@ int qemu_strtoui(const char *nptr, const char **endptr, int base,
-     char *ep;
-     long long lresult;
-
-+    assert((unsigned) base <= 36 && base != 1);
-     if (!nptr) {
-         if (endptr) {
-             *endptr = nptr;
-@@ -433,6 +436,7 @@ int qemu_strtol(const char *nptr, const char **endptr, int base,
- {
-     char *ep;
-
-+    assert((unsigned) base <= 36 && base != 1);
-     if (!nptr) {
-         if (endptr) {
-             *endptr = nptr;
-@@ -475,6 +479,7 @@ int qemu_strtoul(const char *nptr, const char **endptr, int base,
- {
-     char *ep;
-
-+    assert((unsigned) base <= 36 && base != 1);
-     if (!nptr) {
-         if (endptr) {
-             *endptr = nptr;
-@@ -502,6 +507,7 @@ int qemu_strtoi64(const char *nptr, const char **endptr, int base,
- {
-     char *ep;
-
-+    assert((unsigned) base <= 36 && base != 1);
-     if (!nptr) {
-         if (endptr) {
-             *endptr = nptr;
-@@ -525,6 +531,7 @@ int qemu_strtou64(const char *nptr, const char **endptr, int base,
- {
-     char *ep;
-
-+    assert((unsigned) base <= 36 && base != 1);
-     if (!nptr) {
-         if (endptr) {
-             *endptr = nptr;
-@@ -657,6 +664,7 @@ int parse_uint(const char *s, unsigned long long *value, char **endptr,
-     char *endp = (char *)s;
-     unsigned long long val = 0;
-
-+    assert((unsigned) base <= 36 && base != 1);
-     if (!s) {
-         r = -EINVAL;
-         goto out;
--- 
-2.17.2
+MDEuMTIuMjAxOCAxOjAzLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBBbiB1cGNvbWluZyBwYXRjaCB3
+aWxsIGFkZCB0aGUgYWJpbGl0eSBmb3IgcWVtdS1uYmQgdG8gbGlzdA0KPiB0aGUgc2VydmljZXMg
+cHJvdmlkZWQgYnkgYW4gTkJEIHNlcnZlci4gIFNoYXJlIHRoZSBjb21tb24NCj4gY29kZSBvZiB0
+aGUgVExTIGhhbmRzaGFrZSBieSBzcGxpdHRpbmcgdGhlIGluaXRpYWwgZXhjaGFuZ2UNCj4gaW50
+byBhIHNlcGFyYXRlIGZ1bmN0aW9uLCBsZWF2aW5nIG9ubHkgdGhlIGV4cG9ydCBoYW5kbGluZw0K
+PiBpbiB0aGUgb3JpZ2luYWwgZnVuY3Rpb24uICBGdW5jdGlvbmFsbHksIHRoZXJlIHNob3VsZCBi
+ZSBubw0KPiBjaGFuZ2UgaW4gYmVoYXZpb3IgaW4gdGhpcyBwYXRjaCwgYWx0aG91Z2ggc29tZSBv
+ZiB0aGUgY29kZQ0KPiBtb3Rpb24gbWF5IGJlIGRpZmZpY3VsdCB0byBmb2xsb3cgZHVlIHRvIGlu
+ZGVudGF0aW9uIGNoYW5nZXMNCj4gKHZpZXcgd2l0aCAnZ2l0IGRpZmYgLXcnIGZvciBhIHNtYWxs
+ZXIgY2hhbmdlc2V0KS4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEVyaWMgQmxha2UgPGVibGFrZUBy
+ZWRoYXQuY29tPg0KDQpSZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8
+dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KDQo+IC0tLQ0KPiAgIG5iZC9jbGllbnQuYyAgICAg
+fCAxNDIgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0NCj4g
+ICBuYmQvdHJhY2UtZXZlbnRzIHwgICAyICstDQo+ICAgMiBmaWxlcyBjaGFuZ2VkLCA5MiBpbnNl
+cnRpb25zKCspLCA1MiBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9uYmQvY2xpZW50
+LmMgYi9uYmQvY2xpZW50LmMNCj4gaW5kZXggMWVkNTAwOTY0MmUuLmEyODI3MTI3MjRkIDEwMDY0
+NA0KPiAtLS0gYS9uYmQvY2xpZW50LmMNCj4gKysrIGIvbmJkL2NsaWVudC5jDQo+IEBAIC03Njgs
+MjEgKzc2OCwyMiBAQCBzdGF0aWMgaW50IG5iZF9uZWdvdGlhdGVfc2ltcGxlX21ldGFfY29udGV4
+dChRSU9DaGFubmVsICppb2MsDQo+ICAgICAgIHJldHVybiByZWNlaXZlZCB8fCBvcHQgPT0gTkJE
+X09QVF9MSVNUX01FVEFfQ09OVEVYVDsNCj4gICB9DQo+IA0KPiAtaW50IG5iZF9yZWNlaXZlX25l
+Z290aWF0ZShRSU9DaGFubmVsICppb2MsIFFDcnlwdG9UTFNDcmVkcyAqdGxzY3JlZHMsDQo+IC0g
+ICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0IGNoYXIgKmhvc3RuYW1lLCBRSU9DaGFubmVs
+ICoqb3V0aW9jLA0KPiAtICAgICAgICAgICAgICAgICAgICAgICAgICBOQkRFeHBvcnRJbmZvICpp
+bmZvLCBFcnJvciAqKmVycnApDQo+ICsvKiBTdGFydCB0aGUgaGFuZHNoYWtlIHRvIHRoZSBzZXJ2
+ZXIuICBBZnRlciBhIHBvc2l0aXZlIHJldHVybiwgdGhlIHNlcnZlcg0KPiArICogaXMgcmVhZHkg
+dG8gYWNjZXB0IGFkZGl0aW9uYWwgTkJEX09QVCByZXF1ZXN0cy4NCj4gKyAqIFJldHVybnM6IG5l
+Z2F0aXZlIGVycm5vOiBmYWlsdXJlIHRhbGtpbmcgdG8gc2VydmVyDQo+ICsgKiAgICAgICAgICAw
+OiBzZXJ2ZXIgaXMgb2xkc3R5bGUsIGNsaWVudCBtdXN0IHN0aWxsIHBhcnNlIGV4cG9ydCBzaXpl
+DQo+ICsgKiAgICAgICAgICAxOiBzZXJ2ZXIgaXMgbmV3c3R5bGUsIGJ1dCBjYW4gb25seSBhY2Nl
+cHQgRVhQT1JUX05BTUUNCj4gKyAqICAgICAgICAgIDI6IHNlcnZlciBpcyBuZXdzdHlsZSwgYnV0
+IGxhY2tzIHN0cnVjdHVyZWQgcmVwbGllcw0KPiArICogICAgICAgICAgMzogc2VydmVyIGlzIG5l
+d3N0eWxlIGFuZCBzZXQgdXAgZm9yIHN0cnVjdHVyZWQgcmVwbGllcw0KPiArICovDQoNCmhtbSwg
+bWF5IGJlLCBpbnRyb2R1Y2UgZW51bSBvZiBuYW1lZCBjb25zdGFudHMsIGluc3RlYWQgb2YgcmF3
+IG51bWJlcnM/DQoNCk5CRF9TVEFSVEVEX09MRF9TVFlMRQ0KTkJEX1NUQVJURURfTkVXX1NUWUxF
+DQpOQkRfU1RBUlRFRF9ORVdfU1RZTEVfRklYRUQNCk5CRF9TVEFSVEVEX1NUUlVDVFVSRURfUkVQ
+TElFUw0KDQpvciwgYXQgbGVhc3QsIGFkZCBzaG9ydCBjb21tZW50IGFmdGVyIGVhY2ggcmV0dXJu
+IHN0YXRlbWVudCwgdG8gbm90IHNjcm9sbCB1cA0KZXZlcnkgdGltZSAobGlrZSB5b3UgZ3JhY2Vm
+dWxseSBkbyBhZnRlciBlYWNoIGNhc2U6IHN0YXRlbWVudCkuDQoNCkhvd2V2ZXIsIEknbSBva2F5
+IHdpdGggZWl0aGVyIHdheS4NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
