@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47401)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=8715dceb6=Paul.Durrant@citrix.com>)
-	id 1gUvXO-0006Et-V2
+	id 1gUvXL-0006Es-Qg
 	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:26:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=8715dceb6=Paul.Durrant@citrix.com>)
-	id 1gUvHr-0005Rj-Qh
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:10:03 -0500
+	id 1gUvHt-0005Xi-2p
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:10:07 -0500
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Thu, 6 Dec 2018 15:08:30 +0000
-Message-ID: <1544108924-10841-5-git-send-email-paul.durrant@citrix.com>
+Date: Thu, 6 Dec 2018 15:08:35 +0000
+Message-ID: <1544108924-10841-10-git-send-email-paul.durrant@citrix.com>
 In-Reply-To: <1544108924-10841-1-git-send-email-paul.durrant@citrix.com>
 References: <1544108924-10841-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 04/18] xen: create xenstore areas for
- XenDevice-s
+Subject: [Qemu-devel] [PATCH v2 09/18] xen: remove unnecessary code from
+ dataplane/xen-block.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,738 +25,532 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-This patch adds a new source module, xen-bus-helper.c, which builds on
-basic libxenstore primitives to provide functions to create (setting
-permissions appropriately) and destroy xenstore areas, and functions to
-'printf' and 'scanf' nodes therein. The main xen-bus code then uses
-these primitives [1] to initialize and destroy the frontend and backend
-areas for a XenDevice during realize and unrealize respectively.
+Not all of the code duplicated from xen_disk.c is required as the basis for
+the new dataplane implementation so this patch removes extraneous code,
+along with the legacy #includes and calls to the legacy xen_pv_printf()
+function. Error messages are changed to be reported using error_report().
 
-The 'xen-block' implementation is extended with a 'get_name' method that
-returns the VBD number. This number is required to 'name' the xenstore
-areas.
-
-NOTE: An exit handler is also added to make sure the xenstore areas are
-      cleaned up if QEMU terminates without devices being unrealized.
-
-[1] The 'scanf' functions are actually not yet needed, but they will be
-    needed by code delivered in subsequent patches.
+NOTE: The code is still not yet built. Further transformations will be
+      required to make it correctly interface to the new XenBus/XenDevice
+      framework. They will be delivered in a subsequent patch.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Acked-by: Anthony Perard <anthony.perard@citrix.com>
 ---
 Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 Cc: Kevin Wolf <kwolf@redhat.com>
 Cc: Max Reitz <mreitz@redhat.com>
 
 v2:
- - Fix boilerplate
- - Add error pointers to all xs_node... helpers
- - Add GCC_FMT_ATTR to declarations of printf-like helpers
+ - Leave existing boilerplate alone, other than removing the now-incorrect
+   description
 ---
- hw/block/xen-block.c            |   9 ++
- hw/xen/Makefile.objs            |   2 +-
- hw/xen/trace-events             |  12 +-
- hw/xen/xen-bus-helper.c         | 147 ++++++++++++++++++
- hw/xen/xen-bus.c                | 319 +++++++++++++++++++++++++++++++++++++++-
- include/hw/xen/xen-bus-helper.h |  34 +++++
- include/hw/xen/xen-bus.h        |  12 ++
- 7 files changed, 530 insertions(+), 5 deletions(-)
- create mode 100644 hw/xen/xen-bus-helper.c
- create mode 100644 include/hw/xen/xen-bus-helper.h
+ hw/block/dataplane/xen-block.c | 409 ++---------------------------------------
+ 1 file changed, 16 insertions(+), 393 deletions(-)
 
-diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-index 78f4218..440bec2 100644
---- a/hw/block/xen-block.c
-+++ b/hw/block/xen-block.c
-@@ -13,6 +13,14 @@
- #include "hw/xen/xen-block.h"
- #include "trace.h"
+diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-block.c
+index 9fae505..98f987d 100644
+--- a/hw/block/dataplane/xen-block.c
++++ b/hw/block/dataplane/xen-block.c
+@@ -1,6 +1,4 @@
+ /*
+- *  xen paravirt block device backend
+- *
+  *  (c) Gerd Hoffmann <kraxel@redhat.com>
+  *
+  *  This program is free software; you can redistribute it and/or modify
+@@ -19,26 +17,12 @@
+  *  GNU GPL, version 2 or (at your option) any later version.
+  */
  
-+static char *xen_block_get_name(XenDevice *xendev, Error **errp)
-+{
-+    XenBlockDevice *blockdev = XEN_BLOCK_DEVICE(xendev);
-+    XenBlockVdev *vdev = &blockdev->vdev;
-+
-+    return g_strdup_printf("%lu", vdev->number);
-+}
-+
- static void xen_block_unrealize(XenDevice *xendev, Error **errp)
- {
-     XenBlockDevice *blockdev = XEN_BLOCK_DEVICE(xendev);
-@@ -266,6 +274,7 @@ static void xen_block_class_init(ObjectClass *class, void *data)
-     DeviceClass *dev_class = DEVICE_CLASS(class);
-     XenDeviceClass *xendev_class = XEN_DEVICE_CLASS(class);
- 
-+    xendev_class->get_name = xen_block_get_name;
-     xendev_class->realize = xen_block_realize;
-     xendev_class->unrealize = xen_block_unrealize;
- 
-diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
-index d9d6d7b..77c0868 100644
---- a/hw/xen/Makefile.objs
-+++ b/hw/xen/Makefile.objs
-@@ -1,5 +1,5 @@
- # xen backend driver support
--common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o xen-bus.o
-+common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o xen-bus.o xen-bus-helper.o
- 
- obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen-host-pci-device.o
- obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt.o xen_pt_config_init.o xen_pt_graphics.o xen_pt_msi.o
-diff --git a/hw/xen/trace-events b/hw/xen/trace-events
-index 0172cd4..75dc226 100644
---- a/hw/xen/trace-events
-+++ b/hw/xen/trace-events
-@@ -16,5 +16,13 @@ xen_domid_restrict(int err) "err: %u"
- # include/hw/xen/xen-bus.c
- xen_bus_realize(void) ""
- xen_bus_unrealize(void) ""
--xen_device_realize(const char *type) "type: %s"
--xen_device_unrealize(const char *type) "type: %s"
-+xen_device_realize(const char *type, char *name) "type: %s name: %s"
-+xen_device_unrealize(const char *type, char *name) "type: %s name: %s"
-+xen_device_backend_state(const char *type, char *name, const char *state) "type: %s name: %s -> %s"
-+xen_device_frontend_state(const char *type, char *name, const char *state) "type: %s name: %s -> %s"
-+
-+# include/hw/xen/xen-bus-helper.c
-+xs_node_create(const char *node) "%s"
-+xs_node_destroy(const char *node) "%s"
-+xs_node_vprintf(char *path, char *value) "%s %s"
-+xs_node_vscanf(char *path, char *value) "%s %s"
-diff --git a/hw/xen/xen-bus-helper.c b/hw/xen/xen-bus-helper.c
-new file mode 100644
-index 0000000..2304f8e
---- /dev/null
-+++ b/hw/xen/xen-bus-helper.c
-@@ -0,0 +1,147 @@
+-#include "qemu/osdep.h"
+-#include "qemu/units.h"
+-#include <sys/ioctl.h>
+-#include <sys/uio.h>
+-
+-#include "hw/hw.h"
+-#include "hw/xen/xen_backend.h"
+-#include "xen_blkif.h"
+-#include "sysemu/blockdev.h"
+-#include "sysemu/iothread.h"
+-#include "sysemu/block-backend.h"
+-#include "qapi/error.h"
+-#include "qapi/qmp/qdict.h"
+-#include "qapi/qmp/qstring.h"
+-#include "trace.h"
+-
+-/* ------------------------------------------------------------- */
+-
+-#define BLOCK_SIZE  512
+-#define IOCB_COUNT  (BLKIF_MAX_SEGMENTS_PER_REQUEST + 2)
 +/*
 + * Copyright (c) 2018  Citrix Systems Inc.
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
 + * See the COPYING file in the top-level directory.
 + */
-+
-+#include "qemu/osdep.h"
-+#include "hw/hw.h"
-+#include "hw/sysbus.h"
-+#include "hw/xen/xen.h"
-+#include "hw/xen/xen-bus.h"
-+#include "hw/xen/xen-bus-helper.h"
-+#include "qapi/error.h"
-+
-+#include <glib/gprintf.h>
-+
-+struct xs_state {
-+    enum xenbus_state statenum;
-+    const char *statestr;
-+};
-+#define XS_STATE(state) { state, #state }
-+
-+static struct xs_state xs_state[] = {
-+    XS_STATE(XenbusStateUnknown),
-+    XS_STATE(XenbusStateInitialising),
-+    XS_STATE(XenbusStateInitWait),
-+    XS_STATE(XenbusStateInitialised),
-+    XS_STATE(XenbusStateConnected),
-+    XS_STATE(XenbusStateClosing),
-+    XS_STATE(XenbusStateClosed),
-+    XS_STATE(XenbusStateReconfiguring),
-+    XS_STATE(XenbusStateReconfigured),
-+};
-+
-+#undef XS_STATE
-+
-+const char *xs_strstate(enum xenbus_state state)
-+{
-+    unsigned int i;
-+
-+   for (i = 0; i < ARRAY_SIZE(xs_state); i++) {
-+        if (xs_state[i].statenum == state) {
-+            return xs_state[i].statestr;
-+        }
-+    }
-+
-+    return "INVALID";
-+}
-+
-+void xs_node_create(struct xs_handle *xsh, const char *node,
-+                    struct xs_permissions perms[],
-+                    unsigned int nr_perms, Error **errp)
-+{
-+    trace_xs_node_create(node);
-+
-+    if (!xs_write(xsh, XBT_NULL, node, "", 0)) {
-+        error_setg_errno(errp, errno, "failed to create node '%s'", node);
-+        return;
-+    }
-+
-+    if (!xs_set_permissions(xsh, XBT_NULL, node,
-+                            perms, nr_perms)) {
-+        error_setg_errno(errp, errno, "failed to set node '%s' permissions",
-+                         node);
-+    }
-+}
-+
-+void xs_node_destroy(struct xs_handle *xsh, const char *node, Error **errp)
-+{
-+    trace_xs_node_destroy(node);
-+
-+    if (!xs_rm(xsh, XBT_NULL, node)) {
-+        error_setg_errno(errp, errno, "failed to destroy node '%s'", node);
-+    }
-+}
-+
-+void xs_node_vprintf(struct xs_handle *xsh, const char *node,
-+                     const char *key, Error **errp, const char *fmt,
-+                     va_list ap)
-+{
-+    char *path, *value;
-+    int len;
-+
-+    path = (strlen(node) != 0) ? g_strdup_printf("%s/%s", node, key) :
-+        g_strdup(key);
-+    len = g_vasprintf(&value, fmt, ap);
-+
-+    trace_xs_node_vprintf(path, value);
-+
-+    if (!xs_write(xsh, XBT_NULL, path, value, len)) {
-+        error_setg_errno(errp, errno, "failed to write '%s' to '%s'",
-+                         value, path);
-+    }
-+
-+    g_free(value);
-+    g_free(path);
-+}
-+
-+void xs_node_printf(struct xs_handle *xsh, const char *node,
-+                    const char *key, Error **errp, const char *fmt, ...)
-+{
-+    va_list ap;
-+
-+    va_start(ap, fmt);
-+    xs_node_vprintf(xsh, node, key, errp, fmt, ap);
-+    va_end(ap);
-+}
-+
-+int xs_node_vscanf(struct xs_handle *xsh, const char *node, const char *key,
-+                   Error **errp, const char *fmt, va_list ap)
-+{
-+    char *path, *value;
-+    int rc;
-+
-+    path = (strlen(node) != 0) ? g_strdup_printf("%s/%s", node, key) :
-+        g_strdup(key);
-+    value = xs_read(xsh, XBT_NULL, path, NULL);
-+
-+    trace_xs_node_vscanf(path, value);
-+
-+    if (value) {
-+        rc = vsscanf(value, fmt, ap);
-+    } else {
-+        error_setg_errno(errp, errno, "failed to read from '%s'",
-+                         path);
-+        rc = EOF;
-+    }
-+
-+    free(value);
-+    g_free(path);
-+
-+    return rc;
-+}
-+
-+int xs_node_scanf(struct xs_handle *xsh, const char *node, const char *key,
-+                  Error **errp, const char *fmt, ...)
-+{
-+    va_list ap;
-+    int rc;
-+
-+    va_start(ap, fmt);
-+    rc = xs_node_vscanf(xsh, node, key, errp, fmt, ap);
-+    va_end(ap);
-+
-+    return rc;
-+}
-diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-index 1385bab..3bd5e4e 100644
---- a/hw/xen/xen-bus.c
-+++ b/hw/xen/xen-bus.c
-@@ -8,24 +8,102 @@
- #include "qemu/osdep.h"
- #include "hw/hw.h"
- #include "hw/sysbus.h"
-+#include "hw/xen/xen.h"
- #include "hw/xen/xen-bus.h"
-+#include "hw/xen/xen-bus-helper.h"
-+#include "monitor/monitor.h"
- #include "qapi/error.h"
-+#include "sysemu/sysemu.h"
- #include "trace.h"
  
-+static char *xen_device_get_backend_path(XenDevice *xendev)
-+{
-+    XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-+    XenDeviceClass *xendev_class = XEN_DEVICE_GET_CLASS(xendev);
-+    const char *type = object_get_typename(OBJECT(xendev));
-+    const char *backend = xendev_class->backend;
-+
-+    if (!backend) {
-+        backend = type;
-+    }
-+
-+    return g_strdup_printf("/local/domain/%u/backend/%s/%u/%s",
-+                           xenbus->backend_id, backend, xendev->frontend_id,
-+                           xendev->name);
-+}
-+
-+static char *xen_device_get_frontend_path(XenDevice *xendev)
-+{
-+    XenDeviceClass *xendev_class = XEN_DEVICE_GET_CLASS(xendev);
-+    const char *type = object_get_typename(OBJECT(xendev));
-+    const char *device = xendev_class->device;
-+
-+    if (!device) {
-+        device = type;
-+    }
-+
-+    return g_strdup_printf("/local/domain/%u/device/%s/%s",
-+                           xendev->frontend_id, device, xendev->name);
-+}
-+
-+static void xen_bus_print_dev(Monitor *mon, DeviceState *dev, int indent)
-+{
-+    XenDevice *xendev = XEN_DEVICE(dev);
-+
-+    monitor_printf(mon, "%*sname = '%s' frontend_id = %u\n",
-+                   indent, "", xendev->name, xendev->frontend_id);
-+}
-+
-+static char *xen_bus_get_dev_path(DeviceState *dev)
-+{
-+    return xen_device_get_backend_path(XEN_DEVICE(dev));
-+}
-+
- static void xen_bus_unrealize(BusState *bus, Error **errp)
- {
-+    XenBus *xenbus = XEN_BUS(bus);
-+
-     trace_xen_bus_unrealize();
-+
-+    if (!xenbus->xsh) {
-+        return;
-+    }
-+
-+    xs_close(xenbus->xsh);
- }
- 
- static void xen_bus_realize(BusState *bus, Error **errp)
- {
-+    XenBus *xenbus = XEN_BUS(bus);
-+    unsigned int domid;
-+
-     trace_xen_bus_realize();
-+
-+    xenbus->xsh = xs_open(0);
-+    if (!xenbus->xsh) {
-+        error_setg_errno(errp, errno, "failed xs_open");
-+        goto fail;
-+    }
-+
-+    if (xs_node_scanf(xenbus->xsh, "", /* domain root node */
-+                      "domid", NULL, "%u", &domid) == 1) {
-+        xenbus->backend_id = domid;
-+    } else {
-+        xenbus->backend_id = 0; /* Assume lack of node means dom0 */
-+    }
-+
-+    return;
-+
-+fail:
-+    xen_bus_unrealize(bus, &error_abort);
- }
- 
- static void xen_bus_class_init(ObjectClass *class, void *data)
- {
-     BusClass *bus_class = BUS_CLASS(class);
- 
-+    bus_class->print_dev = xen_bus_print_dev;
-+    bus_class->get_dev_path = xen_bus_get_dev_path;
-     bus_class->realize = xen_bus_realize;
-     bus_class->unrealize = xen_bus_unrealize;
- }
-@@ -42,6 +120,162 @@ static const TypeInfo xen_bus_type_info = {
-     },
+ struct ioreq {
+     blkif_request_t     req;
+@@ -101,8 +85,6 @@ struct XenBlkDev {
+     AioContext          *ctx;
  };
  
-+static void xen_device_backend_printf(XenDevice *xendev, const char *key,
-+                                      const char *fmt, ...)
-+{
-+    XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-+    Error *local_err = NULL;
-+    va_list ap;
-+
-+    g_assert(xenbus->xsh);
-+
-+    va_start(ap, fmt);
-+    xs_node_vprintf(xenbus->xsh, xendev->backend_path, key, &local_err,
-+                    fmt, ap);
-+    va_end(ap);
-+
-+    if (local_err) {
-+        error_report_err(local_err);
-+    }
-+}
-+
-+static void xen_device_backend_set_state(XenDevice *xendev,
-+                                         enum xenbus_state state)
-+{
-+    const char *type = object_get_typename(OBJECT(xendev));
-+
-+    if (xendev->backend_state == state) {
-+        return;
-+    }
-+
-+    trace_xen_device_backend_state(type, xendev->name,
-+                                   xs_strstate(state));
-+
-+    xendev->backend_state = state;
-+    xen_device_backend_printf(xendev, "state", "%u", state);
-+}
-+
-+static void xen_device_backend_create(XenDevice *xendev, Error **errp)
-+{
-+    XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-+    struct xs_permissions perms[2];
-+    Error *local_err = NULL;
-+
-+    xendev->backend_path = xen_device_get_backend_path(xendev);
-+
-+    perms[0].id = xenbus->backend_id;
-+    perms[0].perms = XS_PERM_NONE;
-+    perms[1].id = xendev->frontend_id;
-+    perms[1].perms = XS_PERM_READ;
-+
-+    g_assert(xenbus->xsh);
-+
-+    xs_node_create(xenbus->xsh, xendev->backend_path, perms,
-+                   ARRAY_SIZE(perms), &local_err);
-+    if (local_err) {
-+        error_propagate_prepend(errp, local_err,
-+                                "failed to create backend: ");
-+    }
-+}
-+
-+static void xen_device_backend_destroy(XenDevice *xendev)
-+{
-+    XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-+    Error *local_err = NULL;
-+
-+    if (!xendev->backend_path) {
-+        return;
-+    }
-+
-+    g_assert(xenbus->xsh);
-+
-+    xs_node_destroy(xenbus->xsh, xendev->backend_path, &local_err);
-+    g_free(xendev->backend_path);
-+    xendev->backend_path = NULL;
-+
-+    if (local_err) {
-+        error_report_err(local_err);
-+    }
-+}
-+
-+static void xen_device_frontend_printf(XenDevice *xendev, const char *key,
-+                                       const char *fmt, ...)
-+{
-+    XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-+    Error *local_err = NULL;
-+    va_list ap;
-+
-+    g_assert(xenbus->xsh);
-+
-+    va_start(ap, fmt);
-+    xs_node_vprintf(xenbus->xsh, xendev->frontend_path, key, &local_err,
-+                    fmt, ap);
-+    va_end(ap);
-+
-+    if (local_err) {
-+        error_report_err(local_err);
-+    }
-+}
-+
-+static void xen_device_frontend_set_state(XenDevice *xendev,
-+                                          enum xenbus_state state)
-+{
-+    const char *type = object_get_typename(OBJECT(xendev));
-+
-+    if (xendev->frontend_state == state) {
-+        return;
-+    }
-+
-+    trace_xen_device_frontend_state(type, xendev->name,
-+                                    xs_strstate(state));
-+
-+    xendev->frontend_state = state;
-+    xen_device_frontend_printf(xendev, "state", "%u", state);
-+}
-+
-+static void xen_device_frontend_create(XenDevice *xendev, Error **errp)
-+{
-+    XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-+    struct xs_permissions perms[2];
-+    Error *local_err = NULL;
-+
-+    xendev->frontend_path = xen_device_get_frontend_path(xendev);
-+
-+    perms[0].id = xendev->frontend_id;
-+    perms[0].perms = XS_PERM_NONE;
-+    perms[1].id = xenbus->backend_id;
-+    perms[1].perms = XS_PERM_READ | XS_PERM_WRITE;
-+
-+    g_assert(xenbus->xsh);
-+
-+    xs_node_create(xenbus->xsh, xendev->frontend_path, perms,
-+                   ARRAY_SIZE(perms), &local_err);
-+    if (local_err) {
-+        error_propagate_prepend(errp, local_err,
-+                                "failed to create frontend: ");
-+    }
-+}
-+
-+static void xen_device_frontend_destroy(XenDevice *xendev)
-+{
-+    XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-+    Error *local_err = NULL;
-+
-+    if (!xendev->frontend_path) {
-+        return;
-+    }
-+
-+    g_assert(xenbus->xsh);
-+
-+    xs_node_destroy(xenbus->xsh, xendev->frontend_path, &local_err);
-+    g_free(xendev->frontend_path);
-+    xendev->frontend_path = NULL;
-+
-+    if (local_err) {
-+        error_report_err(local_err);
-+    }
-+}
-+
- static void xen_device_unrealize(DeviceState *dev, Error **errp)
+-/* ------------------------------------------------------------- */
+-
+ static void ioreq_reset(struct ioreq *ioreq)
  {
-     XenDevice *xendev = XEN_DEVICE(dev);
-@@ -49,7 +283,16 @@ static void xen_device_unrealize(DeviceState *dev, Error **errp)
-     const char *type = object_get_typename(OBJECT(xendev));
-     Error *local_err = NULL;
+     memset(&ioreq->req, 0, sizeof(ioreq->req));
+@@ -183,11 +165,6 @@ static int ioreq_parse(struct ioreq *ioreq)
+     size_t len;
+     int i;
  
--    trace_xen_device_unrealize(type);
-+    if (!xendev->name) {
-+        return;
-+    }
-+
-+    trace_xen_device_unrealize(type, xendev->name);
-+
-+    if (xendev->exit.notify) {
-+        qemu_remove_exit_notifier(&xendev->exit);
-+        xendev->exit.notify = NULL;
-+    }
+-    xen_pv_printf(
+-        xendev, 3,
+-        "op %d, nr %d, handle %d, id %" PRId64 ", sector %" PRId64 "\n",
+-        ioreq->req.operation, ioreq->req.nr_segments,
+-        ioreq->req.handle, ioreq->req.id, ioreq->req.sector_number);
+     switch (ioreq->req.operation) {
+     case BLKIF_OP_READ:
+         break;
+@@ -202,28 +179,27 @@ static int ioreq_parse(struct ioreq *ioreq)
+     case BLKIF_OP_DISCARD:
+         return 0;
+     default:
+-        xen_pv_printf(xendev, 0, "error: unknown operation (%d)\n",
+-                      ioreq->req.operation);
++        error_report("error: unknown operation (%d)", ioreq->req.operation);
+         goto err;
+     };
  
-     if (xendev_class->unrealize) {
-         xendev_class->unrealize(xendev, &local_err);
-@@ -57,16 +300,63 @@ static void xen_device_unrealize(DeviceState *dev, Error **errp)
-             error_propagate(errp, local_err);
-         }
-     }
-+
-+    xen_device_frontend_destroy(xendev);
-+    xen_device_backend_destroy(xendev);
-+
-+    g_free(xendev->name);
-+    xendev->name = NULL;
-+}
-+
-+static void xen_device_exit(Notifier *n, void *data)
-+{
-+    XenDevice *xendev = container_of(n, XenDevice, exit);
-+
-+    xen_device_unrealize(DEVICE(xendev), &error_abort);
- }
- 
- static void xen_device_realize(DeviceState *dev, Error **errp)
- {
-     XenDevice *xendev = XEN_DEVICE(dev);
-     XenDeviceClass *xendev_class = XEN_DEVICE_GET_CLASS(xendev);
-+    XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-     const char *type = object_get_typename(OBJECT(xendev));
-     Error *local_err = NULL;
- 
--    trace_xen_device_realize(type);
-+    if (xendev->frontend_id == DOMID_INVALID) {
-+        xendev->frontend_id = xen_domid;
-+    }
-+
-+    if (xendev->frontend_id >= DOMID_FIRST_RESERVED) {
-+        error_setg(errp, "invalid frontend-id");
-+        goto unrealize;
-+    }
-+
-+    if (!xendev_class->get_name) {
-+        error_setg(errp, "get_name method not implemented");
-+        goto unrealize;
-+    }
-+
-+    xendev->name = xendev_class->get_name(xendev, &local_err);
-+    if (local_err) {
-+        error_propagate_prepend(errp, local_err,
-+                                "failed to get device name: ");
-+        goto unrealize;
-+    }
-+
-+    trace_xen_device_realize(type, xendev->name);
-+
-+    xen_device_backend_create(xendev, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        goto unrealize;
-+    }
-+
-+    xen_device_frontend_create(xendev, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        goto unrealize;
-+    }
- 
-     if (xendev_class->realize) {
-         xendev_class->realize(xendev, &local_err);
-@@ -76,18 +366,43 @@ static void xen_device_realize(DeviceState *dev, Error **errp)
-         }
+     if (ioreq->req.operation != BLKIF_OP_READ && blkdev->mode[0] != 'w') {
+-        xen_pv_printf(xendev, 0, "error: write req for ro device\n");
++        error_report("error: write req for ro device");
+         goto err;
      }
  
-+    xen_device_backend_printf(xendev, "frontend", "%s",
-+                              xendev->frontend_path);
-+    xen_device_backend_printf(xendev, "frontend-id", "%u",
-+                              xendev->frontend_id);
-+    xen_device_backend_printf(xendev, "online", "%u", 1);
-+    xen_device_backend_printf(xendev, "hotplug-status", "connected");
-+
-+    xen_device_backend_set_state(xendev, XenbusStateInitWait);
-+
-+    xen_device_frontend_printf(xendev, "backend", "%s",
-+                               xendev->backend_path);
-+    xen_device_frontend_printf(xendev, "backend-id", "%u",
-+                               xenbus->backend_id);
-+
-+    xen_device_frontend_set_state(xendev, XenbusStateInitialising);
-+
-+    xendev->exit.notify = xen_device_exit;
-+    qemu_add_exit_notifier(&xendev->exit);
-     return;
+     ioreq->start = ioreq->req.sector_number * blkdev->file_blk;
+     for (i = 0; i < ioreq->req.nr_segments; i++) {
+         if (i == BLKIF_MAX_SEGMENTS_PER_REQUEST) {
+-            xen_pv_printf(xendev, 0, "error: nr_segments too big\n");
++            error_report("error: nr_segments too big");
+             goto err;
+         }
+         if (ioreq->req.seg[i].first_sect > ioreq->req.seg[i].last_sect) {
+-            xen_pv_printf(xendev, 0, "error: first > last sector\n");
++            error_report("error: first > last sector");
+             goto err;
+         }
+         if (ioreq->req.seg[i].last_sect * BLOCK_SIZE >= XC_PAGE_SIZE) {
+-            xen_pv_printf(xendev, 0, "error: page crossing\n");
++            error_report("error: page crossing");
+             goto err;
+         }
  
- unrealize:
-     xen_device_unrealize(dev, &error_abort);
+@@ -232,7 +208,7 @@ static int ioreq_parse(struct ioreq *ioreq)
+         ioreq->size += len;
+     }
+     if (ioreq->start + ioreq->size > blkdev->file_size) {
+-        xen_pv_printf(xendev, 0, "error: access beyond end of file\n");
++        error_report("error: access beyond end of file");
+         goto err;
+     }
+     return 0;
+@@ -278,8 +254,7 @@ static int ioreq_grant_copy(struct ioreq *ioreq)
+     rc = xen_be_copy_grant_refs(xendev, to_domain, segs, count);
+ 
+     if (rc) {
+-        xen_pv_printf(xendev, 0,
+-                      "failed to copy data %d\n", rc);
++        error_report("failed to copy data %d", rc);
+         ioreq->aio_errors++;
+         return -1;
+     }
+@@ -298,8 +273,9 @@ static void qemu_aio_complete(void *opaque, int ret)
+     aio_context_acquire(blkdev->ctx);
+ 
+     if (ret != 0) {
+-        xen_pv_printf(xendev, 0, "%s I/O error\n",
+-                      ioreq->req.operation == BLKIF_OP_READ ? "read" : "write");
++        error_report("%s I/O error",
++                     ioreq->req.operation == BLKIF_OP_READ ?
++                     "read" : "write");
+         ioreq->aio_errors++;
+     }
+ 
+@@ -605,8 +581,6 @@ static void blk_handle_requests(struct XenBlkDev *blkdev)
+     }
  }
  
-+static Property xen_device_props[] = {
-+    DEFINE_PROP_UINT16("frontend-id", XenDevice, frontend_id,
-+                       DOMID_INVALID),
-+    DEFINE_PROP_END_OF_LIST()
-+};
-+
- static void xen_device_class_init(ObjectClass *class, void *data)
+-/* ------------------------------------------------------------- */
+-
+ static void blk_bh(void *opaque)
  {
-     DeviceClass *dev_class = DEVICE_CLASS(class);
- 
-     dev_class->realize = xen_device_realize;
-     dev_class->unrealize = xen_device_unrealize;
-+    dev_class->props = xen_device_props;
-     dev_class->bus_type = TYPE_XEN_BUS;
+     struct XenBlkDev *blkdev = opaque;
+@@ -634,346 +608,6 @@ static void blk_alloc(struct XenLegacyDevice *xendev)
+     blkdev->bh = aio_bh_new(blkdev->ctx, blk_bh, blkdev);
  }
  
-diff --git a/include/hw/xen/xen-bus-helper.h b/include/hw/xen/xen-bus-helper.h
-new file mode 100644
-index 0000000..083e4de
---- /dev/null
-+++ b/include/hw/xen/xen-bus-helper.h
-@@ -0,0 +1,34 @@
-+/*
-+ * Copyright (c) 2018  Citrix Systems Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef HW_XEN_BUS_HELPER_H
-+#define HW_XEN_BUS_HELPER_H
-+
-+#include "hw/xen/xen_common.h"
-+
-+const char *xs_strstate(enum xenbus_state state);
-+
-+void xs_node_create(struct xs_handle *xsh, const char *node,
-+                    struct xs_permissions perms[], unsigned int nr_perms,
-+                    Error **errp);
-+void xs_node_destroy(struct xs_handle *xsh, const char *node, Error **errp);
-+
-+/* Write to node/key unless node is empty, in which case write to key */
-+void xs_node_vprintf(struct xs_handle *xsh, const char *node, const char *key,
-+                     Error **errp, const char *fmt, va_list ap)
-+    GCC_FMT_ATTR(5, 0);
-+void xs_node_printf(struct xs_handle *xsh, const char *node, const char *key,
-+                    Error **errp, const char *fmt, ...)
-+    GCC_FMT_ATTR(5, 6);
-+
-+/* Read from node/key unless node is empty, in which case read from key */
-+int xs_node_vscanf(struct xs_handle *xsh, const char *node, const char *key,
-+                   Error **errp, const char *fmt, va_list ap);
-+int xs_node_scanf(struct xs_handle *xsh, const char *node, const char *key,
-+                  Error **errp, const char *fmt, ...);
-+
-+#endif /* HW_XEN_BUS_HELPER_H */
-diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-index 0cb1246..85a75d8 100644
---- a/include/hw/xen/xen-bus.h
-+++ b/include/hw/xen/xen-bus.h
-@@ -8,12 +8,19 @@
- #ifndef HW_XEN_BUS_H
- #define HW_XEN_BUS_H
+-static void blk_parse_discard(struct XenBlkDev *blkdev)
+-{
+-    struct XenLegacyDevice *xendev = &blkdev->xendev;
+-    int enable;
+-
+-    blkdev->feature_discard = true;
+-
+-    if (xenstore_read_be_int(xendev, "discard-enable", &enable) == 0) {
+-        blkdev->feature_discard = !!enable;
+-    }
+-
+-    if (blkdev->feature_discard) {
+-        xenstore_write_be_int(xendev, "feature-discard", 1);
+-    }
+-}
+-
+-static int blk_init(struct XenLegacyDevice *xendev)
+-{
+-    struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
+-    int info = 0;
+-    char *directiosafe = NULL;
+-
+-    trace_xen_disk_init(xendev->name);
+-
+-    /* read xenstore entries */
+-    if (blkdev->params == NULL) {
+-        char *h = NULL;
+-        blkdev->params = xenstore_read_be_str(xendev, "params");
+-        if (blkdev->params != NULL) {
+-            h = strchr(blkdev->params, ':');
+-        }
+-        if (h != NULL) {
+-            blkdev->fileproto = blkdev->params;
+-            blkdev->filename  = h + 1;
+-            *h = 0;
+-        } else {
+-            blkdev->fileproto = "<unset>";
+-            blkdev->filename  = blkdev->params;
+-        }
+-    }
+-    if (!strcmp("aio", blkdev->fileproto)) {
+-        blkdev->fileproto = "raw";
+-    }
+-    if (!strcmp("vhd", blkdev->fileproto)) {
+-        blkdev->fileproto = "vpc";
+-    }
+-    if (blkdev->mode == NULL) {
+-        blkdev->mode = xenstore_read_be_str(xendev, "mode");
+-    }
+-    if (blkdev->type == NULL) {
+-        blkdev->type = xenstore_read_be_str(xendev, "type");
+-    }
+-    if (blkdev->dev == NULL) {
+-        blkdev->dev = xenstore_read_be_str(xendev, "dev");
+-    }
+-    if (blkdev->devtype == NULL) {
+-        blkdev->devtype = xenstore_read_be_str(xendev, "device-type");
+-    }
+-    directiosafe = xenstore_read_be_str(xendev, "direct-io-safe");
+-    blkdev->directiosafe = (directiosafe && atoi(directiosafe));
+-
+-    /* do we have all we need? */
+-    if (blkdev->params == NULL ||
+-        blkdev->mode == NULL   ||
+-        blkdev->type == NULL   ||
+-        blkdev->dev == NULL) {
+-        goto out_error;
+-    }
+-
+-    /* read-only ? */
+-    if (strcmp(blkdev->mode, "w")) {
+-        info  |= VDISK_READONLY;
+-    }
+-
+-    /* cdrom ? */
+-    if (blkdev->devtype && !strcmp(blkdev->devtype, "cdrom")) {
+-        info  |= VDISK_CDROM;
+-    }
+-
+-    blkdev->file_blk  = BLOCK_SIZE;
+-
+-    /* fill info
+-     * blk_connect supplies sector-size and sectors
+-     */
+-    xenstore_write_be_int(xendev, "feature-flush-cache", 1);
+-    xenstore_write_be_int(xendev, "info", info);
+-
+-    xenstore_write_be_int(xendev, "max-ring-page-order",
+-                          MAX_RING_PAGE_ORDER);
+-
+-    blk_parse_discard(blkdev);
+-
+-    g_free(directiosafe);
+-    return 0;
+-
+-out_error:
+-    g_free(blkdev->params);
+-    blkdev->params = NULL;
+-    g_free(blkdev->mode);
+-    blkdev->mode = NULL;
+-    g_free(blkdev->type);
+-    blkdev->type = NULL;
+-    g_free(blkdev->dev);
+-    blkdev->dev = NULL;
+-    g_free(blkdev->devtype);
+-    blkdev->devtype = NULL;
+-    g_free(directiosafe);
+-    blkdev->directiosafe = false;
+-    return -1;
+-}
+-
+-static int blk_connect(struct XenLegacyDevice *xendev)
+-{
+-    struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
+-    int index, qflags;
+-    bool readonly = true;
+-    bool writethrough = true;
+-    int order, ring_ref;
+-    unsigned int ring_size, max_grants;
+-    unsigned int i;
+-
+-    trace_xen_disk_connect(xendev->name);
+-
+-    /* read-only ? */
+-    if (blkdev->directiosafe) {
+-        qflags = BDRV_O_NOCACHE | BDRV_O_NATIVE_AIO;
+-    } else {
+-        qflags = 0;
+-        writethrough = false;
+-    }
+-    if (strcmp(blkdev->mode, "w") == 0) {
+-        qflags |= BDRV_O_RDWR;
+-        readonly = false;
+-    }
+-    if (blkdev->feature_discard) {
+-        qflags |= BDRV_O_UNMAP;
+-    }
+-
+-    /* init qemu block driver */
+-    index = (xendev->dev - 202 * 256) / 16;
+-    blkdev->dinfo = drive_get(IF_XEN, 0, index);
+-    if (!blkdev->dinfo) {
+-        Error *local_err = NULL;
+-        QDict *options = NULL;
+-
+-        if (strcmp(blkdev->fileproto, "<unset>")) {
+-            options = qdict_new();
+-            qdict_put_str(options, "driver", blkdev->fileproto);
+-        }
+-
+-        /* setup via xenbus -> create new block driver instance */
+-        xen_pv_printf(xendev, 2, "create new bdrv (xenbus setup)\n");
+-        blkdev->blk = blk_new_open(blkdev->filename, NULL, options,
+-                                   qflags, &local_err);
+-        if (!blkdev->blk) {
+-            xen_pv_printf(xendev, 0, "error: %s\n",
+-                          error_get_pretty(local_err));
+-            error_free(local_err);
+-            return -1;
+-        }
+-        blk_set_enable_write_cache(blkdev->blk, !writethrough);
+-    } else {
+-        /* setup via qemu cmdline -> already setup for us */
+-        xen_pv_printf(xendev, 2,
+-                      "get configured bdrv (cmdline setup)\n");
+-        blkdev->blk = blk_by_legacy_dinfo(blkdev->dinfo);
+-        if (blk_is_read_only(blkdev->blk) && !readonly) {
+-            xen_pv_printf(xendev, 0, "Unexpected read-only drive");
+-            blkdev->blk = NULL;
+-            return -1;
+-        }
+-        /* blkdev->blk is not create by us, we get a reference
+-         * so we can blk_unref() unconditionally */
+-        blk_ref(blkdev->blk);
+-    }
+-    blk_attach_dev_legacy(blkdev->blk, blkdev);
+-    blkdev->file_size = blk_getlength(blkdev->blk);
+-    if (blkdev->file_size < 0) {
+-        BlockDriverState *bs = blk_bs(blkdev->blk);
+-        const char *drv_name = bs ? bdrv_get_format_name(bs) : NULL;
+-        xen_pv_printf(xendev, 1, "blk_getlength: %d (%s) | drv %s\n",
+-                      (int)blkdev->file_size, strerror(-blkdev->file_size),
+-                      drv_name ?: "-");
+-        blkdev->file_size = 0;
+-    }
+-
+-    xen_pv_printf(xendev, 1, "type \"%s\", fileproto \"%s\", filename \"%s\","
+-                  " size %" PRId64 " (%" PRId64 " MB)\n",
+-                  blkdev->type, blkdev->fileproto, blkdev->filename,
+-                  blkdev->file_size, blkdev->file_size / MiB);
+-
+-    /* Fill in number of sector size and number of sectors */
+-    xenstore_write_be_int(xendev, "sector-size", blkdev->file_blk);
+-    xenstore_write_be_int64(xendev, "sectors",
+-                            blkdev->file_size / blkdev->file_blk);
+-
+-    if (xenstore_read_fe_int(xendev, "ring-page-order",
+-                             &order) == -1) {
+-        blkdev->nr_ring_ref = 1;
+-
+-        if (xenstore_read_fe_int(xendev, "ring-ref",
+-                                 &ring_ref) == -1) {
+-            return -1;
+-        }
+-        blkdev->ring_ref[0] = ring_ref;
+-
+-    } else if (order >= 0 && order <= MAX_RING_PAGE_ORDER) {
+-        blkdev->nr_ring_ref = 1 << order;
+-
+-        for (i = 0; i < blkdev->nr_ring_ref; i++) {
+-            char *key;
+-
+-            key = g_strdup_printf("ring-ref%u", i);
+-            if (!key) {
+-                return -1;
+-            }
+-
+-            if (xenstore_read_fe_int(xendev, key,
+-                                     &ring_ref) == -1) {
+-                g_free(key);
+-                return -1;
+-            }
+-            blkdev->ring_ref[i] = ring_ref;
+-
+-            g_free(key);
+-        }
+-    } else {
+-        xen_pv_printf(xendev, 0, "invalid ring-page-order: %d\n",
+-                      order);
+-        return -1;
+-    }
+-
+-    if (xenstore_read_fe_int(xendev, "event-channel",
+-                             &xendev->remote_port) == -1) {
+-        return -1;
+-    }
+-
+-    if (!xendev->protocol) {
+-        blkdev->protocol = BLKIF_PROTOCOL_NATIVE;
+-    } else if (strcmp(xendev->protocol, XEN_IO_PROTO_ABI_NATIVE) == 0) {
+-        blkdev->protocol = BLKIF_PROTOCOL_NATIVE;
+-    } else if (strcmp(xendev->protocol, XEN_IO_PROTO_ABI_X86_32) == 0) {
+-        blkdev->protocol = BLKIF_PROTOCOL_X86_32;
+-    } else if (strcmp(xendev->protocol, XEN_IO_PROTO_ABI_X86_64) == 0) {
+-        blkdev->protocol = BLKIF_PROTOCOL_X86_64;
+-    } else {
+-        blkdev->protocol = BLKIF_PROTOCOL_NATIVE;
+-    }
+-
+-    ring_size = XC_PAGE_SIZE * blkdev->nr_ring_ref;
+-    switch (blkdev->protocol) {
+-    case BLKIF_PROTOCOL_NATIVE:
+-    {
+-        blkdev->max_requests = __CONST_RING_SIZE(blkif, ring_size);
+-        break;
+-    }
+-    case BLKIF_PROTOCOL_X86_32:
+-    {
+-        blkdev->max_requests = __CONST_RING_SIZE(blkif_x86_32, ring_size);
+-        break;
+-    }
+-    case BLKIF_PROTOCOL_X86_64:
+-    {
+-        blkdev->max_requests = __CONST_RING_SIZE(blkif_x86_64, ring_size);
+-        break;
+-    }
+-    default:
+-        return -1;
+-    }
+-
+-    /* Add on the number needed for the ring pages */
+-    max_grants = blkdev->nr_ring_ref;
+-
+-    xen_be_set_max_grant_refs(xendev, max_grants);
+-    blkdev->sring = xen_be_map_grant_refs(xendev, blkdev->ring_ref,
+-                                          blkdev->nr_ring_ref,
+-                                          PROT_READ | PROT_WRITE);
+-    if (!blkdev->sring) {
+-        return -1;
+-    }
+-
+-    switch (blkdev->protocol) {
+-    case BLKIF_PROTOCOL_NATIVE:
+-    {
+-        blkif_sring_t *sring_native = blkdev->sring;
+-        BACK_RING_INIT(&blkdev->rings.native, sring_native, ring_size);
+-        break;
+-    }
+-    case BLKIF_PROTOCOL_X86_32:
+-    {
+-        blkif_x86_32_sring_t *sring_x86_32 = blkdev->sring;
+-
+-        BACK_RING_INIT(&blkdev->rings.x86_32_part, sring_x86_32, ring_size);
+-        break;
+-    }
+-    case BLKIF_PROTOCOL_X86_64:
+-    {
+-        blkif_x86_64_sring_t *sring_x86_64 = blkdev->sring;
+-
+-        BACK_RING_INIT(&blkdev->rings.x86_64_part, sring_x86_64, ring_size);
+-        break;
+-    }
+-    }
+-
+-    blk_set_aio_context(blkdev->blk, blkdev->ctx);
+-
+-    xen_be_bind_evtchn(xendev);
+-
+-    xen_pv_printf(xendev, 1, "ok: proto %s, nr-ring-ref %u, "
+-                  "remote port %d, local port %d\n",
+-                  xendev->protocol, blkdev->nr_ring_ref,
+-                  xendev->remote_port, xendev->local_port);
+-    return 0;
+-}
+-
+-static void blk_disconnect(struct XenLegacyDevice *xendev)
+-{
+-    struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
+-
+-    trace_xen_disk_disconnect(xendev->name);
+-
+-    aio_context_acquire(blkdev->ctx);
+-
+-    if (blkdev->blk) {
+-        blk_set_aio_context(blkdev->blk, qemu_get_aio_context());
+-        blk_detach_dev(blkdev->blk, blkdev);
+-        blk_unref(blkdev->blk);
+-        blkdev->blk = NULL;
+-    }
+-    xen_pv_unbind_evtchn(xendev);
+-
+-    aio_context_release(blkdev->ctx);
+-
+-    if (blkdev->sring) {
+-        xen_be_unmap_grant_refs(xendev, blkdev->sring,
+-                                blkdev->nr_ring_ref);
+-        blkdev->sring = NULL;
+-    }
+-}
+-
+ static int blk_free(struct XenLegacyDevice *xendev)
+ {
+     struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
+@@ -1006,14 +640,3 @@ static void blk_event(struct XenLegacyDevice *xendev)
  
-+#include "hw/xen/xen_common.h"
- #include "hw/sysbus.h"
- 
- typedef struct XenDevice {
-     DeviceState qdev;
-+    domid_t frontend_id;
-+    char *name;
-+    char *backend_path, *frontend_path;
-+    enum xenbus_state backend_state, frontend_state;
-+    Notifier exit;
- } XenDevice;
- 
-+typedef char *(*XenDeviceGetName)(XenDevice *xendev, Error **errp);
- typedef void (*XenDeviceRealize)(XenDevice *xendev, Error **errp);
- typedef void (*XenDeviceUnrealize)(XenDevice *xendev, Error **errp);
- 
-@@ -21,6 +28,9 @@ typedef struct XenDeviceClass {
-     /*< private >*/
-     DeviceClass parent_class;
-     /*< public >*/
-+    const char *backend;
-+    const char *device;
-+    XenDeviceGetName get_name;
-     XenDeviceRealize realize;
-     XenDeviceUnrealize unrealize;
- } XenDeviceClass;
-@@ -35,6 +45,8 @@ typedef struct XenDeviceClass {
- 
- typedef struct XenBus {
-     BusState qbus;
-+    domid_t backend_id;
-+    struct xs_handle *xsh;
- } XenBus;
- 
- typedef struct XenBusClass {
+     qemu_bh_schedule(blkdev->bh);
+ }
+-
+-struct XenDevOps xen_blkdev_ops = {
+-    .flags      = DEVOPS_FLAG_NEED_GNTDEV,
+-    .size       = sizeof(struct XenBlkDev),
+-    .alloc      = blk_alloc,
+-    .init       = blk_init,
+-    .initialise = blk_connect,
+-    .disconnect = blk_disconnect,
+-    .event      = blk_event,
+-    .free       = blk_free,
+-};
 -- 
 2.1.4
