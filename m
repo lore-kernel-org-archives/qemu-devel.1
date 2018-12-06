@@ -1,19 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=8715dceb6=Paul.Durrant@citrix.com>)
-	id 1gUvXR-0006qg-Nk
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:26:09 -0500
+	(envelope-from <alifm@linux.ibm.com>) id 1gUvXj-0007QQ-KR
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:26:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=8715dceb6=Paul.Durrant@citrix.com>)
-	id 1gUvHo-0005FS-Qu
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:10:01 -0500
-From: Paul Durrant <paul.durrant@citrix.com>
-Date: Thu, 6 Dec 2018 15:08:26 +0000
-Message-ID: <1544108924-10841-1-git-send-email-paul.durrant@citrix.com>
+	(envelope-from <alifm@linux.ibm.com>) id 1gUvXg-0005kv-Fd
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:26:23 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52169
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1gUvXg-0005kR-92
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:26:20 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wB6FLVr5016103
+	for <qemu-devel@nongnu.org>; Thu, 6 Dec 2018 10:26:19 -0500
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2p75skaw5y-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 10:26:19 -0500
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
+	Thu, 6 Dec 2018 15:26:18 -0000
+References: <20181122165432.4437-1-cohuck@redhat.com>
+	<20181204133810.66e8cfe5@oc2783563651>
+	<20181204141130.06496b9b.cohuck@redhat.com>
+	<20181204160236.54de2784@oc2783563651>
+	<20181205135402.33c2b22d.cohuck@redhat.com>
+	<aa190e90-f832-7958-aa83-1486e570bf40@linux.ibm.com>
+	<20181206153917.59e8e291.cohuck@redhat.com>
+From: Farhan Ali <alifm@linux.ibm.com>
+Date: Thu, 6 Dec 2018 10:26:12 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 00/18] Xen PV backend 'qdevification'
+In-Reply-To: <20181206153917.59e8e291.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <bb6c992e-ac03-ce3e-fba8-283e392f1543@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 0/3] vfio-ccw: support hsch/csch (kernel
+ part)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,126 +48,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Greg Kurz <groug@kaod.org>, Jason Wang <jasowang@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Tim Smith <tim.smith@citrix.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Jason J . Herne" <jjherne@linux.ibm.com>
 
-This series introduces a new QOM compliant framework for Xen PV backends.
-This is achieved by first moving the current non-compliant framework aside,
-before building up a new framework incrementally.
 
-This series was prompted by a thread [1] started by Kevin Wolf in response
-to patches against xen_disk.c posted by Tim Smith. Therefore, alongside
-the patches introducing the new framework, other patches build up a QOM
-compliant replacement for 'xen_disk', called 'xen-qdisk'. Patch #16 swaps
-this new device into place (having establisheda mechanism to auto-
-instantiate devices that is compliant with existing Xen toolstacks in
-patch #15) and patch #18 then removes the old xen_disk code.
 
-Subsequent series will port other Xen PV backends across to the new
-framework.
+On 12/06/2018 09:39 AM, Cornelia Huck wrote:
+> On Wed, 5 Dec 2018 13:34:11 -0500
+> Farhan Ali <alifm@linux.ibm.com> wrote:
+> 
+>> On 12/05/2018 07:54 AM, Cornelia Huck wrote:
+>>>> Yeah, that is perfectly clear, but it ain't the complete story. E.g.
+>>>> are subsequent commands blocking until the preceding command finishes
+>>>> is part of the interface. And what is good implementation depends on the
+>>>> answer. What I mean, I first need to understand how things are supposed
+>>>> to work (together) so I can double check that against the
+>>>> implementation. Otherwise all I can do is nitpicking.
+>>>>
+>>>> To get more tangible: we are in the middle of processing an SSCH request
+>>>> (e.g. doing the translation) when a HSCH comes in. What should happen?
+>>>> Should we start processing HSCH after he instruction part of SSCH is
+>>>> done -- which currently includes translation? Or should we -EBUSY? Or do
+>>>> we abort START related activities and do the HALT stuff?
+>>> I think most of the sorting-out-the-operations stuff should be done by
+>>> the hardware itself, and we should not really try to enforce anything
+>>> special in our vfio code.
+>>>
+>>> For your example, it might be best if a hsch is always accepted and
+>>> send on towards the hardware. Probably best to reflect back -EAGAIN if
+>>> we're currently processing another instruction from another vcpu, so
+>>> that the user space caller can retry. Same for ssch, if another ssch is
+>>> already being processed. We*could*  reflect cc 2 if the fctl bit is
+>>> already set, but that won't do for csch, so it is probably best to have
+>>> the hardware figure that out in any case.
+>>>
+>>> If I read the code correctly, we currently reflect -EBUSY and not
+>>> -EAGAIN if we get a ssch request while already processing another one.
+>>> QEMU hands that back to the guest as a cc 2, which is not 100% correct.
+>>> In practice, we don't see this with Linux guests due to locking.
+>>>    
+>>
+>> If we have a ssch and a csch immediately afterwards from userspace, will
+>> we end up issuing csch first and then ssch to the hardware?
+>>
+>> If I understand correctly, the ccw translation as part of the ssch can
+>> be a slow operation so it might be possible we issue the csch first?
+>> In that case we won't actually clear the original start function as
+>> intended.
+> 
+> When we start processing the ssch request (translation and so on), we
+> set the state to BUSY. This means that any csch request will get a
+> -EBUSY, no overtaking possible. (I think maybe I'll need to check what
+> this series looks like if I rebase it on top of Pierre's rework, as he
+> did some changes in the state machine.)
 
-The series is also available as a repository branch [2] on xenbits.xen.org.
+I think you meant the state is set to BOXED? otherwise the patch 3 says 
+if state is BUSY and CLEAR event request comes in, we issue the clear 
+instruction, no?
 
-[1] https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg00259.html
-[2] http://xenbits.xen.org/gitweb/?p=people/pauldu/qemu.git;a=shortlog;h=refs/heads/qom27
 
-Paul Durrant (18):
-  xen: re-name XenDevice to XenLegacyDevice...
-  xen: introduce new 'XenBus' and 'XenDevice' object hierarchy
-  xen: introduce 'xen-block', 'xen-disk' and 'xen-cdrom'
-  xen: create xenstore areas for XenDevice-s
-  xen: add xenstore watcher infrastructure
-  xen: add grant table interface for XenDevice-s
-  xen: add event channel interface for XenDevice-s
-  xen: duplicate xen_disk.c as basis of dataplane/xen-block.c
-  xen: remove unnecessary code from dataplane/xen-block.c
-  xen: add header and build dataplane/xen-block.c
-  xen: remove 'XenBlkDev' and 'blkdev' names from dataplane/xen-block
-  xen: remove 'ioreq' struct/varable/field names from
-    dataplane/xen-block.c
-  xen: purge 'blk' and 'ioreq' from function names in
-    dataplane/xen-block.c
-  xen: add implementations of xen-block connect and disconnect
-    functions...
-  xen: add a mechanism to automatically create XenDevice-s...
-  xen: automatically create XenBlockDevice-s
-  MAINTAINERS: add myself as a Xen maintainer
-  xen: remove the legacy 'xen_disk' backend
-
- MAINTAINERS                         |    5 +-
- hw/9pfs/xen-9p-backend.c            |   16 +-
- hw/block/Makefile.objs              |    2 +-
- hw/block/dataplane/Makefile.objs    |    1 +
- hw/block/dataplane/xen-block.c      |  814 ++++++++++++++++++++++++++
- hw/block/dataplane/xen-block.h      |   29 +
- hw/block/trace-events               |   11 +
- hw/block/xen-block.c                |  853 +++++++++++++++++++++++++++
- hw/block/xen_disk.c                 | 1011 --------------------------------
- hw/char/xen_console.c               |   12 +-
- hw/display/xenfb.c                  |   25 +-
- hw/i386/xen/xen-hvm.c               |    5 +-
- hw/i386/xen/xen-mapcache.c          |    2 +-
- hw/i386/xen/xen_platform.c          |    2 +-
- hw/net/xen_nic.c                    |   14 +-
- hw/usb/xen-usb.c                    |   25 +-
- hw/xen/Makefile.objs                |    2 +-
- hw/xen/trace-events                 |   25 +
- hw/xen/xen-backend.c                |   69 +++
- hw/xen/xen-bus-helper.c             |  181 ++++++
- hw/xen/xen-bus.c                    | 1094 +++++++++++++++++++++++++++++++++++
- hw/xen/xen-common.c                 |    2 +-
- hw/xen/xen-legacy-backend.c         |  853 +++++++++++++++++++++++++++
- hw/xen/xen_backend.c                |  845 ---------------------------
- hw/xen/xen_devconfig.c              |    2 +-
- hw/xen/xen_pt.c                     |    2 +-
- hw/xen/xen_pt_config_init.c         |    2 +-
- hw/xen/xen_pt_graphics.c            |    2 +-
- hw/xen/xen_pt_msi.c                 |    2 +-
- hw/xen/xen_pvdev.c                  |   20 +-
- hw/xenpv/xen_domainbuild.c          |    2 +-
- hw/xenpv/xen_machine_pv.c           |    5 +-
- include/hw/xen/xen-backend.h        |   26 +
- include/hw/xen/xen-block.h          |   79 +++
- include/hw/xen/xen-bus-helper.h     |   40 ++
- include/hw/xen/xen-bus.h            |  138 +++++
- include/hw/xen/xen-legacy-backend.h |  104 ++++
- include/hw/xen/xen_backend.h        |   99 ----
- include/hw/xen/xen_pvdev.h          |   38 +-
- include/qemu/module.h               |    3 +
- 40 files changed, 4420 insertions(+), 2042 deletions(-)
- create mode 100644 hw/block/dataplane/xen-block.c
- create mode 100644 hw/block/dataplane/xen-block.h
- create mode 100644 hw/block/xen-block.c
- delete mode 100644 hw/block/xen_disk.c
- create mode 100644 hw/xen/xen-backend.c
- create mode 100644 hw/xen/xen-bus-helper.c
- create mode 100644 hw/xen/xen-bus.c
- create mode 100644 hw/xen/xen-legacy-backend.c
- delete mode 100644 hw/xen/xen_backend.c
- create mode 100644 include/hw/xen/xen-backend.h
- create mode 100644 include/hw/xen/xen-block.h
- create mode 100644 include/hw/xen/xen-bus-helper.h
- create mode 100644 include/hw/xen/xen-bus.h
- create mode 100644 include/hw/xen/xen-legacy-backend.h
- delete mode 100644 include/hw/xen/xen_backend.h
----
-Cc: Anthony Perard <anthony.perard@citrix.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: "Marc-André Lureau" <marcandre.lureau@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Tim Smith <tim.smith@citrix.com>
-
-v2:
- - Fix boilerplates of introduced files and leave existing ones alone
--- 
-2.1.4
+> 
+> My idea above was to return -EAGAIN instead of -EBUSY, so that user
+> space can retry the operation.
+> 
+> 
