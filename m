@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gUzHd-0000SA-GK
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 14:26:02 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gUzHl-0000Xv-IG
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 14:26:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gUzHZ-0003rF-Ki
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 14:25:59 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gUzHf-000402-Gf
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 14:26:06 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Thu,  6 Dec 2018 14:25:42 -0500
-Message-Id: <20181206192544.3987-2-jsnow@redhat.com>
+Date: Thu,  6 Dec 2018 14:25:43 -0500
+Message-Id: <20181206192544.3987-3-jsnow@redhat.com>
 In-Reply-To: <20181206192544.3987-1-jsnow@redhat.com>
 References: <20181206192544.3987-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/3] blockdev: abort transactions in reverse
- order
+Subject: [Qemu-devel] [PATCH 2/3] blockdev: n-ary bitmap merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,75 +22,176 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, eblake@redhat.com, Markus Armbruster <armbru@redhat.com>, vsementov@virtuozzo.com, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
-Presently, we abort transactions in the same order they were processed in.
-Bitmap commands, though, attempt to restore backup data structures on abort.
-To that end, though, they need to be aborted in reverse chronological order.
-
-Replace the QSIMPLEQ data structure with a QTAILQ one, so we can iterate
-in reverse for the abort phase of the transaction.
+Especially outside of transactions, it is helpful to provide
+all-or-nothing semantics for bitmap merges. This facilitates
+the coalescing of multiple bitmaps into a single target for
+the "checkpoint" interpretation when assembling bitmaps that
+represent arbitrary points in time from component bitmaps.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- blockdev.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ blockdev.c           | 64 +++++++++++++++++++++++++++++---------------
+ qapi/block-core.json | 22 +++++++--------
+ 2 files changed, 53 insertions(+), 33 deletions(-)
 
 diff --git a/blockdev.c b/blockdev.c
-index 81f95d920b..1ba706df8b 100644
+index 1ba706df8b..0f740fd964 100644
 --- a/blockdev.c
 +++ b/blockdev.c
-@@ -1341,7 +1341,7 @@ struct BlkActionState {
-     const BlkActionOps *ops;
-     JobTxn *block_job_txn;
-     TransactionProperties *txn_props;
--    QSIMPLEQ_ENTRY(BlkActionState) entry;
-+    QTAILQ_ENTRY(BlkActionState) entry;
- };
+@@ -2122,33 +2122,26 @@ static void block_dirty_bitmap_disable_abort(BlkActionState *common)
+     }
+ }
  
- /* internal snapshot private data */
-@@ -2269,8 +2269,8 @@ void qmp_transaction(TransactionActionList *dev_list,
-     BlkActionState *state, *next;
-     Error *local_err = NULL;
++void do_block_dirty_bitmap_merge(const char *node, const char *target,
++                                 strList *bitmaps, HBitmap **backup,
++                                 Error **errp);
++
+ static void block_dirty_bitmap_merge_prepare(BlkActionState *common,
+                                              Error **errp)
+ {
+     BlockDirtyBitmapMerge *action;
+     BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
+                                              common, common);
+-    BdrvDirtyBitmap *merge_source;
  
--    QSIMPLEQ_HEAD(snap_bdrv_states, BlkActionState) snap_bdrv_states;
--    QSIMPLEQ_INIT(&snap_bdrv_states);
-+    QTAILQ_HEAD(snap_bdrv_states, BlkActionState) snap_bdrv_states;
-+    QTAILQ_INIT(&snap_bdrv_states);
- 
-     /* Does this transaction get canceled as a group on failure?
-      * If not, we don't really need to make a JobTxn.
-@@ -2301,7 +2301,7 @@ void qmp_transaction(TransactionActionList *dev_list,
-         state->action = dev_info;
-         state->block_job_txn = block_job_txn;
-         state->txn_props = props;
--        QSIMPLEQ_INSERT_TAIL(&snap_bdrv_states, state, entry);
-+        QTAILQ_INSERT_TAIL(&snap_bdrv_states, state, entry);
- 
-         state->ops->prepare(state, &local_err);
-         if (local_err) {
-@@ -2310,7 +2310,7 @@ void qmp_transaction(TransactionActionList *dev_list,
-         }
+     if (action_check_completion_mode(common, errp) < 0) {
+         return;
      }
  
--    QSIMPLEQ_FOREACH(state, &snap_bdrv_states, entry) {
-+    QTAILQ_FOREACH(state, &snap_bdrv_states, entry) {
-         if (state->ops->commit) {
-             state->ops->commit(state);
-         }
-@@ -2321,13 +2321,13 @@ void qmp_transaction(TransactionActionList *dev_list,
+     action = common->action->u.x_block_dirty_bitmap_merge.data;
+-    state->bitmap = block_dirty_bitmap_lookup(action->node,
+-                                              action->dst_name,
+-                                              &state->bs,
+-                                              errp);
+-    if (!state->bitmap) {
+-        return;
+-    }
  
- delete_and_fail:
-     /* failure, and it is all-or-none; roll back all operations */
--    QSIMPLEQ_FOREACH(state, &snap_bdrv_states, entry) {
-+    QTAILQ_FOREACH_REVERSE(state, &snap_bdrv_states, snap_bdrv_states, entry) {
-         if (state->ops->abort) {
-             state->ops->abort(state);
-         }
+-    merge_source = bdrv_find_dirty_bitmap(state->bs, action->src_name);
+-    if (!merge_source) {
+-        return;
+-    }
+-
+-    bdrv_merge_dirty_bitmap(state->bitmap, merge_source, &state->backup, errp);
++    do_block_dirty_bitmap_merge(action->node, action->target,
++                                action->bitmaps, &state->backup,
++                                errp);
+ }
+ 
+ static void abort_prepare(BlkActionState *common, Error **errp)
+@@ -2980,24 +2973,51 @@ void qmp_x_block_dirty_bitmap_disable(const char *node, const char *name,
+     bdrv_disable_dirty_bitmap(bitmap);
+ }
+ 
+-void qmp_x_block_dirty_bitmap_merge(const char *node, const char *dst_name,
+-                                    const char *src_name, Error **errp)
++void do_block_dirty_bitmap_merge(const char *node, const char *target,
++                                 strList *bitmaps, HBitmap **backup,
++                                 Error **errp)
+ {
+     BlockDriverState *bs;
+-    BdrvDirtyBitmap *dst, *src;
++    BdrvDirtyBitmap *dst, *src, *anon;
++    strList *lst;
++    Error *local_err = NULL;
+ 
+-    dst = block_dirty_bitmap_lookup(node, dst_name, &bs, errp);
++    dst = block_dirty_bitmap_lookup(node, target, &bs, errp);
+     if (!dst) {
+         return;
      }
- exit:
--    QSIMPLEQ_FOREACH_SAFE(state, &snap_bdrv_states, entry, next) {
-+    QTAILQ_FOREACH_SAFE(state, &snap_bdrv_states, entry, next) {
-         if (state->ops->clean) {
-             state->ops->clean(state);
-         }
+ 
+-    src = bdrv_find_dirty_bitmap(bs, src_name);
+-    if (!src) {
+-        error_setg(errp, "Dirty bitmap '%s' not found", src_name);
++    anon = bdrv_create_dirty_bitmap(bs, bdrv_dirty_bitmap_granularity(dst),
++                                    NULL, errp);
++    if (!anon) {
+         return;
+     }
+ 
+-    bdrv_merge_dirty_bitmap(dst, src, NULL, errp);
++    for (lst = bitmaps; lst; lst = lst->next) {
++        src = bdrv_find_dirty_bitmap(bs, lst->value);
++        if (!src) {
++            error_setg(errp, "Dirty bitmap '%s' not found", lst->value);
++            goto out;
++        }
++
++        bdrv_merge_dirty_bitmap(anon, src, NULL, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            goto out;
++        }
++    }
++
++    /* Merge into dst; dst is unchanged on failure. */
++    bdrv_merge_dirty_bitmap(dst, anon, backup, errp);
++
++ out:
++    bdrv_release_dirty_bitmap(bs, anon);
++}
++
++void qmp_x_block_dirty_bitmap_merge(const char *node, const char *target,
++                                    strList *bitmaps, Error **errp)
++{
++    do_block_dirty_bitmap_merge(node, target, bitmaps, NULL, errp);
+ }
+ 
+ BlockDirtyBitmapSha256 *qmp_x_debug_block_dirty_bitmap_sha256(const char *node,
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index d4fe710836..320d74ef34 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1818,14 +1818,14 @@
+ #
+ # @node: name of device/node which the bitmap is tracking
+ #
+-# @dst_name: name of the destination dirty bitmap
++# @target: name of the destination dirty bitmap
+ #
+-# @src_name: name of the source dirty bitmap
++# @bitmaps: name(s) of the source dirty bitmap(s)
+ #
+ # Since: 3.0
+ ##
+ { 'struct': 'BlockDirtyBitmapMerge',
+-  'data': { 'node': 'str', 'dst_name': 'str', 'src_name': 'str' } }
++  'data': { 'node': 'str', 'target': 'str', 'bitmaps': ['str'] } }
+ 
+ ##
+ # @block-dirty-bitmap-add:
+@@ -1940,23 +1940,23 @@
+ ##
+ # @x-block-dirty-bitmap-merge:
+ #
+-# FIXME: Rename @src_name and @dst_name to src-name and dst-name.
+-#
+-# Merge @src_name dirty bitmap to @dst_name dirty bitmap. @src_name dirty
+-# bitmap is unchanged. On error, @dst_name is unchanged.
++# Merge dirty bitmaps listed in @bitmaps to the @target dirty bitmap.
++# The @bitmaps dirty bitmaps are unchanged.
++# On error, @target is unchanged.
+ #
+ # Returns: nothing on success
+ #          If @node is not a valid block device, DeviceNotFound
+-#          If @dst_name or @src_name is not found, GenericError
+-#          If bitmaps has different sizes or granularities, GenericError
++#          If any bitmap in @bitmaps or @target is not found, GenericError
++#          If any of the bitmaps have different sizes or granularities,
++#              GenericError
+ #
+ # Since: 3.0
+ #
+ # Example:
+ #
+ # -> { "execute": "x-block-dirty-bitmap-merge",
+-#      "arguments": { "node": "drive0", "dst_name": "bitmap0",
+-#                     "src_name": "bitmap1" } }
++#      "arguments": { "node": "drive0", "target": "bitmap0",
++#                     "bitmaps": ["bitmap1"] } }
+ # <- { "return": {} }
+ #
+ ##
 -- 
 2.17.2
