@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1gUq0r-0004Rd-3s
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 04:32:09 -0500
+	(envelope-from <david@redhat.com>) id 1gUq2f-0006tN-As
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 04:33:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1gUq0l-0001dE-FE
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 04:32:05 -0500
-Received: from forwardcorp1g.cmail.yandex.net ([87.250.241.190]:36337)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
-	id 1gUq0k-0001Zf-2X
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 04:31:58 -0500
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-In-Reply-To: <20181206063552.6701-2-xieyongji@baidu.com>
-References: <20181206063552.6701-1-xieyongji@baidu.com>
-	<20181206063552.6701-2-xieyongji@baidu.com>
+	(envelope-from <david@redhat.com>) id 1gUq2c-00035Z-5j
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 04:33:57 -0500
+References: <20181130094957.4121-1-david@redhat.com>
+	<b1bd36ca-f0e0-4973-86b8-6dc8b2c0e4b5@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <466691ef-441b-af97-1c1c-adf5d7b67f48@redhat.com>
+Date: Thu, 6 Dec 2018 10:33:49 +0100
 MIME-Version: 1.0
-Date: Thu, 06 Dec 2018 12:31:51 +0300
-Message-Id: <1167371544088711@myt4-a988562a11ab.qloud-c.yandex.net>
+In-Reply-To: <b1bd36ca-f0e0-4973-86b8-6dc8b2c0e4b5@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 1/6] char-socket: Enable "wait"
- option for client mode
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] s390x/tod: Properly stop the KVM TOD
+ while the guest is not running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +25,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "elohimes@gmail.com" <elohimes@gmail.com>, "mst@redhat.com" <mst@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>
-Cc: "nixun@baidu.com" <nixun@baidu.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "lilin24@baidu.com" <lilin24@baidu.com>, "zhangyu31@baidu.com" <zhangyu31@baidu.com>, "chaiwen@baidu.com" <chaiwen@baidu.com>, Xie Yongji <xieyongji@baidu.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 
-Hi,
+On 04.12.18 09:27, Christian Borntraeger wrote:
+> On 30.11.2018 10:49, David Hildenbrand wrote:
+>> Just like on other architectures, we should stop the clock while the guest
+>> is not running. This is already properly done for TCG. Right now, doing an
+>> offline migration (stop, migrate, cont) can easily trigger stalls in the
+>> guest.
+>>
+>> Even doing a
+>>     (hmp) stop
+>>     ... wait 2 minutes ...
+>>     (hmp) cont
+>> will already trigger stalls.
+>>
+>> So whenever the guest stops, backup the KVM TOD. When continuing to run
+>> the guest, restore the KVM TOD.
+>>
+>> One special case is starting a simple VM: Reading the TOD from KVM to
+>> stop it right away until the guest is actually started means that the
+>> time of any simple VM will already differ to the host time. We can
+>> simply leave the TOD running and the guest won't be able to recognize
+>> it.
+>>
+>> For migration, we actually want to keep the TOD stopped until really
+>> starting the guest. To be able to catch most errors, we should however
+>> try to set the TOD in addition to simply storing it. So we can still
+>> catch basic migration problems.
+>>
+>> If anything goes wrong while backing up/restoring the TOD, we have to
+>> ignore it (but print a warning). This is then basically a fallback to
+>> old behavior (TOD remains running).
+>>
+>> I tested this very basically with an initrd:
+>>     1. Start a simple VM. Observed that the TOD is kept running. Old
+>>        behavior.
+>>     2. Ordinary live migration. Observed that the TOD is temporarily
+>>        stopped on the destination when setting the new value and
+>>        correctly started when finally starting the guest.
+>>     3. Offline live migration. (stop, migrate, cont). Observed that the
+>>        TOD will be stopped on the source with the "stop" command. On the
+>>        destination, the TOD is temporarily stopped when setting the new
+>>        value and correctly started when finally starting the guest via
+>>        "cont".
+>>     4. Simple stop/cont correctly stops/starts the TOD. (multiple stops
+>>        or conts in a row have no effect, so works as expected)
+>>
+>> In the future, we might want to send the guest a special kind of time sync
+>> interrupt under some conditions, so it can synchronize its tod to the
+>> host tod. This is interesting for migration scenarios but also when we
+>> get time sync interrupts ourselves. This however will most probably have
+>> to be handled in KVM (e.g. when the tods differ too much) and is not
+>> desired e.g. when debugging the guest. (single stepping should not
+>> result in permanent time syncs). I consider something like that an add-on
+>> on top of this basic "don't break the guest" handling.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+> 
+> 
+> Long time we should really work on getting the guest back in sync with the host
+> TOD (e..g on migration) since there are some advanced mechanisms that rely on all
+> clocks to be in sync. For example the dasd I/O will also write time stamps
+> and in an stp complex (synced time across CECs) this can be useful for "classic"
+> mainframe databases and ordering.
+> 
+> 
+> 
+> It is probably the right thing to do as of today as on migration we are also out
+> of sync.
+> 
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> 
+> Adding Viktor in case he has concerns.
+> 
 
-06.12.2018, 09:37, "elohimes@gmail.com" <elohimes@gmail.com>:
-> From: Xie Yongji <xieyongji@baidu.com>
->
-> Now we attempt to connect asynchronously for "reconnect socket"
-> during open(). But vhost-user device prefer a connected socket
-> during initialization. That means we may still need to support
-> sync connection during open() for the "reconnect socket".
->
-> Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-> Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
-> ---
-> =C2=A0chardev/char-socket.c | 5 +++--
-> =C2=A01 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index eaa8e8b68f..f2819d52e7 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -1072,7 +1072,7 @@ static void qmp_chardev_open_socket(Chardev *chr,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0s->reconnect_time=
- =3D reconnect;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
->
-> - if (s->reconnect_time) {
-> + if (s->reconnect_time && !is_waitconnect) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tcp_chr_connect_a=
-sync(chr);
+Thanks Christian and Thomas,
 
-Does reconnect+wait allow to start QEMU when the first connection was fai=
-led?
-I think it was the main reason to use tcp_chr_connect_async for reconnect=
- case.
+@Conny I assume you will queue this as soon as it makes sense.
 
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (s->is_listen)=
- {
-> @@ -1120,7 +1120,8 @@ static void qemu_chr_parse_socket(QemuOpts *opts,=
- ChardevBackend *backend,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Error **er=
-rp)
-> =C2=A0{
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool is_listen =3D qemu_opt_get_bool(opts=
-, "server", false);
-> - bool is_waitconnect =3D is_listen && qemu_opt_get_bool(opts, "wait", =
-true);
-> + bool is_waitconnect =3D is_listen ? qemu_opt_get_bool(opts, "wait", t=
-rue) :
-> + qemu_opt_get_bool(opts, "wait", false);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool is_telnet =3D qemu_opt_get_bool(opts=
-, "telnet", false);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool is_tn3270 =3D qemu_opt_get_bool(opts=
-, "tn3270", false);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool is_websock =3D qemu_opt_get_bool(opt=
-s, "websocket", false);
-> --
-> 2.17.1
 
-Regards,
-Yury
+-- 
+
+Thanks,
+
+David / dhildenb
