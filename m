@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45274)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gUzHd-0000SB-GH
+	(envelope-from <jsnow@redhat.com>) id 1gUzHd-0000SA-GK
 	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 14:26:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gUzHZ-0003rD-Kk
+	(envelope-from <jsnow@redhat.com>) id 1gUzHZ-0003rF-Ki
 	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 14:25:59 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Thu,  6 Dec 2018 14:25:41 -0500
-Message-Id: <20181206192544.3987-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/3] bitmaps: remove x- prefix from QMP api
+Date: Thu,  6 Dec 2018 14:25:42 -0500
+Message-Id: <20181206192544.3987-2-jsnow@redhat.com>
+In-Reply-To: <20181206192544.3987-1-jsnow@redhat.com>
+References: <20181206192544.3987-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/3] blockdev: abort transactions in reverse
+ order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,20 +23,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, eblake@redhat.com, Markus Armbruster <armbru@redhat.com>, vsementov@virtuozzo.com, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
-Touch up a few last things and remove the x- prefix.
+Presently, we abort transactions in the same order they were processed in.
+Bitmap commands, though, attempt to restore backup data structures on abort.
+To that end, though, they need to be aborted in reverse chronological order.
 
-Test on the way, thoughts?
+Replace the QSIMPLEQ data structure with a QTAILQ one, so we can iterate
+in reverse for the abort phase of the transaction.
 
-John Snow (3):
-  blockdev: abort transactions in reverse order
-  blockdev: n-ary bitmap merge
-  block: remove 'x' prefix from experimental bitmap APIs
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ blockdev.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
- blockdev.c             | 96 +++++++++++++++++++++++++-----------------
- qapi/block-core.json   | 56 ++++++++++++------------
- qapi/transaction.json  | 12 +++---
- tests/qemu-iotests/223 |  4 +-
- 4 files changed, 94 insertions(+), 74 deletions(-)
-
+diff --git a/blockdev.c b/blockdev.c
+index 81f95d920b..1ba706df8b 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1341,7 +1341,7 @@ struct BlkActionState {
+     const BlkActionOps *ops;
+     JobTxn *block_job_txn;
+     TransactionProperties *txn_props;
+-    QSIMPLEQ_ENTRY(BlkActionState) entry;
++    QTAILQ_ENTRY(BlkActionState) entry;
+ };
+ 
+ /* internal snapshot private data */
+@@ -2269,8 +2269,8 @@ void qmp_transaction(TransactionActionList *dev_list,
+     BlkActionState *state, *next;
+     Error *local_err = NULL;
+ 
+-    QSIMPLEQ_HEAD(snap_bdrv_states, BlkActionState) snap_bdrv_states;
+-    QSIMPLEQ_INIT(&snap_bdrv_states);
++    QTAILQ_HEAD(snap_bdrv_states, BlkActionState) snap_bdrv_states;
++    QTAILQ_INIT(&snap_bdrv_states);
+ 
+     /* Does this transaction get canceled as a group on failure?
+      * If not, we don't really need to make a JobTxn.
+@@ -2301,7 +2301,7 @@ void qmp_transaction(TransactionActionList *dev_list,
+         state->action = dev_info;
+         state->block_job_txn = block_job_txn;
+         state->txn_props = props;
+-        QSIMPLEQ_INSERT_TAIL(&snap_bdrv_states, state, entry);
++        QTAILQ_INSERT_TAIL(&snap_bdrv_states, state, entry);
+ 
+         state->ops->prepare(state, &local_err);
+         if (local_err) {
+@@ -2310,7 +2310,7 @@ void qmp_transaction(TransactionActionList *dev_list,
+         }
+     }
+ 
+-    QSIMPLEQ_FOREACH(state, &snap_bdrv_states, entry) {
++    QTAILQ_FOREACH(state, &snap_bdrv_states, entry) {
+         if (state->ops->commit) {
+             state->ops->commit(state);
+         }
+@@ -2321,13 +2321,13 @@ void qmp_transaction(TransactionActionList *dev_list,
+ 
+ delete_and_fail:
+     /* failure, and it is all-or-none; roll back all operations */
+-    QSIMPLEQ_FOREACH(state, &snap_bdrv_states, entry) {
++    QTAILQ_FOREACH_REVERSE(state, &snap_bdrv_states, snap_bdrv_states, entry) {
+         if (state->ops->abort) {
+             state->ops->abort(state);
+         }
+     }
+ exit:
+-    QSIMPLEQ_FOREACH_SAFE(state, &snap_bdrv_states, entry, next) {
++    QTAILQ_FOREACH_SAFE(state, &snap_bdrv_states, entry, next) {
+         if (state->ops->clean) {
+             state->ops->clean(state);
+         }
 -- 
 2.17.2
