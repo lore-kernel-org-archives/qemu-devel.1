@@ -1,16 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gUrSU-00034F-Is
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 06:04:46 -0500
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gUrST-00033F-PL
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 06:04:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gUrSO-0000Jw-Nn
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 06:04:42 -0500
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gUrSO-0000Jc-1r
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 06:04:41 -0500
 From: Peng Hao <peng.hao2@zte.com.cn>
-Date: Thu, 6 Dec 2018 19:25:58 +0800
-Message-Id: <1544095560-70807-4-git-send-email-peng.hao2@zte.com.cn>
+Date: Thu, 6 Dec 2018 19:25:57 +0800
+Message-Id: <1544095560-70807-3-git-send-email-peng.hao2@zte.com.cn>
 In-Reply-To: <1544095560-70807-1-git-send-email-peng.hao2@zte.com.cn>
 References: <1544095560-70807-1-git-send-email-peng.hao2@zte.com.cn>
-Subject: [Qemu-devel] [PATCH V12 3/5] hw/misc/pvpanic: Add the PCI interface
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH V12 2/5]  hw/misc/pvpanic: Cosmetic renaming
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,157 +25,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, drjones@redhat.com, philmd@redhat.com
 Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
 
-Add pvpanic new type "TYPE_PVPANIC_PCI"
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
+To ease the MMIO device addition in the next patch, rename:
+- ISA=5FPVPANIC=5FDEVICE -> PVPANIC=5FISA=5FDEVICE.
+- MemoryRegion io -> mr.
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
 ---
- hw/misc/pvpanic.c         | 62 ++++++++++++++++++++++++++++++++++++++++++++---
- include/hw/misc/pvpanic.h |  1 +
- include/hw/pci/pci.h      |  1 +
- 3 files changed, 60 insertions(+), 4 deletions(-)
+ hw/misc/pvpanic.c | 28 ++++++++++++++++------------
+ 1 file changed, 16 insertions(+), 12 deletions(-)
 
 diff --git a/hw/misc/pvpanic.c b/hw/misc/pvpanic.c
-index 0f23a67..9fb9168 100644
+index 9d8961b..0f23a67 100644
 --- a/hw/misc/pvpanic.c
 +++ b/hw/misc/pvpanic.c
-@@ -2,10 +2,12 @@
-  * QEMU simulated pvpanic device.
-  *
-  * Copyright Fujitsu, Corp. 2013
-+ * Copyright (c) 2018 ZTE Ltd.
-  *
-  * Authors:
-  *     Wen Congyang <wency@cn.fujitsu.com>
-  *     Hu Tao <hutao@cn.fujitsu.com>
-+ *     Peng Hao <peng.hao2@zte.com.cn>
-  *
-  * This work is licensed under the terms of the GNU GPL, version 2 or later.
-  * See the COPYING file in the top-level directory.
-@@ -18,6 +20,7 @@
- 
- #include "hw/nvram/fw_cfg.h"
- #include "hw/misc/pvpanic.h"
-+#include "hw/pci/pci.h"
- 
- /* The bit of supported pv event */
- #define PVPANIC_F_PANICKED      0
-@@ -27,6 +30,8 @@
- 
- #define PVPANIC_ISA_DEVICE(obj)    \
-     OBJECT_CHECK(PVPanicISAState, (obj), TYPE_PVPANIC)
-+#define PVPANIC_PCI_DEVICE(obj)    \
-+    OBJECT_CHECK(PVPanicPCIState, (obj), TYPE_PVPANIC_PCI)
- 
- static void handle_event(int event)
+@@ -25,8 +25,8 @@
+ /* The pv event value */
+ #define PVPANIC=5FPANICKED        (1 << PVPANIC=5FF=5FPANICKED)
+=20
+-#define ISA=5FPVPANIC=5FDEVICE(obj)    \
+-    OBJECT=5FCHECK(PVPanicState, (obj), TYPE=5FPVPANIC)
++#define PVPANIC=5FISA=5FDEVICE(obj)    \
++    OBJECT=5FCHECK(PVPanicISAState, (obj), TYPE=5FPVPANIC)
+=20
+ static void handle=5Fevent(int event)
  {
-@@ -56,21 +61,31 @@ typedef struct PVPanicISAState {
-     MemoryRegion mr;
- } PVPanicISAState;
- 
-+/* PVPanicPCIState for PCI device and
-+ * use mmio.
+@@ -45,12 +45,16 @@ static void handle=5Fevent(int event)
+=20
+ #include "hw/isa/isa.h"
+=20
+-typedef struct PVPanicState {
++/* PVPanicISAState for ISA device and
++ * use ioport.
 + */
-+typedef struct PVPanicPCIState {
++typedef struct PVPanicISAState {
+     ISADevice parent=5Fobj;
+-
+-    MemoryRegion io;
 +    /*< private>*/
-+    PCIDevice dev;
-+
+     uint16=5Ft ioport;
+-} PVPanicState;
 +    /*<public>*/
 +    MemoryRegion mr;
-+} PVPanicPCIState;
++} PVPanicISAState;
+=20
  /* return supported events on read */
--static uint64_t pvpanic_ioport_read(void *opaque, hwaddr addr, unsigned size)
-+static uint64_t pvpanic_read(void *opaque, hwaddr addr, unsigned size)
+ static uint64=5Ft pvpanic=5Fioport=5Fread(void *opaque, hwaddr addr, unsig=
+ned size)
+@@ -75,15 +79,15 @@ static const MemoryRegionOps pvpanic=5Fops =3D {
+=20
+ static void pvpanic=5Fisa=5Finitfn(Object *obj)
  {
-     return PVPANIC_PANICKED;
+-    PVPanicState *s =3D ISA=5FPVPANIC=5FDEVICE(obj);
++    PVPanicISAState *s =3D PVPANIC=5FISA=5FDEVICE(obj);
+=20
+-    memory=5Fregion=5Finit=5Fio(&s->io, OBJECT(s), &pvpanic=5Fops, s, "pvp=
+anic", 1);
++    memory=5Fregion=5Finit=5Fio(&s->mr, OBJECT(s), &pvpanic=5Fops, s, "pvp=
+anic", 1);
  }
- 
--static void pvpanic_ioport_write(void *opaque, hwaddr addr, uint64_t val,
-+static void pvpanic_write(void *opaque, hwaddr addr, uint64_t val,
-                                  unsigned size)
+=20
+ static void pvpanic=5Fisa=5Frealizefn(DeviceState *dev, Error **errp)
  {
-     handle_event(val);
+     ISADevice *d =3D ISA=5FDEVICE(dev);
+-    PVPanicState *s =3D ISA=5FPVPANIC=5FDEVICE(dev);
++    PVPanicISAState *s =3D PVPANIC=5FISA=5FDEVICE(dev);
+     FWCfgState *fw=5Fcfg =3D fw=5Fcfg=5Ffind();
+     uint16=5Ft *pvpanic=5Fport;
+=20
+@@ -96,11 +100,11 @@ static void pvpanic=5Fisa=5Frealizefn(DeviceState *dev=
+, Error **errp)
+     fw=5Fcfg=5Fadd=5Ffile(fw=5Fcfg, "etc/pvpanic-port", pvpanic=5Fport,
+                     sizeof(*pvpanic=5Fport));
+=20
+-    isa=5Fregister=5Fioport(d, &s->io, s->ioport);
++    isa=5Fregister=5Fioport(d, &s->mr, s->ioport);
  }
- 
- static const MemoryRegionOps pvpanic_ops = {
--    .read = pvpanic_ioport_read,
--    .write = pvpanic_ioport_write,
-+    .read = pvpanic_read,
-+    .write = pvpanic_write,
-     .impl = {
-         .min_access_size = 1,
-         .max_access_size = 1,
-@@ -125,9 +140,48 @@ static TypeInfo pvpanic_isa_info = {
-     .class_init    = pvpanic_isa_class_init,
+=20
+ static Property pvpanic=5Fisa=5Fproperties[] =3D {
+-    DEFINE=5FPROP=5FUINT16(PVPANIC=5FIOPORT=5FPROP, PVPanicState, ioport, =
+0x505),
++    DEFINE=5FPROP=5FUINT16(PVPANIC=5FIOPORT=5FPROP, PVPanicISAState, iopor=
+t, 0x505),
+     DEFINE=5FPROP=5FEND=5FOF=5FLIST(),
  };
- 
-+/* pvpanic pci device*/
-+
-+static void pvpanic_pci_realizefn(PCIDevice *dev, Error **errp)
-+{
-+    PVPanicPCIState *s = DO_UPCAST(PVPanicPCIState, dev, dev);
-+
-+    memory_region_init_io(&s->mr, OBJECT(s), &pvpanic_ops, s,
-+                          TYPE_PVPANIC_PCI, 2);
-+    pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->mr);
-+}
-+
-+static void pvpanic_pci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    PCIDeviceClass *pc = PCI_DEVICE_CLASS(klass);
-+
-+    pc->realize = pvpanic_pci_realizefn;
-+    pc->vendor_id = PCI_VENDOR_ID_REDHAT;
-+    pc->device_id = PCI_DEVICE_ID_REDHAT_PVPANIC;
-+    pc->revision = 1;
-+    pc->class_id = PCI_CLASS_SYSTEM_OTHER;
-+
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+}
-+
-+static TypeInfo pvpanic_pci_info = {
-+    .name          = TYPE_PVPANIC_PCI,
-+    .parent        = TYPE_PCI_DEVICE,
-+    .instance_size = sizeof(PVPanicPCIState),
-+    .class_init    = pvpanic_pci_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { INTERFACE_PCIE_DEVICE },
-+        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-+        { }
-+    }
-+};
-+
-+
- static void pvpanic_register_types(void)
- {
-     type_register_static(&pvpanic_isa_info);
-+    type_register_static(&pvpanic_pci_info);
- }
- 
- type_init(pvpanic_register_types)
-diff --git a/include/hw/misc/pvpanic.h b/include/hw/misc/pvpanic.h
-index 1ee071a..477cc36 100644
---- a/include/hw/misc/pvpanic.h
-+++ b/include/hw/misc/pvpanic.h
-@@ -15,6 +15,7 @@
- #define HW_MISC_PVPANIC_H
- 
- #define TYPE_PVPANIC "pvpanic"
-+#define TYPE_PVPANIC_PCI "pvpanic-pci"
- 
- #define PVPANIC_IOPORT_PROP "ioport"
- 
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index e6514bb..92622f7 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -103,6 +103,7 @@ extern bool pci_available;
- #define PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE 0x000e
- #define PCI_DEVICE_ID_REDHAT_MDPY        0x000f
- #define PCI_DEVICE_ID_REDHAT_QXL         0x0100
-+#define PCI_DEVICE_ID_REDHAT_PVPANIC     0x0101
- 
- #define FMT_PCIBUS                      PRIx64
- 
--- 
+=20
+@@ -116,7 +120,7 @@ static void pvpanic=5Fisa=5Fclass=5Finit(ObjectClass *k=
+lass, void *data)
+ static TypeInfo pvpanic=5Fisa=5Finfo =3D {
+     .name          =3D TYPE=5FPVPANIC,
+     .parent        =3D TYPE=5FISA=5FDEVICE,
+-    .instance=5Fsize =3D sizeof(PVPanicState),
++    .instance=5Fsize =3D sizeof(PVPanicISAState),
+     .instance=5Finit =3D pvpanic=5Fisa=5Finitfn,
+     .class=5Finit    =3D pvpanic=5Fisa=5Fclass=5Finit,
+ };
+--=20
 1.8.3.1
