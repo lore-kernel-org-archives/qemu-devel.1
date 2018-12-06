@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gUtMF-0008Kv-Us
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 08:06:29 -0500
+	(envelope-from <prvs=8715dceb6=Paul.Durrant@citrix.com>)
+	id 1gUtMv-0000EP-2Z
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 08:07:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gUtMA-0001Nr-VK
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 08:06:23 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:44244)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gUtM9-0001MW-1t
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 08:06:17 -0500
-Received: by mail-ot1-x344.google.com with SMTP id f18so292530otl.11
-	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 05:06:16 -0800 (PST)
+	(envelope-from <prvs=8715dceb6=Paul.Durrant@citrix.com>)
+	id 1gUtMr-000255-Ae
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 08:07:04 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Thu, 6 Dec 2018 13:06:25 +0000
+Message-ID: <8772cbe6a11d46908c3f4f56365e899e@AMSPEX02CL03.citrite.net>
+References: <20181121151211.15997-1-paul.durrant@citrix.com>
+	<20181121151211.15997-17-paul.durrant@citrix.com>
+	<20181204164052.GY14786@perard.uk.xensource.com>
+In-Reply-To: <20181204164052.GY14786@perard.uk.xensource.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20181203203839.757-1-richard.henderson@linaro.org>
-	<20181203203839.757-7-richard.henderson@linaro.org>
-In-Reply-To: <20181203203839.757-7-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 6 Dec 2018 13:06:04 +0000
-Message-ID: <CAFEAcA9-jB-RhEPb4CnnrCZ9y+SWu_1Ec6GYw7dyQyrVi3fd7w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 06/10] target/arm: Use arm_hcr_el2_eff
- more places
+Subject: Re: [Qemu-devel] [PATCH 16/18] xen: automatically create
+ XenQdiskDevice-s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,91 +28,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Anthony Perard <anthony.perard@citrix.com>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-On Mon, 3 Dec 2018 at 20:38, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Since arm_hcr_el2_eff includes a check against
-> arm_is_secure_below_el3, we can often remove a
-> nearby check against secure state.
->
-> In some cases, sort the call to arm_hcr_el2_eff
-> to the end of a short-circuit logical sequence.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
+> -----Original Message-----
+> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
+> Sent: 04 December 2018 16:41
+> To: Paul Durrant <Paul.Durrant@citrix.com>
+> Cc: qemu-block@nongnu.org; qemu-devel@nongnu.org; xen-
+> devel@lists.xenproject.org; Kevin Wolf <kwolf@redhat.com>; Max Reitz
+> <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
+> Subject: Re: [PATCH 16/18] xen: automatically create XenQdiskDevice-s
+>=20
+> On Wed, Nov 21, 2018 at 03:12:09PM +0000, Paul Durrant wrote:
+> > This patch adds a creator function for XenQdiskDevice-s so that they ca=
+n
+> > be created automatically when the Xen toolstack instantiates a new
+> > PV backend. When the XenQdiskDevice is created this way it is also
+> > necessary to create a drive which matches the configuration that the Xe=
+n
+> > toolstack has written into xenstore. This drive is marked 'auto_del' so
+> > that it will be removed when the XenQdiskDevice is destroyed. Also, for
+> > compatibilitye with the legacy 'xen_disk' implementation, an iothread
+> > is automatically created for the new XenQdiskDevice. This will also be
+> > removed when he XenQdiskDevice is destroyed.
+>=20
+> "the XenQdiskDevice"
+>=20
+> [...]
+> > +    qemu_opt_set(drive_opts, "file.locking", "off", &local_err);
+>=20
+> That looks new, compared to the xen_disk.c implementation. Maybe that
+> should be mention in the commit message.
+>=20
 
+It's necessary to avoid problems when an emulated device is also present. T=
+he xen_disk code avoided the issue by basically bypassing the checks and st=
+ooging into the middle of the block code. I'll add a comment to the code sa=
+ying why locking needs to be off.
 
-> @@ -8797,6 +8795,8 @@ static inline uint32_t regime_sctlr(CPUARMState *env, ARMMMUIdx mmu_idx)
->  static inline bool regime_translation_disabled(CPUARMState *env,
->                                                 ARMMMUIdx mmu_idx)
->  {
-> +    uint64_t hcr_el2;
-> +
->      if (arm_feature(env, ARM_FEATURE_M)) {
->          switch (env->v7m.mpu_ctrl[regime_is_secure(env, mmu_idx)] &
->                  (R_V7M_MPU_CTRL_ENABLE_MASK | R_V7M_MPU_CTRL_HFNMIENA_MASK)) {
-> @@ -8815,19 +8815,21 @@ static inline bool regime_translation_disabled(CPUARMState *env,
->          }
->      }
->
-> +    hcr_el2 = arm_hcr_el2_eff(env);
+>=20
+> [..]
+>=20
+> > +static void xen_qdisk_device_create(BusState *bus, const char *name,
+> > +                                    QDict *opts, Error **errp)
+> > +{
+> [...]
+> > +    iothread =3D iothread_create(vdev, &error_abort);
+>=20
+> I would just propagate the error, since iothread could fail for external
+> reason. No need to crash qemu while a VM is running.
 
-Changing this in this function makes me nervous, because
-arm_hcr_el2_eff() looks at the current CPU state via
-arm_is_secure_below_el3() rather than at the security state
-of the translation regime we're asking about. I think
-it probably doesn't change behaviour, but I'm finding
-it hard to reason about...
+True.
 
-> +
->      if (mmu_idx == ARMMMUIdx_S2NS) {
->          /* HCR.DC means HCR.VM behaves as 1 */
-> -        return (env->cp15.hcr_el2 & (HCR_DC | HCR_VM)) == 0;
-> +        return (hcr_el2 & (HCR_DC | HCR_VM)) == 0;
->      }
->
-> -    if (env->cp15.hcr_el2 & HCR_TGE) {
-> +    if (hcr_el2 & HCR_TGE) {
->          /* TGE means that NS EL0/1 act as if SCTLR_EL1.M is zero */
->          if (!regime_is_secure(env, mmu_idx) && regime_el(env, mmu_idx) == 1) {
->              return true;
->          }
->      }
->
-> -    if ((env->cp15.hcr_el2 & HCR_DC) &&
-> +    if ((hcr_el2 & HCR_DC) &&
->          (mmu_idx == ARMMMUIdx_S1NSE0 || mmu_idx == ARMMMUIdx_S1NSE1)) {
->          /* HCR.DC means SCTLR_EL1.M behaves as 0 */
->          return true;
+>=20
+> > +
+> > +    dev =3D qdev_create(bus, TYPE_XEN_QDISK_DEVICE);
+> > +
+> > +    qdev_prop_set_string(dev, "vdev", vdev);
+> > +
+> > +    if (XEN_QDISK_DEVICE(dev)->vdev.number !=3D number) {
+> > +        error_setg(errp, "invalid dev parameter '%s'", vdev);
+> > +        goto unref;
+> > +    }
+> > +
+> > +    qdev_prop_set_drive(dev, "drive", blk, &local_err);
+> > +    if (local_err) {
+> > +        error_propagate(errp, local_err);
+> > +        error_prepend(errp, "failed to set 'drive': ");
+> > +        goto unref;
+> > +    }
+> > +
+> > +    XEN_QDISK_DEVICE(dev)->auto_iothread =3D iothread;
+> > +
+> > +    qdev_init_nofail(dev);
+>=20
+> That function shouldn't be use during hotplug. But I'm not sure what
+> should be done instead, probably object_property_set_bool(..., true
+> "realized") and check for error.
 
+Ok, I'll do that.
 
-> @@ -995,7 +994,7 @@ void HELPER(pre_smc)(CPUARMState *env, uint32_t syndrome)
->                          exception_target_el(env));
->      }
->
-> -    if (!secure && cur_el == 1 && (env->cp15.hcr_el2 & HCR_TSC)) {
-> +    if (!secure && cur_el == 1 && (arm_hcr_el2_eff(env) & HCR_TSC)) {
+  Paul
 
-Why can't we drop the !secure check here?
-
->          /* In NS EL1, HCR controlled routing to EL2 has priority over SMD.
->           * We also want an EL2 guest to be able to forbid its EL1 from
->           * making PSCI calls into QEMU's "firmware" via HCR.TSC.
-> @@ -1098,8 +1097,7 @@ void HELPER(exception_return)(CPUARMState *env)
->          goto illegal_return;
->      }
->
-> -    if (new_el == 1 && (env->cp15.hcr_el2 & HCR_TGE)
-> -        && !arm_is_secure_below_el3(env)) {
-> +    if (new_el == 1 && (arm_hcr_el2_eff(env) & HCR_TGE)) {
->          goto illegal_return;
->      }
-
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+>=20
+>=20
+> Thanks,
+>=20
+> --
+> Anthony PERARD
