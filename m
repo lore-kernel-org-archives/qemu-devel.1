@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gUshJ-0001Gn-5Z
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:24:06 -0500
+	(envelope-from <prvs=8715dceb6=Paul.Durrant@citrix.com>)
+	id 1gUskk-0005Bj-2M
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:27:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gUsTQ-0001gj-7R
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:09:48 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:45078)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gUsTQ-0001gZ-19
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:09:44 -0500
-Received: by mail-oi1-x241.google.com with SMTP id b141so136578oii.12
-	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 04:09:43 -0800 (PST)
+	(envelope-from <prvs=8715dceb6=Paul.Durrant@citrix.com>)
+	id 1gUskf-0003yK-Vq
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:27:38 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Thu, 6 Dec 2018 12:27:15 +0000
+Message-ID: <1c081c0b852045f9a37306ae92b3764d@AMSPEX02CL03.citrite.net>
+References: <20181121151211.15997-1-paul.durrant@citrix.com>
+	<20181121151211.15997-15-paul.durrant@citrix.com>
+	<20181204123349.GU14786@perard.uk.xensource.com>
+In-Reply-To: <20181204123349.GU14786@perard.uk.xensource.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20181203203839.757-1-richard.henderson@linaro.org>
-	<20181203203839.757-6-richard.henderson@linaro.org>
-In-Reply-To: <20181203203839.757-6-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 6 Dec 2018 12:09:32 +0000
-Message-ID: <CAFEAcA973PazwfLxUpAbbLUkYoGcTq=QrWCUDmmx7VgK8C2LJQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 05/10] target/arm: Introduce
- arm_hcr_el2_eff
+Subject: Re: [Qemu-devel] [PATCH 14/18] xen: add implementations of
+ xen-qdisk connect and disconnect functions...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,111 +28,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Anthony Perard <anthony.perard@citrix.com>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Stefano Stabellini <sstabellini@kernel.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Mon, 3 Dec 2018 at 20:38, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Replace arm_hcr_el2_{fmo,imo,amo} with a more general routine
-> that also takes SCR_EL3.NS (aka arm_is_secure_below_el3) into
-> account, as documented for the plethora of bits in HCR_EL2.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/cpu.h          | 67 +++++++++------------------------------
->  hw/intc/arm_gicv3_cpuif.c | 21 ++++++------
->  target/arm/helper.c       | 65 +++++++++++++++++++++++++++++++------
->  3 files changed, 82 insertions(+), 71 deletions(-)
->
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 20d97b66de..e871b946c8 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -1722,6 +1722,14 @@ static inline bool arm_is_secure(CPUARMState *env)
->  }
->  #endif
->
-> +/**
-> + * arm_hcr_el2_eff(): Return the effective value of HCR_EL2.
-> + * E.g. when in secure state, fields in HCR_EL2 are suppressed,
-> + * "for all purposes other than a direct read or write access of HCR_EL2."
-> + * Not included here are RW, VI, VF.
-> + */
-> +uint64_t arm_hcr_el2_eff(CPUARMState *env);
+> -----Original Message-----
+> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
+> Sent: 04 December 2018 12:34
+> To: Paul Durrant <Paul.Durrant@citrix.com>
+> Cc: qemu-block@nongnu.org; qemu-devel@nongnu.org; xen-
+> devel@lists.xenproject.org; Stefano Stabellini <sstabellini@kernel.org>;
+> Kevin Wolf <kwolf@redhat.com>; Max Reitz <mreitz@redhat.com>
+> Subject: Re: [PATCH 14/18] xen: add implementations of xen-qdisk connect
+> and disconnect functions...
+>=20
+> On Wed, Nov 21, 2018 at 03:12:07PM +0000, Paul Durrant wrote:
+> > diff --git a/hw/block/xen-qdisk.c b/hw/block/xen-qdisk.c
+> > index 35f7b70480..8c88393832 100644
+> > --- a/hw/block/xen-qdisk.c
+> > +++ b/hw/block/xen-qdisk.c
+> >  static void xen_qdisk_connect(XenQdiskDevice *qdiskdev, Error **errp)
+> >  {
+> >      XenQdiskVdev *vdev =3D &qdiskdev->vdev;
+> > +    XenDevice *xendev =3D XEN_DEVICE(qdiskdev);
+> > +    unsigned int order, nr_ring_ref, *ring_ref, event_channel,
+> protocol;
+> > +    char *str;
+> >
+> >      trace_xen_qdisk_connect(vdev->disk, vdev->partition);
+> > +
+> > +    if (xen_device_frontend_scanf(xendev, "ring-page-order", "%u",
+> > +                                  &order) !=3D 1) {
+> > +        nr_ring_ref =3D 1;
+> > +        ring_ref =3D g_new(unsigned int, nr_ring_ref);
+> > +
+> > +        if (xen_device_frontend_scanf(xendev, "ring-ref", "%u",
+> > +                                      &ring_ref[0]) !=3D 1) {
+> > +            error_setg(errp, "failed to read ring-ref");
+>=20
+> Don't you need to free `ring_ref`?
 
-This comment says the not-included bits are RW, VI, VF...
+Yes.
 
-> +/*
-> + * Return the effective value of HCR_EL2.
-> + * Bits that are not included here:
-> + * RW       (read from SCR_EL3.RW as needed)
-> + */
+>=20
+> > +            return;
+> > +        }
+> [...]
+>=20
+> > diff --git a/include/hw/xen/xen-qdisk.h b/include/hw/xen/xen-qdisk.h
+> > index ade0866037..d7dd2bf0ee 100644
+> > --- a/include/hw/xen/xen-qdisk.h
+> > +++ b/include/hw/xen/xen-qdisk.h
+> > @@ -6,7 +6,15 @@
+> >  #ifndef HW_XEN_QDISK_H
+> >  #define HW_XEN_QDISK_H
+> >
+> > +#include "hw/xen/xen.h"
+> >  #include "hw/xen/xen-bus.h"
+> > +#include "hw/block/block.h"
+> > +#include "hw/block/xen_blkif.h"
+> > +#include "hw/block/dataplane/xen-qdisk.h"
+> > +#include "sysemu/blockdev.h"
+> > +#include "sysemu/iothread.h"
+> > +#include "sysemu/block-backend.h"
+> > +#include "sysemu/iothread.h"
+>=20
+> You don't need that many includes, especially not iothread.h twice ;-).
+>=20
 
-...but this comment only lists RW. Which is correct ?
+Oops.
 
-Also, if VI, VF are in the list shouldn't VSE be too ?
+> I think those new includes would be enough:
+> #include "hw/block/block.h"; for BlockConf
+> #include "sysemu/iothread.h"
+> #include "hw/block/dataplane/xen-qdisk.h"
+>=20
 
-> +uint64_t arm_hcr_el2_eff(CPUARMState *env)
-> +{
-> +    uint64_t ret = env->cp15.hcr_el2;
-> +
-> +    if (arm_is_secure_below_el3(env)) {
-> +        /*
-> +         * "This register has no effect if EL2 is not enabled in the
-> +         * current Security state".  This is ARMv8.4-SecEL2 speak for
-> +         * !(SCR_EL3.NS==1 || SCR_EL3.EEL2==1).
-> +         *
-> +         * Prior to that, the language was "In an implementation that
-> +         * includes EL3, when the value of SCR_EL3.NS is 0 the PE behaves
-> +         * as if this field is 0 for all purposes other than a direct
-> +         * read or write access of HCR_EL2".  With lots of enumeration
-> +         * on a per-field basis.  In current QEMU, this is condition
-> +         * is arm_is_secure_below_el3.
-> +         *
-> +         * Since the v8.4 language applies to the entire register, and
-> +         * appears to be backward compatible, use that.
-> +         */
-> +        ret = 0;
-> +    } else if (ret & HCR_TGE) {
-> +        if (ret & HCR_E2H) {
-> +            ret &= ~(HCR_TTLBOS | HCR_TTLBIS | HCR_TOCU | HCR_TICAB |
-> +                     HCR_TID4 | HCR_ID | HCR_CD | HCR_TDZ | HCR_TPU |
-> +                     HCR_TPCP | HCR_TID2 | HCR_TID1 | HCR_TID0 | HCR_TWE |
-> +                     HCR_TWI | HCR_DC | HCR_BSU_MASK | HCR_FB | HCR_AMO |
-> +                     HCR_IMO | HCR_FMO | HCR_VM);
+Yes, those seem to be enough.
 
+  Paul
 
-This list should also in theory include HCR_MIOCNCE, but the
-QEMU implementation of that bit is going to be RAZ/WI anyway.
-
-HCR_TID1 is in the "ignore if TGE==1" group, not the "ignore if
-{E2H, TGE} == {1,1}" group.
-
-Maybe we should be also setting HCR_ATA here ? We could perhaps
-leave that til we implement ARMv8.5-MemTag and understand it better.
-
-> +        } else {
-> +            ret &= ~(HCR_PTW | HCR_FB | HCR_TID1 | HCR_TID3 | HCR_TSC |
-> +                     HCR_TACR | HCR_TSW | HCR_TTLB | HCR_TVM | HCR_HCD |
-> +                     HCR_TRVM | HCR_TLOR);
-
-Shouldn't these bits be being cleared regardless of E2H, rather
-than only in the TGE==1 E2H==0 case ?
-
-Missing HCR_SWIO ?
-
-The list of bits cleared if TGE && E2H is highest-first, but this
-list is lowest-first...
-
-> +            ret |= HCR_FMO | HCR_IMO | HCR_AMO;
-> +        }
-> +    }
-> +
-> +    return ret;
-> +}
-
-Patch looks good otherwise.
-
-thanks
--- PMM
+> >
+> >  typedef enum XenQdiskVdevType {
+> >      XEN_QDISK_VDEV_TYPE_DP,
+> > @@ -33,6 +41,10 @@ typedef struct XenQdiskDevice XenQdiskDevice;
+> >  struct XenQdiskDevice {
+> >      XenDevice xendev;
+> >      XenQdiskVdev vdev;
+> > +    BlockConf conf;
+> > +    unsigned int max_ring_page_order;
+> > +    IOThread *iothread;
+> > +    XenQdiskDataPlane *dataplane;
+> >  };
+> >
+> >  #endif /* HW_XEN_QDISK_H */
+>=20
+> --
+> Anthony PERARD
