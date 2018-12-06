@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47458)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47808)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=8715dceb6=Paul.Durrant@citrix.com>)
-	id 1gUvXR-0006Gx-Ma
+	id 1gUvXR-0006qg-Nk
 	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:26:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=8715dceb6=Paul.Durrant@citrix.com>)
-	id 1gUvHp-0005K2-Qc
+	id 1gUvHo-0005FS-Qu
 	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:10:01 -0500
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Thu, 6 Dec 2018 15:08:29 +0000
-Message-ID: <1544108924-10841-4-git-send-email-paul.durrant@citrix.com>
-In-Reply-To: <1544108924-10841-1-git-send-email-paul.durrant@citrix.com>
-References: <1544108924-10841-1-git-send-email-paul.durrant@citrix.com>
+Date: Thu, 6 Dec 2018 15:08:26 +0000
+Message-ID: <1544108924-10841-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 03/18] xen: introduce 'xen-block',
- 'xen-disk' and 'xen-cdrom'
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 00/18] Xen PV backend 'qdevification'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,518 +23,125 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+Cc: Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Greg Kurz <groug@kaod.org>, Jason Wang <jasowang@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Tim Smith <tim.smith@citrix.com>
 
-This patch adds new XenDevice-s: 'xen-disk' and 'xen-cdrom', both derived
-from a common 'xen-block' parent type. These will eventually replace the
-'xen_disk' (note the underscore rather than hyphen) legacy PV backend but
-it is illustrative to build up the implementation incrementally, along with
-the XenBus/XenDevice framework. Subsequent patches will therefore add to
-these devices' implementation as new features are added to the framework.
+This series introduces a new QOM compliant framework for Xen PV backends.
+This is achieved by first moving the current non-compliant framework aside,
+before building up a new framework incrementally.
 
-After this patch has been applied it is possible to instantiate new
-'xen-disk' or 'xen-cdrom' devices with a single 'vdev' parameter, which
-accepts values adhering to the Xen VBD naming scheme [1]. For example, a
-command-line instantiation of a xen-disk can be done with an argument
-similar to the following:
+This series was prompted by a thread [1] started by Kevin Wolf in response
+to patches against xen_disk.c posted by Tim Smith. Therefore, alongside
+the patches introducing the new framework, other patches build up a QOM
+compliant replacement for 'xen_disk', called 'xen-qdisk'. Patch #16 swaps
+this new device into place (having establisheda mechanism to auto-
+instantiate devices that is compliant with existing Xen toolstacks in
+patch #15) and patch #18 then removes the old xen_disk code.
 
--device xen-disk,vdev=hda
+Subsequent series will port other Xen PV backends across to the new
+framework.
 
-The implementation of the vdev parameter formulates the appropriate VBD
-number for use in the PV protocol.
+The series is also available as a repository branch [2] on xenbits.xen.org.
 
-[1] https://xenbits.xen.org/docs/unstable/man/xen-vbd-interface.7.html
+[1] https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg00259.html
+[2] http://xenbits.xen.org/gitweb/?p=people/pauldu/qemu.git;a=shortlog;h=refs/heads/qom27
 
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Paul Durrant (18):
+  xen: re-name XenDevice to XenLegacyDevice...
+  xen: introduce new 'XenBus' and 'XenDevice' object hierarchy
+  xen: introduce 'xen-block', 'xen-disk' and 'xen-cdrom'
+  xen: create xenstore areas for XenDevice-s
+  xen: add xenstore watcher infrastructure
+  xen: add grant table interface for XenDevice-s
+  xen: add event channel interface for XenDevice-s
+  xen: duplicate xen_disk.c as basis of dataplane/xen-block.c
+  xen: remove unnecessary code from dataplane/xen-block.c
+  xen: add header and build dataplane/xen-block.c
+  xen: remove 'XenBlkDev' and 'blkdev' names from dataplane/xen-block
+  xen: remove 'ioreq' struct/varable/field names from
+    dataplane/xen-block.c
+  xen: purge 'blk' and 'ioreq' from function names in
+    dataplane/xen-block.c
+  xen: add implementations of xen-block connect and disconnect
+    functions...
+  xen: add a mechanism to automatically create XenDevice-s...
+  xen: automatically create XenBlockDevice-s
+  MAINTAINERS: add myself as a Xen maintainer
+  xen: remove the legacy 'xen_disk' backend
+
+ MAINTAINERS                         |    5 +-
+ hw/9pfs/xen-9p-backend.c            |   16 +-
+ hw/block/Makefile.objs              |    2 +-
+ hw/block/dataplane/Makefile.objs    |    1 +
+ hw/block/dataplane/xen-block.c      |  814 ++++++++++++++++++++++++++
+ hw/block/dataplane/xen-block.h      |   29 +
+ hw/block/trace-events               |   11 +
+ hw/block/xen-block.c                |  853 +++++++++++++++++++++++++++
+ hw/block/xen_disk.c                 | 1011 --------------------------------
+ hw/char/xen_console.c               |   12 +-
+ hw/display/xenfb.c                  |   25 +-
+ hw/i386/xen/xen-hvm.c               |    5 +-
+ hw/i386/xen/xen-mapcache.c          |    2 +-
+ hw/i386/xen/xen_platform.c          |    2 +-
+ hw/net/xen_nic.c                    |   14 +-
+ hw/usb/xen-usb.c                    |   25 +-
+ hw/xen/Makefile.objs                |    2 +-
+ hw/xen/trace-events                 |   25 +
+ hw/xen/xen-backend.c                |   69 +++
+ hw/xen/xen-bus-helper.c             |  181 ++++++
+ hw/xen/xen-bus.c                    | 1094 +++++++++++++++++++++++++++++++++++
+ hw/xen/xen-common.c                 |    2 +-
+ hw/xen/xen-legacy-backend.c         |  853 +++++++++++++++++++++++++++
+ hw/xen/xen_backend.c                |  845 ---------------------------
+ hw/xen/xen_devconfig.c              |    2 +-
+ hw/xen/xen_pt.c                     |    2 +-
+ hw/xen/xen_pt_config_init.c         |    2 +-
+ hw/xen/xen_pt_graphics.c            |    2 +-
+ hw/xen/xen_pt_msi.c                 |    2 +-
+ hw/xen/xen_pvdev.c                  |   20 +-
+ hw/xenpv/xen_domainbuild.c          |    2 +-
+ hw/xenpv/xen_machine_pv.c           |    5 +-
+ include/hw/xen/xen-backend.h        |   26 +
+ include/hw/xen/xen-block.h          |   79 +++
+ include/hw/xen/xen-bus-helper.h     |   40 ++
+ include/hw/xen/xen-bus.h            |  138 +++++
+ include/hw/xen/xen-legacy-backend.h |  104 ++++
+ include/hw/xen/xen_backend.h        |   99 ----
+ include/hw/xen/xen_pvdev.h          |   38 +-
+ include/qemu/module.h               |    3 +
+ 40 files changed, 4420 insertions(+), 2042 deletions(-)
+ create mode 100644 hw/block/dataplane/xen-block.c
+ create mode 100644 hw/block/dataplane/xen-block.h
+ create mode 100644 hw/block/xen-block.c
+ delete mode 100644 hw/block/xen_disk.c
+ create mode 100644 hw/xen/xen-backend.c
+ create mode 100644 hw/xen/xen-bus-helper.c
+ create mode 100644 hw/xen/xen-bus.c
+ create mode 100644 hw/xen/xen-legacy-backend.c
+ delete mode 100644 hw/xen/xen_backend.c
+ create mode 100644 include/hw/xen/xen-backend.h
+ create mode 100644 include/hw/xen/xen-block.h
+ create mode 100644 include/hw/xen/xen-bus-helper.h
+ create mode 100644 include/hw/xen/xen-bus.h
+ create mode 100644 include/hw/xen/xen-legacy-backend.h
+ delete mode 100644 include/hw/xen/xen_backend.h
 ---
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>
 Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: "Marc-André Lureau" <marcandre.lureau@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Max Reitz <mreitz@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Tim Smith <tim.smith@citrix.com>
 
 v2:
- - Fix boilerplate
- - Fix vdev parsing
- - Change name from 'xen-qdisk' to 'xen-block', make abstract, and split
-   off 'xen-disk' and 'xen-cdrom' as concrete sub-types
----
- MAINTAINERS                |   2 +-
- hw/block/Makefile.objs     |   1 +
- hw/block/trace-events      |   8 ++
- hw/block/xen-block.c       | 347 +++++++++++++++++++++++++++++++++++++++++++++
- include/hw/xen/xen-block.h |  69 +++++++++
- 5 files changed, 426 insertions(+), 1 deletion(-)
- create mode 100644 hw/block/xen-block.c
- create mode 100644 include/hw/xen/xen-block.h
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 63effdc..dd728c3 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -403,7 +403,7 @@ F: hw/9pfs/xen-9p-backend.c
- F: hw/char/xen_console.c
- F: hw/display/xenfb.c
- F: hw/net/xen_nic.c
--F: hw/block/xen_*
-+F: hw/block/xen*
- F: hw/xen/
- F: hw/xenpv/
- F: hw/i386/xen/
-diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
-index 53ce575..f34813a 100644
---- a/hw/block/Makefile.objs
-+++ b/hw/block/Makefile.objs
-@@ -4,6 +4,7 @@ common-obj-$(CONFIG_SSI_M25P80) += m25p80.o
- common-obj-$(CONFIG_NAND) += nand.o
- common-obj-$(CONFIG_PFLASH_CFI01) += pflash_cfi01.o
- common-obj-$(CONFIG_PFLASH_CFI02) += pflash_cfi02.o
-+common-obj-$(CONFIG_XEN) += xen-block.o
- common-obj-$(CONFIG_XEN) += xen_disk.o
- common-obj-$(CONFIG_ECC) += ecc.o
- common-obj-$(CONFIG_ONENAND) += onenand.o
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index 335c092..4afbd62 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -127,3 +127,11 @@ xen_disk_init(char *name) "%s"
- xen_disk_connect(char *name) "%s"
- xen_disk_disconnect(char *name) "%s"
- xen_disk_free(char *name) "%s"
-+
-+# hw/block/xen-block.c
-+xen_block_realize(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
-+xen_block_unrealize(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
-+xen_disk_realize(void) ""
-+xen_disk_unrealize(void) ""
-+xen_cdrom_realize(void) ""
-+xen_cdrom_unrealize(void) ""
-diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-new file mode 100644
-index 0000000..78f4218
---- /dev/null
-+++ b/hw/block/xen-block.c
-@@ -0,0 +1,347 @@
-+/*
-+ * Copyright (c) 2018  Citrix Systems Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/cutils.h"
-+#include "qapi/error.h"
-+#include "qapi/visitor.h"
-+#include "hw/hw.h"
-+#include "hw/xen/xen-block.h"
-+#include "trace.h"
-+
-+static void xen_block_unrealize(XenDevice *xendev, Error **errp)
-+{
-+    XenBlockDevice *blockdev = XEN_BLOCK_DEVICE(xendev);
-+    XenBlockDeviceClass *blockdev_class =
-+        XEN_BLOCK_DEVICE_GET_CLASS(xendev);
-+    const char *type = object_get_typename(OBJECT(blockdev));
-+    XenBlockVdev *vdev = &blockdev->vdev;
-+    Error *local_err = NULL;
-+
-+    if (vdev->type == XEN_BLOCK_VDEV_TYPE_INVALID) {
-+        return;
-+    }
-+
-+    trace_xen_block_unrealize(type, vdev->disk, vdev->partition);
-+
-+    if (blockdev_class->unrealize) {
-+        blockdev_class->unrealize(blockdev, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+        }
-+    }
-+}
-+
-+static void xen_block_realize(XenDevice *xendev, Error **errp)
-+{
-+    XenBlockDevice *blockdev = XEN_BLOCK_DEVICE(xendev);
-+    XenBlockDeviceClass *blockdev_class =
-+        XEN_BLOCK_DEVICE_GET_CLASS(xendev);
-+    const char *type = object_get_typename(OBJECT(blockdev));
-+    XenBlockVdev *vdev = &blockdev->vdev;
-+    Error *local_err = NULL;
-+
-+    if (vdev->type == XEN_BLOCK_VDEV_TYPE_INVALID) {
-+        error_setg(errp, "vdev property not set");
-+        return;
-+    }
-+
-+    trace_xen_block_realize(type, vdev->disk, vdev->partition);
-+
-+    if (blockdev_class->realize) {
-+        blockdev_class->realize(blockdev, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+        }
-+    }
-+}
-+
-+static char *disk_to_vbd_name(unsigned int disk)
-+{
-+    char *name, *prefix = (disk >= 26) ?
-+        disk_to_vbd_name((disk / 26) - 1) : g_strdup("");
-+
-+    name = g_strdup_printf("%s%c", prefix, 'a' + disk);
-+    g_free(prefix);
-+
-+    return name;
-+}
-+
-+static void xen_block_get_vdev(Object *obj, Visitor *v, const char *name,
-+                               void *opaque, Error **errp)
-+{
-+    DeviceState *dev = DEVICE(obj);
-+    Property *prop = opaque;
-+    XenBlockVdev *vdev = qdev_get_prop_ptr(dev, prop);
-+    char *str;
-+
-+    switch (vdev->type) {
-+    case XEN_BLOCK_VDEV_TYPE_DP:
-+        str = g_strdup_printf("d%lup%lu", vdev->disk, vdev->partition);
-+        break;
-+
-+    case XEN_BLOCK_VDEV_TYPE_XVD:
-+    case XEN_BLOCK_VDEV_TYPE_HD:
-+    case XEN_BLOCK_VDEV_TYPE_SD: {
-+        char *name = disk_to_vbd_name(vdev->disk);
-+
-+        str = g_strdup_printf("%s%s%lu",
-+                              (vdev->type == XEN_BLOCK_VDEV_TYPE_XVD) ?
-+                              "xvd" :
-+                              (vdev->type == XEN_BLOCK_VDEV_TYPE_HD) ?
-+                              "hd" :
-+                              "sd",
-+                              name, vdev->partition);
-+        g_free(name);
-+        break;
-+    }
-+    default:
-+        error_setg(errp, "invalid vdev type");
-+        return;
-+    }
-+
-+    visit_type_str(v, name, &str, errp);
-+    g_free(str);
-+}
-+
-+static unsigned int vbd_name_to_disk(const char *name, const char **endp)
-+{
-+    unsigned int disk = 0;
-+
-+    while (*name != '\0') {
-+        if (!g_ascii_isalpha(*name) || !g_ascii_islower(*name)) {
-+            break;
-+        }
-+
-+        disk *= 26;
-+        disk += *name++ - 'a';
-+    }
-+    *endp = name;
-+
-+    return disk;
-+}
-+
-+static void xen_block_set_vdev(Object *obj, Visitor *v, const char *name,
-+                               void *opaque, Error **errp)
-+{
-+    DeviceState *dev = DEVICE(obj);
-+    Property *prop = opaque;
-+    XenBlockVdev *vdev = qdev_get_prop_ptr(dev, prop);
-+    Error *local_err = NULL;
-+    char *str, *p;
-+    const char *end;
-+
-+    if (dev->realized) {
-+        qdev_prop_set_after_realize(dev, name, errp);
-+        return;
-+    }
-+
-+    visit_type_str(v, name, &str, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    p = strchr(str, 'd');
-+    if (!p) {
-+        goto invalid;
-+    }
-+
-+    *p++ = '\0';
-+    if (*str == '\0') {
-+        vdev->type = XEN_BLOCK_VDEV_TYPE_DP;
-+    } else if (strcmp(str, "xv") == 0) {
-+        vdev->type = XEN_BLOCK_VDEV_TYPE_XVD;
-+    } else if (strcmp(str, "h") == 0) {
-+        vdev->type = XEN_BLOCK_VDEV_TYPE_HD;
-+    } else if (strcmp(str, "s") == 0) {
-+        vdev->type = XEN_BLOCK_VDEV_TYPE_SD;
-+    } else {
-+        goto invalid;
-+    }
-+
-+    if (vdev->type == XEN_BLOCK_VDEV_TYPE_DP) {
-+        if (qemu_strtoul(p, &end, 10, &vdev->disk)) {
-+            goto invalid;
-+        }
-+
-+        if (*end == 'p') {
-+            p = (char *) ++end;
-+            if (*end == '\0') {
-+                goto invalid;
-+            }
-+        }
-+    } else {
-+        vdev->disk = vbd_name_to_disk(p, &end);
-+    }
-+
-+    if (*end != '\0') {
-+        p = (char *)end;
-+
-+        if (qemu_strtoul(p, &end, 10, &vdev->partition)) {
-+            goto invalid;
-+        }
-+
-+        if (*end != '\0') {
-+            goto invalid;
-+        }
-+    } else {
-+        vdev->partition = 0;
-+    }
-+
-+    switch (vdev->type) {
-+    case XEN_BLOCK_VDEV_TYPE_DP:
-+    case XEN_BLOCK_VDEV_TYPE_XVD:
-+        if (vdev->disk < (1 << 4) && vdev->partition < (1 << 4)) {
-+            vdev->number = (202 << 8) | (vdev->disk << 4) |
-+                vdev->partition;
-+        } else if (vdev->disk < (1 << 20) && vdev->partition < (1 << 8)) {
-+            vdev->number = (1 << 28) | (vdev->disk << 8) |
-+                vdev->partition;
-+        } else {
-+            goto invalid;
-+        }
-+        break;
-+
-+    case XEN_BLOCK_VDEV_TYPE_HD:
-+        if ((vdev->disk == 0 || vdev->disk == 1) &&
-+            vdev->partition < (1 << 6)) {
-+            vdev->number = (3 << 8) | (vdev->disk << 6) | vdev->partition;
-+        } else if ((vdev->disk == 2 || vdev->disk == 3) &&
-+                   vdev->partition < (1 << 6)) {
-+            vdev->number = (22 << 8) | ((vdev->disk - 2) << 6) |
-+                vdev->partition;
-+        } else {
-+            goto invalid;
-+        }
-+        break;
-+
-+    case XEN_BLOCK_VDEV_TYPE_SD:
-+        if (vdev->disk < (1 << 4) && vdev->partition < (1 << 4)) {
-+            vdev->number = (8 << 8) | (vdev->disk << 4) | vdev->partition;
-+        } else {
-+            goto invalid;
-+        }
-+        break;
-+
-+    default:
-+        goto invalid;
-+    }
-+
-+    g_free(str);
-+    return;
-+
-+invalid:
-+    error_setg(errp, "invalid virtual disk specifier");
-+
-+    vdev->type = XEN_BLOCK_VDEV_TYPE_INVALID;
-+    g_free(str);
-+}
-+
-+/*
-+ * This property deals with 'vdev' names adhering to the Xen VBD naming
-+ * scheme described in:
-+ *
-+ * https://xenbits.xen.org/docs/unstable/man/xen-vbd-interface.7.html
-+ */
-+const PropertyInfo xen_block_prop_vdev = {
-+    .name  = "str",
-+    .description = "Virtual Disk specifier: d*p*/xvd*/hd*/sd*",
-+    .get = xen_block_get_vdev,
-+    .set = xen_block_set_vdev,
-+};
-+
-+static Property xen_block_props[] = {
-+    DEFINE_PROP("vdev", XenBlockDevice, vdev,
-+                xen_block_prop_vdev, XenBlockVdev),
-+    DEFINE_PROP_END_OF_LIST()
-+};
-+
-+static void xen_block_class_init(ObjectClass *class, void *data)
-+{
-+    DeviceClass *dev_class = DEVICE_CLASS(class);
-+    XenDeviceClass *xendev_class = XEN_DEVICE_CLASS(class);
-+
-+    xendev_class->realize = xen_block_realize;
-+    xendev_class->unrealize = xen_block_unrealize;
-+
-+    dev_class->props = xen_block_props;
-+}
-+
-+static const TypeInfo xen_block_type_info = {
-+    .name = TYPE_XEN_BLOCK_DEVICE,
-+    .parent = TYPE_XEN_DEVICE,
-+    .instance_size = sizeof(XenBlockDevice),
-+    .abstract = true,
-+    .class_size = sizeof(XenBlockDeviceClass),
-+    .class_init = xen_block_class_init,
-+};
-+
-+static void xen_disk_unrealize(XenBlockDevice *blockdev, Error **errp)
-+{
-+    trace_xen_disk_unrealize();
-+}
-+
-+static void xen_disk_realize(XenBlockDevice *blockdev, Error **errp)
-+{
-+    trace_xen_disk_realize();
-+}
-+
-+static void xen_disk_class_init(ObjectClass *class, void *data)
-+{
-+    DeviceClass *dev_class = DEVICE_CLASS(class);
-+    XenBlockDeviceClass *blockdev_class = XEN_BLOCK_DEVICE_CLASS(class);
-+
-+    blockdev_class->realize = xen_disk_realize;
-+    blockdev_class->unrealize = xen_disk_unrealize;
-+
-+    dev_class->desc = "Xen Disk Device";
-+}
-+
-+static const TypeInfo xen_disk_type_info = {
-+    .name = TYPE_XEN_DISK_DEVICE,
-+    .parent = TYPE_XEN_BLOCK_DEVICE,
-+    .instance_size = sizeof(XenDiskDevice),
-+    .class_init = xen_disk_class_init,
-+};
-+
-+static void xen_cdrom_unrealize(XenBlockDevice *blockdev, Error **errp)
-+{
-+    trace_xen_cdrom_unrealize();
-+}
-+
-+static void xen_cdrom_realize(XenBlockDevice *blockdev, Error **errp)
-+{
-+    trace_xen_cdrom_realize();
-+}
-+
-+static void xen_cdrom_class_init(ObjectClass *class, void *data)
-+{
-+    DeviceClass *dev_class = DEVICE_CLASS(class);
-+    XenBlockDeviceClass *blockdev_class = XEN_BLOCK_DEVICE_CLASS(class);
-+
-+    blockdev_class->realize = xen_cdrom_realize;
-+    blockdev_class->unrealize = xen_cdrom_unrealize;
-+
-+    dev_class->desc = "Xen CD-ROM Device";
-+}
-+
-+static const TypeInfo xen_cdrom_type_info = {
-+    .name = TYPE_XEN_CDROM_DEVICE,
-+    .parent = TYPE_XEN_BLOCK_DEVICE,
-+    .instance_size = sizeof(XenCDRomDevice),
-+    .class_init = xen_cdrom_class_init,
-+};
-+
-+static void xen_block_register_types(void)
-+{
-+    type_register_static(&xen_block_type_info);
-+    type_register_static(&xen_disk_type_info);
-+    type_register_static(&xen_cdrom_type_info);
-+}
-+
-+type_init(xen_block_register_types)
-diff --git a/include/hw/xen/xen-block.h b/include/hw/xen/xen-block.h
-new file mode 100644
-index 0000000..067932a
---- /dev/null
-+++ b/include/hw/xen/xen-block.h
-@@ -0,0 +1,69 @@
-+/*
-+ * Copyright (c) 2018  Citrix Systems Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef HW_XEN_BLOCK_H
-+#define HW_XEN_BLOCK_H
-+
-+#include "hw/xen/xen-bus.h"
-+
-+typedef enum XenBlockVdevType {
-+    XEN_BLOCK_VDEV_TYPE_INVALID,
-+    XEN_BLOCK_VDEV_TYPE_DP,
-+    XEN_BLOCK_VDEV_TYPE_XVD,
-+    XEN_BLOCK_VDEV_TYPE_HD,
-+    XEN_BLOCK_VDEV_TYPE_SD,
-+    XEN_BLOCK_VDEV_TYPE__MAX
-+} XenBlockVdevType;
-+
-+typedef struct XenBlockVdev {
-+    XenBlockVdevType type;
-+    unsigned long disk;
-+    unsigned long partition;
-+    unsigned long number;
-+} XenBlockVdev;
-+
-+typedef struct XenBlockDevice {
-+    XenDevice xendev;
-+    XenBlockVdev vdev;
-+} XenBlockDevice;
-+
-+typedef void (*XenBlockDeviceRealize)(XenBlockDevice *blockdev, Error **errp);
-+typedef void (*XenBlockDeviceUnrealize)(XenBlockDevice *blockdev, Error **errp);
-+
-+typedef struct XenBlockDeviceClass {
-+    /*< private >*/
-+    XenDeviceClass parent_class;
-+    /*< public >*/
-+    XenBlockDeviceRealize realize;
-+    XenBlockDeviceUnrealize unrealize;
-+} XenBlockDeviceClass;
-+
-+#define TYPE_XEN_BLOCK_DEVICE  "xen-block"
-+#define XEN_BLOCK_DEVICE(obj) \
-+     OBJECT_CHECK(XenBlockDevice, (obj), TYPE_XEN_BLOCK_DEVICE)
-+#define XEN_BLOCK_DEVICE_CLASS(class) \
-+     OBJECT_CLASS_CHECK(XenBlockDeviceClass, (class), TYPE_XEN_BLOCK_DEVICE)
-+#define XEN_BLOCK_DEVICE_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(XenBlockDeviceClass, (obj), TYPE_XEN_BLOCK_DEVICE)
-+
-+typedef struct XenDiskDevice {
-+    XenBlockDevice blockdev;
-+} XenDiskDevice;
-+
-+#define TYPE_XEN_DISK_DEVICE  "xen-disk"
-+#define XEN_DISK_DEVICE(obj) \
-+     OBJECT_CHECK(XenDiskDevice, (obj), TYPE_XEN_DISK_DEVICE)
-+
-+typedef struct XenCDRomDevice {
-+    XenBlockDevice blockdev;
-+} XenCDRomDevice;
-+
-+#define TYPE_XEN_CDROM_DEVICE  "xen-cdrom"
-+#define XEN_CDROM_DEVICE(obj) \
-+     OBJECT_CHECK(XenCDRomDevice, (obj), TYPE_XEN_CDROM_DEVICE)
-+
-+#endif /* HW_XEN_BLOCK_H */
+ - Fix boilerplates of introduced files and leave existing ones alone
 -- 
 2.1.4
