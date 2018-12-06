@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsKO-0008Rv-EO
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:00:28 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsKQ-0008Vk-IP
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:00:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsKJ-0005Ay-O9
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:00:24 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:60034)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsKM-0005EE-D7
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:00:26 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:60060)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsKC-0004tj-3o
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:00:15 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsKM-00051F-1z
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:00:22 -0500
 From: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Thu, 06 Dec 2018 15:00:02 +0300
-Message-ID: <154409760266.5432.8837782213851122920.stgit@Misha-PC.lan02.inno>
+Date: Thu, 06 Dec 2018 15:00:08 +0300
+Message-ID: <154409760821.5432.8492771845358817756.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <154409751316.5432.3325938832238028060.stgit@Misha-PC.lan02.inno>
 References: <154409751316.5432.3325938832238028060.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v3 15/39] windbg: handler of parsing context
+Subject: [Qemu-devel] [PATCH v3 16/39] windbg: init
+ DBGKD_ANY_WAIT_STATE_CHANGE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,97 +30,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
+Add function for init DBGKD_ANY_WAIT_STATE_CHANGE. It is a header of
+'state change' packets.
+
 Signed-off-by: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 ---
- windbgstub.c |   54 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 53 insertions(+), 1 deletion(-)
+ target/i386/windbgstub.c |   45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
-diff --git a/windbgstub.c b/windbgstub.c
-index c45faec43f..fe0b007a06 100644
---- a/windbgstub.c
-+++ b/windbgstub.c
-@@ -15,6 +15,7 @@
- #include "chardev/char-fe.h"
- #include "qemu/cutils.h"
- #include "sysemu/reset.h"
-+#include "sysemu/sysemu.h"
- #include "sysemu/kvm.h"
- #include "exec/windbgstub.h"
- #include "exec/windbgstub-utils.h"
-@@ -113,7 +114,6 @@ static void windbg_send_data_packet(WindbgState *state, uint8_t *data,
-     state->wait_packet_type = PACKET_TYPE_KD_ACKNOWLEDGE;
- }
+diff --git a/target/i386/windbgstub.c b/target/i386/windbgstub.c
+index f1bab10b10..b2ac7a6d5f 100644
+--- a/target/i386/windbgstub.c
++++ b/target/i386/windbgstub.c
+@@ -15,9 +15,13 @@
+ #ifdef TARGET_X86_64
+ #define OFFSET_KPCR_SELF 0x18
+ #define OFFSET_KPCR_LOCK_ARRAY 0x28
++#define OFFSET_KPRCB 0x20
++#define OFFSET_KPRCB_CURRTHREAD 0x8
+ #else  /* TARGET_I386 */
+ #define OFFSET_KPCR_SELF 0x1C
+ #define OFFSET_KPCR_VERSION 0x34
++#define OFFSET_KPRCB 0x20
++#define OFFSET_KPRCB_CURRTHREAD 0x4
+ #endif /* TARGET_I386 */
  
--__attribute__ ((unused)) /* unused yet */
- static void windbg_send_control_packet(WindbgState *state, uint16_t type,
-                                        uint32_t id)
- {
-@@ -130,8 +130,52 @@ static void windbg_send_control_packet(WindbgState *state, uint16_t type,
-     qemu_chr_fe_write(&state->chr, PTR(packet), sizeof(packet));
+ #ifdef TARGET_X86_64
+@@ -156,3 +160,44 @@ void windbg_on_reset(void)
+     kdVersion.is_init = false;
+ #endif
  }
- 
-+static void windbg_vm_stop(void)
-+{
-+    vm_stop(RUN_STATE_PAUSED);
-+}
 +
-+static void windbg_process_data_packet(WindbgState *state)
++__attribute__ ((unused)) /* unused yet */
++static void kd_init_state_change(CPUState *cs, DBGKD_ANY_WAIT_STATE_CHANGE *sc)
 +{
-+}
++    X86CPU *cpu = X86_CPU(cs);
++    CPUX86State *env = &cpu->env;
++    DBGKD_CONTROL_REPORT *cr = &sc->ControlReport;
++    target_ulong KPRCB = VMEM_ADDR(cs, KPCR.addr + OFFSET_KPRCB);
++    target_ulong thread = VMEM_ADDR(cs, KPRCB + OFFSET_KPRCB_CURRTHREAD);
++    int number_processors = 0;
 +
-+static void windbg_process_control_packet(WindbgState *state)
-+{
-+}
-+
- static void windbg_ctx_handler(WindbgState *state)
- {
-+    if (!state->is_loaded) {
-+        if (state->ctx.result == RESULT_BREAKIN_BYTE) {
-+            state->catched_breakin_byte = true;
-+        }
-+        return;
++    CPUState *cpu_tmp;
++    CPU_FOREACH(cpu_tmp) {
++        ++number_processors;
 +    }
 +
-+    switch (state->ctx.result) {
-+    case RESULT_NONE:
-+        break;
++    /* HEADER */
 +
-+    case RESULT_BREAKIN_BYTE:
-+        windbg_vm_stop();
-+        break;
++    /* TODO: Fix this hardcoded value. */
++    stw_p(&sc->ProcessorLevel, 0);
++    /* TODO: Fix this hardcoded value. */
++    stw_p(&sc->Processor, 0);
++    stl_p(&sc->NumberProcessors, number_processors);
++    sttul_p(&sc->Thread, thread);
++    sttul_p(&sc->ProgramCounter, env->eip);
 +
-+    case RESULT_CONTROL_PACKET:
-+        windbg_process_control_packet(state);
-+        break;
++    /* CONTROL REPORT */
 +
-+    case RESULT_DATA_PACKET:
-+        windbg_process_data_packet(state);
-+        break;
++    sttul_p(&cr->Dr6, env->dr[6]);
++    sttul_p(&cr->Dr7, env->dr[7]);
++    stw_p(&cr->ReportFlags, REPORT_INCLUDES_SEGS | REPORT_STANDARD_CS);
++    stw_p(&cr->SegCs, env->segs[R_CS].selector);
++    stw_p(&cr->SegDs, env->segs[R_DS].selector);
++    stw_p(&cr->SegEs, env->segs[R_ES].selector);
++    stw_p(&cr->SegFs, env->segs[R_FS].selector);
++    stl_p(&cr->EFlags, env->eflags);
 +
-+    case RESULT_UNKNOWN_PACKET:
-+    case RESULT_ERROR:
-+        windbg_send_control_packet(state, PACKET_TYPE_KD_RESEND, 0);
-+        break;
-+
-+    default:
-+        break;
-+    }
- }
- 
- static void windbg_read_byte(ParsingContext *ctx, uint8_t byte)
-@@ -260,6 +304,14 @@ void windbg_try_load(void)
-     if (windbg_state && !windbg_state->is_loaded) {
-         if (windbg_on_load()) {
-             windbg_state->is_loaded = true;
-+
-+            /* Handle last packet. Or we can require resend last packet. */
-+            windbg_ctx_handler(windbg_state);
-+
-+            if (windbg_state->catched_breakin_byte == true) {
-+                windbg_vm_stop();
-+                windbg_state->catched_breakin_byte = false;
-+            }
-         }
-     }
- }
++    /* This is a feature */
++    memset(cr->InstructionStream, 0, DBGKD_MAXSTREAM);
++    stw_p(&cr->InstructionCount, 0);
++}
