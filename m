@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gUvX8-0006Fz-Pz
+	(envelope-from <kwolf@redhat.com>) id 1gUvXD-0006Et-20
 	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:25:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gUvLR-0001r5-QK
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:13:46 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gUvLN-0001kt-CW
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:13:38 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu,  6 Dec 2018 16:13:03 +0100
-Message-Id: <20181206151304.8388-4-kwolf@redhat.com>
+Date: Thu,  6 Dec 2018 16:13:01 +0100
+Message-Id: <20181206151304.8388-2-kwolf@redhat.com>
 In-Reply-To: <20181206151304.8388-1-kwolf@redhat.com>
 References: <20181206151304.8388-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 3/4] iotests: Filter cid numbers in VMDK
- extent info
+Subject: [Qemu-devel] [PATCH v3 1/4] vmdk: Refactor vmdk_create_extent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +26,133 @@ Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, q
 
 From: Fam Zheng <famz@redhat.com>
 
+The extracted vmdk_init_extent takes a BlockBackend object and
+initializes the format metadata. It is the common part between "qemu-img
+create" and "blockdev-create".
+
+Add a "BlockBackend *pbb" parameter to vmdk_create_extent, to return the
+opened BB to the caller in the next patch.
+
 Signed-off-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/common.filter | 1 +
- tests/qemu-iotests/iotests.py    | 1 +
- 2 files changed, 2 insertions(+)
+ block/vmdk.c | 69 ++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 43 insertions(+), 26 deletions(-)
 
-diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common=
-.filter
-index 2031e353a5..1aa7d57140 100644
---- a/tests/qemu-iotests/common.filter
-+++ b/tests/qemu-iotests/common.filter
-@@ -165,6 +165,7 @@ _filter_img_info()
-         -e "/table_size: [0-9]\\+/d" \
-         -e "/compat: '[^']*'/d" \
-         -e "/compat6: \\(on\\|off\\)/d" \
-+        -e "s/cid: [0-9]\+/cid: XXXXXXXXXX/" \
-         -e "/static: \\(on\\|off\\)/d" \
-         -e "/zeroed_grain: \\(on\\|off\\)/d" \
-         -e "/subformat: '[^']*'/d" \
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-index d537538ba0..4142937239 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -248,6 +248,7 @@ def filter_img_info(output, filename):
-                    .replace(imgfmt, 'IMGFMT')
-         line =3D re.sub('iters: [0-9]+', 'iters: XXX', line)
-         line =3D re.sub('uuid: [-a-f0-9]+', 'uuid: XXXXXXXX-XXXX-XXXX-XX=
-XX-XXXXXXXXXXXX', line)
-+        line =3D re.sub('cid: [0-9]+', 'cid: XXXXXXXXXX', line)
-         lines.append(line)
-     return '\n'.join(lines)
+diff --git a/block/vmdk.c b/block/vmdk.c
+index 2c9e86d98f..32fc2c84b3 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -1741,35 +1741,17 @@ static int coroutine_fn vmdk_co_pwrite_zeroes(Blo=
+ckDriverState *bs,
+     return ret;
+ }
 =20
+-static int vmdk_create_extent(const char *filename, int64_t filesize,
+-                              bool flat, bool compress, bool zeroed_grai=
+n,
+-                              QemuOpts *opts, Error **errp)
++static int vmdk_init_extent(BlockBackend *blk,
++                            int64_t filesize, bool flat,
++                            bool compress, bool zeroed_grain,
++                            Error **errp)
+ {
+     int ret, i;
+-    BlockBackend *blk =3D NULL;
+     VMDK4Header header;
+-    Error *local_err =3D NULL;
+     uint32_t tmp, magic, grains, gd_sectors, gt_size, gt_count;
+     uint32_t *gd_buf =3D NULL;
+     int gd_buf_size;
+=20
+-    ret =3D bdrv_create_file(filename, opts, &local_err);
+-    if (ret < 0) {
+-        error_propagate(errp, local_err);
+-        goto exit;
+-    }
+-
+-    blk =3D blk_new_open(filename, NULL, NULL,
+-                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
+-                       &local_err);
+-    if (blk =3D=3D NULL) {
+-        error_propagate(errp, local_err);
+-        ret =3D -EIO;
+-        goto exit;
+-    }
+-
+-    blk_set_allow_write_beyond_eof(blk, true);
+-
+     if (flat) {
+         ret =3D blk_truncate(blk, filesize, PREALLOC_MODE_OFF, errp);
+         goto exit;
+@@ -1863,15 +1845,50 @@ static int vmdk_create_extent(const char *filenam=
+e, int64_t filesize,
+                      gd_buf, gd_buf_size, 0);
+     if (ret < 0) {
+         error_setg(errp, QERR_IO_ERROR);
+-        goto exit;
+     }
+=20
+     ret =3D 0;
++exit:
++    g_free(gd_buf);
++    return ret;
++}
++
++static int vmdk_create_extent(const char *filename, int64_t filesize,
++                              bool flat, bool compress, bool zeroed_grai=
+n,
++                              BlockBackend **pbb,
++                              QemuOpts *opts, Error **errp)
++{
++    int ret;
++    BlockBackend *blk =3D NULL;
++    Error *local_err =3D NULL;
++
++    ret =3D bdrv_create_file(filename, opts, &local_err);
++    if (ret < 0) {
++        error_propagate(errp, local_err);
++        goto exit;
++    }
++
++    blk =3D blk_new_open(filename, NULL, NULL,
++                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
++                       &local_err);
++    if (blk =3D=3D NULL) {
++        error_propagate(errp, local_err);
++        ret =3D -EIO;
++        goto exit;
++    }
++
++    blk_set_allow_write_beyond_eof(blk, true);
++
++    ret =3D vmdk_init_extent(blk, filesize, flat, compress, zeroed_grain=
+, errp);
+ exit:
+     if (blk) {
+-        blk_unref(blk);
++        if (pbb) {
++            *pbb =3D blk;
++        } else {
++            blk_unref(blk);
++            blk =3D NULL;
++        }
+     }
+-    g_free(gd_buf);
+     return ret;
+ }
+=20
+@@ -2094,7 +2111,7 @@ static int coroutine_fn vmdk_co_create_opts(const c=
+har *filename, QemuOpts *opts
+         snprintf(ext_filename, PATH_MAX, "%s%s", path, desc_filename);
+=20
+         if (vmdk_create_extent(ext_filename, size,
+-                               flat, compress, zeroed_grain, opts, errp)=
+) {
++                               flat, compress, zeroed_grain, NULL, opts,=
+ errp)) {
+             ret =3D -EINVAL;
+             goto exit;
+         }
 --=20
 2.19.2
