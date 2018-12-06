@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gUrew-0000Ql-IR
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 06:17:38 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gUrgl-00024k-6B
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 06:19:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gUres-0008Or-CS
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 06:17:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49550)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1gUres-0008OU-4G
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 06:17:30 -0500
-References: <154393964026.28192.13536237934563059985.stgit@gimli.home>
-	<154394082769.28192.14712045129466115638.stgit@gimli.home>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <a050ab6c-7eff-4e40-e0e4-0683ecc27981@redhat.com>
-Date: Thu, 6 Dec 2018 12:17:21 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1gUrgg-0000wL-Pu
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 06:19:27 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:38203)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gUrgg-0000w4-JI
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 06:19:22 -0500
+Received: by mail-oi1-x241.google.com with SMTP id a77so58596oii.5
+	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 03:19:22 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <154394082769.28192.14712045129466115638.stgit@gimli.home>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [for-4.0 PATCH v3 7/9] vfio/pci: Remove PCIe Link
- Status emulation
+References: <20181206084816.30485-1-ppandit@redhat.com>
+	<20181206105830.43eb1d05@redhat.com>
+	<nycvar.YSQ.7.76.1812061637070.2113@xnncv>
+In-Reply-To: <nycvar.YSQ.7.76.1812061637070.2113@xnncv>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 6 Dec 2018 11:19:10 +0000
+Message-ID: <CAFEAcA90U=8s=f-pcFS+8VF3GZby__GnwXy_van=FxiE7fK7gQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] i2c: pm_smbus: check smb_index before
+ block transfer write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
-Cc: Geoffrey McRae <geoff@hostfission.com>
+To: P J P <ppandit@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, public@hansmi.ch, QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Hi
-On 12/4/18 5:27 PM, Alex Williamson wrote:
-> Now that the downstream port will virtually negotiate itself to the
-> link status of the downstream devie, we can remove this emulation.
-s/devie/device
-> It's not clear that it was every terribly useful anyway.
-> 
-> Tested-by: Geoffrey McRae <geoff@hostfission.com>
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+On Thu, 6 Dec 2018 at 11:10, P J P <ppandit@redhat.com> wrote:
+>
+> +-- On Thu, 6 Dec 2018, Igor Mammedov wrote --+
+> | > From: Prasad J Pandit <pjp@fedoraproject.org>
+> | >
+> | > While performing block transfer write in smb_ioport_writeb(),
+> | > 'smb_index' is incremented and used to index smb_data[] array.
+> | > Check 'smb_index' value to avoid OOB access.
+> | >
+> | > Reported-by: Michael Hanselmann <public@hansmi.ch>
+> | > Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> | pls squash in:
+> |
+> | Fixes: 38ad4fae43 i2c: pm_smbus: Add block transfer capability
+>
+> Do we need patch v2, or it can be done while merging it?
 
-> ---
->  hw/vfio/pci.c |    6 ------
->  1 file changed, 6 deletions(-)
-> 
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 74f9a46b4be0..c0cb1ec28908 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -1901,12 +1901,6 @@ static int vfio_setup_pcie_cap(VFIOPCIDevice *vdev, int pos, uint8_t size,
->                             QEMU_PCI_EXP_LNKCAP_MLS(QEMU_PCI_EXP_LNK_2_5GT), ~0);
->              vfio_add_emulated_word(vdev, pos + PCI_EXP_LNKCTL, 0, ~0);
->          }
-> -
-> -        /* Mark the Link Status bits as emulated to allow virtual negotiation */
-> -        vfio_add_emulated_word(vdev, pos + PCI_EXP_LNKSTA,
-> -                               pci_get_word(vdev->pdev.config + pos +
-> -                                            PCI_EXP_LNKSTA),
-> -                               PCI_EXP_LNKCAP_MLW | PCI_EXP_LNKCAP_SLS);
+I can add in the Fixes line when I apply the patch to master.
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+It would be good if we could get some Reviewed-by: tags as well.
 
-Thanks
+I think my current view is that we should apply this today,
+and tag rc5 this afternoon (or maybe tomorrow?), and do the
+final release on schedule on Tuesday.
 
-Eric
->      }
->  
->      /*
-> 
-> 
+Is there anything else in the pipeline that should go in rc5?
+
+thanks
+-- PMM
