@@ -1,47 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1gUy1g-0000gP-TX
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 13:05:32 -0500
+	(envelope-from <armbru@redhat.com>) id 1gUyAr-0001T9-Qd
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 13:14:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1gUxnn-0001LN-HF
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:51:11 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40100
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1gUxnj-0001Hn-PY
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:51:07 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wB6HgrrQ115301
-	for <qemu-devel@nongnu.org>; Thu, 6 Dec 2018 12:50:57 -0500
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2p76sr5mda-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 12:50:57 -0500
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
-	Thu, 6 Dec 2018 17:50:56 -0000
-References: <20181122165432.4437-1-cohuck@redhat.com>
-	<20181204133810.66e8cfe5@oc2783563651>
-	<20181204141130.06496b9b.cohuck@redhat.com>
-	<20181204160236.54de2784@oc2783563651>
-	<20181205135402.33c2b22d.cohuck@redhat.com>
-	<aa190e90-f832-7958-aa83-1486e570bf40@linux.ibm.com>
-	<20181206153917.59e8e291.cohuck@redhat.com>
-	<bb6c992e-ac03-ce3e-fba8-283e392f1543@linux.ibm.com>
-	<20181206172155.6a7dd69e.cohuck@redhat.com>
-From: Farhan Ali <alifm@linux.ibm.com>
-Date: Thu, 6 Dec 2018 12:50:50 -0500
+	(envelope-from <armbru@redhat.com>) id 1gUyAl-0005jf-Np
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 13:14:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54136)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gUyAl-0005hh-FD
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 13:14:51 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D2C8DC049592
+	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 18:14:50 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
+	<20180706105753.26700-23-marcandre.lureau@redhat.com>
+Date: Thu, 06 Dec 2018 19:14:46 +0100
+In-Reply-To: <20180706105753.26700-23-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Fri, 6 Jul 2018
+	12:57:48 +0200")
+Message-ID: <877egm8quh.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20181206172155.6a7dd69e.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <7c88b304-aced-8330-a750-0765e0bd721a@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 0/3] vfio-ccw: support hsch/csch (kernel
- part)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 22/27] docs: document schema
+ configuration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -50,81 +36,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Jason J . Herne" <jjherne@linux.ibm.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  docs/devel/qapi-code-gen.txt | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
+>
+> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+> index c2e11465f0..799aef7728 100644
+> --- a/docs/devel/qapi-code-gen.txt
+> +++ b/docs/devel/qapi-code-gen.txt
+> @@ -752,6 +752,25 @@ gets its generated code guarded like this:
+>   #endif /* defined(HAVE_BAR) */
+>   #endif /* defined(CONFIG_FOO) */
+>=20=20
+> +Where a member can be defined with a single string value for its type,
+> +it is also possible to supply a dictionary instead with both 'type'
+> +and 'if' keys.
+> +
+> +Example: a conditional 'bar' member
+> +
+> +{ 'struct': 'IfStruct', 'data':
+> +  { 'foo': 'int',
+> +    'bar': { 'type': 'int', 'if': 'defined(IFCOND)'} } }
+> +
+> +An enum value can be replaced by a dictionary with a 'name' and a 'if'
+> +key.
+> +
+> +Example: a conditional 'bar' enum member.
+> +
+> +{ 'enum': 'IfEnum', 'data':
+> +  [ 'foo',
+> +    { 'name' : 'bar', 'if': 'defined(IFCOND)' } ] }
+> +
+>  Please note that you are responsible to ensure that the C code will
+>  compile with an arbitrary combination of conditions, since the
+>  generators are unable to check it at this point.
 
-On 12/06/2018 11:21 AM, Cornelia Huck wrote:
-> On Thu, 6 Dec 2018 10:26:12 -0500
-> Farhan Ali <alifm@linux.ibm.com> wrote:
-> 
->> On 12/06/2018 09:39 AM, Cornelia Huck wrote:
->>> On Wed, 5 Dec 2018 13:34:11 -0500
->>> Farhan Ali <alifm@linux.ibm.com> wrote:
->>>    
->>>> On 12/05/2018 07:54 AM, Cornelia Huck wrote:
->>>>>> Yeah, that is perfectly clear, but it ain't the complete story. E.g.
->>>>>> are subsequent commands blocking until the preceding command finishes
->>>>>> is part of the interface. And what is good implementation depends on the
->>>>>> answer. What I mean, I first need to understand how things are supposed
->>>>>> to work (together) so I can double check that against the
->>>>>> implementation. Otherwise all I can do is nitpicking.
->>>>>>
->>>>>> To get more tangible: we are in the middle of processing an SSCH request
->>>>>> (e.g. doing the translation) when a HSCH comes in. What should happen?
->>>>>> Should we start processing HSCH after he instruction part of SSCH is
->>>>>> done -- which currently includes translation? Or should we -EBUSY? Or do
->>>>>> we abort START related activities and do the HALT stuff?
->>>>> I think most of the sorting-out-the-operations stuff should be done by
->>>>> the hardware itself, and we should not really try to enforce anything
->>>>> special in our vfio code.
->>>>>
->>>>> For your example, it might be best if a hsch is always accepted and
->>>>> send on towards the hardware. Probably best to reflect back -EAGAIN if
->>>>> we're currently processing another instruction from another vcpu, so
->>>>> that the user space caller can retry. Same for ssch, if another ssch is
->>>>> already being processed. We*could*  reflect cc 2 if the fctl bit is
->>>>> already set, but that won't do for csch, so it is probably best to have
->>>>> the hardware figure that out in any case.
->>>>>
->>>>> If I read the code correctly, we currently reflect -EBUSY and not
->>>>> -EAGAIN if we get a ssch request while already processing another one.
->>>>> QEMU hands that back to the guest as a cc 2, which is not 100% correct.
->>>>> In practice, we don't see this with Linux guests due to locking.
->>>>>       
->>>>
->>>> If we have a ssch and a csch immediately afterwards from userspace, will
->>>> we end up issuing csch first and then ssch to the hardware?
->>>>
->>>> If I understand correctly, the ccw translation as part of the ssch can
->>>> be a slow operation so it might be possible we issue the csch first?
->>>> In that case we won't actually clear the original start function as
->>>> intended.
->>>
->>> When we start processing the ssch request (translation and so on), we
->>> set the state to BUSY. This means that any csch request will get a
->>> -EBUSY, no overtaking possible. (I think maybe I'll need to check what
->>> this series looks like if I rebase it on top of Pierre's rework, as he
->>> did some changes in the state machine.)
->>
->> I think you meant the state is set to BOXED? otherwise the patch 3 says
->> if state is BUSY and CLEAR event request comes in, we issue the clear
->> instruction, no?
-> 
-> That's what I meant with "need to rebase" :) The BOXED state is gone; I
-> just had not rebased on top of it. There's more changes in the state
-> machine; if we are on the same page as to what should happen, I can
-> start massaging the patches.
-> 
-> 
+I'd prefer to update qapi-code-gen.txt right when we extend the schema
+language, like you did in part 1 (commit 967c885108f qapi: add 'if' to
+top-level expressions).  I understand it's a bit more churn, since you
+need four steps (enum, struct, union, alternate members).  I think the
+following would be the least work for you that still satisfies me:
 
-Sorry maybe I missed it, but are you referring to Pierre's latest 
-cleanup patches? I don't see him removing the BOXED state.
+* Add the part about enum values in PATCH 13.
 
-I think returning -EAGAIN and asking the userspace to retry the 
-operation sounds reasonable to me.
+* Add the rest in PATCH 17 (the first patch that implements a part of
+  it), with a TODO implement <list of things that get done in later
+  patches>.  Then just update the TODO as you go.
 
-But how do we handle the issue of protecting the cmd_region from 
-simultaneous hsch and csch calls? Do we agree on Pierre's method of 
-making write calls mutually exclusive?
+Okay?
