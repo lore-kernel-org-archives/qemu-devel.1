@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gUt6e-00065a-8j
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:50:17 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gUt8x-0007L8-13
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:52:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gUt6a-00020U-BY
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:50:16 -0500
-Received: from mail-wr1-f53.google.com ([209.85.221.53]:44343)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gUt6Z-0001yj-Jx
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:50:12 -0500
-Received: by mail-wr1-f53.google.com with SMTP id z5so333905wrt.11
-	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 04:50:11 -0800 (PST)
-References: <20181206121743.20762-1-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <fa022957-1015-9173-6e17-c683f1a39392@redhat.com>
-Date: Thu, 6 Dec 2018 13:50:08 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1gUt8t-0003N4-0h
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:52:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56618)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gUt8s-0003Me-PZ
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:52:34 -0500
+Date: Thu, 6 Dec 2018 10:52:25 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181206125225.GW18284@habkost.net>
+References: <154394083644.28192.8501647946108201466.stgit@gimli.home>
+	<154394987445.795.4102526920089904508.stgit@gimli.home>
+	<6bc68937-ec9e-d28f-9468-5ee9ba08ef52@de.ibm.com>
+	<20181204122647.3a560066@x1.home>
+	<CAFEAcA_5tDfoPZaPcheMGUyq_ibbvT+GE8WKgXnHf8SnxioPvA@mail.gmail.com>
+	<20181204125621.0ad30dc0@x1.home>
 MIME-Version: 1.0
-In-Reply-To: <20181206121743.20762-1-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] json: Fix to reject duplicate object
- member names
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181204125621.0ad30dc0@x1.home>
+Subject: Re: [Qemu-devel] [for-4.0 PATCH v3.1 8/9] q35/440fx/arm/spapr/ccw:
+ Add QEMU 4.0 machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +32,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, mreitz@redhat.com
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On 12/6/18 1:17 PM, Markus Armbruster wrote:
-> The JSON parser happily accepts duplicate object member names.  The
-> last value wins.  Reproducer #1:
+On Tue, Dec 04, 2018 at 12:56:21PM -0700, Alex Williamson wrote:
+> On Tue, 4 Dec 2018 19:29:25 +0000
+> Peter Maydell <peter.maydell@linaro.org> wrote:
 > 
->     $ qemu-system-x86_64 -qmp stdio
->     {"QMP": {"version": {"qemu": {"micro": 93, "minor": 0, "major": 3},
->     "package": "v3.1.0-rc3-7-g87a45d86ed"}, "capabilities": []}}
->     {'execute':'qmp_capabilities'}
->     {"return": {}}
->     {'execute':'blockdev-add','arguments':{'driver':'null-co',
->      'node-name':'foo','node-name':'bar'}}
->     {"return": {}}
->     {'execute':'query-named-block-nodes'}
->     {"return": [{ [...] "node-name": "bar" [...] }]}
+> > On Tue, 4 Dec 2018 at 19:26, Alex Williamson <alex.williamson@redhat.com> wrote:
+> > >
+> > > On Tue, 4 Dec 2018 20:16:44 +0100
+> > > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> > >  
+> > > > I think Conny has already added the s390/ccw part to her next tree.
+> > > > From a quick glimpse both patches look identical.  
+> > >
+> > > If so then we can just use the original v3 version of this patch that
+> > > touches all but ccw and let them come together in mainline.  My
+> > > assumption is that Peter is only trying to make sure all versioned
+> > > machines are updated early in this release, not necessarily that
+> > > they need to be updated together.  
+> > 
+> > Yes, that's the idea. I also think it's a suboptimal idea
+> > to include the version-number-bump patch in a series that's
+> > adding some feature, because then if the feature itself
+> > has to go through several rounds of patch review the
+> > version-number-bump patch is stuck unapplied (we saw that
+> > at the end of the 3.1 cycle), or it gets bumped by some
+> > other unrelated series and then there's a merge conflict.
+> > But that's more of a things-for-next time remark, no need
+> > to rearrange this now.
 > 
-> Reproducer #2 is iotest 229.
-> 
-> Fix the parser to reject duplicates, and fix iotest 229 not to use
-> them.
+> If you and the other stakeholders agree, you are more than welcome to
+> pluck this patch from the series and apply it as soon as 4.0 opens.  It
+> might make things a tiny bit easier down the road to avoid the
+> conflicts since we seem to have multiple contenders vying for this
+> update.  Maybe the best practice going forward is to open the merge
+> window with such a commit.  Thanks,
 
-Looks like 2 different patches.
+I can queue v3 on machine-next and send a pull request as soon as
+v3.1.0 is tagged.  Any objections?
 
-> 
-> Reported-by: Max Reitz <mreitz@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  qobject/json-parser.c  | 5 +++++
->  tests/qemu-iotests/229 | 1 -
->  2 files changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-> index 5a840dfd86..a86de3f462 100644
-> --- a/qobject/json-parser.c
-> +++ b/qobject/json-parser.c
-> @@ -288,6 +288,11 @@ static int parse_pair(JSONParserContext *ctxt, QDict *dict)
->          goto out;
->      }
->  
-> +    if (qdict_haskey(dict, qstring_get_str(key))) {
-> +        parse_error(ctxt, token, "duplicate key");
-> +        goto out;
-> +    }
-> +        
->      qdict_put_obj(dict, qstring_get_str(key), value);
->  
->      qobject_unref(key);
-> diff --git a/tests/qemu-iotests/229 b/tests/qemu-iotests/229
-> index 86602437ff..893d098ad2 100755
-> --- a/tests/qemu-iotests/229
-> +++ b/tests/qemu-iotests/229
-> @@ -69,7 +69,6 @@ echo
->  _send_qemu_cmd $QEMU_HANDLE \
->      "{'execute': 'drive-mirror',
->                   'arguments': {'device': 'testdisk',
-> -                               'mode':   'absolute-paths',
->                                 'format': '$IMGFMT',
->                                 'target': '$DEST_IMG',
->                                 'sync':   'full',
-> 
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+-- 
+Eduardo
