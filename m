@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gUp1o-0005BJ-SP
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 03:29:05 -0500
+	(envelope-from <ppandit@redhat.com>) id 1gUpMd-0002SW-Li
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 03:50:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gUp1h-0006eM-4m
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 03:28:58 -0500
-References: <20181205145131.28467-1-cohuck@redhat.com>
-	<0d97dcf5-de40-3f18-64fc-7b2eb1799a84@redhat.com>
-	<20181205174508.3e2452af.cohuck@redhat.com>
-	<55928716-cd64-735b-ae66-64b370997e22@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <6b238b89-f1a0-834b-b2f4-3b8c30c484a2@redhat.com>
-Date: Thu, 6 Dec 2018 09:28:34 +0100
+	(envelope-from <ppandit@redhat.com>) id 1gUpMZ-00015T-JE
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 03:50:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51776)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gUpMZ-00012s-A5
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 03:50:27 -0500
+From: P J P <ppandit@redhat.com>
+Date: Thu,  6 Dec 2018 14:18:16 +0530
+Message-Id: <20181206084816.30485-1-ppandit@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <55928716-cd64-735b-ae66-64b370997e22@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC] vfio-ap: flag as compatible with
- balloon
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] i2c: pm_smbus: check smb_index before block
+ transfer write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,84 +24,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Tony Krowiak <akrowiak@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Qemu Developers <qemu-devel@nongnu.org>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Michael Hanselmann <public@hansmi.ch>, Prasad J Pandit <pjp@fedoraproject.org>
 
-On 05.12.18 18:25, Christian Borntraeger wrote:
-> 
-> 
-> On 05.12.2018 17:45, Cornelia Huck wrote:
->> On Wed, 5 Dec 2018 17:38:22 +0100
->> David Hildenbrand <david@redhat.com> wrote:
->>
->>> On 05.12.18 15:51, Cornelia Huck wrote:
->>>> vfio-ap devices do not pin any pages in the host. Therefore, they
->>>> are belived to be compatible with memory ballooning.
->>>>
->>>> Flag them as compatible, so both vfio-ap and a balloon can be
->>>> used simultaneously.
->>>>
->>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->>>> ---
->>>>
->>>> As briefly discussed on IRC. RFC as I do not have easy access to
->>>> hardware I can test this with.
->>>>
->>>> ---
->>>>  hw/vfio/ap.c | 8 ++++++++
->>>>  1 file changed, 8 insertions(+)
->>>>
->>>> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
->>>> index 65de952f44..3bf48eed28 100644
->>>> --- a/hw/vfio/ap.c
->>>> +++ b/hw/vfio/ap.c
->>>> @@ -104,6 +104,14 @@ static void vfio_ap_realize(DeviceState *dev, Error **errp)
->>>>      vapdev->vdev.name = g_strdup_printf("%s", mdevid);
->>>>      vapdev->vdev.dev = dev;
->>>>  
->>>> +    /*
->>>> +     * vfio-ap devices are believed to operate in a way compatible with
->>>> +     * memory ballooning, as no pages are pinned in the host.
->>>> +     * This needs to be set before vfio_get_device() for vfio common to
->>>> +     * handle the balloon inhibitor.
->>>> +     */
->>>> +    vapdev->vdev.balloon_allowed = true;
->>>> +
->>>>      ret = vfio_get_device(vfio_group, mdevid, &vapdev->vdev, &local_err);
->>>>      if (ret) {
->>>>          goto out_get_dev_err;
->>>>   
->>>
->>> What happens if this ever changes? Shouldn't we have an API to at least
->>> check what the vfio device can guarantee?
->>>
->>> "are believed to operate" doesn't sound like guarantees to me :)
-> 
-> I would actually remove that comment or fix it. We either know or we dont.
-> In the way vfio-works I see no reason to disallow balloon. Even if the guest does
-> something wrong (e.g. crypto I/O on freed pages) the host would handle that the
-> same as it would for normal page accesses. From a host point of view the crypto
-> instructions are just CISC instructions with load/store semantics.
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-As long as vfio-ap does not and will never pin pages (and keep them
-pinned), we are fine. I don't know about the details, but if vfio-ap
-really just issues a synchronous instruction for us, we are fine.
+While performing block transfer write in smb_ioport_writeb(),
+'smb_index' is incremented and used to index smb_data[] array.
+Check 'smb_index' value to avoid OOB access.
 
-> 
->>
->> It's the same for ccw :)
->>
->> While such an API definitely sounds like a good idea, it is probably
->> overkill to introduce it for this case (do we envision changing the way
->> vfio-ap operates in the future to make that statement non-true?)
-> 
-> agreed. 
->>
-> 
+Reported-by: Michael Hanselmann <public@hansmi.ch>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ hw/i2c/pm_smbus.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-
--- 
-
-Thanks,
-
-David / dhildenb
+diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
+index 685a2378ed..03062740cc 100644
+--- a/hw/i2c/pm_smbus.c
++++ b/hw/i2c/pm_smbus.c
+@@ -240,6 +240,9 @@ static void smb_ioport_writeb(void *opaque, hwaddr ad=
+dr, uint64_t val,
+             uint8_t read =3D s->smb_addr & 0x01;
+=20
+             s->smb_index++;
++            if (s->smb_index >=3D PM_SMBUS_MAX_MSG_SIZE) {
++                s->smb_index =3D 0;
++            }
+             if (!read && s->smb_index =3D=3D s->smb_data0) {
+                 uint8_t prot =3D (s->smb_ctl >> 2) & 0x07;
+                 uint8_t cmd =3D s->smb_cmd;
+--=20
+2.19.2
