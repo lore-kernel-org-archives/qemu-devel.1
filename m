@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gUwTZ-00015x-DS
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:26:10 -0500
+	(envelope-from <thuth@redhat.com>) id 1gUwUR-0001hY-E4
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:27:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gUwTU-00035i-KU
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:26:09 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41821)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gUwTU-00031t-Dy
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:26:04 -0500
-Received: by mail-ot1-x343.google.com with SMTP id u16so932497otk.8
-	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 08:26:04 -0800 (PST)
-References: <20181203203839.757-1-richard.henderson@linaro.org>
-	<20181203203839.757-9-richard.henderson@linaro.org>
-	<CAFEAcA__1C-GkRk65E+JL9Ovte7GhZhGKmP3Zcv_w=wZSqV7=A@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <2bed35b9-1143-de1a-4d4a-eb5ac23a7ef1@linaro.org>
-Date: Thu, 6 Dec 2018 10:25:59 -0600
+	(envelope-from <thuth@redhat.com>) id 1gUwUO-0006Ak-6v
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:27:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51756)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gUwUN-00062z-TB
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:27:00 -0500
+References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
+	<1543851204-41186-11-git-send-email-pbonzini@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <df1c9b60-9ad1-7820-cee7-3daf4816b130@redhat.com>
+Date: Thu, 6 Dec 2018 17:26:57 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA__1C-GkRk65E+JL9Ovte7GhZhGKmP3Zcv_w=wZSqV7=A@mail.gmail.com>
+In-Reply-To: <1543851204-41186-11-git-send-email-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 08/10] target/arm: Implement the
- ARMv8.1-LOR extension
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 10/71] vhost-user-test: skip if there is no
+ memory at address 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,36 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <laurent@vivier.eu>
 
-On 12/6/18 7:49 AM, Peter Maydell wrote:
->> +        uint64_t hcr = arm_hcr_el2_eff(env);
->> +        if (hcr & HCR_E2H) {
->> +            hcr &= HCR_TLOR;
->> +        } else {
->> +            hcr &= HCR_TGE | HCR_TLOR;
-> This doesn't make sense to me
+On 2018-12-03 16:32, Paolo Bonzini wrote:
+> The virt machine cannot run the vhost-user qtests because they hardcode
+> the presence of memory at address 0.  Report the tests as a skip so tha=
+t
+> they can be converted to use qgraph.
+>=20
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  tests/vhost-user-test.c | 58 ++++++++++++++++++++++++++++++++++++++---=
+--------
+>  1 file changed, 45 insertions(+), 13 deletions(-)
+>=20
+> diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+> index 82fc6c5..59e1aec 100644
+> --- a/tests/vhost-user-test.c
+> +++ b/tests/vhost-user-test.c
+> @@ -228,9 +228,11 @@ static void uninit_virtio_dev(TestServer *s)
+>      qvirtio_pci_device_free(s->dev);
+>  }
+> =20
+> -static void wait_for_fds(TestServer *s)
+> +static bool wait_for_fds(TestServer *s)
+>  {
+>      gint64 end_time;
+> +    bool got_region;
+> +    int i;
+> =20
+>      g_mutex_lock(&s->data_mutex);
+> =20
+> @@ -248,6 +250,19 @@ static void wait_for_fds(TestServer *s)
+>      g_assert_cmpint(s->fds_num, =3D=3D, s->memory.nregions);
+> =20
+>      g_mutex_unlock(&s->data_mutex);
+> +
+> +    got_region =3D false;
+> +    for (i =3D 0; i < s->memory.nregions; ++i) {
+> +        VhostUserMemoryRegion *reg =3D &s->memory.regions[i];
+> +        if (reg->guest_phys_addr =3D=3D 0) {
+> +            got_region =3D true;
+> +            break;
+> +        }
+> +    }
+> +    if (!got_region) {
+> +        g_test_skip("No memory at address 0x0");
+> +    }
 
-The logic is backward.  What I was after was
+g_test_skip does not work with older versions of the gtester ... so this
+patch series depends on your gtester replacement patches first?
 
-  if (hcr & HCR_E2H) {
-      hcr &= HCR_TGE | HCR_TLOR;
-  } else {
-      hcr &= HCR_TLOR;
-  }
-  if (hcr == HCR_TLOR) {
-      trap to el2.
-  }
-
-I.e. swap the then and else condition.  This takes care of the two rules
-
- -- If (SCR_EL3.NS == 1 || SCR_EL3.EEL2 == 1) && IsUsingAArch64(EL2)
-    && HCR_EL2.E2H == 0 && HCR_EL2.TLOR == 1, then
-    accesses at EL1 are trapped to EL2.
- -- If (SCR_EL3.NS == 1 || SCR_EL3.EEL2 == 1) && IsUsingAArch64(EL2)
-    && HCR_EL2.E2H == 1 && HCR_EL2.TGE == 0 && HCR_EL2.TLOR == 1,
-    then accesses at EL1 are trapped to EL2.
-
-
-r~
+ Thomas
