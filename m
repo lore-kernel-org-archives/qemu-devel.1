@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gV2zh-0003Fa-Uv
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 18:23:49 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gV2zm-0003Ka-U6
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 18:23:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gV2zd-0001Q6-KO
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 18:23:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41254)
+	(envelope-from <pbonzini@redhat.com>) id 1gV2zh-0001Sl-Vt
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 18:23:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50700)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gV2zb-00018n-Ng
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 18:23:39 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gV2zf-0001Q2-NF
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 18:23:43 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B33DB3004408
-	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 23:23:37 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 221111F566
+	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 23:23:41 +0000 (UTC)
 Received: from donizetti.redhat.com (ovpn-112-16.ams2.redhat.com
 	[10.36.112.16])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D12B362675
-	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 23:23:36 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 41D806249B
+	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 23:23:40 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri,  7 Dec 2018 00:23:29 +0100
-Message-Id: <20181206232333.22408-3-pbonzini@redhat.com>
+Date: Fri,  7 Dec 2018 00:23:32 +0100
+Message-Id: <20181206232333.22408-6-pbonzini@redhat.com>
 In-Reply-To: <20181206232333.22408-1-pbonzini@redhat.com>
 References: <20181206232333.22408-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 2/6] qemu/queue.h: leave head structs anonymous
- unless necessary
+Subject: [Qemu-devel] [PATCH 5/6] qemu/queue.h: simplify reverse access to
+ QTAILQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,741 +38,624 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Most list head structs need not be given a name.  In most cases the
-name is given just in case one is going to use QTAILQ_LAST, QTAILQ_PREV
-or reverse iteration, but this does not apply to lists of other kinds,
-and even for QTAILQ in practice this is only rarely needed.  In addition,
-we will soon reimplement those macros completely so that they do not
-need a name for the head struct.  So clean up everything, not giving a
-name except in the rare case where it is necessary.
+The new definition of QTAILQ does not require passing the headname,
+remove it.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- accel/kvm/kvm-all.c                     | 4 ++--
- block/gluster.c                         | 2 +-
- block/mirror.c                          | 2 +-
- block/qcow2-bitmap.c                    | 4 +---
- block/qcow2.h                           | 2 +-
- block/sheepdog.c                        | 6 +++---
- block/vhdx.h                            | 2 +-
- blockdev.c                              | 2 +-
- contrib/ivshmem-client/ivshmem-client.h | 4 +---
- contrib/ivshmem-server/ivshmem-server.h | 5 +----
- exec.c                                  | 2 +-
- fsdev/qemu-fsdev.c                      | 2 +-
- hw/block/nvme.h                         | 8 ++++----
- hw/block/xen_disk.c                     | 6 +++---
- hw/core/reset.c                         | 2 +-
- hw/i386/xen/xen-mapcache.c              | 2 +-
- hw/ppc/spapr_iommu.c                    | 2 +-
- hw/usb/ccid-card-emulated.c             | 4 ++--
- hw/usb/dev-network.c                    | 2 +-
- hw/usb/xen-usb.c                        | 6 +++---
- hw/vfio/common.c                        | 4 ++--
- hw/watchdog/watchdog.c                  | 2 +-
- hw/xen/xen_pvdev.c                      | 4 ++--
- include/exec/memory.h                   | 4 ++--
- include/hw/vfio/vfio-common.h           | 4 ++--
- include/hw/vfio/vfio-platform.h         | 2 +-
- include/qom/cpu.h                       | 4 ++--
- include/sysemu/kvm.h                    | 2 --
- include/sysemu/rng.h                    | 2 +-
- linux-user/elfload.c                    | 2 +-
- memory.c                                | 2 +-
- migration/block-dirty-bitmap.c          | 2 +-
- migration/block.c                       | 4 ++--
- migration/ram.c                         | 2 +-
- monitor.c                               | 4 ++--
- net/queue.c                             | 2 +-
- net/slirp.c                             | 2 +-
- slirp/slirp.c                           | 2 +-
- target/arm/kvm.c                        | 2 +-
- target/i386/hax-mem.c                   | 2 +-
- tcg/tcg.h                               | 2 +-
- tests/test-rcu-list.c                   | 2 +-
- vl.c                                    | 2 +-
- 43 files changed, 60 insertions(+), 69 deletions(-)
+ cpus-common.c                   |  2 +-
+ dump.c                          |  2 +-
+ hw/core/qdev.c                  |  4 ++--
+ hw/scsi/scsi-bus.c              |  2 +-
+ hw/usb/combined-packet.c        |  2 +-
+ hw/usb/dev-mtp.c                |  4 ++--
+ hw/usb/hcd-ehci.c               |  2 +-
+ hw/usb/hcd-ehci.h               |  2 +-
+ hw/usb/hcd-uhci.c               |  4 ++--
+ include/exec/memory.h           |  2 +-
+ include/hw/qdev-core.h          |  2 +-
+ include/hw/usb.h                |  2 +-
+ include/net/net.h               |  2 +-
+ include/qemu/option_int.h       |  2 +-
+ include/qemu/queue.h            | 16 ++++++++--------
+ include/sysemu/memory_mapping.h |  2 +-
+ memory.c                        | 17 ++++++-----------
+ memory_mapping.c                |  2 +-
+ net/filter.c                    |  2 +-
+ net/net.c                       |  2 +-
+ qga/commands-posix.c            |  2 +-
+ tcg/tcg.c                       |  2 +-
+ tcg/tcg.h                       |  4 ++--
+ tests/libqos/malloc.c           |  2 +-
+ tests/test-vmstate.c            |  8 ++++----
+ ui/console.c                    |  4 ++--
+ util/qemu-option.c              |  4 ++--
+ 27 files changed, 48 insertions(+), 53 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 4880a05399..4e1de942ce 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -86,7 +86,7 @@ struct KVMState
-     int robust_singlestep;
-     int debugregs;
- #ifdef KVM_CAP_SET_GUEST_DEBUG
--    struct kvm_sw_breakpoint_head kvm_sw_breakpoints;
-+    QTAILQ_HEAD(, kvm_sw_breakpoint) kvm_sw_breakpoints;
- #endif
-     int many_ioeventfds;
-     int intx_set_mask;
-@@ -102,7 +102,7 @@ struct KVMState
-     int nr_allocated_irq_routes;
-     unsigned long *used_gsi_bitmap;
-     unsigned int gsi_count;
--    QTAILQ_HEAD(msi_hashtab, KVMMSIRoute) msi_hashtab[KVM_MSI_HASHTAB_SI=
-ZE];
-+    QTAILQ_HEAD(, KVMMSIRoute) msi_hashtab[KVM_MSI_HASHTAB_SIZE];
- #endif
-     KVMMemoryListener memory_listener;
-     QLIST_HEAD(, KVMParkedVcpu) kvm_parked_vcpus;
-diff --git a/block/gluster.c b/block/gluster.c
-index 5e300c96c8..72891060e3 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -72,7 +72,7 @@ typedef struct ListElement {
-     GlfsPreopened saved;
- } ListElement;
+diff --git a/cpus-common.c b/cpus-common.c
+index 98dd8c6ff1..3ca58c64e8 100644
+--- a/cpus-common.c
++++ b/cpus-common.c
+@@ -99,7 +99,7 @@ void cpu_list_remove(CPUState *cpu)
+         return;
+     }
 =20
--static QLIST_HEAD(glfs_list, ListElement) glfs_list;
-+static QLIST_HEAD(, ListElement) glfs_list;
+-    assert(!(cpu_index_auto_assigned && cpu !=3D QTAILQ_LAST(&cpus, CPUT=
+ailQ)));
++    assert(!(cpu_index_auto_assigned && cpu !=3D QTAILQ_LAST(&cpus)));
 =20
- static QemuOptsList qemu_gluster_create_opts =3D {
-     .name =3D "qemu-gluster-create-opts",
-diff --git a/block/mirror.c b/block/mirror.c
-index 8f52c6215d..6250cc3c87 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -72,7 +72,7 @@ typedef struct MirrorBlockJob {
-     unsigned long *in_flight_bitmap;
-     int in_flight;
-     int64_t bytes_in_flight;
--    QTAILQ_HEAD(MirrorOpList, MirrorOp) ops_in_flight;
-+    QTAILQ_HEAD(, MirrorOp) ops_in_flight;
-     int ret;
-     bool unmap;
-     int target_cluster_size;
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index accebef4cf..b946301429 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -77,8 +77,6 @@ typedef struct Qcow2BitmapTable {
-     uint32_t size; /* number of 64bit entries */
-     QSIMPLEQ_ENTRY(Qcow2BitmapTable) entry;
- } Qcow2BitmapTable;
--typedef QSIMPLEQ_HEAD(Qcow2BitmapTableList, Qcow2BitmapTable)
--    Qcow2BitmapTableList;
-=20
- typedef struct Qcow2Bitmap {
-     Qcow2BitmapTable table;
-@@ -1316,7 +1314,7 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriv=
-erState *bs, Error **errp)
-     int ret;
-     Qcow2BitmapList *bm_list;
-     Qcow2Bitmap *bm;
--    Qcow2BitmapTableList drop_tables;
-+    QSIMPLEQ_HEAD(, Qcow2BitmapTable) drop_tables;
-     Qcow2BitmapTable *tb, *tb_next;
-=20
-     if (!bdrv_has_changed_persistent_bitmaps(bs)) {
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 8662b68575..d747dd14a2 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -281,7 +281,7 @@ typedef struct BDRVQcow2State {
-     uint8_t *cluster_cache;
-     uint8_t *cluster_data;
-     uint64_t cluster_cache_offset;
--    QLIST_HEAD(QCowClusterAlloc, QCowL2Meta) cluster_allocs;
-+    QLIST_HEAD(, QCowL2Meta) cluster_allocs;
-=20
-     uint64_t *refcount_table;
-     uint64_t refcount_table_offset;
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 0125df9d49..90ab43baa4 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -391,12 +391,12 @@ struct BDRVSheepdogState {
-     uint32_t aioreq_seq_num;
-=20
-     /* Every aio request must be linked to either of these queues. */
--    QLIST_HEAD(inflight_aio_head, AIOReq) inflight_aio_head;
--    QLIST_HEAD(failed_aio_head, AIOReq) failed_aio_head;
-+    QLIST_HEAD(, AIOReq) inflight_aio_head;
-+    QLIST_HEAD(, AIOReq) failed_aio_head;
-=20
-     CoMutex queue_lock;
-     CoQueue overlapping_queue;
--    QLIST_HEAD(inflight_aiocb_head, SheepdogAIOCB) inflight_aiocb_head;
-+    QLIST_HEAD(, SheepdogAIOCB) inflight_aiocb_head;
- };
-=20
- typedef struct BDRVSheepdogReopenState {
-diff --git a/block/vhdx.h b/block/vhdx.h
-index 3a5f5293ad..1bfb4e4f73 100644
---- a/block/vhdx.h
-+++ b/block/vhdx.h
-@@ -398,7 +398,7 @@ typedef struct BDRVVHDXState {
-=20
-     bool log_replayed_on_open;
-=20
--    QLIST_HEAD(VHDXRegionHead, VHDXRegionEntry) regions;
-+    QLIST_HEAD(, VHDXRegionEntry) regions;
- } BDRVVHDXState;
-=20
- void vhdx_guid_generate(MSGUID *guid);
-diff --git a/blockdev.c b/blockdev.c
-index 7604b2183b..60d05ec7f5 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2269,7 +2269,7 @@ void qmp_transaction(TransactionActionList *dev_lis=
-t,
-     BlkActionState *state, *next;
-     Error *local_err =3D NULL;
-=20
--    QSIMPLEQ_HEAD(snap_bdrv_states, BlkActionState) snap_bdrv_states;
-+    QSIMPLEQ_HEAD(, BlkActionState) snap_bdrv_states;
-     QSIMPLEQ_INIT(&snap_bdrv_states);
-=20
-     /* Does this transaction get canceled as a group on failure?
-diff --git a/contrib/ivshmem-client/ivshmem-client.h b/contrib/ivshmem-cl=
-ient/ivshmem-client.h
-index 5ee942262b..fe3cc4a03d 100644
---- a/contrib/ivshmem-client/ivshmem-client.h
-+++ b/contrib/ivshmem-client/ivshmem-client.h
-@@ -46,9 +46,7 @@ typedef struct IvshmemClientPeer {
-     int vectors[IVSHMEM_CLIENT_MAX_VECTORS]; /**< one fd per vector */
-     unsigned vectors_count;                  /**< number of vectors */
- } IvshmemClientPeer;
--QTAILQ_HEAD(IvshmemClientPeerList, IvshmemClientPeer);
-=20
--typedef struct IvshmemClientPeerList IvshmemClientPeerList;
- typedef struct IvshmemClient IvshmemClient;
-=20
- /**
-@@ -73,7 +71,7 @@ struct IvshmemClient {
-     int sock_fd;                        /**< unix sock filedesc */
-     int shm_fd;                         /**< shm file descriptor */
-=20
--    IvshmemClientPeerList peer_list;    /**< list of peers */
-+    QTAILQ_HEAD(, IvshmemClientPeer) peer_list;    /**< list of peers */
-     IvshmemClientPeer local;            /**< our own infos */
-=20
-     IvshmemClientNotifCb notif_cb;      /**< notification callback */
-diff --git a/contrib/ivshmem-server/ivshmem-server.h b/contrib/ivshmem-se=
-rver/ivshmem-server.h
-index 4af08e1bb7..d870adb6a0 100644
---- a/contrib/ivshmem-server/ivshmem-server.h
-+++ b/contrib/ivshmem-server/ivshmem-server.h
-@@ -52,9 +52,6 @@ typedef struct IvshmemServerPeer {
-     EventNotifier vectors[IVSHMEM_SERVER_MAX_VECTORS]; /**< one per vect=
-or */
-     unsigned vectors_count;                  /**< number of vectors */
- } IvshmemServerPeer;
--QTAILQ_HEAD(IvshmemServerPeerList, IvshmemServerPeer);
--
--typedef struct IvshmemServerPeerList IvshmemServerPeerList;
-=20
- /**
-  * Structure describing an ivshmem server
-@@ -72,7 +69,7 @@ typedef struct IvshmemServer {
-     unsigned n_vectors;              /**< number of vectors */
-     uint16_t cur_id;                 /**< id to be given to next client =
-*/
-     bool verbose;                    /**< true in verbose mode */
--    IvshmemServerPeerList peer_list; /**< list of peers */
-+    QTAILQ_HEAD(, IvshmemServerPeer) peer_list; /**< list of peers */
- } IvshmemServer;
-=20
- /**
-diff --git a/exec.c b/exec.c
-index bb6170dbff..b6b2007f27 100644
---- a/exec.c
-+++ b/exec.c
-@@ -3464,7 +3464,7 @@ typedef struct MapClient {
- } MapClient;
-=20
- QemuMutex map_client_list_lock;
--static QLIST_HEAD(map_client_list, MapClient) map_client_list
-+static QLIST_HEAD(, MapClient) map_client_list
-     =3D QLIST_HEAD_INITIALIZER(map_client_list);
-=20
- static void cpu_unregister_map_client_do(MapClient *client)
-diff --git a/fsdev/qemu-fsdev.c b/fsdev/qemu-fsdev.c
-index 7a3b87cc9e..82edf43a0d 100644
---- a/fsdev/qemu-fsdev.c
-+++ b/fsdev/qemu-fsdev.c
-@@ -18,7 +18,7 @@
- #include "qemu/error-report.h"
- #include "qemu/option.h"
-=20
--static QTAILQ_HEAD(FsDriverEntry_head, FsDriverListEntry) fsdriver_entri=
-es =3D
-+static QTAILQ_HEAD(, FsDriverListEntry) fsdriver_entries =3D
-     QTAILQ_HEAD_INITIALIZER(fsdriver_entries);
-=20
- static FsDriverTable FsDrivers[] =3D {
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index cabcf20c32..56c9d4b4b1 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -29,8 +29,8 @@ typedef struct NvmeSQueue {
-     uint64_t    dma_addr;
-     QEMUTimer   *timer;
-     NvmeRequest *io_req;
--    QTAILQ_HEAD(sq_req_list, NvmeRequest) req_list;
--    QTAILQ_HEAD(out_req_list, NvmeRequest) out_req_list;
-+    QTAILQ_HEAD(, NvmeRequest) req_list;
-+    QTAILQ_HEAD(, NvmeRequest) out_req_list;
-     QTAILQ_ENTRY(NvmeSQueue) entry;
- } NvmeSQueue;
-=20
-@@ -45,8 +45,8 @@ typedef struct NvmeCQueue {
-     uint32_t    size;
-     uint64_t    dma_addr;
-     QEMUTimer   *timer;
--    QTAILQ_HEAD(sq_list, NvmeSQueue) sq_list;
--    QTAILQ_HEAD(cq_req_list, NvmeRequest) req_list;
-+    QTAILQ_HEAD(, NvmeSQueue) sq_list;
-+    QTAILQ_HEAD(, NvmeRequest) req_list;
- } NvmeCQueue;
-=20
- typedef struct NvmeNamespace {
-diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
-index 36eff94f84..2a254b99d0 100644
---- a/hw/block/xen_disk.c
-+++ b/hw/block/xen_disk.c
-@@ -82,9 +82,9 @@ struct XenBlkDev {
-     int                 more_work;
-=20
-     /* request lists */
--    QLIST_HEAD(inflight_head, ioreq) inflight;
--    QLIST_HEAD(finished_head, ioreq) finished;
--    QLIST_HEAD(freelist_head, ioreq) freelist;
-+    QLIST_HEAD(, ioreq) inflight;
-+    QLIST_HEAD(, ioreq) finished;
-+    QLIST_HEAD(, ioreq) freelist;
-     int                 requests_total;
-     int                 requests_inflight;
-     int                 requests_finished;
-diff --git a/hw/core/reset.c b/hw/core/reset.c
-index 84c8869371..9c477f2bf5 100644
---- a/hw/core/reset.c
-+++ b/hw/core/reset.c
-@@ -35,7 +35,7 @@ typedef struct QEMUResetEntry {
-     void *opaque;
- } QEMUResetEntry;
-=20
--static QTAILQ_HEAD(reset_handlers, QEMUResetEntry) reset_handlers =3D
-+static QTAILQ_HEAD(, QEMUResetEntry) reset_handlers =3D
-     QTAILQ_HEAD_INITIALIZER(reset_handlers);
-=20
- void qemu_register_reset(QEMUResetHandler *func, void *opaque)
-diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
-index 4e4f069a24..02e823c5a2 100644
---- a/hw/i386/xen/xen-mapcache.c
-+++ b/hw/i386/xen/xen-mapcache.c
-@@ -71,7 +71,7 @@ typedef struct MapCacheRev {
- typedef struct MapCache {
-     MapCacheEntry *entry;
-     unsigned long nr_buckets;
--    QTAILQ_HEAD(map_cache_head, MapCacheRev) locked_entries;
-+    QTAILQ_HEAD(, MapCacheRev) locked_entries;
-=20
-     /* For most cases (>99.9%), the page address is the same. */
-     MapCacheEntry *last_entry;
-diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
-index 1b0880ac9e..68dacf6356 100644
---- a/hw/ppc/spapr_iommu.c
-+++ b/hw/ppc/spapr_iommu.c
-@@ -42,7 +42,7 @@ enum sPAPRTCEAccess {
- #define IOMMU_PAGE_SIZE(shift)      (1ULL << (shift))
- #define IOMMU_PAGE_MASK(shift)      (~(IOMMU_PAGE_SIZE(shift) - 1))
-=20
--static QLIST_HEAD(spapr_tce_tables, sPAPRTCETable) spapr_tce_tables;
-+static QLIST_HEAD(, sPAPRTCETable) spapr_tce_tables;
-=20
- sPAPRTCETable *spapr_tce_find_by_liobn(target_ulong liobn)
+     QTAILQ_REMOVE_RCU(&cpus, cpu, node);
+     cpu->cpu_index =3D UNASSIGNED_CPU_INDEX;
+diff --git a/dump.c b/dump.c
+index 4ec94c5e25..ef1d8025c9 100644
+--- a/dump.c
++++ b/dump.c
+@@ -1557,7 +1557,7 @@ static void get_max_mapnr(DumpState *s)
  {
-diff --git a/hw/usb/ccid-card-emulated.c b/hw/usb/ccid-card-emulated.c
-index 25976ed84f..de880a8c30 100644
---- a/hw/usb/ccid-card-emulated.c
-+++ b/hw/usb/ccid-card-emulated.c
-@@ -119,11 +119,11 @@ struct EmulatedState {
-     char    *db;
-     uint8_t  atr[MAX_ATR_SIZE];
-     uint8_t  atr_length;
--    QSIMPLEQ_HEAD(event_list, EmulEvent) event_list;
-+    QSIMPLEQ_HEAD(, EmulEvent) event_list;
-     QemuMutex event_list_mutex;
-     QemuThread event_thread_id;
-     VReader *reader;
--    QSIMPLEQ_HEAD(guest_apdu_list, EmulEvent) guest_apdu_list;
-+    QSIMPLEQ_HEAD(, EmulEvent) guest_apdu_list;
-     QemuMutex vreader_mutex; /* and guest_apdu_list mutex */
-     QemuMutex handle_apdu_mutex;
-     QemuCond handle_apdu_cond;
-diff --git a/hw/usb/dev-network.c b/hw/usb/dev-network.c
-index 385e090336..ffab3fabee 100644
---- a/hw/usb/dev-network.c
-+++ b/hw/usb/dev-network.c
-@@ -648,7 +648,7 @@ typedef struct USBNetState {
-     char usbstring_mac[13];
-     NICState *nic;
-     NICConf conf;
--    QTAILQ_HEAD(rndis_resp_head, rndis_response) rndis_resp;
-+    QTAILQ_HEAD(, rndis_response) rndis_resp;
- } USBNetState;
+     GuestPhysBlock *last_block;
 =20
- #define TYPE_USB_NET "usb-net"
-diff --git a/hw/usb/xen-usb.c b/hw/usb/xen-usb.c
-index 5b2e21ed18..5564eb977c 100644
---- a/hw/usb/xen-usb.c
-+++ b/hw/usb/xen-usb.c
-@@ -72,7 +72,7 @@ struct usbback_stub {
-     USBPort       port;
-     unsigned int  speed;
-     bool          attached;
--    QTAILQ_HEAD(submit_q_head, usbback_req) submit_q;
-+    QTAILQ_HEAD(, usbback_req) submit_q;
- };
-=20
- struct usbback_req {
-@@ -108,8 +108,8 @@ struct usbback_info {
-     int                      num_ports;
-     int                      usb_ver;
-     bool                     ring_error;
--    QTAILQ_HEAD(req_free_q_head, usbback_req) req_free_q;
--    QSIMPLEQ_HEAD(hotplug_q_head, usbback_hotplug) hotplug_q;
-+    QTAILQ_HEAD(, usbback_req) req_free_q;
-+    QSIMPLEQ_HEAD(, usbback_hotplug) hotplug_q;
-     struct usbback_stub      ports[USBBACK_MAXPORTS];
-     struct usbback_stub      *addr_table[USB_DEV_ADDR_SIZE];
-     QEMUBH                   *bh;
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 7c185e5a2e..4262b80c44 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -37,9 +37,9 @@
- #include "trace.h"
- #include "qapi/error.h"
-=20
--struct vfio_group_head vfio_group_list =3D
-+VFIOGroupList vfio_group_list =3D
-     QLIST_HEAD_INITIALIZER(vfio_group_list);
--struct vfio_as_head vfio_address_spaces =3D
-+static QLIST_HEAD(, VFIOAddressSpace) vfio_address_spaces =3D
-     QLIST_HEAD_INITIALIZER(vfio_address_spaces);
-=20
- #ifdef CONFIG_KVM
-diff --git a/hw/watchdog/watchdog.c b/hw/watchdog/watchdog.c
-index 33e6c20184..dce7c1db14 100644
---- a/hw/watchdog/watchdog.c
-+++ b/hw/watchdog/watchdog.c
-@@ -32,7 +32,7 @@
- #include "qemu/help_option.h"
-=20
- static WatchdogAction watchdog_action =3D WATCHDOG_ACTION_RESET;
--static QLIST_HEAD(watchdog_list, WatchdogTimerModel) watchdog_list;
-+static QLIST_HEAD(, WatchdogTimerModel) watchdog_list;
-=20
- void watchdog_add_model(WatchdogTimerModel *model)
- {
-diff --git a/hw/xen/xen_pvdev.c b/hw/xen/xen_pvdev.c
-index aed783e844..f026556f62 100644
---- a/hw/xen/xen_pvdev.c
-+++ b/hw/xen/xen_pvdev.c
-@@ -31,10 +31,10 @@ struct xs_dirs {
-     QTAILQ_ENTRY(xs_dirs) list;
- };
-=20
--static QTAILQ_HEAD(xs_dirs_head, xs_dirs) xs_cleanup =3D
-+static QTAILQ_HEAD(, xs_dirs) xs_cleanup =3D
-     QTAILQ_HEAD_INITIALIZER(xs_cleanup);
-=20
--static QTAILQ_HEAD(XenDeviceHead, XenDevice) xendevs =3D
-+static QTAILQ_HEAD(, XenDevice) xendevs =3D
-     QTAILQ_HEAD_INITIALIZER(xendevs);
-=20
- /* ------------------------------------------------------------- */
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 8e61450de3..ce930689cf 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -379,9 +379,9 @@ struct MemoryRegion {
-     MemoryRegion *alias;
-     hwaddr alias_offset;
-     int32_t priority;
--    QTAILQ_HEAD(subregions, MemoryRegion) subregions;
-+    QTAILQ_HEAD(, MemoryRegion) subregions;
-     QTAILQ_ENTRY(MemoryRegion) subregions_link;
--    QTAILQ_HEAD(coalesced_ranges, CoalescedMemoryRange) coalesced;
-+    QTAILQ_HEAD(, CoalescedMemoryRange) coalesced;
-     const char *name;
-     unsigned ioeventfd_nb;
-     MemoryRegionIoeventfd *ioeventfds;
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.=
-h
-index 1b434d02f6..7624c9f511 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -180,8 +180,8 @@ int vfio_get_device(VFIOGroup *group, const char *nam=
-e,
-                     VFIODevice *vbasedev, Error **errp);
-=20
- extern const MemoryRegionOps vfio_region_ops;
--extern QLIST_HEAD(vfio_group_head, VFIOGroup) vfio_group_list;
--extern QLIST_HEAD(vfio_as_head, VFIOAddressSpace) vfio_address_spaces;
-+typedef QLIST_HEAD(VFIOGroupList, VFIOGroup) VFIOGroupList;
-+extern VFIOGroupList vfio_group_list;
-=20
- #ifdef CONFIG_LINUX
- int vfio_get_region_info(VFIODevice *vbasedev, int index,
-diff --git a/include/hw/vfio/vfio-platform.h b/include/hw/vfio/vfio-platf=
-orm.h
-index 0ee10b1d71..30d3c28d3b 100644
---- a/include/hw/vfio/vfio-platform.h
-+++ b/include/hw/vfio/vfio-platform.h
-@@ -53,7 +53,7 @@ typedef struct VFIOPlatformDevice {
-     VFIORegion **regions;
-     QLIST_HEAD(, VFIOINTp) intp_list; /* list of IRQs */
-     /* queue of pending IRQs */
--    QSIMPLEQ_HEAD(pending_intp_queue, VFIOINTp) pending_intp_queue;
-+    QSIMPLEQ_HEAD(, VFIOINTp) pending_intp_queue;
-     char *compat; /* DT compatible values, separated by NUL */
-     unsigned int num_compat; /* number of compatible values */
-     uint32_t mmap_timeout; /* delay to re-enable mmaps after interrupt *=
-/
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 1396f53e5b..62aef77b87 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -375,9 +375,9 @@ struct CPUState {
-     QTAILQ_ENTRY(CPUState) node;
-=20
-     /* ice debug support */
--    QTAILQ_HEAD(breakpoints_head, CPUBreakpoint) breakpoints;
-+    QTAILQ_HEAD(, CPUBreakpoint) breakpoints;
-=20
--    QTAILQ_HEAD(watchpoints_head, CPUWatchpoint) watchpoints;
-+    QTAILQ_HEAD(, CPUWatchpoint) watchpoints;
-     CPUWatchpoint *watchpoint_hit;
-=20
-     void *opaque;
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 97d8d9d0d5..a6d1cd190f 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -412,8 +412,6 @@ struct kvm_sw_breakpoint {
-     QTAILQ_ENTRY(kvm_sw_breakpoint) entry;
- };
-=20
--QTAILQ_HEAD(kvm_sw_breakpoint_head, kvm_sw_breakpoint);
--
- struct kvm_sw_breakpoint *kvm_find_sw_breakpoint(CPUState *cpu,
-                                                  target_ulong pc);
-=20
-diff --git a/include/sysemu/rng.h b/include/sysemu/rng.h
-index 45629c4c53..27b37da05d 100644
---- a/include/sysemu/rng.h
-+++ b/include/sysemu/rng.h
-@@ -57,7 +57,7 @@ struct RngBackend
-=20
-     /*< protected >*/
-     bool opened;
--    QSIMPLEQ_HEAD(requests, RngRequest) requests;
-+    QSIMPLEQ_HEAD(, RngRequest) requests;
- };
-=20
-=20
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 5bccd2e243..4cff9e1a31 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -2844,7 +2844,7 @@ struct elf_note_info {
-     struct target_elf_prstatus *prstatus;  /* NT_PRSTATUS */
-     struct target_elf_prpsinfo *psinfo;    /* NT_PRPSINFO */
-=20
--    QTAILQ_HEAD(thread_list_head, elf_thread_status) thread_list;
-+    QTAILQ_HEAD(, elf_thread_status) thread_list;
- #if 0
-     /*
-      * Current version of ELF coredump doesn't support
-diff --git a/memory.c b/memory.c
-index 5759f74034..195c5cf639 100644
---- a/memory.c
-+++ b/memory.c
-@@ -2795,7 +2795,7 @@ struct MemoryRegionList {
-     QTAILQ_ENTRY(MemoryRegionList) mrqueue;
- };
-=20
--typedef QTAILQ_HEAD(mrqueue, MemoryRegionList) MemoryRegionListHead;
-+typedef QTAILQ_HEAD(, MemoryRegionList) MemoryRegionListHead;
-=20
- #define MR_SIZE(size) (int128_nz(size) ? (hwaddr)int128_get64( \
-                            int128_sub((size), int128_one())) : 0)
-diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitma=
-p.c
-index 5e90f44c2f..6426151e4f 100644
---- a/migration/block-dirty-bitmap.c
-+++ b/migration/block-dirty-bitmap.c
-@@ -116,7 +116,7 @@ typedef struct DirtyBitmapMigBitmapState {
- } DirtyBitmapMigBitmapState;
-=20
- typedef struct DirtyBitmapMigState {
--    QSIMPLEQ_HEAD(dbms_list, DirtyBitmapMigBitmapState) dbms_list;
-+    QSIMPLEQ_HEAD(, DirtyBitmapMigBitmapState) dbms_list;
-=20
-     bool bulk_completed;
-     bool no_bitmaps;
-diff --git a/migration/block.c b/migration/block.c
-index 4c04d937b1..0e24e18d13 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -93,12 +93,12 @@ typedef struct BlkMigBlock {
- } BlkMigBlock;
-=20
- typedef struct BlkMigState {
--    QSIMPLEQ_HEAD(bmds_list, BlkMigDevState) bmds_list;
-+    QSIMPLEQ_HEAD(, BlkMigDevState) bmds_list;
-     int64_t total_sector_sum;
-     bool zero_blocks;
-=20
-     /* Protected by lock.  */
--    QSIMPLEQ_HEAD(blk_list, BlkMigBlock) blk_list;
-+    QSIMPLEQ_HEAD(, BlkMigBlock) blk_list;
-     int submitted;
-     int read_done;
-=20
-diff --git a/migration/ram.c b/migration/ram.c
-index 7e7deec4d8..1849979fed 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -322,7 +322,7 @@ struct RAMState {
-     RAMBlock *last_req_rb;
-     /* Queue of outstanding page requests from the destination */
-     QemuMutex src_page_req_mutex;
--    QSIMPLEQ_HEAD(src_page_requests, RAMSrcPageRequest) src_page_request=
-s;
-+    QSIMPLEQ_HEAD(, RAMSrcPageRequest) src_page_requests;
- };
- typedef struct RAMState RAMState;
-=20
-diff --git a/monitor.c b/monitor.c
-index d39390c2f2..b8bdb98ba7 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -266,11 +266,11 @@ typedef struct QMPRequest QMPRequest;
- /* Protects mon_list, monitor_qapi_event_state.  */
- static QemuMutex monitor_lock;
- static GHashTable *monitor_qapi_event_state;
--static QTAILQ_HEAD(mon_list, Monitor) mon_list;
-+static QTAILQ_HEAD(, Monitor) mon_list;
-=20
- /* Protects mon_fdsets */
- static QemuMutex mon_fdsets_lock;
--static QLIST_HEAD(mon_fdsets, MonFdset) mon_fdsets;
-+static QLIST_HEAD(, MonFdset) mon_fdsets;
-=20
- static int mon_refcount;
-=20
-diff --git a/net/queue.c b/net/queue.c
-index 9c32abdb8f..61276ca4be 100644
---- a/net/queue.c
-+++ b/net/queue.c
-@@ -55,7 +55,7 @@ struct NetQueue {
-     uint32_t nq_count;
-     NetQueueDeliverFunc *deliver;
-=20
--    QTAILQ_HEAD(packets, NetPacket) packets;
-+    QTAILQ_HEAD(, NetPacket) packets;
-=20
-     unsigned delivering : 1;
- };
-diff --git a/net/slirp.c b/net/slirp.c
-index f6dc03963a..38ae65e4a9 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -85,7 +85,7 @@ typedef struct SlirpState {
- } SlirpState;
-=20
- static struct slirp_config_str *slirp_configs;
--static QTAILQ_HEAD(slirp_stacks, SlirpState) slirp_stacks =3D
-+static QTAILQ_HEAD(, SlirpState) slirp_stacks =3D
-     QTAILQ_HEAD_INITIALIZER(slirp_stacks);
-=20
- static int slirp_hostfwd(SlirpState *s, const char *redir_str, Error **e=
-rrp);
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 322edf51eb..ab2fc4eb8b 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -47,7 +47,7 @@ static const uint8_t special_ethaddr[ETH_ALEN] =3D {
-=20
- u_int curtime;
-=20
--static QTAILQ_HEAD(slirp_instances, Slirp) slirp_instances =3D
-+static QTAILQ_HEAD(, Slirp) slirp_instances =3D
-     QTAILQ_HEAD_INITIALIZER(slirp_instances);
-=20
- static struct in_addr dns_addr;
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 44dd0ce6ce..e00ccf9c98 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -206,7 +206,7 @@ typedef struct KVMDevice {
-     int dev_fd;
- } KVMDevice;
-=20
--static QSLIST_HEAD(kvm_devices_head, KVMDevice) kvm_devices_head;
-+static QSLIST_HEAD(, KVMDevice) kvm_devices_head;
-=20
- static void kvm_arm_devlistener_add(MemoryListener *listener,
-                                     MemoryRegionSection *section)
-diff --git a/target/i386/hax-mem.c b/target/i386/hax-mem.c
-index 5c37e94caa..6bb5a24917 100644
---- a/target/i386/hax-mem.c
-+++ b/target/i386/hax-mem.c
-@@ -56,7 +56,7 @@ typedef struct HAXMapping {
-  * send to the kernel only the removal of the pages from the MMIO hole a=
-fter
-  * having computed locally the result of the deletion and additions.
-  */
--static QTAILQ_HEAD(HAXMappingListHead, HAXMapping) mappings =3D
-+static QTAILQ_HEAD(, HAXMapping) mappings =3D
-     QTAILQ_HEAD_INITIALIZER(mappings);
-=20
- /**
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index f4efbaa680..1e9c87b46c 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -704,7 +704,7 @@ struct TCGContext {
-=20
-     /* These structures are private to tcg-target.inc.c.  */
- #ifdef TCG_TARGET_NEED_LDST_LABELS
--    QSIMPLEQ_HEAD(ldst_labels, TCGLabelQemuLdst) ldst_labels;
-+    QSIMPLEQ_HEAD(, TCGLabelQemuLdst) ldst_labels;
- #endif
- #ifdef TCG_TARGET_NEED_POOL_LABELS
-     struct TCGLabelPoolData *pool_labels;
-diff --git a/tests/test-rcu-list.c b/tests/test-rcu-list.c
-index 2e6f70bd59..6f076473e0 100644
---- a/tests/test-rcu-list.c
-+++ b/tests/test-rcu-list.c
-@@ -108,7 +108,7 @@ static void reclaim_list_el(struct rcu_head *prcu)
+-    last_block =3D QTAILQ_LAST(&s->guest_phys_blocks.head, GuestPhysBloc=
+kHead);
++    last_block =3D QTAILQ_LAST(&s->guest_phys_blocks.head);
+     s->max_mapnr =3D dump_paddr_to_pfn(s, last_block->target_end);
  }
 =20
- #if TEST_LIST_TYPE =3D=3D 1
--static QLIST_HEAD(q_list_head, list_element) Q_list_head;
-+static QLIST_HEAD(, list_element) Q_list_head;
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 6b3cc55b27..a7dd4bebd6 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -158,7 +158,7 @@ DeviceState *qdev_try_create(BusState *bus, const cha=
+r *type)
+     return dev;
+ }
 =20
- #define TEST_NAME "qlist"
- #define TEST_LIST_REMOVE_RCU        QLIST_REMOVE_RCU
-diff --git a/vl.c b/vl.c
-index f6a6193428..4431ae6e99 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1529,7 +1529,7 @@ struct vm_change_state_entry {
-     QLIST_ENTRY (vm_change_state_entry) entries;
+-static QTAILQ_HEAD(device_listeners, DeviceListener) device_listeners
++static QTAILQ_HEAD(, DeviceListener) device_listeners
+     =3D QTAILQ_HEAD_INITIALIZER(device_listeners);
+=20
+ enum ListenerDirection { Forward, Reverse };
+@@ -177,7 +177,7 @@ enum ListenerDirection { Forward, Reverse };
+             break;                                                \
+         case Reverse:                                             \
+             QTAILQ_FOREACH_REVERSE(_listener, &device_listeners,  \
+-                                   device_listeners, link) {      \
++                                   link) {                        \
+                 if (_listener->_callback) {                       \
+                     _listener->_callback(_listener, ##_args);     \
+                 }                                                 \
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index 97cd167114..c480553083 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -1554,7 +1554,7 @@ SCSIDevice *scsi_device_find(SCSIBus *bus, int chan=
+nel, int id, int lun)
+     BusChild *kid;
+     SCSIDevice *target_dev =3D NULL;
+=20
+-    QTAILQ_FOREACH_REVERSE(kid, &bus->qbus.children, ChildrenHead, sibli=
+ng) {
++    QTAILQ_FOREACH_REVERSE(kid, &bus->qbus.children, sibling) {
+         DeviceState *qdev =3D kid->child;
+         SCSIDevice *dev =3D SCSI_DEVICE(qdev);
+=20
+diff --git a/hw/usb/combined-packet.c b/hw/usb/combined-packet.c
+index 01a7ed0848..fc98383d30 100644
+--- a/hw/usb/combined-packet.c
++++ b/hw/usb/combined-packet.c
+@@ -64,7 +64,7 @@ void usb_combined_input_packet_complete(USBDevice *dev,=
+ USBPacket *p)
+=20
+     status =3D combined->first->status;
+     actual_length =3D combined->first->actual_length;
+-    short_not_ok =3D QTAILQ_LAST(&combined->packets, packets_head)->shor=
+t_not_ok;
++    short_not_ok =3D QTAILQ_LAST(&combined->packets)->short_not_ok;
+=20
+     QTAILQ_FOREACH_SAFE(p, &combined->packets, combined_entry, next) {
+         if (!done) {
+diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+index 100b7171f4..c33d7d6b1f 100644
+--- a/hw/usb/dev-mtp.c
++++ b/hw/usb/dev-mtp.c
+@@ -191,7 +191,7 @@ struct MTPState {
+ #ifdef CONFIG_INOTIFY1
+     /* inotify descriptor */
+     int          inotifyfd;
+-    QTAILQ_HEAD(events, MTPMonEntry) events;
++    QTAILQ_HEAD(, MTPMonEntry) events;
+ #endif
+     /* Responder is expecting a write operation */
+     bool write_pending;
+@@ -1982,7 +1982,7 @@ static void usb_mtp_handle_data(USBDevice *dev, USB=
+Packet *p)
+     case EP_EVENT:
+ #ifdef CONFIG_INOTIFY1
+         if (!QTAILQ_EMPTY(&s->events)) {
+-            struct MTPMonEntry *e =3D QTAILQ_LAST(&s->events, events);
++            struct MTPMonEntry *e =3D QTAILQ_LAST(&s->events);
+             uint32_t handle;
+             int len =3D sizeof(container) + sizeof(uint32_t);
+=20
+diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
+index e5acfc5ba5..a2105c8ab1 100644
+--- a/hw/usb/hcd-ehci.c
++++ b/hw/usb/hcd-ehci.c
+@@ -1815,7 +1815,7 @@ static int ehci_state_fetchqtd(EHCIQueue *q)
+             break;
+         case EHCI_ASYNC_INFLIGHT:
+             /* Check if the guest has added new tds to the queue */
+-            again =3D ehci_fill_queue(QTAILQ_LAST(&q->packets, pkts_head=
+));
++            again =3D ehci_fill_queue(QTAILQ_LAST(&q->packets));
+             /* Unfinished async handled packet, go horizontal */
+             ehci_set_state(q->ehci, q->async, EST_HORIZONTALQH);
+             break;
+diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h
+index 0bc364b286..e4460aa1a8 100644
+--- a/hw/usb/hcd-ehci.h
++++ b/hw/usb/hcd-ehci.h
+@@ -247,7 +247,7 @@ struct EHCIQueue {
+     uint32_t qtdaddr;      /* address QTD read from                */
+     int last_pid;          /* pid of last packet executed          */
+     USBDevice *dev;
+-    QTAILQ_HEAD(pkts_head, EHCIPacket) packets;
++    QTAILQ_HEAD(, EHCIPacket) packets;
  };
 =20
--static QLIST_HEAD(vm_change_state_head, vm_change_state_entry) vm_change=
-_state_head;
-+static QLIST_HEAD(, vm_change_state_entry) vm_change_state_head;
+ typedef QTAILQ_HEAD(EHCIQueueHead, EHCIQueue) EHCIQueueHead;
+diff --git a/hw/usb/hcd-uhci.c b/hw/usb/hcd-uhci.c
+index 836b11f177..26f123ed78 100644
+--- a/hw/usb/hcd-uhci.c
++++ b/hw/usb/hcd-uhci.c
+@@ -99,7 +99,7 @@ struct UHCIQueue {
+     UHCIState *uhci;
+     USBEndpoint *ep;
+     QTAILQ_ENTRY(UHCIQueue) next;
+-    QTAILQ_HEAD(asyncs_head, UHCIAsync) asyncs;
++    QTAILQ_HEAD(, UHCIAsync) asyncs;
+     int8_t    valid;
+ };
 =20
- VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandle=
-r *cb,
-                                                      void *opaque)
+@@ -837,7 +837,7 @@ static int uhci_handle_td(UHCIState *s, UHCIQueue *q,=
+ uint32_t qh_addr,
+         }
+         if (!async->done) {
+             UHCI_TD last_td;
+-            UHCIAsync *last =3D QTAILQ_LAST(&async->queue->asyncs, async=
+s_head);
++            UHCIAsync *last =3D QTAILQ_LAST(&async->queue->asyncs);
+             /*
+              * While we are waiting for the current td to complete, the =
+guest
+              * may have added more tds to the queue. Note we re-read the=
+ td
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index ce930689cf..7353fa2ac6 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -445,7 +445,7 @@ struct AddressSpace {
+=20
+     int ioeventfd_nb;
+     struct MemoryRegionIoeventfd *ioeventfds;
+-    QTAILQ_HEAD(memory_listeners_as, MemoryListener) listeners;
++    QTAILQ_HEAD(, MemoryListener) listeners;
+     QTAILQ_ENTRY(AddressSpace) address_spaces_link;
+ };
+=20
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index a24d0dd566..43f926f5eb 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -206,7 +206,7 @@ struct BusState {
+     HotplugHandler *hotplug_handler;
+     int max_index;
+     bool realized;
+-    QTAILQ_HEAD(ChildrenHead, BusChild) children;
++    QTAILQ_HEAD(, BusChild) children;
+     QLIST_ENTRY(BusState) sibling;
+ };
+=20
+diff --git a/include/hw/usb.h b/include/hw/usb.h
+index a5080adecc..f9431a0ebc 100644
+--- a/include/hw/usb.h
++++ b/include/hw/usb.h
+@@ -408,7 +408,7 @@ struct USBPacket {
+=20
+ struct USBCombinedPacket {
+     USBPacket *first;
+-    QTAILQ_HEAD(packets_head, USBPacket) packets;
++    QTAILQ_HEAD(, USBPacket) packets;
+     QEMUIOVector iov;
+ };
+=20
+diff --git a/include/net/net.h b/include/net/net.h
+index ec13702dbf..643295d163 100644
+--- a/include/net/net.h
++++ b/include/net/net.h
+@@ -97,7 +97,7 @@ struct NetClientState {
+     unsigned rxfilter_notify_enabled:1;
+     int vring_enable;
+     int vnet_hdr_len;
+-    QTAILQ_HEAD(NetFilterHead, NetFilterState) filters;
++    QTAILQ_HEAD(, NetFilterState) filters;
+ };
+=20
+ typedef struct NICState {
+diff --git a/include/qemu/option_int.h b/include/qemu/option_int.h
+index 26b1d9e4d6..5dd9a5162d 100644
+--- a/include/qemu/option_int.h
++++ b/include/qemu/option_int.h
+@@ -47,7 +47,7 @@ struct QemuOpts {
+     char *id;
+     QemuOptsList *list;
+     Location loc;
+-    QTAILQ_HEAD(QemuOptHead, QemuOpt) head;
++    QTAILQ_HEAD(, QemuOpt) head;
+     QTAILQ_ENTRY(QemuOpts) next;
+ };
+=20
+diff --git a/include/qemu/queue.h b/include/qemu/queue.h
+index cb1bd6327c..c16d4d3d16 100644
+--- a/include/qemu/queue.h
++++ b/include/qemu/queue.h
+@@ -432,14 +432,14 @@ union {                                            =
+                     \
+                 (var) && ((next_var) =3D ((var)->field.tqe_next), 1);   =
+  \
+                 (var) =3D (next_var))
+=20
+-#define QTAILQ_FOREACH_REVERSE(var, head, headname, field)              =
+\
+-        for ((var) =3D QTAILQ_LAST(head, headname);                     =
+  \
++#define QTAILQ_FOREACH_REVERSE(var, head, field)                        =
+\
++        for ((var) =3D QTAILQ_LAST(head);                               =
+  \
+                 (var);                                                  =
+\
+-                (var) =3D QTAILQ_PREV(var, headname, field))
++                (var) =3D QTAILQ_PREV(var, field))
+=20
+-#define QTAILQ_FOREACH_REVERSE_SAFE(var, head, headname, field, prev_var=
+) \
+-        for ((var) =3D QTAILQ_LAST(head, headname);                     =
+  \
+-             (var) && ((prev_var) =3D QTAILQ_PREV(var, headname, field))=
+; \
++#define QTAILQ_FOREACH_REVERSE_SAFE(var, head, field, prev_var)         =
+\
++        for ((var) =3D QTAILQ_LAST(head);                               =
+  \
++             (var) && ((prev_var) =3D QTAILQ_PREV(var, field));         =
+  \
+              (var) =3D (prev_var))
+=20
+ /*
+@@ -452,9 +452,9 @@ union {                                              =
+                   \
+=20
+ #define QTAILQ_LINK_PREV(link)                                          =
+\
+         ((link).tql_prev->tql_prev->tql_next)
+-#define QTAILQ_LAST(head, headname) \
++#define QTAILQ_LAST(head)                                               =
+\
+         ((typeof((head)->tqh_first)) QTAILQ_LINK_PREV((head)->tqh_circ))
+-#define QTAILQ_PREV(elm, headname, field) \
++#define QTAILQ_PREV(elm, field)                                         =
+\
+         ((typeof((elm)->field.tqe_next)) QTAILQ_LINK_PREV((elm)->field.t=
+qe_circ))
+=20
+ #define field_at_offset(base, offset, type)                             =
+       \
+diff --git a/include/sysemu/memory_mapping.h b/include/sysemu/memory_mapp=
+ing.h
+index 706152d533..58452457ce 100644
+--- a/include/sysemu/memory_mapping.h
++++ b/include/sysemu/memory_mapping.h
+@@ -36,7 +36,7 @@ typedef struct GuestPhysBlock {
+ /* point-in-time snapshot of guest-visible physical mappings */
+ typedef struct GuestPhysBlockList {
+     unsigned num;
+-    QTAILQ_HEAD(GuestPhysBlockHead, GuestPhysBlock) head;
++    QTAILQ_HEAD(, GuestPhysBlock) head;
+ } GuestPhysBlockList;
+=20
+ /* The physical and virtual address in the memory mapping are contiguous=
+. */
+diff --git a/memory.c b/memory.c
+index 195c5cf639..61d66e4441 100644
+--- a/memory.c
++++ b/memory.c
+@@ -39,7 +39,7 @@ static bool memory_region_update_pending;
+ static bool ioeventfd_update_pending;
+ static bool global_dirty_log =3D false;
+=20
+-static QTAILQ_HEAD(memory_listeners, MemoryListener) memory_listeners
++static QTAILQ_HEAD(, MemoryListener) memory_listeners
+     =3D QTAILQ_HEAD_INITIALIZER(memory_listeners);
+=20
+ static QTAILQ_HEAD(, AddressSpace) address_spaces
+@@ -113,8 +113,7 @@ enum ListenerDirection { Forward, Reverse };
+             }                                                           =
+\
+             break;                                                      =
+\
+         case Reverse:                                                   =
+\
+-            QTAILQ_FOREACH_REVERSE(_listener, &memory_listeners,        =
+\
+-                                   memory_listeners, link) {            =
+\
++            QTAILQ_FOREACH_REVERSE(_listener, &memory_listeners, link) {=
+ \
+                 if (_listener->_callback) {                             =
+\
+                     _listener->_callback(_listener, ##_args);           =
+\
+                 }                                                       =
+\
+@@ -128,19 +127,17 @@ enum ListenerDirection { Forward, Reverse };
+ #define MEMORY_LISTENER_CALL(_as, _callback, _direction, _section, _args=
+...) \
+     do {                                                                =
+\
+         MemoryListener *_listener;                                      =
+\
+-        struct memory_listeners_as *list =3D &(_as)->listeners;         =
+  \
+                                                                         =
+\
+         switch (_direction) {                                           =
+\
+         case Forward:                                                   =
+\
+-            QTAILQ_FOREACH(_listener, list, link_as) {                  =
+\
++            QTAILQ_FOREACH(_listener, &(_as)->listeners, link_as) {     =
+\
+                 if (_listener->_callback) {                             =
+\
+                     _listener->_callback(_listener, _section, ##_args); =
+\
+                 }                                                       =
+\
+             }                                                           =
+\
+             break;                                                      =
+\
+         case Reverse:                                                   =
+\
+-            QTAILQ_FOREACH_REVERSE(_listener, list, memory_listeners_as,=
+ \
+-                                   link_as) {                           =
+\
++            QTAILQ_FOREACH_REVERSE(_listener, &(_as)->listeners, link_as=
+) { \
+                 if (_listener->_callback) {                             =
+\
+                     _listener->_callback(_listener, _section, ##_args); =
+\
+                 }                                                       =
+\
+@@ -2691,8 +2688,7 @@ void memory_listener_register(MemoryListener *liste=
+ner, AddressSpace *as)
+=20
+     listener->address_space =3D as;
+     if (QTAILQ_EMPTY(&memory_listeners)
+-        || listener->priority >=3D QTAILQ_LAST(&memory_listeners,
+-                                             memory_listeners)->priority=
+) {
++        || listener->priority >=3D QTAILQ_LAST(&memory_listeners)->prior=
+ity) {
+         QTAILQ_INSERT_TAIL(&memory_listeners, listener, link);
+     } else {
+         QTAILQ_FOREACH(other, &memory_listeners, link) {
+@@ -2704,8 +2700,7 @@ void memory_listener_register(MemoryListener *liste=
+ner, AddressSpace *as)
+     }
+=20
+     if (QTAILQ_EMPTY(&as->listeners)
+-        || listener->priority >=3D QTAILQ_LAST(&as->listeners,
+-                                             memory_listeners)->priority=
+) {
++        || listener->priority >=3D QTAILQ_LAST(&as->listeners)->priority=
+) {
+         QTAILQ_INSERT_TAIL(&as->listeners, listener, link_as);
+     } else {
+         QTAILQ_FOREACH(other, &as->listeners, link_as) {
+diff --git a/memory_mapping.c b/memory_mapping.c
+index 724dd0b417..e3ec70624f 100644
+--- a/memory_mapping.c
++++ b/memory_mapping.c
+@@ -223,7 +223,7 @@ static void guest_phys_blocks_region_add(MemoryListen=
+er *listener,
+     if (!QTAILQ_EMPTY(&g->list->head)) {
+         hwaddr predecessor_size;
+=20
+-        predecessor =3D QTAILQ_LAST(&g->list->head, GuestPhysBlockHead);
++        predecessor =3D QTAILQ_LAST(&g->list->head);
+         predecessor_size =3D predecessor->target_end - predecessor->targ=
+et_start;
+=20
+         /* the memory API guarantees monotonically increasing traversal =
+*/
+diff --git a/net/filter.c b/net/filter.c
+index c9f9e5fa08..28d1930db7 100644
+--- a/net/filter.c
++++ b/net/filter.c
+@@ -55,7 +55,7 @@ static NetFilterState *netfilter_next(NetFilterState *n=
+f,
+         next =3D QTAILQ_NEXT(nf, next);
+     } else {
+         /* reverse order */
+-        next =3D QTAILQ_PREV(nf, NetFilterHead, next);
++        next =3D QTAILQ_PREV(nf, next);
+     }
+=20
+     return next;
+diff --git a/net/net.c b/net/net.c
+index 1f7d626197..3acbdccd61 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -563,7 +563,7 @@ static ssize_t filter_receive_iov(NetClientState *nc,
+             }
+         }
+     } else {
+-        QTAILQ_FOREACH_REVERSE(nf, &nc->filters, NetFilterHead, next) {
++        QTAILQ_FOREACH_REVERSE(nf, &nc->filters, next) {
+             ret =3D qemu_netfilter_receive(nf, direction, sender, flags,=
+ iov,
+                                          iovcnt, sent_cb);
+             if (ret) {
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 1877976522..18a4724bc9 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -1291,7 +1291,7 @@ int64_t qmp_guest_fsfreeze_freeze_list(bool has_mou=
+ntpoints,
+     /* cannot risk guest agent blocking itself on a write in this state =
+*/
+     ga_set_frozen(ga_state);
+=20
+-    QTAILQ_FOREACH_REVERSE(mount, &mounts, FsMountList, next) {
++    QTAILQ_FOREACH_REVERSE(mount, &mounts, next) {
+         /* To issue fsfreeze in the reverse order of mounts, check if th=
+e
+          * mount is listed in the list here */
+         if (has_mountpoints) {
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index e85133ef05..2e090937a9 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -2269,7 +2269,7 @@ static void liveness_pass_1(TCGContext *s)
+=20
+     tcg_la_func_end(s);
+=20
+-    QTAILQ_FOREACH_REVERSE_SAFE(op, &s->ops, TCGOpHead, link, op_prev) {
++    QTAILQ_FOREACH_REVERSE_SAFE(op, &s->ops, link, op_prev) {
+         int i, nb_iargs, nb_oargs;
+         TCGOpcode opc_new, opc_new2;
+         bool have_opc_new2;
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 1e9c87b46c..cbe43095cd 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -715,7 +715,7 @@ struct TCGContext {
+     TCGTempSet free_temps[TCG_TYPE_COUNT * 2];
+     TCGTemp temps[TCG_MAX_TEMPS]; /* globals first, temps after */
+=20
+-    QTAILQ_HEAD(TCGOpHead, TCGOp) ops, free_ops;
++    QTAILQ_HEAD(, TCGOp) ops, free_ops;
+=20
+     /* Tells which temporary holds a given register.
+        It does not take into account fixed registers */
+@@ -843,7 +843,7 @@ static inline void tcg_set_insn_start_param(TCGOp *op=
+, int arg, target_ulong v)
+ /* The last op that was emitted.  */
+ static inline TCGOp *tcg_last_op(void)
+ {
+-    return QTAILQ_LAST(&tcg_ctx->ops, TCGOpHead);
++    return QTAILQ_LAST(&tcg_ctx->ops);
+ }
+=20
+ /* Test for whether to terminate the TB for using too many opcodes.  */
+diff --git a/tests/libqos/malloc.c b/tests/libqos/malloc.c
+index ac05874b0a..f7bae47a08 100644
+--- a/tests/libqos/malloc.c
++++ b/tests/libqos/malloc.c
+@@ -104,7 +104,7 @@ static void mlist_coalesce(MemList *head, MemBlock *n=
+ode)
+=20
+     do {
+         merge =3D 0;
+-        left =3D QTAILQ_PREV(node, MemList, MLIST_ENTNAME);
++        left =3D QTAILQ_PREV(node, MLIST_ENTNAME);
+         right =3D QTAILQ_NEXT(node, MLIST_ENTNAME);
+=20
+         /* clowns to the left of me */
+diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
+index 37a7a93784..0ab29a8216 100644
+--- a/tests/test-vmstate.c
++++ b/tests/test-vmstate.c
+@@ -630,7 +630,7 @@ struct TestQtailqElement {
+=20
+ typedef struct TestQtailq {
+     int16_t  i16;
+-    QTAILQ_HEAD(TestQtailqHead, TestQtailqElement) q;
++    QTAILQ_HEAD(, TestQtailqElement) q;
+     int32_t  i32;
+ } TestQtailq;
+=20
+@@ -735,9 +735,9 @@ static void test_load_q(void)
+     g_assert_cmpint(eof, =3D=3D, QEMU_VM_EOF);
+=20
+     TestQtailqElement *qele_from =3D QTAILQ_FIRST(&obj_q.q);
+-    TestQtailqElement *qlast_from =3D QTAILQ_LAST(&obj_q.q, TestQtailqHe=
+ad);
++    TestQtailqElement *qlast_from =3D QTAILQ_LAST(&obj_q.q);
+     TestQtailqElement *qele_to =3D QTAILQ_FIRST(&tgt.q);
+-    TestQtailqElement *qlast_to =3D QTAILQ_LAST(&tgt.q, TestQtailqHead);
++    TestQtailqElement *qlast_to =3D QTAILQ_LAST(&tgt.q);
+=20
+     while (1) {
+         g_assert_cmpint(qele_to->b, =3D=3D, qele_from->b);
+@@ -755,7 +755,7 @@ static void test_load_q(void)
+     /* clean up */
+     TestQtailqElement *qele;
+     while (!QTAILQ_EMPTY(&tgt.q)) {
+-        qele =3D QTAILQ_LAST(&tgt.q, TestQtailqHead);
++        qele =3D QTAILQ_LAST(&tgt.q);
+         QTAILQ_REMOVE(&tgt.q, qele, next);
+         free(qele);
+         qele =3D NULL;
+diff --git a/ui/console.c b/ui/console.c
+index 3a285bae00..5a904e67d0 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -182,7 +182,7 @@ struct DisplayState {
+=20
+ static DisplayState *display_state;
+ static QemuConsole *active_console;
+-static QTAILQ_HEAD(consoles_head, QemuConsole) consoles =3D
++static QTAILQ_HEAD(, QemuConsole) consoles =3D
+     QTAILQ_HEAD_INITIALIZER(consoles);
+ static bool cursor_visible_phase;
+ static QEMUTimer *cursor_timer;
+@@ -1303,7 +1303,7 @@ static QemuConsole *new_console(DisplayState *ds, c=
+onsole_type_t console_type,
+         s->index =3D 0;
+         QTAILQ_INSERT_TAIL(&consoles, s, next);
+     } else if (console_type !=3D GRAPHIC_CONSOLE || qdev_hotplug) {
+-        QemuConsole *last =3D QTAILQ_LAST(&consoles, consoles_head);
++        QemuConsole *last =3D QTAILQ_LAST(&consoles);
+         s->index =3D last->index + 1;
+         QTAILQ_INSERT_TAIL(&consoles, s, next);
+     } else {
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index de42e2a406..ef60af70fc 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -280,7 +280,7 @@ QemuOpt *qemu_opt_find(QemuOpts *opts, const char *na=
+me)
+ {
+     QemuOpt *opt;
+=20
+-    QTAILQ_FOREACH_REVERSE(opt, &opts->head, QemuOptHead, next) {
++    QTAILQ_FOREACH_REVERSE(opt, &opts->head, next) {
+         if (strcmp(opt->name, name) !=3D 0)
+             continue;
+         return opt;
+@@ -379,7 +379,7 @@ bool qemu_opt_has_help_opt(QemuOpts *opts)
+ {
+     QemuOpt *opt;
+=20
+-    QTAILQ_FOREACH_REVERSE(opt, &opts->head, QemuOptHead, next) {
++    QTAILQ_FOREACH_REVERSE(opt, &opts->head, next) {
+         if (is_help_option(opt->name)) {
+             return true;
+         }
 --=20
 2.19.2
