@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gUxgT-0004ku-Dc
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:43:38 -0500
+	(envelope-from <philmd@redhat.com>) id 1gUxlI-0007Ri-KL
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:48:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gUxgP-00035P-IL
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:43:33 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 6 Dec 2018 17:42:54 +0000
-Message-ID: <fa38eeb1-523f-0bbe-580c-c21a3b86ee21@virtuozzo.com>
-References: <20181205144700.26563-1-vsementsov@virtuozzo.com>
-	<20181205144700.26563-6-vsementsov@virtuozzo.com>
-	<20181206105430.GN29540@redhat.com>
-In-Reply-To: <20181206105430.GN29540@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B093F41D1C55624EB7104F7BEF55A297@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <philmd@redhat.com>) id 1gUxlE-0007uv-5U
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:48:32 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:41805)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gUxlD-0007ri-UI
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:48:28 -0500
+Received: by mail-wr1-f68.google.com with SMTP id x10so1339098wrs.8
+	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 09:48:27 -0800 (PST)
+References: <20181130140615.19937-1-berrange@redhat.com>
+	<20181130140615.19937-10-berrange@redhat.com>
+	<868aa668-c882-3392-ee10-2afc28a51f7e@redhat.com>
+	<5d9b6cdf-3d6b-a424-daa1-e5a498920f59@redhat.com>
+	<d7e633c1-2216-fd2b-dd36-41df5c264f0a@redhat.com>
+	<5a0b8acd-2906-2ee7-1ef2-0035af9af811@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <28a41967-e327-ed9b-4be7-870ba722718d@redhat.com>
+Date: Thu, 6 Dec 2018 18:48:23 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] crypto: support multiple threads
- accessing one QCryptoBlock
+In-Reply-To: <5a0b8acd-2906-2ee7-1ef2-0035af9af811@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v7 09/11] authz: add QAuthZListFile object
+ type for a file access control list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,66 +35,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-MDYuMTIuMjAxOCAxMzo1NCwgRGFuaWVsIFAuIEJlcnJhbmfDqSB3cm90ZToNCj4gT24gV2VkLCBE
-ZWMgMDUsIDIwMTggYXQgMDU6NDc6MDBQTSArMDMwMCwgVmxhZGltaXIgU2VtZW50c292LU9naWV2
-c2tpeSB3cm90ZToNCj4+IFRoZSB0d28gdGhpbmcgdGhhdCBzaG91bGQgYmUgaGFuZGxlZCBhcmUg
-Y2lwaGVyIGFuZCBpdmdlbi4gRm9yIGl2Z2VuDQo+PiB0aGUgc29sdXRpb24gaXMganVzdCBtdXRl
-eCwgYXMgaXYgY2FsY3VsYXRpb25zIHNob3VsZCBub3QgYmUgbG9uZyBpbg0KPj4gY29tcGFyaXNv
-biB3aXRoIGVuY3J5cHRpb24vZGVjcnlwdGlvbi4gQW5kIGZvciBjaXBoZXIgbGV0J3MganVzdCBr
-ZWVwDQo+PiBwZXItdGhyZWFkIGNpcGhlcnMuDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogVmxhZGlt
-aXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4gLS0t
-DQoNClsuLl0NCg0KPj4gLS0tIGEvY3J5cHRvL2Jsb2NrLmMNCj4+ICsrKyBiL2NyeXB0by9ibG9j
-ay5jDQoNClsuLl0NCg0KPj4gICBzdGF0aWMgaW50IGRvX3FjcnlwdG9fY2lwaGVyX2VuY3J5cHQo
-UUNyeXB0b0NpcGhlciAqY2lwaGVyLA0KPj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgc2l6ZV90IG5pdiwNCj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIFFDcnlwdG9JVkdlbiAqaXZnZW4sDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIFFlbXVNdXRleCAqaXZnZW5fbXV0ZXgsDQo+PiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBpbnQgc2VjdG9yc2l6ZSwNCj4+ICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IG9mZnNldCwNCj4+ICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ4X3QgKmJ1ZiwNCj4+IEBAIC0yMTgsMTAg
-KzMwNywxNSBAQCBzdGF0aWMgaW50IGRvX3FjcnlwdG9fY2lwaGVyX2VuY3J5cHQoUUNyeXB0b0Np
-cGhlciAqY2lwaGVyLA0KPj4gICAgICAgd2hpbGUgKGxlbiA+IDApIHsNCj4+ICAgICAgICAgICBz
-aXplX3QgbmJ5dGVzOw0KPj4gICAgICAgICAgIGlmIChuaXYpIHsNCj4+IC0gICAgICAgICAgICBp
-ZiAocWNyeXB0b19pdmdlbl9jYWxjdWxhdGUoaXZnZW4sDQo+PiAtICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIHN0YXJ0c2VjdG9yLA0KPj4gLSAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBpdiwgbml2LA0KPj4gLSAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBlcnJwKSA8IDApIHsNCj4+ICsgICAgICAgICAgICBpZiAoaXZn
-ZW5fbXV0ZXgpIHsNCj4+ICsgICAgICAgICAgICAgICAgcWVtdV9tdXRleF9sb2NrKGl2Z2VuX211
-dGV4KTsNCj4+ICsgICAgICAgICAgICB9DQo+PiArICAgICAgICAgICAgcmV0ID0gcWNyeXB0b19p
-dmdlbl9jYWxjdWxhdGUoaXZnZW4sIHN0YXJ0c2VjdG9yLCBpdiwgbml2LCBlcnJwKTsNCj4+ICsg
-ICAgICAgICAgICBpZiAoaXZnZW5fbXV0ZXgpIHsNCj4+ICsgICAgICAgICAgICAgICAgcWVtdV9t
-dXRleF91bmxvY2soaXZnZW5fbXV0ZXgpOw0KPj4gKyAgICAgICAgICAgIH0NCj4gDQo+IEkgdGhp
-bmsgd2Ugc2hvdWxkIGp1c3QgbWFrZSAgaXZnZW5fbXV0ZXggY29tcHVsc29yeS4uLi4NCj4gDQo+
-PiArDQo+PiArICAgICAgICAgICAgaWYgKHJldCA8IDApIHsNCj4+ICAgICAgICAgICAgICAgICAg
-IGdvdG8gY2xlYW51cDsNCj4+ICAgICAgICAgICAgICAgfQ0KPj4gICANCj4+IEBAIC0yNTgsOCAr
-MzUyLDkgQEAgaW50IHFjcnlwdG9fY2lwaGVyX2RlY3J5cHRfaGVscGVyKFFDcnlwdG9DaXBoZXIg
-KmNpcGhlciwNCj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNpemVfdCBs
-ZW4sDQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBFcnJvciAqKmVycnAp
-DQo+PiAgIHsNCj4+IC0gICAgcmV0dXJuIGRvX3FjcnlwdG9fY2lwaGVyX2VuY3J5cHQoY2lwaGVy
-LCBuaXYsIGl2Z2VuLCBzZWN0b3JzaXplLCBvZmZzZXQsDQo+PiAtICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIGJ1ZiwgbGVuLCBxY3J5cHRvX2NpcGhlcl9kZWNyeXB0LCBlcnJw
-KTsNCj4+ICsgICAgcmV0dXJuIGRvX3FjcnlwdG9fY2lwaGVyX2VuY3J5cHQoY2lwaGVyLCBuaXYs
-IGl2Z2VuLCBOVUxMLCBzZWN0b3JzaXplLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBvZmZzZXQsIGJ1ZiwgbGVuLCBxY3J5cHRvX2NpcGhlcl9kZWNyeXB0LA0KPj4g
-KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBlcnJwKTsNCj4+ICAgfQ0KPj4g
-ICANCj4+ICAgDQo+PiBAQCAtMjcyLDExICszNjcsMTEgQEAgaW50IHFjcnlwdG9fY2lwaGVyX2Vu
-Y3J5cHRfaGVscGVyKFFDcnlwdG9DaXBoZXIgKmNpcGhlciwNCj4+ICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIHNpemVfdCBsZW4sDQo+PiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBFcnJvciAqKmVycnApDQo+PiAgIHsNCj4+IC0gICAgcmV0dXJuIGRvX3Fj
-cnlwdG9fY2lwaGVyX2VuY3J5cHQoY2lwaGVyLCBuaXYsIGl2Z2VuLCBzZWN0b3JzaXplLCBvZmZz
-ZXQsDQo+PiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJ1ZiwgbGVuLCBx
-Y3J5cHRvX2NpcGhlcl9lbmNyeXB0LCBlcnJwKTsNCj4+ICsgICAgcmV0dXJuIGRvX3FjcnlwdG9f
-Y2lwaGVyX2VuY3J5cHQoY2lwaGVyLCBuaXYsIGl2Z2VuLCBOVUxMLCBzZWN0b3JzaXplLA0KPj4g
-KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBvZmZzZXQsIGJ1ZiwgbGVuLCBx
-Y3J5cHRvX2NpcGhlcl9lbmNyeXB0LA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBlcnJwKTsNCj4+ICAgfQ0KPiANCj4gLi4uYW5kIGdldCB0aGUgbXV0ZXggcGFzc2Vk
-IGludG8gdGhlc2UgZnVuY3Rpb25zLCBhcyBpdHMgZWFzaWVyIHRvIGp1c3QNCj4ga25vdyB0aGUg
-aXZnZW4gaXMgYWx3YXlzIHByb3RlY3RlZCwgYW5kIG5vdCBoYXZlIHRvIHRyYWNlIGJhY2sgdGhl
-IGNhbGxwYXRoDQo+IHRvIHNlZSBpZiB0aGUgdXNhZ2UgaXMgc2FmZS4NCg0KYnV0IHRoZXJlIHBs
-YWNlcywgd2hlcmUgdGhlc2UgaGVscGVycyBjYWxsZWQgd2l0aG91dCBhbnkgUUNyeXB0b0Jsb2Nr
-LCB3aGVuIHdlIGp1c3QNCmhhdmUgbG9jYWwgY2lwaGVyIGFuZCBpdmdlbiwgc28gdGhlcmUgaXMg
-bm8gbXV0ZXggYW5kIGl0J3Mgbm90IG5lZWRlZC4NCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFk
-aW1pcg0K
+On 12/6/18 6:07 PM, Eric Blake wrote:
+> On 12/6/18 9:58 AM, Philippe Mathieu-Daudé wrote:
+> 
+>>>>>          "refresh": "yes"
+>>>>
+>>>> I had to use "refresh": yes (value unquoted) to avoid:
+>>>
+>>> Do you mean "refresh":true?  (bare yes is not valid JSON, but bare true
+>>> is the correct way for a JSON bool).
+>>
+>> I first tried 'true' then was curious and tried 'yes' and it worked
+>> too...
+> 
+> Ah, so you're using a python wrapper rather than direct QMP, and
+> benefitting from a rather-forgiving parser that turns yes into the
+> correct QMP true over the wire to the actual monitor.
+
+I'm not sure I'm using a python wrapper, I use rlwrap following:
+
+https://wiki.qemu.org/Documentation/QMP#Trying_it
+
+Regardless, let's use the correct JSON bool for the documentation.
