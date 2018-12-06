@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsMC-0001Pe-Af
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsMA-0001OD-Lf
 	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:02:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsM6-0006SP-At
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:02:16 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:60512)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsM0-0006JG-QQ
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:02:14 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:60480)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsM5-0006FU-UE
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:02:10 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsM0-0006DR-DN
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:02:04 -0500
 From: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Thu, 06 Dec 2018 15:01:54 +0300
-Message-ID: <154409771441.5432.1285340295550689902.stgit@Misha-PC.lan02.inno>
+Date: Thu, 06 Dec 2018 15:01:49 +0300
+Message-ID: <154409770882.5432.1469636471513777468.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <154409751316.5432.3325938832238028060.stgit@Misha-PC.lan02.inno>
 References: <154409751316.5432.3325938832238028060.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v3 35/39] windbg: implement kd_api_read_msr and
- kd_api_write_msr
+Subject: [Qemu-devel] [PATCH v3 34/39] windbg: implement kd_api_get_version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,170 +29,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
-Add sub functions for helper_wrmsr and helper_rdmsr: cpu_x86_write_msr
-and cpu_x86_read_msr.
-
 Signed-off-by: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 ---
- include/exec/windbgstub-utils.h |    2 ++
- target/i386/cpu.h               |    5 +++++
- target/i386/misc_helper.c       |   39 ++++++++++++++++++++++++++++-----------
- target/i386/windbgstub.c        |   30 ++++++++++++++++++++++++++++++
- windbgstub.c                    |    8 ++++++++
- 5 files changed, 73 insertions(+), 11 deletions(-)
+ include/exec/windbgstub-utils.h |    1 +
+ target/i386/windbgstub.c        |   61 +++++++++++++++++++++++++++++++++++++++
+ windbgstub.c                    |    4 +++
+ 3 files changed, 66 insertions(+)
 
 diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-index adfc9936f3..74e3b9a0da 100644
+index fa67a7048d..adfc9936f3 100644
 --- a/include/exec/windbgstub-utils.h
 +++ b/include/exec/windbgstub-utils.h
-@@ -81,6 +81,8 @@ void kd_api_write_io_space(CPUState *cs, PacketData *pd);
+@@ -80,6 +80,7 @@ void kd_api_read_io_space(CPUState *cs, PacketData *pd);
+ void kd_api_write_io_space(CPUState *cs, PacketData *pd);
  void kd_api_read_physical_memory(CPUState *cs, PacketData *pd);
  void kd_api_write_physical_memory(CPUState *cs, PacketData *pd);
- void kd_api_get_version(CPUState *cs, PacketData *pd);
-+void kd_api_read_msr(CPUState *cs, PacketData *pd);
-+void kd_api_write_msr(CPUState *cs, PacketData *pd);
++void kd_api_get_version(CPUState *cs, PacketData *pd);
  void kd_api_clear_all_internal_breakpoints(CPUState *cs, PacketData *pd);
  void kd_api_get_context_ex(CPUState *cs, PacketData *pd);
  void kd_api_set_context_ex(CPUState *cs, PacketData *pd);
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 9c52d0cbeb..0f451d81bf 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1680,6 +1680,11 @@ void cpu_x86_update_cr3(CPUX86State *env, target_ulong new_cr3);
- void cpu_x86_update_cr4(CPUX86State *env, uint32_t new_cr4);
- void cpu_x86_update_dr7(CPUX86State *env, uint32_t new_dr7);
- 
-+#ifndef CONFIG_USER_ONLY
-+void cpu_x86_write_msr(CPUX86State *env, uint64_t val);
-+uint64_t cpu_x86_read_msr(CPUX86State *env);
-+#endif
-+
- /* hw/pc.c */
- uint64_t cpu_get_tsc(CPUX86State *env);
- 
-diff --git a/target/i386/misc_helper.c b/target/i386/misc_helper.c
-index 6ae67cf885..1f9adb246d 100644
---- a/target/i386/misc_helper.c
-+++ b/target/i386/misc_helper.c
-@@ -228,15 +228,8 @@ void helper_rdmsr(CPUX86State *env)
- {
- }
- #else
--void helper_wrmsr(CPUX86State *env)
-+void cpu_x86_write_msr(CPUX86State *env, uint64_t val)
- {
--    uint64_t val;
--
--    cpu_svm_check_intercept_param(env, SVM_EXIT_MSR, 1, GETPC());
--
--    val = ((uint32_t)env->regs[R_EAX]) |
--        ((uint64_t)((uint32_t)env->regs[R_EDX]) << 32);
--
-     switch ((uint32_t)env->regs[R_ECX]) {
-     case MSR_IA32_SYSENTER_CS:
-         env->sysenter_cs = val & 0xffff;
-@@ -386,11 +379,9 @@ void helper_wrmsr(CPUX86State *env)
-         /* XXX: exception? */
-         break;
-     }
--
--    windbg_try_load();
- }
- 
--void helper_rdmsr(CPUX86State *env)
-+uint64_t cpu_x86_read_msr(CPUX86State *env)
- {
-     uint64_t val;
- 
-@@ -537,6 +528,32 @@ void helper_rdmsr(CPUX86State *env)
-         val = 0;
-         break;
-     }
-+
-+    return val;
-+}
-+
-+void helper_wrmsr(CPUX86State *env)
-+{
-+    uint64_t val;
-+
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_MSR, 1, GETPC());
-+
-+    val = ((uint32_t)env->regs[R_EAX]) |
-+        ((uint64_t)((uint32_t)env->regs[R_EDX]) << 32);
-+
-+    cpu_x86_write_msr(env, val);
-+
-+    windbg_try_load();
-+}
-+
-+void helper_rdmsr(CPUX86State *env)
-+{
-+    uint64_t val;
-+
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_MSR, 0, GETPC());
-+
-+    val = cpu_x86_read_msr(env);
-+
-     env->regs[R_EAX] = (uint32_t)(val);
-     env->regs[R_EDX] = (uint32_t)(val >> 32);
- }
 diff --git a/target/i386/windbgstub.c b/target/i386/windbgstub.c
-index 9e84027f19..ccc7bc3035 100644
+index 6d2e7de746..9e84027f19 100644
 --- a/target/i386/windbgstub.c
 +++ b/target/i386/windbgstub.c
-@@ -1083,6 +1083,36 @@ void kd_api_set_context_ex(CPUState *cs, PacketData *pd)
+@@ -15,6 +15,9 @@
+ #ifdef TARGET_X86_64
+ #define OFFSET_KPCR_SELF 0x18
+ #define OFFSET_KPCR_LOCK_ARRAY 0x28
++#define OFFSET_KDBG_LIST 0x0
++#define OFFSET_KDBG_KERNBASE 0x18
++#define OFFSET_KDBG_MODULELIST 0x48
+ #define OFFSET_KPRCB 0x20
+ #define OFFSET_KPRCB_CURRTHREAD 0x8
+ #else  /* TARGET_I386 */
+@@ -1080,6 +1083,64 @@ void kd_api_set_context_ex(CPUState *cs, PacketData *pd)
      stl_p(&ctx->BytesCopied, len);
  }
  
-+void kd_api_read_msr(CPUState *cs, PacketData *pd)
++void kd_api_get_version(CPUState *cs, PacketData *pd)
 +{
-+#ifndef CONFIG_USER_ONLY
-+    DBGKD_READ_WRITE_MSR *m64c = &pd->m64.u.ReadWriteMsr;
-+    X86CPU *cpu = X86_CPU(cs);
-+    CPUX86State *env = &cpu->env;
-+    uint64_t val = cpu_x86_read_msr(env);
++    DBGKD_GET_VERSION64 *kdver = (DBGKD_GET_VERSION64 *) (PTR(pd->m64) + 0x10);
++#ifdef TARGET_X86_64
++    target_ulong kdbg = kdDebuggerDataBlock.addr;
++    target_ulong dDataList = VMEM_ADDR(cs, kdbg + OFFSET_KDBG_LIST);
++    target_ulong kernbase = VMEM_ADDR(cs, kdbg + OFFSET_KDBG_KERNBASE);
++    target_ulong modules = VMEM_ADDR(cs, kdbg + OFFSET_KDBG_MODULELIST);
 +
-+    stq_p(&val, val);
-+
-+    m64c->DataValueLow = val;
-+    m64c->DataValueHigh = val >> 32;
-+    pd->m64.ReturnStatus = STATUS_SUCCESS;
-+#endif /* !CONFIG_USER_ONLY */
++    /* TODO: Fix this hardcoded value.
++     * Receives 0xF if the target's operating system is a free build,
++     * and 0xC if it is a checked build.
++     */
++    stw_p(&kdver->MajorVersion, 0xF);
++    /* TODO: Fix this hardcoded value. Needs NtBuildNumber. How to get it? */
++    stw_p(&kdver->MinorVersion, 0x1db1);
++    stb_p(&kdver->ProtocolVersion, DBGKD_64BIT_PROTOCOL_VERSION2);
++    /* TODO: Fix this hardcoded value. */
++    stb_p(&kdver->KdSecondaryVersion, 0);
++    stw_p(&kdver->Flags,
++          DBGKD_VERS_FLAG_MP | DBGKD_VERS_FLAG_DATA | DBGKD_VERS_FLAG_PTR64);
++    stw_p(&kdver->MachineType, IMAGE_FILE_MACHINE_AMD64);
++    stb_p(&kdver->MaxPacketType, PACKET_TYPE_MAX);
++    stb_p(&kdver->MaxStateChange,
++          DbgKdMaximumStateChange - DbgKdMinimumStateChange);
++    stb_p(&kdver->MaxManipulate,
++          DbgKdMaximumManipulate - DbgKdMinimumManipulate);
++    /* FIXME: Maybe DBGKD_SIMULATION_EXDI? */
++    stb_p(&kdver->Simulation, DBGKD_SIMULATION_NONE);
++    stw_p(&kdver->Unused[0], 0);
++    sttul_p(&kdver->KernBase, kernbase);
++    sttul_p(&kdver->PsLoadedModuleList, modules);
++    sttul_p(&kdver->DebuggerDataList, dDataList);
++#else /* TARGET_I386 */
++    int err = cpu_memory_rw_debug(cs, kdVersion.addr, (uint8_t *) kdver,
++                                  sizeof(DBGKD_MANIPULATE_STATE64) - 0x10, 0);
++    if (!err) {
++        stw_p(&kdver->MajorVersion, kdver->MajorVersion);
++        stw_p(&kdver->MinorVersion, kdver->MinorVersion);
++        stb_p(&kdver->ProtocolVersion, kdver->ProtocolVersion);
++        stb_p(&kdver->KdSecondaryVersion, kdver->KdSecondaryVersion);
++        stw_p(&kdver->Flags, kdver->Flags);
++        stw_p(&kdver->MachineType, kdver->MachineType);
++        stb_p(&kdver->MaxPacketType, kdver->MaxPacketType);
++        stb_p(&kdver->MaxStateChange, kdver->MaxStateChange);
++        stb_p(&kdver->MaxManipulate, kdver->MaxManipulate);
++        stb_p(&kdver->Simulation, kdver->Simulation);
++        stw_p(&kdver->Unused[0], kdver->Unused[0]);
++        sttul_p(&kdver->KernBase, kdver->KernBase);
++        sttul_p(&kdver->PsLoadedModuleList, kdver->PsLoadedModuleList);
++        sttul_p(&kdver->DebuggerDataList, kdver->DebuggerDataList);
++    } else {
++        pd->m64.ReturnStatus = STATUS_UNSUCCESSFUL;
++        WINDBG_ERROR("get_version: " FMT_ERR, err);
++    }
++#endif /* TARGET_I386 */
 +}
 +
-+void kd_api_write_msr(CPUState *cs, PacketData *pd)
-+{
-+#ifndef CONFIG_USER_ONLY
-+    DBGKD_READ_WRITE_MSR *m64c = &pd->m64.u.ReadWriteMsr;
-+    X86CPU *cpu = X86_CPU(cs);
-+    CPUX86State *env = &cpu->env;
-+    uint64_t val = m64c->DataValueLow | ((uint64_t) m64c->DataValueHigh) << 32;
-+
-+    cpu_x86_write_msr(env, ldq_p(&val));
-+
-+    pd->m64.ReturnStatus = STATUS_SUCCESS;
-+#endif /* !CONFIG_USER_ONLY */
-+}
-+
- void kd_api_get_version(CPUState *cs, PacketData *pd)
+ static bool find_KPCR(CPUState *cs)
  {
-     DBGKD_GET_VERSION64 *kdver = (DBGKD_GET_VERSION64 *) (PTR(pd->m64) + 0x10);
+     X86CPU *cpu = X86_CPU(cs);
 diff --git a/windbgstub.c b/windbgstub.c
-index 366856bc81..109a52b663 100644
+index 25331f218f..366856bc81 100644
 --- a/windbgstub.c
 +++ b/windbgstub.c
-@@ -216,6 +216,14 @@ static void windbg_process_manipulate_packet(WindbgState *state)
-         kd_api_get_version(cs, data);
+@@ -212,6 +212,10 @@ static void windbg_process_manipulate_packet(WindbgState *state)
+         kd_api_write_physical_memory(cs, data);
          break;
  
-+    case DbgKdReadMachineSpecificRegister:
-+        kd_api_read_msr(cs, data);
-+        break;
-+
-+    case DbgKdWriteMachineSpecificRegister:
-+        kd_api_write_msr(cs, data);
++    case DbgKdGetVersionApi:
++        kd_api_get_version(cs, data);
 +        break;
 +
      case DbgKdClearAllInternalBreakpointsApi:
