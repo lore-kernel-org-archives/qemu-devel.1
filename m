@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gUq2f-0006tN-As
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 04:33:58 -0500
+	(envelope-from <armbru@redhat.com>) id 1gUq7P-0000iZ-Mk
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 04:38:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gUq2c-00035Z-5j
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 04:33:57 -0500
-References: <20181130094957.4121-1-david@redhat.com>
-	<b1bd36ca-f0e0-4973-86b8-6dc8b2c0e4b5@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <466691ef-441b-af97-1c1c-adf5d7b67f48@redhat.com>
-Date: Thu, 6 Dec 2018 10:33:49 +0100
+	(envelope-from <armbru@redhat.com>) id 1gUq7M-0007f7-BX
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 04:38:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50342)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gUq7L-0007Jr-Vi
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 04:38:48 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181205203737.9011-1-marcandre.lureau@redhat.com>
+	<20181205203737.9011-5-marcandre.lureau@redhat.com>
+	<87bm5zkx0o.fsf@dusky.pond.sub.org>
+	<CAMxuvazPAjrEt2nyEVSwsVhap-dEGGXSa-N1GcdgK-UuhMfN+Q@mail.gmail.com>
+	<87tvjrhvb4.fsf@dusky.pond.sub.org>
+	<CAMxuvawvii_FQCaZLAhrOmKZsVRZCbQw1Q67=wuajH1idszt9w@mail.gmail.com>
+Date: Thu, 06 Dec 2018 10:38:23 +0100
+In-Reply-To: <CAMxuvawvii_FQCaZLAhrOmKZsVRZCbQw1Q67=wuajH1idszt9w@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Thu, 6 Dec 2018
+	13:24:49 +0400")
+Message-ID: <87h8frhu5s.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <b1bd36ca-f0e0-4973-86b8-6dc8b2c0e4b5@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] s390x/tod: Properly stop the KVM TOD
- while the guest is not running
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v4 4/7] monitor: check if chardev
+ can switch gcontext for OOB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,89 +34,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: "Armbruster, Markus" <armbru@redhat.com>, lizhijian@cn.fujitsu.com, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, zhangckid@gmail.com, "Bonzini, Paolo" <pbonzini@redhat.com>
 
-On 04.12.18 09:27, Christian Borntraeger wrote:
-> On 30.11.2018 10:49, David Hildenbrand wrote:
->> Just like on other architectures, we should stop the clock while the guest
->> is not running. This is already properly done for TCG. Right now, doing an
->> offline migration (stop, migrate, cont) can easily trigger stalls in the
->> guest.
->>
->> Even doing a
->>     (hmp) stop
->>     ... wait 2 minutes ...
->>     (hmp) cont
->> will already trigger stalls.
->>
->> So whenever the guest stops, backup the KVM TOD. When continuing to run
->> the guest, restore the KVM TOD.
->>
->> One special case is starting a simple VM: Reading the TOD from KVM to
->> stop it right away until the guest is actually started means that the
->> time of any simple VM will already differ to the host time. We can
->> simply leave the TOD running and the guest won't be able to recognize
->> it.
->>
->> For migration, we actually want to keep the TOD stopped until really
->> starting the guest. To be able to catch most errors, we should however
->> try to set the TOD in addition to simply storing it. So we can still
->> catch basic migration problems.
->>
->> If anything goes wrong while backing up/restoring the TOD, we have to
->> ignore it (but print a warning). This is then basically a fallback to
->> old behavior (TOD remains running).
->>
->> I tested this very basically with an initrd:
->>     1. Start a simple VM. Observed that the TOD is kept running. Old
->>        behavior.
->>     2. Ordinary live migration. Observed that the TOD is temporarily
->>        stopped on the destination when setting the new value and
->>        correctly started when finally starting the guest.
->>     3. Offline live migration. (stop, migrate, cont). Observed that the
->>        TOD will be stopped on the source with the "stop" command. On the
->>        destination, the TOD is temporarily stopped when setting the new
->>        value and correctly started when finally starting the guest via
->>        "cont".
->>     4. Simple stop/cont correctly stops/starts the TOD. (multiple stops
->>        or conts in a row have no effect, so works as expected)
->>
->> In the future, we might want to send the guest a special kind of time sync
->> interrupt under some conditions, so it can synchronize its tod to the
->> host tod. This is interesting for migration scenarios but also when we
->> get time sync interrupts ourselves. This however will most probably have
->> to be handled in KVM (e.g. when the tods differ too much) and is not
->> desired e.g. when debugging the guest. (single stepping should not
->> result in permanent time syncs). I consider something like that an add-on
->> on top of this basic "don't break the guest" handling.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
-> 
-> 
-> Long time we should really work on getting the guest back in sync with the host
-> TOD (e..g on migration) since there are some advanced mechanisms that rely on all
-> clocks to be in sync. For example the dasd I/O will also write time stamps
-> and in an stp complex (synced time across CECs) this can be useful for "classic"
-> mainframe databases and ordering.
-> 
-> 
-> 
-> It is probably the right thing to do as of today as on migration we are also out
-> of sync.
-> 
-> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> 
-> Adding Viktor in case he has concerns.
-> 
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-Thanks Christian and Thomas,
+> Hi
+>
+> On Thu, Dec 6, 2018 at 1:13 PM Markus Armbruster <armbru@redhat.com> wrot=
+e:
+>>
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>>
+>> > Hi
+>> > On Thu, Dec 6, 2018 at 10:08 AM Markus Armbruster <armbru@redhat.com> =
+wrote:
+>> >>
+>> >> One more question...
+>> >>
+>> >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>> >>
+>> >> > Not all backends are able to switch gcontext. Those backends cannot
+>> >> > drive a OOB monitor (the monitor would then be blocking on main
+>> >> > thread).
+>> >> >
+>> >> > For example, ringbuf, spice, or more esoteric input chardevs like
+>> >> > braille or MUX.
+>> >>
+>> >> These chardevs don't provide QEMU_CHAR_FEATURE_GCONTEXT.
+>> >>
+>> >> > We currently forbid MUX because not all frontends are ready to run
+>> >> > outside main loop. Extend to add a context-switching feature check.
+>> >>
+>> >> Why check CHARDEV_IS_MUX() when chardev-mux already fails the
+>> >> qemu_char_feature_gcontext(chr, QEMU_CHAR_FEATURE_GCONTEXT) check?
+>> >>
+>> >
+>> >
+>> > It currently fails, but with "[PATCH 4/9] char: update the mux
+>> > hanlders in class callback", it won't.
+>>
+>> That's because it makes chardev-mux implement chr_update_read_handler(),
+>> and "[PATCH 3/7] char: add a QEMU_CHAR_FEATURE_GCONTEXT flag" assumes
+>> that a chardev implementing that "will take the updated gcontext into
+>> account".
+>>
+>> Sounds to me as if "[PATCH 4/9] char: update the mux hanlders in class
+>> callback" violates that assumption.  Why am I wrong?
+>
+> The mux should be gcontext-feature neutral, or it should in fact
+> reflects the backend capability, since it is entirely driven by it.
 
-@Conny I assume you will queue this as soon as it makes sense.
+Yes, that makes sense.
 
+> For now, it is simpler to keep it mark as unsupport, and I'll probably
+> update the aforementioned patch when resubmitting.
 
--- 
+Okay.
 
-Thanks,
+>> > But the main reason to keep an explicit check on mux is that the
+>> > monitor frontend doesn't know if other mux frontends can be called
+>> > from any context (when you set a context, it is set on the backend
+>> > side, events are dispatched by the backend).
+>> >
+>> > We may want to mix this extra frontend-side capability limitation with
+>> > FEATURE_GCONTEXT flag, but they are fundamentally different: to be
+>> > able to set a backend context VS attached mux frontends can be
+>> > dispatched from any context.
+>>
+>> I'm afraid I can't yet see the full picture.
+>>
+>> The goal of this series PATCH 3-5 is to catch certain thread-related
+>> badness in chardevs before it can happen.
+>
+> Yes, as the context is associated with a thread. If a backend is not
+> able to switch context, it will keep dispatching in the default
+> context, which may have undesirable results for the frontend.
+>
+>>
+>> Apparently, there are two separate kinds of badness:
+>>
+>> * The chardev backend may fail to cope with changed gcontext.  I don't
+>>   understand how exactly the backends screw up, but I doubt I have to
+>>   right now.
+>>
+>> * The chardev frontend may fail to... what exactly?  And why is only
+>>   chardev-mux affected?
+>
+> For some reason, the chardev API let the frontend decide which context
+> should be used for the dispatch.
+>
+> This is quite fine when you have a one-to-one relationship between
+> backend and frontend (as long as the backend complies with context
+> switching, ie FEATURE_GCONTEXT).
+>
+> But in a one-to-many, as is the case with MUX, things get more
+> complicated, because one frontend may want to switch the context
+> (typically an oob monitor, moving dispatch to the iothread) while
+> another frontend (typically, a serial device) may not expect to be
+> dispatched from a different thread than the default thread.
+>
+> As you can see, MUX has two problems wrt context switching: backend
+> and frontends.
 
-David / dhildenb
+Thanks, that helped some.
+
+>                I think it would be safer to mark MUX as
+> !FEATURE_GCONTEXT (although in fact, you could use it if you really
+> now what you do with backend & frontends)
+
+There's no pressing need for a smarter chardev-mux that provides
+FEATURE_GCONTEXT in cases where it's safe.  Simply not providing it at
+all is good enough.
+
+Testing CHARDEV_IS_MUX() in addition to FEATURE_GCONTEXT is then
+redundant.
+
+This makes me think we should drop the CHARDEV_IS_MUX() check from
+monitor_init(), and update the commit message to say
+
+    We already forbid MUX because not all frontends are ready to run outside
+    main loop.  Replace that by a context-switching feature check.
+
+What do you think?
