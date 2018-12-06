@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gUoUN-0005aj-MF
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 02:54:28 -0500
+	(envelope-from <david@redhat.com>) id 1gUp1o-0005BJ-SP
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 03:29:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gUoUM-0008H1-Qz
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 02:54:27 -0500
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:37627)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gUoUM-000864-J8
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 02:54:26 -0500
-Received: by mail-yb1-xb41.google.com with SMTP id w129-v6so8860404ybe.4
-	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 23:54:11 -0800 (PST)
+	(envelope-from <david@redhat.com>) id 1gUp1h-0006eM-4m
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 03:28:58 -0500
+References: <20181205145131.28467-1-cohuck@redhat.com>
+	<0d97dcf5-de40-3f18-64fc-7b2eb1799a84@redhat.com>
+	<20181205174508.3e2452af.cohuck@redhat.com>
+	<55928716-cd64-735b-ae66-64b370997e22@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <6b238b89-f1a0-834b-b2f4-3b8c30c484a2@redhat.com>
+Date: Thu, 6 Dec 2018 09:28:34 +0100
 MIME-Version: 1.0
-References: <20181206063552.6701-1-xieyongji@baidu.com>
-	<20181206063552.6701-2-xieyongji@baidu.com>
-	<CAJ+F1C+hedZC1EkvpScEP5aw3a-exvBauwyecfrM-LB_2rt=bw@mail.gmail.com>
-In-Reply-To: <CAJ+F1C+hedZC1EkvpScEP5aw3a-exvBauwyecfrM-LB_2rt=bw@mail.gmail.com>
-From: Yongji Xie <elohimes@gmail.com>
-Date: Thu, 6 Dec 2018 15:53:57 +0800
-Message-ID: <CAONzpcadpQvcibeRrxTDSLNZCr3DiFoFFGsPyNkn7e66ZJp8yQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 1/6] char-socket: Enable "wait"
- option for client mode
+In-Reply-To: <55928716-cd64-735b-ae66-64b370997e22@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC] vfio-ap: flag as compatible with
+ balloon
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,38 +27,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@gmail.com
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, nixun@baidu.com, qemu-devel@nongnu.org, lilin24@baidu.com, zhangyu31@baidu.com, chaiwen@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Tony Krowiak <akrowiak@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On Thu, 6 Dec 2018 at 15:23, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@gmail.com> wrote:
->
-> Hi
->
-> On Thu, Dec 6, 2018 at 10:38 AM <elohimes@gmail.com> wrote:
-> >
-> > From: Xie Yongji <xieyongji@baidu.com>
-> >
-> > Now we attempt to connect asynchronously for "reconnect socket"
-> > during open(). But vhost-user device prefer a connected socket
-> > during initialization. That means we may still need to support
-> > sync connection during open() for the "reconnect socket".
-> >
-> > Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-> > Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
->
-> I am not sure this makes much sense, since upon reconnect it won't
-> "wait" (if I am not mistaken)
->
+On 05.12.18 18:25, Christian Borntraeger wrote:
+> 
+> 
+> On 05.12.2018 17:45, Cornelia Huck wrote:
+>> On Wed, 5 Dec 2018 17:38:22 +0100
+>> David Hildenbrand <david@redhat.com> wrote:
+>>
+>>> On 05.12.18 15:51, Cornelia Huck wrote:
+>>>> vfio-ap devices do not pin any pages in the host. Therefore, they
+>>>> are belived to be compatible with memory ballooning.
+>>>>
+>>>> Flag them as compatible, so both vfio-ap and a balloon can be
+>>>> used simultaneously.
+>>>>
+>>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>>>> ---
+>>>>
+>>>> As briefly discussed on IRC. RFC as I do not have easy access to
+>>>> hardware I can test this with.
+>>>>
+>>>> ---
+>>>>  hw/vfio/ap.c | 8 ++++++++
+>>>>  1 file changed, 8 insertions(+)
+>>>>
+>>>> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
+>>>> index 65de952f44..3bf48eed28 100644
+>>>> --- a/hw/vfio/ap.c
+>>>> +++ b/hw/vfio/ap.c
+>>>> @@ -104,6 +104,14 @@ static void vfio_ap_realize(DeviceState *dev, Error **errp)
+>>>>      vapdev->vdev.name = g_strdup_printf("%s", mdevid);
+>>>>      vapdev->vdev.dev = dev;
+>>>>  
+>>>> +    /*
+>>>> +     * vfio-ap devices are believed to operate in a way compatible with
+>>>> +     * memory ballooning, as no pages are pinned in the host.
+>>>> +     * This needs to be set before vfio_get_device() for vfio common to
+>>>> +     * handle the balloon inhibitor.
+>>>> +     */
+>>>> +    vapdev->vdev.balloon_allowed = true;
+>>>> +
+>>>>      ret = vfio_get_device(vfio_group, mdevid, &vapdev->vdev, &local_err);
+>>>>      if (ret) {
+>>>>          goto out_get_dev_err;
+>>>>   
+>>>
+>>> What happens if this ever changes? Shouldn't we have an API to at least
+>>> check what the vfio device can guarantee?
+>>>
+>>> "are believed to operate" doesn't sound like guarantees to me :)
+> 
+> I would actually remove that comment or fix it. We either know or we dont.
+> In the way vfio-works I see no reason to disallow balloon. Even if the guest does
+> something wrong (e.g. crypto I/O on freed pages) the host would handle that the
+> same as it would for normal page accesses. From a host point of view the crypto
+> instructions are just CISC instructions with load/store semantics.
 
-Yes, qemu won't wait when reconnecting. The "wait" here just means that
-we should wait connection at first time (during open()). I'm not sure wheth=
-er
-reuse the "wait" option is OK here.
+As long as vfio-ap does not and will never pin pages (and keep them
+pinned), we are fine. I don't know about the details, but if vfio-ap
+really just issues a synchronous instruction for us, we are fine.
 
-If no this option, current qemu will fail to initialize vhost-user-blk
-device when
-"reconnect" option is specified no matter the backend is running or not.
+> 
+>>
+>> It's the same for ccw :)
+>>
+>> While such an API definitely sounds like a good idea, it is probably
+>> overkill to introduce it for this case (do we envision changing the way
+>> vfio-ap operates in the future to make that statement non-true?)
+> 
+> agreed. 
+>>
+> 
+
+
+-- 
 
 Thanks,
-Yongji
+
+David / dhildenb
