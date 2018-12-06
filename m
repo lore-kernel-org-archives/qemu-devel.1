@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gUwew-0003qO-27
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:37:58 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUwfh-0006IC-Tl
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:38:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gUwes-0006Pn-2f
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:37:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49476)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gUweq-0006Et-1W
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:37:49 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4AF1688E65
-	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 16:37:41 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
-	<20180706105753.26700-20-marcandre.lureau@redhat.com>
-Date: Thu, 06 Dec 2018 17:37:37 +0100
-In-Reply-To: <20180706105753.26700-20-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Fri, 6 Jul 2018
-	12:57:45 +0200")
-Message-ID: <87efaua9wu.fsf@dusky.pond.sub.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUwfg-0007GE-PA
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:38:41 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 6 Dec 2018 16:38:21 +0000
+Message-ID: <ed75491c-894a-fce0-bf22-51c0d0560220@virtuozzo.com>
+References: <1544102368-2486-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1544102368-2486-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EEF0C085773A284DA851EB9204388E25@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 19/27] qapi: add 'if' on union members
+Subject: Re: [Qemu-devel] [PATCH v3] qemu-img info lists bitmap directory
+ entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,164 +25,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-In the subject, s/ on / to /.
-
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-
-> Add 'if' key to union members:
->
-> { 'union': 'TestIfUnion', 'data':
->     'mem': { 'type': 'str', 'if': 'COND'} }
->
-> Generated code is not changed by this patch but with "qapi: add #if
-> conditions to generated code".
-
-My suggestion on PATCH 13's commit message applies.
-
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qapi/common.py                  | 17 +++++++++--------
->  tests/qapi-schema/qapi-schema-test.json |  7 ++++++-
->  tests/qapi-schema/qapi-schema-test.out  | 10 ++++++++++
->  tests/qapi-schema/test-qapi.py          |  1 +
->  4 files changed, 26 insertions(+), 9 deletions(-)
->
-> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-> index 13fbb28493..e1bd9a22ba 100644
-> --- a/scripts/qapi/common.py
-> +++ b/scripts/qapi/common.py
-> @@ -813,7 +813,7 @@ def check_union(expr, info):
->      for (key, value) in members.items():
->          check_name(info, "Member of union '%s'" % name, key)
->          source =3D "member '%s' of union '%s'" % (key, name)
-> -        check_known_keys(info, source, value, ['type'], [])
-> +        check_known_keys(info, source, value, ['type'], ['if'])
->          typ =3D value['type']
->=20=20
->          # Each value must name a known type
-> @@ -1496,8 +1496,8 @@ class QAPISchemaObjectTypeVariants(object):
->  class QAPISchemaObjectTypeVariant(QAPISchemaObjectTypeMember):
->      role =3D 'branch'
->=20=20
-> -    def __init__(self, name, typ):
-> -        QAPISchemaObjectTypeMember.__init__(self, name, typ, False)
-> +    def __init__(self, name, typ, ifcond=3DNone):
-> +        QAPISchemaObjectTypeMember.__init__(self, name, typ, False, ifco=
-nd)
->=20=20
->=20=20
->  class QAPISchemaAlternateType(QAPISchemaType):
-> @@ -1777,14 +1777,14 @@ class QAPISchema(object):
->      def _make_variant(self, case, typ):
->          return QAPISchemaObjectTypeVariant(case, typ)
->=20=20
-> -    def _make_simple_variant(self, case, typ, info):
-> +    def _make_simple_variant(self, case, typ, ifcond, info):
->          if isinstance(typ, list):
->              assert len(typ) =3D=3D 1
->              typ =3D self._make_array_type(typ[0], info)
->          typ =3D self._make_implicit_object_type(
->              typ, info, None, self.lookup_type(typ),
->              'wrapper', [self._make_member('data', typ, None, info)])
-> -        return QAPISchemaObjectTypeVariant(case, typ)
-> +        return QAPISchemaObjectTypeVariant(case, typ, ifcond)
->=20=20
->      def _def_union_type(self, expr, info, doc):
->          name =3D expr['union']
-> @@ -1802,10 +1802,11 @@ class QAPISchema(object):
->                          for (key, value) in data.items()]
->              members =3D []
->          else:
-> -            variants =3D [self._make_simple_variant(key, value['type'], =
-info)
-> +            variants =3D [self._make_simple_variant(key, value['type'],
-> +                                                  value.get('if'), info)
->                          for (key, value) in data.items()]
-> -            typ =3D self._make_implicit_enum_type(name, info, ifcond,
-> -                                                [v.name for v in variant=
-s])
-> +            enum =3D [{'name': v.name, 'if': v.ifcond} for v in variants]
-> +            typ =3D self._make_implicit_enum_type(name, info, ifcond, en=
-um)
->              tag_member =3D QAPISchemaObjectTypeMember('type', typ, False)
->              members =3D [tag_member]
->          self._def_entity(
-> diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
-qapi-schema-test.json
-> index 3bf440aab4..6d3c6c0b53 100644
-> --- a/tests/qapi-schema/qapi-schema-test.json
-> +++ b/tests/qapi-schema/qapi-schema-test.json
-> @@ -208,9 +208,14 @@
->    [ 'foo', { 'name' : 'bar', 'if': 'defined(TEST_IF_ENUM_BAR)' } ],
->    'if': 'defined(TEST_IF_ENUM)' }
->=20=20
-> -{ 'union': 'TestIfUnion', 'data': { 'foo': 'TestStruct' },
-> +{ 'union': 'TestIfUnion', 'data':
-> +  { 'foo': 'TestStruct',
-> +    'union_bar': { 'type': 'str', 'if': 'defined(TEST_IF_UNION_BAR)'} },
-
-"Union Bar" sounds like a cocktail lounge in northeast US :)
-
-Back to serious: this is a simple union.  I'd prefer to test flat
-unions.  Changing TestIfUnion accordingly could be done either before
-this patch, or on top of this series, the latter not necessarily by
-you.  Your choice.
-
->    'if': 'defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)' }
->=20=20
-> +{ 'command': 'TestIfUnionCmd', 'data': { 'union_cmd_arg': 'TestIfUnion' =
-},
-> +  'if': 'defined(TEST_IF_UNION)' }
-> +
-
-I'm feeling dense... why does this change belong to this patch?
-
->  { 'alternate': 'TestIfAlternate', 'data': { 'foo': 'int', 'bar': 'TestSt=
-ruct' },
->    'if': 'defined(TEST_IF_ALT) && defined(TEST_IF_STRUCT)' }
->=20=20
-> diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
-api-schema-test.out
-> index 71b84878c7..ac1069cf1f 100644
-> --- a/tests/qapi-schema/qapi-schema-test.out
-> +++ b/tests/qapi-schema/qapi-schema-test.out
-> @@ -278,12 +278,22 @@ object q_obj_TestStruct-wrapper
->      member data: TestStruct optional=3DFalse
->  enum TestIfUnionKind
->      member foo
-> +    member union_bar
-> +        if ['defined(TEST_IF_UNION_BAR)']
->      if ['defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)']
->  object TestIfUnion
->      member type: TestIfUnionKind optional=3DFalse
->      tag type
->      case foo: q_obj_TestStruct-wrapper
-> +    case union_bar: q_obj_str-wrapper
-> +        if ['defined(TEST_IF_UNION_BAR)']
->      if ['defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)']
-> +object q_obj_TestIfUnionCmd-arg
-> +    member union_cmd_arg: TestIfUnion optional=3DFalse
-> +    if ['defined(TEST_IF_UNION)']
-> +command TestIfUnionCmd q_obj_TestIfUnionCmd-arg -> None
-> +   gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfi=
-g=3DFalse
-> +    if ['defined(TEST_IF_UNION)']
->  alternate TestIfAlternate
->      tag type
->      case foo: int
-> diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
-.py
-> index 69e40d87d2..d977e936c7 100644
-> --- a/tests/qapi-schema/test-qapi.py
-> +++ b/tests/qapi-schema/test-qapi.py
-> @@ -68,6 +68,7 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
->              print('    tag %s' % variants.tag_member.name)
->              for v in variants.variants:
->                  print('    case %s: %s' % (v.name, v.type.name))
-> +                QAPISchemaTestVisitor._print_if(v.ifcond, 8)
->=20=20
->      @staticmethod
->      def _print_if(ifcond, indent=3D4):
+MDYuMTIuMjAxOCAxNjoxOSwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IFRoZSAnRm9ybWF0
+IHNwZWNpZmljIGluZm9ybWF0aW9uJyBvZiBxZW11LWltZyBpbmZvIGNvbW1hbmQgd2lsbCBzaG93
+DQo+IHRoZSBuYW1lLCBmbGFncyBhbmQgZ3JhbnVsYXJpdHkgZm9yIGV2ZXJ5IFFDT1cyIGJpdG1h
+cCBhcyBmb2xsb3dzOg0KPiANCj4gaW1hZ2U6IC92ei92bXByaXZhdGUvVk0xL2hhcmRkaXNrLmhk
+ZA0KPiBmaWxlIGZvcm1hdDogcWNvdzINCj4gdmlydHVhbCBzaXplOiA2NEcgKDY4NzE5NDc2NzM2
+IGJ5dGVzKQ0KPiBkaXNrIHNpemU6IDMuME0NCj4gY2x1c3Rlcl9zaXplOiAxMDQ4NTc2DQo+IEZv
+cm1hdCBzcGVjaWZpYyBpbmZvcm1hdGlvbjoNCj4gICAgICBjb21wYXQ6IDEuMQ0KPiAgICAgIGxh
+enkgcmVmY291bnRzOiB0cnVlDQo+ICAgICAgYml0bWFwczoNCj4gICAgICAgICAgWzBdOg0KPiAg
+ICAgICAgICAgICAgZmxhZ3M6DQo+ICAgICAgICAgICAgICAgICAgWzBdOiBpbi11c2UNCj4gICAg
+ICAgICAgICAgICAgICBbMV06IGF1dG8NCj4gICAgICAgICAgICAgIG5hbWU6IGJhY2stdXAxDQo+
+ICAgICAgICAgICAgICB1bmtub3duIGZsYWdzOiA0DQo+ICAgICAgICAgICAgICBncmFudWxhcml0
+eTogNjU1MzYNCj4gICAgICAgICAgWzFdOg0KPiAgICAgICAgICAgICAgZmxhZ3M6DQo+ICAgICAg
+ICAgICAgICAgICAgWzBdOiBpbi11c2UNCj4gICAgICAgICAgICAgICAgICBbMV06IGF1dG8NCj4g
+ICAgICAgICAgICAgIG5hbWU6IGJhY2stdXAyDQo+ICAgICAgICAgICAgICB1bmtub3duIGZsYWdz
+OiA4DQo+ICAgICAgICAgICAgICBncmFudWxhcml0eTogNjU1MzYNCj4gICAgICByZWZjb3VudCBi
+aXRzOiAxNg0KPiAgICAgIGNvcnJ1cHQ6IGZhbHNlDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBBbmRy
+ZXkgU2hpbmtldmljaCA8YW5kcmV5LnNoaW5rZXZpY2hAdmlydHVvenpvLmNvbT4NCj4gLS0tDQo+
+IHYzOg0KPiBOb3csIHFjb3cyX2dldF9iaXRtYXBfaW5mb19saXN0KCkgaXMgaW52b2tlZCB1bmRl
+ciB0aGUgY29uZGl0aW9uIG9mIFFDT1cNCj4gdmVyc2lvbiAjMyB0byBhdm9pZCBtZW1vcnkgbGVh
+a3MgaW4gY2FzZSBvZiBRQ09XIHZlcnNpb24gIzIuDQo+IEZ1cnRoZXJtb3JlLCBxY293Ml9nZXRf
+Yml0bWFwX2luZm9fbGlzdCgpIGNoZWNrcyB0aGUgbnVtYmVyIG9mIGV4aXN0aW5nIGJpdG1hcHMu
+DQo+IFNvLCBpZiBubyBiaXRtYXAgZXhpc3RzLCBubyBiaXRtYXAgZXJyb3IgbWVzc2FnZSBpcyBw
+cmludGVkIGluIHRoZSBvdXRwdXQuDQo+IFRoZSBkYXRhIHR5cGUgb2YgdGhlIGJpdG1hcCAnZ3Jh
+bnVsYXJpdHknIHBhcmFtZXRlciB3YXMgbGVmdCBhcyAndWludDMyJw0KPiBiZWNhdXNlIGJpdG1h
+cF9saXN0X2xvYWQoKSByZXR1cm5zIGVycm9yIGlmIGdyYW51bGFyaXR5X2JpdHMgaXMgZ3JhdGVy
+IHRoYW4gMzEuDQo+IA0KDQpPaywgdWludDMyIHdvcmtzIGZvciBtZSB0b28uDQoNCg0KWy4uLl0N
+Cg0KPiArDQo+ICtRY293MkJpdG1hcEluZm9MaXN0ICpxY293Ml9nZXRfYml0bWFwX2luZm9fbGlz
+dChCbG9ja0RyaXZlclN0YXRlICpicywNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIEVycm9yICoqZXJycCkNCj4gK3sNCj4gKyAgICBCRFJWUWNvdzJT
+dGF0ZSAqcyA9IGJzLT5vcGFxdWU7DQo+ICsgICAgUWNvdzJCaXRtYXBMaXN0ICpibV9saXN0Ow0K
+PiArICAgIFFjb3cyQml0bWFwICpibTsNCj4gKyAgICBRY293MkJpdG1hcEluZm9MaXN0ICpsaXN0
+ID0gTlVMTDsNCj4gKyAgICBRY293MkJpdG1hcEluZm9MaXN0ICoqcGxpc3QgPSAmbGlzdDsNCj4g
+Kw0KPiArICAgIGlmIChzLT5uYl9iaXRtYXBzID09IDApIHsNCj4gKyAgICAgICAgcmV0dXJuIE5V
+TEw7DQo+ICsgICAgfQ0KPiArDQo+ICsgICAgYm1fbGlzdCA9IGJpdG1hcF9saXN0X2xvYWQoYnMs
+IHMtPmJpdG1hcF9kaXJlY3Rvcnlfb2Zmc2V0LA0KPiArICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIHMtPmJpdG1hcF9kaXJlY3Rvcnlfc2l6ZSwgZXJycCk7DQo+ICsgICAgaWYgKGJtX2xp
+c3QgPT0gTlVMTCkgew0KPiArICAgICAgICByZXR1cm4gTlVMTDsNCj4gKyAgICB9DQo+ICsNCj4g
+KyAgICBRU0lNUExFUV9GT1JFQUNIKGJtLCBibV9saXN0LCBlbnRyeSkgew0KPiArICAgICAgICBR
+Y293MkJpdG1hcEluZm8gKmluZm8gPSBnX25ldzAoUWNvdzJCaXRtYXBJbmZvLCAxKTsNCj4gKyAg
+ICAgICAgUWNvdzJCaXRtYXBJbmZvTGlzdCAqb2JqID0gZ19uZXcwKFFjb3cyQml0bWFwSW5mb0xp
+c3QsIDEpOw0KPiArICAgICAgICBpbmZvLT5ncmFudWxhcml0eSA9IDFVIDw8IGJtLT5ncmFudWxh
+cml0eV9iaXRzOw0KPiArICAgICAgICBpbmZvLT5uYW1lID0gZ19zdHJkdXAoYm0tPm5hbWUpOw0K
+PiArICAgICAgICBpbmZvLT5mbGFncyA9IGdldF9iaXRtYXBfaW5mb19mbGFncyhibS0+ZmxhZ3Mp
+Ow0KPiArICAgICAgICBpbmZvLT51bmtub3duX2ZsYWdzID0gYm0tPmZsYWdzICYgfihCTUVfRkxB
+R19JTl9VU0UgfCBCTUVfRkxBR19BVVRPKTsNCg0Kd2Ugc2hvdWxkIHVzZSBibS0+ZmxhZ3MgJiBC
+TUVfUkVTRVJWRURfRkxBR1MgaW5zdGVhZA0KDQo+ICsgICAgICAgIGluZm8tPmhhc191bmtub3du
+X2ZsYWdzID0gISFpbmZvLT51bmtub3duX2ZsYWdzOw0KPiArICAgICAgICBvYmotPnZhbHVlID0g
+aW5mbzsNCj4gKyAgICAgICAgKnBsaXN0ID0gb2JqOw0KPiArICAgICAgICBwbGlzdCA9ICZvYmot
+Pm5leHQ7DQo+ICsgICAgfQ0KPiArDQo+ICsgICAgYml0bWFwX2xpc3RfZnJlZShibV9saXN0KTsN
+Cj4gKw0KPiArICAgIHJldHVybiBsaXN0Ow0KPiArfQ0KPiArDQo+ICAgaW50IHFjb3cyX3Jlb3Bl
+bl9iaXRtYXBzX3J3X2hpbnQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIGJvb2wgKmhlYWRlcl91cGRh
+dGVkLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEVycm9yICoqZXJycCkN
+Cj4gICB7DQo+IGRpZmYgLS1naXQgYS9ibG9jay9xY293Mi5jIGIvYmxvY2svcWNvdzIuYw0KPiBp
+bmRleCA5OTFkNmFjLi5hMDIzODU2IDEwMDY0NA0KPiAtLS0gYS9ibG9jay9xY293Mi5jDQo+ICsr
+KyBiL2Jsb2NrL3Fjb3cyLmMNCj4gQEAgLTQyNTQsNiArNDI1NCw4IEBAIHN0YXRpYyBJbWFnZUlu
+Zm9TcGVjaWZpYyAqcWNvdzJfZ2V0X3NwZWNpZmljX2luZm8oQmxvY2tEcml2ZXJTdGF0ZSAqYnMp
+DQo+ICAgICAgIEJEUlZRY293MlN0YXRlICpzID0gYnMtPm9wYXF1ZTsNCj4gICAgICAgSW1hZ2VJ
+bmZvU3BlY2lmaWMgKnNwZWNfaW5mbzsNCj4gICAgICAgUUNyeXB0b0Jsb2NrSW5mbyAqZW5jcnlw
+dF9pbmZvID0gTlVMTDsNCj4gKyAgICBFcnJvciAqbG9jYWxfZXJyID0gTlVMTDsNCj4gKyAgICBR
+Y293MkJpdG1hcEluZm9MaXN0ICpiaXRtYXBzOw0KPiAgIA0KPiAgICAgICBpZiAocy0+Y3J5cHRv
+ICE9IE5VTEwpIHsNCj4gICAgICAgICAgIGVuY3J5cHRfaW5mbyA9IHFjcnlwdG9fYmxvY2tfZ2V0
+X2luZm8ocy0+Y3J5cHRvLCAmZXJyb3JfYWJvcnQpOw0KPiBAQCAtNDI3MCw2ICs0MjcyLDEwIEBA
+IHN0YXRpYyBJbWFnZUluZm9TcGVjaWZpYyAqcWNvdzJfZ2V0X3NwZWNpZmljX2luZm8oQmxvY2tE
+cml2ZXJTdGF0ZSAqYnMpDQo+ICAgICAgICAgICAgICAgLnJlZmNvdW50X2JpdHMgICAgICA9IHMt
+PnJlZmNvdW50X2JpdHMsDQo+ICAgICAgICAgICB9Ow0KPiAgICAgICB9IGVsc2UgaWYgKHMtPnFj
+b3dfdmVyc2lvbiA9PSAzKSB7DQoNCmJvdGggbG9jYWxfZXJyIGFuZCBiaXRtYXBzIHZhcmlhYmxl
+cyBhcmUgdXNlZCBvbmx5IGhlcmUuDQpJJ2QgbGlrZSBhdCBsZWFzdCBiaXRtYXBzIHRvIGJlIGRl
+ZmluZWQgaGVyZSB0b28uDQoNCj4gKyAgICAgICAgYml0bWFwcyA9IHFjb3cyX2dldF9iaXRtYXBf
+aW5mb19saXN0KGJzLCAmbG9jYWxfZXJyKTsNCj4gKyAgICAgICAgaWYgKGxvY2FsX2VyciAhPSBO
+VUxMKSB7DQo+ICsgICAgICAgICAgICBlcnJvcl9yZXBvcnRfZXJyKGxvY2FsX2Vycik7DQo+ICsg
+ICAgICAgIH0NCj4gICAgICAgICAgICpzcGVjX2luZm8tPnUucWNvdzIuZGF0YSA9IChJbWFnZUlu
+Zm9TcGVjaWZpY1FDb3cyKXsNCj4gICAgICAgICAgICAgICAuY29tcGF0ICAgICAgICAgICAgID0g
+Z19zdHJkdXAoIjEuMSIpLA0KPiAgICAgICAgICAgICAgIC5sYXp5X3JlZmNvdW50cyAgICAgPSBz
+LT5jb21wYXRpYmxlX2ZlYXR1cmVzICYNCj4gQEAgLTQyNzksNiArNDI4NSw4IEBAIHN0YXRpYyBJ
+bWFnZUluZm9TcGVjaWZpYyAqcWNvdzJfZ2V0X3NwZWNpZmljX2luZm8oQmxvY2tEcml2ZXJTdGF0
+ZSAqYnMpDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFFDT1cyX0lOQ09N
+UEFUX0NPUlJVUFQsDQo+ICAgICAgICAgICAgICAgLmhhc19jb3JydXB0ICAgICAgICA9IHRydWUs
+DQo+ICAgICAgICAgICAgICAgLnJlZmNvdW50X2JpdHMgICAgICA9IHMtPnJlZmNvdW50X2JpdHMs
+DQo+ICsgICAgICAgICAgICAuaGFzX2JpdG1hcHMgICAgICAgID0gISFiaXRtYXBzLA0KPiArICAg
+ICAgICAgICAgLmJpdG1hcHMgICAgICAgICAgICA9IGJpdG1hcHMsDQo+ICAgICAgICAgICB9Ow0K
+PiAgICAgICB9IGVsc2Ugew0KPiAgICAgICAgICAgLyogaWYgdGhpcyBhc3NlcnRpb24gZmFpbHMs
+IHRoaXMgcHJvYmFibHkgbWVhbnMgYSBuZXcgdmVyc2lvbiB3YXMNCj4gZGlmZiAtLWdpdCBhL2Js
+b2NrL3Fjb3cyLmggYi9ibG9jay9xY293Mi5oDQo+IGluZGV4IDg2NjJiNjguLjBlYzJiM2QgMTAw
+NjQ0DQo+IC0tLSBhL2Jsb2NrL3Fjb3cyLmgNCj4gKysrIGIvYmxvY2svcWNvdzIuaA0KPiBAQCAt
+Njg1LDYgKzY4NSw4IEBAIGludCBxY293Ml9jaGVja19iaXRtYXBzX3JlZmNvdW50cyhCbG9ja0Ry
+aXZlclN0YXRlICpicywgQmRydkNoZWNrUmVzdWx0ICpyZXMsDQo+ICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIHZvaWQgKipyZWZjb3VudF90YWJsZSwNCj4gICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgaW50NjRfdCAqcmVmY291bnRfdGFibGVfc2l6ZSk7DQo+
+ICAgYm9vbCBxY293Ml9sb2FkX2RpcnR5X2JpdG1hcHMoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIEVy
+cm9yICoqZXJycCk7DQo+ICtRY293MkJpdG1hcEluZm9MaXN0ICpxY293Ml9nZXRfYml0bWFwX2lu
+Zm9fbGlzdChCbG9ja0RyaXZlclN0YXRlICpicywNCj4gKyAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIEVycm9yICoqZXJycCk7DQo+ICAgaW50IHFjb3cyX3Jl
+b3Blbl9iaXRtYXBzX3J3X2hpbnQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIGJvb2wgKmhlYWRlcl91
+cGRhdGVkLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEVycm9yICoqZXJy
+cCk7DQo+ICAgaW50IHFjb3cyX3Jlb3Blbl9iaXRtYXBzX3J3KEJsb2NrRHJpdmVyU3RhdGUgKmJz
+LCBFcnJvciAqKmVycnApOw0KPiBkaWZmIC0tZ2l0IGEvcWFwaS9ibG9jay1jb3JlLmpzb24gYi9x
+YXBpL2Jsb2NrLWNvcmUuanNvbg0KPiBpbmRleCBkNGZlNzEwLi41NWQ3MDU2IDEwMDY0NA0KPiAt
+LS0gYS9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPiArKysgYi9xYXBpL2Jsb2NrLWNvcmUuanNvbg0K
+DQpbLi4uXQ0KDQo+ICAgIyMNCj4gKyMgQFFjb3cyQml0bWFwSW5mb0ZsYWdzOg0KPiArIw0KPiAr
+IyBBbiBlbnVtZXJhdGlvbiBvZiBzdGF0ZXMgdGhhdCBhIGJpdG1hcCBjYW4gcmVwb3J0IHRvIHRo
+ZSB1c2VyLg0KDQptYXkgYmUsIHMvc3RhdGVzL2ZsYWdzLyBpcyBjbG9zZXIgdG8gd2hhdCBpdCBp
+cy4NCg0KPiArIw0KPiArIyBAaW4tdXNlOiBUaGUgYml0bWFwIHdhcyBub3Qgc2F2ZWQgY29ycmVj
+dGx5IGFuZCBtYXkgYmUgaW5jb25zaXN0ZW50Lg0KPiArIw0KPiArIyBAYXV0bzogVGhlIGJpdG1h
+cCBtdXN0IHJlZmxlY3QgYWxsIGNoYW5nZXMgb2YgdGhlIHZpcnR1YWwgZGlzayBieSBhbnkNCj4g
+KyMgICAgICAgIGFwcGxpY2F0aW9uIHRoYXQgd291bGQgd3JpdGUgdG8gdGhpcyBxY293MiBmaWxl
+Lg0KPiArIw0KPiArIyBTaW5jZTogNC4wDQo+ICsjIw0KDQoNCndpdGggYXQgbGVhc3QgQk1FX1JF
+U0VSVkVEX0ZMQUdTIHVzZWQgKGFuZCwgaWYgeW91IHdhbnQsIG90aGVyIHNtYWxsIHRoaW5ncyk6
+DQoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292
+QHZpcnR1b3p6by5jb20+DQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
