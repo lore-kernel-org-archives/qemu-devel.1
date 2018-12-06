@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gUwfh-0006IC-Tl
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:38:42 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gUwhV-00087k-EF
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:40:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gUwfg-0007GE-PA
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:38:41 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 6 Dec 2018 16:38:21 +0000
-Message-ID: <ed75491c-894a-fce0-bf22-51c0d0560220@virtuozzo.com>
-References: <1544102368-2486-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1544102368-2486-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <EEF0C085773A284DA851EB9204388E25@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <laurent@vivier.eu>) id 1gUwhU-0008S9-Jv
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:40:33 -0500
+References: <20181206151856.77503-1-eblake@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <b98ea971-0d16-6586-9595-f9e3922f05c6@vivier.eu>
+Date: Thu, 6 Dec 2018 17:40:17 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3] qemu-img info lists bitmap directory
- entries
+In-Reply-To: <20181206151856.77503-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] cutils: Assert in-range
+ base for string-to-integer conversions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,115 +24,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, vsementsov@virtuozzo.com, armbru@redhat.com
 
-MDYuMTIuMjAxOCAxNjoxOSwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IFRoZSAnRm9ybWF0
-IHNwZWNpZmljIGluZm9ybWF0aW9uJyBvZiBxZW11LWltZyBpbmZvIGNvbW1hbmQgd2lsbCBzaG93
-DQo+IHRoZSBuYW1lLCBmbGFncyBhbmQgZ3JhbnVsYXJpdHkgZm9yIGV2ZXJ5IFFDT1cyIGJpdG1h
-cCBhcyBmb2xsb3dzOg0KPiANCj4gaW1hZ2U6IC92ei92bXByaXZhdGUvVk0xL2hhcmRkaXNrLmhk
-ZA0KPiBmaWxlIGZvcm1hdDogcWNvdzINCj4gdmlydHVhbCBzaXplOiA2NEcgKDY4NzE5NDc2NzM2
-IGJ5dGVzKQ0KPiBkaXNrIHNpemU6IDMuME0NCj4gY2x1c3Rlcl9zaXplOiAxMDQ4NTc2DQo+IEZv
-cm1hdCBzcGVjaWZpYyBpbmZvcm1hdGlvbjoNCj4gICAgICBjb21wYXQ6IDEuMQ0KPiAgICAgIGxh
-enkgcmVmY291bnRzOiB0cnVlDQo+ICAgICAgYml0bWFwczoNCj4gICAgICAgICAgWzBdOg0KPiAg
-ICAgICAgICAgICAgZmxhZ3M6DQo+ICAgICAgICAgICAgICAgICAgWzBdOiBpbi11c2UNCj4gICAg
-ICAgICAgICAgICAgICBbMV06IGF1dG8NCj4gICAgICAgICAgICAgIG5hbWU6IGJhY2stdXAxDQo+
-ICAgICAgICAgICAgICB1bmtub3duIGZsYWdzOiA0DQo+ICAgICAgICAgICAgICBncmFudWxhcml0
-eTogNjU1MzYNCj4gICAgICAgICAgWzFdOg0KPiAgICAgICAgICAgICAgZmxhZ3M6DQo+ICAgICAg
-ICAgICAgICAgICAgWzBdOiBpbi11c2UNCj4gICAgICAgICAgICAgICAgICBbMV06IGF1dG8NCj4g
-ICAgICAgICAgICAgIG5hbWU6IGJhY2stdXAyDQo+ICAgICAgICAgICAgICB1bmtub3duIGZsYWdz
-OiA4DQo+ICAgICAgICAgICAgICBncmFudWxhcml0eTogNjU1MzYNCj4gICAgICByZWZjb3VudCBi
-aXRzOiAxNg0KPiAgICAgIGNvcnJ1cHQ6IGZhbHNlDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBBbmRy
-ZXkgU2hpbmtldmljaCA8YW5kcmV5LnNoaW5rZXZpY2hAdmlydHVvenpvLmNvbT4NCj4gLS0tDQo+
-IHYzOg0KPiBOb3csIHFjb3cyX2dldF9iaXRtYXBfaW5mb19saXN0KCkgaXMgaW52b2tlZCB1bmRl
-ciB0aGUgY29uZGl0aW9uIG9mIFFDT1cNCj4gdmVyc2lvbiAjMyB0byBhdm9pZCBtZW1vcnkgbGVh
-a3MgaW4gY2FzZSBvZiBRQ09XIHZlcnNpb24gIzIuDQo+IEZ1cnRoZXJtb3JlLCBxY293Ml9nZXRf
-Yml0bWFwX2luZm9fbGlzdCgpIGNoZWNrcyB0aGUgbnVtYmVyIG9mIGV4aXN0aW5nIGJpdG1hcHMu
-DQo+IFNvLCBpZiBubyBiaXRtYXAgZXhpc3RzLCBubyBiaXRtYXAgZXJyb3IgbWVzc2FnZSBpcyBw
-cmludGVkIGluIHRoZSBvdXRwdXQuDQo+IFRoZSBkYXRhIHR5cGUgb2YgdGhlIGJpdG1hcCAnZ3Jh
-bnVsYXJpdHknIHBhcmFtZXRlciB3YXMgbGVmdCBhcyAndWludDMyJw0KPiBiZWNhdXNlIGJpdG1h
-cF9saXN0X2xvYWQoKSByZXR1cm5zIGVycm9yIGlmIGdyYW51bGFyaXR5X2JpdHMgaXMgZ3JhdGVy
-IHRoYW4gMzEuDQo+IA0KDQpPaywgdWludDMyIHdvcmtzIGZvciBtZSB0b28uDQoNCg0KWy4uLl0N
-Cg0KPiArDQo+ICtRY293MkJpdG1hcEluZm9MaXN0ICpxY293Ml9nZXRfYml0bWFwX2luZm9fbGlz
-dChCbG9ja0RyaXZlclN0YXRlICpicywNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIEVycm9yICoqZXJycCkNCj4gK3sNCj4gKyAgICBCRFJWUWNvdzJT
-dGF0ZSAqcyA9IGJzLT5vcGFxdWU7DQo+ICsgICAgUWNvdzJCaXRtYXBMaXN0ICpibV9saXN0Ow0K
-PiArICAgIFFjb3cyQml0bWFwICpibTsNCj4gKyAgICBRY293MkJpdG1hcEluZm9MaXN0ICpsaXN0
-ID0gTlVMTDsNCj4gKyAgICBRY293MkJpdG1hcEluZm9MaXN0ICoqcGxpc3QgPSAmbGlzdDsNCj4g
-Kw0KPiArICAgIGlmIChzLT5uYl9iaXRtYXBzID09IDApIHsNCj4gKyAgICAgICAgcmV0dXJuIE5V
-TEw7DQo+ICsgICAgfQ0KPiArDQo+ICsgICAgYm1fbGlzdCA9IGJpdG1hcF9saXN0X2xvYWQoYnMs
-IHMtPmJpdG1hcF9kaXJlY3Rvcnlfb2Zmc2V0LA0KPiArICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIHMtPmJpdG1hcF9kaXJlY3Rvcnlfc2l6ZSwgZXJycCk7DQo+ICsgICAgaWYgKGJtX2xp
-c3QgPT0gTlVMTCkgew0KPiArICAgICAgICByZXR1cm4gTlVMTDsNCj4gKyAgICB9DQo+ICsNCj4g
-KyAgICBRU0lNUExFUV9GT1JFQUNIKGJtLCBibV9saXN0LCBlbnRyeSkgew0KPiArICAgICAgICBR
-Y293MkJpdG1hcEluZm8gKmluZm8gPSBnX25ldzAoUWNvdzJCaXRtYXBJbmZvLCAxKTsNCj4gKyAg
-ICAgICAgUWNvdzJCaXRtYXBJbmZvTGlzdCAqb2JqID0gZ19uZXcwKFFjb3cyQml0bWFwSW5mb0xp
-c3QsIDEpOw0KPiArICAgICAgICBpbmZvLT5ncmFudWxhcml0eSA9IDFVIDw8IGJtLT5ncmFudWxh
-cml0eV9iaXRzOw0KPiArICAgICAgICBpbmZvLT5uYW1lID0gZ19zdHJkdXAoYm0tPm5hbWUpOw0K
-PiArICAgICAgICBpbmZvLT5mbGFncyA9IGdldF9iaXRtYXBfaW5mb19mbGFncyhibS0+ZmxhZ3Mp
-Ow0KPiArICAgICAgICBpbmZvLT51bmtub3duX2ZsYWdzID0gYm0tPmZsYWdzICYgfihCTUVfRkxB
-R19JTl9VU0UgfCBCTUVfRkxBR19BVVRPKTsNCg0Kd2Ugc2hvdWxkIHVzZSBibS0+ZmxhZ3MgJiBC
-TUVfUkVTRVJWRURfRkxBR1MgaW5zdGVhZA0KDQo+ICsgICAgICAgIGluZm8tPmhhc191bmtub3du
-X2ZsYWdzID0gISFpbmZvLT51bmtub3duX2ZsYWdzOw0KPiArICAgICAgICBvYmotPnZhbHVlID0g
-aW5mbzsNCj4gKyAgICAgICAgKnBsaXN0ID0gb2JqOw0KPiArICAgICAgICBwbGlzdCA9ICZvYmot
-Pm5leHQ7DQo+ICsgICAgfQ0KPiArDQo+ICsgICAgYml0bWFwX2xpc3RfZnJlZShibV9saXN0KTsN
-Cj4gKw0KPiArICAgIHJldHVybiBsaXN0Ow0KPiArfQ0KPiArDQo+ICAgaW50IHFjb3cyX3Jlb3Bl
-bl9iaXRtYXBzX3J3X2hpbnQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIGJvb2wgKmhlYWRlcl91cGRh
-dGVkLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEVycm9yICoqZXJycCkN
-Cj4gICB7DQo+IGRpZmYgLS1naXQgYS9ibG9jay9xY293Mi5jIGIvYmxvY2svcWNvdzIuYw0KPiBp
-bmRleCA5OTFkNmFjLi5hMDIzODU2IDEwMDY0NA0KPiAtLS0gYS9ibG9jay9xY293Mi5jDQo+ICsr
-KyBiL2Jsb2NrL3Fjb3cyLmMNCj4gQEAgLTQyNTQsNiArNDI1NCw4IEBAIHN0YXRpYyBJbWFnZUlu
-Zm9TcGVjaWZpYyAqcWNvdzJfZ2V0X3NwZWNpZmljX2luZm8oQmxvY2tEcml2ZXJTdGF0ZSAqYnMp
-DQo+ICAgICAgIEJEUlZRY293MlN0YXRlICpzID0gYnMtPm9wYXF1ZTsNCj4gICAgICAgSW1hZ2VJ
-bmZvU3BlY2lmaWMgKnNwZWNfaW5mbzsNCj4gICAgICAgUUNyeXB0b0Jsb2NrSW5mbyAqZW5jcnlw
-dF9pbmZvID0gTlVMTDsNCj4gKyAgICBFcnJvciAqbG9jYWxfZXJyID0gTlVMTDsNCj4gKyAgICBR
-Y293MkJpdG1hcEluZm9MaXN0ICpiaXRtYXBzOw0KPiAgIA0KPiAgICAgICBpZiAocy0+Y3J5cHRv
-ICE9IE5VTEwpIHsNCj4gICAgICAgICAgIGVuY3J5cHRfaW5mbyA9IHFjcnlwdG9fYmxvY2tfZ2V0
-X2luZm8ocy0+Y3J5cHRvLCAmZXJyb3JfYWJvcnQpOw0KPiBAQCAtNDI3MCw2ICs0MjcyLDEwIEBA
-IHN0YXRpYyBJbWFnZUluZm9TcGVjaWZpYyAqcWNvdzJfZ2V0X3NwZWNpZmljX2luZm8oQmxvY2tE
-cml2ZXJTdGF0ZSAqYnMpDQo+ICAgICAgICAgICAgICAgLnJlZmNvdW50X2JpdHMgICAgICA9IHMt
-PnJlZmNvdW50X2JpdHMsDQo+ICAgICAgICAgICB9Ow0KPiAgICAgICB9IGVsc2UgaWYgKHMtPnFj
-b3dfdmVyc2lvbiA9PSAzKSB7DQoNCmJvdGggbG9jYWxfZXJyIGFuZCBiaXRtYXBzIHZhcmlhYmxl
-cyBhcmUgdXNlZCBvbmx5IGhlcmUuDQpJJ2QgbGlrZSBhdCBsZWFzdCBiaXRtYXBzIHRvIGJlIGRl
-ZmluZWQgaGVyZSB0b28uDQoNCj4gKyAgICAgICAgYml0bWFwcyA9IHFjb3cyX2dldF9iaXRtYXBf
-aW5mb19saXN0KGJzLCAmbG9jYWxfZXJyKTsNCj4gKyAgICAgICAgaWYgKGxvY2FsX2VyciAhPSBO
-VUxMKSB7DQo+ICsgICAgICAgICAgICBlcnJvcl9yZXBvcnRfZXJyKGxvY2FsX2Vycik7DQo+ICsg
-ICAgICAgIH0NCj4gICAgICAgICAgICpzcGVjX2luZm8tPnUucWNvdzIuZGF0YSA9IChJbWFnZUlu
-Zm9TcGVjaWZpY1FDb3cyKXsNCj4gICAgICAgICAgICAgICAuY29tcGF0ICAgICAgICAgICAgID0g
-Z19zdHJkdXAoIjEuMSIpLA0KPiAgICAgICAgICAgICAgIC5sYXp5X3JlZmNvdW50cyAgICAgPSBz
-LT5jb21wYXRpYmxlX2ZlYXR1cmVzICYNCj4gQEAgLTQyNzksNiArNDI4NSw4IEBAIHN0YXRpYyBJ
-bWFnZUluZm9TcGVjaWZpYyAqcWNvdzJfZ2V0X3NwZWNpZmljX2luZm8oQmxvY2tEcml2ZXJTdGF0
-ZSAqYnMpDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFFDT1cyX0lOQ09N
-UEFUX0NPUlJVUFQsDQo+ICAgICAgICAgICAgICAgLmhhc19jb3JydXB0ICAgICAgICA9IHRydWUs
-DQo+ICAgICAgICAgICAgICAgLnJlZmNvdW50X2JpdHMgICAgICA9IHMtPnJlZmNvdW50X2JpdHMs
-DQo+ICsgICAgICAgICAgICAuaGFzX2JpdG1hcHMgICAgICAgID0gISFiaXRtYXBzLA0KPiArICAg
-ICAgICAgICAgLmJpdG1hcHMgICAgICAgICAgICA9IGJpdG1hcHMsDQo+ICAgICAgICAgICB9Ow0K
-PiAgICAgICB9IGVsc2Ugew0KPiAgICAgICAgICAgLyogaWYgdGhpcyBhc3NlcnRpb24gZmFpbHMs
-IHRoaXMgcHJvYmFibHkgbWVhbnMgYSBuZXcgdmVyc2lvbiB3YXMNCj4gZGlmZiAtLWdpdCBhL2Js
-b2NrL3Fjb3cyLmggYi9ibG9jay9xY293Mi5oDQo+IGluZGV4IDg2NjJiNjguLjBlYzJiM2QgMTAw
-NjQ0DQo+IC0tLSBhL2Jsb2NrL3Fjb3cyLmgNCj4gKysrIGIvYmxvY2svcWNvdzIuaA0KPiBAQCAt
-Njg1LDYgKzY4NSw4IEBAIGludCBxY293Ml9jaGVja19iaXRtYXBzX3JlZmNvdW50cyhCbG9ja0Ry
-aXZlclN0YXRlICpicywgQmRydkNoZWNrUmVzdWx0ICpyZXMsDQo+ICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIHZvaWQgKipyZWZjb3VudF90YWJsZSwNCj4gICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgaW50NjRfdCAqcmVmY291bnRfdGFibGVfc2l6ZSk7DQo+
-ICAgYm9vbCBxY293Ml9sb2FkX2RpcnR5X2JpdG1hcHMoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIEVy
-cm9yICoqZXJycCk7DQo+ICtRY293MkJpdG1hcEluZm9MaXN0ICpxY293Ml9nZXRfYml0bWFwX2lu
-Zm9fbGlzdChCbG9ja0RyaXZlclN0YXRlICpicywNCj4gKyAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIEVycm9yICoqZXJycCk7DQo+ICAgaW50IHFjb3cyX3Jl
-b3Blbl9iaXRtYXBzX3J3X2hpbnQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIGJvb2wgKmhlYWRlcl91
-cGRhdGVkLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEVycm9yICoqZXJy
-cCk7DQo+ICAgaW50IHFjb3cyX3Jlb3Blbl9iaXRtYXBzX3J3KEJsb2NrRHJpdmVyU3RhdGUgKmJz
-LCBFcnJvciAqKmVycnApOw0KPiBkaWZmIC0tZ2l0IGEvcWFwaS9ibG9jay1jb3JlLmpzb24gYi9x
-YXBpL2Jsb2NrLWNvcmUuanNvbg0KPiBpbmRleCBkNGZlNzEwLi41NWQ3MDU2IDEwMDY0NA0KPiAt
-LS0gYS9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPiArKysgYi9xYXBpL2Jsb2NrLWNvcmUuanNvbg0K
-DQpbLi4uXQ0KDQo+ICAgIyMNCj4gKyMgQFFjb3cyQml0bWFwSW5mb0ZsYWdzOg0KPiArIw0KPiAr
-IyBBbiBlbnVtZXJhdGlvbiBvZiBzdGF0ZXMgdGhhdCBhIGJpdG1hcCBjYW4gcmVwb3J0IHRvIHRo
-ZSB1c2VyLg0KDQptYXkgYmUsIHMvc3RhdGVzL2ZsYWdzLyBpcyBjbG9zZXIgdG8gd2hhdCBpdCBp
-cy4NCg0KPiArIw0KPiArIyBAaW4tdXNlOiBUaGUgYml0bWFwIHdhcyBub3Qgc2F2ZWQgY29ycmVj
-dGx5IGFuZCBtYXkgYmUgaW5jb25zaXN0ZW50Lg0KPiArIw0KPiArIyBAYXV0bzogVGhlIGJpdG1h
-cCBtdXN0IHJlZmxlY3QgYWxsIGNoYW5nZXMgb2YgdGhlIHZpcnR1YWwgZGlzayBieSBhbnkNCj4g
-KyMgICAgICAgIGFwcGxpY2F0aW9uIHRoYXQgd291bGQgd3JpdGUgdG8gdGhpcyBxY293MiBmaWxl
-Lg0KPiArIw0KPiArIyBTaW5jZTogNC4wDQo+ICsjIw0KDQoNCndpdGggYXQgbGVhc3QgQk1FX1JF
-U0VSVkVEX0ZMQUdTIHVzZWQgKGFuZCwgaWYgeW91IHdhbnQsIG90aGVyIHNtYWxsIHRoaW5ncyk6
-DQoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292
-QHZpcnR1b3p6by5jb20+DQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+Le 06/12/2018 à 16:18, Eric Blake a écrit :
+> POSIX states that the value of endptr is unspecified if strtol()
+> fails with EINVAL due to an invalid base argument.  Since none of
+> the callers to check_strtox_error() initialized endptr, we could
+> end up propagating uninitialized data back to a caller on error.
+> However, passing an out-of-range base is already a sign of poor
+> programming, so let's just assert that base is in range, at which
+> point check_strtox_error() can be tightened to assert that it is
+> receiving an initialized ep that points somewhere within the
+> caller's original string, regardless of whether strto*() succeeded
+> or failed with ERANGE.
+> 
+> Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+> 
+> Also tested that this does not negatively impact David's pending
+> additions of qemu_strtod{,_finite}().  Thus:
+> Based-on: <20181121164421.20780-1-david@redhat.com>
+> 
+>  util/cutils.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/util/cutils.c b/util/cutils.c
+> index 91930d1bbeb..e098debdc0c 100644
+> --- a/util/cutils.c
+> +++ b/util/cutils.c
+> @@ -278,6 +278,7 @@ int qemu_strtosz_metric(const char *nptr, const char **end, uint64_t *result)
+>  static int check_strtox_error(const char *nptr, char *ep,
+>                                const char **endptr, int libc_errno)
+>  {
+> +    assert(ep >= nptr);
+>      if (endptr) {
+>          *endptr = ep;
+>      }
+> @@ -325,6 +326,7 @@ int qemu_strtoi(const char *nptr, const char **endptr, int base,
+>      char *ep;
+>      long long lresult;
+> 
+> +    assert((unsigned) base <= 36 && base != 1);
+
+If you want to play with type, I think you can do:
+
+   assert((unsigned)(base - 2) <= 34)
+
+Thanks,
+Laurent
