@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1gUip4-0004eU-IA
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 20:51:31 -0500
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gUj09-0001i0-Q0
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 21:02:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1gUioq-0006JY-VR
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 20:51:21 -0500
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:36346)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
-	id 1gUion-0006IS-Gz
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 20:51:12 -0500
-Received: by mail-lf1-x143.google.com with SMTP id a16so16249024lfg.3
-	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 17:51:08 -0800 (PST)
-MIME-Version: 1.0
-References: <1539939312-19713-1-git-send-email-hongbo.zhang@linaro.org>
-	<1539939312-19713-2-git-send-email-hongbo.zhang@linaro.org>
-	<CAFEAcA-vF5orNpfGFe2sGWh=TxWL054PmCM-Yu4faJne+4CkbA@mail.gmail.com>
-	<CAHmQWvCN00LkSvmAY8nCtoGYrRDsALYRkg0x_yz6HaRgQkQn3w@mail.gmail.com>
-	<20181205103634.cvogkgjdzq7e3feh@bivouac.eciton.net>
-In-Reply-To: <20181205103634.cvogkgjdzq7e3feh@bivouac.eciton.net>
-From: Hongbo Zhang <hongbo.zhang@linaro.org>
-Date: Thu, 6 Dec 2018 09:50:54 +0800
-Message-ID: <CAHmQWvDvx7GB4+t3EGXcmR1-VLYW04Pu94EX0i7cov9Agv2F8g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4] hw/arm: Add arm SBSA reference machine
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gUj05-0002h1-Nx
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 21:02:53 -0500
+Date: Thu, 6 Dec 2018 10:02:31 +0800 (CST)
+Message-ID: <201812061002316241763@zte.com.cn>
+In-Reply-To: <CAFEAcA8s87tB4LGaVvJNpS0RN1gQ-ZjtzOBO0mWWQamBFiTzYw@mail.gmail.com>
+References: CAFEAcA8hw_PHrBTC+v9rr8VoeU5uiV3Z6nMRknDM7WWdG1Ti5g@mail.gmail.com,
+	CAFEAcA8s87tB4LGaVvJNpS0RN1gQ-ZjtzOBO0mWWQamBFiTzYw@mail.gmail.com
+Mime-Version: 1.0
+From: <peng.hao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BQemu-arm=5D_=5BPATCH_V11_0/8=5D_add_pv?=
+ =?utf-8?q?panic_mmio_support?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Leif Lindholm <leif.lindholm@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
+To: peter.maydell@linaro.org
+Cc: drjones@redhat.com, qemu-arm@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org
 
-On Wed, 5 Dec 2018 at 18:36, Leif Lindholm <leif.lindholm@linaro.org> wrote:
->
-> On Wed, Dec 05, 2018 at 05:50:23PM +0800, Hongbo Zhang wrote:
-> > > > +static
-> > > > +void sbsa_ref_machine_done(Notifier *notifier, void *data)
-> > > > +{
-> > > > +    VirtMachineState *vms = container_of(notifier, VirtMachineState,
-> > > > +                                         machine_done);
-> > > > +    ARMCPU *cpu = ARM_CPU(first_cpu);
-> > > > +    struct arm_boot_info *info = &vms->bootinfo;
-> > > > +    AddressSpace *as = arm_boot_address_space(cpu, info);
-> > > > +
-> > > > +    if (arm_load_dtb(info->dtb_start, info, info->dtb_limit, as) < 0) {
-> > > > +        exit(1);
-> > > > +    }
-> > > > +}
-> > >
-> > > The virt board needs a machine-done notifier because it has
-> > > to add extra things to the DTB here. You don't, so you don't
-> > > need one. Don't set bootinfo.skip_dtb_autoload to true, and
-> > > then the boot.c code will do the arm_load_dtb() call for you.
-> > >
-> > After test and check, I think we still need this machine_done callback
-> > to call arm_load_dtb().
-> > If only kernel loaded via -kernel but without any firmware, it should
-> > work to let arm_load_kernel() call the arm_load_dtb(), while in our
-> > case, we have have firmware loaded but no kernel, so the
-> > arm_load_kernel() returns before calling arm_load_dtb(),  that is,
-> > firmware runs and there is no chance to call arm_load_dtb(), then we
-> > get error message and qemu quits.
-> > Moving arm_load_dtb() to earlier place in arm_load_kernel() cannot fix
-> > this issue either.
->
-> I don't see the value in using -kernel on the SBSA machine.
-> If it causes complexity, can we drop the functionality?
->
-We don't use -kernel parameter on SBSA machine.
-It doesn't cause complexity,  we were suggested to drop the previous
-machine_done() callback to reduce code lines, but I think we have to
-use it still.
-
-> Regards,
->
-> Leif
+Pk9uIFdlZCwgNSBEZWMgMjAxOCBhdCAwMDoyOCwgPHBlbmcuaGFvMkB6dGUuY29tLmNuPiB3cm90
+ZToKPj4KPj4gPkknbSBhZnJhaWQgSSBkb24ndCB1bmRlcnN0YW5kLiBJZiBpdCdzIGEgUENJIGRl
+dmljZSB0aGVuCj4+ID5pdCBkb2VzIG5vdCBuZWVkIHRvIGJlIGxpc3RlZCBpbiB0aGUgZGV2aWNl
+IHRyZWUgb3IgdGhlCj4+ID5BQ1BJIHRhYmxlcyBhdCBhbGwsIGJlY2F1c2UgaXQgaXMgcHJvYmVh
+YmxlIGJ5IHRoZSBndWVzdC4KPj4gPlRoaXMgYWxzbyBzaWduaWZpY2FudGx5IHNpbXBsaWZpZXMg
+dGhlIGNoYW5nZXMgbmVlZGVkIGluIFFFTVUuCj4+ID4KPj4KPj4gSXQgaXMgcHJlY2lzZWx5IGJl
+Y2F1c2UgUENJIGRldmljZXMgY2FuIG5vdCBiZSBjb250cm9sbGVkIGJ5IEZEVCBvciBBQ1BJIHRh
+YmxlcywKPj4gSSBkbyBub3Qgd2FudCB0byBpbXBsZW1lbnQgaXQgYXMgYSBwY2kgZGV2aWNlLgo+
+PiBYODYvcHZwYW5pYyBpcyBpbXBsZW1lbnRlZCBhcyBJU0EgZGV2aWNlIGluIFFFTVUgYW5kIEFD
+UEkgZGV2aWNlIGluIGtlcm5lbC4KPj4gTXkgaW1wbGVtZW50YXRpb24gZXh0ZW5kcyB0aGUgaW1w
+bGVtZW50YXRpb24gb2YgeDg2L3B2cGFuaWMsIGFuZCBhIGxhcmdlIG9mIHg4Ni9wdnBhbmljCj4+
+IGNvZGVzIGFyZSByZXVzZWQuSWYgUENJIGRldmljZXMgYXJlIGltcGxlbWVudGVkIGluIHFlbXUs
+IHRoZW4gQUNQSSBkZXZpY2VzIGFuZCBQQ0kKPj4gZGV2aWNlcyBtYXkgYXBwZWFyIHNpbXVsdGFu
+ZW91c2x5IGluIHRoZSBrZXJuZWwuIFRoaXMgd291bGQgYWRkIGJvdGggZGV2aWNlcyB0byB0aGUK
+Pj4gY3Jhc2ggbm90aWZpZXIgbGlzdCwgd2hpY2ggaXMgb2RkLiBJIHdhbnQgdG8gc2VlIG9ubHkg
+b25lIGRldmljZSBhdCBhbnkgdGltZS4KPgo+WWVzLCBjZXJ0YWlubHkgd2Ugb25seSBuZWVkIG9u
+ZSBwdnBhbmljIGRldmljZS4gSWYgaXQncyBpbXBsZW1lbnRlZAo+YXMgYSBQQ0kgZGV2aWNlLCB0
+aGVuIHRoYXQncyB3aGF0IGFwcGVhcnMuIFdlIGRvbid0IG5lZWQgYW5kCj53b3VsZCBub3QgaW1w
+bGVtZW50IHRoZSBNTUlPIHZlcnNpb24uIE9uIHg4NiBhIHVzZXIgY291bGQKPmluIHRoZW9yeSB1
+c2UgdGhlIGNvbW1hbmQgbGluZSB0byByZXF1ZXN0IGJvdGggSVNBIGFuZCBQQ0kKPnB2cGFuaWMg
+ZGV2aWNlcy4gVGhhdCB3b3VsZCBub3QgYmUgdmVyeSBzZW5zaWJsZSwgYnV0IHRoZXJlCj5hcmUg
+bG90cyBvZiBRRU1VIGNvbW1hbmQgbGluZXMgdGhlIHVzZXIgY2FuIHJlcXVlc3QgdGhhdAo+ZG9u
+J3QgbWFrZSBzZW5zZS4KPgo+PiBPZiBjb3Vyc2UsIG1hbnkKPj4gYXJjaGl0ZWN0dXJlcyBjYW4g
+dXNlIFBDSSBkZXZpY2VzLCBidXQgd2UgYXJlIGN1cnJlbnRseSByZXVzaW5nIHg4Ni9wdnBhbmlj
+IGNvZGUgYXMgbXVjaAo+PiBhcyBwb3NzaWJsZSBpbiBxZW11IGFuZCBrZXJuZWwgLCByYXRoZXIg
+dGhhbiByZWltcGxlbWVudGluZyBpdC4gQXQgdGhlIHNhbWUgdGltZSwKPj4gYmFja3dhcmQgY29t
+cGF0aWJpbGl0eSBhbHNvIG5lZWRzIHRvIGJlIGNvbnNpZGVyZWQuCj4+Cj4+ICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBwdnBhbmljIGluIGd1ZXN0IGtlcm5lbAo+PiBBUk06
+ICAgQUNQSSB0YWJsZSAgICAgICAgIGFjcGkgZGV2aWNlCj4+ICAgICAgICAgICAgIEZEVCAgICAg
+ICAgICAgICAgICAgIG1taW8gZGV2aWNlICAoc3RhcnQgZ3Vlc3QgYnlwYXNzaW5nIHVlZmkpCj4+
+IHg4NiAgICAgIEFDUEkgdGFibGUgICAgICAgICBhY3BpIGRldmljZQo+Cj5Gb3IgQXJtLCB0aGVy
+ZSBpcyBubyBiYWNrd2FyZCBjb21wYXRpYmlsaXR5IGlzc3VlLCBhcyB3ZSBoYXZlCj5ub3QgeWV0
+IGltcGxlbWVudGVkIG9yIHNoaXBwZWQgYW55dGhpbmcuCj4KClNvcnJ5LCB0aGUgZXhwcmVzc2lv
+biBpcyBub3QgY2xlYXIgZW5vdWdoLiBJIHdhbnQgdG8gc2F5IHRoYXQgeDg2IG5lZWRzIGJhY2t3
+YXJkIApjb21wYXRpYmlsaXR5IGlmIHdlIGludGVuZCB0byByZXVzZSB0aGUgY29kZSBvZiB4ODYv
+cHZwYW5pYy4KCj4+ID4+IFNlY29uZGx5LCBJIGRvbid0IHdhbnQgaXQgdG8gYmUgYSBwbHVnZ2Fi
+bGUgZGV2aWNlLiBJZiB0aGUgdXNlcgo+PiA+PiBkZWxldGVzIHRoZSBkZXZpY2UgYnkgbWlzdGFr
+ZSwgaXQgbWF5IGxlYWQgdG8gdW5wcmVkaWN0YWJsZSByZXN1bHRzLgo+PiA+Cj4+ID5JZiB0aGUg
+dXNlciBkZWxldGVzIHRoZSBQQ0kgZGV2aWNlIHRoZXkncmUgdXNpbmcgZm9yIHRoZWlyCj4+ID5k
+aXNrIG9yIG5ldHdvcmtpbmcgdGhpcyB3aWxsIGFsc28gbGVhZCB0byB1bnByZWRpY3RhYmxlCj4+
+ID5yZXN1bHRzLiBXZSBleHBlY3QgdXNlcnMgbm90IHRvIHJhbmRvbWx5IHVucGx1ZyB0aGluZ3Mg
+ZnJvbQo+PiA+dGhlaXIgc3lzdGVtIGlmIHRoZXkgd2FudCBpdCB0byBjb250aW51ZSB0byB3b3Jr
+LiBJbiBhbnkKPj4gPmNhc2UgeW91ciBndWVzdCBkcml2ZXIgY2FuIGVhc2lseSBoYW5kbGUgdGhl
+IHVucGx1ZzogdGhlCj4+ID5ndWVzdCB3b3VsZCB0aGVuIGp1c3QgbG9zZSB0aGUgYWJpbGl0eSB0
+byBub3RpZnkgb24gcGFuaWMsCj4+ID5mYWxsaW5nIGJhY2sgdG8gYXMgaWYgdGhlIHB2cGFuaWMg
+ZGV2aWNlIGhhZCBuZXZlciBiZWVuCj4+ID5wcmVzZW50Lgo+Pgo+PiBJZiB0d28gZGV2aWNlcyBj
+YW4gZXhpc3Qgc2ltdWx0YW5lb3VzbHkgYnkgbW9kaWZ5aW5nIHRoZSBjb2RlLAo+PiAgdGhlbiBi
+ZWNhdXNlIEFDUEkgZGV2aWNlcyByZWx5IG9uIGEgUENJIGRldmljZSwgaWYgUENJIGRldmljZXMg
+YXJlIGR5bmFtaWNhbGx5Cj4+ICB1bnBsdWdnZWQsIEFDUEkgZGV2aWNlIHdpbGwgbm90IHdvcmsg
+d2hlbiBwYW5pYyBpcyB0cmlnZ2VyZWQuCj4KPklmIHNvbWVib2R5IG1vZGlmaWVzIHRoZSBjb2Rl
+IHRvIFFFTVUgb3IgdGhlIGd1ZXN0IGtlcm5lbAo+c3VjaCB0aGF0IHNvbWV0aGluZyBicmVha3Ms
+IHRoYXQncyB0aGVpciBpc3N1ZSB0byBkZWFsIHdpdGguCj5NeSBwcm9wb3NhbCBpcyB0aGF0IHdl
+IHdvdWxkIHNoaXA6Cj4qIGEgUUVNVSB3aXRoIGEgUENJIHB2cGFuaWMgZGV2aWNlICh3aGljaCB5
+b3UgY291bGQgcGx1ZyBpbgo+aWYgeW91IHdhbnRlZCBpdCkKPiogbm8gY2hhbmdlcyB0byB0aGUg
+QXJtIHZpcnQgYm9hcmQsIHNvIG5vdGhpbmcgaW4gdGhlIEFDUEkKPm9yIGRldmljZSB0cmVlCj4q
+IG5vICJtbWlvIHB2cGFuaWMiIGRldmljZQoKb2ssIEkgd2lsbCB0cnkgaXQuCnRoYW5rcy4KPgo+
+dGhhbmtzCj4tLSBQTU0=
