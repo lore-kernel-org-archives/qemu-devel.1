@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <v.maffione@gmail.com>) id 1gUx1v-0003mc-C9
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:01:43 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUx3z-0005MS-FW
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:03:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <v.maffione@gmail.com>) id 1gUx1e-0006t6-ST
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:01:35 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34208)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <v.maffione@gmail.com>)
-	id 1gUx1e-0006kp-99
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:01:22 -0500
-Received: by mail-wr1-x443.google.com with SMTP id j2so1243119wrw.1
-	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 09:01:12 -0800 (PST)
-From: Vincenzo Maffione <v.maffione@gmail.com>
-Date: Thu,  6 Dec 2018 17:59:07 +0100
-Message-Id: <20181206165907.23465-4-v.maffione@gmail.com>
-In-Reply-To: <20181206165907.23465-1-v.maffione@gmail.com>
-References: <20181206165907.23465-1-v.maffione@gmail.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUx3y-0008Rk-31
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:03:47 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 6 Dec 2018 17:03:34 +0000
+Message-ID: <956f2d0d-fa63-587c-3434-7da12f9da5b5@virtuozzo.com>
+References: <20181130220344.3350618-1-eblake@redhat.com>
+	<20181130220344.3350618-9-eblake@redhat.com>
+	<a523fabb-f532-1230-9d61-92d487bb551c@virtuozzo.com>
+	<44ca18c7-02b1-7176-7ef6-0ae477b1bf96@redhat.com>
+In-Reply-To: <44ca18c7-02b1-7176-7ef6-0ae477b1bf96@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <2613F4AEA3226E4FBB30EAA50B8CC7BF@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 3/3] net: netmap: improve
- netmap_receive_iov()
+Subject: Re: [Qemu-devel] [PATCH 08/14] nbd/client: Refactor
+ nbd_receive_list()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,95 +28,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: g.lettieri@iet.unipi.it, jasowang@redhat.com, Vincenzo Maffione <v.maffione@gmail.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-Changes:
-  - Save CPU cycles by computing the return value while scanning the
-    input iovec, rather than calling iov_size() at the end.
-  - Remove check for s->tx != NULL, because it cannot happen.
-  - Cache ring->tail in a local variable and use it to check for
-    space in the TX ring. The use of nm_ring_empty() was invalid,
-    because nobody is updating ring->cur and ring->head at that point.
-  - In case we run out of netmap slots in the middle of a packet,
-    move the wake-up point by advancing ring->cur, but do not
-    expose the incomplete packet (i.e., by updating also ring->head).
-
-Signed-off-by: Vincenzo Maffione <v.maffione@gmail.com>
----
- net/netmap.c | 29 +++++++++++++++++------------
- 1 file changed, 17 insertions(+), 12 deletions(-)
-
-diff --git a/net/netmap.c b/net/netmap.c
-index 852106af29..0cc8f545c5 100644
---- a/net/netmap.c
-+++ b/net/netmap.c
-@@ -159,21 +159,22 @@ static ssize_t netmap_receive_iov(NetClientState *nc,
- {
-     NetmapState *s = DO_UPCAST(NetmapState, nc, nc);
-     struct netmap_ring *ring = s->tx;
-+    unsigned int tail = ring->tail;
-+    ssize_t totlen = 0;
-     uint32_t last;
-     uint32_t idx;
-     uint8_t *dst;
-     int j;
-     uint32_t i;
- 
--    if (unlikely(!ring)) {
--        /* Drop the packet. */
--        return iov_size(iov, iovcnt);
--    }
--
--    last = i = ring->cur;
-+    last = i = ring->head;
- 
-     if (nm_ring_space(ring) < iovcnt) {
--        /* Not enough netmap slots. */
-+        /* Not enough netmap slots. Tell the kernel that we have seen the new
-+         * available slots (so that it notifies us again when it has more
-+         * ones), but without publishing any new slots to be processed
-+         * (e.g., we don't advance ring->head). */
-+        ring->cur = tail;
-         netmap_write_poll(s, true);
-         return 0;
-     }
-@@ -183,14 +184,17 @@ static ssize_t netmap_receive_iov(NetClientState *nc,
-         int offset = 0;
-         int nm_frag_size;
- 
-+        totlen += iov_frag_size;
-+
-         /* Split each iovec fragment over more netmap slots, if
-            necessary. */
-         while (iov_frag_size) {
-             nm_frag_size = MIN(iov_frag_size, ring->nr_buf_size);
- 
--            if (unlikely(nm_ring_empty(ring))) {
--                /* We run out of netmap slots while splitting the
-+            if (unlikely(i == tail)) {
-+                /* We ran out of netmap slots while splitting the
-                    iovec fragments. */
-+                ring->cur = tail;
-                 netmap_write_poll(s, true);
-                 return 0;
-             }
-@@ -212,12 +216,13 @@ static ssize_t netmap_receive_iov(NetClientState *nc,
-     /* The last slot must not have NS_MOREFRAG set. */
-     ring->slot[last].flags &= ~NS_MOREFRAG;
- 
--    /* Now update ring->cur and ring->head. */
--    ring->cur = ring->head = i;
-+    /* Now update ring->head and ring->cur to publish the new slots and
-+     * the new wakeup point. */
-+    ring->head = ring->cur = i;
- 
-     ioctl(s->nmd->fd, NIOCTXSYNC, NULL);
- 
--    return iov_size(iov, iovcnt);
-+    return totlen;
- }
- 
- static ssize_t netmap_receive(NetClientState *nc,
--- 
-2.19.2
+MDYuMTIuMjAxOCAxOTozMSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMTIvNi8xOCA4OjE4IEFN
+LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gMDEuMTIuMjAxOCAxOjAz
+LCBFcmljIEJsYWtlIHdyb3RlOg0KPj4+IEFkZCBzb21lIHBhcmFtZXRlcnMgdG8gbWFrZSB0aGlz
+IGZ1bmN0aW9uIHJldXNhYmxlIGluIHVwY29taW5nDQo+Pj4gZXhwb3J0IGxpc3RpbmcsIHdoZXJl
+IHdlIHdpbGwgd2FudCB0byBjYXB0dXJlIHRoZSBuYW1lIGFuZA0KPj4+IGRlc2NyaXB0aW9uIHJh
+dGhlciB0aGFuIGNvbXBhcmUgYWdhaW5zdCBhIHVzZXItc3VwcGxpZWQgbmFtZS4NCj4+PiBObyBj
+aGFuZ2UgaW4gc2VtYW50aWNzIHRvIHRoZSBleGlzdGluZyBjYWxsZXIuDQo+Pj4NCj4+PiBTaWdu
+ZWQtb2ZmLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0LmNvbT4NCj4+PiAtLS0NCj4+PiDC
+oMKgIG5iZC9jbGllbnQuYyB8IDY2ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KystLS0tLS0tLS0tLS0tLS0NCj4+PiDCoMKgIDEgZmlsZSBjaGFuZ2VkLCA0NyBpbnNlcnRpb25z
+KCspLCAxOSBkZWxldGlvbnMoLSkNCj4gDQo+Pj4gQEAgLTI5MCwzMCArMjk4LDQ5IEBAIHN0YXRp
+YyBpbnQgbmJkX3JlY2VpdmVfbGlzdChRSU9DaGFubmVsICppb2MsIGNvbnN0IGNoYXIgKndhbnQs
+IGJvb2wgKm1hdGNoLA0KPj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgIG5iZF9zZW5kX29wdF9hYm9y
+dChpb2MpOw0KPj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJldHVybiAtMTsNCj4+PiDCoMKgwqDC
+oMKgwqAgfQ0KPj4+IC3CoMKgwqAgaWYgKG5hbWVsZW4gIT0gc3RybGVuKHdhbnQpKSB7DQo+Pj4g
+LcKgwqDCoMKgwqDCoMKgIGlmIChuYmRfZHJvcChpb2MsIGxlbiwgZXJycCkgPCAwKSB7DQo+Pj4g
+LcKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZXJyb3JfcHJlcGVuZChlcnJwLA0KPj4+IC3CoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAiZmFpbGVkIHRvIHNr
+aXAgZXhwb3J0IG5hbWUgd2l0aCB3cm9uZyBsZW5ndGg6ICIpOw0KPj4+IC3CoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgIG5iZF9zZW5kX29wdF9hYm9ydChpb2MpOw0KPj4+IC3CoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgIHJldHVybiAtMTsNCj4+PiArwqDCoMKgIGlmICh3YW50KSB7DQo+Pj4gK8KgwqDCoMKg
+wqDCoMKgIGlmIChuYW1lbGVuICE9IHN0cmxlbih3YW50KSkgew0KPj4+ICvCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgIGlmIChuYmRfZHJvcChpb2MsIGxlbiwgZXJycCkgPCAwKSB7DQo+Pj4gK8KgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBlcnJvcl9wcmVwZW5kKGVycnAsDQo+Pj4gK8KgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgImZh
+aWxlZCB0byBza2lwIGV4cG9ydCBuYW1lIHdpdGggd3JvbmcgbGVuZ3RoOiAiKTsNCj4+PiArwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIG5iZF9zZW5kX29wdF9hYm9ydChpb2MpOw0KPj4+
+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuIC0xOw0KPj4+ICvCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgIH0NCj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gMTsN
+Cj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoCB9DQo+Pj4gLcKgwqDCoMKgwqDCoMKgIHJldHVybiAx
+Ow0KPj4+ICvCoMKgwqDCoMKgwqDCoCBhc3NlcnQobmFtZWxlbiA8IHNpemVvZihhcnJheSkpOw0K
+Pj4+ICvCoMKgwqAgfSBlbHNlIHsNCj4+PiArwqDCoMKgwqDCoMKgwqAgYXNzZXJ0KG5hbWVvdXQp
+Ow0KPj4NCj4+IHRoaXMgYXNzZXJ0IGxvb2tzIGEgYml0IHJlZHVuZGFudCwgaWYgbmFtZW91dCBp
+cyAwLCBuZXh0IGxpbmUgd2lsbCBhYm9ydCBub3QgbGVzcyBjbGVhcmx5DQo+Pg0KPj4+ICvCoMKg
+wqDCoMKgwqDCoCAqbmFtZW91dCA9IG5hbWUgPSBnX25ldyhjaGFyLCBuYW1lbGVuICsgMSk7DQo+
+Pg0KPj4gV2Ugc2hvdWxkIGNoZWNrIG5hbWVsZW4gPD0gTkJEX01BWF9OQU1FX1NJWkUgYmVmb3Jl
+IGl0LCBJIHRoaW5rLg0KPiANCj4gV2h5PyBXZSBhbHJlYWR5IHZhbGlkYXRlZA0KDQpBaCwgdGhh
+biBPSywgdGhlIHdvcnN0IGNhc2UgaXMgfiBOQkRfTUFYX0JVRkZFUl9TSVpFICgzMk0pLCBub3Qg
+NEcuIE1pc3NlZCB0aGF0IDooDQoNCiAgdGhhdCB0aGUgb3ZlcmFsbCBvcHRpb24gaXMgbm90IHRv
+byBsYXJnZSwgYW5kIGV2ZW4gaWYgdGhlIHJlc3VsdGluZyBuYW1lIGZyb20gdGhlIHNlcnZlciBp
+cyBsYXJnZXIgdGhhbiBOQkRfTUFYX05BTUVfU0laRSwgaXQncyBzdGlsbCBuaWNlIHRvIHJlcG9y
+dCB0aGF0IG5hbWUgdG8gdGhlIGNsaWVudCBmb3IgJ3FlbXUtbmJkIC0tbGlzdCcuwqAgQW5kIHRo
+ZXNlIGRheXMsIHdlIG9ubHkgY2FsbCBuYmRfcmVjZWl2ZV9saXN0IGlmIGEgc2VydmVyIGxhY2tl
+ZCBOQkRfT1BUX0dPLCB3aGljaCBpcyBnZXR0aW5nIHJhcmVyIGFuZCByYXJlciwgc28gbWljcm8t
+b3B0aW1pemluZyBhIHJhcmUgY2FzZSB0byBhdm9pZCBhIGxhcmdlIG1hbGxvYyBpc24ndCBnb2lu
+ZyB0byBtYWtlIGEgbm90aWNlYWJsZSBkaWZmZXJlbmNlLg0KPiANCj4+DQo+Pj4gwqDCoMKgwqDC
+oMKgIH0NCj4+Pg0KPj4+IC3CoMKgwqAgYXNzZXJ0KG5hbWVsZW4gPCBzaXplb2YobmFtZSkpOw0K
+Pj4+IMKgwqDCoMKgwqDCoCBpZiAobmJkX3JlYWQoaW9jLCBuYW1lLCBuYW1lbGVuLCBlcnJwKSA8
+IDApIHsNCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoCBlcnJvcl9wcmVwZW5kKGVycnAsICJmYWls
+ZWQgdG8gcmVhZCBleHBvcnQgbmFtZTogIik7DQo+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqAgbmJk
+X3NlbmRfb3B0X2Fib3J0KGlvYyk7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIGlmICghd2FudCkgew0K
+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGZyZWUobmFtZSk7DQo+Pg0KPj4gZ19mcmVlDQo+
+Pg0KPj4+ICvCoMKgwqDCoMKgwqDCoCB9DQo+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJu
+IC0xOw0KPj4+IMKgwqDCoMKgwqDCoCB9DQo+Pj4gwqDCoMKgwqDCoMKgIG5hbWVbbmFtZWxlbl0g
+PSAnXDAnOw0KPj4+IMKgwqDCoMKgwqDCoCBsZW4gLT0gbmFtZWxlbjsNCj4+PiAtwqDCoMKgIGlm
+IChuYmRfZHJvcChpb2MsIGxlbiwgZXJycCkgPCAwKSB7DQo+Pj4gK8KgwqDCoCBpZiAoIXdhbnQp
+IHsNCj4+PiArwqDCoMKgwqDCoMKgwqAgYXNzZXJ0KGRlc2NyaXB0aW9uKTsNCj4+DQo+PiBOQkRf
+TUFYX05BTUVfU0laRQ0KPiANCj4gVGhlIGRlc2NyaXB0aW9uIGlzIG5vdCBib3VuZCBieSBOQkRf
+TUFYX05BTUVfU0laRS7CoCBUaGUgTkJEIHByb3RvY29sIERPRVMgZG9jdW1lbnQgYSBtYXhpbXVt
+IHN0cmluZyBzaXplICg0ayksIGJ1dCB3ZSBhcmUgKHNvIGZhcikgbm90IGFjdHVhbGx5IGhvbm9y
+aW5nIHRoYXQgbGltaXQgKG91ciBjaG9pY2UgZm9yIE5CRF9NQVhfTkFNRV9TSVpFIGlzIDI1Niwg
+d2hpY2ggaXMgc21hbGxlciB0aGFuIHRoZSBOQkQgcHJvdG9jb2wgbGltaXQpLg0KPiANCg0KT2ht
+LCB5ZXMsIHlvdSBhcmUgcmlnaHQgOiguIFRvbyBtdWNoIHJldmlld2luZywgSSBzaG91bGQgc3Rv
+cCBhbmQgbWFrZSBzb21lIHBhdGNoZXMgOikNCg0KPj4NCj4+PiArwqDCoMKgwqDCoMKgwqAgKmRl
+c2NyaXB0aW9uID0gZ19uZXcoY2hhciwgbGVuICsgMSk7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIGlm
+IChuYmRfcmVhZChpb2MsICpkZXNjcmlwdGlvbiwgbGVuLCBlcnJwKSA8IDApIHsNCj4+PiArwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCBlcnJvcl9wcmVwZW5kKGVycnAsICJmYWlsZWQgdG8gcmVhZCBl
+eHBvcnQgZGVzY3JpcHRpb246ICIpOw0KPj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIG5iZF9z
+ZW5kX29wdF9hYm9ydChpb2MpOw0KPj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGZyZWUobmFt
+ZSk7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZnJlZSgqZGVzY3JpcHRpb24pOw0KPj4N
+Cj4+IGdfZnJlZQ0KPj4NCj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gLTE7DQo+
+Pj4gK8KgwqDCoMKgwqDCoMKgIH0NCj4+PiArwqDCoMKgwqDCoMKgwqAgKCpkZXNjcmlwdGlvbilb
+bGVuXSA9ICdcMCc7DQo+Pj4gK8KgwqDCoCB9IGVsc2UgaWYgKG5iZF9kcm9wKGlvYywgbGVuLCBl
+cnJwKSA8IDApIHsNCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoCBlcnJvcl9wcmVwZW5kKGVycnAs
+ICJmYWlsZWQgdG8gcmVhZCBleHBvcnQgZGVzY3JpcHRpb246ICIpOw0KPj4+IMKgwqDCoMKgwqDC
+oMKgwqDCoMKgIG5iZF9zZW5kX29wdF9hYm9ydChpb2MpOw0KPj4+IMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIHJldHVybiAtMTsNCj4+PiDCoMKgwqDCoMKgwqAgfQ0KPj4+IC3CoMKgwqAgaWYgKCFzdHJj
+bXAobmFtZSwgd2FudCkpIHsNCj4+PiArwqDCoMKgIGlmICh3YW50ICYmICFzdHJjbXAobmFtZSwg
+d2FudCkpIHsNCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqbWF0Y2ggPSB0cnVlOw0KPj4+IMKg
+wqDCoMKgwqDCoCB9DQo+Pj4gwqDCoMKgwqDCoMKgIHJldHVybiAxOw0KPj4NCj4+IG9uZSBtb3Jl
+IHRoaW5nOiBvbiBmYWlsIHBhdGgsIHlvdSBmaW5hbGx5IGZpbGwgb3V0cHV0IG5hbWUgYW5kIGRl
+c2NyaXB0aW9uDQo+PiB3aXRoIGZyZWVkIHBvaW50ZXJzLiBJJ2QgcHJlZmVyIHRvIGtlZXAgdGhl
+bSB1bmNoYW5nZWQgaW4gdGhpcyBjYXNlLCBob3dldmVyLA0KPj4gaXQncyBhIG1hdHRlciBvZiB0
+YXN0ZS4NCj4gDQo+IE9rYXksIEknbGwgdHJ5IGFuZCBiZSBtb3JlIGNhcmVmdWwgaW4gdjIgYWJv
+dXQgbm90IGFsdGVyaW5nIHRoZSBjYWxsZXJzIHBvaW50ZXJzIG9uIGZhaWx1cmUuDQo+IA0KDQoN
+Ci0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
