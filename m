@@ -1,35 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gUx8I-0000O3-DZ
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:08:18 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1gUxFP-0006b9-7m
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:15:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gUx8E-00032s-F3
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:08:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34676)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gUx8E-0002xs-8K
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:08:10 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0DD1158E46
-	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 17:08:03 +0000 (UTC)
-References: <20181130140615.19937-1-berrange@redhat.com>
-	<20181130140615.19937-10-berrange@redhat.com>
-	<868aa668-c882-3392-ee10-2afc28a51f7e@redhat.com>
-	<5d9b6cdf-3d6b-a424-daa1-e5a498920f59@redhat.com>
-	<d7e633c1-2216-fd2b-dd36-41df5c264f0a@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5a0b8acd-2906-2ee7-1ef2-0035af9af811@redhat.com>
-Date: Thu, 6 Dec 2018 11:07:53 -0600
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1gUxFL-0007bV-3P
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:15:35 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28803
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1gUxFK-0007at-RP
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:15:31 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wB6H9kEj133266
+	for <qemu-devel@nongnu.org>; Thu, 6 Dec 2018 12:15:28 -0500
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2p76sr40k7-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 12:15:28 -0500
+Received: from localhost
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Thu, 6 Dec 2018 17:15:27 -0000
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <d7e633c1-2216-fd2b-dd36-41df5c264f0a@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 09/11] authz: add QAuthZListFile object
- type for a file access control list
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20181206165047.GT29540@redhat.com>
+References: <20181128153526.10948-1-berrange@redhat.com>
+	<165bc19e-8ed2-8979-aea7-0f6031fc6df2@redhat.com>
+	<20181206165047.GT29540@redhat.com>
+Date: Thu, 06 Dec 2018 11:15:19 -0600
+Message-Id: <154411651930.28165.5754119001430373065@sif>
+Subject: Re: [Qemu-devel] [qemu-web PATCH] Document how to test the site
+ with jekyll locally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,27 +44,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: =?utf-8?q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, alex.bennee@linaro.org, qemu-devel@nongnu.org, raimue@macports.org, Yu Ning <yu.ning@intel.com>
 
-On 12/6/18 9:58 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+Quoting Daniel P. Berrang=C3=A9 (2018-12-06 10:50:47)
+> Copying Michael Roth as the only remaining non-Red Hat contributor
+> we still need approval from
 
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "refresh": "yes"
->>>
->>> I had to use "refresh": yes (value unquoted) to avoid:
->>
->> Do you mean "refresh":true?=C2=A0 (bare yes is not valid JSON, but bar=
-e true
->> is the correct way for a JSON bool).
+No objections from my end.
+
+> =
+
+> On Wed, Nov 28, 2018 at 05:44:09PM +0100, Paolo Bonzini wrote:
+> > On 28/11/18 16:35, Daniel P. Berrang=C3=A9 wrote:
+> > > Add a README file that tells people this is a jekyll based static
+> > > website, and shows people how to run jekyll for testing purposes.
+> > > =
+
+> > > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > > ---
+> > > =
+
+> > > NB, we should really mention a license in the README too, but I don't
+> > > see info about what license we consider qemu-web to be covered by...
+> > =
+
+> >     47        Paolo Bonzini <pbonzini@redhat.com>
+> >     44        Michael Roth <mdroth@linux.vnet.ibm.com>
+> >     13        Thomas Huth <thuth@redhat.com>
+> >      3        Eric Blake <eblake@redhat.com>
+> >      2        Daniel P. Berrange <berrange@redhat.com>
+> >      2        Jeff Cody <jcody@redhat.com>
+> >      1        Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> >      1        Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> >      1        Fam Zheng <famz@redhat.com>
+> >      1        Rainer M=C3=BCller <raimue@macports.org>
+> >      1        Stefan Hajnoczi <stefanha@gmail.com>
+> >      1        Yu Ning <yu.ning@intel.com>
+> > =
+
+> > Anybody (especially non-RH people) disagrees with dual-license CC-BY-SA
+> > 4.0 and GPLv2+?  (So that we can copy from blog posts to manuals)?
+> > =
+
+> > Paolo
+> =
+
+> Regards,
+> Daniel
+> -- =
+
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 >=20
-> I first tried 'true' then was curious and tried 'yes' and it worked too=
-...
-
-Ah, so you're using a python wrapper rather than direct QMP, and=20
-benefitting from a rather-forgiving parser that turns yes into the=20
-correct QMP true over the wire to the actual monitor.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
