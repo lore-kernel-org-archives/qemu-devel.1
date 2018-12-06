@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47968)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=8715dceb6=Paul.Durrant@citrix.com>)
-	id 1gUvXL-0006Es-Qg
+	id 1gUvXP-00071c-On
 	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:26:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=8715dceb6=Paul.Durrant@citrix.com>)
-	id 1gUvHt-0005Xi-2p
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:10:07 -0500
+	id 1gUvHq-0005Oj-Oa
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:10:02 -0500
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Thu, 6 Dec 2018 15:08:35 +0000
-Message-ID: <1544108924-10841-10-git-send-email-paul.durrant@citrix.com>
+Date: Thu, 6 Dec 2018 15:08:33 +0000
+Message-ID: <1544108924-10841-8-git-send-email-paul.durrant@citrix.com>
 In-Reply-To: <1544108924-10841-1-git-send-email-paul.durrant@citrix.com>
 References: <1544108924-10841-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 09/18] xen: remove unnecessary code from
- dataplane/xen-block.c
+Subject: [Qemu-devel] [PATCH v2 07/18] xen: add event channel interface for
+ XenDevice-s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,532 +25,191 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
 
-Not all of the code duplicated from xen_disk.c is required as the basis for
-the new dataplane implementation so this patch removes extraneous code,
-along with the legacy #includes and calls to the legacy xen_pv_printf()
-function. Error messages are changed to be reported using error_report().
-
-NOTE: The code is still not yet built. Further transformations will be
-      required to make it correctly interface to the new XenBus/XenDevice
-      framework. They will be delivered in a subsequent patch.
+The legacy PV backend infrastructure provides functions to bind, unbind
+and send notifications to event channnels. Similar functionality will be
+required by XenDevice implementations so this patch adds the necessary
+support.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-Acked-by: Anthony Perard <anthony.perard@citrix.com>
 ---
 Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
+Cc: Anthony Perard <anthony.perard@citrix.com>
 
 v2:
- - Leave existing boilerplate alone, other than removing the now-incorrect
-   description
+ - Added error pointers to notify and unbind
 ---
- hw/block/dataplane/xen-block.c | 409 ++---------------------------------------
- 1 file changed, 16 insertions(+), 393 deletions(-)
+ hw/xen/xen-bus.c         | 101 +++++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/xen/xen-bus.h |  18 +++++++++
+ 2 files changed, 119 insertions(+)
 
-diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-block.c
-index 9fae505..98f987d 100644
---- a/hw/block/dataplane/xen-block.c
-+++ b/hw/block/dataplane/xen-block.c
-@@ -1,6 +1,4 @@
- /*
-- *  xen paravirt block device backend
-- *
-  *  (c) Gerd Hoffmann <kraxel@redhat.com>
-  *
-  *  This program is free software; you can redistribute it and/or modify
-@@ -19,26 +17,12 @@
-  *  GNU GPL, version 2 or (at your option) any later version.
-  */
- 
--#include "qemu/osdep.h"
--#include "qemu/units.h"
--#include <sys/ioctl.h>
--#include <sys/uio.h>
--
--#include "hw/hw.h"
--#include "hw/xen/xen_backend.h"
--#include "xen_blkif.h"
--#include "sysemu/blockdev.h"
--#include "sysemu/iothread.h"
--#include "sysemu/block-backend.h"
--#include "qapi/error.h"
--#include "qapi/qmp/qdict.h"
--#include "qapi/qmp/qstring.h"
--#include "trace.h"
--
--/* ------------------------------------------------------------- */
--
--#define BLOCK_SIZE  512
--#define IOCB_COUNT  (BLKIF_MAX_SEGMENTS_PER_REQUEST + 2)
-+/*
-+ * Copyright (c) 2018  Citrix Systems Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
- 
- struct ioreq {
-     blkif_request_t     req;
-@@ -101,8 +85,6 @@ struct XenBlkDev {
-     AioContext          *ctx;
- };
- 
--/* ------------------------------------------------------------- */
--
- static void ioreq_reset(struct ioreq *ioreq)
- {
-     memset(&ioreq->req, 0, sizeof(ioreq->req));
-@@ -183,11 +165,6 @@ static int ioreq_parse(struct ioreq *ioreq)
-     size_t len;
-     int i;
- 
--    xen_pv_printf(
--        xendev, 3,
--        "op %d, nr %d, handle %d, id %" PRId64 ", sector %" PRId64 "\n",
--        ioreq->req.operation, ioreq->req.nr_segments,
--        ioreq->req.handle, ioreq->req.id, ioreq->req.sector_number);
-     switch (ioreq->req.operation) {
-     case BLKIF_OP_READ:
-         break;
-@@ -202,28 +179,27 @@ static int ioreq_parse(struct ioreq *ioreq)
-     case BLKIF_OP_DISCARD:
-         return 0;
-     default:
--        xen_pv_printf(xendev, 0, "error: unknown operation (%d)\n",
--                      ioreq->req.operation);
-+        error_report("error: unknown operation (%d)", ioreq->req.operation);
-         goto err;
-     };
- 
-     if (ioreq->req.operation != BLKIF_OP_READ && blkdev->mode[0] != 'w') {
--        xen_pv_printf(xendev, 0, "error: write req for ro device\n");
-+        error_report("error: write req for ro device");
-         goto err;
-     }
- 
-     ioreq->start = ioreq->req.sector_number * blkdev->file_blk;
-     for (i = 0; i < ioreq->req.nr_segments; i++) {
-         if (i == BLKIF_MAX_SEGMENTS_PER_REQUEST) {
--            xen_pv_printf(xendev, 0, "error: nr_segments too big\n");
-+            error_report("error: nr_segments too big");
-             goto err;
-         }
-         if (ioreq->req.seg[i].first_sect > ioreq->req.seg[i].last_sect) {
--            xen_pv_printf(xendev, 0, "error: first > last sector\n");
-+            error_report("error: first > last sector");
-             goto err;
-         }
-         if (ioreq->req.seg[i].last_sect * BLOCK_SIZE >= XC_PAGE_SIZE) {
--            xen_pv_printf(xendev, 0, "error: page crossing\n");
-+            error_report("error: page crossing");
-             goto err;
-         }
- 
-@@ -232,7 +208,7 @@ static int ioreq_parse(struct ioreq *ioreq)
-         ioreq->size += len;
-     }
-     if (ioreq->start + ioreq->size > blkdev->file_size) {
--        xen_pv_printf(xendev, 0, "error: access beyond end of file\n");
-+        error_report("error: access beyond end of file");
-         goto err;
-     }
-     return 0;
-@@ -278,8 +254,7 @@ static int ioreq_grant_copy(struct ioreq *ioreq)
-     rc = xen_be_copy_grant_refs(xendev, to_domain, segs, count);
- 
-     if (rc) {
--        xen_pv_printf(xendev, 0,
--                      "failed to copy data %d\n", rc);
-+        error_report("failed to copy data %d", rc);
-         ioreq->aio_errors++;
-         return -1;
-     }
-@@ -298,8 +273,9 @@ static void qemu_aio_complete(void *opaque, int ret)
-     aio_context_acquire(blkdev->ctx);
- 
-     if (ret != 0) {
--        xen_pv_printf(xendev, 0, "%s I/O error\n",
--                      ioreq->req.operation == BLKIF_OP_READ ? "read" : "write");
-+        error_report("%s I/O error",
-+                     ioreq->req.operation == BLKIF_OP_READ ?
-+                     "read" : "write");
-         ioreq->aio_errors++;
-     }
- 
-@@ -605,8 +581,6 @@ static void blk_handle_requests(struct XenBlkDev *blkdev)
-     }
+diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
+index b40dc83..0e6f194 100644
+--- a/hw/xen/xen-bus.c
++++ b/hw/xen/xen-bus.c
+@@ -621,6 +621,81 @@ done:
+     g_free(xengnttab_segs);
  }
  
--/* ------------------------------------------------------------- */
--
- static void blk_bh(void *opaque)
++struct XenEventChannel {
++    unsigned int local_port;
++    XenEventHandler handler;
++    void *opaque;
++    Notifier notifier;
++};
++
++static void event_notify(Notifier *n, void *data)
++{
++    XenEventChannel *channel = container_of(n, XenEventChannel, notifier);
++    unsigned long port = (unsigned long)data;
++
++    if (port == channel->local_port) {
++        channel->handler(channel->opaque);
++    }
++}
++
++XenEventChannel *xen_device_bind_event_channel(XenDevice *xendev,
++                                               unsigned int port,
++                                               XenEventHandler handler,
++                                               void *opaque, Error **errp)
++{
++    XenEventChannel *channel = g_new0(XenEventChannel, 1);
++
++    channel->local_port = xenevtchn_bind_interdomain(xendev->xeh,
++                                                     xendev->frontend_id,
++                                                     port);
++    if (xendev->local_port < 0) {
++        error_setg_errno(errp, errno, "xenevtchn_bind_interdomain failed");
++
++        g_free(channel);
++        return NULL;
++    }
++
++    channel->handler = handler;
++    channel->opaque = opaque;
++    channel->notifier.notify = event_notify;
++
++    notifier_list_add(&xendev->event_notifiers, &channel->notifier);
++
++    return channel;
++}
++
++void xen_device_notify_event_channel(XenDevice *xendev,
++                                     XenEventChannel *channel,
++                                     Error **errp)
++{
++    if (!channel) {
++        error_setg(errp, "bad channel");
++        return;
++    }
++
++    if (xenevtchn_notify(xendev->xeh, channel->local_port) < 0) {
++        error_setg_errno(errp, errno, "xenevtchn_notify failed");
++    }
++}
++
++void xen_device_unbind_event_channel(XenDevice *xendev,
++                                     XenEventChannel *channel,
++                                     Error **errp)
++{
++    if (!channel) {
++        error_setg(errp, "bad channel");
++        return;
++    }
++
++    notifier_remove(&channel->notifier);
++
++    if (xenevtchn_unbind(xendev->xeh, channel->local_port) < 0) {
++        error_setg_errno(errp, errno, "xenevtchn_unbind failed");
++    }
++
++    g_free(channel);
++}
++
+ static void xen_device_unrealize(DeviceState *dev, Error **errp)
  {
-     struct XenBlkDev *blkdev = opaque;
-@@ -634,346 +608,6 @@ static void blk_alloc(struct XenLegacyDevice *xendev)
-     blkdev->bh = aio_bh_new(blkdev->ctx, blk_bh, blkdev);
+     XenDevice *xendev = XEN_DEVICE(dev);
+@@ -649,6 +724,12 @@ static void xen_device_unrealize(DeviceState *dev, Error **errp)
+     xen_device_frontend_destroy(xendev);
+     xen_device_backend_destroy(xendev);
+ 
++    if (xendev->xeh) {
++        qemu_set_fd_handler(xenevtchn_fd(xendev->xeh), NULL, NULL, NULL);
++        xenevtchn_close(xendev->xeh);
++        xendev->xeh = NULL;
++    }
++
+     if (xendev->xgth) {
+         xengnttab_close(xendev->xgth);
+         xendev->xgth = NULL;
+@@ -665,6 +746,16 @@ static void xen_device_exit(Notifier *n, void *data)
+     xen_device_unrealize(DEVICE(xendev), &error_abort);
  }
  
--static void blk_parse_discard(struct XenBlkDev *blkdev)
--{
--    struct XenLegacyDevice *xendev = &blkdev->xendev;
--    int enable;
--
--    blkdev->feature_discard = true;
--
--    if (xenstore_read_be_int(xendev, "discard-enable", &enable) == 0) {
--        blkdev->feature_discard = !!enable;
--    }
--
--    if (blkdev->feature_discard) {
--        xenstore_write_be_int(xendev, "feature-discard", 1);
--    }
--}
--
--static int blk_init(struct XenLegacyDevice *xendev)
--{
--    struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
--    int info = 0;
--    char *directiosafe = NULL;
--
--    trace_xen_disk_init(xendev->name);
--
--    /* read xenstore entries */
--    if (blkdev->params == NULL) {
--        char *h = NULL;
--        blkdev->params = xenstore_read_be_str(xendev, "params");
--        if (blkdev->params != NULL) {
--            h = strchr(blkdev->params, ':');
--        }
--        if (h != NULL) {
--            blkdev->fileproto = blkdev->params;
--            blkdev->filename  = h + 1;
--            *h = 0;
--        } else {
--            blkdev->fileproto = "<unset>";
--            blkdev->filename  = blkdev->params;
--        }
--    }
--    if (!strcmp("aio", blkdev->fileproto)) {
--        blkdev->fileproto = "raw";
--    }
--    if (!strcmp("vhd", blkdev->fileproto)) {
--        blkdev->fileproto = "vpc";
--    }
--    if (blkdev->mode == NULL) {
--        blkdev->mode = xenstore_read_be_str(xendev, "mode");
--    }
--    if (blkdev->type == NULL) {
--        blkdev->type = xenstore_read_be_str(xendev, "type");
--    }
--    if (blkdev->dev == NULL) {
--        blkdev->dev = xenstore_read_be_str(xendev, "dev");
--    }
--    if (blkdev->devtype == NULL) {
--        blkdev->devtype = xenstore_read_be_str(xendev, "device-type");
--    }
--    directiosafe = xenstore_read_be_str(xendev, "direct-io-safe");
--    blkdev->directiosafe = (directiosafe && atoi(directiosafe));
--
--    /* do we have all we need? */
--    if (blkdev->params == NULL ||
--        blkdev->mode == NULL   ||
--        blkdev->type == NULL   ||
--        blkdev->dev == NULL) {
--        goto out_error;
--    }
--
--    /* read-only ? */
--    if (strcmp(blkdev->mode, "w")) {
--        info  |= VDISK_READONLY;
--    }
--
--    /* cdrom ? */
--    if (blkdev->devtype && !strcmp(blkdev->devtype, "cdrom")) {
--        info  |= VDISK_CDROM;
--    }
--
--    blkdev->file_blk  = BLOCK_SIZE;
--
--    /* fill info
--     * blk_connect supplies sector-size and sectors
--     */
--    xenstore_write_be_int(xendev, "feature-flush-cache", 1);
--    xenstore_write_be_int(xendev, "info", info);
--
--    xenstore_write_be_int(xendev, "max-ring-page-order",
--                          MAX_RING_PAGE_ORDER);
--
--    blk_parse_discard(blkdev);
--
--    g_free(directiosafe);
--    return 0;
--
--out_error:
--    g_free(blkdev->params);
--    blkdev->params = NULL;
--    g_free(blkdev->mode);
--    blkdev->mode = NULL;
--    g_free(blkdev->type);
--    blkdev->type = NULL;
--    g_free(blkdev->dev);
--    blkdev->dev = NULL;
--    g_free(blkdev->devtype);
--    blkdev->devtype = NULL;
--    g_free(directiosafe);
--    blkdev->directiosafe = false;
--    return -1;
--}
--
--static int blk_connect(struct XenLegacyDevice *xendev)
--{
--    struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
--    int index, qflags;
--    bool readonly = true;
--    bool writethrough = true;
--    int order, ring_ref;
--    unsigned int ring_size, max_grants;
--    unsigned int i;
--
--    trace_xen_disk_connect(xendev->name);
--
--    /* read-only ? */
--    if (blkdev->directiosafe) {
--        qflags = BDRV_O_NOCACHE | BDRV_O_NATIVE_AIO;
--    } else {
--        qflags = 0;
--        writethrough = false;
--    }
--    if (strcmp(blkdev->mode, "w") == 0) {
--        qflags |= BDRV_O_RDWR;
--        readonly = false;
--    }
--    if (blkdev->feature_discard) {
--        qflags |= BDRV_O_UNMAP;
--    }
--
--    /* init qemu block driver */
--    index = (xendev->dev - 202 * 256) / 16;
--    blkdev->dinfo = drive_get(IF_XEN, 0, index);
--    if (!blkdev->dinfo) {
--        Error *local_err = NULL;
--        QDict *options = NULL;
--
--        if (strcmp(blkdev->fileproto, "<unset>")) {
--            options = qdict_new();
--            qdict_put_str(options, "driver", blkdev->fileproto);
--        }
--
--        /* setup via xenbus -> create new block driver instance */
--        xen_pv_printf(xendev, 2, "create new bdrv (xenbus setup)\n");
--        blkdev->blk = blk_new_open(blkdev->filename, NULL, options,
--                                   qflags, &local_err);
--        if (!blkdev->blk) {
--            xen_pv_printf(xendev, 0, "error: %s\n",
--                          error_get_pretty(local_err));
--            error_free(local_err);
--            return -1;
--        }
--        blk_set_enable_write_cache(blkdev->blk, !writethrough);
--    } else {
--        /* setup via qemu cmdline -> already setup for us */
--        xen_pv_printf(xendev, 2,
--                      "get configured bdrv (cmdline setup)\n");
--        blkdev->blk = blk_by_legacy_dinfo(blkdev->dinfo);
--        if (blk_is_read_only(blkdev->blk) && !readonly) {
--            xen_pv_printf(xendev, 0, "Unexpected read-only drive");
--            blkdev->blk = NULL;
--            return -1;
--        }
--        /* blkdev->blk is not create by us, we get a reference
--         * so we can blk_unref() unconditionally */
--        blk_ref(blkdev->blk);
--    }
--    blk_attach_dev_legacy(blkdev->blk, blkdev);
--    blkdev->file_size = blk_getlength(blkdev->blk);
--    if (blkdev->file_size < 0) {
--        BlockDriverState *bs = blk_bs(blkdev->blk);
--        const char *drv_name = bs ? bdrv_get_format_name(bs) : NULL;
--        xen_pv_printf(xendev, 1, "blk_getlength: %d (%s) | drv %s\n",
--                      (int)blkdev->file_size, strerror(-blkdev->file_size),
--                      drv_name ?: "-");
--        blkdev->file_size = 0;
--    }
--
--    xen_pv_printf(xendev, 1, "type \"%s\", fileproto \"%s\", filename \"%s\","
--                  " size %" PRId64 " (%" PRId64 " MB)\n",
--                  blkdev->type, blkdev->fileproto, blkdev->filename,
--                  blkdev->file_size, blkdev->file_size / MiB);
--
--    /* Fill in number of sector size and number of sectors */
--    xenstore_write_be_int(xendev, "sector-size", blkdev->file_blk);
--    xenstore_write_be_int64(xendev, "sectors",
--                            blkdev->file_size / blkdev->file_blk);
--
--    if (xenstore_read_fe_int(xendev, "ring-page-order",
--                             &order) == -1) {
--        blkdev->nr_ring_ref = 1;
--
--        if (xenstore_read_fe_int(xendev, "ring-ref",
--                                 &ring_ref) == -1) {
--            return -1;
--        }
--        blkdev->ring_ref[0] = ring_ref;
--
--    } else if (order >= 0 && order <= MAX_RING_PAGE_ORDER) {
--        blkdev->nr_ring_ref = 1 << order;
--
--        for (i = 0; i < blkdev->nr_ring_ref; i++) {
--            char *key;
--
--            key = g_strdup_printf("ring-ref%u", i);
--            if (!key) {
--                return -1;
--            }
--
--            if (xenstore_read_fe_int(xendev, key,
--                                     &ring_ref) == -1) {
--                g_free(key);
--                return -1;
--            }
--            blkdev->ring_ref[i] = ring_ref;
--
--            g_free(key);
--        }
--    } else {
--        xen_pv_printf(xendev, 0, "invalid ring-page-order: %d\n",
--                      order);
--        return -1;
--    }
--
--    if (xenstore_read_fe_int(xendev, "event-channel",
--                             &xendev->remote_port) == -1) {
--        return -1;
--    }
--
--    if (!xendev->protocol) {
--        blkdev->protocol = BLKIF_PROTOCOL_NATIVE;
--    } else if (strcmp(xendev->protocol, XEN_IO_PROTO_ABI_NATIVE) == 0) {
--        blkdev->protocol = BLKIF_PROTOCOL_NATIVE;
--    } else if (strcmp(xendev->protocol, XEN_IO_PROTO_ABI_X86_32) == 0) {
--        blkdev->protocol = BLKIF_PROTOCOL_X86_32;
--    } else if (strcmp(xendev->protocol, XEN_IO_PROTO_ABI_X86_64) == 0) {
--        blkdev->protocol = BLKIF_PROTOCOL_X86_64;
--    } else {
--        blkdev->protocol = BLKIF_PROTOCOL_NATIVE;
--    }
--
--    ring_size = XC_PAGE_SIZE * blkdev->nr_ring_ref;
--    switch (blkdev->protocol) {
--    case BLKIF_PROTOCOL_NATIVE:
--    {
--        blkdev->max_requests = __CONST_RING_SIZE(blkif, ring_size);
--        break;
--    }
--    case BLKIF_PROTOCOL_X86_32:
--    {
--        blkdev->max_requests = __CONST_RING_SIZE(blkif_x86_32, ring_size);
--        break;
--    }
--    case BLKIF_PROTOCOL_X86_64:
--    {
--        blkdev->max_requests = __CONST_RING_SIZE(blkif_x86_64, ring_size);
--        break;
--    }
--    default:
--        return -1;
--    }
--
--    /* Add on the number needed for the ring pages */
--    max_grants = blkdev->nr_ring_ref;
--
--    xen_be_set_max_grant_refs(xendev, max_grants);
--    blkdev->sring = xen_be_map_grant_refs(xendev, blkdev->ring_ref,
--                                          blkdev->nr_ring_ref,
--                                          PROT_READ | PROT_WRITE);
--    if (!blkdev->sring) {
--        return -1;
--    }
--
--    switch (blkdev->protocol) {
--    case BLKIF_PROTOCOL_NATIVE:
--    {
--        blkif_sring_t *sring_native = blkdev->sring;
--        BACK_RING_INIT(&blkdev->rings.native, sring_native, ring_size);
--        break;
--    }
--    case BLKIF_PROTOCOL_X86_32:
--    {
--        blkif_x86_32_sring_t *sring_x86_32 = blkdev->sring;
--
--        BACK_RING_INIT(&blkdev->rings.x86_32_part, sring_x86_32, ring_size);
--        break;
--    }
--    case BLKIF_PROTOCOL_X86_64:
--    {
--        blkif_x86_64_sring_t *sring_x86_64 = blkdev->sring;
--
--        BACK_RING_INIT(&blkdev->rings.x86_64_part, sring_x86_64, ring_size);
--        break;
--    }
--    }
--
--    blk_set_aio_context(blkdev->blk, blkdev->ctx);
--
--    xen_be_bind_evtchn(xendev);
--
--    xen_pv_printf(xendev, 1, "ok: proto %s, nr-ring-ref %u, "
--                  "remote port %d, local port %d\n",
--                  xendev->protocol, blkdev->nr_ring_ref,
--                  xendev->remote_port, xendev->local_port);
--    return 0;
--}
--
--static void blk_disconnect(struct XenLegacyDevice *xendev)
--{
--    struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
--
--    trace_xen_disk_disconnect(xendev->name);
--
--    aio_context_acquire(blkdev->ctx);
--
--    if (blkdev->blk) {
--        blk_set_aio_context(blkdev->blk, qemu_get_aio_context());
--        blk_detach_dev(blkdev->blk, blkdev);
--        blk_unref(blkdev->blk);
--        blkdev->blk = NULL;
--    }
--    xen_pv_unbind_evtchn(xendev);
--
--    aio_context_release(blkdev->ctx);
--
--    if (blkdev->sring) {
--        xen_be_unmap_grant_refs(xendev, blkdev->sring,
--                                blkdev->nr_ring_ref);
--        blkdev->sring = NULL;
--    }
--}
--
- static int blk_free(struct XenLegacyDevice *xendev)
++static void xen_device_event(void *opaque)
++{
++    XenDevice *xendev = opaque;
++    unsigned long port = xenevtchn_pending(xendev->xeh);
++
++    notifier_list_notify(&xendev->event_notifiers, (void *)port);
++
++    xenevtchn_unmask(xendev->xeh, port);
++}
++
+ static void xen_device_realize(DeviceState *dev, Error **errp)
  {
-     struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
-@@ -1006,14 +640,3 @@ static void blk_event(struct XenLegacyDevice *xendev)
+     XenDevice *xendev = XEN_DEVICE(dev);
+@@ -705,6 +796,16 @@ static void xen_device_realize(DeviceState *dev, Error **errp)
+     xendev->feature_grant_copy =
+         (xengnttab_grant_copy(xendev->xgth, 0, NULL) == 0);
  
-     qemu_bh_schedule(blkdev->bh);
- }
--
--struct XenDevOps xen_blkdev_ops = {
--    .flags      = DEVOPS_FLAG_NEED_GNTDEV,
--    .size       = sizeof(struct XenBlkDev),
--    .alloc      = blk_alloc,
--    .init       = blk_init,
--    .initialise = blk_connect,
--    .disconnect = blk_disconnect,
--    .event      = blk_event,
--    .free       = blk_free,
--};
++    xendev->xeh = xenevtchn_open(NULL, 0);
++    if (!xendev->xeh) {
++        error_setg_errno(errp, errno, "failed xenevtchn_open");
++        goto unrealize;
++    }
++
++    notifier_list_init(&xendev->event_notifiers);
++    qemu_set_fd_handler(xenevtchn_fd(xendev->xeh), xen_device_event, NULL,
++                        xendev);
++
+     xen_device_backend_create(xendev, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
+index 63a09b6..f83a95c 100644
+--- a/include/hw/xen/xen-bus.h
++++ b/include/hw/xen/xen-bus.h
+@@ -26,6 +26,9 @@ typedef struct XenDevice {
+     XenWatch *frontend_state_watch;
+     xengnttab_handle *xgth;
+     bool feature_grant_copy;
++    xenevtchn_handle *xeh;
++    xenevtchn_port_or_error_t local_port;
++    NotifierList event_notifiers;
+ } XenDevice;
+ 
+ typedef char *(*XenDeviceGetName)(XenDevice *xendev, Error **errp);
+@@ -104,4 +107,19 @@ void xen_device_copy_grant_refs(XenDevice *xendev, bool to_domain,
+                                 XenDeviceGrantCopySegment segs[],
+                                 unsigned int nr_segs, Error **errp);
+ 
++typedef struct XenEventChannel XenEventChannel;
++
++typedef void (*XenEventHandler)(void *opaque);
++
++XenEventChannel *xen_device_bind_event_channel(XenDevice *xendev,
++                                               unsigned int port,
++                                               XenEventHandler handler,
++                                               void *opaque, Error **errp);
++void xen_device_notify_event_channel(XenDevice *xendev,
++                                     XenEventChannel *channel,
++                                     Error **errp);
++void xen_device_unbind_event_channel(XenDevice *xendev,
++                                     XenEventChannel *channel,
++                                     Error **errp);
++
+ #endif /* HW_XEN_BUS_H */
 -- 
 2.1.4
