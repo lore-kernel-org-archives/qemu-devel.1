@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gUwT7-0000re-Ua
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:25:42 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gUwTZ-00015x-DS
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:26:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gUwT4-00022l-Gz
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:25:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57756)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gUwT4-000220-6u
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:25:38 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0E0A637E66
-	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 16:25:37 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
-	<20180706105753.26700-19-marcandre.lureau@redhat.com>
-Date: Thu, 06 Dec 2018 17:25:31 +0100
-In-Reply-To: <20180706105753.26700-19-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Fri, 6 Jul 2018
-	12:57:44 +0200")
-Message-ID: <871s6ubp1g.fsf@dusky.pond.sub.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1gUwTU-00035i-KU
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:26:09 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41821)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gUwTU-00031t-Dy
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:26:04 -0500
+Received: by mail-ot1-x343.google.com with SMTP id u16so932497otk.8
+	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 08:26:04 -0800 (PST)
+References: <20181203203839.757-1-richard.henderson@linaro.org>
+	<20181203203839.757-9-richard.henderson@linaro.org>
+	<CAFEAcA__1C-GkRk65E+JL9Ovte7GhZhGKmP3Zcv_w=wZSqV7=A@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <2bed35b9-1143-de1a-4d4a-eb5ac23a7ef1@linaro.org>
+Date: Thu, 6 Dec 2018 10:25:59 -0600
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA__1C-GkRk65E+JL9Ovte7GhZhGKmP3Zcv_w=wZSqV7=A@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 18/27] qapi: add an error in case a
- discriminator is conditionnal
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 08/10] target/arm: Implement the
+ ARMv8.1-LOR extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,155 +33,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+On 12/6/18 7:49 AM, Peter Maydell wrote:
+>> +        uint64_t hcr = arm_hcr_el2_eff(env);
+>> +        if (hcr & HCR_E2H) {
+>> +            hcr &= HCR_TLOR;
+>> +        } else {
+>> +            hcr &= HCR_TGE | HCR_TLOR;
+> This doesn't make sense to me
 
-> Making a discriminator conditonal doesn't make much sense.
+The logic is backward.  What I was after was
 
-Good point (so easy to overlook!), but why first add the 'if' feature
-broken that way in PATCH 16, then fix it up in PATCH 18?
+  if (hcr & HCR_E2H) {
+      hcr &= HCR_TGE | HCR_TLOR;
+  } else {
+      hcr &= HCR_TLOR;
+  }
+  if (hcr == HCR_TLOR) {
+      trap to el2.
+  }
 
->                                                            Instead,
-> the union could be made conditional.
+I.e. swap the then and else condition.  This takes care of the two rules
 
-What do you mean by that?
+ -- If (SCR_EL3.NS == 1 || SCR_EL3.EEL2 == 1) && IsUsingAArch64(EL2)
+    && HCR_EL2.E2H == 0 && HCR_EL2.TLOR == 1, then
+    accesses at EL1 are trapped to EL2.
+ -- If (SCR_EL3.NS == 1 || SCR_EL3.EEL2 == 1) && IsUsingAArch64(EL2)
+    && HCR_EL2.E2H == 1 && HCR_EL2.TGE == 0 && HCR_EL2.TLOR == 1,
+    then accesses at EL1 are trapped to EL2.
 
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qapi/common.py                          | 11 +++++++++--
->  tests/Makefile.include                          |  1 +
->  .../flat-union-invalid-if-discriminator.err     |  1 +
->  .../flat-union-invalid-if-discriminator.exit    |  1 +
->  .../flat-union-invalid-if-discriminator.json    | 17 +++++++++++++++++
->  .../flat-union-invalid-if-discriminator.out     |  0
->  6 files changed, 29 insertions(+), 2 deletions(-)
->  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
-.err
->  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
-.exit
->  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
-.json
->  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
-.out
->
-> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-> index 9b95f8cfe9..13fbb28493 100644
-> --- a/scripts/qapi/common.py
-> +++ b/scripts/qapi/common.py
-> @@ -577,7 +577,8 @@ def find_alternate_member_qtype(qapi_type):
->=20=20
->  # Return the discriminator enum define if discriminator is specified as =
-an
->  # enum type, otherwise return None.
-> -def discriminator_find_enum_define(expr):
-> +def discriminator_find_enum_define(expr, info):
-> +    name =3D expr['union']
->      base =3D expr.get('base')
->      discriminator =3D expr.get('discriminator')
->=20=20
-> @@ -592,6 +593,11 @@ def discriminator_find_enum_define(expr):
->      if not discriminator_member:
->          return None
->=20=20
-> +    if discriminator_member.get('if'):
-> +        raise QAPISemError(info, 'The discriminator %s.%s for union %s '
-> +                           'must not be conditional' %
-> +                           (base, discriminator, name))
-> +
->      return enum_types.get(discriminator_member['type'])
->=20=20
->=20=20
 
-I'm afraid this isn't the proper place to check.  It's an accessor
-function for @struct_types and @enum_types.  The check should go into
-check_union(), like this:
-
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 0cf39df404..c1bc9e9c29 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -799,6 +794,11 @@ def check_union(expr, info):
-                                "Discriminator '%s' is not a member of base=
- "
-                                "struct '%s'"
-                                % (discriminator, base))
-+        if discriminator_member.get('if'):
-+            raise QAPISemError(info, 'The discriminator %s.%s for union %s=
- '
-+                               'must not be conditional' %
-+                               (base, discriminator, name))
-+
-         enum_define =3D enum_types.get(discriminator_member['type'])
-         allow_metas =3D ['struct']
-         # Do not allow string discriminator
-
-> @@ -1020,7 +1026,8 @@ def check_exprs(exprs):
->=20=20
->          if 'include' in expr:
->              continue
-> -        if 'union' in expr and not discriminator_find_enum_define(expr):
-> +        info =3D expr_elem['info']
-> +        if 'union' in expr and not discriminator_find_enum_define(expr, =
-info):
->              name =3D '%sKind' % expr['union']
->          elif 'alternate' in expr:
->              name =3D '%sKind' % expr['alternate']
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 43e100a6cd..abc3fdf764 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -510,6 +510,7 @@ qapi-schema +=3D flat-union-inline.json
->  qapi-schema +=3D flat-union-int-branch.json
->  qapi-schema +=3D flat-union-invalid-branch-key.json
->  qapi-schema +=3D flat-union-invalid-discriminator.json
-> +qapi-schema +=3D flat-union-invalid-if-discriminator.json
->  qapi-schema +=3D flat-union-no-base.json
->  qapi-schema +=3D flat-union-optional-discriminator.json
->  qapi-schema +=3D flat-union-string-discriminator.json
-> diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.err b/=
-tests/qapi-schema/flat-union-invalid-if-discriminator.err
-> new file mode 100644
-> index 0000000000..0c94c9860d
-> --- /dev/null
-> +++ b/tests/qapi-schema/flat-union-invalid-if-discriminator.err
-> @@ -0,0 +1 @@
-> +tests/qapi-schema/flat-union-invalid-if-discriminator.json:13: The discr=
-iminator TestBase.enum1 for union TestUnion must not be conditional
-> diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.exit b=
-/tests/qapi-schema/flat-union-invalid-if-discriminator.exit
-> new file mode 100644
-> index 0000000000..d00491fd7e
-> --- /dev/null
-> +++ b/tests/qapi-schema/flat-union-invalid-if-discriminator.exit
-> @@ -0,0 +1 @@
-> +1
-> diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.json b=
-/tests/qapi-schema/flat-union-invalid-if-discriminator.json
-> new file mode 100644
-> index 0000000000..618ec36396
-> --- /dev/null
-> +++ b/tests/qapi-schema/flat-union-invalid-if-discriminator.json
-> @@ -0,0 +1,17 @@
-> +{ 'enum': 'TestEnum',
-> +  'data': [ 'value1', 'value2' ] }
-> +
-> +{ 'struct': 'TestBase',
-> +  'data': { 'enum1': { 'type': 'TestEnum', 'if': 'FOO' } } }
-> +
-> +{ 'struct': 'TestTypeA',
-> +  'data': { 'string': 'str' } }
-> +
-> +{ 'struct': 'TestTypeB',
-> +  'data': { 'integer': 'int' } }
-> +
-> +{ 'union': 'TestUnion',
-> +  'base': 'TestBase',
-> +  'discriminator': 'enum1',
-> +  'data': { 'value1': 'TestTypeA',
-> +            'value2': 'TestTypeB' } }
-> diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.out b/=
-tests/qapi-schema/flat-union-invalid-if-discriminator.out
-> new file mode 100644
-> index 0000000000..e69de29bb2
+r~
