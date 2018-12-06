@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gUzzX-0000qg-4Q
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 15:11:24 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gV00x-0003B3-Og
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 15:12:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gUzzV-0008P5-NP
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 15:11:23 -0500
-Resent-Message-Id: <E1gUzzV-0008P5-NP@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21800)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gUzzR-0008M7-W6
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 15:11:19 -0500
-In-Reply-To: <20181206151304.8388-1-kwolf@redhat.com>
-Message-ID: <154412705136.8197.3009952120306873488@bb8f5089e434>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <pbonzini@redhat.com>) id 1gV00s-0000y9-Sf
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 15:12:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35238)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gV00s-0000wf-Hf
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 15:12:46 -0500
+References: <1544049083-16087-1-git-send-email-liam.merwick@oracle.com>
+	<1544049083-16087-3-git-send-email-liam.merwick@oracle.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <bf336582-e8d6-1bdc-f9b2-99264f5920fe@redhat.com>
+Date: Thu, 6 Dec 2018 21:12:42 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 6 Dec 2018 12:10:53 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] vmdk: Implement blockdev-create
+In-Reply-To: <1544049083-16087-3-git-send-email-liam.merwick@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC qboot 2/3] pvh: use x86/HVM direct boot ABI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,67 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com, mreitz@redhat.com
+To: Liam Merwick <liam.merwick@oracle.com>
+Cc: qemu-devel@nongnu.org, sgarzare@redhat.com, maran.wilson@oracle.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIwNjE1MTMwNC44Mzg4
-LTEta3dvbGZAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
-bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
-bWF0aW9uOgoKVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC80
-XSB2bWRrOiBJbXBsZW1lbnQgYmxvY2tkZXYtY3JlYXRlCk1lc3NhZ2UtaWQ6IDIwMTgxMjA2MTUx
-MzA0LjgzODgtMS1rd29sZkByZWRoYXQuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
-L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
-LiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVI
-IC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVj
-a2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIK
-ICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRj
-aC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAg
-IGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5E
-ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApT
-d2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjcyZWE4NGQgaW90ZXN0czogQWRkIFZNREsg
-dGVzdHMgZm9yIGJsb2NrZGV2LWNyZWF0ZQplMmZhM2NmIGlvdGVzdHM6IEZpbHRlciBjaWQgbnVt
-YmVycyBpbiBWTURLIGV4dGVudCBpbmZvCmZiNzY0MzQgdm1kazogSW1wbGVtZW50IC5iZHJ2X2Nv
-X2NyZWF0ZSBjYWxsYmFjawpkMTY4NTFhIHZtZGs6IFJlZmFjdG9yIHZtZGtfY3JlYXRlX2V4dGVu
-dAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS80OiB2bWRrOiBSZWZhY3Rv
-ciB2bWRrX2NyZWF0ZV9leHRlbnQuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
-IzEyNDogRklMRTogYmxvY2svdm1kay5jOjIxMTQ6CisgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgZmxhdCwgY29tcHJlc3MsIHplcm9lZF9ncmFpbiwgTlVMTCwgb3B0cywgZXJycCkpIHsK
-CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTA0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
-Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMi80OiB2bWRrOiBJ
-bXBsZW1lbnQgLmJkcnZfY29fY3JlYXRlIGNhbGxiYWNrLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4
-MCBjaGFyYWN0ZXJzCiMyMTY6IEZJTEU6IGJsb2NrL3ZtZGsuYzoyMDc1OgorICAgICAgICBiZHJ2
-X2dldF9mdWxsX2JhY2tpbmdfZmlsZW5hbWVfZnJvbV9maWxlbmFtZShibGtfYnMoYmxrKS0+Zmls
-ZW5hbWUsIGJhY2tpbmdfZmlsZSwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMz
-NzE6IEZJTEU6IGJsb2NrL3ZtZGsuYzoyMTc0OgorICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBib29sIGZsYXQsIGJvb2wgc3BsaXQsIGJvb2wgY29tcHJlc3MsCgpX
-QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzg5OiBGSUxFOiBibG9jay92bWRrLmM6
-MjE5MjoKKyAgICAgICAgcmVsX2ZpbGVuYW1lID0gZ19zdHJkdXBfcHJpbnRmKCIlcy1mbGF0JXMi
-LCBkYXRhLT5wcmVmaXgsIGRhdGEtPnBvc3RmaXgpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNo
-YXJhY3RlcnMKIzQwNjogRklMRTogYmxvY2svdm1kay5jOjIyMDk6CitzdGF0aWMgaW50IGNvcm91
-dGluZV9mbiB2bWRrX2NvX2NyZWF0ZV9vcHRzKGNvbnN0IGNoYXIgKmZpbGVuYW1lLCBRZW11T3B0
-cyAqb3B0cywKCnRvdGFsOiAwIGVycm9ycywgNCB3YXJuaW5ncywgNjQ3IGxpbmVzIGNoZWNrZWQK
-CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMy80
-OiBpb3Rlc3RzOiBGaWx0ZXIgY2lkIG51bWJlcnMgaW4gVk1ESyBleHRlbnQgaW5mby4uLgpDaGVj
-a2luZyBQQVRDSCA0LzQ6IGlvdGVzdHM6IEFkZCBWTURLIHRlc3RzIGZvciBibG9ja2Rldi1jcmVh
-dGUuLi4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlO
-VEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTE6IApuZXcgZmlsZSBtb2RlIDEwMDc1NQoKRVJST1I6
-IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzI1MDogRklMRTogdGVzdHMvcWVtdS1pb3Rlc3RzLzIzNy5v
-dXQ6Mjg6CisgICAgICAgICAgICBmb3JtYXQ6ICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNl
-CiMyNzc6IEZJTEU6IHRlc3RzL3FlbXUtaW90ZXN0cy8yMzcub3V0OjU1OgorICAgICAgICAgICAg
-Zm9ybWF0OiAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMzA0OiBGSUxFOiB0ZXN0cy9x
-ZW11LWlvdGVzdHMvMjM3Lm91dDo4MjoKKyAgICAgICAgICAgIGZvcm1hdDogJAoKdG90YWw6IDMg
-ZXJyb3JzLCAxIHdhcm5pbmdzLCA1MTQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhp
-dGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3Bh
-dGNoZXcub3JnL2xvZ3MvMjAxODEyMDYxNTEzMDQuODM4OC0xLWt3b2xmQHJlZGhhdC5jb20vdGVz
-dGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 05/12/18 23:31, Liam Merwick wrote:
+> -static inline uint32_t ldl_p(void *p)
+> +inline uint32_t ldl_p(void *p)
+>  {
+>  	uint32_t val;
+>  	memcpy(&val, p, 4);
+> diff --git a/main.c b/main.c
+
+Can you make instead a header (memaccess.h?) with all of lduw_p, ldl_p,
+stw_p, stl_p?
+
+> 
+> +
+> +struct hvm_start_info start_info = {0};
+
+Please put this declaration in linuxboot.c instead.
+
+> 
+> +#define RSDP_FILE "etc/acpi/rsdp"
+> +
+>  void extract_acpi(void)
+>  {
+>  	int id = fw_cfg_file_id("etc/table-loader");
+> @@ -138,6 +143,10 @@ void extract_acpi(void)
+>  		struct loader_cmd *s = &script[i];
+>  		switch(script[i].cmd) {
+>  		case CMD_ALLOC:
+> +			if (strcmp(s->alloc.file, RSDP_FILE) == 0) {
+> +				start_info.rsdp_paddr =
+> +				    (uintptr_t)id_to_addr(id);
+> +			}
+
+
+Please instead do a memcmp with "RSD PTR" in do_alloc, and also only do
+it if zone is ALLOC_FSEG.
+
+Thanks,
+
+Paolo
