@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gUrTr-0005bd-Cp
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 06:06:13 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gUrW3-0008RV-8q
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 06:08:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gUrTj-0001AW-L5
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 06:06:05 -0500
-Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:46619)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gUrTh-00015Q-Dj
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 06:05:57 -0500
-Received: by mail-ot1-x32f.google.com with SMTP id w25so21588611otm.13
-	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 03:05:50 -0800 (PST)
+	(envelope-from <eric.auger@redhat.com>) id 1gUrVx-0002UV-C7
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 06:08:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38638)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1gUrVx-0002Ts-4Z
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 06:08:17 -0500
+References: <154393964026.28192.13536237934563059985.stgit@gimli.home>
+	<154394078336.28192.11850479111762649553.stgit@gimli.home>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <e9761a45-b656-8d7b-255e-fb6a2b0fbf7d@redhat.com>
+Date: Thu, 6 Dec 2018 12:08:13 +0100
 MIME-Version: 1.0
-References: <20181206084816.30485-1-ppandit@redhat.com>
-	<BN6PR18MB1220A0A33454573CA39058659FA90@BN6PR18MB1220.namprd18.prod.outlook.com>
-	<CAFEAcA_B3FNQXLP4YnL70EPoFUbM89Dh1eFdZSVzpkJrgt+j_g@mail.gmail.com>
-	<BN6PR18MB12207477BC1FC04674F98A2E9FA90@BN6PR18MB1220.namprd18.prod.outlook.com>
-	<CAFEAcA_jT-KzFUmRRPNt-kUDMFAaBzT7Li_ESyuzMUTWdTVZeQ@mail.gmail.com>
-	<CAKXe6S+N_TDs6b=TqWM2POQyOHuWw=CaJOtteaVfYONkYbjc3w@mail.gmail.com>
-In-Reply-To: <CAKXe6S+N_TDs6b=TqWM2POQyOHuWw=CaJOtteaVfYONkYbjc3w@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 6 Dec 2018 11:05:38 +0000
-Message-ID: <CAFEAcA-vT-bOOMZLkvJtXX1v0Tgv3tTLFh=mnbq+C=y=W-L11Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] i2c: pm_smbus: check smb_index before
- block transfer write
+In-Reply-To: <154394078336.28192.11850479111762649553.stgit@gimli.home>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [for-4.0 PATCH v3 4/9] pcie: Add link speed and
+ width fields to PCIESlot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,21 +30,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>
-Cc: li qiang <liq3ea@outlook.com>, P J P <ppandit@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, public@hansmi.ch, Prasad J Pandit <pjp@fedoraproject.org>, "Michael S. Tsirkin" <mst@redhat.com>, Li Qiang <liq3ea@163.com>
+To: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
+Cc: Geoffrey McRae <geoff@hostfission.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Thu, 6 Dec 2018 at 11:00, Li Qiang <liq3ea@gmail.com> wrote:
-> Yes, I know that, but as this issue is so good to write a perfect exploit
-> so I want to do more.
->
-> I know the qemu planing and know this issue doesn't affect anyone.
-> I want to do a perfect work.
+Hi,
 
-The problem is that it does affect other people, because if
-Michael hadn't happened to also notice this bug then we would
-have released 3.1 next Tuesday with the bug still present.
-As it is we'll need to do an extra rc5, which we could have
-avoided if we'd known about this bug earlier, on Monday or Tuesday.
+On 12/4/18 5:26 PM, Alex Williamson wrote:
+> Add fields allowing the PCIe link speed and width of a PCIESlot to
+> be configured, with an instance_post_init callback on the root port
+> parent class to set defaults.  This allows child classes to set these
+> via properties or via their own instance_init callback, without
+> requiring all implementions to support arbitrary user selected values.
+> 
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Tested-by: Geoffrey McRae <geoff@hostfission.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-thanks
--- PMM
+Thanks
+
+Eric
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+>  hw/pci-bridge/pcie_root_port.c |   14 ++++++++++++++
+>  include/hw/pci/pcie_port.h     |    4 ++++
+>  2 files changed, 18 insertions(+)
+> 
+> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+> index 45f9e8cd4a36..34ad76743c44 100644
+> --- a/hw/pci-bridge/pcie_root_port.c
+> +++ b/hw/pci-bridge/pcie_root_port.c
+> @@ -140,6 +140,19 @@ static Property rp_props[] = {
+>      DEFINE_PROP_END_OF_LIST()
+>  };
+>  
+> +static void rp_instance_post_init(Object *obj)
+> +{
+> +    PCIESlot *s = PCIE_SLOT(obj);
+> +
+> +    if (!s->speed) {
+> +        s->speed = QEMU_PCI_EXP_LNK_2_5GT;
+> +    }
+> +
+> +    if (!s->width) {
+> +        s->width = QEMU_PCI_EXP_LNK_X1;
+> +    }
+> +}
+> +
+>  static void rp_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+> @@ -157,6 +170,7 @@ static void rp_class_init(ObjectClass *klass, void *data)
+>  static const TypeInfo rp_info = {
+>      .name          = TYPE_PCIE_ROOT_PORT,
+>      .parent        = TYPE_PCIE_SLOT,
+> +    .instance_post_init = rp_instance_post_init,
+>      .class_init    = rp_class_init,
+>      .abstract      = true,
+>      .class_size = sizeof(PCIERootPortClass),
+> diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
+> index 0736014bfdb4..df242a0cafff 100644
+> --- a/include/hw/pci/pcie_port.h
+> +++ b/include/hw/pci/pcie_port.h
+> @@ -49,6 +49,10 @@ struct PCIESlot {
+>      /* pci express switch port with slot */
+>      uint8_t     chassis;
+>      uint16_t    slot;
+> +
+> +    PCIExpLinkSpeed speed;
+> +    PCIExpLinkWidth width;
+> +
+>      QLIST_ENTRY(PCIESlot) next;
+>  };
+>  
+> 
+> 
