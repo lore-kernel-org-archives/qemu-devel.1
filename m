@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42021)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsLO-0000pJ-OZ
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:01:30 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsLj-00015v-Ob
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:01:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsLJ-0005rP-9E
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:01:26 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:60352)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsLf-00068Q-OD
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:01:47 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:60388)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsLI-0005r6-RB
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:01:21 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsLd-0005yx-O9
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:01:43 -0500
 From: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Thu, 06 Dec 2018 15:01:15 +0300
-Message-ID: <154409767531.5432.754426674425811776.stgit@Misha-PC.lan02.inno>
+Date: Thu, 06 Dec 2018 15:01:26 +0300
+Message-ID: <154409768651.5432.6956625765792328416.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <154409751316.5432.3325938832238028060.stgit@Misha-PC.lan02.inno>
 References: <154409751316.5432.3325938832238028060.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v3 28/39] windbg: implement
- kd_api_read_control_space and kd_api_write_control_space
+Subject: [Qemu-devel] [PATCH v3 30/39] windbg: debug exception subscribing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,135 +29,147 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
+Add handler registration of gdb debug exception. Its exception also can be used
+for windbg.
+
 Signed-off-by: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 ---
- include/exec/windbgstub-utils.h |    2 +
- target/i386/windbgstub.c        |   81 +++++++++++++++++++++++++++++++++++++++
- windbgstub.c                    |    8 ++++
- 3 files changed, 91 insertions(+)
+ cpus.c                  |   20 ++++++++++++++++++--
+ gdbstub.c               |    6 +++++-
+ include/exec/gdbstub.h  |    1 -
+ include/sysemu/sysemu.h |    2 ++
+ windbgstub.c            |   14 ++++++++++++++
+ 5 files changed, 39 insertions(+), 4 deletions(-)
 
-diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-index 6936fd0ffb..2781a54044 100644
---- a/include/exec/windbgstub-utils.h
-+++ b/include/exec/windbgstub-utils.h
-@@ -71,6 +71,8 @@ void kd_api_read_virtual_memory(CPUState *cs, PacketData *pd);
- void kd_api_write_virtual_memory(CPUState *cs, PacketData *pd);
- void kd_api_get_context(CPUState *cs, PacketData *pd);
- void kd_api_set_context(CPUState *cs, PacketData *pd);
-+void kd_api_read_control_space(CPUState *cs, PacketData *pd);
-+void kd_api_write_control_space(CPUState *cs, PacketData *pd);
- void kd_api_get_context_ex(CPUState *cs, PacketData *pd);
- void kd_api_set_context_ex(CPUState *cs, PacketData *pd);
- void kd_api_unsupported(CPUState *cs, PacketData *pd);
-diff --git a/target/i386/windbgstub.c b/target/i386/windbgstub.c
-index 76cdc1d9a7..6d2e7de746 100644
---- a/target/i386/windbgstub.c
-+++ b/target/i386/windbgstub.c
-@@ -962,6 +962,87 @@ void kd_api_set_context(CPUState *cs, PacketData *pd)
-     }
+diff --git a/cpus.c b/cpus.c
+index a2b33ccb29..6a93a5795a 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -33,7 +33,6 @@
+ #include "qemu/error-report.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/block-backend.h"
+-#include "exec/gdbstub.h"
+ #include "sysemu/dma.h"
+ #include "sysemu/hw_accel.h"
+ #include "sysemu/kvm.h"
+@@ -79,6 +78,8 @@ int64_t max_advance;
+ static QEMUTimer *throttle_timer;
+ static unsigned int throttle_percentage;
+ 
++static void (*excp_debug_handler)(CPUState *cpu);
++
+ #define CPU_THROTTLE_PCT_MIN 1
+ #define CPU_THROTTLE_PCT_MAX 99
+ #define CPU_THROTTLE_TIMESLICE_NS 10000000
+@@ -1103,9 +1104,24 @@ static bool cpu_can_run(CPUState *cpu)
+     return true;
  }
  
-+void kd_api_read_control_space(CPUState *cs, PacketData *pd)
++bool register_excp_debug_handler(void (*handler)(CPUState *cpu))
 +{
-+    DBGKD_READ_MEMORY64 *mem = &pd->m64.u.ReadMemory;
-+    target_ulong addr = ldtul_p(&mem->TargetBaseAddress);
-+    uint32_t len = MIN(ldl_p(&mem->TransferCount),
-+                       PACKET_MAX_SIZE - sizeof(DBGKD_MANIPULATE_STATE64));
-+    int err = 0;
-+
-+#ifdef TARGET_X86_64
-+
-+    switch (addr) {
-+    case AMD64_DEBUG_CONTROL_SPACE_KPCR:
-+        addr = KPCR.addr;
-+        len = sizeof(target_ulong);
-+        err = cpu_memory_rw_debug(cs, addr, pd->extra, len, 0);
-+        break;
-+
-+    case AMD64_DEBUG_CONTROL_SPACE_KPRCB:
-+        addr = VMEM_ADDR(cs, KPCR.addr + OFFSET_KPRCB);
-+        len = sizeof(target_ulong);
-+        err = cpu_memory_rw_debug(cs, addr, pd->extra, len, 0);
-+        break;
-+
-+    case AMD64_DEBUG_CONTROL_SPACE_KSPECIAL:
-+        len = MIN(len, sizeof(CPU_KSPECIAL_REGISTERS));
-+        err = windbg_read_ks_regs(cs, pd->extra, len, 0, len);
-+        break;
-+
-+    case AMD64_DEBUG_CONTROL_SPACE_KTHREAD:
-+        addr = VMEM_ADDR(cs, addr + OFFSET_KPRCB_CURRTHREAD);
-+        len = sizeof(target_ulong);
-+        err = cpu_memory_rw_debug(cs, addr, pd->extra, len, 0);
-+        break;
-+    }
-+
-+#else /* TARGET_I386 */
-+
-+    err = windbg_rw_context_ex(cs, pd->extra, len, addr, len, true);
-+
-+#endif /* TARGET_I386 */
-+
-+    if (err) {
-+        len = 0;
-+        pd->m64.ReturnStatus = STATUS_UNSUCCESSFUL;
-+    }
-+
-+    pd->extra_size = len;
-+    stl_p(&mem->ActualBytesRead, len);
-+}
-+
-+void kd_api_write_control_space(CPUState *cs, PacketData *pd)
-+{
-+    DBGKD_WRITE_MEMORY64 *mem = &pd->m64.u.WriteMemory;
-+    target_ulong addr = ldtul_p(&mem->TargetBaseAddress);
-+    uint32_t len = MIN(ldl_p(&mem->TransferCount), pd->extra_size);
-+    int err = 0;
-+
-+#ifdef TARGET_X86_64
-+
-+    if (addr == AMD64_DEBUG_CONTROL_SPACE_KSPECIAL) {
-+        len = MIN(len, sizeof(CPU_KSPECIAL_REGISTERS));
-+        err = windbg_write_ks_regs(cs, pd->extra, len, 0, len);
++    if (excp_debug_handler == NULL) {
++        excp_debug_handler = handler;
++        return true;
 +    } else {
-+        err = 1;
++        error_report("Something debugger is already in use. '-gdb' and "
++                     "'-windbg' cannot be used at the same time");
++        return false;
 +    }
-+
-+#else /* TARGET_I386 */
-+
-+    err = windbg_rw_context_ex(cs, pd->extra, len, addr, len, false);
-+
-+#endif /* TARGET_I386 */
-+
-+    if (err) {
-+        len = 0;
-+        pd->m64.ReturnStatus = STATUS_UNSUCCESSFUL;
-+    }
-+
-+    pd->extra_size = 0;
-+    stl_p(&mem->ActualBytesWritten, len);
 +}
 +
- void kd_api_get_context_ex(CPUState *cs, PacketData *pd)
+ static void cpu_handle_guest_debug(CPUState *cpu)
  {
-     DBGKD_CONTEXT_EX *ctx = &pd->m64.u.ContextEx;
+-    gdb_set_stop_cpu(cpu);
++    if (excp_debug_handler != NULL) {
++        excp_debug_handler(cpu);
++    }
++
+     qemu_system_debug_request();
+     cpu->stopped = true;
+ }
+diff --git a/gdbstub.c b/gdbstub.c
+index c4e4f9f082..1d95965eb8 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -1409,7 +1409,7 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+     return RS_IDLE;
+ }
+ 
+-void gdb_set_stop_cpu(CPUState *cpu)
++static void gdb_set_stop_cpu(CPUState *cpu)
+ {
+     gdbserver_state->c_cpu = cpu;
+     gdbserver_state->g_cpu = cpu;
+@@ -2074,6 +2074,10 @@ int gdbserver_start(const char *device)
+     s->mon_chr = mon_chr;
+     s->current_syscall_cb = NULL;
+ 
++    if (!register_excp_debug_handler(gdb_set_stop_cpu)) {
++        exit(1);
++    }
++
+     return 0;
+ }
+ 
+diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
+index 08363969c1..ad4cdd61b3 100644
+--- a/include/exec/gdbstub.h
++++ b/include/exec/gdbstub.h
+@@ -45,7 +45,6 @@ void gdb_do_syscall(gdb_syscall_complete_cb cb, const char *fmt, ...);
+  */
+ void gdb_do_syscallv(gdb_syscall_complete_cb cb, const char *fmt, va_list va);
+ int use_gdb_syscalls(void);
+-void gdb_set_stop_cpu(CPUState *cpu);
+ void gdb_exit(CPUArchState *, int);
+ #ifdef CONFIG_USER_ONLY
+ /**
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 8d6095d98b..826b701bfa 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -203,6 +203,8 @@ QemuOpts *qemu_get_machine_opts(void);
+ 
+ bool defaults_enabled(void);
+ 
++bool register_excp_debug_handler(void (*handler)(CPUState *cpu));
++
+ extern QemuOptsList qemu_legacy_drive_opts;
+ extern QemuOptsList qemu_common_drive_opts;
+ extern QemuOptsList qemu_drive_opts;
 diff --git a/windbgstub.c b/windbgstub.c
-index e9d759cddf..328a04735f 100644
+index a1c013cd8c..0e4ad6d009 100644
 --- a/windbgstub.c
 +++ b/windbgstub.c
-@@ -165,6 +165,14 @@ static void windbg_process_manipulate_packet(WindbgState *state)
-         kd_api_set_context(cs, data);
-         break;
+@@ -129,9 +129,19 @@ static void windbg_send_control_packet(WindbgState *state, uint16_t type,
+     qemu_chr_fe_write(&state->chr, PTR(packet), sizeof(packet));
+ }
  
-+    case DbgKdReadControlSpaceApi:
-+        kd_api_read_control_space(cs, data);
-+        break;
++static void windbg_bp_handler(CPUState *cs)
++{
++    DBGKD_ANY_WAIT_STATE_CHANGE *sc = kd_state_change_exc(cs);
++    windbg_send_data_packet(windbg_state, (uint8_t *) sc,
++                            sizeof(DBGKD_ANY_WAIT_STATE_CHANGE),
++                            PACKET_TYPE_KD_STATE_CHANGE64);
++}
 +
-+    case DbgKdWriteControlSpaceApi:
-+        kd_api_write_control_space(cs, data);
-+        break;
+ static void windbg_vm_stop(void)
+ {
++    CPUState *cs = qemu_get_cpu(0);
+     vm_stop(RUN_STATE_PAUSED);
++    windbg_bp_handler(cs);
+ }
+ 
+ static void windbg_process_manipulate_packet(WindbgState *state)
+@@ -481,6 +491,10 @@ int windbg_server_start(const char *device)
+ 
+     qemu_register_reset(windbg_handle_reset, NULL);
+ 
++    if (!register_excp_debug_handler(windbg_bp_handler)) {
++        exit(1);
++    }
 +
-     case DbgKdGetContextExApi:
-         kd_api_get_context_ex(cs, data);
-         break;
+     atexit(windbg_exit);
+     return 0;
+ }
