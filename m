@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gUwAT-0003XV-8T
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:06:29 -0500
+	(envelope-from <armbru@redhat.com>) id 1gUwFN-0006o2-6t
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:11:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gUwAN-0005KC-8T
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:06:25 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:40934)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gUwAJ-0005C4-O1
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:06:17 -0500
-Received: by mail-wm1-f67.google.com with SMTP id q26so1588903wmf.5
-	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 08:06:06 -0800 (PST)
-References: <20181205221126.16220-1-paul.burton@mips.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <5887a794-7e88-0904-4e35-64234233eb72@redhat.com>
-Date: Thu, 6 Dec 2018 17:06:03 +0100
+	(envelope-from <armbru@redhat.com>) id 1gUwFJ-0002lW-8m
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:11:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36662)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gUwFJ-0002ij-1f
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:11:25 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2666C307C941
+	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 16:11:24 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
+	<20180706105753.26700-18-marcandre.lureau@redhat.com>
+Date: Thu, 06 Dec 2018 17:11:19 +0100
+In-Reply-To: <20180706105753.26700-18-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Fri, 6 Jul 2018
+	12:57:43 +0200")
+Message-ID: <87va46bpp4.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20181205221126.16220-1-paul.burton@mips.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] atomic.h: Set ATOMIC_REG_SIZE=8 for MIPS
- n32
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 17/27] qapi: add 'if' to implicit struct
+ members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +36,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Burton <paul.burton@mips.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Paul Burton <pburton@wavecomp.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 12/5/18 11:11 PM, Paul Burton wrote:
-> ATOMIC_REG_SIZE is currently defined as the default sizeof(void *) for
-> all MIPS host builds, including those using the n32 ABI. n32 is the
-> MIPS64 ILP32 ABI and as such tcg/mips/tcg-target.h defines
-> TCG_TARGET_REG_BITS as 64 for n32 builds. If we attempt to build QEMU
-> for an n32 host with support for a 64b target architecture then
-> TCG_OVERSIZED_GUEST is 0 and accel/tcg/cputlb.c attempts to use atomic_*
-> functions. This fails because ATOMIC_REG_SIZE is 4, causing the calls to
-> QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE) in the various
-> atomic_* functions to generate errors.
-> 
-> Fix this by defining ATOMIC_REG_SIZE as 8 for all MIPS64 builds, which
-> will cover both n32 (ILP32) & n64 (LP64) ABIs in much the same was as we
-> already do for x86_64/x32.
-> 
-> Signed-off-by: Paul Burton <paul.burton@mips.com>
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Generated code is not changed by this patch, but with "qapi: add #if
+> conditions to generated code" patch.
 
-> ---
->  include/qemu/atomic.h | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/qemu/atomic.h b/include/qemu/atomic.h
-> index f6993a8fb1..a6ac188188 100644
-> --- a/include/qemu/atomic.h
-> +++ b/include/qemu/atomic.h
-> @@ -99,9 +99,10 @@
->   * those few cases by hand.
->   *
->   * Note that x32 is fully detected with __x86_64__ + _ILP32, and that for
-> - * Sparc we always force the use of sparcv9 in configure.
-> + * Sparc we always force the use of sparcv9 in configure. MIPS n32 (ILP32) &
-> + * n64 (LP64) ABIs are both detected using __mips64.
->   */
-> -#if defined(__x86_64__) || defined(__sparc__)
-> +#if defined(__x86_64__) || defined(__sparc__) || defined(__mips64)
->  # define ATOMIC_REG_SIZE  8
->  #else
->  # define ATOMIC_REG_SIZE  sizeof(void *)
-> 
+My suggestion on PATCH 13's commit message applies.
+
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+Other than that,
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
