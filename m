@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gUvXC-0006pW-Jm
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:25:52 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gUvXB-0006YQ-TO
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:25:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gUvLN-0001lB-FM
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:13:39 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gUvLQ-0001pL-St
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 10:13:43 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu,  6 Dec 2018 16:13:02 +0100
-Message-Id: <20181206151304.8388-3-kwolf@redhat.com>
+Date: Thu,  6 Dec 2018 16:13:04 +0100
+Message-Id: <20181206151304.8388-5-kwolf@redhat.com>
 In-Reply-To: <20181206151304.8388-1-kwolf@redhat.com>
 References: <20181206151304.8388-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 2/4] vmdk: Implement .bdrv_co_create callback
+Subject: [Qemu-devel] [PATCH v3 4/4] iotests: Add VMDK tests for
+ blockdev-create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,760 +25,593 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-From: Fam Zheng <famz@redhat.com>
-
-This makes VMDK support blockdev-create. The implementation reuses the
-image creation code in vmdk_co_create_opts which now acceptes a callback
-pointer to "retrieve" BlockBackend pointers from the caller. This way we
-separate the logic between file/extent acquisition and initialization.
-
-The QAPI command parameters are mostly the same as the old create_opts
-except the dropped legacy @compat6 switch, which is redundant with
-@hwversion.
-
 Signed-off-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-core.json  |  70 +++++++
- qapi/qapi-schema.json |   1 +
- block/vmdk.c          | 452 ++++++++++++++++++++++++++++++------------
- 3 files changed, 396 insertions(+), 127 deletions(-)
+ tests/qemu-iotests/237     | 201 ++++++++++++++++++++++++
+ tests/qemu-iotests/237.out | 309 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 511 insertions(+)
+ create mode 100755 tests/qemu-iotests/237
+ create mode 100644 tests/qemu-iotests/237.out
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index d4fe710836..4778f88dd8 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -4021,6 +4021,75 @@
-             'size':             'size',
-             '*cluster-size' :   'size' } }
-=20
-+##
-+# @BlockdevVmdkSubformat:
+diff --git a/tests/qemu-iotests/237 b/tests/qemu-iotests/237
+new file mode 100755
+index 0000000000..08e575bea2
+--- /dev/null
++++ b/tests/qemu-iotests/237
+@@ -0,0 +1,201 @@
++#!/usr/bin/env python
 +#
-+# Subformat options for VMDK images
++# Test vmdk and file image creation
 +#
-+# @monolithicSparse:     Single file image with sparse cluster allocatio=
-n
++# Copyright (C) 2018 Red Hat, Inc.
 +#
-+# @monolithicFlat:       Single flat data image and a descriptor file
++# Creator/Owner: Kevin Wolf <kwolf@redhat.com>
 +#
-+# @twoGbMaxExtentSparse: Data is split into 2GB (per virtual LBA) sparse=
- extent
-+#                        files, in addition to a descriptor file
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
 +#
-+# @twoGbMaxExtentFlat:   Data is split into 2GB (per virtual LBA) flat e=
-xtent
-+#                        files, in addition to a descriptor file
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
 +#
-+# @streamOptimized:      Single file image sparse cluster allocation, op=
-timized
-+#                        for streaming over network.
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 +#
-+# Since: 4.0
-+##
-+{ 'enum': 'BlockdevVmdkSubformat',
-+  'data': [ 'monolithicSparse', 'monolithicFlat', 'twoGbMaxExtentSparse'=
-,
-+            'twoGbMaxExtentFlat', 'streamOptimized'] }
 +
-+##
-+# @BlockdevVmdkAdapterType:
-+#
-+# Adapter type info for VMDK images
-+#
-+# Since: 4.0
-+##
-+{ 'enum': 'BlockdevVmdkAdapterType',
-+  'data': [ 'ide', 'buslogic', 'lsilogic', 'legacyesx'] }
++import iotests
++from iotests import imgfmt
 +
-+##
-+# @BlockdevCreateOptionsVmdk:
-+#
-+# Driver specific image creation options for VMDK.
-+#
-+# @file         Where to store the new image file. This refers to the im=
-age
-+#               file for monolithcSparse and streamOptimized format, or =
-the
-+#               descriptor file for other formats.
-+# @size         Size of the virtual disk in bytes
-+# @extents      Where to store the data extents. Required for monolithcf=
-lat,
-+#               twoGbMaxExtentSparse and twoGbMaxExtentFlat formats. For
-+#               monolithicflat, only one entry is required; for
-+#               twoGbMaxExtent* formats, the number of entries required =
-is
-+#               calculated as extent_number =3D virtual_size / 2GB.
-+# @subformat    The subformat of the VMDK image. Default: "monolithicspa=
-rse".
-+# @backing-file The path of backing file. Default: no backing file is us=
-ed.
-+# @adapter-type The adapter type used to fill in the descriptor. Default=
-: ide.
-+# @hwversion    Hardware version. The meaningful options are "4" or "6".
-+#               Defaulted to "4".
-+# @zeroed-grain Whether to enable zeroed-grain feature for sparse subfor=
-mats.
-+#               Default: false.
-+#
-+# Since: 4.0
-+##
-+{ 'struct': 'BlockdevCreateOptionsVmdk',
-+  'data': { 'file':             'BlockdevRef',
-+            'size':             'size',
-+            '*extents':          ['BlockdevRef'],
-+            '*subformat':       'BlockdevVmdkSubformat',
-+            '*backing-file':    'str',
-+            '*adapter-type':    'BlockdevVmdkAdapterType',
-+            '*hwversion':       'str',
-+            '*zeroed-grain':    'bool' } }
++iotests.verify_image_format(supported_fmts=3D['vmdk'])
 +
++def blockdev_create(vm, options):
++    result =3D vm.qmp_log('blockdev-create', job_id=3D'job0', options=3D=
+options)
 +
- ##
- # @SheepdogRedundancyType:
- #
-@@ -4215,6 +4284,7 @@
-       'ssh':            'BlockdevCreateOptionsSsh',
-       'vdi':            'BlockdevCreateOptionsVdi',
-       'vhdx':           'BlockdevCreateOptionsVhdx',
-+      'vmdk':           'BlockdevCreateOptionsVmdk',
-       'vpc':            'BlockdevCreateOptionsVpc'
-   } }
-=20
-diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-index 65b6dc2f6f..78e8bcd561 100644
---- a/qapi/qapi-schema.json
-+++ b/qapi/qapi-schema.json
-@@ -66,6 +66,7 @@
-         'ACPISlotType',         # DIMM, visible through query-acpi-ospm-=
-status
-         'CpuInfoMIPS',          # PC, visible through query-cpu
-         'CpuInfoTricore',       # PC, visible through query-cpu
-+        'BlockdevVmdkSubformat',# all members, to match VMDK spec spelli=
-ngs
-         'QapiErrorClass',       # all members, visible through errors
-         'UuidInfo',             # UUID, visible through query-uuid
-         'X86CPURegister32',     # all members, visible indirectly throug=
-h qom-get
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 32fc2c84b3..16f86457d7 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -1932,33 +1932,56 @@ static int filename_decompose(const char *filenam=
-e, char *path, char *prefix,
-     return VMDK_OK;
- }
-=20
--static int coroutine_fn vmdk_co_create_opts(const char *filename, QemuOp=
-ts *opts,
--                                            Error **errp)
-+/*
-+ * idx =3D=3D 0: get or create the descriptor file (also the image file =
-if in a
-+ *           non-split format.
-+ * idx >=3D 1: get the n-th extent if in a split subformat
-+ */
-+typedef BlockBackend *(*vmdk_create_extent_fn)(int64_t size,
-+                                               int idx,
-+                                               bool flat,
-+                                               bool split,
-+                                               bool compress,
-+                                               bool zeroed_grain,
-+                                               void *opaque,
-+                                               Error **errp);
++    if 'return' in result:
++        assert result['return'] =3D=3D {}
++        vm.run_job('job0')
++    iotests.log("")
 +
-+static void vmdk_desc_add_extent(GString *desc,
-+                                 const char *extent_line_fmt,
-+                                 int64_t size, const char *filename)
-+{
-+    char *basename =3D g_path_get_basename(filename);
-+    g_string_append_printf(desc, extent_line_fmt,
-+                           DIV_ROUND_UP(size, BDRV_SECTOR_SIZE), basenam=
-e);
++with iotests.FilePath('t.vmdk') as disk_path, \
++     iotests.FilePath('t.vmdk.1') as extent1_path, \
++     iotests.FilePath('t.vmdk.2') as extent2_path, \
++     iotests.FilePath('t.vmdk.3') as extent3_path, \
++     iotests.VM() as vm:
 +
-+    g_free(basename);
-+}
++    #
++    # Successful image creation (defaults)
++    #
++    iotests.log("=3D=3D=3D Successful image creation (defaults) =3D=3D=3D=
+")
++    iotests.log("")
 +
-+static int coroutine_fn vmdk_co_do_create(int64_t size,
-+                                          BlockdevVmdkSubformat subforma=
-t,
-+                                          BlockdevVmdkAdapterType adapte=
-r_type,
-+                                          const char *backing_file,
-+                                          const char *hw_version,
-+                                          bool compat6,
-+                                          bool zeroed_grain,
-+                                          vmdk_create_extent_fn extent_f=
-n,
-+                                          void *opaque,
-+                                          Error **errp)
- {
--    int idx =3D 0;
--    BlockBackend *new_blk =3D NULL;
-+    int extent_idx;
-+    BlockBackend *blk =3D NULL;
-     Error *local_err =3D NULL;
-     char *desc =3D NULL;
--    int64_t total_size =3D 0, filesize;
--    char *adapter_type =3D NULL;
--    char *backing_file =3D NULL;
--    char *hw_version =3D NULL;
--    char *fmt =3D NULL;
-     int ret =3D 0;
-     bool flat, split, compress;
-     GString *ext_desc_lines;
--    char *path =3D g_malloc0(PATH_MAX);
--    char *prefix =3D g_malloc0(PATH_MAX);
--    char *postfix =3D g_malloc0(PATH_MAX);
--    char *desc_line =3D g_malloc0(BUF_SIZE);
--    char *ext_filename =3D g_malloc0(PATH_MAX);
--    char *desc_filename =3D g_malloc0(PATH_MAX);
-     const int64_t split_size =3D 0x80000000;  /* VMDK has constant split=
- size */
--    const char *desc_extent_line;
-+    int64_t extent_size;
-+    int64_t created_size =3D 0;
-+    const char *extent_line_fmt;
-     char *parent_desc_line =3D g_malloc0(BUF_SIZE);
-     uint32_t parent_cid =3D 0xffffffff;
-     uint32_t number_heads =3D 16;
--    bool zeroed_grain =3D false;
-     uint32_t desc_offset =3D 0, desc_len;
-     const char desc_template[] =3D
-         "# Disk DescriptorFile\n"
-@@ -1982,71 +2005,35 @@ static int coroutine_fn vmdk_co_create_opts(const=
- char *filename, QemuOpts *opts
-=20
-     ext_desc_lines =3D g_string_new(NULL);
-=20
--    if (filename_decompose(filename, path, prefix, postfix, PATH_MAX, er=
-rp)) {
--        ret =3D -EINVAL;
--        goto exit;
--    }
-     /* Read out options */
--    total_size =3D ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, =
-0),
--                          BDRV_SECTOR_SIZE);
--    adapter_type =3D qemu_opt_get_del(opts, BLOCK_OPT_ADAPTER_TYPE);
--    backing_file =3D qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
--    hw_version =3D qemu_opt_get_del(opts, BLOCK_OPT_HWVERSION);
--    if (qemu_opt_get_bool_del(opts, BLOCK_OPT_COMPAT6, false)) {
--        if (strcmp(hw_version, "undefined")) {
-+    if (compat6) {
-+        if (hw_version) {
-             error_setg(errp,
-                        "compat6 cannot be enabled with hwversion set");
-             ret =3D -EINVAL;
-             goto exit;
-         }
--        g_free(hw_version);
--        hw_version =3D g_strdup("6");
--    }
--    if (strcmp(hw_version, "undefined") =3D=3D 0) {
--        g_free(hw_version);
--        hw_version =3D g_strdup("4");
-+        hw_version =3D "6";
-     }
--    fmt =3D qemu_opt_get_del(opts, BLOCK_OPT_SUBFMT);
--    if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ZEROED_GRAIN, false)) {
--        zeroed_grain =3D true;
-+    if (!hw_version) {
-+        hw_version =3D "4";
-     }
-=20
--    if (!adapter_type) {
--        adapter_type =3D g_strdup("ide");
--    } else if (strcmp(adapter_type, "ide") &&
--               strcmp(adapter_type, "buslogic") &&
--               strcmp(adapter_type, "lsilogic") &&
--               strcmp(adapter_type, "legacyESX")) {
--        error_setg(errp, "Unknown adapter type: '%s'", adapter_type);
--        ret =3D -EINVAL;
--        goto exit;
--    }
--    if (strcmp(adapter_type, "ide") !=3D 0) {
-+    if (adapter_type !=3D BLOCKDEV_VMDK_ADAPTER_TYPE_IDE) {
-         /* that's the number of heads with which vmware operates when
-            creating, exporting, etc. vmdk files with a non-ide adapter t=
-ype */
-         number_heads =3D 255;
-     }
--    if (!fmt) {
--        /* Default format to monolithicSparse */
--        fmt =3D g_strdup("monolithicSparse");
--    } else if (strcmp(fmt, "monolithicFlat") &&
--               strcmp(fmt, "monolithicSparse") &&
--               strcmp(fmt, "twoGbMaxExtentSparse") &&
--               strcmp(fmt, "twoGbMaxExtentFlat") &&
--               strcmp(fmt, "streamOptimized")) {
--        error_setg(errp, "Unknown subformat: '%s'", fmt);
--        ret =3D -EINVAL;
--        goto exit;
--    }
--    split =3D !(strcmp(fmt, "twoGbMaxExtentFlat") &&
--              strcmp(fmt, "twoGbMaxExtentSparse"));
--    flat =3D !(strcmp(fmt, "monolithicFlat") &&
--             strcmp(fmt, "twoGbMaxExtentFlat"));
--    compress =3D !strcmp(fmt, "streamOptimized");
-+    split =3D (subformat =3D=3D BLOCKDEV_VMDK_SUBFORMAT_TWOGBMAXEXTENTFL=
-AT) ||
-+            (subformat =3D=3D BLOCKDEV_VMDK_SUBFORMAT_TWOGBMAXEXTENTSPAR=
-SE);
-+    flat =3D (subformat =3D=3D BLOCKDEV_VMDK_SUBFORMAT_MONOLITHICFLAT) |=
-|
-+           (subformat =3D=3D BLOCKDEV_VMDK_SUBFORMAT_TWOGBMAXEXTENTFLAT)=
-;
-+    compress =3D subformat =3D=3D BLOCKDEV_VMDK_SUBFORMAT_STREAMOPTIMIZE=
-D;
++    size =3D 5 * 1024 * 1024 * 1024
 +
-     if (flat) {
--        desc_extent_line =3D "RW %" PRId64 " FLAT \"%s\" 0\n";
-+        extent_line_fmt =3D "RW %" PRId64 " FLAT \"%s\" 0\n";
-     } else {
--        desc_extent_line =3D "RW %" PRId64 " SPARSE \"%s\"\n";
-+        extent_line_fmt =3D "RW %" PRId64 " SPARSE \"%s\"\n";
-     }
-     if (flat && backing_file) {
-         error_setg(errp, "Flat image can't have backing file");
-@@ -2058,10 +2045,34 @@ static int coroutine_fn vmdk_co_create_opts(const=
- char *filename, QemuOpts *opts
-         ret =3D -ENOTSUP;
-         goto exit;
-     }
++    vm.launch()
++    blockdev_create(vm, { 'driver': 'file',
++                          'filename': disk_path,
++                          'size': 0 })
 +
-+    /* Create extents */
-+    if (split) {
-+        extent_size =3D split_size;
-+    } else {
-+        extent_size =3D size;
-+    }
-+    if (!split && !flat) {
-+        created_size =3D extent_size;
-+    } else {
-+        created_size =3D 0;
-+    }
-+    /* Get the descriptor file BDS */
-+    blk =3D extent_fn(created_size, 0, flat, split, compress, zeroed_gra=
-in,
-+                    opaque, errp);
-+    if (!blk) {
-+        ret =3D -EIO;
-+        goto exit;
-+    }
-+    if (!split && !flat) {
-+        vmdk_desc_add_extent(ext_desc_lines, extent_line_fmt, created_si=
-ze,
-+                             blk_bs(blk)->filename);
-+    }
++    vm.qmp_log('blockdev-add', driver=3D'file', filename=3Ddisk_path,
++               node_name=3D'imgfile')
 +
-     if (backing_file) {
--        BlockBackend *blk;
-+        BlockBackend *backing;
-         char *full_backing =3D g_new0(char, PATH_MAX);
--        bdrv_get_full_backing_filename_from_filename(filename, backing_f=
-ile,
-+        bdrv_get_full_backing_filename_from_filename(blk_bs(blk)->filena=
-me, backing_file,
-                                                      full_backing, PATH_=
-MAX,
-                                                      &local_err);
-         if (local_err) {
-@@ -2071,106 +2082,215 @@ static int coroutine_fn vmdk_co_create_opts(con=
-st char *filename, QemuOpts *opts
-             goto exit;
-         }
-=20
--        blk =3D blk_new_open(full_backing, NULL, NULL,
--                           BDRV_O_NO_BACKING, errp);
-+        backing =3D blk_new_open(full_backing, NULL, NULL,
-+                               BDRV_O_NO_BACKING, errp);
-         g_free(full_backing);
--        if (blk =3D=3D NULL) {
-+        if (backing =3D=3D NULL) {
-             ret =3D -EIO;
-             goto exit;
-         }
--        if (strcmp(blk_bs(blk)->drv->format_name, "vmdk")) {
--            blk_unref(blk);
-+        if (strcmp(blk_bs(backing)->drv->format_name, "vmdk")) {
-+            error_setg(errp, "Invalid backing file format: %s. Must be v=
-mdk",
-+                       blk_bs(backing)->drv->format_name);
-+            blk_unref(backing);
-             ret =3D -EINVAL;
-             goto exit;
-         }
--        ret =3D vmdk_read_cid(blk_bs(blk), 0, &parent_cid);
--        blk_unref(blk);
-+        ret =3D vmdk_read_cid(blk_bs(backing), 0, &parent_cid);
-+        blk_unref(backing);
-         if (ret) {
-+            error_setg(errp, "Failed to read parent CID");
-             goto exit;
-         }
-         snprintf(parent_desc_line, BUF_SIZE,
-                 "parentFileNameHint=3D\"%s\"", backing_file);
-     }
--
--    /* Create extents */
--    filesize =3D total_size;
--    while (filesize > 0) {
--        int64_t size =3D filesize;
--
--        if (split && size > split_size) {
--            size =3D split_size;
--        }
--        if (split) {
--            snprintf(desc_filename, PATH_MAX, "%s-%c%03d%s",
--                    prefix, flat ? 'f' : 's', ++idx, postfix);
--        } else if (flat) {
--            snprintf(desc_filename, PATH_MAX, "%s-flat%s", prefix, postf=
-ix);
--        } else {
--            snprintf(desc_filename, PATH_MAX, "%s%s", prefix, postfix);
--        }
--        snprintf(ext_filename, PATH_MAX, "%s%s", path, desc_filename);
--
--        if (vmdk_create_extent(ext_filename, size,
--                               flat, compress, zeroed_grain, NULL, opts,=
- errp)) {
-+    extent_idx =3D 1;
-+    while (created_size < size) {
-+        BlockBackend *extent_blk;
-+        int64_t cur_size =3D MIN(size - created_size, extent_size);
-+        extent_blk =3D extent_fn(cur_size, extent_idx, flat, split, comp=
-ress,
-+                               zeroed_grain, opaque, errp);
-+        if (!extent_blk) {
-             ret =3D -EINVAL;
-             goto exit;
-         }
--        filesize -=3D size;
--
--        /* Format description line */
--        snprintf(desc_line, BUF_SIZE,
--                    desc_extent_line, size / BDRV_SECTOR_SIZE, desc_file=
-name);
--        g_string_append(ext_desc_lines, desc_line);
-+        vmdk_desc_add_extent(ext_desc_lines, extent_line_fmt, cur_size,
-+                             blk_bs(extent_blk)->filename);
-+        created_size +=3D cur_size;
-+        extent_idx++;
-+        blk_unref(extent_blk);
-     }
-     /* generate descriptor file */
-     desc =3D g_strdup_printf(desc_template,
-                            g_random_int(),
-                            parent_cid,
--                           fmt,
-+                           BlockdevVmdkSubformat_str(subformat),
-                            parent_desc_line,
-                            ext_desc_lines->str,
-                            hw_version,
--                           total_size /
-+                           size /
-                                (int64_t)(63 * number_heads * BDRV_SECTOR=
-_SIZE),
-                            number_heads,
--                           adapter_type);
-+                           BlockdevVmdkAdapterType_str(adapter_type));
-     desc_len =3D strlen(desc);
-     /* the descriptor offset =3D 0x200 */
-     if (!split && !flat) {
-         desc_offset =3D 0x200;
--    } else {
--        ret =3D bdrv_create_file(filename, opts, &local_err);
-+    }
++    blockdev_create(vm, { 'driver': imgfmt,
++                          'file': 'imgfile',
++                          'size': size })
++    vm.shutdown()
 +
-+    ret =3D blk_pwrite(blk, desc_offset, desc, desc_len, 0);
-+    if (ret < 0) {
-+        error_setg_errno(errp, -ret, "Could not write description");
-+        goto exit;
-+    }
-+    /* bdrv_pwrite write padding zeros to align to sector, we don't need=
- that
-+     * for description file */
-+    if (desc_offset =3D=3D 0) {
-+        ret =3D blk_truncate(blk, desc_len, PREALLOC_MODE_OFF, errp);
-         if (ret < 0) {
--            error_propagate(errp, local_err);
-             goto exit;
-         }
-     }
-+    ret =3D 0;
-+exit:
-+    if (blk) {
-+        blk_unref(blk);
-+    }
-+    g_free(desc);
-+    g_free(parent_desc_line);
-+    g_string_free(ext_desc_lines, true);
-+    return ret;
-+}
-=20
--    new_blk =3D blk_new_open(filename, NULL, NULL,
--                           BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL=
-,
--                           &local_err);
--    if (new_blk =3D=3D NULL) {
--        error_propagate(errp, local_err);
--        ret =3D -EIO;
-+typedef struct {
-+    char *path;
-+    char *prefix;
-+    char *postfix;
-+    QemuOpts *opts;
-+} VMDKCreateOptsData;
++    iotests.img_info_log(disk_path)
 +
-+static BlockBackend *vmdk_co_create_opts_cb(int64_t size, int idx,
-+                                            bool flat, bool split, bool =
-compress,
-+                                            bool zeroed_grain, void *opa=
-que,
-+                                            Error **errp)
-+{
-+    BlockBackend *blk =3D NULL;
-+    BlockDriverState *bs =3D NULL;
-+    VMDKCreateOptsData *data =3D opaque;
-+    char *ext_filename =3D NULL;
-+    char *rel_filename =3D NULL;
++    #
++    # Successful image creation (inline blockdev-add, explicit defaults)
++    #
++    iotests.log("=3D=3D=3D Successful image creation (inline blockdev-ad=
+d, explicit defaults) =3D=3D=3D")
++    iotests.log("")
 +
-+    if (idx =3D=3D 0) {
-+        rel_filename =3D g_strdup_printf("%s%s", data->prefix, data->pos=
-tfix);
-+    } else if (split) {
-+        rel_filename =3D g_strdup_printf("%s-%c%03d%s",
-+                                       data->prefix,
-+                                       flat ? 'f' : 's', idx, data->post=
-fix);
-+    } else {
-+        assert(idx =3D=3D 1);
-+        rel_filename =3D g_strdup_printf("%s-flat%s", data->prefix, data=
-->postfix);
-+    }
++    # Choose a different size to show that we got a new image
++    size =3D 64 * 1024 * 1024
 +
-+    ext_filename =3D g_strdup_printf("%s%s", data->path, rel_filename);
-+    g_free(rel_filename);
++    vm.launch()
++    blockdev_create(vm, { 'driver': 'file',
++                          'filename': disk_path,
++                          'size': 0 })
 +
-+    if (vmdk_create_extent(ext_filename, size,
-+                           flat, compress, zeroed_grain, &blk, data->opt=
-s,
-+                           errp)) {
-         goto exit;
-     }
-+    bdrv_unref(bs);
-+exit:
-+    g_free(ext_filename);
-+    return blk;
-+}
-=20
--    blk_set_allow_write_beyond_eof(new_blk, true);
-+static int coroutine_fn vmdk_co_create_opts(const char *filename, QemuOp=
-ts *opts,
-+                                            Error **errp)
-+{
-+    Error *local_err =3D NULL;
-+    char *desc =3D NULL;
-+    int64_t total_size =3D 0;
-+    char *adapter_type =3D NULL;
-+    BlockdevVmdkAdapterType adapter_type_enum;
-+    char *backing_file =3D NULL;
-+    char *hw_version =3D NULL;
-+    char *fmt =3D NULL;
-+    BlockdevVmdkSubformat subformat;
-+    int ret =3D 0;
-+    char *path =3D g_malloc0(PATH_MAX);
-+    char *prefix =3D g_malloc0(PATH_MAX);
-+    char *postfix =3D g_malloc0(PATH_MAX);
-+    char *desc_line =3D g_malloc0(BUF_SIZE);
-+    char *ext_filename =3D g_malloc0(PATH_MAX);
-+    char *desc_filename =3D g_malloc0(PATH_MAX);
-+    char *parent_desc_line =3D g_malloc0(BUF_SIZE);
-+    bool zeroed_grain;
-+    bool compat6;
-+    int i;
-+    VMDKCreateOptsData data;
-=20
--    ret =3D blk_pwrite(new_blk, desc_offset, desc, desc_len, 0);
--    if (ret < 0) {
--        error_setg_errno(errp, -ret, "Could not write description");
-+    if (filename_decompose(filename, path, prefix, postfix, PATH_MAX, er=
-rp)) {
-+        ret =3D -EINVAL;
-         goto exit;
-     }
--    /* bdrv_pwrite write padding zeros to align to sector, we don't need=
- that
--     * for description file */
--    if (desc_offset =3D=3D 0) {
--        ret =3D blk_truncate(new_blk, desc_len, PREALLOC_MODE_OFF, errp)=
-;
-+    /* Read out options */
-+    total_size =3D ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, =
-0),
-+                          BDRV_SECTOR_SIZE);
-+    adapter_type =3D qemu_opt_get_del(opts, BLOCK_OPT_ADAPTER_TYPE);
-+    backing_file =3D qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
-+    hw_version =3D qemu_opt_get_del(opts, BLOCK_OPT_HWVERSION);
-+    compat6 =3D qemu_opt_get_bool_del(opts, BLOCK_OPT_COMPAT6, false);
-+    if (strcmp(hw_version, "undefined") =3D=3D 0) {
-+        g_free(hw_version);
-+        hw_version =3D g_strdup("4");
-     }
--exit:
--    if (new_blk) {
--        blk_unref(new_blk);
-+    fmt =3D qemu_opt_get_del(opts, BLOCK_OPT_SUBFMT);
-+    zeroed_grain =3D qemu_opt_get_bool_del(opts, BLOCK_OPT_ZEROED_GRAIN,=
- false);
++    blockdev_create(vm, { 'driver': imgfmt,
++                          'file': {
++                              'driver': 'file',
++                              'filename': disk_path,
++                          },
++                          'size': size,
++                          'extents': [],
++                          'subformat': 'monolithicSparse',
++                          'adapter-type': 'ide',
++                          'hwversion': '4',
++                          'zeroed-grain': False })
++    vm.shutdown()
 +
-+    if (adapter_type) {
-+        for (i =3D 0; i < strlen(adapter_type); ++i) {
-+            adapter_type[i] =3D qemu_tolower(adapter_type[i]);
-+        }
-+        adapter_type_enum =3D qapi_enum_parse(&BlockdevVmdkAdapterType_l=
-ookup,
-+                                            adapter_type,
-+                                            BLOCKDEV_VMDK_ADAPTER_TYPE_I=
-DE,
-+                                            &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            ret =3D -EINVAL;
-+            goto exit;
-+        }
-+    } else {
-+        adapter_type_enum =3D BLOCKDEV_VMDK_ADAPTER_TYPE_IDE;
-     }
++    iotests.img_info_log(disk_path)
 +
-+    if (!fmt) {
-+        /* Default format to monolithicSparse */
-+        subformat =3D BLOCKDEV_VMDK_SUBFORMAT_MONOLITHICSPARSE;
-+    } else {
-+        subformat =3D qapi_enum_parse(&BlockdevVmdkSubformat_lookup,
-+                                    fmt,
-+                                    BLOCKDEV_VMDK_SUBFORMAT_MONOLITHICSP=
-ARSE,
-+                                    &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            ret =3D -EINVAL;
-+            goto exit;
-+        }
-+    }
-+    data =3D (VMDKCreateOptsData){
-+        .prefix =3D prefix,
-+        .postfix =3D postfix,
-+        .path =3D path,
-+        .opts =3D opts,
-+    };
-+    ret =3D vmdk_co_do_create(total_size, subformat, adapter_type_enum,
-+                            backing_file, hw_version, compat6, zeroed_gr=
-ain,
-+                            vmdk_co_create_opts_cb, &data, errp);
++    #
++    # Successful image creation (non-default options)
++    #
++    iotests.log("=3D=3D=3D Successful image creation (with non-default o=
+ptions) =3D=3D=3D")
++    iotests.log("")
 +
-+exit:
-     g_free(adapter_type);
-     g_free(backing_file);
-     g_free(hw_version);
-@@ -2183,7 +2303,84 @@ exit:
-     g_free(ext_filename);
-     g_free(desc_filename);
-     g_free(parent_desc_line);
--    g_string_free(ext_desc_lines, true);
-+    return ret;
-+}
++    # Choose a different size to show that we got a new image
++    size =3D 32 * 1024 * 1024
 +
-+static BlockBackend *vmdk_co_create_cb(int64_t size, int idx,
-+                                       bool flat, bool split, bool compr=
-ess,
-+                                       bool zeroed_grain, void *opaque,
-+                                       Error **errp)
-+{
-+    int ret;
-+    BlockDriverState *bs;
-+    BlockBackend *blk;
-+    BlockdevCreateOptionsVmdk *opts =3D opaque;
++    vm.launch()
++    blockdev_create(vm, { 'driver': 'file',
++                          'filename': disk_path,
++                          'size': 0 })
 +
-+    if (idx =3D=3D 0) {
-+        bs =3D bdrv_open_blockdev_ref(opts->file, errp);
-+    } else {
-+        int i;
-+        BlockdevRefList *list =3D opts->extents;
-+        for (i =3D 1; i < idx; i++) {
-+            if (!list || !list->next) {
-+                error_setg(errp, "Extent [%d] not specified", i);
-+                return NULL;
-+            }
-+            list =3D list->next;
-+        }
-+        if (!list) {
-+            error_setg(errp, "Extent [%d] not specified", idx - 1);
-+            return NULL;
-+        }
-+        bs =3D bdrv_open_blockdev_ref(list->value, errp);
-+    }
-+    if (!bs) {
-+        return NULL;
-+    }
-+    blk =3D blk_new(BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE | BLK_PERM=
-_RESIZE,
-+                  BLK_PERM_ALL);
-+    if (blk_insert_bs(blk, bs, errp)) {
-+        bdrv_unref(bs);
-+        return NULL;
-+    }
-+    blk_set_allow_write_beyond_eof(blk, true);
-+    bdrv_unref(bs);
++    blockdev_create(vm, { 'driver': imgfmt,
++                          'file': {
++                              'driver': 'file',
++                              'filename': disk_path,
++                          },
++                          'size': size,
++                          'extents': [],
++                          'subformat': 'monolithicSparse',
++                          'adapter-type': 'buslogic',
++                          'zeroed-grain': True })
++    vm.shutdown()
 +
-+    ret =3D vmdk_init_extent(blk, size, flat, compress, zeroed_grain, er=
-rp);
-+    if (ret) {
-+        blk_unref(blk);
-+        blk =3D NULL;
-+    }
-+    return blk;
-+}
++    iotests.img_info_log(disk_path)
 +
-+static int coroutine_fn vmdk_co_create(BlockdevCreateOptions *create_opt=
-ions,
-+                                       Error **errp)
-+{
-+    int ret;
-+    BlockdevCreateOptionsVmdk *opts;
++    #
++    # Invalid BlockdevRef
++    #
++    iotests.log("=3D=3D=3D Invalid BlockdevRef =3D=3D=3D")
++    iotests.log("")
 +
-+    opts =3D &create_options->u.vmdk;
++    vm.launch()
++    blockdev_create(vm, { 'driver': imgfmt,
++                          'file': "this doesn't exist",
++                          'size': size })
++    vm.shutdown()
 +
-+    /* Validate options */
-+    if (!QEMU_IS_ALIGNED(opts->size, BDRV_SECTOR_SIZE)) {
-+        error_setg(errp, "Image size must be a multiple of 512 bytes");
-+        ret =3D -EINVAL;
-+        goto out;
-+    }
++    #
++    # Other subformats
++    #
++    iotests.log("=3D=3D=3D Other subformats =3D=3D=3D")
++    iotests.log("")
 +
-+    ret =3D vmdk_co_do_create(opts->size,
-+                            opts->subformat,
-+                            opts->adapter_type,
-+                            opts->backing_file,
-+                            opts->hwversion,
-+                            false,
-+                            opts->zeroed_grain,
-+                            vmdk_co_create_cb,
-+                            opts, errp);
-+    return ret;
++    for path in [ extent1_path, extent2_path, extent3_path ]:
++        msg =3D iotests.qemu_img_pipe('create', '-f', imgfmt, path, '0')
++        iotests.log(msg, [iotests.filter_testfiles])
 +
-+out:
-     return ret;
- }
-=20
-@@ -2451,6 +2648,7 @@ static BlockDriver bdrv_vmdk =3D {
-     .bdrv_co_pwrite_zeroes        =3D vmdk_co_pwrite_zeroes,
-     .bdrv_close                   =3D vmdk_close,
-     .bdrv_co_create_opts          =3D vmdk_co_create_opts,
-+    .bdrv_co_create               =3D vmdk_co_create,
-     .bdrv_co_flush_to_disk        =3D vmdk_co_flush,
-     .bdrv_co_block_status         =3D vmdk_co_block_status,
-     .bdrv_get_allocated_file_size =3D vmdk_get_allocated_file_size,
++    vm.add_blockdev('driver=3Dfile,filename=3D%s,node-name=3Dnode0' % (d=
+isk_path))
++    vm.add_blockdev('driver=3Dfile,filename=3D%s,node-name=3Dext1' % (ex=
+tent1_path))
++    vm.add_blockdev('driver=3Dfile,filename=3D%s,node-name=3Dext2' % (ex=
+tent2_path))
++    vm.add_blockdev('driver=3Dfile,filename=3D%s,node-name=3Dext3' % (ex=
+tent3_path))
++
++    # Missing extent
++    iotests.log("=3D=3D Missing extent =3D=3D")
++    iotests.log("")
++
++    vm.launch()
++    blockdev_create(vm, { 'driver': imgfmt,
++                          'file': 'node0',
++                          'size': size,
++                          'subformat': 'monolithicFlat' })
++    vm.shutdown()
++
++    # Correct extent
++    iotests.log("=3D=3D Correct extent =3D=3D")
++    iotests.log("")
++
++    vm.launch()
++    blockdev_create(vm, { 'driver': imgfmt,
++                          'file': 'node0',
++                          'size': size,
++                          'subformat': 'monolithicFlat',
++                          'extents': ['ext1'] })
++    vm.shutdown()
++
++    # Extra extent
++    iotests.log("=3D=3D Extra extent =3D=3D")
++    iotests.log("")
++
++    vm.launch()
++    blockdev_create(vm, { 'driver': imgfmt,
++                          'file': 'node0',
++                          'size': 512,
++                          'subformat': 'monolithicFlat',
++                          'extents': ['ext1', 'ext2', 'ext3'] })
++    vm.shutdown()
++
++    # Split formats
++    iotests.log("=3D=3D Split formats =3D=3D")
++    iotests.log("")
++
++    for size in [ 512, 1073741824, 2147483648, 5368709120 ]:
++        for subfmt in [ 'twoGbMaxExtentFlat', 'twoGbMaxExtentSparse' ]:
++            iotests.log("=3D %s %d =3D" % (subfmt, size))
++            iotests.log("")
++
++            vm.launch()
++            blockdev_create(vm, { 'driver': imgfmt,
++                                  'file': 'node0',
++                                  'size': size,
++                                  'subformat': subfmt,
++                                  'extents': ['ext1', 'ext2', 'ext3'] })
++            vm.shutdown()
++
++            iotests.img_info_log(disk_path)
+diff --git a/tests/qemu-iotests/237.out b/tests/qemu-iotests/237.out
+new file mode 100644
+index 0000000000..d6557826be
+--- /dev/null
++++ b/tests/qemu-iotests/237.out
+@@ -0,0 +1,309 @@
++=3D=3D=3D Successful image creation (defaults) =3D=3D=3D
++
++{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"driver": "file", "filename": "TEST_DIR/PID-t.vmdk", "size": 0}}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++
++{"execute": "blockdev-add", "arguments": {"driver": "file", "filename": =
+"TEST_DIR/PID-t.vmdk", "node_name": "imgfile"}}
++{"return": {}}
++{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"driver": "vmdk", "file": "imgfile", "size": 5368709120}}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++
++image: TEST_IMG
++file format: IMGFMT
++virtual size: 5.0G (5368709120 bytes)
++cluster_size: 65536
++Format specific information:
++    cid: XXXXXXXXXX
++    parent cid: XXXXXXXXXX
++    create type: monolithicSparse
++    extents:
++        [0]:
++            virtual size: 5368709120
++            filename: TEST_IMG
++            cluster size: 65536
++            format:=20
++
++=3D=3D=3D Successful image creation (inline blockdev-add, explicit defau=
+lts) =3D=3D=3D
++
++{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"driver": "file", "filename": "TEST_DIR/PID-t.vmdk", "size": 0}}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++
++{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"adapter-type": "ide", "driver": "vmdk", "extents": [], "file": {"driv=
+er": "file", "filename": "TEST_DIR/PID-t.vmdk"}, "hwversion": "4", "size"=
+: 67108864, "subformat": "monolithicSparse", "zeroed-grain": false}}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++
++image: TEST_IMG
++file format: IMGFMT
++virtual size: 64M (67108864 bytes)
++cluster_size: 65536
++Format specific information:
++    cid: XXXXXXXXXX
++    parent cid: XXXXXXXXXX
++    create type: monolithicSparse
++    extents:
++        [0]:
++            virtual size: 67108864
++            filename: TEST_IMG
++            cluster size: 65536
++            format:=20
++
++=3D=3D=3D Successful image creation (with non-default options) =3D=3D=3D
++
++{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"driver": "file", "filename": "TEST_DIR/PID-t.vmdk", "size": 0}}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++
++{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"adapter-type": "buslogic", "driver": "vmdk", "extents": [], "file": {=
+"driver": "file", "filename": "TEST_DIR/PID-t.vmdk"}, "size": 33554432, "=
+subformat": "monolithicSparse", "zeroed-grain": true}}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++
++image: TEST_IMG
++file format: IMGFMT
++virtual size: 32M (33554432 bytes)
++cluster_size: 65536
++Format specific information:
++    cid: XXXXXXXXXX
++    parent cid: XXXXXXXXXX
++    create type: monolithicSparse
++    extents:
++        [0]:
++            virtual size: 33554432
++            filename: TEST_IMG
++            cluster size: 65536
++            format:=20
++
++=3D=3D=3D Invalid BlockdevRef =3D=3D=3D
++
++{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"driver": "vmdk", "file": "this doesn't exist", "size": 33554432}}}
++{"return": {}}
++Job failed: Cannot find device=3Dthis doesn't exist nor node_name=3Dthis=
+ doesn't exist
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++
++=3D=3D=3D Other subformats =3D=3D=3D
++
++Formatting 'TEST_DIR/PID-t.vmdk.1', fmt=3Dvmdk size=3D0 compat6=3Doff hw=
+version=3Dundefined
++
++Formatting 'TEST_DIR/PID-t.vmdk.2', fmt=3Dvmdk size=3D0 compat6=3Doff hw=
+version=3Dundefined
++
++Formatting 'TEST_DIR/PID-t.vmdk.3', fmt=3Dvmdk size=3D0 compat6=3Doff hw=
+version=3Dundefined
++
++=3D=3D Missing extent =3D=3D
++
++{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"driver": "vmdk", "file": "node0", "size": 33554432, "subformat": "mon=
+olithicFlat"}}}
++{"return": {}}
++Job failed: Extent [0] not specified
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++
++=3D=3D Correct extent =3D=3D
++
++{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"driver": "vmdk", "extents": ["ext1"], "file": "node0", "size": 335544=
+32, "subformat": "monolithicFlat"}}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++
++=3D=3D Extra extent =3D=3D
++
++{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"driver": "vmdk", "extents": ["ext1", "ext2", "ext3"], "file": "node0"=
+, "size": 512, "subformat": "monolithicFlat"}}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++
++=3D=3D Split formats =3D=3D
++
++=3D twoGbMaxExtentFlat 512 =3D
++
++{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"driver": "vmdk", "extents": ["ext1", "ext2", "ext3"], "file": "node0"=
+, "size": 512, "subformat": "twoGbMaxExtentFlat"}}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++
++image: TEST_IMG
++file format: IMGFMT
++virtual size: 512 (512 bytes)
++Format specific information:
++    cid: XXXXXXXXXX
++    parent cid: XXXXXXXXXX
++    create type: twoGbMaxExtentFlat
++    extents:
++        [0]:
++            virtual size: 512
++            filename: TEST_IMG.1
++            format: FLAT
++
++=3D twoGbMaxExtentSparse 512 =3D
++
++{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"driver": "vmdk", "extents": ["ext1", "ext2", "ext3"], "file": "node0"=
+, "size": 512, "subformat": "twoGbMaxExtentSparse"}}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++
++image: TEST_IMG
++file format: IMGFMT
++virtual size: 512 (512 bytes)
++cluster_size: 65536
++Format specific information:
++    cid: XXXXXXXXXX
++    parent cid: XXXXXXXXXX
++    create type: twoGbMaxExtentSparse
++    extents:
++        [0]:
++            virtual size: 512
++            filename: TEST_IMG.1
++            cluster size: 65536
++            format: SPARSE
++
++=3D twoGbMaxExtentFlat 1073741824 =3D
++
++{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"driver": "vmdk", "extents": ["ext1", "ext2", "ext3"], "file": "node0"=
+, "size": 1073741824, "subformat": "twoGbMaxExtentFlat"}}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++
++image: TEST_IMG
++file format: IMGFMT
++virtual size: 1.0G (1073741824 bytes)
++Format specific information:
++    cid: XXXXXXXXXX
++    parent cid: XXXXXXXXXX
++    create type: twoGbMaxExtentFlat
++    extents:
++        [0]:
++            virtual size: 1073741824
++            filename: TEST_IMG.1
++            format: FLAT
++
++=3D twoGbMaxExtentSparse 1073741824 =3D
++
++{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"driver": "vmdk", "extents": ["ext1", "ext2", "ext3"], "file": "node0"=
+, "size": 1073741824, "subformat": "twoGbMaxExtentSparse"}}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++
++image: TEST_IMG
++file format: IMGFMT
++virtual size: 1.0G (1073741824 bytes)
++cluster_size: 65536
++Format specific information:
++    cid: XXXXXXXXXX
++    parent cid: XXXXXXXXXX
++    create type: twoGbMaxExtentSparse
++    extents:
++        [0]:
++            virtual size: 1073741824
++            filename: TEST_IMG.1
++            cluster size: 65536
++            format: SPARSE
++
++=3D twoGbMaxExtentFlat 2147483648 =3D
++
++{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"driver": "vmdk", "extents": ["ext1", "ext2", "ext3"], "file": "node0"=
+, "size": 2147483648, "subformat": "twoGbMaxExtentFlat"}}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++
++image: TEST_IMG
++file format: IMGFMT
++virtual size: 2.0G (2147483648 bytes)
++Format specific information:
++    cid: XXXXXXXXXX
++    parent cid: XXXXXXXXXX
++    create type: twoGbMaxExtentFlat
++    extents:
++        [0]:
++            virtual size: 2147483648
++            filename: TEST_IMG.1
++            format: FLAT
++
++=3D twoGbMaxExtentSparse 2147483648 =3D
++
++{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"driver": "vmdk", "extents": ["ext1", "ext2", "ext3"], "file": "node0"=
+, "size": 2147483648, "subformat": "twoGbMaxExtentSparse"}}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++
++image: TEST_IMG
++file format: IMGFMT
++virtual size: 2.0G (2147483648 bytes)
++cluster_size: 65536
++Format specific information:
++    cid: XXXXXXXXXX
++    parent cid: XXXXXXXXXX
++    create type: twoGbMaxExtentSparse
++    extents:
++        [0]:
++            virtual size: 2147483648
++            filename: TEST_IMG.1
++            cluster size: 65536
++            format: SPARSE
++
++=3D twoGbMaxExtentFlat 5368709120 =3D
++
++{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"driver": "vmdk", "extents": ["ext1", "ext2", "ext3"], "file": "node0"=
+, "size": 5368709120, "subformat": "twoGbMaxExtentFlat"}}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++
++image: TEST_IMG
++file format: IMGFMT
++virtual size: 5.0G (5368709120 bytes)
++Format specific information:
++    cid: XXXXXXXXXX
++    parent cid: XXXXXXXXXX
++    create type: twoGbMaxExtentFlat
++    extents:
++        [0]:
++            virtual size: 2147483648
++            filename: TEST_IMG.1
++            format: FLAT
++        [1]:
++            virtual size: 2147483648
++            filename: TEST_IMG.2
++            format: FLAT
++        [2]:
++            virtual size: 1073741824
++            filename: TEST_IMG.3
++            format: FLAT
++
++=3D twoGbMaxExtentSparse 5368709120 =3D
++
++{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"driver": "vmdk", "extents": ["ext1", "ext2", "ext3"], "file": "node0"=
+, "size": 5368709120, "subformat": "twoGbMaxExtentSparse"}}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++
++image: TEST_IMG
++file format: IMGFMT
++virtual size: 5.0G (5368709120 bytes)
++cluster_size: 65536
++Format specific information:
++    cid: XXXXXXXXXX
++    parent cid: XXXXXXXXXX
++    create type: twoGbMaxExtentSparse
++    extents:
++        [0]:
++            virtual size: 2147483648
++            filename: TEST_IMG.1
++            cluster size: 65536
++            format: SPARSE
++        [1]:
++            virtual size: 2147483648
++            filename: TEST_IMG.2
++            cluster size: 65536
++            format: SPARSE
++        [2]:
++            virtual size: 1073741824
++            filename: TEST_IMG.3
++            cluster size: 65536
++            format: SPARSE
++
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 61a6d98ebd..c4de595f29 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -233,3 +233,4 @@
+ 233 auto quick
+ 234 auto quick migration
+ 235 auto quick
++237 rw auto quick
 --=20
 2.19.2
