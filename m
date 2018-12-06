@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gUwYn-0007or-Jm
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:31:38 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gUwcv-00029d-LK
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:35:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gUwYg-0002e3-0N
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:31:33 -0500
-References: <20181130220344.3350618-1-eblake@redhat.com>
-	<20181130220344.3350618-9-eblake@redhat.com>
-	<a523fabb-f532-1230-9d61-92d487bb551c@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <44ca18c7-02b1-7176-7ef6-0ae477b1bf96@redhat.com>
-Date: Thu, 6 Dec 2018 10:31:06 -0600
+	(envelope-from <eric.auger@redhat.com>) id 1gUwcs-0004MU-ED
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:35:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48376)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1gUwcr-0004K5-Mt
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:35:46 -0500
+References: <154393964026.28192.13536237934563059985.stgit@gimli.home>
+	<154394079441.28192.15583995529917119293.stgit@gimli.home>
+	<f8971f03-82bc-3207-c6c7-d816aa0d6052@redhat.com>
+	<20181206090044.7f22a365@x1.home>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <0ecea9bd-1f2c-ed23-5288-ea1595ebc99f@redhat.com>
+Date: Thu, 6 Dec 2018 17:35:30 +0100
 MIME-Version: 1.0
-In-Reply-To: <a523fabb-f532-1230-9d61-92d487bb551c@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20181206090044.7f22a365@x1.home>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 08/14] nbd/client: Refactor
- nbd_receive_list()
+Subject: Re: [Qemu-devel] [for-4.0 PATCH v3 5/9] pcie: Fill PCIESlot link
+ fields to support higher speeds and widths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,120 +32,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, Geoffrey McRae <geoff@hostfission.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 12/6/18 8:18 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 01.12.2018 1:03, Eric Blake wrote:
->> Add some parameters to make this function reusable in upcoming
->> export listing, where we will want to capture the name and
->> description rather than compare against a user-supplied name.
->> No change in semantics to the existing caller.
+Hi Alex,
+
+On 12/6/18 5:00 PM, Alex Williamson wrote:
+> On Thu, 6 Dec 2018 12:08:09 +0100
+> Auger Eric <eric.auger@redhat.com> wrote:
+> 
+>> Hi Alex,
 >>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> ---
->>    nbd/client.c | 66 +++++++++++++++++++++++++++++++++++++---------------
->>    1 file changed, 47 insertions(+), 19 deletions(-)
-
->> @@ -290,30 +298,49 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
->>            nbd_send_opt_abort(ioc);
->>            return -1;
->>        }
->> -    if (namelen != strlen(want)) {
->> -        if (nbd_drop(ioc, len, errp) < 0) {
->> -            error_prepend(errp,
->> -                          "failed to skip export name with wrong length: ");
->> -            nbd_send_opt_abort(ioc);
->> -            return -1;
->> +    if (want) {
->> +        if (namelen != strlen(want)) {
->> +            if (nbd_drop(ioc, len, errp) < 0) {
->> +                error_prepend(errp,
->> +                              "failed to skip export name with wrong length: ");
->> +                nbd_send_opt_abort(ioc);
->> +                return -1;
->> +            }
->> +            return 1;
->>            }
->> -        return 1;
->> +        assert(namelen < sizeof(array));
->> +    } else {
->> +        assert(nameout);
-> 
-> this assert looks a bit redundant, if nameout is 0, next line will abort not less clearly
-> 
->> +        *nameout = name = g_new(char, namelen + 1);
-> 
-> We should check namelen <= NBD_MAX_NAME_SIZE before it, I think.
-
-Why? We already validated that the overall option is not too large, and 
-even if the resulting name from the server is larger than 
-NBD_MAX_NAME_SIZE, it's still nice to report that name to the client for 
-'qemu-nbd --list'.  And these days, we only call nbd_receive_list if a 
-server lacked NBD_OPT_GO, which is getting rarer and rarer, so 
-micro-optimizing a rare case to avoid a large malloc isn't going to make 
-a noticeable difference.
-
-> 
->>        }
+>> On 12/4/18 5:26 PM, Alex Williamson wrote:
+>>> Make use of the PCIESlot speed and width fields to update link
+>>> information beyond those configured in pcie_cap_v1_fill().  This is
+>>> only called for devices supporting a version 2 capability and
+>>> automatically skips any non-PCIESlot devices.  Only devices with
+>>> increased link values generate any visible config space differences.
+>>>
+>>> Cc: Michael S. Tsirkin <mst@redhat.com>
+>>> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+>>> Tested-by: Geoffrey McRae <geoff@hostfission.com>
+>>> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+>>> ---
+>>>  hw/pci/pcie.c |   72 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>  1 file changed, 72 insertions(+)
+>>>
+>>> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+>>> index 61b7b96c52cd..556ec19925b9 100644
+>>> --- a/hw/pci/pcie.c
+>>> +++ b/hw/pci/pcie.c
+>>> @@ -27,6 +27,7 @@
+>>>  #include "hw/pci/msi.h"
+>>>  #include "hw/pci/pci_bus.h"
+>>>  #include "hw/pci/pcie_regs.h"
+>>> +#include "hw/pci/pcie_port.h"
+>>>  #include "qemu/range.h"
+>>>  
+>>>  //#define DEBUG_PCIE
+>>> @@ -87,6 +88,74 @@ pcie_cap_v1_fill(PCIDevice *dev, uint8_t port, uint8_t type, uint8_t version)
+>>>      pci_set_word(cmask + PCI_EXP_LNKSTA, 0);
+>>>  }
+>>>  
+>>> +static void pcie_cap_fill_slot_lnk(PCIDevice *dev)
+>>> +{
+>>> +    PCIESlot *s = (PCIESlot *)object_dynamic_cast(OBJECT(dev), TYPE_PCIE_SLOT);
+>>> +    uint8_t *exp_cap = dev->config + dev->exp.exp_cap;
+>>> +
+>>> +    /* Skip anything that isn't a PCIESlot */
+>>> +    if (!s) {
+>>> +        return;
+>>> +    }
+>>> +
+>>> +    /* Clear and fill LNKCAP from what was configured above */
+>>> +    pci_long_test_and_clear_mask(exp_cap + PCI_EXP_LNKCAP,
+>>> +                                 PCI_EXP_LNKCAP_MLW | PCI_EXP_LNKCAP_SLS);
+>>> +    pci_long_test_and_set_mask(exp_cap + PCI_EXP_LNKCAP,
+>>> +                               QEMU_PCI_EXP_LNKCAP_MLW(s->width) |
+>>> +                               QEMU_PCI_EXP_LNKCAP_MLS(s->speed));
+>>> +
+>>> +    /*
+>>> +     * Link bandwidth notification is required for all root ports and
+>>> +     * downstream ports supporting links wider than x1.  
 >>
->> -    assert(namelen < sizeof(name));
->>        if (nbd_read(ioc, name, namelen, errp) < 0) {
->>            error_prepend(errp, "failed to read export name: ");
->>            nbd_send_opt_abort(ioc);
->> +        if (!want) {
->> +            free(name);
+>>
+>>> +     */
+>>> +    if (s->width > QEMU_PCI_EXP_LNK_X1) {
+>>> +        pci_long_test_and_set_mask(exp_cap + PCI_EXP_LNKCAP,
+>>> +                                   PCI_EXP_LNKCAP_LBNC);  
+>> spec also says "This capability is required for all Root
+>> Ports and Switch Downstream Ports supporting Links wider than
+>> x1 and/or multiple Link speeds."
+>>
+>> I see below you are likely to report several speed vectors if speed >
+>> 5GT/s so you may also add a test on the speed.
 > 
-> g_free
+> Good catch, so I'll change the above test to:
 > 
->> +        }
->>            return -1;
->>        }
->>        name[namelen] = '\0';
->>        len -= namelen;
->> -    if (nbd_drop(ioc, len, errp) < 0) {
->> +    if (!want) {
->> +        assert(description);
+>     if (s->width > QEMU_PCI_EXP_LNK_X1 ||
+>         s->speed > QEMU_PCI_EXP_LNK_2_5GT) {
 > 
-> NBD_MAX_NAME_SIZE
+>> How are the device types checked?
+> 
+> Via the object_dynamic_cast() at the top of the function, we'll drop
+> anything that isn't a descendant of TYPE_PCIE_SLOT.
 
-The description is not bound by NBD_MAX_NAME_SIZE.  The NBD protocol 
-DOES document a maximum string size (4k), but we are (so far) not 
-actually honoring that limit (our choice for NBD_MAX_NAME_SIZE is 256, 
-which is smaller than the NBD protocol limit).
+Ah OK
+> 
+>>> +    }
+>>> +
+>>> +    if (s->speed > QEMU_PCI_EXP_LNK_2_5GT) {
+>>> +        /*
+>>> +         * Hot-plug capable downstream ports and downstream ports supporting
+>>> +         * link speeds greater than 5GT/s must hardwire PCI_EXP_LNKCAP_DLLLARC
+>>> +         * to 1b.  PCI_EXP_LNKCAP_DLLLARC implies PCI_EXP_LNKSTA_DLLLA, which
+>>> +         * we also hardwire to 1b here.  2.5GT/s hot-plug slots should also
+>>> +         * technically implement this, but it's not done here for compatibility.
+>>> +         */
+>>> +        pci_long_test_and_set_mask(exp_cap + PCI_EXP_LNKCAP,
+>>> +                                   PCI_EXP_LNKCAP_DLLLARC);
+>>> +        pci_word_test_and_set_mask(exp_cap + PCI_EXP_LNKSTA,
+>>> +                                   PCI_EXP_LNKSTA_DLLLA);
+>>> +
+>>> +        /*
+>>> +         * Target Link Speed defaults to the highest link speed supported by
+>>> +         * the component.  2.5GT/s devices are permitted to hardwire to zero.
+>>> +         */
+>>> +        pci_word_test_and_clear_mask(exp_cap + PCI_EXP_LNKCTL2,
+>>> +                                     PCI_EXP_LNKCTL2_TLS);
+>>> +        pci_word_test_and_set_mask(exp_cap + PCI_EXP_LNKCTL2,
+>>> +                                   QEMU_PCI_EXP_LNKCAP_MLS(s->speed) &
+>>> +                                   PCI_EXP_LNKCTL2_TLS);
+>>> +    }
+>>> +
+>>> +    /*
+>>> +     * 2.5 & 5.0GT/s can be fully described by LNKCAP, but 8.0GT/s is
+>>> +     * actually a reference to the highest bit supported in this register.
+>>> +     * We assume the device supports all link speeds.
+>>> +     */
+>>> +    if (s->speed > QEMU_PCI_EXP_LNK_5GT) {
+>>> +        pci_long_test_and_clear_mask(exp_cap + PCI_EXP_LNKCAP2, ~0U);
+>>> +        pci_long_test_and_set_mask(exp_cap + PCI_EXP_LNKCAP2,
+>>> +                                   PCI_EXP_LNKCAP2_SLS_2_5GB |
+>>> +                                   PCI_EXP_LNKCAP2_SLS_5_0GB |
+>>> +                                   PCI_EXP_LNKCAP2_SLS_8_0GB);
+>>> +        if (s->speed > QEMU_PCI_EXP_LNK_8GT) {
+>>> +            pci_long_test_and_set_mask(exp_cap + PCI_EXP_LNKCAP2,
+>>> +                                       PCI_EXP_LNKCAP2_SLS_16_0GB);  
+>> I fail to understand why for 5GB you don't see both 2.5 and 5 as well.
+> 
+> Because there was a bit of a glitch in the PCIe 2.0 spec where lnkcap2
+> is listed as a placeholder, so a strictly gen2 device doesn't need to
+> implement lnkcap2.  In gen1, lnkcap supported link speeds (SLS) vector
+> defined 0001b for 2.5GT/s, gen2 came along and defined 0010b for
+> 2.5GT/s AND 5GT/s, then in the 3.0 spec they decided to slightly
+> re-purpose this and SLS became MLS (max link speed), and introduced
+> lnkcap2 to indicate which speeds were supported.  So the original spec
+> definition of SLS didn't really give hardware the flexibility if they
+> should decide they don't want to validate intermediate link speeds.
 
-> 
->> +        *description = g_new(char, len + 1);
->> +        if (nbd_read(ioc, *description, len, errp) < 0) {
->> +            error_prepend(errp, "failed to read export description: ");
->> +            nbd_send_opt_abort(ioc);
->> +            free(name);
->> +            free(*description);
-> 
-> g_free
-> 
->> +            return -1;
->> +        }
->> +        (*description)[len] = '\0';
->> +    } else if (nbd_drop(ioc, len, errp) < 0) {
->>            error_prepend(errp, "failed to read export description: ");
->>            nbd_send_opt_abort(ioc);
->>            return -1;
->>        }
->> -    if (!strcmp(name, want)) {
->> +    if (want && !strcmp(name, want)) {
->>            *match = true;
->>        }
->>        return 1;
-> 
-> one more thing: on fail path, you finally fill output name and description
-> with freed pointers. I'd prefer to keep them unchanged in this case, however,
-> it's a matter of taste.
+OK Thanks
 
-Okay, I'll try and be more careful in v2 about not altering the callers 
-pointers on failure.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Eric
+> Thanks,
+> 
+> Alex
+> 
+>>> +        }
+>>> +    }
+>>> +}
+>>> +
+>>>  int pcie_cap_init(PCIDevice *dev, uint8_t offset,
+>>>                    uint8_t type, uint8_t port,
+>>>                    Error **errp)
+>>> @@ -108,6 +177,9 @@ int pcie_cap_init(PCIDevice *dev, uint8_t offset,
+>>>      /* Filling values common with v1 */
+>>>      pcie_cap_v1_fill(dev, port, type, PCI_EXP_FLAGS_VER2);
+>>>  
+>>> +    /* Fill link speed and width options */
+>>> +    pcie_cap_fill_slot_lnk(dev);
+>>> +
+>>>      /* Filling v2 specific values */
+>>>      pci_set_long(exp_cap + PCI_EXP_DEVCAP2,
+>>>                   PCI_EXP_DEVCAP2_EFF | PCI_EXP_DEVCAP2_EETLPP);
+>>>
+>>>   
+>>
+>> Thanks
+>>
+>> Eric
+> 
