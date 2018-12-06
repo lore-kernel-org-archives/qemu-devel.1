@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=8715dceb6=Paul.Durrant@citrix.com>)
-	id 1gUstv-0000xs-5P
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:37:11 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gUt0r-0001JA-EG
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:44:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=8715dceb6=Paul.Durrant@citrix.com>)
-	id 1gUstr-0002Z0-0s
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:37:07 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Thu, 6 Dec 2018 12:36:52 +0000
-Message-ID: <66fe7ee71e9642d3bbbda0f4f900c799@AMSPEX02CL03.citrite.net>
-References: <20181121151211.15997-1-paul.durrant@citrix.com>
-	<20181121151211.15997-16-paul.durrant@citrix.com>
-	<20181204153510.GW14786@perard.uk.xensource.com>
-In-Reply-To: <20181204153510.GW14786@perard.uk.xensource.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <jasowang@redhat.com>) id 1gUt0o-0007G7-8Z
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:44:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45908)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gUt0n-0007Fs-Vi
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:44:14 -0500
+References: <CAHyh4xgZhGnEvkD5RiUazZ9Eq_jzr4=bXHfwBvCBkbOLN2UyKA@mail.gmail.com>
+	<915953bd-cc9c-9456-b619-297138f68ae6@redhat.com>
+	<CAHyh4xjNU2ZTvBTqRhVn17SpcqXcKnKvK90oGFeA72t_h3-REw@mail.gmail.com>
+	<7cc73aeb-5eee-8b4f-c005-aee64dfb1bf8@redhat.com>
+	<CAHyh4xhysVpEEiwmYU4cyMZaXwzHZfEyMD4=_4QiNbr9HtKGzA@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <356e7f1d-e95a-a090-4a79-c1cf5a37d50f@redhat.com>
+Date: Thu, 6 Dec 2018 20:44:03 +0800
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 15/18] xen: add a mechanism to
- automatically create XenDevice-s...
+In-Reply-To: <CAHyh4xhysVpEEiwmYU4cyMZaXwzHZfEyMD4=_4QiNbr9HtKGzA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Logging dirty pages from vhost-net in-kernel with
+ vIOMMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,221 +32,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony Perard <anthony.perard@citrix.com>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Stefano Stabellini <sstabellini@kernel.org>
+To: Jintack Lim <jintack@cs.columbia.edu>
+Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>
 
-> -----Original Message-----
-> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
-> Sent: 04 December 2018 15:35
-> To: Paul Durrant <Paul.Durrant@citrix.com>
-> Cc: qemu-block@nongnu.org; qemu-devel@nongnu.org; xen-
-> devel@lists.xenproject.org; Stefano Stabellini <sstabellini@kernel.org>
-> Subject: Re: [PATCH 15/18] xen: add a mechanism to automatically create
-> XenDevice-s...
->=20
-> On Wed, Nov 21, 2018 at 03:12:08PM +0000, Paul Durrant wrote:
-> > +    xen_backend_device_create(BUS(xenbus), type, name, opts,
-> &local_err);
-> > +    qobject_unref(opts);
-> > +
-> > +    if (local_err) {
-> > +        const char *msg =3D error_get_pretty(local_err);
-> > +
-> > +        error_report("failed to create '%s' device '%s': %s", type,
-> name,
-> > +                     msg);
-> > +        error_free(local_err);
->=20
-> You can use error_reportf_err() instead of those three calls. I may have
-> only suggest error_report_err in a previous patch, but error_reportf_err
-> does the error_prepend as well.
->=20
 
-Ah. I'll go back over the patches and use that where necessary.
+On 2018/12/6 =E4=B8=8B=E5=8D=888:11, Jintack Lim wrote:
+> On Thu, Dec 6, 2018 at 2:33 AM Jason Wang <jasowang@redhat.com> wrote:
+>>
+>> On 2018/12/5 =E4=B8=8B=E5=8D=8810:47, Jintack Lim wrote:
+>>> On Tue, Dec 4, 2018 at 8:30 PM Jason Wang <jasowang@redhat.com> wrote=
+:
+>>>> On 2018/12/5 =E4=B8=8A=E5=8D=882:37, Jintack Lim wrote:
+>>>>> Hi,
+>>>>>
+>>>>> I'm wondering how the current implementation works when logging dir=
+ty
+>>>>> pages during migration from vhost-net (in kernel) when used vIOMMU.
+>>>>>
+>>>>> I understand how vhost-net logs GPAs when not using vIOMMU. But whe=
+n
+>>>>> we use vhost with vIOMMU, then shouldn't vhost-net need to log the
+>>>>> translated address (GPA) instead of the address written in the
+>>>>> descriptor (IOVA) ? The current implementation looks like vhost-net
+>>>>> just logs IOVA without translation in vhost_get_vq_desc() in
+>>>>> drivers/vhost/net.c. It seems like QEMU doesn't do any further
+>>>>> translation of the dirty log when syncing.
+>>>>>
+>>>>> I might be missing something. Could somebody shed some light on thi=
+s?
+>>>> Good catch. It looks like a bug to me. Want to post a patch for this=
+?
+>>> Thanks for the confirmation.
+>>>
+>>> What would be a good setup to catch this kind of migration bug? I
+>>> tried to observe it in the VM expecting to see network applications
+>>> not getting data correctly on the destination, but it was not
+>>> successful (i.e. the VM on the destination just worked fine.) I didn'=
+t
+>>> even see anything going wrong when I disabled the vhost logging
+>>> completely without using vIOMMU.
+>>>
+>>> What I did is I ran multiple network benchmarks (e.g. netperf tcp
+>>> stream and my own one to check correctness of received data) in a VM
+>>> without vhost dirty page logging, and the benchmarks just ran fine in
+>>> the destination. I checked the used ring at the time the VM is stoppe=
+d
+>>> in the source for migration, and it had multiple descriptors that is
+>>> (probably) not processed in the VM yet. Do you have any insight how i=
+t
+>>> could just work and what would be a good setup to catch this?
+>>
+>> According to past experience, it could be reproduced by doing scp from
+>> host to guest during migration.
+>>
+> Thanks. I actually tried that, but didn't see any problem either - I
+> copied a large file during migration from host to guest (the copy
+> continued on the destination), and checked md5 hashes using md5sum,
+> but the copied file had the same checksum as the one in the host.
+>
+> Do you recall what kind of symptom you observed when the dirty pages
+> were not migrated correctly with scp?
 
-> > +    }
-> > +}
-> > +
-> > +static void xen_bus_type_enumerate(XenBus *xenbus, const char *type)
-> > +{
-> > +    char *domain_path =3D g_strdup_printf("backend/%s/%u", type,
-> xen_domid);
-> > +    char **backend;
-> > +    unsigned int i, n;
-> > +
-> > +    trace_xen_bus_type_enumerate(type);
-> > +
-> > +    backend =3D xs_directory(xenbus->xsh, XBT_NULL, domain_path, &n);
-> > +    if (!backend) {
->=20
-> domain_path isn't free here, you probably want a `goto out` which would
-> free everything.
 
-Ok.
+Yes,=C2=A0 the point is to make the migration converge before the end of =
+scp=20
+(e.g set migration speed to a very big value). If scp end before=20
+migration, we won't catch the bug. And it's better to do several rounds=20
+of migration during scp.
 
->=20
-> > +        return;
-> > +    }
-> > +
-> > @@ -193,6 +302,17 @@ static void xen_bus_realize(BusState *bus, Error
-> **errp)
-> >      notifier_list_init(&xenbus->watch_notifiers);
-> >      qemu_set_fd_handler(xs_fileno(xenbus->xsh), xen_bus_watch, NULL,
-> >                          xenbus);
-> > +
-> > +    module_call_init(MODULE_INIT_XEN_BACKEND);
-> > +
-> > +    xenbus->backend_watch =3D
-> > +        xen_bus_add_watch(xenbus, "", /* domain root node */
-> > +                          "backend", xen_bus_enumerate, xenbus,
-> &local_err);
-> > +    if (local_err) {
-> > +        error_propagate(errp, local_err);
-> > +        error_prepend(errp, "failed to set up enumeration watch: ");
->=20
-> You should use error_propagate_prepend instead
-> error_propagate;error_prepend. And it looks like there is the same
-> mistake in other patches that I haven't notice.
->=20
+Anyway, let me try to reproduce it tomorrow.
 
-Oh, I didn't know about that one either... I've only seen the separate call=
-s used elsewhere.
+Thanks
 
-> Also you probably want goto fail here.
->=20
 
-Not sure about that. Whilst the bus scan won't happen, it doesn't mean devi=
-ces can't be added via QMP.
-
->=20
-> > +static void xen_device_backend_changed(void *opaque)
-> > +{
-> > +    XenDevice *xendev =3D opaque;
-> > +    const char *type =3D object_get_typename(OBJECT(xendev));
-> > +    enum xenbus_state state;
-> > +    unsigned int online;
-> > +
-> > +    trace_xen_device_backend_changed(type, xendev->name);
-> > +
-> > +    if (xen_device_backend_scanf(xendev, "state", "%u", &state) !=3D 1=
-) {
-> > +        state =3D XenbusStateUnknown;
-> > +    }
-> > +
-> > +    xen_device_backend_set_state(xendev, state);
->=20
-> It's kind of weird to set the internal state base on the external one
-> that something else may have modified. Shouldn't we check that it is
-> fine for something else to modify the state and that it is a correct
-> transition?
-
-The only thing (apart from this code) that's going to have perms to write t=
-he backend state is the toolstack... which is, of course, be definition tru=
-sted.
-
->=20
-> Also aren't we going in a loop by having QEMU set the state, then the
-> watch fires again? (Not really a loop since the function _set_state
-> check for changes.
-
-No. It's de-bounced inside the set_state function.
-
->=20
-> Also maybe we should watch for the state changes only when something
-> else like libxl creates (ask for) the backend, and ignore changes when
-> QEMU did it itself.
-
-I don't think it's necessary to add that complexity.
-
->=20
-> > +
-> > +    if (xen_device_backend_scanf(xendev, "online", "%u", &online) !=3D=
- 1)
-> {
-> > +        online =3D 0;
-> > +    }
-> > +
-> > +    xen_device_backend_set_online(xendev, !!online);
-> > +
-> > +    /*
-> > +     * If a backend is still 'online' then its state should be cycled
-> > +     * back round to InitWait in order for a new frontend instance to
-> > +     * connect. This may happen when, for example, a frontend driver i=
-s
-> > +     * re-installed or updated.
-> > +     * If a backend id not 'online' then the device should be
-> destroyed.
->=20
-> s/id/is/
-
-Ok.
-
->=20
-> > +     */
-> > +    if (xendev->backend_online &&
-> > +        xendev->backend_state =3D=3D XenbusStateClosed) {
-> > +        xen_device_backend_set_state(xendev, XenbusStateInitWait);
-> > +    } else if (!xendev->backend_online &&
-> > +               (xendev->backend_state =3D=3D XenbusStateClosed ||
-> > +                xendev->backend_state =3D=3D XenbusStateInitialising |=
-|
-> > +                xendev->backend_state =3D=3D XenbusStateInitWait ||
-> > +                xendev->backend_state =3D=3D XenbusStateUnknown)) {
-> > +        object_unparent(OBJECT(xendev));
-> > +    }
-> > +}
-> > +
-> >  static void xen_device_backend_create(XenDevice *xendev, Error **errp)
-> >  {
-> >      XenBus *xenbus =3D XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-> > @@ -289,12 +463,38 @@ static void xen_device_backend_create(XenDevice
-> *xendev, Error **errp)
-> >          error_propagate(errp, local_err);
-> >          error_prepend(errp, "failed to create backend: ");
->=20
-> It looks like there is a missing return here.
->=20
-> >      }
-> > +
-> > +    xendev->backend_state_watch =3D
-> > +        xen_bus_add_watch(xenbus, xendev->backend_path,
-> > +                          "state", xen_device_backend_changed,
-> > +                          xendev, &local_err);
-> > +    if (local_err) {
-> > +        error_propagate(errp, local_err);
-> > +        error_prepend(errp, "failed to watch backend state: ");
->=20
-> You should return here, as local_err mustn't be reused.
->=20
-> > +    }
-> > +
-> > +    xendev->backend_online_watch =3D
-> > +        xen_bus_add_watch(xenbus, xendev->backend_path,
-> > +                          "online", xen_device_backend_changed,
-> > +                          xendev, &local_err);
-> > +    if (local_err) {
-> > +        error_propagate(errp, local_err);
-> > +        error_prepend(errp, "failed to watch backend online: ");
->=20
-> You probably want a return here, in case there is more code added after.
-
-Yes, there should be returns in all three cases above.
-
->=20
-> > +    }
->=20
-> Other instances of error_propagate;error_prepend to be replaced by
-> error_propagate_prepend.
-
-Yes, will do.
-
-  Paul
-
->=20
-> >  }
-> >
->=20
-> Thanks,
->=20
-> --
-> Anthony PERARD
+>
+>>> About sending a patch, as Michael suggested, I think it's better for
+>>> you to handle this case - this is not my area of expertise, yet :-)
+>>
+>> No problem, I will fix this.
+>>
+>> Thanks for spotting this issue.
+>>
+>>
+>>>> Thanks
+>>>>
+>>>>
+>>>>> Thanks,
+>>>>> Jintack
+>>>>>
+>>>>>
+>
