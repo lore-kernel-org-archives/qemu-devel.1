@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maran.wilson@oracle.com>) id 1gUn0N-0003qa-Mc
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 01:19:28 -0500
+	(envelope-from <clg@kaod.org>) id 1gUn0g-0003r4-Bd
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 01:19:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maran.wilson@oracle.com>) id 1gUmzn-00058V-IS
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 01:18:53 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:52566)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maran.wilson@oracle.com>)
-	id 1gUmzl-00053C-8y
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 01:18:47 -0500
-References: <1544049446-6359-1-git-send-email-liam.merwick@oracle.com>
-From: Maran Wilson <maran.wilson@oracle.com>
-Message-ID: <07695d32-96a1-cea2-fabd-7e07c2df1fef@oracle.com>
-Date: Wed, 5 Dec 2018 22:18:25 -0800
+	(envelope-from <clg@kaod.org>) id 1gUmyw-00047F-Fh
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 01:17:59 -0500
+Received: from 8.mo68.mail-out.ovh.net ([46.105.74.219]:44930)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gUmyw-00046I-5a
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 01:17:54 -0500
+Received: from player158.ha.ovh.net (unknown [10.109.146.20])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id D284710861F
+	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 07:17:52 +0100 (CET)
+References: <20181205232251.10446-1-clg@kaod.org>
+	<20181205232251.10446-4-clg@kaod.org>
+	<20181206032535.GL768@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <aa579a81-aeec-4197-1ea9-c6a7f995949f@kaod.org>
+Date: Thu, 6 Dec 2018 07:17:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <1544049446-6359-1-git-send-email-liam.merwick@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20181206032535.GL768@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 0/3] QEMU changes to do PVH boot
+Subject: Re: [Qemu-devel] [PATCH v6 03/37] ppc/xive: introduce the
+ XiveNotifier interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,88 +33,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liam Merwick <liam.merwick@oracle.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, ehabkost@redhat.com, rth@twiddle.net, xen-devel@lists.xenproject.org, sgarzare@redhat.com, mst@redhat.com, stefanha@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On 12/5/2018 2:37 PM, Liam Merwick wrote:
-> For certain applications it is desirable to rapidly boot a KVM virtual
-> machine. In cases where legacy hardware and software support within the
-> guest is not needed, QEMU should be able to boot directly into the
-> uncompressed Linux kernel binary with minimal firmware involvement.
->
-> There already exists an ABI to allow this for Xen PVH guests and the AB=
-I
-> is supported by Linux and FreeBSD:
->
->     https://xenbits.xen.org/docs/unstable/misc/pvh.html
->
-> Details on the Linux changes: https://lkml.org/lkml/2018/4/16/1002
+On 12/6/18 4:25 AM, David Gibson wrote:
+> On Thu, Dec 06, 2018 at 12:22:17AM +0100, C=E9dric Le Goater wrote:
+>> The XiveNotifier offers a simple interface, between the XiveSource
+>> object and the main interrupt controller of the machine. It will
+>> forward event notifications to the XIVE Interrupt Virtualization
+>> Routing Engine (IVRE).
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> ---
+>>  include/hw/ppc/xive.h | 23 +++++++++++++++++++++++
+>>  hw/intc/xive.c        | 25 +++++++++++++++++++++++++
+>>  2 files changed, 48 insertions(+)
+>>
+>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+>> index 7cebc32eba4c..6770cffec67d 100644
+>> --- a/include/hw/ppc/xive.h
+>> +++ b/include/hw/ppc/xive.h
+>> @@ -142,6 +142,27 @@
+>> =20
+>>  #include "hw/qdev-core.h"
+>> =20
+>> +/*
+>> + * XIVE Fabric (Interface between Source and Router)
+>> + */
+>> +
+>> +typedef struct XiveNotifier {
+>> +    Object parent;
+>> +} XiveNotifier;
+>> +
+>> +#define TYPE_XIVE_NOTIFIER "xive-fabric"
+>=20
+> I'm applying this, but changing the string here from "xive-fabric" to
+> "xive-notifier".
 
-In case anyone wants to grab the patches and give it a try, I've just=20
-posted an updated version of the Linux patches rebased to the latest=20
-mainline code:
-
-https://lkml.org/lkml/2018/12/6/26
-
-No functional changes from before, just some minor conflict resolution=20
-as part of the rebase.
+Ah yes. My sed command missed that.
 
 Thanks,
--Maran
 
-> qboot patches: http://patchwork.ozlabs.org/project/qemu-devel/list/?ser=
-ies=3D80020
->
-> This patch series provides QEMU support to read the ELF header of an
-> uncompressed kernel binary and get the 32-bit PVH kernel entry point
-> from an ELF Note.  This is called when initialising the machine state
-> in pc_memory_init().  Later on in load_linux() if the kernel entry
-> address is present, the uncompressed kernel binary (ELF) is loaded
-> and qboot does futher initialisation of the guest (e820, etc.) and
-> jumps to the kernel entry address and boots the guest.
->
->
-> Us=D1=96ng the method/scripts documented by the NEMU team at
->
->     https://github.com/intel/nemu/wiki/Measuring-Boot-Latency
->     https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg00200.html
->
-> below are some timings measured (vmlinux and bzImage from the same buil=
-d)
-> Time to get to kernel start is almost halved (95=E1=B9=81s -> 48ms)
->
-> QEMU + qboot + vmlinux (PVH + 4.20-rc4)
->   qemu_init_end: 41.550521
->   fw_start: 41.667139 (+0.116618)
->   fw_do_boot: 47.448495 (+5.781356)
->   linux_startup_64: 47.720785 (+0.27229)
->   linux_start_kernel: 48.399541 (+0.678756)
->   linux_start_user: 296.952056 (+248.552515)
->
-> QEMU + qboot + bzImage:
->   qemu_init_end: 29.209276
->   fw_start: 29.317342 (+0.108066)
->   linux_start_boot: 36.679362 (+7.36202)
->   linux_startup_64: 94.531349 (+57.851987)
->   linux_start_kernel: 94.900913 (+0.369564)
->   linux_start_user: 401.060971 (+306.160058)
->
-> QEMU + bzImage:
->   qemu_init_end: 30.424430
->   linux_startup_64: 893.770334 (+863.345904)
->   linux_start_kernel: 894.17049 (+0.400156)
->   linux_start_user: 1208.679768 (+314.509278)
->
->
-> Liam Merwick (3):
->    pvh: Add x86/HVM direct boot ABI header file
->    pc: Read PVH entry point from ELF note in kernel binary
->    pvh: Boot uncompressed kernel using direct boot ABI
->
->   hw/i386/pc.c                | 344 +++++++++++++++++++++++++++++++++++=
-++++++++-
->   include/elf.h               |  10 ++
->   include/hw/xen/start_info.h | 146 +++++++++++++++++++
->   3 files changed, 499 insertions(+), 1 deletion(-)
->   create mode 100644 include/hw/xen/start_info.h
->
+C.
+
+>=20
+>=20
+>> +#define XIVE_NOTIFIER(obj)                                     \
+>> +    OBJECT_CHECK(XiveNotifier, (obj), TYPE_XIVE_NOTIFIER)
+>> +#define XIVE_NOTIFIER_CLASS(klass)                                   =
+  \
+>> +    OBJECT_CLASS_CHECK(XiveNotifierClass, (klass), TYPE_XIVE_NOTIFIER=
+)
+>> +#define XIVE_NOTIFIER_GET_CLASS(obj)                                 =
+  \
+>> +    OBJECT_GET_CLASS(XiveNotifierClass, (obj), TYPE_XIVE_NOTIFIER)
+>> +
+>> +typedef struct XiveNotifierClass {
+>> +    InterfaceClass parent;
+>> +    void (*notify)(XiveNotifier *xn, uint32_t lisn);
+>> +} XiveNotifierClass;
+>> +
+>>  /*
+>>   * XIVE Interrupt Source
+>>   */
+>> @@ -171,6 +192,8 @@ typedef struct XiveSource {
+>>      uint64_t        esb_flags;
+>>      uint32_t        esb_shift;
+>>      MemoryRegion    esb_mmio;
+>> +
+>> +    XiveNotifier    *xive;
+>>  } XiveSource;
+>> =20
+>>  /*
+>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+>> index 11c7aac962de..79238eb57fae 100644
+>> --- a/hw/intc/xive.c
+>> +++ b/hw/intc/xive.c
+>> @@ -155,7 +155,11 @@ static bool xive_source_esb_eoi(XiveSource *xsrc,=
+ uint32_t srcno)
+>>   */
+>>  static void xive_source_notify(XiveSource *xsrc, int srcno)
+>>  {
+>> +    XiveNotifierClass *xnc =3D XIVE_NOTIFIER_GET_CLASS(xsrc->xive);
+>> =20
+>> +    if (xnc->notify) {
+>> +        xnc->notify(xsrc->xive, srcno);
+>> +    }
+>>  }
+>> =20
+>>  /*
+>> @@ -362,6 +366,17 @@ static void xive_source_reset(void *dev)
+>>  static void xive_source_realize(DeviceState *dev, Error **errp)
+>>  {
+>>      XiveSource *xsrc =3D XIVE_SOURCE(dev);
+>> +    Object *obj;
+>> +    Error *local_err =3D NULL;
+>> +
+>> +    obj =3D object_property_get_link(OBJECT(dev), "xive", &local_err)=
+;
+>> +    if (!obj) {
+>> +        error_propagate(errp, local_err);
+>> +        error_prepend(errp, "required link 'xive' not found: ");
+>> +        return;
+>> +    }
+>> +
+>> +    xsrc->xive =3D XIVE_NOTIFIER(obj);
+>> =20
+>>      if (!xsrc->nr_irqs) {
+>>          error_setg(errp, "Number of interrupt needs to be greater tha=
+n 0");
+>> @@ -428,9 +443,19 @@ static const TypeInfo xive_source_info =3D {
+>>      .class_init    =3D xive_source_class_init,
+>>  };
+>> =20
+>> +/*
+>> + * XIVE Fabric
+>> + */
+>> +static const TypeInfo xive_fabric_info =3D {
+>> +    .name =3D TYPE_XIVE_NOTIFIER,
+>> +    .parent =3D TYPE_INTERFACE,
+>> +    .class_size =3D sizeof(XiveNotifierClass),
+>> +};
+>> +
+>>  static void xive_register_types(void)
+>>  {
+>>      type_register_static(&xive_source_info);
+>> +    type_register_static(&xive_fabric_info);
+>>  }
+>> =20
+>>  type_init(xive_register_types)
+>=20
