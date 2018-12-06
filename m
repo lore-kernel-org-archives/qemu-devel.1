@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gUuD2-0008J6-W2
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 09:01:00 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gUuDZ-00007D-6Y
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 09:01:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gUuCB-0004pj-5B
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 09:00:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35442)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gUuCA-0004oL-Sr
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 09:00:03 -0500
-Date: Thu, 6 Dec 2018 08:59:54 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181206085849-mutt-send-email-mst@kernel.org>
-References: <20181206063552.6701-1-xieyongji@baidu.com>
-	<561e0d7a-af2f-caad-aec3-c15952665687@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1gUuB0-0004IS-I1
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 08:58:55 -0500
+Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:35726)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gUuB0-0004Hj-0Y
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 08:58:50 -0500
+Received: by mail-ot1-x32b.google.com with SMTP id 81so479619otj.2
+	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 05:58:49 -0800 (PST)
+References: <20181203203839.757-1-richard.henderson@linaro.org>
+	<20181203203839.757-9-richard.henderson@linaro.org>
+	<CAFEAcA__1C-GkRk65E+JL9Ovte7GhZhGKmP3Zcv_w=wZSqV7=A@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <915ab710-26df-43af-495f-7c59b0b885e9@linaro.org>
+Date: Thu, 6 Dec 2018 07:58:44 -0600
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA__1C-GkRk65E+JL9Ovte7GhZhGKmP3Zcv_w=wZSqV7=A@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <561e0d7a-af2f-caad-aec3-c15952665687@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 0/6] vhost-user-blk: Add support
- for backend reconnecting
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 08/10] target/arm: Implement the
+ ARMv8.1-LOR extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,84 +33,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: elohimes@gmail.com, marcandre.lureau@redhat.com, nixun@baidu.com, qemu-devel@nongnu.org, lilin24@baidu.com, zhangyu31@baidu.com, chaiwen@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Dec 06, 2018 at 09:57:22PM +0800, Jason Wang wrote:
->=20
-> On 2018/12/6 =E4=B8=8B=E5=8D=882:35, elohimes@gmail.com wrote:
-> > From: Xie Yongji <xieyongji@baidu.com>
-> >=20
-> > This patchset is aimed at supporting qemu to reconnect
-> > vhost-user-blk backend after vhost-user-blk backend crash or
-> > restart.
-> >=20
-> > The patch 1 tries to implenment the sync connection for
-> > "reconnect socket".
-> >=20
-> > The patch 2 introduces a new message VHOST_USER_SET_VRING_INFLIGHT
-> > to support offering shared memory to backend to record
-> > its inflight I/O.
-> >=20
-> > The patch 3,4 are the corresponding libvhost-user patches of
-> > patch 2. Make libvhost-user support VHOST_USER_SET_VRING_INFLIGHT.
-> >=20
-> > The patch 5 supports vhost-user-blk to reconnect backend when
-> > connection closed.
-> >=20
-> > The patch 6 tells qemu that we support reconnecting now.
-> >=20
-> > To use it, we could start qemu with:
-> >=20
-> > qemu-system-x86_64 \
-> >          -chardev socket,id=3Dchar0,path=3D/path/vhost.socket,reconne=
-ct=3D1,wait \
-> >          -device vhost-user-blk-pci,chardev=3Dchar0 \
-> >=20
-> > and start vhost-user-blk backend with:
-> >=20
-> > vhost-user-blk -b /path/file -s /path/vhost.socket
-> >=20
-> > Then we can restart vhost-user-blk at any time during VM running.
->=20
->=20
-> I wonder whether or not it's better to handle this at the level of virt=
-io
-> protocol itself instead of vhost-user level. E.g expose last_avail_idx =
-to
-> driver might be sufficient?
->=20
-> Another possible issue is, looks like you need to deal with different k=
-inds
-> of ring layouts e.g packed virtqueues.
->=20
-> Thanks
+On 12/6/18 7:49 AM, Peter Maydell wrote:
+>> +static inline bool isar_feature_aa64_lor(const ARMISARegisters *id)
+>> +{
+>> +    return FIELD_EX64(id->id_aa64mmfr0, ID_AA64MMFR1, LO) != 0;
+> 
+> You're testing the wrong ID register here...
 
-I'm not sure I understand your comments here.
-All these would be guest-visible extensions.
-Possible for sure but how is this related to
-a patch supporting transparent reconnects?
+Oops, I thought I fixed that...
 
->=20
-> >=20
-> > Xie Yongji (6):
-> >    char-socket: Enable "wait" option for client mode
-> >    vhost-user: Add shared memory to record inflight I/O
-> >    libvhost-user: Introduce vu_queue_map_desc()
-> >    libvhost-user: Support recording inflight I/O in shared memory
-> >    vhost-user-blk: Add support for reconnecting backend
-> >    contrib/vhost-user-blk: enable inflight I/O recording
-> >=20
-> >   chardev/char-socket.c                   |   5 +-
-> >   contrib/libvhost-user/libvhost-user.c   | 215 ++++++++++++++++++++-=
----
-> >   contrib/libvhost-user/libvhost-user.h   |  19 +++
-> >   contrib/vhost-user-blk/vhost-user-blk.c |   3 +-
-> >   hw/block/vhost-user-blk.c               | 169 +++++++++++++++++--
-> >   hw/virtio/vhost-user.c                  |  69 ++++++++
-> >   hw/virtio/vhost.c                       |   8 +
-> >   include/hw/virtio/vhost-backend.h       |   4 +
-> >   include/hw/virtio/vhost-user-blk.h      |   4 +
-> >   include/hw/virtio/vhost-user.h          |   8 +
-> >   10 files changed, 452 insertions(+), 52 deletions(-)
-> >=20
+>> +static CPAccessResult access_lor_other(CPUARMState *env,
+>> +                                       const ARMCPRegInfo *ri, bool isread)
+>> +{
+>> +    int el = arm_current_el(env);
+>> +
+>> +    if (arm_is_secure_below_el3(env)) {
+>> +        /* Access denied in secure mode.  */
+>> +        return CP_ACCESS_TRAP;
+>> +    }
+>> +    if (el < 2 && arm_el_is_aa64(env, 2)) {
+> 
+> You don't need to explicitly check if EL2 is AArch64 --
+> these registers are AArch64 only so if we accessed them
+> from a lower EL then that EL is AArch64 and so all the
+> ELs above it must be too.
+
+Ok.
+
+> 
+>> +        uint64_t hcr = arm_hcr_el2_eff(env);
+>> +        if (hcr & HCR_E2H) {
+>> +            hcr &= HCR_TLOR;
+>> +        } else {
+>> +            hcr &= HCR_TGE | HCR_TLOR;
+> 
+> This doesn't make sense to me: I think TGE can't be 1 here.
+> We know (.access flag) that we're not in EL0. We know from
+> the el < 2 that we're in EL1, and we've already ruled out
+> Secure EL1. So this is NS EL1. If E2H == 0 then TGE can't
+> be set, because E2H,TGE={0,1} means the CPU can never be
+> in NS EL1.
+
+Ok.  Perhaps I was too blindly following the access cases listed in the ARM and
+not applying any extra thought.
+
+> (these remarks apply also to the access_lorid function)
+
+I think I will split out a shared subroutine for these.
+
+>> +    case 0x8: /* STLLR */
+>> +        if (!dc_isar_feature(aa64_lor, s)) {
+>> +            break;
+>> +        }
+>> +        /* StoreLORelease is the same as Store-Release for QEMU.  */
+>> +        /* fallthru */
+> 
+> We are as usual a bit inconsistent, but we seem to use the
+> spelling "fall through" for this linter-hint more often than
+> any of the other variations.
+
+I was going to say something about old habits, but I do note that I've somehow
+migrated from the witheringly old FALLTHRU.  So perhaps I can learn eventually...
+
+
+r~
