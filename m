@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gUrW8-0008Vc-1y
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 06:08:31 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gUrW8-0008Vf-36
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 06:08:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gUrW3-0002Wv-Dn
+	(envelope-from <eric.auger@redhat.com>) id 1gUrW3-0002X9-KB
 	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 06:08:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39376)
+Received: from mx1.redhat.com ([209.132.183.28]:53782)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gUrW3-0002WA-6L
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1gUrW3-0002WZ-Bb
 	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 06:08:23 -0500
-Date: Thu, 6 Dec 2018 16:38:10 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <20181206105830.43eb1d05@redhat.com>
-Message-ID: <nycvar.YSQ.7.76.1812061637070.2113@xnncv>
-References: <20181206084816.30485-1-ppandit@redhat.com>
-	<20181206105830.43eb1d05@redhat.com>
+References: <154393964026.28192.13536237934563059985.stgit@gimli.home>
+	<154394076572.28192.17922483382108051842.stgit@gimli.home>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <1473a7c8-2fdd-4d0e-2540-030d4a28770f@redhat.com>
+Date: Thu, 6 Dec 2018 12:08:14 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH] i2c: pm_smbus: check smb_index before
- block transfer write
+In-Reply-To: <154394076572.28192.17922483382108051842.stgit@gimli.home>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [for-4.0 PATCH v3 1/9] pcie: Create enums for link
+ speed and width
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,25 +30,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Michael Hanselmann <public@hansmi.ch>, "Michael S . Tsirkin" <mst@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
+Cc: Geoffrey McRae <geoff@hostfission.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-+-- On Thu, 6 Dec 2018, Igor Mammedov wrote --+
-| > From: Prasad J Pandit <pjp@fedoraproject.org>
-| > 
-| > While performing block transfer write in smb_ioport_writeb(),
-| > 'smb_index' is incremented and used to index smb_data[] array.
-| > Check 'smb_index' value to avoid OOB access.
-| > 
-| > Reported-by: Michael Hanselmann <public@hansmi.ch>
-| > Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-| pls squash in:
-| 
-| Fixes: 38ad4fae43 i2c: pm_smbus: Add block transfer capability
+Hi
 
-Do we need patch v2, or it can be done while merging it?
+On 12/4/18 5:26 PM, Alex Williamson wrote:
+> In preparation for reporting higher virtual link speeds and widths,
+> create enums and macros to help us manage them.
+> 
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Tested-by: Geoffrey McRae <geoff@hostfission.com>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+Thanks
+
+Eric
+> ---
+>  hw/pci/pcie.c              |    7 ++++---
+>  hw/vfio/pci.c              |    3 ++-
+>  include/hw/pci/pcie_regs.h |   23 +++++++++++++++++++++--
+>  3 files changed, 27 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+> index 6c91bd44a0a5..914a5261a79b 100644
+> --- a/hw/pci/pcie.c
+> +++ b/hw/pci/pcie.c
+> @@ -68,11 +68,12 @@ pcie_cap_v1_fill(PCIDevice *dev, uint8_t port, uint8_t type, uint8_t version)
+>      pci_set_long(exp_cap + PCI_EXP_LNKCAP,
+>                   (port << PCI_EXP_LNKCAP_PN_SHIFT) |
+>                   PCI_EXP_LNKCAP_ASPMS_0S |
+> -                 PCI_EXP_LNK_MLW_1 |
+> -                 PCI_EXP_LNK_LS_25);
+> +                 QEMU_PCI_EXP_LNKCAP_MLW(QEMU_PCI_EXP_LNK_X1) |
+> +                 QEMU_PCI_EXP_LNKCAP_MLS(QEMU_PCI_EXP_LNK_2_5GT));
+>  
+>      pci_set_word(exp_cap + PCI_EXP_LNKSTA,
+> -                 PCI_EXP_LNK_MLW_1 | PCI_EXP_LNK_LS_25);
+> +                 QEMU_PCI_EXP_LNKSTA_NLW(QEMU_PCI_EXP_LNK_X1) |
+> +                 QEMU_PCI_EXP_LNKSTA_CLS(QEMU_PCI_EXP_LNK_2_5GT));
+>  
+>      if (dev->cap_present & QEMU_PCIE_LNKSTA_DLLLA) {
+>          pci_word_test_and_set_mask(exp_cap + PCI_EXP_LNKSTA,
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 5c7bd9698496..74f9a46b4be0 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -1897,7 +1897,8 @@ static int vfio_setup_pcie_cap(VFIOPCIDevice *vdev, int pos, uint8_t size,
+>                                     PCI_EXP_TYPE_ENDPOINT << 4,
+>                                     PCI_EXP_FLAGS_TYPE);
+>              vfio_add_emulated_long(vdev, pos + PCI_EXP_LNKCAP,
+> -                                   PCI_EXP_LNK_MLW_1 | PCI_EXP_LNK_LS_25, ~0);
+> +                           QEMU_PCI_EXP_LNKCAP_MLW(QEMU_PCI_EXP_LNK_X1) |
+> +                           QEMU_PCI_EXP_LNKCAP_MLS(QEMU_PCI_EXP_LNK_2_5GT), ~0);
+>              vfio_add_emulated_word(vdev, pos + PCI_EXP_LNKCTL, 0, ~0);
+>          }
+>  
+> diff --git a/include/hw/pci/pcie_regs.h b/include/hw/pci/pcie_regs.h
+> index a95522a13b04..ad4e7808b8ac 100644
+> --- a/include/hw/pci/pcie_regs.h
+> +++ b/include/hw/pci/pcie_regs.h
+> @@ -34,10 +34,29 @@
+>  
+>  /* PCI_EXP_LINK{CAP, STA} */
+>  /* link speed */
+> -#define PCI_EXP_LNK_LS_25               1
+> +typedef enum PCIExpLinkSpeed {
+> +    QEMU_PCI_EXP_LNK_2_5GT = 1,
+> +    QEMU_PCI_EXP_LNK_5GT,
+> +    QEMU_PCI_EXP_LNK_8GT,
+> +    QEMU_PCI_EXP_LNK_16GT,
+> +} PCIExpLinkSpeed;
+> +
+> +#define QEMU_PCI_EXP_LNKCAP_MLS(speed)  (speed)
+> +#define QEMU_PCI_EXP_LNKSTA_CLS         QEMU_PCI_EXP_LNKCAP_MLS
+> +
+> +typedef enum PCIExpLinkWidth {
+> +    QEMU_PCI_EXP_LNK_X1 = 1,
+> +    QEMU_PCI_EXP_LNK_X2 = 2,
+> +    QEMU_PCI_EXP_LNK_X4 = 4,
+> +    QEMU_PCI_EXP_LNK_X8 = 8,
+> +    QEMU_PCI_EXP_LNK_X12 = 12,
+> +    QEMU_PCI_EXP_LNK_X16 = 16,
+> +    QEMU_PCI_EXP_LNK_X32 = 32,
+> +} PCIExpLinkWidth;
+>  
+>  #define PCI_EXP_LNK_MLW_SHIFT           ctz32(PCI_EXP_LNKCAP_MLW)
+> -#define PCI_EXP_LNK_MLW_1               (1 << PCI_EXP_LNK_MLW_SHIFT)
+> +#define QEMU_PCI_EXP_LNKCAP_MLW(width)  (width << PCI_EXP_LNK_MLW_SHIFT)
+> +#define QEMU_PCI_EXP_LNKSTA_NLW         QEMU_PCI_EXP_LNKCAP_MLW
+>  
+>  /* PCI_EXP_LINKCAP */
+>  #define PCI_EXP_LNKCAP_ASPMS_SHIFT      ctz32(PCI_EXP_LNKCAP_ASPMS)
+> 
+> 
