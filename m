@@ -1,41 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1gUxFP-0006b9-7m
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:15:39 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gUxNc-0004YA-N8
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:24:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1gUxFL-0007bV-3P
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:15:35 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28803
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1gUxFK-0007at-RP
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:15:31 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wB6H9kEj133266
-	for <qemu-devel@nongnu.org>; Thu, 6 Dec 2018 12:15:28 -0500
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2p76sr40k7-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 12:15:28 -0500
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Thu, 6 Dec 2018 17:15:27 -0000
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <richard.henderson@linaro.org>) id 1gUxNX-0003xO-Nr
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:24:04 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:34502)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gUxNX-0003ww-E8
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:23:59 -0500
+Received: by mail-ot1-x343.google.com with SMTP id t5so1155550otk.1
+	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 09:23:59 -0800 (PST)
+References: <20181203203839.757-1-richard.henderson@linaro.org>
+	<20181203203839.757-6-richard.henderson@linaro.org>
+	<CAFEAcA973PazwfLxUpAbbLUkYoGcTq=QrWCUDmmx7VgK8C2LJQ@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <b974bade-cfb2-7740-757a-8781a61c1f8b@linaro.org>
+Date: Thu, 6 Dec 2018 11:23:54 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20181206165047.GT29540@redhat.com>
-References: <20181128153526.10948-1-berrange@redhat.com>
-	<165bc19e-8ed2-8979-aea7-0f6031fc6df2@redhat.com>
-	<20181206165047.GT29540@redhat.com>
-Date: Thu, 06 Dec 2018 11:15:19 -0600
-Message-Id: <154411651930.28165.5754119001430373065@sif>
-Subject: Re: [Qemu-devel] [qemu-web PATCH] Document how to test the site
- with jekyll locally
+In-Reply-To: <CAFEAcA973PazwfLxUpAbbLUkYoGcTq=QrWCUDmmx7VgK8C2LJQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 05/10] target/arm: Introduce
+ arm_hcr_el2_eff
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,60 +33,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, alex.bennee@linaro.org, qemu-devel@nongnu.org, raimue@macports.org, Yu Ning <yu.ning@intel.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Quoting Daniel P. Berrang=C3=A9 (2018-12-06 10:50:47)
-> Copying Michael Roth as the only remaining non-Red Hat contributor
-> we still need approval from
+On 12/6/18 6:09 AM, Peter Maydell wrote:
+> On Mon, 3 Dec 2018 at 20:38, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>>
+>> Replace arm_hcr_el2_{fmo,imo,amo} with a more general routine
+>> that also takes SCR_EL3.NS (aka arm_is_secure_below_el3) into
+>> account, as documented for the plethora of bits in HCR_EL2.
+>>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  target/arm/cpu.h          | 67 +++++++++------------------------------
+>>  hw/intc/arm_gicv3_cpuif.c | 21 ++++++------
+>>  target/arm/helper.c       | 65 +++++++++++++++++++++++++++++++------
+>>  3 files changed, 82 insertions(+), 71 deletions(-)
+>>
+>> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+>> index 20d97b66de..e871b946c8 100644
+>> --- a/target/arm/cpu.h
+>> +++ b/target/arm/cpu.h
+>> @@ -1722,6 +1722,14 @@ static inline bool arm_is_secure(CPUARMState *env)
+>>  }
+>>  #endif
+>>
+>> +/**
+>> + * arm_hcr_el2_eff(): Return the effective value of HCR_EL2.
+>> + * E.g. when in secure state, fields in HCR_EL2 are suppressed,
+>> + * "for all purposes other than a direct read or write access of HCR_EL2."
+>> + * Not included here are RW, VI, VF.
+>> + */
+>> +uint64_t arm_hcr_el2_eff(CPUARMState *env);
+> 
+> This comment says the not-included bits are RW, VI, VF...
+> 
+>> +/*
+>> + * Return the effective value of HCR_EL2.
+>> + * Bits that are not included here:
+>> + * RW       (read from SCR_EL3.RW as needed)
+>> + */
+> 
+> ...but this comment only lists RW. Which is correct ?
+> 
+> Also, if VI, VF are in the list shouldn't VSE be too ?
 
-No objections from my end.
+VI and VF were on the list when I first wrote the patch, then one of the
+target-arm.next patches rearranged how those bits are handled.
 
-> =
+So correct is that they are *not* excluded.
 
-> On Wed, Nov 28, 2018 at 05:44:09PM +0100, Paolo Bonzini wrote:
-> > On 28/11/18 16:35, Daniel P. Berrang=C3=A9 wrote:
-> > > Add a README file that tells people this is a jekyll based static
-> > > website, and shows people how to run jekyll for testing purposes.
-> > > =
+>> +    } else if (ret & HCR_TGE) {
+>> +        if (ret & HCR_E2H) {
+>> +            ret &= ~(HCR_TTLBOS | HCR_TTLBIS | HCR_TOCU | HCR_TICAB |
+>> +                     HCR_TID4 | HCR_ID | HCR_CD | HCR_TDZ | HCR_TPU |
+>> +                     HCR_TPCP | HCR_TID2 | HCR_TID1 | HCR_TID0 | HCR_TWE |
+>> +                     HCR_TWI | HCR_DC | HCR_BSU_MASK | HCR_FB | HCR_AMO |
+>> +                     HCR_IMO | HCR_FMO | HCR_VM);
+> 
+> 
+> This list should also in theory include HCR_MIOCNCE, but the
+> QEMU implementation of that bit is going to be RAZ/WI anyway.
 
-> > > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > > ---
-> > > =
+Even if we do RAZ/WI, it's probably better to match the docs and exclude it
+here.  Fixed.
 
-> > > NB, we should really mention a license in the README too, but I don't
-> > > see info about what license we consider qemu-web to be covered by...
-> > =
+> 
+> HCR_TID1 is in the "ignore if TGE==1" group, not the "ignore if
+> {E2H, TGE} == {1,1}" group.
 
-> >     47        Paolo Bonzini <pbonzini@redhat.com>
-> >     44        Michael Roth <mdroth@linux.vnet.ibm.com>
-> >     13        Thomas Huth <thuth@redhat.com>
-> >      3        Eric Blake <eblake@redhat.com>
-> >      2        Daniel P. Berrange <berrange@redhat.com>
-> >      2        Jeff Cody <jcody@redhat.com>
-> >      1        Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> >      1        Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> >      1        Fam Zheng <famz@redhat.com>
-> >      1        Rainer M=C3=BCller <raimue@macports.org>
-> >      1        Stefan Hajnoczi <stefanha@gmail.com>
-> >      1        Yu Ning <yu.ning@intel.com>
-> > =
+Fixed.
 
-> > Anybody (especially non-RH people) disagrees with dual-license CC-BY-SA
-> > 4.0 and GPLv2+?  (So that we can copy from blog posts to manuals)?
-> > =
+> 
+> Maybe we should be also setting HCR_ATA here ? We could perhaps
+> leave that til we implement ARMv8.5-MemTag and understand it better.
 
-> > Paolo
-> =
+This list was created with the ARMv8.4 document.
+Perhaps a comment to that effect while v8.5 is still in flight?
 
-> Regards,
-> Daniel
-> -- =
+> 
+>> +        } else {
+>> +            ret &= ~(HCR_PTW | HCR_FB | HCR_TID1 | HCR_TID3 | HCR_TSC |
+>> +                     HCR_TACR | HCR_TSW | HCR_TTLB | HCR_TVM | HCR_HCD |
+>> +                     HCR_TRVM | HCR_TLOR);
+> 
+> Shouldn't these bits be being cleared regardless of E2H, rather
+> than only in the TGE==1 E2H==0 case ?
 
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
->=20
+Fixed.
+
+> Missing HCR_SWIO ?
+
+Fixed.
+
+> The list of bits cleared if TGE && E2H is highest-first, but this
+> list is lowest-first...
+
+Both lists now lowest first.
+
+
+r~
