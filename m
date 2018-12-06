@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gUl9J-0007te-Qh
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 23:20:34 -0500
+	(envelope-from <thuth@redhat.com>) id 1gUmJG-0007nm-OT
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 00:34:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gUl9E-0003OF-MX
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 23:20:29 -0500
-Date: Thu, 6 Dec 2018 14:25:35 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181206032535.GL768@umbus.fritz.box>
-References: <20181205232251.10446-1-clg@kaod.org>
-	<20181205232251.10446-4-clg@kaod.org>
+	(envelope-from <thuth@redhat.com>) id 1gUmJ9-0006kA-NT
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 00:34:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39046)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gUmJ7-0006UD-T3
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 00:34:42 -0500
+References: <1543845937-300-1-git-send-email-thuth@redhat.com>
+	<1543845937-300-2-git-send-email-thuth@redhat.com>
+	<31b42ffd-40bb-47c8-4ad4-e8e696596473@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <8d2072f0-d497-5e56-f0aa-2ec17d6f896d@redhat.com>
+Date: Thu, 6 Dec 2018 06:34:25 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="2EnvhqpWJq810sZn"
-Content-Disposition: inline
-In-Reply-To: <20181205232251.10446-4-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v6 03/37] ppc/xive: introduce the
- XiveNotifier interface
+In-Reply-To: <31b42ffd-40bb-47c8-4ad4-e8e696596473@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 1/7] configure: Add a test for the
+ minimum compiler version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,154 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
 
-
---2EnvhqpWJq810sZn
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Dec 06, 2018 at 12:22:17AM +0100, C=E9dric Le Goater wrote:
-> The XiveNotifier offers a simple interface, between the XiveSource
-> object and the main interrupt controller of the machine. It will
-> forward event notifications to the XIVE Interrupt Virtualization
-> Routing Engine (IVRE).
+On 2018-12-05 18:30, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 12/3/18 3:05 PM, Thomas Huth wrote:
+>> So far we only had implicit requirements for the minimum compiler vers=
+ion,
+>> e.g. we require at least GCC 4.1 for the support of atomics. However,
+>> such old compiler versions are not tested anymore by the developers, s=
+o
+>> they are not really supported anymore. Since we recently declared expl=
+icitly
+>> what platforms we intend to support, we can also get more explicit on =
+the
+>> compiler version now. The supported distributions use the following ve=
+rsion
+>> of GCC:
+>>
+>>       RHEL-7: 4.8.5
+>>       Debian (Stretch): 6.3.0
+>>       Debian (Jessie): 4.8.4
+>>       OpenBSD (ports): 4.9.4
+>>       FreeBSD (ports): 8.2.0
+>>       OpenSUSE Leap 15: 7.3.1
+>>       Ubuntu (Xenial): 5.3.1
+>>       macOS (Homebrew): 8.2.0
 >=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> ---
->  include/hw/ppc/xive.h | 23 +++++++++++++++++++++++
->  hw/intc/xive.c        | 25 +++++++++++++++++++++++++
->  2 files changed, 48 insertions(+)
->=20
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index 7cebc32eba4c..6770cffec67d 100644
-> --- a/include/hw/ppc/xive.h
-> +++ b/include/hw/ppc/xive.h
-> @@ -142,6 +142,27 @@
-> =20
->  #include "hw/qdev-core.h"
-> =20
-> +/*
-> + * XIVE Fabric (Interface between Source and Router)
-> + */
-> +
-> +typedef struct XiveNotifier {
-> +    Object parent;
-> +} XiveNotifier;
-> +
-> +#define TYPE_XIVE_NOTIFIER "xive-fabric"
+> I'd like to track this in a machine parsable format, but sure where it
+> better fits however, I'd prefer the git repo, and having the wiki
+> pointing to the git repo.
 
-I'm applying this, but changing the string here from "xive-fabric" to
-"xive-notifier".
+I don't think that it makes sense to put fixed version numbers into the
+git or wiki - the information will expire soon, and it is additional
+maintenance to keep them up to date. We already got the generic
+description here:
 
+https://qemu.weilnetz.de/doc/qemu-doc.html#Supported-build-platforms
 
-> +#define XIVE_NOTIFIER(obj)                                     \
-> +    OBJECT_CHECK(XiveNotifier, (obj), TYPE_XIVE_NOTIFIER)
-> +#define XIVE_NOTIFIER_CLASS(klass)                                     \
-> +    OBJECT_CLASS_CHECK(XiveNotifierClass, (klass), TYPE_XIVE_NOTIFIER)
-> +#define XIVE_NOTIFIER_GET_CLASS(obj)                                   \
-> +    OBJECT_GET_CLASS(XiveNotifierClass, (obj), TYPE_XIVE_NOTIFIER)
-> +
-> +typedef struct XiveNotifierClass {
-> +    InterfaceClass parent;
-> +    void (*notify)(XiveNotifier *xn, uint32_t lisn);
-> +} XiveNotifierClass;
-> +
->  /*
->   * XIVE Interrupt Source
->   */
-> @@ -171,6 +192,8 @@ typedef struct XiveSource {
->      uint64_t        esb_flags;
->      uint32_t        esb_shift;
->      MemoryRegion    esb_mmio;
-> +
-> +    XiveNotifier    *xive;
->  } XiveSource;
-> =20
->  /*
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index 11c7aac962de..79238eb57fae 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -155,7 +155,11 @@ static bool xive_source_esb_eoi(XiveSource *xsrc, ui=
-nt32_t srcno)
->   */
->  static void xive_source_notify(XiveSource *xsrc, int srcno)
->  {
-> +    XiveNotifierClass *xnc =3D XIVE_NOTIFIER_GET_CLASS(xsrc->xive);
-> =20
-> +    if (xnc->notify) {
-> +        xnc->notify(xsrc->xive, srcno);
-> +    }
->  }
-> =20
->  /*
-> @@ -362,6 +366,17 @@ static void xive_source_reset(void *dev)
->  static void xive_source_realize(DeviceState *dev, Error **errp)
->  {
->      XiveSource *xsrc =3D XIVE_SOURCE(dev);
-> +    Object *obj;
-> +    Error *local_err =3D NULL;
-> +
-> +    obj =3D object_property_get_link(OBJECT(dev), "xive", &local_err);
-> +    if (!obj) {
-> +        error_propagate(errp, local_err);
-> +        error_prepend(errp, "required link 'xive' not found: ");
-> +        return;
-> +    }
-> +
-> +    xsrc->xive =3D XIVE_NOTIFIER(obj);
-> =20
->      if (!xsrc->nr_irqs) {
->          error_setg(errp, "Number of interrupt needs to be greater than 0=
-");
-> @@ -428,9 +443,19 @@ static const TypeInfo xive_source_info =3D {
->      .class_init    =3D xive_source_class_init,
->  };
-> =20
-> +/*
-> + * XIVE Fabric
-> + */
-> +static const TypeInfo xive_fabric_info =3D {
-> +    .name =3D TYPE_XIVE_NOTIFIER,
-> +    .parent =3D TYPE_INTERFACE,
-> +    .class_size =3D sizeof(XiveNotifierClass),
-> +};
-> +
->  static void xive_register_types(void)
->  {
->      type_register_static(&xive_source_info);
-> +    type_register_static(&xive_fabric_info);
->  }
-> =20
->  type_init(xive_register_types)
+So you just have to follow these instructions to get to the supported
+versions.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---2EnvhqpWJq810sZn
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwIlqwACgkQbDjKyiDZ
-s5I8jQ//YT2rbeR8S24yfWuJCjaAPrHedEi/35an7bcoKO/nb03EuEMSHv//LWmz
-3jyXMaPlMk1mL4N4ZRsfgR0S/aeDPKhHG9DQvH0q0JciyXC8tsEmrT2G5SyHJS8Q
-Ypc03FgpOluEcIZds5pRJqCxykk/59ohWPp00mNb6b97HgoyV8lLIHBiepBVIdfv
-BdtjMeYk2087B16Xe7dSCY449DeI+1K8ytjqVw5lZOjNqf+4V/AzkWQagKWungBc
-297fzs28hzb3RPkOPVGkeEDRONJBbZ7JCIehjWOpagAGYezRUg+tB8lXFV2m+yCW
-p3W1vq47KsWcr73cLfNbdvHjn+pD3eqtDX7bodtSxJro0eVrOZEMJ5GwnZH6eSBU
-9P/c0Fxjvt7MyQMV9I6+BzuFwfe0ubBPw80WegImOoZisUZyJAUBsfBVvQaxhR38
-QrloGs415VRYctOSfvBLArSf5I66kI9X7XZT8eK6Ef2kMh3xNnbH3xVXXqylKmeg
-Wv5IS4L2HUeSXrmjzqcZGP1ncZBvbIp19XS/EEvp2RAwzgUXEbmY+fMlgy/oDumz
-u3bWDpmYuZdrZWskd7rhoqOWnffKb/8DDxwrctD/f5BSkeSo6VcC3szIUnPWsX1d
-VI/EP96QGkle0vcApKAPl6Fy0pBnE1Ee/0nZBMRHPceW2qFml0Q=
-=/+/O
------END PGP SIGNATURE-----
-
---2EnvhqpWJq810sZn--
+ Thomas
