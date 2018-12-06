@@ -1,26 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gUtR9-0002g2-IP
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 08:11:32 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gUtZ4-0000pv-Mz
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 08:19:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gUtR3-00072i-MI
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 08:11:27 -0500
-Resent-Message-Id: <E1gUtR3-00072i-MI@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21775)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gUtR3-00071t-Bx
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 08:11:21 -0500
-In-Reply-To: <20181206121743.20762-1-armbru@redhat.com>
-Message-ID: <154410186289.6627.18299070552393692973@bb8f5089e434>
-Reply-To: <qemu-devel@nongnu.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 6 Dec 2018 05:11:04 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] json: Fix to reject duplicate object
- member names
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gUtZ0-0000Li-K5
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 08:19:38 -0500
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Date: Thu,  6 Dec 2018 16:19:28 +0300
+Message-Id: <1544102368-2486-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v3] qemu-img info lists bitmap directory entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +17,246 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, mreitz@redhat.com
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIwNjEyMTc0My4yMDc2
-Mi0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpUeXBlOiBzZXJpZXMKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0ganNv
-bjogRml4IHRvIHJlamVjdCBkdXBsaWNhdGUgb2JqZWN0IG1lbWJlciBuYW1lcwpNZXNzYWdlLWlk
-OiAyMDE4MTIwNjEyMTc0My4yMDc2Mi0xLWFybWJydUByZWRoYXQuY29tCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAt
-LW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQg
-bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
-CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
-bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
-cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
-ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
-VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
-NDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmEyYzBhYzkganNv
-bjogRml4IHRvIHJlamVjdCBkdXBsaWNhdGUgb2JqZWN0IG1lbWJlciBuYW1lcwoKPT09IE9VVFBV
-VCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBqc29uOiBGaXggdG8gcmVqZWN0IGR1cGxp
-Y2F0ZSBvYmplY3QgbWVtYmVyIG5hbWVzLi4uCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM0
-MTogRklMRTogcW9iamVjdC9qc29uLXBhcnNlci5jOjI5NToKKyAgICAgICAgJAoKdG90YWw6IDEg
-ZXJyb3JzLCAwIHdhcm5pbmdzLCAxOCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0
-ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0
-Y2hldy5vcmcvbG9ncy8yMDE4MTIwNjEyMTc0My4yMDc2Mi0xLWFybWJydUByZWRoYXQuY29tL3Rl
-c3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+The 'Format specific information' of qemu-img info command will show
+the name, flags and granularity for every QCOW2 bitmap as follows:
+
+image: /vz/vmprivate/VM1/harddisk.hdd
+file format: qcow2
+virtual size: 64G (68719476736 bytes)
+disk size: 3.0M
+cluster_size: 1048576
+Format specific information:
+    compat: 1.1
+    lazy refcounts: true
+    bitmaps:
+        [0]:
+            flags:
+                [0]: in-use
+                [1]: auto
+            name: back-up1
+            unknown flags: 4
+            granularity: 65536
+        [1]:
+            flags:
+                [0]: in-use
+                [1]: auto
+            name: back-up2
+            unknown flags: 8
+            granularity: 65536
+    refcount bits: 16
+    corrupt: false
+
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+---
+v3:
+Now, qcow2_get_bitmap_info_list() is invoked under the condition of QCOW
+version #3 to avoid memory leaks in case of QCOW version #2.
+Furthermore, qcow2_get_bitmap_info_list() checks the number of existing bitmaps.
+So, if no bitmap exists, no bitmap error message is printed in the output.
+The data type of the bitmap 'granularity' parameter was left as 'uint32'
+because bitmap_list_load() returns error if granularity_bits is grater than 31.
+
+v2:
+'[PATCH v2] qemu-img info lists bitmap directory entries'
+The targeted version of the release at 'Since' word of the comments to the new
+structures changed to 4.0 in the file qapi/block-core.json.
+A comment to the 'bitmaps' new member was supplied.
+The 'unknown flags' parameter was introduced to indicate presence of QCOW2
+bitmap unknown flags, if any.
+The word 'dirty' was removed from the code and from the comments as we list all
+the bitmaps.
+The 'bitmaps' printed parameter was removed for the release versions earlier
+than 3.x.
+The example of the output was moved above the 'Signed-off-by' line.
+
+The first version was '[PATCH] qemu-img info lists bitmap directory entries'
+
+ block/qcow2-bitmap.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ block/qcow2.c        |  8 ++++++++
+ block/qcow2.h        |  2 ++
+ qapi/block-core.json | 40 ++++++++++++++++++++++++++++++++++++-
+ 4 files changed, 105 insertions(+), 1 deletion(-)
+
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index accebef..00b33c8 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -1008,6 +1008,62 @@ fail:
+     return false;
+ }
+ 
++static Qcow2BitmapInfoFlagsList *get_bitmap_info_flags(uint32_t flags)
++{
++    Qcow2BitmapInfoFlagsList *list = NULL;
++    Qcow2BitmapInfoFlagsList **plist = &list;
++
++    if (flags & BME_FLAG_IN_USE) {
++        Qcow2BitmapInfoFlagsList *entry = g_new0(Qcow2BitmapInfoFlagsList, 1);
++        entry->value = QCOW2_BITMAP_INFO_FLAGS_IN_USE;
++        *plist = entry;
++        plist = &entry->next;
++    }
++    if (flags & BME_FLAG_AUTO) {
++        Qcow2BitmapInfoFlagsList *entry = g_new0(Qcow2BitmapInfoFlagsList, 1);
++        entry->value = QCOW2_BITMAP_INFO_FLAGS_AUTO;
++        *plist = entry;
++    }
++    return list;
++}
++
++Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
++                                                Error **errp)
++{
++    BDRVQcow2State *s = bs->opaque;
++    Qcow2BitmapList *bm_list;
++    Qcow2Bitmap *bm;
++    Qcow2BitmapInfoList *list = NULL;
++    Qcow2BitmapInfoList **plist = &list;
++
++    if (s->nb_bitmaps == 0) {
++        return NULL;
++    }
++
++    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
++                               s->bitmap_directory_size, errp);
++    if (bm_list == NULL) {
++        return NULL;
++    }
++
++    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
++        Qcow2BitmapInfo *info = g_new0(Qcow2BitmapInfo, 1);
++        Qcow2BitmapInfoList *obj = g_new0(Qcow2BitmapInfoList, 1);
++        info->granularity = 1U << bm->granularity_bits;
++        info->name = g_strdup(bm->name);
++        info->flags = get_bitmap_info_flags(bm->flags);
++        info->unknown_flags = bm->flags & ~(BME_FLAG_IN_USE | BME_FLAG_AUTO);
++        info->has_unknown_flags = !!info->unknown_flags;
++        obj->value = info;
++        *plist = obj;
++        plist = &obj->next;
++    }
++
++    bitmap_list_free(bm_list);
++
++    return list;
++}
++
+ int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
+                                  Error **errp)
+ {
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 991d6ac..a023856 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -4254,6 +4254,8 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs)
+     BDRVQcow2State *s = bs->opaque;
+     ImageInfoSpecific *spec_info;
+     QCryptoBlockInfo *encrypt_info = NULL;
++    Error *local_err = NULL;
++    Qcow2BitmapInfoList *bitmaps;
+ 
+     if (s->crypto != NULL) {
+         encrypt_info = qcrypto_block_get_info(s->crypto, &error_abort);
+@@ -4270,6 +4272,10 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs)
+             .refcount_bits      = s->refcount_bits,
+         };
+     } else if (s->qcow_version == 3) {
++        bitmaps = qcow2_get_bitmap_info_list(bs, &local_err);
++        if (local_err != NULL) {
++            error_report_err(local_err);
++        }
+         *spec_info->u.qcow2.data = (ImageInfoSpecificQCow2){
+             .compat             = g_strdup("1.1"),
+             .lazy_refcounts     = s->compatible_features &
+@@ -4279,6 +4285,8 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs)
+                                   QCOW2_INCOMPAT_CORRUPT,
+             .has_corrupt        = true,
+             .refcount_bits      = s->refcount_bits,
++            .has_bitmaps        = !!bitmaps,
++            .bitmaps            = bitmaps,
+         };
+     } else {
+         /* if this assertion fails, this probably means a new version was
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 8662b68..0ec2b3d 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -685,6 +685,8 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
+                                   void **refcount_table,
+                                   int64_t *refcount_table_size);
+ bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp);
++Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
++                                                Error **errp);
+ int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
+                                  Error **errp);
+ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index d4fe710..55d7056 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -69,6 +69,8 @@
+ # @encrypt: details about encryption parameters; only set if image
+ #           is encrypted (since 2.10)
+ #
++# @bitmaps: list of qcow2 bitmaps details (since 4.0)
++#
+ # Since: 1.7
+ ##
+ { 'struct': 'ImageInfoSpecificQCow2',
+@@ -77,7 +79,8 @@
+       '*lazy-refcounts': 'bool',
+       '*corrupt': 'bool',
+       'refcount-bits': 'int',
+-      '*encrypt': 'ImageInfoSpecificQCow2Encryption'
++      '*encrypt': 'ImageInfoSpecificQCow2Encryption',
++      '*bitmaps': ['Qcow2BitmapInfo']
+   } }
+ 
+ ##
+@@ -454,6 +457,41 @@
+            'status': 'DirtyBitmapStatus'} }
+ 
+ ##
++# @Qcow2BitmapInfoFlags:
++#
++# An enumeration of states that a bitmap can report to the user.
++#
++# @in-use: The bitmap was not saved correctly and may be inconsistent.
++#
++# @auto: The bitmap must reflect all changes of the virtual disk by any
++#        application that would write to this qcow2 file.
++#
++# Since: 4.0
++##
++{ 'enum': 'Qcow2BitmapInfoFlags',
++  'data': ['in-use', 'auto'] }
++
++##
++# @Qcow2BitmapInfo:
++#
++# Qcow2 bitmap information.
++#
++# @name: the name of the bitmap
++#
++# @granularity: granularity of the bitmap in bytes
++#
++# @flags: flags of the bitmap
++#
++# @unknown-flags: unspecified flags if detected
++#
++# Since: 4.0
++##
++{ 'struct': 'Qcow2BitmapInfo',
++  'data': {'name': 'str', 'granularity': 'uint32',
++           'flags': ['Qcow2BitmapInfoFlags'],
++           '*unknown-flags': 'uint32' } }
++
++##
+ # @BlockLatencyHistogramInfo:
+ #
+ # Block latency histogram.
+-- 
+1.8.3.1
