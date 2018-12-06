@@ -1,28 +1,30 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:34254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gUr3e-0001g7-LC
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 05:39:13 -0500
+	(envelope-from <liq3ea@outlook.com>) id 1gUr3p-0001g7-MA
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 05:39:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gUr0B-0006VG-25
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 05:35:32 -0500
-Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:43052)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gUr0A-0006SD-OU
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 05:35:26 -0500
-Received: by mail-yb1-xb43.google.com with SMTP id x144so6593004ybg.10
-	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 02:35:26 -0800 (PST)
+	(envelope-from <liq3ea@outlook.com>) id 1gUqzB-000456-Fa
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 05:34:30 -0500
+Received: from mail-oln040092014103.outbound.protection.outlook.com
+	([40.92.14.103]:15266
+	helo=NAM05-DM3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liq3ea@outlook.com>) id 1gUqzB-0003yX-3C
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 05:34:25 -0500
+From: li qiang <liq3ea@outlook.com>
+Date: Thu, 6 Dec 2018 10:34:22 +0000
+Message-ID: <BN6PR18MB12207477BC1FC04674F98A2E9FA90@BN6PR18MB1220.namprd18.prod.outlook.com>
+References: <20181206084816.30485-1-ppandit@redhat.com>
+	<BN6PR18MB1220A0A33454573CA39058659FA90@BN6PR18MB1220.namprd18.prod.outlook.com>
+	<CAFEAcA_B3FNQXLP4YnL70EPoFUbM89Dh1eFdZSVzpkJrgt+j_g@mail.gmail.com>
+In-Reply-To: <CAFEAcA_B3FNQXLP4YnL70EPoFUbM89Dh1eFdZSVzpkJrgt+j_g@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <2527C8445A2693449C4CA2B433D84685@namprd18.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20181206063552.6701-1-xieyongji@baidu.com>
-	<1157991544088071@myt4-a988562a11ab.qloud-c.yandex.net>
-	<CAONzpcZ4Mvp6vFF9y1X9ymrtRi0G+sZAC2bSjH0f1tv=7V6_9Q@mail.gmail.com>
-	<1184491544089924@myt4-a988562a11ab.qloud-c.yandex.net>
-In-Reply-To: <1184491544089924@myt4-a988562a11ab.qloud-c.yandex.net>
-From: Yongji Xie <elohimes@gmail.com>
-Date: Thu, 6 Dec 2018 18:35:12 +0800
-Message-ID: <CAONzpcaDa-5R8WPZM2i6i44naf=rB3JNOxHwOpN7Gm+TBm9GVQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-4.0 0/6] vhost-user-blk: Add support
- for backend reconnecting
+Subject: Re: [Qemu-devel] [PATCH] i2c: pm_smbus: check smb_index before
+ block transfer write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,21 +33,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yury-kotov@yandex-team.ru
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, marcandre.lureau@redhat.com, nixun@baidu.com, qemu-devel@nongnu.org, lilin24@baidu.com, zhangyu31@baidu.com, chaiwen@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: P J P <ppandit@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "public@hansmi.ch" <public@hansmi.ch>, Prasad J Pandit <pjp@fedoraproject.org>, "Michael S. Tsirkin" <mst@redhat.com>, Li Qiang <liq3ea@163.com>, "liq3ea@gmail.com" <liq3ea@gmail.com>
 
-On Thu, 6 Dec 2018 at 17:52, Yury Kotov <yury-kotov@yandex-team.ru> wrote:
->
-> Yes, I also think that realize shout be sync.
->
-> But may be it's better to add an 'disconnected' option to init the chardev
-> in disconnected state, then do the first connection with
-> qemu_chr_fe_wait_connected from vhost_user_blk_realize. So when
-> connection will be broken in realize we can try again.
-> What do you think about it?
->
-
-Sounds good to me. And maybe we need to add a timeout for the retrying.
-
-Thanks,
-Yongji
+DQrlnKggMjAxOC8xMi82IDE4OjE2LCBQZXRlciBNYXlkZWxsIOWGmemBkzoNCj4gT24gVGh1LCA2
+IERlYyAyMDE4IGF0IDA5OjEwLCBsaSBxaWFuZzxsaXEzZWFAb3V0bG9vay5jb20+ICB3cm90ZToN
+Cj4+IE9oLi4uIEZpbmFsbHkgYW5vdGhlciBvbmUgZmluZCB0aGlzLi4uLi4NCj4+DQo+PiBJJ3Zl
+IGFscmVhZHkgZm91bmQgdGhpcy4gVGhpcyBpcyB2ZXJ5IGEgc2VyaW91cyBzZWN1cml0eSBpc3N1
+ZS4NCj4gSWYgeW91IGZpbmQgYSBzZWN1cml0eSBpc3N1ZSwgd2Ugd291bGQgYXBwcmVjaWF0ZSBp
+dCBpZg0KPiB5b3UgbGV0IHVzIGtub3csIHJhdGhlciB0aGFuIGp1c3Qgd2FpdGluZyB0byBzZWUg
+aWYNCj4gYW55Ym9keSBlbHNlIG5vdGljZXMgaXQuLi4NCg0KSSdtIHNvcnJ5IGZvciB0aGF0Lg0K
+DQpUbyBiZSBwZXJmZWN0LCBJJ20gY3VycmVudGx5IHRyeWluZyB0byB3cml0ZSBhbiBleHAgZm9y
+IGk0NDBmeC4NCg0KSSBpbnRlbmQgcmVwb3J0IGl0IGFmdGVyIGNvbXBsZXRpbmcgaXQuDQoNClRo
+YW5rcywNCkxpIFFpYW5nDQoNCg0KPiB0aGFua3MNCj4gLS0gUE1NDQo=
