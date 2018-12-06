@@ -1,24 +1,47 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gUy1L-0000hl-CR
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 13:05:14 -0500
+	(envelope-from <alifm@linux.ibm.com>) id 1gUy1g-0000gP-TX
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 13:05:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gUxsN-0004ED-Ah
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:55:52 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35642)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gUxsN-0004Dx-4k
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:55:51 -0500
-Received: by mail-oi1-x243.google.com with SMTP id v6so1152975oif.2
-	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 09:55:51 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu,  6 Dec 2018 11:55:41 -0600
-Message-Id: <20181206175541.29508-4-richard.henderson@linaro.org>
-In-Reply-To: <20181206175541.29508-1-richard.henderson@linaro.org>
-References: <20181206175541.29508-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 3/3] target/arm: Implement the ARMv8.1-LOR
- extension
+	(envelope-from <alifm@linux.ibm.com>) id 1gUxnn-0001LN-HF
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:51:11 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40100
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1gUxnj-0001Hn-PY
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:51:07 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wB6HgrrQ115301
+	for <qemu-devel@nongnu.org>; Thu, 6 Dec 2018 12:50:57 -0500
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2p76sr5mda-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 12:50:57 -0500
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
+	Thu, 6 Dec 2018 17:50:56 -0000
+References: <20181122165432.4437-1-cohuck@redhat.com>
+	<20181204133810.66e8cfe5@oc2783563651>
+	<20181204141130.06496b9b.cohuck@redhat.com>
+	<20181204160236.54de2784@oc2783563651>
+	<20181205135402.33c2b22d.cohuck@redhat.com>
+	<aa190e90-f832-7958-aa83-1486e570bf40@linux.ibm.com>
+	<20181206153917.59e8e291.cohuck@redhat.com>
+	<bb6c992e-ac03-ce3e-fba8-283e392f1543@linux.ibm.com>
+	<20181206172155.6a7dd69e.cohuck@redhat.com>
+From: Farhan Ali <alifm@linux.ibm.com>
+Date: Thu, 6 Dec 2018 12:50:50 -0500
+MIME-Version: 1.0
+In-Reply-To: <20181206172155.6a7dd69e.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <7c88b304-aced-8330-a750-0765e0bd721a@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 0/3] vfio-ccw: support hsch/csch (kernel
+ part)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,200 +50,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Jason J . Herne" <jjherne@linux.ibm.com>
 
-Provide a trivial implementation with zero limited ordering regions,
-which causes the LDLAR and STLLR instructions to devolve into the
-LDAR and STLR instructions from the base ARMv8.0 instruction set.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
----
-v2: Mark LORID_EL1 read-only.
-    Add TLOR access checks.
-    Conditionally unmask TLOR in hcr/scr_write.
-v3: Fix isar_feature_aa64_lor.
-    Split out access_lor_ns.
-    Defer all {E2H,TGE} vs TLOR testing to arm_hcr_el2_eff.
----
- target/arm/cpu.h           |  5 +++
- target/arm/cpu64.c         |  1 +
- target/arm/helper.c        | 75 ++++++++++++++++++++++++++++++++++++++
- target/arm/translate-a64.c | 12 ++++++
- 4 files changed, 93 insertions(+)
+On 12/06/2018 11:21 AM, Cornelia Huck wrote:
+> On Thu, 6 Dec 2018 10:26:12 -0500
+> Farhan Ali <alifm@linux.ibm.com> wrote:
+> 
+>> On 12/06/2018 09:39 AM, Cornelia Huck wrote:
+>>> On Wed, 5 Dec 2018 13:34:11 -0500
+>>> Farhan Ali <alifm@linux.ibm.com> wrote:
+>>>    
+>>>> On 12/05/2018 07:54 AM, Cornelia Huck wrote:
+>>>>>> Yeah, that is perfectly clear, but it ain't the complete story. E.g.
+>>>>>> are subsequent commands blocking until the preceding command finishes
+>>>>>> is part of the interface. And what is good implementation depends on the
+>>>>>> answer. What I mean, I first need to understand how things are supposed
+>>>>>> to work (together) so I can double check that against the
+>>>>>> implementation. Otherwise all I can do is nitpicking.
+>>>>>>
+>>>>>> To get more tangible: we are in the middle of processing an SSCH request
+>>>>>> (e.g. doing the translation) when a HSCH comes in. What should happen?
+>>>>>> Should we start processing HSCH after he instruction part of SSCH is
+>>>>>> done -- which currently includes translation? Or should we -EBUSY? Or do
+>>>>>> we abort START related activities and do the HALT stuff?
+>>>>> I think most of the sorting-out-the-operations stuff should be done by
+>>>>> the hardware itself, and we should not really try to enforce anything
+>>>>> special in our vfio code.
+>>>>>
+>>>>> For your example, it might be best if a hsch is always accepted and
+>>>>> send on towards the hardware. Probably best to reflect back -EAGAIN if
+>>>>> we're currently processing another instruction from another vcpu, so
+>>>>> that the user space caller can retry. Same for ssch, if another ssch is
+>>>>> already being processed. We*could*  reflect cc 2 if the fctl bit is
+>>>>> already set, but that won't do for csch, so it is probably best to have
+>>>>> the hardware figure that out in any case.
+>>>>>
+>>>>> If I read the code correctly, we currently reflect -EBUSY and not
+>>>>> -EAGAIN if we get a ssch request while already processing another one.
+>>>>> QEMU hands that back to the guest as a cc 2, which is not 100% correct.
+>>>>> In practice, we don't see this with Linux guests due to locking.
+>>>>>       
+>>>>
+>>>> If we have a ssch and a csch immediately afterwards from userspace, will
+>>>> we end up issuing csch first and then ssch to the hardware?
+>>>>
+>>>> If I understand correctly, the ccw translation as part of the ssch can
+>>>> be a slow operation so it might be possible we issue the csch first?
+>>>> In that case we won't actually clear the original start function as
+>>>> intended.
+>>>
+>>> When we start processing the ssch request (translation and so on), we
+>>> set the state to BUSY. This means that any csch request will get a
+>>> -EBUSY, no overtaking possible. (I think maybe I'll need to check what
+>>> this series looks like if I rebase it on top of Pierre's rework, as he
+>>> did some changes in the state machine.)
+>>
+>> I think you meant the state is set to BOXED? otherwise the patch 3 says
+>> if state is BUSY and CLEAR event request comes in, we issue the clear
+>> instruction, no?
+> 
+> That's what I meant with "need to rebase" :) The BOXED state is gone; I
+> just had not rebased on top of it. There's more changes in the state
+> machine; if we are on the same page as to what should happen, I can
+> start massaging the patches.
+> 
+> 
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 05ac883b6b..c943f35dd9 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -3340,6 +3340,11 @@ static inline bool isar_feature_aa64_sve(const ARMISARegisters *id)
-     return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, SVE) != 0;
- }
- 
-+static inline bool isar_feature_aa64_lor(const ARMISARegisters *id)
-+{
-+    return FIELD_EX64(id->id_aa64mmfr1, ID_AA64MMFR1, LO) != 0;
-+}
-+
- /*
-  * Forward to the above feature tests given an ARMCPU pointer.
-  */
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 1a4289c9dd..1d57be0c91 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -326,6 +326,7 @@ static void aarch64_max_initfn(Object *obj)
- 
-         t = cpu->isar.id_aa64mmfr1;
-         t = FIELD_DP64(t, ID_AA64MMFR1, HPDS, 1); /* HPD */
-+        t = FIELD_DP64(t, ID_AA64MMFR1, LO, 1);
-         cpu->isar.id_aa64mmfr1 = t;
- 
-         /* Replicate the same data to the 32-bit id registers.  */
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 4d25bafd12..1e20956376 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -1281,6 +1281,7 @@ static void scr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
- {
-     /* Begin with base v8.0 state.  */
-     uint32_t valid_mask = 0x3fff;
-+    ARMCPU *cpu = arm_env_get_cpu(env);
- 
-     if (arm_el_is_aa64(env, 3)) {
-         value |= SCR_FW | SCR_AW;   /* these two bits are RES1.  */
-@@ -1303,6 +1304,9 @@ static void scr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
-             valid_mask &= ~SCR_SMD;
-         }
-     }
-+    if (cpu_isar_feature(aa64_lor, cpu)) {
-+        valid_mask |= SCR_TLOR;
-+    }
- 
-     /* Clear all-context RES0 bits.  */
-     value &= valid_mask;
-@@ -3963,6 +3967,9 @@ static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
-          */
-         valid_mask &= ~HCR_TSC;
-     }
-+    if (cpu_isar_feature(aa64_lor, cpu)) {
-+        valid_mask |= HCR_TLOR;
-+    }
- 
-     /* Clear RES0 bits.  */
-     value &= valid_mask;
-@@ -5028,6 +5035,42 @@ static uint64_t id_aa64pfr0_read(CPUARMState *env, const ARMCPRegInfo *ri)
-     return pfr0;
- }
- 
-+/* Shared logic between LORID and the rest of the LOR* registers.
-+ * Secure state has already been delt with.
-+ */
-+static CPAccessResult access_lor_ns(CPUARMState *env)
-+{
-+    int el = arm_current_el(env);
-+
-+    if (el < 2 && (arm_hcr_el2_eff(env) & HCR_TLOR)) {
-+        return CP_ACCESS_TRAP_EL2;
-+    }
-+    if (el < 3 && (env->cp15.scr_el3 & SCR_TLOR)) {
-+        return CP_ACCESS_TRAP_EL3;
-+    }
-+    return CP_ACCESS_OK;
-+}
-+
-+static CPAccessResult access_lorid(CPUARMState *env, const ARMCPRegInfo *ri,
-+                                   bool isread)
-+{
-+    if (arm_is_secure_below_el3(env)) {
-+        /* Access ok in secure mode.  */
-+        return CP_ACCESS_OK;
-+    }
-+    return access_lor_ns(env);
-+}
-+
-+static CPAccessResult access_lor_other(CPUARMState *env,
-+                                       const ARMCPRegInfo *ri, bool isread)
-+{
-+    if (arm_is_secure_below_el3(env)) {
-+        /* Access denied in secure mode.  */
-+        return CP_ACCESS_TRAP;
-+    }
-+    return access_lor_ns(env);
-+}
-+
- void register_cp_regs_for_features(ARMCPU *cpu)
- {
-     /* Register all the coprocessor registers based on feature bits */
-@@ -5769,6 +5812,38 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-         define_one_arm_cp_reg(cpu, &sctlr);
-     }
- 
-+    if (cpu_isar_feature(aa64_lor, cpu)) {
-+        /*
-+         * A trivial implementation of ARMv8.1-LOR leaves all of these
-+         * registers fixed at 0, which indicates that there are zero
-+         * supported Limited Ordering regions.
-+         */
-+        static const ARMCPRegInfo lor_reginfo[] = {
-+            { .name = "LORSA_EL1", .state = ARM_CP_STATE_AA64,
-+              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 0,
-+              .access = PL1_RW, .accessfn = access_lor_other,
-+              .type = ARM_CP_CONST, .resetvalue = 0 },
-+            { .name = "LOREA_EL1", .state = ARM_CP_STATE_AA64,
-+              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 1,
-+              .access = PL1_RW, .accessfn = access_lor_other,
-+              .type = ARM_CP_CONST, .resetvalue = 0 },
-+            { .name = "LORN_EL1", .state = ARM_CP_STATE_AA64,
-+              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 2,
-+              .access = PL1_RW, .accessfn = access_lor_other,
-+              .type = ARM_CP_CONST, .resetvalue = 0 },
-+            { .name = "LORC_EL1", .state = ARM_CP_STATE_AA64,
-+              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 3,
-+              .access = PL1_RW, .accessfn = access_lor_other,
-+              .type = ARM_CP_CONST, .resetvalue = 0 },
-+            { .name = "LORID_EL1", .state = ARM_CP_STATE_AA64,
-+              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 7,
-+              .access = PL1_R, .accessfn = access_lorid,
-+              .type = ARM_CP_CONST, .resetvalue = 0 },
-+            REGINFO_SENTINEL
-+        };
-+        define_arm_cp_regs(cpu, lor_reginfo);
-+    }
-+
-     if (cpu_isar_feature(aa64_sve, cpu)) {
-         define_one_arm_cp_reg(cpu, &zcr_el1_reginfo);
-         if (arm_feature(env, ARM_FEATURE_EL2)) {
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index fd36425f1a..e1da1e4d6f 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -2290,6 +2290,12 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
-         }
-         return;
- 
-+    case 0x8: /* STLLR */
-+        if (!dc_isar_feature(aa64_lor, s)) {
-+            break;
-+        }
-+        /* StoreLORelease is the same as Store-Release for QEMU.  */
-+        /* fall through */
-     case 0x9: /* STLR */
-         /* Generate ISS for non-exclusive accesses including LASR.  */
-         if (rn == 31) {
-@@ -2301,6 +2307,12 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
-                   disas_ldst_compute_iss_sf(size, false, 0), is_lasr);
-         return;
- 
-+    case 0xc: /* LDLAR */
-+        if (!dc_isar_feature(aa64_lor, s)) {
-+            break;
-+        }
-+        /* LoadLOAcquire is the same as Load-Acquire for QEMU.  */
-+        /* fall through */
-     case 0xd: /* LDAR */
-         /* Generate ISS for non-exclusive accesses including LASR.  */
-         if (rn == 31) {
--- 
-2.17.2
+Sorry maybe I missed it, but are you referring to Pierre's latest 
+cleanup patches? I don't see him removing the BOXED state.
+
+I think returning -EAGAIN and asking the userspace to retry the 
+operation sounds reasonable to me.
+
+But how do we handle the issue of protecting the cmd_region from 
+simultaneous hsch and csch calls? Do we agree on Pierre's method of 
+making write calls mutually exclusive?
