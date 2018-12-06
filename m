@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gUzJ1-0001iS-7Q
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 14:27:27 -0500
+	(envelope-from <thuth@redhat.com>) id 1gUzPl-0003Zx-72
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 14:34:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gUzIx-0005Vk-2g
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 14:27:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48646)
+	(envelope-from <thuth@redhat.com>) id 1gUzPh-00038M-3D
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 14:34:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:31433)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gUzIv-0005TN-1T
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 14:27:21 -0500
-Date: Thu, 6 Dec 2018 12:27:11 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20181206122711.7f64f374@x1.home>
-In-Reply-To: <20181206191240.GA31798@habkost.net>
-References: <154393964026.28192.13536237934563059985.stgit@gimli.home>
-	<154394083644.28192.8501647946108201466.stgit@gimli.home>
-	<20181206191240.GA31798@habkost.net>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gUzPg-00033E-Ji
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 14:34:20 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1B90BC0270B4
+	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 19:34:18 +0000 (UTC)
+References: <1544114998-1513-1-git-send-email-thuth@redhat.com>
+	<1544114998-1513-2-git-send-email-thuth@redhat.com>
+	<794f00c2-661d-3534-b3c0-a52d626c1c75@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <fe108439-5ddb-1c8c-2d04-bb2a8b134ba0@redhat.com>
+Date: Thu, 6 Dec 2018 20:34:14 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [for-4.0 PATCH v3 8/9] q35/440fx/arm/spapr: Add
- QEMU 4.0 machine type
+In-Reply-To: <794f00c2-661d-3534-b3c0-a52d626c1c75@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 1/5] tests/boot-serial: Get rid of
+ global_qtest variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,68 +36,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-On Thu, 6 Dec 2018 17:12:40 -0200
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+On 2018-12-06 19:42, Eric Blake wrote:
+> On 12/6/18 10:49 AM, Thomas Huth wrote:
+>> The test does not use any of the functions that require global_qtest,
+>> so we can simply get rid of this global variable here.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>> =C2=A0 tests/boot-serial-test.c | 13 +++++++------
+>> =C2=A0 1 file changed, 7 insertions(+), 6 deletions(-)
+>>
+>=20
+>> -=C2=A0=C2=A0=C2=A0 global_qtest =3D qtest_initf("%s %s -M %s,accel=3D=
+tcg:kvm "
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "-chardev file,id=3Dserial0,path=3D%=
+s "
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "-no-shutdown -serial chardev:serial=
+0
+>> %s",
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 codeparam, code ? codetmp : "",
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 test->machine, serialtmp, test->extr=
+a);
+>> +=C2=A0=C2=A0=C2=A0 qts =3D qtest_initf("%s %s -M %s,accel=3Dtcg:kvm -=
+no-shutdown "
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "-chardev file,=
+id=3Dserial0,path=3D%s "
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 " -serial chard=
+ev:serial0 %s",
+>=20
+> What happened to -no-shutdown?
 
-> On Tue, Dec 04, 2018 at 09:27:16AM -0700, Alex Williamson wrote:
-> > Including all machine types that might have a pcie-root-port.
-> > 
-> > Cc: Peter Maydell <peter.maydell@linaro.org>
-> > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Richard Henderson <rth@twiddle.net>
-> > Cc: Eduardo Habkost <ehabkost@redhat.com>
-> > Acked-by: David Gibson <david@gibson.dropbear.id.au>
-> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> > ---  
-> [...]
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 7afd1a175bf2..80d8498867a6 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -3956,19 +3956,38 @@ static const TypeInfo spapr_machine_info = {
-> >      }                                                                \
-> >      type_init(spapr_machine_register_##suffix)
-> >  
-> > - /*
-> > +/*
-> > + * pseries-4.0
-> > + */
-> > +static void spapr_machine_4_0_instance_options(MachineState *machine)
-> > +{
-> > +}
-> > +
-> > +static void spapr_machine_4_0_class_options(MachineClass *mc)
-> > +{
-> > +    /* Defaults for the latest behaviour inherited from the base class */
-> > +}
-> > +
-> > +DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
-> > +
-> > +/*
-> >   * pseries-3.1
-> >   */
-> > +#define SPAPR_COMPAT_3_1                                              \
-> > +    HW_COMPAT_3_1
-> > +
-> >  static void spapr_machine_3_1_instance_options(MachineState *machine)
-> >  {
-> > +    spapr_machine_4_0_instance_options(machine);
-> >  }
-> >  
-> >  static void spapr_machine_3_1_class_options(MachineClass *mc)
-> >  {
-> > -    /* Defaults for the latest behaviour inherited from the base class */
-> > +    spapr_machine_3_1_class_options(mc);  
-> 
-> Infinite recursion.  This is supposed to be calling
-> spapr_machine_4_0_class_options().  I will fix manually on
-> machine-next.
+Moved to the first line (since there was some more space there now).
 
-Gack!  Thanks!
-
-Alex
+ Thomas
