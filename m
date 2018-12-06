@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gUqYG-0001hc-D9
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 05:06:41 -0500
+	(envelope-from <remy.noel@blade-group.com>) id 1gUqfj-0006ZT-Jg
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 05:14:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gUqYA-0005n6-Un
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 05:06:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60658)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gUqYA-0005k2-2h
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 05:06:30 -0500
-Date: Thu, 6 Dec 2018 10:06:18 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181206100618.GF29540@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181025140631.634922-1-sameeh@daynix.com>
-	<20181205171818.GA1136@redhat.com>
-	<154404147264.6063.14869520867110106084@sif>
+	(envelope-from <remy.noel@blade-group.com>) id 1gUqfe-0002Ce-E0
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 05:14:18 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51680)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <remy.noel@blade-group.com>)
+	id 1gUqfd-0002CC-Ra
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 05:14:14 -0500
+Received: by mail-wm1-x343.google.com with SMTP id s14so389234wmh.1
+	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 02:14:13 -0800 (PST)
+From: remy.noel@blade-group.com
+Date: Thu,  6 Dec 2018 11:14:23 +0100
+Message-Id: <20181206101423.17344-1-remy.noel@blade-group.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <154404147264.6063.14869520867110106084@sif>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 0/2] Attempt to implement the standby feature
- for assigned network devices
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [QEMU-devel][PATCH v2] aio-posix: Fix concurrent
+ aio_poll/set_fd_handler.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,172 +27,245 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: Sameeh Jubran <sameeh@daynix.com>, Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Remy Noel <remy.noel@blade-group.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Weil <sw@weilnetz.de>, "open list:Block I/O path" <qemu-block@nongnu.org>
 
-On Wed, Dec 05, 2018 at 02:24:32PM -0600, Michael Roth wrote:
-> Quoting Daniel P. Berrang=C3=A9 (2018-12-05 11:18:18)
-> > On Thu, Oct 25, 2018 at 05:06:29PM +0300, Sameeh Jubran wrote:
-> > > From: Sameeh Jubran <sjubran@redhat.com>
-> > >=20
-> > > Hi all,
-> > >=20
-> > > Background:
-> > >=20
-> > > There has been a few attempts to implement the standby feature for =
-vfio
-> > > assigned devices which aims to enable the migration of such devices=
-. This
-> > > is another attempt.
-> > >=20
-> > > The series implements an infrastructure for hiding devices from the=
- bus
-> > > upon boot. What it does is the following:
-> > >=20
-> > > * In the first patch the infrastructure for hiding the device is ad=
-ded
-> > >   for the qbus and qdev APIs. A "hidden" boolean is added to the de=
-vice
-> > >   state and it is set based on a callback to the standby device whi=
-ch
-> > >   registers itself for handling the assessment: "should the primary=
- device
-> > >   be hidden?" by cross validating the ids of the devices.
-> > >=20
-> > > * In the second patch the virtio-net uses the API to hide the vfio
-> > >   device and unhides it when the feature is acked.
-> >=20
-> > IIUC, the general idea is that we want to provide a pair of associate=
-d NIC
-> > devices to the guest, one emulated, one physical PCI device. The gues=
-t would
-> > put them in a bonded pair. Before migration the PCI device is unplugg=
-ed & a
-> > new PCI device plugged on target after migration. The guest traffic c=
-ontinues
-> > without interuption due to the emulate device.
-> >=20
-> > This kind of conceptual approach can already be implemented today by =
-management
-> > apps. The only hard problem that exists today is how the guest OS can=
- figure
-> > out that a particular pair of devices it has are intended to be used =
-together.=20
-> >=20
-> > With this series, IIUC, the virtio-net device is getting a given prop=
-erty which
-> > defines the qdev ID of the associated VFIO device. When the guest OS =
-activates
-> > the virtio-net device and acknowledges the STANDBY feature bit, qdev =
-then
-> > unhides the associated VFIO device.
-> >=20
-> > AFAICT the guest has to infer that the device which suddenly appears =
-is the one
-> > associated with the virtio-net device it just initialized, for purpos=
-es of
-> > setting up the NIC bonding. There doesn't appear to be any explicit a=
-ssocation
-> > between the devices exposed to the guest.
-> >=20
-> > This feels pretty fragile for a guest needing to match up devices whe=
-n there
-> > are many pairs of devices exposed to a single guest.
->=20
-> The impression I get from linux.git:Documentation/networking/net_failov=
-er.rst=20
-> is that the matching is done based on the primary/standby NICs having
-> the same MAC address. In theory you pass both to a guest and based on
-> MAC it essentially does automatic, and if you additionally add STANDBY
-> it'll know to use a virtio-net device specifically for failover.
->=20
-> None of this requires any sort of hiding/plugging of devices from
-> QEMU/libvirt (except for the VFIO unplug we'd need to initiate live mig=
-ration
-> and the VFIO hotplug on the other end to switch back over).
->=20
-> That simplifies things greatly, but also introduces the problem of how
-> an older guest will handle seeing 2 NICs with the same MAC, which IIUC
-> is why this series is looking at hotplugging the VFIO device only after
-> we confirm STANDBY is supported by the virtio-net device, and why it's
-> being done transparent to management.
->
-> >=20
-> > Unless I'm mis-reading the patches, it looks like the VFIO device alw=
-ays has
-> > to be available at the time QEMU is started. There's no way to boot a=
- guest
-> > and then later hotplug a VFIO device to accelerate the existing virti=
-o-net NIC.
-> > Or similarly after migration there might not be any VFIO device avail=
-able
-> > initially when QEMU is started to accept the incoming migration. So i=
-t might
-> > need to run in degraded mode for an extended period of time until one=
- becomes
-> > available for hotplugging. The use of qdev IDs makes this troublesome=
-, as the
-> > qdev ID of the future VFIO device would need to be decided upfront be=
-fore it
-> > even exists.
->=20
-> >=20
-> > So overall I'm not really a fan of the dynamic hiding/unhiding of dev=
-ices. I
-> > would much prefer to see some way to expose an explicit relationship =
-between
-> > the devices to the guest.
->=20
-> If we place the burden of determining whether the guest supports STANDB=
-Y
-> on the part of users/management, a lot of this complexity goes away. Fo=
-r
-> instance, one possible implementation is to simply fail migration and s=
-ay
-> "sorry your VFIO device is still there" if the VFIO device is still aro=
-und
-> at the start of migration (whether due to unplug failure or a
-> user/management forgetting to do it manually beforehand).
->=20
-> So how important is it that setting F_STANDBY cap doesn't break older
-> guests? If the idea is to support live migration with VFs then aren't
-> we still dead in the water if the guest boots okay but doesn't have
-> the requisite functionality to be migrated later? Shouldn't that all
-> be sorted out as early as possible? Is a very clear QEMU error message
-> in this case insufficient?
->=20
-> And if backward compatibility is important, are there alternative
-> approaches? Like maybe starting off with a dummy MAC and switching over
-> to the duplicate MAC only after F_STANDBY is negotiated? In that case
-> we could still warn users/management about it but still have the guest
-> be otherwise functional.
+From: Remy Noel <remy.noel@blade-group.com>
 
-Relying on F_STANDBY negotiation to decide whether to activate the VFIO
-device is a bad idea. PCI devices are precious, so if the guest OS does
-not support this standby feature, we must never add the VFIO device to
-QEMU in the first place.
+It is possible for an io_poll callback to be concurrently executed along
+with an aio_set_fd_handlers. This can cause all sorts of problems, like
+a NULL callback or a bad opaque pointer.
 
-We have the libosinfo project which provides metadata on what features
-different guest OS versions support. This can be used to indicate whether
-a guest OS version supports the standby NIC concept and thus avoid needin=
-g
-to allocate PCI devices to guests that will never use them.
+This changes set_fd_handlers so that it no longer modify existing handlers
+entries and instead, always insert those after having proper initialisation.
 
-F_STANDBY is still useful as a flag to inform the guest OS that it should
-pair up NICs with identical MACs, as opposed to configuring them separate=
-ly.
-It shouldn't be used to show/hide the device though, we should simply nev=
-er
-add the 2nd device if we know it won't be used by a given guest OS versio=
-n.
+Also, we do not call aio_epoll_update for deleted handlers as this has
+no impact whatsoever.
 
+Signed-off-by: Remy Noel <remy.noel@blade-group.com>
+---
+ util/aio-posix.c | 85 ++++++++++++++++++++++++++++--------------------
+ util/aio-win32.c | 54 ++++++++++++++----------------
+ 2 files changed, 74 insertions(+), 65 deletions(-)
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index 51c41ed3c9..b34d97292a 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -200,6 +200,31 @@ static AioHandler *find_aio_handler(AioContext *ctx, int fd)
+     return NULL;
+ }
+ 
++static bool aio_remove_fd_handler(AioContext *ctx, AioHandler *node)
++{
++    /* If the GSource is in the process of being destroyed then
++     * g_source_remove_poll() causes an assertion failure.  Skip
++     * removal in that case, because glib cleans up its state during
++     * destruction anyway.
++     */
++    if (!g_source_is_destroyed(&ctx->source)) {
++        g_source_remove_poll(&ctx->source, &node->pfd);
++    }
++
++    /* If a read is in progress, just mark the node as deleted */
++    if (qemu_lockcnt_count(&ctx->list_lock)) {
++        node->deleted = 1;
++        node->pfd.revents = 0;
++        return false;
++    }
++    /* Otherwise, delete it for real.  We can't just mark it as
++     * deleted because deleted nodes are only cleaned up while
++     * no one is walking the handlers list.
++     */
++    QLIST_REMOVE(node, node);
++    return true;
++}
++
+ void aio_set_fd_handler(AioContext *ctx,
+                         int fd,
+                         bool is_external,
+@@ -209,6 +234,7 @@ void aio_set_fd_handler(AioContext *ctx,
+                         void *opaque)
+ {
+     AioHandler *node;
++    AioHandler *new_node = NULL;
+     bool is_new = false;
+     bool deleted = false;
+     int poll_disable_change;
+@@ -223,50 +249,35 @@ void aio_set_fd_handler(AioContext *ctx,
+             qemu_lockcnt_unlock(&ctx->list_lock);
+             return;
+         }
+-
+-        /* If the GSource is in the process of being destroyed then
+-         * g_source_remove_poll() causes an assertion failure.  Skip
+-         * removal in that case, because glib cleans up its state during
+-         * destruction anyway.
+-         */
+-        if (!g_source_is_destroyed(&ctx->source)) {
+-            g_source_remove_poll(&ctx->source, &node->pfd);
+-        }
+-
+-        /* If a read is in progress, just mark the node as deleted */
+-        if (qemu_lockcnt_count(&ctx->list_lock)) {
+-            node->deleted = 1;
+-            node->pfd.revents = 0;
+-        } else {
+-            /* Otherwise, delete it for real.  We can't just mark it as
+-             * deleted because deleted nodes are only cleaned up while
+-             * no one is walking the handlers list.
+-             */
+-            QLIST_REMOVE(node, node);
+-            deleted = true;
+-        }
++        deleted = aio_remove_fd_handler(ctx, node);
+         poll_disable_change = -!node->io_poll;
+     } else {
+         poll_disable_change = !io_poll - (node && !node->io_poll);
+         if (node == NULL) {
+-            /* Alloc and insert if it's not already there */
+-            node = g_new0(AioHandler, 1);
+-            node->pfd.fd = fd;
+-            QLIST_INSERT_HEAD_RCU(&ctx->aio_handlers, node, node);
+-
+-            g_source_add_poll(&ctx->source, &node->pfd);
+             is_new = true;
+         }
++        /* Alloc and insert if it's not already there */
++        new_node = g_new0(AioHandler, 1);
+ 
+         /* Update handler with latest information */
+-        node->io_read = io_read;
+-        node->io_write = io_write;
+-        node->io_poll = io_poll;
+-        node->opaque = opaque;
+-        node->is_external = is_external;
++        new_node->io_read = io_read;
++        new_node->io_write = io_write;
++        new_node->io_poll = io_poll;
++        new_node->opaque = opaque;
++        new_node->is_external = is_external;
++
++        if (is_new) {
++            new_node->pfd.fd = fd;
++        } else {
++            deleted = aio_remove_fd_handler(ctx, node);
++            new_node->pfd = node->pfd;
++        }
++        g_source_add_poll(&ctx->source, &new_node->pfd);
+ 
+-        node->pfd.events = (io_read ? G_IO_IN | G_IO_HUP | G_IO_ERR : 0);
+-        node->pfd.events |= (io_write ? G_IO_OUT | G_IO_ERR : 0);
++        new_node->pfd.events = (io_read ? G_IO_IN | G_IO_HUP | G_IO_ERR : 0);
++        new_node->pfd.events |= (io_write ? G_IO_OUT | G_IO_ERR : 0);
++
++        QLIST_INSERT_HEAD_RCU(&ctx->aio_handlers, new_node, node);
+     }
+ 
+     /* No need to order poll_disable_cnt writes against other updates;
+@@ -278,7 +289,9 @@ void aio_set_fd_handler(AioContext *ctx,
+     atomic_set(&ctx->poll_disable_cnt,
+                atomic_read(&ctx->poll_disable_cnt) + poll_disable_change);
+ 
+-    aio_epoll_update(ctx, node, is_new);
++    if (new_node) {
++        aio_epoll_update(ctx, new_node, is_new);
++    }
+     qemu_lockcnt_unlock(&ctx->list_lock);
+     aio_notify(ctx);
+ 
+diff --git a/util/aio-win32.c b/util/aio-win32.c
+index c58957cc4b..00e38cdd9f 100644
+--- a/util/aio-win32.c
++++ b/util/aio-win32.c
+@@ -35,6 +35,22 @@ struct AioHandler {
+     QLIST_ENTRY(AioHandler) node;
+ };
+ 
++static void aio_remove_fd_handler(AioContext *ctx, AioHandler *node)
++{
++    /* If aio_poll is in progress, just mark the node as deleted */
++    if (qemu_lockcnt_count(&ctx->list_lock)) {
++        node->deleted = 1;
++        node->pfd.revents = 0;
++    } else {
++        /* Otherwise, delete it for real.  We can't just mark it as
++         * deleted because deleted nodes are only cleaned up after
++         * releasing the list_lock.
++         */
++        QLIST_REMOVE(node, node);
++        g_free(node);
++    }
++}
++
+ void aio_set_fd_handler(AioContext *ctx,
+                         int fd,
+                         bool is_external,
+@@ -56,30 +72,20 @@ void aio_set_fd_handler(AioContext *ctx,
+     /* Are we deleting the fd handler? */
+     if (!io_read && !io_write) {
+         if (node) {
+-            /* If aio_poll is in progress, just mark the node as deleted */
+-            if (qemu_lockcnt_count(&ctx->list_lock)) {
+-                node->deleted = 1;
+-                node->pfd.revents = 0;
+-            } else {
+-                /* Otherwise, delete it for real.  We can't just mark it as
+-                 * deleted because deleted nodes are only cleaned up after
+-                 * releasing the list_lock.
+-                 */
+-                QLIST_REMOVE(node, node);
+-                g_free(node);
+-            }
++            aio_remove_fd_handler(ctx, node);
+         }
+     } else {
+         HANDLE event;
+         long bitmask = 0;
+ 
+-        if (node == NULL) {
+-            /* Alloc and insert if it's not already there */
+-            node = g_new0(AioHandler, 1);
+-            node->pfd.fd = fd;
+-            QLIST_INSERT_HEAD_RCU(&ctx->aio_handlers, node, node);
++        if (node) {
++            aio_remove_fd_handler(ctx, node);
+         }
+ 
++        /* Alloc and insert if it's not already there */
++        node = g_new0(AioHandler, 1);
++        node->pfd.fd = fd;
++
+         node->pfd.events = 0;
+         if (node->io_read) {
+             node->pfd.events |= G_IO_IN;
+@@ -104,6 +110,7 @@ void aio_set_fd_handler(AioContext *ctx,
+             bitmask |= FD_WRITE | FD_CONNECT;
+         }
+ 
++        QLIST_INSERT_HEAD_RCU(&ctx->aio_handlers, node, node);
+         event = event_notifier_get_handle(&ctx->notifier);
+         WSAEventSelect(node->pfd.fd, event, bitmask);
+     }
+@@ -139,18 +146,7 @@ void aio_set_event_notifier(AioContext *ctx,
+         if (node) {
+             g_source_remove_poll(&ctx->source, &node->pfd);
+ 
+-            /* aio_poll is in progress, just mark the node as deleted */
+-            if (qemu_lockcnt_count(&ctx->list_lock)) {
+-                node->deleted = 1;
+-                node->pfd.revents = 0;
+-            } else {
+-                /* Otherwise, delete it for real.  We can't just mark it as
+-                 * deleted because deleted nodes are only cleaned up after
+-                 * releasing the list_lock.
+-                 */
+-                QLIST_REMOVE(node, node);
+-                g_free(node);
+-            }
++            aio_remove_fd_handler(ctx, node);
+         }
+     } else {
+         if (node == NULL) {
+-- 
+2.19.2
