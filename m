@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsKp-0000RI-SB
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:01:01 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsKx-0000Tr-6y
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:01:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsKl-0005dx-SD
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:00:51 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:60204)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsKr-0005fw-9V
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:00:59 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:60228)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsKl-0005df-Dh
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:00:47 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gUsKq-0005fY-Sg
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:00:53 -0500
 From: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Thu, 06 Dec 2018 15:00:42 +0300
-Message-ID: <154409764185.5432.8970470779031001849.stgit@Misha-PC.lan02.inno>
+Date: Thu, 06 Dec 2018 15:00:47 +0300
+Message-ID: <154409764742.5432.18254815682355041221.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <154409751316.5432.3325938832238028060.stgit@Misha-PC.lan02.inno>
 References: <154409751316.5432.3325938832238028060.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v3 22/39] windbg: some kernel structures
+Subject: [Qemu-devel] [PATCH v3 23/39] windbg: add helper functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,263 +29,146 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
+Add helper functions for serialization and deserialization kernel structures to
+byte buffer.
+
 Signed-off-by: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 ---
- target/i386/windbgstub.c |  243 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 243 insertions(+)
+ target/i386/windbgstub.c |  123 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 123 insertions(+)
 
 diff --git a/target/i386/windbgstub.c b/target/i386/windbgstub.c
-index 37c5805818..5d47d5c9e9 100644
+index 5d47d5c9e9..e2ed2b3105 100644
 --- a/target/i386/windbgstub.c
 +++ b/target/i386/windbgstub.c
-@@ -30,6 +30,249 @@
- #define TARGET_SAFE(i386_obj, x86_64_obj) i386_obj
+@@ -280,6 +280,129 @@ static InitedAddr kdDebuggerDataBlock;
+ static InitedAddr kdVersion;
  #endif /* TARGET_I386 */
  
-+/*
-+ * Next code copied from winnt.h
-+ */
++__attribute__ ((unused)) /* unused yet */
++static void windbg_set_dr(CPUState *cs, int index, target_ulong value)
++{
++    X86CPU *cpu = X86_CPU(cs);
++    CPUX86State *env = &cpu->env;
++
++    switch (index) {
++    case 0 ... 3:
++        env->dr[index] = value;
++        return;
++    case 6:
++        env->dr[6] = value | DR6_FIXED_1;
++        return;
++    case 7:
++        cpu_x86_update_dr7(env, value);
++        return;
++    }
++}
++
++/* copy from gdbstub.c */
++__attribute__ ((unused)) /* unused yet */
++static void windbg_set_sr(CPUState *cs, int sreg, uint16_t selector)
++{
++    X86CPU *cpu = X86_CPU(cs);
++    CPUX86State *env = &cpu->env;
++
++    if (selector != env->segs[sreg].selector) {
++#if defined(CONFIG_USER_ONLY)
++        cpu_x86_load_seg(env, sreg, selector);
++#else
++        unsigned int limit, flags;
++        target_ulong base;
++
++        if (!(env->cr[0] & CR0_PE_MASK) || (env->eflags & VM_MASK)) {
++            int dpl = (env->eflags & VM_MASK) ? 3 : 0;
++            base = selector << 4;
++            limit = 0xffff;
++            flags = DESC_P_MASK | DESC_S_MASK | DESC_W_MASK |
++                    DESC_A_MASK | (dpl << DESC_DPL_SHIFT);
++        } else {
++            if (!cpu_x86_get_descr_debug(env, selector, &base, &limit,
++                                         &flags)) {
++                return;
++            }
++        }
++        cpu_x86_load_seg_cache(env, sreg, selector, base, limit, flags);
++#endif
++    }
++}
++
++#define rwuw_p(ptr, var, is_read)                                              \
++    do {                                                                       \
++        if (is_read) {                                                         \
++            var = lduw_p(ptr);                                                 \
++        } else {                                                               \
++            stw_p(ptr, var);                                                   \
++        }                                                                      \
++    } while (0)
++
++#define rwl_p(ptr, var, is_read)                                               \
++    do {                                                                       \
++        if (is_read) {                                                         \
++            var = ldl_p(ptr);                                                  \
++        } else {                                                               \
++            stl_p(ptr, var);                                                   \
++        }                                                                      \
++    } while (0)
++
++#define rwtul_p(ptr, var, is_read)                                             \
++    do {                                                                       \
++        if (is_read) {                                                         \
++            var = ldtul_p(ptr);                                                \
++        } else {                                                               \
++            sttul_p(ptr, var);                                                 \
++        }                                                                      \
++    } while (0)
++
++#define RW_DR(ptr, cs, dr_index, is_read)                                      \
++    do {                                                                       \
++        if (is_read) {                                                         \
++            windbg_set_dr(cs, dr_index, ldtul_p(ptr));                         \
++        } else {                                                               \
++            sttul_p(ptr, X86_CPU(cs)->env.dr[dr_index]);                       \
++        }                                                                      \
++    } while (0)
++
++#define RW_SR(ptr, cs, sr_index, is_read)                                      \
++    do {                                                                       \
++        if (is_read) {                                                         \
++            windbg_set_sr(cs, sr_index, lduw_p(ptr));                          \
++        } else {                                                               \
++            stw_p(ptr, X86_CPU(cs)->env.segs[R_CS].selector);                  \
++        }                                                                      \
++    } while (0)
++
++#define RW_CR(ptr, cs, cr_index, is_read)                                      \
++    do {                                                                       \
++        if (is_read) {                                                         \
++            cpu_x86_update_cr##cr_index(env, (int32_t) ldtul_p(ptr));          \
++        } else {                                                               \
++            sttul_p(ptr, (target_ulong) X86_CPU(cs)->env.cr[cr_index]);        \
++        }                                                                      \
++    } while (0)
++
++#define CASE_FIELD(stct, field, field_size, block)                             \
++    case offsetof(stct, field):                                                \
++        field_size = sizeof_field(stct, field);                                \
++        block;                                                                 \
++        break;
++
++#define CASE_FIELD_X32_64(stct, field_x32, field_x64, field_size, block) \
++    CASE_FIELD(stct, TARGET_SAFE(field_x32, field_x64), field_size, block)
++
 +#ifdef TARGET_X86_64
-+
-+#define CPU_CONTEXT_AMD64 0x100000
-+
-+#define CPU_CONTEXT_CONTROL (CPU_CONTEXT_AMD64 | 0x1)
-+#define CPU_CONTEXT_INTEGER (CPU_CONTEXT_AMD64 | 0x2)
-+#define CPU_CONTEXT_SEGMENTS (CPU_CONTEXT_AMD64 | 0x4)
-+#define CPU_CONTEXT_FLOATING_POINT (CPU_CONTEXT_AMD64 | 0x8)
-+#define CPU_CONTEXT_DEBUG_REGISTERS (CPU_CONTEXT_AMD64 | 0x10)
-+
-+#define CPU_CONTEXT_FULL \
-+    (CPU_CONTEXT_CONTROL | CPU_CONTEXT_INTEGER | CPU_CONTEXT_FLOATING_POINT)
-+#define CPU_CONTEXT_ALL \
-+    (CPU_CONTEXT_FULL | CPU_CONTEXT_SEGMENTS | CPU_CONTEXT_DEBUG_REGISTERS)
-+
-+typedef struct _CPU_DESCRIPTOR {
-+    uint16_t Pad[3];
-+    uint16_t Limit;
-+    uint64_t Base;
-+} CPU_DESCRIPTOR, *PCPU_DESCRIPTOR;
-+
-+typedef struct _CPU_KSPECIAL_REGISTERS {
-+    uint64_t Cr0;
-+    uint64_t Cr2;
-+    uint64_t Cr3;
-+    uint64_t Cr4;
-+    uint64_t KernelDr0;
-+    uint64_t KernelDr1;
-+    uint64_t KernelDr2;
-+    uint64_t KernelDr3;
-+    uint64_t KernelDr6;
-+    uint64_t KernelDr7;
-+    CPU_DESCRIPTOR Gdtr;
-+    CPU_DESCRIPTOR Idtr;
-+    uint16_t Tr;
-+    uint16_t Ldtr;
-+    uint32_t MxCsr;
-+    uint64_t DebugControl;
-+    uint64_t LastBranchToRip;
-+    uint64_t LastBranchFromRip;
-+    uint64_t LastExceptionToRip;
-+    uint64_t LastExceptionFromRip;
-+    uint64_t Cr8;
-+    uint64_t MsrGsBase;
-+    uint64_t MsrGsSwap;
-+    uint64_t MsrStar;
-+    uint64_t MsrLStar;
-+    uint64_t MsrCStar;
-+    uint64_t MsrSyscallMask;
-+    uint64_t Xcr0;
-+} CPU_KSPECIAL_REGISTERS, *PCPU_KSPECIAL_REGISTERS;
-+
-+typedef struct _CPU_M128A {
-+    uint64_t Low;
-+    int64_t High;
-+} QEMU_ALIGNED(16) CPU_M128A, *PCPU_M128A;
-+
-+typedef struct _CPU_XMM_SAVE_AREA32 {
-+    uint16_t ControlWord;
-+    uint16_t StatusWord;
-+    uint8_t TagWord;
-+    uint8_t Reserved1;
-+    uint16_t ErrorOpcode;
-+    uint32_t ErrorOffset;
-+    uint16_t ErrorSelector;
-+    uint16_t Reserved2;
-+    uint32_t DataOffset;
-+    uint16_t DataSelector;
-+    uint16_t Reserved3;
-+    uint32_t MxCsr;
-+    uint32_t MxCsr_Mask;
-+    CPU_M128A FloatRegisters[8];
-+    CPU_M128A XmmRegisters[16];
-+    uint8_t Reserved4[96];
-+} CPU_XMM_SAVE_AREA32, *PCPU_XMM_SAVE_AREA32;
-+
-+typedef struct _CPU_CONTEXT { /* sizeof = 1232 */
-+    uint64_t P1Home;
-+    uint64_t P2Home;
-+    uint64_t P3Home;
-+    uint64_t P4Home;
-+    uint64_t P5Home;
-+    uint64_t P6Home;
-+    uint32_t ContextFlags;
-+    uint32_t MxCsr;
-+    uint16_t SegCs;
-+    uint16_t SegDs;
-+    uint16_t SegEs;
-+    uint16_t SegFs;
-+    uint16_t SegGs;
-+    uint16_t SegSs;
-+    uint32_t EFlags;
-+    uint64_t Dr0;
-+    uint64_t Dr1;
-+    uint64_t Dr2;
-+    uint64_t Dr3;
-+    uint64_t Dr6;
-+    uint64_t Dr7;
-+    uint64_t Rax;
-+    uint64_t Rcx;
-+    uint64_t Rdx;
-+    uint64_t Rbx;
-+    uint64_t Rsp;
-+    uint64_t Rbp;
-+    uint64_t Rsi;
-+    uint64_t Rdi;
-+    uint64_t R8;
-+    uint64_t R9;
-+    uint64_t R10;
-+    uint64_t R11;
-+    uint64_t R12;
-+    uint64_t R13;
-+    uint64_t R14;
-+    uint64_t R15;
-+    uint64_t Rip;
-+    union {
-+        CPU_XMM_SAVE_AREA32 FltSave;
-+        CPU_XMM_SAVE_AREA32 FloatSave;
-+        struct {
-+            CPU_M128A Header[2];
-+            CPU_M128A Legacy[8];
-+            CPU_M128A Xmm0;
-+            CPU_M128A Xmm1;
-+            CPU_M128A Xmm2;
-+            CPU_M128A Xmm3;
-+            CPU_M128A Xmm4;
-+            CPU_M128A Xmm5;
-+            CPU_M128A Xmm6;
-+            CPU_M128A Xmm7;
-+            CPU_M128A Xmm8;
-+            CPU_M128A Xmm9;
-+            CPU_M128A Xmm10;
-+            CPU_M128A Xmm11;
-+            CPU_M128A Xmm12;
-+            CPU_M128A Xmm13;
-+            CPU_M128A Xmm14;
-+            CPU_M128A Xmm15;
-+        };
-+    };
-+    CPU_M128A VectorRegister[26];
-+    uint64_t VectorControl;
-+    uint64_t DebugControl;
-+    uint64_t LastBranchToRip;
-+    uint64_t LastBranchFromRip;
-+    uint64_t LastExceptionToRip;
-+    uint64_t LastExceptionFromRip;
-+} QEMU_ALIGNED(16) CPU_CONTEXT, *PCPU_CONTEXT;
-+
-+#else /* TARGET_I386 */
-+
-+#define SIZE_OF_X86_REG 80
-+#define MAX_SUP_EXT 512
-+
-+#define CPU_CONTEXT_i386 0x10000
-+
-+#define CPU_CONTEXT_CONTROL (CPU_CONTEXT_i386 | 0x1)
-+#define CPU_CONTEXT_INTEGER (CPU_CONTEXT_i386 | 0x2)
-+#define CPU_CONTEXT_SEGMENTS (CPU_CONTEXT_i386 | 0x4)
-+#define CPU_CONTEXT_FLOATING_POINT (CPU_CONTEXT_i386 | 0x8)
-+#define CPU_CONTEXT_DEBUG_REGISTERS (CPU_CONTEXT_i386 | 0x10)
-+#define CPU_CONTEXT_EXTENDED_REGISTERS (CPU_CONTEXT_i386 | 0x20)
-+
-+#define CPU_CONTEXT_FULL                                                       \
-+    (CPU_CONTEXT_CONTROL | CPU_CONTEXT_INTEGER | CPU_CONTEXT_SEGMENTS)
-+#define CPU_CONTEXT_ALL                                                        \
-+    (CPU_CONTEXT_FULL | CPU_CONTEXT_FLOATING_POINT                             \
-+     | CPU_CONTEXT_DEBUG_REGISTERS | CPU_CONTEXT_EXTENDED_REGISTERS)
-+
-+typedef struct _CPU_DESCRIPTOR {
-+    uint16_t Pad;
-+    uint16_t Limit;
-+    uint32_t Base;
-+} CPU_DESCRIPTOR, *PCPU_DESCRIPTOR;
-+
-+typedef struct _CPU_KSPECIAL_REGISTERS {
-+    uint32_t Cr0;
-+    uint32_t Cr2;
-+    uint32_t Cr3;
-+    uint32_t Cr4;
-+    uint32_t KernelDr0;
-+    uint32_t KernelDr1;
-+    uint32_t KernelDr2;
-+    uint32_t KernelDr3;
-+    uint32_t KernelDr6;
-+    uint32_t KernelDr7;
-+    CPU_DESCRIPTOR Gdtr;
-+    CPU_DESCRIPTOR Idtr;
-+    uint16_t Tr;
-+    uint16_t Ldtr;
-+    uint32_t Reserved[6];
-+} CPU_KSPECIAL_REGISTERS, *PCPU_KSPECIAL_REGISTERS;
-+
-+typedef struct _CPU_FLOATING_SAVE_AREA {
-+    uint32_t ControlWord;
-+    uint32_t StatusWord;
-+    uint32_t TagWord;
-+    uint32_t ErrorOffset;
-+    uint32_t ErrorSelector;
-+    uint32_t DataOffset;
-+    uint32_t DataSelector;
-+    uint8_t RegisterArea[SIZE_OF_X86_REG];
-+    uint32_t Cr0NpxState;
-+} CPU_FLOATING_SAVE_AREA, *PCPU_FLOATING_SAVE_AREA;
-+
-+typedef struct _CPU_CONTEXT { /* sizeof = 716 */
-+    uint32_t ContextFlags;
-+    uint32_t Dr0;
-+    uint32_t Dr1;
-+    uint32_t Dr2;
-+    uint32_t Dr3;
-+    uint32_t Dr6;
-+    uint32_t Dr7;
-+    CPU_FLOATING_SAVE_AREA FloatSave;
-+    uint32_t SegGs;
-+    uint32_t SegFs;
-+    uint32_t SegEs;
-+    uint32_t SegDs;
-+
-+    uint32_t Edi;
-+    uint32_t Esi;
-+    uint32_t Ebx;
-+    uint32_t Edx;
-+    uint32_t Ecx;
-+    uint32_t Eax;
-+    uint32_t Ebp;
-+    uint32_t Eip;
-+    uint32_t SegCs;
-+    uint32_t EFlags;
-+    uint32_t Esp;
-+    uint32_t SegSs;
-+    uint8_t ExtendedRegisters[MAX_SUP_EXT];
-+} CPU_CONTEXT, *PCPU_CONTEXT;
-+
++#define CASE_FIELD_X32(stct, field, field_size, block)
++#define CASE_FIELD_X64(stct, field, field_size, block) \
++    CASE_FIELD(stct, field, field_size, block)
++#else  /* TARGET_I386 */
++#define CASE_FIELD_X64(stct, field, field_size, block)
++#define CASE_FIELD_X32(stct, field, field_size, block) \
++    CASE_FIELD(stct, field, field_size, block)
 +#endif /* TARGET_I386 */
 +
-+typedef struct _CPU_KPROCESSOR_STATE {
-+    CPU_CONTEXT ContextFrame;
-+    CPU_KSPECIAL_REGISTERS SpecialRegisters;
-+} CPU_KPROCESSOR_STATE, *PCPU_KPROCESSOR_STATE;
-+
- static InitedAddr KPCR;
- #ifdef TARGET_X86_64
- static InitedAddr kdDebuggerDataBlock;
+ static bool find_KPCR(CPUState *cs)
+ {
+     X86CPU *cpu = X86_CPU(cs);
