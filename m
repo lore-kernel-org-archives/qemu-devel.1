@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gUwPh-0007jV-5p
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:22:12 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1gUwRi-00006r-El
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:24:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gUwPc-0003vJ-Q0
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:22:08 -0500
-Date: Thu, 6 Dec 2018 17:21:55 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181206172155.6a7dd69e.cohuck@redhat.com>
-In-Reply-To: <bb6c992e-ac03-ce3e-fba8-283e392f1543@linux.ibm.com>
-References: <20181122165432.4437-1-cohuck@redhat.com>
-	<20181204133810.66e8cfe5@oc2783563651>
-	<20181204141130.06496b9b.cohuck@redhat.com>
-	<20181204160236.54de2784@oc2783563651>
-	<20181205135402.33c2b22d.cohuck@redhat.com>
-	<aa190e90-f832-7958-aa83-1486e570bf40@linux.ibm.com>
-	<20181206153917.59e8e291.cohuck@redhat.com>
-	<bb6c992e-ac03-ce3e-fba8-283e392f1543@linux.ibm.com>
+	(envelope-from <alex.williamson@redhat.com>) id 1gUwRe-0007Xa-Lm
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:24:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50704)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1gUwRa-0007L9-Qu
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:24:08 -0500
+Date: Thu, 6 Dec 2018 09:24:01 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20181206092401.09e6ed37@x1.home>
+In-Reply-To: <20181206125225.GW18284@habkost.net>
+References: <154394083644.28192.8501647946108201466.stgit@gimli.home>
+	<154394987445.795.4102526920089904508.stgit@gimli.home>
+	<6bc68937-ec9e-d28f-9468-5ee9ba08ef52@de.ibm.com>
+	<20181204122647.3a560066@x1.home>
+	<CAFEAcA_5tDfoPZaPcheMGUyq_ibbvT+GE8WKgXnHf8SnxioPvA@mail.gmail.com>
+	<20181204125621.0ad30dc0@x1.home>
+	<20181206125225.GW18284@habkost.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/3] vfio-ccw: support hsch/csch (kernel
- part)
+Subject: Re: [Qemu-devel] [for-4.0 PATCH v3.1 8/9] q35/440fx/arm/spapr/ccw:
+ Add QEMU 4.0 machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +34,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Farhan Ali <alifm@linux.ibm.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Jason J
-	. Herne" <jjherne@linux.ibm.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, =?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau <marcandre.lureau@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On Thu, 6 Dec 2018 10:26:12 -0500
-Farhan Ali <alifm@linux.ibm.com> wrote:
+On Thu, 6 Dec 2018 10:52:25 -0200
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-> On 12/06/2018 09:39 AM, Cornelia Huck wrote:
-> > On Wed, 5 Dec 2018 13:34:11 -0500
-> > Farhan Ali <alifm@linux.ibm.com> wrote:
+> On Tue, Dec 04, 2018 at 12:56:21PM -0700, Alex Williamson wrote:
+> > On Tue, 4 Dec 2018 19:29:25 +0000
+> > Peter Maydell <peter.maydell@linaro.org> wrote:
 > >   
-> >> On 12/05/2018 07:54 AM, Cornelia Huck wrote:  
-> >>>> Yeah, that is perfectly clear, but it ain't the complete story. E.g.
-> >>>> are subsequent commands blocking until the preceding command finishes
-> >>>> is part of the interface. And what is good implementation depends on the
-> >>>> answer. What I mean, I first need to understand how things are supposed
-> >>>> to work (together) so I can double check that against the
-> >>>> implementation. Otherwise all I can do is nitpicking.
-> >>>>
-> >>>> To get more tangible: we are in the middle of processing an SSCH request
-> >>>> (e.g. doing the translation) when a HSCH comes in. What should happen?
-> >>>> Should we start processing HSCH after he instruction part of SSCH is
-> >>>> done -- which currently includes translation? Or should we -EBUSY? Or do
-> >>>> we abort START related activities and do the HALT stuff?  
-> >>> I think most of the sorting-out-the-operations stuff should be done by
-> >>> the hardware itself, and we should not really try to enforce anything
-> >>> special in our vfio code.
-> >>>
-> >>> For your example, it might be best if a hsch is always accepted and
-> >>> send on towards the hardware. Probably best to reflect back -EAGAIN if
-> >>> we're currently processing another instruction from another vcpu, so
-> >>> that the user space caller can retry. Same for ssch, if another ssch is
-> >>> already being processed. We*could*  reflect cc 2 if the fctl bit is
-> >>> already set, but that won't do for csch, so it is probably best to have
-> >>> the hardware figure that out in any case.
-> >>>
-> >>> If I read the code correctly, we currently reflect -EBUSY and not
-> >>> -EAGAIN if we get a ssch request while already processing another one.
-> >>> QEMU hands that back to the guest as a cc 2, which is not 100% correct.
-> >>> In practice, we don't see this with Linux guests due to locking.
-> >>>      
-> >>
-> >> If we have a ssch and a csch immediately afterwards from userspace, will
-> >> we end up issuing csch first and then ssch to the hardware?
-> >>
-> >> If I understand correctly, the ccw translation as part of the ssch can
-> >> be a slow operation so it might be possible we issue the csch first?
-> >> In that case we won't actually clear the original start function as
-> >> intended.  
+> > > On Tue, 4 Dec 2018 at 19:26, Alex Williamson <alex.williamson@redhat.com> wrote:  
+> > > >
+> > > > On Tue, 4 Dec 2018 20:16:44 +0100
+> > > > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> > > >    
+> > > > > I think Conny has already added the s390/ccw part to her next tree.
+> > > > > From a quick glimpse both patches look identical.    
+> > > >
+> > > > If so then we can just use the original v3 version of this patch that
+> > > > touches all but ccw and let them come together in mainline.  My
+> > > > assumption is that Peter is only trying to make sure all versioned
+> > > > machines are updated early in this release, not necessarily that
+> > > > they need to be updated together.    
+> > > 
+> > > Yes, that's the idea. I also think it's a suboptimal idea
+> > > to include the version-number-bump patch in a series that's
+> > > adding some feature, because then if the feature itself
+> > > has to go through several rounds of patch review the
+> > > version-number-bump patch is stuck unapplied (we saw that
+> > > at the end of the 3.1 cycle), or it gets bumped by some
+> > > other unrelated series and then there's a merge conflict.
+> > > But that's more of a things-for-next time remark, no need
+> > > to rearrange this now.  
 > > 
-> > When we start processing the ssch request (translation and so on), we
-> > set the state to BUSY. This means that any csch request will get a
-> > -EBUSY, no overtaking possible. (I think maybe I'll need to check what
-> > this series looks like if I rebase it on top of Pierre's rework, as he
-> > did some changes in the state machine.)  
+> > If you and the other stakeholders agree, you are more than welcome to
+> > pluck this patch from the series and apply it as soon as 4.0 opens.  It
+> > might make things a tiny bit easier down the road to avoid the
+> > conflicts since we seem to have multiple contenders vying for this
+> > update.  Maybe the best practice going forward is to open the merge
+> > window with such a commit.  Thanks,  
 > 
-> I think you meant the state is set to BOXED? otherwise the patch 3 says 
-> if state is BUSY and CLEAR event request comes in, we issue the clear 
-> instruction, no?
+> I can queue v3 on machine-next and send a pull request as soon as
+> v3.1.0 is tagged.  Any objections?
 
-That's what I meant with "need to rebase" :) The BOXED state is gone; I
-just had not rebased on top of it. There's more changes in the state
-machine; if we are on the same page as to what should happen, I can
-start massaging the patches.
+No objection from me, so long as the pull doesn't get delayed.  Please
+also collect the Reviewed-by from Eric.  Thanks,
+
+Alex
