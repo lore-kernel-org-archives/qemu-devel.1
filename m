@@ -1,23 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gUsl9-0005cY-Bh
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:28:07 -0500
+	(envelope-from <pasic@linux.ibm.com>) id 1gUspn-0004XM-9N
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:32:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gUsl5-0004F4-1C
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:28:03 -0500
-References: <20181123091729.29921-1-luc.michel@greensocs.com>
-	<20181123091729.29921-4-luc.michel@greensocs.com>
-	<970cc3ab-f93b-75c2-f3f0-86a1ddc75ca7@redhat.com>
-From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <ef9e6b39-6d3e-230b-6116-3a2cb9a5e1a6@greensocs.com>
-Date: Thu, 6 Dec 2018 13:27:39 +0100
+	(envelope-from <pasic@linux.ibm.com>) id 1gUspj-0000LJ-I7
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:32:51 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60322
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1gUspj-0000K6-CB
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 07:32:47 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wB6CQSiL013918
+	for <qemu-devel@nongnu.org>; Thu, 6 Dec 2018 07:32:46 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2p72dn42hu-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 07:32:46 -0500
+Received: from localhost
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Thu, 6 Dec 2018 12:32:44 -0000
+Date: Thu, 6 Dec 2018 13:32:39 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+In-Reply-To: <6b238b89-f1a0-834b-b2f4-3b8c30c484a2@redhat.com>
+References: <20181205145131.28467-1-cohuck@redhat.com>
+	<0d97dcf5-de40-3f18-64fc-7b2eb1799a84@redhat.com>
+	<20181205174508.3e2452af.cohuck@redhat.com>
+	<55928716-cd64-735b-ae66-64b370997e22@de.ibm.com>
+	<6b238b89-f1a0-834b-b2f4-3b8c30c484a2@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <970cc3ab-f93b-75c2-f3f0-86a1ddc75ca7@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 03/16] gdbstub: add multiprocess support
- to '?' packets
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20181206133239.5e5b5cb3@oc2783563651>
+Subject: Re: [Qemu-devel] [PATCH RFC] vfio-ap: flag as compatible with
+ balloon
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,198 +45,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, alistair@alistair23.me, mark.burton@greensocs.com, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, saipava@xilinx.com, edgari@xilinx.com, qemu-arm@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Tony Krowiak <akrowiak@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On 11/25/18 10:22 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Luc,
->=20
-> On 23/11/18 10:17, Luc Michel wrote:
->> The gdb_get_cpu_pid() function does the PID lookup for the given CPU. =
-It
->> checks if the CPU is a direct child of a CPU cluster. If it is, the
->> returned PID is the cluster ID plus one (cluster IDs start at 0, GDB
->> PIDs at 1). When the CPU is not a child of such a container, the PID o=
-f
->> the first process is returned.
->>
->> The gdb_fmt_thread_id() function generates the string to be used to id=
-entify
->> a given thread, in a response packet for the peer. This function
->> supports generating thread IDs when multiprocess mode is enabled (in t=
-he
->> form `p<pid>.<tid>').
->>
->> Use them in the reply to a '?' request.
->>
->> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
->> Acked-by: Alistair Francis <alistair.francis@wdc.com>
->> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
->> ---
->>  gdbstub.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++-=
--
->>  1 file changed, 58 insertions(+), 2 deletions(-)
->>
->> diff --git a/gdbstub.c b/gdbstub.c
->> index 26f5a7449a..4fbc05dfe3 100644
->> --- a/gdbstub.c
->> +++ b/gdbstub.c
->> @@ -638,10 +638,52 @@ static int memtox(char *buf, const char *mem, in=
-t len)
->>          }
->>      }
->>      return p - buf;
->>  }
->> =20
->> +static uint32_t gdb_get_cpu_pid(const GDBState *s, CPUState *cpu)
->> +{
->> +#ifndef CONFIG_USER_ONLY
->> +    gchar *path, *name;
->=20
-> Setting ...
->=20
->        gchar *path, *name =3D NULL;
->=20
->> +    Object *obj;
->> +    CPUClusterState *cluster;
->> +    uint32_t ret;
->> +
->> +    path =3D object_get_canonical_path(OBJECT(cpu));
->> +    name =3D object_get_canonical_path_component(OBJECT(cpu));
->=20
-> ... we might move this line ...
->=20
->> +
->> +    if (path =3D=3D NULL) {
->> +        ret =3D s->processes[0].pid;
->> +        goto out;
->> +    }
->=20
-> ... hereOK I'll change that.
->=20
->        name =3D object_get_canonical_path_component(OBJECT(cpu));
->=20
->> +
->> +    /*
->> +     * Retrieve the CPU parent path by removing the last '/' and the =
-CPU name
->> +     * from the CPU canonical path. */
->> +    path[strlen(path) - strlen(name) - 1] =3D '\0';
->=20
-> Can we get there with path !=3D NULL && name =3D=3D NULL?
-I think the only way we could end up in this case is if cpu =3D=3D
-object_get_root(), which does not make much sense. I can add an
-assert(name !=3D NULL) here to enforce that.
+On Thu, 6 Dec 2018 09:28:34 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
->=20
->> +
->> +    obj =3D object_resolve_path_type(path, TYPE_CPU_CLUSTER, NULL);
->> +
->> +    if (obj =3D=3D NULL) {
->> +        ret =3D s->processes[0].pid;
->> +        goto out;
->> +    }
->> +
->> +    cluster =3D CPU_CLUSTER(obj);
->> +    ret =3D cluster->cluster_id + 1;
->> +
->> +out:
->> +    g_free(name);
->> +    g_free(path);
->> +
->> +    return ret;
->> +
->> +#else
->=20
-> [*]
->=20
->> +    return s->processes[0].pid;
->> +#endif
->> +}
->> +
->>  static const char *get_feature_xml(const char *p, const char **newp,
->>                                     CPUClass *cc)
->>  {
->>      size_t len;
->>      int i;
->> @@ -907,10 +949,23 @@ static CPUState *find_cpu(uint32_t thread_id)
->>      }
->> =20
->>      return NULL;
->>  }
->> =20
->> +static char *gdb_fmt_thread_id(const GDBState *s, CPUState *cpu,
->> +                           char *buf, size_t buf_size)
->> +{
->> +    if (s->multiprocess) {
->> +        snprintf(buf, buf_size, "p%02x.%02x",
->> +                 gdb_get_cpu_pid(s, cpu), cpu_gdb_index(cpu));
->> +    } else {
->> +        snprintf(buf, buf_size, "%02x", cpu_gdb_index(cpu));
->> +    }
->> +
->> +    return buf;
->> +}
->> +
->>  static int is_query_packet(const char *p, const char *query, char sep=
-arator)
->>  {
->>      unsigned int query_len =3D strlen(query);
->> =20
->>      return strncmp(p, query, query_len) =3D=3D 0 &&
->> @@ -1018,22 +1073,23 @@ static int gdb_handle_packet(GDBState *s, cons=
-t char *line_buf)
->>      const char *p;
->>      uint32_t thread;
->>      int ch, reg_size, type, res;
->>      uint8_t mem_buf[MAX_PACKET_LENGTH];
->>      char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
->> +    char thread_id[16];
->>      uint8_t *registers;
->>      target_ulong addr, len;
->> =20
->>      trace_gdbstub_io_command(line_buf);
->> =20
->>      p =3D line_buf;
->>      ch =3D *p++;
->>      switch(ch) {
->>      case '?':
->>          /* TODO: Make this return the correct value for user-mode.  *=
-/
->=20
-> Is this comment still relevant?
->=20
-> If so, wouldn't it be better placed in [*]?
-git blame shows that at the time when this comment was added
-(1fddef4b1ba from 2005), the Stop Reply packet was like this:
+> On 05.12.18 18:25, Christian Borntraeger wrote:
+> > 
+> > 
+> > On 05.12.2018 17:45, Cornelia Huck wrote:
+> >> On Wed, 5 Dec 2018 17:38:22 +0100
+> >> David Hildenbrand <david@redhat.com> wrote:
+> >>
+> >>> On 05.12.18 15:51, Cornelia Huck wrote:
+> >>>> vfio-ap devices do not pin any pages in the host. Therefore, they
+> >>>> are belived to be compatible with memory ballooning.
+> >>>>
+> >>>> Flag them as compatible, so both vfio-ap and a balloon can be
+> >>>> used simultaneously.
+> >>>>
+> >>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> >>>> ---
+> >>>>
+> >>>> As briefly discussed on IRC. RFC as I do not have easy access to
+> >>>> hardware I can test this with.
+> >>>>
+> >>>> ---
+> >>>>  hw/vfio/ap.c | 8 ++++++++
+> >>>>  1 file changed, 8 insertions(+)
+> >>>>
+> >>>> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
+> >>>> index 65de952f44..3bf48eed28 100644
+> >>>> --- a/hw/vfio/ap.c
+> >>>> +++ b/hw/vfio/ap.c
+> >>>> @@ -104,6 +104,14 @@ static void vfio_ap_realize(DeviceState *dev, Error **errp)
+> >>>>      vapdev->vdev.name = g_strdup_printf("%s", mdevid);
+> >>>>      vapdev->vdev.dev = dev;
+> >>>>  
+> >>>> +    /*
+> >>>> +     * vfio-ap devices are believed to operate in a way compatible with
+> >>>> +     * memory ballooning, as no pages are pinned in the host.
+> >>>> +     * This needs to be set before vfio_get_device() for vfio common to
+> >>>> +     * handle the balloon inhibitor.
+> >>>> +     */
+> >>>> +    vapdev->vdev.balloon_allowed = true;
+> >>>> +
+> >>>>      ret = vfio_get_device(vfio_group, mdevid, &vapdev->vdev, &local_err);
+> >>>>      if (ret) {
+> >>>>          goto out_get_dev_err;
+> >>>>   
+> >>>
+> >>> What happens if this ever changes? Shouldn't we have an API to at least
+> >>> check what the vfio device can guarantee?
+> >>>
+> >>> "are believed to operate" doesn't sound like guarantees to me :)
+> > 
+> > I would actually remove that comment or fix it. We either know or we dont.
+> > In the way vfio-works I see no reason to disallow balloon. Even if the guest does
+> > something wrong (e.g. crypto I/O on freed pages) the host would handle that the
+> > same as it would for normal page accesses. From a host point of view the crypto
+> > instructions are just CISC instructions with load/store semantics.
+> 
+> As long as vfio-ap does not and will never pin pages (and keep them
+> pinned), we are fine. I don't know about the details, but if vfio-ap
+> really just issues a synchronous instruction for us, we are fine.
+> 
 
-+        /* TODO: Make this return the correct value for user-mode.  */
-         snprintf(buf, sizeof(buf), "S%02x", SIGTRAP);
+I agree with Christian. That comment is best removed.
 
-Which is the form that contains only a signal number. So this comment
-must refer to this hard-coded signal, so I think it is still valid :-)
+@Tony, I guess you should have the most elaborate test setup. Can you give
+this some testing just in case?
 
-However, you are right pointing out that the PID used in user-mode
-should probably be the one of the QEMU process running the guest binary
-(as it is done for TIDs I believe). I'll add a comment at [*] to point
-that out.
+> > 
+> >>
+> >> It's the same for ccw :)
 
-Thanks.
+As a matter of fact, I don't like that comment.
 
---=20
-Luc
+Regards,
+Halil
 
->=20
->> -        snprintf(buf, sizeof(buf), "T%02xthread:%02x;", GDB_SIGNAL_TR=
-AP,
->> -                 cpu_gdb_index(s->c_cpu));
->> +        snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP=
-,
->> +                 gdb_fmt_thread_id(s, s->c_cpu, thread_id, sizeof(thr=
-ead_id)));
->>          put_packet(s, buf);
->>          /* Remove all the breakpoints when this query is issued,
->>           * because gdb is doing and initial connect and the state
->>           * should be cleaned up.
->>           */
->>
+> >>
+> >> While such an API definitely sounds like a good idea, it is probably
+> >> overkill to introduce it for this case (do we envision changing the way
+> >> vfio-ap operates in the future to make that statement non-true?)
+> > 
+> > agreed. 
+> >>
+> > 
+> 
+> 
