@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58075)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gUo9t-0003TI-EV
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 02:33:18 -0500
+	(envelope-from <elohimes@gmail.com>) id 1gUoJf-0000dP-HP
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 02:43:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gUo9p-0004M1-Rj
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 02:33:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44440)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gUo9p-0004Hx-Hn
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 02:33:13 -0500
-References: <CAHyh4xgZhGnEvkD5RiUazZ9Eq_jzr4=bXHfwBvCBkbOLN2UyKA@mail.gmail.com>
-	<915953bd-cc9c-9456-b619-297138f68ae6@redhat.com>
-	<CAHyh4xjNU2ZTvBTqRhVn17SpcqXcKnKvK90oGFeA72t_h3-REw@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <7cc73aeb-5eee-8b4f-c005-aee64dfb1bf8@redhat.com>
-Date: Thu, 6 Dec 2018 15:33:02 +0800
+	(envelope-from <elohimes@gmail.com>) id 1gUoJe-00047n-62
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 02:43:23 -0500
+Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:37544)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gUoJa-0003ud-9l
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 02:43:20 -0500
+Received: by mail-yb1-xb42.google.com with SMTP id w129-v6so8841848ybe.4
+	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 23:43:15 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAHyh4xjNU2ZTvBTqRhVn17SpcqXcKnKvK90oGFeA72t_h3-REw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+References: <20181206063552.6701-1-xieyongji@baidu.com>
+	<CAJ+F1C+PrJ2RTNqFQ-Jv8xVrDE+Ozp+YOWoSP9sW0pfwUW1ibA@mail.gmail.com>
+In-Reply-To: <CAJ+F1C+PrJ2RTNqFQ-Jv8xVrDE+Ozp+YOWoSP9sW0pfwUW1ibA@mail.gmail.com>
+From: Yongji Xie <elohimes@gmail.com>
+Date: Thu, 6 Dec 2018 15:43:00 +0800
+Message-ID: <CAONzpcb-a=Nz-BCbf1_wrVSZXNk_p8Qy7HPFW_NQY2fp+wzVWg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Logging dirty pages from vhost-net in-kernel with
- vIOMMU
+Subject: Re: [Qemu-devel] [PATCH for-4.0 0/6] vhost-user-blk: Add support
+ for backend reconnecting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +30,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jintack Lim <jintack@cs.columbia.edu>
-Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>
+To: marcandre.lureau@gmail.com
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, nixun@baidu.com, qemu-devel@nongnu.org, lilin24@baidu.com, zhangyu31@baidu.com, chaiwen@baidu.com, Xie Yongji <xieyongji@baidu.com>
 
-
-On 2018/12/5 =E4=B8=8B=E5=8D=8810:47, Jintack Lim wrote:
-> On Tue, Dec 4, 2018 at 8:30 PM Jason Wang <jasowang@redhat.com> wrote:
->>
->> On 2018/12/5 =E4=B8=8A=E5=8D=882:37, Jintack Lim wrote:
->>> Hi,
->>>
->>> I'm wondering how the current implementation works when logging dirty
->>> pages during migration from vhost-net (in kernel) when used vIOMMU.
->>>
->>> I understand how vhost-net logs GPAs when not using vIOMMU. But when
->>> we use vhost with vIOMMU, then shouldn't vhost-net need to log the
->>> translated address (GPA) instead of the address written in the
->>> descriptor (IOVA) ? The current implementation looks like vhost-net
->>> just logs IOVA without translation in vhost_get_vq_desc() in
->>> drivers/vhost/net.c. It seems like QEMU doesn't do any further
->>> translation of the dirty log when syncing.
->>>
->>> I might be missing something. Could somebody shed some light on this?
->>
->> Good catch. It looks like a bug to me. Want to post a patch for this?
-> Thanks for the confirmation.
+On Thu, 6 Dec 2018 at 15:23, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@gmail.com> wrote:
 >
-> What would be a good setup to catch this kind of migration bug? I
-> tried to observe it in the VM expecting to see network applications
-> not getting data correctly on the destination, but it was not
-> successful (i.e. the VM on the destination just worked fine.) I didn't
-> even see anything going wrong when I disabled the vhost logging
-> completely without using vIOMMU.
+> Hi
 >
-> What I did is I ran multiple network benchmarks (e.g. netperf tcp
-> stream and my own one to check correctness of received data) in a VM
-> without vhost dirty page logging, and the benchmarks just ran fine in
-> the destination. I checked the used ring at the time the VM is stopped
-> in the source for migration, and it had multiple descriptors that is
-> (probably) not processed in the VM yet. Do you have any insight how it
-> could just work and what would be a good setup to catch this?
-
-
-According to past experience, it could be reproduced by doing scp from=20
-host to guest during migration.
-
-
+> On Thu, Dec 6, 2018 at 10:36 AM <elohimes@gmail.com> wrote:
+> >
+> > From: Xie Yongji <xieyongji@baidu.com>
+> >
+> > This patchset is aimed at supporting qemu to reconnect
+> > vhost-user-blk backend after vhost-user-blk backend crash or
+> > restart.
+> >
+> > The patch 1 tries to implenment the sync connection for
+> > "reconnect socket".
+> >
+> > The patch 2 introduces a new message VHOST_USER_SET_VRING_INFLIGHT
+> > to support offering shared memory to backend to record
+> > its inflight I/O.
+> >
+> > The patch 3,4 are the corresponding libvhost-user patches of
+> > patch 2. Make libvhost-user support VHOST_USER_SET_VRING_INFLIGHT.
+> >
+> > The patch 5 supports vhost-user-blk to reconnect backend when
+> > connection closed.
+> >
+> > The patch 6 tells qemu that we support reconnecting now.
+> >
+> > To use it, we could start qemu with:
+> >
+> > qemu-system-x86_64 \
+> >         -chardev socket,id=3Dchar0,path=3D/path/vhost.socket,reconnect=
+=3D1,wait \
+> >         -device vhost-user-blk-pci,chardev=3Dchar0 \
 >
-> About sending a patch, as Michael suggested, I think it's better for
-> you to handle this case - this is not my area of expertise, yet :-)
+> Why do you want qemu to be the client since it is actually the one
+> that serves and remains alive?  Why make it try to reconnect regularly
+> when it could instead wait for a connection to come up?
+>
 
+Actually, this patchset should also work when qemu is in server mode.
+The reason I make qemu to be client is that some vhost-user backend
+such as spdk, vhost-user-blk may still work in server mode. And
+seems like we could not make sure all vhost-user backend is working in
+client mode.
 
-No problem, I will fix this.
-
-Thanks for spotting this issue.
-
-
->> Thanks
->>
->>
->>> Thanks,
->>> Jintack
->>>
->>>
+Thanks,
+Yongji
