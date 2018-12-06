@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gUnH4-0001Js-IJ
+	(envelope-from <elohimes@gmail.com>) id 1gUnH4-0001Jr-I2
 	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 01:36:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gUnH1-0003Es-PW
+	(envelope-from <elohimes@gmail.com>) id 1gUnGz-00038x-Ud
 	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 01:36:38 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:34113)
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:41105)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gUnH1-0003BZ-G7
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 01:36:35 -0500
-Received: by mail-pg1-x544.google.com with SMTP id 17so10208605pgg.1
-	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 22:36:35 -0800 (PST)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gUnGz-000364-Dr
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 01:36:33 -0500
+Received: by mail-pf1-x442.google.com with SMTP id b7so11279920pfi.8
+	for <qemu-devel@nongnu.org>; Wed, 05 Dec 2018 22:36:31 -0800 (PST)
 From: elohimes@gmail.com
-Date: Thu,  6 Dec 2018 14:35:47 +0800
-Message-Id: <20181206063552.6701-2-xieyongji@baidu.com>
-In-Reply-To: <20181206063552.6701-1-xieyongji@baidu.com>
-References: <20181206063552.6701-1-xieyongji@baidu.com>
-Subject: [Qemu-devel] [PATCH for-4.0 1/6] char-socket: Enable "wait" option
- for client mode
+Date: Thu,  6 Dec 2018 14:35:46 +0800
+Message-Id: <20181206063552.6701-1-xieyongji@baidu.com>
+Subject: [Qemu-devel] [PATCH for-4.0 0/6] vhost-user-blk: Add support for
+ backend reconnecting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +29,56 @@ Cc: qemu-devel@nongnu.org, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.c
 
 From: Xie Yongji <xieyongji@baidu.com>
 
-Now we attempt to connect asynchronously for "reconnect socket"
-during open(). But vhost-user device prefer a connected socket
-during initialization. That means we may still need to support
-sync connection during open() for the "reconnect socket".
+This patchset is aimed at supporting qemu to reconnect
+vhost-user-blk backend after vhost-user-blk backend crash or
+restart.
 
-Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
----
- chardev/char-socket.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+The patch 1 tries to implenment the sync connection for
+"reconnect socket".
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index eaa8e8b68f..f2819d52e7 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -1072,7 +1072,7 @@ static void qmp_chardev_open_socket(Chardev *chr,
-         s->reconnect_time = reconnect;
-     }
- 
--    if (s->reconnect_time) {
-+    if (s->reconnect_time && !is_waitconnect) {
-         tcp_chr_connect_async(chr);
-     } else {
-         if (s->is_listen) {
-@@ -1120,7 +1120,8 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
-                                   Error **errp)
- {
-     bool is_listen      = qemu_opt_get_bool(opts, "server", false);
--    bool is_waitconnect = is_listen && qemu_opt_get_bool(opts, "wait", true);
-+    bool is_waitconnect = is_listen ? qemu_opt_get_bool(opts, "wait", true) :
-+                          qemu_opt_get_bool(opts, "wait", false);
-     bool is_telnet      = qemu_opt_get_bool(opts, "telnet", false);
-     bool is_tn3270      = qemu_opt_get_bool(opts, "tn3270", false);
-     bool is_websock     = qemu_opt_get_bool(opts, "websocket", false);
+The patch 2 introduces a new message VHOST_USER_SET_VRING_INFLIGHT
+to support offering shared memory to backend to record
+its inflight I/O.
+
+The patch 3,4 are the corresponding libvhost-user patches of
+patch 2. Make libvhost-user support VHOST_USER_SET_VRING_INFLIGHT.
+
+The patch 5 supports vhost-user-blk to reconnect backend when
+connection closed.
+
+The patch 6 tells qemu that we support reconnecting now.
+
+To use it, we could start qemu with:
+
+qemu-system-x86_64 \
+        -chardev socket,id=char0,path=/path/vhost.socket,reconnect=1,wait \
+        -device vhost-user-blk-pci,chardev=char0 \
+
+and start vhost-user-blk backend with:
+
+vhost-user-blk -b /path/file -s /path/vhost.socket
+
+Then we can restart vhost-user-blk at any time during VM running.
+
+Xie Yongji (6):
+  char-socket: Enable "wait" option for client mode
+  vhost-user: Add shared memory to record inflight I/O
+  libvhost-user: Introduce vu_queue_map_desc()
+  libvhost-user: Support recording inflight I/O in shared memory
+  vhost-user-blk: Add support for reconnecting backend
+  contrib/vhost-user-blk: enable inflight I/O recording
+
+ chardev/char-socket.c                   |   5 +-
+ contrib/libvhost-user/libvhost-user.c   | 215 ++++++++++++++++++++----
+ contrib/libvhost-user/libvhost-user.h   |  19 +++
+ contrib/vhost-user-blk/vhost-user-blk.c |   3 +-
+ hw/block/vhost-user-blk.c               | 169 +++++++++++++++++--
+ hw/virtio/vhost-user.c                  |  69 ++++++++
+ hw/virtio/vhost.c                       |   8 +
+ include/hw/virtio/vhost-backend.h       |   4 +
+ include/hw/virtio/vhost-user-blk.h      |   4 +
+ include/hw/virtio/vhost-user.h          |   8 +
+ 10 files changed, 452 insertions(+), 52 deletions(-)
+
 -- 
 2.17.1
