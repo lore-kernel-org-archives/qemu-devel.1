@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gV1Hz-0004nu-OU
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 16:34:32 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gV1XY-0005xJ-GL
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 16:50:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gV1Hw-0003vQ-ET
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 16:34:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37530)
+	(envelope-from <pbonzini@redhat.com>) id 1gV1XW-00055i-B6
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 16:50:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48452)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gV1Hw-0003ob-3c
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 16:34:28 -0500
-References: <20181108141944.15769-1-minyard@acm.org>
-	<20181108232211.GB26872@umbus.fritz.box>
-	<8a03cead-db46-f4fb-1e57-30bec0802bc8@acm.org>
-	<61eb1702-f620-9267-1dd5-e024c65a22ef@redhat.com>
-	<ec06b913-304c-a9b1-c314-350b712a9d0a@acm.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gV1XU-00051G-LC
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 16:50:32 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CDDDB3078AD4
+	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 21:50:31 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <619ccd65-b66a-92ab-a581-056bc07c1022@redhat.com>
-Date: Thu, 6 Dec 2018 22:34:09 +0100
+Date: Thu,  6 Dec 2018 22:50:25 +0100
+Message-Id: <20181206215026.7716-2-pbonzini@redhat.com>
+In-Reply-To: <20181206215026.7716-1-pbonzini@redhat.com>
+References: <20181206215026.7716-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <ec06b913-304c-a9b1-c314-350b712a9d0a@acm.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/2] ipmi: Allow UUID to be set for a BMC
+Subject: [Qemu-devel] [PATCH 1/2] test: execute g_test_run when tests are
+ skipped
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,38 +32,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: minyard@acm.org, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, "Michael S . Tsirkin" <mst@redhat.com>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, eblake@redhat.com, thuth@redhat.com
 
-On 06/12/18 22:27, Corey Minyard wrote:
-> On 12/6/18 3:10 PM, Paolo Bonzini wrote:
->> On 09/11/18 14:33, Corey Minyard wrote:
->>> On 11/8/18 5:22 PM, David Gibson wrote:
->>> I'm not sure about migration.=A0 I suppose it could be migrated, but =
-I
->>> would consider the BMC part of the hardware that needs to be the
->>> same on both sides.=A0 It's a fuzzy line, I suppose.=A0 The qemu UUID
->>> is migrated, so I suppose that's not an issue.
->>>
->>> Controlling it explicitly is important for some testing I do, and mig=
-ht
->>> be for other people at some point in time, if you are trying to
->>> emulate something specific.=A0 And when re-invoking qemu, you
->>> might want to keep it the same to avoid confusing software.
->> I don't understand, do you need it to be different from the dmicode
->> UUID?=A0 On real hardware are they the same or different?
->=20
-> They are different on real hardware, and software that uses IPMI
-> can expect that it doesn't change unless the BMC changes.
+Sometimes a test's main() function recognizes that the environment
+does not support the test, and therefore exits.  In this case, we
+still should run g_test_run() so that a TAP harness will print the
+test plan ("1..0") and the test will be marked as skipped.
 
-You can say the latter of the dmidecode UUID too, it's not supposed to
-change.  However, if they are different in real hardware they should be
-different in QEMU too.  Or at least it should be possible to make them
-different. :)
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ tests/cdrom-test.c     | 2 +-
+ tests/migration-test.c | 8 ++++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-I guess it's up to you whether the default should be qemu_uuid or no
-support for the get UUID command.
-
-Thanks,
-
-Paolo
+diff --git a/tests/cdrom-test.c b/tests/cdrom-test.c
+index 9b43dc9ab4..14bd981336 100644
+--- a/tests/cdrom-test.c
++++ b/tests/cdrom-test.c
+@@ -169,7 +169,7 @@ int main(int argc, char **argv)
+=20
+     if (exec_genisoimg(genisocheck)) {
+         /* genisoimage not available - so can't run tests */
+-        return 0;
++        return g_test_run();
+     }
+=20
+     ret =3D prepare_image(arch, isoimage);
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 06ca5068d8..8352612364 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -789,7 +789,7 @@ int main(int argc, char **argv)
+     g_test_init(&argc, &argv, NULL);
+=20
+     if (!ufd_version_check()) {
+-        return 0;
++        return g_test_run();
+     }
+=20
+     /*
+@@ -800,7 +800,7 @@ int main(int argc, char **argv)
+     if (g_str_equal(qtest_get_arch(), "ppc64") &&
+         access("/sys/module/kvm_hv", F_OK)) {
+         g_test_message("Skipping test: kvm_hv not available");
+-        return 0;
++        return g_test_run();
+     }
+=20
+     /*
+@@ -811,11 +811,11 @@ int main(int argc, char **argv)
+ #if defined(HOST_S390X)
+         if (access("/dev/kvm", R_OK | W_OK)) {
+             g_test_message("Skipping test: kvm not available");
+-            return 0;
++            return g_test_run();
+         }
+ #else
+         g_test_message("Skipping test: Need s390x host to work properly"=
+);
+-        return 0;
++        return g_test_run();
+ #endif
+     }
+=20
+--=20
+2.19.2
