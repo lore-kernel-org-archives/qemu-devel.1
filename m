@@ -1,40 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1gV2eL-0002ZQ-CI
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 18:01:45 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gV2zd-0003CG-Fb
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 18:23:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1gV2eH-0000ld-JS
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 18:01:41 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45804
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
-	id 1gV2eF-0000js-Bw
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 18:01:35 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wB6MwYRE126980
-	for <qemu-devel@nongnu.org>; Thu, 6 Dec 2018 18:01:32 -0500
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2p7cwa8fr0-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 18:01:31 -0500
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
-	Thu, 6 Dec 2018 23:01:30 -0000
-References: <20181205145131.28467-1-cohuck@redhat.com>
-From: Tony Krowiak <akrowiak@linux.ibm.com>
-Date: Thu, 6 Dec 2018 18:01:24 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gV2zZ-00016f-G0
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 18:23:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34884)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gV2zZ-0000zr-4u
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 18:23:37 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6CA5930014C4
+	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 23:23:36 +0000 (UTC)
+Received: from donizetti.redhat.com (ovpn-112-16.ams2.redhat.com
+	[10.36.112.16])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D2D8762675
+	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 23:23:35 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri,  7 Dec 2018 00:23:28 +0100
+Message-Id: <20181206232333.22408-2-pbonzini@redhat.com>
+In-Reply-To: <20181206232333.22408-1-pbonzini@redhat.com>
+References: <20181206232333.22408-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181205145131.28467-1-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <72ca111b-d1e8-2b18-9f3e-153a0a7a16d1@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH RFC] vfio-ap: flag as compatible with
- balloon
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 1/6] qemu/queue.h: do not access tqe_prev
+ directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,46 +36,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 12/5/18 9:51 AM, Cornelia Huck wrote:
-> vfio-ap devices do not pin any pages in the host. Therefore, they
-> are belived to be compatible with memory ballooning.
-> 
-> Flag them as compatible, so both vfio-ap and a balloon can be
-> used simultaneously.
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
-> 
-> As briefly discussed on IRC. RFC as I do not have easy access to
-> hardware I can test this with.
-> 
-> ---
->   hw/vfio/ap.c | 8 ++++++++
->   1 file changed, 8 insertions(+)
-> 
-> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-> index 65de952f44..3bf48eed28 100644
-> --- a/hw/vfio/ap.c
-> +++ b/hw/vfio/ap.c
-> @@ -104,6 +104,14 @@ static void vfio_ap_realize(DeviceState *dev, Error **errp)
->       vapdev->vdev.name = g_strdup_printf("%s", mdevid);
->       vapdev->vdev.dev = dev;
->   
-> +    /*
-> +     * vfio-ap devices are believed to operate in a way compatible with
-> +     * memory ballooning, as no pages are pinned in the host.
-> +     * This needs to be set before vfio_get_device() for vfio common to
-> +     * handle the balloon inhibitor.
-> +     */
-> +    vapdev->vdev.balloon_allowed = true;
-> +
->       ret = vfio_get_device(vfio_group, mdevid, &vapdev->vdev, &local_err);
->       if (ret) {
->           goto out_get_dev_err;
+Use the QTAILQ_IN_USE macro instead, it does the same thing but the next
+patch will change it to a different definition.
 
-Tested-by: Tony Krowiak <akrowiak@linux.ibm.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ blockdev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> 
+diff --git a/blockdev.c b/blockdev.c
+index 81f95d920b..7604b2183b 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -4259,7 +4259,7 @@ void qmp_blockdev_del(const char *node_name, Error =
+**errp)
+         goto out;
+     }
+=20
+-    if (!bs->monitor_list.tqe_prev) {
++    if (!QTAILQ_IN_USE(bs, monitor_list)) {
+         error_setg(errp, "Node %s is not owned by the monitor",
+                    bs->node_name);
+         goto out;
+--=20
+2.19.2
