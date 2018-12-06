@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gUy1L-0000gP-Fq
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 13:05:13 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gUy1L-0000hl-CR
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 13:05:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gUxsL-0004DT-SN
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:55:51 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:36906)
+	(envelope-from <richard.henderson@linaro.org>) id 1gUxsN-0004ED-Ah
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:55:52 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35642)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gUxsL-0004DF-NH
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:55:49 -0500
-Received: by mail-ot1-x344.google.com with SMTP id 40so1243008oth.4
-	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 09:55:49 -0800 (PST)
+	id 1gUxsN-0004Dx-4k
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:55:51 -0500
+Received: by mail-oi1-x243.google.com with SMTP id v6so1152975oif.2
+	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 09:55:51 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu,  6 Dec 2018 11:55:40 -0600
-Message-Id: <20181206175541.29508-3-richard.henderson@linaro.org>
+Date: Thu,  6 Dec 2018 11:55:41 -0600
+Message-Id: <20181206175541.29508-4-richard.henderson@linaro.org>
 In-Reply-To: <20181206175541.29508-1-richard.henderson@linaro.org>
 References: <20181206175541.29508-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 2/3] target/arm: Use arm_hcr_el2_eff more
- places
+Subject: [Qemu-devel] [PATCH v3 3/3] target/arm: Implement the ARMv8.1-LOR
+ extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,118 +30,197 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Since arm_hcr_el2_eff includes a check against
-arm_is_secure_below_el3, we can often remove a
-nearby check against secure state.
-
-In some cases, sort the call to arm_hcr_el2_eff
-to the end of a short-circuit logical sequence.
+Provide a trivial implementation with zero limited ordering regions,
+which causes the LDLAR and STLLR instructions to devolve into the
+LDAR and STLR instructions from the base ARMv8.0 instruction set.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
-v3: Do not change regime_translation_disabled.
----
- target/arm/helper.c    | 12 +++++-------
- target/arm/op_helper.c | 14 ++++++--------
- 2 files changed, 11 insertions(+), 15 deletions(-)
 
+---
+v2: Mark LORID_EL1 read-only.
+    Add TLOR access checks.
+    Conditionally unmask TLOR in hcr/scr_write.
+v3: Fix isar_feature_aa64_lor.
+    Split out access_lor_ns.
+    Defer all {E2H,TGE} vs TLOR testing to arm_hcr_el2_eff.
+---
+ target/arm/cpu.h           |  5 +++
+ target/arm/cpu64.c         |  1 +
+ target/arm/helper.c        | 75 ++++++++++++++++++++++++++++++++++++++
+ target/arm/translate-a64.c | 12 ++++++
+ 4 files changed, 93 insertions(+)
+
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 05ac883b6b..c943f35dd9 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3340,6 +3340,11 @@ static inline bool isar_feature_aa64_sve(const ARMISARegisters *id)
+     return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, SVE) != 0;
+ }
+ 
++static inline bool isar_feature_aa64_lor(const ARMISARegisters *id)
++{
++    return FIELD_EX64(id->id_aa64mmfr1, ID_AA64MMFR1, LO) != 0;
++}
++
+ /*
+  * Forward to the above feature tests given an ARMCPU pointer.
+  */
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 1a4289c9dd..1d57be0c91 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -326,6 +326,7 @@ static void aarch64_max_initfn(Object *obj)
+ 
+         t = cpu->isar.id_aa64mmfr1;
+         t = FIELD_DP64(t, ID_AA64MMFR1, HPDS, 1); /* HPD */
++        t = FIELD_DP64(t, ID_AA64MMFR1, LO, 1);
+         cpu->isar.id_aa64mmfr1 = t;
+ 
+         /* Replicate the same data to the 32-bit id registers.  */
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 63e02e9fa2..4d25bafd12 100644
+index 4d25bafd12..1e20956376 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -448,7 +448,7 @@ static CPAccessResult access_tdosa(CPUARMState *env, const ARMCPRegInfo *ri,
-     int el = arm_current_el(env);
-     bool mdcr_el2_tdosa = (env->cp15.mdcr_el2 & MDCR_TDOSA) ||
-         (env->cp15.mdcr_el2 & MDCR_TDE) ||
--        (env->cp15.hcr_el2 & HCR_TGE);
-+        (arm_hcr_el2_eff(env) & HCR_TGE);
- 
-     if (el < 2 && mdcr_el2_tdosa && !arm_is_secure_below_el3(env)) {
-         return CP_ACCESS_TRAP_EL2;
-@@ -468,7 +468,7 @@ static CPAccessResult access_tdra(CPUARMState *env, const ARMCPRegInfo *ri,
-     int el = arm_current_el(env);
-     bool mdcr_el2_tdra = (env->cp15.mdcr_el2 & MDCR_TDRA) ||
-         (env->cp15.mdcr_el2 & MDCR_TDE) ||
--        (env->cp15.hcr_el2 & HCR_TGE);
-+        (arm_hcr_el2_eff(env) & HCR_TGE);
- 
-     if (el < 2 && mdcr_el2_tdra && !arm_is_secure_below_el3(env)) {
-         return CP_ACCESS_TRAP_EL2;
-@@ -488,7 +488,7 @@ static CPAccessResult access_tda(CPUARMState *env, const ARMCPRegInfo *ri,
-     int el = arm_current_el(env);
-     bool mdcr_el2_tda = (env->cp15.mdcr_el2 & MDCR_TDA) ||
-         (env->cp15.mdcr_el2 & MDCR_TDE) ||
--        (env->cp15.hcr_el2 & HCR_TGE);
-+        (arm_hcr_el2_eff(env) & HCR_TGE);
- 
-     if (el < 2 && mdcr_el2_tda && !arm_is_secure_below_el3(env)) {
-         return CP_ACCESS_TRAP_EL2;
-@@ -4576,8 +4576,7 @@ int sve_exception_el(CPUARMState *env, int el)
-         if (disabled) {
-             /* route_to_el2 */
-             return (arm_feature(env, ARM_FEATURE_EL2)
--                    && !arm_is_secure(env)
--                    && (env->cp15.hcr_el2 & HCR_TGE) ? 2 : 1);
-+                    && (arm_hcr_el2_eff(env) & HCR_TGE) ? 2 : 1);
-         }
- 
-         /* Check CPACR.FPEN.  */
-@@ -6226,9 +6225,8 @@ static int bad_mode_switch(CPUARMState *env, int mode, CPSRWriteType write_type)
-          * and CPS are treated as illegal mode changes.
-          */
-         if (write_type == CPSRWriteByInstr &&
--            (env->cp15.hcr_el2 & HCR_TGE) &&
-             (env->uncached_cpsr & CPSR_M) == ARM_CPU_MODE_MON &&
--            !arm_is_secure_below_el3(env)) {
-+            (arm_hcr_el2_eff(env) & HCR_TGE)) {
-             return 1;
-         }
-         return 0;
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index 0d6e89e474..ef72361a36 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -33,8 +33,7 @@ void raise_exception(CPUARMState *env, uint32_t excp,
+@@ -1281,6 +1281,7 @@ static void scr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
  {
-     CPUState *cs = CPU(arm_env_get_cpu(env));
+     /* Begin with base v8.0 state.  */
+     uint32_t valid_mask = 0x3fff;
++    ARMCPU *cpu = arm_env_get_cpu(env);
  
--    if ((env->cp15.hcr_el2 & HCR_TGE) &&
--        target_el == 1 && !arm_is_secure(env)) {
-+    if (target_el == 1 && (arm_hcr_el2_eff(env) & HCR_TGE)) {
-         /*
-          * Redirect NS EL1 exceptions to NS EL2. These are reported with
-          * their original syndrome register value, with the exception of
-@@ -428,9 +427,9 @@ static inline int check_wfx_trap(CPUARMState *env, bool is_wfe)
-      * No need for ARM_FEATURE check as if HCR_EL2 doesn't exist the
-      * bits will be zero indicating no trap.
-      */
--    if (cur_el < 2 && !arm_is_secure(env)) {
--        mask = (is_wfe) ? HCR_TWE : HCR_TWI;
--        if (env->cp15.hcr_el2 & mask) {
-+    if (cur_el < 2) {
-+        mask = is_wfe ? HCR_TWE : HCR_TWI;
-+        if (arm_hcr_el2_eff(env) & mask) {
-             return 2;
+     if (arm_el_is_aa64(env, 3)) {
+         value |= SCR_FW | SCR_AW;   /* these two bits are RES1.  */
+@@ -1303,6 +1304,9 @@ static void scr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+             valid_mask &= ~SCR_SMD;
          }
      }
-@@ -995,7 +994,7 @@ void HELPER(pre_smc)(CPUARMState *env, uint32_t syndrome)
-                         exception_target_el(env));
++    if (cpu_isar_feature(aa64_lor, cpu)) {
++        valid_mask |= SCR_TLOR;
++    }
+ 
+     /* Clear all-context RES0 bits.  */
+     value &= valid_mask;
+@@ -3963,6 +3967,9 @@ static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+          */
+         valid_mask &= ~HCR_TSC;
+     }
++    if (cpu_isar_feature(aa64_lor, cpu)) {
++        valid_mask |= HCR_TLOR;
++    }
+ 
+     /* Clear RES0 bits.  */
+     value &= valid_mask;
+@@ -5028,6 +5035,42 @@ static uint64_t id_aa64pfr0_read(CPUARMState *env, const ARMCPRegInfo *ri)
+     return pfr0;
+ }
+ 
++/* Shared logic between LORID and the rest of the LOR* registers.
++ * Secure state has already been delt with.
++ */
++static CPAccessResult access_lor_ns(CPUARMState *env)
++{
++    int el = arm_current_el(env);
++
++    if (el < 2 && (arm_hcr_el2_eff(env) & HCR_TLOR)) {
++        return CP_ACCESS_TRAP_EL2;
++    }
++    if (el < 3 && (env->cp15.scr_el3 & SCR_TLOR)) {
++        return CP_ACCESS_TRAP_EL3;
++    }
++    return CP_ACCESS_OK;
++}
++
++static CPAccessResult access_lorid(CPUARMState *env, const ARMCPRegInfo *ri,
++                                   bool isread)
++{
++    if (arm_is_secure_below_el3(env)) {
++        /* Access ok in secure mode.  */
++        return CP_ACCESS_OK;
++    }
++    return access_lor_ns(env);
++}
++
++static CPAccessResult access_lor_other(CPUARMState *env,
++                                       const ARMCPRegInfo *ri, bool isread)
++{
++    if (arm_is_secure_below_el3(env)) {
++        /* Access denied in secure mode.  */
++        return CP_ACCESS_TRAP;
++    }
++    return access_lor_ns(env);
++}
++
+ void register_cp_regs_for_features(ARMCPU *cpu)
+ {
+     /* Register all the coprocessor registers based on feature bits */
+@@ -5769,6 +5812,38 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+         define_one_arm_cp_reg(cpu, &sctlr);
      }
  
--    if (!secure && cur_el == 1 && (env->cp15.hcr_el2 & HCR_TSC)) {
-+    if (cur_el == 1 && (arm_hcr_el2_eff(env) & HCR_TSC)) {
-         /* In NS EL1, HCR controlled routing to EL2 has priority over SMD.
-          * We also want an EL2 guest to be able to forbid its EL1 from
-          * making PSCI calls into QEMU's "firmware" via HCR.TSC.
-@@ -1098,8 +1097,7 @@ void HELPER(exception_return)(CPUARMState *env)
-         goto illegal_return;
-     }
++    if (cpu_isar_feature(aa64_lor, cpu)) {
++        /*
++         * A trivial implementation of ARMv8.1-LOR leaves all of these
++         * registers fixed at 0, which indicates that there are zero
++         * supported Limited Ordering regions.
++         */
++        static const ARMCPRegInfo lor_reginfo[] = {
++            { .name = "LORSA_EL1", .state = ARM_CP_STATE_AA64,
++              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 0,
++              .access = PL1_RW, .accessfn = access_lor_other,
++              .type = ARM_CP_CONST, .resetvalue = 0 },
++            { .name = "LOREA_EL1", .state = ARM_CP_STATE_AA64,
++              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 1,
++              .access = PL1_RW, .accessfn = access_lor_other,
++              .type = ARM_CP_CONST, .resetvalue = 0 },
++            { .name = "LORN_EL1", .state = ARM_CP_STATE_AA64,
++              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 2,
++              .access = PL1_RW, .accessfn = access_lor_other,
++              .type = ARM_CP_CONST, .resetvalue = 0 },
++            { .name = "LORC_EL1", .state = ARM_CP_STATE_AA64,
++              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 3,
++              .access = PL1_RW, .accessfn = access_lor_other,
++              .type = ARM_CP_CONST, .resetvalue = 0 },
++            { .name = "LORID_EL1", .state = ARM_CP_STATE_AA64,
++              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 7,
++              .access = PL1_R, .accessfn = access_lorid,
++              .type = ARM_CP_CONST, .resetvalue = 0 },
++            REGINFO_SENTINEL
++        };
++        define_arm_cp_regs(cpu, lor_reginfo);
++    }
++
+     if (cpu_isar_feature(aa64_sve, cpu)) {
+         define_one_arm_cp_reg(cpu, &zcr_el1_reginfo);
+         if (arm_feature(env, ARM_FEATURE_EL2)) {
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index fd36425f1a..e1da1e4d6f 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -2290,6 +2290,12 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
+         }
+         return;
  
--    if (new_el == 1 && (env->cp15.hcr_el2 & HCR_TGE)
--        && !arm_is_secure_below_el3(env)) {
-+    if (new_el == 1 && (arm_hcr_el2_eff(env) & HCR_TGE)) {
-         goto illegal_return;
-     }
++    case 0x8: /* STLLR */
++        if (!dc_isar_feature(aa64_lor, s)) {
++            break;
++        }
++        /* StoreLORelease is the same as Store-Release for QEMU.  */
++        /* fall through */
+     case 0x9: /* STLR */
+         /* Generate ISS for non-exclusive accesses including LASR.  */
+         if (rn == 31) {
+@@ -2301,6 +2307,12 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
+                   disas_ldst_compute_iss_sf(size, false, 0), is_lasr);
+         return;
  
++    case 0xc: /* LDLAR */
++        if (!dc_isar_feature(aa64_lor, s)) {
++            break;
++        }
++        /* LoadLOAcquire is the same as Load-Acquire for QEMU.  */
++        /* fall through */
+     case 0xd: /* LDAR */
+         /* Generate ISS for non-exclusive accesses including LASR.  */
+         if (rn == 31) {
 -- 
 2.17.2
