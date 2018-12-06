@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gUj09-0001i0-Q0
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 21:02:57 -0500
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gUj6c-0006SE-2o
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 21:09:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gUj05-0002h1-Nx
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 21:02:53 -0500
-Date: Thu, 6 Dec 2018 10:02:31 +0800 (CST)
-Message-ID: <201812061002316241763@zte.com.cn>
-In-Reply-To: <CAFEAcA8s87tB4LGaVvJNpS0RN1gQ-ZjtzOBO0mWWQamBFiTzYw@mail.gmail.com>
-References: CAFEAcA8hw_PHrBTC+v9rr8VoeU5uiV3Z6nMRknDM7WWdG1Ti5g@mail.gmail.com,
-	CAFEAcA8s87tB4LGaVvJNpS0RN1gQ-ZjtzOBO0mWWQamBFiTzYw@mail.gmail.com
-Mime-Version: 1.0
-From: <peng.hao2@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BQemu-arm=5D_=5BPATCH_V11_0/8=5D_add_pv?=
- =?utf-8?q?panic_mmio_support?=
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gUj6Z-0003K1-CZ
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 21:09:34 -0500
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:44257
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gUj6Y-0003Hp-UA
+	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 21:09:31 -0500
+References: <1543848532-12604-1-git-send-email-lizhijian@cn.fujitsu.com>
+	<1543848532-12604-2-git-send-email-lizhijian@cn.fujitsu.com>
+	<92678cef-b2de-0eb6-d7c8-013f7adca4a2@redhat.com>
+From: Li Zhijian <lizhijian@cn.fujitsu.com>
+Message-ID: <09c493b0-9f67-efb8-2966-f3e5cda928af@cn.fujitsu.com>
+Date: Thu, 6 Dec 2018 10:09:26 +0800
+MIME-Version: 1.0
+In-Reply-To: <92678cef-b2de-0eb6-d7c8-013f7adca4a2@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v3 1/4] unify len and addr type for
+ memory/address APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,63 +30,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: drjones@redhat.com, qemu-arm@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com, peter.maydell@linaro.org
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, philip.li@intel.com, zhijianx.li@intel.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Pk9uIFdlZCwgNSBEZWMgMjAxOCBhdCAwMDoyOCwgPHBlbmcuaGFvMkB6dGUuY29tLmNuPiB3cm90
-ZToKPj4KPj4gPkknbSBhZnJhaWQgSSBkb24ndCB1bmRlcnN0YW5kLiBJZiBpdCdzIGEgUENJIGRl
-dmljZSB0aGVuCj4+ID5pdCBkb2VzIG5vdCBuZWVkIHRvIGJlIGxpc3RlZCBpbiB0aGUgZGV2aWNl
-IHRyZWUgb3IgdGhlCj4+ID5BQ1BJIHRhYmxlcyBhdCBhbGwsIGJlY2F1c2UgaXQgaXMgcHJvYmVh
-YmxlIGJ5IHRoZSBndWVzdC4KPj4gPlRoaXMgYWxzbyBzaWduaWZpY2FudGx5IHNpbXBsaWZpZXMg
-dGhlIGNoYW5nZXMgbmVlZGVkIGluIFFFTVUuCj4+ID4KPj4KPj4gSXQgaXMgcHJlY2lzZWx5IGJl
-Y2F1c2UgUENJIGRldmljZXMgY2FuIG5vdCBiZSBjb250cm9sbGVkIGJ5IEZEVCBvciBBQ1BJIHRh
-YmxlcywKPj4gSSBkbyBub3Qgd2FudCB0byBpbXBsZW1lbnQgaXQgYXMgYSBwY2kgZGV2aWNlLgo+
-PiBYODYvcHZwYW5pYyBpcyBpbXBsZW1lbnRlZCBhcyBJU0EgZGV2aWNlIGluIFFFTVUgYW5kIEFD
-UEkgZGV2aWNlIGluIGtlcm5lbC4KPj4gTXkgaW1wbGVtZW50YXRpb24gZXh0ZW5kcyB0aGUgaW1w
-bGVtZW50YXRpb24gb2YgeDg2L3B2cGFuaWMsIGFuZCBhIGxhcmdlIG9mIHg4Ni9wdnBhbmljCj4+
-IGNvZGVzIGFyZSByZXVzZWQuSWYgUENJIGRldmljZXMgYXJlIGltcGxlbWVudGVkIGluIHFlbXUs
-IHRoZW4gQUNQSSBkZXZpY2VzIGFuZCBQQ0kKPj4gZGV2aWNlcyBtYXkgYXBwZWFyIHNpbXVsdGFu
-ZW91c2x5IGluIHRoZSBrZXJuZWwuIFRoaXMgd291bGQgYWRkIGJvdGggZGV2aWNlcyB0byB0aGUK
-Pj4gY3Jhc2ggbm90aWZpZXIgbGlzdCwgd2hpY2ggaXMgb2RkLiBJIHdhbnQgdG8gc2VlIG9ubHkg
-b25lIGRldmljZSBhdCBhbnkgdGltZS4KPgo+WWVzLCBjZXJ0YWlubHkgd2Ugb25seSBuZWVkIG9u
-ZSBwdnBhbmljIGRldmljZS4gSWYgaXQncyBpbXBsZW1lbnRlZAo+YXMgYSBQQ0kgZGV2aWNlLCB0
-aGVuIHRoYXQncyB3aGF0IGFwcGVhcnMuIFdlIGRvbid0IG5lZWQgYW5kCj53b3VsZCBub3QgaW1w
-bGVtZW50IHRoZSBNTUlPIHZlcnNpb24uIE9uIHg4NiBhIHVzZXIgY291bGQKPmluIHRoZW9yeSB1
-c2UgdGhlIGNvbW1hbmQgbGluZSB0byByZXF1ZXN0IGJvdGggSVNBIGFuZCBQQ0kKPnB2cGFuaWMg
-ZGV2aWNlcy4gVGhhdCB3b3VsZCBub3QgYmUgdmVyeSBzZW5zaWJsZSwgYnV0IHRoZXJlCj5hcmUg
-bG90cyBvZiBRRU1VIGNvbW1hbmQgbGluZXMgdGhlIHVzZXIgY2FuIHJlcXVlc3QgdGhhdAo+ZG9u
-J3QgbWFrZSBzZW5zZS4KPgo+PiBPZiBjb3Vyc2UsIG1hbnkKPj4gYXJjaGl0ZWN0dXJlcyBjYW4g
-dXNlIFBDSSBkZXZpY2VzLCBidXQgd2UgYXJlIGN1cnJlbnRseSByZXVzaW5nIHg4Ni9wdnBhbmlj
-IGNvZGUgYXMgbXVjaAo+PiBhcyBwb3NzaWJsZSBpbiBxZW11IGFuZCBrZXJuZWwgLCByYXRoZXIg
-dGhhbiByZWltcGxlbWVudGluZyBpdC4gQXQgdGhlIHNhbWUgdGltZSwKPj4gYmFja3dhcmQgY29t
-cGF0aWJpbGl0eSBhbHNvIG5lZWRzIHRvIGJlIGNvbnNpZGVyZWQuCj4+Cj4+ICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBwdnBhbmljIGluIGd1ZXN0IGtlcm5lbAo+PiBBUk06
-ICAgQUNQSSB0YWJsZSAgICAgICAgIGFjcGkgZGV2aWNlCj4+ICAgICAgICAgICAgIEZEVCAgICAg
-ICAgICAgICAgICAgIG1taW8gZGV2aWNlICAoc3RhcnQgZ3Vlc3QgYnlwYXNzaW5nIHVlZmkpCj4+
-IHg4NiAgICAgIEFDUEkgdGFibGUgICAgICAgICBhY3BpIGRldmljZQo+Cj5Gb3IgQXJtLCB0aGVy
-ZSBpcyBubyBiYWNrd2FyZCBjb21wYXRpYmlsaXR5IGlzc3VlLCBhcyB3ZSBoYXZlCj5ub3QgeWV0
-IGltcGxlbWVudGVkIG9yIHNoaXBwZWQgYW55dGhpbmcuCj4KClNvcnJ5LCB0aGUgZXhwcmVzc2lv
-biBpcyBub3QgY2xlYXIgZW5vdWdoLiBJIHdhbnQgdG8gc2F5IHRoYXQgeDg2IG5lZWRzIGJhY2t3
-YXJkIApjb21wYXRpYmlsaXR5IGlmIHdlIGludGVuZCB0byByZXVzZSB0aGUgY29kZSBvZiB4ODYv
-cHZwYW5pYy4KCj4+ID4+IFNlY29uZGx5LCBJIGRvbid0IHdhbnQgaXQgdG8gYmUgYSBwbHVnZ2Fi
-bGUgZGV2aWNlLiBJZiB0aGUgdXNlcgo+PiA+PiBkZWxldGVzIHRoZSBkZXZpY2UgYnkgbWlzdGFr
-ZSwgaXQgbWF5IGxlYWQgdG8gdW5wcmVkaWN0YWJsZSByZXN1bHRzLgo+PiA+Cj4+ID5JZiB0aGUg
-dXNlciBkZWxldGVzIHRoZSBQQ0kgZGV2aWNlIHRoZXkncmUgdXNpbmcgZm9yIHRoZWlyCj4+ID5k
-aXNrIG9yIG5ldHdvcmtpbmcgdGhpcyB3aWxsIGFsc28gbGVhZCB0byB1bnByZWRpY3RhYmxlCj4+
-ID5yZXN1bHRzLiBXZSBleHBlY3QgdXNlcnMgbm90IHRvIHJhbmRvbWx5IHVucGx1ZyB0aGluZ3Mg
-ZnJvbQo+PiA+dGhlaXIgc3lzdGVtIGlmIHRoZXkgd2FudCBpdCB0byBjb250aW51ZSB0byB3b3Jr
-LiBJbiBhbnkKPj4gPmNhc2UgeW91ciBndWVzdCBkcml2ZXIgY2FuIGVhc2lseSBoYW5kbGUgdGhl
-IHVucGx1ZzogdGhlCj4+ID5ndWVzdCB3b3VsZCB0aGVuIGp1c3QgbG9zZSB0aGUgYWJpbGl0eSB0
-byBub3RpZnkgb24gcGFuaWMsCj4+ID5mYWxsaW5nIGJhY2sgdG8gYXMgaWYgdGhlIHB2cGFuaWMg
-ZGV2aWNlIGhhZCBuZXZlciBiZWVuCj4+ID5wcmVzZW50Lgo+Pgo+PiBJZiB0d28gZGV2aWNlcyBj
-YW4gZXhpc3Qgc2ltdWx0YW5lb3VzbHkgYnkgbW9kaWZ5aW5nIHRoZSBjb2RlLAo+PiAgdGhlbiBi
-ZWNhdXNlIEFDUEkgZGV2aWNlcyByZWx5IG9uIGEgUENJIGRldmljZSwgaWYgUENJIGRldmljZXMg
-YXJlIGR5bmFtaWNhbGx5Cj4+ICB1bnBsdWdnZWQsIEFDUEkgZGV2aWNlIHdpbGwgbm90IHdvcmsg
-d2hlbiBwYW5pYyBpcyB0cmlnZ2VyZWQuCj4KPklmIHNvbWVib2R5IG1vZGlmaWVzIHRoZSBjb2Rl
-IHRvIFFFTVUgb3IgdGhlIGd1ZXN0IGtlcm5lbAo+c3VjaCB0aGF0IHNvbWV0aGluZyBicmVha3Ms
-IHRoYXQncyB0aGVpciBpc3N1ZSB0byBkZWFsIHdpdGguCj5NeSBwcm9wb3NhbCBpcyB0aGF0IHdl
-IHdvdWxkIHNoaXA6Cj4qIGEgUUVNVSB3aXRoIGEgUENJIHB2cGFuaWMgZGV2aWNlICh3aGljaCB5
-b3UgY291bGQgcGx1ZyBpbgo+aWYgeW91IHdhbnRlZCBpdCkKPiogbm8gY2hhbmdlcyB0byB0aGUg
-QXJtIHZpcnQgYm9hcmQsIHNvIG5vdGhpbmcgaW4gdGhlIEFDUEkKPm9yIGRldmljZSB0cmVlCj4q
-IG5vICJtbWlvIHB2cGFuaWMiIGRldmljZQoKb2ssIEkgd2lsbCB0cnkgaXQuCnRoYW5rcy4KPgo+
-dGhhbmtzCj4tLSBQTU0=
+
+On 12/05/2018 01:40 AM, Philippe Mathieu-Daudé wrote:
+> Hi Li,
+>
+> On 3/12/18 15:48, Li Zhijian wrote:
+>> Some address/memory APIs have different type between
+>> 'hwaddr/target_ulong addr' and 'int len'. It is very unsafety, espcially
+> I'm not native English speaker, but I think this should be spell:
+>
+> ... "very unsafe, especially" ...
+
+thanks, Google said so.
+
+Thanks
+Zhijian
