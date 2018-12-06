@@ -1,17 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gUx8D-0000JY-3H
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:08:13 -0500
+	(envelope-from <eblake@redhat.com>) id 1gUx8I-0000O3-DZ
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:08:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gUx84-0002wl-59
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:08:07 -0500
-From: Eric Auger <eric.auger@redhat.com>
-Date: Thu,  6 Dec 2018 18:07:32 +0100
-Message-Id: <20181206170733.7469-2-eric.auger@redhat.com>
-In-Reply-To: <20181206170733.7469-1-eric.auger@redhat.com>
-References: <20181206170733.7469-1-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH-for-4.0 v2 1/2] hw/arm/virt-acpi-build: Set
- COHACC override flag in IORT SMMUv3 node
+	(envelope-from <eblake@redhat.com>) id 1gUx8E-00032s-F3
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:08:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34676)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gUx8E-0002xs-8K
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 12:08:10 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0DD1158E46
+	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 17:08:03 +0000 (UTC)
+References: <20181130140615.19937-1-berrange@redhat.com>
+	<20181130140615.19937-10-berrange@redhat.com>
+	<868aa668-c882-3392-ee10-2afc28a51f7e@redhat.com>
+	<5d9b6cdf-3d6b-a424-daa1-e5a498920f59@redhat.com>
+	<d7e633c1-2216-fd2b-dd36-41df5c264f0a@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5a0b8acd-2906-2ee7-1ef2-0035af9af811@redhat.com>
+Date: Thu, 6 Dec 2018 11:07:53 -0600
+MIME-Version: 1.0
+In-Reply-To: <d7e633c1-2216-fd2b-dd36-41df5c264f0a@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 09/11] authz: add QAuthZListFile object
+ type for a file access control list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,54 +38,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shannon.zhaosl@gmail.com
-Cc: shameerali.kolothum.thodi@huawei.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-Let's report IO-coherent access is supported for translation
-table walks, descriptor fetches and queues by setting the COHACC
-override flag. Without that, we observe wrong command opcodes.
-The DT description also advertises the dma coherency.
+On 12/6/18 9:58 AM, Philippe Mathieu-Daud=C3=A9 wrote:
 
-Fixes a703b4f6c1ee ("hw/arm/virt-acpi-build: Add smmuv3 node in IORT table")
+>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "refresh": "yes"
+>>>
+>>> I had to use "refresh": yes (value unquoted) to avoid:
+>>
+>> Do you mean "refresh":true?=C2=A0 (bare yes is not valid JSON, but bar=
+e true
+>> is the correct way for a JSON bool).
+>=20
+> I first tried 'true' then was curious and tried 'yes' and it worked too=
+...
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reported-by: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Ah, so you're using a python wrapper rather than direct QMP, and=20
+benefitting from a rather-forgiving parser that turns yes into the=20
+correct QMP true over the wire to the actual monitor.
 
----
-
-- change the commit title
-- addition of new fields (pxm and id_mapping_index) done in a
-  separate patch
----
- hw/arm/virt-acpi-build.c    | 1 +
- include/hw/acpi/acpi-defs.h | 2 ++
- 2 files changed, 3 insertions(+)
-
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 5785fb697c..aa177ba64d 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -448,6 +448,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-         smmu->mapping_count = cpu_to_le32(1);
-         smmu->mapping_offset = cpu_to_le32(sizeof(*smmu));
-         smmu->base_address = cpu_to_le64(vms->memmap[VIRT_SMMU].base);
-+        smmu->flags = ACPI_IORT_SMMU_V3_COHACC_OVERRIDE;
-         smmu->event_gsiv = cpu_to_le32(irq);
-         smmu->pri_gsiv = cpu_to_le32(irq + 1);
-         smmu->gerr_gsiv = cpu_to_le32(irq + 2);
-diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-index af8e023968..532eaf79bd 100644
---- a/include/hw/acpi/acpi-defs.h
-+++ b/include/hw/acpi/acpi-defs.h
-@@ -628,6 +628,8 @@ struct AcpiIortItsGroup {
- } QEMU_PACKED;
- typedef struct AcpiIortItsGroup AcpiIortItsGroup;
- 
-+#define ACPI_IORT_SMMU_V3_COHACC_OVERRIDE 1
-+
- struct AcpiIortSmmu3 {
-     ACPI_IORT_NODE_HEADER_DEF
-     uint64_t base_address;
--- 
-2.17.2
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
