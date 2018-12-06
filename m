@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gUwRi-00006r-El
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:24:15 -0500
+	(envelope-from <armbru@redhat.com>) id 1gUwT7-0000re-Ua
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:25:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gUwRe-0007Xa-Lm
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:24:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50704)
+	(envelope-from <armbru@redhat.com>) id 1gUwT4-00022l-Gz
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:25:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57756)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gUwRa-0007L9-Qu
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:24:08 -0500
-Date: Thu, 6 Dec 2018 09:24:01 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20181206092401.09e6ed37@x1.home>
-In-Reply-To: <20181206125225.GW18284@habkost.net>
-References: <154394083644.28192.8501647946108201466.stgit@gimli.home>
-	<154394987445.795.4102526920089904508.stgit@gimli.home>
-	<6bc68937-ec9e-d28f-9468-5ee9ba08ef52@de.ibm.com>
-	<20181204122647.3a560066@x1.home>
-	<CAFEAcA_5tDfoPZaPcheMGUyq_ibbvT+GE8WKgXnHf8SnxioPvA@mail.gmail.com>
-	<20181204125621.0ad30dc0@x1.home>
-	<20181206125225.GW18284@habkost.net>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gUwT4-000220-6u
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 11:25:38 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0E0A637E66
+	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 16:25:37 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
+	<20180706105753.26700-19-marcandre.lureau@redhat.com>
+Date: Thu, 06 Dec 2018 17:25:31 +0100
+In-Reply-To: <20180706105753.26700-19-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Fri, 6 Jul 2018
+	12:57:44 +0200")
+Message-ID: <871s6ubp1g.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [for-4.0 PATCH v3.1 8/9] q35/440fx/arm/spapr/ccw:
- Add QEMU 4.0 machine type
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 18/27] qapi: add an error in case a
+ discriminator is conditionnal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,51 +36,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, =?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau <marcandre.lureau@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Thu, 6 Dec 2018 10:52:25 -0200
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-> On Tue, Dec 04, 2018 at 12:56:21PM -0700, Alex Williamson wrote:
-> > On Tue, 4 Dec 2018 19:29:25 +0000
-> > Peter Maydell <peter.maydell@linaro.org> wrote:
-> >   
-> > > On Tue, 4 Dec 2018 at 19:26, Alex Williamson <alex.williamson@redhat.com> wrote:  
-> > > >
-> > > > On Tue, 4 Dec 2018 20:16:44 +0100
-> > > > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> > > >    
-> > > > > I think Conny has already added the s390/ccw part to her next tree.
-> > > > > From a quick glimpse both patches look identical.    
-> > > >
-> > > > If so then we can just use the original v3 version of this patch that
-> > > > touches all but ccw and let them come together in mainline.  My
-> > > > assumption is that Peter is only trying to make sure all versioned
-> > > > machines are updated early in this release, not necessarily that
-> > > > they need to be updated together.    
-> > > 
-> > > Yes, that's the idea. I also think it's a suboptimal idea
-> > > to include the version-number-bump patch in a series that's
-> > > adding some feature, because then if the feature itself
-> > > has to go through several rounds of patch review the
-> > > version-number-bump patch is stuck unapplied (we saw that
-> > > at the end of the 3.1 cycle), or it gets bumped by some
-> > > other unrelated series and then there's a merge conflict.
-> > > But that's more of a things-for-next time remark, no need
-> > > to rearrange this now.  
-> > 
-> > If you and the other stakeholders agree, you are more than welcome to
-> > pluck this patch from the series and apply it as soon as 4.0 opens.  It
-> > might make things a tiny bit easier down the road to avoid the
-> > conflicts since we seem to have multiple contenders vying for this
-> > update.  Maybe the best practice going forward is to open the merge
-> > window with such a commit.  Thanks,  
-> 
-> I can queue v3 on machine-next and send a pull request as soon as
-> v3.1.0 is tagged.  Any objections?
+> Making a discriminator conditonal doesn't make much sense.
 
-No objection from me, so long as the pull doesn't get delayed.  Please
-also collect the Reviewed-by from Eric.  Thanks,
+Good point (so easy to overlook!), but why first add the 'if' feature
+broken that way in PATCH 16, then fix it up in PATCH 18?
 
-Alex
+>                                                            Instead,
+> the union could be made conditional.
+
+What do you mean by that?
+
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi/common.py                          | 11 +++++++++--
+>  tests/Makefile.include                          |  1 +
+>  .../flat-union-invalid-if-discriminator.err     |  1 +
+>  .../flat-union-invalid-if-discriminator.exit    |  1 +
+>  .../flat-union-invalid-if-discriminator.json    | 17 +++++++++++++++++
+>  .../flat-union-invalid-if-discriminator.out     |  0
+>  6 files changed, 29 insertions(+), 2 deletions(-)
+>  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
+.err
+>  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
+.exit
+>  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
+.json
+>  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
+.out
+>
+> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+> index 9b95f8cfe9..13fbb28493 100644
+> --- a/scripts/qapi/common.py
+> +++ b/scripts/qapi/common.py
+> @@ -577,7 +577,8 @@ def find_alternate_member_qtype(qapi_type):
+>=20=20
+>  # Return the discriminator enum define if discriminator is specified as =
+an
+>  # enum type, otherwise return None.
+> -def discriminator_find_enum_define(expr):
+> +def discriminator_find_enum_define(expr, info):
+> +    name =3D expr['union']
+>      base =3D expr.get('base')
+>      discriminator =3D expr.get('discriminator')
+>=20=20
+> @@ -592,6 +593,11 @@ def discriminator_find_enum_define(expr):
+>      if not discriminator_member:
+>          return None
+>=20=20
+> +    if discriminator_member.get('if'):
+> +        raise QAPISemError(info, 'The discriminator %s.%s for union %s '
+> +                           'must not be conditional' %
+> +                           (base, discriminator, name))
+> +
+>      return enum_types.get(discriminator_member['type'])
+>=20=20
+>=20=20
+
+I'm afraid this isn't the proper place to check.  It's an accessor
+function for @struct_types and @enum_types.  The check should go into
+check_union(), like this:
+
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 0cf39df404..c1bc9e9c29 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -799,6 +794,11 @@ def check_union(expr, info):
+                                "Discriminator '%s' is not a member of base=
+ "
+                                "struct '%s'"
+                                % (discriminator, base))
++        if discriminator_member.get('if'):
++            raise QAPISemError(info, 'The discriminator %s.%s for union %s=
+ '
++                               'must not be conditional' %
++                               (base, discriminator, name))
++
+         enum_define =3D enum_types.get(discriminator_member['type'])
+         allow_metas =3D ['struct']
+         # Do not allow string discriminator
+
+> @@ -1020,7 +1026,8 @@ def check_exprs(exprs):
+>=20=20
+>          if 'include' in expr:
+>              continue
+> -        if 'union' in expr and not discriminator_find_enum_define(expr):
+> +        info =3D expr_elem['info']
+> +        if 'union' in expr and not discriminator_find_enum_define(expr, =
+info):
+>              name =3D '%sKind' % expr['union']
+>          elif 'alternate' in expr:
+>              name =3D '%sKind' % expr['alternate']
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 43e100a6cd..abc3fdf764 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -510,6 +510,7 @@ qapi-schema +=3D flat-union-inline.json
+>  qapi-schema +=3D flat-union-int-branch.json
+>  qapi-schema +=3D flat-union-invalid-branch-key.json
+>  qapi-schema +=3D flat-union-invalid-discriminator.json
+> +qapi-schema +=3D flat-union-invalid-if-discriminator.json
+>  qapi-schema +=3D flat-union-no-base.json
+>  qapi-schema +=3D flat-union-optional-discriminator.json
+>  qapi-schema +=3D flat-union-string-discriminator.json
+> diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.err b/=
+tests/qapi-schema/flat-union-invalid-if-discriminator.err
+> new file mode 100644
+> index 0000000000..0c94c9860d
+> --- /dev/null
+> +++ b/tests/qapi-schema/flat-union-invalid-if-discriminator.err
+> @@ -0,0 +1 @@
+> +tests/qapi-schema/flat-union-invalid-if-discriminator.json:13: The discr=
+iminator TestBase.enum1 for union TestUnion must not be conditional
+> diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.exit b=
+/tests/qapi-schema/flat-union-invalid-if-discriminator.exit
+> new file mode 100644
+> index 0000000000..d00491fd7e
+> --- /dev/null
+> +++ b/tests/qapi-schema/flat-union-invalid-if-discriminator.exit
+> @@ -0,0 +1 @@
+> +1
+> diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.json b=
+/tests/qapi-schema/flat-union-invalid-if-discriminator.json
+> new file mode 100644
+> index 0000000000..618ec36396
+> --- /dev/null
+> +++ b/tests/qapi-schema/flat-union-invalid-if-discriminator.json
+> @@ -0,0 +1,17 @@
+> +{ 'enum': 'TestEnum',
+> +  'data': [ 'value1', 'value2' ] }
+> +
+> +{ 'struct': 'TestBase',
+> +  'data': { 'enum1': { 'type': 'TestEnum', 'if': 'FOO' } } }
+> +
+> +{ 'struct': 'TestTypeA',
+> +  'data': { 'string': 'str' } }
+> +
+> +{ 'struct': 'TestTypeB',
+> +  'data': { 'integer': 'int' } }
+> +
+> +{ 'union': 'TestUnion',
+> +  'base': 'TestBase',
+> +  'discriminator': 'enum1',
+> +  'data': { 'value1': 'TestTypeA',
+> +            'value2': 'TestTypeB' } }
+> diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.out b/=
+tests/qapi-schema/flat-union-invalid-if-discriminator.out
+> new file mode 100644
+> index 0000000000..e69de29bb2
