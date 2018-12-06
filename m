@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gUjpG-0006dF-AI
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 21:55:46 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUuUF-00082J-G8
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 09:18:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gUjpC-0004Uz-AZ
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 21:55:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:36366)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gUjpB-0004Rh-Un
-	for qemu-devel@nongnu.org; Wed, 05 Dec 2018 21:55:38 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gUjpA-00074g-7T
-	for <qemu-devel@nongnu.org>; Thu, 06 Dec 2018 02:55:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 167962E80D1
-	for <qemu-devel@nongnu.org>; Thu,  6 Dec 2018 02:55:36 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gUuUB-0003KF-JQ
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 09:18:43 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 6 Dec 2018 14:18:26 +0000
+Message-ID: <a523fabb-f532-1230-9d61-92d487bb551c@virtuozzo.com>
+References: <20181130220344.3350618-1-eblake@redhat.com>
+	<20181130220344.3350618-9-eblake@redhat.com>
+In-Reply-To: <20181130220344.3350618-9-eblake@redhat.com>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 06 Dec 2018 02:44:22 -0000
-From: Hongquan Zhu <zhuhq@certusnet.com.cn>
-Reply-To: Bug 1807073 <1807073@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154406426264.32667.2616897072259419283.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1807073] [NEW] qemu-guest-agent stop work when
- fsfreeze
+Content-ID: <8387F105E2C23C43938D6422B5555B29@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 08/14] nbd/client: Refactor
+ nbd_receive_list()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,83 +26,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-Public bug reported:
-
-Create a live snapshot, we should first to fsfreeze the file system. We do =
-have only one disk mounted to /:
-Filesystem      Size  Used Avail Use% Mounted on
-udev             48G     0   48G   0% /dev
-tmpfs           9.5G  8.7M  9.5G   1% /run
-/dev/vda1       485G  1.5G  484G   1% /
-tmpfs            48G     0   48G   0% /dev/shm
-tmpfs           5.0M     0  5.0M   0% /run/lock
-tmpfs            48G     0   48G   0% /sys/fs/cgroup
-tmpfs           9.5G     0  9.5G   0% /run/user/0
-
-snapshot action is OK, when we restore the snapshot, the file system became=
- read-only, and syslog seems stop writing until we fsck /dev/vda1 and mount=
- -o rw,remount /:
-Dec  5 00:39:16 systemd[1]: Started Session 180 of user root.
-Dec  5 00:45:05 qemu-ga: info: guest-fsfreeze called
-Dec  5 07:00:45 kernel: [  114.623823] EXT4-fs (vda1): re-mounted. Opts: (n=
-ull)
-
-So after snapshoting, wo do fsthaw the file system,  maybe the qga dose
-not respond or stop work, this action dose not execute successfully and
-there is no log to show the status of qemu-guest-agent.
-
-Version:
-libvirt 1.2.17
-qemu 2.3.0
-qemu-guest-agent 2.5
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1807073
-
-Title:
-  qemu-guest-agent stop work when fsfreeze
-
-Status in QEMU:
-  New
-
-Bug description:
-  Create a live snapshot, we should first to fsfreeze the file system. We d=
-o have only one disk mounted to /:
-  Filesystem      Size  Used Avail Use% Mounted on
-  udev             48G     0   48G   0% /dev
-  tmpfs           9.5G  8.7M  9.5G   1% /run
-  /dev/vda1       485G  1.5G  484G   1% /
-  tmpfs            48G     0   48G   0% /dev/shm
-  tmpfs           5.0M     0  5.0M   0% /run/lock
-  tmpfs            48G     0   48G   0% /sys/fs/cgroup
-  tmpfs           9.5G     0  9.5G   0% /run/user/0
-
-  snapshot action is OK, when we restore the snapshot, the file system beca=
-me read-only, and syslog seems stop writing until we fsck /dev/vda1 and mou=
-nt -o rw,remount /:
-  Dec  5 00:39:16 systemd[1]: Started Session 180 of user root.
-  Dec  5 00:45:05 qemu-ga: info: guest-fsfreeze called
-  Dec  5 07:00:45 kernel: [  114.623823] EXT4-fs (vda1): re-mounted. Opts: =
-(null)
-
-  So after snapshoting, wo do fsthaw the file system,  maybe the qga
-  dose not respond or stop work, this action dose not execute
-  successfully and there is no log to show the status of qemu-guest-
-  agent.
-
-  Version:
-  libvirt 1.2.17
-  qemu 2.3.0
-  qemu-guest-agent 2.5
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1807073/+subscriptions
+MDEuMTIuMjAxOCAxOjAzLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBBZGQgc29tZSBwYXJhbWV0ZXJz
+IHRvIG1ha2UgdGhpcyBmdW5jdGlvbiByZXVzYWJsZSBpbiB1cGNvbWluZw0KPiBleHBvcnQgbGlz
+dGluZywgd2hlcmUgd2Ugd2lsbCB3YW50IHRvIGNhcHR1cmUgdGhlIG5hbWUgYW5kDQo+IGRlc2Ny
+aXB0aW9uIHJhdGhlciB0aGFuIGNvbXBhcmUgYWdhaW5zdCBhIHVzZXItc3VwcGxpZWQgbmFtZS4N
+Cj4gTm8gY2hhbmdlIGluIHNlbWFudGljcyB0byB0aGUgZXhpc3RpbmcgY2FsbGVyLg0KPiANCj4g
+U2lnbmVkLW9mZi1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+IC0tLQ0KPiAg
+IG5iZC9jbGllbnQuYyB8IDY2ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKyst
+LS0tLS0tLS0tLS0tLS0NCj4gICAxIGZpbGUgY2hhbmdlZCwgNDcgaW5zZXJ0aW9ucygrKSwgMTkg
+ZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvbmJkL2NsaWVudC5jIGIvbmJkL2NsaWVu
+dC5jDQo+IGluZGV4IDFkYzhmODNlMTlhLi4yNzc4NWM1NWQwYSAxMDA2NDQNCj4gLS0tIGEvbmJk
+L2NsaWVudC5jDQo+ICsrKyBiL25iZC9jbGllbnQuYw0KPiBAQCAtMjMyLDE4ICsyMzIsMjEgQEAg
+c3RhdGljIGludCBuYmRfaGFuZGxlX3JlcGx5X2VycihRSU9DaGFubmVsICppb2MsIE5CRE9wdGlv
+blJlcGx5ICpyZXBseSwNCj4gICAgICAgcmV0dXJuIHJlc3VsdDsNCj4gICB9DQo+IA0KPiAtLyog
+UHJvY2VzcyBhbm90aGVyIHBvcnRpb24gb2YgdGhlIE5CRF9PUFRfTElTVCByZXBseS4gIFNldCAq
+QG1hdGNoIGlmDQo+IC0gKiB0aGUgY3VycmVudCByZXBseSBtYXRjaGVzIEB3YW50IG9yIGlmIHRo
+ZSBzZXJ2ZXIgZG9lcyBub3Qgc3VwcG9ydA0KPiAtICogTkJEX09QVF9MSVNULCBvdGhlcndpc2Ug
+bGVhdmUgQG1hdGNoIGFsb25lLiAgUmV0dXJuIDAgaWYgaXRlcmF0aW9uDQo+IC0gKiBpcyBjb21w
+bGV0ZSwgcG9zaXRpdmUgaWYgbW9yZSByZXBsaWVzIGFyZSBleHBlY3RlZCwgb3IgbmVnYXRpdmUN
+Cj4gLSAqIHdpdGggQGVycnAgc2V0IGlmIGFuIHVucmVjb3ZlcmFibGUgZXJyb3Igb2NjdXJyZWQu
+ICovDQo+ICsvKiBQcm9jZXNzIGFub3RoZXIgcG9ydGlvbiBvZiB0aGUgTkJEX09QVF9MSVNUIHJl
+cGx5LiAgSWYgQHdhbnQsIHRoZW4NCj4gKyAqIHNldCAqQG1hdGNoIGlmIHRoZSBjdXJyZW50IHJl
+cGx5IG1hdGNoZXMgQHdhbnQgb3IgaWYgdGhlIHNlcnZlcg0KPiArICogZG9lcyBub3Qgc3VwcG9y
+dCBOQkRfT1BUX0xJU1QsIG90aGVyd2lzZSBsZWF2ZSBAbWF0Y2ggYWxvbmUuDQo+ICsgKiBPdGhl
+cndpc2UsIEBuYW1lb3V0IGFuZCBAZGVzY3JpcHRpb24gYXJlIG1hbGxvYydkIHRvIGNvbnRhaW4N
+Cg0Kd2hhdCB0aGlzICJvdGhlcndpc2UiIHJlZmVycmVkIHRvPw0KDQp1cGQ6IGFoYSwgYWZ0ZXIg
+cmVyZWFkaW5nLCBJIHVuZGVyc3Rvb2QgdGhhdCBpdCByZWxhdGVzIHRvIHRoZSB2ZXJ5IGZpcnN0
+DQpJZiwgYW5kIHRoZSB3aG9sZSB0aGluZyBiZWNhbWUgY2xlYXIuIEhtbSwgSSdtIG9rYXkgd2l0
+aCB0aGlzIG5vdywgYnV0IGl0DQptYXkgYmUgc3RpbGwgd29ydGggc29tZSBzaW1wbGlmeWluZy4N
+Cg0KPiArICogTlVMLXRlcm1pbmF0ZWQgY29waWVzIG9mIHRoZSByZXBseS4NCg0KWW91IGRpZG4n
+dCBzYXkgYW55dGhpbmcgYWJvdXQgQG1hdGNoIGluICJPdGhlcndpc2UiIGJyYW5jaA0KDQogICBS
+ZXR1cm4gMCBpZiBpdGVyYXRpb24gaXMNCg0KaG93ZXZlciwgIml0ZXJhdGlvbnMgaXMgY29tcGxl
+dGUiIG1heSBkaWZmZXIgZm9yIEB3YW50LyFAd2FudCBjYXNlcw0KDQo+ICsgKiBjb21wbGV0ZSwg
+cG9zaXRpdmUgaWYgbW9yZSByZXBsaWVzIGFyZSBleHBlY3RlZCwgb3IgbmVnYXRpdmUgd2l0aA0K
+PiArICogQGVycnAgc2V0IGlmIGFuIHVucmVjb3ZlcmFibGUgZXJyb3Igb2NjdXJyZWQuICovDQo+
+ICAgc3RhdGljIGludCBuYmRfcmVjZWl2ZV9saXN0KFFJT0NoYW5uZWwgKmlvYywgY29uc3QgY2hh
+ciAqd2FudCwgYm9vbCAqbWF0Y2gsDQo+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgRXJy
+b3IgKiplcnJwKQ0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNoYXIgKipuYW1lb3V0
+LCBjaGFyICoqZGVzY3JpcHRpb24sIEVycm9yICoqZXJycCkNCj4gICB7DQo+ICAgICAgIE5CRE9w
+dGlvblJlcGx5IHJlcGx5Ow0KPiAgICAgICB1aW50MzJfdCBsZW47DQo+ICAgICAgIHVpbnQzMl90
+IG5hbWVsZW47DQo+IC0gICAgY2hhciBuYW1lW05CRF9NQVhfTkFNRV9TSVpFICsgMV07DQo+ICsg
+ICAgY2hhciBhcnJheVtOQkRfTUFYX05BTUVfU0laRSArIDFdOw0KPiArICAgIGNoYXIgKm5hbWUg
+PSBhcnJheTsNCj4gICAgICAgaW50IGVycm9yOw0KPiANCj4gICAgICAgaWYgKG5iZF9yZWNlaXZl
+X29wdGlvbl9yZXBseShpb2MsIE5CRF9PUFRfTElTVCwgJnJlcGx5LCBlcnJwKSA8IDApIHsNCj4g
+QEAgLTI1Myw3ICsyNTYsMTIgQEAgc3RhdGljIGludCBuYmRfcmVjZWl2ZV9saXN0KFFJT0NoYW5u
+ZWwgKmlvYywgY29uc3QgY2hhciAqd2FudCwgYm9vbCAqbWF0Y2gsDQo+ICAgICAgIGlmIChlcnJv
+ciA8PSAwKSB7DQo+ICAgICAgICAgICAvKiBUaGUgc2VydmVyIGRpZCBub3Qgc3VwcG9ydCBOQkRf
+T1BUX0xJU1QsIHNvIHNldCAqbWF0Y2ggb24NCj4gICAgICAgICAgICAqIHRoZSBhc3N1bXB0aW9u
+IHRoYXQgYW55IG5hbWUgd2lsbCBiZSBhY2NlcHRlZC4gICovDQo+IC0gICAgICAgICptYXRjaCA9
+IHRydWU7DQo+ICsgICAgICAgIGlmICh3YW50KSB7DQo+ICsgICAgICAgICAgICAqbWF0Y2ggPSB0
+cnVlOw0KPiArICAgICAgICB9IGVsc2UgaWYgKCFlcnJvcikgew0KPiArICAgICAgICAgICAgZXJy
+b3Jfc2V0ZyhlcnJwLCAiU2VydmVyIGRvZXMgbm90IHN1cHBvcnQgZXhwb3J0IGxpc3RzIik7DQo+
+ICsgICAgICAgICAgICBlcnJvciA9IC0xOw0KPiArICAgICAgICB9DQo+ICAgICAgICAgICByZXR1
+cm4gZXJyb3I7DQo+ICAgICAgIH0NCj4gICAgICAgbGVuID0gcmVwbHkubGVuZ3RoOw0KPiBAQCAt
+MjkwLDMwICsyOTgsNDkgQEAgc3RhdGljIGludCBuYmRfcmVjZWl2ZV9saXN0KFFJT0NoYW5uZWwg
+KmlvYywgY29uc3QgY2hhciAqd2FudCwgYm9vbCAqbWF0Y2gsDQo+ICAgICAgICAgICBuYmRfc2Vu
+ZF9vcHRfYWJvcnQoaW9jKTsNCj4gICAgICAgICAgIHJldHVybiAtMTsNCj4gICAgICAgfQ0KPiAt
+ICAgIGlmIChuYW1lbGVuICE9IHN0cmxlbih3YW50KSkgew0KPiAtICAgICAgICBpZiAobmJkX2Ry
+b3AoaW9jLCBsZW4sIGVycnApIDwgMCkgew0KPiAtICAgICAgICAgICAgZXJyb3JfcHJlcGVuZChl
+cnJwLA0KPiAtICAgICAgICAgICAgICAgICAgICAgICAgICAiZmFpbGVkIHRvIHNraXAgZXhwb3J0
+IG5hbWUgd2l0aCB3cm9uZyBsZW5ndGg6ICIpOw0KPiAtICAgICAgICAgICAgbmJkX3NlbmRfb3B0
+X2Fib3J0KGlvYyk7DQo+IC0gICAgICAgICAgICByZXR1cm4gLTE7DQo+ICsgICAgaWYgKHdhbnQp
+IHsNCj4gKyAgICAgICAgaWYgKG5hbWVsZW4gIT0gc3RybGVuKHdhbnQpKSB7DQo+ICsgICAgICAg
+ICAgICBpZiAobmJkX2Ryb3AoaW9jLCBsZW4sIGVycnApIDwgMCkgew0KPiArICAgICAgICAgICAg
+ICAgIGVycm9yX3ByZXBlbmQoZXJycCwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICJmYWlsZWQgdG8gc2tpcCBleHBvcnQgbmFtZSB3aXRoIHdyb25nIGxlbmd0aDogIik7DQo+ICsg
+ICAgICAgICAgICAgICAgbmJkX3NlbmRfb3B0X2Fib3J0KGlvYyk7DQo+ICsgICAgICAgICAgICAg
+ICAgcmV0dXJuIC0xOw0KPiArICAgICAgICAgICAgfQ0KPiArICAgICAgICAgICAgcmV0dXJuIDE7
+DQo+ICAgICAgICAgICB9DQo+IC0gICAgICAgIHJldHVybiAxOw0KPiArICAgICAgICBhc3NlcnQo
+bmFtZWxlbiA8IHNpemVvZihhcnJheSkpOw0KPiArICAgIH0gZWxzZSB7DQo+ICsgICAgICAgIGFz
+c2VydChuYW1lb3V0KTsNCg0KdGhpcyBhc3NlcnQgbG9va3MgYSBiaXQgcmVkdW5kYW50LCBpZiBu
+YW1lb3V0IGlzIDAsIG5leHQgbGluZSB3aWxsIGFib3J0IG5vdCBsZXNzIGNsZWFybHkNCg0KPiAr
+ICAgICAgICAqbmFtZW91dCA9IG5hbWUgPSBnX25ldyhjaGFyLCBuYW1lbGVuICsgMSk7DQoNCldl
+IHNob3VsZCBjaGVjayBuYW1lbGVuIDw9IE5CRF9NQVhfTkFNRV9TSVpFIGJlZm9yZSBpdCwgSSB0
+aGluay4NCg0KPiAgICAgICB9DQo+IA0KPiAtICAgIGFzc2VydChuYW1lbGVuIDwgc2l6ZW9mKG5h
+bWUpKTsNCj4gICAgICAgaWYgKG5iZF9yZWFkKGlvYywgbmFtZSwgbmFtZWxlbiwgZXJycCkgPCAw
+KSB7DQo+ICAgICAgICAgICBlcnJvcl9wcmVwZW5kKGVycnAsICJmYWlsZWQgdG8gcmVhZCBleHBv
+cnQgbmFtZTogIik7DQo+ICAgICAgICAgICBuYmRfc2VuZF9vcHRfYWJvcnQoaW9jKTsNCj4gKyAg
+ICAgICAgaWYgKCF3YW50KSB7DQo+ICsgICAgICAgICAgICBmcmVlKG5hbWUpOw0KDQpnX2ZyZWUN
+Cg0KPiArICAgICAgICB9DQo+ICAgICAgICAgICByZXR1cm4gLTE7DQo+ICAgICAgIH0NCj4gICAg
+ICAgbmFtZVtuYW1lbGVuXSA9ICdcMCc7DQo+ICAgICAgIGxlbiAtPSBuYW1lbGVuOw0KPiAtICAg
+IGlmIChuYmRfZHJvcChpb2MsIGxlbiwgZXJycCkgPCAwKSB7DQo+ICsgICAgaWYgKCF3YW50KSB7
+DQo+ICsgICAgICAgIGFzc2VydChkZXNjcmlwdGlvbik7DQoNCk5CRF9NQVhfTkFNRV9TSVpFDQoN
+Cj4gKyAgICAgICAgKmRlc2NyaXB0aW9uID0gZ19uZXcoY2hhciwgbGVuICsgMSk7DQo+ICsgICAg
+ICAgIGlmIChuYmRfcmVhZChpb2MsICpkZXNjcmlwdGlvbiwgbGVuLCBlcnJwKSA8IDApIHsNCj4g
+KyAgICAgICAgICAgIGVycm9yX3ByZXBlbmQoZXJycCwgImZhaWxlZCB0byByZWFkIGV4cG9ydCBk
+ZXNjcmlwdGlvbjogIik7DQo+ICsgICAgICAgICAgICBuYmRfc2VuZF9vcHRfYWJvcnQoaW9jKTsN
+Cj4gKyAgICAgICAgICAgIGZyZWUobmFtZSk7DQo+ICsgICAgICAgICAgICBmcmVlKCpkZXNjcmlw
+dGlvbik7DQoNCmdfZnJlZQ0KDQo+ICsgICAgICAgICAgICByZXR1cm4gLTE7DQo+ICsgICAgICAg
+IH0NCj4gKyAgICAgICAgKCpkZXNjcmlwdGlvbilbbGVuXSA9ICdcMCc7DQo+ICsgICAgfSBlbHNl
+IGlmIChuYmRfZHJvcChpb2MsIGxlbiwgZXJycCkgPCAwKSB7DQo+ICAgICAgICAgICBlcnJvcl9w
+cmVwZW5kKGVycnAsICJmYWlsZWQgdG8gcmVhZCBleHBvcnQgZGVzY3JpcHRpb246ICIpOw0KPiAg
+ICAgICAgICAgbmJkX3NlbmRfb3B0X2Fib3J0KGlvYyk7DQo+ICAgICAgICAgICByZXR1cm4gLTE7
+DQo+ICAgICAgIH0NCj4gLSAgICBpZiAoIXN0cmNtcChuYW1lLCB3YW50KSkgew0KPiArICAgIGlm
+ICh3YW50ICYmICFzdHJjbXAobmFtZSwgd2FudCkpIHsNCj4gICAgICAgICAgICptYXRjaCA9IHRy
+dWU7DQo+ICAgICAgIH0NCj4gICAgICAgcmV0dXJuIDE7DQoNCm9uZSBtb3JlIHRoaW5nOiBvbiBm
+YWlsIHBhdGgsIHlvdSBmaW5hbGx5IGZpbGwgb3V0cHV0IG5hbWUgYW5kIGRlc2NyaXB0aW9uDQp3
+aXRoIGZyZWVkIHBvaW50ZXJzLiBJJ2QgcHJlZmVyIHRvIGtlZXAgdGhlbSB1bmNoYW5nZWQgaW4g
+dGhpcyBjYXNlLCBob3dldmVyLA0KaXQncyBhIG1hdHRlciBvZiB0YXN0ZS4NCg0KDQo+IEBAIC00
+OTgsNyArNTI1LDggQEAgc3RhdGljIGludCBuYmRfcmVjZWl2ZV9xdWVyeV9leHBvcnRzKFFJT0No
+YW5uZWwgKmlvYywNCj4gICAgICAgfQ0KPiANCj4gICAgICAgd2hpbGUgKDEpIHsNCj4gLSAgICAg
+ICAgaW50IHJldCA9IG5iZF9yZWNlaXZlX2xpc3QoaW9jLCB3YW50bmFtZSwgJmZvdW5kRXhwb3J0
+LCBlcnJwKTsNCj4gKyAgICAgICAgaW50IHJldCA9IG5iZF9yZWNlaXZlX2xpc3QoaW9jLCB3YW50
+bmFtZSwgJmZvdW5kRXhwb3J0LA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBOVUxMLCBOVUxMLCBlcnJwKTsNCj4gDQo+ICAgICAgICAgICBpZiAocmV0IDwgMCkgew0KPiAg
+ICAgICAgICAgICAgIC8qIFNlcnZlciBnYXZlIHVuZXhwZWN0ZWQgcmVwbHkgKi8NCj4gDQoNCg0K
+LS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
