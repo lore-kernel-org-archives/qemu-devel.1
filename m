@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gVFhA-0005l5-T6
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 07:57:30 -0500
+	(envelope-from <prvs=872b883f0=Paul.Durrant@citrix.com>)
+	id 1gVFhH-0005p0-Ca
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 07:57:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gVFh8-0007ZH-VD
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 07:57:28 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181206151304.8388-1-kwolf@redhat.com>
-	<20181206151304.8388-3-kwolf@redhat.com>
-	<87o99x3j8e.fsf@dusky.pond.sub.org>
-	<20181207105329.GB5119@linux.fritz.box>
-Date: Fri, 07 Dec 2018 13:57:17 +0100
-In-Reply-To: <20181207105329.GB5119@linux.fritz.box> (Kevin Wolf's message of
-	"Fri, 7 Dec 2018 11:53:29 +0100")
-Message-ID: <87bm5xxzo2.fsf@dusky.pond.sub.org>
+	(envelope-from <prvs=872b883f0=Paul.Durrant@citrix.com>)
+	id 1gVFhE-0007ot-3r
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 07:57:35 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Fri, 7 Dec 2018 12:57:29 +0000
+Message-ID: <e4bc3b20558141f2b4b2154fdc9f6448@AMSPEX02CL03.citrite.net>
+References: <1544108924-10841-1-git-send-email-paul.durrant@citrix.com>
+	<1544108924-10841-3-git-send-email-paul.durrant@citrix.com>
+	<20181207121519.GE18875@perard.uk.xensource.com>
+In-Reply-To: <20181207121519.GE18875@perard.uk.xensource.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] vmdk: Implement .bdrv_co_create
- callback
+Subject: Re: [Qemu-devel] [PATCH v2 02/18] xen: introduce new 'XenBus' and
+ 'XenDevice' object hierarchy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,345 +28,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Anthony Perard <anthony.perard@citrix.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel
+	Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+> -----Original Message-----
+> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
+> Sent: 07 December 2018 12:15
+> To: Paul Durrant <Paul.Durrant@citrix.com>
+> Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
+> devel@lists.xenproject.org; Stefano Stabellini <sstabellini@kernel.org>;
+> Michael S. Tsirkin <mst@redhat.com>; Marcel Apfelbaum
+> <marcel.apfelbaum@gmail.com>; Paolo Bonzini <pbonzini@redhat.com>; Richar=
+d
+> Henderson <rth@twiddle.net>; Eduardo Habkost <ehabkost@redhat.com>
+> Subject: Re: [PATCH v2 02/18] xen: introduce new 'XenBus' and 'XenDevice'
+> object hierarchy
+>=20
+> On Thu, Dec 06, 2018 at 03:08:28PM +0000, Paul Durrant wrote:
+> > This patch adds the basic boilerplate for a 'XenBus' object that will
+> act
+> > as a parent to 'XenDevice' PV backends.
+> > A new 'XenBridge' object is also added to connect XenBus to the system
+> bus.
+> >
+> > The XenBus object is instantiated by a new xen_bus_init() function
+> called
+> > from the same sites as the legacy xen_be_init() function.
+> >
+> > Subsequent patches will flesh-out the functionality of these objects.
+> >
+> > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> > ---
+> > Cc: Stefano Stabellini <sstabellini@kernel.org>
+> > Cc: Anthony Perard <anthony.perard@citrix.com>
+> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> > Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Cc: Richard Henderson <rth@twiddle.net>
+> > Cc: Eduardo Habkost <ehabkost@redhat.com>
+> >
+> > v2:
+> >  - Fix boilerplate
+> >  - Make xen-bus hotplug capable
+> > ---
+> >  hw/i386/xen/xen-hvm.c     |   3 ++
+> >  hw/xen/Makefile.objs      |   2 +-
+> >  hw/xen/trace-events       |   6 +++
+> >  hw/xen/xen-bus.c          | 131
+> ++++++++++++++++++++++++++++++++++++++++++++++
+> >  hw/xenpv/xen_machine_pv.c |   3 ++
+> >  include/hw/xen/xen-bus.h  |  55 +++++++++++++++++++
+> >  6 files changed, 199 insertions(+), 1 deletion(-)
+> >  create mode 100644 hw/xen/xen-bus.c
+> >  create mode 100644 include/hw/xen/xen-bus.h
+> >
+> > diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+> > index 1d63763..4497f75 100644
+> > --- a/hw/i386/xen/xen-hvm.c
+> > +++ b/hw/i386/xen/xen-hvm.c
+> > @@ -17,6 +17,7 @@
+> >  #include "hw/i386/apic-msidef.h"
+> >  #include "hw/xen/xen_common.h"
+> >  #include "hw/xen/xen-legacy-backend.h"
+> > +#include "hw/xen/xen-bus.h"
+> >  #include "qapi/error.h"
+> >  #include "qapi/qapi-commands-misc.h"
+> >  #include "qemu/error-report.h"
+> > @@ -1479,6 +1480,8 @@ void xen_hvm_init(PCMachineState *pcms,
+> MemoryRegion **ram_memory)
+> >      QLIST_INIT(&state->dev_list);
+> >      device_listener_register(&state->device_listener);
+> >
+> > +    xen_bus_init();
+> > +
+> >      /* Initialize backend core & drivers */
+> >      if (xen_be_init() !=3D 0) {
+> >          error_report("xen backend core setup failed");
+> > diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
+> > index 3f64a44..d9d6d7b 100644
+> > --- a/hw/xen/Makefile.objs
+> > +++ b/hw/xen/Makefile.objs
+> > @@ -1,5 +1,5 @@
+> >  # xen backend driver support
+> > -common-obj-$(CONFIG_XEN) +=3D xen-legacy-backend.o xen_devconfig.o
+> xen_pvdev.o xen-common.o
+> > +common-obj-$(CONFIG_XEN) +=3D xen-legacy-backend.o xen_devconfig.o
+> xen_pvdev.o xen-common.o xen-bus.o
+> >
+> >  obj-$(CONFIG_XEN_PCI_PASSTHROUGH) +=3D xen-host-pci-device.o
+> >  obj-$(CONFIG_XEN_PCI_PASSTHROUGH) +=3D xen_pt.o xen_pt_config_init.o
+> xen_pt_graphics.o xen_pt_msi.o
+> > diff --git a/hw/xen/trace-events b/hw/xen/trace-events
+> > index c7e7a3b..0172cd4 100644
+> > --- a/hw/xen/trace-events
+> > +++ b/hw/xen/trace-events
+> > @@ -12,3 +12,9 @@ xen_unmap_portio_range(uint32_t id, uint64_t
+> start_addr, uint64_t end_addr) "id:
+> >  xen_map_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func)
+> "id: %u bdf: %02x.%02x.%02x"
+> >  xen_unmap_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func)
+> "id: %u bdf: %02x.%02x.%02x"
+> >  xen_domid_restrict(int err) "err: %u"
+> > +
+> > +# include/hw/xen/xen-bus.c
+> > +xen_bus_realize(void) ""
+> > +xen_bus_unrealize(void) ""
+> > +xen_device_realize(const char *type) "type: %s"
+> > +xen_device_unrealize(const char *type) "type: %s"
+> > diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
+> > new file mode 100644
+> > index 0000000..1385bab
+> > --- /dev/null
+> > +++ b/hw/xen/xen-bus.c
+> > @@ -0,0 +1,131 @@
+> > +/*
+> > + * Copyright (c) 2018  Citrix Systems Inc.
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or
+> later.
+> > + * See the COPYING file in the top-level directory.
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +#include "hw/hw.h"
+> > +#include "hw/sysbus.h"
+> > +#include "hw/xen/xen-bus.h"
+> > +#include "qapi/error.h"
+> > +#include "trace.h"
+> > +
+> > +static void xen_bus_unrealize(BusState *bus, Error **errp)
+> > +{
+> > +    trace_xen_bus_unrealize();
+> > +}
+> > +
+> > +static void xen_bus_realize(BusState *bus, Error **errp)
+> > +{
+> > +    trace_xen_bus_realize();
+> > +}
+> > +
+> > +static void xen_bus_class_init(ObjectClass *class, void *data)
+> > +{
+> > +    BusClass *bus_class =3D BUS_CLASS(class);
+> > +
+> > +    bus_class->realize =3D xen_bus_realize;
+> > +    bus_class->unrealize =3D xen_bus_unrealize;
+> > +}
+> > +
+> > +static const TypeInfo xen_bus_type_info =3D {
+> > +    .name =3D TYPE_XEN_BUS,
+> > +    .parent =3D TYPE_BUS,
+> > +    .instance_size =3D sizeof(XenBus),
+> > +    .class_size =3D sizeof(XenBusClass),
+> > +    .class_init =3D xen_bus_class_init,
+> > +    .interfaces =3D (InterfaceInfo[]) {
+> > +        { TYPE_HOTPLUG_HANDLER },
+> > +        { }
+> > +    },
+> > +};
+> > +
+> > +static void xen_device_unrealize(DeviceState *dev, Error **errp)
+> > +{
+> > +    XenDevice *xendev =3D XEN_DEVICE(dev);
+> > +    XenDeviceClass *xendev_class =3D XEN_DEVICE_GET_CLASS(xendev);
+> > +    const char *type =3D object_get_typename(OBJECT(xendev));
+> > +    Error *local_err =3D NULL;
+> > +
+> > +    trace_xen_device_unrealize(type);
+> > +
+> > +    if (xendev_class->unrealize) {
+> > +        xendev_class->unrealize(xendev, &local_err);
+>=20
+> Since all you do here is propagate the error, you could even pass `errp'
+> to unrealize(), instead of having `local_err'. That "for readability",
+> as explained in "qapi/error.h".
 
-> Am 07.12.2018 um 08:10 hat Markus Armbruster geschrieben:
->> This is a reasonably careful review of the QAPI-related parts, but more
->> of an eye-over for the remainder.
->> 
->> Kevin Wolf <kwolf@redhat.com> writes:
->> 
->> > From: Fam Zheng <famz@redhat.com>
->> >
->> > This makes VMDK support blockdev-create. The implementation reuses the
->> > image creation code in vmdk_co_create_opts which now acceptes a callback
->> > pointer to "retrieve" BlockBackend pointers from the caller. This way we
->> > separate the logic between file/extent acquisition and initialization.
->> >
->> > The QAPI command parameters are mostly the same as the old create_opts
->> > except the dropped legacy @compat6 switch, which is redundant with
->> > @hwversion.
->> >
->> > Signed-off-by: Fam Zheng <famz@redhat.com>
->> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->> > ---
->> >  qapi/block-core.json  |  70 +++++++
->> >  qapi/qapi-schema.json |   1 +
->> >  block/vmdk.c          | 452 ++++++++++++++++++++++++++++++------------
->> >  3 files changed, 396 insertions(+), 127 deletions(-)
->> >
->> > diff --git a/qapi/block-core.json b/qapi/block-core.json
->> > index d4fe710836..4778f88dd8 100644
->> > --- a/qapi/block-core.json
->> > +++ b/qapi/block-core.json
->> > @@ -4021,6 +4021,75 @@
->> >              'size':             'size',
->> >              '*cluster-size' :   'size' } }
->> >  
->> > +##
->> > +# @BlockdevVmdkSubformat:
->> > +#
->> > +# Subformat options for VMDK images
->> > +#
->> > +# @monolithicSparse:     Single file image with sparse cluster allocation
->> > +#
->> > +# @monolithicFlat:       Single flat data image and a descriptor file
->> > +#
->> > +# @twoGbMaxExtentSparse: Data is split into 2GB (per virtual LBA) sparse extent
->> > +#                        files, in addition to a descriptor file
->> > +#
->> > +# @twoGbMaxExtentFlat:   Data is split into 2GB (per virtual LBA) flat extent
->> > +#                        files, in addition to a descriptor file
->> > +#
->> > +# @streamOptimized:      Single file image sparse cluster allocation, optimized
->> > +#                        for streaming over network.
->> > +#
->> > +# Since: 4.0
->> > +##
->> > +{ 'enum': 'BlockdevVmdkSubformat',
->> > +  'data': [ 'monolithicSparse', 'monolithicFlat', 'twoGbMaxExtentSparse',
->> > +            'twoGbMaxExtentFlat', 'streamOptimized'] }
->> 
->> Don't conform to the QAPI rules on names "to match VMDK spec spellings"
->> (see qapi-schema.json below).  We discussed this in review of v1.
->> 
->> PRO: matches the VMDK spec (whatever that's worth), keeps the code
->> simple.
->> 
->> CON: the non-conforming names become part of the stable QMP interface,
->> in the argument of command blockdev-create.
->> 
->> I don't like the CON, but I'm willing to tolerate it in the name of
->> simplicity.
->
-> I don't really have a opinion here. It seems this is what you had agreed
-> on in v1 and it still feels acceptable (even if not perfect) to you, so
-> I'll stick with it.
+Yes, true.
 
-That's okay.  I think I'd like the alternatives less.
+>=20
+> > +        if (local_err) {
+> > +            error_propagate(errp, local_err);
+> > +        }
+> > +    }
+> > +}
+> > +
+>=20
+> With that nit fixed:
+> Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
+>=20
 
->> > +
->> > +##
->> > +# @BlockdevVmdkAdapterType:
->> > +#
->> > +# Adapter type info for VMDK images
->> > +#
->> > +# Since: 4.0
->> > +##
->> > +{ 'enum': 'BlockdevVmdkAdapterType',
->> > +  'data': [ 'ide', 'buslogic', 'lsilogic', 'legacyesx'] }
->> 
->> May I have hyphens in the composite nouns?  Hmm, might be the way they
->> are to match VMDK spec spellings or for backward compatibility.  I guess
->> we'll see below.
->
-> These are literal values to be written into the VMDK descriptor files,
-> so they have to use this spelling. If we want to have a different
-> spelling in QMP, then we'll have to translate internally.
->
-> I guess this is the same argument as for BlockdevVmdkSubformat above.
-> For consistency, we should use the spec spellings in both cases or not
-> at all.
+Thanks :-)
 
-Makes sense.
+  Paul
 
->> > +
->> > +##
->> > +# @BlockdevCreateOptionsVmdk:
->> > +#
->> > +# Driver specific image creation options for VMDK.
->> > +#
->> > +# @file         Where to store the new image file. This refers to the image
->> > +#               file for monolithcSparse and streamOptimized format, or the
->> > +#               descriptor file for other formats.
->> > +# @size         Size of the virtual disk in bytes
->> > +# @extents      Where to store the data extents. Required for monolithcflat,
->> > +#               twoGbMaxExtentSparse and twoGbMaxExtentFlat formats. For
->> > +#               monolithicflat, only one entry is required; for
->> 
->> monolithicFlat
->> 
->> > +#               twoGbMaxExtent* formats, the number of entries required is
->> > +#               calculated as extent_number = virtual_size / 2GB.
->> 
->> Is it okay to supply more entries than required, or do I have to supply
->> exactly the right number?
->
-> If I understand the code correctly, additional extents are silently
-> ignored.
-
-I see you're fixing that in v4.  Good.
-
->> > +# @subformat    The subformat of the VMDK image. Default: "monolithicsparse".
->> 
->> monolithicSparse
->> 
->> > +# @backing-file The path of backing file. Default: no backing file is used.
->> > +# @adapter-type The adapter type used to fill in the descriptor. Default: ide.
->> > +# @hwversion    Hardware version. The meaningful options are "4" or "6".
->> > +#               Defaulted to "4".
->> 
->> Default: "4"
->
-> Fixed all the spelling changes.
->
->> > +# @zeroed-grain Whether to enable zeroed-grain feature for sparse subformats.
->> > +#               Default: false.
->> > +#
->> > +# Since: 4.0
->> > +##
->> > +{ 'struct': 'BlockdevCreateOptionsVmdk',
->> > +  'data': { 'file':             'BlockdevRef',
->> > +            'size':             'size',
->> > +            '*extents':          ['BlockdevRef'],
->> > +            '*subformat':       'BlockdevVmdkSubformat',
->> > +            '*backing-file':    'str',
->> > +            '*adapter-type':    'BlockdevVmdkAdapterType',
->> > +            '*hwversion':       'str',
->> > +            '*zeroed-grain':    'bool' } }
->> 
->> @zeroed-grain is undocumented.
->
-> It's right there at the beginning of the quote after your last comment?
-
-You're right, sorry for the noise.
-
->> > +
->> > +
->> >  ##
->> >  # @SheepdogRedundancyType:
->> >  #
->> > @@ -4215,6 +4284,7 @@
->> >        'ssh':            'BlockdevCreateOptionsSsh',
->> >        'vdi':            'BlockdevCreateOptionsVdi',
->> >        'vhdx':           'BlockdevCreateOptionsVhdx',
->> > +      'vmdk':           'BlockdevCreateOptionsVmdk',
->> >        'vpc':            'BlockdevCreateOptionsVpc'
->> >    } }
->> >  
->> > diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
->> > index 65b6dc2f6f..78e8bcd561 100644
->> > --- a/qapi/qapi-schema.json
->> > +++ b/qapi/qapi-schema.json
->> > @@ -66,6 +66,7 @@
->> >          'ACPISlotType',         # DIMM, visible through query-acpi-ospm-status
->> >          'CpuInfoMIPS',          # PC, visible through query-cpu
->> >          'CpuInfoTricore',       # PC, visible through query-cpu
->> > +        'BlockdevVmdkSubformat',# all members, to match VMDK spec spellings
->> >          'QapiErrorClass',       # all members, visible through errors
->> >          'UuidInfo',             # UUID, visible through query-uuid
->> >          'X86CPURegister32',     # all members, visible indirectly through qom-get
->> > diff --git a/block/vmdk.c b/block/vmdk.c
->> > index 32fc2c84b3..16f86457d7 100644
->> > --- a/block/vmdk.c
->> > +++ b/block/vmdk.c
->> > @@ -1932,33 +1932,56 @@ static int filename_decompose(const char *filename, char *path, char *prefix,
->> >      return VMDK_OK;
->> >  }
->> >  
->> > -static int coroutine_fn vmdk_co_create_opts(const char *filename, QemuOpts *opts,
->> > -                                            Error **errp)
->> > +/*
->> > + * idx == 0: get or create the descriptor file (also the image file if in a
->> > + *           non-split format.
->> > + * idx >= 1: get the n-th extent if in a split subformat
->> > + */
->> > +typedef BlockBackend *(*vmdk_create_extent_fn)(int64_t size,
->> > +                                               int idx,
->> > +                                               bool flat,
->> > +                                               bool split,
->> > +                                               bool compress,
->> > +                                               bool zeroed_grain,
->> > +                                               void *opaque,
->> > +                                               Error **errp);
->> > +
->> > +static void vmdk_desc_add_extent(GString *desc,
->> > +                                 const char *extent_line_fmt,
->> > +                                 int64_t size, const char *filename)
->> > +{
->> > +    char *basename = g_path_get_basename(filename);
->> 
->> I like a blank line between declarations and statements.
->
-> Matter of taste. But okay, I already changed this function, so I'll give
-> you this one.
->
->> > +    g_string_append_printf(desc, extent_line_fmt,
->> > +                           DIV_ROUND_UP(size, BDRV_SECTOR_SIZE), basename);
->> > +
->> > +    g_free(basename);
->> > +}
->> > +
->> > +static int coroutine_fn vmdk_co_do_create(int64_t size,
->> > +                                          BlockdevVmdkSubformat subformat,
->> > +                                          BlockdevVmdkAdapterType adapter_type,
->> > +                                          const char *backing_file,
->> > +                                          const char *hw_version,
->> > +                                          bool compat6,
->> > +                                          bool zeroed_grain,
->> > +                                          vmdk_create_extent_fn extent_fn,
->> > +                                          void *opaque,
->> > +                                          Error **errp)
->> >  {
->> > -    int idx = 0;
->> > -    BlockBackend *new_blk = NULL;
->> > +    int extent_idx;
->> > +    BlockBackend *blk = NULL;
->> >      Error *local_err = NULL;
->> >      char *desc = NULL;
->> > -    int64_t total_size = 0, filesize;
->> > -    char *adapter_type = NULL;
->> > -    char *backing_file = NULL;
->> > -    char *hw_version = NULL;
->> > -    char *fmt = NULL;
->> >      int ret = 0;
->> >      bool flat, split, compress;
->> >      GString *ext_desc_lines;
->> > -    char *path = g_malloc0(PATH_MAX);
->> > -    char *prefix = g_malloc0(PATH_MAX);
->> > -    char *postfix = g_malloc0(PATH_MAX);
->> > -    char *desc_line = g_malloc0(BUF_SIZE);
->> > -    char *ext_filename = g_malloc0(PATH_MAX);
->> > -    char *desc_filename = g_malloc0(PATH_MAX);
->> >      const int64_t split_size = 0x80000000;  /* VMDK has constant split size */
->> > -    const char *desc_extent_line;
->> > +    int64_t extent_size;
->> > +    int64_t created_size = 0;
->> > +    const char *extent_line_fmt;
->> >      char *parent_desc_line = g_malloc0(BUF_SIZE);
->> >      uint32_t parent_cid = 0xffffffff;
->> >      uint32_t number_heads = 16;
->> > -    bool zeroed_grain = false;
->> >      uint32_t desc_offset = 0, desc_len;
->> >      const char desc_template[] =
->> >          "# Disk DescriptorFile\n"
->> > @@ -1982,71 +2005,35 @@ static int coroutine_fn vmdk_co_create_opts(const char *filename, QemuOpts *opts
->> >  
->> >      ext_desc_lines = g_string_new(NULL);
->> >  
->> > -    if (filename_decompose(filename, path, prefix, postfix, PATH_MAX, errp)) {
->> > -        ret = -EINVAL;
->> > -        goto exit;
->> > -    }
->> >      /* Read out options */
->> > -    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
->> > -                          BDRV_SECTOR_SIZE);
->> > -    adapter_type = qemu_opt_get_del(opts, BLOCK_OPT_ADAPTER_TYPE);
->> > -    backing_file = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
->> > -    hw_version = qemu_opt_get_del(opts, BLOCK_OPT_HWVERSION);
->> > -    if (qemu_opt_get_bool_del(opts, BLOCK_OPT_COMPAT6, false)) {
->> > -        if (strcmp(hw_version, "undefined")) {
->> > +    if (compat6) {
->> > +        if (hw_version) {
->> >              error_setg(errp,
->> >                         "compat6 cannot be enabled with hwversion set");
->> >              ret = -EINVAL;
->> >              goto exit;
->> >          }
->> > -        g_free(hw_version);
->> > -        hw_version = g_strdup("6");
->> > -    }
->> > -    if (strcmp(hw_version, "undefined") == 0) {
->> > -        g_free(hw_version);
->> > -        hw_version = g_strdup("4");
->> > +        hw_version = "6";
->> >      }
->> > -    fmt = qemu_opt_get_del(opts, BLOCK_OPT_SUBFMT);
->> > -    if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ZEROED_GRAIN, false)) {
->> > -        zeroed_grain = true;
->> > +    if (!hw_version) {
->> > +        hw_version = "4";
->> >      }
->> >  
->> > -    if (!adapter_type) {
->> > -        adapter_type = g_strdup("ide");
->> > -    } else if (strcmp(adapter_type, "ide") &&
->> > -               strcmp(adapter_type, "buslogic") &&
->> > -               strcmp(adapter_type, "lsilogic") &&
->> > -               strcmp(adapter_type, "legacyESX")) {
->> > -        error_setg(errp, "Unknown adapter type: '%s'", adapter_type);
->> > -        ret = -EINVAL;
->> > -        goto exit;
->> > -    }
->> 
->> Old code recognizes "legacyESX".  New code recognizes "legacyesx".  Bug
->> or feature?
->
-> Good catch!
->
-> Who knows? But it's not advertised as a feature in the commit message,
-> and I can only see the spelling "legacyESX" in the spec, so I'll change
-> the QAPI definition to "legacyESX". Leaving things as they were should
-> be safe.
-
-I suspect it's a remnant of v1, where Fam used all lower case enum
-values, plus code to match them case insensitively.
-
-> Fam also made the value case insensitive when parsing QemuOpts in
-> vmdk_co_create_opts() to compensate for the change. I think this can
-> also go away then?
-
-Yes, please.
+> Thanks,
+>=20
+> --
+> Anthony PERARD
