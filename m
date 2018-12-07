@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gV9SK-0005MN-2X
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 01:17:44 -0500
+	(envelope-from <armbru@redhat.com>) id 1gV9op-0000jR-Cq
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 01:41:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gV9SJ-0004Mn-6K
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 01:17:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58414)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gV9SI-0004MI-TX
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 01:17:43 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0925BDC8E8
-	for <qemu-devel@nongnu.org>; Fri,  7 Dec 2018 06:17:42 +0000 (UTC)
-References: <20181206215026.7716-1-pbonzini@redhat.com>
-	<20181206215026.7716-2-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <02e7fe97-89be-5204-1342-a076be4a0733@redhat.com>
-Date: Fri, 7 Dec 2018 07:17:39 +0100
+	(envelope-from <armbru@redhat.com>) id 1gV9oo-0008PO-Dc
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 01:40:59 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181206151304.8388-1-kwolf@redhat.com>
+	<20181206151304.8388-2-kwolf@redhat.com>
+Date: Fri, 07 Dec 2018 07:40:50 +0100
+In-Reply-To: <20181206151304.8388-2-kwolf@redhat.com> (Kevin Wolf's message of
+	"Thu, 6 Dec 2018 16:13:01 +0100")
+Message-ID: <871s6t4z65.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20181206215026.7716-2-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] test: execute g_test_run when tests
- are skipped
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] vmdk: Refactor vmdk_create_extent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,70 +23,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
 
-On 2018-12-06 22:50, Paolo Bonzini wrote:
-> Sometimes a test's main() function recognizes that the environment
-> does not support the test, and therefore exits.  In this case, we
-> still should run g_test_run() so that a TAP harness will print the
-> test plan ("1..0") and the test will be marked as skipped.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Kevin Wolf <kwolf@redhat.com> writes:
+
+> From: Fam Zheng <famz@redhat.com>
+>
+> The extracted vmdk_init_extent takes a BlockBackend object and
+> initializes the format metadata. It is the common part between "qemu-img
+> create" and "blockdev-create".
+>
+> Add a "BlockBackend *pbb" parameter to vmdk_create_extent, to return the
+> opened BB to the caller in the next patch.
+
+I'd do this part in the next patch, when it has a user.  Matter of
+taste.
+
+>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  tests/cdrom-test.c     | 2 +-
->  tests/migration-test.c | 8 ++++----
->  2 files changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/tests/cdrom-test.c b/tests/cdrom-test.c
-> index 9b43dc9ab4..14bd981336 100644
-> --- a/tests/cdrom-test.c
-> +++ b/tests/cdrom-test.c
-> @@ -169,7 +169,7 @@ int main(int argc, char **argv)
+>  block/vmdk.c | 69 ++++++++++++++++++++++++++++++++--------------------
+>  1 file changed, 43 insertions(+), 26 deletions(-)
+>
+> diff --git a/block/vmdk.c b/block/vmdk.c
+> index 2c9e86d98f..32fc2c84b3 100644
+> --- a/block/vmdk.c
+> +++ b/block/vmdk.c
+> @@ -1741,35 +1741,17 @@ static int coroutine_fn vmdk_co_pwrite_zeroes(BlockDriverState *bs,
+>      return ret;
+>  }
 >  
->      if (exec_genisoimg(genisocheck)) {
->          /* genisoimage not available - so can't run tests */
-> -        return 0;
-> +        return g_test_run();
+> -static int vmdk_create_extent(const char *filename, int64_t filesize,
+> -                              bool flat, bool compress, bool zeroed_grain,
+> -                              QemuOpts *opts, Error **errp)
+> +static int vmdk_init_extent(BlockBackend *blk,
+> +                            int64_t filesize, bool flat,
+> +                            bool compress, bool zeroed_grain,
+> +                            Error **errp)
+>  {
+>      int ret, i;
+> -    BlockBackend *blk = NULL;
+>      VMDK4Header header;
+> -    Error *local_err = NULL;
+>      uint32_t tmp, magic, grains, gd_sectors, gt_size, gt_count;
+>      uint32_t *gd_buf = NULL;
+>      int gd_buf_size;
+>  
+> -    ret = bdrv_create_file(filename, opts, &local_err);
+> -    if (ret < 0) {
+> -        error_propagate(errp, local_err);
+> -        goto exit;
+> -    }
+> -
+> -    blk = blk_new_open(filename, NULL, NULL,
+> -                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
+> -                       &local_err);
+> -    if (blk == NULL) {
+> -        error_propagate(errp, local_err);
+> -        ret = -EIO;
+> -        goto exit;
+> -    }
+> -
+> -    blk_set_allow_write_beyond_eof(blk, true);
+> -
+>      if (flat) {
+>          ret = blk_truncate(blk, filesize, PREALLOC_MODE_OFF, errp);
+>          goto exit;
+> @@ -1863,15 +1845,50 @@ static int vmdk_create_extent(const char *filename, int64_t filesize,
+>                       gd_buf, gd_buf_size, 0);
+>      if (ret < 0) {
+>          error_setg(errp, QERR_IO_ERROR);
+> -        goto exit;
 >      }
 >  
->      ret = prepare_image(arch, isoimage);
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index 06ca5068d8..8352612364 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -789,7 +789,7 @@ int main(int argc, char **argv)
->      g_test_init(&argc, &argv, NULL);
->  
->      if (!ufd_version_check()) {
-> -        return 0;
-> +        return g_test_run();
+>      ret = 0;
+> +exit:
+> +    g_free(gd_buf);
+> +    return ret;
+> +}
+> +
+> +static int vmdk_create_extent(const char *filename, int64_t filesize,
+> +                              bool flat, bool compress, bool zeroed_grain,
+> +                              BlockBackend **pbb,
+> +                              QemuOpts *opts, Error **errp)
+> +{
+> +    int ret;
+> +    BlockBackend *blk = NULL;
+> +    Error *local_err = NULL;
+> +
+> +    ret = bdrv_create_file(filename, opts, &local_err);
+> +    if (ret < 0) {
+> +        error_propagate(errp, local_err);
+> +        goto exit;
+> +    }
+> +
+> +    blk = blk_new_open(filename, NULL, NULL,
+> +                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
+> +                       &local_err);
+> +    if (blk == NULL) {
+> +        error_propagate(errp, local_err);
+> +        ret = -EIO;
+> +        goto exit;
+> +    }
+> +
+> +    blk_set_allow_write_beyond_eof(blk, true);
+> +
+> +    ret = vmdk_init_extent(blk, filesize, flat, compress, zeroed_grain, errp);
+>  exit:
+>      if (blk) {
+> -        blk_unref(blk);
+> +        if (pbb) {
+> +            *pbb = blk;
+> +        } else {
+> +            blk_unref(blk);
+> +            blk = NULL;
+
+Dead assignment.  Matter of taste.
+
+> +        }
 >      }
+> -    g_free(gd_buf);
+>      return ret;
+>  }
 >  
->      /*
-> @@ -800,7 +800,7 @@ int main(int argc, char **argv)
->      if (g_str_equal(qtest_get_arch(), "ppc64") &&
->          access("/sys/module/kvm_hv", F_OK)) {
->          g_test_message("Skipping test: kvm_hv not available");
-> -        return 0;
-> +        return g_test_run();
->      }
+> @@ -2094,7 +2111,7 @@ static int coroutine_fn vmdk_co_create_opts(const char *filename, QemuOpts *opts
+>          snprintf(ext_filename, PATH_MAX, "%s%s", path, desc_filename);
 >  
->      /*
-> @@ -811,11 +811,11 @@ int main(int argc, char **argv)
->  #if defined(HOST_S390X)
->          if (access("/dev/kvm", R_OK | W_OK)) {
->              g_test_message("Skipping test: kvm not available");
-> -            return 0;
-> +            return g_test_run();
+>          if (vmdk_create_extent(ext_filename, size,
+> -                               flat, compress, zeroed_grain, opts, errp)) {
+> +                               flat, compress, zeroed_grain, NULL, opts, errp)) {
+>              ret = -EINVAL;
+>              goto exit;
 >          }
->  #else
->          g_test_message("Skipping test: Need s390x host to work properly");
 
-TODO: Switch these skip messages to g_test_skip() now that we do not
-have to deal with broken gtester binaries anymore... (could be done in a
-future patch, though)
-
- Thomas
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
