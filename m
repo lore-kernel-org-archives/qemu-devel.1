@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gVJBS-0003N4-4a
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:40:59 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1gVJBj-0003Yd-Ue
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:41:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gVJBQ-0001vA-Ds
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:40:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:2440)
+	(envelope-from <alex.williamson@redhat.com>) id 1gVJBg-0002sO-Bh
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:41:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33084)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gVJBQ-0001sl-3d
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:40:56 -0500
+	id 1gVJBg-0002qq-3i
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:41:12 -0500
 From: Alex Williamson <alex.williamson@redhat.com>
-Date: Fri, 07 Dec 2018 09:40:54 -0700
-Message-ID: <154420085469.27028.14795273775779936674.stgit@gimli.home>
+Date: Fri, 07 Dec 2018 09:41:00 -0700
+Message-ID: <154420086051.27028.16459299330341430515.stgit@gimli.home>
 In-Reply-To: <154419994154.27028.14774494243513273923.stgit@gimli.home>
 References: <154419994154.27028.14774494243513273923.stgit@gimli.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [for-4.0 PATCH v4 1/9] q35/440fx/arm/spapr/ccw: Add
- QEMU 4.0 machine type
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [for-4.0 PATCH v4 2/9] pcie: Create enums for link
+ speed and width
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,249 +29,95 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, Eric Auger <eric.auger@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Geoffrey McRae <geoff@hostfission.com>, Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Eric Auger <eric.auger@redhat.com>
 
-For reference only, Eduardo plans to merge this via his tree.
+In preparation for reporting higher virtual link speeds and widths,
+create enums and macros to help us manage them.
 
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Tested-by: Geoffrey McRae <geoff@hostfission.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- hw/arm/virt.c              |   19 +++++++++++++++++--
- hw/i386/pc_piix.c          |   15 ++++++++++++---
- hw/i386/pc_q35.c           |   13 +++++++++++--
- hw/ppc/spapr.c             |   25 ++++++++++++++++++++++---
- hw/s390x/s390-virtio-ccw.c |   17 ++++++++++++++++-
- include/hw/compat.h        |    3 +++
- include/hw/i386/pc.h       |    3 +++
- 7 files changed, 84 insertions(+), 11 deletions(-)
+ hw/pci/pcie.c              |    7 ++++---
+ hw/vfio/pci.c              |    3 ++-
+ include/hw/pci/pcie_regs.h |   23 +++++++++++++++++++++--
+ 3 files changed, 27 insertions(+), 6 deletions(-)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index f69e7eb39977..beaf6bc43905 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1797,7 +1797,7 @@ static void machvirt_machine_init(void)
- }
- type_init(machvirt_machine_init);
- 
--static void virt_3_1_instance_init(Object *obj)
-+static void virt_4_0_instance_init(Object *obj)
- {
-     VirtMachineState *vms = VIRT_MACHINE(obj);
-     VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-@@ -1867,10 +1867,25 @@ static void virt_3_1_instance_init(Object *obj)
-     vms->irqmap = a15irqmap;
- }
- 
-+static void virt_machine_4_0_options(MachineClass *mc)
-+{
-+}
-+DEFINE_VIRT_MACHINE_AS_LATEST(4, 0)
+diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+index 6c91bd44a0a5..914a5261a79b 100644
+--- a/hw/pci/pcie.c
++++ b/hw/pci/pcie.c
+@@ -68,11 +68,12 @@ pcie_cap_v1_fill(PCIDevice *dev, uint8_t port, uint8_=
+t type, uint8_t version)
+     pci_set_long(exp_cap + PCI_EXP_LNKCAP,
+                  (port << PCI_EXP_LNKCAP_PN_SHIFT) |
+                  PCI_EXP_LNKCAP_ASPMS_0S |
+-                 PCI_EXP_LNK_MLW_1 |
+-                 PCI_EXP_LNK_LS_25);
++                 QEMU_PCI_EXP_LNKCAP_MLW(QEMU_PCI_EXP_LNK_X1) |
++                 QEMU_PCI_EXP_LNKCAP_MLS(QEMU_PCI_EXP_LNK_2_5GT));
+=20
+     pci_set_word(exp_cap + PCI_EXP_LNKSTA,
+-                 PCI_EXP_LNK_MLW_1 | PCI_EXP_LNK_LS_25);
++                 QEMU_PCI_EXP_LNKSTA_NLW(QEMU_PCI_EXP_LNK_X1) |
++                 QEMU_PCI_EXP_LNKSTA_CLS(QEMU_PCI_EXP_LNK_2_5GT));
+=20
+     if (dev->cap_present & QEMU_PCIE_LNKSTA_DLLLA) {
+         pci_word_test_and_set_mask(exp_cap + PCI_EXP_LNKSTA,
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 5c7bd9698496..74f9a46b4be0 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -1897,7 +1897,8 @@ static int vfio_setup_pcie_cap(VFIOPCIDevice *vdev,=
+ int pos, uint8_t size,
+                                    PCI_EXP_TYPE_ENDPOINT << 4,
+                                    PCI_EXP_FLAGS_TYPE);
+             vfio_add_emulated_long(vdev, pos + PCI_EXP_LNKCAP,
+-                                   PCI_EXP_LNK_MLW_1 | PCI_EXP_LNK_LS_25=
+, ~0);
++                           QEMU_PCI_EXP_LNKCAP_MLW(QEMU_PCI_EXP_LNK_X1) =
+|
++                           QEMU_PCI_EXP_LNKCAP_MLS(QEMU_PCI_EXP_LNK_2_5G=
+T), ~0);
+             vfio_add_emulated_word(vdev, pos + PCI_EXP_LNKCTL, 0, ~0);
+         }
+=20
+diff --git a/include/hw/pci/pcie_regs.h b/include/hw/pci/pcie_regs.h
+index a95522a13b04..ad4e7808b8ac 100644
+--- a/include/hw/pci/pcie_regs.h
++++ b/include/hw/pci/pcie_regs.h
+@@ -34,10 +34,29 @@
+=20
+ /* PCI_EXP_LINK{CAP, STA} */
+ /* link speed */
+-#define PCI_EXP_LNK_LS_25               1
++typedef enum PCIExpLinkSpeed {
++    QEMU_PCI_EXP_LNK_2_5GT =3D 1,
++    QEMU_PCI_EXP_LNK_5GT,
++    QEMU_PCI_EXP_LNK_8GT,
++    QEMU_PCI_EXP_LNK_16GT,
++} PCIExpLinkSpeed;
 +
-+#define VIRT_COMPAT_3_1 \
-+    HW_COMPAT_3_1
++#define QEMU_PCI_EXP_LNKCAP_MLS(speed)  (speed)
++#define QEMU_PCI_EXP_LNKSTA_CLS         QEMU_PCI_EXP_LNKCAP_MLS
 +
-+static void virt_3_1_instance_init(Object *obj)
-+{
-+    virt_4_0_instance_init(obj);
-+}
-+
- static void virt_machine_3_1_options(MachineClass *mc)
- {
-+    virt_machine_4_0_options(mc);
-+    SET_MACHINE_COMPAT(mc, VIRT_COMPAT_3_1);
- }
--DEFINE_VIRT_MACHINE_AS_LATEST(3, 1)
-+DEFINE_VIRT_MACHINE(3, 1)
- 
- #define VIRT_COMPAT_3_0 \
-     HW_COMPAT_3_0
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 7092d6d13f66..cfaa83ee2fad 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -428,21 +428,30 @@ static void pc_i440fx_machine_options(MachineClass *m)
-     machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
- }
- 
--static void pc_i440fx_3_1_machine_options(MachineClass *m)
-+static void pc_i440fx_4_0_machine_options(MachineClass *m)
- {
-     pc_i440fx_machine_options(m);
-     m->alias = "pc";
-     m->is_default = 1;
- }
- 
-+DEFINE_I440FX_MACHINE(v4_0, "pc-i440fx-4.0", NULL,
-+                      pc_i440fx_4_0_machine_options);
-+
-+static void pc_i440fx_3_1_machine_options(MachineClass *m)
-+{
-+    pc_i440fx_4_0_machine_options(m);
-+    m->is_default = 0;
-+    m->alias = NULL;
-+    SET_MACHINE_COMPAT(m, PC_COMPAT_3_1);
-+}
-+
- DEFINE_I440FX_MACHINE(v3_1, "pc-i440fx-3.1", NULL,
-                       pc_i440fx_3_1_machine_options);
- 
- static void pc_i440fx_3_0_machine_options(MachineClass *m)
- {
-     pc_i440fx_3_1_machine_options(m);
--    m->is_default = 0;
--    m->alias = NULL;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
- }
- 
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 4702bb13c472..e245db096dc1 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -311,19 +311,28 @@ static void pc_q35_machine_options(MachineClass *m)
-     m->max_cpus = 288;
- }
- 
--static void pc_q35_3_1_machine_options(MachineClass *m)
-+static void pc_q35_4_0_machine_options(MachineClass *m)
- {
-     pc_q35_machine_options(m);
-     m->alias = "q35";
- }
- 
-+DEFINE_Q35_MACHINE(v4_0, "pc-q35-4.0", NULL,
-+                   pc_q35_4_0_machine_options);
-+
-+static void pc_q35_3_1_machine_options(MachineClass *m)
-+{
-+    pc_q35_4_0_machine_options(m);
-+    m->alias = NULL;
-+    SET_MACHINE_COMPAT(m, PC_COMPAT_3_1);
-+}
-+
- DEFINE_Q35_MACHINE(v3_1, "pc-q35-3.1", NULL,
-                    pc_q35_3_1_machine_options);
- 
- static void pc_q35_3_0_machine_options(MachineClass *m)
- {
-     pc_q35_3_1_machine_options(m);
--    m->alias = NULL;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
- }
- 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 7afd1a175bf2..def3e502d8fd 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3956,19 +3956,38 @@ static const TypeInfo spapr_machine_info = {
-     }                                                                \
-     type_init(spapr_machine_register_##suffix)
- 
-- /*
-+/*
-+ * pseries-4.0
-+ */
-+static void spapr_machine_4_0_instance_options(MachineState *machine)
-+{
-+}
-+
-+static void spapr_machine_4_0_class_options(MachineClass *mc)
-+{
-+    /* Defaults for the latest behaviour inherited from the base class */
-+}
-+
-+DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
-+
-+/*
-  * pseries-3.1
-  */
-+#define SPAPR_COMPAT_3_1                                              \
-+    HW_COMPAT_3_1
-+
- static void spapr_machine_3_1_instance_options(MachineState *machine)
- {
-+    spapr_machine_4_0_instance_options(machine);
- }
- 
- static void spapr_machine_3_1_class_options(MachineClass *mc)
- {
--    /* Defaults for the latest behaviour inherited from the base class */
-+    spapr_machine_4_0_class_options(mc);
-+    SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_3_1);
- }
- 
--DEFINE_SPAPR_MACHINE(3_1, "3.1", true);
-+DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
- 
- /*
-  * pseries-3.0
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index a0615a8b35f5..fd9d0b0542bb 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -651,6 +651,9 @@ bool css_migration_enabled(void)
-     }                                                                         \
-     type_init(ccw_machine_register_##suffix)
- 
-+#define CCW_COMPAT_3_1 \
-+        HW_COMPAT_3_1
-+
- #define CCW_COMPAT_3_0 \
-         HW_COMPAT_3_0
- 
-@@ -742,14 +745,26 @@ bool css_migration_enabled(void)
-             .value    = "0",\
-         },
- 
-+static void ccw_machine_4_0_instance_options(MachineState *machine)
-+{
-+}
-+
-+static void ccw_machine_4_0_class_options(MachineClass *mc)
-+{
-+}
-+DEFINE_CCW_MACHINE(4_0, "4.0", true);
-+
- static void ccw_machine_3_1_instance_options(MachineState *machine)
- {
-+    ccw_machine_4_0_instance_options(machine);
- }
- 
- static void ccw_machine_3_1_class_options(MachineClass *mc)
- {
-+    ccw_machine_4_0_class_options(mc);
-+    SET_MACHINE_COMPAT(mc, CCW_COMPAT_3_1);
- }
--DEFINE_CCW_MACHINE(3_1, "3.1", true);
-+DEFINE_CCW_MACHINE(3_1, "3.1", false);
- 
- static void ccw_machine_3_0_instance_options(MachineState *machine)
- {
-diff --git a/include/hw/compat.h b/include/hw/compat.h
-index 6f4d5fc64704..70958328fe7a 100644
---- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -1,6 +1,9 @@
- #ifndef HW_COMPAT_H
- #define HW_COMPAT_H
- 
-+#define HW_COMPAT_3_1 \
-+    /* empty */
-+
- #define HW_COMPAT_3_0 \
-     /* empty */
- 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 136fe497b6b2..cb645bf368a3 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -294,6 +294,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
- int e820_get_num_entries(void);
- bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
- 
-+#define PC_COMPAT_3_1 \
-+    HW_COMPAT_3_1 \
-+
- #define PC_COMPAT_3_0 \
-     HW_COMPAT_3_0 \
-     {\
++typedef enum PCIExpLinkWidth {
++    QEMU_PCI_EXP_LNK_X1 =3D 1,
++    QEMU_PCI_EXP_LNK_X2 =3D 2,
++    QEMU_PCI_EXP_LNK_X4 =3D 4,
++    QEMU_PCI_EXP_LNK_X8 =3D 8,
++    QEMU_PCI_EXP_LNK_X12 =3D 12,
++    QEMU_PCI_EXP_LNK_X16 =3D 16,
++    QEMU_PCI_EXP_LNK_X32 =3D 32,
++} PCIExpLinkWidth;
+=20
+ #define PCI_EXP_LNK_MLW_SHIFT           ctz32(PCI_EXP_LNKCAP_MLW)
+-#define PCI_EXP_LNK_MLW_1               (1 << PCI_EXP_LNK_MLW_SHIFT)
++#define QEMU_PCI_EXP_LNKCAP_MLW(width)  (width << PCI_EXP_LNK_MLW_SHIFT)
++#define QEMU_PCI_EXP_LNKSTA_NLW         QEMU_PCI_EXP_LNKCAP_MLW
+=20
+ /* PCI_EXP_LINKCAP */
+ #define PCI_EXP_LNKCAP_ASPMS_SHIFT      ctz32(PCI_EXP_LNKCAP_ASPMS)
