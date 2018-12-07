@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gVFnf-0002IW-BG
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 08:04:12 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gVFrf-0006J3-G3
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 08:08:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gVFnd-00036P-I4
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 08:04:11 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181207115343.6747-1-kwolf@redhat.com>
-	<20181207115343.6747-3-kwolf@redhat.com>
-	<875zw5xzh1.fsf@dusky.pond.sub.org>
-Date: Fri, 07 Dec 2018 14:04:00 +0100
-In-Reply-To: <875zw5xzh1.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Fri, 07 Dec 2018 14:01:30 +0100")
-Message-ID: <87o99xwksf.fsf@dusky.pond.sub.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gVFre-0002Uz-06
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 08:08:18 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 7 Dec 2018 13:08:04 +0000
+Message-ID: <1f4f45ae-49bc-84dd-4896-78549f9b051c@virtuozzo.com>
+References: <20181130220344.3350618-1-eblake@redhat.com>
+	<20181130220344.3350618-15-eblake@redhat.com>
+In-Reply-To: <20181130220344.3350618-15-eblake@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <CDD5EE2A1E3D384A98448068BFCAE8E3@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 2/5] vmdk: Implement .bdrv_co_create
- callback
+Subject: Re: [Qemu-devel] [PATCH 14/14] iotests: Enhance 223,
+ 233 to cover 'qemu-nbd --list'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +26,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Markus Armbruster <armbru@redhat.com> writes:
-
-> Kevin Wolf <kwolf@redhat.com> writes:
->
->> From: Fam Zheng <famz@redhat.com>
->>
->> This makes VMDK support blockdev-create. The implementation reuses the
->> image creation code in vmdk_co_create_opts which now acceptes a callback
->> pointer to "retrieve" BlockBackend pointers from the caller. This way we
->> separate the logic between file/extent acquisition and initialization.
->>
->> The QAPI command parameters are mostly the same as the old create_opts
->> except the dropped legacy @compat6 switch, which is redundant with
->> @hwversion.
->>
->> Signed-off-by: Fam Zheng <famz@redhat.com>
->> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->> ---
->>  qapi/block-core.json  |  70 +++++++
->>  qapi/qapi-schema.json |  16 +-
->>  block/vmdk.c          | 448 ++++++++++++++++++++++++++++++------------
->>  3 files changed, 400 insertions(+), 134 deletions(-)
->>
->> diff --git a/qapi/block-core.json b/qapi/block-core.json
->> index d4fe710836..0793550cf2 100644
->> --- a/qapi/block-core.json
->> +++ b/qapi/block-core.json
-[...]
->> +##
->> +# @BlockdevCreateOptionsVmdk:
->> +#
->> +# Driver specific image creation options for VMDK.
->> +#
->> +# @file         Where to store the new image file. This refers to the image
->> +#               file for monolithcSparse and streamOptimized format, or the
->> +#               descriptor file for other formats.
->> +# @size         Size of the virtual disk in bytes
->> +# @extents      Where to store the data extents. Required for monolithcFlat,
->> +#               twoGbMaxExtentSparse and twoGbMaxExtentFlat formats. For
->> +#               monolithicFlat, only one entry is required; for
->> +#               twoGbMaxExtent* formats, the number of entries required is
->> +#               calculated as extent_number = virtual_size / 2GB.
->
-> Doesn't quite spell out that the number of extents has to match
-> exactly.  I'm not sure I care.
-
-Nevermind, you address that in PATCH 5.
-
-[...]
+MDEuMTIuMjAxOCAxOjAzLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBBbnkgZ29vZCBuZXcgZmVhdHVy
+ZSBkZXNlcnZlcyBzb21lIHJlZ3Jlc3Npb24gdGVzdGluZyA6KQ0KPiBDb3ZlcmFnZSBpbmNsdWRl
+czoNCj4gLSAyMjM6IHdoYXQgaGFwcGVucyB3aGVuIHRoZXJlIGFyZSAwIG9yIG1vcmUgdGhhbiAx
+IGV4cG9ydCwNCj4gcHJvb2YgdGhhdCB3ZSBjYW4gc2VlIG11bHRpcGxlIGNvbnRleHRzIGluY2x1
+ZGluZyBxZW11OmRpcnR5LWJpdG1hcA0KPiAtIDIzMzogcHJvb2YgdGhhdCB3ZSBjYW4gbGlzdCBv
+dmVyIFRMUywgYW5kIHRoYXQgbWl4LWFuZC1tYXRjaCBvZg0KPiBwbGFpbi9UTFMgbGlzdGluZ3Mg
+c2FuZWx5DQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0LmNv
+bT4NCj4gLS0tDQoNClsuLl0NCg0KPiANCj4gICA9PT0gQ29udHJhc3Qgbm9ybWFsIHN0YXR1cyB0
+byBsYXJnZSBncmFudWxhcml0eSBkaXJ0eS1iaXRtYXAgPT09DQo+IA0KPiBkaWZmIC0tZ2l0IGEv
+dGVzdHMvcWVtdS1pb3Rlc3RzLzIzMyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8yMzMNCj4gaW5kZXgg
+MTgxNGVmZTMzMzMuLjVkNjk0ZDlkMjQyIDEwMDc1NQ0KPiAtLS0gYS90ZXN0cy9xZW11LWlvdGVz
+dHMvMjMzDQo+ICsrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8yMzMNCj4gQEAgLTcyLDYgKzcyLDkg
+QEAgJFFFTVVfSU1HIGluZm8gLS1pbWFnZS1vcHRzIFwNCj4gICAgICAgLS1vYmplY3QgdGxzLWNy
+ZWRzLXg1MDksZGlyPSR7dGxzX2Rpcn0vY2xpZW50MSxlbmRwb2ludD1jbGllbnQsaWQ9dGxzMCBc
+DQo+ICAgICAgIGRyaXZlcj1uYmQsaG9zdD0kbmJkX3RjcF9hZGRyLHBvcnQ9JG5iZF90Y3BfcG9y
+dCx0bHMtY3JlZHM9dGxzMCBcDQo+ICAgICAgIDI+JjEgfCBzZWQgInMvJG5iZF90Y3BfcG9ydC9Q
+T1JUL2ciDQo+ICskUUVNVV9OQkRfUFJPRyAtTCAtYiAkbmJkX3RjcF9hZGRyIC1wICRuYmRfdGNw
+X3BvcnQgXA0KPiArICAgIC0tb2JqZWN0IHRscy1jcmVkcy14NTA5LGRpcj0ke3Rsc19kaXJ9L2Ns
+aWVudDEsZW5kcG9pbnQ9Y2xpZW50LGlkPXRsczAgXA0KPiArICAgIC0tdGxzLWNyZWRzPXRsczAN
+Cg0KLS1vYmplY3QgcGFyYW1ldGVyIG1heSBiZSBzdG9yZWQgdG8gYSB2YXJpYWJsZSBiZWZvcmUg
+dGhlc2UgdHdvIGNvbW1hbmRzLCB0byBub3QgZHVwbGljYXRlLA0KYW5kIGluIGZvbGxvd2luZyBj
+YXNlcyB0b28uDQoNCndpdGggb3Igd2l0aG91dDoNCg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNl
+bWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KDQoNCi0tIA0K
+QmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
