@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gVD4h-0004pB-6v
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:09:36 -0500
+	(envelope-from <philmd@redhat.com>) id 1gVD8A-0006vx-V2
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:13:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gVD4d-0006Rd-TO
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:09:35 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:54082)
+	(envelope-from <philmd@redhat.com>) id 1gVD87-0002b7-MD
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:13:10 -0500
+Received: from mail-wm1-f51.google.com ([209.85.128.51]:35038)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gVD4d-0006RL-Lm
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:09:31 -0500
-Received: by mail-wm1-f68.google.com with SMTP id y1so3751259wmi.3
-	for <qemu-devel@nongnu.org>; Fri, 07 Dec 2018 02:09:31 -0800 (PST)
-References: <20181116190211.17622-1-remy.noel@blade-group.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gVD85-0002E2-Ic
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:13:07 -0500
+Received: by mail-wm1-f51.google.com with SMTP id c126so3928688wmh.0
+	for <qemu-devel@nongnu.org>; Fri, 07 Dec 2018 02:13:00 -0800 (PST)
+References: <20181206151856.77503-1-eblake@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e4aa171f-4112-f249-4ecf-3a27f0a0c459@redhat.com>
-Date: Fri, 7 Dec 2018 11:09:29 +0100
+Message-ID: <9022c85e-9bbd-3500-edcd-c4ff014c5604@redhat.com>
+Date: Fri, 7 Dec 2018 11:12:58 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181116190211.17622-1-remy.noel@blade-group.com>
+In-Reply-To: <20181206151856.77503-1-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] aio_poll race condition.
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] cutils: Assert in-range base for
+ string-to-integer conversions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +30,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: remy.noel@blade-group.com, qemu-devel@nongnu.org
-Cc: Fam Zheng <fam@euphon.net>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, vsementsov@virtuozzo.com, armbru@redhat.com
 
-Hi Remy,
-On 11/16/18 8:02 PM, remy.noel@blade-group.com wrote:
-> From: Remy Noel <remy.noel@blade-group.com>
+On 12/6/18 4:18 PM, Eric Blake wrote:
+> POSIX states that the value of endptr is unspecified if strtol()
+> fails with EINVAL due to an invalid base argument.  Since none of
+> the callers to check_strtox_error() initialized endptr, we could
+> end up propagating uninitialized data back to a caller on error.
+> However, passing an out-of-range base is already a sign of poor
+> programming, so let's just assert that base is in range, at which
+> point check_strtox_error() can be tightened to assert that it is
+> receiving an initialized ep that points somewhere within the
+> caller's original string, regardless of whether strto*() succeeded
+> or failed with ERANGE.
 > 
-> It is possible for an io_poll callback to be concurrently executed along
-> with an aio_set_fd_handlers. This can cause all sorts of problems, like
-> a NULL callback or a bad opaque pointer.
-> We fixes that by using an remove/insert RCU scheme.
-
-You forgot to Cc the relevant maintainers, that's probably why your
-series went unnoticed.
-
->From the wiki:
-https://wiki.qemu.org/Contribute/SubmitAPatch#CC_the_relevant_maintainer
-
-$ ./scripts/get_maintainer.pl -f include/block/aio.h util/aio-posix.c
-util/aio-win32.c util/async.c
-Stefan Hajnoczi <stefanha@redhat.com> (supporter:Block I/O path)
-Fam Zheng <famz@redhat.com> (supporter:Block I/O path)
-Kevin Wolf <kwolf@redhat.com> (supporter:Block layer core)
-Max Reitz <mreitz@redhat.com> (supporter:Block layer core)
-Stefan Weil <sw@weilnetz.de> (maintainer:W32, W64)
-qemu-block@nongnu.org (open list:Block I/O path)
-qemu-devel@nongnu.org (open list:All patches CC here)
-
-Please Cc them in your v2.
-
-(Note Fam has a new email: Fam Zheng <fam@euphon.net>)
-
-Regards,
-
-Phil.
-
+> Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
 > 
-> Please note that i did not test the win32 version.
+> Also tested that this does not negatively impact David's pending
+> additions of qemu_strtod{,_finite}().  Thus:
+> Based-on: <20181121164421.20780-1-david@redhat.com>
 > 
-> Remy Noel (3):
->   aio-posix: Fix concurrent aio_poll/set_fd_handler.
->   util/aio-posix: Use RCU for handler insertion.
->   aio: Do not use list_lock as a sync mechanism for aio_handlers
->     anymore.
+>  util/cutils.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 > 
->  include/block/aio.h |   4 +-
->  util/aio-posix.c    | 148 ++++++++++++++++++++------------------------
->  util/aio-win32.c    |  82 +++++++++---------------
->  util/async.c        |   7 ++-
->  4 files changed, 103 insertions(+), 138 deletions(-)
+> diff --git a/util/cutils.c b/util/cutils.c
+> index 91930d1bbeb..e098debdc0c 100644
+> --- a/util/cutils.c
+> +++ b/util/cutils.c
+> @@ -278,6 +278,7 @@ int qemu_strtosz_metric(const char *nptr, const char **end, uint64_t *result)
+>  static int check_strtox_error(const char *nptr, char *ep,
+>                                const char **endptr, int libc_errno)
+>  {
+> +    assert(ep >= nptr);
+>      if (endptr) {
+>          *endptr = ep;
+>      }
+> @@ -325,6 +326,7 @@ int qemu_strtoi(const char *nptr, const char **endptr, int base,
+>      char *ep;
+>      long long lresult;
 > 
+> +    assert((unsigned) base <= 36 && base != 1);
+>      if (!nptr) {
+>          if (endptr) {
+>              *endptr = nptr;
+> @@ -377,6 +379,7 @@ int qemu_strtoui(const char *nptr, const char **endptr, int base,
+>      char *ep;
+>      long long lresult;
+> 
+> +    assert((unsigned) base <= 36 && base != 1);
+>      if (!nptr) {
+>          if (endptr) {
+>              *endptr = nptr;
+> @@ -433,6 +436,7 @@ int qemu_strtol(const char *nptr, const char **endptr, int base,
+>  {
+>      char *ep;
+> 
+> +    assert((unsigned) base <= 36 && base != 1);
+>      if (!nptr) {
+>          if (endptr) {
+>              *endptr = nptr;
+> @@ -475,6 +479,7 @@ int qemu_strtoul(const char *nptr, const char **endptr, int base,
+>  {
+>      char *ep;
+> 
+> +    assert((unsigned) base <= 36 && base != 1);
+>      if (!nptr) {
+>          if (endptr) {
+>              *endptr = nptr;
+> @@ -502,6 +507,7 @@ int qemu_strtoi64(const char *nptr, const char **endptr, int base,
+>  {
+>      char *ep;
+> 
+> +    assert((unsigned) base <= 36 && base != 1);
+>      if (!nptr) {
+>          if (endptr) {
+>              *endptr = nptr;
+> @@ -525,6 +531,7 @@ int qemu_strtou64(const char *nptr, const char **endptr, int base,
+>  {
+>      char *ep;
+> 
+> +    assert((unsigned) base <= 36 && base != 1);
+>      if (!nptr) {
+>          if (endptr) {
+>              *endptr = nptr;
+> @@ -657,6 +664,7 @@ int parse_uint(const char *s, unsigned long long *value, char **endptr,
+>      char *endp = (char *)s;
+>      unsigned long long val = 0;
+> 
+> +    assert((unsigned) base <= 36 && base != 1);
+>      if (!s) {
+>          r = -EINVAL;
+>          goto out;
+> 
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
