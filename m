@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gVJCF-0003wA-GK
+	(envelope-from <alex.williamson@redhat.com>) id 1gVJCF-0003w2-Fb
 	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:41:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gVJCD-0005JC-5j
+	(envelope-from <alex.williamson@redhat.com>) id 1gVJCC-0005Fn-K1
 	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:41:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50842)
+Received: from mx1.redhat.com ([209.132.183.28]:37600)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gVJCC-00056H-LY
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:41:44 -0500
+	id 1gVJCB-0004SU-Cy
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:41:43 -0500
 From: Alex Williamson <alex.williamson@redhat.com>
-Date: Fri, 07 Dec 2018 09:41:42 -0700
-Message-ID: <154420090267.27028.651037857567016111.stgit@gimli.home>
+Date: Fri, 07 Dec 2018 09:41:36 -0700
+Message-ID: <154420089677.27028.4140810041884273128.stgit@gimli.home>
 In-Reply-To: <154419994154.27028.14774494243513273923.stgit@gimli.home>
 References: <154419994154.27028.14774494243513273923.stgit@gimli.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [for-4.0 PATCH v4 7/9] pcie: Allow generic PCIe root
- port to specify link speed and width
+Subject: [Qemu-devel] [for-4.0 PATCH v4 6/9] pcie: Fill PCIESlot link fields
+ to support higher speeds and widths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +29,118 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Geoffrey McRae <geoff@hostfission.com>, Eric Auger <eric.auger@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Geoffrey McRae <geoff@hostfission.com>
 
-Allow users to experimentally specify speed and width values for the
-generic PCIe root port.  Defaults remain at 2.5GT/s & x1 for
-compatiblity with the intent to only support changing defaults via
-machine types for now.
-
-Note for libvirt testing that pcie-root-port controllers are given
-default names like "pci.7" which don't play well with using the
-"-set device.$name.$prop=$value" options accessible to us via
-<qemu:commandline> options.  The solution is to add an <alias> to the
-pcie-root-port <controller>, for example:
-
-    <controller type='pci' index='7' model='pcie-root-port'>
-      <model name='pcie-root-port'/>
-      <target chassis='7' port='0x15'/>
-      <alias name='ua-gfx0'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x5'/>
-    </controller>
-
-The "ua-" here is a mandatory prefix.  We can then use:
-
-  <qemu:commandline>
-    <qemu:arg value='-set'/>
-    <qemu:arg value='device.ua-gfx0.x-speed=8'/>
-    <qemu:arg value='-set'/>
-    <qemu:arg value='device.ua-gfx0.x-width=16'/>
-  </qemu:commandline>
-
-or, without an alias, set globals such as:
-
-  <qemu:commandline>
-    <qemu:arg value='-global'/>
-    <qemu:arg value='pcie-root-port.x-speed=8'/>
-    <qemu:arg value='-global'/>
-    <qemu:arg value='pcie-root-port.x-width=16'/>
-  </qemu:commandline>
+Make use of the PCIESlot speed and width fields to update link
+information beyond those configured in pcie_cap_v1_fill().  This is
+only called for devices supporting a version 2 capability and
+automatically skips any non-PCIESlot devices.  Only devices with
+increased link values generate any visible config space differences.
 
 Cc: Michael S. Tsirkin <mst@redhat.com>
 Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Tested-by: Geoffrey McRae <geoff@hostfission.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- hw/pci-bridge/gen_pcie_root_port.c |    4 ++++
- 1 file changed, 4 insertions(+)
+ hw/pci/pcie.c |   74 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 74 insertions(+)
 
-diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
-index 299de429ec1e..ca5418a89dd2 100644
---- a/hw/pci-bridge/gen_pcie_root_port.c
-+++ b/hw/pci-bridge/gen_pcie_root_port.c
-@@ -124,6 +124,10 @@ static Property gen_rp_props[] = {
-                      res_reserve.mem_pref_32, -1),
-     DEFINE_PROP_SIZE("pref64-reserve", GenPCIERootPort,
-                      res_reserve.mem_pref_64, -1),
-+    DEFINE_PROP_PCIE_LINK_SPEED("x-speed", PCIESlot,
-+                                speed, PCIE_LINK_SPEED_2_5),
-+    DEFINE_PROP_PCIE_LINK_WIDTH("x-width", PCIESlot,
-+                                width, PCIE_LINK_WIDTH_1),
-     DEFINE_PROP_END_OF_LIST()
- };
+diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+index 61b7b96c52cd..8673b163de25 100644
+--- a/hw/pci/pcie.c
++++ b/hw/pci/pcie.c
+@@ -27,6 +27,7 @@
+ #include "hw/pci/msi.h"
+ #include "hw/pci/pci_bus.h"
+ #include "hw/pci/pcie_regs.h"
++#include "hw/pci/pcie_port.h"
+ #include "qemu/range.h"
  
+ //#define DEBUG_PCIE
+@@ -87,6 +88,76 @@ pcie_cap_v1_fill(PCIDevice *dev, uint8_t port, uint8_t type, uint8_t version)
+     pci_set_word(cmask + PCI_EXP_LNKSTA, 0);
+ }
+ 
++static void pcie_cap_fill_slot_lnk(PCIDevice *dev)
++{
++    PCIESlot *s = (PCIESlot *)object_dynamic_cast(OBJECT(dev), TYPE_PCIE_SLOT);
++    uint8_t *exp_cap = dev->config + dev->exp.exp_cap;
++
++    /* Skip anything that isn't a PCIESlot */
++    if (!s) {
++        return;
++    }
++
++    /* Clear and fill LNKCAP from what was configured above */
++    pci_long_test_and_clear_mask(exp_cap + PCI_EXP_LNKCAP,
++                                 PCI_EXP_LNKCAP_MLW | PCI_EXP_LNKCAP_SLS);
++    pci_long_test_and_set_mask(exp_cap + PCI_EXP_LNKCAP,
++                               QEMU_PCI_EXP_LNKCAP_MLW(s->width) |
++                               QEMU_PCI_EXP_LNKCAP_MLS(s->speed));
++
++    /*
++     * Link bandwidth notification is required for all root ports and
++     * downstream ports supporting links wider than x1 or multiple link
++     * speeds.
++     */
++    if (s->width > QEMU_PCI_EXP_LNK_X1 ||
++        s->speed > QEMU_PCI_EXP_LNK_2_5GT) {
++        pci_long_test_and_set_mask(exp_cap + PCI_EXP_LNKCAP,
++                                   PCI_EXP_LNKCAP_LBNC);
++    }
++
++    if (s->speed > QEMU_PCI_EXP_LNK_2_5GT) {
++        /*
++         * Hot-plug capable downstream ports and downstream ports supporting
++         * link speeds greater than 5GT/s must hardwire PCI_EXP_LNKCAP_DLLLARC
++         * to 1b.  PCI_EXP_LNKCAP_DLLLARC implies PCI_EXP_LNKSTA_DLLLA, which
++         * we also hardwire to 1b here.  2.5GT/s hot-plug slots should also
++         * technically implement this, but it's not done here for compatibility.
++         */
++        pci_long_test_and_set_mask(exp_cap + PCI_EXP_LNKCAP,
++                                   PCI_EXP_LNKCAP_DLLLARC);
++        pci_word_test_and_set_mask(exp_cap + PCI_EXP_LNKSTA,
++                                   PCI_EXP_LNKSTA_DLLLA);
++
++        /*
++         * Target Link Speed defaults to the highest link speed supported by
++         * the component.  2.5GT/s devices are permitted to hardwire to zero.
++         */
++        pci_word_test_and_clear_mask(exp_cap + PCI_EXP_LNKCTL2,
++                                     PCI_EXP_LNKCTL2_TLS);
++        pci_word_test_and_set_mask(exp_cap + PCI_EXP_LNKCTL2,
++                                   QEMU_PCI_EXP_LNKCAP_MLS(s->speed) &
++                                   PCI_EXP_LNKCTL2_TLS);
++    }
++
++    /*
++     * 2.5 & 5.0GT/s can be fully described by LNKCAP, but 8.0GT/s is
++     * actually a reference to the highest bit supported in this register.
++     * We assume the device supports all link speeds.
++     */
++    if (s->speed > QEMU_PCI_EXP_LNK_5GT) {
++        pci_long_test_and_clear_mask(exp_cap + PCI_EXP_LNKCAP2, ~0U);
++        pci_long_test_and_set_mask(exp_cap + PCI_EXP_LNKCAP2,
++                                   PCI_EXP_LNKCAP2_SLS_2_5GB |
++                                   PCI_EXP_LNKCAP2_SLS_5_0GB |
++                                   PCI_EXP_LNKCAP2_SLS_8_0GB);
++        if (s->speed > QEMU_PCI_EXP_LNK_8GT) {
++            pci_long_test_and_set_mask(exp_cap + PCI_EXP_LNKCAP2,
++                                       PCI_EXP_LNKCAP2_SLS_16_0GB);
++        }
++    }
++}
++
+ int pcie_cap_init(PCIDevice *dev, uint8_t offset,
+                   uint8_t type, uint8_t port,
+                   Error **errp)
+@@ -108,6 +179,9 @@ int pcie_cap_init(PCIDevice *dev, uint8_t offset,
+     /* Filling values common with v1 */
+     pcie_cap_v1_fill(dev, port, type, PCI_EXP_FLAGS_VER2);
+ 
++    /* Fill link speed and width options */
++    pcie_cap_fill_slot_lnk(dev);
++
+     /* Filling v2 specific values */
+     pci_set_long(exp_cap + PCI_EXP_DEVCAP2,
+                  PCI_EXP_DEVCAP2_EFF | PCI_EXP_DEVCAP2_EETLPP);
