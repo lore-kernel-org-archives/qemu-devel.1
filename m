@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gVK3e-00058L-Oy
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:36:59 -0500
+	(envelope-from <mst@redhat.com>) id 1gVK9x-00072n-CJ
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:43:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gVK3Z-0007sZ-RQ
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:36:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56378)
+	(envelope-from <mst@redhat.com>) id 1gVK9s-0003cE-ET
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:43:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52474)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gVK3Z-0007ov-LE
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:36:53 -0500
-Date: Fri, 7 Dec 2018 12:36:41 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gVK9s-0003bH-4L
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:43:24 -0500
+Date: Fri, 7 Dec 2018 12:43:18 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181207123456-mutt-send-email-mst@kernel.org>
-References: <20181207165103.3992-1-philmd@redhat.com>
+Message-ID: <20181207123822-mutt-send-email-mst@kernel.org>
+References: <20181207170400.5129-1-philmd@redhat.com>
+	<20181207170400.5129-4-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20181207165103.3992-1-philmd@redhat.com>
+In-Reply-To: <20181207170400.5129-4-philmd@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/4] Introduce the hw/firmware/ namespace
+Subject: Re: [Qemu-devel] [PATCH 3/6] hw/i386: Remove unused include
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +29,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Corey Minyard <minyard@acm.org>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Fri, Dec 07, 2018 at 05:50:59PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> QEMU interacts with various firmwares. We already have some helpers
-> for some firmwares. Later we will add UEFI helpers.
-> This series introduce the hw/firmware namespace for this.
+
+On Fri, Dec 07, 2018 at 06:03:57PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> ---
+>  hw/acpi/piix4.c      | 1 -
+>  hw/i386/acpi-build.c | 1 -
+>  hw/i386/pc.c         | 1 -
+>  3 files changed, 3 deletions(-)
 >=20
-> There is no need to move hw/smbios sources into a specific directory,
-> we only focus on the headers.
+> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> index e330f24c71..49a33bfcda 100644
+> --- a/hw/acpi/piix4.c
+> +++ b/hw/acpi/piix4.c
+> @@ -28,7 +28,6 @@
+>  #include "sysemu/sysemu.h"
+>  #include "qapi/error.h"
+>  #include "qemu/range.h"
+> -#include "hw/nvram/fw_cfg.h"
+>  #include "exec/address-spaces.h"
+>  #include "hw/acpi/piix4.h"
+>  #include "hw/acpi/pcihp.h"
 
-I like this
+Looks right.
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 236a20eaa8..1e5c371294 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -35,7 +35,6 @@
+>  #include "hw/acpi/acpi-defs.h"
+>  #include "hw/acpi/acpi.h"
+>  #include "hw/acpi/cpu.h"
+> -#include "hw/nvram/fw_cfg.h"
+>  #include "hw/acpi/bios-linker-loader.h"
+>  #include "hw/loader.h"
+>  #include "hw/isa/isa.h"
 
-will queue after giving people a bit of time for review.
+This one calls fw_cfg_add_file.
 
-> Philippe Mathieu-Daud=E9 (4):
->   tests: Remove unused include
->   hw/smbios: Restrict access to "smbios_ipmi.h"
->   hw/smbios: Remove "smbios_ipmi.h"
->   hw/smbios: Move to the hw/firmware/ namespace
->=20
->  MAINTAINERS                              |  2 +-
->  hw/arm/virt.c                            |  2 +-
->  hw/i386/pc.c                             |  2 +-
->  hw/i386/pc_piix.c                        |  2 +-
->  hw/i386/pc_q35.c                         |  2 +-
->  hw/smbios/smbios-stub.c                  |  2 +-
->  hw/smbios/smbios.c                       |  3 +--
->  hw/smbios/smbios_build.h                 |  4 ++++
->  hw/smbios/smbios_type_38-stub.c          |  2 +-
->  hw/smbios/smbios_type_38.c               |  3 +--
->  include/hw/{smbios =3D> firmware}/smbios.h |  0
->  include/hw/smbios/ipmi.h                 | 15 ---------------
->  tests/acpi-utils.c                       |  1 -
->  tests/bios-tables-test.c                 |  2 +-
->  vl.c                                     |  2 +-
->  15 files changed, 15 insertions(+), 29 deletions(-)
->  rename include/hw/{smbios =3D> firmware}/smbios.h (100%)
->  delete mode 100644 include/hw/smbios/ipmi.h
->=20
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index f095725dba..2221dcdb36 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -35,7 +35,6 @@
+>  #include "hw/ide.h"
+>  #include "hw/pci/pci.h"
+>  #include "hw/pci/pci_bus.h"
+> -#include "hw/nvram/fw_cfg.h"
+>  #include "hw/timer/hpet.h"
+>  #include "hw/smbios/smbios.h"
+>  #include "hw/loader.h"
+
+
+And this calls fw_cfg_add_bytes
+
 > --=20
 > 2.17.2
