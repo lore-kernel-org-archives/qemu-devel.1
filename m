@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gVJTm-0000Bd-7M
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:59:57 -0500
+	(envelope-from <eblake@redhat.com>) id 1gVJXE-0004R0-ER
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:03:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gVJTj-0006cL-Hs
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:59:53 -0500
-References: <20181130220344.3350618-1-eblake@redhat.com>
-	<20181130220344.3350618-14-eblake@redhat.com>
-	<1827042e-ddf6-47cd-52b3-403e37c7fa1f@virtuozzo.com>
-	<ce5520fd-11bf-e927-49c9-1e8422d053f3@redhat.com>
-	<c108cdc2-a382-d6da-85c4-468f90bc2b86@virtuozzo.com>
+	(envelope-from <eblake@redhat.com>) id 1gVJXA-0003ps-Na
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:03:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56388)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gVJX9-0003mx-FT
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:03:23 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 265413081D08
+	for <qemu-devel@nongnu.org>; Fri,  7 Dec 2018 17:03:21 +0000 (UTC)
+References: <20181207165414.17566-1-berrange@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <77a23d5f-6299-3971-129c-5ed5df71b410@redhat.com>
-Date: Fri, 7 Dec 2018 10:59:38 -0600
+Message-ID: <17b48158-003b-a805-5ab6-4d56d2da287c@redhat.com>
+Date: Fri, 7 Dec 2018 11:03:19 -0600
 MIME-Version: 1.0
-In-Reply-To: <c108cdc2-a382-d6da-85c4-468f90bc2b86@virtuozzo.com>
+In-Reply-To: <20181207165414.17566-1-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 13/14] qemu-nbd: Add --list option
+Subject: Re: [Qemu-devel] [qemu-web PATCH v2] Add license files for GPLv2+
+ and CC-BY-SA-4.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +34,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-On 12/7/18 10:49 AM, Vladimir Sementsov-Ogievskiy wrote:
-
->>>> $ qemu-nbd -L
->>>> exports available: 1
->>>>  =C2=A0=C2=A0 export: ''
->>>>  =C2=A0=C2=A0=C2=A0 size:=C2=A0 65536
->>>>  =C2=A0=C2=A0=C2=A0 flags: 0x4ed ( flush fua trim zeroes df cache )
->>>>  =C2=A0=C2=A0=C2=A0 min block: 512
->>>>  =C2=A0=C2=A0=C2=A0 opt block: 4096
->>>>  =C2=A0=C2=A0=C2=A0 max block: 33554432
->>>>  =C2=A0=C2=A0=C2=A0 available meta contexts: 1
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0 base:allocation
->>>
->>> don't you plan to bind this all to QAPI and expose in json?
->>
->> No. As explained above, QAPI is very much centered on per-BDS actions,=
- while this action is a per-server action (where many servers have only o=
-ne export, but it is also possible to have a server with 0 exports or a p=
-lurality of exports).=C2=A0 I _can't_ fit this into query-block's ImageIn=
-fo details about a block device, because we don't have a way of stating '=
-connect to this arbitrary server, create an unspecified number of block d=
-evices, tell me about each of them, and then throw them all away because =
-we only wanted the info about what the server made available'. The same i=
-s true for gluster or other remote access block devices - the QMP command=
-s pre-suppose you already know WHICH specific resource you are accessing,=
- rather than providing a way for you to query the remote server about ALL=
- resources available but without actually selecting those resources.
->>
->> I'm open to ideas about a new QMP command to do such a query, but who =
-would be the client?=C2=A0 A management app that wants to hotplug a new N=
-BD device to a running guest can run 'qemu-nbd --list' just as easily as =
-they could run a new QMP command to learn what the server is offering. Wi=
-thout a strong reason of a client that would need this in QMP, I don't se=
-e the point in adding it to the qemu binary.
+On 12/7/18 10:54 AM, Daniel P. Berrang=C3=A9 wrote:
+> The intent is that from this point onwards, content for this repository
+> is dual-licensed under the GPLv2+ and CC-BY-SA-4.0
 >=20
-> I didn't mean QMP. For example, QAPI struct ImageCheck is used only in =
-qemu-img, to format output.
-> Anyway, creating a struct in QAPI for something we want to export is a =
-good thing, I think.
-
-Oh, I see where you're going with this. Just as 'qemu-img info' has=20
-routines to pretty-print a QAPI structure (and thus adding ImageInfo to=20
-the .json files automatically gets output in HMP without any additional=20
-work), you're suggesting that NBDExportInfo be converted into a QAPI=20
-struct, even if it won't be tied to QMP, in order to make the output=20
-more programmatic instead of manual effort.  I'll have to play with=20
-that, although it might be a separate series on top of this.
-
-> Also, if, as you said, some management app wants to query this informat=
-ion, again strictly
-> defined data + json output should be a good option. And, if there would=
- be such users, we'll
-> need to track compatibility of exported structure between qemu versions=
- and this is easier
-> with QAPI defined structure.
+> With git HEAD at d06ee0a788da27a2f24ab46928bc03eea019fb44, we have
+> authors:
 >=20
-> And then, defined structure may be then (at least partly) shared with I=
-mageInfoSpecificNBD.
+>    $ git shortlog -e -s
+>       1  Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>       5  Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>       3  Eric Blake <eblake@redhat.com>
+>       1  Fam Zheng <famz@redhat.com>
+>       2  Jeff Cody <jcody@redhat.com>
+>      50  Michael Roth <mdroth@linux.vnet.ibm.com>
+>      47  Paolo Bonzini <pbonzini@redhat.com>
+>       1  Rainer M=C3=BCller <raimue@macports.org>
+>       1  Stefan Hajnoczi <stefanha@gmail.com>
+>      14  Thomas Huth <thuth@redhat.com>
+>       1  Yu Ning <yu.ning@intel.com>
 >=20
-> And if we will need at some point a qmp command like query-nbd-server, =
-to get same information through
-> current qmp-connection, not running additional nbd-client, it would be =
-a simple thing to do.
+> This patch constitutes approval for all Red Hat copyright content (all
+> @redhat.com addrs & Stefan Hajnoczi) to be placed under these licenses.
+> For non-Red Hat copyright holders approval was given on the
+> qemu-devel@nongnu.org mailing list with the following Message-IDs:
+>=20
+>   - Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>=20
+>     <CAHDbmO2Gt+5RWaJ8Ka3LpB8o4Anq+evtKDO1oc6+X8gF7LZsOw@mail.gmail.com=
+>
+>=20
+>   - Michael Roth <mdroth@linux.vnet.ibm.com>
+>=20
+>     <154411651930.28165.5754119001430373065@sif>
+>=20
+>   - Rainer M=C3=BCller <raimue@macports.org>
+>=20
+>     <a6ad246f-b674-56d9-8c82-bb80880932a8@macports.org>
+>=20
+>   - Yu Ning <yu.ning@intel.com>
+>=20
+>     <C29659EAAA3E0143B583467412621C605E3E6CFF@SHSMSX101.ccr.corp.intel.=
+com>
+>=20
+> Note core basic site template/layout design is derived from a pre-built
+> template already under the CC-by-3.0 license, and will not change.
+>=20
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>   LICENSE-CC-BY-3.0.md     | 324 +++++++++++++++++++++++++++++++++++
+>   LICENSE-CC-BY-SA-4.0.md  | 356 ++++++++++++++++++++++++++++++++++++++=
++
+>   LICENSE-GPL.md           | 346 +++++++++++++++++++++++++++++++++++++
+>   LICENSE.md               |  18 ++
 
-If we ever need future extensions, we'll want to have QAPI structs in=20
-place. But whether we implement the QAPI structs now, or at the time of=20
-the future extension, is an engineering tradeoff (how much technical=20
-debt are we incurring by not doing it now; and how likely are we to ever=20
-want the future extension).
+And there's what I was missing :)
+
+>   _includes/copyright.html |   7 +-
+>   5 files changed, 1047 insertions(+), 4 deletions(-)
+>   create mode 100644 LICENSE-CC-BY-3.0.md
+>   create mode 100644 LICENSE-CC-BY-SA-4.0.md
+>   create mode 100644 LICENSE-GPL.md
+>   create mode 100644 LICENSE.md
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
 Eric Blake, Principal Software Engineer
