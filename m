@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gVJD2-0004WT-9s
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:42:37 -0500
+	(envelope-from <berrange@redhat.com>) id 1gVJFO-0000vE-MR
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:45:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gVJD1-0001tq-1o
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:42:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58342)
+	(envelope-from <berrange@redhat.com>) id 1gVJFI-0001EC-TM
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:45:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49311)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gVJD0-0001qV-RL
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:42:34 -0500
-From: Alex Williamson <alex.williamson@redhat.com>
-Date: Fri, 07 Dec 2018 09:42:11 -0700
-Message-ID: <154420093096.27028.2850537601140155413.stgit@gimli.home>
-In-Reply-To: <154419994154.27028.14774494243513273923.stgit@gimli.home>
-References: <154419994154.27028.14774494243513273923.stgit@gimli.home>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gVJFI-00019v-Jn
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:44:56 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B96248EC
+	for <qemu-devel@nongnu.org>; Fri,  7 Dec 2018 16:44:55 +0000 (UTC)
+Date: Fri, 7 Dec 2018 16:44:50 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181207164450.GO13784@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181207151636.8123-1-berrange@redhat.com>
+	<b9998045-614b-fb45-2369-e48f77d29ad4@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [for-4.0 PATCH v4 9/9] pcie: Fast PCIe root ports for
- new machines
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <b9998045-614b-fb45-2369-e48f77d29ad4@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-web PATCH] Add license files for GPLv2+ and
+ CC-BY-SA-4.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +36,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eric Auger <eric.auger@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-Change the default speed and width for new machine types to the
-fastest and widest currently supported.  This should be compatible to
-the PCIe 4.0 spec.  Pre-QEMU-4.0 machine types remain at 2.5GT/s, x1
-width.
+On Fri, Dec 07, 2018 at 10:40:50AM -0600, Eric Blake wrote:
+> On 12/7/18 9:16 AM, Daniel P. Berrang=C3=A9 wrote:
+> > The intent is that from this point onwards, content for this reposito=
+ry
+> > is dual-licensed under the GPLv2+ and CC-BY-SA-4.0
+> >=20
+> > With git HEAD at d06ee0a788da27a2f24ab46928bc03eea019fb44, we have
+> > authors:
+> >=20
+> >    $ git log | grep Author | sed -e 's/Author: //' | sort | uniq -c
+>=20
+> You're reinventing:
+> $ git shortlog -e -s
+>=20
+> >        1 Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> >        2 Daniel P. Berrange <berrange@redhat.com>
+> >        3 Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>=20
+> Looks like a separate patch introducing .mailmap is in order :)
+>=20
+> >        3 Eric Blake <eblake@redhat.com>
+> >        1 Fam Zheng <famz@redhat.com>
+> >        2 Jeff Cody <jcody@redhat.com>
+> >       50 Michael Roth <mdroth@linux.vnet.ibm.com>
+> >       47 Paolo Bonzini <pbonzini@redhat.com>
+> >        1 Rainer M=C3=BCller <raimue@macports.org>
+> >        1 Stefan Hajnoczi <stefanha@gmail.com>
+> >       14 Thomas Huth <thuth@redhat.com>
+> >        1 Yu Ning <yu.ning@intel.com>
+> >=20
+> > This patch constitutes approval for all Red Hat copyright content (al=
+l
+> > @redhat.com addrs & Stefan Hajnoczi) to be placed under these license=
+s.
+> > For non-Red Hat copyright holders approval was given on the
+> > qemu-devel@nongnu.org mailing list with the following Message-IDs:
+> >=20
+> >   - Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> >=20
+> >     <CAHDbmO2Gt+5RWaJ8Ka3LpB8o4Anq+evtKDO1oc6+X8gF7LZsOw@mail.gmail.c=
+om>
+> >=20
+> >   - Michael Roth <mdroth@linux.vnet.ibm.com>
+> >=20
+> >     <154411651930.28165.5754119001430373065@sif>
+> >=20
+> >   - Rainer M=C3=BCller <raimue@macports.org>
+> >=20
+> >     <a6ad246f-b674-56d9-8c82-bb80880932a8@macports.org>
+> >=20
+> >   - Yu Ning <yu.ning@intel.com>
+> >=20
+> >     <C29659EAAA3E0143B583467412621C605E3E6CFF@SHSMSX101.ccr.corp.inte=
+l.com>
+> >=20
+> > Note core basic site template/layout design is derived from a pre-bui=
+lt
+> > template already under the CC-by-3.0 license, and will not change.
+> >=20
+> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > ---
+>=20
+> > +++ b/_includes/copyright.html
+> > @@ -1,8 +1,7 @@
+> >   <div id=3D"copyright">
+> >   	<div id=3D"copyright-inner">
+> > -	<div class=3D"container">
+> > -		Design: <a href=3D"http://templated.co">TEMPLATED</a> &mdash;
+> > -		available under CC-BY 3.0
+> > -	</div>
+> > +	  <div class=3D"container">
+> > +	    This site is made available under the terms of <a href=3D"/lice=
+nse">a number of licenses</a>.
+>=20
+> Does Jekyll auto-create a /license file from the various LICENSE-*
+> additions, or did you forget to 'git add' yet another file?  I'm assumi=
+ng
+> that this _includes/copyright.html is merely a footer appended on each =
+page.
 
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- hw/pci-bridge/gen_pcie_root_port.c |    4 ++--
- include/hw/compat.h                |   10 +++++++++-
- 2 files changed, 11 insertions(+), 3 deletions(-)
+Doh, yes, I missed a file.
 
-diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
-index ca5418a89dd2..9766edb44596 100644
---- a/hw/pci-bridge/gen_pcie_root_port.c
-+++ b/hw/pci-bridge/gen_pcie_root_port.c
-@@ -125,9 +125,9 @@ static Property gen_rp_props[] = {
-     DEFINE_PROP_SIZE("pref64-reserve", GenPCIERootPort,
-                      res_reserve.mem_pref_64, -1),
-     DEFINE_PROP_PCIE_LINK_SPEED("x-speed", PCIESlot,
--                                speed, PCIE_LINK_SPEED_2_5),
-+                                speed, PCIE_LINK_SPEED_16),
-     DEFINE_PROP_PCIE_LINK_WIDTH("x-width", PCIESlot,
--                                width, PCIE_LINK_WIDTH_1),
-+                                width, PCIE_LINK_WIDTH_32),
-     DEFINE_PROP_END_OF_LIST()
- };
- 
-diff --git a/include/hw/compat.h b/include/hw/compat.h
-index 70958328fe7a..3ca85b037c04 100644
---- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -2,7 +2,15 @@
- #define HW_COMPAT_H
- 
- #define HW_COMPAT_3_1 \
--    /* empty */
-+    {\
-+        .driver   = "pcie-root-port",\
-+        .property = "x-speed",\
-+        .value    = "2_5",\
-+    },{\
-+        .driver   = "pcie-root-port",\
-+        .property = "x-width",\
-+        .value    = "1",\
-+    },
- 
- #define HW_COMPAT_3_0 \
-     /* empty */
+> Is it worth being specific that the TEMPLATED portion is still CC-BY-3.=
+0,
+> while all other contributions are dual-licensed GPLv2+/CC-BY-SA-4.0?  O=
+r, if
+> we don't want that much details in the footer, should README at least
+> mention the distinctions?
+
+That's what the missing file does indeed do :-)
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
