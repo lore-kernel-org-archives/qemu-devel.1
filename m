@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gVKMf-0007Xp-RJ
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:56:38 -0500
+	(envelope-from <mst@redhat.com>) id 1gVKN1-0007kG-VB
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:57:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gVKMd-0005SM-MX
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:56:36 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 7 Dec 2018 17:56:22 +0000
-Message-ID: <a277c7ee-ad0e-104e-d41b-1e943018adb7@virtuozzo.com>
-References: <1544176849-899477-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<5c525644-cc38-9d0b-c591-6d75315e25cc@redhat.com>
-	<d3507d7b-1bfe-0ae6-fd83-693272785f0d@virtuozzo.com>
-	<46df3ce6-c091-93e4-10c4-4d71687eadc4@redhat.com>
-	<df11cc1a-8bb1-6380-f878-4cdd1ce0ab0c@virtuozzo.com>
-In-Reply-To: <df11cc1a-8bb1-6380-f878-4cdd1ce0ab0c@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B934EAB9B01F9542A0684D72690C1BDF@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <mst@redhat.com>) id 1gVKMy-0005fk-PL
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:56:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51402)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gVKMy-0005a8-FA
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:56:56 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8619EA7DD
+	for <qemu-devel@nongnu.org>; Fri,  7 Dec 2018 17:56:47 +0000 (UTC)
+Date: Fri, 7 Dec 2018 12:56:37 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181207125539-mutt-send-email-mst@kernel.org>
+References: <20181207170400.5129-1-philmd@redhat.com>
+	<20181207170400.5129-7-philmd@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4] qemu-img info lists bitmap directory
- entries
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181207170400.5129-7-philmd@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 6/6] hw/nvram/fw_cfg: Add
+ fw_cfg_add_file_from_host()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,78 +35,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, Denis Lunev <den@virtuozzo.com>, John Snow <jsnow@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-MDcuMTIuMjAxOCAyMDo1MiwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
-MDcuMTIuMjAxOCAyMDozMSwgRXJpYyBCbGFrZSB3cm90ZToNCj4+IE9uIDEyLzcvMTggMTE6MjQg
-QU0sIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4gMDcuMTIuMjAxOCAx
-OToyMCwgRXJpYyBCbGFrZSB3cm90ZToNCj4+Pj4gT24gMTIvNy8xOCA0OjAwIEFNLCBBbmRyZXkg
-U2hpbmtldmljaCB3cm90ZToNCj4+Pj4+ICsrKyBiL2Jsb2NrL3Fjb3cyLmMNCj4+Pj4+IEBAIC00
-MjcwLDYgKzQyNzAsMTIgQEAgc3RhdGljIEltYWdlSW5mb1NwZWNpZmljICpxY293Ml9nZXRfc3Bl
-Y2lmaWNfaW5mbyhCbG9ja0RyaXZlclN0YXRlICpicykNCj4+Pj4+IMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqAgLnJlZmNvdW50X2JpdHPCoMKgwqDCoMKgID0gcy0+cmVmY291bnRfYml0cywN
-Cj4+Pj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgIH07DQo+Pj4+PiDCoMKgwqDCoMKgwqAgfSBlbHNl
-IGlmIChzLT5xY293X3ZlcnNpb24gPT0gMykgew0KPj4+Pj4gK8KgwqDCoMKgwqDCoMKgIFFjb3cy
-Qml0bWFwSW5mb0xpc3QgKmJpdG1hcHM7DQo+Pj4+PiArwqDCoMKgwqDCoMKgwqAgRXJyb3IgKmxv
-Y2FsX2VyciA9IE5VTEw7DQo+Pj4+PiArwqDCoMKgwqDCoMKgwqAgYml0bWFwcyA9IHFjb3cyX2dl
-dF9iaXRtYXBfaW5mb19saXN0KGJzLCAmbG9jYWxfZXJyKTsNCj4+Pj4+ICvCoMKgwqDCoMKgwqDC
-oCBpZiAobG9jYWxfZXJyICE9IE5VTEwpIHsNCj4+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IGVycm9yX3JlcG9ydF9lcnIobG9jYWxfZXJyKTsNCj4+Pj4+ICvCoMKgwqDCoMKgwqDCoCB9DQo+
-Pj4+DQo+Pj4+IE91Y2guIENhbGxpbmcgZXJyb3JfcmVwb3J0X2VycigpIGRvZXNuJ3QgYWx3YXlz
-IHdvcmsgaW4gUU1QIGNvbnRleHQ7IGJldHRlciB3b3VsZCBiZSB0byBwbHVtYiBFcnJvciAqKmVy
-cnAgYmFjayB1cCB0byB0aGUgY2FsbGVyLCBpZiBnZXR0aW5nIHRoaXMgc3BlY2lmaWMgaW5mb3Jt
-YXRpb24gY2FuIGZhaWwgYW5kIHdlIHdhbnQgdGhlIG92ZXJhbGwgcXVlcnktYmxvY2sgdG8gZmFp
-bC7CoCBPciwgd2UgY291bGQgZGVjaWRlIHRoYXQgZmFpbHVyZSB0byBnZXQgYml0bWFwIGluZm8g
-aXMgbm9uLWZhdGFsLCBhbmQgdGhhdCBpdCB3YXMganVzdCBhIGJlc3QtZWZmb3J0IGF0dGVtcHQg
-dG8gZ2V0IG1vcmUgaW5mbywgd2hlcmUgd2UgdGhlbiBpZ25vcmUgdGhlIGZhaWx1cmUsIHJhdGhl
-ciB0aGFuIHRyeWluZyB0byByZXBvcnQgaXQgaW5jb3JyZWN0bHkuDQo+Pj4NCj4+PiBPaCwgeWVz
-LCB5b3UgYXJlIHJpZ2h0LiBTdHJhbmdlLCBidXTCoCBiZHJ2X2dldF9zcGVjaWZpY19pbmZvIGxh
-Y2tzIGVycnAuIGVycm9yX2Fib3J0IHVzIHVzZWQgYWJvdmUgZm9yIGNyeXB0byBpbmZvIGVycm9y
-cy4NCj4+DQo+PiBBbmQgdGh1cyB3ZSBzaG91bGQgcHJvYmFibHkgZml4IHRoYXQgLSBidXQgaXQg
-ZG9lc24ndCBoYXZlIHRvIGJlIHBhcnQgb2YgdGhpcyBzZXJpZXMuDQo+Pg0KPj4+DQo+Pj4gUXVl
-cnlpbmcgYml0bWFwcyBuZWVkcyBkaXNrIGFjY2VzcyBzbyBpdCByZWFsbHkgbWF5IGZhaWwsIGFu
-ZCBpdCBtYXkgYmUgc2FkIHRvIGZhaWwgZ2V0IGFueSBpbmZvcm1hdGlvbiBiZWNhdXNlIG9mIHJl
-cGVhdGluZyBzb21lIGRpc2svcWNvdzIgZXJyb3IsIHNvIGl0J3MgYmV0dGVyIG5vdCB0byBhYm9y
-dCBhbmQgZXZlbiBub3QgdG8gZmFpbCBxbXAgY29tbWFuZCBoZXJlLg0KPj4+DQo+Pg0KPj4+Pj4g
-LcKgwqDCoMKgwqAgJyplbmNyeXB0JzogJ0ltYWdlSW5mb1NwZWNpZmljUUNvdzJFbmNyeXB0aW9u
-Jw0KPj4+Pj4gK8KgwqDCoMKgwqAgJyplbmNyeXB0JzogJ0ltYWdlSW5mb1NwZWNpZmljUUNvdzJF
-bmNyeXB0aW9uJywNCj4+Pj4+ICvCoMKgwqDCoMKgICcqYml0bWFwcyc6IFsnUWNvdzJCaXRtYXBJ
-bmZvJ10NCj4+Pj4NCj4+Pj4gSG1tLiBZb3UncmUgb21pdHRpbmcgdGhpcyBmaWVsZCBib3RoIGlm
-IHRoZXJlIGFyZSAwIGJpdG1hcHMsIGFuZCB3aGVuIGl0IHdhcyBhIHZlcnNpb24gMiBpbWFnZS4g
-SXMgaXQgd29ydGggaW5jbHVkaW5nIHRoaXMgZmllbGQgYXMgYSAwLWxlbmd0aCBhcnJheSB3aGVu
-IHRoZXJlIGFyZSBubyBiaXRtYXBzIGJ1dCB3aGVuIHRoZSBpbWFnZSBmb3JtYXQgaXMgbmV3IGVu
-b3VnaCB0byBzdXBwb3J0IHRoZW0sIG9yIGFyZSB3ZSBoYXBweSB3aXRoIHRoZSBpZGVhIG9mIG9u
-bHkgaW5jbHVkaW5nIHRoZSBmaWVsZCB3aGVuIGl0IGhhcyBhdCBsZWFzdCBvbmUgYml0bWFwP8Kg
-IFRoZSBkaWZmZXJlbmNlIGlzIHdoZXRoZXIgdGhlIGNhbGxpbmcgYXBwIGNhbiBleHBsaWNpdGx5
-IGxlYXJuIHRoYXQgdGhlcmUgYXJlIG5vIGJpdG1hcHMgKDAtbGVuZ3RoIHJlcGx5KSB2cy4gdGhl
-IGFtYmlndWl0eSBvZiBvbWl0dGluZyBpdCBmcm9tIHRoZSByZXBseSAobWlzc2luZyBtaWdodCBt
-ZWFuIG5vIGJpdG1hcHMsIG9yIGFuIGVycm9yIGluIHRyeWluZyB0byByZXBvcnQgdGhlIGJpdG1h
-cHMsIG9yIGFuIG9sZGVyIHFlbXUgdGhhdCBkaWRuJ3Qga25vdyBob3cgdG8gcmVwb3J0IGJpdG1h
-cHMpLg0KPj4+DQo+Pj4gSG1tLCBJIGRvbid0IGxpa2Ugb3ZlcnVzaW5nIC5oYXNfYml0bWFwcyBh
-cyBhIHNpZ24gb2YgZXJyb3IsIGF0IGxlYXN0IGl0IHdvdWxkIGJlIHZlcnkgd2VpcmQgdG8gZG9j
-dW1lbnQgc3VjaCBiZWhhdmlvciwgYW5kIGEgdW5kb2N1bWVudGVkIHRyaWNrIGl0IGlzIG5vdCBy
-ZWFsbHkgdXNlZnVsLg0KPj4+IEhtbSwgaWYgd2Ugd2FudCBzb21ldGhpbmcgbGlrZSB0aGlzIEkn
-ZCBwcmVmZXIgLmhhc19iaXRtYXBzIHRvIGJlIGZhbHNlIG9ubHkgaW4gY2FzZSBvZiBlcnJvciwg
-c28gZm9yIHYyIHdlJ2xsIGhhdmUgZW1wdHkgYXJyYXkuIEl0J3Mgc2ltcGxlciB0byBkb2N1bWVu
-dC4NCj4+DQo+PiBJJ20gaGFwcHkgd2l0aCB2MiBpbWFnZXMgcmVwb3J0aW5nIGEgMC1sZW5ndGgg
-YXJyYXkgaW5zdGVhZCBvZiBvbWl0dGluZyB0aGUgZmllbGQsIGVzcGVjaWFsbHkgaWYgdGhhdCBt
-ZWFucyB3ZSBjYW4gc2ltcGx5IGhhdmU6DQo+Pg0KPj4gb2xkIHFlbXU6IGZpZWxkIGFsd2F5cyBv
-bWl0dGVkIGJlY2F1c2Ugd2UgZGlkbid0IGNvbXB1dGUgaXQNCj4+IG5ldyBxZW11OiBmaWVsZCBv
-bWl0dGVkIGlmIHdlIGhpdCBhbiBlcnJvciBjb21wdXRpbmcgaXQNCj4+IMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIG90aGVyd2lzZSBwcmVzZW50IChidXQgcG9zc2libHkgMCBsZW5ndGgpIGFuZCBhY2N1
-cmF0ZQ0KPiANCj4gYW55d2F5LCB3ZSBjYW4gYWRqdXN0IGh1bWFuIG91dHB1dCB0eXBlIG9mIHFl
-bXUtaW1nIGluZm8gdG8gY2F0Y2ggdGhpcyBjYXNlIGFuZCBwcmludCBhZGRpdGlvbmFsIGVycm9y
-IG1lc3NhZ2UNCg0KYW5kIHRvIG1ha2UgaXQgc2ltcGxlciB0byByZWNvZ25pemUgZmFpbCwgaXQg
-c2hvdWxkIGJlIG9uZSB0aGluZywgaW5kZXBlbmRlbnQgb2YgdGhlIHZlcnNpb24sIGZvciBleGFt
-cGxlOiBvbWl0dGVkIGFsd2F5cyBtZWFucyBlcnJvci4gT3IgdmlzYS12ZXJzYTogZW1wdHkgbGlz
-dCBhbHdheXMgbWVhbnMgZXJyb3IsIG9taXR0ZWQgbWVhbnMgbm8gYml0bWFwcyBvciB1bnN1cHBv
-cnRlZC4NCg0KPiANCj4+DQo+Pj4NCj4+PiBPciB3ZSBuZWVkIHNlcGFyYXRlIGNhbnRfbG9hZF9i
-aXRtYXBzOiBib29sLCBvciBiaXRtYXBzIHNob3VsZCBiZSBlbnVtIG9mICggWydRY293MkJpdG1h
-cEluZm8nXSAsIHsnZXJyb3InOiAnc3RyJ30gKSwgZG8gd2UgaGF2ZSBzb21ldGhpbmcgbGlrZSB0
-aGlzIGFscmVhZHkgaW4gUUFQST8gVGhpcyBpcyB0aGUgcXVlc3Rpb24gYWJvdXQgcGFydGlhbCBz
-dWNjZXNzIG9mIGluZm8tZXhwb3J0aW5nIGNvbW1hbmRzLg0KPj4NCj4+IE5vLCBJIGRvbid0IHNl
-ZSBhIHJlYXNvbiB0byBvdmVyLWVuZ2luZWVyIHRoaW5nczsgcXVlcnktYmxvY2sgaXMgYWxyZWFk
-eSBhIGJlaGVtb3RoIHdpdGhvdXQgdHJ5aW5nIHRvIGphbSBpbiBtb3JlIGRldGFpbHMgYWJvdXQg
-d2hldGhlciBpbmZvLWV4cG9ydGluZyBoaXQgcGFydGlhbCBmYWlsdXJlLg0KPj4NCj4gDQo+IA0K
-DQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+On Fri, Dec 07, 2018 at 06:04:00PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Add a function to read the full content of file on the host, and add
+> a new 'file' name item to the fw_cfg device.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+
+Need to be careful with options that let users play with firmware.
+Way too easy to create conflicts.
+Anyway, I'd rather have this included with whatever is using it.
+
+> ---
+>  hw/nvram/fw_cfg.c         | 22 ++++++++++++++++++++++
+>  include/hw/nvram/fw_cfg.h | 22 ++++++++++++++++++++++
+>  2 files changed, 44 insertions(+)
+>=20
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 50525ec1dd..f3232fcb16 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -842,6 +842,28 @@ void fw_cfg_add_file(FWCfgState *s,  const char *f=
+ilename,
+>      fw_cfg_add_file_callback(s, filename, NULL, NULL, NULL, data, len,=
+ true);
+>  }
+> =20
+> +void *fw_cfg_add_file_from_host(FWCfgState *s, const char *filename,
+> +                                const char *host_path, size_t *len)
+> +{
+> +    GError *gerr =3D NULL;
+> +    gchar *ptr =3D NULL;
+> +    gsize contents_len =3D 0;
+> +
+> +
+> +    if (g_file_get_contents(host_path, &ptr, &contents_len, &gerr)) {
+> +        fw_cfg_add_file(s, filename, ptr, contents_len);
+> +    } else {
+> +        error_report("failed to read file %s, %s", host_path, gerr->me=
+ssage);
+> +        g_error_free(gerr);
+> +        return NULL;
+> +    }
+> +    if (len) {
+> +        *len =3D contents_len;
+> +    }
+> +
+> +    return ptr;
+> +}
+> +
+>  void *fw_cfg_modify_file(FWCfgState *s, const char *filename,
+>                          void *data, size_t len)
+>  {
+> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
+> index 28630b2f26..8de8d63433 100644
+> --- a/include/hw/nvram/fw_cfg.h
+> +++ b/include/hw/nvram/fw_cfg.h
+> @@ -166,6 +166,28 @@ void fw_cfg_add_i64(FWCfgState *s, uint16_t key, u=
+int64_t value);
+>  void fw_cfg_add_file(FWCfgState *s, const char *filename, void *data,
+>                       size_t len);
+> =20
+> +/**
+> + * fw_cfg_add_file_from_host:
+> + * @s: fw_cfg device being modified
+> + * @filename: name of new fw_cfg file item
+> + * @host_path: path of the host file to read the data from
+> + * @len: pointer to hold the length of the host file (optional)
+> + *
+> + * Read the content of a host file as a raw "blob" then add a new NAME=
+D
+> + * fw_cfg item of the file size. If @len is provided, it will contains=
+ the
+> + * total length read from the host file. The data referenced by the st=
+arting
+> + * pointer is only linked, NOT copied, into the data structure of the =
+fw_cfg
+> + * device.
+> + * The next available (unused) selector key starting at FW_CFG_FILE_FI=
+RST
+> + * will be used; also, a new entry will be added to the file directory
+> + * structure residing at key value FW_CFG_FILE_DIR, containing the ite=
+m name,
+> + * data size, and assigned selector key value.
+> + *
+> + * Returns: pointer to the file content, or NULL if an error occured.
+> + */
+> +void *fw_cfg_add_file_from_host(FWCfgState *s, const char *filename,
+> +                                const char *host_path, size_t *len);
+> +
+>  /**
+>   * fw_cfg_add_file_callback:
+>   * @s: fw_cfg device being modified
+> --=20
+> 2.17.2
