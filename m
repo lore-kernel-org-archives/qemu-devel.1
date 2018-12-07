@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gVE9H-0000kU-N8
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 06:18:25 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gVECG-0003OH-Py
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 06:21:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gVE9F-0003Az-Ty
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 06:18:23 -0500
-References: <20181206151856.77503-1-eblake@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <9c3877f7-6884-791d-b67b-7f32b8275470@vivier.eu>
-Date: Fri, 7 Dec 2018 12:18:06 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181206151856.77503-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gVECF-0005rZ-K8
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 06:21:28 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 7 Dec 2018 11:21:17 +0000
+Message-ID: <13a090e9-ef18-4215-6726-453251b76560@virtuozzo.com>
+References: <20181130220344.3350618-1-eblake@redhat.com>
+	<20181130220344.3350618-13-eblake@redhat.com>
+In-Reply-To: <20181130220344.3350618-13-eblake@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] cutils: Assert in-range
- base for string-to-integer conversions
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C122E1D831B6464B9B7785C1B4FD8966@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 12/14] nbd/client: Work around 3.0 bug for
+ listing meta contexts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +26,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, vsementsov@virtuozzo.com, armbru@redhat.com
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-Le 06/12/2018 à 16:18, Eric Blake a écrit :
-> POSIX states that the value of endptr is unspecified if strtol()
-> fails with EINVAL due to an invalid base argument.  Since none of
-> the callers to check_strtox_error() initialized endptr, we could
-> end up propagating uninitialized data back to a caller on error.
-> However, passing an out-of-range base is already a sign of poor
-> programming, so let's just assert that base is in range, at which
-> point check_strtox_error() can be tightened to assert that it is
-> receiving an initialized ep that points somewhere within the
-> caller's original string, regardless of whether strto*() succeeded
-> or failed with ERANGE.
-> 
-> Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
-> 
-> Also tested that this does not negatively impact David's pending
-> additions of qemu_strtod{,_finite}().  Thus:
-> Based-on: <20181121164421.20780-1-david@redhat.com>
-> 
->  util/cutils.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-
-Applied to my trivial-patches branch.
-
-Thanks,
-Laurent
+MDEuMTIuMjAxOCAxOjAzLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBDb21taXQgM2QwNjhhZmYgZm9y
+Z290IHRvIGFkdmVydGlzZSBhdmFpbGFibGUgcWVtdTogY29udGV4dHMNCj4gd2hlbiB0aGUgY2xp
+ZW50IHJlcXVlc3RzIGEgbGlzdCB3aXRoIDAgcXVlcmllcy4gRnVydGhlcm1vcmUsDQo+IDMuMCBz
+aGlwcGVkIHdpdGggYSBxZW11LWltZyBoYWNrIG9mIHgtZGlydHktYml0bWFwIChjb21taXQNCj4g
+MjE2ZWUzNjUpIHRoYXQgX3NpbGVudGx5XyBhY3RzIGFzIHRob3VnaCB0aGUgZW50aXJlIGltYWdl
+IGlzDQo+IGNsZWFuIGlmIGEgcmVxdWVzdGVkIGJpdG1hcCBpcyBub3QgcHJlc2VudC4gIEJvdGgg
+YnVncyBoYXZlDQo+IGJlZW4gcmVjZW50bHkgZml4ZWQgdG8gZ2l2ZSBmdWxsIG91dHB1dCBmcm9t
+IHRoZSBzdGFydCwgYW5kDQo+IHRvIHJlZnVzZSBhIGNvbm5lY3Rpb24gaWYgYSByZXF1ZXN0ZWQg
+eC1kaXJ0eS1iaXRtYXAgd2FzIG5vdA0KPiBmb3VuZC4NCj4gDQo+IFN0aWxsLCBpdCBpcyBsaWtl
+bHkgdGhhdCB0aGVyZSB3aWxsIGJlIHVzZXJzIHRoYXQgaGF2ZSB0bw0KPiB3b3JrIHdpdGggYSBt
+aXggb2Ygb2xkIGFuZCBuZXcgcWVtdSB2ZXJzaW9ucywgZGVwZW5kaW5nIG9uDQo+IHdoaWNoIGZl
+YXR1cmVzIGdldCBiYWNrcG9ydGVkIHdoZXJlLCBhdCB3aGljaCBwb2ludCBiZWluZw0KPiBhYmxl
+IHRvIHJlbHkgb24gJ3FlbXUtaW1nIC0tbGlzdCcgb3V0cHV0IHRvIGtub3cgZm9yIHN1cmUNCj4g
+d2hldGhlciBhIGdpdmVuIE5CRCBleHBvcnQgaGFzIHRoZSBkZXNpcmVkIGRpcnR5IGJpdG1hcCBp
+cw0KPiBtdWNoIG5pY2VyIHRoYW4gYmxpbmRseSBjb25uZWN0aW5nIGFuZCByaXNraW5nIHRoYXQg
+dGhlDQo+IGVudGlyZSBpbWFnZSBtYXkgYXBwZWFyIGNsZWFuLiAgV2UgY2FuIG1ha2Ugb3VyIC0t
+bGlzdCBjb2RlDQo+IHNtYXJ0IGVub3VnaCB0byB3b3JrIGFyb3VuZCBidWdneSBzZXJ2ZXJzIGJ5
+IHRyYWNraW5nDQo+IHdoZXRoZXIgd2UndmUgc2VlbiBhbnkgcWVtdTogcmVwbGllcyBpbiB0aGUg
+b3JpZ2luYWwgMC1xdWVyeQ0KPiBsaXN0OyBpZiBub3QsIHJlY3Vyc2UgdG8gYSBzaW5nbGUgcXVl
+cnkgb24gInFlbXU6IiAod2hpY2gNCj4gbWF5IHN0aWxsIGhhdmUgbm8gcmVwbGllcywgYnV0IHRo
+ZW4gd2Uga25vdyBmb3Igc3VyZSB3ZQ0KPiBkaWRuJ3QgdHJpcCB1cCBvbiB0aGUgc2VydmVyIGJ1
+ZykuDQoNCnJlbGF0ZWQgdGhpbmc6DQpzaG91bGQgd2UgZG9jdW1lbnQgdGhlc2UgYnVncyB3aXRo
+IGNvcnJlc3BvbmRpbmcgdmVyc2lvbiBudW1iZXJzIGluIGRvY3MvaW50ZXJvcC9uYmQudHh0Pw0K
+DQoNCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPg0K
+PiANCj4gLS0tDQo+IERvbmUgYXMgYSBzZXBhcmF0ZSBwYXRjaCB0byBtYWtlIGl0IGVhc2llciB0
+byByZXZlcnQgd2hlbiB3ZSBubw0KPiBsb25nZXIgY2FyZSBhYm91dCAzLjAgc2VydmVycw0KPiAt
+LS0NCj4gICBuYmQvY2xpZW50LmMgfCAxMSArKysrKysrKysrLQ0KPiAgIDEgZmlsZSBjaGFuZ2Vk
+LCAxMCBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvbmJk
+L2NsaWVudC5jIGIvbmJkL2NsaWVudC5jDQo+IGluZGV4IDYyOTJkZTU2MGVlLi45MjhlY2FiZDQy
+MCAxMDA2NDQNCj4gLS0tIGEvbmJkL2NsaWVudC5jDQo+ICsrKyBiL25iZC9jbGllbnQuYw0KPiBA
+QCAtMjEsNiArMjEsNyBAQA0KPiAgICNpbmNsdWRlICJxYXBpL2Vycm9yLmgiDQo+ICAgI2luY2x1
+ZGUgInRyYWNlLmgiDQo+ICAgI2luY2x1ZGUgIm5iZC1pbnRlcm5hbC5oIg0KPiArI2luY2x1ZGUg
+InFlbXUvY3V0aWxzLmgiDQo+IA0KPiAgIC8qIERlZmluaXRpb25zIGZvciBvcGFxdWUgZGF0YSB0
+eXBlcyAqLw0KPiANCj4gQEAgLTczNiwxMiArNzM3LDEzIEBAIHN0YXRpYyBpbnQgbmJkX25lZ290
+aWF0ZV9zaW1wbGVfbWV0YV9jb250ZXh0KFFJT0NoYW5uZWwgKmlvYywNCj4gICAgICAgICAgICAg
+ICAgICAgcmV0dXJuIC0xOw0KPiAgICAgICAgICAgICAgIH0NCj4gICAgICAgICAgICAgICBnX2Zy
+ZWUobmFtZSk7DQo+ICsgICAgICAgICAgICByZWNlaXZlZCA9IHRydWU7DQo+ICAgICAgICAgICB9
+IGVsc2Ugew0KPiAgICAgICAgICAgICAgIGluZm8tPmNvbnRleHRzID0gZ19yZW5ldyhjaGFyICos
+IGluZm8tPmNvbnRleHRzLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICArK2luZm8tPm5fY29udGV4dHMpOw0KPiAgICAgICAgICAgICAgIGluZm8tPmNvbnRleHRzW2lu
+Zm8tPm5fY29udGV4dHMgLSAxXSA9IG5hbWU7DQo+ICsgICAgICAgICAgICByZWNlaXZlZCB8PSBz
+dHJzdGFydChuYW1lLCAicWVtdToiLCBOVUxMKTsNCg0Kc28sIGZvciBfTElTVF8sIGl0IGlzIGFj
+dHVhbGx5IHJlY2VpdmVkX3FlbXUgdmFyLiBJdCBoYXMgdGFrZW4gc29tZSB0aW1lIGZvciBtZQ0K
+dG8gdW5kZXJzdGFuZCB0aGF0IGl0J3Mgb2sgKHR1cm5zIG91dCwgdGhhdCB0aGlzIHZhcmlhYmxl
+IGFjdHVhbGx5IGlzbid0IHVzZWQgZm9yDQpfTElTVF8gY2FzZSkuLiBQZXJzb25hbGx5IEkgZG9u
+J3QgbGlrZSBpdCwgZm9yIG1lIGl0J3MgdG9vIHRyaWNreSwgYnV0IGFueXdheSwgeW91DQpzYWlk
+LCB5b3UnbGwgcmVmYWN0b3IgdGhpcyBmdW5jdGlvbiBzb21laG93Lg0KDQo+ICAgICAgICAgICB9
+DQo+IC0gICAgICAgIHJlY2VpdmVkID0gdHJ1ZTsNCj4gDQo+ICAgICAgICAgICAvKiByZWNlaXZl
+IE5CRF9SRVBfQUNLICovDQo+ICAgICAgICAgICBpZiAobmJkX3JlY2VpdmVfb3B0aW9uX3JlcGx5
+KGlvYywgb3B0LCAmcmVwbHksIGVycnApIDwgMCkgew0KPiBAQCAtNzcxLDYgKzc3MywxMyBAQCBz
+dGF0aWMgaW50IG5iZF9uZWdvdGlhdGVfc2ltcGxlX21ldGFfY29udGV4dChRSU9DaGFubmVsICpp
+b2MsDQo+ICAgICAgICAgICBpbmZvLT5tZXRhX2Jhc2VfYWxsb2NhdGlvbl9pZCA9IHJlY2VpdmVk
+X2lkOw0KPiAgICAgICB9DQo+IA0KPiArICAgIC8qIFJlY3Vyc2UgdG8gd29yayBhcm91bmQgcWVt
+dSAzLjAgYnVnIC0gdGhlIHNlcnZlciBmb3Jnb3QgdG8gc2VuZA0KPiArICAgICAqICJxZW11OiIg
+cmVwbGllcyB0byAwIHF1ZXJpZXMuICovDQo+ICsgICAgaWYgKCFjb250ZXh0ICYmICFyZWNlaXZl
+ZCkgew0KPiArICAgICAgICByZXR1cm4gbmJkX25lZ290aWF0ZV9zaW1wbGVfbWV0YV9jb250ZXh0
+KGlvYywgb3B0LCAicWVtdToiLCBpbmZvLA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIGVycnApOw0KPiArICAgIH0NCj4gKw0KPiAgICAgICByZXR1
+cm4gcmVjZWl2ZWQgfHwgb3B0ID09IE5CRF9PUFRfTElTVF9NRVRBX0NPTlRFWFQ7DQo+ICAgfQ0K
+PiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
