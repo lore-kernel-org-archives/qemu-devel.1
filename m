@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=872b883f0=Paul.Durrant@citrix.com>)
-	id 1gVFhH-0005p0-Ca
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 07:57:36 -0500
+	(envelope-from <armbru@redhat.com>) id 1gVFlZ-0000Wl-V1
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 08:02:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=872b883f0=Paul.Durrant@citrix.com>)
-	id 1gVFhE-0007ot-3r
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 07:57:35 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Fri, 7 Dec 2018 12:57:29 +0000
-Message-ID: <e4bc3b20558141f2b4b2154fdc9f6448@AMSPEX02CL03.citrite.net>
-References: <1544108924-10841-1-git-send-email-paul.durrant@citrix.com>
-	<1544108924-10841-3-git-send-email-paul.durrant@citrix.com>
-	<20181207121519.GE18875@perard.uk.xensource.com>
-In-Reply-To: <20181207121519.GE18875@perard.uk.xensource.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <armbru@redhat.com>) id 1gVFlT-0007i0-N1
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 08:02:01 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181207115343.6747-1-kwolf@redhat.com>
+	<20181207115343.6747-3-kwolf@redhat.com>
+Date: Fri, 07 Dec 2018 14:01:30 +0100
+In-Reply-To: <20181207115343.6747-3-kwolf@redhat.com> (Kevin Wolf's message of
+	"Fri, 7 Dec 2018 12:53:40 +0100")
+Message-ID: <875zw5xzh1.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 02/18] xen: introduce new 'XenBus' and
- 'XenDevice' object hierarchy
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 2/5] vmdk: Implement .bdrv_co_create
+ callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,200 +24,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony Perard <anthony.perard@citrix.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel
-	Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
 
-> -----Original Message-----
-> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
-> Sent: 07 December 2018 12:15
-> To: Paul Durrant <Paul.Durrant@citrix.com>
-> Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
-> devel@lists.xenproject.org; Stefano Stabellini <sstabellini@kernel.org>;
-> Michael S. Tsirkin <mst@redhat.com>; Marcel Apfelbaum
-> <marcel.apfelbaum@gmail.com>; Paolo Bonzini <pbonzini@redhat.com>; Richar=
-d
-> Henderson <rth@twiddle.net>; Eduardo Habkost <ehabkost@redhat.com>
-> Subject: Re: [PATCH v2 02/18] xen: introduce new 'XenBus' and 'XenDevice'
-> object hierarchy
->=20
-> On Thu, Dec 06, 2018 at 03:08:28PM +0000, Paul Durrant wrote:
-> > This patch adds the basic boilerplate for a 'XenBus' object that will
-> act
-> > as a parent to 'XenDevice' PV backends.
-> > A new 'XenBridge' object is also added to connect XenBus to the system
-> bus.
-> >
-> > The XenBus object is instantiated by a new xen_bus_init() function
-> called
-> > from the same sites as the legacy xen_be_init() function.
-> >
-> > Subsequent patches will flesh-out the functionality of these objects.
-> >
-> > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-> > ---
-> > Cc: Stefano Stabellini <sstabellini@kernel.org>
-> > Cc: Anthony Perard <anthony.perard@citrix.com>
-> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Richard Henderson <rth@twiddle.net>
-> > Cc: Eduardo Habkost <ehabkost@redhat.com>
-> >
-> > v2:
-> >  - Fix boilerplate
-> >  - Make xen-bus hotplug capable
-> > ---
-> >  hw/i386/xen/xen-hvm.c     |   3 ++
-> >  hw/xen/Makefile.objs      |   2 +-
-> >  hw/xen/trace-events       |   6 +++
-> >  hw/xen/xen-bus.c          | 131
-> ++++++++++++++++++++++++++++++++++++++++++++++
-> >  hw/xenpv/xen_machine_pv.c |   3 ++
-> >  include/hw/xen/xen-bus.h  |  55 +++++++++++++++++++
-> >  6 files changed, 199 insertions(+), 1 deletion(-)
-> >  create mode 100644 hw/xen/xen-bus.c
-> >  create mode 100644 include/hw/xen/xen-bus.h
-> >
-> > diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-> > index 1d63763..4497f75 100644
-> > --- a/hw/i386/xen/xen-hvm.c
-> > +++ b/hw/i386/xen/xen-hvm.c
-> > @@ -17,6 +17,7 @@
-> >  #include "hw/i386/apic-msidef.h"
-> >  #include "hw/xen/xen_common.h"
-> >  #include "hw/xen/xen-legacy-backend.h"
-> > +#include "hw/xen/xen-bus.h"
-> >  #include "qapi/error.h"
-> >  #include "qapi/qapi-commands-misc.h"
-> >  #include "qemu/error-report.h"
-> > @@ -1479,6 +1480,8 @@ void xen_hvm_init(PCMachineState *pcms,
-> MemoryRegion **ram_memory)
-> >      QLIST_INIT(&state->dev_list);
-> >      device_listener_register(&state->device_listener);
-> >
-> > +    xen_bus_init();
-> > +
-> >      /* Initialize backend core & drivers */
-> >      if (xen_be_init() !=3D 0) {
-> >          error_report("xen backend core setup failed");
-> > diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
-> > index 3f64a44..d9d6d7b 100644
-> > --- a/hw/xen/Makefile.objs
-> > +++ b/hw/xen/Makefile.objs
-> > @@ -1,5 +1,5 @@
-> >  # xen backend driver support
-> > -common-obj-$(CONFIG_XEN) +=3D xen-legacy-backend.o xen_devconfig.o
-> xen_pvdev.o xen-common.o
-> > +common-obj-$(CONFIG_XEN) +=3D xen-legacy-backend.o xen_devconfig.o
-> xen_pvdev.o xen-common.o xen-bus.o
-> >
-> >  obj-$(CONFIG_XEN_PCI_PASSTHROUGH) +=3D xen-host-pci-device.o
-> >  obj-$(CONFIG_XEN_PCI_PASSTHROUGH) +=3D xen_pt.o xen_pt_config_init.o
-> xen_pt_graphics.o xen_pt_msi.o
-> > diff --git a/hw/xen/trace-events b/hw/xen/trace-events
-> > index c7e7a3b..0172cd4 100644
-> > --- a/hw/xen/trace-events
-> > +++ b/hw/xen/trace-events
-> > @@ -12,3 +12,9 @@ xen_unmap_portio_range(uint32_t id, uint64_t
-> start_addr, uint64_t end_addr) "id:
-> >  xen_map_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func)
-> "id: %u bdf: %02x.%02x.%02x"
-> >  xen_unmap_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func)
-> "id: %u bdf: %02x.%02x.%02x"
-> >  xen_domid_restrict(int err) "err: %u"
-> > +
-> > +# include/hw/xen/xen-bus.c
-> > +xen_bus_realize(void) ""
-> > +xen_bus_unrealize(void) ""
-> > +xen_device_realize(const char *type) "type: %s"
-> > +xen_device_unrealize(const char *type) "type: %s"
-> > diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-> > new file mode 100644
-> > index 0000000..1385bab
-> > --- /dev/null
-> > +++ b/hw/xen/xen-bus.c
-> > @@ -0,0 +1,131 @@
-> > +/*
-> > + * Copyright (c) 2018  Citrix Systems Inc.
-> > + *
-> > + * This work is licensed under the terms of the GNU GPL, version 2 or
-> later.
-> > + * See the COPYING file in the top-level directory.
-> > + */
-> > +
-> > +#include "qemu/osdep.h"
-> > +#include "hw/hw.h"
-> > +#include "hw/sysbus.h"
-> > +#include "hw/xen/xen-bus.h"
-> > +#include "qapi/error.h"
-> > +#include "trace.h"
-> > +
-> > +static void xen_bus_unrealize(BusState *bus, Error **errp)
-> > +{
-> > +    trace_xen_bus_unrealize();
-> > +}
-> > +
-> > +static void xen_bus_realize(BusState *bus, Error **errp)
-> > +{
-> > +    trace_xen_bus_realize();
-> > +}
-> > +
-> > +static void xen_bus_class_init(ObjectClass *class, void *data)
-> > +{
-> > +    BusClass *bus_class =3D BUS_CLASS(class);
-> > +
-> > +    bus_class->realize =3D xen_bus_realize;
-> > +    bus_class->unrealize =3D xen_bus_unrealize;
-> > +}
-> > +
-> > +static const TypeInfo xen_bus_type_info =3D {
-> > +    .name =3D TYPE_XEN_BUS,
-> > +    .parent =3D TYPE_BUS,
-> > +    .instance_size =3D sizeof(XenBus),
-> > +    .class_size =3D sizeof(XenBusClass),
-> > +    .class_init =3D xen_bus_class_init,
-> > +    .interfaces =3D (InterfaceInfo[]) {
-> > +        { TYPE_HOTPLUG_HANDLER },
-> > +        { }
-> > +    },
-> > +};
-> > +
-> > +static void xen_device_unrealize(DeviceState *dev, Error **errp)
-> > +{
-> > +    XenDevice *xendev =3D XEN_DEVICE(dev);
-> > +    XenDeviceClass *xendev_class =3D XEN_DEVICE_GET_CLASS(xendev);
-> > +    const char *type =3D object_get_typename(OBJECT(xendev));
-> > +    Error *local_err =3D NULL;
-> > +
-> > +    trace_xen_device_unrealize(type);
-> > +
-> > +    if (xendev_class->unrealize) {
-> > +        xendev_class->unrealize(xendev, &local_err);
->=20
-> Since all you do here is propagate the error, you could even pass `errp'
-> to unrealize(), instead of having `local_err'. That "for readability",
-> as explained in "qapi/error.h".
+Kevin Wolf <kwolf@redhat.com> writes:
 
-Yes, true.
+> From: Fam Zheng <famz@redhat.com>
+>
+> This makes VMDK support blockdev-create. The implementation reuses the
+> image creation code in vmdk_co_create_opts which now acceptes a callback
+> pointer to "retrieve" BlockBackend pointers from the caller. This way we
+> separate the logic between file/extent acquisition and initialization.
+>
+> The QAPI command parameters are mostly the same as the old create_opts
+> except the dropped legacy @compat6 switch, which is redundant with
+> @hwversion.
+>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  qapi/block-core.json  |  70 +++++++
+>  qapi/qapi-schema.json |  16 +-
+>  block/vmdk.c          | 448 ++++++++++++++++++++++++++++++------------
+>  3 files changed, 400 insertions(+), 134 deletions(-)
+>
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index d4fe710836..0793550cf2 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -4021,6 +4021,75 @@
+>              'size':             'size',
+>              '*cluster-size' :   'size' } }
+>  
+> +##
+> +# @BlockdevVmdkSubformat:
+> +#
+> +# Subformat options for VMDK images
+> +#
+> +# @monolithicSparse:     Single file image with sparse cluster allocation
+> +#
+> +# @monolithicFlat:       Single flat data image and a descriptor file
+> +#
+> +# @twoGbMaxExtentSparse: Data is split into 2GB (per virtual LBA) sparse extent
+> +#                        files, in addition to a descriptor file
+> +#
+> +# @twoGbMaxExtentFlat:   Data is split into 2GB (per virtual LBA) flat extent
+> +#                        files, in addition to a descriptor file
+> +#
+> +# @streamOptimized:      Single file image sparse cluster allocation, optimized
+> +#                        for streaming over network.
+> +#
+> +# Since: 4.0
+> +##
+> +{ 'enum': 'BlockdevVmdkSubformat',
+> +  'data': [ 'monolithicSparse', 'monolithicFlat', 'twoGbMaxExtentSparse',
+> +            'twoGbMaxExtentFlat', 'streamOptimized'] }
+> +
+> +##
+> +# @BlockdevVmdkAdapterType:
+> +#
+> +# Adapter type info for VMDK images
+> +#
+> +# Since: 4.0
+> +##
+> +{ 'enum': 'BlockdevVmdkAdapterType',
+> +  'data': [ 'ide', 'buslogic', 'lsilogic', 'legacyESX'] }
+> +
+> +##
+> +# @BlockdevCreateOptionsVmdk:
+> +#
+> +# Driver specific image creation options for VMDK.
+> +#
+> +# @file         Where to store the new image file. This refers to the image
+> +#               file for monolithcSparse and streamOptimized format, or the
+> +#               descriptor file for other formats.
+> +# @size         Size of the virtual disk in bytes
+> +# @extents      Where to store the data extents. Required for monolithcFlat,
+> +#               twoGbMaxExtentSparse and twoGbMaxExtentFlat formats. For
+> +#               monolithicFlat, only one entry is required; for
+> +#               twoGbMaxExtent* formats, the number of entries required is
+> +#               calculated as extent_number = virtual_size / 2GB.
 
->=20
-> > +        if (local_err) {
-> > +            error_propagate(errp, local_err);
-> > +        }
-> > +    }
-> > +}
-> > +
->=20
-> With that nit fixed:
-> Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
->=20
+Doesn't quite spell out that the number of extents has to match
+exactly.  I'm not sure I care.
 
-Thanks :-)
+> +# @subformat    The subformat of the VMDK image. Default: "monolithicSparse".
+> +# @backing-file The path of backing file. Default: no backing file is used.
+> +# @adapter-type The adapter type used to fill in the descriptor. Default: ide.
+> +# @hwversion    Hardware version. The meaningful options are "4" or "6".
+> +#               Default: "4".
+> +# @zeroed-grain Whether to enable zeroed-grain feature for sparse subformats.
+> +#               Default: false.
+> +#
+> +# Since: 4.0
+> +##
+> +{ 'struct': 'BlockdevCreateOptionsVmdk',
+> +  'data': { 'file':             'BlockdevRef',
+> +            'size':             'size',
+> +            '*extents':          ['BlockdevRef'],
+> +            '*subformat':       'BlockdevVmdkSubformat',
+> +            '*backing-file':    'str',
+> +            '*adapter-type':    'BlockdevVmdkAdapterType',
+> +            '*hwversion':       'str',
+> +            '*zeroed-grain':    'bool' } }
+> +
+> +
+>  ##
+>  # @SheepdogRedundancyType:
+>  #
+> @@ -4215,6 +4284,7 @@
+>        'ssh':            'BlockdevCreateOptionsSsh',
+>        'vdi':            'BlockdevCreateOptionsVdi',
+>        'vhdx':           'BlockdevCreateOptionsVhdx',
+> +      'vmdk':           'BlockdevCreateOptionsVmdk',
+>        'vpc':            'BlockdevCreateOptionsVpc'
+>    } }
+>  
+[...]
 
-  Paul
-
-> Thanks,
->=20
-> --
-> Anthony PERARD
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
