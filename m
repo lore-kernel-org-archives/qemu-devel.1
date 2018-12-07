@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gVDVD-0008Bt-6k
+	(envelope-from <richard.henderson@linaro.org>) id 1gVDVA-00089n-16
 	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:37:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gVDVA-0007fW-Jf
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:36:59 -0500
-Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:37925)
+	(envelope-from <richard.henderson@linaro.org>) id 1gVDV9-0007ci-5Z
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:36:55 -0500
+Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:43461)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gVDVA-0007fD-E7
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:36:56 -0500
-Received: by mail-ot1-x334.google.com with SMTP id e12so3351119otl.5
-	for <qemu-devel@nongnu.org>; Fri, 07 Dec 2018 02:36:56 -0800 (PST)
+	id 1gVDV9-0007c4-0b
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:36:55 -0500
+Received: by mail-ot1-x32d.google.com with SMTP id a11so3336493otr.10
+	for <qemu-devel@nongnu.org>; Fri, 07 Dec 2018 02:36:54 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  7 Dec 2018 04:36:18 -0600
-Message-Id: <20181207103631.28193-14-richard.henderson@linaro.org>
+Date: Fri,  7 Dec 2018 04:36:17 -0600
+Message-Id: <20181207103631.28193-13-richard.henderson@linaro.org>
 In-Reply-To: <20181207103631.28193-1-richard.henderson@linaro.org>
 References: <20181207103631.28193-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 13/26] target/arm: Decode Load/store register
- (pac)
+Subject: [Qemu-devel] [PATCH 12/26] target/arm: Decode PAuth within
+ disas_uncond_b_reg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,93 +30,145 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, ramana.radhakrishnan@arm.com
 
-Not that there are any stores involved, but why argue with ARM's
-naming convention.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 62 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
+ target/arm/translate-a64.c | 100 +++++++++++++++++++++++++++++++++++--
+ 1 file changed, 95 insertions(+), 5 deletions(-)
 
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index d4df2b48b1..99e1405dff 100644
+index 5fa2647771..d4df2b48b1 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -3143,6 +3143,65 @@ static void disas_ldst_atomic(DisasContext *s, uint32_t insn,
-        s->be_data | size | MO_ALIGN);
- }
- 
-+/* PAC memory operations
-+ *
-+ *  31  30      27  26    24    22  21       12  11  10    5     0
-+ * +------+-------+---+-----+-----+---+--------+---+---+----+-----+
-+ * | size | 1 1 1 | V | 0 0 | M S | 1 |  imm9  | W | 1 | Rn |  Rt |
-+ * +------+-------+---+-----+-----+------------+---+---+----+-----+
-+ *
-+ * Rt: the result register
-+ * Rn: base address or SP
-+ * Rs: the source register for the operation
-+ * V: vector flag (always 0 as of v8.3)
-+ * M: clear for key DA, set for key DB
-+ * W: pre-indexing flag
-+ * S: sign for imm9.
-+ */
-+static void disas_ldst_pac(DisasContext *s, uint32_t insn,
-+                           int size, int rt, bool is_vector)
-+{
-+    int rn = extract32(insn, 5, 5);
-+    bool is_wback = extract32(insn, 11, 1);
-+    bool use_key_a = !extract32(insn, 23, 1);
-+    int offset, memidx;
-+    TCGv_i64 tcg_addr, tcg_rt;
-+
-+    if (size != 3 || is_vector || !dc_isar_feature(aa64_pauth, s)) {
-+        unallocated_encoding(s);
-+        return;
-+    }
-+
-+    if (rn == 31) {
-+        gen_check_sp_alignment(s);
-+    }
-+    tcg_addr = read_cpu_reg_sp(s, rn, 1);
-+
-+    if (s->pauth_active) {
-+        if (use_key_a) {
-+            gen_helper_autda(tcg_addr, cpu_env, tcg_addr, cpu_X[31]);
-+        } else {
-+            gen_helper_autdb(tcg_addr, cpu_env, tcg_addr, cpu_X[31]);
-+        }
-+    }
-+
-+    /* Form the 10-bit signed, scaled offset.  */
-+    offset = (extract32(insn, 22, 1) << 9) | extract32(insn, 12, 9);
-+    offset = sextract32(offset << size, 10 + size, 0);
-+    tcg_gen_addi_i64(tcg_addr, tcg_addr, offset);
-+
-+    tcg_rt = cpu_reg(s, rt);
-+    memidx = get_mem_index(s);
-+    do_gpr_ld_memidx(s, tcg_rt, tcg_addr, size,
-+                     /* is_signed */ false, /* extend */ false, memidx,
-+                     /* iss_valid */ true, /* iss_srt */ rt,
-+                     /* iss_sf */ true, /* iss_ar */ false);
-+
-+    if (is_wback) {
-+        tcg_gen_mov_i64(cpu_reg_sp(s, rn), tcg_addr);
-+    }
-+}
-+
- /* Load/store register (all forms) */
- static void disas_ldst_reg(DisasContext *s, uint32_t insn)
+@@ -1982,6 +1982,7 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
  {
-@@ -3168,6 +3227,9 @@ static void disas_ldst_reg(DisasContext *s, uint32_t insn)
-         case 2:
-             disas_ldst_reg_roffset(s, insn, opc, size, rt, is_vector);
-             return;
+     unsigned int opc, op2, op3, rn, op4;
+     TCGv_i64 dst;
++    TCGv_i64 modifier;
+ 
+     opc = extract32(insn, 21, 4);
+     op2 = extract32(insn, 16, 5);
+@@ -1997,9 +1998,47 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
+     case 0: /* BR */
+     case 1: /* BLR */
+     case 2: /* RET */
+-        if (op3 == 0 && op4 == 0) {
++        switch (op3) {
++        case 0:
++            /* BR, BLR, RET */
++            if (op4 != 0) {
++                goto do_unallocated;
++            }
+             dst = cpu_reg(s, rn);
+-        } else {
++            break;
++
++        case 2:
++        case 3:
++            if (!dc_isar_feature(aa64_pauth, s)) {
++                goto do_unallocated;
++            }
++            if (opc == 2) {
++                /* RETAA, RETAB */
++                if (rn != 0x1f || op4 != 0x1f) {
++                    goto do_unallocated;
++                }
++                rn = 30;
++                modifier = cpu_X[31];
++            } else {
++                /* BRAAZ, BRABZ, BLRAAZ, BLRABZ */
++                if (op4 != 0x1f) {
++                    goto do_unallocated;
++                }
++                modifier = new_tmp_a64_zero(s);
++            }
++            if (s->pauth_active) {
++                dst = new_tmp_a64(s);
++                if (op3 == 2) {
++                    gen_helper_autia(dst, cpu_env, cpu_reg(s, rn), modifier);
++                } else {
++                    gen_helper_autib(dst, cpu_env, cpu_reg(s, rn), modifier);
++                }
++            } else {
++                dst = cpu_reg(s, rn);
++            }
++            break;
++
 +        default:
-+            disas_ldst_pac(s, insn, size, rt, is_vector);
-+            return;
+             goto do_unallocated;
+         }
+         gen_a64_set_pc(s, dst);
+@@ -2009,6 +2048,32 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
          }
          break;
-     case 1:
+ 
++    case 8: /* BRAA */
++    case 9: /* BLRAA */
++        if (!dc_isar_feature(aa64_pauth, s)) {
++            goto do_unallocated;
++        }
++        if (op3 != 2 || op3 != 3) {
++            goto do_unallocated;
++        }
++        if (s->pauth_active) {
++            dst = new_tmp_a64(s);
++            modifier = cpu_reg_sp(s, op4);
++            if (op3 == 2) {
++                gen_helper_autia(dst, cpu_env, cpu_reg(s, rn), modifier);
++            } else {
++                gen_helper_autib(dst, cpu_env, cpu_reg(s, rn), modifier);
++            }
++        } else {
++            dst = cpu_reg(s, rn);
++        }
++        gen_a64_set_pc(s, dst);
++        /* BLRAA also needs to load return address */
++        if (opc == 9) {
++            tcg_gen_movi_i64(cpu_reg(s, 30), s->pc);
++        }
++        break;
++
+     case 4: /* ERET */
+         if (s->current_el == 0) {
+             goto do_unallocated;
+@@ -2016,11 +2081,36 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
+         dst = tcg_temp_new_i64();
+         tcg_gen_ld_i64(dst, cpu_env,
+                        offsetof(CPUARMState, elr_el[s->current_el]));
+-        if (op3 == 0 && op4 == 0) {
+-            ;
+-        } else {
++
++        switch (op3) {
++        case 0: /* ERET */
++            if (op4 != 0) {
++                goto do_unallocated;
++            }
++            break;
++
++        case 2: /* ERETAA */
++        case 3: /* ERETAB */
++            if (!dc_isar_feature(aa64_pauth, s)) {
++                goto do_unallocated;
++            }
++            if (rn != 0x1f || op4 != 0x1f) {
++                goto do_unallocated;
++            }
++            if (s->pauth_active) {
++                modifier = cpu_X[31];
++                if (op3 == 2) {
++                    gen_helper_autia(dst, cpu_env, dst, modifier);
++                } else {
++                    gen_helper_autib(dst, cpu_env, dst, modifier);
++                }
++            }
++            break;
++
++        default:
+             goto do_unallocated;
+         }
++
+         if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
+             gen_io_start();
+         }
 -- 
 2.17.2
