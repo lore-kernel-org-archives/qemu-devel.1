@@ -1,22 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gVFc8-0002Lj-Pw
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 07:52:17 -0500
+	(envelope-from <pasic@linux.ibm.com>) id 1gVFcx-0003f1-Tg
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 07:53:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gVFc7-0004Zh-Ux
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 07:52:16 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181206151304.8388-1-kwolf@redhat.com>
-	<20181206151304.8388-2-kwolf@redhat.com>
-	<871s6t4z65.fsf@dusky.pond.sub.org>
-	<20181207102425.GA5119@linux.fritz.box>
-Date: Fri, 07 Dec 2018 13:52:00 +0100
-In-Reply-To: <20181207102425.GA5119@linux.fritz.box> (Kevin Wolf's message of
-	"Fri, 7 Dec 2018 11:24:25 +0100")
-Message-ID: <87ftv9xzwv.fsf@dusky.pond.sub.org>
+	(envelope-from <pasic@linux.ibm.com>) id 1gVFcu-0006Nh-CL
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 07:53:07 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60374
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1gVFct-0006KF-8Y
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 07:53:03 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wB7Cebui104640
+	for <qemu-devel@nongnu.org>; Fri, 7 Dec 2018 07:53:01 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2p7qkb4ngn-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 07 Dec 2018 07:53:01 -0500
+Received: from localhost
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Fri, 7 Dec 2018 12:53:00 -0000
+Date: Fri, 7 Dec 2018 13:52:53 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+In-Reply-To: <20181207132946.00df1f5a.cohuck@redhat.com>
+References: <20181205145131.28467-1-cohuck@redhat.com>
+	<5d274f2c-23a2-0c4f-9f2d-07cbe529c5ac@de.ibm.com>
+	<20181207132946.00df1f5a.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 1/4] vmdk: Refactor vmdk_create_extent
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20181207135253.10e3e021@oc2783563651>
+Subject: Re: [Qemu-devel] [PATCH RFC] vfio-ap: flag as compatible with
+ balloon
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +43,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Tony Krowiak <akrowiak@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+On Fri, 7 Dec 2018 13:29:46 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-> Am 07.12.2018 um 07:40 hat Markus Armbruster geschrieben:
->> Kevin Wolf <kwolf@redhat.com> writes:
->> 
->> > From: Fam Zheng <famz@redhat.com>
->> >
->> > The extracted vmdk_init_extent takes a BlockBackend object and
->> > initializes the format metadata. It is the common part between "qemu-img
->> > create" and "blockdev-create".
->> >
->> > Add a "BlockBackend *pbb" parameter to vmdk_create_extent, to return the
->> > opened BB to the caller in the next patch.
->> 
->> I'd do this part in the next patch, when it has a user.  Matter of
->> taste.
->
-> I kept Fam as the author of the patches (except for the test case which
-> is effectively a rewrite with Fam's test as the spec), so I'd like to
-> do only the minimal editing necessary to make the patches mergeable. If
-> it's a matter of taste, I'll leave it as it is.
+> On Fri, 7 Dec 2018 13:17:02 +0100
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+> > On 05.12.2018 15:51, Cornelia Huck wrote:
+> > > vfio-ap devices do not pin any pages in the host. Therefore, they
+> > > are belived to be compatible with memory ballooning.
+> > > 
+> > > Flag them as compatible, so both vfio-ap and a balloon can be
+> > > used simultaneously.
+> > > 
+> > > Signed-off-by: Cornelia Huck <cohuck@redhat.com>  
 
-That's fine.  Matter of taste means I'm stating mine without demanding
-you change the patch to conform to it.
+With the comment stuff sorted out:
+Reviewed-by: Halil Pasic <pasic@linux.ibm.com> 
 
-> The same goes for code changes that are a matter of taste: If you
-> _really_ care about taste in the vmdk code, feel free to send a
-> follow-up and I'll merge it on top, but I'll leave Fam's patches alone
-> as much as I can.
+@Connie: Just had a look at the MAINTAINERS file and hw/vfio/ap.c
+is listed under Arch. support S90 with you as a maintainer, and under
+vfio-ap with 4 maintainers listed one of them being me. The question
+is who is going to post a PULL request for this?
 
-Makes sense.
+> > 
+> > Does it make sense to add cc stable for 3.1?
+> 
+> Can do that, given that s390x systems really rely on the ballooner in
+> general.
+> 
 
->> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->
-> Thanks!
->
-> Kevin
+I agree with cc stable.
+
+Halil
