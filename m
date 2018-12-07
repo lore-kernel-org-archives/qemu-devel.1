@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gVJM0-0001pn-CF
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:51:53 -0500
+	(envelope-from <berrange@redhat.com>) id 1gVJN7-0002ou-AF
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:53:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gVJLy-0007Bu-Uo
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:51:52 -0500
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Fri,  7 Dec 2018 17:51:03 +0100
-Message-Id: <20181207165103.3992-5-philmd@redhat.com>
-In-Reply-To: <20181207165103.3992-1-philmd@redhat.com>
-References: <20181207165103.3992-1-philmd@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1gVJN3-000191-WF
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:53:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43508)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gVJN3-00010S-6B
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:52:57 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4B66F2D804
+	for <qemu-devel@nongnu.org>; Fri,  7 Dec 2018 16:52:54 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Fri,  7 Dec 2018 16:52:50 +0000
+Message-Id: <20181207165250.17043-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 4/4] hw/smbios: Move to the hw/firmware/
- namespace
+Subject: [Qemu-devel] [qemu-web PATCH] Add a .mailmap file for preferred
+ name spellings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,161 +31,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <minyard@acm.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-SMBIOS is just another firmware used by some QEMU models.
-We will later introduce more firmwares in this namespace.
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- MAINTAINERS                              | 2 +-
- hw/arm/virt.c                            | 2 +-
- hw/i386/pc.c                             | 2 +-
- hw/i386/pc_piix.c                        | 2 +-
- hw/i386/pc_q35.c                         | 2 +-
- hw/smbios/smbios-stub.c                  | 2 +-
- hw/smbios/smbios.c                       | 2 +-
- hw/smbios/smbios_type_38.c               | 2 +-
- include/hw/{smbios =3D> firmware}/smbios.h | 0
- tests/bios-tables-test.c                 | 2 +-
- vl.c                                     | 2 +-
- 11 files changed, 10 insertions(+), 10 deletions(-)
- rename include/hw/{smbios =3D> firmware}/smbios.h (100%)
+ .mailmap | 3 +++
+ 1 file changed, 3 insertions(+)
+ create mode 100644 .mailmap
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 63effdc473..f7ba25c146 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1238,7 +1238,7 @@ M: Michael S. Tsirkin <mst@redhat.com>
- M: Igor Mammedov <imammedo@redhat.com>
- S: Supported
- F: include/hw/acpi/*
--F: include/hw/smbios/*
-+F: include/hw/firmware/smbios.h
- F: hw/mem/*
- F: hw/acpi/*
- F: hw/smbios/*
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index f69e7eb399..49813bca1b 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -55,7 +55,7 @@
- #include "hw/intc/arm_gic.h"
- #include "hw/intc/arm_gicv3_common.h"
- #include "kvm_arm.h"
--#include "hw/smbios/smbios.h"
-+#include "hw/firmware/smbios.h"
- #include "qapi/visitor.h"
- #include "standard-headers/linux/input.h"
- #include "hw/arm/smmuv3.h"
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index f095725dba..afa1098082 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -37,7 +37,7 @@
- #include "hw/pci/pci_bus.h"
- #include "hw/nvram/fw_cfg.h"
- #include "hw/timer/hpet.h"
--#include "hw/smbios/smbios.h"
-+#include "hw/firmware/smbios.h"
- #include "hw/loader.h"
- #include "elf.h"
- #include "multiboot.h"
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 7092d6d13f..e3ee3091d2 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -30,7 +30,7 @@
- #include "hw/i386/pc.h"
- #include "hw/i386/apic.h"
- #include "hw/display/ramfb.h"
--#include "hw/smbios/smbios.h"
-+#include "hw/firmware/smbios.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_ids.h"
- #include "hw/usb.h"
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 4702bb13c4..bc31cd5822 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -47,7 +47,7 @@
- #include "hw/i386/amd_iommu.h"
- #include "hw/i386/intel_iommu.h"
- #include "hw/display/ramfb.h"
--#include "hw/smbios/smbios.h"
-+#include "hw/firmware/smbios.h"
- #include "hw/ide/pci.h"
- #include "hw/ide/ahci.h"
- #include "hw/usb.h"
-diff --git a/hw/smbios/smbios-stub.c b/hw/smbios/smbios-stub.c
-index d3a385441a..64e5ba93ec 100644
---- a/hw/smbios/smbios-stub.c
-+++ b/hw/smbios/smbios-stub.c
-@@ -23,7 +23,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qapi/qmp/qerror.h"
--#include "hw/smbios/smbios.h"
-+#include "hw/firmware/smbios.h"
-=20
- void smbios_entry_add(QemuOpts *opts, Error **errp)
- {
-diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
-index 9d737642cb..2a61f38637 100644
---- a/hw/smbios/smbios.c
-+++ b/hw/smbios/smbios.c
-@@ -24,7 +24,7 @@
- #include "sysemu/sysemu.h"
- #include "qemu/uuid.h"
- #include "sysemu/cpus.h"
--#include "hw/smbios/smbios.h"
-+#include "hw/firmware/smbios.h"
- #include "hw/loader.h"
- #include "exec/cpu-common.h"
- #include "smbios_build.h"
-diff --git a/hw/smbios/smbios_type_38.c b/hw/smbios/smbios_type_38.c
-index a1ad28d059..0c08f282de 100644
---- a/hw/smbios/smbios_type_38.c
-+++ b/hw/smbios/smbios_type_38.c
-@@ -9,7 +9,7 @@
-=20
- #include "qemu/osdep.h"
- #include "hw/ipmi/ipmi.h"
--#include "hw/smbios/smbios.h"
-+#include "hw/firmware/smbios.h"
- #include "qemu/error-report.h"
- #include "smbios_build.h"
-=20
-diff --git a/include/hw/smbios/smbios.h b/include/hw/firmware/smbios.h
-similarity index 100%
-rename from include/hw/smbios/smbios.h
-rename to include/hw/firmware/smbios.h
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index d661d9be62..dfa74a5bec 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -13,7 +13,7 @@
- #include "qemu/osdep.h"
- #include <glib/gstdio.h>
- #include "qemu-common.h"
--#include "hw/smbios/smbios.h"
-+#include "hw/firmware/smbios.h"
- #include "qemu/bitmap.h"
- #include "acpi-utils.h"
- #include "boot-sector.h"
-diff --git a/vl.c b/vl.c
-index a5ae5f23d2..bfc3114dd4 100644
---- a/vl.c
-+++ b/vl.c
-@@ -61,7 +61,7 @@ int main(int argc, char **argv)
- #include "hw/display/vga.h"
- #include "hw/bt.h"
- #include "sysemu/watchdog.h"
--#include "hw/smbios/smbios.h"
-+#include "hw/firmware/smbios.h"
- #include "hw/acpi/acpi.h"
- #include "hw/xen/xen.h"
- #include "hw/qdev.h"
+diff --git a/.mailmap b/.mailmap
+new file mode 100644
+index 0000000..fa8ab68
+--- /dev/null
++++ b/.mailmap
+@@ -0,0 +1,3 @@
++# Preferred name forms where people have changed their
++# git author config, or having utf8/latin1 encoding issues.
++Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 --=20
-2.17.2
+2.19.2
