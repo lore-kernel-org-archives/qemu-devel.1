@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gVBwu-0002Z3-Bb
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 03:57:30 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gVC1G-0007tq-EA
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 04:01:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gVBwq-0000Qa-Ab
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 03:57:28 -0500
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Fri,  7 Dec 2018 08:56:34 +0000
-Message-Id: <20181207085635.4291-6-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20181207085635.4291-1-mark.cave-ayland@ilande.co.uk>
-References: <20181207085635.4291-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [RFC PATCH 5/6] target/ppc: convert VMX logical
- instructions to use vector operations
+	(envelope-from <luc.michel@greensocs.com>) id 1gVC1F-0005VO-E0
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 04:01:58 -0500
+From: Luc Michel <luc.michel@greensocs.com>
+Date: Fri,  7 Dec 2018 10:01:27 +0100
+Message-Id: <20181207090135.7651-10-luc.michel@greensocs.com>
+In-Reply-To: <20181207090135.7651-1-luc.michel@greensocs.com>
+References: <20181207090135.7651-1-luc.michel@greensocs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v8 09/16] gdbstub: add multiprocess support to
+ gdb_vm_state_change()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,117 +23,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, richard.henderson@linaro.org
+To: qemu-devel@nongnu.org
+Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Add support for multiprocess extension in gdb_vm_state_change()
+function.
+
+Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Acked-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/ppc/translate.c              |  1 +
- target/ppc/translate/vmx-impl.inc.c | 64 ++++++++++++++++++++++---------------
- 2 files changed, 40 insertions(+), 25 deletions(-)
+ gdbstub.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 5923c688cd..92d023864e 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -24,6 +24,7 @@
- #include "disas/disas.h"
- #include "exec/exec-all.h"
- #include "tcg-op.h"
-+#include "tcg-op-gvec.h"
- #include "qemu/host-utils.h"
- #include "exec/cpu_ldst.h"
- 
-diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index 30046c6e31..b252fce71b 100644
---- a/target/ppc/translate/vmx-impl.inc.c
-+++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -14,6 +14,11 @@ static inline TCGv_ptr gen_avr_ptr(int reg)
-     return r;
- }
- 
-+static inline long avr64_offset(int reg, bool high)
-+{
-+    return offsetof(CPUPPCState, avr[reg].u64[(high ? 0 : 1)]);
-+}
+diff --git a/gdbstub.c b/gdbstub.c
+index c66bf37b49..4645d59d8c 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -1722,10 +1722,11 @@ void gdb_set_stop_cpu(CPUState *cpu)
+ static void gdb_vm_state_change(void *opaque, int running, RunState stat=
+e)
+ {
+     GDBState *s =3D gdbserver_state;
+     CPUState *cpu =3D s->c_cpu;
+     char buf[256];
++    char thread_id[16];
+     const char *type;
+     int ret;
+=20
+     if (running || s->state =3D=3D RS_INACTIVE) {
+         return;
+@@ -1733,10 +1734,18 @@ static void gdb_vm_state_change(void *opaque, int=
+ running, RunState state)
+     /* Is there a GDB syscall waiting to be sent?  */
+     if (s->current_syscall_cb) {
+         put_packet(s, s->syscall_buf);
+         return;
+     }
 +
- #define GEN_VR_LDX(name, opc2, opc3)                                          \
- static void glue(gen_, name)(DisasContext *ctx)                                       \
- {                                                                             \
-@@ -257,41 +262,50 @@ GEN_VX_VMUL10(vmul10euq, 1, 0);
- GEN_VX_VMUL10(vmul10cuq, 0, 1);
- GEN_VX_VMUL10(vmul10ecuq, 1, 1);
- 
--/* Logical operations */
--#define GEN_VX_LOGICAL(name, tcg_op, opc2, opc3)                        \
--static void glue(gen_, name)(DisasContext *ctx)                                 \
-+#define GEN_VXFORM_V(name, vece, tcg_op, opc2, opc3)                    \
-+static void glue(gen_, name)(DisasContext *ctx)                         \
- {                                                                       \
--    TCGv_i64 t0 = tcg_temp_new_i64();                                   \
--    TCGv_i64 t1 = tcg_temp_new_i64();                                   \
--    TCGv_i64 avr = tcg_temp_new_i64();                                  \
-+    if (unlikely(!ctx->altivec_enabled)) {                              \
-+        gen_exception(ctx, POWERPC_EXCP_VPU);                           \
-+        return;                                                         \
-+    }                                                                   \
-                                                                         \
-+    tcg_op(vece,                                                        \
-+           avr64_offset(rD(ctx->opcode), true),                         \
-+           avr64_offset(rA(ctx->opcode), true),                         \
-+           avr64_offset(rB(ctx->opcode), true),                         \
-+           16, 16);                                                     \
-+}
++    if (cpu =3D=3D NULL) {
++        /* No process attached */
++        return;
++    }
 +
-+#define GEN_VXFORM_VN(name, vece, tcg_op, opc2, opc3)                   \
-+static void glue(gen_, name)(DisasContext *ctx)                         \
-+{                                                                       \
-     if (unlikely(!ctx->altivec_enabled)) {                              \
-         gen_exception(ctx, POWERPC_EXCP_VPU);                           \
-         return;                                                         \
-     }                                                                   \
--    get_avr64(t0, rA(ctx->opcode), true);                               \
--    get_avr64(t1, rB(ctx->opcode), true);                               \
--    tcg_op(avr, t0, t1);                                                \
--    set_avr64(rD(ctx->opcode), avr, true);                              \
-                                                                         \
--    get_avr64(t0, rA(ctx->opcode), false);                              \
--    get_avr64(t1, rB(ctx->opcode), false);                              \
--    tcg_op(avr, t0, t1);                                                \
--    set_avr64(rD(ctx->opcode), avr, false);                             \
-+    tcg_op(vece,                                                        \
-+           avr64_offset(rD(ctx->opcode), true),                         \
-+           avr64_offset(rA(ctx->opcode), true),                         \
-+           avr64_offset(rB(ctx->opcode), true),                         \
-+           16, 16);                                                     \
-                                                                         \
--    tcg_temp_free_i64(t0);                                              \
--    tcg_temp_free_i64(t1);                                              \
--    tcg_temp_free_i64(avr);                                             \
-+    tcg_gen_gvec_not(vece,                                              \
-+                     avr64_offset(rD(ctx->opcode), true),               \
-+                     avr64_offset(rD(ctx->opcode), true),               \
-+                     16, 16);                                           \
- }
- 
--GEN_VX_LOGICAL(vand, tcg_gen_and_i64, 2, 16);
--GEN_VX_LOGICAL(vandc, tcg_gen_andc_i64, 2, 17);
--GEN_VX_LOGICAL(vor, tcg_gen_or_i64, 2, 18);
--GEN_VX_LOGICAL(vxor, tcg_gen_xor_i64, 2, 19);
--GEN_VX_LOGICAL(vnor, tcg_gen_nor_i64, 2, 20);
--GEN_VX_LOGICAL(veqv, tcg_gen_eqv_i64, 2, 26);
--GEN_VX_LOGICAL(vnand, tcg_gen_nand_i64, 2, 22);
--GEN_VX_LOGICAL(vorc, tcg_gen_orc_i64, 2, 21);
-+/* Logical operations */
-+GEN_VXFORM_V(vand, MO_64, tcg_gen_gvec_and, 2, 16);
-+GEN_VXFORM_V(vandc, MO_64, tcg_gen_gvec_andc, 2, 17);
-+GEN_VXFORM_V(vor, MO_64, tcg_gen_gvec_or, 2, 18);
-+GEN_VXFORM_V(vxor, MO_64, tcg_gen_gvec_xor, 2, 19);
-+GEN_VXFORM_VN(vnor, MO_64, tcg_gen_gvec_or, 2, 20);
-+GEN_VXFORM_VN(veqv, MO_64, tcg_gen_gvec_xor, 2, 26);
-+GEN_VXFORM_VN(vnand, MO_64, tcg_gen_gvec_and, 2, 22);
-+GEN_VXFORM_V(vorc, MO_64, tcg_gen_gvec_orc, 2, 21);
- 
- #define GEN_VXFORM(name, opc2, opc3)                                    \
- static void glue(gen_, name)(DisasContext *ctx)                                 \
--- 
-2.11.0
++    gdb_fmt_thread_id(s, cpu, thread_id, sizeof(thread_id));
++
+     switch (state) {
+     case RUN_STATE_DEBUG:
+         if (cpu->watchpoint_hit) {
+             switch (cpu->watchpoint_hit->flags & BP_MEM_ACCESS) {
+             case BP_MEM_READ:
+@@ -1750,12 +1759,12 @@ static void gdb_vm_state_change(void *opaque, int=
+ running, RunState state)
+                 break;
+             }
+             trace_gdbstub_hit_watchpoint(type, cpu_gdb_index(cpu),
+                     (target_ulong)cpu->watchpoint_hit->vaddr);
+             snprintf(buf, sizeof(buf),
+-                     "T%02xthread:%02x;%swatch:" TARGET_FMT_lx ";",
+-                     GDB_SIGNAL_TRAP, cpu_gdb_index(cpu), type,
++                     "T%02xthread:%s;%swatch:" TARGET_FMT_lx ";",
++                     GDB_SIGNAL_TRAP, thread_id, type,
+                      (target_ulong)cpu->watchpoint_hit->vaddr);
+             cpu->watchpoint_hit =3D NULL;
+             goto send_packet;
+         } else {
+             trace_gdbstub_hit_break();
+@@ -1793,11 +1802,11 @@ static void gdb_vm_state_change(void *opaque, int=
+ running, RunState state)
+         trace_gdbstub_hit_unknown(state);
+         ret =3D GDB_SIGNAL_UNKNOWN;
+         break;
+     }
+     gdb_set_stop_cpu(cpu);
+-    snprintf(buf, sizeof(buf), "T%02xthread:%02x;", ret, cpu_gdb_index(c=
+pu));
++    snprintf(buf, sizeof(buf), "T%02xthread:%s;", ret, thread_id);
+=20
+ send_packet:
+     put_packet(s, buf);
+=20
+     /* disable single step if it was enabled */
+--=20
+2.19.2
