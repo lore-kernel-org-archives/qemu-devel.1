@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gVB8x-0001FH-Oh
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 03:05:53 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gVBes-0002A0-8N
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 03:38:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gVB8s-0002qH-1W
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 03:05:50 -0500
-Received: from 1.mo4.mail-out.ovh.net ([178.33.248.196]:44520)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gVB8p-0002KC-GM
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 03:05:45 -0500
-Received: from player787.ha.ovh.net (unknown [10.109.143.183])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 544261C50D9
-	for <qemu-devel@nongnu.org>; Fri,  7 Dec 2018 09:05:37 +0100 (CET)
-References: <20181205232251.10446-1-clg@kaod.org>
-	<20181205232251.10446-12-clg@kaod.org>
-	<20181207034649.GA10945@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <0416a307-f6dd-552b-3b57-04ce6c7b101a@kaod.org>
-Date: Fri, 7 Dec 2018 09:05:31 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181207034649.GA10945@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gVBer-0007uW-CH
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 03:38:50 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 7 Dec 2018 08:38:40 +0000
+Message-ID: <1bc9877f-ef90-29e5-a40c-7363417eae12@virtuozzo.com>
+References: <20181206192544.3987-1-jsnow@redhat.com>
+	<20181206192544.3987-2-jsnow@redhat.com>
+In-Reply-To: <20181206192544.3987-2-jsnow@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 11/37] spapr/xive: use the VCPU id as a
- NVT identifier
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <2B593F4A5527D94CBCB96D0959673820@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 1/3] blockdev: abort transactions in
+ reverse order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,136 +26,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, "vsementov@virtuozzo.com" <vsementov@virtuozzo.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 12/7/18 4:46 AM, David Gibson wrote:
-> On Thu, Dec 06, 2018 at 12:22:25AM +0100, C=E9dric Le Goater wrote:
->> The IVPE scans the O/S CAM line of the XIVE thread interrupt contexts
->> to find a matching Notification Virtual Target (NVT) among the NVTs
->> dispatched on the HW processor threads.
->>
->> On a real system, the thread interrupt contexts are updated by the
->> hypervisor when a Virtual Processor is scheduled to run on a HW
->> thread. Under QEMU, the model will emulate the same behavior by
->> hardwiring the NVT identifier in the thread context registers at
->> reset.
->>
->> The NVT identifier used by the sPAPRXive model is the VCPU id. The END
->> identifier is also derived from the VCPU id. A set of helpers doing
->> the conversion between identifiers are provided for the hcalls
->> configuring the sources and the ENDs.
->>
->> The model does not need a NVT table but The XiveRouter NVT operations
->> are provided to perform some extra checks in the routing algorithm.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>  hw/intc/spapr_xive.c | 53 +++++++++++++++++++++++++++++++++++++++++++=
--
->>  1 file changed, 52 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
->> index eef5830d45c6..8da7a8bee949 100644
->> --- a/hw/intc/spapr_xive.c
->> +++ b/hw/intc/spapr_xive.c
->> @@ -26,6 +26,27 @@
->>  #define SPAPR_XIVE_VC_BASE   0x0006010000000000ull
->>  #define SPAPR_XIVE_TM_BASE   0x0006030203180000ull
->> =20
->> +/*
->> + * The allocation of VP blocks is a complex operation in OPAL and the
->> + * VP identifiers have a relation with the number of HW chips, the
->> + * size of the VP blocks, VP grouping, etc. The QEMU sPAPR XIVE
->> + * controller model does not have the same constraints and can use a
->> + * simple mapping scheme of the CPU vcpu_id
->> + *
->> + * These identifiers are never returned to the OS.
->> + */
->> +
->> +#define SPAPR_XIVE_NVT_BASE 0x400
->> +
->> +/*
->> + * sPAPR NVT and END indexing helpers
->> + */
->> +static uint32_t spapr_xive_nvt_to_target(sPAPRXive *xive, uint8_t nvt=
-_blk,
->> +                                  uint32_t nvt_idx)
->> +{
->> +    return nvt_idx - SPAPR_XIVE_NVT_BASE;
->> +}
->> +
->>  /*
->>   * On sPAPR machines, use a simplified output for the XIVE END
->>   * structure dumping only the information related to the OS EQ.
->> @@ -40,7 +61,8 @@ static void spapr_xive_end_pic_print_info(sPAPRXive =
-*xive, XiveEND *end,
->>      uint32_t nvt =3D GETFIELD_BE32(END_W6_NVT_INDEX, end->w6);
->>      uint8_t priority =3D GETFIELD_BE32(END_W7_F0_PRIORITY, end->w7);
->> =20
->> -    monitor_printf(mon, "%3d/%d % 6d/%5d ^%d", nvt,
->> +    monitor_printf(mon, "%3d/%d % 6d/%5d ^%d",
->> +                   spapr_xive_nvt_to_target(xive, 0, nvt),
->>                     priority, qindex, qentries, qgen);
->> =20
->>      xive_end_queue_pic_print_info(end, 6, mon);
->> @@ -246,6 +268,33 @@ static int spapr_xive_write_end(XiveRouter *xrtr,=
- uint8_t end_blk,
->>      return 0;
->>  }
->> =20
->> +static int spapr_xive_get_nvt(XiveRouter *xrtr,
->> +                              uint8_t nvt_blk, uint32_t nvt_idx, Xive=
-NVT *nvt)
->> +{
->> +    sPAPRXive *xive =3D SPAPR_XIVE(xrtr);
->> +    uint32_t vcpu_id =3D spapr_xive_nvt_to_target(xive, nvt_blk, nvt_=
-idx);
->> +    PowerPCCPU *cpu =3D spapr_find_cpu(vcpu_id);
->> +
->> +    if (!cpu) {
->> +        return -1;
->> +    }
->> +
->> +    /*
->> +     * sPAPR does not maintain a NVT table. Return that the NVT is
->> +     * valid if we have found a matching CPU
->> +     */
->> +    nvt->w0 =3D cpu_to_be32(NVT_W0_VALID);
->> +    return 0;
->> +}
->> +
->> +static int spapr_xive_write_nvt(XiveRouter *xrtr, uint8_t nvt_blk,
->> +                                uint32_t nvt_idx, XiveNVT *nvt,
->> +                                uint8_t word_number)
->> +{
->> +    /* no NVT table */
->> +    return 0;
->=20
-> Should this ever get called.  IIUC, we don't need to write back to the
-> NVTs because the papr machine should never hit a non-scheduled NVT.
-
-yes.
-
-> But in that case should this actually be a no-op, or should it be an
-> g_assert_not_reached()?
-
-We should never reach it because the get_nvt() should have failed
-before in xive_presenter_notify() :
-
-    ...
-    /* NVT cache lookup */
-    if (xive_router_get_nvt(xrtr, nvt_blk, nvt_idx, &nvt)) {
-        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: no NVT %x/%x\n",
-                      nvt_blk, nvt_idx);
-        return;
-    }
-    ...
-
-Leaving the machine in a curious state.
-
-so for _write_nvt(), I think g_assert_not_reached() is appropriate and=20
-I will add the comment you just made.
-
-may be, I should add an 'assert(cpu)' in _get_nvt() also.
-C.=20
+MDYuMTIuMjAxOCAyMjoyNSwgSm9obiBTbm93IHdyb3RlOg0KPiBQcmVzZW50bHksIHdlIGFib3J0
+IHRyYW5zYWN0aW9ucyBpbiB0aGUgc2FtZSBvcmRlciB0aGV5IHdlcmUgcHJvY2Vzc2VkIGluLg0K
+PiBCaXRtYXAgY29tbWFuZHMsIHRob3VnaCwgYXR0ZW1wdCB0byByZXN0b3JlIGJhY2t1cCBkYXRh
+IHN0cnVjdHVyZXMgb24gYWJvcnQuDQo+IFRvIHRoYXQgZW5kLCB0aG91Z2gsIHRoZXkgbmVlZCB0
+byBiZSBhYm9ydGVkIGluIHJldmVyc2UgY2hyb25vbG9naWNhbCBvcmRlci4NCj4gDQo+IFJlcGxh
+Y2UgdGhlIFFTSU1QTEVRIGRhdGEgc3RydWN0dXJlIHdpdGggYSBRVEFJTFEgb25lLCBzbyB3ZSBj
+YW4gaXRlcmF0ZQ0KPiBpbiByZXZlcnNlIGZvciB0aGUgYWJvcnQgcGhhc2Ugb2YgdGhlIHRyYW5z
+YWN0aW9uLg0KDQphaGEsIHNvLCBhYm9ydCBmb3INCiAgIGFkZA0KICAgZGlzYWJsZQ0Kc2hvdWxk
+IGJlDQogICBlbmFibGUNCiAgIGRlbA0KYW5kIG5vdCB2aXNhLXZlcnNhDQoNClJldmlld2VkLWJ5
+OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+
+DQoNCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEpvaG4gU25vdyA8anNub3dAcmVkaGF0LmNvbT4NCj4g
+LS0tDQo+ICAgYmxvY2tkZXYuYyB8IDE0ICsrKysrKystLS0tLS0tDQo+ICAgMSBmaWxlIGNoYW5n
+ZWQsIDcgaW5zZXJ0aW9ucygrKSwgNyBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9i
+bG9ja2Rldi5jIGIvYmxvY2tkZXYuYw0KPiBpbmRleCA4MWY5NWQ5MjBiLi4xYmE3MDZkZjhiIDEw
+MDY0NA0KPiAtLS0gYS9ibG9ja2Rldi5jDQo+ICsrKyBiL2Jsb2NrZGV2LmMNCj4gQEAgLTEzNDEs
+NyArMTM0MSw3IEBAIHN0cnVjdCBCbGtBY3Rpb25TdGF0ZSB7DQo+ICAgICAgIGNvbnN0IEJsa0Fj
+dGlvbk9wcyAqb3BzOw0KPiAgICAgICBKb2JUeG4gKmJsb2NrX2pvYl90eG47DQo+ICAgICAgIFRy
+YW5zYWN0aW9uUHJvcGVydGllcyAqdHhuX3Byb3BzOw0KPiAtICAgIFFTSU1QTEVRX0VOVFJZKEJs
+a0FjdGlvblN0YXRlKSBlbnRyeTsNCj4gKyAgICBRVEFJTFFfRU5UUlkoQmxrQWN0aW9uU3RhdGUp
+IGVudHJ5Ow0KPiAgIH07DQo+ICAgDQo+ICAgLyogaW50ZXJuYWwgc25hcHNob3QgcHJpdmF0ZSBk
+YXRhICovDQo+IEBAIC0yMjY5LDggKzIyNjksOCBAQCB2b2lkIHFtcF90cmFuc2FjdGlvbihUcmFu
+c2FjdGlvbkFjdGlvbkxpc3QgKmRldl9saXN0LA0KPiAgICAgICBCbGtBY3Rpb25TdGF0ZSAqc3Rh
+dGUsICpuZXh0Ow0KPiAgICAgICBFcnJvciAqbG9jYWxfZXJyID0gTlVMTDsNCj4gICANCj4gLSAg
+ICBRU0lNUExFUV9IRUFEKHNuYXBfYmRydl9zdGF0ZXMsIEJsa0FjdGlvblN0YXRlKSBzbmFwX2Jk
+cnZfc3RhdGVzOw0KPiAtICAgIFFTSU1QTEVRX0lOSVQoJnNuYXBfYmRydl9zdGF0ZXMpOw0KPiAr
+ICAgIFFUQUlMUV9IRUFEKHNuYXBfYmRydl9zdGF0ZXMsIEJsa0FjdGlvblN0YXRlKSBzbmFwX2Jk
+cnZfc3RhdGVzOw0KPiArICAgIFFUQUlMUV9JTklUKCZzbmFwX2JkcnZfc3RhdGVzKTsNCj4gICAN
+Cj4gICAgICAgLyogRG9lcyB0aGlzIHRyYW5zYWN0aW9uIGdldCBjYW5jZWxlZCBhcyBhIGdyb3Vw
+IG9uIGZhaWx1cmU/DQo+ICAgICAgICAqIElmIG5vdCwgd2UgZG9uJ3QgcmVhbGx5IG5lZWQgdG8g
+bWFrZSBhIEpvYlR4bi4NCj4gQEAgLTIzMDEsNyArMjMwMSw3IEBAIHZvaWQgcW1wX3RyYW5zYWN0
+aW9uKFRyYW5zYWN0aW9uQWN0aW9uTGlzdCAqZGV2X2xpc3QsDQo+ICAgICAgICAgICBzdGF0ZS0+
+YWN0aW9uID0gZGV2X2luZm87DQo+ICAgICAgICAgICBzdGF0ZS0+YmxvY2tfam9iX3R4biA9IGJs
+b2NrX2pvYl90eG47DQo+ICAgICAgICAgICBzdGF0ZS0+dHhuX3Byb3BzID0gcHJvcHM7DQo+IC0g
+ICAgICAgIFFTSU1QTEVRX0lOU0VSVF9UQUlMKCZzbmFwX2JkcnZfc3RhdGVzLCBzdGF0ZSwgZW50
+cnkpOw0KPiArICAgICAgICBRVEFJTFFfSU5TRVJUX1RBSUwoJnNuYXBfYmRydl9zdGF0ZXMsIHN0
+YXRlLCBlbnRyeSk7DQo+ICAgDQo+ICAgICAgICAgICBzdGF0ZS0+b3BzLT5wcmVwYXJlKHN0YXRl
+LCAmbG9jYWxfZXJyKTsNCj4gICAgICAgICAgIGlmIChsb2NhbF9lcnIpIHsNCj4gQEAgLTIzMTAs
+NyArMjMxMCw3IEBAIHZvaWQgcW1wX3RyYW5zYWN0aW9uKFRyYW5zYWN0aW9uQWN0aW9uTGlzdCAq
+ZGV2X2xpc3QsDQo+ICAgICAgICAgICB9DQo+ICAgICAgIH0NCj4gICANCj4gLSAgICBRU0lNUExF
+UV9GT1JFQUNIKHN0YXRlLCAmc25hcF9iZHJ2X3N0YXRlcywgZW50cnkpIHsNCj4gKyAgICBRVEFJ
+TFFfRk9SRUFDSChzdGF0ZSwgJnNuYXBfYmRydl9zdGF0ZXMsIGVudHJ5KSB7DQo+ICAgICAgICAg
+ICBpZiAoc3RhdGUtPm9wcy0+Y29tbWl0KSB7DQo+ICAgICAgICAgICAgICAgc3RhdGUtPm9wcy0+
+Y29tbWl0KHN0YXRlKTsNCj4gICAgICAgICAgIH0NCj4gQEAgLTIzMjEsMTMgKzIzMjEsMTMgQEAg
+dm9pZCBxbXBfdHJhbnNhY3Rpb24oVHJhbnNhY3Rpb25BY3Rpb25MaXN0ICpkZXZfbGlzdCwNCj4g
+ICANCj4gICBkZWxldGVfYW5kX2ZhaWw6DQo+ICAgICAgIC8qIGZhaWx1cmUsIGFuZCBpdCBpcyBh
+bGwtb3Itbm9uZTsgcm9sbCBiYWNrIGFsbCBvcGVyYXRpb25zICovDQo+IC0gICAgUVNJTVBMRVFf
+Rk9SRUFDSChzdGF0ZSwgJnNuYXBfYmRydl9zdGF0ZXMsIGVudHJ5KSB7DQo+ICsgICAgUVRBSUxR
+X0ZPUkVBQ0hfUkVWRVJTRShzdGF0ZSwgJnNuYXBfYmRydl9zdGF0ZXMsIHNuYXBfYmRydl9zdGF0
+ZXMsIGVudHJ5KSB7DQo+ICAgICAgICAgICBpZiAoc3RhdGUtPm9wcy0+YWJvcnQpIHsNCj4gICAg
+ICAgICAgICAgICBzdGF0ZS0+b3BzLT5hYm9ydChzdGF0ZSk7DQo+ICAgICAgICAgICB9DQo+ICAg
+ICAgIH0NCj4gICBleGl0Og0KPiAtICAgIFFTSU1QTEVRX0ZPUkVBQ0hfU0FGRShzdGF0ZSwgJnNu
+YXBfYmRydl9zdGF0ZXMsIGVudHJ5LCBuZXh0KSB7DQo+ICsgICAgUVRBSUxRX0ZPUkVBQ0hfU0FG
+RShzdGF0ZSwgJnNuYXBfYmRydl9zdGF0ZXMsIGVudHJ5LCBuZXh0KSB7DQo+ICAgICAgICAgICBp
+ZiAoc3RhdGUtPm9wcy0+Y2xlYW4pIHsNCj4gICAgICAgICAgICAgICBzdGF0ZS0+b3BzLT5jbGVh
+bihzdGF0ZSk7DQo+ICAgICAgICAgICB9DQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxh
+ZGltaXINCg==
