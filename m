@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gVKLF-0006iz-IZ
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:55:10 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gVKMf-0007Xp-RJ
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:56:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gVKL8-0003vm-20
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:55:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50394)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gVKL6-0003lf-1P
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:55:00 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 71058461CF
-	for <qemu-devel@nongnu.org>; Fri,  7 Dec 2018 17:54:53 +0000 (UTC)
-Date: Fri, 7 Dec 2018 12:54:47 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181207124425-mutt-send-email-mst@kernel.org>
-References: <20181207170400.5129-1-philmd@redhat.com>
-	<20181207170400.5129-6-philmd@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gVKMd-0005SM-MX
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:56:36 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 7 Dec 2018 17:56:22 +0000
+Message-ID: <a277c7ee-ad0e-104e-d41b-1e943018adb7@virtuozzo.com>
+References: <1544176849-899477-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<5c525644-cc38-9d0b-c591-6d75315e25cc@redhat.com>
+	<d3507d7b-1bfe-0ae6-fd83-693272785f0d@virtuozzo.com>
+	<46df3ce6-c091-93e4-10c4-4d71687eadc4@redhat.com>
+	<df11cc1a-8bb1-6380-f878-4cdd1ce0ab0c@virtuozzo.com>
+In-Reply-To: <df11cc1a-8bb1-6380-f878-4cdd1ce0ab0c@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <B934EAB9B01F9542A0684D72690C1BDF@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20181207170400.5129-6-philmd@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 5/6] hw/nvram/fw_cfg: Add HMP 'info fw_cfg'
- command
+Subject: Re: [Qemu-devel] [PATCH v4] qemu-img info lists bitmap directory
+ entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,242 +29,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, Denis Lunev <den@virtuozzo.com>, John Snow <jsnow@redhat.com>
 
-On Fri, Dec 07, 2018 at 06:03:59PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> $ qemu-system-x86_64 -S -monitor stdio
-> (qemu) info fw_cfg
->         Type    Perm    Size    Specific   Order   Info
-
-Can we do better than "Info"?
-
->    signature      RO       4                       QEMU
->           id      RO       4                       0x00000003
->         uuid      RO      16                       00000000-0000-0000-0=
-000-000000000000
->     ram_size      RO       8                       0x0000000008000000
->    nographic      RO       2                       0x0000
->      nb_cpus      RO       2                       0x0001
->         numa      RO      16
->    boot_menu      RO       2                       0x0000
->     max_cpus      RO       2                       0x0001
->     file_dir      RO    2052
->  file (id 1)      RO      36                 160   etc/acpi/rsdp
->  file (id 2)      RO  131072                 130   etc/acpi/tables
->  file (id 3)      RO       4                  15   etc/boot-fail-wait
->  file (id 4)      RO      20                  40   etc/e820
->  file (id 5)      RO      31                  30   etc/smbios/smbios-an=
-chor
->  file (id 6)      RO     320                  20   etc/smbios/smbios-ta=
-bles
->  file (id 7)      RO       6                  90   etc/system-states
->  file (id 8)      RO    4096                 140   etc/table-loader
-> file (id 10)      RO    9216                  55   genroms/kvmvapic.bin
->         uuid      RO       4  (arch spec)          01000000-0000-0000-0=
-000-000000000000
->     ram_size      RO     324  (arch spec)
->    nographic      RO     121  (arch spec)
-
-Weird. Your code has arch_spec.
-
-> (qemu)
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-
-
-Looks helpful but generally IMHO whatever is exposed through hmp
-should be in the qmp as well.
-
-
-> ---
->  hmp-commands-info.hx      |  14 +++++
->  hw/nvram/fw_cfg.c         | 115 ++++++++++++++++++++++++++++++++++++++
->  include/hw/nvram/fw_cfg.h |   2 +
->  3 files changed, 131 insertions(+)
->=20
-> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> index cbee8b944d..9e86dceeb4 100644
-> --- a/hmp-commands-info.hx
-> +++ b/hmp-commands-info.hx
-> @@ -916,6 +916,20 @@ STEXI
->  @item info sev
->  @findex info sev
->  Show SEV information.
-> +ETEXI
-> +
-> +    {
-> +        .name       =3D "fw_cfg",
-> +        .args_type  =3D "",
-> +        .params     =3D "",
-> +        .help       =3D "Display the table of the fw_cfg entries regis=
-tered",
-
-I think the help line should be a bit more verbose.
-Mention it's a paravirtualized interface, and why
-would one want to display it (debugging guest firmware?).
-
-
-> +        .cmd        =3D hmp_info_fw_cfg,
-> +    },
-> +
-> +STEXI
-> +@item info fw_cfg
-> +@findex info fw_cfg
-> +Show roms.
->  ETEXI
-> =20
->  STEXI
-> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index 582653f07e..50525ec1dd 100644
-> --- a/hw/nvram/fw_cfg.c
-> +++ b/hw/nvram/fw_cfg.c
-> @@ -36,6 +36,7 @@
->  #include "qemu/config-file.h"
->  #include "qemu/cutils.h"
->  #include "qapi/error.h"
-> +#include "monitor/monitor.h"
-> =20
->  #define FW_CFG_FILE_SLOTS_DFLT 0x20
-> =20
-> @@ -1164,3 +1165,117 @@ static void fw_cfg_register_types(void)
->  }
-> =20
->  type_init(fw_cfg_register_types)
-> +
-> +static const char *fw_cfg_wellknown_entries[0x20] =3D {
-> +    [FW_CFG_SIGNATURE] =3D "signature",
-> +    [FW_CFG_ID] =3D "id",
-> +    [FW_CFG_UUID] =3D "uuid",
-> +    [FW_CFG_RAM_SIZE] =3D "ram_size",
-> +    [FW_CFG_NOGRAPHIC] =3D "nographic",
-> +    [FW_CFG_NB_CPUS] =3D "nb_cpus",
-> +    [FW_CFG_MACHINE_ID] =3D "machine_id",
-> +    [FW_CFG_KERNEL_ADDR] =3D "kernel_addr",
-> +    [FW_CFG_KERNEL_SIZE] =3D "kernel_size",
-> +    [FW_CFG_KERNEL_CMDLINE] =3D "kernel_cmdline",
-> +    [FW_CFG_INITRD_ADDR] =3D "initrd_addr",
-> +    [FW_CFG_INITRD_SIZE] =3D "initdr_size",
-> +    [FW_CFG_BOOT_DEVICE] =3D "boot_device",
-> +    [FW_CFG_NUMA] =3D "numa",
-> +    [FW_CFG_BOOT_MENU] =3D "boot_menu",
-> +    [FW_CFG_MAX_CPUS] =3D "max_cpus",
-> +    [FW_CFG_KERNEL_ENTRY] =3D "kernel_entry",
-> +    [FW_CFG_KERNEL_DATA] =3D "kernel_data",
-> +    [FW_CFG_INITRD_DATA] =3D "initrd_data",
-> +    [FW_CFG_CMDLINE_ADDR] =3D "cmdline_addr",
-> +    [FW_CFG_CMDLINE_SIZE] =3D "cmdline_size",
-> +    [FW_CFG_CMDLINE_DATA] =3D "cmdline_data",
-> +    [FW_CFG_SETUP_ADDR] =3D "setup_addr",
-> +    [FW_CFG_SETUP_SIZE] =3D "setup_size",
-> +    [FW_CFG_SETUP_DATA] =3D "setup_data",
-> +    [FW_CFG_FILE_DIR] =3D "file_dir",
-> +};
-> +
-> +void hmp_info_fw_cfg(Monitor *mon, const QDict *qdict)
-> +{
-> +    FWCfgState *s =3D fw_cfg_find();
-> +    int arch, key;
-
-Looks like this will crash on a machine without fw cfg.
-
-
-> +
-> +    monitor_printf(mon, "%12s %5s %7s %9s %6s %-24s\n",
-> +                   "Type", "Perm", "Size", "Specific", "Order", "Info"=
-);
-> +    for (arch =3D 0; arch < ARRAY_SIZE(s->entries); ++arch) {
-> +        for (key =3D 0; key < fw_cfg_max_entry(s); ++key) {
-> +            FWCfgEntry *e =3D &s->entries[arch][key];
-> +            const char *perm =3D e->allow_write ? "RW" : "RO";
-> +            const char *arch_spec =3D arch ? "arch_spec" : "";
-> +            char *type, *info =3D NULL;
-> +
-> +            if (!e->len) {
-> +                continue;
-> +            }
-> +            if (key >=3D FW_CFG_FILE_FIRST) {
-> +                int id =3D key - FW_CFG_FILE_FIRST;
-> +                const char *path =3D s->files->f[id].name;
-> +
-> +                type =3D g_strdup_printf("file (id %d)", id);
-> +                monitor_printf(mon, "%12s %5s %7d %10s %5d %-24s\n",
-> +                               type, perm, e->len, arch_spec,
-> +                               get_fw_cfg_order(s, path), path);
-> +                g_free(type);
-> +                continue;
-> +            }
-> +            type =3D g_strdup(fw_cfg_wellknown_entries[key]);
-> +            if (!type) {
-> +                type =3D g_strdup_printf("entry_%d", key);
-> +            }
-> +
-> +            switch (key) {
-> +            case FW_CFG_SIGNATURE:
-> +                info =3D g_strndup((const gchar *)e->data, e->len);
-> +                break;
-> +            case FW_CFG_UUID:
-> +                info =3D qemu_uuid_unparse_strdup((const QemuUUID *)e-=
->data);
-> +                break;
-> +            case FW_CFG_ID:
-> +            case FW_CFG_NOGRAPHIC:
-> +            case FW_CFG_NB_CPUS:
-> +            case FW_CFG_BOOT_MENU:
-> +            case FW_CFG_MAX_CPUS:
-> +            case FW_CFG_RAM_SIZE:
-> +            case FW_CFG_KERNEL_ADDR:
-> +            case FW_CFG_KERNEL_SIZE:
-> +            case FW_CFG_KERNEL_CMDLINE:
-> +            case FW_CFG_KERNEL_ENTRY:
-> +            case FW_CFG_KERNEL_DATA:
-> +            case FW_CFG_INITRD_ADDR:
-> +            case FW_CFG_INITRD_SIZE:
-> +            case FW_CFG_INITRD_DATA:
-> +            case FW_CFG_CMDLINE_ADDR:
-> +            case FW_CFG_CMDLINE_SIZE:
-> +            case FW_CFG_CMDLINE_DATA:
-> +            case FW_CFG_SETUP_ADDR:
-> +            case FW_CFG_SETUP_SIZE:
-> +            case FW_CFG_SETUP_DATA:
-> +                switch (e->len) {
-> +                case 2:
-> +                    info =3D g_strdup_printf("0x%04x", lduw_le_p(e->da=
-ta));
-> +                    break;
-> +                case 4:
-> +                    info =3D g_strdup_printf("0x%08x", ldl_le_p(e->dat=
-a));
-> +                    break;
-> +                case 8:
-> +                    info =3D g_strdup_printf("0x%016" PRIx64, ldq_le_p=
-(e->data));
-> +                    break;
-> +                default:
-> +                    break;
-> +                }
-> +                break;
-> +            default:
-> +                break;
-> +            }
-> +            monitor_printf(mon, "%12s %5s %7d %10s %5s %-24s\n",
-> +                           type, perm, e->len, arch_spec, "", info ? i=
-nfo : "");
-> +            g_free(type);
-> +            g_free(info);
-> +        }
-> +    }
-> +}
-> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
-> index f5a6895a74..28630b2f26 100644
-> --- a/include/hw/nvram/fw_cfg.h
-> +++ b/include/hw/nvram/fw_cfg.h
-> @@ -226,4 +226,6 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
->  FWCfgState *fw_cfg_find(void);
->  bool fw_cfg_dma_enabled(void *opaque);
-> =20
-> +void hmp_info_fw_cfg(Monitor *mon, const QDict *qdict);
-> +
->  #endif
-> --=20
-> 2.17.2
+MDcuMTIuMjAxOCAyMDo1MiwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
+MDcuMTIuMjAxOCAyMDozMSwgRXJpYyBCbGFrZSB3cm90ZToNCj4+IE9uIDEyLzcvMTggMTE6MjQg
+QU0sIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4gMDcuMTIuMjAxOCAx
+OToyMCwgRXJpYyBCbGFrZSB3cm90ZToNCj4+Pj4gT24gMTIvNy8xOCA0OjAwIEFNLCBBbmRyZXkg
+U2hpbmtldmljaCB3cm90ZToNCj4+Pj4+ICsrKyBiL2Jsb2NrL3Fjb3cyLmMNCj4+Pj4+IEBAIC00
+MjcwLDYgKzQyNzAsMTIgQEAgc3RhdGljIEltYWdlSW5mb1NwZWNpZmljICpxY293Ml9nZXRfc3Bl
+Y2lmaWNfaW5mbyhCbG9ja0RyaXZlclN0YXRlICpicykNCj4+Pj4+IMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqAgLnJlZmNvdW50X2JpdHPCoMKgwqDCoMKgID0gcy0+cmVmY291bnRfYml0cywN
+Cj4+Pj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgIH07DQo+Pj4+PiDCoMKgwqDCoMKgwqAgfSBlbHNl
+IGlmIChzLT5xY293X3ZlcnNpb24gPT0gMykgew0KPj4+Pj4gK8KgwqDCoMKgwqDCoMKgIFFjb3cy
+Qml0bWFwSW5mb0xpc3QgKmJpdG1hcHM7DQo+Pj4+PiArwqDCoMKgwqDCoMKgwqAgRXJyb3IgKmxv
+Y2FsX2VyciA9IE5VTEw7DQo+Pj4+PiArwqDCoMKgwqDCoMKgwqAgYml0bWFwcyA9IHFjb3cyX2dl
+dF9iaXRtYXBfaW5mb19saXN0KGJzLCAmbG9jYWxfZXJyKTsNCj4+Pj4+ICvCoMKgwqDCoMKgwqDC
+oCBpZiAobG9jYWxfZXJyICE9IE5VTEwpIHsNCj4+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+IGVycm9yX3JlcG9ydF9lcnIobG9jYWxfZXJyKTsNCj4+Pj4+ICvCoMKgwqDCoMKgwqDCoCB9DQo+
+Pj4+DQo+Pj4+IE91Y2guIENhbGxpbmcgZXJyb3JfcmVwb3J0X2VycigpIGRvZXNuJ3QgYWx3YXlz
+IHdvcmsgaW4gUU1QIGNvbnRleHQ7IGJldHRlciB3b3VsZCBiZSB0byBwbHVtYiBFcnJvciAqKmVy
+cnAgYmFjayB1cCB0byB0aGUgY2FsbGVyLCBpZiBnZXR0aW5nIHRoaXMgc3BlY2lmaWMgaW5mb3Jt
+YXRpb24gY2FuIGZhaWwgYW5kIHdlIHdhbnQgdGhlIG92ZXJhbGwgcXVlcnktYmxvY2sgdG8gZmFp
+bC7CoCBPciwgd2UgY291bGQgZGVjaWRlIHRoYXQgZmFpbHVyZSB0byBnZXQgYml0bWFwIGluZm8g
+aXMgbm9uLWZhdGFsLCBhbmQgdGhhdCBpdCB3YXMganVzdCBhIGJlc3QtZWZmb3J0IGF0dGVtcHQg
+dG8gZ2V0IG1vcmUgaW5mbywgd2hlcmUgd2UgdGhlbiBpZ25vcmUgdGhlIGZhaWx1cmUsIHJhdGhl
+ciB0aGFuIHRyeWluZyB0byByZXBvcnQgaXQgaW5jb3JyZWN0bHkuDQo+Pj4NCj4+PiBPaCwgeWVz
+LCB5b3UgYXJlIHJpZ2h0LiBTdHJhbmdlLCBidXTCoCBiZHJ2X2dldF9zcGVjaWZpY19pbmZvIGxh
+Y2tzIGVycnAuIGVycm9yX2Fib3J0IHVzIHVzZWQgYWJvdmUgZm9yIGNyeXB0byBpbmZvIGVycm9y
+cy4NCj4+DQo+PiBBbmQgdGh1cyB3ZSBzaG91bGQgcHJvYmFibHkgZml4IHRoYXQgLSBidXQgaXQg
+ZG9lc24ndCBoYXZlIHRvIGJlIHBhcnQgb2YgdGhpcyBzZXJpZXMuDQo+Pg0KPj4+DQo+Pj4gUXVl
+cnlpbmcgYml0bWFwcyBuZWVkcyBkaXNrIGFjY2VzcyBzbyBpdCByZWFsbHkgbWF5IGZhaWwsIGFu
+ZCBpdCBtYXkgYmUgc2FkIHRvIGZhaWwgZ2V0IGFueSBpbmZvcm1hdGlvbiBiZWNhdXNlIG9mIHJl
+cGVhdGluZyBzb21lIGRpc2svcWNvdzIgZXJyb3IsIHNvIGl0J3MgYmV0dGVyIG5vdCB0byBhYm9y
+dCBhbmQgZXZlbiBub3QgdG8gZmFpbCBxbXAgY29tbWFuZCBoZXJlLg0KPj4+DQo+Pg0KPj4+Pj4g
+LcKgwqDCoMKgwqAgJyplbmNyeXB0JzogJ0ltYWdlSW5mb1NwZWNpZmljUUNvdzJFbmNyeXB0aW9u
+Jw0KPj4+Pj4gK8KgwqDCoMKgwqAgJyplbmNyeXB0JzogJ0ltYWdlSW5mb1NwZWNpZmljUUNvdzJF
+bmNyeXB0aW9uJywNCj4+Pj4+ICvCoMKgwqDCoMKgICcqYml0bWFwcyc6IFsnUWNvdzJCaXRtYXBJ
+bmZvJ10NCj4+Pj4NCj4+Pj4gSG1tLiBZb3UncmUgb21pdHRpbmcgdGhpcyBmaWVsZCBib3RoIGlm
+IHRoZXJlIGFyZSAwIGJpdG1hcHMsIGFuZCB3aGVuIGl0IHdhcyBhIHZlcnNpb24gMiBpbWFnZS4g
+SXMgaXQgd29ydGggaW5jbHVkaW5nIHRoaXMgZmllbGQgYXMgYSAwLWxlbmd0aCBhcnJheSB3aGVu
+IHRoZXJlIGFyZSBubyBiaXRtYXBzIGJ1dCB3aGVuIHRoZSBpbWFnZSBmb3JtYXQgaXMgbmV3IGVu
+b3VnaCB0byBzdXBwb3J0IHRoZW0sIG9yIGFyZSB3ZSBoYXBweSB3aXRoIHRoZSBpZGVhIG9mIG9u
+bHkgaW5jbHVkaW5nIHRoZSBmaWVsZCB3aGVuIGl0IGhhcyBhdCBsZWFzdCBvbmUgYml0bWFwP8Kg
+IFRoZSBkaWZmZXJlbmNlIGlzIHdoZXRoZXIgdGhlIGNhbGxpbmcgYXBwIGNhbiBleHBsaWNpdGx5
+IGxlYXJuIHRoYXQgdGhlcmUgYXJlIG5vIGJpdG1hcHMgKDAtbGVuZ3RoIHJlcGx5KSB2cy4gdGhl
+IGFtYmlndWl0eSBvZiBvbWl0dGluZyBpdCBmcm9tIHRoZSByZXBseSAobWlzc2luZyBtaWdodCBt
+ZWFuIG5vIGJpdG1hcHMsIG9yIGFuIGVycm9yIGluIHRyeWluZyB0byByZXBvcnQgdGhlIGJpdG1h
+cHMsIG9yIGFuIG9sZGVyIHFlbXUgdGhhdCBkaWRuJ3Qga25vdyBob3cgdG8gcmVwb3J0IGJpdG1h
+cHMpLg0KPj4+DQo+Pj4gSG1tLCBJIGRvbid0IGxpa2Ugb3ZlcnVzaW5nIC5oYXNfYml0bWFwcyBh
+cyBhIHNpZ24gb2YgZXJyb3IsIGF0IGxlYXN0IGl0IHdvdWxkIGJlIHZlcnkgd2VpcmQgdG8gZG9j
+dW1lbnQgc3VjaCBiZWhhdmlvciwgYW5kIGEgdW5kb2N1bWVudGVkIHRyaWNrIGl0IGlzIG5vdCBy
+ZWFsbHkgdXNlZnVsLg0KPj4+IEhtbSwgaWYgd2Ugd2FudCBzb21ldGhpbmcgbGlrZSB0aGlzIEkn
+ZCBwcmVmZXIgLmhhc19iaXRtYXBzIHRvIGJlIGZhbHNlIG9ubHkgaW4gY2FzZSBvZiBlcnJvciwg
+c28gZm9yIHYyIHdlJ2xsIGhhdmUgZW1wdHkgYXJyYXkuIEl0J3Mgc2ltcGxlciB0byBkb2N1bWVu
+dC4NCj4+DQo+PiBJJ20gaGFwcHkgd2l0aCB2MiBpbWFnZXMgcmVwb3J0aW5nIGEgMC1sZW5ndGgg
+YXJyYXkgaW5zdGVhZCBvZiBvbWl0dGluZyB0aGUgZmllbGQsIGVzcGVjaWFsbHkgaWYgdGhhdCBt
+ZWFucyB3ZSBjYW4gc2ltcGx5IGhhdmU6DQo+Pg0KPj4gb2xkIHFlbXU6IGZpZWxkIGFsd2F5cyBv
+bWl0dGVkIGJlY2F1c2Ugd2UgZGlkbid0IGNvbXB1dGUgaXQNCj4+IG5ldyBxZW11OiBmaWVsZCBv
+bWl0dGVkIGlmIHdlIGhpdCBhbiBlcnJvciBjb21wdXRpbmcgaXQNCj4+IMKgwqDCoMKgwqDCoMKg
+wqDCoMKgIG90aGVyd2lzZSBwcmVzZW50IChidXQgcG9zc2libHkgMCBsZW5ndGgpIGFuZCBhY2N1
+cmF0ZQ0KPiANCj4gYW55d2F5LCB3ZSBjYW4gYWRqdXN0IGh1bWFuIG91dHB1dCB0eXBlIG9mIHFl
+bXUtaW1nIGluZm8gdG8gY2F0Y2ggdGhpcyBjYXNlIGFuZCBwcmludCBhZGRpdGlvbmFsIGVycm9y
+IG1lc3NhZ2UNCg0KYW5kIHRvIG1ha2UgaXQgc2ltcGxlciB0byByZWNvZ25pemUgZmFpbCwgaXQg
+c2hvdWxkIGJlIG9uZSB0aGluZywgaW5kZXBlbmRlbnQgb2YgdGhlIHZlcnNpb24sIGZvciBleGFt
+cGxlOiBvbWl0dGVkIGFsd2F5cyBtZWFucyBlcnJvci4gT3IgdmlzYS12ZXJzYTogZW1wdHkgbGlz
+dCBhbHdheXMgbWVhbnMgZXJyb3IsIG9taXR0ZWQgbWVhbnMgbm8gYml0bWFwcyBvciB1bnN1cHBv
+cnRlZC4NCg0KPiANCj4+DQo+Pj4NCj4+PiBPciB3ZSBuZWVkIHNlcGFyYXRlIGNhbnRfbG9hZF9i
+aXRtYXBzOiBib29sLCBvciBiaXRtYXBzIHNob3VsZCBiZSBlbnVtIG9mICggWydRY293MkJpdG1h
+cEluZm8nXSAsIHsnZXJyb3InOiAnc3RyJ30gKSwgZG8gd2UgaGF2ZSBzb21ldGhpbmcgbGlrZSB0
+aGlzIGFscmVhZHkgaW4gUUFQST8gVGhpcyBpcyB0aGUgcXVlc3Rpb24gYWJvdXQgcGFydGlhbCBz
+dWNjZXNzIG9mIGluZm8tZXhwb3J0aW5nIGNvbW1hbmRzLg0KPj4NCj4+IE5vLCBJIGRvbid0IHNl
+ZSBhIHJlYXNvbiB0byBvdmVyLWVuZ2luZWVyIHRoaW5nczsgcXVlcnktYmxvY2sgaXMgYWxyZWFk
+eSBhIGJlaGVtb3RoIHdpdGhvdXQgdHJ5aW5nIHRvIGphbSBpbiBtb3JlIGRldGFpbHMgYWJvdXQg
+d2hldGhlciBpbmZvLWV4cG9ydGluZyBoaXQgcGFydGlhbCBmYWlsdXJlLg0KPj4NCj4gDQo+IA0K
+DQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
