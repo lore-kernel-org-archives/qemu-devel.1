@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gVIwu-0007HC-5N
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:25:57 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gVIyy-0003bE-DD
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:28:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gVIwt-0007zX-4y
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:25:56 -0500
-References: <20181206192544.3987-1-jsnow@redhat.com>
-	<20181206192544.3987-3-jsnow@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <59d3744f-8c61-724b-784d-43e5f2b0ae8e@redhat.com>
-Date: Fri, 7 Dec 2018 10:25:49 -0600
+	(envelope-from <richard.henderson@linaro.org>) id 1gVIyv-0007OI-97
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:28:04 -0500
+Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:34844)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gVIyu-0007Fx-M5
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:28:00 -0500
+Received: by mail-ot1-x32e.google.com with SMTP id 81so4329974otj.2
+	for <qemu-devel@nongnu.org>; Fri, 07 Dec 2018 08:27:59 -0800 (PST)
+References: <1543937577-28256-1-git-send-email-thuth@redhat.com>
+	<1543937577-28256-2-git-send-email-thuth@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <b5f4bb3b-5c07-f50a-b689-4ea98b73f0bc@linaro.org>
+Date: Fri, 7 Dec 2018 10:27:55 -0600
 MIME-Version: 1.0
-In-Reply-To: <20181206192544.3987-3-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1543937577-28256-2-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] blockdev: n-ary bitmap merge
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v2 1/7] configure: Add a test for
+ the minimum compiler version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +32,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, vsementov@virtuozzo.com, Max Reitz <mreitz@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>
 
-On 12/6/18 1:25 PM, John Snow wrote:
-> Especially outside of transactions, it is helpful to provide
-> all-or-nothing semantics for bitmap merges. This facilitates
-> the coalescing of multiple bitmaps into a single target for
-> the "checkpoint" interpretation when assembling bitmaps that
-> represent arbitrary points in time from component bitmaps.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->   blockdev.c           | 64 +++++++++++++++++++++++++++++---------------
->   qapi/block-core.json | 22 +++++++--------
->   2 files changed, 53 insertions(+), 33 deletions(-)
-> 
+On 12/4/18 9:32 AM, Thomas Huth wrote:
+> +# Check whether the compiler matches our minimum requirements:
+> +cat > $TMPC << EOF
+> +#if defined(__clang_major__) && defined(__clang_minor__)
+> +# ifdef __apple_build_version__
+> +#  if __clang_major__ < 5 || (__clang_major__ == 5 && __clang_minor__ < 1)
+> +#   error You need at least XCode Clang v5.1 to compile QEMU
+> +#  endif
+> +# else
+> +#  if __clang_major__ < 3 || (__clang_major__ == 3 && __clang_minor__ < 4)
+> +#   error You need at least Clang v3.4 to compile QEMU
+> +#  endif
+> +# endif
+> +#elif defined(__GNUC__) && defined(__GNUC_MINOR__)
+> +# if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 8)
+> +#  error You need at least GCC v4.8 to compile QEMU
+> +# endif
+> +#else
+> +# error You either need GCC or Clang to compiler QEMU
+> +#endif
+> +int main (void) { return 0; }
+> +EOF
+> +if ! compile_prog "" "" ; then
+> +    error_exit "You need at least GCC v4.8 or Clang v3.4 (or XCode Clang v5.1)"
+> +fi
 
-> +++ b/qapi/block-core.json
-> @@ -1818,14 +1818,14 @@
->   #
->   # @node: name of device/node which the bitmap is tracking
->   #
-> -# @dst_name: name of the destination dirty bitmap
-> +# @target: name of the destination dirty bitmap
->   #
-> -# @src_name: name of the source dirty bitmap
-> +# @bitmaps: name(s) of the source dirty bitmap(s)
->   #
->   # Since: 3.0
->   ##
->   { 'struct': 'BlockDirtyBitmapMerge',
-> -  'data': { 'node': 'str', 'dst_name': 'str', 'src_name': 'str' } }
-> +  'data': { 'node': 'str', 'target': 'str', 'bitmaps': ['str'] } }
+I wonder if we could capture the actual error message that you used during the
+test and feed that back to the user.  That said,
 
-Definitely worthwhile!
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-I'll update my pending libvirt patches to use this.
 
->   
->   ##
->   # @block-dirty-bitmap-add:
-> @@ -1940,23 +1940,23 @@
->   ##
->   # @x-block-dirty-bitmap-merge:
->   #
-> -# FIXME: Rename @src_name and @dst_name to src-name and dst-name.
-> -#
-> -# Merge @src_name dirty bitmap to @dst_name dirty bitmap. @src_name dirty
-> -# bitmap is unchanged. On error, @dst_name is unchanged.
-> +# Merge dirty bitmaps listed in @bitmaps to the @target dirty bitmap.
-> +# The @bitmaps dirty bitmaps are unchanged.
-
-Well, except in the corner case of when @bitmaps also lists the 
-destination (I presume that merging a bitmap into itself silently 
-succeeds with no further changes, but therefore the inclusion of the 
-destination in the list of sources means that that particular source is 
-changing due to merging in the other sources).  Not worth rewording this 
-  sentence, but does make you want to consider ensuring that the 
-testsuite covers merging a bitmap into itself.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+r~
