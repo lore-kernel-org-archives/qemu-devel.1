@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gVKGi-0001Zw-Vd
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:50:30 -0500
+	(envelope-from <rkagan@virtuozzo.com>) id 1gVKHB-0002Le-L6
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:50:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gVKGh-00082A-4F
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:50:28 -0500
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+	(envelope-from <rkagan@virtuozzo.com>) id 1gVKH8-0000G5-ER
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:50:57 -0500
+Received: from mail-he1eur04hn030e.outbound.protection.outlook.com
+	([2a01:111:f400:fe0d::30e]:10029
+	helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1gVKH6-0008VS-FF
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:50:54 -0500
+From: Roman Kagan <rkagan@virtuozzo.com>
 Date: Fri, 7 Dec 2018 17:50:13 +0000
-Message-ID: <7a891e46-863b-1092-4598-63b2a27e06f0@virtuozzo.com>
-References: <1544176849-899477-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<5c525644-cc38-9d0b-c591-6d75315e25cc@redhat.com>
-In-Reply-To: <5c525644-cc38-9d0b-c591-6d75315e25cc@redhat.com>
+Message-ID: <20181207175009.GA2485@rkaganb.sw.ru>
+References: <20181025140631.634922-1-sameeh@daynix.com>
+	<20181205171818.GA1136@redhat.com>
+	<154404147264.6063.14869520867110106084@sif>
+	<20181206100618.GF29540@redhat.com>
+In-Reply-To: <20181206100618.GF29540@redhat.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2798F6DBD2F8FA4DA14883F78140F241@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="iso-8859-1"
+Content-ID: <B97EB41C32A8994CAD1D2A5E36B5B884@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4] qemu-img info lists bitmap directory
- entries
+Subject: Re: [Qemu-devel] [RFC 0/2] Attempt to implement the standby feature
+ for assigned network devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,109 +35,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, John Snow <jsnow@redhat.com>
+To: =?iso-8859-1?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Sameeh Jubran <sameeh@daynix.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S .
+	Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Yan Vugenfirer <yan@daynix.com>
 
-T24gMDcuMTIuMjAxOCAxOToyMCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMTIvNy8xOCA0OjAw
-IEFNLCBBbmRyZXkgU2hpbmtldmljaCB3cm90ZToNCj4+IEluIHRoZSAnRm9ybWF0IHNwZWNpZmlj
-IGluZm9ybWF0aW9uJyBzZWN0aW9uIG9mIHRoZSAncWVtdS1pbWcgaW5mbycNCj4+IGNvbW1hbmQg
-b3V0cHV0LCB0aGUgc3VwcGxlbWVudGFsIGluZm9ybWF0aW9uIGFib3V0IGV4aXN0aW5nIFFDT1cy
-DQo+PiBiaXRtYXBzIHdpbGwgYmUgc2hvd24sIHN1Y2ggYXMgYSBiaXRtYXAgbmFtZSwgZmxhZ3Mg
-YW5kIGdyYW51bGFyaXR5Og0KPj4NCj4+IGltYWdlOiAvdnovdm1wcml2YXRlL1ZNMS9oYXJkZGlz
-ay5oZGQNCj4+IGZpbGUgZm9ybWF0OiBxY293Mg0KPj4gdmlydHVhbCBzaXplOiA2NEcgKDY4NzE5
-NDc2NzM2IGJ5dGVzKQ0KPj4gZGlzayBzaXplOiAzLjBNDQo+PiBjbHVzdGVyX3NpemU6IDEwNDg1
-NzYNCj4+IEZvcm1hdCBzcGVjaWZpYyBpbmZvcm1hdGlvbjoNCj4+IMKgwqDCoMKgIGNvbXBhdDog
-MS4xDQo+PiDCoMKgwqDCoCBsYXp5IHJlZmNvdW50czogdHJ1ZQ0KPj4gwqDCoMKgwqAgYml0bWFw
-czoNCj4+IMKgwqDCoMKgwqDCoMKgwqAgWzBdOg0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IGZsYWdzOg0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgWzBdOiBpbi11c2UN
-Cj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIFsxXTogYXV0bw0KPj4gwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgIG5hbWU6IGJhY2stdXAxDQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqAgdW5rbm93biBmbGFnczogNA0KPg0KPiBJJ20gZ3Vlc3NpbmcgeW91IGRvY3RvcmVkIGFu
-IGltYWdlIGluIGEgaGV4LWVkaXRvciB0byBnZXQgdGhpcyANCj4gcGFydGljdWxhciBvdXRwdXQ/
-DQo+DQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZ3JhbnVsYXJpdHk6IDY1NTM2DQo+PiDC
-oMKgwqDCoMKgwqDCoMKgIFsxXToNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBmbGFnczoN
-Cj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIFswXTogaW4tdXNlDQo+PiDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBbMV06IGF1dG8NCj4+IMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCBuYW1lOiBiYWNrLXVwMg0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHVu
-a25vd24gZmxhZ3M6IDgNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBncmFudWxhcml0eTog
-NjU1MzYNCj4+IMKgwqDCoMKgIHJlZmNvdW50IGJpdHM6IDE2DQo+PiDCoMKgwqDCoCBjb3JydXB0
-OiBmYWxzZQ0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IEFuZHJleSBTaGlua2V2aWNoIDxhbmRyZXku
-c2hpbmtldmljaEB2aXJ0dW96em8uY29tPg0KPj4gUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVu
-dHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+IC0tLQ0KPj4gdjQ6
-DQo+PiBVbmtub3duIGZsYWdzIGFyZSBjaGVja2VkIHdpdGggdGhlIG1hc2sgQk1FX1JFU0VSVkVE
-X0ZMQUdTLg0KPj4gVGhlIGNvZGUgbWlub3IgcmVmYWN0b3Jpbmcgd2FzIG1hZGUuDQo+Pg0KPg0K
-Pj4gwqAgYmxvY2svcWNvdzItYml0bWFwLmMgfCA1NiANCj4+ICsrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4+IMKgIGJsb2NrL3Fjb3cyLmPCoMKg
-wqDCoMKgwqDCoCB8wqAgOCArKysrKysrKw0KPj4gwqAgYmxvY2svcWNvdzIuaMKgwqDCoMKgwqDC
-oMKgIHzCoCAyICsrDQo+PiDCoCBxYXBpL2Jsb2NrLWNvcmUuanNvbiB8IDQwICsrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKy0NCj4+IMKgIDQgZmlsZXMgY2hhbmdlZCwgMTA1IGlu
-c2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCj4NCj4gSSdtIGFzc3VtaW5nIEpvaG4gd2lsbCBt
-ZXJnZSB0aGlzIGFzIGEgYml0bWFwLXJlbGF0ZWQgcGF0Y2g7IG1ha2Ugc3VyZSANCj4gaGUgaXMg
-aW4gY2MgaWYgeW91IHNlbmQgYSB2NSAoYWRkaW5nIG5vdykuDQo+DQo+PiArKysgYi9ibG9jay9x
-Y293Mi5jDQo+PiBAQCAtNDI3MCw2ICs0MjcwLDEyIEBAIHN0YXRpYyBJbWFnZUluZm9TcGVjaWZp
-YyANCj4+ICpxY293Ml9nZXRfc3BlY2lmaWNfaW5mbyhCbG9ja0RyaXZlclN0YXRlICpicykNCj4+
-IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC5yZWZjb3VudF9iaXRzwqDCoMKgwqDCoCA9IHMt
-PnJlZmNvdW50X2JpdHMsDQo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgfTsNCj4+IMKgwqDCoMKgwqAg
-fSBlbHNlIGlmIChzLT5xY293X3ZlcnNpb24gPT0gMykgew0KPj4gK8KgwqDCoMKgwqDCoMKgIFFj
-b3cyQml0bWFwSW5mb0xpc3QgKmJpdG1hcHM7DQo+PiArwqDCoMKgwqDCoMKgwqAgRXJyb3IgKmxv
-Y2FsX2VyciA9IE5VTEw7DQo+PiArwqDCoMKgwqDCoMKgwqAgYml0bWFwcyA9IHFjb3cyX2dldF9i
-aXRtYXBfaW5mb19saXN0KGJzLCAmbG9jYWxfZXJyKTsNCj4+ICvCoMKgwqDCoMKgwqDCoCBpZiAo
-bG9jYWxfZXJyICE9IE5VTEwpIHsNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGVycm9yX3Jl
-cG9ydF9lcnIobG9jYWxfZXJyKTsNCj4+ICvCoMKgwqDCoMKgwqDCoCB9DQo+DQo+IE91Y2guIENh
-bGxpbmcgZXJyb3JfcmVwb3J0X2VycigpIGRvZXNuJ3QgYWx3YXlzIHdvcmsgaW4gUU1QIGNvbnRl
-eHQ7IA0KPiBiZXR0ZXIgd291bGQgYmUgdG8gcGx1bWIgRXJyb3IgKiplcnJwIGJhY2sgdXAgdG8g
-dGhlIGNhbGxlciwgaWYgDQo+IGdldHRpbmcgdGhpcyBzcGVjaWZpYyBpbmZvcm1hdGlvbiBjYW4g
-ZmFpbCBhbmQgd2Ugd2FudCB0aGUgb3ZlcmFsbCANCj4gcXVlcnktYmxvY2sgdG8gZmFpbC7CoCBP
-ciwgd2UgY291bGQgZGVjaWRlIHRoYXQgZmFpbHVyZSB0byBnZXQgYml0bWFwIA0KPiBpbmZvIGlz
-IG5vbi1mYXRhbCwgYW5kIHRoYXQgaXQgd2FzIGp1c3QgYSBiZXN0LWVmZm9ydCBhdHRlbXB0IHRv
-IGdldCANCj4gbW9yZSBpbmZvLCB3aGVyZSB3ZSB0aGVuIGlnbm9yZSB0aGUgZmFpbHVyZSwgcmF0
-aGVyIHRoYW4gdHJ5aW5nIHRvIA0KPiByZXBvcnQgaXQgaW5jb3JyZWN0bHkuDQo+DQo+DQo+PiAr
-KysgYi9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPj4gQEAgLTY5LDYgKzY5LDggQEANCj4+IMKgICMg
-QGVuY3J5cHQ6IGRldGFpbHMgYWJvdXQgZW5jcnlwdGlvbiBwYXJhbWV0ZXJzOyBvbmx5IHNldCBp
-ZiBpbWFnZQ0KPj4gwqAgI8KgwqDCoMKgwqDCoMKgwqDCoMKgIGlzIGVuY3J5cHRlZCAoc2luY2Ug
-Mi4xMCkNCj4+IMKgICMNCj4+ICsjIEBiaXRtYXBzOiBsaXN0IG9mIHFjb3cyIGJpdG1hcHMgZGV0
-YWlscyAoc2luY2UgNC4wKQ0KPj4gKyMNCj4+IMKgICMgU2luY2U6IDEuNw0KPj4gwqAgIyMNCj4+
-IMKgIHsgJ3N0cnVjdCc6ICdJbWFnZUluZm9TcGVjaWZpY1FDb3cyJywNCj4+IEBAIC03Nyw3ICs3
-OSw4IEBADQo+PiDCoMKgwqDCoMKgwqDCoCAnKmxhenktcmVmY291bnRzJzogJ2Jvb2wnLA0KPj4g
-wqDCoMKgwqDCoMKgwqAgJypjb3JydXB0JzogJ2Jvb2wnLA0KPj4gwqDCoMKgwqDCoMKgwqAgJ3Jl
-ZmNvdW50LWJpdHMnOiAnaW50JywNCj4+IC3CoMKgwqDCoMKgICcqZW5jcnlwdCc6ICdJbWFnZUlu
-Zm9TcGVjaWZpY1FDb3cyRW5jcnlwdGlvbicNCj4+ICvCoMKgwqDCoMKgICcqZW5jcnlwdCc6ICdJ
-bWFnZUluZm9TcGVjaWZpY1FDb3cyRW5jcnlwdGlvbicsDQo+PiArwqDCoMKgwqDCoCAnKmJpdG1h
-cHMnOiBbJ1Fjb3cyQml0bWFwSW5mbyddDQo+DQo+IEhtbS4gWW91J3JlIG9taXR0aW5nIHRoaXMg
-ZmllbGQgYm90aCBpZiB0aGVyZSBhcmUgMCBiaXRtYXBzLCBhbmQgd2hlbiANCj4gaXQgd2FzIGEg
-dmVyc2lvbiAyIGltYWdlLiBJcyBpdCB3b3J0aCBpbmNsdWRpbmcgdGhpcyBmaWVsZCBhcyBhIA0K
-PiAwLWxlbmd0aCBhcnJheSB3aGVuIHRoZXJlIGFyZSBubyBiaXRtYXBzIGJ1dCB3aGVuIHRoZSBp
-bWFnZSBmb3JtYXQgaXMgDQo+IG5ldyBlbm91Z2ggdG8gc3VwcG9ydCB0aGVtLCBvciBhcmUgd2Ug
-aGFwcHkgd2l0aCB0aGUgaWRlYSBvZiBvbmx5IA0KPiBpbmNsdWRpbmcgdGhlIGZpZWxkIHdoZW4g
-aXQgaGFzIGF0IGxlYXN0IG9uZSBiaXRtYXA/IFRoZSBkaWZmZXJlbmNlIGlzIA0KPiB3aGV0aGVy
-IHRoZSBjYWxsaW5nIGFwcCBjYW4gZXhwbGljaXRseSBsZWFybiB0aGF0IHRoZXJlIGFyZSBubyBi
-aXRtYXBzIA0KPiAoMC1sZW5ndGggcmVwbHkpIHZzLiB0aGUgYW1iaWd1aXR5IG9mIG9taXR0aW5n
-IGl0IGZyb20gdGhlIHJlcGx5IA0KPiAobWlzc2luZyBtaWdodCBtZWFuIG5vIGJpdG1hcHMsIG9y
-IGFuIGVycm9yIGluIHRyeWluZyB0byByZXBvcnQgdGhlIA0KPiBiaXRtYXBzLCBvciBhbiBvbGRl
-ciBxZW11IHRoYXQgZGlkbid0IGtub3cgaG93IHRvIHJlcG9ydCBiaXRtYXBzKS4NCj4NCj4NCj4+
-ICsjIw0KPj4gKyMgQFFjb3cyQml0bWFwSW5mbzoNCj4+ICsjDQo+PiArIyBRY293MiBiaXRtYXAg
-aW5mb3JtYXRpb24uDQo+PiArIw0KPj4gKyMgQG5hbWU6IHRoZSBuYW1lIG9mIHRoZSBiaXRtYXAN
-Cj4+ICsjDQo+PiArIyBAZ3JhbnVsYXJpdHk6IGdyYW51bGFyaXR5IG9mIHRoZSBiaXRtYXAgaW4g
-Ynl0ZXMNCj4+ICsjDQo+PiArIyBAZmxhZ3M6IGZsYWdzIG9mIHRoZSBiaXRtYXANCj4+ICsjDQo+
-PiArIyBAdW5rbm93bi1mbGFnczogdW5zcGVjaWZpZWQgZmxhZ3MgaWYgZGV0ZWN0ZWQNCj4+ICsj
-DQo+PiArIyBTaW5jZTogNC4wDQo+PiArIyMNCj4+ICt7ICdzdHJ1Y3QnOiAnUWNvdzJCaXRtYXBJ
-bmZvJywNCj4+ICvCoCAnZGF0YSc6IHsnbmFtZSc6ICdzdHInLCAnZ3JhbnVsYXJpdHknOiAndWlu
-dDMyJywNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoCAnZmxhZ3MnOiBbJ1Fjb3cyQml0bWFwSW5m
-b0ZsYWdzJ10sDQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqAgJyp1bmtub3duLWZsYWdzJzogJ3Vp
-bnQzMicgfSB9DQo+DQo+IEhlcmUsIHlvdSBzYWlkIGZsYWdzIHdpbGwgYWx3YXlzIGJlIHByZXNl
-bnQsIGV2ZW4gaWYgaXQgaXMgYSAwLWxlbmd0aCANCj4gYXJyYXkuIERpZCB5b3UgdGVzdCB0aGUg
-Y2FzZSB3aGVyZSBhbiBvbi1kaXNrIGJpdG1hcCBoYXMgbmVpdGhlciANCj4gJ2luLXVzZScgbm9y
-ICdhdXRvJyBzZXQgKHdoZXJlIGdldF9iaXRtYXBfaW5mb19mbGFncygpIHJldHVybnMgTlVMTCkg
-DQo+IHRvIGVuc3VyZSB0aGF0IGl0IGluZGVlZCByZXN1bHRzIGluIGEgMC1sZW5ndGggcmVwbHkg
-YW5kIG5vdCBhIGNyYXNoPw0KSW4gY2FzZSBvZiBubyBmbGFnLCB0aGUgb3V0cHV0IGZvciBhIGJp
-dG1hcCBsb29rcyBsaWtlIHRoaXM6DQoNCmltYWdlOiAvdnovdm1wcml2YXRlL1ZNMS9oYXJkZGlz
-ay5oZGQNCmZpbGUgZm9ybWF0OiBxY293Mg0KdmlydHVhbCBzaXplOiA2NEcgKDY4NzE5NDc2NzM2
-IGJ5dGVzKQ0KZGlzayBzaXplOiAzLjBNDQpjbHVzdGVyX3NpemU6IDEwNDg1NzYNCkZvcm1hdCBz
-cGVjaWZpYyBpbmZvcm1hdGlvbjoNCiDCoMKgwqAgY29tcGF0OiAxLjENCiDCoMKgwqAgbGF6eSBy
-ZWZjb3VudHM6IHRydWUNCiDCoMKgwqAgYml0bWFwczoNCiDCoMKgwqDCoMKgwqDCoCBbMF06DQog
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBmbGFnczoNCiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIG5h
-bWU6IHgNCiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGdyYW51bGFyaXR5OiA2NTUzNg0KIMKgwqDC
-oCByZWZjb3VudCBiaXRzOiAxNg0KIMKgwqDCoCBjb3JydXB0OiBmYWxzZQ0KDQpUaGUgb3V0cHV0
-IGZvcm1hdCBpcyBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBiYXNlZCBvbiB0aGUganNvbiBzeW50
-YXguDQpObyBjcmFzaCBoYXBwZW5lZC4NCj4NCj4gT3RoZXJ3aXNlLCBpdCdzIGxvb2tpbmcgZmFp
-cmx5IGdvb2QuDQo+DQoNCktpbmRseSwNCg0KQW5kcmV5IFNoaW5rZXZpY2gNCg0K
+On Thu, Dec 06, 2018 at 10:06:18AM +0000, Daniel P. Berrang=E9 wrote:
+> On Wed, Dec 05, 2018 at 02:24:32PM -0600, Michael Roth wrote:
+> > Quoting Daniel P. Berrang=E9 (2018-12-05 11:18:18)
+> > > On Thu, Oct 25, 2018 at 05:06:29PM +0300, Sameeh Jubran wrote:
+> > > > From: Sameeh Jubran <sjubran@redhat.com>
+> > > >=20
+> > > > Hi all,
+> > > >=20
+> > > > Background:
+> > > >=20
+> > > > There has been a few attempts to implement the standby feature for =
+vfio
+> > > > assigned devices which aims to enable the migration of such devices=
+. This
+> > > > is another attempt.
+> > > >=20
+> > > > The series implements an infrastructure for hiding devices from the=
+ bus
+> > > > upon boot. What it does is the following:
+> > > >=20
+> > > > * In the first patch the infrastructure for hiding the device is ad=
+ded
+> > > >   for the qbus and qdev APIs. A "hidden" boolean is added to the de=
+vice
+> > > >   state and it is set based on a callback to the standby device whi=
+ch
+> > > >   registers itself for handling the assessment: "should the primary=
+ device
+> > > >   be hidden?" by cross validating the ids of the devices.
+> > > >=20
+> > > > * In the second patch the virtio-net uses the API to hide the vfio
+> > > >   device and unhides it when the feature is acked.
+> > >=20
+> > > IIUC, the general idea is that we want to provide a pair of associate=
+d NIC
+> > > devices to the guest, one emulated, one physical PCI device. The gues=
+t would
+> > > put them in a bonded pair. Before migration the PCI device is unplugg=
+ed & a
+> > > new PCI device plugged on target after migration. The guest traffic c=
+ontinues
+> > > without interuption due to the emulate device.
+> > >=20
+> > > This kind of conceptual approach can already be implemented today by =
+management
+> > > apps. The only hard problem that exists today is how the guest OS can=
+ figure
+> > > out that a particular pair of devices it has are intended to be used =
+together.=20
+> > >=20
+> > > With this series, IIUC, the virtio-net device is getting a given prop=
+erty which
+> > > defines the qdev ID of the associated VFIO device. When the guest OS =
+activates
+> > > the virtio-net device and acknowledges the STANDBY feature bit, qdev =
+then
+> > > unhides the associated VFIO device.
+> > >=20
+> > > AFAICT the guest has to infer that the device which suddenly appears =
+is the one
+> > > associated with the virtio-net device it just initialized, for purpos=
+es of
+> > > setting up the NIC bonding. There doesn't appear to be any explicit a=
+ssocation
+> > > between the devices exposed to the guest.
+> > >=20
+> > > This feels pretty fragile for a guest needing to match up devices whe=
+n there
+> > > are many pairs of devices exposed to a single guest.
+> >=20
+> > The impression I get from linux.git:Documentation/networking/net_failov=
+er.rst=20
+> > is that the matching is done based on the primary/standby NICs having
+> > the same MAC address. In theory you pass both to a guest and based on
+> > MAC it essentially does automatic, and if you additionally add STANDBY
+> > it'll know to use a virtio-net device specifically for failover.
+> >=20
+> > None of this requires any sort of hiding/plugging of devices from
+> > QEMU/libvirt (except for the VFIO unplug we'd need to initiate live mig=
+ration
+> > and the VFIO hotplug on the other end to switch back over).
+> >=20
+> > That simplifies things greatly, but also introduces the problem of how
+> > an older guest will handle seeing 2 NICs with the same MAC, which IIUC
+> > is why this series is looking at hotplugging the VFIO device only after
+> > we confirm STANDBY is supported by the virtio-net device, and why it's
+> > being done transparent to management.
+> >
+> > >=20
+> > > Unless I'm mis-reading the patches, it looks like the VFIO device alw=
+ays has
+> > > to be available at the time QEMU is started. There's no way to boot a=
+ guest
+> > > and then later hotplug a VFIO device to accelerate the existing virti=
+o-net NIC.
+> > > Or similarly after migration there might not be any VFIO device avail=
+able
+> > > initially when QEMU is started to accept the incoming migration. So i=
+t might
+> > > need to run in degraded mode for an extended period of time until one=
+ becomes
+> > > available for hotplugging. The use of qdev IDs makes this troublesome=
+, as the
+> > > qdev ID of the future VFIO device would need to be decided upfront be=
+fore it
+> > > even exists.
+> >=20
+> > >=20
+> > > So overall I'm not really a fan of the dynamic hiding/unhiding of dev=
+ices. I
+> > > would much prefer to see some way to expose an explicit relationship =
+between
+> > > the devices to the guest.
+> >=20
+> > If we place the burden of determining whether the guest supports STANDB=
+Y
+> > on the part of users/management, a lot of this complexity goes away. Fo=
+r
+> > instance, one possible implementation is to simply fail migration and s=
+ay
+> > "sorry your VFIO device is still there" if the VFIO device is still aro=
+und
+> > at the start of migration (whether due to unplug failure or a
+> > user/management forgetting to do it manually beforehand).
+> >=20
+> > So how important is it that setting F_STANDBY cap doesn't break older
+> > guests? If the idea is to support live migration with VFs then aren't
+> > we still dead in the water if the guest boots okay but doesn't have
+> > the requisite functionality to be migrated later? Shouldn't that all
+> > be sorted out as early as possible? Is a very clear QEMU error message
+> > in this case insufficient?
+> >=20
+> > And if backward compatibility is important, are there alternative
+> > approaches? Like maybe starting off with a dummy MAC and switching over
+> > to the duplicate MAC only after F_STANDBY is negotiated? In that case
+> > we could still warn users/management about it but still have the guest
+> > be otherwise functional.
+>=20
+> Relying on F_STANDBY negotiation to decide whether to activate the VFIO
+> device is a bad idea.  PCI devices are precious, so if the guest OS does
+> not support this standby feature, we must never add the VFIO device to
+> QEMU in the first place.
+
+But it can be a good idea if the upper layer can see the result of this
+negotiation and only grab the VFIO device and plug it in when it sees
+the guest acknowledge the support for it.
+
+There was an attempt to expose acknowledged virtio features in QMP/HMP
+about a year ago (purely for debugging back then); it can be resurrected
+and adapted for this purpose.
+
+> We have the libosinfo project which provides metadata on what features
+> different guest OS versions support. This can be used to indicate whether
+> a guest OS version supports the standby NIC concept and thus avoid needin=
+g
+> to allocate PCI devices to guests that will never use them.
+
+Not sure how reliable this is.
+
+> F_STANDBY is still useful as a flag to inform the guest OS that it should
+> pair up NICs with identical MACs, as opposed to configuring them separate=
+ly.
+> It shouldn't be used to show/hide the device though, we should simply nev=
+er
+> add the 2nd device if we know it won't be used by a given guest OS versio=
+n.
+
+Agreed.
+
+Roman.
