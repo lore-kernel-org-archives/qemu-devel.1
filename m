@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=87219212e=anthony.perard@citrix.com>)
-	id 1gVHis-00073k-1h
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 10:07:23 -0500
+	(envelope-from <berto@igalia.com>) id 1gVHlU-0002tA-Hm
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 10:10:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=87219212e=anthony.perard@citrix.com>)
-	id 1gVHim-0003pS-IU
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 10:07:22 -0500
-Date: Fri, 7 Dec 2018 15:07:06 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20181207150706.GG18875@perard.uk.xensource.com>
-References: <1544108924-10841-1-git-send-email-paul.durrant@citrix.com>
-	<1544108924-10841-5-git-send-email-paul.durrant@citrix.com>
+	(envelope-from <berto@igalia.com>) id 1gVHlQ-000678-Al
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 10:10:04 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20181203101429.88735-7-anton.nefedov@virtuozzo.com>
+References: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
+	<20181203101429.88735-7-anton.nefedov@virtuozzo.com>
+Date: Fri, 07 Dec 2018 16:09:48 +0100
+Message-ID: <w51h8fpv0eb.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1544108924-10841-5-git-send-email-paul.durrant@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH v2 04/18] xen: create xenstore areas for
- XenDevice-s
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v10 6/9] file-posix: support
+ BDRV_REQ_ALLOCATE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,34 +23,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On Thu, Dec 06, 2018 at 03:08:30PM +0000, Paul Durrant wrote:
-> This patch adds a new source module, xen-bus-helper.c, which builds on
-> basic libxenstore primitives to provide functions to create (setting
-> permissions appropriately) and destroy xenstore areas, and functions to
-> 'printf' and 'scanf' nodes therein. The main xen-bus code then uses
-> these primitives [1] to initialize and destroy the frontend and backend
-> areas for a XenDevice during realize and unrealize respectively.
-> 
-> The 'xen-block' implementation is extended with a 'get_name' method that
-> returns the VBD number. This number is required to 'name' the xenstore
-> areas.
-> 
-> NOTE: An exit handler is also added to make sure the xenstore areas are
->       cleaned up if QEMU terminates without devices being unrealized.
-> 
-> [1] The 'scanf' functions are actually not yet needed, but they will be
->     needed by code delivered in subsequent patches.
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+On Mon 03 Dec 2018 11:14:58 AM CET, Anton Nefedov wrote:
+> Current write_zeroes implementation is good enough to satisfy this flag too
+>
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-Looks good,
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
-
-Thanks,
-
--- 
-Anthony PERARD
+Berto
