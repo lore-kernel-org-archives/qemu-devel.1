@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gVDUv-0007xo-Qm
+	(envelope-from <richard.henderson@linaro.org>) id 1gVDUv-0007xm-Pw
 	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:36:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gVDUs-0007BN-If
+	(envelope-from <richard.henderson@linaro.org>) id 1gVDUu-0007DG-Gc
 	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:36:41 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:37100)
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:40167)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gVDUs-0007AZ-4c
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:36:38 -0500
-Received: by mail-oi1-x244.google.com with SMTP id y23so3000315oia.4
-	for <qemu-devel@nongnu.org>; Fri, 07 Dec 2018 02:36:37 -0800 (PST)
+	id 1gVDUu-0007Cr-Bi
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:36:40 -0500
+Received: by mail-oi1-x241.google.com with SMTP id t204so2988754oie.7
+	for <qemu-devel@nongnu.org>; Fri, 07 Dec 2018 02:36:40 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  7 Dec 2018 04:36:05 -0600
-Message-Id: <20181207103631.28193-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 00/26] target/arm: Implement ARMv8.3-PAuth
+Date: Fri,  7 Dec 2018 04:36:07 -0600
+Message-Id: <20181207103631.28193-3-richard.henderson@linaro.org>
+In-Reply-To: <20181207103631.28193-1-richard.henderson@linaro.org>
+References: <20181207103631.28193-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 02/26] target/arm: Add SCTLR bits through
+ ARMv8.5
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,114 +30,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, ramana.radhakrishnan@arm.com
 
-This has survivied a small user-only smoke test.
+Post v8.4 bits taken from SysReg_v85_xml-00bet8.
 
-I need to build a kernel with the right patches in order to both
-test this in system mode as well as verify the hashes that I am
-producing vs ARM Fast Model.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/cpu.h | 40 +++++++++++++++++++++++++++++-----------
+ 1 file changed, 29 insertions(+), 11 deletions(-)
 
-However,
-
-$ aarch64-linux-gcc-8.0.1 -msign-return-address=all z.c
-$ ./aarch64-linux-user/qemu-aarch64 -D z -d in_asm,op,cpu -singlestep ./a.out 
-Hello, World!
-
-IN: main
-0x004005a4:  d503233f  hint     #0x19
-
-OP:
- ld_i32 tmp0,env,$0xffffffffffffffe4
- movi_i32 tmp1,$0x0
- brcond_i32 tmp0,tmp1,lt,$L0
-
- ---- 00000000004005a4 0000000000000000 0000000000000000
- call pacia,$0x20,$1,lr,env,lr,sp
- goto_tb $0x1
- movi_i64 pc,$0x4005a8
- exit_tb $0x5608e569e281
- set_label $L0
- exit_tb $0x5608e569e283
-
-- X29=00000040007ff4a0 X30=00000040008778a4  SP=00000040007ff4a0
-+ X29=00000040007ff4a0 X30=c0270040008778a4  SP=00000040007ff4a0
-
-IN: main
-0x004005c4:  d50323bf  hint     #0x1d
-
-OP:
- ld_i32 tmp0,env,$0xffffffffffffffe4
- movi_i32 tmp1,$0x0
- brcond_i32 tmp0,tmp1,lt,$L0
-
- ---- 00000000004005c4 0000000000000000 0000000000000000
- call autia,$0x20,$1,lr,env,lr,sp
- goto_tb $0x1
- movi_i64 pc,$0x4005c8
- exit_tb $0x5608e5706241
- set_label $L0
- exit_tb $0x5608e5706243
-
-- X29=00000040007ff4a0 X30=c0270040008778a4  SP=00000040007ff4a0
-+ X29=00000040007ff4a0 X30=00000040008778a4  SP=00000040007ff4a0
-
-So, yay!  We sign something with high bits set and can get
-back the original pointer.  Note that this is with key==0,
-as I do not yet initialize AutKeyIA to anything, as the
-real kernel would for a given thread.
-
-This is based on my v3 ARMv8.1-LOR patches, which in turn
-are based on Peter's target-arm.next.  The full tree is
-available at
-
-  https://github.com/rth7680/qemu.git tgt-arm-pauth
-
-and this version is tagged tgt-arm-pauth-hello-world.  ;-)
-
-
-r~
-
-
-Richard Henderson (26):
-  target/arm: Add state for the ARMv8.3-PAuth extension
-  target/arm: Add SCTLR bits through ARMv8.5
-  target/arm: Add PAuth active bit to tbflags
-  target/arm: Add PAuth helpers
-  target/arm: Decode PAuth within system hint space
-  target/arm: Rearrange decode in disas_data_proc_1src
-  target/arm: Decode PAuth within disas_data_proc_1src
-  target/arm: Decode PAuth within disas_data_proc_2src
-  target/arm: Move helper_exception_return to helper-a64.c
-  target/arm: Add new_pc argument to helper_exception_return
-  target/arm: Rearrange decode in disas_uncond_b_reg
-  target/arm: Decode PAuth within disas_uncond_b_reg
-  target/arm: Decode Load/store register (pac)
-  target/arm: Move cpu_mmu_index out of line
-  target/arm: Introduce arm_mmu_idx
-  target/arm: Create ARMVAParameters and helpers
-  target/arm: Reuse aa64_va_parameters for setting tbflags
-  target/arm: Export aa64_va_parameters to internals.h
-  target/arm: Implement pauth_strip
-  target/arm: Implement pauth_auth
-  target/arm: Implement pauth_addpac
-  target/arm: Implement pauth_computepac
-  target/arm: Add PAuth system registers
-  target/arm: Enable PAuth for user-only -cpu max
-  target/arm: Enable PAuth for user-only, part 2
-  target/arm: Tidy TBI handling in gen_a64_set_pc
-
- target/arm/cpu.h           | 151 ++++-----
- target/arm/helper-a64.h    |  14 +
- target/arm/helper.h        |   1 -
- target/arm/internals.h     |  35 ++
- target/arm/translate.h     |   2 +
- target/arm/cpu.c           |   6 +
- target/arm/cpu64.c         |   4 +
- target/arm/helper-a64.c    | 631 +++++++++++++++++++++++++++++++++++++
- target/arm/helper.c        | 459 ++++++++++++++++-----------
- target/arm/machine.c       |  23 ++
- target/arm/op_helper.c     | 155 ---------
- target/arm/translate-a64.c | 531 ++++++++++++++++++++++++++-----
- 12 files changed, 1519 insertions(+), 493 deletions(-)
-
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 0766e32a1b..80d65866c6 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -984,12 +984,14 @@ void pmccntr_sync(CPUARMState *env);
+ #define SCTLR_A       (1U << 1)
+ #define SCTLR_C       (1U << 2)
+ #define SCTLR_W       (1U << 3) /* up to v6; RAO in v7 */
+-#define SCTLR_SA      (1U << 3)
++#define SCTLR_nTLSMD_32 (1U << 3) /* v8.2-LSMAOC, AArch32 only */
+ #define SCTLR_P       (1U << 4) /* up to v5; RAO in v6 and v7 */
++#define SCTLR_LSMAOE_32 (1U << 4) /* v8.2-LSMAOC, AArch32 only */
+ #define SCTLR_SA0     (1U << 4) /* v8 onward, AArch64 only */
+ #define SCTLR_D       (1U << 5) /* up to v5; RAO in v6 */
+ #define SCTLR_CP15BEN (1U << 5) /* v7 onward */
+ #define SCTLR_L       (1U << 6) /* up to v5; RAO in v6 and v7; RAZ in v8 */
++#define SCTLR_nAA     (1U << 6) /* when v8.4-LSE is implemented */
+ #define SCTLR_B       (1U << 7) /* up to v6; RAZ in v7 */
+ #define SCTLR_ITD     (1U << 7) /* v8 onward */
+ #define SCTLR_S       (1U << 8) /* up to v6; RAZ in v7 */
+@@ -997,35 +999,51 @@ void pmccntr_sync(CPUARMState *env);
+ #define SCTLR_R       (1U << 9) /* up to v6; RAZ in v7 */
+ #define SCTLR_UMA     (1U << 9) /* v8 onward, AArch64 only */
+ #define SCTLR_F       (1U << 10) /* up to v6 */
+-#define SCTLR_SW      (1U << 10) /* v7 onward */
+-#define SCTLR_Z       (1U << 11)
++#define SCTLR_SW      (1U << 10) /* v7, RES0 in v8 */
++#define SCTLR_Z       (1U << 11) /* in v7, RES1 in v8 */
+ #define SCTLR_I       (1U << 12)
+-#define SCTLR_V       (1U << 13)
++#define SCTLR_V       (1U << 13) /* AArch32 only */
++#define SCTLR_EnDB    (1U << 13) /* v8.3, AArch64 only */
+ #define SCTLR_RR      (1U << 14) /* up to v7 */
+ #define SCTLR_DZE     (1U << 14) /* v8 onward, AArch64 only */
+ #define SCTLR_L4      (1U << 15) /* up to v6; RAZ in v7 */
+ #define SCTLR_UCT     (1U << 15) /* v8 onward, AArch64 only */
+ #define SCTLR_DT      (1U << 16) /* up to ??, RAO in v6 and v7 */
+ #define SCTLR_nTWI    (1U << 16) /* v8 onward */
+-#define SCTLR_HA      (1U << 17)
++#define SCTLR_HA      (1U << 17) /* up to v7, RES0 in v8 */
+ #define SCTLR_BR      (1U << 17) /* PMSA only */
+ #define SCTLR_IT      (1U << 18) /* up to ??, RAO in v6 and v7 */
+ #define SCTLR_nTWE    (1U << 18) /* v8 onward */
+ #define SCTLR_WXN     (1U << 19)
+ #define SCTLR_ST      (1U << 20) /* up to ??, RAZ in v6 */
+-#define SCTLR_UWXN    (1U << 20) /* v7 onward */
+-#define SCTLR_FI      (1U << 21)
+-#define SCTLR_U       (1U << 22)
++#define SCTLR_UWXN    (1U << 20) /* v7 onward, AArch32 only */
++#define SCTLR_FI      (1U << 21) /* up to v7, v8 RES0 */
++#define SCTLR_IESB    (1U << 21) /* v8.2-IESB, AArch64 only */
++#define SCTLR_U       (1U << 22) /* up to ??, v8 RES1 */
+ #define SCTLR_XP      (1U << 23) /* up to v6; v7 onward RAO */
++#define SCTLR_SPAN    (1U << 23) /* v8.1-PAN */
+ #define SCTLR_VE      (1U << 24) /* up to v7 */
+ #define SCTLR_E0E     (1U << 24) /* v8 onward, AArch64 only */
+ #define SCTLR_EE      (1U << 25)
+ #define SCTLR_L2      (1U << 26) /* up to v6, RAZ in v7 */
+ #define SCTLR_UCI     (1U << 26) /* v8 onward, AArch64 only */
+ #define SCTLR_NMFI    (1U << 27)
+-#define SCTLR_TRE     (1U << 28)
+-#define SCTLR_AFE     (1U << 29)
+-#define SCTLR_TE      (1U << 30)
++#define SCTLR_EnDA    (1U << 27) /* v8.3, AArch64 only */
++#define SCTLR_TRE     (1U << 28) /* AArch32 only */
++#define SCTLR_nTLSMD_64 (1U << 28) /* v8.2-LSMAOC, AArch64 only */
++#define SCTLR_AFE     (1U << 29) /* AArch32 only */
++#define SCTLR_LSMAOE_64 (1U << 29) /* v8.2-LSMAOC, AArch64 only */
++#define SCTLR_TE      (1U << 30) /* AArch32 only */
++#define SCTLR_EnIB    (1U << 30) /* v8.3, AArch64 only */
++#define SCTLR_EnIA    (1U << 31) /* v8.3, AArch64 only */
++#define SCTLR_BT0     (1ULL << 35) /* v8.5-BTI */
++#define SCTLR_BT1     (1ULL << 36) /* v8.5-BTI */
++#define SCTLR_ITFSB   (1ULL << 37) /* v8.5-MemTag */
++#define SCTLR_TCF0    (3ULL << 38) /* v8.5-MemTag */
++#define SCTLR_TCF     (3ULL << 40) /* v8.5-MemTag */
++#define SCTLR_ATA0    (1ULL << 42) /* v8.5-MemTag */
++#define SCTLR_ATA     (1ULL << 43) /* v8.5-MemTag */
++#define SCTLR_DSSBS   (1ULL << 44) /* v8.5 */
+ 
+ #define CPTR_TCPAC    (1U << 31)
+ #define CPTR_TTA      (1U << 20)
 -- 
 2.17.2
