@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gVIzU-0005Of-SE
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:28:37 -0500
+	(envelope-from <eblake@redhat.com>) id 1gVIzv-0005sJ-Ca
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:29:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gVIzR-000142-Hw
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:28:36 -0500
-Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:46584)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gVIzR-00012b-9C
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:28:33 -0500
-Received: by mail-ot1-x32e.google.com with SMTP id w25so4265943otm.13
-	for <qemu-devel@nongnu.org>; Fri, 07 Dec 2018 08:28:33 -0800 (PST)
-References: <1543937577-28256-1-git-send-email-thuth@redhat.com>
-	<1543937577-28256-6-git-send-email-thuth@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <1c526f15-7e97-bf9d-87ee-dc9cd7b77ec0@linaro.org>
-Date: Fri, 7 Dec 2018 10:28:29 -0600
+	(envelope-from <eblake@redhat.com>) id 1gVIzt-0002dW-Jm
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:29:03 -0500
+References: <20181206192544.3987-1-jsnow@redhat.com>
+	<20181206192544.3987-4-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <99292902-c7bd-7f1f-0a5d-72894c83dd93@redhat.com>
+Date: Fri, 7 Dec 2018 10:28:51 -0600
 MIME-Version: 1.0
-In-Reply-To: <1543937577-28256-6-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20181206192544.3987-4-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v2 5/7] audio/alsaaudio: Remove
- compiler check around pragma
+Subject: Re: [Qemu-devel] [PATCH 3/3] block: remove 'x' prefix from
+ experimental bitmap APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,19 +25,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, vsementov@virtuozzo.com, Max Reitz <mreitz@redhat.com>
 
-On 12/4/18 9:32 AM, Thomas Huth wrote:
-> Both GCC v4.8 and Clang v3.4 support the -Waddress option, so we do
-> not need the compiler version check here anymore.
+On 12/6/18 1:25 PM, John Snow wrote:
+> The 'x' prefix was added because we were uncertain of the direction we'd
+> take for the libvirt API. With the general approach solidified, I feel
+> comfortable committing to this API for 4.0.
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  audio/alsaaudio.c | 2 --
->  1 file changed, 2 deletions(-)
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> +++ b/tests/qemu-iotests/223
+> @@ -112,9 +112,9 @@ _send_qemu_cmd $QEMU_HANDLE '{"execute":"qmp_capabilities"}' "return"
+>   _send_qemu_cmd $QEMU_HANDLE '{"execute":"blockdev-add",
+>     "arguments":{"driver":"qcow2", "node-name":"n",
+>       "file":{"driver":"file", "filename":"'"$TEST_IMG"'"}}}' "return"
+> -_send_qemu_cmd $QEMU_HANDLE '{"execute":"x-block-dirty-bitmap-disable",
+> +_send_qemu_cmd $QEMU_HANDLE '{"execute":"block-dirty-bitmap-disable",
+>     "arguments":{"node":"n", "name":"b"}}' "return"
+> -_send_qemu_cmd $QEMU_HANDLE '{"execute":"x-block-dirty-bitmap-disable",
+> +_send_qemu_cmd $QEMU_HANDLE '{"execute":"block-dirty-bitmap-disable",
+>     "arguments":{"node":"n", "name":"b2"}}' "return"
+>   _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-start",
+>     "arguments":{"addr":{"type":"unix",
 
+No iotests coverage of block-dirty-bitmap-merge.  We should fix that as 
+part of this series; separate patch is fine.
 
-r~
+I'm glad you remembered to renumber all the 'since' tags to 4.0 (as the 
+new spelling is indeed new to 4.0, not when we introduced the older x- 
+variant).
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
