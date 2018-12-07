@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gVFSn-0004ul-6h
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 07:42:38 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gVFYZ-0001RG-6d
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 07:48:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gVFSj-0004Ua-67
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 07:42:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35774)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gVFSi-0004UG-SF
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 07:42:33 -0500
-References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
-	<1543851204-41186-20-git-send-email-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d412f01a-2b40-8ecd-b2f1-53119b9e7ce0@redhat.com>
-Date: Fri, 7 Dec 2018 13:42:28 +0100
-MIME-Version: 1.0
-In-Reply-To: <1543851204-41186-20-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gVFYY-0005VN-0z
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 07:48:35 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 7 Dec 2018 12:48:24 +0000
+Message-ID: <1827042e-ddf6-47cd-52b3-403e37c7fa1f@virtuozzo.com>
+References: <20181130220344.3350618-1-eblake@redhat.com>
+	<20181130220344.3350618-14-eblake@redhat.com>
+In-Reply-To: <20181130220344.3350618-14-eblake@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 19/71] tests: qgraph API for the qtest
- driver framework
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <1B32CB4A58D8734C81B28628DB2128B2@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 13/14] qemu-nbd: Add --list option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +25,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <laurent@vivier.eu>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-On 2018-12-03 16:32, Paolo Bonzini wrote:
-> From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-> 
-> Add qgraph API that allows to add/remove nodes and edges from the graph,
-> implementation of Depth First Search to discover the paths and basic unit
-> test to check correctness of the API.
-> Included also a main executable that takes care of starting the framework,
-> create the nodes, set the available drivers/machines, discover the path and
-> run tests.
-> 
-> graph.h provides the public API to manage the graph nodes/edges
-> graph_extra.h provides a more private API used successively by the gtest integration part
-> qos-test.c provides the main executable
-> 
-> Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-> [Paolo's changes compared to the Google Summer of Code submission:
->  * added subprocess to test options
->  * refactored object creation to support live migration tests
->  * removed driver .before callback (unused)
->  * removed test .after callbacks (replaced by GTest destruction queue)]
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
-[...]
-> diff --git a/tests/libqos/qgraph.c b/tests/libqos/qgraph.c
-> new file mode 100644
-> index 0000000..03783f5
-> --- /dev/null
-> +++ b/tests/libqos/qgraph.c
-> @@ -0,0 +1,760 @@
-> +/*
-> + * libqos driver framework
-> + *
-> + * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License version 2 as published by the Free Software Foundation.
-
-The license statement is inaccurate. There is no "GNU *Lesser* General
-Public License version *2*" ... so I'm assuming you wanted to use one of
-these two options:
-
-- GNU Library General Public License, version 2.0
-- GNU Lesser General Public License, version 2.1
-
-I assume you wanted to use the latter, so please replace the "2" with
-"2.1" in all license statements here.
-
- Thomas
+MDEuMTIuMjAxOCAxOjAzLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBXZSB3YW50IHRvIGJlIGFibGUg
+dG8gZGV0ZWN0IHdoZXRoZXIgYSBnaXZlbiBxZW11IE5CRCBzZXJ2ZXIgaXMNCj4gZXhwb3Npbmcg
+dGhlIHJpZ2h0IGV4cG9ydChzKSBhbmQgZGlydHkgYml0bWFwcywgYXQgbGVhc3QgZm9yDQo+IHJl
+Z3Jlc3Npb24gdGVzdGluZy4gIFdlIGNvdWxkIHVzZSAnbmJkLWNsaWVudCAtbCcgZnJvbSB0aGUg
+dXBzdHJlYW0NCj4gTkJEIHByb2plY3QgdG8gbGlzdCBleHBvcnRzLCBidXQgaXQncyBhbm5veWlu
+ZyB0byByZWx5IG9uDQo+IG91dC1vZi10cmVlIGJpbmFyaWVzOyBmdXJ0aGVybW9yZSwgbmJkLWNs
+aWVudCBkb2Vzbid0IG5lY2Vzc2FyaWx5DQo+IGtub3cgYWJvdXQgYWxsIG9mIHRoZSBxZW11IE5C
+RCBleHRlbnNpb25zLiAgVGh1cywgd2UgcGxhbiBvbiBhZGRpbmcNCg0KaGEsIGluIHRoaXMgcGF0
+Y2gsIG5vdCBwbGFuIGJ1dCBhZGQ6KQ0KDQo+IGEgbmV3IG1vZGUgdG8gcWVtdS1uYmQgdGhhdCBt
+ZXJlbHkgc25pZmZzIGFsbCBwb3NzaWJsZSBpbmZvcm1hdGlvbg0KPiBmcm9tIHRoZSBzZXJ2ZXIg
+ZHVyaW5nIGhhbmRzaGFrZSBwaGFzZSwgdGhlbiBkaXNjb25uZWN0cyBhbmQgZHVtcHMNCj4gdGhl
+IGluZm9ybWF0aW9uLg0KPiANCj4gVGhpcyBwYXRjaCBhY3R1YWxseSBpbXBsZW1lbnRzIC0tbGlz
+dC8tTCwgd2hpbGUgcmV1c2luZyBvdGhlcg0KPiBvcHRpb25zIHN1Y2ggYXMgLS10bHMtY3JlZHMg
+Zm9yIG5vdyBkZXNpZ25hdGluZyBob3cgdG8gY29ubmVjdA0KPiBhcyB0aGUgY2xpZW50IChyYXRo
+ZXIgdGhhbiB0aGVpciBub24tbGlzdCB1c2FnZSBvZiBob3cgdG8gb3BlcmF0ZQ0KPiBhcyB0aGUg
+c2VydmVyKS4NCj4gDQo+IEkgZGViYXRlZCBhYm91dCBhZGRpbmcgdGhpcyBmdW5jdGlvbmFsaXR5
+IHRvIHNvbWV0aGluZyBha2luIHRvDQo+ICdxZW11LWltZyBpbmZvJyAtIGJ1dCB0aGF0IHRvb2wg
+ZG9lcyBub3QgcmVhZGlseSBsZW5kIGl0c2VsZg0KPiB0byBjb25uZWN0aW5nIHRvIGFuIGFyYml0
+cmFyeSBOQkQgc2VydmVyIHdpdGhvdXQgYWxzbyB0eWluZyB0bw0KPiBhIHNwZWNpZmljIGV4cG9y
+dCAoSSBtYXksIGhvd2V2ZXIsIHN0aWxsIGFkZCBJbWFnZUluZm9TcGVjaWZpY05CRA0KPiBmb3Ig
+cmVwb3J0aW5nIHRoZSBiaXRtYXBzIGF2YWlsYWJsZSB3aGVuIGNvbm5lY3RpbmcgdG8gYSBzaW5n
+bGUNCj4gZXhwb3J0KS4gIEFuZCwgd2hpbGUgaXQgbWF5IGZlZWwgYSBiaXQgb2RkIHRoYXQgbm9y
+bWFsbHkNCj4gcWVtdS1uYmQgaXMgYSBzZXJ2ZXIgYnV0ICdxZW11LW5iZCAtTCcgaXMgYSBjbGll
+bnQsIHdlIGFyZSBub3QNCj4gcmVhbGx5IG1ha2luZyB0aGUgcWVtdS1uYmQgYmluYXJ5IHRoYXQg
+bXVjaCBsYXJnZXIsIGJlY2F1c2UNCj4gJ3FlbXUtbmJkIC1jJyBoYXMgdG8gb3BlcmF0ZSBhcyBi
+b3RoIHNlcnZlciBhbmQgY2xpZW50DQo+IHNpbXVsdGFuZW91c2x5IGFjcm9zcyB0d28gdGhyZWFk
+cyB3aGVuIGZlZWRpbmcgdGhlIGtlcm5lbCBtb2R1bGUNCj4gZm9yIC9kZXYvbmJkTiBhY2Nlc3Mu
+DQo+IA0KPiBTYW1wbGUgb3V0cHV0Og0KPiAkIHFlbXUtbmJkIC1MDQo+IGV4cG9ydHMgYXZhaWxh
+YmxlOiAxDQo+ICAgZXhwb3J0OiAnJw0KPiAgICBzaXplOiAgNjU1MzYNCj4gICAgZmxhZ3M6IDB4
+NGVkICggZmx1c2ggZnVhIHRyaW0gemVyb2VzIGRmIGNhY2hlICkNCj4gICAgbWluIGJsb2NrOiA1
+MTINCj4gICAgb3B0IGJsb2NrOiA0MDk2DQo+ICAgIG1heCBibG9jazogMzM1NTQ0MzINCj4gICAg
+YXZhaWxhYmxlIG1ldGEgY29udGV4dHM6IDENCj4gICAgIGJhc2U6YWxsb2NhdGlvbg0KDQpkb24n
+dCB5b3UgcGxhbiB0byBiaW5kIHRoaXMgYWxsIHRvIFFBUEkgYW5kIGV4cG9zZSBpbiBqc29uPw0K
+DQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0LmNvbT4NCj4g
+LS0tDQo+ICAgcWVtdS1uYmQuYyB8IDE1MyArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKystLS0tLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAxNDEgaW5zZXJ0aW9u
+cygrKSwgMTIgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvcWVtdS1uYmQuYyBiL3Fl
+bXUtbmJkLmMNCj4gaW5kZXggYzU3MDUzYTA3OTUuLmUxOWE4NDFiODY5IDEwMDY0NA0KPiAtLS0g
+YS9xZW11LW5iZC5jDQo+ICsrKyBiL3FlbXUtbmJkLmMNCj4gQEAgLTc2LDYgKzc2LDcgQEAgc3Rh
+dGljIHZvaWQgdXNhZ2UoY29uc3QgY2hhciAqbmFtZSkNCj4gICB7DQo+ICAgICAgIChwcmludGYp
+ICgNCj4gICAiVXNhZ2U6ICVzIFtPUFRJT05TXSBGSUxFXG4iDQo+ICsiICBvcjogICVzIC1MIFtP
+UFRJT05TXVxuIg0KPiAgICJRRU1VIERpc2sgTmV0d29yayBCbG9jayBEZXZpY2UgU2VydmVyXG4i
+DQoNCkRvIGFueW9uZSBrbm93LCB3aHkgdGh1bmRlcmJpcmQgYWRkIGFkZGl0aW9uYWwgc3BhY2Ug
+dG8gdGhlIGxpbmVzIHN0YXJ0ZWQgZnJvbSBzcGFjZSB3aGVuIHF1b3RpbmcsDQp3aGljaCBicmVh
+a3MgaW5kZW50YXRpb24gaW4gcXVvdGVkIHBhdGNoZXM/IEhvdyB0byBmaXggaXQ/IEkgdXNlIHBs
+YWluIHRleHQuDQoNCj4gICAiXG4iDQo+ICAgIiAgLWgsIC0taGVscCAgICAgICAgICAgICAgICBk
+aXNwbGF5IHRoaXMgaGVscCBhbmQgZXhpdFxuIg0KPiBAQCAtOTcsNiArOTgsNyBAQCBzdGF0aWMg
+dm9pZCB1c2FnZShjb25zdCBjaGFyICpuYW1lKQ0KPiAgICIgIC1QLCAtLXBhcnRpdGlvbj1OVU0g
+ICAgICAgb25seSBleHBvc2UgcGFydGl0aW9uIE5VTVxuIg0KPiAgICJcbiINCj4gICAiR2VuZXJh
+bCBwdXJwb3NlIG9wdGlvbnM6XG4iDQo+ICsiICAtTCwgLS1saXN0ICAgICAgICAgICAgICAgIGxp
+c3QgTkJEIGV4cG9ydHMgdmlzaWJsZSB0byBjbGllbnRcbiINCg0KaG0uIEkgdGhpbmssIHVzZXIg
+d2hvIHRoaW5ncyB0aGF0IHFlbXUtbmJkIGlzIG9ubHkgYSBzZXJ2ZXIsIGNhbiB1bmRlcnN0YW5k
+IHRoaXMgYXMNCiJkcnkgcnVuLCBkb24ndCBhY3R1YWxseSBzdGFydCB0aGUgc2VydmVyLCBidXQg
+b25seSBsaXN0IGV4cG9ydHMsIHdoaWNoIHdpbGwgYmUNCmF2YWlsYWJsZSB0byBjbGllbnRzLCBr
+ZWVwaW5nIGluIG1pbmQgYWxsIG90aGVyIHNwZWNpZmllZCBvcHRpb25zIi4NCg0Kc28sIG1heSBi
+ZSwgImxpc3QgcmVtb3RlIE5CRCBzZXJ2ZXIgZXhwb3J0cyBhbmQgb3B0aW9ucyIgb3Igc29tZXRo
+aW5nIGxpa2UgdGhpcz8NCg0KPiAgICIgIC0tb2JqZWN0IHR5cGUsaWQ9SUQsLi4uICAgZGVmaW5l
+IGFuIG9iamVjdCBzdWNoIGFzICdzZWNyZXQnIGZvciBwcm92aWRpbmdcbiINCj4gICAiICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIHBhc3N3b3JkcyBhbmQvb3IgZW5jcnlwdGlvbiBrZXlzXG4i
+DQo+ICAgIiAgLS10bHMtY3JlZHM9SUQgICAgICAgICAgICB1c2UgaWQgb2YgYW4gZWFybGllciAt
+LW9iamVjdCB0byBwcm92aWRlIFRMU1xuIg0KPiBAQCAtMTMwLDcgKzEzMiw3IEBAIHN0YXRpYyB2
+b2lkIHVzYWdlKGNvbnN0IGNoYXIgKm5hbWUpDQo+ICAgIiAgICAgIC0taW1hZ2Utb3B0cyAgICAg
+ICAgICB0cmVhdCBGSUxFIGFzIGEgZnVsbCBzZXQgb2YgaW1hZ2Ugb3B0aW9uc1xuIg0KPiAgICJc
+biINCj4gICBRRU1VX0hFTFBfQk9UVE9NICJcbiINCj4gLSAgICAsIG5hbWUsIE5CRF9ERUZBVUxU
+X1BPUlQsICJERVZJQ0UiKTsNCj4gKyAgICAsIG5hbWUsIG5hbWUsIE5CRF9ERUZBVUxUX1BPUlQs
+ICJERVZJQ0UiKTsNCj4gICB9DQo+IA0KPiAgIHN0YXRpYyB2b2lkIHZlcnNpb24oY29uc3QgY2hh
+ciAqbmFtZSkNCj4gQEAgLTI0Miw2ICsyNDQsOTIgQEAgc3RhdGljIHZvaWQgdGVybXNpZ19oYW5k
+bGVyKGludCBzaWdudW0pDQo+ICAgfQ0KPiANCj4gDQo+ICtzdGF0aWMgaW50IHFlbXVfbmJkX2Ns
+aWVudF9saXN0KFNvY2tldEFkZHJlc3MgKnNhZGRyLCBRQ3J5cHRvVExTQ3JlZHMgKnRscywNCj4g
+KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY29uc3QgY2hhciAqaG9zdG5hbWUpDQo+
+ICt7DQo+ICsgICAgaW50IHJldCA9IEVYSVRfRkFJTFVSRTsNCj4gKyAgICBpbnQgcmM7DQo+ICsg
+ICAgRXJyb3IgKmVyciA9IE5VTEw7DQo+ICsgICAgUUlPQ2hhbm5lbFNvY2tldCAqc2lvYzsNCj4g
+KyAgICBOQkRFeHBvcnRJbmZvICpsaXN0Ow0KPiArICAgIGludCBpLCBqOw0KPiArDQo+ICsgICAg
+c2lvYyA9IHFpb19jaGFubmVsX3NvY2tldF9uZXcoKTsNCj4gKyAgICBpZiAocWlvX2NoYW5uZWxf
+c29ja2V0X2Nvbm5lY3Rfc3luYyhzaW9jLCBzYWRkciwgJmVycikgPCAwKSB7DQo+ICsgICAgICAg
+IGVycm9yX3JlcG9ydF9lcnIoZXJyKTsNCj4gKyAgICAgICAgZ290byBvdXQ7DQo+ICsgICAgfQ0K
+PiArICAgIHJjID0gbmJkX3JlY2VpdmVfZXhwb3J0X2xpc3QoUUlPX0NIQU5ORUwoc2lvYyksIHRs
+cywgaG9zdG5hbWUsICZsaXN0LA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+JmVycik7DQo+ICsgICAgaWYgKHJjIDwgMCkgew0KPiArICAgICAgICBpZiAoZXJyKSB7DQo+ICsg
+ICAgICAgICAgICBlcnJvcl9yZXBvcnRfZXJyKGVycik7DQo+ICsgICAgICAgIH0NCj4gKyAgICAg
+ICAgZ290byBvdXRfc29ja2V0Ow0KPiArICAgIH0NCj4gKyAgICBwcmludGYoImV4cG9ydHMgYXZh
+aWxhYmxlOiAlZFxuIiwgcmMpOw0KPiArICAgIGZvciAoaSA9IDA7IGkgPCByYzsgaSsrKSB7DQo+
+ICsgICAgICAgIHByaW50ZigiIGV4cG9ydDogJyVzJ1xuIiwgbGlzdFtpXS5uYW1lKTsNCj4gKyAg
+ICAgICAgaWYgKGxpc3RbaV0uZGVzY3JpcHRpb24gJiYgKmxpc3RbaV0uZGVzY3JpcHRpb24pIHsN
+Cj4gKyAgICAgICAgICAgIHByaW50ZigiICBkZXNjcmlwdGlvbjogJXNcbiIsIGxpc3RbaV0uZGVz
+Y3JpcHRpb24pOw0KPiArICAgICAgICB9DQo+ICsgICAgICAgIGlmIChsaXN0W2ldLmZsYWdzICYg
+TkJEX0ZMQUdfSEFTX0ZMQUdTKSB7DQo+ICsgICAgICAgICAgICBwcmludGYoIiAgc2l6ZTogICUi
+IFBSSXU2NCAiXG4iLCBsaXN0W2ldLnNpemUpOw0KDQpzaXplIGlzIGF2YWlsYWJsZSBvbmx5IGlm
+IE5CRF9GTEFHX0hBU19GTEFHUz8gYXQgbGVhc3QsIGFjY29yZGluZ2x5IHRvIGNvZGUsDQppbiBj
+YXNlIDA6IHNpemUgaXMgdW5yZWxhdGVkIHRvIGZsYWdzLg0KDQo+ICsgICAgICAgICAgICBwcmlu
+dGYoIiAgZmxhZ3M6IDB4JXggKCIsIGxpc3RbaV0uZmxhZ3MpOw0KPiArICAgICAgICAgICAgaWYg
+KGxpc3RbaV0uZmxhZ3MgJiBOQkRfRkxBR19SRUFEX09OTFkpIHsNCj4gKyAgICAgICAgICAgICAg
+ICBwcmludGYoIiByZWFkb25seSIpOw0KPiArICAgICAgICAgICAgfQ0KPiArICAgICAgICAgICAg
+aWYgKGxpc3RbaV0uZmxhZ3MgJiBOQkRfRkxBR19TRU5EX0ZMVVNIKSB7DQo+ICsgICAgICAgICAg
+ICAgICAgcHJpbnRmKCIgZmx1c2giKTsNCj4gKyAgICAgICAgICAgIH0NCj4gKyAgICAgICAgICAg
+IGlmIChsaXN0W2ldLmZsYWdzICYgTkJEX0ZMQUdfU0VORF9GVUEpIHsNCj4gKyAgICAgICAgICAg
+ICAgICBwcmludGYoIiBmdWEiKTsNCj4gKyAgICAgICAgICAgIH0NCj4gKyAgICAgICAgICAgIGlm
+IChsaXN0W2ldLmZsYWdzICYgTkJEX0ZMQUdfUk9UQVRJT05BTCkgew0KPiArICAgICAgICAgICAg
+ICAgIHByaW50ZigiIHJvdGF0aW9uYWwiKTsNCj4gKyAgICAgICAgICAgIH0NCj4gKyAgICAgICAg
+ICAgIGlmIChsaXN0W2ldLmZsYWdzICYgTkJEX0ZMQUdfU0VORF9UUklNKSB7DQo+ICsgICAgICAg
+ICAgICAgICAgcHJpbnRmKCIgdHJpbSIpOw0KPiArICAgICAgICAgICAgfQ0KPiArICAgICAgICAg
+ICAgaWYgKGxpc3RbaV0uZmxhZ3MgJiBOQkRfRkxBR19TRU5EX1dSSVRFX1pFUk9FUykgew0KPiAr
+ICAgICAgICAgICAgICAgIHByaW50ZigiIHplcm9lcyIpOw0KPiArICAgICAgICAgICAgfQ0KPiAr
+ICAgICAgICAgICAgaWYgKGxpc3RbaV0uZmxhZ3MgJiBOQkRfRkxBR19TRU5EX0RGKSB7DQo+ICsg
+ICAgICAgICAgICAgICAgcHJpbnRmKCIgZGYiKTsNCj4gKyAgICAgICAgICAgIH0NCj4gKyAgICAg
+ICAgICAgIGlmIChsaXN0W2ldLmZsYWdzICYgTkJEX0ZMQUdfQ0FOX01VTFRJX0NPTk4pIHsNCj4g
+KyAgICAgICAgICAgICAgICBwcmludGYoIiBtdWx0aSIpOw0KPiArICAgICAgICAgICAgfQ0KPiAr
+ICAgICAgICAgICAgaWYgKGxpc3RbaV0uZmxhZ3MgJiBOQkRfRkxBR19TRU5EX1JFU0laRSkgew0K
+PiArICAgICAgICAgICAgICAgIHByaW50ZigiIHJlc2l6ZSIpOw0KPiArICAgICAgICAgICAgfQ0K
+PiArICAgICAgICAgICAgaWYgKGxpc3RbaV0uZmxhZ3MgJiBOQkRfRkxBR19TRU5EX0NBQ0hFKSB7
+DQo+ICsgICAgICAgICAgICAgICAgcHJpbnRmKCIgY2FjaGUiKTsNCj4gKyAgICAgICAgICAgIH0N
+Cj4gKyAgICAgICAgICAgIHByaW50ZigiIClcbiIpOw0KPiArICAgICAgICB9DQo+ICsgICAgICAg
+IGlmIChsaXN0W2ldLm1pbl9ibG9jaykgew0KPiArICAgICAgICAgICAgcHJpbnRmKCIgIG1pbiBi
+bG9jazogJXVcbiIsIGxpc3RbaV0ubWluX2Jsb2NrKTsNCj4gKyAgICAgICAgICAgIHByaW50Zigi
+ICBvcHQgYmxvY2s6ICV1XG4iLCBsaXN0W2ldLm9wdF9ibG9jayk7DQo+ICsgICAgICAgICAgICBw
+cmludGYoIiAgbWF4IGJsb2NrOiAldVxuIiwgbGlzdFtpXS5tYXhfYmxvY2spOw0KPiArICAgICAg
+ICB9DQo+ICsgICAgICAgIGlmIChsaXN0W2ldLm5fY29udGV4dHMpIHsNCj4gKyAgICAgICAgICAg
+IHByaW50ZigiICBhdmFpbGFibGUgbWV0YSBjb250ZXh0czogJWRcbiIsIGxpc3RbaV0ubl9jb250
+ZXh0cyk7DQo+ICsgICAgICAgICAgICBmb3IgKGogPSAwOyBqIDwgbGlzdFtpXS5uX2NvbnRleHRz
+OyBqKyspIHsNCj4gKyAgICAgICAgICAgICAgICBwcmludGYoIiAgICVzXG4iLCBsaXN0W2ldLmNv
+bnRleHRzW2pdKTsNCj4gKyAgICAgICAgICAgIH0NCj4gKyAgICAgICAgfQ0KPiArICAgIH0NCj4g
+KyAgICBuYmRfZnJlZV9leHBvcnRfbGlzdChsaXN0LCByYyk7DQo+ICsNCj4gKyAgICByZXQgPSBF
+WElUX1NVQ0NFU1M7DQo+ICsgb3V0X3NvY2tldDoNCj4gKyAgICBvYmplY3RfdW5yZWYoT0JKRUNU
+KHNpb2MpKTsNCj4gKyBvdXQ6DQo+ICsgICAgcmV0dXJuIHJldDsNCj4gK30NCj4gKw0KDQoNCi0t
+IA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
