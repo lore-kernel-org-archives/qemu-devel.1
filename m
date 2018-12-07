@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gV3w6-0006E1-GU
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 19:24:10 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gV4Im-0001Yf-G4
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 19:47:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gV3w1-00040J-Hw
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 19:24:06 -0500
-Resent-Message-Id: <E1gV3w1-00040J-Hw@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21755)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gV3w1-0003xA-8Z
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 19:24:01 -0500
-In-Reply-To: <20181206192544.3987-1-jsnow@redhat.com>
-Message-ID: <154414128075.8206.639791884193945612@bb8f5089e434>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <dgibson@ozlabs.org>) id 1gV4Ii-00064W-5s
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 19:47:32 -0500
+Date: Fri, 7 Dec 2018 11:22:21 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20181207002221.GR768@umbus.fritz.box>
+References: <20181205205827.19387-1-ehabkost@redhat.com>
+	<20181205205827.19387-5-ehabkost@redhat.com>
+	<20181205223035.GH768@umbus.fritz.box>
+	<20181206124851.GV18284@habkost.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 6 Dec 2018 16:08:02 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/3] bitmaps: remove x- prefix from QMP api
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="9lPOKfY2vCV97ybw"
+Content-Disposition: inline
+In-Reply-To: <20181206124851.GV18284@habkost.net>
+Subject: Re: [Qemu-devel] [PATCH for-4.0 4/5] spapr: Delete instance_options
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +27,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jsnow@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, vsementov@virtuozzo.com, armbru@redhat.com, mreitz@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIwNjE5MjU0NC4zOTg3
-LTEtanNub3dAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
-bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
-bWF0aW9uOgoKVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC8zXSBi
-aXRtYXBzOiByZW1vdmUgeC0gcHJlZml4IGZyb20gUU1QIGFwaQpNZXNzYWdlLWlkOiAyMDE4MTIw
-NjE5MjU0NC4zOTg3LTEtanNub3dAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09
-PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRC
-QVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxp
-bWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1h
-dD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAi
-Q2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYyku
-Li4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNr
-cGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hv
-CiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBU
-IEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMz
-ODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpjOTcyNjczIGJsb2NrOiByZW1vdmUg
-J3gnIHByZWZpeCBmcm9tIGV4cGVyaW1lbnRhbCBiaXRtYXAgQVBJcwplYmQxZTZjIGJsb2NrZGV2
-OiBuLWFyeSBiaXRtYXAgbWVyZ2UKNjhkM2MwYyBibG9ja2RldjogYWJvcnQgdHJhbnNhY3Rpb25z
-IGluIHJldmVyc2Ugb3JkZXIKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEv
-MzogYmxvY2tkZXY6IGFib3J0IHRyYW5zYWN0aW9ucyBpbiByZXZlcnNlIG9yZGVyLi4uCkNoZWNr
-aW5nIFBBVENIIDIvMzogYmxvY2tkZXY6IG4tYXJ5IGJpdG1hcCBtZXJnZS4uLgpFUlJPUjogZXh0
-ZXJucyBzaG91bGQgYmUgYXZvaWRlZCBpbiAuYyBmaWxlcwojMjM6IEZJTEU6IGJsb2NrZGV2LmM6
-MjEyNToKK3ZvaWQgZG9fYmxvY2tfZGlydHlfYml0bWFwX21lcmdlKGNvbnN0IGNoYXIgKm5vZGUs
-IGNvbnN0IGNoYXIgKnRhcmdldCwKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTQ3IGxp
-bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNr
-aW5nIFBBVENIIDMvMzogYmxvY2s6IHJlbW92ZSAneCcgcHJlZml4IGZyb20gZXhwZXJpbWVudGFs
-IGJpdG1hcCBBUElzLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
-aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3
-Lm9yZy9sb2dzLzIwMTgxMjA2MTkyNTQ0LjM5ODctMS1qc25vd0ByZWRoYXQuY29tL3Rlc3Rpbmcu
-Y2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
-bHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
-ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+
+--9lPOKfY2vCV97ybw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Dec 06, 2018 at 10:48:51AM -0200, Eduardo Habkost wrote:
+> On Thu, Dec 06, 2018 at 09:30:35AM +1100, David Gibson wrote:
+> > On Wed, Dec 05, 2018 at 06:58:26PM -0200, Eduardo Habkost wrote:
+> > > Now that all instance_options functions for spapr are empty,
+> > > delete them.
+> > >=20
+> > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> >=20
+> > Acked-by: David Gibson <david@gibson.dropbear.id.au>
+>=20
+> Thanks!
+>=20
+> >=20
+> > Do you want me to stage the ppc patches in my ppc-for-4.0 tree, or
+> > would you prefer to keep your series together to go in via your tree?
+>=20
+> I wouldn't mind to get this queued through the ppc tree, but
+> maybe it will be easier to get them through the machine tree
+> because of the dependency on the 4.0 machine-type patch.
+
+Sure.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--9lPOKfY2vCV97ybw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwJvTkACgkQbDjKyiDZ
+s5JaghAAhKcGrt7aBXNqx4UXLbb0LMsZpUMoCradgpxn4ODRk5bJ0pIS/gL+PVPK
+zKBLmax+rjBe6qsZF2PykW4EEuC1alUdndLgu5hyRleB0LfSz+0U6NlQes3tggF8
+GfrPser7BL5vTE3sBBgLbmePx7A+Ua6m0UFzULxLV9P9MbAsqTmIEb9RlWKWbDV/
+xC83qWdcTJjV4VFDscRMBp11opjzh1FOU5gkUdF49oTViIrcgJQSOc8pKH4vkFvM
+S5sqWKGl5DXA7g7p/VLSpNvqgvgG4S3OM3RfB5Z/FDcw3bEEqTSuKSDqMXaKq7+R
+CeiNJGU5BE7rPFRZXLfdMGx9EQoYzudSYDosgW9RcKBe/DWt4XtpAjb++bgMdi5Y
+sErPcgWy1Tebh8xBTEN0JaFEyGZM7OVjdiOSds7jjc3DNM4usJMsSY0UyI/QeJpT
+IrusUuEyescCemAXJnNVrwsaAwrerRWEEAC6ZGtZWZfM3++83VLgd26W0vaTOup+
+3DrPCIJUvm8oJaT55NDmiOLVeJ6PSa3nZ7KcAqNjrbniRag1C/c71yRvJmBgvCws
+XdJADz57QawUAu4HSpAT3pkq85kXCDUOg7G0rLiKqrmHZBqBbkQr2AlVVYKUjQZR
+2w7ReZVIJAceWZ1CHovBdxGO9zfXgNpvAoraaTbj6NA8TXknNbE=
+=/+Pl
+-----END PGP SIGNATURE-----
+
+--9lPOKfY2vCV97ybw--
