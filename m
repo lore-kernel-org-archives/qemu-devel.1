@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38758)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gVAtA-0001hK-IW
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 02:49:36 -0500
+	(envelope-from <clg@kaod.org>) id 1gVB8x-0001FH-Oh
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 03:05:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gVAt6-00029q-3I
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 02:49:32 -0500
-Received: from 5.mo178.mail-out.ovh.net ([46.105.51.53]:45302)
+	(envelope-from <clg@kaod.org>) id 1gVB8s-0002qH-1W
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 03:05:50 -0500
+Received: from 1.mo4.mail-out.ovh.net ([178.33.248.196]:44520)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gVAt5-00027g-PE
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 02:49:27 -0500
-Received: from player770.ha.ovh.net (unknown [10.109.143.18])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 39CDB42968
-	for <qemu-devel@nongnu.org>; Fri,  7 Dec 2018 08:49:26 +0100 (CET)
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gVB8p-0002KC-GM
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 03:05:45 -0500
+Received: from player787.ha.ovh.net (unknown [10.109.143.183])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 544261C50D9
+	for <qemu-devel@nongnu.org>; Fri,  7 Dec 2018 09:05:37 +0100 (CET)
 References: <20181205232251.10446-1-clg@kaod.org>
-	<20181205232251.10446-5-clg@kaod.org>
-	<20181206034124.GM768@umbus.fritz.box>
-	<0ed7f319-7ae1-e407-96c1-266463d2a472@kaod.org>
-	<20181207015753.GW768@umbus.fritz.box>
-Message-ID: <bb2b0691-2366-cb73-4407-af16a812725b@kaod.org>
-Date: Fri, 7 Dec 2018 08:49:21 +0100
+	<20181205232251.10446-12-clg@kaod.org>
+	<20181207034649.GA10945@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <0416a307-f6dd-552b-3b57-04ce6c7b101a@kaod.org>
+Date: Fri, 7 Dec 2018 09:05:31 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181207015753.GW768@umbus.fritz.box>
+In-Reply-To: <20181207034649.GA10945@umbus.fritz.box>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 04/37] ppc/xive: introduce the
- XiveRouter model
+Subject: Re: [Qemu-devel] [PATCH v6 11/37] spapr/xive: use the VCPU id as a
+ NVT identifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,98 +36,133 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On 12/7/18 2:57 AM, David Gibson wrote:
-> On Thu, Dec 06, 2018 at 07:22:54AM +0100, C=E9dric Le Goater wrote:
->> On 12/6/18 4:41 AM, David Gibson wrote:
->>> On Thu, Dec 06, 2018 at 12:22:18AM +0100, C=E9dric Le Goater wrote:
->>>> The XiveRouter models the second sub-engine of the XIVE architecture=
- :
->>>> the Interrupt Virtualization Routing Engine (IVRE).
->>>>
->>>> The IVRE handles event notifications of the IVSE and performs the
->>>> interrupt routing process. For this purpose, it uses a set of tables
->>>> stored in system memory, the first of which being the Event Assignme=
-nt
->>>> Structure (EAS) table.
->>>>
->>>> The EAT associates an interrupt source number with an Event Notifica=
-tion
->>>> Descriptor (END) which will be used in a second phase of the routing
->>>> process to identify a Notification Virtual Target.
->>>>
->>>> The XiveRouter is an abstract class which needs to be inherited from
->>>> to define a storage for the EAT, and other upcoming tables.
->>>>
->>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->>>> ---
->>>>  include/hw/ppc/xive.h      | 31 ++++++++++++++++
->>>>  include/hw/ppc/xive_regs.h | 50 +++++++++++++++++++++++++
->>>>  hw/intc/xive.c             | 76 +++++++++++++++++++++++++++++++++++=
-+++
->>>>  3 files changed, 157 insertions(+)
->>>>  create mode 100644 include/hw/ppc/xive_regs.h
->>>>
->>>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
->>>> index 6770cffec67d..57ec9f84f527 100644
->>>> --- a/include/hw/ppc/xive.h
->>>> +++ b/include/hw/ppc/xive.h
->>>> @@ -141,6 +141,8 @@
->>>>  #define PPC_XIVE_H
->>>> =20
->>>>  #include "hw/qdev-core.h"
->>>> +#include "hw/sysbus.h"
->>>> +#include "hw/ppc/xive_regs.h"
->>>> =20
->>>>  /*
->>>>   * XIVE Fabric (Interface between Source and Router)
->>>> @@ -297,4 +299,33 @@ static inline void xive_source_irq_set(XiveSour=
-ce *xsrc, uint32_t srcno,
->>>>      }
->>>>  }
->>>> =20
->>>> +/*
->>>> + * XIVE Router
->>>> + */
->>>> +
->>>> +typedef struct XiveRouter {
->>>> +    SysBusDevice    parent;
->>>
->>> I thought the plan was to make XiveRouter as well as XiveSource a
->>> TYPE_DEVICE descendent rather than a SysBusDevice?
+On 12/7/18 4:46 AM, David Gibson wrote:
+> On Thu, Dec 06, 2018 at 12:22:25AM +0100, C=E9dric Le Goater wrote:
+>> The IVPE scans the O/S CAM line of the XIVE thread interrupt contexts
+>> to find a matching Notification Virtual Target (NVT) among the NVTs
+>> dispatched on the HW processor threads.
 >>
->> We start talking about that, indeed, but then :
+>> On a real system, the thread interrupt contexts are updated by the
+>> hypervisor when a Virtual Processor is scheduled to run on a HW
+>> thread. Under QEMU, the model will emulate the same behavior by
+>> hardwiring the NVT identifier in the thread context registers at
+>> reset.
 >>
->> 	https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg06407.html
+>> The NVT identifier used by the sPAPRXive model is the VCPU id. The END
+>> identifier is also derived from the VCPU id. A set of helpers doing
+>> the conversion between identifiers are provided for the hcalls
+>> configuring the sources and the ENDs.
 >>
->> I thought we concluded that it was going to get too complex.
+>> The model does not need a NVT table but The XiveRouter NVT operations
+>> are provided to perform some extra checks in the routing algorithm.
 >>
->> Also, sPAPRXive is a direct descendant of XiveRouter and we want sPAPR=
-Xive=20
->> on SysBus.
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> ---
+>>  hw/intc/spapr_xive.c | 53 +++++++++++++++++++++++++++++++++++++++++++=
+-
+>>  1 file changed, 52 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+>> index eef5830d45c6..8da7a8bee949 100644
+>> --- a/hw/intc/spapr_xive.c
+>> +++ b/hw/intc/spapr_xive.c
+>> @@ -26,6 +26,27 @@
+>>  #define SPAPR_XIVE_VC_BASE   0x0006010000000000ull
+>>  #define SPAPR_XIVE_TM_BASE   0x0006030203180000ull
+>> =20
+>> +/*
+>> + * The allocation of VP blocks is a complex operation in OPAL and the
+>> + * VP identifiers have a relation with the number of HW chips, the
+>> + * size of the VP blocks, VP grouping, etc. The QEMU sPAPR XIVE
+>> + * controller model does not have the same constraints and can use a
+>> + * simple mapping scheme of the CPU vcpu_id
+>> + *
+>> + * These identifiers are never returned to the OS.
+>> + */
+>> +
+>> +#define SPAPR_XIVE_NVT_BASE 0x400
+>> +
+>> +/*
+>> + * sPAPR NVT and END indexing helpers
+>> + */
+>> +static uint32_t spapr_xive_nvt_to_target(sPAPRXive *xive, uint8_t nvt=
+_blk,
+>> +                                  uint32_t nvt_idx)
+>> +{
+>> +    return nvt_idx - SPAPR_XIVE_NVT_BASE;
+>> +}
+>> +
+>>  /*
+>>   * On sPAPR machines, use a simplified output for the XIVE END
+>>   * structure dumping only the information related to the OS EQ.
+>> @@ -40,7 +61,8 @@ static void spapr_xive_end_pic_print_info(sPAPRXive =
+*xive, XiveEND *end,
+>>      uint32_t nvt =3D GETFIELD_BE32(END_W6_NVT_INDEX, end->w6);
+>>      uint8_t priority =3D GETFIELD_BE32(END_W7_F0_PRIORITY, end->w7);
+>> =20
+>> -    monitor_printf(mon, "%3d/%d % 6d/%5d ^%d", nvt,
+>> +    monitor_printf(mon, "%3d/%d % 6d/%5d ^%d",
+>> +                   spapr_xive_nvt_to_target(xive, 0, nvt),
+>>                     priority, qindex, qentries, qgen);
+>> =20
+>>      xive_end_queue_pic_print_info(end, 6, mon);
+>> @@ -246,6 +268,33 @@ static int spapr_xive_write_end(XiveRouter *xrtr,=
+ uint8_t end_blk,
+>>      return 0;
+>>  }
+>> =20
+>> +static int spapr_xive_get_nvt(XiveRouter *xrtr,
+>> +                              uint8_t nvt_blk, uint32_t nvt_idx, Xive=
+NVT *nvt)
+>> +{
+>> +    sPAPRXive *xive =3D SPAPR_XIVE(xrtr);
+>> +    uint32_t vcpu_id =3D spapr_xive_nvt_to_target(xive, nvt_blk, nvt_=
+idx);
+>> +    PowerPCCPU *cpu =3D spapr_find_cpu(vcpu_id);
+>> +
+>> +    if (!cpu) {
+>> +        return -1;
+>> +    }
+>> +
+>> +    /*
+>> +     * sPAPR does not maintain a NVT table. Return that the NVT is
+>> +     * valid if we have found a matching CPU
+>> +     */
+>> +    nvt->w0 =3D cpu_to_be32(NVT_W0_VALID);
+>> +    return 0;
+>> +}
+>> +
+>> +static int spapr_xive_write_nvt(XiveRouter *xrtr, uint8_t nvt_blk,
+>> +                                uint32_t nvt_idx, XiveNVT *nvt,
+>> +                                uint8_t word_number)
+>> +{
+>> +    /* no NVT table */
+>> +    return 0;
 >=20
-> Ah, good point.  So, to clarify my thinking here - I think from a
-> theoretical point of view, having XiveRouter not be sysbus and
-> including it by composition is probably the "correct" approach.
+> Should this ever get called.  IIUC, we don't need to write back to the
+> NVTs because the papr machine should never hit a non-scheduled NVT.
 
-One possible solution would be to transform the XiveRouter in a QOM=20
-interface, this will be possible when I have removed the chip_id field,
-and define the VST accessors as we do today. I am not sure how QOM=20
-interfaces are considered, but I think they are more in the composition=20
-pattern than inheritance. That way, we could have sPAPRXive directly=20
-inherit from SysBusDevice.
+yes.
 
-I can give it a try for v7, and you could merge the small XiveRouter=20
-changes in the current XiveRouter patch.
+> But in that case should this actually be a no-op, or should it be an
+> g_assert_not_reached()?
 
-> But I can also see that that will be a bit of a pain in practice.  So
-> yes, keeping it as a SysBusDevice is ok, at least as long as any
-> migration stuff is in the "outermost" / most specific type, which I
-> believe it is.
+We should never reach it because the get_nvt() should have failed
+before in xive_presenter_notify() :
 
-By this sentence, you mean that we don't rely on the XiveRouter model=20
-to capture the sPAPRXive state ?=20
+    ...
+    /* NVT cache lookup */
+    if (xive_router_get_nvt(xrtr, nvt_blk, nvt_idx, &nvt)) {
+        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: no NVT %x/%x\n",
+                      nvt_blk, nvt_idx);
+        return;
+    }
+    ...
 
-Thanks,
+Leaving the machine in a curious state.
 
+so for _write_nvt(), I think g_assert_not_reached() is appropriate and=20
+I will add the comment you just made.
+
+may be, I should add an 'assert(cpu)' in _get_nvt() also.
 C.=20
-=20
