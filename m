@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gVFvj-0007yU-C4
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 08:12:32 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gVG0e-0005AI-QM
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 08:17:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gVFvh-0004Xs-BL
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 08:12:31 -0500
-Resent-Message-Id: <E1gVFvh-0004Xs-BL@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21724)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gVFvh-0004UR-1P
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 08:12:29 -0500
-In-Reply-To: <20181207115343.6747-1-kwolf@redhat.com>
-Message-ID: <154418741329.13448.14567523618939491443@bb8f5089e434>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <cohuck@redhat.com>) id 1gVG0Z-00067q-Ru
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 08:17:36 -0500
+Date: Fri, 7 Dec 2018 14:17:20 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181207141720.2264b06f.cohuck@redhat.com>
+In-Reply-To: <20181207135253.10e3e021@oc2783563651>
+References: <20181205145131.28467-1-cohuck@redhat.com>
+	<5d274f2c-23a2-0c4f-9f2d-07cbe529c5ac@de.ibm.com>
+	<20181207132946.00df1f5a.cohuck@redhat.com>
+	<20181207135253.10e3e021@oc2783563651>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 7 Dec 2018 04:56:54 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v4 0/5] vmdk: Implement blockdev-create
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC] vfio-ap: flag as compatible with
+ balloon
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com, mreitz@redhat.com
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Tony Krowiak <akrowiak@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIwNzExNTM0My42NzQ3
-LTEta3dvbGZAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
-bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
-bWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxODEyMDcxMTUzNDMuNjc0Ny0xLWt3b2xmQHJlZGhhdC5j
-b20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NCAwLzVdIHZtZGs6IEltcGxlbWVudCBi
-bG9ja2Rldi1jcmVhdGUKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
-L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
-LiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVI
-IC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVj
-a2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIK
-ICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRj
-aC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAg
-IGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5E
-ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApT
-d2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjkxNGI2Nzkgdm1kazogUmVqZWN0IGV4Y2Vz
-cyBleHRlbnRzIGluIGJsb2NrZGV2LWNyZWF0ZQoyNzIxY2ZmIGlvdGVzdHM6IEFkZCBWTURLIHRl
-c3RzIGZvciBibG9ja2Rldi1jcmVhdGUKYzA5OGUzNyBpb3Rlc3RzOiBGaWx0ZXIgY2lkIG51bWJl
-cnMgaW4gVk1ESyBleHRlbnQgaW5mbwozZThmMDY4IHZtZGs6IEltcGxlbWVudCAuYmRydl9jb19j
-cmVhdGUgY2FsbGJhY2sKNTRiMjlmZiB2bWRrOiBSZWZhY3RvciB2bWRrX2NyZWF0ZV9leHRlbnQK
-Cj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTogdm1kazogUmVmYWN0b3Ig
-dm1ka19jcmVhdGVfZXh0ZW50Li4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMx
-MjU6IEZJTEU6IGJsb2NrL3ZtZGsuYzoyMTE0OgorICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIGZsYXQsIGNvbXByZXNzLCB6ZXJvZWRfZ3JhaW4sIE5VTEwsIG9wdHMsIGVycnApKSB7Cgp0
-b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDEwNCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDIvNTogdm1kazogSW1w
-bGVtZW50IC5iZHJ2X2NvX2NyZWF0ZSBjYWxsYmFjay4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
-Y2hhcmFjdGVycwojMjE2OiBGSUxFOiBibG9jay92bWRrLmM6MjA3NToKKyAgICAgICAgYmRydl9n
-ZXRfZnVsbF9iYWNraW5nX2ZpbGVuYW1lX2Zyb21fZmlsZW5hbWUoYmxrX2JzKGJsayktPmZpbGVu
-YW1lLCBiYWNraW5nX2ZpbGUsCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzcx
-OiBGSUxFOiBibG9jay92bWRrLmM6MjE3NDoKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgYm9vbCBmbGF0LCBib29sIHNwbGl0LCBib29sIGNvbXByZXNzLAoKV0FS
-TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzM4OTogRklMRTogYmxvY2svdm1kay5jOjIx
-OTI6CisgICAgICAgIHJlbF9maWxlbmFtZSA9IGdfc3RyZHVwX3ByaW50ZigiJXMtZmxhdCVzIiwg
-ZGF0YS0+cHJlZml4LCBkYXRhLT5wb3N0Zml4KTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
-YWN0ZXJzCiM0MDY6IEZJTEU6IGJsb2NrL3ZtZGsuYzoyMjA5Ogorc3RhdGljIGludCBjb3JvdXRp
-bmVfZm4gdm1ka19jb19jcmVhdGVfb3B0cyhjb25zdCBjaGFyICpmaWxlbmFtZSwgUWVtdU9wdHMg
-Km9wdHMsCgp0b3RhbDogMCBlcnJvcnMsIDQgd2FybmluZ3MsIDY1OCBsaW5lcyBjaGVja2VkCgpZ
-b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDMvNTog
-aW90ZXN0czogRmlsdGVyIGNpZCBudW1iZXJzIGluIFZNREsgZXh0ZW50IGluZm8uLi4KQ2hlY2tp
-bmcgUEFUQ0ggNC81OiBpb3Rlc3RzOiBBZGQgVk1ESyB0ZXN0cyBmb3IgYmxvY2tkZXYtY3JlYXRl
-Li4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRB
-SU5FUlMgbmVlZCB1cGRhdGluZz8KIzExOiAKbmV3IGZpbGUgbW9kZSAxMDA3NTUKCkVSUk9SOiB0
-cmFpbGluZyB3aGl0ZXNwYWNlCiMyODI6IEZJTEU6IHRlc3RzL3FlbXUtaW90ZXN0cy8yMzcub3V0
-OjI4OgorICAgICAgICAgICAgZm9ybWF0OiAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQoj
-MzA5OiBGSUxFOiB0ZXN0cy9xZW11LWlvdGVzdHMvMjM3Lm91dDo1NToKKyAgICAgICAgICAgIGZv
-cm1hdDogJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzMzNjogRklMRTogdGVzdHMvcWVt
-dS1pb3Rlc3RzLzIzNy5vdXQ6ODI6CisgICAgICAgICAgICBmb3JtYXQ6ICQKCnRvdGFsOiAzIGVy
-cm9ycywgMSB3YXJuaW5ncywgNTg0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDUvNTogdm1kazogUmVqZWN0IGV4Y2Vz
-cyBleHRlbnRzIGluIGJsb2NrZGV2LWNyZWF0ZS4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3Qg
-Y29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBh
-dApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE4MTIwNzExNTM0My42NzQ3LTEta3dvbGZAcmVk
-aGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
-YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Fri, 7 Dec 2018 13:52:53 +0100
+Halil Pasic <pasic@linux.ibm.com> wrote:
+
+> On Fri, 7 Dec 2018 13:29:46 +0100
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+> > On Fri, 7 Dec 2018 13:17:02 +0100
+> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> >   
+> > > On 05.12.2018 15:51, Cornelia Huck wrote:  
+> > > > vfio-ap devices do not pin any pages in the host. Therefore, they
+> > > > are belived to be compatible with memory ballooning.
+> > > > 
+> > > > Flag them as compatible, so both vfio-ap and a balloon can be
+> > > > used simultaneously.
+> > > > 
+> > > > Signed-off-by: Cornelia Huck <cohuck@redhat.com>    
+> 
+> With the comment stuff sorted out:
+> Reviewed-by: Halil Pasic <pasic@linux.ibm.com> 
+
+So, do you agree with the comment change I suggested?
+
++    /*
++     * vfio-ap devices operate in a way compatible with
++     * memory ballooning, as no pages are pinned in the host.
++     * This needs to be set before vfio_get_device() for vfio common to
++     * handle the balloon inhibitor.
++     */
+
+> 
+> @Connie: Just had a look at the MAINTAINERS file and hw/vfio/ap.c
+> is listed under Arch. support S90 with you as a maintainer, and under
+> vfio-ap with 4 maintainers listed one of them being me. The question
+> is who is going to post a PULL request for this?
+
+General practice has been that I'm collecting everything s390x related.
+I have also pulled from others before (e.g. some bios changes from
+Thomas). While you could apply the patch, send it to me, and then I'd
+queue it to s390-next, I can also simply queue it directly with your
+ack :)
+
+[Longer term, if you want to collect ap patches and then send me a pull
+request, I would also be happy to do that. For this single patch, it
+seems overkill.]
+
+> 
+> > > 
+> > > Does it make sense to add cc stable for 3.1?  
+> > 
+> > Can do that, given that s390x systems really rely on the ballooner in
+> > general.
+> >   
+> 
+> I agree with cc stable.
+
+Will add when applying.
