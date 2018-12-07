@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55586)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=87219212e=anthony.perard@citrix.com>)
-	id 1gVI12-0005N6-C5
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 10:26:09 -0500
+	(envelope-from <berrange@redhat.com>) id 1gVI8z-0001yi-5L
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 10:34:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=87219212e=anthony.perard@citrix.com>)
-	id 1gVI0z-0004Av-1k
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 10:26:08 -0500
-Date: Fri, 7 Dec 2018 15:26:01 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20181207152601.GH18875@perard.uk.xensource.com>
+	(envelope-from <berrange@redhat.com>) id 1gVI8v-0008Gq-7Q
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 10:34:21 -0500
+Date: Fri, 7 Dec 2018 15:34:00 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181207153400.GM13784@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <1544108924-10841-1-git-send-email-paul.durrant@citrix.com>
 	<1544108924-10841-4-git-send-email-paul.durrant@citrix.com>
 	<20181207143525.GF18875@perard.uk.xensource.com>
 	<ce9a0cbaa69c42c084e40b96c4d01c26@AMSPEX02CL03.citrite.net>
+	<20181207152601.GH18875@perard.uk.xensource.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ce9a0cbaa69c42c084e40b96c4d01c26@AMSPEX02CL03.citrite.net>
+In-Reply-To: <20181207152601.GH18875@perard.uk.xensource.com>
 Subject: Re: [Qemu-devel] [PATCH v2 03/18] xen: introduce 'xen-block',
  'xen-disk' and 'xen-cdrom'
 List-Id: <qemu-devel.nongnu.org>
@@ -28,83 +28,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+To: Anthony PERARD <anthony.perard@citrix.com>
+Cc: Paul Durrant <Paul.Durrant@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
 
-On Fri, Dec 07, 2018 at 02:39:40PM +0000, Paul Durrant wrote:
-> > -----Original Message-----
-> > From: Anthony PERARD [mailto:anthony.perard@citrix.com]
-> > Sent: 07 December 2018 14:35
-> > To: Paul Durrant <Paul.Durrant@citrix.com>
-> > Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
-> > devel@lists.xenproject.org; Kevin Wolf <kwolf@redhat.com>; Max Reitz
-> > <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
-> > Subject: Re: [PATCH v2 03/18] xen: introduce 'xen-block', 'xen-disk' and
-> > 'xen-cdrom'
+On Fri, Dec 07, 2018 at 03:26:01PM +0000, Anthony PERARD wrote:
+> On Fri, Dec 07, 2018 at 02:39:40PM +0000, Paul Durrant wrote:
+> > > -----Original Message-----
+> > > From: Anthony PERARD [mailto:anthony.perard@citrix.com]
+> > > Sent: 07 December 2018 14:35
+> > > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > > Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
+> > > devel@lists.xenproject.org; Kevin Wolf <kwolf@redhat.com>; Max Reitz
+> > > <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
+> > > Subject: Re: [PATCH v2 03/18] xen: introduce 'xen-block', 'xen-disk' and
+> > > 'xen-cdrom'
+> > > 
+> > > On Thu, Dec 06, 2018 at 03:08:29PM +0000, Paul Durrant wrote:
+> > > > +static char *disk_to_vbd_name(unsigned int disk)
+> > > > +{
+> > > > +    char *name, *prefix = (disk >= 26) ?
+> > > > +        disk_to_vbd_name((disk / 26) - 1) : g_strdup("");
+> > > > +
+> > > > +    name = g_strdup_printf("%s%c", prefix, 'a' + disk);
+> > > 
+> > > I don't think that works, if disk is 27, we do ('a' + 27) here. It's
+> > > probably missing a `disk % 26`.
 > > 
-> > On Thu, Dec 06, 2018 at 03:08:29PM +0000, Paul Durrant wrote:
-> > > +static char *disk_to_vbd_name(unsigned int disk)
-> > > +{
-> > > +    char *name, *prefix = (disk >= 26) ?
-> > > +        disk_to_vbd_name((disk / 26) - 1) : g_strdup("");
-> > > +
-> > > +    name = g_strdup_printf("%s%c", prefix, 'a' + disk);
+> > Damn, yes I was not allowing the >2 letters.
 > > 
-> > I don't think that works, if disk is 27, we do ('a' + 27) here. It's
-> > probably missing a `disk % 26`.
+> > > 
+> > > > +    g_free(prefix);
+> > > > +
+> > > > +    return name;
+> > > > +}
+> > > 
+> > > [...]
+> > > 
+> > > > +static unsigned int vbd_name_to_disk(const char *name, const char
+> > > **endp)
+> > > > +{
+> > > > +    unsigned int disk = 0;
+> > > > +
+> > > > +    while (*name != '\0') {
+> > > > +        if (!g_ascii_isalpha(*name) || !g_ascii_islower(*name)) {
+> > > > +            break;
+> > > > +        }
+> > > > +
+> > > > +        disk *= 26;
+> > > > +        disk += *name++ - 'a';
+> > > > +    }
+> > > > +    *endp = name;
+> > > > +
+> > > > +    return disk;
+> > > > +}
+> > > > +
+> > > > +static void xen_block_set_vdev(Object *obj, Visitor *v, const char
+> > > *name,
+> > > > +                               void *opaque, Error **errp)
+> > > > +{
+> > > 
+> > > Setting vdev doesn't work. I've tried to add a disk `xvdaa', and it
+> > > result in `xvda', or `d0p0' (in the trace). (Same result with `xvdaaa',
+> > > and 'xvdba' gives 'xvdaa'/d26p0)
+> > > 
+> > 
+> > Ok, that's weird. I'll have to figure that out.
 > 
-> Damn, yes I was not allowing the >2 letters.
+> It's probably because 'a' is somtime 0 and sometime is 1.
 > 
-> > 
-> > > +    g_free(prefix);
-> > > +
-> > > +    return name;
-> > > +}
-> > 
-> > [...]
-> > 
-> > > +static unsigned int vbd_name_to_disk(const char *name, const char
-> > **endp)
-> > > +{
-> > > +    unsigned int disk = 0;
-> > > +
-> > > +    while (*name != '\0') {
-> > > +        if (!g_ascii_isalpha(*name) || !g_ascii_islower(*name)) {
-> > > +            break;
-> > > +        }
-> > > +
-> > > +        disk *= 26;
-> > > +        disk += *name++ - 'a';
-> > > +    }
-> > > +    *endp = name;
-> > > +
-> > > +    return disk;
-> > > +}
-> > > +
-> > > +static void xen_block_set_vdev(Object *obj, Visitor *v, const char
-> > *name,
-> > > +                               void *opaque, Error **errp)
-> > > +{
-> > 
-> > Setting vdev doesn't work. I've tried to add a disk `xvdaa', and it
-> > result in `xvda', or `d0p0' (in the trace). (Same result with `xvdaaa',
-> > and 'xvdba' gives 'xvdaa'/d26p0)
-> > 
+> 'a' should be 0
+> 'aa' should be 26,
+> 'aaa' Seems to be 702.
 > 
-> Ok, that's weird. I'll have to figure that out.
+> 'xvda': 0     ->                     0 * 1
+> 'xvdz': 25    ->                    25 * 1
+> 'xvdaa': 26   ->            1 * 26 + 0 * 1
+> 'xvdaaa': 702 -> 1 * 26^2 + 1 * 26 + 0 * 1
+> 
+> So, it's weird. Have fun fixing the algorithm for that.
 
-It's probably because 'a' is somtime 0 and sometime is 1.
+Libvirt has code for going in both directions, that's LGPLv2+
+licensed if you want it:
 
-'a' should be 0
-'aa' should be 26,
-'aaa' Seems to be 702.
+  https://libvirt.org/git/?p=libvirt.git;a=blob;f=src/util/virutil.c;h=279e6aedc0f5921c850130499fc95c7d4a1e34c9;hb=HEAD#l546
 
-'xvda': 0     ->                     0 * 1
-'xvdz': 25    ->                    25 * 1
-'xvdaa': 26   ->            1 * 26 + 0 * 1
-'xvdaaa': 702 -> 1 * 26^2 + 1 * 26 + 0 * 1
 
-So, it's weird. Have fun fixing the algorithm for that.
-
+Regards,
+Daniel
 -- 
-Anthony PERARD
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
