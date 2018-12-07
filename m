@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gVDZv-0005Xt-Pw
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:41:52 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gVDlM-00032J-8n
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:53:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gVDZt-0003WO-Cx
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:41:50 -0500
-Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:37338)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gVDZt-0003Vp-6I
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:41:49 -0500
-Received: by mail-ot1-x32f.google.com with SMTP id 40so3374057oth.4
-	for <qemu-devel@nongnu.org>; Fri, 07 Dec 2018 02:41:49 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1gVDlK-0005wH-KC
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:53:40 -0500
+Date: Fri, 7 Dec 2018 11:53:29 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181207105329.GB5119@linux.fritz.box>
+References: <20181206151304.8388-1-kwolf@redhat.com>
+	<20181206151304.8388-3-kwolf@redhat.com>
+	<87o99x3j8e.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <CAHmME9qhe0ZemTkc2jkEO=_hu6PhvKUKGHC9QYTj2j+QHhNf8g@mail.gmail.com>
-	<CAFEAcA8fYaKTZkLR8Ja3P590bSWy1cu61-gSxyf6+wXCfCLoxA@mail.gmail.com>
-	<CAHmME9qQo4XfRgZUZDt3xbx=5KmRoYbO3N0+3m9gdKi9hvnZQA@mail.gmail.com>
-In-Reply-To: <CAHmME9qQo4XfRgZUZDt3xbx=5KmRoYbO3N0+3m9gdKi9hvnZQA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 7 Dec 2018 10:41:37 +0000
-Message-ID: <CAFEAcA_3aGAZTEsuqjEnjijTnJi4QCVM09yYJ3-dwQp8wmkA3Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] more serial ports on arm?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87o99x3j8e.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] vmdk: Implement .bdrv_co_create
+ callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,27 +25,332 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
 
-On Fri, 7 Dec 2018 at 04:43, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> On Tue, Nov 20, 2018 at 11:08 AM Peter Maydell <peter.maydell@linaro.org> wrote:
-> > It's still stuck, because unconditionally adding a second serial
-> > port to the virt board breaks some commonly used existing guest
-> > code (UEFI + Linux), and it's not clear to me what the best
-> > command line UI is for allowing the user to request the second
-> > serial port.
->
-> Can the UI be the same more or less as for x86? Specify a second
-> -serial, and then the machine gets one added? If it's in secure mode,
-> then it's added as serial 3 instead of 2, to remain backwards
-> compatible.
+Am 07.12.2018 um 08:10 hat Markus Armbruster geschrieben:
+> This is a reasonably careful review of the QAPI-related parts, but more
+> of an eye-over for the remainder.
+> 
+> Kevin Wolf <kwolf@redhat.com> writes:
+> 
+> > From: Fam Zheng <famz@redhat.com>
+> >
+> > This makes VMDK support blockdev-create. The implementation reuses the
+> > image creation code in vmdk_co_create_opts which now acceptes a callback
+> > pointer to "retrieve" BlockBackend pointers from the caller. This way we
+> > separate the logic between file/extent acquisition and initialization.
+> >
+> > The QAPI command parameters are mostly the same as the old create_opts
+> > except the dropped legacy @compat6 switch, which is redundant with
+> > @hwversion.
+> >
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >  qapi/block-core.json  |  70 +++++++
+> >  qapi/qapi-schema.json |   1 +
+> >  block/vmdk.c          | 452 ++++++++++++++++++++++++++++++------------
+> >  3 files changed, 396 insertions(+), 127 deletions(-)
+> >
+> > diff --git a/qapi/block-core.json b/qapi/block-core.json
+> > index d4fe710836..4778f88dd8 100644
+> > --- a/qapi/block-core.json
+> > +++ b/qapi/block-core.json
+> > @@ -4021,6 +4021,75 @@
+> >              'size':             'size',
+> >              '*cluster-size' :   'size' } }
+> >  
+> > +##
+> > +# @BlockdevVmdkSubformat:
+> > +#
+> > +# Subformat options for VMDK images
+> > +#
+> > +# @monolithicSparse:     Single file image with sparse cluster allocation
+> > +#
+> > +# @monolithicFlat:       Single flat data image and a descriptor file
+> > +#
+> > +# @twoGbMaxExtentSparse: Data is split into 2GB (per virtual LBA) sparse extent
+> > +#                        files, in addition to a descriptor file
+> > +#
+> > +# @twoGbMaxExtentFlat:   Data is split into 2GB (per virtual LBA) flat extent
+> > +#                        files, in addition to a descriptor file
+> > +#
+> > +# @streamOptimized:      Single file image sparse cluster allocation, optimized
+> > +#                        for streaming over network.
+> > +#
+> > +# Since: 4.0
+> > +##
+> > +{ 'enum': 'BlockdevVmdkSubformat',
+> > +  'data': [ 'monolithicSparse', 'monolithicFlat', 'twoGbMaxExtentSparse',
+> > +            'twoGbMaxExtentFlat', 'streamOptimized'] }
+> 
+> Don't conform to the QAPI rules on names "to match VMDK spec spellings"
+> (see qapi-schema.json below).  We discussed this in review of v1.
+> 
+> PRO: matches the VMDK spec (whatever that's worth), keeps the code
+> simple.
+> 
+> CON: the non-conforming names become part of the stable QMP interface,
+> in the argument of command blockdev-create.
+> 
+> I don't like the CON, but I'm willing to tolerate it in the name of
+> simplicity.
 
-Yeah, that was more or less my plan. I just haven't done
-the work of digging around to check whether it matches
-what other QEMU board models have done and whether there
-are any other hidden snags yet.
+I don't really have a opinion here. It seems this is what you had agreed
+on in v1 and it still feels acceptable (even if not perfect) to you, so
+I'll stick with it.
 
-thanks
--- PMM
+> > +
+> > +##
+> > +# @BlockdevVmdkAdapterType:
+> > +#
+> > +# Adapter type info for VMDK images
+> > +#
+> > +# Since: 4.0
+> > +##
+> > +{ 'enum': 'BlockdevVmdkAdapterType',
+> > +  'data': [ 'ide', 'buslogic', 'lsilogic', 'legacyesx'] }
+> 
+> May I have hyphens in the composite nouns?  Hmm, might be the way they
+> are to match VMDK spec spellings or for backward compatibility.  I guess
+> we'll see below.
+
+These are literal values to be written into the VMDK descriptor files,
+so they have to use this spelling. If we want to have a different
+spelling in QMP, then we'll have to translate internally.
+
+I guess this is the same argument as for BlockdevVmdkSubformat above.
+For consistency, we should use the spec spellings in both cases or not
+at all.
+
+> > +
+> > +##
+> > +# @BlockdevCreateOptionsVmdk:
+> > +#
+> > +# Driver specific image creation options for VMDK.
+> > +#
+> > +# @file         Where to store the new image file. This refers to the image
+> > +#               file for monolithcSparse and streamOptimized format, or the
+> > +#               descriptor file for other formats.
+> > +# @size         Size of the virtual disk in bytes
+> > +# @extents      Where to store the data extents. Required for monolithcflat,
+> > +#               twoGbMaxExtentSparse and twoGbMaxExtentFlat formats. For
+> > +#               monolithicflat, only one entry is required; for
+> 
+> monolithicFlat
+> 
+> > +#               twoGbMaxExtent* formats, the number of entries required is
+> > +#               calculated as extent_number = virtual_size / 2GB.
+> 
+> Is it okay to supply more entries than required, or do I have to supply
+> exactly the right number?
+
+If I understand the code correctly, additional extents are silently
+ignored.
+
+> > +# @subformat    The subformat of the VMDK image. Default: "monolithicsparse".
+> 
+> monolithicSparse
+> 
+> > +# @backing-file The path of backing file. Default: no backing file is used.
+> > +# @adapter-type The adapter type used to fill in the descriptor. Default: ide.
+> > +# @hwversion    Hardware version. The meaningful options are "4" or "6".
+> > +#               Defaulted to "4".
+> 
+> Default: "4"
+
+Fixed all the spelling changes.
+
+> > +# @zeroed-grain Whether to enable zeroed-grain feature for sparse subformats.
+> > +#               Default: false.
+> > +#
+> > +# Since: 4.0
+> > +##
+> > +{ 'struct': 'BlockdevCreateOptionsVmdk',
+> > +  'data': { 'file':             'BlockdevRef',
+> > +            'size':             'size',
+> > +            '*extents':          ['BlockdevRef'],
+> > +            '*subformat':       'BlockdevVmdkSubformat',
+> > +            '*backing-file':    'str',
+> > +            '*adapter-type':    'BlockdevVmdkAdapterType',
+> > +            '*hwversion':       'str',
+> > +            '*zeroed-grain':    'bool' } }
+> 
+> @zeroed-grain is undocumented.
+
+It's right there at the beginning of the quote after your last comment?
+
+> > +
+> > +
+> >  ##
+> >  # @SheepdogRedundancyType:
+> >  #
+> > @@ -4215,6 +4284,7 @@
+> >        'ssh':            'BlockdevCreateOptionsSsh',
+> >        'vdi':            'BlockdevCreateOptionsVdi',
+> >        'vhdx':           'BlockdevCreateOptionsVhdx',
+> > +      'vmdk':           'BlockdevCreateOptionsVmdk',
+> >        'vpc':            'BlockdevCreateOptionsVpc'
+> >    } }
+> >  
+> > diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
+> > index 65b6dc2f6f..78e8bcd561 100644
+> > --- a/qapi/qapi-schema.json
+> > +++ b/qapi/qapi-schema.json
+> > @@ -66,6 +66,7 @@
+> >          'ACPISlotType',         # DIMM, visible through query-acpi-ospm-status
+> >          'CpuInfoMIPS',          # PC, visible through query-cpu
+> >          'CpuInfoTricore',       # PC, visible through query-cpu
+> > +        'BlockdevVmdkSubformat',# all members, to match VMDK spec spellings
+> >          'QapiErrorClass',       # all members, visible through errors
+> >          'UuidInfo',             # UUID, visible through query-uuid
+> >          'X86CPURegister32',     # all members, visible indirectly through qom-get
+> > diff --git a/block/vmdk.c b/block/vmdk.c
+> > index 32fc2c84b3..16f86457d7 100644
+> > --- a/block/vmdk.c
+> > +++ b/block/vmdk.c
+> > @@ -1932,33 +1932,56 @@ static int filename_decompose(const char *filename, char *path, char *prefix,
+> >      return VMDK_OK;
+> >  }
+> >  
+> > -static int coroutine_fn vmdk_co_create_opts(const char *filename, QemuOpts *opts,
+> > -                                            Error **errp)
+> > +/*
+> > + * idx == 0: get or create the descriptor file (also the image file if in a
+> > + *           non-split format.
+> > + * idx >= 1: get the n-th extent if in a split subformat
+> > + */
+> > +typedef BlockBackend *(*vmdk_create_extent_fn)(int64_t size,
+> > +                                               int idx,
+> > +                                               bool flat,
+> > +                                               bool split,
+> > +                                               bool compress,
+> > +                                               bool zeroed_grain,
+> > +                                               void *opaque,
+> > +                                               Error **errp);
+> > +
+> > +static void vmdk_desc_add_extent(GString *desc,
+> > +                                 const char *extent_line_fmt,
+> > +                                 int64_t size, const char *filename)
+> > +{
+> > +    char *basename = g_path_get_basename(filename);
+> 
+> I like a blank line between declarations and statements.
+
+Matter of taste. But okay, I already changed this function, so I'll give
+you this one.
+
+> > +    g_string_append_printf(desc, extent_line_fmt,
+> > +                           DIV_ROUND_UP(size, BDRV_SECTOR_SIZE), basename);
+> > +
+> > +    g_free(basename);
+> > +}
+> > +
+> > +static int coroutine_fn vmdk_co_do_create(int64_t size,
+> > +                                          BlockdevVmdkSubformat subformat,
+> > +                                          BlockdevVmdkAdapterType adapter_type,
+> > +                                          const char *backing_file,
+> > +                                          const char *hw_version,
+> > +                                          bool compat6,
+> > +                                          bool zeroed_grain,
+> > +                                          vmdk_create_extent_fn extent_fn,
+> > +                                          void *opaque,
+> > +                                          Error **errp)
+> >  {
+> > -    int idx = 0;
+> > -    BlockBackend *new_blk = NULL;
+> > +    int extent_idx;
+> > +    BlockBackend *blk = NULL;
+> >      Error *local_err = NULL;
+> >      char *desc = NULL;
+> > -    int64_t total_size = 0, filesize;
+> > -    char *adapter_type = NULL;
+> > -    char *backing_file = NULL;
+> > -    char *hw_version = NULL;
+> > -    char *fmt = NULL;
+> >      int ret = 0;
+> >      bool flat, split, compress;
+> >      GString *ext_desc_lines;
+> > -    char *path = g_malloc0(PATH_MAX);
+> > -    char *prefix = g_malloc0(PATH_MAX);
+> > -    char *postfix = g_malloc0(PATH_MAX);
+> > -    char *desc_line = g_malloc0(BUF_SIZE);
+> > -    char *ext_filename = g_malloc0(PATH_MAX);
+> > -    char *desc_filename = g_malloc0(PATH_MAX);
+> >      const int64_t split_size = 0x80000000;  /* VMDK has constant split size */
+> > -    const char *desc_extent_line;
+> > +    int64_t extent_size;
+> > +    int64_t created_size = 0;
+> > +    const char *extent_line_fmt;
+> >      char *parent_desc_line = g_malloc0(BUF_SIZE);
+> >      uint32_t parent_cid = 0xffffffff;
+> >      uint32_t number_heads = 16;
+> > -    bool zeroed_grain = false;
+> >      uint32_t desc_offset = 0, desc_len;
+> >      const char desc_template[] =
+> >          "# Disk DescriptorFile\n"
+> > @@ -1982,71 +2005,35 @@ static int coroutine_fn vmdk_co_create_opts(const char *filename, QemuOpts *opts
+> >  
+> >      ext_desc_lines = g_string_new(NULL);
+> >  
+> > -    if (filename_decompose(filename, path, prefix, postfix, PATH_MAX, errp)) {
+> > -        ret = -EINVAL;
+> > -        goto exit;
+> > -    }
+> >      /* Read out options */
+> > -    total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+> > -                          BDRV_SECTOR_SIZE);
+> > -    adapter_type = qemu_opt_get_del(opts, BLOCK_OPT_ADAPTER_TYPE);
+> > -    backing_file = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
+> > -    hw_version = qemu_opt_get_del(opts, BLOCK_OPT_HWVERSION);
+> > -    if (qemu_opt_get_bool_del(opts, BLOCK_OPT_COMPAT6, false)) {
+> > -        if (strcmp(hw_version, "undefined")) {
+> > +    if (compat6) {
+> > +        if (hw_version) {
+> >              error_setg(errp,
+> >                         "compat6 cannot be enabled with hwversion set");
+> >              ret = -EINVAL;
+> >              goto exit;
+> >          }
+> > -        g_free(hw_version);
+> > -        hw_version = g_strdup("6");
+> > -    }
+> > -    if (strcmp(hw_version, "undefined") == 0) {
+> > -        g_free(hw_version);
+> > -        hw_version = g_strdup("4");
+> > +        hw_version = "6";
+> >      }
+> > -    fmt = qemu_opt_get_del(opts, BLOCK_OPT_SUBFMT);
+> > -    if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ZEROED_GRAIN, false)) {
+> > -        zeroed_grain = true;
+> > +    if (!hw_version) {
+> > +        hw_version = "4";
+> >      }
+> >  
+> > -    if (!adapter_type) {
+> > -        adapter_type = g_strdup("ide");
+> > -    } else if (strcmp(adapter_type, "ide") &&
+> > -               strcmp(adapter_type, "buslogic") &&
+> > -               strcmp(adapter_type, "lsilogic") &&
+> > -               strcmp(adapter_type, "legacyESX")) {
+> > -        error_setg(errp, "Unknown adapter type: '%s'", adapter_type);
+> > -        ret = -EINVAL;
+> > -        goto exit;
+> > -    }
+> 
+> Old code recognizes "legacyESX".  New code recognizes "legacyesx".  Bug
+> or feature?
+
+Good catch!
+
+Who knows? But it's not advertised as a feature in the commit message,
+and I can only see the spelling "legacyESX" in the spec, so I'll change
+the QAPI definition to "legacyESX". Leaving things as they were should
+be safe.
+
+Fam also made the value case insensitive when parsing QemuOpts in
+vmdk_co_create_opts() to compensate for the change. I think this can
+also go away then?
+
+Kevin
