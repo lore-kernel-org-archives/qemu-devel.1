@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gVJBO-0003L9-8n
+	(envelope-from <alex.williamson@redhat.com>) id 1gVJBN-0003L8-UD
 	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:40:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gVJBN-0001jM-31
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:40:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47050)
+	(envelope-from <alex.williamson@redhat.com>) id 1gVJBK-0001d6-OV
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:40:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58778)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gVJBM-0001hG-PZ
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:40:52 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2CF6B307D981
-	for <qemu-devel@nongnu.org>; Fri,  7 Dec 2018 16:40:52 +0000 (UTC)
-References: <20181207151636.8123-1-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b9998045-614b-fb45-2369-e48f77d29ad4@redhat.com>
-Date: Fri, 7 Dec 2018 10:40:50 -0600
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1gVJBK-0001Zl-F3
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:40:50 -0500
+From: Alex Williamson <alex.williamson@redhat.com>
+Date: Fri, 07 Dec 2018 09:40:33 -0700
+Message-ID: <154419994154.27028.14774494243513273923.stgit@gimli.home>
 MIME-Version: 1.0
-In-Reply-To: <20181207151636.8123-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-web PATCH] Add license files for GPLv2+ and
- CC-BY-SA-4.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [for-4.0 PATCH v4 0/9] pcie: Enhanced link speed and
+ width support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,89 +26,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eric Auger <eric.auger@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Markus Armbruster <armbru@redhat.com>, Geoffrey McRae <geoff@hostfission.com>
 
-On 12/7/18 9:16 AM, Daniel P. Berrang=C3=A9 wrote:
-> The intent is that from this point onwards, content for this repository
-> is dual-licensed under the GPLv2+ and CC-BY-SA-4.0
->=20
-> With git HEAD at d06ee0a788da27a2f24ab46928bc03eea019fb44, we have
-> authors:
->=20
->    $ git log | grep Author | sed -e 's/Author: //' | sort | uniq -c
+v3->v4:
+ - v4.0 machine types moved to patch 1/9.  This patch is now for
+   reference only with the expectation that it will be merged 
+   through Eduardo's tree.  Including here only to have a self
+   contained series. (Includes Eduardo's SPAPR loop fix)
+ - Add Markus & Philippe's Review-by
+ - Add Eric's Review-by and corrections to various patches:
+   - qapi: correct release reference to 4.0 in enum definitions
+   - link fill: set link bandwidth notification for width > x1
+     OR (new) speed > 2.5GT/s with comment update
+ - Correct HW_COMPAT_3_1 to the experimental property names
 
-You're reinventing:
-$ git shortlog -e -s
+v2->v3:
+ - Michael suggested offline that we not commit the pcie-root-port
+   driver API to support arbitrary speeds and widths without some
+   necessary use case where it's required to set these outside of
+   the machine type defaults.  These options therefore become
+   experimental, x-speed and x-width, with the expectation that users
+   can either update their machine type or use experimental options
+   for old machine types.  Patches 6 & 9 affected.  Leaving Geoffrey's
+   Tested-by on patch 6 as this is a superficial change.
+ - Rolled in David's Ack for spapr 4.0 machine type (patch 8).
 
->        1 Alex Benn=C3=A9e <alex.bennee@linaro.org>
->        2 Daniel P. Berrange <berrange@redhat.com>
->        3 Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+v1->v2:
+ - Update for QEMU release numbering, next is 4.0 not 3.2.  Only
+   patch 8 and the commit log of patch 9 updated.
 
-Looks like a separate patch introducing .mailmap is in order :)
+RFC->v1:
+ - Add Cc reported by get_maintainer
+ - Fixup some commit logs (no code changes in patches 1-7)
+ - Add Geoffrey's Tested-by
+ - Add patches 8 & 9 which define a QEMU 3.2 machine type and cranking
+   up the link speed and width for that machine type while maintaining
+   compatibile speeds for older machine types (testing requested for
+   non-x86 machine types)
+ - Various other users have also reported success with this series
+   (/r/VFIO)
 
->        3 Eric Blake <eblake@redhat.com>
->        1 Fam Zheng <famz@redhat.com>
->        2 Jeff Cody <jcody@redhat.com>
->       50 Michael Roth <mdroth@linux.vnet.ibm.com>
->       47 Paolo Bonzini <pbonzini@redhat.com>
->        1 Rainer M=C3=BCller <raimue@macports.org>
->        1 Stefan Hajnoczi <stefanha@gmail.com>
->       14 Thomas Huth <thuth@redhat.com>
->        1 Yu Ning <yu.ning@intel.com>
->=20
-> This patch constitutes approval for all Red Hat copyright content (all
-> @redhat.com addrs & Stefan Hajnoczi) to be placed under these licenses.
-> For non-Red Hat copyright holders approval was given on the
-> qemu-devel@nongnu.org mailing list with the following Message-IDs:
->=20
->   - Alex Benn=C3=A9e <alex.bennee@linaro.org>
->=20
->     <CAHDbmO2Gt+5RWaJ8Ka3LpB8o4Anq+evtKDO1oc6+X8gF7LZsOw@mail.gmail.com=
->
->=20
->   - Michael Roth <mdroth@linux.vnet.ibm.com>
->=20
->     <154411651930.28165.5754119001430373065@sif>
->=20
->   - Rainer M=C3=BCller <raimue@macports.org>
->=20
->     <a6ad246f-b674-56d9-8c82-bb80880932a8@macports.org>
->=20
->   - Yu Ning <yu.ning@intel.com>
->=20
->     <C29659EAAA3E0143B583467412621C605E3E6CFF@SHSMSX101.ccr.corp.intel.=
-com>
->=20
-> Note core basic site template/layout design is derived from a pre-built
-> template already under the CC-by-3.0 license, and will not change.
->=20
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
+Original cover letter:
 
-> +++ b/_includes/copyright.html
-> @@ -1,8 +1,7 @@
->   <div id=3D"copyright">
->   	<div id=3D"copyright-inner">
-> -	<div class=3D"container">
-> -		Design: <a href=3D"http://templated.co">TEMPLATED</a> &mdash;
-> -		available under CC-BY 3.0
-> -	</div>
-> +	  <div class=3D"container">
-> +	    This site is made available under the terms of <a href=3D"/licens=
-e">a number of licenses</a>.
+QEMU exposes gen1 PCI-express interconnect devices supporting only
+2.5GT/s and x1 width.  It might not seem obvious that a virtual
+bandwidth limitation can result in a real performance degradation, but
+it's been reported that in some configurations assigned GPUs might not
+scale their link speed up to the maximum supported value if the
+downstream port above it only advertises limited link support.
 
-Does Jekyll auto-create a /license file from the various LICENSE-*=20
-additions, or did you forget to 'git add' yet another file?  I'm=20
-assuming that this _includes/copyright.html is merely a footer appended=20
-on each page.
+As proposed[1] this series effectively implements virtual link
+negotiation on downstream ports and enhances the generic PCIe root
+port to allow user configurable speeds and widths.  The "negotiation"
+simply mirrors the link status of the connected downstream device
+providing the appearance of dynamic link speed scaling to match the
+endpoint device.  Not yet implemented from the proposal is support
+for globally updating defaults based on machine type, though the
+foundation is provided here by allowing supporting PCIESlots to
+implement an instance_init callback which can call into a common
+helper for this.
 
-Is it worth being specific that the TEMPLATED portion is still=20
-CC-BY-3.0, while all other contributions are dual-licensed=20
-GPLv2+/CC-BY-SA-4.0?  Or, if we don't want that much details in the=20
-footer, should README at least mention the distinctions?
+I have not specifically tested migration with this, but we already
+consider LNKSTA to be dynamic and the other changes implemented here
+are static config space changes with no changes being implemented for
+devices using default values, ie. they should be compatible by virtue
+of existing config space migration support.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I think I've covered the required link related registers to support
+PCIe 4.0, but please let me know if I've missed any.
+
+Testing and feedback appreciated, patch 6/7 [now 7/9] provides example
+qemu:arg options and requirements to use with existing libvirt.  Native
+libvirt support TBD.  Thanks,
+
+Alex
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg03086.html
+---
+
+Alex Williamson (9):
+      q35/440fx/arm/spapr/ccw: Add QEMU 4.0 machine type
+      pcie: Create enums for link speed and width
+      pci: Sync PCIe downstream port LNKSTA on read
+      qapi: Define PCIe link speed and width properties
+      pcie: Add link speed and width fields to PCIESlot
+      pcie: Fill PCIESlot link fields to support higher speeds and widths
+      pcie: Allow generic PCIe root port to specify link speed and width
+      vfio/pci: Remove PCIe Link Status emulation
+      pcie: Fast PCIe root ports for new machines
+
+
+ hw/arm/virt.c                      |   19 +++-
+ hw/core/qdev-properties.c          |  178 ++++++++++++++++++++++++++++++++++++
+ hw/i386/pc_piix.c                  |   15 ++-
+ hw/i386/pc_q35.c                   |   13 ++-
+ hw/pci-bridge/gen_pcie_root_port.c |    4 +
+ hw/pci-bridge/pcie_root_port.c     |   14 +++
+ hw/pci/pci.c                       |    4 +
+ hw/pci/pcie.c                      |  120 ++++++++++++++++++++++++
+ hw/ppc/spapr.c                     |   25 ++++-
+ hw/s390x/s390-virtio-ccw.c         |   17 +++
+ hw/vfio/pci.c                      |    9 --
+ include/hw/compat.h                |   11 ++
+ include/hw/i386/pc.h               |    3 +
+ include/hw/pci/pci.h               |   13 +++
+ include/hw/pci/pcie.h              |    1 
+ include/hw/pci/pcie_port.h         |    4 +
+ include/hw/pci/pcie_regs.h         |   23 ++++-
+ include/hw/qdev-properties.h       |    8 ++
+ qapi/common.json                   |   42 ++++++++
+ 19 files changed, 500 insertions(+), 23 deletions(-)
