@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gVECG-0003OH-Py
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 06:21:34 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gVEH8-0001Zd-1R
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 06:26:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gVECF-0005rZ-K8
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 06:21:28 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 7 Dec 2018 11:21:17 +0000
-Message-ID: <13a090e9-ef18-4215-6726-453251b76560@virtuozzo.com>
-References: <20181130220344.3350618-1-eblake@redhat.com>
-	<20181130220344.3350618-13-eblake@redhat.com>
-In-Reply-To: <20181130220344.3350618-13-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C122E1D831B6464B9B7785C1B4FD8966@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <mlureau@redhat.com>) id 1gVEH4-0001C1-2D
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 06:26:30 -0500
+Received: from mail-qt1-f180.google.com ([209.85.160.180]:37844)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gVEH3-0001BR-TZ
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 06:26:25 -0500
+Received: by mail-qt1-f180.google.com with SMTP id z16so4043521qtq.4
+	for <qemu-devel@nongnu.org>; Fri, 07 Dec 2018 03:26:25 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 12/14] nbd/client: Work around 3.0 bug for
- listing meta contexts
+References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
+	<20180706105753.26700-11-marcandre.lureau@redhat.com>
+	<87k1koq6s6.fsf@dusky.pond.sub.org>
+In-Reply-To: <87k1koq6s6.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Fri, 7 Dec 2018 15:26:13 +0400
+Message-ID: <CAMxuvaw_3gHsgDZ9tN7r+uzV3BPr8TAoBoYBVUnPMv6ODyYfYA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 10/27] qapi: factor out checking for keys
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,66 +30,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: "Armbruster, Markus" <armbru@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-MDEuMTIuMjAxOCAxOjAzLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBDb21taXQgM2QwNjhhZmYgZm9y
-Z290IHRvIGFkdmVydGlzZSBhdmFpbGFibGUgcWVtdTogY29udGV4dHMNCj4gd2hlbiB0aGUgY2xp
-ZW50IHJlcXVlc3RzIGEgbGlzdCB3aXRoIDAgcXVlcmllcy4gRnVydGhlcm1vcmUsDQo+IDMuMCBz
-aGlwcGVkIHdpdGggYSBxZW11LWltZyBoYWNrIG9mIHgtZGlydHktYml0bWFwIChjb21taXQNCj4g
-MjE2ZWUzNjUpIHRoYXQgX3NpbGVudGx5XyBhY3RzIGFzIHRob3VnaCB0aGUgZW50aXJlIGltYWdl
-IGlzDQo+IGNsZWFuIGlmIGEgcmVxdWVzdGVkIGJpdG1hcCBpcyBub3QgcHJlc2VudC4gIEJvdGgg
-YnVncyBoYXZlDQo+IGJlZW4gcmVjZW50bHkgZml4ZWQgdG8gZ2l2ZSBmdWxsIG91dHB1dCBmcm9t
-IHRoZSBzdGFydCwgYW5kDQo+IHRvIHJlZnVzZSBhIGNvbm5lY3Rpb24gaWYgYSByZXF1ZXN0ZWQg
-eC1kaXJ0eS1iaXRtYXAgd2FzIG5vdA0KPiBmb3VuZC4NCj4gDQo+IFN0aWxsLCBpdCBpcyBsaWtl
-bHkgdGhhdCB0aGVyZSB3aWxsIGJlIHVzZXJzIHRoYXQgaGF2ZSB0bw0KPiB3b3JrIHdpdGggYSBt
-aXggb2Ygb2xkIGFuZCBuZXcgcWVtdSB2ZXJzaW9ucywgZGVwZW5kaW5nIG9uDQo+IHdoaWNoIGZl
-YXR1cmVzIGdldCBiYWNrcG9ydGVkIHdoZXJlLCBhdCB3aGljaCBwb2ludCBiZWluZw0KPiBhYmxl
-IHRvIHJlbHkgb24gJ3FlbXUtaW1nIC0tbGlzdCcgb3V0cHV0IHRvIGtub3cgZm9yIHN1cmUNCj4g
-d2hldGhlciBhIGdpdmVuIE5CRCBleHBvcnQgaGFzIHRoZSBkZXNpcmVkIGRpcnR5IGJpdG1hcCBp
-cw0KPiBtdWNoIG5pY2VyIHRoYW4gYmxpbmRseSBjb25uZWN0aW5nIGFuZCByaXNraW5nIHRoYXQg
-dGhlDQo+IGVudGlyZSBpbWFnZSBtYXkgYXBwZWFyIGNsZWFuLiAgV2UgY2FuIG1ha2Ugb3VyIC0t
-bGlzdCBjb2RlDQo+IHNtYXJ0IGVub3VnaCB0byB3b3JrIGFyb3VuZCBidWdneSBzZXJ2ZXJzIGJ5
-IHRyYWNraW5nDQo+IHdoZXRoZXIgd2UndmUgc2VlbiBhbnkgcWVtdTogcmVwbGllcyBpbiB0aGUg
-b3JpZ2luYWwgMC1xdWVyeQ0KPiBsaXN0OyBpZiBub3QsIHJlY3Vyc2UgdG8gYSBzaW5nbGUgcXVl
-cnkgb24gInFlbXU6IiAod2hpY2gNCj4gbWF5IHN0aWxsIGhhdmUgbm8gcmVwbGllcywgYnV0IHRo
-ZW4gd2Uga25vdyBmb3Igc3VyZSB3ZQ0KPiBkaWRuJ3QgdHJpcCB1cCBvbiB0aGUgc2VydmVyIGJ1
-ZykuDQoNCnJlbGF0ZWQgdGhpbmc6DQpzaG91bGQgd2UgZG9jdW1lbnQgdGhlc2UgYnVncyB3aXRo
-IGNvcnJlc3BvbmRpbmcgdmVyc2lvbiBudW1iZXJzIGluIGRvY3MvaW50ZXJvcC9uYmQudHh0Pw0K
-DQoNCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPg0K
-PiANCj4gLS0tDQo+IERvbmUgYXMgYSBzZXBhcmF0ZSBwYXRjaCB0byBtYWtlIGl0IGVhc2llciB0
-byByZXZlcnQgd2hlbiB3ZSBubw0KPiBsb25nZXIgY2FyZSBhYm91dCAzLjAgc2VydmVycw0KPiAt
-LS0NCj4gICBuYmQvY2xpZW50LmMgfCAxMSArKysrKysrKysrLQ0KPiAgIDEgZmlsZSBjaGFuZ2Vk
-LCAxMCBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvbmJk
-L2NsaWVudC5jIGIvbmJkL2NsaWVudC5jDQo+IGluZGV4IDYyOTJkZTU2MGVlLi45MjhlY2FiZDQy
-MCAxMDA2NDQNCj4gLS0tIGEvbmJkL2NsaWVudC5jDQo+ICsrKyBiL25iZC9jbGllbnQuYw0KPiBA
-QCAtMjEsNiArMjEsNyBAQA0KPiAgICNpbmNsdWRlICJxYXBpL2Vycm9yLmgiDQo+ICAgI2luY2x1
-ZGUgInRyYWNlLmgiDQo+ICAgI2luY2x1ZGUgIm5iZC1pbnRlcm5hbC5oIg0KPiArI2luY2x1ZGUg
-InFlbXUvY3V0aWxzLmgiDQo+IA0KPiAgIC8qIERlZmluaXRpb25zIGZvciBvcGFxdWUgZGF0YSB0
-eXBlcyAqLw0KPiANCj4gQEAgLTczNiwxMiArNzM3LDEzIEBAIHN0YXRpYyBpbnQgbmJkX25lZ290
-aWF0ZV9zaW1wbGVfbWV0YV9jb250ZXh0KFFJT0NoYW5uZWwgKmlvYywNCj4gICAgICAgICAgICAg
-ICAgICAgcmV0dXJuIC0xOw0KPiAgICAgICAgICAgICAgIH0NCj4gICAgICAgICAgICAgICBnX2Zy
-ZWUobmFtZSk7DQo+ICsgICAgICAgICAgICByZWNlaXZlZCA9IHRydWU7DQo+ICAgICAgICAgICB9
-IGVsc2Ugew0KPiAgICAgICAgICAgICAgIGluZm8tPmNvbnRleHRzID0gZ19yZW5ldyhjaGFyICos
-IGluZm8tPmNvbnRleHRzLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICArK2luZm8tPm5fY29udGV4dHMpOw0KPiAgICAgICAgICAgICAgIGluZm8tPmNvbnRleHRzW2lu
-Zm8tPm5fY29udGV4dHMgLSAxXSA9IG5hbWU7DQo+ICsgICAgICAgICAgICByZWNlaXZlZCB8PSBz
-dHJzdGFydChuYW1lLCAicWVtdToiLCBOVUxMKTsNCg0Kc28sIGZvciBfTElTVF8sIGl0IGlzIGFj
-dHVhbGx5IHJlY2VpdmVkX3FlbXUgdmFyLiBJdCBoYXMgdGFrZW4gc29tZSB0aW1lIGZvciBtZQ0K
-dG8gdW5kZXJzdGFuZCB0aGF0IGl0J3Mgb2sgKHR1cm5zIG91dCwgdGhhdCB0aGlzIHZhcmlhYmxl
-IGFjdHVhbGx5IGlzbid0IHVzZWQgZm9yDQpfTElTVF8gY2FzZSkuLiBQZXJzb25hbGx5IEkgZG9u
-J3QgbGlrZSBpdCwgZm9yIG1lIGl0J3MgdG9vIHRyaWNreSwgYnV0IGFueXdheSwgeW91DQpzYWlk
-LCB5b3UnbGwgcmVmYWN0b3IgdGhpcyBmdW5jdGlvbiBzb21laG93Lg0KDQo+ICAgICAgICAgICB9
-DQo+IC0gICAgICAgIHJlY2VpdmVkID0gdHJ1ZTsNCj4gDQo+ICAgICAgICAgICAvKiByZWNlaXZl
-IE5CRF9SRVBfQUNLICovDQo+ICAgICAgICAgICBpZiAobmJkX3JlY2VpdmVfb3B0aW9uX3JlcGx5
-KGlvYywgb3B0LCAmcmVwbHksIGVycnApIDwgMCkgew0KPiBAQCAtNzcxLDYgKzc3MywxMyBAQCBz
-dGF0aWMgaW50IG5iZF9uZWdvdGlhdGVfc2ltcGxlX21ldGFfY29udGV4dChRSU9DaGFubmVsICpp
-b2MsDQo+ICAgICAgICAgICBpbmZvLT5tZXRhX2Jhc2VfYWxsb2NhdGlvbl9pZCA9IHJlY2VpdmVk
-X2lkOw0KPiAgICAgICB9DQo+IA0KPiArICAgIC8qIFJlY3Vyc2UgdG8gd29yayBhcm91bmQgcWVt
-dSAzLjAgYnVnIC0gdGhlIHNlcnZlciBmb3Jnb3QgdG8gc2VuZA0KPiArICAgICAqICJxZW11OiIg
-cmVwbGllcyB0byAwIHF1ZXJpZXMuICovDQo+ICsgICAgaWYgKCFjb250ZXh0ICYmICFyZWNlaXZl
-ZCkgew0KPiArICAgICAgICByZXR1cm4gbmJkX25lZ290aWF0ZV9zaW1wbGVfbWV0YV9jb250ZXh0
-KGlvYywgb3B0LCAicWVtdToiLCBpbmZvLA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIGVycnApOw0KPiArICAgIH0NCj4gKw0KPiAgICAgICByZXR1
-cm4gcmVjZWl2ZWQgfHwgb3B0ID09IE5CRF9PUFRfTElTVF9NRVRBX0NPTlRFWFQ7DQo+ICAgfQ0K
-PiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+On Wed, Dec 5, 2018 at 8:26 PM Markus Armbruster <armbru@redhat.com> wrote:
+>
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+> > Introduce a new helper function to check if the given keys are known,
+> > and if mandatory keys are present. The function will be reused in
+> > other places in the following code changes.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  scripts/qapi/common.py | 20 +++++++++++++-------
+> >  1 file changed, 13 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+> > index a353670079..8313c478c4 100644
+> > --- a/scripts/qapi/common.py
+> > +++ b/scripts/qapi/common.py
+> > @@ -873,6 +873,17 @@ def check_struct(expr, info):
+> >                 allow_metas=3D['struct'])
+> >
+> >
+> > +def check_known_keys(info, source, keys, required, optional):
+> > +    for key in keys:
+> > +        if key not in required and key not in optional:
+> > +            raise QAPISemError(info, "Unknown key '%s' in %s" % (key, =
+source))
+> > +
+> > +    for key in required:
+> > +        if key not in keys:
+> > +            raise QAPISemError(info, "Key '%s' is missing from %s"
+> > +                               % (key, source))
+> > +
+> > +
+> >  def check_keys(expr_elem, meta, required, optional=3D[]):
+> >      expr =3D expr_elem['expr']
+> >      info =3D expr_elem['info']
+> > @@ -880,10 +891,9 @@ def check_keys(expr_elem, meta, required, optional=
+=3D[]):
+> >      if not isinstance(name, str):
+> >          raise QAPISemError(info, "'%s' key must have a string value" %=
+ meta)
+> >      required =3D required + [meta]
+> > +    source =3D "%s '%s'" % (meta, name)
+> > +    check_known_keys(info, source, list(expr.keys()), required, option=
+al)
+>
+> Sure you need list() here?
+
+I don't know, that's what python-modernize suggests.
+
+Also the top answer from:
+https://stackoverflow.com/questions/16819222/how-to-return-dictionary-keys-=
+as-a-list-in-python#16819250
+
+Do you mind if I leave the list() ? (mostly for python-modernize to be happ=
+y)
+
+
+>
+> >      for (key, value) in expr.items():
+> > -        if key not in required and key not in optional:
+> > -            raise QAPISemError(info, "Unknown key '%s' in %s '%s'"
+> > -                               % (key, meta, name))
+> >          if key in ['gen', 'success-response'] and value is not False:
+> >              raise QAPISemError(info,
+> >                                 "'%s' of %s '%s' should only use false =
+value"
+> > @@ -895,10 +905,6 @@ def check_keys(expr_elem, meta, required, optional=
+=3D[]):
+> >                                 % (key, meta, name))
+> >          if key =3D=3D 'if':
+> >              check_if(expr, info)
+> > -    for key in required:
+> > -        if key not in expr:
+> > -            raise QAPISemError(info, "Key '%s' is missing from %s '%s'=
+"
+> > -                               % (key, meta, name))
+> >
+> >
+> >  def check_exprs(exprs):
