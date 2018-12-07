@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gVHxK-0002h9-Kr
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 10:22:19 -0500
+	(envelope-from <prvs=87219212e=anthony.perard@citrix.com>)
+	id 1gVI12-0005N6-C5
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 10:26:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gVHxI-0000Zq-Ir
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 10:22:18 -0500
-References: <20181130220344.3350618-1-eblake@redhat.com>
-	<20181130220344.3350618-13-eblake@redhat.com>
-	<13a090e9-ef18-4215-6726-453251b76560@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6a8e30be-505d-77d8-2201-390bad247de2@redhat.com>
-Date: Fri, 7 Dec 2018 09:21:58 -0600
+	(envelope-from <prvs=87219212e=anthony.perard@citrix.com>)
+	id 1gVI0z-0004Av-1k
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 10:26:08 -0500
+Date: Fri, 7 Dec 2018 15:26:01 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20181207152601.GH18875@perard.uk.xensource.com>
+References: <1544108924-10841-1-git-send-email-paul.durrant@citrix.com>
+	<1544108924-10841-4-git-send-email-paul.durrant@citrix.com>
+	<20181207143525.GF18875@perard.uk.xensource.com>
+	<ce9a0cbaa69c42c084e40b96c4d01c26@AMSPEX02CL03.citrite.net>
 MIME-Version: 1.0
-In-Reply-To: <13a090e9-ef18-4215-6726-453251b76560@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 12/14] nbd/client: Work around 3.0 bug for
- listing meta contexts
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ce9a0cbaa69c42c084e40b96c4d01c26@AMSPEX02CL03.citrite.net>
+Subject: Re: [Qemu-devel] [PATCH v2 03/18] xen: introduce 'xen-block',
+ 'xen-disk' and 'xen-cdrom'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,39 +28,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Paul Durrant <Paul.Durrant@citrix.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-On 12/7/18 5:21 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 01.12.2018 1:03, Eric Blake wrote:
->> Commit 3d068aff forgot to advertise available qemu: contexts
->> when the client requests a list with 0 queries. Furthermore,
->> 3.0 shipped with a qemu-img hack of x-dirty-bitmap (commit
->> 216ee365) that _silently_ acts as though the entire image is
->> clean if a requested bitmap is not present.  Both bugs have
->> been recently fixed to give full output from the start, and
->> to refuse a connection if a requested x-dirty-bitmap was not
->> found.
->>
->> Still, it is likely that there will be users that have to
->> work with a mix of old and new qemu versions, depending on
->> which features get backported where, at which point being
->> able to rely on 'qemu-img --list' output to know for sure
->> whether a given NBD export has the desired dirty bitmap is
->> much nicer than blindly connecting and risking that the
->> entire image may appear clean.  We can make our --list code
->> smart enough to work around buggy servers by tracking
->> whether we've seen any qemu: replies in the original 0-query
->> list; if not, recurse to a single query on "qemu:" (which
->> may still have no replies, but then we know for sure we
->> didn't trip up on the server bug).
+On Fri, Dec 07, 2018 at 02:39:40PM +0000, Paul Durrant wrote:
+> > -----Original Message-----
+> > From: Anthony PERARD [mailto:anthony.perard@citrix.com]
+> > Sent: 07 December 2018 14:35
+> > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
+> > devel@lists.xenproject.org; Kevin Wolf <kwolf@redhat.com>; Max Reitz
+> > <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
+> > Subject: Re: [PATCH v2 03/18] xen: introduce 'xen-block', 'xen-disk' and
+> > 'xen-cdrom'
+> > 
+> > On Thu, Dec 06, 2018 at 03:08:29PM +0000, Paul Durrant wrote:
+> > > +static char *disk_to_vbd_name(unsigned int disk)
+> > > +{
+> > > +    char *name, *prefix = (disk >= 26) ?
+> > > +        disk_to_vbd_name((disk / 26) - 1) : g_strdup("");
+> > > +
+> > > +    name = g_strdup_printf("%s%c", prefix, 'a' + disk);
+> > 
+> > I don't think that works, if disk is 27, we do ('a' + 27) here. It's
+> > probably missing a `disk % 26`.
 > 
-> related thing:
-> should we document these bugs with corresponding version numbers in docs/interop/nbd.txt?
+> Damn, yes I was not allowing the >2 letters.
+> 
+> > 
+> > > +    g_free(prefix);
+> > > +
+> > > +    return name;
+> > > +}
+> > 
+> > [...]
+> > 
+> > > +static unsigned int vbd_name_to_disk(const char *name, const char
+> > **endp)
+> > > +{
+> > > +    unsigned int disk = 0;
+> > > +
+> > > +    while (*name != '\0') {
+> > > +        if (!g_ascii_isalpha(*name) || !g_ascii_islower(*name)) {
+> > > +            break;
+> > > +        }
+> > > +
+> > > +        disk *= 26;
+> > > +        disk += *name++ - 'a';
+> > > +    }
+> > > +    *endp = name;
+> > > +
+> > > +    return disk;
+> > > +}
+> > > +
+> > > +static void xen_block_set_vdev(Object *obj, Visitor *v, const char
+> > *name,
+> > > +                               void *opaque, Error **errp)
+> > > +{
+> > 
+> > Setting vdev doesn't work. I've tried to add a disk `xvdaa', and it
+> > result in `xvda', or `d0p0' (in the trace). (Same result with `xvdaaa',
+> > and 'xvdba' gives 'xvdaa'/d26p0)
+> > 
+> 
+> Ok, that's weird. I'll have to figure that out.
 
-Might be useful.  I'll add that as another patch in my v2 series.
+It's probably because 'a' is somtime 0 and sometime is 1.
+
+'a' should be 0
+'aa' should be 26,
+'aaa' Seems to be 702.
+
+'xvda': 0     ->                     0 * 1
+'xvdz': 25    ->                    25 * 1
+'xvdaa': 26   ->            1 * 26 + 0 * 1
+'xvdaaa': 702 -> 1 * 26^2 + 1 * 26 + 0 * 1
+
+So, it's weird. Have fun fixing the algorithm for that.
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Anthony PERARD
