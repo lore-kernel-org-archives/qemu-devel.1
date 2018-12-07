@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gVG0e-0005AI-QM
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 08:17:37 -0500
+	(envelope-from <lvivier@redhat.com>) id 1gVG0i-0005Ch-GR
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 08:17:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gVG0Z-00067q-Ru
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 08:17:36 -0500
-Date: Fri, 7 Dec 2018 14:17:20 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181207141720.2264b06f.cohuck@redhat.com>
-In-Reply-To: <20181207135253.10e3e021@oc2783563651>
-References: <20181205145131.28467-1-cohuck@redhat.com>
-	<5d274f2c-23a2-0c4f-9f2d-07cbe529c5ac@de.ibm.com>
-	<20181207132946.00df1f5a.cohuck@redhat.com>
-	<20181207135253.10e3e021@oc2783563651>
+	(envelope-from <lvivier@redhat.com>) id 1gVG0h-0006Pl-BN
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 08:17:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44886)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1gVG0h-0006Lx-1Y
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 08:17:39 -0500
+From: Laurent Vivier <lvivier@redhat.com>
+Date: Fri,  7 Dec 2018 14:17:32 +0100
+Message-Id: <20181207131732.21073-2-lvivier@redhat.com>
+In-Reply-To: <20181207131732.21073-1-lvivier@redhat.com>
+References: <20181207131732.21073-1-lvivier@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC] vfio-ap: flag as compatible with
- balloon
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 2/2] scsi-generic: Convert from DPRINTF() macro
+ to trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,63 +26,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Tony Krowiak <akrowiak@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Laurent Vivier <lvivier@redhat.com>
 
-On Fri, 7 Dec 2018 13:52:53 +0100
-Halil Pasic <pasic@linux.ibm.com> wrote:
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+---
+ hw/scsi/scsi-generic.c | 56 ++++++++++++++++++++----------------------
+ hw/scsi/trace-events   | 11 +++++++++
+ 2 files changed, 37 insertions(+), 30 deletions(-)
 
-> On Fri, 7 Dec 2018 13:29:46 +0100
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
-> > On Fri, 7 Dec 2018 13:17:02 +0100
-> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> >   
-> > > On 05.12.2018 15:51, Cornelia Huck wrote:  
-> > > > vfio-ap devices do not pin any pages in the host. Therefore, they
-> > > > are belived to be compatible with memory ballooning.
-> > > > 
-> > > > Flag them as compatible, so both vfio-ap and a balloon can be
-> > > > used simultaneously.
-> > > > 
-> > > > Signed-off-by: Cornelia Huck <cohuck@redhat.com>    
-> 
-> With the comment stuff sorted out:
-> Reviewed-by: Halil Pasic <pasic@linux.ibm.com> 
-
-So, do you agree with the comment change I suggested?
-
-+    /*
-+     * vfio-ap devices operate in a way compatible with
-+     * memory ballooning, as no pages are pinned in the host.
-+     * This needs to be set before vfio_get_device() for vfio common to
-+     * handle the balloon inhibitor.
-+     */
-
-> 
-> @Connie: Just had a look at the MAINTAINERS file and hw/vfio/ap.c
-> is listed under Arch. support S90 with you as a maintainer, and under
-> vfio-ap with 4 maintainers listed one of them being me. The question
-> is who is going to post a PULL request for this?
-
-General practice has been that I'm collecting everything s390x related.
-I have also pulled from others before (e.g. some bios changes from
-Thomas). While you could apply the patch, send it to me, and then I'd
-queue it to s390-next, I can also simply queue it directly with your
-ack :)
-
-[Longer term, if you want to collect ap patches and then send me a pull
-request, I would also be happy to do that. For this single patch, it
-seems overkill.]
-
-> 
-> > > 
-> > > Does it make sense to add cc stable for 3.1?  
-> > 
-> > Can do that, given that s390x systems really rely on the ballooner in
-> > general.
-> >   
-> 
-> I agree with cc stable.
-
-Will add when applying.
+diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+index 7237b4162e..842f8e0893 100644
+--- a/hw/scsi/scsi-generic.c
++++ b/hw/scsi/scsi-generic.c
+@@ -18,21 +18,10 @@
+ #include "hw/scsi/scsi.h"
+ #include "hw/scsi/emulation.h"
+ #include "sysemu/block-backend.h"
++#include "trace.h"
+=20
+ #ifdef __linux__
+=20
+-//#define DEBUG_SCSI
+-
+-#ifdef DEBUG_SCSI
+-#define DPRINTF(fmt, ...) \
+-do { printf("scsi-generic: " fmt , ## __VA_ARGS__); } while (0)
+-#else
+-#define DPRINTF(fmt, ...) do {} while(0)
+-#endif
+-
+-#define BADF(fmt, ...) \
+-do { fprintf(stderr, "scsi-generic: " fmt , ## __VA_ARGS__); } while (0)
+-
+ #include <scsi/sg.h>
+ #include "scsi/constants.h"
+=20
+@@ -98,8 +87,7 @@ static void scsi_command_complete_noio(SCSIGenericReq *=
+r, int ret)
+         }
+     }
+=20
+-    DPRINTF("Command complete 0x%p tag=3D0x%x status=3D%d\n",
+-            r, r->req.tag, status);
++    trace_scsi_generic_command_complete_noio(r, r->req.tag, status);
+=20
+     scsi_req_complete(&r->req, status);
+ done:
+@@ -259,7 +247,7 @@ static void scsi_read_complete(void * opaque, int ret=
+)
+     }
+=20
+     len =3D r->io_header.dxfer_len - r->io_header.resid;
+-    DPRINTF("Data ready tag=3D0x%x len=3D%d\n", r->req.tag, len);
++    trace_scsi_generic_read_complete(r->req.tag, len);
+=20
+     r->len =3D -1;
+=20
+@@ -335,7 +323,7 @@ static void scsi_read_data(SCSIRequest *req)
+     SCSIDevice *s =3D r->req.dev;
+     int ret;
+=20
+-    DPRINTF("scsi_read_data tag=3D0x%x\n", req->tag);
++    trace_scsi_generic_read_data(req->tag);
+=20
+     /* The request is used as the AIO opaque value, so add a ref.  */
+     scsi_req_ref(&r->req);
+@@ -356,7 +344,7 @@ static void scsi_write_complete(void * opaque, int re=
+t)
+     SCSIGenericReq *r =3D (SCSIGenericReq *)opaque;
+     SCSIDevice *s =3D r->req.dev;
+=20
+-    DPRINTF("scsi_write_complete() ret =3D %d\n", ret);
++    trace_scsi_generic_write_complete(ret);
+=20
+     assert(r->req.aiocb !=3D NULL);
+     r->req.aiocb =3D NULL;
+@@ -371,7 +359,7 @@ static void scsi_write_complete(void * opaque, int re=
+t)
+     if (r->req.cmd.buf[0] =3D=3D MODE_SELECT && r->req.cmd.buf[4] =3D=3D=
+ 12 &&
+         s->type =3D=3D TYPE_TAPE) {
+         s->blocksize =3D (r->buf[9] << 16) | (r->buf[10] << 8) | r->buf[=
+11];
+-        DPRINTF("block size %d\n", s->blocksize);
++        trace_scsi_generic_write_complete_blocksize(s->blocksize);
+     }
+=20
+     scsi_command_complete_noio(r, ret);
+@@ -388,7 +376,7 @@ static void scsi_write_data(SCSIRequest *req)
+     SCSIDevice *s =3D r->req.dev;
+     int ret;
+=20
+-    DPRINTF("scsi_write_data tag=3D0x%x\n", req->tag);
++    trace_scsi_generic_write_data(req->tag);
+     if (r->len =3D=3D 0) {
+         r->len =3D r->buflen;
+         scsi_req_data(&r->req, r->len);
+@@ -411,6 +399,21 @@ static uint8_t *scsi_get_buf(SCSIRequest *req)
+     return r->buf;
+ }
+=20
++static void scsi_generic_command_dump(uint8_t *cmd, int len)
++{
++    int i;
++    char *line_buffer, *p;
++
++    line_buffer =3D g_malloc(len * 5 + 1);
++
++    for (i =3D 0, p =3D line_buffer; i < len; i++) {
++        p +=3D sprintf(p, " 0x%02x", cmd[i]);
++    }
++    trace_scsi_generic_send_command(line_buffer);
++
++    g_free(line_buffer);
++}
++
+ /* Execute a scsi command.  Returns the length of the data expected by t=
+he
+    command.  This will be Positive for data transfers from the device
+    (eg. disk reads), negative for transfers to the device (eg. disk writ=
+es),
+@@ -422,16 +425,9 @@ static int32_t scsi_send_command(SCSIRequest *req, u=
+int8_t *cmd)
+     SCSIDevice *s =3D r->req.dev;
+     int ret;
+=20
+-#ifdef DEBUG_SCSI
+-    DPRINTF("Command: data=3D0x%02x", cmd[0]);
+-    {
+-        int i;
+-        for (i =3D 1; i < r->req.cmd.len; i++) {
+-            printf(" 0x%02x", cmd[i]);
+-        }
+-        printf("\n");
++    if (trace_event_get_state_backends(TRACE_SCSI_GENERIC_SEND_COMMAND))=
+ {
++        scsi_generic_command_dump(cmd, r->req.cmd.len);
+     }
+-#endif
+=20
+     if (r->req.cmd.xfer =3D=3D 0) {
+         g_free(r->buf);
+@@ -693,7 +689,7 @@ static void scsi_generic_realize(SCSIDevice *s, Error=
+ **errp)
+=20
+     /* define device state */
+     s->type =3D scsiid.scsi_type;
+-    DPRINTF("device type %d\n", s->type);
++    trace_scsi_generic_realize_type(s->type);
+=20
+     switch (s->type) {
+     case TYPE_TAPE:
+@@ -716,7 +712,7 @@ static void scsi_generic_realize(SCSIDevice *s, Error=
+ **errp)
+         break;
+     }
+=20
+-    DPRINTF("block size %d\n", s->blocksize);
++    trace_scsi_generic_realize_blocksize(s->blocksize);
+=20
+     /* Only used by scsi-block, but initialize it nevertheless to be cle=
+an.  */
+     s->default_scsi_version =3D -1;
+diff --git a/hw/scsi/trace-events b/hw/scsi/trace-events
+index e9625f790c..3c2fd7f52f 100644
+--- a/hw/scsi/trace-events
++++ b/hw/scsi/trace-events
+@@ -320,3 +320,14 @@ scsi_disk_emulate_command_UNKNOWN(int cmd, const cha=
+r *name) "Unknown SCSI comma
+ scsi_disk_dma_command_READ(uint64_t lba, uint32_t len) "Read (sector %" =
+PRId64 ", count %u)"
+ scsi_disk_dma_command_WRITE(const char *cmd, uint64_t lba, int len) "Wri=
+te %s(sector %" PRId64 ", count %u)"
+ scsi_disk_new_request(uint32_t lun, uint32_t tag, const char *line) "Com=
+mand: lun=3D%d tag=3D0x%x data=3D%s"
++
++# hw/scsi/scsi-generic.c
++scsi_generic_command_complete_noio(void *req, uint32_t tag, int statuc) =
+"Command complete %p tag=3D0x%x status=3D%d"
++scsi_generic_read_complete(uint32_t tag, int len) "Data ready tag=3D0x%x=
+ len=3D%d"
++scsi_generic_read_data(uint32_t tag) "scsi_read_data tag=3D0x%x"
++scsi_generic_write_complete(int ret) "scsi_write_complete() ret =3D %d"
++scsi_generic_write_complete_blocksize(int blocksize) "block size %d"
++scsi_generic_write_data(uint32_t tag) "scsi_write_data tag=3D0x%x"
++scsi_generic_send_command(const char *line) "Command: data=3D%s"
++scsi_generic_realize_type(int type) "device type %d"
++scsi_generic_realize_blocksize(int blocksize) "block size %d"
+--=20
+2.19.2
