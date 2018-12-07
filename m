@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gVJI0-0005BC-Lr
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:47:46 -0500
+	(envelope-from <prvs=87219212e=anthony.perard@citrix.com>)
+	id 1gVJK3-0000Cg-4d
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:49:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gVJHz-0001gZ-SW
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:47:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49956)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gVJHz-0001ep-Ky
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:47:43 -0500
-References: <20181207131732.21073-1-lvivier@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9e6f1c89-90d3-8582-a6fa-550a2691c35e@redhat.com>
-Date: Fri, 7 Dec 2018 10:47:40 -0600
+	(envelope-from <prvs=87219212e=anthony.perard@citrix.com>)
+	id 1gVJJz-00012s-8s
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:49:51 -0500
+Date: Fri, 7 Dec 2018 16:48:10 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20181207164810.GK18875@perard.uk.xensource.com>
+References: <1544108924-10841-1-git-send-email-paul.durrant@citrix.com>
+	<1544108924-10841-11-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <20181207131732.21073-1-lvivier@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] scsi-disk: Convert from DPRINTF()
- macro to trace events
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1544108924-10841-11-git-send-email-paul.durrant@citrix.com>
+Subject: Re: [Qemu-devel] [PATCH v2 10/18] xen: add header and build
+ dataplane/xen-block.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +26,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Paul Durrant <paul.durrant@citrix.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-On 12/7/18 7:17 AM, Laurent Vivier wrote:
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->   hw/scsi/scsi-disk.c  | 105 +++++++++++++++++++++----------------------
->   hw/scsi/trace-events |  29 ++++++++++++
->   2 files changed, 81 insertions(+), 53 deletions(-)
+On Thu, Dec 06, 2018 at 03:08:36PM +0000, Paul Durrant wrote:
+> This patch adds the transformations necessary to get dataplane/xen-block.c
+> to build against the new XenBus/XenDevice framework. MAINTAINERS is also
+> updated due to the introduction of dataplane/xen-block.h.
 > 
-> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-> index 0e9027c8f3..29e541efdb 100644
-> --- a/hw/scsi/scsi-disk.c
-> +++ b/hw/scsi/scsi-disk.c
-> @@ -19,15 +19,6 @@
->    * the host adapter emulator.
->    */
->   
-> -//#define DEBUG_SCSI
-> -
-> -#ifdef DEBUG_SCSI
-> -#define DPRINTF(fmt, ...) \
-> -do { printf("scsi-disk: " fmt , ## __VA_ARGS__); } while (0)
-> -#else
-> -#define DPRINTF(fmt, ...) do {} while(0)
-> -#endif
-> -
+> NOTE: Existing data structure names are retained for the moment. These will
+>       be modified by subsequent patches. A typedef for XenBlockDataPlane
+>       has been added to the header (based on the old struct XenBlkDev name
+>       for the moment) so that the old names don't need to leak out of the
+>       dataplane code.
+> 
+> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 
-Yay for getting rid of yet another bit-rottable debug statement.
+Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
+
+Thanks,
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Anthony PERARD
