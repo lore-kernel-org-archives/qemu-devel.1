@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gVC7m-0006Nz-RY
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 04:08:43 -0500
+	(envelope-from <thuth@redhat.com>) id 1gVCF1-0003wU-Dp
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 04:16:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gVC7j-00043n-Fz
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 04:08:42 -0500
-Received: from 5.mo6.mail-out.ovh.net ([46.105.54.31]:48037)
+	(envelope-from <thuth@redhat.com>) id 1gVCEw-0003jj-9A
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 04:16:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54116)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gVC7j-0003wv-8M
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 04:08:39 -0500
-Received: from player793.ha.ovh.net (unknown [10.109.143.246])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 5ED2C19C86F
-	for <qemu-devel@nongnu.org>; Fri,  7 Dec 2018 10:08:37 +0100 (CET)
-References: <20181205232251.10446-1-clg@kaod.org>
-	<20181205232251.10446-4-clg@kaod.org>
-	<20181206032535.GL768@umbus.fritz.box>
-	<aa579a81-aeec-4197-1ea9-c6a7f995949f@kaod.org>
-	<20181207020735.GY768@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <c74c6541-a20d-4cab-9f8d-81854800afd7@kaod.org>
-Date: Fri, 7 Dec 2018 10:08:31 +0100
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gVCEv-0003jR-UU
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 04:16:06 -0500
+References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
+	<1543851204-41186-16-git-send-email-pbonzini@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <512311a0-6198-2677-9a9f-53a24b3dc273@redhat.com>
+Date: Fri, 7 Dec 2018 10:16:01 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181207020735.GY768@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <1543851204-41186-16-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 03/37] ppc/xive: introduce the
- XiveNotifier interface
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 15/71] tests/libqos: introduce
+ virtio_start_device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,75 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <laurent@vivier.eu>
 
-On 12/7/18 3:07 AM, David Gibson wrote:
-> On Thu, Dec 06, 2018 at 07:17:47AM +0100, C=E9dric Le Goater wrote:
->> On 12/6/18 4:25 AM, David Gibson wrote:
->>> On Thu, Dec 06, 2018 at 12:22:17AM +0100, C=E9dric Le Goater wrote:
->>>> The XiveNotifier offers a simple interface, between the XiveSource
->>>> object and the main interrupt controller of the machine. It will
->>>> forward event notifications to the XIVE Interrupt Virtualization
->>>> Routing Engine (IVRE).
->>>>
->>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->>>> ---
->>>>  include/hw/ppc/xive.h | 23 +++++++++++++++++++++++
->>>>  hw/intc/xive.c        | 25 +++++++++++++++++++++++++
->>>>  2 files changed, 48 insertions(+)
->>>>
->>>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
->>>> index 7cebc32eba4c..6770cffec67d 100644
->>>> --- a/include/hw/ppc/xive.h
->>>> +++ b/include/hw/ppc/xive.h
->>>> @@ -142,6 +142,27 @@
->>>> =20
->>>>  #include "hw/qdev-core.h"
->>>> =20
->>>> +/*
->>>> + * XIVE Fabric (Interface between Source and Router)
->>>> + */
->>>> +
->>>> +typedef struct XiveNotifier {
->>>> +    Object parent;
->>>> +} XiveNotifier;
->>>> +
->>>> +#define TYPE_XIVE_NOTIFIER "xive-fabric"
->>>
->>> I'm applying this, but changing the string here from "xive-fabric" to
->>> "xive-notifier".
->>
->> Ah yes. My sed command missed that.
->=20
-> So, I've now applied patches 1-5.  I think we've agreed to a change in
-> patch 6 which will require tweaks to a bunch further down the series,
+On 2018-12-03 16:32, Paolo Bonzini wrote:
+> From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+> 
+> This function is intended to group all the qvirtio_* functions that
+> start the qvirtio devices.
+> Applied in all tests using this combination of functions.
+> 
+> Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  tests/libqos/virtio.c    |  7 +++++++
+>  tests/libqos/virtio.h    |  1 +
+>  tests/vhost-user-test.c  |  4 +---
+>  tests/virtio-9p-test.c   |  4 +---
+>  tests/virtio-blk-test.c  | 10 +++-------
+>  tests/virtio-net-test.c  |  4 +---
+>  tests/virtio-scsi-test.c |  4 +---
+>  7 files changed, 15 insertions(+), 19 deletions(-)
+[...]
+> diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+> index 04c6087..f97c158 100644
+> --- a/tests/virtio-blk-test.c
+> +++ b/tests/virtio-blk-test.c
+> @@ -116,10 +116,7 @@ static QVirtioPCIDevice *virtio_blk_pci_init(QPCIBus *bus, int slot)
+>      g_assert_cmphex(dev->pdev->devfn, ==, ((slot << 3) | PCI_FN));
+>  
+>      qvirtio_pci_device_enable(dev);
+> -    qvirtio_reset(&dev->vdev);
+> -    qvirtio_set_acknowledge(&dev->vdev);
+> -    qvirtio_set_driver(&dev->vdev);
+> -
+> +    qvirtio_start_device(&dev->vdev);
+>      return dev;
+>  }
+>  
+> @@ -333,6 +330,7 @@ static void pci_indirect(void)
+>      qvirtio_set_features(&dev->vdev, features);
+>  
+>      vqpci = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, qs->alloc, 0);
+> +
+>      qvirtio_set_driver_ok(&dev->vdev);
 
-yes.
+Unnecessary white-space change. Apart from that nit:
 
-> so I think the rest will need a v7.
-
-Yes.
-
-Here's my TODO list :=20
-
-- some asserts and comments
-- introduce a helper to get the CAM line of a ring
-- rework the physical CAM line setting.
-- introduce a "block" property in XiveENDSource
-- remove chip_id id from XiveRouter
-- may be modify XiveRouter to be a QOM interface
-
-
-The hcalls are the big remaining part to review before adding the=20
-XIVE-only machine.
-
-I think I will move up in the patchset the TCG "dual" machine because=20
-it does not need much more changes and the XICS machine is not impacted.
-
-KVM will come after.
-=20
-
-Thanks,
-
-C.=20
+Reviewed-by: Thomas Huth <thuth@redhat.com>
