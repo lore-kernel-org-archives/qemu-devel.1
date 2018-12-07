@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gVKN1-0007kG-VB
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:57:00 -0500
+	(envelope-from <mst@redhat.com>) id 1gVKNk-0008Ci-ER
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:57:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gVKMy-0005fk-PL
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:56:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51402)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gVKMy-0005a8-FA
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:56:56 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8619EA7DD
-	for <qemu-devel@nongnu.org>; Fri,  7 Dec 2018 17:56:47 +0000 (UTC)
-Date: Fri, 7 Dec 2018 12:56:37 -0500
+	(envelope-from <mst@redhat.com>) id 1gVKNj-0006Rx-LT
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:57:44 -0500
+Date: Fri, 7 Dec 2018 12:57:28 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181207125539-mutt-send-email-mst@kernel.org>
+Message-ID: <20181207125716-mutt-send-email-mst@kernel.org>
 References: <20181207170400.5129-1-philmd@redhat.com>
-	<20181207170400.5129-7-philmd@redhat.com>
+	<20181207170400.5129-3-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20181207170400.5129-7-philmd@redhat.com>
+In-Reply-To: <20181207170400.5129-3-philmd@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 6/6] hw/nvram/fw_cfg: Add
- fw_cfg_add_file_from_host()
+Subject: Re: [Qemu-devel] [PATCH 2/6] hw/arm: Remove unused include
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,98 +25,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>
 
-On Fri, Dec 07, 2018 at 06:04:00PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Add a function to read the full content of file on the host, and add
-> a new 'file' name item to the fw_cfg device.
->=20
+On Fri, Dec 07, 2018 at 06:03:56PM +0100, Philippe Mathieu-Daud=E9 wrote:
 > Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-
-Need to be careful with options that let users play with firmware.
-Way too easy to create conflicts.
-Anyway, I'd rather have this included with whatever is using it.
-
 > ---
->  hw/nvram/fw_cfg.c         | 22 ++++++++++++++++++++++
->  include/hw/nvram/fw_cfg.h | 22 ++++++++++++++++++++++
->  2 files changed, 44 insertions(+)
+>  hw/arm/virt-acpi-build.c | 1 -
+>  1 file changed, 1 deletion(-)
 >=20
-> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index 50525ec1dd..f3232fcb16 100644
-> --- a/hw/nvram/fw_cfg.c
-> +++ b/hw/nvram/fw_cfg.c
-> @@ -842,6 +842,28 @@ void fw_cfg_add_file(FWCfgState *s,  const char *f=
-ilename,
->      fw_cfg_add_file_callback(s, filename, NULL, NULL, NULL, data, len,=
- true);
->  }
-> =20
-> +void *fw_cfg_add_file_from_host(FWCfgState *s, const char *filename,
-> +                                const char *host_path, size_t *len)
-> +{
-> +    GError *gerr =3D NULL;
-> +    gchar *ptr =3D NULL;
-> +    gsize contents_len =3D 0;
-> +
-> +
-> +    if (g_file_get_contents(host_path, &ptr, &contents_len, &gerr)) {
-> +        fw_cfg_add_file(s, filename, ptr, contents_len);
-> +    } else {
-> +        error_report("failed to read file %s, %s", host_path, gerr->me=
-ssage);
-> +        g_error_free(gerr);
-> +        return NULL;
-> +    }
-> +    if (len) {
-> +        *len =3D contents_len;
-> +    }
-> +
-> +    return ptr;
-> +}
-> +
->  void *fw_cfg_modify_file(FWCfgState *s, const char *filename,
->                          void *data, size_t len)
->  {
-> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
-> index 28630b2f26..8de8d63433 100644
-> --- a/include/hw/nvram/fw_cfg.h
-> +++ b/include/hw/nvram/fw_cfg.h
-> @@ -166,6 +166,28 @@ void fw_cfg_add_i64(FWCfgState *s, uint16_t key, u=
-int64_t value);
->  void fw_cfg_add_file(FWCfgState *s, const char *filename, void *data,
->                       size_t len);
-> =20
-> +/**
-> + * fw_cfg_add_file_from_host:
-> + * @s: fw_cfg device being modified
-> + * @filename: name of new fw_cfg file item
-> + * @host_path: path of the host file to read the data from
-> + * @len: pointer to hold the length of the host file (optional)
-> + *
-> + * Read the content of a host file as a raw "blob" then add a new NAME=
-D
-> + * fw_cfg item of the file size. If @len is provided, it will contains=
- the
-> + * total length read from the host file. The data referenced by the st=
-arting
-> + * pointer is only linked, NOT copied, into the data structure of the =
-fw_cfg
-> + * device.
-> + * The next available (unused) selector key starting at FW_CFG_FILE_FI=
-RST
-> + * will be used; also, a new entry will be added to the file directory
-> + * structure residing at key value FW_CFG_FILE_DIR, containing the ite=
-m name,
-> + * data size, and assigned selector key value.
-> + *
-> + * Returns: pointer to the file content, or NULL if an error occured.
-> + */
-> +void *fw_cfg_add_file_from_host(FWCfgState *s, const char *filename,
-> +                                const char *host_path, size_t *len);
-> +
->  /**
->   * fw_cfg_add_file_callback:
->   * @s: fw_cfg device being modified
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 5785fb697c..98d7f7cf20 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -35,7 +35,6 @@
+>  #include "target/arm/cpu.h"
+>  #include "hw/acpi/acpi-defs.h"
+>  #include "hw/acpi/acpi.h"
+> -#include "hw/nvram/fw_cfg.h"
+>  #include "hw/acpi/bios-linker-loader.h"
+>  #include "hw/loader.h"
+>  #include "hw/hw.h"
+
+
+This file uses fw_cfg_add_file, looks wrong.
+
 > --=20
 > 2.17.2
