@@ -1,23 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=87219212e=anthony.perard@citrix.com>)
-	id 1gVIbW-00089H-OS
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:03:51 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gVIfx-00020T-Re
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:08:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=87219212e=anthony.perard@citrix.com>)
-	id 1gVIbV-0004SX-SN
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:03:50 -0500
-Date: Fri, 7 Dec 2018 16:03:31 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20181207160331.GJ18875@perard.uk.xensource.com>
-References: <1544108924-10841-1-git-send-email-paul.durrant@citrix.com>
-	<1544108924-10841-8-git-send-email-paul.durrant@citrix.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1544108924-10841-8-git-send-email-paul.durrant@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH v2 07/18] xen: add event channel interface
- for XenDevice-s
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gVIft-0001dp-Nm
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:08:25 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Fri,  7 Dec 2018 16:08:03 +0000
+Message-Id: <20181207160806.13569-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 0/3] macppc: minor patches for 4.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,20 +17,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-On Thu, Dec 06, 2018 at 03:08:33PM +0000, Paul Durrant wrote:
-> The legacy PV backend infrastructure provides functions to bind, unbind
-> and send notifications to event channnels. Similar functionality will be
-> required by XenDevice implementations so this patch adds the necessary
-> support.
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Here are a few minor macppc patches that have been sitting in my local queue
+during freeze in preparation for 4.0.
 
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Thanks,
+
+Mark Cave-Ayland (3):
+  MAINTAINERS: add myself as maintainer for Mac Old World and New World
+    machines
+  mac_newworld: enable access to EDID data for the VGA device
+  mac_oldworld: enable access to EDID data for the VGA device
+
+ MAINTAINERS           | 6 ++++--
+ hw/ppc/mac_newworld.c | 5 ++++-
+ hw/ppc/mac_oldworld.c | 5 ++++-
+ 3 files changed, 12 insertions(+), 4 deletions(-)
 
 -- 
-Anthony PERARD
+2.11.0
