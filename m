@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gVItk-0004lc-Ik
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:22:41 -0500
+	(envelope-from <eblake@redhat.com>) id 1gVIwu-0007HC-5N
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:25:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gVIth-0001JJ-Ch
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:22:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50326)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gVIth-0001Fc-56
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:22:37 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 63F9A30642AD
-	for <qemu-devel@nongnu.org>; Fri,  7 Dec 2018 16:22:36 +0000 (UTC)
-Date: Fri, 7 Dec 2018 16:22:28 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181207162228.GN13784@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181207161447.31314-1-philmd@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1gVIwt-0007zX-4y
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:25:56 -0500
+References: <20181206192544.3987-1-jsnow@redhat.com>
+	<20181206192544.3987-3-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <59d3744f-8c61-724b-784d-43e5f2b0ae8e@redhat.com>
+Date: Fri, 7 Dec 2018 10:25:49 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181207161447.31314-1-philmd@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] util/error: Remove an unnecessary NULL
- check
+In-Reply-To: <20181206192544.3987-3-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] blockdev: n-ary bitmap merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,29 +24,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, vsementov@virtuozzo.com, Max Reitz <mreitz@redhat.com>
 
-On Fri, Dec 07, 2018 at 05:14:47PM +0100, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> This NULL check was required while introduced in 680d16dcb79f.
-> Later refactor added a NULL check in error_setv(), so this check
-> is now redundant.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On 12/6/18 1:25 PM, John Snow wrote:
+> Especially outside of transactions, it is helpful to provide
+> all-or-nothing semantics for bitmap merges. This facilitates
+> the coalescing of multiple bitmaps into a single target for
+> the "checkpoint" interpretation when assembling bitmaps that
+> represent arbitrary points in time from component bitmaps.
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  util/error.c | 4 ----
->  1 file changed, 4 deletions(-)
+>   blockdev.c           | 64 +++++++++++++++++++++++++++++---------------
+>   qapi/block-core.json | 22 +++++++--------
+>   2 files changed, 53 insertions(+), 33 deletions(-)
+> 
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> +++ b/qapi/block-core.json
+> @@ -1818,14 +1818,14 @@
+>   #
+>   # @node: name of device/node which the bitmap is tracking
+>   #
+> -# @dst_name: name of the destination dirty bitmap
+> +# @target: name of the destination dirty bitmap
+>   #
+> -# @src_name: name of the source dirty bitmap
+> +# @bitmaps: name(s) of the source dirty bitmap(s)
+>   #
+>   # Since: 3.0
+>   ##
+>   { 'struct': 'BlockDirtyBitmapMerge',
+> -  'data': { 'node': 'str', 'dst_name': 'str', 'src_name': 'str' } }
+> +  'data': { 'node': 'str', 'target': 'str', 'bitmaps': ['str'] } }
 
+Definitely worthwhile!
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+I'll update my pending libvirt patches to use this.
+
+>   
+>   ##
+>   # @block-dirty-bitmap-add:
+> @@ -1940,23 +1940,23 @@
+>   ##
+>   # @x-block-dirty-bitmap-merge:
+>   #
+> -# FIXME: Rename @src_name and @dst_name to src-name and dst-name.
+> -#
+> -# Merge @src_name dirty bitmap to @dst_name dirty bitmap. @src_name dirty
+> -# bitmap is unchanged. On error, @dst_name is unchanged.
+> +# Merge dirty bitmaps listed in @bitmaps to the @target dirty bitmap.
+> +# The @bitmaps dirty bitmaps are unchanged.
+
+Well, except in the corner case of when @bitmaps also lists the 
+destination (I presume that merging a bitmap into itself silently 
+succeeds with no further changes, but therefore the inclusion of the 
+destination in the list of sources means that that particular source is 
+changing due to merging in the other sources).  Not worth rewording this 
+  sentence, but does make you want to consider ensuring that the 
+testsuite covers merging a bitmap into itself.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
