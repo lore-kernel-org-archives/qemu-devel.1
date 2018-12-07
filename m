@@ -1,19 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gVC1o-0008NO-Oq
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 04:02:36 -0500
+	(envelope-from <armbru@redhat.com>) id 1gVC1q-0008OZ-Gf
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 04:02:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gVC1j-0005ob-7t
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 04:02:32 -0500
-From: Luc Michel <luc.michel@greensocs.com>
-Date: Fri,  7 Dec 2018 10:01:29 +0100
-Message-Id: <20181207090135.7651-12-luc.michel@greensocs.com>
-In-Reply-To: <20181207090135.7651-1-luc.michel@greensocs.com>
-References: <20181207090135.7651-1-luc.michel@greensocs.com>
+	(envelope-from <armbru@redhat.com>) id 1gVC1n-0005sW-6B
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 04:02:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48788)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gVC1m-0005sB-Vf
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 04:02:31 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4A6A5307DAB6
+	for <qemu-devel@nongnu.org>; Fri,  7 Dec 2018 09:02:30 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181206232333.22408-1-pbonzini@redhat.com>
+	<20181206232333.22408-7-pbonzini@redhat.com>
+Date: Fri, 07 Dec 2018 10:02:28 +0100
+In-Reply-To: <20181206232333.22408-7-pbonzini@redhat.com> (Paolo Bonzini's
+	message of "Fri, 7 Dec 2018 00:23:33 +0100")
+Message-ID: <87d0qd1zh7.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v8 11/16] gdbstub: add support for extended
- mode packet
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 6/6] checkpatch: warn about queue/queue.h
+ head structs that are not typedef-ed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,38 +34,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Add support for the '!' extended mode packet. This is required for the
-multiprocess extension.
+Let's state the rationale for requiring a typedef in the commit
+message, or point to a prior commit that has it.
 
-Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Acked-by: Alistair Francis <alistair.francis@wdc.com>
----
- gdbstub.c | 3 +++
- 1 file changed, 3 insertions(+)
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-diff --git a/gdbstub.c b/gdbstub.c
-index 48c2571ebe..1cf1bea428 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1301,10 +1301,13 @@ static int gdb_handle_packet(GDBState *s, const c=
-har *line_buf)
-     trace_gdbstub_io_command(line_buf);
-=20
-     p =3D line_buf;
-     ch =3D *p++;
-     switch(ch) {
-+    case '!':
-+        put_packet(s, "OK");
-+        break;
-     case '?':
-         /* TODO: Make this return the correct value for user-mode.  */
-         snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,
-                  gdb_fmt_thread_id(s, s->c_cpu, thread_id, sizeof(thread=
-_id)));
-         put_packet(s, buf);
---=20
-2.19.2
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  scripts/checkpatch.pl | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index a8d6e44107..b4b3495044 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -2263,6 +2263,11 @@ sub process {
+>  			}
+>  		}
+>  
+> +		if ($line =~ /^.\s*(Q(?:S?LIST|SIMPLEQ|TAILQ)_HEAD)\s*\(\s*[^,]/ &&
+> +		    $line !~ /^.typedef/) {
+> +		    ERROR("named $1 should be typedefed separately\n" . $herecurr);
+> +		}
+> +
+>  # Need a space before open parenthesis after if, while etc
+>  		if ($line=~/\b(if|while|for|switch)\(/) {
+>  			ERROR("space required before the open parenthesis '('\n" . $herecurr);
