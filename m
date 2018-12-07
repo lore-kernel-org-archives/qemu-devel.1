@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56595)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gVF1L-0006fS-5u
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 07:14:16 -0500
+	(envelope-from <prvs=87219212e=anthony.perard@citrix.com>)
+	id 1gVF2b-0007im-5L
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 07:15:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gVF1J-0002Dp-6d
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 07:14:15 -0500
-Date: Fri, 7 Dec 2018 13:14:02 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181207121402.GD5119@linux.fritz.box>
-References: <75f7e3cc-bd46-c743-84ab-cd68bcb1dcfb@de.ibm.com>
-	<d0966d94-87d4-0f25-f2e0-846a1d338be7@de.ibm.com>
-	<20181205084614.GA4018@dhcp-200-186.str.redhat.com>
-	<30858ce0-5b4b-c3c4-b846-6a214670f8d2@de.ibm.com>
-	<f91cf64b-db93-f2e5-bceb-93013592ad03@virtuozzo.com>
-	<34e1b572-41b0-ae72-6d12-283516c9218c@de.ibm.com>
-	<7d5d502b-9bba-47ed-648e-65495765c4ca@virtuozzo.com>
-	<f791fd99-4055-c308-6e62-fc3b818c7ebf@de.ibm.com>
-	<61995d89-db9d-ac34-0b32-aacffd49b184@virtuozzo.com>
-	<b11370e6-23f2-9586-aae4-915b8743a440@de.ibm.com>
+	(envelope-from <prvs=87219212e=anthony.perard@citrix.com>)
+	id 1gVF2X-00034A-Tt
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 07:15:33 -0500
+Date: Fri, 7 Dec 2018 12:15:19 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20181207121519.GE18875@perard.uk.xensource.com>
+References: <1544108924-10841-1-git-send-email-paul.durrant@citrix.com>
+	<1544108924-10841-3-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <b11370e6-23f2-9586-aae4-915b8743a440@de.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PULL 2/2] iotests: simple mirror
- test with kvm on 1G image
+In-Reply-To: <1544108924-10841-3-git-send-email-paul.durrant@citrix.com>
+Subject: Re: [Qemu-devel] [PATCH v2 02/18] xen: introduce new 'XenBus' and
+ 'XenDevice' object hierarchy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,109 +26,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Paul Durrant <paul.durrant@citrix.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-Am 06.12.2018 um 12:05 hat Christian Borntraeger geschrieben:
+On Thu, Dec 06, 2018 at 03:08:28PM +0000, Paul Durrant wrote:
+> This patch adds the basic boilerplate for a 'XenBus' object that will act
+> as a parent to 'XenDevice' PV backends.
+> A new 'XenBridge' object is also added to connect XenBus to the system bus.
 > 
+> The XenBus object is instantiated by a new xen_bus_init() function called
+> from the same sites as the legacy xen_be_init() function.
 > 
-> On 05.12.2018 17:09, Vladimir Sementsov-Ogievskiy wrote:
-> > 05.12.2018 18:52, Christian Borntraeger wrote:
-> >>
-> >>
-> >> On 05.12.2018 14:39, Vladimir Sementsov-Ogievskiy wrote:
-> >>> 05.12.2018 15:35, Christian Borntraeger wrote:
-> >>>>
-> >>>>
-> >>>> On 05.12.2018 13:00, Vladimir Sementsov-Ogievskiy wrote:
-> >>>>> 05.12.2018 12:01, Christian Borntraeger wrote:
-> >>>>>>
-> >>>>>>
-> >>>>>> On 05.12.2018 09:46, Kevin Wolf wrote:
-> >>>>>>> Am 05.12.2018 um 09:23 hat Christian Borntraeger geschrieben:
-> >>>>>>>>>>> +# prepare source image
-> >>>>>>>>>>> +qemu_img_create('-f', iotests.imgfmt, '-o', 'preallocation=metadata', disk,
-> >>>>>>>>>>> +                str(size))
-> >>>>>>>>>>> +
-> >>>>>>>>>>> +vm = QEMUMachine(iotests.qemu_prog)
-> >>>>>>>>>>> +vm.add_args('-machine', 'pc,accel=kvm')
-> >>>>>>>>
-> >>>>>>>> This (pc) clearly does not work on other architectures.
-> >>>>>>>> In addition to that, I also need to add -no-shutdown on s390 (see 068 for a similar case)
-> >>>>>>>
-> >>>>>>> Leaving out pc definitely makes sense, and the bug still reproduces for
-> >>>>>>> me without it.
-> >>>>>>>
-> >>>>>>> I don't understand the -no-shutdown, though. Already for 068, neither
-> >>>>>>> the code nor the commit message when it was added explain why this is
-> >>>>>>> needed.
-> >>>>>>>
-> >>>>>>> Can you turn this into a proper patch and add a comment why -no-shutdown
-> >>>>>>> is needed?
-> >>>>>>
-> >>>>>> I already sent this patch. The reason is that there is no BIOS in a classical sense
-> >>>>>> on s390x. If no bootable image (external kernel or from disk) is found, the small boot
-> >>>>>> bios loads a disabled wait PSW. The default action for that is then shutdown.
-> >>>>>>
-> >>>>>
-> >>>>> Is it an option for you just drop the whole line "vm.add_args('-machine', 'pc,accel=kvm')"?
-> >>>>> The problem without it for me was that gdb failed to produce full and nice backtrace, but
-> >>>>> test worked anyway
-> >>>>
-> >>>> In the commid message Vladimir said that kvm is necessary to trigger the problem.
-> >>>>
-> >>>
-> >>> No, I didn't)
-> >>>
-> >>> and it's in the comment:
-> >>> # 3. drop kvm and use iotests.VM() (maybe, because of qtest) (however, it still
-> >>> #    reproduces, if just drop kvm, but gdb failed to produce full backtraces
-> >>> #    for me)
-> >>
-> >> Ok, so I would be fine with completely dropping that line.
-> >>
-> >> the patch would then be
-> >>
-> >>
-> >>
-> >> "-machine pc" will not work all architectures. Lets fall back to the
-> >> default machine by not specifying anything for the machine.
-> >>
-> >> In addition we also need to specify -no-shutdown on s390 as qemu will
-> >> exit on guest shutdown. This happens when there is no kernel or bootable
-> >> disk on s390.
-> >>
-> >> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> >> ---
-> >>   tests/qemu-iotests/235 | 3 ++-
-> >>   1 file changed, 2 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/tests/qemu-iotests/235 b/tests/qemu-iotests/235
-> >> index da044ed34e..329da8f0c2 100755
-> >> --- a/tests/qemu-iotests/235
-> >> +++ b/tests/qemu-iotests/235
-> >> @@ -49,7 +49,8 @@ qemu_img_create('-f', iotests.imgfmt, '-o', 'preallocation=metadata', disk,
-> >>                   str(size))
-> >>   
-> >>   vm = QEMUMachine(iotests.qemu_prog)
-> >> -vm.add_args('-machine', 'pc,accel=kvm')
-> >> +if iotests.qemu_default_machine == 's390-ccw-virtio':
-> >> +        vm.add_args('-no-shutdown')
-> >>   vm.add_args('-drive', 'id=src,file=' + disk)
-> >>   vm.launch()
-> >>   
-> >>
-> >>
-> >> Shall I resend a v2?
-> >>
-> > 
-> > so, we need -no-shutdown even if we drop kvm? I hoped that not..
-> > Hmm. grep points only to one iotest doing the same about no-shutdown
-> > - 068..
+> Subsequent patches will flesh-out the functionality of these objects.
 > 
-> Kevin, shall I send the above patch as v2?
+> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> ---
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> 
+> v2:
+>  - Fix boilerplate
+>  - Make xen-bus hotplug capable
+> ---
+>  hw/i386/xen/xen-hvm.c     |   3 ++
+>  hw/xen/Makefile.objs      |   2 +-
+>  hw/xen/trace-events       |   6 +++
+>  hw/xen/xen-bus.c          | 131 ++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/xenpv/xen_machine_pv.c |   3 ++
+>  include/hw/xen/xen-bus.h  |  55 +++++++++++++++++++
+>  6 files changed, 199 insertions(+), 1 deletion(-)
+>  create mode 100644 hw/xen/xen-bus.c
+>  create mode 100644 include/hw/xen/xen-bus.h
+> 
+> diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+> index 1d63763..4497f75 100644
+> --- a/hw/i386/xen/xen-hvm.c
+> +++ b/hw/i386/xen/xen-hvm.c
+> @@ -17,6 +17,7 @@
+>  #include "hw/i386/apic-msidef.h"
+>  #include "hw/xen/xen_common.h"
+>  #include "hw/xen/xen-legacy-backend.h"
+> +#include "hw/xen/xen-bus.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qapi-commands-misc.h"
+>  #include "qemu/error-report.h"
+> @@ -1479,6 +1480,8 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
+>      QLIST_INIT(&state->dev_list);
+>      device_listener_register(&state->device_listener);
+>  
+> +    xen_bus_init();
+> +
+>      /* Initialize backend core & drivers */
+>      if (xen_be_init() != 0) {
+>          error_report("xen backend core setup failed");
+> diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
+> index 3f64a44..d9d6d7b 100644
+> --- a/hw/xen/Makefile.objs
+> +++ b/hw/xen/Makefile.objs
+> @@ -1,5 +1,5 @@
+>  # xen backend driver support
+> -common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o
+> +common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o xen-bus.o
+>  
+>  obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen-host-pci-device.o
+>  obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt.o xen_pt_config_init.o xen_pt_graphics.o xen_pt_msi.o
+> diff --git a/hw/xen/trace-events b/hw/xen/trace-events
+> index c7e7a3b..0172cd4 100644
+> --- a/hw/xen/trace-events
+> +++ b/hw/xen/trace-events
+> @@ -12,3 +12,9 @@ xen_unmap_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id:
+>  xen_map_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
+>  xen_unmap_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
+>  xen_domid_restrict(int err) "err: %u"
+> +
+> +# include/hw/xen/xen-bus.c
+> +xen_bus_realize(void) ""
+> +xen_bus_unrealize(void) ""
+> +xen_device_realize(const char *type) "type: %s"
+> +xen_device_unrealize(const char *type) "type: %s"
+> diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
+> new file mode 100644
+> index 0000000..1385bab
+> --- /dev/null
+> +++ b/hw/xen/xen-bus.c
+> @@ -0,0 +1,131 @@
+> +/*
+> + * Copyright (c) 2018  Citrix Systems Inc.
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/hw.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/xen/xen-bus.h"
+> +#include "qapi/error.h"
+> +#include "trace.h"
+> +
+> +static void xen_bus_unrealize(BusState *bus, Error **errp)
+> +{
+> +    trace_xen_bus_unrealize();
+> +}
+> +
+> +static void xen_bus_realize(BusState *bus, Error **errp)
+> +{
+> +    trace_xen_bus_realize();
+> +}
+> +
+> +static void xen_bus_class_init(ObjectClass *class, void *data)
+> +{
+> +    BusClass *bus_class = BUS_CLASS(class);
+> +
+> +    bus_class->realize = xen_bus_realize;
+> +    bus_class->unrealize = xen_bus_unrealize;
+> +}
+> +
+> +static const TypeInfo xen_bus_type_info = {
+> +    .name = TYPE_XEN_BUS,
+> +    .parent = TYPE_BUS,
+> +    .instance_size = sizeof(XenBus),
+> +    .class_size = sizeof(XenBusClass),
+> +    .class_init = xen_bus_class_init,
+> +    .interfaces = (InterfaceInfo[]) {
+> +        { TYPE_HOTPLUG_HANDLER },
+> +        { }
+> +    },
+> +};
+> +
+> +static void xen_device_unrealize(DeviceState *dev, Error **errp)
+> +{
+> +    XenDevice *xendev = XEN_DEVICE(dev);
+> +    XenDeviceClass *xendev_class = XEN_DEVICE_GET_CLASS(xendev);
+> +    const char *type = object_get_typename(OBJECT(xendev));
+> +    Error *local_err = NULL;
+> +
+> +    trace_xen_device_unrealize(type);
+> +
+> +    if (xendev_class->unrealize) {
+> +        xendev_class->unrealize(xendev, &local_err);
 
-Don't bother, I think v1 is fine. By specifying kvm explicitly, it's at
-least clear that we're not using qtest like in other tests.
+Since all you do here is propagate the error, you could even pass `errp'
+to unrealize(), instead of having `local_err'. That "for readability",
+as explained in "qapi/error.h".
 
-Kevin
+> +        if (local_err) {
+> +            error_propagate(errp, local_err);
+> +        }
+> +    }
+> +}
+> +
+
+With that nit fixed:
+Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
+
+Thanks,
+
+-- 
+Anthony PERARD
