@@ -1,29 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gVJgy-000802-CO
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:13:41 -0500
+	(envelope-from <leonardo@linux.vnet.ibm.com>) id 1gVJhT-00008R-9O
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:14:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gVJgo-0007Ky-6n
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:13:32 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:38783)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gVJgm-0007H8-GR
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:13:20 -0500
-Received: by mail-ot1-x343.google.com with SMTP id e12so4450845otl.5
-	for <qemu-devel@nongnu.org>; Fri, 07 Dec 2018 09:13:20 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-Reply-To: minyard@acm.org
-References: <20181207165103.3992-1-philmd@redhat.com>
-	<20181207165103.3992-4-philmd@redhat.com>
-From: Corey Minyard <minyard@acm.org>
-Message-ID: <83bb467c-6d0f-f97b-5ae2-a1ec99f6aa47@acm.org>
-Date: Fri, 7 Dec 2018 11:13:16 -0600
+	(envelope-from <leonardo@linux.vnet.ibm.com>) id 1gVJhP-0008Dj-O4
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:14:03 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46380)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <leonardo@linux.vnet.ibm.com>)
+	id 1gVJhP-0008CI-E0
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:13:59 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wB7H9E4O009904
+	for <qemu-devel@nongnu.org>; Fri, 7 Dec 2018 12:13:58 -0500
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2p7vwarrqm-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 07 Dec 2018 12:13:58 -0500
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <leonardo@linux.vnet.ibm.com>;
+	Fri, 7 Dec 2018 17:13:56 -0000
+From: Leonardo Bras <leonardo@linux.vnet.ibm.com>
+Date: Fri,  7 Dec 2018 15:13:14 -0200
 MIME-Version: 1.0
-In-Reply-To: <20181207165103.3992-4-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-Subject: Re: [Qemu-devel] [PATCH 3/4] hw/smbios: Remove "smbios_ipmi.h"
+Message-Id: <20181207171314.30769-1-leonardo@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 1/1] Changes requirement for "vsubsbs"
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,108 +38,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: "Paul A. Clarke" <pc@us.ibm.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, qemu-stable@nongnu.org, Leonardo Bras <leonardo@linux.vnet.ibm.com>
 
-On 12/7/18 10:51 AM, Philippe Mathieu-Daudé wrote:
-> This header only declare a single function: smbios_build_type_38_table().
-> We already have a header that declares such functions: "smbios_build.h".
-> Move the declaration and remove the header.
->
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: "Paul A. Clarke" <pc@us.ibm.com>
 
-The two IPMI changes look good to me, a definite improvement. I'm not
-sure of the value of having two separate patches, as a single patch would
-not be any bigger than the second patch and I don't see any clarity two
-patches bring.  But fine either way.
+Changes requirement for "vsubsbs" instruction, which has been supported
+since ISA 2.03. (Please see section 5.9.1.2 of ISA 2.03)
 
-Reviewed-by: Corey Minyard <cminyard@mvista.com>
+Reported-by: Paul A. Clarke <pc@us.ibm.com>
+Signed-off-by: Paul A. Clarke <pc@us.ibm.com>
+Signed-off-by: Leonardo Bras <leonardo@linux.vnet.ibm.com>
+---
+ target/ppc/translate/vmx-ops.inc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-> ---
->   hw/smbios/smbios.c              |  1 -
->   hw/smbios/smbios_build.h        |  4 ++++
->   hw/smbios/smbios_ipmi.h         | 15 ---------------
->   hw/smbios/smbios_type_38-stub.c |  2 +-
->   hw/smbios/smbios_type_38.c      |  1 -
->   5 files changed, 5 insertions(+), 18 deletions(-)
->   delete mode 100644 hw/smbios/smbios_ipmi.h
->
-> diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
-> index 30bd4731cf..9d737642cb 100644
-> --- a/hw/smbios/smbios.c
-> +++ b/hw/smbios/smbios.c
-> @@ -28,7 +28,6 @@
->   #include "hw/loader.h"
->   #include "exec/cpu-common.h"
->   #include "smbios_build.h"
-> -#include "smbios_ipmi.h"
->   
->   /* legacy structures and constants for <= 2.0 machines */
->   struct smbios_header {
-> diff --git a/hw/smbios/smbios_build.h b/hw/smbios/smbios_build.h
-> index 93b360d520..56b5a1e3f3 100644
-> --- a/hw/smbios/smbios_build.h
-> +++ b/hw/smbios/smbios_build.h
-> @@ -3,6 +3,7 @@
->    *
->    * Copyright (C) 2009 Hewlett-Packard Development Company, L.P.
->    * Copyright (C) 2013 Red Hat, Inc.
-> + * Copyright (c) 2015,2016 Corey Minyard, MontaVista Software, LLC
->    *
->    * Authors:
->    *  Alex Williamson <alex.williamson@hp.com>
-> @@ -96,4 +97,7 @@ extern unsigned smbios_table_cnt;
->           smbios_table_cnt++;                                               \
->       } while (0)
->   
-> +/* IPMI SMBIOS firmware handling */
-> +void smbios_build_type_38_table(void);
-> +
->   #endif /* QEMU_SMBIOS_BUILD_H */
-> diff --git a/hw/smbios/smbios_ipmi.h b/hw/smbios/smbios_ipmi.h
-> deleted file mode 100644
-> index 1c9aae38f2..0000000000
-> --- a/hw/smbios/smbios_ipmi.h
-> +++ /dev/null
-> @@ -1,15 +0,0 @@
-> -/*
-> - * IPMI SMBIOS firmware handling
-> - *
-> - * Copyright (c) 2015,2016 Corey Minyard, MontaVista Software, LLC
-> - *
-> - * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> - * See the COPYING file in the top-level directory.
-> - */
-> -
-> -#ifndef QEMU_SMBIOS_IPMI_H
-> -#define QEMU_SMBIOS_IPMI_H
-> -
-> -void smbios_build_type_38_table(void);
-> -
-> -#endif /* QEMU_SMBIOS_IPMI_H */
-> diff --git a/hw/smbios/smbios_type_38-stub.c b/hw/smbios/smbios_type_38-stub.c
-> index fc4516bc8a..14b53d004b 100644
-> --- a/hw/smbios/smbios_type_38-stub.c
-> +++ b/hw/smbios/smbios_type_38-stub.c
-> @@ -8,7 +8,7 @@
->    */
->   
->   #include "qemu/osdep.h"
-> -#include "smbios_ipmi.h"
-> +#include "smbios_build.h"
->   
->   void smbios_build_type_38_table(void)
->   {
-> diff --git a/hw/smbios/smbios_type_38.c b/hw/smbios/smbios_type_38.c
-> index d84e87d608..a1ad28d059 100644
-> --- a/hw/smbios/smbios_type_38.c
-> +++ b/hw/smbios/smbios_type_38.c
-> @@ -12,7 +12,6 @@
->   #include "hw/smbios/smbios.h"
->   #include "qemu/error-report.h"
->   #include "smbios_build.h"
-> -#include "smbios_ipmi.h"
->   
->   /* SMBIOS type 38 - IPMI */
->   struct smbios_type_38 {
+diff --git a/target/ppc/translate/vmx-ops.inc.c b/target/ppc/translate/vmx-ops.inc.c
+index 139f80cb24..84e05fb827 100644
+--- a/target/ppc/translate/vmx-ops.inc.c
++++ b/target/ppc/translate/vmx-ops.inc.c
+@@ -143,7 +143,7 @@ GEN_VXFORM(vaddsws, 0, 14),
+ GEN_VXFORM_DUAL(vsububs, bcdadd, 0, 24, PPC_ALTIVEC, PPC_NONE),
+ GEN_VXFORM_DUAL(vsubuhs, bcdsub, 0, 25, PPC_ALTIVEC, PPC_NONE),
+ GEN_VXFORM(vsubuws, 0, 26),
+-GEN_VXFORM_DUAL(vsubsbs, bcdtrunc, 0, 28, PPC_NONE, PPC2_ISA300),
++GEN_VXFORM_DUAL(vsubsbs, bcdtrunc, 0, 28, PPC_ALTIVEC, PPC2_ISA300),
+ GEN_VXFORM(vsubshs, 0, 29),
+ GEN_VXFORM_DUAL(vsubsws, xpnd04_2, 0, 30, PPC_ALTIVEC, PPC_NONE),
+ GEN_VXFORM_207(vadduqm, 0, 4),
+-- 
+2.19.2
