@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1gVC7G-0005wU-4c
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 04:08:11 -0500
+	(envelope-from <hongbo.zhang@linaro.org>) id 1gVC7J-000602-Bp
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 04:08:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1gVC7C-0001LE-Pl
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 04:08:10 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:37148)
+	(envelope-from <hongbo.zhang@linaro.org>) id 1gVC7G-0001mp-Eo
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 04:08:13 -0500
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:40732)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
-	id 1gVC7C-00018O-Fy
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 04:08:06 -0500
-Received: by mail-pl1-x644.google.com with SMTP id b5so1556197plr.4
-	for <qemu-devel@nongnu.org>; Fri, 07 Dec 2018 01:08:05 -0800 (PST)
+	id 1gVC7G-0001ff-3j
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 04:08:10 -0500
+Received: by mail-pl1-x641.google.com with SMTP id u18so1552668plq.7
+	for <qemu-devel@nongnu.org>; Fri, 07 Dec 2018 01:08:09 -0800 (PST)
 From: Hongbo Zhang <hongbo.zhang@linaro.org>
-Date: Fri,  7 Dec 2018 17:07:53 +0800
-Message-Id: <1544173675-14217-1-git-send-email-hongbo.zhang@linaro.org>
-Subject: [Qemu-devel] [PATCH v5 0/2] [PATCH v4] Add arm SBSA reference
- machine
+Date: Fri,  7 Dec 2018 17:07:54 +0800
+Message-Id: <1544173675-14217-2-git-send-email-hongbo.zhang@linaro.org>
+In-Reply-To: <1544173675-14217-1-git-send-email-hongbo.zhang@linaro.org>
+References: <1544173675-14217-1-git-send-email-hongbo.zhang@linaro.org>
+Subject: [Qemu-devel] [PATCH v5 1/2] hw/arm: Add arm SBSA reference machine,
+ skeleton part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,75 +32,346 @@ Cc: ard.biesheuvel@linaro.org, leif.lindholm@linaro.org, radoslaw.biernacki@lina
 
 For the Aarch64, there is one machine 'virt', it is primarily meant to
 run on KVM and execute virtualization workloads, but we need an
-environment as faithful as possible to physical hardware,  to support
+environment as faithful as possible to physical hardware, for supporting
 firmware and OS development for pysical Aarch64 machines.
 
-This machine comes with:
+This patch introduces new machine type 'sbsa-ref' with main features:
+ - Based on 'virt' machine type.
  - Re-designed memory map.
- - CPU cortex-a57.
- - EL2 and EL3 enabled.
+ - CPU type cortex-a57.
+ - EL2 and EL3 are enabled.
  - GIC version 3.
  - System bus AHCI controller.
  - System bus XHCI controller(TBD).
  - CDROM and hard disc on AHCI bus.
  - E1000E ethernet card on PCIE bus.
  - VGA display adaptor on PCIE bus.
+ - No virtio deivces.
+ - No fw_cfg device.
+ - No ACPI table supplied.
  - Only minimal device tree nodes.
-And without:
- - virtio deivces.
- - fw_cfg device.
- - ACPI tables.
 
 Arm Trusted Firmware and UEFI porting to this are done accordingly, and
 it should supply ACPI tables to load OS, the minimal device tree nodes
 supplied from this platform are only to pass the dynamic info reflecting
 command line input to firmware, not for loading OS.
 
-v5 changes:
- - removed more lines derived from virt.c
- - designed a new memory map
- - splitted former one patch into two for easier review
- - cancled previous EHCI and new HXCI coming later separately
+To make the review easier, this task is split into two patches, the
+fundamental sceleton part and the peripheral devices part, this patch is
+the first part.
 
-V4 changes:
- - rebased to v3.0.0
- - removed timer, uart, rtc, *hci device tree nodes
-   (others were removerd in v3)
- - other minore codes clean up, mainly unsed header files, comments etc.
-
-V3 changes:
- - rename the platform 'sbsa-ref'
- - move all the codes to a separate file sbsa-ref.c
- - remove paravirtualized fw_cfg device
- - do not supply ACPI tables, since firmware will do it
- - supply only necessary DT nodes
- - and other minor code clean up
-
-In the previous v4 cover letter,
-https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg04282.html
-I mentioned I had to revert two commits temperarily to run:
- Revert "target/arm: Implement new do_transaction_failed hook"
- Revert "device_tree: Increase FDT_MAX_SIZE to 1 MiB"
-
-Now the 1st one is fixed by Ard Biesheuvel in the edk2 side, and for
-the 2nd one, a simple change in firmware side can fix it, so I won't
-mention these issues in details in the cover letter any more.
-
-I also put a branch here:
-http://git.linaro.org/people/hongbo.zhang/qemu-enterprise.git/log/?h=sbsa-upstream-v5
-with the last 3 workaroud we can test using legacy firmware
-but gicv3 needs to be enabled in ATF:
-http://git.linaro.org/people/hongbo.zhang/atf-sbsa.git/log/?h=sbsa_gicv3
-
-Hongbo Zhang (2):
-  hw/arm: Add arm SBSA reference machine, skeleton part
-  hw/arm: add Arm SBSA reference machine, devices part
-
+Signed-off-by: Hongbo Zhang <hongbo.zhang@linaro.org>
+---
  hw/arm/Makefile.objs  |   2 +-
- hw/arm/sbsa-ref.c     | 698 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/arm/sbsa-ref.c     | 277 ++++++++++++++++++++++++++++++++++++++++++++++++++
  include/hw/arm/virt.h |   1 +
- 3 files changed, 700 insertions(+), 1 deletion(-)
+ 3 files changed, 279 insertions(+), 1 deletion(-)
  create mode 100644 hw/arm/sbsa-ref.c
 
+diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+index d51fcec..a8895eb 100644
+--- a/hw/arm/Makefile.objs
++++ b/hw/arm/Makefile.objs
+@@ -1,4 +1,4 @@
+-obj-y += boot.o virt.o sysbus-fdt.o
++obj-y += boot.o virt.o sbsa-ref.o sysbus-fdt.o
+ obj-$(CONFIG_ACPI) += virt-acpi-build.o
+ obj-$(CONFIG_DIGIC) += digic_boards.o
+ obj-$(CONFIG_EXYNOS4) += exynos4_boards.o
+diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
+new file mode 100644
+index 0000000..1d6252b
+--- /dev/null
++++ b/hw/arm/sbsa-ref.c
+@@ -0,0 +1,277 @@
++/*
++ * ARM SBSA Reference Platform emulation
++ *
++ * Copyright (c) 2018 Linaro Limited
++ * Written by Hongbo Zhang <hongbo.zhang@linaro.org>
++ *
++ * Based on hw/arm/virt.c
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "hw/arm/arm.h"
++#include "hw/arm/virt.h"
++#include "hw/devices.h"
++#include "net/net.h"
++#include "sysemu/device_tree.h"
++#include "sysemu/numa.h"
++#include "sysemu/sysemu.h"
++#include "hw/loader.h"
++#include "exec/address-spaces.h"
++#include "qemu/error-report.h"
++#include "hw/pci-host/gpex.h"
++#include "hw/arm/sysbus-fdt.h"
++#include "hw/arm/fdt.h"
++#include "hw/intc/arm_gic.h"
++#include "hw/intc/arm_gicv3_common.h"
++#include "kvm_arm.h"
++#include "hw/ide/internal.h"
++#include "hw/ide/ahci_internal.h"
++#include "qemu/units.h"
++
++#define NUM_IRQS 256
++
++#define RAMLIMIT_GB 8192
++#define RAMLIMIT_BYTES (RAMLIMIT_GB * GiB)
++
++static const MemMapEntry sbsa_ref_memmap[] = {
++    /* 512M boot ROM */
++    [VIRT_FLASH] =              {          0, 0x20000000 },
++    /* 512M secure memery */
++    [VIRT_SECURE_MEM] =         { 0x20000000, 0x20000000 },
++    [VIRT_CPUPERIPHS] =         { 0x40000000, 0x00080000 },
++    /* GIC distributor and CPU interface expansion spaces reserved */
++    [VIRT_GIC_DIST] =           { 0x40000000, 0x00010000 },
++    [VIRT_GIC_CPU] =            { 0x40040000, 0x00010000 },
++    /* 64M redistributor space allows up to 512 CPUs */
++    [VIRT_GIC_REDIST] =         { 0x40080000, 0x04000000 },
++    /* Space here reserved for redistributor and vCPU/HYP expansion */
++    [VIRT_UART] =               { 0x60000000, 0x00001000 },
++    [VIRT_RTC] =                { 0x60010000, 0x00001000 },
++    [VIRT_GPIO] =               { 0x60020000, 0x00001000 },
++    [VIRT_SECURE_UART] =        { 0x60030000, 0x00001000 },
++    [VIRT_SMMU] =               { 0x60040000, 0x00020000 },
++    /* Space here reserved for more SMMUs */
++    [VIRT_AHCI] =               { 0x60100000, 0x00010000 },
++    /* Space here reserved for other devices */
++    [VIRT_PCIE_PIO] =           { 0x7fff0000, 0x00010000 },
++    /* 256M PCIE ECAM space */
++    [VIRT_PCIE_ECAM] =          { 0x80000000, 0x10000000 },
++    /* ~1TB for PCIE MMIO (4GB to 1024GB boundary) */
++    [VIRT_PCIE_MMIO] =          { 0x100000000ULL, 0xFF00000000ULL },
++    [VIRT_MEM] =                { 0x10000000000ULL, RAMLIMIT_BYTES },
++};
++
++static const int sbsa_ref_irqmap[] = {
++    [VIRT_UART] = 1,
++    [VIRT_RTC] = 2,
++    [VIRT_PCIE] = 3, /* ... to 6 */
++    [VIRT_GPIO] = 7,
++    [VIRT_SECURE_UART] = 8,
++    [VIRT_AHCI] = 9,
++};
++
++static void sbsa_ref_init(MachineState *machine)
++{
++    VirtMachineState *vms = VIRT_MACHINE(machine);
++    MachineClass *mc = MACHINE_GET_CLASS(machine);
++    MemoryRegion *sysmem = get_system_memory();
++    MemoryRegion *secure_sysmem = NULL;
++    MemoryRegion *ram = g_new(MemoryRegion, 1);
++    bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
++    const CPUArchIdList *possible_cpus;
++    int n, sbsa_max_cpus;
++
++    if (strcmp(machine->cpu_type, ARM_CPU_TYPE_NAME("cortex-a57"))) {
++        error_report("sbsa-ref: CPU type other than the built-in "
++                     "cortex-a57 not supported");
++        exit(1);
++    }
++
++    if (kvm_enabled()) {
++        error_report("sbsa-ref: KVM is not supported at this machine");
++        exit(1);
++    }
++
++    if (machine->kernel_filename && firmware_loaded) {
++        error_report("sbsa-ref: No fw_cfg device on this machine, "
++                     "so -kernel option is not supported when firmware loaded, "
++                     "please load OS from hard disk instead");
++        exit(1);
++    }
++
++    /* This machine has EL3 enabled, external firmware should supply PSCI
++     * implementation, so the QEMU's internal PSCI is disabled.
++     */
++    vms->psci_conduit = QEMU_PSCI_CONDUIT_DISABLED;
++
++    sbsa_max_cpus = vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
++
++    if (max_cpus > sbsa_max_cpus) {
++        error_report("Number of SMP CPUs requested (%d) exceeds max CPUs "
++                     "supported by machine 'sbsa-ref' (%d)",
++                     max_cpus, sbsa_max_cpus);
++        exit(1);
++    }
++
++    vms->smp_cpus = smp_cpus;
++
++    if (machine->ram_size > vms->memmap[VIRT_MEM].size) {
++        error_report("sbsa-ref: cannot model more than %dGB RAM", RAMLIMIT_GB);
++        exit(1);
++    }
++
++    secure_sysmem = g_new(MemoryRegion, 1);
++    memory_region_init(secure_sysmem, OBJECT(machine), "secure-memory",
++                       UINT64_MAX);
++    memory_region_add_subregion_overlap(secure_sysmem, 0, sysmem, -1);
++
++    possible_cpus = mc->possible_cpu_arch_ids(machine);
++    for (n = 0; n < possible_cpus->len; n++) {
++        Object *cpuobj;
++        CPUState *cs;
++
++        if (n >= smp_cpus) {
++            break;
++        }
++
++        cpuobj = object_new(possible_cpus->cpus[n].type);
++        object_property_set_int(cpuobj, possible_cpus->cpus[n].arch_id,
++                                "mp-affinity", NULL);
++
++        cs = CPU(cpuobj);
++        cs->cpu_index = n;
++
++        numa_cpu_pre_plug(&possible_cpus->cpus[cs->cpu_index], DEVICE(cpuobj),
++                          &error_fatal);
++
++        if (object_property_find(cpuobj, "reset-cbar", NULL)) {
++            object_property_set_int(cpuobj, vms->memmap[VIRT_CPUPERIPHS].base,
++                                    "reset-cbar", &error_abort);
++        }
++
++        object_property_set_link(cpuobj, OBJECT(sysmem), "memory",
++                                 &error_abort);
++
++        object_property_set_link(cpuobj, OBJECT(secure_sysmem),
++                                 "secure-memory", &error_abort);
++
++        object_property_set_bool(cpuobj, true, "realized", &error_fatal);
++        object_unref(cpuobj);
++    }
++
++    memory_region_allocate_system_memory(ram, NULL, "sbsa-ref.ram",
++                                         machine->ram_size);
++    memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
++
++    vms->bootinfo.ram_size = machine->ram_size;
++    vms->bootinfo.kernel_filename = machine->kernel_filename;
++    vms->bootinfo.nb_cpus = smp_cpus;
++    vms->bootinfo.board_id = -1;
++    vms->bootinfo.loader_start = vms->memmap[VIRT_MEM].base;
++    vms->bootinfo.firmware_loaded = firmware_loaded;
++    arm_load_kernel(ARM_CPU(first_cpu), &vms->bootinfo);
++}
++
++static uint64_t sbsa_ref_cpu_mp_affinity(VirtMachineState *vms, int idx)
++{
++    uint8_t clustersz = ARM_DEFAULT_CPUS_PER_CLUSTER;
++    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
++
++    if (!vmc->disallow_affinity_adjustment) {
++        clustersz = GICV3_TARGETLIST_BITS;
++    }
++    return arm_cpu_mp_affinity(idx, clustersz);
++}
++
++static const CPUArchIdList *sbsa_ref_possible_cpu_arch_ids(MachineState *ms)
++{
++    VirtMachineState *vms = VIRT_MACHINE(ms);
++    int n;
++
++    if (ms->possible_cpus) {
++        assert(ms->possible_cpus->len == max_cpus);
++        return ms->possible_cpus;
++    }
++
++    ms->possible_cpus = g_malloc0(sizeof(CPUArchIdList) +
++                                  sizeof(CPUArchId) * max_cpus);
++    ms->possible_cpus->len = max_cpus;
++    for (n = 0; n < ms->possible_cpus->len; n++) {
++        ms->possible_cpus->cpus[n].type = ms->cpu_type;
++        ms->possible_cpus->cpus[n].arch_id =
++            sbsa_ref_cpu_mp_affinity(vms, n);
++        ms->possible_cpus->cpus[n].props.has_thread_id = true;
++        ms->possible_cpus->cpus[n].props.thread_id = n;
++    }
++    return ms->possible_cpus;
++}
++
++static CpuInstanceProperties
++sbsa_ref_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
++{
++    MachineClass *mc = MACHINE_GET_CLASS(ms);
++    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(ms);
++
++    assert(cpu_index < possible_cpus->len);
++    return possible_cpus->cpus[cpu_index].props;
++}
++
++static int64_t
++sbsa_ref_get_default_cpu_node_id(const MachineState *ms, int idx)
++{
++    return idx % nb_numa_nodes;
++}
++
++static void sbsa_ref_instance_init(Object *obj)
++{
++    VirtMachineState *vms = VIRT_MACHINE(obj);
++
++    vms->memmap = sbsa_ref_memmap;
++    vms->irqmap = sbsa_ref_irqmap;
++}
++
++static void sbsa_ref_class_init(ObjectClass *oc, void *data)
++{
++    MachineClass *mc = MACHINE_CLASS(oc);
++
++    mc->init = sbsa_ref_init;
++    mc->desc = "QEMU 'SBSA Reference' ARM Virtual Machine";
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a57");
++    mc->max_cpus = 512;
++    mc->pci_allow_0_address = true;
++    mc->minimum_page_bits = 12;
++    mc->block_default_type = IF_IDE;
++    mc->no_cdrom = 1;
++    mc->default_ram_size = 1 * GiB;
++    mc->default_cpus = 4;
++    mc->possible_cpu_arch_ids = sbsa_ref_possible_cpu_arch_ids;
++    mc->cpu_index_to_instance_props = sbsa_ref_cpu_index_to_props;
++    mc->get_default_cpu_node_id = sbsa_ref_get_default_cpu_node_id;
++}
++
++static const TypeInfo sbsa_ref_info = {
++    .name          = MACHINE_TYPE_NAME("sbsa-ref"),
++    .parent        = TYPE_VIRT_MACHINE,
++    .instance_init = sbsa_ref_instance_init,
++    .class_init    = sbsa_ref_class_init,
++};
++
++static void sbsa_ref_machine_init(void)
++{
++    type_register_static(&sbsa_ref_info);
++}
++
++type_init(sbsa_ref_machine_init);
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 9a870cc..c73c46b 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -78,6 +78,7 @@ enum {
+     VIRT_GPIO,
+     VIRT_SECURE_UART,
+     VIRT_SECURE_MEM,
++    VIRT_AHCI,
+ };
+ 
+ typedef enum VirtIOMMUType {
 -- 
 2.7.4
