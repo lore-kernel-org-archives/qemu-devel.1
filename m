@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gV52S-0001Ye-Am
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 20:34:48 -0500
+	(envelope-from <wangjian161@huawei.com>) id 1gV5Kk-0003aW-CY
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 20:53:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gV52O-0007s9-Ad
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 20:34:44 -0500
-Resent-Message-Id: <E1gV52O-0007s9-Ad@eggs.gnu.org>
-In-Reply-To: <1544135058-21380-1-git-send-email-walling@linux.ibm.com>
-Message-ID: <154414643757.8206.7892229242719489075@bb8f5089e434>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <wangjian161@huawei.com>) id 1gV5Kg-0004J0-DX
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 20:53:38 -0500
+From: wangjian <wangjian161@huawei.com>
+Message-ID: <2121490c-6d17-bb39-eebe-1be4553f8c14@huawei.com>
+Date: Fri, 7 Dec 2018 09:53:06 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 6 Dec 2018 17:33:59 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] Guest Support for Diagnose 318
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] qemu: avoid memory leak while remove disk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +21,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: walling@linux.ibm.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, rth@twiddle.net, david@redhat.com, borntraeger@de.ibm.com, thuth@redhat.com
+To: mst@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, famz@redhat.com, stefanha@gmail.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, eric.fangyi@huawei.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTQ0MTM1MDU4LTIxMzgwLTEt
-Z2l0LXNlbmQtZW1haWwtd2FsbGluZ0BsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVz
-IHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVs
-b3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKU3ViamVjdDogW1FlbXUtZGV2
-ZWxdIFtQQVRDSCB2MiAwLzNdIEd1ZXN0IFN1cHBvcnQgZm9yIERpYWdub3NlIDMxOApNZXNzYWdl
-LWlkOiAxNTQ0MTM1MDU4LTIxMzgwLTEtZ2l0LXNlbmQtZW1haWwtd2FsbGluZ0BsaW51eC5pYm0u
-Y29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
-CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
-bQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9y
-IGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQo
-Z2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1m
-b3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4K
-ICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUK
-CmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
-MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
-J3Rlc3QnCjVhMzRiYTYgczM5MDogbWlncmF0aW9uIGFuZCByZXNldCBzdXBwb3J0IGZvciBkaWFn
-bm9zZSAzMTgKNzQ0ZWY5MCBzMzkwOiBjcHUgZmVhdHVyZSBmb3IgZGlhZ25vc2UgMzE4IGFuZGxp
-bWl0IG1heCBWQ1BVcyB0byAyNDcKNDIwNWU1MCBzMzkwOiBsaW51eCBoZWFkZXIgc3luYyBmb3Ig
-ZGlhZ25vc2UgMzE4Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzM6IHMz
-OTA6IGxpbnV4IGhlYWRlciBzeW5jIGZvciBkaWFnbm9zZSAzMTguLi4KQ2hlY2tpbmcgUEFUQ0gg
-Mi8zOiBzMzkwOiBjcHUgZmVhdHVyZSBmb3IgZGlhZ25vc2UgMzE4IGFuZGxpbWl0IG1heCBWQ1BV
-cyB0byAyNDcuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8zOiBzMzkwOiBtaWdyYXRpb24gYW5kIHJlc2V0
-IHN1cHBvcnQgZm9yIGRpYWdub3NlIDMxOC4uLgpFUlJPUjogYWRkaW5nIGEgbGluZSB3aXRob3V0
-IG5ld2xpbmUgYXQgZW5kIG9mIGZpbGUKIzE2OTogRklMRTogdGFyZ2V0L3MzOTB4L2t2bS1zdHVi
-LmM6MTE2OgorfQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNTkgbGluZXMgY2hlY2tl
-ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQg
-PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBh
-dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU0NDEzNTA1OC0yMTM4MC0xLWdp
-dC1zZW5kLWVtYWlsLXdhbGxpbmdAbGludXguaWJtLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5
-cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
-W2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
-ZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Memset vhost_dev to zero in the vhost_dev_cleanup function.
+This causes dev.vqs to be NULL, so that
+vqs does not free up space when calling the g_free function.
+This will result in a memory leak. But you can't release vqs
+directly in the vhost_dev_cleanup function, because vhost_net
+will also call this function, and vhost_net's vqs is assigned by array.
+In order to solve this problem, we first save the pointer of vqs,
+and release the space of vqs after vhost_dev_cleanup is called.
+
+Signed-off-by: Jian Wang <wangjian161@huawei.com>
+---
+  hw/block/vhost-user-blk.c | 7 +++++--
+  hw/scsi/vhost-scsi.c      | 3 ++-
+  hw/scsi/vhost-user-scsi.c | 3 ++-
+  3 files changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+index 1451940..c3af28f 100644
+--- a/hw/block/vhost-user-blk.c
++++ b/hw/block/vhost-user-blk.c
+@@ -250,6 +250,7 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
+      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+      VHostUserBlk *s = VHOST_USER_BLK(vdev);
+      VhostUserState *user;
++    struct vhost_virtqueue *vqs = NULL;
+      int i, ret;
+  
+      if (!s->chardev.chr) {
+@@ -288,6 +289,7 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
+      s->dev.vqs = g_new(struct vhost_virtqueue, s->dev.nvqs);
+      s->dev.vq_index = 0;
+      s->dev.backend_features = 0;
++    vqs = s->dev.vqs;
+  
+      vhost_dev_set_config_notifier(&s->dev, &blk_ops);
+  
+@@ -314,7 +316,7 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
+  vhost_err:
+      vhost_dev_cleanup(&s->dev);
+  virtio_err:
+-    g_free(s->dev.vqs);
++    g_free(vqs);
+      virtio_cleanup(vdev);
+  
+      vhost_user_cleanup(user);
+@@ -326,10 +328,11 @@ static void vhost_user_blk_device_unrealize(DeviceState *dev, Error **errp)
+  {
+      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+      VHostUserBlk *s = VHOST_USER_BLK(dev);
++    struct vhost_virtqueue *vqs = s->dev.vqs;
+  
+      vhost_user_blk_set_status(vdev, 0);
+      vhost_dev_cleanup(&s->dev);
+-    g_free(s->dev.vqs);
++    g_free(vqs);
+      virtio_cleanup(vdev);
+  
+      if (s->vhost_user) {
+diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
+index 7f21b4f..61e2e57 100644
+--- a/hw/scsi/vhost-scsi.c
++++ b/hw/scsi/vhost-scsi.c
+@@ -215,6 +215,7 @@ static void vhost_scsi_unrealize(DeviceState *dev, Error **errp)
+  {
+      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+      VHostSCSICommon *vsc = VHOST_SCSI_COMMON(dev);
++    struct vhost_virtqueue *vqs = vsc->dev.vqs;
+  
+      migrate_del_blocker(vsc->migration_blocker);
+      error_free(vsc->migration_blocker);
+@@ -223,7 +224,7 @@ static void vhost_scsi_unrealize(DeviceState *dev, Error **errp)
+      vhost_scsi_set_status(vdev, 0);
+  
+      vhost_dev_cleanup(&vsc->dev);
+-    g_free(vsc->dev.vqs);
++    g_free(vqs);
+  
+      virtio_scsi_common_unrealize(dev, errp);
+  }
+diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
+index 2e1ba4a..6728878 100644
+--- a/hw/scsi/vhost-user-scsi.c
++++ b/hw/scsi/vhost-user-scsi.c
+@@ -121,12 +121,13 @@ static void vhost_user_scsi_unrealize(DeviceState *dev, Error **errp)
+      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+      VHostUserSCSI *s = VHOST_USER_SCSI(dev);
+      VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
++    struct vhost_virtqueue *vqs = vsc->dev.vqs;
+  
+      /* This will stop the vhost backend. */
+      vhost_user_scsi_set_status(vdev, 0);
+  
+      vhost_dev_cleanup(&vsc->dev);
+-    g_free(vsc->dev.vqs);
++    g_free(vqs);
+  
+      virtio_scsi_common_unrealize(dev, errp);
+  
+-- 
+1.8.3.1
