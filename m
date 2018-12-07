@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gVDVW-00007O-5e
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:37:19 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gVDZv-0005Xt-Pw
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:41:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gVDVT-00083g-4l
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:37:18 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41505)
+	(envelope-from <peter.maydell@linaro.org>) id 1gVDZt-0003WO-Cx
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:41:50 -0500
+Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:37338)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gVDVS-00082y-Vf
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:37:15 -0500
-Received: by mail-ot1-x342.google.com with SMTP id u16so3339889otk.8
-	for <qemu-devel@nongnu.org>; Fri, 07 Dec 2018 02:37:14 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  7 Dec 2018 04:36:31 -0600
-Message-Id: <20181207103631.28193-27-richard.henderson@linaro.org>
-In-Reply-To: <20181207103631.28193-1-richard.henderson@linaro.org>
-References: <20181207103631.28193-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 26/26] target/arm: Tidy TBI handling in
- gen_a64_set_pc
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gVDZt-0003Vp-6I
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 05:41:49 -0500
+Received: by mail-ot1-x32f.google.com with SMTP id 40so3374057oth.4
+	for <qemu-devel@nongnu.org>; Fri, 07 Dec 2018 02:41:49 -0800 (PST)
+MIME-Version: 1.0
+References: <CAHmME9qhe0ZemTkc2jkEO=_hu6PhvKUKGHC9QYTj2j+QHhNf8g@mail.gmail.com>
+	<CAFEAcA8fYaKTZkLR8Ja3P590bSWy1cu61-gSxyf6+wXCfCLoxA@mail.gmail.com>
+	<CAHmME9qQo4XfRgZUZDt3xbx=5KmRoYbO3N0+3m9gdKi9hvnZQA@mail.gmail.com>
+In-Reply-To: <CAHmME9qQo4XfRgZUZDt3xbx=5KmRoYbO3N0+3m9gdKi9hvnZQA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 7 Dec 2018 10:41:37 +0000
+Message-ID: <CAFEAcA_3aGAZTEsuqjEnjijTnJi4QCVM09yYJ3-dwQp8wmkA3Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] more serial ports on arm?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,107 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, ramana.radhakrishnan@arm.com
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-We can perform this with fewer operations.
+On Fri, 7 Dec 2018 at 04:43, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>
+> On Tue, Nov 20, 2018 at 11:08 AM Peter Maydell <peter.maydell@linaro.org> wrote:
+> > It's still stuck, because unconditionally adding a second serial
+> > port to the virt board breaks some commonly used existing guest
+> > code (UEFI + Linux), and it's not clear to me what the best
+> > command line UI is for allowing the user to request the second
+> > serial port.
+>
+> Can the UI be the same more or less as for x86? Specify a second
+> -serial, and then the machine gets one added? If it's in secure mode,
+> then it's added as serial 3 instead of 2, to remain backwards
+> compatible.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/translate-a64.c | 65 ++++++++++++++------------------------
- 1 file changed, 23 insertions(+), 42 deletions(-)
+Yeah, that was more or less my plan. I just haven't done
+the work of digging around to check whether it matches
+what other QEMU board models have done and whether there
+are any other hidden snags yet.
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 99e1405dff..15080cbb3c 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -261,7 +261,7 @@ void gen_a64_set_pc_im(uint64_t val)
- /* Load the PC from a generic TCG variable.
-  *
-  * If address tagging is enabled via the TCR TBI bits, then loading
-- * an address into the PC will clear out any tag in the it:
-+ * an address into the PC will clear out any tag in it:
-  *  + for EL2 and EL3 there is only one TBI bit, and if it is set
-  *    then the address is zero-extended, clearing bits [63:56]
-  *  + for EL0 and EL1, TBI0 controls addresses with bit 55 == 0
-@@ -276,56 +276,37 @@ void gen_a64_set_pc_im(uint64_t val)
-  */
- static void gen_a64_set_pc(DisasContext *s, TCGv_i64 src)
- {
-+    bool tbi0 = s->tbi0, tbi1 = s->tbi1;
- 
-     if (s->current_el <= 1) {
--        /* Test if NEITHER or BOTH TBI values are set.  If so, no need to
--         * examine bit 55 of address, can just generate code.
--         * If mixed, then test via generated code
--         */
--        if (s->tbi0 && s->tbi1) {
--            TCGv_i64 tmp_reg = tcg_temp_new_i64();
--            /* Both bits set, sign extension from bit 55 into [63:56] will
--             * cover both cases
--             */
--            tcg_gen_shli_i64(tmp_reg, src, 8);
--            tcg_gen_sari_i64(cpu_pc, tmp_reg, 8);
--            tcg_temp_free_i64(tmp_reg);
--        } else if (!s->tbi0 && !s->tbi1) {
--            /* Neither bit set, just load it as-is */
--            tcg_gen_mov_i64(cpu_pc, src);
--        } else {
--            TCGv_i64 tcg_tmpval = tcg_temp_new_i64();
--            TCGv_i64 tcg_bit55  = tcg_temp_new_i64();
--            TCGv_i64 tcg_zero   = tcg_const_i64(0);
-+        if (tbi0 || tbi1) {
-+            /* Sign-extend from bit 55.  */
-+            tcg_gen_sextract_i64(cpu_pc, src, 0, 56);
- 
--            tcg_gen_andi_i64(tcg_bit55, src, (1ull << 55));
-+            if (tbi0 != tbi1) {
-+                TCGv_i64 tcg_zero = tcg_const_i64(0);
- 
--            if (s->tbi0) {
--                /* tbi0==1, tbi1==0, so 0-fill upper byte if bit 55 = 0 */
--                tcg_gen_andi_i64(tcg_tmpval, src,
--                                 0x00FFFFFFFFFFFFFFull);
--                tcg_gen_movcond_i64(TCG_COND_EQ, cpu_pc, tcg_bit55, tcg_zero,
--                                    tcg_tmpval, src);
--            } else {
--                /* tbi0==0, tbi1==1, so 1-fill upper byte if bit 55 = 1 */
--                tcg_gen_ori_i64(tcg_tmpval, src,
--                                0xFF00000000000000ull);
--                tcg_gen_movcond_i64(TCG_COND_NE, cpu_pc, tcg_bit55, tcg_zero,
--                                    tcg_tmpval, src);
-+                /*
-+                 * The two TBI bits differ.
-+                 * If tbi0, then !tbi1: only use the extension if positive.
-+                 * if !tbi0, then tbi1: only use the extension if negative.
-+                 */
-+                tcg_gen_movcond_i64(tbi0 ? TCG_COND_GE : TCG_COND_LT,
-+                                    cpu_pc, cpu_pc, tcg_zero, cpu_pc, src);
-+                tcg_temp_free_i64(tcg_zero);
-             }
--            tcg_temp_free_i64(tcg_zero);
--            tcg_temp_free_i64(tcg_bit55);
--            tcg_temp_free_i64(tcg_tmpval);
-+            return;
-         }
--    } else {  /* EL > 1 */
--        if (s->tbi0) {
-+    } else {
-+        if (tbi0) {
-             /* Force tag byte to all zero */
--            tcg_gen_andi_i64(cpu_pc, src, 0x00FFFFFFFFFFFFFFull);
--        } else {
--            /* Load unmodified address */
--            tcg_gen_mov_i64(cpu_pc, src);
-+            tcg_gen_extract_i64(cpu_pc, src, 0, 56);
-+            return;
-         }
-     }
-+
-+    /* Load unmodified address */
-+    tcg_gen_mov_i64(cpu_pc, src);
- }
- 
- typedef struct DisasCompare64 {
--- 
-2.17.2
+thanks
+-- PMM
