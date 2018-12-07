@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gVBes-0002A0-8N
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 03:38:51 -0500
+	(envelope-from <clg@kaod.org>) id 1gVBpN-0007Vd-7C
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 03:49:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gVBer-0007uW-CH
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 03:38:50 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 7 Dec 2018 08:38:40 +0000
-Message-ID: <1bc9877f-ef90-29e5-a40c-7363417eae12@virtuozzo.com>
-References: <20181206192544.3987-1-jsnow@redhat.com>
-	<20181206192544.3987-2-jsnow@redhat.com>
-In-Reply-To: <20181206192544.3987-2-jsnow@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2B593F4A5527D94CBCB96D0959673820@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <clg@kaod.org>) id 1gVBpI-0000CE-VG
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 03:49:41 -0500
+Received: from 20.mo1.mail-out.ovh.net ([188.165.45.168]:55439)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gVBpI-0000BL-Ku
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 03:49:36 -0500
+Received: from player158.ha.ovh.net (unknown [10.109.160.230])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id D391014929A
+	for <qemu-devel@nongnu.org>; Fri,  7 Dec 2018 09:49:34 +0100 (CET)
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+References: <20181205232251.10446-1-clg@kaod.org>
+	<20181205232251.10446-9-clg@kaod.org>
+	<20181207031007.GZ768@umbus.fritz.box>
+Message-ID: <388a3d28-8684-d2f3-6deb-7f88db46e63c@kaod.org>
+Date: Fri, 7 Dec 2018 09:49:29 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/3] blockdev: abort transactions in
- reverse order
+In-Reply-To: <20181207031007.GZ768@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 08/37] ppc/xive: introduce a simplified
+ XIVE presenter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,62 +33,497 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, "vsementov@virtuozzo.com" <vsementov@virtuozzo.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-MDYuMTIuMjAxOCAyMjoyNSwgSm9obiBTbm93IHdyb3RlOg0KPiBQcmVzZW50bHksIHdlIGFib3J0
-IHRyYW5zYWN0aW9ucyBpbiB0aGUgc2FtZSBvcmRlciB0aGV5IHdlcmUgcHJvY2Vzc2VkIGluLg0K
-PiBCaXRtYXAgY29tbWFuZHMsIHRob3VnaCwgYXR0ZW1wdCB0byByZXN0b3JlIGJhY2t1cCBkYXRh
-IHN0cnVjdHVyZXMgb24gYWJvcnQuDQo+IFRvIHRoYXQgZW5kLCB0aG91Z2gsIHRoZXkgbmVlZCB0
-byBiZSBhYm9ydGVkIGluIHJldmVyc2UgY2hyb25vbG9naWNhbCBvcmRlci4NCj4gDQo+IFJlcGxh
-Y2UgdGhlIFFTSU1QTEVRIGRhdGEgc3RydWN0dXJlIHdpdGggYSBRVEFJTFEgb25lLCBzbyB3ZSBj
-YW4gaXRlcmF0ZQ0KPiBpbiByZXZlcnNlIGZvciB0aGUgYWJvcnQgcGhhc2Ugb2YgdGhlIHRyYW5z
-YWN0aW9uLg0KDQphaGEsIHNvLCBhYm9ydCBmb3INCiAgIGFkZA0KICAgZGlzYWJsZQ0Kc2hvdWxk
-IGJlDQogICBlbmFibGUNCiAgIGRlbA0KYW5kIG5vdCB2aXNhLXZlcnNhDQoNClJldmlld2VkLWJ5
-OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+
-DQoNCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEpvaG4gU25vdyA8anNub3dAcmVkaGF0LmNvbT4NCj4g
-LS0tDQo+ICAgYmxvY2tkZXYuYyB8IDE0ICsrKysrKystLS0tLS0tDQo+ICAgMSBmaWxlIGNoYW5n
-ZWQsIDcgaW5zZXJ0aW9ucygrKSwgNyBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9i
-bG9ja2Rldi5jIGIvYmxvY2tkZXYuYw0KPiBpbmRleCA4MWY5NWQ5MjBiLi4xYmE3MDZkZjhiIDEw
-MDY0NA0KPiAtLS0gYS9ibG9ja2Rldi5jDQo+ICsrKyBiL2Jsb2NrZGV2LmMNCj4gQEAgLTEzNDEs
-NyArMTM0MSw3IEBAIHN0cnVjdCBCbGtBY3Rpb25TdGF0ZSB7DQo+ICAgICAgIGNvbnN0IEJsa0Fj
-dGlvbk9wcyAqb3BzOw0KPiAgICAgICBKb2JUeG4gKmJsb2NrX2pvYl90eG47DQo+ICAgICAgIFRy
-YW5zYWN0aW9uUHJvcGVydGllcyAqdHhuX3Byb3BzOw0KPiAtICAgIFFTSU1QTEVRX0VOVFJZKEJs
-a0FjdGlvblN0YXRlKSBlbnRyeTsNCj4gKyAgICBRVEFJTFFfRU5UUlkoQmxrQWN0aW9uU3RhdGUp
-IGVudHJ5Ow0KPiAgIH07DQo+ICAgDQo+ICAgLyogaW50ZXJuYWwgc25hcHNob3QgcHJpdmF0ZSBk
-YXRhICovDQo+IEBAIC0yMjY5LDggKzIyNjksOCBAQCB2b2lkIHFtcF90cmFuc2FjdGlvbihUcmFu
-c2FjdGlvbkFjdGlvbkxpc3QgKmRldl9saXN0LA0KPiAgICAgICBCbGtBY3Rpb25TdGF0ZSAqc3Rh
-dGUsICpuZXh0Ow0KPiAgICAgICBFcnJvciAqbG9jYWxfZXJyID0gTlVMTDsNCj4gICANCj4gLSAg
-ICBRU0lNUExFUV9IRUFEKHNuYXBfYmRydl9zdGF0ZXMsIEJsa0FjdGlvblN0YXRlKSBzbmFwX2Jk
-cnZfc3RhdGVzOw0KPiAtICAgIFFTSU1QTEVRX0lOSVQoJnNuYXBfYmRydl9zdGF0ZXMpOw0KPiAr
-ICAgIFFUQUlMUV9IRUFEKHNuYXBfYmRydl9zdGF0ZXMsIEJsa0FjdGlvblN0YXRlKSBzbmFwX2Jk
-cnZfc3RhdGVzOw0KPiArICAgIFFUQUlMUV9JTklUKCZzbmFwX2JkcnZfc3RhdGVzKTsNCj4gICAN
-Cj4gICAgICAgLyogRG9lcyB0aGlzIHRyYW5zYWN0aW9uIGdldCBjYW5jZWxlZCBhcyBhIGdyb3Vw
-IG9uIGZhaWx1cmU/DQo+ICAgICAgICAqIElmIG5vdCwgd2UgZG9uJ3QgcmVhbGx5IG5lZWQgdG8g
-bWFrZSBhIEpvYlR4bi4NCj4gQEAgLTIzMDEsNyArMjMwMSw3IEBAIHZvaWQgcW1wX3RyYW5zYWN0
-aW9uKFRyYW5zYWN0aW9uQWN0aW9uTGlzdCAqZGV2X2xpc3QsDQo+ICAgICAgICAgICBzdGF0ZS0+
-YWN0aW9uID0gZGV2X2luZm87DQo+ICAgICAgICAgICBzdGF0ZS0+YmxvY2tfam9iX3R4biA9IGJs
-b2NrX2pvYl90eG47DQo+ICAgICAgICAgICBzdGF0ZS0+dHhuX3Byb3BzID0gcHJvcHM7DQo+IC0g
-ICAgICAgIFFTSU1QTEVRX0lOU0VSVF9UQUlMKCZzbmFwX2JkcnZfc3RhdGVzLCBzdGF0ZSwgZW50
-cnkpOw0KPiArICAgICAgICBRVEFJTFFfSU5TRVJUX1RBSUwoJnNuYXBfYmRydl9zdGF0ZXMsIHN0
-YXRlLCBlbnRyeSk7DQo+ICAgDQo+ICAgICAgICAgICBzdGF0ZS0+b3BzLT5wcmVwYXJlKHN0YXRl
-LCAmbG9jYWxfZXJyKTsNCj4gICAgICAgICAgIGlmIChsb2NhbF9lcnIpIHsNCj4gQEAgLTIzMTAs
-NyArMjMxMCw3IEBAIHZvaWQgcW1wX3RyYW5zYWN0aW9uKFRyYW5zYWN0aW9uQWN0aW9uTGlzdCAq
-ZGV2X2xpc3QsDQo+ICAgICAgICAgICB9DQo+ICAgICAgIH0NCj4gICANCj4gLSAgICBRU0lNUExF
-UV9GT1JFQUNIKHN0YXRlLCAmc25hcF9iZHJ2X3N0YXRlcywgZW50cnkpIHsNCj4gKyAgICBRVEFJ
-TFFfRk9SRUFDSChzdGF0ZSwgJnNuYXBfYmRydl9zdGF0ZXMsIGVudHJ5KSB7DQo+ICAgICAgICAg
-ICBpZiAoc3RhdGUtPm9wcy0+Y29tbWl0KSB7DQo+ICAgICAgICAgICAgICAgc3RhdGUtPm9wcy0+
-Y29tbWl0KHN0YXRlKTsNCj4gICAgICAgICAgIH0NCj4gQEAgLTIzMjEsMTMgKzIzMjEsMTMgQEAg
-dm9pZCBxbXBfdHJhbnNhY3Rpb24oVHJhbnNhY3Rpb25BY3Rpb25MaXN0ICpkZXZfbGlzdCwNCj4g
-ICANCj4gICBkZWxldGVfYW5kX2ZhaWw6DQo+ICAgICAgIC8qIGZhaWx1cmUsIGFuZCBpdCBpcyBh
-bGwtb3Itbm9uZTsgcm9sbCBiYWNrIGFsbCBvcGVyYXRpb25zICovDQo+IC0gICAgUVNJTVBMRVFf
-Rk9SRUFDSChzdGF0ZSwgJnNuYXBfYmRydl9zdGF0ZXMsIGVudHJ5KSB7DQo+ICsgICAgUVRBSUxR
-X0ZPUkVBQ0hfUkVWRVJTRShzdGF0ZSwgJnNuYXBfYmRydl9zdGF0ZXMsIHNuYXBfYmRydl9zdGF0
-ZXMsIGVudHJ5KSB7DQo+ICAgICAgICAgICBpZiAoc3RhdGUtPm9wcy0+YWJvcnQpIHsNCj4gICAg
-ICAgICAgICAgICBzdGF0ZS0+b3BzLT5hYm9ydChzdGF0ZSk7DQo+ICAgICAgICAgICB9DQo+ICAg
-ICAgIH0NCj4gICBleGl0Og0KPiAtICAgIFFTSU1QTEVRX0ZPUkVBQ0hfU0FGRShzdGF0ZSwgJnNu
-YXBfYmRydl9zdGF0ZXMsIGVudHJ5LCBuZXh0KSB7DQo+ICsgICAgUVRBSUxRX0ZPUkVBQ0hfU0FG
-RShzdGF0ZSwgJnNuYXBfYmRydl9zdGF0ZXMsIGVudHJ5LCBuZXh0KSB7DQo+ICAgICAgICAgICBp
-ZiAoc3RhdGUtPm9wcy0+Y2xlYW4pIHsNCj4gICAgICAgICAgICAgICBzdGF0ZS0+b3BzLT5jbGVh
-bihzdGF0ZSk7DQo+ICAgICAgICAgICB9DQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxh
-ZGltaXINCg==
+On 12/7/18 4:10 AM, David Gibson wrote:
+> On Thu, Dec 06, 2018 at 12:22:22AM +0100, C=E9dric Le Goater wrote:
+>> The last sub-engine of the XIVE architecture is the Interrupt
+>> Virtualization Presentation Engine (IVPE). On HW, the IVRE and the
+>> IVPE share elements, the Power Bus interface (CQ), the routing table
+>> descriptors, and they can be combined in the same HW logic. We do the
+>> same in QEMU and combine both engines in the XiveRouter for
+>> simplicity.
+>>
+>> When the IVRE has completed its job of matching an event source with a
+>> Notification Virtual Target (NVT) to notify, it forwards the event
+>> notification to the IVPE sub-engine. The IVPE scans the thread
+>> interrupt contexts of the Notification Virtual Targets (NVT)
+>> dispatched on the HW processor threads and if a match is found, it
+>> signals the thread. If not, the IVPE escalates the notification to
+>> some other targets and records the notification in a backlog queue.
+>>
+>> The IVPE maintains the thread interrupt context state for each of its
+>> NVTs not dispatched on HW processor threads in the Notification
+>> Virtual Target table (NVTT).
+>>
+>> The model currently only supports single NVT notifications.
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> ---
+>>  include/hw/ppc/xive.h      |  15 +++
+>>  include/hw/ppc/xive_regs.h |  24 ++++
+>>  hw/intc/xive.c             | 227 ++++++++++++++++++++++++++++++++++++=
++
+>>  3 files changed, 266 insertions(+)
+>>
+>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+>> index 74b547707b17..e9b06e75fc1c 100644
+>> --- a/include/hw/ppc/xive.h
+>> +++ b/include/hw/ppc/xive.h
+>> @@ -327,6 +327,10 @@ typedef struct XiveRouterClass {
+>>                     XiveEND *end);
+>>      int (*write_end)(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_=
+idx,
+>>                       XiveEND *end, uint8_t word_number);
+>> +    int (*get_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_id=
+x,
+>> +                   XiveNVT *nvt);
+>> +    int (*write_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_=
+idx,
+>> +                     XiveNVT *nvt, uint8_t word_number);
+>>  } XiveRouterClass;
+>> =20
+>>  void xive_eas_pic_print_info(XiveEAS *eas, uint32_t lisn, Monitor *mo=
+n);
+>> @@ -337,6 +341,11 @@ int xive_router_get_end(XiveRouter *xrtr, uint8_t=
+ end_blk, uint32_t end_idx,
+>>                          XiveEND *end);
+>>  int xive_router_write_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t=
+ end_idx,
+>>                            XiveEND *end, uint8_t word_number);
+>> +int xive_router_get_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t n=
+vt_idx,
+>> +                        XiveNVT *nvt);
+>> +int xive_router_write_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t=
+ nvt_idx,
+>> +                          XiveNVT *nvt, uint8_t word_number);
+>> +
+>> =20
+>>  /*
+>>   * XIVE END ESBs
+>> @@ -393,6 +402,7 @@ typedef struct XiveTCTX {
+>>      qemu_irq    output;
+>> =20
+>>      uint8_t     regs[XIVE_TM_RING_COUNT * XIVE_TM_RING_SIZE];
+>> +    uint32_t    hw_cam;
+>=20
+> I don't love having this as a separate field.  Since it also appears
+> within the register space, it's kind of redundant.=20
+
+yes.
+
+> On the other hand,
+> I see that wiring up the property directly to the register space
+> doesn't really work.  Not sure how to deal with that one.
+
+We could use get/set properties for "hw-cam" to assign WORD2 of the=20
+physical ring and exclude it from reset, which makes some sense. The
+test on the PHYS ring in xive_presenter_tctx_match() would also look=20
+like the other tests. I think this is better.=20
+
+On a related topic, WORD2 of the OS ring is assigned by the hypervisor.=20
+For the sPAPR machine, this is done when the sPAPR IRQ backend is=20
+reseted. See patch 21 in v6.
+=20
+>=20
+>>  } XiveTCTX;
+>> =20
+>>  /*
+>> @@ -412,4 +422,9 @@ extern const MemoryRegionOps xive_tm_ops;
+>> =20
+>>  void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
+>> =20
+>> +static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nv=
+t_idx)
+>> +{
+>> +    return (nvt_blk << 19) | nvt_idx;
+>> +}
+>> +
+>>  #endif /* PPC_XIVE_H */
+>> diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
+>> index ede3d04c5eda..85557e730cd8 100644
+>> --- a/include/hw/ppc/xive_regs.h
+>> +++ b/include/hw/ppc/xive_regs.h
+>> @@ -186,4 +186,28 @@ typedef struct XiveEND {
+>>  #define GETFIELD_BE32(m, v)       GETFIELD(m, be32_to_cpu(v))
+>>  #define SETFIELD_BE32(m, v, val)  cpu_to_be32(SETFIELD(m, be32_to_cpu=
+(v), val))
+>> =20
+>> +/* Notification Virtual Target (NVT) */
+>> +typedef struct XiveNVT {
+>> +        uint32_t        w0;
+>> +#define NVT_W0_VALID             PPC_BIT32(0)
+>> +        uint32_t        w1;
+>> +        uint32_t        w2;
+>> +        uint32_t        w3;
+>> +        uint32_t        w4;
+>> +        uint32_t        w5;
+>> +        uint32_t        w6;
+>> +        uint32_t        w7;
+>> +        uint32_t        w8;
+>> +#define NVT_W8_GRP_VALID         PPC_BIT32(0)
+>> +        uint32_t        w9;
+>> +        uint32_t        wa;
+>> +        uint32_t        wb;
+>> +        uint32_t        wc;
+>> +        uint32_t        wd;
+>> +        uint32_t        we;
+>> +        uint32_t        wf;
+>> +} XiveNVT;
+>> +
+>> +#define xive_nvt_is_valid(nvt)    (be32_to_cpu((nvt)->w0) & NVT_W0_VA=
+LID)
+>> +
+>>  #endif /* PPC_XIVE_REGS_H */
+>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+>> index 80a965c14200..891542920683 100644
+>> --- a/hw/intc/xive.c
+>> +++ b/hw/intc/xive.c
+>> @@ -358,6 +358,25 @@ void xive_tctx_pic_print_info(XiveTCTX *tctx, Mon=
+itor *mon)
+>>      }
+>>  }
+>> =20
+>> +/* The HW CAM (23bits) is hardwired to :
+>> + *
+>> + *   0x000||0b1||4Bit chip number||7Bit Thread number.
+>> + *
+>> + * and when the block grouping extension is enabled :
+>> + *
+>> + *   4Bit chip number||0x001||7Bit Thread number.
+>> + */
+>> +static uint32_t hw_cam_line(uint8_t chip_id, uint8_t tid)
+>> +{
+>> +    bool block_group =3D false; /* TODO (PowerNV) */
+>> +
+>> +    if (block_group) {
+>> +        return 1 << 11 | (chip_id & 0xf) << 7 | (tid & 0x7f);
+>> +    } else {
+>> +        return (chip_id & 0xf) << 11 | 1 << 7 | (tid & 0x7f);
+>> +    }
+>> +}
+>> +
+>>  static void xive_tctx_reset(void *dev)
+>>  {
+>>      XiveTCTX *tctx =3D XIVE_TCTX(dev);
+>> @@ -388,6 +407,12 @@ static void xive_tctx_realize(DeviceState *dev, E=
+rror **errp)
+>>      cpu =3D POWERPC_CPU(obj);
+>>      tctx->cs =3D CPU(obj);
+>> =20
+>> +    if (!tctx->hw_cam) {
+>> +        error_setg(errp, "XIVE: HW CAM is not set for CPU %d",
+>> +                   tctx->cs->cpu_index);
+>=20
+> You could do this at realize, rather than reset, couldn't you?
+
+yes but I will remove "hw-cam" I think.
+=20
+>> +        return;
+>> +    }
+>> +
+>>      env =3D &cpu->env;
+>>      switch (PPC_INPUT(env)) {
+>>      case PPC_FLAGS_INPUT_POWER7:
+>> @@ -418,11 +443,17 @@ static const VMStateDescription vmstate_xive_tct=
+x =3D {
+>>      },
+>>  };
+>> =20
+>> +static Property  xive_tctx_properties[] =3D {
+>> +    DEFINE_PROP_UINT32("hw-cam", XiveTCTX, hw_cam, 0),
+>> +    DEFINE_PROP_END_OF_LIST(),
+>> +};
+>> +
+>>  static void xive_tctx_class_init(ObjectClass *klass, void *data)
+>>  {
+>>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+>> =20
+>>      dc->desc =3D "XIVE Interrupt Thread Context";
+>> +    dc->props =3D xive_tctx_properties;
+>>      dc->realize =3D xive_tctx_realize;
+>>      dc->unrealize =3D xive_tctx_unrealize;
+>>      dc->vmsd =3D &vmstate_xive_tctx;
+>> @@ -978,6 +1009,194 @@ int xive_router_write_end(XiveRouter *xrtr, uin=
+t8_t end_blk, uint32_t end_idx,
+>>     return xrc->write_end(xrtr, end_blk, end_idx, end, word_number);
+>>  }
+>> =20
+>> +int xive_router_get_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t n=
+vt_idx,
+>> +                        XiveNVT *nvt)
+>> +{
+>> +   XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
+>> +
+>> +   return xrc->get_nvt(xrtr, nvt_blk, nvt_idx, nvt);
+>> +}
+>> +
+>> +int xive_router_write_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t=
+ nvt_idx,
+>> +                        XiveNVT *nvt, uint8_t word_number)
+>> +{
+>> +   XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
+>> +
+>> +   return xrc->write_nvt(xrtr, nvt_blk, nvt_idx, nvt, word_number);
+>> +}
+>> +
+>> +/*
+>> + * The thread context register words are in big-endian format.
+>> + */
+>> +static int xive_presenter_tctx_match(XiveTCTX *tctx, uint8_t format,
+>> +                                     uint8_t nvt_blk, uint32_t nvt_id=
+x,
+>> +                                     bool cam_ignore, uint32_t logic_=
+serv)
+>> +{
+>> +    uint32_t cam =3D xive_nvt_cam_line(nvt_blk, nvt_idx);
+>> +    uint8_t *regs;
+>> +    uint32_t qw3w2;
+>> +    uint32_t qw2w2;
+>> +    uint32_t qw1w2;
+>> +    uint32_t qw0w2;
+>> +
+>> +    /* TODO (PowerNV): ignore low order bits of nvt id */
+>> +
+>> +    regs =3D &tctx->regs[TM_QW3_HV_PHYS];
+>> +    qw3w2 =3D be32_to_cpu(*((uint32_t *) &regs[TM_WORD2]));
+>=20
+> This is one of the main places we access regs and we have to do
+> horrible casting.  Would it make more sense for it to be a uint32_t
+> array?  Or at least for the local *regs to be.
+
+The register array is accessed by byte (patch 9) for the first two=20
+words and by word for WORD2. I don't see any good solution apart=20
+from a helper routine maybe :=20
+
+  static inline uint32_t xive_tctx_word2(int8_t *regs)
+  {
+      return be32_to_cpu(*((uint32_t *) &regs[TM_WORD2]));
+  }
+
+which I need for xive_tctx_ring_print() also.
+=20
+>> +    regs =3D &tctx->regs[TM_QW2_HV_POOL];
+>> +    qw2w2 =3D be32_to_cpu(*((uint32_t *) &regs[TM_WORD2]));
+>> +    regs =3D &tctx->regs[TM_QW1_OS];
+>> +    qw1w2 =3D be32_to_cpu(*((uint32_t *) &regs[TM_WORD2]));
+>> +    regs =3D &tctx->regs[TM_QW0_USER];
+>> +    qw0w2 =3D be32_to_cpu(*((uint32_t *) &regs[TM_WORD2]));
+>> +
+>> +    if (format =3D=3D 0) {
+>> +        /* F=3D0 & i=3D1: Logical server notification */
+>=20
+> I'm guessing the i=3D1 is the cam_ignore=3D=3Dtrue check?  Maybe put th=
+is
+> comment inside the if block to make that clearer.
+
+yes.=20
+
+>=20
+>> +        if (cam_ignore =3D=3D true) {
+>> +            qemu_log_mask(LOG_UNIMP, "XIVE: no support for LS NVT %x/=
+%x\n",
+>> +                          nvt_blk, nvt_idx);
+>> +             return -1;
+>> +        }
+>> +
+>> +        /* F=3D0 & i=3D0: Specific NVT notification */
+>> +
+>> +        /* PHYS ring */
+>> +        if ((qw3w2 & TM_QW3W2_VT) &&
+>> +            tctx->hw_cam =3D=3D hw_cam_line(nvt_blk, nvt_idx)) {
+>> +            return TM_QW3_HV_PHYS;
+>> +        }
+>> +
+>> +        /* HV POOL ring */
+>> +        if ((qw2w2 & TM_QW2W2_VP) &&
+>> +            cam =3D=3D GETFIELD(TM_QW2W2_POOL_CAM, qw2w2)) {
+>=20
+> Does that need to be a GETFIELD_BE32?
+
+the qw[0123]w2 variables have been byteswapped already. But, that might
+not be a good idea. in that case, we should byteswap the V[TPOU] bit valu=
+e=20
+instead ? What's your opinion.
+
+we would get rid of the be32_to_cpu() above=20
+
+>=20
+>> +            return TM_QW2_HV_POOL;
+>> +        }
+>> +
+>> +        /* OS ring */
+>> +        if ((qw1w2 & TM_QW1W2_VO) &&
+>> +            cam =3D=3D GETFIELD(TM_QW1W2_OS_CAM, qw1w2)) {
+>=20
+> And here.
+>=20
+>> +            return TM_QW1_OS;
+>> +        }
+>> +    } else {
+>> +        /* F=3D1 : User level Event-Based Branch (EBB) notification *=
+/
+>> +
+>> +        /* USER ring */
+>> +        if  ((qw1w2 & TM_QW1W2_VO) &&
+>> +             (cam =3D=3D GETFIELD(TM_QW1W2_OS_CAM, qw1w2)) &&
+>=20
+> And here.
+>=20
+>> +             (qw0w2 & TM_QW0W2_VU) &&
+>> +             (logic_serv =3D=3D GETFIELD(TM_QW0W2_LOGIC_SERV, qw0w2))=
+) {
+>> +            return TM_QW0_USER;
+>> +        }
+>> +    }
+>> +    return -1;
+>> +}
+>> +
+>> +typedef struct XiveTCTXMatch {
+>> +    XiveTCTX *tctx;
+>> +    uint8_t ring;
+>> +} XiveTCTXMatch;
+>> +
+>> +static bool xive_presenter_match(XiveRouter *xrtr, uint8_t format,
+>> +                                 uint8_t nvt_blk, uint32_t nvt_idx,
+>> +                                 bool cam_ignore, uint8_t priority,
+>> +                                 uint32_t logic_serv, XiveTCTXMatch *=
+match)
+>> +{
+>> +    CPUState *cs;
+>> +
+>> +    /* TODO (PowerNV): handle chip_id overwrite of block field for
+>> +     * hardwired CAM compares */
+>> +
+>> +    CPU_FOREACH(cs) {
+>> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>> +        XiveTCTX *tctx =3D XIVE_TCTX(cpu->intc);
+>> +        int ring;
+>> +
+>> +        /*
+>> +         * HW checks that the CPU is enabled in the Physical Thread
+>> +         * Enable Register (PTER).
+>> +         */
+>> +
+>> +        /*
+>> +         * Check the thread context CAM lines and record matches. We
+>> +         * will handle CPU exception delivery later
+>> +         */
+>> +        ring =3D xive_presenter_tctx_match(tctx, format, nvt_blk, nvt=
+_idx,
+>> +                                         cam_ignore, logic_serv);
+>> +        /*
+>> +         * Save the context and follow on to catch duplicates, that w=
+e
+>> +         * don't support yet.
+>> +         */
+>> +        if (ring !=3D -1) {
+>> +            if (match->tctx) {
+>> +                qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found a=
+ thread "
+>> +                              "context NVT %x/%x\n", nvt_blk, nvt_idx=
+);
+>> +                return false;
+>> +            }
+>> +
+>> +            match->ring =3D ring;
+>> +            match->tctx =3D tctx;
+>> +        }
+>> +    }
+>> +
+>> +    if (!match->tctx) {
+>> +        qemu_log_mask(LOG_UNIMP, "XIVE: NVT %x/%x is not dispatched\n=
+",
+>> +                      nvt_blk, nvt_idx);
+>> +        return false;
+>> +    }
+>> +
+>> +    return true;
+>> +}
+>> +
+>> +/*
+>> + * This is our simple Xive Presenter Engine model. It is merged in th=
+e
+>> + * Router as it does not require an extra object.
+>> + *
+>> + * It receives notification requests sent by the IVRE to find one
+>> + * matching NVT (or more) dispatched on the processor threads. In cas=
+e
+>> + * of a single NVT notification, the process is abreviated and the
+>> + * thread is signaled if a match is found. In case of a logical serve=
+r
+>> + * notification (bits ignored at the end of the NVT identifier), the
+>> + * IVPE and IVRE select a winning thread using different filters. Thi=
+s
+>> + * involves 2 or 3 exchanges on the PowerBus that the model does not
+>> + * support.
+>> + *
+>> + * The parameters represent what is sent on the PowerBus
+>> + */
+>> +static void xive_presenter_notify(XiveRouter *xrtr, uint8_t format,
+>> +                                  uint8_t nvt_blk, uint32_t nvt_idx,
+>> +                                  bool cam_ignore, uint8_t priority,
+>> +                                  uint32_t logic_serv)
+>> +{
+>> +    XiveNVT nvt;
+>> +    XiveTCTXMatch match =3D { 0 };
+>=20
+> IIUC that's initializing the tctx pointer field of match, so should be
+> NULL, not 0 (yes, technically they're equivalent in C, but using 0 for
+> a pointer is confusing).
+
+OK. I will clarify.
+
+>=20
+>> +    bool found;
+>> +
+>> +    /* NVT cache lookup */
+>> +    if (xive_router_get_nvt(xrtr, nvt_blk, nvt_idx, &nvt)) {
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: no NVT %x/%x\n",
+>> +                      nvt_blk, nvt_idx);
+>> +        return;
+>> +    }
+>> +
+>> +    if (!xive_nvt_is_valid(&nvt)) {
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: NVT %x/%x is invalid\n"=
+,
+>> +                      nvt_blk, nvt_idx);
+>> +        return;
+>> +    }
+>> +
+>> +    found =3D xive_presenter_match(xrtr, format, nvt_blk, nvt_idx, ca=
+m_ignore,
+>> +                                 priority, logic_serv, &match);
+>> +    if (found) {
+>> +        return;
+>> +    }
+>> +
+>> +    /* If no matching NVT is dispatched on a HW thread :
+>> +     * - update the NVT structure if backlog is activated
+>> +     * - escalate (ESe PQ bits and EAS in w4-5) if escalation is
+>> +     *   activated
+>> +     */
+>> +}
+>> +
+>>  /*
+>>   * An END trigger can come from an event trigger (IPI or HW) or from
+>>   * another chip. We don't model the PowerBus but the END trigger
+>> @@ -1047,6 +1266,14 @@ static void xive_router_end_notify(XiveRouter *=
+xrtr, uint8_t end_blk,
+>>      /*
+>>       * Follows IVPE notification
+>>       */
+>> +    xive_presenter_notify(xrtr, format,
+>> +                          GETFIELD_BE32(END_W6_NVT_BLOCK, end.w6),
+>> +                          GETFIELD_BE32(END_W6_NVT_INDEX, end.w6),
+>> +                          GETFIELD_BE32(END_W7_F0_IGNORE, end.w7),
+>> +                          priority,
+>> +                          GETFIELD_BE32(END_W7_F1_LOG_SERVER_ID, end.=
+w7));
+>> +
+>> +    /* TODO: Auto EOI. */
+>>  }
+>> =20
+>>  static void xive_router_notify(XiveNotifier *xn, uint32_t lisn)
+>=20
