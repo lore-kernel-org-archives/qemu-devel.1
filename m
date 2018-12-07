@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gVJZo-0007sy-Uf
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:06:09 -0500
+	(envelope-from <eblake@redhat.com>) id 1gVJZv-0007zN-Gv
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:06:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gVJZg-00073z-Hc
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:06:06 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33764)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gVJZg-0006z3-0A
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:06:00 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gVJZd-0007A4-O9
-	for <qemu-devel@nongnu.org>; Fri, 07 Dec 2018 17:05:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8ECE12E807C
-	for <qemu-devel@nongnu.org>; Fri,  7 Dec 2018 17:05:57 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1gVJZp-0007Fv-6v
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:06:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43656)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gVJZo-0007B7-Ue
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 12:06:09 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4163B30642AD
+	for <qemu-devel@nongnu.org>; Fri,  7 Dec 2018 17:06:05 +0000 (UTC)
+References: <20181207165250.17043-1-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a6e63d34-a8f3-90d6-5d0c-84df345ac09f@redhat.com>
+Date: Fri, 7 Dec 2018 11:06:03 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20181207165250.17043-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Dec 2018 16:51:48 -0000
-From: Richard Henderson <rth@twiddle.net>
-Reply-To: Bug 1803160 <1803160@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154212865934.10800.13528910091420823354.malonedeb@wampee.canonical.com>
-Message-Id: <154420150844.616.10290043074641688914.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1803160] Re: qemu-3.1.0-rc0: tcg.c crash in
- temp_load
+Subject: Re: [Qemu-devel] [qemu-web PATCH] Add a .mailmap file for preferred
+ name spellings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,86 +34,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-This second crash is of course a different bug.
+On 12/7/18 10:52 AM, Daniel P. Berrang=C3=A9 wrote:
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>   .mailmap | 3 +++
+>   1 file changed, 3 insertions(+)
+>   create mode 100644 .mailmap
+>=20
+> diff --git a/.mailmap b/.mailmap
+> new file mode 100644
+> index 0000000..fa8ab68
+> --- /dev/null
+> +++ b/.mailmap
+> @@ -0,0 +1,3 @@
+> +# Preferred name forms where people have changed their
+> +# git author config, or having utf8/latin1 encoding issues.
 
--- =
+Tenses don't line up - but that's copied from qemu.git/.mailmap so we=20
+should fix it there too.  I suggest s/having/had/
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1803160
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Title:
-  qemu-3.1.0-rc0: tcg.c crash in temp_load
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  QEMU version:
-  -------------
-
-  qemu-3.1.0-rc0 compiled from sources (earlier versions also affected)
-
-  Summary:
-  --------
-
-  TCG crashes in i386 and x86_64 when it tries to execute some specific
-  illegal instructions. When running full OS emulation, both the guest
-  system and QEMU crash.
-
-  The issue has been reproduced in two scenarios:
-
-  Ubuntu x64 host running Debian x86 guest with the following command
-  line: qemu-system-x86_64 -m 4G debian.qcow
-
-  When the attached ELF file is executed inside the guest, QEMU crashes.
-
-  It can also be reproduced from the command line:
-
-  $ qemu-i386 tcg_crash.elf
-  /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:2863: tcg fatal error
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-  zsh: segmentation fault (core dumped)  ../qemu-3.1.0-rc0/build/i386-linux=
--user/qemu-i386 tcg_crash.elf
-
-  GDB backtrace:
-
-  (gdb) bt
-  #0  0x0000000060206488 in raise ()
-  #1  0x0000000060206b8a in abort ()
-  #2  0x0000000060007016 in temp_load (s=3Ds@entry=3D0x607a2780 <tcg_init_c=
-tx>, ts=3Dts@entry=3D0x607a3178 <tcg_init_ctx+2552>, desired_regs=3D<optimi=
-zed out>, allocated_regs=3Dallocated_regs@entry=3D16400)
-  =C2=A0=C2=A0=C2=A0=C2=A0at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg=
-.c:2863
-  #3  0x000000006000a4d9 in tcg_reg_alloc_op (op=3D0x62808c20, s=3D<optimiz=
-ed out>) at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:3070
-  #4  tcg_gen_code (s=3D<optimized out>, tb=3Dtb@entry=3D0x607ac040 <static=
-_code_gen_buffer+4144>) at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c=
-:3598
-  #5  0x000000006003ef9a in tb_gen_code (cpu=3Dcpu@entry=3D0x627e0010, pc=
-=3Dpc@entry=3D134512724, cs_base=3Dcs_base@entry=3D0, flags=3Dflags@entry=
-=3D4194483, cflags=3Dcflags@entry=3D0)
-  =C2=A0=C2=A0=C2=A0=C2=A0at /home/alberto/Documents/qemu-3.1.0-rc0/accel/t=
-cg/translate-all.c:1752
-  #6  0x000000006003d979 in tb_find (cf_mask=3D0, tb_exit=3D0, last_tb=3D0x=
-0, cpu=3D0x0) at /home/alberto/Documents/qemu-3.1.0-rc0/accel/tcg/cpu-exec.=
-c:404
-  #7  cpu_exec (cpu=3Dcpu@entry=3D0x627e0010) at /home/alberto/Documents/qe=
-mu-3.1.0-rc0/accel/tcg/cpu-exec.c:724
-  #8  0x000000006006e1a0 in cpu_loop (env=3Denv@entry=3D0x627e82c0) at /hom=
-e/alberto/Documents/qemu-3.1.0-rc0/linux-user/i386/cpu_loop.c:93
-  #9  0x00000000600037c5 in main (argc=3D2, argv=3D0x7fffffffdd28, envp=3D<=
-optimized out>) at /home/alberto/Documents/qemu-3.1.0-rc0/linux-user/main.c=
-:819
-  (gdb)
-
-  Testcase:
-  ---------
-
-  Find ELF file attached.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1803160/+subscriptions
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
