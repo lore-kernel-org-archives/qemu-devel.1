@@ -1,13 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gVJK5-0000Eg-RU
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:49:57 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gVJKC-0000MC-Jy
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:50:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gVJK4-0001JC-Dt
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:49:53 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gVJKB-0001cm-8s
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:50:00 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 7 Dec 2018 16:49:36 +0000
-Message-ID: <56fa86af-3848-2ab1-acc1-9f8526bf8cd6@virtuozzo.com>
+Date: Fri, 7 Dec 2018 16:49:46 +0000
+Message-ID: <c108cdc2-a382-d6da-85c4-468f90bc2b86@virtuozzo.com>
 References: <20181130220344.3350618-1-eblake@redhat.com>
 	<20181130220344.3350618-14-eblake@redhat.com>
 	<1827042e-ddf6-47cd-52b3-403e37c7fa1f@virtuozzo.com>
@@ -15,7 +15,7 @@ References: <20181130220344.3350618-1-eblake@redhat.com>
 In-Reply-To: <ce5520fd-11bf-e927-49c9-1e8422d053f3@redhat.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-ID: <0C18AC9EBF88D54F92E383205BE94FD9@eurprd08.prod.outlook.com>
+Content-ID: <32C2998EB6B8D041B00ECAA12180E3DA@eurprd08.prod.outlook.com>
 Content-Transfer-Encoding: base64
 MIME-Version: 1.0
 Subject: Re: [Qemu-devel] [PATCH 13/14] qemu-nbd: Add --list option
