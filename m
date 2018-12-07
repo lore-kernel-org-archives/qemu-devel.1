@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gV4Im-0001Yf-G4
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 19:47:37 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gV52S-0001Ye-Am
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 20:34:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gV4Ii-00064W-5s
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 19:47:32 -0500
-Date: Fri, 7 Dec 2018 11:22:21 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181207002221.GR768@umbus.fritz.box>
-References: <20181205205827.19387-1-ehabkost@redhat.com>
-	<20181205205827.19387-5-ehabkost@redhat.com>
-	<20181205223035.GH768@umbus.fritz.box>
-	<20181206124851.GV18284@habkost.net>
+	(envelope-from <no-reply@patchew.org>) id 1gV52O-0007s9-Ad
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 20:34:44 -0500
+Resent-Message-Id: <E1gV52O-0007s9-Ad@eggs.gnu.org>
+In-Reply-To: <1544135058-21380-1-git-send-email-walling@linux.ibm.com>
+Message-ID: <154414643757.8206.7892229242719489075@bb8f5089e434>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="9lPOKfY2vCV97ybw"
-Content-Disposition: inline
-In-Reply-To: <20181206124851.GV18284@habkost.net>
-Subject: Re: [Qemu-devel] [PATCH for-4.0 4/5] spapr: Delete instance_options
- functions
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 6 Dec 2018 17:33:59 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] Guest Support for Diagnose 318
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,61 +23,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>
+To: walling@linux.ibm.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, rth@twiddle.net, david@redhat.com, borntraeger@de.ibm.com, thuth@redhat.com
 
-
---9lPOKfY2vCV97ybw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Dec 06, 2018 at 10:48:51AM -0200, Eduardo Habkost wrote:
-> On Thu, Dec 06, 2018 at 09:30:35AM +1100, David Gibson wrote:
-> > On Wed, Dec 05, 2018 at 06:58:26PM -0200, Eduardo Habkost wrote:
-> > > Now that all instance_options functions for spapr are empty,
-> > > delete them.
-> > >=20
-> > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> >=20
-> > Acked-by: David Gibson <david@gibson.dropbear.id.au>
->=20
-> Thanks!
->=20
-> >=20
-> > Do you want me to stage the ppc patches in my ppc-for-4.0 tree, or
-> > would you prefer to keep your series together to go in via your tree?
->=20
-> I wouldn't mind to get this queued through the ppc tree, but
-> maybe it will be easier to get them through the machine tree
-> because of the dependency on the 4.0 machine-type patch.
-
-Sure.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---9lPOKfY2vCV97ybw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwJvTkACgkQbDjKyiDZ
-s5JaghAAhKcGrt7aBXNqx4UXLbb0LMsZpUMoCradgpxn4ODRk5bJ0pIS/gL+PVPK
-zKBLmax+rjBe6qsZF2PykW4EEuC1alUdndLgu5hyRleB0LfSz+0U6NlQes3tggF8
-GfrPser7BL5vTE3sBBgLbmePx7A+Ua6m0UFzULxLV9P9MbAsqTmIEb9RlWKWbDV/
-xC83qWdcTJjV4VFDscRMBp11opjzh1FOU5gkUdF49oTViIrcgJQSOc8pKH4vkFvM
-S5sqWKGl5DXA7g7p/VLSpNvqgvgG4S3OM3RfB5Z/FDcw3bEEqTSuKSDqMXaKq7+R
-CeiNJGU5BE7rPFRZXLfdMGx9EQoYzudSYDosgW9RcKBe/DWt4XtpAjb++bgMdi5Y
-sErPcgWy1Tebh8xBTEN0JaFEyGZM7OVjdiOSds7jjc3DNM4usJMsSY0UyI/QeJpT
-IrusUuEyescCemAXJnNVrwsaAwrerRWEEAC6ZGtZWZfM3++83VLgd26W0vaTOup+
-3DrPCIJUvm8oJaT55NDmiOLVeJ6PSa3nZ7KcAqNjrbniRag1C/c71yRvJmBgvCws
-XdJADz57QawUAu4HSpAT3pkq85kXCDUOg7G0rLiKqrmHZBqBbkQr2AlVVYKUjQZR
-2w7ReZVIJAceWZ1CHovBdxGO9zfXgNpvAoraaTbj6NA8TXknNbE=
-=/+Pl
------END PGP SIGNATURE-----
-
---9lPOKfY2vCV97ybw--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTQ0MTM1MDU4LTIxMzgwLTEt
+Z2l0LXNlbmQtZW1haWwtd2FsbGluZ0BsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVz
+IHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVs
+b3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKU3ViamVjdDogW1FlbXUtZGV2
+ZWxdIFtQQVRDSCB2MiAwLzNdIEd1ZXN0IFN1cHBvcnQgZm9yIERpYWdub3NlIDMxOApNZXNzYWdl
+LWlkOiAxNTQ0MTM1MDU4LTIxMzgwLTEtZ2l0LXNlbmQtZW1haWwtd2FsbGluZ0BsaW51eC5pYm0u
+Y29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
+CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
+bQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9y
+IGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQo
+Z2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1m
+b3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4K
+ICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUK
+CmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
+MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
+J3Rlc3QnCjVhMzRiYTYgczM5MDogbWlncmF0aW9uIGFuZCByZXNldCBzdXBwb3J0IGZvciBkaWFn
+bm9zZSAzMTgKNzQ0ZWY5MCBzMzkwOiBjcHUgZmVhdHVyZSBmb3IgZGlhZ25vc2UgMzE4IGFuZGxp
+bWl0IG1heCBWQ1BVcyB0byAyNDcKNDIwNWU1MCBzMzkwOiBsaW51eCBoZWFkZXIgc3luYyBmb3Ig
+ZGlhZ25vc2UgMzE4Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzM6IHMz
+OTA6IGxpbnV4IGhlYWRlciBzeW5jIGZvciBkaWFnbm9zZSAzMTguLi4KQ2hlY2tpbmcgUEFUQ0gg
+Mi8zOiBzMzkwOiBjcHUgZmVhdHVyZSBmb3IgZGlhZ25vc2UgMzE4IGFuZGxpbWl0IG1heCBWQ1BV
+cyB0byAyNDcuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8zOiBzMzkwOiBtaWdyYXRpb24gYW5kIHJlc2V0
+IHN1cHBvcnQgZm9yIGRpYWdub3NlIDMxOC4uLgpFUlJPUjogYWRkaW5nIGEgbGluZSB3aXRob3V0
+IG5ld2xpbmUgYXQgZW5kIG9mIGZpbGUKIzE2OTogRklMRTogdGFyZ2V0L3MzOTB4L2t2bS1zdHVi
+LmM6MTE2OgorfQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNTkgbGluZXMgY2hlY2tl
+ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
+b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQg
+PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBh
+dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU0NDEzNTA1OC0yMTM4MC0xLWdp
+dC1zZW5kLWVtYWlsLXdhbGxpbmdAbGludXguaWJtLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5
+cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
+W2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
+ZXctZGV2ZWxAcmVkaGF0LmNvbQ==
