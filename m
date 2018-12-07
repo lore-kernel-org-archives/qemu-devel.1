@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gVJCz-0004U8-3g
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:42:36 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1gVJD2-0004WT-9s
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:42:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gVJCy-0001cx-71
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:42:32 -0500
-Date: Fri, 7 Dec 2018 17:42:09 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181207164209.GH5119@linux.fritz.box>
-References: <20181207115343.6747-1-kwolf@redhat.com>
-	<20181207115343.6747-5-kwolf@redhat.com>
-	<87in05wkev.fsf@dusky.pond.sub.org>
-	<20181207144519.GF5119@linux.fritz.box>
-	<5c0dd2fb-fbe6-41da-77ff-def0f2f3e830@redhat.com>
+	(envelope-from <alex.williamson@redhat.com>) id 1gVJD1-0001tq-1o
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:42:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58342)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1gVJD0-0001qV-RL
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:42:34 -0500
+From: Alex Williamson <alex.williamson@redhat.com>
+Date: Fri, 07 Dec 2018 09:42:11 -0700
+Message-ID: <154420093096.27028.2850537601140155413.stgit@gimli.home>
+In-Reply-To: <154419994154.27028.14774494243513273923.stgit@gimli.home>
+References: <154419994154.27028.14774494243513273923.stgit@gimli.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5c0dd2fb-fbe6-41da-77ff-def0f2f3e830@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 4/5] iotests: Add VMDK tests for
- blockdev-create
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [for-4.0 PATCH v4 9/9] pcie: Fast PCIe root ports for
+ new machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,43 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eric Auger <eric.auger@redhat.com>
 
-Am 07.12.2018 um 16:40 hat Eric Blake geschrieben:
-> On 12/7/18 8:45 AM, Kevin Wolf wrote:
-> > Am 07.12.2018 um 14:12 hat Markus Armbruster geschrieben:
-> > > git-am complains
-> > > 
-> > >      Applying: iotests: Add VMDK tests for blockdev-create
-> > >      .git/rebase-apply/patch:281: trailing whitespace.
-> > >                  format:
-> > >      .git/rebase-apply/patch:308: trailing whitespace.
-> > >                  format:
-> > >      .git/rebase-apply/patch:335: trailing whitespace.
-> > >                  format:
-> > >      .git/rebase-apply/patch:600: new blank line at EOF.
-> > >      +
-> > >      warning: 4 lines add whitespace errors.
-> > 
-> > This is in the reference output, so trailing whitespace/blank lines are
-> > actually correct.
-> 
-> Ah, but doesn't ./check already ignore differences in trailing whitespace
-> present in the actual running that is not present in the *.out files,
-> precisely so we don't have to check in trailing whitespace reference
-> outputs?
+Change the default speed and width for new machine types to the
+fastest and widest currently supported.  This should be compatible to
+the PCIe 4.0 spec.  Pre-QEMU-4.0 machine types remain at 2.5GT/s, x1
+width.
 
-It does ignore whitespace changes, so even if we remove that whitespace,
-the test won't fail. But I don't think that's a good reason to check in
-inaccurate reference output.
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
+ hw/pci-bridge/gen_pcie_root_port.c |    4 ++--
+ include/hw/compat.h                |   10 +++++++++-
+ 2 files changed, 11 insertions(+), 3 deletions(-)
 
-There are a few test cases that have a reference output like this and
-it's always annoying: When I later add a new subtest, I add the new test
-code, review the ./check output and if it looks good, I do something
-like 'cp 237.out.bad 237.out'. At that point, I'll have to manually
-revert completely unrelated whitespace changes again.
-
-Some 'git am' warnings feel like the lesser evil to me.
-
-Kevin
+diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
+index ca5418a89dd2..9766edb44596 100644
+--- a/hw/pci-bridge/gen_pcie_root_port.c
++++ b/hw/pci-bridge/gen_pcie_root_port.c
+@@ -125,9 +125,9 @@ static Property gen_rp_props[] = {
+     DEFINE_PROP_SIZE("pref64-reserve", GenPCIERootPort,
+                      res_reserve.mem_pref_64, -1),
+     DEFINE_PROP_PCIE_LINK_SPEED("x-speed", PCIESlot,
+-                                speed, PCIE_LINK_SPEED_2_5),
++                                speed, PCIE_LINK_SPEED_16),
+     DEFINE_PROP_PCIE_LINK_WIDTH("x-width", PCIESlot,
+-                                width, PCIE_LINK_WIDTH_1),
++                                width, PCIE_LINK_WIDTH_32),
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
+diff --git a/include/hw/compat.h b/include/hw/compat.h
+index 70958328fe7a..3ca85b037c04 100644
+--- a/include/hw/compat.h
++++ b/include/hw/compat.h
+@@ -2,7 +2,15 @@
+ #define HW_COMPAT_H
+ 
+ #define HW_COMPAT_3_1 \
+-    /* empty */
++    {\
++        .driver   = "pcie-root-port",\
++        .property = "x-speed",\
++        .value    = "2_5",\
++    },{\
++        .driver   = "pcie-root-port",\
++        .property = "x-width",\
++        .value    = "1",\
++    },
+ 
+ #define HW_COMPAT_3_0 \
+     /* empty */
