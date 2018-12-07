@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gV7S0-0002O6-UG
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 23:09:21 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gV7S1-0002QL-Dw
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 23:09:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gV7Rw-0006lG-CN
-	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 23:09:16 -0500
-Date: Fri, 7 Dec 2018 14:59:45 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gV7Rw-0006l9-Bi
+	for qemu-devel@nongnu.org; Thu, 06 Dec 2018 23:09:17 -0500
+Date: Fri, 7 Dec 2018 15:07:42 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181207035945.GB10945@umbus.fritz.box>
+Message-ID: <20181207040742.GD10945@umbus.fritz.box>
 References: <20181205232251.10446-1-clg@kaod.org>
-	<20181205232251.10446-13-clg@kaod.org>
+	<20181205232251.10446-16-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="TRYliJ5NKNqkz5bu"
+	protocol="application/pgp-signature"; boundary="rz+pwK2yUstbofK6"
 Content-Disposition: inline
-In-Reply-To: <20181205232251.10446-13-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v6 12/37] spapr: initialize VSMT before
- initializing the IRQ backend
+In-Reply-To: <20181205232251.10446-16-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v6 15/37] spapr: export and rename the
+ xics_max_server_number() routine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +29,79 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---TRYliJ5NKNqkz5bu
+--rz+pwK2yUstbofK6
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 06, 2018 at 12:22:26AM +0100, C=E9dric Le Goater wrote:
-> We will need to use xics_max_server_number() to create the sPAPRXive
-> object modeling the interrupt controller of the machine which is
-> created before the CPUs.
+On Thu, Dec 06, 2018 at 12:22:29AM +0100, C=E9dric Le Goater wrote:
+> The XIVE sPAPR IRQ backend will use it to define the number of ENDs of
+> the IC controller.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> Reviewed-by: Greg Kurz <groug@kaod.org>
 
-This one stands on its own, so I've applied.
+Again, this makes sense on its own, so I've applied.
 
 > ---
->  hw/ppc/spapr.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+>  include/hw/ppc/spapr.h | 1 +
+>  hw/ppc/spapr.c         | 8 ++++----
+>  2 files changed, 5 insertions(+), 4 deletions(-)
 >=20
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 6279711fe8f7..198764066dc9 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -737,6 +737,7 @@ int spapr_hpt_shift_for_ramsize(uint64_t ramsize);
+>  void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
+>                            Error **errp);
+>  void spapr_clear_pending_events(sPAPRMachineState *spapr);
+> +int spapr_max_server_number(sPAPRMachineState *spapr);
+> =20
+>  /* CPU and LMB DRC release callbacks. */
+>  void spapr_core_release(DeviceState *dev);
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 7afd1a175bf2..50cb9f9f4a02 100644
+> index e470efe7993c..a689f853e020 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -2466,11 +2466,6 @@ static void spapr_init_cpus(sPAPRMachineState *spa=
-pr)
->          boot_cores_nr =3D possible_cpus->len;
->      }
+> @@ -150,7 +150,7 @@ static void pre_2_10_vmstate_unregister_dummy_icp(int=
+ i)
+>                         (void *)(uintptr_t) i);
+>  }
 > =20
-> -    /* VSMT must be set in order to be able to compute VCPU ids, ie to
-> -     * call xics_max_server_number() or spapr_vcpu_id().
-> -     */
-> -    spapr_set_vsmt_mode(spapr, &error_fatal);
-> -
+> -static int xics_max_server_number(sPAPRMachineState *spapr)
+> +int spapr_max_server_number(sPAPRMachineState *spapr)
+>  {
+>      assert(spapr->vsmt);
+>      return DIV_ROUND_UP(max_cpus * spapr->vsmt, smp_threads);
+> @@ -1270,7 +1270,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spa=
+pr,
+>      _FDT(fdt_setprop_cell(fdt, 0, "#size-cells", 2));
+> =20
+>      /* /interrupt controller */
+> -    spapr_dt_xics(xics_max_server_number(spapr), fdt, PHANDLE_XICP);
+> +    spapr_dt_xics(spapr_max_server_number(spapr), fdt, PHANDLE_XICP);
+> =20
+>      ret =3D spapr_populate_memory(spapr, fdt);
+>      if (ret < 0) {
+> @@ -2469,7 +2469,7 @@ static void spapr_init_cpus(sPAPRMachineState *spap=
+r)
 >      if (smc->pre_2_10_has_unused_icps) {
 >          int i;
 > =20
-> @@ -2593,6 +2588,11 @@ static void spapr_machine_init(MachineState *machi=
-ne)
->      /* Setup a load limit for the ramdisk leaving room for SLOF and FDT =
-*/
+> -        for (i =3D 0; i < xics_max_server_number(spapr); i++) {
+> +        for (i =3D 0; i < spapr_max_server_number(spapr); i++) {
+>              /* Dummy entries get deregistered when real ICPState objects
+>               * are registered during CPU core hotplug.
+>               */
+> @@ -2589,7 +2589,7 @@ static void spapr_machine_init(MachineState *machin=
+e)
 >      load_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FW_OVERHEAD;
 > =20
-> +    /* VSMT must be set in order to be able to compute VCPU ids, ie to
-> +     * call xics_max_server_number() or spapr_vcpu_id().
-> +     */
-> +    spapr_set_vsmt_mode(spapr, &error_fatal);
-> +
->      /* Set up Interrupt Controller before we create the VCPUs */
->      smc->irq->init(spapr, &error_fatal);
+>      /* VSMT must be set in order to be able to compute VCPU ids, ie to
+> -     * call xics_max_server_number() or spapr_vcpu_id().
+> +     * call spapr_max_server_number() or spapr_vcpu_id().
+>       */
+>      spapr_set_vsmt_mode(spapr, &error_fatal);
 > =20
 
 --=20
@@ -86,24 +110,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---TRYliJ5NKNqkz5bu
+--rz+pwK2yUstbofK6
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwJ8C4ACgkQbDjKyiDZ
-s5KN4RAAlXnEjYOSvN4KOA2IYitbSConyFzoTb6tdgM/5/LgRhQAoYULbT92poTg
-DetylBGOFaQew1SNPbKYqcMKSLIk4SsVtQg6HnOf9VDDFnJxjOMBB/A9PxB8+JSS
-R1e3AhY63HsiagEbRAMVliL3L01LOXiXAR5lglZyhDEYUS/AArTJ/YSAbpQvXGLK
-zQ/xB+FuX9+miSuG1ahNYtBlJR/C98qtsW+sdNG5x0ocoHzIos/JNX1qKpt13MWW
-km3qwTtNqqzqCwijl5nmjetuKbGrOFoUBx4tUmd+NES+z3blHdK0ygjmINC9dhu7
-ozauK7LTvAPR33RFNS94JPTnmrwW+ji9HFy6TDtj5DcrJoAUXmlFYSVytZie+G3j
-RlOEfOgKV6PHyyZpFNU3Exj+Z/drvie+TR8Gx97kKDYgDkitXlAFZnbmkr3C5XKm
-RW0KONM5x2zL16yE0KjZ4q/srmIKLmq7b5pzQYXfQkjn97HJJ7glc8pcXM7JBQcz
-O4mVCUcpZlYOlb19inPqJjs1IqFgSeuWcX2gPgUVzpUoUznUOtTrlS4esRddnjAg
-BFj2NFseWB3rvfGA+nyruGE07L9tvEnYcZfnskWPK2WGZ17U8N6TXVYKc0wc5CFu
-ozYggKCEmfnp6VlsH8ZFjnBgmx1eDDhfLhLZ5qCFdz3elERSp1g=
-=dzz7
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwJ8g4ACgkQbDjKyiDZ
+s5JOOQ//QXUuxVpKGrHIJpi3/NReP3J/QhJhcu5AhIbs5dDX54/WXZmdTx3l7GwS
+sDDsALmorG3hXU9MaR+Fj6PtoLue/RkIagLhMWfR2/YQzcJCJdCAFY8OsMow6wgy
+OMkVJa2aLFOazaYhvvaRmaAPKeqWQNS7gPw8E4/bkzVSkf01+xlHr+8jybj2L5o8
+wrk30FfxtNf6mexboCX8gIvRkJ90pcuVc5+FjkU1JI7eFPJu5a1tEDwNwwpWU8dS
+1Tzy0ELAJK+qJQ0x08s+gZlTTKyTiuj36Ccef6BJhwGtBvcyhfeaFwu51FAAHOXX
+SnS1DojYKTJwO6BIGPpEgxG3FWSCzutSem/I57/WPmGNgUG7UbfiAtAW7TlJLJVi
+4t7e5QFzGz1kks7tZ/kqo2GZXyZO0J2dDVrTY69yfgpokL/TMkPknADZlr86bULg
+oX8lH5k6wi+KLM0njsy6L/aDnvU+dZUYAtbprgj0zW6hEXqQwh3G8p7rlnYfGkXd
+Ia/lgM5ZPqxcJX3JvJaJcjCfEwnIj1zVB0cV7/Rc/GEVRXnxCFJP3YiUabUQkuC1
+pQRKdz67ZKqyHrMeB8WyvQC/9dt19qCqRUjlfF2LDU4DZ7WD8Mlphye4mWOIjdgH
+WtV+Lnv72nyZIN2y3XvNU1wQXPm/rb0QO4KLMZWngDro3difIng=
+=oyEM
 -----END PGP SIGNATURE-----
 
---TRYliJ5NKNqkz5bu--
+--rz+pwK2yUstbofK6--
