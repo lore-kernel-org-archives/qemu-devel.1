@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gVHWQ-0008Ny-1a
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 09:54:31 -0500
+	(envelope-from <berto@igalia.com>) id 1gVHWh-000057-Vm
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 09:54:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gVHWO-0001eX-HQ
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 09:54:29 -0500
-Date: Fri, 7 Dec 2018 15:54:17 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181207145417.GG5119@linux.fritz.box>
-References: <20181207115343.6747-1-kwolf@redhat.com>
-	<20181207115343.6747-6-kwolf@redhat.com>
-	<87k1klwkft.fsf@dusky.pond.sub.org>
+	(envelope-from <berto@igalia.com>) id 1gVHWd-0002PS-3t
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 09:54:47 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <92eb1acf-62f0-9a0b-eb55-f347fa80c2ac@virtuozzo.com>
+References: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
+	<20181203101429.88735-4-anton.nefedov@virtuozzo.com>
+	<w51pnudv221.fsf@maestria.local.igalia.com>
+	<92eb1acf-62f0-9a0b-eb55-f347fa80c2ac@virtuozzo.com>
+Date: Fri, 07 Dec 2018 15:54:39 +0100
+Message-ID: <w51muphv13k.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87k1klwkft.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v4 5/5] vmdk: Reject excess extents in
- blockdev-create
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v10 3/9] quorum: set supported write flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,104 +24,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Am 07.12.2018 um 14:11 hat Markus Armbruster geschrieben:
-> Kevin Wolf <kwolf@redhat.com> writes:
-> 
-> > Clarify that the number of extents provided in BlockdevCreateOptionsVmdk
-> > must match the number of extents that will actually be used. Providing
-> > more extents will result in an error now.
-> >
-> > This requires adapting the test case to provide the right number of
-> > extents.
-> >
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  qapi/block-core.json       |  3 ++-
-> >  block/vmdk.c               | 29 ++++++++++++++++++++++++-----
-> >  tests/qemu-iotests/237     |  6 +++++-
-> >  tests/qemu-iotests/237.out | 13 +++++++------
-> >  4 files changed, 38 insertions(+), 13 deletions(-)
-> >
-> > diff --git a/qapi/block-core.json b/qapi/block-core.json
-> > index 0793550cf2..afdd2f89a2 100644
-> > --- a/qapi/block-core.json
-> > +++ b/qapi/block-core.json
-> > @@ -4068,7 +4068,8 @@
-> >  #               twoGbMaxExtentSparse and twoGbMaxExtentFlat formats. For
-> >  #               monolithicFlat, only one entry is required; for
-> >  #               twoGbMaxExtent* formats, the number of entries required is
-> > -#               calculated as extent_number = virtual_size / 2GB.
-> > +#               calculated as extent_number = virtual_size / 2GB. Providing
-> > +#               more extents than will be used is an error.
-> >  # @subformat    The subformat of the VMDK image. Default: "monolithicSparse".
-> >  # @backing-file The path of backing file. Default: no backing file is used.
-> >  # @adapter-type The adapter type used to fill in the descriptor. Default: ide.
-> > diff --git a/block/vmdk.c b/block/vmdk.c
-> > index 5a162ee85c..682ad93aa1 100644
-> > --- a/block/vmdk.c
-> > +++ b/block/vmdk.c
-> > @@ -1970,6 +1970,7 @@ static int coroutine_fn vmdk_co_do_create(int64_t size,
-> >  {
-> >      int extent_idx;
-> >      BlockBackend *blk = NULL;
-> > +    BlockBackend *extent_blk;
-> >      Error *local_err = NULL;
-> >      char *desc = NULL;
-> >      int ret = 0;
-> > @@ -2107,7 +2108,6 @@ static int coroutine_fn vmdk_co_do_create(int64_t size,
-> >      }
-> >      extent_idx = 1;
-> >      while (created_size < size) {
-> > -        BlockBackend *extent_blk;
-> >          int64_t cur_size = MIN(size - created_size, extent_size);
-> >          extent_blk = extent_fn(cur_size, extent_idx, flat, split, compress,
-> >                                 zeroed_grain, opaque, errp);
-> > @@ -2121,6 +2121,17 @@ static int coroutine_fn vmdk_co_do_create(int64_t size,
-> >          extent_idx++;
-> >          blk_unref(extent_blk);
-> >      }
-> > +
-> > +    /* Check whether we got excess extents */
-> > +    extent_blk = extent_fn(-1, extent_idx, flat, split, compress, zeroed_grain,
-> > +                           opaque, NULL);
-> > +    if (extent_blk) {
-> > +        blk_unref(extent_blk);
-> > +        error_setg(errp, "List of extents contains unused extents");
-> > +        ret = -EINVAL;
-> > +        goto exit;
-> > +    }
-> > +
-> >      /* generate descriptor file */
-> >      desc = g_strdup_printf(desc_template,
-> >                             g_random_int(),
-> > @@ -2181,6 +2192,12 @@ static BlockBackend *vmdk_co_create_opts_cb(int64_t size, int idx,
-> >      char *ext_filename = NULL;
-> >      char *rel_filename = NULL;
-> >  
-> > +    /* We're done, don't create excess extents. */
-> > +    if (size == -1) {
-> > +        assert(errp == NULL);
-> > +        return NULL;
-> > +    }
-> > +
-> 
-> I'm afraid I don't get this hunk.
+On Fri 07 Dec 2018 03:46:13 PM CET, Anton Nefedov wrote:
+>>> +static void quorum_set_supported_flags(BlockDriverState *bs)
+>>> +{
+>>> +    BDRVQuorumState *s = bs->opaque;
+>>> +    int i;
+>>> +
+>>> +    bs->supported_write_flags = BDRV_REQ_FUA;
+>>> +    for (i = 0; i < s->num_children; i++) {
+>>> +        bs->supported_write_flags &= s->children[i]->bs->supported_write_flags;
+>>> +    }
+>>> +
+>>> +    bs->supported_write_flags |= BDRV_REQ_WRITE_UNCHANGED;
+>>> +}
+>> 
+>> You don't set supported_zero_flags here anymore ?
+>
+> Yes, I noticed (that late) that quorum doesn't actually implement
+> write_zeroes(). bdrv_co_do_pwrite_zeroes() specifically checks that
+> there must be no supported flags set in such case.
 
-vmdk_co_create_opts_cb() is for the legacy code path, where 'qemu-img
-create' passes us a QemuOpts. This doesn't contain extents, so rather
-than returning ther next extent from the input, this function simply
-creates a new extent file each time it is called.
+Oh, I see.
 
-When checking whether we have too many extents, we don't know from which
-code path we came, so we have to call the callback uncondtionally and
-see whether it still returns an extra extent. In this case, creating a
-new one would obviously be counterproductive and trigger an error, so I
-just return NULL immediately.
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-If you have a suggestion for a comment to put somewhere, I'll gladly add
-it.
-
-Kevin
+Berto
