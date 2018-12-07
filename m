@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gVJN7-0002ou-AF
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:53:02 -0500
+	(envelope-from <eblake@redhat.com>) id 1gVJNC-0002tW-4Y
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:53:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gVJN3-000191-WF
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:53:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43508)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gVJN3-00010S-6B
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:52:57 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4B66F2D804
-	for <qemu-devel@nongnu.org>; Fri,  7 Dec 2018 16:52:54 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Fri,  7 Dec 2018 16:52:50 +0000
-Message-Id: <20181207165250.17043-1-berrange@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1gVJNA-0001N4-9s
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 11:53:05 -0500
+References: <20181207115343.6747-1-kwolf@redhat.com>
+	<20181207115343.6747-5-kwolf@redhat.com>
+	<87in05wkev.fsf@dusky.pond.sub.org>
+	<20181207144519.GF5119@linux.fritz.box>
+	<5c0dd2fb-fbe6-41da-77ff-def0f2f3e830@redhat.com>
+	<20181207164209.GH5119@linux.fritz.box>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <77a60e02-c5e5-4f30-46fd-3eca4604f038@redhat.com>
+Date: Fri, 7 Dec 2018 10:52:58 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [qemu-web PATCH] Add a .mailmap file for preferred
- name spellings
+In-Reply-To: <20181207164209.GH5119@linux.fritz.box>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 4/5] iotests: Add VMDK tests for
+ blockdev-create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,23 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- .mailmap | 3 +++
- 1 file changed, 3 insertions(+)
- create mode 100644 .mailmap
+On 12/7/18 10:42 AM, Kevin Wolf wrote:
+> Am 07.12.2018 um 16:40 hat Eric Blake geschrieben:
+>> On 12/7/18 8:45 AM, Kevin Wolf wrote:
+>>> Am 07.12.2018 um 14:12 hat Markus Armbruster geschrieben:
+>>>> git-am complains
+>>>>
+>>>>       Applying: iotests: Add VMDK tests for blockdev-create
+>>>>       .git/rebase-apply/patch:281: trailing whitespace.
+>>>>                   format:
+>>>>       .git/rebase-apply/patch:308: trailing whitespace.
+>>>>                   format:
+>>>>       .git/rebase-apply/patch:335: trailing whitespace.
+>>>>                   format:
+>>>>       .git/rebase-apply/patch:600: new blank line at EOF.
+>>>>       +
+>>>>       warning: 4 lines add whitespace errors.
+>>>
+>>> This is in the reference output, so trailing whitespace/blank lines are
+>>> actually correct.
+>>
+>> Ah, but doesn't ./check already ignore differences in trailing whitespace
+>> present in the actual running that is not present in the *.out files,
+>> precisely so we don't have to check in trailing whitespace reference
+>> outputs?
+> 
+> It does ignore whitespace changes, so even if we remove that whitespace,
+> the test won't fail. But I don't think that's a good reason to check in
+> inaccurate reference output.
+> 
+> There are a few test cases that have a reference output like this and
+> it's always annoying: When I later add a new subtest, I add the new test
+> code, review the ./check output and if it looks good, I do something
+> like 'cp 237.out.bad 237.out'. At that point, I'll have to manually
+> revert completely unrelated whitespace changes again.
 
-diff --git a/.mailmap b/.mailmap
-new file mode 100644
-index 0000000..fa8ab68
---- /dev/null
-+++ b/.mailmap
-@@ -0,0 +1,3 @@
-+# Preferred name forms where people have changed their
-+# git author config, or having utf8/latin1 encoding issues.
-+Daniel P. Berrang=C3=A9 <berrange@redhat.com>
---=20
-2.19.2
+Is it worth teaching iotests.img_info_log() to strip trailing 
+whitespace?  Or even to teach qemu-img itself to quit generating 
+trailing whitespace?
+
+> 
+> Some 'git am' warnings feel like the lesser evil to me.
+
+True, and a comment in the commit message about intentionally triggering 
+a known checkpatch flag goes a long ways to document why you want the 
+trailing whitespace (assuming we don't instead decide to tackle a root 
+cause of having the whitespace in the first place).
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
