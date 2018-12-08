@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45245)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xuyandong2@huawei.com>) id 1gVbGU-0004SG-9N
-	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 06:59:23 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55915)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <jaap@jcz.nl>)
+	id 1gVYMA-0008Na-5R
+	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 03:53:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xuyandong2@huawei.com>) id 1gVbGR-00008T-1t
-	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 06:59:22 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2744 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <xuyandong2@huawei.com>)
-	id 1gVbGN-0008WB-8n
-	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 06:59:17 -0500
-From: xuyandong <xuyandong2@huawei.com>
-Date: Sat, 8 Dec 2018 11:58:59 +0000
-Message-ID: <7CECC2DFC21538489F72729DF5EFB4D908ABD3A4@dggemm521-mbs.china.huawei.com>
-Content-Language: zh-CN
+	(envelope-from <jaap@jcz.nl>) id 1gVYM6-0007LW-VY
+	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 03:53:02 -0500
+Received: from [2a01:7c8:fffd:340:5054:ff:fefb:99] (port=42753
+	helo=mail.jcz.nl)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jaap@jcz.nl>) id 1gVYM6-0007Gb-PC
+	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 03:52:58 -0500
+Reply-To: jaap@jcz.nl
+References: <20181207155911.12710-1-peter.maydell@linaro.org>
+From: Jaap Crezee <jaap@jcz.nl>
+Message-ID: <8a142e35-44af-194b-01ad-9e9a9f3c9369@jcz.nl>
+Date: Sat, 8 Dec 2018 09:47:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: [Qemu-devel] [BUG]Unassigned mem write during pci device hot-plug
+In-Reply-To: <20181207155911.12710-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: nl-NL
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] cpus.c: Fix race condition in
+ cpu_stop_current()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,103 +30,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "mst@redhat.com" <mst@redhat.com>, "marcel@redhat.com" <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>
 
-SGkgYWxsLA0KDQpJbiBvdXIgdGVzdCwgd2UgY29uZmlndXJlZCBWTSB3aXRoIHNldmVyYWwgcGNp
-LWJyaWRnZXMgYW5kIGEgdmlydGlvLW5ldCBuaWMgYmVlbiBhdHRhY2hlZCB3aXRoIGJ1cyA0LA0K
-QWZ0ZXIgVk0gaXMgc3RhcnR1cCwgV2UgcGluZyB0aGlzIG5pYyBmcm9tIGhvc3QgdG8ganVkZ2Ug
-aWYgaXQgaXMgd29ya2luZyBub3JtYWxseS4gVGhlbiwgd2UgaG90IGFkZCBwY2kgZGV2aWNlcyB0
-byB0aGlzIFZNIHdpdGggYnVzIDAuDQpXZSAgZm91bmQgdGhlIHZpcnRpby1uZXQgTklDIGluIGJ1
-cyA0IGlzIG5vdCB3b3JraW5nIChjYW4gbm90IGNvbm5lY3QpIG9jY2FzaW9uYWxseSwgYXMgaXQg
-a2ljayB2aXJ0aW8gYmFja2VuZCBmYWlsdXJlIHdpdGggZXJyb3IgYmVsb3c6DQogICAgVW5hc3Np
-Z25lZCBtZW0gd3JpdGUgMDAwMDAwMDBmYzgwMzAwNCA9IDB4MQ0KDQptZW1vcnktcmVnaW9uOiBw
-Y2lfYnJpZGdlX3BjaQ0KICAwMDAwMDAwMDAwMDAwMDAwLWZmZmZmZmZmZmZmZmZmZmYgKHByaW8g
-MCwgUlcpOiBwY2lfYnJpZGdlX3BjaQ0KICAgIDAwMDAwMDAwZmM4MDAwMDAtMDAwMDAwMDBmYzgw
-M2ZmZiAocHJpbyAxLCBSVyk6IHZpcnRpby1wY2kNCiAgICAgIDAwMDAwMDAwZmM4MDAwMDAtMDAw
-MDAwMDBmYzgwMGZmZiAocHJpbyAwLCBSVyk6IHZpcnRpby1wY2ktY29tbW9uDQogICAgICAwMDAw
-MDAwMGZjODAxMDAwLTAwMDAwMDAwZmM4MDFmZmYgKHByaW8gMCwgUlcpOiB2aXJ0aW8tcGNpLWlz
-cg0KICAgICAgMDAwMDAwMDBmYzgwMjAwMC0wMDAwMDAwMGZjODAyZmZmIChwcmlvIDAsIFJXKTog
-dmlydGlvLXBjaS1kZXZpY2UNCiAgICAgIDAwMDAwMDAwZmM4MDMwMDAtMDAwMDAwMDBmYzgwM2Zm
-ZiAocHJpbyAwLCBSVyk6IHZpcnRpby1wY2ktbm90aWZ5ICA8LSBpbyBtZW0gdW5hc3NpZ25lZA0K
-ICAgICAg4oCmDQoNCldlIGNhdWdodCBhbiBleGNlcHRpb25hbCBhZGRyZXNzIGNoYW5naW5nIHdo
-aWxlIHRoaXMgcHJvYmxlbSBoYXBwZW5lZCwgc2hvdyBhcyBmb2xsb3c6DQpCZWZvcmUgcGNpX2Jy
-aWRnZV91cGRhdGVfbWFwcGluZ3PvvJoNCiAgICAgIDAwMDAwMDAwZmMwMDAwMDAtMDAwMDAwMDBm
-YzFmZmZmZiAocHJpbyAxLCBSVyk6IGFsaWFzIHBjaV9icmlkZ2VfcHJlZl9tZW0gQHBjaV9icmlk
-Z2VfcGNpIDAwMDAwMDAwZmMwMDAwMDAtMDAwMDAwMDBmYzFmZmZmZg0KICAgICAgMDAwMDAwMDBm
-YzIwMDAwMC0wMDAwMDAwMGZjM2ZmZmZmIChwcmlvIDEsIFJXKTogYWxpYXMgcGNpX2JyaWRnZV9w
-cmVmX21lbSBAcGNpX2JyaWRnZV9wY2kgMDAwMDAwMDBmYzIwMDAwMC0wMDAwMDAwMGZjM2ZmZmZm
-DQogICAgICAwMDAwMDAwMGZjNDAwMDAwLTAwMDAwMDAwZmM1ZmZmZmYgKHByaW8gMSwgUlcpOiBh
-bGlhcyBwY2lfYnJpZGdlX3ByZWZfbWVtIEBwY2lfYnJpZGdlX3BjaSAwMDAwMDAwMGZjNDAwMDAw
-LTAwMDAwMDAwZmM1ZmZmZmYNCiAgICAgIDAwMDAwMDAwZmM2MDAwMDAtMDAwMDAwMDBmYzdmZmZm
-ZiAocHJpbyAxLCBSVyk6IGFsaWFzIHBjaV9icmlkZ2VfcHJlZl9tZW0gQHBjaV9icmlkZ2VfcGNp
-IDAwMDAwMDAwZmM2MDAwMDAtMDAwMDAwMDBmYzdmZmZmZg0KICAgICAgMDAwMDAwMDBmYzgwMDAw
-MC0wMDAwMDAwMGZjOWZmZmZmIChwcmlvIDEsIFJXKTogYWxpYXMgcGNpX2JyaWRnZV9wcmVmX21l
-bSBAcGNpX2JyaWRnZV9wY2kgMDAwMDAwMDBmYzgwMDAwMC0wMDAwMDAwMGZjOWZmZmZmIDwtIGNv
-cnJlY3QgQWRyZXNzIFNwY2UNCiAgICAgIDAwMDAwMDAwZmNhMDAwMDAtMDAwMDAwMDBmY2JmZmZm
-ZiAocHJpbyAxLCBSVyk6IGFsaWFzIHBjaV9icmlkZ2VfcHJlZl9tZW0gQHBjaV9icmlkZ2VfcGNp
-IDAwMDAwMDAwZmNhMDAwMDAtMDAwMDAwMDBmY2JmZmZmZg0KICAgICAgMDAwMDAwMDBmY2MwMDAw
-MC0wMDAwMDAwMGZjZGZmZmZmIChwcmlvIDEsIFJXKTogYWxpYXMgcGNpX2JyaWRnZV9wcmVmX21l
-bSBAcGNpX2JyaWRnZV9wY2kgMDAwMDAwMDBmY2MwMDAwMC0wMDAwMDAwMGZjZGZmZmZmDQogICAg
-ICAwMDAwMDAwMGZjZTAwMDAwLTAwMDAwMDAwZmNmZmZmZmYgKHByaW8gMSwgUlcpOiBhbGlhcyBw
-Y2lfYnJpZGdlX3ByZWZfbWVtIEBwY2lfYnJpZGdlX3BjaSAwMDAwMDAwMGZjZTAwMDAwLTAwMDAw
-MDAwZmNmZmZmZmYNCg0KQWZ0ZXIgcGNpX2JyaWRnZV91cGRhdGVfbWFwcGluZ3PvvJoNCiAgICAg
-IDAwMDAwMDAwZmRhMDAwMDAtMDAwMDAwMDBmZGJmZmZmZiAocHJpbyAxLCBSVyk6IGFsaWFzIHBj
-aV9icmlkZ2VfbWVtIEBwY2lfYnJpZGdlX3BjaSAwMDAwMDAwMGZkYTAwMDAwLTAwMDAwMDAwZmRi
-ZmZmZmYNCiAgICAgIDAwMDAwMDAwZmRjMDAwMDAtMDAwMDAwMDBmZGRmZmZmZiAocHJpbyAxLCBS
-Vyk6IGFsaWFzIHBjaV9icmlkZ2VfbWVtIEBwY2lfYnJpZGdlX3BjaSAwMDAwMDAwMGZkYzAwMDAw
-LTAwMDAwMDAwZmRkZmZmZmYNCiAgICAgIDAwMDAwMDAwZmRlMDAwMDAtMDAwMDAwMDBmZGZmZmZm
-ZiAocHJpbyAxLCBSVyk6IGFsaWFzIHBjaV9icmlkZ2VfbWVtIEBwY2lfYnJpZGdlX3BjaSAwMDAw
-MDAwMGZkZTAwMDAwLTAwMDAwMDAwZmRmZmZmZmYNCiAgICAgIDAwMDAwMDAwZmUwMDAwMDAtMDAw
-MDAwMDBmZTFmZmZmZiAocHJpbyAxLCBSVyk6IGFsaWFzIHBjaV9icmlkZ2VfbWVtIEBwY2lfYnJp
-ZGdlX3BjaSAwMDAwMDAwMGZlMDAwMDAwLTAwMDAwMDAwZmUxZmZmZmYNCiAgICAgIDAwMDAwMDAw
-ZmUyMDAwMDAtMDAwMDAwMDBmZTNmZmZmZiAocHJpbyAxLCBSVyk6IGFsaWFzIHBjaV9icmlkZ2Vf
-bWVtIEBwY2lfYnJpZGdlX3BjaSAwMDAwMDAwMGZlMjAwMDAwLTAwMDAwMDAwZmUzZmZmZmYNCiAg
-ICAgIDAwMDAwMDAwZmU0MDAwMDAtMDAwMDAwMDBmZTVmZmZmZiAocHJpbyAxLCBSVyk6IGFsaWFz
-IHBjaV9icmlkZ2VfbWVtIEBwY2lfYnJpZGdlX3BjaSAwMDAwMDAwMGZlNDAwMDAwLTAwMDAwMDAw
-ZmU1ZmZmZmYNCiAgICAgIDAwMDAwMDAwZmU2MDAwMDAtMDAwMDAwMDBmZTdmZmZmZiAocHJpbyAx
-LCBSVyk6IGFsaWFzIHBjaV9icmlkZ2VfbWVtIEBwY2lfYnJpZGdlX3BjaSAwMDAwMDAwMGZlNjAw
-MDAwLTAwMDAwMDAwZmU3ZmZmZmYNCiAgICAgIDAwMDAwMDAwZmU4MDAwMDAtMDAwMDAwMDBmZTlm
-ZmZmZiAocHJpbyAxLCBSVyk6IGFsaWFzIHBjaV9icmlkZ2VfbWVtIEBwY2lfYnJpZGdlX3BjaSAw
-MDAwMDAwMGZlODAwMDAwLTAwMDAwMDAwZmU5ZmZmZmYNCiAgICAgIGZmZmZmZmZmZmM4MDAwMDAt
-ZmZmZmZmZmZmYzgwMDAwMCAocHJpbyAxLCBSVyk6IGFsaWFzIHBjaV9icmlkZ2VfcHJlZl9tZW0g
-QHBjaV9icmlkZ2VfcGNpIGZmZmZmZmZmZmM4MDAwMDAtZmZmZmZmZmZmYzgwMDAwMCAgIDwtIEV4
-Y2VwdGlvbmFsIEFkcmVzcyBTcGFjZQ0KDQpXZSBoYXZlIGZpZ3VyZWQgb3V0IHdoeSB0aGlzIGFk
-ZHJlc3MgYmVjb21lcyB0aGlzIHZhbHVlLCAgYWNjb3JkaW5nIHRvIHBjaSBzcGVjLCAgcGNpIGRy
-aXZlciBjYW4gZ2V0IEJBUiBhZGRyZXNzIHNpemUgYnkgd3JpdGluZyAweGZmZmZmZmZmIHRvDQp0
-aGUgcGNpIHJlZ2lzdGVyIGZpcnN0bHksIGFuZCB0aGVuIHJlYWQgYmFjayB0aGUgdmFsdWUgZnJv
-bSB0aGlzIHJlZ2lzdGVyLg0KV2UgZGlkbid0IGhhbmRsZSB0aGlzIHZhbHVlICBzcGVjaWFsbHkg
-d2hpbGUgcHJvY2VzcyBwY2kgd3JpdGUgaW4gcWVtdSwgdGhlIGZ1bmN0aW9uIGNhbGwgc3RhY2sg
-aXM6DQpQY2lfYnJpZGdlX2Rldl93cml0ZV9jb25maWcNCi0+IHBjaV9icmlkZ2Vfd3JpdGVfY29u
-ZmlnDQotPiBwY2lfZGVmYXVsdF93cml0ZV9jb25maWcgKHdlIHVwZGF0ZSB0aGUgY29uZmlnW2Fk
-ZHJlc3NdIHZhbHVlIGhlcmUgdG8gZmZmZmZmZmZmYzgwMDAwMCwgd2hpY2ggc2hvdWxkIGJlIDB4
-ZmM4MDAwMDAgKQ0KLT4gcGNpX2JyaWRnZV91cGRhdGVfbWFwcGluZ3MNCiAgICAgICAgICAgICAg
-ICAtPnBjaV9icmlkZ2VfcmVnaW9uX2RlbChiciwgYnItPndpbmRvd3MpOw0KLT4gcGNpX2JyaWRn
-ZV9yZWdpb25faW5pdA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIC0+cGNpX2JyaWRnZV9pbml0X2FsaWFzIChoZXJlIHBjaV9i
-cmlkZ2VfZ2V0X2Jhc2UsIHdlIHVzZSB0aGUgd3JvbmcgdmFsdWUgZmZmZmZmZmZmYzgwMDAwMCkN
-CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC0+IG1lbW9y
-eV9yZWdpb25fdHJhbnNhY3Rpb25fY29tbWl0DQoNClNvLCBhcyB3ZSBjYW4gc2VlLCB3ZSB1c2Ug
-dGhlIHdyb25nIGJhc2UgYWRkcmVzcyBpbiBxZW11IHRvIHVwZGF0ZSB0aGUgbWVtb3J5IHJlZ2lv
-bnMsIHRob3VnaCwgd2UgdXBkYXRlIHRoZSBiYXNlIGFkZHJlc3MgdG8NClRoZSBjb3JyZWN0IHZh
-bHVlIGFmdGVyIHBjaSBkcml2ZXIgaW4gVk0gd3JpdGUgdGhlIG9yaWdpbmFsIHZhbHVlIGJhY2ss
-IHRoZSB2aXJ0aW8gTklDIGluIGJ1cyA0IG1heSBzdGlsbCBzZW5kcyBuZXQgcGFja2V0cyBjb25j
-dXJyZW50bHkgd2l0aA0KVGhlIHdyb25nIG1lbW9yeSByZWdpb24gYWRkcmVzcy4NCg0KV2UgaGF2
-ZSB0cmllZCB0byBza2lwIHRoZSBtZW1vcnkgcmVnaW9uIHVwZGF0ZSBhY3Rpb24gaW4gcWVtdSB3
-aGlsZSBkZXRlY3QgcGNpIHdyaXRlIHdpdGggMHhmZmZmZmZmZiB2YWx1ZSwgYW5kIGl0IGRvZXMg
-d29yaywgYnV0DQpUaGlzIHNlZW1zIHRvIGJlIG5vdCBnZW50bHkuDQoNCmRpZmYgLS1naXQgYS9o
-dy9wY2kvcGNpX2JyaWRnZS5jIGIvaHcvcGNpL3BjaV9icmlkZ2UuYw0KaW5kZXggYjJlNTBjMy4u
-ODRiNDA1ZCAxMDA2NDQNCi0tLSBhL2h3L3BjaS9wY2lfYnJpZGdlLmMNCisrKyBiL2h3L3BjaS9w
-Y2lfYnJpZGdlLmMNCkBAIC0yNTYsNyArMjU2LDggQEAgdm9pZCBwY2lfYnJpZGdlX3dyaXRlX2Nv
-bmZpZyhQQ0lEZXZpY2UgKmQsDQogICAgIHBjaV9kZWZhdWx0X3dyaXRlX2NvbmZpZyhkLCBhZGRy
-ZXNzLCB2YWwsIGxlbik7DQotICAgIGlmIChyYW5nZXNfb3ZlcmxhcChhZGRyZXNzLCBsZW4sIFBD
-SV9DT01NQU5ELCAyKSB8fA0KKyAgICBpZiAoICh2YWwgIT0gMHhmZmZmZmZmZikgJiYNCisgICAg
-ICAgIChyYW5nZXNfb3ZlcmxhcChhZGRyZXNzLCBsZW4sIFBDSV9DT01NQU5ELCAyKSB8fA0KICAg
-ICAgICAgLyogaW8gYmFzZS9saW1pdCAqLw0KICAgICAgICAgcmFuZ2VzX292ZXJsYXAoYWRkcmVz
-cywgbGVuLCBQQ0lfSU9fQkFTRSwgMikgfHwNCkBAIC0yNjYsNyArMjY3LDcgQEAgdm9pZCBwY2lf
-YnJpZGdlX3dyaXRlX2NvbmZpZyhQQ0lEZXZpY2UgKmQsDQogICAgICAgICByYW5nZXNfb3Zlcmxh
-cChhZGRyZXNzLCBsZW4sIFBDSV9NRU1PUllfQkFTRSwgMjApIHx8DQogICAgICAgICAvKiB2Z2Eg
-ZW5hYmxlICovDQotICAgICAgICByYW5nZXNfb3ZlcmxhcChhZGRyZXNzLCBsZW4sIFBDSV9CUklE
-R0VfQ09OVFJPTCwgMikpIHsNCisgICAgICAgIHJhbmdlc19vdmVybGFwKGFkZHJlc3MsIGxlbiwg
-UENJX0JSSURHRV9DT05UUk9MLCAyKSkpIHsNCiAgICAgICAgIHBjaV9icmlkZ2VfdXBkYXRlX21h
-cHBpbmdzKHMpOw0KICAgICB9DQoNClRoaW5rcywNClh1DQo=
+Hi all,
+
+On 12/7/18 4:59 PM, Peter Maydell wrote:
+> Jaap: could you test whether this patch fixes the issue you
+> were seeing, please?
+
+I have applied the patch and started my test tool against it. It will need some time as I have also seen cases where it only failed after 600 reboots.
+My testtool logs into the VM over ssh and reboots it. Meanwhile it will check the device going offline and coming back online again and starts over
+(including a random wait).
+
+I will keep you updated. Thanks!
+
+Jaap
