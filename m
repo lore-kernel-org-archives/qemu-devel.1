@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gVQuz-0002Qc-72
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 19:56:30 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gVS8H-0006Ty-TH
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 21:14:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gVQuy-0004f5-0w
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 19:56:29 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gVS8E-0006Yx-Mg
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 21:14:17 -0500
+Resent-Message-Id: <E1gVS8E-0006Yx-Mg@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21739)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gVS8E-0006Iw-EM
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 21:14:14 -0500
+In-Reply-To: <cover.1544229872.git.alistair.francis@wdc.com>
+Message-ID: <154423520716.14995.6676533445416805876@bb8f5089e434>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-References: <20181207090135.7651-1-luc.michel@greensocs.com>
-	<20181207090135.7651-5-luc.michel@greensocs.com>
-In-Reply-To: <20181207090135.7651-5-luc.michel@greensocs.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 7 Dec 2018 16:55:58 -0800
-Message-ID: <CAKmqyKNgS2qr-BFsU7qP0LQ+jieWG_QaCvFpFBgOJyvP+dNamg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 04/16] gdbstub: add multiprocess support
- to 'H' and 'T' packets
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 7 Dec 2018 18:13:28 -0800 (PST)
+Subject: Re: [Qemu-devel] [RFC v3 00/24]  Add RISC-V TCG backend support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,280 +28,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Luc Michel <luc.michel@greensocs.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Alistair Francis <alistair@alistair23.me>, Mark Burton <mark.burton@greensocs.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>
+To: Alistair.Francis@wdc.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-riscv@nongnu.org, alistair23@gmail.com, richard.henderson@linaro.org
 
-On Fri, Dec 7, 2018 at 1:02 AM Luc Michel <luc.michel@greensocs.com> wrote:
->
-> Add a couple of helper functions to cope with GDB threads and processes.
->
-> The gdb_get_process() function looks for a process given a pid.
->
-> The gdb_get_cpu() function returns the CPU corresponding to the (pid,
-> tid) pair given as parameters.
->
-> The read_thread_id() function parses the thread-id sent by the peer.
-> This function supports the multiprocess extension thread-id syntax.  The
-> return value specifies if the parsing failed, or if a special case was
-> encountered (all processes or all threads).
->
-> Use them in 'H' and 'T' packets handling to support the multiprocess
-> extension.
->
-> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-Acked-by: Alistair Francis <alistair.francis@wdc.com>
-
-Alistair
-
-> ---
->  gdbstub.c | 154 +++++++++++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 136 insertions(+), 18 deletions(-)
->
-> diff --git a/gdbstub.c b/gdbstub.c
-> index 07508c2e6b..911faa225a 100644
-> --- a/gdbstub.c
-> +++ b/gdbstub.c
-> @@ -685,10 +685,75 @@ out:
->      /* TODO: In user mode, we should use the task state PID */
->      return s->processes[s->process_num - 1].pid;
->  #endif
->  }
->
-> +static GDBProcess *gdb_get_process(const GDBState *s, uint32_t pid)
-> +{
-> +    int i;
-> +
-> +    if (!pid) {
-> +        /* 0 means any process, we take the first one */
-> +        return &s->processes[0];
-> +    }
-> +
-> +    for (i =3D 0; i < s->process_num; i++) {
-> +        if (s->processes[i].pid =3D=3D pid) {
-> +            return &s->processes[i];
-> +        }
-> +    }
-> +
-> +    return NULL;
-> +}
-> +
-> +static GDBProcess *gdb_get_cpu_process(const GDBState *s, CPUState *cpu)
-> +{
-> +    return gdb_get_process(s, gdb_get_cpu_pid(s, cpu));
-> +}
-> +
-> +static CPUState *find_cpu(uint32_t thread_id)
-> +{
-> +    CPUState *cpu;
-> +
-> +    CPU_FOREACH(cpu) {
-> +        if (cpu_gdb_index(cpu) =3D=3D thread_id) {
-> +            return cpu;
-> +        }
-> +    }
-> +
-> +    return NULL;
-> +}
-> +
-> +static CPUState *gdb_get_cpu(const GDBState *s, uint32_t pid, uint32_t t=
-id)
-> +{
-> +    GDBProcess *process;
-> +    CPUState *cpu;
-> +
-> +    if (!tid) {
-> +        /* 0 means any thread, we take the first one */
-> +        tid =3D 1;
-> +    }
-> +
-> +    cpu =3D find_cpu(tid);
-> +
-> +    if (cpu =3D=3D NULL) {
-> +        return NULL;
-> +    }
-> +
-> +    process =3D gdb_get_cpu_process(s, cpu);
-> +
-> +    if (process->pid !=3D pid) {
-> +        return NULL;
-> +    }
-> +
-> +    if (!process->attached) {
-> +        return NULL;
-> +    }
-> +
-> +    return cpu;
-> +}
-> +
->  static const char *get_feature_xml(const char *p, const char **newp,
->                                     CPUClass *cc)
->  {
->      size_t len;
->      int i;
-> @@ -941,23 +1006,10 @@ static void gdb_set_cpu_pc(GDBState *s, target_ulo=
-ng pc)
->
->      cpu_synchronize_state(cpu);
->      cpu_set_pc(cpu, pc);
->  }
->
-> -static CPUState *find_cpu(uint32_t thread_id)
-> -{
-> -    CPUState *cpu;
-> -
-> -    CPU_FOREACH(cpu) {
-> -        if (cpu_gdb_index(cpu) =3D=3D thread_id) {
-> -            return cpu;
-> -        }
-> -    }
-> -
-> -    return NULL;
-> -}
-> -
->  static char *gdb_fmt_thread_id(const GDBState *s, CPUState *cpu,
->                             char *buf, size_t buf_size)
->  {
->      if (s->multiprocess) {
->          snprintf(buf, buf_size, "p%02x.%02x",
-> @@ -967,10 +1019,64 @@ static char *gdb_fmt_thread_id(const GDBState *s, =
-CPUState *cpu,
->      }
->
->      return buf;
->  }
->
-> +typedef enum GDBThreadIdKind {
-> +    GDB_ONE_THREAD =3D 0,
-> +    GDB_ALL_THREADS,     /* One process, all threads */
-> +    GDB_ALL_PROCESSES,
-> +    GDB_READ_THREAD_ERR
-> +} GDBThreadIdKind;
-> +
-> +static GDBThreadIdKind read_thread_id(const char *buf, const char **end_=
-buf,
-> +                                      uint32_t *pid, uint32_t *tid)
-> +{
-> +    unsigned long p, t;
-> +    int ret;
-> +
-> +    if (*buf =3D=3D 'p') {
-> +        buf++;
-> +        ret =3D qemu_strtoul(buf, &buf, 16, &p);
-> +
-> +        if (ret) {
-> +            return GDB_READ_THREAD_ERR;
-> +        }
-> +
-> +        /* Skip '.' */
-> +        buf++;
-> +    } else {
-> +        p =3D 1;
-> +    }
-> +
-> +    ret =3D qemu_strtoul(buf, &buf, 16, &t);
-> +
-> +    if (ret) {
-> +        return GDB_READ_THREAD_ERR;
-> +    }
-> +
-> +    *end_buf =3D buf;
-> +
-> +    if (p =3D=3D -1) {
-> +        return GDB_ALL_PROCESSES;
-> +    }
-> +
-> +    if (pid) {
-> +        *pid =3D p;
-> +    }
-> +
-> +    if (t =3D=3D -1) {
-> +        return GDB_ALL_THREADS;
-> +    }
-> +
-> +    if (tid) {
-> +        *tid =3D t;
-> +    }
-> +
-> +    return GDB_ONE_THREAD;
-> +}
-> +
->  static int is_query_packet(const char *p, const char *query, char separa=
-tor)
->  {
->      unsigned int query_len =3D strlen(query);
->
->      return strncmp(p, query, query_len) =3D=3D 0 &&
-> @@ -1075,16 +1181,18 @@ static int gdb_handle_packet(GDBState *s, const c=
-har *line_buf)
->  {
->      CPUState *cpu;
->      CPUClass *cc;
->      const char *p;
->      uint32_t thread;
-> +    uint32_t pid, tid;
->      int ch, reg_size, type, res;
->      uint8_t mem_buf[MAX_PACKET_LENGTH];
->      char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
->      char thread_id[16];
->      uint8_t *registers;
->      target_ulong addr, len;
-> +    GDBThreadIdKind thread_kind;
->
->      trace_gdbstub_io_command(line_buf);
->
->      p =3D line_buf;
->      ch =3D *p++;
-> @@ -1288,16 +1396,22 @@ static int gdb_handle_packet(GDBState *s, const c=
-har *line_buf)
->          else
->              put_packet(s, "E22");
->          break;
->      case 'H':
->          type =3D *p++;
-> -        thread =3D strtoull(p, (char **)&p, 16);
-> -        if (thread =3D=3D -1 || thread =3D=3D 0) {
-> +
-> +        thread_kind =3D read_thread_id(p, &p, &pid, &tid);
-> +        if (thread_kind =3D=3D GDB_READ_THREAD_ERR) {
-> +            put_packet(s, "E22");
-> +            break;
-> +        }
-> +
-> +        if (thread_kind !=3D GDB_ONE_THREAD) {
->              put_packet(s, "OK");
->              break;
->          }
-> -        cpu =3D find_cpu(thread);
-> +        cpu =3D gdb_get_cpu(s, pid, tid);
->          if (cpu =3D=3D NULL) {
->              put_packet(s, "E22");
->              break;
->          }
->          switch (type) {
-> @@ -1313,12 +1427,16 @@ static int gdb_handle_packet(GDBState *s, const c=
-har *line_buf)
->               put_packet(s, "E22");
->               break;
->          }
->          break;
->      case 'T':
-> -        thread =3D strtoull(p, (char **)&p, 16);
-> -        cpu =3D find_cpu(thread);
-> +        thread_kind =3D read_thread_id(p, &p, &pid, &tid);
-> +        if (thread_kind =3D=3D GDB_READ_THREAD_ERR) {
-> +            put_packet(s, "E22");
-> +            break;
-> +        }
-> +        cpu =3D gdb_get_cpu(s, pid, tid);
->
->          if (cpu !=3D NULL) {
->              put_packet(s, "OK");
->          } else {
->              put_packet(s, "E22");
-> --
-> 2.19.2
->
->
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTQ0MjI5ODcyLmdp
+dC5hbGlzdGFpci5mcmFuY2lzQHdkYy5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
+aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
+ZSBpbmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IGNvdmVyLjE1NDQyMjk4NzIuZ2l0LmFsaXN0YWly
+LmZyYW5jaXNAd2RjLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1JGQyB2MyAwMC8yNF0gIEFk
+ZCBSSVNDLVYgVENHIGJhY2tlbmQgc3VwcG9ydApUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQ
+VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0t
+b25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQg
+Y29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBs
+b2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8K
+ICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3Jt
+YXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2Ny
+aXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAg
+ICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBU
+RVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0
+NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYmQxOGE2OCBjb25m
+aWd1cmU6IEFkZCBzdXBwb3J0IGZvciBidWlsZGluZyBSSVNDLVYgaG9zdAo0YjY2OTRlIGRpYXM6
+IEFkZCBSSVNDLVYgc3VwcG9ydAo3NTIzMWY0IHRjZzogQWRkIFJJU0MtViBjcHUgc2lnbmFsIGhh
+bmRsZXIKZDExMDc2YSByaXNjdjogdGNnLXRhcmdldDogQWRkIHRoZSB0YXJnZXQgaW5pdCBjb2Rl
+CjdhMjkwMjYgcmlzY3Y6IHRjZy10YXJnZXQ6IEFkZCB0aGUgcHJvbG9ndWUgZ2VuZXJhdGlvbiBh
+bmQgcmVnaXN0ZXIgdGhlIEpJVApjZmJmM2E0IHJpc2N2OiB0Y2ctdGFyZ2V0OiBBZGQgdGhlIG91
+dCBvcCBkZWNvZGVyCmM5YjY0ZGIgcmlzY3Y6IHRjZy10YXJnZXQ6IEFkZCBkaXJlY3QgbG9hZCBh
+bmQgc3RvcmUgaW5zdHJ1Y3Rpb25zCmIzYmNlOTIgcmlzY3Y6IHRjZy10YXJnZXQ6IEFkZCBzbG93
+cGF0aCBsb2FkIGFuZCBzdG9yZSBpbnN0cnVjdGlvbnMKZjYzOGJmNSByaXNjdjogdGNnLXRhcmdl
+dDogQWRkIGJyYW5jaCBhbmQganVtcCBpbnN0cnVjdGlvbnMKYWFkNzBkZSByaXNjdjogdGNnLXRh
+cmdldDogQWRkIHRoZSBhZGQyIGFuZCBzdWIyIGluc3RydWN0aW9ucwpiMmFhZDgxIHJpc2N2OiB0
+Y2ctdGFyZ2V0OiBBZGQgdGhlIG91dCBsb2FkIGFuZCBzdG9yZSBpbnN0cnVjdGlvbnMKOWU0ZWEy
+ZCByaXNjdjogdGNnLXRhcmdldDogQWRkIHRoZSBleHRyYWN0IGluc3RydWN0aW9ucwpkMWIwNzA5
+IHJpc2N2OiB0Y2ctdGFyZ2V0OiBBZGQgdGhlIG1vdiBhbmQgbW92aSBpbnN0cnVjdGlvbgpmODAw
+NWQ2IHJpc2N2OiB0Y2ctdGFyZ2V0OiBBZGQgdGhlIHJlbG9jYXRpb24gZnVuY3Rpb25zCjQ1MWEz
+MmUgcmlzY3Y6IHRjZy10YXJnZXQ6IEFkZCB0aGUgaW5zdHJ1Y3Rpb24gZW1pdHRlcnMKODg4OGM3
+ZiByaXNjdjogdGNnLXRhcmdldDogQWRkIHRoZSBpbW1lZGlhdGUgZW5jb2RlcnMKYjZhYjMxYSBy
+aXNjdjogdGNnLXRhcmdldDogQWRkIHN1cHBvcnQgZm9yIHRoZSBjb25zdHJhaW50cwphZTU0NDc0
+IHJpc2N2OiBBZGQgdGhlIHRjZyB0YXJnZXQgcmVnaXN0ZXJzCjJmZTk5NTEgcmlzY3Y6IEFkZCB0
+aGUgdGNnLXRhcmdldCBoZWFkZXIgZmlsZQoyOTFkODA5IGV4ZWM6IEFkZCBSSVNDLVYgR0NDIHBv
+aXNvbiBtYWNybwplYjhjYjYwIGxpbnV4LXVzZXI6IHJpc2N2OiBGaXggY29tcGlsZSBmYWlsdXJl
+IG9uIHJpc2N2MzIgaG9zdHMKYmE1NGE3MiBsaW51eC11c2VyOiBBZGQgaG9zdCBkZXBlbmRlbmN5
+IGZvciBSSVNDLVYgNjQtYml0CmY3Nzc1ZmUgbGludXgtdXNlcjogQWRkIGhvc3QgZGVwZW5kZW5j
+eSBmb3IgUklTQy1WIDMyLWJpdApmYWE4NmU0IGVsZi5oOiBBZGQgdGhlIFJJU0NWIEVMRiBtYWdp
+YyBudW1iZXJzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI0OiBlbGYu
+aDogQWRkIHRoZSBSSVNDViBFTEYgbWFnaWMgbnVtYmVycy4uLgpDaGVja2luZyBQQVRDSCAyLzI0
+OiBsaW51eC11c2VyOiBBZGQgaG9zdCBkZXBlbmRlbmN5IGZvciBSSVNDLVYgMzItYml0Li4uCldB
+Uk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMg
+bmVlZCB1cGRhdGluZz8KIzI0OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9y
+cywgMSB3YXJuaW5ncywgMTggbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJv
+YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
+b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
+IE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAzLzI0OiBsaW51eC11c2VyOiBBZGQgaG9zdCBk
+ZXBlbmRlbmN5IGZvciBSSVNDLVYgNjQtYml0Li4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
+ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzI0OiAKbmV3
+IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTggbGluZXMg
+Y2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
+ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
+dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQ
+QVRDSCA0LzI0OiBsaW51eC11c2VyOiByaXNjdjogRml4IGNvbXBpbGUgZmFpbHVyZSBvbiByaXNj
+djMyIGhvc3RzLi4uCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3Vs
+ZCBiZSBhdm9pZGVkCiMyMzogRklMRTogbGludXgtdXNlci9yaXNjdi90YXJnZXRfc3lzY2FsbC5o
+OjUxOgorI2lmICFkZWZpbmVkKF9fTlJfX2xsc2VlaykgJiYgIWRlZmluZWQoX19OUl9sc2VlaykK
+CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRj
+aCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA1LzI0OiBleGVjOiBB
+ZGQgUklTQy1WIEdDQyBwb2lzb24gbWFjcm8uLi4KQ2hlY2tpbmcgUEFUQ0ggNi8yNDogcmlzY3Y6
+IEFkZCB0aGUgdGNnLXRhcmdldCBoZWFkZXIgZmlsZS4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQg
+b3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyNDog
+Cm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVm
+aW5lcyBzaG91bGQgYmUgYXZvaWRlZAojNTY6IEZJTEU6IHRjZy9yaXNjdi90Y2ctdGFyZ2V0Lmg6
+Mjg6CisjaWYgX19yaXNjdl94bGVuID09IDMyCgp0b3RhbDogMCBlcnJvcnMsIDIgd2FybmluZ3Ms
+IDE4MiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+CkNoZWNraW5nIFBBVENIIDcvMjQ6IHJpc2N2OiBBZGQgdGhlIHRjZyB0YXJnZXQgcmVnaXN0ZXJz
+Li4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRB
+SU5FUlMgbmVlZCB1cGRhdGluZz8KIzEyOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAw
+IGVycm9ycywgMSB3YXJuaW5ncywgMTE4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggOC8yNDogcmlzY3Y6IHRjZy10YXJn
+ZXQ6IEFkZCBzdXBwb3J0IGZvciB0aGUgY29uc3RyYWludHMuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8y
+NDogcmlzY3Y6IHRjZy10YXJnZXQ6IEFkZCB0aGUgaW1tZWRpYXRlIGVuY29kZXJzLi4uCkNoZWNr
+aW5nIFBBVENIIDEwLzI0OiByaXNjdjogdGNnLXRhcmdldDogQWRkIHRoZSBpbnN0cnVjdGlvbiBl
+bWl0dGVycy4uLgpDaGVja2luZyBQQVRDSCAxMS8yNDogcmlzY3Y6IHRjZy10YXJnZXQ6IEFkZCB0
+aGUgcmVsb2NhdGlvbiBmdW5jdGlvbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMjQ6IHJpc2N2OiB0
+Y2ctdGFyZ2V0OiBBZGQgdGhlIG1vdiBhbmQgbW92aSBpbnN0cnVjdGlvbi4uLgpDaGVja2luZyBQ
+QVRDSCAxMy8yNDogcmlzY3Y6IHRjZy10YXJnZXQ6IEFkZCB0aGUgZXh0cmFjdCBpbnN0cnVjdGlv
+bnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvMjQ6IHJpc2N2OiB0Y2ctdGFyZ2V0OiBBZGQgdGhlIG91
+dCBsb2FkIGFuZCBzdG9yZSBpbnN0cnVjdGlvbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvMjQ6IHJp
+c2N2OiB0Y2ctdGFyZ2V0OiBBZGQgdGhlIGFkZDIgYW5kIHN1YjIgaW5zdHJ1Y3Rpb25zLi4uCkNo
+ZWNraW5nIFBBVENIIDE2LzI0OiByaXNjdjogdGNnLXRhcmdldDogQWRkIGJyYW5jaCBhbmQganVt
+cCBpbnN0cnVjdGlvbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTcvMjQ6IHJpc2N2OiB0Y2ctdGFyZ2V0
+OiBBZGQgc2xvd3BhdGggbG9hZCBhbmQgc3RvcmUgaW5zdHJ1Y3Rpb25zLi4uCkNoZWNraW5nIFBB
+VENIIDE4LzI0OiByaXNjdjogdGNnLXRhcmdldDogQWRkIGRpcmVjdCBsb2FkIGFuZCBzdG9yZSBp
+bnN0cnVjdGlvbnMuLi4KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0
+eDpXeFYpCiM3MzogRklMRTogdGNnL3Jpc2N2L3RjZy10YXJnZXQuaW5jLmM6MTE5MDoKKyAgICB0
+Y2dfaW5zbl91bml0ICpsYWJlbF9wdHJbMV07CiAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjog
+c3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikKIzE0NDogRklMRTogdGNn
+L3Jpc2N2L3RjZy10YXJnZXQuaW5jLmM6MTI2MToKKyAgICB0Y2dfaW5zbl91bml0ICpsYWJlbF9w
+dHJbMV07CiAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3Ms
+IDE2MSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+CgpDaGVja2luZyBQQVRDSCAxOS8yNDogcmlzY3Y6IHRjZy10YXJnZXQ6IEFkZCB0aGUgb3V0IG9w
+IGRlY29kZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggMjAvMjQ6IHJpc2N2OiB0Y2ctdGFyZ2V0OiBBZGQg
+dGhlIHByb2xvZ3VlIGdlbmVyYXRpb24gYW5kIHJlZ2lzdGVyIHRoZSBKSVQuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMjEvMjQ6IHJpc2N2OiB0Y2ctdGFyZ2V0OiBBZGQgdGhlIHRhcmdldCBpbml0IGNvZGUu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMjIvMjQ6IHRjZzogQWRkIFJJU0MtViBjcHUgc2lnbmFsIGhhbmRs
+ZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggMjMvMjQ6IGRpYXM6IEFkZCBSSVNDLVYgc3VwcG9ydC4uLgpX
+QVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAoj
+MjI6IEZJTEU6IGRpc2FzLmM6NTI2OgorI2lmIGRlZmluZWQoX0lMUDMyKSB8fCAoX19yaXNjdl94
+bGVuID09IDMyKQoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNiBsaW5lcyBjaGVja2Vk
+CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDI0
+LzI0OiBjb25maWd1cmU6IEFkZCBzdXBwb3J0IGZvciBidWlsZGluZyBSSVNDLVYgaG9zdC4uLgo9
+PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhl
+IGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy9jb3Zlci4x
+NTQ0MjI5ODcyLmdpdC5hbGlzdGFpci5mcmFuY2lzQHdkYy5jb20vdGVzdGluZy5jaGVja3BhdGNo
+Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
+aGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
+YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
