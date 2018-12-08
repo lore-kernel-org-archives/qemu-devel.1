@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49675)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gVOvM-0000Mo-T8
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 17:48:45 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gVQ6n-0002vW-EQ
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 19:04:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gVOvK-0004Xo-5V
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 17:48:44 -0500
-Resent-Message-Id: <E1gVOvK-0004Xo-5V@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21755)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gVOvJ-0004Ug-VD
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 17:48:42 -0500
-In-Reply-To: <20181207170400.5129-1-philmd@redhat.com>
-Message-ID: <154422288914.14995.435815784241619944@bb8f5089e434>
-Reply-To: <qemu-devel@nongnu.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 7 Dec 2018 14:48:10 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/6] fw_cfg: add HMP 'info fw_cfg' and
- add_file_from_host()
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gVQ6m-0002xI-Lp
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 19:04:37 -0500
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:35663)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gVQ6m-0002tX-DQ
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 19:04:36 -0500
+Received: by mail-lj1-x244.google.com with SMTP id x85-v6so4997328ljb.2
+	for <qemu-devel@nongnu.org>; Fri, 07 Dec 2018 16:04:36 -0800 (PST)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Fri,  7 Dec 2018 16:04:23 -0800
+Message-Id: <20181208000423.2807-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH] target/xtensa/import_core.sh: don't add
+ duplicate 'static'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,22 +24,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: philmd@redhat.com
-Cc: famz@redhat.com, mst@redhat.com, lersek@redhat.com, dgilbert@redhat.com, peter.maydell@linaro.org, imammedo@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, ehabkost@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIwNzE3MDQwMC41MTI5
-LTEtcGhpbG1kQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
-ZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
-YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
-LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9z
-NyBTSE9XX0VOVj0xIEo9OAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKbGlicG1lbSBzdXBwb3J0
-ICAgbm8KbGlidWRldiAgICAgICAgICAgbm8KCldBUk5JTkc6IFVzZSBvZiBTREwgMS4yIGlzIGRl
-cHJlY2F0ZWQgYW5kIHdpbGwgYmUgcmVtb3ZlZCBpbgpXQVJOSU5HOiBmdXR1cmUgcmVsZWFzZXMu
-IFBsZWFzZSBzd2l0Y2ggdG8gdXNpbmcgU0RMIDIuMAoKTk9URTogY3Jvc3MtY29tcGlsZXJzIGVu
-YWJsZWQ6ICAnY2MnCiAgR0VOICAgICB4ODZfNjQtc29mdG1tdS9jb25maWctZGV2aWNlcy5tYWsu
-dG1wCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9n
-cy8yMDE4MTIwNzE3MDQwMC41MTI5LTEtcGhpbG1kQHJlZGhhdC5jb20vdGVzdGluZy5kb2NrZXIt
-cXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
-ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+xtensa-modules.c produced by recent Tensilica tools have
+Opcode_*_encode_fns arrays defined as static. Don't add extra 'static'
+in front of them when importing.
+
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+ target/xtensa/import_core.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/target/xtensa/import_core.sh b/target/xtensa/import_core.sh
+index 039406bf28fa..e4a2e39f6353 100755
+--- a/target/xtensa/import_core.sh
++++ b/target/xtensa/import_core.sh
+@@ -27,7 +27,7 @@ tar -xf "$OVERLAY" -O gdb/xtensa-config.c | \
+ # Fix up known issues in the xtensa-modules.c
+ #
+ tar -xf "$OVERLAY" -O binutils/xtensa-modules.c | \
+-    sed -e 's/\(xtensa_opcode_encode_fn.*\[\] =\)/static \1/' \
++    sed -e 's/^\(xtensa_opcode_encode_fn.*\[\] =\)/static \1/' \
+         -e '/^int num_bypass_groups()/,/}/d' \
+         -e '/^int num_bypass_group_chunks()/,/}/d' \
+         -e '/^uint32 \*bypass_entry(int i)/,/}/d' \
+-- 
+2.11.0
