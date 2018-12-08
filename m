@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gVabC-0003xZ-LF
-	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 06:16:45 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gVabJ-00043S-BY
+	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 06:16:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gVabA-0003o3-RD
-	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 06:16:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51398)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gVabI-0003qW-28
+	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 06:16:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36082)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gVabA-0003nj-JA
-	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 06:16:40 -0500
+	id 1gVabH-0003q0-Q1
+	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 06:16:47 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Sat,  8 Dec 2018 15:15:42 +0400
-Message-Id: <20181208111606.8505-4-marcandre.lureau@redhat.com>
+Date: Sat,  8 Dec 2018 15:15:43 +0400
+Message-Id: <20181208111606.8505-5-marcandre.lureau@redhat.com>
 In-Reply-To: <20181208111606.8505-1-marcandre.lureau@redhat.com>
 References: <20181208111606.8505-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-4.0 v7 03/27] qapi: rename
- QAPISchemaEnumType.values to .members
+Subject: [Qemu-devel] [PATCH for-4.0 v7 04/27] qapi: change enum visitor and
+ gen_enum* to take QAPISchemaMember
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,74 +31,217 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Rename QAPISchemaEnumType.values and related variables to members.
-Makes sense ever since commit 93bda4dd4 changed .values from list of
-string to list of QAPISchemaMember. Obvious no-op.
+This will allow to add and access more properties associated with enum
+values/members, like the associated 'if' condition. We may want to
+have a specialized type QAPISchemaEnumMember, for now this will do.
 
+Modify gen_enum() and gen_enum_lookup() for the same reason.
+
+Suggested-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi/common.py | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+ scripts/qapi/common.py         | 22 +++++++++++-----------
+ scripts/qapi/doc.py            |  2 +-
+ scripts/qapi/events.py         | 13 +++++++------
+ scripts/qapi/introspect.py     |  5 +++--
+ scripts/qapi/types.py          |  6 +++---
+ scripts/qapi/visit.py          |  2 +-
+ tests/qapi-schema/test-qapi.py |  4 ++--
+ 7 files changed, 28 insertions(+), 26 deletions(-)
 
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 7ea0cf5139..55c914ec44 100644
+index 55c914ec44..1fa2f79990 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -1161,22 +1161,22 @@ class QAPISchemaBuiltinType(QAPISchemaType):
+@@ -1063,7 +1063,7 @@ class QAPISchemaVisitor(object):
+     def visit_builtin_type(self, name, info, json_type):
+         pass
+=20
+-    def visit_enum_type(self, name, info, ifcond, values, prefix):
++    def visit_enum_type(self, name, info, ifcond, members, prefix):
+         pass
+=20
+     def visit_array_type(self, name, info, ifcond, element_type):
+@@ -1193,7 +1193,7 @@ class QAPISchemaEnumType(QAPISchemaType):
+=20
+     def visit(self, visitor):
+         visitor.visit_enum_type(self.name, self.info, self.ifcond,
+-                                self.member_names(), self.prefix)
++                                self.members, self.prefix)
 =20
 =20
- class QAPISchemaEnumType(QAPISchemaType):
--    def __init__(self, name, info, doc, ifcond, values, prefix):
-+    def __init__(self, name, info, doc, ifcond, members, prefix):
-         QAPISchemaType.__init__(self, name, info, doc, ifcond)
--        for v in values:
--            assert isinstance(v, QAPISchemaMember)
--            v.set_owner(name)
-+        for m in members:
-+            assert isinstance(m, QAPISchemaMember)
-+            m.set_owner(name)
-         assert prefix is None or isinstance(prefix, str)
--        self.values =3D values
-+        self.members =3D members
-         self.prefix =3D prefix
+ class QAPISchemaArrayType(QAPISchemaType):
+@@ -2012,19 +2012,19 @@ def _wrap_ifcond(ifcond, before, after):
+     return out
 =20
-     def check(self, schema):
-         QAPISchemaType.check(self, schema)
-         seen =3D {}
--        for v in self.values:
--            v.check_clash(self.info, seen)
-+        for m in self.members:
-+            m.check_clash(self.info, seen)
-             if self.doc:
--                self.doc.connect_member(v)
-+                self.doc.connect_member(m)
 =20
-     def is_implicit(self):
-         # See QAPISchema._make_implicit_enum_type() and ._def_predefined=
-s()
-@@ -1186,7 +1186,7 @@ class QAPISchemaEnumType(QAPISchemaType):
-         return c_name(self.name)
+-def gen_enum_lookup(name, values, prefix=3DNone):
++def gen_enum_lookup(name, members, prefix=3DNone):
+     ret =3D mcgen('''
 =20
-     def member_names(self):
--        return [v.name for v in self.values]
-+        return [m.name for m in self.members]
+ const QEnumLookup %(c_name)s_lookup =3D {
+     .array =3D (const char *const[]) {
+ ''',
+                 c_name=3Dc_name(name))
+-    for value in values:
+-        index =3D c_enum_const(name, value, prefix)
++    for m in members:
++        index =3D c_enum_const(name, m.name, prefix)
+         ret +=3D mcgen('''
+-        [%(index)s] =3D "%(value)s",
++        [%(index)s] =3D "%(name)s",
+ ''',
+-                     index=3Dindex, value=3Dvalue)
++                     index=3Dindex, name=3Dm.name)
 =20
-     def json_type(self):
-         return 'string'
-@@ -1403,9 +1403,9 @@ class QAPISchemaObjectTypeVariants(object):
-         if self._tag_name:    # flat union
-             # branches that are not explicitly covered get an empty type
-             cases =3D set([v.name for v in self.variants])
--            for val in self.tag_member.type.values:
--                if val.name not in cases:
--                    v =3D QAPISchemaObjectTypeVariant(val.name, 'q_empty=
-')
-+            for m in self.tag_member.type.members:
-+                if m.name not in cases:
-+                    v =3D QAPISchemaObjectTypeVariant(m.name, 'q_empty')
-                     v.set_owner(self.tag_member.owner)
-                     self.variants.append(v)
-         for v in self.variants:
+     ret +=3D mcgen('''
+     },
+@@ -2035,9 +2035,9 @@ const QEnumLookup %(c_name)s_lookup =3D {
+     return ret
+=20
+=20
+-def gen_enum(name, values, prefix=3DNone):
++def gen_enum(name, members, prefix=3DNone):
+     # append automatically generated _MAX value
+-    enum_values =3D values + ['_MAX']
++    enum_members =3D members + [QAPISchemaMember('_MAX')]
+=20
+     ret =3D mcgen('''
+=20
+@@ -2045,11 +2045,11 @@ typedef enum %(c_name)s {
+ ''',
+                 c_name=3Dc_name(name))
+=20
+-    for value in enum_values:
++    for m in enum_members:
+         ret +=3D mcgen('''
+     %(c_enum)s,
+ ''',
+-                     c_enum=3Dc_enum_const(name, value, prefix))
++                     c_enum=3Dc_enum_const(name, m.name, prefix))
+=20
+     ret +=3D mcgen('''
+ } %(c_name)s;
+diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
+index 987fd3c943..76cb186ff9 100755
+--- a/scripts/qapi/doc.py
++++ b/scripts/qapi/doc.py
+@@ -206,7 +206,7 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
+isitor):
+     def write(self, output_dir):
+         self._gen.write(output_dir, self._prefix + 'qapi-doc.texi')
+=20
+-    def visit_enum_type(self, name, info, ifcond, values, prefix):
++    def visit_enum_type(self, name, info, ifcond, members, prefix):
+         doc =3D self.cur_doc
+         self._gen.add(TYPE_FMT(type=3D'Enum',
+                                name=3Ddoc.symbol,
+diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
+index 2ed7902424..f1b88d8786 100644
+--- a/scripts/qapi/events.py
++++ b/scripts/qapi/events.py
+@@ -143,8 +143,8 @@ class QAPISchemaGenEventVisitor(QAPISchemaModularCVis=
+itor):
+         QAPISchemaModularCVisitor.__init__(
+             self, prefix, 'qapi-events',
+             ' * Schema-defined QAPI/QMP events', __doc__)
+-        self._enum_name =3D c_name(prefix + 'QAPIEvent', protect=3DFalse=
+)
+-        self._event_names =3D []
++        self._event_enum_name =3D c_name(prefix + 'QAPIEvent', protect=3D=
+False)
++        self._event_enum_members =3D []
+=20
+     def _begin_module(self, name):
+         types =3D self._module_basename('qapi-types', name)
+@@ -170,15 +170,16 @@ class QAPISchemaGenEventVisitor(QAPISchemaModularCV=
+isitor):
+=20
+     def visit_end(self):
+         (genc, genh) =3D self._module[self._main_module]
+-        genh.add(gen_enum(self._enum_name, self._event_names))
+-        genc.add(gen_enum_lookup(self._enum_name, self._event_names))
++        genh.add(gen_enum(self._event_enum_name, self._event_enum_member=
+s))
++        genc.add(gen_enum_lookup(self._event_enum_name,
++                                 self._event_enum_members))
+=20
+     def visit_event(self, name, info, ifcond, arg_type, boxed):
+         with ifcontext(ifcond, self._genh, self._genc):
+             self._genh.add(gen_event_send_decl(name, arg_type, boxed))
+             self._genc.add(gen_event_send(name, arg_type, boxed,
+-                                          self._enum_name))
+-        self._event_names.append(name)
++                                          self._event_enum_name))
++        self._event_enum_members.append(QAPISchemaMember(name))
+=20
+=20
+ def gen_events(schema, output_dir, prefix):
+diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+index 67d6106f77..417625d54b 100644
+--- a/scripts/qapi/introspect.py
++++ b/scripts/qapi/introspect.py
+@@ -174,8 +174,9 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+     def visit_builtin_type(self, name, info, json_type):
+         self._gen_qlit(name, 'builtin', {'json-type': json_type}, [])
+=20
+-    def visit_enum_type(self, name, info, ifcond, values, prefix):
+-        self._gen_qlit(name, 'enum', {'values': values}, ifcond)
++    def visit_enum_type(self, name, info, ifcond, members, prefix):
++        self._gen_qlit(name, 'enum',
++                       {'values': [m.name for m in members]}, ifcond)
+=20
+     def visit_array_type(self, name, info, ifcond, element_type):
+         element =3D self._use_type(element_type)
+diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
+index 3bb9cb6d47..0404710bbd 100644
+--- a/scripts/qapi/types.py
++++ b/scripts/qapi/types.py
+@@ -215,10 +215,10 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVi=
+sitor):
+         self._genh.add(gen_type_cleanup_decl(name))
+         self._genc.add(gen_type_cleanup(name))
+=20
+-    def visit_enum_type(self, name, info, ifcond, values, prefix):
++    def visit_enum_type(self, name, info, ifcond, members, prefix):
+         with ifcontext(ifcond, self._genh, self._genc):
+-            self._genh.preamble_add(gen_enum(name, values, prefix))
+-            self._genc.add(gen_enum_lookup(name, values, prefix))
++            self._genh.preamble_add(gen_enum(name, members, prefix))
++            self._genc.add(gen_enum_lookup(name, members, prefix))
+=20
+     def visit_array_type(self, name, info, ifcond, element_type):
+         with ifcontext(ifcond, self._genh, self._genc):
+diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
+index 460cf12989..24f85a2e85 100644
+--- a/scripts/qapi/visit.py
++++ b/scripts/qapi/visit.py
+@@ -310,7 +310,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaModularCVis=
+itor):
+ ''',
+                                       types=3Dtypes))
+=20
+-    def visit_enum_type(self, name, info, ifcond, values, prefix):
++    def visit_enum_type(self, name, info, ifcond, members, prefix):
+         with ifcontext(ifcond, self._genh, self._genc):
+             self._genh.add(gen_visit_decl(name, scalar=3DTrue))
+             self._genc.add(gen_visit_enum(name))
+diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
+.py
+index cea21c773a..27f776693e 100644
+--- a/tests/qapi-schema/test-qapi.py
++++ b/tests/qapi-schema/test-qapi.py
+@@ -23,8 +23,8 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+     def visit_include(self, name, info):
+         print('include %s' % name)
+=20
+-    def visit_enum_type(self, name, info, ifcond, values, prefix):
+-        print('enum %s %s' % (name, values))
++    def visit_enum_type(self, name, info, ifcond, members, prefix):
++        print('enum %s %s' % (name, [m.name for m in members]))
+         if prefix:
+             print('    prefix %s' % prefix)
+         self._print_if(ifcond)
 --=20
 2.20.0.rc1
