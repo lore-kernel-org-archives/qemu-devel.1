@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40462)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=8739c4fd6=Alistair.Francis@wdc.com>)
-	id 1gVQo3-0003S4-39
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 19:49:21 -0500
+	id 1gVQoC-0003ZE-1a
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 19:49:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=8739c4fd6=Alistair.Francis@wdc.com>)
-	id 1gVQnz-0001J1-P0
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 19:49:19 -0500
+	id 1gVQo8-0001Kx-O6
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 19:49:27 -0500
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Sat, 8 Dec 2018 00:49:11 +0000
-Message-ID: <c1cbe33881d567ee4712128282e6fcc49a5736b5.1544229872.git.alistair.francis@wdc.com>
+Date: Sat, 8 Dec 2018 00:49:21 +0000
+Message-ID: <ae5ded1970b8015626a389cf4e977a55be6f8cdb.1544229872.git.alistair.francis@wdc.com>
 References: <cover.1544229872.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1544229872.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [RFC v3 19/24] riscv: tcg-target: Add the out op
- decoder
+Subject: [Qemu-devel] [RFC v3 20/24] riscv: tcg-target: Add the prologue
+ generation and register the JIT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,515 +31,136 @@ Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistai
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/riscv/tcg-target.inc.c | 493 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 493 insertions(+)
+ tcg/riscv/tcg-target.inc.c | 111 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 111 insertions(+)
 
 diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
-index 280ba699c9..29c8a30a7d 100644
+index 29c8a30a7d..e5a4642609 100644
 --- a/tcg/riscv/tcg-target.inc.c
 +++ b/tcg/riscv/tcg-target.inc.c
-@@ -1290,3 +1290,496 @@ static void tcg_out_qemu_st(TCGContext *s, const TC=
-GArg *args, bool is_64)
-     tcg_out_qemu_st_direct(s, data_regl, data_regh, base, opc);
- #endif
+@@ -1783,3 +1783,114 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGO=
+pcode op)
+         return NULL;
+     }
  }
 +
-+static tcg_insn_unit *tb_ret_addr;
++static const int tcg_target_callee_save_regs[] =3D {
++    TCG_REG_S0,       /* used for the global env (TCG_AREG0) */
++    TCG_REG_S1,
++    TCG_REG_S2,
++    TCG_REG_S3,
++    TCG_REG_S4,
++    TCG_REG_S5,
++    TCG_REG_S6,
++    TCG_REG_S7,
++    TCG_REG_S8,
++    TCG_REG_S9,
++    TCG_REG_S10,
++    TCG_REG_S11,
++    TCG_REG_RA,       /* should be last for ABI compliance */
++};
 +
-+static void tcg_out_op(TCGContext *s, TCGOpcode opc,
-+                       const TCGArg *args, const int *const_args)
++/* Stack frame parameters.  */
++#define REG_SIZE   (TCG_TARGET_REG_BITS / 8)
++#define SAVE_SIZE  ((int)ARRAY_SIZE(tcg_target_callee_save_regs) * REG_SIZ=
+E)
++#define TEMP_SIZE  (CPU_TEMP_BUF_NLONGS * (int)sizeof(long))
++#define FRAME_SIZE ((TCG_STATIC_CALL_ARGS_SIZE + TEMP_SIZE + SAVE_SIZE \
++                     + TCG_TARGET_STACK_ALIGN - 1) \
++                    & -TCG_TARGET_STACK_ALIGN)
++#define SAVE_OFS   (TCG_STATIC_CALL_ARGS_SIZE + TEMP_SIZE)
++
++/* We're expecting to be able to use an immediate for frame allocation.  *=
+/
++QEMU_BUILD_BUG_ON(FRAME_SIZE > 0x7ff);
++
++/* Generate global QEMU prologue and epilogue code */
++static void tcg_target_qemu_prologue(TCGContext *s)
 +{
-+    TCGArg a0 =3D args[0];
-+    TCGArg a1 =3D args[1];
-+    TCGArg a2 =3D args[2];
-+    int c2 =3D const_args[2];
++    int i;
 +
-+    switch (opc) {
-+    case INDEX_op_exit_tb:
-+        /* Reuse the zeroing that exists for goto_ptr.  */
-+        if (a0 =3D=3D 0) {
-+            tcg_out_call_int(s, s->code_gen_epilogue, true);
-+        } else {
-+            tcg_out_movi(s, TCG_TYPE_PTR, TCG_REG_A0, a0);
-+            tcg_out_call_int(s, tb_ret_addr, true);
-+        }
-+        break;
++    tcg_set_frame(s, TCG_REG_SP, TCG_STATIC_CALL_ARGS_SIZE, TEMP_SIZE);
 +
-+    case INDEX_op_goto_tb:
-+        assert(s->tb_jmp_insn_offset =3D=3D 0);
-+        /* indirect jump method */
-+        tcg_out_ld(s, TCG_TYPE_PTR, TCG_REG_TMP0, TCG_REG_ZERO,
-+                   (uintptr_t)(s->tb_jmp_target_addr + a0));
-+        tcg_out_opc_imm(s, OPC_JALR, TCG_REG_ZERO, TCG_REG_TMP0, 0);
-+        set_jmp_reset_offset(s, a0);
-+        break;
-+
-+    case INDEX_op_goto_ptr:
-+        tcg_out_opc_imm(s, OPC_JALR, TCG_REG_ZERO, a0, 0);
-+        break;
-+
-+    case INDEX_op_br:
-+        tcg_out_reloc(s, s->code_ptr, R_RISCV_JAL, arg_label(a0), 0);
-+        tcg_out_opc_jump(s, OPC_JAL, TCG_REG_ZERO, 0);
-+        break;
-+
-+    case INDEX_op_ld8u_i32:
-+    case INDEX_op_ld8u_i64:
-+        tcg_out_ldst(s, OPC_LBU, a0, a1, a2);
-+        break;
-+    case INDEX_op_ld8s_i32:
-+    case INDEX_op_ld8s_i64:
-+        tcg_out_ldst(s, OPC_LB, a0, a1, a2);
-+        break;
-+    case INDEX_op_ld16u_i32:
-+    case INDEX_op_ld16u_i64:
-+        tcg_out_ldst(s, OPC_LHU, a0, a1, a2);
-+        break;
-+    case INDEX_op_ld16s_i32:
-+    case INDEX_op_ld16s_i64:
-+        tcg_out_ldst(s, OPC_LH, a0, a1, a2);
-+        break;
-+    case INDEX_op_ld32u_i64:
-+        tcg_out_ldst(s, OPC_LWU, a0, a1, a2);
-+        break;
-+    case INDEX_op_ld_i32:
-+    case INDEX_op_ld32s_i64:
-+        tcg_out_ldst(s, OPC_LW, a0, a1, a2);
-+        break;
-+    case INDEX_op_ld_i64:
-+        tcg_out_ldst(s, OPC_LD, a0, a1, a2);
-+        break;
-+
-+    case INDEX_op_st8_i32:
-+    case INDEX_op_st8_i64:
-+        tcg_out_ldst(s, OPC_SB, a0, a1, a2);
-+        break;
-+    case INDEX_op_st16_i32:
-+    case INDEX_op_st16_i64:
-+        tcg_out_ldst(s, OPC_SH, a0, a1, a2);
-+        break;
-+    case INDEX_op_st_i32:
-+    case INDEX_op_st32_i64:
-+        tcg_out_ldst(s, OPC_SW, a0, a1, a2);
-+        break;
-+    case INDEX_op_st_i64:
-+        tcg_out_ldst(s, OPC_SD, a0, a1, a2);
-+        break;
-+
-+    case INDEX_op_add_i32:
-+        if (c2) {
-+            tcg_out_opc_imm(s, OPC_ADDIW, a0, a1, a2);
-+        } else {
-+            tcg_out_opc_reg(s, OPC_ADDW, a0, a1, a2);
-+        }
-+        break;
-+    case INDEX_op_add_i64:
-+        if (c2) {
-+            tcg_out_opc_imm(s, OPC_ADDI, a0, a1, a2);
-+        } else {
-+            tcg_out_opc_reg(s, OPC_ADD, a0, a1, a2);
-+        }
-+        break;
-+
-+    case INDEX_op_sub_i32:
-+        if (c2) {
-+            tcg_out_opc_imm(s, OPC_ADDIW, a0, a1, -a2);
-+        } else {
-+            tcg_out_opc_reg(s, OPC_SUBW, a0, a1, a2);
-+        }
-+        break;
-+    case INDEX_op_sub_i64:
-+        if (c2) {
-+            tcg_out_opc_imm(s, OPC_ADDI, a0, a1, -a2);
-+        } else {
-+            tcg_out_opc_reg(s, OPC_SUB, a0, a1, a2);
-+        }
-+        break;
-+
-+    case INDEX_op_and_i32:
-+    case INDEX_op_and_i64:
-+        if (c2) {
-+            tcg_out_opc_imm(s, OPC_ANDI, a0, a1, a2);
-+        } else {
-+            tcg_out_opc_reg(s, OPC_AND, a0, a1, a2);
-+        }
-+        break;
-+
-+    case INDEX_op_or_i32:
-+    case INDEX_op_or_i64:
-+        if (c2) {
-+            tcg_out_opc_imm(s, OPC_ORI, a0, a1, a2);
-+        } else {
-+            tcg_out_opc_reg(s, OPC_OR, a0, a1, a2);
-+        }
-+        break;
-+
-+    case INDEX_op_xor_i32:
-+    case INDEX_op_xor_i64:
-+        if (c2) {
-+            tcg_out_opc_imm(s, OPC_XORI, a0, a1, a2);
-+        } else {
-+            tcg_out_opc_reg(s, OPC_XOR, a0, a1, a2);
-+        }
-+        break;
-+
-+    case INDEX_op_not_i32:
-+    case INDEX_op_not_i64:
-+        tcg_out_opc_imm(s, OPC_XORI, a0, a1, -1);
-+        break;
-+
-+    case INDEX_op_neg_i32:
-+        tcg_out_opc_reg(s, OPC_SUBW, a0, TCG_REG_ZERO, a1);
-+        break;
-+    case INDEX_op_neg_i64:
-+        tcg_out_opc_imm(s, OPC_SUB, a0, TCG_REG_ZERO, a1);
-+        break;
-+
-+    case INDEX_op_mul_i32:
-+        tcg_out_opc_reg(s, OPC_MULW, a0, a1, a2);
-+        break;
-+    case INDEX_op_mul_i64:
-+        tcg_out_opc_reg(s, OPC_MUL, a0, a1, a2);
-+        break;
-+
-+    case INDEX_op_div_i32:
-+        tcg_out_opc_reg(s, OPC_DIVW, a0, a1, a2);
-+        break;
-+    case INDEX_op_div_i64:
-+        tcg_out_opc_reg(s, OPC_DIV, a0, a1, a2);
-+        break;
-+
-+    case INDEX_op_divu_i32:
-+        tcg_out_opc_reg(s, OPC_DIVUW, a0, a1, a2);
-+        break;
-+    case INDEX_op_divu_i64:
-+        tcg_out_opc_reg(s, OPC_DIVU, a0, a1, a2);
-+        break;
-+
-+    case INDEX_op_rem_i32:
-+        tcg_out_opc_reg(s, OPC_REMW, a0, a1, a2);
-+        break;
-+    case INDEX_op_rem_i64:
-+        tcg_out_opc_reg(s, OPC_REM, a0, a1, a2);
-+        break;
-+
-+    case INDEX_op_remu_i32:
-+        tcg_out_opc_reg(s, OPC_REMUW, a0, a1, a2);
-+        break;
-+    case INDEX_op_remu_i64:
-+        tcg_out_opc_reg(s, OPC_REMU, a0, a1, a2);
-+        break;
-+
-+    case INDEX_op_shl_i32:
-+        if (c2) {
-+            tcg_out_opc_imm(s, OPC_SLLIW, a0, a1, a2);
-+        } else {
-+            tcg_out_opc_reg(s, OPC_SLLW, a0, a1, a2);
-+        }
-+        break;
-+    case INDEX_op_shl_i64:
-+        if (c2) {
-+            tcg_out_opc_imm(s, OPC_SLLI, a0, a1, a2);
-+        } else {
-+            tcg_out_opc_reg(s, OPC_SLL, a0, a1, a2);
-+        }
-+        break;
-+
-+    case INDEX_op_shr_i32:
-+        if (c2) {
-+            tcg_out_opc_imm(s, OPC_SRLIW, a0, a1, a2);
-+        } else {
-+            tcg_out_opc_reg(s, OPC_SRLW, a0, a1, a2);
-+        }
-+        break;
-+    case INDEX_op_shr_i64:
-+        if (c2) {
-+            tcg_out_opc_imm(s, OPC_SRLI, a0, a1, a2);
-+        } else {
-+            tcg_out_opc_reg(s, OPC_SRL, a0, a1, a2);
-+        }
-+        break;
-+
-+    case INDEX_op_sar_i32:
-+        if (c2) {
-+            tcg_out_opc_imm(s, OPC_SRAIW, a0, a1, a2);
-+        } else {
-+            tcg_out_opc_reg(s, OPC_SRAW, a0, a1, a2);
-+        }
-+        break;
-+    case INDEX_op_sar_i64:
-+        if (c2) {
-+            tcg_out_opc_imm(s, OPC_SRAI, a0, a1, a2);
-+        } else {
-+            tcg_out_opc_reg(s, OPC_SRA, a0, a1, a2);
-+        }
-+        break;
-+
-+    case INDEX_op_add2_i32:
-+        tcg_out_addsub2(s, a0, a1, a2, args[3], args[4], args[5],
-+                        const_args[4], const_args[5], false, true);
-+        break;
-+    case INDEX_op_add2_i64:
-+        tcg_out_addsub2(s, a0, a1, a2, args[3], args[4], args[5],
-+                        const_args[4], const_args[5], false, false);
-+        break;
-+    case INDEX_op_sub2_i32:
-+        tcg_out_addsub2(s, a0, a1, a2, args[3], args[4], args[5],
-+                        const_args[4], const_args[5], true, true);
-+        break;
-+    case INDEX_op_sub2_i64:
-+        tcg_out_addsub2(s, a0, a1, a2, args[3], args[4], args[5],
-+                        const_args[4], const_args[5], true, false);
-+        break;
-+
-+    case INDEX_op_brcond_i32:
-+    case INDEX_op_brcond_i64:
-+        tcg_out_brcond(s, a2, a0, a1, arg_label(args[3]));
-+        break;
-+    case INDEX_op_brcond2_i32:
-+        tcg_out_brcond2(s, args[4], a0, a1, a2, args[3], arg_label(args[5]=
-));
-+        break;
-+
-+    case INDEX_op_setcond_i32:
-+    case INDEX_op_setcond_i64:
-+        tcg_out_setcond(s, args[3], a0, a1, a2);
-+        break;
-+    case INDEX_op_setcond2_i32:
-+        tcg_out_setcond2(s, args[5], a0, a1, a2, args[3], args[4]);
-+        break;
-+
-+    case INDEX_op_qemu_ld_i32:
-+        tcg_out_qemu_ld(s, args, false);
-+        break;
-+    case INDEX_op_qemu_ld_i64:
-+        tcg_out_qemu_ld(s, args, true);
-+        break;
-+    case INDEX_op_qemu_st_i32:
-+        tcg_out_qemu_st(s, args, false);
-+        break;
-+    case INDEX_op_qemu_st_i64:
-+        tcg_out_qemu_st(s, args, true);
-+        break;
-+
-+    case INDEX_op_ext8u_i32:
-+    case INDEX_op_ext8u_i64:
-+        tcg_out_ext8u(s, a0, a1);
-+        break;
-+
-+    case INDEX_op_ext16u_i32:
-+    case INDEX_op_ext16u_i64:
-+        tcg_out_ext16u(s, a0, a1);
-+        break;
-+
-+    case INDEX_op_ext32u_i64:
-+    case INDEX_op_extu_i32_i64:
-+        tcg_out_ext32u(s, a0, a1);
-+        break;
-+
-+    case INDEX_op_ext8s_i32:
-+    case INDEX_op_ext8s_i64:
-+        tcg_out_ext8s(s, a0, a1);
-+        break;
-+
-+    case INDEX_op_ext16s_i32:
-+    case INDEX_op_ext16s_i64:
-+        tcg_out_ext16s(s, a0, a1);
-+        break;
-+
-+    case INDEX_op_ext32s_i64:
-+    case INDEX_op_extrl_i64_i32:
-+    case INDEX_op_extrh_i64_i32:
-+    case INDEX_op_ext_i32_i64:
-+        tcg_out_ext32s(s, a0, a1);
-+        break;
-+
-+    case INDEX_op_mulsh_i32:
-+    case INDEX_op_mulsh_i64:
-+        tcg_out_opc_imm(s, OPC_MULH, a0, a1, a2);
-+        break;
-+
-+    case INDEX_op_muluh_i32:
-+    case INDEX_op_muluh_i64:
-+        tcg_out_opc_imm(s, OPC_MULHU, a0, a1, a2);
-+        break;
-+
-+    case INDEX_op_mb:
-+        tcg_out_mb(s, a0);
-+        break;
-+
-+    case INDEX_op_mov_i32:  /* Always emitted via tcg_out_mov.  */
-+    case INDEX_op_mov_i64:
-+    case INDEX_op_movi_i32: /* Always emitted via tcg_out_movi.  */
-+    case INDEX_op_movi_i64:
-+    case INDEX_op_call:     /* Always emitted via tcg_out_call.  */
-+    default:
-+        g_assert_not_reached();
++    /* TB prologue */
++    tcg_out_opc_imm(s, OPC_ADDI, TCG_REG_SP, TCG_REG_SP, -FRAME_SIZE);
++    for (i =3D 0; i < ARRAY_SIZE(tcg_target_callee_save_regs); i++) {
++        tcg_out_st(s, TCG_TYPE_REG, tcg_target_callee_save_regs[i],
++                   TCG_REG_SP, SAVE_OFS + i * REG_SIZE);
 +    }
++
++#if !defined(CONFIG_SOFTMMU)
++    tcg_out_movi(s, TCG_TYPE_PTR, TCG_GUEST_BASE_REG, guest_base);
++    tcg_regset_set_reg(s->reserved_regs, TCG_GUEST_BASE_REG);
++#endif
++
++    /* Call generated code */
++    tcg_out_mov(s, TCG_TYPE_PTR, TCG_AREG0, tcg_target_call_iarg_regs[0]);
++    tcg_out_opc_imm(s, OPC_JALR, TCG_REG_ZERO, tcg_target_call_iarg_regs[1=
+], 0);
++
++    /* Return path for goto_ptr. Set return value to 0 */
++    s->code_gen_epilogue =3D s->code_ptr;
++    tcg_out_mov(s, TCG_TYPE_REG, TCG_REG_A0, TCG_REG_ZERO);
++
++    /* TB epilogue */
++    tb_ret_addr =3D s->code_ptr;
++    for (i =3D 0; i < ARRAY_SIZE(tcg_target_callee_save_regs); i++) {
++        tcg_out_ld(s, TCG_TYPE_REG, tcg_target_callee_save_regs[i],
++                   TCG_REG_SP, SAVE_OFS + i * REG_SIZE);
++    }
++
++    tcg_out_opc_imm(s, OPC_ADDI, TCG_REG_SP, TCG_REG_SP, FRAME_SIZE);
++    tcg_out_opc_imm(s, OPC_JALR, TCG_REG_ZERO, TCG_REG_RA, 0);
 +}
 +
-+static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-+{
-+    static const TCGTargetOpDef r
-+        =3D { .args_ct_str =3D { "r" } };
-+    static const TCGTargetOpDef r_r
-+        =3D { .args_ct_str =3D { "r", "r" } };
-+    static const TCGTargetOpDef rZ_r
-+        =3D { .args_ct_str =3D { "rZ", "r" } };
-+    static const TCGTargetOpDef rZ_rZ
-+        =3D { .args_ct_str =3D { "rZ", "rZ" } };
-+    static const TCGTargetOpDef rZ_rZ_rZ_rZ
-+        =3D { .args_ct_str =3D { "rZ", "rZ", "rZ", "rZ" } };
-+    static const TCGTargetOpDef r_r_ri
-+        =3D { .args_ct_str =3D { "r", "r", "ri" } };
-+    static const TCGTargetOpDef r_r_rI
-+        =3D { .args_ct_str =3D { "r", "r", "rI" } };
-+    static const TCGTargetOpDef r_rZ_rN
-+        =3D { .args_ct_str =3D { "r", "rZ", "rN" } };
-+    static const TCGTargetOpDef r_rZ_rZ
-+        =3D { .args_ct_str =3D { "r", "rZ", "rZ" } };
-+    static const TCGTargetOpDef r_rZ_rZ_rZ_rZ
-+        =3D { .args_ct_str =3D { "r", "rZ", "rZ", "rZ", "rZ" } };
-+    static const TCGTargetOpDef r_L
-+        =3D { .args_ct_str =3D { "r", "L" } };
-+    static const TCGTargetOpDef r_r_L
-+        =3D { .args_ct_str =3D { "r", "r", "L" } };
-+    static const TCGTargetOpDef r_L_L
-+        =3D { .args_ct_str =3D { "r", "L", "L" } };
-+    static const TCGTargetOpDef r_r_L_L
-+        =3D { .args_ct_str =3D { "r", "r", "L", "L" } };
-+    static const TCGTargetOpDef LZ_L
-+        =3D { .args_ct_str =3D { "LZ", "L" } };
-+    static const TCGTargetOpDef LZ_L_L
-+        =3D { .args_ct_str =3D { "LZ", "L", "L" } };
-+    static const TCGTargetOpDef LZ_LZ_L
-+        =3D { .args_ct_str =3D { "LZ", "LZ", "L" } };
-+    static const TCGTargetOpDef LZ_LZ_L_L
-+        =3D { .args_ct_str =3D { "LZ", "LZ", "L", "L" } };
-+    static const TCGTargetOpDef r_r_rZ_rZ_rM_rM
-+        =3D { .args_ct_str =3D { "r", "r", "rZ", "rZ", "rM", "rM" } };
++typedef struct {
++    DebugFrameHeader h;
++    uint8_t fde_def_cfa[4];
++    uint8_t fde_reg_ofs[ARRAY_SIZE(tcg_target_callee_save_regs) * 2];
++} DebugFrame;
 +
-+    switch (op) {
-+    case INDEX_op_goto_ptr:
-+        return &r;
++#define ELF_HOST_MACHINE EM_RISCV
 +
-+    case INDEX_op_ld8u_i32:
-+    case INDEX_op_ld8s_i32:
-+    case INDEX_op_ld16u_i32:
-+    case INDEX_op_ld16s_i32:
-+    case INDEX_op_ld_i32:
-+    case INDEX_op_not_i32:
-+    case INDEX_op_neg_i32:
-+    case INDEX_op_ld8u_i64:
-+    case INDEX_op_ld8s_i64:
-+    case INDEX_op_ld16u_i64:
-+    case INDEX_op_ld16s_i64:
-+    case INDEX_op_ld32s_i64:
-+    case INDEX_op_ld32u_i64:
-+    case INDEX_op_ld_i64:
-+    case INDEX_op_not_i64:
-+    case INDEX_op_neg_i64:
-+    case INDEX_op_ext8u_i32:
-+    case INDEX_op_ext8u_i64:
-+    case INDEX_op_ext16u_i32:
-+    case INDEX_op_ext16u_i64:
-+    case INDEX_op_ext32u_i64:
-+    case INDEX_op_extu_i32_i64:
-+    case INDEX_op_ext8s_i32:
-+    case INDEX_op_ext8s_i64:
-+    case INDEX_op_ext16s_i32:
-+    case INDEX_op_ext16s_i64:
-+    case INDEX_op_ext32s_i64:
-+    case INDEX_op_extrl_i64_i32:
-+    case INDEX_op_extrh_i64_i32:
-+    case INDEX_op_ext_i32_i64:
-+        return &r_r;
++static const DebugFrame debug_frame =3D {
++    .h.cie.len =3D sizeof(DebugFrameCIE) - 4, /* length after .len member =
+*/
++    .h.cie.id =3D -1,
++    .h.cie.version =3D 1,
++    .h.cie.code_align =3D 1,
++    .h.cie.data_align =3D -(TCG_TARGET_REG_BITS / 8) & 0x7f, /* sleb128 */
++    .h.cie.return_column =3D TCG_REG_RA,
 +
-+    case INDEX_op_st8_i32:
-+    case INDEX_op_st16_i32:
-+    case INDEX_op_st_i32:
-+    case INDEX_op_st8_i64:
-+    case INDEX_op_st16_i64:
-+    case INDEX_op_st32_i64:
-+    case INDEX_op_st_i64:
-+        return &rZ_r;
++    /* Total FDE size does not include the "len" member.  */
++    .h.fde.len =3D sizeof(DebugFrame) - offsetof(DebugFrame, h.fde.cie_off=
+set),
 +
-+    case INDEX_op_add_i32:
-+    case INDEX_op_and_i32:
-+    case INDEX_op_or_i32:
-+    case INDEX_op_xor_i32:
-+    case INDEX_op_add_i64:
-+    case INDEX_op_and_i64:
-+    case INDEX_op_or_i64:
-+    case INDEX_op_xor_i64:
-+        return &r_r_rI;
-+
-+    case INDEX_op_sub_i32:
-+    case INDEX_op_sub_i64:
-+        return &r_rZ_rN;
-+
-+    case INDEX_op_mul_i32:
-+    case INDEX_op_mulsh_i32:
-+    case INDEX_op_muluh_i32:
-+    case INDEX_op_div_i32:
-+    case INDEX_op_divu_i32:
-+    case INDEX_op_rem_i32:
-+    case INDEX_op_remu_i32:
-+    case INDEX_op_setcond_i32:
-+    case INDEX_op_mul_i64:
-+    case INDEX_op_mulsh_i64:
-+    case INDEX_op_muluh_i64:
-+    case INDEX_op_div_i64:
-+    case INDEX_op_divu_i64:
-+    case INDEX_op_rem_i64:
-+    case INDEX_op_remu_i64:
-+    case INDEX_op_setcond_i64:
-+        return &r_rZ_rZ;
-+
-+    case INDEX_op_shl_i32:
-+    case INDEX_op_shr_i32:
-+    case INDEX_op_sar_i32:
-+    case INDEX_op_shl_i64:
-+    case INDEX_op_shr_i64:
-+    case INDEX_op_sar_i64:
-+        return &r_r_ri;
-+
-+    case INDEX_op_brcond_i32:
-+    case INDEX_op_brcond_i64:
-+        return &rZ_rZ;
-+
-+    case INDEX_op_add2_i32:
-+    case INDEX_op_add2_i64:
-+    case INDEX_op_sub2_i32:
-+    case INDEX_op_sub2_i64:
-+        return &r_r_rZ_rZ_rM_rM;
-+
-+    case INDEX_op_brcond2_i32:
-+        return &rZ_rZ_rZ_rZ;
-+
-+    case INDEX_op_setcond2_i32:
-+        return &r_rZ_rZ_rZ_rZ;
-+
-+    case INDEX_op_qemu_ld_i32:
-+        return TARGET_LONG_BITS <=3D TCG_TARGET_REG_BITS ? &r_L : &r_L_L;
-+    case INDEX_op_qemu_st_i32:
-+        return TARGET_LONG_BITS <=3D TCG_TARGET_REG_BITS ? &LZ_L : &LZ_L_L=
-;
-+    case INDEX_op_qemu_ld_i64:
-+        return TCG_TARGET_REG_BITS =3D=3D 64 ? &r_L
-+               : TARGET_LONG_BITS <=3D TCG_TARGET_REG_BITS ? &r_r_L
-+               : &r_r_L_L;
-+    case INDEX_op_qemu_st_i64:
-+        return TCG_TARGET_REG_BITS =3D=3D 64 ? &LZ_L
-+               : TARGET_LONG_BITS <=3D TCG_TARGET_REG_BITS ? &LZ_LZ_L
-+               : &LZ_LZ_L_L;
-+
-+    default:
-+        return NULL;
++    .fde_def_cfa =3D {
++        12, TCG_REG_SP,                 /* DW_CFA_def_cfa sp, ... */
++        (FRAME_SIZE & 0x7f) | 0x80,     /* ... uleb128 FRAME_SIZE */
++        (FRAME_SIZE >> 7)
++    },
++    .fde_reg_ofs =3D {
++        0x80 + 9,  12,                  /* DW_CFA_offset, s1,  -96 */
++        0x80 + 18, 11,                  /* DW_CFA_offset, s2,  -88 */
++        0x80 + 19, 10,                  /* DW_CFA_offset, s3,  -80 */
++        0x80 + 20, 9,                   /* DW_CFA_offset, s4,  -72 */
++        0x80 + 21, 8,                   /* DW_CFA_offset, s5,  -64 */
++        0x80 + 22, 7,                   /* DW_CFA_offset, s6,  -56 */
++        0x80 + 23, 6,                   /* DW_CFA_offset, s7,  -48 */
++        0x80 + 24, 5,                   /* DW_CFA_offset, s8,  -40 */
++        0x80 + 25, 4,                   /* DW_CFA_offset, s9,  -32 */
++        0x80 + 26, 3,                   /* DW_CFA_offset, s10, -24 */
++        0x80 + 27, 2,                   /* DW_CFA_offset, s11, -16 */
++        0x80 + 1 , 1,                   /* DW_CFA_offset, ra,  -8 */
 +    }
++};
++
++void tcg_register_jit(void *buf, size_t buf_size)
++{
++    tcg_register_jit_int(buf, buf_size, &debug_frame, sizeof(debug_frame))=
+;
 +}
 --=20
 2.19.1
