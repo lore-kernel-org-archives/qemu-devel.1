@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gVacQ-000501-Mq
-	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 06:18:00 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gVacZ-00056L-RX
+	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 06:18:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gVacP-00047V-Hm
-	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 06:17:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44716)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gVacW-0004Bo-MO
+	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 06:18:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51750)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gVacP-00047I-94
-	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 06:17:57 -0500
+	id 1gVacW-0004Bg-D1
+	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 06:18:04 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Sat,  8 Dec 2018 15:15:53 +0400
-Message-Id: <20181208111606.8505-15-marcandre.lureau@redhat.com>
+Date: Sat,  8 Dec 2018 15:15:54 +0400
+Message-Id: <20181208111606.8505-16-marcandre.lureau@redhat.com>
 In-Reply-To: <20181208111606.8505-1-marcandre.lureau@redhat.com>
 References: <20181208111606.8505-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-4.0 v7 14/27] qapi: add 'if' to implicit
- struct members
+Subject: [Qemu-devel] [PATCH for-4.0 v7 15/27] qapi: add an error in case a
+ discriminator is conditional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,180 +31,126 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-The generated code is for now *unconditional*. Later patches generate
-the conditionals.
+Making a discriminator conditional doesn't make much sense. Instead,
+the union could be made conditional.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi/common.py                  | 14 +++++++-------
- docs/devel/qapi-code-gen.txt            | 10 ++++++++++
- tests/qapi-schema/qapi-schema-test.json | 12 +++++++++---
- tests/qapi-schema/qapi-schema-test.out  |  5 +++++
- tests/qapi-schema/test-qapi.py          |  1 +
- 5 files changed, 32 insertions(+), 10 deletions(-)
+ scripts/qapi/common.py                          |  8 ++++++++
+ tests/Makefile.include                          |  1 +
+ .../flat-union-invalid-if-discriminator.err     |  1 +
+ .../flat-union-invalid-if-discriminator.exit    |  1 +
+ .../flat-union-invalid-if-discriminator.json    | 17 +++++++++++++++++
+ .../flat-union-invalid-if-discriminator.out     |  0
+ 6 files changed, 28 insertions(+)
+ create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
+.err
+ create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
+.exit
+ create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
+.json
+ create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
+.out
 
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 4b3ba53dc7..aec51acb07 100644
+index aec51acb07..f79b3fad54 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -717,7 +717,7 @@ def check_type(info, source, value, allow_array=3DFal=
-se,
-         # an optional argument.
-         if isinstance(arg, dict):
-             check_known_keys(info, "member '%s' of %s" % (key, source),
--                             arg, ['type'], [])
-+                             arg, ['type'], ['if'])
-             typ =3D arg['type']
-         else:
-             typ =3D arg
-@@ -1438,8 +1438,8 @@ class QAPISchemaMember(object):
+@@ -578,6 +578,7 @@ def find_alternate_member_qtype(qapi_type):
+ # Return the discriminator enum define if discriminator is specified as =
+an
+ # enum type, otherwise return None.
+ def discriminator_find_enum_define(expr):
++    name =3D expr['union']
+     base =3D expr.get('base')
+     discriminator =3D expr.get('discriminator')
 =20
+@@ -594,6 +595,7 @@ def discriminator_find_enum_define(expr):
 =20
- class QAPISchemaObjectTypeMember(QAPISchemaMember):
--    def __init__(self, name, typ, optional):
--        QAPISchemaMember.__init__(self, name)
-+    def __init__(self, name, typ, optional, ifcond=3DNone):
-+        QAPISchemaMember.__init__(self, name, ifcond)
-         assert isinstance(typ, str)
-         assert isinstance(optional, bool)
-         self._type_name =3D typ
-@@ -1762,7 +1762,7 @@ class QAPISchema(object):
-             name, info, doc, ifcond,
-             self._make_enum_members(data), prefix))
-=20
--    def _make_member(self, name, typ, info):
-+    def _make_member(self, name, typ, ifcond, info):
-         optional =3D False
-         if name.startswith('*'):
-             name =3D name[1:]
-@@ -1770,10 +1770,10 @@ class QAPISchema(object):
-         if isinstance(typ, list):
-             assert len(typ) =3D=3D 1
-             typ =3D self._make_array_type(typ[0], info)
--        return QAPISchemaObjectTypeMember(name, typ, optional)
-+        return QAPISchemaObjectTypeMember(name, typ, optional, ifcond)
-=20
-     def _make_members(self, data, info):
--        return [self._make_member(key, value['type'], info)
-+        return [self._make_member(key, value['type'], value.get('if'), i=
-nfo)
-                 for (key, value) in data.items()]
-=20
-     def _def_struct_type(self, expr, info, doc):
-@@ -1794,7 +1794,7 @@ class QAPISchema(object):
-             typ =3D self._make_array_type(typ[0], info)
-         typ =3D self._make_implicit_object_type(
-             typ, info, None, self.lookup_type(typ),
--            'wrapper', [self._make_member('data', typ, info)])
-+            'wrapper', [self._make_member('data', typ, None, info)])
-         return QAPISchemaObjectTypeVariant(case, typ)
-=20
-     def _def_union_type(self, expr, info, doc):
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 08c5ef97ff..e6fff32241 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -752,6 +752,16 @@ gets its generated code guarded like this:
-  #endif /* defined(HAVE_BAR) */
-  #endif /* defined(CONFIG_FOO) */
-=20
-+Where a member can be defined with a single string value for its type,
-+it is also possible to supply a dictionary instead with both 'type'
-+and 'if' keys. (TODO: union and alternate)
+     if isinstance(discriminator_value, dict):
+         discriminator_value =3D discriminator_value['type']
 +
-+Example: a conditional 'bar' member
+     return enum_types.get(discriminator_value)
+=20
+=20
+@@ -800,7 +802,12 @@ def check_union(expr, info):
+                                "struct '%s'"
+                                % (discriminator, base))
+         if isinstance(discriminator_value, dict):
++            if discriminator_value.get('if'):
++                raise QAPISemError(info, 'The discriminator %s.%s for un=
+ion %s '
++                                   'must not be conditional' %
++                                   (base, discriminator, name))
+             discriminator_value =3D discriminator_value['type']
 +
-+{ 'struct': 'IfStruct', 'data':
-+  { 'foo': 'int',
-+    'bar': { 'type': 'int', 'if': 'defined(IFCOND)'} } }
+         enum_define =3D enum_types.get(discriminator_value)
+         allow_metas =3D ['struct']
+         # Do not allow string discriminator
+@@ -1023,6 +1030,7 @@ def check_exprs(exprs):
+=20
+         if 'include' in expr:
+             continue
++        info =3D expr_elem['info']
+         if 'union' in expr and not discriminator_find_enum_define(expr):
+             name =3D '%sKind' % expr['union']
+         elif 'alternate' in expr:
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index ea5d1e8787..3f5a1d0c30 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -409,6 +409,7 @@ qapi-schema +=3D flat-union-inline-invalid-dict.json
+ qapi-schema +=3D flat-union-int-branch.json
+ qapi-schema +=3D flat-union-invalid-branch-key.json
+ qapi-schema +=3D flat-union-invalid-discriminator.json
++qapi-schema +=3D flat-union-invalid-if-discriminator.json
+ qapi-schema +=3D flat-union-no-base.json
+ qapi-schema +=3D flat-union-optional-discriminator.json
+ qapi-schema +=3D flat-union-string-discriminator.json
+diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.err b/=
+tests/qapi-schema/flat-union-invalid-if-discriminator.err
+new file mode 100644
+index 0000000000..0c94c9860d
+--- /dev/null
++++ b/tests/qapi-schema/flat-union-invalid-if-discriminator.err
+@@ -0,0 +1 @@
++tests/qapi-schema/flat-union-invalid-if-discriminator.json:13: The discr=
+iminator TestBase.enum1 for union TestUnion must not be conditional
+diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.exit b=
+/tests/qapi-schema/flat-union-invalid-if-discriminator.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/flat-union-invalid-if-discriminator.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.json b=
+/tests/qapi-schema/flat-union-invalid-if-discriminator.json
+new file mode 100644
+index 0000000000..618ec36396
+--- /dev/null
++++ b/tests/qapi-schema/flat-union-invalid-if-discriminator.json
+@@ -0,0 +1,17 @@
++{ 'enum': 'TestEnum',
++  'data': [ 'value1', 'value2' ] }
 +
- An enum value can be replaced by a dictionary with a 'name' and a 'if'
- key.
-=20
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
-qapi-schema-test.json
-index 94570154c9..b8565a3913 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -201,7 +201,9 @@
-=20
- # test 'if' condition handling
-=20
--{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
-+{ 'struct': 'TestIfStruct', 'data':
-+  { 'foo': 'int',
-+    'bar': { 'type': 'int', 'if': 'defined(TEST_IF_STRUCT_BAR)'} },
-   'if': 'defined(TEST_IF_STRUCT)' }
-=20
- { 'enum': 'TestIfEnum', 'data':
-@@ -214,11 +216,15 @@
- { 'alternate': 'TestIfAlternate', 'data': { 'foo': 'int', 'bar': 'TestSt=
-ruct' },
-   'if': 'defined(TEST_IF_ALT) && defined(TEST_IF_STRUCT)' }
-=20
--{ 'command': 'TestIfCmd', 'data': { 'foo': 'TestIfStruct', 'bar': 'TestI=
-fEnum' },
-+{ 'command': 'TestIfCmd', 'data':
-+  { 'foo': 'TestIfStruct',
-+    'bar': { 'type': 'TestIfEnum', 'if': 'defined(TEST_IF_CMD_BAR)' } },
-   'returns': 'UserDefThree',
-   'if': ['defined(TEST_IF_CMD)', 'defined(TEST_IF_STRUCT)'] }
-=20
- { 'command': 'TestCmdReturnDefThree', 'returns': 'UserDefThree' }
-=20
--{ 'event': 'TestIfEvent', 'data': { 'foo': 'TestIfStruct' },
-+{ 'event': 'TestIfEvent', 'data':
-+  { 'foo': 'TestIfStruct',
-+    'bar': { 'type': 'TestIfEnum', 'if': 'defined(TEST_IF_EVT_BAR)' } },
-   'if': 'defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)' }
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
-api-schema-test.out
-index 130199fe8f..23fb078b85 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -268,6 +268,8 @@ command __org.qemu_x-command q_obj___org.qemu_x-comma=
-nd-arg -> __org.qemu_x-Unio
-    gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfi=
-g=3DFalse
- object TestIfStruct
-     member foo: int optional=3DFalse
-+    member bar: int optional=3DFalse
-+        if ['defined(TEST_IF_STRUCT_BAR)']
-     if ['defined(TEST_IF_STRUCT)']
- enum TestIfEnum
-     member foo
-@@ -292,6 +294,7 @@ alternate TestIfAlternate
- object q_obj_TestIfCmd-arg
-     member foo: TestIfStruct optional=3DFalse
-     member bar: TestIfEnum optional=3DFalse
-+        if ['defined(TEST_IF_CMD_BAR)']
-     if ['defined(TEST_IF_CMD)', 'defined(TEST_IF_STRUCT)']
- command TestIfCmd q_obj_TestIfCmd-arg -> UserDefThree
-    gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfi=
-g=3DFalse
-@@ -300,6 +303,8 @@ command TestCmdReturnDefThree None -> UserDefThree
-    gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfi=
-g=3DFalse
- object q_obj_TestIfEvent-arg
-     member foo: TestIfStruct optional=3DFalse
-+    member bar: TestIfEnum optional=3DFalse
-+        if ['defined(TEST_IF_EVT_BAR)']
-     if ['defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)']
- event TestIfEvent q_obj_TestIfEvent-arg
-    boxed=3DFalse
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
-.py
-index aadf252d9d..27081cb50c 100644
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -39,6 +39,7 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-         for m in members:
-             print('    member %s: %s optional=3D%s'
-                   % (m.name, m.type.name, m.optional))
-+            self._print_if(m.ifcond, 8)
-         self._print_variants(variants)
-         self._print_if(ifcond)
-=20
++{ 'struct': 'TestBase',
++  'data': { 'enum1': { 'type': 'TestEnum', 'if': 'FOO' } } }
++
++{ 'struct': 'TestTypeA',
++  'data': { 'string': 'str' } }
++
++{ 'struct': 'TestTypeB',
++  'data': { 'integer': 'int' } }
++
++{ 'union': 'TestUnion',
++  'base': 'TestBase',
++  'discriminator': 'enum1',
++  'data': { 'value1': 'TestTypeA',
++            'value2': 'TestTypeB' } }
+diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.out b/=
+tests/qapi-schema/flat-union-invalid-if-discriminator.out
+new file mode 100644
+index 0000000000..e69de29bb2
 --=20
 2.20.0.rc1
