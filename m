@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gVaar-0003m9-Su
-	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 06:16:23 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gVaaw-0003nd-Ls
+	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 06:16:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gVaao-0003W5-No
-	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 06:16:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45870)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gVaaw-0003eN-2Z
+	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 06:16:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36036)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gVaao-0003Vf-FK
-	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 06:16:18 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1B00CCD4C2
-	for <qemu-devel@nongnu.org>; Sat,  8 Dec 2018 11:16:17 +0000 (UTC)
+	id 1gVaav-0003e8-Sp
+	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 06:16:26 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Sat,  8 Dec 2018 15:15:39 +0400
-Message-Id: <20181208111606.8505-1-marcandre.lureau@redhat.com>
+Date: Sat,  8 Dec 2018 15:15:40 +0400
+Message-Id: <20181208111606.8505-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20181208111606.8505-1-marcandre.lureau@redhat.com>
+References: <20181208111606.8505-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-4.0 v7 00/27] Hi,
+Subject: [Qemu-devel] [PATCH for-4.0 v7 01/27] qapi: make sure osdep.h is
+ included in type headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,204 +29,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-This is the second part of the "add #if pre-processor conditions to
-generated code" series, adding schema member conditions (roughly
-16-38/49).
+Now that the schema can be configured, it is crucial that all types
+are configured the same. Make sure config-host.h is included, by
+checking osdep.h inclusion. The build-sys tracks the dependency and
+rebuilds the types if the configuration changed.
 
-Members can be exploded as dictionnary with 'type'/'if' keys:
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ scripts/qapi/types.py | 3 +++
+ 1 file changed, 3 insertions(+)
 
-{ 'struct': 'TestIfStruct', 'data':
-  { 'foo': 'int',
-    'bar': { 'type': 'int', 'if': 'defined(TEST_IF_STRUCT_BAR)'} } }
-
-Enum values can be exploded as dictionnary with 'type'/'if' keys:
-
-{ 'enum': 'TestIfEnum', 'data':
-  [ 'foo',
-    { 'name' : 'bar', 'if': 'defined(TEST_IF_ENUM_BAR)' } ] }
-
-v7:
-- replaced osdep.h include by a #warning check
-- renamed event_names/event_enum_members, enum_name/event_enum_ename
-- move normalization after checking
-- simplify make_enum_members()
-- some tests changes
-- rebase/conflicts tweaks
-- squash documentation changes in related patches
-- tweak generated documentation code & output
-- modify commit comments, add rb tags
-
-v6:
-- subset of v5 series: add schema member conditions
-- split "qapi: factor out check_known_keys()", error report improvements
-- add a patch to "qapi: include osdep.h in type headers" to avoid
-  potential build configuration change issues
-- rebased, on top of Markus's qapi-next branch (first 4 patches,
-  included for patchew testing)
-
-Marc-Andr=C3=A9 Lureau (27):
-  qapi: make sure osdep.h is included in type headers
-  qapi: do not define enumeration value explicitly
-  qapi: rename QAPISchemaEnumType.values to .members
-  qapi: change enum visitor and gen_enum* to take QAPISchemaMember
-  tests: print enum type members more like object type members
-  qapi: factor out checking for keys
-  qapi: improve reporting of unknown or missing keys
-  qapi: add a dictionary form with 'name' key for enum members
-  qapi: add 'if' to enum members
-  qapi-events: add 'if' condition to implicit event enum
-  qapi: pass long form enum to make_enum_members
-  qapi: rename allow_dict to allow_implicit
-  qapi: add a dictionary form for TYPE
-  qapi: add 'if' to implicit struct members
-  qapi: add an error in case a discriminator is conditional
-  qapi: add 'if' to union members
-  qapi: simplify make_enum_members()
-  tests/qapi: add command with condition on union argument
-  qapi: add 'if' to alternate members
-  tests/qapi: add command with condition on alternate argument
-  qapi: add #if conditions to generated code members
-  qapi: add 'If:' condition to enum values documentation
-  qapi: add 'If:' condition to struct members documentation
-  qapi: add condition to variants documentation
-  qapi: break long lines at 'data' member
-  qapi: add more conditions to SPICE
-  qapi: add conditions to REPLICATION type/commands on the schema
-
- qapi/block-core.json                          |  26 +-
- qapi/char.json                                | 150 ++++++-----
- qapi/migration.json                           |  15 +-
- qapi/misc.json                                |   7 +-
- qapi/net.json                                 |   3 +-
- qapi/tpm.json                                 |   5 +-
- qapi/ui.json                                  |   3 +-
- scripts/qapi/common.py                        | 253 ++++++++++++------
- scripts/qapi/doc.py                           |  30 ++-
- scripts/qapi/events.py                        |  13 +-
- scripts/qapi/introspect.py                    |  16 +-
- scripts/qapi/types.py                         |  13 +-
- scripts/qapi/visit.py                         |   8 +-
- migration/colo.c                              |  16 +-
- monitor.c                                     |   5 -
- docs/devel/qapi-code-gen.txt                  |  19 ++
- tests/Makefile.include                        |  11 +-
- tests/qapi-schema/alternate-base.err          |   1 +
- tests/qapi-schema/alternate-invalid-dict.err  |   1 +
- ...ember.exit =3D> alternate-invalid-dict.exit} |   0
- tests/qapi-schema/alternate-invalid-dict.json |   4 +
- ...-member.out =3D> alternate-invalid-dict.out} |   0
- tests/qapi-schema/comments.out                |  14 +-
- tests/qapi-schema/doc-bad-section.out         |  13 +-
- tests/qapi-schema/doc-good.json               |  11 +-
- tests/qapi-schema/doc-good.out                |  22 +-
- tests/qapi-schema/doc-good.texi               |   7 +-
- tests/qapi-schema/double-type.err             |   1 +
- tests/qapi-schema/empty.out                   |   9 +-
- tests/qapi-schema/enum-bad-member.err         |   1 +
- tests/qapi-schema/enum-bad-member.exit        |   1 +
- tests/qapi-schema/enum-bad-member.json        |   2 +
- tests/qapi-schema/enum-bad-member.out         |   0
- .../qapi-schema/enum-dict-member-unknown.err  |   2 +
- .../qapi-schema/enum-dict-member-unknown.exit |   1 +
- .../qapi-schema/enum-dict-member-unknown.json |   2 +
- .../qapi-schema/enum-dict-member-unknown.out  |   0
- tests/qapi-schema/enum-dict-member.err        |   1 -
- tests/qapi-schema/enum-dict-member.json       |   2 -
- tests/qapi-schema/enum-if-invalid.err         |   1 +
- tests/qapi-schema/enum-if-invalid.exit        |   1 +
- tests/qapi-schema/enum-if-invalid.json        |   3 +
- tests/qapi-schema/enum-if-invalid.out         |   0
- tests/qapi-schema/event-case.out              |   9 +-
- .../qapi-schema/event-member-invalid-dict.err |   1 +
- .../event-member-invalid-dict.exit            |   1 +
- .../event-member-invalid-dict.json            |   2 +
- .../qapi-schema/event-member-invalid-dict.out |   0
- tests/qapi-schema/event-nest-struct.json      |   2 +-
- .../flat-union-inline-invalid-dict.err        |   1 +
- .../flat-union-inline-invalid-dict.exit       |   1 +
- .../flat-union-inline-invalid-dict.json       |  11 +
- .../flat-union-inline-invalid-dict.out        |   0
- tests/qapi-schema/flat-union-inline.json      |   2 +-
- .../flat-union-invalid-if-discriminator.err   |   1 +
- .../flat-union-invalid-if-discriminator.exit  |   1 +
- .../flat-union-invalid-if-discriminator.json  |  17 ++
- .../flat-union-invalid-if-discriminator.out   |   0
- tests/qapi-schema/ident-with-escape.out       |   9 +-
- tests/qapi-schema/include-relpath.out         |  14 +-
- tests/qapi-schema/include-repetition.out      |  14 +-
- tests/qapi-schema/include-simple.out          |  14 +-
- tests/qapi-schema/indented-expr.out           |   9 +-
- .../nested-struct-data-invalid-dict.err       |   1 +
- .../nested-struct-data-invalid-dict.exit      |   1 +
- .../nested-struct-data-invalid-dict.json      |   3 +
- .../nested-struct-data-invalid-dict.out       |   0
- tests/qapi-schema/nested-struct-data.json     |   2 +-
- tests/qapi-schema/qapi-schema-test.json       |  39 ++-
- tests/qapi-schema/qapi-schema-test.out        |  74 ++++-
- .../struct-member-invalid-dict.err            |   1 +
- .../struct-member-invalid-dict.exit           |   1 +
- .../struct-member-invalid-dict.json           |   3 +
- .../struct-member-invalid-dict.out            |   0
- tests/qapi-schema/test-qapi.py                |   9 +-
- .../qapi-schema/union-branch-invalid-dict.err |   1 +
- .../union-branch-invalid-dict.exit            |   1 +
- .../union-branch-invalid-dict.json            |   4 +
- .../qapi-schema/union-branch-invalid-dict.out |   0
- tests/qapi-schema/unknown-expr-key.err        |   3 +-
- tests/qapi-schema/unknown-expr-key.json       |   2 +-
- 81 files changed, 681 insertions(+), 266 deletions(-)
- create mode 100644 tests/qapi-schema/alternate-invalid-dict.err
- rename tests/qapi-schema/{enum-dict-member.exit =3D> alternate-invalid-d=
-ict.exit} (100%)
- create mode 100644 tests/qapi-schema/alternate-invalid-dict.json
- rename tests/qapi-schema/{enum-dict-member.out =3D> alternate-invalid-di=
-ct.out} (100%)
- create mode 100644 tests/qapi-schema/enum-bad-member.err
- create mode 100644 tests/qapi-schema/enum-bad-member.exit
- create mode 100644 tests/qapi-schema/enum-bad-member.json
- create mode 100644 tests/qapi-schema/enum-bad-member.out
- create mode 100644 tests/qapi-schema/enum-dict-member-unknown.err
- create mode 100644 tests/qapi-schema/enum-dict-member-unknown.exit
- create mode 100644 tests/qapi-schema/enum-dict-member-unknown.json
- create mode 100644 tests/qapi-schema/enum-dict-member-unknown.out
- delete mode 100644 tests/qapi-schema/enum-dict-member.err
- delete mode 100644 tests/qapi-schema/enum-dict-member.json
- create mode 100644 tests/qapi-schema/enum-if-invalid.err
- create mode 100644 tests/qapi-schema/enum-if-invalid.exit
- create mode 100644 tests/qapi-schema/enum-if-invalid.json
- create mode 100644 tests/qapi-schema/enum-if-invalid.out
- create mode 100644 tests/qapi-schema/event-member-invalid-dict.err
- create mode 100644 tests/qapi-schema/event-member-invalid-dict.exit
- create mode 100644 tests/qapi-schema/event-member-invalid-dict.json
- create mode 100644 tests/qapi-schema/event-member-invalid-dict.out
- create mode 100644 tests/qapi-schema/flat-union-inline-invalid-dict.err
- create mode 100644 tests/qapi-schema/flat-union-inline-invalid-dict.exit
- create mode 100644 tests/qapi-schema/flat-union-inline-invalid-dict.json
- create mode 100644 tests/qapi-schema/flat-union-inline-invalid-dict.out
- create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
-.err
- create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
-.exit
- create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
-.json
- create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
-.out
- create mode 100644 tests/qapi-schema/nested-struct-data-invalid-dict.err
- create mode 100644 tests/qapi-schema/nested-struct-data-invalid-dict.exi=
-t
- create mode 100644 tests/qapi-schema/nested-struct-data-invalid-dict.jso=
-n
- create mode 100644 tests/qapi-schema/nested-struct-data-invalid-dict.out
- create mode 100644 tests/qapi-schema/struct-member-invalid-dict.err
- create mode 100644 tests/qapi-schema/struct-member-invalid-dict.exit
- create mode 100644 tests/qapi-schema/struct-member-invalid-dict.json
- create mode 100644 tests/qapi-schema/struct-member-invalid-dict.out
- create mode 100644 tests/qapi-schema/union-branch-invalid-dict.err
- create mode 100644 tests/qapi-schema/union-branch-invalid-dict.exit
- create mode 100644 tests/qapi-schema/union-branch-invalid-dict.json
- create mode 100644 tests/qapi-schema/union-branch-invalid-dict.out
-
+diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
+index fd7808103c..3bb9cb6d47 100644
+--- a/scripts/qapi/types.py
++++ b/scripts/qapi/types.py
+@@ -201,6 +201,9 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVisi=
+tor):
+ ''',
+                                       types=3Dtypes, visit=3Dvisit))
+         self._genh.preamble_add(mcgen('''
++#ifndef QEMU_OSDEP_H
++#error Please include osdep.h first!
++#endif
+ #include "qapi/qapi-builtin-types.h"
+ '''))
+=20
 --=20
 2.20.0.rc1
