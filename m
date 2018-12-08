@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gW53y-0003og-2l
-	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 14:48:29 -0500
+	(envelope-from <bounces@canonical.com>) id 1gVhkt-0006k8-Bk
+	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 13:55:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gW53u-0000Yw-3x
-	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 14:48:26 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35524)
+	(envelope-from <bounces@canonical.com>) id 1gVhkl-0001Be-D1
+	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 13:55:10 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39708)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gW53q-0008Q4-4F
-	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 14:48:18 -0500
-Received: by mail-wm1-x344.google.com with SMTP id c126so9116051wmh.0
-	for <qemu-devel@nongnu.org>; Sun, 09 Dec 2018 11:48:10 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20181207170951.7307-1-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <cba8c0c3-3450-df69-c57e-e3c66e55e987@amsat.org>
-Date: Sun, 9 Dec 2018 20:48:07 +0100
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gVhkj-00019M-Be
+	for qemu-devel@nongnu.org; Sat, 08 Dec 2018 13:55:03 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gVhke-0007Pn-Jm
+	for <qemu-devel@nongnu.org>; Sat, 08 Dec 2018 18:54:56 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8B2B62E8084
+	for <qemu-devel@nongnu.org>; Sat,  8 Dec 2018 18:54:56 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20181207170951.7307-1-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/i386: Generate #UD when applying
- LOCK to a register
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 08 Dec 2018 18:43:32 -0000
+From: "Mark A. Hershberger" <mah@everybody.org>
+Reply-To: Bug 1174654 <1174654@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130430080722.32341.54160.malonedeb@gac.canonical.com>
+Message-Id: <154429461298.889.622814861831968708.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1174654] Re: qemu-system-x86_64 takes 100% CPU
+ after host machine resumed from suspend to ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,61 +37,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Alberto Ortega <aortega.lms@gmail.com>
-Cc: pbonzini@redhat.com
+To: qemu-devel@nongnu.org
 
-Cc'ing Alberto
+I was seeing this problem when my Debian laptop suspended.  The CentOS
+guest would begin consuming a lot of cpu and only a hard-reset would fix
+it.
 
-On 12/7/18 6:09 PM, Richard Henderson wrote:
-> This covers inc, dec, and the bit test instructions.
-> 
-> I believe we've finally covered all of the cases for
-> which we have an atomic path that would use the cpu_A0
-> temp, which is only initialized for address sources.
-> 
+Changing the rtc line to
 
-Reported-by: Alberto Ortega <aortega.lms@gmail.com>
+      <timer name=3D'rtc' track=3D'guest'/>
 
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1803160/comments/4
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/i386/translate.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/target/i386/translate.c b/target/i386/translate.c
-> index 0dd5fbe45c..eb52322a47 100644
-> --- a/target/i386/translate.c
-> +++ b/target/i386/translate.c
-> @@ -1398,6 +1398,11 @@ static void gen_op(DisasContext *s1, int op, TCGMemOp ot, int d)
->  static void gen_inc(DisasContext *s1, TCGMemOp ot, int d, int c)
->  {
->      if (s1->prefix & PREFIX_LOCK) {
-> +        if (d != OR_TMP0) {
-> +            /* Lock prefix when destination is not memory.  */
-> +            gen_illegal_opcode(s1);
-> +            return;
-> +        }
->          tcg_gen_movi_tl(s1->T0, c > 0 ? 1 : -1);
->          tcg_gen_atomic_add_fetch_tl(s1->T0, s1->A0, s1->T0,
->                                      s1->mem_index, ot | MO_LE);
-> @@ -6764,6 +6769,9 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
->                  gen_op_ld_v(s, ot, s->T0, s->A0);
->              }
->          } else {
-> +            if (s->prefix & PREFIX_LOCK) {
-> +                goto illegal_op;
-> +            }
->              gen_op_mov_v_reg(s, ot, s->T0, rm);
->          }
->          /* load shift */
-> @@ -6803,6 +6811,9 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
->                  gen_op_ld_v(s, ot, s->T0, s->A0);
->              }
->          } else {
-> +            if (s->prefix & PREFIX_LOCK) {
-> +                goto illegal_op;
-> +            }
->              gen_op_mov_v_reg(s, ot, s->T0, rm);
->          }
->      bt_op:
-> 
+seems to have fixed it, though I haven't done extensive testing yet.
+
+Thanks!
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1174654
+
+Title:
+  qemu-system-x86_64 takes 100% CPU after host machine resumed from
+  suspend to ram
+
+Status in QEMU:
+  Confirmed
+Status in qemu package in Ubuntu:
+  Invalid
+
+Bug description:
+  I have Windows XP SP3  inside qemu VM. All works fine in 12.10. But
+  after upgraiding to 13.04 i have to restart the VM each time i
+  resuming my host machine, because qemu process starts to take CPU
+  cycles and OS inside VM is very slow and sluggish. However it's still
+  controllable and could be shutdown by itself.
+
+  According to the taskmgr any active process takes 99% CPU. It's not
+  stuck on some single process.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1174654/+subscriptions
