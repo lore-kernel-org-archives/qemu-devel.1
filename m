@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39721)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=8739c4fd6=Alistair.Francis@wdc.com>)
-	id 1gVQmU-0000KH-Ms
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 19:47:46 -0500
+	id 1gVQmd-0000e3-TQ
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 19:47:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=8739c4fd6=Alistair.Francis@wdc.com>)
-	id 1gVQmQ-0000k2-Ix
-	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 19:47:42 -0500
+	id 1gVQmZ-0000nE-Vc
+	for qemu-devel@nongnu.org; Fri, 07 Dec 2018 19:47:51 -0500
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Sat, 8 Dec 2018 00:47:35 +0000
-Message-ID: <2e6df8dd71cfdc9391131548c483ef65fe858428.1544229872.git.alistair.francis@wdc.com>
+Date: Sat, 8 Dec 2018 00:47:44 +0000
+Message-ID: <ca06c726b208569d1dbea3d25566aea0ed8df47d.1544229872.git.alistair.francis@wdc.com>
 References: <cover.1544229872.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1544229872.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [RFC v3 09/24] riscv: tcg-target: Add the immediate
- encoders
+Subject: [Qemu-devel] [RFC v3 10/24] riscv: tcg-target: Add the instruction
+ emitters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,116 +31,67 @@ Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistai
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/riscv/tcg-target.inc.c | 90 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 90 insertions(+)
+ tcg/riscv/tcg-target.inc.c | 48 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
 diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
-index af1d2c235a..c385ff68ae 100644
+index c385ff68ae..cfcab9c716 100644
 --- a/tcg/riscv/tcg-target.inc.c
 +++ b/tcg/riscv/tcg-target.inc.c
-@@ -284,3 +284,93 @@ typedef enum {
-=20
-     OPC_FENCE =3D 0x0000000f,
- } RISCVInsn;
+@@ -374,3 +374,51 @@ static int32_t encode_uj(RISCVInsn opc, TCGReg rd, uin=
+t32_t imm)
+ {
+     return opc | (rd & 0x1f) << 7 | encode_ujimm20(imm);
+ }
 +
 +/*
-+ * RISC-V immediate and instruction encoders (excludes 16-bit RVC)
++ * RISC-V instruction emitters
 + */
 +
-+/* Type-R */
-+
-+static int32_t encode_r(RISCVInsn opc, TCGReg rd, TCGReg rs1, TCGReg rs2)
++static void tcg_out_opc_reg(TCGContext *s, RISCVInsn opc,
++                            TCGReg rd, TCGReg rs1, TCGReg rs2)
 +{
-+    return opc | (rd & 0x1f) << 7 | (rs1 & 0x1f) << 15 | (rs2 & 0x1f) << 2=
-0;
++    tcg_out32(s, encode_r(opc, rd, rs1, rs2));
 +}
 +
-+/* Type-I */
-+
-+static int32_t encode_imm12(uint32_t imm)
++static void tcg_out_opc_imm(TCGContext *s, RISCVInsn opc,
++                            TCGReg rd, TCGReg rs1, TCGArg imm)
 +{
-+    return (imm & 0xfff) << 20;
++    tcg_out32(s, encode_i(opc, rd, rs1, imm));
 +}
 +
-+static int32_t encode_i(RISCVInsn opc, TCGReg rd, TCGReg rs1, uint32_t imm=
-)
++static void tcg_out_opc_store(TCGContext *s, RISCVInsn opc,
++                              TCGReg rs1, TCGReg rs2, uint32_t imm)
 +{
-+    return opc | (rd & 0x1f) << 7 | (rs1 & 0x1f) << 15 | encode_imm12(imm)=
-;
++    tcg_out32(s, encode_s(opc, rs1, rs2, imm));
 +}
 +
-+/* Type-S */
-+
-+static int32_t encode_simm12(uint32_t imm)
++static void tcg_out_opc_branch(TCGContext *s, RISCVInsn opc,
++                               TCGReg rs1, TCGReg rs2, uint32_t imm)
 +{
-+    int32_t ret =3D 0;
-+
-+    ret |=3D (imm & 0xFE0) << 20;
-+    ret |=3D (imm & 0x1F) << 7;
-+
-+    return ret;
++    tcg_out32(s, encode_sb(opc, rs1, rs2, imm));
 +}
 +
-+static int32_t encode_s(RISCVInsn opc, TCGReg rs1, TCGReg rs2, uint32_t im=
-m)
++static void tcg_out_opc_upper(TCGContext *s, RISCVInsn opc,
++                              TCGReg rd, uint32_t imm)
 +{
-+    return opc | (rs1 & 0x1f) << 15 | (rs2 & 0x1f) << 20 | encode_simm12(i=
-mm);
++    tcg_out32(s, encode_u(opc, rd, imm));
 +}
 +
-+/* Type-SB */
-+
-+static int32_t encode_sbimm12(uint32_t imm)
++static void tcg_out_opc_jump(TCGContext *s, RISCVInsn opc,
++                             TCGReg rd, uint32_t imm)
 +{
-+    int32_t ret =3D 0;
-+
-+    ret |=3D (imm & 0x1000) << 19;
-+    ret |=3D (imm & 0x7e0) << 20;
-+    ret |=3D (imm & 0x1e) << 7;
-+    ret |=3D (imm & 0x800) >> 4;
-+
-+    return ret;
++    tcg_out32(s, encode_uj(opc, rd, imm));
 +}
 +
-+static int32_t encode_sb(RISCVInsn opc, TCGReg rs1, TCGReg rs2, uint32_t i=
-mm)
++static void tcg_out_nop_fill(tcg_insn_unit *p, int count)
 +{
-+    return opc | (rs1 & 0x1f) << 15 | (rs2 & 0x1f) << 20 | encode_sbimm12(=
-imm);
-+}
-+
-+/* Type-U */
-+
-+static int32_t encode_uimm20(uint32_t imm)
-+{
-+    return imm & 0xfffff000;
-+}
-+
-+static int32_t encode_u(RISCVInsn opc, TCGReg rd, uint32_t imm)
-+{
-+    return opc | (rd & 0x1f) << 7 | encode_uimm20(imm);
-+}
-+
-+/* Type-UJ */
-+
-+static int32_t encode_ujimm20(uint32_t imm)
-+{
-+    int32_t ret =3D 0;
-+
-+    ret |=3D (imm & 0x0007fe) << (21 - 1);
-+    ret |=3D (imm & 0x000800) << (20 - 11);
-+    ret |=3D (imm & 0x0ff000) << (12 - 12);
-+    ret |=3D (imm & 0x100000) << (31 - 20);
-+
-+    return ret;
-+}
-+
-+static int32_t encode_uj(RISCVInsn opc, TCGReg rd, uint32_t imm)
-+{
-+    return opc | (rd & 0x1f) << 7 | encode_ujimm20(imm);
++    int i;
++    for (i =3D 0; i < count; ++i) {
++        p[i] =3D encode_i(OPC_ADDI, TCG_REG_ZERO, TCG_REG_ZERO, 0);
++    }
 +}
 --=20
 2.19.1
