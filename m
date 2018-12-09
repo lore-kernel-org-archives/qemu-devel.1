@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gW52G-0001Qo-KM
-	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 14:46:44 -0500
+	(envelope-from <clg@kaod.org>) id 1gW52H-0001RR-H2
+	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 14:46:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gW52C-00049a-Ea
-	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 14:46:40 -0500
-Received: from 2.mo173.mail-out.ovh.net ([178.33.251.49]:33763)
+	(envelope-from <clg@kaod.org>) id 1gW52D-0004Aq-77
+	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 14:46:41 -0500
+Received: from 19.mo7.mail-out.ovh.net ([178.33.251.118]:33559)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gW52C-0003o7-4v
-	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 14:46:36 -0500
-Received: from player695.ha.ovh.net (unknown [10.109.146.132])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id D57CEE374E
-	for <qemu-devel@nongnu.org>; Sun,  9 Dec 2018 20:46:23 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gW52C-0003rA-VV
+	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 14:46:37 -0500
+Received: from player695.ha.ovh.net (unknown [10.109.159.157])
+	by mo7.mail-out.ovh.net (Postfix) with ESMTP id DE7E8ECF44
+	for <qemu-devel@nongnu.org>; Sun,  9 Dec 2018 20:46:28 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Sun,  9 Dec 2018 20:45:51 +0100
-Message-Id: <20181209194610.29727-1-clg@kaod.org>
+Date: Sun,  9 Dec 2018 20:45:52 +0100
+Message-Id: <20181209194610.29727-2-clg@kaod.org>
+In-Reply-To: <20181209194610.29727-1-clg@kaod.org>
+References: <20181209194610.29727-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 00/19] ppc: support for the XIVE interrupt
- controller (POWER9)
+Subject: [Qemu-devel] [PATCH v7 01/19] ppc/xive: add support for the END
+ Event State Buffers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,364 +33,262 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Hello,
+The Event Notification Descriptor (END) XIVE structure also contains
+two Event State Buffers providing further coalescing of interrupts,
+one for the notification event (ESn) and one for the escalation events
+(ESe). A MMIO page is assigned for each to control the EOI through
+loads only. Stores are not allowed.
 
-Here is the version 7 of the QEMU models adding support for the XIVE
-interrupt controller to the sPAPR machine, under TCG only this
-time. KVM support will be proposed in an other patchset, along with
-the KVM XIVE device patchset, and so will PowerNV.
+The END ESBs are modeled through an object resembling the 'XiveSource'
+It is stateless as the END state bits are backed into the XiveEND
+structure under the XiveRouter and the MMIO accesses follow the same
+rules as for the XiveSource ESBs.
 
-The most important changes for sPAPR are the introduction of the 4.0
-machines. The sPAPRXive model still inherits from the XiveRouter. It
-is possible to change the class inheritance tree but it does not bring
-much for now.
+END ESBs are not supported by the Linux drivers neither on OPAL nor on
+sPAPR. Nevetherless, it provides a mean to study the question in the
+future and validates a bit more the XIVE model.
 
-I am not sure how we should handle the machine definitions, so I
-proposed both, XIVE only and dual interrupt mode. The impact on the
-XICS machine is limited with TCG but KVM support of the 'dual' machine
-will change things. Let me know how you want to proceed.
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
 
-Thanks,
+ Changes since v6:
 
-C.
-
-Changes in v7 :
-
- Common XIVE models :
-=20
  - removed the 'chip-id' field from XiveRouter
  - introduced a 'block-id' field in XiveENDSource to lookup the XIVE
    END structure when doing a load in the MMIO ESB
  - removed reset XiveENDSource handler
- - introduced a xive_tctx_word2() helper to extract TM_WORD2 of a ring.
- - removed HW CAM line setting and use as it is only useful for PowerNV
- - made use of xive_tctx_word2() helper
- - made use of GETFIELD_BE32() to compare CAM lines
- - fixed initialization of XiveTCTXMatch
 
- sPAPR models :
+ include/hw/ppc/xive.h |  21 ++++++
+ hw/intc/xive.c        | 160 +++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 179 insertions(+), 2 deletions(-)
 
- - simplified the prototypes of helpers
- - introduced an assert in set_nvt() method
- - introduced a fixed value for the controller block id value.
- - removed the hardwiring the HW CAM line. Back to v5 state.
- - removed patch "spapr: modify the irq backend 'init' method". It did
-   not bring much
- - split the 'xive' sPAPR IRQ backend from the 'xive' machine
- - split the 'dual' sPAPR IRQ backend from the 'dual' machine
- - introduced 4.0* machines
+diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+index 4851d3b3a41f..014f64aa98f6 100644
+--- a/include/hw/ppc/xive.h
++++ b/include/hw/ppc/xive.h
+@@ -336,6 +336,27 @@ int xive_router_get_end(XiveRouter *xrtr, uint8_t en=
+d_blk, uint32_t end_idx,
+ int xive_router_write_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t en=
+d_idx,
+                           XiveEND *end, uint8_t word_number);
 =20
- KVM :
-
- - hardly no changes=20
- - will come later in a KVM patchset
-
- PowerNV:
-
- - will come later in a PowerNV patchset
-
-Changes in v6 :
-
- https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg00965.html
-
-Changes in v5 :
-
- https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg03218.html
-
-Changes in v4 :
-
- https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg01672.html
-
-
-=3D XIVE =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-
-The POWER9 processor comes with a new interrupt controller, called
-XIVE as "eXternal Interrupt Virtualization Engine".
-
-
-* Overall architecture
-
-
-             XIVE Interrupt Controller
-             +------------------------------------+      IPIs
-             | +---------+ +---------+ +--------+ |    +-------+
-             | |VC       | |CQ       | |PC      |----> | CORES |
-             | |     esb | |         | |        |----> |       |
-             | |     eas | |  Bridge | |   tctx |----> |       |
-             | |SC   end | |         | |    nvt | |    |       |
- +------+    | +---------+ +----+----+ +--------+ |    +-+-+-+-+
- | RAM  |    +------------------|-----------------+      | | |
- |      |                       |                        | | |
- |      |                       |                        | | |
- |      |  +--------------------v------------------------v-v-v--+    othe=
-r
- |      <--+                     Power Bus                      +--> chip=
-s
- |  esb |  +---------+-----------------------+------------------+
- |  eas |            |                       |
- |  end |         +--|------+                |
- |  nvt |       +----+----+ |           +----+----+
- +------+       |SC       | |           |SC       |
-                |         | |           |         |
-                | PQ-bits | |           | PQ-bits |
-                | local   |-+           |  in VC  |
-                +---------+             +---------+
-                   PCIe                 NX,NPU,CAPI
-
-                  SC: Source Controller (aka. IVSE)
-                  VC: Virtualization Controller (aka. IVRE)
-                  PC: Presentation Controller (aka. IVPE)
-                  CQ: Common Queue (Bridge)
-
-             PQ-bits: 2 bits source state machine (P:pending Q:queued)
-                 esb: Event State Buffer (Array of PQ bits in an IVSE)
-                 eas: Event Assignment Structure
-                 end: Event Notification Descriptor
-                 nvt: Notification Virtual Target
-                tctx: Thread interrupt Context
-
-
-The XIVE IC is composed of three sub-engines :
-
-  - Interrupt Virtualization Source Engine (IVSE), or Source
-    Controller (SC). These are found in PCI PHBs, in the PSI host
-    bridge controller, but also inside the main controller for the
-    core IPIs and other sub-chips (NX, CAP, NPU) of the
-    chip/processor. They are configured to feed the IVRE with events.
-
-  - Interrupt Virtualization Routing Engine (IVRE) or Virtualization
-    Controller (VC). Its job is to match an event source with an Event
-    Notification Descriptor (END).
-
-  - Interrupt Virtualization Presentation Engine (IVPE) or Presentation
-    Controller (PC). It maintains the interrupt context state of each
-    thread and handles the delivery of the external exception to the
-    thread.
-
-
-* XIVE internal tables
-
-Each of the sub-engines uses a set of tables to redirect exceptions
-from event sources to CPU threads.
-
-                                          +-------+
-  User or OS                              |  EQ   |
-      or                          +------>|entries|
-  Hypervisor                      |       |  ..   |
-    Memory                        |       +-------+
-                                  |           ^
-                                  |           |
-             +-------------------------------------------------+
-                                  |           |
-  Hypervisor      +------+    +---+--+    +---+--+   +------+
-    Memory        | ESB  |    | EAT  |    | ENDT |   | NVTT |
-   (skiboot)      +----+-+    +----+-+    +----+-+   +------+
-                    ^  |        ^  |        ^  |       ^
-                    |  |        |  |        |  |       |
-             +-------------------------------------------------+
-                    |  |        |  |        |  |       |
-                    |  |        |  |        |  |       |
-               +----|--|--------|--|--------|--|-+   +-|-----+    +------=
++/*
++ * XIVE END ESBs
++ */
 +
-               |    |  |        |  |        |  | |   | | tctx|    |Thread=
-|
-   IPI or   ---+    +  v        +  v        +  v |---| +  .. |----->     =
-|
-  HW events    |                                 |   |       |    |      =
-|
-               |             IVRE                |   | IVPE  |    +------=
++#define TYPE_XIVE_END_SOURCE "xive-end-source"
++#define XIVE_END_SOURCE(obj) \
++    OBJECT_CHECK(XiveENDSource, (obj), TYPE_XIVE_END_SOURCE)
 +
-               +---------------------------------+   +-------+
-           =20
-
-
-The IVSE have a 2-bits state machine, P for pending and Q for queued,
-for each source that allows events to be triggered. They are stored in
-an Event State Buffer (ESB) array and can be controlled by MMIOs.
-
-If the event is let through, the IVRE looks up in the Event Assignment
-Structure (EAS) table for an Event Notification Descriptor (END)
-configured for the source. Each Event Notification Descriptor defines
-a notification path to a CPU and an in-memory Event Queue, in which
-will be enqueued an EQ data for the OS to pull.
-
-The IVPE determines if a Notification Virtual Target (NVT) can handle
-the event by scanning the thread contexts of the VCPUs dispatched on
-the processor HW threads. It maintains the interrupt context state of
-each thread in a NVT table.
-
-
-* Overview of the QEMU models for the XIVE sub-engines
-
-The XiveSource models the IVSE in general, internal and external. It
-handles the source ESBs and the MMIO interface to control them.
-
-The XiveNotifier is a small helper interface interconnecting the
-XiveSource to the XiveRouter.
-
-The XiveRouter is an abstract model acting as a combined IVRE and
-IVPE. It routes event notifications using the IVE and EQD tables to
-the IVPE sub-engine which does a CAM scan to find a CPU to deliver the
-exception. Storage should be provided by the inheriting classes.
-
-XiveENDSource is a special source object. It exposes the EQ ESB MMIOs of
-the Event Queues which are used for coalescing event notifications and
-for escalation. Not used on the field, only to sync the EQ cache in
-OPAL.
-
-Finally, the XiveTCTX contains the interrupt state context of a thread,
-four sets of registers, one for each exception that can be delivered
-to a CPU. These contexts are scanned by the IVPE to find a matching VP
-when a notification is triggered. It also models the Thread Interrupt
-Management Area (TIMA), which exposes the thread context registers to
-the CPU for interrupt management.
-
-
-* XIVE for sPAPR
-
-sPAPRXive models the XIVE interrupt controller of a sPAPR machine. It
-inherits from the XiveRouter and provisions storage for the IVE and
-END tables. The NVT table does not need a backend in sPAPR. It owns a
-XiveSource object for the IPIs and the virtual device interrupts, a
-memory region for the TIMA and a XiveENDSource to manage the END ESBs.
-(not used by Linux).
-
-These choices were made to have a sPAPR interrupt controller
-consistent with the one found on baremetal and to facilitate KVM
-support, the main difficulty being the host memory regions exposed to
-the guest.
-
-The NVT and tbe END indexing needs some care and a set of helpers are
-defined to ease the conversion between the CPU id as seen by the guest
-and the XIVE identifiers manipulated by the models.=20
-
-
-* Integration in the sPAPR machine, xive only and dual
-
-A new sPAPR IRQ backend is defined for XIVE. It introduces a couple of
-new operations to handle the differences in the creation of the device
-tree and in the allocation of the CPU interrupt controller. A new
-'xive' only pseries machine is defined using this XIVE backend.
-
-Being able to support both interrupt mode in the same machine requires
-some more changes. As the machine chooses the interrupt mode at CAS
-time, it is activated after a reconfiguration done in a reset. This is
-handled by a new 'dual' sPAPR IRQ backend which is built on top of the
-XICS and XIVE backend. A new 'dual' pseries machine is defined using
-this backend.
-
-
-* KVM support
-
-Support for KVM introduces a set of specific XIVE models, very much
-like XICS does, which self-connect to their KVM counterparts in the
-Linux kernel. Two host memory regions are exposed to the guest and
-need special care at initialization :
-
-  - ESB mmios
-  - Thread Interrupt Management Area (TIMA)
-
-The models uses KVM accessors to synchronize the QEMU state with
-KVM. The states are :
-
-  - the source configuration (EAT)
-  - the END configuration (ENDT)
-  - the OS EQ state (toggle bit and index)
-  - the thread interrupt context registers.
-
-Hybrid guest using KVM and an emulated irqchip (kernel_irqchip=3Doff) is
-supported. Migration under KVM is supported.
-
-KVM support for the 'dual' machine required some more changes. Both
-interrupt mode need to be initialized at the QEMU level to keep the
-IRQ number space in sync and to allow switching from one mode to
-another. At the KVM level, the whole initialization of the KVM device,
-sources and presenters, needs to be done in the reset handler when the
-interrupt mode is chosen. This is a major change in the KVM models.
-
-KVM being initialized at reset, we loose the possiblity to fallback to
-the QEMU emulated mode in case of failure and failures become fatal to
-the machine.
-
-
-* PowerNV models
-
-The PnvXIVE model uses the XiveRouter abstract model just like
-sPAPRXive. It provides accessors to the EAS, END and NVT tables which
-are stored in the QEMU PowerNV machine and not in QEMU anymore. It
-owns a set of memory regions for the IC registers, the ESBs, the END
-ESBs, the TIMA, the notification MMIO.
-
-Multichip is supported and the available IVSEs are the internal one
-for the IPIS, the PSI host bridge controller and PHB4.
-
-The next interesting step would be to add escalation events and model
-the VCPU dispatching to support emulated KVM guests.
-
-
-* GitHub trees
++typedef struct XiveENDSource {
++    DeviceState parent;
++
++    uint32_t        nr_ends;
++    uint8_t         block_id;
++
++    /* ESB memory region */
++    uint32_t        esb_shift;
++    MemoryRegion    esb_mmio;
++
++    XiveRouter      *xrtr;
++} XiveENDSource;
++
+ /*
+  * For legacy compatibility, the exceptions define up to 256 different
+  * priorities. P9 implements only 9 levels : 8 active levels [0 - 7]
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 41d8ba1540d0..2196ce8de059 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -612,8 +612,18 @@ static void xive_router_end_notify(XiveRouter *xrtr,=
+ uint8_t end_blk,
+      * even futher coalescing in the Router
+      */
+     if (!xive_end_is_notify(&end)) {
+-        qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implemented\n"=
+);
+-        return;
++        uint8_t pq =3D GETFIELD_BE32(END_W1_ESn, end.w1);
++        bool notify =3D xive_esb_trigger(&pq);
++
++        if (pq !=3D GETFIELD_BE32(END_W1_ESn, end.w1)) {
++            end.w1 =3D SETFIELD_BE32(END_W1_ESn, end.w1, pq);
++            xive_router_write_end(xrtr, end_blk, end_idx, &end, 1);
++        }
++
++        /* ESn[Q]=3D1 : end of notification */
++        if (!notify) {
++            return;
++        }
+     }
 =20
-QEMU sPAPR:
-
-  https://github.com/legoater/qemu/commits/xive-v7-3.1
- =20
-QEMU PowerNV:
-
-  https://github.com/legoater/qemu/commits/powernv-3.1
-
-Linux/KVM:
-
-  https://github.com/legoater/linux/commits/xive-4.20
-
-OPAL:
-
-  https://github.com/legoater/skiboot/commits/xive
-
-C=C3=A9dric Le Goater (19):
-  ppc/xive: add support for the END Event State Buffers
-  ppc/xive: introduce the XIVE interrupt thread context
-  ppc/xive: introduce a simplified XIVE presenter
-  ppc/xive: notify the CPU when the interrupt priority is more
-    privileged
-  spapr/xive: introduce a XIVE interrupt controller
-  spapr/xive: use the VCPU id as a NVT identifier
-  spapr: introduce a new machine IRQ backend for XIVE
-  spapr: add hcalls support for the XIVE exploitation interrupt mode
-  spapr: add device tree support for the XIVE exploitation mode
-  spapr: allocate the interrupt thread context under the CPU core
-  spapr: extend the sPAPR IRQ backend for XICS migration
-  spapr: add a 'reset' method to the sPAPR IRQ backend
-  spapr: add an extra OV5 field to the sPAPR IRQ backend
-  spapr: set the interrupt presenter at reset
-  spapr/xive: enable XIVE MMIOs at reset
-  spapr: introduce a new sPAPR IRQ backend supporting XIVE and XICS
-  spapr: Add a pseries-4.0 machine type
-  spapr: add a 'pseries-4.0-xive' machine type
-  spapr: add a 'pseries-4.0-dual' machine type
-
- default-configs/ppc64-softmmu.mak |    1 +
- include/hw/compat.h               |    3 +
- include/hw/ppc/spapr.h            |   23 +-
- include/hw/ppc/spapr_cpu_core.h   |    2 +
- include/hw/ppc/spapr_irq.h        |   12 +
- include/hw/ppc/spapr_xive.h       |   53 ++
- include/hw/ppc/xics.h             |    4 +-
- include/hw/ppc/xive.h             |   80 ++
- include/hw/ppc/xive_regs.h        |  106 +++
- hw/intc/spapr_xive.c              | 1480 +++++++++++++++++++++++++++++
- hw/intc/xics_spapr.c              |    3 +-
- hw/intc/xive.c                    |  883 ++++++++++++++++-
- hw/ppc/spapr.c                    |  100 +-
- hw/ppc/spapr_cpu_core.c           |   31 +-
- hw/ppc/spapr_hcall.c              |   13 +
- hw/ppc/spapr_irq.c                |  350 +++++++
- hw/intc/Makefile.objs             |    1 +
- 17 files changed, 3119 insertions(+), 26 deletions(-)
- create mode 100644 include/hw/ppc/spapr_xive.h
- create mode 100644 hw/intc/spapr_xive.c
-
+     /*
+@@ -692,6 +702,151 @@ void xive_eas_pic_print_info(XiveEAS *eas, uint32_t=
+ lisn, Monitor *mon)
+                    (uint32_t) GETFIELD_BE64(EAS_END_DATA, eas->w));
+ }
+=20
++/*
++ * END ESB MMIO loads
++ */
++static uint64_t xive_end_source_read(void *opaque, hwaddr addr, unsigned=
+ size)
++{
++    XiveENDSource *xsrc =3D XIVE_END_SOURCE(opaque);
++    uint32_t offset =3D addr & 0xFFF;
++    uint8_t end_blk;
++    uint32_t end_idx;
++    XiveEND end;
++    uint32_t end_esmask;
++    uint8_t pq;
++    uint64_t ret =3D -1;
++
++    end_blk =3D xsrc->block_id;
++    end_idx =3D addr >> (xsrc->esb_shift + 1);
++
++    if (xive_router_get_end(xsrc->xrtr, end_blk, end_idx, &end)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: No END %x/%x\n", end_blk,
++                      end_idx);
++        return -1;
++    }
++
++    if (!xive_end_is_valid(&end)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: END %x/%x is invalid\n",
++                      end_blk, end_idx);
++        return -1;
++    }
++
++    end_esmask =3D addr_is_even(addr, xsrc->esb_shift) ? END_W1_ESn : EN=
+D_W1_ESe;
++    pq =3D GETFIELD_BE32(end_esmask, end.w1);
++
++    switch (offset) {
++    case XIVE_ESB_LOAD_EOI ... XIVE_ESB_LOAD_EOI + 0x7FF:
++        ret =3D xive_esb_eoi(&pq);
++
++        /* Forward the source event notification for routing ?? */
++        break;
++
++    case XIVE_ESB_GET ... XIVE_ESB_GET + 0x3FF:
++        ret =3D pq;
++        break;
++
++    case XIVE_ESB_SET_PQ_00 ... XIVE_ESB_SET_PQ_00 + 0x0FF:
++    case XIVE_ESB_SET_PQ_01 ... XIVE_ESB_SET_PQ_01 + 0x0FF:
++    case XIVE_ESB_SET_PQ_10 ... XIVE_ESB_SET_PQ_10 + 0x0FF:
++    case XIVE_ESB_SET_PQ_11 ... XIVE_ESB_SET_PQ_11 + 0x0FF:
++        ret =3D xive_esb_set(&pq, (offset >> 8) & 0x3);
++        break;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid END ESB load addr =
+%d\n",
++                      offset);
++        return -1;
++    }
++
++    if (pq !=3D GETFIELD_BE32(end_esmask, end.w1)) {
++        end.w1 =3D SETFIELD_BE32(end_esmask, end.w1, pq);
++        xive_router_write_end(xsrc->xrtr, end_blk, end_idx, &end, 1);
++    }
++
++    return ret;
++}
++
++/*
++ * END ESB MMIO stores are invalid
++ */
++static void xive_end_source_write(void *opaque, hwaddr addr,
++                                  uint64_t value, unsigned size)
++{
++    qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid ESB write addr 0x%"
++                  HWADDR_PRIx"\n", addr);
++}
++
++static const MemoryRegionOps xive_end_source_ops =3D {
++    .read =3D xive_end_source_read,
++    .write =3D xive_end_source_write,
++    .endianness =3D DEVICE_BIG_ENDIAN,
++    .valid =3D {
++        .min_access_size =3D 8,
++        .max_access_size =3D 8,
++    },
++    .impl =3D {
++        .min_access_size =3D 8,
++        .max_access_size =3D 8,
++    },
++};
++
++static void xive_end_source_realize(DeviceState *dev, Error **errp)
++{
++    XiveENDSource *xsrc =3D XIVE_END_SOURCE(dev);
++    Object *obj;
++    Error *local_err =3D NULL;
++
++    obj =3D object_property_get_link(OBJECT(dev), "xive", &local_err);
++    if (!obj) {
++        error_propagate(errp, local_err);
++        error_prepend(errp, "required link 'xive' not found: ");
++        return;
++    }
++
++    xsrc->xrtr =3D XIVE_ROUTER(obj);
++
++    if (!xsrc->nr_ends) {
++        error_setg(errp, "Number of interrupt needs to be greater than 0=
+");
++        return;
++    }
++
++    if (xsrc->esb_shift !=3D XIVE_ESB_4K &&
++        xsrc->esb_shift !=3D XIVE_ESB_64K) {
++        error_setg(errp, "Invalid ESB shift setting");
++        return;
++    }
++
++    /*
++     * Each END is assigned an even/odd pair of MMIO pages, the even pag=
+e
++     * manages the ESn field while the odd page manages the ESe field.
++     */
++    memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
++                          &xive_end_source_ops, xsrc, "xive.end",
++                          (1ull << (xsrc->esb_shift + 1)) * xsrc->nr_end=
+s);
++}
++
++static Property xive_end_source_properties[] =3D {
++    DEFINE_PROP_UINT8("block-id", XiveENDSource, block_id, 0),
++    DEFINE_PROP_UINT32("nr-ends", XiveENDSource, nr_ends, 0),
++    DEFINE_PROP_UINT32("shift", XiveENDSource, esb_shift, XIVE_ESB_64K),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void xive_end_source_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->desc    =3D "XIVE END Source";
++    dc->props   =3D xive_end_source_properties;
++    dc->realize =3D xive_end_source_realize;
++}
++
++static const TypeInfo xive_end_source_info =3D {
++    .name          =3D TYPE_XIVE_END_SOURCE,
++    .parent        =3D TYPE_DEVICE,
++    .instance_size =3D sizeof(XiveENDSource),
++    .class_init    =3D xive_end_source_class_init,
++};
++
+ /*
+  * XIVE Fabric
+  */
+@@ -706,6 +861,7 @@ static void xive_register_types(void)
+     type_register_static(&xive_source_info);
+     type_register_static(&xive_fabric_info);
+     type_register_static(&xive_router_info);
++    type_register_static(&xive_end_source_info);
+ }
+=20
+ type_init(xive_register_types)
 --=20
 2.17.2
