@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gW4uS-0001c3-3w
+	(envelope-from <cota@braap.org>) id 1gW4uS-0001c4-3w
 	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 14:38:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gW4uO-0006nU-Bk
+	(envelope-from <cota@braap.org>) id 1gW4uO-0006lW-6G
 	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 14:38:35 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:57967)
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:33329)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gW4uN-0005sv-U5
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gW4uN-0005sj-TF
 	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 14:38:32 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Sun,  9 Dec 2018 14:37:44 -0500
-Message-Id: <20181209193749.12277-34-cota@braap.org>
+Date: Sun,  9 Dec 2018 14:37:43 -0500
+Message-Id: <20181209193749.12277-33-cota@braap.org>
 In-Reply-To: <20181209193749.12277-1-cota@braap.org>
 References: <20181209193749.12277-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v2 33/38] translator: inject instrumentation from
- plugins
+Subject: [Qemu-devel] [RFC v2 32/38] target/openrisc: fetch code with
+ translator_ld
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +29,21 @@ Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/translator.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ target/openrisc/translate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
-index afd0a49ea6..68174a2986 100644
---- a/accel/tcg/translator.c
-+++ b/accel/tcg/translator.c
-@@ -17,6 +17,7 @@
- #include "exec/gen-icount.h"
- #include "exec/log.h"
- #include "exec/translator.h"
-+#include "exec/plugin-gen.h"
- 
- /* Pairs with tcg_clear_temp_count.
-    To be called by #TranslatorOps.{translate_insn,tb_stop} if
-@@ -35,6 +36,7 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
-                      CPUState *cpu, TranslationBlock *tb)
+diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
+index a271cd3903..6b5efc0155 100644
+--- a/target/openrisc/translate.c
++++ b/target/openrisc/translate.c
+@@ -1305,7 +1305,7 @@ static void openrisc_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
  {
-     int bp_insn = 0;
-+    bool plugin_enabled;
+     DisasContext *dc = container_of(dcbase, DisasContext, base);
+     OpenRISCCPU *cpu = OPENRISC_CPU(cs);
+-    uint32_t insn = cpu_ldl_code(&cpu->env, dc->base.pc_next);
++    uint32_t insn = translator_ldl(&cpu->env, dc->base.pc_next);
  
-     /* Initialize DisasContext */
-     db->tb = tb;
-@@ -67,11 +69,17 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
-     ops->tb_start(db, cpu);
-     tcg_debug_assert(db->is_jmp == DISAS_NEXT);  /* no early exit */
- 
-+    plugin_enabled = plugin_gen_tb_start(cpu, tb);
-+
-     while (true) {
-         db->num_insns++;
-         ops->insn_start(db, cpu);
-         tcg_debug_assert(db->is_jmp == DISAS_NEXT);  /* no early exit */
- 
-+        if (plugin_enabled) {
-+            plugin_gen_insn_start(cpu, db);
-+        }
-+
-         /* Pass breakpoint hits to target for further processing */
-         if (!db->singlestep_enabled
-             && unlikely(!QTAILQ_EMPTY(&cpu->breakpoints))) {
-@@ -107,6 +115,10 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
-             ops->translate_insn(db, cpu);
-         }
- 
-+        if (plugin_enabled) {
-+            plugin_gen_insn_end();
-+        }
-+
-         /* Stop translation if translate_insn so indicated.  */
-         if (db->is_jmp != DISAS_NEXT) {
-             break;
-@@ -124,6 +136,10 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
-     ops->tb_stop(db, cpu);
-     gen_tb_end(db->tb, db->num_insns - bp_insn);
- 
-+    if (plugin_enabled) {
-+        plugin_gen_tb_end(cpu);
-+    }
-+
-     /* The disas_log hook may use these values rather than recompute.  */
-     db->tb->size = db->pc_next - db->pc_first;
-     db->tb->icount = db->num_insns;
+     if (!decode(dc, insn)) {
+         gen_illegal_exception(dc);
 -- 
 2.17.1
