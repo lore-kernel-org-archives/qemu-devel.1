@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gW52i-0001ix-6Q
-	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 14:47:12 -0500
+	(envelope-from <clg@kaod.org>) id 1gW534-0001za-2l
+	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 14:47:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gW52Z-00054q-2F
-	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 14:47:04 -0500
-Received: from 11.mo6.mail-out.ovh.net ([188.165.38.119]:33626)
+	(envelope-from <clg@kaod.org>) id 1gW52x-00061z-BW
+	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 14:47:28 -0500
+Received: from 6.mo178.mail-out.ovh.net ([46.105.53.132]:42394)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gW52X-0004uC-Ar
-	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 14:46:58 -0500
-Received: from player695.ha.ovh.net (unknown [10.109.146.50])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 0B67A19D3B7
-	for <qemu-devel@nongnu.org>; Sun,  9 Dec 2018 20:46:55 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gW52r-00059T-D8
+	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 14:47:19 -0500
+Received: from player695.ha.ovh.net (unknown [10.109.160.244])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 716824075F
+	for <qemu-devel@nongnu.org>; Sun,  9 Dec 2018 20:47:00 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Sun,  9 Dec 2018 20:45:57 +0100
-Message-Id: <20181209194610.29727-7-clg@kaod.org>
+Date: Sun,  9 Dec 2018 20:45:58 +0100
+Message-Id: <20181209194610.29727-8-clg@kaod.org>
 In-Reply-To: <20181209194610.29727-1-clg@kaod.org>
 References: <20181209194610.29727-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 06/19] spapr/xive: use the VCPU id as a NVT
- identifier
+Subject: [Qemu-devel] [PATCH v7 07/19] spapr: introduce a new machine IRQ
+ backend for XIVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,127 +33,200 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-The IVPE scans the O/S CAM line of the XIVE thread interrupt contexts
-to find a matching Notification Virtual Target (NVT) among the NVTs
-dispatched on the HW processor threads.
+The XIVE IRQ backend uses the same layout as the new XICS backend but
+covers the full range of the IRQ number space. The IRQ numbers for the
+CPU IPIs are allocated at the bottom of this space, below 4K, to
+preserve compatibility with XICS which does not use that range.
 
-On a real system, the thread interrupt contexts are updated by the
-hypervisor when a Virtual Processor is scheduled to run on a HW
-thread. Under QEMU, the model will emulate the same behavior by
-hardwiring the NVT identifier in the thread context registers at
-reset.
-
-The NVT identifier used by the sPAPRXive model is the VCPU id. The END
-identifier is also derived from the VCPU id. A set of helpers doing
-the conversion between identifiers are provided for the hcalls
-configuring the sources and the ENDs.
-
-The model does not need a NVT table but the XiveRouter NVT operations
-are provided to perform some extra checks in the routing algorithm.
+This should be enough given that the maximum number of CPUs is 1024
+for the sPAPR machine under QEMU. For the record, the biggest POWER8
+or POWER9 system has a maximum of 1536 HW threads (16 sockets, 192
+cores, SMT8).
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
+ include/hw/ppc/spapr.h     |   2 +
+ include/hw/ppc/spapr_irq.h |   2 +
+ hw/ppc/spapr_irq.c         | 113 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 117 insertions(+)
 
- Changes since v6:
-
- - simplified the prototypes of helpers
- - introduced an assert in set_nvt() method
-
- hw/intc/spapr_xive.c | 56 +++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 55 insertions(+), 1 deletion(-)
-
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index eef5830d45c6..3ade419fdbb1 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -26,6 +26,26 @@
- #define SPAPR_XIVE_VC_BASE   0x0006010000000000ull
- #define SPAPR_XIVE_TM_BASE   0x0006030203180000ull
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 198764066dc9..cb3082d319af 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -16,6 +16,7 @@ typedef struct sPAPREventLogEntry sPAPREventLogEntry;
+ typedef struct sPAPREventSource sPAPREventSource;
+ typedef struct sPAPRPendingHPT sPAPRPendingHPT;
+ typedef struct ICSState ICSState;
++typedef struct sPAPRXive sPAPRXive;
 =20
-+/*
-+ * The allocation of VP blocks is a complex operation in OPAL and the
-+ * VP identifiers have a relation with the number of HW chips, the
-+ * size of the VP blocks, VP grouping, etc. The QEMU sPAPR XIVE
-+ * controller model does not have the same constraints and can use a
-+ * simple mapping scheme of the CPU vcpu_id
-+ *
-+ * These identifiers are never returned to the OS.
-+ */
-+
-+#define SPAPR_XIVE_NVT_BASE 0x400
-+
-+/*
-+ * sPAPR NVT and END indexing helpers
-+ */
-+static uint32_t spapr_xive_nvt_to_target(uint8_t nvt_blk, uint32_t nvt_i=
-dx)
-+{
-+    return nvt_idx - SPAPR_XIVE_NVT_BASE;
-+}
-+
+ #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
+ #define SPAPR_ENTRY_POINT       0x100
+@@ -175,6 +176,7 @@ struct sPAPRMachineState {
+     const char *icp_type;
+     int32_t irq_map_nr;
+     unsigned long *irq_map;
++    sPAPRXive  *xive;
+=20
+     bool cmd_line_caps[SPAPR_CAP_NUM];
+     sPAPRCapabilities def, eff, mig;
+diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+index bd7301e6d9c6..23cdb51b879e 100644
+--- a/include/hw/ppc/spapr_irq.h
++++ b/include/hw/ppc/spapr_irq.h
+@@ -13,6 +13,7 @@
  /*
-  * On sPAPR machines, use a simplified output for the XIVE END
-  * structure dumping only the information related to the OS EQ.
-@@ -40,7 +60,8 @@ static void spapr_xive_end_pic_print_info(sPAPRXive *xi=
-ve, XiveEND *end,
-     uint32_t nvt =3D GETFIELD_BE32(END_W6_NVT_INDEX, end->w6);
-     uint8_t priority =3D GETFIELD_BE32(END_W7_F0_PRIORITY, end->w7);
+  * IRQ range offsets per device type
+  */
++#define SPAPR_IRQ_IPI        0x0
+ #define SPAPR_IRQ_EPOW       0x1000  /* XICS_IRQ_BASE offset */
+ #define SPAPR_IRQ_HOTPLUG    0x1001
+ #define SPAPR_IRQ_VIO        0x1100  /* 256 VIO devices */
+@@ -42,6 +43,7 @@ typedef struct sPAPRIrq {
 =20
--    monitor_printf(mon, "%3d/%d % 6d/%5d ^%d", nvt,
-+    monitor_printf(mon, "%3d/%d % 6d/%5d ^%d",
-+                   spapr_xive_nvt_to_target(0, nvt),
-                    priority, qindex, qentries, qgen);
+ extern sPAPRIrq spapr_irq_xics;
+ extern sPAPRIrq spapr_irq_xics_legacy;
++extern sPAPRIrq spapr_irq_xive;
 =20
-     xive_end_queue_pic_print_info(end, 6, mon);
-@@ -246,6 +267,37 @@ static int spapr_xive_write_end(XiveRouter *xrtr, ui=
-nt8_t end_blk,
-     return 0;
- }
+ void spapr_irq_init(sPAPRMachineState *spapr, Error **errp);
+ int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
+*errp);
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index f8b651de0ec9..0bf47ff9fa26 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -12,6 +12,7 @@
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "hw/ppc/spapr.h"
++#include "hw/ppc/spapr_xive.h"
+ #include "hw/ppc/xics.h"
+ #include "sysemu/kvm.h"
 =20
-+static int spapr_xive_get_nvt(XiveRouter *xrtr,
-+                              uint8_t nvt_blk, uint32_t nvt_idx, XiveNVT=
- *nvt)
+@@ -205,6 +206,118 @@ sPAPRIrq spapr_irq_xics =3D {
+     .print_info  =3D spapr_irq_print_info_xics,
+ };
+=20
++/*
++ * XIVE IRQ backend.
++ */
++static sPAPRXive *spapr_xive_create(sPAPRMachineState *spapr, int nr_irq=
+s,
++                                    int nr_servers, Error **errp)
 +{
-+    uint32_t vcpu_id =3D spapr_xive_nvt_to_target(nvt_blk, nvt_idx);
-+    PowerPCCPU *cpu =3D spapr_find_cpu(vcpu_id);
++    sPAPRXive *xive;
++    Error *local_err =3D NULL;
++    Object *obj;
++    uint32_t nr_ends =3D nr_servers << 3; /* 8 priority ENDs per CPU */
++    int i;
 +
-+    if (!cpu) {
-+        /* TODO: should we assert() if we can find a NVT ? */
-+        return -1;
++    /* TODO : use qdev_create() ? */
++    obj =3D object_new(TYPE_SPAPR_XIVE);
++    object_property_set_int(obj, nr_irqs, "nr-irqs", &error_abort);
++    object_property_set_int(obj, nr_ends, "nr-ends", &error_abort);
++    object_property_set_bool(obj, true, "realized", &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return NULL;
++    }
++    qdev_set_parent_bus(DEVICE(obj), sysbus_get_default());
++    xive =3D SPAPR_XIVE(obj);
++
++    /* Enable the CPU IPIs */
++    for (i =3D 0; i < nr_servers; ++i) {
++        spapr_xive_irq_claim(xive, SPAPR_IRQ_IPI + i, false);
 +    }
 +
-+    /*
-+     * sPAPR does not maintain a NVT table. Return that the NVT is
-+     * valid if we have found a matching CPU
-+     */
-+    nvt->w0 =3D cpu_to_be32(NVT_W0_VALID);
++    return xive;
++}
++
++static void spapr_irq_init_xive(sPAPRMachineState *spapr, Error **errp)
++{
++    MachineState *machine =3D MACHINE(spapr);
++    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
++    int nr_irqs =3D smc->irq->nr_irqs;
++    Error *local_err =3D NULL;
++
++    /* KVM XIVE device not yet available */
++    if (kvm_enabled()) {
++        if (machine_kernel_irqchip_required(machine)) {
++            error_setg(errp, "kernel_irqchip requested. no KVM XIVE supp=
+ort");
++            return;
++        }
++    }
++
++    spapr->xive =3D spapr_xive_create(spapr, nr_irqs,
++                                    spapr_max_server_number(spapr), &loc=
+al_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++}
++
++static int spapr_irq_claim_xive(sPAPRMachineState *spapr, int irq, bool =
+lsi,
++                                Error **errp)
++{
++    if (!spapr_xive_irq_claim(spapr->xive, irq, lsi)) {
++        error_setg(errp, "IRQ %d is invalid", irq);
++        return -1;
++    }
 +    return 0;
 +}
 +
-+static int spapr_xive_write_nvt(XiveRouter *xrtr, uint8_t nvt_blk,
-+                                uint32_t nvt_idx, XiveNVT *nvt,
-+                                uint8_t word_number)
++static void spapr_irq_free_xive(sPAPRMachineState *spapr, int irq, int n=
+um)
 +{
-+    /*
-+     * We don't need to write back to the NVTs because the sPAPR
-+     * machine should never hit a non-scheduled NVT. It should never
-+     * get called.
-+     */
-+    g_assert_not_reached();
++    int i;
++
++    for (i =3D irq; i < irq + num; ++i) {
++        spapr_xive_irq_free(spapr->xive, i);
++    }
 +}
 +
- static const VMStateDescription vmstate_spapr_xive_end =3D {
-     .name =3D TYPE_SPAPR_XIVE "/end",
-     .version_id =3D 1,
-@@ -308,6 +360,8 @@ static void spapr_xive_class_init(ObjectClass *klass,=
- void *data)
-     xrc->get_eas =3D spapr_xive_get_eas;
-     xrc->get_end =3D spapr_xive_get_end;
-     xrc->write_end =3D spapr_xive_write_end;
-+    xrc->get_nvt =3D spapr_xive_get_nvt;
-+    xrc->write_nvt =3D spapr_xive_write_nvt;
- }
-=20
- static const TypeInfo spapr_xive_info =3D {
++static qemu_irq spapr_qirq_xive(sPAPRMachineState *spapr, int irq)
++{
++    return spapr_xive_qirq(spapr->xive, irq);
++}
++
++static void spapr_irq_print_info_xive(sPAPRMachineState *spapr,
++                                      Monitor *mon)
++{
++    CPUState *cs;
++
++    CPU_FOREACH(cs) {
++        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
++
++        xive_tctx_pic_print_info(XIVE_TCTX(cpu->intc), mon);
++    }
++
++    spapr_xive_pic_print_info(spapr->xive, mon);
++}
++
++/*
++ * XIVE uses the full IRQ number space. Set it to 8K to be compatible
++ * with XICS.
++ */
++
++#define SPAPR_IRQ_XIVE_NR_IRQS     0x2000
++#define SPAPR_IRQ_XIVE_NR_MSIS     (SPAPR_IRQ_XIVE_NR_IRQS - SPAPR_IRQ_M=
+SI)
++
++sPAPRIrq spapr_irq_xive =3D {
++    .nr_irqs     =3D SPAPR_IRQ_XIVE_NR_IRQS,
++    .nr_msis     =3D SPAPR_IRQ_XIVE_NR_MSIS,
++
++    .init        =3D spapr_irq_init_xive,
++    .claim       =3D spapr_irq_claim_xive,
++    .free        =3D spapr_irq_free_xive,
++    .qirq        =3D spapr_qirq_xive,
++    .print_info  =3D spapr_irq_print_info_xive,
++};
++
+ /*
+  * sPAPR IRQ frontend routines for devices
+  */
 --=20
 2.17.2
