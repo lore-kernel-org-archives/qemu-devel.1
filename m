@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWLHU-0002wf-LR
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:07:30 -0500
+	(envelope-from <armbru@redhat.com>) id 1gWLJM-00050J-4s
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:09:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWLHT-0006Qm-O7
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:07:28 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:42700)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gWLHT-0006QR-Hp
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:07:27 -0500
-Received: by mail-ot1-x343.google.com with SMTP id v23so10278357otk.9
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 05:07:27 -0800 (PST)
+	(envelope-from <armbru@redhat.com>) id 1gWLJG-0007Uh-Qd
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:09:24 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1544176849-899477-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<5c525644-cc38-9d0b-c591-6d75315e25cc@redhat.com>
+	<49356a26-c25a-2159-de5d-48fccba6af33@virtuozzo.com>
+Date: Mon, 10 Dec 2018 14:08:58 +0100
+In-Reply-To: <49356a26-c25a-2159-de5d-48fccba6af33@virtuozzo.com> (Andrey
+	Shinkevich's message of "Mon, 10 Dec 2018 12:12:38 +0000")
+Message-ID: <8736r5h6l1.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20181207155911.12710-1-peter.maydell@linaro.org>
-	<87wooh1w21.fsf@linaro.org>
-	<CAFEAcA8x6Xv0dL_zZRzMENhixBFw2xd5=0hYwpDF86FiH_WkSQ@mail.gmail.com>
-	<87va411ssi.fsf@linaro.org>
-In-Reply-To: <87va411ssi.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Dec 2018 13:07:14 +0000
-Message-ID: <CAFEAcA_nGuZhu2q_LWxC1kyk5tgYvfLw41p+VxmDmSN8juHn8Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] cpus.c: Fix race condition in
- cpu_stop_current()
+Subject: Re: [Qemu-devel] [PATCH v4] qemu-img info lists bitmap directory
+ entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,28 +26,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Jaap Crezee <jaap@jcz.nl>, "patches@linaro.org" <patches@linaro.org>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Cc: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Denis Lunev <den@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
-On Mon, 10 Dec 2018 at 12:15, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
-> Peter Maydell <peter.maydell@linaro.org> writes:
-> > though I might actually have meant pause_all_vcpus().
-> > (For pause_all_vcpus() I think the correct thing is to
-> > fix the hw/i386/kvmvapic.c code to work in some other way,
-> > and then assert that pause_all_vcpus() is never called from
-> > the VCPU thread.)
+Please don't use "Content-Transfer-Encoding: base64".
+
+Andrey Shinkevich <andrey.shinkevich@virtuozzo.com> writes:
+
+> On 07.12.2018 19:20, Eric Blake wrote:
 >
-> I thought we had already fixed this, but it is yet another case. See the
-> patch_instruction code in the same file. The only niggle is ensuring
-> that either the helper is called from last instruction in the block or
-> forcing a cpu_exit after queuing the work.
+>> On 12/7/18 4:00 AM, Andrey Shinkevich wrote:
+[...]
+>>> +++ b/block/qcow2.c
+>>> @@ -4270,6 +4270,12 @@ static ImageInfoSpecific=20
+>>> *qcow2_get_specific_info(BlockDriverState *bs)
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 .refcount_bits=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D s->refcount_bits,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 };
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else if (s->qcow_version =3D=3D 3) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Qcow2BitmapInfoList *bitmap=
+s;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Error *local_err =3D NULL;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bitmaps =3D qcow2_get_bitma=
+p_info_list(bs, &local_err);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (local_err !=3D NULL) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 err=
+or_report_err(local_err);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>
+>> Ouch. Calling error_report_err() doesn't always work in QMP context;=20
+>> better would be to plumb Error **errp back up to the caller, if=20
+>> getting this specific information can fail and we want the overall=20
+>> query-block to fail.=C2=A0 Or, we could decide that failure to get bitma=
+p=20
+>> info is non-fatal, and that it was just a best-effort attempt to get=20
+>> more info, where we then ignore the failure, rather than trying to=20
+>> report it incorrectly.
+> In my test environment, error_report_err() and warn_report_err() both=20
+> cause printing an error message as the only output of 'qemu-img info'=20
+> command.
 
-Note that the call to pause_all_vcpus() is inside an
-"if (kvm_enabled())" so it doesn't matter what the TCG
-code does in the way of dividing code up into blocks.
-(Though the comment suggests that making it work in TCG
-might be nice in theory.)
+Eric is right, using error_report() & friends in QMP context is almost
+always wrong.  Here's the issue in a bit more detail.  Consider QMP
+command query-block.  Reverse call stack:
 
-thanks
--- PMM
+    qmp_query_block()
+    bdrv_query_info()
+    bdrv_block_device_info()
+    bdrv_query_image_info()
+    bdrv_get_specific_info()
+    qcow2_get_specific_info()
+
+The error you report in qcow2_get_specific_info() gets reported to
+stderr.  It is *not* reported to the QMP client.  Why is that a good
+idea?
+
+[...]
