@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gWQde-0003oP-5i
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:50:43 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gWQsU-0003Br-3Y
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:06:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gWQdd-00020v-2P
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:50:42 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 10 Dec 2018 18:50:09 +0000
-Message-ID: <34f9335a-1cd8-aa06-1fe7-0f2ab33515d0@virtuozzo.com>
-References: <1544465367-16302-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1544465367-16302-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CCD29A4CF196E6479593EDFECE99F2ED@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <richard.henderson@linaro.org>) id 1gWQsP-0001rx-AL
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:06:02 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:42656)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gWQsO-0001rQ-Qs
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:05:57 -0500
+Received: by mail-ot1-x343.google.com with SMTP id v23so11492072otk.9
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 11:05:56 -0800 (PST)
+References: <20181207085635.4291-1-mark.cave-ayland@ilande.co.uk>
+	<20181207085635.4291-5-mark.cave-ayland@ilande.co.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <958fc521-9193-bd72-ca82-c8aac222fad2@linaro.org>
+Date: Mon, 10 Dec 2018 13:05:52 -0600
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5] qemu-img info lists bitmap directory
- entries
+In-Reply-To: <20181207085635.4291-5-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 4/6] target/ppc: switch FPR,
+ VMX and VSX helpers to access data directly from cpu_env
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,85 +32,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-MTAuMTIuMjAxOCAyMTowOSwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IEluIHRoZSAnRm9y
-bWF0IHNwZWNpZmljIGluZm9ybWF0aW9uJyBzZWN0aW9uIG9mIHRoZSAncWVtdS1pbWcgaW5mbycN
-Cj4gY29tbWFuZCBvdXRwdXQsIHRoZSBzdXBwbGVtZW50YWwgaW5mb3JtYXRpb24gYWJvdXQgZXhp
-c3RpbmcgUUNPVzINCj4gYml0bWFwcyB3aWxsIGJlIHNob3duLCBzdWNoIGFzIGEgYml0bWFwIG5h
-bWUsIGZsYWdzIGFuZCBncmFudWxhcml0eToNCj4gDQoNClsuLi5dDQoNCj4gLS0tIGEvYmxvY2sv
-cWNvdzIuYw0KPiArKysgYi9ibG9jay9xY293Mi5jDQo+IEBAIC00MjcwLDYgKzQyNzAsMTkgQEAg
-c3RhdGljIEltYWdlSW5mb1NwZWNpZmljICpxY293Ml9nZXRfc3BlY2lmaWNfaW5mbyhCbG9ja0Ry
-aXZlclN0YXRlICpicykNCj4gICAgICAgICAgICAgICAucmVmY291bnRfYml0cyAgICAgID0gcy0+
-cmVmY291bnRfYml0cywNCj4gICAgICAgICAgIH07DQo+ICAgICAgIH0gZWxzZSBpZiAocy0+cWNv
-d192ZXJzaW9uID09IDMpIHsNCj4gKyAgICAgICAgYm9vbCBoYXNfYml0bWFwczsNCj4gKyAgICAg
-ICAgUWNvdzJCaXRtYXBJbmZvTGlzdCAqYml0bWFwczsNCj4gKyAgICAgICAgRXJyb3IgKmxvY2Fs
-X2VyciA9IE5VTEw7DQo+ICsNCj4gKyAgICAgICAgYml0bWFwcyA9IHFjb3cyX2dldF9iaXRtYXBf
-aW5mb19saXN0KGJzLCAmbG9jYWxfZXJyKTsNCj4gKyAgICAgICAgaWYgKGxvY2FsX2Vycikgew0K
-PiArICAgICAgICAgICAgLyogVE9ETzogUmVwb3J0IHRoZSBFcnJvciB1cCB0byB0aGUgY2FsbGVy
-IHdoZW4gaW1wbGVtZW50ZWQgKi8NCj4gKyAgICAgICAgICAgIGVycm9yX2ZyZWUobG9jYWxfZXJy
-KTsNCj4gKyAgICAgICAgICAgIC8qIFRoZSAnYml0bWFwcycgZW1wdHkgbGlzdCBkZXNpZ25hdGVz
-IGEgZmFpbHVyZSB0byBnZXQgaW5mbyAqLw0KPiArICAgICAgICAgICAgaGFzX2JpdG1hcHMgPSB0
-cnVlOw0KPiArICAgICAgICB9IGVsc2Ugew0KPiArICAgICAgICAgICAgaGFzX2JpdG1hcHMgPSAh
-IWJpdG1hcHM7DQo+ICsgICAgICAgIH0NCj4gICAgICAgICAgICpzcGVjX2luZm8tPnUucWNvdzIu
-ZGF0YSA9IChJbWFnZUluZm9TcGVjaWZpY1FDb3cyKXsNCj4gICAgICAgICAgICAgICAuY29tcGF0
-ICAgICAgICAgICAgID0gZ19zdHJkdXAoIjEuMSIpLA0KPiAgICAgICAgICAgICAgIC5sYXp5X3Jl
-ZmNvdW50cyAgICAgPSBzLT5jb21wYXRpYmxlX2ZlYXR1cmVzICYNCj4gQEAgLTQyNzksNiArNDI5
-Miw4IEBAIHN0YXRpYyBJbWFnZUluZm9TcGVjaWZpYyAqcWNvdzJfZ2V0X3NwZWNpZmljX2luZm8o
-QmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIFFDT1cyX0lOQ09NUEFUX0NPUlJVUFQsDQo+ICAgICAgICAgICAgICAgLmhhc19jb3JydXB0
-ICAgICAgICA9IHRydWUsDQo+ICAgICAgICAgICAgICAgLnJlZmNvdW50X2JpdHMgICAgICA9IHMt
-PnJlZmNvdW50X2JpdHMsDQo+ICsgICAgICAgICAgICAuaGFzX2JpdG1hcHMgICAgICAgID0gaGFz
-X2JpdG1hcHMsDQo+ICsgICAgICAgICAgICAuYml0bWFwcyAgICAgICAgICAgID0gYml0bWFwcywN
-Cj4gICAgICAgICAgIH07DQo+ICAgICAgIH0gZWxzZSB7DQo+ICAgICAgICAgICAvKiBpZiB0aGlz
-IGFzc2VydGlvbiBmYWlscywgdGhpcyBwcm9iYWJseSBtZWFucyBhIG5ldyB2ZXJzaW9uIHdhcw0K
-DQpbLi5dDQoNCj4gaW5kZXggZDRmZTcxMC4uNTM4MjBhNSAxMDA2NDQNCj4gLS0tIGEvcWFwaS9i
-bG9jay1jb3JlLmpzb24NCj4gKysrIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4gQEAgLTY5LDYg
-KzY5LDExIEBADQo+ICAgIyBAZW5jcnlwdDogZGV0YWlscyBhYm91dCBlbmNyeXB0aW9uIHBhcmFt
-ZXRlcnM7IG9ubHkgc2V0IGlmIGltYWdlDQo+ICAgIyAgICAgICAgICAgaXMgZW5jcnlwdGVkIChz
-aW5jZSAyLjEwKQ0KPiAgICMNCj4gKyMgQGJpdG1hcHM6IGxpc3Qgb2YgcWNvdzIgYml0bWFwcyBk
-ZXRhaWxzOyB0aGUgZW1wdHkgbGlzdCBkZXNpZ25hdGVzDQo+ICsjICAgICAgICAgICAiZmFpbCB0
-byBsb2FkIGJpdG1hcHMiIGlmIGl0IGlzIHBhc3NlZCB0byB0aGUgY2FsbGVyIG9yDQo+ICsjICAg
-ICAgICAgICAibm8gYml0bWFwcyIgb3RoZXJ3aXNlOw0KPiArIyAgICAgICAgICAgdW5zdXBwb3J0
-ZWQgZm9yIHRoZSBmb3JtYXQgUUNPVzIgdjIgKHNpbmNlIDQuMCkNCg0KDQpGb3IgbWUsIGl0IGxv
-b2tzIHNpbXBsZXIgdG8gZGVjbGFyZSBhbHRlcm5hdGl2ZSBhcHByb2FjaCwgYXNzdW1pbmcgdGhh
-dCBhYnNlbmNlDQpvZiB0aGUgZmllbGQgbWVhbnMgZXJyb3IsIGxpa2UgdGhpczoNCg0KQGJpdG1h
-cHM6IG9wdGlvbmFsIGZpZWxkIHdpdGggdW5jb21tb24gc2VtYW50aWNzOg0KICAgICAgICAgICBB
-YnNlbmNlIG9mIHRoZSBmaWVsZCBtZWFucyB0aGF0IGJpdG1hcHMgaW5mbyBxdWVyeSBmYWlsZWQg
-KHdoaWNoIGRvZXNuJ3QNCiAgICAgICAgICAgaW1wbHkgdGhlIHdob2xlIHF1ZXJ5IGZhaWx1cmUp
-Lg0KICAgICAgICAgICBJZiB0aGUgZmllbGQgZXhpc3RzIGluIHF1ZXJ5IHJlc3VsdHMsIHRoZXJl
-IHdlcmUgbm8gZXJyb3JzLCBhbmQgaXQgcmVwcmVzZW50cw0KICAgICAgICAgICBsaXN0IG9mIHFj
-b3cyIGJpdG1hcHMgZGV0YWlscy4gU28sIHN1Y2Nlc3NmdWwgcmVzdWx0IHdpbGwgYWx3YXlzIHVz
-ZSBlbXB0eQ0KICAgICAgICAgICBsaXN0IHRvIHNob3cgdGhhdCB0aGVyZSBhcmUgbm8gYml0bWFw
-cy4NCiAgICAgICAgICAgTm90ZTogYml0bWFwcyBhcmUgbm90IHN1cHBvcnRlZCBiZWZvcmUgUUNP
-VzIgdjMsIHNvIGZvciBlbGRlciB2ZXJzaW9ucw0KICAgICAgICAgICBAYml0bWFwcyB3aWxsIGFs
-d2F5cyBiZSBhbiBlbXB0eSBsaXN0Lg0KDQoNClRoZSBtYWluIHF1ZXN0aW9uIGhlcmU6IGlzIGl0
-IGEgZmlyc3QgdGltZSwgd2UgYXJlIGRvaW5nIHNvbWV0aGluZyBsaWtlIHRoaXM/IElmIG5vdCwN
-CndlIG11c3QgZ28gdGhlIGV4aXN0aW5nIHdheS4NCg0KSSd2ZSBmb3VuZCB0aGUgb25seSBvbmUg
-c2ltaWxhciB0aGluZzoNCmluIHFhcGkvbWlzYy5qc29uOg0KIyBJZiBAdW5hdmFpbGFibGUtZmVh
-dHVyZXMgaXMgYW4gZW1wdHkgbGlzdCwgdGhlIENQVSBtb2RlbCBpcw0KIyBydW5uYWJsZSB1c2lu
-ZyB0aGUgY3VycmVudCBob3N0IGFuZCBtYWNoaW5lLXR5cGUuDQojIElmIEB1bmF2YWlsYWJsZS1m
-ZWF0dXJlcyBpcyBub3QgcHJlc2VudCwgcnVubmFiaWxpdHkNCiMgaW5mb3JtYXRpb24gZm9yIHRo
-ZSBDUFUgaXMgbm90IGF2YWlsYWJsZS4NCg0KaXQncyBub3QgYWJvdXQgZXJyb3IsIGhvd2V2ZXIu
-Lg0KDQpJbnRlcmVzdGluZyB3aGF0IGlzIHRoZSBjb21tb24gKG1vc3QgY29tbW9uKSBiZWhhdmlv
-ciBhcm91bmQgZW1wdHktbGlzdC9hYnNlbnQtcGFyYW1ldGVyPw0KDQoNCkFoYSwgb25lIHBvaW50
-IHRvIG15IHNlbWFudGljczoNCndlIGNhbiBkZWZpbmUgcmVxdWlyZWQgZmllbGQsIHdpdGhvdXQg
-JyonLCBhbmQgaXQgaW1wbGllcyB0aGF0IHRoZXJlIHNob3VsZCBub3QgYmUgYW55IGVycm9ycywN
-CmFuZCB3ZSBkb24ndCBoYXZlIGV4dHJhIG9wdGlvbnMgKG9ubHkgZW1wdHkgbGlzdCBpcyBwb3Nz
-aWJsZSB0byBzaG93IGFic2VuY2Ugb2YgZWxlbWVudHMpLg0KYW5kIHRoYW4sICcqJyBzaG93cyBw
-b3NzaWJpbGl0eSBvZiBlcnJvcnMgKGlmIGRlc2NyaWJlZCBpbiBzcGVjKS4NCg0KYW5kIHdpdGgg
-eW91ciBzZW1hbnRpY3MsIGlmIHdlIHdhbnQgdG8gc2F5IGluIGdlbmVyYWwsIHRoYXQgZW1wdHkt
-bGlzdCA9IGVycm9yLCB3ZSdsbCBuZWVkIHRvDQp1c2UgJyonIGZvciBhbGwgZmllbGRzLCBldmVu
-IGZvciB0aG91cyB3aXRob3V0IHBvc3NpYmxlIGVycm9ycy4NCg0KKG9mIGNvdXJzZSwgd2UgYWN0
-dWFsbHkgY2FuIG5vdCBzYXkgc29tZXRoaW5nIGluIGdlbmVyYWwsIGJlY2F1c2UsIEknbSBhZnJh
-aWQsIHRoYXQgd2UgY3VycmVudGx5DQpoYXZlIG1peGVkIHNlbWFudGljcyBhcm91bmQgZW1wdHkg
-bGlzdHMpDQoNCg0KPiArIw0KPiAgICMgU2luY2U6IDEuNw0KPiAgICMjDQo+ICAgeyAnc3RydWN0
-JzogJ0ltYWdlSW5mb1NwZWNpZmljUUNvdzInLA0KPiBAQCAtNzcsNyArODIsOCBAQA0KPiAgICAg
-ICAgICcqbGF6eS1yZWZjb3VudHMnOiAnYm9vbCcsDQo+ICAgICAgICAgJypjb3JydXB0JzogJ2Jv
-b2wnLA0KPiAgICAgICAgICdyZWZjb3VudC1iaXRzJzogJ2ludCcsDQo+IC0gICAgICAnKmVuY3J5
-cHQnOiAnSW1hZ2VJbmZvU3BlY2lmaWNRQ293MkVuY3J5cHRpb24nDQo+ICsgICAgICAnKmVuY3J5
-cHQnOiAnSW1hZ2VJbmZvU3BlY2lmaWNRQ293MkVuY3J5cHRpb24nLA0KPiArICAgICAgJypiaXRt
-YXBzJzogWydRY293MkJpdG1hcEluZm8nXQ0KPiAgICAgfSB9DQo+ICAgDQo+ICAgIyMNCj4gQEAg
-LTQ1NCw2ICs0NjAsNDEgQEANCj4gICAgICAgICAgICAgICdzdGF0dXMnOiAnRGlydHlCaXRtYXBT
-dGF0dXMnfSB9DQo+ICAgDQoNCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+On 12/7/18 2:56 AM, Mark Cave-Ayland wrote:
+> Instead of accessing the FPR, VMX and VSX registers through static arrays of
+> TCGv_i64 globals, remove them and change the helpers to load/store data directly
+> within cpu_env.
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  target/ppc/translate.c | 59 ++++++++++++++------------------------------------
+>  1 file changed, 16 insertions(+), 43 deletions(-)
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+Note however, that there are other steps that you must add here before using
+vector operations in the next patch:
+
+(1a) The fpr and vsr arrays must be merged, since fpr[n] == vsrh[n].
+     If this isn't done, then you simply cannot apply one operation
+     to two disjoint memory blocks.
+
+(1b) The vsr and avr arrays should be merged, since vsr[32+n] == avr[n].
+     This is simply tidiness, matching the layout to the architecture.
+
+These steps will modify gdbstub.c, machine.c, and linux-user/.
+
+(2) The vsr array needs to be QEMU_ALIGN(16).  See target/arm/cpu.h.
+    We assert that the host addresses are 16 byte aligned, so that we
+    can eventually use Altivec/VSX in tcg/ppc/.
+
+
+r~
