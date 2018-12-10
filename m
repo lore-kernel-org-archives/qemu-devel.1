@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gWQI4-0008Ck-Hc
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:28:25 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gWQI6-0008ES-9K
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:28:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gWQI1-0003Yj-Az
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:28:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41294)
+	(envelope-from <pbonzini@redhat.com>) id 1gWQI5-0003bx-95
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:28:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42144)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gWQI1-0003Xw-3V
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:28:21 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gWQI5-0003b1-23
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:28:25 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 41F678666A
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 18:28:20 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2030D81127
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 18:28:24 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 10 Dec 2018 19:28:09 +0100
-Message-Id: <20181210182816.2014-2-pbonzini@redhat.com>
+Date: Mon, 10 Dec 2018 19:28:10 +0100
+Message-Id: <20181210182816.2014-3-pbonzini@redhat.com>
 In-Reply-To: <20181210182816.2014-1-pbonzini@redhat.com>
 References: <20181210182816.2014-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/8] qemu/queue.h: do not access tqe_prev
- directly
+Subject: [Qemu-devel] [PATCH 2/8] vfio: make vfio_address_spaces static
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,29 +32,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com
+Cc: armbru@redhat.com, Alex Williamson <alex.williamson@redhat.com>
 
-Use the QTAILQ_IN_USE macro instead, it does the same thing but in a
-few patches its definition will change.
+It is not used outside hw/vfio/common.c, so it does not need to
+be extern.
 
+Cc: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- blockdev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/vfio/common.c              | 2 +-
+ include/hw/vfio/vfio-common.h | 1 -
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index 81f95d920b..7604b2183b 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -4259,7 +4259,7 @@ void qmp_blockdev_del(const char *node_name, Error =
-**errp)
-         goto out;
-     }
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 7c185e5a2e..7aa804ea0b 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -39,7 +39,7 @@
 =20
--    if (!bs->monitor_list.tqe_prev) {
-+    if (!QTAILQ_IN_USE(bs, monitor_list)) {
-         error_setg(errp, "Node %s is not owned by the monitor",
-                    bs->node_name);
-         goto out;
+ struct vfio_group_head vfio_group_list =3D
+     QLIST_HEAD_INITIALIZER(vfio_group_list);
+-struct vfio_as_head vfio_address_spaces =3D
++static QLIST_HEAD(, VFIOAddressSpace) vfio_address_spaces =3D
+     QLIST_HEAD_INITIALIZER(vfio_address_spaces);
+=20
+ #ifdef CONFIG_KVM
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.=
+h
+index 1b434d02f6..127ca47815 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -181,7 +181,6 @@ int vfio_get_device(VFIOGroup *group, const char *nam=
+e,
+=20
+ extern const MemoryRegionOps vfio_region_ops;
+ extern QLIST_HEAD(vfio_group_head, VFIOGroup) vfio_group_list;
+-extern QLIST_HEAD(vfio_as_head, VFIOAddressSpace) vfio_address_spaces;
+=20
+ #ifdef CONFIG_LINUX
+ int vfio_get_region_info(VFIODevice *vbasedev, int index,
 --=20
 2.19.2
