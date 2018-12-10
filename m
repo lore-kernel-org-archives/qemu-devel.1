@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWMSC-0007e3-GY
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:22:37 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gWMT3-0000Jh-8q
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:23:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWMSB-0006nD-7X
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:22:36 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:38850)
+	(envelope-from <peter.maydell@linaro.org>) id 1gWMT2-0007I1-8E
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:23:29 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:38226)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gWMSA-0006mI-Ee
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:22:35 -0500
-Received: by mail-ot1-x343.google.com with SMTP id e12so10518728otl.5
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 06:22:33 -0800 (PST)
+	id 1gWMT2-0007Hc-1q
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:23:28 -0500
+Received: by mail-oi1-x241.google.com with SMTP id a77so9069343oii.5
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 06:23:27 -0800 (PST)
 MIME-Version: 1.0
-References: <20181206175541.29508-1-richard.henderson@linaro.org>
-	<20181206175541.29508-2-richard.henderson@linaro.org>
-In-Reply-To: <20181206175541.29508-2-richard.henderson@linaro.org>
+References: <20181210135803.20208-1-peter.maydell@linaro.org>
+	<20181210151310.3f13c28f.cohuck@redhat.com>
+In-Reply-To: <20181210151310.3f13c28f.cohuck@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Dec 2018 14:22:21 +0000
-Message-ID: <CAFEAcA9HSrGX2PR8DieF6Fa8x2fHk1xnnismNvcMpaSQ4U9dMA@mail.gmail.com>
+Date: Mon, 10 Dec 2018 14:23:15 +0000
+Message-ID: <CAFEAcA8q6sgirc9ydFRNGs5tCn0PjScHD_tHCR2XhxBM=CoZeg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] target/arm: Introduce
- arm_hcr_el2_eff
+Subject: Re: [Qemu-devel] [PATCH] hw/s390/ccw.c: Don't take address of
+ packed members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,86 +30,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, qemu-s390x <qemu-s390x@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Thu, 6 Dec 2018 at 17:55, Richard Henderson
-<richard.henderson@linaro.org> wrote:
+On Mon, 10 Dec 2018 at 14:13, Cornelia Huck <cohuck@redhat.com> wrote:
 >
-> Replace arm_hcr_el2_{fmo,imo,amo} with a more general routine
-> that also takes SCR_EL3.NS (aka arm_is_secure_below_el3) into
-> account, as documented for the plethora of bits in HCR_EL2.
+> On Mon, 10 Dec 2018 13:58:03 +0000
+> Peter Maydell <peter.maydell@linaro.org> wrote:
 >
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ----
-> v3: Fix set of bits affected by just TGE.
->     Reorder the bits to ascending order.
->     Zap VF,VI,VSE when !TGE and ![FIA]MO.
+> > Taking the address of a field in a packed struct is a bad idea, because
+> > it might not be actually aligned enough for that pointer type (and
+> > thus cause a crash on dereference on some host architectures). Newer
+> > versions of clang warn about this.
+> >
+> > Avoid the problem by using local copies of the PMCW and SCSW
+> > struct fields in copy_schib_from_guest() and copy_schib_to_guest().
+> >
+> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> > ---
+> > This seemed like a not totally ugly and reasonably localised fix
+> > that satisfies clang. Oddly, this makes the generated object file
+> > 15K smaller (421K vs 406K), so it might even be better code...
+>
+> Nice :)
+>
+> >
+> >  hw/s390x/css.c | 20 ++++++++++++++++----
+> >  1 file changed, 16 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> > index 04ec5cc9705..ef07691e36b 100644
+> > --- a/hw/s390x/css.c
+> > +++ b/hw/s390x/css.c
+> > @@ -1290,9 +1290,15 @@ void copy_scsw_to_guest(SCSW *dest, const SCSW *src)
+> >  static void copy_schib_to_guest(SCHIB *dest, const SCHIB *src)
+> >  {
+> >      int i;
+> > +    PMCW srcpmcw, destpmcw;
+> > +    SCSW srcscsw, destscsw;
+>
+> <bikeshed>
+> I would find src_pmcw etc. easier to read. Other opinions?
+> </bikeshed>
 
-> +/*
-> + * Return the effective value of HCR_EL2.
-> + * Bits that are not included here:
-> + * RW       (read from SCR_EL3.RW as needed)
-> + */
-> +uint64_t arm_hcr_el2_eff(CPUARMState *env)
-> +{
-> +    uint64_t ret = env->cp15.hcr_el2;
-> +
-> +    if (arm_is_secure_below_el3(env)) {
-> +        /*
-> +         * "This register has no effect if EL2 is not enabled in the
-> +         * current Security state".  This is ARMv8.4-SecEL2 speak for
-> +         * !(SCR_EL3.NS==1 || SCR_EL3.EEL2==1).
-> +         *
-> +         * Prior to that, the language was "In an implementation that
-> +         * includes EL3, when the value of SCR_EL3.NS is 0 the PE behaves
-> +         * as if this field is 0 for all purposes other than a direct
-> +         * read or write access of HCR_EL2".  With lots of enumeration
-> +         * on a per-field basis.  In current QEMU, this is condition
-> +         * is arm_is_secure_below_el3.
-> +         *
-> +         * Since the v8.4 language applies to the entire register, and
-> +         * appears to be backward compatible, use that.
-> +         */
-> +        ret = 0;
-> +    } else if (ret & HCR_TGE) {
-> +        /* These bits are up-to-date as of ARMv8.4.  */
-> +        if (ret & HCR_E2H) {
-> +            ret &= ~(HCR_VM | HCR_FMO | HCR_IMO | HCR_AMO |
-> +                     HCR_BSU_MASK | HCR_DC | HCR_TWI | HCR_TWE |
-> +                     HCR_TID0 | HCR_TID2 | HCR_TPCP | HCR_TPU |
-> +                     HCR_TDZ | HCR_CD | HCR_ID | HCR_MIOCNCE);
-> +        } else {
-> +            ret |= HCR_FMO | HCR_IMO | HCR_AMO;
-> +        }
-> +        ret &= ~(HCR_SWIO | HCR_PTW | HCR_VF | HCR_VI | HCR_VSE |
-> +                 HCR_FB | HCR_TID1 | HCR_TID3 | HCR_TSC | HCR_TACR |
-> +                 HCR_TSW | HCR_TTLB | HCR_TVM | HCR_HCD | HCR_TRVM |
-> +                 HCR_TLOR);
-> +    } else {
-> +        if (!(ret & HCR_FMO)) {
-> +            ret &= ~HCR_VF;
-> +        }
-> +        if (!(ret & HCR_IMO)) {
-> +            ret &= ~HCR_VI;
-> +        }
-> +        if (!(ret & HCR_AMO)) {
-> +            ret &= ~HCR_VSE;
-> +        }
-
-This section that clears VI/VF/VSE is new, and I'm not sure it's right.
-The spec says that the virtual IRQ interrupt is enabled only if {TGE,IMO}
-is {0,1}, but the meaning of the bit is "pending", and an interrupt
-can be pending without being enabled. Ditto VF, VSE.
-
-(As there are only two places that look at the VI/VF/VSE bits and
-they both look directly at cp15.hcr_el2 this doesn't change behaviour.)
-
-> +    }
-> +
-> +    return ret;
-> +}
-> +
+CODING_STYLE's "Naming" section agrees with you...
 
 thanks
 -- PMM
