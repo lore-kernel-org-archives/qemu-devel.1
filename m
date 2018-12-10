@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gWKdY-0000R7-6F
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 07:26:16 -0500
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gWKdc-0000TM-CC
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 07:26:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gWKTg-0006HF-UC
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 07:16:05 -0500
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:37060)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gWKTg-0006Gg-ID
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 07:16:00 -0500
-Received: by mail-wr1-x42b.google.com with SMTP id j10so10240392wru.4
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 04:16:00 -0800 (PST)
-References: <20181207155911.12710-1-peter.maydell@linaro.org>
-	<87wooh1w21.fsf@linaro.org>
-	<CAFEAcA8x6Xv0dL_zZRzMENhixBFw2xd5=0hYwpDF86FiH_WkSQ@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA8x6Xv0dL_zZRzMENhixBFw2xd5=0hYwpDF86FiH_WkSQ@mail.gmail.com>
-Date: Mon, 10 Dec 2018 12:15:57 +0000
-Message-ID: <87va411ssi.fsf@linaro.org>
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gWKSi-0005jk-7v
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 07:15:07 -0500
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Date: Mon, 10 Dec 2018 12:14:54 +0000
+Message-ID: <01597daf-b1b8-d506-85c1-b58af758f367@virtuozzo.com>
+References: <20181205122326.26625-1-dplotnikov@virtuozzo.com>
+	<20181207122647.GE5119@linux.fritz.box>
+In-Reply-To: <20181207122647.GE5119@linux.fritz.box>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <FB2C82252A347D41A16D73DA387E5BF4@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] cpus.c: Fix race condition in
- cpu_stop_current()
+Subject: Re: [Qemu-devel] [PATCH] blk: postpone request execution on a
+ context protected with "drained section"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,102 +26,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Jaap Crezee <jaap@jcz.nl>, "patches@linaro.org" <patches@linaro.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "keith.busch@intel.com" <keith.busch@intel.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>, "famz@redhat.com" <famz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On Mon, 10 Dec 2018 at 11:06, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
->>
->>
->> Peter Maydell <peter.maydell@linaro.org> writes:
->> > We discussed this a little while back:
->> > https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg00154.html
->> > and Jaap reported a bug which I suspect of being the same thing:
->> > https://lists.gnu.org/archive/html/qemu-discuss/2018-10/msg00014.html
->> >
->> > Annoyingly I have lost the test case that demonstrated this
->> > race, but I analysed it at the time and this should definitely
->> > fix it. I have opted not to try to address any of the other
->> > possible cleanup here (eg vm_stop() has a potential similar
->> > race if called from a vcpu thread I suspect), since it gets
->> > pretty tangled.
->> >
->> > Jaap: could you test whether this patch fixes the issue you
->> > were seeing, please?
->> > ---
->> >  cpus.c | 3 ++-
->> >  1 file changed, 2 insertions(+), 1 deletion(-)
->> >
->> > diff --git a/cpus.c b/cpus.c
->> > index 0ddeeefc14f..b09b7027126 100644
->> > --- a/cpus.c
->> > +++ b/cpus.c
->> > @@ -2100,7 +2100,8 @@ void qemu_init_vcpu(CPUState *cpu)
->> >  void cpu_stop_current(void)
->> >  {
->> >      if (current_cpu) {
->> > -        qemu_cpu_stop(current_cpu, true);
->> > +        current_cpu->stop =3D true;
->> > +        cpu_exit(current_cpu);
->>
->> Should the FIXME in vm_stop also be fixed?
->>
->>         /*
->>          * FIXME: should not return to device code in case
->>          * vm_stop() has been requested.
->>          */
->>         cpu_stop_current();
->>         return 0;
->
-> This is one of the things I had in mind with:
->> > I have opted not to try to address any of the other
->> > possible cleanup here (eg vm_stop() has a potential similar
->> > race if called from a vcpu thread I suspect), since it gets
->> > pretty tangled.
->
-> though I might actually have meant pause_all_vcpus().
-> (For pause_all_vcpus() I think the correct thing is to
-> fix the hw/i386/kvmvapic.c code to work in some other way,
-> and then assert that pause_all_vcpus() is never called from
-> the VCPU thread.)
-
-I thought we had already fixed this, but it is yet another case. See the
-patch_instruction code in the same file. The only niggle is ensuring
-that either the helper is called from last instruction in the block or
-forcing a cpu_exit after queuing the work.
-
-The i386 helpers are tricky because they seem to be very deeply nested
-so its hard to be sure everything really is done.
-
-But yes I agree that pause_all_vcpus() should be reserved for non-vCPU
-contexts only.
-
-> At any rate, this code is quite complicated, so I think
-> it's worth just fixing this specific race without getting
-> tangled up in everything else we could potentially refactor.
-
-Fair enough.
-
->
-> I'm not even sure how we would arrange for vm_stop() to
-> avoid returning to device emulation code if it has been
-> called from there -- I would favour instead changing/defining
-> the semantics to be like the shutdown-request and reset-request
-> where the device code expects that control will return but
-> the VM stop happens at the next opportunity, ie as soon
-> as the execution of the insn which wrote to the device
-> register has completed.
-
-Is there anyway we can assert we are in a helper that has caused all
-globals to be saved before the call? Otherwise we need to make similar
-guarantees that the ARM TLB flushes have that they are always the last
-in a block of instructions.
-
-prep_port0092_write in PPC seems to do a similar thing. Perhaps we need
-to expose some common helpers for vcpus?
-
---
-Alex Benn=C3=A9e
+DQoNCk9uIDA3LjEyLjIwMTggMTU6MjYsIEtldmluIFdvbGYgd3JvdGU6DQo+IEFtIDA1LjEyLjIw
+MTggdW0gMTM6MjMgaGF0IERlbmlzIFBsb3RuaWtvdiBnZXNjaHJpZWJlbjoNCj4+IEF0IHRoZSB0
+aW1lLCB0aGUgImRyYWluZWQgc2VjdGlvbiIgZG9lc24ndCBwcm90ZWN0IEJsb2NrIERyaXZlciBT
+dGF0ZQ0KPj4gZnJvbSB0aGUgcmVxdWVzdHMgYXBwZWFyaW5nIGluIHRoZSB2Q1BVIHRocmVhZHMu
+DQo+PiBUaGlzIGNvdWxkIGxlYWQgdG8gdGhlIGRhdGEgbG9zcyBiZWNhdXNlIG9mIHJlcXVlc3Qg
+Y29taW5nIHRvDQo+PiBhbiB1bmV4cGVjdGVkIEJEUy4NCj4+DQo+PiBGb3IgZXhhbXBsZSwgd2hl
+biBhIHJlcXVlc3QgY29tZXMgdG8gaWRlIGNvbnRyb2xsZXIgZnJvbSB0aGUgZ3Vlc3QsDQo+PiB0
+aGUgY29udHJvbGxlciBjcmVhdGVzIGEgcmVxdWVzdCBjb3JvdXRpbmUgYW5kIGV4ZWN1dGVzIHRo
+ZSBjb3JvdXRpbmUNCj4+IGluIHRoZSB2Q1BVIHRocmVhZC4gSWYgYW5vdGhlciB0aHJlYWQoaW90
+aHJlYWQpIGhhcyBlbnRlcmVkIHRoZQ0KPj4gImRyYWluZWQgc2VjdGlvbiIgb24gYSBCRFMgd2l0
+aCBiZHJ2X2RyYWluZWRfYmVnaW4sIHdoaWNoIHByb3RlY3RzDQo+PiBCRFMnIEFpb0NvbnRleHQg
+ZnJvbSBleHRlcm5hbCByZXF1ZXN0cywgYW5kIHJlbGVhc2VkIHRoZSBBaW9Db250ZXh0DQo+PiBi
+ZWNhdXNlIG9mIGZpbmlzaGluZyBzb21lIGNvcm91dGluZSBieSB0aGUgbW9tZW50IG9mIHRoZSBy
+ZXF1ZXN0DQo+PiBhcHBlYXJpbmcgYXQgdGhlIGlkZSBjb250cm9sbGVyLCB0aGUgY29udHJvbGxl
+ciBhY3F1aXJlcyB0aGUgQWlvQ29udGV4dA0KPj4gYW5kIGV4ZWN1dGVzIGl0cyByZXF1ZXN0IHdp
+dGhvdXQgYW55IHJlc3BlY3QgdG8gdGhlIGVudGVyZWQNCj4+ICJkcmFpbmVkIHNlY3Rpb24iIHBy
+b2R1Y2luZyBhbnkga2luZHMgb2YgZGF0YSBpbmNvbnNpc3RlbmN5Lg0KPj4NCj4+IFRoZSBwYXRj
+aCBwcmV2ZW50cyB0aGlzIGNhc2UgYnkgcHV0dGluZyByZXF1ZXN0cyBmcm9tIGV4dGVybmFsIHRo
+cmVhZHMgdG8NCj4+IHRoZSBxdWV1ZSBvbiBBaW9Db250ZXh0IHdoaWxlIHRoZSBjb250ZXh0IGlz
+IHByb3RlY3RlZCBmb3IgZXh0ZXJuYWwgcmVxdWVzdHMNCj4+IGFuZCBleGVjdXRlcyB0aG9zZSBy
+ZXF1ZXN0cyBsYXRlciBvbiB0aGUgZXh0ZXJuYWwgcmVxdWVzdHMgcHJvdGVjdGlvbiByZW1vdmlu
+Zy4NCkluIGdlbmVyYWwsIEkgYWdyZWUgd2l0aCB0aGUgY29tbWVudHMgYW5kIGdvaW5nIHRvIG1h
+a2UgY2hhbmdlcyBpbiB0aGUgDQpwYXRjaGVzIGFjY29yZGluZ2x5Lg0KDQpBbHNvLCBJJ2QgbGlr
+ZSB0byBhc2sgYSBxdWVzdGlvbiBiZWxvdw0KPj4NCj4+IEFsc28sIHRoZSBwYXRjaCBtYXJrcyBy
+ZXF1ZXN0cyBnZW5lcmF0ZWQgaW4gYSB2Q1BVIHRocmVhZCBhcyBleHRlcm5hbCBvbmVzDQo+PiB0
+byBtYWtlIHVzZSBvZiB0aGUgcmVxdWVzdCBwb3N0cG9uaW5nLg0KPj4NCj4+IEhvdyB0byByZXBy
+b2R1Y2U6DQo+PiAxLiBzdGFydCB2bSB3aXRoIGFuIGlkZSBkaXNrIGFuZCBhIGxpbnV4IGd1ZXN0
+DQo+PiAyLiBpbiB0aGUgZ3Vlc3QgcnVuOiBkZCBpZj0uLi4gb2Y9Li4uIGJzPTRLIGNvdW50PTEw
+MDAwMCBvZmxhZz1kaXJlY3QNCj4+IDMuIChxZW11KSBkcml2ZV9taXJyb3IgImRpc2stbmFtZSIN
+Cj4+IDQuIHdhaXQgdW50aWwgYmxvY2sgam9iIGNhbiByZWNlaXZlIGJsb2NrX2pvYl9jb21wbGV0
+ZQ0KPj4gNS4gKHFlbXUpIGJsb2NrX2pvYl9jb21wbGV0ZSAiZGlzay1uYW1lIg0KPj4gNi4gYmxr
+X2Fpb19wW3JlYWR8d3JpdGVddiBtYXkgYXBwZWFyIGluIHZDUFUgY29udGV4dCAoaGVyZSBpcyB0
+aGUgcmFjZSkNCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBEZW5pcyBQbG90bmlrb3YgPGRwbG90bmlr
+b3ZAdmlydHVvenpvLmNvbT4NCj4gDQo+IFRoaXMgaXMgZ2V0dGluZyBjbG9zZXIsIGJ1dCBJJ2Qg
+bGlrZSB0byBzZWUgdHdvIG1vcmUgbWFqb3IgY2hhbmdlczoNCj4gDQo+PiBkaWZmIC0tZ2l0IGEv
+aW5jbHVkZS9ibG9jay9haW8uaCBiL2luY2x1ZGUvYmxvY2svYWlvLmgNCj4+IGluZGV4IDBjYTI1
+ZGZlYzYuLjg1MTJiZGE0NGUgMTAwNjQ0DQo+PiAtLS0gYS9pbmNsdWRlL2Jsb2NrL2Fpby5oDQo+
+PiArKysgYi9pbmNsdWRlL2Jsb2NrL2Fpby5oDQo+PiBAQCAtMTksNiArMTksNyBAQA0KPj4gICAj
+aW5jbHVkZSAicWVtdS9ldmVudF9ub3RpZmllci5oIg0KPj4gICAjaW5jbHVkZSAicWVtdS90aHJl
+YWQuaCINCj4+ICAgI2luY2x1ZGUgInFlbXUvdGltZXIuaCINCj4+ICsjaW5jbHVkZSAicWVtdS9j
+b3JvdXRpbmUuaCINCj4+ICAgDQo+PiAgIHR5cGVkZWYgc3RydWN0IEJsb2NrQUlPQ0IgQmxvY2tB
+SU9DQjsNCj4+ICAgdHlwZWRlZiB2b2lkIEJsb2NrQ29tcGxldGlvbkZ1bmModm9pZCAqb3BhcXVl
+LCBpbnQgcmV0KTsNCj4+IEBAIC0xMzAsNiArMTMxLDExIEBAIHN0cnVjdCBBaW9Db250ZXh0IHsN
+Cj4+ICAgICAgIFFFTVVUaW1lckxpc3RHcm91cCB0bGc7DQo+PiAgIA0KPj4gICAgICAgaW50IGV4
+dGVybmFsX2Rpc2FibGVfY250Ow0KPj4gKyAgICAvKiBRdWV1ZSB0byBzdG9yZSB0aGUgcmVxdWVz
+dHMgY29taW5nIHdoZW4gdGhlIGNvbnRleHQgaXMgZGlzYWJsZWQgZm9yDQo+PiArICAgICAqIGV4
+dGVybmFsIHJlcXVlc3RzLg0KPj4gKyAgICAgKiBEb24ndCB1c2UgYSBzZXBhcmF0ZSBsb2NrIGZv
+ciBwcm90ZWN0aW9uIHJlbHlpbmcgdGhlIGNvbnRleHQgbG9jaw0KPj4gKyAgICAgKi8NCj4+ICsg
+ICAgQ29RdWV1ZSBwb3N0cG9uZWRfcmVxczsNCj4gDQo+IFdoeSBpbnZvbHZlIHRoZSBBaW9Db250
+ZXh0IGF0IGFsbD8gVGhpcyBjb3VsZCBhbGwgYmUga2VwdCBhdCB0aGUNCj4gQmxvY2tCYWNrZW5k
+IGxldmVsIHdpdGhvdXQgZXh0ZW5kaW5nIHRoZSBsYXllcmluZyB2aW9sYXRpb24gdGhhdA0KPiBh
+aW9fZGlzYWJsZV9leHRlcm5hbCgpIGlzLg0KPiANCj4gQmxvY2tCYWNrZW5kcyBnZXQgbm90aWZp
+ZWQgd2hlbiB0aGVpciByb290IG5vZGUgaXMgZHJhaW5lZCwgc28gaG9va2luZw0KPiB0aGluZ3Mg
+dXAgdGhlcmUgc2hvdWxkIGJlIGFzIGVhc3ksIGlmIG5vdCBldmVuIGVhc2llciB0aGFuIGluDQo+
+IEFpb0NvbnRleHQuDQo+IA0KPj4gICAgICAgLyogTnVtYmVyIG9mIEFpb0hhbmRsZXJzIHdpdGhv
+dXQgLmlvX3BvbGwoKSAqLw0KPj4gICAgICAgaW50IHBvbGxfZGlzYWJsZV9jbnQ7DQo+PiBAQCAt
+NDgzLDYgKzQ4OSwxNSBAQCBzdGF0aWMgaW5saW5lIHZvaWQgYWlvX3RpbWVyX2luaXQoQWlvQ29u
+dGV4dCAqY3R4LA0KPj4gICAgKi8NCj4+ICAgaW50NjRfdCBhaW9fY29tcHV0ZV90aW1lb3V0KEFp
+b0NvbnRleHQgKmN0eCk7DQo+PiAgIA0KPj4gKy8qKg0KPj4gKyAqIGFpb19jb19lbnRlcjoNCj4+
+ICsgKiBAY3R4OiB0aGUgY29udGV4dCB0byBydW4gdGhlIGNvcm91dGluZQ0KPj4gKyAqIEBjbzog
+dGhlIGNvcm91dGluZSB0byBydW4NCj4+ICsgKg0KPj4gKyAqIEVudGVyIGEgY29yb3V0aW5lIGlu
+IHRoZSBzcGVjaWZpZWQgQWlvQ29udGV4dC4NCj4+ICsgKi8NCj4+ICt2b2lkIGFpb19jb19lbnRl
+cihBaW9Db250ZXh0ICpjdHgsIHN0cnVjdCBDb3JvdXRpbmUgKmNvKTsNCj4+ICsNCj4+ICAgLyoq
+DQo+PiAgICAqIGFpb19kaXNhYmxlX2V4dGVybmFsOg0KPj4gICAgKiBAY3R4OiB0aGUgYWlvIGNv
+bnRleHQNCj4+IEBAIC00OTEsOSArNTA2LDE3IEBAIGludDY0X3QgYWlvX2NvbXB1dGVfdGltZW91
+dChBaW9Db250ZXh0ICpjdHgpOw0KPj4gICAgKi8NCj4+ICAgc3RhdGljIGlubGluZSB2b2lkIGFp
+b19kaXNhYmxlX2V4dGVybmFsKEFpb0NvbnRleHQgKmN0eCkNCj4+ICAgew0KPj4gKyAgICBhaW9f
+Y29udGV4dF9hY3F1aXJlKGN0eCk7DQo+PiAgICAgICBhdG9taWNfaW5jKCZjdHgtPmV4dGVybmFs
+X2Rpc2FibGVfY250KTsNCj4+ICsgICAgYWlvX2NvbnRleHRfcmVsZWFzZShjdHgpOw0KPj4gICB9
+DQo+IA0KPiBUaGlzIGFjcXVpcmUvcmVsZWFzZSBwYWlyIGxvb2tzIHJhdGhlciB1c2VsZXNzPw0K
+DQpJJ20gbm90IHN1cmUgdGhhdCBJIHVuZGVyc3RhbmQgZXZlcnl0aGluZyBjb3JyZWN0bHkuLi4N
+CmJ1dCBjYW4gYSB0aHJlYWQgKGNvbnRleHQpIHRyeSB0byBkaXNhYmxlIGV4dGVybmFsIGluIGFu
+b3RoZXIgY29udGV4dD8NCg0KPiANCj4+ICtzdGF0aWMgdm9pZCBydW5fcG9zdHBvbmVkX2NvKHZv
+aWQgKm9wYXF1ZSkNCj4+ICt7DQo+PiArICAgIEFpb0NvbnRleHQgKmN0eCA9IChBaW9Db250ZXh0
+ICopIG9wYXF1ZTsNCj4+ICsNCj4+ICsgICAgcWVtdV9jb19xdWV1ZV9yZXN0YXJ0X2FsbCgmY3R4
+LT5wb3N0cG9uZWRfcmVxcyk7DQo+PiArfQ0KPj4gICAvKioNCj4+ICAgICogYWlvX2VuYWJsZV9l
+eHRlcm5hbDoNCj4+ICAgICogQGN0eDogdGhlIGFpbyBjb250ZXh0DQo+PiBAQCAtNTA0LDEyICs1
+MjcsMTcgQEAgc3RhdGljIGlubGluZSB2b2lkIGFpb19lbmFibGVfZXh0ZXJuYWwoQWlvQ29udGV4
+dCAqY3R4KQ0KPj4gICB7DQo+PiAgICAgICBpbnQgb2xkOw0KPj4gICANCj4+ICsgICAgYWlvX2Nv
+bnRleHRfYWNxdWlyZShjdHgpOw0KPj4gICAgICAgb2xkID0gYXRvbWljX2ZldGNoX2RlYygmY3R4
+LT5leHRlcm5hbF9kaXNhYmxlX2NudCk7DQo+PiAgICAgICBhc3NlcnQob2xkID4gMCk7DQo+PiAg
+ICAgICBpZiAob2xkID09IDEpIHsNCj4+ICsgICAgICAgIENvcm91dGluZSAqY28gPSBxZW11X2Nv
+cm91dGluZV9jcmVhdGUocnVuX3Bvc3Rwb25lZF9jbywgY3R4KTsNCj4+ICsgICAgICAgIGFpb19j
+b19lbnRlcihjdHgsIGNvKTsNCj4+ICsNCj4+ICAgICAgICAgICAvKiBLaWNrIGV2ZW50IGxvb3Ag
+c28gaXQgcmUtYXJtcyBmaWxlIGRlc2NyaXB0b3JzICovDQo+PiAgICAgICAgICAgYWlvX25vdGlm
+eShjdHgpOw0KPj4gICAgICAgfQ0KPj4gKyAgICBhaW9fY29udGV4dF9yZWxlYXNlKGN0eCk7DQo+
+PiAgIH0NCj4+ICAgDQo+PiAgIC8qKg0KPj4gQEAgLTU2NCwxNSArNTkyLDYgQEAgdm9pZCBhaW9f
+Y29fc2NoZWR1bGUoQWlvQ29udGV4dCAqY3R4LCBzdHJ1Y3QgQ29yb3V0aW5lICpjbyk7DQo+PiAg
+ICAqLw0KPj4gICB2b2lkIGFpb19jb193YWtlKHN0cnVjdCBDb3JvdXRpbmUgKmNvKTsNCj4+ICAg
+DQo+PiAtLyoqDQo+PiAtICogYWlvX2NvX2VudGVyOg0KPj4gLSAqIEBjdHg6IHRoZSBjb250ZXh0
+IHRvIHJ1biB0aGUgY29yb3V0aW5lDQo+PiAtICogQGNvOiB0aGUgY29yb3V0aW5lIHRvIHJ1bg0K
+Pj4gLSAqDQo+PiAtICogRW50ZXIgYSBjb3JvdXRpbmUgaW4gdGhlIHNwZWNpZmllZCBBaW9Db250
+ZXh0Lg0KPj4gLSAqLw0KPj4gLXZvaWQgYWlvX2NvX2VudGVyKEFpb0NvbnRleHQgKmN0eCwgc3Ry
+dWN0IENvcm91dGluZSAqY28pOw0KPj4gLQ0KPj4gICAvKioNCj4+ICAgICogUmV0dXJuIHRoZSBB
+aW9Db250ZXh0IHdob3NlIGV2ZW50IGxvb3AgcnVucyBpbiB0aGUgY3VycmVudCB0aHJlYWQuDQo+
+PiAgICAqDQo+PiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9ibG9jay9ibG9jay5oIGIvaW5jbHVkZS9i
+bG9jay9ibG9jay5oDQo+PiBpbmRleCA3ZjU0NTNiNDViLi4wNjg1YTczOTc1IDEwMDY0NA0KPj4g
+LS0tIGEvaW5jbHVkZS9ibG9jay9ibG9jay5oDQo+PiArKysgYi9pbmNsdWRlL2Jsb2NrL2Jsb2Nr
+LmgNCj4+IEBAIC04Myw4ICs4MywxNCBAQCB0eXBlZGVmIGVudW0gew0KPj4gICAgICAgICovDQo+
+PiAgICAgICBCRFJWX1JFUV9TRVJJQUxJU0lORyAgICAgICAgPSAweDgwLA0KPj4gICANCj4+ICsg
+ICAgLyoNCj4+ICsgICAgICogbWFya3MgcmVxdWVzdHMgY29tbWluZyBmcm9tIGV4dGVybmFsIHNv
+dXJjZXMsDQo+PiArICAgICAqIGUuZyBibG9jayByZXF1ZXN0cyBmcm9tIGRtYSBydW5uaW5nIGlu
+IHRoZSB2Q1BVIHRocmVhZA0KPj4gKyAgICAgKi8NCj4+ICsgICAgQkRSVl9SRVFfRVhURVJOQUwg
+ICA9IDB4MTAwLA0KPiANCj4gSSBkb24ndCBsaWtlIHRoaXMgb25lIGJlY2F1c2UgQmxvY2tCYWNr
+ZW5kcyBzaG91bGQgYmUgdXNlZCBfb25seV8gZnJvbQ0KPiBleHRlcm5hbCBzb3VyY2VzLg0KPiAN
+Cj4gSSBrbm93IHRoYXQgdGhpcyBpc24ndCBxdWl0ZSB0cnVlIHRvZGF5IGFuZCB0aGVyZSBhcmUg
+c3RpbGwgYmxvY2sgam9icw0KPiBjYWxsaW5nIEJsb2NrQmFja2VuZCBpbnRlcm5hbGx5IHdoaWxl
+IGhhbmRsaW5nIGEgQkRTIHJlcXVlc3QsIGJ1dCBJIGhvcGUNCj4gd2l0aCBWbGFkaW1pcidzIGJh
+Y2t1cCBwYXRjaGVzIGdvaW5nIGl0LCB0aGlzIGNhbiBnbyBhd2F5Lg0KPiANCj4gU28gSSBzdWdn
+ZXN0IHRoYXQgZm9yIHRoZSB0aW1lIGJlaW5nLCB3ZSBpbnZlcnQgdGhlIGZsYWcgYW5kIGhhdmUg
+YQ0KPiBCRFJWX1JFUV9JTlRFUk5BTCBpbnN0ZWFkLCB3aGljaCBpcyBvbmx5IHVzZWQgZm9yIEJs
+b2NrQmFja2VuZCByZXF1ZXN0cywNCj4gaG9wZWZ1bGx5IGRvZXNuJ3QgaGF2ZSB0byBiZSB1c2Vk
+IGluIG1hbnkgcGxhY2VzIGFuZCB3aGljaCBjYW4gZ28gYXdheQ0KPiBldmVudHVhbGx5Lg0KPiAN
+Cj4+ICAgICAgIC8qIE1hc2sgb2YgdmFsaWQgZmxhZ3MgKi8NCj4+IC0gICAgQkRSVl9SRVFfTUFT
+SyAgICAgICAgICAgICAgID0gMHhmZiwNCj4+ICsgICAgQkRSVl9SRVFfTUFTSyAgICAgICAgICAg
+ICAgID0gMHhmZmYsDQo+PiAgIH0gQmRydlJlcXVlc3RGbGFnczsNCj4+ICAgDQo+PiAgIHR5cGVk
+ZWYgc3RydWN0IEJsb2NrU2l6ZXMgew0KPiANCj4gS2V2aW4NCj4gDQpEZW5pcw0KLS0gDQpCZXN0
+LA0KRGVuaXMNCg==
