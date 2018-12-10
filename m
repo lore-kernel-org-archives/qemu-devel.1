@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gWQcc-0002JQ-Fs
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:49:41 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gWQcv-0002e3-I8
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:49:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gWQQ7-0001gW-T9
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:36:48 -0500
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:45682)
+	(envelope-from <peter.maydell@linaro.org>) id 1gWQMY-000759-1i
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:33:03 -0500
+Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:34577)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gWQQ7-0001fy-Nv
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:36:43 -0500
-Received: by mail-qk1-f195.google.com with SMTP id y78so7063252qka.12
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 10:36:42 -0800 (PST)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gWQMX-0006yk-Qs
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:33:01 -0500
+Received: by mail-oi1-x235.google.com with SMTP id h25so9843187oig.1
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 10:33:01 -0800 (PST)
 MIME-Version: 1.0
-References: <20181126124250.29985-1-marcandre.lureau@redhat.com>
-	<20181126124250.29985-2-marcandre.lureau@redhat.com>
-	<20181210142956.wucn33osm7fxa27d@sirius.home.kraxel.org>
-In-Reply-To: <20181210142956.wucn33osm7fxa27d@sirius.home.kraxel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Mon, 10 Dec 2018 22:36:29 +0400
-Message-ID: <CAMxuvawUrZ=y-txTS86Tz3b-BYY05k4n-jBiY8+vO5e7AOkPKA@mail.gmail.com>
+References: <20181210175630.30643-1-peter.maydell@linaro.org>
+	<CAFEAcA8eFk79oTXmwMd0s8gVBQjf8XSaUptRkYJrgGgvdZJBcA@mail.gmail.com>
+In-Reply-To: <CAFEAcA8eFk79oTXmwMd0s8gVBQjf8XSaUptRkYJrgGgvdZJBcA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 10 Dec 2018 18:32:49 +0000
+Message-ID: <CAFEAcA8n1g4CFkOYt9+L9CmgVeE7V7BhD+K8hR0X0tQ4GJoLOg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 01/11] vhost-user: define
- conventions for vhost-user backends
+Subject: Re: [Qemu-devel] [RFC] target/microblaze: Switch to
+ transaction_failed hook
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +30,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Hoffmann, Gerd" <kraxel@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "P. Berrange,
-	Daniel" <berrange@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "patches@linaro.org" <patches@linaro.org>
 
-Hi
-
-On Mon, Dec 10, 2018 at 6:30 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
+On Mon, 10 Dec 2018 at 18:31, Peter Maydell <peter.maydell@linaro.org> wrote:
 >
-> On Mon, Nov 26, 2018 at 04:42:40PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> > As discussed during "[PATCH v4 00/29] vhost-user for input & GPU"
-> > review, let's define a common set of backend conventions to help with
-> > management layer implementation, and interoperability.
+> On Mon, 10 Dec 2018 at 17:57, Peter Maydell <peter.maydell@linaro.org> wrote:
 > >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->
-> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
->
-> btw: have you seen the idea to use a vfio-style interface for
-> communication between qemu and external device emulation processes?
+> > Switch the microblaze target from the old unassigned_access hook
+> > to the transaction_failed hook.
+> >
+> > The notable difference is that rather than it being called
+> > for all physical memory accesses which fail (including
+> > those made by DMA devices or by the gdbstub), it is only
+> > called for those made by the CPU via its MMU. For
+> > microblaze this makes no difference because none of the
+> > target CPU code needs to make loads or stores by physical
+> > address.
+> >
+> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> > ---
+> > A straightforward conversion, but tagged RFC because I don't have
+> > any microblaze test images and have tested only with "make check".
+> >
+> >  target/microblaze/cpu.h       |  7 ++++---
+> >  target/microblaze/cpu.c       |  2 +-
+> >  target/microblaze/op_helper.c | 20 ++++++++++----------
+> >  3 files changed, 15 insertions(+), 14 deletions(-)
+> >
+> > diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+> > index 3c4e0ba80ac..03ca91007d5 100644
+> > --- a/target/microblaze/cpu.h
+> > +++ b/target/microblaze/cpu.h
+> > @@ -388,9 +388,10 @@ static inline void cpu_get_tb_cpu_state(CPUMBState *env, target_ulong *pc,
+> >  }
+> >
+> >  #if !defined(CONFIG_USER_ONLY)
+> > -void mb_cpu_unassigned_access(CPUState *cpu, hwaddr addr,
+> > -                              bool is_write, bool is_exec, int is_asi,
+> > -                              unsigned size);
+> > +void mb_cpu_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
+> > +                               unsigned size, MMUAccessType access_type,
+> > +                               int mmu_idx, MemTxAttrs attrs,
+> > +                               MemTxResult response, uintptr_t retaddr);
+> >  #endif
+> >
+> >  #endif
+> > diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
+> > index 9b546a2c18e..49876b19b38 100644
+> > --- a/target/microblaze/cpu.c
+> > +++ b/target/microblaze/cpu.c
+> > @@ -297,7 +297,7 @@ static void mb_cpu_class_init(ObjectClass *oc, void *data)
+> >  #ifdef CONFIG_USER_ONLY
+> >      cc->handle_mmu_fault = mb_cpu_handle_mmu_fault;
+> >  #else
+> > -    cc->do_unassigned_access = mb_cpu_unassigned_access;
+> > +    cc->do_transaction_failed = mb_cpu_transaction_failed;
+> >      cc->get_phys_page_debug = mb_cpu_get_phys_page_debug;
+> >  #endif
+> >      dc->vmsd = &vmstate_mb_cpu;
+> > diff --git a/target/microblaze/op_helper.c b/target/microblaze/op_helper.c
+> > index 7cdbbcccaef..d25d3b626c8 100644
+> > --- a/target/microblaze/op_helper.c
+> > +++ b/target/microblaze/op_helper.c
+> > @@ -486,18 +486,18 @@ void helper_mmu_write(CPUMBState *env, uint32_t ext, uint32_t rn, uint32_t v)
+> >      mmu_write(env, ext, rn, v);
+> >  }
+> >
+> > -void mb_cpu_unassigned_access(CPUState *cs, hwaddr addr,
+> > -                              bool is_write, bool is_exec, int is_asi,
+> > -                              unsigned size)
+> > +void mb_cpu_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
+> > +                               unsigned size, MMUAccessType access_type,
+> > +                               int mmu_idx, MemTxAttrs attrs,
+> > +                               MemTxResult response, uintptr_t retaddr)
+> >  {
+> >      MicroBlazeCPU *cpu;
+> >      CPUMBState *env;
+> > -
+> > -    qemu_log_mask(CPU_LOG_INT, "Unassigned " TARGET_FMT_plx " wr=%d exe=%d\n",
+> > -             addr, is_write ? 1 : 0, is_exec ? 1 : 0);
+> > -    if (cs == NULL) {
+> > -        return;
+> > -    }
+> > +    qemu_log_mask(CPU_LOG_INT, "Transaction failed: vaddr 0x%" VADDR_PRIx
+> > +                  " physaddr 0x" TARGET_FMT_plx "size %d access type %s\n",
+> > +                  addr, physaddr, size,
+> > +                  access_type == MMU_INST_FETCH ? "INST_FETCH" :
+> > +                  (access_type == MMU_DATA_LOAD ? "DATA_LOAD" : "DATA_STORE"));
+> >      cpu = MICROBLAZE_CPU(cs);
+> >      env = &cpu->env;
 
-I heard there was some discussion during KVM forum.
+Oops. Here there should be
 
-Fwiwi, this is also an idea I proposed last year (and quickly
-discussed during my talk about multi-process qemu).
-I also experimented with the idea, and wrote a vfio-user backend, with
-a PCI serial device running in a seperate process:
-the qemu tree: https://github.com/elmarco/qemu/tree/wip/vfio-user (dirty tr=
-ee)
-and the serial device:
-https://github.com/elmarco/qemu/blob/wip/vfio-user/contrib/libvfio-user/vfi=
-o-user-serial.c
+    cpu_restore_state(cs, retaddr, true);
 
+> >      if (!(env->sregs[SR_MSR] & MSR_EE)) {
+> > @@ -505,7 +505,7 @@ void mb_cpu_unassigned_access(CPUState *cs, hwaddr addr,
+> >      }
+> >
+> >      env->sregs[SR_EAR] = addr;
+> > -    if (is_exec) {
+> > +    if (access_type == MMU_INST_FETCH) {
+> >          if ((env->pvr.regs[2] & PVR2_IOPB_BUS_EXC_MASK)) {
+> >              env->sregs[SR_ESR] = ESR_EC_INSN_BUS;
+> >              helper_raise_exception(env, EXCP_HW_EXCP);
+> > --
+> > 2.19.2
 
-
->
-> cheers,
->   Gerd
->
+thanks
+-- PMM
