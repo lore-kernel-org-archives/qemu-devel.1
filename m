@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gWTea-0005zD-SS
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 17:03:53 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gWTfz-0006eJ-HL
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 17:05:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gWTea-0000GI-1L
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 17:03:52 -0500
-References: <20181130220344.3350618-1-eblake@redhat.com>
-	<20181130220344.3350618-3-eblake@redhat.com>
-	<54a5b82e-f433-4624-d556-72cc9d43dab9@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <82bd0f2c-bafa-84ec-5585-3897a47b6325@redhat.com>
-Date: Mon, 10 Dec 2018 16:03:37 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1gWTfx-0004Hy-Kc
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 17:05:19 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:45962)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gWTfv-0003yA-Rh
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 17:05:16 -0500
+Received: by mail-ot1-x343.google.com with SMTP id 32so11985338ota.12
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 14:05:12 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <54a5b82e-f433-4624-d556-72cc9d43dab9@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 02/14] nbd/client: More consistent error
- messages
+References: <20181210183836.20074-1-qwandor@google.com>
+	<CAFEAcA9kXXeRkFamN73XREDp4QaokMs3E9TRLThKf4zYufapSQ@mail.gmail.com>
+	<CAMKQLNK2J=JsgEch3G-pQ0mjW5B-n8Xc_4PDGHjFs6CfcA2ngg@mail.gmail.com>
+In-Reply-To: <CAMKQLNK2J=JsgEch3G-pQ0mjW5B-n8Xc_4PDGHjFs6CfcA2ngg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 10 Dec 2018 22:04:59 +0000
+Message-ID: <CAFEAcA9LNUWrW1dePcKh4LLnN9xUKWswWnfjiNN_2JWExCj90A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Implement VI/VF bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,40 +30,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: wedsonaf@google.com
+Cc: qwandor@google.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 12/5/18 9:03 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 01.12.2018 1:03, Eric Blake wrote:
->> Consolidate on using decimal (not hex) and on outputting the
->> option reply name (not just value) when the client reports
->> protocol discrepancies from the server.  While it won't affect
->> normal operation, it makes debugging additions easier.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> ---
+On Mon, 10 Dec 2018 at 21:32, Wedson Almeida Filho <wedsonaf@google.com> wrote:
+>
+> Hi Peter,
+>
+> We put this together months ago and hadn't kept up to date with the changes here.
+>
+> We're happy to see that support has been added for the VI bit. Is it going to be available in the v3.1.0 release?
 
->> +        error_setg(errp, "Unexpected option type %u (%s) expected %u (%s)",
->> +                   reply->option, nbd_opt_lookup(reply->option),
->> +                   opt, nbd_opt_lookup(opt));
+Yes, that commit is in 3.1.0 -- do test it and let me know if
+there's still an issue in this area for your guest code.
 
->> @@ -378,9 +380,9 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
->>                return 1;
->>            }
->>            if (reply.type != NBD_REP_INFO) {
->> -            error_setg(errp, "unexpected reply type %" PRIu32
->> -                       " (%s), expected %u",
->> -                       reply.type, nbd_rep_lookup(reply.type), NBD_REP_INFO);
->> +            error_setg(errp, "unexpected reply type %u (%s), expected %u (%s)",
-> 
-> hmm, we are definitely inconsistent about having comma before "expected" word...
-> 
-> anyway,
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
-That's minor enough; I'll add commas to all instances, but keep your R-b.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+thanks
+-- PMM
