@@ -1,39 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1gWN1J-0000kH-By
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:58:54 -0500
+	(envelope-from <lersek@redhat.com>) id 1gWN3J-0001d8-W9
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:00:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1gWN1F-0006Mt-CR
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:58:53 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58348
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1gWN1F-0006Lv-6U
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:58:49 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wBAEs0ZZ183533
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 09:58:47 -0500
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2p9s6741kw-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 09:58:47 -0500
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
-	Mon, 10 Dec 2018 14:58:46 -0000
-References: <20181210135803.20208-1-peter.maydell@linaro.org>
-From: Farhan Ali <alifm@linux.ibm.com>
-Date: Mon, 10 Dec 2018 09:58:42 -0500
+	(envelope-from <lersek@redhat.com>) id 1gWN3G-0000b7-Pb
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:00:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40940)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gWN3E-0000Uh-K1
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:00:54 -0500
+References: <20181207165103.3992-1-philmd@redhat.com>
+	<20181207165103.3992-3-philmd@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <0f7d8556-168d-491d-433b-801837afb0dc@redhat.com>
+Date: Mon, 10 Dec 2018 16:00:33 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181210135803.20208-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20181207165103.3992-3-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <10299eda-e310-5711-cb09-f3b725daec90@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/s390/ccw.c: Don't take address of
- packed members
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/4] hw/smbios: Restrict access to
+ "smbios_ipmi.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,69 +29,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, patches@linaro.org, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <minyard@acm.org>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 
+On 12/07/18 17:51, Philippe Mathieu-Daud=C3=A9 wrote:
+> All the consumers of "smbios_ipmi.h" are located in hw/smbios/.
 
+I tried to verify this statement by grepping the tree for
+"smbios_ipmi.h". There were zero hits. Please use the more precise
+pathname "hw/smbios/ipmi.h". (I can't suggest just "ipmi.h", because
+that isn't unique.)
 
-On 12/10/2018 08:58 AM, Peter Maydell wrote:
-> Taking the address of a field in a packed struct is a bad idea, because
-> it might not be actually aligned enough for that pointer type (and
-> thus cause a crash on dereference on some host architectures). Newer
-> versions of clang warn about this.
-> 
-> Avoid the problem by using local copies of the PMCW and SCSW
-> struct fields in copy_schib_from_guest() and copy_schib_to_guest().
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+With this update:
+
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+
+Thanks,
+Laszlo
+
+> There is no need to have this include publicly exposed,
+> reduce the visibility by moving it in hw/smbios/.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
-> This seemed like a not totally ugly and reasonably localised fix
-> that satisfies clang. Oddly, this makes the generated object file
-> 15K smaller (421K vs 406K), so it might even be better code...
-> 
->   hw/s390x/css.c | 20 ++++++++++++++++----
->   1 file changed, 16 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 04ec5cc9705..ef07691e36b 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -1290,9 +1290,15 @@ void copy_scsw_to_guest(SCSW *dest, const SCSW *src)
->   static void copy_schib_to_guest(SCHIB *dest, const SCHIB *src)
->   {
->       int i;
-> +    PMCW srcpmcw, destpmcw;
-> +    SCSW srcscsw, destscsw;
-> 
-> -    copy_pmcw_to_guest(&dest->pmcw, &src->pmcw);
-> -    copy_scsw_to_guest(&dest->scsw, &src->scsw);
-> +    srcpmcw = src->pmcw;
-> +    copy_pmcw_to_guest(&destpmcw, &srcpmcw);
-> +    dest->pmcw = destpmcw;
-> +    srcscsw = src->scsw;
-> +    copy_scsw_to_guest(&destscsw, &srcscsw);
-> +    dest->scsw = destscsw;
->       dest->mba = cpu_to_be64(src->mba);
->       for (i = 0; i < ARRAY_SIZE(dest->mda); i++) {
->           dest->mda[i] = src->mda[i];
-> @@ -1339,9 +1345,15 @@ static void copy_scsw_from_guest(SCSW *dest, const SCSW *src)
->   static void copy_schib_from_guest(SCHIB *dest, const SCHIB *src)
->   {
->       int i;
-> +    PMCW srcpmcw, destpmcw;
-> +    SCSW srcscsw, destscsw;
-> 
-> -    copy_pmcw_from_guest(&dest->pmcw, &src->pmcw);
-> -    copy_scsw_from_guest(&dest->scsw, &src->scsw);
-> +    srcpmcw = src->pmcw;
-> +    copy_pmcw_from_guest(&destpmcw, &srcpmcw);
-> +    dest->pmcw = destpmcw;
-> +    srcscsw = src->scsw;
-> +    copy_scsw_from_guest(&destscsw, &srcscsw);
-> +    dest->scsw = destscsw;
->       dest->mba = be64_to_cpu(src->mba);
->       for (i = 0; i < ARRAY_SIZE(dest->mda); i++) {
->           dest->mda[i] = src->mda[i];
-> 
-
-Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+>  hw/smbios/smbios.c                                  | 2 +-
+>  include/hw/smbios/ipmi.h =3D> hw/smbios/smbios_ipmi.h | 0
+>  hw/smbios/smbios_type_38-stub.c                     | 2 +-
+>  hw/smbios/smbios_type_38.c                          | 2 +-
+>  4 files changed, 3 insertions(+), 3 deletions(-)
+>  rename include/hw/smbios/ipmi.h =3D> hw/smbios/smbios_ipmi.h (100%)
+>=20
+> diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
+> index 920939454e..30bd4731cf 100644
+> --- a/hw/smbios/smbios.c
+> +++ b/hw/smbios/smbios.c
+> @@ -28,7 +28,7 @@
+>  #include "hw/loader.h"
+>  #include "exec/cpu-common.h"
+>  #include "smbios_build.h"
+> -#include "hw/smbios/ipmi.h"
+> +#include "smbios_ipmi.h"
+> =20
+>  /* legacy structures and constants for <=3D 2.0 machines */
+>  struct smbios_header {
+> diff --git a/include/hw/smbios/ipmi.h b/hw/smbios/smbios_ipmi.h
+> similarity index 100%
+> rename from include/hw/smbios/ipmi.h
+> rename to hw/smbios/smbios_ipmi.h
+> diff --git a/hw/smbios/smbios_type_38-stub.c b/hw/smbios/smbios_type_38=
+-stub.c
+> index 5b83c9b1f1..fc4516bc8a 100644
+> --- a/hw/smbios/smbios_type_38-stub.c
+> +++ b/hw/smbios/smbios_type_38-stub.c
+> @@ -8,7 +8,7 @@
+>   */
+> =20
+>  #include "qemu/osdep.h"
+> -#include "hw/smbios/ipmi.h"
+> +#include "smbios_ipmi.h"
+> =20
+>  void smbios_build_type_38_table(void)
+>  {
+> diff --git a/hw/smbios/smbios_type_38.c b/hw/smbios/smbios_type_38.c
+> index 56e8609c00..d84e87d608 100644
+> --- a/hw/smbios/smbios_type_38.c
+> +++ b/hw/smbios/smbios_type_38.c
+> @@ -9,10 +9,10 @@
+> =20
+>  #include "qemu/osdep.h"
+>  #include "hw/ipmi/ipmi.h"
+> -#include "hw/smbios/ipmi.h"
+>  #include "hw/smbios/smbios.h"
+>  #include "qemu/error-report.h"
+>  #include "smbios_build.h"
+> +#include "smbios_ipmi.h"
+> =20
+>  /* SMBIOS type 38 - IPMI */
+>  struct smbios_type_38 {
+>=20
