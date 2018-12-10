@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gWOyv-00071p-9F
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:04:34 -0500
+	(envelope-from <armbru@redhat.com>) id 1gWOzS-0007Md-OF
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:05:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gWOyo-0003kT-Kr
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:04:33 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:36689)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gWOyn-0003jy-Pi
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:04:26 -0500
-Received: by mail-oi1-x244.google.com with SMTP id x23so9561812oix.3
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 09:04:25 -0800 (PST)
-References: <cover.1544229872.git.alistair.francis@wdc.com>
-	<d6c491ecb5c0224c113ddfb2c06552ec89b68227.1544229872.git.alistair.francis@wdc.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b4a5e3e9-5e62-c0a3-67e3-891725db89d5@linaro.org>
-Date: Mon, 10 Dec 2018 11:04:21 -0600
+	(envelope-from <armbru@redhat.com>) id 1gWOzP-000402-F0
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:05:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36496)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gWOzP-0003z7-7m
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:05:03 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181208111606.8505-1-marcandre.lureau@redhat.com>
+	<20181208111606.8505-12-marcandre.lureau@redhat.com>
+Date: Mon, 10 Dec 2018 18:04:56 +0100
+In-Reply-To: <20181208111606.8505-12-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Sat, 8 Dec 2018 15:15:50 +0400")
+Message-ID: <87in01e2iv.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <d6c491ecb5c0224c113ddfb2c06552ec89b68227.1544229872.git.alistair.francis@wdc.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3 04/24] linux-user: riscv: Fix compile
- failure on riscv32 hosts
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v7 11/27] qapi: pass long form enum
+ to make_enum_members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,46 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
-Cc: "alistair23@gmail.com" <alistair23@gmail.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 12/7/18 6:46 PM, Alistair Francis wrote:
-> When cross compilling for riscv32 hosts using GCC 8.2 this error is seen:
->     error: '__NR__llseek' undeclared (first use in this function); did you mean '_llseek'?
-> 
-> To avoid the error let's ensure that __NR__llseek is defined.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+
+> This will allow to get rid of short form handling in a following
+> patch.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Suggested-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  linux-user/riscv/target_syscall.h | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/linux-user/riscv/target_syscall.h b/linux-user/riscv/target_syscall.h
-> index ee81d8bc88..af73f71839 100644
-> --- a/linux-user/riscv/target_syscall.h
-> +++ b/linux-user/riscv/target_syscall.h
-> @@ -47,6 +47,11 @@ struct target_pt_regs {
->  #endif
->  #define UNAME_MINIMUM_RELEASE "4.15.0"
->  
-> +/* This is sometimes needed to compile riscv32 Linux user mode */
-> +#if !defined(__NR__llseek) && !defined(__NR_lseek)
-> +#define __NR__llseek __NR3264_lseek
-> +#endif
+>  scripts/qapi/common.py | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+>
+> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+> index fdc0fd69ef..557b413950 100644
+> --- a/scripts/qapi/common.py
+> +++ b/scripts/qapi/common.py
+> @@ -1663,9 +1663,10 @@ class QAPISchema(object):
+>          self.the_empty_object_type =3D QAPISchemaObjectType(
+>              'q_empty', None, None, None, None, [], None)
+>          self._def_entity(self.the_empty_object_type)
+> -        qtype_values =3D self._make_enum_members(['none', 'qnull', 'qnum=
+',
+> -                                                'qstring', 'qdict', 'qli=
+st',
+> -                                                'qbool'])
+> +
+> +        qtypes =3D ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist'=
+, 'qbool']
 
-I'm not quite sure how this could be.  Upstream I see
+Long line.
 
-#if __BITS_PER_LONG == 64 && !defined(__SYSCALL_COMPAT)
-...
-#define __NR_lseek __NR3264_lseek
-...
-#else
-...
-#define __NR_llseek __NR3264_lseek
+> +        qtype_values =3D self._make_enum_members([{'name': n} for n in q=
+types])
+> +
+>          self._def_entity(QAPISchemaEnumType('QType', None, None, None,
+>                                              qtype_values, 'QTYPE'))
 
-so this define should already exist.
+We may want to squash this one into PATCH 08 as mentioned in that
+patch's review.
 
-Do you have the wrong headers installed for the cross-build?
-
-
-r~
+In case we don't:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
