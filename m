@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gWR2v-00022m-Mw
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:16:50 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gWRCA-0005eh-7P
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:26:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gWR2p-0003z5-VA
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:16:48 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:36506)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gWR2o-0003xE-U2
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:16:43 -0500
-Received: by mail-oi1-x243.google.com with SMTP id x23so9939507oix.3
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 11:16:41 -0800 (PST)
-References: <20181207085635.4291-1-mark.cave-ayland@ilande.co.uk>
-	<20181207085635.4291-4-mark.cave-ayland@ilande.co.uk>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <54550637-3a70-722f-a98f-6bd93958b644@linaro.org>
-Date: Mon, 10 Dec 2018 13:16:37 -0600
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gWRC6-0003BQ-6y
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:26:22 -0500
 MIME-Version: 1.0
-In-Reply-To: <20181207085635.4291-4-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 3/6] target/ppc: introduce
- get_cpu_vsr{l, h}() and set_cpu_vsr{l, h}() helpers for VSR register access
+References: <03506cf0-a204-f619-8ee4-4990a5e69af5@cea.fr>
+In-Reply-To: <03506cf0-a204-f619-8ee4-4990a5e69af5@cea.fr>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Mon, 10 Dec 2018 20:26:05 +0100
+Message-ID: <CAAdtpL5BdqUvHpVTpKuJ6R+yEHGi7U6T9rUK2PbL3nwC7F_3jA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] Fixes i386 xchgq test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,20 +23,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: fabrice.desclaux@cea.fr, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>, camille.mougey@cea.fr
 
-On 12/7/18 2:56 AM, Mark Cave-Ayland wrote:
-> +static inline void get_vsr(TCGv_i64 dst, int n)
-> +{
-> +    tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUPPCState, vsr[n]));
-> +}
-> +
-> +static inline void set_vsr(int n, TCGv_i64 src)
-> +{
-> +    tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState, vsr[n]));
-> +}
+Hi Fabrice,
 
-Why isn't this helper still using cpu_vsr[n]?
+On Fri, Dec 7, 2018 at 5:06 PM <fabrice.desclaux@cea.fr> wrote:
+>
+> As "xchg" reads and writes both operands, the "+m" is required to avoid
+> undefined behavior on -O2 compilation.
+>
+> Signed-off-by: Fabrice Desclaux <fabrice.desclaux@cea.fr>
+> ---
+>   tests/tcg/i386/test-i386.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/tests/tcg/i386/test-i386.c b/tests/tcg/i386/test-i386.c
+> index a29b41e764..18d5609665 100644
+> --- a/tests/tcg/i386/test-i386.c
+> +++ b/tests/tcg/i386/test-i386.c
+> @@ -1137,7 +1137,7 @@ void test_xchg(void)
+>       TEST_XCHG(xchgb, "b", "+q");
+>
+>   #if defined(__x86_64__)
+> -    TEST_XCHG(xchgq, "", "=m");
+> +    TEST_XCHG(xchgq, "", "+m");
+>   #endif
+>       TEST_XCHG(xchgl, "k", "+m");
+>       TEST_XCHG(xchgw, "w", "+m");
+> --
+> 2.19.2
 
+All QEMU patches has to go via the qemu-devel@nongnu.org list (you
+only sent it to the trivial list).
+I'm also Cc'ing the maintainers:
 
-r~
+$ ./scripts/get_maintainer.pl -f tests/tcg/i386/test-i386.c
+Paolo Bonzini <pbonzini@redhat.com> (maintainer:X86)
+Richard Henderson <rth@twiddle.net> (maintainer:X86)
+Eduardo Habkost <ehabkost@redhat.com> (maintainer:X86)
+qemu-devel@nongnu.org (open list:All patches CC here)
+
+Regards,
+
+Phil.
