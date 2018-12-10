@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWQcv-0002e3-I8
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gWQcv-00033u-I5
 	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:49:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWQMY-000759-1i
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:33:03 -0500
-Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:34577)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gWQMj-0007a0-0a
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:33:14 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33665)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gWQMX-0006yk-Qs
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:33:01 -0500
-Received: by mail-oi1-x235.google.com with SMTP id h25so9843187oig.1
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 10:33:01 -0800 (PST)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gWQMi-0007Zd-OB
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:33:12 -0500
+Received: by mail-wr1-x444.google.com with SMTP id c14so11587748wrr.0
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 10:33:12 -0800 (PST)
 MIME-Version: 1.0
-References: <20181210175630.30643-1-peter.maydell@linaro.org>
-	<CAFEAcA8eFk79oTXmwMd0s8gVBQjf8XSaUptRkYJrgGgvdZJBcA@mail.gmail.com>
-In-Reply-To: <CAFEAcA8eFk79oTXmwMd0s8gVBQjf8XSaUptRkYJrgGgvdZJBcA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Dec 2018 18:32:49 +0000
-Message-ID: <CAFEAcA8n1g4CFkOYt9+L9CmgVeE7V7BhD+K8hR0X0tQ4GJoLOg@mail.gmail.com>
+References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
+	<20180706105753.26700-19-marcandre.lureau@redhat.com>
+	<871s6ubp1g.fsf@dusky.pond.sub.org>
+In-Reply-To: <871s6ubp1g.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 10 Dec 2018 22:32:59 +0400
+Message-ID: <CAJ+F1C+CTew2Uqz3EEJHS93MZhKrqchcwBFC+8VyExk1+3Vgew@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC] target/microblaze: Switch to
- transaction_failed hook
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 18/27] qapi: add an error in case a
+ discriminator is conditionnal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,113 +32,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "patches@linaro.org" <patches@linaro.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
-On Mon, 10 Dec 2018 at 18:31, Peter Maydell <peter.maydell@linaro.org> wrote:
+Hi
+
+On Thu, Dec 6, 2018 at 8:25 PM Markus Armbruster <armbru@redhat.com> wrote:
 >
-> On Mon, 10 Dec 2018 at 17:57, Peter Maydell <peter.maydell@linaro.org> wrote:
-> >
-> > Switch the microblaze target from the old unassigned_access hook
-> > to the transaction_failed hook.
-> >
-> > The notable difference is that rather than it being called
-> > for all physical memory accesses which fail (including
-> > those made by DMA devices or by the gdbstub), it is only
-> > called for those made by the CPU via its MMU. For
-> > microblaze this makes no difference because none of the
-> > target CPU code needs to make loads or stores by physical
-> > address.
-> >
-> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+> > Making a discriminator conditonal doesn't make much sense.
+>
+> Good point (so easy to overlook!), but why first add the 'if' feature
+> broken that way in PATCH 16, then fix it up in PATCH 18?
+
+Not sure, I guess I found out after. Feel free to squash
+
+>
+> >                                                            Instead,
+> > the union could be made conditional.
+>
+> What do you mean by that?
+
+That the alternative is probably to make the whole union conditional
+
+>
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > > ---
-> > A straightforward conversion, but tagged RFC because I don't have
-> > any microblaze test images and have tested only with "make check".
+> >  scripts/qapi/common.py                          | 11 +++++++++--
+> >  tests/Makefile.include                          |  1 +
+> >  .../flat-union-invalid-if-discriminator.err     |  1 +
+> >  .../flat-union-invalid-if-discriminator.exit    |  1 +
+> >  .../flat-union-invalid-if-discriminator.json    | 17 +++++++++++++++++
+> >  .../flat-union-invalid-if-discriminator.out     |  0
+> >  6 files changed, 29 insertions(+), 2 deletions(-)
+> >  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminat=
+or.err
+> >  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminat=
+or.exit
+> >  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminat=
+or.json
+> >  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminat=
+or.out
 > >
-> >  target/microblaze/cpu.h       |  7 ++++---
-> >  target/microblaze/cpu.c       |  2 +-
-> >  target/microblaze/op_helper.c | 20 ++++++++++----------
-> >  3 files changed, 15 insertions(+), 14 deletions(-)
+> > diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+> > index 9b95f8cfe9..13fbb28493 100644
+> > --- a/scripts/qapi/common.py
+> > +++ b/scripts/qapi/common.py
+> > @@ -577,7 +577,8 @@ def find_alternate_member_qtype(qapi_type):
 > >
-> > diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-> > index 3c4e0ba80ac..03ca91007d5 100644
-> > --- a/target/microblaze/cpu.h
-> > +++ b/target/microblaze/cpu.h
-> > @@ -388,9 +388,10 @@ static inline void cpu_get_tb_cpu_state(CPUMBState *env, target_ulong *pc,
-> >  }
+> >  # Return the discriminator enum define if discriminator is specified a=
+s an
+> >  # enum type, otherwise return None.
+> > -def discriminator_find_enum_define(expr):
+> > +def discriminator_find_enum_define(expr, info):
+> > +    name =3D expr['union']
+> >      base =3D expr.get('base')
+> >      discriminator =3D expr.get('discriminator')
 > >
-> >  #if !defined(CONFIG_USER_ONLY)
-> > -void mb_cpu_unassigned_access(CPUState *cpu, hwaddr addr,
-> > -                              bool is_write, bool is_exec, int is_asi,
-> > -                              unsigned size);
-> > +void mb_cpu_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
-> > +                               unsigned size, MMUAccessType access_type,
-> > +                               int mmu_idx, MemTxAttrs attrs,
-> > +                               MemTxResult response, uintptr_t retaddr);
-> >  #endif
+> > @@ -592,6 +593,11 @@ def discriminator_find_enum_define(expr):
+> >      if not discriminator_member:
+> >          return None
 > >
-> >  #endif
-> > diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-> > index 9b546a2c18e..49876b19b38 100644
-> > --- a/target/microblaze/cpu.c
-> > +++ b/target/microblaze/cpu.c
-> > @@ -297,7 +297,7 @@ static void mb_cpu_class_init(ObjectClass *oc, void *data)
-> >  #ifdef CONFIG_USER_ONLY
-> >      cc->handle_mmu_fault = mb_cpu_handle_mmu_fault;
-> >  #else
-> > -    cc->do_unassigned_access = mb_cpu_unassigned_access;
-> > +    cc->do_transaction_failed = mb_cpu_transaction_failed;
-> >      cc->get_phys_page_debug = mb_cpu_get_phys_page_debug;
-> >  #endif
-> >      dc->vmsd = &vmstate_mb_cpu;
-> > diff --git a/target/microblaze/op_helper.c b/target/microblaze/op_helper.c
-> > index 7cdbbcccaef..d25d3b626c8 100644
-> > --- a/target/microblaze/op_helper.c
-> > +++ b/target/microblaze/op_helper.c
-> > @@ -486,18 +486,18 @@ void helper_mmu_write(CPUMBState *env, uint32_t ext, uint32_t rn, uint32_t v)
-> >      mmu_write(env, ext, rn, v);
-> >  }
+> > +    if discriminator_member.get('if'):
+> > +        raise QAPISemError(info, 'The discriminator %s.%s for union %s=
+ '
+> > +                           'must not be conditional' %
+> > +                           (base, discriminator, name))
+> > +
+> >      return enum_types.get(discriminator_member['type'])
 > >
-> > -void mb_cpu_unassigned_access(CPUState *cs, hwaddr addr,
-> > -                              bool is_write, bool is_exec, int is_asi,
-> > -                              unsigned size)
-> > +void mb_cpu_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
-> > +                               unsigned size, MMUAccessType access_type,
-> > +                               int mmu_idx, MemTxAttrs attrs,
-> > +                               MemTxResult response, uintptr_t retaddr)
-> >  {
-> >      MicroBlazeCPU *cpu;
-> >      CPUMBState *env;
-> > -
-> > -    qemu_log_mask(CPU_LOG_INT, "Unassigned " TARGET_FMT_plx " wr=%d exe=%d\n",
-> > -             addr, is_write ? 1 : 0, is_exec ? 1 : 0);
-> > -    if (cs == NULL) {
-> > -        return;
-> > -    }
-> > +    qemu_log_mask(CPU_LOG_INT, "Transaction failed: vaddr 0x%" VADDR_PRIx
-> > +                  " physaddr 0x" TARGET_FMT_plx "size %d access type %s\n",
-> > +                  addr, physaddr, size,
-> > +                  access_type == MMU_INST_FETCH ? "INST_FETCH" :
-> > +                  (access_type == MMU_DATA_LOAD ? "DATA_LOAD" : "DATA_STORE"));
-> >      cpu = MICROBLAZE_CPU(cs);
-> >      env = &cpu->env;
+> >
+>
+> I'm afraid this isn't the proper place to check.  It's an accessor
+> function for @struct_types and @enum_types.  The check should go into
+> check_union(), like this:
 
-Oops. Here there should be
+indeed, thanks for the hint
 
-    cpu_restore_state(cs, retaddr, true);
-
-> >      if (!(env->sregs[SR_MSR] & MSR_EE)) {
-> > @@ -505,7 +505,7 @@ void mb_cpu_unassigned_access(CPUState *cs, hwaddr addr,
-> >      }
+>
+> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+> index 0cf39df404..c1bc9e9c29 100644
+> --- a/scripts/qapi/common.py
+> +++ b/scripts/qapi/common.py
+> @@ -799,6 +794,11 @@ def check_union(expr, info):
+>                                 "Discriminator '%s' is not a member of ba=
+se "
+>                                 "struct '%s'"
+>                                 % (discriminator, base))
+> +        if discriminator_member.get('if'):
+> +            raise QAPISemError(info, 'The discriminator %s.%s for union =
+%s '
+> +                               'must not be conditional' %
+> +                               (base, discriminator, name))
+> +
+>          enum_define =3D enum_types.get(discriminator_member['type'])
+>          allow_metas =3D ['struct']
+>          # Do not allow string discriminator
+>
+> > @@ -1020,7 +1026,8 @@ def check_exprs(exprs):
 > >
-> >      env->sregs[SR_EAR] = addr;
-> > -    if (is_exec) {
-> > +    if (access_type == MMU_INST_FETCH) {
-> >          if ((env->pvr.regs[2] & PVR2_IOPB_BUS_EXC_MASK)) {
-> >              env->sregs[SR_ESR] = ESR_EC_INSN_BUS;
-> >              helper_raise_exception(env, EXCP_HW_EXCP);
-> > --
-> > 2.19.2
+> >          if 'include' in expr:
+> >              continue
+> > -        if 'union' in expr and not discriminator_find_enum_define(expr=
+):
+> > +        info =3D expr_elem['info']
+> > +        if 'union' in expr and not discriminator_find_enum_define(expr=
+, info):
+> >              name =3D '%sKind' % expr['union']
+> >          elif 'alternate' in expr:
+> >              name =3D '%sKind' % expr['alternate']
+> > diff --git a/tests/Makefile.include b/tests/Makefile.include
+> > index 43e100a6cd..abc3fdf764 100644
+> > --- a/tests/Makefile.include
+> > +++ b/tests/Makefile.include
+> > @@ -510,6 +510,7 @@ qapi-schema +=3D flat-union-inline.json
+> >  qapi-schema +=3D flat-union-int-branch.json
+> >  qapi-schema +=3D flat-union-invalid-branch-key.json
+> >  qapi-schema +=3D flat-union-invalid-discriminator.json
+> > +qapi-schema +=3D flat-union-invalid-if-discriminator.json
+> >  qapi-schema +=3D flat-union-no-base.json
+> >  qapi-schema +=3D flat-union-optional-discriminator.json
+> >  qapi-schema +=3D flat-union-string-discriminator.json
+> > diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.err =
+b/tests/qapi-schema/flat-union-invalid-if-discriminator.err
+> > new file mode 100644
+> > index 0000000000..0c94c9860d
+> > --- /dev/null
+> > +++ b/tests/qapi-schema/flat-union-invalid-if-discriminator.err
+> > @@ -0,0 +1 @@
+> > +tests/qapi-schema/flat-union-invalid-if-discriminator.json:13: The dis=
+criminator TestBase.enum1 for union TestUnion must not be conditional
+> > diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.exit=
+ b/tests/qapi-schema/flat-union-invalid-if-discriminator.exit
+> > new file mode 100644
+> > index 0000000000..d00491fd7e
+> > --- /dev/null
+> > +++ b/tests/qapi-schema/flat-union-invalid-if-discriminator.exit
+> > @@ -0,0 +1 @@
+> > +1
+> > diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.json=
+ b/tests/qapi-schema/flat-union-invalid-if-discriminator.json
+> > new file mode 100644
+> > index 0000000000..618ec36396
+> > --- /dev/null
+> > +++ b/tests/qapi-schema/flat-union-invalid-if-discriminator.json
+> > @@ -0,0 +1,17 @@
+> > +{ 'enum': 'TestEnum',
+> > +  'data': [ 'value1', 'value2' ] }
+> > +
+> > +{ 'struct': 'TestBase',
+> > +  'data': { 'enum1': { 'type': 'TestEnum', 'if': 'FOO' } } }
+> > +
+> > +{ 'struct': 'TestTypeA',
+> > +  'data': { 'string': 'str' } }
+> > +
+> > +{ 'struct': 'TestTypeB',
+> > +  'data': { 'integer': 'int' } }
+> > +
+> > +{ 'union': 'TestUnion',
+> > +  'base': 'TestBase',
+> > +  'discriminator': 'enum1',
+> > +  'data': { 'value1': 'TestTypeA',
+> > +            'value2': 'TestTypeB' } }
+> > diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.out =
+b/tests/qapi-schema/flat-union-invalid-if-discriminator.out
+> > new file mode 100644
+> > index 0000000000..e69de29bb2
+>
 
-thanks
--- PMM
+
+--
+Marc-Andr=C3=A9 Lureau
