@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gWPoZ-0008TH-Er
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:57:56 -0500
+	(envelope-from <leozinho29_eu@hotmail.com>) id 1gWPqB-0001TO-Jp
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:59:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gWPoY-0001Xl-9u
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:57:55 -0500
-Date: Mon, 10 Dec 2018 12:57:41 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181210125731-mutt-send-email-mst@kernel.org>
-References: <20181210112649.11581-1-peter.maydell@linaro.org>
-	<20181210112649.11581-4-peter.maydell@linaro.org>
+	(envelope-from <leozinho29_eu@hotmail.com>) id 1gWPq5-0002Nj-0C
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:59:33 -0500
+Received: from mail-oln040092003070.outbound.protection.outlook.com
+	([40.92.3.70]:37855
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <leozinho29_eu@hotmail.com>)
+	id 1gWPq4-0002Jt-FX
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:59:28 -0500
+From: =?utf-8?B?TGVvbmFyZG8gU29hcmVzIE3DvGxsZXI=?= <leozinho29_eu@hotmail.com>
+Date: Mon, 10 Dec 2018 17:59:16 +0000
+Message-ID: <RO1P152MB14830626598EB7237193F0E497A50@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+References: <RO1P152MB14839E480D046B4052F0ADC797A40@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+	<20181210063657.2lqj7vkqwdaobp7e@sirius.home.kraxel.org>
+	<RO1P152MB1483300ECF25FEE36927B1AF97A50@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+	<20181210125613.x6mrmfgvtcoo3sv3@sirius.home.kraxel.org>
+In-Reply-To: <20181210125613.x6mrmfgvtcoo3sv3@sirius.home.kraxel.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C1D537E05F8B824892CD78A80B79131B@LAMP152.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181210112649.11581-4-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 3/3] uuid: Make qemu_uuid_bswap() take and
- return a QemuUUID
+Subject: Re: [Qemu-devel] Guests are crashing on startup,
+ seem related to usb-audio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,137 +35,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Ben Warren <ben@skyportsystems.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Weil <sw@weilnetz.de>
+To: "kraxel@redhat.com" <kraxel@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Mon, Dec 10, 2018 at 11:26:49AM +0000, Peter Maydell wrote:
-> Currently qemu_uuid_bswap() takes a pointer to the QemuUUID to
-> be byte-swapped. This means it can't be used when the UUID
-> to be swapped is in a packed member of a struct. It's also
-> out of line with the general bswap*() functions we provide
-> in bswap.h, which take the value to be swapped and return it.
-> 
-> Make qemu_uuid_bswap() take a QemuUUID and return the swapped version.
-> 
-> This fixes some clang warnings about taking the address of
-> a packed struct member in block/vdi.c.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-For acpi:
-
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-
-> ---
->  include/qemu/uuid.h  |  2 +-
->  block/vdi.c          | 16 ++++++++--------
->  hw/acpi/vmgenid.c    |  6 ++----
->  tests/vmgenid-test.c |  2 +-
->  util/uuid.c          | 10 +++++-----
->  5 files changed, 17 insertions(+), 19 deletions(-)
-> 
-> diff --git a/include/qemu/uuid.h b/include/qemu/uuid.h
-> index 09489ce5c5e..037357d990b 100644
-> --- a/include/qemu/uuid.h
-> +++ b/include/qemu/uuid.h
-> @@ -56,6 +56,6 @@ char *qemu_uuid_unparse_strdup(const QemuUUID *uuid);
->  
->  int qemu_uuid_parse(const char *str, QemuUUID *uuid);
->  
-> -void qemu_uuid_bswap(QemuUUID *uuid);
-> +QemuUUID qemu_uuid_bswap(QemuUUID uuid);
->  
->  #endif
-> diff --git a/block/vdi.c b/block/vdi.c
-> index 4cc726047c3..0c34f6bae46 100644
-> --- a/block/vdi.c
-> +++ b/block/vdi.c
-> @@ -203,10 +203,10 @@ static void vdi_header_to_cpu(VdiHeader *header)
->      header->block_extra = le32_to_cpu(header->block_extra);
->      header->blocks_in_image = le32_to_cpu(header->blocks_in_image);
->      header->blocks_allocated = le32_to_cpu(header->blocks_allocated);
-> -    qemu_uuid_bswap(&header->uuid_image);
-> -    qemu_uuid_bswap(&header->uuid_last_snap);
-> -    qemu_uuid_bswap(&header->uuid_link);
-> -    qemu_uuid_bswap(&header->uuid_parent);
-> +    header->uuid_image = qemu_uuid_bswap(header->uuid_image);
-> +    header->uuid_last_snap = qemu_uuid_bswap(header->uuid_last_snap);
-> +    header->uuid_link = qemu_uuid_bswap(header->uuid_link);
-> +    header->uuid_parent = qemu_uuid_bswap(header->uuid_parent);
->  }
->  
->  static void vdi_header_to_le(VdiHeader *header)
-> @@ -227,10 +227,10 @@ static void vdi_header_to_le(VdiHeader *header)
->      header->block_extra = cpu_to_le32(header->block_extra);
->      header->blocks_in_image = cpu_to_le32(header->blocks_in_image);
->      header->blocks_allocated = cpu_to_le32(header->blocks_allocated);
-> -    qemu_uuid_bswap(&header->uuid_image);
-> -    qemu_uuid_bswap(&header->uuid_last_snap);
-> -    qemu_uuid_bswap(&header->uuid_link);
-> -    qemu_uuid_bswap(&header->uuid_parent);
-> +    header->uuid_image = qemu_uuid_bswap(header->uuid_image);
-> +    header->uuid_last_snap = qemu_uuid_bswap(header->uuid_last_snap);
-> +    header->uuid_link = qemu_uuid_bswap(header->uuid_link);
-> +    header->uuid_parent = qemu_uuid_bswap(header->uuid_parent);
->  }
->  
->  static void vdi_header_print(VdiHeader *header)
-> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-> index d78b579a201..02717a8b0dc 100644
-> --- a/hw/acpi/vmgenid.c
-> +++ b/hw/acpi/vmgenid.c
-> @@ -30,8 +30,7 @@ void vmgenid_build_acpi(VmGenIdState *vms, GArray *table_data, GArray *guid,
->       * first, since that's what the guest expects
->       */
->      g_array_set_size(guid, VMGENID_FW_CFG_SIZE - ARRAY_SIZE(guid_le.data));
-> -    guid_le = vms->guid;
-> -    qemu_uuid_bswap(&guid_le);
-> +    guid_le = qemu_uuid_bswap(vms->guid);
->      /* The GUID is written at a fixed offset into the fw_cfg file
->       * in order to implement the "OVMF SDT Header probe suppressor"
->       * see docs/specs/vmgenid.txt for more details
-> @@ -149,8 +148,7 @@ static void vmgenid_update_guest(VmGenIdState *vms)
->               * however, will expect the fields to be little-endian.
->               * Perform a byte swap immediately before writing.
->               */
-> -            guid_le = vms->guid;
-> -            qemu_uuid_bswap(&guid_le);
-> +            guid_le = qemu_uuid_bswap(vms->guid);
->              /* The GUID is written at a fixed offset into the fw_cfg file
->               * in order to implement the "OVMF SDT Header probe suppressor"
->               * see docs/specs/vmgenid.txt for more details.
-> diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-> index 0a6fb55f2eb..98db43f5a65 100644
-> --- a/tests/vmgenid-test.c
-> +++ b/tests/vmgenid-test.c
-> @@ -110,7 +110,7 @@ static void read_guid_from_memory(QemuUUID *guid)
->      /* The GUID is in little-endian format in the guest, while QEMU
->       * uses big-endian.  Swap after reading.
->       */
-> -    qemu_uuid_bswap(guid);
-> +    *guid = qemu_uuid_bswap(*guid);
->  }
->  
->  static void read_guid_from_monitor(QemuUUID *guid)
-> diff --git a/util/uuid.c b/util/uuid.c
-> index ebf06c049ad..5787f0978c1 100644
-> --- a/util/uuid.c
-> +++ b/util/uuid.c
-> @@ -110,10 +110,10 @@ int qemu_uuid_parse(const char *str, QemuUUID *uuid)
->  
->  /* Swap from UUID format endian (BE) to the opposite or vice versa.
->   */
-> -void qemu_uuid_bswap(QemuUUID *uuid)
-> +QemuUUID qemu_uuid_bswap(QemuUUID uuid)
->  {
-> -    assert(QEMU_PTR_IS_ALIGNED(uuid, sizeof(uint32_t)));
-> -    bswap32s(&uuid->fields.time_low);
-> -    bswap16s(&uuid->fields.time_mid);
-> -    bswap16s(&uuid->fields.time_high_and_version);
-> +    bswap32s(&uuid.fields.time_low);
-> +    bswap16s(&uuid.fields.time_mid);
-> +    bswap16s(&uuid.fields.time_high_and_version);
-> +    return uuid;
->  }
-> -- 
-> 2.19.2
+SSBhbSB0ZXN0aW5nIHRoaXMgUUVNVSBidWlsZCBpbiB0d28gVk0gZ3Vlc3RzLCBvbmUgTWFnZWlh
+IDcgYW5kIG90aGVyDQpvcGVuU1VTRSBMZWFwLiBUaGV5IHJlYWNoIHRoZSBncmFwaGljYWwgc2Vz
+c2lvbiwgcGxheSBhIHNvdW5kIHVzaW5nDQphcGxheSBhbmQgcmVib290IGF1dG9tYXRpY2FsbHku
+IFRoZSBzY3JlZW4gYW5kIGF1ZGlvIGZyb20gdGhlIGhvc3Qgd2VyZQ0KY2FwdHVyZWQgdG8gY2hl
+Y2sgaWYgdGhlIHNvdW5kIHdvdWxkIHdvcmsgZXZlbiB3aXRoIHRoZSB3YXJuaW5nLg0KDQpPbmNl
+LCB0aGUgTWFnZWlhIDcgZ3Vlc3QgaGFkIGluIHRoZSB0ZXJtaW5hbDoNCg0KcWVtdS1zeXN0ZW0t
+eDg2XzY0OiB3YXJuaW5nOiB1c2ItYXVkaW86IDAvMTkyDQoNCkFuZCBpdCBjb250aW51ZWQgb3Bl
+cmF0aW5nIG5vcm1hbGx5LCB3aXRoIG5vIGNyYXNoIG9yIGZyZWV6ZSBhbmQgc291bmQNCnBsYXll
+ZCBub3JtYWxseS4gT25lIHZpZGVvIHNob3dpbmcgaXRzIGJlaGF2aW9yIGNhbiBiZSBzZWVuIG9u
+IHRoaXMgbGluazoNCg0KaHR0cHM6Ly9jZG4uZGlzY29yZGFwcC5jb20vYXR0YWNobWVudHMvNDU3
+NzQ3MTg5NjE2MjE0MDE5LzUyMTc0NDg4NzE5Mjg3OTEyMC9xZW11LXRlc3RlLWF1ZGlvMDAyLndl
+Ym0NCg0KVGhlIHNvdW5kIHF1YWxpdHkgaW4gdGhlIHZpZGVvIGlzIHdvcnNlIHRoYW4gbm9ybWFs
+IGJlY2F1c2UgdGhlIE1hZ2VpYQ0KZ3Vlc3Qgc2FtcGxlIHJhdGUgaXMgc2V0IHRvIDQ0MTAwIEh6
+IHdoaWxlIHRoZSB1c2ItYXVkaW8gc2FtcGxlIHJhdGUgaXMNCjQ4MDAwIEh6IGFuZCBiZWNhdXNl
+IEZGbXBlZyAibWFnbmlmaWVzIiBjZXJ0YWluIGF1ZGlvIGlzc3Vlcy4NCg0KVGhlIG9wZW5TVVNF
+IGd1ZXN0IGhhcyBvbmNlIHNob3duIHRoZSBmb2xsb3dpbmc6DQoNCnF4bF9zZW5kX2V2ZW50czog
+c3BpY2Utc2VydmVyIGJ1ZzogZ3Vlc3Qgc3RvcHBlZCwgaWdub3JpbmcNCltUaHJlYWQgMHg3ZmZm
+Y2Y3ZmU3MDAgKExXUCAxMjc3MSkgZXhpdGVkXQ0KW05ldyBUaHJlYWQgMHg3ZmZmY2Y3ZmU3MDAg
+KExXUCAxMzAzNildDQpbVGhyZWFkIDB4N2ZmZmNmN2ZlNzAwIChMV1AgMTMwMzYpIGV4aXRlZF0N
+CltOZXcgVGhyZWFkIDB4N2ZmZmNmN2ZlNzAwIChMV1AgMTMwNjcpXQ0KW1RocmVhZCAweDdmZmZj
+ZjdmZTcwMCAoTFdQIDEzMDY3KSBleGl0ZWRdDQpbTmV3IFRocmVhZCAweDdmZmZjZjdmZTcwMCAo
+TFdQIDEzMDk4KV0NCnFlbXUtc3lzdGVtLXg4Nl82NDogd2FybmluZzogdXNiLWF1ZGlvOiAwLzE5
+Mg0KcWVtdS1zeXN0ZW0teDg2XzY0OiB3YXJuaW5nOiB1c2ItYXVkaW86IDAvMTkyDQpxZW11LXN5
+c3RlbS14ODZfNjQ6IHdhcm5pbmc6IHVzYi1hdWRpbzogMC8xOTINCnFlbXUtc3lzdGVtLXg4Nl82
+NDogd2FybmluZzogdXNiLWF1ZGlvOiAwLzE5Mg0KcWVtdS1zeXN0ZW0teDg2XzY0OiB3YXJuaW5n
+OiB1c2ItYXVkaW86IDAvMTkyDQpxZW11LXN5c3RlbS14ODZfNjQ6IHdhcm5pbmc6IHVzYi1hdWRp
+bzogMC8xOTINCnFlbXUtc3lzdGVtLXg4Nl82NDogd2FybmluZzogdXNiLWF1ZGlvOiAwLzE5Mg0K
+cWVtdS1zeXN0ZW0teDg2XzY0OiB3YXJuaW5nOiB1c2ItYXVkaW86IDAvMTkyDQpxZW11LXN5c3Rl
+bS14ODZfNjQ6IHdhcm5pbmc6IHVzYi1hdWRpbzogMC8xOTINCnFlbXUtc3lzdGVtLXg4Nl82NDog
+d2FybmluZzogdXNiLWF1ZGlvOiAwLzE5Mg0KDQpXaGlsZSBpdCBkaWQgbm90IGNyYXNoLCBpdHMg
+c2NyZWVuIGZyb3plLiBCeSB0aGUgUVhMIG1lc3NhZ2UsIGl0IHNlZW1zDQp0aGUgYnVnIGh0dHBz
+Oi8vYnVncy5sYXVuY2hwYWQubmV0L3FlbXUvK2J1Zy8xNzg3MDcwIGlzIHN0aWxsIHByZXNlbnQN
+CmFuZCBjYXVzaW5nIGZhaWx1cmVzIG9uIGd1ZXN0cyB0b28sIHdpdGggb3BlblNVU0Ugc3RpbGwg
+YmVpbmcgdGhlDQpiaWdnZXN0IHZpY3RpbS4NCg0KUmVnYXJkaW5nIHRoaXMgc3BlY2lmaWMgdXNi
+LWF1ZGlvIGNyYXNoIHByb2JsZW0sIFFFTVUgZnJvbQ0Kc2lyaXVzL3VzYi1hdWRpby1jcmFzaCBz
+ZWVtcyB0byBiZSBmaXhlZC4NCg0Kw4BzIDEwOjU2IGRlIDEwLzEyLzIwMTgsIGtyYXhlbEByZWRo
+YXQuY29tIGVzY3JldmV1Og0KPiBPbiBNb24sIERlYyAxMCwgMjAxOCBhdCAxMjoxMTowOVBNICsw
+MDAwLCBMZW9uYXJkbyBTb2FyZXMgTcO8bGxlciB3cm90ZToNCj4+IEhpLCBJIGRpZCBub3Qgc2F2
+ZSB0aGF0IE1hZ2VpYSA3IGRhdGEgYXMgSSB3YXMgdW5hd2FyZSBJIGNvdWxkIGRvIHRoaXMuDQo+
+PiBUaGUgZGF0YSBiZWxvdyBpcyBmcm9tIGFub3RoZXIgY3Jhc2ggd2l0aCBvcGVuU1VTRSBMZWFw
+LCB0aGlzIHRpbWUgSQ0KPj4gc2F2ZWQgdGhpcyBiYWNrdHJhY2Ugd2l0aCBnZW5lcmF0ZS1jb3Jl
+LWZpbGUuDQo+IA0KPj4gT24gIzQgaXQgc2hvd3M6DQo+PiAkMiA9IHtwaWQgPSAyMjUsIGlkID0g
+MjAyNzIwMzE2OCwgZXAgPSAweDU1NTU1N2U0NjUyMCwgc3RyZWFtID0gMCwgaW92ID0NCj4+IHtp
+b3YgPSAweDdmZmZjNDE4ZDE5MCwgbmlvdiA9IDAsIG5hbGxvYyA9IDEsIHNpemUgPSAwfSwgcGFy
+YW1ldGVyID0gMCwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBeXl5eXl5eXg0KPj4gc2hvcnRfbm90X29rID0gZmFsc2UsIGludF9yZXEgPSBmYWxzZSwg
+c3RhdHVzID0gMCwgYWN0dWFsX2xlbmd0aCA9IDAsDQo+PiAgIHN0YXRlID0gVVNCX1BBQ0tFVF9T
+RVRVUCwgY29tYmluZWQgPSAweDAsIHF1ZXVlID0ge3RxZV9uZXh0ID0gMHgwLA0KPj4gdHFlX3By
+ZXYgPSAweDB9LCBjb21iaW5lZF9lbnRyeSA9IHt0cWVfbmV4dCA9IDB4MCwgdHFlX3ByZXYgPSAw
+eDB9fQ0KPiANCj4gSG1tLCB6ZXJvLWxlbmd0aCB1c2IgcGFja2FnZS4gIFNob3VsZCBiZSAxOTIg
+Ynl0ZXMgLi4uDQo+IA0KPiBEb2VzIGFueXRoaW5nIGNoYW5nZSB3aXRoDQo+ICAgaHR0cHM6Ly9n
+aXQua3JheGVsLm9yZy9jZ2l0L3FlbXUvbG9nLz9oPXNpcml1cy91c2ItYXVkaW8tY3Jhc2ggPw0K
+PiANCj4gdGhhbmtzLA0KPiAgIEdlcmQNCj4gDQo=
