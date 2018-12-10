@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gWT1i-0003lf-MN
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:23:43 -0500
+	(envelope-from <wedsonaf@google.com>) id 1gWTA7-0005Bu-3O
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:32:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gWT1f-0003mh-0X
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:23:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54830)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gWT1d-0003lM-Ix
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:23:38 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5E6DC4902D
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 21:23:35 +0000 (UTC)
-Date: Mon, 10 Dec 2018 14:23:32 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20181210142332.44e79f28@x1.home>
-In-Reply-To: <20181210182816.2014-3-pbonzini@redhat.com>
-References: <20181210182816.2014-1-pbonzini@redhat.com>
-	<20181210182816.2014-3-pbonzini@redhat.com>
+	(envelope-from <wedsonaf@google.com>) id 1gWTA6-0006sH-3Z
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:32:22 -0500
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:41682)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <wedsonaf@google.com>) id 1gWTA5-0006ra-Qb
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:32:21 -0500
+Received: by mail-io1-xd42.google.com with SMTP id s22so10037883ioc.8
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 13:32:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/8] vfio: make vfio_address_spaces static
+References: <20181210183836.20074-1-qwandor@google.com>
+	<CAFEAcA9kXXeRkFamN73XREDp4QaokMs3E9TRLThKf4zYufapSQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA9kXXeRkFamN73XREDp4QaokMs3E9TRLThKf4zYufapSQ@mail.gmail.com>
+From: Wedson Almeida Filho <wedsonaf@google.com>
+Date: Mon, 10 Dec 2018 21:32:09 +0000
+Message-ID: <CAMKQLNK2J=JsgEch3G-pQ0mjW5B-n8Xc_4PDGHjFs6CfcA2ngg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Implement VI/VF bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,46 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+To: peter.maydell@linaro.org
+Cc: Andrew Walbran <qwandor@google.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-On Mon, 10 Dec 2018 19:28:10 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+Hi Peter,
 
-> It is not used outside hw/vfio/common.c, so it does not need to
-> be extern.
-> 
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  hw/vfio/common.c              | 2 +-
->  include/hw/vfio/vfio-common.h | 1 -
->  2 files changed, 1 insertion(+), 2 deletions(-)
+We put this together months ago and hadn't kept up to date with the changes
+here.
 
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
+We're happy to see that support has been added for the VI bit. Is it going
+to be available in the v3.1.0 release?
 
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 7c185e5a2e..7aa804ea0b 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -39,7 +39,7 @@
->  
->  struct vfio_group_head vfio_group_list =
->      QLIST_HEAD_INITIALIZER(vfio_group_list);
-> -struct vfio_as_head vfio_address_spaces =
-> +static QLIST_HEAD(, VFIOAddressSpace) vfio_address_spaces =
->      QLIST_HEAD_INITIALIZER(vfio_address_spaces);
->  
->  #ifdef CONFIG_KVM
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> index 1b434d02f6..127ca47815 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -181,7 +181,6 @@ int vfio_get_device(VFIOGroup *group, const char *name,
->  
->  extern const MemoryRegionOps vfio_region_ops;
->  extern QLIST_HEAD(vfio_group_head, VFIOGroup) vfio_group_list;
-> -extern QLIST_HEAD(vfio_as_head, VFIOAddressSpace) vfio_address_spaces;
->  
->  #ifdef CONFIG_LINUX
->  int vfio_get_region_info(VFIODevice *vbasedev, int index,
+Thanks,
+-Wedson
+
+On Mon, Dec 10, 2018 at 8:41 PM Peter Maydell <peter.maydell@linaro.org>
+wrote:
+
+> On Mon, 10 Dec 2018 at 18:38, Andrew Walbran <qwandor@google.com> wrote:
+> >
+> > From: Wedson Almeida Filho <wedsonaf@google.com>
+> >
+> > This lets hypervisors running at EL2 inject virtual interrupts into
+> guest VMs.
+> >
+> > Signed-off-by: Wedson Almeida Filho <wedsonaf@google.com>
+> > Signed-off-by: Andrew Walbran <qwandor@google.com>
+>
+> Hi; thanks for this patch. I'm a bit confused -- can you
+> explain what the patch provides that isn't already
+> implemented by commit 89430fc6f80a5aef1d4cb ?
+>
+> thanks
+> -- PMM
+>
