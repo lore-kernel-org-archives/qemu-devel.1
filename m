@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gWQcv-00033u-I5
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:49:58 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gWQde-0003oP-5i
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:50:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gWQMj-0007a0-0a
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:33:14 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33665)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gWQMi-0007Zd-OB
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:33:12 -0500
-Received: by mail-wr1-x444.google.com with SMTP id c14so11587748wrr.0
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 10:33:12 -0800 (PST)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gWQdd-00020v-2P
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:50:42 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 10 Dec 2018 18:50:09 +0000
+Message-ID: <34f9335a-1cd8-aa06-1fe7-0f2ab33515d0@virtuozzo.com>
+References: <1544465367-16302-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1544465367-16302-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <CCD29A4CF196E6479593EDFECE99F2ED@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
-	<20180706105753.26700-19-marcandre.lureau@redhat.com>
-	<871s6ubp1g.fsf@dusky.pond.sub.org>
-In-Reply-To: <871s6ubp1g.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 10 Dec 2018 22:32:59 +0400
-Message-ID: <CAJ+F1C+CTew2Uqz3EEJHS93MZhKrqchcwBFC+8VyExk1+3Vgew@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 18/27] qapi: add an error in case a
- discriminator is conditionnal
+Subject: Re: [Qemu-devel] [PATCH v5] qemu-img info lists bitmap directory
+ entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,175 +25,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-Hi
-
-On Thu, Dec 6, 2018 at 8:25 PM Markus Armbruster <armbru@redhat.com> wrote:
->
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->
-> > Making a discriminator conditonal doesn't make much sense.
->
-> Good point (so easy to overlook!), but why first add the 'if' feature
-> broken that way in PATCH 16, then fix it up in PATCH 18?
-
-Not sure, I guess I found out after. Feel free to squash
-
->
-> >                                                            Instead,
-> > the union could be made conditional.
->
-> What do you mean by that?
-
-That the alternative is probably to make the whole union conditional
-
->
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  scripts/qapi/common.py                          | 11 +++++++++--
-> >  tests/Makefile.include                          |  1 +
-> >  .../flat-union-invalid-if-discriminator.err     |  1 +
-> >  .../flat-union-invalid-if-discriminator.exit    |  1 +
-> >  .../flat-union-invalid-if-discriminator.json    | 17 +++++++++++++++++
-> >  .../flat-union-invalid-if-discriminator.out     |  0
-> >  6 files changed, 29 insertions(+), 2 deletions(-)
-> >  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminat=
-or.err
-> >  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminat=
-or.exit
-> >  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminat=
-or.json
-> >  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminat=
-or.out
-> >
-> > diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-> > index 9b95f8cfe9..13fbb28493 100644
-> > --- a/scripts/qapi/common.py
-> > +++ b/scripts/qapi/common.py
-> > @@ -577,7 +577,8 @@ def find_alternate_member_qtype(qapi_type):
-> >
-> >  # Return the discriminator enum define if discriminator is specified a=
-s an
-> >  # enum type, otherwise return None.
-> > -def discriminator_find_enum_define(expr):
-> > +def discriminator_find_enum_define(expr, info):
-> > +    name =3D expr['union']
-> >      base =3D expr.get('base')
-> >      discriminator =3D expr.get('discriminator')
-> >
-> > @@ -592,6 +593,11 @@ def discriminator_find_enum_define(expr):
-> >      if not discriminator_member:
-> >          return None
-> >
-> > +    if discriminator_member.get('if'):
-> > +        raise QAPISemError(info, 'The discriminator %s.%s for union %s=
- '
-> > +                           'must not be conditional' %
-> > +                           (base, discriminator, name))
-> > +
-> >      return enum_types.get(discriminator_member['type'])
-> >
-> >
->
-> I'm afraid this isn't the proper place to check.  It's an accessor
-> function for @struct_types and @enum_types.  The check should go into
-> check_union(), like this:
-
-indeed, thanks for the hint
-
->
-> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-> index 0cf39df404..c1bc9e9c29 100644
-> --- a/scripts/qapi/common.py
-> +++ b/scripts/qapi/common.py
-> @@ -799,6 +794,11 @@ def check_union(expr, info):
->                                 "Discriminator '%s' is not a member of ba=
-se "
->                                 "struct '%s'"
->                                 % (discriminator, base))
-> +        if discriminator_member.get('if'):
-> +            raise QAPISemError(info, 'The discriminator %s.%s for union =
-%s '
-> +                               'must not be conditional' %
-> +                               (base, discriminator, name))
-> +
->          enum_define =3D enum_types.get(discriminator_member['type'])
->          allow_metas =3D ['struct']
->          # Do not allow string discriminator
->
-> > @@ -1020,7 +1026,8 @@ def check_exprs(exprs):
-> >
-> >          if 'include' in expr:
-> >              continue
-> > -        if 'union' in expr and not discriminator_find_enum_define(expr=
-):
-> > +        info =3D expr_elem['info']
-> > +        if 'union' in expr and not discriminator_find_enum_define(expr=
-, info):
-> >              name =3D '%sKind' % expr['union']
-> >          elif 'alternate' in expr:
-> >              name =3D '%sKind' % expr['alternate']
-> > diff --git a/tests/Makefile.include b/tests/Makefile.include
-> > index 43e100a6cd..abc3fdf764 100644
-> > --- a/tests/Makefile.include
-> > +++ b/tests/Makefile.include
-> > @@ -510,6 +510,7 @@ qapi-schema +=3D flat-union-inline.json
-> >  qapi-schema +=3D flat-union-int-branch.json
-> >  qapi-schema +=3D flat-union-invalid-branch-key.json
-> >  qapi-schema +=3D flat-union-invalid-discriminator.json
-> > +qapi-schema +=3D flat-union-invalid-if-discriminator.json
-> >  qapi-schema +=3D flat-union-no-base.json
-> >  qapi-schema +=3D flat-union-optional-discriminator.json
-> >  qapi-schema +=3D flat-union-string-discriminator.json
-> > diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.err =
-b/tests/qapi-schema/flat-union-invalid-if-discriminator.err
-> > new file mode 100644
-> > index 0000000000..0c94c9860d
-> > --- /dev/null
-> > +++ b/tests/qapi-schema/flat-union-invalid-if-discriminator.err
-> > @@ -0,0 +1 @@
-> > +tests/qapi-schema/flat-union-invalid-if-discriminator.json:13: The dis=
-criminator TestBase.enum1 for union TestUnion must not be conditional
-> > diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.exit=
- b/tests/qapi-schema/flat-union-invalid-if-discriminator.exit
-> > new file mode 100644
-> > index 0000000000..d00491fd7e
-> > --- /dev/null
-> > +++ b/tests/qapi-schema/flat-union-invalid-if-discriminator.exit
-> > @@ -0,0 +1 @@
-> > +1
-> > diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.json=
- b/tests/qapi-schema/flat-union-invalid-if-discriminator.json
-> > new file mode 100644
-> > index 0000000000..618ec36396
-> > --- /dev/null
-> > +++ b/tests/qapi-schema/flat-union-invalid-if-discriminator.json
-> > @@ -0,0 +1,17 @@
-> > +{ 'enum': 'TestEnum',
-> > +  'data': [ 'value1', 'value2' ] }
-> > +
-> > +{ 'struct': 'TestBase',
-> > +  'data': { 'enum1': { 'type': 'TestEnum', 'if': 'FOO' } } }
-> > +
-> > +{ 'struct': 'TestTypeA',
-> > +  'data': { 'string': 'str' } }
-> > +
-> > +{ 'struct': 'TestTypeB',
-> > +  'data': { 'integer': 'int' } }
-> > +
-> > +{ 'union': 'TestUnion',
-> > +  'base': 'TestBase',
-> > +  'discriminator': 'enum1',
-> > +  'data': { 'value1': 'TestTypeA',
-> > +            'value2': 'TestTypeB' } }
-> > diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.out =
-b/tests/qapi-schema/flat-union-invalid-if-discriminator.out
-> > new file mode 100644
-> > index 0000000000..e69de29bb2
->
-
-
---
-Marc-Andr=C3=A9 Lureau
+MTAuMTIuMjAxOCAyMTowOSwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IEluIHRoZSAnRm9y
+bWF0IHNwZWNpZmljIGluZm9ybWF0aW9uJyBzZWN0aW9uIG9mIHRoZSAncWVtdS1pbWcgaW5mbycN
+Cj4gY29tbWFuZCBvdXRwdXQsIHRoZSBzdXBwbGVtZW50YWwgaW5mb3JtYXRpb24gYWJvdXQgZXhp
+c3RpbmcgUUNPVzINCj4gYml0bWFwcyB3aWxsIGJlIHNob3duLCBzdWNoIGFzIGEgYml0bWFwIG5h
+bWUsIGZsYWdzIGFuZCBncmFudWxhcml0eToNCj4gDQoNClsuLi5dDQoNCj4gLS0tIGEvYmxvY2sv
+cWNvdzIuYw0KPiArKysgYi9ibG9jay9xY293Mi5jDQo+IEBAIC00MjcwLDYgKzQyNzAsMTkgQEAg
+c3RhdGljIEltYWdlSW5mb1NwZWNpZmljICpxY293Ml9nZXRfc3BlY2lmaWNfaW5mbyhCbG9ja0Ry
+aXZlclN0YXRlICpicykNCj4gICAgICAgICAgICAgICAucmVmY291bnRfYml0cyAgICAgID0gcy0+
+cmVmY291bnRfYml0cywNCj4gICAgICAgICAgIH07DQo+ICAgICAgIH0gZWxzZSBpZiAocy0+cWNv
+d192ZXJzaW9uID09IDMpIHsNCj4gKyAgICAgICAgYm9vbCBoYXNfYml0bWFwczsNCj4gKyAgICAg
+ICAgUWNvdzJCaXRtYXBJbmZvTGlzdCAqYml0bWFwczsNCj4gKyAgICAgICAgRXJyb3IgKmxvY2Fs
+X2VyciA9IE5VTEw7DQo+ICsNCj4gKyAgICAgICAgYml0bWFwcyA9IHFjb3cyX2dldF9iaXRtYXBf
+aW5mb19saXN0KGJzLCAmbG9jYWxfZXJyKTsNCj4gKyAgICAgICAgaWYgKGxvY2FsX2Vycikgew0K
+PiArICAgICAgICAgICAgLyogVE9ETzogUmVwb3J0IHRoZSBFcnJvciB1cCB0byB0aGUgY2FsbGVy
+IHdoZW4gaW1wbGVtZW50ZWQgKi8NCj4gKyAgICAgICAgICAgIGVycm9yX2ZyZWUobG9jYWxfZXJy
+KTsNCj4gKyAgICAgICAgICAgIC8qIFRoZSAnYml0bWFwcycgZW1wdHkgbGlzdCBkZXNpZ25hdGVz
+IGEgZmFpbHVyZSB0byBnZXQgaW5mbyAqLw0KPiArICAgICAgICAgICAgaGFzX2JpdG1hcHMgPSB0
+cnVlOw0KPiArICAgICAgICB9IGVsc2Ugew0KPiArICAgICAgICAgICAgaGFzX2JpdG1hcHMgPSAh
+IWJpdG1hcHM7DQo+ICsgICAgICAgIH0NCj4gICAgICAgICAgICpzcGVjX2luZm8tPnUucWNvdzIu
+ZGF0YSA9IChJbWFnZUluZm9TcGVjaWZpY1FDb3cyKXsNCj4gICAgICAgICAgICAgICAuY29tcGF0
+ICAgICAgICAgICAgID0gZ19zdHJkdXAoIjEuMSIpLA0KPiAgICAgICAgICAgICAgIC5sYXp5X3Jl
+ZmNvdW50cyAgICAgPSBzLT5jb21wYXRpYmxlX2ZlYXR1cmVzICYNCj4gQEAgLTQyNzksNiArNDI5
+Miw4IEBAIHN0YXRpYyBJbWFnZUluZm9TcGVjaWZpYyAqcWNvdzJfZ2V0X3NwZWNpZmljX2luZm8o
+QmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIFFDT1cyX0lOQ09NUEFUX0NPUlJVUFQsDQo+ICAgICAgICAgICAgICAgLmhhc19jb3JydXB0
+ICAgICAgICA9IHRydWUsDQo+ICAgICAgICAgICAgICAgLnJlZmNvdW50X2JpdHMgICAgICA9IHMt
+PnJlZmNvdW50X2JpdHMsDQo+ICsgICAgICAgICAgICAuaGFzX2JpdG1hcHMgICAgICAgID0gaGFz
+X2JpdG1hcHMsDQo+ICsgICAgICAgICAgICAuYml0bWFwcyAgICAgICAgICAgID0gYml0bWFwcywN
+Cj4gICAgICAgICAgIH07DQo+ICAgICAgIH0gZWxzZSB7DQo+ICAgICAgICAgICAvKiBpZiB0aGlz
+IGFzc2VydGlvbiBmYWlscywgdGhpcyBwcm9iYWJseSBtZWFucyBhIG5ldyB2ZXJzaW9uIHdhcw0K
+DQpbLi5dDQoNCj4gaW5kZXggZDRmZTcxMC4uNTM4MjBhNSAxMDA2NDQNCj4gLS0tIGEvcWFwaS9i
+bG9jay1jb3JlLmpzb24NCj4gKysrIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4gQEAgLTY5LDYg
+KzY5LDExIEBADQo+ICAgIyBAZW5jcnlwdDogZGV0YWlscyBhYm91dCBlbmNyeXB0aW9uIHBhcmFt
+ZXRlcnM7IG9ubHkgc2V0IGlmIGltYWdlDQo+ICAgIyAgICAgICAgICAgaXMgZW5jcnlwdGVkIChz
+aW5jZSAyLjEwKQ0KPiAgICMNCj4gKyMgQGJpdG1hcHM6IGxpc3Qgb2YgcWNvdzIgYml0bWFwcyBk
+ZXRhaWxzOyB0aGUgZW1wdHkgbGlzdCBkZXNpZ25hdGVzDQo+ICsjICAgICAgICAgICAiZmFpbCB0
+byBsb2FkIGJpdG1hcHMiIGlmIGl0IGlzIHBhc3NlZCB0byB0aGUgY2FsbGVyIG9yDQo+ICsjICAg
+ICAgICAgICAibm8gYml0bWFwcyIgb3RoZXJ3aXNlOw0KPiArIyAgICAgICAgICAgdW5zdXBwb3J0
+ZWQgZm9yIHRoZSBmb3JtYXQgUUNPVzIgdjIgKHNpbmNlIDQuMCkNCg0KDQpGb3IgbWUsIGl0IGxv
+b2tzIHNpbXBsZXIgdG8gZGVjbGFyZSBhbHRlcm5hdGl2ZSBhcHByb2FjaCwgYXNzdW1pbmcgdGhh
+dCBhYnNlbmNlDQpvZiB0aGUgZmllbGQgbWVhbnMgZXJyb3IsIGxpa2UgdGhpczoNCg0KQGJpdG1h
+cHM6IG9wdGlvbmFsIGZpZWxkIHdpdGggdW5jb21tb24gc2VtYW50aWNzOg0KICAgICAgICAgICBB
+YnNlbmNlIG9mIHRoZSBmaWVsZCBtZWFucyB0aGF0IGJpdG1hcHMgaW5mbyBxdWVyeSBmYWlsZWQg
+KHdoaWNoIGRvZXNuJ3QNCiAgICAgICAgICAgaW1wbHkgdGhlIHdob2xlIHF1ZXJ5IGZhaWx1cmUp
+Lg0KICAgICAgICAgICBJZiB0aGUgZmllbGQgZXhpc3RzIGluIHF1ZXJ5IHJlc3VsdHMsIHRoZXJl
+IHdlcmUgbm8gZXJyb3JzLCBhbmQgaXQgcmVwcmVzZW50cw0KICAgICAgICAgICBsaXN0IG9mIHFj
+b3cyIGJpdG1hcHMgZGV0YWlscy4gU28sIHN1Y2Nlc3NmdWwgcmVzdWx0IHdpbGwgYWx3YXlzIHVz
+ZSBlbXB0eQ0KICAgICAgICAgICBsaXN0IHRvIHNob3cgdGhhdCB0aGVyZSBhcmUgbm8gYml0bWFw
+cy4NCiAgICAgICAgICAgTm90ZTogYml0bWFwcyBhcmUgbm90IHN1cHBvcnRlZCBiZWZvcmUgUUNP
+VzIgdjMsIHNvIGZvciBlbGRlciB2ZXJzaW9ucw0KICAgICAgICAgICBAYml0bWFwcyB3aWxsIGFs
+d2F5cyBiZSBhbiBlbXB0eSBsaXN0Lg0KDQoNClRoZSBtYWluIHF1ZXN0aW9uIGhlcmU6IGlzIGl0
+IGEgZmlyc3QgdGltZSwgd2UgYXJlIGRvaW5nIHNvbWV0aGluZyBsaWtlIHRoaXM/IElmIG5vdCwN
+CndlIG11c3QgZ28gdGhlIGV4aXN0aW5nIHdheS4NCg0KSSd2ZSBmb3VuZCB0aGUgb25seSBvbmUg
+c2ltaWxhciB0aGluZzoNCmluIHFhcGkvbWlzYy5qc29uOg0KIyBJZiBAdW5hdmFpbGFibGUtZmVh
+dHVyZXMgaXMgYW4gZW1wdHkgbGlzdCwgdGhlIENQVSBtb2RlbCBpcw0KIyBydW5uYWJsZSB1c2lu
+ZyB0aGUgY3VycmVudCBob3N0IGFuZCBtYWNoaW5lLXR5cGUuDQojIElmIEB1bmF2YWlsYWJsZS1m
+ZWF0dXJlcyBpcyBub3QgcHJlc2VudCwgcnVubmFiaWxpdHkNCiMgaW5mb3JtYXRpb24gZm9yIHRo
+ZSBDUFUgaXMgbm90IGF2YWlsYWJsZS4NCg0KaXQncyBub3QgYWJvdXQgZXJyb3IsIGhvd2V2ZXIu
+Lg0KDQpJbnRlcmVzdGluZyB3aGF0IGlzIHRoZSBjb21tb24gKG1vc3QgY29tbW9uKSBiZWhhdmlv
+ciBhcm91bmQgZW1wdHktbGlzdC9hYnNlbnQtcGFyYW1ldGVyPw0KDQoNCkFoYSwgb25lIHBvaW50
+IHRvIG15IHNlbWFudGljczoNCndlIGNhbiBkZWZpbmUgcmVxdWlyZWQgZmllbGQsIHdpdGhvdXQg
+JyonLCBhbmQgaXQgaW1wbGllcyB0aGF0IHRoZXJlIHNob3VsZCBub3QgYmUgYW55IGVycm9ycywN
+CmFuZCB3ZSBkb24ndCBoYXZlIGV4dHJhIG9wdGlvbnMgKG9ubHkgZW1wdHkgbGlzdCBpcyBwb3Nz
+aWJsZSB0byBzaG93IGFic2VuY2Ugb2YgZWxlbWVudHMpLg0KYW5kIHRoYW4sICcqJyBzaG93cyBw
+b3NzaWJpbGl0eSBvZiBlcnJvcnMgKGlmIGRlc2NyaWJlZCBpbiBzcGVjKS4NCg0KYW5kIHdpdGgg
+eW91ciBzZW1hbnRpY3MsIGlmIHdlIHdhbnQgdG8gc2F5IGluIGdlbmVyYWwsIHRoYXQgZW1wdHkt
+bGlzdCA9IGVycm9yLCB3ZSdsbCBuZWVkIHRvDQp1c2UgJyonIGZvciBhbGwgZmllbGRzLCBldmVu
+IGZvciB0aG91cyB3aXRob3V0IHBvc3NpYmxlIGVycm9ycy4NCg0KKG9mIGNvdXJzZSwgd2UgYWN0
+dWFsbHkgY2FuIG5vdCBzYXkgc29tZXRoaW5nIGluIGdlbmVyYWwsIGJlY2F1c2UsIEknbSBhZnJh
+aWQsIHRoYXQgd2UgY3VycmVudGx5DQpoYXZlIG1peGVkIHNlbWFudGljcyBhcm91bmQgZW1wdHkg
+bGlzdHMpDQoNCg0KPiArIw0KPiAgICMgU2luY2U6IDEuNw0KPiAgICMjDQo+ICAgeyAnc3RydWN0
+JzogJ0ltYWdlSW5mb1NwZWNpZmljUUNvdzInLA0KPiBAQCAtNzcsNyArODIsOCBAQA0KPiAgICAg
+ICAgICcqbGF6eS1yZWZjb3VudHMnOiAnYm9vbCcsDQo+ICAgICAgICAgJypjb3JydXB0JzogJ2Jv
+b2wnLA0KPiAgICAgICAgICdyZWZjb3VudC1iaXRzJzogJ2ludCcsDQo+IC0gICAgICAnKmVuY3J5
+cHQnOiAnSW1hZ2VJbmZvU3BlY2lmaWNRQ293MkVuY3J5cHRpb24nDQo+ICsgICAgICAnKmVuY3J5
+cHQnOiAnSW1hZ2VJbmZvU3BlY2lmaWNRQ293MkVuY3J5cHRpb24nLA0KPiArICAgICAgJypiaXRt
+YXBzJzogWydRY293MkJpdG1hcEluZm8nXQ0KPiAgICAgfSB9DQo+ICAgDQo+ICAgIyMNCj4gQEAg
+LTQ1NCw2ICs0NjAsNDEgQEANCj4gICAgICAgICAgICAgICdzdGF0dXMnOiAnRGlydHlCaXRtYXBT
+dGF0dXMnfSB9DQo+ICAgDQoNCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
