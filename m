@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gWM4Y-0000dj-F5
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:58:11 -0500
+	(envelope-from <berto@igalia.com>) id 1gWMDH-0002ml-Sq
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:07:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gWM4X-0002fT-1q
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:58:10 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Dec 2018 13:58:03 +0000
-Message-Id: <20181210135803.20208-1-peter.maydell@linaro.org>
+	(envelope-from <berto@igalia.com>) id 1gWMDB-0007EV-Vb
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:07:11 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20181207161351.4380-6-vsementsov@virtuozzo.com>
+References: <20181207161351.4380-1-vsementsov@virtuozzo.com>
+	<20181207161351.4380-6-vsementsov@virtuozzo.com>
+Date: Mon, 10 Dec 2018 15:06:59 +0100
+Message-ID: <w514lbllblo.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] hw/s390/ccw.c: Don't take address of packed
- members
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 5/5] crypto: support multiple threads
+ accessing one QCryptoBlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,65 +23,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: berrange@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-Taking the address of a field in a packed struct is a bad idea, because
-it might not be actually aligned enough for that pointer type (and
-thus cause a crash on dereference on some host architectures). Newer
-versions of clang warn about this.
+On Fri 07 Dec 2018 05:13:51 PM CET, Vladimir Sementsov-Ogievskiy wrote:
+> @@ -148,12 +154,97 @@ int qcrypto_block_encrypt(QCryptoBlock *block,
+>  
+>  QCryptoCipher *qcrypto_block_get_cipher(QCryptoBlock *block)
+>  {
+> -    return block->cipher;
+> +    /* Ciphers should be accessed through pop/push method to be thread-safe.
+> +     * Better, they should not be accessed externally at all (note, that
+> +     * pop/push are static functions)
+> +     * This function is used only in test with one thread (it's safe to skip
+> +     * pop/push interface), so it's enough to assert it here:
+> +     */
+> +    assert(block->n_ciphers <= 1);
+> +    return block->ciphers ? block->ciphers[0] : NULL;
 
-Avoid the problem by using local copies of the PMCW and SCSW
-struct fields in copy_schib_from_guest() and copy_schib_to_guest().
+If this is only supposed to be called in test mode I think you can also
+assert that g_test_initialized() is true.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-This seemed like a not totally ugly and reasonably localised fix
-that satisfies clang. Oddly, this makes the generated object file
-15K smaller (421K vs 406K), so it might even be better code...
+And the same with qcrypto_block_get_ivgen() later in this patch.
 
- hw/s390x/css.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+> +int qcrypto_block_init_cipher(QCryptoBlock *block,
+> +                              QCryptoCipherAlgorithm alg,
+> +                              QCryptoCipherMode mode,
+> +                              const uint8_t *key, size_t nkey,
+> +                              size_t n_threads, Error **errp)
+> +{
+> +    size_t i;
+> +
+> +    assert(!block->ciphers && !block->n_ciphers && !block->n_free_ciphers);
+> +
+> +    block->ciphers = g_new0(QCryptoCipher *, n_threads);
 
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index 04ec5cc9705..ef07691e36b 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -1290,9 +1290,15 @@ void copy_scsw_to_guest(SCSW *dest, const SCSW *src)
- static void copy_schib_to_guest(SCHIB *dest, const SCHIB *src)
- {
-     int i;
-+    PMCW srcpmcw, destpmcw;
-+    SCSW srcscsw, destscsw;
- 
--    copy_pmcw_to_guest(&dest->pmcw, &src->pmcw);
--    copy_scsw_to_guest(&dest->scsw, &src->scsw);
-+    srcpmcw = src->pmcw;
-+    copy_pmcw_to_guest(&destpmcw, &srcpmcw);
-+    dest->pmcw = destpmcw;
-+    srcscsw = src->scsw;
-+    copy_scsw_to_guest(&destscsw, &srcscsw);
-+    dest->scsw = destscsw;
-     dest->mba = cpu_to_be64(src->mba);
-     for (i = 0; i < ARRAY_SIZE(dest->mda); i++) {
-         dest->mda[i] = src->mda[i];
-@@ -1339,9 +1345,15 @@ static void copy_scsw_from_guest(SCSW *dest, const SCSW *src)
- static void copy_schib_from_guest(SCHIB *dest, const SCHIB *src)
- {
-     int i;
-+    PMCW srcpmcw, destpmcw;
-+    SCSW srcscsw, destscsw;
- 
--    copy_pmcw_from_guest(&dest->pmcw, &src->pmcw);
--    copy_scsw_from_guest(&dest->scsw, &src->scsw);
-+    srcpmcw = src->pmcw;
-+    copy_pmcw_from_guest(&destpmcw, &srcpmcw);
-+    dest->pmcw = destpmcw;
-+    srcscsw = src->scsw;
-+    copy_scsw_from_guest(&destscsw, &srcscsw);
-+    dest->scsw = destscsw;
-     dest->mba = be64_to_cpu(src->mba);
-     for (i = 0; i < ARRAY_SIZE(dest->mda); i++) {
-         dest->mda[i] = src->mda[i];
--- 
-2.19.2
+You can use g_new() instead of g_new0() because you're anyway
+overwriting all elements of the array.
+
+But these are minor nits, the patchs looks good to me else.
+
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+
+Berto
