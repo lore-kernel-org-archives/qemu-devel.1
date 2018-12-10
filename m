@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gWLmi-0007Fx-5j
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:39:50 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gWLmn-0006OB-7Z
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:39:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gWLmc-0007TC-Mg
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:39:44 -0500
-Date: Mon, 10 Dec 2018 14:39:24 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181210143924.0cba741a.cohuck@redhat.com>
-In-Reply-To: <20181210140642.4f2f457c@oc2783563651>
-References: <20181210120436.30522-1-peter.maydell@linaro.org>
-	<20181210140642.4f2f457c@oc2783563651>
+	(envelope-from <kraxel@redhat.com>) id 1gWLWk-0005jB-E3
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:23:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35866)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gWLWk-0005it-64
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:23:14 -0500
+Date: Mon, 10 Dec 2018 14:23:11 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181210132311.2y4tfwy4ra5iqx4s@sirius.home.kraxel.org>
+References: <20181130064700.5984-1-linzhecheng@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] hw/s390x/virtio-ccw.c: Don't
- take address of fields in packed structs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181130064700.5984-1-linzhecheng@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH] usb-host: reset and close
+ libusb_device_handle before qemu exit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +27,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, patches@linaro.org, David Hildenbrand <david@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: linzhecheng <linzhecheng@huawei.com>
+Cc: qemu-devel@nongnu.org, jianjay.zhou@huawei.com, wangxinxin.wang@huawei.com
 
-On Mon, 10 Dec 2018 14:06:42 +0100
-Halil Pasic <pasic@linux.ibm.com> wrote:
-
-> On Mon, 10 Dec 2018 12:04:36 +0000
-> Peter Maydell <peter.maydell@linaro.org> wrote:
+On Fri, Nov 30, 2018 at 02:47:00PM +0800, linzhecheng wrote:
+> we should perform these things as same as usb_host_close.
 > 
-> > Taking the address of a field in a packed struct is a bad idea, because
-> > it might not be actually aligned enough for that pointer type (and
-> > thus cause a crash on dereference on some host architectures). Newer
-> > versions of clang warn about this. Avoid the bug by not using the
-> > "modify in place" byte swapping functions.
-> > 
-> > Patch produced with scripts/coccinelle/inplace-byteswaps.cocci
-> > (with a couple of long lines manually wrapped).
-> > 
-> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>  
+> Signed-off-by: linzhecheng <linzhecheng@huawei.com>
 > 
-> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-> 
-> I wonder if packed was a good idea in the first place. @Connie: Do you
-> have an opinion on this?
+> diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
+> index b6602ded4e..2016375e6b 100644
+> --- a/hw/usb/host-libusb.c
+> +++ b/hw/usb/host-libusb.c
+> @@ -988,7 +988,9 @@ static void usb_host_exit_notifier(struct Notifier *n, void *data)
+>  
+>      if (s->dh) {
+>          usb_host_release_interfaces(s);
+> +	libusb_reset_device(s->dh);
+>          usb_host_attach_kernel(s);
+> +	libusb_close(s->dh);
 
-Some of the structures probably don't need the packed attribute; but
-there are two structures that have a trailing 8 bit value. The problem
-is that the structures are a a guest<->host interface as defined in the
-virtio standard, so we can't e.g. add padding to the structures with
-the isc at the end.
+qemu codesstyle uses spaces not tabs, please update your editor settings.
 
-If I had to re-define the interface, I'd probably add tail padding; but
-I was not aware of the problems the packing might cause when I defined
-them, and we can't get rid of them without also getting rid of support
-for older virtio versions.
+Fixed and added to usb queue.
 
-Simply moving away from the modify in place byteswaps is the easiest
-solution.
+thanks,
+  Gerd
