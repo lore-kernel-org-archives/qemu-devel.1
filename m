@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gWLm9-0006Ie-6I
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:39:10 -0500
+	(envelope-from <armbru@redhat.com>) id 1gWLmK-0006OE-ED
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:39:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gWLfU-000413-Q8
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:32:21 -0500
-Date: Mon, 10 Dec 2018 13:32:06 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181210133205.GC2372@work-vm>
-References: <1538036615-32542-1-git-send-email-thuth@redhat.com>
-	<1538036615-32542-4-git-send-email-thuth@redhat.com>
-	<CAFEAcA_qgD3Lzfoyf4vq-79aCxaVA=_gBQK-yJOOYULHmNTZpA@mail.gmail.com>
-	<20181210141607.0ef48273.cohuck@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1gWLbv-00023D-IE
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:28:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44514)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gWLbv-00022N-7x
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:28:35 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181208111606.8505-1-marcandre.lureau@redhat.com>
+	<20181208111606.8505-2-marcandre.lureau@redhat.com>
+	<875zw1lne9.fsf@dusky.pond.sub.org>
+	<CAJ+F1CKOgnJOmBAYSG1OYKt5XpB_BCgbfCcsexbrVNM0odymNw@mail.gmail.com>
+Date: Mon, 10 Dec 2018 14:28:26 +0100
+In-Reply-To: <CAJ+F1CKOgnJOmBAYSG1OYKt5XpB_BCgbfCcsexbrVNM0odymNw@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 10 Dec 2018
+	15:13:47 +0400")
+Message-ID: <87va41fr45.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181210141607.0ef48273.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] hw/s390x/ioinst: Fix alignment
- problem in struct SubchDev
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v7 01/27] qapi: make sure osdep.h
+ is included in type headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,109 +32,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, David Hildenbrand <david@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-* Cornelia Huck (cohuck@redhat.com) wrote:
-> On Mon, 10 Dec 2018 12:27:56 +0000
-> Peter Maydell <peter.maydell@linaro.org> wrote:
-> 
-> > On Thu, 27 Sep 2018 at 09:25, Thomas Huth <thuth@redhat.com> wrote:
-> > >
-> > > struct SubchDev embeds several other structures which are marked with
-> > > QEMU_PACKED. This causes the compiler to not care for proper alignment
-> > > of these structures. When we later pass around pointers to the unaligned
-> > > struct members during migration, this causes problems on host architectures
-> > > like Sparc that can not do unaligned memory access.
-> > >
-> > > Most of the structs in ioinst.h are naturally aligned, so we can fix
-> > > most of the problem by removing the QEMU_PACKED statements (and use
-> > > QEMU_BUILD_BUG_MSG() statements instead to make sure that there is no
-> > > padding). However, for the struct SCHIB, we have to keep the QEMU_PACKED
-> > > since the compiler adds some padding here otherwise. Move this struct
-> > > to the beginning of struct SubchDev instead to fix the alignment problem
-> > > here, too.  
-> > 
-> > Unfortunately clang does not like the struct SCHIB being still
-> > marked packed:
-> > 
-> > /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1294:25:
-> > warning: taking address of packed member 'pmcw' of class or structure
-> > 'SCHIB' may result in an unaligned pointer value
-> > [-Waddress-of-packed-member]
-> >     copy_pmcw_to_guest(&dest->pmcw, &src->pmcw);
-> >                         ^~~~~~~~~~
-> > /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1294:38:
-> > warning: taking address of packed member 'pmcw' of class or structure
-> > 'SCHIB' may result in an unaligned pointer value
-> > [-Waddress-of-packed-member]
-> >     copy_pmcw_to_guest(&dest->pmcw, &src->pmcw);
-> >                                      ^~~~~~~~~
-> > /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1295:25:
-> > warning: taking address of packed member 'scsw' of class or structure
-> > 'SCHIB' may result in an unaligned pointer value
-> > [-Waddress-of-packed-member]
-> >     copy_scsw_to_guest(&dest->scsw, &src->scsw);
-> >                         ^~~~~~~~~~
-> > /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1295:38:
-> > warning: taking address of packed member 'scsw' of class or structure
-> > 'SCHIB' may result in an unaligned pointer value
-> > [-Waddress-of-packed-member]
-> >     copy_scsw_to_guest(&dest->scsw, &src->scsw);
-> >                                      ^~~~~~~~~
-> > /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1343:27:
-> > warning: taking address of packed member 'pmcw' of class or structure
-> > 'SCHIB' may result in an unaligned pointer value
-> > [-Waddress-of-packed-member]
-> >     copy_pmcw_from_guest(&dest->pmcw, &src->pmcw);
-> >                           ^~~~~~~~~~
-> > /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1343:40:
-> > warning: taking address of packed member 'pmcw' of class or structure
-> > 'SCHIB' may result in an unaligned pointer value
-> > [-Waddress-of-packed-member]
-> >     copy_pmcw_from_guest(&dest->pmcw, &src->pmcw);
-> >                                        ^~~~~~~~~
-> > /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1344:27:
-> > warning: taking address of packed member 'scsw' of class or structure
-> > 'SCHIB' may result in an unaligned pointer value
-> > [-Waddress-of-packed-member]
-> >     copy_scsw_from_guest(&dest->scsw, &src->scsw);
-> >                           ^~~~~~~~~~
-> > /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1344:40:
-> > warning: taking address of packed member 'scsw' of class or structure
-> > 'SCHIB' may result in an unaligned pointer value
-> > [-Waddress-of-packed-member]
-> >     copy_scsw_from_guest(&dest->scsw, &src->scsw);
-> >                                        ^~~~~~~~~
-> 
-> That's really annoying :(
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-Is the problem here that the field could actually be misaligned (on
-any conceivable build) or is it just a matter of convincing clang it's
-safe?
+> Hi
+>
+> On Mon, Dec 10, 2018 at 1:52 PM Markus Armbruster <armbru@redhat.com> wro=
+te:
+>>
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>>
+>> > Now that the schema can be configured, it is crucial that all types
+>> > are configured the same. Make sure config-host.h is included, by
+>> > checking osdep.h inclusion. The build-sys tracks the dependency and
+>> > rebuilds the types if the configuration changed.
+>> >
+>> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> > ---
+>> >  scripts/qapi/types.py | 3 +++
+>> >  1 file changed, 3 insertions(+)
+>> >
+>> > diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
+>> > index fd7808103c..3bb9cb6d47 100644
+>> > --- a/scripts/qapi/types.py
+>> > +++ b/scripts/qapi/types.py
+>> > @@ -201,6 +201,9 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCV=
+isitor):
+>> >  ''',
+>> >                                        types=3Dtypes, visit=3Dvisit))
+>> >          self._genh.preamble_add(mcgen('''
+>> > +#ifndef QEMU_OSDEP_H
+>> > +#error Please include osdep.h first!
+>> > +#endif
+>> >  #include "qapi/qapi-builtin-types.h"
+>> >  '''))
+>>
+>> I understand why you propose this patch.  The QAPI-generated headers use
+>> #ifdef CONFIG_FOO.  The configuration header "qemu/osdep.h" must be
+>> consistently included before the generated headers, or else you end up
+>> with nasty bugs, such as the same enum having different values in
+>> different .o, or the same struct having a different layout.
+>>
+>> But this applies to *all* headers that use #ifdef.  Why check it here,
+>> but not there?  What makes the QAPI-generated headers special?
+>>
+>
+> It's the discussion about #if in headers (and enums in particular)
+> that started this. We want to make sure all compilation units share
+> the same data structure/ABI. I proposed to include osdep.h in qapi
+> headers, but that was rejected.
+> The warning is a different approach. I agree it could apply to all
+> headers. Do you think I should update all headers as well?
 
-Dave
+That would replace the rule 'all .c files must include "qemu/osdep.h"
+first' by 'all .h files must check "qemu/osdep.h" has been included
+already', which is not an improvement.
 
-> > Not sure how best to address this. A couple of ideas that I had:
-> > 
-> > (1) make the 'uint64_t mba' field in the SCHIB struct into
-> > two uint32_t fields, adjusting all the code which needs
-> > to access it accordingly; then we could drop the packed
-> > annotation from the struct
-> 
-> This would mean some annoying gymnastics, but fortunately that field is
-> not accessed in many places.
-> 
-> > 
-> > (2) have the guts of copy_{pmcw,scsw}_{to,from}_guest() be
-> > macros, so we can do them inline in the copy_schib_{to,from}_guest()
-> > function and thus operate directly on src->pmcw.foo &c
-> > fields rather than ever having to take the address of any
-> > of the fields in src or dest
-> 
-> I'm not really a fan of using macros, but if it stays readable...
-> 
-> Not sure what the best option is here; this is why I haven't done
-> anything yet to fix it, as no idea was really appealing.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+All we have right now to help with enforcing our osdep.h rule is
+scripts/clean-includes.  We run it periodically to fix rule breakers.
+It's manual, because we have a few .c files in the tree where the rule
+doesn't apply, and the script doesn't know about them.  Fixable, I
+guess.  Most recent run:
+
+    Subject: [PATCH] Clean up includes
+    Message-Id: <20181204172535.2799-1-armbru@redhat.com>
+    https://lists.nongnu.org/archive/html/qemu-devel/2018-12/msg00605.html
+
+The obvious improvement would be flagging rule breakers before they get
+committed.
+
+checkpatch.pl could flag patches adding .c files that don't include
+"qemu/osdep.h" first.  The "first" part might be a bit annoying to code.
+The "adding files" part already exists: checkpatch.pl warns when you add
+a file without updating MAINTAINERS.
+
+checkpatch.pl could also flag patches removing #include "qemu/osdep.h".
+
+Other projects use a syntax-check make target to check sources.  If we
+decide we like that better than checkpatch.pl for some checks, we can do
+that.
