@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gWJsv-00041t-Tp
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 06:38:04 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gWJxz-0006Tf-OM
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 06:43:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gWJsu-0006nB-As
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 06:38:01 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gWJxv-0001Uy-AJ
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 06:43:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52894)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gWJxu-0001Ru-Tp
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 06:43:11 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EE10630832CF
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 11:43:05 +0000 (UTC)
+Date: Mon, 10 Dec 2018 11:42:54 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181210114254.GB2372@work-vm>
+References: <20181207170400.5129-1-philmd@redhat.com>
+	<20181207170400.5129-6-philmd@redhat.com>
 MIME-Version: 1.0
-References: <20181210112649.11581-1-peter.maydell@linaro.org>
-	<20181210112649.11581-4-peter.maydell@linaro.org>
-In-Reply-To: <20181210112649.11581-4-peter.maydell@linaro.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 10 Dec 2018 15:37:45 +0400
-Message-ID: <CAJ+F1CJbOMcDtCWchyeD1_cRi9ovtKYsER5DtQuEde75Hxzoxg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181207170400.5129-6-philmd@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] uuid: Make qemu_uuid_bswap() take and
- return a QemuUUID
+Subject: Re: [Qemu-devel] [PATCH 5/6] hw/nvram/fw_cfg: Add HMP 'info fw_cfg'
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,148 +35,238 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Weil <sw@weilnetz.de>, patches@linaro.org, Max Reitz <mreitz@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Mon, Dec 10, 2018 at 3:27 PM Peter Maydell <peter.maydell@linaro.org> wr=
-ote:
->
-> Currently qemu_uuid_bswap() takes a pointer to the QemuUUID to
-> be byte-swapped. This means it can't be used when the UUID
-> to be swapped is in a packed member of a struct. It's also
-> out of line with the general bswap*() functions we provide
-> in bswap.h, which take the value to be swapped and return it.
->
-> Make qemu_uuid_bswap() take a QemuUUID and return the swapped version.
->
-> This fixes some clang warnings about taking the address of
-> a packed struct member in block/vdi.c.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
+* Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
+> $ qemu-system-x86_64 -S -monitor stdio
+> (qemu) info fw_cfg
+>         Type    Perm    Size    Specific   Order   Info
+>    signature      RO       4                       QEMU
+>           id      RO       4                       0x00000003
+>         uuid      RO      16                       00000000-0000-0000-0=
+000-000000000000
+>     ram_size      RO       8                       0x0000000008000000
+>    nographic      RO       2                       0x0000
+>      nb_cpus      RO       2                       0x0001
+>         numa      RO      16
+>    boot_menu      RO       2                       0x0000
+>     max_cpus      RO       2                       0x0001
+>     file_dir      RO    2052
+>  file (id 1)      RO      36                 160   etc/acpi/rsdp
+>  file (id 2)      RO  131072                 130   etc/acpi/tables
+>  file (id 3)      RO       4                  15   etc/boot-fail-wait
+>  file (id 4)      RO      20                  40   etc/e820
+>  file (id 5)      RO      31                  30   etc/smbios/smbios-an=
+chor
+>  file (id 6)      RO     320                  20   etc/smbios/smbios-ta=
+bles
+>  file (id 7)      RO       6                  90   etc/system-states
+>  file (id 8)      RO    4096                 140   etc/table-loader
+> file (id 10)      RO    9216                  55   genroms/kvmvapic.bin
+>         uuid      RO       4  (arch spec)          01000000-0000-0000-0=
+000-000000000000
+>     ram_size      RO     324  (arch spec)
+>    nographic      RO     121  (arch spec)
+> (qemu)
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 > ---
->  include/qemu/uuid.h  |  2 +-
->  block/vdi.c          | 16 ++++++++--------
->  hw/acpi/vmgenid.c    |  6 ++----
->  tests/vmgenid-test.c |  2 +-
->  util/uuid.c          | 10 +++++-----
->  5 files changed, 17 insertions(+), 19 deletions(-)
->
-> diff --git a/include/qemu/uuid.h b/include/qemu/uuid.h
-> index 09489ce5c5e..037357d990b 100644
-> --- a/include/qemu/uuid.h
-> +++ b/include/qemu/uuid.h
-> @@ -56,6 +56,6 @@ char *qemu_uuid_unparse_strdup(const QemuUUID *uuid);
->
->  int qemu_uuid_parse(const char *str, QemuUUID *uuid);
->
-> -void qemu_uuid_bswap(QemuUUID *uuid);
-> +QemuUUID qemu_uuid_bswap(QemuUUID uuid);
->
+>  hmp-commands-info.hx      |  14 +++++
+>  hw/nvram/fw_cfg.c         | 115 ++++++++++++++++++++++++++++++++++++++
+>  include/hw/nvram/fw_cfg.h |   2 +
+>  3 files changed, 131 insertions(+)
+>=20
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index cbee8b944d..9e86dceeb4 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -916,6 +916,20 @@ STEXI
+>  @item info sev
+>  @findex info sev
+>  Show SEV information.
+> +ETEXI
+> +
+> +    {
+> +        .name       =3D "fw_cfg",
+> +        .args_type  =3D "",
+> +        .params     =3D "",
+> +        .help       =3D "Display the table of the fw_cfg entries regis=
+tered",
+> +        .cmd        =3D hmp_info_fw_cfg,
+> +    },
+> +
+> +STEXI
+> +@item info fw_cfg
+> +@findex info fw_cfg
+> +Show roms.
+>  ETEXI
+> =20
+>  STEXI
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 582653f07e..50525ec1dd 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -36,6 +36,7 @@
+>  #include "qemu/config-file.h"
+>  #include "qemu/cutils.h"
+>  #include "qapi/error.h"
+> +#include "monitor/monitor.h"
+> =20
+>  #define FW_CFG_FILE_SLOTS_DFLT 0x20
+> =20
+> @@ -1164,3 +1165,117 @@ static void fw_cfg_register_types(void)
+>  }
+> =20
+>  type_init(fw_cfg_register_types)
+> +
+> +static const char *fw_cfg_wellknown_entries[0x20] =3D {
+
+That magic 0x20 is a shame; we should probably have a #define
+for that max, or perhaps it can just be removed.
+
+> +    [FW_CFG_SIGNATURE] =3D "signature",
+> +    [FW_CFG_ID] =3D "id",
+> +    [FW_CFG_UUID] =3D "uuid",
+> +    [FW_CFG_RAM_SIZE] =3D "ram_size",
+> +    [FW_CFG_NOGRAPHIC] =3D "nographic",
+> +    [FW_CFG_NB_CPUS] =3D "nb_cpus",
+> +    [FW_CFG_MACHINE_ID] =3D "machine_id",
+> +    [FW_CFG_KERNEL_ADDR] =3D "kernel_addr",
+> +    [FW_CFG_KERNEL_SIZE] =3D "kernel_size",
+> +    [FW_CFG_KERNEL_CMDLINE] =3D "kernel_cmdline",
+> +    [FW_CFG_INITRD_ADDR] =3D "initrd_addr",
+> +    [FW_CFG_INITRD_SIZE] =3D "initdr_size",
+> +    [FW_CFG_BOOT_DEVICE] =3D "boot_device",
+> +    [FW_CFG_NUMA] =3D "numa",
+> +    [FW_CFG_BOOT_MENU] =3D "boot_menu",
+> +    [FW_CFG_MAX_CPUS] =3D "max_cpus",
+> +    [FW_CFG_KERNEL_ENTRY] =3D "kernel_entry",
+> +    [FW_CFG_KERNEL_DATA] =3D "kernel_data",
+> +    [FW_CFG_INITRD_DATA] =3D "initrd_data",
+> +    [FW_CFG_CMDLINE_ADDR] =3D "cmdline_addr",
+> +    [FW_CFG_CMDLINE_SIZE] =3D "cmdline_size",
+> +    [FW_CFG_CMDLINE_DATA] =3D "cmdline_data",
+> +    [FW_CFG_SETUP_ADDR] =3D "setup_addr",
+> +    [FW_CFG_SETUP_SIZE] =3D "setup_size",
+> +    [FW_CFG_SETUP_DATA] =3D "setup_data",
+> +    [FW_CFG_FILE_DIR] =3D "file_dir",
+> +};
+> +
+> +void hmp_info_fw_cfg(Monitor *mon, const QDict *qdict)
+> +{
+> +    FWCfgState *s =3D fw_cfg_find();
+> +    int arch, key;
+> +
+> +    monitor_printf(mon, "%12s %5s %7s %9s %6s %-24s\n",
+> +                   "Type", "Perm", "Size", "Specific", "Order", "Info"=
+);
+> +    for (arch =3D 0; arch < ARRAY_SIZE(s->entries); ++arch) {
+> +        for (key =3D 0; key < fw_cfg_max_entry(s); ++key) {
+> +            FWCfgEntry *e =3D &s->entries[arch][key];
+> +            const char *perm =3D e->allow_write ? "RW" : "RO";
+> +            const char *arch_spec =3D arch ? "arch_spec" : "";
+> +            char *type, *info =3D NULL;
+> +
+> +            if (!e->len) {
+> +                continue;
+> +            }
+> +            if (key >=3D FW_CFG_FILE_FIRST) {
+> +                int id =3D key - FW_CFG_FILE_FIRST;
+> +                const char *path =3D s->files->f[id].name;
+> +
+> +                type =3D g_strdup_printf("file (id %d)", id);
+> +                monitor_printf(mon, "%12s %5s %7d %10s %5d %-24s\n",
+> +                               type, perm, e->len, arch_spec,
+> +                               get_fw_cfg_order(s, path), path);
+> +                g_free(type);
+> +                continue;
+> +            }
+> +            type =3D g_strdup(fw_cfg_wellknown_entries[key]);
+> +            if (!type) {
+> +                type =3D g_strdup_printf("entry_%d", key);
+> +            }
+> +
+> +            switch (key) {
+> +            case FW_CFG_SIGNATURE:
+> +                info =3D g_strndup((const gchar *)e->data, e->len);
+> +                break;
+> +            case FW_CFG_UUID:
+> +                info =3D qemu_uuid_unparse_strdup((const QemuUUID *)e-=
+>data);
+> +                break;
+
+It seems odd to encode the type of each entry in this switch;  I guess
+it's OK if no one else needs it, else perhaps there should be a type
+array.
+
+Other than that, it's fine from the HMP side, but I agree it should
+either have a QMP equivalent (in which case the structure is a bit
+different) or a good justification of if it's really debug only.
+
+Dave
+
+> +            case FW_CFG_ID:
+> +            case FW_CFG_NOGRAPHIC:
+> +            case FW_CFG_NB_CPUS:
+> +            case FW_CFG_BOOT_MENU:
+> +            case FW_CFG_MAX_CPUS:
+> +            case FW_CFG_RAM_SIZE:
+> +            case FW_CFG_KERNEL_ADDR:
+> +            case FW_CFG_KERNEL_SIZE:
+> +            case FW_CFG_KERNEL_CMDLINE:
+> +            case FW_CFG_KERNEL_ENTRY:
+> +            case FW_CFG_KERNEL_DATA:
+> +            case FW_CFG_INITRD_ADDR:
+> +            case FW_CFG_INITRD_SIZE:
+> +            case FW_CFG_INITRD_DATA:
+> +            case FW_CFG_CMDLINE_ADDR:
+> +            case FW_CFG_CMDLINE_SIZE:
+> +            case FW_CFG_CMDLINE_DATA:
+> +            case FW_CFG_SETUP_ADDR:
+> +            case FW_CFG_SETUP_SIZE:
+> +            case FW_CFG_SETUP_DATA:
+> +                switch (e->len) {
+> +                case 2:
+> +                    info =3D g_strdup_printf("0x%04x", lduw_le_p(e->da=
+ta));
+> +                    break;
+> +                case 4:
+> +                    info =3D g_strdup_printf("0x%08x", ldl_le_p(e->dat=
+a));
+> +                    break;
+> +                case 8:
+> +                    info =3D g_strdup_printf("0x%016" PRIx64, ldq_le_p=
+(e->data));
+> +                    break;
+> +                default:
+> +                    break;
+> +                }
+> +                break;
+> +            default:
+> +                break;
+> +            }
+> +            monitor_printf(mon, "%12s %5s %7d %10s %5s %-24s\n",
+> +                           type, perm, e->len, arch_spec, "", info ? i=
+nfo : "");
+> +            g_free(type);
+> +            g_free(info);
+> +        }
+> +    }
+> +}
+> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
+> index f5a6895a74..28630b2f26 100644
+> --- a/include/hw/nvram/fw_cfg.h
+> +++ b/include/hw/nvram/fw_cfg.h
+> @@ -226,4 +226,6 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
+>  FWCfgState *fw_cfg_find(void);
+>  bool fw_cfg_dma_enabled(void *opaque);
+> =20
+> +void hmp_info_fw_cfg(Monitor *mon, const QDict *qdict);
+> +
 >  #endif
-> diff --git a/block/vdi.c b/block/vdi.c
-> index 4cc726047c3..0c34f6bae46 100644
-> --- a/block/vdi.c
-> +++ b/block/vdi.c
-> @@ -203,10 +203,10 @@ static void vdi_header_to_cpu(VdiHeader *header)
->      header->block_extra =3D le32_to_cpu(header->block_extra);
->      header->blocks_in_image =3D le32_to_cpu(header->blocks_in_image);
->      header->blocks_allocated =3D le32_to_cpu(header->blocks_allocated);
-> -    qemu_uuid_bswap(&header->uuid_image);
-> -    qemu_uuid_bswap(&header->uuid_last_snap);
-> -    qemu_uuid_bswap(&header->uuid_link);
-> -    qemu_uuid_bswap(&header->uuid_parent);
-> +    header->uuid_image =3D qemu_uuid_bswap(header->uuid_image);
-> +    header->uuid_last_snap =3D qemu_uuid_bswap(header->uuid_last_snap);
-> +    header->uuid_link =3D qemu_uuid_bswap(header->uuid_link);
-> +    header->uuid_parent =3D qemu_uuid_bswap(header->uuid_parent);
->  }
->
->  static void vdi_header_to_le(VdiHeader *header)
-> @@ -227,10 +227,10 @@ static void vdi_header_to_le(VdiHeader *header)
->      header->block_extra =3D cpu_to_le32(header->block_extra);
->      header->blocks_in_image =3D cpu_to_le32(header->blocks_in_image);
->      header->blocks_allocated =3D cpu_to_le32(header->blocks_allocated);
-> -    qemu_uuid_bswap(&header->uuid_image);
-> -    qemu_uuid_bswap(&header->uuid_last_snap);
-> -    qemu_uuid_bswap(&header->uuid_link);
-> -    qemu_uuid_bswap(&header->uuid_parent);
-> +    header->uuid_image =3D qemu_uuid_bswap(header->uuid_image);
-> +    header->uuid_last_snap =3D qemu_uuid_bswap(header->uuid_last_snap);
-> +    header->uuid_link =3D qemu_uuid_bswap(header->uuid_link);
-> +    header->uuid_parent =3D qemu_uuid_bswap(header->uuid_parent);
->  }
->
->  static void vdi_header_print(VdiHeader *header)
-> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-> index d78b579a201..02717a8b0dc 100644
-> --- a/hw/acpi/vmgenid.c
-> +++ b/hw/acpi/vmgenid.c
-> @@ -30,8 +30,7 @@ void vmgenid_build_acpi(VmGenIdState *vms, GArray *tabl=
-e_data, GArray *guid,
->       * first, since that's what the guest expects
->       */
->      g_array_set_size(guid, VMGENID_FW_CFG_SIZE - ARRAY_SIZE(guid_le.data=
-));
-> -    guid_le =3D vms->guid;
-> -    qemu_uuid_bswap(&guid_le);
-> +    guid_le =3D qemu_uuid_bswap(vms->guid);
->      /* The GUID is written at a fixed offset into the fw_cfg file
->       * in order to implement the "OVMF SDT Header probe suppressor"
->       * see docs/specs/vmgenid.txt for more details
-> @@ -149,8 +148,7 @@ static void vmgenid_update_guest(VmGenIdState *vms)
->               * however, will expect the fields to be little-endian.
->               * Perform a byte swap immediately before writing.
->               */
-> -            guid_le =3D vms->guid;
-> -            qemu_uuid_bswap(&guid_le);
-> +            guid_le =3D qemu_uuid_bswap(vms->guid);
->              /* The GUID is written at a fixed offset into the fw_cfg fil=
-e
->               * in order to implement the "OVMF SDT Header probe suppress=
-or"
->               * see docs/specs/vmgenid.txt for more details.
-> diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-> index 0a6fb55f2eb..98db43f5a65 100644
-> --- a/tests/vmgenid-test.c
-> +++ b/tests/vmgenid-test.c
-> @@ -110,7 +110,7 @@ static void read_guid_from_memory(QemuUUID *guid)
->      /* The GUID is in little-endian format in the guest, while QEMU
->       * uses big-endian.  Swap after reading.
->       */
-> -    qemu_uuid_bswap(guid);
-> +    *guid =3D qemu_uuid_bswap(*guid);
->  }
->
->  static void read_guid_from_monitor(QemuUUID *guid)
-> diff --git a/util/uuid.c b/util/uuid.c
-> index ebf06c049ad..5787f0978c1 100644
-> --- a/util/uuid.c
-> +++ b/util/uuid.c
-> @@ -110,10 +110,10 @@ int qemu_uuid_parse(const char *str, QemuUUID *uuid=
-)
->
->  /* Swap from UUID format endian (BE) to the opposite or vice versa.
->   */
-> -void qemu_uuid_bswap(QemuUUID *uuid)
-> +QemuUUID qemu_uuid_bswap(QemuUUID uuid)
->  {
-> -    assert(QEMU_PTR_IS_ALIGNED(uuid, sizeof(uint32_t)));
-> -    bswap32s(&uuid->fields.time_low);
-> -    bswap16s(&uuid->fields.time_mid);
-> -    bswap16s(&uuid->fields.time_high_and_version);
-> +    bswap32s(&uuid.fields.time_low);
-> +    bswap16s(&uuid.fields.time_mid);
-> +    bswap16s(&uuid.fields.time_high_and_version);
-> +    return uuid;
->  }
-> --
-> 2.19.2
->
->
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+> --=20
+> 2.17.2
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
