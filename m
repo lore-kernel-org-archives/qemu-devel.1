@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gWPnJ-0007j4-Fl
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:56:38 -0500
+	(envelope-from <mst@redhat.com>) id 1gWPoZ-0008TH-Er
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:57:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gWPnE-0000qa-Hb
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:56:37 -0500
-Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:33556)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gWPnE-0000o7-6t
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:56:32 -0500
-Received: by mail-oi1-x235.google.com with SMTP id c206so9732072oib.0
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 09:56:31 -0800 (PST)
-References: <cover.1544229872.git.alistair.francis@wdc.com>
-	<c1cbe33881d567ee4712128282e6fcc49a5736b5.1544229872.git.alistair.francis@wdc.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <98465a90-99cc-bce6-8cde-5025a30b3785@linaro.org>
-Date: Mon, 10 Dec 2018 11:56:27 -0600
+	(envelope-from <mst@redhat.com>) id 1gWPoY-0001Xl-9u
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:57:55 -0500
+Date: Mon, 10 Dec 2018 12:57:41 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181210125731-mutt-send-email-mst@kernel.org>
+References: <20181210112649.11581-1-peter.maydell@linaro.org>
+	<20181210112649.11581-4-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <c1cbe33881d567ee4712128282e6fcc49a5736b5.1544229872.git.alistair.francis@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3 19/24] riscv: tcg-target: Add the out op
- decoder
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181210112649.11581-4-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 3/3] uuid: Make qemu_uuid_bswap() take and
+ return a QemuUUID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,26 +24,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
-Cc: "alistair23@gmail.com" <alistair23@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Ben Warren <ben@skyportsystems.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Weil <sw@weilnetz.de>
 
-On 12/7/18 6:49 PM, Alistair Francis wrote:
-> +    case INDEX_op_neg_i64:
-> +        tcg_out_opc_imm(s, OPC_SUB, a0, TCG_REG_ZERO, a1);
+On Mon, Dec 10, 2018 at 11:26:49AM +0000, Peter Maydell wrote:
+> Currently qemu_uuid_bswap() takes a pointer to the QemuUUID to
+> be byte-swapped. This means it can't be used when the UUID
+> to be swapped is in a packed member of a struct. It's also
+> out of line with the general bswap*() functions we provide
+> in bswap.h, which take the value to be swapped and return it.
+> 
+> Make qemu_uuid_bswap() take a QemuUUID and return the swapped version.
+> 
+> This fixes some clang warnings about taking the address of
+> a packed struct member in block/vdi.c.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-tcg_out_opc_reg.
+For acpi:
 
-> +    case INDEX_op_mulsh_i32:
-> +    case INDEX_op_mulsh_i64:
-> +        tcg_out_opc_imm(s, OPC_MULH, a0, a1, a2);
-> +        break;
-> +
-> +    case INDEX_op_muluh_i32:
-> +    case INDEX_op_muluh_i64:
-> +        tcg_out_opc_imm(s, OPC_MULHU, a0, a1, a2);
-> +        break;
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-Likewise.
-
-
-r~
+> ---
+>  include/qemu/uuid.h  |  2 +-
+>  block/vdi.c          | 16 ++++++++--------
+>  hw/acpi/vmgenid.c    |  6 ++----
+>  tests/vmgenid-test.c |  2 +-
+>  util/uuid.c          | 10 +++++-----
+>  5 files changed, 17 insertions(+), 19 deletions(-)
+> 
+> diff --git a/include/qemu/uuid.h b/include/qemu/uuid.h
+> index 09489ce5c5e..037357d990b 100644
+> --- a/include/qemu/uuid.h
+> +++ b/include/qemu/uuid.h
+> @@ -56,6 +56,6 @@ char *qemu_uuid_unparse_strdup(const QemuUUID *uuid);
+>  
+>  int qemu_uuid_parse(const char *str, QemuUUID *uuid);
+>  
+> -void qemu_uuid_bswap(QemuUUID *uuid);
+> +QemuUUID qemu_uuid_bswap(QemuUUID uuid);
+>  
+>  #endif
+> diff --git a/block/vdi.c b/block/vdi.c
+> index 4cc726047c3..0c34f6bae46 100644
+> --- a/block/vdi.c
+> +++ b/block/vdi.c
+> @@ -203,10 +203,10 @@ static void vdi_header_to_cpu(VdiHeader *header)
+>      header->block_extra = le32_to_cpu(header->block_extra);
+>      header->blocks_in_image = le32_to_cpu(header->blocks_in_image);
+>      header->blocks_allocated = le32_to_cpu(header->blocks_allocated);
+> -    qemu_uuid_bswap(&header->uuid_image);
+> -    qemu_uuid_bswap(&header->uuid_last_snap);
+> -    qemu_uuid_bswap(&header->uuid_link);
+> -    qemu_uuid_bswap(&header->uuid_parent);
+> +    header->uuid_image = qemu_uuid_bswap(header->uuid_image);
+> +    header->uuid_last_snap = qemu_uuid_bswap(header->uuid_last_snap);
+> +    header->uuid_link = qemu_uuid_bswap(header->uuid_link);
+> +    header->uuid_parent = qemu_uuid_bswap(header->uuid_parent);
+>  }
+>  
+>  static void vdi_header_to_le(VdiHeader *header)
+> @@ -227,10 +227,10 @@ static void vdi_header_to_le(VdiHeader *header)
+>      header->block_extra = cpu_to_le32(header->block_extra);
+>      header->blocks_in_image = cpu_to_le32(header->blocks_in_image);
+>      header->blocks_allocated = cpu_to_le32(header->blocks_allocated);
+> -    qemu_uuid_bswap(&header->uuid_image);
+> -    qemu_uuid_bswap(&header->uuid_last_snap);
+> -    qemu_uuid_bswap(&header->uuid_link);
+> -    qemu_uuid_bswap(&header->uuid_parent);
+> +    header->uuid_image = qemu_uuid_bswap(header->uuid_image);
+> +    header->uuid_last_snap = qemu_uuid_bswap(header->uuid_last_snap);
+> +    header->uuid_link = qemu_uuid_bswap(header->uuid_link);
+> +    header->uuid_parent = qemu_uuid_bswap(header->uuid_parent);
+>  }
+>  
+>  static void vdi_header_print(VdiHeader *header)
+> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+> index d78b579a201..02717a8b0dc 100644
+> --- a/hw/acpi/vmgenid.c
+> +++ b/hw/acpi/vmgenid.c
+> @@ -30,8 +30,7 @@ void vmgenid_build_acpi(VmGenIdState *vms, GArray *table_data, GArray *guid,
+>       * first, since that's what the guest expects
+>       */
+>      g_array_set_size(guid, VMGENID_FW_CFG_SIZE - ARRAY_SIZE(guid_le.data));
+> -    guid_le = vms->guid;
+> -    qemu_uuid_bswap(&guid_le);
+> +    guid_le = qemu_uuid_bswap(vms->guid);
+>      /* The GUID is written at a fixed offset into the fw_cfg file
+>       * in order to implement the "OVMF SDT Header probe suppressor"
+>       * see docs/specs/vmgenid.txt for more details
+> @@ -149,8 +148,7 @@ static void vmgenid_update_guest(VmGenIdState *vms)
+>               * however, will expect the fields to be little-endian.
+>               * Perform a byte swap immediately before writing.
+>               */
+> -            guid_le = vms->guid;
+> -            qemu_uuid_bswap(&guid_le);
+> +            guid_le = qemu_uuid_bswap(vms->guid);
+>              /* The GUID is written at a fixed offset into the fw_cfg file
+>               * in order to implement the "OVMF SDT Header probe suppressor"
+>               * see docs/specs/vmgenid.txt for more details.
+> diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+> index 0a6fb55f2eb..98db43f5a65 100644
+> --- a/tests/vmgenid-test.c
+> +++ b/tests/vmgenid-test.c
+> @@ -110,7 +110,7 @@ static void read_guid_from_memory(QemuUUID *guid)
+>      /* The GUID is in little-endian format in the guest, while QEMU
+>       * uses big-endian.  Swap after reading.
+>       */
+> -    qemu_uuid_bswap(guid);
+> +    *guid = qemu_uuid_bswap(*guid);
+>  }
+>  
+>  static void read_guid_from_monitor(QemuUUID *guid)
+> diff --git a/util/uuid.c b/util/uuid.c
+> index ebf06c049ad..5787f0978c1 100644
+> --- a/util/uuid.c
+> +++ b/util/uuid.c
+> @@ -110,10 +110,10 @@ int qemu_uuid_parse(const char *str, QemuUUID *uuid)
+>  
+>  /* Swap from UUID format endian (BE) to the opposite or vice versa.
+>   */
+> -void qemu_uuid_bswap(QemuUUID *uuid)
+> +QemuUUID qemu_uuid_bswap(QemuUUID uuid)
+>  {
+> -    assert(QEMU_PTR_IS_ALIGNED(uuid, sizeof(uint32_t)));
+> -    bswap32s(&uuid->fields.time_low);
+> -    bswap16s(&uuid->fields.time_mid);
+> -    bswap16s(&uuid->fields.time_high_and_version);
+> +    bswap32s(&uuid.fields.time_low);
+> +    bswap16s(&uuid.fields.time_mid);
+> +    bswap16s(&uuid.fields.time_high_and_version);
+> +    return uuid;
+>  }
+> -- 
+> 2.19.2
