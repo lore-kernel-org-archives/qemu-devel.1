@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gWBuy-00084i-Gn
-	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 22:07:38 -0500
+	(envelope-from <xuyandong2@huawei.com>) id 1gWC0O-00057d-5E
+	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 22:13:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gWBuv-0000FK-8A
-	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 22:07:36 -0500
-Date: Mon, 10 Dec 2018 14:05:27 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181210030527.GF4261@umbus.fritz.box>
-References: <20181205232251.10446-1-clg@kaod.org>
-	<20181205232251.10446-9-clg@kaod.org>
-	<20181207031007.GZ768@umbus.fritz.box>
-	<388a3d28-8684-d2f3-6deb-7f88db46e63c@kaod.org>
+	(envelope-from <xuyandong2@huawei.com>) id 1gWC0K-00033g-U1
+	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 22:13:12 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2746 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <xuyandong2@huawei.com>)
+	id 1gWC0I-00031k-Sd
+	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 22:13:08 -0500
+From: xuyandong <xuyandong2@huawei.com>
+Date: Mon, 10 Dec 2018 03:12:53 +0000
+Message-ID: <7CECC2DFC21538489F72729DF5EFB4D908AC486D@DGGEMM501-MBX.china.huawei.com>
+References: <7CECC2DFC21538489F72729DF5EFB4D908ABD3A4@dggemm521-mbs.china.huawei.com>
+	<20181209211730-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20181209211730-mutt-send-email-mst@kernel.org>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="+ts6NCQ4mrNQIV8p"
-Content-Disposition: inline
-In-Reply-To: <388a3d28-8684-d2f3-6deb-7f88db46e63c@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v6 08/37] ppc/xive: introduce a simplified
- XIVE presenter
+Subject: Re: [Qemu-devel] [BUG]Unassigned mem write during pci device
+ hot-plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,403 +30,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "marcel@redhat.com" <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>
 
-
---+ts6NCQ4mrNQIV8p
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Dec 07, 2018 at 09:49:29AM +0100, C=E9dric Le Goater wrote:
-> On 12/7/18 4:10 AM, David Gibson wrote:
-> > On Thu, Dec 06, 2018 at 12:22:22AM +0100, C=E9dric Le Goater wrote:
-> >> The last sub-engine of the XIVE architecture is the Interrupt
-> >> Virtualization Presentation Engine (IVPE). On HW, the IVRE and the
-> >> IVPE share elements, the Power Bus interface (CQ), the routing table
-> >> descriptors, and they can be combined in the same HW logic. We do the
-> >> same in QEMU and combine both engines in the XiveRouter for
-> >> simplicity.
-> >>
-> >> When the IVRE has completed its job of matching an event source with a
-> >> Notification Virtual Target (NVT) to notify, it forwards the event
-> >> notification to the IVPE sub-engine. The IVPE scans the thread
-> >> interrupt contexts of the Notification Virtual Targets (NVT)
-> >> dispatched on the HW processor threads and if a match is found, it
-> >> signals the thread. If not, the IVPE escalates the notification to
-> >> some other targets and records the notification in a backlog queue.
-> >>
-> >> The IVPE maintains the thread interrupt context state for each of its
-> >> NVTs not dispatched on HW processor threads in the Notification
-> >> Virtual Target table (NVTT).
-> >>
-> >> The model currently only supports single NVT notifications.
-> >>
-> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> >> ---
-> >>  include/hw/ppc/xive.h      |  15 +++
-> >>  include/hw/ppc/xive_regs.h |  24 ++++
-> >>  hw/intc/xive.c             | 227 +++++++++++++++++++++++++++++++++++++
-> >>  3 files changed, 266 insertions(+)
-> >>
-> >> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> >> index 74b547707b17..e9b06e75fc1c 100644
-> >> --- a/include/hw/ppc/xive.h
-> >> +++ b/include/hw/ppc/xive.h
-> >> @@ -327,6 +327,10 @@ typedef struct XiveRouterClass {
-> >>                     XiveEND *end);
-> >>      int (*write_end)(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_=
-idx,
-> >>                       XiveEND *end, uint8_t word_number);
-> >> +    int (*get_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_id=
-x,
-> >> +                   XiveNVT *nvt);
-> >> +    int (*write_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_=
-idx,
-> >> +                     XiveNVT *nvt, uint8_t word_number);
-> >>  } XiveRouterClass;
-> >> =20
-> >>  void xive_eas_pic_print_info(XiveEAS *eas, uint32_t lisn, Monitor *mo=
-n);
-> >> @@ -337,6 +341,11 @@ int xive_router_get_end(XiveRouter *xrtr, uint8_t=
- end_blk, uint32_t end_idx,
-> >>                          XiveEND *end);
-> >>  int xive_router_write_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t=
- end_idx,
-> >>                            XiveEND *end, uint8_t word_number);
-> >> +int xive_router_get_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t n=
-vt_idx,
-> >> +                        XiveNVT *nvt);
-> >> +int xive_router_write_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t=
- nvt_idx,
-> >> +                          XiveNVT *nvt, uint8_t word_number);
-> >> +
-> >> =20
-> >>  /*
-> >>   * XIVE END ESBs
-> >> @@ -393,6 +402,7 @@ typedef struct XiveTCTX {
-> >>      qemu_irq    output;
-> >> =20
-> >>      uint8_t     regs[XIVE_TM_RING_COUNT * XIVE_TM_RING_SIZE];
-> >> +    uint32_t    hw_cam;
-> >=20
-> > I don't love having this as a separate field.  Since it also appears
-> > within the register space, it's kind of redundant.=20
->=20
-> yes.
->=20
-> > On the other hand,
-> > I see that wiring up the property directly to the register space
-> > doesn't really work.  Not sure how to deal with that one.
->=20
-> We could use get/set properties for "hw-cam" to assign WORD2 of the=20
-> physical ring and exclude it from reset, which makes some sense. The
-> test on the PHYS ring in xive_presenter_tctx_match() would also look=20
-> like the other tests. I think this is better.
-
-Ok sounds good.
-
-> On a related topic, WORD2 of the OS ring is assigned by the hypervisor.=
-=20
-> For the sPAPR machine, this is done when the sPAPR IRQ backend is=20
-> reseted. See patch 21 in v6.
-
-Yes, I figured.
-
-[snip]
-> >> +/*
-> >> + * The thread context register words are in big-endian format.
-> >> + */
-> >> +static int xive_presenter_tctx_match(XiveTCTX *tctx, uint8_t format,
-> >> +                                     uint8_t nvt_blk, uint32_t nvt_id=
-x,
-> >> +                                     bool cam_ignore, uint32_t logic_=
-serv)
-> >> +{
-> >> +    uint32_t cam =3D xive_nvt_cam_line(nvt_blk, nvt_idx);
-> >> +    uint8_t *regs;
-> >> +    uint32_t qw3w2;
-> >> +    uint32_t qw2w2;
-> >> +    uint32_t qw1w2;
-> >> +    uint32_t qw0w2;
-> >> +
-> >> +    /* TODO (PowerNV): ignore low order bits of nvt id */
-> >> +
-> >> +    regs =3D &tctx->regs[TM_QW3_HV_PHYS];
-> >> +    qw3w2 =3D be32_to_cpu(*((uint32_t *) &regs[TM_WORD2]));
-> >=20
-> > This is one of the main places we access regs and we have to do
-> > horrible casting.  Would it make more sense for it to be a uint32_t
-> > array?  Or at least for the local *regs to be.
->=20
-> The register array is accessed by byte (patch 9) for the first two=20
-> words and by word for WORD2. I don't see any good solution apart=20
-> from a helper routine maybe :=20
->=20
->   static inline uint32_t xive_tctx_word2(int8_t *regs)
->   {
->       return be32_to_cpu(*((uint32_t *) &regs[TM_WORD2]));
->   }
->=20
-> which I need for xive_tctx_ring_print() also.
-
-Well, you could at least make the regs local variable a uint32_t *,
-since you're only accessing the 32-bit parts of the ring in this
-function.
-
-Alternatively, you could represent the regs not with a plain array,
-but a structure which has some u8 fields and some u32 fields.
-
-> =20
-> >> +    regs =3D &tctx->regs[TM_QW2_HV_POOL];
-> >> +    qw2w2 =3D be32_to_cpu(*((uint32_t *) &regs[TM_WORD2]));
-> >> +    regs =3D &tctx->regs[TM_QW1_OS];
-> >> +    qw1w2 =3D be32_to_cpu(*((uint32_t *) &regs[TM_WORD2]));
-> >> +    regs =3D &tctx->regs[TM_QW0_USER];
-> >> +    qw0w2 =3D be32_to_cpu(*((uint32_t *) &regs[TM_WORD2]));
-> >> +
-> >> +    if (format =3D=3D 0) {
-> >> +        /* F=3D0 & i=3D1: Logical server notification */
-> >=20
-> > I'm guessing the i=3D1 is the cam_ignore=3D=3Dtrue check?  Maybe put th=
-is
-> > comment inside the if block to make that clearer.
->=20
-> yes.=20
->=20
-> >=20
-> >> +        if (cam_ignore =3D=3D true) {
-> >> +            qemu_log_mask(LOG_UNIMP, "XIVE: no support for LS NVT %x/=
-%x\n",
-> >> +                          nvt_blk, nvt_idx);
-> >> +             return -1;
-> >> +        }
-> >> +
-> >> +        /* F=3D0 & i=3D0: Specific NVT notification */
-> >> +
-> >> +        /* PHYS ring */
-> >> +        if ((qw3w2 & TM_QW3W2_VT) &&
-> >> +            tctx->hw_cam =3D=3D hw_cam_line(nvt_blk, nvt_idx)) {
-> >> +            return TM_QW3_HV_PHYS;
-> >> +        }
-> >> +
-> >> +        /* HV POOL ring */
-> >> +        if ((qw2w2 & TM_QW2W2_VP) &&
-> >> +            cam =3D=3D GETFIELD(TM_QW2W2_POOL_CAM, qw2w2)) {
-> >=20
-> > Does that need to be a GETFIELD_BE32?
->=20
-> the qw[0123]w2 variables have been byteswapped already. But, that might
-> not be a good idea. in that case, we should byteswap the V[TPOU] bit valu=
-e=20
-> instead ? What's your opinion.
-
-Actually I think it's fine as it is, I was just missing that the
-locals were already byteswapped values.  As a rule I dislike
-byteswapping constants rather than the variable part (at least partly
-because it's a pattern that *only* works for bitwise operations).
-
->=20
-> we would get rid of the be32_to_cpu() above=20
->=20
-> >=20
-> >> +            return TM_QW2_HV_POOL;
-> >> +        }
-> >> +
-> >> +        /* OS ring */
-> >> +        if ((qw1w2 & TM_QW1W2_VO) &&
-> >> +            cam =3D=3D GETFIELD(TM_QW1W2_OS_CAM, qw1w2)) {
-> >=20
-> > And here.
-> >=20
-> >> +            return TM_QW1_OS;
-> >> +        }
-> >> +    } else {
-> >> +        /* F=3D1 : User level Event-Based Branch (EBB) notification */
-> >> +
-> >> +        /* USER ring */
-> >> +        if  ((qw1w2 & TM_QW1W2_VO) &&
-> >> +             (cam =3D=3D GETFIELD(TM_QW1W2_OS_CAM, qw1w2)) &&
-> >=20
-> > And here.
-> >=20
-> >> +             (qw0w2 & TM_QW0W2_VU) &&
-> >> +             (logic_serv =3D=3D GETFIELD(TM_QW0W2_LOGIC_SERV, qw0w2))=
-) {
-> >> +            return TM_QW0_USER;
-> >> +        }
-> >> +    }
-> >> +    return -1;
-> >> +}
-> >> +
-> >> +typedef struct XiveTCTXMatch {
-> >> +    XiveTCTX *tctx;
-> >> +    uint8_t ring;
-> >> +} XiveTCTXMatch;
-> >> +
-> >> +static bool xive_presenter_match(XiveRouter *xrtr, uint8_t format,
-> >> +                                 uint8_t nvt_blk, uint32_t nvt_idx,
-> >> +                                 bool cam_ignore, uint8_t priority,
-> >> +                                 uint32_t logic_serv, XiveTCTXMatch *=
-match)
-> >> +{
-> >> +    CPUState *cs;
-> >> +
-> >> +    /* TODO (PowerNV): handle chip_id overwrite of block field for
-> >> +     * hardwired CAM compares */
-> >> +
-> >> +    CPU_FOREACH(cs) {
-> >> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> >> +        XiveTCTX *tctx =3D XIVE_TCTX(cpu->intc);
-> >> +        int ring;
-> >> +
-> >> +        /*
-> >> +         * HW checks that the CPU is enabled in the Physical Thread
-> >> +         * Enable Register (PTER).
-> >> +         */
-> >> +
-> >> +        /*
-> >> +         * Check the thread context CAM lines and record matches. We
-> >> +         * will handle CPU exception delivery later
-> >> +         */
-> >> +        ring =3D xive_presenter_tctx_match(tctx, format, nvt_blk, nvt=
-_idx,
-> >> +                                         cam_ignore, logic_serv);
-> >> +        /*
-> >> +         * Save the context and follow on to catch duplicates, that we
-> >> +         * don't support yet.
-> >> +         */
-> >> +        if (ring !=3D -1) {
-> >> +            if (match->tctx) {
-> >> +                qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found a=
- thread "
-> >> +                              "context NVT %x/%x\n", nvt_blk, nvt_idx=
-);
-> >> +                return false;
-> >> +            }
-> >> +
-> >> +            match->ring =3D ring;
-> >> +            match->tctx =3D tctx;
-> >> +        }
-> >> +    }
-> >> +
-> >> +    if (!match->tctx) {
-> >> +        qemu_log_mask(LOG_UNIMP, "XIVE: NVT %x/%x is not dispatched\n=
-",
-> >> +                      nvt_blk, nvt_idx);
-> >> +        return false;
-> >> +    }
-> >> +
-> >> +    return true;
-> >> +}
-> >> +
-> >> +/*
-> >> + * This is our simple Xive Presenter Engine model. It is merged in the
-> >> + * Router as it does not require an extra object.
-> >> + *
-> >> + * It receives notification requests sent by the IVRE to find one
-> >> + * matching NVT (or more) dispatched on the processor threads. In case
-> >> + * of a single NVT notification, the process is abreviated and the
-> >> + * thread is signaled if a match is found. In case of a logical server
-> >> + * notification (bits ignored at the end of the NVT identifier), the
-> >> + * IVPE and IVRE select a winning thread using different filters. This
-> >> + * involves 2 or 3 exchanges on the PowerBus that the model does not
-> >> + * support.
-> >> + *
-> >> + * The parameters represent what is sent on the PowerBus
-> >> + */
-> >> +static void xive_presenter_notify(XiveRouter *xrtr, uint8_t format,
-> >> +                                  uint8_t nvt_blk, uint32_t nvt_idx,
-> >> +                                  bool cam_ignore, uint8_t priority,
-> >> +                                  uint32_t logic_serv)
-> >> +{
-> >> +    XiveNVT nvt;
-> >> +    XiveTCTXMatch match =3D { 0 };
-> >=20
-> > IIUC that's initializing the tctx pointer field of match, so should be
-> > NULL, not 0 (yes, technically they're equivalent in C, but using 0 for
-> > a pointer is confusing).
->=20
-> OK. I will clarify.
->=20
-> >=20
-> >> +    bool found;
-> >> +
-> >> +    /* NVT cache lookup */
-> >> +    if (xive_router_get_nvt(xrtr, nvt_blk, nvt_idx, &nvt)) {
-> >> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: no NVT %x/%x\n",
-> >> +                      nvt_blk, nvt_idx);
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    if (!xive_nvt_is_valid(&nvt)) {
-> >> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: NVT %x/%x is invalid\n",
-> >> +                      nvt_blk, nvt_idx);
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    found =3D xive_presenter_match(xrtr, format, nvt_blk, nvt_idx, ca=
-m_ignore,
-> >> +                                 priority, logic_serv, &match);
-> >> +    if (found) {
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    /* If no matching NVT is dispatched on a HW thread :
-> >> +     * - update the NVT structure if backlog is activated
-> >> +     * - escalate (ESe PQ bits and EAS in w4-5) if escalation is
-> >> +     *   activated
-> >> +     */
-> >> +}
-> >> +
-> >>  /*
-> >>   * An END trigger can come from an event trigger (IPI or HW) or from
-> >>   * another chip. We don't model the PowerBus but the END trigger
-> >> @@ -1047,6 +1266,14 @@ static void xive_router_end_notify(XiveRouter *=
-xrtr, uint8_t end_blk,
-> >>      /*
-> >>       * Follows IVPE notification
-> >>       */
-> >> +    xive_presenter_notify(xrtr, format,
-> >> +                          GETFIELD_BE32(END_W6_NVT_BLOCK, end.w6),
-> >> +                          GETFIELD_BE32(END_W6_NVT_INDEX, end.w6),
-> >> +                          GETFIELD_BE32(END_W7_F0_IGNORE, end.w7),
-> >> +                          priority,
-> >> +                          GETFIELD_BE32(END_W7_F1_LOG_SERVER_ID, end.=
-w7));
-> >> +
-> >> +    /* TODO: Auto EOI. */
-> >>  }
-> >> =20
-> >>  static void xive_router_notify(XiveNotifier *xn, uint32_t lisn)
-> >=20
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---+ts6NCQ4mrNQIV8p
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwN1/cACgkQbDjKyiDZ
-s5JplBAA0N829EAS1LvJ6J8PWVrlNQZUVb62UK4Si/XgnHIwTkkcabMjJxhnn13E
-b7JwbagspHFWuWgnjG6/5O2mwdN/FLOpJcPBzFZt5R+4/Y+JPQKteele8uoGLx1M
-XpxeldheU7W/DbODBOgk6dLJ/OeycbQpm7pez1BpiDdggUpMiMtdo1A67MbeeSqh
-TEVqSYpMroSN9/fDUs1YtXTzdZwaqeYlIWglFKwFFceULnKW97UQdwEAxECcg+we
-610BkgGt+mi1VSqXMkPq/1vq4U5RFyUWaorOQTbVe+KiHLhaYPjLRLAzfQYxoxJ9
-eAGP9fMy2JR9XRP+3yftH5xRalJ4Vrx3cLmMJUkrPfyh85J2L1Kwx5WX/Vie4Ru7
-MZP/04BX2t81Q2UnB3nmHGURcjwYLW9dES1Z9YFGj9Mwfaq39JaGCZZs39AdQy9D
-8OxeMItdWZU0zhof0Fs8viidWYytqdlm6CjNdO2IcewXAokkm9TNxT5ix2rMsr9y
-vEAPC5EWC6yrpHLSn84FALgLqYFAfjzQDpcBAIexy8PJLt6UabvEM3q9gyBmTsTN
-qkRzzZFVMWZRAnPjVHOD/VY1jfxNccNvFuqclRZVBo3OWOxEfMkfLdsPT7UkC13w
-5STV/r3SjdjPVc0HNOJwlT/5J6HdJHzZaOETwCflrk7Eo73hZ2M=
-=d0jM
------END PGP SIGNATURE-----
-
---+ts6NCQ4mrNQIV8p--
+T24gU2F0LCBEZWMgMDgsIDIwMTggYXQgMTE6NTg6NTlBTSArMDAwMCwgeHV5YW5kb25nIHdyb3Rl
+Og0KPiA+IEhpIGFsbCwNCj4gPg0KPiA+DQo+ID4NCj4gPiBJbiBvdXIgdGVzdCwgd2UgY29uZmln
+dXJlZCBWTSB3aXRoIHNldmVyYWwgcGNpLWJyaWRnZXMgYW5kIGENCj4gPiB2aXJ0aW8tbmV0IG5p
+YyBiZWVuIGF0dGFjaGVkIHdpdGggYnVzIDQsDQo+ID4NCj4gPiBBZnRlciBWTSBpcyBzdGFydHVw
+LCBXZSBwaW5nIHRoaXMgbmljIGZyb20gaG9zdCB0byBqdWRnZSBpZiBpdCBpcw0KPiA+IHdvcmtp
+bmcgbm9ybWFsbHkuIFRoZW4sIHdlIGhvdCBhZGQgcGNpIGRldmljZXMgdG8gdGhpcyBWTSB3aXRo
+IGJ1cyAwLg0KPiA+DQo+ID4gV2UgIGZvdW5kIHRoZSB2aXJ0aW8tbmV0IE5JQyBpbiBidXMgNCBp
+cyBub3Qgd29ya2luZyAoY2FuIG5vdCBjb25uZWN0KQ0KPiA+IG9jY2FzaW9uYWxseSwgYXMgaXQg
+a2ljayB2aXJ0aW8gYmFja2VuZCBmYWlsdXJlIHdpdGggZXJyb3IgYmVsb3c6DQo+ID4NCj4gPiAg
+ICAgVW5hc3NpZ25lZCBtZW0gd3JpdGUgMDAwMDAwMDBmYzgwMzAwNCA9IDB4MQ0KPiA+DQo+ID4N
+Cj4gPg0KPiA+IG1lbW9yeS1yZWdpb246IHBjaV9icmlkZ2VfcGNpDQo+ID4NCj4gPiAgIDAwMDAw
+MDAwMDAwMDAwMDAtZmZmZmZmZmZmZmZmZmZmZiAocHJpbyAwLCBSVyk6IHBjaV9icmlkZ2VfcGNp
+DQo+ID4NCj4gPiAgICAgMDAwMDAwMDBmYzgwMDAwMC0wMDAwMDAwMGZjODAzZmZmIChwcmlvIDEs
+IFJXKTogdmlydGlvLXBjaQ0KPiA+DQo+ID4gICAgICAgMDAwMDAwMDBmYzgwMDAwMC0wMDAwMDAw
+MGZjODAwZmZmIChwcmlvIDAsIFJXKToNCj4gPiB2aXJ0aW8tcGNpLWNvbW1vbg0KPiA+DQo+ID4g
+ICAgICAgMDAwMDAwMDBmYzgwMTAwMC0wMDAwMDAwMGZjODAxZmZmIChwcmlvIDAsIFJXKTogdmly
+dGlvLXBjaS1pc3INCj4gPg0KPiA+ICAgICAgIDAwMDAwMDAwZmM4MDIwMDAtMDAwMDAwMDBmYzgw
+MmZmZiAocHJpbyAwLCBSVyk6DQo+ID4gdmlydGlvLXBjaS1kZXZpY2UNCj4gPg0KPiA+ICAgICAg
+IDAwMDAwMDAwZmM4MDMwMDAtMDAwMDAwMDBmYzgwM2ZmZiAocHJpbyAwLCBSVyk6DQo+ID4gdmly
+dGlvLXBjaS1ub3RpZnkgIDwtIGlvIG1lbSB1bmFzc2lnbmVkDQo+ID4NCj4gPiAgICAgICDigKYN
+Cj4gPg0KPiA+DQo+ID4NCj4gPiBXZSBjYXVnaHQgYW4gZXhjZXB0aW9uYWwgYWRkcmVzcyBjaGFu
+Z2luZyB3aGlsZSB0aGlzIHByb2JsZW0gaGFwcGVuZWQsDQo+ID4gc2hvdyBhcw0KPiA+IGZvbGxv
+dzoNCj4gPg0KPiA+IEJlZm9yZSBwY2lfYnJpZGdlX3VwZGF0ZV9tYXBwaW5nc++8mg0KPiA+DQo+
+ID4gICAgICAgMDAwMDAwMDBmYzAwMDAwMC0wMDAwMDAwMGZjMWZmZmZmIChwcmlvIDEsIFJXKTog
+YWxpYXMNCj4gPiBwY2lfYnJpZGdlX3ByZWZfbWVtIEBwY2lfYnJpZGdlX3BjaSAwMDAwMDAwMGZj
+MDAwMDAwLTAwMDAwMDAwZmMxZmZmZmYNCj4gPg0KPiA+ICAgICAgIDAwMDAwMDAwZmMyMDAwMDAt
+MDAwMDAwMDBmYzNmZmZmZiAocHJpbyAxLCBSVyk6IGFsaWFzDQo+ID4gcGNpX2JyaWRnZV9wcmVm
+X21lbSBAcGNpX2JyaWRnZV9wY2kgMDAwMDAwMDBmYzIwMDAwMC0wMDAwMDAwMGZjM2ZmZmZmDQo+
+ID4NCj4gPiAgICAgICAwMDAwMDAwMGZjNDAwMDAwLTAwMDAwMDAwZmM1ZmZmZmYgKHByaW8gMSwg
+UlcpOiBhbGlhcw0KPiA+IHBjaV9icmlkZ2VfcHJlZl9tZW0gQHBjaV9icmlkZ2VfcGNpIDAwMDAw
+MDAwZmM0MDAwMDAtMDAwMDAwMDBmYzVmZmZmZg0KPiA+DQo+ID4gICAgICAgMDAwMDAwMDBmYzYw
+MDAwMC0wMDAwMDAwMGZjN2ZmZmZmIChwcmlvIDEsIFJXKTogYWxpYXMNCj4gPiBwY2lfYnJpZGdl
+X3ByZWZfbWVtIEBwY2lfYnJpZGdlX3BjaSAwMDAwMDAwMGZjNjAwMDAwLTAwMDAwMDAwZmM3ZmZm
+ZmYNCj4gPg0KPiA+ICAgICAgIDAwMDAwMDAwZmM4MDAwMDAtMDAwMDAwMDBmYzlmZmZmZiAocHJp
+byAxLCBSVyk6IGFsaWFzDQo+ID4gcGNpX2JyaWRnZV9wcmVmX21lbSBAcGNpX2JyaWRnZV9wY2kg
+MDAwMDAwMDBmYzgwMDAwMC0wMDAwMDAwMGZjOWZmZmZmDQo+ID4gPC0gY29ycmVjdCBBZHJlc3Mg
+U3BjZQ0KPiA+DQo+ID4gICAgICAgMDAwMDAwMDBmY2EwMDAwMC0wMDAwMDAwMGZjYmZmZmZmIChw
+cmlvIDEsIFJXKTogYWxpYXMNCj4gPiBwY2lfYnJpZGdlX3ByZWZfbWVtIEBwY2lfYnJpZGdlX3Bj
+aSAwMDAwMDAwMGZjYTAwMDAwLTAwMDAwMDAwZmNiZmZmZmYNCj4gPg0KPiA+ICAgICAgIDAwMDAw
+MDAwZmNjMDAwMDAtMDAwMDAwMDBmY2RmZmZmZiAocHJpbyAxLCBSVyk6IGFsaWFzDQo+ID4gcGNp
+X2JyaWRnZV9wcmVmX21lbSBAcGNpX2JyaWRnZV9wY2kgMDAwMDAwMDBmY2MwMDAwMC0wMDAwMDAw
+MGZjZGZmZmZmDQo+ID4NCj4gPiAgICAgICAwMDAwMDAwMGZjZTAwMDAwLTAwMDAwMDAwZmNmZmZm
+ZmYgKHByaW8gMSwgUlcpOiBhbGlhcw0KPiA+IHBjaV9icmlkZ2VfcHJlZl9tZW0gQHBjaV9icmlk
+Z2VfcGNpIDAwMDAwMDAwZmNlMDAwMDAtMDAwMDAwMDBmY2ZmZmZmZg0KPiA+DQo+ID4NCj4gPg0K
+PiA+IEFmdGVyIHBjaV9icmlkZ2VfdXBkYXRlX21hcHBpbmdz77yaDQo+ID4NCj4gPiAgICAgICAw
+MDAwMDAwMGZkYTAwMDAwLTAwMDAwMDAwZmRiZmZmZmYgKHByaW8gMSwgUlcpOiBhbGlhcw0KPiA+
+IHBjaV9icmlkZ2VfbWVtIEBwY2lfYnJpZGdlX3BjaSAwMDAwMDAwMGZkYTAwMDAwLTAwMDAwMDAw
+ZmRiZmZmZmYNCj4gPg0KPiA+ICAgICAgIDAwMDAwMDAwZmRjMDAwMDAtMDAwMDAwMDBmZGRmZmZm
+ZiAocHJpbyAxLCBSVyk6IGFsaWFzDQo+ID4gcGNpX2JyaWRnZV9tZW0gQHBjaV9icmlkZ2VfcGNp
+IDAwMDAwMDAwZmRjMDAwMDAtMDAwMDAwMDBmZGRmZmZmZg0KPiA+DQo+ID4gICAgICAgMDAwMDAw
+MDBmZGUwMDAwMC0wMDAwMDAwMGZkZmZmZmZmIChwcmlvIDEsIFJXKTogYWxpYXMNCj4gPiBwY2lf
+YnJpZGdlX21lbSBAcGNpX2JyaWRnZV9wY2kgMDAwMDAwMDBmZGUwMDAwMC0wMDAwMDAwMGZkZmZm
+ZmZmDQo+ID4NCj4gPiAgICAgICAwMDAwMDAwMGZlMDAwMDAwLTAwMDAwMDAwZmUxZmZmZmYgKHBy
+aW8gMSwgUlcpOiBhbGlhcw0KPiA+IHBjaV9icmlkZ2VfbWVtIEBwY2lfYnJpZGdlX3BjaSAwMDAw
+MDAwMGZlMDAwMDAwLTAwMDAwMDAwZmUxZmZmZmYNCj4gPg0KPiA+ICAgICAgIDAwMDAwMDAwZmUy
+MDAwMDAtMDAwMDAwMDBmZTNmZmZmZiAocHJpbyAxLCBSVyk6IGFsaWFzDQo+ID4gcGNpX2JyaWRn
+ZV9tZW0gQHBjaV9icmlkZ2VfcGNpIDAwMDAwMDAwZmUyMDAwMDAtMDAwMDAwMDBmZTNmZmZmZg0K
+PiA+DQo+ID4gICAgICAgMDAwMDAwMDBmZTQwMDAwMC0wMDAwMDAwMGZlNWZmZmZmIChwcmlvIDEs
+IFJXKTogYWxpYXMNCj4gPiBwY2lfYnJpZGdlX21lbSBAcGNpX2JyaWRnZV9wY2kgMDAwMDAwMDBm
+ZTQwMDAwMC0wMDAwMDAwMGZlNWZmZmZmDQo+ID4NCj4gPiAgICAgICAwMDAwMDAwMGZlNjAwMDAw
+LTAwMDAwMDAwZmU3ZmZmZmYgKHByaW8gMSwgUlcpOiBhbGlhcw0KPiA+IHBjaV9icmlkZ2VfbWVt
+IEBwY2lfYnJpZGdlX3BjaSAwMDAwMDAwMGZlNjAwMDAwLTAwMDAwMDAwZmU3ZmZmZmYNCj4gPg0K
+PiA+ICAgICAgIDAwMDAwMDAwZmU4MDAwMDAtMDAwMDAwMDBmZTlmZmZmZiAocHJpbyAxLCBSVyk6
+IGFsaWFzDQo+ID4gcGNpX2JyaWRnZV9tZW0gQHBjaV9icmlkZ2VfcGNpIDAwMDAwMDAwZmU4MDAw
+MDAtMDAwMDAwMDBmZTlmZmZmZg0KPiA+DQo+ID4gICAgICAgZmZmZmZmZmZmYzgwMDAwMC1mZmZm
+ZmZmZmZjODAwMDAwIChwcmlvIDEsIFJXKTogYWxpYXMgcGNpX2JyaWRnZV9wcmVmX21lbQ0KPiA+
+IEBwY2lfYnJpZGdlX3BjaSBmZmZmZmZmZmZjODAwMDAwLWZmZmZmZmZmZmM4MDAwMDAgICA8LSBF
+eGNlcHRpb25hbCBBZHJlc3MNCj4gU3BhY2UNCj4gDQo+IFRoaXMgb25lIGlzIGVtcHR5IHRob3Vn
+aCByaWdodD8NCj4gDQo+ID4NCj4gPg0KPiA+IFdlIGhhdmUgZmlndXJlZCBvdXQgd2h5IHRoaXMg
+YWRkcmVzcyBiZWNvbWVzIHRoaXMgdmFsdWUsICBhY2NvcmRpbmcgdG8NCj4gPiBwY2kgc3BlYywg
+IHBjaSBkcml2ZXIgY2FuIGdldCBCQVIgYWRkcmVzcyBzaXplIGJ5IHdyaXRpbmcgMHhmZmZmZmZm
+Zg0KPiA+IHRvDQo+ID4NCj4gPiB0aGUgcGNpIHJlZ2lzdGVyIGZpcnN0bHksIGFuZCB0aGVuIHJl
+YWQgYmFjayB0aGUgdmFsdWUgZnJvbSB0aGlzIHJlZ2lzdGVyLg0KPiANCj4gDQo+IE9LIGhvd2V2
+ZXIgYXMgeW91IHNob3cgYmVsb3cgdGhlIEJBUiBiZWluZyBzaXplZCBpcyB0aGUgQkFSIGlmIGEg
+YnJpZGdlLiBBcmUNCj4geW91IHRoZW4gYWRkaW5nIGEgYnJpZGdlIGRldmljZSBieSBob3RwbHVn
+Pw0KDQpObywgSSBqdXN0IHNpbXBseSBob3QgcGx1Z2dlZCBhIFZGSU8gZGV2aWNlIHRvIEJ1cyAw
+LCBhbm90aGVyIGludGVyZXN0aW5nIHBoZW5vbWVub24gaXMNCklmIEkgaG90IHBsdWcgdGhlIGRl
+dmljZSB0byBvdGhlciBidXMsIHRoaXMgZG9lc24ndCBoYXBwZW5lZC4NCiANCj4gDQo+IA0KPiA+
+IFdlIGRpZG4ndCBoYW5kbGUgdGhpcyB2YWx1ZSAgc3BlY2lhbGx5IHdoaWxlIHByb2Nlc3MgcGNp
+IHdyaXRlIGluDQo+ID4gcWVtdSwgdGhlIGZ1bmN0aW9uIGNhbGwgc3RhY2sgaXM6DQo+ID4NCj4g
+PiBQY2lfYnJpZGdlX2Rldl93cml0ZV9jb25maWcNCj4gPg0KPiA+IC0+IHBjaV9icmlkZ2Vfd3Jp
+dGVfY29uZmlnDQo+ID4NCj4gPiAtPiBwY2lfZGVmYXVsdF93cml0ZV9jb25maWcgKHdlIHVwZGF0
+ZSB0aGUgY29uZmlnW2FkZHJlc3NdIHZhbHVlIGhlcmUNCj4gPiAtPiB0bw0KPiA+IGZmZmZmZmZm
+ZmM4MDAwMDAsIHdoaWNoIHNob3VsZCBiZSAweGZjODAwMDAwICkNCj4gPg0KPiA+IC0+IHBjaV9i
+cmlkZ2VfdXBkYXRlX21hcHBpbmdzDQo+ID4NCj4gPiAgICAgICAgICAgICAgICAgLT5wY2lfYnJp
+ZGdlX3JlZ2lvbl9kZWwoYnIsIGJyLT53aW5kb3dzKTsNCj4gPg0KPiA+IC0+IHBjaV9icmlkZ2Vf
+cmVnaW9uX2luaXQNCj4gPg0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAtPg0KPiA+IHBjaV9icmlkZ2VfaW5pdF9hbGlh
+cyAoaGVyZSBwY2lfYnJpZGdlX2dldF9iYXNlLCB3ZSB1c2UgdGhlIHdyb25nDQo+ID4gdmFsdWUN
+Cj4gPiBmZmZmZmZmZmZjODAwMDAwKQ0KPiA+DQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgLT4NCj4gPiBtZW1vcnlfcmVnaW9uX3RyYW5zYWN0aW9u
+X2NvbW1pdA0KPiA+DQo+ID4NCj4gPg0KPiA+IFNvLCBhcyB3ZSBjYW4gc2VlLCB3ZSB1c2UgdGhl
+IHdyb25nIGJhc2UgYWRkcmVzcyBpbiBxZW11IHRvIHVwZGF0ZSB0aGUNCj4gPiBtZW1vcnkgcmVn
+aW9ucywgdGhvdWdoLCB3ZSB1cGRhdGUgdGhlIGJhc2UgYWRkcmVzcyB0bw0KPiA+DQo+ID4gVGhl
+IGNvcnJlY3QgdmFsdWUgYWZ0ZXIgcGNpIGRyaXZlciBpbiBWTSB3cml0ZSB0aGUgb3JpZ2luYWwg
+dmFsdWUNCj4gPiBiYWNrLCB0aGUgdmlydGlvIE5JQyBpbiBidXMgNCBtYXkgc3RpbGwgc2VuZHMg
+bmV0IHBhY2tldHMgY29uY3VycmVudGx5DQo+ID4gd2l0aA0KPiA+DQo+ID4gVGhlIHdyb25nIG1l
+bW9yeSByZWdpb24gYWRkcmVzcy4NCj4gPg0KPiA+DQo+ID4NCj4gPiBXZSBoYXZlIHRyaWVkIHRv
+IHNraXAgdGhlIG1lbW9yeSByZWdpb24gdXBkYXRlIGFjdGlvbiBpbiBxZW11IHdoaWxlDQo+ID4g
+ZGV0ZWN0IHBjaSB3cml0ZSB3aXRoIDB4ZmZmZmZmZmYgdmFsdWUsIGFuZCBpdCBkb2VzIHdvcmss
+IGJ1dA0KPiA+DQo+ID4gVGhpcyBzZWVtcyB0byBiZSBub3QgZ2VudGx5Lg0KPiANCj4gRm9yIHN1
+cmUuIEJ1dCBJJ20gc3RpbGwgcHV6emxlZCBhcyB0byB3aHkgZG9lcyBMaW51eCB0cnkgdG8gc2l6
+ZSB0aGUgQkFSIG9mIHRoZQ0KPiBicmlkZ2Ugd2hpbGUgYSBkZXZpY2UgYmVoaW5kIGl0IGlzIHVz
+ZWQuDQo+IA0KPiBDYW4geW91IHBscyBwb3N0IHlvdXIgUUVNVSBjb21tYW5kIGxpbmU/DQoNCk15
+IFFFTVUgY29tbWFuZCBsaW5lOg0KL3Jvb3QveHlkL3FlbXUtc3lzdGVtLXg4Nl82NCAtbmFtZSBn
+dWVzdD1MaW51eCxkZWJ1Zy10aHJlYWRzPW9uIC1TIC1vYmplY3Qgc2VjcmV0LGlkPW1hc3Rlcktl
+eTAsZm9ybWF0PXJhdyxmaWxlPS92YXIvcnVuL2xpYnZpcnQvcWVtdS9kb21haW4tMTk0LUxpbnV4
+L21hc3Rlci1rZXkuYWVzIC1tYWNoaW5lIHBjLWk0NDBmeC0yLjgsYWNjZWw9a3ZtLHVzYj1vZmYs
+ZHVtcC1ndWVzdC1jb3JlPW9mZiAtY3B1IGhvc3QsK2t2bV9wdl9lb2kgLWJpb3MgL3Vzci9zaGFy
+ZS9PVk1GL09WTUYuZmQgLW0gc2l6ZT00MTk0MzA0ayxzbG90cz0yNTYsbWF4bWVtPTMzNTU0NDMy
+ayAtcmVhbHRpbWUgbWxvY2s9b2ZmIC1zbXAgMjAsc29ja2V0cz0yMCxjb3Jlcz0xLHRocmVhZHM9
+MSAtbnVtYSBub2RlLG5vZGVpZD0wLGNwdXM9MC00LG1lbT0xMDI0IC1udW1hIG5vZGUsbm9kZWlk
+PTEsY3B1cz01LTksbWVtPTEwMjQgLW51bWEgbm9kZSxub2RlaWQ9MixjcHVzPTEwLTE0LG1lbT0x
+MDI0IC1udW1hIG5vZGUsbm9kZWlkPTMsY3B1cz0xNS0xOSxtZW09MTAyNCAtdXVpZCAzNGE1ODhj
+Ny1iMGYyLTQ5NTItYjM5Yy00N2ZhZTM0MTE0MzkgLW5vLXVzZXItY29uZmlnIC1ub2RlZmF1bHRz
+IC1jaGFyZGV2IHNvY2tldCxpZD1jaGFybW9uaXRvcixwYXRoPS92YXIvcnVuL2xpYnZpcnQvcWVt
+dS9kb21haW4tMTk0LUxpbnV4L21vbml0b3Iuc29jayxzZXJ2ZXIsbm93YWl0IC1tb24gY2hhcmRl
+dj1jaGFybW9uaXRvcixpZD1tb25pdG9yLG1vZGU9Y29udHJvbCAtcnRjIGJhc2U9dXRjIC1uby1o
+cGV0IC1nbG9iYWwga3ZtLXBpdC5sb3N0X3RpY2tfcG9saWN5PWRlbGF5IC1uby1zaHV0ZG93biAt
+Ym9vdCBzdHJpY3Q9b24gLWRldmljZSBwY2ktYnJpZGdlLGNoYXNzaXNfbnI9MSxpZD1wY2kuMSxi
+dXM9cGNpLjAsYWRkcj0weDggLWRldmljZSBwY2ktYnJpZGdlLGNoYXNzaXNfbnI9MixpZD1wY2ku
+MixidXM9cGNpLjAsYWRkcj0weDkgLWRldmljZSBwY2ktYnJpZGdlLGNoYXNzaXNfbnI9MyxpZD1w
+Y2kuMyxidXM9cGNpLjAsYWRkcj0weGEgLWRldmljZSBwY2ktYnJpZGdlLGNoYXNzaXNfbnI9NCxp
+ZD1wY2kuNCxidXM9cGNpLjAsYWRkcj0weGIgLWRldmljZSBwY2ktYnJpZGdlLGNoYXNzaXNfbnI9
+NSxpZD1wY2kuNSxidXM9cGNpLjAsYWRkcj0weGMgLWRldmljZSBwaWl4My11c2ItdWhjaSxpZD11
+c2IsYnVzPXBjaS4wLGFkZHI9MHgxLjB4MiAtZGV2aWNlIHVzYi1laGNpLGlkPXVzYjEsYnVzPXBj
+aS4wLGFkZHI9MHgxMCAtZGV2aWNlIG5lYy11c2IteGhjaSxpZD11c2IyLGJ1cz1wY2kuMCxhZGRy
+PTB4MTEgLWRldmljZSB2aXJ0aW8tc2NzaS1wY2ksaWQ9c2NzaTAsYnVzPXBjaS4wLGFkZHI9MHgz
+IC1kZXZpY2UgdmlydGlvLXNjc2ktcGNpLGlkPXNjc2kxLGJ1cz1wY2kuMCxhZGRyPTB4NCAtZGV2
+aWNlIHZpcnRpby1zY3NpLXBjaSxpZD1zY3NpMixidXM9cGNpLjAsYWRkcj0weDUgLWRldmljZSB2
+aXJ0aW8tc2NzaS1wY2ksaWQ9c2NzaTMsYnVzPXBjaS4wLGFkZHI9MHg2IC1kZXZpY2UgdmlydGlv
+LXNlcmlhbC1wY2ksaWQ9dmlydGlvLXNlcmlhbDAsYnVzPXBjaS4wLGFkZHI9MHg3IC1kcml2ZSBm
+aWxlPS9tbnQvc2RiL3htbC9jZW50b3NfNzRfeDY0X3VlZmkucmF3LGZvcm1hdD1yYXcsaWY9bm9u
+ZSxpZD1kcml2ZS12aXJ0aW8tZGlzazAsY2FjaGU9bm9uZSAtZGV2aWNlIHZpcnRpby1ibGstcGNp
+LHNjc2k9b2ZmLGJ1cz1wY2kuMCxhZGRyPTB4Mixkcml2ZT1kcml2ZS12aXJ0aW8tZGlzazAsaWQ9
+dmlydGlvLWRpc2swLGJvb3RpbmRleD0xIC1kcml2ZSBpZj1ub25lLGlkPWRyaXZlLWlkZTAtMS0x
+LHJlYWRvbmx5PW9uLGNhY2hlPW5vbmUgLWRldmljZSBpZGUtY2QsYnVzPWlkZS4xLHVuaXQ9MSxk
+cml2ZT1kcml2ZS1pZGUwLTEtMSxpZD1pZGUwLTEtMSAtbmV0ZGV2IHRhcCxmZD0zNSxpZD1ob3N0
+bmV0MCAtZGV2aWNlIHZpcnRpby1uZXQtcGNpLG5ldGRldj1ob3N0bmV0MCxpZD1uZXQwLG1hYz01
+Mjo1NDowMDo4OTo1ZDo4YixidXM9cGNpLjQsYWRkcj0weDEgLWNoYXJkZXYgcHR5LGlkPWNoYXJz
+ZXJpYWwwIC1kZXZpY2UgaXNhLXNlcmlhbCxjaGFyZGV2PWNoYXJzZXJpYWwwLGlkPXNlcmlhbDAg
+LWRldmljZSB1c2ItdGFibGV0LGlkPWlucHV0MCxidXM9dXNiLjAscG9ydD0xIC12bmMgMC4wLjAu
+MDowIC1kZXZpY2UgY2lycnVzLXZnYSxpZD12aWRlbzAsdmdhbWVtX21iPTgsYnVzPXBjaS4wLGFk
+ZHI9MHgxMiAtZGV2aWNlIHZpcnRpby1iYWxsb29uLXBjaSxpZD1iYWxsb29uMCxidXM9cGNpLjAs
+YWRkcj0weGQgLW1zZyB0aW1lc3RhbXA9b24NCg0KSSBhbSBhbHNvIHZlcnkgY3VyaW91cyBhYm91
+dCB0aGlzIGlzc3VlLCBpbiB0aGUgbGludXgga2VybmVsIGNvZGUsIG1heWJlIGRvdWJsZSBjaGVj
+ayBpbiBmdW5jdGlvbiBwY2lfYnJpZGdlX2NoZWNrX3JhbmdlcyB0cmlnZ2VyZWQgdGhpcyBwcm9i
+bGVtLg0KDQoNCj4gDQo+IA0KPiANCj4gPg0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2h3L3BjaS9w
+Y2lfYnJpZGdlLmMgYi9ody9wY2kvcGNpX2JyaWRnZS5jDQo+ID4NCj4gPiBpbmRleCBiMmU1MGMz
+Li44NGI0MDVkIDEwMDY0NA0KPiA+DQo+ID4gLS0tIGEvaHcvcGNpL3BjaV9icmlkZ2UuYw0KPiA+
+DQo+ID4gKysrIGIvaHcvcGNpL3BjaV9icmlkZ2UuYw0KPiA+DQo+ID4gQEAgLTI1Niw3ICsyNTYs
+OCBAQCB2b2lkIHBjaV9icmlkZ2Vfd3JpdGVfY29uZmlnKFBDSURldmljZSAqZCwNCj4gPg0KPiA+
+ICAgICAgcGNpX2RlZmF1bHRfd3JpdGVfY29uZmlnKGQsIGFkZHJlc3MsIHZhbCwgbGVuKTsNCj4g
+Pg0KPiA+IC0gICAgaWYgKHJhbmdlc19vdmVybGFwKGFkZHJlc3MsIGxlbiwgUENJX0NPTU1BTkQs
+IDIpIHx8DQo+ID4NCj4gPiArICAgIGlmICggKHZhbCAhPSAweGZmZmZmZmZmKSAmJg0KPiA+DQo+
+ID4gKyAgICAgICAgKHJhbmdlc19vdmVybGFwKGFkZHJlc3MsIGxlbiwgUENJX0NPTU1BTkQsIDIp
+IHx8DQo+ID4NCj4gPiAgICAgICAgICAvKiBpbyBiYXNlL2xpbWl0ICovDQo+ID4NCj4gPiAgICAg
+ICAgICByYW5nZXNfb3ZlcmxhcChhZGRyZXNzLCBsZW4sIFBDSV9JT19CQVNFLCAyKSB8fA0KPiA+
+DQo+ID4gQEAgLTI2Niw3ICsyNjcsNyBAQCB2b2lkIHBjaV9icmlkZ2Vfd3JpdGVfY29uZmlnKFBD
+SURldmljZSAqZCwNCj4gPg0KPiA+ICAgICAgICAgIHJhbmdlc19vdmVybGFwKGFkZHJlc3MsIGxl
+biwgUENJX01FTU9SWV9CQVNFLCAyMCkgfHwNCj4gPg0KPiA+ICAgICAgICAgIC8qIHZnYSBlbmFi
+bGUgKi8NCj4gPg0KPiA+IC0gICAgICAgIHJhbmdlc19vdmVybGFwKGFkZHJlc3MsIGxlbiwgUENJ
+X0JSSURHRV9DT05UUk9MLCAyKSkgew0KPiA+DQo+ID4gKyAgICAgICAgcmFuZ2VzX292ZXJsYXAo
+YWRkcmVzcywgbGVuLCBQQ0lfQlJJREdFX0NPTlRST0wsIDIpKSkgew0KPiA+DQo+ID4gICAgICAg
+ICAgcGNpX2JyaWRnZV91cGRhdGVfbWFwcGluZ3Mocyk7DQo+ID4NCj4gPiAgICAgIH0NCj4gPg0K
+PiA+DQo+ID4NCj4gPiBUaGlua3MsDQo+ID4NCj4gPiBYdQ0KPiA+DQo=
