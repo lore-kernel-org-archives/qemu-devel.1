@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gWN6g-0002NV-CM
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:04:27 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gWN7N-0002gS-Lc
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:05:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gWN6d-0003GB-5d
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:04:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54944)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gWN6c-0003Fb-MI
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:04:23 -0500
-References: <20181207165103.3992-1-philmd@redhat.com>
-	<20181207165103.3992-4-philmd@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <20662354-7090-a3da-f3d2-225e81665350@redhat.com>
-Date: Mon, 10 Dec 2018 16:04:13 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181207165103.3992-4-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/4] hw/smbios: Remove "smbios_ipmi.h"
+	(envelope-from <richard.henderson@linaro.org>) id 1gWN7M-0003jb-8h
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:05:09 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46252)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gWN7M-0003jL-3E
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:05:08 -0500
+Received: by mail-oi1-x242.google.com with SMTP id x202so9156102oif.13
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 07:05:08 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Mon, 10 Dec 2018 09:05:00 -0600
+Message-Id: <20181210150501.7990-3-richard.henderson@linaro.org>
+In-Reply-To: <20181210150501.7990-1-richard.henderson@linaro.org>
+References: <20181210150501.7990-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v4 2/3] target/arm: Use arm_hcr_el2_eff more
+ places
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,107 +27,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <minyard@acm.org>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On 12/07/18 17:51, Philippe Mathieu-Daud=C3=A9 wrote:
-> This header only declare a single function: smbios_build_type_38_table(=
-).
-> We already have a header that declares such functions: "smbios_build.h"=
-.
-> Move the declaration and remove the header.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  hw/smbios/smbios.c              |  1 -
->  hw/smbios/smbios_build.h        |  4 ++++
->  hw/smbios/smbios_ipmi.h         | 15 ---------------
->  hw/smbios/smbios_type_38-stub.c |  2 +-
->  hw/smbios/smbios_type_38.c      |  1 -
->  5 files changed, 5 insertions(+), 18 deletions(-)
->  delete mode 100644 hw/smbios/smbios_ipmi.h
->=20
-> diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
-> index 30bd4731cf..9d737642cb 100644
-> --- a/hw/smbios/smbios.c
-> +++ b/hw/smbios/smbios.c
-> @@ -28,7 +28,6 @@
->  #include "hw/loader.h"
->  #include "exec/cpu-common.h"
->  #include "smbios_build.h"
-> -#include "smbios_ipmi.h"
-> =20
->  /* legacy structures and constants for <=3D 2.0 machines */
->  struct smbios_header {
-> diff --git a/hw/smbios/smbios_build.h b/hw/smbios/smbios_build.h
-> index 93b360d520..56b5a1e3f3 100644
-> --- a/hw/smbios/smbios_build.h
-> +++ b/hw/smbios/smbios_build.h
-> @@ -3,6 +3,7 @@
->   *
->   * Copyright (C) 2009 Hewlett-Packard Development Company, L.P.
->   * Copyright (C) 2013 Red Hat, Inc.
-> + * Copyright (c) 2015,2016 Corey Minyard, MontaVista Software, LLC
->   *
->   * Authors:
->   *  Alex Williamson <alex.williamson@hp.com>
-> @@ -96,4 +97,7 @@ extern unsigned smbios_table_cnt;
->          smbios_table_cnt++;                                           =
-    \
->      } while (0)
-> =20
-> +/* IPMI SMBIOS firmware handling */
-> +void smbios_build_type_38_table(void);
-> +
->  #endif /* QEMU_SMBIOS_BUILD_H */
-> diff --git a/hw/smbios/smbios_ipmi.h b/hw/smbios/smbios_ipmi.h
-> deleted file mode 100644
-> index 1c9aae38f2..0000000000
-> --- a/hw/smbios/smbios_ipmi.h
-> +++ /dev/null
-> @@ -1,15 +0,0 @@
-> -/*
-> - * IPMI SMBIOS firmware handling
-> - *
-> - * Copyright (c) 2015,2016 Corey Minyard, MontaVista Software, LLC
-> - *
-> - * This work is licensed under the terms of the GNU GPL, version 2 or =
-later.
-> - * See the COPYING file in the top-level directory.
-> - */
-> -
-> -#ifndef QEMU_SMBIOS_IPMI_H
-> -#define QEMU_SMBIOS_IPMI_H
-> -
-> -void smbios_build_type_38_table(void);
-> -
-> -#endif /* QEMU_SMBIOS_IPMI_H */
-> diff --git a/hw/smbios/smbios_type_38-stub.c b/hw/smbios/smbios_type_38=
--stub.c
-> index fc4516bc8a..14b53d004b 100644
-> --- a/hw/smbios/smbios_type_38-stub.c
-> +++ b/hw/smbios/smbios_type_38-stub.c
-> @@ -8,7 +8,7 @@
->   */
-> =20
->  #include "qemu/osdep.h"
-> -#include "smbios_ipmi.h"
-> +#include "smbios_build.h"
-> =20
->  void smbios_build_type_38_table(void)
->  {
-> diff --git a/hw/smbios/smbios_type_38.c b/hw/smbios/smbios_type_38.c
-> index d84e87d608..a1ad28d059 100644
-> --- a/hw/smbios/smbios_type_38.c
-> +++ b/hw/smbios/smbios_type_38.c
-> @@ -12,7 +12,6 @@
->  #include "hw/smbios/smbios.h"
->  #include "qemu/error-report.h"
->  #include "smbios_build.h"
-> -#include "smbios_ipmi.h"
-> =20
->  /* SMBIOS type 38 - IPMI */
->  struct smbios_type_38 {
->=20
+Since arm_hcr_el2_eff includes a check against
+arm_is_secure_below_el3, we can often remove a
+nearby check against secure state.
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+In some cases, sort the call to arm_hcr_el2_eff
+to the end of a short-circuit logical sequence.
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+v3: Do not change regime_translation_disabled.
+---
+ target/arm/helper.c    | 12 +++++-------
+ target/arm/op_helper.c | 14 ++++++--------
+ 2 files changed, 11 insertions(+), 15 deletions(-)
+
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 95d59e07fb..d6f8be9f4e 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -448,7 +448,7 @@ static CPAccessResult access_tdosa(CPUARMState *env, const ARMCPRegInfo *ri,
+     int el = arm_current_el(env);
+     bool mdcr_el2_tdosa = (env->cp15.mdcr_el2 & MDCR_TDOSA) ||
+         (env->cp15.mdcr_el2 & MDCR_TDE) ||
+-        (env->cp15.hcr_el2 & HCR_TGE);
++        (arm_hcr_el2_eff(env) & HCR_TGE);
+ 
+     if (el < 2 && mdcr_el2_tdosa && !arm_is_secure_below_el3(env)) {
+         return CP_ACCESS_TRAP_EL2;
+@@ -468,7 +468,7 @@ static CPAccessResult access_tdra(CPUARMState *env, const ARMCPRegInfo *ri,
+     int el = arm_current_el(env);
+     bool mdcr_el2_tdra = (env->cp15.mdcr_el2 & MDCR_TDRA) ||
+         (env->cp15.mdcr_el2 & MDCR_TDE) ||
+-        (env->cp15.hcr_el2 & HCR_TGE);
++        (arm_hcr_el2_eff(env) & HCR_TGE);
+ 
+     if (el < 2 && mdcr_el2_tdra && !arm_is_secure_below_el3(env)) {
+         return CP_ACCESS_TRAP_EL2;
+@@ -488,7 +488,7 @@ static CPAccessResult access_tda(CPUARMState *env, const ARMCPRegInfo *ri,
+     int el = arm_current_el(env);
+     bool mdcr_el2_tda = (env->cp15.mdcr_el2 & MDCR_TDA) ||
+         (env->cp15.mdcr_el2 & MDCR_TDE) ||
+-        (env->cp15.hcr_el2 & HCR_TGE);
++        (arm_hcr_el2_eff(env) & HCR_TGE);
+ 
+     if (el < 2 && mdcr_el2_tda && !arm_is_secure_below_el3(env)) {
+         return CP_ACCESS_TRAP_EL2;
+@@ -4566,8 +4566,7 @@ int sve_exception_el(CPUARMState *env, int el)
+         if (disabled) {
+             /* route_to_el2 */
+             return (arm_feature(env, ARM_FEATURE_EL2)
+-                    && !arm_is_secure(env)
+-                    && (env->cp15.hcr_el2 & HCR_TGE) ? 2 : 1);
++                    && (arm_hcr_el2_eff(env) & HCR_TGE) ? 2 : 1);
+         }
+ 
+         /* Check CPACR.FPEN.  */
+@@ -6216,9 +6215,8 @@ static int bad_mode_switch(CPUARMState *env, int mode, CPSRWriteType write_type)
+          * and CPS are treated as illegal mode changes.
+          */
+         if (write_type == CPSRWriteByInstr &&
+-            (env->cp15.hcr_el2 & HCR_TGE) &&
+             (env->uncached_cpsr & CPSR_M) == ARM_CPU_MODE_MON &&
+-            !arm_is_secure_below_el3(env)) {
++            (arm_hcr_el2_eff(env) & HCR_TGE)) {
+             return 1;
+         }
+         return 0;
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index 0d6e89e474..ef72361a36 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -33,8 +33,7 @@ void raise_exception(CPUARMState *env, uint32_t excp,
+ {
+     CPUState *cs = CPU(arm_env_get_cpu(env));
+ 
+-    if ((env->cp15.hcr_el2 & HCR_TGE) &&
+-        target_el == 1 && !arm_is_secure(env)) {
++    if (target_el == 1 && (arm_hcr_el2_eff(env) & HCR_TGE)) {
+         /*
+          * Redirect NS EL1 exceptions to NS EL2. These are reported with
+          * their original syndrome register value, with the exception of
+@@ -428,9 +427,9 @@ static inline int check_wfx_trap(CPUARMState *env, bool is_wfe)
+      * No need for ARM_FEATURE check as if HCR_EL2 doesn't exist the
+      * bits will be zero indicating no trap.
+      */
+-    if (cur_el < 2 && !arm_is_secure(env)) {
+-        mask = (is_wfe) ? HCR_TWE : HCR_TWI;
+-        if (env->cp15.hcr_el2 & mask) {
++    if (cur_el < 2) {
++        mask = is_wfe ? HCR_TWE : HCR_TWI;
++        if (arm_hcr_el2_eff(env) & mask) {
+             return 2;
+         }
+     }
+@@ -995,7 +994,7 @@ void HELPER(pre_smc)(CPUARMState *env, uint32_t syndrome)
+                         exception_target_el(env));
+     }
+ 
+-    if (!secure && cur_el == 1 && (env->cp15.hcr_el2 & HCR_TSC)) {
++    if (cur_el == 1 && (arm_hcr_el2_eff(env) & HCR_TSC)) {
+         /* In NS EL1, HCR controlled routing to EL2 has priority over SMD.
+          * We also want an EL2 guest to be able to forbid its EL1 from
+          * making PSCI calls into QEMU's "firmware" via HCR.TSC.
+@@ -1098,8 +1097,7 @@ void HELPER(exception_return)(CPUARMState *env)
+         goto illegal_return;
+     }
+ 
+-    if (new_el == 1 && (env->cp15.hcr_el2 & HCR_TGE)
+-        && !arm_is_secure_below_el3(env)) {
++    if (new_el == 1 && (arm_hcr_el2_eff(env) & HCR_TGE)) {
+         goto illegal_return;
+     }
+ 
+-- 
+2.17.2
