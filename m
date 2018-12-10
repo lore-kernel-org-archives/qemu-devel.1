@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55144)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gWL6e-0007FA-Pl
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 07:56:18 -0500
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gWLEj-0001fQ-Bn
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:04:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gWL6d-0007Ib-SG
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 07:56:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51368)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gWL6d-0007IN-Lw
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 07:56:15 -0500
-Date: Mon, 10 Dec 2018 13:56:13 +0100
-From: "kraxel@redhat.com" <kraxel@redhat.com>
-Message-ID: <20181210125613.x6mrmfgvtcoo3sv3@sirius.home.kraxel.org>
-References: <RO1P152MB14839E480D046B4052F0ADC797A40@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
-	<20181210063657.2lqj7vkqwdaobp7e@sirius.home.kraxel.org>
-	<RO1P152MB1483300ECF25FEE36927B1AF97A50@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gWLEi-0004nd-4L
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:04:37 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <RO1P152MB1483300ECF25FEE36927B1AF97A50@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Guests are crashing on startup,
- seem related to usb-audio
+In-Reply-To: <20181207085635.4291-1-mark.cave-ayland@ilande.co.uk>
+References: <20181207085635.4291-1-mark.cave-ayland@ilande.co.uk>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 10 Dec 2018 14:04:28 +0100
+Message-ID: <CAL1e-=jWJ_kzwrC4nkt-UQnHXh5y-i5NF0N0ToXj534ehkuGOQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC PATCH 0/6] target/ppc: convert VMX
+ instructions to use TCG vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +22,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Leonardo Soares =?utf-8?Q?M=C3=BCller?= <leozinho29_eu@hotmail.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: david@gibson.dropbear.id.au, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, richard.henderson@linaro.org
 
-On Mon, Dec 10, 2018 at 12:11:09PM +0000, Leonardo Soares M=FCller wrote:
-> Hi, I did not save that Mageia 7 data as I was unaware I could do this.
-> The data below is from another crash with openSUSE Leap, this time I
-> saved this backtrace with generate-core-file.
+On Dec 7, 2018 9:59 AM, "Mark Cave-Ayland" <mark.cave-ayland@ilande.co.uk>
+wrote:
+>
+> This patchset is an attempt at trying to improve the VMX (Altivec)
+instruction
+> performance by making use of the new TCG vector operations where possible.
+>
 
-> On #4 it shows:
-> $2 =3D {pid =3D 225, id =3D 2027203168, ep =3D 0x555557e46520, stream =3D=
- 0, iov =3D
-> {iov =3D 0x7fffc418d190, niov =3D 0, nalloc =3D 1, size =3D 0}, paramet=
-er =3D 0,
-                                               ^^^^^^^^
-> short_not_ok =3D false, int_req =3D false, status =3D 0, actual_length =
-=3D 0,
->   state =3D USB_PACKET_SETUP, combined =3D 0x0, queue =3D {tqe_next =3D=
- 0x0,
-> tqe_prev =3D 0x0}, combined_entry =3D {tqe_next =3D 0x0, tqe_prev =3D 0=
-x0}}
+Hello, Mark.
 
-Hmm, zero-length usb package.  Should be 192 bytes ...
+I just want to say that I support these efforts. Very interesting, it can
+bring significant improvements for multimedia intensive emulations. But,
+even more important, we can see new tcg vector interface in action,
+possibly suggest improvements, extensions.
 
-Does anything change with
-  https://git.kraxel.org/cgit/qemu/log/?h=3Dsirius/usb-audio-crash ?
+I would just like to ask you to add some performance comparisons, if
+possible. Very simple tests would be sufficient.
 
-thanks,
-  Gerd
+Thanks again for this series!
+
+Aleksandar
+
+> In order to use TCG vector operations, the registers must be accessible
+from cpu_env
+> whilst currently they are accessed via arrays of static TCG globals.
+Patches 1-3
+> are therefore mechanical patches which introduce access helpers for FPR,
+AVR and VSR
+> registers using the supplied TCGv_i64 parameter.
+>
+> Once this is done, patch 4 enables us to remove the static TCG global
+arrays and updates
+> the access helpers to read/write to the relevant fields in cpu_env
+directly.
+>
+> The final patches 5 and 6 convert the VMX logical instructions and
+addition/subtraction
+> instructions respectively over to the TCG vector operations.
+>
+> NOTE: there are a lot of instructions that cannot (yet) be optimised to
+use TCG vector
+> operations, however it struck me that there may be some potential for
+converting
+> saturating add/sub and cmp instructions if there were a mechanism to
+return a set of
+> flags indicating the result of the saturation/comparison.
+>
+> Finally thanks to Richard for taking the time to answer some of my
+(mostly beginner)
+> questions related to TCG.
+>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>
+>
+> Mark Cave-Ayland (6):
+>   target/ppc: introduce get_fpr() and set_fpr() helpers for FP register
+>     access
+>   target/ppc: introduce get_avr64() and set_avr64() helpers for VMX
+>     register access
+>   target/ppc: introduce get_cpu_vsr{l,h}() and set_cpu_vsr{l,h}()
+>     helpers for VSR register access
+>   target/ppc: switch FPR, VMX and VSX helpers to access data directly
+>     from cpu_env
+>   target/ppc: convert VMX logical instructions to use vector operations
+>   target/ppc: convert vaddu[b,h,w,d] and vsubu[b,h,w,d] over to use
+>     vector operations
+>
+>  target/ppc/helper.h                 |   8 -
+>  target/ppc/int_helper.c             |   7 -
+>  target/ppc/translate.c              |  72 ++--
+>  target/ppc/translate/fp-impl.inc.c  | 492 ++++++++++++++++++-----
+>  target/ppc/translate/vmx-impl.inc.c | 182 ++++++---
+>  target/ppc/translate/vsx-impl.inc.c | 782
+++++++++++++++++++++++++++----------
+>  6 files changed, 1110 insertions(+), 433 deletions(-)
+>
+> --
+> 2.11.0
+>
+>
