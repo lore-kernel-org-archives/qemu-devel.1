@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gWHRw-0002o8-Du
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 04:02:03 -0500
+	(envelope-from <bounces@canonical.com>) id 1gWHaU-0006NH-DO
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 04:10:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gWHRq-0008Hz-Fi
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 04:02:00 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <CAErn8fQO8cwNC8KjkczGwh6L3sTgxyzPX48fVkUdihXW9gHBSg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ecb955dd-2312-ca7c-6f7f-37ca024d918e@amsat.org>
-Date: Mon, 10 Dec 2018 10:01:46 +0100
+	(envelope-from <bounces@canonical.com>) id 1gWHaR-0006CM-Jl
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 04:10:50 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35550)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gWHaR-0006Bh-Cw
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 04:10:47 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gWHaQ-0006nR-Bv
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 09:10:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5469A2E8054
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 09:10:46 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAErn8fQO8cwNC8KjkczGwh6L3sTgxyzPX48fVkUdihXW9gHBSg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] possible bug hw/adc/stm32f2xx_adc.c
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 10 Dec 2018 08:58:03 -0000
+From: Alberto Ortega <1807675@bugs.launchpad.net>
+Reply-To: Bug 1807675 <1807675@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154443228387.16328.809879618975540748.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1807675] [NEW] qemu commit 80422b0: tcg.c crash
+ in temp_load
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,108 +36,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Seth K <skintigh@gmail.com>, Alistair Francis <alistair23@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Alistair Francis <alistair@alistair23.me>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
 
-Hi Seth,
+Public bug reported:
 
-On 12/10/18 4:39 AM, Seth K wrote:
-> Thank you all for help with my last patch. I found one more entry in my
-> notes that could be a bug, or could be a misunderstanding on my part.
-> 
-> The memory map in DocID15818 (Rev 15) datasheet says:
->     ADC1 - ADC2 - ADC3:  0x40012000-0x400123FF
-> 
-> That suggests a size of 0x400 (they share that range?)
+As discussed in #1803160 I'm opening a new ticket for the new bug.
 
-This datasheet is more about how the chip interracts with the external
-world. There is another document about how to use it (internally) which
-is the "Technical Reference Manual" (RM0033 Rev 8):
-https://www.st.com/resource/en/reference_manual/cd00225773.pdf
+QEMU version:
+-------------
 
-See Section 10.13.18 "ADC register map": There are 3 ADCs indeed, each
-mapped at a 0x100 base. Each ADC can be addressed in a 0x50 bytes range.
+qemu from git, master branch commit
+80422b00196a7af4c6efb628fae0ad8b644e98af
 
-> 
-> Line 279/280 of hw/adc/stm32f2xx_adc.c seems to use 0xFF
-> memory_region_init_io(&s->mmio,obj,&stm32f2xx_adc_ops,s,
-> 	TYPE_STM32F2XX_ADC,0xFF);
+Summary:
+--------
 
-This code define a single ADC and looks correct.
+TCG crashes in i386 and x86_64 when it tries to execute some specific
+illegal instructions. When running full OS emulation, both the guest
+system and QEMU crash.
 
-The consumer of this ADC is the SoC object, defined in the file
-hw/arm/stm32f205_soc.c. You can see lines 70:
+$ qemu-i386 tcg_crash1.elf
+/home/alberto/Documents/qemu/tcg/tcg.c:2863: tcg fatal error
+qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+zsh: segmentation fault (core dumped) ./qemu/build/i386-linux-user/qemu-i38=
+6 tcg_crash1.elf
 
- for (i = 0; i < STM_NUM_ADCS; i++) {
-     sysbus_init_child_obj(obj, "adc[*]", &s->adc[i], sizeof(s->adc[i]),
-                           TYPE_STM32F2XX_ADC);
- }
+Invalid instructions:
 
-Having in include/hw/arm/stm32f205_soc.h:42:#define STM_NUM_ADCS 3
-and:
-static const uint32_t adc_addr[STM_NUM_ADCS] = { 0x40012000, 0x40012100,
-    0x40012200 };
+f0 invalid
+40 inc eax
+a7 cmpsd dword [esi], dword ptr es:[edi]
+48 dec eax
 
-So the SoC code instanciates 3 ADCs, each at the correct address.
-(You can check the SoC Memory Map at Section 2.3 "Memory map" p. 53).
+Testcase:
+---------
 
-An easy way to figure out the memory map in QEMU is using the 'info
-mtree' in the QEMU Monitor:
+Find ELF file attached.
 
-qemu-system-arm -M netduino2 -kernel /dev/null -S -monitor stdio
-QEMU 3.0.94 monitor - type 'help' for more information
-(qemu) info mtree
-address-space: memory
-  0000000000000000-ffffffffffffffff (prio -1, i/o): system
-    0000000000000000-00000000000fffff (prio 0, i/o): alias flash
-    0000000008000000-00000000080fffff (prio 0, rom): STM32F205.flash
-    0000000020000000-000000002001ffff (prio 0, ram): STM32F205.sram
-    0000000040000000-00000000400003ff (prio 0, i/o): stm32f2xx_timer
-    0000000040000400-00000000400007ff (prio 0, i/o): stm32f2xx_timer
-    0000000040000800-0000000040000bff (prio 0, i/o): stm32f2xx_timer
-    0000000040000c00-0000000040000fff (prio 0, i/o): stm32f2xx_timer
-    0000000040003800-0000000040003bff (prio 0, i/o): stm32f2xx-spi
-    0000000040003c00-0000000040003fff (prio 0, i/o): stm32f2xx-spi
-    0000000040004400-00000000400047ff (prio 0, i/o): stm32f2xx-usart
-    0000000040004800-0000000040004bff (prio 0, i/o): stm32f2xx-usart
-    0000000040004c00-0000000040004fff (prio 0, i/o): stm32f2xx-usart
-    0000000040005000-00000000400053ff (prio 0, i/o): stm32f2xx-usart
-    0000000040011000-00000000400113ff (prio 0, i/o): stm32f2xx-usart
-    0000000040011400-00000000400117ff (prio 0, i/o): stm32f2xx-usart
-    0000000040012000-00000000400120fe (prio 0, i/o): stm32f2xx-adc
-    0000000040012100-00000000400121fe (prio 0, i/o): stm32f2xx-adc
-    0000000040012200-00000000400122fe (prio 0, i/o): stm32f2xx-adc
-    0000000040013000-00000000400133ff (prio 0, i/o): stm32f2xx-spi
-    0000000040013800-0000000040013bff (prio 0, i/o): stm32f2xx-syscfg
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-You are correct we should declare a 0x100 region rather than 0xff.
 
-> 
-> Probably just confusion on my part, but thought I would mention it just
-> in case.
-> Thanks,
-> Seth
-> 
-> PS: Sorry if you are all the wrong people to email about this ADC...
+** Tags: tcg
 
-You did well :)
+** Attachment added: "tcg_crash1.elf"
+   https://bugs.launchpad.net/bugs/1807675/+attachment/5220847/+files/tcg_c=
+rash1.elf
 
-You can also use this script:
+-- =
 
-./scripts/get_maintainer.pl -f hw/adc/stm32f2xx_adc.c
-Alistair Francis <alistair@alistair23.me> (maintainer:STM32F205)
-Peter Maydell <peter.maydell@linaro.org> (maintainer:STM32F205)
-qemu-devel@nongnu.org (open list:All patches CC here)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1807675
 
-But for this particular case, using the SoC file is more complete (you
-get the ARM list):
+Title:
+  qemu commit 80422b0: tcg.c crash in temp_load
 
-./scripts/get_maintainer.pl -f hw/arm/stm32f205_soc.c
-Alistair Francis <alistair@alistair23.me> (maintainer:STM32F205)
-Peter Maydell <peter.maydell@linaro.org> (maintainer:STM32F205)
-qemu-arm@nongnu.org (open list:ARM)
-qemu-devel@nongnu.org (open list:All patches CC here)
+Status in QEMU:
+  New
 
-Regards,
+Bug description:
+  As discussed in #1803160 I'm opening a new ticket for the new bug.
 
-Phil.
+  QEMU version:
+  -------------
+
+  qemu from git, master branch commit
+  80422b00196a7af4c6efb628fae0ad8b644e98af
+
+  Summary:
+  --------
+
+  TCG crashes in i386 and x86_64 when it tries to execute some specific
+  illegal instructions. When running full OS emulation, both the guest
+  system and QEMU crash.
+
+  $ qemu-i386 tcg_crash1.elf
+  /home/alberto/Documents/qemu/tcg/tcg.c:2863: tcg fatal error
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  zsh: segmentation fault (core dumped) ./qemu/build/i386-linux-user/qemu-i=
+386 tcg_crash1.elf
+
+  Invalid instructions:
+
+  f0 invalid
+  40 inc eax
+  a7 cmpsd dword [esi], dword ptr es:[edi]
+  48 dec eax
+
+  Testcase:
+  ---------
+
+  Find ELF file attached.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1807675/+subscriptions
