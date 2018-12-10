@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gWNZL-0004h4-K6
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:34:04 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gWNa9-0005M6-Lj
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:34:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gWNZG-0004Qr-MI
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:34:03 -0500
-Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:37071)
+	(envelope-from <alex.bennee@linaro.org>) id 1gWNa4-0005NU-M0
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:34:53 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34976)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gWNZG-0004PS-Ea
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:33:58 -0500
-Received: by mail-oi1-x234.google.com with SMTP id y23so9282845oia.4
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 07:33:58 -0800 (PST)
-References: <54990469B118604BB659B7D5A1E9A4623E80C70E@HASMSX111.ger.corp.intel.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <61892168-20ad-11fd-6b7c-ebefe9808a2d@linaro.org>
-Date: Mon, 10 Dec 2018 09:33:53 -0600
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gWNa4-0005Mt-8T
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:34:48 -0500
+Received: by mail-wm1-x341.google.com with SMTP id c126so11687959wmh.0
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 07:34:48 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Mon, 10 Dec 2018 15:28:28 +0000
+Message-Id: <20181210152829.29271-13-alex.bennee@linaro.org>
+In-Reply-To: <20181210152829.29271-1-alex.bennee@linaro.org>
+References: <20181210152829.29271-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <54990469B118604BB659B7D5A1E9A4623E80C70E@HASMSX111.ger.corp.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [TCG SIMD] 128 bit SIMD support in the TCG backend
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC PATCH 12/13] tests/tcg/cris: align mul operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +29,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Ancuta, Cristian" <cristian.ancuta@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: edgar.iglesias@gmail.com, michael@walle.cc, aurelien@aurel32.net, amarkovic@wavecomp.com, shorne@gmail.com, jcmvbkbc@gmail.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On 12/10/18 8:37 AM, Ancuta, Cristian wrote:
-> Hi,
-> 
-> Hope this is the right place for this question.
-> 
-> I was wondering whether the TCG i386 backend is currently able to generate SIMD code ( vector loads/store, moves, vector arithmetic, etc ).
+To avoid:
 
-Yes, it is.
+  Error: dangerous MULS/MULU location; give it higher alignment
 
-> Looking around on patchwork I found these patches:
-> 
-> https://patchwork.kernel.org/project/qemu-devel/list/?submitter=172151
-> 
-> They seem to implement the vector support that I'd be interested in (including support for tcg_gen_qemu_<ld/st>_v128 ) but I guess the patches didn't make it into any stable version?
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ tests/tcg/cris/system/check_mulx.s | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-They made it in with a different form.
-
-See tcg/tcg-op-gvec.[ch] and how those are used within target/arm/.
-
-We do not yet use the infrastructure for targets other than ARM, though Mark
-Cave-Ayland has just posted a patch set that begins conversion of target/ppc/.
-
-
-r~
+diff --git a/tests/tcg/cris/system/check_mulx.s b/tests/tcg/cris/system/check_mulx.s
+index d43241a6f5..a7a1f82a82 100644
+--- a/tests/tcg/cris/system/check_mulx.s
++++ b/tests/tcg/cris/system/check_mulx.s
+@@ -3,6 +3,8 @@
+ 
+  .include "testutils.inc"
+  start
++
++ .align 4
+  moveq -1,r3
+  moveq 2,r4
+  muls.d r4,r3
+@@ -11,6 +13,7 @@
+  move mof,r3
+  checkr3 ffffffff
+ 
++ .align 4
+  moveq -1,r3
+  moveq 2,r4
+  mulu.d r4,r3
+@@ -19,6 +22,7 @@
+  move mof,r3
+  checkr3 1
+ 
++ .align 4
+  moveq 2,r3
+  moveq -1,r4
+  muls.d r4,r3
+@@ -27,6 +31,7 @@
+  move mof,r3
+  checkr3 ffffffff
+ 
++ .align 4
+  moveq 2,r3
+  moveq -1,r4
+  mulu.d r4,r3
+@@ -98,6 +103,7 @@
+  checkr3 1fffe
+  move mof,r3
+  checkr3 0
++ nop
+ 
+  moveq 2,r3
+  move.d 0xffff,r4
+@@ -138,6 +144,7 @@
+  checkr3 fdbdade2
+  move mof,r3
+  checkr3 ffffffff
++ nop
+ 
+  move.d 0x5432f789,r4
+  move.d 0x78134452,r3
+@@ -146,6 +153,7 @@
+  checkr3 420fade2
+  move mof,r3
+  checkr3 0
++ nop
+ 
+  move.d 0xff,r3
+  moveq 2,r4
+@@ -186,6 +194,7 @@
+  checkr3 1
+  move mof,r3
+  checkr3 0
++ nop
+ 
+  moveq -1,r4
+  move.d r4,r3
+@@ -194,6 +203,7 @@
+  checkr3 fe01
+  move mof,r3
+  checkr3 0
++ nop
+ 
+  move.d 0xfeda49ff,r4
+  move.d r4,r3
+@@ -202,6 +212,7 @@
+  checkr3 1
+  move mof,r3
+  checkr3 0
++ nop
+ 
+  move.d 0xfeda49ff,r4
+  move.d r4,r3
+-- 
+2.17.1
