@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=875e259b5=Paul.Durrant@citrix.com>)
-	id 1gWO7D-0005FY-7R
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:09:04 -0500
+	(envelope-from <lersek@redhat.com>) id 1gWO97-0006kR-5k
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:11:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=875e259b5=Paul.Durrant@citrix.com>)
-	id 1gWO7A-0005qm-3g
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:09:03 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Mon, 10 Dec 2018 16:07:04 +0000
-Message-ID: <f6ab0bd96c9e41d493f683602ccc242f@AMSPEX02CL03.citrite.net>
-References: <1544108924-10841-1-git-send-email-paul.durrant@citrix.com>
-	<1544108924-10841-15-git-send-email-paul.durrant@citrix.com>
-	<20181207182054.GM18875@perard.uk.xensource.com>
-In-Reply-To: <20181207182054.GM18875@perard.uk.xensource.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <lersek@redhat.com>) id 1gWO93-0007Qg-L9
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:11:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49656)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gWO93-0007PX-87
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:10:57 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7A5E430832E3
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 16:10:55 +0000 (UTC)
+References: <20181207170400.5129-1-philmd@redhat.com>
+	<20181207170400.5129-5-philmd@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <8ec2e7fd-bf8e-e537-6a9c-905312bafc94@redhat.com>
+Date: Mon, 10 Dec 2018 17:10:40 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 14/18] xen: add implementations of
- xen-block connect and disconnect functions...
+In-Reply-To: <20181207170400.5129-5-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/6] hw/nvram/fw_cfg: Add trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +34,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony Perard <anthony.perard@citrix.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Stefano Stabellini <sstabellini@kernel.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-> -----Original Message-----
-> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
-> Sent: 07 December 2018 18:21
-> To: Paul Durrant <Paul.Durrant@citrix.com>
-> Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
-> devel@lists.xenproject.org; Stefano Stabellini <sstabellini@kernel.org>;
-> Kevin Wolf <kwolf@redhat.com>; Max Reitz <mreitz@redhat.com>
-> Subject: Re: [PATCH v2 14/18] xen: add implementations of xen-block
-> connect and disconnect functions...
+On 12/07/18 18:03, Philippe Mathieu-Daud=C3=A9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  hw/nvram/fw_cfg.c     | 5 +++++
+>  hw/nvram/trace-events | 5 +++++
+>  2 files changed, 10 insertions(+)
 >=20
-> On Thu, Dec 06, 2018 at 03:08:40PM +0000, Paul Durrant wrote:
-> > ...and wire in the dataplane.
-> >
-> > This patch adds the remaining code to make the xen-block XenDevice
-> > functional. The parameters that a block frontend expects to find are
-> > populated in the backend xenstore area, and the 'ring-ref' and
-> > 'event-channel' values specified in the frontend xenstore area are
-> > mapped/bound and used to set up the dataplane.
-> >
-> > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
->=20
-> With this patch, we should be able to have QEMU instantiate a new
-> backend for a guest, right ? (via command line or QMP)
->=20
-> I've tried, and that doesn't work, the xenstore path for the frontend is
-> wrong. In the qemu trace, I have:
->     xs_node_create /local/domain/0/backend/xen-disk/23/268572709
-> Which is probably fine, even if not described in xenstore-paths.markdown.
->     xs_node_create /local/domain/23/device/xen-disk/268572709
-> Which is not, instead of "xen-disk", we should have "vbd".
->=20
-> I know that this is fixed in "xen: automatically create
-> XenBlockDevice-s", but at least the "vbd" type couldn't be added in this
-> patch, or maybe a previous one.
->=20
->=20
-> Another issue seems to be error handling. I've done a very simple test,
-> I've added '-device xen-disk,vdev=3Dd536p37,id=3Dmydisk' to the command
-> line (which is obvious wrong), and QEMU abort with:
->     qemu-system-i386: hw/block/xen-block.c:174: xen_block_realize:
-> Assertion `conf->blk' failed.
-> But I've pointed out the error in the code below.
->=20
->=20
-> And just for fun, adding then removing a xen-disk via QMP. Adding works
-> fine (once I've fixed the frontend name). I've run the following with
-> ./scripts/qmp/qmp-shell:
-> blockdev-add driver=3Dfile  filename=3D/root/vm/disk/testing-disk.qcow2 n=
-ode-
-> name=3Demptyfile
-> blockdev-add driver=3Dqcow2 node-name=3Demptyqcow2 file=3Demptyfile
-> device_add driver=3Dxen-disk vdev=3Dxvdn id=3Dfromqmp drive=3Demptyqcow2
->=20
-> But, then, remove doesn't work, running "device_del id=3Dfromqmp" doesn't
-> do anything. I guess we can try to fix that later if you don't find
-> what's missing.
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 3cb726ff68..582653f07e 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -627,6 +627,7 @@ static void *fw_cfg_modify_bytes_read(FWCfgState *s=
+, uint16_t key,
+> =20
+>  void fw_cfg_add_bytes(FWCfgState *s, uint16_t key, void *data, size_t =
+len)
+>  {
+> +    trace_fw_cfg_add_bytes(key, len);
+>      fw_cfg_add_bytes_callback(s, key, NULL, NULL, NULL, data, len, tru=
+e);
+>  }
+> =20
+> @@ -634,6 +635,7 @@ void fw_cfg_add_string(FWCfgState *s, uint16_t key,=
+ const char *value)
+>  {
+>      size_t sz =3D strlen(value) + 1;
+> =20
+> +    trace_fw_cfg_add_string(key, value);
+>      fw_cfg_add_bytes(s, key, g_memdup(value, sz), sz);
+>  }
+> =20
+> @@ -643,6 +645,7 @@ void fw_cfg_add_i16(FWCfgState *s, uint16_t key, ui=
+nt16_t value)
+> =20
+>      copy =3D g_malloc(sizeof(value));
+>      *copy =3D cpu_to_le16(value);
+> +    trace_fw_cfg_add_i16(key, value);
+>      fw_cfg_add_bytes(s, key, copy, sizeof(value));
+>  }
+> =20
+> @@ -662,6 +665,7 @@ void fw_cfg_add_i32(FWCfgState *s, uint16_t key, ui=
+nt32_t value)
+> =20
+>      copy =3D g_malloc(sizeof(value));
+>      *copy =3D cpu_to_le32(value);
+> +    trace_fw_cfg_add_i32(key, value);
+>      fw_cfg_add_bytes(s, key, copy, sizeof(value));
+>  }
+> =20
+> @@ -671,6 +675,7 @@ void fw_cfg_add_i64(FWCfgState *s, uint16_t key, ui=
+nt64_t value)
+> =20
+>      copy =3D g_malloc(sizeof(value));
+>      *copy =3D cpu_to_le64(value);
+> +    trace_fw_cfg_add_i64(key, value);
+>      fw_cfg_add_bytes(s, key, copy, sizeof(value));
+>  }
+> =20
+> diff --git a/hw/nvram/trace-events b/hw/nvram/trace-events
+> index 6b55ba7a09..0ee0f8d04a 100644
+> --- a/hw/nvram/trace-events
+> +++ b/hw/nvram/trace-events
+> @@ -7,4 +7,9 @@ nvram_write(uint32_t addr, uint32_t old, uint32_t val) =
+"write addr %d: 0x%02x ->
+>  # hw/nvram/fw_cfg.c
+>  fw_cfg_select(void *s, uint16_t key, int ret) "%p key %d =3D %d"
+>  fw_cfg_read(void *s, uint64_t ret) "%p =3D 0x%"PRIx64
+> +fw_cfg_add_bytes(uint16_t key, size_t len) "key 0x%04" PRIx16 " (%zu b=
+ytes)"
+>  fw_cfg_add_file(void *s, int index, char *name, size_t len) "%p #%d: %=
+s (%zd bytes)"
+> +fw_cfg_add_string(uint16_t key, const char *value) "key 0x%04" PRIx16 =
+", value '%s'"
+> +fw_cfg_add_i16(uint16_t key, uint32_t value) "key 0x%04" PRIx16 ", val=
+ue 0x%" PRIx32
 
-The missing piece is a hotplug controller 'unplug' or 'unplug_request' meth=
-od implementation. I think the 'right' thing to do is implement 'unplug_req=
-uest' and mimic the behaviour of libxl... i.e. set 'online' to 0 and 'state=
-' to closing (i.e. 5) under transaction lock. This means that any connected=
- frontend should go through a clean disconnect and then the device will get=
- removed.
-To that end I'm going to need to add transaction support to my helper funct=
-ions (in patch #4) and then add in the unplug_request implementation in thi=
-s patch.
+For the "value" parameter, you should use "uint16_t" here (and replace
+PRIx32 with PRIx16, as well).
 
-  Paul
+(In practice this will make no difference, but for consistency's sake,
+we should do this.)
+
+With the update:
+
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+
+Thanks
+Laszlo
+
+> +fw_cfg_add_i32(uint16_t key, uint32_t value) "key 0x%04" PRIx16 ", val=
+ue 0x%" PRIx32
+> +fw_cfg_add_i64(uint16_t key, uint64_t value) "key 0x%04" PRIx16 ", val=
+ue 0x%" PRIx64
+>=20
