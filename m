@@ -1,35 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gWHHL-0006hJ-6W
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 03:51:05 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gWHRw-0002o8-Du
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 04:02:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gWHHH-00081B-Qr
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 03:51:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41122)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gWHHH-00080c-G5
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 03:50:59 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 543DC3164677
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 08:50:58 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
-	<20180706105753.26700-16-marcandre.lureau@redhat.com>
-	<87lg53olyf.fsf@dusky.pond.sub.org>
-	<CAMxuvaxENFTV9SV0jF9Q9qcf2p5vAdPZ5t8BumQLVXvqP9knrA@mail.gmail.com>
-Date: Mon, 10 Dec 2018 09:50:52 +0100
-In-Reply-To: <CAMxuvaxENFTV9SV0jF9Q9qcf2p5vAdPZ5t8BumQLVXvqP9knrA@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Sat, 8 Dec 2018
-	15:20:18 +0400")
-Message-ID: <8736r5n4sz.fsf@dusky.pond.sub.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gWHRq-0008Hz-Fi
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 04:02:00 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <CAErn8fQO8cwNC8KjkczGwh6L3sTgxyzPX48fVkUdihXW9gHBSg@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <ecb955dd-2312-ca7c-6f7f-37ca024d918e@amsat.org>
+Date: Mon, 10 Dec 2018 10:01:46 +0100
 MIME-Version: 1.0
+In-Reply-To: <CAErn8fQO8cwNC8KjkczGwh6L3sTgxyzPX48fVkUdihXW9gHBSg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 15/27] qapi: rename allow_dict to
- allow_implicit
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] possible bug hw/adc/stm32f2xx_adc.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,125 +27,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Seth K <skintigh@gmail.com>, Alistair Francis <alistair23@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Alistair Francis <alistair@alistair23.me>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+Hi Seth,
 
-> On Wed, Dec 5, 2018 at 10:41 PM Markus Armbruster <armbru@redhat.com> wro=
-te:
->>
->> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->>
->> > This makes it a bit clearer what is the intent of the dictionnary for
->>
->> dictionary
->
-> sigh, this must be a very common misspell (dictionnaire in french)
+On 12/10/18 4:39 AM, Seth K wrote:
+> Thank you all for help with my last patch. I found one more entry in my
+> notes that could be a bug, or could be a misunderstanding on my part.
+> 
+> The memory map in DocID15818 (Rev 15) datasheet says:
+>     ADC1 - ADC2 - ADC3:  0x40012000-0x400123FF
+> 
+> That suggests a size of 0x400 (they share that range?)
 
-Muscle memory...
+This datasheet is more about how the chip interracts with the external
+world. There is another document about how to use it (internally) which
+is the "Technical Reference Manual" (RM0033 Rev 8):
+https://www.st.com/resource/en/reference_manual/cd00225773.pdf
 
->> > the check_type() function, since there was some confusion on a
->> > previous iteration of this series.
->>
->> I don't remember... got a pointer to that confusion handy?
->
-> https://lists.nongnu.org/archive/html/qemu-devel/2017-12/msg01584.html
+See Section 10.13.18 "ADC register map": There are 3 ADCs indeed, each
+mapped at a 0x100 base. Each ADC can be addressed in a 0x50 bytes range.
 
-Thanks!
+> 
+> Line 279/280 of hw/adc/stm32f2xx_adc.c seems to use 0xFF
+> memory_region_init_io(&s->mmio,obj,&stm32f2xx_adc_ops,s,
+> 	TYPE_STM32F2XX_ADC,0xFF);
 
-My review comment was
+This code define a single ADC and looks correct.
 
-    > diff --git a/scripts/qapi.py b/scripts/qapi.py
-    > index df2a304e8f..15711f96fa 100644
-    > --- a/scripts/qapi.py
-    > +++ b/scripts/qapi.py
-    > @@ -696,7 +696,15 @@ def check_type(info, source, value, allow_array=
-=3DFalse,
-    >          return
-    >=20=20
-    >      if not allow_dict:
-    > -        raise QAPISemError(info, "%s should be a type name" % source)
-    > +        if isinstance(value, dict) and 'type' in value:
-    > +            check_type(info, source, value['type'], allow_array,
-    > +                       allow_dict, allow_optional, allow_metas)
-    > +            if 'if' in value:
-    > +                check_if(value, info)
-    > +            check_unknown_keys(info, value, {'type', 'if'})
-    > +            return
-    > +        else:
-    > +            raise QAPISemError(info, "%s should be a type name" % so=
-urce)
+The consumer of this ADC is the SoC object, defined in the file
+hw/arm/stm32f205_soc.c. You can see lines 70:
 
-    @allow_dict becomes a misnomer: dictionaries are now always allowed, but
-    they have different meaning (implicit type vs. named type with
-    additional attributes).
+ for (i = 0; i < STM_NUM_ADCS; i++) {
+     sysbus_init_child_obj(obj, "adc[*]", &s->adc[i], sizeof(s->adc[i]),
+                           TYPE_STM32F2XX_ADC);
+ }
 
-    Rename to @allow_implicit?
+Having in include/hw/arm/stm32f205_soc.h:42:#define STM_NUM_ADCS 3
+and:
+static const uint32_t adc_addr[STM_NUM_ADCS] = { 0x40012000, 0x40012100,
+    0x40012200 };
 
-As far as I can tell, it's not an issue in the current version of your
-patches anymore:
+So the SoC code instanciates 3 ADCs, each at the correct address.
+(You can check the SoC Memory Map at Section 2.3 "Memory map" p. 53).
 
-    def check_type(info, source, value, allow_array=3DFalse,
-                   allow_implicit=3DFalse, allow_optional=3DFalse,
-                   allow_metas=3D[]):
-        global all_names
+An easy way to figure out the memory map in QEMU is using the 'info
+mtree' in the QEMU Monitor:
 
-        if value is None:
-            return
+qemu-system-arm -M netduino2 -kernel /dev/null -S -monitor stdio
+QEMU 3.0.94 monitor - type 'help' for more information
+(qemu) info mtree
+address-space: memory
+  0000000000000000-ffffffffffffffff (prio -1, i/o): system
+    0000000000000000-00000000000fffff (prio 0, i/o): alias flash
+    0000000008000000-00000000080fffff (prio 0, rom): STM32F205.flash
+    0000000020000000-000000002001ffff (prio 0, ram): STM32F205.sram
+    0000000040000000-00000000400003ff (prio 0, i/o): stm32f2xx_timer
+    0000000040000400-00000000400007ff (prio 0, i/o): stm32f2xx_timer
+    0000000040000800-0000000040000bff (prio 0, i/o): stm32f2xx_timer
+    0000000040000c00-0000000040000fff (prio 0, i/o): stm32f2xx_timer
+    0000000040003800-0000000040003bff (prio 0, i/o): stm32f2xx-spi
+    0000000040003c00-0000000040003fff (prio 0, i/o): stm32f2xx-spi
+    0000000040004400-00000000400047ff (prio 0, i/o): stm32f2xx-usart
+    0000000040004800-0000000040004bff (prio 0, i/o): stm32f2xx-usart
+    0000000040004c00-0000000040004fff (prio 0, i/o): stm32f2xx-usart
+    0000000040005000-00000000400053ff (prio 0, i/o): stm32f2xx-usart
+    0000000040011000-00000000400113ff (prio 0, i/o): stm32f2xx-usart
+    0000000040011400-00000000400117ff (prio 0, i/o): stm32f2xx-usart
+    0000000040012000-00000000400120fe (prio 0, i/o): stm32f2xx-adc
+    0000000040012100-00000000400121fe (prio 0, i/o): stm32f2xx-adc
+    0000000040012200-00000000400122fe (prio 0, i/o): stm32f2xx-adc
+    0000000040013000-00000000400133ff (prio 0, i/o): stm32f2xx-spi
+    0000000040013800-0000000040013bff (prio 0, i/o): stm32f2xx-syscfg
 
-        # Check if array type for value is okay
-        if isinstance(value, list):
-            if not allow_array:
-                raise QAPISemError(info, "%s cannot be an array" % source)
-            if len(value) !=3D 1 or not isinstance(value[0], str):
-                raise QAPISemError(info,
-                                   "%s: array type must contain single type=
- name" %
-                                   source)
-            value =3D value[0]
+You are correct we should declare a 0x100 region rather than 0xff.
 
-        # Check if type name for value is okay
-        if isinstance(value, str):
-            if value not in all_names:
-                raise QAPISemError(info, "%s uses unknown type '%s'"
-                                   % (source, value))
-            if not all_names[value] in allow_metas:
-                raise QAPISemError(info, "%s cannot use %s type '%s'" %
-                                   (source, all_names[value], value))
-            return
+> 
+> Probably just confusion on my part, but thought I would mention it just
+> in case.
+> Thanks,
+> Seth
+> 
+> PS: Sorry if you are all the wrong people to email about this ADC...
 
-        if not allow_implicit:
-            raise QAPISemError(info, "%s should be a type name" % source)
+You did well :)
 
-        if not isinstance(value, OrderedDict):
-            raise QAPISemError(info,
-                               "%s should be a dictionary or type name" % s=
-ource)
+You can also use this script:
 
-        # value is a dictionary, check that each member is okay
-        for (key, arg) in value.items():
-            check_name(info, "Member of %s" % source, key,
-                       allow_optional=3Dallow_optional)
-            if c_name(key, False) =3D=3D 'u' or c_name(key, False).startswi=
-th('has_'):
-                raise QAPISemError(info, "Member of %s uses reserved name '=
-%s'"
-                                   % (source, key))
-            # Todo: allow dictionaries to represent default values of
-            # an optional argument.
-            if isinstance(arg, dict):
-                check_known_keys(info, "member '%s' of %s" % (key, source),
-                                 arg, ['type'], ['if'])
-                typ =3D arg['type']
-            else:
-                typ =3D arg
-            check_type(info, "Member '%s' of %s" % (key, source),
-                       typ, allow_array=3DTrue,
-                       allow_metas=3D['built-in', 'union', 'alternate', 'st=
-ruct',
-                                    'enum'])
+./scripts/get_maintainer.pl -f hw/adc/stm32f2xx_adc.c
+Alistair Francis <alistair@alistair23.me> (maintainer:STM32F205)
+Peter Maydell <peter.maydell@linaro.org> (maintainer:STM32F205)
+qemu-devel@nongnu.org (open list:All patches CC here)
 
+But for this particular case, using the SoC file is more complete (you
+get the ARM list):
 
->> > Suggested-by: Markus Armbruster <armbru@redhat.com>
->> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+./scripts/get_maintainer.pl -f hw/arm/stm32f205_soc.c
+Alistair Francis <alistair@alistair23.me> (maintainer:STM32F205)
+Peter Maydell <peter.maydell@linaro.org> (maintainer:STM32F205)
+qemu-arm@nongnu.org (open list:ARM)
+qemu-devel@nongnu.org (open list:All patches CC here)
+
+Regards,
+
+Phil.
