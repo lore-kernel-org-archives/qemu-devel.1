@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gWQwB-00060R-20
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:09:52 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gWQwH-00063z-Eg
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:09:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gWQw6-0004NH-Fq
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:09:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54520)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gWQw6-0004MG-8C
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:09:46 -0500
-Date: Mon, 10 Dec 2018 17:09:42 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181210190942.GL4669@habkost.net>
-References: <20181207204107.GH7395@habkost.net>
-	<20181209222738.GA9292@flamenco>
-	<20181210163601.GA4669@habkost.net>
-	<20181210170720.GA21344@flamenco>
-	<20181210173427.GG4669@habkost.net>
+	(envelope-from <richard.henderson@linaro.org>) id 1gWQwC-0004S9-Ld
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:09:57 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43932)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gWQwC-0004RR-Ea
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:09:52 -0500
+Received: by mail-ot1-x343.google.com with SMTP id a11so11503592otr.10
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 11:09:52 -0800 (PST)
+References: <20181207085635.4291-1-mark.cave-ayland@ilande.co.uk>
+	<20181207085635.4291-7-mark.cave-ayland@ilande.co.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <e67fd1ca-cc67-bc6f-e672-7c84d54b685b@linaro.org>
+Date: Mon, 10 Dec 2018 13:09:48 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181210173427.GG4669@habkost.net>
-Subject: Re: [Qemu-devel] Help needed: test-qht-par hangs on Travis
+In-Reply-To: <20181207085635.4291-7-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 6/6] target/ppc: convert vaddu[b, h, w,
+ d] and vsubu[b, h, w, d] over to use vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +32,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-On Mon, Dec 10, 2018 at 03:34:27PM -0200, Eduardo Habkost wrote:
-> On Mon, Dec 10, 2018 at 12:07:20PM -0500, Emilio G. Cota wrote:
-> > On Mon, Dec 10, 2018 at 14:36:01 -0200, Eduardo Habkost wrote:
-> > > On Sun, Dec 09, 2018 at 05:27:38PM -0500, Emilio G. Cota wrote:
-> > > > Can you try re-running the test, after applying the appended patch?
-> > > > (It disables the "resize" thread.)
-> > > 
-> > > It is running right now, here:
-> > > https://travis-ci.org/ehabkost/qemu-hacks/jobs/466074591
-> > > 
-> > > > 
-> > > > Also, does it reliably hang on Travis, or are these hangs
-> > > > intermittent?
-> > > 
-> > > It can be reproduced reliably.  qemu.git builds are failing since
-> > > Thursday:
-> > > https://travis-ci.org/qemu/qemu/builds
-> > 
-> > I see the build you launched timed out. Can you try the following
-> > patch (after discarding the previous one)? Let's see if just by
-> > disabling the second test we can get the build to move ahead.
-> 
-> I will try it.  I'm not sure yet if it's the first or the second
-> test case timing out.  Maybe the "OK\n" we see in the log file is
-> from another process running in parallel.
+On 12/7/18 2:56 AM, Mark Cave-Ayland wrote:
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  target/ppc/helper.h                 |  8 --------
+>  target/ppc/int_helper.c             |  7 -------
+>  target/ppc/translate/vmx-impl.inc.c | 16 ++++++++--------
+>  3 files changed, 8 insertions(+), 23 deletions(-)
 
-Yeah, I think the first test case is the one hanging:
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-https://travis-ci.org/ehabkost/qemu-hacks/jobs/466074591#L7741
 
-> 
-> 
-> > 
-> > Thanks,
-> > 
-> > 		E.
-> > ---
-> > diff --git a/tests/test-qht-par.c b/tests/test-qht-par.c
-> > index d8a83caf5c..a916c91ccb 100644
-> > --- a/tests/test-qht-par.c
-> > +++ b/tests/test-qht-par.c
-> > @@ -46,7 +46,6 @@ int main(int argc, char *argv[])
-> > 
-> >      if (g_test_quick()) {
-> >          g_test_add_func("/qht/parallel/2threads-0%updates-1s", test_2th0u1s);
-> > -        g_test_add_func("/qht/parallel/2threads-20%updates-1s", test_2th20u1s);
-> >      } else {
-> >          g_test_add_func("/qht/parallel/2threads-0%updates-5s", test_2th0u5s);
-> >          g_test_add_func("/qht/parallel/2threads-20%updates-5s", test_2th20u5s);
-> 
-> -- 
-> Eduardo
-
--- 
-Eduardo
+r~
