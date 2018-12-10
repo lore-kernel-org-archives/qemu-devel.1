@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gWPJe-0002gp-1E
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:25:58 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gWPLq-00044B-2b
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:28:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gWPJa-0000ix-SA
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:25:57 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43242)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gWPJa-0000hw-Lk
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:25:54 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gWPJY-00056J-1T
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 17:25:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B440E2E8083
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 17:25:50 +0000 (UTC)
+	(envelope-from <imammedo@redhat.com>) id 1gWPLm-0001kU-Uw
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:28:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41684)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gWPLm-0001k0-LS
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:28:10 -0500
+Date: Mon, 10 Dec 2018 18:28:01 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181210182801.7eda2151@Igors-MacBook-Pro.local>
+In-Reply-To: <20181204142023.15982-15-marcandre.lureau@redhat.com>
+References: <20181204142023.15982-1-marcandre.lureau@redhat.com>
+	<20181204142023.15982-15-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Dec 2018 17:17:34 -0000
-From: MVoloshin <1743441@bugs.launchpad.net>
-Reply-To: Bug 1743441 <1743441@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151604323239.5020.7297818634644485125.malonedeb@wampee.canonical.com>
-Message-Id: <154446225496.16288.15309783349193784506.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1743441] Re: OS/2 Warp 4.52 OS2LVM failure
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v5 14/19] qdev-props: call
+ object_apply_global_props()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,30 +28,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, Andreas =?UTF-8?Q?F=C3=A4r?= =?UTF-8?Q?ber?= <afaerber@suse.de>
 
-As far as I know it has never worked. I have checked it on version 2.11
-and attached a link to my disk image. I used qemu-system-i386w -cpu
-pentium3 -m 128 -hda c.img -boot c
+On Tue,  4 Dec 2018 18:20:18 +0400
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
--- =
+> It's now possible to use the common function.
+>=20
+> Teach object_apply_global_props() to warn if Error argument is NULL.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1743441
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Title:
-  OS/2 Warp 4.52 OS2LVM failure
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  When I try to boot OS/2 Warp 4.51 (Merlin), 4.52 (Aurora) or eCS 1.2.5, e=
-tc. I always get an exception in OS2LVM (TRAP 000E). Tried both FAT and HPF=
-S. You can reproduce the bug using this disk image: https://drive.google.co=
-m/open?id=3D1zzjs9hTS0TK-Xb5hnon8SQ-2C1EmlYfy
-  P.S. OS/2 Warp 4.0 boots OK (if installed on FAT, not HPFS)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1743441/+subscriptions
+> ---
+>  hw/core/qdev-properties.c | 24 ++----------------------
+>  qom/object.c              | 12 +++++++++++-
+>  2 files changed, 13 insertions(+), 23 deletions(-)
+>=20
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index a2d25d3d37..6061090dc2 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -1223,28 +1223,8 @@ int qdev_prop_check_globals(void)
+> =20
+>  void qdev_prop_set_globals(DeviceState *dev)
+>  {
+> -    int i;
+> -
+> -    for (i =3D 0; i < global_props()->len; i++) {
+> -        GlobalProperty *prop;
+> -        Error *err =3D NULL;
+> -
+> -        prop =3D g_ptr_array_index(global_props(), i);
+> -        if (object_dynamic_cast(OBJECT(dev), prop->driver) =3D=3D NULL) {
+> -            continue;
+> -        }
+> -        prop->used =3D true;
+> -        object_property_parse(OBJECT(dev), prop->value, prop->property, =
+&err);
+> -        if (err !=3D NULL) {
+> -            error_prepend(&err, "can't apply global %s.%s=3D%s: ",
+> -                          prop->driver, prop->property, prop->value);
+> -            if (!dev->hotplugged) {
+> -                error_propagate(&error_fatal, err);
+> -            } else {
+> -                warn_report_err(err);
+> -            }
+> -        }
+> -    }
+> +    object_apply_global_props(OBJECT(dev), global_props(),
+> +                              dev->hotplugged ? NULL : &error_fatal);
+>  }
+> =20
+>  /* --- 64bit unsigned int 'size' type --- */
+> diff --git a/qom/object.c b/qom/object.c
+> index dbdab0aead..aa6f3a2a71 100644
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -390,7 +390,17 @@ void object_apply_global_props(Object *obj, const GP=
+trArray *props, Error **errp
+>          if (err !=3D NULL) {
+>              error_prepend(&err, "can't apply global %s.%s=3D%s: ",
+>                            p->driver, p->property, p->value);
+> -            error_propagate(errp, err);
+> +            /*
+> +             * If errp !=3D NULL, propagate error and return.
+> +             * If errp =3D=3D NULL, report a warning, but keep going
+> +             * with the remaining globals.
+> +             */
+> +            if (errp) {
+> +                error_propagate(errp, err);
+> +                return;
+> +            } else {
+> +                warn_report_err(err);
+> +            }
+>          }
+>      }
+>  }
