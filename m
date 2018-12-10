@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gWHtm-0006Gw-8s
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 04:30:47 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gWHvM-0007Mu-NF
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 04:32:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gWHtj-0003Oc-3Q
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 04:30:46 -0500
-Received: from 12.mo1.mail-out.ovh.net ([87.98.162.229]:55463)
+	(envelope-from <jasowang@redhat.com>) id 1gWHvH-0004hP-Ti
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 04:32:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40882)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gWHti-0003N2-RF
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 04:30:43 -0500
-Received: from player762.ha.ovh.net (unknown [10.109.160.244])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 64E09149843
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 10:30:40 +0100 (CET)
-Date: Mon, 10 Dec 2018 10:30:32 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20181210103032.088de905@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20181210062043.GS4261@umbus.fritz.box>
-References: <20181108014406.29818-1-aik@ozlabs.ru>
-	<20181111191047.7af39551@bahia.lan>
-	<efc67974-4118-7877-6f8d-ce0a09cb9999@ozlabs.ru>
-	<20181210062043.GS4261@umbus.fritz.box>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gWHvG-0004g3-Gq
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 04:32:19 -0500
+References: <20181206063552.6701-1-xieyongji@baidu.com>
+	<561e0d7a-af2f-caad-aec3-c15952665687@redhat.com>
+	<20181206085849-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <cf555a3d-0312-0b61-d18a-12ca295520a0@redhat.com>
+Date: Mon, 10 Dec 2018 17:32:00 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/LvNoeFKPQqQ3D_vZy.3hsyN";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH qemu] ppc/spapr: Receive and
- store device tree blob from SLOF
+In-Reply-To: <20181206085849-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 0/6] vhost-user-blk: Add support
+ for backend reconnecting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,192 +30,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: zhangyu31@baidu.com, Xie Yongji <xieyongji@baidu.com>, lilin24@baidu.com, qemu-devel@nongnu.org, elohimes@gmail.com, chaiwen@baidu.com, marcandre.lureau@redhat.com, nixun@baidu.com
 
---Sig_/LvNoeFKPQqQ3D_vZy.3hsyN
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, 10 Dec 2018 17:20:43 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+On 2018/12/6 =E4=B8=8B=E5=8D=889:59, Michael S. Tsirkin wrote:
+> On Thu, Dec 06, 2018 at 09:57:22PM +0800, Jason Wang wrote:
+>> On 2018/12/6 =E4=B8=8B=E5=8D=882:35,elohimes@gmail.com  wrote:
+>>> From: Xie Yongji<xieyongji@baidu.com>
+>>>
+>>> This patchset is aimed at supporting qemu to reconnect
+>>> vhost-user-blk backend after vhost-user-blk backend crash or
+>>> restart.
+>>>
+>>> The patch 1 tries to implenment the sync connection for
+>>> "reconnect socket".
+>>>
+>>> The patch 2 introduces a new message VHOST_USER_SET_VRING_INFLIGHT
+>>> to support offering shared memory to backend to record
+>>> its inflight I/O.
+>>>
+>>> The patch 3,4 are the corresponding libvhost-user patches of
+>>> patch 2. Make libvhost-user support VHOST_USER_SET_VRING_INFLIGHT.
+>>>
+>>> The patch 5 supports vhost-user-blk to reconnect backend when
+>>> connection closed.
+>>>
+>>> The patch 6 tells qemu that we support reconnecting now.
+>>>
+>>> To use it, we could start qemu with:
+>>>
+>>> qemu-system-x86_64 \
+>>>           -chardev socket,id=3Dchar0,path=3D/path/vhost.socket,reconn=
+ect=3D1,wait \
+>>>           -device vhost-user-blk-pci,chardev=3Dchar0 \
+>>>
+>>> and start vhost-user-blk backend with:
+>>>
+>>> vhost-user-blk -b /path/file -s /path/vhost.socket
+>>>
+>>> Then we can restart vhost-user-blk at any time during VM running.
+>> I wonder whether or not it's better to handle this at the level of vir=
+tio
+>> protocol itself instead of vhost-user level. E.g expose last_avail_idx=
+ to
+>> driver might be sufficient?
+>>
+>> Another possible issue is, looks like you need to deal with different =
+kinds
+>> of ring layouts e.g packed virtqueues.
+>>
+>> Thanks
+> I'm not sure I understand your comments here.
+> All these would be guest-visible extensions.
 
-> On Mon, Nov 12, 2018 at 03:12:26PM +1100, Alexey Kardashevskiy wrote:
-> >=20
-> >=20
-> > On 12/11/2018 05:10, Greg Kurz wrote: =20
-> > > Hi Alexey,
-> > >=20
-> > > Just a few remarks. See below.
-> > >=20
-> > > On Thu,  8 Nov 2018 12:44:06 +1100
-> > > Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> > >  =20
-> > >> SLOF receives a device tree and updates it with various properties
-> > >> before switching to the guest kernel and QEMU is not aware of any ch=
-anges
-> > >> made by SLOF. Since there is no real RTAS (QEMU implements it), it m=
-akes
-> > >> sense to pass the SLOF final device tree to QEMU to let it implement
-> > >> RTAS related tasks better, such as PCI host bus adapter hotplug.
-> > >>
-> > >> Specifially, now QEMU can find out the actual XICS phandle (for PHB
-> > >> hotplug) and the RTAS linux,rtas-entry/base properties (for firmware
-> > >> assisted NMI - FWNMI).
-> > >>
-> > >> This stores the initial DT blob in the sPAPR machine and replaces it
-> > >> in the KVMPPC_H_UPDATE_DT (new private hypercall) handler.
-> > >>
-> > >> This adds an @update_dt_enabled machine property to allow backward
-> > >> migration.
-> > >>
-> > >> SLOF already has a hypercall since
-> > >> https://github.com/aik/SLOF/commit/e6fc84652c9c0073f9183
-> > >>
-> > >> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> > >> ---
-> > >>  include/hw/ppc/spapr.h |  7 ++++++-
-> > >>  hw/ppc/spapr.c         | 29 ++++++++++++++++++++++++++++-
-> > >>  hw/ppc/spapr_hcall.c   | 32 ++++++++++++++++++++++++++++++++
-> > >>  hw/ppc/trace-events    |  2 ++
-> > >>  4 files changed, 68 insertions(+), 2 deletions(-)
-> > >>
-> > >> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > >> index ad4d7cfd97..f5dcaf44cb 100644
-> > >> --- a/include/hw/ppc/spapr.h
-> > >> +++ b/include/hw/ppc/spapr.h
-> > >> @@ -100,6 +100,7 @@ struct sPAPRMachineClass {
-> > >> =20
-> > >>      /*< public >*/
-> > >>      bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug o=
-f LMBs */
-> > >> +    bool update_dt_enabled;    /* enable KVMPPC_H_UPDATE_DT */
-> > >>      bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
-> > >>      bool pre_2_10_has_unused_icps;
-> > >>      bool legacy_irq_allocation;
-> > >> @@ -136,6 +137,9 @@ struct sPAPRMachineState {
-> > >>      int vrma_adjust;
-> > >>      ssize_t rtas_size;
-> > >>      void *rtas_blob;
-> > >> +    uint32_t fdt_size;
-> > >> +    uint32_t fdt_initial_size; =20
-> > >=20
-> > > I don't quite see the purpose of fdt_initial_size... it seems to be o=
-nly
-> > > used to print a trace. =20
-> >=20
-> >=20
-> > Ah, lost in rebase. The purpose was to test if the new device tree has
-> > not grown too much.
-> >=20
-> >=20
-> >  =20
-> > >  =20
-> > >> +    void *fdt_blob;
-> > >>      long kernel_size;
-> > >>      bool kernel_le;
-> > >>      uint32_t initrd_base;
-> > >> @@ -462,7 +466,8 @@ struct sPAPRMachineState {
-> > >>  #define KVMPPC_H_LOGICAL_MEMOP  (KVMPPC_HCALL_BASE + 0x1)
-> > >>  /* Client Architecture support */
-> > >>  #define KVMPPC_H_CAS            (KVMPPC_HCALL_BASE + 0x2)
-> > >> -#define KVMPPC_HCALL_MAX        KVMPPC_H_CAS
-> > >> +#define KVMPPC_H_UPDATE_DT      (KVMPPC_HCALL_BASE + 0x3)
-> > >> +#define KVMPPC_HCALL_MAX        KVMPPC_H_UPDATE_DT
-> > >> =20
-> > >>  typedef struct sPAPRDeviceTreeUpdateHeader {
-> > >>      uint32_t version_id;
-> > >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > >> index c08130facb..5e2d4d211c 100644
-> > >> --- a/hw/ppc/spapr.c
-> > >> +++ b/hw/ppc/spapr.c
-> > >> @@ -1633,7 +1633,10 @@ static void spapr_machine_reset(void)
-> > >>      /* Load the fdt */
-> > >>      qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
-> > >>      cpu_physical_memory_write(fdt_addr, fdt, fdt_totalsize(fdt));
-> > >> -    g_free(fdt);
-> > >> +    g_free(spapr->fdt_blob);
-> > >> +    spapr->fdt_size =3D fdt_totalsize(fdt);
-> > >> +    spapr->fdt_initial_size =3D spapr->fdt_size;
-> > >> +    spapr->fdt_blob =3D fdt; =20
-> > >=20
-> > > Hmm... It looks weird to store state in a reset handler. I'd rather z=
-eroe
-> > > both fdt_blob and fdt_size here. =20
-> >=20
-> > The device tree is built from the reset handler and the idea is that we
-> > want to always have some tree in the machine. =20
->=20
-> Yes, I think the approach here is fine.  Otherwise when we want to
-> look up the current fdt state in RTAS calls or whatever we'd always
-> have to do
-> 	if (fdt_blob)
-> 		look up that
-> 	else
-> 		look up qemu created fdt.
->=20
 
-No. We only have one fdt blob: the initial one, I'd rather
-call reset time one, or the updated one.
+Looks not, it only introduces a shared memory between qemu and=20
+vhost-user backend?
 
-> Incidentally 'fdt' and 'fdt_blob' names do a terrible job of
-> distinguishing what the difference is.  Renaming fdt to fdt_initial
-> (to match fdt_initial_size) and fdt_blob to fdt should make that
-> clearer.
->=20
 
-As mentioned earlier in this thread, spapr->fdt_initial_size is only used
-for tracing if the received fdt blob fails fdt_check_full()...
+> Possible for sure but how is this related to
+> a patch supporting transparent reconnects?
 
-$ git grep -H fdt_initial_size
-hw/ppc/spapr.c:    spapr->fdt_initial_size =3D spapr->fdt_size;
-hw/ppc/spapr.c:        VMSTATE_UINT32(fdt_initial_size, sPAPRMachineState),
-hw/ppc/spapr_hcall.c:        trace_spapr_update_dt_failed(spapr->fdt_initia=
-l_size, cb,
-include/hw/ppc/spapr.h:    uint32_t fdt_initial_size;
 
-Not sure it is helpful, and anyway, it is expected to be the same in source
-and destination, so why put it in the migration stream ?
+I might miss something. My understanding is that we support transparent=20
+reconnects, but we can't deduce an accurate last_avail_idx and this is=20
+what capability this series try to add. To me, this series is functional=20
+equivalent to expose last_avail_idx (or avail_idx_cons) in available=20
+ring. So the information is inside guest memory, vhost-user backend can=20
+access it and update it directly. I believe this is some modern NIC did=20
+as well (but index is in MMIO area of course).
 
-The only case where we want to migrate something is when h_update_dt() has
-succeeded, ie, the guest passed a valid DT blob. This implies that its
-size isn't 0, otherwise fdt_check_full() would return -FDT_ERR_TRUNCATED.
-
-I would suggest rather to:
-
-- completely drop spapr->fdt_initial_size
-- clear spapr->fdt_size at machine reset
-- migrate if spapr->fdt_size is not zero
-
-Also, I've just realized another problem... nothing prevents a malicious
-guest to pass an insanely great size to h_update_dt, which would cause
-g_malloc0() to abort... The passed size should be checked against
-FDT_MAX_SIZE.
-
-Cheers,
-
---
-Greg
-
---Sig_/LvNoeFKPQqQ3D_vZy.3hsyN
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlwOMjgACgkQcdTV5YIv
-c9YfwA/+NHFaL1lJE1eF+/WnXWMb9PBTsLrEhD3BQ+71Qnd86R+bO2mI9J3ShEum
-Pzl2ena+LDFolT3WLUKplOiakZMt+LX2/R1WF9CFSdEudpEXpz8EwMbMn89/M0mS
-9C7aOcBnyB1yhELt5hUQWd2i4S/RUzQODfUT4GaoptLHdOoYo877P52k+Tt4K+fK
-iwyQgQYosUrWEt+pGfP0Q9+tbsq4gZ4zerHT1zX1jk5T++1O9GXpGuLlI8vwZf1T
-TR3ngpse0QycFdz1CTKe8mdN8AtPsJVCXVmcP/kNIph7vqCbRDA25n2FtrxzXdwf
-1GrjxeS/cAyG2JwG8257m1Nbr4UmzNqEsQ7Y9iML60ij06JNnTHK4pSq54eC9W8T
-yKiMIasM6tRjWO7gDv+AYQCrTWESWng3jnOHSMsv+uTmiHh/npp25Q0b7kPB5Fif
-Iv90o+ueVqzPn1BDBBD/WaZ5PEnsm96nnVDj6DPdYEC3McVz109RUokIRPfClSAO
-r/VvMh6b+G/JedcC78Q7BP+YPW0E4PIhl0hLqI4lybGu47NaXs6eOrDMnRXqKjfD
-k1oUQRpLUx4+LpbzZn/whsWVDUqNt+Q2uLyPTQoHlML4gEN8Snl3TWmY2jp25K3X
-NQB5ESD2y+CAhk6beA1/e2ppE3XenA5u2HiGuVSM85DxMuxsyEw=
-=Iwwy
------END PGP SIGNATURE-----
-
---Sig_/LvNoeFKPQqQ3D_vZy.3hsyN--
+Thanks
