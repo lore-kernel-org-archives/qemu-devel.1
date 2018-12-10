@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gWLOh-0006Zl-Mv
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:14:56 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gWLQ7-0007La-A2
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:16:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gWLOc-0001Tn-Ql
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:14:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44702)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gWLOc-0001TJ-JU
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:14:50 -0500
-Date: Mon, 10 Dec 2018 14:14:46 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181210131446.4yqpeplud2wmribm@sirius.home.kraxel.org>
-References: <20181206133923.30105-1-jgross@suse.com>
+	(envelope-from <cohuck@redhat.com>) id 1gWLQ3-0002Dp-HZ
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:16:21 -0500
+Date: Mon, 10 Dec 2018 14:16:07 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181210141607.0ef48273.cohuck@redhat.com>
+In-Reply-To: <CAFEAcA_qgD3Lzfoyf4vq-79aCxaVA=_gBQK-yJOOYULHmNTZpA@mail.gmail.com>
+References: <1538036615-32542-1-git-send-email-thuth@redhat.com>
+	<1538036615-32542-4-git-send-email-thuth@redhat.com>
+	<CAFEAcA_qgD3Lzfoyf4vq-79aCxaVA=_gBQK-yJOOYULHmNTZpA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181206133923.30105-1-jgross@suse.com>
-Subject: Re: [Qemu-devel] [PATCH] pvusb: set max grants only in initialise
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] hw/s390x/ioinst: Fix alignment
+ problem in struct SubchDev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,15 +25,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juergen Gross <jgross@suse.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, anthony.perard@citrix.com, sstabellini@kernel.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, David Hildenbrand <david@redhat.com>
 
-On Thu, Dec 06, 2018 at 02:39:23PM +0100, Juergen Gross wrote:
-> Don't call xen_be_set_max_grant_refs() in usbback_alloc(), as the
-> gnttabdev pointer won't be initialised yet. The call can easily be
-> moved to usbback_connect().
+On Mon, 10 Dec 2018 12:27:56 +0000
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-Added to usb queue.
+> On Thu, 27 Sep 2018 at 09:25, Thomas Huth <thuth@redhat.com> wrote:
+> >
+> > struct SubchDev embeds several other structures which are marked with
+> > QEMU_PACKED. This causes the compiler to not care for proper alignment
+> > of these structures. When we later pass around pointers to the unaligned
+> > struct members during migration, this causes problems on host architectures
+> > like Sparc that can not do unaligned memory access.
+> >
+> > Most of the structs in ioinst.h are naturally aligned, so we can fix
+> > most of the problem by removing the QEMU_PACKED statements (and use
+> > QEMU_BUILD_BUG_MSG() statements instead to make sure that there is no
+> > padding). However, for the struct SCHIB, we have to keep the QEMU_PACKED
+> > since the compiler adds some padding here otherwise. Move this struct
+> > to the beginning of struct SubchDev instead to fix the alignment problem
+> > here, too.  
+> 
+> Unfortunately clang does not like the struct SCHIB being still
+> marked packed:
+> 
+> /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1294:25:
+> warning: taking address of packed member 'pmcw' of class or structure
+> 'SCHIB' may result in an unaligned pointer value
+> [-Waddress-of-packed-member]
+>     copy_pmcw_to_guest(&dest->pmcw, &src->pmcw);
+>                         ^~~~~~~~~~
+> /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1294:38:
+> warning: taking address of packed member 'pmcw' of class or structure
+> 'SCHIB' may result in an unaligned pointer value
+> [-Waddress-of-packed-member]
+>     copy_pmcw_to_guest(&dest->pmcw, &src->pmcw);
+>                                      ^~~~~~~~~
+> /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1295:25:
+> warning: taking address of packed member 'scsw' of class or structure
+> 'SCHIB' may result in an unaligned pointer value
+> [-Waddress-of-packed-member]
+>     copy_scsw_to_guest(&dest->scsw, &src->scsw);
+>                         ^~~~~~~~~~
+> /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1295:38:
+> warning: taking address of packed member 'scsw' of class or structure
+> 'SCHIB' may result in an unaligned pointer value
+> [-Waddress-of-packed-member]
+>     copy_scsw_to_guest(&dest->scsw, &src->scsw);
+>                                      ^~~~~~~~~
+> /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1343:27:
+> warning: taking address of packed member 'pmcw' of class or structure
+> 'SCHIB' may result in an unaligned pointer value
+> [-Waddress-of-packed-member]
+>     copy_pmcw_from_guest(&dest->pmcw, &src->pmcw);
+>                           ^~~~~~~~~~
+> /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1343:40:
+> warning: taking address of packed member 'pmcw' of class or structure
+> 'SCHIB' may result in an unaligned pointer value
+> [-Waddress-of-packed-member]
+>     copy_pmcw_from_guest(&dest->pmcw, &src->pmcw);
+>                                        ^~~~~~~~~
+> /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1344:27:
+> warning: taking address of packed member 'scsw' of class or structure
+> 'SCHIB' may result in an unaligned pointer value
+> [-Waddress-of-packed-member]
+>     copy_scsw_from_guest(&dest->scsw, &src->scsw);
+>                           ^~~~~~~~~~
+> /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1344:40:
+> warning: taking address of packed member 'scsw' of class or structure
+> 'SCHIB' may result in an unaligned pointer value
+> [-Waddress-of-packed-member]
+>     copy_scsw_from_guest(&dest->scsw, &src->scsw);
+>                                        ^~~~~~~~~
 
-thanks,
-  Gerd
+That's really annoying :(
+
+> Not sure how best to address this. A couple of ideas that I had:
+> 
+> (1) make the 'uint64_t mba' field in the SCHIB struct into
+> two uint32_t fields, adjusting all the code which needs
+> to access it accordingly; then we could drop the packed
+> annotation from the struct
+
+This would mean some annoying gymnastics, but fortunately that field is
+not accessed in many places.
+
+> 
+> (2) have the guts of copy_{pmcw,scsw}_{to,from}_guest() be
+> macros, so we can do them inline in the copy_schib_{to,from}_guest()
+> function and thus operate directly on src->pmcw.foo &c
+> fields rather than ever having to take the address of any
+> of the fields in src or dest
+
+I'm not really a fan of using macros, but if it stays readable...
+
+Not sure what the best option is here; this is why I haven't done
+anything yet to fix it, as no idea was really appealing.
