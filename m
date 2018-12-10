@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gWO2g-0000K5-Sl
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:04:25 -0500
+	(envelope-from <armbru@redhat.com>) id 1gWO3p-0001o3-QQ
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:05:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gWNql-0006Av-I7
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:52:07 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:38774)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gWNql-0006AU-97
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:52:03 -0500
-Received: by mail-wr1-f65.google.com with SMTP id v13so11007961wrw.5
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 07:52:03 -0800 (PST)
-References: <20181207165103.3992-1-philmd@redhat.com>
-	<20181207165103.3992-2-philmd@redhat.com>
-	<5877a477-9f86-00e4-fce7-87485d54533e@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a47fb35b-85c5-0084-0a4a-cba2498cebd3@redhat.com>
-Date: Mon, 10 Dec 2018 16:51:58 +0100
+	(envelope-from <armbru@redhat.com>) id 1gWO3l-0004cp-QZ
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:05:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51032)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gWO3f-0004Xa-1x
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:05:27 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181208111606.8505-1-marcandre.lureau@redhat.com>
+	<20181208111606.8505-9-marcandre.lureau@redhat.com>
+	<87h8flfktf.fsf@dusky.pond.sub.org>
+Date: Mon, 10 Dec 2018 17:05:10 +0100
+In-Reply-To: <87h8flfktf.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Mon, 10 Dec 2018 16:44:28 +0100")
+Message-ID: <87woohxt8p.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <5877a477-9f86-00e4-fce7-87485d54533e@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/4] tests: Remove unused include
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v7 08/27] qapi: add a dictionary
+ form with 'name' key for enum members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +30,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <minyard@acm.org>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 12/10/18 3:55 PM, Laszlo Ersek wrote:
-> On 12/07/18 17:51, Philippe Mathieu-Daudé wrote:
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+One more thing...
+
+Markus Armbruster <armbru@redhat.com> writes:
+
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+>> Desugar the enum NAME form to { 'name': NAME }. This will allow to add
+>> new enum members, such as 'if' in the following patch.
+>>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 >> ---
->>  tests/acpi-utils.c | 1 -
->>  1 file changed, 1 deletion(-)
+>>  scripts/qapi/common.py                        | 49 ++++++++++++++++---
+>>  tests/Makefile.include                        |  3 +-
+>>  tests/qapi-schema/enum-bad-member.err         |  1 +
+>>  ...-dict-member.exit =3D> enum-bad-member.exit} |  0
+>>  tests/qapi-schema/enum-bad-member.json        |  2 +
+>>  ...um-dict-member.out =3D> enum-bad-member.out} |  0
+>>  .../qapi-schema/enum-dict-member-unknown.err  |  2 +
+>>  .../qapi-schema/enum-dict-member-unknown.exit |  1 +
+>>  .../qapi-schema/enum-dict-member-unknown.json |  2 +
+>>  .../qapi-schema/enum-dict-member-unknown.out  |  0
+>>  tests/qapi-schema/enum-dict-member.err        |  1 -
+>>  tests/qapi-schema/enum-dict-member.json       |  2 -
+>>  12 files changed, 52 insertions(+), 11 deletions(-)
+>>  create mode 100644 tests/qapi-schema/enum-bad-member.err
+>>  rename tests/qapi-schema/{enum-dict-member.exit =3D> enum-bad-member.ex=
+it} (100%)
+>>  create mode 100644 tests/qapi-schema/enum-bad-member.json
+>>  rename tests/qapi-schema/{enum-dict-member.out =3D> enum-bad-member.out=
+} (100%)
+>>  create mode 100644 tests/qapi-schema/enum-dict-member-unknown.err
+>>  create mode 100644 tests/qapi-schema/enum-dict-member-unknown.exit
+>>  create mode 100644 tests/qapi-schema/enum-dict-member-unknown.json
+>>  create mode 100644 tests/qapi-schema/enum-dict-member-unknown.out
+>>  delete mode 100644 tests/qapi-schema/enum-dict-member.err
+>>  delete mode 100644 tests/qapi-schema/enum-dict-member.json
 >>
->> diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
->> index 41dc1ea9b4..297af55d39 100644
->> --- a/tests/acpi-utils.c
->> +++ b/tests/acpi-utils.c
->> @@ -15,7 +15,6 @@
->>  #include "qemu/osdep.h"
->>  #include <glib/gstdio.h>
->>  #include "qemu-common.h"
->> -#include "hw/smbios/smbios.h"
->>  #include "qemu/bitmap.h"
->>  #include "acpi-utils.h"
->>  #include "boot-sector.h"
->>
-> 
-> Opinions vary whether empty commit message bodies are good style or not.
-> Personally I prefer to put at least one sentence in there, even if it
-> only repeats the subject line. Up to subsystem maintainers to decide I
-> guess.
+>> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+[...]
+>> @@ -847,18 +851,32 @@ def check_alternate(expr, info):
+>>              types_seen[qt] =3D key
+>>=20=20
+>>=20=20
+>> +def normalize_enum(expr):
+>> +    members =3D expr['data']
+>> +
+>> +    # translate short member form to dict form
+>> +    expr['data'] =3D [m if isinstance(m, dict) else {'name': m} for m i=
+n members]
+>> +
+>> +
+>>  def check_enum(expr, info):
+>>      name =3D expr['enum']
+>> -    members =3D expr.get('data')
+>> +    members =3D expr['data']
+>>      prefix =3D expr.get('prefix')
+>>=20=20
+>> -    if not isinstance(members, list):
+>> -        raise QAPISemError(info,
+>> -                           "Enum '%s' requires an array for 'data'" % n=
+ame)
+>>      if prefix is not None and not isinstance(prefix, str):
+>>          raise QAPISemError(info,
+>>                             "Enum '%s' requires a string for 'prefix'" %=
+ name)
+>> +
+>> +    if not isinstance(members, list):
+>> +        raise QAPISemError(info,
+>> +                           "Enum '%s' requires an array for 'data'" % n=
+ame)
+>> +
+>
+> Did you move this check down intentionally?
+>
+>>      for member in members:
+>> +        if isinstance(member, dict):
+>> +            source =3D "dictionary member of enum '%s'" % name
+>> +            check_known_keys(info, source, member, ['name'], [])
+>> +            member =3D member['name']
+>> +
+>>          check_name(info, "Member of enum '%s'" % name, member,
+>>                     enum_member=3DTrue)
+>
+> Again, slightly more complicated than v6 because it now runs before
+> normalization.  We'll revisit this at [*] below.
 
-OK, understood.
+If we keep it this way, then let's at least avoid assigning to the loop
+control variable:
 
-> 
-> With the commit message updated, or not:
-> 
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+                member_name =3D member['name']
+            else:
+                member_name =3D member
+            check_name(info, "Member of enum '%s'" % name, member_name,
+                       enum_member=3DTrue)
 
-Thanks!
+[...]
