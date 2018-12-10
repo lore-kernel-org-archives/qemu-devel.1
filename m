@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gWLVh-0002FK-QS
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:22:10 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gWLm9-0006Ie-6I
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:39:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gWLVh-0005GO-1j
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:22:09 -0500
-Date: Mon, 10 Dec 2018 13:21:56 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181210132156.GG20272@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181207161351.4380-1-vsementsov@virtuozzo.com>
-	<20181207161351.4380-4-vsementsov@virtuozzo.com>
-	<w51d0q9lkzd.fsf@maestria.local.igalia.com>
+	(envelope-from <dgilbert@redhat.com>) id 1gWLfU-000413-Q8
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:32:21 -0500
+Date: Mon, 10 Dec 2018 13:32:06 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181210133205.GC2372@work-vm>
+References: <1538036615-32542-1-git-send-email-thuth@redhat.com>
+	<1538036615-32542-4-git-send-email-thuth@redhat.com>
+	<CAFEAcA_qgD3Lzfoyf4vq-79aCxaVA=_gBQK-yJOOYULHmNTZpA@mail.gmail.com>
+	<20181210141607.0ef48273.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <w51d0q9lkzd.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] crypto/block: rename
- qcrypto_block_*crypt_helper
+In-Reply-To: <20181210141607.0ef48273.cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] hw/s390x/ioinst: Fix alignment
+ problem in struct SubchDev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,26 +26,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, David Hildenbrand <david@redhat.com>
 
-On Mon, Dec 10, 2018 at 11:44:22AM +0100, Alberto Garcia wrote:
-> On Fri 07 Dec 2018 05:13:49 PM CET, Vladimir Sementsov-Ogievskiy wrote:
-> > Rename qcrypto_block_*crypt_helper to qcrypto_cipher_*crypt_helper, as
+* Cornelia Huck (cohuck@redhat.com) wrote:
+> On Mon, 10 Dec 2018 12:27:56 +0000
+> Peter Maydell <peter.maydell@linaro.org> wrote:
 > 
-> You forgot to update the new function names in the commit message.
+> > On Thu, 27 Sep 2018 at 09:25, Thomas Huth <thuth@redhat.com> wrote:
+> > >
+> > > struct SubchDev embeds several other structures which are marked with
+> > > QEMU_PACKED. This causes the compiler to not care for proper alignment
+> > > of these structures. When we later pass around pointers to the unaligned
+> > > struct members during migration, this causes problems on host architectures
+> > > like Sparc that can not do unaligned memory access.
+> > >
+> > > Most of the structs in ioinst.h are naturally aligned, so we can fix
+> > > most of the problem by removing the QEMU_PACKED statements (and use
+> > > QEMU_BUILD_BUG_MSG() statements instead to make sure that there is no
+> > > padding). However, for the struct SCHIB, we have to keep the QEMU_PACKED
+> > > since the compiler adds some padding here otherwise. Move this struct
+> > > to the beginning of struct SubchDev instead to fix the alignment problem
+> > > here, too.  
+> > 
+> > Unfortunately clang does not like the struct SCHIB being still
+> > marked packed:
+> > 
+> > /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1294:25:
+> > warning: taking address of packed member 'pmcw' of class or structure
+> > 'SCHIB' may result in an unaligned pointer value
+> > [-Waddress-of-packed-member]
+> >     copy_pmcw_to_guest(&dest->pmcw, &src->pmcw);
+> >                         ^~~~~~~~~~
+> > /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1294:38:
+> > warning: taking address of packed member 'pmcw' of class or structure
+> > 'SCHIB' may result in an unaligned pointer value
+> > [-Waddress-of-packed-member]
+> >     copy_pmcw_to_guest(&dest->pmcw, &src->pmcw);
+> >                                      ^~~~~~~~~
+> > /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1295:25:
+> > warning: taking address of packed member 'scsw' of class or structure
+> > 'SCHIB' may result in an unaligned pointer value
+> > [-Waddress-of-packed-member]
+> >     copy_scsw_to_guest(&dest->scsw, &src->scsw);
+> >                         ^~~~~~~~~~
+> > /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1295:38:
+> > warning: taking address of packed member 'scsw' of class or structure
+> > 'SCHIB' may result in an unaligned pointer value
+> > [-Waddress-of-packed-member]
+> >     copy_scsw_to_guest(&dest->scsw, &src->scsw);
+> >                                      ^~~~~~~~~
+> > /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1343:27:
+> > warning: taking address of packed member 'pmcw' of class or structure
+> > 'SCHIB' may result in an unaligned pointer value
+> > [-Waddress-of-packed-member]
+> >     copy_pmcw_from_guest(&dest->pmcw, &src->pmcw);
+> >                           ^~~~~~~~~~
+> > /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1343:40:
+> > warning: taking address of packed member 'pmcw' of class or structure
+> > 'SCHIB' may result in an unaligned pointer value
+> > [-Waddress-of-packed-member]
+> >     copy_pmcw_from_guest(&dest->pmcw, &src->pmcw);
+> >                                        ^~~~~~~~~
+> > /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1344:27:
+> > warning: taking address of packed member 'scsw' of class or structure
+> > 'SCHIB' may result in an unaligned pointer value
+> > [-Waddress-of-packed-member]
+> >     copy_scsw_from_guest(&dest->scsw, &src->scsw);
+> >                           ^~~~~~~~~~
+> > /home/petmay01/linaro/qemu-from-laptop/qemu/hw/s390x/css.c:1344:40:
+> > warning: taking address of packed member 'scsw' of class or structure
+> > 'SCHIB' may result in an unaligned pointer value
+> > [-Waddress-of-packed-member]
+> >     copy_scsw_from_guest(&dest->scsw, &src->scsw);
+> >                                        ^~~~~~~~~
 > 
-> > -int qcrypto_block_decrypt_helper(QCryptoCipher *cipher,
-> > -int qcrypto_block_encrypt_helper(QCryptoCipher *cipher,
-> > +int qcrypto_block_cipher_decrypt_helper(QCryptoCipher *cipher,
-> > +int qcrypto_block_cipher_encrypt_helper(QCryptoCipher *cipher,
+> That's really annoying :(
 
-I'll take care of that when queuing these patches
+Is the problem here that the field could actually be misaligned (on
+any conceivable build) or is it just a matter of convincing clang it's
+safe?
 
+Dave
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> > Not sure how best to address this. A couple of ideas that I had:
+> > 
+> > (1) make the 'uint64_t mba' field in the SCHIB struct into
+> > two uint32_t fields, adjusting all the code which needs
+> > to access it accordingly; then we could drop the packed
+> > annotation from the struct
+> 
+> This would mean some annoying gymnastics, but fortunately that field is
+> not accessed in many places.
+> 
+> > 
+> > (2) have the guts of copy_{pmcw,scsw}_{to,from}_guest() be
+> > macros, so we can do them inline in the copy_schib_{to,from}_guest()
+> > function and thus operate directly on src->pmcw.foo &c
+> > fields rather than ever having to take the address of any
+> > of the fields in src or dest
+> 
+> I'm not really a fan of using macros, but if it stays readable...
+> 
+> Not sure what the best option is here; this is why I haven't done
+> anything yet to fix it, as no idea was really appealing.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
