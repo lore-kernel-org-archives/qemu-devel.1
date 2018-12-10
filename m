@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWMT3-0000Jh-8q
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:23:30 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gWMVt-0001hk-P9
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:26:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWMT2-0007I1-8E
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:23:29 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:38226)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gWMT2-0007Hc-1q
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:23:28 -0500
-Received: by mail-oi1-x241.google.com with SMTP id a77so9069343oii.5
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 06:23:27 -0800 (PST)
+	(envelope-from <kraxel@redhat.com>) id 1gWMVq-00007t-Lz
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:26:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32782)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gWMVq-00007h-Ds
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:26:22 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 80238300C230
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 14:26:21 +0000 (UTC)
+Date: Mon, 10 Dec 2018 15:26:15 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181210142615.orvgefvnsjr2gufw@sirius.home.kraxel.org>
+References: <20181126124250.29985-1-marcandre.lureau@redhat.com>
+	<20181126124250.29985-8-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <20181210135803.20208-1-peter.maydell@linaro.org>
-	<20181210151310.3f13c28f.cohuck@redhat.com>
-In-Reply-To: <20181210151310.3f13c28f.cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Dec 2018 14:23:15 +0000
-Message-ID: <CAFEAcA8q6sgirc9ydFRNGs5tCn0PjScHD_tHCR2XhxBM=CoZeg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/s390/ccw.c: Don't take address of
- packed members
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181126124250.29985-8-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 07/11] vhost-user: add
+ vhost_user_input_get_config()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +35,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, qemu-s390x <qemu-s390x@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Mon, 10 Dec 2018 at 14:13, Cornelia Huck <cohuck@redhat.com> wrote:
->
-> On Mon, 10 Dec 2018 13:58:03 +0000
-> Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> > Taking the address of a field in a packed struct is a bad idea, because
-> > it might not be actually aligned enough for that pointer type (and
-> > thus cause a crash on dereference on some host architectures). Newer
-> > versions of clang warn about this.
-> >
-> > Avoid the problem by using local copies of the PMCW and SCSW
-> > struct fields in copy_schib_from_guest() and copy_schib_to_guest().
-> >
-> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> > ---
-> > This seemed like a not totally ugly and reasonably localised fix
-> > that satisfies clang. Oddly, this makes the generated object file
-> > 15K smaller (421K vs 406K), so it might even be better code...
->
-> Nice :)
->
-> >
-> >  hw/s390x/css.c | 20 ++++++++++++++++----
-> >  1 file changed, 16 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> > index 04ec5cc9705..ef07691e36b 100644
-> > --- a/hw/s390x/css.c
-> > +++ b/hw/s390x/css.c
-> > @@ -1290,9 +1290,15 @@ void copy_scsw_to_guest(SCSW *dest, const SCSW *src)
-> >  static void copy_schib_to_guest(SCHIB *dest, const SCHIB *src)
-> >  {
-> >      int i;
-> > +    PMCW srcpmcw, destpmcw;
-> > +    SCSW srcscsw, destscsw;
->
-> <bikeshed>
-> I would find src_pmcw etc. easier to read. Other opinions?
-> </bikeshed>
+On Mon, Nov 26, 2018 at 04:42:46PM +0400, Marc-Andr=E9 Lureau wrote:
+> Ask vhost user input backend the list of virtio_input_config.
 
-CODING_STYLE's "Naming" section agrees with you...
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 
-thanks
--- PMM
+>=20
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  contrib/libvhost-user/libvhost-user.h |  1 +
+>  include/hw/virtio/vhost-backend.h     |  4 ++
+>  hw/virtio/vhost-user.c                | 60 +++++++++++++++++++++++++++
+>  docs/interop/vhost-user.txt           |  8 ++++
+>  4 files changed, 73 insertions(+)
+>=20
+> diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-u=
+ser/libvhost-user.h
+> index 4aa55b4d2d..a4afbc3a46 100644
+> --- a/contrib/libvhost-user/libvhost-user.h
+> +++ b/contrib/libvhost-user/libvhost-user.h
+> @@ -91,6 +91,7 @@ typedef enum VhostUserRequest {
+>      VHOST_USER_POSTCOPY_ADVISE  =3D 28,
+>      VHOST_USER_POSTCOPY_LISTEN  =3D 29,
+>      VHOST_USER_POSTCOPY_END     =3D 30,
+> +    VHOST_USER_INPUT_GET_CONFIG =3D 31,
+>      VHOST_USER_MAX
+>  } VhostUserRequest;
+> =20
+> diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhos=
+t-backend.h
+> index 81283ec50f..1fca321d8a 100644
+> --- a/include/hw/virtio/vhost-backend.h
+> +++ b/include/hw/virtio/vhost-backend.h
+> @@ -12,6 +12,7 @@
+>  #define VHOST_BACKEND_H
+> =20
+>  #include "exec/memory.h"
+> +#include "standard-headers/linux/virtio_input.h"
+> =20
+>  typedef enum VhostBackendType {
+>      VHOST_BACKEND_TYPE_NONE =3D 0,
+> @@ -160,4 +161,7 @@ int vhost_backend_invalidate_device_iotlb(struct vh=
+ost_dev *dev,
+>  int vhost_backend_handle_iotlb_msg(struct vhost_dev *dev,
+>                                            struct vhost_iotlb_msg *imsg=
+);
+> =20
+> +int vhost_user_input_get_config(struct vhost_dev *dev,
+> +                                struct virtio_input_config **config);
+> +
+>  #endif /* VHOST_BACKEND_H */
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index 9256364e30..d51d1087f6 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -89,6 +89,7 @@ typedef enum VhostUserRequest {
+>      VHOST_USER_POSTCOPY_ADVISE  =3D 28,
+>      VHOST_USER_POSTCOPY_LISTEN  =3D 29,
+>      VHOST_USER_POSTCOPY_END     =3D 30,
+> +    VHOST_USER_INPUT_GET_CONFIG =3D 31,
+>      VHOST_USER_MAX
+>  } VhostUserRequest;
+> =20
+> @@ -338,6 +339,65 @@ static int vhost_user_write(struct vhost_dev *dev,=
+ VhostUserMsg *msg,
+>      return 0;
+>  }
+> =20
+> +static void *vhost_user_read_size(struct vhost_dev *dev, uint32_t size=
+)
+> +{
+> +    struct vhost_user *u =3D dev->opaque;
+> +    CharBackend *chr =3D u->user->chr;
+> +    int r;
+> +    uint8_t *p =3D g_malloc(size);
+> +
+> +    r =3D qemu_chr_fe_read_all(chr, p, size);
+> +    if (r !=3D size) {
+> +        error_report("Failed to read msg payload."
+> +                     " Read %d instead of %u.", r, size);
+> +        g_free(p);
+> +        return NULL;
+> +    }
+> +
+> +    return p;
+> +}
+> +
+> +int vhost_user_input_get_config(struct vhost_dev *dev,
+> +                                struct virtio_input_config **config)
+> +{
+> +    void *p =3D NULL;
+> +    VhostUserMsg msg =3D {
+> +        .hdr.request =3D VHOST_USER_INPUT_GET_CONFIG,
+> +        .hdr.flags =3D VHOST_USER_VERSION,
+> +    };
+> +
+> +    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
+> +        goto err;
+> +    }
+> +
+> +    if (vhost_user_read_header(dev, &msg) < 0) {
+> +        goto err;
+> +    }
+> +
+> +    if (msg.hdr.request !=3D VHOST_USER_INPUT_GET_CONFIG) {
+> +        error_report("Received unexpected msg type. Expected %d receiv=
+ed %d",
+> +                     VHOST_USER_INPUT_GET_CONFIG, msg.hdr.request);
+> +        goto err;
+> +    }
+> +
+> +    if (msg.hdr.size % sizeof(struct virtio_input_config)) {
+> +        error_report("Invalid msg size");
+> +        goto err;
+> +    }
+> +
+> +    p =3D vhost_user_read_size(dev, msg.hdr.size);
+> +    if (!p) {
+> +        goto err;
+> +    }
+> +
+> +    *config =3D p;
+> +    return msg.hdr.size / sizeof(struct virtio_input_config);
+> +
+> +err:
+> +    g_free(p);
+> +    return -1;
+> +}
+> +
+>  static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t bas=
+e,
+>                                     struct vhost_log *log)
+>  {
+> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+> index cefec9ffe1..95720be81b 100644
+> --- a/docs/interop/vhost-user.txt
+> +++ b/docs/interop/vhost-user.txt
+> @@ -766,6 +766,14 @@ Master message types
+>        was previously sent.
+>        The value returned is an error indication; 0 is success.
+> =20
+> + * VHOST_USER_INPUT_GET_CONFIG
+> +      Id: 31
+> +      Master payload: N/A
+> +      Slave payload: (struct virtio_input_config)*
+> +
+> +      Ask vhost user input backend the list of virtio_input_config, in
+> +      host endianness.
+> +
+>  Slave message types
+>  -------------------
+> =20
+> --=20
+> 2.20.0.rc1
+>=20
