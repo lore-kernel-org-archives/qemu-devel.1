@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gWN7T-0002jk-WE
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:05:21 -0500
+	(envelope-from <berto@igalia.com>) id 1gWNBm-00075q-LZ
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:09:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gWN7N-0003kk-G9
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:05:15 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:41805)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gWN7N-0003k7-7o
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:05:09 -0500
-Received: by mail-ot1-x344.google.com with SMTP id u16so10643099otk.8
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 07:05:09 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 10 Dec 2018 09:05:01 -0600
-Message-Id: <20181210150501.7990-4-richard.henderson@linaro.org>
-In-Reply-To: <20181210150501.7990-1-richard.henderson@linaro.org>
-References: <20181210150501.7990-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v4 3/3] target/arm: Implement the ARMv8.1-LOR
- extension
+	(envelope-from <berto@igalia.com>) id 1gWNBj-000744-BM
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:09:42 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20181210145203.GM20272@redhat.com>
+References: <20181207161351.4380-1-vsementsov@virtuozzo.com>
+	<20181207161351.4380-6-vsementsov@virtuozzo.com>
+	<w514lbllblo.fsf@maestria.local.igalia.com>
+	<20181210145203.GM20272@redhat.com>
+Date: Mon, 10 Dec 2018 16:09:31 +0100
+Message-ID: <w511s6pl8pg.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 5/5] crypto: support multiple threads
+ accessing one QCryptoBlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,200 +26,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-Provide a trivial implementation with zero limited ordering regions,
-which causes the LDLAR and STLLR instructions to devolve into the
-LDAR and STLR instructions from the base ARMv8.0 instruction set.
+On Mon 10 Dec 2018 03:52:03 PM CET, Daniel P. Berrang=C3=A9 wrote:
+>> > +int qcrypto_block_init_cipher(QCryptoBlock *block,
+>> > +                              QCryptoCipherAlgorithm alg,
+>> > +                              QCryptoCipherMode mode,
+>> > +                              const uint8_t *key, size_t nkey,
+>> > +                              size_t n_threads, Error **errp)
+>> > +{
+>> > +    size_t i;
+>> > +
+>> > +    assert(!block->ciphers && !block->n_ciphers && !block->n_free_cip=
+hers);
+>> > +
+>> > +    block->ciphers =3D g_new0(QCryptoCipher *, n_threads);
+>>=20
+>> You can use g_new() instead of g_new0() because you're anyway
+>> overwriting all elements of the array.
+>
+> I'd rather have it initialized to zero upfront, so if creating any
+> cipher in the array fails, we don't have uninitialized array elements
+> during later cleanup code.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
-v2: Mark LORID_EL1 read-only.
-    Add TLOR access checks.
-    Conditionally unmask TLOR in hcr/scr_write.
-v3: Fix isar_feature_aa64_lor.
-    Split out access_lor_ns.
-    Defer all {E2H,TGE} vs TLOR testing to arm_hcr_el2_eff.
----
- target/arm/cpu.h           |  5 +++
- target/arm/cpu64.c         |  1 +
- target/arm/helper.c        | 75 ++++++++++++++++++++++++++++++++++++++
- target/arm/translate-a64.c | 12 ++++++
- 4 files changed, 93 insertions(+)
+But it is the value of block->n_ciphers that determines the size of the
+array, and that is only incremented after each successful iteration:
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 05ac883b6b..c943f35dd9 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -3340,6 +3340,11 @@ static inline bool isar_feature_aa64_sve(const ARMISARegisters *id)
-     return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, SVE) != 0;
- }
- 
-+static inline bool isar_feature_aa64_lor(const ARMISARegisters *id)
-+{
-+    return FIELD_EX64(id->id_aa64mmfr1, ID_AA64MMFR1, LO) != 0;
-+}
-+
- /*
-  * Forward to the above feature tests given an ARMCPU pointer.
-  */
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 1a4289c9dd..1d57be0c91 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -326,6 +326,7 @@ static void aarch64_max_initfn(Object *obj)
- 
-         t = cpu->isar.id_aa64mmfr1;
-         t = FIELD_DP64(t, ID_AA64MMFR1, HPDS, 1); /* HPD */
-+        t = FIELD_DP64(t, ID_AA64MMFR1, LO, 1);
-         cpu->isar.id_aa64mmfr1 = t;
- 
-         /* Replicate the same data to the 32-bit id registers.  */
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index d6f8be9f4e..644599b29d 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -1281,6 +1281,7 @@ static void scr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
- {
-     /* Begin with base v8.0 state.  */
-     uint32_t valid_mask = 0x3fff;
-+    ARMCPU *cpu = arm_env_get_cpu(env);
- 
-     if (arm_el_is_aa64(env, 3)) {
-         value |= SCR_FW | SCR_AW;   /* these two bits are RES1.  */
-@@ -1303,6 +1304,9 @@ static void scr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
-             valid_mask &= ~SCR_SMD;
-         }
-     }
-+    if (cpu_isar_feature(aa64_lor, cpu)) {
-+        valid_mask |= SCR_TLOR;
-+    }
- 
-     /* Clear all-context RES0 bits.  */
-     value &= valid_mask;
-@@ -3963,6 +3967,9 @@ static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
-          */
-         valid_mask &= ~HCR_TSC;
-     }
-+    if (cpu_isar_feature(aa64_lor, cpu)) {
-+        valid_mask |= HCR_TLOR;
-+    }
- 
-     /* Clear RES0 bits.  */
-     value &= valid_mask;
-@@ -5018,6 +5025,42 @@ static uint64_t id_aa64pfr0_read(CPUARMState *env, const ARMCPRegInfo *ri)
-     return pfr0;
- }
- 
-+/* Shared logic between LORID and the rest of the LOR* registers.
-+ * Secure state has already been delt with.
-+ */
-+static CPAccessResult access_lor_ns(CPUARMState *env)
-+{
-+    int el = arm_current_el(env);
-+
-+    if (el < 2 && (arm_hcr_el2_eff(env) & HCR_TLOR)) {
-+        return CP_ACCESS_TRAP_EL2;
-+    }
-+    if (el < 3 && (env->cp15.scr_el3 & SCR_TLOR)) {
-+        return CP_ACCESS_TRAP_EL3;
-+    }
-+    return CP_ACCESS_OK;
-+}
-+
-+static CPAccessResult access_lorid(CPUARMState *env, const ARMCPRegInfo *ri,
-+                                   bool isread)
-+{
-+    if (arm_is_secure_below_el3(env)) {
-+        /* Access ok in secure mode.  */
-+        return CP_ACCESS_OK;
-+    }
-+    return access_lor_ns(env);
-+}
-+
-+static CPAccessResult access_lor_other(CPUARMState *env,
-+                                       const ARMCPRegInfo *ri, bool isread)
-+{
-+    if (arm_is_secure_below_el3(env)) {
-+        /* Access denied in secure mode.  */
-+        return CP_ACCESS_TRAP;
-+    }
-+    return access_lor_ns(env);
-+}
-+
- void register_cp_regs_for_features(ARMCPU *cpu)
- {
-     /* Register all the coprocessor registers based on feature bits */
-@@ -5759,6 +5802,38 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-         define_one_arm_cp_reg(cpu, &sctlr);
-     }
- 
-+    if (cpu_isar_feature(aa64_lor, cpu)) {
-+        /*
-+         * A trivial implementation of ARMv8.1-LOR leaves all of these
-+         * registers fixed at 0, which indicates that there are zero
-+         * supported Limited Ordering regions.
-+         */
-+        static const ARMCPRegInfo lor_reginfo[] = {
-+            { .name = "LORSA_EL1", .state = ARM_CP_STATE_AA64,
-+              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 0,
-+              .access = PL1_RW, .accessfn = access_lor_other,
-+              .type = ARM_CP_CONST, .resetvalue = 0 },
-+            { .name = "LOREA_EL1", .state = ARM_CP_STATE_AA64,
-+              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 1,
-+              .access = PL1_RW, .accessfn = access_lor_other,
-+              .type = ARM_CP_CONST, .resetvalue = 0 },
-+            { .name = "LORN_EL1", .state = ARM_CP_STATE_AA64,
-+              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 2,
-+              .access = PL1_RW, .accessfn = access_lor_other,
-+              .type = ARM_CP_CONST, .resetvalue = 0 },
-+            { .name = "LORC_EL1", .state = ARM_CP_STATE_AA64,
-+              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 3,
-+              .access = PL1_RW, .accessfn = access_lor_other,
-+              .type = ARM_CP_CONST, .resetvalue = 0 },
-+            { .name = "LORID_EL1", .state = ARM_CP_STATE_AA64,
-+              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 7,
-+              .access = PL1_R, .accessfn = access_lorid,
-+              .type = ARM_CP_CONST, .resetvalue = 0 },
-+            REGINFO_SENTINEL
-+        };
-+        define_arm_cp_regs(cpu, lor_reginfo);
-+    }
-+
-     if (cpu_isar_feature(aa64_sve, cpu)) {
-         define_one_arm_cp_reg(cpu, &zcr_el1_reginfo);
-         if (arm_feature(env, ARM_FEATURE_EL2)) {
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index fd36425f1a..e1da1e4d6f 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -2290,6 +2290,12 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
-         }
-         return;
- 
-+    case 0x8: /* STLLR */
-+        if (!dc_isar_feature(aa64_lor, s)) {
-+            break;
-+        }
-+        /* StoreLORelease is the same as Store-Release for QEMU.  */
-+        /* fall through */
-     case 0x9: /* STLR */
-         /* Generate ISS for non-exclusive accesses including LASR.  */
-         if (rn == 31) {
-@@ -2301,6 +2307,12 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
-                   disas_ldst_compute_iss_sf(size, false, 0), is_lasr);
-         return;
- 
-+    case 0xc: /* LDLAR */
-+        if (!dc_isar_feature(aa64_lor, s)) {
-+            break;
-+        }
-+        /* LoadLOAcquire is the same as Load-Acquire for QEMU.  */
-+        /* fall through */
-     case 0xd: /* LDAR */
-         /* Generate ISS for non-exclusive accesses including LASR.  */
-         if (rn == 31) {
--- 
-2.17.2
+  for (i =3D 0; i < n_threads; i++) {
+      block->ciphers[i] =3D qcrypto_cipher_new(alg, mode, key, nkey, errp);
+      /* ... error handling ... */
+      block->n_ciphers++;
+      block->n_free_ciphers++;
+  }
+
+In other words, the cleanup code won't touch uninitialized elements
+because it cannot even tell the difference between an index that points
+to an uninitialized element of the array and an index that points beyond
+the allocated memory.
+
+Berto
