@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wedsonaf@google.com>) id 1gWTA7-0005Bu-3O
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:32:23 -0500
+	(envelope-from <cota@braap.org>) id 1gWTUT-0003CU-Rr
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:53:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wedsonaf@google.com>) id 1gWTA6-0006sH-3Z
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:32:22 -0500
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:41682)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <wedsonaf@google.com>) id 1gWTA5-0006ra-Qb
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:32:21 -0500
-Received: by mail-io1-xd42.google.com with SMTP id s22so10037883ioc.8
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 13:32:21 -0800 (PST)
+	(envelope-from <cota@braap.org>) id 1gWTUQ-0002Oz-JY
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:53:25 -0500
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:46525)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gWTUQ-0002N7-7y
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:53:22 -0500
+Date: Mon, 10 Dec 2018 16:53:19 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181210215319.GA25006@flamenco>
+References: <20181203160840.15115-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-References: <20181210183836.20074-1-qwandor@google.com>
-	<CAFEAcA9kXXeRkFamN73XREDp4QaokMs3E9TRLThKf4zYufapSQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA9kXXeRkFamN73XREDp4QaokMs3E9TRLThKf4zYufapSQ@mail.gmail.com>
-From: Wedson Almeida Filho <wedsonaf@google.com>
-Date: Mon, 10 Dec 2018 21:32:09 +0000
-Message-ID: <CAMKQLNK2J=JsgEch3G-pQ0mjW5B-n8Xc_4PDGHjFs6CfcA2ngg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Implement VI/VF bits
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181203160840.15115-1-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH for-4.0 0/5] tcg/i386: Improve guest_base
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +27,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: Andrew Walbran <qwandor@google.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org
 
-Hi Peter,
+On Mon, Dec 03, 2018 at 10:08:35 -0600, Richard Henderson wrote:
+> This tidies guest_base handling such that (1) we require no scratch
+> registers, (2) we require no extra instructions besides the memory op,
+> and (3) we reduce the size of the memory op by omitting a prefix.
+> 
+> In principal point 3 is offset by adding additional opcodes to handle
+> zero-extension when converting 64-bit guest values back to 32-bit guest
+> addresses.  But those turn out to be hen's teeth, since 32-bit guests
+> often have no way of even producing 64-bit guest values.
+> 
+> In particular, I saw none in a simple pass through linux-user-test-0.3
+> for i386, arm, sh4, sparc.
 
-We put this together months ago and hadn't kept up to date with the changes
-here.
+Reviewed-by: Emilio G. Cota <cota@braap.org>
 
-We're happy to see that support has been added for the VI bit. Is it going
-to be available in the v3.1.0 release?
+for the series.
 
 Thanks,
--Wedson
 
-On Mon, Dec 10, 2018 at 8:41 PM Peter Maydell <peter.maydell@linaro.org>
-wrote:
-
-> On Mon, 10 Dec 2018 at 18:38, Andrew Walbran <qwandor@google.com> wrote:
-> >
-> > From: Wedson Almeida Filho <wedsonaf@google.com>
-> >
-> > This lets hypervisors running at EL2 inject virtual interrupts into
-> guest VMs.
-> >
-> > Signed-off-by: Wedson Almeida Filho <wedsonaf@google.com>
-> > Signed-off-by: Andrew Walbran <qwandor@google.com>
->
-> Hi; thanks for this patch. I'm a bit confused -- can you
-> explain what the patch provides that isn't already
-> implemented by commit 89430fc6f80a5aef1d4cb ?
->
-> thanks
-> -- PMM
->
+		Emilio
