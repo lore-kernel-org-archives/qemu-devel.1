@@ -1,32 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <leozinho29_eu@hotmail.com>) id 1gWPqB-0001TO-Jp
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:59:37 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gWPtX-00038W-5Q
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:03:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <leozinho29_eu@hotmail.com>) id 1gWPq5-0002Nj-0C
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:59:33 -0500
-Received: from mail-oln040092003070.outbound.protection.outlook.com
-	([40.92.3.70]:37855
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <leozinho29_eu@hotmail.com>)
-	id 1gWPq4-0002Jt-FX
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:59:28 -0500
-From: =?utf-8?B?TGVvbmFyZG8gU29hcmVzIE3DvGxsZXI=?= <leozinho29_eu@hotmail.com>
-Date: Mon, 10 Dec 2018 17:59:16 +0000
-Message-ID: <RO1P152MB14830626598EB7237193F0E497A50@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
-References: <RO1P152MB14839E480D046B4052F0ADC797A40@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
-	<20181210063657.2lqj7vkqwdaobp7e@sirius.home.kraxel.org>
-	<RO1P152MB1483300ECF25FEE36927B1AF97A50@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
-	<20181210125613.x6mrmfgvtcoo3sv3@sirius.home.kraxel.org>
-In-Reply-To: <20181210125613.x6mrmfgvtcoo3sv3@sirius.home.kraxel.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C1D537E05F8B824892CD78A80B79131B@LAMP152.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Guests are crashing on startup,
- seem related to usb-audio
+	(envelope-from <ehabkost@redhat.com>) id 1gWPtP-0004q6-RJ
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:03:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36325)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gWPtO-0004mz-DE
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:02:55 -0500
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Mon, 10 Dec 2018 16:02:50 -0200
+Message-Id: <20181210180250.31299-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH] i386: Add "stibp" flag name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,59 +21,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "kraxel@redhat.com" <kraxel@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-SSBhbSB0ZXN0aW5nIHRoaXMgUUVNVSBidWlsZCBpbiB0d28gVk0gZ3Vlc3RzLCBvbmUgTWFnZWlh
-IDcgYW5kIG90aGVyDQpvcGVuU1VTRSBMZWFwLiBUaGV5IHJlYWNoIHRoZSBncmFwaGljYWwgc2Vz
-c2lvbiwgcGxheSBhIHNvdW5kIHVzaW5nDQphcGxheSBhbmQgcmVib290IGF1dG9tYXRpY2FsbHku
-IFRoZSBzY3JlZW4gYW5kIGF1ZGlvIGZyb20gdGhlIGhvc3Qgd2VyZQ0KY2FwdHVyZWQgdG8gY2hl
-Y2sgaWYgdGhlIHNvdW5kIHdvdWxkIHdvcmsgZXZlbiB3aXRoIHRoZSB3YXJuaW5nLg0KDQpPbmNl
-LCB0aGUgTWFnZWlhIDcgZ3Vlc3QgaGFkIGluIHRoZSB0ZXJtaW5hbDoNCg0KcWVtdS1zeXN0ZW0t
-eDg2XzY0OiB3YXJuaW5nOiB1c2ItYXVkaW86IDAvMTkyDQoNCkFuZCBpdCBjb250aW51ZWQgb3Bl
-cmF0aW5nIG5vcm1hbGx5LCB3aXRoIG5vIGNyYXNoIG9yIGZyZWV6ZSBhbmQgc291bmQNCnBsYXll
-ZCBub3JtYWxseS4gT25lIHZpZGVvIHNob3dpbmcgaXRzIGJlaGF2aW9yIGNhbiBiZSBzZWVuIG9u
-IHRoaXMgbGluazoNCg0KaHR0cHM6Ly9jZG4uZGlzY29yZGFwcC5jb20vYXR0YWNobWVudHMvNDU3
-NzQ3MTg5NjE2MjE0MDE5LzUyMTc0NDg4NzE5Mjg3OTEyMC9xZW11LXRlc3RlLWF1ZGlvMDAyLndl
-Ym0NCg0KVGhlIHNvdW5kIHF1YWxpdHkgaW4gdGhlIHZpZGVvIGlzIHdvcnNlIHRoYW4gbm9ybWFs
-IGJlY2F1c2UgdGhlIE1hZ2VpYQ0KZ3Vlc3Qgc2FtcGxlIHJhdGUgaXMgc2V0IHRvIDQ0MTAwIEh6
-IHdoaWxlIHRoZSB1c2ItYXVkaW8gc2FtcGxlIHJhdGUgaXMNCjQ4MDAwIEh6IGFuZCBiZWNhdXNl
-IEZGbXBlZyAibWFnbmlmaWVzIiBjZXJ0YWluIGF1ZGlvIGlzc3Vlcy4NCg0KVGhlIG9wZW5TVVNF
-IGd1ZXN0IGhhcyBvbmNlIHNob3duIHRoZSBmb2xsb3dpbmc6DQoNCnF4bF9zZW5kX2V2ZW50czog
-c3BpY2Utc2VydmVyIGJ1ZzogZ3Vlc3Qgc3RvcHBlZCwgaWdub3JpbmcNCltUaHJlYWQgMHg3ZmZm
-Y2Y3ZmU3MDAgKExXUCAxMjc3MSkgZXhpdGVkXQ0KW05ldyBUaHJlYWQgMHg3ZmZmY2Y3ZmU3MDAg
-KExXUCAxMzAzNildDQpbVGhyZWFkIDB4N2ZmZmNmN2ZlNzAwIChMV1AgMTMwMzYpIGV4aXRlZF0N
-CltOZXcgVGhyZWFkIDB4N2ZmZmNmN2ZlNzAwIChMV1AgMTMwNjcpXQ0KW1RocmVhZCAweDdmZmZj
-ZjdmZTcwMCAoTFdQIDEzMDY3KSBleGl0ZWRdDQpbTmV3IFRocmVhZCAweDdmZmZjZjdmZTcwMCAo
-TFdQIDEzMDk4KV0NCnFlbXUtc3lzdGVtLXg4Nl82NDogd2FybmluZzogdXNiLWF1ZGlvOiAwLzE5
-Mg0KcWVtdS1zeXN0ZW0teDg2XzY0OiB3YXJuaW5nOiB1c2ItYXVkaW86IDAvMTkyDQpxZW11LXN5
-c3RlbS14ODZfNjQ6IHdhcm5pbmc6IHVzYi1hdWRpbzogMC8xOTINCnFlbXUtc3lzdGVtLXg4Nl82
-NDogd2FybmluZzogdXNiLWF1ZGlvOiAwLzE5Mg0KcWVtdS1zeXN0ZW0teDg2XzY0OiB3YXJuaW5n
-OiB1c2ItYXVkaW86IDAvMTkyDQpxZW11LXN5c3RlbS14ODZfNjQ6IHdhcm5pbmc6IHVzYi1hdWRp
-bzogMC8xOTINCnFlbXUtc3lzdGVtLXg4Nl82NDogd2FybmluZzogdXNiLWF1ZGlvOiAwLzE5Mg0K
-cWVtdS1zeXN0ZW0teDg2XzY0OiB3YXJuaW5nOiB1c2ItYXVkaW86IDAvMTkyDQpxZW11LXN5c3Rl
-bS14ODZfNjQ6IHdhcm5pbmc6IHVzYi1hdWRpbzogMC8xOTINCnFlbXUtc3lzdGVtLXg4Nl82NDog
-d2FybmluZzogdXNiLWF1ZGlvOiAwLzE5Mg0KDQpXaGlsZSBpdCBkaWQgbm90IGNyYXNoLCBpdHMg
-c2NyZWVuIGZyb3plLiBCeSB0aGUgUVhMIG1lc3NhZ2UsIGl0IHNlZW1zDQp0aGUgYnVnIGh0dHBz
-Oi8vYnVncy5sYXVuY2hwYWQubmV0L3FlbXUvK2J1Zy8xNzg3MDcwIGlzIHN0aWxsIHByZXNlbnQN
-CmFuZCBjYXVzaW5nIGZhaWx1cmVzIG9uIGd1ZXN0cyB0b28sIHdpdGggb3BlblNVU0Ugc3RpbGwg
-YmVpbmcgdGhlDQpiaWdnZXN0IHZpY3RpbS4NCg0KUmVnYXJkaW5nIHRoaXMgc3BlY2lmaWMgdXNi
-LWF1ZGlvIGNyYXNoIHByb2JsZW0sIFFFTVUgZnJvbQ0Kc2lyaXVzL3VzYi1hdWRpby1jcmFzaCBz
-ZWVtcyB0byBiZSBmaXhlZC4NCg0Kw4BzIDEwOjU2IGRlIDEwLzEyLzIwMTgsIGtyYXhlbEByZWRo
-YXQuY29tIGVzY3JldmV1Og0KPiBPbiBNb24sIERlYyAxMCwgMjAxOCBhdCAxMjoxMTowOVBNICsw
-MDAwLCBMZW9uYXJkbyBTb2FyZXMgTcO8bGxlciB3cm90ZToNCj4+IEhpLCBJIGRpZCBub3Qgc2F2
-ZSB0aGF0IE1hZ2VpYSA3IGRhdGEgYXMgSSB3YXMgdW5hd2FyZSBJIGNvdWxkIGRvIHRoaXMuDQo+
-PiBUaGUgZGF0YSBiZWxvdyBpcyBmcm9tIGFub3RoZXIgY3Jhc2ggd2l0aCBvcGVuU1VTRSBMZWFw
-LCB0aGlzIHRpbWUgSQ0KPj4gc2F2ZWQgdGhpcyBiYWNrdHJhY2Ugd2l0aCBnZW5lcmF0ZS1jb3Jl
-LWZpbGUuDQo+IA0KPj4gT24gIzQgaXQgc2hvd3M6DQo+PiAkMiA9IHtwaWQgPSAyMjUsIGlkID0g
-MjAyNzIwMzE2OCwgZXAgPSAweDU1NTU1N2U0NjUyMCwgc3RyZWFtID0gMCwgaW92ID0NCj4+IHtp
-b3YgPSAweDdmZmZjNDE4ZDE5MCwgbmlvdiA9IDAsIG5hbGxvYyA9IDEsIHNpemUgPSAwfSwgcGFy
-YW1ldGVyID0gMCwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBeXl5eXl5eXg0KPj4gc2hvcnRfbm90X29rID0gZmFsc2UsIGludF9yZXEgPSBmYWxzZSwg
-c3RhdHVzID0gMCwgYWN0dWFsX2xlbmd0aCA9IDAsDQo+PiAgIHN0YXRlID0gVVNCX1BBQ0tFVF9T
-RVRVUCwgY29tYmluZWQgPSAweDAsIHF1ZXVlID0ge3RxZV9uZXh0ID0gMHgwLA0KPj4gdHFlX3By
-ZXYgPSAweDB9LCBjb21iaW5lZF9lbnRyeSA9IHt0cWVfbmV4dCA9IDB4MCwgdHFlX3ByZXYgPSAw
-eDB9fQ0KPiANCj4gSG1tLCB6ZXJvLWxlbmd0aCB1c2IgcGFja2FnZS4gIFNob3VsZCBiZSAxOTIg
-Ynl0ZXMgLi4uDQo+IA0KPiBEb2VzIGFueXRoaW5nIGNoYW5nZSB3aXRoDQo+ICAgaHR0cHM6Ly9n
-aXQua3JheGVsLm9yZy9jZ2l0L3FlbXUvbG9nLz9oPXNpcml1cy91c2ItYXVkaW8tY3Jhc2ggPw0K
-PiANCj4gdGhhbmtzLA0KPiAgIEdlcmQNCj4gDQo=
+The STIBP flag may be supported by the host KVM module, so QEMU
+can allow it to be configured manually, and it can be exposed to
+guests when using "-cpu host".
+
+No additional migration code is required because the whole
+contents of spec_ctrl is already migrated in the "cpu/spec_ctrl"
+section.
+
+Corresponding KVM patch was submitted at:
+https://lore.kernel.org/lkml/20181205191956.31480-1-ehabkost@redhat.com/
+
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ target/i386/cpu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index f81d35e1f9..079678f282 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -1042,7 +1042,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, "pconfig", NULL,
+             NULL, NULL, NULL, NULL,
+-            NULL, NULL, "spec-ctrl", NULL,
++            NULL, NULL, "spec-ctrl", "stibp",
+             NULL, "arch-capabilities", NULL, "ssbd",
+         },
+         .cpuid = {
+-- 
+2.18.0.rc1.1.g3f1ff2140
