@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gWSqx-0000mi-Jl
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:12:36 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1gWT1i-0003lf-MN
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:23:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gWSqu-0005tF-EX
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:12:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47956)
+	(envelope-from <alex.williamson@redhat.com>) id 1gWT1f-0003mh-0X
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:23:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54830)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gWSqu-0005t6-86
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:12:32 -0500
-References: <20181210173151.16629-1-dgilbert@redhat.com>
-	<20181210173151.16629-8-dgilbert@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a893ff17-9bfe-b541-75c9-6d4bd34176db@redhat.com>
-Date: Mon, 10 Dec 2018 15:12:27 -0600
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1gWT1d-0003lM-Ix
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:23:38 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5E6DC4902D
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 21:23:35 +0000 (UTC)
+Date: Mon, 10 Dec 2018 14:23:32 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20181210142332.44e79f28@x1.home>
+In-Reply-To: <20181210182816.2014-3-pbonzini@redhat.com>
+References: <20181210182816.2014-1-pbonzini@redhat.com>
+	<20181210182816.2014-3-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181210173151.16629-8-dgilbert@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 7/7] virtio-fs: Allow mapping of journal
+Subject: Re: [Qemu-devel] [PATCH 2/8] vfio: make vfio_address_spaces static
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +34,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org
-Cc: sweil@redhat.com, swhiteho@redhat.com, stefanha@redhat.com, vgoyal@redhat.com, miklos@szeredi.hu
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com
 
-On 12/10/18 11:31 AM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Mon, 10 Dec 2018 19:28:10 +0100
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+
+> It is not used outside hw/vfio/common.c, so it does not need to
+> be extern.
 > 
-> The 'journal' is a shared block of RAM between QEMU and it's
-
-s/it's/its/ (here, you want possessive)
-
-> fuse daemon.  It's typically a shmfs file and it's specified as:
-
-whereas here, both uses of "it's" are correct as contractions for "it 
-is" (although I might use just "is" instead of "it's" for that last 
-instance).
-
-> 
-> -device
-> vhost-user-fs-pci,chardev=char0,tag=myfs,cache-size=1G,versiontable=/dev/shm/mdvt1,journal=/dev/shm/journal1
-> 
-> It gets mapped into the PCI bar after the version table.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
+>  hw/vfio/common.c              | 2 +-
+>  include/hw/vfio/vfio-common.h | 1 -
+>  2 files changed, 1 insertion(+), 2 deletions(-)
 
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 7c185e5a2e..7aa804ea0b 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -39,7 +39,7 @@
+>  
+>  struct vfio_group_head vfio_group_list =
+>      QLIST_HEAD_INITIALIZER(vfio_group_list);
+> -struct vfio_as_head vfio_address_spaces =
+> +static QLIST_HEAD(, VFIOAddressSpace) vfio_address_spaces =
+>      QLIST_HEAD_INITIALIZER(vfio_address_spaces);
+>  
+>  #ifdef CONFIG_KVM
+> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> index 1b434d02f6..127ca47815 100644
+> --- a/include/hw/vfio/vfio-common.h
+> +++ b/include/hw/vfio/vfio-common.h
+> @@ -181,7 +181,6 @@ int vfio_get_device(VFIOGroup *group, const char *name,
+>  
+>  extern const MemoryRegionOps vfio_region_ops;
+>  extern QLIST_HEAD(vfio_group_head, VFIOGroup) vfio_group_list;
+> -extern QLIST_HEAD(vfio_as_head, VFIOAddressSpace) vfio_address_spaces;
+>  
+>  #ifdef CONFIG_LINUX
+>  int vfio_get_region_info(VFIODevice *vbasedev, int index,
