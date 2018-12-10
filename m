@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gWNU6-00086F-Fa
+	(envelope-from <alex.bennee@linaro.org>) id 1gWNU7-00086s-6P
 	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:28:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gWNU4-0000VQ-DT
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:28:38 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45987)
+	(envelope-from <alex.bennee@linaro.org>) id 1gWNU6-0000Wb-6f
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:28:39 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35522)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gWNU4-0000Uq-3f
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:28:36 -0500
-Received: by mail-wr1-x443.google.com with SMTP id b14so10888130wru.12
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 07:28:36 -0800 (PST)
+	id 1gWNU5-0000W3-VA
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:28:38 -0500
+Received: by mail-wr1-x442.google.com with SMTP id 96so10928354wrb.2
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 07:28:37 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 10 Dec 2018 15:28:21 +0000
-Message-Id: <20181210152829.29271-6-alex.bennee@linaro.org>
+Date: Mon, 10 Dec 2018 15:28:23 +0000
+Message-Id: <20181210152829.29271-8-alex.bennee@linaro.org>
 In-Reply-To: <20181210152829.29271-1-alex.bennee@linaro.org>
 References: <20181210152829.29271-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH 05/13] tests/tcg/mips: enable mips64 system
- tests (WIP)
+Subject: [Qemu-devel] [RFC PATCH 07/13] tests/tcg/xtensa: enable system tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,400 +30,163 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: edgar.iglesias@gmail.com, michael@walle.cc, aurelien@aurel32.net, amarkovic@wavecomp.com, shorne@gmail.com, jcmvbkbc@gmail.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>
-
-The mips64-dsp and mips64-dspr2 tests are softmmu tests. Tweaks the
-makefiles to use the tcg tests build system.
-
-[WIP: currently won't link but the flags for HEAD vs CFLAGS seem odd]
+Cc: edgar.iglesias@gmail.com, michael@walle.cc, aurelien@aurel32.net, amarkovic@wavecomp.com, shorne@gmail.com, jcmvbkbc@gmail.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/tcg/mips/Makefile.softmmu-target |  20 ++
- tests/tcg/mips/mips64-dsp/Makefile     | 336 ++++---------------------
- 2 files changed, 64 insertions(+), 292 deletions(-)
- create mode 100644 tests/tcg/mips/Makefile.softmmu-target
+ tests/tcg/xtensa/Makefile                | 93 ------------------------
+ tests/tcg/xtensa/Makefile.softmmu-target | 43 +++++++++++
+ 2 files changed, 43 insertions(+), 93 deletions(-)
+ delete mode 100644 tests/tcg/xtensa/Makefile
+ create mode 100644 tests/tcg/xtensa/Makefile.softmmu-target
 
-diff --git a/tests/tcg/mips/Makefile.softmmu-target b/tests/tcg/mips/Makefile.softmmu-target
-new file mode 100644
-index 0000000000..79781ae03c
---- /dev/null
-+++ b/tests/tcg/mips/Makefile.softmmu-target
-@@ -0,0 +1,20 @@
-+# -*- Mode: makefile -*-
-+#
-+# MIPS Softmmu Targets - included from tests/tcg/Makefile.target
-+#
-+# The system tests for mips cover a number of different devices and
-+# softmmu builds so we include only the one appropriate for the
-+# current target.
-+#
-+
-+# Set search path for all sources. As there are clashing files in both
-+# the mips64-dsp and mips64-dspr2 directories we build the rules
-+# explicitly including the directory so VPATH only needs to be the top
-+# of the MIPS tests.
-+MIPS_SRC = $(SRC_PATH)/tests/tcg/mips
-+VPATH 	+= $(MIPS_SRC)
-+
-+ifeq ($(TARGET_NAME),mips64el)
-+-include $(MIPS_SRC)/mips64-dsp/Makefile
-+#-include $(MIPS_SRC)/mips64-dspr2/Makefile
-+endif
-diff --git a/tests/tcg/mips/mips64-dsp/Makefile b/tests/tcg/mips/mips64-dsp/Makefile
-index b2ac6b3ffd..55198f3cc9 100644
---- a/tests/tcg/mips/mips64-dsp/Makefile
-+++ b/tests/tcg/mips/mips64-dsp/Makefile
-@@ -1,306 +1,58 @@
+diff --git a/tests/tcg/xtensa/Makefile b/tests/tcg/xtensa/Makefile
+deleted file mode 100644
+index 2f5691f75b..0000000000
+--- a/tests/tcg/xtensa/Makefile
++++ /dev/null
+@@ -1,93 +0,0 @@
+--include ../../../config-host.mak
 -
--CROSS_COMPILE	?= mips64el-unknown-linux-gnu-
+-CORE=dc232b
+-CROSS=xtensa-$(CORE)-elf-
 -
--SIM = qemu-system-mips64el
--SIMFLAGS = -nographic -cpu mips64dspr2 -kernel
+-ifndef XT
+-SIM = ../../../xtensa-softmmu/qemu-system-xtensa
+-SIMFLAGS = -M sim -cpu $(CORE) -nographic -semihosting -icount 6 $(EXTFLAGS) -kernel
+-SIMDEBUG = -s -S
+-else
+-SIM = xt-run
+-SIMFLAGS = --xtensa-core=DC_B_232L --exit_with_target_code $(EXTFLAGS)
+-SIMDEBUG = --gdbserve=0
+-endif
 -
--AS      = $(CROSS_COMPILE)as
--LD      = $(CROSS_COMPILE)ld
--CC      = $(CROSS_COMPILE)gcc
--AR      = $(CROSS_COMPILE)ar
--NM      = $(CROSS_COMPILE)nm
--STRIP       = $(CROSS_COMPILE)strip
--RANLIB      = $(CROSS_COMPILE)ranlib
--OBJCOPY     = $(CROSS_COMPILE)objcopy
--OBJDUMP     = $(CROSS_COMPILE)objdump
+-HOST_CC = gcc
+-CC      = $(CROSS)gcc
+-AS      = $(CROSS)gcc -x assembler-with-cpp
+-LD      = $(CROSS)ld
 -
--VECTORS_OBJ ?= ./head.o ./printf.o
+-XTENSA_SRC_PATH = $(SRC_PATH)/tests/tcg/xtensa
+-INCLUDE_DIRS = $(XTENSA_SRC_PATH) $(SRC_PATH)/target/xtensa/core-$(CORE)
+-XTENSA_INC = $(addprefix -I,$(INCLUDE_DIRS))
 -
--HEAD_FLAGS ?= -nostdinc -mabi=64 -G 0 -mno-abicalls -fno-pic -pipe \
--              -msoft-float -march=mips64 -Wa,-mips64 -Wa,--trap \
--              -msym32 -DKBUILD_64BIT_SYM32 -I./
+-LDFLAGS = -Tlinker.ld
 -
--CFLAGS ?= -nostdinc -mabi=64 -G 0 -mno-abicalls -fno-pic -fno-builtin  \
-+#
-+# MIPS64-DSP softmmu tests
-+#
-+
-+MIPS64_DSP_SRC = $(SRC_PATH)/tests/tcg/mips/mips64-dsp
-+MIPS64_DSP_ALL = $(wildcard $(MIPS64_DSP_SRC)/*.c)
-+MIPS64_DSP_TESTS = $(patsubst $(MIPS64_DSP_SRC)/%.c, %, $(MIPS64_DSP_ALL))
-+# for now filter out these
-+MIPS64_DSP_BROKEN_TESTS  = dappend preceq_l_pwl preceq_l_pwr precequ_qh_obla precequ_qh_obl
-+MIPS64_DSP_BROKEN_TESTS += precequ_qh_obra precequ_qh_obr precr_ob_qh precr_sra_qh_pw
-+MIPS64_DSP_BROKEN_TESTS += precr_sra_r_qh_pw prependd prependw raddu_l_ob
-+MIPS64_DSP_BROKEN_TESTS += shra_ob shra_r_ob shrl_qh shrlv_qh
-+MIPS64_DSP_USABLE_TESTS = $(patsubst %,mips64-dsp/%, $(filter-out $(MIPS64_DSP_BROKEN_TESTS), $(MIPS64_DSP_TESTS)))
-+MIPS64_DSP_RUNS = $(patsubst %, run-%, $(MIPS64_DSP_USABLE_TESTS))
-+
-+# add to the list of tests
-+TESTS += $(MIPS64_DSP_USABLE_TESTS)
-+
-+.PHONY: mips64-dsp.build
-+mips64-dsp.build:
-+	mkdir -p mips64-dsp
-+
-+# head objects (linked into other binaries)
-+VECTORS_OBJ = mips64-dsp/head.o mips64-dsp/printf.o
-+.PRECIOUS: $(VECTOR_OBJS)
-+
-+HEAD_FLAGS = -nostdinc -mabi=64 -G 0 -mno-abicalls -fno-pic -pipe \
-+           -msoft-float -march=mips64 -Wa,-mips64 -Wa,--trap \
-+           -msym32 -DKBUILD_64BIT_SYM32 -I./
-+
-+CFLAGS = -nostdinc -mabi=64 -G 0 -mno-abicalls -fno-pic -fno-builtin  \
-           -pipe -march=mips64r2 -mgp64 -mdsp -static -Wa,--trap -msym32 \
-           -DKBUILD_64BIT_SYM32 -I./
- 
--LDFLAGS = -T./mips_boot.lds -L./
-+LDFLAGS = -T$(MIPS64_DSP_SRC)/mips_boot.lds -L./mips64-dsp
- FLAGS = -nostdlib -mabi=64 -march=mips64r2 -mgp64 -mdsp
- 
-+mips64-dsp/head.o: mips64-dsp/head.S | mips64-dsp.build
-+	$(CC) $(HEAD_FLAGS) -D"STACK_TOP=0xffffffff80200000" -c $< -o $@
- 
--#TESTCASES = absq_s_ob.tst
--TESTCASES = absq_s_ph.tst
--TESTCASES += absq_s_pw.tst
--TESTCASES += absq_s_qh.tst
--TESTCASES += absq_s_w.tst
--TESTCASES += addq_ph.tst
--TESTCASES += addq_pw.tst
--TESTCASES += addq_qh.tst
--TESTCASES += addq_s_ph.tst
--TESTCASES += addq_s_pw.tst
--TESTCASES += addq_s_qh.tst
--TESTCASES += addq_s_w.tst
--TESTCASES += addsc.tst
--TESTCASES += addu_ob.tst
--TESTCASES += addu_qb.tst
--TESTCASES += addu_s_ob.tst
--TESTCASES += addu_s_qb.tst
--TESTCASES += addwc.tst
--TESTCASES += bitrev.tst
--TESTCASES += bposge32.tst
--TESTCASES += bposge64.tst
--TESTCASES += cmp_eq_ph.tst
--TESTCASES += cmp_eq_pw.tst
--TESTCASES += cmp_eq_qh.tst
--TESTCASES += cmpgu_eq_ob.tst
--TESTCASES += cmpgu_eq_qb.tst
--TESTCASES += cmpgu_le_ob.tst
--TESTCASES += cmpgu_le_qb.tst
--TESTCASES += cmpgu_lt_ob.tst
--TESTCASES += cmpgu_lt_qb.tst
--TESTCASES += cmp_le_ph.tst
--TESTCASES += cmp_le_pw.tst
--TESTCASES += cmp_le_qh.tst
--TESTCASES += cmp_lt_ph.tst
--TESTCASES += cmp_lt_pw.tst
--TESTCASES += cmp_lt_qh.tst
--TESTCASES += cmpu_eq_ob.tst
--TESTCASES += cmpu_eq_qb.tst
--TESTCASES += cmpu_le_ob.tst
--TESTCASES += cmpu_le_qb.tst
--TESTCASES += cmpu_lt_ob.tst
--TESTCASES += cmpu_lt_qb.tst
--#TESTCASES += dappend.tst
--TESTCASES += dextp.tst
--TESTCASES += dextpdp.tst
--TESTCASES += dextpdpv.tst
--TESTCASES += dextpv.tst
--TESTCASES += dextr_l.tst
--TESTCASES += dextr_r_l.tst
--TESTCASES += dextr_rs_l.tst
--TESTCASES += dextr_rs_w.tst
--TESTCASES += dextr_r_w.tst
--TESTCASES += dextr_s_h.tst
--TESTCASES += dextrv_l.tst
--TESTCASES += dextrv_r_l.tst
--TESTCASES += dextrv_rs_l.tst
--TESTCASES += dextrv_rs_w.tst
--TESTCASES += dextrv_r_w.tst
--TESTCASES += dextrv_s_h.tst
--TESTCASES += dextrv_w.tst
--TESTCASES += dextr_w.tst
--TESTCASES += dinsv.tst
--TESTCASES += dmadd.tst
--TESTCASES += dmaddu.tst
--TESTCASES += dmsub.tst
--TESTCASES += dmsubu.tst
--TESTCASES += dmthlip.tst
--TESTCASES += dpaq_sa_l_pw.tst
--TESTCASES += dpaq_sa_l_w.tst
--TESTCASES += dpaq_s_w_ph.tst
--TESTCASES += dpaq_s_w_qh.tst
--TESTCASES += dpau_h_obl.tst
--TESTCASES += dpau_h_obr.tst
--TESTCASES += dpau_h_qbl.tst
--TESTCASES += dpau_h_qbr.tst
--TESTCASES += dpsq_sa_l_pw.tst
--TESTCASES += dpsq_sa_l_w.tst
--TESTCASES += dpsq_s_w_ph.tst
--TESTCASES += dpsq_s_w_qh.tst
--TESTCASES += dpsu_h_obl.tst
--TESTCASES += dpsu_h_obr.tst
--TESTCASES += dpsu_h_qbl.tst
--TESTCASES += dpsu_h_qbr.tst
--TESTCASES += dshilo.tst
--TESTCASES += dshilov.tst
--TESTCASES += extp.tst
--TESTCASES += extpdp.tst
--TESTCASES += extpdpv.tst
--TESTCASES += extpv.tst
--TESTCASES += extr_rs_w.tst
--TESTCASES += extr_r_w.tst
--TESTCASES += extr_s_h.tst
--TESTCASES += extrv_rs_w.tst
--TESTCASES += extrv_r_w.tst
--TESTCASES += extrv_s_h.tst
--TESTCASES += extrv_w.tst
--TESTCASES += extr_w.tst
--TESTCASES += insv.tst
--TESTCASES += lbux.tst
--TESTCASES += lhx.tst
--TESTCASES += lwx.tst
--TESTCASES += ldx.tst
--TESTCASES += madd.tst
--TESTCASES += maddu.tst
--TESTCASES += maq_sa_w_phl.tst
--TESTCASES += maq_sa_w_phr.tst
--TESTCASES += maq_sa_w_qhll.tst
--TESTCASES += maq_sa_w_qhlr.tst
--TESTCASES += maq_sa_w_qhrl.tst
--TESTCASES += maq_sa_w_qhrr.tst
--TESTCASES += maq_s_l_pwl.tst
--TESTCASES += maq_s_l_pwr.tst
--TESTCASES += maq_s_w_phl.tst
--TESTCASES += maq_s_w_phr.tst
--TESTCASES += maq_s_w_qhll.tst
--TESTCASES += maq_s_w_qhlr.tst
--TESTCASES += maq_s_w_qhrl.tst
--TESTCASES += maq_s_w_qhrr.tst
--TESTCASES += mfhi.tst
--TESTCASES += mflo.tst
--TESTCASES += modsub.tst
--TESTCASES += msub.tst
--TESTCASES += msubu.tst
--TESTCASES += mthi.tst
--TESTCASES += mthlip.tst
--TESTCASES += mtlo.tst
--TESTCASES += muleq_s_pw_qhl.tst
--TESTCASES += muleq_s_pw_qhr.tst
--TESTCASES += muleq_s_w_phl.tst
--TESTCASES += muleq_s_w_phr.tst
--TESTCASES += muleu_s_ph_qbl.tst
--TESTCASES += muleu_s_ph_qbr.tst
--TESTCASES += muleu_s_qh_obl.tst
--TESTCASES += muleu_s_qh_obr.tst
--TESTCASES += mulq_rs_ph.tst
--TESTCASES += mulq_rs_qh.tst
--TESTCASES += mulsaq_s_l_pw.tst
--TESTCASES += mulsaq_s_w_qh.tst
--TESTCASES += mult.tst
--TESTCASES += multu.tst
--TESTCASES += packrl_ph.tst
--TESTCASES += packrl_pw.tst
--TESTCASES += pick_ob.tst
--TESTCASES += pick_ph.tst
--TESTCASES += pick_pw.tst
--TESTCASES += pick_qb.tst
--TESTCASES += pick_qh.tst
--#TESTCASES += preceq_l_pwl.tst
--#TESTCASES += preceq_l_pwr.tst
--TESTCASES += preceq_pw_qhla.tst
--TESTCASES += preceq_pw_qhl.tst
--TESTCASES += preceq_pw_qhra.tst
--TESTCASES += preceq_pw_qhr.tst
--TESTCASES += precequ_ph_qbla.tst
--TESTCASES += precequ_ph_qbl.tst
--TESTCASES += precequ_ph_qbra.tst
--TESTCASES += precequ_ph_qbr.tst
--#TESTCASES += precequ_qh_obla.tst
--#TESTCASES += precequ_qh_obl.tst
--#TESTCASES += precequ_qh_obra.tst
--#TESTCASES += precequ_qh_obr.tst
--TESTCASES += preceq_w_phl.tst
--TESTCASES += preceq_w_phr.tst
--TESTCASES += preceu_ph_qbla.tst
--TESTCASES += preceu_ph_qbl.tst
--TESTCASES += preceu_ph_qbra.tst
--TESTCASES += preceu_ph_qbr.tst
--TESTCASES += preceu_qh_obla.tst
--TESTCASES += preceu_qh_obl.tst
--TESTCASES += preceu_qh_obra.tst
--TESTCASES += preceu_qh_obr.tst
--#TESTCASES += precr_ob_qh.tst
--TESTCASES += precrq_ob_qh.tst
--TESTCASES += precrq_ph_w.tst
--TESTCASES += precrq_pw_l.tst
--TESTCASES += precrq_qb_ph.tst
--TESTCASES += precrq_qh_pw.tst
--TESTCASES += precrq_rs_ph_w.tst
--TESTCASES += precrq_rs_qh_pw.tst
--TESTCASES += precrqu_s_ob_qh.tst
--TESTCASES += precrqu_s_qb_ph.tst
--#TESTCASES += precr_sra_qh_pw.tst
--#TESTCASES += precr_sra_r_qh_pw.tst
--#TESTCASES += prependd.tst
--#TESTCASES += prependw.tst
--#TESTCASES += raddu_l_ob.tst
--TESTCASES += raddu_w_qb.tst
--TESTCASES += rddsp.tst
--TESTCASES += repl_ob.tst
--TESTCASES += repl_ph.tst
--TESTCASES += repl_pw.tst
--TESTCASES += repl_qb.tst
--TESTCASES += repl_qh.tst
--TESTCASES += replv_ob.tst
--TESTCASES += replv_ph.tst
--TESTCASES += replv_pw.tst
--TESTCASES += replv_qb.tst
--TESTCASES += shilo.tst
--TESTCASES += shilov.tst
--TESTCASES += shll_ob.tst
--TESTCASES += shll_ph.tst
--TESTCASES += shll_pw.tst
--TESTCASES += shll_qb.tst
--TESTCASES += shll_qh.tst
--TESTCASES += shll_s_ph.tst
--TESTCASES += shll_s_pw.tst
--TESTCASES += shll_s_qh.tst
--TESTCASES += shll_s_w.tst
--TESTCASES += shllv_ob.tst
--TESTCASES += shllv_ph.tst
--TESTCASES += shllv_pw.tst
--TESTCASES += shllv_qb.tst
--TESTCASES += shllv_qh.tst
--TESTCASES += shllv_s_ph.tst
--TESTCASES += shllv_s_pw.tst
--TESTCASES += shllv_s_qh.tst
--TESTCASES += shllv_s_w.tst
--#TESTCASES += shra_ob.tst
--TESTCASES += shra_ph.tst
--TESTCASES += shra_pw.tst
--TESTCASES += shra_qh.tst
--#TESTCASES += shra_r_ob.tst
--TESTCASES += shra_r_ph.tst
--TESTCASES += shra_r_pw.tst
--TESTCASES += shra_r_qh.tst
--TESTCASES += shra_r_w.tst
--TESTCASES += shrav_ph.tst
--TESTCASES += shrav_pw.tst
--TESTCASES += shrav_qh.tst
--TESTCASES += shrav_r_ph.tst
--TESTCASES += shrav_r_pw.tst
--TESTCASES += shrav_r_qh.tst
--TESTCASES += shrav_r_w.tst
--TESTCASES += shrl_ob.tst
--TESTCASES += shrl_qb.tst
--#TESTCASES += shrl_qh.tst
--TESTCASES += shrlv_ob.tst
--TESTCASES += shrlv_qb.tst
--#TESTCASES += shrlv_qh.tst
--TESTCASES += subq_ph.tst
--TESTCASES += subq_pw.tst
--TESTCASES += subq_qh.tst
--TESTCASES += subq_s_ph.tst
--TESTCASES += subq_s_pw.tst
--TESTCASES += subq_s_qh.tst
--TESTCASES += subq_s_w.tst
--TESTCASES += subu_ob.tst
--TESTCASES += subu_qb.tst
--TESTCASES += subu_s_ob.tst
--TESTCASES += subu_s_qb.tst
--TESTCASES += wrdsp.tst
+-CRT        = crt.o vectors.o
+-
+-TESTCASES += test_b.tst
+-TESTCASES += test_bi.tst
+-#TESTCASES += test_boolean.tst
+-TESTCASES += test_break.tst
+-TESTCASES += test_bz.tst
+-TESTCASES += test_cache.tst
+-TESTCASES += test_clamps.tst
+-TESTCASES += test_extui.tst
+-TESTCASES += test_fail.tst
+-TESTCASES += test_interrupt.tst
+-TESTCASES += test_loop.tst
+-TESTCASES += test_mac16.tst
+-TESTCASES += test_max.tst
+-TESTCASES += test_min.tst
+-TESTCASES += test_mmu.tst
+-TESTCASES += test_mul16.tst
+-TESTCASES += test_mul32.tst
+-TESTCASES += test_nsa.tst
+-TESTCASES += test_phys_mem.tst
+-ifdef XT
+-TESTCASES += test_pipeline.tst
+-endif
+-TESTCASES += test_quo.tst
+-TESTCASES += test_rem.tst
+-TESTCASES += test_rst0.tst
+-TESTCASES += test_s32c1i.tst
+-TESTCASES += test_sar.tst
+-TESTCASES += test_sext.tst
+-TESTCASES += test_shift.tst
+-TESTCASES += test_sr.tst
+-TESTCASES += test_timer.tst
+-TESTCASES += test_windowed.tst
 -
 -all: build
 -
--head.o : head.S
--	$(Q)$(CC) $(HEAD_FLAGS) -D"STACK_TOP=0xffffffff80200000" -c $< -o $@
+-linker.ld: $(XTENSA_SRC_PATH)/linker.ld.S
+-	$(HOST_CC) $(XTENSA_INC) -E -P $< -o $@
 -
--%.o  : %.S
-+mips64-dsp/%.o: mips64-dsp/%.S | mips64-dsp.build
- 	$(CC) $(CFLAGS) -c $< -o $@
- 
--%.o  : %.c
-+mips64-dsp/%.o: mips64-dsp/%.c | mips64-dsp.build
- 	$(CC) $(CFLAGS) -c $< -o $@
- 
--%.tst: %.o $(VECTORS_OBJ)
-+mips64-dsp/%: mips64-dsp/%.o $(VECTORS_OBJ)
- 	$(CC) $(VECTORS_OBJ) $(FLAGS) $(LDFLAGS) $< -o $@
- 
--build: $(VECTORS_OBJ) $(MIPSSOC_LIB) $(TESTCASES)
-+#
-+# Runners
-+#
- 
--check:  $(VECTORS_OBJ) $(MIPSSOC_LIB) $(TESTCASES)
--	@for case in $(TESTCASES); do \
--		echo $(SIM) $(SIMFLAGS) ./$$case; \
--		$(SIM) $(SIMFLAGS) ./$$case & (sleep 1; killall $(SIM)); \
--	done
-+$(MIPS64_DSP_RUNS): QEMU_OPTS=-nographic -cpu mips64dspr2 -kernel
- 
+-%.o: $(XTENSA_SRC_PATH)/%.c
+-	$(CC) $(XTENSA_INC) $(CFLAGS) -c $< -o $@
+-
+-%.o: $(XTENSA_SRC_PATH)/%.S
+-	$(CC) $(XTENSA_INC) $(ASFLAGS) -c $< -o $@
+-
+-%.tst: %.o linker.ld $(XTENSA_SRC_PATH)/macros.inc $(CRT) Makefile
+-	$(LD) $(LDFLAGS) $(NOSTDFLAGS) $(CRT) $< -o $@
+-
+-build: $(TESTCASES)
+-
+-check: $(addprefix run-, $(TESTCASES))
+-
+-run-%.tst: %.tst
+-	$(SIM) $(SIMFLAGS) ./$<
+-
+-run-test_fail.tst: test_fail.tst
+-	! $(SIM) $(SIMFLAGS) ./$<
+-
+-debug-%.tst: %.tst
+-	$(SIM) $(SIMDEBUG) $(SIMFLAGS) ./$<
+-
+-host-debug-%.tst: %.tst
+-	gdb --args $(SIM) $(SIMFLAGS) ./$<
+-
 -clean:
--	$(Q)rm -f *.o *.tst *.a
-+# FIXME: I don't know why the general rule in tests/tcg/Makefile isn't enough
-+run-mips64-dsp/%: mips64-dsp/%
-+	$(call run-test, $<, $(QEMU) $(QEMU_OPTS) $<, "$< on $(TARGET_NAME) $(QEMU_OPTS)")
+-	$(RM) -fr $(TESTCASES) $(CRT) linker.ld
+diff --git a/tests/tcg/xtensa/Makefile.softmmu-target b/tests/tcg/xtensa/Makefile.softmmu-target
+new file mode 100644
+index 0000000000..e9d6939990
+--- /dev/null
++++ b/tests/tcg/xtensa/Makefile.softmmu-target
+@@ -0,0 +1,43 @@
++#
++# Xtensa softmmu tests
++#
++
++XTENSA_SRC = $(SRC_PATH)/tests/tcg/xtensa
++XTENSA_ALL = $(wildcard $(XTENSA_SRC)/*.S)
++XTENSA_TESTS = $(patsubst $(XTENSA_SRC)/%.S, %, $(XTENSA_ALL))
++# Filter out common blobs and broken tests
++XTENSA_BROKEN_TESTS  = crt vectors test_boolean test_pipeline
++XTENSA_USABLE_TESTS = $(filter-out $(XTENSA_BROKEN_TESTS), $(XTENSA_TESTS))
++XTENSA_RUNS = $(patsubst %, run-%, $(XTENSA_USABLE_TESTS))
++
++# add to the list of tests
++TESTS += $(XTENSA_USABLE_TESTS)
++VPATH += $(XTENSA_SRC)
++
++CORE=dc232b
++QEMU_OPTS = -M sim -cpu $(CORE) -nographic -semihosting -icount 6 $(EXTFLAGS) -kernel
++
++INCLUDE_DIRS = $(SRC_PATH)/target/xtensa/core-$(CORE)
++XTENSA_INC = $(addprefix -I,$(INCLUDE_DIRS))
++
++LDFLAGS = -Tlinker.ld -nostartfiles -nostdlib
++
++CRT        = crt.o vectors.o
++
++linker.ld: linker.ld.S
++	$(HOST_CC) $(XTENSA_INC) -E -P $< -o $@
++
++$(XTENSA_USABLE_TESTS): linker.ld macros.inc $(CRT) Makefile.softmmu-target
++
++# special rule for common blobs
++%.o: %.S
++	$(CC) $(XTENSA_INC) $(ASFLAGS) -c $< -o $@
++
++%: %.S
++	$(CC) $(XTENSA_INC) $(ASFLAGS) $< -o $@ $(LDFLAGS) $(NOSTDFLAGS) $(CRT)
++
++# Special runner
++$(XTENSA_RUNS): $(XTENSA_USABLE_TESTS)
++	$(call quiet-command,					\
++		timeout $(TIMEOUT) $(QEMU) $(QEMU_OPTS) $<, 	\
++		"TEST","$< on $(TARGET_NAME) $(QEMU_OPTS)")
 -- 
 2.17.1
