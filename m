@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56044)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gWOGu-0003Ek-4M
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:19:04 -0500
+	(envelope-from <drjones@redhat.com>) id 1gWOHo-00042N-Bs
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:20:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gWOGr-0003ny-0N
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:19:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50096)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gWOGq-0003nX-O6
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:19:00 -0500
-Date: Mon, 10 Dec 2018 17:18:45 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181210171845.4f132e25@Igors-MacBook-Pro.local>
-In-Reply-To: <20181127135030.1671-2-i.maximets@samsung.com>
-References: <20181127135030.1671-1-i.maximets@samsung.com>
-	<CGME20181127135045eucas1p1e259cacbab5e715f7845b9beee22f882@eucas1p1.samsung.com>
-	<20181127135030.1671-2-i.maximets@samsung.com>
+	(envelope-from <drjones@redhat.com>) id 1gWOHl-0004JQ-7l
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:20:00 -0500
+Date: Mon, 10 Dec 2018 17:19:34 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20181210161934.5zmat6tjtx4utmzh@kamzik.brq.redhat.com>
+References: <1544095560-70807-1-git-send-email-peng.hao2@zte.com.cn>
+	<1544095560-70807-6-git-send-email-peng.hao2@zte.com.cn>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] hostmem-memfd: disable for systems
- wihtout sealing support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1544095560-70807-6-git-send-email-peng.hao2@zte.com.cn>
+Subject: Re: [Qemu-devel] [PATCH]  pvpanic : update pvpanic document
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,101 +23,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ilya Maximets <i.maximets@samsung.com>
-Cc: =?UTF-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Peng Hao <peng.hao2@zte.com.cn>
+Cc: peter.maydell@linaro.org, philmd@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-On Tue, 27 Nov 2018 16:50:27 +0300
-Ilya Maximets <i.maximets@samsung.com> wrote:
-
-s/wihtout/without/ in subj
-
-> If seals are not supported, memfd_create() will fail.
-> Furthermore, there is no way to disable it in this case because
-> '.seal' property is not registered.
+On Thu, Dec 06, 2018 at 07:26:00PM +0800, Peng Hao wrote:
+> Add mmio mode as a pci device support info in docs/specs/pvpanic.txt.
 > 
-> This issue leads to vhost-user-test failures on RHEL 7.2:
-> 
->   qemu-system-x86_64: -object memory-backend-memfd,id=mem,size=2M,: \
->                       failed to create memfd: Invalid argument
-> 
-> and actually breaks the feature on such systems.
-> 
-> Let's restrict memfd backend to systems with sealing support.
-> 
-> Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
+> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
 > ---
->  backends/hostmem-memfd.c | 18 ++++++++----------
->  tests/vhost-user-test.c  |  6 +++---
->  2 files changed, 11 insertions(+), 13 deletions(-)
+>  docs/specs/pvpanic.txt | 13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
 > 
-> diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
-> index b6836b28e5..a3455da9c9 100644
-> --- a/backends/hostmem-memfd.c
-> +++ b/backends/hostmem-memfd.c
-> @@ -156,15 +156,13 @@ memfd_backend_class_init(ObjectClass *oc, void *data)
->                                                "Huge pages size (ex: 2M, 1G)",
->                                                &error_abort);
->      }
-> -    if (qemu_memfd_check(MFD_ALLOW_SEALING)) {
-> -        object_class_property_add_bool(oc, "seal",
-> -                                       memfd_backend_get_seal,
-> -                                       memfd_backend_set_seal,
-> -                                       &error_abort);
-> -        object_class_property_set_description(oc, "seal",
-> -                                              "Seal growing & shrinking",
-> -                                              &error_abort);
-> -    }
-> +    object_class_property_add_bool(oc, "seal",
-> +                                   memfd_backend_get_seal,
-> +                                   memfd_backend_set_seal,
-> +                                   &error_abort);
-> +    object_class_property_set_description(oc, "seal",
-> +                                          "Seal growing & shrinking",
-> +                                          &error_abort);
->  }
+> diff --git a/docs/specs/pvpanic.txt b/docs/specs/pvpanic.txt
+> index c7bbacc..6d62d72 100644
+> --- a/docs/specs/pvpanic.txt
+> +++ b/docs/specs/pvpanic.txt
+> @@ -1,7 +1,7 @@
+>  PVPANIC DEVICE
+>  ==============
 >  
->  static const TypeInfo memfd_backend_info = {
-> @@ -177,7 +175,7 @@ static const TypeInfo memfd_backend_info = {
+> -pvpanic device is a simulated ISA device, through which a guest panic
+> +pvpanic device is a simulated device, through which a guest panic
+>  event is sent to qemu, and a QMP event is generated. This allows
+>  management apps (e.g. libvirt) to be notified and respond to the event.
 >  
->  static void register_types(void)
->  {
-> -    if (qemu_memfd_check(0)) {
-> +    if (qemu_memfd_check(MFD_ALLOW_SEALING)) {
->          type_register_static(&memfd_backend_info);
-that would either lead to not clear error that type doesn't exist.
-it could be better to report sensible error from memfd_backend_memory_alloc() if
-the feature is required but not supported by host 
+> @@ -9,6 +9,10 @@ The management app has the option of waiting for GUEST_PANICKED events,
+>  and/or polling for guest-panicked RunState, to learn when the pvpanic
+>  device has fired a panic event.
+>  
+> +The pvpanic device can be implemented as an ISA device (using IOPORT),
+> +or, since qemu 4.0, as a PCI device (using MMIO address space of pci
+> +device).
 
->      }
->  }
-> diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-> index 45d58d8ea2..e3e9a33580 100644
-> --- a/tests/vhost-user-test.c
-> +++ b/tests/vhost-user-test.c
-> @@ -169,7 +169,7 @@ static char *get_qemu_cmd(TestServer *s,
->                            int mem, enum test_memfd memfd, const char *mem_path,
->                            const char *chr_opts, const char *extra)
->  {
-> -    if (memfd == TEST_MEMFD_AUTO && qemu_memfd_check(0)) {
-> +    if (memfd == TEST_MEMFD_AUTO && qemu_memfd_check(MFD_ALLOW_SEALING)) {
->          memfd = TEST_MEMFD_YES;
->      }
+I'd drop the part in (). Just end with 'as a PCI device.' The MMIO stuff
+is described below in the "PCI Interface" section.
+
+> +
+>  ISA Interface
+>  -------------
 >  
-> @@ -903,7 +903,7 @@ static void test_multiqueue(void)
->      s->queues = 2;
->      test_server_listen(s);
+> @@ -19,6 +23,13 @@ Software should set only bits both itself and the device recognize.
+>  Currently, only bit 0 is recognized, setting it indicates a guest panic
+>  has happened.
 >  
-> -    if (qemu_memfd_check(0)) {
-> +    if (qemu_memfd_check(MFD_ALLOW_SEALING)) {
->          cmd = g_strdup_printf(
->              QEMU_CMD_MEMFD QEMU_CMD_CHR QEMU_CMD_NETDEV ",queues=%d "
->              "-device virtio-net-pci,netdev=net0,mq=on,vectors=%d",
-> @@ -963,7 +963,7 @@ int main(int argc, char **argv)
->      /* run the main loop thread so the chardev may operate */
->      thread = g_thread_new(NULL, thread_function, loop);
+> +PCI Interface
+> +-------------
+> +
+> +The PCI interface is similar to the ISA interface except that it uses
+> +MMIO.
+
+uses an MMIO address space provided by its BAR0.
+
+Should describe that the MMIO address is two bytes in size here as well.
+
+
+> For example, the arm virt machine could enable pvpanic-pci device 
+> +according to adding "-device pvpanic-pci" in qemu command.
+
+For example, the arm virt machine may enable a pvpanic device by
+adding '-device pvpanic-pci' to the command line.
+
+> +
+>  ACPI Interface
+>  --------------
 >  
-> -    if (qemu_memfd_check(0)) {
-> +    if (qemu_memfd_check(MFD_ALLOW_SEALING)) {
->          qtest_add_data_func("/vhost-user/read-guest-mem/memfd",
->                              GINT_TO_POINTER(TEST_MEMFD_YES),
->                              test_read_guest_mem);
+> -- 
+> 1.8.3.1
+> 
+>
+
+Thanks,
+drew 
