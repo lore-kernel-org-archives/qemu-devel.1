@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1gWR0i-0000YE-77
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:14:34 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gWR2v-00022m-Mw
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:16:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1gWR0b-0001qi-Ha
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:14:30 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44600)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
-	id 1gWR0b-0001pD-7U
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:14:25 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wBAJDsfm136491
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 14:14:23 -0500
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2p9tp02vg0-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 14:14:23 -0500
-Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
-	Mon, 10 Dec 2018 19:14:22 -0000
-From: Tony Krowiak <akrowiak@linux.ibm.com>
-Date: Mon, 10 Dec 2018 14:14:14 -0500
-Message-Id: <1544469254-11629-1-git-send-email-akrowiak@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH] qdev/core: Can not replug device on bus that
- allows one device
+	(envelope-from <richard.henderson@linaro.org>) id 1gWR2p-0003z5-VA
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:16:48 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:36506)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gWR2o-0003xE-U2
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:16:43 -0500
+Received: by mail-oi1-x243.google.com with SMTP id x23so9939507oix.3
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 11:16:41 -0800 (PST)
+References: <20181207085635.4291-1-mark.cave-ayland@ilande.co.uk>
+	<20181207085635.4291-4-mark.cave-ayland@ilande.co.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <54550637-3a70-722f-a98f-6bd93958b644@linaro.org>
+Date: Mon, 10 Dec 2018 13:16:37 -0600
+MIME-Version: 1.0
+In-Reply-To: <20181207085635.4291-4-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 3/6] target/ppc: introduce
+ get_cpu_vsr{l, h}() and set_cpu_vsr{l, h}() helpers for VSR register access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,34 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, pasic@linux.ibm.com, armbru@redhat.com, f4bug@amsat.org, pbonzini@redhat.com, eblake@redhat.com, thuth@redhat.com, Tony Krowiak <akrowiak@linux.ibm.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-If the maximum number of devices allowed on a bus is 1 and a device
-which is plugged into the bus is subsequently unplugged, attempting to replug
-the device fails with error "Bus 'xxx' does not support hotplugging".
-The "error" is detected in the qbus_is_full(BusState *bus) function
-(qdev_monitor.c) because bus->max_index >= bus_class->max_dev. The
-root of the problem is that the bus->max_index is not decremented when a device
-is unplugged from the bus. This patch fixes that problem.
+On 12/7/18 2:56 AM, Mark Cave-Ayland wrote:
+> +static inline void get_vsr(TCGv_i64 dst, int n)
+> +{
+> +    tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUPPCState, vsr[n]));
+> +}
+> +
+> +static inline void set_vsr(int n, TCGv_i64 src)
+> +{
+> +    tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState, vsr[n]));
+> +}
 
-Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
----
- hw/core/qdev.c | 2 ++
- 1 file changed, 2 insertions(+)
+Why isn't this helper still using cpu_vsr[n]?
 
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 6b3cc55b27c2..b35b0bf27925 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -59,6 +59,8 @@ static void bus_remove_child(BusState *bus, DeviceState *child)
-             snprintf(name, sizeof(name), "child[%d]", kid->index);
-             QTAILQ_REMOVE(&bus->children, kid, sibling);
- 
-+            bus->max_index--;
-+
-             /* This gives back ownership of kid->child back to us.  */
-             object_property_del(OBJECT(bus), name, NULL);
-             object_unref(OBJECT(kid->child));
--- 
-2.7.4
+
+r~
