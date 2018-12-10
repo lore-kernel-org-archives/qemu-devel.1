@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gWLmn-0006OB-7Z
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:39:53 -0500
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gWLrH-00033m-QZ
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:44:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gWLWk-0005jB-E3
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:23:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35866)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gWLWk-0005it-64
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:23:14 -0500
-Date: Mon, 10 Dec 2018 14:23:11 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181210132311.2y4tfwy4ra5iqx4s@sirius.home.kraxel.org>
-References: <20181130064700.5984-1-linzhecheng@huawei.com>
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gWLrG-0002Ow-3q
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:44:27 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:41888)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1gWLrF-0002Nk-SW
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:44:26 -0500
+Received: by mail-oi1-x244.google.com with SMTP id j21so8959163oii.8
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 05:44:24 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181130064700.5984-1-linzhecheng@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH] usb-host: reset and close
- libusb_device_handle before qemu exit
+In-Reply-To: <alpine.BSF.2.21.9999.1812091654210.8180@zero.eik.bme.hu>
+References: <alpine.BSF.2.21.9999.1812091654210.8180@zero.eik.bme.hu>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 10 Dec 2018 14:44:23 +0100
+Message-ID: <CAL1e-=ihjy_mvxUPtcKBxUOPrBquAe+=A3K6sXz4c=r2Roe=KQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] qdev documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: linzhecheng <linzhecheng@huawei.com>
-Cc: qemu-devel@nongnu.org, jianjay.zhou@huawei.com, wangxinxin.wang@huawei.com
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On Fri, Nov 30, 2018 at 02:47:00PM +0800, linzhecheng wrote:
-> we should perform these things as same as usb_host_close.
-> 
-> Signed-off-by: linzhecheng <linzhecheng@huawei.com>
-> 
-> diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
-> index b6602ded4e..2016375e6b 100644
-> --- a/hw/usb/host-libusb.c
-> +++ b/hw/usb/host-libusb.c
-> @@ -988,7 +988,9 @@ static void usb_host_exit_notifier(struct Notifier *n, void *data)
->  
->      if (s->dh) {
->          usb_host_release_interfaces(s);
-> +	libusb_reset_device(s->dh);
->          usb_host_attach_kernel(s);
-> +	libusb_close(s->dh);
+On Dec 9, 2018 5:00 PM, "BALATON Zoltan" <balaton@eik.bme.hu> wrote:
+>
+> Hello,
+>
+> I was searching for some good summary on how to implement new devices and
+machines in QEMU for those who might want to start working on it but not
+much seems to be available. I've found this which seems to be useful:
+>
+> https://lists.nongnu.org/archive/html/qemu-devel/2011-07/msg00842.html
+>
+> What happened to this? Was it ever finished? It does not seem to be in
+docs, only qdev-device-use.txt is there. (Maybe this qdev-for-programmers
+doc could be in docs/devel.)
+>
+> Thank you,
+> BALATON Zoltan
+>
 
-qemu codesstyle uses spaces not tabs, please update your editor settings.
+Hi, Zoltan.
 
-Fixed and added to usb queue.
+I unfortunatelly can't answer your questions, but I do agree that some
+writings on QEMU internals would be super-helpful. The problem is that, as
+we all know, documentation often gets forgotten in our hectic pace of
+development, even if it is planned to be written.
 
-thanks,
-  Gerd
+It could be that a problem is there is no a single person (at least I don't
+know him/her) who would actively take care of the internal docs as a whole,
+and, let's say, constantly ping other developers to improve or update their
+bits and pieces.
+
+Good that you brought this to our attention!
+
+Aleksandar
