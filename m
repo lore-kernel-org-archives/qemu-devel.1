@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gWNPm-00054g-JL
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:24:11 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gWNQ5-0005Ey-Bu
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:24:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gWNPj-0006Dr-Az
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:24:10 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:39006)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gWNPj-0006DC-0A
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:24:07 -0500
-Received: by mail-oi1-x243.google.com with SMTP id i6so9247765oia.6
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 07:24:06 -0800 (PST)
-References: <20181210114654.31433-1-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <1740a92d-70d7-69a3-4a7b-b42b83f0f160@linaro.org>
-Date: Mon, 10 Dec 2018 09:24:02 -0600
+	(envelope-from <mreitz@redhat.com>) id 1gWNQ4-0006ME-HN
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:24:29 -0500
+References: <1543568126-727235-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1543568126-727235-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <f7e23917-92ea-bdc9-09a4-9deafa7ee142@redhat.com>
+Date: Mon, 10 Dec 2018 16:24:18 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181210114654.31433-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/i386/kvm.c: Don't mark cpuid_data
- as QEMU_PACKED
+In-Reply-To: <1543568126-727235-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="tM8YpzGHYT1EPzLmuipPvE1Pk1nHSToyA"
+Subject: Re: [Qemu-devel] [PATCH v4 1/5] Discard blocks while copy-on-read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +24,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, patches@linaro.org, Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-On 12/10/18 5:46 AM, Peter Maydell wrote:
-> clang complains about taking the address of a packed
-> member of a struct:
-> 
-> target/i386/kvm.c:1245:27: warning: taking address of packed member 'cpuid' of class or structure '' may result in an unaligned pointer value [-Waddress-of-packed-member]
->     c = cpuid_find_entry(&cpuid_data.cpuid, 1, 0);
->                           ^~~~~~~~~~~~~~~~
-> target/i386/kvm.c:1297:31: warning: taking address of packed member 'cpuid' of class or structure '' may result in an unaligned pointer value [-Waddress-of-packed-member]
->         c = cpuid_find_entry(&cpuid_data.cpuid, kvm_base, 0);
->                               ^~~~~~~~~~~~~~~~
-> 
-> The kernel's definitions of struct kvm_cpuid2 and struct
-> kvm_cpuid_entry2 are carefully set up with padding fields
-> so that there is no between-struct padding anyway, so
-> the QEMU_PACKED annotation is unnecessary and might result
-> in the compiler generating worse code. Drop it, and instead
-> assert at build time that there is no stray padding.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--tM8YpzGHYT1EPzLmuipPvE1Pk1nHSToyA
+From: Max Reitz <mreitz@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, den@openvz.org,
+ vsementsov@virtuozzo.com
+Message-ID: <f7e23917-92ea-bdc9-09a4-9deafa7ee142@redhat.com>
+Subject: Re: [PATCH v4 1/5] Discard blocks while copy-on-read
+References: <1543568126-727235-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1543568126-727235-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1543568126-727235-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 30.11.18 09:55, Andrey Shinkevich wrote:
+> Discards the block duplicated in an intermediate backing file
+> after the block have been copied into the active layer during
+> QMP block-stream operation.
+> It saves the disk space while merging external snapshots.
+>=20
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 > ---
->  target/i386/kvm.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
+>  block/stream.c | 428 +++++++++++++++++++++++++++++++++++++++++++++++++=
+++++++--
+>  1 file changed, 413 insertions(+), 15 deletions(-)
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+I wonder why you aren't adding this functionality to the copy-on-read
+filter driver; not just because it makes sense to have feature parity
+between block-stream and that filter, but also because I imagine you
+could use it as the filter node you're adding here.
+
+I thought that block-stream could be rewritten to:
+(1) Create a block-stream filter node on top of @device, with the
+necessary parameters,
+(2) Read everything that is allocated in (@base, @device), so that it is
+copied to the target.
+
+I think that can be done today.  There is no need for the COR filter to
+support a base node parameter, as block-stream simply needs to take care
+just to read things that are allocated above @base.
+
+Max
 
 
-r~
+--tM8YpzGHYT1EPzLmuipPvE1Pk1nHSToyA
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlwOhSIACgkQ9AfbAGHV
+z0CnqAf/W+Zgp6F4Dqbx39kTMmioHRPQK2ydfs0KdqT9gNGewRUAthVtzS8lhfRF
+2h6cYgyHTghjAPAlmHSNct1kUArpG7uHXRzTIRIDSQTthd2WCBLZac15TKymivyh
+PqyxLjYg9firLFUy94KWuJt98rEwpU40RALHrf0odLncr4bXagQkTH5tj3mGhDvc
+UsGbCjdCX+A0k2nzpZ15u9s9oh/kHQHuQOjHWNO2BLCkF5QLZ7PBYKe/gaNTQrph
+oz72Q5gtb3M4e4nuaLVfARjeuDg2hrUuZrC6CjbIitDTBz0LOJJVqfmY3jo1kRET
+9FPGRYVhOZeKDdrcq9PAs1QC4dWaqg==
+=v8p9
+-----END PGP SIGNATURE-----
+
+--tM8YpzGHYT1EPzLmuipPvE1Pk1nHSToyA--
