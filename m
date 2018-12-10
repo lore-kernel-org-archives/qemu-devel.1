@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gWQwH-00063z-Eg
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:09:58 -0500
+	(envelope-from <antonkuchin@yandex-team.ru>) id 1gWQx8-0006jX-9s
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:10:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gWQwC-0004S9-Ld
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:09:57 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43932)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gWQwC-0004RR-Ea
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:09:52 -0500
-Received: by mail-ot1-x343.google.com with SMTP id a11so11503592otr.10
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 11:09:52 -0800 (PST)
-References: <20181207085635.4291-1-mark.cave-ayland@ilande.co.uk>
-	<20181207085635.4291-7-mark.cave-ayland@ilande.co.uk>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <e67fd1ca-cc67-bc6f-e672-7c84d54b685b@linaro.org>
-Date: Mon, 10 Dec 2018 13:09:48 -0600
+	(envelope-from <antonkuchin@yandex-team.ru>) id 1gWQx4-0005jN-8L
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:10:48 -0500
+From: Anton Kuchin <antonkuchin@yandex-team.ru>
+Message-ID: <94f9fc23-961c-7109-643b-ba1e8c625d92@yandex-team.ru>
+Date: Mon, 10 Dec 2018 22:10:30 +0300
 MIME-Version: 1.0
-In-Reply-To: <20181207085635.4291-7-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 6/6] target/ppc: convert vaddu[b, h, w,
- d] and vsubu[b, h, w, d] over to use vector operations
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC] block: Is name of BlockBackend deprecated with
+ -blockdev parameter?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,17 +22,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: qemu-block@nongnu.org
+Cc: wolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-On 12/7/18 2:56 AM, Mark Cave-Ayland wrote:
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->  target/ppc/helper.h                 |  8 --------
->  target/ppc/int_helper.c             |  7 -------
->  target/ppc/translate/vmx-impl.inc.c | 16 ++++++++--------
->  3 files changed, 8 insertions(+), 23 deletions(-)
+Hello,
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+I'm trying to switch from -drive parameter to -blockdev + -device and=20
+having problems. Looks like with this option I have no way to set the=20
+name of=C2=A0 created BlockBackend, but some QMP and HMP commands are try=
+ing=20
+to find blk with blk_by_name() and fail to locate my device (e.g.=20
+hmp_commit, qmp_x_bloc_latency_histogram_set ...). Was it intentional=20
+and BB names are going to be deprecated?
 
+This also seems to be a the case for all block devices hotplugged with=20
+QMP as they use the same code path.
 
-r~
+As far as I understand all named backends are stored in=20
+monitor_block_backends list, but I can't get what is the point of having=20
+this list, and why parse_drive() function doesn't call monitor_add_blk()=20
+like blockdev_init() does with -drive option. Can someone give me a hint=20
+on this?
+
+I also noticed that some commands fallback to search by qdev_id or=20
+BDS->node_name,=C2=A0 but at the creation time (both in bdrv_assing_node_=
+name=20
+and monitor_add_blk) it is already checked that names are unique across=20
+these namespaces so may be it would be useful to introduce generic=20
+search function?
+
+Thanks,
+Anton
