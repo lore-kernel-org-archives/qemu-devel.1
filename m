@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54634)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gWJiK-0007KN-4I
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 06:27:05 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gWJiL-0007KS-4I
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 06:27:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gWJiJ-00064c-44
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 06:27:04 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gWJiK-00065S-3U
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 06:27:05 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Dec 2018 11:26:48 +0000
-Message-Id: <20181210112649.11581-3-peter.maydell@linaro.org>
+Date: Mon, 10 Dec 2018 11:26:49 +0000
+Message-Id: <20181210112649.11581-4-peter.maydell@linaro.org>
 In-Reply-To: <20181210112649.11581-1-peter.maydell@linaro.org>
 References: <20181210112649.11581-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 2/3] block/vdi: Don't take address of fields in
- packed structs
+Subject: [Qemu-devel] [PATCH 3/3] uuid: Make qemu_uuid_bswap() take and
+ return a QemuUUID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,113 +25,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Ben Warren <ben@skyportsystems.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Weil <sw@weilnetz.de>
 
-Taking the address of a field in a packed struct is a bad idea, because
-it might not be actually aligned enough for that pointer type (and
-thus cause a crash on dereference on some host architectures). Newer
-versions of clang warn about this.
+Currently qemu_uuid_bswap() takes a pointer to the QemuUUID to
+be byte-swapped. This means it can't be used when the UUID
+to be swapped is in a packed member of a struct. It's also
+out of line with the general bswap*() functions we provide
+in bswap.h, which take the value to be swapped and return it.
 
-Instead of passing UUID related functions the address of a possibly
-unaligned QemuUUID struct, use local variables and then copy to/from
-the struct field as appropriate.
+Make qemu_uuid_bswap() take a QemuUUID and return the swapped version.
+
+This fixes some clang warnings about taking the address of
+a packed struct member in block/vdi.c.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- block/vdi.c | 38 +++++++++++++++++++++++++-------------
- 1 file changed, 25 insertions(+), 13 deletions(-)
+ include/qemu/uuid.h  |  2 +-
+ block/vdi.c          | 16 ++++++++--------
+ hw/acpi/vmgenid.c    |  6 ++----
+ tests/vmgenid-test.c |  2 +-
+ util/uuid.c          | 10 +++++-----
+ 5 files changed, 17 insertions(+), 19 deletions(-)
 
+diff --git a/include/qemu/uuid.h b/include/qemu/uuid.h
+index 09489ce5c5e..037357d990b 100644
+--- a/include/qemu/uuid.h
++++ b/include/qemu/uuid.h
+@@ -56,6 +56,6 @@ char *qemu_uuid_unparse_strdup(const QemuUUID *uuid);
+ 
+ int qemu_uuid_parse(const char *str, QemuUUID *uuid);
+ 
+-void qemu_uuid_bswap(QemuUUID *uuid);
++QemuUUID qemu_uuid_bswap(QemuUUID uuid);
+ 
+ #endif
 diff --git a/block/vdi.c b/block/vdi.c
-index 2380daa583e..4cc726047c3 100644
+index 4cc726047c3..0c34f6bae46 100644
 --- a/block/vdi.c
 +++ b/block/vdi.c
-@@ -235,7 +235,8 @@ static void vdi_header_to_le(VdiHeader *header)
- 
- static void vdi_header_print(VdiHeader *header)
- {
--    char uuid[37];
-+    char uuidstr[37];
-+    QemuUUID uuid;
-     logout("text        %s", header->text);
-     logout("signature   0x%08x\n", header->signature);
-     logout("header size 0x%04x\n", header->header_size);
-@@ -254,14 +255,18 @@ static void vdi_header_print(VdiHeader *header)
-     logout("block extra 0x%04x\n", header->block_extra);
-     logout("blocks tot. 0x%04x\n", header->blocks_in_image);
-     logout("blocks all. 0x%04x\n", header->blocks_allocated);
--    qemu_uuid_unparse(&header->uuid_image, uuid);
--    logout("uuid image  %s\n", uuid);
--    qemu_uuid_unparse(&header->uuid_last_snap, uuid);
--    logout("uuid snap   %s\n", uuid);
--    qemu_uuid_unparse(&header->uuid_link, uuid);
--    logout("uuid link   %s\n", uuid);
--    qemu_uuid_unparse(&header->uuid_parent, uuid);
--    logout("uuid parent %s\n", uuid);
-+    uuid = header->uuid_image;
-+    qemu_uuid_unparse(&uuid, uuidstr);
-+    logout("uuid image  %s\n", uuidstr);
-+    uuid = header->uuid_last_snap;
-+    qemu_uuid_unparse(&uuid, uuidstr);
-+    logout("uuid snap   %s\n", uuidstr);
-+    uuid = header->uuid_link;
-+    qemu_uuid_unparse(&uuid, uuidstr);
-+    logout("uuid link   %s\n", uuidstr);
-+    uuid = header->uuid_parent;
-+    qemu_uuid_unparse(&uuid, uuidstr);
-+    logout("uuid parent %s\n", uuidstr);
+@@ -203,10 +203,10 @@ static void vdi_header_to_cpu(VdiHeader *header)
+     header->block_extra = le32_to_cpu(header->block_extra);
+     header->blocks_in_image = le32_to_cpu(header->blocks_in_image);
+     header->blocks_allocated = le32_to_cpu(header->blocks_allocated);
+-    qemu_uuid_bswap(&header->uuid_image);
+-    qemu_uuid_bswap(&header->uuid_last_snap);
+-    qemu_uuid_bswap(&header->uuid_link);
+-    qemu_uuid_bswap(&header->uuid_parent);
++    header->uuid_image = qemu_uuid_bswap(header->uuid_image);
++    header->uuid_last_snap = qemu_uuid_bswap(header->uuid_last_snap);
++    header->uuid_link = qemu_uuid_bswap(header->uuid_link);
++    header->uuid_parent = qemu_uuid_bswap(header->uuid_parent);
  }
  
- static int coroutine_fn vdi_co_check(BlockDriverState *bs, BdrvCheckResult *res,
-@@ -368,6 +373,7 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
-     size_t bmap_size;
-     int ret;
-     Error *local_err = NULL;
-+    QemuUUID uuid_link, uuid_parent;
+ static void vdi_header_to_le(VdiHeader *header)
+@@ -227,10 +227,10 @@ static void vdi_header_to_le(VdiHeader *header)
+     header->block_extra = cpu_to_le32(header->block_extra);
+     header->blocks_in_image = cpu_to_le32(header->blocks_in_image);
+     header->blocks_allocated = cpu_to_le32(header->blocks_allocated);
+-    qemu_uuid_bswap(&header->uuid_image);
+-    qemu_uuid_bswap(&header->uuid_last_snap);
+-    qemu_uuid_bswap(&header->uuid_link);
+-    qemu_uuid_bswap(&header->uuid_parent);
++    header->uuid_image = qemu_uuid_bswap(header->uuid_image);
++    header->uuid_last_snap = qemu_uuid_bswap(header->uuid_last_snap);
++    header->uuid_link = qemu_uuid_bswap(header->uuid_link);
++    header->uuid_parent = qemu_uuid_bswap(header->uuid_parent);
+ }
  
-     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file,
-                                false, errp);
-@@ -395,6 +401,9 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
-         goto fail;
-     }
+ static void vdi_header_print(VdiHeader *header)
+diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+index d78b579a201..02717a8b0dc 100644
+--- a/hw/acpi/vmgenid.c
++++ b/hw/acpi/vmgenid.c
+@@ -30,8 +30,7 @@ void vmgenid_build_acpi(VmGenIdState *vms, GArray *table_data, GArray *guid,
+      * first, since that's what the guest expects
+      */
+     g_array_set_size(guid, VMGENID_FW_CFG_SIZE - ARRAY_SIZE(guid_le.data));
+-    guid_le = vms->guid;
+-    qemu_uuid_bswap(&guid_le);
++    guid_le = qemu_uuid_bswap(vms->guid);
+     /* The GUID is written at a fixed offset into the fw_cfg file
+      * in order to implement the "OVMF SDT Header probe suppressor"
+      * see docs/specs/vmgenid.txt for more details
+@@ -149,8 +148,7 @@ static void vmgenid_update_guest(VmGenIdState *vms)
+              * however, will expect the fields to be little-endian.
+              * Perform a byte swap immediately before writing.
+              */
+-            guid_le = vms->guid;
+-            qemu_uuid_bswap(&guid_le);
++            guid_le = qemu_uuid_bswap(vms->guid);
+             /* The GUID is written at a fixed offset into the fw_cfg file
+              * in order to implement the "OVMF SDT Header probe suppressor"
+              * see docs/specs/vmgenid.txt for more details.
+diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+index 0a6fb55f2eb..98db43f5a65 100644
+--- a/tests/vmgenid-test.c
++++ b/tests/vmgenid-test.c
+@@ -110,7 +110,7 @@ static void read_guid_from_memory(QemuUUID *guid)
+     /* The GUID is in little-endian format in the guest, while QEMU
+      * uses big-endian.  Swap after reading.
+      */
+-    qemu_uuid_bswap(guid);
++    *guid = qemu_uuid_bswap(*guid);
+ }
  
-+    uuid_link = header.uuid_link;
-+    uuid_parent = header.uuid_parent;
-+
-     if (header.disk_size % SECTOR_SIZE != 0) {
-         /* 'VBoxManage convertfromraw' can create images with odd disk sizes.
-            We accept them but round the disk size to the next multiple of
-@@ -444,11 +453,11 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
-                    (uint64_t)header.blocks_in_image * header.block_size);
-         ret = -ENOTSUP;
-         goto fail;
--    } else if (!qemu_uuid_is_null(&header.uuid_link)) {
-+    } else if (!qemu_uuid_is_null(&uuid_link)) {
-         error_setg(errp, "unsupported VDI image (non-NULL link UUID)");
-         ret = -ENOTSUP;
-         goto fail;
--    } else if (!qemu_uuid_is_null(&header.uuid_parent)) {
-+    } else if (!qemu_uuid_is_null(&uuid_parent)) {
-         error_setg(errp, "unsupported VDI image (non-NULL parent UUID)");
-         ret = -ENOTSUP;
-         goto fail;
-@@ -733,6 +742,7 @@ static int coroutine_fn vdi_co_do_create(BlockdevCreateOptions *create_options,
-     BlockDriverState *bs_file = NULL;
-     BlockBackend *blk = NULL;
-     uint32_t *bmap = NULL;
-+    QemuUUID uuid;
+ static void read_guid_from_monitor(QemuUUID *guid)
+diff --git a/util/uuid.c b/util/uuid.c
+index ebf06c049ad..5787f0978c1 100644
+--- a/util/uuid.c
++++ b/util/uuid.c
+@@ -110,10 +110,10 @@ int qemu_uuid_parse(const char *str, QemuUUID *uuid)
  
-     assert(create_options->driver == BLOCKDEV_DRIVER_VDI);
-     vdi_opts = &create_options->u.vdi;
-@@ -819,8 +829,10 @@ static int coroutine_fn vdi_co_do_create(BlockdevCreateOptions *create_options,
-     if (image_type == VDI_TYPE_STATIC) {
-         header.blocks_allocated = blocks;
-     }
--    qemu_uuid_generate(&header.uuid_image);
--    qemu_uuid_generate(&header.uuid_last_snap);
-+    qemu_uuid_generate(&uuid);
-+    header.uuid_image = uuid;
-+    qemu_uuid_generate(&uuid);
-+    header.uuid_last_snap = uuid;
-     /* There is no need to set header.uuid_link or header.uuid_parent here. */
-     if (VDI_DEBUG) {
-         vdi_header_print(&header);
+ /* Swap from UUID format endian (BE) to the opposite or vice versa.
+  */
+-void qemu_uuid_bswap(QemuUUID *uuid)
++QemuUUID qemu_uuid_bswap(QemuUUID uuid)
+ {
+-    assert(QEMU_PTR_IS_ALIGNED(uuid, sizeof(uint32_t)));
+-    bswap32s(&uuid->fields.time_low);
+-    bswap16s(&uuid->fields.time_mid);
+-    bswap16s(&uuid->fields.time_high_and_version);
++    bswap32s(&uuid.fields.time_low);
++    bswap16s(&uuid.fields.time_mid);
++    bswap16s(&uuid.fields.time_high_and_version);
++    return uuid;
+ }
 -- 
 2.19.2
