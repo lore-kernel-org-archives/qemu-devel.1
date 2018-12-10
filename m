@@ -1,30 +1,23 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:38943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gWLmU-0006gr-PK
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:39:33 -0500
+	(envelope-from <berto@igalia.com>) id 1gWLmf-0006gr-0m
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:39:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gWLZk-00079S-Uz
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:26:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47958)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gWLZi-00078m-Ts
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:26:20 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0342C89AC9
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 13:26:18 +0000 (UTC)
-Date: Mon, 10 Dec 2018 14:26:16 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181210132616.f7k6l5c5t4sawe22@sirius.home.kraxel.org>
-References: <1543492248-28356-1-git-send-email-thuth@redhat.com>
+	(envelope-from <berto@igalia.com>) id 1gWLXj-0006F7-RD
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 08:24:19 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20181210132156.GG20272@redhat.com>
+References: <20181207161351.4380-1-vsementsov@virtuozzo.com>
+	<20181207161351.4380-4-vsementsov@virtuozzo.com>
+	<w51d0q9lkzd.fsf@maestria.local.igalia.com>
+	<20181210132156.GG20272@redhat.com>
+Date: Mon, 10 Dec 2018 14:24:04 +0100
+Message-ID: <w517eghldl7.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1543492248-28356-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-4.0] tests/display-vga: Enable
- virtio-vga test
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] crypto/block: rename
+ qcrypto_block_*crypt_helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,23 +26,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-On Thu, Nov 29, 2018 at 12:50:48PM +0100, Thomas Huth wrote:
-> There are some "#ifdef CONFIG_VIRTIO_VGA" in the code here which
-> do not work as expected: CONFIG_VIRTIO_VGA is a Makefile switch,
-> but not a CPP macro, so the "guarded" code currently simply never
-> gets enabled.
-> 
-> So enable this code now unconditionally, with some runtime switches
-> for the architectures that have the VIRTIO_VGA device enabled by
-> default. Looking at the other if-statement in the main function here,
-> it also seems like this test was originally supposed to be running
-> on "mips" and "alpha", too, so enable it now for these architectures
-> in the Makefile, too.
+On Mon 10 Dec 2018 02:21:56 PM CET, Daniel P. Berrang=C3=A9 wrote:
+> On Mon, Dec 10, 2018 at 11:44:22AM +0100, Alberto Garcia wrote:
+>> On Fri 07 Dec 2018 05:13:49 PM CET, Vladimir Sementsov-Ogievskiy wrote:
+>> > Rename qcrypto_block_*crypt_helper to qcrypto_cipher_*crypt_helper, as
+>>=20
+>> You forgot to update the new function names in the commit message.
+>>=20
+>> > -int qcrypto_block_decrypt_helper(QCryptoCipher *cipher,
+>> > -int qcrypto_block_encrypt_helper(QCryptoCipher *cipher,
+>> > +int qcrypto_block_cipher_decrypt_helper(QCryptoCipher *cipher,
+>> > +int qcrypto_block_cipher_encrypt_helper(QCryptoCipher *cipher,
+>
+> I'll take care of that when queuing these patches
 
-Added to vga queue.
+Ok then
 
-thanks,
-  Gerd
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+
+Berto
