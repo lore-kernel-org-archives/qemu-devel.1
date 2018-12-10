@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gWMuu-0004gN-08
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:52:16 -0500
+	(envelope-from <frederic.konrad@adacore.com>) id 1gWMvI-0004qw-T9
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:52:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gWMut-0001AZ-3G
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:52:15 -0500
-Date: Mon, 10 Dec 2018 14:52:03 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181210145203.GM20272@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181207161351.4380-1-vsementsov@virtuozzo.com>
-	<20181207161351.4380-6-vsementsov@virtuozzo.com>
-	<w514lbllblo.fsf@maestria.local.igalia.com>
+	(envelope-from <frederic.konrad@adacore.com>) id 1gWMvG-0001aU-Un
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:52:40 -0500
+Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:37676
+	helo=smtp.eu.adacore.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1gWMvD-0001W7-48
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 09:52:37 -0500
+References: <20181207155911.12710-1-peter.maydell@linaro.org>
+	<c2f3400e-84d9-d380-3259-7e3231ff12f6@adacore.com>
+	<CAFEAcA_vuA=P2JDmaWZ3XQrcrjnKpewhgxbMA8YWXxo=vU981A@mail.gmail.com>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <e19cf13a-2629-6184-9a9c-0e9b6dba2104@adacore.com>
+Date: Mon, 10 Dec 2018 15:52:28 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <w514lbllblo.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] crypto: support multiple threads
- accessing one QCryptoBlock
+In-Reply-To: <CAFEAcA_vuA=P2JDmaWZ3XQrcrjnKpewhgxbMA8YWXxo=vU981A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] cpus.c: Fix race condition in
+ cpu_stop_current()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,60 +32,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Jaap Crezee <jaap@jcz.nl>, "patches@linaro.org" <patches@linaro.org>
 
-On Mon, Dec 10, 2018 at 03:06:59PM +0100, Alberto Garcia wrote:
-> On Fri 07 Dec 2018 05:13:51 PM CET, Vladimir Sementsov-Ogievskiy wrote:
-> > @@ -148,12 +154,97 @@ int qcrypto_block_encrypt(QCryptoBlock *block,
-> >  
-> >  QCryptoCipher *qcrypto_block_get_cipher(QCryptoBlock *block)
-> >  {
-> > -    return block->cipher;
-> > +    /* Ciphers should be accessed through pop/push method to be thread-safe.
-> > +     * Better, they should not be accessed externally at all (note, that
-> > +     * pop/push are static functions)
-> > +     * This function is used only in test with one thread (it's safe to skip
-> > +     * pop/push interface), so it's enough to assert it here:
-> > +     */
-> > +    assert(block->n_ciphers <= 1);
-> > +    return block->ciphers ? block->ciphers[0] : NULL;
-> 
-> If this is only supposed to be called in test mode I think you can also
-> assert that g_test_initialized() is true.
-> 
-> And the same with qcrypto_block_get_ivgen() later in this patch.
 
-I consider these APIs as being valid for use anywhere - it just
-happens it is only used in the tests right now. So I think it is
-ok to assert on n_cipers here.
 
-> > +int qcrypto_block_init_cipher(QCryptoBlock *block,
-> > +                              QCryptoCipherAlgorithm alg,
-> > +                              QCryptoCipherMode mode,
-> > +                              const uint8_t *key, size_t nkey,
-> > +                              size_t n_threads, Error **errp)
-> > +{
-> > +    size_t i;
-> > +
-> > +    assert(!block->ciphers && !block->n_ciphers && !block->n_free_ciphers);
-> > +
-> > +    block->ciphers = g_new0(QCryptoCipher *, n_threads);
-> 
-> You can use g_new() instead of g_new0() because you're anyway
-> overwriting all elements of the array.
+Le 12/10/18 =C3=A0 3:39 PM, Peter Maydell a =C3=A9crit=C2=A0:
+> On Mon, 10 Dec 2018 at 14:30, KONRAD Frederic
+> <frederic.konrad@adacore.com> wrote:
+>>
+>> Hi Peter,
+>>
+>> Thanks for that patch!
+>>
+>> I'm seeing the same kind of issue when I run 8 qemu in parallel but it=
+ doesn't
+>> seem to be fixed by this patch. Is it supposed to fix the issue when w=
+e are
+>> doing a reset_request through a MMIO device?
+>>
+>> It happens (rarely) with this kind of guest code:
+>>
+>> exit:
+>>     write to the register to reset the device
+>> loop:
+>>     branch loop
+>>
+>> The code after the reset is executed.. can't we exit the loop directly=
+ with
+>> cpu_loop_exit after cpu_exit?
+>=20
+> cpu_loop_exit would abort the execution of the store instruction
+> that writes to the reset register. I'm not sure that's a great
+> idea. My thought was more that we should just make sure that insn
+> is the last one in the TB, so effectively we execute that insn and
+> then reset the system before executing any further insns. Thinking
+> it over though I'm not sure that we do do anything that could
+> avoid having more insns following in the same TB, unless you're
+> using singlestep or icount...
 
-I'd rather have it initialized to zero upfront, so if creating any
-cipher in the array fails, we don't have uninitialized array elements
-during later cleanup code.
+Exactly I think we don't do anything for that.. But we can't guess which =
+IO will
+require the loop to be exited though..
 
-> But these are minor nits, the patchs looks good to me else.
-> 
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
+Fred
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+>=20
+> thanks
+> -- PMM
+>=20
