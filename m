@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gWBD8-0005lU-Ua
-	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 21:22:19 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gWBIo-0002ka-Gj
+	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 21:28:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gWBD5-0008O4-7d
-	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 21:22:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49984)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gWBD4-0008NA-Uk
-	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 21:22:15 -0500
-Date: Sun, 9 Dec 2018 21:22:08 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181209211730-mutt-send-email-mst@kernel.org>
-References: <7CECC2DFC21538489F72729DF5EFB4D908ABD3A4@dggemm521-mbs.china.huawei.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1gWBIn-0002BO-M9
+	for qemu-devel@nongnu.org; Sun, 09 Dec 2018 21:28:10 -0500
+Date: Mon, 10 Dec 2018 12:27:55 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20181210012755.GB4261@umbus.fritz.box>
+References: <20181207160806.13569-1-mark.cave-ayland@ilande.co.uk>
+	<20181207160806.13569-2-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="0ntfKIWw70PvrIHh"
 Content-Disposition: inline
-In-Reply-To: <7CECC2DFC21538489F72729DF5EFB4D908ABD3A4@dggemm521-mbs.china.huawei.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [BUG]Unassigned mem write during pci device
- hot-plug
+In-Reply-To: <20181207160806.13569-2-mark.cave-ayland@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH 1/3] MAINTAINERS: add myself as maintainer
+ for Mac Old World and New World machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,240 +25,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: xuyandong <xuyandong2@huawei.com>
-Cc: "marcel@redhat.com" <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On Sat, Dec 08, 2018 at 11:58:59AM +0000, xuyandong wrote:
-> Hi all,
+
+--0ntfKIWw70PvrIHh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Dec 07, 2018 at 04:08:04PM +0000, Mark Cave-Ayland wrote:
+> I've unofficially been doing most of the work on the Mac machines for a w=
+hile
+> now, so update MAINTAINERS to reflect this. David is still happy to be li=
+sted
+> as a reviewer as per our discussion at KVM forum.
 >=20
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+>  MAINTAINERS | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 63effdc473..64bffaecca 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -935,7 +935,8 @@ F: hw/ppc/mpc8544ds.c
+>  F: hw/ppc/mpc8544_guts.c
 > =20
->=20
-> In our test, we configured VM with several pci-bridges and a virtio-net=
- nic
-> been attached with bus 4,
->=20
-> After VM is startup, We ping this nic from host to judge if it is worki=
-ng
-> normally. Then, we hot add pci devices to this VM with bus 0.
->=20
-> We  found the virtio-net NIC in bus 4 is not working (can not connect)
-> occasionally, as it kick virtio backend failure with error below:
->=20
->     Unassigned mem write 00000000fc803004 =3D 0x1
->=20
+>  New World
+> -M: David Gibson <david@gibson.dropbear.id.au>
+> +M: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> +R: David Gibson <david@gibson.dropbear.id.au>
+>  L: qemu-ppc@nongnu.org
+>  S: Odd Fixes
+>  F: hw/ppc/mac_newworld.c
+> @@ -949,7 +950,8 @@ F: include/hw/misc/mos6522.h
+>  F: include/hw/ppc/mac_dbdma.h
 > =20
->=20
-> memory-region: pci_bridge_pci
->=20
->   0000000000000000-ffffffffffffffff (prio 0, RW): pci_bridge_pci
->=20
->     00000000fc800000-00000000fc803fff (prio 1, RW): virtio-pci
->=20
->       00000000fc800000-00000000fc800fff (prio 0, RW): virtio-pci-common
->=20
->       00000000fc801000-00000000fc801fff (prio 0, RW): virtio-pci-isr
->=20
->       00000000fc802000-00000000fc802fff (prio 0, RW): virtio-pci-device
->=20
->       00000000fc803000-00000000fc803fff (prio 0, RW): virtio-pci-notify=
-  <- io
-> mem unassigned
->=20
->       =E2=80=A6
->=20
-> =20
->=20
-> We caught an exceptional address changing while this problem happened, =
-show as
-> follow:
->=20
-> Before pci_bridge_update_mappings=EF=BC=9A
->=20
->       00000000fc000000-00000000fc1fffff (prio 1, RW): alias pci_bridge_=
-pref_mem
-> @pci_bridge_pci 00000000fc000000-00000000fc1fffff
->=20
->       00000000fc200000-00000000fc3fffff (prio 1, RW): alias pci_bridge_=
-pref_mem
-> @pci_bridge_pci 00000000fc200000-00000000fc3fffff
->=20
->       00000000fc400000-00000000fc5fffff (prio 1, RW): alias pci_bridge_=
-pref_mem
-> @pci_bridge_pci 00000000fc400000-00000000fc5fffff
->=20
->       00000000fc600000-00000000fc7fffff (prio 1, RW): alias pci_bridge_=
-pref_mem
-> @pci_bridge_pci 00000000fc600000-00000000fc7fffff
->=20
->       00000000fc800000-00000000fc9fffff (prio 1, RW): alias pci_bridge_=
-pref_mem
-> @pci_bridge_pci 00000000fc800000-00000000fc9fffff <- correct Adress Spc=
-e
->=20
->       00000000fca00000-00000000fcbfffff (prio 1, RW): alias pci_bridge_=
-pref_mem
-> @pci_bridge_pci 00000000fca00000-00000000fcbfffff
->=20
->       00000000fcc00000-00000000fcdfffff (prio 1, RW): alias pci_bridge_=
-pref_mem
-> @pci_bridge_pci 00000000fcc00000-00000000fcdfffff
->=20
->       00000000fce00000-00000000fcffffff (prio 1, RW): alias pci_bridge_=
-pref_mem
-> @pci_bridge_pci 00000000fce00000-00000000fcffffff
->=20
-> =20
->=20
-> After pci_bridge_update_mappings=EF=BC=9A
->=20
->       00000000fda00000-00000000fdbfffff (prio 1, RW): alias pci_bridge_=
-mem
-> @pci_bridge_pci 00000000fda00000-00000000fdbfffff
->=20
->       00000000fdc00000-00000000fddfffff (prio 1, RW): alias pci_bridge_=
-mem
-> @pci_bridge_pci 00000000fdc00000-00000000fddfffff
->=20
->       00000000fde00000-00000000fdffffff (prio 1, RW): alias pci_bridge_=
-mem
-> @pci_bridge_pci 00000000fde00000-00000000fdffffff
->=20
->       00000000fe000000-00000000fe1fffff (prio 1, RW): alias pci_bridge_=
-mem
-> @pci_bridge_pci 00000000fe000000-00000000fe1fffff
->=20
->       00000000fe200000-00000000fe3fffff (prio 1, RW): alias pci_bridge_=
-mem
-> @pci_bridge_pci 00000000fe200000-00000000fe3fffff
->=20
->       00000000fe400000-00000000fe5fffff (prio 1, RW): alias pci_bridge_=
-mem
-> @pci_bridge_pci 00000000fe400000-00000000fe5fffff
->=20
->       00000000fe600000-00000000fe7fffff (prio 1, RW): alias pci_bridge_=
-mem
-> @pci_bridge_pci 00000000fe600000-00000000fe7fffff
->=20
->       00000000fe800000-00000000fe9fffff (prio 1, RW): alias pci_bridge_=
-mem
-> @pci_bridge_pci 00000000fe800000-00000000fe9fffff
->=20
->       fffffffffc800000-fffffffffc800000 (prio 1, RW): alias pci_bridge_=
-pref_mem
-> @pci_bridge_pci fffffffffc800000-fffffffffc800000   <- Exceptional Adre=
-ss Space
+>  Old World
+> -M: David Gibson <david@gibson.dropbear.id.au>
+> +M: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> +R: David Gibson <david@gibson.dropbear.id.au>
+>  L: qemu-ppc@nongnu.org
+>  S: Odd Fixes
+>  F: hw/ppc/mac_oldworld.c
 
-This one is empty though right?
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-> =20
->=20
-> We have figured out why this address becomes this value,  according to =
-pci
-> spec,  pci driver can get BAR address size by writing 0xffffffff to
->=20
-> the pci register firstly, and then read back the value from this regist=
-er.
+--0ntfKIWw70PvrIHh
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
-OK however as you show below the BAR being sized is the BAR
-if a bridge. Are you then adding a bridge device by hotplug?
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwNwRsACgkQbDjKyiDZ
+s5LsLg//ZkVhBeVxhOeyeO+XA+ecK6xq9j2ZEfK7pKw/laWBpyYkhehQooiW8IRv
+vEHhLtj86roSxiWkx9g6d2HS+YeGM+xQSX7wKGKUe7/uWDgCbDyxU5RCkImCEmeP
+qwlkaUn1GquTDyNo4PT9Tq4Tk0BvF6YK+MTlBEzAPl6rUmeDIh/L0s2M1ErxNxc6
+Xcq7TzaH5rxjiKCBFw9snxx2H5BhRQKAKrBz1pB6H0DJi/r59UJLHBUOXaddftNu
+pIb7o6ngQt3jTEOdAjtUk/RGpVBTtn8M7Is9xJWV14BuPE0Uow+BooYWr1OhwNPC
+YljGFyGHHabikLAfcssIwv4G6kPyxD4QEB2BsBZ3NOVW6YX9uUS35c9tMhmYdKBI
+IDNuLTfvh6gcL3nTimxAeMm761uLhQ9/eh1tl76jaP67NNcCPKGMW+vwvoXOONI4
+S9oYCwXRMTwnWHv0imyPx69ttmCtxUoNoGlCqlWRKVQc+0IIRIL009/83jRUWSuY
+RLkeEJXlBsi3nqGNxaQHGG3mR30xEl0B83a1imKQI6RJwz/DFItmaGjplMPjA6bU
+X7wPW/Ih0Uy3x8Y3m1YXVhTPyAg9aY7mdUnJ0fqgCSI9gN//7NPSg0dSr7FaGyP9
++nzeoj3HC7WAhCC4upD8nXhhIWgXMtdjGr+EOuLmxJZzG6DdrBE=
+=hGB/
+-----END PGP SIGNATURE-----
 
-
-
-> We didn't handle this value  specially while process pci write in qemu,=
- the
-> function call stack is:
->=20
-> Pci_bridge_dev_write_config
->=20
-> -> pci_bridge_write_config
->=20
-> -> pci_default_write_config (we update the config[address] value here t=
-o
-> fffffffffc800000, which should be 0xfc800000 )
->
-> -> pci_bridge_update_mappings
->=20
->                 ->pci_bridge_region_del(br, br->windows);
->=20
-> -> pci_bridge_region_init
->=20
->                                                                 ->
-> pci_bridge_init_alias (here pci_bridge_get_base, we use the wrong value
-> fffffffffc800000)
->=20
->                                                 ->
-> memory_region_transaction_commit
->=20
-> =20
->=20
-> So, as we can see, we use the wrong base address in qemu to update the =
-memory
-> regions, though, we update the base address to
->=20
-> The correct value after pci driver in VM write the original value back,=
- the
-> virtio NIC in bus 4 may still sends net packets concurrently with
->=20
-> The wrong memory region address.
->=20
-> =20
->=20
-> We have tried to skip the memory region update action in qemu while det=
-ect pci
-> write with 0xffffffff value, and it does work, but
->=20
-> This seems to be not gently.
-
-For sure. But I'm still puzzled as to why does Linux try to
-size the BAR of the bridge while a device behind it is
-used.
-
-Can you pls post your QEMU command line?
-
-
-
-> =20
->=20
-> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
->=20
-> index b2e50c3..84b405d 100644
->=20
-> --- a/hw/pci/pci_bridge.c
->=20
-> +++ b/hw/pci/pci_bridge.c
->=20
-> @@ -256,7 +256,8 @@ void pci_bridge_write_config(PCIDevice *d,
->=20
->      pci_default_write_config(d, address, val, len);
->=20
-> -    if (ranges_overlap(address, len, PCI_COMMAND, 2) ||
->=20
-> +    if ( (val !=3D 0xffffffff) &&
->=20
-> +        (ranges_overlap(address, len, PCI_COMMAND, 2) ||
->=20
->          /* io base/limit */
->=20
->          ranges_overlap(address, len, PCI_IO_BASE, 2) ||
->=20
-> @@ -266,7 +267,7 @@ void pci_bridge_write_config(PCIDevice *d,
->=20
->          ranges_overlap(address, len, PCI_MEMORY_BASE, 20) ||
->=20
->          /* vga enable */
->=20
-> -        ranges_overlap(address, len, PCI_BRIDGE_CONTROL, 2)) {
->=20
-> +        ranges_overlap(address, len, PCI_BRIDGE_CONTROL, 2))) {
->=20
->          pci_bridge_update_mappings(s);
->=20
->      }
->=20
-> =20
->=20
-> Thinks,
->=20
-> Xu
->=20
+--0ntfKIWw70PvrIHh--
