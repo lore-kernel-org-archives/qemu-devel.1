@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gWSiM-0004ok-Dh
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:03:43 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gWSnh-0007Sc-0G
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:09:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gWSiI-0001te-0x
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:03:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47300)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gWSiH-0001tJ-Qf
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:03:37 -0500
-References: <20181210173151.16629-1-dgilbert@redhat.com>
-	<20181210173151.16629-2-dgilbert@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ad65a93f-9b0e-39c3-97ad-9204b30da630@redhat.com>
-Date: Mon, 10 Dec 2018 15:03:27 -0600
+	(envelope-from <richard.henderson@linaro.org>) id 1gWSnd-0004iK-63
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:09:12 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:33420)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gWSnb-0004hb-7h
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:09:07 -0500
+Received: by mail-ot1-x341.google.com with SMTP id i20so11906881otl.0
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 13:09:06 -0800 (PST)
+References: <20181207085635.4291-1-mark.cave-ayland@ilande.co.uk>
+	<alpine.BSF.2.21.9999.1812100112050.45639@zero.eik.bme.hu>
+	<20181210025943.GE4261@umbus.fritz.box>
+	<alpine.BSF.2.21.9999.1812102035360.24343@zero.eik.bme.hu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <763b8fce-daee-97ff-f1da-4f6dba6c5036@linaro.org>
+Date: Mon, 10 Dec 2018 15:09:01 -0600
 MIME-Version: 1.0
-In-Reply-To: <20181210173151.16629-2-dgilbert@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <alpine.BSF.2.21.9999.1812102035360.24343@zero.eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 1/7] virtio: Add shared memory
- capability
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH 0/6] target/ppc: convert VMX
+ instructions to use TCG vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +34,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org
-Cc: sweil@redhat.com, swhiteho@redhat.com, stefanha@redhat.com, vgoyal@redhat.com, miklos@szeredi.hu
+To: BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 12/10/18 11:31 AM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On 12/10/18 2:54 PM, BALATON Zoltan wrote:
+>> What was your host machine.  IIUC this change will only improve
+>> performance if the host tcg backend is able to implement TCG vector
+>> ops in terms of vector ops on the host.
 > 
-> Define a new capability type 'VIRTIO_PCI_CAP_SHARED_MEMORY_CFG'
-> and the data structure 'virtio_pci_shm_cap' to go with it.
-> They allow defining shared memory regions with sizes and offsets
-> of 2^32 and more.
-> Multiple instances of the capability are allowed and distinguished
-> by a device-specific 'id'.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->   hw/virtio/virtio-pci.c                      | 20 ++++++++++++++++++++
->   include/standard-headers/linux/virtio_pci.h |  9 +++++++++
->   2 files changed, 29 insertions(+)
-> 
+> Tried it on i5 650 which has: sse sse2 ssse3 sse4_1 sse4_2. I assume x86_64
+> should be supported but not sure what are the CPU requirements.
 
-> +++ b/include/standard-headers/linux/virtio_pci.h
-> @@ -113,6 +113,8 @@
->   #define VIRTIO_PCI_CAP_DEVICE_CFG	4
->   /* PCI configuration access */
->   #define VIRTIO_PCI_CAP_PCI_CFG		5
-> +/* Additional shared memory capability */
-> +#define VIRTIO_PCI_CAP_SHARED_MEMORY_CFG 8
->   
->   /* This is the PCI capability header: */
->   struct virtio_pci_cap {
-> @@ -163,6 +165,13 @@ struct virtio_pci_cfg_cap {
->   	uint8_t pci_cfg_data[4]; /* Data for BAR access. */
->   };
->   
-> +struct virtio_pci_shm_cap {
-> +	struct virtio_pci_cap cap;
-> +	uint32_t offset_hi;             /* Most sig 32 bits of offset */
-> +	uint32_t length_hi;             /* Most sig 32 bits of length */
-> +        uint8_t  id;                    /* To distinguish shm chunks */
+Not quite.  I only support avx1 and later.
 
-TAB damage.
+I thought about supporting sse4 and later (that's the minimum with all of the
+instructions that do what we need), but there is only one cpu generation with
+sse4 and without avx1, and avx1 is already 8 years old.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+
+r~
