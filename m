@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gWQAp-0001Xa-Lr
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:20:58 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gWQAt-0001ZY-6M
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:21:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gWQAn-0006QS-4x
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:20:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59046)
+	(envelope-from <imammedo@redhat.com>) id 1gWQAp-0006TG-W0
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:20:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56172)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gWQAm-0006PE-M7
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:20:53 -0500
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gWQAp-0006SA-IV
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:20:55 -0500
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Mon, 10 Dec 2018 19:10:12 +0100
-Message-Id: <1544465415-207855-7-git-send-email-imammedo@redhat.com>
+Date: Mon, 10 Dec 2018 19:10:14 +0100
+Message-Id: <1544465415-207855-9-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1544465415-207855-1-git-send-email-imammedo@redhat.com>
 References: <1544465415-207855-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 6/9] tests: acpi: reuse fetch_table() in
- vmgenid-test
+Subject: [Qemu-devel] [PATCH 8/9] tests: acpi: squash sanitize_fadt_ptrs()
+ into test_acpi_fadt_table()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,305 +27,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>
 
-Move fetch_table() into acpi-utils.c renaming it to acpi_fetch_table()
-and reuse it in vmgenid-test that reads RSDT and then tables it references,
-to find and parse VMGNEID SSDT.
-While at it wrap RSDT referenced tables enumeration into FOREACH macro
-(similar to what we do with QLIST_FOREACH & co) to reuse it with bios and
-vmgenid tests.
+some parts of sanitize_fadt_ptrs() do redundant job
+  - locating FADT
+  - checking original checksum
+
+There is no need to do it as test_acpi_fadt_table() already does that,
+so drop duplicate code and move remaining fixup code into
+test_acpi_fadt_table().
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- tests/acpi-utils.h       | 22 ++++++-----------
- tests/acpi-utils.c       | 33 +++++++++++++++++++------
- tests/bios-tables-test.c | 48 +++++++++---------------------------
- tests/vmgenid-test.c     | 63 +++++++++++++++---------------------------------
- 4 files changed, 62 insertions(+), 104 deletions(-)
+ tests/bios-tables-test.c | 40 ++++++++++------------------------------
+ 1 file changed, 10 insertions(+), 30 deletions(-)
 
-diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
-index 2244e8e..1b584d3 100644
---- a/tests/acpi-utils.h
-+++ b/tests/acpi-utils.h
-@@ -22,7 +22,7 @@ typedef struct {
-         AcpiTableHeader *header;
-         uint8_t *aml;            /* aml bytecode from guest */
-     };
--    gsize aml_len;
-+    uint32_t aml_len;
-     gchar *aml_file;
-     gchar *asl;            /* asl code generated from aml */
-     gsize asl_len;
-@@ -47,19 +47,6 @@ typedef struct {
- #define ACPI_READ_ARRAY(arr, addr)                               \
-     ACPI_READ_ARRAY_PTR(arr, sizeof(arr) / sizeof(arr[0]), addr)
- 
--#define ACPI_READ_TABLE_HEADER(table, addr)                      \
--    do {                                                         \
--        ACPI_READ_FIELD((table)->signature, addr);               \
--        ACPI_READ_FIELD((table)->length, addr);                  \
--        ACPI_READ_FIELD((table)->revision, addr);                \
--        ACPI_READ_FIELD((table)->checksum, addr);                \
--        ACPI_READ_ARRAY((table)->oem_id, addr);                  \
--        ACPI_READ_ARRAY((table)->oem_table_id, addr);            \
--        ACPI_READ_FIELD((table)->oem_revision, addr);            \
--        ACPI_READ_ARRAY((table)->asl_compiler_id, addr);         \
--        ACPI_READ_FIELD((table)->asl_compiler_revision, addr);   \
--    } while (0)
--
- #define ACPI_ASSERT_CMP(actual, expected) do { \
-     char ACPI_ASSERT_CMP_str[5] = {}; \
-     memcpy(ACPI_ASSERT_CMP_str, &actual, 4); \
-@@ -73,11 +60,16 @@ typedef struct {
- } while (0)
- 
- 
-+#define ACPI_FOREACH_RSDT_ENTRY(table, table_len, entry_ptr, entry_size) \
-+    for (entry_ptr = table + 36 /* 1st Entry */;                         \
-+         entry_ptr < table + table_len;                                  \
-+         entry_ptr += entry_size)
- 
- uint8_t acpi_calc_checksum(const uint8_t *data, int len);
- uint32_t acpi_find_rsdp_address(void);
--uint32_t acpi_get_rsdt_address(uint8_t *rsdp_table);
- uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table);
- void acpi_parse_rsdp_table(uint32_t addr, uint8_t *rsdp_table);
-+void acpi_fetch_table(uint8_t **aml, uint32_t *aml_len, const uint8_t *addr_ptr,
-+                      const char *sig, bool verify_checksum);
- 
- #endif  /* TEST_ACPI_UTILS_H */
-diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
-index d07f748..de1492c 100644
---- a/tests/acpi-utils.c
-+++ b/tests/acpi-utils.c
-@@ -52,14 +52,6 @@ uint32_t acpi_find_rsdp_address(void)
-     return off;
- }
- 
--uint32_t acpi_get_rsdt_address(uint8_t *rsdp_table)
--{
--    uint32_t rsdt_physical_address;
--
--    memcpy(&rsdt_physical_address, &rsdp_table[16 /* RsdtAddress offset */], 4);
--    return le32_to_cpu(rsdt_physical_address);
--}
--
- uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table)
- {
-     uint64_t xsdt_physical_address;
-@@ -93,3 +85,28 @@ void acpi_parse_rsdp_table(uint32_t addr, uint8_t *rsdp_table)
- 
-     ACPI_ASSERT_CMP64(*((uint64_t *)(rsdp_table)), "RSD PTR ");
- }
-+
-+/** acpi_fetch_table
-+ *  load ACPI table at @addr_ptr offset pointer into buffer and return it in
-+ *  @aml, its length in @aml_len and check that signature/checksum matches
-+ *  actual one.
-+ */
-+void acpi_fetch_table(uint8_t **aml, uint32_t *aml_len, const uint8_t *addr_ptr,
-+                      const char *sig, bool verify_checksum)
-+{
-+    uint32_t addr, len;
-+
-+    memcpy(&addr, addr_ptr , sizeof(addr));
-+    addr = le32_to_cpu(addr);
-+    memread(addr + 4, &len, 4); /* Length of ACPI table */
-+    *aml_len = le32_to_cpu(len);
-+    *aml = g_malloc0(*aml_len);
-+    memread(addr, *aml, *aml_len); /* get whole table */
-+
-+    if (sig) {
-+        ACPI_ASSERT_CMP(**aml, sig);
-+    }
-+    if (verify_checksum) {
-+        g_assert(!acpi_calc_checksum(*aml, *aml_len));
-+    }
-+}
 diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index df61fc2..8160fc0 100644
+index 9aa7c86..40b224f 100644
 --- a/tests/bios-tables-test.c
 +++ b/tests/bios-tables-test.c
-@@ -71,30 +71,6 @@ static void free_test_data(test_data *data)
-     g_array_free(data->tables, true);
- }
+@@ -126,6 +126,7 @@ static void test_acpi_fadt_table(test_data *data)
+     /* FADT table is 1st */
+     AcpiSdtTable table = g_array_index(data->tables, typeof(table), 0);
+     uint8_t *fadt_aml = table.aml;
++    uint32_t fadt_len = table.aml_len;
  
--/** fetch_table
-- *   load ACPI table at @addr_ptr offset pointer into table descriptor
-- *   @sdt_table and check that signature/checksum matches actual one.
-- */
--static void fetch_table(AcpiSdtTable *sdt_table, uint8_t *addr_ptr,
--                        const char *sig, bool verify_checksum)
--{
--    uint32_t addr;
--
--    memcpy(&addr, addr_ptr , sizeof(addr));
--    addr = le32_to_cpu(addr);
--    memread(addr + 4, &sdt_table->aml_len, 4); /* Length of ACPI table */
--    sdt_table->aml_len = le32_to_cpu(sdt_table->aml_len);
--    sdt_table->aml = g_malloc0(sdt_table->aml_len);
--    memread(addr, sdt_table->aml, sdt_table->aml_len); /* get whole table */
--
--    if (sig) {
--        ACPI_ASSERT_CMP(sdt_table->header->signature, sig);
--    }
--    if (verify_checksum) {
--        g_assert(!acpi_calc_checksum(sdt_table->aml, sdt_table->aml_len));
--    }
--}
--
- static void test_acpi_rsdp_address(test_data *data)
- {
-     uint32_t off = acpi_find_rsdp_address();
-@@ -126,22 +102,18 @@ static void test_acpi_rsdp_table(test_data *data)
- 
- static void test_acpi_rsdt_table(test_data *data)
- {
--    const int entry_size = 4 /* 32-bit Entry size */;
--    const int tables_off = 36 /* 1st Entry */;
-     AcpiSdtTable rsdt = {};
--    int i, table_len, table_nr;
-+    uint8_t *ent;
- 
--    /* read the header */
--    fetch_table(&rsdt, &data->rsdp_table[16 /* RsdtAddress */], "RSDT", true);
-+    /* read RSDT table */
-+    acpi_fetch_table(&rsdt.aml, &rsdt.aml_len,
-+                     &data->rsdp_table[16 /* RsdtAddress */], "RSDT", true);
- 
-     /* Load all tables and add to test list directly RSDT referenced tables */
--    table_len = le32_to_cpu(rsdt.header->length);
--    table_nr = (table_len - tables_off) / entry_size;
--    for (i = 0; i < table_nr; i++) {
-+    ACPI_FOREACH_RSDT_ENTRY(rsdt.aml, rsdt.aml_len, ent, 4 /* Entry size */) {
-         AcpiSdtTable ssdt_table = {};
- 
--        fetch_table(&ssdt_table, rsdt.aml + tables_off + i * entry_size,
--                    NULL, true);
-+        acpi_fetch_table(&ssdt_table.aml, &ssdt_table.aml_len, ent, NULL, true);
- 
-         /* Add table to ASL test tables list */
-         g_array_append_val(data->tables, ssdt_table);
-@@ -158,10 +130,12 @@ static void test_acpi_fadt_table(test_data *data)
      ACPI_ASSERT_CMP(table.header->signature, "FACP");
  
-     /* Since DSDT/FACS isn't in RSDT, add them to ASL test list manually */
--    fetch_table(&table, fadt_aml + 36 /* FIRMWARE_CTRL */, "FACS", false);
-+    acpi_fetch_table(&table.aml, &table.aml_len,
-+                     fadt_aml + 36 /* FIRMWARE_CTRL */, "FACS", false);
+@@ -137,36 +138,17 @@ static void test_acpi_fadt_table(test_data *data)
+     acpi_fetch_table(&table.aml, &table.aml_len,
+                      fadt_aml + 40 /* DSDT */, "DSDT", true);
      g_array_append_val(data->tables, table);
- 
--    fetch_table(&table, fadt_aml + 40 /* DSDT */, "DSDT", true);
-+    acpi_fetch_table(&table.aml, &table.aml_len,
-+                     fadt_aml + 40 /* DSDT */, "DSDT", true);
-     g_array_append_val(data->tables, table);
- }
- 
-@@ -346,7 +320,7 @@ try_again:
-             fprintf(stderr, "\nUsing expected file '%s'\n", aml_file);
-         }
-         ret = g_file_get_contents(aml_file, (gchar **)&exp_sdt.aml,
--                                  &exp_sdt.aml_len, &error);
-+                                  (gsize *)&exp_sdt.aml_len, &error);
-         g_assert(ret);
-         g_assert_no_error(error);
-         g_assert(exp_sdt.aml);
-diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-index 97219ae..316dcf5 100644
---- a/tests/vmgenid-test.c
-+++ b/tests/vmgenid-test.c
-@@ -23,26 +23,13 @@
-                                   */
- #define RSDP_ADDR_INVALID 0x100000 /* RSDP must be below this address */
- 
--typedef struct {
--    AcpiTableHeader header;
--    gchar name_op;
--    gchar vgia[4];
--    gchar val_op;
--    uint32_t vgia_val;
--} QEMU_PACKED VgidTable;
+-}
 -
- static uint32_t acpi_find_vgia(void)
- {
-     uint32_t rsdp_offset;
-     uint32_t guid_offset = 0;
-     uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
--    uint32_t rsdt, rsdt_table_length;
--    AcpiRsdtDescriptorRev1 rsdt_table;
--    size_t tables_nr;
--    uint32_t *tables;
--    AcpiTableHeader ssdt_table;
--    VgidTable vgid_table;
+-static void sanitize_fadt_ptrs(test_data *data)
+-{
+-    /* fixup pointers in FADT */
 -    int i;
-+    uint32_t rsdt_len, table_length;
-+    uint8_t *rsdt, *ent;
- 
-     /* Wait for guest firmware to finish and start the payload. */
-     boot_sector_test(global_qtest);
-@@ -53,47 +40,35 @@ static uint32_t acpi_find_vgia(void)
-     g_assert_cmphex(rsdp_offset, <, RSDP_ADDR_INVALID);
- 
-     acpi_parse_rsdp_table(rsdp_offset, rsdp_table);
-+    acpi_fetch_table(&rsdt, &rsdt_len, &rsdp_table[16 /* RsdtAddress */],
-+                     "RSDT", true);
- 
--    rsdt = acpi_get_rsdt_address(rsdp_table);
--    g_assert(rsdt);
 -
--    /* read the header */
--    ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
--    ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
--    rsdt_table_length = le32_to_cpu(rsdt_table.length);
-+    ACPI_FOREACH_RSDT_ENTRY(rsdt, rsdt_len, ent, 4 /* Entry size */) {
-+        uint8_t *table_aml;
+-    for (i = 0; i < data->tables->len; i++) {
+-        AcpiSdtTable *sdt = &g_array_index(data->tables, AcpiSdtTable, i);
+-
+-        if (memcmp(&sdt->header->signature, "FACP", 4)) {
+-            continue;
+-        }
  
--    /* compute the table entries in rsdt */
--    g_assert_cmpint(rsdt_table_length, >, sizeof(AcpiRsdtDescriptorRev1));
--    tables_nr = (rsdt_table_length - sizeof(AcpiRsdtDescriptorRev1)) /
--                sizeof(uint32_t);
+-        /* check original FADT checksum before sanitizing table */
+-        g_assert(!acpi_calc_checksum((uint8_t *)sdt->aml, sdt->aml_len));
 -
--    /* get the addresses of the tables pointed by rsdt */
--    tables = g_new0(uint32_t, tables_nr);
--    ACPI_READ_ARRAY_PTR(tables, tables_nr, rsdt);
+-        /* sdt->aml field offset := spec offset - header size */
+-        memset(sdt->aml + 36, 0, 4); /* sanitize FIRMWARE_CTRL ptr */
+-        memset(sdt->aml + 40, 0, 4); /* sanitize DSDT ptr */
+-        if (sdt->header->revision >= 3) {
+-            memset(sdt->aml + 132, 0, 8); /* sanitize X_FIRMWARE_CTRL ptr */
+-            memset(sdt->aml + 140, 0, 8); /* sanitize X_DSDT ptr */
+-        }
 -
--    for (i = 0; i < tables_nr; i++) {
--        uint32_t addr = le32_to_cpu(tables[i]);
--        ACPI_READ_TABLE_HEADER(&ssdt_table, addr);
--        if (!strncmp((char *)ssdt_table.oem_table_id, "VMGENID", 7)) {
-+        acpi_fetch_table(&table_aml, &table_length, ent, NULL, true);
-+        if (!memcmp(table_aml + 16 /* OEM Table ID */, "VMGENID", 7)) {
-+            uint32_t vgia_val;
-+            uint8_t *aml = &table_aml[36 /* AML byte-code start */];
-             /* the first entry in the table should be VGIA
-              * That's all we need
-              */
--            ACPI_READ_FIELD(vgid_table.name_op, addr);
--            g_assert(vgid_table.name_op == 0x08);  /* name */
--            ACPI_READ_ARRAY(vgid_table.vgia, addr);
--            g_assert(memcmp(vgid_table.vgia, "VGIA", 4) == 0);
--            ACPI_READ_FIELD(vgid_table.val_op, addr);
--            g_assert(vgid_table.val_op == 0x0C);  /* dword */
--            ACPI_READ_FIELD(vgid_table.vgia_val, addr);
-+            g_assert(aml[0 /* name_op*/] == 0x08);
-+            g_assert(memcmp(&aml[1 /* name */], "VGIA", 4) == 0);
-+            g_assert(aml[5 /* value op */] == 0x0C /* dword */);
-+            memcpy(&vgia_val, &aml[6 /* value */], 4);
-+
-             /* The GUID is written at a fixed offset into the fw_cfg file
-              * in order to implement the "OVMF SDT Header probe suppressor"
-              * see docs/specs/vmgenid.txt for more details
-              */
--            guid_offset = le32_to_cpu(vgid_table.vgia_val) + VMGENID_GUID_OFFSET;
-+            guid_offset = le32_to_cpu(vgia_val) + VMGENID_GUID_OFFSET;
-+            g_free(table_aml);
-             break;
-         }
-+        g_free(table_aml);
+-        /* update checksum */
+-        sdt->header->checksum = 0;
+-        sdt->header->checksum -= acpi_calc_checksum(sdt->aml, sdt->aml_len);
+-        break;
++    memset(fadt_aml + 36, 0, 4); /* sanitize FIRMWARE_CTRL ptr */
++    memset(fadt_aml + 40, 0, 4); /* sanitize DSDT ptr */
++    if (fadt_aml[8 /* FADT Major Version */] >= 3) {
++        memset(fadt_aml + 132, 0, 8); /* sanitize X_FIRMWARE_CTRL ptr */
++        memset(fadt_aml + 140, 0, 8); /* sanitize X_DSDT ptr */
      }
--    g_free(tables);
-+    g_free(rsdt);
-     return guid_offset;
++
++    /* update checksum */
++    fadt_aml[9 /* Checksum */] = 0;
++    fadt_aml[9 /* Checksum */] -= acpi_calc_checksum(fadt_aml, fadt_len);
  }
  
+ static void dump_aml_files(test_data *data, bool rebuild)
+@@ -537,8 +519,6 @@ static void test_acpi_one(const char *params, test_data *data)
+     test_acpi_rsdt_table(data);
+     test_acpi_fadt_table(data);
+ 
+-    sanitize_fadt_ptrs(data);
+-
+     if (iasl) {
+         if (getenv(ACPI_REBUILD_EXPECTED_AML)) {
+             dump_aml_files(data, true);
 -- 
 2.7.4
