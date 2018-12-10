@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gWDyi-0002O2-0l
+	(envelope-from <dgibson@ozlabs.org>) id 1gWDyj-0002OR-HC
 	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 00:19:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gWDye-0001lJ-Ez
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 00:19:34 -0500
-Date: Mon, 10 Dec 2018 15:16:46 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gWDye-0001lT-Fl
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 00:19:36 -0500
+Date: Mon, 10 Dec 2018 14:46:42 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181210041646.GK4261@umbus.fritz.box>
-References: <20181209194610.29727-1-clg@kaod.org>
-	<20181209194610.29727-2-clg@kaod.org>
+Message-ID: <20181210034642.GJ4261@umbus.fritz.box>
+References: <20181207160806.13569-1-mark.cave-ayland@ilande.co.uk>
+	<20181207160806.13569-3-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Ucgz5Oc/kKURWzXs"
+	protocol="application/pgp-signature"; boundary="FCKy2vjPBX+S/5dE"
 Content-Disposition: inline
-In-Reply-To: <20181209194610.29727-2-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v7 01/19] ppc/xive: add support for the END
- Event State Buffers
+In-Reply-To: <20181207160806.13569-3-mark.cave-ayland@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH 2/3] mac_newworld: enable access to EDID
+ data for the VGA device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +25,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---Ucgz5Oc/kKURWzXs
-Content-Type: text/plain; charset=iso-8859-1
+--FCKy2vjPBX+S/5dE
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Dec 09, 2018 at 08:45:52PM +0100, C=E9dric Le Goater wrote:
-> The Event Notification Descriptor (END) XIVE structure also contains
-> two Event State Buffers providing further coalescing of interrupts,
-> one for the notification event (ESn) and one for the escalation events
-> (ESe). A MMIO page is assigned for each to control the EOI through
-> loads only. Stores are not allowed.
+On Fri, Dec 07, 2018 at 04:08:05PM +0000, Mark Cave-Ayland wrote:
+> This is in preparation for some upcoming QEMU NDRV driver changes that pa=
+ss
+> display information from the host to the guest.
 >=20
-> The END ESBs are modeled through an object resembling the 'XiveSource'
-> It is stateless as the END state bits are backed into the XiveEND
-> structure under the XiveRouter and the MMIO accesses follow the same
-> rules as for the XiveSource ESBs.
->=20
-> END ESBs are not supported by the Linux drivers neither on OPAL nor on
-> sPAPR. Nevetherless, it provides a mean to study the question in the
-> future and validates a bit more the XIVE model.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+This looks fine by my limited knowledge of this area.  I'm slightly
+perturbed I can't see any existing examples in the tree of setting the
+edid property from the machine.
+
 > ---
+>  hw/ppc/mac_newworld.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 >=20
->  Changes since v6:
->=20
->  - removed the 'chip-id' field from XiveRouter
->  - introduced a 'block-id' field in XiveENDSource to lookup the XIVE
->    END structure when doing a load in the MMIO ESB
->  - removed reset XiveENDSource handler
->=20
->  include/hw/ppc/xive.h |  21 ++++++
->  hw/intc/xive.c        | 160 +++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 179 insertions(+), 2 deletions(-)
-
-Applied to ppc-for-4.0.
-
-I had some thoughts about maybe-nicer arrangements of things here, but
-nothing important enough to delay this (the things I'm mulling over
-wouldn't break migration, so it's fixable later).
+> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+> index 14273a123e..df0a2f03ff 100644
+> --- a/hw/ppc/mac_newworld.c
+> +++ b/hw/ppc/mac_newworld.c
+> @@ -430,7 +430,10 @@ static void ppc_core99_init(MachineState *machine)
+>          }
+>      }
+> =20
+> -    pci_vga_init(pci_bus);
+> +    dev =3D qdev_create(BUS(pci_bus), "VGA");
+> +    qdev_prop_set_int32(dev, "addr", -1);
+> +    qdev_prop_set_bit(dev, "edid", true);
+> +    qdev_init_nofail(dev);
+> =20
+>      if (graphic_depth !=3D 15 && graphic_depth !=3D 32 && graphic_depth =
+!=3D 8) {
+>          graphic_depth =3D 15;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -76,24 +73,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Ucgz5Oc/kKURWzXs
+--FCKy2vjPBX+S/5dE
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwN6KwACgkQbDjKyiDZ
-s5K7AxAAxRHQvL8qEdfowUrzxN/HIjxCQkXNCSLxTZuQ4Y8MpOEeYiryo33Vo20u
-2nl6HdvwcZFyDHAalXbQQXxBbAwpN9BTin4ADGRqbIZanhvlE5jhHlEqip+tEYKx
-7AvU2x2fR7L8HQ6hIYfiT8GN900Gk9oCLPaiXrh3xc3eguO2Wand2jQocgGlSupx
-1qjdK8pk/mwkq4Udk7oZ+pY6bTYwNMYEQO4NIZcYDsFj9cFvvZohSMAWi2VDIjbv
-eI6bEoPoM7DfNJJWJ9ROTeO97mTUFs3qgMtuvU8zKBH+zP2CfneWnJdVV6N1LIz0
-2JIgQKUPdGUSUzO2jW4wXXqkkIm4HtL4+7ZaIkPJMocf87XcJPG304On2Ot0fAMp
-QJM4m2FbyZHp3IV/NTOBe2gde6hOe+peYcCoR6WBgbFrQaECn3a5FqUqEQbNhH+H
-+BvsQuKbkGG60H7DMJYNSYsI3VNjZgLVRT3SOZXsE1Vji59AoZLT4781gFlO05u6
-ZBZ1JLQTj9W1Ax+jR9MOzCt4FpH8pmLlYfYi4X9ad3C+zPnnbpjEpL6XzIDPEvAL
-ClC/z+2JAlf6/F44sHwQ/+cy4L1FHvwDIojSBGcNt8WoGeN03DAurXM0hs0ezC8w
-SeGlgNwBNcHqiM4U7PUDGLKuPqk1qUSG31rUZVIU498/jH6bUGs=
-=QYH+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwN4aIACgkQbDjKyiDZ
+s5L44g/8ChlW2+nT1fsYFq9u+oMkJUGkbT+7NQxCG/lF7UZWWaOltci76z8Q4t0Y
+3+UqGe/PQuQeaeYjDeNJU4IsM5RsbxLV60VKTWhq+JCsCSqqfD5Ws89sX5gbAFCr
+JOBYldn9i+WHRSCr5lxHMvohAvxDb9m/C8exwcpCO3JbynV4OVAeOsSUWIk1SlxC
+fL7QRHrh70pZ5eWOih8Gqw3Nv5UugQ1XtibZa7vKWTcjpGNNcASEvaCEh/5ZtH6E
+k2n2oRZv1bAJ76SzwDmAyXuw8/IYf9Wv7pYpqv3BSfwjMTI/jDMlu5Ll2z1FAe7d
+yLezypD7qoNcDqUJ7l1QwuFsK7mdu45OAtUZGl/N9xaJD+4nPRoz9oZuU7cE5Auw
+PBz9pWtAWarBzA2l9WcBbjGS4Kua8luvOhChyUUfHoSqClxVYiVPKbJD8s84mT3w
+Nr5OVNpXW3LLZGrylYPkSopDQj/QcKgAA/6HM7IAIRwaqFaqOIBNJeo0jJ86K4NZ
+diUi9x75SLGPq9S3u+bhgE8CVk13vncPcp1Mz7BxJKZpFaONkFSwWTQA5F1QByLM
+CUxE9ywWBEWO4AVsIQnhcs2fON/8xbRCXKq8s/DIyJ6qiCQSCrDbVgx/rhHtoUEx
+CjfEufrCvwearxdB1MLoMTbyXsIZkaH1+OH9tPR7BPFYuRaCR50=
+=J6F5
 -----END PGP SIGNATURE-----
 
---Ucgz5Oc/kKURWzXs--
+--FCKy2vjPBX+S/5dE--
