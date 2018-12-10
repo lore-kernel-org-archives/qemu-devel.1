@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gWOlz-0007iH-M7
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:51:13 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gWOpi-0000gf-Gx
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:55:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gWOlv-0003ul-LC
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:51:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:10712)
+	(envelope-from <imammedo@redhat.com>) id 1gWOpe-00070r-Gb
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:55:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58930)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gWOlu-0003u9-C7
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:51:07 -0500
-Date: Mon, 10 Dec 2018 14:50:57 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181210165057.GD4669@habkost.net>
-References: <20181210114654.31433-1-peter.maydell@linaro.org>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gWOpe-0006zc-4A
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:54:58 -0500
+Date: Mon, 10 Dec 2018 17:54:41 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181210175441.7d6e0dcd@Igors-MacBook-Pro.local>
+In-Reply-To: <20181210174522.04b21215@Igors-MacBook-Pro.local>
+References: <20181204142023.15982-1-marcandre.lureau@redhat.com>
+	<20181204142023.15982-8-marcandre.lureau@redhat.com>
+	<20181210174522.04b21215@Igors-MacBook-Pro.local>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181210114654.31433-1-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH] target/i386/kvm.c: Don't mark cpuid_data
- as QEMU_PACKED
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v5 07/19] hw: apply accel compat
+ properties without touching globals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,30 +29,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, ehabkost@redhat.com, qemu-devel@nongnu.org, "open list:X86" <xen-devel@lists.xenproject.org>, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Andreas =?UTF-8?Q?F=C3=A4rber?= <afaerber@suse.de>
 
-On Mon, Dec 10, 2018 at 11:46:54AM +0000, Peter Maydell wrote:
-> clang complains about taking the address of a packed
-> member of a struct:
-> 
-> target/i386/kvm.c:1245:27: warning: taking address of packed member 'cpuid' of class or structure '' may result in an unaligned pointer value [-Waddress-of-packed-member]
->     c = cpuid_find_entry(&cpuid_data.cpuid, 1, 0);
->                           ^~~~~~~~~~~~~~~~
-> target/i386/kvm.c:1297:31: warning: taking address of packed member 'cpuid' of class or structure '' may result in an unaligned pointer value [-Waddress-of-packed-member]
->         c = cpuid_find_entry(&cpuid_data.cpuid, kvm_base, 0);
->                               ^~~~~~~~~~~~~~~~
-> 
-> The kernel's definitions of struct kvm_cpuid2 and struct
-> kvm_cpuid_entry2 are carefully set up with padding fields
-> so that there is no between-struct padding anyway, so
-> the QEMU_PACKED annotation is unnecessary and might result
-> in the compiler generating worse code. Drop it, and instead
-> assert at build time that there is no stray padding.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On Mon, 10 Dec 2018 17:45:22 +0100
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-Queued, thanks.
+> On Tue,  4 Dec 2018 18:20:11 +0400
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+>=20
+> > Instead of registering compat properties as globals, let's keep them
+> > in their own array, to avoid mixing with user globals.
+> >=20
+> > Introduce object_apply_global_props() function, to apply compatibility
+> > properties from a GPtrArray.
+> >=20
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  include/hw/qdev-core.h | 10 ++++++++++
+> >  include/qom/object.h   |  3 +++
+> >  include/sysemu/accel.h |  4 +---
+> >  accel/accel.c          | 12 ------------
+> >  hw/core/qdev.c         |  9 +++++++++
+> >  hw/xen/xen-common.c    |  9 ++++++---
+> >  qom/object.c           | 25 +++++++++++++++++++++++++
+> >  vl.c                   |  1 -
+> >  8 files changed, 54 insertions(+), 19 deletions(-)
+> >=20
+> [...]
+> > diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
+> > index 6ec14c73ca..4532aa8632 100644
+> > --- a/hw/xen/xen-common.c
+> > +++ b/hw/xen/xen-common.c
+> > @@ -174,18 +174,21 @@ static GlobalProperty xen_compat_props[] =3D {
+> >          .driver =3D "migration",
+> >          .property =3D "send-section-footer",
+> >          .value =3D "off",
+> > -    },
+> > -    { /* end of list */ },
+> > +    }
+> >  };
+> > =20
+> >  static void xen_accel_class_init(ObjectClass *oc, void *data)
+> >  {
+> >      AccelClass *ac =3D ACCEL_CLASS(oc);
+> > +
+> >      ac->name =3D "Xen";
+> >      ac->init_machine =3D xen_init;
+> >      ac->setup_post =3D xen_setup_post;
+> >      ac->allowed =3D &xen_allowed;
+> > -    ac->global_props =3D xen_compat_props;
+> > +    ac->compat_props =3D g_ptr_array_new();
+> where is matching free for that?
+can we at least annotate it somehow so that valgrind won't complain about t=
+his leak?
 
--- 
-Eduardo
+>=20
+> > +
+> > +    compat_props_add(ac->compat_props,
+> > +                     xen_compat_props, G_N_ELEMENTS(xen_compat_props));
+> >  }
+> > =20
+> >  #define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")
+> > diff --git a/qom/object.c b/qom/object.c
+> > index 17921c0a71..dbdab0aead 100644
+> > --- a/qom/object.c
+> > +++ b/qom/object.c
+> > @@ -370,6 +370,31 @@ static void object_post_init_with_type(Object *obj=
+, TypeImpl *ti)
+> >      }
+> >  }
+> > =20
+> > +void object_apply_global_props(Object *obj, const GPtrArray *props, Er=
+ror **errp)
+> > +{
+> > +    Error *err =3D NULL;
+> > +    int i;
+> > +
+> > +    if (!props) {
+> > +        return;
+> > +    }
+> > +
+> > +    for (i =3D 0; i < props->len; i++) {
+> > +        GlobalProperty *p =3D g_ptr_array_index(props, i);
+> > +
+> > +        if (object_dynamic_cast(obj, p->driver) =3D=3D NULL) {
+> > +            continue;
+> > +        }
+> > +        p->used =3D true;
+> > +        object_property_parse(obj, p->value, p->property, &err);
+> > +        if (err !=3D NULL) {
+> > +            error_prepend(&err, "can't apply global %s.%s=3D%s: ",
+> > +                          p->driver, p->property, p->value);
+> > +            error_propagate(errp, err);
+> > +        }
+> > +    }
+> > +}
+> > +
+> >  static void object_initialize_with_type(void *data, size_t size, TypeI=
+mpl *type)
+> >  {
+> >      Object *obj =3D data;
+> > diff --git a/vl.c b/vl.c
+> > index a5ae5f23d2..88ba658572 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -2968,7 +2968,6 @@ static void user_register_global_props(void)
+> >   */
+> >  static void register_global_properties(MachineState *ms)
+> >  {
+> > -    accel_register_compat_props(ms->accelerator);
+> >      machine_register_compat_props(ms);
+> >      user_register_global_props();
+> >  }
+>=20
+>=20
