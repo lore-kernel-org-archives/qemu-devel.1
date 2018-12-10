@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gWNLa-0002hs-OG
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:19:52 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gWNOD-0003SC-Ma
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:22:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gWNLX-0004V1-0h
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:19:50 -0500
-Date: Mon, 10 Dec 2018 15:19:19 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181210151918.GO20272@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181207161351.4380-1-vsementsov@virtuozzo.com>
+	(envelope-from <cohuck@redhat.com>) id 1gWNOA-0005hw-IM
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:22:33 -0500
+Date: Mon, 10 Dec 2018 16:22:19 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181210162219.7edcc6a9.cohuck@redhat.com>
+In-Reply-To: <20181210120436.30522-1-peter.maydell@linaro.org>
+References: <20181210120436.30522-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181207161351.4380-1-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/5] crypto threads
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/s390x/virtio-ccw.c: Don't take address
+ of fields in packed structs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,44 +23,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, berto@igalia.com, den@openvz.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, qemu-s390x@nongnu.org, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-On Fri, Dec 07, 2018 at 07:13:46PM +0300, Vladimir Sementsov-Ogievskiy wrote:
-> Hi all.
-> 
-> v3:
-> 01: add r-b by Daniel and Alberto
-> 02: Alberto r-b
->     encrypt->encdec for generic
-> 03: qcrypto_cipher_*crypt_helper->
->     qcrypto_block_cipher_*crypt_helper
-> 04: rebased on previous renamings
->     Daniel r-b
-> 05: use size_t
->     improve comment about n_threads
->     don't use ret in qcrypto_block_luks_create
->     do qemu_mutex_init at the end of open/create
->     do qemu_mutex_destroy in free
->     fix comment for qcrypto_block_get_cipher
-> 
-> v2:
-> 05: fix compilation of test-crypto-block (I am ashamed:(
->     and change QCryptoBlock interface to be a bit more safe.
-> 
-> These series are preliminary step before moving encryption code in
-> qcow2 to the threads. The first attempt of doing it is on list
-> ([PATCH 00/11] qcow2: encryption threads : 
->  https://lists.gnu.org/archive/html/qemu-block/2018-11/msg00729.html)
-> But it's approach with multiplying the whole QCryptoBlock per thread
-> was rejected. So, here is a solution to maintain multitasking inside
-> QCryptoBlock.
+On Mon, 10 Dec 2018 12:04:36 +0000
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-Thanks, I've queued this series for when 4.0 opens up.
+> Taking the address of a field in a packed struct is a bad idea, because
+> it might not be actually aligned enough for that pointer type (and
+> thus cause a crash on dereference on some host architectures). Newer
+> versions of clang warn about this. Avoid the bug by not using the
+> "modify in place" byte swapping functions.
+> 
+> Patch produced with scripts/coccinelle/inplace-byteswaps.cocci
+> (with a couple of long lines manually wrapped).
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Thanks, applied.
