@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gWJxz-0006Tf-OM
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 06:43:17 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gWK1d-0007Ow-Ok
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 06:47:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gWJxv-0001Uy-AJ
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 06:43:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52894)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gWJxu-0001Ru-Tp
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 06:43:11 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EE10630832CF
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 11:43:05 +0000 (UTC)
-Date: Mon, 10 Dec 2018 11:42:54 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181210114254.GB2372@work-vm>
-References: <20181207170400.5129-1-philmd@redhat.com>
-	<20181207170400.5129-6-philmd@redhat.com>
+	(envelope-from <pm215@archaic.org.uk>) id 1gWK1Z-0004Lo-7m
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 06:47:01 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:53362)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1gWK1Y-0004Js-W8
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 06:46:57 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 10 Dec 2018 11:46:54 +0000
+Message-Id: <20181210114654.31433-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20181207170400.5129-6-philmd@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 5/6] hw/nvram/fw_cfg: Add HMP 'info fw_cfg'
- command
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] target/i386/kvm.c: Don't mark cpuid_data as
+ QEMU_PACKED
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,238 +25,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-* Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
-> $ qemu-system-x86_64 -S -monitor stdio
-> (qemu) info fw_cfg
->         Type    Perm    Size    Specific   Order   Info
->    signature      RO       4                       QEMU
->           id      RO       4                       0x00000003
->         uuid      RO      16                       00000000-0000-0000-0=
-000-000000000000
->     ram_size      RO       8                       0x0000000008000000
->    nographic      RO       2                       0x0000
->      nb_cpus      RO       2                       0x0001
->         numa      RO      16
->    boot_menu      RO       2                       0x0000
->     max_cpus      RO       2                       0x0001
->     file_dir      RO    2052
->  file (id 1)      RO      36                 160   etc/acpi/rsdp
->  file (id 2)      RO  131072                 130   etc/acpi/tables
->  file (id 3)      RO       4                  15   etc/boot-fail-wait
->  file (id 4)      RO      20                  40   etc/e820
->  file (id 5)      RO      31                  30   etc/smbios/smbios-an=
-chor
->  file (id 6)      RO     320                  20   etc/smbios/smbios-ta=
-bles
->  file (id 7)      RO       6                  90   etc/system-states
->  file (id 8)      RO    4096                 140   etc/table-loader
-> file (id 10)      RO    9216                  55   genroms/kvmvapic.bin
->         uuid      RO       4  (arch spec)          01000000-0000-0000-0=
-000-000000000000
->     ram_size      RO     324  (arch spec)
->    nographic      RO     121  (arch spec)
-> (qemu)
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> ---
->  hmp-commands-info.hx      |  14 +++++
->  hw/nvram/fw_cfg.c         | 115 ++++++++++++++++++++++++++++++++++++++
->  include/hw/nvram/fw_cfg.h |   2 +
->  3 files changed, 131 insertions(+)
->=20
-> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> index cbee8b944d..9e86dceeb4 100644
-> --- a/hmp-commands-info.hx
-> +++ b/hmp-commands-info.hx
-> @@ -916,6 +916,20 @@ STEXI
->  @item info sev
->  @findex info sev
->  Show SEV information.
-> +ETEXI
-> +
-> +    {
-> +        .name       =3D "fw_cfg",
-> +        .args_type  =3D "",
-> +        .params     =3D "",
-> +        .help       =3D "Display the table of the fw_cfg entries regis=
-tered",
-> +        .cmd        =3D hmp_info_fw_cfg,
-> +    },
-> +
-> +STEXI
-> +@item info fw_cfg
-> +@findex info fw_cfg
-> +Show roms.
->  ETEXI
-> =20
->  STEXI
-> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index 582653f07e..50525ec1dd 100644
-> --- a/hw/nvram/fw_cfg.c
-> +++ b/hw/nvram/fw_cfg.c
-> @@ -36,6 +36,7 @@
->  #include "qemu/config-file.h"
->  #include "qemu/cutils.h"
->  #include "qapi/error.h"
-> +#include "monitor/monitor.h"
-> =20
->  #define FW_CFG_FILE_SLOTS_DFLT 0x20
-> =20
-> @@ -1164,3 +1165,117 @@ static void fw_cfg_register_types(void)
->  }
-> =20
->  type_init(fw_cfg_register_types)
-> +
-> +static const char *fw_cfg_wellknown_entries[0x20] =3D {
+clang complains about taking the address of a packed
+member of a struct:
 
-That magic 0x20 is a shame; we should probably have a #define
-for that max, or perhaps it can just be removed.
+target/i386/kvm.c:1245:27: warning: taking address of packed member 'cpuid' of class or structure '' may result in an unaligned pointer value [-Waddress-of-packed-member]
+    c = cpuid_find_entry(&cpuid_data.cpuid, 1, 0);
+                          ^~~~~~~~~~~~~~~~
+target/i386/kvm.c:1297:31: warning: taking address of packed member 'cpuid' of class or structure '' may result in an unaligned pointer value [-Waddress-of-packed-member]
+        c = cpuid_find_entry(&cpuid_data.cpuid, kvm_base, 0);
+                              ^~~~~~~~~~~~~~~~
 
-> +    [FW_CFG_SIGNATURE] =3D "signature",
-> +    [FW_CFG_ID] =3D "id",
-> +    [FW_CFG_UUID] =3D "uuid",
-> +    [FW_CFG_RAM_SIZE] =3D "ram_size",
-> +    [FW_CFG_NOGRAPHIC] =3D "nographic",
-> +    [FW_CFG_NB_CPUS] =3D "nb_cpus",
-> +    [FW_CFG_MACHINE_ID] =3D "machine_id",
-> +    [FW_CFG_KERNEL_ADDR] =3D "kernel_addr",
-> +    [FW_CFG_KERNEL_SIZE] =3D "kernel_size",
-> +    [FW_CFG_KERNEL_CMDLINE] =3D "kernel_cmdline",
-> +    [FW_CFG_INITRD_ADDR] =3D "initrd_addr",
-> +    [FW_CFG_INITRD_SIZE] =3D "initdr_size",
-> +    [FW_CFG_BOOT_DEVICE] =3D "boot_device",
-> +    [FW_CFG_NUMA] =3D "numa",
-> +    [FW_CFG_BOOT_MENU] =3D "boot_menu",
-> +    [FW_CFG_MAX_CPUS] =3D "max_cpus",
-> +    [FW_CFG_KERNEL_ENTRY] =3D "kernel_entry",
-> +    [FW_CFG_KERNEL_DATA] =3D "kernel_data",
-> +    [FW_CFG_INITRD_DATA] =3D "initrd_data",
-> +    [FW_CFG_CMDLINE_ADDR] =3D "cmdline_addr",
-> +    [FW_CFG_CMDLINE_SIZE] =3D "cmdline_size",
-> +    [FW_CFG_CMDLINE_DATA] =3D "cmdline_data",
-> +    [FW_CFG_SETUP_ADDR] =3D "setup_addr",
-> +    [FW_CFG_SETUP_SIZE] =3D "setup_size",
-> +    [FW_CFG_SETUP_DATA] =3D "setup_data",
-> +    [FW_CFG_FILE_DIR] =3D "file_dir",
-> +};
-> +
-> +void hmp_info_fw_cfg(Monitor *mon, const QDict *qdict)
-> +{
-> +    FWCfgState *s =3D fw_cfg_find();
-> +    int arch, key;
-> +
-> +    monitor_printf(mon, "%12s %5s %7s %9s %6s %-24s\n",
-> +                   "Type", "Perm", "Size", "Specific", "Order", "Info"=
-);
-> +    for (arch =3D 0; arch < ARRAY_SIZE(s->entries); ++arch) {
-> +        for (key =3D 0; key < fw_cfg_max_entry(s); ++key) {
-> +            FWCfgEntry *e =3D &s->entries[arch][key];
-> +            const char *perm =3D e->allow_write ? "RW" : "RO";
-> +            const char *arch_spec =3D arch ? "arch_spec" : "";
-> +            char *type, *info =3D NULL;
-> +
-> +            if (!e->len) {
-> +                continue;
-> +            }
-> +            if (key >=3D FW_CFG_FILE_FIRST) {
-> +                int id =3D key - FW_CFG_FILE_FIRST;
-> +                const char *path =3D s->files->f[id].name;
-> +
-> +                type =3D g_strdup_printf("file (id %d)", id);
-> +                monitor_printf(mon, "%12s %5s %7d %10s %5d %-24s\n",
-> +                               type, perm, e->len, arch_spec,
-> +                               get_fw_cfg_order(s, path), path);
-> +                g_free(type);
-> +                continue;
-> +            }
-> +            type =3D g_strdup(fw_cfg_wellknown_entries[key]);
-> +            if (!type) {
-> +                type =3D g_strdup_printf("entry_%d", key);
-> +            }
-> +
-> +            switch (key) {
-> +            case FW_CFG_SIGNATURE:
-> +                info =3D g_strndup((const gchar *)e->data, e->len);
-> +                break;
-> +            case FW_CFG_UUID:
-> +                info =3D qemu_uuid_unparse_strdup((const QemuUUID *)e-=
->data);
-> +                break;
+The kernel's definitions of struct kvm_cpuid2 and struct
+kvm_cpuid_entry2 are carefully set up with padding fields
+so that there is no between-struct padding anyway, so
+the QEMU_PACKED annotation is unnecessary and might result
+in the compiler generating worse code. Drop it, and instead
+assert at build time that there is no stray padding.
 
-It seems odd to encode the type of each entry in this switch;  I guess
-it's OK if no one else needs it, else perhaps there should be a type
-array.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/i386/kvm.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-Other than that, it's fine from the HMP side, but I agree it should
-either have a QMP equivalent (in which case the structure is a bit
-different) or a good justification of if it's really debug only.
-
-Dave
-
-> +            case FW_CFG_ID:
-> +            case FW_CFG_NOGRAPHIC:
-> +            case FW_CFG_NB_CPUS:
-> +            case FW_CFG_BOOT_MENU:
-> +            case FW_CFG_MAX_CPUS:
-> +            case FW_CFG_RAM_SIZE:
-> +            case FW_CFG_KERNEL_ADDR:
-> +            case FW_CFG_KERNEL_SIZE:
-> +            case FW_CFG_KERNEL_CMDLINE:
-> +            case FW_CFG_KERNEL_ENTRY:
-> +            case FW_CFG_KERNEL_DATA:
-> +            case FW_CFG_INITRD_ADDR:
-> +            case FW_CFG_INITRD_SIZE:
-> +            case FW_CFG_INITRD_DATA:
-> +            case FW_CFG_CMDLINE_ADDR:
-> +            case FW_CFG_CMDLINE_SIZE:
-> +            case FW_CFG_CMDLINE_DATA:
-> +            case FW_CFG_SETUP_ADDR:
-> +            case FW_CFG_SETUP_SIZE:
-> +            case FW_CFG_SETUP_DATA:
-> +                switch (e->len) {
-> +                case 2:
-> +                    info =3D g_strdup_printf("0x%04x", lduw_le_p(e->da=
-ta));
-> +                    break;
-> +                case 4:
-> +                    info =3D g_strdup_printf("0x%08x", ldl_le_p(e->dat=
-a));
-> +                    break;
-> +                case 8:
-> +                    info =3D g_strdup_printf("0x%016" PRIx64, ldq_le_p=
-(e->data));
-> +                    break;
-> +                default:
-> +                    break;
-> +                }
-> +                break;
-> +            default:
-> +                break;
-> +            }
-> +            monitor_printf(mon, "%12s %5s %7d %10s %5s %-24s\n",
-> +                           type, perm, e->len, arch_spec, "", info ? i=
-nfo : "");
-> +            g_free(type);
-> +            g_free(info);
-> +        }
-> +    }
-> +}
-> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
-> index f5a6895a74..28630b2f26 100644
-> --- a/include/hw/nvram/fw_cfg.h
-> +++ b/include/hw/nvram/fw_cfg.h
-> @@ -226,4 +226,6 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
->  FWCfgState *fw_cfg_find(void);
->  bool fw_cfg_dma_enabled(void *opaque);
-> =20
-> +void hmp_info_fw_cfg(Monitor *mon, const QDict *qdict);
-> +
->  #endif
-> --=20
-> 2.17.2
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index b2401d13ea7..739cf8c8ea1 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -864,7 +864,15 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     struct {
+         struct kvm_cpuid2 cpuid;
+         struct kvm_cpuid_entry2 entries[KVM_MAX_CPUID_ENTRIES];
+-    } QEMU_PACKED cpuid_data;
++    } cpuid_data;
++    /*
++     * The kernel defines these structs with padding fields so there
++     * should be no extra padding in our cpuid_data struct.
++     */
++    QEMU_BUILD_BUG_ON(sizeof(cpuid_data) !=
++                      sizeof(struct kvm_cpuid2) +
++                      sizeof(struct kvm_cpuid_entry2) * KVM_MAX_CPUID_ENTRIES);
++
+     X86CPU *cpu = X86_CPU(cs);
+     CPUX86State *env = &cpu->env;
+     uint32_t limit, i, j, cpuid_i;
+-- 
+2.19.2
