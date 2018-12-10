@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gWQI9-0008Km-Vj
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:28:33 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gWQID-00005N-B5
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:28:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gWQI8-0003ew-CM
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:28:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:3643)
+	(envelope-from <pbonzini@redhat.com>) id 1gWQIB-0003j6-88
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:28:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33960)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gWQI8-0003dt-2t
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:28:28 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gWQIA-0003iC-U9
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 13:28:31 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4062887622
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 18:28:27 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2CB423084033
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 18:28:30 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 10 Dec 2018 19:28:12 +0100
-Message-Id: <20181210182816.2014-5-pbonzini@redhat.com>
+Date: Mon, 10 Dec 2018 19:28:14 +0100
+Message-Id: <20181210182816.2014-7-pbonzini@redhat.com>
 In-Reply-To: <20181210182816.2014-1-pbonzini@redhat.com>
 References: <20181210182816.2014-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 4/8] qemu/queue.h: typedef QTAILQ heads
+Subject: [Qemu-devel] [PATCH 6/8] qemu/queue.h: reimplement QTAILQ without
+ pointer-to-pointers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,149 +35,555 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com
 
-This will be needed when we change the QTAILQ head and elem structs
-to unions.  However, it is also consistent with the usage elsewhere
-in QEMU for other list head structs (see for example FsMountList).
+QTAILQ is a doubly linked list, with a pointer-to-pointer to the last
+element from the head, and the previous element from each node.
 
-Note that most QTAILQs only need their name in order to do backwards
-walks.  Those do not break with the struct->union change, and anyway
-the change will also remove the need to name heads when doing backwards
-walks, so those are not touched here.
+But if you squint enough, QTAILQ becomes a combination of a singly-linked
+forwards list, and another singly-linked list which goes backwards and
+is circular.  This is the idea that lets QTAILQ implement reverse
+iteration: only, because the backwards list points inside the node,
+accessing the previous element needs to go two steps back and one
+forwards.
+
+What this patch does is implement it in these terms, without actually
+changing the in-memory layout at all.  The coexistence of the two lists
+is realized by making QTAILQ_HEAD and QTAILQ_ENTRY unions of the forwards
+pointer and a generic QTailQLink node.  Thq QTailQLink can walk the list =
+in
+both directions; the union is needed so that the forwards pointer can
+have the correct type, as a sort of poor man's template.  While there
+are other ways to get the same layout without a union, this one has
+the advantage of simpler operation in the debugger, because the fields
+tqh_first and tqe_next still exist as before the patch.  Those fields are
+also used by scripts/qemugdb/mtree.py, so it's a good idea to preserve th=
+em.
+
+The advantage of the new representation is that the two-back-one-forward
+dance done by backwards accesses can be done all while operating on
+QTailQLinks.  No casting to the head struct is needed anymore because,
+even though the QTailQLink's forward pointer is a void *, we can use
+typeof to recover the correct type.  This patch only changes the
+implementation, not the interface.  The next patch will remove the head
+struct name from the backwards visit macros.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- exec.c                        |  3 ++-
- hw/vfio/common.c              |  2 +-
- include/hw/vfio/vfio-common.h |  3 ++-
- include/qom/cpu.h             |  5 +++--
- ui/input.c                    | 14 ++++++++------
- 5 files changed, 16 insertions(+), 11 deletions(-)
+ include/qemu/queue.h       | 139 ++++++++++++++++---------------------
+ include/qemu/rcu_queue.h   |  45 ++++++------
+ scripts/cocci-macro-file.h |  14 ++--
+ 3 files changed, 92 insertions(+), 106 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index b6b2007f27..a629c98eb5 100644
---- a/exec.c
-+++ b/exec.c
-@@ -94,7 +94,8 @@ int target_page_bits;
- bool target_page_bits_decided;
- #endif
+diff --git a/include/qemu/queue.h b/include/qemu/queue.h
+index b9571e93d8..a893facb86 100644
+--- a/include/qemu/queue.h
++++ b/include/qemu/queue.h
+@@ -346,23 +346,28 @@ struct {                                           =
+                     \
+ #define QSIMPLEQ_FIRST(head)        ((head)->sqh_first)
+ #define QSIMPLEQ_NEXT(elm, field)   ((elm)->field.sqe_next)
 =20
--struct CPUTailQ cpus =3D QTAILQ_HEAD_INITIALIZER(cpus);
-+CPUTailQ cpus =3D QTAILQ_HEAD_INITIALIZER(cpus);
-+
- /* current CPU in the current thread. It is only valid inside
-    cpu_exec() */
- __thread CPUState *current_cpu;
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 7aa804ea0b..4262b80c44 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -37,7 +37,7 @@
- #include "trace.h"
- #include "qapi/error.h"
++typedef struct QTailQLink {
++    void *tql_next;
++    struct QTailQLink *tql_prev;
++} QTailQLink;
 =20
--struct vfio_group_head vfio_group_list =3D
-+VFIOGroupList vfio_group_list =3D
-     QLIST_HEAD_INITIALIZER(vfio_group_list);
- static QLIST_HEAD(, VFIOAddressSpace) vfio_address_spaces =3D
-     QLIST_HEAD_INITIALIZER(vfio_address_spaces);
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.=
-h
-index 127ca47815..7624c9f511 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -180,7 +180,8 @@ int vfio_get_device(VFIOGroup *group, const char *nam=
-e,
-                     VFIODevice *vbasedev, Error **errp);
-=20
- extern const MemoryRegionOps vfio_region_ops;
--extern QLIST_HEAD(vfio_group_head, VFIOGroup) vfio_group_list;
-+typedef QLIST_HEAD(VFIOGroupList, VFIOGroup) VFIOGroupList;
-+extern VFIOGroupList vfio_group_list;
-=20
- #ifdef CONFIG_LINUX
- int vfio_get_region_info(VFIODevice *vbasedev, int index,
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 62aef77b87..4662a205c1 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -435,8 +435,9 @@ struct CPUState {
-     GArray *iommu_notifiers;
- };
-=20
--QTAILQ_HEAD(CPUTailQ, CPUState);
--extern struct CPUTailQ cpus;
-+typedef QTAILQ_HEAD(CPUTailQ, CPUState) CPUTailQ;
-+extern CPUTailQ cpus;
-+
- #define first_cpu        QTAILQ_FIRST_RCU(&cpus)
- #define CPU_NEXT(cpu)    QTAILQ_NEXT_RCU(cpu, node)
- #define CPU_FOREACH(cpu) QTAILQ_FOREACH_RCU(cpu, &cpus, node)
-diff --git a/ui/input.c b/ui/input.c
-index 7c9a4109c4..35c7964f64 100644
---- a/ui/input.c
-+++ b/ui/input.c
-@@ -19,6 +19,9 @@ struct QemuInputHandlerState {
- };
-=20
- typedef struct QemuInputEventQueue QemuInputEventQueue;
-+typedef QTAILQ_HEAD(QemuInputEventQueueHead, QemuInputEventQueue)
-+    QemuInputEventQueueHead;
-+
- struct QemuInputEventQueue {
-     enum {
-         QEMU_INPUT_QUEUE_DELAY =3D 1,
-@@ -37,8 +40,7 @@ static QTAILQ_HEAD(, QemuInputHandlerState) handlers =3D
- static NotifierList mouse_mode_notifiers =3D
-     NOTIFIER_LIST_INITIALIZER(mouse_mode_notifiers);
-=20
--static QTAILQ_HEAD(QemuInputEventQueueHead, QemuInputEventQueue) kbd_que=
-ue =3D
--    QTAILQ_HEAD_INITIALIZER(kbd_queue);
-+static QemuInputEventQueueHead kbd_queue =3D QTAILQ_HEAD_INITIALIZER(kbd=
-_queue);
- static QEMUTimer *kbd_timer;
- static uint32_t kbd_default_delay_ms =3D 10;
- static uint32_t queue_count;
-@@ -257,7 +259,7 @@ static void qemu_input_event_trace(QemuConsole *src, =
-InputEvent *evt)
-=20
- static void qemu_input_queue_process(void *opaque)
- {
--    struct QemuInputEventQueueHead *queue =3D opaque;
-+    QemuInputEventQueueHead *queue =3D opaque;
-     QemuInputEventQueue *item;
-=20
-     g_assert(!QTAILQ_EMPTY(queue));
-@@ -288,7 +290,7 @@ static void qemu_input_queue_process(void *opaque)
-     }
+ /*
+- * Tail queue definitions.
++ * Tail queue definitions.  The union acts as a poor man template, as if
++ * it were QTailQLink<type>.
+  */
+ #define QTAILQ_HEAD(name, type)                                         =
+\
+-struct name {                                                           =
+\
+-        type *tqh_first;      /* first element */                       =
+\
+-        type **tqh_last;      /* addr of last next element */           =
+\
++union name {                                                            =
+\
++        struct type *tqh_first;       /* first element */               =
+\
++        QTailQLink tqh_circ;          /* link for circular backwards lis=
+t */ \
  }
 =20
--static void qemu_input_queue_delay(struct QemuInputEventQueueHead *queue=
-,
-+static void qemu_input_queue_delay(QemuInputEventQueueHead *queue,
-                                    QEMUTimer *timer, uint32_t delay_ms)
- {
-     QemuInputEventQueue *item =3D g_new0(QemuInputEventQueue, 1);
-@@ -306,7 +308,7 @@ static void qemu_input_queue_delay(struct QemuInputEv=
-entQueueHead *queue,
-     }
+ #define QTAILQ_HEAD_INITIALIZER(head)                                   =
+\
+-        { NULL, &(head).tqh_first }
++        { .tqh_circ =3D { NULL, &(head).tqh_circ } }
+=20
+ #define QTAILQ_ENTRY(type)                                              =
+\
+-struct {                                                                =
+\
+-        type *tqe_next;       /* next element */                   \
+-        type **tqe_prev;      /* address of previous next element */    =
+\
++union {                                                                 =
+\
++        struct type *tqe_next;        /* next element */                =
+\
++        QTailQLink tqe_circ;          /* link for circular backwards lis=
+t */ \
  }
 =20
--static void qemu_input_queue_event(struct QemuInputEventQueueHead *queue=
-,
-+static void qemu_input_queue_event(QemuInputEventQueueHead *queue,
-                                    QemuConsole *src, InputEvent *evt)
- {
-     QemuInputEventQueue *item =3D g_new0(QemuInputEventQueue, 1);
-@@ -318,7 +320,7 @@ static void qemu_input_queue_event(struct QemuInputEv=
-entQueueHead *queue,
-     queue_count++;
+ /*
+@@ -370,51 +375,51 @@ struct {                                           =
+                     \
+  */
+ #define QTAILQ_INIT(head) do {                                          =
+\
+         (head)->tqh_first =3D NULL;                                     =
+  \
+-        (head)->tqh_last =3D &(head)->tqh_first;                        =
+  \
++        (head)->tqh_circ.tql_prev =3D &(head)->tqh_circ;                =
+  \
+ } while (/*CONSTCOND*/0)
+=20
+ #define QTAILQ_INSERT_HEAD(head, elm, field) do {                       =
+\
+         if (((elm)->field.tqe_next =3D (head)->tqh_first) !=3D NULL)    =
+    \
+-                (head)->tqh_first->field.tqe_prev =3D                   =
+  \
+-                    &(elm)->field.tqe_next;                             =
+\
++            (head)->tqh_first->field.tqe_circ.tql_prev =3D              =
+  \
++                &(elm)->field.tqe_circ;                                 =
+\
+         else                                                            =
+\
+-                (head)->tqh_last =3D &(elm)->field.tqe_next;            =
+  \
++            (head)->tqh_circ.tql_prev =3D &(elm)->field.tqe_circ;       =
+  \
+         (head)->tqh_first =3D (elm);                                    =
+  \
+-        (elm)->field.tqe_prev =3D &(head)->tqh_first;                   =
+  \
++        (elm)->field.tqe_circ.tql_prev =3D &(head)->tqh_circ;           =
+  \
+ } while (/*CONSTCOND*/0)
+=20
+ #define QTAILQ_INSERT_TAIL(head, elm, field) do {                       =
+\
+         (elm)->field.tqe_next =3D NULL;                                 =
+  \
+-        (elm)->field.tqe_prev =3D (head)->tqh_last;                     =
+  \
+-        *(head)->tqh_last =3D (elm);                                    =
+  \
+-        (head)->tqh_last =3D &(elm)->field.tqe_next;                    =
+  \
++        (elm)->field.tqe_circ.tql_prev =3D (head)->tqh_circ.tql_prev;   =
+  \
++        (head)->tqh_circ.tql_prev->tql_next =3D (elm);                  =
+  \
++        (head)->tqh_circ.tql_prev =3D &(elm)->field.tqe_circ;           =
+  \
+ } while (/*CONSTCOND*/0)
+=20
+ #define QTAILQ_INSERT_AFTER(head, listelm, elm, field) do {             =
+\
+         if (((elm)->field.tqe_next =3D (listelm)->field.tqe_next) !=3D N=
+ULL)\
+-                (elm)->field.tqe_next->field.tqe_prev =3D               =
+  \
+-                    &(elm)->field.tqe_next;                             =
+\
++            (elm)->field.tqe_next->field.tqe_circ.tql_prev =3D          =
+  \
++                &(elm)->field.tqe_circ;                                 =
+\
+         else                                                            =
+\
+-                (head)->tqh_last =3D &(elm)->field.tqe_next;            =
+  \
++            (head)->tqh_circ.tql_prev =3D &(elm)->field.tqe_circ;       =
+  \
+         (listelm)->field.tqe_next =3D (elm);                            =
+  \
+-        (elm)->field.tqe_prev =3D &(listelm)->field.tqe_next;           =
+  \
++        (elm)->field.tqe_circ.tql_prev =3D &(listelm)->field.tqe_circ;  =
+  \
+ } while (/*CONSTCOND*/0)
+=20
+-#define QTAILQ_INSERT_BEFORE(listelm, elm, field) do {                  =
+\
+-        (elm)->field.tqe_prev =3D (listelm)->field.tqe_prev;            =
+  \
+-        (elm)->field.tqe_next =3D (listelm);                            =
+  \
+-        *(listelm)->field.tqe_prev =3D (elm);                           =
+  \
+-        (listelm)->field.tqe_prev =3D &(elm)->field.tqe_next;           =
+  \
++#define QTAILQ_INSERT_BEFORE(listelm, elm, field) do {                  =
+     \
++        (elm)->field.tqe_circ.tql_prev =3D (listelm)->field.tqe_circ.tql=
+_prev; \
++        (elm)->field.tqe_next =3D (listelm);                            =
+       \
++        (listelm)->field.tqe_circ.tql_prev->tql_next =3D (elm);         =
+       \
++        (listelm)->field.tqe_circ.tql_prev =3D &(elm)->field.tqe_circ;  =
+       \
+ } while (/*CONSTCOND*/0)
+=20
+ #define QTAILQ_REMOVE(head, elm, field) do {                            =
+\
+         if (((elm)->field.tqe_next) !=3D NULL)                          =
+  \
+-                (elm)->field.tqe_next->field.tqe_prev =3D               =
+  \
+-                    (elm)->field.tqe_prev;                              =
+\
++            (elm)->field.tqe_next->field.tqe_circ.tql_prev =3D          =
+  \
++                (elm)->field.tqe_circ.tql_prev;                         =
+\
+         else                                                            =
+\
+-                (head)->tqh_last =3D (elm)->field.tqe_prev;             =
+  \
+-        *(elm)->field.tqe_prev =3D (elm)->field.tqe_next;               =
+  \
+-        (elm)->field.tqe_prev =3D NULL;                                 =
+  \
++            (head)->tqh_circ.tql_prev =3D (elm)->field.tqe_circ.tql_prev=
+; \
++        (elm)->field.tqe_circ.tql_prev->tql_next =3D (elm)->field.tqe_ne=
+xt; \
++        (elm)->field.tqe_circ.tql_prev =3D NULL;                        =
+  \
+ } while (/*CONSTCOND*/0)
+=20
+ #define QTAILQ_FOREACH(var, head, field)                                =
+\
+@@ -428,13 +433,13 @@ struct {                                           =
+                     \
+                 (var) =3D (next_var))
+=20
+ #define QTAILQ_FOREACH_REVERSE(var, head, headname, field)              =
+\
+-        for ((var) =3D (*(((struct headname *)((head)->tqh_last))->tqh_l=
+ast));    \
++        for ((var) =3D QTAILQ_LAST(head, headname);                     =
+  \
+                 (var);                                                  =
+\
+-                (var) =3D (*(((struct headname *)((var)->field.tqe_prev)=
+)->tqh_last)))
++                (var) =3D QTAILQ_PREV(var, headname, field))
+=20
+ #define QTAILQ_FOREACH_REVERSE_SAFE(var, head, headname, field, prev_var=
+) \
+-        for ((var) =3D (*(((struct headname *)((head)->tqh_last))->tqh_l=
+ast)); \
+-             (var) && ((prev_var) =3D (*(((struct headname *)((var)->fie=
+ld.tqe_prev))->tqh_last)), 1); \
++        for ((var) =3D QTAILQ_LAST(head, headname);                     =
+  \
++             (var) && ((prev_var) =3D QTAILQ_PREV(var, headname, field))=
+; \
+              (var) =3D (prev_var))
+=20
+ /*
+@@ -443,71 +448,49 @@ struct {                                           =
+                     \
+ #define QTAILQ_EMPTY(head)               ((head)->tqh_first =3D=3D NULL)
+ #define QTAILQ_FIRST(head)               ((head)->tqh_first)
+ #define QTAILQ_NEXT(elm, field)          ((elm)->field.tqe_next)
+-#define QTAILQ_IN_USE(elm, field)        ((elm)->field.tqe_prev !=3D NUL=
+L)
++#define QTAILQ_IN_USE(elm, field)        ((elm)->field.tqe_circ.tql_prev=
+ !=3D NULL)
+=20
++#define QTAILQ_LINK_PREV(link)                                          =
+\
++        ((link).tql_prev->tql_prev->tql_next)
+ #define QTAILQ_LAST(head, headname) \
+-        (*(((struct headname *)((head)->tqh_last))->tqh_last))
++        ((typeof((head)->tqh_first)) QTAILQ_LINK_PREV((head)->tqh_circ))
+ #define QTAILQ_PREV(elm, headname, field) \
+-        (*(((struct headname *)((elm)->field.tqe_prev))->tqh_last))
++        ((typeof((elm)->field.tqe_next)) QTAILQ_LINK_PREV((elm)->field.t=
+qe_circ))
+=20
+ #define field_at_offset(base, offset, type)                             =
+       \
+-        ((type) (((char *) (base)) + (offset)))
+-
+-typedef struct DUMMY_Q_ENTRY DUMMY_Q_ENTRY;
+-typedef struct DUMMY_Q DUMMY_Q;
+-
+-struct DUMMY_Q_ENTRY {
+-        QTAILQ_ENTRY(DUMMY_Q_ENTRY) next;
+-};
+-
+-struct DUMMY_Q {
+-        QTAILQ_HEAD(DUMMY_Q_HEAD, DUMMY_Q_ENTRY) head;
+-};
+-
+-#define dummy_q ((DUMMY_Q *) 0)
+-#define dummy_qe ((DUMMY_Q_ENTRY *) 0)
++        ((type *) (((char *) (base)) + (offset)))
+=20
+ /*
+- * Offsets of layout of a tail queue head.
+- */
+-#define QTAILQ_FIRST_OFFSET (offsetof(typeof(dummy_q->head), tqh_first))
+-#define QTAILQ_LAST_OFFSET  (offsetof(typeof(dummy_q->head), tqh_last))
+-/*
+- * Raw access of elements of a tail queue
++ * Raw access of elements of a tail queue head.  Offsets are all zero
++ * because it's a union.
+  */
+ #define QTAILQ_RAW_FIRST(head)                                          =
+       \
+-        (*field_at_offset(head, QTAILQ_FIRST_OFFSET, void **))
+-#define QTAILQ_RAW_TQH_LAST(head)                                       =
+       \
+-        (*field_at_offset(head, QTAILQ_LAST_OFFSET, void ***))
+-
+-/*
+- * Offsets of layout of a tail queue element.
+- */
+-#define QTAILQ_NEXT_OFFSET (offsetof(typeof(dummy_qe->next), tqe_next))
+-#define QTAILQ_PREV_OFFSET (offsetof(typeof(dummy_qe->next), tqe_prev))
++        field_at_offset(head, 0, void *)
++#define QTAILQ_RAW_TQH_CIRC(head)                                       =
+       \
++        field_at_offset(head, 0, QTailQLink)
+=20
+ /*
+  * Raw access of elements of a tail entry
+  */
+ #define QTAILQ_RAW_NEXT(elm, entry)                                     =
+       \
+-        (*field_at_offset(elm, entry + QTAILQ_NEXT_OFFSET, void **))
+-#define QTAILQ_RAW_TQE_PREV(elm, entry)                                 =
+       \
+-        (*field_at_offset(elm, entry + QTAILQ_PREV_OFFSET, void ***))
++        field_at_offset(elm, entry, void *)
++#define QTAILQ_RAW_TQE_CIRC(elm, entry)                                 =
+       \
++        field_at_offset(elm, entry, QTailQLink)
+ /*
+- * Tail queue tranversal using pointer arithmetic.
++ * Tail queue traversal using pointer arithmetic.
+  */
+ #define QTAILQ_RAW_FOREACH(elm, head, entry)                            =
+       \
+-        for ((elm) =3D QTAILQ_RAW_FIRST(head);                          =
+         \
++        for ((elm) =3D *QTAILQ_RAW_FIRST(head);                         =
+         \
+              (elm);                                                     =
+       \
+-             (elm) =3D QTAILQ_RAW_NEXT(elm, entry))
++             (elm) =3D *QTAILQ_RAW_NEXT(elm, entry))
+ /*
+  * Tail queue insertion using pointer arithmetic.
+  */
+-#define QTAILQ_RAW_INSERT_TAIL(head, elm, entry) do {                   =
+       \
+-        QTAILQ_RAW_NEXT(elm, entry) =3D NULL;                           =
+         \
+-        QTAILQ_RAW_TQE_PREV(elm, entry) =3D QTAILQ_RAW_TQH_LAST(head);  =
+         \
+-        *QTAILQ_RAW_TQH_LAST(head) =3D (elm);                           =
+         \
+-        QTAILQ_RAW_TQH_LAST(head) =3D &QTAILQ_RAW_NEXT(elm, entry);     =
+         \
++#define QTAILQ_RAW_INSERT_TAIL(head, elm, entry) do {                   =
+        \
++        *QTAILQ_RAW_NEXT(elm, entry) =3D NULL;                          =
+          \
++        QTAILQ_RAW_TQE_CIRC(elm, entry)->tql_prev =3D QTAILQ_RAW_TQH_CIR=
+C(head)->tql_prev; \
++        QTAILQ_RAW_TQH_CIRC(head)->tql_prev->tql_next =3D (elm);        =
+          \
++        QTAILQ_RAW_TQH_CIRC(head)->tql_prev =3D QTAILQ_RAW_TQE_CIRC(elm,=
+ entry);  \
+ } while (/*CONSTCOND*/0)
+=20
+ #endif /* QEMU_SYS_QUEUE_H */
+diff --git a/include/qemu/rcu_queue.h b/include/qemu/rcu_queue.h
+index 904b3372dc..2d386f303e 100644
+--- a/include/qemu/rcu_queue.h
++++ b/include/qemu/rcu_queue.h
+@@ -206,47 +206,50 @@ extern "C" {
+ #define QTAILQ_INSERT_HEAD_RCU(head, elm, field) do {                   =
+\
+     (elm)->field.tqe_next =3D (head)->tqh_first;                        =
+  \
+     if ((elm)->field.tqe_next !=3D NULL) {                              =
+  \
+-        (head)->tqh_first->field.tqe_prev =3D &(elm)->field.tqe_next;   =
+  \
++        (head)->tqh_first->field.tqe_circ.tql_prev =3D                  =
+  \
++            &(elm)->field.tqe_circ;                                     =
+\
+     } else {                                                            =
+\
+-        (head)->tqh_last =3D &(elm)->field.tqe_next;                    =
+  \
++        (head)->tqh_circ.tql_prev =3D &(elm)->field.tqe_circ;           =
+  \
+     }                                                                   =
+\
+     atomic_rcu_set(&(head)->tqh_first, (elm));                          =
+\
+-    (elm)->field.tqe_prev =3D &(head)->tqh_first;                       =
+  \
++    (elm)->field.tqe_circ.tql_prev =3D &(head)->tqh_circ;               =
+  \
+ } while (/*CONSTCOND*/0)
+=20
+-#define QTAILQ_INSERT_TAIL_RCU(head, elm, field) do {               \
+-    (elm)->field.tqe_next =3D NULL;                                   \
+-    (elm)->field.tqe_prev =3D (head)->tqh_last;                       \
+-    atomic_rcu_set((head)->tqh_last, (elm));                        \
+-    (head)->tqh_last =3D &(elm)->field.tqe_next;                      \
++#define QTAILQ_INSERT_TAIL_RCU(head, elm, field) do {                   =
+\
++    (elm)->field.tqe_next =3D NULL;                                     =
+  \
++    (elm)->field.tqe_circ.tql_prev =3D (head)->tqh_circ.tql_prev;       =
+  \
++    atomic_rcu_set(&(head)->tqh_circ.tql_prev->tql_next, (elm));        =
+\
++    (head)->tqh_circ.tql_prev =3D &(elm)->field.tqe_circ;               =
+  \
+ } while (/*CONSTCOND*/0)
+=20
+ #define QTAILQ_INSERT_AFTER_RCU(head, listelm, elm, field) do {         =
+\
+     (elm)->field.tqe_next =3D (listelm)->field.tqe_next;                =
+  \
+     if ((elm)->field.tqe_next !=3D NULL) {                              =
+  \
+-        (elm)->field.tqe_next->field.tqe_prev =3D &(elm)->field.tqe_next=
+; \
++        (elm)->field.tqe_next->field.tqe_circ.tql_prev =3D              =
+  \
++            &(elm)->field.tqe_circ;                                     =
+\
+     } else {                                                            =
+\
+-        (head)->tqh_last =3D &(elm)->field.tqe_next;                    =
+  \
++        (head)->tqh_circ.tql_prev =3D &(elm)->field.tqe_circ;           =
+  \
+     }                                                                   =
+\
+     atomic_rcu_set(&(listelm)->field.tqe_next, (elm));                  =
+\
+-    (elm)->field.tqe_prev =3D &(listelm)->field.tqe_next;               =
+  \
++    (elm)->field.tqe_circ.tql_prev =3D &(listelm)->field.tqe_circ;      =
+  \
+ } while (/*CONSTCOND*/0)
+=20
+-#define QTAILQ_INSERT_BEFORE_RCU(listelm, elm, field) do {          \
+-    (elm)->field.tqe_prev =3D (listelm)->field.tqe_prev;              \
+-    (elm)->field.tqe_next =3D (listelm);                              \
+-    atomic_rcu_set((listelm)->field.tqe_prev, (elm));               \
+-    (listelm)->field.tqe_prev =3D &(elm)->field.tqe_next;             \
+-    } while (/*CONSTCOND*/0)
++#define QTAILQ_INSERT_BEFORE_RCU(listelm, elm, field) do {              =
+  \
++    (elm)->field.tqe_circ.tql_prev =3D (listelm)->field.tqe_circ.tql_pre=
+v;  \
++    (elm)->field.tqe_next =3D (listelm);                                =
+    \
++    atomic_rcu_set(&(listelm)->field.tqe_circ.tql_prev->tql_next, (elm))=
+; \
++    (listelm)->field.tqe_circ.tql_prev =3D &(elm)->field.tqe_circ;      =
+    \
++} while (/*CONSTCOND*/0)
+=20
+ #define QTAILQ_REMOVE_RCU(head, elm, field) do {                        =
+\
+     if (((elm)->field.tqe_next) !=3D NULL) {                            =
+  \
+-        (elm)->field.tqe_next->field.tqe_prev =3D (elm)->field.tqe_prev;=
+  \
++        (elm)->field.tqe_next->field.tqe_circ.tql_prev =3D              =
+  \
++            (elm)->field.tqe_circ.tql_prev;                             =
+\
+     } else {                                                            =
+\
+-        (head)->tqh_last =3D (elm)->field.tqe_prev;                     =
+  \
++        (head)->tqh_circ.tql_prev =3D (elm)->field.tqe_circ.tql_prev;   =
+  \
+     }                                                                   =
+\
+-    atomic_set((elm)->field.tqe_prev, (elm)->field.tqe_next);           =
+\
+-    (elm)->field.tqe_prev =3D NULL;                                     =
+  \
++    atomic_set(&(elm)->field.tqe_circ.tql_prev->tql_next, (elm)->field.t=
+qe_next); \
++    (elm)->field.tqe_circ.tql_prev =3D NULL;                            =
+  \
+ } while (/*CONSTCOND*/0)
+=20
+ #define QTAILQ_FOREACH_RCU(var, head, field)                            =
+\
+diff --git a/scripts/cocci-macro-file.h b/scripts/cocci-macro-file.h
+index 5c49369dac..1cb0b4aa49 100644
+--- a/scripts/cocci-macro-file.h
++++ b/scripts/cocci-macro-file.h
+@@ -94,18 +94,18 @@ struct {                                             =
+                   \
+  * Tail queue definitions.
+  */
+ #define QTAILQ_HEAD(name, type)                                         =
+\
+-struct name {                                                           =
+\
+-        type *tqh_first;      /* first element */                       =
+\
+-        type **tqh_last;      /* addr of last next element */           =
+\
++union name {                                                            =
+\
++        struct type *tqh_first;       /* first element */               =
+\
++        QTailQLink tqh_circ;          /* link for last element */       =
+\
  }
 =20
--static void qemu_input_queue_sync(struct QemuInputEventQueueHead *queue)
-+static void qemu_input_queue_sync(QemuInputEventQueueHead *queue)
- {
-     QemuInputEventQueue *item =3D g_new0(QemuInputEventQueue, 1);
+ #define QTAILQ_HEAD_INITIALIZER(head)                                   =
+\
+-        { NULL, &(head).tqh_first }
++        { .tqh_circ =3D { NULL, &(head).tqh_circ } }
 =20
+ #define QTAILQ_ENTRY(type)                                              =
+\
+-struct {                                                                =
+\
+-        type *tqe_next;       /* next element */                        =
+\
+-        type **tqe_prev;      /* address of previous next element */    =
+\
++union {                                                                 =
+\
++        struct type *tqe_next;        /* next element */                =
+\
++        QTailQLink tqe_circ;          /* link for prev element */       =
+\
+ }
+=20
+ /* From glib */
 --=20
 2.19.2
