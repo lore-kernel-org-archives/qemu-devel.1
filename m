@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gWREy-0007TB-UG
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:29:20 -0500
+	(envelope-from <rth7680@gmail.com>) id 1gWRRr-0002Sh-20
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:42:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gWREu-0005di-RP
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:29:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38826)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gWREu-0005Ks-C4
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:29:12 -0500
-References: <1544458548-5986-1-git-send-email-venu.busireddy@oracle.com>
-	<1544458548-5986-3-git-send-email-venu.busireddy@oracle.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6f1e76f0-4871-95fb-4691-d10c216a0826@redhat.com>
-Date: Mon, 10 Dec 2018 13:28:42 -0600
+	(envelope-from <rth7680@gmail.com>) id 1gWRRq-0007JF-9e
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 14:42:34 -0500
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <03506cf0-a204-f619-8ee4-4990a5e69af5@cea.fr>
+	<CAAdtpL5BdqUvHpVTpKuJ6R+yEHGi7U6T9rUK2PbL3nwC7F_3jA@mail.gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <271fd922-943a-f092-d714-697320e9ea21@twiddle.net>
+Date: Mon, 10 Dec 2018 13:42:24 -0600
 MIME-Version: 1.0
-In-Reply-To: <1544458548-5986-3-git-send-email-venu.busireddy@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CAAdtpL5BdqUvHpVTpKuJ6R+yEHGi7U6T9rUK2PbL3nwC7F_3jA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] virtio_net: Add support for "Data Path
- Switching" during Live Migration.
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] Fixes i386 xchgq test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +25,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Venu Busireddy <venu.busireddy@oracle.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, fabrice.desclaux@cea.fr, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>, camille.mougey@cea.fr
 
-On 12/10/18 10:15 AM, Venu Busireddy wrote:
-> Added two new events, FAILOVER_PLUG_PRIMARY and FAILOVER_UNPLUG_PRIMARY.
-> The first is emitted when the guest negotiates the F_STANDBY feature
-> bit. The second is emitted when the virtio_net driver is removed, either
-> manually or as a result of guest reboot. Management stack can use these
-> events to determine when to plug/unplug the VF device to/from the guest.
+On 12/10/18 1:26 PM, Philippe Mathieu-Daudé wrote:
+> Hi Fabrice,
 > 
-> Also, the Virtual Functions will be automatically removed from the guest
-> if the guest is rebooted. To properly identify the VFIO devices that
-> must be removed, a new property named "x-failover-primary" is added to
-> the vfio-pci devices. Only the vfio-pci devices that have this property
-> enabled are removed from the guest upon reboot.
+> On Fri, Dec 7, 2018 at 5:06 PM <fabrice.desclaux@cea.fr> wrote:
+>>
+>> As "xchg" reads and writes both operands, the "+m" is required to avoid
+>> undefined behavior on -O2 compilation.
+>>
+>> Signed-off-by: Fabrice Desclaux <fabrice.desclaux@cea.fr>
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+>> ---
+>>   tests/tcg/i386/test-i386.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/tests/tcg/i386/test-i386.c b/tests/tcg/i386/test-i386.c
+>> index a29b41e764..18d5609665 100644
+>> --- a/tests/tcg/i386/test-i386.c
+>> +++ b/tests/tcg/i386/test-i386.c
+>> @@ -1137,7 +1137,7 @@ void test_xchg(void)
+>>       TEST_XCHG(xchgb, "b", "+q");
+>>
+>>   #if defined(__x86_64__)
+>> -    TEST_XCHG(xchgq, "", "=m");
+>> +    TEST_XCHG(xchgq, "", "+m");
+>>   #endif
+>>       TEST_XCHG(xchgl, "k", "+m");
+>>       TEST_XCHG(xchgw, "w", "+m");
+>> --
+>> 2.19.2
 > 
-> Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
-> ---
+> All QEMU patches has to go via the qemu-devel@nongnu.org list (you
+> only sent it to the trivial list).
+> I'm also Cc'ing the maintainers:
 
-> +++ b/qapi/net.json
-> @@ -683,3 +683,47 @@
->   ##
->   { 'event': 'NIC_RX_FILTER_CHANGED',
->     'data': { '*name': 'str', 'path': 'str' } }
-> +
-> +##
-> +# @FAILOVER_PLUG_PRIMARY:
-> +#
-> +# Emitted when the guest successfully loads the driver after the STANDBY
-> +# feature bit is negotiated.
-> +#
-> +# @device: Indicates the virtio_net device.
-> +#
-> +# @path: Indicates the device path.
-> +#
-> +# Since: 3.0
-
-You've missed 3.0, and even 3.1.  This should be 4.0.
-
-> +#
-> +# Example:
-> +#
-> +# <- {"timestamp": {"seconds": 1432121972, "microseconds": 744001},
-> +#     "event": "FAILOVER_PLUG_PRIMARY",
-> +#     "data": {"device": "net0", "path": "/machine/peripheral/net0/virtio-backend"} }
-> +#
-> +##
-> +{ 'event': 'FAILOVER_PLUG_PRIMARY',
-> +  'data': {'*device': 'str', 'path': 'str'} }
-> +
-> +##
-> +# @FAILOVER_UNPLUG_PRIMARY:
-> +#
-> +# Emitted when the guest resets the virtio_net driver.
-> +# The reset can be the result of either unloading the driver or a reboot.
-> +#
-> +# @device: Indicates the virtio_net device.
-> +#
-> +# @path: Indicates the device path.
-> +#
-> +# Since: 3.0
-
-and again
+Thanks, Phil.
 
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+r~
