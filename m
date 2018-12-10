@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <leozinho29_eu@hotmail.com>) id 1gWKdl-0000TM-LT
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 07:26:30 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gWKdu-00017V-Ny
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 07:26:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <leozinho29_eu@hotmail.com>) id 1gWKP7-00044v-OY
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 07:11:21 -0500
-Received: from mail-oln040092001021.outbound.protection.outlook.com
-	([40.92.1.21]:22848
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <leozinho29_eu@hotmail.com>)
-	id 1gWKP4-00042u-3L
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 07:11:15 -0500
-From: =?utf-8?B?TGVvbmFyZG8gU29hcmVzIE3DvGxsZXI=?= <leozinho29_eu@hotmail.com>
-Date: Mon, 10 Dec 2018 12:11:09 +0000
-Message-ID: <RO1P152MB1483300ECF25FEE36927B1AF97A50@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
-References: <RO1P152MB14839E480D046B4052F0ADC797A40@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
-	<20181210063657.2lqj7vkqwdaobp7e@sirius.home.kraxel.org>
-In-Reply-To: <20181210063657.2lqj7vkqwdaobp7e@sirius.home.kraxel.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <796D771FCD583B439E6AAE90D1669C01@LAMP152.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+	(envelope-from <kwolf@redhat.com>) id 1gWKdq-00033m-IO
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 07:26:34 -0500
+Date: Mon, 10 Dec 2018 13:25:17 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181210122517.GD5000@localhost.localdomain>
+References: <20181205122326.26625-1-dplotnikov@virtuozzo.com>
+	<20181207122647.GE5119@linux.fritz.box>
+	<01597daf-b1b8-d506-85c1-b58af758f367@virtuozzo.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Guests are crashing on startup,
- seem related to usb-audio
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <01597daf-b1b8-d506-85c1-b58af758f367@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH] blk: postpone request execution on a
+ context protected with "drained section"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,113 +25,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "kraxel@redhat.com" <kraxel@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Cc: "keith.busch@intel.com" <keith.busch@intel.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>, "famz@redhat.com" <famz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-SGksIEkgZGlkIG5vdCBzYXZlIHRoYXQgTWFnZWlhIDcgZGF0YSBhcyBJIHdhcyB1bmF3YXJlIEkg
-Y291bGQgZG8gdGhpcy4NClRoZSBkYXRhIGJlbG93IGlzIGZyb20gYW5vdGhlciBjcmFzaCB3aXRo
-IG9wZW5TVVNFIExlYXAsIHRoaXMgdGltZSBJDQpzYXZlZCB0aGlzIGJhY2t0cmFjZSB3aXRoIGdl
-bmVyYXRlLWNvcmUtZmlsZS4NCg0KUUVNVSBjb21tYW5kIGxpbmU6DQoNCmVudiBRRU1VX0FVRElP
-X0FEQ19WT0lDRVM9MCBRRU1VX0FVRElPX0RSVj1wYSBcDQpRRU1VX0FVRElPX0RBQ19GSVhFRF9G
-UkVRPTk2MDAwIFwNClFFTVVfQVVESU9fQURDX0ZJWEVEX0ZSRVE9OTYwMDAgXA0KUUVNVV9BVURJ
-T19BRENfVk9JQ0VTPTAgXA0KZ2RiIC1leCAiaGFuZGxlIFNJR1VTUjEgbm9zdG9wIG5vcGFzcyBu
-b3ByaW50IiAtZXggInJ1biIgLS1hcmdzDQpxZW11LXN5c3RlbS14ODZfNjQgXA0KLW5hbWUgIm9w
-ZW5TVVNFIExlYXAiIC1rIHB0LWJyIC1ub2RlZmF1bHRzIC1lbmFibGUta3ZtIC1jcHUgaG9zdCAt
-c21wDQpjb3Jlcz0yLHRocmVhZHM9MSAtbSAyRyBcDQotZGV2aWNlIHFlbXUteGhjaSxpZD14aGNp
-aHViIC1kZXZpY2UgdXNiLWF1ZGlvLGlkPXVzYmF1ZGlvLGJ1ZmZlcj02MTQ0IFwNCi1kZXZpY2Ug
-dmlydGlvLXRhYmxldC1wY2ksaWQ9cGNpdGFibGV0IC1iaW9zIC91c3Ivc2hhcmUvb3ZtZi9PVk1G
-LmZkIFwNCi1kZXZpY2UgcXhsLXZnYSx4cmVzPTgwMCx5cmVzPTYwMCAtZGlzcGxheSBndGssZ2w9
-b24gXA0KLWhkYSAvaG9tZS91c3VhcmlvLy5sb2NhbC9zaGFyZS9saWJ2aXJ0L2ltYWdlcy9vcGVu
-c3VzZV9sZWFwLnFjb3cyIFwNCi1tb25pdG9yIHZjIC1zZXJpYWwgdmMgXA0KLW1hY2hpbmUga2Vy
-bmVsX2lycWNoaXA9b24gLWdsb2JhbCBQSUlYNF9QTS5kaXNhYmxlX3MzPTEgLWdsb2JhbA0KUElJ
-WDRfUE0uZGlzYWJsZV9zND0xIC1NIHBjLHVzYj10cnVlIFwNCi1uZXRkZXYgdXNlcixpZD1uZXQw
-IC1kZXZpY2UgZTEwMDAsbmV0ZGV2PW5ldDAsYWRkcj04DQoNCmdkYiBiYWNrdHJhY2U6DQoNCiMw
-ICAweDAwMDA3ZmZmZjAxY2NlOTcgaW4gX19HSV9yYWlzZSAoc2lnPXNpZ0BlbnRyeT02KSBhdA0K
-Li4vc3lzZGVwcy91bml4L3N5c3YvbGludXgvcmFpc2UuYzo1MQ0KIzEgIDB4MDAwMDdmZmZmMDFj
-ZTgwMSBpbiBfX0dJX2Fib3J0ICgpIGF0IGFib3J0LmM6NzkNCiMyICAweDAwMDA3ZmZmZjAxYmUz
-OWEgaW4gX19hc3NlcnRfZmFpbF9iYXNlIChmbXQ9MHg3ZmZmZDQwM2UyMDINCiIlcyVzJXM6JXU6
-ICVzJXNBc3NlcnRpdmEg4oCcJXPigJ0gZmFsaG91LlxuJW4iLA0KYXNzZXJ0aW9uPWFzc2VydGlv
-bkBlbnRyeT0weDU1NTU1NWZiODczOCAicC0+YWN0dWFsX2xlbmd0aCArIGJ5dGVzIDw9DQppb3Yt
-PnNpemUiLCBmaWxlPWZpbGVAZW50cnk9MHg1NTU1NTVmYjg0NTYgImh3L3VzYi9jb3JlLmMiLA0K
-bGluZT1saW5lQGVudHJ5PTU5MiwgZnVuY3Rpb249ZnVuY3Rpb25AZW50cnk9MHg1NTU1NTVmYjg5
-ODANCjxfX1BSRVRUWV9GVU5DVElPTl9fLjI2MzUxPiAidXNiX3BhY2tldF9jb3B5IikgYXQgYXNz
-ZXJ0LmM6OTINCiMzICAweDAwMDA3ZmZmZjAxYmU0MTIgaW4gX19HSV9fX2Fzc2VydF9mYWlsIChh
-c3NlcnRpb249MHg1NTU1NTVmYjg3MzgNCiJwLT5hY3R1YWxfbGVuZ3RoICsgYnl0ZXMgPD0gaW92
-LT5zaXplIiwgZmlsZT0weDU1NTU1NWZiODQ1Ng0KImh3L3VzYi9jb3JlLmMiLCBsaW5lPTU5Miwg
-ZnVuY3Rpb249MHg1NTU1NTVmYjg5ODANCjxfX1BSRVRUWV9GVU5DVElPTl9fLjI2MzUxPiAidXNi
-X3BhY2tldF9jb3B5IikgYXQgYXNzZXJ0LmM6MTAxDQojNCAgMHgwMDAwNTU1NTU1YmQ1ZWQ3IGlu
-IHVzYl9wYWNrZXRfY29weSAocD0weDdmZmZjNDE3NDEyOCwNCnB0cj0weDdmZmZiODAxZTM5MCwg
-Ynl0ZXM9MTkyKSBhdCBody91c2IvY29yZS5jOjU5Mg0KIzUgIDB4MDAwMDU1NTU1NWMwMjRkOCBp
-biBzdHJlYW1idWZfcHV0IChidWY9MHg1NTU1NTdlNDY4YTAsDQpwPTB4N2ZmZmM0MTc0MTI4KSBh
-dCBody91c2IvZGV2LWF1ZGlvLmM6MzI1DQojNiAgMHgwMDAwNTU1NTU1YzAyZDc4IGluIHVzYl9h
-dWRpb19oYW5kbGVfZGF0YW91dCAocz0weDU1NTU1N2U0NTFiMCwNCnA9MHg3ZmZmYzQxNzQxMjgp
-IGF0IGh3L3VzYi9kZXYtYXVkaW8uYzo1OTYNCiM3ICAweDAwMDA1NTU1NTVjMDJlMTYgaW4gdXNi
-X2F1ZGlvX2hhbmRsZV9kYXRhIChkZXY9MHg1NTU1NTdlNDUxYjAsDQpwPTB4N2ZmZmM0MTc0MTI4
-KSBhdCBody91c2IvZGV2LWF1ZGlvLmM6NjA4DQojOCAgMHgwMDAwNTU1NTU1YmQ3YzM5IGluIHVz
-Yl9kZXZpY2VfaGFuZGxlX2RhdGEgKGRldj0weDU1NTU1N2U0NTFiMCwNCnA9MHg3ZmZmYzQxNzQx
-MjgpIGF0IGh3L3VzYi9idXMuYzoxODQNCiM5ICAweDAwMDA1NTU1NTViZDU0YTkgaW4gdXNiX3By
-b2Nlc3Nfb25lIChwPTB4N2ZmZmM0MTc0MTI4KSBhdA0KaHcvdXNiL2NvcmUuYzozODgNCiMxMCAw
-eDAwMDA1NTU1NTViZDU2NjggaW4gdXNiX2hhbmRsZV9wYWNrZXQgKGRldj0weDU1NTU1N2U0NTFi
-MCwNCnA9MHg3ZmZmYzQxNzQxMjgpIGF0IGh3L3VzYi9jb3JlLmM6NDIwDQojMTEgMHgwMDAwNTU1
-NTU1YmY2ZDhlIGluIHhoY2lfc3VibWl0ICh4aGNpPTB4N2ZmZmNkNTM4MDEwLA0KeGZlcj0weDdm
-ZmZjNDE3NDEyMCwgZXBjdHg9MHg3ZmZmYzQxNzJmNDApIGF0IGh3L3VzYi9oY2QteGhjaS5jOjE4
-MTkNCiMxMiAweDAwMDA1NTU1NTViZjZkZjYgaW4geGhjaV9maXJlX3RyYW5zZmVyICh4aGNpPTB4
-N2ZmZmNkNTM4MDEwLA0KeGZlcj0weDdmZmZjNDE3NDEyMCwgZXBjdHg9MHg3ZmZmYzQxNzJmNDAp
-IGF0IGh3L3VzYi9oY2QteGhjaS5jOjE4MjgNCiMxMyAweDAwMDA1NTU1NTViZjczZWIgaW4geGhj
-aV9raWNrX2VwY3R4IChlcGN0eD0weDdmZmZjNDE3MmY0MCwNCnN0cmVhbWlkPTApIGF0IGh3L3Vz
-Yi9oY2QteGhjaS5jOjE5NjkNCiMxNCAweDAwMDA1NTU1NTViZjZlZWYgaW4geGhjaV9raWNrX2Vw
-ICh4aGNpPTB4N2ZmZmNkNTM4MDEwLCBzbG90aWQ9MSwNCmVwaWQ9Miwgc3RyZWFtaWQ9MCkgYXQg
-aHcvdXNiL2hjZC14aGNpLmM6MTg1Mw0KIzE1IDB4MDAwMDU1NTU1NWJmYTBhYyBpbiB4aGNpX2Rv
-b3JiZWxsX3dyaXRlIChwdHI9MHg3ZmZmY2Q1MzgwMTAsDQpyZWc9MSwgdmFsPTIsIHNpemU9NCkg
-YXQgaHcvdXNiL2hjZC14aGNpLmM6MzEyNQ0KIzE2IDB4MDAwMDU1NTU1NTg3ZjQ0ZSBpbiBtZW1v
-cnlfcmVnaW9uX3dyaXRlX2FjY2Vzc29yDQoobXI9MHg3ZmZmY2Q1MzhkNjAsIGFkZHI9NCwgdmFs
-dWU9MHg3ZmZmY2VlYjgwYjgsIHNpemU9NCwgc2hpZnQ9MCwNCm1hc2s9NDI5NDk2NzI5NSwgYXR0
-cnM9Li4uKSBhdCAvaG9tZS91c3VhcmlvL0RvY3VtZW50b3MvcWVtdS9tZW1vcnkuYzo1MDQNCiMx
-NyAweDAwMDA1NTU1NTU4N2Y2NWUgaW4gYWNjZXNzX3dpdGhfYWRqdXN0ZWRfc2l6ZSAoYWRkcj00
-LA0KdmFsdWU9MHg3ZmZmY2VlYjgwYjgsIHNpemU9NCwgYWNjZXNzX3NpemVfbWluPTEsIGFjY2Vz
-c19zaXplX21heD00LA0KYWNjZXNzX2ZuPQ0KICAgIDB4NTU1NTU1ODdmMzY1IDxtZW1vcnlfcmVn
-aW9uX3dyaXRlX2FjY2Vzc29yPiwgbXI9MHg3ZmZmY2Q1MzhkNjAsDQphdHRycz0uLi4pIGF0IC9o
-b21lL3VzdWFyaW8vRG9jdW1lbnRvcy9xZW11L21lbW9yeS5jOjU3MA0KIzE4IDB4MDAwMDU1NTU1
-NTg4MjM1OSBpbiBtZW1vcnlfcmVnaW9uX2Rpc3BhdGNoX3dyaXRlDQoobXI9MHg3ZmZmY2Q1Mzhk
-NjAsIGFkZHI9NCwgZGF0YT0yLCBzaXplPTQsIGF0dHJzPS4uLikgYXQNCi9ob21lL3VzdWFyaW8v
-RG9jdW1lbnRvcy9xZW11L21lbW9yeS5jOjE0NTINCiMxOSAweDAwMDA1NTU1NTU4MWQzNTkgaW4g
-ZmxhdHZpZXdfd3JpdGVfY29udGludWUgKGZ2PTB4N2ZmZmM0MTg4YmMwLA0KYWRkcj0zNDM1OTc2
-Mjk0OCwgYXR0cnM9Li4uLCBidWY9MHg3ZmZmZjdmZjMwMjggIlwwMDIiLCBsZW49NCwgYWRkcjE9
-NCwNCmw9NCwgbXI9MHg3ZmZmY2Q1MzhkNjApIGF0IC9ob21lL3VzdWFyaW8vRG9jdW1lbnRvcy9x
-ZW11L2V4ZWMuYzozMjMzDQojMjAgMHgwMDAwNTU1NTU1ODFkNGEzIGluIGZsYXR2aWV3X3dyaXRl
-IChmdj0weDdmZmZjNDE4OGJjMCwNCmFkZHI9MzQzNTk3NjI5NDgsIGF0dHJzPS4uLiwgYnVmPTB4
-N2ZmZmY3ZmYzMDI4ICJcMDAyIiwgbGVuPTQpIGF0DQovaG9tZS91c3VhcmlvL0RvY3VtZW50b3Mv
-cWVtdS9leGVjLmM6MzI3Mg0KIzIxIDB4MDAwMDU1NTU1NTgxZDdhOSBpbiBhZGRyZXNzX3NwYWNl
-X3dyaXRlIChhcz0weDU1NTU1NjdkNjQ2MA0KPGFkZHJlc3Nfc3BhY2VfbWVtb3J5PiwgYWRkcj0z
-NDM1OTc2Mjk0OCwgYXR0cnM9Li4uLCBidWY9MHg3ZmZmZjdmZjMwMjgNCiJcMDAyIiwgbGVuPTQp
-IGF0IC9ob21lL3VzdWFyaW8vRG9jdW1lbnRvcy9xZW11L2V4ZWMuYzozMzYyDQojMjIgMHgwMDAw
-NTU1NTU1ODFkN2ZhIGluIGFkZHJlc3Nfc3BhY2VfcncgKGFzPTB4NTU1NTU2N2Q2NDYwDQo8YWRk
-cmVzc19zcGFjZV9tZW1vcnk+LCBhZGRyPTM0MzU5NzYyOTQ4LCBhdHRycz0uLi4sIGJ1Zj0weDdm
-ZmZmN2ZmMzAyOA0KIlwwMDIiLCBsZW49NCwgaXNfd3JpdGU9dHJ1ZSkgYXQgL2hvbWUvdXN1YXJp
-by9Eb2N1bWVudG9zL3FlbXUvZXhlYy5jOjMzNzMNCiMyMyAweDAwMDA1NTU1NTU4OWVhMzMgaW4g
-a3ZtX2NwdV9leGVjIChjcHU9MHg1NTU1NTZiOWRkZjApIGF0DQovaG9tZS91c3VhcmlvL0RvY3Vt
-ZW50b3MvcWVtdS9hY2NlbC9rdm0va3ZtLWFsbC5jOjIwMzENCiMyNCAweDAwMDA1NTU1NTU4NjQ1
-M2IgaW4gcWVtdV9rdm1fY3B1X3RocmVhZF9mbiAoYXJnPTB4NTU1NTU2YjlkZGYwKSBhdA0KL2hv
-bWUvdXN1YXJpby9Eb2N1bWVudG9zL3FlbXUvY3B1cy5jOjEyODENCiMyNSAweDAwMDA1NTU1NTVl
-MTFkMDcgaW4gcWVtdV90aHJlYWRfc3RhcnQgKGFyZ3M9MHg1NTU1NTZiYmU1MjApIGF0DQp1dGls
-L3FlbXUtdGhyZWFkLXBvc2l4LmM6NDk4DQojMjYgMHgwMDAwN2ZmZmYwNTg2NmRiIGluIHN0YXJ0
-X3RocmVhZCAoYXJnPTB4N2ZmZmNlZWJiNzAwKSBhdA0KcHRocmVhZF9jcmVhdGUuYzo0NjMNCiMy
-NyAweDAwMDA3ZmZmZjAyYWY4OGYgaW4gY2xvbmUgKCkgYXQNCi4uL3N5c2RlcHMvdW5peC9zeXN2
-L2xpbnV4L3g4Nl82NC9jbG9uZS5TOjk1DQoNCk9uICMzIGl0IG91dHB1dHM6DQpObyBzeW1ib2wg
-InAiIGluIGN1cnJlbnQgY29udGV4dC4NCg0KT24gIzQgaXQgc2hvd3M6DQokMiA9IHtwaWQgPSAy
-MjUsIGlkID0gMjAyNzIwMzE2OCwgZXAgPSAweDU1NTU1N2U0NjUyMCwgc3RyZWFtID0gMCwgaW92
-ID0NCntpb3YgPSAweDdmZmZjNDE4ZDE5MCwgbmlvdiA9IDAsIG5hbGxvYyA9IDEsIHNpemUgPSAw
-fSwgcGFyYW1ldGVyID0gMCwNCnNob3J0X25vdF9vayA9IGZhbHNlLCBpbnRfcmVxID0gZmFsc2Us
-IHN0YXR1cyA9IDAsIGFjdHVhbF9sZW5ndGggPSAwLA0KICBzdGF0ZSA9IFVTQl9QQUNLRVRfU0VU
-VVAsIGNvbWJpbmVkID0gMHgwLCBxdWV1ZSA9IHt0cWVfbmV4dCA9IDB4MCwNCnRxZV9wcmV2ID0g
-MHgwfSwgY29tYmluZWRfZW50cnkgPSB7dHFlX25leHQgPSAweDAsIHRxZV9wcmV2ID0gMHgwfX0N
-Cg0Kw4BzIDA0OjM2IGRlIDEwLzEyLzIwMTgsIGtyYXhlbEByZWRoYXQuY29tIGVzY3JldmV1Og0K
-PiAgIEhpLA0KPiANCj4+ICMzICAweDAwMDA3ZmZmZjAxYmU0MTIgaW4gX19HSV9fX2Fzc2VydF9m
-YWlsIChhc3NlcnRpb249MHg1NTU1NTVmYjg3MzgNCj4+ICJwLT5hY3R1YWxfbGVuZ3RoICsgYnl0
-ZXMgPD0gaW92LT5zaXplIiwgZmlsZT0weDU1NTU1NWZiODQ1Ng0KPj4gImh3L3VzYi9jb3JlLmMi
-LCBsaW5lPTU5MiwgZnVuY3Rpb249MHg1NTU1NTVmYjg5ODANCj4+IDxfX1BSRVRUWV9GVU5DVElP
-Tl9fLjI2MzUxPiAidXNiX3BhY2tldF9jb3B5IikgYXQgYXNzZXJ0LmM6MTAxDQo+PiAjNCAgMHgw
-MDAwNTU1NTU1YmQ1ZWQ3IGluIHVzYl9wYWNrZXRfY29weSAocD0weDdmZmZjNDcyMmVhOCwNCj4+
-IHB0cj0weDdmZmZiYzA1M2VlMCwgYnl0ZXM9MTkyKSBhdCBody91c2IvY29yZS5jOjU5Mg0KPiAN
-Cj4gQ2FuIHlvdSAicHJpbnQgKnAiIGhlcmU/DQo+IA0KPiB0aGFua3MsDQo+ICAgR2VyZA0KPiAN
-Cg==
+Am 10.12.2018 um 13:14 hat Denis Plotnikov geschrieben:
+> >> @@ -491,9 +506,17 @@ int64_t aio_compute_timeout(AioContext *ctx);
+> >>    */
+> >>   static inline void aio_disable_external(AioContext *ctx)
+> >>   {
+> >> +    aio_context_acquire(ctx);
+> >>       atomic_inc(&ctx->external_disable_cnt);
+> >> +    aio_context_release(ctx);
+> >>   }
+> > 
+> > This acquire/release pair looks rather useless?
+> 
+> I'm not sure that I understand everything correctly...
+> but can a thread (context) try to disable external in another context?
+
+Yes, that can happen. For example, think of bdrv_drain_all().
+
+Kevin
