@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42158)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <jaap@jcz.nl>)
-	id 1gWSdg-00039g-5B
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 15:58:53 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43114)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <eblake@redhat.com>) id 1gWSiM-0004ok-Dh
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:03:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jaap@jcz.nl>) id 1gWSdc-0008Q0-0u
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 15:58:52 -0500
-Received: from [2a01:7c8:fffd:340:5054:ff:fefb:99] (port=58487
-	helo=mail.jcz.nl)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jaap@jcz.nl>) id 1gWSda-0008Mz-Dl
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 15:58:47 -0500
-Reply-To: jaap@jcz.nl
-References: <20181207155911.12710-1-peter.maydell@linaro.org>
-From: Jaap Crezee <jaap@jcz.nl>
-Message-ID: <2163773a-f826-d713-a29c-c425403505d8@jcz.nl>
-Date: Mon, 10 Dec 2018 21:58:43 +0100
+	(envelope-from <eblake@redhat.com>) id 1gWSiI-0001te-0x
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:03:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47300)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gWSiH-0001tJ-Qf
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:03:37 -0500
+References: <20181210173151.16629-1-dgilbert@redhat.com>
+	<20181210173151.16629-2-dgilbert@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ad65a93f-9b0e-39c3-97ad-9204b30da630@redhat.com>
+Date: Mon, 10 Dec 2018 15:03:27 -0600
 MIME-Version: 1.0
-In-Reply-To: <20181207155911.12710-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: nl-NL
+In-Reply-To: <20181210173151.16629-2-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] cpus.c: Fix race condition in
- cpu_stop_current()
+Subject: Re: [Qemu-devel] [RFC PATCH 1/7] virtio: Add shared memory
+ capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+Cc: sweil@redhat.com, swhiteho@redhat.com, stefanha@redhat.com, vgoyal@redhat.com, miklos@szeredi.hu
 
-Hi again,
-
-On 12/7/18 4:59 PM, Peter Maydell wrote:
-> We use cpu_stop_current() to ensure the current CPU has stopped
-> from places like qemu_system_reset_request(). Unfortunately its
-> current implementation has a race. It calls qemu_cpu_stop(),
-> which sets cpu->stopped to true even though the CPU hasn't
-> actually stopped yet. The main thread will look at the flags
-> set by qemu_system_reset_request() and call pause_all_vcpus().
-> pause_all_vcpus() waits for every cpu to have cpu->stopped true,
-> so it can continue (and we will start the system reset operation)
-> before the vcpu thread has got back to its top level loop.
+On 12/10/18 11:31 AM, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> Instead, just set cpu->stop and call cpu_exit(). This will
-> cause the vcpu to exit back to the top level loop, and there
-> (as part of the wait_io_event code) it will call qemu_cpu_stop().
+> Define a new capability type 'VIRTIO_PCI_CAP_SHARED_MEMORY_CFG'
+> and the data structure 'virtio_pci_shm_cap' to go with it.
+> They allow defining shared memory regions with sizes and offsets
+> of 2^32 and more.
+> Multiple instances of the capability are allowed and distinguished
+> by a device-specific 'id'.
 > 
-> This fixes bugs where the reset request appeared to be ignored
-> or the CPU misbehaved because the reset operation started
-> to change vcpu state while the vcpu thread was still using it.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > ---
-> We discussed this a little while back:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg00154.html
-> and Jaap reported a bug which I suspect of being the same thing:
-> https://lists.gnu.org/archive/html/qemu-discuss/2018-10/msg00014.html
-> 
-> Annoyingly I have lost the test case that demonstrated this
-> race, but I analysed it at the time and this should definitely
-> fix it. I have opted not to try to address any of the other
-> possible cleanup here (eg vm_stop() has a potential similar
-> race if called from a vcpu thread I suspect), since it gets
-> pretty tangled.
-> 
-> Jaap: could you test whether this patch fixes the issue you
-> were seeing, please?
-> ---
->  cpus.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/cpus.c b/cpus.c
-> index 0ddeeefc14f..b09b7027126 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -2100,7 +2100,8 @@ void qemu_init_vcpu(CPUState *cpu)
->  void cpu_stop_current(void)
->  {
->      if (current_cpu) {
-> -        qemu_cpu_stop(current_cpu, true);
-> +        current_cpu->stop = true;
-> +        cpu_exit(current_cpu);
->      }
->  }
->  
+>   hw/virtio/virtio-pci.c                      | 20 ++++++++++++++++++++
+>   include/standard-headers/linux/virtio_pci.h |  9 +++++++++
+>   2 files changed, 29 insertions(+)
 > 
 
+> +++ b/include/standard-headers/linux/virtio_pci.h
+> @@ -113,6 +113,8 @@
+>   #define VIRTIO_PCI_CAP_DEVICE_CFG	4
+>   /* PCI configuration access */
+>   #define VIRTIO_PCI_CAP_PCI_CFG		5
+> +/* Additional shared memory capability */
+> +#define VIRTIO_PCI_CAP_SHARED_MEMORY_CFG 8
+>   
+>   /* This is the PCI capability header: */
+>   struct virtio_pci_cap {
+> @@ -163,6 +165,13 @@ struct virtio_pci_cfg_cap {
+>   	uint8_t pci_cfg_data[4]; /* Data for BAR access. */
+>   };
+>   
+> +struct virtio_pci_shm_cap {
+> +	struct virtio_pci_cap cap;
+> +	uint32_t offset_hi;             /* Most sig 32 bits of offset */
+> +	uint32_t length_hi;             /* Most sig 32 bits of length */
+> +        uint8_t  id;                    /* To distinguish shm chunks */
 
-The patch also fixed the issue on my production system. Thanks!
+TAB damage.
 
-regards,
-
-
-Jaap
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
