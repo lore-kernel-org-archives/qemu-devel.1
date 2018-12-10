@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gWOvw-0004jb-9J
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:01:34 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gWOyv-00071p-9F
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:04:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gWOvt-0001pk-2C
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:01:28 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37740)
+	(envelope-from <richard.henderson@linaro.org>) id 1gWOyo-0003kT-Kr
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:04:33 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:36689)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gWOvs-0001o3-7c
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:01:24 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gWOvp-00022P-PP
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 17:01:21 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 805182E80C3
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 17:01:21 +0000 (UTC)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gWOyn-0003jy-Pi
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:04:26 -0500
+Received: by mail-oi1-x244.google.com with SMTP id x23so9561812oix.3
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 09:04:25 -0800 (PST)
+References: <cover.1544229872.git.alistair.francis@wdc.com>
+	<d6c491ecb5c0224c113ddfb2c06552ec89b68227.1544229872.git.alistair.francis@wdc.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <b4a5e3e9-5e62-c0a3-67e3-891725db89d5@linaro.org>
+Date: Mon, 10 Dec 2018 11:04:21 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Dec 2018 16:48:20 -0000
-From: Eduardo Habkost <ehabkost@redhat.com>
-Reply-To: Bug 1703506 <1703506@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149974876377.6612.10329067332937096720.malonedeb@gac.canonical.com>
-Message-Id: <154446050053.25883.8887182205676047534.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1703506] Re: SMT not supported by QEMU on AMD
- Ryzen CPU
+In-Reply-To: <d6c491ecb5c0224c113ddfb2c06552ec89b68227.1544229872.git.alistair.francis@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v3 04/24] linux-user: riscv: Fix compile
+ failure on riscv32 hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,38 +32,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>
 
-QEMU 3.0 has limited TOPOEXT support.  You can try using `-cpu EPYC`,
-and the `threads` option is supposed to work.
+On 12/7/18 6:46 PM, Alistair Francis wrote:
+> When cross compilling for riscv32 hosts using GCC 8.2 this error is seen:
+>     error: '__NR__llseek' undeclared (first use in this function); did you mean '_llseek'?
+> 
+> To avoid the error let's ensure that __NR__llseek is defined.
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  linux-user/riscv/target_syscall.h | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/linux-user/riscv/target_syscall.h b/linux-user/riscv/target_syscall.h
+> index ee81d8bc88..af73f71839 100644
+> --- a/linux-user/riscv/target_syscall.h
+> +++ b/linux-user/riscv/target_syscall.h
+> @@ -47,6 +47,11 @@ struct target_pt_regs {
+>  #endif
+>  #define UNAME_MINIMUM_RELEASE "4.15.0"
+>  
+> +/* This is sometimes needed to compile riscv32 Linux user mode */
+> +#if !defined(__NR__llseek) && !defined(__NR_lseek)
+> +#define __NR__llseek __NR3264_lseek
+> +#endif
 
--- =
+I'm not quite sure how this could be.  Upstream I see
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1703506
+#if __BITS_PER_LONG == 64 && !defined(__SYSCALL_COMPAT)
+...
+#define __NR_lseek __NR3264_lseek
+...
+#else
+...
+#define __NR_llseek __NR3264_lseek
 
-Title:
-  SMT not supported by QEMU on AMD Ryzen CPU
+so this define should already exist.
 
-Status in QEMU:
-  New
+Do you have the wrong headers installed for the cross-build?
 
-Bug description:
-  HyperThreading/SMT is supported by AMD Ryzen CPUs but results in this
-  message when setting the topology to threads=3D2:
 
-  qemu-system-x86_64: AMD CPU doesn't support hyperthreading. Please
-  configure -smp options properly.
-
-  Checking in a Windows 10 guest reveals that SMT is not enabled, and
-  from what I understand, QEMU converts the topology from threads to
-  cores internally on AMD CPUs. This appears to cause performance
-  problems in the guest perhaps because programs are assuming that these
-  threads are actual cores.
-
-  Software: Linux 4.12, qemu 2.9.0 host with KVM enabled, Windows 10 pro
-  guest
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1703506/+subscriptions
+r~
