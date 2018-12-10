@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gWPW0-0004bO-Jt
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:38:45 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gWPWv-0005H9-6A
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:39:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gWPVx-00077z-Bd
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:38:44 -0500
-Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:35813)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gWPVw-00075W-SZ
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:38:41 -0500
-Received: by mail-ot1-x336.google.com with SMTP id 81so11241704otj.2
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 09:38:40 -0800 (PST)
-References: <cover.1544229872.git.alistair.francis@wdc.com>
-	<989024c7cf2a45f6e4a7d793f7760c90e1b36e45.1544229872.git.alistair.francis@wdc.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b36cd3c2-1094-10bb-670a-fdb09bd9134d@linaro.org>
-Date: Mon, 10 Dec 2018 11:38:37 -0600
+	(envelope-from <ehabkost@redhat.com>) id 1gWPWs-0008PC-2K
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:39:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36022)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gWPWr-0008Jn-Q0
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:39:37 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E2AB23081252
+	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 17:39:36 +0000 (UTC)
+Date: Mon, 10 Dec 2018 15:39:32 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181210173932.GH4669@habkost.net>
+References: <20181204142023.15982-1-marcandre.lureau@redhat.com>
+	<20181210170718.GE4669@habkost.net>
+	<20181210183159.7613d08d@Igors-MacBook-Pro.local>
 MIME-Version: 1.0
-In-Reply-To: <989024c7cf2a45f6e4a7d793f7760c90e1b36e45.1544229872.git.alistair.francis@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3 17/24] riscv: tcg-target: Add slowpath
- load and store instructions
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181210183159.7613d08d@Igors-MacBook-Pro.local>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v5 00/19] Generalize machine
+ compatibility properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,26 +36,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
-Cc: "alistair23@gmail.com" <alistair23@gmail.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 
-On 12/7/18 6:48 PM, Alistair Francis wrote:
-> +    /* Compare masked address with the TLB entry. */
-> +    label_ptr[0] = s->code_ptr;
-> +    tcg_out_opc_branch(s, OPC_BNE, TCG_REG_TMP0, TCG_REG_TMP1, 0);
-> +    /* TODO: Move this out of line
+On Mon, Dec 10, 2018 at 06:31:59PM +0100, Igor Mammedov wrote:
+> On Mon, 10 Dec 2018 15:07:18 -0200
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+>=20
+> > On Tue, Dec 04, 2018 at 06:20:04PM +0400, Marc-Andr=E9 Lureau wrote:
+> > [...]
+> > > Marc-Andr=E9 Lureau (19):
+> > >   tests: qdev_prop_check_globals() doesn't return "all_used"
+> > >   qom: make interface types abstract
+> > >   qom: make user_creatable_complete() specific to UserCreatable
+> > >   accel: register global_props like machine globals
+> > >   qdev: move qdev_prop_register_global_list() to tests
+> > >   qom: remove unimplemented class_finalize
+> >=20
+> > Patches 1-6 (above) queued on machine-next.  Thanks!
+> let's drop patch 6 for now until we decide what to do with GPtrArray le=
+aks
 
-Until you do move this out of line, you need to add the nop that you use for
-normal branches...
+I appreciate your effort to make sure there are no memory
+allocations that could make Valgrind complain, but I don't see
+the point of keeping dead code that was never called in the tree.
 
+Are the new GPtrArray allocations different from the g_malloc0()
+calls in type_new() and type_initialize()?  Doesn't Valgrind
+complain about them today?
 
-> +    /* resolve label address */
-> +    reloc_sbimm12(l->label_ptr[0], s->code_ptr);
-
-... and use patch_reloc(..., R_RISCV_BRANCH, ...).
-Or split that out to its own function too.
-
-Otherwise this branch is going to be out of range at some point.
-
-
-r~
+--=20
+Eduardo
