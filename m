@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gWPPb-0006TT-HT
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:32:09 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gWPRN-00080l-3f
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:33:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gWPPZ-0003fX-Sl
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:32:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52630)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gWPPZ-0003fI-Jw
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:32:05 -0500
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 10 Dec 2018 17:31:50 +0000
-Message-Id: <20181210173151.16629-7-dgilbert@redhat.com>
-In-Reply-To: <20181210173151.16629-1-dgilbert@redhat.com>
-References: <20181210173151.16629-1-dgilbert@redhat.com>
+	(envelope-from <pm215@archaic.org.uk>) id 1gWPRK-0004Pb-Ln
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:33:56 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:53448)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1gWPRK-0004Oe-Cg
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 12:33:54 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 10 Dec 2018 17:33:50 +0000
+Message-Id: <20181210173350.13073-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH 6/7] virtio-fs: Allow mapping of meta data
- version table
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC] hw/alpha/typhoon: Stop calling
+ cpu_unassigned_access()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,177 +26,143 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: vgoyal@redhat.com, miklos@szeredi.hu, stefanha@redhat.com, sweil@redhat.com, swhiteho@redhat.com
+Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+The typhoon MemoryRegionOps callbacks directly call
+cpu_unassigned_access(), presumably as the old-fashioned way
+to provoke a CPU exception.  This won't work since commit
+6ad4d7eed05a1e235 when we switched Alpha over to the
+transaction_failed hook API, because now cpu_unassigned_access()
+is a no-op for Alpha.
 
-The 'meta data version table' is a block of shared memory mapped between
-multiple QEMUs and fuse daemons, so that they can be informed
-of metadata updates.  It's typically a shmfs file, and
-it's specified as :
+Make the MemoryRegionOps callbacks use the read_with_attrs
+and write_with_attrs hooks, so they can signal a failure
+that should cause a CPU exception by returning MEMTX_ERROR.
 
-   -device vhost-user-fs-pci,chardev=3Dchar0,tag=3Dmyfs,cache-size=3D1G,v=
-ersiontable=3D/dev/shm/mdvt1
-
-It gets mapped into the PCI bar after the data cache; it's read only.
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/virtio/vhost-user-fs.c                  | 36 ++++++++++++++++++++++
- hw/virtio/virtio-pci.c                     | 16 ++++++++--
- include/hw/virtio/vhost-user-fs.h          |  4 +++
- include/standard-headers/linux/virtio_fs.h |  1 +
- 4 files changed, 55 insertions(+), 2 deletions(-)
+RFC because untested, since I don't have an alpha test image.
 
-diff --git a/hw/virtio/vhost-user-fs.c b/hw/virtio/vhost-user-fs.c
-index bbb15477e5..a39ecd3a16 100644
---- a/hw/virtio/vhost-user-fs.c
-+++ b/hw/virtio/vhost-user-fs.c
-@@ -296,6 +296,7 @@ static void vuf_device_realize(DeviceState *dev, Erro=
-r **errp)
-     unsigned int i;
-     size_t len;
-     int ret;
-+    int mdvtfd =3D -1;
-=20
-     if (!fs->conf.chardev.chr) {
-         error_setg(errp, "missing chardev");
-@@ -338,6 +339,31 @@ static void vuf_device_realize(DeviceState *dev, Err=
-or **errp)
-                          "no smaller than the page size");
-         return;
+ hw/alpha/typhoon.c | 47 ++++++++++++++++++++++++++--------------------
+ 1 file changed, 27 insertions(+), 20 deletions(-)
+
+diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
+index 8004afe45b3..cbacea5fbd8 100644
+--- a/hw/alpha/typhoon.c
++++ b/hw/alpha/typhoon.c
+@@ -75,7 +75,9 @@ static void cpu_irq_change(AlphaCPU *cpu, uint64_t req)
+     }
+ }
+ 
+-static uint64_t cchip_read(void *opaque, hwaddr addr, unsigned size)
++static MemTxResult cchip_read(void *opaque, hwaddr addr,
++                              uint64_t *data, unsigned size,
++                              MemTxAttrs attrs)
+ {
+     CPUState *cpu = current_cpu;
+     TyphoonState *s = opaque;
+@@ -196,11 +198,11 @@ static uint64_t cchip_read(void *opaque, hwaddr addr, unsigned size)
+         break;
+ 
+     default:
+-        cpu_unassigned_access(cpu, addr, false, false, 0, size);
+-        return -1;
++        return MEMTX_ERROR;
+     }
+ 
+-    return ret;
++    *data = ret;
++    return MEMTX_OK;
+ }
+ 
+ static uint64_t dchip_read(void *opaque, hwaddr addr, unsigned size)
+@@ -209,7 +211,8 @@ static uint64_t dchip_read(void *opaque, hwaddr addr, unsigned size)
+     return 0;
+ }
+ 
+-static uint64_t pchip_read(void *opaque, hwaddr addr, unsigned size)
++static MemTxResult pchip_read(void *opaque, hwaddr addr, uint64_t *data,
++                              unsigned size, MemTxAttrs attrs)
+ {
+     TyphoonState *s = opaque;
+     uint64_t ret = 0;
+@@ -294,15 +297,16 @@ static uint64_t pchip_read(void *opaque, hwaddr addr, unsigned size)
+         break;
+ 
+     default:
+-        cpu_unassigned_access(current_cpu, addr, false, false, 0, size);
+-        return -1;
++        return MEMTX_ERROR;
+     }
+ 
+-    return ret;
++    *data = ret;
++    return MEMTX_OK;
+ }
+ 
+-static void cchip_write(void *opaque, hwaddr addr,
+-                        uint64_t val, unsigned size)
++static MemTxResult cchip_write(void *opaque, hwaddr addr,
++                               uint64_t val, unsigned size,
++                               MemTxAttrs attrs)
+ {
+     TyphoonState *s = opaque;
+     uint64_t oldval, newval;
+@@ -446,9 +450,10 @@ static void cchip_write(void *opaque, hwaddr addr,
+         break;
+ 
+     default:
+-        cpu_unassigned_access(current_cpu, addr, true, false, 0, size);
+-        return;
++        return MEMTX_ERROR;
      }
 +
-+    if (fs->conf.mdvtpath) {
-+        struct stat statbuf;
++    return MEMTX_OK;
+ }
+ 
+ static void dchip_write(void *opaque, hwaddr addr,
+@@ -457,8 +462,9 @@ static void dchip_write(void *opaque, hwaddr addr,
+     /* Skip this.  It's all related to DRAM timing and setup.  */
+ }
+ 
+-static void pchip_write(void *opaque, hwaddr addr,
+-                        uint64_t val, unsigned size)
++static MemTxResult pchip_write(void *opaque, hwaddr addr,
++                               uint64_t val, unsigned size,
++                               MemTxAttrs attrs)
+ {
+     TyphoonState *s = opaque;
+     uint64_t oldval;
+@@ -553,14 +559,15 @@ static void pchip_write(void *opaque, hwaddr addr,
+         break;
+ 
+     default:
+-        cpu_unassigned_access(current_cpu, addr, true, false, 0, size);
+-        return;
++        return MEMTX_ERROR;
+     }
 +
-+        mdvtfd =3D open(fs->conf.mdvtpath, O_RDWR);
-+        if (mdvtfd < 0) {
-+            error_setg_errno(errp, errno,
-+                             "Failed to open meta-data version table '%s=
-'",
-+                             fs->conf.mdvtpath);
-+
-+            return;
-+        }
-+        if (fstat(mdvtfd, &statbuf) =3D=3D -1) {
-+            error_setg_errno(errp, errno,
-+                             "Failed to stat meta-data version table '%s=
-'",
-+                             fs->conf.mdvtpath);
-+            close(mdvtfd);
-+            return;
-+        }
-+
-+        fs->mdvt_size =3D statbuf.st_size;
-+    }
-+    fprintf(stderr, "%s: cachesize=3D%zd mdvt_size=3D%zd\n", __func__,
-+            fs->conf.cache_size, fs->mdvt_size);
-+
-     /* We need a region with some host memory, 'ram' is the easiest */
-     memory_region_init_ram_nomigrate(&fs->cache, OBJECT(vdev),
-                        "virtio-fs-cache",
-@@ -348,6 +374,15 @@ static void vuf_device_realize(DeviceState *dev, Err=
-or **errp)
-     mprotect(memory_region_get_ram_ptr(&fs->cache), fs->conf.cache_size,
-              PROT_NONE);
-=20
-+
-+    if (mdvtfd) {
-+        memory_region_init_ram_from_fd(&fs->mdvt, OBJECT(vdev),
-+                       "virtio-fs-mdvt",
-+                       fs->mdvt_size, true, mdvtfd, NULL);
-+        /* The version table is read-only by the guest */
-+        memory_region_set_readonly(&fs->mdvt, true);
-+    }
-+
-     fs->vhost_user =3D vhost_user_init();
-     if (!fs->vhost_user) {
-         error_setg(errp, "failed to initialize vhost-user");
-@@ -416,6 +451,7 @@ static Property vuf_properties[] =3D {
-     DEFINE_PROP_UINT16("queue-size", VHostUserFS, conf.queue_size, 128),
-     DEFINE_PROP_STRING("vhostfd", VHostUserFS, conf.vhostfd),
-     DEFINE_PROP_SIZE("cache-size", VHostUserFS, conf.cache_size, 1ull <<=
- 30),
-+    DEFINE_PROP_STRING("versiontable", VHostUserFS, conf.mdvtpath),
-     DEFINE_PROP_END_OF_LIST(),
++    return MEMTX_OK;
+ }
+ 
+ static const MemoryRegionOps cchip_ops = {
+-    .read = cchip_read,
+-    .write = cchip_write,
++    .read_with_attrs = cchip_read,
++    .write_with_attrs = cchip_write,
+     .endianness = DEVICE_LITTLE_ENDIAN,
+     .valid = {
+         .min_access_size = 8,
+@@ -587,8 +594,8 @@ static const MemoryRegionOps dchip_ops = {
  };
-=20
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index e819a29fb1..d8785b78bf 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -2680,20 +2680,32 @@ static void vhost_user_fs_pci_realize(VirtIOPCIPr=
-oxy *vpci_dev, Error **errp)
-     VHostUserFSPCI *dev =3D VHOST_USER_FS_PCI(vpci_dev);
-     DeviceState *vdev =3D DEVICE(&dev->vdev);
-     uint64_t cachesize;
-+    uint64_t totalsize;
-=20
-     qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
-     object_property_set_bool(OBJECT(vdev), true, "realized", errp);
-     cachesize =3D memory_region_size(&dev->vdev.cache);
-=20
-+    /* PCIe bar needs to be a power of 2 */
-+    totalsize =3D pow2ceil(cachesize + dev->vdev.mdvt_size);
-+
-     /* The bar starts with the data/DAX cache
--     * Others will be added later.
-+     * followed by the metadata cache.
-      */
-     memory_region_init(&dev->cachebar, OBJECT(vpci_dev),
--                       "vhost-fs-pci-cachebar", cachesize);
-+                       "vhost-fs-pci-cachebar", totalsize);
-     memory_region_add_subregion(&dev->cachebar, 0, &dev->vdev.cache);
-     virtio_pci_add_shm_cap(vpci_dev, VIRTIO_FS_PCI_CACHE_BAR, 0, cachesi=
-ze,
-                            VIRTIO_FS_PCI_SHMCAP_ID_CACHE);
-=20
-+    if (dev->vdev.mdvt_size) {
-+        memory_region_add_subregion(&dev->cachebar, cachesize,
-+                                    &dev->vdev.mdvt);
-+        virtio_pci_add_shm_cap(vpci_dev, VIRTIO_FS_PCI_CACHE_BAR,
-+                               cachesize, dev->vdev.mdvt_size,
-+                               VIRTIO_FS_PCI_SHMCAP_ID_VERTAB);
-+    }
-+
-     /* After 'realized' so the memory region exists */
-     pci_register_bar(&vpci_dev->pci_dev, VIRTIO_FS_PCI_CACHE_BAR,
-                      PCI_BASE_ADDRESS_SPACE_MEMORY |
-diff --git a/include/hw/virtio/vhost-user-fs.h b/include/hw/virtio/vhost-=
-user-fs.h
-index 9989bcd9e7..281ae0a52d 100644
---- a/include/hw/virtio/vhost-user-fs.h
-+++ b/include/hw/virtio/vhost-user-fs.h
-@@ -48,6 +48,7 @@ typedef struct {
-     uint16_t queue_size;
-     char *vhostfd;
-     size_t cache_size;
-+    char *mdvtpath;
- } VHostUserFSConf;
-=20
- typedef struct {
-@@ -60,6 +61,9 @@ typedef struct {
-=20
-     /*< public >*/
-     MemoryRegion cache;
-+    /* Metadata version table */
-+    size_t mdvt_size;
-+    MemoryRegion mdvt;
- } VHostUserFS;
-=20
- /* Callbacks from the vhost-user code for slave commands */
-diff --git a/include/standard-headers/linux/virtio_fs.h b/include/standar=
-d-headers/linux/virtio_fs.h
-index b5f137ca79..77fa651073 100644
---- a/include/standard-headers/linux/virtio_fs.h
-+++ b/include/standard-headers/linux/virtio_fs.h
-@@ -42,5 +42,6 @@ struct virtio_fs_config {
-=20
- /* For the id field in virtio_pci_shm_cap */
- #define VIRTIO_FS_PCI_SHMCAP_ID_CACHE 0
-+#define VIRTIO_FS_PCI_SHMCAP_ID_VERTAB 1
-=20
- #endif /* _LINUX_VIRTIO_FS_H */
---=20
+ 
+ static const MemoryRegionOps pchip_ops = {
+-    .read = pchip_read,
+-    .write = pchip_write,
++    .read_with_attrs = pchip_read,
++    .write_with_attrs = pchip_write,
+     .endianness = DEVICE_LITTLE_ENDIAN,
+     .valid = {
+         .min_access_size = 8,
+-- 
 2.19.2
