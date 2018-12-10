@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gWSnh-0007Sc-0G
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:09:14 -0500
+	(envelope-from <eblake@redhat.com>) id 1gWSol-0008Dv-H4
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:10:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gWSnd-0004iK-63
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:09:12 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:33420)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gWSnb-0004hb-7h
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:09:07 -0500
-Received: by mail-ot1-x341.google.com with SMTP id i20so11906881otl.0
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 13:09:06 -0800 (PST)
-References: <20181207085635.4291-1-mark.cave-ayland@ilande.co.uk>
-	<alpine.BSF.2.21.9999.1812100112050.45639@zero.eik.bme.hu>
-	<20181210025943.GE4261@umbus.fritz.box>
-	<alpine.BSF.2.21.9999.1812102035360.24343@zero.eik.bme.hu>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <763b8fce-daee-97ff-f1da-4f6dba6c5036@linaro.org>
-Date: Mon, 10 Dec 2018 15:09:01 -0600
+	(envelope-from <eblake@redhat.com>) id 1gWSoi-0005Be-2q
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:10:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47344)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gWSog-00058S-6r
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 16:10:14 -0500
+References: <20181210173151.16629-1-dgilbert@redhat.com>
+	<20181210173151.16629-4-dgilbert@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b2ca83a1-6515-e291-fd7c-ea08ae93e6e0@redhat.com>
+Date: Mon, 10 Dec 2018 15:10:00 -0600
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.9999.1812102035360.24343@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20181210173151.16629-4-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH 0/6] target/ppc: convert VMX
- instructions to use TCG vector operations
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 3/7] virtio-fs: Add cache BAR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,22 +28,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+Cc: sweil@redhat.com, swhiteho@redhat.com, stefanha@redhat.com, vgoyal@redhat.com, miklos@szeredi.hu
 
-On 12/10/18 2:54 PM, BALATON Zoltan wrote:
->> What was your host machine.  IIUC this change will only improve
->> performance if the host tcg backend is able to implement TCG vector
->> ops in terms of vector ops on the host.
+On 12/10/18 11:31 AM, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> Tried it on i5 650 which has: sse sse2 ssse3 sse4_1 sse4_2. I assume x86_64
-> should be supported but not sure what are the CPU requirements.
+> Add a cache BAR into which files will be directly mapped.
+> The size cacn be set with the cache-size= property, e.g.
 
-Not quite.  I only support avx1 and later.
+s/cacn/can/
 
-I thought about supporting sse4 and later (that's the minimum with all of the
-instructions that do what we need), but there is only one cpu generation with
-sse4 and without avx1, and avx1 is already 8 years old.
-
-
-r~
+>     -device vhost-user-fs-pci,chardev=char0,tag=myfs,cache-size=16G
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
