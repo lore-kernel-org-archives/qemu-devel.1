@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gWO97-0006kR-5k
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:11:02 -0500
+	(envelope-from <venu.busireddy@oracle.com>) id 1gWOE5-0001GM-EQ
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:16:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gWO93-0007Qg-L9
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:11:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49656)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gWO93-0007PX-87
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:10:57 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7A5E430832E3
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 16:10:55 +0000 (UTC)
-References: <20181207170400.5129-1-philmd@redhat.com>
-	<20181207170400.5129-5-philmd@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <8ec2e7fd-bf8e-e537-6a9c-905312bafc94@redhat.com>
-Date: Mon, 10 Dec 2018 17:10:40 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181207170400.5129-5-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/6] hw/nvram/fw_cfg: Add trace events
+	(envelope-from <venu.busireddy@oracle.com>) id 1gWOE2-0001h7-8u
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:16:09 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:39134)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <venu.busireddy@oracle.com>)
+	id 1gWOE1-0001fw-Vk
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:16:06 -0500
+From: Venu Busireddy <venu.busireddy@oracle.com>
+Date: Mon, 10 Dec 2018 11:15:45 -0500
+Message-Id: <1544458548-5986-1-git-send-email-venu.busireddy@oracle.com>
+Subject: [Qemu-devel] [PATCH 0/3] Support for datapath switching during live
+ migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,100 +23,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: venu.busireddy@oracle.com, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-On 12/07/18 18:03, Philippe Mathieu-Daud=C3=A9 wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  hw/nvram/fw_cfg.c     | 5 +++++
->  hw/nvram/trace-events | 5 +++++
->  2 files changed, 10 insertions(+)
->=20
-> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index 3cb726ff68..582653f07e 100644
-> --- a/hw/nvram/fw_cfg.c
-> +++ b/hw/nvram/fw_cfg.c
-> @@ -627,6 +627,7 @@ static void *fw_cfg_modify_bytes_read(FWCfgState *s=
-, uint16_t key,
-> =20
->  void fw_cfg_add_bytes(FWCfgState *s, uint16_t key, void *data, size_t =
-len)
->  {
-> +    trace_fw_cfg_add_bytes(key, len);
->      fw_cfg_add_bytes_callback(s, key, NULL, NULL, NULL, data, len, tru=
-e);
->  }
-> =20
-> @@ -634,6 +635,7 @@ void fw_cfg_add_string(FWCfgState *s, uint16_t key,=
- const char *value)
->  {
->      size_t sz =3D strlen(value) + 1;
-> =20
-> +    trace_fw_cfg_add_string(key, value);
->      fw_cfg_add_bytes(s, key, g_memdup(value, sz), sz);
->  }
-> =20
-> @@ -643,6 +645,7 @@ void fw_cfg_add_i16(FWCfgState *s, uint16_t key, ui=
-nt16_t value)
-> =20
->      copy =3D g_malloc(sizeof(value));
->      *copy =3D cpu_to_le16(value);
-> +    trace_fw_cfg_add_i16(key, value);
->      fw_cfg_add_bytes(s, key, copy, sizeof(value));
->  }
-> =20
-> @@ -662,6 +665,7 @@ void fw_cfg_add_i32(FWCfgState *s, uint16_t key, ui=
-nt32_t value)
-> =20
->      copy =3D g_malloc(sizeof(value));
->      *copy =3D cpu_to_le32(value);
-> +    trace_fw_cfg_add_i32(key, value);
->      fw_cfg_add_bytes(s, key, copy, sizeof(value));
->  }
-> =20
-> @@ -671,6 +675,7 @@ void fw_cfg_add_i64(FWCfgState *s, uint16_t key, ui=
-nt64_t value)
-> =20
->      copy =3D g_malloc(sizeof(value));
->      *copy =3D cpu_to_le64(value);
-> +    trace_fw_cfg_add_i64(key, value);
->      fw_cfg_add_bytes(s, key, copy, sizeof(value));
->  }
-> =20
-> diff --git a/hw/nvram/trace-events b/hw/nvram/trace-events
-> index 6b55ba7a09..0ee0f8d04a 100644
-> --- a/hw/nvram/trace-events
-> +++ b/hw/nvram/trace-events
-> @@ -7,4 +7,9 @@ nvram_write(uint32_t addr, uint32_t old, uint32_t val) =
-"write addr %d: 0x%02x ->
->  # hw/nvram/fw_cfg.c
->  fw_cfg_select(void *s, uint16_t key, int ret) "%p key %d =3D %d"
->  fw_cfg_read(void *s, uint64_t ret) "%p =3D 0x%"PRIx64
-> +fw_cfg_add_bytes(uint16_t key, size_t len) "key 0x%04" PRIx16 " (%zu b=
-ytes)"
->  fw_cfg_add_file(void *s, int index, char *name, size_t len) "%p #%d: %=
-s (%zd bytes)"
-> +fw_cfg_add_string(uint16_t key, const char *value) "key 0x%04" PRIx16 =
-", value '%s'"
-> +fw_cfg_add_i16(uint16_t key, uint32_t value) "key 0x%04" PRIx16 ", val=
-ue 0x%" PRIx32
+Implement the infrastructure to support datapath switching during live
+migration involving SR-IOV devices.
 
-For the "value" parameter, you should use "uint16_t" here (and replace
-PRIx32 with PRIx16, as well).
+1. This patch is based off on the current VIRTIO_NET_F_STANDBY feature
+   bit and MAC address device pairing.
 
-(In practice this will make no difference, but for consistency's sake,
-we should do this.)
+2. This set of events will be consumed by userspace management software
+   to orchestrate all the hot plug and datapath switching activities.
+   This scheme has the least QEMU modifications while allowing userspace
+   software to build its own intelligence to control the whole process
+   of SR-IOV live migration.
 
-With the update:
+3. While the hidden device model (viz. coupled device model) is still
+   being explored for automatic hot plugging (QEMU) and automatic datapath
+   switching (host-kernel), this series provides a supplemental set
+   of interfaces if management software wants to drive the SR-IOV live
+   migration on its own. It should not conflict with the hidden device
+   model but just offers simplicity of implementation.
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Sridhar Samudrala (1):
+  virtio_net: Add VIRTIO_NET_F_STANDBY feature bit.
 
-Thanks
-Laszlo
+Venu Busireddy (1):
+  virtio_net: Add support for "Data Path Switching" during Live Migration.
 
-> +fw_cfg_add_i32(uint16_t key, uint32_t value) "key 0x%04" PRIx16 ", val=
-ue 0x%" PRIx32
-> +fw_cfg_add_i64(uint16_t key, uint64_t value) "key 0x%04" PRIx16 ", val=
-ue 0x%" PRIx64
->=20
+Si-Wei Liu (1):
+  vfio-pci: Add FAILOVER_PRIMARY_CHANGED event to shorten downtime during failover
+
+ hw/acpi/pcihp.c                | 27 ++++++++++++++++
+ hw/net/virtio-net.c            | 25 +++++++++++++++
+ hw/vfio/pci.c                  | 60 ++++++++++++++++++++++++++++++++++++
+ hw/vfio/pci.h                  |  1 +
+ include/hw/pci/pci.h           |  1 +
+ include/hw/virtio/virtio-net.h |  4 +++
+ qapi/net.json                  | 70 ++++++++++++++++++++++++++++++++++++++++++
+ 7 files changed, 188 insertions(+)
