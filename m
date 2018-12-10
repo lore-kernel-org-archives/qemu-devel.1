@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWJZ2-0003Gl-Dc
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 06:17:31 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gWJiK-0007KN-4I
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 06:27:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWJZ0-0008Ox-MM
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 06:17:28 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:41972)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gWJZ0-0008OG-EC
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 06:17:26 -0500
-Received: by mail-oi1-x244.google.com with SMTP id j21so8633665oii.8
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 03:17:26 -0800 (PST)
-MIME-Version: 1.0
-References: <20181207155911.12710-1-peter.maydell@linaro.org>
-	<87wooh1w21.fsf@linaro.org>
-In-Reply-To: <87wooh1w21.fsf@linaro.org>
+	(envelope-from <pm215@archaic.org.uk>) id 1gWJiJ-00064c-44
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 06:27:04 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Dec 2018 11:17:13 +0000
-Message-ID: <CAFEAcA8x6Xv0dL_zZRzMENhixBFw2xd5=0hYwpDF86FiH_WkSQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] cpus.c: Fix race condition in
- cpu_stop_current()
+Date: Mon, 10 Dec 2018 11:26:48 +0000
+Message-Id: <20181210112649.11581-3-peter.maydell@linaro.org>
+In-Reply-To: <20181210112649.11581-1-peter.maydell@linaro.org>
+References: <20181210112649.11581-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 2/3] block/vdi: Don't take address of fields in
+ packed structs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,77 +22,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Jaap Crezee <jaap@jcz.nl>, "patches@linaro.org" <patches@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Ben Warren <ben@skyportsystems.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Weil <sw@weilnetz.de>
 
-On Mon, 10 Dec 2018 at 11:06, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
->
->
-> Peter Maydell <peter.maydell@linaro.org> writes:
-> > We discussed this a little while back:
-> > https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg00154.html
-> > and Jaap reported a bug which I suspect of being the same thing:
-> > https://lists.gnu.org/archive/html/qemu-discuss/2018-10/msg00014.html
-> >
-> > Annoyingly I have lost the test case that demonstrated this
-> > race, but I analysed it at the time and this should definitely
-> > fix it. I have opted not to try to address any of the other
-> > possible cleanup here (eg vm_stop() has a potential similar
-> > race if called from a vcpu thread I suspect), since it gets
-> > pretty tangled.
-> >
-> > Jaap: could you test whether this patch fixes the issue you
-> > were seeing, please?
-> > ---
-> >  cpus.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/cpus.c b/cpus.c
-> > index 0ddeeefc14f..b09b7027126 100644
-> > --- a/cpus.c
-> > +++ b/cpus.c
-> > @@ -2100,7 +2100,8 @@ void qemu_init_vcpu(CPUState *cpu)
-> >  void cpu_stop_current(void)
-> >  {
-> >      if (current_cpu) {
-> > -        qemu_cpu_stop(current_cpu, true);
-> > +        current_cpu->stop =3D true;
-> > +        cpu_exit(current_cpu);
->
-> Should the FIXME in vm_stop also be fixed?
->
->         /*
->          * FIXME: should not return to device code in case
->          * vm_stop() has been requested.
->          */
->         cpu_stop_current();
->         return 0;
+Taking the address of a field in a packed struct is a bad idea, because
+it might not be actually aligned enough for that pointer type (and
+thus cause a crash on dereference on some host architectures). Newer
+versions of clang warn about this.
 
-This is one of the things I had in mind with:
-> > I have opted not to try to address any of the other
-> > possible cleanup here (eg vm_stop() has a potential similar
-> > race if called from a vcpu thread I suspect), since it gets
-> > pretty tangled.
+Instead of passing UUID related functions the address of a possibly
+unaligned QemuUUID struct, use local variables and then copy to/from
+the struct field as appropriate.
 
-though I might actually have meant pause_all_vcpus().
-(For pause_all_vcpus() I think the correct thing is to
-fix the hw/i386/kvmvapic.c code to work in some other way,
-and then assert that pause_all_vcpus() is never called from
-the VCPU thread.)
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ block/vdi.c | 38 +++++++++++++++++++++++++-------------
+ 1 file changed, 25 insertions(+), 13 deletions(-)
 
-At any rate, this code is quite complicated, so I think
-it's worth just fixing this specific race without getting
-tangled up in everything else we could potentially refactor.
-
-I'm not even sure how we would arrange for vm_stop() to
-avoid returning to device emulation code if it has been
-called from there -- I would favour instead changing/defining
-the semantics to be like the shutdown-request and reset-request
-where the device code expects that control will return but
-the VM stop happens at the next opportunity, ie as soon
-as the execution of the insn which wrote to the device
-register has completed.
-
-thanks
--- PMM
+diff --git a/block/vdi.c b/block/vdi.c
+index 2380daa583e..4cc726047c3 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -235,7 +235,8 @@ static void vdi_header_to_le(VdiHeader *header)
+ 
+ static void vdi_header_print(VdiHeader *header)
+ {
+-    char uuid[37];
++    char uuidstr[37];
++    QemuUUID uuid;
+     logout("text        %s", header->text);
+     logout("signature   0x%08x\n", header->signature);
+     logout("header size 0x%04x\n", header->header_size);
+@@ -254,14 +255,18 @@ static void vdi_header_print(VdiHeader *header)
+     logout("block extra 0x%04x\n", header->block_extra);
+     logout("blocks tot. 0x%04x\n", header->blocks_in_image);
+     logout("blocks all. 0x%04x\n", header->blocks_allocated);
+-    qemu_uuid_unparse(&header->uuid_image, uuid);
+-    logout("uuid image  %s\n", uuid);
+-    qemu_uuid_unparse(&header->uuid_last_snap, uuid);
+-    logout("uuid snap   %s\n", uuid);
+-    qemu_uuid_unparse(&header->uuid_link, uuid);
+-    logout("uuid link   %s\n", uuid);
+-    qemu_uuid_unparse(&header->uuid_parent, uuid);
+-    logout("uuid parent %s\n", uuid);
++    uuid = header->uuid_image;
++    qemu_uuid_unparse(&uuid, uuidstr);
++    logout("uuid image  %s\n", uuidstr);
++    uuid = header->uuid_last_snap;
++    qemu_uuid_unparse(&uuid, uuidstr);
++    logout("uuid snap   %s\n", uuidstr);
++    uuid = header->uuid_link;
++    qemu_uuid_unparse(&uuid, uuidstr);
++    logout("uuid link   %s\n", uuidstr);
++    uuid = header->uuid_parent;
++    qemu_uuid_unparse(&uuid, uuidstr);
++    logout("uuid parent %s\n", uuidstr);
+ }
+ 
+ static int coroutine_fn vdi_co_check(BlockDriverState *bs, BdrvCheckResult *res,
+@@ -368,6 +373,7 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
+     size_t bmap_size;
+     int ret;
+     Error *local_err = NULL;
++    QemuUUID uuid_link, uuid_parent;
+ 
+     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file,
+                                false, errp);
+@@ -395,6 +401,9 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
+         goto fail;
+     }
+ 
++    uuid_link = header.uuid_link;
++    uuid_parent = header.uuid_parent;
++
+     if (header.disk_size % SECTOR_SIZE != 0) {
+         /* 'VBoxManage convertfromraw' can create images with odd disk sizes.
+            We accept them but round the disk size to the next multiple of
+@@ -444,11 +453,11 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
+                    (uint64_t)header.blocks_in_image * header.block_size);
+         ret = -ENOTSUP;
+         goto fail;
+-    } else if (!qemu_uuid_is_null(&header.uuid_link)) {
++    } else if (!qemu_uuid_is_null(&uuid_link)) {
+         error_setg(errp, "unsupported VDI image (non-NULL link UUID)");
+         ret = -ENOTSUP;
+         goto fail;
+-    } else if (!qemu_uuid_is_null(&header.uuid_parent)) {
++    } else if (!qemu_uuid_is_null(&uuid_parent)) {
+         error_setg(errp, "unsupported VDI image (non-NULL parent UUID)");
+         ret = -ENOTSUP;
+         goto fail;
+@@ -733,6 +742,7 @@ static int coroutine_fn vdi_co_do_create(BlockdevCreateOptions *create_options,
+     BlockDriverState *bs_file = NULL;
+     BlockBackend *blk = NULL;
+     uint32_t *bmap = NULL;
++    QemuUUID uuid;
+ 
+     assert(create_options->driver == BLOCKDEV_DRIVER_VDI);
+     vdi_opts = &create_options->u.vdi;
+@@ -819,8 +829,10 @@ static int coroutine_fn vdi_co_do_create(BlockdevCreateOptions *create_options,
+     if (image_type == VDI_TYPE_STATIC) {
+         header.blocks_allocated = blocks;
+     }
+-    qemu_uuid_generate(&header.uuid_image);
+-    qemu_uuid_generate(&header.uuid_last_snap);
++    qemu_uuid_generate(&uuid);
++    header.uuid_image = uuid;
++    qemu_uuid_generate(&uuid);
++    header.uuid_last_snap = uuid;
+     /* There is no need to set header.uuid_link or header.uuid_parent here. */
+     if (VDI_DEBUG) {
+         vdi_header_print(&header);
+-- 
+2.19.2
