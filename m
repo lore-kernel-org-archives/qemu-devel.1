@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gWNIu-0001Tb-Um
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:17:06 -0500
+	(envelope-from <berrange@redhat.com>) id 1gWNLa-0002hs-OG
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:19:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gWNIt-0003XT-Ia
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:17:04 -0500
-Date: Mon, 10 Dec 2018 15:16:48 +0000
+	(envelope-from <berrange@redhat.com>) id 1gWNLX-0004V1-0h
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 10:19:50 -0500
+Date: Mon, 10 Dec 2018 15:19:19 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181210151648.GN20272@redhat.com>
+Message-ID: <20181210151918.GO20272@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20181207161351.4380-1-vsementsov@virtuozzo.com>
-	<20181207161351.4380-6-vsementsov@virtuozzo.com>
-	<w514lbllblo.fsf@maestria.local.igalia.com>
-	<20181210145203.GM20272@redhat.com>
-	<w511s6pl8pg.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <w511s6pl8pg.fsf@maestria.local.igalia.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] crypto: support multiple threads
- accessing one QCryptoBlock
+In-Reply-To: <20181207161351.4380-1-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] crypto threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +23,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, berto@igalia.com, den@openvz.org
 
-On Mon, Dec 10, 2018 at 04:09:31PM +0100, Alberto Garcia wrote:
-> On Mon 10 Dec 2018 03:52:03 PM CET, Daniel P. Berrang=C3=A9 wrote:
-> >> > +int qcrypto_block_init_cipher(QCryptoBlock *block,
-> >> > +                              QCryptoCipherAlgorithm alg,
-> >> > +                              QCryptoCipherMode mode,
-> >> > +                              const uint8_t *key, size_t nkey,
-> >> > +                              size_t n_threads, Error **errp)
-> >> > +{
-> >> > +    size_t i;
-> >> > +
-> >> > +    assert(!block->ciphers && !block->n_ciphers && !block->n_free=
-_ciphers);
-> >> > +
-> >> > +    block->ciphers =3D g_new0(QCryptoCipher *, n_threads);
-> >>=20
-> >> You can use g_new() instead of g_new0() because you're anyway
-> >> overwriting all elements of the array.
-> >
-> > I'd rather have it initialized to zero upfront, so if creating any
-> > cipher in the array fails, we don't have uninitialized array elements
-> > during later cleanup code.
->=20
-> But it is the value of block->n_ciphers that determines the size of the
-> array, and that is only incremented after each successful iteration:
->=20
->   for (i =3D 0; i < n_threads; i++) {
->       block->ciphers[i] =3D qcrypto_cipher_new(alg, mode, key, nkey, er=
-rp);
->       /* ... error handling ... */
->       block->n_ciphers++;
->       block->n_free_ciphers++;
->   }
->=20
-> In other words, the cleanup code won't touch uninitialized elements
-> because it cannot even tell the difference between an index that points
-> to an uninitialized element of the array and an index that points beyon=
-d
-> the allocated memory.
+On Fri, Dec 07, 2018 at 07:13:46PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+> Hi all.
+> 
+> v3:
+> 01: add r-b by Daniel and Alberto
+> 02: Alberto r-b
+>     encrypt->encdec for generic
+> 03: qcrypto_cipher_*crypt_helper->
+>     qcrypto_block_cipher_*crypt_helper
+> 04: rebased on previous renamings
+>     Daniel r-b
+> 05: use size_t
+>     improve comment about n_threads
+>     don't use ret in qcrypto_block_luks_create
+>     do qemu_mutex_init at the end of open/create
+>     do qemu_mutex_destroy in free
+>     fix comment for qcrypto_block_get_cipher
+> 
+> v2:
+> 05: fix compilation of test-crypto-block (I am ashamed:(
+>     and change QCryptoBlock interface to be a bit more safe.
+> 
+> These series are preliminary step before moving encryption code in
+> qcow2 to the threads. The first attempt of doing it is on list
+> ([PATCH 00/11] qcow2: encryption threads : 
+>  https://lists.gnu.org/archive/html/qemu-block/2018-11/msg00729.html)
+> But it's approach with multiplying the whole QCryptoBlock per thread
+> was rejected. So, here is a solution to maintain multitasking inside
+> QCryptoBlock.
 
-.../correctly written/ cleanup code won't touch uninitialized elements...
-
-I prefer to see the code be hardened against mistakes and so would always
-zero-initialize everything unless there's compelling performance reason
-not to in certain specific places.
+Thanks, I've queued this series for when 4.0 opens up.
 
 Regards,
 Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
