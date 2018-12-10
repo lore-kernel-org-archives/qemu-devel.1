@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gWOgb-0004i3-8o
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:45:39 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gWOi3-0005nn-0p
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:47:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gWOgW-0000gC-MP
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:45:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32775)
+	(envelope-from <ehabkost@redhat.com>) id 1gWOi0-0001YB-Q5
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:47:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:27717)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gWOgW-0000Zw-9p
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:45:32 -0500
-Date: Mon, 10 Dec 2018 17:45:22 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181210174522.04b21215@Igors-MacBook-Pro.local>
-In-Reply-To: <20181204142023.15982-8-marcandre.lureau@redhat.com>
-References: <20181204142023.15982-1-marcandre.lureau@redhat.com>
-	<20181204142023.15982-8-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gWOi0-0001Xj-Ec
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 11:47:04 -0500
+Date: Mon, 10 Dec 2018 14:46:57 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181210164657.GB4669@habkost.net>
+References: <20181207221417.5152-1-wainersm@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v5 07/19] hw: apply accel compat
- properties without touching globals
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181207221417.5152-1-wainersm@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] target/i386: Fixes to the check missing
+ features routine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,110 +27,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Andreas =?UTF-8?Q?F=C3=A4rber?= <afaerber@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, "open list:X86" <xen-devel@lists.xenproject.org>
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, ccarrara@redhat.com, crosa@redhat.com
 
-On Tue,  4 Dec 2018 18:20:11 +0400
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
-
-> Instead of registering compat properties as globals, let's keep them
-> in their own array, to avoid mixing with user globals.
->=20
-> Introduce object_apply_global_props() function, to apply compatibility
-> properties from a GPtrArray.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On Fri, Dec 07, 2018 at 05:14:17PM -0500, Wainer dos Santos Moschetta wrote:
+> The x86_cpu_class_check_missing_features() returns a list
+> of unavailable features compared to the host CPU. Currently it may
+> return empty strings for unamed features as well as duplicated
+> names.
+> 
+> For example, the qmp "query-cpu-definitions" below shows one empty
+> string and repeated "mpx" entries:
+> 
+> (...)
+> {"execute": "query-cpu-definitions"}
+> (...)
+>         {
+>             "name": "Cascadelake-Server",
+>             "typename": "Cascadelake-Server-x86_64-cpu",
+>             "unavailable-features": [
+>                 "hle",
+>                 "rtm",
+>                 "mpx",
+>                 "avx512f",
+>                 "avx512dq",
+>                 "rdseed",
+>                 "adx",
+>                 "smap",
+>                 "clflushopt",
+>                 "clwb",
+>                 "intel-pt",
+>                 "avx512cd",
+>                 "avx512bw",
+>                 "avx512vl",
+>                 "pku",
+>                 "",
+>                 "avx512vnni",
+>                 "spec-ctrl",
+>                 "ssbd",
+>                 "3dnowprefetch",
+>                 "xsavec",
+>                 "xgetbv1",
+>                 "mpx",
+>                 "mpx",
+>                 "avx512f",
+>                 "avx512f",
+>                 "avx512f",
+>                 "pku"
+>             ],
+> (...)
+> 
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
 > ---
->  include/hw/qdev-core.h | 10 ++++++++++
->  include/qom/object.h   |  3 +++
->  include/sysemu/accel.h |  4 +---
->  accel/accel.c          | 12 ------------
->  hw/core/qdev.c         |  9 +++++++++
->  hw/xen/xen-common.c    |  9 ++++++---
->  qom/object.c           | 25 +++++++++++++++++++++++++
->  vl.c                   |  1 -
->  8 files changed, 54 insertions(+), 19 deletions(-)
->=20
-[...]
-> diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
-> index 6ec14c73ca..4532aa8632 100644
-> --- a/hw/xen/xen-common.c
-> +++ b/hw/xen/xen-common.c
-> @@ -174,18 +174,21 @@ static GlobalProperty xen_compat_props[] =3D {
->          .driver =3D "migration",
->          .property =3D "send-section-footer",
->          .value =3D "off",
-> -    },
-> -    { /* end of list */ },
-> +    }
->  };
-> =20
->  static void xen_accel_class_init(ObjectClass *oc, void *data)
->  {
->      AccelClass *ac =3D ACCEL_CLASS(oc);
-> +
->      ac->name =3D "Xen";
->      ac->init_machine =3D xen_init;
->      ac->setup_post =3D xen_setup_post;
->      ac->allowed =3D &xen_allowed;
-> -    ac->global_props =3D xen_compat_props;
-> +    ac->compat_props =3D g_ptr_array_new();
-where is matching free for that?
+> Note: the skipped testcase was used to test fix in my system so it has
+> assumptions about the host CPU. It's impracticial to change it to allow
+> running on any system though. Therefore, I am okay on either leave or remove
+> it. Opinions?
+> ---
+>  target/i386/cpu.c                   | 12 +++++-
+>  tests/acceptance/cpu_definitions.py | 61 +++++++++++++++++++++++++++++
+>  2 files changed, 72 insertions(+), 1 deletion(-)
+>  create mode 100644 tests/acceptance/cpu_definitions.py
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index f81d35e1f9..2502a3adda 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -3615,19 +3615,29 @@ static void x86_cpu_class_check_missing_features(X86CPUClass *xcc,
+>  
+>      x86_cpu_filter_features(xc);
+>  
+> +    /* Uses an auxiliar dictionary to ensure the list of features has not
+> +       repeated name. */
+> +    QDict *unique_feats_dict = qdict_new();
+
+Multiline comments are formatted this way:
+
+ /*
+  * like
+  * this
+  */
+
+(See CODING_STYLE for details)
+
+In this case, we can probably make the comment fit in a single
+line:
+
+    /* Auxiliary dict to avoid duplicate entries in the list */
 
 > +
-> +    compat_props_add(ac->compat_props,
-> +                     xen_compat_props, G_N_ELEMENTS(xen_compat_props));
->  }
-> =20
->  #define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")
-> diff --git a/qom/object.c b/qom/object.c
-> index 17921c0a71..dbdab0aead 100644
-> --- a/qom/object.c
-> +++ b/qom/object.c
-> @@ -370,6 +370,31 @@ static void object_post_init_with_type(Object *obj, =
-TypeImpl *ti)
+>      for (w = 0; w < FEATURE_WORDS; w++) {
+>          uint32_t filtered = xc->filtered_features[w];
+>          int i;
+>          for (i = 0; i < 32; i++) {
+>              if (filtered & (1UL << i)) {
+> +                const char *fname = g_strdup(x86_cpu_feature_name(w, i));
+
+I believe you didn't mean to call g_strdup() here, as you are now
+calling g_strdup(fname) below.
+
+> +                if (!fname || qdict_haskey(unique_feats_dict, fname)) {
+> +                    continue;
+> +                }
+>                  strList *new = g_new0(strList, 1);
+> -                new->value = g_strdup(x86_cpu_feature_name(w, i));
+> +                new->value = g_strdup(fname);
+>                  *next = new;
+>                  next = &new->next;
+> +                qdict_put_null(unique_feats_dict, new->value);
+>              }
+>          }
 >      }
+>  
+> +    g_free(unique_feats_dict);
+>      object_unref(OBJECT(xc));
 >  }
-> =20
-> +void object_apply_global_props(Object *obj, const GPtrArray *props, Erro=
-r **errp)
-> +{
-> +    Error *err =3D NULL;
-> +    int i;
+>  
+> diff --git a/tests/acceptance/cpu_definitions.py b/tests/acceptance/cpu_definitions.py
+> new file mode 100644
+> index 0000000000..65cea0427e
+> --- /dev/null
+> +++ b/tests/acceptance/cpu_definitions.py
+> @@ -0,0 +1,61 @@
+> +# CPU definitions tests.
+> +#
+> +# Copyright (c) 2018 Red Hat, Inc.
+> +#
+> +# Author:
+> +#  Wainer dos Santos Moschetta <wainersm@redhat.com>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2 or
+> +# later.  See the COPYING file in the top-level directory.
 > +
-> +    if (!props) {
-> +        return;
-> +    }
+> +from avocado import skip
+> +from avocado_qemu import Test
 > +
-> +    for (i =3D 0; i < props->len; i++) {
-> +        GlobalProperty *p =3D g_ptr_array_index(props, i);
 > +
-> +        if (object_dynamic_cast(obj, p->driver) =3D=3D NULL) {
-> +            continue;
-> +        }
-> +        p->used =3D true;
-> +        object_property_parse(obj, p->value, p->property, &err);
-> +        if (err !=3D NULL) {
-> +            error_prepend(&err, "can't apply global %s.%s=3D%s: ",
-> +                          p->driver, p->property, p->value);
-> +            error_propagate(errp, err);
-> +        }
-> +    }
-> +}
+> +class CPUDefinitions(Test):
+> +    """
+> +    Tests for the CPU definitions.
 > +
->  static void object_initialize_with_type(void *data, size_t size, TypeImp=
-l *type)
->  {
->      Object *obj =3D data;
-> diff --git a/vl.c b/vl.c
-> index a5ae5f23d2..88ba658572 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2968,7 +2968,6 @@ static void user_register_global_props(void)
->   */
->  static void register_global_properties(MachineState *ms)
->  {
-> -    accel_register_compat_props(ms->accelerator);
->      machine_register_compat_props(ms);
->      user_register_global_props();
->  }
+> +    :avocado: enable
+> +    :avocado: tags=x86_64
+> +    """
+> +    def test_unavailable_features(self):
+> +        self.vm.add_args("-machine", "q35,accel=kvm")
+
+Do you really need accel=kvm to reproduce the original bug?
+
+> +        self.vm.launch()
+> +        cpu_definitions = self.vm.command('query-cpu-definitions')
+> +        self.assertTrue(len(cpu_definitions) > 0)
+> +        for cpu_model in cpu_definitions:
+> +            name = cpu_model.get('name')
+> +            unavailable_features = cpu_model.get('unavailable-features')
+> +
+> +            self.assertNotIn("", unavailable_features,
+> +                             name + " has unamed feature")
+> +            self.assertEqual(len(unavailable_features),
+> +                             len(set(unavailable_features)),
+> +                             name + " has duplicate feature")
+> +
+> +    @skip("Have assumptions about the host CPU")
+> +    def test_unavailable_features_manual(self):
+> +        """
+> +        This test is meant for manual testing only because the list of expected
+> +        unavailable features depend on the actual host CPU knowledge.
+> +        """
+> +        expected_cpu = 'Cascadelake-Server'
+> +        expected_unavailable_features = ["hle", "rtm", "mpx", "avx512f",
+> +                                         "avx512dq", "rdseed", "adx", "smap",
+> +                                         "clflushopt", "clwb", "intel-pt",
+> +                                         "avx512cd", "avx512bw", "avx512vl",
+> +                                         "pku", "avx512vnni", "spec-ctrl",
+> +                                         "ssbd", "3dnowprefetch", "xsavec",
+> +                                         "xgetbv1"]
+
+It looks like this test will work only on one specific host CPU
+model.  It seems very unlikely that anybody will ever try to run
+it manually.  I suggest just deleting it.
+
+> +
+> +        self.vm.add_args("-machine", "q35,accel=kvm")
+> +        self.vm.launch()
+> +        cpu_definitions = self.vm.command('query-cpu-definitions')
+> +        self.assertTrue(len(cpu_definitions) > 0)
+> +
+> +        cpus = [cpu_model for cpu_model in cpu_definitions
+> +                if cpu_model['name'] == expected_cpu]
+> +        actual_unavailable_features = cpus[0]['unavailable-features']
+> +        self.assertCountEqual(expected_unavailable_features,
+> +                              actual_unavailable_features)
+> -- 
+> 2.19.1
+> 
+
+-- 
+Eduardo
