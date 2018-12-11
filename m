@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gWk7f-00031i-53
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:39:00 -0500
+	(envelope-from <prvs=87697dac6=Paul.Durrant@citrix.com>)
+	id 1gWk87-0003MH-VC
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:39:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gWk7b-0001vx-2k
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:38:59 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:53710)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gWk7a-0001v6-LC
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:38:54 -0500
-Date: Tue, 11 Dec 2018 17:38:31 +0200
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20181211153830.GC28105@lap1>
-References: <20181211132642.3027-1-ppandit@redhat.com>
-	<20181211132642.3027-4-ppandit@redhat.com>
+	(envelope-from <prvs=87697dac6=Paul.Durrant@citrix.com>)
+	id 1gWk83-0002Bm-Sz
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:39:27 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Tue, 11 Dec 2018 15:38:52 +0000
+Message-ID: <289322a222fa426faf953c88274d4b2f@AMSPEX02CL03.citrite.net>
+References: <1544525238-3527-1-git-send-email-paul.durrant@citrix.com>
+	<1544525238-3527-10-git-send-email-paul.durrant@citrix.com>
+	<20181211153021.GA16149@perard.uk.xensource.com>
+In-Reply-To: <20181211153021.GA16149@perard.uk.xensource.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181211132642.3027-4-ppandit@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/5] pvrdma: check number of pages when
- creating rings
+Subject: Re: [Qemu-devel] [Xen-devel] [PATCH v3 09/18] xen: remove
+ unnecessary code from dataplane/xen-block.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +28,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Saar Amar <saaramar5@gmail.com>, Li Qiang <liq3ea@163.com>, Prasad J Pandit <pjp@fedoraproject.org>, yuval.shaia@oracle.com
+To: Anthony Perard <anthony.perard@citrix.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Kevin Wolf <kwolf@redhat.com>, Stefano
+	Stabellini <sstabellini@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Tue, Dec 11, 2018 at 06:56:40PM +0530, P J P wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
-> 
-> When creating CQ/QP rings, an object can have up to
-> PVRDMA_MAX_FAST_REG_PAGES=128 pages. Check 'npages' parameter
-> to avoid excessive memory allocation or a null dereference.
-> 
-> Reported-by: Li Qiang <liq3ea@163.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> ---
->  hw/rdma/vmw/pvrdma_cmd.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
-> index 4faeb21631..ee2888259c 100644
-> --- a/hw/rdma/vmw/pvrdma_cmd.c
-> +++ b/hw/rdma/vmw/pvrdma_cmd.c
-> @@ -273,6 +273,10 @@ static int create_cq_ring(PCIDevice *pci_dev , PvrdmaRing **ring,
->          pr_dbg("Failed to map to CQ page table\n");
->          goto out;
->      }
-> +    if (!nchunks || nchunks > PVRDMA_MAX_FAST_REG_PAGES) {
-> +        pr_dbg("invalid nchunks: %d\n", nchunks);
-> +        goto out;
-> +    }
->  
->      r = g_malloc(sizeof(*r));
->      *ring = r;
-> @@ -389,6 +393,11 @@ static int create_qp_rings(PCIDevice *pci_dev, uint64_t pdir_dma,
->          pr_dbg("Failed to map to CQ page table\n");
->          goto out;
->      }
-> +    if (!spages || spages > PVRDMA_MAX_FAST_REG_PAGES
-> +        || !rpages || rpages > PVRDMA_MAX_FAST_REG_PAGES) {
-> +        pr_dbg("invalid pages: %d, %d\n", spages, rpages);
-> +        goto out;
-> +    }
->  
+> -----Original Message-----
+> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
+> Sent: 11 December 2018 15:30
+> To: Paul Durrant <Paul.Durrant@citrix.com>
+> Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
+> devel@lists.xenproject.org; Kevin Wolf <kwolf@redhat.com>; Stefano
+> Stabellini <sstabellini@kernel.org>; Stefan Hajnoczi
+> <stefanha@redhat.com>; Max Reitz <mreitz@redhat.com>
+> Subject: Re: [Xen-devel] [PATCH v3 09/18] xen: remove unnecessary code
+> from dataplane/xen-block.c
+>=20
+> On Tue, Dec 11, 2018 at 10:47:09AM +0000, Paul Durrant wrote:
+> > v2:
+> >  - Leave existing boilerplate alone, other than removing the now-
+> incorrect
+> >    description
+> > ---
+> >  hw/block/dataplane/xen-block.c | 409 ++-------------------------------=
+-
+> -------
+> >  1 file changed, 16 insertions(+), 393 deletions(-)
+> >
+> > diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-
+> block.c
+> > index 9fae505..98f987d 100644
+> > --- a/hw/block/dataplane/xen-block.c
+> > +++ b/hw/block/dataplane/xen-block.c
+> > @@ -1,6 +1,4 @@
+> >  /*
+> > - *  xen paravirt block device backend
+> > - *
+> >   *  (c) Gerd Hoffmann <kraxel@redhat.com>
+> >   *
+> >   *  This program is free software; you can redistribute it and/or
+> modify
+> > @@ -19,26 +17,12 @@
+> >   *  GNU GPL, version 2 or (at your option) any later version.
+> >   */
+> >
+> > +/*
+> > + * Copyright (c) 2018  Citrix Systems Inc.
+>=20
+> Can you move this copyright line to the existing license boilerplate as
+> I've asked on v2?
+>=20
 
-This check (along with the one in create_cq_ring) better be placed before
-mapping to page table.
+Oops. I thought I'd done this.
 
-With or without accepting the suggestion fix LGTM.
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or
+> later.
+> > + * See the COPYING file in the top-level directory.
+>=20
+> And this isn't needed as it just duplicate the already existing one.
+>=20
 
-Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+Sure. I'll send v4 with both these fixed.
 
->      sr = g_malloc(2 * sizeof(*rr));
->      rr = &sr[1];
-> -- 
-> 2.19.2
-> 
+  Paul
+
+> > + */
+> >
+>=20
+> Thanks,
+>=20
+> --
+> Anthony PERARD
