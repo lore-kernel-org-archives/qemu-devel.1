@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gWmNG-0006GY-My
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:03:15 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gWmNM-0006OS-Sq
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:03:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gWmND-0005xd-82
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:03:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60472)
+	(envelope-from <ehabkost@redhat.com>) id 1gWmNK-0006GL-CA
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:03:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:61894)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gWmNC-0005vp-Sx
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:03:11 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gWmNK-0006Dh-4W
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:03:18 -0500
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Tue, 11 Dec 2018 16:01:28 -0200
-Message-Id: <20181211180129.7661-24-ehabkost@redhat.com>
+Date: Tue, 11 Dec 2018 16:01:29 -0200
+Message-Id: <20181211180129.7661-25-ehabkost@redhat.com>
 In-Reply-To: <20181211180129.7661-1-ehabkost@redhat.com>
 References: <20181211180129.7661-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 23/24] qdev: move
- qdev_prop_register_global_list() to tests
+Subject: [Qemu-devel] [PULL 24/24] qom: remove unimplemented class_finalize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,113 +31,97 @@ Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, =?UTF-8?q?Marc-Andr=C3=A9=20L
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-The function is only used by a test, move it there.
+Instead of trying to implement something that isn't well specified,
+remove it. (it would be tricky to implement, since a class struct is
+memcpy on children types...)
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <20181204142023.15982-6-marcandre.lureau@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20181204142023.15982-7-marcandre.lureau@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/qdev-properties.h   |  1 -
- hw/core/qdev-properties.c      |  9 ---------
- tests/test-qdev-global-props.c | 18 ++++++++++++++----
- 3 files changed, 14 insertions(+), 14 deletions(-)
+ include/qom/object.h |  7 ++-----
+ hw/core/machine.c    | 11 -----------
+ qom/object.c         |  2 --
+ 3 files changed, 2 insertions(+), 18 deletions(-)
 
-diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-index a95f4a73eb..3ab9cd2eb6 100644
---- a/include/hw/qdev-properties.h
-+++ b/include/hw/qdev-properties.h
-@@ -249,7 +249,6 @@ void qdev_prop_set_enum(DeviceState *dev, const char =
-*name, int value);
- void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value);
+diff --git a/include/qom/object.h b/include/qom/object.h
+index 499e1fd8b7..bcae3f4951 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -454,10 +454,8 @@ struct Object
+  *   parent class initialization has occurred, but before the class itse=
+lf
+  *   is initialized.  This is the function to use to undo the effects of
+  *   memcpy from the parent class to the descendants.
+- * @class_finalize: This function is called during class destruction and=
+ is
+- *   meant to release and dynamic parameters allocated by @class_init.
+- * @class_data: Data to pass to the @class_init, @class_base_init and
+- *   @class_finalize functions.  This can be useful when building dynami=
+c
++ * @class_data: Data to pass to the @class_init,
++ *   @class_base_init. This can be useful when building dynamic
+  *   classes.
+  * @interfaces: The list of interfaces associated with this type.  This
+  *   should point to a static array that's terminated with a zero filled
+@@ -478,7 +476,6 @@ struct TypeInfo
 =20
- void qdev_prop_register_global(GlobalProperty *prop);
--void qdev_prop_register_global_list(GlobalProperty *props);
- int qdev_prop_check_globals(void);
- void qdev_prop_set_globals(DeviceState *dev);
- void error_set_from_qdev_prop_error(Error **errp, int ret, DeviceState *=
-dev,
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index ab61d502fd..bd84c4ea4c 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -1180,15 +1180,6 @@ void qdev_prop_register_global(GlobalProperty *pro=
-p)
-     global_props =3D g_list_append(global_props, prop);
+     void (*class_init)(ObjectClass *klass, void *data);
+     void (*class_base_init)(ObjectClass *klass, void *data);
+-    void (*class_finalize)(ObjectClass *klass, void *data);
+     void *class_data;
+=20
+     InterfaceInfo *interfaces;
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index da50ad6de7..c51423b647 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -834,16 +834,6 @@ void machine_run_board_init(MachineState *machine)
+     machine_class->init(machine);
  }
 =20
--void qdev_prop_register_global_list(GlobalProperty *props)
+-static void machine_class_finalize(ObjectClass *klass, void *data)
 -{
--    int i;
+-    MachineClass *mc =3D MACHINE_CLASS(klass);
 -
--    for (i =3D 0; props[i].driver !=3D NULL; i++) {
--        qdev_prop_register_global(props+i);
+-    if (mc->compat_props) {
+-        g_array_free(mc->compat_props, true);
 -    }
+-    g_free(mc->name);
 -}
 -
- int qdev_prop_check_globals(void)
+ void machine_register_compat_props(MachineState *machine)
  {
-     GList *l;
-diff --git a/tests/test-qdev-global-props.c b/tests/test-qdev-global-prop=
-s.c
-index ccdf6c57c1..b1eb505442 100644
---- a/tests/test-qdev-global-props.c
-+++ b/tests/test-qdev-global-props.c
-@@ -89,6 +89,16 @@ static void test_static_prop(void)
-     g_test_trap_assert_stdout("");
- }
+     MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+@@ -869,7 +859,6 @@ static const TypeInfo machine_info =3D {
+     .class_size =3D sizeof(MachineClass),
+     .class_init    =3D machine_class_init,
+     .class_base_init =3D machine_class_base_init,
+-    .class_finalize =3D machine_class_finalize,
+     .instance_size =3D sizeof(MachineState),
+     .instance_init =3D machine_initfn,
+     .instance_finalize =3D machine_finalize,
+diff --git a/qom/object.c b/qom/object.c
+index eb770dbf7f..17921c0a71 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -49,7 +49,6 @@ struct TypeImpl
 =20
-+static void register_global_properties(GlobalProperty *props)
-+{
-+    int i;
-+
-+    for (i =3D 0; props[i].driver !=3D NULL; i++) {
-+        qdev_prop_register_global(props + i);
-+    }
-+}
-+
-+
- /* Test setting of static property using global properties */
- static void test_static_globalprop_subprocess(void)
- {
-@@ -98,7 +108,7 @@ static void test_static_globalprop_subprocess(void)
-         {}
-     };
+     void (*class_init)(ObjectClass *klass, void *data);
+     void (*class_base_init)(ObjectClass *klass, void *data);
+-    void (*class_finalize)(ObjectClass *klass, void *data);
 =20
--    qdev_prop_register_global_list(props);
-+    register_global_properties(props);
+     void *class_data;
 =20
-     mt =3D STATIC_TYPE(object_new(TYPE_STATIC_PROPS));
-     qdev_init_nofail(DEVICE(mt));
-@@ -216,7 +226,7 @@ static void test_dynamic_globalprop_subprocess(void)
-     };
-     int global_error;
+@@ -114,7 +113,6 @@ static TypeImpl *type_new(const TypeInfo *info)
 =20
--    qdev_prop_register_global_list(props);
-+    register_global_properties(props);
+     ti->class_init =3D info->class_init;
+     ti->class_base_init =3D info->class_base_init;
+-    ti->class_finalize =3D info->class_finalize;
+     ti->class_data =3D info->class_data;
 =20
-     mt =3D DYNAMIC_TYPE(object_new(TYPE_DYNAMIC_PROPS));
-     qdev_init_nofail(DEVICE(mt));
-@@ -261,7 +271,7 @@ static void test_dynamic_globalprop_nouser_subprocess=
-(void)
-     };
-     int global_error;
-=20
--    qdev_prop_register_global_list(props);
-+    register_global_properties(props);
-=20
-     mt =3D DYNAMIC_TYPE(object_new(TYPE_DYNAMIC_PROPS));
-     qdev_init_nofail(DEVICE(mt));
-@@ -299,7 +309,7 @@ static void test_subclass_global_props(void)
-         {}
-     };
-=20
--    qdev_prop_register_global_list(props);
-+    register_global_properties(props);
-=20
-     mt =3D STATIC_TYPE(object_new(TYPE_SUBCLASS));
-     qdev_init_nofail(DEVICE(mt));
+     ti->instance_init =3D info->instance_init;
 --=20
 2.18.0.rc1.1.g3f1ff2140
