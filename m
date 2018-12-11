@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gWmN3-00066G-Am
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:03:02 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gWmN7-0006AV-Ip
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:03:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gWmN1-0005b6-9M
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:03:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40492)
+	(envelope-from <ehabkost@redhat.com>) id 1gWmN6-0005i1-F8
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:03:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54874)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gWmMy-0005Xe-Sb
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:02:57 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gWmN6-0005hR-5w
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:03:04 -0500
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Tue, 11 Dec 2018 16:01:26 -0200
-Message-Id: <20181211180129.7661-22-ehabkost@redhat.com>
+Date: Tue, 11 Dec 2018 16:01:27 -0200
+Message-Id: <20181211180129.7661-23-ehabkost@redhat.com>
 In-Reply-To: <20181211180129.7661-1-ehabkost@redhat.com>
 References: <20181211180129.7661-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 21/24] qom: make user_creatable_complete()
- specific to UserCreatable
+Subject: [Qemu-devel] [PULL 22/24] accel: register global_props like machine
+ globals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,157 +32,120 @@ Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, =?UTF-8?q?Marc-Andr=C3=A9=20L
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Instead of accepting any Object*, change user_creatable_complete() to
-require a UserCreatable*. Modify the callers to pass the appropriate
-argument, removing redundant dynamic cast checks in object creation.
+global_props is only used for Xen xen_compat_props. It's a static
+array of GlobalProperty, like machine globals in SET_MACHINE_COMPAT().
+Let's register the globals the same way, without extra copy allocation.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20181204142023.15982-4-marcandre.lureau@redhat.com>
+Message-Id: <20181204142023.15982-5-marcandre.lureau@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/qom/object_interfaces.h |  4 ++--
- hw/misc/ivshmem.c               |  2 +-
- hw/virtio/virtio-rng.c          |  2 +-
- qom/object.c                    | 12 ++++++++----
- qom/object_interfaces.c         | 14 +++-----------
- 5 files changed, 15 insertions(+), 19 deletions(-)
+ include/hw/qdev-properties.h | 29 -----------------------------
+ accel/accel.c                |  9 ++++++++-
+ hw/core/qdev-properties.c    | 21 ---------------------
+ 3 files changed, 8 insertions(+), 51 deletions(-)
 
-diff --git a/include/qom/object_interfaces.h b/include/qom/object_interfa=
-ces.h
-index 652a16d2ba..682ba1d9b0 100644
---- a/include/qom/object_interfaces.h
-+++ b/include/qom/object_interfaces.h
-@@ -51,14 +51,14 @@ typedef struct UserCreatableClass {
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index 4f60cc88f3..a95f4a73eb 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -255,35 +255,6 @@ void qdev_prop_set_globals(DeviceState *dev);
+ void error_set_from_qdev_prop_error(Error **errp, int ret, DeviceState *=
+dev,
+                                     Property *prop, const char *value);
 =20
+-/**
+- * register_compat_prop:
+- *
+- * Register internal (not user-provided) global property, changing the
+- * default value of a given property in a device type.  This can be used
+- * for enabling machine-type compatibility or for enabling
+- * accelerator-specific defaults in devices.
+- *
+- * The property values set using this function must be always valid and
+- * never report setter errors, as the property will have
+- * GlobalProperty::errp set to &error_abort.
+- *
+- * User-provided global properties should override internal global
+- * properties, so callers of this function should ensure that it is
+- * called before user-provided global properties are registered.
+- *
+- * @driver: Device type to be affected
+- * @property: Property whose default value is going to be changed
+- * @value: New default value for the property
+- */
+-void register_compat_prop(const char *driver, const char *property,
+-                          const char *value);
+-/*
+- * register_compat_props_array(): using register_compat_prop(), which
+- * only registers internal global properties (which has lower priority
+- * than user-provided global properties)
+- */
+-void register_compat_props_array(GlobalProperty *prop);
+-
  /**
-  * user_creatable_complete:
-- * @obj: the object whose complete() method is called if defined
-+ * @uc: the user-creatable object whose complete() method is called if d=
-efined
-  * @errp: if an error occurs, a pointer to an area to store the error
-  *
-  * Wrapper to call complete() method if one of types it's inherited
-  * from implements USER_CREATABLE interface, otherwise the call does
-  * nothing.
-  */
--void user_creatable_complete(Object *obj, Error **errp);
-+void user_creatable_complete(UserCreatable *uc, Error **errp);
+  * qdev_property_add_static:
+  * @dev: Device to add the property to.
+diff --git a/accel/accel.c b/accel/accel.c
+index 966b2d8f53..3da26eb90f 100644
+--- a/accel/accel.c
++++ b/accel/accel.c
+@@ -34,6 +34,7 @@
+ #include "qom/object.h"
+ #include "qemu/error-report.h"
+ #include "qemu/option.h"
++#include "qapi/error.h"
 =20
- /**
-  * user_creatable_can_be_deleted:
-diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index ecfd10a29a..8213659602 100644
---- a/hw/misc/ivshmem.c
-+++ b/hw/misc/ivshmem.c
-@@ -1280,7 +1280,7 @@ static void desugar_shm(IVShmemState *s)
-     object_property_add_child(OBJECT(s), "internal-shm-backend", obj,
-                               &error_abort);
-     object_unref(obj);
--    user_creatable_complete(obj, &error_abort);
-+    user_creatable_complete(USER_CREATABLE(obj), &error_abort);
-     s->hostmem =3D MEMORY_BACKEND(obj);
+ static const TypeInfo accel_type =3D {
+     .name =3D TYPE_ACCEL,
+@@ -121,7 +122,13 @@ void configure_accelerator(MachineState *ms)
+ void accel_register_compat_props(AccelState *accel)
+ {
+     AccelClass *class =3D ACCEL_GET_CLASS(accel);
+-    register_compat_props_array(class->global_props);
++    GlobalProperty *prop =3D class->global_props;
++
++    for (; prop && prop->driver; prop++) {
++        /* Any compat_props must never cause error */
++        prop->errp =3D &error_abort;
++        qdev_prop_register_global(prop);
++    }
  }
 =20
-diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
-index 855f1b41d1..30493a2586 100644
---- a/hw/virtio/virtio-rng.c
-+++ b/hw/virtio/virtio-rng.c
-@@ -191,7 +191,7 @@ static void virtio_rng_device_realize(DeviceState *de=
-v, Error **errp)
-     if (vrng->conf.rng =3D=3D NULL) {
-         vrng->conf.default_backend =3D RNG_RANDOM(object_new(TYPE_RNG_RA=
-NDOM));
+ void accel_setup_post(MachineState *ms)
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 35072dec1e..ab61d502fd 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -1180,27 +1180,6 @@ void qdev_prop_register_global(GlobalProperty *pro=
+p)
+     global_props =3D g_list_append(global_props, prop);
+ }
 =20
--        user_creatable_complete(OBJECT(vrng->conf.default_backend),
-+        user_creatable_complete(USER_CREATABLE(vrng->conf.default_backen=
-d),
-                                 &local_err);
-         if (local_err) {
-             error_propagate(errp, local_err);
-diff --git a/qom/object.c b/qom/object.c
-index 547dcf97c3..eb770dbf7f 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -417,6 +417,7 @@ void object_initialize_childv(Object *parentobj, cons=
-t char *propname,
- {
-     Error *local_err =3D NULL;
-     Object *obj;
-+    UserCreatable *uc;
-=20
-     object_initialize(childobj, size, type);
-     obj =3D OBJECT(childobj);
-@@ -431,8 +432,9 @@ void object_initialize_childv(Object *parentobj, cons=
-t char *propname,
-         goto out;
-     }
-=20
--    if (object_dynamic_cast(obj, TYPE_USER_CREATABLE)) {
--        user_creatable_complete(obj, &local_err);
-+    uc =3D (UserCreatable *)object_dynamic_cast(obj, TYPE_USER_CREATABLE=
-);
-+    if (uc) {
-+        user_creatable_complete(uc, &local_err);
-         if (local_err) {
-             object_unparent(obj);
-             goto out;
-@@ -590,6 +592,7 @@ Object *object_new_with_propv(const char *typename,
-     Object *obj;
-     ObjectClass *klass;
-     Error *local_err =3D NULL;
-+    UserCreatable *uc;
-=20
-     klass =3D object_class_by_name(typename);
-     if (!klass) {
-@@ -612,8 +615,9 @@ Object *object_new_with_propv(const char *typename,
-         goto error;
-     }
-=20
--    if (object_dynamic_cast(obj, TYPE_USER_CREATABLE)) {
--        user_creatable_complete(obj, &local_err);
-+    uc =3D (UserCreatable *)object_dynamic_cast(obj, TYPE_USER_CREATABLE=
-);
-+    if (uc) {
-+        user_creatable_complete(uc, &local_err);
-         if (local_err) {
-             object_unparent(obj);
-             goto error;
-diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-index 97b79b48bb..db85d1eb75 100644
---- a/qom/object_interfaces.c
-+++ b/qom/object_interfaces.c
-@@ -8,18 +8,10 @@
- #include "qapi/opts-visitor.h"
- #include "qemu/config-file.h"
-=20
--void user_creatable_complete(Object *obj, Error **errp)
-+void user_creatable_complete(UserCreatable *uc, Error **errp)
- {
-+    UserCreatableClass *ucc =3D USER_CREATABLE_GET_CLASS(uc);
-=20
--    UserCreatableClass *ucc;
--    UserCreatable *uc =3D
--        (UserCreatable *)object_dynamic_cast(obj, TYPE_USER_CREATABLE);
+-void register_compat_prop(const char *driver,
+-                          const char *property,
+-                          const char *value)
+-{
+-    GlobalProperty *p =3D g_new0(GlobalProperty, 1);
 -
--    if (!uc) {
--        return;
+-    /* Any compat_props must never cause error */
+-    p->errp =3D &error_abort;
+-    p->driver =3D driver;
+-    p->property =3D property;
+-    p->value =3D value;
+-    qdev_prop_register_global(p);
+-}
+-
+-void register_compat_props_array(GlobalProperty *prop)
+-{
+-    for (; prop && prop->driver; prop++) {
+-        register_compat_prop(prop->driver, prop->property, prop->value);
 -    }
+-}
 -
--    ucc =3D USER_CREATABLE_GET_CLASS(uc);
-     if (ucc->complete) {
-         ucc->complete(uc, errp);
-     }
-@@ -89,7 +81,7 @@ Object *user_creatable_add_type(const char *type, const=
- char *id,
-         goto out;
-     }
-=20
--    user_creatable_complete(obj, &local_err);
-+    user_creatable_complete(USER_CREATABLE(obj), &local_err);
-     if (local_err) {
-         object_property_del(object_get_objects_root(),
-                             id, &error_abort);
+ void qdev_prop_register_global_list(GlobalProperty *props)
+ {
+     int i;
 --=20
 2.18.0.rc1.1.g3f1ff2140
