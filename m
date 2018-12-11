@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gWWuY-0008Tm-Qk
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 20:32:35 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gWWzG-0001kY-RI
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 20:37:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gWWuQ-00054q-Ri
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 20:32:32 -0500
-Received: from ozlabs.org ([203.11.71.1]:35123)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1gWWuP-00053h-PZ
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 20:32:26 -0500
-Date: Tue, 11 Dec 2018 12:20:46 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gWWzC-0007R5-9H
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 20:37:26 -0500
+Date: Tue, 11 Dec 2018 12:37:10 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181211012045.GB4261@umbus.fritz.box>
-References: <20181121181347.24035-1-farosas@linux.ibm.com>
-	<20181121181347.24035-4-farosas@linux.ibm.com>
-	<20181126074100.GJ2251@umbus.fritz.box>
-	<87h8fymgyq.fsf@linux.ibm.com>
-	<20181202091317.GM30479@umbus.fritz.box>
-	<87d0q9mtml.fsf@linux.ibm.com>
+Message-ID: <20181211013710.GC4261@umbus.fritz.box>
+References: <20181209194610.29727-1-clg@kaod.org>
+	<20181209194610.29727-4-clg@kaod.org>
+	<20181210042747.GM4261@umbus.fritz.box>
+	<157aa1c9-20a6-e177-eac7-f47f40188df3@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="DkeqYIVsoi/Xkk+N"
+	protocol="application/pgp-signature"; boundary="SVeEiVwWO9F1slJ8"
 Content-Disposition: inline
-In-Reply-To: <87d0q9mtml.fsf@linux.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 3/3] target/ppc: support single
- stepping with KVM HV
+In-Reply-To: <157aa1c9-20a6-e177-eac7-f47f40188df3@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v7 03/19] ppc/xive: introduce a simplified
+ XIVE presenter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,71 +27,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fabiano Rosas <farosas@linux.ibm.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, James Hogan <jhogan@kernel.org>, Marcelo Tosatti <mtosatti@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---DkeqYIVsoi/Xkk+N
-Content-Type: text/plain; charset=us-ascii
+--SVeEiVwWO9F1slJ8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 10, 2018 at 10:52:18AM -0200, Fabiano Rosas wrote:
-> David Gibson <david@gibson.dropbear.id.au> writes:
+On Mon, Dec 10, 2018 at 08:15:40AM +0100, C=E9dric Le Goater wrote:
+> On 12/10/18 5:27 AM, David Gibson wrote:
+> > On Sun, Dec 09, 2018 at 08:45:54PM +0100, C=E9dric Le Goater wrote:
+> >> The last sub-engine of the XIVE architecture is the Interrupt
+> >> Virtualization Presentation Engine (IVPE). On HW, the IVRE and the
+> >> IVPE share elements, the Power Bus interface (CQ), the routing table
+> >> descriptors, and they can be combined in the same HW logic. We do the
+> >> same in QEMU and combine both engines in the XiveRouter for
+> >> simplicity.
+> >>
+> >> When the IVRE has completed its job of matching an event source with a
+> >> Notification Virtual Target (NVT) to notify, it forwards the event
+> >> notification to the IVPE sub-engine. The IVPE scans the thread
+> >> interrupt contexts of the Notification Virtual Targets (NVT)
+> >> dispatched on the HW processor threads and if a match is found, it
+> >> signals the thread. If not, the IVPE escalates the notification to
+> >> some other targets and records the notification in a backlog queue.
+> >>
+> >> The IVPE maintains the thread interrupt context state for each of its
+> >> NVTs not dispatched on HW processor threads in the Notification
+> >> Virtual Target table (NVTT).
+> >>
+> >> The model currently only supports single NVT notifications.
+> >>
+> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >=20
+> > Applied.
+> >=20
+> > I think the tctx_word2() should have the byteswap, rather than having
+> > it in the callers, but that can be fixed later.
 >=20
-> >> >> +    if (arch_info->address =3D=3D trace_handler_addr) {
-> >> >> +        cpu_synchronize_state(cs);
-> >> >> +        kvm_remove_breakpoint(cs, trace_handler_addr, 4, GDB_BREAK=
-POINT_SW);
-> >> >> +
-> >> >> +        cpu_memory_rw_debug(cs, env->spr[SPR_SRR0] - 4, (uint8_t *=
-)&insn,
-> >> >> +                            sizeof(insn), 0);
-> >> >> +
-> >> >> +        /* If the last instruction was a mfmsr, make sure that the
-> >> >> +         * MSR_SE bit is not set to avoid the guest kernel knowing
-> >> >> +         * that it is being single-stepped */
-> >> >> +        if (extract32(insn, 26, 6) =3D=3D 31 && extract32(insn, 1,=
- 10) =3D=3D 83) {
-> >> >> +            reg =3D extract32(insn, 21, 5);
-> >> >> +            env->gpr[reg] &=3D ~(1ULL << MSR_SE);
-> >> >> +        }
-> >> >
-> >> > Hm.  What happens if both qemu and the guest itself attempt to single
-> >> > step at the same time?  How do you distinguish between the cases?
-> >>=20
-> >> There is currently no distinction being made.
-> >
-> > This seems incorrect to me.  Basically you're restoring !MSR_SE
-> > unconditionaly when you finish the hypervisor side step, which might
-> > not be correct if the guest is also attempting to single step itself.
-> > AFAICT it should be possible to track what the guest thinks is the
-> > value of MSR_SE and restore that.
->=20
-> I was skeptical of being able to do both single steps at the same time
-> but I found a way to reproduce it by stepping over an rfid when
-> SRR1_SE is already 1.
->=20
-> >  If both hypervisor and guest
-> > attempt to single step, I'd expect to have the hypervisor trap first,
-> > then return to the guest's single step vector.
->=20
-> With the fix you suggest above, QEMU will be able to single step the
-> interrupt handler during the guest's single step. That means I'll have
-> to restore the SRRs as well so that the handler returns to the correct
-> place.
->=20
-> >> I could do the latter, if you prefer.
-> >
-> > I think that's better - I don't think it's safe to assume that you're
-> > *not* synchronized with KVM.
->=20
-> Ok, that's better indeed.
->=20
-> Thanks for the comments, I'll prepare another version with the
-> appropriate corrections.
+> I thought it was better to explicitly show in the code where the=20
+> byteswaps were needed. Anyway, this is very localized, so, yes,=20
+> we can change it later on.
 
-Ok, great.
+To clarify my thinking here; the important thing is not knowing where
+the byteswaps are, but being able to tell as easily as possible what
+endianness a given piece of data is right now.
+
+The convention I'm aiming for here - which is one I try to use most
+places is that structures - at least structures which map to specific
+in-memory things - are in the required endianness for that stuff in
+memory.  However bare integers - uint32_t or uint64_t or whatever -
+are, well, numbers, in native endian.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -105,24 +87,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---DkeqYIVsoi/Xkk+N
+--SVeEiVwWO9F1slJ8
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwPEO0ACgkQbDjKyiDZ
-s5KOXw//SVGgssKFVnUMFf0SfpuvlRhkIb9MNCGMkdU1+FPs07SoXp7Bd6mJNbLO
-lnlNX45DORzSXo3qpoukKa53Mox3p0zpe66VNn3IiTnmdn5tQ6TMxIlXqYEEELXT
-L3KwrmZZmQTl6b8C4znDVj3lv1oU67pQlg8G8uTcxXPUl+RdP9neJfAtCUAgxtD8
-U7VwKUl0DX58c4kdbFrmiMB67aGb6E4Q5iKpBKJq5Hw3f2bGqSL+GGJJJXJjB6Ou
-LxNbkDt0mjy2wdTSK/OjASdyz/ni50Cw0SsKGAPzbPpZoCoePExrxsSchAvlqoVs
-s4VuXQ5ecsbuIiBKTOmQTW+nrpdDb948Hlh36jTwf4SK5UeO70ZIh9ZiBAGtgjW1
-F7PsmPxcs1Qe093sdCyyJzleLYsjeW9P5DTRfg/cjW0qN23UWPWw4iPpne7vL8dg
-+Jf5mxSyYCRRc4Jxbmkh4/+1iaeDHdta8VlsIOXXJ+gOL8BEpzTW9fh6pSpf2ski
-arq5JEpLy6mQyAmbDFykWA1FRSOLS1qC7PGIxaVZrMMbP0Lrv1NccMNz8jDup/k/
-BeY/GJa4yRkjy2kGHZvnpzcCFxOurgZO7eeMuOgdelMI+aB7wg/PTaRA8Qa9mGGt
-LMB1iKFs5KV3OX2BQASP+gzjNuH7gkzuxfzQjmUhd7Qd3JcTy+o=
-=ljHp
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwPFMMACgkQbDjKyiDZ
+s5JcnA/+JJdb6Y0InXiG2bk6aoW3lKoGS1O7zusSoBzAc0iRtG9uVSKO8WORgvvU
+xyQl9Fd1zzvwPld0L78QIPgEB1PnCxoMZsaiBPKuc3ZLi9ZeUNiMBazQm95+VLei
+hv/8YwfS2Ol30bl3DgavZGpU4OUsAn/47ednSrZs6tjICW7q23wvZgB6qPetM54a
+O9WBij1sPOkZIZl20J770ZDNrMf8SVawMM4BX6Qvd1lUP8am6ciotHfsEm8rZG+M
+AWDnJr7v7EcYNTVX8odVekPBk/LUsDpSRR4ugpj9y9CtnarP6VlqJ03z/P9FJZlu
+KgA3Yj5fEIHnLVCqGlQUxwBBDUTOZQGMi8+lBPabb2klf+c7bF5kkoSKCNrcBMtx
+SBgbVZxP84wN2xxUqf/sMS9wFAP7fYs5OxJ+VjFXEplkMt4WZ3jim83yNy3q79xK
+Ahry8LzsjSc5tALSVUKEKuNmT7SQSAlljX/q1l20g7KdAen5tgjV/RIsuaYLdypQ
+ChMU/mGug1xWjlZEhAJx3CCKiywWvNuUtvwgJVBhyh/XLanHSfhwseDpxP4pn4nn
+VFYhu76hrFM6/YgXxlx/WVDhI6WUzx/8ewwmyhmjgOy2un69H/Y576gsOdaUpADw
+9P/y12fWm4csisJmnYcf5EzSrgbNCYs1MLDgW9NLq16U5CXFYF4=
+=8vEd
 -----END PGP SIGNATURE-----
 
---DkeqYIVsoi/Xkk+N--
+--SVeEiVwWO9F1slJ8--
