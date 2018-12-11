@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58947)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gWfi1-0002O6-QZ
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:56:14 -0500
+	(envelope-from <prvs=87697dac6=Paul.Durrant@citrix.com>)
+	id 1gWfkV-0004E6-25
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:58:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gWfhw-0007Fq-55
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:56:13 -0500
-Received: from 4.mo2.mail-out.ovh.net ([87.98.172.75]:39948)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gWfhv-0007EJ-De
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:56:07 -0500
-Received: from player755.ha.ovh.net (unknown [10.109.143.223])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id D866617069C
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 11:56:05 +0100 (CET)
-References: <20181209194610.29727-1-clg@kaod.org>
-	<20181209194610.29727-13-clg@kaod.org>
-	<20181210064214.GV4261@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <e43447bf-2a32-a08c-874d-7152fd89e1ba@kaod.org>
-Date: Tue, 11 Dec 2018 11:55:59 +0100
+	(envelope-from <prvs=87697dac6=Paul.Durrant@citrix.com>)
+	id 1gWfkQ-0001WH-Sd
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:58:47 -0500
+From: Paul Durrant <paul.durrant@citrix.com>
+Date: Tue, 11 Dec 2018 10:47:11 +0000
+Message-ID: <1544525238-3527-12-git-send-email-paul.durrant@citrix.com>
+In-Reply-To: <1544525238-3527-1-git-send-email-paul.durrant@citrix.com>
+References: <1544525238-3527-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <20181210064214.GV4261@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 12/19] spapr: add a 'reset' method to
- the sPAPR IRQ backend
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3 11/18] xen: remove 'XenBlkDev' and 'blkdev'
+ names from dataplane/xen-block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,192 +24,812 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 12/10/18 7:42 AM, David Gibson wrote:
-> On Sun, Dec 09, 2018 at 08:46:03PM +0100, C=E9dric Le Goater wrote:
->> For the time being, the XIVE reset handler updates the OS CAM line of
->> the vCPU as it is done under a real hypervisor when a vCPU is
->> scheduled to run on a HW thread.
->>
->> This handler will become even more useful when we introduce the
->> machine supporting both interrupt modes, XIVE and XICS. In this
->> machine, the interrupt mode is chosen by the CAS negotiation process
->> and activated after a reset.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>  include/hw/ppc/spapr_irq.h  |  2 ++
->>  include/hw/ppc/spapr_xive.h |  1 +
->>  hw/intc/spapr_xive.c        | 24 ++++++++++++++++++++++++
->>  hw/ppc/spapr.c              |  5 +++++
->>  hw/ppc/spapr_irq.c          | 24 ++++++++++++++++++++++++
->>  5 files changed, 56 insertions(+)
->>
->> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
->> index 84a25ffb6c65..63061a009b4c 100644
->> --- a/include/hw/ppc/spapr_irq.h
->> +++ b/include/hw/ppc/spapr_irq.h
->> @@ -44,6 +44,7 @@ typedef struct sPAPRIrq {
->>      Object *(*cpu_intc_create)(sPAPRMachineState *spapr, Object *cpu,
->>                                 Error **errp);
->>      int (*post_load)(sPAPRMachineState *spapr, int version_id);
->> +    void (*reset)(sPAPRMachineState *spapr, Error **errp);
->>  } sPAPRIrq;
->> =20
->>  extern sPAPRIrq spapr_irq_xics;
->> @@ -55,6 +56,7 @@ int spapr_irq_claim(sPAPRMachineState *spapr, int ir=
-q, bool lsi, Error **errp);
->>  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
->>  qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
->>  int spapr_irq_post_load(sPAPRMachineState *spapr, int version_id);
->> +void spapr_irq_reset(sPAPRMachineState *spapr, Error **errp);
->> =20
->>  /*
->>   * XICS legacy routines
->> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
->> index 728a5e8dc163..7244a6231ce6 100644
->> --- a/include/hw/ppc/spapr_xive.h
->> +++ b/include/hw/ppc/spapr_xive.h
->> @@ -47,5 +47,6 @@ typedef struct sPAPRMachineState sPAPRMachineState;
->>  void spapr_xive_hcall_init(sPAPRMachineState *spapr);
->>  void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, voi=
-d *fdt,
->>                     uint32_t phandle);
->> +void spapr_xive_reset_tctx(sPAPRXive *xive);
->> =20
->>  #endif /* PPC_SPAPR_XIVE_H */
->> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
->> index a6d854b07690..560d8d031f74 100644
->> --- a/hw/intc/spapr_xive.c
->> +++ b/hw/intc/spapr_xive.c
->> @@ -179,6 +179,30 @@ static void spapr_xive_map_mmio(sPAPRXive *xive)
->>      sysbus_mmio_map(SYS_BUS_DEVICE(xive), 2, xive->tm_base);
->>  }
->> =20
->> +/*
->> + * When a Virtual Processor is scheduled to run on a HW thread, the
->> + * hypervisor pushes its identifier in the OS CAM line. Emulate the
->> + * same behavior under QEMU.
->> + */
->> +void spapr_xive_reset_tctx(sPAPRXive *xive)
->> +{
->> +    CPUState *cs;
->> +    uint8_t  nvt_blk;
->> +    uint32_t nvt_idx;
->> +    uint32_t nvt_cam;
->> +
->> +    CPU_FOREACH(cs) {
->> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
->> +        XiveTCTX *tctx =3D XIVE_TCTX(cpu->intc);
->> +
->> +        spapr_xive_cpu_to_nvt(cpu, &nvt_blk, &nvt_idx);
->> +
->> +        nvt_cam =3D cpu_to_be32(TM_QW1W2_VO |
->> +                              xive_nvt_cam_line(nvt_blk, nvt_idx));
->> +        memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &nvt_cam, 4);
->> +    }
->> +}
->> +
+This is a purely cosmetic patch that substitutes the old 'struct XenBlkDev'
+name with 'XenBlockDataPlane' and 'blkdev' field/variable names with
+'dataplane', and then does necessary fix-up to adhere to coding style.
 
-I will need to rework that patch because the OS CAM line needs to be=20
-reseted when a CPU is hot plugged also.
+No functional change.
 
-C.=20
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Acked-by: Anthony Perard <anthony.perard@citrix.com>
+---
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+---
+ hw/block/dataplane/xen-block.c | 352 +++++++++++++++++++++--------------------
+ hw/block/dataplane/xen-block.h |   2 +-
+ 2 files changed, 183 insertions(+), 171 deletions(-)
 
->>  static void spapr_xive_end_reset(XiveEND *end)
->>  {
->>      memset(end, 0, sizeof(*end));
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index 8cea4cad1732..98d69f09e080 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -1619,6 +1619,11 @@ static void spapr_machine_reset(void)
->> =20
->>      qemu_devices_reset();
->> =20
->> +    /* This is fixing some of the default configuration of the XIVE
->> +     * devices. To be called after the reset of the machine devices.
->> +     */
->> +    spapr_irq_reset(spapr, &error_fatal);
->> +
->>      /* DRC reset may cause a device to be unplugged. This will cause =
-troubles
->>       * if this device is used by another device (eg, a running vhost =
-backend
->>       * will crash QEMU if the DIMM holding the vring goes away). To a=
-void such
->> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
->> index 35a067cad3f8..04f5c9665550 100644
->> --- a/hw/ppc/spapr_irq.c
->> +++ b/hw/ppc/spapr_irq.c
->> @@ -209,6 +209,10 @@ static int spapr_irq_post_load_xics(sPAPRMachineS=
-tate *spapr, int version_id)
->>      return 0;
->>  }
->> =20
->> +static void spapr_irq_reset_xics(sPAPRMachineState *spapr, Error **er=
-rp)
->> +{
->> +}
->=20
-> You already have a check for a NULL reset hook in spapr_irq_reset() so
-> you could omit this empty function.
->=20
->> +
->>  #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
->>  #define SPAPR_IRQ_XICS_NR_MSIS     \
->>      (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
->> @@ -225,6 +229,7 @@ sPAPRIrq spapr_irq_xics =3D {
->>      .dt_populate =3D spapr_dt_xics,
->>      .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
->>      .post_load   =3D spapr_irq_post_load_xics,
->> +    .reset       =3D spapr_irq_reset_xics,
->>  };
->> =20
->>  /*
->> @@ -333,6 +338,15 @@ static int spapr_irq_post_load_xive(sPAPRMachineS=
-tate *spapr, int version_id)
->>      return 0;
->>  }
->> =20
->> +static void spapr_irq_reset_xive(sPAPRMachineState *spapr, Error **er=
-rp)
->> +{
->> +    /*
->> +     * Set the OS CAM line of the cpu interrupt thread context. Needs
->> +     * to come after the XiveTCTX reset handlers.
->> +     */
->> +    spapr_xive_reset_tctx(spapr->xive);
->> +}
->> +
->>  /*
->>   * XIVE uses the full IRQ number space. Set it to 8K to be compatible
->>   * with XICS.
->> @@ -353,6 +367,7 @@ sPAPRIrq spapr_irq_xive =3D {
->>      .dt_populate =3D spapr_dt_xive,
->>      .cpu_intc_create =3D spapr_irq_cpu_intc_create_xive,
->>      .post_load   =3D spapr_irq_post_load_xive,
->> +    .reset       =3D spapr_irq_reset_xive,
->>  };
->> =20
->>  /*
->> @@ -398,6 +413,15 @@ int spapr_irq_post_load(sPAPRMachineState *spapr,=
- int version_id)
->>      return smc->irq->post_load(spapr, version_id);
->>  }
->> =20
->> +void spapr_irq_reset(sPAPRMachineState *spapr, Error **errp)
->> +{
->> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
->> +
->> +    if (smc->irq->reset) {
->> +        smc->irq->reset(spapr, errp);
->> +    }
->> +}
->> +
->>  /*
->>   * XICS legacy routines - to deprecate one day
->>   */
->=20
+diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-block.c
+index 20d16e7..6ecd160 100644
+--- a/hw/block/dataplane/xen-block.c
++++ b/hw/block/dataplane/xen-block.c
+@@ -44,12 +44,12 @@ struct ioreq {
+     int presync;
+     int aio_inflight;
+     int aio_errors;
+-    struct XenBlkDev *blkdev;
++    XenBlockDataPlane *dataplane;
+     QLIST_ENTRY(ioreq) list;
+     BlockAcctCookie acct;
+ };
+ 
+-struct XenBlkDev {
++struct XenBlockDataPlane {
+     XenDevice *xendev;
+     XenEventChannel *event_channel;
+     unsigned int *ring_ref;
+@@ -85,33 +85,33 @@ static void ioreq_reset(struct ioreq *ioreq)
+     ioreq->aio_inflight = 0;
+     ioreq->aio_errors = 0;
+ 
+-    ioreq->blkdev = NULL;
++    ioreq->dataplane = NULL;
+     memset(&ioreq->list, 0, sizeof(ioreq->list));
+     memset(&ioreq->acct, 0, sizeof(ioreq->acct));
+ 
+     qemu_iovec_reset(&ioreq->v);
+ }
+ 
+-static struct ioreq *ioreq_start(struct XenBlkDev *blkdev)
++static struct ioreq *ioreq_start(XenBlockDataPlane *dataplane)
+ {
+     struct ioreq *ioreq = NULL;
+ 
+-    if (QLIST_EMPTY(&blkdev->freelist)) {
+-        if (blkdev->requests_total >= blkdev->max_requests) {
++    if (QLIST_EMPTY(&dataplane->freelist)) {
++        if (dataplane->requests_total >= dataplane->max_requests) {
+             goto out;
+         }
+         /* allocate new struct */
+         ioreq = g_malloc0(sizeof(*ioreq));
+-        ioreq->blkdev = blkdev;
+-        blkdev->requests_total++;
++        ioreq->dataplane = dataplane;
++        dataplane->requests_total++;
+         qemu_iovec_init(&ioreq->v, 1);
+     } else {
+         /* get one from freelist */
+-        ioreq = QLIST_FIRST(&blkdev->freelist);
++        ioreq = QLIST_FIRST(&dataplane->freelist);
+         QLIST_REMOVE(ioreq, list);
+     }
+-    QLIST_INSERT_HEAD(&blkdev->inflight, ioreq, list);
+-    blkdev->requests_inflight++;
++    QLIST_INSERT_HEAD(&dataplane->inflight, ioreq, list);
++    dataplane->requests_inflight++;
+ 
+ out:
+     return ioreq;
+@@ -119,26 +119,26 @@ out:
+ 
+ static void ioreq_finish(struct ioreq *ioreq)
+ {
+-    struct XenBlkDev *blkdev = ioreq->blkdev;
++    XenBlockDataPlane *dataplane = ioreq->dataplane;
+ 
+     QLIST_REMOVE(ioreq, list);
+-    QLIST_INSERT_HEAD(&blkdev->finished, ioreq, list);
+-    blkdev->requests_inflight--;
+-    blkdev->requests_finished++;
++    QLIST_INSERT_HEAD(&dataplane->finished, ioreq, list);
++    dataplane->requests_inflight--;
++    dataplane->requests_finished++;
+ }
+ 
+ static void ioreq_release(struct ioreq *ioreq, bool finish)
+ {
+-    struct XenBlkDev *blkdev = ioreq->blkdev;
++    XenBlockDataPlane *dataplane = ioreq->dataplane;
+ 
+     QLIST_REMOVE(ioreq, list);
+     ioreq_reset(ioreq);
+-    ioreq->blkdev = blkdev;
+-    QLIST_INSERT_HEAD(&blkdev->freelist, ioreq, list);
++    ioreq->dataplane = dataplane;
++    QLIST_INSERT_HEAD(&dataplane->freelist, ioreq, list);
+     if (finish) {
+-        blkdev->requests_finished--;
++        dataplane->requests_finished--;
+     } else {
+-        blkdev->requests_inflight--;
++        dataplane->requests_inflight--;
+     }
+ }
+ 
+@@ -148,7 +148,7 @@ static void ioreq_release(struct ioreq *ioreq, bool finish)
+  */
+ static int ioreq_parse(struct ioreq *ioreq)
+ {
+-    struct XenBlkDev *blkdev = ioreq->blkdev;
++    XenBlockDataPlane *dataplane = ioreq->dataplane;
+     size_t len;
+     int i;
+ 
+@@ -171,12 +171,12 @@ static int ioreq_parse(struct ioreq *ioreq)
+     };
+ 
+     if (ioreq->req.operation != BLKIF_OP_READ &&
+-        blk_is_read_only(blkdev->blk)) {
++        blk_is_read_only(dataplane->blk)) {
+         error_report("error: write req for ro device");
+         goto err;
+     }
+ 
+-    ioreq->start = ioreq->req.sector_number * blkdev->file_blk;
++    ioreq->start = ioreq->req.sector_number * dataplane->file_blk;
+     for (i = 0; i < ioreq->req.nr_segments; i++) {
+         if (i == BLKIF_MAX_SEGMENTS_PER_REQUEST) {
+             error_report("error: nr_segments too big");
+@@ -186,16 +186,16 @@ static int ioreq_parse(struct ioreq *ioreq)
+             error_report("error: first > last sector");
+             goto err;
+         }
+-        if (ioreq->req.seg[i].last_sect * blkdev->file_blk >= XC_PAGE_SIZE) {
++        if (ioreq->req.seg[i].last_sect * dataplane->file_blk >= XC_PAGE_SIZE) {
+             error_report("error: page crossing");
+             goto err;
+         }
+ 
+         len = (ioreq->req.seg[i].last_sect -
+-               ioreq->req.seg[i].first_sect + 1) * blkdev->file_blk;
++               ioreq->req.seg[i].first_sect + 1) * dataplane->file_blk;
+         ioreq->size += len;
+     }
+-    if (ioreq->start + ioreq->size > blkdev->file_size) {
++    if (ioreq->start + ioreq->size > dataplane->file_size) {
+         error_report("error: access beyond end of file");
+         goto err;
+     }
+@@ -208,11 +208,11 @@ err:
+ 
+ static int ioreq_grant_copy(struct ioreq *ioreq)
+ {
+-    struct XenBlkDev *blkdev = ioreq->blkdev;
+-    XenDevice *xendev = blkdev->xendev;
++    XenBlockDataPlane *dataplane = ioreq->dataplane;
++    XenDevice *xendev = dataplane->xendev;
+     XenDeviceGrantCopySegment segs[BLKIF_MAX_SEGMENTS_PER_REQUEST];
+     int i, count;
+-    int64_t file_blk = blkdev->file_blk;
++    int64_t file_blk = dataplane->file_blk;
+     bool to_domain = (ioreq->req.operation == BLKIF_OP_READ);
+     void *virt = ioreq->buf;
+     Error *local_err = NULL;
+@@ -257,9 +257,9 @@ static int ioreq_runio_qemu_aio(struct ioreq *ioreq);
+ static void qemu_aio_complete(void *opaque, int ret)
+ {
+     struct ioreq *ioreq = opaque;
+-    struct XenBlkDev *blkdev = ioreq->blkdev;
++    XenBlockDataPlane *dataplane = ioreq->dataplane;
+ 
+-    aio_context_acquire(blkdev->ctx);
++    aio_context_acquire(dataplane->ctx);
+ 
+     if (ret != 0) {
+         error_report("%s I/O error",
+@@ -308,25 +308,25 @@ static void qemu_aio_complete(void *opaque, int ret)
+         }
+     case BLKIF_OP_READ:
+         if (ioreq->status == BLKIF_RSP_OKAY) {
+-            block_acct_done(blk_get_stats(blkdev->blk), &ioreq->acct);
++            block_acct_done(blk_get_stats(dataplane->blk), &ioreq->acct);
+         } else {
+-            block_acct_failed(blk_get_stats(blkdev->blk), &ioreq->acct);
++            block_acct_failed(blk_get_stats(dataplane->blk), &ioreq->acct);
+         }
+         break;
+     case BLKIF_OP_DISCARD:
+     default:
+         break;
+     }
+-    qemu_bh_schedule(blkdev->bh);
++    qemu_bh_schedule(dataplane->bh);
+ 
+ done:
+-    aio_context_release(blkdev->ctx);
++    aio_context_release(dataplane->ctx);
+ }
+ 
+ static bool blk_split_discard(struct ioreq *ioreq, blkif_sector_t sector_number,
+                               uint64_t nr_sectors)
+ {
+-    struct XenBlkDev *blkdev = ioreq->blkdev;
++    XenBlockDataPlane *dataplane = ioreq->dataplane;
+     int64_t byte_offset;
+     int byte_chunk;
+     uint64_t byte_remaining, limit;
+@@ -335,18 +335,18 @@ static bool blk_split_discard(struct ioreq *ioreq, blkif_sector_t sector_number,
+ 
+     /* Wrap around, or overflowing byte limit? */
+     if (sec_start + sec_count < sec_count ||
+-        sec_start + sec_count > INT64_MAX / blkdev->file_blk) {
++        sec_start + sec_count > INT64_MAX / dataplane->file_blk) {
+         return false;
+     }
+ 
+-    limit = BDRV_REQUEST_MAX_SECTORS * blkdev->file_blk;
+-    byte_offset = sec_start * blkdev->file_blk;
+-    byte_remaining = sec_count * blkdev->file_blk;
++    limit = BDRV_REQUEST_MAX_SECTORS * dataplane->file_blk;
++    byte_offset = sec_start * dataplane->file_blk;
++    byte_remaining = sec_count * dataplane->file_blk;
+ 
+     do {
+         byte_chunk = byte_remaining > limit ? limit : byte_remaining;
+         ioreq->aio_inflight++;
+-        blk_aio_pdiscard(blkdev->blk, byte_offset, byte_chunk,
++        blk_aio_pdiscard(dataplane->blk, byte_offset, byte_chunk,
+                          qemu_aio_complete, ioreq);
+         byte_remaining -= byte_chunk;
+         byte_offset += byte_chunk;
+@@ -357,7 +357,7 @@ static bool blk_split_discard(struct ioreq *ioreq, blkif_sector_t sector_number,
+ 
+ static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
+ {
+-    struct XenBlkDev *blkdev = ioreq->blkdev;
++    XenBlockDataPlane *dataplane = ioreq->dataplane;
+ 
+     ioreq->buf = qemu_memalign(XC_PAGE_SIZE, ioreq->size);
+     if (ioreq->req.nr_segments &&
+@@ -370,17 +370,17 @@ static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
+ 
+     ioreq->aio_inflight++;
+     if (ioreq->presync) {
+-        blk_aio_flush(ioreq->blkdev->blk, qemu_aio_complete, ioreq);
++        blk_aio_flush(ioreq->dataplane->blk, qemu_aio_complete, ioreq);
+         return 0;
+     }
+ 
+     switch (ioreq->req.operation) {
+     case BLKIF_OP_READ:
+         qemu_iovec_add(&ioreq->v, ioreq->buf, ioreq->size);
+-        block_acct_start(blk_get_stats(blkdev->blk), &ioreq->acct,
++        block_acct_start(blk_get_stats(dataplane->blk), &ioreq->acct,
+                          ioreq->v.size, BLOCK_ACCT_READ);
+         ioreq->aio_inflight++;
+-        blk_aio_preadv(blkdev->blk, ioreq->start, &ioreq->v, 0,
++        blk_aio_preadv(dataplane->blk, ioreq->start, &ioreq->v, 0,
+                        qemu_aio_complete, ioreq);
+         break;
+     case BLKIF_OP_WRITE:
+@@ -390,12 +390,12 @@ static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
+         }
+ 
+         qemu_iovec_add(&ioreq->v, ioreq->buf, ioreq->size);
+-        block_acct_start(blk_get_stats(blkdev->blk), &ioreq->acct,
++        block_acct_start(blk_get_stats(dataplane->blk), &ioreq->acct,
+                          ioreq->v.size,
+                          ioreq->req.operation == BLKIF_OP_WRITE ?
+                          BLOCK_ACCT_WRITE : BLOCK_ACCT_FLUSH);
+         ioreq->aio_inflight++;
+-        blk_aio_pwritev(blkdev->blk, ioreq->start, &ioreq->v, 0,
++        blk_aio_pwritev(dataplane->blk, ioreq->start, &ioreq->v, 0,
+                         qemu_aio_complete, ioreq);
+         break;
+     case BLKIF_OP_DISCARD:
+@@ -423,27 +423,27 @@ err:
+ 
+ static int blk_send_response_one(struct ioreq *ioreq)
+ {
+-    struct XenBlkDev *blkdev = ioreq->blkdev;
++    XenBlockDataPlane *dataplane = ioreq->dataplane;
+     int send_notify = 0;
+     int have_requests = 0;
+     blkif_response_t *resp;
+ 
+     /* Place on the response ring for the relevant domain. */
+-    switch (blkdev->protocol) {
++    switch (dataplane->protocol) {
+     case BLKIF_PROTOCOL_NATIVE:
+         resp = (blkif_response_t *)RING_GET_RESPONSE(
+-            &blkdev->rings.native,
+-            blkdev->rings.native.rsp_prod_pvt);
++            &dataplane->rings.native,
++            dataplane->rings.native.rsp_prod_pvt);
+         break;
+     case BLKIF_PROTOCOL_X86_32:
+         resp = (blkif_response_t *)RING_GET_RESPONSE(
+-            &blkdev->rings.x86_32_part,
+-            blkdev->rings.x86_32_part.rsp_prod_pvt);
++            &dataplane->rings.x86_32_part,
++            dataplane->rings.x86_32_part.rsp_prod_pvt);
+         break;
+     case BLKIF_PROTOCOL_X86_64:
+         resp = (blkif_response_t *)RING_GET_RESPONSE(
+-            &blkdev->rings.x86_64_part,
+-            blkdev->rings.x86_64_part.rsp_prod_pvt);
++            &dataplane->rings.x86_64_part,
++            dataplane->rings.x86_64_part.rsp_prod_pvt);
+         break;
+     default:
+         return 0;
+@@ -453,42 +453,45 @@ static int blk_send_response_one(struct ioreq *ioreq)
+     resp->operation = ioreq->req.operation;
+     resp->status = ioreq->status;
+ 
+-    blkdev->rings.common.rsp_prod_pvt++;
++    dataplane->rings.common.rsp_prod_pvt++;
+ 
+-    RING_PUSH_RESPONSES_AND_CHECK_NOTIFY(&blkdev->rings.common, send_notify);
+-    if (blkdev->rings.common.rsp_prod_pvt == blkdev->rings.common.req_cons) {
++    RING_PUSH_RESPONSES_AND_CHECK_NOTIFY(&dataplane->rings.common,
++                                         send_notify);
++    if (dataplane->rings.common.rsp_prod_pvt ==
++        dataplane->rings.common.req_cons) {
+         /*
+          * Tail check for pending requests. Allows frontend to avoid
+          * notifications if requests are already in flight (lower
+          * overheads and promotes batching).
+          */
+-        RING_FINAL_CHECK_FOR_REQUESTS(&blkdev->rings.common, have_requests);
+-    } else if (RING_HAS_UNCONSUMED_REQUESTS(&blkdev->rings.common)) {
++        RING_FINAL_CHECK_FOR_REQUESTS(&dataplane->rings.common,
++                                      have_requests);
++    } else if (RING_HAS_UNCONSUMED_REQUESTS(&dataplane->rings.common)) {
+         have_requests = 1;
+     }
+ 
+     if (have_requests) {
+-        blkdev->more_work++;
++        dataplane->more_work++;
+     }
+     return send_notify;
+ }
+ 
+ /* walk finished list, send outstanding responses, free requests */
+-static void blk_send_response_all(struct XenBlkDev *blkdev)
++static void blk_send_response_all(XenBlockDataPlane *dataplane)
+ {
+     struct ioreq *ioreq;
+     int send_notify = 0;
+ 
+-    while (!QLIST_EMPTY(&blkdev->finished)) {
+-        ioreq = QLIST_FIRST(&blkdev->finished);
++    while (!QLIST_EMPTY(&dataplane->finished)) {
++        ioreq = QLIST_FIRST(&dataplane->finished);
+         send_notify += blk_send_response_one(ioreq);
+         ioreq_release(ioreq, true);
+     }
+     if (send_notify) {
+         Error *local_err = NULL;
+ 
+-        xen_device_notify_event_channel(blkdev->xendev,
+-                                        blkdev->event_channel,
++        xen_device_notify_event_channel(dataplane->xendev,
++                                        dataplane->event_channel,
+                                         &local_err);
+         if (local_err) {
+             error_report_err(local_err);
+@@ -496,67 +499,76 @@ static void blk_send_response_all(struct XenBlkDev *blkdev)
+     }
+ }
+ 
+-static int blk_get_request(struct XenBlkDev *blkdev, struct ioreq *ioreq,
++static int blk_get_request(XenBlockDataPlane *dataplane, struct ioreq *ioreq,
+                            RING_IDX rc)
+ {
+-    switch (blkdev->protocol) {
+-    case BLKIF_PROTOCOL_NATIVE:
+-        memcpy(&ioreq->req, RING_GET_REQUEST(&blkdev->rings.native, rc),
+-               sizeof(ioreq->req));
++    switch (dataplane->protocol) {
++    case BLKIF_PROTOCOL_NATIVE: {
++        blkif_request_t *req =
++            RING_GET_REQUEST(&dataplane->rings.native, rc);
++
++        memcpy(&ioreq->req, req, sizeof(ioreq->req));
+         break;
+-    case BLKIF_PROTOCOL_X86_32:
+-        blkif_get_x86_32_req(&ioreq->req,
+-                             RING_GET_REQUEST(&blkdev->rings.x86_32_part, rc));
++    }
++    case BLKIF_PROTOCOL_X86_32: {
++        blkif_x86_32_request_t *req =
++            RING_GET_REQUEST(&dataplane->rings.x86_32_part, rc);
++
++        blkif_get_x86_32_req(&ioreq->req, req);
+         break;
+-    case BLKIF_PROTOCOL_X86_64:
+-        blkif_get_x86_64_req(&ioreq->req,
+-                             RING_GET_REQUEST(&blkdev->rings.x86_64_part, rc));
++    }
++    case BLKIF_PROTOCOL_X86_64: {
++        blkif_x86_64_request_t *req =
++            RING_GET_REQUEST(&dataplane->rings.x86_64_part, rc);
++
++        blkif_get_x86_64_req(&ioreq->req, req);
+         break;
+     }
++    }
+     /* Prevent the compiler from accessing the on-ring fields instead. */
+     barrier();
+     return 0;
+ }
+ 
+-static void blk_handle_requests(struct XenBlkDev *blkdev)
++static void blk_handle_requests(XenBlockDataPlane *dataplane)
+ {
+     RING_IDX rc, rp;
+     struct ioreq *ioreq;
+ 
+-    blkdev->more_work = 0;
++    dataplane->more_work = 0;
+ 
+-    rc = blkdev->rings.common.req_cons;
+-    rp = blkdev->rings.common.sring->req_prod;
++    rc = dataplane->rings.common.req_cons;
++    rp = dataplane->rings.common.sring->req_prod;
+     xen_rmb(); /* Ensure we see queued requests up to 'rp'. */
+ 
+-    blk_send_response_all(blkdev);
++    blk_send_response_all(dataplane);
+     while (rc != rp) {
+         /* pull request from ring */
+-        if (RING_REQUEST_CONS_OVERFLOW(&blkdev->rings.common, rc)) {
++        if (RING_REQUEST_CONS_OVERFLOW(&dataplane->rings.common, rc)) {
+             break;
+         }
+-        ioreq = ioreq_start(blkdev);
++        ioreq = ioreq_start(dataplane);
+         if (ioreq == NULL) {
+-            blkdev->more_work++;
++            dataplane->more_work++;
+             break;
+         }
+-        blk_get_request(blkdev, ioreq, rc);
+-        blkdev->rings.common.req_cons = ++rc;
++        blk_get_request(dataplane, ioreq, rc);
++        dataplane->rings.common.req_cons = ++rc;
+ 
+         /* parse them */
+         if (ioreq_parse(ioreq) != 0) {
+ 
+             switch (ioreq->req.operation) {
+             case BLKIF_OP_READ:
+-                block_acct_invalid(blk_get_stats(blkdev->blk),
++                block_acct_invalid(blk_get_stats(dataplane->blk),
+                                    BLOCK_ACCT_READ);
+                 break;
+             case BLKIF_OP_WRITE:
+-                block_acct_invalid(blk_get_stats(blkdev->blk),
++                block_acct_invalid(blk_get_stats(dataplane->blk),
+                                    BLOCK_ACCT_WRITE);
+                 break;
+             case BLKIF_OP_FLUSH_DISKCACHE:
+-                block_acct_invalid(blk_get_stats(blkdev->blk),
++                block_acct_invalid(blk_get_stats(dataplane->blk),
+                                    BLOCK_ACCT_FLUSH);
+             default:
+                 break;
+@@ -565,8 +577,8 @@ static void blk_handle_requests(struct XenBlkDev *blkdev)
+             if (blk_send_response_one(ioreq)) {
+                 Error *local_err = NULL;
+ 
+-                xen_device_notify_event_channel(blkdev->xendev,
+-                                                blkdev->event_channel,
++                xen_device_notify_event_channel(dataplane->xendev,
++                                                dataplane->event_channel,
+                                                 &local_err);
+                 if (local_err) {
+                     error_report_err(local_err);
+@@ -579,173 +591,173 @@ static void blk_handle_requests(struct XenBlkDev *blkdev)
+         ioreq_runio_qemu_aio(ioreq);
+     }
+ 
+-    if (blkdev->more_work && blkdev->requests_inflight < blkdev->max_requests) {
+-        qemu_bh_schedule(blkdev->bh);
++    if (dataplane->more_work &&
++        dataplane->requests_inflight < dataplane->max_requests) {
++        qemu_bh_schedule(dataplane->bh);
+     }
+ }
+ 
+ static void blk_bh(void *opaque)
+ {
+-    struct XenBlkDev *blkdev = opaque;
++    XenBlockDataPlane *dataplane = opaque;
+ 
+-    aio_context_acquire(blkdev->ctx);
+-    blk_handle_requests(blkdev);
+-    aio_context_release(blkdev->ctx);
++    aio_context_acquire(dataplane->ctx);
++    blk_handle_requests(dataplane);
++    aio_context_release(dataplane->ctx);
+ }
+ 
+ static void blk_event(void *opaque)
+ {
+-    struct XenBlkDev *blkdev = opaque;
++    XenBlockDataPlane *dataplane = opaque;
+ 
+-    qemu_bh_schedule(blkdev->bh);
++    qemu_bh_schedule(dataplane->bh);
+ }
+ 
+-struct XenBlkDev *xen_block_dataplane_create(XenDevice *xendev,
+-                                             BlockConf *conf,
+-                                             IOThread *iothread)
++XenBlockDataPlane *xen_block_dataplane_create(XenDevice *xendev,
++                                              BlockConf *conf,
++                                              IOThread *iothread)
+ {
+-    struct XenBlkDev *blkdev = g_new0(struct XenBlkDev, 1);
++    XenBlockDataPlane *dataplane = g_new0(XenBlockDataPlane, 1);
+ 
+-    blkdev->xendev = xendev;
+-    blkdev->file_blk = conf->logical_block_size;
+-    blkdev->blk = conf->blk;
+-    blkdev->file_size = blk_getlength(blkdev->blk);
++    dataplane->xendev = xendev;
++    dataplane->file_blk = conf->logical_block_size;
++    dataplane->blk = conf->blk;
++    dataplane->file_size = blk_getlength(dataplane->blk);
+ 
+-    QLIST_INIT(&blkdev->inflight);
+-    QLIST_INIT(&blkdev->finished);
+-    QLIST_INIT(&blkdev->freelist);
++    QLIST_INIT(&dataplane->inflight);
++    QLIST_INIT(&dataplane->finished);
++    QLIST_INIT(&dataplane->freelist);
+ 
+     if (iothread) {
+-        blkdev->iothread = iothread;
+-        object_ref(OBJECT(blkdev->iothread));
+-        blkdev->ctx = iothread_get_aio_context(blkdev->iothread);
++        dataplane->iothread = iothread;
++        object_ref(OBJECT(dataplane->iothread));
++        dataplane->ctx = iothread_get_aio_context(dataplane->iothread);
+     } else {
+-        blkdev->ctx = qemu_get_aio_context();
++        dataplane->ctx = qemu_get_aio_context();
+     }
+-    blkdev->bh = aio_bh_new(blkdev->ctx, blk_bh, blkdev);
++    dataplane->bh = aio_bh_new(dataplane->ctx, blk_bh, dataplane);
+ 
+-    return blkdev;
++    return dataplane;
+ }
+ 
+-void xen_block_dataplane_destroy(struct XenBlkDev *blkdev)
++void xen_block_dataplane_destroy(XenBlockDataPlane *dataplane)
+ {
+     struct ioreq *ioreq;
+ 
+-    if (!blkdev) {
++    if (!dataplane) {
+         return;
+     }
+ 
+-    while (!QLIST_EMPTY(&blkdev->freelist)) {
+-        ioreq = QLIST_FIRST(&blkdev->freelist);
++    while (!QLIST_EMPTY(&dataplane->freelist)) {
++        ioreq = QLIST_FIRST(&dataplane->freelist);
+         QLIST_REMOVE(ioreq, list);
+         qemu_iovec_destroy(&ioreq->v);
+         g_free(ioreq);
+     }
+ 
+-    qemu_bh_delete(blkdev->bh);
+-    if (blkdev->iothread) {
+-        object_unref(OBJECT(blkdev->iothread));
++    qemu_bh_delete(dataplane->bh);
++    if (dataplane->iothread) {
++        object_unref(OBJECT(dataplane->iothread));
+     }
+ 
+-    g_free(blkdev);
++    g_free(dataplane);
+ }
+ 
+-
+-void xen_block_dataplane_stop(struct XenBlkDev *blkdev)
++void xen_block_dataplane_stop(XenBlockDataPlane *dataplane)
+ {
+     XenDevice *xendev;
+ 
+-    if (!blkdev) {
++    if (!dataplane) {
+         return;
+     }
+ 
+-    aio_context_acquire(blkdev->ctx);
+-    blk_set_aio_context(blkdev->blk, qemu_get_aio_context());
+-    aio_context_release(blkdev->ctx);
++    aio_context_acquire(dataplane->ctx);
++    blk_set_aio_context(dataplane->blk, qemu_get_aio_context());
++    aio_context_release(dataplane->ctx);
+ 
+-    xendev = blkdev->xendev;
++    xendev = dataplane->xendev;
+ 
+-    if (blkdev->event_channel) {
++    if (dataplane->event_channel) {
+         Error *local_err = NULL;
+ 
+-        xen_device_unbind_event_channel(xendev, blkdev->event_channel,
++        xen_device_unbind_event_channel(xendev, dataplane->event_channel,
+                                         &local_err);
+-        blkdev->event_channel = NULL;
++        dataplane->event_channel = NULL;
+ 
+         if (local_err) {
+             error_report_err(local_err);
+         }
+     }
+ 
+-    if (blkdev->sring) {
++    if (dataplane->sring) {
+         Error *local_err = NULL;
+ 
+-        xen_device_unmap_grant_refs(xendev, blkdev->sring,
+-                                    blkdev->nr_ring_ref, &local_err);
+-        blkdev->sring = NULL;
++        xen_device_unmap_grant_refs(xendev, dataplane->sring,
++                                    dataplane->nr_ring_ref, &local_err);
++        dataplane->sring = NULL;
+ 
+         if (local_err) {
+             error_report_err(local_err);
+         }
+     }
+ 
+-    g_free(blkdev->ring_ref);
+-    blkdev->ring_ref = NULL;
++    g_free(dataplane->ring_ref);
++    dataplane->ring_ref = NULL;
+ }
+ 
+-void xen_block_dataplane_start(struct XenBlkDev *blkdev,
++void xen_block_dataplane_start(XenBlockDataPlane *dataplane,
+                                const unsigned int ring_ref[],
+                                unsigned int nr_ring_ref,
+                                unsigned int event_channel,
+                                unsigned int protocol,
+                                Error **errp)
+ {
+-    XenDevice *xendev = blkdev->xendev;
++    XenDevice *xendev = dataplane->xendev;
+     Error *local_err = NULL;
+     unsigned int ring_size;
+     unsigned int i;
+ 
+-    blkdev->nr_ring_ref = nr_ring_ref;
+-    blkdev->ring_ref = g_new(unsigned int, nr_ring_ref);
++    dataplane->nr_ring_ref = nr_ring_ref;
++    dataplane->ring_ref = g_new(unsigned int, nr_ring_ref);
+ 
+     for (i = 0; i < nr_ring_ref; i++) {
+-        blkdev->ring_ref[i] = ring_ref[i];
++        dataplane->ring_ref[i] = ring_ref[i];
+     }
+ 
+-    blkdev->protocol = protocol;
++    dataplane->protocol = protocol;
+ 
+-    ring_size = XC_PAGE_SIZE * blkdev->nr_ring_ref;
+-    switch (blkdev->protocol) {
++    ring_size = XC_PAGE_SIZE * dataplane->nr_ring_ref;
++    switch (dataplane->protocol) {
+     case BLKIF_PROTOCOL_NATIVE:
+     {
+-        blkdev->max_requests = __CONST_RING_SIZE(blkif, ring_size);
++        dataplane->max_requests = __CONST_RING_SIZE(blkif, ring_size);
+         break;
+     }
+     case BLKIF_PROTOCOL_X86_32:
+     {
+-        blkdev->max_requests = __CONST_RING_SIZE(blkif_x86_32, ring_size);
++        dataplane->max_requests = __CONST_RING_SIZE(blkif_x86_32, ring_size);
+         break;
+     }
+     case BLKIF_PROTOCOL_X86_64:
+     {
+-        blkdev->max_requests = __CONST_RING_SIZE(blkif_x86_64, ring_size);
++        dataplane->max_requests = __CONST_RING_SIZE(blkif_x86_64, ring_size);
+         break;
+     }
+     default:
+-        error_setg(errp, "unknown protocol %u", blkdev->protocol);
++        error_setg(errp, "unknown protocol %u", dataplane->protocol);
+         return;
+     }
+ 
+-    xen_device_set_max_grant_refs(xendev, blkdev->nr_ring_ref,
++    xen_device_set_max_grant_refs(xendev, dataplane->nr_ring_ref,
+                                   &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         goto stop;
+     }
+ 
+-    blkdev->sring = xen_device_map_grant_refs(xendev,
+-                                              blkdev->ring_ref,
+-                                              blkdev->nr_ring_ref,
++    dataplane->sring = xen_device_map_grant_refs(xendev,
++                                              dataplane->ring_ref,
++                                              dataplane->nr_ring_ref,
+                                               PROT_READ | PROT_WRITE,
+                                               &local_err);
+     if (local_err) {
+@@ -753,46 +765,46 @@ void xen_block_dataplane_start(struct XenBlkDev *blkdev,
+         goto stop;
+     }
+ 
+-    switch (blkdev->protocol) {
++    switch (dataplane->protocol) {
+     case BLKIF_PROTOCOL_NATIVE:
+     {
+-        blkif_sring_t *sring_native = blkdev->sring;
++        blkif_sring_t *sring_native = dataplane->sring;
+ 
+-        BACK_RING_INIT(&blkdev->rings.native, sring_native, ring_size);
++        BACK_RING_INIT(&dataplane->rings.native, sring_native, ring_size);
+         break;
+     }
+     case BLKIF_PROTOCOL_X86_32:
+     {
+-        blkif_x86_32_sring_t *sring_x86_32 = blkdev->sring;
++        blkif_x86_32_sring_t *sring_x86_32 = dataplane->sring;
+ 
+-        BACK_RING_INIT(&blkdev->rings.x86_32_part, sring_x86_32,
++        BACK_RING_INIT(&dataplane->rings.x86_32_part, sring_x86_32,
+                        ring_size);
+         break;
+     }
+     case BLKIF_PROTOCOL_X86_64:
+     {
+-        blkif_x86_64_sring_t *sring_x86_64 = blkdev->sring;
++        blkif_x86_64_sring_t *sring_x86_64 = dataplane->sring;
+ 
+-        BACK_RING_INIT(&blkdev->rings.x86_64_part, sring_x86_64,
++        BACK_RING_INIT(&dataplane->rings.x86_64_part, sring_x86_64,
+                        ring_size);
+         break;
+     }
+     }
+ 
+-    blkdev->event_channel =
++    dataplane->event_channel =
+         xen_device_bind_event_channel(xendev, event_channel,
+-                                      blk_event, blkdev,
++                                      blk_event, dataplane,
+                                       &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         goto stop;
+     }
+ 
+-    aio_context_acquire(blkdev->ctx);
+-    blk_set_aio_context(blkdev->blk, blkdev->ctx);
+-    aio_context_release(blkdev->ctx);
++    aio_context_acquire(dataplane->ctx);
++    blk_set_aio_context(dataplane->blk, dataplane->ctx);
++    aio_context_release(dataplane->ctx);
+     return;
+ 
+ stop:
+-    xen_block_dataplane_stop(blkdev);
++    xen_block_dataplane_stop(dataplane);
+ }
+diff --git a/hw/block/dataplane/xen-block.h b/hw/block/dataplane/xen-block.h
+index f31da38..d6fa6d2 100644
+--- a/hw/block/dataplane/xen-block.h
++++ b/hw/block/dataplane/xen-block.h
+@@ -12,7 +12,7 @@
+ #include "hw/xen/xen-bus.h"
+ #include "sysemu/iothread.h"
+ 
+-typedef struct XenBlkDev XenBlockDataPlane;
++typedef struct XenBlockDataPlane XenBlockDataPlane;
+ 
+ XenBlockDataPlane *xen_block_dataplane_create(XenDevice *xendev,
+                                               BlockConf *conf,
+-- 
+2.1.4
