@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <matthias@weckbecker.name>) id 1gWcLa-0007vL-AB
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 02:20:51 -0500
+	(envelope-from <qwandor@google.com>) id 1gWfCd-0004Cf-5B
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:23:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <matthias@weckbecker.name>) id 1gWcLU-0002BT-KJ
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 02:20:50 -0500
-Received: from weckbecker.name ([87.118.122.104]:64110)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <matthias@weckbecker.name>)
-	id 1gWcLU-0001y1-2J
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 02:20:44 -0500
-Date: Tue, 11 Dec 2018 08:20:27 +0100
-From: Matthias Weckbecker <matthias@weckbecker.name>
-Message-ID: <20181211072027.GA4465@weckbecker.name>
-References: <20181210145653.GE5000@localhost.localdomain>
-Content-Type: multipart/mixed; boundary="y0ulUmNC+osPPQO6"
-Content-Disposition: inline
-In-Reply-To: <20181210145653.GE5000@localhost.localdomain>
-Subject: Re: [Qemu-devel] Fwd: [PATCH] QEMU patch for PCI handling bug
- (invalid free)
+	(envelope-from <qwandor@google.com>) id 1gWfCc-0007kP-6h
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:23:47 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46370)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <qwandor@google.com>) id 1gWfCb-0007ir-QZ
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:23:46 -0500
+Received: by mail-wr1-x441.google.com with SMTP id l9so13422908wrt.13
+	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 02:23:45 -0800 (PST)
+MIME-Version: 1.0
+References: <20181210183836.20074-1-qwandor@google.com>
+	<CAFEAcA9kXXeRkFamN73XREDp4QaokMs3E9TRLThKf4zYufapSQ@mail.gmail.com>
+	<CAMKQLNK2J=JsgEch3G-pQ0mjW5B-n8Xc_4PDGHjFs6CfcA2ngg@mail.gmail.com>
+	<CAFEAcA9LNUWrW1dePcKh4LLnN9xUKWswWnfjiNN_2JWExCj90A@mail.gmail.com>
+In-Reply-To: <CAFEAcA9LNUWrW1dePcKh4LLnN9xUKWswWnfjiNN_2JWExCj90A@mail.gmail.com>
+From: Andrew Walbran <qwandor@google.com>
+Date: Tue, 11 Dec 2018 10:23:31 +0000
+Message-ID: <CA+_y_2Fa3ffTEcmdNgg7iO+A4W1jZVGQb9GX_46jmER=zJsc6Q@mail.gmail.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature";
+	micalg=sha-256; boundary="000000000000e79559057cbc79ae"
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Implement VI/VF bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,204 +31,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, marcel.apfelbaum@gmail.com
+To: peter.maydell@linaro.org
+Cc: Wedson Almeida Filho <wedsonaf@google.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
+--000000000000e79559057cbc79ae
+Content-Type: text/plain; charset="UTF-8"
 
---y0ulUmNC+osPPQO6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Mon, 10 Dec 2018 at 22:05, Peter Maydell <peter.maydell@linaro.org>
+wrote:
 
-On Mon, Dec 10, 2018 at 03:56:53PM +0100, Kevin Wolf wrote:
-> Am 10.12.2018 um 14:38 hat Matthias Weckbecker geschrieben:
-> > Hi Kevin,
-> > 
-> > I'm attaching a patch for qemu. Read below for details.
-> > 
-> > There's a bug in qemu in the PCI bridge handling that can be triggered when
-> > following the steps below:
-> > 
-> >   1) Create some VM (e.g. w/ virsh define)
-> >   2) Ensure there is a PCI bridge attached, e.g. w/ libvirt like this:
-> > 
-> >      <controller type='pci' index='1' model='pci-bridge'>
-> >       <model name='pci-bridge'/>
-> >       <target chassisNr='1'/>
-> >       <alias name='pci'/>
-> >       <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x1'/>
-> >      </controller>
-> > 
-> >   3) Take a snapshot while it's *running*, like this:
-> > 
-> >      % virsh start mips64el-vm
-> >      % virsh snapshot-create-as mips64el-vm mips64el-snap
-> > 
-> >   4) Destroy the VM and revert from snapshot:
-> > 
-> >      % virsh destroy mips64el-vm
-> >      % virsh snapshot-revert mips64el-vm mips64el-snap --running
-> >        error: internal error: process exited while connecting to monitor: corrupted size vs. prev_size
-> > 
-> >   5) qemu-system-mips64el crashes
-> > 
-> > The attached patch resolves the issue. Can you maybe review+commit, please?
-> 
-> Hi Matthias,
-> 
+> On Mon, 10 Dec 2018 at 21:32, Wedson Almeida Filho <wedsonaf@google.com>
+> wrote:
+> >
+> > Hi Peter,
+> >
+> > We put this together months ago and hadn't kept up to date with the
+> changes here.
+> >
+> > We're happy to see that support has been added for the VI bit. Is it
+> going to be available in the v3.1.0 release?
+>
+> Yes, that commit is in 3.1.0 -- do test it and let me know if
+> there's still an issue in this area for your guest code.
+>
+Ah, thanks, you're quite right! Everything seems to work fine in
+v3.1.0-rc5, please ignore this patch.
 
-Hi Kevin,
+--000000000000e79559057cbc79ae
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-> thanks for sending the patch. The next step is that it needs to be
-> reviewed on the qemu-devel mailing list (CCed) and then the PCI
-> subsystem maintainers (Michael and Marcel, CCed as well) can commit it.
-> 
-
-thank you for looking into it and forwarding it.
-
-> Maybe some of the explanation above should actually be moved to the
-> commit message of the patch itself?
-> 
-
-yes, I agree. I have --amend'ed my commit message and re-attached it.
-
-> Kevin
-
-Thanks,
-Matthias
-
-> 
-> ----- Forwarded message from Matthias Weckbecker <matthias@weckbecker.name> -----
-> 
-> (gdb) bt
-> #0  __GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:51
-> #1  0x00007fde12dfc801 in __GI_abort () at abort.c:79
-> #2  0x00007fde12e45897 in __libc_message (action=action@entry=do_abort, fmt=fmt@entry=0x7fde12f72b9a "%s\n") at ../sysdeps/posix/libc_fatal.c:181
-> #3  0x00007fde12e4c90a in malloc_printerr (str=str@entry=0x7fde12f70c9d "corrupted size vs. prev_size") at malloc.c:5350
-> #4  0x00007fde12e4cb0c in malloc_consolidate (av=av@entry=0x7fde131a7c40 <main_arena>) at malloc.c:4456
-> #5  0x00007fde12e5403b in _int_free (have_lock=0, p=<optimized out>, av=0x7fde131a7c40 <main_arena>) at malloc.c:4362
-> #6  __GI___libc_free (mem=0x55f089173c20) at malloc.c:3124
-> #7  0x000055f086c85062 in phys_section_destroy (mr=0x55f089173c20) at ./exec.c:1317
-> #8  phys_sections_free (map=0x55f0890f1560) at ./exec.c:1325
-> #9  address_space_dispatch_free (d=0x55f0890f1550) at ./exec.c:2777
-> #10 0x000055f086cc0509 in flatview_destroy (view=0x55f088a5caf0) at ./memory.c:301
-> #11 0x000055f087031dc0 in call_rcu_thread (opaque=<optimized out>) at ./util/rcu.c:272
-> #12 0x00007fde131b46db in start_thread (arg=0x7fde0aa39700) at pthread_create.c:463
-> #13 0x00007fde12edd88f in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
-> 
-> ==13641== Thread 2:                                                                                                                                                                                   [0/5041]
-> ==13641== Invalid read of size 8
-> ==13641==    at 0x42755B: memory_region_unref (memory.c:1749)
-> ==13641==    by 0x42755B: flatview_destroy (memory.c:307)
-> ==13641==    by 0x798DBF: call_rcu_thread (rcu.c:272)
-> ==13641==    by 0x97BF6DA: start_thread (pthread_create.c:463)
-> ==13641==    by 0x9AF888E: clone (clone.S:95)
-> ==13641==  Address 0x408e4670 is 64 bytes inside a block of size 1,440 free'd
-> ==13641==    at 0x4C30D3B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-> ==13641==    by 0x5E988B: get_pci_config_device (pci.c:491)
-> ==13641==    by 0x660069: vmstate_load_state (vmstate.c:140)
-> ==13641==    by 0x660236: vmstate_load_state (vmstate.c:137)
-> ==13641==    by 0x659994: vmstate_load (savevm.c:748)
-> ==13641==    by 0x65A7B1: qemu_loadvm_section_start_full.isra.11 (savevm.c:1918)
-> ==13641==    by 0x65AA67: qemu_loadvm_state_main.isra.13 (savevm.c:2013)
-> ==13641==    by 0x65D7CE: qemu_loadvm_state (savevm.c:2092)
-> ==13641==    by 0x65E40D: load_snapshot (savevm.c:2406)
-> ==13641==    by 0x3E28C2: main (vl.c:4918)
-> ==13641==  Block was alloc'd at
-> ==13641==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-> ==13641==    by 0x8D35A28: g_malloc (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.5600.3)
-> ==13641==    by 0x5ECA8A: pci_bridge_region_init (pci_bridge.c:187)
-> ==13641==    by 0x5ECEFC: pci_bridge_initfn (pci_bridge.c:384)
-> ==13641==    by 0x5E654F: pci_bridge_dev_realize (pci_bridge_dev.c:59)
-> ==13641==    by 0x5EBED0: pci_qdev_realize (pci.c:2034)
-> ==13641==    by 0x5742D8: device_set_realized (qdev.c:914)
-> ==13641==    by 0x6B8F96: property_set_bool (object.c:1906)
-> ==13641==    by 0x6BD11E: object_property_set_qobject (qom-qobject.c:27)
-> ==13641==    by 0x6BAD7F: object_property_set_bool (object.c:1171)
-> ==13641==    by 0x4FA75D: qdev_device_add (qdev-monitor.c:629)
-> ==13641==    by 0x4FCD36: device_init_func (vl.c:2432)
-> ==13641==
-> 
-> 
-> From 8229eb9cb97a1806e264290e2935261bf23c7f34 Mon Sep 17 00:00:00 2001
-> From: Matthias Weckbecker <matthias@weckbecker.name>
-> Date: Mon, 10 Dec 2018 14:00:48 +0100
-> Subject: [PATCH] hw/pci-bridge: Fix invalid free()
-> 
-> When loadvm'ing a *running* snapshot qemu crashes due to an invalid
-> free. It's fortunately caught early by glibc heap memory corruption
-> protection and qemu gets killed with SIGABRT.
-> 
-> This commit fixes the issue.
-> 
-> Signed-off-by: Matthias Weckbecker <matthias@weckbecker.name>
-> ---
->  hw/pci/pci_bridge.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
-> index ee9dff2d3a..b9143ac88b 100644
-> --- a/hw/pci/pci_bridge.c
-> +++ b/hw/pci/pci_bridge.c
-> @@ -241,9 +241,9 @@ void pci_bridge_update_mappings(PCIBridge *br)
->       * while another accesses an unaffected region. */
->      memory_region_transaction_begin();
->      pci_bridge_region_del(br, br->windows);
-> +    pci_bridge_region_cleanup(br, w);
->      br->windows = pci_bridge_region_init(br);
->      memory_region_transaction_commit();
-> -    pci_bridge_region_cleanup(br, w);
->  }
->  
->  /* default write_config function for PCI-to-PCI bridge */
-> -- 
-> 2.11.0
-> 
-> ----- End forwarded message -----
-
---y0ulUmNC+osPPQO6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="0001-hw-pci-bridge-Fix-invalid-free.patch"
-
->From 3f5ea73db8f781a43b0af0d3855cec604ba0434e Mon Sep 17 00:00:00 2001
-From: Matthias Weckbecker <matthias@weckbecker.name>
-Date: Mon, 10 Dec 2018 14:00:48 +0100
-Subject: [PATCH] hw/pci-bridge: Fix invalid free()
-
-When loadvm'ing a *running* snapshot qemu crashes due to an invalid
-free. It's fortunately caught early by glibc heap memory corruption
-protection and qemu gets killed with SIGABRT.
-
-Steps to reproduce:
-
-1) Create VM (e.g w/ virsh define)
-2) Start the VM and take a snapshot while it's running and having a
-   PCI bridge attached
-3) Destroy the VM and revert the running snapshot.
-
-This commit fixes the issue.
-
-Signed-off-by: Matthias Weckbecker <matthias@weckbecker.name>
----
- hw/pci/pci_bridge.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
-index ee9dff2d3a..b9143ac88b 100644
---- a/hw/pci/pci_bridge.c
-+++ b/hw/pci/pci_bridge.c
-@@ -241,9 +241,9 @@ void pci_bridge_update_mappings(PCIBridge *br)
-      * while another accesses an unaffected region. */
-     memory_region_transaction_begin();
-     pci_bridge_region_del(br, br->windows);
-+    pci_bridge_region_cleanup(br, w);
-     br->windows = pci_bridge_region_init(br);
-     memory_region_transaction_commit();
--    pci_bridge_region_cleanup(br, w);
- }
- 
- /* default write_config function for PCI-to-PCI bridge */
--- 
-2.11.0
-
-
---y0ulUmNC+osPPQO6--
+MIIS6QYJKoZIhvcNAQcCoIIS2jCCEtYCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+ghBPMIIEXDCCA0SgAwIBAgIOSBtqDm4P/739RPqw/wcwDQYJKoZIhvcNAQELBQAwZDELMAkGA1UE
+BhMCQkUxGTAXBgNVBAoTEEdsb2JhbFNpZ24gbnYtc2ExOjA4BgNVBAMTMUdsb2JhbFNpZ24gUGVy
+c29uYWxTaWduIFBhcnRuZXJzIENBIC0gU0hBMjU2IC0gRzIwHhcNMTYwNjE1MDAwMDAwWhcNMjEw
+NjE1MDAwMDAwWjBMMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTEiMCAG
+A1UEAxMZR2xvYmFsU2lnbiBIViBTL01JTUUgQ0EgMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
+AQoCggEBALR23lKtjlZW/17kthzYcMHHKFgywfc4vLIjfq42NmMWbXkNUabIgS8KX4PnIFsTlD6F
+GO2fqnsTygvYPFBSMX4OCFtJXoikP2CQlEvO7WooyE94tqmqD+w0YtyP2IB5j4KvOIeNv1Gbnnes
+BIUWLFxs1ERvYDhmk+OrvW7Vd8ZfpRJj71Rb+QQsUpkyTySaqALXnyztTDp1L5d1bABJN/bJbEU3
+Hf5FLrANmognIu+Npty6GrA6p3yKELzTsilOFmYNWg7L838NS2JbFOndl+ce89gM36CW7vyhszi6
+6LqqzJL8MsmkP53GGhf11YMP9EkmawYouMDP/PwQYhIiUO0CAwEAAaOCASIwggEeMA4GA1UdDwEB
+/wQEAwIBBjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwEgYDVR0TAQH/BAgwBgEB/wIB
+ADAdBgNVHQ4EFgQUyzgSsMeZwHiSjLMhleb0JmLA4D8wHwYDVR0jBBgwFoAUJiSSix/TRK+xsBtt
+r+500ox4AAMwSwYDVR0fBEQwQjBAoD6gPIY6aHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9ncy9n
+c3BlcnNvbmFsc2lnbnB0bnJzc2hhMmcyLmNybDBMBgNVHSAERTBDMEEGCSsGAQQBoDIBKDA0MDIG
+CCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzANBgkqhkiG
+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
+BgEFBQcwAoY0aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NodnNtaW1lY2Ex
+LmNydDAdBgNVHQ4EFgQUjOqjviYWNDzbpIZA9rXUhQD/PI4wHwYDVR0jBBgwFoAUyzgSsMeZwHiS
+jLMhleb0JmLA4D8wTAYDVR0gBEUwQzBBBgkrBgEEAaAyASgwNDAyBggrBgEFBQcCARYmaHR0cHM6
+Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wOwYDVR0fBDQwMjAwoC6gLIYqaHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2h2c21pbWVjYTEuY3JsMA4GA1UdDwEB/wQEAwIFoDAdBgNV
+HSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwDQYJKoZIhvcNAQELBQADggEBAJT+kOPyEAkypy9d
+Kvgp0tQqYnr9tB8GXBAFwVcBp65D9h/5CDqLyMV09pZx6Jt/KfEwGeaAy7go/KIuUFueEaWVeDdM
+alZPMuoVZABJ1fIsMOFlbmK0k2WwMlvWxKAOr1KIUkSgjtTqy+nEwHNU4e9U/ECXqkChMCv0gLVK
+VaS9gHvwegDzmPZTljNy19eua7qaEAqJg/m01Ph9J3S91hKc6jaNeM3d06dAXlY3E1Y6qc9NiERw
+gGBFJQs4fHifgtqf+YGoo+SXWONQdjG+0Dguyn9GkK76O7uyL3TZWAuNW6qptURaYW5Fl3S4anoi
+PfSZCMuXCj2LGgUUKa5GZLQxggJeMIICWgIBATBcMEwxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBH
+bG9iYWxTaWduIG52LXNhMSIwIAYDVQQDExlHbG9iYWxTaWduIEhWIFMvTUlNRSBDQSAxAgwe6rFI
+XyvxfCITQFowDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIBpdrVOUcOe+C5s9vinm
+qcLvmNul1Cgkqh/1rYZeubOVMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkF
+MQ8XDTE4MTIxMTEwMjM0NFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUD
+BAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsG
+CWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBlax1UEosSFpBbkuRhbd8NxK4iviMmqORDs2nb
+Dkv1I+2DmPAWHo/dyZKZvpGL9opadBbvE5jnuX7X8vYfOGQv4dCFA7XHk7TPeO3NRxjleeRzUwmq
+vWpFdnwA0WU2HCJdhQfoWt7bcuHb31XgiSeIhalZ0WwZa32oXxOfC2xaogwXpoB34ngD1LLmXydU
+2K5gwdfHyaOxzpwaXc/pbhmJJrBKxlxFdiY2NLv+rUFMKC9R/IJaHPzRJRfwjyeulpkzaqFyB088
+/i4IO31HLjiCCZqKLKEG2LJVRYMfnQJqliEniGfAD8Y40JFcLMlfNWIssfgYO9H8NirKW092nx/w
+--000000000000e79559057cbc79ae--
