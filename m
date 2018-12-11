@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWkC2-0006re-Qs
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:43:31 -0500
+	(envelope-from <prvs=87697dac6=Paul.Durrant@citrix.com>)
+	id 1gWkCz-0007hj-AK
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:44:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWkC1-0005PN-QG
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:43:30 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:42026)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gWkC1-0005Nx-JU
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:43:29 -0500
-Received: by mail-oi1-x244.google.com with SMTP id w13so12332227oiw.9
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 07:43:29 -0800 (PST)
+	(envelope-from <prvs=87697dac6=Paul.Durrant@citrix.com>)
+	id 1gWkCv-0005rg-7f
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:44:29 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Tue, 11 Dec 2018 15:43:52 +0000
+Message-ID: <7a3465bbcbd441638ebe1eec7623599c@AMSPEX02CL03.citrite.net>
+References: <1544525238-3527-1-git-send-email-paul.durrant@citrix.com>
+	<1544525238-3527-8-git-send-email-paul.durrant@citrix.com>
+	<20181211152455.GT18875@perard.uk.xensource.com>
+In-Reply-To: <20181211152455.GT18875@perard.uk.xensource.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20181207103631.28193-1-richard.henderson@linaro.org>
-	<20181207103631.28193-16-richard.henderson@linaro.org>
-In-Reply-To: <20181207103631.28193-16-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 11 Dec 2018 15:43:17 +0000
-Message-ID: <CAFEAcA9HJEQqe70VvC2Env+DNW5Q+siMFzcLnv_ZPxvMP6uQrQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 15/26] target/arm: Introduce arm_mmu_idx
+Subject: Re: [Qemu-devel] [PATCH v3 07/18] xen: add event channel interface
+ for XenDevice-s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
+To: Anthony Perard <anthony.perard@citrix.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
 
-On Fri, 7 Dec 2018 at 10:36, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> The pattern
->
->   ARMMMUIdx mmu_idx = core_to_arm_mmu_idx(env, cpu_mmu_index(env, false));
->
-> is computing the full ARMMMUIdx, stripping off the ARM bits,
-> and then putting them back.
->
-> Avoid the extra two steps with the appropriate helper function.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/cpu.h    |  1 +
->  target/arm/helper.c | 27 ++++++++++++++++-----------
->  2 files changed, 17 insertions(+), 11 deletions(-)
->
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 18f2378b87..6bac5c18d0 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -2740,6 +2740,7 @@ ARMMMUIdx arm_v7m_mmu_idx_for_secstate_and_priv(CPUARMState *env,
->  ARMMMUIdx arm_v7m_mmu_idx_for_secstate(CPUARMState *env, bool secstate);
->
->  /* Determine the current mmu_idx to use for normal loads/stores */
-> +ARMMMUIdx arm_mmu_idx(CPUARMState *env);
->  int cpu_mmu_index(CPUARMState *env, bool ifetch);
+> -----Original Message-----
+> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
+> Sent: 11 December 2018 15:25
+> To: Paul Durrant <Paul.Durrant@citrix.com>
+> Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
+> devel@lists.xenproject.org
+> Subject: Re: [PATCH v3 07/18] xen: add event channel interface for
+> XenDevice-s
+>=20
+> On Tue, Dec 11, 2018 at 10:47:07AM +0000, Paul Durrant wrote:
+> > The legacy PV backend infrastructure provides functions to bind, unbind
+> > and send notifications to event channnels. Similar functionality will b=
+e
+> > required by XenDevice implementations so this patch adds the necessary
+> > support.
+> >
+> > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> > Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+>=20
+> When and where did this review happend? I can only find my review-by tag
+> on v2, which is missing here.
+>=20
 
-Could we give the new function its own comment rather than
-making it share with the existing function, please?
+Oh, that must have been my mistake... I cut'n'pasted the wrong line. Apolog=
+ies to Stefano and yourself... I'll fix it in v4.
 
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+  Paul
 
-thanks
--- PMM
+> --
+> Anthony PERARD
