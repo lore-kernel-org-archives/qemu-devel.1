@@ -1,40 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1gWnu7-00036P-JB
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 14:41:16 -0500
+	(envelope-from <wainersm@redhat.com>) id 1gWo0Q-0005VO-S3
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 14:47:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1gWnu2-0006Xd-KC
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 14:41:15 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35416)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
-	id 1gWnu2-0006Ve-8O
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 14:41:10 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wBBJYTPc008935
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 14:41:08 -0500
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2pagmp06ma-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 14:41:07 -0500
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
-	Tue, 11 Dec 2018 19:41:06 -0000
-References: <1544469254-11629-1-git-send-email-akrowiak@linux.ibm.com>
-	<20181211162303.2e581899@redhat.com>
-From: Tony Krowiak <akrowiak@linux.ibm.com>
-Date: Tue, 11 Dec 2018 14:41:00 -0500
+	(envelope-from <wainersm@redhat.com>) id 1gWo0E-0003Ey-6D
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 14:47:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38476)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1gWo0D-0003Dq-9z
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 14:47:33 -0500
+References: <20181211162846.31149-1-wainersm@redhat.com>
+	<b75eb4c9-17dc-9311-d569-d2a8772b2ef3@redhat.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <b9be5998-8914-fce5-bcb7-8ff8780d9dcc@redhat.com>
+Date: Tue, 11 Dec 2018 17:47:26 -0200
 MIME-Version: 1.0
-In-Reply-To: <20181211162303.2e581899@redhat.com>
+In-Reply-To: <b75eb4c9-17dc-9311-d569-d2a8772b2ef3@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <ee5f36b2-e0a0-cdee-ad9a-dbeb36f1583c@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] qdev/core: Can not replug device on bus
- that allows one device
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] target/i386: Fixes to the check missing
+ features routine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,141 +29,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, thuth@redhat.com, armbru@redhat.com, f4bug@amsat.org, pasic@linux.ibm.com, borntraeger@de.ibm.com, pbonzini@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, crosa@redhat.com, ccarrara@redhat.com
 
-On 12/11/18 10:23 AM, Igor Mammedov wrote:
-> On Mon, 10 Dec 2018 14:14:14 -0500
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-> 
->> If the maximum number of devices allowed on a bus is 1 and a device
->> which is plugged into the bus is subsequently unplugged, attempting to replug
->> the device fails with error "Bus 'xxx' does not support hotplugging".
->> The "error" is detected in the qbus_is_full(BusState *bus) function
->> (qdev_monitor.c) because bus->max_index >= bus_class->max_dev. The
->> root of the problem is that the bus->max_index is not decremented when a device
->> is unplugged from the bus. This patch fixes that problem.
+
+On 12/11/2018 03:15 PM, Eric Blake wrote:
+> On 12/11/18 10:28 AM, Wainer dos Santos Moschetta wrote:
+>> The x86_cpu_class_check_missing_features() returns a list
+>> of unavailable features compared to the host CPU. Currently it may
+>> return empty strings for unnamed features as well as duplicated
+>> names.
 >>
->> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>> For example, the qmp "query-cpu-definitions" below shows one empty
+>> string and repeated "mpx" entries:
+>>
+>
+>> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+>> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>
+> Careful. While I spotted typos in v1,...
+>
+>> Reviewed-by: Caio Carrara <ccarrara@redhat.com>
 >> ---
->>   hw/core/qdev.c | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
->> index 6b3cc55b27c2..b35b0bf27925 100644
->> --- a/hw/core/qdev.c
->> +++ b/hw/core/qdev.c
->> @@ -59,6 +59,8 @@ static void bus_remove_child(BusState *bus, DeviceState *child)
->>               snprintf(name, sizeof(name), "child[%d]", kid->index);
->>               QTAILQ_REMOVE(&bus->children, kid, sibling);
->>   
->> +            bus->max_index--;
-> that might cause problem when bus is allowed to has more than 1 device
-> and unplugged device is not the last one.
-> In that case bus_add_child() might create a child with duplicate name.
+>> v2:
+>> =C2=A0 * Fixed typos. [eblake]
+>
+> ...and you indeed addressed them, me pointing out typos does not imply=20
+> that I reviewed the patch for correctness.=C2=A0 In fact, I specificall=
+y=20
+> did NOT give my R-by: tag to v1, because I'm not (yet?) familiar=20
+> enough with the tests/acceptance/ framework to state that I have fully=20
+> reviewed the patch for correctness; instead, I'm comfortable relying=20
+> on the reviews of others (and I am again intentionally not giving R-by=20
+> to v2).
+>
+> Also, when posting a v2, you should include the R-by actually given to=20
+> v1 only if the patch is roughly the same as the original.=C2=A0 Fixing=20
+> minor issues that a reviewer pointed out, or doing obvious rebasing to=20
+> changes applied earlier in the series or on upstream git, but where=20
+> the algorithm of the patch itself did not change, is okay for keeping=20
+> R-b (so if I _had_ given R-b, and your spelling changes were the only=20
+> difference, then keeping my R-b would make sense); but where the patch=20
+> is fundamentally different, such as:
+>
+>> =C2=A0* Removed unwanted manual test case. [ccarrara, ehabkost]
+>> =C2=A0* Not passing 'accel=3Dkvm' on test's VM. [ehabkost]
+>
+> then omitting ALL R-by tags, in order to ensure that reviewers check=20
+> that the new patch is still correct, is a wiser course of action.=C2=A0=
+=20
+> Yes, this is more of a rule of thumb, and there are cases where=20
+> keeping or dropping R-b is more of an art form than an exact science;=20
+> but hopefully this helps you understand how the tag can be useful for=20
+> iterative reviews.
+>
 
-I see what you are saying. The max_index is assigned to the child device
-index in the bus_add_child() function. The child device index is used to
-generate a unique name for the child device. The generated name is then
-used to link the child as a property to the bus. When the child is
-removed from the bus, the name is regenerated from the child device
-index and the named property is . It would therefore appear that the
-real purpose of the max_index is to generate indexes for children of
-the bus thus ensuring each child has a unique index. In other words,
-the max_index value is only tangentially connected to indexing the list
-of children.
+Hi Eric,
 
-This results in a disconnect between the usage of the max_index value
-when adding and removing a child from the bus, and the check in the
-qbus_is_full() function which compares the max_index to the maximum
-number of devices allowed on the bus. If a child has been removed from
-the bus, the max_index value does not indicate whether the bus is
-full, it only specifies the index to be assigned to the next child to be
-added to the bus.
+Yes, it helped a lot, thanks. And I apologize for my mistake, I'm gonna=20
+send a v3 fixing it.
 
-To resolve this problem, I propose the following:
+Another doubt that I have: is it advisable to CC everyone that reviewed=20
+(with or without R-by) the previous version of my patch?
 
-Add the following field to struct BusState (include/hw/qdev_core.h):
+Thanks!
 
-struct BusState {
-     Object obj;
-     DeviceState *parent;
-     char *name;
-     HotplugHandler *hotplug_handler;
-     int max_index;
-     bool realized;
-+    int num_children;
-     QTAILQ_HEAD(ChildrenHead, BusChild) children;
-     QLIST_ENTRY(BusState) sibling;
-};
-
-Add the following lines of code to the add/remove child functions in
-hw/core/qdev.c:
-
-static void bus_add_child(BusState *bus, DeviceState *child)
-{
-     char name[32];
-     BusChild *kid = g_malloc0(sizeof(*kid));
-
-     kid->index = bus->max_index++;
-     kid->child = child;
-     object_ref(OBJECT(kid->child));
-
-     QTAILQ_INSERT_HEAD(&bus->children, kid, sibling);
-
-     /* This transfers ownership of kid->child to the property.  */
-     snprintf(name, sizeof(name), "child[%d]", kid->index);
-     object_property_add_link(OBJECT(bus), name,
-                              object_get_typename(OBJECT(child)),
-                              (Object **)&kid->child,
-                              NULL, /* read-only property */
-                              0, /* return ownership on prop deletion */
-                              NULL);
-
-+    bus->num_children++;
-}
-
-static void bus_remove_child(BusState *bus, DeviceState *child)
-{
-     BusChild *kid;
-
-     QTAILQ_FOREACH(kid, &bus->children, sibling) {
-         if (kid->child == child) {
-             char name[32];
-
-             snprintf(name, sizeof(name), "child[%d]", kid->index);
-             QTAILQ_REMOVE(&bus->children, kid, sibling);
-
-             /* This gives back ownership of kid->child back to us.  */
-             object_property_del(OBJECT(bus), name, NULL);
-             object_unref(OBJECT(kid->child));
-             g_free(kid);
-
-+           bus->num_children--;
-
-             return;
-         }
-     }
-}
-
-Change the line of code in the qbus_is_full() function in
-qdev_monitor.c:
-
-
-static inline bool qbus_is_full(BusState *bus)
-{
-     BusClass *bus_class = BUS_GET_CLASS(bus);
--    return bus_class->max_dev &&
--           bus->max_index >= bus_class->max_dev;
-+    return bus_class->max_dev &&
-+           bus->num_children >= bus_class->max_dev;
-}
-
-
-
-> 
->> +
->>               /* This gives back ownership of kid->child back to us.  */
->>               object_property_del(OBJECT(bus), name, NULL);
->>               object_unref(OBJECT(kid->child));
-> 
+- Wainer
