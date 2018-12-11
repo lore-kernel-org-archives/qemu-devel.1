@@ -1,16 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gWavo-0001tc-2g
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 00:50:08 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gWcRX-0000aK-Oq
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 02:27:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gWavn-0003x5-3l
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 00:50:07 -0500
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Tue, 11 Dec 2018 16:49:26 +1100
-Message-Id: <20181211054926.56717-4-aik@ozlabs.ru>
-In-Reply-To: <20181211054926.56717-1-aik@ozlabs.ru>
-References: <20181211054926.56717-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu 3/3] spapr: Fix fdt warnings
+	(envelope-from <kraxel@redhat.com>) id 1gWcRS-0007Tp-SC
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 02:26:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44044)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gWcRS-0007Sq-LY
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 02:26:54 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C155A308FBA0
+	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 07:26:52 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 11 Dec 2018 08:26:49 +0100
+Message-Id: <20181211072649.20700-1-kraxel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] usb-audio: ignore usb packages with wrong size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,39 +31,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-The FDT blob which the spapr machine renders at reset time produces
-warnings like this:
+usb packets with no payload (zero length) seem to happen in practice for
+whatever reason.  Add a check and skip the packet then, otherwise we'll
+trigger an assert.
 
-my-181211-154309.dts: Warning (unit_address_format): Node /memory@0000000080000000 unit name should not have leading 0s
-my-181211-154309.dts: Warning (unit_address_format): Node /memory@0000000040000000 unit name should not have leading 0s
-my-181211-154309.dts: Warning (unit_address_format): Node /memory@0000000020000000 unit name should not have leading 0s
-my-181211-154309.dts: Warning (unit_address_format): Node /memory@0000000010000000 unit name should not have leading 0s
-my-181211-154309.dts: Warning (unit_address_format): Node /memory@0000000000000000 unit name should not have leading 0s
-
-because TARGET_FMT_lx is defined as "%016"PRIx64.
-
-This uses simple "%lx" to suppress the warning. Since it is spapr which
-is always 64bit, we assume here that hwaddr is always "long".
-
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Reported-by: Leonardo Soares M=C3=BCller <leozinho29_eu@hotmail.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/ppc/spapr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/usb/dev-audio.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 984bf32..be565f0 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -376,7 +376,7 @@ static int spapr_populate_memory_node(void *fdt, int nodeid, hwaddr start,
-     mem_reg_property[0] = cpu_to_be64(start);
-     mem_reg_property[1] = cpu_to_be64(size);
- 
--    sprintf(mem_name, "memory@" TARGET_FMT_lx, start);
-+    sprintf(mem_name, "memory@%lx", start);
-     off = fdt_add_subnode(fdt, 0, mem_name);
-     _FDT(off);
-     _FDT((fdt_setprop_string(fdt, off, "device_type", "memory")));
--- 
-2.17.1
+diff --git a/hw/usb/dev-audio.c b/hw/usb/dev-audio.c
+index ee43e4914d..28ac7c5165 100644
+--- a/hw/usb/dev-audio.c
++++ b/hw/usb/dev-audio.c
+@@ -321,6 +321,9 @@ static int streambuf_put(struct streambuf *buf, USBPa=
+cket *p)
+     if (!free) {
+         return 0;
+     }
++    if (p->iov.size !=3D USBAUDIO_PACKET_SIZE) {
++        return 0;
++    }
+     assert(free >=3D USBAUDIO_PACKET_SIZE);
+     usb_packet_copy(p, buf->data + (buf->prod % buf->size),
+                     USBAUDIO_PACKET_SIZE);
+--=20
+2.9.3
