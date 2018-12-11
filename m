@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gWr6F-0000Pw-PV
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 18:06:00 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gWr8p-00019f-By
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 18:08:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gWr6E-00039m-SE
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 18:05:59 -0500
-References: <20181206192544.3987-1-jsnow@redhat.com>
-	<20181206192544.3987-3-jsnow@redhat.com>
-	<59d3744f-8c61-724b-784d-43e5f2b0ae8e@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1gWr8o-0004Ye-Eb
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 18:08:39 -0500
+References: <154414128075.8206.639791884193945612@bb8f5089e434>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <a30ba3e1-7a8f-c25d-28d7-54239869a0f4@redhat.com>
-Date: Tue, 11 Dec 2018 18:05:49 -0500
+Message-ID: <a5c017a1-8388-dd18-52cd-3eea7c21dfcf@redhat.com>
+Date: Tue, 11 Dec 2018 18:08:29 -0500
 MIME-Version: 1.0
-In-Reply-To: <59d3744f-8c61-724b-784d-43e5f2b0ae8e@redhat.com>
+In-Reply-To: <154414128075.8206.639791884193945612@bb8f5089e434>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] blockdev: n-ary bitmap merge
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] bitmaps: remove x- prefix from QMP api
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,76 +23,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, vsementov@virtuozzo.com, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, vsementov@virtuozzo.com, armbru@redhat.com, mreitz@redhat.com
 
 
 
-On 12/7/18 11:25 AM, Eric Blake wrote:
-> On 12/6/18 1:25 PM, John Snow wrote:
->> Especially outside of transactions, it is helpful to provide
->> all-or-nothing semantics for bitmap merges. This facilitates
->> the coalescing of multiple bitmaps into a single target for
->> the "checkpoint" interpretation when assembling bitmaps that
->> represent arbitrary points in time from component bitmaps.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->> =C2=A0 blockdev.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 | 64 +++++++++++++++++++++++++++++---------------
->> =C2=A0 qapi/block-core.json | 22 +++++++--------
->> =C2=A0 2 files changed, 53 insertions(+), 33 deletions(-)
->>
->=20
->> +++ b/qapi/block-core.json
->> @@ -1818,14 +1818,14 @@
->> =C2=A0 #
->> =C2=A0 # @node: name of device/node which the bitmap is tracking
->> =C2=A0 #
->> -# @dst_name: name of the destination dirty bitmap
->> +# @target: name of the destination dirty bitmap
->> =C2=A0 #
->> -# @src_name: name of the source dirty bitmap
->> +# @bitmaps: name(s) of the source dirty bitmap(s)
->> =C2=A0 #
->> =C2=A0 # Since: 3.0
->> =C2=A0 ##
->> =C2=A0 { 'struct': 'BlockDirtyBitmapMerge',
->> -=C2=A0 'data': { 'node': 'str', 'dst_name': 'str', 'src_name': 'str' =
-} }
->> +=C2=A0 'data': { 'node': 'str', 'target': 'str', 'bitmaps': ['str'] }=
- }
->=20
-> Definitely worthwhile!
->=20
-> I'll update my pending libvirt patches to use this.
->=20
->> =C2=A0 =C2=A0 ##
->> =C2=A0 # @block-dirty-bitmap-add:
->> @@ -1940,23 +1940,23 @@
->> =C2=A0 ##
->> =C2=A0 # @x-block-dirty-bitmap-merge:
->> =C2=A0 #
->> -# FIXME: Rename @src_name and @dst_name to src-name and dst-name.
->> -#
->> -# Merge @src_name dirty bitmap to @dst_name dirty bitmap. @src_name
->> dirty
->> -# bitmap is unchanged. On error, @dst_name is unchanged.
->> +# Merge dirty bitmaps listed in @bitmaps to the @target dirty bitmap.
->> +# The @bitmaps dirty bitmaps are unchanged.
->=20
-> Well, except in the corner case of when @bitmaps also lists the
-> destination (I presume that merging a bitmap into itself silently
-> succeeds with no further changes, but therefore the inclusion of the
-> destination in the list of sources means that that particular source is
-> changing due to merging in the other sources).=C2=A0 Not worth rewordin=
-g this
-> =C2=A0sentence, but does make you want to consider ensuring that the
-> testsuite covers merging a bitmap into itself.
->=20
+On 12/6/18 7:08 PM, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20181206192544.3987-1-jsnow@redhat.com/
+> 
+> 
+> 
+> Hi,
+> 
+> This series seems to have some coding style problems. See output below for
+> more information:
+> 
+> Type: series
+> Subject: [Qemu-devel] [PATCH 0/3] bitmaps: remove x- prefix from QMP api
+> Message-id: 20181206192544.3987-1-jsnow@redhat.com
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> 
+> BASE=base
+> n=1
+> total=$(git log --oneline $BASE.. | wc -l)
+> failed=0
+> 
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> git config --local diff.algorithm histogram
+> 
+> commits="$(git log --format=%H --reverse $BASE..)"
+> for c in $commits; do
+>     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
+>     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
+>         failed=1
+>         echo
+>     fi
+>     n=$((n+1))
+> done
+> 
+> exit $failed
+> === TEST SCRIPT END ===
+> 
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> Switched to a new branch 'test'
+> c972673 block: remove 'x' prefix from experimental bitmap APIs
+> ebd1e6c blockdev: n-ary bitmap merge
+> 68d3c0c blockdev: abort transactions in reverse order
+> 
+> === OUTPUT BEGIN ===
+> Checking PATCH 1/3: blockdev: abort transactions in reverse order...
+> Checking PATCH 2/3: blockdev: n-ary bitmap merge...
+> ERROR: externs should be avoided in .c files
+> #23: FILE: blockdev.c:2125:
+> +void do_block_dirty_bitmap_merge(const char *node, const char *target,
+> 
 
-OK, noted.
+Oh, I guess I'm missing `static` here for this forward declaration.
 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
-Thanks!
+Also, we need to edit patchew to not CC famz@redhat.com anymore :(
+
+> total: 1 errors, 0 warnings, 147 lines checked
+> 
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 
+> Checking PATCH 3/3: block: remove 'x' prefix from experimental bitmap APIs...
+> === OUTPUT END ===
+> 
+> Test command exited with code: 1
+> 
+> 
+> The full log is available at
+> http://patchew.org/logs/20181206192544.3987-1-jsnow@redhat.com/testing.checkpatch/?type=message.
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
+> 
