@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gWkai-0004nQ-Vv
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:09:01 -0500
+	(envelope-from <philmd@redhat.com>) id 1gWkfJ-0000gK-4H
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:13:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gWkag-00036N-D8
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:09:00 -0500
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:38494)
+	(envelope-from <philmd@redhat.com>) id 1gWkfG-0006XC-CT
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:13:45 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:34088)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gWkag-00034u-8D
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:08:58 -0500
-Received: by mail-qt1-f196.google.com with SMTP id p17so16981347qtl.5
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 08:08:56 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gWkfG-0006WS-5A
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:13:42 -0500
+Received: by mail-wm1-f68.google.com with SMTP id y185so9353254wmd.1
+	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 08:13:42 -0800 (PST)
+References: <1542777026-2788-1-git-send-email-liq3ea@gmail.com>
+	<1542777026-2788-2-git-send-email-liq3ea@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <e319b73f-6f42-24f4-1480-8b124a26a720@redhat.com>
+Date: Tue, 11 Dec 2018 17:13:39 +0100
 MIME-Version: 1.0
-References: <20181208111606.8505-1-marcandre.lureau@redhat.com>
-	<20181208111606.8505-26-marcandre.lureau@redhat.com>
-	<87woognj2k.fsf@dusky.pond.sub.org>
-In-Reply-To: <87woognj2k.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Tue, 11 Dec 2018 20:08:43 +0400
-Message-ID: <CAMxuvayGNWF3JEbRsvAKZzgzK9zJt_1NYr+8EQkeJ0+G84h=gg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v7 25/27] qapi: break long lines at
- 'data' member
+In-Reply-To: <1542777026-2788-2-git-send-email-liq3ea@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] fw_cfg: fix -boot bootsplash error
+ checking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,29 +31,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Armbruster, Markus" <armbru@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Hoffmann, Gerd" <kraxel@redhat.com>, "Bonzini,
-	Paolo" <pbonzini@redhat.com>, stefanb@linux.ibm.com
+To: Li Qiang <liq3ea@gmail.com>, armbru@redhat.com, pbonzini@redhat.com, kraxel@redhat.com, lersek@redhat.com
+Cc: qemu-devel@nongnu.org
 
-Hi
-
-On Tue, Dec 11, 2018 at 8:07 PM Markus Armbruster <armbru@redhat.com> wrote=
-:
->
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->
-> > Let's break the line before 'data'. While at it, improve a bit
-> > indentation/spacing. (I removed some alignment which are not helping
-> > much readability and become quickly inconsistent)
-> >
-> > Suggested-by: Markus Armbruster <armbru@redhat.com>
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->
+On 11/21/18 6:10 AM, Li Qiang wrote:
+> fw_cfg_bootsplash() gets option parameter "splash-time"
+> with qemu_opt_get(), then converts it to an integer by hand.
+> It neglects to check that conversion for errors. This is
+> needlessly complicated and error-prone. But as "splash-time
+> not specified" is not the same as "splash-time=T" for any T,
+> we need use qemu_opt_get() to check if splash time exists.
+> This patch also make the qemu exit when finding or loading
+> splash file failed.
+> 
+> Signed-off-by: Li Qiang <liq3ea@gmail.com>
 > Reviewed-by: Markus Armbruster <armbru@redhat.com>
->
-> I can cherry-pick this one into my next pull request to reduce the
-> likelihood of conflicts.
 
-Ideally, you take as much patches as you can in your -next tree, so I
-don't have to carry them and resend them all the time. Up to you, you
-are the maintainer.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> ---
+> v1->v2: drop error_report when read_splashfile() fails
+> 
+>  hw/nvram/fw_cfg.c | 35 +++++++++++++----------------------
+>  vl.c              |  2 +-
+>  2 files changed, 14 insertions(+), 23 deletions(-)
+> 
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 946f765f7f..83d66818f6 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -118,47 +118,38 @@ error:
+>  
+>  static void fw_cfg_bootsplash(FWCfgState *s)
+>  {
+> -    int boot_splash_time = -1;
+>      const char *boot_splash_filename = NULL;
+> -    char *p;
+> +    const char *boot_splash_time = NULL;
+>      char *filename, *file_data;
+>      gsize file_size;
+>      int file_type;
+> -    const char *temp;
+>  
+>      /* get user configuration */
+>      QemuOptsList *plist = qemu_find_opts("boot-opts");
+>      QemuOpts *opts = QTAILQ_FIRST(&plist->head);
+> -    if (opts != NULL) {
+> -        temp = qemu_opt_get(opts, "splash");
+> -        if (temp != NULL) {
+> -            boot_splash_filename = temp;
+> -        }
+> -        temp = qemu_opt_get(opts, "splash-time");
+> -        if (temp != NULL) {
+> -            p = (char *)temp;
+> -            boot_splash_time = strtol(p, &p, 10);
+> -        }
+> -    }
+> +    boot_splash_filename = qemu_opt_get(opts, "splash");
+> +    boot_splash_time = qemu_opt_get(opts, "splash-time");
+>  
+>      /* insert splash time if user configurated */
+> -    if (boot_splash_time >= 0) {
+> +    if (boot_splash_time) {
+> +        int64_t bst_val = qemu_opt_get_number(opts, "splash-time", -1);
+>          /* validate the input */
+> -        if (boot_splash_time > 0xffff) {
+> -            error_report("splash time is big than 65535, force it to 65535.");
+> -            boot_splash_time = 0xffff;
+> +        if (bst_val < 0 || bst_val > 0xffff) {
+> +            error_report("splash-time is invalid,"
+> +                         "it should be a value between 0 and 65535");
+> +            exit(1);
+>          }
+>          /* use little endian format */
+> -        qemu_extra_params_fw[0] = (uint8_t)(boot_splash_time & 0xff);
+> -        qemu_extra_params_fw[1] = (uint8_t)((boot_splash_time >> 8) & 0xff);
+> +        qemu_extra_params_fw[0] = (uint8_t)(bst_val & 0xff);
+> +        qemu_extra_params_fw[1] = (uint8_t)((bst_val >> 8) & 0xff);
+>          fw_cfg_add_file(s, "etc/boot-menu-wait", qemu_extra_params_fw, 2);
+>      }
+>  
+>      /* insert splash file if user configurated */
+> -    if (boot_splash_filename != NULL) {
+> +    if (boot_splash_filename) {
+>          filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, boot_splash_filename);
+>          if (filename == NULL) {
+> -            error_report("failed to find file '%s'.", boot_splash_filename);
+> +            error_report("failed to find file '%s'", boot_splash_filename);
+>              return;
+>          }
+>  
+> diff --git a/vl.c b/vl.c
+> index fa25d1ae2d..96ac0ddcf6 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -336,7 +336,7 @@ static QemuOptsList qemu_boot_opts = {
+>              .type = QEMU_OPT_STRING,
+>          }, {
+>              .name = "splash-time",
+> -            .type = QEMU_OPT_STRING,
+> +            .type = QEMU_OPT_NUMBER,
+>          }, {
+>              .name = "reboot-timeout",
+>              .type = QEMU_OPT_STRING,
+> 
