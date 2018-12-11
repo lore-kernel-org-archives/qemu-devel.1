@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gWehc-0008Ko-SD
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 04:51:49 -0500
+	(envelope-from <fli@suse.com>) id 1gWehh-0008M0-Vb
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 04:51:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gWehV-0007y0-Ly
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 04:51:41 -0500
-Received: from smtp.nue.novell.com ([195.135.221.5]:33227)
+	(envelope-from <fli@suse.com>) id 1gWehf-00083l-Cp
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 04:51:49 -0500
+Received: from smtp.nue.novell.com ([195.135.221.5]:51512)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gWehR-0007sh-QV
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 04:51:35 -0500
+	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gWehf-0007zX-0f
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 04:51:47 -0500
 From: Fei Li <fli@suse.com>
-Date: Tue, 11 Dec 2018 17:50:51 +0800
-Message-Id: <20181211095057.14623-2-fli@suse.com>
+Date: Tue, 11 Dec 2018 17:50:57 +0800
+Message-Id: <20181211095057.14623-8-fli@suse.com>
 In-Reply-To: <20181211095057.14623-1-fli@suse.com>
 References: <20181211095057.14623-1-fli@suse.com>
-Subject: [Qemu-devel] [PATCH for-4.0 v8 1/7] Fix segmentation fault when
- qemu_signal_init fails
+Subject: [Qemu-devel] [PATCH for-4.0 v8 7/7] qemu_thread_join: fix
+ segmentation fault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +25,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Weil <sw@weilnetz.de>
 
-When qemu_signal_init() fails in qemu_init_main_loop(), we return
-without setting an error.  Its callers crash then when they try to
-report the error with error_report_err().
+To avoid the segmentation fault in qemu_thread_join(), just directly
+return when the QemuThread *thread failed to be created in either
+qemu-thread-posix.c or qemu-thread-win32.c.
 
-To avoid such segmentation fault, add a new Error parameter to make
-the call trace to propagate the err to the final caller.
-
-Fixes: 2f78e491d7b46542158ce0b8132ee4e05bc0ade4
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Weil <sw@weilnetz.de>
 Signed-off-by: Fei Li <fli@suse.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- util/main-loop.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ util/qemu-thread-posix.c | 3 +++
+ util/qemu-thread-win32.c | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/util/main-loop.c b/util/main-loop.c
-index affe0403c5..443cb4cfe8 100644
---- a/util/main-loop.c
-+++ b/util/main-loop.c
-@@ -71,7 +71,7 @@ static void sigfd_handler(void *opaque)
+diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+index 81b40a1ece..cb3722a4f4 100644
+--- a/util/qemu-thread-posix.c
++++ b/util/qemu-thread-posix.c
+@@ -566,6 +566,9 @@ void *qemu_thread_join(QemuThread *thread)
+     int err;
+     void *ret;
+ 
++    if (!thread->thread) {
++        return NULL;
++    }
+     err = pthread_join(thread->thread, &ret);
+     if (err) {
+         error_exit(err, __func__);
+diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
+index 57b1143e97..ca4d5329e3 100644
+--- a/util/qemu-thread-win32.c
++++ b/util/qemu-thread-win32.c
+@@ -367,7 +367,7 @@ void *qemu_thread_join(QemuThread *thread)
+     HANDLE handle;
+ 
+     data = thread->data;
+-    if (data->mode == QEMU_THREAD_DETACHED) {
++    if (data == NULL || data->mode == QEMU_THREAD_DETACHED) {
+         return NULL;
      }
- }
  
--static int qemu_signal_init(void)
-+static int qemu_signal_init(Error **errp)
- {
-     int sigfd;
-     sigset_t set;
-@@ -96,7 +96,7 @@ static int qemu_signal_init(void)
-     sigdelset(&set, SIG_IPI);
-     sigfd = qemu_signalfd(&set);
-     if (sigfd == -1) {
--        fprintf(stderr, "failed to create signalfd\n");
-+        error_setg_errno(errp, errno, "failed to create signalfd");
-         return -errno;
-     }
- 
-@@ -109,7 +109,7 @@ static int qemu_signal_init(void)
- 
- #else /* _WIN32 */
- 
--static int qemu_signal_init(void)
-+static int qemu_signal_init(Error **errp)
- {
-     return 0;
- }
-@@ -148,7 +148,7 @@ int qemu_init_main_loop(Error **errp)
- 
-     init_clocks(qemu_timer_notify_cb);
- 
--    ret = qemu_signal_init();
-+    ret = qemu_signal_init(errp);
-     if (ret) {
-         return ret;
-     }
 -- 
 2.13.7
