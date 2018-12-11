@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1gWZ3r-0000NF-Uv
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 22:50:21 -0500
+	(envelope-from <mst@redhat.com>) id 1gWZ41-0000OI-Ns
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 22:50:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1gWYxR-0001LX-2t
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 22:43:42 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:43892)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1gWYxQ-0001LI-Re
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 22:43:41 -0500
-Received: by mail-ot1-x342.google.com with SMTP id a11so12699407otr.10
-	for <qemu-devel@nongnu.org>; Mon, 10 Dec 2018 19:43:40 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1gWYsU-0006Wg-0I
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 22:38:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57926)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gWYsT-0006W6-Mk
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 22:38:33 -0500
+Date: Mon, 10 Dec 2018 22:38:24 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181210223128-mutt-send-email-mst@kernel.org>
+References: <7CECC2DFC21538489F72729DF5EFB4D908ABD3A4@dggemm521-mbs.china.huawei.com>
+	<20181209211730-mutt-send-email-mst@kernel.org>
+	<7CECC2DFC21538489F72729DF5EFB4D908AC486D@DGGEMM501-MBX.china.huawei.com>
+	<20181210130650-mutt-send-email-mst@kernel.org>
+	<7CECC2DFC21538489F72729DF5EFB4D908AC78EE@DGGEMM501-MBX.china.huawei.com>
+	<20181210205229-mutt-send-email-mst@kernel.org>
+	<7CECC2DFC21538489F72729DF5EFB4D908AC7980@DGGEMM501-MBX.china.huawei.com>
 MIME-Version: 1.0
-References: <830bfc39-56c7-a901-9ebb-77d6e7a5614c@huawei.com>
-	<874lxeovrg.fsf@secure.mitica>
-	<7cd332ec-48d4-1feb-12e2-97b50b04e028@huawei.com>
-	<20170424164244.GJ2362@work-vm>
-	<B2D15215269B544CADD246097EACE747395AD759@dggeml511-mbx.china.huawei.com>
-	<85e3a0dd-20c8-8ff2-37ce-bfdf543e7787@redhat.com>
-	<CANRm+CzvNpLGqH5KuqqO7Wh7UabSkMBbxuTymbM0CZPgpQOwCg@mail.gmail.com>
-	<B2D15215269B544CADD246097EACE747395C283F@dggeml511-mbx.china.huawei.com>
-	<1280755991.8446336.1495007019282.JavaMail.zimbra@redhat.com>
-	<CANRm+CwbTaoxq35zyfNF1BP3d5GqRmtq0sY+aRKRaOsFwGB1Mw@mail.gmail.com>
-	<591EA84D.1030800@huawei.com>
-In-Reply-To: <591EA84D.1030800@huawei.com>
-From: Wanpeng Li <kernellwp@gmail.com>
-Date: Tue, 11 Dec 2018 11:43:24 +0800
-Message-ID: <CANRm+CzvwhV1CqYfc_=tO167A=3Lmqf7HCeYhY4kGCW=p-V3cQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] About QEMU BQL and dirty log switch in Migration
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <7CECC2DFC21538489F72729DF5EFB4D908AC7980@DGGEMM501-MBX.china.huawei.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [BUG]Unassigned mem write during pci device
+ hot-plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,197 +34,371 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, yanghongyang <yanghongyang@huawei.com>, Juan Quintela <quintela@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Gonglei <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "Herongguang (Stephen)" <herongguang.he@huawei.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, kvm <kvm@vger.kernel.org>
+To: xuyandong <xuyandong2@huawei.com>
+Cc: "marcel@redhat.com" <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>
 
-On Fri, 19 May 2017 at 16:10, Jay Zhou <jianjay.zhou@huawei.com> wrote:
->
-> Hi Paolo and Wanpeng,
->
-> On 2017/5/17 16:38, Wanpeng Li wrote:
-> > 2017-05-17 15:43 GMT+08:00 Paolo Bonzini <pbonzini@redhat.com>:
-> >>> Recently, I have tested the performance before migration and after migration failure
-> >>> using spec cpu2006 https://www.spec.org/cpu2006/, which is a standard performance
-> >>> evaluation tool.
-> >>>
-> >>> These are the steps:
-> >>> ======
-> >>>   (1) the version of kmod is 4.4.11(with slightly modified) and the version of
-> >>>   qemu is 2.6.0
-> >>>      (with slightly modified), the kmod is applied with the following patch
-> >>>
-> >>> diff --git a/source/x86/x86.c b/source/x86/x86.c
-> >>> index 054a7d3..75a4bb3 100644
-> >>> --- a/source/x86/x86.c
-> >>> +++ b/source/x86/x86.c
-> >>> @@ -8550,8 +8550,10 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
-> >>>           */
-> >>>          if ((change != KVM_MR_DELETE) &&
-> >>>                  (old->flags & KVM_MEM_LOG_DIRTY_PAGES) &&
-> >>> -               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES))
-> >>> -               kvm_mmu_zap_collapsible_sptes(kvm, new);
-> >>> +               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES)) {
-> >>> +               printk(KERN_ERR "zj make KVM_REQ_MMU_RELOAD request\n");
-> >>> +               kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_RELOAD);
-> >>> +       }
-> >>>
-> >>>          /*
-> >>>           * Set up write protection and/or dirty logging for the new slot.
-> >>
-> >> Try these modifications to the setup:
-> >>
-> >> 1) set up 1G hugetlbfs hugepages and use those for the guest's memory
-> >>
-> >> 2) test both without and with the above patch.
-> >>
->
-> In order to avoid random memory allocation issues, I reran the test cases:
-> (1) setup: start a 4U10G VM with memory preoccupied, each vcpu is pinned to a
-> pcpu respectively, these resources(memory and pcpu) allocated to VM are all
-> from NUMA node 0
-> (2) sequence: firstly, I run the 429.mcf of spec cpu2006 before migration, and
-> get a result. And then, migration failure is constructed. At last, I run the
-> test case again, and get an another result.
-> (3) results:
-> Host hugepages           THP on(2M)  THP on(2M)   THP on(2M)   THP on(2M)
-> Patch                    patch1      patch2       patch3       -
-> Before migration         No          No           No           Yes
-> After migration failed   Yes         Yes          Yes          No
-> Largepages               67->1862    62->1890     95->1865     1926
-> score of 429.mcf         189         188          188          189
->
-> Host hugepages           1G hugepages  1G hugepages  1G hugepages  1G hugepages
-> Patch                    patch1        patch2        patch3        -
-> Before migration         No            No            No            Yes
-> After migration failed   Yes           Yes           Yes           No
-> Largepages               21            21            26            39
-> score of 429.mcf         188           188           186           188
->
-> Notes:
-> patch1  means with "lazy collapse small sptes into large sptes" codes
-> patch2  means comment out "lazy collapse small sptes into large sptes" codes
-> patch3  means using kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_RELOAD)
->          instead of kvm_mmu_zap_collapsible_sptes(kvm, new)
->
-> "Largepages" means the value of /sys/kernel/debug/kvm/largepages
->
-> > In addition, we can compare /sys/kernel/debug/kvm/largepages w/ and
-> > w/o the patch. IIRC, /sys/kernel/debug/kvm/largepages will drop during
-> > live migration, it will keep a small value if live migration fails and
-> > w/o "lazy collapse small sptes into large sptes" codes, however, it
-> > will increase gradually if w/ the "lazy collapse small sptes into
-> > large sptes" codes.
+On Tue, Dec 11, 2018 at 02:55:43AM +0000, xuyandong wrote:
+> On Tue, Dec 11, 2018 at 01:47:37AM +0000, xuyandong wrote:
+> > > On Sat, Dec 08, 2018 at 11:58:59AM +0000, xuyandong wrote:
+> > > > > > > Hi all,
+> > > > > > >
+> > > > > > >
+> > > > > > >
+> > > > > > > In our test, we configured VM with several pci-bridges and =
+a
+> > > > > > > virtio-net nic been attached with bus 4,
+> > > > > > >
+> > > > > > > After VM is startup, We ping this nic from host to judge if=
+ it
+> > > > > > > is working normally. Then, we hot add pci devices to this V=
+M with bus
+> > 0.
+> > > > > > >
+> > > > > > > We  found the virtio-net NIC in bus 4 is not working (can n=
+ot
+> > > > > > > connect) occasionally, as it kick virtio backend failure wi=
+th error below:
+> > > > > > >
+> > > > > > >     Unassigned mem write 00000000fc803004 =3D 0x1
+> > > > > > >
+> > > > > > >
+> > > > > > >
+> > > > > > > memory-region: pci_bridge_pci
+> > > > > > >
+> > > > > > >   0000000000000000-ffffffffffffffff (prio 0, RW):
+> > > > > > > pci_bridge_pci
+> > > > > > >
+> > > > > > >     00000000fc800000-00000000fc803fff (prio 1, RW): virtio-=
+pci
+> > > > > > >
+> > > > > > >       00000000fc800000-00000000fc800fff (prio 0, RW):
+> > > > > > > virtio-pci-common
+> > > > > > >
+> > > > > > >       00000000fc801000-00000000fc801fff (prio 0, RW):
+> > > > > > > virtio-pci-isr
+> > > > > > >
+> > > > > > >       00000000fc802000-00000000fc802fff (prio 0, RW):
+> > > > > > > virtio-pci-device
+> > > > > > >
+> > > > > > >       00000000fc803000-00000000fc803fff (prio 0, RW):
+> > > > > > > virtio-pci-notify  <- io mem unassigned
+> > > > > > >
+> > > > > > >       =E2=80=A6
+> > > > > > >
+> > > > > > >
+> > > > > > >
+> > > > > > > We caught an exceptional address changing while this proble=
+m
+> > > > > > > happened, show as
+> > > > > > > follow:
+> > > > > > >
+> > > > > > > Before pci_bridge_update_mappings=EF=BC=9A
+> > > > > > >
+> > > > > > >       00000000fc000000-00000000fc1fffff (prio 1, RW): alias
+> > > > > > > pci_bridge_pref_mem @pci_bridge_pci
+> > > > > > > 00000000fc000000-00000000fc1fffff
+> > > > > > >
+> > > > > > >       00000000fc200000-00000000fc3fffff (prio 1, RW): alias
+> > > > > > > pci_bridge_pref_mem @pci_bridge_pci
+> > > > > > > 00000000fc200000-00000000fc3fffff
+> > > > > > >
+> > > > > > >       00000000fc400000-00000000fc5fffff (prio 1, RW): alias
+> > > > > > > pci_bridge_pref_mem @pci_bridge_pci
+> > > > > > > 00000000fc400000-00000000fc5fffff
+> > > > > > >
+> > > > > > >       00000000fc600000-00000000fc7fffff (prio 1, RW): alias
+> > > > > > > pci_bridge_pref_mem @pci_bridge_pci
+> > > > > > > 00000000fc600000-00000000fc7fffff
+> > > > > > >
+> > > > > > >       00000000fc800000-00000000fc9fffff (prio 1, RW): alias
+> > > > > > > pci_bridge_pref_mem @pci_bridge_pci
+> > > > > > > 00000000fc800000-00000000fc9fffff
+> > > > > > > <- correct Adress Spce
+> > > > > > >
+> > > > > > >       00000000fca00000-00000000fcbfffff (prio 1, RW): alias
+> > > > > > > pci_bridge_pref_mem @pci_bridge_pci
+> > > > > > > 00000000fca00000-00000000fcbfffff
+> > > > > > >
+> > > > > > >       00000000fcc00000-00000000fcdfffff (prio 1, RW): alias
+> > > > > > > pci_bridge_pref_mem @pci_bridge_pci
+> > > > > > > 00000000fcc00000-00000000fcdfffff
+> > > > > > >
+> > > > > > >       00000000fce00000-00000000fcffffff (prio 1, RW): alias
+> > > > > > > pci_bridge_pref_mem @pci_bridge_pci
+> > > > > > > 00000000fce00000-00000000fcffffff
+> > > > > > >
+> > > > > > >
+> > > > > > >
+> > > > > > > After pci_bridge_update_mappings=EF=BC=9A
+> > > > > > >
+> > > > > > >       00000000fda00000-00000000fdbfffff (prio 1, RW): alias
+> > > > > > > pci_bridge_mem @pci_bridge_pci
+> > > > > > > 00000000fda00000-00000000fdbfffff
+> > > > > > >
+> > > > > > >       00000000fdc00000-00000000fddfffff (prio 1, RW): alias
+> > > > > > > pci_bridge_mem @pci_bridge_pci
+> > > > > > > 00000000fdc00000-00000000fddfffff
+> > > > > > >
+> > > > > > >       00000000fde00000-00000000fdffffff (prio 1, RW): alias
+> > > > > > > pci_bridge_mem @pci_bridge_pci
+> > > > > > > 00000000fde00000-00000000fdffffff
+> > > > > > >
+> > > > > > >       00000000fe000000-00000000fe1fffff (prio 1, RW): alias
+> > > > > > > pci_bridge_mem @pci_bridge_pci
+> > > > > > > 00000000fe000000-00000000fe1fffff
+> > > > > > >
+> > > > > > >       00000000fe200000-00000000fe3fffff (prio 1, RW): alias
+> > > > > > > pci_bridge_mem @pci_bridge_pci
+> > > > > > > 00000000fe200000-00000000fe3fffff
+> > > > > > >
+> > > > > > >       00000000fe400000-00000000fe5fffff (prio 1, RW): alias
+> > > > > > > pci_bridge_mem @pci_bridge_pci
+> > > > > > > 00000000fe400000-00000000fe5fffff
+> > > > > > >
+> > > > > > >       00000000fe600000-00000000fe7fffff (prio 1, RW): alias
+> > > > > > > pci_bridge_mem @pci_bridge_pci
+> > > > > > > 00000000fe600000-00000000fe7fffff
+> > > > > > >
+> > > > > > >       00000000fe800000-00000000fe9fffff (prio 1, RW): alias
+> > > > > > > pci_bridge_mem @pci_bridge_pci
+> > > > > > > 00000000fe800000-00000000fe9fffff
+> > > > > > >
+> > > > > > >       fffffffffc800000-fffffffffc800000 (prio 1, RW): alias
+> > > > pci_bridge_pref_mem
+> > > > > > > @pci_bridge_pci fffffffffc800000-fffffffffc800000   <- Exce=
+ptional
+> > Adress
+> > > > > > Space
+> > > > > >
+> > > > > > This one is empty though right?
+> > > > > >
+> > > > > > >
+> > > > > > >
+> > > > > > > We have figured out why this address becomes this value,
+> > > > > > > according to pci spec,  pci driver can get BAR address size=
+ by
+> > > > > > > writing 0xffffffff to
+> > > > > > >
+> > > > > > > the pci register firstly, and then read back the value from=
+ this register.
+> > > > > >
+> > > > > >
+> > > > > > OK however as you show below the BAR being sized is the BAR i=
+f a
+> > > > > > bridge. Are you then adding a bridge device by hotplug?
+> > > > >
+> > > > > No, I just simply hot plugged a VFIO device to Bus 0, another
+> > > > > interesting phenomenon is If I hot plug the device to other bus=
+,
+> > > > > this doesn't
+> > > > happened.
+> > > > >
+> > > > > >
+> > > > > >
+> > > > > > > We didn't handle this value  specially while process pci wr=
+ite
+> > > > > > > in qemu, the function call stack is:
+> > > > > > >
+> > > > > > > Pci_bridge_dev_write_config
+> > > > > > >
+> > > > > > > -> pci_bridge_write_config
+> > > > > > >
+> > > > > > > -> pci_default_write_config (we update the config[address]
+> > > > > > > -> value here to
+> > > > > > > fffffffffc800000, which should be 0xfc800000 )
+> > > > > > >
+> > > > > > > -> pci_bridge_update_mappings
+> > > > > > >
+> > > > > > >                 ->pci_bridge_region_del(br, br->windows);
+> > > > > > >
+> > > > > > > -> pci_bridge_region_init
+> > > > > > >
+> > > > > > >
+> > > > > > > -> pci_bridge_init_alias (here pci_bridge_get_base, we use =
+the
+> > > > > > > wrong value
+> > > > > > > fffffffffc800000)
+> > > > > > >
+> > > > > > >                                                 ->
+> > > > > > > memory_region_transaction_commit
+> > > > > > >
+> > > > > > >
+> > > > > > >
+> > > > > > > So, as we can see, we use the wrong base address in qemu to
+> > > > > > > update the memory regions, though, we update the base addre=
+ss
+> > > > > > > to
+> > > > > > >
+> > > > > > > The correct value after pci driver in VM write the original
+> > > > > > > value back, the virtio NIC in bus 4 may still sends net
+> > > > > > > packets concurrently with
+> > > > > > >
+> > > > > > > The wrong memory region address.
+> > > > > > >
+> > > > > > >
+> > > > > > >
+> > > > > > > We have tried to skip the memory region update action in qe=
+mu
+> > > > > > > while detect pci write with 0xffffffff value, and it does
+> > > > > > > work, but
+> > > > > > >
+> > > > > > > This seems to be not gently.
+> > > > > >
+> > > > > > For sure. But I'm still puzzled as to why does Linux try to s=
+ize
+> > > > > > the BAR of the bridge while a device behind it is used.
+> > > > > >
+> > > > > > Can you pls post your QEMU command line?
+> > > > >
+> > > > > My QEMU command line:
+> > > > > /root/xyd/qemu-system-x86_64 -name guest=3DLinux,debug-threads=3D=
+on -S
+> > > > > -object
+> > > > > secret,id=3DmasterKey0,format=3Draw,file=3D/var/run/libvirt/qem=
+u/domain-
+> > > > > 194-
+> > > > > Linux/master-key.aes -machine
+> > > > > pc-i440fx-2.8,accel=3Dkvm,usb=3Doff,dump-guest-core=3Doff -cpu
+> > > > > host,+kvm_pv_eoi -bios /usr/share/OVMF/OVMF.fd -m
+> > > > > size=3D4194304k,slots=3D256,maxmem=3D33554432k -realtime mlock=3D=
+off -smp
+> > > > > 20,sockets=3D20,cores=3D1,threads=3D1 -numa
+> > > > > node,nodeid=3D0,cpus=3D0-4,mem=3D1024 -numa
+> > > > > node,nodeid=3D1,cpus=3D5-9,mem=3D1024 -numa
+> > > > > node,nodeid=3D2,cpus=3D10-14,mem=3D1024 -numa
+> > > > > node,nodeid=3D3,cpus=3D15-19,mem=3D1024 -uuid
+> > > > > 34a588c7-b0f2-4952-b39c-47fae3411439 -no-user-config -nodefault=
+s
+> > > > > -chardev
+> > > > > socket,id=3Dcharmonitor,path=3D/var/run/libvirt/qemu/domain-194=
+-Linux/
+> > > > > moni
+> > > > > tor.sock,server,nowait -mon
+> > > > > chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Du=
+tc -no-hpet
+> > > > > -global kvm-pit.lost_tick_policy=3Ddelay -no-shutdown -boot
+> > > > > strict=3Don -device
+> > > > > pci-bridge,chassis_nr=3D1,id=3Dpci.1,bus=3Dpci.0,addr=3D0x8 -de=
+vice
+> > > > > pci-bridge,chassis_nr=3D2,id=3Dpci.2,bus=3Dpci.0,addr=3D0x9 -de=
+vice
+> > > > > pci-bridge,chassis_nr=3D3,id=3Dpci.3,bus=3Dpci.0,addr=3D0xa -de=
+vice
+> > > > > pci-bridge,chassis_nr=3D4,id=3Dpci.4,bus=3Dpci.0,addr=3D0xb -de=
+vice
+> > > > > pci-bridge,chassis_nr=3D5,id=3Dpci.5,bus=3Dpci.0,addr=3D0xc -de=
+vice
+> > > > > piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -device
+> > > > > usb-ehci,id=3Dusb1,bus=3Dpci.0,addr=3D0x10 -device
+> > > > > nec-usb-xhci,id=3Dusb2,bus=3Dpci.0,addr=3D0x11 -device
+> > > > > virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.0,addr=3D0x3 -device
+> > > > > virtio-scsi-pci,id=3Dscsi1,bus=3Dpci.0,addr=3D0x4 -device
+> > > > > virtio-scsi-pci,id=3Dscsi2,bus=3Dpci.0,addr=3D0x5 -device
+> > > > > virtio-scsi-pci,id=3Dscsi3,bus=3Dpci.0,addr=3D0x6 -device
+> > > > > virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x7 -d=
+rive
+> > > > > file=3D/mnt/sdb/xml/centos_74_x64_uefi.raw,format=3Draw,if=3Dno=
+ne,id=3Ddri
+> > > > > ve-v
+> > > > > irtio-disk0,cache=3Dnone -device
+> > > > > virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x2,drive=3Ddrive-=
+virtio-disk
+> > > > > 0,id
+> > > > > =3Dvirtio-disk0,bootindex=3D1 -drive
+> > > > > if=3Dnone,id=3Ddrive-ide0-1-1,readonly=3Don,cache=3Dnone -devic=
+e
+> > > > > ide-cd,bus=3Dide.1,unit=3D1,drive=3Ddrive-ide0-1-1,id=3Dide0-1-=
+1 -netdev
+> > > > > tap,fd=3D35,id=3Dhostnet0 -device
+> > > > > virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:89:5d=
+:8b,bus=3Dp
+> > > > > ci.4
+> > > > > ,addr=3D0x1 -chardev pty,id=3Dcharserial0 -device
+> > > > > isa-serial,chardev=3Dcharserial0,id=3Dserial0 -device
+> > > > > usb-tablet,id=3Dinput0,bus=3Dusb.0,port=3D1 -vnc 0.0.0.0:0 -dev=
+ice
+> > > > > cirrus-vga,id=3Dvideo0,vgamem_mb=3D8,bus=3Dpci.0,addr=3D0x12 -d=
+evice
+> > > > > virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0xd -msg
+> > > > > timestamp=3Don
+> > > > >
+> > > > > I am also very curious about this issue, in the linux kernel co=
+de,
+> > > > > maybe double
+> > > > check in function pci_bridge_check_ranges triggered this problem.
+> > > >
+> > > > If you can get the stacktrace in Linux when it tries to write thi=
+s
+> > > > fffff value, that would be quite helpful.
+> > > >
+> > >
+> > > After I add mdelay(100) in function pci_bridge_check_ranges, this
+> > > phenomenon is easier to reproduce, below is my modify in kernel:
+> > > diff --git a/drivers/pci/setup-bus.c b/drivers/pci/setup-bus.c inde=
+x
+> > > cb389277..86e232d 100644
+> > > --- a/drivers/pci/setup-bus.c
+> > > +++ b/drivers/pci/setup-bus.c
+> > > @@ -27,7 +27,7 @@
+> > >  #include <linux/slab.h>
+> > >  #include <linux/acpi.h>
+> > >  #include "pci.h"
+> > > -
+> > > +#include <linux/delay.h>
+> > >  unsigned int pci_flags;
+> > >
+> > >  struct pci_dev_resource {
+> > > @@ -787,6 +787,9 @@ static void pci_bridge_check_ranges(struct pci_=
+bus
+> > *bus)
+> > >                 pci_write_config_dword(bridge, PCI_PREF_BASE_UPPER3=
+2,
+> > >                                                0xffffffff);
+> > >                 pci_read_config_dword(bridge, PCI_PREF_BASE_UPPER32=
+,
+> > > &tmp);
+> > > +               mdelay(100);
+> > > +               printk(KERN_ERR "sleep\n");
+> > > +                dump_stack();
+> > >                 if (!tmp)
+> > >                         b_res[2].flags &=3D ~IORESOURCE_MEM_64;
+> > >                 pci_write_config_dword(bridge, PCI_PREF_BASE_UPPER3=
+2,
+> > >
+> >=20
+> > OK!
+> > I just sent a Linux patch that should help.
+> > I would appreciate it if you will give it a try and if that helps rep=
+ly to it with a
+> > Tested-by: tag.
 > >
->
-> No, without the "lazy collapse small sptes into large sptes" codes,
-> /sys/kernel/debug/kvm/largepages does drop during live migration,
-> but it still will increase gradually if live migration fails, see the result
-> above. I printed out the back trace when it increases after migration failure,
->
-> [139574.369098]  [<ffffffff81644a7f>] dump_stack+0x19/0x1b
-> [139574.369111]  [<ffffffffa02c3af6>] mmu_set_spte+0x2f6/0x310 [kvm]
-> [139574.369122]  [<ffffffffa02c4f7e>] __direct_map.isra.109+0x1de/0x250 [kvm]
-> [139574.369133]  [<ffffffffa02c8a76>] tdp_page_fault+0x246/0x280 [kvm]
-> [139574.369144]  [<ffffffffa02bf4e4>] kvm_mmu_page_fault+0x24/0x130 [kvm]
-> [139574.369148]  [<ffffffffa07c8116>] handle_ept_violation+0x96/0x170 [kvm_intel]
-> [139574.369153]  [<ffffffffa07cf949>] vmx_handle_exit+0x299/0xbf0 [kvm_intel]
-> [139574.369157]  [<ffffffff816559f0>] ? uv_bau_message_intr1+0x80/0x80
-> [139574.369161]  [<ffffffffa07cd5e0>] ? vmx_inject_irq+0xf0/0xf0 [kvm_intel]
-> [139574.369172]  [<ffffffffa02b35cd>] vcpu_enter_guest+0x76d/0x1160 [kvm]
-> [139574.369184]  [<ffffffffa02d9285>] ? kvm_apic_local_deliver+0x65/0x70 [kvm]
-> [139574.369196]  [<ffffffffa02bb125>] kvm_arch_vcpu_ioctl_run+0xd5/0x440 [kvm]
-> [139574.369205]  [<ffffffffa02a2b11>] kvm_vcpu_ioctl+0x2b1/0x640 [kvm]
-> [139574.369209]  [<ffffffff810e7852>] ? do_futex+0x122/0x5b0
-> [139574.369212]  [<ffffffff811fd9d5>] do_vfs_ioctl+0x2e5/0x4c0
-> [139574.369223]  [<ffffffffa02b0cf5>] ? kvm_on_user_return+0x75/0xb0 [kvm]
-> [139574.369225]  [<ffffffff811fdc51>] SyS_ioctl+0xa1/0xc0
-> [139574.369229]  [<ffffffff81654e09>] system_call_fastpath+0x16/0x1b
->
-> Any suggestion will be appreciated, Thanks!
+> =20
+> I tested this patch and it works fine on my machine.
+>=20
+> But I have another question, if we only fix this problem in the kernel,=
+ the Linux
+> version that has been released does not work well on the virtualization=
+ platform.=20
+> Is there a way to fix this problem in the backend?
 
-I found some time to figure it out, there is a simple program to
-reproduce in the guest:
+There could we a way to work around this.
+Does below help?
 
-#include <stdio.h>
-#include <pthread.h>
-#include <unistd.h>
-
-#define BUFSIZE (1024 * 1024)
-
-int useconds = 0;
-int mbytes = 0;
-
-void *memory_write(void *arg)
-{
-    int i = arg;
-    int j = 0;
-    char *p_buf = NULL;
-    p_buf = (char *)malloc(mbytes * BUFSIZE);
-    //use the memory
-    memset(p_buf, 0, mbytes * BUFSIZE);
-    printf("thread: %d\n", i);
-    while (1) {
-        for (j = 0; j < mbytes; j++) {
-            memset(&p_buf[j * BUFSIZE], 0, 100);
-        }
-    usleep(useconds);
-    }
-}
-
-int main(int argc, const char *argv[])
-{
-    int i = 0;
-    int ret = 0;
-    int threads = 0;
-    pthread_t tid = 0;
-    mbytes = atoi(argv[1]);
-    threads = atoi(argv[2]);
-    useconds = atoi(argv[3]);
-    if (mbytes == 0 || threads == 0 || useconds == 0) {
-        printf("get mbytes or threads or useconds error\n");
-        return 1;
-    }
-
-    printf("mbytes:%dm, thread:%d, useconds:%d\n", mbytes, threads, useconds);
-
-    for (i=0; i< threads; i++) {
-        ret = pthread_create(&tid, NULL, (void *)memory_write, (void *)i);
-        if(ret)
-        {
-            printf("Create pthread error!\n");
-            return 1;
-        }
-   }
-
-    sleep(1000000);
-    return 0;
-}
-
-I try ./a.out 100 50 2 which means it will spawn 50 threads, each
-allocate 100MB, and sleep 2us after each round of writing. In
-addition, it just dirties 100 byte(which just occupies 4KB page) of
-each 1MB memory.  The large sptes are dropped in the ept violation
-path since the large sptes are write-protect during live migration,
-small sptes are populated in this process, however, in the above
-setup, just 2 small sptes for each 2MB memory range are populated,
-there is no further ept violation and no further small sptes are
-replaced by large sptes after migration fails since the 2 small sptes
-are still populated. If I stop the a.out and run it the second time,
-the memory of a.out is reallocated, it probably allocate other gfns,
-the small sptes are replaced by large sptes during this process since
-the sptes(the remaining sptes in the 2MB memory except the 2 before)
-of the new gfns are empty and ept violation path figure out it is huge
-page backed. I do another testing, replace the 100 bytes by BUFSIZE
-which means that it will dirty the whole 1MB memory, this result in
-all the small sptes are populated, it will not be replaced by large
-sptes any more after migration fails.
-
-For the the 429.mcf of spec cpu2006 testcase, the RES is 10GB, I guess
-the whole memory of each 2MB is not accessing simultaneously, during
-EPT violation, most large sptes are dropped, part of each 2MB memory
-is accessed and small sptes are populated. The small sptes will be
-dropped and replaced by large sptes in the ept violation path if other
-part of each 2MB memory is accessed after migration fails.
-
-Regards,
-Wanpeng Li
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 236a20eaa8..7834cac4b0 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -551,7 +551,7 @@ static void build_append_pci_bus_devices(Aml *parent_=
+scope, PCIBus *bus,
+=20
+         aml_append(method, aml_store(aml_int(bsel_val), aml_name("BNUM")=
+));
+         aml_append(method,
+-            aml_call2("DVNT", aml_name("PCIU"), aml_int(1) /* Device Che=
+ck */)
++            aml_call2("DVNT", aml_name("PCIU"), aml_int(4) /* Device Che=
+ck Light */)
+         );
+         aml_append(method,
+             aml_call2("DVNT", aml_name("PCID"), aml_int(3)/* Eject Reque=
+st */)
