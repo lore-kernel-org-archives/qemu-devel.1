@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gWmOQ-0007XR-Tz
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:04:27 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gWmOR-0007Y2-FZ
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:04:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gWmOO-00071o-OT
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:04:26 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gWmON-00070x-4X
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:04:27 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 11 Dec 2018 19:03:35 +0100
-Message-Id: <20181211180352.19644-14-laurent@vivier.eu>
+Date: Tue, 11 Dec 2018 19:03:32 +0100
+Message-Id: <20181211180352.19644-11-laurent@vivier.eu>
 In-Reply-To: <20181211180352.19644-1-laurent@vivier.eu>
 References: <20181211180352.19644-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 13/30] MAINTAINERS: Add missing entries for the
- Jazz machine
+Subject: [Qemu-devel] [PULL 10/30] MAINTAINERS: Fix ACPI tests data files
+ path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +28,30 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org, Laurent Vivi
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
+Missed while moving those files in 438c78dab75.
+
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
-Message-Id: <20181125205000.10324-6-philmd@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20181125205000.10324-2-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- MAINTAINERS | 2 ++
- 1 file changed, 2 insertions(+)
+ MAINTAINERS | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index b32cd139a7..5c20fed4d4 100644
+index f5ef20d359..59233c2139 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -865,6 +865,8 @@ M: Hervé Poussineau <hpoussin@reactos.org>
- R: Stefan Markovic <smarkovic@wavecomp.com>
- S: Maintained
- F: hw/mips/mips_jazz.c
-+F: hw/display/jazz_led.c
-+F: hw/dma/rc4030.c
+@@ -1252,8 +1252,7 @@ F: hw/i386/acpi-build.[hc]
+ F: hw/arm/virt-acpi-build.c
+ F: tests/bios-tables-test.c
+ F: tests/acpi-utils.[hc]
+-F: tests/acpi-test-data/*
+-F: tests/acpi-test-data/*/*
++F: tests/data/acpi/
  
- Malta
- M: Aurelien Jarno <aurelien@aurel32.net>
+ ppc4xx
+ M: David Gibson <david@gibson.dropbear.id.au>
 -- 
 2.19.2
