@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gWehh-0008M0-Vb
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 04:51:51 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gWehf-00083l-Cp
+	(envelope-from <fli@suse.com>) id 1gWehc-0008Kl-Q9
 	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 04:51:49 -0500
-Received: from smtp.nue.novell.com ([195.135.221.5]:51512)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <fli@suse.com>) id 1gWehV-0007y5-LT
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 04:51:41 -0500
+Received: from smtp.nue.novell.com ([195.135.221.5]:43351)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gWehf-0007zX-0f
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 04:51:47 -0500
+	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gWehR-0007uL-RB
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 04:51:35 -0500
 From: Fei Li <fli@suse.com>
-Date: Tue, 11 Dec 2018 17:50:57 +0800
-Message-Id: <20181211095057.14623-8-fli@suse.com>
+Date: Tue, 11 Dec 2018 17:50:52 +0800
+Message-Id: <20181211095057.14623-3-fli@suse.com>
 In-Reply-To: <20181211095057.14623-1-fli@suse.com>
 References: <20181211095057.14623-1-fli@suse.com>
-Subject: [Qemu-devel] [PATCH for-4.0 v8 7/7] qemu_thread_join: fix
- segmentation fault
+Subject: [Qemu-devel] [PATCH for-4.0 v8 2/7] qemu_init_vcpu: add a new Error
+ parameter to propagate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,46 +25,500 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Weil <sw@weilnetz.de>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-To avoid the segmentation fault in qemu_thread_join(), just directly
-return when the QemuThread *thread failed to be created in either
-qemu-thread-posix.c or qemu-thread-win32.c.
+This patch is to pave the way for a later patch as it is too long:
+"qemu_thread_create: propagate the error to callers to handle."
 
-Cc: Stefan Weil <sw@weilnetz.de>
+The callers of qemu_init_vcpu() already passed the **errp to handle
+errors. In view of this, add a new Error parameter to all the
+functions called by qemu_init_vcpu() to propagate the error and let
+the further callers check it.
+
+Besides, make qemu_init_vcpu() return a Boolean value to let its
+callers know whether it succeeds.
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Fei Li <fli@suse.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 ---
- util/qemu-thread-posix.c | 3 +++
- util/qemu-thread-win32.c | 2 +-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ accel/tcg/user-exec-stub.c      |  3 ++-
+ cpus.c                          | 34 +++++++++++++++++++++-------------
+ include/qom/cpu.h               |  2 +-
+ target/alpha/cpu.c              |  4 +++-
+ target/arm/cpu.c                |  4 +++-
+ target/cris/cpu.c               |  4 +++-
+ target/hppa/cpu.c               |  4 +++-
+ target/i386/cpu.c               |  4 +++-
+ target/lm32/cpu.c               |  4 +++-
+ target/m68k/cpu.c               |  4 +++-
+ target/microblaze/cpu.c         |  4 +++-
+ target/mips/cpu.c               |  4 +++-
+ target/moxie/cpu.c              |  4 +++-
+ target/nios2/cpu.c              |  4 +++-
+ target/openrisc/cpu.c           |  4 +++-
+ target/ppc/translate_init.inc.c |  4 +++-
+ target/riscv/cpu.c              |  4 +++-
+ target/s390x/cpu.c              |  4 +++-
+ target/sh4/cpu.c                |  4 +++-
+ target/sparc/cpu.c              |  4 +++-
+ target/tilegx/cpu.c             |  4 +++-
+ target/tricore/cpu.c            |  4 +++-
+ target/unicore32/cpu.c          |  4 +++-
+ target/xtensa/cpu.c             |  4 +++-
+ 24 files changed, 87 insertions(+), 36 deletions(-)
 
-diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
-index 81b40a1ece..cb3722a4f4 100644
---- a/util/qemu-thread-posix.c
-+++ b/util/qemu-thread-posix.c
-@@ -566,6 +566,9 @@ void *qemu_thread_join(QemuThread *thread)
-     int err;
-     void *ret;
+diff --git a/accel/tcg/user-exec-stub.c b/accel/tcg/user-exec-stub.c
+index a32b4496af..f8c38a375c 100644
+--- a/accel/tcg/user-exec-stub.c
++++ b/accel/tcg/user-exec-stub.c
+@@ -10,8 +10,9 @@ void cpu_resume(CPUState *cpu)
+ {
+ }
  
-+    if (!thread->thread) {
-+        return NULL;
-+    }
-     err = pthread_join(thread->thread, &ret);
-     if (err) {
-         error_exit(err, __func__);
-diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
-index 57b1143e97..ca4d5329e3 100644
---- a/util/qemu-thread-win32.c
-+++ b/util/qemu-thread-win32.c
-@@ -367,7 +367,7 @@ void *qemu_thread_join(QemuThread *thread)
-     HANDLE handle;
+-void qemu_init_vcpu(CPUState *cpu)
++bool qemu_init_vcpu(CPUState *cpu, Error **errp)
+ {
++    return true;
+ }
  
-     data = thread->data;
--    if (data->mode == QEMU_THREAD_DETACHED) {
-+    if (data == NULL || data->mode == QEMU_THREAD_DETACHED) {
-         return NULL;
+ /* User mode emulation does not support record/replay yet.  */
+diff --git a/cpus.c b/cpus.c
+index 0ddeeefc14..7b091bda53 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1931,7 +1931,7 @@ void cpu_remove_sync(CPUState *cpu)
+ /* For temporary buffers for forming a name */
+ #define VCPU_THREAD_NAME_SIZE 16
+ 
+-static void qemu_tcg_init_vcpu(CPUState *cpu)
++static void qemu_tcg_init_vcpu(CPUState *cpu, Error **errp)
+ {
+     char thread_name[VCPU_THREAD_NAME_SIZE];
+     static QemuCond *single_tcg_halt_cond;
+@@ -1987,7 +1987,7 @@ static void qemu_tcg_init_vcpu(CPUState *cpu)
+     }
+ }
+ 
+-static void qemu_hax_start_vcpu(CPUState *cpu)
++static void qemu_hax_start_vcpu(CPUState *cpu, Error **errp)
+ {
+     char thread_name[VCPU_THREAD_NAME_SIZE];
+ 
+@@ -2004,7 +2004,7 @@ static void qemu_hax_start_vcpu(CPUState *cpu)
+ #endif
+ }
+ 
+-static void qemu_kvm_start_vcpu(CPUState *cpu)
++static void qemu_kvm_start_vcpu(CPUState *cpu, Error **errp)
+ {
+     char thread_name[VCPU_THREAD_NAME_SIZE];
+ 
+@@ -2017,7 +2017,7 @@ static void qemu_kvm_start_vcpu(CPUState *cpu)
+                        cpu, QEMU_THREAD_JOINABLE);
+ }
+ 
+-static void qemu_hvf_start_vcpu(CPUState *cpu)
++static void qemu_hvf_start_vcpu(CPUState *cpu, Error **errp)
+ {
+     char thread_name[VCPU_THREAD_NAME_SIZE];
+ 
+@@ -2035,7 +2035,7 @@ static void qemu_hvf_start_vcpu(CPUState *cpu)
+                        cpu, QEMU_THREAD_JOINABLE);
+ }
+ 
+-static void qemu_whpx_start_vcpu(CPUState *cpu)
++static void qemu_whpx_start_vcpu(CPUState *cpu, Error **errp)
+ {
+     char thread_name[VCPU_THREAD_NAME_SIZE];
+ 
+@@ -2051,7 +2051,7 @@ static void qemu_whpx_start_vcpu(CPUState *cpu)
+ #endif
+ }
+ 
+-static void qemu_dummy_start_vcpu(CPUState *cpu)
++static void qemu_dummy_start_vcpu(CPUState *cpu, Error **errp)
+ {
+     char thread_name[VCPU_THREAD_NAME_SIZE];
+ 
+@@ -2064,11 +2064,12 @@ static void qemu_dummy_start_vcpu(CPUState *cpu)
+                        QEMU_THREAD_JOINABLE);
+ }
+ 
+-void qemu_init_vcpu(CPUState *cpu)
++bool qemu_init_vcpu(CPUState *cpu, Error **errp)
+ {
+     cpu->nr_cores = smp_cores;
+     cpu->nr_threads = smp_threads;
+     cpu->stopped = true;
++    Error *local_err = NULL;
+ 
+     if (!cpu->as) {
+         /* If the target cpu hasn't set up any address spaces itself,
+@@ -2079,22 +2080,29 @@ void qemu_init_vcpu(CPUState *cpu)
      }
  
+     if (kvm_enabled()) {
+-        qemu_kvm_start_vcpu(cpu);
++        qemu_kvm_start_vcpu(cpu, &local_err);
+     } else if (hax_enabled()) {
+-        qemu_hax_start_vcpu(cpu);
++        qemu_hax_start_vcpu(cpu, &local_err);
+     } else if (hvf_enabled()) {
+-        qemu_hvf_start_vcpu(cpu);
++        qemu_hvf_start_vcpu(cpu, &local_err);
+     } else if (tcg_enabled()) {
+-        qemu_tcg_init_vcpu(cpu);
++        qemu_tcg_init_vcpu(cpu, &local_err);
+     } else if (whpx_enabled()) {
+-        qemu_whpx_start_vcpu(cpu);
++        qemu_whpx_start_vcpu(cpu, &local_err);
+     } else {
+-        qemu_dummy_start_vcpu(cpu);
++        qemu_dummy_start_vcpu(cpu, &local_err);
++    }
++
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return false;
+     }
+ 
+     while (!cpu->created) {
+         qemu_cond_wait(&qemu_cpu_cond, &qemu_global_mutex);
+     }
++
++    return true;
+ }
+ 
+ void cpu_stop_current(void)
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 1396f53e5b..696c3608d2 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -1006,7 +1006,7 @@ void end_exclusive(void);
+  *
+  * Initializes a vCPU.
+  */
+-void qemu_init_vcpu(CPUState *cpu);
++bool qemu_init_vcpu(CPUState *cpu, Error **errp);
+ 
+ #define SSTEP_ENABLE  0x1  /* Enable simulated HW single stepping */
+ #define SSTEP_NOIRQ   0x2  /* Do not use IRQ while single stepping */
+diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
+index a953897fcc..bf3c34516d 100644
+--- a/target/alpha/cpu.c
++++ b/target/alpha/cpu.c
+@@ -66,7 +66,9 @@ static void alpha_cpu_realizefn(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
+-    qemu_init_vcpu(cs);
++    if (!qemu_init_vcpu(cs, errp)) {
++        return;
++    }
+ 
+     acc->parent_realize(dev, errp);
+ }
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 60411f6bfe..29a68c5114 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1110,7 +1110,9 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+     }
+ #endif
+ 
+-    qemu_init_vcpu(cs);
++    if (!qemu_init_vcpu(cs, errp)) {
++        return;
++    }
+     cpu_reset(cs);
+ 
+     acc->parent_realize(dev, errp);
+diff --git a/target/cris/cpu.c b/target/cris/cpu.c
+index a23aba2688..ec92d69781 100644
+--- a/target/cris/cpu.c
++++ b/target/cris/cpu.c
+@@ -140,7 +140,9 @@ static void cris_cpu_realizefn(DeviceState *dev, Error **errp)
+     }
+ 
+     cpu_reset(cs);
+-    qemu_init_vcpu(cs);
++    if (!qemu_init_vcpu(cs, errp)) {
++        return;
++    }
+ 
+     ccc->parent_realize(dev, errp);
+ }
+diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
+index 00bf444620..08f600ced9 100644
+--- a/target/hppa/cpu.c
++++ b/target/hppa/cpu.c
+@@ -98,7 +98,9 @@ static void hppa_cpu_realizefn(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
+-    qemu_init_vcpu(cs);
++    if (!qemu_init_vcpu(cs, errp)) {
++        return;
++    }
+     acc->parent_realize(dev, errp);
+ 
+ #ifndef CONFIG_USER_ONLY
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index f81d35e1f9..85612dc465 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5279,7 +5279,9 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+     }
+ #endif
+ 
+-    qemu_init_vcpu(cs);
++    if (!qemu_init_vcpu(cs, errp)) {
++        return;
++    }
+ 
+     /*
+      * Most Intel and certain AMD CPUs support hyperthreading. Even though QEMU
+diff --git a/target/lm32/cpu.c b/target/lm32/cpu.c
+index b7499cb627..d50b1e4a43 100644
+--- a/target/lm32/cpu.c
++++ b/target/lm32/cpu.c
+@@ -139,7 +139,9 @@ static void lm32_cpu_realizefn(DeviceState *dev, Error **errp)
+ 
+     cpu_reset(cs);
+ 
+-    qemu_init_vcpu(cs);
++    if (!qemu_init_vcpu(cs, errp)) {
++        return;
++    }
+ 
+     lcc->parent_realize(dev, errp);
+ }
+diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+index 582e3a73b3..4ab53f2d58 100644
+--- a/target/m68k/cpu.c
++++ b/target/m68k/cpu.c
+@@ -231,7 +231,9 @@ static void m68k_cpu_realizefn(DeviceState *dev, Error **errp)
+     m68k_cpu_init_gdb(cpu);
+ 
+     cpu_reset(cs);
+-    qemu_init_vcpu(cs);
++    if (!qemu_init_vcpu(cs, errp)) {
++        return;
++    }
+ 
+     mcc->parent_realize(dev, errp);
+ }
+diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
+index 9b546a2c18..3906c864a3 100644
+--- a/target/microblaze/cpu.c
++++ b/target/microblaze/cpu.c
+@@ -161,7 +161,9 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
+-    qemu_init_vcpu(cs);
++    if (!qemu_init_vcpu(cs, errp)) {
++        return;
++    }
+ 
+     env->pvr.regs[0] = PVR0_USE_EXC_MASK \
+                        | PVR0_USE_ICACHE_MASK \
+diff --git a/target/mips/cpu.c b/target/mips/cpu.c
+index e217fb3e36..1e5aa69c57 100644
+--- a/target/mips/cpu.c
++++ b/target/mips/cpu.c
+@@ -145,7 +145,9 @@ static void mips_cpu_realizefn(DeviceState *dev, Error **errp)
+     cpu_mips_realize_env(&cpu->env);
+ 
+     cpu_reset(cs);
+-    qemu_init_vcpu(cs);
++    if (!qemu_init_vcpu(cs, errp)) {
++        return;
++    }
+ 
+     mcc->parent_realize(dev, errp);
+ }
+diff --git a/target/moxie/cpu.c b/target/moxie/cpu.c
+index 8d67eb6727..8581a6d922 100644
+--- a/target/moxie/cpu.c
++++ b/target/moxie/cpu.c
+@@ -66,7 +66,9 @@ static void moxie_cpu_realizefn(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
+-    qemu_init_vcpu(cs);
++    if (!qemu_init_vcpu(cs, errp)) {
++        return;
++    }
+     cpu_reset(cs);
+ 
+     mcc->parent_realize(dev, errp);
+diff --git a/target/nios2/cpu.c b/target/nios2/cpu.c
+index fbfaa2ce26..5c7b4b486e 100644
+--- a/target/nios2/cpu.c
++++ b/target/nios2/cpu.c
+@@ -94,7 +94,9 @@ static void nios2_cpu_realizefn(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
+-    qemu_init_vcpu(cs);
++    if (!qemu_init_vcpu(cs, errp)) {
++        return;
++    }
+     cpu_reset(cs);
+ 
+     ncc->parent_realize(dev, errp);
+diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
+index fb7cb5c507..a6dcdb9df9 100644
+--- a/target/openrisc/cpu.c
++++ b/target/openrisc/cpu.c
+@@ -83,7 +83,9 @@ static void openrisc_cpu_realizefn(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
+-    qemu_init_vcpu(cs);
++    if (!qemu_init_vcpu(cs, errp)) {
++        return;
++    }
+     cpu_reset(cs);
+ 
+     occ->parent_realize(dev, errp);
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+index 168d0cec28..587a0e7710 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -9711,7 +9711,9 @@ static void ppc_cpu_realize(DeviceState *dev, Error **errp)
+                                  32, "power-vsx.xml", 0);
+     }
+ 
+-    qemu_init_vcpu(cs);
++    if (!qemu_init_vcpu(cs, errp)) {
++        goto unrealize;
++    }
+ 
+     pcc->parent_realize(dev, errp);
+ 
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index a025a0a3ba..9829fd9bc4 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -305,7 +305,9 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
+-    qemu_init_vcpu(cs);
++    if (!qemu_init_vcpu(cs, errp)) {
++        return;
++    }
+     cpu_reset(cs);
+ 
+     mcc->parent_realize(dev, errp);
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index 18ba7f85a5..2a3eac9761 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -222,7 +222,9 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
+     qemu_register_reset(s390_cpu_machine_reset_cb, cpu);
+ #endif
+     s390_cpu_gdb_init(cs);
+-    qemu_init_vcpu(cs);
++    if (!qemu_init_vcpu(cs, errp)) {
++        return;
++    }
+ 
+     /*
+      * KVM requires the initial CPU reset ioctl to be executed on the target
+diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
+index b9f393b7c7..d32ef2e1cb 100644
+--- a/target/sh4/cpu.c
++++ b/target/sh4/cpu.c
+@@ -196,7 +196,9 @@ static void superh_cpu_realizefn(DeviceState *dev, Error **errp)
+     }
+ 
+     cpu_reset(cs);
+-    qemu_init_vcpu(cs);
++    if (!qemu_init_vcpu(cs, errp)) {
++        return;
++    }
+ 
+     scc->parent_realize(dev, errp);
+ }
+diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
+index 0f090ece54..9c22f6a7df 100644
+--- a/target/sparc/cpu.c
++++ b/target/sparc/cpu.c
+@@ -773,7 +773,9 @@ static void sparc_cpu_realizefn(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
+-    qemu_init_vcpu(cs);
++    if (!qemu_init_vcpu(cs, errp)) {
++        return;
++    }
+ 
+     scc->parent_realize(dev, errp);
+ }
+diff --git a/target/tilegx/cpu.c b/target/tilegx/cpu.c
+index bfe9be59b5..234148fabd 100644
+--- a/target/tilegx/cpu.c
++++ b/target/tilegx/cpu.c
+@@ -92,7 +92,9 @@ static void tilegx_cpu_realizefn(DeviceState *dev, Error **errp)
+     }
+ 
+     cpu_reset(cs);
+-    qemu_init_vcpu(cs);
++    if (!qemu_init_vcpu(cs, errp)) {
++        return;
++    }
+ 
+     tcc->parent_realize(dev, errp);
+ }
+diff --git a/target/tricore/cpu.c b/target/tricore/cpu.c
+index 2edaef1aef..5482d6ea3f 100644
+--- a/target/tricore/cpu.c
++++ b/target/tricore/cpu.c
+@@ -96,7 +96,9 @@ static void tricore_cpu_realizefn(DeviceState *dev, Error **errp)
+         set_feature(env, TRICORE_FEATURE_13);
+     }
+     cpu_reset(cs);
+-    qemu_init_vcpu(cs);
++    if (!qemu_init_vcpu(cs, errp)) {
++        return;
++    }
+ 
+     tcc->parent_realize(dev, errp);
+ }
+diff --git a/target/unicore32/cpu.c b/target/unicore32/cpu.c
+index 2b49d1ca40..0c737c3187 100644
+--- a/target/unicore32/cpu.c
++++ b/target/unicore32/cpu.c
+@@ -96,7 +96,9 @@ static void uc32_cpu_realizefn(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
+-    qemu_init_vcpu(cs);
++    if (!qemu_init_vcpu(cs, errp)) {
++        return;
++    }
+ 
+     ucc->parent_realize(dev, errp);
+ }
+diff --git a/target/xtensa/cpu.c b/target/xtensa/cpu.c
+index a54dbe4260..d2351c9b20 100644
+--- a/target/xtensa/cpu.c
++++ b/target/xtensa/cpu.c
+@@ -131,7 +131,9 @@ static void xtensa_cpu_realizefn(DeviceState *dev, Error **errp)
+ 
+     cs->gdb_num_regs = xcc->config->gdb_regmap.num_regs;
+ 
+-    qemu_init_vcpu(cs);
++    if (!qemu_init_vcpu(cs, errp)) {
++        return;
++    }
+ 
+     xcc->parent_realize(dev, errp);
+ }
 -- 
 2.13.7
