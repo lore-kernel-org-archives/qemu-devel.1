@@ -1,34 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gWZi4-0000Jw-IU
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 23:31:53 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gWavH-0001b1-49
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 00:49:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gWZhz-00009N-Ke
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 23:31:52 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48382)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gWZhz-00008f-EU
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 23:31:47 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gWZhw-0001ba-6P
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 04:31:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 275C42E8DBD
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 04:31:44 +0000 (UTC)
+	(envelope-from <aik@ozlabs.ru>) id 1gWavD-0003Xh-V2
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 00:49:35 -0500
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Tue, 11 Dec 2018 16:49:23 +1100
+Message-Id: <20181211054926.56717-1-aik@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 11 Dec 2018 04:17:30 -0000
-From: Launchpad Bug Tracker <1368204@bugs.launchpad.net>
-Reply-To: Bug 1368204 <1368204@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140911122344.25076.48914.malonedeb@soybean.canonical.com>
-Message-Id: <154450185055.29389.2259238816084040202.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1368204] Re: WinME isn't able to detect QEMU's
- cdrom drive and other hard drives automatically
+Subject: [Qemu-devel] [PATCH qemu 0/3] ppc/spapr: Receive and store device
+ tree blob from SLOF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,50 +22,28 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+Here is my FDT queue for sPAPR.
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+This is based on sha1
+41bcd77 C=C3=A9dric Le Goater "spapr: Add a pseries-4.0 machine type".
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1368204
-
-Title:
-  WinME isn't able to detect QEMU's cdrom drive and other hard drives
-  automatically
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  On a fresh installation of Windows Millennium (WinME) in qemu, Windows
-  Me isn't able to find the CD-ROM drive or additional hard drives other
-  than -hda at first place.
-
-  Only if i add manually an IDE controller driver in Windows ME's device ma=
-nager, the CD-ROM inserted in QEMU is found.
-  Thus an IDE controller isn't found automatically either.
-
-  This shouldn't be the case. On normal real hardware, Windows ME would
-  find at least one IDE or SCSI controller.
-
-  The command line that was used is the following:
-  sudo /usr/bin/qemu-system-i386 -hda WinME_QEMU.img -cdrom drivers.iso -bo=
-ot c -no-acpi -no-hpet -soundhw sb16 -net nic -cpu pentium3 -m 256 -vga cir=
-rus   =
+Please comment. Thanks.
 
 
-  qemu's version is:
-  qemu-system-i386 --version                                               =
-                                                                           =
-                                                =
 
-  QEMU emulator version 2.0.0 (Debian 2.0.0+dfsg-2ubuntu1.3), Copyright (c)=
- 2003-2008 Fabrice Bellard
+Alexey Kardashevskiy (3):
+  configure/fdt: Use more strict test for libfdt version
+  ppc/spapr: Receive and store device tree blob from SLOF
+  spapr: Fix fdt warnings
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1368204/+subscriptions
+ configure              |  2 +-
+ include/hw/ppc/spapr.h |  7 ++++++-
+ hw/ppc/spapr.c         | 33 +++++++++++++++++++++++++++++++--
+ hw/ppc/spapr_hcall.c   | 42 ++++++++++++++++++++++++++++++++++++++++++
+ hw/ppc/trace-events    |  3 +++
+ 5 files changed, 83 insertions(+), 4 deletions(-)
+
+--=20
+2.17.1
