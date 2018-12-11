@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gWedO-00073m-Q4
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 04:47:23 -0500
+	(envelope-from <fli@suse.com>) id 1gWehc-0008Ko-SD
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 04:51:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gWedN-0005HN-V7
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 04:47:22 -0500
-Date: Tue, 11 Dec 2018 10:47:09 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181211094709.GA31849@localhost.localdomain>
-References: <94f9fc23-961c-7109-643b-ba1e8c625d92@yandex-team.ru>
-	<87h8fkbjyn.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <87h8fkbjyn.fsf@dusky.pond.sub.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC] block: Is name of BlockBackend deprecated
- with -blockdev parameter?
+	(envelope-from <fli@suse.com>) id 1gWehV-0007y0-Ly
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 04:51:41 -0500
+Received: from smtp.nue.novell.com ([195.135.221.5]:33227)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gWehR-0007sh-QV
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 04:51:35 -0500
+From: Fei Li <fli@suse.com>
+Date: Tue, 11 Dec 2018 17:50:51 +0800
+Message-Id: <20181211095057.14623-2-fli@suse.com>
+In-Reply-To: <20181211095057.14623-1-fli@suse.com>
+References: <20181211095057.14623-1-fli@suse.com>
+Subject: [Qemu-devel] [PATCH for-4.0 v8 1/7] Fix segmentation fault when
+ qemu_signal_init fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Anton Kuchin <antonkuchin@yandex-team.ru>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-Am 11.12.2018 um 08:28 hat Markus Armbruster geschrieben:
-> I figure Kevin knows, but you typoed his e-mail address.  I fixed it fo=
-r
-> you.
->=20
-> Anton Kuchin <antonkuchin@yandex-team.ru> writes:
->=20
-> > Hello,
-> >
-> > I'm trying to switch from -drive parameter to -blockdev + -device and
-> > having problems. Looks like with this option I have no way to set the
-> > name of=A0 created BlockBackend, but some QMP and HMP commands are
-> > trying to find blk with blk_by_name() and fail to locate my device
-> > (e.g. hmp_commit, qmp_x_bloc_latency_histogram_set ...). Was it
-> > intentional and BB names are going to be deprecated?
-> >
-> > This also seems to be a the case for all block devices hotplugged wit=
-h
-> > QMP as they use the same code path.
-> >
-> > As far as I understand all named backends are stored in
-> > monitor_block_backends list, but I can't get what is the point of
-> > having this list, and why parse_drive() function doesn't call
-> > monitor_add_blk() like blockdev_init() does with -drive option. Can
-> > someone give me a hint on this?
-> >
-> > I also noticed that some commands fallback to search by qdev_id or
-> > BDS->node_name,=A0 but at the creation time (both in
-> > bdrv_assing_node_name and monitor_add_blk) it is already checked that
-> > names are unique across these namespaces so may be it would be useful
-> > to introduce generic search function?
+When qemu_signal_init() fails in qemu_init_main_loop(), we return
+without setting an error.  Its callers crash then when they try to
+report the error with error_report_err().
 
-Yes, BlockBackend names are not supposed to be used in the external
-interfaces any more. If the QMP command is about the backend, it will
-take a node name, and if it's about the guest device (which may not even
-have a node attached with removable media), it will take a qdev ID.
+To avoid such segmentation fault, add a new Error parameter to make
+the call trace to propagate the err to the final caller.
 
-The implementation of qmp_x_block_latency_histogram_set() is incorrect,
-it shouldn't use blk_by_name(). I wonder where it got that pattern from
-because it was added long after all other QMP commands had switched to
-qmp_get_blk() or bdrv_lookup_bs().
+Fixes: 2f78e491d7b46542158ce0b8132ee4e05bc0ade4
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Fei Li <fli@suse.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+---
+ util/main-loop.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-hmp_commit() should indeed use bdrv_lookup_bs() to also accept node
-names. I think we reviewed QMP to make sure we converted everything
-and forgot about HMP commands that aren't mapped to QMP.
-
-Kevin
+diff --git a/util/main-loop.c b/util/main-loop.c
+index affe0403c5..443cb4cfe8 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -71,7 +71,7 @@ static void sigfd_handler(void *opaque)
+     }
+ }
+ 
+-static int qemu_signal_init(void)
++static int qemu_signal_init(Error **errp)
+ {
+     int sigfd;
+     sigset_t set;
+@@ -96,7 +96,7 @@ static int qemu_signal_init(void)
+     sigdelset(&set, SIG_IPI);
+     sigfd = qemu_signalfd(&set);
+     if (sigfd == -1) {
+-        fprintf(stderr, "failed to create signalfd\n");
++        error_setg_errno(errp, errno, "failed to create signalfd");
+         return -errno;
+     }
+ 
+@@ -109,7 +109,7 @@ static int qemu_signal_init(void)
+ 
+ #else /* _WIN32 */
+ 
+-static int qemu_signal_init(void)
++static int qemu_signal_init(Error **errp)
+ {
+     return 0;
+ }
+@@ -148,7 +148,7 @@ int qemu_init_main_loop(Error **errp)
+ 
+     init_clocks(qemu_timer_notify_cb);
+ 
+-    ret = qemu_signal_init();
++    ret = qemu_signal_init(errp);
+     if (ret) {
+         return ret;
+     }
+-- 
+2.13.7
