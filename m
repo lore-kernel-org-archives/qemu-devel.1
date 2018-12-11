@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gWf8K-0002eD-Ds
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:19:23 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gWfDh-0004Mj-8i
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:24:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gWf89-0003ru-D2
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:19:14 -0500
-Received: from 5.mo178.mail-out.ovh.net ([46.105.51.53]:33390)
+	(envelope-from <dgilbert@redhat.com>) id 1gWfDd-0008RS-UL
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:24:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35830)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gWf88-0003ql-Sq
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:19:09 -0500
-Received: from player797.ha.ovh.net (unknown [10.109.146.168])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id AFF6342E72
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 11:19:06 +0100 (CET)
-References: <20181209194610.29727-1-clg@kaod.org>
-	<20181209194610.29727-17-clg@kaod.org>
-	<20181211020350.GF4261@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <771f030d-b69f-78e4-ac0c-9f37e3ab9c17@kaod.org>
-Date: Tue, 11 Dec 2018 11:19:01 +0100
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gWfDd-0008Q8-Lf
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:24:49 -0500
+Date: Tue, 11 Dec 2018 10:24:40 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181211102440.GD2734@work-vm>
+References: <20181210173151.16629-1-dgilbert@redhat.com>
+	<20181210173151.16629-2-dgilbert@redhat.com>
+	<ad65a93f-9b0e-39c3-97ad-9204b30da630@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181211020350.GF4261@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 16/19] spapr: introduce a new sPAPR IRQ
- backend supporting XIVE and XICS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ad65a93f-9b0e-39c3-97ad-9204b30da630@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 1/7] virtio: Add shared memory
+ capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,268 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, sweil@redhat.com, swhiteho@redhat.com, stefanha@redhat.com, vgoyal@redhat.com, miklos@szeredi.hu
 
-On 12/11/18 3:03 AM, David Gibson wrote:
-> On Sun, Dec 09, 2018 at 08:46:07PM +0100, C=E9dric Le Goater wrote:
->> The interrupt mode is chosen by the CAS negotiation process and
->> activated after a reset to take into account the required changes in
->> the machine. These impact the device tree layout, the interrupt
->> presenter object and the exposed MMIO regions in the case of XIVE.
->>
->> This default interrupt mode for the machine is XICS.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>  include/hw/ppc/spapr_irq.h |   1 +
->>  hw/ppc/spapr.c             |   3 +-
->>  hw/ppc/spapr_hcall.c       |  13 ++++
->>  hw/ppc/spapr_irq.c         | 143 ++++++++++++++++++++++++++++++++++++=
-+
->>  4 files changed, 159 insertions(+), 1 deletion(-)
->>
->> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
->> index b34d5a00381b..29936498dbc8 100644
->> --- a/include/hw/ppc/spapr_irq.h
->> +++ b/include/hw/ppc/spapr_irq.h
->> @@ -51,6 +51,7 @@ typedef struct sPAPRIrq {
->>  extern sPAPRIrq spapr_irq_xics;
->>  extern sPAPRIrq spapr_irq_xics_legacy;
->>  extern sPAPRIrq spapr_irq_xive;
->> +extern sPAPRIrq spapr_irq_dual;
->> =20
->>  void spapr_irq_init(sPAPRMachineState *spapr, Error **errp);
->>  int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Erro=
-r **errp);
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index 5ef87a00f68b..fa41927d95dd 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -2631,7 +2631,8 @@ static void spapr_machine_init(MachineState *mac=
-hine)
->>      spapr_ovec_set(spapr->ov5, OV5_DRMEM_V2);
->> =20
->>      /* advertise XIVE */
->> -    if (smc->irq->ov5 =3D=3D SPAPR_OV5_XIVE_EXPLOIT) {
->> +    if (smc->irq->ov5 =3D=3D SPAPR_OV5_XIVE_EXPLOIT ||
->> +        smc->irq->ov5 =3D=3D SPAPR_OV5_XIVE_BOTH) {
->>          spapr_ovec_set(spapr->ov5, OV5_XIVE_EXPLOIT);
->>      }
->> =20
->> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
->> index ae913d070f50..186b6a65543f 100644
->> --- a/hw/ppc/spapr_hcall.c
->> +++ b/hw/ppc/spapr_hcall.c
->> @@ -1654,6 +1654,19 @@ static target_ulong h_client_architecture_suppo=
-rt(PowerPCCPU *cpu,
->>              (spapr_h_cas_compose_response(spapr, args[1], args[2],
->>                                            ov5_updates) !=3D 0);
->>      }
->> +
->> +    /*
->> +     * Generate a machine reset when we have an update of the
->> +     * interrupt mode. Only required on the machine supporting both
->> +     * mode.
->> +     */
->> +    if (!spapr->cas_reboot) {
->> +        sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
->> +
->> +        spapr->cas_reboot =3D spapr_ovec_test(ov5_updates, OV5_XIVE_E=
-XPLOIT)
->> +            && smc->irq->ov5 =3D=3D SPAPR_OV5_XIVE_BOTH;
->> +    }
->> +
->>      spapr_ovec_cleanup(ov5_updates);
->> =20
->>      if (spapr->cas_reboot) {
->> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
->> index a8e50725397c..7c34939f774a 100644
->> --- a/hw/ppc/spapr_irq.c
->> +++ b/hw/ppc/spapr_irq.c
->> @@ -392,6 +392,149 @@ sPAPRIrq spapr_irq_xive =3D {
->>      .reset       =3D spapr_irq_reset_xive,
->>  };
->> =20
->> +/*
->> + * Dual XIVE and XICS IRQ backend.
->> + *
->> + * Both interrupt mode, XIVE and XICS, objects are created but the
->> + * machine starts in legacy interrupt mode (XICS). It can be changed
->> + * by the CAS negotiation process and, in that case, the new mode is
->> + * activated after extra machine reset.
->> + */
->> +
->> +/*
->> + * Returns the sPAPR IRQ backend negotiated by CAS. XICS is the
->> + * default.
->> + */
->> +static sPAPRIrq *spapr_irq_current(sPAPRMachineState *spapr)
->> +{
->> +    return spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT) ?
->> +        &spapr_irq_xive : &spapr_irq_xics;
->> +}
->> +
->> +static void spapr_irq_init_dual(sPAPRMachineState *spapr, Error **err=
-p)
->> +{
->> +    MachineState *machine =3D MACHINE(spapr);
->> +    Error *local_err =3D NULL;
->> +
->> +    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
->> +        error_setg(errp, "No KVM support for the 'dual' machine");
->> +        return;
->> +    }
->> +
->> +    spapr_irq_xics.init(spapr, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->> +
->> +    spapr_irq_xive.init(spapr, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->> +}
->> +
->> +static int spapr_irq_claim_dual(sPAPRMachineState *spapr, int irq, bo=
-ol lsi,
->> +                                Error **errp)
->> +{
->> +    int ret;
->> +    Error *local_err =3D NULL;
->> +
->> +    ret =3D spapr_irq_xive.claim(spapr, irq, lsi, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return ret;
->> +    }
->> +
->> +    ret =3D spapr_irq_xics.claim(spapr, irq, lsi, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +    }
->> +
->> +    return ret;
->> +}
->> +
->> +static void spapr_irq_free_dual(sPAPRMachineState *spapr, int irq, in=
-t num)
->> +{
->> +    spapr_irq_xive.free(spapr, irq, num);
->> +    spapr_irq_xics.free(spapr, irq, num);
->> +}
->> +
->> +static qemu_irq spapr_qirq_dual(sPAPRMachineState *spapr, int irq)
->> +{
->> +    return spapr_irq_current(spapr)->qirq(spapr, irq);
->=20
-> Urgh... I don't think this is going to work.  IIRC the various devices
-> (PHB, VIO, etc.)  are wired up to their qirqs at realize() time, so if
-> you reboot from a XIVE guest to XICS guest (or maybe the other way
-> around) the peripherals won't be able to signal irqs in the new
-> scheme.
+* Eric Blake (eblake@redhat.com) wrote:
+> On 12/10/18 11:31 AM, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > Define a new capability type 'VIRTIO_PCI_CAP_SHARED_MEMORY_CFG'
+> > and the data structure 'virtio_pci_shm_cap' to go with it.
+> > They allow defining shared memory regions with sizes and offsets
+> > of 2^32 and more.
+> > Multiple instances of the capability are allowed and distinguished
+> > by a device-specific 'id'.
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >   hw/virtio/virtio-pci.c                      | 20 ++++++++++++++++++++
+> >   include/standard-headers/linux/virtio_pci.h |  9 +++++++++
+> >   2 files changed, 29 insertions(+)
+> > 
+> 
+> > +++ b/include/standard-headers/linux/virtio_pci.h
+> > @@ -113,6 +113,8 @@
+> >   #define VIRTIO_PCI_CAP_DEVICE_CFG	4
+> >   /* PCI configuration access */
+> >   #define VIRTIO_PCI_CAP_PCI_CFG		5
+> > +/* Additional shared memory capability */
+> > +#define VIRTIO_PCI_CAP_SHARED_MEMORY_CFG 8
+> >   /* This is the PCI capability header: */
+> >   struct virtio_pci_cap {
+> > @@ -163,6 +165,13 @@ struct virtio_pci_cfg_cap {
+> >   	uint8_t pci_cfg_data[4]; /* Data for BAR access. */
+> >   };
+> > +struct virtio_pci_shm_cap {
+> > +	struct virtio_pci_cap cap;
+> > +	uint32_t offset_hi;             /* Most sig 32 bits of offset */
+> > +	uint32_t length_hi;             /* Most sig 32 bits of length */
+> > +        uint8_t  id;                    /* To distinguish shm chunks */
+> 
+> TAB damage.
 
-It does. The IRQ numbers are claimed in both backends.=20
+Thanks, fixed.
 
-This is the problem since the very beginning. For reset and migration
-to work, we need to keep in sync the IRQ number space of the machine=20
-and the different interrupt controllers.=20
+Dave
 
-C.=20
-
-
-> I think instead we need a common set of qirqs, whose set_irq routine
-> looks at whether to signal XICS or XIVE.  FOr now I think the easiest
-> approach is to layer those on top of the existing XICS or XIVE
-> specific qirqs.  Later we might want to remove the (input) qirqs
-> entirely from the XICS and XIVE subsystems, instead having just
-> explicit trigger functions.  Then spapr will always supply the qirqs
-> which call into one or the other.
->=20
->> +}
->> +
->> +static void spapr_irq_print_info_dual(sPAPRMachineState *spapr, Monit=
-or *mon)
->> +{
->> +    spapr_irq_current(spapr)->print_info(spapr, mon);
->> +}
->> +
->> +static void spapr_irq_dt_populate_dual(sPAPRMachineState *spapr,
->> +                                       uint32_t nr_servers, void *fdt=
-,
->> +                                       uint32_t phandle)
->> +{
->> +    spapr_irq_current(spapr)->dt_populate(spapr, nr_servers, fdt, pha=
-ndle);
->> +}
->> +
->> +static Object *spapr_irq_cpu_intc_create_dual(sPAPRMachineState *spap=
-r,
->> +                                              Object *cpu, Error **er=
-rp)
->> +{
->> +    Error *local_err =3D NULL;
->> +
->> +    spapr_irq_xive.cpu_intc_create(spapr, cpu, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return NULL;
->> +    }
->> +
->> +    /* Default to XICS interrupt mode */
->> +    return spapr_irq_xics.cpu_intc_create(spapr, cpu, errp);
->> +}
->> +
->> +static int spapr_irq_post_load_dual(sPAPRMachineState *spapr, int ver=
-sion_id)
->> +{
->> +    /*
->> +     * Force a reset of the XIVE backend after migration. The machine
->> +     * defaults to XICS at startup.
->> +     */
->> +    if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
->> +        spapr_irq_xive.reset(spapr, &error_fatal);
->> +    }
->> +
->> +    return spapr_irq_current(spapr)->post_load(spapr, version_id);
->> +}
->> +
->> +static void spapr_irq_reset_dual(sPAPRMachineState *spapr, Error **er=
-rp)
->> +{
->> +    /*
->> +     * Reset the interrupt mode selected by CAS.
->> +     */
->> +    spapr_irq_current(spapr)->reset(spapr, errp);
->> +}
->> +
->> +/*
->> + * Define values in sync with the XIVE and XICS backend
->> + */
->> +#define SPAPR_IRQ_DUAL_NR_IRQS     0x2000
->> +#define SPAPR_IRQ_DUAL_NR_MSIS     (SPAPR_IRQ_DUAL_NR_IRQS - SPAPR_IR=
-Q_MSI)
->> +
->> +sPAPRIrq spapr_irq_dual =3D {
->> +    .nr_irqs     =3D SPAPR_IRQ_DUAL_NR_IRQS,
->> +    .nr_msis     =3D SPAPR_IRQ_DUAL_NR_MSIS,
->> +    .ov5         =3D SPAPR_OV5_XIVE_BOTH,
->> +
->> +    .init        =3D spapr_irq_init_dual,
->> +    .claim       =3D spapr_irq_claim_dual,
->> +    .free        =3D spapr_irq_free_dual,
->> +    .qirq        =3D spapr_qirq_dual,
->> +    .print_info  =3D spapr_irq_print_info_dual,
->> +    .dt_populate =3D spapr_irq_dt_populate_dual,
->> +    .cpu_intc_create =3D spapr_irq_cpu_intc_create_dual,
->> +    .post_load   =3D spapr_irq_post_load_dual,
->> +    .reset       =3D spapr_irq_reset_dual,
->> +};
->> +
->>  /*
->>   * sPAPR IRQ frontend routines for devices
->>   */
->=20
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
