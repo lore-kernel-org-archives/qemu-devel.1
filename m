@@ -1,36 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gWeMc-0003nP-BH
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 04:30:07 -0500
+	(envelope-from <berrange@redhat.com>) id 1gWeOs-0004cM-2a
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 04:32:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gWeMY-0000yy-9g
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 04:30:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60737)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gWeMY-0000yK-2w
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 04:29:58 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0B180307C94A
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 09:29:57 +0000 (UTC)
-Date: Tue, 11 Dec 2018 09:29:44 +0000
+	(envelope-from <berrange@redhat.com>) id 1gWeOk-0002gK-QN
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 04:32:21 -0500
+Date: Tue, 11 Dec 2018 09:31:58 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181211092944.GA921@redhat.com>
+Message-ID: <20181211093158.GB921@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181126124250.29985-1-marcandre.lureau@redhat.com>
-	<20181126124250.29985-2-marcandre.lureau@redhat.com>
-	<20181210142956.wucn33osm7fxa27d@sirius.home.kraxel.org>
-	<CAMxuvawUrZ=y-txTS86Tz3b-BYY05k4n-jBiY8+vO5e7AOkPKA@mail.gmail.com>
-	<20181210183313-mutt-send-email-mst@kernel.org>
-	<20181211074241.ovuharwewaw22ygq@sirius.home.kraxel.org>
+References: <20181211054926.56717-1-aik@ozlabs.ru>
+	<20181211054926.56717-2-aik@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20181211074241.ovuharwewaw22ygq@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] [PATCH for-3.2 01/11] vhost-user: define
- conventions for vhost-user backends
+In-Reply-To: <20181211054926.56717-2-aik@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu 1/3] configure/fdt: Use more strict
+ test for libfdt version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,50 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Hoffmann, Gerd" <kraxel@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
 
-On Tue, Dec 11, 2018 at 08:42:41AM +0100, Hoffmann, Gerd wrote:
->   Hi,
+On Tue, Dec 11, 2018 at 04:49:24PM +1100, Alexey Kardashevskiy wrote:
+> The libfdt installed in the system is preferred to the dtc submodule by
+> default. The recent libfdt update added a new symbol - fdt_check_full -
+> and this breaks compile if there is an older libfdt installed in
+> the system.
+
+AFACT, there's no usage of fdt_check_full in the QMEU tree, so this
+commit message is wrong.  The first usage is introduced in your
+next patch, so this configure change should just be part of that
+patch which introduces it.
+
 > 
-> > Right. The main issue is that we need to make sure only
-> > in-tree devices are supported.
+> This changes the test to force ./configure into using newer libfdt.
 > 
-> Well, that is under debate right now, see:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg04912.html
-
-I've previously been against the idea of external plugins for QEMU,
-however, that was when the plugin was something that would be dlopen'd
-by QEMU. That would cause our internal ABI to be exposed to 3rd parties
-which is highly undesirable, even if they were open source to comply
-with the license needs.
-
-When the plugin is a completely isolated process communicating with a
-well defined protocol, it is not placing a significant burden on the
-QEMU developers' ongoing maintainence, nor has problems with license
-compliance. The main problem would come from debugging the combined
-system as the external process is essentially a black box from QEMU's
-POV. Downstream OS vendors are free to place restrictions on which
-backend processes they'd be willing to support with QEMU, and upstream
-is under no obligation to debug stuff beyond the QEMU boundary.
-
-We have already accepted that tradeoff with networking by supporting
-vhost-user and have externals impls like DPDK, so I don't see a
-compelling reason to try to restrict it for other vhost-user backends.
-
-> > vhost-user by design
-> > is for out of tree users. It needn't be hard,
-> > maybe it's enough to just make qemu launch these processes
-> > as opposed to connecting to them on command line.
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+>  configure | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Not sure this is a good idea, with security being one of the motivating
-> factors to move device emulation to other processes.  When libvirt
-> launches the processes it can place them in separate sandboxes ...
-
-Yep, libvirt already turns on seccomp policies which forbid QEMU from
-forking/execing anything, and we have no desire to go backwards here.
-Any external processes have to be launched by libvirt ahead of time.
-
+> diff --git a/configure b/configure
+> index 0a3c6a7..e5312da 100755
+> --- a/configure
+> +++ b/configure
+> @@ -3880,7 +3880,7 @@ if test "$fdt" != "no" ; then
+>    cat > $TMPC << EOF
+>  #include <libfdt.h>
+>  #include <libfdt_env.h>
+> -int main(void) { fdt_first_subnode(0, 0); return 0; }
+> +int main(void) { fdt_check_full(NULL, 0); return 0; }
+>  EOF
+>    if compile_prog "" "$fdt_libs" ; then
+>      # system DTC is good - use it
+> -- 
+> 2.17.1
+> 
 
 Regards,
 Daniel
