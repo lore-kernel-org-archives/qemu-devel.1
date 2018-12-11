@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gWf5d-0001XS-5U
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:16:36 -0500
+	(envelope-from <clg@kaod.org>) id 1gWf8K-0002eD-Ds
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:19:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gWf5a-0001cq-Cj
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:16:33 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:37468)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1gWf5Z-0001aR-Sk
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:16:30 -0500
-Received: by mail-ot1-x342.google.com with SMTP id 40so13488155oth.4
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 02:16:29 -0800 (PST)
+	(envelope-from <clg@kaod.org>) id 1gWf89-0003ru-D2
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:19:14 -0500
+Received: from 5.mo178.mail-out.ovh.net ([46.105.51.53]:33390)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gWf88-0003ql-Sq
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:19:09 -0500
+Received: from player797.ha.ovh.net (unknown [10.109.146.168])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id AFF6342E72
+	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 11:19:06 +0100 (CET)
+References: <20181209194610.29727-1-clg@kaod.org>
+	<20181209194610.29727-17-clg@kaod.org>
+	<20181211020350.GF4261@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <771f030d-b69f-78e4-ac0c-9f37e3ab9c17@kaod.org>
+Date: Tue, 11 Dec 2018 11:19:01 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=j1o_Sc0-xsgTq+0wsE1HC+p1_kEA5Op4Ub0D03J7juMA@mail.gmail.com>
-References: <20181210152829.29271-1-alex.bennee@linaro.org>
-	<20181210152829.29271-5-alex.bennee@linaro.org>
-	<CAL1e-=j1o_Sc0-xsgTq+0wsE1HC+p1_kEA5Op4Ub0D03J7juMA@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 11 Dec 2018 11:16:27 +0100
-Message-ID: <CAL1e-=hQ34wdia9Tt9tEeFGPQZ44z1QnZg85Gc=jvNB_BC9R0g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20181211020350.GF4261@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 04/13] tests/tcg/mips: enable
- mips32-dsp/mips32-dspr2/mipsr5900 linux-user (WIP)
+Subject: Re: [Qemu-devel] [PATCH v7 16/19] spapr: introduce a new sPAPR IRQ
+ backend supporting XIVE and XICS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,422 +33,268 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, amarkovic@wavecomp.com, shorne@gmail.com, aurelien@aurel32.net, edgar.iglesias@gmail.com, jcmvbkbc@gmail.com, Stefan Markovic <smarkovic@wavecomp.com>, michael@walle.cc
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On Dec 11, 2018 10:54 AM, "Aleksandar Markovic" <aleksandar.m.mail@gmail.co=
-m>
-wrote:
->
->
-> On Dec 10, 2018 4:29 PM, "Alex Benn=C3=A9e" <alex.bennee@linaro.org> wrot=
-e:
-> >
-> > Convert the existing tests to use our common cross build
-> > infrastructure.
-> >
-> > [WIP: mips32r2 disabled to avoid name clash]
-> > [WIP: mipsr5900 disabled due to clashing build flags]
-> >
-> > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> > ---
-> >  tests/tcg/mips/Makefile.target       |  15 ++-
-> >  tests/tcg/mips/mips32-dsp/Makefile   | 166 +++++----------------------
-> >  tests/tcg/mips/mips32-dspr2/Makefile |  83 +++-----------
-> >  tests/tcg/mips/mipsr5900/Makefile    |  40 +++----
-> >  4 files changed, 75 insertions(+), 229 deletions(-)
-> >
->
-> Thank you Alex for this initiative.
->
-> For DSP, following MIPS CPUs in QEMU support DSP:
->
-> DSP: 24KEc (MIPS32R2),  34Kf (MIPS32R2), 74Kf (MIPS32R2), mips64dspr2
-(MIPS64R2),
->
-> DSP R2: mips64dspr2 (MIPS64R2),
->
+On 12/11/18 3:03 AM, David Gibson wrote:
+> On Sun, Dec 09, 2018 at 08:46:07PM +0100, C=E9dric Le Goater wrote:
+>> The interrupt mode is chosen by the CAS negotiation process and
+>> activated after a reset to take into account the required changes in
+>> the machine. These impact the device tree layout, the interrupt
+>> presenter object and the exposed MMIO regions in the case of XIVE.
+>>
+>> This default interrupt mode for the machine is XICS.
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> ---
+>>  include/hw/ppc/spapr_irq.h |   1 +
+>>  hw/ppc/spapr.c             |   3 +-
+>>  hw/ppc/spapr_hcall.c       |  13 ++++
+>>  hw/ppc/spapr_irq.c         | 143 ++++++++++++++++++++++++++++++++++++=
++
+>>  4 files changed, 159 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+>> index b34d5a00381b..29936498dbc8 100644
+>> --- a/include/hw/ppc/spapr_irq.h
+>> +++ b/include/hw/ppc/spapr_irq.h
+>> @@ -51,6 +51,7 @@ typedef struct sPAPRIrq {
+>>  extern sPAPRIrq spapr_irq_xics;
+>>  extern sPAPRIrq spapr_irq_xics_legacy;
+>>  extern sPAPRIrq spapr_irq_xive;
+>> +extern sPAPRIrq spapr_irq_dual;
+>> =20
+>>  void spapr_irq_init(sPAPRMachineState *spapr, Error **errp);
+>>  int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Erro=
+r **errp);
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index 5ef87a00f68b..fa41927d95dd 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -2631,7 +2631,8 @@ static void spapr_machine_init(MachineState *mac=
+hine)
+>>      spapr_ovec_set(spapr->ov5, OV5_DRMEM_V2);
+>> =20
+>>      /* advertise XIVE */
+>> -    if (smc->irq->ov5 =3D=3D SPAPR_OV5_XIVE_EXPLOIT) {
+>> +    if (smc->irq->ov5 =3D=3D SPAPR_OV5_XIVE_EXPLOIT ||
+>> +        smc->irq->ov5 =3D=3D SPAPR_OV5_XIVE_BOTH) {
+>>          spapr_ovec_set(spapr->ov5, OV5_XIVE_EXPLOIT);
+>>      }
+>> =20
+>> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+>> index ae913d070f50..186b6a65543f 100644
+>> --- a/hw/ppc/spapr_hcall.c
+>> +++ b/hw/ppc/spapr_hcall.c
+>> @@ -1654,6 +1654,19 @@ static target_ulong h_client_architecture_suppo=
+rt(PowerPCCPU *cpu,
+>>              (spapr_h_cas_compose_response(spapr, args[1], args[2],
+>>                                            ov5_updates) !=3D 0);
+>>      }
+>> +
+>> +    /*
+>> +     * Generate a machine reset when we have an update of the
+>> +     * interrupt mode. Only required on the machine supporting both
+>> +     * mode.
+>> +     */
+>> +    if (!spapr->cas_reboot) {
+>> +        sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+>> +
+>> +        spapr->cas_reboot =3D spapr_ovec_test(ov5_updates, OV5_XIVE_E=
+XPLOIT)
+>> +            && smc->irq->ov5 =3D=3D SPAPR_OV5_XIVE_BOTH;
+>> +    }
+>> +
+>>      spapr_ovec_cleanup(ov5_updates);
+>> =20
+>>      if (spapr->cas_reboot) {
+>> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+>> index a8e50725397c..7c34939f774a 100644
+>> --- a/hw/ppc/spapr_irq.c
+>> +++ b/hw/ppc/spapr_irq.c
+>> @@ -392,6 +392,149 @@ sPAPRIrq spapr_irq_xive =3D {
+>>      .reset       =3D spapr_irq_reset_xive,
+>>  };
+>> =20
+>> +/*
+>> + * Dual XIVE and XICS IRQ backend.
+>> + *
+>> + * Both interrupt mode, XIVE and XICS, objects are created but the
+>> + * machine starts in legacy interrupt mode (XICS). It can be changed
+>> + * by the CAS negotiation process and, in that case, the new mode is
+>> + * activated after extra machine reset.
+>> + */
+>> +
+>> +/*
+>> + * Returns the sPAPR IRQ backend negotiated by CAS. XICS is the
+>> + * default.
+>> + */
+>> +static sPAPRIrq *spapr_irq_current(sPAPRMachineState *spapr)
+>> +{
+>> +    return spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT) ?
+>> +        &spapr_irq_xive : &spapr_irq_xics;
+>> +}
+>> +
+>> +static void spapr_irq_init_dual(sPAPRMachineState *spapr, Error **err=
+p)
+>> +{
+>> +    MachineState *machine =3D MACHINE(spapr);
+>> +    Error *local_err =3D NULL;
+>> +
+>> +    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
+>> +        error_setg(errp, "No KVM support for the 'dual' machine");
+>> +        return;
+>> +    }
+>> +
+>> +    spapr_irq_xics.init(spapr, &local_err);
+>> +    if (local_err) {
+>> +        error_propagate(errp, local_err);
+>> +        return;
+>> +    }
+>> +
+>> +    spapr_irq_xive.init(spapr, &local_err);
+>> +    if (local_err) {
+>> +        error_propagate(errp, local_err);
+>> +        return;
+>> +    }
+>> +}
+>> +
+>> +static int spapr_irq_claim_dual(sPAPRMachineState *spapr, int irq, bo=
+ol lsi,
+>> +                                Error **errp)
+>> +{
+>> +    int ret;
+>> +    Error *local_err =3D NULL;
+>> +
+>> +    ret =3D spapr_irq_xive.claim(spapr, irq, lsi, &local_err);
+>> +    if (local_err) {
+>> +        error_propagate(errp, local_err);
+>> +        return ret;
+>> +    }
+>> +
+>> +    ret =3D spapr_irq_xics.claim(spapr, irq, lsi, &local_err);
+>> +    if (local_err) {
+>> +        error_propagate(errp, local_err);
+>> +    }
+>> +
+>> +    return ret;
+>> +}
+>> +
+>> +static void spapr_irq_free_dual(sPAPRMachineState *spapr, int irq, in=
+t num)
+>> +{
+>> +    spapr_irq_xive.free(spapr, irq, num);
+>> +    spapr_irq_xics.free(spapr, irq, num);
+>> +}
+>> +
+>> +static qemu_irq spapr_qirq_dual(sPAPRMachineState *spapr, int irq)
+>> +{
+>> +    return spapr_irq_current(spapr)->qirq(spapr, irq);
+>=20
+> Urgh... I don't think this is going to work.  IIRC the various devices
+> (PHB, VIO, etc.)  are wired up to their qirqs at realize() time, so if
+> you reboot from a XIVE guest to XICS guest (or maybe the other way
+> around) the peripherals won't be able to signal irqs in the new
+> scheme.
 
-Correction: 74Kf supports DSP R2 too. So this is the only MIPS32R2 cpu with
-DSP R2 support. While mips64dspr2 is the only MIPS64R2 cpu with DSP R2
-support.
+It does. The IRQ numbers are claimed in both backends.=20
 
-> (For simplicity, I didn't mention new nanoMIPS architecture, since your
-gcc for sure don't support it yet)
->
-> In brackets, those are architectures that are usually required to be
-passed to gcc as its option, and that explains the switch involving
-MIPS64R2 for DSP R2.
->
-> Whereas while starting QEMU, CPU name should be specified in -cpu switch.
->
-> mips64dspr2 is a virtual cpu (doesn't model any real cpu) made
-specifically for DSP R2 testings, hence such odd name.
->
-> Hopefully this clarifies some of your dilemmas.
->
-> What are name clashes that you mention? Are they just related to
-filenames?
->
-> CHEERS,
-> Aleksandar
->
-> > diff --git a/tests/tcg/mips/Makefile.target
-b/tests/tcg/mips/Makefile.target
-> > index 086625f533..33bb25bf8d 100644
-> > --- a/tests/tcg/mips/Makefile.target
-> > +++ b/tests/tcg/mips/Makefile.target
-> > @@ -15,8 +15,17 @@ TESTS +=3D $(MIPS_TESTS)
-> >  hello-mips: CFLAGS+=3D-ffreestanding
-> >  hello-mips: LDFLAGS+=3D-nostdlib
-> >
-> > -# For MIPS32 and 64 we have a bunch of extra tests in sub-directories
-> > -# however they are intended for system tests.
-> > -
-> >  run-hello-mips: hello-mips
-> >         $(call skip-test, $<, "BROKEN")
-> > +
-> > +# For MIPS32 and mipsr5900 we have a bunch of extra tests in
-sub-directories
-> > +
-> > +ifeq ($(TARGET_NAME),mipsel)
-> > +-include $(MIPS_SRC)/mips32-dsp/Makefile
-> > +
-> > +# FIXME: doesn't build - names clash with mips32-dsp
-> > +#-include $(MIPS_SRC)/mips32-dspr2/Makefile
-> > +
-> > +# FIXME: the docker compiler can't build the binaries
-> > +#-include $(MIPS_SRC)/mipsr5900/Makefile
-> > +endif
-> > diff --git a/tests/tcg/mips/mips32-dsp/Makefile
-b/tests/tcg/mips/mips32-dsp/Makefile
-> > index c3a0a00944..df2dddceaa 100644
-> > --- a/tests/tcg/mips/mips32-dsp/Makefile
-> > +++ b/tests/tcg/mips/mips32-dsp/Makefile
-> > @@ -1,136 +1,30 @@
-> > --include ../../config-host.mak
-> > -
-> > -CROSS=3Dmips64el-unknown-linux-gnu-
-> > -
-> > -SIM=3Dqemu-mipsel
-> > -SIM_FLAGS=3D-cpu 74Kf
-> > -
-> > -CC      =3D $(CROSS)gcc
-> > -CFLAGS  =3D -mabi=3D32 -march=3Dmips32r2 -mgp32 -mdsp -static
-> > -
-> > -TESTCASES =3D absq_s_ph.tst
-> > -TESTCASES +=3D absq_s_w.tst
-> > -TESTCASES +=3D addq_ph.tst
-> > -TESTCASES +=3D addq_s_ph.tst
-> > -TESTCASES +=3D addq_s_w.tst
-> > -TESTCASES +=3D addsc.tst
-> > -TESTCASES +=3D addu_qb.tst
-> > -TESTCASES +=3D addu_s_qb.tst
-> > -TESTCASES +=3D addwc.tst
-> > -TESTCASES +=3D bitrev.tst
-> > -TESTCASES +=3D bposge32.tst
-> > -TESTCASES +=3D cmp_eq_ph.tst
-> > -TESTCASES +=3D cmpgu_eq_qb.tst
-> > -TESTCASES +=3D cmpgu_le_qb.tst
-> > -TESTCASES +=3D cmpgu_lt_qb.tst
-> > -TESTCASES +=3D cmp_le_ph.tst
-> > -TESTCASES +=3D cmp_lt_ph.tst
-> > -TESTCASES +=3D cmpu_eq_qb.tst
-> > -TESTCASES +=3D cmpu_le_qb.tst
-> > -TESTCASES +=3D cmpu_lt_qb.tst
-> > -TESTCASES +=3D dpaq_sa_l_w.tst
-> > -TESTCASES +=3D dpaq_s_w_ph.tst
-> > -TESTCASES +=3D dpau_h_qbl.tst
-> > -TESTCASES +=3D dpau_h_qbr.tst
-> > -TESTCASES +=3D dpsq_sa_l_w.tst
-> > -TESTCASES +=3D dpsq_s_w_ph.tst
-> > -TESTCASES +=3D dpsu_h_qbl.tst
-> > -TESTCASES +=3D dpsu_h_qbr.tst
-> > -TESTCASES +=3D extp.tst
-> > -TESTCASES +=3D extpdp.tst
-> > -TESTCASES +=3D extpdpv.tst
-> > -TESTCASES +=3D extpv.tst
-> > -TESTCASES +=3D extr_rs_w.tst
-> > -TESTCASES +=3D extr_r_w.tst
-> > -TESTCASES +=3D extr_s_h.tst
-> > -TESTCASES +=3D extrv_rs_w.tst
-> > -TESTCASES +=3D extrv_r_w.tst
-> > -TESTCASES +=3D extrv_s_h.tst
-> > -TESTCASES +=3D extrv_w.tst
-> > -TESTCASES +=3D extr_w.tst
-> > -TESTCASES +=3D insv.tst
-> > -TESTCASES +=3D lbux.tst
-> > -TESTCASES +=3D lhx.tst
-> > -TESTCASES +=3D lwx.tst
-> > -TESTCASES +=3D madd.tst
-> > -TESTCASES +=3D maddu.tst
-> > -TESTCASES +=3D maq_sa_w_phl.tst
-> > -TESTCASES +=3D maq_sa_w_phr.tst
-> > -TESTCASES +=3D maq_s_w_phl.tst
-> > -TESTCASES +=3D maq_s_w_phr.tst
-> > -TESTCASES +=3D mfhi.tst
-> > -TESTCASES +=3D mflo.tst
-> > -TESTCASES +=3D modsub.tst
-> > -TESTCASES +=3D msub.tst
-> > -TESTCASES +=3D msubu.tst
-> > -TESTCASES +=3D mthi.tst
-> > -TESTCASES +=3D mthlip.tst
-> > -TESTCASES +=3D mtlo.tst
-> > -TESTCASES +=3D muleq_s_w_phl.tst
-> > -TESTCASES +=3D muleq_s_w_phr.tst
-> > -TESTCASES +=3D muleu_s_ph_qbl.tst
-> > -TESTCASES +=3D muleu_s_ph_qbr.tst
-> > -TESTCASES +=3D mulq_rs_ph.tst
-> > -TESTCASES +=3D mult.tst
-> > -TESTCASES +=3D multu.tst
-> > -TESTCASES +=3D packrl_ph.tst
-> > -TESTCASES +=3D pick_ph.tst
-> > -TESTCASES +=3D pick_qb.tst
-> > -TESTCASES +=3D precequ_ph_qbla.tst
-> > -TESTCASES +=3D precequ_ph_qbl.tst
-> > -TESTCASES +=3D precequ_ph_qbra.tst
-> > -TESTCASES +=3D precequ_ph_qbr.tst
-> > -TESTCASES +=3D preceq_w_phl.tst
-> > -TESTCASES +=3D preceq_w_phr.tst
-> > -TESTCASES +=3D preceu_ph_qbla.tst
-> > -TESTCASES +=3D preceu_ph_qbl.tst
-> > -TESTCASES +=3D preceu_ph_qbra.tst
-> > -TESTCASES +=3D preceu_ph_qbr.tst
-> > -TESTCASES +=3D precrq_ph_w.tst
-> > -TESTCASES +=3D precrq_qb_ph.tst
-> > -TESTCASES +=3D precrq_rs_ph_w.tst
-> > -TESTCASES +=3D precrqu_s_qb_ph.tst
-> > -TESTCASES +=3D raddu_w_qb.tst
-> > -TESTCASES +=3D rddsp.tst
-> > -TESTCASES +=3D repl_ph.tst
-> > -TESTCASES +=3D repl_qb.tst
-> > -TESTCASES +=3D replv_ph.tst
-> > -TESTCASES +=3D replv_qb.tst
-> > -TESTCASES +=3D shilo.tst
-> > -TESTCASES +=3D shilov.tst
-> > -TESTCASES +=3D shll_ph.tst
-> > -TESTCASES +=3D shll_qb.tst
-> > -TESTCASES +=3D shll_s_ph.tst
-> > -TESTCASES +=3D shll_s_w.tst
-> > -TESTCASES +=3D shllv_ph.tst
-> > -TESTCASES +=3D shllv_qb.tst
-> > -TESTCASES +=3D shllv_s_ph.tst
-> > -TESTCASES +=3D shllv_s_w.tst
-> > -TESTCASES +=3D shra_ph.tst
-> > -TESTCASES +=3D shra_r_ph.tst
-> > -TESTCASES +=3D shra_r_w.tst
-> > -TESTCASES +=3D shrav_ph.tst
-> > -TESTCASES +=3D shrav_r_ph.tst
-> > -TESTCASES +=3D shrav_r_w.tst
-> > -TESTCASES +=3D shrl_qb.tst
-> > -TESTCASES +=3D shrlv_qb.tst
-> > -TESTCASES +=3D subq_ph.tst
-> > -TESTCASES +=3D subq_s_ph.tst
-> > -TESTCASES +=3D subq_s_w.tst
-> > -TESTCASES +=3D subu_qb.tst
-> > -TESTCASES +=3D subu_s_qb.tst
-> > -TESTCASES +=3D wrdsp.tst
-> > -
-> > -all: $(TESTCASES)
-> > -
-> > -%.tst: %.c
-> > -       $(CC) $(CFLAGS) $< -o $@
-> > -
-> > -check: $(TESTCASES)
-> > -       @for case in $(TESTCASES); do \
-> > -        echo $(SIM) $(SIM_FLAGS) ./$$case;\
-> > -        $(SIM) $(SIM_FLAGS) ./$$case; \
-> > -       done
-> > -
-> > -clean:
-> > -       $(RM) -rf $(TESTCASES)
-> > +#
-> > +# MIPS32-DSP linux-user tests
-> > +#
-> > +# We don't set the VPATH for these tests as we re-use the VPATH from
-> > +# ../Makefile and add explicit paths for the source to avoid name
-clashes
-> > +# between the various sub-dirs.
-> > +#
-> > +
-> > +MIPS32DSP_SRC =3D $(SRC_PATH)/tests/tcg/mips/mips32-dsp
-> > +MIPS32DSP_ALL =3D $(wildcard $(MIPS32DSP_SRC)/*.c)
-> > +MIPS32DSP_TESTS =3D $(patsubst $(MIPS32DSP_SRC)/%.c, mips32-dsp/%,
-$(MIPS32DSP_ALL))
-> > +MIPS32DSP_RUNS =3D $(patsubst %, run-%, $(MIPS32DSP_TESTS))
-> > +
-> > +# add to the list of tests
-> > +TESTS +=3D $(MIPS32DSP_TESTS)
-> > +
-> > +# We need a rule to ensure we create a sub-directory to build in
-> > +# It is a PHONY target to prevent confusion with MIPS32DSP_SRC
-> > +.PHONY: mips32-dsp.build
-> > +mips32-dsp.build:
-> > +       mkdir -p mips32-dsp
-> > +
-> > +$(MIPS32DSP_TESTS): | mips32-dsp.build
-> > +$(MIPS32DSP_TESTS): CFLAGS+=3D-mabi=3D32 -march=3Dmips32r2 -mgp32 -mds=
-p
-> > +
-> > +$(MIPS32DSP_RUNS): QEMU_OPTS=3D-cpu 74Kf
-> > +
-> > +# FIXME: I don't know why the general rule in tests/tcg/Makefile isn't
-enough
-> > +run-mips32-dsp/%: mips32-dsp/%
-> > +       $(call run-test, $<, $(QEMU) $(QEMU_OPTS) $<, "$< on
-$(TARGET_NAME) $(QEMU_OPTS)")
-> > diff --git a/tests/tcg/mips/mips32-dspr2/Makefile
-b/tests/tcg/mips/mips32-dspr2/Makefile
-> > index ed19581c7e..6da966abb6 100644
-> > --- a/tests/tcg/mips/mips32-dspr2/Makefile
-> > +++ b/tests/tcg/mips/mips32-dspr2/Makefile
-> > @@ -1,71 +1,24 @@
-> > --include ../../config-host.mak
-> > +#
-> > +# MIPS32-DSPR2 linux-user tests
-> > +#
-> >
-> > -CROSS=3Dmips64el-unknown-linux-gnu-
-> > +MIPS32_DSPR2_SRC =3D $(SRC_PATH)/tests/tcg/mips/mips32-dsp
-> > +MIPS32_DSPR2_ALL =3D $(wildcard $(MIPS32_DSPR2_SRC)/*.c)
-> > +MIPS32_DSPR2_TESTS =3D $(patsubst $(MIPS32_DSPR2_SRC)/%.c,
-mips32-dspr2/%, $(MIPS32_DSPR2_ALL))
-> > +MIPS32_DSPR2_RUNS =3D $(patsubst %, run-%, $(MIPS32_DSPR2_TESTS))
-> >
-> > -SIM=3Dqemu-mipsel
-> > -SIM_FLAGS=3D-cpu 74Kf
-> > +# add to the list of tests
-> > +TESTS +=3D $(MIPS32_DSPR2_TESTS)
-> >
-> > -CC      =3D $(CROSS)gcc
-> > -CFLAGS  =3D -mabi=3D32 -march=3Dmips32r2 -mgp32 -mdspr2 -static
-> > +.PHONY: mips32-dspr2.build
-> > +mips32-dspr2.build:
-> > +       mkdir -p mips32-dspr2
-> >
-> > -TESTCASES =3D absq_s_qb.tst
-> > -TESTCASES +=3D addqh_ph.tst
-> > -TESTCASES +=3D addqh_r_ph.tst
-> > -TESTCASES +=3D addqh_r_w.tst
-> > -TESTCASES +=3D addqh_w.tst
-> > -TESTCASES +=3D adduh_qb.tst
-> > -TESTCASES +=3D adduh_r_qb.tst
-> > -TESTCASES +=3D addu_ph.tst
-> > -TESTCASES +=3D addu_s_ph.tst
-> > -TESTCASES +=3D append.tst
-> > -TESTCASES +=3D balign.tst
-> > -TESTCASES +=3D cmpgdu_eq_qb.tst
-> > -TESTCASES +=3D cmpgdu_le_qb.tst
-> > -TESTCASES +=3D cmpgdu_lt_qb.tst
-> > -TESTCASES +=3D dpaqx_sa_w_ph.tst
-> > -TESTCASES +=3D dpa_w_ph.tst
-> > -TESTCASES +=3D dpax_w_ph.tst
-> > -TESTCASES +=3D dpaqx_s_w_ph.tst
-> > -TESTCASES +=3D dpsqx_sa_w_ph.tst
-> > -TESTCASES +=3D dpsqx_s_w_ph.tst
-> > -TESTCASES +=3D dps_w_ph.tst
-> > -TESTCASES +=3D dpsx_w_ph.tst
-> > -TESTCASES +=3D mul_ph.tst
-> > -TESTCASES +=3D mulq_rs_w.tst
-> > -TESTCASES +=3D mulq_s_ph.tst
-> > -TESTCASES +=3D mulq_s_w.tst
-> > -TESTCASES +=3D mulsaq_s_w_ph.tst
-> > -TESTCASES +=3D mulsa_w_ph.tst
-> > -TESTCASES +=3D mul_s_ph.tst
-> > -TESTCASES +=3D precr_qb_ph.tst
-> > -TESTCASES +=3D precr_sra_ph_w.tst
-> > -TESTCASES +=3D precr_sra_r_ph_w.tst
-> > -TESTCASES +=3D prepend.tst
-> > -TESTCASES +=3D shra_qb.tst
-> > -TESTCASES +=3D shra_r_qb.tst
-> > -TESTCASES +=3D shrav_qb.tst
-> > -TESTCASES +=3D shrav_r_qb.tst
-> > -TESTCASES +=3D shrl_ph.tst
-> > -TESTCASES +=3D shrlv_ph.tst
-> > -TESTCASES +=3D subqh_ph.tst
-> > -TESTCASES +=3D subqh_r_ph.tst
-> > -TESTCASES +=3D subqh_r_w.tst
-> > -TESTCASES +=3D subqh_w.tst
-> > -TESTCASES +=3D subuh_qb.tst
-> > -TESTCASES +=3D subuh_r_qb.tst
-> > -TESTCASES +=3D subu_ph.tst
-> > -TESTCASES +=3D subu_s_ph.tst
-> > +$(MIPS32_DSPR2_TESTS): | mips32-dspr2.build
-> > +$(MIPS32_DSPR2_TESTS): CFLAGS+=3D-mabi=3D32 -march=3Dmips32r2 -mgp32 -=
-mdspr2
-> >
-> > -all: $(TESTCASES)
-> > +$(MIPS32_DSPR2_RUNS): QEMU_OPTS=3D-cpu 74Kf
-> >
-> > -%.tst: %.c
-> > -       $(CC) $(CFLAGS) $< -o $@
-> > -
-> > -check: $(TESTCASES)
-> > -       @for case in $(TESTCASES); do \
-> > -        echo $(SIM) $(SIM_FLAGS) ./$$case;\
-> > -               $(SIM) $(SIM_FLAGS) ./$$case; \
-> > -       done
-> > -
-> > -clean:
-> > -       $(RM) -rf $(TESTCASES)
-> > +# FIXME: I don't know why the general rule in tests/tcg/Makefile isn't
-enough
-> > +run-mips32-dspr2/%: mips32-dspr2/%
-> > +       $(call run-test, $<, $(QEMU) $(QEMU_OPTS) $<, "$< on
-$(TARGET_NAME) $(QEMU_OPTS)")
-> > diff --git a/tests/tcg/mips/mipsr5900/Makefile
-b/tests/tcg/mips/mipsr5900/Makefile
-> > index a1c388bc3c..7880e76986 100644
-> > --- a/tests/tcg/mips/mipsr5900/Makefile
-> > +++ b/tests/tcg/mips/mipsr5900/Makefile
-> > @@ -1,30 +1,20 @@
-> > --include ../../config-host.mak
-> > +#
-> > +# MIPSR5900 linux-user tests
-> > +#
-> >
-> > -CROSS=3Dmipsr5900el-unknown-linux-gnu-
-> > +MIPSR5900_SRC =3D $(SRC_PATH)/tests/tcg/mips/mipsr5900
-> > +MIPSR5900_ALL =3D $(wildcard $(MIPSR5900_SRC)/*.c)
-> > +MIPSR5900_TESTS =3D $(patsubst $(MIPSR5900_SRC)/%.c, %, $(MIPSR5900_AL=
-L))
-> > +MIPSR5900_RUNS =3D $(patsubst %, run-%, $(MIPSR5900_TESTS))
-> >
-> > -SIM=3Dqemu-mipsel
-> > -SIM_FLAGS=3D-cpu R5900
-> > +# add to the list of tests
-> > +TESTS +=3D $(MIPSR5900_TESTS)
-> >
-> > -CC      =3D $(CROSS)gcc
-> > -CFLAGS  =3D -Wall -mabi=3D32 -march=3Dr5900 -static
-> > +.PHONY: mipsr5900.build
-> > +mipsr5900.build:
-> > +       mkdir -p mipsr5900
-> >
-> > -TESTCASES =3D div1.tst
-> > -TESTCASES +=3D divu1.tst
-> > -TESTCASES +=3D mflohi1.tst
-> > -TESTCASES +=3D mtlohi1.tst
-> > -TESTCASES +=3D mult.tst
-> > -TESTCASES +=3D multu.tst
-> > +$(MIPS32DSP_TESTS): | mipsr5900.build
-> > +$(MIPSR5900_TESTS): CFLAGS+=3D-mabi=3D32 -march=3Dr5900 -msingle-float
-> >
-> > -all: $(TESTCASES)
-> > -
-> > -%.tst: %.c
-> > -       $(CC) $(CFLAGS) $< -o $@
-> > -
-> > -check: $(TESTCASES)
-> > -       @for case in $(TESTCASES); do \
-> > -        echo $(SIM) $(SIM_FLAGS) ./$$case;\
-> > -        $(SIM) $(SIM_FLAGS) ./$$case; \
-> > -       done
-> > -
-> > -clean:
-> > -       $(RM) -rf $(TESTCASES)
-> > +$(MIPSR5900_RUNS): QEMU_OPTS=3D-cpu R5900
-> > --
-> > 2.17.1
-> >
-> >
+This is the problem since the very beginning. For reset and migration
+to work, we need to keep in sync the IRQ number space of the machine=20
+and the different interrupt controllers.=20
+
+C.=20
+
+
+> I think instead we need a common set of qirqs, whose set_irq routine
+> looks at whether to signal XICS or XIVE.  FOr now I think the easiest
+> approach is to layer those on top of the existing XICS or XIVE
+> specific qirqs.  Later we might want to remove the (input) qirqs
+> entirely from the XICS and XIVE subsystems, instead having just
+> explicit trigger functions.  Then spapr will always supply the qirqs
+> which call into one or the other.
+>=20
+>> +}
+>> +
+>> +static void spapr_irq_print_info_dual(sPAPRMachineState *spapr, Monit=
+or *mon)
+>> +{
+>> +    spapr_irq_current(spapr)->print_info(spapr, mon);
+>> +}
+>> +
+>> +static void spapr_irq_dt_populate_dual(sPAPRMachineState *spapr,
+>> +                                       uint32_t nr_servers, void *fdt=
+,
+>> +                                       uint32_t phandle)
+>> +{
+>> +    spapr_irq_current(spapr)->dt_populate(spapr, nr_servers, fdt, pha=
+ndle);
+>> +}
+>> +
+>> +static Object *spapr_irq_cpu_intc_create_dual(sPAPRMachineState *spap=
+r,
+>> +                                              Object *cpu, Error **er=
+rp)
+>> +{
+>> +    Error *local_err =3D NULL;
+>> +
+>> +    spapr_irq_xive.cpu_intc_create(spapr, cpu, &local_err);
+>> +    if (local_err) {
+>> +        error_propagate(errp, local_err);
+>> +        return NULL;
+>> +    }
+>> +
+>> +    /* Default to XICS interrupt mode */
+>> +    return spapr_irq_xics.cpu_intc_create(spapr, cpu, errp);
+>> +}
+>> +
+>> +static int spapr_irq_post_load_dual(sPAPRMachineState *spapr, int ver=
+sion_id)
+>> +{
+>> +    /*
+>> +     * Force a reset of the XIVE backend after migration. The machine
+>> +     * defaults to XICS at startup.
+>> +     */
+>> +    if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
+>> +        spapr_irq_xive.reset(spapr, &error_fatal);
+>> +    }
+>> +
+>> +    return spapr_irq_current(spapr)->post_load(spapr, version_id);
+>> +}
+>> +
+>> +static void spapr_irq_reset_dual(sPAPRMachineState *spapr, Error **er=
+rp)
+>> +{
+>> +    /*
+>> +     * Reset the interrupt mode selected by CAS.
+>> +     */
+>> +    spapr_irq_current(spapr)->reset(spapr, errp);
+>> +}
+>> +
+>> +/*
+>> + * Define values in sync with the XIVE and XICS backend
+>> + */
+>> +#define SPAPR_IRQ_DUAL_NR_IRQS     0x2000
+>> +#define SPAPR_IRQ_DUAL_NR_MSIS     (SPAPR_IRQ_DUAL_NR_IRQS - SPAPR_IR=
+Q_MSI)
+>> +
+>> +sPAPRIrq spapr_irq_dual =3D {
+>> +    .nr_irqs     =3D SPAPR_IRQ_DUAL_NR_IRQS,
+>> +    .nr_msis     =3D SPAPR_IRQ_DUAL_NR_MSIS,
+>> +    .ov5         =3D SPAPR_OV5_XIVE_BOTH,
+>> +
+>> +    .init        =3D spapr_irq_init_dual,
+>> +    .claim       =3D spapr_irq_claim_dual,
+>> +    .free        =3D spapr_irq_free_dual,
+>> +    .qirq        =3D spapr_qirq_dual,
+>> +    .print_info  =3D spapr_irq_print_info_dual,
+>> +    .dt_populate =3D spapr_irq_dt_populate_dual,
+>> +    .cpu_intc_create =3D spapr_irq_cpu_intc_create_dual,
+>> +    .post_load   =3D spapr_irq_post_load_dual,
+>> +    .reset       =3D spapr_irq_reset_dual,
+>> +};
+>> +
+>>  /*
+>>   * sPAPR IRQ frontend routines for devices
+>>   */
+>=20
