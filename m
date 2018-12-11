@@ -1,39 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1gWp5X-0006Fh-Tn
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 15:57:10 -0500
+	(envelope-from <walling@linux.ibm.com>) id 1gWpKT-0004PN-6P
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 16:12:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1gWp5U-0003jR-Ei
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 15:57:07 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34124
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <walling@linux.ibm.com>) id 1gWpKP-00068N-9V
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 16:12:33 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54182)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1gWp5U-0003io-6J
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 15:57:04 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wBBKsEOP013722
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 15:57:03 -0500
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2pakv3agw5-1
+	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+	id 1gWpKO-00062F-33
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 16:12:29 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wBBL8m4h054913
+	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 16:12:22 -0500
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2pajuydvhy-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 15:57:03 -0500
+	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 16:12:22 -0500
 Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Tue, 11 Dec 2018 20:57:02 -0000
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Tue, 11 Dec 2018 15:56:53 -0500
-In-Reply-To: <20181211205654.3550341-1-stefanb@linux.vnet.ibm.com>
-References: <20181211205654.3550341-1-stefanb@linux.vnet.ibm.com>
+	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
+	Tue, 11 Dec 2018 21:12:21 -0000
+From: Collin Walling <walling@linux.ibm.com>
+References: <1544135058-21380-1-git-send-email-walling@linux.ibm.com>
+	<1544135058-21380-3-git-send-email-walling@linux.ibm.com>
+	<20181207130853.20506345.cohuck@redhat.com>
+	<dbabb43d-01e7-d221-a761-ad5a53fd8f94@linux.ibm.com>
+Date: Tue, 11 Dec 2018 16:12:16 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20181211205654.3550341-3-stefanb@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 2/3] tpm: Make sure new locality passed to
- tpm_tis_prep_abort() is valid
+In-Reply-To: <dbabb43d-01e7-d221-a761-ad5a53fd8f94@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <aff40d67-9fcb-43fb-beeb-1dbe7a1e22f3@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 2/3] s390: cpu feature for
+ diagnose 318 andlimit max VCPUs to 247
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,36 +45,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Stefan Berger <stefanb@linux.vnet.ibm.com>, Stefan Berger <stefanb@linux.ibm.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: thuth@redhat.com, david@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
 
-Make sure that the new locality passed to tpm_tis_prep_abort()
-is valid.
+On 12/11/18 11:47 AM, Collin Walling wrote:
+> On 12/7/18 7:08 AM, Cornelia Huck wrote:
+>> On Thu,  6 Dec 2018 17:24:17 -0500
+>> Collin Walling <walling@linux.ibm.com> wrote:
+>>
+>>> Diagnose 318 is a new z14.2 CPU feature. Since we are able to emulate
+>>> it entirely via KVM, we can add guest support for earlier models. A
+>>> new CPU feature for diagnose 318 (shortened to diag318) will be made
+>>> available to guests starting with the zEC12-full CPU model.
+>>>
+>>> The z14.2 adds a new read SCP info byte (let's call it byte 134) to
+>>> detect the availability of diag318. Because of this, we have room for
+>>> one less VCPU and thus limit the max VPUs supported in a configuration
+>>> to 247 (down from 248).
+>>>
+>>> Signed-off-by: Collin Walling <walling@linux.ibm.com>.
+>>> ---
+>>>  hw/s390x/sclp.c                 | 2 ++
+>>>  include/hw/s390x/sclp.h         | 2 ++
+>>>  target/s390x/cpu.h              | 2 +-
+>>>  target/s390x/cpu_features.c     | 3 +++
+>>>  target/s390x/cpu_features.h     | 1 +
+>>>  target/s390x/cpu_features_def.h | 3 +++
+>>>  target/s390x/gen-features.c     | 1 +
+>>>  target/s390x/kvm.c              | 1 +
+>>>  8 files changed, 14 insertions(+), 1 deletion(-)
+>>>
+>>
+>>> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+>>> index 8c2320e..594b4a4 100644
+>>> --- a/target/s390x/cpu.h
+>>> +++ b/target/s390x/cpu.h
+>>> @@ -52,7 +52,7 @@
+>>>  
+>>>  #define MMU_USER_IDX 0
+>>>  
+>>> -#define S390_MAX_CPUS 248
+>>> +#define S390_MAX_CPUS 247
+>>
+>> Isn't that already problematic if you try to migrate from an older QEMU
+>> with all possible vcpus defined? IOW, don't you really need a way that
+>> older machines can still run with one more vcpu?
+>>
+> 
+> Good call. I'll run some tests on this and see what happens. I'll report
+> here on those results.
+> 
 
-Add a comment to aborting_locty that it may be any locality, including
-TPM_TIS_NO_LOCALITY.
+Migrating to a machine that supports less vCPUs will report
 
-Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- hw/tpm/tpm_tis.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+error: unsupported configuration: Maximum CPUs greater than specified machine type limit
 
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index 176d424ed9..04e4ad9212 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -263,7 +263,9 @@ static void tpm_tis_prep_abort(TPMState *s, uint8_t l=
-octy, uint8_t newlocty)
- {
-     uint8_t busy_locty;
-=20
--    s->aborting_locty =3D locty;
-+    assert(TPM_TIS_IS_VALID_LOCTY(newlocty));
-+
-+    s->aborting_locty =3D locty; /* may also be TPM_TIS_NO_LOCALITY */
-     s->next_locty =3D newlocty;  /* locality after successful abort */
-=20
-     /*
---=20
-2.17.1
+I revisited the code to see if there's a way to dynamically set the max vcpu count based 
+on the read scp info size, but it gets really tricky and code looks very complicated.
+(Having a packed struct contain the CPU entries whose maximum is determined by hardware
+limitations makes things difficult -- but who said s390 is easy? :) )
+
+In reality, do we often have guests running with 248 or even 247 vcpus? If so, I imagine
+the performance isn't too significant?
+
+>>>  
+>>>  typedef struct PSW {
+>>>      uint64_t mask;
+>>
+> 
+> 
+
+
+-- 
+Respectfully,
+- Collin Walling
