@@ -1,25 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gWnp4-0001LT-Mf
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 14:36:04 -0500
+	(envelope-from <akrowiak@linux.ibm.com>) id 1gWnu7-00036P-JB
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 14:41:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gWnoz-0002z4-NJ
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 14:36:02 -0500
-References: <20181207085635.4291-1-mark.cave-ayland@ilande.co.uk>
-	<alpine.BSF.2.21.9999.1812100112050.45639@zero.eik.bme.hu>
-	<20181210025943.GE4261@umbus.fritz.box>
-	<alpine.BSF.2.21.9999.1812102035360.24343@zero.eik.bme.hu>
-	<20181211012027.GA4261@umbus.fritz.box>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <7bcfc7ae-7777-e1e5-d1a4-36c2d958b845@ilande.co.uk>
-Date: Tue, 11 Dec 2018 19:35:42 +0000
+	(envelope-from <akrowiak@linux.ibm.com>) id 1gWnu2-0006Xd-KC
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 14:41:15 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35416)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
+	id 1gWnu2-0006Ve-8O
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 14:41:10 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wBBJYTPc008935
+	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 14:41:08 -0500
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2pagmp06ma-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 14:41:07 -0500
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
+	Tue, 11 Dec 2018 19:41:06 -0000
+References: <1544469254-11629-1-git-send-email-akrowiak@linux.ibm.com>
+	<20181211162303.2e581899@redhat.com>
+From: Tony Krowiak <akrowiak@linux.ibm.com>
+Date: Tue, 11 Dec 2018 14:41:00 -0500
 MIME-Version: 1.0
-In-Reply-To: <20181211012027.GA4261@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH 0/6] target/ppc: convert VMX
- instructions to use TCG vector operations
+In-Reply-To: <20181211162303.2e581899@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <ee5f36b2-e0a0-cdee-ad9a-dbeb36f1583c@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] qdev/core: Can not replug device on bus
+ that allows one device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,141 +43,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-ppc@nongnu.org, richard.henderson@linaro.org, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, thuth@redhat.com, armbru@redhat.com, f4bug@amsat.org, pasic@linux.ibm.com, borntraeger@de.ibm.com, pbonzini@redhat.com
 
-On 11/12/2018 01:20, David Gibson wrote:
-
-> On Mon, Dec 10, 2018 at 09:54:51PM +0100, BALATON Zoltan wrote:
->> On Mon, 10 Dec 2018, David Gibson wrote:
->>> On Mon, Dec 10, 2018 at 01:33:53AM +0100, BALATON Zoltan wrote:
->>>> On Fri, 7 Dec 2018, Mark Cave-Ayland wrote:
->>>>> This patchset is an attempt at trying to improve the VMX (Altivec) instruction
->>>>> performance by making use of the new TCG vector operations where possible.
->>>>
->>>> This is very welcome, thanks for doing this.
->>>>
->>>>> In order to use TCG vector operations, the registers must be accessible from cpu_env
->>>>> whilst currently they are accessed via arrays of static TCG globals. Patches 1-3
->>>>> are therefore mechanical patches which introduce access helpers for FPR, AVR and VSR
->>>>> registers using the supplied TCGv_i64 parameter.
->>>>
->>>> Have you tried some benchmarks or tests to measure the impact of these
->>>> changes? I've tried the (very unscientific) benchmarks I've written about
->>>> before here:
->>>>
->>>> http://lists.nongnu.org/archive/html/qemu-ppc/2018-07/msg00261.html
->>>>
->>>> (which seem to use AltiVec/VMX instructions but not sure which) on mac99
->>>> with MorphOS and I could not see any performance increase. I haven't run
->>>> enough tests but results with or without this series on master were mostly
->>>> the same within a few percents, and sometimes even seen lower performance
->>>> with these patches than without. I haven't tried to find out why (no time
->>>> for that now) so can't really draw any conclusions from this. I'm also not
->>>> sure if I've actually tested what you've changed or these use instructions
->>>> that your patches don't optimise yet, or the changes I've seen were just
->>>> normal changes between runs; but I wonder if the increased number of
->>>> temporaries could result in lower performance in some cases?
->>>
->>> What was your host machine.  IIUC this change will only improve
->>> performance if the host tcg backend is able to implement TCG vector
->>> ops in terms of vector ops on the host.
->>
->> Tried it on i5 650 which has: sse sse2 ssse3 sse4_1 sse4_2. I assume x86_64
->> should be supported but not sure what are the CPU requirements.
->>
->>> In addition, this series only converts a subset of the integer and
->>> logical vector instructions.  If your testcase is mostly floating
->>> point (vectored or otherwise), it will still be softfloat and so not
->>> see any speedup.
->>
->> Yes, I don't really know what these tests use but I think "lame" test is
->> mostly floating point but tried with "lame_vmx" which should at least use
->> some vector ops and "mplayer -benchmark" test is more vmx dependent based on
->> my previous profiling and testing with hardfloat but I'm not sure. (When
->> testing these with hardfloat I've found that lame was benefiting from
->> hardfloat but mplayer wasn't and more VMX related functions showed up with
->> mplayer so I assumed it's more VMX bound.)
+On 12/11/18 10:23 AM, Igor Mammedov wrote:
+> On Mon, 10 Dec 2018 14:14:14 -0500
+> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 > 
-> I should clarify here.  When I say "floating point" above, I'm not
-> meaning things using the regular FPU instead of the vector unit.  I'm
-> saying *anything* involving floating point calculations whether
-> they're done in the FPU or the vector unit.
+>> If the maximum number of devices allowed on a bus is 1 and a device
+>> which is plugged into the bus is subsequently unplugged, attempting to replug
+>> the device fails with error "Bus 'xxx' does not support hotplugging".
+>> The "error" is detected in the qbus_is_full(BusState *bus) function
+>> (qdev_monitor.c) because bus->max_index >= bus_class->max_dev. The
+>> root of the problem is that the bus->max_index is not decremented when a device
+>> is unplugged from the bus. This patch fixes that problem.
+>>
+>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>> ---
+>>   hw/core/qdev.c | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+>> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+>> index 6b3cc55b27c2..b35b0bf27925 100644
+>> --- a/hw/core/qdev.c
+>> +++ b/hw/core/qdev.c
+>> @@ -59,6 +59,8 @@ static void bus_remove_child(BusState *bus, DeviceState *child)
+>>               snprintf(name, sizeof(name), "child[%d]", kid->index);
+>>               QTAILQ_REMOVE(&bus->children, kid, sibling);
+>>   
+>> +            bus->max_index--;
+> that might cause problem when bus is allowed to has more than 1 device
+> and unplugged device is not the last one.
+> In that case bus_add_child() might create a child with duplicate name.
+
+I see what you are saying. The max_index is assigned to the child device
+index in the bus_add_child() function. The child device index is used to
+generate a unique name for the child device. The generated name is then
+used to link the child as a property to the bus. When the child is
+removed from the bus, the name is regenerated from the child device
+index and the named property is . It would therefore appear that the
+real purpose of the max_index is to generate indexes for children of
+the bus thus ensuring each child has a unique index. In other words,
+the max_index value is only tangentially connected to indexing the list
+of children.
+
+This results in a disconnect between the usage of the max_index value
+when adding and removing a child from the bus, and the check in the
+qbus_is_full() function which compares the max_index to the maximum
+number of devices allowed on the bus. If a child has been removed from
+the bus, the max_index value does not indicate whether the bus is
+full, it only specifies the index to be assigned to the next child to be
+added to the bus.
+
+To resolve this problem, I propose the following:
+
+Add the following field to struct BusState (include/hw/qdev_core.h):
+
+struct BusState {
+     Object obj;
+     DeviceState *parent;
+     char *name;
+     HotplugHandler *hotplug_handler;
+     int max_index;
+     bool realized;
++    int num_children;
+     QTAILQ_HEAD(ChildrenHead, BusChild) children;
+     QLIST_ENTRY(BusState) sibling;
+};
+
+Add the following lines of code to the add/remove child functions in
+hw/core/qdev.c:
+
+static void bus_add_child(BusState *bus, DeviceState *child)
+{
+     char name[32];
+     BusChild *kid = g_malloc0(sizeof(*kid));
+
+     kid->index = bus->max_index++;
+     kid->child = child;
+     object_ref(OBJECT(kid->child));
+
+     QTAILQ_INSERT_HEAD(&bus->children, kid, sibling);
+
+     /* This transfers ownership of kid->child to the property.  */
+     snprintf(name, sizeof(name), "child[%d]", kid->index);
+     object_property_add_link(OBJECT(bus), name,
+                              object_get_typename(OBJECT(child)),
+                              (Object **)&kid->child,
+                              NULL, /* read-only property */
+                              0, /* return ownership on prop deletion */
+                              NULL);
+
++    bus->num_children++;
+}
+
+static void bus_remove_child(BusState *bus, DeviceState *child)
+{
+     BusChild *kid;
+
+     QTAILQ_FOREACH(kid, &bus->children, sibling) {
+         if (kid->child == child) {
+             char name[32];
+
+             snprintf(name, sizeof(name), "child[%d]", kid->index);
+             QTAILQ_REMOVE(&bus->children, kid, sibling);
+
+             /* This gives back ownership of kid->child back to us.  */
+             object_property_del(OBJECT(bus), name, NULL);
+             object_unref(OBJECT(kid->child));
+             g_free(kid);
+
++           bus->num_children--;
+
+             return;
+         }
+     }
+}
+
+Change the line of code in the qbus_is_full() function in
+qdev_monitor.c:
+
+
+static inline bool qbus_is_full(BusState *bus)
+{
+     BusClass *bus_class = BUS_GET_CLASS(bus);
+-    return bus_class->max_dev &&
+-           bus->max_index >= bus_class->max_dev;
++    return bus_class->max_dev &&
++           bus->num_children >= bus_class->max_dev;
+}
+
+
+
 > 
-> The patches here don't convert all VMX instructions to use vector TCG
-> ops - they only convert a few, and those few are about using the
-> vector unit for integer (and logical) operations.  VMX instructions
-> involving floating point calculations are unaffected and will still
-> use soft-float.
-
-Right. As I mentioned in an earlier email, this is hopefully laying the groundwork
-for future evolution of the TCG vector operations and making use of the existing
-functions first.
-
-Certainly I'd be interested at looking at the hardfloat patches after this, since FP
-performance is something that can offer enormous benefit to MacOS emulation.
-
->> I've tried to do some profiling again to find out what's used but I can't
->> get good results with the tools I have (oprofile stopped working since I've
->> updated my machine and Linux perf provides results that are hard to
->> interpret for me, haven't tried if gprof would work now it didn't before)
->> but I've seen some vector related helpers in the profile so at least some
->> vector ops are used. The "helper_vperm" came up top at about 11th (not sure
->> where is it called from), other vector helpers were lower.
->>
->> I don't remember details now but previously when testing hardfloat I've
->> written this: "I've looked at vperm which came out top in one of the
->> profiles I've taken and on little endian hosts it has the loop backwards and
->> also accesses vector elements from end to front which I wonder may be enough
->> for the compiler to not be able to optimise it? But I haven't checked
->> assembly. The altivec dependent mplayer video decoding test did not change
->> much with hardfloat, it took 98% compared to master so likely altivec is
->> dominating here." (Although this was with the PPC specific vector helpers
->> before VMX patch so not sure if this is still relevant.)
->>
->> The top 10 in profile were still related to low level memory access and MMU
->> management stuff as I've found before:
->>
->> http://lists.nongnu.org/archive/html/qemu-devel/2018-07/msg03609.html
->> http://lists.nongnu.org/archive/html/qemu-devel/2018-07/msg03704.html
->>
->> I think implementing i2c for mac99 may help this and some other
->> optimisations may also be possible but I don't know enough about these to
->> try that.
->>
->> It also looks like with --enable-debug something is always flusing tlb and
->> blowing away tb caches so these will be top in profile and likely dominate
->> runtime so can't really use profile to measure impact of VMX patch. Without
->> --enable-debug I can't get call graphs so can't get useful profile. I think
->> I've looked at this before as well but can't remember now which check
->> enabled by --enable-debug is responsible for constant tb cache flush and if
->> that could be avoided. I just don't use --enable-debug since unless need to
->> debug somthing.
->>
->> Maybe the PPC softmmu should be reviewed and optimised by someone who knows
->> it...
+>> +
+>>               /* This gives back ownership of kid->child back to us.  */
+>>               object_property_del(OBJECT(bus), name, NULL);
+>>               object_unref(OBJECT(kid->child));
 > 
-> I'm not sure there is anyone who knows it at this point.  I probably
-> know it as well as anybody, and the ppc32 code scares me.  It's a
-> crufty mess and it would be nice to clean up, but that requires
-> someone with enough time and interest.
-
-As a newcomer to this code, it's not particularly easy to read. It strikes me that
-one of the main improvements would be to switch over to using generated helper
-templates rather than to make use of nested macros as in use currently.
-
-Looking at your profiles above, the primary hotspot appears to be
-helper_lookup_tb_ptr(). However as someone quite new to the TCG parts of QEMU, I
-couldn't tell you whether or not this is to be expected.
-
-Perhaps a question for Richard: what could we consider to be a "normal" backend when
-looking at profiles in terms of recommended features to implement, and to get an idea
-of what a typical profile should look like?
-
-It would be interesting to compare with a similar workload profile on e.g. ARM to see
-if there is anything obvious that stands out for PPC.
-
-
-ATB,
-
-Mark.
