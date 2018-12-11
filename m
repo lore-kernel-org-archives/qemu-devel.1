@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=8761f1f8f=anthony.perard@citrix.com>)
-	id 1gWlF6-00013g-H1
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:50:45 -0500
+	(envelope-from <berrange@redhat.com>) id 1gWlF6-000147-W7
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:50:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=8761f1f8f=anthony.perard@citrix.com>)
-	id 1gWlF5-0003Wf-RK
+	(envelope-from <berrange@redhat.com>) id 1gWlF6-0003Wv-2w
 	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:50:44 -0500
-Date: Tue, 11 Dec 2018 16:50:30 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20181211165030.GW18875@perard.uk.xensource.com>
-References: <1544543862-9997-1-git-send-email-paul.durrant@citrix.com>
-	<1544543862-9997-16-git-send-email-paul.durrant@citrix.com>
+Date: Tue, 11 Dec 2018 16:50:33 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181211165033.GQ921@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181211164317.32893-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1544543862-9997-16-git-send-email-paul.durrant@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH v4 15/18] xen: add a mechanism to
- automatically create XenDevice-s...
+In-Reply-To: <20181211164317.32893-1-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/8] qcow2: encryption threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,29 +23,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, berto@igalia.com, den@openvz.org
 
-On Tue, Dec 11, 2018 at 03:57:39PM +0000, Paul Durrant wrote:
-> ...that maintains compatibility with existing Xen toolstacks.
+On Tue, Dec 11, 2018 at 07:43:09PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+> Hi all!
 > 
-> Xen toolstacks instantiate PV backends by simply writing information into
-> xenstore and expecting a backend implementation to be watching for this.
+> The series brings threads to qcow2 encryption/decryption path,
+> like it is already done for compression.
 > 
-> This patch adds a new 'xen-backend' module to allow individual XenDevice
-> implementations to register a creator function to be called when a tool-
-> stack instantiates a new backend in this way.
+> v2: - multiple cipher inside QCryptoBlock instead of multiple
+>       blocks inside qcow2, as suggested by Daniel, and it is
+>       done in separate series
+>     - use threaded encryption in do_perform_cow_encrypt() too
+>     - some renaming and refactoring and simplifications
+> (Sorry for not being very careful about change list, but v1 isn't
+>  actually reviewed, as approach with multiple blocks was early
+>  rejected by Denial)
 > 
-> To support this it is also necessary to add new watchers into the XenBus
-> implementation to handle enumeration of new backends and also destruction
-> of XenDevice-s when the toolstack sets the backend 'online' key to 0.
-> 
-> NOTE: This patch only adds the framework. A subsequent patch will add a
->       creator function for xen-block devices.
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> The series now based on two queued for 4.0 series, which, in
+> turn, may be applied in any order: "crypto threads" (Daniel's
+> tree), and  "qcow2 decompress in threads", which is now in
+> Kevin's block-next.
 
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
+FYI I've pushed my crypto queue here for benefit of anyone
+wishing to test this series
 
+  https://github.com/berrange/qemu/tree/qcrypto-next
+
+
+Regards,
+Daniel
 -- 
-Anthony PERARD
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
