@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWjyX-0003dZ-Un
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:29:34 -0500
+	(envelope-from <prvs=8761f1f8f=anthony.perard@citrix.com>)
+	id 1gWjzZ-0004Z9-3t
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:30:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWjyX-0002Uj-3s
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:29:33 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:40144)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gWjyV-0002S1-AH
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:29:31 -0500
-Received: by mail-ot1-x342.google.com with SMTP id s5so14361976oth.7
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 07:29:29 -0800 (PST)
+	(envelope-from <prvs=8761f1f8f=anthony.perard@citrix.com>)
+	id 1gWjzT-00038O-Ix
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:30:37 -0500
+Date: Tue, 11 Dec 2018 15:30:21 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20181211153021.GA16149@perard.uk.xensource.com>
+References: <1544525238-3527-1-git-send-email-paul.durrant@citrix.com>
+	<1544525238-3527-10-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
-References: <20181207103631.28193-1-richard.henderson@linaro.org>
-	<20181207103631.28193-7-richard.henderson@linaro.org>
-In-Reply-To: <20181207103631.28193-7-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 11 Dec 2018 15:29:18 +0000
-Message-ID: <CAFEAcA_owe2OumDoTq-xCW+2_SUV0OEOuVWGGo1UZ-SzHS1d=A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 06/26] target/arm: Rearrange decode in
- disas_data_proc_1src
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1544525238-3527-10-git-send-email-paul.durrant@citrix.com>
+Subject: Re: [Qemu-devel] [Xen-devel] [PATCH v3 09/18] xen: remove
+ unnecessary code from dataplane/xen-block.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,22 +26,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
+To: Paul Durrant <paul.durrant@citrix.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org, Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Fri, 7 Dec 2018 at 10:36, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Now properly signals unallocated for REV64 with SF=0.
-> Allows for the opcode2 field to be decoded shortly.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On Tue, Dec 11, 2018 at 10:47:09AM +0000, Paul Durrant wrote:
+> v2:
+>  - Leave existing boilerplate alone, other than removing the now-incorrect
+>    description
 > ---
->  target/arm/translate-a64.c | 31 ++++++++++++++++++++++---------
->  1 file changed, 22 insertions(+), 9 deletions(-)
+>  hw/block/dataplane/xen-block.c | 409 ++---------------------------------------
+>  1 file changed, 16 insertions(+), 393 deletions(-)
+> 
+> diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-block.c
+> index 9fae505..98f987d 100644
+> --- a/hw/block/dataplane/xen-block.c
+> +++ b/hw/block/dataplane/xen-block.c
+> @@ -1,6 +1,4 @@
+>  /*
+> - *  xen paravirt block device backend
+> - *
+>   *  (c) Gerd Hoffmann <kraxel@redhat.com>
+>   *
+>   *  This program is free software; you can redistribute it and/or modify
+> @@ -19,26 +17,12 @@
+>   *  GNU GPL, version 2 or (at your option) any later version.
+>   */
+>  
+> +/*
+> + * Copyright (c) 2018  Citrix Systems Inc.
 
+Can you move this copyright line to the existing license boilerplate as
+I've asked on v2?
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
 
-thanks
--- PMM
+And this isn't needed as it just duplicate the already existing one.
+
+> + */
+>  
+
+Thanks,
+
+-- 
+Anthony PERARD
