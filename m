@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1gWdre-0002TP-Hc
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 03:58:04 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1gWdrh-0002W5-6h
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 03:58:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1gWdrd-0006Ir-1Y
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 03:58:02 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1gWdrf-0006Jq-AZ
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 03:58:05 -0500
 Received: from mga07.intel.com ([134.134.136.100]:27021)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1gWdrc-0006FH-M8
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 03:58:00 -0500
+	id 1gWdre-0006FH-UQ
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 03:58:03 -0500
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Tue, 11 Dec 2018 16:24:50 +0800
-Message-Id: <1544516693-5395-5-git-send-email-wei.w.wang@intel.com>
+Date: Tue, 11 Dec 2018 16:24:51 +0800
+Message-Id: <1544516693-5395-6-git-send-email-wei.w.wang@intel.com>
 In-Reply-To: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
 References: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v11 4/7] migration: API to clear bits of guest
- free pages from the dirty bitmap
+Subject: [Qemu-devel] [PATCH v11 5/7] migration/ram.c: add a notifier chain
+ for precopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,9 +28,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 Cc: pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com, wei.w.wang@intel.com
 
-This patch adds an API to clear bits corresponding to guest free pages
-from the dirty bitmap. Spilt the free page block if it crosses the QEMU
-RAMBlock boundary.
+This patch adds a notifier chain for the memory precopy. This enables various
+precopy optimizations to be invoked at specific places.
 
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
@@ -39,85 +38,190 @@ CC: Michael S. Tsirkin <mst@redhat.com>
 CC: Peter Xu <peterx@redhat.com>
 Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- include/migration/misc.h |  2 ++
- migration/ram.c          | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 49 insertions(+)
+ include/migration/misc.h | 19 ++++++++++++++++++
+ migration/ram.c          | 51 +++++++++++++++++++++++++++++++++++++++++++++---
+ migration/savevm.c       | 15 ++++++++++++++
+ vl.c                     |  1 +
+ 4 files changed, 83 insertions(+), 3 deletions(-)
 
 diff --git a/include/migration/misc.h b/include/migration/misc.h
-index 4ebf24c..113320e 100644
+index 113320e..15f8d00 100644
 --- a/include/migration/misc.h
 +++ b/include/migration/misc.h
-@@ -14,11 +14,13 @@
- #ifndef MIGRATION_MISC_H
- #define MIGRATION_MISC_H
- 
-+#include "exec/cpu-common.h"
- #include "qemu/notify.h"
+@@ -19,6 +19,25 @@
  
  /* migration/ram.c */
  
++typedef enum PrecopyNotifyReason {
++    PRECOPY_NOTIFY_SETUP = 0,
++    PRECOPY_NOTIFY_BEFORE_BITMAP_SYNC = 1,
++    PRECOPY_NOTIFY_AFTER_BITMAP_SYNC = 2,
++    PRECOPY_NOTIFY_COMPLETE = 3,
++    PRECOPY_NOTIFY_CLEANUP = 4,
++    PRECOPY_NOTIFY_MAX = 5,
++} PrecopyNotifyReason;
++
++typedef struct PrecopyNotifyData {
++    enum PrecopyNotifyReason reason;
++    Error **errp;
++} PrecopyNotifyData;
++
++void precopy_infrastructure_init(void);
++void precopy_add_notifier(NotifierWithReturn *n);
++void precopy_remove_notifier(NotifierWithReturn *n);
++int precopy_notify(PrecopyNotifyReason reason, Error **errp);
++
  void ram_mig_init(void);
-+void qemu_guest_free_page_hint(void *addr, size_t len);
- 
- /* migration/block.c */
+ void qemu_guest_free_page_hint(void *addr, size_t len);
  
 diff --git a/migration/ram.c b/migration/ram.c
-index 01d267f..c13b44f 100644
+index c13b44f..1e00d92 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -3131,6 +3131,53 @@ static void ram_state_resume_prepare(RAMState *rs, QEMUFile *out)
+@@ -328,6 +328,32 @@ typedef struct RAMState RAMState;
+ 
+ static RAMState *ram_state;
+ 
++static NotifierWithReturnList precopy_notifier_list;
++
++void precopy_infrastructure_init(void)
++{
++    notifier_with_return_list_init(&precopy_notifier_list);
++}
++
++void precopy_add_notifier(NotifierWithReturn *n)
++{
++    notifier_with_return_list_add(&precopy_notifier_list, n);
++}
++
++void precopy_remove_notifier(NotifierWithReturn *n)
++{
++    notifier_with_return_remove(n);
++}
++
++int precopy_notify(PrecopyNotifyReason reason, Error **errp)
++{
++    PrecopyNotifyData pnd;
++    pnd.reason = reason;
++    pnd.errp = errp;
++
++    return notifier_with_return_list_notify(&precopy_notifier_list, &pnd);
++}
++
+ uint64_t ram_bytes_remaining(void)
+ {
+     return ram_state ? (ram_state->migration_dirty_pages * TARGET_PAGE_SIZE) :
+@@ -1701,6 +1727,25 @@ static void migration_bitmap_sync(RAMState *rs)
+     }
  }
  
- /*
-+ * This function clears bits of the free pages reported by the caller from the
-+ * migration dirty bitmap. @addr is the host address corresponding to the
-+ * start of the continuous guest free pages, and @len is the total bytes of
-+ * those pages.
-+ */
-+void qemu_guest_free_page_hint(void *addr, size_t len)
++static void migration_bitmap_sync_precopy(RAMState *rs)
 +{
-+    RAMBlock *block;
-+    ram_addr_t offset;
-+    size_t used_len, start, npages;
-+    MigrationState *s = migrate_get_current();
++    Error *local_err = NULL;
 +
-+    /* This function is currently expected to be used during live migration */
-+    if (!migration_is_setup_or_active(s->state)) {
-+        return;
++    /*
++     * The current notifier usage is just an optimization to migration, so we
++     * don't stop the normal migration process in the error case.
++     */
++    if (precopy_notify(PRECOPY_NOTIFY_BEFORE_BITMAP_SYNC, &local_err)) {
++        error_report_err(local_err);
 +    }
 +
-+    for (; len > 0; len -= used_len, addr += used_len) {
-+        block = qemu_ram_block_from_host(addr, false, &offset);
-+        if (unlikely(!block || offset >= block->used_length)) {
-+            /*
-+             * The implementation might not support RAMBlock resize during
-+             * live migration, but it could happen in theory with future
-+             * updates. So we add a check here to capture that case.
-+             */
-+            error_report_once("%s unexpected error", __func__);
-+            return;
-+        }
++    migration_bitmap_sync(rs);
 +
-+        if (len <= block->used_length - offset) {
-+            used_len = len;
-+        } else {
-+            used_len = block->used_length - offset;
-+        }
-+
-+        start = offset >> TARGET_PAGE_BITS;
-+        npages = used_len >> TARGET_PAGE_BITS;
-+
-+        qemu_mutex_lock(&ram_state->bitmap_mutex);
-+        ram_state->migration_dirty_pages -=
-+                      bitmap_count_one_with_offset(block->bmap, start, npages);
-+        bitmap_clear(block->bmap, start, npages);
-+        qemu_mutex_unlock(&ram_state->bitmap_mutex);
++    if (precopy_notify(PRECOPY_NOTIFY_AFTER_BITMAP_SYNC, &local_err)) {
++        error_report_err(local_err);
 +    }
 +}
 +
-+/*
-  * Each of ram_save_setup, ram_save_iterate and ram_save_complete has
-  * long-running RCU critical section.  When rcu-reclaims in the code
-  * start to become numerous it will be necessary to reduce the
+ /**
+  * save_zero_page_to_file: send the zero page to the file
+  *
+@@ -3072,7 +3117,7 @@ static void ram_init_bitmaps(RAMState *rs)
+ 
+     ram_list_init_bitmaps();
+     memory_global_dirty_log_start();
+-    migration_bitmap_sync(rs);
++    migration_bitmap_sync_precopy(rs);
+ 
+     rcu_read_unlock();
+     qemu_mutex_unlock_ramlist();
+@@ -3348,7 +3393,7 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
+     rcu_read_lock();
+ 
+     if (!migration_in_postcopy()) {
+-        migration_bitmap_sync(rs);
++        migration_bitmap_sync_precopy(rs);
+     }
+ 
+     ram_control_before_iterate(f, RAM_CONTROL_FINISH);
+@@ -3397,7 +3442,7 @@ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
+         remaining_size < max_size) {
+         qemu_mutex_lock_iothread();
+         rcu_read_lock();
+-        migration_bitmap_sync(rs);
++        migration_bitmap_sync_precopy(rs);
+         rcu_read_unlock();
+         qemu_mutex_unlock_iothread();
+         remaining_size = rs->migration_dirty_pages * TARGET_PAGE_SIZE;
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 9e45fb4..ec74f44 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1018,6 +1018,7 @@ void qemu_savevm_state_header(QEMUFile *f)
+ void qemu_savevm_state_setup(QEMUFile *f)
+ {
+     SaveStateEntry *se;
++    Error *local_err = NULL;
+     int ret;
+ 
+     trace_savevm_state_setup();
+@@ -1039,6 +1040,10 @@ void qemu_savevm_state_setup(QEMUFile *f)
+             break;
+         }
+     }
++
++    if (precopy_notify(PRECOPY_NOTIFY_SETUP, &local_err)) {
++        error_report_err(local_err);
++    }
+ }
+ 
+ int qemu_savevm_state_resume_prepare(MigrationState *s)
+@@ -1181,6 +1186,11 @@ int qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only,
+     SaveStateEntry *se;
+     int ret;
+     bool in_postcopy = migration_in_postcopy();
++    Error *local_err = NULL;
++
++    if (precopy_notify(PRECOPY_NOTIFY_COMPLETE, &local_err)) {
++        error_report_err(local_err);
++    }
+ 
+     trace_savevm_state_complete_precopy();
+ 
+@@ -1313,6 +1323,11 @@ void qemu_savevm_state_pending(QEMUFile *f, uint64_t threshold_size,
+ void qemu_savevm_state_cleanup(void)
+ {
+     SaveStateEntry *se;
++    Error *local_err = NULL;
++
++    if (precopy_notify(PRECOPY_NOTIFY_CLEANUP, &local_err)) {
++        error_report_err(local_err);
++    }
+ 
+     trace_savevm_state_cleanup();
+     QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+diff --git a/vl.c b/vl.c
+index a5ae5f2..1621e1c 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3062,6 +3062,7 @@ int main(int argc, char **argv, char **envp)
+     module_call_init(MODULE_INIT_OPTS);
+ 
+     runstate_init();
++    precopy_infrastructure_init();
+     postcopy_infrastructure_init();
+     monitor_init_globals();
+ 
 -- 
 1.8.3.1
