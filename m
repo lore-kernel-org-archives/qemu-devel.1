@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gWWVP-0001kc-Nr
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 20:06:36 -0500
+	(envelope-from <linzhecheng@huawei.com>) id 1gWWW8-0002Gd-Ky
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 20:07:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gWWVH-0004cu-D1
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 20:06:31 -0500
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:49685)
+	(envelope-from <linzhecheng@huawei.com>) id 1gWWW4-00050V-NP
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 20:07:20 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:59935 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gWWVG-0004cC-Qc
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 20:06:27 -0500
-Date: Mon, 10 Dec 2018 20:06:23 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181211010623.GA25029@flamenco>
-References: <20181207155911.12710-1-peter.maydell@linaro.org>
+	(Exim 4.71) (envelope-from <linzhecheng@huawei.com>)
+	id 1gWWW4-0004y9-Ae
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 20:07:16 -0500
+From: linzhecheng <linzhecheng@huawei.com>
+Date: Tue, 11 Dec 2018 09:06:56 +0800
+Message-ID: <20181211010656.704-1-linzhecheng@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181207155911.12710-1-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH] cpus.c: Fix race condition in
- cpu_stop_current()
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] usb-host: reset and close
+ libusb_device_handle before qemu exit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +25,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Jaap Crezee <jaap@jcz.nl>, patches@linaro.org
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, jianjay.zhou@huawei.com, linzhecheng <linzhecheng@huawei.com>
 
-On Fri, Dec 07, 2018 at 15:59:11 +0000, Peter Maydell wrote:
-> We use cpu_stop_current() to ensure the current CPU has stopped
-> from places like qemu_system_reset_request(). Unfortunately its
-> current implementation has a race. It calls qemu_cpu_stop(),
-> which sets cpu->stopped to true even though the CPU hasn't
-> actually stopped yet. The main thread will look at the flags
-> set by qemu_system_reset_request() and call pause_all_vcpus().
-> pause_all_vcpus() waits for every cpu to have cpu->stopped true,
-> so it can continue (and we will start the system reset operation)
-> before the vcpu thread has got back to its top level loop.
-> 
-> Instead, just set cpu->stop and call cpu_exit(). This will
-> cause the vcpu to exit back to the top level loop, and there
-> (as part of the wait_io_event code) it will call qemu_cpu_stop().
-> 
-> This fixes bugs where the reset request appeared to be ignored
-> or the CPU misbehaved because the reset operation started
-> to change vcpu state while the vcpu thread was still using it.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+we should perform these actions as same as usb_host_close.
 
-Reviewed-by: Emilio G. Cota <cota@braap.org>
+Signed-off-by: linzhecheng <linzhecheng@huawei.com>
 
-Thanks,
-
-		E.
+diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
+index b6602ded4e..833250a886 100644
+--- a/hw/usb/host-libusb.c
++++ b/hw/usb/host-libusb.c
+@@ -988,7 +988,9 @@ static void usb_host_exit_notifier(struct Notifier *n, void *data)
+ 
+     if (s->dh) {
+         usb_host_release_interfaces(s);
++        libusb_reset_device(s->dh);
+         usb_host_attach_kernel(s);
++        libusb_close(s->dh);
+     }
+ }
+ 
+-- 
+2.12.2.windows.2
