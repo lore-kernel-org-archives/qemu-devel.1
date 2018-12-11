@@ -1,27 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWl5b-00089a-W3
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:40:57 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gWl85-0001u7-CJ
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:43:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWl5a-00022W-8m
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:40:55 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:33763)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gWl5Y-0001za-0Q
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:40:52 -0500
-Received: by mail-oi1-x242.google.com with SMTP id c206so12545518oib.0
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 08:40:50 -0800 (PST)
-MIME-Version: 1.0
-References: <20181207103631.28193-1-richard.henderson@linaro.org>
-	<20181207103631.28193-17-richard.henderson@linaro.org>
-In-Reply-To: <20181207103631.28193-17-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 11 Dec 2018 16:40:37 +0000
-Message-ID: <CAFEAcA8CazDSeNdaKys1H9Gud7ajpX7YeRuP3wW2YwaJLegbBg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 16/26] target/arm: Create ARMVAParameters
- and helpers
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gWl81-0004Gu-TM
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:43:29 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 11 Dec 2018 19:43:09 +0300
+Message-Id: <20181211164317.32893-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v2 0/8] qcow2: encryption threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,392 +17,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, berrange@redhat.com, berto@igalia.com, vsementsov@virtuozzo.com, den@openvz.org
 
-On Fri, 7 Dec 2018 at 10:37, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Split out functions to extract the virtual address parameters.
-> Let the functions choose T0 or T1 address space half, if present.
-> Extract (most of) the control bits that vary between EL or Tx.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/helper.c | 274 ++++++++++++++++++++++++--------------------
->  1 file changed, 147 insertions(+), 127 deletions(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index be8daefc46..99ceed2cab 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -9754,6 +9754,123 @@ static uint8_t convert_stage2_attrs(CPUARMState *env, uint8_t s2attrs)
->      return (hiattr << 6) | (hihint << 4) | (loattr << 2) | lohint;
->  }
->
-> +typedef struct ARMVAParameters {
-> +    unsigned tsz    : 8;
-> +    unsigned select : 1;
-> +    bool tbi        : 1;
-> +    bool epd        : 1;
-> +    bool hpd        : 1;
-> +    bool ha         : 1;
-> +    bool hd         : 1;
-> +    bool using16k   : 1;
-> +    bool using64k   : 1;
-> +} ARMVAParameters;
-> +
-> +static ARMVAParameters aa64_va_parameters(CPUARMState *env, uint64_t va,
-> +                                          ARMMMUIdx mmu_idx, bool data)
-> +{
-> +    uint64_t tcr = regime_tcr(env, mmu_idx)->raw_tcr;
-> +    uint32_t el = regime_el(env, mmu_idx);
-> +    bool tbi, tbid, epd, hpd, ha, hd, using16k, using64k;
-> +    int select, tsz;
-> +
-> +    /* Bit 55 is always between the two regions, and is canonical for
-> +     * determining if address tagging is enabled.
-> +     */
-> +    select = extract64(va, 55, 1);
-> +
-> +    if (el > 1) {
-> +        tsz = extract32(tcr, 0, 6);
-> +        using64k = extract32(tcr, 14, 1);
-> +        using16k = extract32(tcr, 15, 1);
-> +        tbi = extract32(tcr, 20, 1);
+Hi all!
 
-The old code explicitly avoided looking at the TCR bit 20
-for the mmu_idx == ARMMMUIdx_S2NS case. At the moment VTCR_EL2
-bit 20 is RES0 but it might not be in future.
+The series brings threads to qcow2 encryption/decryption path,
+like it is already done for compression.
 
-> +        ha = extract32(tcr, 21, 1);
-> +        hd = extract32(tcr, 22, 1);
-> +        hpd = extract32(tcr, 24, 1);
-> +        tbid = extract32(tcr, 29, 1);
+v2: - multiple cipher inside QCryptoBlock instead of multiple
+      blocks inside qcow2, as suggested by Daniel, and it is
+      done in separate series
+    - use threaded encryption in do_perform_cow_encrypt() too
+    - some renaming and refactoring and simplifications
+(Sorry for not being very careful about change list, but v1 isn't
+ actually reviewed, as approach with multiple blocks was early
+ rejected by Denial)
 
-No HPD in VTCR_EL2 either, and bit 29 is NSW there.
+The series now based on two queued for 4.0 series, which, in
+turn, may be applied in any order: "crypto threads" (Daniel's
+tree), and  "qcow2 decompress in threads", which is now in
+Kevin's block-next.
 
-> +        epd = false;
-> +    } else if (!select) {
-> +        tsz = extract32(tcr, 0, 6);
-> +        epd = extract32(tcr, 7, 1);
-> +        using64k = extract32(tcr, 14, 1);
-> +        using16k = extract32(tcr, 15, 1);
-> +        tbi = extract64(tcr, 37, 1);
-> +        ha = extract64(tcr, 39, 1);
-> +        hd = extract64(tcr, 40, 1);
-> +        hpd = extract64(tcr, 41, 1);
-> +        tbid = extract64(tcr, 51, 1);
-> +    } else {
-> +        int tg = extract32(tcr, 30, 2);
-> +        using16k = tg == 1;
-> +        using64k = tg == 3;
-> +        tsz = extract32(tcr, 16, 6);
-> +        epd = extract32(tcr, 23, 1);
-> +        tbi = extract64(tcr, 38, 1);
-> +        ha = extract64(tcr, 39, 1);
-> +        hd = extract64(tcr, 40, 1);
-> +        hpd = extract64(tcr, 42, 1);
-> +        tbid = extract64(tcr, 52, 1);
-> +    }
-> +    tsz = MIN(tsz, 39);  /* TODO: ARMv8.4-TTST */
-> +    tsz = MAX(tsz, 16);  /* TODO: ARMv8.2-LVA  */
-> +
-> +    return (ARMVAParameters) {
-> +        .tsz = tsz,
-> +        .select = select,
-> +        .tbi = tbi & (data | !tbid),
-> +        .epd = epd,
-> +        .hpd = hpd,
-> +        .ha = ha,
-> +        .hd = hd,
-> +        .using16k = using16k,
-> +        .using64k = using64k,
-> +    };
-> +}
-> +
-> +static ARMVAParameters aa32_va_parameters(CPUARMState *env, uint32_t va,
-> +                                          ARMMMUIdx mmu_idx)
-> +{
-> +    uint64_t tcr = regime_tcr(env, mmu_idx)->raw_tcr;
-> +    int select, tsz;
-> +    bool epd, hpd;
-> +
-> +    if (mmu_idx == ARMMMUIdx_S2NS) {
-> +        tsz = sextract32(tcr, 0, 4) + 8;
-> +        select = 0;
-> +        hpd = false;
-> +        epd = false;
-> +    } else {
-> +        int t0sz = extract32(tcr, 0, 3);
-> +        int t1sz = extract32(tcr, 16, 3);
+Based-on: <20181207161351.4380-1-vsementsov@virtuozzo.com>
+([PATCH v3 0/5] crypto threads)
+Based-on: git://repo.or.cz/qemu/kevin.git block-next
+(decompress in threads inside)
 
-If this is EL2 (ie regime_tcr() is HTCR) then we
-shouldn't be looking at bits 16:3, because there is
-no T1SZ field there.
+Final performance gain is illustrated by the following test:
+ (note, that in v2 I've dropped iter-time=10, pointed by Daniel)
 
-> +
-> +        if (t1sz == 0) {
-> +            select = va > (0xffffffffu >> t0sz);
-> +        } else {
-> +            /* Note that we will detect errors later.  */
-> +            select = va >= ~(0xffffffffu >> t1sz);
-> +        }
-> +
-> +        if (!select) {
-> +            tsz = t0sz;
-> +            epd = extract32(tcr, 7, 1);
-> +            hpd = extract64(tcr, 41, 1);
-> +        } else {
-> +            tsz = t1sz;
-> +            epd = extract32(tcr, 23, 1);
-> +            hpd = extract64(tcr, 42, 1);
+]# cat test.sh 
+#!/bin/bash
 
-In HTCR the HPD bit is 24, and there is no EPD bit and no T2E bit.
+size=1G
+src=/ssd/src.raw
+dst=/ssd/dst.enc.qcow2
 
-> +        }
-> +        /* For aarch32, hpd0 is not enabled without t2e as well.  */
-> +        hpd &= extract32(tcr, 6, 1);
-> +    }
-> +
-> +    return (ARMVAParameters) {
-> +        .tsz = tsz,
-> +        .select = select,
-> +        .epd = epd,
-> +        .hpd = hpd,
-> +    };
-> +}
-> +
->  static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
->                                 MMUAccessType access_type, ARMMMUIdx mmu_idx,
->                                 hwaddr *phys_ptr, MemTxAttrs *txattrs, int *prot,
-> @@ -9765,26 +9882,20 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
->      /* Read an LPAE long-descriptor translation table. */
->      ARMFaultType fault_type = ARMFault_Translation;
->      uint32_t level;
-> -    uint32_t epd = 0;
-> -    int32_t t0sz, t1sz;
-> -    uint32_t tg;
-> +    ARMVAParameters param;
->      uint64_t ttbr;
-> -    int ttbr_select;
->      hwaddr descaddr, indexmask, indexmask_grainsize;
->      uint32_t tableattrs;
->      target_ulong page_size;
->      uint32_t attrs;
-> -    int32_t stride = 9;
-> -    int32_t addrsize;
-> -    int inputsize;
-> -    int32_t tbi = 0;
-> +    int32_t stride;
-> +    int top_bit, inputsize;
->      TCR *tcr = regime_tcr(env, mmu_idx);
->      int ap, ns, xn, pxn;
->      uint32_t el = regime_el(env, mmu_idx);
-> -    bool ttbr1_valid = true;
-> +    bool ttbr1_valid;
->      uint64_t descaddrmask;
->      bool aarch64 = arm_el_is_aa64(env, el);
-> -    bool hpd = false;
->
->      /* TODO:
->       * This code does not handle the different format TCR for VTCR_EL2.
-> @@ -9793,91 +9904,43 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
->       * support for those page table walks.
->       */
->      if (aarch64) {
-> +        param = aa64_va_parameters(env, address, mmu_idx,
-> +                                   access_type != MMU_INST_FETCH);
->          level = 0;
-> -        addrsize = 64;
-> -        if (el > 1) {
-> -            if (mmu_idx != ARMMMUIdx_S2NS) {
-> -                tbi = extract64(tcr->raw_tcr, 20, 1);
-> -            }
-> -        } else {
-> -            if (extract64(address, 55, 1)) {
-> -                tbi = extract64(tcr->raw_tcr, 38, 1);
-> -            } else {
-> -                tbi = extract64(tcr->raw_tcr, 37, 1);
-> -            }
-> -        }
-> -        tbi *= 8;
-> -
->          /* If we are in 64-bit EL2 or EL3 then there is no TTBR1, so mark it
->           * invalid.
->           */
-> -        if (el > 1) {
-> -            ttbr1_valid = false;
-> -        }
-> +        ttbr1_valid = (el < 1);
->      } else {
-> +        param = aa32_va_parameters(env, address, mmu_idx);
->          level = 1;
-> -        addrsize = 32;
->          /* There is no TTBR1 for EL2 */
-> -        if (el == 2) {
-> -            ttbr1_valid = false;
-> -        }
-> +        ttbr1_valid = (el != 2);
->      }
->
-> -    /* Determine whether this address is in the region controlled by
-> -     * TTBR0 or TTBR1 (or if it is in neither region and should fault).
-> -     * This is a Non-secure PL0/1 stage 1 translation, so controlled by
-> -     * TTBCR/TTBR0/TTBR1 in accordance with ARM ARM DDI0406C table B-32:
-> +    top_bit = (aarch64 ? 64 : 32);
+# create source for tests
+./qemu-img create -f raw "$src" $size > /dev/null
+./qemu-io -f raw -c "write -P 0xa 0 $size" "$src" > /dev/null
 
-The old code had 3 cases here: 64 for AArch64, 32 for AArch32 stage 1,
-and 40 for AArch32 stage 2.
+for w in "" "-W"; do
+    echo -e "Test with additional paramter for qemu-img: '$w'"
 
-> +    inputsize = top_bit - param.tsz;
-> +    top_bit -= 8 * param.tbi;
-> +
-> +    /* We determined the region when collecting the parameters, but we
-> +     * have not yet validated that the address is valid for the region.
->       */
-> -    if (aarch64) {
-> -        /* AArch64 translation.  */
-> -        t0sz = extract32(tcr->raw_tcr, 0, 6);
-> -        t0sz = MIN(t0sz, 39);
-> -        t0sz = MAX(t0sz, 16);
-> -    } else if (mmu_idx != ARMMMUIdx_S2NS) {
-> -        /* AArch32 stage 1 translation.  */
-> -        t0sz = extract32(tcr->raw_tcr, 0, 3);
-> -    } else {
-> -        /* AArch32 stage 2 translation.  */
-> -        bool sext = extract32(tcr->raw_tcr, 4, 1);
-> -        bool sign = extract32(tcr->raw_tcr, 3, 1);
-> -        /* Address size is 40-bit for a stage 2 translation,
-> -         * and t0sz can be negative (from -8 to 7),
-> -         * so we need to adjust it to use the TTBR selecting logic below.
-> -         */
-> -        addrsize = 40;
-> -        t0sz = sextract32(tcr->raw_tcr, 0, 4) + 8;
-> -
-> -        /* If the sign-extend bit is not the same as t0sz[3], the result
-> -         * is unpredictable. Flag this as a guest error.  */
-> -        if (sign != sext) {
-> -            qemu_log_mask(LOG_GUEST_ERROR,
-> -                          "AArch32: VTCR.S / VTCR.T0SZ[3] mismatch\n");
+    # create target
+    ./qemu-img create -f qcow2 --object secret,id=sec0,data=test -o encrypt.format=luks,encrypt.key-secret=sec0 "$dst" $size > /dev/null
 
-This guest-error check seems to have vanished in the refactoring.
+    time ./qemu-img convert $w -f raw --object secret,id=sec0,data=test --target-image-opts -n "$src" "driver=qcow2,file.filename=$dst,encrypt.key-secret=sec0"
+    echo
+done
 
-> -        }
-> -    }
-> -    t1sz = extract32(tcr->raw_tcr, 16, 6);
-> -    if (aarch64) {
-> -        t1sz = MIN(t1sz, 39);
-> -        t1sz = MAX(t1sz, 16);
-> -    }
-> -    if (t0sz && !extract64(address, addrsize - t0sz, t0sz - tbi)) {
-> -        /* there is a ttbr0 region and we are in it (high bits all zero) */
-> -        ttbr_select = 0;
-> -    } else if (ttbr1_valid && t1sz &&
-> -               !extract64(~address, addrsize - t1sz, t1sz - tbi)) {
-> -        /* there is a ttbr1 region and we are in it (high bits all one) */
-> -        ttbr_select = 1;
-> -    } else if (!t0sz) {
-> -        /* ttbr0 region is "everything not in the ttbr1 region" */
-> -        ttbr_select = 0;
-> -    } else if (!t1sz && ttbr1_valid) {
-> -        /* ttbr1 region is "everything not in the ttbr0 region" */
-> -        ttbr_select = 1;
-> -    } else {
-> -        /* in the gap between the two regions, this is a Translation fault */
-> +    if (param.select
-> +        ? extract64(~address, inputsize, top_bit - inputsize) || !ttbr1_valid
-> +        : extract64(address, inputsize, top_bit - inputsize)) {
 
-I find this expression rather confusing...
+before crypto threads series:
+Test with additional paramter for qemu-img: ''
 
-> +        /* In the gap between the two regions, this is a Translation fault */
->          fault_type = ARMFault_Translation;
->          goto do_fault;
->      }
->
-> +    if (param.using64k) {
-> +        stride = 13;
-> +    } else if (param.using16k) {
-> +        stride = 11;
-> +    } else {
-> +        stride = 9;
-> +    }
-> +
->      /* Note that QEMU ignores shareability and cacheability attributes,
->       * so we don't need to do anything with the SH, ORGN, IRGN fields
->       * in the TTBCR.  Similarly, TTBCR:A1 selects whether we get the
-> @@ -9885,56 +9948,13 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
->       * implement any ASID-like capability so we can ignore it (instead
->       * we will always flush the TLB any time the ASID is changed).
->       */
-> -    if (ttbr_select == 0) {
-> -        ttbr = regime_ttbr(env, mmu_idx, 0);
-> -        if (el < 2) {
-> -            epd = extract32(tcr->raw_tcr, 7, 1);
-> -        }
-> -        inputsize = addrsize - t0sz;
-> -
-> -        tg = extract32(tcr->raw_tcr, 14, 2);
-> -        if (tg == 1) { /* 64KB pages */
-> -            stride = 13;
-> -        }
-> -        if (tg == 2) { /* 16KB pages */
-> -            stride = 11;
-> -        }
-> -        if (aarch64 && el > 1) {
-> -            hpd = extract64(tcr->raw_tcr, 24, 1);
-> -        } else {
-> -            hpd = extract64(tcr->raw_tcr, 41, 1);
-> -        }
-> -        if (!aarch64) {
-> -            /* For aarch32, hpd0 is not enabled without t2e as well.  */
-> -            hpd &= extract64(tcr->raw_tcr, 6, 1);
-> -        }
-> -    } else {
-> -        /* We should only be here if TTBR1 is valid */
-> -        assert(ttbr1_valid);
-> -
-> -        ttbr = regime_ttbr(env, mmu_idx, 1);
-> -        epd = extract32(tcr->raw_tcr, 23, 1);
-> -        inputsize = addrsize - t1sz;
-> -
-> -        tg = extract32(tcr->raw_tcr, 30, 2);
-> -        if (tg == 3)  { /* 64KB pages */
-> -            stride = 13;
-> -        }
-> -        if (tg == 1) { /* 16KB pages */
-> -            stride = 11;
-> -        }
-> -        hpd = extract64(tcr->raw_tcr, 42, 1);
-> -        if (!aarch64) {
-> -            /* For aarch32, hpd1 is not enabled without t2e as well.  */
-> -            hpd &= extract64(tcr->raw_tcr, 6, 1);
-> -        }
-> -    }
-> +    ttbr = regime_ttbr(env, mmu_idx, param.select);
->
->      /* Here we should have set up all the parameters for the translation:
->       * inputsize, ttbr, epd, stride, tbi
->       */
->
-> -    if (epd) {
-> +    if (param.epd) {
->          /* Translation table walk disabled => Translation fault on TLB miss
->           * Note: This is always 0 on 64-bit EL2 and EL3.
->           */
-> @@ -10047,7 +10067,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
->          }
->          /* Merge in attributes from table descriptors */
->          attrs |= nstable << 3; /* NS */
-> -        if (hpd) {
-> +        if (param.hpd) {
->              /* HPD disables all the table attributes except NSTable.  */
->              break;
->          }
-> --
-> 2.17.2
->
+real    0m14.224s
+user    0m13.559s
+sys     0m0.860s
 
-thanks
--- PMM
+Test with additional paramter for qemu-img: '-W'
+
+real    0m14.002s
+user    0m13.562s
+sys     0m1.187s
+
+
+after crypto threads series:
+Test with additional paramter for qemu-img: ''
+
+real    0m14.307s
+user    0m13.646s
+sys     0m0.859s
+
+Test with additional paramter for qemu-img: '-W'
+
+real    0m14.452s
+user    0m13.699s
+sys     0m1.112s
+
+
+and after these series:
+Test with additional paramter for qemu-img: ''
+
+real    0m14.367s
+user    0m13.722s
+sys     0m0.829s
+
+Test with additional paramter for qemu-img: '-W'
+
+real    0m5.641s
+user    0m15.692s
+sys     0m1.207s
+
+Vladimir Sementsov-Ogievskiy (8):
+  qcow2.h: add missing include
+  qcow2: add separate file for threaded data processing functions
+  qcow2-threads: use thread_pool_submit_co
+  qcow2-threads: split out generic path
+  qcow2: qcow2_co_preadv: improve locking
+  qcow2: qcow2_co_preadv: skip using hd_qiov when possible
+  qcow2: bdrv_co_pwritev: move encryption code out of the lock
+  qcow2: do encryption in threads
+
+ block/qcow2.h         |  20 ++-
+ block/qcow2-cluster.c |   7 +-
+ block/qcow2-threads.c | 260 +++++++++++++++++++++++++++++++++++++++
+ block/qcow2.c         | 276 ++++++++----------------------------------
+ block/Makefile.objs   |   2 +-
+ 5 files changed, 335 insertions(+), 230 deletions(-)
+ create mode 100644 block/qcow2-threads.c
+
+-- 
+2.18.0
