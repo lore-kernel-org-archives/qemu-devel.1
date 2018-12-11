@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gWXbw-0008Tc-N6
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 21:17:26 -0500
+	(envelope-from <mst@redhat.com>) id 1gWXcI-0000Jl-Kv
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 21:17:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gWXMw-0003lw-Qk
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 21:01:57 -0500
-Date: Tue, 11 Dec 2018 12:47:37 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181211014737.GE4261@umbus.fritz.box>
-References: <20181209194610.29727-1-clg@kaod.org>
-	<20181209194610.29727-16-clg@kaod.org>
+	(envelope-from <mst@redhat.com>) id 1gWXcD-0006nc-K0
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 21:17:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47214)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gWXcD-0006mt-AQ
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 21:17:41 -0500
+Date: Mon, 10 Dec 2018 21:17:36 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181210205229-mutt-send-email-mst@kernel.org>
+References: <7CECC2DFC21538489F72729DF5EFB4D908ABD3A4@dggemm521-mbs.china.huawei.com>
+	<20181209211730-mutt-send-email-mst@kernel.org>
+	<7CECC2DFC21538489F72729DF5EFB4D908AC486D@DGGEMM501-MBX.china.huawei.com>
+	<20181210130650-mutt-send-email-mst@kernel.org>
+	<7CECC2DFC21538489F72729DF5EFB4D908AC78EE@DGGEMM501-MBX.china.huawei.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="sG624X+5B8xHI10M"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20181209194610.29727-16-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v7 15/19] spapr/xive: enable XIVE MMIOs at
- reset
+In-Reply-To: <7CECC2DFC21538489F72729DF5EFB4D908AC78EE@DGGEMM501-MBX.china.huawei.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [BUG]Unassigned mem write during pci device
+ hot-plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,115 +32,316 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: xuyandong <xuyandong2@huawei.com>
+Cc: "marcel@redhat.com" <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>
 
-
---sG624X+5B8xHI10M
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Sun, Dec 09, 2018 at 08:46:06PM +0100, C=E9dric Le Goater wrote:
-> Depending on the interrupt mode chosen, enable or disable the XIVE
-> MMIOs.
+On Tue, Dec 11, 2018 at 01:47:37AM +0000, xuyandong wrote:
+> On Sat, Dec 08, 2018 at 11:58:59AM +0000, xuyandong wrote:
+> > > > > Hi all,
+> > > > >
+> > > > >
+> > > > >
+> > > > > In our test, we configured VM with several pci-bridges and a
+> > > > > virtio-net nic been attached with bus 4,
+> > > > >
+> > > > > After VM is startup, We ping this nic from host to judge if it =
+is
+> > > > > working normally. Then, we hot add pci devices to this VM with =
+bus 0.
+> > > > >
+> > > > > We  found the virtio-net NIC in bus 4 is not working (can not
+> > > > > connect) occasionally, as it kick virtio backend failure with e=
+rror below:
+> > > > >
+> > > > >     Unassigned mem write 00000000fc803004 =3D 0x1
+> > > > >
+> > > > >
+> > > > >
+> > > > > memory-region: pci_bridge_pci
+> > > > >
+> > > > >   0000000000000000-ffffffffffffffff (prio 0, RW): pci_bridge_pc=
+i
+> > > > >
+> > > > >     00000000fc800000-00000000fc803fff (prio 1, RW): virtio-pci
+> > > > >
+> > > > >       00000000fc800000-00000000fc800fff (prio 0, RW):
+> > > > > virtio-pci-common
+> > > > >
+> > > > >       00000000fc801000-00000000fc801fff (prio 0, RW):
+> > > > > virtio-pci-isr
+> > > > >
+> > > > >       00000000fc802000-00000000fc802fff (prio 0, RW):
+> > > > > virtio-pci-device
+> > > > >
+> > > > >       00000000fc803000-00000000fc803fff (prio 0, RW):
+> > > > > virtio-pci-notify  <- io mem unassigned
+> > > > >
+> > > > >       =E2=80=A6
+> > > > >
+> > > > >
+> > > > >
+> > > > > We caught an exceptional address changing while this problem
+> > > > > happened, show as
+> > > > > follow:
+> > > > >
+> > > > > Before pci_bridge_update_mappings=EF=BC=9A
+> > > > >
+> > > > >       00000000fc000000-00000000fc1fffff (prio 1, RW): alias
+> > > > > pci_bridge_pref_mem @pci_bridge_pci
+> > > > > 00000000fc000000-00000000fc1fffff
+> > > > >
+> > > > >       00000000fc200000-00000000fc3fffff (prio 1, RW): alias
+> > > > > pci_bridge_pref_mem @pci_bridge_pci
+> > > > > 00000000fc200000-00000000fc3fffff
+> > > > >
+> > > > >       00000000fc400000-00000000fc5fffff (prio 1, RW): alias
+> > > > > pci_bridge_pref_mem @pci_bridge_pci
+> > > > > 00000000fc400000-00000000fc5fffff
+> > > > >
+> > > > >       00000000fc600000-00000000fc7fffff (prio 1, RW): alias
+> > > > > pci_bridge_pref_mem @pci_bridge_pci
+> > > > > 00000000fc600000-00000000fc7fffff
+> > > > >
+> > > > >       00000000fc800000-00000000fc9fffff (prio 1, RW): alias
+> > > > > pci_bridge_pref_mem @pci_bridge_pci
+> > > > > 00000000fc800000-00000000fc9fffff
+> > > > > <- correct Adress Spce
+> > > > >
+> > > > >       00000000fca00000-00000000fcbfffff (prio 1, RW): alias
+> > > > > pci_bridge_pref_mem @pci_bridge_pci
+> > > > > 00000000fca00000-00000000fcbfffff
+> > > > >
+> > > > >       00000000fcc00000-00000000fcdfffff (prio 1, RW): alias
+> > > > > pci_bridge_pref_mem @pci_bridge_pci
+> > > > > 00000000fcc00000-00000000fcdfffff
+> > > > >
+> > > > >       00000000fce00000-00000000fcffffff (prio 1, RW): alias
+> > > > > pci_bridge_pref_mem @pci_bridge_pci
+> > > > > 00000000fce00000-00000000fcffffff
+> > > > >
+> > > > >
+> > > > >
+> > > > > After pci_bridge_update_mappings=EF=BC=9A
+> > > > >
+> > > > >       00000000fda00000-00000000fdbfffff (prio 1, RW): alias
+> > > > > pci_bridge_mem @pci_bridge_pci 00000000fda00000-00000000fdbffff=
+f
+> > > > >
+> > > > >       00000000fdc00000-00000000fddfffff (prio 1, RW): alias
+> > > > > pci_bridge_mem @pci_bridge_pci 00000000fdc00000-00000000fddffff=
+f
+> > > > >
+> > > > >       00000000fde00000-00000000fdffffff (prio 1, RW): alias
+> > > > > pci_bridge_mem @pci_bridge_pci 00000000fde00000-00000000fdfffff=
+f
+> > > > >
+> > > > >       00000000fe000000-00000000fe1fffff (prio 1, RW): alias
+> > > > > pci_bridge_mem @pci_bridge_pci 00000000fe000000-00000000fe1ffff=
+f
+> > > > >
+> > > > >       00000000fe200000-00000000fe3fffff (prio 1, RW): alias
+> > > > > pci_bridge_mem @pci_bridge_pci 00000000fe200000-00000000fe3ffff=
+f
+> > > > >
+> > > > >       00000000fe400000-00000000fe5fffff (prio 1, RW): alias
+> > > > > pci_bridge_mem @pci_bridge_pci 00000000fe400000-00000000fe5ffff=
+f
+> > > > >
+> > > > >       00000000fe600000-00000000fe7fffff (prio 1, RW): alias
+> > > > > pci_bridge_mem @pci_bridge_pci 00000000fe600000-00000000fe7ffff=
+f
+> > > > >
+> > > > >       00000000fe800000-00000000fe9fffff (prio 1, RW): alias
+> > > > > pci_bridge_mem @pci_bridge_pci 00000000fe800000-00000000fe9ffff=
+f
+> > > > >
+> > > > >       fffffffffc800000-fffffffffc800000 (prio 1, RW): alias
+> > pci_bridge_pref_mem
+> > > > > @pci_bridge_pci fffffffffc800000-fffffffffc800000   <- Exceptio=
+nal Adress
+> > > > Space
+> > > >
+> > > > This one is empty though right?
+> > > >
+> > > > >
+> > > > >
+> > > > > We have figured out why this address becomes this value,
+> > > > > according to pci spec,  pci driver can get BAR address size by
+> > > > > writing 0xffffffff to
+> > > > >
+> > > > > the pci register firstly, and then read back the value from thi=
+s register.
+> > > >
+> > > >
+> > > > OK however as you show below the BAR being sized is the BAR if a
+> > > > bridge. Are you then adding a bridge device by hotplug?
+> > >
+> > > No, I just simply hot plugged a VFIO device to Bus 0, another
+> > > interesting phenomenon is If I hot plug the device to other bus, th=
+is doesn't
+> > happened.
+> > >
+> > > >
+> > > >
+> > > > > We didn't handle this value  specially while process pci write =
+in
+> > > > > qemu, the function call stack is:
+> > > > >
+> > > > > Pci_bridge_dev_write_config
+> > > > >
+> > > > > -> pci_bridge_write_config
+> > > > >
+> > > > > -> pci_default_write_config (we update the config[address] valu=
+e
+> > > > > -> here to
+> > > > > fffffffffc800000, which should be 0xfc800000 )
+> > > > >
+> > > > > -> pci_bridge_update_mappings
+> > > > >
+> > > > >                 ->pci_bridge_region_del(br, br->windows);
+> > > > >
+> > > > > -> pci_bridge_region_init
+> > > > >
+> > > > >                                                                =
+ ->
+> > > > > pci_bridge_init_alias (here pci_bridge_get_base, we use the wro=
+ng
+> > > > > value
+> > > > > fffffffffc800000)
+> > > > >
+> > > > >                                                 ->
+> > > > > memory_region_transaction_commit
+> > > > >
+> > > > >
+> > > > >
+> > > > > So, as we can see, we use the wrong base address in qemu to upd=
+ate
+> > > > > the memory regions, though, we update the base address to
+> > > > >
+> > > > > The correct value after pci driver in VM write the original val=
+ue
+> > > > > back, the virtio NIC in bus 4 may still sends net packets
+> > > > > concurrently with
+> > > > >
+> > > > > The wrong memory region address.
+> > > > >
+> > > > >
+> > > > >
+> > > > > We have tried to skip the memory region update action in qemu
+> > > > > while detect pci write with 0xffffffff value, and it does work,
+> > > > > but
+> > > > >
+> > > > > This seems to be not gently.
+> > > >
+> > > > For sure. But I'm still puzzled as to why does Linux try to size =
+the
+> > > > BAR of the bridge while a device behind it is used.
+> > > >
+> > > > Can you pls post your QEMU command line?
+> > >
+> > > My QEMU command line:
+> > > /root/xyd/qemu-system-x86_64 -name guest=3DLinux,debug-threads=3Don=
+ -S
+> > > -object
+> > > secret,id=3DmasterKey0,format=3Draw,file=3D/var/run/libvirt/qemu/do=
+main-194-
+> > > Linux/master-key.aes -machine
+> > > pc-i440fx-2.8,accel=3Dkvm,usb=3Doff,dump-guest-core=3Doff -cpu
+> > > host,+kvm_pv_eoi -bios /usr/share/OVMF/OVMF.fd -m
+> > > size=3D4194304k,slots=3D256,maxmem=3D33554432k -realtime mlock=3Dof=
+f -smp
+> > > 20,sockets=3D20,cores=3D1,threads=3D1 -numa node,nodeid=3D0,cpus=3D=
+0-4,mem=3D1024
+> > > -numa node,nodeid=3D1,cpus=3D5-9,mem=3D1024 -numa
+> > > node,nodeid=3D2,cpus=3D10-14,mem=3D1024 -numa
+> > > node,nodeid=3D3,cpus=3D15-19,mem=3D1024 -uuid
+> > > 34a588c7-b0f2-4952-b39c-47fae3411439 -no-user-config -nodefaults
+> > > -chardev
+> > > socket,id=3Dcharmonitor,path=3D/var/run/libvirt/qemu/domain-194-Lin=
+ux/moni
+> > > tor.sock,server,nowait -mon
+> > > chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc -=
+no-hpet
+> > > -global kvm-pit.lost_tick_policy=3Ddelay -no-shutdown -boot strict=3D=
+on
+> > > -device pci-bridge,chassis_nr=3D1,id=3Dpci.1,bus=3Dpci.0,addr=3D0x8=
+ -device
+> > > pci-bridge,chassis_nr=3D2,id=3Dpci.2,bus=3Dpci.0,addr=3D0x9 -device
+> > > pci-bridge,chassis_nr=3D3,id=3Dpci.3,bus=3Dpci.0,addr=3D0xa -device
+> > > pci-bridge,chassis_nr=3D4,id=3Dpci.4,bus=3Dpci.0,addr=3D0xb -device
+> > > pci-bridge,chassis_nr=3D5,id=3Dpci.5,bus=3Dpci.0,addr=3D0xc -device
+> > > piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -device
+> > > usb-ehci,id=3Dusb1,bus=3Dpci.0,addr=3D0x10 -device
+> > > nec-usb-xhci,id=3Dusb2,bus=3Dpci.0,addr=3D0x11 -device
+> > > virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.0,addr=3D0x3 -device
+> > > virtio-scsi-pci,id=3Dscsi1,bus=3Dpci.0,addr=3D0x4 -device
+> > > virtio-scsi-pci,id=3Dscsi2,bus=3Dpci.0,addr=3D0x5 -device
+> > > virtio-scsi-pci,id=3Dscsi3,bus=3Dpci.0,addr=3D0x6 -device
+> > > virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x7 -drive
+> > > file=3D/mnt/sdb/xml/centos_74_x64_uefi.raw,format=3Draw,if=3Dnone,i=
+d=3Ddrive-v
+> > > irtio-disk0,cache=3Dnone -device
+> > > virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x2,drive=3Ddrive-virt=
+io-disk0,id
+> > > =3Dvirtio-disk0,bootindex=3D1 -drive
+> > > if=3Dnone,id=3Ddrive-ide0-1-1,readonly=3Don,cache=3Dnone -device
+> > > ide-cd,bus=3Dide.1,unit=3D1,drive=3Ddrive-ide0-1-1,id=3Dide0-1-1 -n=
+etdev
+> > > tap,fd=3D35,id=3Dhostnet0 -device
+> > > virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:89:5d:8b,=
+bus=3Dpci.4
+> > > ,addr=3D0x1 -chardev pty,id=3Dcharserial0 -device
+> > > isa-serial,chardev=3Dcharserial0,id=3Dserial0 -device
+> > > usb-tablet,id=3Dinput0,bus=3Dusb.0,port=3D1 -vnc 0.0.0.0:0 -device
+> > > cirrus-vga,id=3Dvideo0,vgamem_mb=3D8,bus=3Dpci.0,addr=3D0x12 -devic=
+e
+> > > virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0xd -msg timest=
+amp=3Don
+> > >
+> > > I am also very curious about this issue, in the linux kernel code, =
+maybe double
+> > check in function pci_bridge_check_ranges triggered this problem.
+> >=20
+> > If you can get the stacktrace in Linux when it tries to write this ff=
+fff value, that
+> > would be quite helpful.
+> >=20
 >=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> ---
->  include/hw/ppc/spapr_xive.h | 1 +
->  hw/intc/spapr_xive.c        | 9 +++++++++
->  hw/ppc/spapr_irq.c          | 8 ++++++++
->  3 files changed, 18 insertions(+)
->=20
-> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> index 7244a6231ce6..308afb61a666 100644
-> --- a/include/hw/ppc/spapr_xive.h
-> +++ b/include/hw/ppc/spapr_xive.h
-> @@ -48,5 +48,6 @@ void spapr_xive_hcall_init(sPAPRMachineState *spapr);
->  void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void *=
-fdt,
->                     uint32_t phandle);
->  void spapr_xive_reset_tctx(sPAPRXive *xive);
-> +void spapr_xive_enable_mmio(sPAPRXive *xive, bool enable);
+> After I add mdelay(100) in function pci_bridge_check_ranges, this pheno=
+menon is
+> easier to reproduce, below is my modify in kernel:
+> diff --git a/drivers/pci/setup-bus.c b/drivers/pci/setup-bus.c
+> index cb389277..86e232d 100644
+> --- a/drivers/pci/setup-bus.c
+> +++ b/drivers/pci/setup-bus.c
+> @@ -27,7 +27,7 @@
+>  #include <linux/slab.h>
+>  #include <linux/acpi.h>
+>  #include "pci.h"
+> -
+> +#include <linux/delay.h>
+>  unsigned int pci_flags;
 > =20
->  #endif /* PPC_SPAPR_XIVE_H */
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index 560d8d031f74..c6dbb2e8cfc7 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -179,6 +179,15 @@ static void spapr_xive_map_mmio(sPAPRXive *xive)
->      sysbus_mmio_map(SYS_BUS_DEVICE(xive), 2, xive->tm_base);
->  }
-> =20
-> +void spapr_xive_enable_mmio(sPAPRXive *xive, bool enable)
+>  struct pci_dev_resource {
+> @@ -787,6 +787,9 @@ static void pci_bridge_check_ranges(struct pci_bus =
+*bus)
+>                 pci_write_config_dword(bridge, PCI_PREF_BASE_UPPER32,
+>                                                0xffffffff);
+>                 pci_read_config_dword(bridge, PCI_PREF_BASE_UPPER32, &t=
+mp);
+> +               mdelay(100);
+> +               printk(KERN_ERR "sleep\n");
+> +                dump_stack();
+>                 if (!tmp)
+>                         b_res[2].flags &=3D ~IORESOURCE_MEM_64;
+>                 pci_write_config_dword(bridge, PCI_PREF_BASE_UPPER32,
+>
 
-The logic looks fine, but I dislike this name - it's called
-=2E.._enable() when it can also be used to disable.
-
-> +{
-> +    memory_region_set_enabled(&xive->source.esb_mmio, enable);
-> +    memory_region_set_enabled(&xive->tm_mmio, enable);
-> +
-> +    /* Disable the END ESBs until a guest OS makes use of them */
-> +    memory_region_set_enabled(&xive->end_source.esb_mmio, false);
-> +}
-> +
->  /*
->   * When a Virtual Processor is scheduled to run on a HW thread, the
->   * hypervisor pushes its identifier in the OS CAM line. Emulate the
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index b423cee30e2c..a8e50725397c 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -217,6 +217,11 @@ static void spapr_irq_reset_xics(sPAPRMachineState *=
-spapr, Error **errp)
->      CPU_FOREACH(cs) {
->          spapr_cpu_core_set_intc(POWERPC_CPU(cs), spapr->icp_type);
->      }
-> +
-> +    /* Deactivate the XIVE MMIOs */
-> +    if (spapr->xive) {
-> +        spapr_xive_enable_mmio(spapr->xive, false);
-> +    }
->  }
-> =20
->  #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
-> @@ -358,6 +363,9 @@ static void spapr_irq_reset_xive(sPAPRMachineState *s=
-papr, Error **errp)
->       * to come after the XiveTCTX reset handlers.
->       */
->      spapr_xive_reset_tctx(spapr->xive);
-> +
-> +    /* Activate the XIVE MMIOs */
-> +    spapr_xive_enable_mmio(spapr->xive, true);
->  }
-> =20
->  /*
+OK!
+I just sent a Linux patch that should help.
+I would appreciate it if you will give it a try
+and if that helps reply to it with
+a Tested-by: tag.
 
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---sG624X+5B8xHI10M
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwPFzkACgkQbDjKyiDZ
-s5IZqQ/+PDgqqFuxTWksqr/KMkZNsrTSLXwoKnkeLYZZYwzAHR9oa+hDXoBRoyI8
-HSsYHJo24ou6w2VK09v6jN+dr1MxgNsGGEHC/fXfg6Fry7MFPyPV1RBcdF2lyiEP
-eYRNGpLHqlnXAqQ4rrROgeSi7JdGFRMWyg5IXsj8tGFh6olflLSzvlvdRTQTcqA9
-QGrKnPmCdge7lr0pXCeL4tb+B5IlXJ/4YVEW8hNQ79zfbJxZVpN4xxSBNx8fY6s9
-/Na8x1Vq3WpWH0YjmuthieOPZXZG24D/psrjNqhZJYOJfCva4norfRuzPxnXJ+L4
-wED+6HNCTfResiBEsQ9MmrT8ESuGAAlodR0eOfCuTrlP3WJIUxfpRGKnyoLeR8SK
-+BFZd2Vd0YrHpOCzaIUt2ehYd/vPKsfIcn6Rh5nCsyxeU70+hU6v1Umdi51qV5cE
-xwL2UGFNggljnYL6dpZPNcat6gbbOSsJZ4DybL1xBRu+lHGJl3Tp8pupfX2xFugS
-YWdqE5sfTMlIL7UDtgpCn/guakZmhBo/d9FMf9UGy1go2vYTlD6tzUiig2thvLkp
-a02GAM5IqGh+BpywkN/uoEQtKiaV3zZWirjbO6kIWow8xc1roMRJ9uEXSIsfvVOM
-FXPtiHviYZW4QdXSkvYcsuMPItIOik4eWLZUvVZtkRLU8rCt7OI=
-=7WiE
------END PGP SIGNATURE-----
-
---sG624X+5B8xHI10M--
+MST
