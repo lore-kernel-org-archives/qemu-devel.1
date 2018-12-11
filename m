@@ -1,42 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1gWpKT-0004PN-6P
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 16:12:34 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gWpVi-0007w1-TD
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 16:24:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1gWpKP-00068N-9V
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 16:12:33 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54182)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
-	id 1gWpKO-00062F-33
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 16:12:29 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wBBL8m4h054913
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 16:12:22 -0500
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2pajuydvhy-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 16:12:22 -0500
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
-	Tue, 11 Dec 2018 21:12:21 -0000
-From: Collin Walling <walling@linux.ibm.com>
-References: <1544135058-21380-1-git-send-email-walling@linux.ibm.com>
-	<1544135058-21380-3-git-send-email-walling@linux.ibm.com>
-	<20181207130853.20506345.cohuck@redhat.com>
-	<dbabb43d-01e7-d221-a761-ad5a53fd8f94@linux.ibm.com>
-Date: Tue, 11 Dec 2018 16:12:16 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gWpVf-00041p-Mm
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 16:24:10 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:44309)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gWpVf-00041S-6U
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 16:24:07 -0500
+Received: by mail-ot1-x344.google.com with SMTP id f18so15525288otl.11
+	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 13:24:07 -0800 (PST)
+References: <20181207085635.4291-1-mark.cave-ayland@ilande.co.uk>
+	<20181207085635.4291-5-mark.cave-ayland@ilande.co.uk>
+	<958fc521-9193-bd72-ca82-c8aac222fad2@linaro.org>
+	<7297dcf6-c856-5e5c-e8e7-9bf8bb0f2178@ilande.co.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <e71301ba-0350-4a4a-eb3b-e156fef33720@linaro.org>
+Date: Tue, 11 Dec 2018 15:24:02 -0600
 MIME-Version: 1.0
-In-Reply-To: <dbabb43d-01e7-d221-a761-ad5a53fd8f94@linux.ibm.com>
+In-Reply-To: <7297dcf6-c856-5e5c-e8e7-9bf8bb0f2178@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <aff40d67-9fcb-43fb-beeb-1dbe7a1e22f3@linux.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 2/3] s390: cpu feature for
- diagnose 318 andlimit max VCPUs to 247
+Subject: Re: [Qemu-devel] [RFC PATCH 4/6] target/ppc: switch FPR,
+ VMX and VSX helpers to access data directly from cpu_env
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,77 +34,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: thuth@redhat.com, david@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-On 12/11/18 11:47 AM, Collin Walling wrote:
-> On 12/7/18 7:08 AM, Cornelia Huck wrote:
->> On Thu,  6 Dec 2018 17:24:17 -0500
->> Collin Walling <walling@linux.ibm.com> wrote:
+On 12/11/18 1:21 PM, Mark Cave-Ayland wrote:
+>> Note however, that there are other steps that you must add here before using
+>> vector operations in the next patch:
 >>
->>> Diagnose 318 is a new z14.2 CPU feature. Since we are able to emulate
->>> it entirely via KVM, we can add guest support for earlier models. A
->>> new CPU feature for diagnose 318 (shortened to diag318) will be made
->>> available to guests starting with the zEC12-full CPU model.
->>>
->>> The z14.2 adds a new read SCP info byte (let's call it byte 134) to
->>> detect the availability of diag318. Because of this, we have room for
->>> one less VCPU and thus limit the max VPUs supported in a configuration
->>> to 247 (down from 248).
->>>
->>> Signed-off-by: Collin Walling <walling@linux.ibm.com>.
->>> ---
->>>  hw/s390x/sclp.c                 | 2 ++
->>>  include/hw/s390x/sclp.h         | 2 ++
->>>  target/s390x/cpu.h              | 2 +-
->>>  target/s390x/cpu_features.c     | 3 +++
->>>  target/s390x/cpu_features.h     | 1 +
->>>  target/s390x/cpu_features_def.h | 3 +++
->>>  target/s390x/gen-features.c     | 1 +
->>>  target/s390x/kvm.c              | 1 +
->>>  8 files changed, 14 insertions(+), 1 deletion(-)
->>>
+>> (1a) The fpr and vsr arrays must be merged, since fpr[n] == vsrh[n].
+>>      If this isn't done, then you simply cannot apply one operation
+>>      to two disjoint memory blocks.
 >>
->>> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
->>> index 8c2320e..594b4a4 100644
->>> --- a/target/s390x/cpu.h
->>> +++ b/target/s390x/cpu.h
->>> @@ -52,7 +52,7 @@
->>>  
->>>  #define MMU_USER_IDX 0
->>>  
->>> -#define S390_MAX_CPUS 248
->>> +#define S390_MAX_CPUS 247
+>> (1b) The vsr and avr arrays should be merged, since vsr[32+n] == avr[n].
+>>      This is simply tidiness, matching the layout to the architecture.
 >>
->> Isn't that already problematic if you try to migrate from an older QEMU
->> with all possible vcpus defined? IOW, don't you really need a way that
->> older machines can still run with one more vcpu?
->>
+>> These steps will modify gdbstub.c, machine.c, and linux-user/.
 > 
-> Good call. I'll run some tests on this and see what happens. I'll report
-> here on those results.
+> The reason I didn't touch the VSR arrays was because I was hoping that this could be
+> done as a follow up later; my thought was that since I'd only introduced vector
+> operations into the VMX instructions then currently no vector operations could be
+> done across the 2 separate memory blocks?
+
+True, until you convert the VSX insns you can delay this.
+Though honestly I would consider doing both at once.
+
+>> (2) The vsr array needs to be QEMU_ALIGN(16).  See target/arm/cpu.h.
+>>     We assert that the host addresses are 16 byte aligned, so that we
+>>     can eventually use Altivec/VSX in tcg/ppc/.
 > 
+> That's a good observation. Presumably being on Intel the unaligned accesses would
+> still work but just be slower? I've certainly seen the new vector ops being emitted
+> in the generated code.
 
-Migrating to a machine that supports less vCPUs will report
+Yes, currently I generate unaligned loads.  It made sense when considering AVX2
+and ARM SVE, since I do not increase the alignment requirements to 32-bytes
+when using 256-bit vectors.
 
-error: unsupported configuration: Maximum CPUs greater than specified machine type limit
-
-I revisited the code to see if there's a way to dynamically set the max vcpu count based 
-on the read scp info size, but it gets really tricky and code looks very complicated.
-(Having a packed struct contain the CPU entries whose maximum is determined by hardware
-limitations makes things difficult -- but who said s390 is easy? :) )
-
-In reality, do we often have guests running with 248 or even 247 vcpus? If so, I imagine
-the performance isn't too significant?
-
->>>  
->>>  typedef struct PSW {
->>>      uint64_t mask;
->>
-> 
-> 
+I do wonder if I should go back and generate aligned loads, just to raise
+SIGBUS when one has forgotten the QEMU_ALIGN marker, as a portability aid.
 
 
--- 
-Respectfully,
-- Collin Walling
+r~
