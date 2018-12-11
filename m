@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWjss-0006tf-I0
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:23:43 -0500
+	(envelope-from <armbru@redhat.com>) id 1gWjtD-0007CO-La
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:24:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWjsr-0003Rc-9Y
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:23:42 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:39347)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gWjsq-0003Qv-QM
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:23:40 -0500
-Received: by mail-ot1-x342.google.com with SMTP id n8so14365169otl.6
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 07:23:40 -0800 (PST)
+	(envelope-from <armbru@redhat.com>) id 1gWjt8-0003ZS-ID
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:24:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59798)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gWjt8-0003YY-2l
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:23:58 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181208111606.8505-1-marcandre.lureau@redhat.com>
+	<20181208111606.8505-16-marcandre.lureau@redhat.com>
+	<87zhtdcmq0.fsf@dusky.pond.sub.org>
+Date: Tue, 11 Dec 2018 16:23:51 +0100
+In-Reply-To: <87zhtdcmq0.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Mon, 10 Dec 2018 18:31:35 +0100")
+Message-ID: <87y38woznc.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20181207103631.28193-1-richard.henderson@linaro.org>
-	<20181207103631.28193-4-richard.henderson@linaro.org>
-In-Reply-To: <20181207103631.28193-4-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 11 Dec 2018 15:23:28 +0000
-Message-ID: <CAFEAcA95JywjZ61czo1rtH=QHDbpfQyAP3d28Nh=THuvHDS10g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 03/26] target/arm: Add PAuth active bit to
- tbflags
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v7 15/27] qapi: add an error in
+ case a discriminator is conditional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,107 +30,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Fri, 7 Dec 2018 at 10:36, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> There are 5 bits of state that could be added, but to save
-> space within tbflags, add only a single enable bit.
-> Helpers will determine the rest of the state at runtime.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/cpu.h           |  4 ++++
->  target/arm/translate.h     |  2 ++
->  target/arm/helper.c        | 19 +++++++++++++++++++
->  target/arm/translate-a64.c |  1 +
->  4 files changed, 26 insertions(+)
->
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 80d65866c6..f70eff8bcf 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -3024,6 +3024,8 @@ static inline bool arm_cpu_data_is_big_endian(CPUARMState *env)
->  #define ARM_TBFLAG_SVEEXC_EL_MASK   (0x3 << ARM_TBFLAG_SVEEXC_EL_SHIFT)
->  #define ARM_TBFLAG_ZCR_LEN_SHIFT    4
->  #define ARM_TBFLAG_ZCR_LEN_MASK     (0xf << ARM_TBFLAG_ZCR_LEN_SHIFT)
-> +#define ARM_TBFLAG_PAUTH_ACTIVE_SHIFT  8
-> +#define ARM_TBFLAG_PAUTH_ACTIVE_MASK   (1ull << ARM_TBFLAG_PAUTH_ACTIVE_SHIFT)
->
->  /* some convenience accessor macros */
->  #define ARM_TBFLAG_AARCH64_STATE(F) \
-> @@ -3066,6 +3068,8 @@ static inline bool arm_cpu_data_is_big_endian(CPUARMState *env)
->      (((F) & ARM_TBFLAG_SVEEXC_EL_MASK) >> ARM_TBFLAG_SVEEXC_EL_SHIFT)
->  #define ARM_TBFLAG_ZCR_LEN(F) \
->      (((F) & ARM_TBFLAG_ZCR_LEN_MASK) >> ARM_TBFLAG_ZCR_LEN_SHIFT)
-> +#define ARM_TBFLAG_PAUTH_ACTIVE(F) \
-> +    (((F) & ARM_TBFLAG_PAUTH_ACTIVE_MASK) >> ARM_TBFLAG_PAUTH_ACTIVE_SHIFT)
->
->  static inline bool bswap_code(bool sctlr_b)
->  {
-> diff --git a/target/arm/translate.h b/target/arm/translate.h
-> index 1550aa8bc7..d8a8bb4e9c 100644
-> --- a/target/arm/translate.h
-> +++ b/target/arm/translate.h
-> @@ -68,6 +68,8 @@ typedef struct DisasContext {
->      bool is_ldex;
->      /* True if a single-step exception will be taken to the current EL */
->      bool ss_same_el;
-> +    /* True if v8.3-PAuth is active.  */
-> +    bool pauth_active;
->      /* Bottom two bits of XScale c15_cpar coprocessor access control reg */
->      int c15_cpar;
->      /* TCG op of the current insn_start.  */
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 1e20956376..158c550fab 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -12991,6 +12991,25 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
->              flags |= sve_el << ARM_TBFLAG_SVEEXC_EL_SHIFT;
->              flags |= zcr_len << ARM_TBFLAG_ZCR_LEN_SHIFT;
->          }
-> +
-> +        if (cpu_isar_feature(aa64_pauth, cpu)) {
-> +            /*
-> +             * In order to save space in flags, we record only whether
-> +             * pauth is "inactive", meaning the insns are implemented as
-> +             * a nop, or "active" when some action must be performed.
-> +             * The decision of which action to take is left to a helper.
-> +             */
-> +            uint64_t sctlr;
-> +            if (current_el == 0) {
-> +                /* FIXME: ARMv8.1-VHE S2 translation regime.  */
-> +                sctlr = env->cp15.sctlr_el[1];
-> +            } else {
-> +                sctlr = env->cp15.sctlr_el[current_el];
-> +            }
-> +            if (sctlr & (SCTLR_EnIA |SCTLR_EnIB | SCTLR_EnDA | SCTLR_EnDB)) {
+Two more nits...
 
-Missing space before SCTLR_EnIB.
+Markus Armbruster <armbru@redhat.com> writes:
 
-> +                flags |= ARM_TBFLAG_PAUTH_ACTIVE_MASK;
-> +            }
-> +        }
->      } else {
->          *pc = env->regs[15];
->          flags = (env->thumb << ARM_TBFLAG_THUMB_SHIFT)
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index e1da1e4d6f..7c1cc1ce8e 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -13407,6 +13407,7 @@ static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
->      dc->fp_excp_el = ARM_TBFLAG_FPEXC_EL(dc->base.tb->flags);
->      dc->sve_excp_el = ARM_TBFLAG_SVEEXC_EL(dc->base.tb->flags);
->      dc->sve_len = (ARM_TBFLAG_ZCR_LEN(dc->base.tb->flags) + 1) * 16;
-> +    dc->pauth_active = ARM_TBFLAG_PAUTH_ACTIVE(dc->base.tb->flags);
->      dc->vec_len = 0;
->      dc->vec_stride = 0;
->      dc->cp_regs = arm_cpu->cp_regs;
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+>> Making a discriminator conditional doesn't make much sense.
+>
+> Good point (so easy to overlook!), but why first add the 'if' feature
+> broken that way in PATCH 13, then fix it up in PATCH 15?
+>
+>>                                                             Instead,
+>> the union could be made conditional.
+>
+> What do you mean by that?
+>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> ---
+>>  scripts/qapi/common.py                          |  8 ++++++++
+>>  tests/Makefile.include                          |  1 +
+>>  .../flat-union-invalid-if-discriminator.err     |  1 +
+>>  .../flat-union-invalid-if-discriminator.exit    |  1 +
+>>  .../flat-union-invalid-if-discriminator.json    | 17 +++++++++++++++++
+>>  .../flat-union-invalid-if-discriminator.out     |  0
+>>  6 files changed, 28 insertions(+)
+>>  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminato=
+r.err
+>>  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminato=
+r.exit
+>>  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminato=
+r.json
+>>  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminato=
+r.out
+>>
+>> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+>> index aec51acb07..f79b3fad54 100644
+>> --- a/scripts/qapi/common.py
+>> +++ b/scripts/qapi/common.py
+>> @@ -578,6 +578,7 @@ def find_alternate_member_qtype(qapi_type):
+>>  # Return the discriminator enum define if discriminator is specified as=
+ an
+>>  # enum type, otherwise return None.
+>>  def discriminator_find_enum_define(expr):
+>> +    name =3D expr['union']
 
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Dead assignment.
 
-thanks
--- PMM
+>>      base =3D expr.get('base')
+>>      discriminator =3D expr.get('discriminator')
+>>=20=20
+>> @@ -594,6 +595,7 @@ def discriminator_find_enum_define(expr):
+>>=20=20
+>>      if isinstance(discriminator_value, dict):
+>>          discriminator_value =3D discriminator_value['type']
+>> +
+>>      return enum_types.get(discriminator_value)
+>>=20=20
+>>=20=20
+>
+> These two hunks are leftovers, please drop.
+>
+>> @@ -800,7 +802,12 @@ def check_union(expr, info):
+>>                                 "struct '%s'"
+>>                                 % (discriminator, base))
+>>          if isinstance(discriminator_value, dict):
+>> +            if discriminator_value.get('if'):
+>> +                raise QAPISemError(info, 'The discriminator %s.%s for u=
+nion %s '
+
+pycodestyle complains
+
+    scripts/qapi/common.py:806:80: E501 line too long (80 > 79 characters)
+
+>> +                                   'must not be conditional' %
+>> +                                   (base, discriminator, name))
+>>              discriminator_value =3D discriminator_value['type']
+>> +
+>>          enum_define =3D enum_types.get(discriminator_value)
+>>          allow_metas =3D ['struct']
+>>          # Do not allow string discriminator
+>> @@ -1023,6 +1030,7 @@ def check_exprs(exprs):
+>>=20=20
+>>          if 'include' in expr:
+>>              continue
+>> +        info =3D expr_elem['info']
+>>          if 'union' in expr and not discriminator_find_enum_define(expr):
+>>              name =3D '%sKind' % expr['union']
+>>          elif 'alternate' in expr:
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index ea5d1e8787..3f5a1d0c30 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -409,6 +409,7 @@ qapi-schema +=3D flat-union-inline-invalid-dict.json
+>>  qapi-schema +=3D flat-union-int-branch.json
+>>  qapi-schema +=3D flat-union-invalid-branch-key.json
+>>  qapi-schema +=3D flat-union-invalid-discriminator.json
+>> +qapi-schema +=3D flat-union-invalid-if-discriminator.json
+>>  qapi-schema +=3D flat-union-no-base.json
+>>  qapi-schema +=3D flat-union-optional-discriminator.json
+>>  qapi-schema +=3D flat-union-string-discriminator.json
+>> diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.err b=
+/tests/qapi-schema/flat-union-invalid-if-discriminator.err
+>> new file mode 100644
+>> index 0000000000..0c94c9860d
+>> --- /dev/null
+>> +++ b/tests/qapi-schema/flat-union-invalid-if-discriminator.err
+>> @@ -0,0 +1 @@
+>> +tests/qapi-schema/flat-union-invalid-if-discriminator.json:13: The disc=
+riminator TestBase.enum1 for union TestUnion must not be conditional
+>> diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.exit =
+b/tests/qapi-schema/flat-union-invalid-if-discriminator.exit
+>> new file mode 100644
+>> index 0000000000..d00491fd7e
+>> --- /dev/null
+>> +++ b/tests/qapi-schema/flat-union-invalid-if-discriminator.exit
+>> @@ -0,0 +1 @@
+>> +1
+>> diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.json =
+b/tests/qapi-schema/flat-union-invalid-if-discriminator.json
+>> new file mode 100644
+>> index 0000000000..618ec36396
+>> --- /dev/null
+>> +++ b/tests/qapi-schema/flat-union-invalid-if-discriminator.json
+>> @@ -0,0 +1,17 @@
+>> +{ 'enum': 'TestEnum',
+>> +  'data': [ 'value1', 'value2' ] }
+>> +
+>> +{ 'struct': 'TestBase',
+>> +  'data': { 'enum1': { 'type': 'TestEnum', 'if': 'FOO' } } }
+>> +
+>> +{ 'struct': 'TestTypeA',
+>> +  'data': { 'string': 'str' } }
+>> +
+>> +{ 'struct': 'TestTypeB',
+>> +  'data': { 'integer': 'int' } }
+>> +
+>> +{ 'union': 'TestUnion',
+>> +  'base': 'TestBase',
+>> +  'discriminator': 'enum1',
+>> +  'data': { 'value1': 'TestTypeA',
+>> +            'value2': 'TestTypeB' } }
+>> diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.out b=
+/tests/qapi-schema/flat-union-invalid-if-discriminator.out
+>> new file mode 100644
+>> index 0000000000..e69de29bb2
+>
+> Patch looks good otherwise.
