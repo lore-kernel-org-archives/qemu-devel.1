@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gWlCX-0006G6-Sy
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:48:07 -0500
+	(envelope-from <prvs=8761f1f8f=anthony.perard@citrix.com>)
+	id 1gWlF2-0000zo-DS
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:50:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gWlCU-0000S0-8e
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:48:05 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:33224)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gWlCT-0000Ot-6V
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:48:01 -0500
-Date: Tue, 11 Dec 2018 18:47:43 +0200
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20181211164742.GA2923@lap1>
-References: <20181211132642.3027-1-ppandit@redhat.com>
-	<20181211132642.3027-5-ppandit@redhat.com>
+	(envelope-from <prvs=8761f1f8f=anthony.perard@citrix.com>)
+	id 1gWlEz-0003PU-Fy
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:50:40 -0500
+Date: Tue, 11 Dec 2018 16:50:19 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20181211165019.GV18875@perard.uk.xensource.com>
+References: <1544543862-9997-1-git-send-email-paul.durrant@citrix.com>
+	<1544543862-9997-15-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20181211132642.3027-5-ppandit@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/5] pvrdma: release ring object in case of
- an error
+In-Reply-To: <1544543862-9997-15-git-send-email-paul.durrant@citrix.com>
+Subject: Re: [Qemu-devel] [PATCH v4 14/18] xen: add implementations of
+ xen-block connect and disconnect functions...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +26,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Saar Amar <saaramar5@gmail.com>, Li Qiang <liq3ea@163.com>, Prasad J Pandit <pjp@fedoraproject.org>, yuval.shaia@oracle.com
+To: Paul Durrant <paul.durrant@citrix.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Tue, Dec 11, 2018 at 06:56:41PM +0530, P J P wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
+On Tue, Dec 11, 2018 at 03:57:38PM +0000, Paul Durrant wrote:
+> ...and wire in the dataplane.
 > 
-> create_cq and create_qp routines allocate ring object, but it's
-> not released in case of an error, leading to memory leakage.
+> This patch adds the remaining code to make the xen-block XenDevice
+> functional. The parameters that a block frontend expects to find are
+> populated in the backend xenstore area, and the 'ring-ref' and
+> 'event-channel' values specified in the frontend xenstore area are
+> mapped/bound and used to set up the dataplane.
 > 
-> Reported-by: Li Qiang <liq3ea@163.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> ---
->  hw/rdma/vmw/pvrdma_cmd.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
-> index ee2888259c..e8d99f29fa 100644
-> --- a/hw/rdma/vmw/pvrdma_cmd.c
-> +++ b/hw/rdma/vmw/pvrdma_cmd.c
-> @@ -337,7 +337,9 @@ static int create_cq(PVRDMADev *dev, union pvrdma_cmd_req *req,
->  
->      resp->hdr.err = rdma_rm_alloc_cq(&dev->rdma_dev_res, &dev->backend_dev,
->                                       cmd->cqe, &resp->cq_handle, ring);
-> -    resp->cqe = cmd->cqe;
-> +    if (resp->hdr.err) {
-> +        g_free(ring);
+> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 
-This is not enough since all ring's resources (ring state and ring's pages)
-left mapped.
+Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
 
-The steps needed are the steps detailed in destroy_cq.
-
-> +    }
->  
->  out:
->      pr_dbg("ret=%d\n", resp->hdr.err);
-> @@ -490,6 +492,10 @@ static int create_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
->                                       cmd->max_send_sge, cmd->send_cq_handle,
->                                       cmd->max_recv_wr, cmd->max_recv_sge,
->                                       cmd->recv_cq_handle, rings, &resp->qpn);
-> +    if (resp->hdr.err) {
-> +        g_free(rings);
-
-Ditto, here send rind and recv rings stays mapped.
-Look at how QP's ring is destroyed in destroy_qp.
-
-For both case suggesting to define a new static function that destroy rings
-and call it from both error flow of create_* and from destroy_*
-
-> +        goto out;
-> +    }
->  
->      resp->max_send_wr = cmd->max_send_wr;
->      resp->max_recv_wr = cmd->max_recv_wr;
-> -- 
-> 2.19.2
-> 
+-- 
+Anthony PERARD
