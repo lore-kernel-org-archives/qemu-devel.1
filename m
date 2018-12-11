@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gWl0N-0003R3-RM
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:35:39 -0500
+	(envelope-from <groug@kaod.org>) id 1gWl0Q-0003Uy-VH
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:35:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gWl0G-00071Y-0T
+	(envelope-from <groug@kaod.org>) id 1gWl0N-0007AY-C5
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:35:34 -0500
+Received: from 18.mo3.mail-out.ovh.net ([87.98.172.162]:42749)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gWl0M-00076p-Uf
 	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:35:31 -0500
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Tue, 11 Dec 2018 17:34:05 +0100
-Message-Id: <20181211163406.3322-4-philmd@redhat.com>
-In-Reply-To: <20181211163406.3322-1-philmd@redhat.com>
-References: <20181211163406.3322-1-philmd@redhat.com>
+Received: from player711.ha.ovh.net (unknown [10.109.159.35])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id AFA761EA868
+	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 17:35:28 +0100 (CET)
+Date: Tue, 11 Dec 2018 17:35:20 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20181211173520.785736ae@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20181211054926.56717-3-aik@ozlabs.ru>
+References: <20181211054926.56717-1-aik@ozlabs.ru>
+	<20181211054926.56717-3-aik@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 3/4] hw/smbios: Remove "smbios_ipmi.h"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH qemu 2/3] ppc/spapr: Receive and
+ store device tree blob from SLOF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,106 +31,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, Corey Minyard <minyard@acm.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, "Daniel P . =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-This header only declare a single function: smbios_build_type_38_table().
-We already have a header that declares such functions: "smbios_build.h".
-Move the declaration and remove the header.
+On Tue, 11 Dec 2018 16:49:25 +1100
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 
-Reviewed-by: Corey Minyard <cminyard@mvista.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/smbios/smbios.c              |  1 -
- hw/smbios/smbios_build.h        |  4 ++++
- hw/smbios/smbios_ipmi.h         | 15 ---------------
- hw/smbios/smbios_type_38-stub.c |  2 +-
- hw/smbios/smbios_type_38.c      |  1 -
- 5 files changed, 5 insertions(+), 18 deletions(-)
- delete mode 100644 hw/smbios/smbios_ipmi.h
+> SLOF receives a device tree and updates it with various properties
+> before switching to the guest kernel and QEMU is not aware of any changes
+> made by SLOF. Since there is no real RTAS (QEMU implements it), it makes
+> sense to pass the SLOF final device tree to QEMU to let it implement
+> RTAS related tasks better, such as PCI host bus adapter hotplug.
+> 
+> Specifially, now QEMU can find out the actual XICS phandle (for PHB
+> hotplug) and the RTAS linux,rtas-entry/base properties (for firmware
+> assisted NMI - FWNMI).
+> 
+> This stores the initial DT blob in the sPAPR machine and replaces it
+> in the KVMPPC_H_UPDATE_DT (new private hypercall) handler.
+> 
+> This adds an @update_dt_enabled machine property to allow backward
+> migration.
+> 
+> SLOF already has a hypercall since
+> https://github.com/aik/SLOF/commit/e6fc84652c9c0073f9183
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+>  include/hw/ppc/spapr.h |  7 ++++++-
+>  hw/ppc/spapr.c         | 31 ++++++++++++++++++++++++++++++-
+>  hw/ppc/spapr_hcall.c   | 42 ++++++++++++++++++++++++++++++++++++++++++
+>  hw/ppc/trace-events    |  3 +++
+>  4 files changed, 81 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 1987640..86c90df 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -102,6 +102,7 @@ struct sPAPRMachineClass {
+>  
+>      /*< public >*/
+>      bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMBs */
+> +    bool update_dt_enabled;    /* enable KVMPPC_H_UPDATE_DT */
+>      bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
+>      bool pre_2_10_has_unused_icps;
+>      bool legacy_irq_allocation;
+> @@ -138,6 +139,9 @@ struct sPAPRMachineState {
+>      int vrma_adjust;
+>      ssize_t rtas_size;
+>      void *rtas_blob;
+> +    uint32_t fdt_size;
+> +    uint32_t fdt_initial_size;
+> +    void *fdt_blob;
+>      long kernel_size;
+>      bool kernel_le;
+>      uint32_t initrd_base;
+> @@ -464,7 +468,8 @@ struct sPAPRMachineState {
+>  #define KVMPPC_H_LOGICAL_MEMOP  (KVMPPC_HCALL_BASE + 0x1)
+>  /* Client Architecture support */
+>  #define KVMPPC_H_CAS            (KVMPPC_HCALL_BASE + 0x2)
+> -#define KVMPPC_HCALL_MAX        KVMPPC_H_CAS
+> +#define KVMPPC_H_UPDATE_DT      (KVMPPC_HCALL_BASE + 0x3)
+> +#define KVMPPC_HCALL_MAX        KVMPPC_H_UPDATE_DT
+>  
+>  typedef struct sPAPRDeviceTreeUpdateHeader {
+>      uint32_t version_id;
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 8a18250..984bf32 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1654,7 +1654,10 @@ static void spapr_machine_reset(void)
+>      /* Load the fdt */
+>      qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
+>      cpu_physical_memory_write(fdt_addr, fdt, fdt_totalsize(fdt));
+> -    g_free(fdt);
+> +    g_free(spapr->fdt_blob);
+> +    spapr->fdt_size = fdt_totalsize(fdt);
+> +    spapr->fdt_initial_size = spapr->fdt_size;
+> +    spapr->fdt_blob = fdt;
+>  
+>      /* Set up the entry state */
+>      spapr_cpu_set_entry_state(first_ppc_cpu, SPAPR_ENTRY_POINT, fdt_addr);
+> @@ -1908,6 +1911,27 @@ static const VMStateDescription vmstate_spapr_irq_map = {
+>      },
+>  };
+>  
+> +static bool spapr_dtb_needed(void *opaque)
+> +{
+> +    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(opaque);
+> +
+> +    return smc->update_dt_enabled;
+> +}
+> +
+> +static const VMStateDescription vmstate_spapr_dtb = {
+> +    .name = "spapr_dtb",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .needed = spapr_dtb_needed,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT32(fdt_initial_size, sPAPRMachineState),
+> +        VMSTATE_UINT32(fdt_size, sPAPRMachineState),
+> +        VMSTATE_VBUFFER_ALLOC_UINT32(fdt_blob, sPAPRMachineState, 0, NULL,
+> +                                     fdt_size),
 
-diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
-index 30bd4731cf..9d737642cb 100644
---- a/hw/smbios/smbios.c
-+++ b/hw/smbios/smbios.c
-@@ -28,7 +28,6 @@
- #include "hw/loader.h"
- #include "exec/cpu-common.h"
- #include "smbios_build.h"
--#include "smbios_ipmi.h"
-=20
- /* legacy structures and constants for <=3D 2.0 machines */
- struct smbios_header {
-diff --git a/hw/smbios/smbios_build.h b/hw/smbios/smbios_build.h
-index 93b360d520..56b5a1e3f3 100644
---- a/hw/smbios/smbios_build.h
-+++ b/hw/smbios/smbios_build.h
-@@ -3,6 +3,7 @@
-  *
-  * Copyright (C) 2009 Hewlett-Packard Development Company, L.P.
-  * Copyright (C) 2013 Red Hat, Inc.
-+ * Copyright (c) 2015,2016 Corey Minyard, MontaVista Software, LLC
-  *
-  * Authors:
-  *  Alex Williamson <alex.williamson@hp.com>
-@@ -96,4 +97,7 @@ extern unsigned smbios_table_cnt;
-         smbios_table_cnt++;                                             =
-  \
-     } while (0)
-=20
-+/* IPMI SMBIOS firmware handling */
-+void smbios_build_type_38_table(void);
-+
- #endif /* QEMU_SMBIOS_BUILD_H */
-diff --git a/hw/smbios/smbios_ipmi.h b/hw/smbios/smbios_ipmi.h
-deleted file mode 100644
-index 1c9aae38f2..0000000000
---- a/hw/smbios/smbios_ipmi.h
-+++ /dev/null
-@@ -1,15 +0,0 @@
--/*
-- * IPMI SMBIOS firmware handling
-- *
-- * Copyright (c) 2015,2016 Corey Minyard, MontaVista Software, LLC
-- *
-- * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-- * See the COPYING file in the top-level directory.
-- */
--
--#ifndef QEMU_SMBIOS_IPMI_H
--#define QEMU_SMBIOS_IPMI_H
--
--void smbios_build_type_38_table(void);
--
--#endif /* QEMU_SMBIOS_IPMI_H */
-diff --git a/hw/smbios/smbios_type_38-stub.c b/hw/smbios/smbios_type_38-s=
-tub.c
-index fc4516bc8a..14b53d004b 100644
---- a/hw/smbios/smbios_type_38-stub.c
-+++ b/hw/smbios/smbios_type_38-stub.c
-@@ -8,7 +8,7 @@
-  */
-=20
- #include "qemu/osdep.h"
--#include "smbios_ipmi.h"
-+#include "smbios_build.h"
-=20
- void smbios_build_type_38_table(void)
- {
-diff --git a/hw/smbios/smbios_type_38.c b/hw/smbios/smbios_type_38.c
-index d84e87d608..a1ad28d059 100644
---- a/hw/smbios/smbios_type_38.c
-+++ b/hw/smbios/smbios_type_38.c
-@@ -12,7 +12,6 @@
- #include "hw/smbios/smbios.h"
- #include "qemu/error-report.h"
- #include "smbios_build.h"
--#include "smbios_ipmi.h"
-=20
- /* SMBIOS type 38 - IPMI */
- struct smbios_type_38 {
---=20
-2.17.2
+Unless I'm missing something, it looks like the initial spapr->fdt_blob in the
+destination might be leaked...
+
+> +        VMSTATE_END_OF_LIST()
+> +    },
+> +};
+> +
+>  static const VMStateDescription vmstate_spapr = {
+>      .name = "spapr",
+>      .version_id = 3,
+> @@ -1937,6 +1961,7 @@ static const VMStateDescription vmstate_spapr = {
+>          &vmstate_spapr_cap_ibs,
+>          &vmstate_spapr_irq_map,
+>          &vmstate_spapr_cap_nested_kvm_hv,
+> +        &vmstate_spapr_dtb,
+>          NULL
+>      }
+>  };
+> @@ -3871,6 +3896,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+>      hc->unplug = spapr_machine_device_unplug;
+>  
+>      smc->dr_lmb_enabled = true;
+> +    smc->update_dt_enabled = true;
+>      mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power8_v2.0");
+>      mc->has_hotpluggable_cpus = true;
+>      smc->resize_hpt_default = SPAPR_RESIZE_HPT_ENABLED;
+> @@ -3981,8 +4007,11 @@ static void spapr_machine_3_1_instance_options(MachineState *machine)
+>  
+>  static void spapr_machine_3_1_class_options(MachineClass *mc)
+>  {
+> +    sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
+> +
+>      spapr_machine_4_0_class_options(mc);
+>      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_3_1);
+> +    smc->update_dt_enabled = false;
+>  }
+>  
+>  DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index ae913d0..dfd3cf3 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1717,6 +1717,46 @@ static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
+>  
+>      args[0] = characteristics;
+>      args[1] = behaviour;
+> +    return H_SUCCESS;
+> +}
+> +
+> +static target_ulong h_update_dt(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+> +                                target_ulong opcode, target_ulong *args)
+> +{
+> +    target_ulong dt = ppc64_phys_to_real(args[0]);
+> +    struct fdt_header hdr = { 0 };
+> +    unsigned cb;
+> +    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
+> +    void *fdt;
+> +
+> +    cpu_physical_memory_read(dt, &hdr, sizeof(hdr));
+> +    cb = fdt32_to_cpu(hdr.totalsize);
+> +
+> +    if (!smc->update_dt_enabled) {
+> +        return H_SUCCESS;
+> +    }
+> +
+> +    /* Check that the fdt did not grow out of proportion */
+> +    if (cb > spapr->fdt_initial_size * 2) {
+
+Ok, so this caps the new fdt tree to 2 megs, which seems reasonable.
+
+BTW, why 2 and not some other growth factor ?
+
+> +        trace_spapr_update_dt_failed_size(spapr->fdt_initial_size, cb,
+> +            fdt32_to_cpu(hdr.magic));
+> +        return H_PARAMETER;
+> +    }
+> +
+> +    fdt = g_malloc0(cb);
+> +    cpu_physical_memory_read(dt, fdt, cb);
+> +
+> +    /* Check the fdt consostency */
+> +    if (fdt_check_full(fdt, cb)) {
+> +        trace_spapr_update_dt_failed_check(spapr->fdt_initial_size, cb,
+> +            fdt32_to_cpu(hdr.magic));
+> +        return H_PARAMETER;
+> +    }
+> +
+> +    g_free(spapr->fdt_blob);
+> +    spapr->fdt_size = cb;
+> +    spapr->fdt_blob = fdt;
+> +    trace_spapr_update_dt(cb);
+>  
+>      return H_SUCCESS;
+>  }
+> @@ -1822,6 +1862,8 @@ static void hypercall_register_types(void)
+>  
+>      /* ibm,client-architecture-support support */
+>      spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_support);
+> +
+> +    spapr_register_hypercall(KVMPPC_H_UPDATE_DT, h_update_dt);
+>  }
+>  
+>  type_init(hypercall_register_types)
+> diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
+> index dc5e65a..0af155e 100644
+> --- a/hw/ppc/trace-events
+> +++ b/hw/ppc/trace-events
+> @@ -22,6 +22,9 @@ spapr_cas_pvr_try(uint32_t pvr) "0x%x"
+>  spapr_cas_pvr(uint32_t cur_pvr, bool explicit_match, uint32_t new_pvr) "current=0x%x, explicit_match=%u, new=0x%x"
+>  spapr_h_resize_hpt_prepare(uint64_t flags, uint64_t shift) "flags=0x%"PRIx64", shift=%"PRIu64
+>  spapr_h_resize_hpt_commit(uint64_t flags, uint64_t shift) "flags=0x%"PRIx64", shift=%"PRIu64
+> +spapr_update_dt(unsigned cb) "New blob %u bytes"
+> +spapr_update_dt_failed_size(unsigned cbold, unsigned cbnew, unsigned magic) "Old blob %u bytes, new blob %u bytes, magic 0x%x"
+> +spapr_update_dt_failed_check(unsigned cbold, unsigned cbnew, unsigned magic) "Old blob %u bytes, new blob %u bytes, magic 0x%x"
+>  
+>  # hw/ppc/spapr_iommu.c
+>  spapr_iommu_put(uint64_t liobn, uint64_t ioba, uint64_t tce, uint64_t ret) "liobn=0x%"PRIx64" ioba=0x%"PRIx64" tce=0x%"PRIx64" ret=%"PRId64
