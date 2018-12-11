@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gWmMY-0005hs-Px
+	(envelope-from <ehabkost@redhat.com>) id 1gWmMY-0005ho-Ob
 	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:02:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gWmMV-0005II-Oj
+	(envelope-from <ehabkost@redhat.com>) id 1gWmMV-0005Hb-Ed
 	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:02:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35508)
+Received: from mx1.redhat.com ([209.132.183.28]:41366)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gWmMV-00059T-Di
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gWmMT-00058D-9I
 	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:02:27 -0500
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Tue, 11 Dec 2018 16:01:19 -0200
-Message-Id: <20181211180129.7661-15-ehabkost@redhat.com>
+Date: Tue, 11 Dec 2018 16:01:18 -0200
+Message-Id: <20181211180129.7661-14-ehabkost@redhat.com>
 In-Reply-To: <20181211180129.7661-1-ehabkost@redhat.com>
 References: <20181211180129.7661-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 14/24] virt: Eliminate separate instance_init
- functions
+Subject: [Qemu-devel] [PULL 13/24] q35/440fx/arm/spapr: Add QEMU 4.0 machine
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,193 +25,219 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-All instance_init functions for all virt machine-types run
-exactly the same code, so we don't need separate functions.  We
-only need to set instance_init for TYPE_VIRT_MACHINE.
+From: Alex Williamson <alex.williamson@redhat.com>
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20181205205827.19387-2-ehabkost@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Including all machine types that might have a pcie-root-port.
+
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+Message-Id: <154394083644.28192.8501647946108201466.stgit@gimli.home>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+[ehabkost: fixed accidental recursion at spapr_machine_3_1_class_options()]
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/arm/virt.c | 87 +++++++++++++--------------------------------------
- 1 file changed, 21 insertions(+), 66 deletions(-)
+ include/hw/compat.h  |  3 +++
+ include/hw/i386/pc.h |  3 +++
+ hw/arm/virt.c        | 19 +++++++++++++++++--
+ hw/i386/pc_piix.c    | 15 ++++++++++++---
+ hw/i386/pc_q35.c     | 13 +++++++++++--
+ hw/ppc/spapr.c       | 25 ++++++++++++++++++++++---
+ 6 files changed, 68 insertions(+), 10 deletions(-)
 
+diff --git a/include/hw/compat.h b/include/hw/compat.h
+index 6f4d5fc647..70958328fe 100644
+--- a/include/hw/compat.h
++++ b/include/hw/compat.h
+@@ -1,6 +1,9 @@
+ #ifndef HW_COMPAT_H
+ #define HW_COMPAT_H
+ 
++#define HW_COMPAT_3_1 \
++    /* empty */
++
+ #define HW_COMPAT_3_0 \
+     /* empty */
+ 
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 7bb52b4762..9d29c4b1df 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -294,6 +294,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
+ int e820_get_num_entries(void);
+ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+ 
++#define PC_COMPAT_3_1 \
++    HW_COMPAT_3_1 \
++
+ #define PC_COMPAT_3_0 \
+     HW_COMPAT_3_0 \
+     {\
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index beaf6bc439..17f1b49d11 100644
+index f69e7eb399..beaf6bc439 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -74,7 +74,6 @@
-     static const TypeInfo machvirt_##major##_##minor##_info = { \
-         .name = MACHINE_TYPE_NAME("virt-" # major "." # minor), \
-         .parent = TYPE_VIRT_MACHINE, \
--        .instance_init = virt_##major##_##minor##_instance_init, \
-         .class_init = virt_##major##_##minor##_class_init, \
-     }; \
-     static void machvirt_machine_##major##_##minor##_init(void) \
-@@ -1778,26 +1777,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     hc->plug = virt_machine_device_plug_cb;
+@@ -1797,7 +1797,7 @@ static void machvirt_machine_init(void)
  }
+ type_init(machvirt_machine_init);
  
--static const TypeInfo virt_machine_info = {
--    .name          = TYPE_VIRT_MACHINE,
--    .parent        = TYPE_MACHINE,
--    .abstract      = true,
--    .instance_size = sizeof(VirtMachineState),
--    .class_size    = sizeof(VirtMachineClass),
--    .class_init    = virt_machine_class_init,
--    .interfaces = (InterfaceInfo[]) {
--         { TYPE_HOTPLUG_HANDLER },
--         { }
--    },
--};
--
--static void machvirt_machine_init(void)
--{
--    type_register_static(&virt_machine_info);
--}
--type_init(machvirt_machine_init);
--
--static void virt_4_0_instance_init(Object *obj)
-+static void virt_instance_init(Object *obj)
+-static void virt_3_1_instance_init(Object *obj)
++static void virt_4_0_instance_init(Object *obj)
  {
      VirtMachineState *vms = VIRT_MACHINE(obj);
      VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-@@ -1867,6 +1847,26 @@ static void virt_4_0_instance_init(Object *obj)
+@@ -1867,10 +1867,25 @@ static void virt_3_1_instance_init(Object *obj)
      vms->irqmap = a15irqmap;
  }
  
-+static const TypeInfo virt_machine_info = {
-+    .name          = TYPE_VIRT_MACHINE,
-+    .parent        = TYPE_MACHINE,
-+    .abstract      = true,
-+    .instance_size = sizeof(VirtMachineState),
-+    .class_size    = sizeof(VirtMachineClass),
-+    .class_init    = virt_machine_class_init,
-+	.instance_init = virt_instance_init,
-+    .interfaces = (InterfaceInfo[]) {
-+         { TYPE_HOTPLUG_HANDLER },
-+         { }
-+    },
-+};
-+
-+static void machvirt_machine_init(void)
++static void virt_machine_4_0_options(MachineClass *mc)
 +{
-+    type_register_static(&virt_machine_info);
 +}
-+type_init(machvirt_machine_init);
++DEFINE_VIRT_MACHINE_AS_LATEST(4, 0)
 +
- static void virt_machine_4_0_options(MachineClass *mc)
- {
- }
-@@ -1875,11 +1875,6 @@ DEFINE_VIRT_MACHINE_AS_LATEST(4, 0)
- #define VIRT_COMPAT_3_1 \
-     HW_COMPAT_3_1
- 
--static void virt_3_1_instance_init(Object *obj)
--{
--    virt_4_0_instance_init(obj);
--}
--
++#define VIRT_COMPAT_3_1 \
++    HW_COMPAT_3_1
++
++static void virt_3_1_instance_init(Object *obj)
++{
++    virt_4_0_instance_init(obj);
++}
++
  static void virt_machine_3_1_options(MachineClass *mc)
  {
-     virt_machine_4_0_options(mc);
-@@ -1890,11 +1885,6 @@ DEFINE_VIRT_MACHINE(3, 1)
++    virt_machine_4_0_options(mc);
++    SET_MACHINE_COMPAT(mc, VIRT_COMPAT_3_1);
+ }
+-DEFINE_VIRT_MACHINE_AS_LATEST(3, 1)
++DEFINE_VIRT_MACHINE(3, 1)
+ 
  #define VIRT_COMPAT_3_0 \
      HW_COMPAT_3_0
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 2d996162f1..d9b04c8427 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -429,21 +429,30 @@ static void pc_i440fx_machine_options(MachineClass *m)
+     machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
+ }
  
--static void virt_3_0_instance_init(Object *obj)
--{
--    virt_3_1_instance_init(obj);
--}
--
- static void virt_machine_3_0_options(MachineClass *mc)
+-static void pc_i440fx_3_1_machine_options(MachineClass *m)
++static void pc_i440fx_4_0_machine_options(MachineClass *m)
  {
-     virt_machine_3_1_options(mc);
-@@ -1905,11 +1895,6 @@ DEFINE_VIRT_MACHINE(3, 0)
- #define VIRT_COMPAT_2_12 \
-     HW_COMPAT_2_12
+     pc_i440fx_machine_options(m);
+     m->alias = "pc";
+     m->is_default = 1;
+ }
  
--static void virt_2_12_instance_init(Object *obj)
--{
--    virt_3_0_instance_init(obj);
--}
--
- static void virt_machine_2_12_options(MachineClass *mc)
- {
-     VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-@@ -1924,11 +1909,6 @@ DEFINE_VIRT_MACHINE(2, 12)
- #define VIRT_COMPAT_2_11 \
-     HW_COMPAT_2_11
++DEFINE_I440FX_MACHINE(v4_0, "pc-i440fx-4.0", NULL,
++                      pc_i440fx_4_0_machine_options);
++
++static void pc_i440fx_3_1_machine_options(MachineClass *m)
++{
++    pc_i440fx_4_0_machine_options(m);
++    m->is_default = 0;
++    m->alias = NULL;
++    SET_MACHINE_COMPAT(m, PC_COMPAT_3_1);
++}
++
+ DEFINE_I440FX_MACHINE(v3_1, "pc-i440fx-3.1", NULL,
+                       pc_i440fx_3_1_machine_options);
  
--static void virt_2_11_instance_init(Object *obj)
--{
--    virt_2_12_instance_init(obj);
--}
--
- static void virt_machine_2_11_options(MachineClass *mc)
+ static void pc_i440fx_3_0_machine_options(MachineClass *m)
  {
-     VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-@@ -1942,11 +1922,6 @@ DEFINE_VIRT_MACHINE(2, 11)
- #define VIRT_COMPAT_2_10 \
-     HW_COMPAT_2_10
+     pc_i440fx_3_1_machine_options(m);
+-    m->is_default = 0;
+-    m->alias = NULL;
+     SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
+ }
  
--static void virt_2_10_instance_init(Object *obj)
--{
--    virt_2_11_instance_init(obj);
--}
--
- static void virt_machine_2_10_options(MachineClass *mc)
- {
-     virt_machine_2_11_options(mc);
-@@ -1959,11 +1934,6 @@ DEFINE_VIRT_MACHINE(2, 10)
- #define VIRT_COMPAT_2_9 \
-     HW_COMPAT_2_9
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 6e3d81f5be..58459bdab5 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -311,19 +311,28 @@ static void pc_q35_machine_options(MachineClass *m)
+     m->max_cpus = 288;
+ }
  
--static void virt_2_9_instance_init(Object *obj)
--{
--    virt_2_10_instance_init(obj);
--}
--
- static void virt_machine_2_9_options(MachineClass *mc)
+-static void pc_q35_3_1_machine_options(MachineClass *m)
++static void pc_q35_4_0_machine_options(MachineClass *m)
  {
-     virt_machine_2_10_options(mc);
-@@ -1974,11 +1944,6 @@ DEFINE_VIRT_MACHINE(2, 9)
- #define VIRT_COMPAT_2_8 \
-     HW_COMPAT_2_8
+     pc_q35_machine_options(m);
+     m->alias = "q35";
+ }
  
--static void virt_2_8_instance_init(Object *obj)
--{
--    virt_2_9_instance_init(obj);
--}
--
- static void virt_machine_2_8_options(MachineClass *mc)
- {
-     VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-@@ -1995,11 +1960,6 @@ DEFINE_VIRT_MACHINE(2, 8)
- #define VIRT_COMPAT_2_7 \
-     HW_COMPAT_2_7
++DEFINE_Q35_MACHINE(v4_0, "pc-q35-4.0", NULL,
++                   pc_q35_4_0_machine_options);
++
++static void pc_q35_3_1_machine_options(MachineClass *m)
++{
++    pc_q35_4_0_machine_options(m);
++    m->alias = NULL;
++    SET_MACHINE_COMPAT(m, PC_COMPAT_3_1);
++}
++
+ DEFINE_Q35_MACHINE(v3_1, "pc-q35-3.1", NULL,
+                    pc_q35_3_1_machine_options);
  
--static void virt_2_7_instance_init(Object *obj)
--{
--    virt_2_8_instance_init(obj);
--}
--
- static void virt_machine_2_7_options(MachineClass *mc)
+ static void pc_q35_3_0_machine_options(MachineClass *m)
  {
-     VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-@@ -2016,11 +1976,6 @@ DEFINE_VIRT_MACHINE(2, 7)
- #define VIRT_COMPAT_2_6 \
-     HW_COMPAT_2_6
+     pc_q35_3_1_machine_options(m);
+-    m->alias = NULL;
+     SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
+ }
  
--static void virt_2_6_instance_init(Object *obj)
--{
--    virt_2_7_instance_init(obj);
--}
--
- static void virt_machine_2_6_options(MachineClass *mc)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 7afd1a175b..def3e502d8 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3956,19 +3956,38 @@ static const TypeInfo spapr_machine_info = {
+     }                                                                \
+     type_init(spapr_machine_register_##suffix)
+ 
+- /*
++/*
++ * pseries-4.0
++ */
++static void spapr_machine_4_0_instance_options(MachineState *machine)
++{
++}
++
++static void spapr_machine_4_0_class_options(MachineClass *mc)
++{
++    /* Defaults for the latest behaviour inherited from the base class */
++}
++
++DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
++
++/*
+  * pseries-3.1
+  */
++#define SPAPR_COMPAT_3_1                                              \
++    HW_COMPAT_3_1
++
+ static void spapr_machine_3_1_instance_options(MachineState *machine)
  {
-     VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
++    spapr_machine_4_0_instance_options(machine);
+ }
+ 
+ static void spapr_machine_3_1_class_options(MachineClass *mc)
+ {
+-    /* Defaults for the latest behaviour inherited from the base class */
++    spapr_machine_4_0_class_options(mc);
++    SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_3_1);
+ }
+ 
+-DEFINE_SPAPR_MACHINE(3_1, "3.1", true);
++DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
+ 
+ /*
+  * pseries-3.0
 -- 
 2.18.0.rc1.1.g3f1ff2140
