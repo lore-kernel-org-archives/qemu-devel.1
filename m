@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51291)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=87697dac6=Paul.Durrant@citrix.com>)
-	id 1gWkQF-0004bj-GM
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:58:18 -0500
+	id 1gWkQK-0004gB-5W
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:58:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=87697dac6=Paul.Durrant@citrix.com>)
-	id 1gWkQ9-0003Lb-Vh
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:58:11 -0500
+	id 1gWkQE-0003Sg-5p
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:58:15 -0500
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Tue, 11 Dec 2018 15:57:29 +0000
-Message-ID: <1544543862-9997-6-git-send-email-paul.durrant@citrix.com>
+Date: Tue, 11 Dec 2018 15:57:26 +0000
+Message-ID: <1544543862-9997-3-git-send-email-paul.durrant@citrix.com>
 In-Reply-To: <1544543862-9997-1-git-send-email-paul.durrant@citrix.com>
 References: <1544543862-9997-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 05/18] xen: add xenstore watcher
- infrastructure
+Subject: [Qemu-devel] [PATCH v4 02/18] xen: introduce new 'XenBus' and
+ 'XenDevice' object hierarchy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,591 +25,304 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-A Xen PV frontend communicates its state to the PV backend by writing to
-the 'state' key in the frontend area in xenstore. It is therefore
-necessary for a XenDevice implementation to be notified whenever the
-value of this key changes.
+This patch adds the basic boilerplate for a 'XenBus' object that will act
+as a parent to 'XenDevice' PV backends.
+A new 'XenBridge' object is also added to connect XenBus to the system bus.
 
-This patch adds code to do this as follows:
+The XenBus object is instantiated by a new xen_bus_init() function called
+from the same sites as the legacy xen_be_init() function.
 
-- an 'fd handler' is registered on the libxenstore handle which will be
-  triggered whenever a 'watch' event occurs
-- primitives are added to xen-bus-helper to add or remove watch events
-- a list of Notifier objects is added to XenBus to provide a mechanism
-  to call the appropriate 'watch handler' when its associated event
-  occurs
-
-The xen-block implementation is extended with a 'frontend_changed' method,
-which calls as-yet stub 'connect' and 'disconnect' functions when the
-relevant frontend state transitions occur. A subsequent patch will supply
-a full implementation for these functions.
+Subsequent patches will flesh-out the functionality of these objects.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
 ---
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
 Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 
 v3:
- - Remove unnecessary instances of local_err
+ - Don't use local_err unless it is needed
 
 v2:
- - Don't crash when xen_block_disconnect() fails
- - Check xs_unwatch() for error
- - Add new_watch() and free_watch() utility functions
- - Use xs_check_watch() rather than xs_read_watch()
+ - Fix boilerplate
+ - Make xen-bus hotplug capable
 ---
- hw/block/trace-events           |   2 +
- hw/block/xen-block.c            |  70 +++++++++++++
- hw/xen/trace-events             |   6 ++
- hw/xen/xen-bus-helper.c         |  34 +++++++
- hw/xen/xen-bus.c                | 211 +++++++++++++++++++++++++++++++++++++++-
- include/hw/xen/xen-bus-helper.h |   6 ++
- include/hw/xen/xen-bus.h        |  15 +++
- 7 files changed, 342 insertions(+), 2 deletions(-)
+ hw/i386/xen/xen-hvm.c     |   3 ++
+ hw/xen/Makefile.objs      |   2 +-
+ hw/xen/trace-events       |   6 +++
+ hw/xen/xen-bus.c          | 127 ++++++++++++++++++++++++++++++++++++++++++++++
+ hw/xenpv/xen_machine_pv.c |   3 ++
+ include/hw/xen/xen-bus.h  |  55 ++++++++++++++++++++
+ 6 files changed, 195 insertions(+), 1 deletion(-)
+ create mode 100644 hw/xen/xen-bus.c
+ create mode 100644 include/hw/xen/xen-bus.h
 
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index 4afbd62..89e2583 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -130,6 +130,8 @@ xen_disk_free(char *name) "%s"
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index 1d63763..4497f75 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -17,6 +17,7 @@
+ #include "hw/i386/apic-msidef.h"
+ #include "hw/xen/xen_common.h"
+ #include "hw/xen/xen-legacy-backend.h"
++#include "hw/xen/xen-bus.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-commands-misc.h"
+ #include "qemu/error-report.h"
+@@ -1479,6 +1480,8 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
+     QLIST_INIT(&state->dev_list);
+     device_listener_register(&state->device_listener);
  
- # hw/block/xen-block.c
- xen_block_realize(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
-+xen_block_connect(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
-+xen_block_disconnect(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
- xen_block_unrealize(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
- xen_disk_realize(void) ""
- xen_disk_unrealize(void) ""
-diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-index fa57bf1..5932672 100644
---- a/hw/block/xen-block.c
-+++ b/hw/block/xen-block.c
-@@ -21,6 +21,24 @@ static char *xen_block_get_name(XenDevice *xendev, Error **errp)
-     return g_strdup_printf("%lu", vdev->number);
- }
++    xen_bus_init();
++
+     /* Initialize backend core & drivers */
+     if (xen_be_init() != 0) {
+         error_report("xen backend core setup failed");
+diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
+index 3f64a44..d9d6d7b 100644
+--- a/hw/xen/Makefile.objs
++++ b/hw/xen/Makefile.objs
+@@ -1,5 +1,5 @@
+ # xen backend driver support
+-common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o
++common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o xen-bus.o
  
-+static void xen_block_disconnect(XenDevice *xendev, Error **errp)
-+{
-+    XenBlockDevice *blockdev = XEN_BLOCK_DEVICE(xendev);
-+    const char *type = object_get_typename(OBJECT(blockdev));
-+    XenBlockVdev *vdev = &blockdev->vdev;
-+
-+    trace_xen_block_disconnect(type, vdev->disk, vdev->partition);
-+}
-+
-+static void xen_block_connect(XenDevice *xendev, Error **errp)
-+{
-+    XenBlockDevice *blockdev = XEN_BLOCK_DEVICE(xendev);
-+    const char *type = object_get_typename(OBJECT(blockdev));
-+    XenBlockVdev *vdev = &blockdev->vdev;
-+
-+    trace_xen_block_connect(type, vdev->disk, vdev->partition);
-+}
-+
- static void xen_block_unrealize(XenDevice *xendev, Error **errp)
- {
-     XenBlockDevice *blockdev = XEN_BLOCK_DEVICE(xendev);
-@@ -35,6 +53,9 @@ static void xen_block_unrealize(XenDevice *xendev, Error **errp)
- 
-     trace_xen_block_unrealize(type, vdev->disk, vdev->partition);
- 
-+    /* Disconnect from the frontend in case this has not already happened */
-+    xen_block_disconnect(xendev, NULL);
-+
-     if (blockdev_class->unrealize) {
-         blockdev_class->unrealize(blockdev, errp);
-     }
-@@ -64,6 +85,54 @@ static void xen_block_realize(XenDevice *xendev, Error **errp)
-     }
- }
- 
-+static void xen_block_frontend_changed(XenDevice *xendev,
-+                                       enum xenbus_state frontend_state,
-+                                       Error **errp)
-+{
-+    enum xenbus_state backend_state = xen_device_backend_get_state(xendev);
-+    Error *local_err = NULL;
-+
-+    switch (frontend_state) {
-+    case XenbusStateInitialised:
-+    case XenbusStateConnected:
-+        if (backend_state == XenbusStateConnected) {
-+            break;
-+        }
-+
-+        xen_block_disconnect(xendev, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            break;
-+        }
-+
-+        xen_block_connect(xendev, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            break;
-+        }
-+
-+        xen_device_backend_set_state(xendev, XenbusStateConnected);
-+        break;
-+
-+    case XenbusStateClosing:
-+        xen_device_backend_set_state(xendev, XenbusStateClosing);
-+        break;
-+
-+    case XenbusStateClosed:
-+        xen_block_disconnect(xendev, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            break;
-+        }
-+
-+        xen_device_backend_set_state(xendev, XenbusStateClosed);
-+        break;
-+
-+    default:
-+        break;
-+    }
-+}
-+
- static char *disk_to_vbd_name(unsigned int disk)
- {
-     char *name, *prefix = (disk >= 26) ?
-@@ -272,6 +341,7 @@ static void xen_block_class_init(ObjectClass *class, void *data)
- 
-     xendev_class->get_name = xen_block_get_name;
-     xendev_class->realize = xen_block_realize;
-+    xendev_class->frontend_changed = xen_block_frontend_changed;
-     xendev_class->unrealize = xen_block_unrealize;
- 
-     dev_class->props = xen_block_props;
+ obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen-host-pci-device.o
+ obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt.o xen_pt_config_init.o xen_pt_graphics.o xen_pt_msi.o
 diff --git a/hw/xen/trace-events b/hw/xen/trace-events
-index 75dc226..22055b5 100644
+index c7e7a3b..0172cd4 100644
 --- a/hw/xen/trace-events
 +++ b/hw/xen/trace-events
-@@ -16,13 +16,19 @@ xen_domid_restrict(int err) "err: %u"
- # include/hw/xen/xen-bus.c
- xen_bus_realize(void) ""
- xen_bus_unrealize(void) ""
-+xen_bus_add_watch(const char *node, const char *key, char *token) "node: %s key: %s token: %s"
-+xen_bus_remove_watch(const char *node, const char *key, char *token) "node: %s key: %s token: %s"
-+xen_bus_watch(const char *token) "token: %s"
- xen_device_realize(const char *type, char *name) "type: %s name: %s"
- xen_device_unrealize(const char *type, char *name) "type: %s name: %s"
- xen_device_backend_state(const char *type, char *name, const char *state) "type: %s name: %s -> %s"
- xen_device_frontend_state(const char *type, char *name, const char *state) "type: %s name: %s -> %s"
-+xen_device_frontend_changed(const char *type, char *name) "type: %s name: %s"
- 
- # include/hw/xen/xen-bus-helper.c
- xs_node_create(const char *node) "%s"
- xs_node_destroy(const char *node) "%s"
- xs_node_vprintf(char *path, char *value) "%s %s"
- xs_node_vscanf(char *path, char *value) "%s %s"
-+xs_node_watch(char *path) "%s"
-+xs_node_unwatch(char *path) "%s"
-diff --git a/hw/xen/xen-bus-helper.c b/hw/xen/xen-bus-helper.c
-index 15b3ad8..5f7a4b2 100644
---- a/hw/xen/xen-bus-helper.c
-+++ b/hw/xen/xen-bus-helper.c
-@@ -148,3 +148,37 @@ int xs_node_scanf(struct xs_handle *xsh,  xs_transaction_t tid,
- 
-     return rc;
- }
+@@ -12,3 +12,9 @@ xen_unmap_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id:
+ xen_map_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
+ xen_unmap_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
+ xen_domid_restrict(int err) "err: %u"
 +
-+void xs_node_watch(struct xs_handle *xsh, const char *node, const char *key,
-+                   char *token, Error **errp)
-+{
-+    char *path;
-+
-+    path = (strlen(node) != 0) ? g_strdup_printf("%s/%s", node, key) :
-+        g_strdup(key);
-+
-+    trace_xs_node_watch(path);
-+
-+    if (!xs_watch(xsh, path, token)) {
-+        error_setg_errno(errp, errno, "failed to watch node '%s'", path);
-+    }
-+
-+    g_free(path);
-+}
-+
-+void xs_node_unwatch(struct xs_handle *xsh, const char *node,
-+                     const char *key, const char *token, Error **errp)
-+{
-+    char *path;
-+
-+    path = (strlen(node) != 0) ? g_strdup_printf("%s/%s", node, key) :
-+        g_strdup(key);
-+
-+    trace_xs_node_unwatch(path);
-+
-+    if (!xs_unwatch(xsh, path, token)) {
-+        error_setg_errno(errp, errno, "failed to unwatch node '%s'", path);
-+    }
-+
-+    g_free(path);
-+}
++# include/hw/xen/xen-bus.c
++xen_bus_realize(void) ""
++xen_bus_unrealize(void) ""
++xen_device_realize(const char *type) "type: %s"
++xen_device_unrealize(const char *type) "type: %s"
 diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-index 843fda2..5e19592 100644
---- a/hw/xen/xen-bus.c
+new file mode 100644
+index 0000000..bc04da7
+--- /dev/null
 +++ b/hw/xen/xen-bus.c
-@@ -6,6 +6,8 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/main-loop.h"
-+#include "qemu/uuid.h"
- #include "hw/hw.h"
- #include "hw/sysbus.h"
- #include "hw/xen/xen.h"
-@@ -59,6 +61,87 @@ static char *xen_bus_get_dev_path(DeviceState *dev)
-     return xen_device_get_backend_path(XEN_DEVICE(dev));
- }
- 
-+struct XenWatch {
-+    char *node, *key;
-+    char *token;
-+    XenWatchHandler handler;
-+    void *opaque;
-+    Notifier notifier;
+@@ -0,0 +1,127 @@
++/*
++ * Copyright (c) 2018  Citrix Systems Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/hw.h"
++#include "hw/sysbus.h"
++#include "hw/xen/xen-bus.h"
++#include "qapi/error.h"
++#include "trace.h"
++
++static void xen_bus_unrealize(BusState *bus, Error **errp)
++{
++    trace_xen_bus_unrealize();
++}
++
++static void xen_bus_realize(BusState *bus, Error **errp)
++{
++    trace_xen_bus_realize();
++}
++
++static void xen_bus_class_init(ObjectClass *class, void *data)
++{
++    BusClass *bus_class = BUS_CLASS(class);
++
++    bus_class->realize = xen_bus_realize;
++    bus_class->unrealize = xen_bus_unrealize;
++}
++
++static const TypeInfo xen_bus_type_info = {
++    .name = TYPE_XEN_BUS,
++    .parent = TYPE_BUS,
++    .instance_size = sizeof(XenBus),
++    .class_size = sizeof(XenBusClass),
++    .class_init = xen_bus_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_HOTPLUG_HANDLER },
++        { }
++    },
 +};
 +
-+static void watch_notify(Notifier *n, void *data)
++static void xen_device_unrealize(DeviceState *dev, Error **errp)
 +{
-+    XenWatch *watch = container_of(n, XenWatch, notifier);
-+    const char *token = data;
-+
-+    if (!strcmp(watch->token, token)) {
-+        watch->handler(watch->opaque);
-+    }
-+}
-+
-+static XenWatch *new_watch(const char *node, const char *key,
-+                           XenWatchHandler handler, void *opaque)
-+{
-+    XenWatch *watch = g_new0(XenWatch, 1);
-+    QemuUUID uuid;
-+
-+    qemu_uuid_generate(&uuid);
-+
-+    watch->token = qemu_uuid_unparse_strdup(&uuid);
-+    watch->node = g_strdup(node);
-+    watch->key = g_strdup(key);
-+    watch->handler = handler;
-+    watch->opaque = opaque;
-+    watch->notifier.notify = watch_notify;
-+
-+    return watch;
-+}
-+
-+static void free_watch(XenWatch *watch)
-+{
-+    g_free(watch->token);
-+    g_free(watch->key);
-+    g_free(watch->node);
-+
-+    g_free(watch);
-+}
-+
-+static XenWatch *xen_bus_add_watch(XenBus *xenbus, const char *node,
-+                                   const char *key, XenWatchHandler handler,
-+                                   void *opaque, Error **errp)
-+{
-+    XenWatch *watch = new_watch(node, key, handler, opaque);
-+    Error *local_err = NULL;
-+
-+    trace_xen_bus_add_watch(watch->node, watch->key, watch->token);
-+
-+    notifier_list_add(&xenbus->watch_notifiers, &watch->notifier);
-+
-+    xs_node_watch(xenbus->xsh, node, key, watch->token, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+
-+        notifier_remove(&watch->notifier);
-+        free_watch(watch);
-+
-+        return NULL;
-+    }
-+
-+    return watch;
-+}
-+
-+static void xen_bus_remove_watch(XenBus *xenbus, XenWatch *watch,
-+                                 Error **errp)
-+{
-+    trace_xen_bus_remove_watch(watch->node, watch->key, watch->token);
-+
-+    xs_node_unwatch(xenbus->xsh, watch->node, watch->key, watch->token,
-+                    errp);
-+
-+    notifier_remove(&watch->notifier);
-+    free_watch(watch);
-+}
-+
- static void xen_bus_unrealize(BusState *bus, Error **errp)
- {
-     XenBus *xenbus = XEN_BUS(bus);
-@@ -69,9 +152,33 @@ static void xen_bus_unrealize(BusState *bus, Error **errp)
-         return;
-     }
- 
-+    qemu_set_fd_handler(xs_fileno(xenbus->xsh), NULL, NULL, NULL);
-+
-     xs_close(xenbus->xsh);
- }
- 
-+static void xen_bus_watch(void *opaque)
-+{
-+    XenBus *xenbus = opaque;
-+    char **v;
-+    const char *token;
-+
-+    g_assert(xenbus->xsh);
-+
-+    v = xs_check_watch(xenbus->xsh);
-+    if (!v) {
-+        return;
-+    }
-+
-+    token = v[XS_WATCH_TOKEN];
-+
-+    trace_xen_bus_watch(token);
-+
-+    notifier_list_notify(&xenbus->watch_notifiers, (void *)token);
-+
-+    free(v);
-+}
-+
- static void xen_bus_realize(BusState *bus, Error **errp)
- {
-     XenBus *xenbus = XEN_BUS(bus);
-@@ -92,6 +199,9 @@ static void xen_bus_realize(BusState *bus, Error **errp)
-         xenbus->backend_id = 0; /* Assume lack of node means dom0 */
-     }
- 
-+    notifier_list_init(&xenbus->watch_notifiers);
-+    qemu_set_fd_handler(xs_fileno(xenbus->xsh), xen_bus_watch, NULL,
-+                        xenbus);
-     return;
- 
- fail:
-@@ -139,8 +249,25 @@ static void xen_device_backend_printf(XenDevice *xendev, const char *key,
-     }
- }
- 
--static void xen_device_backend_set_state(XenDevice *xendev,
--                                         enum xenbus_state state)
-+static int xen_device_backend_scanf(XenDevice *xendev, const char *key,
-+                                    const char *fmt, ...)
-+{
-+    XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-+    va_list ap;
-+    int rc;
-+
-+    g_assert(xenbus->xsh);
-+
-+    va_start(ap, fmt);
-+    rc = xs_node_vscanf(xenbus->xsh, XBT_NULL, xendev->backend_path, key,
-+                        NULL, fmt, ap);
-+    va_end(ap);
-+
-+    return rc;
-+}
-+
-+void xen_device_backend_set_state(XenDevice *xendev,
-+                                  enum xenbus_state state)
- {
-     const char *type = object_get_typename(OBJECT(xendev));
- 
-@@ -155,6 +282,11 @@ static void xen_device_backend_set_state(XenDevice *xendev,
-     xen_device_backend_printf(xendev, "state", "%u", state);
- }
- 
-+enum xenbus_state xen_device_backend_get_state(XenDevice *xendev)
-+{
-+    return xendev->backend_state;
-+}
-+
- static void xen_device_backend_create(XenDevice *xendev, Error **errp)
- {
-     XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-@@ -218,6 +350,23 @@ static void xen_device_frontend_printf(XenDevice *xendev, const char *key,
-     }
- }
- 
-+static int xen_device_frontend_scanf(XenDevice *xendev, const char *key,
-+                                     const char *fmt, ...)
-+{
-+    XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-+    va_list ap;
-+    int rc;
-+
-+    g_assert(xenbus->xsh);
-+
-+    va_start(ap, fmt);
-+    rc = xs_node_vscanf(xenbus->xsh, XBT_NULL, xendev->frontend_path, key,
-+                        NULL, fmt, ap);
-+    va_end(ap);
-+
-+    return rc;
-+}
-+
- static void xen_device_frontend_set_state(XenDevice *xendev,
-                                           enum xenbus_state state)
- {
-@@ -234,6 +383,50 @@ static void xen_device_frontend_set_state(XenDevice *xendev,
-     xen_device_frontend_printf(xendev, "state", "%u", state);
- }
- 
-+static void xen_device_frontend_changed(void *opaque)
-+{
-+    XenDevice *xendev = opaque;
++    XenDevice *xendev = XEN_DEVICE(dev);
 +    XenDeviceClass *xendev_class = XEN_DEVICE_GET_CLASS(xendev);
 +    const char *type = object_get_typename(OBJECT(xendev));
-+    enum xenbus_state state;
 +
-+    trace_xen_device_frontend_changed(type, xendev->name);
++    trace_xen_device_unrealize(type);
 +
-+    if (xen_device_frontend_scanf(xendev, "state", "%u", &state) != 1) {
-+        state = XenbusStateUnknown;
-+    }
-+
-+    xen_device_frontend_set_state(xendev, state);
-+
-+    if (xendev_class->frontend_changed) {
-+        Error *local_err = NULL;
-+
-+        xendev_class->frontend_changed(xendev, state, &local_err);
-+
-+        if (local_err) {
-+            error_reportf_err(local_err, "frontend change error: ");
-+        }
-+    }
-+
-+    /*
-+     * If a backend is still 'online' then its state should be cycled
-+     * back round to InitWait in order for a new frontend instance to
-+     * connect. This may happen when, for example, a frontend driver is
-+     * re-installed or updated.
-+     */
-+    if (xendev->backend_state == XenbusStateClosed) {
-+        unsigned int online;
-+
-+        if (xen_device_backend_scanf(xendev, "online", "%u", &online) != 1) {
-+            online = 0;
-+        }
-+
-+        if (online) {
-+            xen_device_backend_set_state(xendev, XenbusStateInitWait);
-+        }
++    if (xendev_class->unrealize) {
++        xendev_class->unrealize(xendev, errp);
 +    }
 +}
 +
- static void xen_device_frontend_create(XenDevice *xendev, Error **errp)
- {
-     XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-@@ -254,6 +447,15 @@ static void xen_device_frontend_create(XenDevice *xendev, Error **errp)
-     if (local_err) {
-         error_propagate_prepend(errp, local_err,
-                                 "failed to create frontend: ");
-+        return;
++static void xen_device_realize(DeviceState *dev, Error **errp)
++{
++    XenDevice *xendev = XEN_DEVICE(dev);
++    XenDeviceClass *xendev_class = XEN_DEVICE_GET_CLASS(xendev);
++    const char *type = object_get_typename(OBJECT(xendev));
++    Error *local_err = NULL;
++
++    trace_xen_device_realize(type);
++
++    if (xendev_class->realize) {
++        xendev_class->realize(xendev, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            goto unrealize;
++        }
 +    }
 +
-+    xendev->frontend_state_watch =
-+        xen_bus_add_watch(xenbus, xendev->frontend_path, "state",
-+                          xen_device_frontend_changed, xendev, &local_err);
-+    if (local_err) {
-+        error_propagate_prepend(errp, local_err,
-+                                "failed to watch frontend state: ");
++    return;
++
++unrealize:
++    xen_device_unrealize(dev, &error_abort);
++}
++
++static void xen_device_class_init(ObjectClass *class, void *data)
++{
++    DeviceClass *dev_class = DEVICE_CLASS(class);
++
++    dev_class->realize = xen_device_realize;
++    dev_class->unrealize = xen_device_unrealize;
++    dev_class->bus_type = TYPE_XEN_BUS;
++}
++
++static const TypeInfo xen_device_type_info = {
++    .name = TYPE_XEN_DEVICE,
++    .parent = TYPE_DEVICE,
++    .instance_size = sizeof(XenDevice),
++    .abstract = true,
++    .class_size = sizeof(XenDeviceClass),
++    .class_init = xen_device_class_init,
++};
++
++typedef struct XenBridge {
++    SysBusDevice busdev;
++} XenBridge;
++
++#define TYPE_XEN_BRIDGE "xen-bridge"
++
++static const TypeInfo xen_bridge_type_info = {
++    .name = TYPE_XEN_BRIDGE,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(XenBridge),
++};
++
++static void xen_register_types(void)
++{
++    type_register_static(&xen_bridge_type_info);
++    type_register_static(&xen_bus_type_info);
++    type_register_static(&xen_device_type_info);
++}
++
++type_init(xen_register_types)
++
++void xen_bus_init(void)
++{
++    DeviceState *dev = qdev_create(NULL, TYPE_XEN_BRIDGE);
++    BusState *bus = qbus_create(TYPE_XEN_BUS, dev, NULL);
++
++    qdev_init_nofail(dev);
++    qbus_set_bus_hotplug_handler(bus, &error_abort);
++}
+diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
+index 8c86fb7..608e591 100644
+--- a/hw/xenpv/xen_machine_pv.c
++++ b/hw/xenpv/xen_machine_pv.c
+@@ -27,6 +27,7 @@
+ #include "hw/hw.h"
+ #include "hw/boards.h"
+ #include "hw/xen/xen-legacy-backend.h"
++#include "hw/xen/xen-bus.h"
+ #include "xen_domainbuild.h"
+ #include "sysemu/block-backend.h"
+ 
+@@ -93,6 +94,8 @@ static void xen_init_pv(MachineState *machine)
+         xen_config_dev_nic(nd_table + i);
      }
+ 
++    xen_bus_init();
++
+     /* config cleanup hook */
+     atexit(xen_config_cleanup);
  }
- 
-@@ -262,6 +464,11 @@ static void xen_device_frontend_destroy(XenDevice *xendev)
-     XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-     Error *local_err = NULL;
- 
-+    if (xendev->frontend_state_watch) {
-+        xen_bus_remove_watch(xenbus, xendev->frontend_state_watch, NULL);
-+        xendev->frontend_state_watch = NULL;
-+    }
-+
-     if (!xendev->frontend_path) {
-         return;
-     }
-diff --git a/include/hw/xen/xen-bus-helper.h b/include/hw/xen/xen-bus-helper.h
-index 5cd9c3d..4c0f747 100644
---- a/include/hw/xen/xen-bus-helper.h
-+++ b/include/hw/xen/xen-bus-helper.h
-@@ -36,4 +36,10 @@ int xs_node_scanf(struct xs_handle *xsh,  xs_transaction_t tid,
-                   const char *node, const char *key, Error **errp,
-                   const char *fmt, ...);
- 
-+/* Watch node/key unless node is empty, in which case watch key */
-+void xs_node_watch(struct xs_handle *xsh, const char *node, const char *key,
-+                   char *token, Error **errp);
-+void xs_node_unwatch(struct xs_handle *xsh, const char *node, const char *key,
-+                     const char *token, Error **errp);
-+
- #endif /* HW_XEN_BUS_HELPER_H */
 diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-index 85a75d8..df73674 100644
---- a/include/hw/xen/xen-bus.h
+new file mode 100644
+index 0000000..0cb1246
+--- /dev/null
 +++ b/include/hw/xen/xen-bus.h
-@@ -10,6 +10,11 @@
- 
- #include "hw/xen/xen_common.h"
- #include "hw/sysbus.h"
-+#include "qemu/notify.h"
+@@ -0,0 +1,55 @@
++/*
++ * Copyright (c) 2018  Citrix Systems Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +
-+typedef void (*XenWatchHandler)(void *opaque);
++#ifndef HW_XEN_BUS_H
++#define HW_XEN_BUS_H
 +
-+typedef struct XenWatch XenWatch;
- 
- typedef struct XenDevice {
-     DeviceState qdev;
-@@ -18,10 +23,14 @@ typedef struct XenDevice {
-     char *backend_path, *frontend_path;
-     enum xenbus_state backend_state, frontend_state;
-     Notifier exit;
-+    XenWatch *frontend_state_watch;
- } XenDevice;
- 
- typedef char *(*XenDeviceGetName)(XenDevice *xendev, Error **errp);
- typedef void (*XenDeviceRealize)(XenDevice *xendev, Error **errp);
-+typedef void (*XenDeviceFrontendChanged)(XenDevice *xendev,
-+                                         enum xenbus_state frontend_state,
-+                                         Error **errp);
- typedef void (*XenDeviceUnrealize)(XenDevice *xendev, Error **errp);
- 
- typedef struct XenDeviceClass {
-@@ -32,6 +41,7 @@ typedef struct XenDeviceClass {
-     const char *device;
-     XenDeviceGetName get_name;
-     XenDeviceRealize realize;
-+    XenDeviceFrontendChanged frontend_changed;
-     XenDeviceUnrealize unrealize;
- } XenDeviceClass;
- 
-@@ -47,6 +57,7 @@ typedef struct XenBus {
-     BusState qbus;
-     domid_t backend_id;
-     struct xs_handle *xsh;
-+    NotifierList watch_notifiers;
- } XenBus;
- 
- typedef struct XenBusClass {
-@@ -64,4 +75,8 @@ typedef struct XenBusClass {
- 
- void xen_bus_init(void);
- 
-+void xen_device_backend_set_state(XenDevice *xendev,
-+                                  enum xenbus_state state);
-+enum xenbus_state xen_device_backend_get_state(XenDevice *xendev);
++#include "hw/sysbus.h"
 +
- #endif /* HW_XEN_BUS_H */
++typedef struct XenDevice {
++    DeviceState qdev;
++} XenDevice;
++
++typedef void (*XenDeviceRealize)(XenDevice *xendev, Error **errp);
++typedef void (*XenDeviceUnrealize)(XenDevice *xendev, Error **errp);
++
++typedef struct XenDeviceClass {
++    /*< private >*/
++    DeviceClass parent_class;
++    /*< public >*/
++    XenDeviceRealize realize;
++    XenDeviceUnrealize unrealize;
++} XenDeviceClass;
++
++#define TYPE_XEN_DEVICE "xen-device"
++#define XEN_DEVICE(obj) \
++     OBJECT_CHECK(XenDevice, (obj), TYPE_XEN_DEVICE)
++#define XEN_DEVICE_CLASS(class) \
++     OBJECT_CLASS_CHECK(XenDeviceClass, (class), TYPE_XEN_DEVICE)
++#define XEN_DEVICE_GET_CLASS(obj) \
++     OBJECT_GET_CLASS(XenDeviceClass, (obj), TYPE_XEN_DEVICE)
++
++typedef struct XenBus {
++    BusState qbus;
++} XenBus;
++
++typedef struct XenBusClass {
++    /*< private >*/
++    BusClass parent_class;
++} XenBusClass;
++
++#define TYPE_XEN_BUS "xen-bus"
++#define XEN_BUS(obj) \
++    OBJECT_CHECK(XenBus, (obj), TYPE_XEN_BUS)
++#define XEN_BUS_CLASS(class) \
++    OBJECT_CLASS_CHECK(XenBusClass, (class), TYPE_XEN_BUS)
++#define XEN_BUS_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(XenBusClass, (obj), TYPE_XEN_BUS)
++
++void xen_bus_init(void);
++
++#endif /* HW_XEN_BUS_H */
 -- 
 2.1.4
