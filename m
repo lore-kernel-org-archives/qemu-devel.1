@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=8761f1f8f=anthony.perard@citrix.com>)
-	id 1gWjrM-0005CV-38
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:22:09 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gWjs4-0005oH-7J
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:22:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=8761f1f8f=anthony.perard@citrix.com>)
-	id 1gWjrK-0002MJ-Fl
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:22:08 -0500
-Date: Tue, 11 Dec 2018 15:21:29 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20181211152129.GS18875@perard.uk.xensource.com>
-References: <1544525238-3527-1-git-send-email-paul.durrant@citrix.com>
-	<1544525238-3527-6-git-send-email-paul.durrant@citrix.com>
+	(envelope-from <yuval.shaia@oracle.com>) id 1gWjrz-0002um-3E
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:22:52 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:35976)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1gWjry-0002tp-Ne
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:22:46 -0500
+Date: Tue, 11 Dec 2018 17:22:32 +0200
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20181211152231.GB28105@lap1>
+References: <20181211132642.3027-1-ppandit@redhat.com>
+	<20181211132642.3027-3-ppandit@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1544525238-3527-6-git-send-email-paul.durrant@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH v3 05/18] xen: add xenstore watcher
- infrastructure
+In-Reply-To: <20181211132642.3027-3-ppandit@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/5] pvrdma: add uar_read routine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,32 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+To: P J P <ppandit@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Saar Amar <saaramar5@gmail.com>, Li Qiang <liq3ea@163.com>, Prasad J Pandit <pjp@fedoraproject.org>, yuval.shaia@oracle.com
 
-On Tue, Dec 11, 2018 at 10:47:05AM +0000, Paul Durrant wrote:
-> A Xen PV frontend communicates its state to the PV backend by writing to
-> the 'state' key in the frontend area in xenstore. It is therefore
-> necessary for a XenDevice implementation to be notified whenever the
-> value of this key changes.
+On Tue, Dec 11, 2018 at 06:56:39PM +0530, P J P wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
 > 
-> This patch adds code to do this as follows:
+> Define skeleton 'uar_read' routine. Avoid NULL dereference.
 > 
-> - an 'fd handler' is registered on the libxenstore handle which will be
->   triggered whenever a 'watch' event occurs
-> - primitives are added to xen-bus-helper to add or remove watch events
-> - a list of Notifier objects is added to XenBus to provide a mechanism
->   to call the appropriate 'watch handler' when its associated event
->   occurs
+> Reported-by: Li Qiang <liq3ea@163.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> ---
+>  hw/rdma/vmw/pvrdma_main.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
-> The xen-block implementation is extended with a 'frontend_changed' method,
-> which calls as-yet stub 'connect' and 'disconnect' functions when the
-> relevant frontend state transitions occur. A subsequent patch will supply
-> a full implementation for these functions.
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+> index ca5fa8d981..a6211d416d 100644
+> --- a/hw/rdma/vmw/pvrdma_main.c
+> +++ b/hw/rdma/vmw/pvrdma_main.c
+> @@ -455,6 +455,11 @@ static const MemoryRegionOps regs_ops = {
+>      },
+>  };
+>  
+> +static uint64_t uar_read(void *opaque, hwaddr addr, unsigned size)
+> +{
+> +    return 0;
+> +}
+> +
+>  static void uar_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+>  {
+>      PVRDMADev *dev = opaque;
+> @@ -496,6 +501,7 @@ static void uar_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+>  }
+>  
+>  static const MemoryRegionOps uar_ops = {
+> +    .read = uar_read,
 
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
+Are you sure it is needed?
+Looking at memory_region_dispatch_read1 i can see that there is a check but
+not sure this is the right place. Anyways, if it is not, i believe this
+should be framework responsibility.
 
--- 
-Anthony PERARD
+>      .write = uar_write,
+>      .endianness = DEVICE_LITTLE_ENDIAN,
+>      .impl = {
+> -- 
+> 2.19.2
+> 
