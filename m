@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWk3Y-0007tm-Ny
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:34:45 -0500
+	(envelope-from <armbru@redhat.com>) id 1gWk48-0008K9-0W
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:35:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWk3Y-0006ST-3r
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:34:44 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:40842)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gWk3X-0006Qm-Mo
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:34:44 -0500
-Received: by mail-oi1-x244.google.com with SMTP id t204so12309306oie.7
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 07:34:42 -0800 (PST)
+	(envelope-from <armbru@redhat.com>) id 1gWk45-0007Bt-RM
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:35:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33130)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gWk45-00079c-KD
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:35:17 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181208111606.8505-1-marcandre.lureau@redhat.com>
+	<20181208111606.8505-14-marcandre.lureau@redhat.com>
+	<87a7lde1lg.fsf@dusky.pond.sub.org>
+	<CAJ+F1CKFipFDJcO=cFwAUO+7Y_dx7-DbJgfaBwyk9zJj=XR3dw@mail.gmail.com>
+Date: Tue, 11 Dec 2018 16:35:13 +0100
+In-Reply-To: <CAJ+F1CKFipFDJcO=cFwAUO+7Y_dx7-DbJgfaBwyk9zJj=XR3dw@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 11 Dec 2018
+	16:11:00 +0400")
+Message-ID: <87efaooz4e.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20181207103631.28193-1-richard.henderson@linaro.org>
-	<20181207103631.28193-11-richard.henderson@linaro.org>
-In-Reply-To: <20181207103631.28193-11-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 11 Dec 2018 15:34:30 +0000
-Message-ID: <CAFEAcA-=3MWWhhjTpq22OGYqPdg=pb=z8DsR07geDzhodRHNeg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 10/26] target/arm: Add new_pc argument to
- helper_exception_return
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v7 13/27] qapi: add a dictionary
+ form for TYPE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,20 +32,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Fri, 7 Dec 2018 at 10:36, Richard Henderson
-<richard.henderson@linaro.org> wrote:
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+
+> Hi
 >
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/helper-a64.h    |  2 +-
->  target/arm/helper-a64.c    | 10 +++++-----
->  target/arm/translate-a64.c |  7 ++++++-
->  3 files changed, 12 insertions(+), 7 deletions(-)
+> On Mon, Dec 10, 2018 at 9:26 PM Markus Armbruster <armbru@redhat.com> wro=
+te:
+[...]
+>> Looks good, but I'd like to investigate whether my suggested placement
+>> of the normalization would simplify things before I give my R-by.
+>>
+>
+> I am not sure I follow, you suggest to have normalization before
+> check? Then how can we produce an error that reflects the input
+> accurately? Should we carry additional information (original form etc)
+> on the source during normalization?
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+Let me play with it.  If my idea works out, showing it to you will be
+easier than explaining it.  If it doesn't, ditching it quietly will also
+be easier than explaining it :)
