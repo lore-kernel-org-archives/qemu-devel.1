@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=87697dac6=Paul.Durrant@citrix.com>)
-	id 1gWk87-0003MH-VC
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:39:28 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gWk9A-0004BY-CI
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:40:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=87697dac6=Paul.Durrant@citrix.com>)
-	id 1gWk83-0002Bm-Sz
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:39:27 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Tue, 11 Dec 2018 15:38:52 +0000
-Message-ID: <289322a222fa426faf953c88274d4b2f@AMSPEX02CL03.citrite.net>
-References: <1544525238-3527-1-git-send-email-paul.durrant@citrix.com>
-	<1544525238-3527-10-git-send-email-paul.durrant@citrix.com>
-	<20181211153021.GA16149@perard.uk.xensource.com>
-In-Reply-To: <20181211153021.GA16149@perard.uk.xensource.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <peter.maydell@linaro.org>) id 1gWk98-00032v-Gr
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:40:31 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:35803)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gWk98-00031k-9f
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:40:30 -0500
+Received: by mail-oi1-x242.google.com with SMTP id v6so12355826oif.2
+	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 07:40:30 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH v3 09/18] xen: remove
- unnecessary code from dataplane/xen-block.c
+References: <20181207103631.28193-1-richard.henderson@linaro.org>
+	<20181207103631.28193-12-richard.henderson@linaro.org>
+In-Reply-To: <20181207103631.28193-12-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 11 Dec 2018 15:40:18 +0000
+Message-ID: <CAFEAcA_rRBJNoSkVQXj=+-69aBOk7OAZyzUUKyvf4NQjg=g3iA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 11/26] target/arm: Rearrange decode in
+ disas_uncond_b_reg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +30,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony Perard <anthony.perard@citrix.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Kevin Wolf <kwolf@redhat.com>, Stefano
-	Stabellini <sstabellini@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
 
-> -----Original Message-----
-> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
-> Sent: 11 December 2018 15:30
-> To: Paul Durrant <Paul.Durrant@citrix.com>
-> Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
-> devel@lists.xenproject.org; Kevin Wolf <kwolf@redhat.com>; Stefano
-> Stabellini <sstabellini@kernel.org>; Stefan Hajnoczi
-> <stefanha@redhat.com>; Max Reitz <mreitz@redhat.com>
-> Subject: Re: [Xen-devel] [PATCH v3 09/18] xen: remove unnecessary code
-> from dataplane/xen-block.c
->=20
-> On Tue, Dec 11, 2018 at 10:47:09AM +0000, Paul Durrant wrote:
-> > v2:
-> >  - Leave existing boilerplate alone, other than removing the now-
-> incorrect
-> >    description
-> > ---
-> >  hw/block/dataplane/xen-block.c | 409 ++-------------------------------=
--
-> -------
-> >  1 file changed, 16 insertions(+), 393 deletions(-)
-> >
-> > diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-
-> block.c
-> > index 9fae505..98f987d 100644
-> > --- a/hw/block/dataplane/xen-block.c
-> > +++ b/hw/block/dataplane/xen-block.c
-> > @@ -1,6 +1,4 @@
-> >  /*
-> > - *  xen paravirt block device backend
-> > - *
-> >   *  (c) Gerd Hoffmann <kraxel@redhat.com>
-> >   *
-> >   *  This program is free software; you can redistribute it and/or
-> modify
-> > @@ -19,26 +17,12 @@
-> >   *  GNU GPL, version 2 or (at your option) any later version.
-> >   */
-> >
-> > +/*
-> > + * Copyright (c) 2018  Citrix Systems Inc.
->=20
-> Can you move this copyright line to the existing license boilerplate as
-> I've asked on v2?
->=20
+On Fri, 7 Dec 2018 at 10:36, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> This will enable PAuth decode in a subsequent patch.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/translate-a64.c | 34 +++++++++++++++++++++++-----------
+>  1 file changed, 23 insertions(+), 11 deletions(-)
+>
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index c84c2dbb66..5fa2647771 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -1989,32 +1989,41 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
+>      rn = extract32(insn, 5, 5);
+>      op4 = extract32(insn, 0, 5);
+>
+> -    if (op4 != 0x0 || op3 != 0x0 || op2 != 0x1f) {
+> -        unallocated_encoding(s);
+> -        return;
+> +    if (op2 != 0x1f) {
+> +        goto do_unallocated;
+>      }
+>
+>      switch (opc) {
+>      case 0: /* BR */
+>      case 1: /* BLR */
+>      case 2: /* RET */
+> -        gen_a64_set_pc(s, cpu_reg(s, rn));
+> +        if (op3 == 0 && op4 == 0) {
+> +            dst = cpu_reg(s, rn);
+> +        } else {
+> +            goto do_unallocated;
+> +        }
+> +        gen_a64_set_pc(s, dst);
+>          /* BLR also needs to load return address */
+>          if (opc == 1) {
+>              tcg_gen_movi_i64(cpu_reg(s, 30), s->pc);
+>          }
+>          break;
+> +
+>      case 4: /* ERET */
+>          if (s->current_el == 0) {
+> -            unallocated_encoding(s);
+> -            return;
+> -        }
+> -        if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
+> -            gen_io_start();
+> +            goto do_unallocated;
+>          }
+>          dst = tcg_temp_new_i64();
+>          tcg_gen_ld_i64(dst, cpu_env,
+>                         offsetof(CPUARMState, elr_el[s->current_el]));
+> +        if (op3 == 0 && op4 == 0) {
+> +            ;
+> +        } else {
+> +            goto do_unallocated;
 
-Oops. I thought I'd done this.
 
-> > + *
-> > + * This work is licensed under the terms of the GNU GPL, version 2 or
-> later.
-> > + * See the COPYING file in the top-level directory.
->=20
-> And this isn't needed as it just duplicate the already existing one.
->=20
+This decode check should go before any code has been
+emittede (ie before the tcg_gen_ld_i64 above it).
 
-Sure. I'll send v4 with both these fixed.
+> +        }
+> +        if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
+> +            gen_io_start();
+> +        }
+>          gen_helper_exception_return(cpu_env, dst);
+>          tcg_temp_free_i64(dst);
+>          if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
+> @@ -2023,14 +2032,17 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
+>          /* Must exit loop to check un-masked IRQs */
+>          s->base.is_jmp = DISAS_EXIT;
+>          return;
+> +
+>      case 5: /* DRPS */
+> -        if (rn != 0x1f) {
+> -            unallocated_encoding(s);
+> +        if (op3 != 0 || op4 != 0 || rn != 0x1f) {
+> +            goto do_unallocated;
+>          } else {
+>              unsupported_encoding(s, insn);
+>          }
+>          return;
+> +
+>      default:
+> +    do_unallocated:
+>          unallocated_encoding(s);
+>          return;
+>      }
 
-  Paul
-
-> > + */
-> >
->=20
-> Thanks,
->=20
-> --
-> Anthony PERARD
+thanks
+-- PMM
