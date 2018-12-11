@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=8761f1f8f=anthony.perard@citrix.com>)
-	id 1gWjzZ-0004Z9-3t
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:30:37 -0500
+	(envelope-from <olaf@aepfle.de>) id 1gWjzt-0004pp-PW
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:30:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=8761f1f8f=anthony.perard@citrix.com>)
-	id 1gWjzT-00038O-Ix
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:30:37 -0500
-Date: Tue, 11 Dec 2018 15:30:21 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20181211153021.GA16149@perard.uk.xensource.com>
-References: <1544525238-3527-1-git-send-email-paul.durrant@citrix.com>
-	<1544525238-3527-10-git-send-email-paul.durrant@citrix.com>
+	(envelope-from <olaf@aepfle.de>) id 1gWjzp-0003Lu-2A
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:30:57 -0500
+Received: from mo6-p00-ob.smtp.rzone.de ([2a01:238:20a:202:5300::7]:17558)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <olaf@aepfle.de>) id 1gWjzo-0003Jh-FI
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:30:52 -0500
+Date: Tue, 11 Dec 2018 16:30:47 +0100
+From: Olaf Hering <olaf@aepfle.de>
+Message-ID: <20181211153047.GB18447@aepfle.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="R3G7APHDIzY6R/pk"
 Content-Disposition: inline
-In-Reply-To: <1544525238-3527-10-git-send-email-paul.durrant@citrix.com>
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH v3 09/18] xen: remove
- unnecessary code from dataplane/xen-block.c
+Subject: [Qemu-devel] memory leak in block/xen_disk in qemu-3.x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,48 +25,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org, Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
 
-On Tue, Dec 11, 2018 at 10:47:09AM +0000, Paul Durrant wrote:
-> v2:
->  - Leave existing boilerplate alone, other than removing the now-incorrect
->    description
-> ---
->  hw/block/dataplane/xen-block.c | 409 ++---------------------------------------
->  1 file changed, 16 insertions(+), 393 deletions(-)
-> 
-> diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-block.c
-> index 9fae505..98f987d 100644
-> --- a/hw/block/dataplane/xen-block.c
-> +++ b/hw/block/dataplane/xen-block.c
-> @@ -1,6 +1,4 @@
->  /*
-> - *  xen paravirt block device backend
-> - *
->   *  (c) Gerd Hoffmann <kraxel@redhat.com>
->   *
->   *  This program is free software; you can redistribute it and/or modify
-> @@ -19,26 +17,12 @@
->   *  GNU GPL, version 2 or (at your option) any later version.
->   */
->  
-> +/*
-> + * Copyright (c) 2018  Citrix Systems Inc.
 
-Can you move this copyright line to the existing license boilerplate as
-I've asked on v2?
+--R3G7APHDIzY6R/pk
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
+What are the live time rules of ioreq->buf?
 
-And this isn't needed as it just duplicate the already existing one.
+In my testing the memory usage of qemu is constantly growing from about
+250MB to several GB after a few days.
 
-> + */
->  
+Some debugging shows that ioreq_runio_qemu_aio() overwrites ioreq->buf,
+which contributes to the leak. In addition, ioreq_reset() also just
+globbers iorew->buf. While this was observed with a backport of xen_disk
+changes to qemu-2.9, the code in xen_disk.c did not change in this
+regard. I changed the code to call qemu_vfree(ioreq->buf) in the few
+places that globber the pointer, that fixes the leak for me.
 
-Thanks,
+Right now neither qemu-3.0 nor 3.1 for me, so I can not test
+qemu.git#master if it eventually behaves different than
+qemu.git#stable-2.9+backport.
 
--- 
-Anthony PERARD
+Olaf
+
+--R3G7APHDIzY6R/pk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQSkRyP6Rn//f03pRUBdQqD6ppg2fgUCXA/YJQAKCRBdQqD6ppg2
+flJmAKCgJg3Pwe/+iJOGnJ+k7JBe/ZRmTACeIqEF7lhpQ2PtBti0q4o6q0XRVMA=
+=ds9E
+-----END PGP SIGNATURE-----
+
+--R3G7APHDIzY6R/pk--
