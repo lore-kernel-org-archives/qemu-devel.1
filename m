@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1gWdrb-0002SS-Rm
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 03:58:00 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1gWdre-0002TP-Hc
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 03:58:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1gWdrY-0006EO-GT
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 03:57:59 -0500
-Received: from mga07.intel.com ([134.134.136.100]:27013)
+	(envelope-from <wei.w.wang@intel.com>) id 1gWdrd-0006Ir-1Y
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 03:58:02 -0500
+Received: from mga07.intel.com ([134.134.136.100]:27021)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1gWdrY-0006Ck-6A
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 03:57:56 -0500
+	id 1gWdrc-0006FH-M8
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 03:58:00 -0500
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Tue, 11 Dec 2018 16:24:46 +0800
-Message-Id: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v11 0/7] virtio-balloon: free page hint support
+Date: Tue, 11 Dec 2018 16:24:50 +0800
+Message-Id: <1544516693-5395-5-git-send-email-wei.w.wang@intel.com>
+In-Reply-To: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
+References: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
+Subject: [Qemu-devel] [PATCH v11 4/7] migration: API to clear bits of guest
+ free pages from the dirty bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,74 +28,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 Cc: pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com, wei.w.wang@intel.com
 
-This is the deivce part implementation to add a new feature,
-VIRTIO_BALLOON_F_FREE_PAGE_HINT to the virtio-balloon device. The device
-receives the guest free page hints from the driver and clears the
-corresponding bits in the dirty bitmap, so that those free pages are
-not sent by the migration thread to the destination.
+This patch adds an API to clear bits corresponding to guest free pages
+from the dirty bitmap. Spilt the free page block if it crosses the QEMU
+RAMBlock boundary.
 
-*Tests
-1 Test Environment
-    Host: Intel(R) Xeon(R) CPU E5-2699 v4 @ 2.20GHz
-    Migration setup: migrate_set_speed 100G, migrate_set_downtime 400ms
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+CC: Juan Quintela <quintela@redhat.com>
+CC: Michael S. Tsirkin <mst@redhat.com>
+CC: Peter Xu <peterx@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+---
+ include/migration/misc.h |  2 ++
+ migration/ram.c          | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 49 insertions(+)
 
-2 Test Results (results are averaged over several repeated runs)
-    2.1 Guest setup: 8G RAM, 4 vCPU
-        2.1.1 Idle guest live migration time
-            Optimization v.s. Legacy = 620ms vs 2970ms
-            --> ~79% reduction
-        2.1.2 Guest live migration with Linux compilation workload
-          (i.e. make bzImage -j4) running
-          1) Live Migration Time:
-             Optimization v.s. Legacy = 2273ms v.s. 4502ms
-             --> ~50% reduction
-          2) Linux Compilation Time:
-             Optimization v.s. Legacy = 8min42s v.s. 8min43s
-             --> no obvious difference
-
-    2.2 Guest setup: 128G RAM, 4 vCPU
-        2.2.1 Idle guest live migration time
-            Optimization v.s. Legacy = 5294ms vs 41651ms
-            --> ~87% reduction
-        2.2.2 Guest live migration with Linux compilation workload
-          1) Live Migration Time:
-            Optimization v.s. Legacy = 8816ms v.s. 54201ms
-            --> 84% reduction
-          2) Linux Compilation Time:
-            Optimization v.s. Legacy = 8min30s v.s. 8min36s
-            --> no obvious difference
-
-ChangeLog:
-v10->v11:
-migration:
-    - qemu_guest_free_page_hint:
-        - "offset >= block->used_length", instead of
-          "offset > block->used_length";
-    - RAMState: enable the "fpo_enabled" flag, when the free page
-      optimization feature is used, instead of disabling ram_bulk_stage.
-      Please see patch 6 commit log for details.
-
-Previous changelog:
-http://lists.nongnu.org/archive/html/qemu-devel/2018-12/msg00055.html
-
-Wei Wang (7):
-  bitmap: fix bitmap_count_one
-  bitmap: bitmap_count_one_with_offset
-  migration: use bitmap_mutex in migration_bitmap_clear_dirty
-  migration: API to clear bits of guest free pages from the dirty bitmap
-  migration/ram.c: add a notifier chain for precopy
-  migration/ram.c: add the free page optimization enable flag
-  virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT
-
- hw/virtio/virtio-balloon.c                      | 263 ++++++++++++++++++++++++
- include/hw/virtio/virtio-balloon.h              |  28 ++-
- include/migration/misc.h                        |  22 ++
- include/qemu/bitmap.h                           |  17 ++
- include/standard-headers/linux/virtio_balloon.h |   5 +
- migration/ram.c                                 | 121 ++++++++++-
- migration/savevm.c                              |  15 ++
- vl.c                                            |   1 +
- 8 files changed, 466 insertions(+), 6 deletions(-)
-
+diff --git a/include/migration/misc.h b/include/migration/misc.h
+index 4ebf24c..113320e 100644
+--- a/include/migration/misc.h
++++ b/include/migration/misc.h
+@@ -14,11 +14,13 @@
+ #ifndef MIGRATION_MISC_H
+ #define MIGRATION_MISC_H
+ 
++#include "exec/cpu-common.h"
+ #include "qemu/notify.h"
+ 
+ /* migration/ram.c */
+ 
+ void ram_mig_init(void);
++void qemu_guest_free_page_hint(void *addr, size_t len);
+ 
+ /* migration/block.c */
+ 
+diff --git a/migration/ram.c b/migration/ram.c
+index 01d267f..c13b44f 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -3131,6 +3131,53 @@ static void ram_state_resume_prepare(RAMState *rs, QEMUFile *out)
+ }
+ 
+ /*
++ * This function clears bits of the free pages reported by the caller from the
++ * migration dirty bitmap. @addr is the host address corresponding to the
++ * start of the continuous guest free pages, and @len is the total bytes of
++ * those pages.
++ */
++void qemu_guest_free_page_hint(void *addr, size_t len)
++{
++    RAMBlock *block;
++    ram_addr_t offset;
++    size_t used_len, start, npages;
++    MigrationState *s = migrate_get_current();
++
++    /* This function is currently expected to be used during live migration */
++    if (!migration_is_setup_or_active(s->state)) {
++        return;
++    }
++
++    for (; len > 0; len -= used_len, addr += used_len) {
++        block = qemu_ram_block_from_host(addr, false, &offset);
++        if (unlikely(!block || offset >= block->used_length)) {
++            /*
++             * The implementation might not support RAMBlock resize during
++             * live migration, but it could happen in theory with future
++             * updates. So we add a check here to capture that case.
++             */
++            error_report_once("%s unexpected error", __func__);
++            return;
++        }
++
++        if (len <= block->used_length - offset) {
++            used_len = len;
++        } else {
++            used_len = block->used_length - offset;
++        }
++
++        start = offset >> TARGET_PAGE_BITS;
++        npages = used_len >> TARGET_PAGE_BITS;
++
++        qemu_mutex_lock(&ram_state->bitmap_mutex);
++        ram_state->migration_dirty_pages -=
++                      bitmap_count_one_with_offset(block->bmap, start, npages);
++        bitmap_clear(block->bmap, start, npages);
++        qemu_mutex_unlock(&ram_state->bitmap_mutex);
++    }
++}
++
++/*
+  * Each of ram_save_setup, ram_save_iterate and ram_save_complete has
+  * long-running RCU critical section.  When rcu-reclaims in the code
+  * start to become numerous it will be necessary to reduce the
 -- 
 1.8.3.1
