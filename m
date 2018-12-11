@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49487)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gWXbm-0008Hy-Jh
-	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 21:17:17 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gWXbo-0008Mn-SD
+	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 21:17:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gWXRQ-0006ku-B1
+	(envelope-from <dgibson@ozlabs.org>) id 1gWXRQ-0006l0-CF
 	for qemu-devel@nongnu.org; Mon, 10 Dec 2018 21:06:35 -0500
-Date: Tue, 11 Dec 2018 13:03:50 +1100
+Date: Tue, 11 Dec 2018 13:06:20 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181211020350.GF4261@umbus.fritz.box>
+Message-ID: <20181211020620.GG4261@umbus.fritz.box>
 References: <20181209194610.29727-1-clg@kaod.org>
-	<20181209194610.29727-17-clg@kaod.org>
+	<20181209194610.29727-19-clg@kaod.org>
+	<39e8edd0-6056-5b51-174b-631dcb267ff5@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="juLeBF1Sbpsr6d7u"
+	protocol="application/pgp-signature"; boundary="fc3RSXbRKaEj1MFC"
 Content-Disposition: inline
-In-Reply-To: <20181209194610.29727-17-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v7 16/19] spapr: introduce a new sPAPR IRQ
- backend supporting XIVE and XICS
+In-Reply-To: <39e8edd0-6056-5b51-174b-631dcb267ff5@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v7 18/19] spapr: add a 'pseries-4.0-xive'
+ machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,256 +30,85 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---juLeBF1Sbpsr6d7u
+--fc3RSXbRKaEj1MFC
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Dec 09, 2018 at 08:46:07PM +0100, C=E9dric Le Goater wrote:
-> The interrupt mode is chosen by the CAS negotiation process and
-> activated after a reset to take into account the required changes in
-> the machine. These impact the device tree layout, the interrupt
-> presenter object and the exposed MMIO regions in the case of XIVE.
+On Mon, Dec 10, 2018 at 11:17:33PM +0100, C=E9dric Le Goater wrote:
+> On 12/9/18 8:46 PM, C=E9dric Le Goater wrote:
+> > This pseries machine makes use of a new sPAPR IRQ backend supporting
+> > the XIVE interrupt mode.
+> >=20
+> > The guest OS is required to have support for the XIVE exploitation
+> > mode of the POWER9 interrupt controller.
+> >=20
+> > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> > ---
+> >  hw/ppc/spapr.c | 15 +++++++++++++++
+> >  1 file changed, 15 insertions(+)
+> >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 4012ebd794a4..3cc134a0b673 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -3985,6 +3985,21 @@ static void spapr_machine_4_0_class_options(Mach=
+ineClass *mc)
+> > =20
+> >  DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
+> > =20
+> > +static void spapr_machine_4_0_xive_instance_options(MachineState *mach=
+ine)
+> > +{
+> > +    spapr_machine_4_0_instance_options(machine);
+> > +}
+> > +
+> > +static void spapr_machine_4_0_xive_class_options(MachineClass *mc)
+> > +{
+> > +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+> > +
+> > +    spapr_machine_4_0_class_options(mc);> +    smc->irq =3D &spapr_irq=
+_xive;
 >=20
-> This default interrupt mode for the machine is XICS.
+> I have been adding checks on the CPU model to export the XIVE capability=
+=20
+> only on POWER9 processors but it breaks some of the tests.
 >=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> ---
->  include/hw/ppc/spapr_irq.h |   1 +
->  hw/ppc/spapr.c             |   3 +-
->  hw/ppc/spapr_hcall.c       |  13 ++++
->  hw/ppc/spapr_irq.c         | 143 +++++++++++++++++++++++++++++++++++++
->  4 files changed, 159 insertions(+), 1 deletion(-)
+> I was wondering if we could add a default POWER9 CPU to the -xive machine=
+ :=20
 >=20
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index b34d5a00381b..29936498dbc8 100644
-> --- a/include/hw/ppc/spapr_irq.h
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -51,6 +51,7 @@ typedef struct sPAPRIrq {
->  extern sPAPRIrq spapr_irq_xics;
->  extern sPAPRIrq spapr_irq_xics_legacy;
->  extern sPAPRIrq spapr_irq_xive;
-> +extern sPAPRIrq spapr_irq_dual;
-> =20
->  void spapr_irq_init(sPAPRMachineState *spapr, Error **errp);
->  int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
-*errp);
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 5ef87a00f68b..fa41927d95dd 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2631,7 +2631,8 @@ static void spapr_machine_init(MachineState *machin=
-e)
->      spapr_ovec_set(spapr->ov5, OV5_DRMEM_V2);
-> =20
->      /* advertise XIVE */
-> -    if (smc->irq->ov5 =3D=3D SPAPR_OV5_XIVE_EXPLOIT) {
-> +    if (smc->irq->ov5 =3D=3D SPAPR_OV5_XIVE_EXPLOIT ||
-> +        smc->irq->ov5 =3D=3D SPAPR_OV5_XIVE_BOTH) {
->          spapr_ovec_set(spapr->ov5, OV5_XIVE_EXPLOIT);
->      }
-> =20
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index ae913d070f50..186b6a65543f 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1654,6 +1654,19 @@ static target_ulong h_client_architecture_support(=
-PowerPCCPU *cpu,
->              (spapr_h_cas_compose_response(spapr, args[1], args[2],
->                                            ov5_updates) !=3D 0);
->      }
-> +
-> +    /*
-> +     * Generate a machine reset when we have an update of the
-> +     * interrupt mode. Only required on the machine supporting both
-> +     * mode.
-> +     */
-> +    if (!spapr->cas_reboot) {
-> +        sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> +
-> +        spapr->cas_reboot =3D spapr_ovec_test(ov5_updates, OV5_XIVE_EXPL=
-OIT)
-> +            && smc->irq->ov5 =3D=3D SPAPR_OV5_XIVE_BOTH;
-> +    }
-> +
->      spapr_ovec_cleanup(ov5_updates);
-> =20
->      if (spapr->cas_reboot) {
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index a8e50725397c..7c34939f774a 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -392,6 +392,149 @@ sPAPRIrq spapr_irq_xive =3D {
->      .reset       =3D spapr_irq_reset_xive,
->  };
-> =20
-> +/*
-> + * Dual XIVE and XICS IRQ backend.
-> + *
-> + * Both interrupt mode, XIVE and XICS, objects are created but the
-> + * machine starts in legacy interrupt mode (XICS). It can be changed
-> + * by the CAS negotiation process and, in that case, the new mode is
-> + * activated after extra machine reset.
-> + */
-> +
-> +/*
-> + * Returns the sPAPR IRQ backend negotiated by CAS. XICS is the
-> + * default.
-> + */
-> +static sPAPRIrq *spapr_irq_current(sPAPRMachineState *spapr)
-> +{
-> +    return spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT) ?
-> +        &spapr_irq_xive : &spapr_irq_xics;
-> +}
-> +
-> +static void spapr_irq_init_dual(sPAPRMachineState *spapr, Error **errp)
-> +{
-> +    MachineState *machine =3D MACHINE(spapr);
-> +    Error *local_err =3D NULL;
-> +
-> +    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
-> +        error_setg(errp, "No KVM support for the 'dual' machine");
-> +        return;
-> +    }
-> +
-> +    spapr_irq_xics.init(spapr, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +
-> +    spapr_irq_xive.init(spapr, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +}
-> +
-> +static int spapr_irq_claim_dual(sPAPRMachineState *spapr, int irq, bool =
-lsi,
-> +                                Error **errp)
-> +{
-> +    int ret;
-> +    Error *local_err =3D NULL;
-> +
-> +    ret =3D spapr_irq_xive.claim(spapr, irq, lsi, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return ret;
-> +    }
-> +
-> +    ret =3D spapr_irq_xics.claim(spapr, irq, lsi, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +    }
-> +
-> +    return ret;
-> +}
-> +
-> +static void spapr_irq_free_dual(sPAPRMachineState *spapr, int irq, int n=
-um)
-> +{
-> +    spapr_irq_xive.free(spapr, irq, num);
-> +    spapr_irq_xics.free(spapr, irq, num);
-> +}
-> +
-> +static qemu_irq spapr_qirq_dual(sPAPRMachineState *spapr, int irq)
-> +{
-> +    return spapr_irq_current(spapr)->qirq(spapr, irq);
+>   + mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power9_v2.0");
+>=20
+> and if we could change tests/cpu-plug-test.c with :
+>=20
+>   @@ -198,8 +198,13 @@ static void add_pseries_test_case(const
+>        }
+>        data =3D g_new(PlugTestData, 1);
+>        data->machine =3D g_strdup(mname);
+>   -    data->cpu_model =3D "power8_v2.0";
+>   -    data->device_model =3D g_strdup("power8_v2.0-spapr-cpu-core");
+>   +    if (g_str_has_suffix(mname, "xive")) {
+>   +        data->cpu_model =3D "power9_v2.0";
+>   +        data->device_model =3D g_strdup("power9_v2.0-spapr-cpu-core");
+>   +    } else {
+>   +        data->cpu_model =3D "power8_v2.0";
+>   +        data->device_model =3D g_strdup("power8_v2.0-spapr-cpu-core");
+>   +    }
+>        data->sockets =3D 2;
+>        data->cores =3D 3;
+>        data->threads =3D 1;
+>=20
+> or if there is a better way ?
 
-Urgh... I don't think this is going to work.  IIRC the various devices
-(PHB, VIO, etc.)  are wired up to their qirqs at realize() time, so if
-you reboot from a XIVE guest to XICS guest (or maybe the other way
-around) the peripherals won't be able to signal irqs in the new
-scheme.
+So, I'd actually prefer a machine option, rather than wholly separate
+machine types to select xics/xive/dual.  Machine types was fine while
+prototyping this, but I don't think we want to actually merge new
+machine types for it.
 
-I think instead we need a common set of qirqs, whose set_irq routine
-looks at whether to signal XICS or XIVE.  FOr now I think the easiest
-approach is to layer those on top of the existing XICS or XIVE
-specific qirqs.  Later we might want to remove the (input) qirqs
-entirely from the XICS and XIVE subsystems, instead having just
-explicit trigger functions.  Then spapr will always supply the qirqs
-which call into one or the other.
-
-> +}
-> +
-> +static void spapr_irq_print_info_dual(sPAPRMachineState *spapr, Monitor =
-*mon)
-> +{
-> +    spapr_irq_current(spapr)->print_info(spapr, mon);
-> +}
-> +
-> +static void spapr_irq_dt_populate_dual(sPAPRMachineState *spapr,
-> +                                       uint32_t nr_servers, void *fdt,
-> +                                       uint32_t phandle)
-> +{
-> +    spapr_irq_current(spapr)->dt_populate(spapr, nr_servers, fdt, phandl=
-e);
-> +}
-> +
-> +static Object *spapr_irq_cpu_intc_create_dual(sPAPRMachineState *spapr,
-> +                                              Object *cpu, Error **errp)
-> +{
-> +    Error *local_err =3D NULL;
-> +
-> +    spapr_irq_xive.cpu_intc_create(spapr, cpu, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return NULL;
-> +    }
-> +
-> +    /* Default to XICS interrupt mode */
-> +    return spapr_irq_xics.cpu_intc_create(spapr, cpu, errp);
-> +}
-> +
-> +static int spapr_irq_post_load_dual(sPAPRMachineState *spapr, int versio=
-n_id)
-> +{
-> +    /*
-> +     * Force a reset of the XIVE backend after migration. The machine
-> +     * defaults to XICS at startup.
-> +     */
-> +    if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
-> +        spapr_irq_xive.reset(spapr, &error_fatal);
-> +    }
-> +
-> +    return spapr_irq_current(spapr)->post_load(spapr, version_id);
-> +}
-> +
-> +static void spapr_irq_reset_dual(sPAPRMachineState *spapr, Error **errp)
-> +{
-> +    /*
-> +     * Reset the interrupt mode selected by CAS.
-> +     */
-> +    spapr_irq_current(spapr)->reset(spapr, errp);
-> +}
-> +
-> +/*
-> + * Define values in sync with the XIVE and XICS backend
-> + */
-> +#define SPAPR_IRQ_DUAL_NR_IRQS     0x2000
-> +#define SPAPR_IRQ_DUAL_NR_MSIS     (SPAPR_IRQ_DUAL_NR_IRQS - SPAPR_IRQ_M=
-SI)
-> +
-> +sPAPRIrq spapr_irq_dual =3D {
-> +    .nr_irqs     =3D SPAPR_IRQ_DUAL_NR_IRQS,
-> +    .nr_msis     =3D SPAPR_IRQ_DUAL_NR_MSIS,
-> +    .ov5         =3D SPAPR_OV5_XIVE_BOTH,
-> +
-> +    .init        =3D spapr_irq_init_dual,
-> +    .claim       =3D spapr_irq_claim_dual,
-> +    .free        =3D spapr_irq_free_dual,
-> +    .qirq        =3D spapr_qirq_dual,
-> +    .print_info  =3D spapr_irq_print_info_dual,
-> +    .dt_populate =3D spapr_irq_dt_populate_dual,
-> +    .cpu_intc_create =3D spapr_irq_cpu_intc_create_dual,
-> +    .post_load   =3D spapr_irq_post_load_dual,
-> +    .reset       =3D spapr_irq_reset_dual,
-> +};
-> +
->  /*
->   * sPAPR IRQ frontend routines for devices
->   */
+So, instead I think we want a machine option which can be set to
+xics/xive/dual, with xics being the default for earlier machine types
+and dual the default for 4.0 onwards.  We can make POWER9 the default
+cpu for 4.0 onwards as well, if you want.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -286,24 +116,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---juLeBF1Sbpsr6d7u
+--fc3RSXbRKaEj1MFC
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwPGwIACgkQbDjKyiDZ
-s5KVAxAArPYFeAQIvy/s1XR7Wwy1aynIMPCtmD0ajAVtd3LrJw0IN4iZ+xOk3+UA
-+24PhUDNd0bmAFYACXlWEbR4HVtAbthBumRFs1rUTX7qOVjQWJH2+1BuUSSNt152
-fnDftx7OA7C0bXQOKPXhYnEqfzjOZ75sseKQuKjpsACQIqR/J6kDlGV9lBXePGqY
-IhwW4QQVH9As50vNYXsw1AHG3f34+ihdy64ZrtyutprcCQoLhzI2u+jv0bjqInJO
-56fysIC+WPlxdjZMd+b4n7svdckHQhMq40xAzJlu5J3A/pIjw/KBMyw3fpWzSm+M
-c8qUv+HJlaLsyUwxKkDbLltaWEfCqRDM1ImeR3iYL/2hm4v+Z8wwSMVKffcTfzEr
-2YvxoUK/2/+UdOUH6e001il6GM7vG553N9XW86TPYJCuxt0xrKJL084tR5lXeqiP
-DHZ+mHIZnQJuovo82cLL+hTM1AoZ1gPyibYh/f0yjT600hCpc9oGCag+DtKFf46r
-kahA6lr7il4jdQPt75EYYvZLgesBRU8nDasfz61+rnPGxVdWpwN5m00fHea3E5gq
-ijyy4OY1fq/aYpyNNu1xGgdyD7r0VSDwC72Bc/RvLkeHOMtmDuoaSSB8ZbaOEbUg
-u+T46D40DfFYGx1/xevC2HB7fOcMD++I0UVjzOIWBCHMfHGRQnw=
-=7Kf3
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwPG5wACgkQbDjKyiDZ
+s5KumRAA27S7RBP7KS2Plel9ii5EXpWtSrc8kOg1Jb2OOEUGPDGXk+Obdyt/hU01
+m8TeSUF1bV8mhywIG7hkY23MrIFJVvVehhSiu4DGzBEDPnoZdYiSPeUpW5JDSnNQ
+LewAbRQFGRcwcNIZBxI7dK7p78DEwS+n58uoNPf1K/MrTGZngXNOs7e2HXz84HGG
+p/vwRX1rAxKKMlIfHW8AYEAoGwJfQ2db7E7Ql7SndB8YkXAZ/oBPeU0Qh6Wkvlf1
+nn6h6lLPd9maEeigppkJutZIPzn932MeexgzKXNdBgFEWFPXvZBluFyYJIU/I9ZG
+jVzlmzb5A/7DfKpuklHgPzxPWkEfogYC61r5/xsjRVmt92F8yRVienMldJphcojQ
+316ijE4HTHLmEo9qT3TdBtyP68QuTdELSTUsWHbKbtBKjMUlqcRbMZtmov7wIrj8
+F2WZHog4C4CI6VC1c5xeSE9d8eY8LkGKbyzc0vcdFJhBqZH5VtaUN4UDo743TcGX
+XylzLGPyAvot5b9QqANdBZDx9Njf4MpMw1ZnX9cCrKideITihxp5Tvlv7LSo8lXr
+FJQOkSotdWgXjhWPGtMzzLBEEs2zDlkrv0qjo/j5nzHQx37IEU6H5fSMs3zgEpPG
+psN1RybzdaP0bZ8xo7aBsOuTTua2HCi8yXPWW6IpW2xX1q11zPw=
+=M+UU
 -----END PGP SIGNATURE-----
 
---juLeBF1Sbpsr6d7u--
+--fc3RSXbRKaEj1MFC--
