@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gWfUg-0001X3-8D
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:42:27 -0500
+	(envelope-from <clg@kaod.org>) id 1gWfVX-00022V-W0
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:43:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gWfUa-0004ei-Az
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:42:26 -0500
-Received: from 9.mo177.mail-out.ovh.net ([46.105.72.238]:45711)
+	(envelope-from <clg@kaod.org>) id 1gWfVS-0005Xq-Qq
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:43:19 -0500
+Received: from 7.mo178.mail-out.ovh.net ([46.105.58.91]:58805)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gWfUW-0004bs-3j
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:42:16 -0500
-Received: from player738.ha.ovh.net (unknown [10.109.159.69])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 28E27D4F5C
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 11:42:09 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gWfVS-0005TT-Iw
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:43:14 -0500
+Received: from player729.ha.ovh.net (unknown [10.109.143.201])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id D000A42F6F
+	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 11:43:12 +0100 (CET)
 References: <20181209194610.29727-1-clg@kaod.org>
-	<20181209194610.29727-19-clg@kaod.org>
-	<39e8edd0-6056-5b51-174b-631dcb267ff5@kaod.org>
-	<20181211020620.GG4261@umbus.fritz.box>
+	<20181209194610.29727-4-clg@kaod.org>
+	<20181210042747.GM4261@umbus.fritz.box>
+	<157aa1c9-20a6-e177-eac7-f47f40188df3@kaod.org>
+	<20181211013710.GC4261@umbus.fritz.box>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <744ff9f8-6f84-00d4-a2e0-84652658762e@kaod.org>
-Date: Tue, 11 Dec 2018 11:42:03 +0100
+Message-ID: <079ddd99-4c35-c3be-0b27-59c2ce39ef21@kaod.org>
+Date: Tue, 11 Dec 2018 11:43:08 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181211020620.GG4261@umbus.fritz.box>
+In-Reply-To: <20181211013710.GC4261@umbus.fritz.box>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 18/19] spapr: add a 'pseries-4.0-xive'
- machine type
+Subject: Re: [Qemu-devel] [PATCH v7 03/19] ppc/xive: introduce a simplified
+ XIVE presenter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,98 +38,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On 12/11/18 3:06 AM, David Gibson wrote:
-> On Mon, Dec 10, 2018 at 11:17:33PM +0100, C=E9dric Le Goater wrote:
->> On 12/9/18 8:46 PM, C=E9dric Le Goater wrote:
->>> This pseries machine makes use of a new sPAPR IRQ backend supporting
->>> the XIVE interrupt mode.
+On 12/11/18 2:37 AM, David Gibson wrote:
+> On Mon, Dec 10, 2018 at 08:15:40AM +0100, C=E9dric Le Goater wrote:
+>> On 12/10/18 5:27 AM, David Gibson wrote:
+>>> On Sun, Dec 09, 2018 at 08:45:54PM +0100, C=E9dric Le Goater wrote:
+>>>> The last sub-engine of the XIVE architecture is the Interrupt
+>>>> Virtualization Presentation Engine (IVPE). On HW, the IVRE and the
+>>>> IVPE share elements, the Power Bus interface (CQ), the routing table
+>>>> descriptors, and they can be combined in the same HW logic. We do th=
+e
+>>>> same in QEMU and combine both engines in the XiveRouter for
+>>>> simplicity.
+>>>>
+>>>> When the IVRE has completed its job of matching an event source with=
+ a
+>>>> Notification Virtual Target (NVT) to notify, it forwards the event
+>>>> notification to the IVPE sub-engine. The IVPE scans the thread
+>>>> interrupt contexts of the Notification Virtual Targets (NVT)
+>>>> dispatched on the HW processor threads and if a match is found, it
+>>>> signals the thread. If not, the IVPE escalates the notification to
+>>>> some other targets and records the notification in a backlog queue.
+>>>>
+>>>> The IVPE maintains the thread interrupt context state for each of it=
+s
+>>>> NVTs not dispatched on HW processor threads in the Notification
+>>>> Virtual Target table (NVTT).
+>>>>
+>>>> The model currently only supports single NVT notifications.
+>>>>
+>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 >>>
->>> The guest OS is required to have support for the XIVE exploitation
->>> mode of the POWER9 interrupt controller.
+>>> Applied.
 >>>
->>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->>> ---
->>>  hw/ppc/spapr.c | 15 +++++++++++++++
->>>  1 file changed, 15 insertions(+)
->>>
->>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->>> index 4012ebd794a4..3cc134a0b673 100644
->>> --- a/hw/ppc/spapr.c
->>> +++ b/hw/ppc/spapr.c
->>> @@ -3985,6 +3985,21 @@ static void spapr_machine_4_0_class_options(Ma=
-chineClass *mc)
->>> =20
->>>  DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
->>> =20
->>> +static void spapr_machine_4_0_xive_instance_options(MachineState *ma=
-chine)
->>> +{
->>> +    spapr_machine_4_0_instance_options(machine);
->>> +}
->>> +
->>> +static void spapr_machine_4_0_xive_class_options(MachineClass *mc)
->>> +{
->>> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
->>> +
->>> +    spapr_machine_4_0_class_options(mc);> +    smc->irq =3D &spapr_i=
-rq_xive;
+>>> I think the tctx_word2() should have the byteswap, rather than having
+>>> it in the callers, but that can be fixed later.
 >>
->> I have been adding checks on the CPU model to export the XIVE capabili=
-ty=20
->> only on POWER9 processors but it breaks some of the tests.
->>
->> I was wondering if we could add a default POWER9 CPU to the -xive mach=
-ine :=20
->>
->>   + mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power9_v2.0");
->>
->> and if we could change tests/cpu-plug-test.c with :
->>
->>   @@ -198,8 +198,13 @@ static void add_pseries_test_case(const
->>        }
->>        data =3D g_new(PlugTestData, 1);
->>        data->machine =3D g_strdup(mname);
->>   -    data->cpu_model =3D "power8_v2.0";
->>   -    data->device_model =3D g_strdup("power8_v2.0-spapr-cpu-core");
->>   +    if (g_str_has_suffix(mname, "xive")) {
->>   +        data->cpu_model =3D "power9_v2.0";
->>   +        data->device_model =3D g_strdup("power9_v2.0-spapr-cpu-core=
-");
->>   +    } else {
->>   +        data->cpu_model =3D "power8_v2.0";
->>   +        data->device_model =3D g_strdup("power8_v2.0-spapr-cpu-core=
-");
->>   +    }
->>        data->sockets =3D 2;
->>        data->cores =3D 3;
->>        data->threads =3D 1;
->>
->> or if there is a better way ?
+>> I thought it was better to explicitly show in the code where the=20
+>> byteswaps were needed. Anyway, this is very localized, so, yes,=20
+>> we can change it later on.
 >=20
-> So, I'd actually prefer a machine option, rather than wholly separate
-> machine types to select xics/xive/dual.  Machine types was fine while
-> prototyping this, but I don't think we want to actually merge new
-> machine types for it.
+> To clarify my thinking here; the important thing is not knowing where
+> the byteswaps are, but being able to tell as easily as possible what
+> endianness a given piece of data is right now.
+>=20
+> The convention I'm aiming for here - which is one I try to use most
+> places is that structures - at least structures which map to specific
+> in-memory things - are in the required endianness for that stuff in
+> memory.  However bare integers - uint32_t or uint64_t or whatever -
+> are, well, numbers, in native endian.
+>=20
 
-I agree.=20
-
-> So, instead I think we want a machine option which can be set to
-> xics/xive/dual, with xics being the default for earlier machine types
-> and dual the default for 4.0 onwards.
-
-I will revive an old patch doing just that.=20
-
-The question now is how to link the sPAPRMachineState instance to=20
-the selected sPAPR IRQ backend.=20
-
-I don't think we can move 'smc->irq' to sPAPRMachineState. So we will
-need an helper returning the appropriate backend depending on the machine=
-=20
-option and 'smc->irq' should disappear.
-
-> We can make POWER9 the default cpu for 4.0 onwards as well, if you want=
-.
-
-OK.
+ok. Adding that to the TODO list.
 
 C.
