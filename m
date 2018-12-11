@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gWqpR-0006WM-3Q
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 17:48:39 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gWqvu-0002tY-Pm
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 17:55:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gWqpN-0007TP-R3
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 17:48:36 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:35855)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gWqpN-0007SQ-Fy
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 17:48:33 -0500
-Received: by mail-pf1-x443.google.com with SMTP id b85so7850194pfc.3
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 14:48:33 -0800 (PST)
-Date: Tue, 11 Dec 2018 14:48:31 -0800 (PST)
-In-Reply-To: <cover.1544567709.git.alistair.francis@wdc.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-b51f090f-6ece-4e17-9527-04f73763de4d@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v8 0/4] Connect a PCIe host and graphics
- support to RISC-V
+	(envelope-from <jsnow@redhat.com>) id 1gWqvr-0004xj-PC
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 17:55:17 -0500
+References: <20181206192544.3987-1-jsnow@redhat.com>
+	<20181206192544.3987-4-jsnow@redhat.com>
+	<99292902-c7bd-7f1f-0a5d-72894c83dd93@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <1c6f42f4-2043-27ae-b3d7-e47551a11667@redhat.com>
+Date: Tue, 11 Dec 2018 17:55:02 -0500
+MIME-Version: 1.0
+In-Reply-To: <99292902-c7bd-7f1f-0a5d-72894c83dd93@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/3] block: remove 'x' prefix from
+ experimental bitmap APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +26,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-riscv@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>, alistair23@gmail.com, stephen@eideticom.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, vsementov@virtuozzo.com, Max Reitz <mreitz@redhat.com>
 
-On Tue, 11 Dec 2018 14:37:07 PST (-0800), Alistair Francis wrote:
-> This series is now ready to be merged, all of the patches are reviewed
-> and tested.
->
-> Palmer can you take this with all the other RISC-V patches sent during
-> the freeze?
 
-Yep, I'll be collecting everything this week.
+
+On 12/7/18 11:28 AM, Eric Blake wrote:
+> On 12/6/18 1:25 PM, John Snow wrote:
+>> The 'x' prefix was added because we were uncertain of the direction we=
+'d
+>> take for the libvirt API. With the general approach solidified, I feel
+>> comfortable committing to this API for 4.0.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>=20
+>> +++ b/tests/qemu-iotests/223
+>> @@ -112,9 +112,9 @@ _send_qemu_cmd $QEMU_HANDLE
+>> '{"execute":"qmp_capabilities"}' "return"
+>> =C2=A0 _send_qemu_cmd $QEMU_HANDLE '{"execute":"blockdev-add",
+>> =C2=A0=C2=A0=C2=A0 "arguments":{"driver":"qcow2", "node-name":"n",
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "file":{"driver":"file", "filename":"'"=
+$TEST_IMG"'"}}}' "return"
+>> -_send_qemu_cmd $QEMU_HANDLE '{"execute":"x-block-dirty-bitmap-disable=
+",
+>> +_send_qemu_cmd $QEMU_HANDLE '{"execute":"block-dirty-bitmap-disable",
+>> =C2=A0=C2=A0=C2=A0 "arguments":{"node":"n", "name":"b"}}' "return"
+>> -_send_qemu_cmd $QEMU_HANDLE '{"execute":"x-block-dirty-bitmap-disable=
+",
+>> +_send_qemu_cmd $QEMU_HANDLE '{"execute":"block-dirty-bitmap-disable",
+>> =C2=A0=C2=A0=C2=A0 "arguments":{"node":"n", "name":"b2"}}' "return"
+>> =C2=A0 _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-start",
+>> =C2=A0=C2=A0=C2=A0 "arguments":{"addr":{"type":"unix",
+>=20
+> No iotests coverage of block-dirty-bitmap-merge.=C2=A0 We should fix th=
+at as
+> part of this series; separate patch is fine.
+>=20
+
+you're not wrong :(
+
+> I'm glad you remembered to renumber all the 'since' tags to 4.0 (as the
+> new spelling is indeed new to 4.0, not when we introduced the older x-
+> variant).
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
 
 Thanks!
-
->
-> V8:
->  - Drop SiFive U support
->  - Drop legacy -nic support
->  - Small other review changes
-> V7:
->  - Fix the GPEX memory mapping thanks to Bin Meng
->  - Fix the interrupt mapping thanks to Logan Gunthorpe
-> V6:
->  - Fix the interrupt issue for the GPEX device
-> V5:
->  - Rebase
->  - Include pci.mak in the default configs
-> V4:
->  - Fix the spike device tree
->  - Don't use stdvga device
-> V3:
->  - Remove Makefile config changes
->  - Connect a network adapter to the virt device
-> V2:
->  - Use the gpex PCIe host for virt
->  - Add support for SiFive U PCIe
->
->
-> Alistair Francis (4):
->   hw/riscv/virt: Increase the number of interrupts
->   hw/riscv/virt: Adjust memory layout spacing
->   hw/riscv/virt: Connect the gpex PCIe
->   riscv: Enable VGA and PCIE_VGA
->
->  default-configs/riscv32-softmmu.mak |   8 +-
->  default-configs/riscv64-softmmu.mak |   8 +-
->  hw/riscv/virt.c                     | 147 ++++++++++++++++++++++++++--
->  include/hw/riscv/virt.h             |  15 ++-
->  4 files changed, 165 insertions(+), 13 deletions(-)
->
-> -- 
-> 2.19.1
