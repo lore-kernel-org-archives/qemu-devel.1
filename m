@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gWkfJ-0000gK-4H
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:13:47 -0500
+	(envelope-from <bp@alien8.de>) id 1gWkgL-0001gx-QT
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:14:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gWkfG-0006XC-CT
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:13:45 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:34088)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gWkfG-0006WS-5A
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:13:42 -0500
-Received: by mail-wm1-f68.google.com with SMTP id y185so9353254wmd.1
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 08:13:42 -0800 (PST)
-References: <1542777026-2788-1-git-send-email-liq3ea@gmail.com>
-	<1542777026-2788-2-git-send-email-liq3ea@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e319b73f-6f42-24f4-1480-8b124a26a720@redhat.com>
-Date: Tue, 11 Dec 2018 17:13:39 +0100
+	(envelope-from <bp@alien8.de>) id 1gWkgK-000892-M1
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:14:49 -0500
+Received: from mail.skyhub.de ([2a01:4f8:190:11c2::b:1457]:48714)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bp@alien8.de>) id 1gWkgK-00081J-Am
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:14:48 -0500
+Date: Tue, 11 Dec 2018 17:14:40 +0100
+From: Borislav Petkov <bp@alien8.de>
+Message-ID: <20181211161440.GG27375@zn.tnic>
+References: <20181210181328.GA762@zn.tnic> <20181210183730.GJ4669@habkost.net>
+	<20181210184153.GB5482@zn.tnic> <20181210190600.GK4669@habkost.net>
+	<20181210194258.GD5482@zn.tnic> <20181210200843.GN4669@habkost.net>
+	<20181211103839.GC921@redhat.com>
+	<20181211115546.GQ4669@habkost.net>
+	<e4d9a943-2de2-34a7-3f52-ee3d64ea889a@redhat.com>
+	<20181211153017.GN921@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1542777026-2788-2-git-send-email-liq3ea@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] fw_cfg: fix -boot bootsplash error
- checking
+Content-Disposition: inline
+In-Reply-To: <20181211153017.GN921@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] target-i386: Reenable RDTSCP support on
+ Opteron_G[345] CPU models
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,107 +34,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>, armbru@redhat.com, pbonzini@redhat.com, kraxel@redhat.com, lersek@redhat.com
-Cc: qemu-devel@nongnu.org
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?B?SsO2cmcgUsO2ZGVs?= <joro@8bytes.org>, Andre Przywara <andre.przywara@arm.com>, kvm ML <kvm@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 
-On 11/21/18 6:10 AM, Li Qiang wrote:
-> fw_cfg_bootsplash() gets option parameter "splash-time"
-> with qemu_opt_get(), then converts it to an integer by hand.
-> It neglects to check that conversion for errors. This is
-> needlessly complicated and error-prone. But as "splash-time
-> not specified" is not the same as "splash-time=T" for any T,
-> we need use qemu_opt_get() to check if splash time exists.
-> This patch also make the qemu exit when finding or loading
-> splash file failed.
-> 
-> Signed-off-by: Li Qiang <liq3ea@gmail.com>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
++ qemu-devel.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+On Tue, Dec 11, 2018 at 03:30:17PM +0000, Daniel P. Berrang=C3=A9 wrote:
+> Great, then, this is a non-issue - we just need to mention that fact
+> in the commit that sets the min version for the kernel
 
-> ---
-> v1->v2: drop error_report when read_splashfile() fails
-> 
->  hw/nvram/fw_cfg.c | 35 +++++++++++++----------------------
->  vl.c              |  2 +-
->  2 files changed, 14 insertions(+), 23 deletions(-)
-> 
-> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index 946f765f7f..83d66818f6 100644
-> --- a/hw/nvram/fw_cfg.c
-> +++ b/hw/nvram/fw_cfg.c
-> @@ -118,47 +118,38 @@ error:
->  
->  static void fw_cfg_bootsplash(FWCfgState *s)
->  {
-> -    int boot_splash_time = -1;
->      const char *boot_splash_filename = NULL;
-> -    char *p;
-> +    const char *boot_splash_time = NULL;
->      char *filename, *file_data;
->      gsize file_size;
->      int file_type;
-> -    const char *temp;
->  
->      /* get user configuration */
->      QemuOptsList *plist = qemu_find_opts("boot-opts");
->      QemuOpts *opts = QTAILQ_FIRST(&plist->head);
-> -    if (opts != NULL) {
-> -        temp = qemu_opt_get(opts, "splash");
-> -        if (temp != NULL) {
-> -            boot_splash_filename = temp;
-> -        }
-> -        temp = qemu_opt_get(opts, "splash-time");
-> -        if (temp != NULL) {
-> -            p = (char *)temp;
-> -            boot_splash_time = strtol(p, &p, 10);
-> -        }
-> -    }
-> +    boot_splash_filename = qemu_opt_get(opts, "splash");
-> +    boot_splash_time = qemu_opt_get(opts, "splash-time");
->  
->      /* insert splash time if user configurated */
-> -    if (boot_splash_time >= 0) {
-> +    if (boot_splash_time) {
-> +        int64_t bst_val = qemu_opt_get_number(opts, "splash-time", -1);
->          /* validate the input */
-> -        if (boot_splash_time > 0xffff) {
-> -            error_report("splash time is big than 65535, force it to 65535.");
-> -            boot_splash_time = 0xffff;
-> +        if (bst_val < 0 || bst_val > 0xffff) {
-> +            error_report("splash-time is invalid,"
-> +                         "it should be a value between 0 and 65535");
-> +            exit(1);
->          }
->          /* use little endian format */
-> -        qemu_extra_params_fw[0] = (uint8_t)(boot_splash_time & 0xff);
-> -        qemu_extra_params_fw[1] = (uint8_t)((boot_splash_time >> 8) & 0xff);
-> +        qemu_extra_params_fw[0] = (uint8_t)(bst_val & 0xff);
-> +        qemu_extra_params_fw[1] = (uint8_t)((bst_val >> 8) & 0xff);
->          fw_cfg_add_file(s, "etc/boot-menu-wait", qemu_extra_params_fw, 2);
->      }
->  
->      /* insert splash file if user configurated */
-> -    if (boot_splash_filename != NULL) {
-> +    if (boot_splash_filename) {
->          filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, boot_splash_filename);
->          if (filename == NULL) {
-> -            error_report("failed to find file '%s'.", boot_splash_filename);
-> +            error_report("failed to find file '%s'", boot_splash_filename);
->              return;
->          }
->  
-> diff --git a/vl.c b/vl.c
-> index fa25d1ae2d..96ac0ddcf6 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -336,7 +336,7 @@ static QemuOptsList qemu_boot_opts = {
->              .type = QEMU_OPT_STRING,
->          }, {
->              .name = "splash-time",
-> -            .type = QEMU_OPT_STRING,
-> +            .type = QEMU_OPT_NUMBER,
->          }, {
->              .name = "reboot-timeout",
->              .type = QEMU_OPT_STRING,
-> 
+Ok, here's a first draft ontop of Eduardo's machine-next branch from
+http://github.com/ehabkost/qemu
+
+Also, thanks for the help Eduardo! :-)
+
+---
+From: Borislav Petkov <bp@suse.de>
+Date: Tue, 11 Dec 2018 17:01:00 +0100
+
+The missing functionality was added ~3 years ago with the Linux commit
+
+  46896c73c1a4 ("KVM: svm: add support for RDTSCP")
+
+so reenable RDTSCP support on those CPU models.
+
+Opteron_G2 - being family 15, model 6, doesn't have RDTSCP support
+(the real hardware doesn't have it. K8 got RDTSCP support with the NPT
+models, i.e., models >=3D 0x40).
+
+Document the host's minimum required kernel version, while at it.
+
+Signed-off-by: Borislav Petkov <bp@suse.de>
+---
+ include/hw/i386/pc.h | 17 +++++++++++++----
+ qemu-doc.texi        | 13 +++++++++++++
+ target/i386/cpu.c    | 11 ++++-------
+ 3 files changed, 30 insertions(+), 11 deletions(-)
+
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 9d29c4b1df2a..ebc28e816b04 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -296,6 +296,19 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint6=
+4_t *);
+=20
+ #define PC_COMPAT_3_1 \
+     HW_COMPAT_3_1 \
++    {\
++        .driver   =3D "Opteron_G3" "-" TYPE_X86_CPU,\
++        .property =3D "rdtscp",\
++        .value    =3D "off",\
++    },{\
++        .driver   =3D "Opteron_G4" "-" TYPE_X86_CPU,\
++        .property =3D "rdtscp",\
++        .value    =3D "off",\
++    },{\
++        .driver   =3D "Opteron_G5" "-" TYPE_X86_CPU,\
++        .property =3D "rdtscp",\
++        .value    =3D "off",\
++    },
+=20
+ #define PC_COMPAT_3_0 \
+     HW_COMPAT_3_0 \
+@@ -527,10 +540,6 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint6=
+4_t *);
+         .driver   =3D "qemu32" "-" TYPE_X86_CPU,\
+         .property =3D "popcnt",\
+         .value    =3D "on",\
+-    },{\
+-        .driver   =3D "Opteron_G2" "-" TYPE_X86_CPU,\
+-        .property =3D "rdtscp",\
+-        .value    =3D "on",\
+     },{\
+         .driver   =3D "Opteron_G3" "-" TYPE_X86_CPU,\
+         .property =3D "rdtscp",\
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index f7ad1dfe4b69..16b955cbf985 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -37,6 +37,7 @@
+ * QEMU System emulator for non PC targets::
+ * QEMU Guest Agent::
+ * QEMU User space emulator::
++* System requirements::
+ * Implementation notes::
+ * Deprecated features::
+ * Supported build platforms::
+@@ -2813,6 +2814,18 @@ Act as if the host page size was 'pagesize' bytes
+ Run the emulation in single step mode.
+ @end table
+=20
++@node System requirements
++@chapter System requirements
++
++@section KVM kernel module
++
++On x86_64 hosts, the default set of CPU features enabled by the KVM acce=
+lerator
++require the host to be running Linux v4.5 or newer.
++
++The OpteronG[345] CPU models require KVM support for RDTSCP, which was
++added with Linux 4.5 which is supported by the major distros. And even
++if RHEL7 has kernel 3.10, KVM there has the required functionality there
++to make it close to a 4.5 or newer kernel.
+=20
+ @include qemu-tech.texi
+=20
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index f81d35e1f914..a7def11b27cd 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -2706,7 +2706,6 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             CPUID_DE | CPUID_FP87,
+         .features[FEAT_1_ECX] =3D
+             CPUID_EXT_CX16 | CPUID_EXT_SSE3,
+-        /* Missing: CPUID_EXT2_RDTSCP */
+         .features[FEAT_8000_0001_EDX] =3D
+             CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
+         .features[FEAT_8000_0001_ECX] =3D
+@@ -2730,9 +2729,9 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+         .features[FEAT_1_ECX] =3D
+             CPUID_EXT_POPCNT | CPUID_EXT_CX16 | CPUID_EXT_MONITOR |
+             CPUID_EXT_SSE3,
+-        /* Missing: CPUID_EXT2_RDTSCP */
+         .features[FEAT_8000_0001_EDX] =3D
+-            CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
++            CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL |
++            CPUID_EXT2_RDTSCP,
+         .features[FEAT_8000_0001_ECX] =3D
+             CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A |
+             CPUID_EXT3_ABM | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
+@@ -2757,10 +2756,9 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             CPUID_EXT_POPCNT | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
+             CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
+             CPUID_EXT_SSE3,
+-        /* Missing: CPUID_EXT2_RDTSCP */
+         .features[FEAT_8000_0001_EDX] =3D
+             CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_NX |
+-            CPUID_EXT2_SYSCALL,
++            CPUID_EXT2_SYSCALL | CPUID_EXT2_RDTSCP,
+         .features[FEAT_8000_0001_ECX] =3D
+             CPUID_EXT3_FMA4 | CPUID_EXT3_XOP |
+             CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_MISALIGNSSE |
+@@ -2788,10 +2786,9 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+             CPUID_EXT_AES | CPUID_EXT_POPCNT | CPUID_EXT_SSE42 |
+             CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_FMA |
+             CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
+-        /* Missing: CPUID_EXT2_RDTSCP */
+         .features[FEAT_8000_0001_EDX] =3D
+             CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_NX |
+-            CPUID_EXT2_SYSCALL,
++            CPUID_EXT2_SYSCALL | CPUID_EXT2_RDTSCP,
+         .features[FEAT_8000_0001_ECX] =3D
+             CPUID_EXT3_TBM | CPUID_EXT3_FMA4 | CPUID_EXT3_XOP |
+             CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_MISALIGNSSE |
+--=20
+2.19.1
+
+--=20
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
