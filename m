@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gWkwF-0008RU-IB
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:31:18 -0500
+	(envelope-from <lvivier@redhat.com>) id 1gWkwJ-0008VV-0j
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:31:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gWkwE-0004s2-Bx
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:31:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38876)
+	(envelope-from <lvivier@redhat.com>) id 1gWkwC-0004qu-3Z
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:31:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47014)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1gWkwE-0004rj-3N
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:31:14 -0500
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1gWkwB-0004qR-RB
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:31:12 -0500
 From: Laurent Vivier <lvivier@redhat.com>
-Date: Tue, 11 Dec 2018 17:31:05 +0100
-Message-Id: <20181211163105.31834-3-lvivier@redhat.com>
+Date: Tue, 11 Dec 2018 17:31:04 +0100
+Message-Id: <20181211163105.31834-2-lvivier@redhat.com>
 In-Reply-To: <20181211163105.31834-1-lvivier@redhat.com>
 References: <20181211163105.31834-1-lvivier@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 2/2] scsi-generic: Convert from DPRINTF()
- macro to trace events
+Subject: [Qemu-devel] [PATCH v2 1/2] scsi-disk: Convert from DPRINTF() macro
+ to trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,188 +34,411 @@ Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/scsi/scsi-generic.c | 56 ++++++++++++++++++++----------------------
- hw/scsi/trace-events   | 11 +++++++++
- 2 files changed, 37 insertions(+), 30 deletions(-)
 
-diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
-index 7237b4162e..842f8e0893 100644
---- a/hw/scsi/scsi-generic.c
-+++ b/hw/scsi/scsi-generic.c
-@@ -18,21 +18,10 @@
- #include "hw/scsi/scsi.h"
- #include "hw/scsi/emulation.h"
- #include "sysemu/block-backend.h"
-+#include "trace.h"
-=20
- #ifdef __linux__
+Notes:
+    v2: call directly trace_scsi_disk_new_request(), don't pass
+        it in the arguments
+
+ hw/scsi/scsi-disk.c  | 103 +++++++++++++++++++++----------------------
+ hw/scsi/trace-events |  29 ++++++++++++
+ 2 files changed, 79 insertions(+), 53 deletions(-)
+
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 0e9027c8f3..6524360114 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -19,15 +19,6 @@
+  * the host adapter emulator.
+  */
 =20
 -//#define DEBUG_SCSI
 -
 -#ifdef DEBUG_SCSI
 -#define DPRINTF(fmt, ...) \
--do { printf("scsi-generic: " fmt , ## __VA_ARGS__); } while (0)
+-do { printf("scsi-disk: " fmt , ## __VA_ARGS__); } while (0)
 -#else
 -#define DPRINTF(fmt, ...) do {} while(0)
 -#endif
 -
--#define BADF(fmt, ...) \
--do { fprintf(stderr, "scsi-generic: " fmt , ## __VA_ARGS__); } while (0)
--
+ #include "qemu/osdep.h"
+ #include "qemu/units.h"
+ #include "qapi/error.h"
+@@ -41,6 +32,7 @@ do { printf("scsi-disk: " fmt , ## __VA_ARGS__); } whil=
+e (0)
+ #include "hw/block/block.h"
+ #include "sysemu/dma.h"
+ #include "qemu/cutils.h"
++#include "trace.h"
+=20
+ #ifdef __linux
  #include <scsi/sg.h>
- #include "scsi/constants.h"
-=20
-@@ -98,8 +87,7 @@ static void scsi_command_complete_noio(SCSIGenericReq *=
-r, int ret)
-         }
-     }
-=20
--    DPRINTF("Command complete 0x%p tag=3D0x%x status=3D%d\n",
--            r, r->req.tag, status);
-+    trace_scsi_generic_command_complete_noio(r, r->req.tag, status);
-=20
-     scsi_req_complete(&r->req, status);
- done:
-@@ -259,7 +247,7 @@ static void scsi_read_complete(void * opaque, int ret=
+@@ -128,8 +120,8 @@ static void scsi_free_request(SCSIRequest *req)
+ /* Helper function for command completion with sense.  */
+ static void scsi_check_condition(SCSIDiskReq *r, SCSISense sense)
+ {
+-    DPRINTF("Command complete tag=3D0x%x sense=3D%d/%d/%d\n",
+-            r->req.tag, sense.key, sense.asc, sense.ascq);
++    trace_scsi_disk_check_condition(r->req.tag, sense.key, sense.asc,
++                                    sense.ascq);
+     scsi_req_build_sense(&r->req, sense);
+     scsi_req_complete(&r->req, CHECK_CONDITION);
+ }
+@@ -317,7 +309,7 @@ static void scsi_read_complete(void * opaque, int ret=
 )
      }
 =20
-     len =3D r->io_header.dxfer_len - r->io_header.resid;
--    DPRINTF("Data ready tag=3D0x%x len=3D%d\n", r->req.tag, len);
-+    trace_scsi_generic_read_complete(r->req.tag, len);
+     block_acct_done(blk_get_stats(s->qdev.conf.blk), &r->acct);
+-    DPRINTF("Data ready tag=3D0x%x len=3D%zd\n", r->req.tag, r->qiov.siz=
+e);
++    trace_scsi_disk_read_complete(r->req.tag, r->qiov.size);
 =20
-     r->len =3D -1;
+     n =3D r->qiov.size / 512;
+     r->sector +=3D n;
+@@ -388,7 +380,7 @@ static void scsi_read_data(SCSIRequest *req)
+     SCSIDiskState *s =3D DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
+     bool first;
 =20
-@@ -335,7 +323,7 @@ static void scsi_read_data(SCSIRequest *req)
-     SCSIDevice *s =3D r->req.dev;
-     int ret;
-=20
--    DPRINTF("scsi_read_data tag=3D0x%x\n", req->tag);
-+    trace_scsi_generic_read_data(req->tag);
-=20
+-    DPRINTF("Read sector_count=3D%d\n", r->sector_count);
++    trace_scsi_disk_read_data_count(r->sector_count);
+     if (r->sector_count =3D=3D 0) {
+         /* This also clears the sense buffer for REQUEST SENSE.  */
+         scsi_req_complete(&r->req, GOOD);
+@@ -401,7 +393,7 @@ static void scsi_read_data(SCSIRequest *req)
      /* The request is used as the AIO opaque value, so add a ref.  */
      scsi_req_ref(&r->req);
-@@ -356,7 +344,7 @@ static void scsi_write_complete(void * opaque, int re=
-t)
-     SCSIGenericReq *r =3D (SCSIGenericReq *)opaque;
-     SCSIDevice *s =3D r->req.dev;
-=20
--    DPRINTF("scsi_write_complete() ret =3D %d\n", ret);
-+    trace_scsi_generic_write_complete(ret);
-=20
-     assert(r->req.aiocb !=3D NULL);
-     r->req.aiocb =3D NULL;
-@@ -371,7 +359,7 @@ static void scsi_write_complete(void * opaque, int re=
-t)
-     if (r->req.cmd.buf[0] =3D=3D MODE_SELECT && r->req.cmd.buf[4] =3D=3D=
- 12 &&
-         s->type =3D=3D TYPE_TAPE) {
-         s->blocksize =3D (r->buf[9] << 16) | (r->buf[10] << 8) | r->buf[=
-11];
--        DPRINTF("block size %d\n", s->blocksize);
-+        trace_scsi_generic_write_complete_blocksize(s->blocksize);
+     if (r->req.cmd.mode =3D=3D SCSI_XFER_TO_DEV) {
+-        DPRINTF("Data transfer direction invalid\n");
++        trace_scsi_disk_read_data_invalid();
+         scsi_read_complete(r, -EINVAL);
+         return;
+     }
+@@ -502,7 +494,7 @@ static void scsi_write_complete_noio(SCSIDiskReq *r, =
+int ret)
+         return;
+     } else {
+         scsi_init_iovec(r, SCSI_DMA_BUF_SIZE);
+-        DPRINTF("Write complete tag=3D0x%x more=3D%zd\n", r->req.tag, r-=
+>qiov.size);
++        trace_scsi_disk_write_complete_noio(r->req.tag, r->qiov.size);
+         scsi_req_data(&r->req, r->qiov.size);
      }
 =20
-     scsi_command_complete_noio(r, ret);
-@@ -388,7 +376,7 @@ static void scsi_write_data(SCSIRequest *req)
-     SCSIDevice *s =3D r->req.dev;
-     int ret;
+@@ -540,7 +532,7 @@ static void scsi_write_data(SCSIRequest *req)
+     /* The request is used as the AIO opaque value, so add a ref.  */
+     scsi_req_ref(&r->req);
+     if (r->req.cmd.mode !=3D SCSI_XFER_TO_DEV) {
+-        DPRINTF("Data transfer direction invalid\n");
++        trace_scsi_disk_write_data_invalid();
+         scsi_write_complete_noio(r, -EINVAL);
+         return;
+     }
+@@ -605,8 +597,7 @@ static int scsi_disk_emulate_vpd_page(SCSIRequest *re=
+q, uint8_t *outbuf)
+     switch (page_code) {
+     case 0x00: /* Supported page codes, mandatory */
+     {
+-        DPRINTF("Inquiry EVPD[Supported pages] "
+-                "buffer size %zd\n", req->cmd.xfer);
++        trace_scsi_disk_emulate_vpd_page_00(req->cmd.xfer);
+         outbuf[buflen++] =3D 0x00; /* list of supported pages (this page=
+) */
+         if (s->serial) {
+             outbuf[buflen++] =3D 0x80; /* unit serial number */
+@@ -624,7 +615,7 @@ static int scsi_disk_emulate_vpd_page(SCSIRequest *re=
+q, uint8_t *outbuf)
+         int l;
 =20
--    DPRINTF("scsi_write_data tag=3D0x%x\n", req->tag);
-+    trace_scsi_generic_write_data(req->tag);
-     if (r->len =3D=3D 0) {
-         r->len =3D r->buflen;
-         scsi_req_data(&r->req, r->len);
-@@ -411,6 +399,21 @@ static uint8_t *scsi_get_buf(SCSIRequest *req)
-     return r->buf;
- }
+         if (!s->serial) {
+-            DPRINTF("Inquiry (EVPD[Serial number] not supported\n");
++            trace_scsi_disk_emulate_vpd_page_80_not_supported();
+             return -1;
+         }
 =20
-+static void scsi_generic_command_dump(uint8_t *cmd, int len)
+@@ -633,8 +624,7 @@ static int scsi_disk_emulate_vpd_page(SCSIRequest *re=
+q, uint8_t *outbuf)
+             l =3D 36;
+         }
+=20
+-        DPRINTF("Inquiry EVPD[Serial number] "
+-                "buffer size %zd\n", req->cmd.xfer);
++        trace_scsi_disk_emulate_vpd_page_80(req->cmd.xfer);
+         memcpy(outbuf + buflen, s->serial, l);
+         buflen +=3D l;
+         break;
+@@ -649,8 +639,7 @@ static int scsi_disk_emulate_vpd_page(SCSIRequest *re=
+q, uint8_t *outbuf)
+         if (id_len > max_len) {
+             id_len =3D max_len;
+         }
+-        DPRINTF("Inquiry EVPD[Device identification] "
+-                "buffer size %zd\n", req->cmd.xfer);
++        trace_scsi_disk_emulate_vpd_page_83(req->cmd.xfer);
+=20
+         outbuf[buflen++] =3D 0x2; /* ASCII */
+         outbuf[buflen++] =3D 0;   /* not officially assigned */
+@@ -695,8 +684,7 @@ static int scsi_disk_emulate_vpd_page(SCSIRequest *re=
+q, uint8_t *outbuf)
+         SCSIBlockLimits bl =3D {};
+=20
+         if (s->qdev.type =3D=3D TYPE_ROM) {
+-            DPRINTF("Inquiry (EVPD[%02X] not supported for CDROM\n",
+-                    page_code);
++            trace_scsi_disk_emulate_vpd_page_b0_not_supported();
+             return -1;
+         }
+         bl.wsnz =3D 1;
+@@ -1243,8 +1231,9 @@ static int scsi_disk_emulate_mode_sense(SCSIDiskReq=
+ *r, uint8_t *outbuf)
+     dbd =3D (r->req.cmd.buf[1] & 0x8) !=3D 0;
+     page =3D r->req.cmd.buf[2] & 0x3f;
+     page_control =3D (r->req.cmd.buf[2] & 0xc0) >> 6;
+-    DPRINTF("Mode Sense(%d) (page %d, xfer %zd, page_control %d)\n",
+-        (r->req.cmd.buf[0] =3D=3D MODE_SENSE) ? 6 : 10, page, r->req.cmd=
+.xfer, page_control);
++
++    trace_scsi_disk_emulate_mode_sense((r->req.cmd.buf[0] =3D=3D MODE_SE=
+NSE) ? 6 :
++                                       10, page, r->req.cmd.xfer, page_c=
+ontrol);
+     memset(outbuf, 0, r->req.cmd.xfer);
+     p =3D outbuf;
+=20
+@@ -1336,7 +1325,7 @@ static int scsi_disk_emulate_read_toc(SCSIRequest *=
+req, uint8_t *outbuf)
+     format =3D req->cmd.buf[2] & 0xf;
+     start_track =3D req->cmd.buf[6];
+     blk_get_geometry(s->qdev.conf.blk, &nb_sectors);
+-    DPRINTF("Read TOC (track %d format %d msf %d)\n", start_track, forma=
+t, msf >> 1);
++    trace_scsi_disk_emulate_read_toc(start_track, format, msf >> 1);
+     nb_sectors /=3D s->qdev.blocksize / 512;
+     switch (format) {
+     case 0:
+@@ -1395,7 +1384,7 @@ static void scsi_disk_emulate_read_data(SCSIRequest=
+ *req)
+     int buflen =3D r->iov.iov_len;
+=20
+     if (buflen) {
+-        DPRINTF("Read buf_len=3D%d\n", buflen);
++        trace_scsi_disk_emulate_read_data(buflen);
+         r->iov.iov_len =3D 0;
+         r->started =3D true;
+         scsi_req_data(&r->req, buflen);
+@@ -1814,7 +1803,7 @@ static void scsi_disk_emulate_write_data(SCSIReques=
+t *req)
+=20
+     if (r->iov.iov_len) {
+         int buflen =3D r->iov.iov_len;
+-        DPRINTF("Write buf_len=3D%d\n", buflen);
++        trace_scsi_disk_emulate_write_data(buflen);
+         r->iov.iov_len =3D 0;
+         scsi_req_data(&r->req, buflen);
+         return;
+@@ -2023,7 +2012,7 @@ static int32_t scsi_disk_emulate_command(SCSIReques=
+t *req, uint8_t *buf)
+     case SERVICE_ACTION_IN_16:
+         /* Service Action In subcommands. */
+         if ((req->cmd.buf[1] & 31) =3D=3D SAI_READ_CAPACITY_16) {
+-            DPRINTF("SAI READ CAPACITY(16)\n");
++            trace_scsi_disk_emulate_command_SAI_16();
+             memset(outbuf, 0, req->cmd.xfer);
+             blk_get_geometry(s->qdev.conf.blk, &nb_sectors);
+             if (!nb_sectors) {
+@@ -2061,7 +2050,7 @@ static int32_t scsi_disk_emulate_command(SCSIReques=
+t *req, uint8_t *buf)
+             /* Protection, exponent and lowest lba field left blank. */
+             break;
+         }
+-        DPRINTF("Unsupported Service Action In\n");
++        trace_scsi_disk_emulate_command_SAI_unsupported();
+         goto illegal_request;
+     case SYNCHRONIZE_CACHE:
+         /* The request is used as the AIO opaque value, so add a ref.  *=
+/
+@@ -2071,37 +2060,36 @@ static int32_t scsi_disk_emulate_command(SCSIRequ=
+est *req, uint8_t *buf)
+         r->req.aiocb =3D blk_aio_flush(s->qdev.conf.blk, scsi_aio_comple=
+te, r);
+         return 0;
+     case SEEK_10:
+-        DPRINTF("Seek(10) (sector %" PRId64 ")\n", r->req.cmd.lba);
++        trace_scsi_disk_emulate_command_SEEK_10(r->req.cmd.lba);
+         if (r->req.cmd.lba > s->qdev.max_lba) {
+             goto illegal_lba;
+         }
+         break;
+     case MODE_SELECT:
+-        DPRINTF("Mode Select(6) (len %lu)\n", (unsigned long)r->req.cmd.=
+xfer);
++        trace_scsi_disk_emulate_command_MODE_SELECT(r->req.cmd.xfer);
+         break;
+     case MODE_SELECT_10:
+-        DPRINTF("Mode Select(10) (len %lu)\n", (unsigned long)r->req.cmd=
+.xfer);
++        trace_scsi_disk_emulate_command_MODE_SELECT_10(r->req.cmd.xfer);
+         break;
+     case UNMAP:
+-        DPRINTF("Unmap (len %lu)\n", (unsigned long)r->req.cmd.xfer);
++        trace_scsi_disk_emulate_command_UNMAP(r->req.cmd.xfer);
+         break;
+     case VERIFY_10:
+     case VERIFY_12:
+     case VERIFY_16:
+-        DPRINTF("Verify (bytchk %d)\n", (req->cmd.buf[1] >> 1) & 3);
++        trace_scsi_disk_emulate_command_VERIFY((req->cmd.buf[1] >> 1) & =
+3);
+         if (req->cmd.buf[1] & 6) {
+             goto illegal_request;
+         }
+         break;
+     case WRITE_SAME_10:
+     case WRITE_SAME_16:
+-        DPRINTF("WRITE SAME %d (len %lu)\n",
+-                req->cmd.buf[0] =3D=3D WRITE_SAME_10 ? 10 : 16,
+-                (unsigned long)r->req.cmd.xfer);
++        trace_scsi_disk_emulate_command_WRITE_SAME(
++                req->cmd.buf[0] =3D=3D WRITE_SAME_10 ? 10 : 16, r->req.c=
+md.xfer);
+         break;
+     default:
+-        DPRINTF("Unknown SCSI command (%2.2x=3D%s)\n", buf[0],
+-                scsi_command_name(buf[0]));
++        trace_scsi_disk_emulate_command_UNKNOWN(buf[0],
++                                                scsi_command_name(buf[0]=
+));
+         scsi_check_condition(r, SENSE_CODE(INVALID_OPCODE));
+         return 0;
+     }
+@@ -2154,7 +2142,7 @@ static int32_t scsi_disk_dma_command(SCSIRequest *r=
+eq, uint8_t *buf)
+     case READ_10:
+     case READ_12:
+     case READ_16:
+-        DPRINTF("Read (sector %" PRId64 ", count %u)\n", r->req.cmd.lba,=
+ len);
++        trace_scsi_disk_dma_command_READ(r->req.cmd.lba, len);
+         /* Protection information is not supported.  For SCSI versions 2=
+ and
+          * older (as determined by snooping the guest's INQUIRY commands=
+),
+          * there is no RD/WR/VRPROTECT, so skip this check in these vers=
+ions.
+@@ -2179,7 +2167,7 @@ static int32_t scsi_disk_dma_command(SCSIRequest *r=
+eq, uint8_t *buf)
+             scsi_check_condition(r, SENSE_CODE(WRITE_PROTECTED));
+             return 0;
+         }
+-        DPRINTF("Write %s(sector %" PRId64 ", count %u)\n",
++        trace_scsi_disk_dma_command_WRITE(
+                 (command & 0xe) =3D=3D 0xe ? "And Verify " : "",
+                 r->req.cmd.lba, len);
+         /* fall through */
+@@ -2497,6 +2485,22 @@ static const SCSIReqOps *const scsi_disk_reqops_di=
+spatch[256] =3D {
+     [WRITE_VERIFY_16]                 =3D &scsi_disk_dma_reqops,
+ };
+=20
++static void scsi_disk_new_request_dump(uint32_t lun, uint32_t tag, uint8=
+_t *buf)
 +{
 +    int i;
++    int len =3D scsi_cdb_length(buf);
 +    char *line_buffer, *p;
 +
 +    line_buffer =3D g_malloc(len * 5 + 1);
 +
 +    for (i =3D 0, p =3D line_buffer; i < len; i++) {
-+        p +=3D sprintf(p, " 0x%02x", cmd[i]);
++        p +=3D sprintf(p, " 0x%02x", buf[i]);
 +    }
-+    trace_scsi_generic_send_command(line_buffer);
++    trace_scsi_disk_new_request(lun, tag, line_buffer);
 +
 +    g_free(line_buffer);
 +}
 +
- /* Execute a scsi command.  Returns the length of the data expected by t=
-he
-    command.  This will be Positive for data transfers from the device
-    (eg. disk reads), negative for transfers to the device (eg. disk writ=
-es),
-@@ -422,16 +425,9 @@ static int32_t scsi_send_command(SCSIRequest *req, u=
-int8_t *cmd)
-     SCSIDevice *s =3D r->req.dev;
-     int ret;
+ static SCSIRequest *scsi_new_request(SCSIDevice *d, uint32_t tag, uint32=
+_t lun,
+                                      uint8_t *buf, void *hba_private)
+ {
+@@ -2512,16 +2516,9 @@ static SCSIRequest *scsi_new_request(SCSIDevice *d=
+, uint32_t tag, uint32_t lun,
+     }
+     req =3D scsi_req_alloc(ops, &s->qdev, tag, lun, hba_private);
 =20
 -#ifdef DEBUG_SCSI
--    DPRINTF("Command: data=3D0x%02x", cmd[0]);
+-    DPRINTF("Command: lun=3D%d tag=3D0x%x data=3D0x%02x", lun, tag, buf[=
+0]);
 -    {
 -        int i;
--        for (i =3D 1; i < r->req.cmd.len; i++) {
--            printf(" 0x%02x", cmd[i]);
+-        for (i =3D 1; i < scsi_cdb_length(buf); i++) {
+-            printf(" 0x%02x", buf[i]);
 -        }
 -        printf("\n");
-+    if (trace_event_get_state_backends(TRACE_SCSI_GENERIC_SEND_COMMAND))=
- {
-+        scsi_generic_command_dump(cmd, r->req.cmd.len);
++    if (trace_event_get_state_backends(TRACE_SCSI_DISK_NEW_REQUEST)) {
++        scsi_disk_new_request_dump(lun, tag, buf);
      }
 -#endif
 =20
-     if (r->req.cmd.xfer =3D=3D 0) {
-         g_free(r->buf);
-@@ -693,7 +689,7 @@ static void scsi_generic_realize(SCSIDevice *s, Error=
- **errp)
-=20
-     /* define device state */
-     s->type =3D scsiid.scsi_type;
--    DPRINTF("device type %d\n", s->type);
-+    trace_scsi_generic_realize_type(s->type);
-=20
-     switch (s->type) {
-     case TYPE_TAPE:
-@@ -716,7 +712,7 @@ static void scsi_generic_realize(SCSIDevice *s, Error=
- **errp)
-         break;
-     }
-=20
--    DPRINTF("block size %d\n", s->blocksize);
-+    trace_scsi_generic_realize_blocksize(s->blocksize);
-=20
-     /* Only used by scsi-block, but initialize it nevertheless to be cle=
-an.  */
-     s->default_scsi_version =3D -1;
+     return req;
+ }
 diff --git a/hw/scsi/trace-events b/hw/scsi/trace-events
-index e9625f790c..3c2fd7f52f 100644
+index 0fb6a99616..e9625f790c 100644
 --- a/hw/scsi/trace-events
 +++ b/hw/scsi/trace-events
-@@ -320,3 +320,14 @@ scsi_disk_emulate_command_UNKNOWN(int cmd, const cha=
-r *name) "Unknown SCSI comma
- scsi_disk_dma_command_READ(uint64_t lba, uint32_t len) "Read (sector %" =
-PRId64 ", count %u)"
- scsi_disk_dma_command_WRITE(const char *cmd, uint64_t lba, int len) "Wri=
-te %s(sector %" PRId64 ", count %u)"
- scsi_disk_new_request(uint32_t lun, uint32_t tag, const char *line) "Com=
-mand: lun=3D%d tag=3D0x%x data=3D%s"
+@@ -291,3 +291,32 @@ lsi_execute_script_stop(void) "SCRIPTS execution sto=
+pped"
+ lsi_awoken(void) "Woken by SIGP"
+ lsi_reg_read(const char *name, int offset, uint8_t ret) "Read reg %s 0x%=
+x =3D 0x%02x"
+ lsi_reg_write(const char *name, int offset, uint8_t val) "Write reg %s 0=
+x%x =3D 0x%02x"
 +
-+# hw/scsi/scsi-generic.c
-+scsi_generic_command_complete_noio(void *req, uint32_t tag, int statuc) =
-"Command complete %p tag=3D0x%x status=3D%d"
-+scsi_generic_read_complete(uint32_t tag, int len) "Data ready tag=3D0x%x=
- len=3D%d"
-+scsi_generic_read_data(uint32_t tag) "scsi_read_data tag=3D0x%x"
-+scsi_generic_write_complete(int ret) "scsi_write_complete() ret =3D %d"
-+scsi_generic_write_complete_blocksize(int blocksize) "block size %d"
-+scsi_generic_write_data(uint32_t tag) "scsi_write_data tag=3D0x%x"
-+scsi_generic_send_command(const char *line) "Command: data=3D%s"
-+scsi_generic_realize_type(int type) "device type %d"
-+scsi_generic_realize_blocksize(int blocksize) "block size %d"
++# hw/scsi/scsi-disk.c
++scsi_disk_check_condition(uint32_t tag, uint8_t key, uint8_t asc, uint8_=
+t ascq) "Command complete tag=3D0x%x sense=3D%d/%d/%d"
++scsi_disk_read_complete(uint32_t tag, size_t size) "Data ready tag=3D0x%=
+x len=3D%zd"
++scsi_disk_read_data_count(uint32_t sector_count) "Read sector_count=3D%d=
+"
++scsi_disk_read_data_invalid(void) "Data transfer direction invalid"
++scsi_disk_write_complete_noio(uint32_t tag, size_t size) "Write complete=
+ tag=3D0x%x more=3D%zd"
++scsi_disk_write_data_invalid(void) "Data transfer direction invalid"
++scsi_disk_emulate_vpd_page_00(size_t xfer) "Inquiry EVPD[Supported pages=
+] buffer size %zd"
++scsi_disk_emulate_vpd_page_80_not_supported(void) "Inquiry (EVPD[Serial =
+number] not supported"
++scsi_disk_emulate_vpd_page_80(size_t xfer) "Inquiry EVPD[Serial number] =
+buffer size %zd"
++scsi_disk_emulate_vpd_page_83(size_t xfer) "Inquiry EVPD[Device identifi=
+cation] buffer size %zd"
++scsi_disk_emulate_vpd_page_b0_not_supported(void) "Inquiry (EVPD[Block l=
+imits] not supported for CDROM"
++scsi_disk_emulate_mode_sense(int cmd, int page, size_t xfer, int control=
+) "Mode Sense(%d) (page %d, xfer %zd, page_control %d)"
++scsi_disk_emulate_read_toc(int start_track, int format, int msf) "Read T=
+OC (track %d format %d msf %d)"
++scsi_disk_emulate_read_data(int buflen) "Read buf_len=3D%d"
++scsi_disk_emulate_write_data(int buflen) "Write buf_len=3D%d"
++scsi_disk_emulate_command_SAI_16(void) "SAI READ CAPACITY(16)"
++scsi_disk_emulate_command_SAI_unsupported(void) "Unsupported Service Act=
+ion In"
++scsi_disk_emulate_command_SEEK_10(uint64_t lba) "Seek(10) (sector %" PRI=
+d64 ")"
++scsi_disk_emulate_command_MODE_SELECT(size_t xfer) "Mode Select(6) (len =
+%zd)"
++scsi_disk_emulate_command_MODE_SELECT_10(size_t xfer) "Mode Select(10) (=
+len %zd)"
++scsi_disk_emulate_command_UNMAP(size_t xfer) "Unmap (len %zd)"
++scsi_disk_emulate_command_VERIFY(int bytchk) "Verify (bytchk %d)"
++scsi_disk_emulate_command_WRITE_SAME(int cmd, size_t xfer) "WRITE SAME %=
+d (len %zd)"
++scsi_disk_emulate_command_UNKNOWN(int cmd, const char *name) "Unknown SC=
+SI command (0x%2.2x=3D%s)"
++scsi_disk_dma_command_READ(uint64_t lba, uint32_t len) "Read (sector %" =
+PRId64 ", count %u)"
++scsi_disk_dma_command_WRITE(const char *cmd, uint64_t lba, int len) "Wri=
+te %s(sector %" PRId64 ", count %u)"
++scsi_disk_new_request(uint32_t lun, uint32_t tag, const char *line) "Com=
+mand: lun=3D%d tag=3D0x%x data=3D%s"
 --=20
 2.19.2
