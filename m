@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <qwandor@google.com>) id 1gWfCd-0004Cf-5B
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:23:47 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gWibW-00059O-J1
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 09:01:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <qwandor@google.com>) id 1gWfCc-0007kP-6h
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:23:47 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46370)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <qwandor@google.com>) id 1gWfCb-0007ir-QZ
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 05:23:46 -0500
-Received: by mail-wr1-x441.google.com with SMTP id l9so13422908wrt.13
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 02:23:45 -0800 (PST)
+	(envelope-from <stefanha@redhat.com>) id 1gWibQ-0003fi-JH
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 09:01:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50306)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gWibQ-0003aa-9A
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 09:01:36 -0500
+Date: Tue, 11 Dec 2018 14:01:24 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20181211140124.GA23460@stefanha-x1.localdomain>
+References: <1544049446-6359-1-git-send-email-liam.merwick@oracle.com>
+	<1544049446-6359-2-git-send-email-liam.merwick@oracle.com>
 MIME-Version: 1.0
-References: <20181210183836.20074-1-qwandor@google.com>
-	<CAFEAcA9kXXeRkFamN73XREDp4QaokMs3E9TRLThKf4zYufapSQ@mail.gmail.com>
-	<CAMKQLNK2J=JsgEch3G-pQ0mjW5B-n8Xc_4PDGHjFs6CfcA2ngg@mail.gmail.com>
-	<CAFEAcA9LNUWrW1dePcKh4LLnN9xUKWswWnfjiNN_2JWExCj90A@mail.gmail.com>
-In-Reply-To: <CAFEAcA9LNUWrW1dePcKh4LLnN9xUKWswWnfjiNN_2JWExCj90A@mail.gmail.com>
-From: Andrew Walbran <qwandor@google.com>
-Date: Tue, 11 Dec 2018 10:23:31 +0000
-Message-ID: <CA+_y_2Fa3ffTEcmdNgg7iO+A4W1jZVGQb9GX_46jmER=zJsc6Q@mail.gmail.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature";
-	micalg=sha-256; boundary="000000000000e79559057cbc79ae"
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Implement VI/VF bits
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="LQksG6bCIzRHxTLp"
+Content-Disposition: inline
+In-Reply-To: <1544049446-6359-2-git-send-email-liam.merwick@oracle.com>
+Subject: Re: [Qemu-devel] [RFC 1/3] pvh: Add x86/HVM direct boot ABI header
+ file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,121 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: Wedson Almeida Filho <wedsonaf@google.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: Liam Merwick <liam.merwick@oracle.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, ehabkost@redhat.com, rth@twiddle.net, xen-devel@lists.xenproject.org, sgarzare@redhat.com, mst@redhat.com, maran.wilson@oracle.com
 
---000000000000e79559057cbc79ae
-Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 10 Dec 2018 at 22:05, Peter Maydell <peter.maydell@linaro.org>
-wrote:
+--LQksG6bCIzRHxTLp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> On Mon, 10 Dec 2018 at 21:32, Wedson Almeida Filho <wedsonaf@google.com>
-> wrote:
-> >
-> > Hi Peter,
-> >
-> > We put this together months ago and hadn't kept up to date with the
-> changes here.
-> >
-> > We're happy to see that support has been added for the VI bit. Is it
-> going to be available in the v3.1.0 release?
->
-> Yes, that commit is in 3.1.0 -- do test it and let me know if
-> there's still an issue in this area for your guest code.
->
-Ah, thanks, you're quite right! Everything seems to work fine in
-v3.1.0-rc5, please ignore this patch.
+On Wed, Dec 05, 2018 at 10:37:24PM +0000, Liam Merwick wrote:
+> From: Liam Merwick <Liam.Merwick@oracle.com>
+>=20
+> The x86/HVM direct boot ABI permits Qemu to be able to boot directly
+> into the uncompressed Linux kernel binary without the need to run firmwar=
+e.
+>=20
+> 	https://xenbits.xen.org/docs/unstable/misc/pvh.html
+>=20
+> This commit adds the header file that defines the start_info struct
+> that needs to be populated in order to use this ABI.
+>=20
+> Signed-off-by: Maran Wilson <Maran.Wilson@oracle.com>
+> Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
+> Reviewed-by: Konrad Rzeszutek Wilk <Konrad.Wilk@oracle.com>
+> ---
+>  include/hw/xen/start_info.h | 146 ++++++++++++++++++++++++++++++++++++++=
+++++++
+>  1 file changed, 146 insertions(+)
+>  create mode 100644 include/hw/xen/start_info.h
 
---000000000000e79559057cbc79ae
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Does it make sense to bring in Linux
+include/xen/interface/hvm/start_info.h via QEMU's
+include/standard-headers/?
 
-MIIS6QYJKoZIhvcNAQcCoIIS2jCCEtYCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
-ghBPMIIEXDCCA0SgAwIBAgIOSBtqDm4P/739RPqw/wcwDQYJKoZIhvcNAQELBQAwZDELMAkGA1UE
-BhMCQkUxGTAXBgNVBAoTEEdsb2JhbFNpZ24gbnYtc2ExOjA4BgNVBAMTMUdsb2JhbFNpZ24gUGVy
-c29uYWxTaWduIFBhcnRuZXJzIENBIC0gU0hBMjU2IC0gRzIwHhcNMTYwNjE1MDAwMDAwWhcNMjEw
-NjE1MDAwMDAwWjBMMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTEiMCAG
-A1UEAxMZR2xvYmFsU2lnbiBIViBTL01JTUUgQ0EgMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
-AQoCggEBALR23lKtjlZW/17kthzYcMHHKFgywfc4vLIjfq42NmMWbXkNUabIgS8KX4PnIFsTlD6F
-GO2fqnsTygvYPFBSMX4OCFtJXoikP2CQlEvO7WooyE94tqmqD+w0YtyP2IB5j4KvOIeNv1Gbnnes
-BIUWLFxs1ERvYDhmk+OrvW7Vd8ZfpRJj71Rb+QQsUpkyTySaqALXnyztTDp1L5d1bABJN/bJbEU3
-Hf5FLrANmognIu+Npty6GrA6p3yKELzTsilOFmYNWg7L838NS2JbFOndl+ce89gM36CW7vyhszi6
-6LqqzJL8MsmkP53GGhf11YMP9EkmawYouMDP/PwQYhIiUO0CAwEAAaOCASIwggEeMA4GA1UdDwEB
-/wQEAwIBBjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwEgYDVR0TAQH/BAgwBgEB/wIB
-ADAdBgNVHQ4EFgQUyzgSsMeZwHiSjLMhleb0JmLA4D8wHwYDVR0jBBgwFoAUJiSSix/TRK+xsBtt
-r+500ox4AAMwSwYDVR0fBEQwQjBAoD6gPIY6aHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9ncy9n
-c3BlcnNvbmFsc2lnbnB0bnJzc2hhMmcyLmNybDBMBgNVHSAERTBDMEEGCSsGAQQBoDIBKDA0MDIG
-CCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzANBgkqhkiG
-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
-BgEFBQcwAoY0aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NodnNtaW1lY2Ex
-LmNydDAdBgNVHQ4EFgQUjOqjviYWNDzbpIZA9rXUhQD/PI4wHwYDVR0jBBgwFoAUyzgSsMeZwHiS
-jLMhleb0JmLA4D8wTAYDVR0gBEUwQzBBBgkrBgEEAaAyASgwNDAyBggrBgEFBQcCARYmaHR0cHM6
-Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wOwYDVR0fBDQwMjAwoC6gLIYqaHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2h2c21pbWVjYTEuY3JsMA4GA1UdDwEB/wQEAwIFoDAdBgNV
-HSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwDQYJKoZIhvcNAQELBQADggEBAJT+kOPyEAkypy9d
-Kvgp0tQqYnr9tB8GXBAFwVcBp65D9h/5CDqLyMV09pZx6Jt/KfEwGeaAy7go/KIuUFueEaWVeDdM
-alZPMuoVZABJ1fIsMOFlbmK0k2WwMlvWxKAOr1KIUkSgjtTqy+nEwHNU4e9U/ECXqkChMCv0gLVK
-VaS9gHvwegDzmPZTljNy19eua7qaEAqJg/m01Ph9J3S91hKc6jaNeM3d06dAXlY3E1Y6qc9NiERw
-gGBFJQs4fHifgtqf+YGoo+SXWONQdjG+0Dguyn9GkK76O7uyL3TZWAuNW6qptURaYW5Fl3S4anoi
-PfSZCMuXCj2LGgUUKa5GZLQxggJeMIICWgIBATBcMEwxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBH
-bG9iYWxTaWduIG52LXNhMSIwIAYDVQQDExlHbG9iYWxTaWduIEhWIFMvTUlNRSBDQSAxAgwe6rFI
-XyvxfCITQFowDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIBpdrVOUcOe+C5s9vinm
-qcLvmNul1Cgkqh/1rYZeubOVMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkF
-MQ8XDTE4MTIxMTEwMjM0NFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUD
-BAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsG
-CWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBlax1UEosSFpBbkuRhbd8NxK4iviMmqORDs2nb
-Dkv1I+2DmPAWHo/dyZKZvpGL9opadBbvE5jnuX7X8vYfOGQv4dCFA7XHk7TPeO3NRxjleeRzUwmq
-vWpFdnwA0WU2HCJdhQfoWt7bcuHb31XgiSeIhalZ0WwZa32oXxOfC2xaogwXpoB34ngD1LLmXydU
-2K5gwdfHyaOxzpwaXc/pbhmJJrBKxlxFdiY2NLv+rUFMKC9R/IJaHPzRJRfwjyeulpkzaqFyB088
-/i4IO31HLjiCCZqKLKEG2LJVRYMfnQJqliEniGfAD8Y40JFcLMlfNWIssfgYO9H8NirKW092nx/w
---000000000000e79559057cbc79ae--
+QEMU has a script in scripts/update-linux-header.sh for syncing Linux
+headers into include/standard-headers/.  This makes it easy to keep
+Linux header files up-to-date.  We basically treat files in
+include/standard-headers/ as auto-generated.
+
+If you define start_info.h yourself without using
+include/standard-headers/, then it won't be synced with Linux.
+
+--LQksG6bCIzRHxTLp
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcD8M0AAoJEJykq7OBq3PIOlMH/0Xf2zqEnnYKUyPXmya3wH6y
+LNjfD5I10PacQClqAaM/ZMBEjX3GNd2fppFZXCdv6ELktHx0Ix5HFTDa0P/ABCMs
+M3HT+tJ4J11rZwh1U0CZod7xbavQnoIMWJhQuPy367KsrscIRCEpoV3eO/4lu4gb
+3vkl+t+4e2GCegs0CWLPCHfv+Qs084prHK/0BoURzQGNLB7il/O5g6FGG1LmZlse
+gKkboRKnN/MiG6ct+Z1RQZhp16+u4s94MYGy+hgtSVI6Q5cNFYZ6UbzA8f5+FTFQ
+rqOQZ+LHqMV2dZ/yRugRkjbvld1AGSPyp3AkiAkDdOC89TVSTSx91+2YQg2i1GQ=
+=Wifw
+-----END PGP SIGNATURE-----
+
+--LQksG6bCIzRHxTLp--
