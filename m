@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=87697dac6=Paul.Durrant@citrix.com>)
-	id 1gWkCz-0007hj-AK
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:44:30 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gWkDv-00008F-LI
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:45:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=87697dac6=Paul.Durrant@citrix.com>)
-	id 1gWkCv-0005rg-7f
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:44:29 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Tue, 11 Dec 2018 15:43:52 +0000
-Message-ID: <7a3465bbcbd441638ebe1eec7623599c@AMSPEX02CL03.citrite.net>
-References: <1544525238-3527-1-git-send-email-paul.durrant@citrix.com>
-	<1544525238-3527-8-git-send-email-paul.durrant@citrix.com>
-	<20181211152455.GT18875@perard.uk.xensource.com>
-In-Reply-To: <20181211152455.GT18875@perard.uk.xensource.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <peter.maydell@linaro.org>) id 1gWkDu-0006iQ-UP
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:45:27 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35051)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gWkDu-0006iA-P1
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:45:26 -0500
+Received: by mail-ot1-x341.google.com with SMTP id 81so14463353otj.2
+	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 07:45:26 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 07/18] xen: add event channel interface
- for XenDevice-s
+References: <20181207103631.28193-1-richard.henderson@linaro.org>
+	<20181207103631.28193-25-richard.henderson@linaro.org>
+In-Reply-To: <20181207103631.28193-25-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 11 Dec 2018 15:45:14 +0000
+Message-ID: <CAFEAcA_rYiGZN=hXBYWbMhu-rH86xJAreHkpisz=zKUfa773SA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 24/26] target/arm: Enable PAuth for
+ user-only -cpu max
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony Perard <anthony.perard@citrix.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
 
-> -----Original Message-----
-> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
-> Sent: 11 December 2018 15:25
-> To: Paul Durrant <Paul.Durrant@citrix.com>
-> Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
-> devel@lists.xenproject.org
-> Subject: Re: [PATCH v3 07/18] xen: add event channel interface for
-> XenDevice-s
->=20
-> On Tue, Dec 11, 2018 at 10:47:07AM +0000, Paul Durrant wrote:
-> > The legacy PV backend infrastructure provides functions to bind, unbind
-> > and send notifications to event channnels. Similar functionality will b=
-e
-> > required by XenDevice implementations so this patch adds the necessary
-> > support.
-> >
-> > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-> > Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
->=20
-> When and where did this review happend? I can only find my review-by tag
-> on v2, which is missing here.
->=20
+On Fri, 7 Dec 2018 at 10:37, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/cpu64.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> index 1d57be0c91..84f70b2a24 100644
+> --- a/target/arm/cpu64.c
+> +++ b/target/arm/cpu64.c
+> @@ -316,6 +316,10 @@ static void aarch64_max_initfn(Object *obj)
+>
+>          t = cpu->isar.id_aa64isar1;
+>          t = FIELD_DP64(t, ID_AA64ISAR1, FCMA, 1);
+> +        t = FIELD_DP64(t, ID_AA64ISAR1, APA, 1); /* PAuth, architected only */
+> +        t = FIELD_DP64(t, ID_AA64ISAR1, API, 0);
+> +        t = FIELD_DP64(t, ID_AA64ISAR1, GPA, 1);
+> +        t = FIELD_DP64(t, ID_AA64ISAR1, GPI, 0);
+>          cpu->isar.id_aa64isar1 = t;
+>
+>          t = cpu->isar.id_aa64pfr0;
 
-Oh, that must have been my mistake... I cut'n'pasted the wrong line. Apolog=
-ies to Stefano and yourself... I'll fix it in v4.
+I don't see why this is enabling for user-only and
+not also for system: what am I missing ?
 
-  Paul
-
-> --
-> Anthony PERARD
+thanks
+-- PMM
