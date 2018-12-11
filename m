@@ -1,28 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maran.wilson@oracle.com>) id 1gWmsV-0000Sq-MI
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:35:33 -0500
+	(envelope-from <mst@redhat.com>) id 1gWnCe-00087v-Sv
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:56:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maran.wilson@oracle.com>) id 1gWmsR-0007Aa-F3
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:35:31 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:60954)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maran.wilson@oracle.com>)
-	id 1gWmsO-0006yA-1L
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:35:24 -0500
-References: <1544049446-6359-1-git-send-email-liam.merwick@oracle.com>
-	<1544049446-6359-4-git-send-email-liam.merwick@oracle.com>
-	<CAGxU2F4j11wVoDktowJwXDy42_PWbjwF0qAueFg+He4Tb86wgQ@mail.gmail.com>
-From: Maran Wilson <maran.wilson@oracle.com>
-Message-ID: <33fb9ea4-d6c5-ed23-2fb5-6f818e250043@oracle.com>
-Date: Tue, 11 Dec 2018 10:35:01 -0800
+	(envelope-from <mst@redhat.com>) id 1gWnCa-0006yN-PE
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:56:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54127)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gWnCa-0006xa-G8
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:56:16 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 46B7029A76
+	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 18:56:15 +0000 (UTC)
+Date: Tue, 11 Dec 2018 13:56:04 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181211135230-mutt-send-email-mst@kernel.org>
+References: <20181126124250.29985-1-marcandre.lureau@redhat.com>
+	<20181126124250.29985-2-marcandre.lureau@redhat.com>
+	<20181210142956.wucn33osm7fxa27d@sirius.home.kraxel.org>
+	<CAMxuvawUrZ=y-txTS86Tz3b-BYY05k4n-jBiY8+vO5e7AOkPKA@mail.gmail.com>
+	<20181210183313-mutt-send-email-mst@kernel.org>
+	<20181211074241.ovuharwewaw22ygq@sirius.home.kraxel.org>
+	<20181211092944.GA921@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAGxU2F4j11wVoDktowJwXDy42_PWbjwF0qAueFg+He4Tb86wgQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [RFC 3/3] pvh: Boot uncompressed kernel using
- direct boot ABI
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181211092944.GA921@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 01/11] vhost-user: define
+ conventions for vhost-user backends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,158 +40,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>, liam.merwick@oracle.com
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, rth@twiddle.net, xen-devel@lists.xenproject.org, mst@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: "Hoffmann, Gerd" <kraxel@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-On 12/11/2018 9:11 AM, Stefano Garzarella wrote:
-> Hi Liam,
-> in order to support PVH also with SeaBIOS, I'm going to work on a new
-> option rom (like linuxboot/multiboot) that can be used in this case.
+On Tue, Dec 11, 2018 at 09:29:44AM +0000, Daniel P. Berrang=E9 wrote:
+> On Tue, Dec 11, 2018 at 08:42:41AM +0100, Hoffmann, Gerd wrote:
+> >   Hi,
+> >=20
+> > > Right. The main issue is that we need to make sure only
+> > > in-tree devices are supported.
+> >=20
+> > Well, that is under debate right now, see:
+> > https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg04912.html
+>=20
+> I've previously been against the idea of external plugins for QEMU,
+> however, that was when the plugin was something that would be dlopen'd
+> by QEMU. That would cause our internal ABI to be exposed to 3rd parties
+> which is highly undesirable, even if they were open source to comply
+> with the license needs.
+>=20
+> When the plugin is a completely isolated process communicating with a
+> well defined protocol, it is not placing a significant burden on the
+> QEMU developers' ongoing maintainence, nor has problems with license
+> compliance. The main problem would come from debugging the combined
+> system as the external process is essentially a black box from QEMU's
+> POV. Downstream OS vendors are free to place restrictions on which
+> backend processes they'd be willing to support with QEMU, and upstream
+> is under no obligation to debug stuff beyond the QEMU boundary.
+>=20
+> We have already accepted that tradeoff with networking by supporting
+> vhost-user and have externals impls like DPDK, so I don't see a
+> compelling reason to try to restrict it for other vhost-user backends.
 
-That is awesome. Yes, please keep us posted when you have something working.
+OK seems to be more or less a rough concensus then.
 
-Just FYI, before switching over to using Qemu+qboot, we had been using a 
-Qemu only solution (but not using an option rom) internally that worked 
-very well using no FW at all. We had Qemu simply parse the ELF file and 
-jump to the PVH entry point if one is found. The only gotcha was that we 
-had to include a pair of patches that were originally written by folks 
-at Intel as part of the clear containers work. Specifically, in order to 
-be able to skip firmware entirely, we had to do 2 additional things: (1) 
-ACPI tables generated by Qemu are usually patched up by FW. Since we 
-were running no FW, we needed to do that patching up of the ACPI tables 
-in Qemu when it was detected that we were going to enter the OS via the 
-PVH entry point. (2) We also needed to add a patch to Qemu to enable a 
-few PM registers -- something typically done by FW.
+I wonder what's the approach wrt migration though.
 
-But if SeaBIOS is involved in the solution you are working on, I guess 
-you won't really need those extra patches. Just figured I'd mention it 
-so you have the full picture.
+Even the compatibility story about vhost-user isn't
+great, I would like to see something solid before
+we allow that.
 
-Thanks,
--Maran
+Are we happy to just block live migration?
+For sure that's already the case with VFIO.
 
-> I'll keep you updated on it!
->
-> Cheers,
-> Stefano
-> On Wed, Dec 5, 2018 at 11:38 PM Liam Merwick <liam.merwick@oracle.com> wrote:
->> These changes (along with corresponding qboot and Linux kernel changes)
->> enable a guest to be booted using the x86/HVM direct boot ABI.
->>
->> This commit adds a load_elfboot() routine to pass the size and
->> location of the kernel entry point to qboot (which will fill in
->> the start_info struct information needed to to boot the guest).
->> Having loaded the ELF binary, load_linux() will run qboot
->> which continues the boot.
->>
->> The address for the kernel entry point has already been read
->> from an ELF Note in the uncompressed kernel binary earlier
->> in pc_memory_init().
->>
->> Signed-off-by: George Kennedy <George.Kennedy@oracle.com>
->> Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
->> ---
->>   hw/i386/pc.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 72 insertions(+)
->>
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index 056aa46d99b9..d3012cbd8597 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -54,6 +54,7 @@
->>   #include "sysemu/qtest.h"
->>   #include "kvm_i386.h"
->>   #include "hw/xen/xen.h"
->> +#include "hw/xen/start_info.h"
->>   #include "ui/qemu-spice.h"
->>   #include "exec/memory.h"
->>   #include "exec/address-spaces.h"
->> @@ -1098,6 +1099,50 @@ done:
->>       return pvh_start_addr != 0;
->>   }
->>
->> +static bool load_elfboot(const char *kernel_filename,
->> +                   int kernel_file_size,
->> +                   uint8_t *header,
->> +                   size_t pvh_xen_start_addr,
->> +                   FWCfgState *fw_cfg)
->> +{
->> +    uint32_t flags = 0;
->> +    uint32_t mh_load_addr = 0;
->> +    uint32_t elf_kernel_size = 0;
->> +    uint64_t elf_entry;
->> +    uint64_t elf_low, elf_high;
->> +    int kernel_size;
->> +
->> +    if (ldl_p(header) != 0x464c457f) {
->> +        return false; /* no elfboot */
->> +    }
->> +
->> +    bool elf_is64 = header[EI_CLASS] == ELFCLASS64;
->> +    flags = elf_is64 ?
->> +        ((Elf64_Ehdr *)header)->e_flags : ((Elf32_Ehdr *)header)->e_flags;
->> +
->> +    if (flags & 0x00010004) { /* LOAD_ELF_HEADER_HAS_ADDR */
->> +        error_report("elfboot unsupported flags = %x", flags);
->> +        exit(1);
->> +    }
->> +
->> +    kernel_size = load_elf(kernel_filename, NULL, NULL, &elf_entry,
->> +                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
->> +                           0, 0);
->> +
->> +    if (kernel_size < 0) {
->> +        error_report("Error while loading elf kernel");
->> +        exit(1);
->> +    }
->> +    mh_load_addr = elf_low;
->> +    elf_kernel_size = elf_high - elf_low;
->> +
->> +    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_xen_start_addr);
->> +    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
->> +    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
->> +
->> +    return true;
->> +}
->> +
->>   static void load_linux(PCMachineState *pcms,
->>                          FWCfgState *fw_cfg)
->>   {
->> @@ -1138,6 +1183,33 @@ static void load_linux(PCMachineState *pcms,
->>       if (ldl_p(header+0x202) == 0x53726448) {
->>           protocol = lduw_p(header+0x206);
->>       } else {
->> +        /* If the kernel address for using the x86/HVM direct boot ABI has
->> +         * been saved then proceed with booting the uncompressed kernel */
->> +        if (pvh_start_addr) {
->> +            if (load_elfboot(kernel_filename, kernel_size,
->> +                             header, pvh_start_addr, fw_cfg)) {
->> +                struct hvm_modlist_entry ramdisk_mod = { 0 };
->> +
->> +                fclose(f);
->> +
->> +                fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
->> +                    strlen(kernel_cmdline) + 1);
->> +                fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA, kernel_cmdline);
->> +
->> +                assert(machine->device_memory != NULL);
->> +                ramdisk_mod.paddr = machine->device_memory->base;
->> +                ramdisk_mod.size =
->> +                    memory_region_size(&machine->device_memory->mr);
->> +
->> +                fw_cfg_add_bytes(fw_cfg, FW_CFG_KERNEL_DATA, &ramdisk_mod,
->> +                                 sizeof(ramdisk_mod));
->> +                fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_SIZE, sizeof(header));
->> +                fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA,
->> +                                 header, sizeof(header));
->> +
->> +                return;
->> +            }
->> +        }
->>           /* This looks like a multiboot kernel. If it is, let's stop
->>              treating it like a Linux kernel. */
->>           if (load_multiboot(fw_cfg, f, kernel_filename, initrd_filename,
->> --
->> 1.8.3.1
->>
->
+
+> > > vhost-user by design
+> > > is for out of tree users. It needn't be hard,
+> > > maybe it's enough to just make qemu launch these processes
+> > > as opposed to connecting to them on command line.
+> >=20
+> > Not sure this is a good idea, with security being one of the motivati=
+ng
+> > factors to move device emulation to other processes.  When libvirt
+> > launches the processes it can place them in separate sandboxes ...
+>=20
+> Yep, libvirt already turns on seccomp policies which forbid QEMU from
+> forking/execing anything, and we have no desire to go backwards here.
+> Any external processes have to be launched by libvirt ahead of time.
+>=20
+>=20
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
