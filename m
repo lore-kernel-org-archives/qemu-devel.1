@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gWm3l-0004RN-80
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 12:43:06 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gWm3y-0004Zd-9O
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 12:43:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gWm3i-0005Gc-Fk
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 12:43:05 -0500
-References: <03506cf0-a204-f619-8ee4-4990a5e69af5@cea.fr>
-	<CAAdtpL5BdqUvHpVTpKuJ6R+yEHGi7U6T9rUK2PbL3nwC7F_3jA@mail.gmail.com>
-	<271fd922-943a-f092-d714-697320e9ea21@twiddle.net>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <fae4435d-2b31-204c-7c5d-4bc19a122d12@vivier.eu>
-Date: Tue, 11 Dec 2018 18:42:30 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1gWm3n-0005JG-7u
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 12:43:12 -0500
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:39925)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gWm3m-0005IS-Sh
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 12:43:07 -0500
+Received: by mail-wr1-x430.google.com with SMTP id t27so14997096wra.6
+	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 09:43:06 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Tue, 11 Dec 2018 17:42:53 +0000
+Message-Id: <20181211174253.10947-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <271fd922-943a-f092-d714-697320e9ea21@twiddle.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] Fixes i386 xchgq test
+Subject: [Qemu-devel] [RFC PATCH] contrib: add a basic gitdm config
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,25 +27,549 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, fabrice.desclaux@cea.fr, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>, camille.mougey@cea.fr
+To: qemu-devel@nongnu.org
+Cc: maxim.kuvyrkov@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Le 10/12/2018 à 20:42, Richard Henderson a écrit :
-> On 12/10/18 1:26 PM, Philippe Mathieu-Daudé wrote:
->> Hi Fabrice,
->>
->> On Fri, Dec 7, 2018 at 5:06 PM <fabrice.desclaux@cea.fr> wrote:
->>>
->>> As "xchg" reads and writes both operands, the "+m" is required to avoid
->>> undefined behavior on -O2 compilation.
->>>
->>> Signed-off-by: Fabrice Desclaux <fabrice.desclaux@cea.fr>
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> 
-> 
+This is a QEMU specific version of a gitdm config for generating
+reports on the contributor base of the project. I've added enough
+group maps and domain aliases to ensure the current top ten is as
+reflective as it can be. As of this commit running:
 
-Applied to my trivial-patches branch.
+  git log --numstat --since "Last Year" | gitdm -n -l 16
 
-Thanks,
-Laurent
+Reports:
+
+  Top changeset contributors by employer
+  RedHat                    3116 (43.8%)
+  Linaro                    1166 (16.4%)
+  f4bug@amsat.org            384 (5.4%)
+  IBM                        170 (2.4%)
+  Virtuozzo                  168 (2.4%)
+  mark.cave-ayland@ilande.co.uk  161 (2.3%)
+  cota@braap.org             134 (1.9%)
+  Xilinx                     102 (1.4%)
+  clg@kaod.org               100 (1.4%)
+  Igalia                      93 (1.3%)
+  Cadence Design Systems      88 (1.2%)
+  groug@kaod.org              78 (1.1%)
+  Wave Computing              73 (1.0%)
+  SiFive                      59 (0.8%)
+  Oracle                      53 (0.7%)
+  noring@nocrew.org           37 (0.5%)
+
+  Top lines changed by employer
+  RedHat                    143092 (27.9%)
+  Cadence Design Systems    126554 (24.7%)
+  Linaro                    78371 (15.3%)
+  Wave Computing            29258 (5.7%)
+  SiFive                    14392 (2.8%)
+  Virtuozzo                 10445 (2.0%)
+  cota@braap.org            9803 (1.9%)
+  CodeWeavers               9179 (1.8%)
+  IBM                       7608 (1.5%)
+  mark.cave-ayland@ilande.co.uk 6838 (1.3%)
+  f4bug@amsat.org           5140 (1.0%)
+  Xilinx                    4572 (0.9%)
+  Oracle                    4546 (0.9%)
+  balaton@eik.bme.hu        4342 (0.8%)
+  andrew.smirnov@gmail.com  3511 (0.7%)
+  clg@kaod.org              3263 (0.6%)
+
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ contrib/gitdm/domain-map            |  15 ++
+ contrib/gitdm/filetypes.txt         | 362 ++++++++++++++++++++++++++++
+ contrib/gitdm/group-map-cadence     |   3 +
+ contrib/gitdm/group-map-codeweavers |   1 +
+ contrib/gitdm/group-map-redhat      |   6 +
+ contrib/gitdm/group-map-wavecomp    |   8 +
+ gitdm.config                        |  41 ++++
+ 7 files changed, 436 insertions(+)
+ create mode 100644 contrib/gitdm/domain-map
+ create mode 100644 contrib/gitdm/filetypes.txt
+ create mode 100644 contrib/gitdm/group-map-cadence
+ create mode 100644 contrib/gitdm/group-map-codeweavers
+ create mode 100644 contrib/gitdm/group-map-redhat
+ create mode 100644 contrib/gitdm/group-map-wavecomp
+ create mode 100644 gitdm.config
+
+diff --git a/contrib/gitdm/domain-map b/contrib/gitdm/domain-map
+new file mode 100644
+index 0000000000..234e616f37
+--- /dev/null
++++ b/contrib/gitdm/domain-map
+@@ -0,0 +1,15 @@
++#
++# QEMU gitdm domain-map
++#
++# This maps email domains to nice easy to read company names
++#
++
++ibm.com         IBM
++igalia.com      Igalia
++ispras.ru       Institute for System Programming of RAS
++linaro.org      Linaro
++oracle.com      Oracle
++redhat.com      RedHat
++sifive.com      SiFive
++virtuozzo.com   Virtuozzo
++xilinx.com      Xilinx
+diff --git a/contrib/gitdm/filetypes.txt b/contrib/gitdm/filetypes.txt
+new file mode 100644
+index 0000000000..e24c396b48
+--- /dev/null
++++ b/contrib/gitdm/filetypes.txt
+@@ -0,0 +1,362 @@
++# -*- coding:utf-8 -*-
++# Copyright (C)  2006 Libresoft
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option  any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU Library General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++#
++# Authors : Gregorio Robles <grex@gsyc.escet.urjc.es>
++# Authors : Germán Póo-Caamaño <gpoo@gnome.org>
++#
++# This file contains associations parameters regarding filetypes
++# (documentation, develompent, multimedia, images...)
++#
++# format:
++# filetype <type> <regex> [<comment>]
++#
++# Order:
++#   The list should keep an order, so filetypes can be counted properly.
++#   ie. we want ltmain.sh -> 'build' instead of 'code'.
++#
++#   If there is an filetype which is not in order but has values, it will
++#   be added at the end.
++#
++order image,translation,ui,multimedia,package,build,code,documentation,devel-doc
++#
++#
++# Code files (headers and the like included
++# (most common languages first
++#
++filetype code \.c$	# C
++filetype code \.pc$	# C
++filetype code \.ec$	# C
++filetype code \.ecp$	# C
++filetype code \.C$	# C++
++filetype code \.cpp$	# C++
++filetype code \.c\+\+$	# C++
++filetype code \.cxx$	# C++
++filetype code \.cc$	# C++
++filetype code \.pcc$	# C++
++filetype code \.cpy$	# C++
++filetype code \.h$	# C or C++ header
++filetype code \.hh$	# C++ header
++filetype code \.hpp$	# C++ header
++filetype code \.hxx$	# C++ header
++filetype code \.sh$	# Shell
++filetype code \.pl$	# Perl
++filetype code \.pm$	# Perl
++filetype code \.pod$	# Perl
++filetype code \.perl$	# Perl
++filetype code \.cgi$	# CGI
++filetype code \.php$	# PHP
++filetype code \.php3$	# PHP
++filetype code \.php4$	# PHP
++filetype code \.inc$	# PHP
++filetype code \.py$	# Python
++filetype code \.java$	# Java
++filetype code \.class$	# Java Class (or at least a class in some OOPL
++filetype code \.ada$	# ADA
++filetype code \.ads$	# ADA
++filetype code \.adb$	# ADA
++filetype code \.pad$	# ADA
++filetype code \.s$	# Assembly
++filetype code \.S$	# Assembly
++filetype code \.asm$	# Assembly
++filetype code \.awk$	# awk
++filetype code \.cs$	# C#
++filetype code \.csh$	# CShell (including tcsh
++filetype code \.cob$	# COBOL
++filetype code \.cbl$	# COBOL
++filetype code \.COB$	# COBOL
++filetype code \.CBL$	# COBOL
++filetype code \.exp$	# Expect
++filetype code \.l$	# (F lex
++filetype code \.ll$	# (F lex
++filetype code \.lex$	# (F lex
++filetype code \.f$	# Fortran
++filetype code \.f77$	# Fortran
++filetype code \.F$	# Fortran
++filetype code \.hs$	# Haskell
++filetype code \.lhs$	# Not preprocessed Haskell
++filetype code \.el$	# LISP (including Scheme
++filetype code \.scm$	# LISP (including Scheme
++filetype code \.lsp$	# LISP (including Scheme
++filetype code \.jl$	# LISP (including Scheme
++filetype code \.ml$	# ML
++filetype code \.ml3$	# ML
++filetype code \.m3$	# Modula3
++filetype code \.i3$	# Modula3
++filetype code \.m$	# Objective-C
++filetype code \.p$	# Pascal
++filetype code \.pas$	# Pascal
++filetype code \.rb$	# Ruby
++filetype code \.sed$	# sed
++filetype code \.tcl$	# TCL
++filetype code \.tk$	# TCL
++filetype code \.itk$	# TCL
++filetype code \.y$	# Yacc
++filetype code \.yy$	# Yacc
++filetype code \.idl$	# CORBA IDL
++filetype code \.gnorba$	# GNOME CORBA IDL
++filetype code \.oafinfo$	# GNOME OAF
++filetype code \.mcopclass$	# MCOP IDL compiler generated class
++filetype code \.autoforms$	# Autoform
++filetype code \.atf$	# Autoform
++filetype code \.gnuplot$
++filetype code \.xs$	# Shared library? Seen a lot of them in gnome-perl
++filetype code \.js$	# JavaScript (and who knows, maybe more
++filetype code \.patch$
++filetype code \.diff$	# Sometimes patches appear this way
++filetype code \.ids$	# Not really sure what this means
++filetype code \.upd$	# ¿¿¿??? (from Kcontrol
++filetype code $.ad$ 	# ¿¿¿??? (from Kdisplay and mc
++filetype code $.i$	# Appears in the kbindings for Qt
++filetype code $.pri$	# from Qt
++filetype code \.schema$	# Not really sure what this means
++filetype code \.fd$	# Something to do with latex
++filetype code \.cls$	# Something to do with latex
++filetype code \.pro$	# Postscript generation
++filetype code \.ppd$	# PDF generation
++filetype code \.dlg$	# Not really sure what this means
++filetype code \.plugin$	# Plug-in file
++filetype code \.dsp	# Microsoft Developer Studio Project File
++filetype code \.vim$	# vim syntax file
++filetype code \.trm$	# gnuplot term file
++filetype code \.font$	# Font mapping
++filetype code \.ccg$	# C++ files - Found in gtkmm*
++filetype code \.hg$	# C++ headers - Found in gtkmm*
++filetype code \.dtd	# XML Document Type Definition
++filetype code \.bat	# DOS batch files
++filetype code \.vala	# Vala
++filetype code \.py\.in$
++filetype code \.rhtml$	# eRuby
++filetype code \.sql$	# SQL script
++#
++#
++# Development documentation files (for hacking generally
++#
++filetype devel-doc ^readme.*$
++filetype devel-doc ^changelog.*
++filetype devel-doc ^todo.*$
++filetype devel-doc ^credits.*$
++filetype devel-doc ^authors.*$
++filetype devel-doc ^changes.*$
++filetype devel-doc ^news.*$
++filetype devel-doc ^install.*$
++filetype devel-doc ^hacking.*$
++filetype devel-doc ^copyright.*$
++filetype devel-doc ^licen(s|c)e.*$
++filetype devel-doc ^copying.*$
++filetype devel-doc manifest$
++filetype devel-doc faq$
++filetype devel-doc building$
++filetype devel-doc howto$
++filetype devel-doc design$
++filetype devel-doc \.files$
++filetype devel-doc files$
++filetype devel-doc subdirs$
++filetype devel-doc maintainers$
++filetype devel-doc developers$
++filetype devel-doc contributors$
++filetype devel-doc thanks$
++filetype devel-doc releasing$
++filetype devel-doc test$
++filetype devel-doc testing$
++filetype devel-doc build$
++filetype devel-doc comments?$
++filetype devel-doc bugs$
++filetype devel-doc buglist$
++filetype devel-doc problems$
++filetype devel-doc debug$
++filetype devel-doc hacks$
++filetype devel-doc hacking$
++filetype devel-doc versions?$
++filetype devel-doc mappings$
++filetype devel-doc tips$
++filetype devel-doc ideas?$
++filetype devel-doc spec$
++filetype devel-doc compiling$
++filetype devel-doc notes$
++filetype devel-doc missing$
++filetype devel-doc done$
++filetype devel-doc \.omf$	# XML-based format used in GNOME
++filetype devel-doc \.lsm$
++filetype devel-doc ^doxyfile$
++filetype devel-doc \.kdevprj$
++filetype devel-doc \.directory$
++filetype devel-doc \.dox$
++filetype devel-doc \.doap$
++#
++#
++# Building, compiling, configuration and CVS admin files
++#
++filetype build \.in.*$
++filetype build configure.*$
++filetype build makefile.*$
++filetype build config\.sub$
++filetype build config\.guess$
++filetype build config\.status$
++filetype build ltmain\.sh$
++filetype build autogen\.sh$
++filetype build config$
++filetype build conf$
++filetype build cvsignore$
++filetype build \.cfg$
++filetype build \.m4$
++filetype build \.mk$
++filetype build \.mak$
++filetype build \.make$
++filetype build \.mbx$
++filetype build \.protocol$
++filetype build \.version$
++filetype build mkinstalldirs$
++filetype build install-sh$
++filetype build rules$
++filetype build \.kdelnk$
++filetype build \.menu$
++filetype build linguas$	# Build translations
++filetype build potfiles.*$	# Build translations
++filetype build \.shlibs$	# Shared libraries
++# filetype build %debian%
++# filetype build %specs/%
++filetype build \.spec$	# It seems theyre necessary for RPM build
++filetype build \.def$	# build bootstrap for DLLs on win32
++#
++#
++# Documentation files
++#
++# filetype documentation doc/%
++# filetype documentation %HOWTO%
++filetype documentation \.html$
++filetype documentation \.txt$
++filetype documentation \.ps(\.gz|\.bz2)?$
++filetype documentation \.dvi(\.gz|\.bz2)?$
++filetype documentation \.lyx$
++filetype documentation \.tex$
++filetype documentation \.texi$
++filetype documentation \.pdf(\.gz|\.bz2)?$
++filetype documentation \.djvu$
++filetype documentation \.epub$
++filetype documentation \.sgml$
++filetype documentation \.docbook$
++filetype documentation \.wml$
++filetype documentation \.xhtml$
++filetype documentation \.phtml$
++filetype documentation \.shtml$
++filetype documentation \.htm$
++filetype documentation \.rdf$
++filetype documentation \.phtm$
++filetype documentation \.tmpl$
++filetype documentation \.ref$	# References
++filetype documentation \.css$
++# filetype documentation %tutorial%
++filetype documentation \.templates$
++filetype documentation \.dsl$
++filetype documentation \.ent$
++filetype documentation \.xml$
++filetype documentation \.xmi$
++filetype documentation \.xsl$
++filetype documentation \.entities$
++filetype documentation \.[1-7]$	# Man pages
++filetype documentation \.man$
++filetype documentation \.manpages$
++filetype documentation \.doc$
++filetype documentation \.rtf$
++filetype documentation \.wpd$
++filetype documentation \.qt3$
++filetype documentation man\d?/.*\.\d$
++filetype documentation \.docs$
++filetype documentation \.sdw$	# OpenOffice.org Writer document
++filetype documentation \.odt$	# OpenOffice.org document
++filetype documentation \.en$	# Files in English language
++filetype documentation \.de$	# Files in German
++filetype documentation \.es$	# Files in Spanish
++filetype documentation \.fr$	# Files in French
++filetype documentation \.it$	# Files in Italian
++filetype documentation \.cz$	# Files in Czech
++filetype documentation \.page$	# Mallard
++filetype documentation \.page.stub$	# Mallard stub
++#
++#
++# Images
++#
++filetype image \.png$
++filetype image \.jpg$
++filetype image \.jpeg$
++filetype image \.bmp$
++filetype image \.gif$
++filetype image \.xbm$
++filetype image \.eps$
++filetype image \.mng$
++filetype image \.pnm$
++filetype image \.pbm$
++filetype image \.ppm$
++filetype image \.pgm$
++filetype image \.gbr$
++filetype image \.svg$
++filetype image \.fig$
++filetype image \.tif$
++filetype image \.swf$
++filetype image \.svgz$
++filetype image \.shape$	# XML files used for shapes for instance in Kivio
++filetype image \.sml$	# XML files used for shapes for instance in Kivio
++filetype image \.bdf$	#  vfontcap  - Vector Font Capability Database (VFlib Version 2
++filetype image \.ico$
++filetype image \.dia$	# We consider .dia as images, I dont want them in unknown
++#
++#
++# Translation files
++#
++filetype translation \.po$
++filetype translation \.pot$
++filetype translation \.charset$
++filetype translation \.mo$
++#
++#
++# User interface files
++#
++filetype ui \.desktop$
++filetype ui \.ui$
++filetype ui \.xpm$
++filetype ui \.xcf$
++filetype ui \.3ds$
++filetype ui \.theme$
++filetype ui \.kimap$
++filetype ui \.glade$
++filetype ui \.gtkbuilder$
++filetype ui rc$
++#
++#
++# Sound files
++#
++filetype multimedia \.mp3$
++filetype multimedia \.ogg$
++filetype multimedia \.wav$
++filetype multimedia \.au$
++filetype multimedia \.mid$
++filetype multimedia \.vorbis$
++filetype multimedia \.midi$
++filetype multimedia \.arts$
++#
++#
++# Packages (yes, there are people who upload packages to the repo)
++#
++filetype package \.tar$
++filetype package \.tar.gz$
++filetype package \.tar.bz2$
++filetype package \.tar.xz$
++filetype package \.tgz$
++filetype package \.deb$
++filetype package \.rpm$
++filetype package \.srpm$
++filetype package \.ebuild$
+diff --git a/contrib/gitdm/group-map-cadence b/contrib/gitdm/group-map-cadence
+new file mode 100644
+index 0000000000..ab97dd2fc3
+--- /dev/null
++++ b/contrib/gitdm/group-map-cadence
+@@ -0,0 +1,3 @@
++# Cadence Design Systems
++
++jcmvbkbc@gmail.com
+diff --git a/contrib/gitdm/group-map-codeweavers b/contrib/gitdm/group-map-codeweavers
+new file mode 100644
+index 0000000000..c4803489e2
+--- /dev/null
++++ b/contrib/gitdm/group-map-codeweavers
+@@ -0,0 +1 @@
++sergio.g.delreal@gmail.com
+diff --git a/contrib/gitdm/group-map-redhat b/contrib/gitdm/group-map-redhat
+new file mode 100644
+index 0000000000..2cb3d4dacd
+--- /dev/null
++++ b/contrib/gitdm/group-map-redhat
+@@ -0,0 +1,6 @@
++#
++# RedHat contributors using non-corporate email
++#
++
++david@gibson.dropbear.id.au
++laurent@vivier.eu
+diff --git a/contrib/gitdm/group-map-wavecomp b/contrib/gitdm/group-map-wavecomp
+new file mode 100644
+index 0000000000..906c8138b3
+--- /dev/null
++++ b/contrib/gitdm/group-map-wavecomp
+@@ -0,0 +1,8 @@
++#
++# Wave Computing acquired MIPS in June 2018 from imgtec
++#
++
++amarkovic@wavecomp.com
++smarkovic@wavecomp.com
++paul.burton@imgtec.com
++yongbok.kim@imgtec.com
+diff --git a/gitdm.config b/gitdm.config
+new file mode 100644
+index 0000000000..d5c0f55e18
+--- /dev/null
++++ b/gitdm.config
+@@ -0,0 +1,41 @@
++#
++# This is the gitdm configuration file for QEMU.
++#
++# It is to be used with LWN's git dataminer tool for generating
++# reports about development activity in the QEMU repo. The LWN gitdm
++# tool can be found at:
++#
++#   git://git.lwn.net/gitdm.git
++#
++# A run to generate a report for the last year of activity would be
++#
++#     $ git-log --numstat -M v2.12.0..v3.0.0 | gitdm -n -l 16
++#
++
++# EmailAliases lets us cope with developers who use more
++# than one address or have changed addresses. We re-use the existing
++# mailmap for this.
++#
++EmailAliases .mailmap
++
++#
++# EmailMap does the main work of mapping addresses onto
++# employers.
++#
++EmailMap contrib/gitdm/domain-map
++
++#
++# Use GroupMap to map a file full of addresses to the
++# same employer. This is used for people that don't post from easily
++# identifiable corportate emails.
++#
++GroupMap contrib/gitdm/group-map-redhat RedHat
++GroupMap contrib/gitdm/group-map-wavecomp Wave Computing
++GroupMap contrib/gitdm/group-map-cadence Cadence Design Systems
++GroupMap contrib/gitdm/group-map-codeweavers CodeWeavers
++#
++#
++# Use FileTypeMap to map a file types to file names using regular
++# regular expressions.
++#
++FileTypeMap contrib/gitdm/filetypes.txt
+-- 
+2.17.1
