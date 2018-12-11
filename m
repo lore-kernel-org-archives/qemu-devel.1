@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=87697dac6=Paul.Durrant@citrix.com>)
-	id 1gWk9X-0004cU-GF
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:40:56 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gWkA2-00052N-5z
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:41:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=87697dac6=Paul.Durrant@citrix.com>)
-	id 1gWk9T-0003IS-Ao
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:40:55 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Tue, 11 Dec 2018 15:40:30 +0000
-Message-ID: <88b1bbdbad294bf5b4013fd144534651@AMSPEX02CL03.citrite.net>
-References: <1544525238-3527-1-git-send-email-paul.durrant@citrix.com>
-	<1544525238-3527-4-git-send-email-paul.durrant@citrix.com>
-	<20181211151636.GQ18875@perard.uk.xensource.com>
-In-Reply-To: <20181211151636.GQ18875@perard.uk.xensource.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <peter.maydell@linaro.org>) id 1gWk9z-0003sT-8z
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:41:24 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:33999)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gWk9u-0003nm-PD
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:41:20 -0500
+Received: by mail-ot1-x343.google.com with SMTP id t5so14467332otk.1
+	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 07:41:16 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 03/18] xen: introduce 'xen-block',
- 'xen-disk' and 'xen-cdrom'
+References: <20181207103631.28193-1-richard.henderson@linaro.org>
+	<20181207103631.28193-15-richard.henderson@linaro.org>
+In-Reply-To: <20181207103631.28193-15-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 11 Dec 2018 15:41:04 +0000
+Message-ID: <CAFEAcA_A0fshRFunzjj6Qj4BQBk--UeDkRbRr61SL6TKLxbrdw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 14/26] target/arm: Move cpu_mmu_index out
+ of line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +30,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony Perard <anthony.perard@citrix.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
 
-> -----Original Message-----
-> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
-> Sent: 11 December 2018 15:17
-> To: Paul Durrant <Paul.Durrant@citrix.com>
-> Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
-> devel@lists.xenproject.org; Kevin Wolf <kwolf@redhat.com>; Max Reitz
-> <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
-> Subject: Re: [PATCH v3 03/18] xen: introduce 'xen-block', 'xen-disk' and
-> 'xen-cdrom'
->=20
-> On Tue, Dec 11, 2018 at 10:47:03AM +0000, Paul Durrant wrote:
-> > This patch adds new XenDevice-s: 'xen-disk' and 'xen-cdrom', both
-> derived
-> > from a common 'xen-block' parent type. These will eventually replace th=
-e
-> > 'xen_disk' (note the underscore rather than hyphen) legacy PV backend
-> but
-> > it is illustrative to build up the implementation incrementally, along
-> with
-> > the XenBus/XenDevice framework. Subsequent patches will therefore add t=
-o
-> > these devices' implementation as new features are added to the
-> framework.
-> >
-> > After this patch has been applied it is possible to instantiate new
-> > 'xen-disk' or 'xen-cdrom' devices with a single 'vdev' parameter, which
-> > accepts values adhering to the Xen VBD naming scheme [1]. For example, =
-a
-> > command-line instantiation of a xen-disk can be done with an argument
-> > similar to the following:
-> >
-> > -device xen-disk,vdev=3Dhda
-> >
-> > The implementation of the vdev parameter formulates the appropriate VBD
-> > number for use in the PV protocol.
-> >
-> > [1] https://xenbits.xen.org/docs/unstable/man/xen-vbd-interface.7.html
-> >
-> > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
->=20
-> Now we can add a xen-disk with vdev=3Dxvdbgqcv :)
+On Fri, 7 Dec 2018 at 10:36, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> This function is, or will shortly become, too big to inline.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/cpu.h    | 48 +++++----------------------------------------
+>  target/arm/helper.c | 44 +++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 49 insertions(+), 43 deletions(-)
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Yep, you can keep going until xenstore explodes :-)
-
-  Paul
-
->=20
-> Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
->=20
-> Thanks,
->=20
-> --
-> Anthony PERARD
+thanks
+-- PMM
