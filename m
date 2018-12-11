@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1gWl5Y-00085n-5C
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:40:53 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gWl5b-00089a-W3
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:40:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1gWl5W-0001zo-3D
+	(envelope-from <peter.maydell@linaro.org>) id 1gWl5a-00022W-8m
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:40:55 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:33763)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gWl5Y-0001za-0Q
 	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:40:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41422)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1gWl5S-0001wU-65
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:40:48 -0500
-References: <20181207221417.5152-1-wainersm@redhat.com>
-	<20181210164657.GB4669@habkost.net>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <5cd0b649-c74f-877d-4b5d-a0943a04c7eb@redhat.com>
-Date: Tue, 11 Dec 2018 14:40:33 -0200
+Received: by mail-oi1-x242.google.com with SMTP id c206so12545518oib.0
+	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 08:40:50 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20181210164657.GB4669@habkost.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] target/i386: Fixes to the check missing
- features routine
+References: <20181207103631.28193-1-richard.henderson@linaro.org>
+	<20181207103631.28193-17-richard.henderson@linaro.org>
+In-Reply-To: <20181207103631.28193-17-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 11 Dec 2018 16:40:37 +0000
+Message-ID: <CAFEAcA8CazDSeNdaKys1H9Gud7ajpX7YeRuP3wW2YwaJLegbBg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 16/26] target/arm: Create ARMVAParameters
+ and helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,202 +30,392 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, ccarrara@redhat.com, crosa@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
 
+On Fri, 7 Dec 2018 at 10:37, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Split out functions to extract the virtual address parameters.
+> Let the functions choose T0 or T1 address space half, if present.
+> Extract (most of) the control bits that vary between EL or Tx.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper.c | 274 ++++++++++++++++++++++++--------------------
+>  1 file changed, 147 insertions(+), 127 deletions(-)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index be8daefc46..99ceed2cab 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -9754,6 +9754,123 @@ static uint8_t convert_stage2_attrs(CPUARMState *env, uint8_t s2attrs)
+>      return (hiattr << 6) | (hihint << 4) | (loattr << 2) | lohint;
+>  }
+>
+> +typedef struct ARMVAParameters {
+> +    unsigned tsz    : 8;
+> +    unsigned select : 1;
+> +    bool tbi        : 1;
+> +    bool epd        : 1;
+> +    bool hpd        : 1;
+> +    bool ha         : 1;
+> +    bool hd         : 1;
+> +    bool using16k   : 1;
+> +    bool using64k   : 1;
+> +} ARMVAParameters;
+> +
+> +static ARMVAParameters aa64_va_parameters(CPUARMState *env, uint64_t va,
+> +                                          ARMMMUIdx mmu_idx, bool data)
+> +{
+> +    uint64_t tcr = regime_tcr(env, mmu_idx)->raw_tcr;
+> +    uint32_t el = regime_el(env, mmu_idx);
+> +    bool tbi, tbid, epd, hpd, ha, hd, using16k, using64k;
+> +    int select, tsz;
+> +
+> +    /* Bit 55 is always between the two regions, and is canonical for
+> +     * determining if address tagging is enabled.
+> +     */
+> +    select = extract64(va, 55, 1);
+> +
+> +    if (el > 1) {
+> +        tsz = extract32(tcr, 0, 6);
+> +        using64k = extract32(tcr, 14, 1);
+> +        using16k = extract32(tcr, 15, 1);
+> +        tbi = extract32(tcr, 20, 1);
 
-On 12/10/2018 02:46 PM, Eduardo Habkost wrote:
-> On Fri, Dec 07, 2018 at 05:14:17PM -0500, Wainer dos Santos Moschetta wrote:
->> The x86_cpu_class_check_missing_features() returns a list
->> of unavailable features compared to the host CPU. Currently it may
->> return empty strings for unamed features as well as duplicated
->> names.
->>
->> For example, the qmp "query-cpu-definitions" below shows one empty
->> string and repeated "mpx" entries:
->>
->> (...)
->> {"execute": "query-cpu-definitions"}
->> (...)
->>          {
->>              "name": "Cascadelake-Server",
->>              "typename": "Cascadelake-Server-x86_64-cpu",
->>              "unavailable-features": [
->>                  "hle",
->>                  "rtm",
->>                  "mpx",
->>                  "avx512f",
->>                  "avx512dq",
->>                  "rdseed",
->>                  "adx",
->>                  "smap",
->>                  "clflushopt",
->>                  "clwb",
->>                  "intel-pt",
->>                  "avx512cd",
->>                  "avx512bw",
->>                  "avx512vl",
->>                  "pku",
->>                  "",
->>                  "avx512vnni",
->>                  "spec-ctrl",
->>                  "ssbd",
->>                  "3dnowprefetch",
->>                  "xsavec",
->>                  "xgetbv1",
->>                  "mpx",
->>                  "mpx",
->>                  "avx512f",
->>                  "avx512f",
->>                  "avx512f",
->>                  "pku"
->>              ],
->> (...)
->>
->> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
->> ---
->> Note: the skipped testcase was used to test fix in my system so it has
->> assumptions about the host CPU. It's impracticial to change it to allow
->> running on any system though. Therefore, I am okay on either leave or remove
->> it. Opinions?
->> ---
->>   target/i386/cpu.c                   | 12 +++++-
->>   tests/acceptance/cpu_definitions.py | 61 +++++++++++++++++++++++++++++
->>   2 files changed, 72 insertions(+), 1 deletion(-)
->>   create mode 100644 tests/acceptance/cpu_definitions.py
->>
->> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index f81d35e1f9..2502a3adda 100644
->> --- a/target/i386/cpu.c
->> +++ b/target/i386/cpu.c
->> @@ -3615,19 +3615,29 @@ static void x86_cpu_class_check_missing_features(X86CPUClass *xcc,
->>   
->>       x86_cpu_filter_features(xc);
->>   
->> +    /* Uses an auxiliar dictionary to ensure the list of features has not
->> +       repeated name. */
->> +    QDict *unique_feats_dict = qdict_new();
-> Multiline comments are formatted this way:
->
->   /*
->    * like
->    * this
->    */
->
-> (See CODING_STYLE for details)
+The old code explicitly avoided looking at the TCR bit 20
+for the mmu_idx == ARMMMUIdx_S2NS case. At the moment VTCR_EL2
+bit 20 is RES0 but it might not be in future.
 
-scripts/checkpatch.pl did not catch it. Should it?
+> +        ha = extract32(tcr, 21, 1);
+> +        hd = extract32(tcr, 22, 1);
+> +        hpd = extract32(tcr, 24, 1);
+> +        tbid = extract32(tcr, 29, 1);
 
-Thanks!
+No HPD in VTCR_EL2 either, and bit 29 is NSW there.
 
-- Wainer
+> +        epd = false;
+> +    } else if (!select) {
+> +        tsz = extract32(tcr, 0, 6);
+> +        epd = extract32(tcr, 7, 1);
+> +        using64k = extract32(tcr, 14, 1);
+> +        using16k = extract32(tcr, 15, 1);
+> +        tbi = extract64(tcr, 37, 1);
+> +        ha = extract64(tcr, 39, 1);
+> +        hd = extract64(tcr, 40, 1);
+> +        hpd = extract64(tcr, 41, 1);
+> +        tbid = extract64(tcr, 51, 1);
+> +    } else {
+> +        int tg = extract32(tcr, 30, 2);
+> +        using16k = tg == 1;
+> +        using64k = tg == 3;
+> +        tsz = extract32(tcr, 16, 6);
+> +        epd = extract32(tcr, 23, 1);
+> +        tbi = extract64(tcr, 38, 1);
+> +        ha = extract64(tcr, 39, 1);
+> +        hd = extract64(tcr, 40, 1);
+> +        hpd = extract64(tcr, 42, 1);
+> +        tbid = extract64(tcr, 52, 1);
+> +    }
+> +    tsz = MIN(tsz, 39);  /* TODO: ARMv8.4-TTST */
+> +    tsz = MAX(tsz, 16);  /* TODO: ARMv8.2-LVA  */
+> +
+> +    return (ARMVAParameters) {
+> +        .tsz = tsz,
+> +        .select = select,
+> +        .tbi = tbi & (data | !tbid),
+> +        .epd = epd,
+> +        .hpd = hpd,
+> +        .ha = ha,
+> +        .hd = hd,
+> +        .using16k = using16k,
+> +        .using64k = using64k,
+> +    };
+> +}
+> +
+> +static ARMVAParameters aa32_va_parameters(CPUARMState *env, uint32_t va,
+> +                                          ARMMMUIdx mmu_idx)
+> +{
+> +    uint64_t tcr = regime_tcr(env, mmu_idx)->raw_tcr;
+> +    int select, tsz;
+> +    bool epd, hpd;
+> +
+> +    if (mmu_idx == ARMMMUIdx_S2NS) {
+> +        tsz = sextract32(tcr, 0, 4) + 8;
+> +        select = 0;
+> +        hpd = false;
+> +        epd = false;
+> +    } else {
+> +        int t0sz = extract32(tcr, 0, 3);
+> +        int t1sz = extract32(tcr, 16, 3);
 
+If this is EL2 (ie regime_tcr() is HTCR) then we
+shouldn't be looking at bits 16:3, because there is
+no T1SZ field there.
+
+> +
+> +        if (t1sz == 0) {
+> +            select = va > (0xffffffffu >> t0sz);
+> +        } else {
+> +            /* Note that we will detect errors later.  */
+> +            select = va >= ~(0xffffffffu >> t1sz);
+> +        }
+> +
+> +        if (!select) {
+> +            tsz = t0sz;
+> +            epd = extract32(tcr, 7, 1);
+> +            hpd = extract64(tcr, 41, 1);
+> +        } else {
+> +            tsz = t1sz;
+> +            epd = extract32(tcr, 23, 1);
+> +            hpd = extract64(tcr, 42, 1);
+
+In HTCR the HPD bit is 24, and there is no EPD bit and no T2E bit.
+
+> +        }
+> +        /* For aarch32, hpd0 is not enabled without t2e as well.  */
+> +        hpd &= extract32(tcr, 6, 1);
+> +    }
+> +
+> +    return (ARMVAParameters) {
+> +        .tsz = tsz,
+> +        .select = select,
+> +        .epd = epd,
+> +        .hpd = hpd,
+> +    };
+> +}
+> +
+>  static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+>                                 MMUAccessType access_type, ARMMMUIdx mmu_idx,
+>                                 hwaddr *phys_ptr, MemTxAttrs *txattrs, int *prot,
+> @@ -9765,26 +9882,20 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+>      /* Read an LPAE long-descriptor translation table. */
+>      ARMFaultType fault_type = ARMFault_Translation;
+>      uint32_t level;
+> -    uint32_t epd = 0;
+> -    int32_t t0sz, t1sz;
+> -    uint32_t tg;
+> +    ARMVAParameters param;
+>      uint64_t ttbr;
+> -    int ttbr_select;
+>      hwaddr descaddr, indexmask, indexmask_grainsize;
+>      uint32_t tableattrs;
+>      target_ulong page_size;
+>      uint32_t attrs;
+> -    int32_t stride = 9;
+> -    int32_t addrsize;
+> -    int inputsize;
+> -    int32_t tbi = 0;
+> +    int32_t stride;
+> +    int top_bit, inputsize;
+>      TCR *tcr = regime_tcr(env, mmu_idx);
+>      int ap, ns, xn, pxn;
+>      uint32_t el = regime_el(env, mmu_idx);
+> -    bool ttbr1_valid = true;
+> +    bool ttbr1_valid;
+>      uint64_t descaddrmask;
+>      bool aarch64 = arm_el_is_aa64(env, el);
+> -    bool hpd = false;
 >
-> In this case, we can probably make the comment fit in a single
-> line:
+>      /* TODO:
+>       * This code does not handle the different format TCR for VTCR_EL2.
+> @@ -9793,91 +9904,43 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+>       * support for those page table walks.
+>       */
+>      if (aarch64) {
+> +        param = aa64_va_parameters(env, address, mmu_idx,
+> +                                   access_type != MMU_INST_FETCH);
+>          level = 0;
+> -        addrsize = 64;
+> -        if (el > 1) {
+> -            if (mmu_idx != ARMMMUIdx_S2NS) {
+> -                tbi = extract64(tcr->raw_tcr, 20, 1);
+> -            }
+> -        } else {
+> -            if (extract64(address, 55, 1)) {
+> -                tbi = extract64(tcr->raw_tcr, 38, 1);
+> -            } else {
+> -                tbi = extract64(tcr->raw_tcr, 37, 1);
+> -            }
+> -        }
+> -        tbi *= 8;
+> -
+>          /* If we are in 64-bit EL2 or EL3 then there is no TTBR1, so mark it
+>           * invalid.
+>           */
+> -        if (el > 1) {
+> -            ttbr1_valid = false;
+> -        }
+> +        ttbr1_valid = (el < 1);
+>      } else {
+> +        param = aa32_va_parameters(env, address, mmu_idx);
+>          level = 1;
+> -        addrsize = 32;
+>          /* There is no TTBR1 for EL2 */
+> -        if (el == 2) {
+> -            ttbr1_valid = false;
+> -        }
+> +        ttbr1_valid = (el != 2);
+>      }
 >
->      /* Auxiliary dict to avoid duplicate entries in the list */
+> -    /* Determine whether this address is in the region controlled by
+> -     * TTBR0 or TTBR1 (or if it is in neither region and should fault).
+> -     * This is a Non-secure PL0/1 stage 1 translation, so controlled by
+> -     * TTBCR/TTBR0/TTBR1 in accordance with ARM ARM DDI0406C table B-32:
+> +    top_bit = (aarch64 ? 64 : 32);
+
+The old code had 3 cases here: 64 for AArch64, 32 for AArch32 stage 1,
+and 40 for AArch32 stage 2.
+
+> +    inputsize = top_bit - param.tsz;
+> +    top_bit -= 8 * param.tbi;
+> +
+> +    /* We determined the region when collecting the parameters, but we
+> +     * have not yet validated that the address is valid for the region.
+>       */
+> -    if (aarch64) {
+> -        /* AArch64 translation.  */
+> -        t0sz = extract32(tcr->raw_tcr, 0, 6);
+> -        t0sz = MIN(t0sz, 39);
+> -        t0sz = MAX(t0sz, 16);
+> -    } else if (mmu_idx != ARMMMUIdx_S2NS) {
+> -        /* AArch32 stage 1 translation.  */
+> -        t0sz = extract32(tcr->raw_tcr, 0, 3);
+> -    } else {
+> -        /* AArch32 stage 2 translation.  */
+> -        bool sext = extract32(tcr->raw_tcr, 4, 1);
+> -        bool sign = extract32(tcr->raw_tcr, 3, 1);
+> -        /* Address size is 40-bit for a stage 2 translation,
+> -         * and t0sz can be negative (from -8 to 7),
+> -         * so we need to adjust it to use the TTBR selecting logic below.
+> -         */
+> -        addrsize = 40;
+> -        t0sz = sextract32(tcr->raw_tcr, 0, 4) + 8;
+> -
+> -        /* If the sign-extend bit is not the same as t0sz[3], the result
+> -         * is unpredictable. Flag this as a guest error.  */
+> -        if (sign != sext) {
+> -            qemu_log_mask(LOG_GUEST_ERROR,
+> -                          "AArch32: VTCR.S / VTCR.T0SZ[3] mismatch\n");
+
+This guest-error check seems to have vanished in the refactoring.
+
+> -        }
+> -    }
+> -    t1sz = extract32(tcr->raw_tcr, 16, 6);
+> -    if (aarch64) {
+> -        t1sz = MIN(t1sz, 39);
+> -        t1sz = MAX(t1sz, 16);
+> -    }
+> -    if (t0sz && !extract64(address, addrsize - t0sz, t0sz - tbi)) {
+> -        /* there is a ttbr0 region and we are in it (high bits all zero) */
+> -        ttbr_select = 0;
+> -    } else if (ttbr1_valid && t1sz &&
+> -               !extract64(~address, addrsize - t1sz, t1sz - tbi)) {
+> -        /* there is a ttbr1 region and we are in it (high bits all one) */
+> -        ttbr_select = 1;
+> -    } else if (!t0sz) {
+> -        /* ttbr0 region is "everything not in the ttbr1 region" */
+> -        ttbr_select = 0;
+> -    } else if (!t1sz && ttbr1_valid) {
+> -        /* ttbr1 region is "everything not in the ttbr0 region" */
+> -        ttbr_select = 1;
+> -    } else {
+> -        /* in the gap between the two regions, this is a Translation fault */
+> +    if (param.select
+> +        ? extract64(~address, inputsize, top_bit - inputsize) || !ttbr1_valid
+> +        : extract64(address, inputsize, top_bit - inputsize)) {
+
+I find this expression rather confusing...
+
+> +        /* In the gap between the two regions, this is a Translation fault */
+>          fault_type = ARMFault_Translation;
+>          goto do_fault;
+>      }
 >
->> +
->>       for (w = 0; w < FEATURE_WORDS; w++) {
->>           uint32_t filtered = xc->filtered_features[w];
->>           int i;
->>           for (i = 0; i < 32; i++) {
->>               if (filtered & (1UL << i)) {
->> +                const char *fname = g_strdup(x86_cpu_feature_name(w, i));
-> I believe you didn't mean to call g_strdup() here, as you are now
-> calling g_strdup(fname) below.
+> +    if (param.using64k) {
+> +        stride = 13;
+> +    } else if (param.using16k) {
+> +        stride = 11;
+> +    } else {
+> +        stride = 9;
+> +    }
+> +
+>      /* Note that QEMU ignores shareability and cacheability attributes,
+>       * so we don't need to do anything with the SH, ORGN, IRGN fields
+>       * in the TTBCR.  Similarly, TTBCR:A1 selects whether we get the
+> @@ -9885,56 +9948,13 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+>       * implement any ASID-like capability so we can ignore it (instead
+>       * we will always flush the TLB any time the ASID is changed).
+>       */
+> -    if (ttbr_select == 0) {
+> -        ttbr = regime_ttbr(env, mmu_idx, 0);
+> -        if (el < 2) {
+> -            epd = extract32(tcr->raw_tcr, 7, 1);
+> -        }
+> -        inputsize = addrsize - t0sz;
+> -
+> -        tg = extract32(tcr->raw_tcr, 14, 2);
+> -        if (tg == 1) { /* 64KB pages */
+> -            stride = 13;
+> -        }
+> -        if (tg == 2) { /* 16KB pages */
+> -            stride = 11;
+> -        }
+> -        if (aarch64 && el > 1) {
+> -            hpd = extract64(tcr->raw_tcr, 24, 1);
+> -        } else {
+> -            hpd = extract64(tcr->raw_tcr, 41, 1);
+> -        }
+> -        if (!aarch64) {
+> -            /* For aarch32, hpd0 is not enabled without t2e as well.  */
+> -            hpd &= extract64(tcr->raw_tcr, 6, 1);
+> -        }
+> -    } else {
+> -        /* We should only be here if TTBR1 is valid */
+> -        assert(ttbr1_valid);
+> -
+> -        ttbr = regime_ttbr(env, mmu_idx, 1);
+> -        epd = extract32(tcr->raw_tcr, 23, 1);
+> -        inputsize = addrsize - t1sz;
+> -
+> -        tg = extract32(tcr->raw_tcr, 30, 2);
+> -        if (tg == 3)  { /* 64KB pages */
+> -            stride = 13;
+> -        }
+> -        if (tg == 1) { /* 16KB pages */
+> -            stride = 11;
+> -        }
+> -        hpd = extract64(tcr->raw_tcr, 42, 1);
+> -        if (!aarch64) {
+> -            /* For aarch32, hpd1 is not enabled without t2e as well.  */
+> -            hpd &= extract64(tcr->raw_tcr, 6, 1);
+> -        }
+> -    }
+> +    ttbr = regime_ttbr(env, mmu_idx, param.select);
 >
->> +                if (!fname || qdict_haskey(unique_feats_dict, fname)) {
->> +                    continue;
->> +                }
->>                   strList *new = g_new0(strList, 1);
->> -                new->value = g_strdup(x86_cpu_feature_name(w, i));
->> +                new->value = g_strdup(fname);
->>                   *next = new;
->>                   next = &new->next;
->> +                qdict_put_null(unique_feats_dict, new->value);
->>               }
->>           }
->>       }
->>   
->> +    g_free(unique_feats_dict);
->>       object_unref(OBJECT(xc));
->>   }
->>   
->> diff --git a/tests/acceptance/cpu_definitions.py b/tests/acceptance/cpu_definitions.py
->> new file mode 100644
->> index 0000000000..65cea0427e
->> --- /dev/null
->> +++ b/tests/acceptance/cpu_definitions.py
->> @@ -0,0 +1,61 @@
->> +# CPU definitions tests.
->> +#
->> +# Copyright (c) 2018 Red Hat, Inc.
->> +#
->> +# Author:
->> +#  Wainer dos Santos Moschetta <wainersm@redhat.com>
->> +#
->> +# This work is licensed under the terms of the GNU GPL, version 2 or
->> +# later.  See the COPYING file in the top-level directory.
->> +
->> +from avocado import skip
->> +from avocado_qemu import Test
->> +
->> +
->> +class CPUDefinitions(Test):
->> +    """
->> +    Tests for the CPU definitions.
->> +
->> +    :avocado: enable
->> +    :avocado: tags=x86_64
->> +    """
->> +    def test_unavailable_features(self):
->> +        self.vm.add_args("-machine", "q35,accel=kvm")
-> Do you really need accel=kvm to reproduce the original bug?
+>      /* Here we should have set up all the parameters for the translation:
+>       * inputsize, ttbr, epd, stride, tbi
+>       */
 >
->> +        self.vm.launch()
->> +        cpu_definitions = self.vm.command('query-cpu-definitions')
->> +        self.assertTrue(len(cpu_definitions) > 0)
->> +        for cpu_model in cpu_definitions:
->> +            name = cpu_model.get('name')
->> +            unavailable_features = cpu_model.get('unavailable-features')
->> +
->> +            self.assertNotIn("", unavailable_features,
->> +                             name + " has unamed feature")
->> +            self.assertEqual(len(unavailable_features),
->> +                             len(set(unavailable_features)),
->> +                             name + " has duplicate feature")
->> +
->> +    @skip("Have assumptions about the host CPU")
->> +    def test_unavailable_features_manual(self):
->> +        """
->> +        This test is meant for manual testing only because the list of expected
->> +        unavailable features depend on the actual host CPU knowledge.
->> +        """
->> +        expected_cpu = 'Cascadelake-Server'
->> +        expected_unavailable_features = ["hle", "rtm", "mpx", "avx512f",
->> +                                         "avx512dq", "rdseed", "adx", "smap",
->> +                                         "clflushopt", "clwb", "intel-pt",
->> +                                         "avx512cd", "avx512bw", "avx512vl",
->> +                                         "pku", "avx512vnni", "spec-ctrl",
->> +                                         "ssbd", "3dnowprefetch", "xsavec",
->> +                                         "xgetbv1"]
-> It looks like this test will work only on one specific host CPU
-> model.  It seems very unlikely that anybody will ever try to run
-> it manually.  I suggest just deleting it.
+> -    if (epd) {
+> +    if (param.epd) {
+>          /* Translation table walk disabled => Translation fault on TLB miss
+>           * Note: This is always 0 on 64-bit EL2 and EL3.
+>           */
+> @@ -10047,7 +10067,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+>          }
+>          /* Merge in attributes from table descriptors */
+>          attrs |= nstable << 3; /* NS */
+> -        if (hpd) {
+> +        if (param.hpd) {
+>              /* HPD disables all the table attributes except NSTable.  */
+>              break;
+>          }
+> --
+> 2.17.2
 >
->> +
->> +        self.vm.add_args("-machine", "q35,accel=kvm")
->> +        self.vm.launch()
->> +        cpu_definitions = self.vm.command('query-cpu-definitions')
->> +        self.assertTrue(len(cpu_definitions) > 0)
->> +
->> +        cpus = [cpu_model for cpu_model in cpu_definitions
->> +                if cpu_model['name'] == expected_cpu]
->> +        actual_unavailable_features = cpus[0]['unavailable-features']
->> +        self.assertCountEqual(expected_unavailable_features,
->> +                              actual_unavailable_features)
->> -- 
->> 2.19.1
->>
+
+thanks
+-- PMM
