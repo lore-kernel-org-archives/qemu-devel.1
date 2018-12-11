@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gWqgz-0007R5-Ov
+	(envelope-from <clg@kaod.org>) id 1gWqgz-0007RD-RV
 	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 17:39:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gWqgu-0008GL-8B
+	(envelope-from <clg@kaod.org>) id 1gWqgw-0008KL-9b
 	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 17:39:53 -0500
-Received: from 4.mo5.mail-out.ovh.net ([178.33.111.247]:60131)
+Received: from 2.mo69.mail-out.ovh.net ([178.33.251.80]:40330)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gWqgt-000820-Nw
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 17:39:48 -0500
-Received: from player688.ha.ovh.net (unknown [10.109.146.86])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 10ECE2095D0
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 23:39:31 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gWqgv-0008Gj-Sm
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 17:39:50 -0500
+Received: from player688.ha.ovh.net (unknown [10.109.146.5])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id F385537391
+	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 23:39:47 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Tue, 11 Dec 2018 23:38:12 +0100
-Message-Id: <20181211223823.13770-2-clg@kaod.org>
+Date: Tue, 11 Dec 2018 23:38:15 +0100
+Message-Id: <20181211223823.13770-5-clg@kaod.org>
 In-Reply-To: <20181211223823.13770-1-clg@kaod.org>
 References: <20181211223823.13770-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v8 01/12] spapr: introduce a new machine IRQ
- backend for XIVE
+Subject: [Qemu-devel] [PATCH v8 04/12] spapr: allocate the interrupt thread
+ context under the CPU core
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,185 +33,168 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-The XIVE IRQ backend uses the same layout as the new XICS backend but
-covers the full range of the IRQ number space. The IRQ numbers for the
-CPU IPIs are allocated at the bottom of this space, below 4K, to
-preserve compatibility with XICS which does not use that range.
+Each interrupt mode has its own specific interrupt presenter object,
+that we store under the CPU object, one for XICS and one for XIVE.
 
-This should be enough given that the maximum number of CPUs is 1024
-for the sPAPR machine under QEMU. For the record, the biggest POWER8
-or POWER9 system has a maximum of 1536 HW threads (16 sockets, 192
-cores, SMT8).
+Extend the sPAPR IRQ backend with a new handler to support them both.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 ---
+ include/hw/ppc/spapr_irq.h |  2 ++
+ include/hw/ppc/xive.h      |  1 +
+ hw/intc/xive.c             | 22 ++++++++++++++++++++++
+ hw/ppc/spapr_cpu_core.c    |  5 ++---
+ hw/ppc/spapr_irq.c         | 15 +++++++++++++++
+ 5 files changed, 42 insertions(+), 3 deletions(-)
 
- Changes since v7:
-
- - removed spapr_xive_create()
- - reworked spapr_irq_init_xive() to use qdev_create()
-=20
- include/hw/ppc/spapr.h     |  2 +
- include/hw/ppc/spapr_irq.h |  2 +
- hw/ppc/spapr_irq.c         | 93 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 97 insertions(+)
-
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 198764066dc9..cb3082d319af 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -16,6 +16,7 @@ typedef struct sPAPREventLogEntry sPAPREventLogEntry;
- typedef struct sPAPREventSource sPAPREventSource;
- typedef struct sPAPRPendingHPT sPAPRPendingHPT;
- typedef struct ICSState ICSState;
-+typedef struct sPAPRXive sPAPRXive;
-=20
- #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
- #define SPAPR_ENTRY_POINT       0x100
-@@ -175,6 +176,7 @@ struct sPAPRMachineState {
-     const char *icp_type;
-     int32_t irq_map_nr;
-     unsigned long *irq_map;
-+    sPAPRXive  *xive;
-=20
-     bool cmd_line_caps[SPAPR_CAP_NUM];
-     sPAPRCapabilities def, eff, mig;
 diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-index bd7301e6d9c6..23cdb51b879e 100644
+index e51e9f052f63..13db0428ab51 100644
 --- a/include/hw/ppc/spapr_irq.h
 +++ b/include/hw/ppc/spapr_irq.h
-@@ -13,6 +13,7 @@
- /*
-  * IRQ range offsets per device type
-  */
-+#define SPAPR_IRQ_IPI        0x0
- #define SPAPR_IRQ_EPOW       0x1000  /* XICS_IRQ_BASE offset */
- #define SPAPR_IRQ_HOTPLUG    0x1001
- #define SPAPR_IRQ_VIO        0x1100  /* 256 VIO devices */
-@@ -42,6 +43,7 @@ typedef struct sPAPRIrq {
+@@ -41,6 +41,8 @@ typedef struct sPAPRIrq {
+     void (*print_info)(sPAPRMachineState *spapr, Monitor *mon);
+     void (*dt_populate)(sPAPRMachineState *spapr, uint32_t nr_servers,
+                         void *fdt, uint32_t phandle);
++    Object *(*cpu_intc_create)(sPAPRMachineState *spapr, Object *cpu,
++                               Error **errp);
+ } sPAPRIrq;
 =20
  extern sPAPRIrq spapr_irq_xics;
- extern sPAPRIrq spapr_irq_xics_legacy;
-+extern sPAPRIrq spapr_irq_xive;
+diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+index 19309d1d65d1..18cd114eb244 100644
+--- a/include/hw/ppc/xive.h
++++ b/include/hw/ppc/xive.h
+@@ -419,6 +419,7 @@ typedef struct XiveTCTX {
+ extern const MemoryRegionOps xive_tm_ops;
 =20
- void spapr_irq_init(sPAPRMachineState *spapr, Error **errp);
- int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
-*errp);
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index f8b651de0ec9..1f5aac55d370 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -12,6 +12,7 @@
- #include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "hw/ppc/spapr.h"
-+#include "hw/ppc/spapr_xive.h"
- #include "hw/ppc/xics.h"
- #include "sysemu/kvm.h"
+ void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
++Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp);
 =20
-@@ -205,6 +206,98 @@ sPAPRIrq spapr_irq_xics =3D {
-     .print_info  =3D spapr_irq_print_info_xics,
+ static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nvt_i=
+dx)
+ {
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index ea5385ff7784..53d2f191e8a3 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -526,6 +526,28 @@ static const TypeInfo xive_tctx_info =3D {
+     .class_init    =3D xive_tctx_class_init,
  };
 =20
-+/*
-+ * XIVE IRQ backend.
-+ */
-+static void spapr_irq_init_xive(sPAPRMachineState *spapr, Error **errp)
++Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp)
 +{
-+    MachineState *machine =3D MACHINE(spapr);
-+    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-+    uint32_t nr_servers =3D spapr_max_server_number(spapr);
-+    DeviceState *dev;
-+    int i;
++    Error *local_err =3D NULL;
++    Object *obj;
 +
-+    /* KVM XIVE device not yet available */
-+    if (kvm_enabled()) {
-+        if (machine_kernel_irqchip_required(machine)) {
-+            error_setg(errp, "kernel_irqchip requested. no KVM XIVE supp=
-ort");
-+            return;
-+        }
++    obj =3D object_new(TYPE_XIVE_TCTX);
++    object_property_add_child(cpu, TYPE_XIVE_TCTX, obj, &error_abort);
++    object_unref(obj);
++    object_property_add_const_link(obj, "cpu", cpu, &error_abort);
++    object_property_set_bool(obj, true, "realized", &local_err);
++    if (local_err) {
++        goto error;
 +    }
 +
-+    dev =3D qdev_create(NULL, TYPE_SPAPR_XIVE);
-+    qdev_prop_set_uint32(dev, "nr-irqs", smc->irq->nr_irqs);
-+    /*
-+     * 8 XIVE END structures per CPU. One for each available priority
-+     */
-+    qdev_prop_set_uint32(dev, "nr-ends", nr_servers << 3);
-+    qdev_init_nofail(dev);
++    return obj;
 +
-+    spapr->xive =3D SPAPR_XIVE(dev);
-+
-+    /* Enable the CPU IPIs */
-+    for (i =3D 0; i < nr_servers; ++i) {
-+        spapr_xive_irq_claim(spapr->xive, SPAPR_IRQ_IPI + i, false);
-+    }
++error:
++    object_unparent(obj);
++    error_propagate(errp, local_err);
++    return NULL;
 +}
-+
-+static int spapr_irq_claim_xive(sPAPRMachineState *spapr, int irq, bool =
-lsi,
-+                                Error **errp)
-+{
-+    if (!spapr_xive_irq_claim(spapr->xive, irq, lsi)) {
-+        error_setg(errp, "IRQ %d is invalid", irq);
-+        return -1;
-+    }
-+    return 0;
-+}
-+
-+static void spapr_irq_free_xive(sPAPRMachineState *spapr, int irq, int n=
-um)
-+{
-+    int i;
-+
-+    for (i =3D irq; i < irq + num; ++i) {
-+        spapr_xive_irq_free(spapr->xive, i);
-+    }
-+}
-+
-+static qemu_irq spapr_qirq_xive(sPAPRMachineState *spapr, int irq)
-+{
-+    return spapr_xive_qirq(spapr->xive, irq);
-+}
-+
-+static void spapr_irq_print_info_xive(sPAPRMachineState *spapr,
-+                                      Monitor *mon)
-+{
-+    CPUState *cs;
-+
-+    CPU_FOREACH(cs) {
-+        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-+
-+        xive_tctx_pic_print_info(XIVE_TCTX(cpu->intc), mon);
-+    }
-+
-+    spapr_xive_pic_print_info(spapr->xive, mon);
-+}
-+
-+/*
-+ * XIVE uses the full IRQ number space. Set it to 8K to be compatible
-+ * with XICS.
-+ */
-+
-+#define SPAPR_IRQ_XIVE_NR_IRQS     0x2000
-+#define SPAPR_IRQ_XIVE_NR_MSIS     (SPAPR_IRQ_XIVE_NR_IRQS - SPAPR_IRQ_M=
-SI)
-+
-+sPAPRIrq spapr_irq_xive =3D {
-+    .nr_irqs     =3D SPAPR_IRQ_XIVE_NR_IRQS,
-+    .nr_msis     =3D SPAPR_IRQ_XIVE_NR_MSIS,
-+
-+    .init        =3D spapr_irq_init_xive,
-+    .claim       =3D spapr_irq_claim_xive,
-+    .free        =3D spapr_irq_free_xive,
-+    .qirq        =3D spapr_qirq_xive,
-+    .print_info  =3D spapr_irq_print_info_xive,
-+};
 +
  /*
-  * sPAPR IRQ frontend routines for devices
+  * XIVE ESB helpers
   */
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 2398ce62c0e7..1811cd48db90 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -11,7 +11,6 @@
+ #include "hw/ppc/spapr_cpu_core.h"
+ #include "target/ppc/cpu.h"
+ #include "hw/ppc/spapr.h"
+-#include "hw/ppc/xics.h" /* for icp_create() - to be removed */
+ #include "hw/boards.h"
+ #include "qapi/error.h"
+ #include "sysemu/cpus.h"
+@@ -215,6 +214,7 @@ static void spapr_cpu_core_unrealize(DeviceState *dev=
+, Error **errp)
+ static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPRMachineState *spapr=
+,
+                                sPAPRCPUCore *sc, Error **errp)
+ {
++    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+     CPUPPCState *env =3D &cpu->env;
+     CPUState *cs =3D CPU(cpu);
+     Error *local_err =3D NULL;
+@@ -233,8 +233,7 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPR=
+MachineState *spapr,
+     qemu_register_reset(spapr_cpu_reset, cpu);
+     spapr_cpu_reset(cpu);
+=20
+-    cpu->intc =3D icp_create(OBJECT(cpu), spapr->icp_type, XICS_FABRIC(s=
+papr),
+-                           &local_err);
++    cpu->intc =3D smc->irq->cpu_intc_create(spapr, OBJECT(cpu), &local_e=
+rr);
+     if (local_err) {
+         goto error_unregister;
+     }
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index 975954dc2712..fdcc7795e446 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -191,6 +191,12 @@ static void spapr_irq_print_info_xics(sPAPRMachineSt=
+ate *spapr, Monitor *mon)
+     ics_pic_print_info(spapr->ics, mon);
+ }
+=20
++static Object *spapr_irq_cpu_intc_create_xics(sPAPRMachineState *spapr,
++                                              Object *cpu, Error **errp)
++{
++    return icp_create(cpu, spapr->icp_type, XICS_FABRIC(spapr), errp);
++}
++
+ #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
+ #define SPAPR_IRQ_XICS_NR_MSIS     \
+     (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
+@@ -205,6 +211,7 @@ sPAPRIrq spapr_irq_xics =3D {
+     .qirq        =3D spapr_qirq_xics,
+     .print_info  =3D spapr_irq_print_info_xics,
+     .dt_populate =3D spapr_dt_xics,
++    .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
+ };
+=20
+ /*
+@@ -282,6 +289,12 @@ static void spapr_irq_print_info_xive(sPAPRMachineSt=
+ate *spapr,
+     spapr_xive_pic_print_info(spapr->xive, mon);
+ }
+=20
++static Object *spapr_irq_cpu_intc_create_xive(sPAPRMachineState *spapr,
++                                              Object *cpu, Error **errp)
++{
++    return xive_tctx_create(cpu, XIVE_ROUTER(spapr->xive), errp);
++}
++
+ /*
+  * XIVE uses the full IRQ number space. Set it to 8K to be compatible
+  * with XICS.
+@@ -300,6 +313,7 @@ sPAPRIrq spapr_irq_xive =3D {
+     .qirq        =3D spapr_qirq_xive,
+     .print_info  =3D spapr_irq_print_info_xive,
+     .dt_populate =3D spapr_dt_xive,
++    .cpu_intc_create =3D spapr_irq_cpu_intc_create_xive,
+ };
+=20
+ /*
+@@ -405,4 +419,5 @@ sPAPRIrq spapr_irq_xics_legacy =3D {
+     .qirq        =3D spapr_qirq_xics,
+     .print_info  =3D spapr_irq_print_info_xics,
+     .dt_populate =3D spapr_dt_xics,
++    .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
+ };
 --=20
 2.17.2
