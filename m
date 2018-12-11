@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ann.zhuangyanying@huawei.com>) id 1gWiwz-0002nl-BD
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 09:23:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1gWixn-0003FM-JI
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 09:24:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ann.zhuangyanying@huawei.com>) id 1gWiwv-0004Tp-G8
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 09:23:52 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3111 helo=huawei.com)
+	(envelope-from <eblake@redhat.com>) id 1gWixk-0004vj-FF
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 09:24:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41382)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ann.zhuangyanying@huawei.com>)
-	id 1gWiwu-0004Qw-W4
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 09:23:49 -0500
-From: Zhuangyanying <ann.zhuangyanying@huawei.com>
-Date: Tue, 11 Dec 2018 14:20:42 +0000
-Message-ID: <1544538042-16072-1-git-send-email-ann.zhuangyanying@huawei.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gWixk-0004vM-8y
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 09:24:40 -0500
+References: <20181210145653.GE5000@localhost.localdomain>
+	<20181211072027.GA4465@weckbecker.name>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1d51f9d6-7872-c1eb-cdd6-4db8134b859e@redhat.com>
+Date: Tue, 11 Dec 2018 08:24:34 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFH]vcpu may hang for up to 4s while starting
- migration
+In-Reply-To: <20181211072027.GA4465@weckbecker.name>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Fwd: [PATCH] QEMU patch for PCI handling bug
+ (invalid free)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +29,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jianjay.zhou@huawei.com, dgilbert@redhat.com, qemu-devel@nongnu.org, xiaoguangrong@tencent.com
-Cc: xiexiangyou@huawei.com, Zhuang Yanying <ann.zhuangyanying@huawei.com>
+To: Matthias Weckbecker <matthias@weckbecker.name>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com
 
-From: Zhuang Yanying <ann.zhuangyanying@huawei.com>
+On 12/11/18 1:20 AM, Matthias Weckbecker wrote:
 
-Hi,
+>> Maybe some of the explanation above should actually be moved to the
+>> commit message of the patch itself?
+>>
+> 
+> yes, I agree. I have --amend'ed my commit message and re-attached it.
 
-Recently I test live-migration vm with 1T memory,
-find vcpu may hang for up to 4s while starting migration.
-The reason is memory_global_dirty_log_start taking too long, and the vcpu=
- is waiting for BQL.
+It's best to resend the patch as a new top-level thread with v2 in the 
+title; 'git send-email -v2' can do that.
 
-migrate thread                                    vcpu
--------------------------------------------------------------------------=
------------------------------------------
-qemu_mutex_lock_iothread
-                                                 kvm_handle_io
-memory_global_dirty_log_start  /* lasts 4s */           try qemu_mutex_lo=
-ck_iothread
+More patch submission hints:
+https://wiki.qemu.org/Contribute/SubmitAPatch
 
-qemu_mutex_unlock_iothread
-                                                 success qemu_mutex_lock_=
-iothread
-
-Memory_global_dirty_log_start will cleans up the dirty bits of spte in th=
-e KVM, and starts the dirty page tracking of PML.Because the VM's memory =
-is very large, it takes too long time in KVM.
-
-Is the following scheme feasible=EF=BC=9A
-(1)Put the action of turning on dirty page tracking in memory_global_dirt=
-y_log_start into asynchronous execution outside BQL.
-(2)The first time tunrning on dirty page tracking, only clean up the dirt=
-y page bits of the 1G pagetable, and the time spent by memory_global_dirt=
-y_log_start is reduced.
-
-Best regards,
- -Zhuang Yanying
----
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
