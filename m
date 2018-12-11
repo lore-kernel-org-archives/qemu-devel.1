@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gWgnb-000504-EU
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 07:06:04 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gWgp7-0005ad-AT
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 07:07:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gWgnY-0005x8-5l
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 07:06:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46250)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gWgnX-0005wW-TW
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 07:06:00 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181208111606.8505-1-marcandre.lureau@redhat.com>
-	<20181208111606.8505-18-marcandre.lureau@redhat.com>
-Date: Tue, 11 Dec 2018 13:05:54 +0100
-In-Reply-To: <20181208111606.8505-18-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Sat, 8 Dec 2018 15:15:56 +0400")
-Message-ID: <87o99ss1y5.fsf@dusky.pond.sub.org>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gWgp6-0006mT-Bq
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 07:07:37 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20181204142023.15982-1-marcandre.lureau@redhat.com>
+	<20181204142023.15982-9-marcandre.lureau@redhat.com>
+	<20181210173118.GF4669@habkost.net>
+In-Reply-To: <20181210173118.GF4669@habkost.net>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 11 Dec 2018 16:07:19 +0400
+Message-ID: <CAJ+F1CKcNhLsu=b5ZJbA_6Kyb3_EUt3nzsZ0q+OWpvZS6JyytA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v7 17/27] qapi: simplify
- make_enum_members()
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v5 08/19] hw: apply machine compat
+ properties without touching globals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +25,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, David Hildenbrand <david@redhat.com>, "open list:sPAPR pseries" <qemu-ppc@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, QEMU <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Qemu-s390x list <qemu-s390x@nongnu.org>, "open list:ARM" <qemu-arm@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+Hi
 
-> The function only receives the dictionary form of enum expressions
-> now, so we can make it shorter.
+On Mon, Dec 10, 2018 at 9:31 PM Eduardo Habkost <ehabkost@redhat.com> wrote=
+:
 >
-> Suggested-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qapi/common.py | 11 +----------
->  1 file changed, 1 insertion(+), 10 deletions(-)
+> On Tue, Dec 04, 2018 at 06:20:12PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> > Similarly to accel properties, move compat properties out of globals
+> > registration, and apply the machine compat properties during
+> > device_post_init().
+> >
+> > As suggested during review, populating the arrays can be done directly
+> > without resorting to using macros.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  include/hw/boards.h        |   3 +-
+> >  hw/arm/virt.c              |  48 ++-
+> >  hw/core/machine.c          |  19 +-
+> >  hw/core/qdev.c             |   2 +
+> >  hw/i386/pc_piix.c          | 588 +++++++++++++++++++++----------------
+> >  hw/i386/pc_q35.c           |  70 ++++-
+> >  hw/ppc/spapr.c             | 209 +++++++------
+> >  hw/s390x/s390-virtio-ccw.c | 220 +++++++-------
+> >  vl.c                       |   1 -
+> >  9 files changed, 673 insertions(+), 487 deletions(-)
+> >
+> > diff --git a/include/hw/boards.h b/include/hw/boards.h
+> > index f82f28468b..28c2b0af41 100644
+> > --- a/include/hw/boards.h
+> > +++ b/include/hw/boards.h
+> > @@ -69,7 +69,6 @@ int machine_kvm_shadow_mem(MachineState *machine);
+> >  int machine_phandle_start(MachineState *machine);
+> >  bool machine_dump_guest_core(MachineState *machine);
+> >  bool machine_mem_merge(MachineState *machine);
+> > -void machine_register_compat_props(MachineState *machine);
+> >  HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *mac=
+hine);
+> >  void machine_set_cpu_numa_node(MachineState *machine,
+> >                                 const CpuInstanceProperties *props,
+> > @@ -191,7 +190,7 @@ struct MachineClass {
+> >      const char *default_machine_opts;
+> >      const char *default_boot_order;
+> >      const char *default_display;
+> > -    GArray *compat_props;
+> > +    GPtrArray *compat_props;
+> >      const char *hw_version;
+> >      ram_addr_t default_ram_size;
+> >      const char *default_cpu_type;
+> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > index f69e7eb399..530c8ca89d 100644
+> > --- a/hw/arm/virt.c
+> > +++ b/hw/arm/virt.c
+> > @@ -1872,8 +1872,9 @@ static void virt_machine_3_1_options(MachineClass=
+ *mc)
+> >  }
+> >  DEFINE_VIRT_MACHINE_AS_LATEST(3, 1)
+> >
+> > -#define VIRT_COMPAT_3_0 \
+> > +static GlobalProperty virt_compat_3_0[] =3D {
+> >      HW_COMPAT_3_0
+> > +};
+> [...]
 >
-> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-> index fd622313cb..44020779dd 100644
-> --- a/scripts/qapi/common.py
-> +++ b/scripts/qapi/common.py
-> @@ -1714,16 +1714,7 @@ class QAPISchema(object):
->                                              qtype_values, 'QTYPE'))
->=20=20
->      def _make_enum_members(self, values):
-> -        enum =3D []
-> -        for v in values:
-> -            if isinstance(v, dict):
-> -                name =3D v['name']
-> -                ifcond =3D v.get('if')
-> -            else:
-> -                name =3D v
-> -                ifcond =3D None
-> -            enum.append(QAPISchemaMember(name, ifcond))
-> -        return enum
-> +        return [QAPISchemaMember(v['name'], v.get('if')) for v in values]
->=20=20
->      def _make_implicit_enum_type(self, name, info, ifcond, values):
->          # See also QAPISchemaObjectTypeMember._pretty_owner()
+> All the changes to compat macros are independent from the change
+> you describe in the patch subject, and makes review more
+> difficult.  What about doing that in a separate patch?
+>
+> We can replace all the virt.c, pc_piix.c, pc_q35.c, and spapr.c
+> hunks in this patch with the following:
+>
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index f82f28468b..622bbaf939 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -290,18 +289,10 @@ struct MachineState {
+>
+>  #define SET_MACHINE_COMPAT(m, COMPAT) \
+>      do {                              \
+> -        int i;                        \
+>          static GlobalProperty props[] =3D {       \
+>              COMPAT                              \
+> -            { /* end of list */ }               \
+>          };                                      \
+> -        if (!m->compat_props) { \
+> -            m->compat_props =3D g_array_new(false, false, sizeof(void *)=
+); \
+> -        } \
+> -        for (i =3D 0; props[i].driver !=3D NULL; i++) {    \
+> -            GlobalProperty *prop =3D &props[i];          \
+> -            g_array_append_val(m->compat_props, prop); \
+> -        }                                              \
+> +        compat_props_add(m->compat_props, props, G_N_ELEMENTS(props)); \
+>      } while (0)
+>
+>  #endif
+>
 
-We may want to squash this one into PATCH 08 as mentioned in that
-patch's review.
+Didn't you ask in a previous iteration to remove the macros?
+"I like us to be able to
+register compat properties without macro magic.  The existence of
+SET_MACHINE_COMPAT is a bug and not a feature.
 
-In case we don't:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+
+--=20
+Marc-Andr=C3=A9 Lureau
