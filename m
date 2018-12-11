@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gWkLH-0007tu-3t
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:53:06 -0500
+	(envelope-from <prvs=87697dac6=Paul.Durrant@citrix.com>)
+	id 1gWkQA-0004Wq-Bw
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:58:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gWkLA-0004i6-UY
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:53:02 -0500
-Date: Tue, 11 Dec 2018 16:52:29 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181211165229.744f0c07@redhat.com>
-In-Reply-To: <CAJ+F1CKF7_MEtZNY2FEot9dG-RZQwGeZZ7+3+q1QgD98koF2SA@mail.gmail.com>
-References: <20181204142023.15982-1-marcandre.lureau@redhat.com>
-	<20181204142023.15982-9-marcandre.lureau@redhat.com>
-	<20181211142310.GB20015@habkost.net>
-	<CAJ+F1CKF7_MEtZNY2FEot9dG-RZQwGeZZ7+3+q1QgD98koF2SA@mail.gmail.com>
+	(envelope-from <prvs=87697dac6=Paul.Durrant@citrix.com>)
+	id 1gWkQ5-0003Eb-79
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:58:05 -0500
+From: Paul Durrant <paul.durrant@citrix.com>
+Date: Tue, 11 Dec 2018 15:57:31 +0000
+Message-ID: <1544543862-9997-8-git-send-email-paul.durrant@citrix.com>
+In-Reply-To: <1544543862-9997-1-git-send-email-paul.durrant@citrix.com>
+References: <1544543862-9997-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v5 08/19] hw: apply machine compat
- properties without touching globals
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v4 07/18] xen: add event channel interface for
+ XenDevice-s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,59 +24,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@gmail.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, QEMU <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Qemu-s390x list <qemu-s390x@nongnu.org>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:sPAPR pseries" <qemu-ppc@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-On Tue, 11 Dec 2018 18:30:32 +0400
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
+The legacy PV backend infrastructure provides functions to bind, unbind
+and send notifications to event channnels. Similar functionality will be
+required by XenDevice implementations so this patch adds the necessary
+support.
 
-> Hi
->=20
-> On Tue, Dec 11, 2018 at 6:24 PM Eduardo Habkost <ehabkost@redhat.com> wro=
-te:
-> >
-> > I have specific questions about the approach we are using to
-> > eliminate the macros.
-> >
-> > My main goal when asking this to be moved to a separate patch is
-> > to not make this discussion block the register_global_properties() &
-> > device_post_init() changes (which look good to me).
-> >
-> >
-> > On Tue, Dec 04, 2018 at 06:20:12PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> > [...] =20
-> > > -#define VIRT_COMPAT_3_0 \
-> > > +static GlobalProperty virt_compat_3_0[] =3D {
-> > >      HW_COMPAT_3_0
-> > > +}; =20
-> >
-> > What about moving the array inside virt_machine_3_0_options()? =20
->=20
-> Sure
->=20
-> > =20
-> > >
-> > >  static void virt_3_0_instance_init(Object *obj)
-> > >  {
-> > > @@ -1883,12 +1884,14 @@ static void virt_3_0_instance_init(Object *ob=
-j)
-> > >  static void virt_machine_3_0_options(MachineClass *mc)
-> > >  {
-> > >      virt_machine_3_1_options(mc);
-> > > -    SET_MACHINE_COMPAT(mc, VIRT_COMPAT_3_0);
-> > > +    compat_props_add(mc->compat_props,
-> > > +                     virt_compat_3_0, G_N_ELEMENTS(virt_compat_3_0));
-> > >  }
-> > >  DEFINE_VIRT_MACHINE(3, 0) =20
-> >
-> > This is nice, because it's basically the same amount of
-> > boilerplate code, but I would find a NULL-terminated array much
-> > easier to use than having to use G_N_ELEMENTS(). =20
->=20
-> But easier to get wrong too. I prefer the explicit N arguments. (it
-> also gives some flexibility, since you can point to inner pointer +
-> size, although we don't care at this point)
-+1 to explicit array size,
-it also allows to drop terminating NULL entry in compat declarations
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
+---
+Cc: Stefano Stabellini <sstabellini@kernel.org>
 
-[...]
+v2:
+ - Added error pointers to notify and unbind
+---
+ hw/xen/xen-bus.c         | 101 +++++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/xen/xen-bus.h |  18 +++++++++
+ 2 files changed, 119 insertions(+)
+
+diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
+index faa9fd3..9443f27 100644
+--- a/hw/xen/xen-bus.c
++++ b/hw/xen/xen-bus.c
+@@ -617,6 +617,81 @@ done:
+     g_free(xengnttab_segs);
+ }
+ 
++struct XenEventChannel {
++    unsigned int local_port;
++    XenEventHandler handler;
++    void *opaque;
++    Notifier notifier;
++};
++
++static void event_notify(Notifier *n, void *data)
++{
++    XenEventChannel *channel = container_of(n, XenEventChannel, notifier);
++    unsigned long port = (unsigned long)data;
++
++    if (port == channel->local_port) {
++        channel->handler(channel->opaque);
++    }
++}
++
++XenEventChannel *xen_device_bind_event_channel(XenDevice *xendev,
++                                               unsigned int port,
++                                               XenEventHandler handler,
++                                               void *opaque, Error **errp)
++{
++    XenEventChannel *channel = g_new0(XenEventChannel, 1);
++
++    channel->local_port = xenevtchn_bind_interdomain(xendev->xeh,
++                                                     xendev->frontend_id,
++                                                     port);
++    if (xendev->local_port < 0) {
++        error_setg_errno(errp, errno, "xenevtchn_bind_interdomain failed");
++
++        g_free(channel);
++        return NULL;
++    }
++
++    channel->handler = handler;
++    channel->opaque = opaque;
++    channel->notifier.notify = event_notify;
++
++    notifier_list_add(&xendev->event_notifiers, &channel->notifier);
++
++    return channel;
++}
++
++void xen_device_notify_event_channel(XenDevice *xendev,
++                                     XenEventChannel *channel,
++                                     Error **errp)
++{
++    if (!channel) {
++        error_setg(errp, "bad channel");
++        return;
++    }
++
++    if (xenevtchn_notify(xendev->xeh, channel->local_port) < 0) {
++        error_setg_errno(errp, errno, "xenevtchn_notify failed");
++    }
++}
++
++void xen_device_unbind_event_channel(XenDevice *xendev,
++                                     XenEventChannel *channel,
++                                     Error **errp)
++{
++    if (!channel) {
++        error_setg(errp, "bad channel");
++        return;
++    }
++
++    notifier_remove(&channel->notifier);
++
++    if (xenevtchn_unbind(xendev->xeh, channel->local_port) < 0) {
++        error_setg_errno(errp, errno, "xenevtchn_unbind failed");
++    }
++
++    g_free(channel);
++}
++
+ static void xen_device_unrealize(DeviceState *dev, Error **errp)
+ {
+     XenDevice *xendev = XEN_DEVICE(dev);
+@@ -641,6 +716,12 @@ static void xen_device_unrealize(DeviceState *dev, Error **errp)
+     xen_device_frontend_destroy(xendev);
+     xen_device_backend_destroy(xendev);
+ 
++    if (xendev->xeh) {
++        qemu_set_fd_handler(xenevtchn_fd(xendev->xeh), NULL, NULL, NULL);
++        xenevtchn_close(xendev->xeh);
++        xendev->xeh = NULL;
++    }
++
+     if (xendev->xgth) {
+         xengnttab_close(xendev->xgth);
+         xendev->xgth = NULL;
+@@ -657,6 +738,16 @@ static void xen_device_exit(Notifier *n, void *data)
+     xen_device_unrealize(DEVICE(xendev), &error_abort);
+ }
+ 
++static void xen_device_event(void *opaque)
++{
++    XenDevice *xendev = opaque;
++    unsigned long port = xenevtchn_pending(xendev->xeh);
++
++    notifier_list_notify(&xendev->event_notifiers, (void *)port);
++
++    xenevtchn_unmask(xendev->xeh, port);
++}
++
+ static void xen_device_realize(DeviceState *dev, Error **errp)
+ {
+     XenDevice *xendev = XEN_DEVICE(dev);
+@@ -697,6 +788,16 @@ static void xen_device_realize(DeviceState *dev, Error **errp)
+     xendev->feature_grant_copy =
+         (xengnttab_grant_copy(xendev->xgth, 0, NULL) == 0);
+ 
++    xendev->xeh = xenevtchn_open(NULL, 0);
++    if (!xendev->xeh) {
++        error_setg_errno(errp, errno, "failed xenevtchn_open");
++        goto unrealize;
++    }
++
++    notifier_list_init(&xendev->event_notifiers);
++    qemu_set_fd_handler(xenevtchn_fd(xendev->xeh), xen_device_event, NULL,
++                        xendev);
++
+     xen_device_backend_create(xendev, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
+index 63a09b6..f83a95c 100644
+--- a/include/hw/xen/xen-bus.h
++++ b/include/hw/xen/xen-bus.h
+@@ -26,6 +26,9 @@ typedef struct XenDevice {
+     XenWatch *frontend_state_watch;
+     xengnttab_handle *xgth;
+     bool feature_grant_copy;
++    xenevtchn_handle *xeh;
++    xenevtchn_port_or_error_t local_port;
++    NotifierList event_notifiers;
+ } XenDevice;
+ 
+ typedef char *(*XenDeviceGetName)(XenDevice *xendev, Error **errp);
+@@ -104,4 +107,19 @@ void xen_device_copy_grant_refs(XenDevice *xendev, bool to_domain,
+                                 XenDeviceGrantCopySegment segs[],
+                                 unsigned int nr_segs, Error **errp);
+ 
++typedef struct XenEventChannel XenEventChannel;
++
++typedef void (*XenEventHandler)(void *opaque);
++
++XenEventChannel *xen_device_bind_event_channel(XenDevice *xendev,
++                                               unsigned int port,
++                                               XenEventHandler handler,
++                                               void *opaque, Error **errp);
++void xen_device_notify_event_channel(XenDevice *xendev,
++                                     XenEventChannel *channel,
++                                     Error **errp);
++void xen_device_unbind_event_channel(XenDevice *xendev,
++                                     XenEventChannel *channel,
++                                     Error **errp);
++
+ #endif /* HW_XEN_BUS_H */
+-- 
+2.1.4
