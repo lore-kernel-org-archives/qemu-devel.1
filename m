@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gWhv3-0000P9-QY
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 08:17:51 -0500
+	(envelope-from <ppandit@redhat.com>) id 1gWi5p-0002FF-2D
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 08:28:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gWhv0-0007oO-JK
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 08:17:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50448)
+	(envelope-from <ppandit@redhat.com>) id 1gWi5n-0000au-VD
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 08:28:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33756)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gWhv0-0007jK-B6
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 08:17:46 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181208111606.8505-1-marcandre.lureau@redhat.com>
-	<20181208111606.8505-22-marcandre.lureau@redhat.com>
-Date: Tue, 11 Dec 2018 14:17:28 +0100
-In-Reply-To: <20181208111606.8505-22-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Sat, 8 Dec 2018 15:16:00 +0400")
-Message-ID: <87h8fkqk2f.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gWi5n-0000a8-Ow
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 08:28:55 -0500
+From: P J P <ppandit@redhat.com>
+Date: Tue, 11 Dec 2018 18:56:38 +0530
+Message-Id: <20181211132642.3027-2-ppandit@redhat.com>
+In-Reply-To: <20181211132642.3027-1-ppandit@redhat.com>
+References: <20181211132642.3027-1-ppandit@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v7 21/27] qapi: add #if conditions
- to generated code members
+Subject: [Qemu-devel] [PATCH 1/5] rdma: check that num_sge does not exceed
+ MAX_SGE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,216 +26,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Qemu Developers <qemu-devel@nongnu.org>
+Cc: Yuval Shaia <yuval.shaia@oracle.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Saar Amar <saaramar5@gmail.com>, Li Qiang <liq3ea@163.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-> Wrap generated enum/struct members and code with #if/#endif, using the
-> .ifcond members added in the previous patches.
->
-> Some types generate both enum and struct members for example, so a
-> step-by-step is unnecessarily complicated to deal with (it would
-> easily generate invalid intermediary code).
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+rdma back-end has scatter/gather array ibv_sge[MAX_SGE=3D4] set
+to have 4 elements. A guest could send a 'PvrdmaSqWqe' ring element
+with 'num_sge' set to > MAX_SGE, which may lead to OOB access issue.
+Add check to avoid it.
 
-We've since agreed to tweak the commit message:
+Reported-by: Saar Amar <saaramar5@gmail.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ hw/rdma/rdma_backend.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-    qapi: Add #if conditions to generated code members
-
-    Wrap generated enum and struct members and their supporting code with
-    #if/#endif, using the .ifcond members added in the previous patches.
-
-    We do enum and struct in a single patch because union tag enum and the
-    associated variants tie them together, and dealing with that to split
-    the patch doesn't seem worthwhile.
-
-> ---
->  scripts/qapi/common.py     |  4 ++++
->  scripts/qapi/introspect.py | 13 +++++++++----
->  scripts/qapi/types.py      |  4 ++++
->  scripts/qapi/visit.py      |  6 ++++++
->  4 files changed, 23 insertions(+), 4 deletions(-)
->
-> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-> index a70d6dec3b..3a29812ef2 100644
-> --- a/scripts/qapi/common.py
-> +++ b/scripts/qapi/common.py
-> @@ -2108,11 +2108,13 @@ const QEnumLookup %(c_name)s_lookup =3D {
->  ''',
->                  c_name=3Dc_name(name))
->      for m in members:
-> +        ret +=3D gen_if(m.ifcond)
->          index =3D c_enum_const(name, m.name, prefix)
->          ret +=3D mcgen('''
->          [%(index)s] =3D "%(name)s",
->  ''',
->                       index=3Dindex, name=3Dm.name)
-> +        ret +=3D gen_endif(m.ifcond)
->=20=20
->      ret +=3D mcgen('''
->      },
-> @@ -2134,10 +2136,12 @@ typedef enum %(c_name)s {
->                  c_name=3Dc_name(name))
->=20=20
->      for m in enum_members:
-> +        ret +=3D gen_if(m.ifcond)
->          ret +=3D mcgen('''
->      %(c_enum)s,
->  ''',
->                       c_enum=3Dc_enum_const(name, m.name, prefix))
-> +        ret +=3D gen_endif(m.ifcond)
->=20=20
->      ret +=3D mcgen('''
->  } %(c_name)s;
-> diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-> index 417625d54b..77087f629b 100644
-> --- a/scripts/qapi/introspect.py
-> +++ b/scripts/qapi/introspect.py
-> @@ -162,6 +162,8 @@ const QLitObject %(c_name)s =3D %(c_string)s;
->          ret =3D {'name': member.name, 'type': self._use_type(member.type=
-)}
->          if member.optional:
->              ret['default'] =3D None
-> +        if member.ifcond:
-> +            ret =3D (ret, {'if': member.ifcond})
->          return ret
->=20=20
->      def _gen_variants(self, tag_name, variants):
-> @@ -169,14 +171,16 @@ const QLitObject %(c_name)s =3D %(c_string)s;
->                  'variants': [self._gen_variant(v) for v in variants]}
->=20=20
->      def _gen_variant(self, variant):
-> -        return {'case': variant.name, 'type': self._use_type(variant.typ=
-e)}
-> +        return ({'case': variant.name, 'type': self._use_type(variant.ty=
-pe)},
-> +                {'if': variant.ifcond})
->=20=20
->      def visit_builtin_type(self, name, info, json_type):
->          self._gen_qlit(name, 'builtin', {'json-type': json_type}, [])
->=20=20
->      def visit_enum_type(self, name, info, ifcond, members, prefix):
->          self._gen_qlit(name, 'enum',
-> -                       {'values': [m.name for m in members]}, ifcond)
-> +                       {'values': [(m.name, {'if': m.ifcond}) for m in m=
-embers]},
-> +                       ifcond)
->=20=20
->      def visit_array_type(self, name, info, ifcond, element_type):
->          element =3D self._use_type(element_type)
-> @@ -192,8 +196,9 @@ const QLitObject %(c_name)s =3D %(c_string)s;
->=20=20
->      def visit_alternate_type(self, name, info, ifcond, variants):
->          self._gen_qlit(name, 'alternate',
-> -                       {'members': [{'type': self._use_type(m.type)}
-> -                                    for m in variants.variants]}, ifcond)
-> +                       {'members': [
-> +                           ({'type': self._use_type(m.type)}, {'if': m.i=
-fcond})
-
-Long line.  I'll feed the series to pycodestyle and pylint.
-
-> +                           for m in variants.variants]}, ifcond)
->=20=20
->      def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
->                        success_response, boxed, allow_oob, allow_preconfi=
-g):
-> diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
-> index 0404710bbd..e2ee9f3b72 100644
-> --- a/scripts/qapi/types.py
-> +++ b/scripts/qapi/types.py
-> @@ -43,6 +43,7 @@ struct %(c_name)s {
->  def gen_struct_members(members):
->      ret =3D ''
->      for memb in members:
-> +        ret +=3D gen_if(memb.ifcond)
->          if memb.optional:
->              ret +=3D mcgen('''
->      bool has_%(c_name)s;
-> @@ -52,6 +53,7 @@ def gen_struct_members(members):
->      %(c_type)s %(c_name)s;
->  ''',
->                       c_type=3Dmemb.type.c_type(), c_name=3Dc_name(memb.n=
-ame))
-> +        ret +=3D gen_endif(memb.ifcond)
->      return ret
->=20=20
->=20=20
-> @@ -131,11 +133,13 @@ def gen_variants(variants):
->      for var in variants.variants:
->          if var.type.name =3D=3D 'q_empty':
->              continue
-> +        ret +=3D gen_if(var.ifcond)
->          ret +=3D mcgen('''
->          %(c_type)s %(c_name)s;
->  ''',
->                       c_type=3Dvar.type.c_unboxed_type(),
->                       c_name=3Dc_name(var.name))
-> +        ret +=3D gen_endif(var.ifcond)
->=20=20
->      ret +=3D mcgen('''
->      } u;
-> diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
-> index 24f85a2e85..82eab72b21 100644
-> --- a/scripts/qapi/visit.py
-> +++ b/scripts/qapi/visit.py
-> @@ -54,6 +54,7 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name=
-)s *obj, Error **errp)
->                       c_type=3Dbase.c_name())
->=20=20
->      for memb in members:
-> +        ret +=3D gen_if(memb.ifcond)
->          if memb.optional:
->              ret +=3D mcgen('''
->      if (visit_optional(v, "%(name)s", &obj->has_%(c_name)s)) {
-> @@ -73,6 +74,7 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name=
-)s *obj, Error **errp)
->              ret +=3D mcgen('''
->      }
->  ''')
-> +        ret +=3D gen_endif(memb.ifcond)
->=20=20
->      if variants:
->          ret +=3D mcgen('''
-> @@ -84,6 +86,7 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name=
-)s *obj, Error **errp)
->              case_str =3D c_enum_const(variants.tag_member.type.name,
->                                      var.name,
->                                      variants.tag_member.type.prefix)
-> +            ret +=3D gen_if(var.ifcond)
->              if var.type.name =3D=3D 'q_empty':
->                  # valid variant and nothing to do
->                  ret +=3D mcgen('''
-> @@ -100,6 +103,7 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_na=
-me)s *obj, Error **errp)
->                               case=3Dcase_str,
->                               c_type=3Dvar.type.c_name(), c_name=3Dc_name=
-(var.name))
->=20=20
-> +            ret +=3D gen_endif(var.ifcond)
->          ret +=3D mcgen('''
->      default:
->          abort();
-> @@ -190,6 +194,7 @@ void visit_type_%(c_name)s(Visitor *v, const char *na=
-me, %(c_name)s **obj, Error
->                  c_name=3Dc_name(name))
->=20=20
->      for var in variants.variants:
-> +        ret +=3D gen_if(var.ifcond)
->          ret +=3D mcgen('''
->      case %(case)s:
->  ''',
-> @@ -217,6 +222,7 @@ void visit_type_%(c_name)s(Visitor *v, const char *na=
-me, %(c_name)s **obj, Error
->          ret +=3D mcgen('''
->          break;
->  ''')
-> +        ret +=3D gen_endif(var.ifcond)
->=20=20
->      ret +=3D mcgen('''
->      case QTYPE_NONE:
-
-With the tweaked commit message:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+index d7a4bbd91f..0b3b98a94c 100644
+--- a/hw/rdma/rdma_backend.c
++++ b/hw/rdma/rdma_backend.c
+@@ -311,8 +311,8 @@ void rdma_backend_post_send(RdmaBackendDev *backend_d=
+ev,
+     }
+=20
+     pr_dbg("num_sge=3D%d\n", num_sge);
+-    if (!num_sge) {
+-        pr_dbg("num_sge=3D0\n");
++    if (!num_sge || num_sge > MAX_SGE) {
++        pr_dbg("invalid num_sge=3D%d\n", num_sge);
+         comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_NO_SGE, ctx);
+         return;
+     }
+@@ -390,8 +390,8 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_d=
+ev,
+     }
+=20
+     pr_dbg("num_sge=3D%d\n", num_sge);
+-    if (!num_sge) {
+-        pr_dbg("num_sge=3D0\n");
++    if (!num_sge || num_sge > MAX_SGE) {
++        pr_dbg("invalid num_sge=3D%d\n", num_sge);
+         comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_NO_SGE, ctx);
+         return;
+     }
+--=20
+2.19.2
