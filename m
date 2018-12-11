@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gWl0Q-0003Uy-VH
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:35:40 -0500
+	(envelope-from <wainersm@redhat.com>) id 1gWl5Y-00085n-5C
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:40:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gWl0N-0007AY-C5
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:35:34 -0500
-Received: from 18.mo3.mail-out.ovh.net ([87.98.172.162]:42749)
+	(envelope-from <wainersm@redhat.com>) id 1gWl5W-0001zo-3D
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:40:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41422)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gWl0M-00076p-Uf
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:35:31 -0500
-Received: from player711.ha.ovh.net (unknown [10.109.159.35])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id AFA761EA868
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 17:35:28 +0100 (CET)
-Date: Tue, 11 Dec 2018 17:35:20 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20181211173520.785736ae@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20181211054926.56717-3-aik@ozlabs.ru>
-References: <20181211054926.56717-1-aik@ozlabs.ru>
-	<20181211054926.56717-3-aik@ozlabs.ru>
+	(Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1gWl5S-0001wU-65
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:40:48 -0500
+References: <20181207221417.5152-1-wainersm@redhat.com>
+	<20181210164657.GB4669@habkost.net>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <5cd0b649-c74f-877d-4b5d-a0943a04c7eb@redhat.com>
+Date: Tue, 11 Dec 2018 14:40:33 -0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20181210164657.GB4669@habkost.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH qemu 2/3] ppc/spapr: Receive and
- store device tree blob from SLOF
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH] target/i386: Fixes to the check missing
+ features routine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,223 +29,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, "Daniel P . =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, ccarrara@redhat.com, crosa@redhat.com
 
-On Tue, 11 Dec 2018 16:49:25 +1100
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 
-> SLOF receives a device tree and updates it with various properties
-> before switching to the guest kernel and QEMU is not aware of any changes
-> made by SLOF. Since there is no real RTAS (QEMU implements it), it makes
-> sense to pass the SLOF final device tree to QEMU to let it implement
-> RTAS related tasks better, such as PCI host bus adapter hotplug.
-> 
-> Specifially, now QEMU can find out the actual XICS phandle (for PHB
-> hotplug) and the RTAS linux,rtas-entry/base properties (for firmware
-> assisted NMI - FWNMI).
-> 
-> This stores the initial DT blob in the sPAPR machine and replaces it
-> in the KVMPPC_H_UPDATE_DT (new private hypercall) handler.
-> 
-> This adds an @update_dt_enabled machine property to allow backward
-> migration.
-> 
-> SLOF already has a hypercall since
-> https://github.com/aik/SLOF/commit/e6fc84652c9c0073f9183
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
->  include/hw/ppc/spapr.h |  7 ++++++-
->  hw/ppc/spapr.c         | 31 ++++++++++++++++++++++++++++++-
->  hw/ppc/spapr_hcall.c   | 42 ++++++++++++++++++++++++++++++++++++++++++
->  hw/ppc/trace-events    |  3 +++
->  4 files changed, 81 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 1987640..86c90df 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -102,6 +102,7 @@ struct sPAPRMachineClass {
->  
->      /*< public >*/
->      bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMBs */
-> +    bool update_dt_enabled;    /* enable KVMPPC_H_UPDATE_DT */
->      bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
->      bool pre_2_10_has_unused_icps;
->      bool legacy_irq_allocation;
-> @@ -138,6 +139,9 @@ struct sPAPRMachineState {
->      int vrma_adjust;
->      ssize_t rtas_size;
->      void *rtas_blob;
-> +    uint32_t fdt_size;
-> +    uint32_t fdt_initial_size;
-> +    void *fdt_blob;
->      long kernel_size;
->      bool kernel_le;
->      uint32_t initrd_base;
-> @@ -464,7 +468,8 @@ struct sPAPRMachineState {
->  #define KVMPPC_H_LOGICAL_MEMOP  (KVMPPC_HCALL_BASE + 0x1)
->  /* Client Architecture support */
->  #define KVMPPC_H_CAS            (KVMPPC_HCALL_BASE + 0x2)
-> -#define KVMPPC_HCALL_MAX        KVMPPC_H_CAS
-> +#define KVMPPC_H_UPDATE_DT      (KVMPPC_HCALL_BASE + 0x3)
-> +#define KVMPPC_HCALL_MAX        KVMPPC_H_UPDATE_DT
->  
->  typedef struct sPAPRDeviceTreeUpdateHeader {
->      uint32_t version_id;
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 8a18250..984bf32 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1654,7 +1654,10 @@ static void spapr_machine_reset(void)
->      /* Load the fdt */
->      qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
->      cpu_physical_memory_write(fdt_addr, fdt, fdt_totalsize(fdt));
-> -    g_free(fdt);
-> +    g_free(spapr->fdt_blob);
-> +    spapr->fdt_size = fdt_totalsize(fdt);
-> +    spapr->fdt_initial_size = spapr->fdt_size;
-> +    spapr->fdt_blob = fdt;
->  
->      /* Set up the entry state */
->      spapr_cpu_set_entry_state(first_ppc_cpu, SPAPR_ENTRY_POINT, fdt_addr);
-> @@ -1908,6 +1911,27 @@ static const VMStateDescription vmstate_spapr_irq_map = {
->      },
->  };
->  
-> +static bool spapr_dtb_needed(void *opaque)
-> +{
-> +    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(opaque);
-> +
-> +    return smc->update_dt_enabled;
-> +}
-> +
-> +static const VMStateDescription vmstate_spapr_dtb = {
-> +    .name = "spapr_dtb",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .needed = spapr_dtb_needed,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT32(fdt_initial_size, sPAPRMachineState),
-> +        VMSTATE_UINT32(fdt_size, sPAPRMachineState),
-> +        VMSTATE_VBUFFER_ALLOC_UINT32(fdt_blob, sPAPRMachineState, 0, NULL,
-> +                                     fdt_size),
+On 12/10/2018 02:46 PM, Eduardo Habkost wrote:
+> On Fri, Dec 07, 2018 at 05:14:17PM -0500, Wainer dos Santos Moschetta wrote:
+>> The x86_cpu_class_check_missing_features() returns a list
+>> of unavailable features compared to the host CPU. Currently it may
+>> return empty strings for unamed features as well as duplicated
+>> names.
+>>
+>> For example, the qmp "query-cpu-definitions" below shows one empty
+>> string and repeated "mpx" entries:
+>>
+>> (...)
+>> {"execute": "query-cpu-definitions"}
+>> (...)
+>>          {
+>>              "name": "Cascadelake-Server",
+>>              "typename": "Cascadelake-Server-x86_64-cpu",
+>>              "unavailable-features": [
+>>                  "hle",
+>>                  "rtm",
+>>                  "mpx",
+>>                  "avx512f",
+>>                  "avx512dq",
+>>                  "rdseed",
+>>                  "adx",
+>>                  "smap",
+>>                  "clflushopt",
+>>                  "clwb",
+>>                  "intel-pt",
+>>                  "avx512cd",
+>>                  "avx512bw",
+>>                  "avx512vl",
+>>                  "pku",
+>>                  "",
+>>                  "avx512vnni",
+>>                  "spec-ctrl",
+>>                  "ssbd",
+>>                  "3dnowprefetch",
+>>                  "xsavec",
+>>                  "xgetbv1",
+>>                  "mpx",
+>>                  "mpx",
+>>                  "avx512f",
+>>                  "avx512f",
+>>                  "avx512f",
+>>                  "pku"
+>>              ],
+>> (...)
+>>
+>> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+>> ---
+>> Note: the skipped testcase was used to test fix in my system so it has
+>> assumptions about the host CPU. It's impracticial to change it to allow
+>> running on any system though. Therefore, I am okay on either leave or remove
+>> it. Opinions?
+>> ---
+>>   target/i386/cpu.c                   | 12 +++++-
+>>   tests/acceptance/cpu_definitions.py | 61 +++++++++++++++++++++++++++++
+>>   2 files changed, 72 insertions(+), 1 deletion(-)
+>>   create mode 100644 tests/acceptance/cpu_definitions.py
+>>
+>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> index f81d35e1f9..2502a3adda 100644
+>> --- a/target/i386/cpu.c
+>> +++ b/target/i386/cpu.c
+>> @@ -3615,19 +3615,29 @@ static void x86_cpu_class_check_missing_features(X86CPUClass *xcc,
+>>   
+>>       x86_cpu_filter_features(xc);
+>>   
+>> +    /* Uses an auxiliar dictionary to ensure the list of features has not
+>> +       repeated name. */
+>> +    QDict *unique_feats_dict = qdict_new();
+> Multiline comments are formatted this way:
+>
+>   /*
+>    * like
+>    * this
+>    */
+>
+> (See CODING_STYLE for details)
 
-Unless I'm missing something, it looks like the initial spapr->fdt_blob in the
-destination might be leaked...
+scripts/checkpatch.pl did not catch it. Should it?
 
-> +        VMSTATE_END_OF_LIST()
-> +    },
-> +};
-> +
->  static const VMStateDescription vmstate_spapr = {
->      .name = "spapr",
->      .version_id = 3,
-> @@ -1937,6 +1961,7 @@ static const VMStateDescription vmstate_spapr = {
->          &vmstate_spapr_cap_ibs,
->          &vmstate_spapr_irq_map,
->          &vmstate_spapr_cap_nested_kvm_hv,
-> +        &vmstate_spapr_dtb,
->          NULL
->      }
->  };
-> @@ -3871,6 +3896,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
->      hc->unplug = spapr_machine_device_unplug;
->  
->      smc->dr_lmb_enabled = true;
-> +    smc->update_dt_enabled = true;
->      mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power8_v2.0");
->      mc->has_hotpluggable_cpus = true;
->      smc->resize_hpt_default = SPAPR_RESIZE_HPT_ENABLED;
-> @@ -3981,8 +4007,11 @@ static void spapr_machine_3_1_instance_options(MachineState *machine)
->  
->  static void spapr_machine_3_1_class_options(MachineClass *mc)
->  {
-> +    sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
-> +
->      spapr_machine_4_0_class_options(mc);
->      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_3_1);
-> +    smc->update_dt_enabled = false;
->  }
->  
->  DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index ae913d0..dfd3cf3 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1717,6 +1717,46 @@ static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
->  
->      args[0] = characteristics;
->      args[1] = behaviour;
-> +    return H_SUCCESS;
-> +}
-> +
-> +static target_ulong h_update_dt(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-> +                                target_ulong opcode, target_ulong *args)
-> +{
-> +    target_ulong dt = ppc64_phys_to_real(args[0]);
-> +    struct fdt_header hdr = { 0 };
-> +    unsigned cb;
-> +    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
-> +    void *fdt;
-> +
-> +    cpu_physical_memory_read(dt, &hdr, sizeof(hdr));
-> +    cb = fdt32_to_cpu(hdr.totalsize);
-> +
-> +    if (!smc->update_dt_enabled) {
-> +        return H_SUCCESS;
-> +    }
-> +
-> +    /* Check that the fdt did not grow out of proportion */
-> +    if (cb > spapr->fdt_initial_size * 2) {
+Thanks!
 
-Ok, so this caps the new fdt tree to 2 megs, which seems reasonable.
+- Wainer
 
-BTW, why 2 and not some other growth factor ?
-
-> +        trace_spapr_update_dt_failed_size(spapr->fdt_initial_size, cb,
-> +            fdt32_to_cpu(hdr.magic));
-> +        return H_PARAMETER;
-> +    }
-> +
-> +    fdt = g_malloc0(cb);
-> +    cpu_physical_memory_read(dt, fdt, cb);
-> +
-> +    /* Check the fdt consostency */
-> +    if (fdt_check_full(fdt, cb)) {
-> +        trace_spapr_update_dt_failed_check(spapr->fdt_initial_size, cb,
-> +            fdt32_to_cpu(hdr.magic));
-> +        return H_PARAMETER;
-> +    }
-> +
-> +    g_free(spapr->fdt_blob);
-> +    spapr->fdt_size = cb;
-> +    spapr->fdt_blob = fdt;
-> +    trace_spapr_update_dt(cb);
->  
->      return H_SUCCESS;
->  }
-> @@ -1822,6 +1862,8 @@ static void hypercall_register_types(void)
->  
->      /* ibm,client-architecture-support support */
->      spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_support);
-> +
-> +    spapr_register_hypercall(KVMPPC_H_UPDATE_DT, h_update_dt);
->  }
->  
->  type_init(hypercall_register_types)
-> diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
-> index dc5e65a..0af155e 100644
-> --- a/hw/ppc/trace-events
-> +++ b/hw/ppc/trace-events
-> @@ -22,6 +22,9 @@ spapr_cas_pvr_try(uint32_t pvr) "0x%x"
->  spapr_cas_pvr(uint32_t cur_pvr, bool explicit_match, uint32_t new_pvr) "current=0x%x, explicit_match=%u, new=0x%x"
->  spapr_h_resize_hpt_prepare(uint64_t flags, uint64_t shift) "flags=0x%"PRIx64", shift=%"PRIu64
->  spapr_h_resize_hpt_commit(uint64_t flags, uint64_t shift) "flags=0x%"PRIx64", shift=%"PRIu64
-> +spapr_update_dt(unsigned cb) "New blob %u bytes"
-> +spapr_update_dt_failed_size(unsigned cbold, unsigned cbnew, unsigned magic) "Old blob %u bytes, new blob %u bytes, magic 0x%x"
-> +spapr_update_dt_failed_check(unsigned cbold, unsigned cbnew, unsigned magic) "Old blob %u bytes, new blob %u bytes, magic 0x%x"
->  
->  # hw/ppc/spapr_iommu.c
->  spapr_iommu_put(uint64_t liobn, uint64_t ioba, uint64_t tce, uint64_t ret) "liobn=0x%"PRIx64" ioba=0x%"PRIx64" tce=0x%"PRIx64" ret=%"PRId64
+>
+> In this case, we can probably make the comment fit in a single
+> line:
+>
+>      /* Auxiliary dict to avoid duplicate entries in the list */
+>
+>> +
+>>       for (w = 0; w < FEATURE_WORDS; w++) {
+>>           uint32_t filtered = xc->filtered_features[w];
+>>           int i;
+>>           for (i = 0; i < 32; i++) {
+>>               if (filtered & (1UL << i)) {
+>> +                const char *fname = g_strdup(x86_cpu_feature_name(w, i));
+> I believe you didn't mean to call g_strdup() here, as you are now
+> calling g_strdup(fname) below.
+>
+>> +                if (!fname || qdict_haskey(unique_feats_dict, fname)) {
+>> +                    continue;
+>> +                }
+>>                   strList *new = g_new0(strList, 1);
+>> -                new->value = g_strdup(x86_cpu_feature_name(w, i));
+>> +                new->value = g_strdup(fname);
+>>                   *next = new;
+>>                   next = &new->next;
+>> +                qdict_put_null(unique_feats_dict, new->value);
+>>               }
+>>           }
+>>       }
+>>   
+>> +    g_free(unique_feats_dict);
+>>       object_unref(OBJECT(xc));
+>>   }
+>>   
+>> diff --git a/tests/acceptance/cpu_definitions.py b/tests/acceptance/cpu_definitions.py
+>> new file mode 100644
+>> index 0000000000..65cea0427e
+>> --- /dev/null
+>> +++ b/tests/acceptance/cpu_definitions.py
+>> @@ -0,0 +1,61 @@
+>> +# CPU definitions tests.
+>> +#
+>> +# Copyright (c) 2018 Red Hat, Inc.
+>> +#
+>> +# Author:
+>> +#  Wainer dos Santos Moschetta <wainersm@redhat.com>
+>> +#
+>> +# This work is licensed under the terms of the GNU GPL, version 2 or
+>> +# later.  See the COPYING file in the top-level directory.
+>> +
+>> +from avocado import skip
+>> +from avocado_qemu import Test
+>> +
+>> +
+>> +class CPUDefinitions(Test):
+>> +    """
+>> +    Tests for the CPU definitions.
+>> +
+>> +    :avocado: enable
+>> +    :avocado: tags=x86_64
+>> +    """
+>> +    def test_unavailable_features(self):
+>> +        self.vm.add_args("-machine", "q35,accel=kvm")
+> Do you really need accel=kvm to reproduce the original bug?
+>
+>> +        self.vm.launch()
+>> +        cpu_definitions = self.vm.command('query-cpu-definitions')
+>> +        self.assertTrue(len(cpu_definitions) > 0)
+>> +        for cpu_model in cpu_definitions:
+>> +            name = cpu_model.get('name')
+>> +            unavailable_features = cpu_model.get('unavailable-features')
+>> +
+>> +            self.assertNotIn("", unavailable_features,
+>> +                             name + " has unamed feature")
+>> +            self.assertEqual(len(unavailable_features),
+>> +                             len(set(unavailable_features)),
+>> +                             name + " has duplicate feature")
+>> +
+>> +    @skip("Have assumptions about the host CPU")
+>> +    def test_unavailable_features_manual(self):
+>> +        """
+>> +        This test is meant for manual testing only because the list of expected
+>> +        unavailable features depend on the actual host CPU knowledge.
+>> +        """
+>> +        expected_cpu = 'Cascadelake-Server'
+>> +        expected_unavailable_features = ["hle", "rtm", "mpx", "avx512f",
+>> +                                         "avx512dq", "rdseed", "adx", "smap",
+>> +                                         "clflushopt", "clwb", "intel-pt",
+>> +                                         "avx512cd", "avx512bw", "avx512vl",
+>> +                                         "pku", "avx512vnni", "spec-ctrl",
+>> +                                         "ssbd", "3dnowprefetch", "xsavec",
+>> +                                         "xgetbv1"]
+> It looks like this test will work only on one specific host CPU
+> model.  It seems very unlikely that anybody will ever try to run
+> it manually.  I suggest just deleting it.
+>
+>> +
+>> +        self.vm.add_args("-machine", "q35,accel=kvm")
+>> +        self.vm.launch()
+>> +        cpu_definitions = self.vm.command('query-cpu-definitions')
+>> +        self.assertTrue(len(cpu_definitions) > 0)
+>> +
+>> +        cpus = [cpu_model for cpu_model in cpu_definitions
+>> +                if cpu_model['name'] == expected_cpu]
+>> +        actual_unavailable_features = cpus[0]['unavailable-features']
+>> +        self.assertCountEqual(expected_unavailable_features,
+>> +                              actual_unavailable_features)
+>> -- 
+>> 2.19.1
+>>
