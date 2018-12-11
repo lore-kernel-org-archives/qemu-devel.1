@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gWhXo-0002hV-JX
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 07:53:49 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gWhbF-0003pM-6q
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 07:57:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gWhXl-0008On-9D
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 07:53:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39760)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gWhXl-0008OR-2k
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 07:53:45 -0500
-Date: Tue, 11 Dec 2018 12:53:42 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20181211125342.GA21137@stefanha-x1.localdomain>
-References: <20181210173151.16629-1-dgilbert@redhat.com>
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gWhbD-0002ha-71
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 07:57:21 -0500
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Date: Tue, 11 Dec 2018 12:57:06 +0000
+Message-ID: <d2cf4d34-27ef-13ae-c50e-90cf8a320d04@virtuozzo.com>
+References: <1544465367-16302-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<34f9335a-1cd8-aa06-1fe7-0f2ab33515d0@virtuozzo.com>
+	<b4aaefb3-89a9-49e1-633f-fcdc629bc9e3@redhat.com>
+In-Reply-To: <b4aaefb3-89a9-49e1-633f-fcdc629bc9e3@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EA71CCBDBDCFF04080DFDDF67E50E977@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="WIyZ46R2i8wDzkSu"
-Content-Disposition: inline
-In-Reply-To: <20181210173151.16629-1-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 0/7] virtio-fs: shared file system for
- virtual machines3
+Subject: Re: [Qemu-devel] [PATCH v5] qemu-img info lists bitmap directory
+ entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +27,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, vgoyal@redhat.com, miklos@szeredi.hu, sweil@redhat.com, swhiteho@redhat.com
+To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-
---WIyZ46R2i8wDzkSu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Dec 10, 2018 at 05:31:44PM +0000, Dr. David Alan Gilbert (git) wrot=
-e:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> Hi,
->   This is the first RFC for the QEMU side of 'virtio-fs';
-> a new mechanism for mounting host directories into the guest
-> in a fast, consistent and secure manner.  Our primary use
-> case is kata containers, but it should be usable in other scenarios
-> as well.
->=20
-> There are corresponding patches being posted to Linux kernel,
-> libfuse and kata lists.
->=20
-> For a fuller design description, and benchmark numbers, please see
-> Vivek's posting of the kernel set here:
->=20
-> https://marc.info/?l=3Dlinux-kernel&m=3D154446243024251&w=3D2
->=20
-> We've got a small website with instructions on how to use it, here:
->=20
-> https://virtio-fs.gitlab.io/
->=20
-> and all the code is available on gitlab at:
->=20
-> https://gitlab.com/virtio-fs
-
-A draft specification for the virtio-fs device is available here:
-
-https://stefanha.github.io/virtio/virtio-fs.html#x1-38800010 (HTML)
-
-https://github.com/stefanha/virtio/commit/e1cac3777ef03bc9c5c8ee91bcc6ba478=
-272e6b6
-
-Stefan
-
---WIyZ46R2i8wDzkSu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcD7NWAAoJEJykq7OBq3PIJ/oIAKQYMOXfAB3yXqtBGMBClH38
-wy3d73lWJBwTwOeal0L7Ra6/aO5WYE0jOi67d+2ruO3mLigOriZm6ZPlVys8RzVW
-9CFOhLfAj36JZ0aC6lb6BlRdCgUtDisyPDWQbkhKDIgLyK6TU+phT93LSEFXaHZ3
-H07BYK52j3vVfy9LU1ejgIwajv4dZCh2MI2b2U/flmTUaamMM/418fBcPNXcwqkm
-SubEqk2VmXhaAcVQ2fHo1wsvA1Y+FxpLtbM/GZtIk/rQej2OBvXV77b1V1eRExBz
-I0m9FJ2+v0Qy1g+DRKSOvKsU/7xVXXc82o5vQq81PGzTj6g++rIVjVkAmMqtKcg=
-=+qf+
------END PGP SIGNATURE-----
-
---WIyZ46R2i8wDzkSu--
+DQoNCk9uIDEwLjEyLjIwMTggMjI6NDgsIEVyaWMgQmxha2Ugd3JvdGU6DQo+IE9uIDEyLzEwLzE4
+IDEyOjUwIFBNLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gMTAuMTIu
+MjAxOCAyMTowOSwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+Pj4gSW4gdGhlICdGb3JtYXQg
+c3BlY2lmaWMgaW5mb3JtYXRpb24nIHNlY3Rpb24gb2YgdGhlICdxZW11LWltZyBpbmZvJw0KPj4+
+IGNvbW1hbmQgb3V0cHV0LCB0aGUgc3VwcGxlbWVudGFsIGluZm9ybWF0aW9uIGFib3V0IGV4aXN0
+aW5nIFFDT1cyDQo+Pj4gYml0bWFwcyB3aWxsIGJlIHNob3duLCBzdWNoIGFzIGEgYml0bWFwIG5h
+bWUsIGZsYWdzIGFuZCBncmFudWxhcml0eToNCj4+Pg0KPj4NCj4+IFsuLi5dDQo+Pg0KPj4+IC0t
+LSBhL2Jsb2NrL3Fjb3cyLmMNCj4+PiArKysgYi9ibG9jay9xY293Mi5jDQo+Pj4gQEAgLTQyNzAs
+NiArNDI3MCwxOSBAQCBzdGF0aWMgSW1hZ2VJbmZvU3BlY2lmaWMgDQo+Pj4gKnFjb3cyX2dldF9z
+cGVjaWZpY19pbmZvKEJsb2NrRHJpdmVyU3RhdGUgKmJzKQ0KPj4+IMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqAgLnJlZmNvdW50X2JpdHPCoMKgwqDCoMKgID0gcy0+cmVmY291bnRfYml0cywN
+Cj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoCB9Ow0KPj4+IMKgwqDCoMKgwqDCoCB9IGVsc2UgaWYg
+KHMtPnFjb3dfdmVyc2lvbiA9PSAzKSB7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIGJvb2wgaGFzX2Jp
+dG1hcHM7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIFFjb3cyQml0bWFwSW5mb0xpc3QgKmJpdG1hcHM7
+DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIEVycm9yICpsb2NhbF9lcnIgPSBOVUxMOw0KPj4+ICsNCj4+
+PiArwqDCoMKgwqDCoMKgwqAgYml0bWFwcyA9IHFjb3cyX2dldF9iaXRtYXBfaW5mb19saXN0KGJz
+LCAmbG9jYWxfZXJyKTsNCj4+PiArwqDCoMKgwqDCoMKgwqAgaWYgKGxvY2FsX2Vycikgew0KPj4+
+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC8qIFRPRE86IFJlcG9ydCB0aGUgRXJyb3IgdXAgdG8g
+dGhlIGNhbGxlciB3aGVuIA0KPj4+IGltcGxlbWVudGVkICovDQo+Pj4gK8KgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgZXJyb3JfZnJlZShsb2NhbF9lcnIpOw0KPj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIC8qIFRoZSAnYml0bWFwcycgZW1wdHkgbGlzdCBkZXNpZ25hdGVzIGEgZmFpbHVyZSB0byBn
+ZXQgDQo+Pj4gaW5mbyAqLw0KPj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGhhc19iaXRtYXBz
+ID0gdHJ1ZTsNCj4gDQo+IEkgdGhpbmsgeW91IGdvdCBpdCBiYWNrd2FyZHMuwqAgSSB3b3VsZCBw
+cmVmZXIgaGFzX2JpdG1hcHMgPSBmYWxzZSBvbiANCj4gZXJyb3IsLi4uDQo+IA0KPj4+ICvCoMKg
+wqDCoMKgwqDCoCB9IGVsc2Ugew0KPj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGhhc19iaXRt
+YXBzID0gISFiaXRtYXBzOw0KPiANCj4gLi4uYW5kIGFuIGVtcHR5IGxpc3Qgd2hlbiB5b3Ugc3Vj
+Y2Vzc2Z1bGx5IGRldGVybWluZWQgdGhhdCB0aGVyZSBhcmUgbm8gDQo+IGJpdG1hcHMuDQo+IA0K
+PiANCj4+PiArKysgYi9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPj4+IEBAIC02OSw2ICs2OSwxMSBA
+QA0KPj4+IMKgwqAgIyBAZW5jcnlwdDogZGV0YWlscyBhYm91dCBlbmNyeXB0aW9uIHBhcmFtZXRl
+cnM7IG9ubHkgc2V0IGlmIGltYWdlDQo+Pj4gwqDCoCAjwqDCoMKgwqDCoMKgwqDCoMKgwqAgaXMg
+ZW5jcnlwdGVkIChzaW5jZSAyLjEwKQ0KPj4+IMKgwqAgIw0KPj4+ICsjIEBiaXRtYXBzOiBsaXN0
+IG9mIHFjb3cyIGJpdG1hcHMgZGV0YWlsczsgdGhlIGVtcHR5IGxpc3QgZGVzaWduYXRlcw0KPj4+
+ICsjwqDCoMKgwqDCoMKgwqDCoMKgwqAgImZhaWwgdG8gbG9hZCBiaXRtYXBzIiBpZiBpdCBpcyBw
+YXNzZWQgdG8gdGhlIGNhbGxlciBvcg0KPj4+ICsjwqDCoMKgwqDCoMKgwqDCoMKgwqAgIm5vIGJp
+dG1hcHMiIG90aGVyd2lzZTsNCj4+PiArI8KgwqDCoMKgwqDCoMKgwqDCoMKgIHVuc3VwcG9ydGVk
+IGZvciB0aGUgZm9ybWF0IFFDT1cyIHYyIChzaW5jZSA0LjApDQo+Pg0KPj4NCj4+IEZvciBtZSwg
+aXQgbG9va3Mgc2ltcGxlciB0byBkZWNsYXJlIGFsdGVybmF0aXZlIGFwcHJvYWNoLCBhc3N1bWlu
+ZyANCj4+IHRoYXQgYWJzZW5jZQ0KPj4gb2YgdGhlIGZpZWxkIG1lYW5zIGVycm9yLCBsaWtlIHRo
+aXM6DQo+Pg0KPj4gQGJpdG1hcHM6IG9wdGlvbmFsIGZpZWxkIHdpdGggdW5jb21tb24gc2VtYW50
+aWNzOg0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBBYnNlbmNlIG9mIHRoZSBmaWVsZCBtZWFu
+cyB0aGF0IGJpdG1hcHMgaW5mbyBxdWVyeSBmYWlsZWQgDQo+PiAod2hpY2ggZG9lc24ndA0KPj4g
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpbXBseSB0aGUgd2hvbGUgcXVlcnkgZmFpbHVyZSkuDQo+
+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIElmIHRoZSBmaWVsZCBleGlzdHMgaW4gcXVlcnkgcmVz
+dWx0cywgdGhlcmUgd2VyZSBubyANCj4+IGVycm9ycywgYW5kIGl0IHJlcHJlc2VudHMNCj4+IMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqAgbGlzdCBvZiBxY293MiBiaXRtYXBzIGRldGFpbHMuIFNvLCBz
+dWNjZXNzZnVsIHJlc3VsdCB3aWxsIA0KPj4gYWx3YXlzIHVzZSBlbXB0eQ0KPj4gwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoCBsaXN0IHRvIHNob3cgdGhhdCB0aGVyZSBhcmUgbm8gYml0bWFwcy4NCj4+
+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgTm90ZTogYml0bWFwcyBhcmUgbm90IHN1cHBvcnRlZCBi
+ZWZvcmUgUUNPVzIgdjMsIHNvIGZvciANCj4+IGVsZGVyIHZlcnNpb25zDQo+PiDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgIEBiaXRtYXBzIHdpbGwgYWx3YXlzIGJlIGFuIGVtcHR5IGxpc3QuDQo+IA0K
+PiBJJ2QgcHJlZmVyOg0KPiANCj4gQGJpdG1hcHM6IEEgbGlzdCBvZiBxY293MiBiaXRtYXAgZGV0
+YWlscyAocG9zc2libHkgZW1wdHksIHN1Y2ggYXMgZm9yIHYyDQo+ICDCoMKgwqDCoMKgwqDCoMKg
+wqAgaW1hZ2VzIHdoaWNoIGRvIG5vdCBzdXBwb3J0IGJpdG1hcHMpLsKgIEFic2VudCBpZiBiaXRt
+YXANCj4gIMKgwqDCoMKgwqDCoMKgwqDCoCBpbmZvcm1hdGlvbiBjb3VsZCBub3QgYmUgb2J0YWlu
+ZWQuIChzaW5jZSA0LjApDQo+IA0KDQpUaGFuayB5b3UgYWxsIGZvciB5b3VyIGNvbW1lbnRzLiBU
+aGUgaW50ZXJwcmV0YXRpb24gb2YgYW4gZW50aXR5IGRlcGVuZHMgDQpvbiBhbiBleWUgb2YgdGhl
+IGJlaG9sZGVyLiBJIGFtIGZsZXhpYmxlIG9uIHRoZSBkaXNjdXNzZWQgbWF0dGVyIGFuZCANCndp
+bGwgaW5jbHVkZSB5b3VyIGFwcHJvYWNoIGludG8gdjYgdmVyc2lvbi4gVGhhbmsgeW91IHZlcnkg
+bXVjaCBmb3IgeW91ciANCmNvbGxhYm9yYXRpb24uDQotLSANCldpdGggdGhlIGJlc3QgcmVnYXJk
+cywNCkFuZHJleSBTaGlua2V2aWNoDQoNCg==
