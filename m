@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gWmMZ-0005i9-O9
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:02:32 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gWmMc-0005l6-OS
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:02:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gWmMV-0005I3-LY
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:02:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50188)
+	(envelope-from <ehabkost@redhat.com>) id 1gWmMb-0005Oq-TX
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:02:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50332)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gWmMV-0005AU-Bg
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:02:27 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gWmMb-0005OF-MR
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 13:02:33 -0500
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Tue, 11 Dec 2018 16:01:20 -0200
-Message-Id: <20181211180129.7661-16-ehabkost@redhat.com>
+Date: Tue, 11 Dec 2018 16:01:24 -0200
+Message-Id: <20181211180129.7661-20-ehabkost@redhat.com>
 In-Reply-To: <20181211180129.7661-1-ehabkost@redhat.com>
 References: <20181211180129.7661-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 15/24] spapr: Use default_machine_opts to set
- use_hotplug_event_source
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 19/24] tests: qdev_prop_check_globals() doesn't
+ return "all_used"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +28,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Instead of setting use_hotplug_event_source at instance_init
-time, set default_machine_opts on spapr_machine_2_7_class_options()
-to implement equivalent behavior.
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-This will let us eliminate the need for separate instance_init
-functions for each spapr machine-type.
+Instead, it returns 1 if an error was detected, which is the case for:
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20181205205827.19387-3-ehabkost@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+/qdev/properties/dynamic/global/subprocess:
+warning: global dynamic-prop-type-bad.prop3 has invalid class name
+warning: global nohotplug-type.prop5=3D105 not used
+warning: global nondevice-type.prop6 has invalid class name
+
+Clarify the function return value.
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20181204142023.15982-2-marcandre.lureau@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/ppc/spapr.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ tests/test-qdev-global-props.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index def3e502d8..a3f4c86a44 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4240,10 +4240,7 @@ static void phb_placement_2_7(sPAPRMachineState *spapr, uint32_t index,
- 
- static void spapr_machine_2_7_instance_options(MachineState *machine)
- {
--    sPAPRMachineState *spapr = SPAPR_MACHINE(machine);
--
-     spapr_machine_2_8_instance_options(machine);
--    spapr->use_hotplug_event_source = false;
- }
- 
- static void spapr_machine_2_7_class_options(MachineClass *mc)
-@@ -4252,6 +4249,7 @@ static void spapr_machine_2_7_class_options(MachineClass *mc)
- 
-     spapr_machine_2_8_class_options(mc);
-     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power7_v2.3");
-+    mc->default_machine_opts = "modern-hotplug-events=off";
-     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_7);
-     smc->phb_placement = phb_placement_2_7;
- }
--- 
+diff --git a/tests/test-qdev-global-props.c b/tests/test-qdev-global-prop=
+s.c
+index d81b0862d5..ccdf6c57c1 100644
+--- a/tests/test-qdev-global-props.c
++++ b/tests/test-qdev-global-props.c
+@@ -214,7 +214,7 @@ static void test_dynamic_globalprop_subprocess(void)
+         { TYPE_NONDEVICE, "prop6", "106", true },
+         {}
+     };
+-    int all_used;
++    int global_error;
+=20
+     qdev_prop_register_global_list(props);
+=20
+@@ -223,8 +223,8 @@ static void test_dynamic_globalprop_subprocess(void)
+=20
+     g_assert_cmpuint(mt->prop1, =3D=3D, 101);
+     g_assert_cmpuint(mt->prop2, =3D=3D, 102);
+-    all_used =3D qdev_prop_check_globals();
+-    g_assert_cmpuint(all_used, =3D=3D, 1);
++    global_error =3D qdev_prop_check_globals();
++    g_assert_cmpuint(global_error, =3D=3D, 1);
+     g_assert(props[0].used);
+     g_assert(props[1].used);
+     g_assert(!props[2].used);
+@@ -259,7 +259,7 @@ static void test_dynamic_globalprop_nouser_subprocess=
+(void)
+         { TYPE_NONDEVICE, "prop6", "106" },
+         {}
+     };
+-    int all_used;
++    int global_error;
+=20
+     qdev_prop_register_global_list(props);
+=20
+@@ -268,8 +268,8 @@ static void test_dynamic_globalprop_nouser_subprocess=
+(void)
+=20
+     g_assert_cmpuint(mt->prop1, =3D=3D, 101);
+     g_assert_cmpuint(mt->prop2, =3D=3D, 102);
+-    all_used =3D qdev_prop_check_globals();
+-    g_assert_cmpuint(all_used, =3D=3D, 0);
++    global_error =3D qdev_prop_check_globals();
++    g_assert_cmpuint(global_error, =3D=3D, 0);
+     g_assert(props[0].used);
+     g_assert(props[1].used);
+     g_assert(!props[2].used);
+--=20
 2.18.0.rc1.1.g3f1ff2140
