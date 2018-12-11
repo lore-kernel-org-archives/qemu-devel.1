@@ -1,16 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gWl85-0001u4-C0
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:43:34 -0500
+	(envelope-from <clg@kaod.org>) id 1gWl9B-0002zD-J7
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:44:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gWl83-0004Jd-TI
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:43:29 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 11 Dec 2018 19:43:10 +0300
-Message-Id: <20181211164317.32893-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20181211164317.32893-1-vsementsov@virtuozzo.com>
-References: <20181211164317.32893-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 1/8] qcow2.h: add missing include
+	(envelope-from <clg@kaod.org>) id 1gWl98-0005Or-66
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:44:37 -0500
+Received: from 4.mo5.mail-out.ovh.net ([178.33.111.247]:46619)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gWl97-0005O8-VG
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 11:44:34 -0500
+Received: from player798.ha.ovh.net (unknown [10.109.146.86])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 7B21620A073
+	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 17:44:32 +0100 (CET)
+References: <20181209194610.29727-1-clg@kaod.org>
+	<20181209194610.29727-19-clg@kaod.org>
+	<39e8edd0-6056-5b51-174b-631dcb267ff5@kaod.org>
+	<20181211020620.GG4261@umbus.fritz.box>
+	<744ff9f8-6f84-00d4-a2e0-84652658762e@kaod.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <23f5d148-5b11-bc33-6a88-7df9e591f9d0@kaod.org>
+Date: Tue, 11 Dec 2018 17:44:26 +0100
+MIME-Version: 1.0
+In-Reply-To: <744ff9f8-6f84-00d4-a2e0-84652658762e@kaod.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 18/19] spapr: add a 'pseries-4.0-xive'
+ machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,29 +35,288 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, berrange@redhat.com, berto@igalia.com, vsementsov@virtuozzo.com, den@openvz.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-qcow2.h depends on block_int.h. Compilation isn't broken currently only
-due to block_int.h always included before qcow2.h. Though, it seems
-better to directly include block_int.h in qcow2.h.
+On 12/11/18 11:42 AM, C=E9dric Le Goater wrote:
+> On 12/11/18 3:06 AM, David Gibson wrote:
+>> On Mon, Dec 10, 2018 at 11:17:33PM +0100, C=E9dric Le Goater wrote:
+>>> On 12/9/18 8:46 PM, C=E9dric Le Goater wrote:
+>>>> This pseries machine makes use of a new sPAPR IRQ backend supporting
+>>>> the XIVE interrupt mode.
+>>>>
+>>>> The guest OS is required to have support for the XIVE exploitation
+>>>> mode of the POWER9 interrupt controller.
+>>>>
+>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>>>> ---
+>>>>  hw/ppc/spapr.c | 15 +++++++++++++++
+>>>>  1 file changed, 15 insertions(+)
+>>>>
+>>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>>>> index 4012ebd794a4..3cc134a0b673 100644
+>>>> --- a/hw/ppc/spapr.c
+>>>> +++ b/hw/ppc/spapr.c
+>>>> @@ -3985,6 +3985,21 @@ static void spapr_machine_4_0_class_options(M=
+achineClass *mc)
+>>>> =20
+>>>>  DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
+>>>> =20
+>>>> +static void spapr_machine_4_0_xive_instance_options(MachineState *m=
+achine)
+>>>> +{
+>>>> +    spapr_machine_4_0_instance_options(machine);
+>>>> +}
+>>>> +
+>>>> +static void spapr_machine_4_0_xive_class_options(MachineClass *mc)
+>>>> +{
+>>>> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+>>>> +
+>>>> +    spapr_machine_4_0_class_options(mc);> +    smc->irq =3D &spapr_=
+irq_xive;
+>>>
+>>> I have been adding checks on the CPU model to export the XIVE capabil=
+ity=20
+>>> only on POWER9 processors but it breaks some of the tests.
+>>>
+>>> I was wondering if we could add a default POWER9 CPU to the -xive mac=
+hine :=20
+>>>
+>>>   + mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power9_v2.0");
+>>>
+>>> and if we could change tests/cpu-plug-test.c with :
+>>>
+>>>   @@ -198,8 +198,13 @@ static void add_pseries_test_case(const
+>>>        }
+>>>        data =3D g_new(PlugTestData, 1);
+>>>        data->machine =3D g_strdup(mname);
+>>>   -    data->cpu_model =3D "power8_v2.0";
+>>>   -    data->device_model =3D g_strdup("power8_v2.0-spapr-cpu-core");
+>>>   +    if (g_str_has_suffix(mname, "xive")) {
+>>>   +        data->cpu_model =3D "power9_v2.0";
+>>>   +        data->device_model =3D g_strdup("power9_v2.0-spapr-cpu-cor=
+e");
+>>>   +    } else {
+>>>   +        data->cpu_model =3D "power8_v2.0";
+>>>   +        data->device_model =3D g_strdup("power8_v2.0-spapr-cpu-cor=
+e");
+>>>   +    }
+>>>        data->sockets =3D 2;
+>>>        data->cores =3D 3;
+>>>        data->threads =3D 1;
+>>>
+>>> or if there is a better way ?
+>>
+>> So, I'd actually prefer a machine option, rather than wholly separate
+>> machine types to select xics/xive/dual.  Machine types was fine while
+>> prototyping this, but I don't think we want to actually merge new
+>> machine types for it.
+>=20
+> I agree.=20
+>=20
+>> So, instead I think we want a machine option which can be set to
+>> xics/xive/dual, with xics being the default for earlier machine types
+>> and dual the default for 4.0 onwards.
+>=20
+> I will revive an old patch doing just that.=20
+>=20
+> The question now is how to link the sPAPRMachineState instance to=20
+> the selected sPAPR IRQ backend.=20
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/qcow2.h | 1 +
- 1 file changed, 1 insertion(+)
+Would something like below be acceptable ? If so I will change the=20
+remaining patches to use 'spapr->irq' and not 'smc->irq' anymore.
+=20
+Thanks,
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index a98d24500b..5095f893a0 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -28,6 +28,7 @@
- #include "crypto/block.h"
- #include "qemu/coroutine.h"
- #include "qemu/units.h"
-+#include "block/block_int.h"
- 
- //#define DEBUG_ALLOC
- //#define DEBUG_ALLOC2
--- 
-2.18.0
+C.
+
+Index: qemu-xive.git/include/hw/ppc/spapr.h
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+--- qemu-xive.git.orig/include/hw/ppc/spapr.h
++++ qemu-xive.git/include/hw/ppc/spapr.h
+@@ -177,6 +177,7 @@ struct sPAPRMachineState {
+     int32_t irq_map_nr;
+     unsigned long *irq_map;
+     sPAPRXive  *xive;
++    sPAPRIrq *irq;
+=20
+     bool cmd_line_caps[SPAPR_CAP_NUM];
+     sPAPRCapabilities def, eff, mig;
+Index: qemu-xive.git/hw/ppc/spapr.c
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+--- qemu-xive.git.orig/hw/ppc/spapr.c
++++ qemu-xive.git/hw/ppc/spapr.c
+@@ -1302,7 +1301,7 @@ static void *spapr_build_fdt(sPAPRMachin
+     }
+=20
+     QLIST_FOREACH(phb, &spapr->phbs, list) {
+-        ret =3D spapr_populate_pci_dt(phb, PHANDLE_XICP, fdt, smc->irq->=
+nr_msis);
++        ret =3D spapr_populate_pci_dt(phb, PHANDLE_XICP, fdt, spapr->irq=
+->nr_msis);
+         if (ret < 0) {
+             error_report("couldn't setup PCI devices in fdt");
+             exit(1);
+@@ -3056,9 +3055,38 @@ static void spapr_set_vsmt(Object *obj,
+     visit_type_uint32(v, name, (uint32_t *)opaque, errp);
+ }
+=20
++static char *spapr_get_irq(Object *obj, Error **errp)
++{
++    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
++
++    if (spapr->irq =3D=3D &spapr_irq_xics_legacy) {
++        return g_strdup("legacy");
++    } else if (spapr->irq =3D=3D &spapr_irq_xics) {
++        return g_strdup("xics");
++    } else if (spapr->irq =3D=3D &spapr_irq_xive) {
++        return g_strdup("xive");
++    }
++    g_assert_not_reached();
++}
++
++static void spapr_set_irq(Object *obj, const char *value, Error **errp)
++{
++    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
++
++    /* We don't want to set the legacy IRQ backend */
++    if (strcmp(value, "xics") =3D=3D 0) {
++        spapr->irq =3D &spapr_irq_xics;
++    } else if (strcmp(value, "xive") =3D=3D 0) {
++        spapr->irq =3D &spapr_irq_xive;
++    } else {
++        error_setg(errp, "Bad value for \"irq\" property");
++    }
++}
++
+ static void spapr_instance_init(Object *obj)
+ {
+     sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
++    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+=20
+     spapr->htab_fd =3D -1;
+     spapr->use_hotplug_event_source =3D true;
+@@ -3092,6 +3120,13 @@ static void spapr_instance_init(Object *
+                                     " the host's SMT mode", &error_abort=
+);
+     object_property_add_bool(obj, "vfio-no-msix-emulation",
+                              spapr_get_msix_emulation, NULL, NULL);
++
++    /* Get the default from the machine class */
++    spapr->irq =3D smc->irq;
++    object_property_add_str(obj, "irq", spapr_get_irq, spapr_set_irq, NU=
+LL);
++    object_property_set_description(obj, "irq",
++                 "Specifies the interrupt controller mode (xics, xive)",
++                 NULL);
+ }
+=20
+ static void spapr_machine_finalizefn(Object *obj)
+@@ -3814,9 +3849,8 @@ static void spapr_pic_print_info(Interru
+                                  Monitor *mon)
+ {
+     sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+-    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+=20
+-    smc->irq->print_info(spapr, mon);
++    spapr->irq->print_info(spapr, mon);
+ }
+=20
+ int spapr_get_vcpu_id(PowerPCCPU *cpu)
+Index: qemu-xive.git/hw/ppc/spapr_irq.c
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+--- qemu-xive.git.orig/hw/ppc/spapr_irq.c
++++ qemu-xive.git/hw/ppc/spapr_irq.c
+@@ -94,8 +94,7 @@ error:
+ static void spapr_irq_init_xics(sPAPRMachineState *spapr, Error **errp)
+ {
+     MachineState *machine =3D MACHINE(spapr);
+-    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+-    int nr_irqs =3D smc->irq->nr_irqs;
++    int nr_irqs =3D spapr->irq->nr_irqs;
+     Error *local_err =3D NULL;
+=20
+     if (kvm_enabled()) {
+@@ -234,7 +233,6 @@ sPAPRIrq spapr_irq_xics =3D {
+ static void spapr_irq_init_xive(sPAPRMachineState *spapr, Error **errp)
+ {
+     MachineState *machine =3D MACHINE(spapr);
+-    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+     uint32_t nr_servers =3D spapr_max_server_number(spapr);
+     DeviceState *dev;
+     int i;
+@@ -248,7 +246,7 @@ static void spapr_irq_init_xive(sPAPRMac
+     }
+=20
+     dev =3D qdev_create(NULL, TYPE_SPAPR_XIVE);
+-    qdev_prop_set_uint32(dev, "nr-irqs", smc->irq->nr_irqs);
++    qdev_prop_set_uint32(dev, "nr-irqs", spapr->irq->nr_irqs);
+     /*
+      * 8 XIVE END structures per CPU. One for each available priority
+      */
+@@ -353,50 +351,38 @@ sPAPRIrq spapr_irq_xive =3D {
+  */
+ void spapr_irq_init(sPAPRMachineState *spapr, Error **errp)
+ {
+-    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+-
+     /* Initialize the MSI IRQ allocator. */
+     if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+-        spapr_irq_msi_init(spapr, smc->irq->nr_msis);
++        spapr_irq_msi_init(spapr, spapr->irq->nr_msis);
+     }
+=20
+-    smc->irq->init(spapr, errp);
++    spapr->irq->init(spapr, errp);
+ }
+=20
+ int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
+*errp)
+ {
+-    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+-
+-    return smc->irq->claim(spapr, irq, lsi, errp);
++    return spapr->irq->claim(spapr, irq, lsi, errp);
+ }
+=20
+ void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num)
+ {
+-    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+-
+-    smc->irq->free(spapr, irq, num);
++    spapr->irq->free(spapr, irq, num);
+ }
+=20
+ qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq)
+ {
+-    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+-
+-    return smc->irq->qirq(spapr, irq);
++    return spapr->irq->qirq(spapr, irq);
+ }
+=20
+ int spapr_irq_post_load(sPAPRMachineState *spapr, int version_id)
+ {
+-    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+-
+-    return smc->irq->post_load(spapr, version_id);
++    return spapr->irq->post_load(spapr, version_id);
+ }
+=20
+ void spapr_irq_reset(sPAPRMachineState *spapr, Error **errp)
+ {
+-    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+-
+-    if (smc->irq->reset) {
+-        smc->irq->reset(spapr, errp);
++    if (spapr->irq->reset) {
++        spapr->irq->reset(spapr, errp);
+     }
+ }
+=20
