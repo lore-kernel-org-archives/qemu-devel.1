@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWk9A-0004BY-CI
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:40:33 -0500
+	(envelope-from <prvs=87697dac6=Paul.Durrant@citrix.com>)
+	id 1gWk9X-0004cU-GF
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:40:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gWk98-00032v-Gr
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:40:31 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:35803)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gWk98-00031k-9f
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:40:30 -0500
-Received: by mail-oi1-x242.google.com with SMTP id v6so12355826oif.2
-	for <qemu-devel@nongnu.org>; Tue, 11 Dec 2018 07:40:30 -0800 (PST)
+	(envelope-from <prvs=87697dac6=Paul.Durrant@citrix.com>)
+	id 1gWk9T-0003IS-Ao
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 10:40:55 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Tue, 11 Dec 2018 15:40:30 +0000
+Message-ID: <88b1bbdbad294bf5b4013fd144534651@AMSPEX02CL03.citrite.net>
+References: <1544525238-3527-1-git-send-email-paul.durrant@citrix.com>
+	<1544525238-3527-4-git-send-email-paul.durrant@citrix.com>
+	<20181211151636.GQ18875@perard.uk.xensource.com>
+In-Reply-To: <20181211151636.GQ18875@perard.uk.xensource.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20181207103631.28193-1-richard.henderson@linaro.org>
-	<20181207103631.28193-12-richard.henderson@linaro.org>
-In-Reply-To: <20181207103631.28193-12-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 11 Dec 2018 15:40:18 +0000
-Message-ID: <CAFEAcA_rRBJNoSkVQXj=+-69aBOk7OAZyzUUKyvf4NQjg=g3iA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 11/26] target/arm: Rearrange decode in
- disas_uncond_b_reg
+Subject: Re: [Qemu-devel] [PATCH v3 03/18] xen: introduce 'xen-block',
+ 'xen-disk' and 'xen-cdrom'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,99 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
+To: Anthony Perard <anthony.perard@citrix.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-On Fri, 7 Dec 2018 at 10:36, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> This will enable PAuth decode in a subsequent patch.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/translate-a64.c | 34 +++++++++++++++++++++++-----------
->  1 file changed, 23 insertions(+), 11 deletions(-)
->
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index c84c2dbb66..5fa2647771 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -1989,32 +1989,41 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
->      rn = extract32(insn, 5, 5);
->      op4 = extract32(insn, 0, 5);
->
-> -    if (op4 != 0x0 || op3 != 0x0 || op2 != 0x1f) {
-> -        unallocated_encoding(s);
-> -        return;
-> +    if (op2 != 0x1f) {
-> +        goto do_unallocated;
->      }
->
->      switch (opc) {
->      case 0: /* BR */
->      case 1: /* BLR */
->      case 2: /* RET */
-> -        gen_a64_set_pc(s, cpu_reg(s, rn));
-> +        if (op3 == 0 && op4 == 0) {
-> +            dst = cpu_reg(s, rn);
-> +        } else {
-> +            goto do_unallocated;
-> +        }
-> +        gen_a64_set_pc(s, dst);
->          /* BLR also needs to load return address */
->          if (opc == 1) {
->              tcg_gen_movi_i64(cpu_reg(s, 30), s->pc);
->          }
->          break;
-> +
->      case 4: /* ERET */
->          if (s->current_el == 0) {
-> -            unallocated_encoding(s);
-> -            return;
-> -        }
-> -        if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
-> -            gen_io_start();
-> +            goto do_unallocated;
->          }
->          dst = tcg_temp_new_i64();
->          tcg_gen_ld_i64(dst, cpu_env,
->                         offsetof(CPUARMState, elr_el[s->current_el]));
-> +        if (op3 == 0 && op4 == 0) {
-> +            ;
-> +        } else {
-> +            goto do_unallocated;
+> -----Original Message-----
+> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
+> Sent: 11 December 2018 15:17
+> To: Paul Durrant <Paul.Durrant@citrix.com>
+> Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
+> devel@lists.xenproject.org; Kevin Wolf <kwolf@redhat.com>; Max Reitz
+> <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
+> Subject: Re: [PATCH v3 03/18] xen: introduce 'xen-block', 'xen-disk' and
+> 'xen-cdrom'
+>=20
+> On Tue, Dec 11, 2018 at 10:47:03AM +0000, Paul Durrant wrote:
+> > This patch adds new XenDevice-s: 'xen-disk' and 'xen-cdrom', both
+> derived
+> > from a common 'xen-block' parent type. These will eventually replace th=
+e
+> > 'xen_disk' (note the underscore rather than hyphen) legacy PV backend
+> but
+> > it is illustrative to build up the implementation incrementally, along
+> with
+> > the XenBus/XenDevice framework. Subsequent patches will therefore add t=
+o
+> > these devices' implementation as new features are added to the
+> framework.
+> >
+> > After this patch has been applied it is possible to instantiate new
+> > 'xen-disk' or 'xen-cdrom' devices with a single 'vdev' parameter, which
+> > accepts values adhering to the Xen VBD naming scheme [1]. For example, =
+a
+> > command-line instantiation of a xen-disk can be done with an argument
+> > similar to the following:
+> >
+> > -device xen-disk,vdev=3Dhda
+> >
+> > The implementation of the vdev parameter formulates the appropriate VBD
+> > number for use in the PV protocol.
+> >
+> > [1] https://xenbits.xen.org/docs/unstable/man/xen-vbd-interface.7.html
+> >
+> > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+>=20
+> Now we can add a xen-disk with vdev=3Dxvdbgqcv :)
 
+Yep, you can keep going until xenstore explodes :-)
 
-This decode check should go before any code has been
-emittede (ie before the tcg_gen_ld_i64 above it).
+  Paul
 
-> +        }
-> +        if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
-> +            gen_io_start();
-> +        }
->          gen_helper_exception_return(cpu_env, dst);
->          tcg_temp_free_i64(dst);
->          if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
-> @@ -2023,14 +2032,17 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
->          /* Must exit loop to check un-masked IRQs */
->          s->base.is_jmp = DISAS_EXIT;
->          return;
-> +
->      case 5: /* DRPS */
-> -        if (rn != 0x1f) {
-> -            unallocated_encoding(s);
-> +        if (op3 != 0 || op4 != 0 || rn != 0x1f) {
-> +            goto do_unallocated;
->          } else {
->              unsupported_encoding(s, insn);
->          }
->          return;
-> +
->      default:
-> +    do_unallocated:
->          unallocated_encoding(s);
->          return;
->      }
-
-thanks
--- PMM
+>=20
+> Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
+>=20
+> Thanks,
+>=20
+> --
+> Anthony PERARD
