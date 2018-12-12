@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gX4ZW-0003kl-2X
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:29:07 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gX4ib-0002Xq-RM
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:38:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gX4ZU-0001zQ-7u
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:29:06 -0500
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 12 Dec 2018 14:27:34 +0100
-Message-Id: <20181212132735.16080-41-kwolf@redhat.com>
-In-Reply-To: <20181212132735.16080-1-kwolf@redhat.com>
-References: <20181212132735.16080-1-kwolf@redhat.com>
+	(envelope-from <kraxel@redhat.com>) id 1gX4iY-0008Vi-EV
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:38:29 -0500
+Date: Wed, 12 Dec 2018 14:38:09 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181212133809.evtizdym6awwkw7f@sirius.home.kraxel.org>
+References: <20181207160806.13569-1-mark.cave-ayland@ilande.co.uk>
+	<20181207160806.13569-3-mark.cave-ayland@ilande.co.uk>
+	<20181212083250.56xfzy5j4t4o6ale@sirius.home.kraxel.org>
+	<f7fb9204-bfc1-f27b-d66c-51e650a30cd5@ilande.co.uk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 40/41] block: Assert that flags are up-to-date
- in bdrv_reopen_prepare()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f7fb9204-bfc1-f27b-d66c-51e650a30cd5@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH 2/3] mac_newworld: enable access to EDID
+ data for the VGA device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,60 +26,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-From: Alberto Garcia <berto@igalia.com>
+On Wed, Dec 12, 2018 at 08:54:37AM +0000, Mark Cave-Ayland wrote:
+> On 12/12/2018 08:32, Gerd Hoffmann wrote:
+> 
+> > On Fri, Dec 07, 2018 at 04:08:05PM +0000, Mark Cave-Ayland wrote:
+> >> This is in preparation for some upcoming QEMU NDRV driver changes that pass
+> >> display information from the host to the guest.
+> > 
+> >> -    pci_vga_init(pci_bus);
+> >> +    dev = qdev_create(BUS(pci_bus), "VGA");
+> >> +    qdev_prop_set_int32(dev, "addr", -1);
+> >> +    qdev_prop_set_bit(dev, "edid", true);
+> >> +    qdev_init_nofail(dev);
+> > 
+> > Hmm.  IMO you should not overwrite the device defaults here.
+> > 
+> > edid is off by default only because it is new and I'm conservative.
+> > I want a release (or two) with it being available for user testing.
+> > If no issues pop up flip it to default on.
+> 
+> Oh, okay. I already have some unreleased guest code that makes use of this, so my
+> questions would be: how can EDID be enabled from the command line for in-built VGA
+> devices,
 
-Towards the end of bdrv_reopen_queue_child(), before starting to
-process the children, the update_flags_from_options() function is
-called in order to have BDRVReopenState.flags in sync with the options
-from the QDict.
+"-global VGA.edid=on" should do.
 
-This is necessary because during the reopen process flags must be
-updated for all nodes in the queue so bdrv_is_writable_after_reopen()
-and the permission checks work correctly.
+> and how do I detect whether EDID support is present from the guest?
 
-Because of that, calling update_flags_from_options() again in
-bdrv_reopen_prepare() doesn't really change the flags (they are
-already up-to-date). But we need to call it in order to remove those
-options from QemuOpts and that way indicate that they have been
-processed.
+Check whenever the header is present.  The edid blob has a fixed 8 byte
+header (00 FF FF FF FF FF FF 00).  The linux kernel driver is lazy and
+checks the first two bytes only.
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+> Otherwise a guest driver that assumes it is always present and tries
+> to read from that area of memory will crash.
 
-diff --git a/block.c b/block.c
-index c6d4564bcf..4f5ff2cc12 100644
---- a/block.c
-+++ b/block.c
-@@ -3197,6 +3197,7 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_sta=
-te, BlockReopenQueue *queue,
-                         Error **errp)
- {
-     int ret =3D -1;
-+    int old_flags;
-     Error *local_err =3D NULL;
-     BlockDriver *drv;
-     QemuOpts *opts;
-@@ -3223,7 +3224,12 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_st=
-ate, BlockReopenQueue *queue,
-         goto error;
-     }
-=20
-+    /* This was already called in bdrv_reopen_queue_child() so the flags
-+     * are up-to-date. This time we simply want to remove the options fr=
-om
-+     * QemuOpts in order to indicate that they have been processed. */
-+    old_flags =3D reopen_state->flags;
-     update_flags_from_options(&reopen_state->flags, opts);
-+    assert(old_flags =3D=3D reopen_state->flags);
-=20
-     discard =3D qemu_opt_get_del(opts, BDRV_OPT_DISCARD);
-     if (discard !=3D NULL) {
---=20
-2.19.2
+Oh, reading should work no matter what.  You just don't find valid edid
+data there if it is turned off.
+
+cheers,
+  Gerd
