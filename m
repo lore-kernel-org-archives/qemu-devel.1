@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gX4QZ-0008NY-T4
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:19:52 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gX4YN-0002Gy-Oc
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:27:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gX4QV-0001vX-31
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:19:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55668)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gX4QU-0001uP-7I
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:19:46 -0500
-Date: Wed, 12 Dec 2018 08:19:40 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181212081902-mutt-send-email-mst@kernel.org>
-References: <5C10DAE9.3010605@huawei.com>
+	(envelope-from <kwolf@redhat.com>) id 1gX4YM-0000oZ-Qr
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:27:55 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Wed, 12 Dec 2018 14:26:55 +0100
+Message-Id: <20181212132735.16080-2-kwolf@redhat.com>
+In-Reply-To: <20181212132735.16080-1-kwolf@redhat.com>
+References: <20181212132735.16080-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5C10DAE9.3010605@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH] vhost-vsock: support parse mergeable
- feature
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 01/41] block: adding lzfse decompressing support
+ as a module.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +22,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jiangyiwen <jiangyiwen@huawei.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-On Wed, Dec 12, 2018 at 05:54:49PM +0800, jiangyiwen wrote:
-> Currently vhost-vsock doesn't have any feature bits, so it
-> don't support parse mergeable rx buffer feature. And the
-> feature is support in another series of patches named
-> "VSOCK: support mergeable rx buffer in vhost-vsock".
-> 
-> So we neet to support parse mergeable feature in vhost-vsock
-> if above patches are merged.
-> 
-> Signed-off-by: Yiwen Jiang <jiangyiwen@huawei.com>
+From: Julio Faracco <jcfaracco@gmail.com>
 
-OK but what does it do? this just defines the feature bit ...
-Also pls copy virtio-dev whenever you change the host/guest
-interface.
+QEMU dmg support includes zlib and bzip2, but it does not contains lzfse
+support. This commit adds the source file to extend compression support
+for new DMGs.
 
-Thanks!
+Signed-off-by: Julio Faracco <jcfaracco@gmail.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/dmg-lzfse.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
+ create mode 100644 block/dmg-lzfse.c
 
-> ---
->  hw/virtio/vhost-vsock.c                       | 9 +++++++--
->  include/standard-headers/linux/virtio_vsock.h | 3 +++
->  2 files changed, 10 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/virtio/vhost-vsock.c b/hw/virtio/vhost-vsock.c
-> index aa5af92..5023c05 100644
-> --- a/hw/virtio/vhost-vsock.c
-> +++ b/hw/virtio/vhost-vsock.c
-> @@ -178,8 +178,13 @@ static uint64_t vhost_vsock_get_features(VirtIODevice *vdev,
->                                           uint64_t requested_features,
->                                           Error **errp)
->  {
-> -    /* No feature bits used yet */
-> -    return requested_features;
-> +    VHostVSock *vsock = VHOST_VSOCK(vdev);
-> +    uint64_t features;
-> +
-> +    virtio_add_feature(&requested_features, VIRTIO_VSOCK_F_MRG_RXBUF);
-> +    features = requested_features & vsock->vhost_dev.features;
-> +
-> +    return features;
->  }
-> 
->  static void vhost_vsock_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-> diff --git a/include/standard-headers/linux/virtio_vsock.h b/include/standard-headers/linux/virtio_vsock.h
-> index be44321..4c583ec 100644
-> --- a/include/standard-headers/linux/virtio_vsock.h
-> +++ b/include/standard-headers/linux/virtio_vsock.h
-> @@ -38,6 +38,9 @@
->  #include "standard-headers/linux/virtio_ids.h"
->  #include "standard-headers/linux/virtio_config.h"
-> 
-> +/* Virtio-vsock feature */
-> +#define VIRTIO_VSOCK_F_MRG_RXBUF 0 /* Host can merge receive buffers. */
-> +
->  struct virtio_vsock_config {
->  	uint64_t guest_cid;
->  } QEMU_PACKED;
-> -- 
-> 1.8.3.1
-> 
+diff --git a/block/dmg-lzfse.c b/block/dmg-lzfse.c
+new file mode 100644
+index 0000000000..19d25bc646
+--- /dev/null
++++ b/block/dmg-lzfse.c
+@@ -0,0 +1,49 @@
++/*
++ * DMG lzfse uncompression
++ *
++ * Copyright (c) 2018 Julio Cesar Faracco
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
++ * of this software and associated documentation files (the "Software"),=
+ to deal
++ * in the Software without restriction, including without limitation the=
+ rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be includ=
+ed in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
++ * THE SOFTWARE.
++ */
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "dmg.h"
++#include <lzfse.h>
++
++static int dmg_uncompress_lzfse_do(char *next_in, unsigned int avail_in,
++                                   char *next_out, unsigned int avail_ou=
+t)
++{
++    size_t out_size =3D lzfse_decode_buffer((uint8_t *) next_out, avail_=
+out,
++                                          (uint8_t *) next_in, avail_in,
++                                          NULL);
++
++    /* We need to decode the single chunk only. */
++    /* So, out_size =3D=3D avail_out is not an error here. */
++    if (out_size > 0) {
++        return out_size;
++    }
++    return -1;
++}
++
++__attribute__((constructor))
++static void dmg_lzfse_init(void)
++{
++    assert(!dmg_uncompress_lzfse);
++    dmg_uncompress_lzfse =3D dmg_uncompress_lzfse_do;
++}
+--=20
+2.19.2
