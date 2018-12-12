@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49468)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=8779827ad=Alistair.Francis@wdc.com>)
-	id 1gXASd-0002v6-7Q
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:46:27 -0500
+	id 1gXASo-00033J-LH
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:46:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=8779827ad=Alistair.Francis@wdc.com>)
-	id 1gXASZ-0003SL-7s
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:46:23 -0500
+	id 1gXASk-0003ZF-HZ
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:46:34 -0500
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Wed, 12 Dec 2018 19:46:16 +0000
-Message-ID: <97ab2db0d4eac20809f092a9d095ac03b8f7ff3c.1544643238.git.alistair.francis@wdc.com>
+Date: Wed, 12 Dec 2018 19:46:25 +0000
+Message-ID: <d816afe4d7dfbade1743c440f4f277fe1c17662a.1544643238.git.alistair.francis@wdc.com>
 References: <cover.1544643238.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1544643238.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v1 22/23] dias: Add RISC-V support
+Subject: [Qemu-devel] [PATCH v1 23/23] configure: Add support for building
+ RISC-V host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,29 +33,53 @@ Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- disas.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ configure | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/disas.c b/disas.c
-index 5325b7e6be..e627fc74f9 100644
---- a/disas.c
-+++ b/disas.c
-@@ -522,8 +522,14 @@ void disas(FILE *out, void *code, unsigned long size)
- # ifdef _ARCH_PPC64
-     s.info.cap_mode =3D CS_MODE_64;
- # endif
--#elif defined(__riscv__)
--    print_insn =3D print_insn_riscv;
-+#elif defined(__riscv) && defined(CONFIG_RISCV_DIS)
-+#if defined(_ILP32) || (__riscv_xlen =3D=3D 32)
-+    print_insn =3D print_insn_riscv32;
-+#elif defined(_LP64)
-+    print_insn =3D print_insn_riscv64;
-+#else
-+#error unsupported RISC-V ABI
-+#endif
- #elif defined(__aarch64__) && defined(CONFIG_ARM_A64_DIS)
-     print_insn =3D print_insn_arm_a64;
-     s.info.cap_arch =3D CS_ARCH_ARM64;
+diff --git a/configure b/configure
+index 0a3c6a72c3..2e13ee918d 100755
+--- a/configure
++++ b/configure
+@@ -709,6 +709,12 @@ elif check_define __s390__ ; then
+   else
+     cpu=3D"s390"
+   fi
++elif check_define __riscv ; then
++  if check_define _LP64 ; then
++    cpu=3D"riscv64"
++  else
++    cpu=3D"riscv32"
++  fi
+ elif check_define __arm__ ; then
+   cpu=3D"arm"
+ elif check_define __aarch64__ ; then
+@@ -721,7 +727,7 @@ ARCH=3D
+ # Normalise host CPU name and set ARCH.
+ # Note that this case should only have supported host CPUs, not guests.
+ case "$cpu" in
+-  ppc|ppc64|s390|s390x|sparc64|x32)
++  ppc|ppc64|s390|s390x|sparc64|x32|riscv32|riscv64)
+     cpu=3D"$cpu"
+     supported_cpu=3D"yes"
+     eval "cross_cc_${cpu}=3D\$host_cc"
+@@ -6900,6 +6906,8 @@ elif test "$ARCH" =3D "x86_64" -o "$ARCH" =3D "x32" ;=
+ then
+   QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/i386 $QEMU_INCLUDES"
+ elif test "$ARCH" =3D "ppc64" ; then
+   QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/ppc $QEMU_INCLUDES"
++elif test "$ARCH" =3D "riscv32" -o "$ARCH" =3D "riscv64" ; then
++  QEMU_INCLUDES=3D"-I\$(SRC_PATH)/tcg/riscv $QEMU_INCLUDES"
+ else
+   QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/\$(ARCH) $QEMU_INCLUDES"
+ fi
+@@ -7397,7 +7405,7 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
+   ppc*)
+     disas_config "PPC"
+   ;;
+-  riscv)
++  riscv*)
+     disas_config "RISCV"
+   ;;
+   s390*)
 --=20
 2.19.1
