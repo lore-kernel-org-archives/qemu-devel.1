@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6Mh-0000zp-8t
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:00 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6Mc-0000uK-OL
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6Mf-0000PQ-5v
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:59 -0500
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:39680)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6MZ-0000Ib-OV
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:54 -0500
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:40847)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gX6Me-0000Oa-RQ
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:57 -0500
-Received: by mail-wr1-x42b.google.com with SMTP id t27so18088015wra.6
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:23:56 -0800 (PST)
+	id 1gX6MZ-0000Gj-EH
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:51 -0500
+Received: by mail-wm1-x334.google.com with SMTP id q26so6345460wmf.5
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:23:51 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
+	u10sm15878859wrr.33.2018.12.12.07.23.48 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 12 Dec 2018 07:23:48 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 12 Dec 2018 16:22:56 +0100
-Message-Id: <1544628195-37728-36-git-send-email-pbonzini@redhat.com>
+Date: Wed, 12 Dec 2018 16:22:50 +0100
+Message-Id: <1544628195-37728-30-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
 References: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 35/54] configure: Remove old -fno-gcse
- workaround for GCC 4.6.x and 4.7.[012]
+Subject: [Qemu-devel] [PULL 29/54] qemu/queue.h: remove Q_TAILQ_{HEAD, ENTRY}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +32,77 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>
 
-From: Thomas Huth <thuth@redhat.com>
+These are not present for other kinds of queue, and unused.
+Zap them before more changes are made to the QTAILQ
+implementation.
 
-Now that we require at least GCC 4.8, we don't need this als workaround
-for 4.6 and 4.7 anymore.
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1543937577-28256-4-git-send-email-thuth@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile.target |  3 ---
- configure       | 16 ----------------
- 2 files changed, 19 deletions(-)
+ include/qemu/queue.h       | 14 ++++++--------
+ scripts/cocci-macro-file.h | 10 ----------
+ 2 files changed, 6 insertions(+), 18 deletions(-)
 
-diff --git a/Makefile.target b/Makefile.target
-index 4d56298..44ec4b6 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -158,9 +158,6 @@ GENERATED_FILES += hmp-commands.h hmp-commands-info.h
+diff --git a/include/qemu/queue.h b/include/qemu/queue.h
+index ac418ef..b9571e9 100644
+--- a/include/qemu/queue.h
++++ b/include/qemu/queue.h
+@@ -350,22 +350,20 @@ struct {                                                                \
+ /*
+  * Tail queue definitions.
+  */
+-#define Q_TAILQ_HEAD(name, type, qual)                                  \
++#define QTAILQ_HEAD(name, type)                                         \
+ struct name {                                                           \
+-        qual type *tqh_first;           /* first element */             \
+-        qual type *qual *tqh_last;      /* addr of last next element */ \
++        type *tqh_first;      /* first element */                       \
++        type **tqh_last;      /* addr of last next element */           \
+ }
+-#define QTAILQ_HEAD(name, type)  Q_TAILQ_HEAD(name, struct type,)
  
- endif # CONFIG_SOFTMMU
+ #define QTAILQ_HEAD_INITIALIZER(head)                                   \
+         { NULL, &(head).tqh_first }
  
--# Workaround for http://gcc.gnu.org/PR55489, see configure.
--%/translate.o: QEMU_CFLAGS += $(TRANSLATE_OPT_CFLAGS)
--
- dummy := $(call unnest-vars,,obj-y)
- all-obj-y := $(obj-y)
+-#define Q_TAILQ_ENTRY(type, qual)                                       \
++#define QTAILQ_ENTRY(type)                                              \
+ struct {                                                                \
+-        qual type *tqe_next;            /* next element */              \
+-        qual type *qual *tqe_prev;      /* address of previous next element */\
++        type *tqe_next;       /* next element */                   \
++        type **tqe_prev;      /* address of previous next element */    \
+ }
+-#define QTAILQ_ENTRY(type)       Q_TAILQ_ENTRY(struct type,)
  
-diff --git a/configure b/configure
-index 3e401b7..131eae5 100755
---- a/configure
-+++ b/configure
-@@ -1933,21 +1933,6 @@ else
-   QEMU_CFLAGS="$QEMU_CFLAGS -Wno-missing-braces"
- fi
+ /*
+  * Tail queue functions.
+diff --git a/scripts/cocci-macro-file.h b/scripts/cocci-macro-file.h
+index 9f2e72e..5c49369 100644
+--- a/scripts/cocci-macro-file.h
++++ b/scripts/cocci-macro-file.h
+@@ -93,11 +93,6 @@ struct {                                                                \
+ /*
+  * Tail queue definitions.
+  */
+-#define Q_TAILQ_HEAD(name, type, qual)                                  \
+-struct name {                                                           \
+-        qual type *tqh_first;           /* first element */             \
+-        qual type *qual *tqh_last;      /* addr of last next element */ \
+-}
+ #define QTAILQ_HEAD(name, type)                                         \
+ struct name {                                                           \
+         type *tqh_first;      /* first element */                       \
+@@ -107,11 +102,6 @@ struct name {                                                           \
+ #define QTAILQ_HEAD_INITIALIZER(head)                                   \
+         { NULL, &(head).tqh_first }
  
--# Workaround for http://gcc.gnu.org/PR55489.  Happens with -fPIE/-fPIC and
--# large functions that use global variables.  The bug is in all releases of
--# GCC, but it became particularly acute in 4.6.x and 4.7.x.  It is fixed in
--# 4.7.3 and 4.8.0.  We should be able to delete this at the end of 2013.
--cat > $TMPC << EOF
--#if __GNUC__ == 4 && (__GNUC_MINOR__ == 6 || (__GNUC_MINOR__ == 7 && __GNUC_PATCHLEVEL__ <= 2))
--int main(void) { return 0; }
--#else
--#error No bug in this compiler.
--#endif
--EOF
--if compile_prog "-Werror -fno-gcse" "" ; then
--  TRANSLATE_OPT_CFLAGS=-fno-gcse
--fi
--
- if test "$static" = "yes" ; then
-   if test "$modules" = "yes" ; then
-     error_exit "static and modules are mutually incompatible"
-@@ -6980,7 +6965,6 @@ echo "LIBS_QGA+=$libs_qga" >> $config_host_mak
- echo "TASN1_LIBS=$tasn1_libs" >> $config_host_mak
- echo "TASN1_CFLAGS=$tasn1_cflags" >> $config_host_mak
- echo "POD2MAN=$POD2MAN" >> $config_host_mak
--echo "TRANSLATE_OPT_CFLAGS=$TRANSLATE_OPT_CFLAGS" >> $config_host_mak
- if test "$gcov" = "yes" ; then
-   echo "CONFIG_GCOV=y" >> $config_host_mak
-   echo "GCOV=$gcov_tool" >> $config_host_mak
+-#define Q_TAILQ_ENTRY(type, qual)                                       \
+-struct {                                                                \
+-        qual type *tqe_next;            /* next element */              \
+-        qual type *qual *tqe_prev;      /* address of previous next element */\
+-}
+ #define QTAILQ_ENTRY(type)                                              \
+ struct {                                                                \
+         type *tqe_next;       /* next element */                        \
 -- 
 1.8.3.1
