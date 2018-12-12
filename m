@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6N8-0001NC-8v
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6NA-0001No-3G
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6N5-0000gD-PM
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:26 -0500
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:39688)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6N6-0000h3-Bc
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:28 -0500
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:40079)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gX6N5-0000cP-CM
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:23 -0500
-Received: by mail-wr1-x431.google.com with SMTP id t27so18089326wra.6
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:24:18 -0800 (PST)
+	id 1gX6N5-0000ZI-Ux
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:24 -0500
+Received: by mail-wr1-x429.google.com with SMTP id p4so18090179wrt.7
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:24:12 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	u10sm15878859wrr.33.2018.12.12.07.24.15 for <qemu-devel@nongnu.org>
+	u10sm15878859wrr.33.2018.12.12.07.24.09 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 12 Dec 2018 07:24:15 -0800 (PST)
+	Wed, 12 Dec 2018 07:24:10 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 12 Dec 2018 16:23:15 +0100
-Message-Id: <1544628195-37728-55-git-send-email-pbonzini@redhat.com>
+Date: Wed, 12 Dec 2018 16:23:10 +0100
+Message-Id: <1544628195-37728-50-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
 References: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 54/54] vhost-user-test: create a temporary
- directory per TestServer
+Subject: [Qemu-devel] [PULL 49/54] vhost-user-test: support
+ VHOST_USER_PROTOCOL_F_CROSS_ENDIAN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,214 +37,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This makes the tests more independent, and also the source and destination
-TestServers in the migration test.
+This will be useful to run the qtest for ppc64 targets on (for example)
+x86_64 hosts.
 
 Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <1543851204-41186-15-git-send-email-pbonzini@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1543851204-41186-10-git-send-email-pbonzini@redhat.com>
 ---
- tests/vhost-user-test.c | 75 ++++++++++++++++++++++---------------------------
- 1 file changed, 34 insertions(+), 41 deletions(-)
+ tests/vhost-user-test.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index 4e4765b..9d7b0d4 100644
+index 6a805e6..82fc6c5 100644
 --- a/tests/vhost-user-test.c
 +++ b/tests/vhost-user-test.c
-@@ -139,6 +139,8 @@ typedef struct TestServer {
-     gchar *socket_path;
-     gchar *mig_path;
-     gchar *chr_name;
-+    const gchar *mem_path;
-+    gchar *tmpfs;
-     CharBackend chr;
-     int fds_num;
-     int fds[VHOST_MEMORY_MAX_NREGIONS];
-@@ -159,9 +161,6 @@ static TestServer *test_server_new(const gchar *name);
- static void test_server_free(TestServer *server);
- static void test_server_listen(TestServer *server);
+@@ -51,6 +51,7 @@
+ #define VHOST_USER_F_PROTOCOL_FEATURES 30
+ #define VHOST_USER_PROTOCOL_F_MQ 0
+ #define VHOST_USER_PROTOCOL_F_LOG_SHMFD 1
++#define VHOST_USER_PROTOCOL_F_CROSS_ENDIAN   6
  
--static const char *tmpfs;
--static const char *root;
--
- enum test_memfd {
-     TEST_MEMFD_AUTO,
-     TEST_MEMFD_YES,
-@@ -169,7 +168,7 @@ enum test_memfd {
- };
+ #define VHOST_LOG_PAGE 0x1000
  
- static char *get_qemu_cmd(TestServer *s,
--                          int mem, enum test_memfd memfd, const char *mem_path,
-+                          int mem, enum test_memfd memfd,
-                           const char *chr_opts, const char *extra)
+@@ -251,7 +252,7 @@ static void wait_for_fds(TestServer *s)
+ 
+ static void read_guest_mem_server(TestServer *s)
  {
-     if (memfd == TEST_MEMFD_AUTO && qemu_memfd_check(0)) {
-@@ -184,7 +183,7 @@ static char *get_qemu_cmd(TestServer *s,
-     } else {
-         return g_strdup_printf(QEMU_CMD_MEM QEMU_CMD_CHR
-                                QEMU_CMD_NETDEV QEMU_CMD_NET "%s", mem, mem,
--                               mem_path, s->chr_name, s->socket_path,
-+                               s->mem_path, s->chr_name, s->socket_path,
-                                chr_opts, s->chr_name, extra);
-     }
- }
-@@ -499,11 +498,21 @@ static const char *init_hugepagefs(void)
- static TestServer *test_server_new(const gchar *name)
- {
-     TestServer *server = g_new0(TestServer, 1);
-+    char template[] = "/tmp/vhost-test-XXXXXX";
-+    const char *tmpfs;
+-    uint32_t *guest_mem;
++    uint8_t *guest_mem;
+     int i, j;
+     size_t size;
  
-     server->loop = g_main_loop_new(NULL, FALSE);
-     /* run the main loop thread so the chardev may operate */
-     server->thread = g_thread_new(NULL, thread_function, server->loop);
+@@ -278,8 +279,8 @@ static void read_guest_mem_server(TestServer *s)
+         g_assert(guest_mem != MAP_FAILED);
+         guest_mem += (s->memory.regions[i].mmap_offset / sizeof(*guest_mem));
  
-+    tmpfs = mkdtemp(template);
-+    if (!tmpfs) {
-+        g_test_message("mkdtemp on path (%s): %s", template, strerror(errno));
-+    }
-+    g_assert(tmpfs);
-+
-+    server->tmpfs = g_strdup(tmpfs);
-+    server->mem_path = init_hugepagefs() ? : server->tmpfs;
-     server->socket_path = g_strdup_printf("%s/%s.sock", tmpfs, name);
-     server->mig_path = g_strdup_printf("%s/%s.mig", tmpfs, name);
-     server->chr_name = g_strdup_printf("chr-%s", name);
-@@ -560,6 +569,18 @@ static void test_server_free(TestServer *server)
-     }
-     g_main_loop_unref(server->loop);
+-        for (j = 0; j < 256; j++) {
+-            uint32_t a = readl(s->memory.regions[i].guest_phys_addr + j*4);
++        for (j = 0; j < 1024; j++) {
++            uint32_t a = readb(s->memory.regions[i].guest_phys_addr + j);
+             uint32_t b = guest_mem[j];
  
-+    unlink(server->socket_path);
-+    g_free(server->socket_path);
-+
-+    unlink(server->mig_path);
-+    g_free(server->mig_path);
-+
-+    ret = rmdir(server->tmpfs);
-+    if (ret != 0) {
-+        g_test_message("unable to rmdir: path (%s): %s",
-+                       server->tmpfs, strerror(errno));
-+    }
-+
-     qemu_chr_fe_deinit(&server->chr, true);
- 
-     for (i = 0; i < server->fds_num; i++) {
-@@ -570,12 +591,6 @@ static void test_server_free(TestServer *server)
-         close(server->log_fd);
-     }
- 
--    unlink(server->socket_path);
--    g_free(server->socket_path);
--
--    unlink(server->mig_path);
--    g_free(server->mig_path);
--
-     g_free(server->chr_name);
-     g_assert(server->bus);
-     qpci_free_pc(server->bus);
-@@ -681,7 +696,7 @@ static void test_read_guest_mem(const void *arg)
-                              "read-guest-memfd" : "read-guest-mem");
-     test_server_listen(server);
- 
--    qemu_cmd = get_qemu_cmd(server, 512, memfd, root, "", "");
-+    qemu_cmd = get_qemu_cmd(server, 512, memfd, "", "");
- 
-     s = qtest_start(qemu_cmd);
-     g_free(qemu_cmd);
-@@ -716,7 +731,7 @@ static void test_migrate(void)
-     test_server_listen(s);
-     test_server_listen(dest);
- 
--    cmd = get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, root, "", "");
-+    cmd = get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, "", "");
-     from = qtest_start(cmd);
-     g_free(cmd);
- 
-@@ -729,7 +744,7 @@ static void test_migrate(void)
-     g_assert_cmpint(size, ==, (2 * 1024 * 1024) / (VHOST_LOG_PAGE * 8));
- 
-     tmp = g_strdup_printf(" -incoming %s", uri);
--    cmd = get_qemu_cmd(dest, 2, TEST_MEMFD_AUTO, root, "", tmp);
-+    cmd = get_qemu_cmd(dest, 2, TEST_MEMFD_AUTO, "", tmp);
-     g_free(tmp);
-     to = qtest_init(cmd);
-     g_free(cmd);
-@@ -839,7 +854,7 @@ static void test_reconnect_subprocess(void)
-     char *cmd;
- 
-     g_thread_new("connect", connect_thread, s);
--    cmd = get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, root, ",server", "");
-+    cmd = get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, ",server", "");
-     qtest_start(cmd);
-     g_free(cmd);
- 
-@@ -881,7 +896,7 @@ static void test_connect_fail_subprocess(void)
- 
-     s->test_fail = true;
-     g_thread_new("connect", connect_thread, s);
--    cmd = get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, root, ",server", "");
-+    cmd = get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, ",server", "");
-     qtest_start(cmd);
-     g_free(cmd);
- 
-@@ -914,7 +929,7 @@ static void test_flags_mismatch_subprocess(void)
- 
-     s->test_flags = TEST_FLAGS_DISCONNECT;
-     g_thread_new("connect", connect_thread, s);
--    cmd = get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, root, ",server", "");
-+    cmd = get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, ",server", "");
-     qtest_start(cmd);
-     g_free(cmd);
- 
-@@ -962,7 +977,7 @@ static void test_multiqueue(void)
-         cmd = g_strdup_printf(
-             QEMU_CMD_MEM QEMU_CMD_CHR QEMU_CMD_NETDEV ",queues=%d "
-             "-device virtio-net-pci,netdev=net0,mq=on,vectors=%d",
--            512, 512, root, s->chr_name,
-+            512, 512, s->mem_path, s->chr_name,
-             s->socket_path, "", s->chr_name,
-             s->queues, s->queues * 2 + 2);
-     }
-@@ -982,22 +997,11 @@ static void test_multiqueue(void)
- 
- int main(int argc, char **argv)
- {
--    int ret;
--    char template[] = "/tmp/vhost-test-XXXXXX";
--
-     g_test_init(&argc, &argv, NULL);
- 
-     module_call_init(MODULE_INIT_QOM);
-     qemu_add_opts(&qemu_chardev_opts);
- 
--    tmpfs = mkdtemp(template);
--    if (!tmpfs) {
--        g_test_message("mkdtemp on path (%s): %s\n", template, strerror(errno));
--    }
--    g_assert(tmpfs);
--
--    root = init_hugepagefs() ? : tmpfs;
--
-     if (qemu_memfd_check(0)) {
-         qtest_add_data_func("/vhost-user/read-guest-mem/memfd",
-                             GINT_TO_POINTER(TEST_MEMFD_YES),
-@@ -1021,16 +1025,5 @@ int main(int argc, char **argv)
-         qtest_add_func("/vhost-user/flags-mismatch", test_flags_mismatch);
-     }
- 
--    ret = g_test_run();
--
--    /* cleanup */
--
--    ret = rmdir(tmpfs);
--    if (ret != 0) {
--        g_test_message("unable to rmdir: path (%s): %s\n",
--                       tmpfs, strerror(errno));
--    }
--    g_assert_cmpint(ret, ==, 0);
--
--    return ret;
-+    return g_test_run();
- }
+             g_assert_cmpint(a, ==, b);
+@@ -367,6 +368,7 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
+         msg.flags |= VHOST_USER_REPLY_MASK;
+         msg.size = sizeof(m.payload.u64);
+         msg.payload.u64 = 1 << VHOST_USER_PROTOCOL_F_LOG_SHMFD;
++        msg.payload.u64 |= 1 << VHOST_USER_PROTOCOL_F_CROSS_ENDIAN;
+         if (s->queues > 1) {
+             msg.payload.u64 |= 1 << VHOST_USER_PROTOCOL_F_MQ;
+         }
 -- 
 1.8.3.1
