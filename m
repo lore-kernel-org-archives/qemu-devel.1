@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6NA-0001No-3G
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6NA-0001Nu-4n
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6N6-0000h3-Bc
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6N6-0000gx-8B
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:28 -0500
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:40079)
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:53236)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gX6N5-0000ZI-Ux
+	id 1gX6N5-0000bq-S4
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:24 -0500
-Received: by mail-wr1-x429.google.com with SMTP id p4so18090179wrt.7
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:24:12 -0800 (PST)
+Received: by mail-wm1-x32d.google.com with SMTP id m1so5560018wml.2
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:24:16 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	u10sm15878859wrr.33.2018.12.12.07.24.09 for <qemu-devel@nongnu.org>
+	u10sm15878859wrr.33.2018.12.12.07.24.14 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 12 Dec 2018 07:24:10 -0800 (PST)
+	Wed, 12 Dec 2018 07:24:14 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 12 Dec 2018 16:23:10 +0100
-Message-Id: <1544628195-37728-50-git-send-email-pbonzini@redhat.com>
+Date: Wed, 12 Dec 2018 16:23:14 +0100
+Message-Id: <1544628195-37728-54-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
 References: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 49/54] vhost-user-test: support
- VHOST_USER_PROTOCOL_F_CROSS_ENDIAN
+Subject: [Qemu-devel] [PULL 53/54] vhost-user-test: small changes to
+ init_hugepagefs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,56 +37,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This will be useful to run the qtest for ppc64 targets on (for example)
-x86_64 hosts.
+After the conversion to qgraph, the equivalent of "main" will be in
+a constructor and will run even if the tests are not being requested.
+Therefore, it should not assert that init_hugepagefs succeeds and will
+be called when creating the TestServer.  This patch changes the prototype
+of init_hugepagefs, this way the next patch looks nicer.
 
 Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1543851204-41186-10-git-send-email-pbonzini@redhat.com>
+Message-Id: <1543851204-41186-14-git-send-email-pbonzini@redhat.com>
 ---
- tests/vhost-user-test.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ tests/vhost-user-test.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
 diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index 6a805e6..82fc6c5 100644
+index 2e610d4..4e4765b 100644
 --- a/tests/vhost-user-test.c
 +++ b/tests/vhost-user-test.c
-@@ -51,6 +51,7 @@
- #define VHOST_USER_F_PROTOCOL_FEATURES 30
- #define VHOST_USER_PROTOCOL_F_MQ 0
- #define VHOST_USER_PROTOCOL_F_LOG_SHMFD 1
-+#define VHOST_USER_PROTOCOL_F_CROSS_ENDIAN   6
+@@ -461,13 +461,19 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
+     g_mutex_unlock(&s->data_mutex);
+ }
  
- #define VHOST_LOG_PAGE 0x1000
- 
-@@ -251,7 +252,7 @@ static void wait_for_fds(TestServer *s)
- 
- static void read_guest_mem_server(TestServer *s)
+-static const char *init_hugepagefs(const char *path)
++static const char *init_hugepagefs(void)
  {
--    uint32_t *guest_mem;
-+    uint8_t *guest_mem;
-     int i, j;
-     size_t size;
++    const char *path = getenv("QTEST_HUGETLBFS_PATH");
+     struct statfs fs;
+     int ret;
  
-@@ -278,8 +279,8 @@ static void read_guest_mem_server(TestServer *s)
-         g_assert(guest_mem != MAP_FAILED);
-         guest_mem += (s->memory.regions[i].mmap_offset / sizeof(*guest_mem));
++    if (!path) {
++        return NULL;
++    }
++
+     if (access(path, R_OK | W_OK | X_OK)) {
+         g_test_message("access on path (%s): %s\n", path, strerror(errno));
++        abort();
+         return NULL;
+     }
  
--        for (j = 0; j < 256; j++) {
--            uint32_t a = readl(s->memory.regions[i].guest_phys_addr + j*4);
-+        for (j = 0; j < 1024; j++) {
-+            uint32_t a = readb(s->memory.regions[i].guest_phys_addr + j);
-             uint32_t b = guest_mem[j];
+@@ -477,11 +483,13 @@ static const char *init_hugepagefs(const char *path)
  
-             g_assert_cmpint(a, ==, b);
-@@ -367,6 +368,7 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
-         msg.flags |= VHOST_USER_REPLY_MASK;
-         msg.size = sizeof(m.payload.u64);
-         msg.payload.u64 = 1 << VHOST_USER_PROTOCOL_F_LOG_SHMFD;
-+        msg.payload.u64 |= 1 << VHOST_USER_PROTOCOL_F_CROSS_ENDIAN;
-         if (s->queues > 1) {
-             msg.payload.u64 |= 1 << VHOST_USER_PROTOCOL_F_MQ;
-         }
+     if (ret != 0) {
+         g_test_message("statfs on path (%s): %s\n", path, strerror(errno));
++        abort();
+         return NULL;
+     }
+ 
+     if (fs.f_type != HUGETLBFS_MAGIC) {
+         g_test_message("Warning: path not on HugeTLBFS: %s\n", path);
++        abort();
+         return NULL;
+     }
+ 
+@@ -974,7 +982,6 @@ static void test_multiqueue(void)
+ 
+ int main(int argc, char **argv)
+ {
+-    const char *hugefs;
+     int ret;
+     char template[] = "/tmp/vhost-test-XXXXXX";
+ 
+@@ -989,13 +996,7 @@ int main(int argc, char **argv)
+     }
+     g_assert(tmpfs);
+ 
+-    hugefs = getenv("QTEST_HUGETLBFS_PATH");
+-    if (hugefs) {
+-        root = init_hugepagefs(hugefs);
+-        g_assert(root);
+-    } else {
+-        root = tmpfs;
+-    }
++    root = init_hugepagefs() ? : tmpfs;
+ 
+     if (qemu_memfd_check(0)) {
+         qtest_add_data_func("/vhost-user/read-guest-mem/memfd",
 -- 
 1.8.3.1
