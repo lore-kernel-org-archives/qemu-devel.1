@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gX0Eh-0006V6-MG
+	(envelope-from <bounces@canonical.com>) id 1gX0Eh-0006V5-MA
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 03:51:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gX0Ec-0005Aq-10
+	(envelope-from <bounces@canonical.com>) id 1gX0Eb-0005Ae-VN
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 03:51:17 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43028)
+Received: from indium.canonical.com ([91.189.90.7]:42982)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gX0Eb-00058V-PY
+	id 1gX0EZ-000580-Vc
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 03:51:13 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gX0EY-0007fW-4D
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 08:51:10 +0000
+	id 1gX0EX-0007fa-Ay
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 08:51:09 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1DE942E8078
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 08:51:10 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 519C52E8078
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 08:51:09 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Dec 2018 08:36:44 -0000
-From: Thomas Huth <1637974@bugs.launchpad.net>
-Reply-To: Bug 1637974 <1637974@bugs.launchpad.net>
+Date: Wed, 12 Dec 2018 08:35:59 -0000
+From: Thomas Huth <1785972@bugs.launchpad.net>
+Reply-To: Bug 1785972 <1785972@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20161031104836.30100.23885.malonedeb@wampee.canonical.com>
-Message-Id: <154460380567.8781.501723554878852034.launchpad@gac.canonical.com>
+References: <153371136089.29473.12663307170219083138.malonedeb@chaenomeles.canonical.com>
+Message-Id: <154460375995.9175.13754369118352920739.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1637974] Re: dead code in pl080 functions
+Subject: [Qemu-devel] [Bug 1785972] Re: v3.0.0-rc4: VM fails to start after
+ vcpuhotunplug, managedsave sequence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,6 +39,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dcc71c7760e263f808c424=
+0a
+
 ** Changed in: qemu
        Status: Fix Committed =3D> Fix Released
 
@@ -45,72 +49,77 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1637974
+https://bugs.launchpad.net/bugs/1785972
 
 Title:
-  dead code in pl080 functions
+  v3.0.0-rc4: VM fails to start after vcpuhotunplug, managedsave
+  sequence
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  pl080 is arm dma controller virtual device.
-  source code path: hw/dma/pl080.c
-  I find there are two same dead code in pl080_read and pl080_write,
-  Here's the code, comments are my opinion:
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-  240 static uint64_t pl080_read(void *opaque, hwaddr offset,
-  241                            unsigned size)
-  242 {
-  243     PL080State *s =3D (PL080State *)opaque;
-  244     uint32_t i;
-  245     uint32_t mask;
-  246
-  247     if (offset >=3D 0xfe0 && offset < 0x1000) {
-  248         if (s->nchannels =3D=3D 8) {
-  249             return pl080_id[(offset - 0xfe0) >> 2];
-  250         } else {
-  251             return pl081_id[(offset - 0xfe0) >> 2];
-  252         }
-  253     }
-  254     if (offset >=3D 0x100 && offset < 0x200) {   //// here offset is =
-limited in 0x100~0x200
-  255         i =3D (offset & 0xe0) >> 5;
-  256         if (i >=3D s->nchannels)
-  257             goto bad_offset;
-  258         switch (offset >> 2) {                 //// then here, offset=
->>2 is in range  64~128
-  259         case 0: /* SrcAddr */                  //// while the switch =
-case is 0,1,2,3,4,
-  260             return s->chan[i].src;             //// so, NONE of the s=
-witch case would be selected !
-  261         case 1: /* DestAddr */                 //// this switch is A =
-DEAD CODE, it is contradictory with if.
-  262             return s->chan[i].dest;
-  263         case 2: /* LLI */
-  264             return s->chan[i].lli;
-  265         case 3: /* Control */
-  266             return s->chan[i].ctrl;
-  267         case 4: /* Configuration */
-  268             return s->chan[i].conf;
-  269         default:
-  270             goto bad_offset;
-  271         }
-  272     }
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.........................=
-............
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  VM fails to start after vcpu hot un-plug, managedsave sequence
 
-  I guess, switch statement should like this :
-  switch((offset-0x100)>>2)
-  {
-  ...
-  }
-  if this DEADCODE is not the author's original purpose,
-  Then there must be something in logic goes wrong, pl080 have NEVER works =
-correctly ?
+  Host info:
+  Kernel: 4.18.0-rc8-00002-g1236568ee3cb
+
+  qemu: commit 6ad90805383e6d04b3ff49681b8519a48c9f4410 (HEAD -> master, ta=
+g: v3.0.0-rc4)
+  QEMU emulator version 2.12.94 (v3.0.0-rc4-dirty)
+
+  libvirt: commit 087de2f5a3dffb27d2eeb0c50a86d5d6984e5a5e (HEAD -> master)
+  libvirtd (libvirt) 4.6.0
+
+  Guest Kernel: 4.18.0-rc8-00002-g1236568ee3cb
+
+  =
+
+  Steps to reproduce:
+  1. Start a guest(VM) with 2 current , 4 max vcpus
+  virsh start vm1
+  Domain vm1 started
+
+  2. Hotplug 2 vcpus
+  virsh setvcpus vm1 4 --live
+
+  3. Hot unplug 2 vcpus
+  virsh setvcpus vm1 2 --live
+
+  4. Managedsave the VM
+  virsh managedsave vm1
+
+  Domain vm1 state saved by libvirt
+
+  5. Start the VM ---Fails to start
+  virsh start vm1
+
+  error: Failed to start domain avocado-vt-vm1
+  error: internal error: qemu unexpectedly closed the monitor: 2018-08-08T0=
+6:27:53.853818Z qemu: Unknown savevm section or instance 'spapr_cpu' 2
+  2018-08-08T06:27:53.854949Z qemu: load of migration failed: Invalid argum=
+ent
+
+
+  Testcase:
+  avocado run libvirt_vcpu_plug_unplug.positive_test.vcpu_set.live.vm_opera=
+te.managedsave_with_unplug --vt-type libvirt --vt-extra-params emulator_pat=
+h=3D/usr/share/avocado-plugins-vt/bin/qemu create_vm_libvirt=3Dyes kill_vm_=
+libvirt=3Dyes env_cleanup=3Dyes smp=3D8 backup_image_before_testing=3Dno li=
+bvirt_controller=3Dvirtio-scsi scsi_hba=3Dvirtio-scsi-pci drive_format=3Dsc=
+si-hd use_os_variant=3Dno restore_image_after_testing=3Dno vga=3Dnone displ=
+ay=3Dnographic kernel=3D/home/kvmci/linux/vmlinux kernel_args=3D'root=3D/de=
+v/sda2 rw console=3Dtty0 console=3DttyS0,115200 init=3D/sbin/init  initcall=
+_debug' take_regular_screendumps=3Dno --vt-guest-os JeOS.27.ppc64le
+  JOB ID     : 1f869477ad87e7d7e7e7777f631ae08965f41a74
+  JOB LOG    : /root/avocado/job-results/job-2018-08-08T02.42-1f86947/job.l=
+og
+   (1/1) type_specific.io-github-autotest-libvirt.libvirt_vcpu_plug_unplug.=
+positive_test.vcpu_set.live.vm_operate.managedsave_with_unplug: ERROR (91.5=
+8 s)
+  RESULTS    : PASS 0 | ERROR 1 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | =
+CANCEL 0
+  JOB TIME   : 95.89 s
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1637974/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1785972/+subscriptions
