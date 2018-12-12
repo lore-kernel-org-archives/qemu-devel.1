@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bp@alien8.de>) id 1gXAo7-0005D4-5U
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:08:36 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gXB1e-0002Jc-0j
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:22:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bp@alien8.de>) id 1gXAo2-0004FV-NX
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:08:35 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:47510)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bp@alien8.de>) id 1gXAo2-0003tn-8t
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:08:30 -0500
-Date: Wed, 12 Dec 2018 21:08:03 +0100
-From: Borislav Petkov <bp@alien8.de>
-Message-ID: <20181212200803.GG6653@zn.tnic>
-References: <20181210184153.GB5482@zn.tnic> <20181210190600.GK4669@habkost.net>
-	<20181210194258.GD5482@zn.tnic> <20181210200843.GN4669@habkost.net>
-	<20181211103839.GC921@redhat.com>
-	<20181211115546.GQ4669@habkost.net>
-	<e4d9a943-2de2-34a7-3f52-ee3d64ea889a@redhat.com>
-	<20181211153017.GN921@redhat.com> <20181211161440.GG27375@zn.tnic>
-	<20181212195235.GX7141@habkost.net>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gXB1c-000098-T4
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:22:34 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44124)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gXB1c-00006L-IN
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:22:32 -0500
+Received: by mail-wr1-x441.google.com with SMTP id z5so18964187wrt.11
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 12:22:32 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181212195235.GX7141@habkost.net>
-Subject: [Qemu-devel] [PATCH -v2] target-i386: Reenable RDTSCP support on
- Opteron_G[345] CPU models CPU models
+References: <20180910083222.8245-1-marcandre.lureau@redhat.com>
+	<20180910083222.8245-4-marcandre.lureau@redhat.com>
+	<d67240e3-7dd0-732f-62b4-bb6b332d8dfe@redhat.com>
+In-Reply-To: <d67240e3-7dd0-732f-62b4-bb6b332d8dfe@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 13 Dec 2018 00:22:18 +0400
+Message-ID: <CAJ+F1CJXwF3Gtd1G4GK3AfOYAEs7aNLBUhtRMksHNkpESdpiDw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v12 3/6] tpm: allocate/map buffer for TPM
+ Physical Presence interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,151 +32,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?B?SsO2cmcgUsO2ZGVs?= <joro@8bytes.org>, Andre Przywara <andre.przywara@arm.com>, kvm ML <kvm@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+To: philmd@redhat.com
+Cc: QEMU <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, Dec 12, 2018 at 05:52:35PM -0200, Eduardo Habkost wrote:
-> Why did you remove this entry from PC_COMPAT_2_4?
-> 
-> We must keep compatibility with old behavior of Opteron_G2 on
-> pc-2.4, even if the old behavior was incorrect.
+Hi
 
-Ok, hunk reverted. v2 below.
+On Wed, Dec 12, 2018 at 8:13 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> Hi Stefan, Marc-Andr=C3=A9,
+>
+> On 9/10/18 10:32 AM, Marc-Andr=C3=A9 Lureau wrote:
+> > From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> >
+> > Implement a virtual memory device for the TPM Physical Presence interfa=
+ce.
+> > The memory is located at 0xFED45000 and used by ACPI to send messages t=
+o the
+> > firmware (BIOS) and by the firmware to provide parameters for each one =
+of
+> > the supported codes.
+> >
+> > This interface should be used by all TPM devices on x86 and can be
+> > added by calling tpm_ppi_init_io().
+> >
+> > Note: bios_linker cannot be used to allocate the PPI memory region,
+> > since the reserved memory should stay stable across reboots, and might
+> > be needed before the ACPI tables are installed.
+> >
+> > Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> >  hw/tpm/tpm_ppi.h      | 26 ++++++++++++++++++++++++++
+> >  include/hw/acpi/tpm.h |  6 ++++++
+> >  hw/tpm/tpm_crb.c      |  8 ++++++++
+> >  hw/tpm/tpm_ppi.c      | 32 ++++++++++++++++++++++++++++++++
+> >  hw/tpm/tpm_tis.c      |  8 ++++++++
+> >  hw/tpm/Makefile.objs  |  1 +
+> >  6 files changed, 81 insertions(+)
+> >  create mode 100644 hw/tpm/tpm_ppi.h
+> >  create mode 100644 hw/tpm/tpm_ppi.c
+> >
+> > diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
+> > new file mode 100644
+> > index 0000000000..c2ab2ed300
+> > --- /dev/null
+> > +++ b/hw/tpm/tpm_ppi.h
+> > @@ -0,0 +1,26 @@
+> > +/*
+> > + * TPM Physical Presence Interface
+> > + *
+> > + * Copyright (C) 2018 IBM Corporation
+> > + *
+> > + * Authors:
+> > + *  Stefan Berger    <stefanb@us.ibm.com>
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or =
+later.
+> > + * See the COPYING file in the top-level directory.
+> > + */
+> > +#ifndef TPM_TPM_PPI_H
+> > +#define TPM_TPM_PPI_H
+> > +
+> > +#include "hw/acpi/tpm.h"
+> > +#include "exec/address-spaces.h"
+> > +
+> > +typedef struct TPMPPI {
+> > +    MemoryRegion ram;
+> > +    uint8_t *buf;
+> > +} TPMPPI;
+> > +
+>
+> Can you add a description for this public function?
 
-Thx.
+ok
 
----
-From: Borislav Petkov <bp@suse.de>
+>
+> > +bool tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
+> > +                  hwaddr addr, Object *obj, Error **errp);
+> > +
+> > +#endif /* TPM_TPM_PPI_H */
+> > diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+> > index 3580ffd50c..b8796df916 100644
+> > --- a/include/hw/acpi/tpm.h
+> > +++ b/include/hw/acpi/tpm.h
+> > @@ -188,4 +188,10 @@ REG32(CRB_DATA_BUFFER, 0x80)
+> >  #define TPM2_START_METHOD_MMIO      6
+> >  #define TPM2_START_METHOD_CRB       7
+> >
+> > +/*
+> > + * Physical Presence Interface
+> > + */
+> > +#define TPM_PPI_ADDR_SIZE           0x400
+> > +#define TPM_PPI_ADDR_BASE           0xFED45000
+> > +
+> >  #endif /* HW_ACPI_TPM_H */
+> > diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
+> > index d5b0ac5920..b243222fd6 100644
+> > --- a/hw/tpm/tpm_crb.c
+> > +++ b/hw/tpm/tpm_crb.c
+> > @@ -29,6 +29,7 @@
+> >  #include "sysemu/reset.h"
+> >  #include "tpm_int.h"
+> >  #include "tpm_util.h"
+> > +#include "tpm_ppi.h"
+> >  #include "trace.h"
+> >
+> >  typedef struct CRBState {
+> > @@ -43,6 +44,7 @@ typedef struct CRBState {
+> >      size_t be_buffer_size;
+> >
+> >      bool ppi_enabled;
+> > +    TPMPPI ppi;
+> >  } CRBState;
+> >
+> >  #define CRB(obj) OBJECT_CHECK(CRBState, (obj), TYPE_TPM_CRB)
+> > @@ -294,6 +296,12 @@ static void tpm_crb_realize(DeviceState *dev, Erro=
+r **errp)
+> >      memory_region_add_subregion(get_system_memory(),
+> >          TPM_CRB_ADDR_BASE + sizeof(s->regs), &s->cmdmem);
+> >
+> > +    if (s->ppi_enabled &&
+> > +        !tpm_ppi_init(&s->ppi, get_system_memory(),
+> > +                      TPM_PPI_ADDR_BASE, OBJECT(s), errp)) {
+> > +        return;
+> > +    }
+> > +
+> >      qemu_register_reset(tpm_crb_reset, dev);
+> >  }
+> >
+> > diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
+> > new file mode 100644
+> > index 0000000000..f2f07f895e
+> > --- /dev/null
+> > +++ b/hw/tpm/tpm_ppi.c
+> > @@ -0,0 +1,32 @@
+> > +/*
+> > + * tpm_ppi.c - TPM Physical Presence Interface
+> > + *
+> > + * Copyright (C) 2018 IBM Corporation
+> > + *
+> > + * Authors:
+> > + *  Stefan Berger <stefanb@us.ibm.com>
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or =
+later.
+> > + * See the COPYING file in the top-level directory.
+> > + *
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +
+> > +#include "qapi/error.h"
+> > +#include "cpu.h"
+> > +#include "sysemu/memory_mapping.h"
+> > +#include "migration/vmstate.h"
+> > +#include "tpm_ppi.h"
+> > +
+> > +bool tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
+> > +                  hwaddr addr, Object *obj, Error **errp)
+> > +{
+> > +    tpmppi->buf =3D g_malloc0(HOST_PAGE_ALIGN(TPM_PPI_ADDR_SIZE));
+> > +    memory_region_init_ram_device_ptr(&tpmppi->ram, obj, "tpm-ppi",
+> > +                                      TPM_PPI_ADDR_SIZE, tpmppi->buf);
+> > +    vmstate_register_ram(&tpmppi->ram, DEVICE(obj));
+> > +
+> > +    memory_region_add_subregion(m, addr, &tpmppi->ram);
+> > +    return true;
+> > +}
+> > diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+> > index d9ddf9b723..70432ffe8b 100644
+> > --- a/hw/tpm/tpm_tis.c
+> > +++ b/hw/tpm/tpm_tis.c
+> > @@ -31,6 +31,7 @@
+> >  #include "sysemu/tpm_backend.h"
+> >  #include "tpm_int.h"
+> >  #include "tpm_util.h"
+> > +#include "tpm_ppi.h"
+> >  #include "trace.h"
+> >
+> >  #define TPM_TIS_NUM_LOCALITIES      5     /* per spec */
+> > @@ -83,6 +84,7 @@ typedef struct TPMState {
+> >      size_t be_buffer_size;
+> >
+> >      bool ppi_enabled;
+> > +    TPMPPI ppi;
+> >  } TPMState;
+> >
+> >  #define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)
+> > @@ -979,6 +981,12 @@ static void tpm_tis_realizefn(DeviceState *dev, Er=
+ror **errp)
+> >
+> >      memory_region_add_subregion(isa_address_space(ISA_DEVICE(dev)),
+> >                                  TPM_TIS_ADDR_BASE, &s->mmio);
+> > +
+> > +    if (s->ppi_enabled &&
+> > +        !tpm_ppi_init(&s->ppi, isa_address_space(ISA_DEVICE(dev)),
+> > +                      TPM_PPI_ADDR_BASE, OBJECT(s), errp)) {
+> > +        return;
+> > +    }
+> >  }
+> >
+>
+> Shouldn't you implement the unrealize() function, destroying the PPI buff=
+er?
 
-The missing functionality was added ~3 years ago with the Linux commit
+I don't think it's necessary since the TPM and PPI are not hotpluggable.
 
-  46896c73c1a4 ("KVM: svm: add support for RDTSCP")
+> Patch looks good otherwise.
+>
+> >  static void tpm_tis_initfn(Object *obj)
+> > diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
+> > index 1dc9f8bf2c..700c878622 100644
+> > --- a/hw/tpm/Makefile.objs
+> > +++ b/hw/tpm/Makefile.objs
+> > @@ -1,4 +1,5 @@
+> >  common-obj-y +=3D tpm_util.o
+> > +obj-y +=3D tpm_ppi.o
+> >  common-obj-$(CONFIG_TPM_TIS) +=3D tpm_tis.o
+> >  common-obj-$(CONFIG_TPM_CRB) +=3D tpm_crb.o
+> >  common-obj-$(CONFIG_TPM_PASSTHROUGH) +=3D tpm_passthrough.o
+> >
+>
 
-so reenable RDTSCP support on those CPU models.
 
-Opteron_G2 - being family 15, model 6, doesn't have RDTSCP support
-(the real hardware doesn't have it. K8 got RDTSCP support with the NPT
-models, i.e., models >= 0x40).
-
-Document the host's minimum required kernel version, while at it.
-
-Signed-off-by: Borislav Petkov <bp@suse.de>
----
-v2: Keep Opteron_G2 in PC_COMPAT_2_4 unchanged.
-
- include/hw/i386/pc.h | 13 +++++++++++++
- qemu-doc.texi        | 13 +++++++++++++
- target/i386/cpu.c    | 11 ++++-------
- 3 files changed, 30 insertions(+), 7 deletions(-)
-
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 9d29c4b1df2a..236d962d2547 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -296,6 +296,19 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
- 
- #define PC_COMPAT_3_1 \
-     HW_COMPAT_3_1 \
-+    {\
-+        .driver   = "Opteron_G3" "-" TYPE_X86_CPU,\
-+        .property = "rdtscp",\
-+        .value    = "off",\
-+    },{\
-+        .driver   = "Opteron_G4" "-" TYPE_X86_CPU,\
-+        .property = "rdtscp",\
-+        .value    = "off",\
-+    },{\
-+        .driver   = "Opteron_G5" "-" TYPE_X86_CPU,\
-+        .property = "rdtscp",\
-+        .value    = "off",\
-+    },
- 
- #define PC_COMPAT_3_0 \
-     HW_COMPAT_3_0 \
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index f7ad1dfe4b69..16b955cbf985 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -37,6 +37,7 @@
- * QEMU System emulator for non PC targets::
- * QEMU Guest Agent::
- * QEMU User space emulator::
-+* System requirements::
- * Implementation notes::
- * Deprecated features::
- * Supported build platforms::
-@@ -2813,6 +2814,18 @@ Act as if the host page size was 'pagesize' bytes
- Run the emulation in single step mode.
- @end table
- 
-+@node System requirements
-+@chapter System requirements
-+
-+@section KVM kernel module
-+
-+On x86_64 hosts, the default set of CPU features enabled by the KVM accelerator
-+require the host to be running Linux v4.5 or newer.
-+
-+The OpteronG[345] CPU models require KVM support for RDTSCP, which was
-+added with Linux 4.5 which is supported by the major distros. And even
-+if RHEL7 has kernel 3.10, KVM there has the required functionality there
-+to make it close to a 4.5 or newer kernel.
- 
- @include qemu-tech.texi
- 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index f81d35e1f914..a7def11b27cd 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2706,7 +2706,6 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_DE | CPUID_FP87,
-         .features[FEAT_1_ECX] =
-             CPUID_EXT_CX16 | CPUID_EXT_SSE3,
--        /* Missing: CPUID_EXT2_RDTSCP */
-         .features[FEAT_8000_0001_EDX] =
-             CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-         .features[FEAT_8000_0001_ECX] =
-@@ -2730,9 +2729,9 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         .features[FEAT_1_ECX] =
-             CPUID_EXT_POPCNT | CPUID_EXT_CX16 | CPUID_EXT_MONITOR |
-             CPUID_EXT_SSE3,
--        /* Missing: CPUID_EXT2_RDTSCP */
-         .features[FEAT_8000_0001_EDX] =
--            CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-+            CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL |
-+            CPUID_EXT2_RDTSCP,
-         .features[FEAT_8000_0001_ECX] =
-             CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A |
-             CPUID_EXT3_ABM | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
-@@ -2757,10 +2756,9 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_EXT_POPCNT | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
-             CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
-             CPUID_EXT_SSE3,
--        /* Missing: CPUID_EXT2_RDTSCP */
-         .features[FEAT_8000_0001_EDX] =
-             CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_NX |
--            CPUID_EXT2_SYSCALL,
-+            CPUID_EXT2_SYSCALL | CPUID_EXT2_RDTSCP,
-         .features[FEAT_8000_0001_ECX] =
-             CPUID_EXT3_FMA4 | CPUID_EXT3_XOP |
-             CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_MISALIGNSSE |
-@@ -2788,10 +2786,9 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_EXT_AES | CPUID_EXT_POPCNT | CPUID_EXT_SSE42 |
-             CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_FMA |
-             CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
--        /* Missing: CPUID_EXT2_RDTSCP */
-         .features[FEAT_8000_0001_EDX] =
-             CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_NX |
--            CPUID_EXT2_SYSCALL,
-+            CPUID_EXT2_SYSCALL | CPUID_EXT2_RDTSCP,
-         .features[FEAT_8000_0001_ECX] =
-             CPUID_EXT3_TBM | CPUID_EXT3_FMA4 | CPUID_EXT3_XOP |
-             CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_MISALIGNSSE |
--- 
-2.19.1
-
--- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+--=20
+Marc-Andr=C3=A9 Lureau
