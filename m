@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gX5Ex-0003eB-VU
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:11:56 -0500
+	(envelope-from <jjherne@linux.ibm.com>) id 1gX5Et-0003Zs-UT
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:11:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gX5Et-0007J1-Qn
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:11:55 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35444)
+	(envelope-from <jjherne@linux.ibm.com>) id 1gX5Ep-0007Fv-NH
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:11:51 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44660)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1gX5Et-0007Et-Ay
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:11:51 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	id 1gX5El-00077x-AI
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:11:45 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wBCE9MKN127401
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:11:45 -0500
+	wBCE9MgD062270
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:11:35 -0500
 Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2pb2d7vjwm-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2pb3mh8xfa-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:11:45 -0500
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:11:35 -0500
 Received: from localhost
 	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Wed, 12 Dec 2018 14:11:44 -0000
+	Wed, 12 Dec 2018 14:11:34 -0000
 From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Wed, 12 Dec 2018 09:11:15 -0500
+Date: Wed, 12 Dec 2018 09:11:09 -0500
 In-Reply-To: <1544623878-11248-1-git-send-email-jjherne@linux.ibm.com>
 References: <1544623878-11248-1-git-send-email-jjherne@linux.ibm.com>
-Message-Id: <1544623878-11248-13-git-send-email-jjherne@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH 12/15] s390-bios: Refactor virtio to run
- channel programs via cio
+Message-Id: <1544623878-11248-7-git-send-email-jjherne@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH 06/15] s390-bios: Clean up cio.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,50 +39,201 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com, borntraeger@de.ibm.com
 
-Now that we have a Channel I/O library let's modify virtio boot code to
-make use of it for running channel programs.
+Add proper typedefs to all structs and modify all bit fields to use consistent
+formatting.
 
 Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+Reviewed-by: Collin Walling <walling@linux.ibm.com>
 ---
- pc-bios/s390-ccw/virtio.c | 21 ++-------------------
- 1 file changed, 2 insertions(+), 19 deletions(-)
+ pc-bios/s390-ccw/cio.h      | 86 ++++++++++++++++++++++-----------------------
+ pc-bios/s390-ccw/s390-ccw.h |  8 -----
+ 2 files changed, 43 insertions(+), 51 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-index aa9da72..5fb49e2 100644
---- a/pc-bios/s390-ccw/virtio.c
-+++ b/pc-bios/s390-ccw/virtio.c
-@@ -92,30 +92,13 @@ int drain_irqs(SubChannelId schid)
- static int run_ccw(VDev *vdev, int cmd, void *ptr, int len)
- {
-     Ccw1 ccw = {};
--    CmdOrb orb = {};
--    int r;
+diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
+index 1a0795f..a48eee5 100644
+--- a/pc-bios/s390-ccw/cio.h
++++ b/pc-bios/s390-ccw/cio.h
+@@ -53,12 +53,12 @@ struct schib_config {
+     __u64 mba;
+     __u32 intparm;
+     __u16 mbi;
+-    __u32 isc:3;
+-    __u32 ena:1;
+-    __u32 mme:2;
+-    __u32 mp:1;
+-    __u32 csense:1;
+-    __u32 mbfc:1;
++    __u32 isc    : 3;
++    __u32 ena    : 1;
++    __u32 mme    : 2;
++    __u32 mp     : 1;
++    __u32 csense : 1;
++    __u32 mbfc   : 1;
+ } __attribute__ ((packed));
+ 
+ struct scsw {
+@@ -77,41 +77,41 @@ struct scsw {
+ /*
+  * subchannel information block
+  */
+-struct schib {
++typedef struct schib {
+     struct pmcw pmcw;     /* path management control word */
+     struct scsw scsw;     /* subchannel status word */
+     __u64 mba;            /* measurement block address */
+     __u8 mda[4];          /* model dependent area */
+-} __attribute__ ((packed,aligned(4)));
++} __attribute__ ((packed, aligned(4))) Schib;
+ 
+-struct subchannel_id {
++typedef struct subchannel_id {
+         __u32 cssid  : 8;
+         __u32        : 4;
+         __u32 m      : 1;
+         __u32 ssid   : 2;
+         __u32 one    : 1;
+         __u32 sch_no : 16;
+-} __attribute__ ((packed, aligned(4)));
++} __attribute__ ((packed, aligned(4))) SubChannelId;
+ 
+ struct chsc_header {
+     __u16 length;
+     __u16 code;
+ } __attribute__((packed));
+ 
+-struct chsc_area_sda {
++typedef struct chsc_area_sda {
+     struct chsc_header request;
+-    __u8 reserved1:4;
+-    __u8 format:4;
++    __u8 reserved1  : 4;
++    __u8 format     : 4;
+     __u8 reserved2;
+     __u16 operation_code;
+     __u32 reserved3;
+     __u32 reserved4;
+     __u32 operation_data_area[252];
+     struct chsc_header response;
+-    __u32 reserved5:4;
+-    __u32 format2:4;
+-    __u32 reserved6:24;
+-} __attribute__((packed));
++    __u32 reserved5 : 4;
++    __u32 format2   : 4;
++    __u32 reserved6 : 24;
++} __attribute__((packed)) ChscAreaSda;
+ 
+ /*
+  * TPI info structure
+@@ -128,12 +128,12 @@ struct tpi_info {
+ } __attribute__ ((packed, aligned(4)));
+ 
+ /* channel command word (type 1) */
+-struct ccw1 {
++typedef struct ccw1 {
+     __u8 cmd_code;
+     __u8 flags;
+     __u16 count;
+     __u32 cda;
+-} __attribute__ ((packed, aligned(8)));
++} __attribute__ ((packed, aligned(8))) Ccw1;
+ 
+ #define CCW_FLAG_DC              0x80
+ #define CCW_FLAG_CC              0x40
+@@ -162,27 +162,27 @@ struct ccw1 {
+ /*
+  * Command-mode operation request block
+  */
+-struct cmd_orb {
++typedef struct cmd_orb {
+     __u32 intparm;    /* interruption parameter */
+-    __u32 key:4;      /* flags, like key, suspend control, etc. */
+-    __u32 spnd:1;     /* suspend control */
+-    __u32 res1:1;     /* reserved */
+-    __u32 mod:1;      /* modification control */
+-    __u32 sync:1;     /* synchronize control */
+-    __u32 fmt:1;      /* format control */
+-    __u32 pfch:1;     /* prefetch control */
+-    __u32 isic:1;     /* initial-status-interruption control */
+-    __u32 alcc:1;     /* address-limit-checking control */
+-    __u32 ssic:1;     /* suppress-suspended-interr. control */
+-    __u32 res2:1;     /* reserved */
+-    __u32 c64:1;      /* IDAW/QDIO 64 bit control  */
+-    __u32 i2k:1;      /* IDAW 2/4kB block size control */
+-    __u32 lpm:8;      /* logical path mask */
+-    __u32 ils:1;      /* incorrect length */
+-    __u32 zero:6;     /* reserved zeros */
+-    __u32 orbx:1;     /* ORB extension control */
+-    __u32 cpa;    /* channel program address */
+-}  __attribute__ ((packed, aligned(4)));
++    __u32 key  : 4;   /* flags, like key, suspend control, etc. */
++    __u32 spnd : 1;   /* suspend control */
++    __u32 res1 : 1;   /* reserved */
++    __u32 mod  : 1;   /* modification control */
++    __u32 sync : 1;   /* synchronize control */
++    __u32 fmt  : 1;   /* format control */
++    __u32 pfch : 1;   /* prefetch control */
++    __u32 isic : 1;   /* initial-status-interruption control */
++    __u32 alcc : 1;   /* address-limit-checking control */
++    __u32 ssic : 1;   /* suppress-suspended-interr. control */
++    __u32 res2 : 1;   /* reserved */
++    __u32 c64  : 1;   /* IDAW/QDIO 64 bit control  */
++    __u32 i2k  : 1;   /* IDAW 2/4kB block size control */
++    __u32 lpm  : 8;   /* logical path mask */
++    __u32 ils  : 1;   /* incorrect length */
++    __u32 zero : 6;   /* reserved zeros */
++    __u32 orbx : 1;   /* ORB extension control */
++    __u32 cpa;        /* channel program address */
++}  __attribute__ ((packed, aligned(4))) CmdOrb;
+ 
+ struct ciw {
+     __u8 type;
+@@ -193,7 +193,7 @@ struct ciw {
+ /*
+  * sense-id response buffer layout
+  */
+-struct senseid {
++typedef struct senseid {
+     /* common part */
+     __u8  reserved;   /* always 0x'FF' */
+     __u16 cu_type;    /* control unit type */
+@@ -203,15 +203,15 @@ struct senseid {
+     __u8  unused;     /* padding byte */
+     /* extended part */
+     struct ciw ciw[62];
+-}  __attribute__ ((packed, aligned(4)));
++}  __attribute__ ((packed, aligned(4))) SenseId;
+ 
+ /* interruption response block */
+-struct irb {
++typedef struct irb {
+     struct scsw scsw;
+     __u32 esw[5];
+     __u32 ecw[8];
+     __u32 emw[8];
+-}  __attribute__ ((packed, aligned(4)));
++}  __attribute__ ((packed, aligned(4))) Irb;
+ 
+ /*
+  * Some S390 specific IO instructions as inline
+diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+index 9828aa2..241c6d0 100644
+--- a/pc-bios/s390-ccw/s390-ccw.h
++++ b/pc-bios/s390-ccw/s390-ccw.h
+@@ -49,14 +49,6 @@ typedef unsigned long long __u64;
+ #include "cio.h"
+ #include "iplb.h"
+ 
+-typedef struct irb Irb;
+-typedef struct ccw1 Ccw1;
+-typedef struct cmd_orb CmdOrb;
+-typedef struct schib Schib;
+-typedef struct chsc_area_sda ChscAreaSda;
+-typedef struct senseid SenseId;
+-typedef struct subchannel_id SubChannelId;
 -
--    enable_subchannel(vdev->schid);
--
--    /* start subchannel command */
--    orb.fmt = 1;
--    orb.cpa = (u32)(long)&ccw;
--    orb.lpm = 0x80;
- 
-     ccw.cmd_code = cmd;
-     ccw.cda = (long)ptr;
-     ccw.count = len;
- 
--    r = ssch(vdev->schid, &orb);
--    /*
--     * XXX Wait until device is done processing the CCW. For now we can
--     *     assume that a simple tsch will have finished the CCW processing,
--     *     but the architecture allows for asynchronous operation
--     */
--    if (!r) {
--        r = drain_irqs(vdev->schid);
--    }
--    return r;
-+    enable_subchannel(vdev->schid);
-+    return do_cio(vdev->schid, ptr2u32(&ccw), CCW_FMT1);
- }
- 
- static void vring_init(VRing *vr, VqInfo *info)
+ /* start.s */
+ void disabled_wait(void);
+ void consume_sclp_int(void);
 -- 
 2.7.4
