@@ -1,45 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1gX61C-0001bf-5K
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:01:55 -0500
+	(envelope-from <mst@redhat.com>) id 1gX65h-0002sx-MQ
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:06:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1gX615-0002Fy-8M
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:01:46 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45087)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
-	id 1gX611-0002D4-D0
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:01:38 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wBCErddB082504
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 10:01:31 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2pb3mhbcfc-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 10:01:24 -0500
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
-	Wed, 12 Dec 2018 15:01:23 -0000
-References: <1544135058-21380-1-git-send-email-walling@linux.ibm.com>
-	<1544135058-21380-3-git-send-email-walling@linux.ibm.com>
-	<20181207130853.20506345.cohuck@redhat.com>
-	<dbabb43d-01e7-d221-a761-ad5a53fd8f94@linux.ibm.com>
-	<aff40d67-9fcb-43fb-beeb-1dbe7a1e22f3@linux.ibm.com>
-	<5c491972-5210-5ac6-6023-7365fb24dc3f@redhat.com>
-	<20181212144132.41a1409d.cohuck@redhat.com>
-From: Collin Walling <walling@linux.ibm.com>
-Date: Wed, 12 Dec 2018 10:01:18 -0500
+	(envelope-from <mst@redhat.com>) id 1gX65c-0004Vc-9Y
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:06:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46588)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gX65b-0004VA-V3
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:06:20 -0500
+Date: Wed, 12 Dec 2018 10:06:13 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181212100106-mutt-send-email-mst@kernel.org>
+References: <cover.1544598069.git.yi.z.zhang@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20181212144132.41a1409d.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <9259bc67-2598-560b-8143-39fd9d3391ab@linux.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 2/3] s390: cpu feature for
- diagnose 318 andlimit max VCPUs to 247
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1544598069.git.yi.z.zhang@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH V6 0/6] nvdimm: support MAP_SYNC for
+ memory-backend-file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,113 +27,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
-Cc: thuth@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
+To: Zhang Yi <yi.z.zhang@linux.intel.com>
+Cc: xiaoguangrong.eric@gmail.com, dan.j.williams@intel.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, qemu-devel@nongnu.org, imammedo@redhat.com, ehabkost@redhat.com
 
-On 12/12/18 8:41 AM, Cornelia Huck wrote:
-> On Wed, 12 Dec 2018 12:20:08 +0100
-> David Hildenbrand <david@redhat.com> wrote:
+On Wed, Dec 12, 2018 at 04:11:44PM +0800, Zhang Yi wrote:
+> Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
+> guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
+> files on ext4/xfs file system mounted with '-o dax').
 > 
->> On 11.12.18 22:12, Collin Walling wrote:
->>> On 12/11/18 11:47 AM, Collin Walling wrote:  
->>>> On 12/7/18 7:08 AM, Cornelia Huck wrote:  
->>>>> On Thu,  6 Dec 2018 17:24:17 -0500
->>>>> Collin Walling <walling@linux.ibm.com> wrote:
->>>>>  
->>>>>> Diagnose 318 is a new z14.2 CPU feature. Since we are able to emulate
->>>>>> it entirely via KVM, we can add guest support for earlier models. A
->>>>>> new CPU feature for diagnose 318 (shortened to diag318) will be made
->>>>>> available to guests starting with the zEC12-full CPU model.
->>>>>>
->>>>>> The z14.2 adds a new read SCP info byte (let's call it byte 134) to
->>>>>> detect the availability of diag318. Because of this, we have room for
->>>>>> one less VCPU and thus limit the max VPUs supported in a configuration
->>>>>> to 247 (down from 248).
->>>>>>
->>>>>> Signed-off-by: Collin Walling <walling@linux.ibm.com>.
->>>>>> ---
->>>>>>  hw/s390x/sclp.c                 | 2 ++
->>>>>>  include/hw/s390x/sclp.h         | 2 ++
->>>>>>  target/s390x/cpu.h              | 2 +-
->>>>>>  target/s390x/cpu_features.c     | 3 +++
->>>>>>  target/s390x/cpu_features.h     | 1 +
->>>>>>  target/s390x/cpu_features_def.h | 3 +++
->>>>>>  target/s390x/gen-features.c     | 1 +
->>>>>>  target/s390x/kvm.c              | 1 +
->>>>>>  8 files changed, 14 insertions(+), 1 deletion(-)
->>>>>>  
->>>>>  
->>>>>> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
->>>>>> index 8c2320e..594b4a4 100644
->>>>>> --- a/target/s390x/cpu.h
->>>>>> +++ b/target/s390x/cpu.h
->>>>>> @@ -52,7 +52,7 @@
->>>>>>  
->>>>>>  #define MMU_USER_IDX 0
->>>>>>  
->>>>>> -#define S390_MAX_CPUS 248
->>>>>> +#define S390_MAX_CPUS 247  
->>>>>
->>>>> Isn't that already problematic if you try to migrate from an older QEMU
->>>>> with all possible vcpus defined? IOW, don't you really need a way that
->>>>> older machines can still run with one more vcpu?
->>>>>  
->>>>
->>>> Good call. I'll run some tests on this and see what happens. I'll report
->>>> here on those results.
->>>>  
->>>
->>> Migrating to a machine that supports less vCPUs will report
->>>
->>> error: unsupported configuration: Maximum CPUs greater than specified machine type limit
->>>
->>> I revisited the code to see if there's a way to dynamically set the max vcpu count based 
->>> on the read scp info size, but it gets really tricky and code looks very complicated.
->>> (Having a packed struct contain the CPU entries whose maximum is determined by hardware
->>> limitations makes things difficult -- but who said s390 is easy? :) )
->>>
->>> In reality, do we often have guests running with 248 or even 247 vcpus? If so, I imagine
->>> the performance isn't too significant?  
->> Gluing CPU feature availability to machines is plain ugly. This sounds
->> like going back to pre-cpu model times ;)
->>
->> There are two alternatives:
->>
->> a) Don't model it as a CPU feature in QEMU. Glue it completely to the
->> QEMU machine. This goes hand-in-hand with the proposal I made in the KVM
->> thread, that diag318 is to be handled completely in QEMU, always. The
->> KVM setting part is optional (if KVM + HW support it).
->>
->> Then we can have two different max_cpus/ReadInfo layouts based on the
->> machine type. No need to worry about QEMU cpu features.
->>
->> Once we have other SCLP features (eventually requiring KVM/HW support)
->> announced in the same feature block, things might get more involved, but
->> I guess we could handle it somehow.
+> A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
+>     https://patchwork.kernel.org/patch/10028151/
 > 
-> Perhaps via a capability to be enabled?
+> In order to make sure that the file metadata is in sync after a fault 
+> while we are writing a shared DAX supporting backend files, this
+> patch-set enables QEMU to use MAP_SYNC flag for memory-backend-dax-file.
 > 
->>
->>
->> b) Glue the ReadInfo layout to the CPU feature, we would have to
->> default-disable the CPU feature for legacy machines. And bail out if
->> more CPUs are used when the feature is enabled. Hairy.
->>
->>
->> I guess a) would be the best thing to do. After all this really does not
->> sound like a CPU feature but more like a machine feature. But there is
->> usually a fine line between them.
+> As the DAX vs DMA truncated issue was solved, we refined the code and
+> send out this feature for the v5 version.
 > 
-> a) sounds like the better option to me as well.
-> 
+> A new auto on/off option 'sync' is added to memory-backend-file:
+>  - on:  try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
+>         'share=off', QEMU will abort
+>  - off: never pass MAP_SYNC to mmap(2)
+>  - auto (default): if MAP_SYNC is supported and 'share=on', work as if
+>         'sync=on'; otherwise, work as if 'sync=off'
 
-I think this makes sense as well. A CPU feat really doesn't make sense if we 
-just want to enable this "always" so-to-speak. I'll get cracking on a rework
-of this patch series. It'll take me some time.
+Can this change be limited to a real DAX device?
+Then you won't need to bother with flags at all.
 
-In the mean time, I'll return the favor and take a look at the PCI stuff you
-guys have posted ;)
+And am I mistaken in thinking that this will affect all
+guest memory with share=on? Or do I misunderstand?
 
--- 
-Respectfully,
-- Collin Walling
+
+
+> Changes in v6:
+>  * Pankaj: 3/7 are squashed with 2/7
+>  * Pankaj: 7/7 update comments to "consistent filesystem metadata".
+>  * Pankaj, Igor: 1/7 Added Reviewed-by in patch-1/7
+>  * Stefan, 4/7 move the include header from "/linux/mman.h" to "osdep.h"
+>  * Stefan, 5/7 Add missing "munmap"
+>  * Stefan, 2/7 refine the shared/flag.
+> 
+> Changes in v5:
+>  * Add patch 1 to fix a memory leak issue.
+>  * Refine the patch 4-6
+>  * Remove the patch 3 as we already change the parameter from "shared" to
+>    "flags"
+> 
+> Changes in v4:
+>  * Add patch 1-3 to switch some functions to a single 'flags'
+>    parameters. (Michael S. Tsirkin)
+>  * v3 patch 1-3 become v4 patch 4-6.
+>  * Patch 4: move definitions of MAP_SYNC and MAP_SHARED_VALIDATE to a
+>    new header file under include/standard-headers/linux/. (Michael S. Tsirkin)
+>  * Patch 6: refine the description of the 'sync' option. (Michael S. Tsirkin)
+> 
+> Changes in v3:
+>  * Patch 1: add MAP_SHARED_VALIDATE in both sync=on and sync=auto
+>    cases, and add back the retry mechanism. MAP_SYNC will be ignored
+>    by Linux kernel 4.15 if MAP_SHARED_VALIDATE is missed.
+>  * Patch 1: define MAP_SYNC and MAP_SHARED_VALIDATE as 0 on non-Linux
+>    platforms in order to make qemu_ram_mmap() compile on those platforms.
+>  * Patch 2&3: include more information in error messages of
+>    memory-backend in hope to help user to identify the error.
+>    (Dr. David Alan Gilbert)
+>  * Patch 3: fix typo in the commit message. (Dr. David Alan Gilbert)
+> 
+> Changes in v2:
+>  * Add 'sync' option to control the use of MAP_SYNC. (Eduardo Habkost)
+>  * Remove the unnecessary set of MAP_SHARED_VALIDATE in some cases and
+>    the retry mechanism in qemu_ram_mmap(). (Michael S. Tsirkin)
+>  * Move OS dependent definitions of MAP_SYNC and MAP_SHARED_VALIDATE
+>    to osdep.h. (Michael S. Tsirkin)
+> 
+> Zhang Yi (6):
+>   numa: Fixed the memory leak of numa error message
+>   util/mmap-alloc: switch qemu_ram_mmap() to 'flags' parameter
+>   util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
+>   util/mmap-alloc: Switch the RAM_SYNC flags to OnOffAuto
+>   hostmem: add more information in error messages
+>   hostmem-file: add 'sync' option
+> 
+>  backends/hostmem-file.c   | 45 +++++++++++++++++++++++++++++++++++++++++++--
+>  backends/hostmem.c        |  8 +++++---
+>  docs/nvdimm.txt           | 20 +++++++++++++++++++-
+>  exec.c                    |  9 +++++----
+>  include/exec/memory.h     | 18 ++++++++++++++++++
+>  include/exec/ram_addr.h   |  1 +
+>  include/qemu/mmap-alloc.h | 20 +++++++++++++++++++-
+>  include/qemu/osdep.h      | 29 +++++++++++++++++++++++++++++
+>  numa.c                    |  1 +
+>  qemu-options.hx           | 22 +++++++++++++++++++++-
+>  util/mmap-alloc.c         | 26 +++++++++++++++++++++-----
+>  util/oslib-posix.c        |  8 +++++++-
+>  12 files changed, 189 insertions(+), 18 deletions(-)
+> 
+> -- 
+> 2.7.4
