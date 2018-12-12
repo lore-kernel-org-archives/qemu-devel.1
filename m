@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gWzdG-0000D8-Lq
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 03:12:41 -0500
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gWzdO-0000Iv-QV
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 03:12:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gWzcz-0007xa-Sx
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 03:12:34 -0500
-Received: from mga09.intel.com ([134.134.136.24]:14548)
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gWzdL-0008Cs-Mn
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 03:12:46 -0500
+Received: from mga07.intel.com ([134.134.136.100]:54434)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1gWzcz-0007x2-K9
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 03:12:21 -0500
+	id 1gWzdL-0008Bn-Dr
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 03:12:43 -0500
 From: Zhang Yi <yi.z.zhang@linux.intel.com>
-Date: Wed, 12 Dec 2018 16:12:11 +0800
-Message-Id: <51ba6d7d0333a5517d824a870dd20887156dd15a.1544598069.git.yi.z.zhang@linux.intel.com>
+Date: Wed, 12 Dec 2018 16:12:33 +0800
+Message-Id: <62a8796330b86f9f6571e48755d718db11855a6b.1544598069.git.yi.z.zhang@linux.intel.com>
 In-Reply-To: <cover.1544598069.git.yi.z.zhang@linux.intel.com>
 References: <cover.1544598069.git.yi.z.zhang@linux.intel.com>
-Subject: [Qemu-devel] [PATCH V6 1/6] numa: Fixed the memory leak of numa
- error message
+Subject: [Qemu-devel] [PATCH V6 2/6] util/mmap-alloc: switch qemu_ram_mmap()
+ to 'flags' parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,27 +28,135 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: xiaoguangrong.eric@gmail.com, dan.j.williams@intel.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com
 Cc: mst@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, ehabkost@redhat.com, Zhang Yi <yi.z.zhang@linux.intel.com>
 
-object_get_canonical_path_component() returns a string which
-must be freed using g_free().
+As more flag parameters besides the existing 'shared' are going to be
+added to qemu_ram_mmap(), let's switch 'shared' to a 'flags' parameter
+in advance, so as to ease the further additions.
 
+Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
 Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-Reviewed-by: Pankaj gupta <pagupta@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- numa.c | 1 +
- 1 file changed, 1 insertion(+)
+ exec.c                    |  7 ++++---
+ include/qemu/mmap-alloc.h | 19 ++++++++++++++++++-
+ util/mmap-alloc.c         |  8 +++++---
+ util/oslib-posix.c        |  8 +++++++-
+ 4 files changed, 34 insertions(+), 8 deletions(-)
 
-diff --git a/numa.c b/numa.c
-index 50ec016..3875e1e 100644
---- a/numa.c
-+++ b/numa.c
-@@ -533,6 +533,7 @@ void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
-             error_report("memory backend %s is used multiple times. Each "
-                          "-numa option must use a different memdev value.",
-                          path);
-+            g_free(path);
-             exit(1);
-         }
+diff --git a/exec.c b/exec.c
+index bb6170d..e92a7da 100644
+--- a/exec.c
++++ b/exec.c
+@@ -1810,6 +1810,7 @@ static void *file_ram_alloc(RAMBlock *block,
+                             ram_addr_t memory,
+                             int fd,
+                             bool truncate,
++                            uint32_t flags,
+                             Error **errp)
+ {
+     void *area;
+@@ -1859,8 +1860,7 @@ static void *file_ram_alloc(RAMBlock *block,
+         perror("ftruncate");
+     }
  
+-    area = qemu_ram_mmap(fd, memory, block->mr->align,
+-                         block->flags & RAM_SHARED);
++    area = qemu_ram_mmap(fd, memory, block->mr->align, flags);
+     if (area == MAP_FAILED) {
+         error_setg_errno(errp, errno,
+                          "unable to map backing store for guest RAM");
+@@ -2279,7 +2279,8 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+     new_block->used_length = size;
+     new_block->max_length = size;
+     new_block->flags = ram_flags;
+-    new_block->host = file_ram_alloc(new_block, size, fd, !file_size, errp);
++    new_block->host = file_ram_alloc(new_block, size, fd, !file_size,
++            ram_flags, errp);
+     if (!new_block->host) {
+         g_free(new_block);
+         return NULL;
+diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
+index 50385e3..6fe6ed4 100644
+--- a/include/qemu/mmap-alloc.h
++++ b/include/qemu/mmap-alloc.h
+@@ -7,7 +7,24 @@ size_t qemu_fd_getpagesize(int fd);
+ 
+ size_t qemu_mempath_getpagesize(const char *mem_path);
+ 
+-void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared);
++/**
++ * qemu_ram_mmap: mmap the specified file or device.
++ *
++ * Parameters:
++ *  @fd: the file or the device to mmap
++ *  @size: the number of bytes to be mmaped
++ *  @align: if not zero, specify the alignment of the starting mapping address;
++ *          otherwise, the alignment in use will be determined by QEMU.
++ *  @flags: specifies additional properties of the mapping, which can be one or
++ *          bit-or of following values
++ *          - RAM_SHARED: mmap with MAP_SHARED flag
++ *          Other bits are ignored.
++ *
++ * Return:
++ *  On success, return a pointer to the mapped area.
++ *  On failure, return MAP_FAILED.
++ */
++void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags);
+ 
+ void qemu_ram_munmap(void *ptr, size_t size);
+ 
+diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+index fd329ec..8f0a740 100644
+--- a/util/mmap-alloc.c
++++ b/util/mmap-alloc.c
+@@ -13,6 +13,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu/mmap-alloc.h"
+ #include "qemu/host-utils.h"
++#include "exec/memory.h"
+ 
+ #define HUGETLBFS_MAGIC       0x958458f6
+ 
+@@ -75,7 +76,7 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
+     return getpagesize();
+ }
+ 
+-void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
++void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags)
+ {
+     /*
+      * Note: this always allocates at least one extra page of virtual address
+@@ -92,11 +93,12 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
+      * anonymous memory is OK.
+      */
+     int anonfd = fd == -1 || qemu_fd_getpagesize(fd) == getpagesize() ? -1 : fd;
+-    int flags = anonfd == -1 ? MAP_ANONYMOUS : MAP_NORESERVE;
+-    void *ptr = mmap(0, total, PROT_NONE, flags | MAP_PRIVATE, anonfd, 0);
++    int mmap_flags = anonfd == -1 ? MAP_ANONYMOUS : MAP_NORESERVE;
++    void *ptr = mmap(0, total, PROT_NONE, mmap_flags | MAP_PRIVATE, anonfd, 0);
+ #else
+     void *ptr = mmap(0, total, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+ #endif
++    bool shared = flags & RAM_SHARED;
+     size_t offset;
+     void *ptr1;
+ 
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index fbd0dc8..121c31f 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -203,7 +203,13 @@ void *qemu_memalign(size_t alignment, size_t size)
+ void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment, bool shared)
+ {
+     size_t align = QEMU_VMALLOC_ALIGN;
+-    void *ptr = qemu_ram_mmap(-1, size, align, shared);
++    uint32_t flags = 0;
++    void *ptr;
++
++    if (shared) {
++        flags = MAP_SHARED;
++    }
++    ptr = qemu_ram_mmap(-1, size, align, flags);
+ 
+     if (ptr == MAP_FAILED) {
+         return NULL;
 -- 
 2.7.4
