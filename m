@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gX823-0006l8-Hp
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:10:48 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gX83E-0007Ju-PX
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:12:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gX820-0002Pt-CS
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:10:47 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:53364)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1gX820-0002PC-58
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:10:44 -0500
-Received: by mail-wm1-x342.google.com with SMTP id y1so6512245wmi.3
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:10:43 -0800 (PST)
-References: <20181212114726.24060-1-ppandit@redhat.com>
-	<20181212114726.24060-3-ppandit@redhat.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <d10a4009-7d52-bc5f-45e8-8c7ba5bf4055@gmail.com>
-Date: Wed, 12 Dec 2018 19:10:42 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1gX83A-00038P-6H
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:12:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37322)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gX839-00037j-UZ
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:11:56 -0500
+Date: Wed, 12 Dec 2018 15:11:51 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181212171151.GW7141@habkost.net>
+References: <20181211205346.11118-1-ehabkost@redhat.com>
+	<20181211205346.11118-5-ehabkost@redhat.com>
+	<c4bdc91b-3946-0345-bb57-f3e2e71b9ae3@amd.com>
+	<20181212170110.GJ31033@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181212114726.24060-3-ppandit@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v1 2/6] pvrdma: add uar_read routine
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181212170110.GJ31033@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 4/4] i386: Add "stibp" flag name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,52 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>, Yuval Shaia <yuval.shaia@oracle.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Saar Amar <saaramar5@gmail.com>, Li Qiang <liq3ea@163.com>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, Peter Maydell <peter.maydell@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Hi Prasad,
+On Wed, Dec 12, 2018 at 05:01:10PM +0000, Daniel P. Berrang=E9 wrote:
+> On Wed, Dec 12, 2018 at 04:57:42PM +0000, Lendacky, Thomas wrote:
+> > On 12/11/2018 02:53 PM, Eduardo Habkost wrote:
+> > > The STIBP flag may be supported by the host KVM module, so QEMU
+> > > can allow it to be configured manually, and it can be exposed to
+> > > guests when using "-cpu host".
+> > >=20
+> > > No additional migration code is required because the whole
+> > > contents of spec_ctrl is already migrated in the "cpu/spec_ctrl"
+> > > section.
+> > >=20
+> > > Corresponding KVM patch was submitted at:
+> > > https://lore.kernel.org/lkml/20181205191956.31480-1-ehabkost@redhat=
+.com/
+> > >=20
+> > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > > Message-Id: <20181210180250.31299-1-ehabkost@redhat.com>
+> > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > > ---
+> > >  target/i386/cpu.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >=20
+> > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > > index 86a934d450..12f559b6af 100644
+> > > --- a/target/i386/cpu.c
+> > > +++ b/target/i386/cpu.c
+> > > @@ -1042,7 +1042,7 @@ static FeatureWordInfo feature_word_info[FEAT=
+URE_WORDS] =3D {
+> > >              NULL, NULL, NULL, NULL,
+> > >              NULL, NULL, "pconfig", NULL,
+> > >              NULL, NULL, NULL, NULL,
+> > > -            NULL, NULL, "spec-ctrl", NULL,
+> > > +            NULL, NULL, "spec-ctrl", "stibp",
+> >=20
+> > I guess I missed this earlier. Is there a corresponding patch for the=
+ AMD
+> > STIBP bit (CPUID 0x80000008_EBX[15]) that is in KVM?
+>=20
+> This Intel STIBP patch is one that many distros have carried downstream
+> since the flaw came to light.
+>=20
+> I've not seen any equiv patch for AMD STIBP bit, in either QMEU or libv=
+irt,
+> so guess that's a gap that needs filling.
 
+I can submit a "amd-stibp" patch for completeness, although I
+doubt many people will actually use the flag.
 
-On 12/12/18 1:47 PM, P J P wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
->
-> Define skeleton 'uar_read' routine. Avoid NULL dereference.
->
-> Reported-by: Li Qiang <liq3ea@163.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> ---
->   hw/rdma/vmw/pvrdma_main.c | 6 ++++++
->   1 file changed, 6 insertions(+)
->
-> diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-> index 23dc9926e3..8a03ab4669 100644
-> --- a/hw/rdma/vmw/pvrdma_main.c
-> +++ b/hw/rdma/vmw/pvrdma_main.c
-> @@ -448,6 +448,11 @@ static const MemoryRegionOps regs_ops = {
->       },
->   };
->   
-> +static uint64_t uar_read(void *opaque, hwaddr addr, unsigned size)
-> +{
-> +    return 0;
-
-The PCI read operation should fail if the read op is  not implemented.
-Please use  "return 0xffffffff" to emulate the PCI read failure.
-(0 is a successfully read)
-
-Thanks,
-Marcel
-
-> +}
-> +
->   static void uar_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
->   {
->       PVRDMADev *dev = opaque;
-> @@ -489,6 +494,7 @@ static void uar_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
->   }
->   
->   static const MemoryRegionOps uar_ops = {
-> +    .read = uar_read,
->       .write = uar_write,
->       .endianness = DEVICE_LITTLE_ENDIAN,
->       .impl = {
+--=20
+Eduardo
