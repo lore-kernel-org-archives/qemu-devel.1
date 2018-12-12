@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gX4Yb-0002RJ-MK
+	(envelope-from <kwolf@redhat.com>) id 1gX4Yb-0002RD-Kk
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:28:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gX4Ya-00014E-FJ
+	(envelope-from <kwolf@redhat.com>) id 1gX4Ya-00013p-E7
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:28:09 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 12 Dec 2018 14:27:03 +0100
-Message-Id: <20181212132735.16080-10-kwolf@redhat.com>
+Date: Wed, 12 Dec 2018 14:27:00 +0100
+Message-Id: <20181212132735.16080-7-kwolf@redhat.com>
 In-Reply-To: <20181212132735.16080-1-kwolf@redhat.com>
 References: <20181212132735.16080-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 09/41] qcow2: move decompression from
- qcow2-cluster.c to qcow2.c
+Subject: [Qemu-devel] [PULL 06/41] block/backup: drop unused synchronization
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,202 +27,95 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Compression is done in threads in qcow2.c. We want to do decompression
-in the same way, so, firstly, move it to the same file.
-
-The only change is braces around if-body in decompress_buffer, to
-satisfy checkpatch.
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/qcow2-cluster.c | 70 ------------------------------------------
- block/qcow2.c         | 71 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 71 insertions(+), 70 deletions(-)
+ include/block/block_backup.h | 13 ------------
+ block/backup.c               | 38 +++++++-----------------------------
+ 2 files changed, 7 insertions(+), 44 deletions(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index d37fe08b3d..e2737429f5 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -1571,76 +1571,6 @@ again:
-     return 0;
+diff --git a/include/block/block_backup.h b/include/block/block_backup.h
+index 994a3bd2ec..157596c296 100644
+--- a/include/block/block_backup.h
++++ b/include/block/block_backup.h
+@@ -20,19 +20,6 @@
+=20
+ #include "block/block_int.h"
+=20
+-typedef struct CowRequest {
+-    int64_t start_byte;
+-    int64_t end_byte;
+-    QLIST_ENTRY(CowRequest) list;
+-    CoQueue wait_queue; /* coroutines blocked on this request */
+-} CowRequest;
+-
+-void backup_wait_for_overlapping_requests(BlockJob *job, int64_t offset,
+-                                          uint64_t bytes);
+-void backup_cow_request_begin(CowRequest *req, BlockJob *job,
+-                              int64_t offset, uint64_t bytes);
+-void backup_cow_request_end(CowRequest *req);
+-
+ void backup_do_checkpoint(BlockJob *job, Error **errp);
+=20
+ #endif
+diff --git a/block/backup.c b/block/backup.c
+index 4d084f6ca6..b829b251eb 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -28,6 +28,13 @@
+=20
+ #define BACKUP_CLUSTER_SIZE_DEFAULT (1 << 16)
+=20
++typedef struct CowRequest {
++    int64_t start_byte;
++    int64_t end_byte;
++    QLIST_ENTRY(CowRequest) list;
++    CoQueue wait_queue; /* coroutines blocked on this request */
++} CowRequest;
++
+ typedef struct BackupBlockJob {
+     BlockJob common;
+     BlockBackend *target;
+@@ -322,37 +329,6 @@ void backup_do_checkpoint(BlockJob *job, Error **err=
+p)
+     hbitmap_set(backup_job->copy_bitmap, 0, len);
  }
 =20
--static int decompress_buffer(uint8_t *out_buf, int out_buf_size,
--                             const uint8_t *buf, int buf_size)
+-void backup_wait_for_overlapping_requests(BlockJob *job, int64_t offset,
+-                                          uint64_t bytes)
 -{
--    z_stream strm1, *strm =3D &strm1;
--    int ret, out_len;
+-    BackupBlockJob *backup_job =3D container_of(job, BackupBlockJob, com=
+mon);
+-    int64_t start, end;
 -
--    memset(strm, 0, sizeof(*strm));
+-    assert(block_job_driver(job) =3D=3D &backup_job_driver);
 -
--    strm->next_in =3D (uint8_t *)buf;
--    strm->avail_in =3D buf_size;
--    strm->next_out =3D out_buf;
--    strm->avail_out =3D out_buf_size;
--
--    ret =3D inflateInit2(strm, -12);
--    if (ret !=3D Z_OK)
--        return -1;
--    ret =3D inflate(strm, Z_FINISH);
--    out_len =3D strm->next_out - out_buf;
--    if ((ret !=3D Z_STREAM_END && ret !=3D Z_BUF_ERROR) ||
--        out_len !=3D out_buf_size) {
--        inflateEnd(strm);
--        return -1;
--    }
--    inflateEnd(strm);
--    return 0;
+-    start =3D QEMU_ALIGN_DOWN(offset, backup_job->cluster_size);
+-    end =3D QEMU_ALIGN_UP(offset + bytes, backup_job->cluster_size);
+-    wait_for_overlapping_requests(backup_job, start, end);
 -}
 -
--int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offs=
-et)
+-void backup_cow_request_begin(CowRequest *req, BlockJob *job,
+-                              int64_t offset, uint64_t bytes)
 -{
--    BDRVQcow2State *s =3D bs->opaque;
--    int ret, csize, nb_csectors, sector_offset;
--    uint64_t coffset;
+-    BackupBlockJob *backup_job =3D container_of(job, BackupBlockJob, com=
+mon);
+-    int64_t start, end;
 -
--    coffset =3D cluster_offset & s->cluster_offset_mask;
--    if (s->cluster_cache_offset !=3D coffset) {
--        nb_csectors =3D ((cluster_offset >> s->csize_shift) & s->csize_m=
-ask) + 1;
--        sector_offset =3D coffset & 511;
--        csize =3D nb_csectors * 512 - sector_offset;
+-    assert(block_job_driver(job) =3D=3D &backup_job_driver);
 -
--        /* Allocate buffers on first decompress operation, most images a=
-re
--         * uncompressed and the memory overhead can be avoided.  The buf=
-fers
--         * are freed in .bdrv_close().
--         */
--        if (!s->cluster_data) {
--            /* one more sector for decompressed data alignment */
--            s->cluster_data =3D qemu_try_blockalign(bs->file->bs,
--                    QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size + 512);
--            if (!s->cluster_data) {
--                return -ENOMEM;
--            }
--        }
--        if (!s->cluster_cache) {
--            s->cluster_cache =3D g_malloc(s->cluster_size);
--        }
--
--        BLKDBG_EVENT(bs->file, BLKDBG_READ_COMPRESSED);
--        ret =3D bdrv_read(bs->file, coffset >> 9, s->cluster_data,
--                        nb_csectors);
--        if (ret < 0) {
--            return ret;
--        }
--        if (decompress_buffer(s->cluster_cache, s->cluster_size,
--                              s->cluster_data + sector_offset, csize) < =
-0) {
--            return -EIO;
--        }
--        s->cluster_cache_offset =3D coffset;
--    }
--    return 0;
+-    start =3D QEMU_ALIGN_DOWN(offset, backup_job->cluster_size);
+-    end =3D QEMU_ALIGN_UP(offset + bytes, backup_job->cluster_size);
+-    cow_request_begin(req, backup_job, start, end);
 -}
 -
- /*
-  * This discards as many clusters of nb_clusters as possible at once (i.=
-e.
-  * all clusters in the same L2 slice) and returns the number of discarde=
-d
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 0c1569f715..d4d141c495 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3762,6 +3762,34 @@ static ssize_t qcow2_compress(void *dest, size_t d=
-est_size,
-     return ret;
- }
-=20
-+static int decompress_buffer(uint8_t *out_buf, int out_buf_size,
-+                             const uint8_t *buf, int buf_size)
-+{
-+    z_stream strm1, *strm =3D &strm1;
-+    int ret, out_len;
-+
-+    memset(strm, 0, sizeof(*strm));
-+
-+    strm->next_in =3D (uint8_t *)buf;
-+    strm->avail_in =3D buf_size;
-+    strm->next_out =3D out_buf;
-+    strm->avail_out =3D out_buf_size;
-+
-+    ret =3D inflateInit2(strm, -12);
-+    if (ret !=3D Z_OK) {
-+        return -1;
-+    }
-+    ret =3D inflate(strm, Z_FINISH);
-+    out_len =3D strm->next_out - out_buf;
-+    if ((ret !=3D Z_STREAM_END && ret !=3D Z_BUF_ERROR) ||
-+        out_len !=3D out_buf_size) {
-+        inflateEnd(strm);
-+        return -1;
-+    }
-+    inflateEnd(strm);
-+    return 0;
-+}
-+
- #define MAX_COMPRESS_THREADS 4
-=20
- typedef struct Qcow2CompressData {
-@@ -3915,6 +3943,49 @@ fail:
-     return ret;
- }
-=20
-+int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offs=
-et)
-+{
-+    BDRVQcow2State *s =3D bs->opaque;
-+    int ret, csize, nb_csectors, sector_offset;
-+    uint64_t coffset;
-+
-+    coffset =3D cluster_offset & s->cluster_offset_mask;
-+    if (s->cluster_cache_offset !=3D coffset) {
-+        nb_csectors =3D ((cluster_offset >> s->csize_shift) & s->csize_m=
-ask) + 1;
-+        sector_offset =3D coffset & 511;
-+        csize =3D nb_csectors * 512 - sector_offset;
-+
-+        /* Allocate buffers on first decompress operation, most images a=
-re
-+         * uncompressed and the memory overhead can be avoided.  The buf=
-fers
-+         * are freed in .bdrv_close().
-+         */
-+        if (!s->cluster_data) {
-+            /* one more sector for decompressed data alignment */
-+            s->cluster_data =3D qemu_try_blockalign(bs->file->bs,
-+                    QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size + 512);
-+            if (!s->cluster_data) {
-+                return -ENOMEM;
-+            }
-+        }
-+        if (!s->cluster_cache) {
-+            s->cluster_cache =3D g_malloc(s->cluster_size);
-+        }
-+
-+        BLKDBG_EVENT(bs->file, BLKDBG_READ_COMPRESSED);
-+        ret =3D bdrv_read(bs->file, coffset >> 9, s->cluster_data,
-+                        nb_csectors);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+        if (decompress_buffer(s->cluster_cache, s->cluster_size,
-+                              s->cluster_data + sector_offset, csize) < =
-0) {
-+            return -EIO;
-+        }
-+        s->cluster_cache_offset =3D coffset;
-+    }
-+    return 0;
-+}
-+
- static int make_completely_empty(BlockDriverState *bs)
+-void backup_cow_request_end(CowRequest *req)
+-{
+-    cow_request_end(req);
+-}
+-
+ static void backup_drain(BlockJob *job)
  {
-     BDRVQcow2State *s =3D bs->opaque;
+     BackupBlockJob *s =3D container_of(job, BackupBlockJob, common);
 --=20
 2.19.2
