@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gX0ad-00087F-LJ
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:14:00 -0500
+	(envelope-from <thuth@redhat.com>) id 1gX0ae-00087v-Ju
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:14:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gX0aa-00043y-Fb
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:13:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55306)
+	(envelope-from <thuth@redhat.com>) id 1gX0ad-00045g-KQ
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:14:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47706)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gX0aa-00043T-8q
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:13:56 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gX0ad-00045E-CJ
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:13:59 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 12 Dec 2018 10:13:44 +0100
-Message-Id: <1544606032-16924-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/8] Set minimum compiler versions to GCC 4.8
- and Clang 3.4
+Date: Wed, 12 Dec 2018 10:13:47 +0100
+Message-Id: <1544606032-16924-4-git-send-email-thuth@redhat.com>
+In-Reply-To: <1544606032-16924-1-git-send-email-thuth@redhat.com>
+References: <1544606032-16924-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PULL 3/8] configure: Remove old -fno-gcse workaround
+ for GCC 4.6.x and 4.7.[012]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +27,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-devel@nongnu.org
 
- Hi Peter,
+Now that we require at least GCC 4.8, we don't need this als workaround
+for 4.6 and 4.7 anymore.
 
-the following changes since commit bb9bf94b3e8926553290bc9a7cb84315af4220=
-86:
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ Makefile.target |  3 ---
+ configure       | 17 +----------------
+ 2 files changed, 1 insertion(+), 19 deletions(-)
 
-  Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-r=
-equest' into staging (2018-12-11 19:18:58 +0000)
-
-are available in the git repository at:
-
-  https://gitlab.com/huth/qemu.git tags/pull-request-2018-12-12
-
-for you to fetch changes up to 2b4c1125ac3db2734222ff43c25388a16aca4a99:
-
-  i2c: Move typedef of bitbang_i2c_interface to i2c.h (2018-12-12 10:01:1=
-3 +0100)
-
-----------------------------------------------------------------
-Explicitly check for minimum compiler versions.
-Remove obsolete code for old compilers that is now not required anymore.
-Fix a duplicated typedef for Clang 3.4.
-----------------------------------------------------------------
-
-BALATON Zoltan (1):
-      i2c: Move typedef of bitbang_i2c_interface to i2c.h
-
-Thomas Huth (7):
-      configure: Add a test for the minimum compiler version
-      configure: Remove obsolete check for Clang < 3.2
-      configure: Remove old -fno-gcse workaround for GCC 4.6.x and 4.7.[0=
-12]
-      tcg/tcg.h: Remove GCC check for tcg_debug_assert() macro
-      audio/alsaaudio: Remove compiler check around pragma
-      includes: Replace QEMU_GNUC_PREREQ with "__has_builtin || !defined(=
-__clang__)"
-      Remove QEMU_ARTIFICIAL macro
-
- Makefile.target             |  3 ---
- audio/alsaaudio.c           |  2 --
- configure                   | 47 +++++++++++++++++++++++++--------------=
-------
- hw/i2c/bitbang_i2c.h        |  2 --
- include/hw/i2c/i2c.h        |  2 ++
- include/hw/i2c/ppc4xx_i2c.h |  3 ---
- include/qemu/compiler.h     |  8 +-------
- include/qemu/host-utils.h   |  4 ++--
- scripts/checkpatch.pl       |  1 -
- scripts/cocci-macro-file.h  |  1 -
- tcg/tcg.h                   |  4 +---
- 11 files changed, 32 insertions(+), 45 deletions(-)
+diff --git a/Makefile.target b/Makefile.target
+index 4d56298..44ec4b6 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -158,9 +158,6 @@ GENERATED_FILES += hmp-commands.h hmp-commands-info.h
+ 
+ endif # CONFIG_SOFTMMU
+ 
+-# Workaround for http://gcc.gnu.org/PR55489, see configure.
+-%/translate.o: QEMU_CFLAGS += $(TRANSLATE_OPT_CFLAGS)
+-
+ dummy := $(call unnest-vars,,obj-y)
+ all-obj-y := $(obj-y)
+ 
+diff --git a/configure b/configure
+index ca364f6..0886f45 100755
+--- a/configure
++++ b/configure
+@@ -1936,21 +1936,7 @@ else
+   QEMU_CFLAGS="$QEMU_CFLAGS -Wno-missing-braces"
+ fi
+ 
+-# Workaround for http://gcc.gnu.org/PR55489.  Happens with -fPIE/-fPIC and
+-# large functions that use global variables.  The bug is in all releases of
+-# GCC, but it became particularly acute in 4.6.x and 4.7.x.  It is fixed in
+-# 4.7.3 and 4.8.0.  We should be able to delete this at the end of 2013.
+-cat > $TMPC << EOF
+-#if __GNUC__ == 4 && (__GNUC_MINOR__ == 6 || (__GNUC_MINOR__ == 7 && __GNUC_PATCHLEVEL__ <= 2))
+-int main(void) { return 0; }
+-#else
+-#error No bug in this compiler.
+-#endif
+-EOF
+-if compile_prog "-Werror -fno-gcse" "" ; then
+-  TRANSLATE_OPT_CFLAGS=-fno-gcse
+-fi
+-
++# Static linking is not possible with modules or PIE
+ if test "$static" = "yes" ; then
+   if test "$modules" = "yes" ; then
+     error_exit "static and modules are mutually incompatible"
+@@ -6983,7 +6969,6 @@ echo "LIBS_QGA+=$libs_qga" >> $config_host_mak
+ echo "TASN1_LIBS=$tasn1_libs" >> $config_host_mak
+ echo "TASN1_CFLAGS=$tasn1_cflags" >> $config_host_mak
+ echo "POD2MAN=$POD2MAN" >> $config_host_mak
+-echo "TRANSLATE_OPT_CFLAGS=$TRANSLATE_OPT_CFLAGS" >> $config_host_mak
+ if test "$gcov" = "yes" ; then
+   echo "CONFIG_GCOV=y" >> $config_host_mak
+   echo "GCOV=$gcov_tool" >> $config_host_mak
+-- 
+1.8.3.1
