@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gX4ib-0002Xq-RM
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:38:31 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gX4lj-0005Jk-EJ
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:41:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gX4iY-0008Vi-EV
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:38:29 -0500
-Date: Wed, 12 Dec 2018 14:38:09 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181212133809.evtizdym6awwkw7f@sirius.home.kraxel.org>
-References: <20181207160806.13569-1-mark.cave-ayland@ilande.co.uk>
-	<20181207160806.13569-3-mark.cave-ayland@ilande.co.uk>
-	<20181212083250.56xfzy5j4t4o6ale@sirius.home.kraxel.org>
-	<f7fb9204-bfc1-f27b-d66c-51e650a30cd5@ilande.co.uk>
+	(envelope-from <cohuck@redhat.com>) id 1gX4li-0002Dt-8l
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:41:43 -0500
+Date: Wed, 12 Dec 2018 14:41:32 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181212144132.41a1409d.cohuck@redhat.com>
+In-Reply-To: <5c491972-5210-5ac6-6023-7365fb24dc3f@redhat.com>
+References: <1544135058-21380-1-git-send-email-walling@linux.ibm.com>
+	<1544135058-21380-3-git-send-email-walling@linux.ibm.com>
+	<20181207130853.20506345.cohuck@redhat.com>
+	<dbabb43d-01e7-d221-a761-ad5a53fd8f94@linux.ibm.com>
+	<aff40d67-9fcb-43fb-beeb-1dbe7a1e22f3@linux.ibm.com>
+	<5c491972-5210-5ac6-6023-7365fb24dc3f@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f7fb9204-bfc1-f27b-d66c-51e650a30cd5@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 2/3] mac_newworld: enable access to EDID
- data for the VGA device
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 2/3] s390: cpu feature for
+ diagnose 318 andlimit max VCPUs to 247
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +28,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: David Hildenbrand <david@redhat.com>
+Cc: Collin Walling <walling@linux.ibm.com>, thuth@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
 
-On Wed, Dec 12, 2018 at 08:54:37AM +0000, Mark Cave-Ayland wrote:
-> On 12/12/2018 08:32, Gerd Hoffmann wrote:
+On Wed, 12 Dec 2018 12:20:08 +0100
+David Hildenbrand <david@redhat.com> wrote:
+
+> On 11.12.18 22:12, Collin Walling wrote:
+> > On 12/11/18 11:47 AM, Collin Walling wrote:  
+> >> On 12/7/18 7:08 AM, Cornelia Huck wrote:  
+> >>> On Thu,  6 Dec 2018 17:24:17 -0500
+> >>> Collin Walling <walling@linux.ibm.com> wrote:
+> >>>  
+> >>>> Diagnose 318 is a new z14.2 CPU feature. Since we are able to emulate
+> >>>> it entirely via KVM, we can add guest support for earlier models. A
+> >>>> new CPU feature for diagnose 318 (shortened to diag318) will be made
+> >>>> available to guests starting with the zEC12-full CPU model.
+> >>>>
+> >>>> The z14.2 adds a new read SCP info byte (let's call it byte 134) to
+> >>>> detect the availability of diag318. Because of this, we have room for
+> >>>> one less VCPU and thus limit the max VPUs supported in a configuration
+> >>>> to 247 (down from 248).
+> >>>>
+> >>>> Signed-off-by: Collin Walling <walling@linux.ibm.com>.
+> >>>> ---
+> >>>>  hw/s390x/sclp.c                 | 2 ++
+> >>>>  include/hw/s390x/sclp.h         | 2 ++
+> >>>>  target/s390x/cpu.h              | 2 +-
+> >>>>  target/s390x/cpu_features.c     | 3 +++
+> >>>>  target/s390x/cpu_features.h     | 1 +
+> >>>>  target/s390x/cpu_features_def.h | 3 +++
+> >>>>  target/s390x/gen-features.c     | 1 +
+> >>>>  target/s390x/kvm.c              | 1 +
+> >>>>  8 files changed, 14 insertions(+), 1 deletion(-)
+> >>>>  
+> >>>  
+> >>>> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> >>>> index 8c2320e..594b4a4 100644
+> >>>> --- a/target/s390x/cpu.h
+> >>>> +++ b/target/s390x/cpu.h
+> >>>> @@ -52,7 +52,7 @@
+> >>>>  
+> >>>>  #define MMU_USER_IDX 0
+> >>>>  
+> >>>> -#define S390_MAX_CPUS 248
+> >>>> +#define S390_MAX_CPUS 247  
+> >>>
+> >>> Isn't that already problematic if you try to migrate from an older QEMU
+> >>> with all possible vcpus defined? IOW, don't you really need a way that
+> >>> older machines can still run with one more vcpu?
+> >>>  
+> >>
+> >> Good call. I'll run some tests on this and see what happens. I'll report
+> >> here on those results.
+> >>  
+> > 
+> > Migrating to a machine that supports less vCPUs will report
+> > 
+> > error: unsupported configuration: Maximum CPUs greater than specified machine type limit
+> > 
+> > I revisited the code to see if there's a way to dynamically set the max vcpu count based 
+> > on the read scp info size, but it gets really tricky and code looks very complicated.
+> > (Having a packed struct contain the CPU entries whose maximum is determined by hardware
+> > limitations makes things difficult -- but who said s390 is easy? :) )
+> > 
+> > In reality, do we often have guests running with 248 or even 247 vcpus? If so, I imagine
+> > the performance isn't too significant?  
+> Gluing CPU feature availability to machines is plain ugly. This sounds
+> like going back to pre-cpu model times ;)
 > 
-> > On Fri, Dec 07, 2018 at 04:08:05PM +0000, Mark Cave-Ayland wrote:
-> >> This is in preparation for some upcoming QEMU NDRV driver changes that pass
-> >> display information from the host to the guest.
-> > 
-> >> -    pci_vga_init(pci_bus);
-> >> +    dev = qdev_create(BUS(pci_bus), "VGA");
-> >> +    qdev_prop_set_int32(dev, "addr", -1);
-> >> +    qdev_prop_set_bit(dev, "edid", true);
-> >> +    qdev_init_nofail(dev);
-> > 
-> > Hmm.  IMO you should not overwrite the device defaults here.
-> > 
-> > edid is off by default only because it is new and I'm conservative.
-> > I want a release (or two) with it being available for user testing.
-> > If no issues pop up flip it to default on.
+> There are two alternatives:
 > 
-> Oh, okay. I already have some unreleased guest code that makes use of this, so my
-> questions would be: how can EDID be enabled from the command line for in-built VGA
-> devices,
+> a) Don't model it as a CPU feature in QEMU. Glue it completely to the
+> QEMU machine. This goes hand-in-hand with the proposal I made in the KVM
+> thread, that diag318 is to be handled completely in QEMU, always. The
+> KVM setting part is optional (if KVM + HW support it).
+> 
+> Then we can have two different max_cpus/ReadInfo layouts based on the
+> machine type. No need to worry about QEMU cpu features.
+> 
+> Once we have other SCLP features (eventually requiring KVM/HW support)
+> announced in the same feature block, things might get more involved, but
+> I guess we could handle it somehow.
 
-"-global VGA.edid=on" should do.
+Perhaps via a capability to be enabled?
 
-> and how do I detect whether EDID support is present from the guest?
+> 
+> 
+> b) Glue the ReadInfo layout to the CPU feature, we would have to
+> default-disable the CPU feature for legacy machines. And bail out if
+> more CPUs are used when the feature is enabled. Hairy.
+> 
+> 
+> I guess a) would be the best thing to do. After all this really does not
+> sound like a CPU feature but more like a machine feature. But there is
+> usually a fine line between them.
 
-Check whenever the header is present.  The edid blob has a fixed 8 byte
-header (00 FF FF FF FF FF FF 00).  The linux kernel driver is lazy and
-checks the first two bytes only.
-
-> Otherwise a guest driver that assumes it is always present and tries
-> to read from that area of memory will crash.
-
-Oh, reading should work no matter what.  You just don't find valid edid
-data there if it is turned off.
-
-cheers,
-  Gerd
+a) sounds like the better option to me as well.
