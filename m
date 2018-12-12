@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gX8LB-0006yU-Hp
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:30:36 -0500
+	(envelope-from <lvivier@redhat.com>) id 1gX8LB-0006yV-IV
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:30:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gX8L6-000122-Go
+	(envelope-from <lvivier@redhat.com>) id 1gX8L8-00017p-Ex
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:30:33 -0500
 From: Laurent Vivier <lvivier@redhat.com>
-Date: Wed, 12 Dec 2018 18:30:03 +0100
-Message-Id: <20181212173007.11407-3-lvivier@redhat.com>
+Date: Wed, 12 Dec 2018 18:30:06 +0100
+Message-Id: <20181212173007.11407-6-lvivier@redhat.com>
 In-Reply-To: <20181212173007.11407-1-lvivier@redhat.com>
 References: <20181212173007.11407-1-lvivier@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 2/6] hw/dma/puv3_gpio: Convert from DPRINTF()
+Subject: [Qemu-devel] [PATCH 5/6] hw/timer/puv3_ost: Convert from DPRINTF()
  macro to trace event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,104 +27,84 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-trivial@no
 
 Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 ---
- Makefile.objs        |  1 +
- hw/gpio/puv3_gpio.c  | 15 +++++++--------
- hw/gpio/trace-events |  6 ++++++
- 3 files changed, 14 insertions(+), 8 deletions(-)
- create mode 100644 hw/gpio/trace-events
+ hw/timer/puv3_ost.c   | 14 ++++++--------
+ hw/timer/trace-events |  7 +++++++
+ 2 files changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 1e1ff387d7..fbc3bad1e1 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -243,6 +243,7 @@ trace-events-subdirs +=3D hw/vfio
- trace-events-subdirs +=3D hw/virtio
- trace-events-subdirs +=3D hw/watchdog
- trace-events-subdirs +=3D hw/xen
-+trace-events-subdirs +=3D hw/gpio
- trace-events-subdirs +=3D io
- trace-events-subdirs +=3D linux-user
- trace-events-subdirs +=3D migration
-diff --git a/hw/gpio/puv3_gpio.c b/hw/gpio/puv3_gpio.c
-index 445afccf9f..1b52b2c291 100644
---- a/hw/gpio/puv3_gpio.c
-+++ b/hw/gpio/puv3_gpio.c
-@@ -11,9 +11,8 @@
- #include "qemu/osdep.h"
- #include "hw/hw.h"
+diff --git a/hw/timer/puv3_ost.c b/hw/timer/puv3_ost.c
+index 0b3d717e60..387b7a9bd1 100644
+--- a/hw/timer/puv3_ost.c
++++ b/hw/timer/puv3_ost.c
+@@ -12,9 +12,8 @@
  #include "hw/sysbus.h"
+ #include "hw/ptimer.h"
+ #include "qemu/main-loop.h"
 -
 -#undef DEBUG_PUV3
  #include "hw/unicore32/puv3.h"
 +#include "trace.h"
 =20
- #define TYPE_PUV3_GPIO "puv3_gpio"
- #define PUV3_GPIO(obj) OBJECT_CHECK(PUV3GPIOState, (obj), TYPE_PUV3_GPIO=
-)
-@@ -46,9 +45,9 @@ static uint64_t puv3_gpio_read(void *opaque, hwaddr off=
-set,
-         ret =3D s->reg_GPIR;
+ #define TYPE_PUV3_OST "puv3_ost"
+ #define PUV3_OST(obj) OBJECT_CHECK(PUV3OSTState, (obj), TYPE_PUV3_OST)
+@@ -51,9 +50,9 @@ static uint64_t puv3_ost_read(void *opaque, hwaddr offs=
+et,
+         ret =3D s->reg_OIER;
          break;
      default:
--        DPRINTF("Bad offset 0x%x\n", offset);
-+        trace_puv3_gpio_read_bad(offset);
+-        DPRINTF("Bad offset %x\n", (int)offset);
++        trace_puv3_ost_read_bad(offset);
      }
 -    DPRINTF("offset 0x%x, value 0x%x\n", offset, ret);
-+    trace_puv3_gpio_read(offset, ret);
-=20
++    trace_puv3_ost_read(offset, ret);
      return ret;
  }
-@@ -58,7 +57,7 @@ static void puv3_gpio_write(void *opaque, hwaddr offset=
-,
+=20
+@@ -62,7 +61,7 @@ static void puv3_ost_write(void *opaque, hwaddr offset,
  {
-     PUV3GPIOState *s =3D opaque;
+     PUV3OSTState *s =3D opaque;
 =20
 -    DPRINTF("offset 0x%x, value 0x%x\n", offset, value);
-+    trace_puv3_gpio_write(offset, value);
++    trace_puv3_ost_write(offset, value);
      switch (offset) {
-     case 0x04:
-         s->reg_GPDR =3D value;
-@@ -67,14 +66,14 @@ static void puv3_gpio_write(void *opaque, hwaddr offs=
-et,
-         if (s->reg_GPDR & value) {
-             s->reg_GPLR |=3D value;
-         } else {
--            DPRINTF("Write gpio input port error!");
-+            trace_puv3_gpio_write_error();
-         }
-         break;
-     case 0x0c:
-         if (s->reg_GPDR & value) {
-             s->reg_GPLR &=3D ~value;
-         } else {
--            DPRINTF("Write gpio input port error!");
-+            trace_puv3_gpio_write_error();
-         }
-         break;
-     case 0x10: /* GRER */
-@@ -85,7 +84,7 @@ static void puv3_gpio_write(void *opaque, hwaddr offset=
-,
-         s->reg_GPIR =3D value;
+     case 0x00: /* Match Register 0 */
+         s->reg_OSMR0 =3D value;
+@@ -85,7 +84,7 @@ static void puv3_ost_write(void *opaque, hwaddr offset,
+         s->reg_OIER =3D value;
          break;
      default:
--        DPRINTF("Bad offset 0x%x\n", offset);
-+        trace_puv3_gpio_write_bad(offset);
+-        DPRINTF("Bad offset %x\n", (int)offset);
++        trace_puv3_ost_write_bad(offset);
      }
  }
 =20
-diff --git a/hw/gpio/trace-events b/hw/gpio/trace-events
-new file mode 100644
-index 0000000000..5708899a79
---- /dev/null
-+++ b/hw/gpio/trace-events
-@@ -0,0 +1,6 @@
-+# hw/gpio/puv3_gpio.c
-+puv3_gpio_read_bad(unsigned offset) "Bad offset 0x%x"
-+puv3_gpio_read(unsigned offset, uint32_t value) "offset 0x%x, value 0x%x=
-"
-+puv3_gpio_write(unsigned offset, uint64_t value) "offset 0x%x, value 0x%=
-" PRIx64
-+puv3_gpio_write_error(void) "Write gpio input port error!"
-+puv3_gpio_write_bad(unsigned offset) "Bad offset 0x%x"
+@@ -103,8 +102,7 @@ static void puv3_ost_tick(void *opaque)
+ {
+     PUV3OSTState *s =3D opaque;
+=20
+-    DPRINTF("ost hit when ptimer counter from 0x%x to 0x%x!\n",
+-            s->reg_OSCR, s->reg_OSMR0);
++    trace_puv3_ost_tick(s->reg_OSCR, s->reg_OSMR0);
+=20
+     s->reg_OSCR =3D s->reg_OSMR0;
+     if (s->reg_OIER) {
+diff --git a/hw/timer/trace-events b/hw/timer/trace-events
+index 75bd3b1042..c504fd52c0 100644
+--- a/hw/timer/trace-events
++++ b/hw/timer/trace-events
+@@ -72,3 +72,10 @@ sun4v_rtc_write(uint64_t addr, uint64_t value) "write:=
+ addr 0x%" PRIx64 " value
+=20
+ # hw/timer/xlnx-zynqmp-rtc.c
+ xlnx_zynqmp_rtc_gettime(int year, int month, int day, int hour, int min,=
+ int sec) "Get time from host: %d-%d-%d %2d:%02d:%02d"
++
++# hw/timer/puv3_ost.c
++puv3_ost_read_bad(uint32_t offset) "Bad offset 0x%x"
++puv3_ost_read(uint32_t offset, uint32_t value) "offset 0x%x, value 0x%x"
++puv3_ost_write(uint32_t offset, uint64_t value) "offset 0x%x, value 0x%"=
+ PRIx64
++puv3_ost_write_bad(uint32_t offset) "Bad offset 0x%x"
++puv3_ost_tick(uint32_t oscr, uint32_t osmr0) "ost hit when ptimer counte=
+r from 0x%x to 0x%x!"
 --=20
 2.19.2
