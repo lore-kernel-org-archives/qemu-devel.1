@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6N9-0001NO-NN
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:28 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gX6Ob-0002fn-1U
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:25:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6N5-0000ga-VV
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:27 -0500
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:39692)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gX6N5-0000YH-MC
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:23 -0500
-Received: by mail-wr1-x436.google.com with SMTP id t27so18088871wra.6
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:24:10 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	u10sm15878859wrr.33.2018.12.12.07.24.07 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 12 Dec 2018 07:24:07 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1gX6OW-0001ia-48
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:25:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35468)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gX6OU-0001gC-4P
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:25:51 -0500
+References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
+	<1543851204-41186-23-git-send-email-pbonzini@redhat.com>
+	<f999872d-d940-7093-3c4c-f245e27c803f@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 12 Dec 2018 16:23:08 +0100
-Message-Id: <1544628195-37728-48-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
-References: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
+Message-ID: <217295f3-ca0e-af08-face-08144088e27d@redhat.com>
+Date: Wed, 12 Dec 2018 16:25:41 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 47/54] vhost-user-test: signal data_cond when
- s->rings changes
+In-Reply-To: <f999872d-d940-7093-3c4c-f245e27c803f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 22/71] tests/libqos: sdhci driver and
+ interface nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,37 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <laurent@vivier.eu>
 
-This speeds up wait_for_rings_started, which currently is just waiting for
-the timeout before checking s->rings.
+On 12/12/18 15:35, Philippe Mathieu-Daud=C3=A9 wrote:
+>> +}
+>> +
+>> +static void qsdhci_register_nodes(void)
+>> +{
+>> +    QPCIAddress addr =3D {
+>> +        .devfn =3D QPCI_DEVFN(4, 0),
+>> +        .vendor_id =3D PCI_VENDOR_ID_REDHAT,
+>> +        .device_id =3D PCI_DEVICE_ID_REDHAT_SDHCI,
+>> +    };
+>> +
+>> +    QOSGraphEdgeOptions opts =3D {
+>> +        .extra_device_opts =3D "addr=3D04.0",
+> Shouldn't this be formatted from the previous QPCIAddress?
+>=20
 
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <1543851204-41186-8-git-send-email-pbonzini@redhat.com>
----
- tests/vhost-user-test.c | 2 ++
- 1 file changed, 2 insertions(+)
+Maybe, but there isn't a way to couple the two for now.  A device
+address allocator is on the todo list. :)
 
-diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index 656e519..6a805e6 100644
---- a/tests/vhost-user-test.c
-+++ b/tests/vhost-user-test.c
-@@ -384,6 +384,7 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
- 
-         assert(msg.payload.state.index < s->queues * 2);
-         s->rings &= ~(0x1ULL << msg.payload.state.index);
-+        g_cond_broadcast(&s->data_cond);
-         break;
- 
-     case VHOST_USER_SET_MEM_TABLE:
-@@ -425,6 +426,7 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
-     case VHOST_USER_SET_VRING_BASE:
-         assert(msg.payload.state.index < s->queues * 2);
-         s->rings |= 0x1ULL << msg.payload.state.index;
-+        g_cond_broadcast(&s->data_cond);
-         break;
- 
-     case VHOST_USER_GET_QUEUE_NUM:
--- 
-1.8.3.1
+Paolo
