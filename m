@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gX0rL-0006Pn-RE
+	(envelope-from <bounces@canonical.com>) id 1gX0rL-0006Po-Sr
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gX0rJ-0005Ai-G9
+	(envelope-from <bounces@canonical.com>) id 1gX0rI-00059r-E6
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:15 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58672)
+Received: from indium.canonical.com ([91.189.90.7]:58540)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gX0rH-0004zt-Cs
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:12 -0500
+	id 1gX0rD-0004yy-OM
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:10 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gX0r8-0007Wd-Ir
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:31:02 +0000
+	id 1gX0r6-0007XN-S0
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:31:01 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9FE7D2E80DF
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:31:01 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 79A8E2E818A
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:30:59 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Dec 2018 09:17:37 -0000
-From: Thomas Huth <1793119@bugs.launchpad.net>
-Reply-To: Bug 1793119 <1793119@bugs.launchpad.net>
+Date: Wed, 12 Dec 2018 09:19:31 -0000
+From: Thomas Huth <1797033@bugs.launchpad.net>
+Reply-To: Bug 1797033 <1797033@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <153726785322.19300.9182114718255539260.malonedeb@wampee.canonical.com>
-Message-Id: <154460625718.23822.6085974060385294768.malone@soybean.canonical.com>
+References: <153914992284.15580.825215730676882564.malonedeb@gac.canonical.com>
+Message-Id: <154460637128.1185.12960525216607937606.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1793119] Re: Wrong floating-point emulation on
- AArch64 with FPCR set to zero
+Subject: [Qemu-devel] [Bug 1797033] Re: Running with -rtc clock=vm,
+ base=<datetime> introduces arbitrary base shift at guest startup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,70 +39,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D5dfbc9e4903c0121140f2
+Fix has been included here:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Deb6a52099160f1a6e66d7e
 
 ** Changed in: qemu
-       Status: Fix Committed =3D> Fix Released
+       Status: New =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1793119
+https://bugs.launchpad.net/bugs/1797033
 
 Title:
-  Wrong floating-point emulation on AArch64 with FPCR set to zero
+  Running with -rtc clock=3Dvm,base=3D<datetime> introduces arbitrary base
+  shift at guest startup
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  On AArch64, with FPCR set to Zero (i.e., FPU set to IEEE-754 compliant
-  mode), floating-point emulation does not produce the same results as
-  real hardware (e.g., Raspberry Pi 3 with AArch64 Linux).
+  When specifying 'base' for RTC to start with, it has incorrect
+  implementation in combination with clock=3Dvm.
 
-  I attached a sample that reproduces the issue. It divides `x` by `y`
-  and puts the result in `r`. The expected result of the operation is
-  `q`.
+  I inspected source code. This is because it uses host clock
+  (qemu_time() function return value) as reference with
+  'rtc_date_offset' operations across several places in code before
+  guest execution starts, which has no relevance with clock=3Dvm.
 
-  Output on real hardware:
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
-  fpcr =3D 0x07000000.
-  x =3D 0x03250f416dcdc6d0. y =3D 0x00029f4e5837c977. r =3D 0x7ff0000000000=
-000. q =3D 0x43300fde9cbcf023.
-  fpcr =3D 0x00000000.
-  x =3D 0x03250f416dcdc6d0. y =3D 0x00029f4e5837c977. r =3D 0x43300fde9cbcf=
-023. q =3D 0x43300fde9cbcf023.
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
+  It works in vast majority of cases only thanks to combination of some
+  luck and fast execution of qemu initialization phase relative to host
+  real time (i.e. multiple calls of qemu_time() returns same value). But
+  if qemu execution is being slow down by high CPU load on host or
+  started just before value of second changes, it may accumulate at
+  least 1 second (and in hard circumstances even 2+ seconds) of delay
+  from specified base datetime before guest becomes ready to start.
 
-  Notice that after setting FPCR to zero, `r` equals `q`.
-
-  Output on qemu 3.0.0 (Linux user-mode emulation):
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
-  fpcr =3D 0x07000000.
-  x =3D 0x03250f416dcdc6d0. y =3D 0x00029f4e5837c977. r =3D 0x7ff0000000000=
-000. q =3D 0x43300fde9cbcf023.
-  fpcr =3D 0x00000000.
-  x =3D 0x03250f416dcdc6d0. y =3D 0x00029f4e5837c977. r =3D 0x43300fde9cbcf=
-024. q =3D 0x43300fde9cbcf023.
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
-
-  Notice that after setting FPCR to zero, `r` is not equal to `q`.
-
-  Also notice that, using another proprietary operating system, the same
-  issue arises between a real board and QEMU. This might be an issue in
-  emulation of the AArch64 instruction "fdiv".
-
-  Build command line: aarch64-linux-gnu-gcc -static -O0 -o sample1
-  sample1.c
+  This behavior breaks determinism of guest execution in icount mode.
+  (Even if guest doesn't cares about precise time, just one second shift
+  may trigger such chain of changes which accumulates significant
+  difference in guest state at the moment when guest OS finishes
+  booting.)
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1793119/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1797033/+subscriptions
