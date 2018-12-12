@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gX85B-00008k-OI
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:14:02 -0500
+	(envelope-from <armbru@redhat.com>) id 1gX89k-00019Y-RA
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:18:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gX858-0004g1-IS
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:14:01 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:36248)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gX858-0004f6-8K
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:13:58 -0500
-Date: Wed, 12 Dec 2018 19:13:34 +0200
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20181212171333.GC5747@lap1>
-References: <20181212114726.24060-1-ppandit@redhat.com>
-	<20181212114726.24060-5-ppandit@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1gX89h-0007hL-Mw
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:18:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50800)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gX89h-0007gz-Fq
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:18:41 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B044481F0B
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 17:18:40 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181208111606.8505-1-marcandre.lureau@redhat.com>
+Date: Wed, 12 Dec 2018 18:18:36 +0100
+In-Reply-To: <20181208111606.8505-1-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Sat, 8 Dec 2018 15:15:39 +0400")
+Message-ID: <87va3yfytv.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181212114726.24060-5-ppandit@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1 4/6] pvrdma: release ring object in case
- of an error
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v7 00/27] Hi,
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,111 +34,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Saar Amar <saaramar5@gmail.com>, Li Qiang <liq3ea@163.com>, Prasad J Pandit <pjp@fedoraproject.org>, yuval.shaia@oracle.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Wed, Dec 12, 2018 at 05:17:24PM +0530, P J P wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
-> 
-> create_cq and create_qp routines allocate ring object, but it's
-> not released in case of an error, leading to memory leakage.
-> 
-> Reported-by: Li Qiang <liq3ea@163.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> ---
->  hw/rdma/vmw/pvrdma_cmd.c | 36 +++++++++++++++++++++++++-----------
->  1 file changed, 25 insertions(+), 11 deletions(-)
-> 
-> Update v1: define new function to free PvrdmaRing object
->   -> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg02328.html
-> 
-> diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
-> index e37fb18280..7e29607d2f 100644
-> --- a/hw/rdma/vmw/pvrdma_cmd.c
-> +++ b/hw/rdma/vmw/pvrdma_cmd.c
-> @@ -313,6 +313,14 @@ out:
->      return rc;
->  }
->  
-> +static void destroy_cq_ring(PvrdmaRing *ring)
-> +{
-> +    pvrdma_ring_free(ring);
-> +    /* ring_state was in slot 1, not 0 so need to jump back */
-> +    rdma_pci_dma_unmap(ring->dev, --ring->ring_state, TARGET_PAGE_SIZE);
-> +    g_free(ring);
-> +}
-> +
->  static int create_cq(PVRDMADev *dev, union pvrdma_cmd_req *req,
->                       union pvrdma_cmd_resp *rsp)
->  {
-> @@ -335,6 +343,9 @@ static int create_cq(PVRDMADev *dev, union pvrdma_cmd_req *req,
->  
->      rc = rdma_rm_alloc_cq(&dev->rdma_dev_res, &dev->backend_dev, cmd->cqe,
->                            &resp->cq_handle, ring);
-> +    if (rc) {
-> +        destroy_cq_ring(ring);
-> +    }
->  
->      return rc;
->  }
-> @@ -355,10 +366,7 @@ static int destroy_cq(PVRDMADev *dev, union pvrdma_cmd_req *req,
->      }
->  
->      ring = (PvrdmaRing *)cq->opaque;
-> -    pvrdma_ring_free(ring);
-> -    /* ring_state was in slot 1, not 0 so need to jump back */
-> -    rdma_pci_dma_unmap(PCI_DEVICE(dev), --ring->ring_state, TARGET_PAGE_SIZE);
-> -    g_free(ring);
-> +    destroy_cq_ring(ring);
->  
->      rdma_rm_dealloc_cq(&dev->rdma_dev_res, cmd->cq_handle);
->  
-> @@ -456,6 +464,17 @@ out:
->      return rc;
->  }
->  
-> +static void destroy_qp_rings(PvrdmaRing *ring)
-> +{
-> +    pr_dbg("sring=%p\n", &ring[0]);
-> +    pvrdma_ring_free(&ring[0]);
-> +    pr_dbg("rring=%p\n", &ring[1]);
-> +    pvrdma_ring_free(&ring[1]);
-> +
-> +    rdma_pci_dma_unmap(ring->dev, ring->ring_state, TARGET_PAGE_SIZE);
-> +    g_free(ring);
-> +}
-> +
->  static int create_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
->                       union pvrdma_cmd_resp *rsp)
->  {
-> @@ -485,6 +504,7 @@ static int create_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
->                            cmd->max_recv_sge, cmd->recv_cq_handle, rings,
->                            &resp->qpn);
->      if (rc) {
-> +        destroy_qp_rings(rings);
->          return rc;
->      }
->  
-> @@ -557,13 +577,7 @@ static int destroy_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
->      rdma_rm_dealloc_qp(&dev->rdma_dev_res, cmd->qp_handle);
->  
->      ring = (PvrdmaRing *)qp->opaque;
-> -    pr_dbg("sring=%p\n", &ring[0]);
-> -    pvrdma_ring_free(&ring[0]);
-> -    pr_dbg("rring=%p\n", &ring[1]);
-> -    pvrdma_ring_free(&ring[1]);
-> -
-> -    rdma_pci_dma_unmap(PCI_DEVICE(dev), ring->ring_state, TARGET_PAGE_SIZE);
-> -    g_free(ring);
-> +    destroy_qp_rings(ring);
->  
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-Thanks.
+> This is the second part of the "add #if pre-processor conditions to
+> generated code" series, adding schema member conditions (roughly
+> 16-38/49).
+>
+> Members can be exploded as dictionnary with 'type'/'if' keys:
+>
+> { 'struct': 'TestIfStruct', 'data':
+>   { 'foo': 'int',
+>     'bar': { 'type': 'int', 'if': 'defined(TEST_IF_STRUCT_BAR)'} } }
+>
+> Enum values can be exploded as dictionnary with 'type'/'if' keys:
+>
+> { 'enum': 'TestIfEnum', 'data':
+>   [ 'foo',
+>     { 'name' : 'bar', 'if': 'defined(TEST_IF_ENUM_BAR)' } ] }
 
-Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+PATCH 03,18,20,25 are only losely related to this second part.  They are
+also ready.  Queued on branch qapi-next in my public repository, with
+PATCH 18 and 20 squashed together.
 
->      return 0;
->  }
-> -- 
-> 2.19.2
-> 
+I took the liberty to implement the the idea on normalization I
+mentioned in review of PATCH 08.  I also squashed a few patches that are
+essentially fixups into the patches they fix.  I did not address any
+other review comments.  Result is on branch qapi-if-2.  Please have a
+look.
