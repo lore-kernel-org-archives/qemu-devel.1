@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gWyL2-00005X-CO
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 01:49:45 -0500
+	(envelope-from <clg@kaod.org>) id 1gWyuk-00073b-JD
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 02:26:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gWyKy-0005U3-Gs
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 01:49:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:26338)
+	(envelope-from <clg@kaod.org>) id 1gWyuh-0005jO-AS
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 02:26:38 -0500
+Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:52362)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gWyKy-0005Ts-Am
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 01:49:40 -0500
-Date: Wed, 12 Dec 2018 07:49:36 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181212064936.ubnv3yif34e7ga5j@sirius.home.kraxel.org>
-References: <20181127135030.1671-1-i.maximets@samsung.com>
-	<CGME20181127135045eucas1p1e259cacbab5e715f7845b9beee22f882@eucas1p1.samsung.com>
-	<20181127135030.1671-2-i.maximets@samsung.com>
-	<20181211105329.GE921@redhat.com>
-	<52c43506-ef39-6d08-7db4-ad3c0f96dd1f@samsung.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gWyuh-0005e5-2Z
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 02:26:35 -0500
+Received: from player697.ha.ovh.net (unknown [10.109.160.93])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 289701773F9
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 08:26:33 +0100 (CET)
+References: <20181209194610.29727-1-clg@kaod.org>
+	<20181209194610.29727-19-clg@kaod.org>
+	<39e8edd0-6056-5b51-174b-631dcb267ff5@kaod.org>
+	<20181211020620.GG4261@umbus.fritz.box>
+	<744ff9f8-6f84-00d4-a2e0-84652658762e@kaod.org>
+	<20181212003459.GF2719@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <bdfb5ed7-f388-f330-ffe7-6dd39f5a482c@kaod.org>
+Date: Wed, 12 Dec 2018 08:26:20 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <52c43506-ef39-6d08-7db4-ad3c0f96dd1f@samsung.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] hostmem-memfd: disable for systems
- wihtout sealing support
+In-Reply-To: <20181212003459.GF2719@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 18/19] spapr: add a 'pseries-4.0-xive'
+ machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +36,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ilya Maximets <i.maximets@samsung.com>
-Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On Tue, Dec 11, 2018 at 02:09:11PM +0300, Ilya Maximets wrote:
-> On 11.12.2018 13:53, Daniel P. Berrang=E9 wrote:
-> >>
-> >> Let's restrict memfd backend to systems with sealing support.
-> >=20
-> > I don't think we need todo that - sealing is optional in the QEMU cod=
-e,
-> > we simply have it set to the wrong default when sealing is not availa=
-ble.
->=20
-> That was literally what I've fixed in v1:
->     https://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg05483.h=
-tml
->=20
-> but 2 people suggested me to disable memfd entirely for this case.
-> Do you think I need to get patch from v1 back ?
->=20
-> Gerd, Marc-Andr=E9, what do you think?
+[ ... ]
 
-I still think it makes sense to require sealing support.  Sealing is
-very useful, and there are only a few kernel versions with memfd but
-without sealing.  So finding such kernels in the wild will become more
-rare over time.  I wouldn't worry too much about them.
+>>> So, instead I think we want a machine option which can be set to
+>>> xics/xive/dual, with xics being the default for earlier machine types
+>>> and dual the default for 4.0 onwards.
+>>
+>> I will revive an old patch doing just that. 
+>>
+>> The question now is how to link the sPAPRMachineState instance to 
+>> the selected sPAPR IRQ backend. 
+>>
+>> I don't think we can move 'smc->irq' to sPAPRMachineState.
+> 
+> I think you could..
+> 
+>> So we will
+>> need an helper returning the appropriate backend depending on the machine 
+>> option and 'smc->irq' should disappear.
+> 
+> ..but this approach might be easier.
 
-cheers,
-  Gerd
+I proposed the first approach in v8. We can add the missing wrappers 
+in a second round and move then under spapr_irq.h. These are :
+ 
+ops :
+
+   spapr->irq->dt_populate   spapr->irq->print_info
+   spapr->irq->cpu_intc_create (this name is too long)
+
+constants :
+
+   spapr->irq->ov5
+   spapr->irq->nr_msis
+
+C.
