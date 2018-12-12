@@ -1,21 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gX0ah-0008Av-KM
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:14:09 -0500
+	(envelope-from <david@redhat.com>) id 1gX0dB-0001pj-TF
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:16:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gX0ag-00048h-HL
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:14:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56042)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gX0ag-000485-Bg
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:14:02 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 12 Dec 2018 10:13:50 +0100
-Message-Id: <1544606032-16924-7-git-send-email-thuth@redhat.com>
-In-Reply-To: <1544606032-16924-1-git-send-email-thuth@redhat.com>
-References: <1544606032-16924-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PULL 6/8] includes: Replace QEMU_GNUC_PREREQ with
- "__has_builtin || !defined(__clang__)"
+	(envelope-from <david@redhat.com>) id 1gX0d8-0005Fh-N4
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:16:37 -0500
+From: David Hildenbrand <david@redhat.com>
+Date: Wed, 12 Dec 2018 10:16:12 +0100
+Message-Id: <20181212091623.16950-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 00/11] pci: hotplug handler reworks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,54 +17,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, qemu-ppc@nongnu.org, David Hildenbrand <david@redhat.com>
 
-Since we require GCC version 4.8 or newer now, we can be sure that
-the builtin functions are always available on GCC. And for Clang,
-we can check the availablility with __has_builtin instead.
+This is a resend with added RB's.  @MST please pick up :)
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- include/qemu/compiler.h   | 2 +-
- include/qemu/host-utils.h | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+This series reworks some pci hotplug handlers (except for s390, that will
+require more work but is not required for now).
 
-diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
-index 6b92710..1593bca 100644
---- a/include/qemu/compiler.h
-+++ b/include/qemu/compiler.h
-@@ -127,7 +127,7 @@
- #define __has_builtin(x) 0 /* compatibility with non-clang compilers */
- #endif
- 
--#if __has_builtin(__builtin_assume_aligned) || QEMU_GNUC_PREREQ(4, 7)
-+#if __has_builtin(__builtin_assume_aligned) || !defined(__clang__)
- #define HAS_ASSUME_ALIGNED
- #endif
- 
-diff --git a/include/qemu/host-utils.h b/include/qemu/host-utils.h
-index 38da849..4cd170e 100644
---- a/include/qemu/host-utils.h
-+++ b/include/qemu/host-utils.h
-@@ -207,7 +207,7 @@ static inline int cto64(uint64_t val)
-  */
- static inline int clrsb32(uint32_t val)
- {
--#if QEMU_GNUC_PREREQ(4, 7)
-+#if __has_builtin(__builtin_clrsb) || !defined(__clang__)
-     return __builtin_clrsb(val);
- #else
-     return clz32(val ^ ((int32_t)val >> 1)) - 1;
-@@ -223,7 +223,7 @@ static inline int clrsb32(uint32_t val)
-  */
- static inline int clrsb64(uint64_t val)
- {
--#if QEMU_GNUC_PREREQ(4, 7)
-+#if __has_builtin(__builtin_clrsbll) || !defined(__clang__)
-     return __builtin_clrsbll(val);
- #else
-     return clz64(val ^ ((int64_t)val >> 1)) - 1;
+1. Route all unplug calls via the hotplug handler when called from the
+   unplug_request handler. This will be required to get multi-stage
+   hotplug handlers running, but also makes sense on its own (just like we
+   already did for some CPU/memory hotplug handlers).
+
+2. Introduce some pre_plug handlers where it makes sense already.
+
+3. Call the plug/pre_plug handler also for coldplugged devices. Especially
+   pcihp is special as it overwrites hotplug handlers.
+
+This series will not yet factor out pre_plug/plug/unplug from pci device
+realize/unrealize functions, this will require more work but this
+series is also required first to get it running.
+
+In my opinion what needs to be done in the future:
+1. Introduce pre_plug/plug/unplug_request/unplug handlers for all PCI
+   buses
+2. Move pci realize/unrealize parts to pre_plug/pkug/unplug functions like
+   pci_pre_plug() ...
+3. Call the pci pre_plug/plug/unplug handlers from the PCI bus hotplug
+   handler at the right spots
+4. Factor more checks from existing plug() handlers out into pre_plug()
+   (e.g. after the call to pci_pre_plug())
+
+v3 -> v4:
+- RB's added
+
+v2 -> v3:
+- Added "pci: Reuse pci-bridge hotplug handler handlers for pcie-pci-bridge"
+-- Use one handler callback for pcie and !pcie
+- "pci/shpc: perform unplug via the hotplug handler"
+-- Use one handler callback for pcie and !pcie
+-- Replace error check by an assertion
+- Minor description changes.
+- Added Rbs
+
+v1 -> v2:
+- Added "pci/pcie: rename hotplug handler callbacks"
+- Added "pci/shpc: rename hotplug handler callbacks"
+- Added "s390x/pci: rename hotplug handler callbacks"
+- Dropped "pci/shpc: move hotplug checks to preplug handler"
+-- We will have to factor out stuff into pre_plug() first as described
+   above
+- Renamed and added more details to the "perform unplug via the hotplug
+  handler" patches
+- "pci/pcihp: overwrite hotplug handler recursively from the start"
+-- Perform the overwrite only for cold plugged bridges, to keep the
+   existing behavior
+
+David Hildenbrand (11):
+  pci/pcie: rename hotplug handler callbacks
+  pci/shpc: rename hotplug handler callbacks
+  s390x/pci: rename hotplug handler callbacks
+  pci/pcie: stop plug/unplug if the slot is locked
+  pci/pcihp: perform check for bus capability in pre_plug handler
+  pci/pcihp: overwrite hotplug handler recursively from the start
+  pci/pcihp: perform unplug via the hotplug handler
+  pci/pcie: perform unplug via the hotplug handler
+  pci: Reuse pci-bridge hotplug handler handlers for pcie-pci-bridge
+  pci/shpc: perform unplug via the hotplug handler
+  spapr_pci: perform unplug via the hotplug handler
+
+ hw/acpi/pcihp.c                 | 47 ++++++++++++++++++++++++++++-----
+ hw/acpi/piix4.c                 | 39 ++++++++++++++-------------
+ hw/pci-bridge/pci_bridge_dev.c  | 31 ++++++++++++++--------
+ hw/pci-bridge/pcie_pci_bridge.c | 32 +++-------------------
+ hw/pci/pcie.c                   | 46 +++++++++++++++++++++-----------
+ hw/pci/pcie_port.c              |  6 +++--
+ hw/pci/shpc.c                   | 25 ++++++++++++------
+ hw/ppc/spapr_pci.c              | 33 ++++++++++++++---------
+ hw/s390x/s390-pci-bus.c         | 12 ++++-----
+ include/hw/acpi/pcihp.h         |  5 ++++
+ include/hw/pci/pci_bridge.h     |  6 +++++
+ include/hw/pci/pcie.h           | 12 ++++++---
+ include/hw/pci/shpc.h           | 10 ++++---
+ 13 files changed, 187 insertions(+), 117 deletions(-)
+
 -- 
-1.8.3.1
+2.17.2
