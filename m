@@ -1,35 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gX5F1-0003iH-Hj
+	(envelope-from <jjherne@linux.ibm.com>) id 1gX5F1-0003i2-C4
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:12:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gX5Eu-0007KH-Bb
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:11:59 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54882
+	(envelope-from <jjherne@linux.ibm.com>) id 1gX5Et-0007JB-Ti
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:11:56 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37430
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1gX5Et-0007DO-Vu
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:11:52 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wBCE9cDJ014633
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:11:43 -0500
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2pb1njpgtj-1
+	id 1gX5Et-0007DI-I0
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:11:51 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wBCE9hSD108309
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:11:42 -0500
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2pb2aqcuc9-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:11:42 -0500
 Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Wed, 12 Dec 2018 14:11:38 -0000
+	Wed, 12 Dec 2018 14:11:41 -0000
 From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Wed, 12 Dec 2018 09:11:11 -0500
+Date: Wed, 12 Dec 2018 09:11:13 -0500
 In-Reply-To: <1544623878-11248-1-git-send-email-jjherne@linux.ibm.com>
 References: <1544623878-11248-1-git-send-email-jjherne@linux.ibm.com>
-Message-Id: <1544623878-11248-9-git-send-email-jjherne@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH 08/15] s390-bios: Map low core memory
+Message-Id: <1544623878-11248-11-git-send-email-jjherne@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH 10/15] s390-bios: Support for running
+ format-0/1 channel programs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,142 +41,386 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com, borntraeger@de.ibm.com
 
-Create a new header for basic architecture specific definitions and add a
-mapping of low core memory. This mapping will be used by the real dasd boot
-process.
+Add struct for format-0 ccws. Support executing format-0 channel
+programs and waiting for their completion before continuing execution.
+This will be used for real dasd ipl.
+
+Add cu_type() to channel io library. This will be used to query control
+unit type which is used to determine if we are booting a virtio device or a
+real dasd device.
 
 Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
 ---
- pc-bios/s390-ccw/main.c      |   2 +
- pc-bios/s390-ccw/s390-arch.h | 100 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 102 insertions(+)
- create mode 100644 pc-bios/s390-ccw/s390-arch.h
+ pc-bios/s390-ccw/cio.c      | 108 ++++++++++++++++++++++++++++++++++++++
+ pc-bios/s390-ccw/cio.h      | 124 ++++++++++++++++++++++++++++++++++++++++++--
+ pc-bios/s390-ccw/s390-ccw.h |   1 +
+ pc-bios/s390-ccw/start.S    |  33 +++++++++++-
+ 4 files changed, 261 insertions(+), 5 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 1bc61b5..fa90aa3 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -9,6 +9,7 @@
-  */
+diff --git a/pc-bios/s390-ccw/cio.c b/pc-bios/s390-ccw/cio.c
+index 095f79b..9019250 100644
+--- a/pc-bios/s390-ccw/cio.c
++++ b/pc-bios/s390-ccw/cio.c
+@@ -10,6 +10,7 @@
  
  #include "libc.h"
-+#include "s390-arch.h"
  #include "s390-ccw.h"
++#include "s390-arch.h"
  #include "cio.h"
- #include "virtio.h"
-@@ -19,6 +20,7 @@ static char loadparm_str[LOADPARM_LEN + 1] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
- QemuIplParameters qipl;
- IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
- static bool have_iplb;
-+const LowCore *lowcore; /* Yes, this *is* a pointer to address 0 */
  
- #define LOADPARM_PROMPT "PROMPT  "
- #define LOADPARM_EMPTY  "        "
-diff --git a/pc-bios/s390-ccw/s390-arch.h b/pc-bios/s390-ccw/s390-arch.h
-new file mode 100644
-index 0000000..47eaa04
---- /dev/null
-+++ b/pc-bios/s390-ccw/s390-arch.h
-@@ -0,0 +1,100 @@
-+/*
-+ * S390 Basic Architecture
+ static char chsc_page[PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)));
+@@ -39,3 +40,110 @@ void enable_subchannel(SubChannelId schid)
+     schib.pmcw.ena = 1;
+     msch(schid, &schib);
+ }
++
++uint16_t cu_type(SubChannelId schid)
++{
++    Ccw1 sense_id_ccw;
++    SenseId sense_data;
++
++    sense_id_ccw.cmd_code = CCW_CMD_SENSE_ID;
++    sense_id_ccw.cda = ptr2u32(&sense_data);
++    sense_id_ccw.count = sizeof(sense_data);
++
++    if (do_cio(schid, ptr2u32(&sense_id_ccw), CCW_FMT1)) {
++        panic("Failed to run SenseID CCw\n");
++    }
++
++    return sense_data.cu_type;
++}
++
++void basic_sense(SubChannelId schid, SenseData *sd)
++{
++    Ccw1 senseCcw;
++
++    senseCcw.cmd_code = CCW_CMD_BASIC_SENSE;
++    senseCcw.cda = ptr2u32(sd);
++    senseCcw.count = sizeof(*sd);
++
++    if (do_cio(schid, ptr2u32(&senseCcw), CCW_FMT1)) {
++        panic("Failed to run Basic Sense CCW\n");
++    }
++}
++
++static bool irb_error(Irb *irb)
++{
++    /* We have to ignore Incorrect Length (cstat == 0x40) indicators because
++     * real devices expect a 24 byte SenseID  buffer, and virtio devices expect
++     * a much larger buffer. Neither device type can tolerate a buffer size
++     * different from what they expect so they set this indicator.
++     */
++    if (irb->scsw.cstat != 0x00 && irb->scsw.cstat != 0x40) {
++        return true;
++    }
++    return irb->scsw.dstat != 0xc;
++}
++
++/* Executes a channel program at a given subchannel. The request to run the
++ * channel program is sent to the subchannel, we then wait for the interrupt
++ * singaling completion of the I/O operation(s) perfomed by the channel
++ * program. Lastly we verify that the i/o operation completed without error and
++ * that the interrupt we received was for the subchannel used to run the
++ * channel program.
 + *
-+ * Copyright (c) 2018 Jason J. Herne <jjherne@us.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
++ * Note: This function assumes it is running in an environment where no other
++ * cpus are generating or receiving I/O interrupts. So either run it in a
++ * single-cpu environment or make sure all other cpus are not doing I/O and
++ * have I/O interrupts masked off.
 + */
++int do_cio(SubChannelId schid, uint32_t ccw_addr, int fmt)
++{
++    CmdOrb orb = {};
++    Irb irb = {};
++    SenseData sd;
++    int rc, retries = 0;
 +
-+#ifndef S390_ARCH_H
-+#define S390_ARCH_H
++    IPL_assert(fmt == 0 || fmt == 1, "Invalid ccw format");
 +
-+typedef struct PSW {
-+    uint64_t mask;
-+    uint64_t addr;
-+} __attribute__ ((packed, aligned(8))) PSW;
++    /* ccw_addr must be <= 24 bits and point to at least one whole ccw. */
++    if (fmt == 0) {
++        IPL_assert(ccw_addr <= 0xFFFFFF - 8, "Invalid ccw address");
++    }
 +
-+/* Older PSW format used by LPSW instruction */
-+typedef struct PSWLegacy {
-+    uint32_t mask;
-+    uint32_t addr;
-+} __attribute__ ((packed, aligned(8))) PSWLegacy;
++    orb.fmt = fmt ;
++    orb.pfch = 1;  /* QEMU's cio implementation requires prefetch */
++    orb.c64 = 1;   /* QEMU's cio implementation requires 64-bit idaws */
++    orb.lpm = 0xFF; /* All paths allowed */
++    orb.cpa = ccw_addr;
 +
-+/* s390 psw bit masks */
-+#define PSW_MASK_IOINT      0x0200000000000000ULL
-+#define PSW_MASK_WAIT       0x0002000000000000ULL
-+#define PSW_MASK_EAMODE     0x0000000100000000ULL
-+#define PSW_MASK_BAMODE     0x0000000080000000ULL
-+#define PSW_MASK_ZMODE      (PSW_MASK_EAMODE | PSW_MASK_BAMODE)
++    while (true) {
++        rc = ssch(schid, &orb);
++        if (rc) {
++            print_int("ssch failed with rc=", rc);
++            break;
++        }
 +
-+/* Low core mapping */
-+typedef struct LowCore {
-+    /* prefix area: defined by architecture */
-+    uint64_t        ipl_psw;                  /* 0x000 */
-+    uint32_t        ccw1[2];                  /* 0x008 */
-+    uint32_t        ccw2[2];                  /* 0x010 */
-+    uint8_t         pad1[0x80 - 0x18];        /* 0x018 */
-+    uint32_t        ext_params;               /* 0x080 */
-+    uint16_t        cpu_addr;                 /* 0x084 */
-+    uint16_t        ext_int_code;             /* 0x086 */
-+    uint16_t        svc_ilen;                 /* 0x088 */
-+    uint16_t        svc_code;                 /* 0x08a */
-+    uint16_t        pgm_ilen;                 /* 0x08c */
-+    uint16_t        pgm_code;                 /* 0x08e */
-+    uint32_t        data_exc_code;            /* 0x090 */
-+    uint16_t        mon_class_num;            /* 0x094 */
-+    uint16_t        per_perc_atmid;           /* 0x096 */
-+    uint64_t        per_address;              /* 0x098 */
-+    uint8_t         exc_access_id;            /* 0x0a0 */
-+    uint8_t         per_access_id;            /* 0x0a1 */
-+    uint8_t         op_access_id;             /* 0x0a2 */
-+    uint8_t         ar_access_id;             /* 0x0a3 */
-+    uint8_t         pad2[0xA8 - 0xA4];        /* 0x0a4 */
-+    uint64_t        trans_exc_code;           /* 0x0a8 */
-+    uint64_t        monitor_code;             /* 0x0b0 */
-+    uint16_t        subchannel_id;            /* 0x0b8 */
-+    uint16_t        subchannel_nr;            /* 0x0ba */
-+    uint32_t        io_int_parm;              /* 0x0bc */
-+    uint32_t        io_int_word;              /* 0x0c0 */
-+    uint8_t         pad3[0xc8 - 0xc4];        /* 0x0c4 */
-+    uint32_t        stfl_fac_list;            /* 0x0c8 */
-+    uint8_t         pad4[0xe8 - 0xcc];        /* 0x0cc */
-+    uint64_t        mcic;                     /* 0x0e8 */
-+    uint8_t         pad5[0xf4 - 0xf0];        /* 0x0f0 */
-+    uint32_t        external_damage_code;     /* 0x0f4 */
-+    uint64_t        failing_storage_address;  /* 0x0f8 */
-+    uint8_t         pad6[0x110 - 0x100];      /* 0x100 */
-+    uint64_t        per_breaking_event_addr;  /* 0x110 */
-+    uint8_t         pad7[0x120 - 0x118];      /* 0x118 */
-+    PSW             restart_old_psw;          /* 0x120 */
-+    PSW             external_old_psw;         /* 0x130 */
-+    PSW             svc_old_psw;              /* 0x140 */
-+    PSW             program_old_psw;          /* 0x150 */
-+    PSW             mcck_old_psw;             /* 0x160 */
-+    PSW             io_old_psw;               /* 0x170 */
-+    uint8_t         pad8[0x1a0 - 0x180];      /* 0x180 */
-+    PSW             restart_new_psw;          /* 0x1a0 */
-+    PSW             external_new_psw;         /* 0x1b0 */
-+    PSW             svc_new_psw;              /* 0x1c0 */
-+    PSW             program_new_psw;          /* 0x1d0 */
-+    PSW             mcck_new_psw;             /* 0x1e0 */
-+    PSW             io_new_psw;               /* 0x1f0 */
-+    PSW             return_psw;               /* 0x200 */
-+    uint8_t         irb[64];                  /* 0x210 */
-+    uint64_t        sync_enter_timer;         /* 0x250 */
-+    uint64_t        async_enter_timer;        /* 0x258 */
-+    uint64_t        exit_timer;               /* 0x260 */
-+    uint64_t        last_update_timer;        /* 0x268 */
-+    uint64_t        user_timer;               /* 0x270 */
-+    uint64_t        system_timer;             /* 0x278 */
-+    uint64_t        last_update_clock;        /* 0x280 */
-+    uint64_t        steal_clock;              /* 0x288 */
-+    PSW             return_mcck_psw;          /* 0x290 */
-+    uint8_t         pad9[0xc00 - 0x2a0];      /* 0x2a0 */
-+} __attribute__((packed, aligned(8192))) LowCore;
++        consume_io_int();
 +
-+extern const LowCore *lowcore;
++        /* Clear read */
++        rc = tsch(schid, &irb);
++        if (rc) {
++            print_int("tsch failed with rc=", rc);
++            break;
++        }
 +
-+#endif
++        if (!irb_error(&irb)) {
++            break;
++        }
++
++        /* Unexpected unit check. Use sense to clear unit check then retry. */
++        if (unit_check(&irb) && retries <= 2) {
++            basic_sense(schid, &sd);
++            retries++;
++            continue;
++        }
++
++        break;
++    }
++
++    return rc;
++}
+diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
+index 7b07d75..5c16635 100644
+--- a/pc-bios/s390-ccw/cio.h
++++ b/pc-bios/s390-ccw/cio.h
+@@ -70,9 +70,46 @@ struct scsw {
+     __u16 count;
+ } __attribute__ ((packed));
+ 
+-#define SCSW_FCTL_CLEAR_FUNC 0x1000
+-#define SCSW_FCTL_HALT_FUNC 0x2000
++/* Function Control */
+ #define SCSW_FCTL_START_FUNC 0x4000
++#define SCSW_FCTL_HALT_FUNC 0x2000
++#define SCSW_FCTL_CLEAR_FUNC 0x1000
++
++/* Activity Control */
++#define SCSW_ACTL_RESUME_PEND   0x0800
++#define SCSW_ACTL_START_PEND    0x0400
++#define SCSW_ACTL_HALT_PEND     0x0200
++#define SCSW_ACTL_CLEAR_PEND    0x0100
++#define SCSW_ACTL_CH_ACTIVE     0x0080
++#define SCSW_ACTL_DEV_ACTIVE    0x0040
++#define SCSW_ACTL_SUSPENDED     0x0020
++
++/* Status Control */
++#define SCSW_SCTL_ALERT         0x0010
++#define SCSW_SCTL_INTERMED      0x0008
++#define SCSW_SCTL_PRIMARY       0x0004
++#define SCSW_SCTL_SECONDARY     0x0002
++#define SCSW_SCTL_STATUS_PEND   0x0001
++
++/* SCSW Device Status Flags */
++#define SCSW_DSTAT_ATTN     0x80
++#define SCSW_DSTAT_STATMOD  0x40
++#define SCSW_DSTAT_CUEND    0x20
++#define SCSW_DSTAT_BUSY     0x10
++#define SCSW_DSTAT_CHEND    0x08
++#define SCSW_DSTAT_DEVEND   0x04
++#define SCSW_DSTAT_UCHK     0x02
++#define SCSW_DSTAT_UEXCP    0x01
++
++/* SCSW Subchannel Status Flags */
++#define SCSW_CSTAT_PCINT    0x80
++#define SCSW_CSTAT_BADLEN   0x40
++#define SCSW_CSTAT_PROGCHK  0x20
++#define SCSW_CSTAT_PROTCHK  0x10
++#define SCSW_CSTAT_CHDCHK   0x08
++#define SCSW_CSTAT_CHCCHK   0x04
++#define SCSW_CSTAT_ICCHK    0x02
++#define SCSW_CSTAT_CHAINCHK 0x01
+ 
+ /*
+  * subchannel information block
+@@ -127,7 +164,23 @@ struct tpi_info {
+     __u32 reserved4  : 12;
+ } __attribute__ ((packed, aligned(4)));
+ 
+-/* channel command word (type 1) */
++/* channel command word (format 0) */
++typedef struct ccw0 {
++    __u8 cmd_code;
++    __u32 cda        : 24;
++    __u32 chainData  : 1;
++    __u32 chain      : 1;
++    __u32 sli        : 1;
++    __u32 skip       : 1;
++    __u32 pci        : 1;
++    __u32 ida        : 1;
++    __u32 suspend    : 1;
++    __u32 mida       : 1;
++    __u8 reserved;
++    __u16 count;
++} __attribute__ ((packed, aligned(8))) Ccw0;
++
++/* channel command word (format 1) */
+ typedef struct ccw1 {
+     __u8 cmd_code;
+     __u8 flags;
+@@ -135,6 +188,10 @@ typedef struct ccw1 {
+     __u32 cda;
+ } __attribute__ ((packed, aligned(8))) Ccw1;
+ 
++/* do_cio() CCW formats */
++#define CCW_FMT0                 0x00
++#define CCW_FMT1                 0x01
++
+ #define CCW_FLAG_DC              0x80
+ #define CCW_FLAG_CC              0x40
+ #define CCW_FLAG_SLI             0x20
+@@ -190,6 +247,9 @@ struct ciw {
+     __u16 count;
+ };
+ 
++#define CU_TYPE_VIRTIO          0x3832
++#define CU_TYPE_DASD            0x3990
++
+ /*
+  * sense-id response buffer layout
+  */
+@@ -205,6 +265,61 @@ typedef struct senseid {
+     struct ciw ciw[62];
+ }  __attribute__ ((packed, aligned(4))) SenseId;
+ 
++/* architected values for first sense byte */
++#define SNS0_CMD_REJECT         0x80
++#define SNS0_INTERVENTION_REQ   0x40
++#define SNS0_BUS_OUT_CHECK      0x20
++#define SNS0_EQUIPMENT_CHECK    0x10
++#define SNS0_DATA_CHECK         0x08
++#define SNS0_OVERRUN            0x04
++#define SNS0_INCOMPL_DOMAIN     0x01
++
++/* architectured values for second sense byte */
++#define SNS1_PERM_ERR           0x80
++#define SNS1_INV_TRACK_FORMAT   0x40
++#define SNS1_EOC                0x20
++#define SNS1_MESSAGE_TO_OPER    0x10
++#define SNS1_NO_REC_FOUND       0x08
++#define SNS1_FILE_PROTECTED     0x04
++#define SNS1_WRITE_INHIBITED    0x02
++#define SNS1_INPRECISE_END      0x01
++
++/* architectured values for third sense byte */
++#define SNS2_REQ_INH_WRITE      0x80
++#define SNS2_CORRECTABLE        0x40
++#define SNS2_FIRST_LOG_ERR      0x20
++#define SNS2_ENV_DATA_PRESENT   0x10
++#define SNS2_INPRECISE_END      0x04
++
++/* 24-byte Sense fmt/msg codes */
++#define SENSE24_FMT_PROG_SYS    0x0
++#define SENSE24_FMT_EQUIPMENT   0x2
++#define SENSE24_FMT_CONTROLLER  0x3
++#define SENSE24_FMT_MISC        0xF
++
++#define SENSE24_FMT0_MSG_RESET_NOTIFICATION 0x16
++
++/* basic sense response buffer layout */
++typedef struct senseData {
++    uint8_t status[3];
++    uint8_t res_count;
++    uint8_t phys_drive_id;
++    uint8_t low_cyl_addr;
++    uint8_t head_high_cyl_addr;
++    uint8_t fmt_msg;
++    uint64_t fmt_dependent_info[2];
++    uint8_t reserved;
++    uint8_t program_action_code;
++    uint16_t config_info;
++    uint8_t mcode_hicyl;
++    uint8_t cyl_head_addr[3];
++}  __attribute__ ((packed, aligned(4))) SenseData;
++
++#define SENSE24_GET_FMT(sd)     (sd->fmt_msg & 0xF0 >> 4)
++#define SENSE24_GET_MSG(sd)     (sd->fmt_msg & 0x0F)
++
++#define unit_check(irb)     ((irb)->scsw.dstat & SCSW_DSTAT_UCHK)
++
+ /* interruption response block */
+ typedef struct irb {
+     struct scsw scsw;
+@@ -215,6 +330,9 @@ typedef struct irb {
+ 
+ int enable_mss_facility(void);
+ void enable_subchannel(SubChannelId schid);
++uint16_t cu_type(SubChannelId schid);
++void basic_sense(SubChannelId schid, SenseData *sd);
++int do_cio(SubChannelId schid, uint32_t ccw_addr, int fmt);
+ 
+ /*
+  * Some S390 specific IO instructions as inline
+diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+index b39ee5d..11bce7d 100644
+--- a/pc-bios/s390-ccw/s390-ccw.h
++++ b/pc-bios/s390-ccw/s390-ccw.h
+@@ -52,6 +52,7 @@ typedef unsigned long long __u64;
+ /* start.s */
+ void disabled_wait(void);
+ void consume_sclp_int(void);
++void consume_io_int(void);
+ 
+ /* main.c */
+ void panic(const char *string);
+diff --git a/pc-bios/s390-ccw/start.S b/pc-bios/s390-ccw/start.S
+index eb8d024..a48c38f 100644
+--- a/pc-bios/s390-ccw/start.S
++++ b/pc-bios/s390-ccw/start.S
+@@ -65,12 +65,32 @@ consume_sclp_int:
+         /* prepare external call handler */
+         larl %r1, external_new_code
+         stg %r1, 0x1b8
+-        larl %r1, external_new_mask
++        larl %r1, int_new_mask
+         mvc 0x1b0(8),0(%r1)
+         /* load enabled wait PSW */
+         larl %r1, enabled_wait_psw
+         lpswe 0(%r1)
+ 
++/*
++ * void consume_io_int(void)
++ *
++ * eats one I/O interrupt
++ */
++        .globl consume_io_int
++consume_io_int:
++        /* enable I/O interrupts in cr0 */
++        stctg 6,6,0(15)
++        oi 4(15), 0xff
++        lctlg 6,6,0(15)
++        /* prepare external call handler */
++        larl %r1, io_new_code
++        stg %r1, 0x1f8
++        larl %r1, int_new_mask
++        mvc 0x1f0(8),0(%r1)
++        /* load enabled wait PSW */
++        larl %r1, enabled_wait_psw
++        lpswe 0(%r1)
++
+ external_new_code:
+         /* disable service interrupts in cr0 */
+         stctg 0,0,0(15)
+@@ -78,10 +98,19 @@ external_new_code:
+         lctlg 0,0,0(15)
+         br 14
+ 
++io_new_code:
++        /* disable I/O interrupts in cr6 */
++        stctg 6,6,0(15)
++        ni 4(15), 0x00
++        lctlg 6,6,0(15)
++        br 14
++
++
++
+         .align  8
+ disabled_wait_psw:
+         .quad   0x0002000180000000,0x0000000000000000
+ enabled_wait_psw:
+         .quad   0x0302000180000000,0x0000000000000000
+-external_new_mask:
++int_new_mask:
+         .quad   0x0000000180000000
 -- 
 2.7.4
