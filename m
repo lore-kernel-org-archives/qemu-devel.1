@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6MZ-0000qJ-DH
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6Ma-0000rR-Hp
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6MX-0000Ep-FB
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:51 -0500
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:46532)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6MX-0000EP-9X
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:52 -0500
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:42667)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gX6MX-00008l-2R
+	id 1gX6MW-00006K-Ue
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:49 -0500
-Received: by mail-wr1-x434.google.com with SMTP id l9so18047851wrt.13
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:23:42 -0800 (PST)
+Received: by mail-wr1-x430.google.com with SMTP id q18so18082005wrx.9
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:23:40 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 12 Dec 2018 16:22:42 +0100
-Message-Id: <1544628195-37728-22-git-send-email-pbonzini@redhat.com>
+Date: Wed, 12 Dec 2018 16:22:40 +0100
+Message-Id: <1544628195-37728-20-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
 References: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 21/54] RFC: qga: drop < Vista compatibility
+Subject: [Qemu-devel] [PULL 19/54] build-sys: move windows defines in
+ osdep.h header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,135 +36,68 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Building QGA for XP seems possible so far: the dependency on
-libqemuutil.a implies building qemu-thread-win32.c, which requires
-Vista API since commit 12f8def0 (v2.9). But qemu-thread isn't being
-used in QGA, the resulting binary may still work on XP.  XP is no
-longer supported for the past 4.5y, it's time to drop support for it.
+This removes some clutter in compilation logging, and allows some
+easier tweaking per compilation unit/CFLAGS overriding.
+
+Note that we can't move those define in os-win32.h, since they must be
+set before the first system headers are included.
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20181122110039.15972-5-marcandre.lureau@redhat.com>
+Message-Id: <20181122110039.15972-3-marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- qga/commands-win32.c | 64 ----------------------------------------------------
- 1 file changed, 64 deletions(-)
+ configure            |  3 ---
+ include/qemu/osdep.h | 17 +++++++++++++++++
+ 2 files changed, 17 insertions(+), 3 deletions(-)
 
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index f03b9c1..989b93e 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -466,13 +466,11 @@ static STORAGE_BUS_TYPE win2qemu[] = {
-     [BusTypeFibre] = GUEST_DISK_BUS_TYPE_SSA,
-     [BusTypeUsb] = GUEST_DISK_BUS_TYPE_USB,
-     [BusTypeRAID] = GUEST_DISK_BUS_TYPE_RAID,
--#if (_WIN32_WINNT >= 0x0600)
-     [BusTypeiScsi] = GUEST_DISK_BUS_TYPE_ISCSI,
-     [BusTypeSas] = GUEST_DISK_BUS_TYPE_SAS,
-     [BusTypeSata] = GUEST_DISK_BUS_TYPE_SATA,
-     [BusTypeSd] =  GUEST_DISK_BUS_TYPE_SD,
-     [BusTypeMmc] = GUEST_DISK_BUS_TYPE_MMC,
--#endif
- #if (_WIN32_WINNT >= 0x0601)
-     [BusTypeVirtual] = GUEST_DISK_BUS_TYPE_VIRTUAL,
-     [BusTypeFileBackedVirtual] = GUEST_DISK_BUS_TYPE_FILE_BACKED_VIRTUAL,
-@@ -724,10 +722,8 @@ static void get_single_disk_info(GuestDiskAddress *disk, Error **errp)
-     if (disk->bus_type == GUEST_DISK_BUS_TYPE_SCSI
-             || disk->bus_type == GUEST_DISK_BUS_TYPE_IDE
-             || disk->bus_type == GUEST_DISK_BUS_TYPE_RAID
--#if (_WIN32_WINNT >= 0x0600)
-             /* This bus type is not supported before Windows Server 2003 SP1 */
-             || disk->bus_type == GUEST_DISK_BUS_TYPE_SAS
--#endif
-         ) {
-         /* We are able to use the same ioctls for different bus types
-          * according to Microsoft docs
-@@ -1322,7 +1318,6 @@ static char *guest_addr_to_str(IP_ADAPTER_UNICAST_ADDRESS *ip_addr,
-     return NULL;
- }
+diff --git a/configure b/configure
+index 0a3c6a7..8c292ef 100755
+--- a/configure
++++ b/configure
+@@ -905,9 +905,6 @@ fi
+ if test "$mingw32" = "yes" ; then
+   EXESUF=".exe"
+   DSOSUF=".dll"
+-  QEMU_CFLAGS="-DWIN32_LEAN_AND_MEAN -DWINVER=0x501 $QEMU_CFLAGS"
+-  # enable C99/POSIX format strings (needs mingw32-runtime 3.15 or later)
+-  QEMU_CFLAGS="-D__USE_MINGW_ANSI_STDIO=1 $QEMU_CFLAGS"
+   # MinGW needs -mthreads for TLS and macro _MT.
+   QEMU_CFLAGS="-mthreads $QEMU_CFLAGS"
+   LIBS="-lwinmm -lws2_32 -liphlpapi $LIBS"
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 3bf48bc..7b6e5db 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -74,13 +74,30 @@ typedef __float128 _Float128;
+ extern int daemon(int, int);
+ #endif
  
--#if (_WIN32_WINNT >= 0x0600)
- static int64_t guest_ip_prefix(IP_ADAPTER_UNICAST_ADDRESS *ip_addr)
- {
-     /* For Windows Vista/2008 and newer, use the OnLinkPrefixLength
-@@ -1330,60 +1325,6 @@ static int64_t guest_ip_prefix(IP_ADAPTER_UNICAST_ADDRESS *ip_addr)
-      */
-     return ip_addr->OnLinkPrefixLength;
- }
--#else
--/* When using the Windows XP and 2003 build environment, do the best we can to
-- * figure out the prefix.
-- */
--static IP_ADAPTER_INFO *guest_get_adapters_info(void)
--{
--    IP_ADAPTER_INFO *adptr_info = NULL;
--    ULONG adptr_info_len = 0;
--    DWORD ret;
--
--    /* Call the first time to get the adptr_info_len. */
--    GetAdaptersInfo(adptr_info, &adptr_info_len);
--
--    adptr_info = g_malloc(adptr_info_len);
--    ret = GetAdaptersInfo(adptr_info, &adptr_info_len);
--    if (ret != ERROR_SUCCESS) {
--        g_free(adptr_info);
--        adptr_info = NULL;
--    }
--    return adptr_info;
--}
--
--static int64_t guest_ip_prefix(IP_ADAPTER_UNICAST_ADDRESS *ip_addr)
--{
--    int64_t prefix = -1; /* Use for AF_INET6 and unknown/undetermined values. */
--    IP_ADAPTER_INFO *adptr_info, *info;
--    IP_ADDR_STRING *ip;
--    struct in_addr *p;
--
--    if (ip_addr->Address.lpSockaddr->sa_family != AF_INET) {
--        return prefix;
--    }
--    adptr_info = guest_get_adapters_info();
--    if (adptr_info == NULL) {
--        return prefix;
--    }
--
--    /* Match up the passed in ip_addr with one found in adaptr_info.
--     * The matching one in adptr_info will have the netmask.
--     */
--    p = &((struct sockaddr_in *)ip_addr->Address.lpSockaddr)->sin_addr;
--    for (info = adptr_info; info; info = info->Next) {
--        for (ip = &info->IpAddressList; ip; ip = ip->Next) {
--            if (p->S_un.S_addr == inet_addr(ip->IpAddress.String)) {
--                prefix = ctpop32(inet_addr(ip->IpMask.String));
--                goto out;
--            }
--        }
--    }
--out:
--    g_free(adptr_info);
--    return prefix;
--}
--#endif
- 
- #define INTERFACE_PATH_BUF_SZ 512
- 
-@@ -1904,7 +1845,6 @@ typedef struct _GA_WTSINFOA {
- 
- GuestUserList *qmp_guest_get_users(Error **err)
- {
--#if (_WIN32_WINNT >= 0x0600)
- #define QGA_NANOSECONDS 10000000
- 
-     GHashTable *cache = NULL;
-@@ -1974,10 +1914,6 @@ GuestUserList *qmp_guest_get_users(Error **err)
-     }
-     g_hash_table_destroy(cache);
-     return head;
--#else
--    error_setg(err, QERR_UNSUPPORTED);
--    return NULL;
--#endif
- }
- 
- typedef struct _ga_matrix_lookup_t {
++#ifdef _WIN32
++/* as defined in sdkddkver.h */
++#ifndef WINVER
++#define WINVER 0x0501 /* XP */
++#endif
++/* reduces the number of implicitly included headers */
++#ifndef WIN32_LEAN_AND_MEAN
++#define WIN32_LEAN_AND_MEAN
++#endif
++#endif
++
+ #include <stdarg.h>
+ #include <stddef.h>
+ #include <stdbool.h>
+ #include <stdint.h>
+ #include <sys/types.h>
+ #include <stdlib.h>
++
++/* enable C99/POSIX format strings (needs mingw32-runtime 3.15 or later) */
++#ifdef __MINGW32__
++#define __USE_MINGW_ANSI_STDIO 1
++#endif
+ #include <stdio.h>
++
+ #include <string.h>
+ #include <strings.h>
+ #include <inttypes.h>
 -- 
 1.8.3.1
