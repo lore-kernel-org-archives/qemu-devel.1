@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gX0e6-0002dg-KN
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:17:36 -0500
+	(envelope-from <david@redhat.com>) id 1gX0e9-0002g7-43
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:17:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gX0e0-0005bo-LR
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:17:34 -0500
+	(envelope-from <david@redhat.com>) id 1gX0e6-0005gk-Je
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:17:37 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Wed, 12 Dec 2018 10:16:20 +0100
-Message-Id: <20181212091623.16950-9-david@redhat.com>
+Date: Wed, 12 Dec 2018 10:16:22 +0100
+Message-Id: <20181212091623.16950-11-david@redhat.com>
 In-Reply-To: <20181212091623.16950-1-david@redhat.com>
 References: <20181212091623.16950-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 08/11] pci/pcie: perform unplug via the
+Subject: [Qemu-devel] [PATCH v4 10/11] pci/shpc: perform unplug via the
  hotplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -33,63 +33,116 @@ actually unplugging a device after an unplug request. Lookup the hotplug
 handler and call "unplug".
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/pci/pcie.c         | 10 +++++++++-
- hw/pci/pcie_port.c    |  1 +
- include/hw/pci/pcie.h |  2 ++
- 3 files changed, 12 insertions(+), 1 deletion(-)
+ hw/pci-bridge/pci_bridge_dev.c  | 10 ++++++++++
+ hw/pci-bridge/pcie_pci_bridge.c |  1 +
+ hw/pci/shpc.c                   | 11 ++++++++++-
+ include/hw/pci/pci_bridge.h     |  2 ++
+ include/hw/pci/shpc.h           |  2 ++
+ 5 files changed, 25 insertions(+), 1 deletion(-)
 
-diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-index ccba29269e..ba3ea925e9 100644
---- a/hw/pci/pcie.c
-+++ b/hw/pci/pcie.c
-@@ -364,11 +364,19 @@ void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-     }
+diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
+index fa0be13ac4..ff6b8323da 100644
+--- a/hw/pci-bridge/pci_bridge_dev.c
++++ b/hw/pci-bridge/pci_bridge_dev.c
+@@ -219,6 +219,15 @@ void pci_bridge_dev_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+     shpc_device_plug_cb(hotplug_dev, dev, errp);
  }
  
--static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque)
-+void pcie_cap_slot_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                             Error **errp)
- {
-     object_unparent(OBJECT(dev));
- }
- 
-+static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque)
++void pci_bridge_dev_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
++                              Error **errp)
 +{
-+    HotplugHandler *hotplug_ctrl = qdev_get_hotplug_handler(DEVICE(dev));
++    PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
 +
-+    hotplug_handler_unplug(hotplug_ctrl, DEVICE(dev), &error_abort);
++    g_assert(shpc_present(pci_hotplug_dev));
++    shpc_device_unplug_cb(hotplug_dev, dev, errp);
 +}
 +
- void pcie_cap_slot_unplug_request_cb(HotplugHandler *hotplug_dev,
-                                      DeviceState *dev, Error **errp)
+ void pci_bridge_dev_unplug_request_cb(HotplugHandler *hotplug_dev,
+                                       DeviceState *dev, Error **errp)
  {
-diff --git a/hw/pci/pcie_port.c b/hw/pci/pcie_port.c
-index 7982a87880..a30291ef54 100644
---- a/hw/pci/pcie_port.c
-+++ b/hw/pci/pcie_port.c
-@@ -156,6 +156,7 @@ static void pcie_slot_class_init(ObjectClass *oc, void *data)
-     dc->props = pcie_slot_props;
-     hc->pre_plug = pcie_cap_slot_pre_plug_cb;
-     hc->plug = pcie_cap_slot_plug_cb;
-+    hc->unplug = pcie_cap_slot_unplug_cb;
-     hc->unplug_request = pcie_cap_slot_unplug_request_cb;
+@@ -251,6 +260,7 @@ static void pci_bridge_dev_class_init(ObjectClass *klass, void *data)
+     dc->vmsd = &pci_bridge_dev_vmstate;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+     hc->plug = pci_bridge_dev_plug_cb;
++    hc->unplug = pci_bridge_dev_unplug_cb;
+     hc->unplug_request = pci_bridge_dev_unplug_request_cb;
  }
  
-diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
-index d9fbcf4a4a..9ae6482658 100644
---- a/include/hw/pci/pcie.h
-+++ b/include/hw/pci/pcie.h
-@@ -135,6 +135,8 @@ void pcie_cap_slot_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-                                Error **errp);
- void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-                            Error **errp);
-+void pcie_cap_slot_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                             Error **errp);
- void pcie_cap_slot_unplug_request_cb(HotplugHandler *hotplug_dev,
-                                      DeviceState *dev, Error **errp);
- #endif /* QEMU_PCIE_H */
+diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
+index 0ffea680d5..d491b40d04 100644
+--- a/hw/pci-bridge/pcie_pci_bridge.c
++++ b/hw/pci-bridge/pcie_pci_bridge.c
+@@ -154,6 +154,7 @@ static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
+     dc->reset = &pcie_pci_bridge_reset;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+     hc->plug = pci_bridge_dev_plug_cb;
++    hc->unplug = pci_bridge_dev_unplug_cb;
+     hc->unplug_request = pci_bridge_dev_unplug_request_cb;
+ }
+ 
+diff --git a/hw/pci/shpc.c b/hw/pci/shpc.c
+index 7851bfa8ad..45053b39b9 100644
+--- a/hw/pci/shpc.c
++++ b/hw/pci/shpc.c
+@@ -238,6 +238,7 @@ static void shpc_invalid_command(SHPCDevice *shpc)
+ 
+ static void shpc_free_devices_in_slot(SHPCDevice *shpc, int slot)
+ {
++    HotplugHandler *hotplug_ctrl;
+     int devfn;
+     int pci_slot = SHPC_IDX_TO_PCI(slot);
+     for (devfn = PCI_DEVFN(pci_slot, 0);
+@@ -245,7 +246,9 @@ static void shpc_free_devices_in_slot(SHPCDevice *shpc, int slot)
+          ++devfn) {
+         PCIDevice *affected_dev = shpc->sec_bus->devices[devfn];
+         if (affected_dev) {
+-            object_unparent(OBJECT(affected_dev));
++            hotplug_ctrl = qdev_get_hotplug_handler(DEVICE(affected_dev));
++            hotplug_handler_unplug(hotplug_ctrl, DEVICE(affected_dev),
++                                   &error_abort);
+         }
+     }
+ }
+@@ -540,6 +543,12 @@ void shpc_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+     shpc_interrupt_update(pci_hotplug_dev);
+ }
+ 
++void shpc_device_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
++                           Error **errp)
++{
++    object_unparent(OBJECT(dev));
++}
++
+ void shpc_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+                                    DeviceState *dev, Error **errp)
+ {
+diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
+index 6e37c7551a..ba488818d2 100644
+--- a/include/hw/pci/pci_bridge.h
++++ b/include/hw/pci/pci_bridge.h
+@@ -101,6 +101,8 @@ void pci_bridge_exitfn(PCIDevice *pci_dev);
+ 
+ void pci_bridge_dev_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+                             Error **errp);
++void pci_bridge_dev_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
++                              Error **errp);
+ void pci_bridge_dev_unplug_request_cb(HotplugHandler *hotplug_dev,
+                                       DeviceState *dev, Error **errp);
+ 
+diff --git a/include/hw/pci/shpc.h b/include/hw/pci/shpc.h
+index 71293aca58..18f6ec1cd5 100644
+--- a/include/hw/pci/shpc.h
++++ b/include/hw/pci/shpc.h
+@@ -47,6 +47,8 @@ void shpc_cap_write_config(PCIDevice *d, uint32_t addr, uint32_t val, int len);
+ 
+ void shpc_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+                          Error **errp);
++void shpc_device_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
++                           Error **errp);
+ void shpc_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+                                    DeviceState *dev, Error **errp);
+ 
 -- 
 2.17.2
