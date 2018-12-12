@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gX1Ue-0000u4-Nk
+	(envelope-from <armbru@redhat.com>) id 1gX1Ue-0000u0-Mk
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 05:11:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gX1Uc-0003NK-On
+	(envelope-from <armbru@redhat.com>) id 1gX1UZ-0003Jv-Nv
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 05:11:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45982)
+Received: from mx1.redhat.com ([209.132.183.28]:33170)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gX1Uc-0003MD-Hs
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 05:11:50 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gX1UZ-0003JL-HC
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 05:11:47 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
 	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D2CFE3002C6A
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 10:11:49 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BDB2030014CD
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 10:11:46 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-56.ams2.redhat.com
+	[10.36.116.56])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B3D019743
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 10:11:46 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 12 Dec 2018 11:11:36 +0100
-Message-Id: <20181212101145.3496-3-armbru@redhat.com>
-In-Reply-To: <20181212101145.3496-1-armbru@redhat.com>
-References: <20181212101145.3496-1-armbru@redhat.com>
+Date: Wed, 12 Dec 2018 11:11:34 +0100
+Message-Id: <20181212101145.3496-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 02/11] monitor: accept chardev input from
- iothread
+Subject: [Qemu-devel] [PULL 00/11] Monitor patches for 2018-12-12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,91 +35,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+The following changes since commit bb9bf94b3e8926553290bc9a7cb84315af4220=
+86:
 
-Chardev backends may not handle safely IO events from concurrent
-threads (may not handle I/O events from concurrent threads safely,
-only the write path is since commit >
-9005b2a7589540a3733b3abdcfbccfe7746cd1a1). Better to wake up the
-chardev from the monitor IO thread if it's being used as the chardev
-context.
+  Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-r=
+equest' into staging (2018-12-11 19:18:58 +0000)
 
-Unify code paths by using a BH in all cases.
+are available in the Git repository at:
 
-Drop the now redundant aio_notify() call.
+  git://repo.or.cz/qemu/armbru.git tags/pull-monitor-2018-12-12
 
-Clean up control flow not to rely on mon->use_io_thread implying
-monitor_is_qmp(mon).
+for you to fetch changes up to c55f070b7195cee4e06998c10f57f13c7df98dbd:
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20181205203737.9011-3-marcandre.lureau@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- monitor.c | 29 +++++++++++++++++++----------
- 1 file changed, 19 insertions(+), 10 deletions(-)
+  tests: add oob functional test for test-qmp-cmds (2018-12-12 10:28:27 +=
+0100)
 
-diff --git a/monitor.c b/monitor.c
-index d531e8ccc9..79afe99079 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -4297,7 +4297,7 @@ int monitor_suspend(Monitor *mon)
-=20
-     atomic_inc(&mon->suspend_cnt);
-=20
--    if (monitor_is_qmp(mon) && mon->use_io_thread) {
-+    if (mon->use_io_thread) {
-         /*
-          * Kick I/O thread to make sure this takes effect.  It'll be
-          * evaluated again in prepare() of the watch object.
-@@ -4309,6 +4309,13 @@ int monitor_suspend(Monitor *mon)
-     return 0;
- }
-=20
-+static void monitor_accept_input(void *opaque)
-+{
-+    Monitor *mon =3D opaque;
-+
-+    qemu_chr_fe_accept_input(&mon->chr);
-+}
-+
- void monitor_resume(Monitor *mon)
- {
-     if (monitor_is_hmp_non_interactive(mon)) {
-@@ -4316,20 +4323,22 @@ void monitor_resume(Monitor *mon)
-     }
-=20
-     if (atomic_dec_fetch(&mon->suspend_cnt) =3D=3D 0) {
--        if (monitor_is_qmp(mon)) {
--            /*
--             * For QMP monitors that are running in the I/O thread,
--             * let's kick the thread in case it's sleeping.
--             */
--            if (mon->use_io_thread) {
--                aio_notify(iothread_get_aio_context(mon_iothread));
--            }
-+        AioContext *ctx;
-+
-+        if (mon->use_io_thread) {
-+            ctx =3D iothread_get_aio_context(mon_iothread);
-         } else {
-+            ctx =3D qemu_get_aio_context();
-+        }
-+
-+        if (!monitor_is_qmp(mon)) {
-             assert(mon->rs);
-             readline_show_prompt(mon->rs);
-         }
--        qemu_chr_fe_accept_input(&mon->chr);
-+
-+        aio_bh_schedule_oneshot(ctx, monitor_accept_input, mon);
-     }
-+
-     trace_monitor_suspend(mon, -1);
- }
-=20
+----------------------------------------------------------------
+Monitor patches for 2018-12-12
+
+* Fixes related to running the monitor in an I/O thread
+* Change how OOB-enabled QMP monitors handle flow control: suspend
+  monitor instead dropping commands
+* Offer QMP capability "oob" unconditionally, remove "x-oob"
+
+----------------------------------------------------------------
+Marc-Andr=C3=A9 Lureau (7):
+      monitor: inline ambiguous helper functions
+      monitor: accept chardev input from iothread
+      char: add a QEMU_CHAR_FEATURE_GCONTEXT flag
+      monitor: check if chardev can switch gcontext for OOB
+      colo: check chardev can switch context
+      monitor: prevent inserting new monitors after cleanup
+      monitor: avoid potential dead-lock when cleaning up
+
+Peter Xu (4):
+      monitor: Suspend monitor instead dropping commands
+      monitor: Remove "x-oob", offer capability "oob" unconditionally
+      Revert "tests: Add parameter to qtest_init_without_qmp_handshake"
+      tests: add oob functional test for test-qmp-cmds
+
+ chardev/char.c            |  11 ++++
+ docs/interop/qmp-spec.txt |   5 +-
+ include/chardev/char.h    |   3 +
+ include/monitor/monitor.h |   3 +-
+ monitor.c                 | 139 +++++++++++++++++++++++-----------------=
+------
+ net/colo-compare.c        |   6 ++
+ qapi/misc.json            |  40 -------------
+ tests/libqtest.c          |   9 ++-
+ tests/libqtest.h          |   4 +-
+ tests/qmp-test.c          |   6 +-
+ tests/test-qmp-cmds.c     |  16 ++++++
+ vl.c                      |   5 --
+ 12 files changed, 118 insertions(+), 129 deletions(-)
+
 --=20
 2.17.2
