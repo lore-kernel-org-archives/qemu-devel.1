@@ -1,14 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gXCcK-0007Tm-8B
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 17:04:33 -0500
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gXCdO-0008Mt-Lg
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 17:05:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gXCcC-0001Cc-9G
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 17:04:30 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Wed, 12 Dec 2018 16:04:10 -0600
-Message-Id: <20181212220410.569069-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC] qemu-io: Prefer stderr for error messages
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gXCdN-0002MO-4a
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 17:05:38 -0500
+Received: from mail-lf1-x12f.google.com ([2a00:1450:4864:20::12f]:34919)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
+	id 1gXCdM-0002Le-P4
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 17:05:37 -0500
+Received: by mail-lf1-x12f.google.com with SMTP id e26so14762520lfc.2
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 14:05:36 -0800 (PST)
+MIME-Version: 1.0
+References: <20181102171638.24069-1-peter.maydell@linaro.org>
+	<20181102171638.24069-11-peter.maydell@linaro.org>
+	<CAFEAcA_Fp8r7HPY6hORagGo=1ypAn-U_wqq7e3HkouUHJAQW5A@mail.gmail.com>
+In-Reply-To: <CAFEAcA_Fp8r7HPY6hORagGo=1ypAn-U_wqq7e3HkouUHJAQW5A@mail.gmail.com>
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Date: Wed, 12 Dec 2018 23:05:22 +0100
+Message-ID: <CAJy5ezqrnUP0pLPkZZ2U1hwrPw9sSyQ+tS+9HAp1Lda6xS4YSQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 10/10] hw/arm: versal: Add a virtual Xilinx
+ Versal board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,398 +31,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, rjones@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-When a qemu-io command fails, it's best if the failure message
-goes to stderr rather than stdout.
+Hi Peter,
 
-Reported-by: Richard W.M. Jones <rjones@redhat.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
+Thanks for pointing this out. I'll post patches soon unless someone beats
+me to it. I'm travelling, hence the slow and top posted reply....
+
+Cheers,
+Edgar
 ---
+Sent from my phone
 
-RFC because at least iotest 60 (found by -qcow2 -g quick) breaks due
-to reordering of output lines, and I'd rather know if we like this
-idea before bothering to revisit all affected iotests (including
-discovering if other slower ones have similar problems).
+On Tue, Dec 4, 2018, 11:28 Peter Maydell <peter.maydell@linaro.org wrote:
 
- qemu-io-cmds.c | 120 ++++++++++++++++++++++++++-----------------------
- qemu-io.c      |   3 +-
- 2 files changed, 67 insertions(+), 56 deletions(-)
-
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index 5363482213b..e4f3925b5c9 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -184,14 +184,14 @@ static void print_cvtnum_err(int64_t rc, const char *arg)
- {
-     switch (rc) {
-     case -EINVAL:
--        printf("Parsing error: non-numeric argument,"
--               " or extraneous/unrecognized suffix -- %s\n", arg);
-+        fprintf(stderr, "Parsing error: non-numeric argument,"
-+                " or extraneous/unrecognized suffix -- %s\n", arg);
-         break;
-     case -ERANGE:
--        printf("Parsing error: argument too large -- %s\n", arg);
-+        fprintf(stderr, "Parsing error: argument too large -- %s\n", arg);
-         break;
-     default:
--        printf("Parsing error: %s\n", arg);
-+        fprintf(stderr, "Parsing error: %s\n", arg);
-     }
- }
-
-@@ -312,7 +312,7 @@ static int parse_pattern(const char *arg)
-
-     pattern = strtol(arg, &endptr, 0);
-     if (pattern < 0 || pattern > UCHAR_MAX || *endptr != '\0') {
--        printf("%s is not a valid pattern byte\n", arg);
-+        fprintf(stderr, "%s is not a valid pattern byte\n", arg);
-         return -1;
-     }
-
-@@ -421,14 +421,16 @@ create_iovec(BlockBackend *blk, QEMUIOVector *qiov, char **argv, int nr_iov,
-         }
-
-         if (len > BDRV_REQUEST_MAX_BYTES) {
--            printf("Argument '%s' exceeds maximum size %" PRIu64 "\n", arg,
--                   (uint64_t)BDRV_REQUEST_MAX_BYTES);
-+            fprintf(stderr,
-+                    "Argument '%s' exceeds maximum size %" PRIu64 "\n", arg,
-+                    (uint64_t)BDRV_REQUEST_MAX_BYTES);
-             goto fail;
-         }
-
-         if (count > BDRV_REQUEST_MAX_BYTES - len) {
--            printf("The total number of bytes exceed the maximum size %" PRIu64
--                   "\n", (uint64_t)BDRV_REQUEST_MAX_BYTES);
-+            fprintf(stderr,
-+                    "The total number of bytes exceed the maximum size %" PRIu64
-+                    "\n", (uint64_t)BDRV_REQUEST_MAX_BYTES);
-             goto fail;
-         }
-
-@@ -723,8 +725,8 @@ static int read_f(BlockBackend *blk, int argc, char **argv)
-         print_cvtnum_err(count, argv[optind]);
-         return count;
-     } else if (count > BDRV_REQUEST_MAX_BYTES) {
--        printf("length cannot exceed %" PRIu64 ", given %s\n",
--               (uint64_t)BDRV_REQUEST_MAX_BYTES, argv[optind]);
-+        fprintf(stderr, "length cannot exceed %" PRIu64 ", given %s\n",
-+                (uint64_t)BDRV_REQUEST_MAX_BYTES, argv[optind]);
-         return -EINVAL;
-     }
-
-@@ -738,19 +740,22 @@ static int read_f(BlockBackend *blk, int argc, char **argv)
-     }
-
-     if ((pattern_count < 0) || (pattern_count + pattern_offset > count))  {
--        printf("pattern verification range exceeds end of read data\n");
-+        fprintf(stderr,
-+                "pattern verification range exceeds end of read data\n");
-         return -EINVAL;
-     }
-
-     if (bflag) {
-         if (!QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE)) {
--            printf("%" PRId64 " is not a sector-aligned value for 'offset'\n",
--                   offset);
-+            fprintf(stderr,
-+                    "%" PRId64 " is not a sector-aligned value for 'offset'\n",
-+                    offset);
-             return -EINVAL;
-         }
-         if (!QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE)) {
--            printf("%"PRId64" is not a sector-aligned value for 'count'\n",
--                   count);
-+            fprintf(stderr,
-+                    "%"PRId64" is not a sector-aligned value for 'count'\n",
-+                    count);
-             return -EINVAL;
-         }
-     }
-@@ -766,7 +771,7 @@ static int read_f(BlockBackend *blk, int argc, char **argv)
-     gettimeofday(&t2, NULL);
-
-     if (ret < 0) {
--        printf("read failed: %s\n", strerror(-ret));
-+        fprintf(stderr, "read failed: %s\n", strerror(-ret));
-         goto out;
-     }
-     cnt = ret;
-@@ -777,9 +782,9 @@ static int read_f(BlockBackend *blk, int argc, char **argv)
-         void *cmp_buf = g_malloc(pattern_count);
-         memset(cmp_buf, pattern, pattern_count);
-         if (memcmp(buf + pattern_offset, cmp_buf, pattern_count)) {
--            printf("Pattern verification failed at offset %"
--                   PRId64 ", %"PRId64" bytes\n",
--                   offset + pattern_offset, pattern_count);
-+            fprintf(stderr, "Pattern verification failed at offset %"
-+                    PRId64 ", %"PRId64" bytes\n",
-+                    offset + pattern_offset, pattern_count);
-             ret = -EINVAL;
-         }
-         g_free(cmp_buf);
-@@ -895,7 +900,7 @@ static int readv_f(BlockBackend *blk, int argc, char **argv)
-     gettimeofday(&t2, NULL);
-
-     if (ret < 0) {
--        printf("readv failed: %s\n", strerror(-ret));
-+        fprintf(stderr, "readv failed: %s\n", strerror(-ret));
-         goto out;
-     }
-     cnt = ret;
-@@ -906,8 +911,8 @@ static int readv_f(BlockBackend *blk, int argc, char **argv)
-         void *cmp_buf = g_malloc(qiov.size);
-         memset(cmp_buf, pattern, qiov.size);
-         if (memcmp(buf, cmp_buf, qiov.size)) {
--            printf("Pattern verification failed at offset %"
--                   PRId64 ", %zu bytes\n", offset, qiov.size);
-+            fprintf(stderr, "Pattern verification failed at offset %"
-+                    PRId64 ", %zu bytes\n", offset, qiov.size);
-             ret = -EINVAL;
-         }
-         g_free(cmp_buf);
-@@ -1027,22 +1032,23 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
-     }
-
-     if (bflag && zflag) {
--        printf("-b and -z cannot be specified at the same time\n");
-+        fprintf(stderr, "-b and -z cannot be specified at the same time\n");
-         return -EINVAL;
-     }
-
-     if ((flags & BDRV_REQ_FUA) && (bflag || cflag)) {
--        printf("-f and -b or -c cannot be specified at the same time\n");
-+        fprintf(stderr,
-+                "-f and -b or -c cannot be specified at the same time\n");
-         return -EINVAL;
-     }
-
-     if ((flags & BDRV_REQ_MAY_UNMAP) && !zflag) {
--        printf("-u requires -z to be specified\n");
-+        fprintf(stderr, "-u requires -z to be specified\n");
-         return -EINVAL;
-     }
-
-     if (zflag && Pflag) {
--        printf("-z and -P cannot be specified at the same time\n");
-+        fprintf(stderr, "-z and -P cannot be specified at the same time\n");
-         return -EINVAL;
-     }
-
-@@ -1058,21 +1064,23 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
-         print_cvtnum_err(count, argv[optind]);
-         return count;
-     } else if (count > BDRV_REQUEST_MAX_BYTES) {
--        printf("length cannot exceed %" PRIu64 ", given %s\n",
--               (uint64_t)BDRV_REQUEST_MAX_BYTES, argv[optind]);
-+        fprintf(stderr, "length cannot exceed %" PRIu64 ", given %s\n",
-+                (uint64_t)BDRV_REQUEST_MAX_BYTES, argv[optind]);
-         return -EINVAL;
-     }
-
-     if (bflag || cflag) {
-         if (!QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE)) {
--            printf("%" PRId64 " is not a sector-aligned value for 'offset'\n",
--                   offset);
-+            fprintf(stderr,
-+                    "%" PRId64 " is not a sector-aligned value for 'offset'\n",
-+                    offset);
-             return -EINVAL;
-         }
-
-         if (!QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE)) {
--            printf("%"PRId64" is not a sector-aligned value for 'count'\n",
--                   count);
-+            fprintf(stderr,
-+                    "%"PRId64" is not a sector-aligned value for 'count'\n",
-+                    count);
-             return -EINVAL;
-         }
-     }
-@@ -1094,7 +1102,7 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
-     gettimeofday(&t2, NULL);
-
-     if (ret < 0) {
--        printf("write failed: %s\n", strerror(-ret));
-+        fprintf(stderr, "write failed: %s\n", strerror(-ret));
-         goto out;
-     }
-     cnt = ret;
-@@ -1208,7 +1216,7 @@ static int writev_f(BlockBackend *blk, int argc, char **argv)
-     gettimeofday(&t2, NULL);
-
-     if (ret < 0) {
--        printf("writev failed: %s\n", strerror(-ret));
-+        fprintf(stderr, "writev failed: %s\n", strerror(-ret));
-         goto out;
-     }
-     cnt = ret;
-@@ -1252,7 +1260,7 @@ static void aio_write_done(void *opaque, int ret)
-
-
-     if (ret < 0) {
--        printf("aio_write failed: %s\n", strerror(-ret));
-+        fprintf(stderr, "aio_write failed: %s\n", strerror(-ret));
-         block_acct_failed(blk_get_stats(ctx->blk), &ctx->acct);
-         goto out;
-     }
-@@ -1283,7 +1291,7 @@ static void aio_read_done(void *opaque, int ret)
-     gettimeofday(&t2, NULL);
-
-     if (ret < 0) {
--        printf("readv failed: %s\n", strerror(-ret));
-+        fprintf(stderr, "readv failed: %s\n", strerror(-ret));
-         block_acct_failed(blk_get_stats(ctx->blk), &ctx->acct);
-         goto out;
-     }
-@@ -1293,8 +1301,8 @@ static void aio_read_done(void *opaque, int ret)
-
-         memset(cmp_buf, ctx->pattern, ctx->qiov.size);
-         if (memcmp(ctx->buf, cmp_buf, ctx->qiov.size)) {
--            printf("Pattern verification failed at offset %"
--                   PRId64 ", %zu bytes\n", ctx->offset, ctx->qiov.size);
-+            fprintf(stderr, "Pattern verification failed at offset %"
-+                    PRId64 ", %zu bytes\n", ctx->offset, ctx->qiov.size);
-         }
-         g_free(cmp_buf);
-     }
-@@ -1513,19 +1521,19 @@ static int aio_write_f(BlockBackend *blk, int argc, char **argv)
-     }
-
-     if (ctx->zflag && optind != argc - 2) {
--        printf("-z supports only a single length parameter\n");
-+        fprintf(stderr, "-z supports only a single length parameter\n");
-         g_free(ctx);
-         return -EINVAL;
-     }
-
-     if ((flags & BDRV_REQ_MAY_UNMAP) && !ctx->zflag) {
--        printf("-u requires -z to be specified\n");
-+        fprintf(stderr, "-u requires -z to be specified\n");
-         g_free(ctx);
-         return -EINVAL;
-     }
-
-     if (ctx->zflag && ctx->Pflag) {
--        printf("-z and -P cannot be specified at the same time\n");
-+        fprintf(stderr, "-z and -P cannot be specified at the same time\n");
-         g_free(ctx);
-         return -EINVAL;
-     }
-@@ -1637,7 +1645,7 @@ static int length_f(BlockBackend *blk, int argc, char **argv)
-
-     size = blk_getlength(blk);
-     if (size < 0) {
--        printf("getlength: %s\n", strerror(-size));
-+        fprintf(stderr, "getlength: %s\n", strerror(-size));
-         return size;
-     }
-
-@@ -1767,9 +1775,9 @@ static int discard_f(BlockBackend *blk, int argc, char **argv)
-         print_cvtnum_err(bytes, argv[optind]);
-         return bytes;
-     } else if (bytes >> BDRV_SECTOR_BITS > BDRV_REQUEST_MAX_SECTORS) {
--        printf("length cannot exceed %"PRIu64", given %s\n",
--               (uint64_t)BDRV_REQUEST_MAX_SECTORS << BDRV_SECTOR_BITS,
--               argv[optind]);
-+        fprintf(stderr, "length cannot exceed %"PRIu64", given %s\n",
-+                (uint64_t)BDRV_REQUEST_MAX_SECTORS << BDRV_SECTOR_BITS,
-+                argv[optind]);
-         return -EINVAL;
-     }
-
-@@ -1778,7 +1786,7 @@ static int discard_f(BlockBackend *blk, int argc, char **argv)
-     gettimeofday(&t2, NULL);
-
-     if (ret < 0) {
--        printf("discard failed: %s\n", strerror(-ret));
-+        fprintf(stderr, "discard failed: %s\n", strerror(-ret));
-         return ret;
-     }
-
-@@ -1820,7 +1828,7 @@ static int alloc_f(BlockBackend *blk, int argc, char **argv)
-     while (remaining) {
-         ret = bdrv_is_allocated(bs, offset, remaining, &num);
-         if (ret < 0) {
--            printf("is_allocated failed: %s\n", strerror(-ret));
-+            fprintf(stderr, "is_allocated failed: %s\n", strerror(-ret));
-             return ret;
-         }
-         offset += num;
-@@ -2069,7 +2077,7 @@ static int break_f(BlockBackend *blk, int argc, char **argv)
-
-     ret = bdrv_debug_breakpoint(blk_bs(blk), argv[1], argv[2]);
-     if (ret < 0) {
--        printf("Could not set breakpoint: %s\n", strerror(-ret));
-+        fprintf(stderr, "Could not set breakpoint: %s\n", strerror(-ret));
-         return ret;
-     }
-
-@@ -2082,7 +2090,8 @@ static int remove_break_f(BlockBackend *blk, int argc, char **argv)
-
-     ret = bdrv_debug_remove_breakpoint(blk_bs(blk), argv[1]);
-     if (ret < 0) {
--        printf("Could not remove breakpoint %s: %s\n", argv[1], strerror(-ret));
-+        fprintf(stderr, "Could not remove breakpoint %s: %s\n",
-+                argv[1], strerror(-ret));
-         return ret;
-     }
-
-@@ -2114,7 +2123,7 @@ static int resume_f(BlockBackend *blk, int argc, char **argv)
-
-     ret = bdrv_debug_resume(blk_bs(blk), argv[1]);
-     if (ret < 0) {
--        printf("Could not resume request: %s\n", strerror(-ret));
-+        fprintf(stderr, "Could not resume request: %s\n", strerror(-ret));
-         return ret;
-     }
-
-@@ -2193,8 +2202,9 @@ static int sigraise_f(BlockBackend *blk, int argc, char **argv)
-         print_cvtnum_err(sig, argv[1]);
-         return sig;
-     } else if (sig > NSIG) {
--        printf("signal argument '%s' is too large to be a valid signal\n",
--               argv[1]);
-+        fprintf(stderr,
-+                "signal argument '%s' is too large to be a valid signal\n",
-+                argv[1]);
-         return -EINVAL;
-     }
-
-@@ -2224,7 +2234,7 @@ static int sleep_f(BlockBackend *blk, int argc, char **argv)
-
-     ms = strtol(argv[1], &endptr, 0);
-     if (ms < 0 || *endptr != '\0') {
--        printf("%s is not a valid number\n", argv[1]);
-+        fprintf(stderr, "%s is not a valid number\n", argv[1]);
-         return -EINVAL;
-     }
-
-@@ -2294,7 +2304,7 @@ static int help_f(BlockBackend *blk, int argc, char **argv)
-
-     ct = find_command(argv[1]);
-     if (ct == NULL) {
--        printf("command %s not found\n", argv[1]);
-+        fprintf(stderr, "command %s not found\n", argv[1]);
-         return -EINVAL;
-     }
-
-diff --git a/qemu-io.c b/qemu-io.c
-index 6df7731af49..36308abb0cc 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
-@@ -206,7 +206,8 @@ static int open_f(BlockBackend *blk, int argc, char **argv)
-             break;
-         case 'o':
-             if (imageOpts) {
--                printf("--image-opts and 'open -o' are mutually exclusive\n");
-+                fprintf(stderr,
-+                        "--image-opts and 'open -o' are mutually exclusive\n");
-                 qemu_opts_reset(&empty_opts);
-                 return -EINVAL;
-             }
--- 
-2.17.2
+> On Fri, 2 Nov 2018 at 17:24, Peter Maydell <peter.maydell@linaro.org>
+> wrote:
+> >
+> > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> >
+> > Add a virtual Xilinx Versal board.
+> >
+> > This board is based on the Xilinx Versal SoC. The exact
+> > details of what peripherals are attached to this board
+> > will remain in control of QEMU. QEMU will generate an
+> > FDT on the fly for Linux and other software to auto-discover
+> > peripherals.
+> >
+> > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> > Message-id: 20181102131913.1535-3-edgar.iglesias@xilinx.com
+> > Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>
+> Hi Edgar -- I've been running the clang-7 leak sanitizer
+> on "make check", and it spotted a couple of minor memory
+> leaks in the versal board code:
+>
+> > +static void fdt_add_gic_nodes(VersalVirt *s)
+> > +{
+> > +    char *nodename;
+> > +
+> > +    nodename = g_strdup_printf("/gic@%x", MM_GIC_APU_DIST_MAIN);
+> > +    qemu_fdt_add_subnode(s->fdt, nodename);
+> > +    qemu_fdt_setprop_cell(s->fdt, nodename, "phandle", s->phandle.gic);
+> > +    qemu_fdt_setprop_cells(s->fdt, nodename, "interrupts",
+> > +                           GIC_FDT_IRQ_TYPE_PPI, VERSAL_GIC_MAINT_IRQ,
+> > +                           GIC_FDT_IRQ_FLAGS_LEVEL_HI);
+> > +    qemu_fdt_setprop(s->fdt, nodename, "interrupt-controller", NULL, 0);
+> > +    qemu_fdt_setprop_sized_cells(s->fdt, nodename, "reg",
+> > +                                 2, MM_GIC_APU_DIST_MAIN,
+> > +                                 2, MM_GIC_APU_DIST_MAIN_SIZE,
+> > +                                 2, MM_GIC_APU_REDIST_0,
+> > +                                 2, MM_GIC_APU_REDIST_0_SIZE);
+> > +    qemu_fdt_setprop_cell(s->fdt, nodename, "#interrupt-cells", 3);
+> > +    qemu_fdt_setprop_string(s->fdt, nodename, "compatible",
+> "arm,gic-v3");
+>
+> nodename is allocated but never freed here.
+>
+> > +}
+>
+>
+> > +#define NUM_VIRTIO_TRANSPORT 32
+> > +static void create_virtio_regions(VersalVirt *s)
+> > +{
+> > +    int virtio_mmio_size = 0x200;
+> > +    int i;
+> > +
+> > +    for (i = 0; i < NUM_VIRTIO_TRANSPORT; i++) {
+> > +        char *name = g_strdup_printf("virtio%d", i);;
+> > +        hwaddr base = MM_TOP_RSVD + i * virtio_mmio_size;
+> > +        int irq = VERSAL_RSVD_HIGH_IRQ_FIRST + i;
+> > +        MemoryRegion *mr;
+> > +        DeviceState *dev;
+> > +        qemu_irq pic_irq;
+> > +
+> > +        pic_irq = qdev_get_gpio_in(DEVICE(&s->soc.fpd.apu.gic), irq);
+> > +        dev = qdev_create(NULL, "virtio-mmio");
+> > +        object_property_add_child(OBJECT(&s->soc), name, OBJECT(dev),
+> > +                                  &error_fatal);
+> > +        qdev_init_nofail(dev);
+> > +        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic_irq);
+> > +        mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
+> > +        memory_region_add_subregion(&s->soc.mr_ps, base, mr);
+> > +        sysbus_create_simple("virtio-mmio", base, pic_irq);
+>
+> The body of this loop allocates name but forgets to free it.
+>
+> > +    }
+>
+> thanks
+> -- PMM
+>
