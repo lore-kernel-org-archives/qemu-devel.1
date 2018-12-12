@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gX0rN-0006Qq-G7
+	(envelope-from <bounces@canonical.com>) id 1gX0rN-0006R1-L7
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gX0rM-0005DR-1X
+	(envelope-from <bounces@canonical.com>) id 1gX0rL-0005DK-VM
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:17 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59204)
+Received: from indium.canonical.com ([91.189.90.7]:59400)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gX0rL-00059G-NA
+	id 1gX0rL-0005Bv-KL
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:15 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gX0rH-0007ug-3F
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:31:11 +0000
+	id 1gX0rK-0007uk-DW
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:31:14 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CF61D2E808D
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:31:10 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 621292E807C
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:31:14 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Dec 2018 09:21:47 -0000
-From: Thomas Huth <1768246@bugs.launchpad.net>
-Reply-To: Bug 1768246 <1768246@bugs.launchpad.net>
+Date: Wed, 12 Dec 2018 09:21:23 -0000
+From: Thomas Huth <1716292@bugs.launchpad.net>
+Reply-To: Bug 1716292 <1716292@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <152518111080.22177.382728353135880212.malonedeb@soybean.canonical.com>
-Message-Id: <154460650886.27949.4917717698410049285.launchpad@wampee.canonical.com>
+References: <150508616435.31900.3449336177179115668.malonedeb@soybean.canonical.com>
+Message-Id: <154460648389.8821.5759478063676115034.launchpad@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1768246] Re: cpu-exec.c:648: cpu_loop_exec_tb:
- Assertion `use_icount' failed.
+Subject: [Qemu-devel] [Bug 1716292] Re: User mode emulation returns wrong
+ value for write(fd, NULL, 0)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,28 +46,49 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1768246
+https://bugs.launchpad.net/bugs/1716292
 
 Title:
-  cpu-exec.c:648: cpu_loop_exec_tb: Assertion `use_icount' failed.
+  User mode emulation returns wrong value for write(fd, NULL, 0)
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  OpenJDK no longer works on qemu-sh4, it previously did after #1735384
-  was fixed.
+  QEMU version: latest master (fcea73709b966a7ded9efa7b106ea50c7fe9025c)
+  OS version: Ubuntu 14.04.5
+  Configured with: ../configure --target-list=3Dx86_64-linux-user
 
-  Crash indicates an assertion failure:
+  QEMU Linux usermode emulation does not handle write() syscalls with
+  zero length and a null pointer correctly: on Linux this returns 0, but
+  in emulation this returns -1.
 
-  (sid-sh4-sbuild)root@nofan:/# java --version
-  qemu-sh4-static: /root/qemu/accel/tcg/cpu-exec.c:648: cpu_loop_exec_tb: A=
-ssertion `use_icount' failed.
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  Aborted
-  (sid-sh4-sbuild)root@nofan:/#
+  I ran into this while using an aarch64 abuild-tar from Alpine Linux in
+  user-mode emulation; here's the minimized reproduction test case:
 
-  Haven't bi-sected the issue yet, but will do so later.
+  zhuowei@zhuowei-tablet:/tmp$ cat writezerobytes.c
+  #include <stdio.h>
+  #include <unistd.h>
+  #include <fcntl.h>
+
+  int main() {
+  =C2=A0ssize_t ret =3D write(STDOUT_FILENO, NULL, 0);
+  =C2=A0fprintf(stderr, "write returned %ld\n", ret);
+  =C2=A0return 0;
+  }
+  zhuowei@zhuowei-tablet:/tmp$ gcc -o writezerobytes writezerobytes.c
+  zhuowei@zhuowei-tablet:/tmp$ uname -a
+  Linux zhuowei-tablet 3.13.0-129-generic #178-Ubuntu SMP Fri Aug 11 12:48:=
+20 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+  zhuowei@zhuowei-tablet:/tmp$ ./writezerobytes
+  write returned 0
+  zhuowei@zhuowei-tablet:/tmp$ /media/zhuowei/redhd/docs/repos/qemu/build4/=
+x86_64-linux-user/qemu-x86_64 ./writezerobytes
+  write returned -1
+  zhuowei@zhuowei-tablet:/tmp$ /media/zhuowei/redhd/docs/repos/qemu/build4/=
+x86_64-linux-user/qemu-x86_64 --version
+  qemu-x86_64 version 2.10.50 (v2.10.0-471-gfcea737-dirty)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1768246/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1716292/+subscriptions
