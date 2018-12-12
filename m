@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gX6Ph-0003Yy-8P
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:27:06 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gX6R0-00055j-2p
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:28:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gX6Pc-0002QQ-Ag
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:27:05 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:50386)
+	(envelope-from <sgarzare@redhat.com>) id 1gX6Qv-0003GP-3v
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:28:26 -0500
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:46436)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gX6Pc-0002Pv-2X
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:27:00 -0500
-Received: by mail-wm1-f65.google.com with SMTP id n190so6220786wmd.0
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:26:59 -0800 (PST)
-References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
-	<1543851204-41186-24-git-send-email-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <d18fe1cd-eb5a-af4a-2d54-6f395c3a4bbc@redhat.com>
-Date: Wed, 12 Dec 2018 16:26:56 +0100
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gX6Qu-0003Fv-RT
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:28:20 -0500
+Received: by mail-ot1-f68.google.com with SMTP id w25so17921816otm.13
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:28:20 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1543851204-41186-24-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 23/71] tests/libqos: arm/raspi2 machine node
+References: <1544049446-6359-1-git-send-email-liam.merwick@oracle.com>
+	<1544049446-6359-4-git-send-email-liam.merwick@oracle.com>
+	<CAGxU2F4j11wVoDktowJwXDy42_PWbjwF0qAueFg+He4Tb86wgQ@mail.gmail.com>
+	<33fb9ea4-d6c5-ed23-2fb5-6f818e250043@oracle.com>
+In-Reply-To: <33fb9ea4-d6c5-ed23-2fb5-6f818e250043@oracle.com>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Wed, 12 Dec 2018 16:28:07 +0100
+Message-ID: <CAGxU2F793nfiFADnJW-j-vLSS0Mp-XP54JFEq++0_JunHQj50w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC 3/3] pvh: Boot uncompressed kernel using
+ direct boot ABI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,144 +31,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <laurent@vivier.eu>
+To: maran.wilson@oracle.com
+Cc: liam.merwick@oracle.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, rth@twiddle.net, xen-devel@lists.xenproject.org, Michael Tsirkin <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Hi Paolo,
+On Tue, Dec 11, 2018 at 7:35 PM Maran Wilson <maran.wilson@oracle.com> wrote:
+>
+> On 12/11/2018 9:11 AM, Stefano Garzarella wrote:
+> > Hi Liam,
+> > in order to support PVH also with SeaBIOS, I'm going to work on a new
+> > option rom (like linuxboot/multiboot) that can be used in this case.
+>
+> That is awesome. Yes, please keep us posted when you have something working.
 
-On 12/3/18 4:32 PM, Paolo Bonzini wrote:
-> From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-> 
-> Add arm/raspi2 machine to the graph. This machine contains a generic-sdhci, so
-> its constructor must take care of setting it properly when called.
-> 
-> Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  tests/Makefile.include            |  1 +
->  tests/libqos/arm-raspi2-machine.c | 91 +++++++++++++++++++++++++++++++++++++++
->  2 files changed, 92 insertions(+)
->  create mode 100644 tests/libqos/arm-raspi2-machine.c
-> 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 66c7848..75951f8 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -681,6 +681,7 @@ qos-test-obj-y += $(libqos-pc-obj-y)
->  qos-test-obj-y += tests/libqos/sdhci.o
->  
->  # Machines
-> +qos-test-obj-y += tests/libqos/arm-raspi2-machine.o
->  qos-test-obj-y += tests/libqos/x86_64_pc-machine.o
->  
->  check-unit-y += tests/test-qgraph$(EXESUF)
-> diff --git a/tests/libqos/arm-raspi2-machine.c b/tests/libqos/arm-raspi2-machine.c
-> new file mode 100644
-> index 0000000..3aff670
-> --- /dev/null
-> +++ b/tests/libqos/arm-raspi2-machine.c
-> @@ -0,0 +1,91 @@
-> +/*
-> + * libqos driver framework
-> + *
-> + * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License version 2 as published by the Free Software Foundation.
-> + *
-> + * This library is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * Lesser General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU Lesser General Public
-> + * License along with this library; if not, see <http://www.gnu.org/licenses/>
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "libqtest.h"
-> +#include "libqos/malloc.h"
-> +#include "libqos/qgraph.h"
-> +#include "sdhci.h"
-> +
-> +#define ARM_PAGE_SIZE             4096
-> +#define RASPI2_RAM_ADDR           0
-> +#define RASPI2_RAM_SIZE           0x20000000
-> +
-> +typedef struct QRaspi2Machine QRaspi2Machine;
-> +
-> +struct QRaspi2Machine {
-> +    QOSGraphObject obj;
-> +    QGuestAllocator alloc;
-> +    QSDHCI_MemoryMapped sdhci;
-> +};
-> +
-> +static void *raspi2_get_driver(void *object, const char *interface)
-> +{
-> +    QRaspi2Machine *machine = object;
-> +    if (!g_strcmp0(interface, "memory")) {
-> +        return &machine->alloc;
-> +    }
-> +
-> +    fprintf(stderr, "%s not present in arm/raspi2\n", interface);
+Yes, I'll keep you updated!
 
-I'd cocci-replace fprintf(stderr) -> g_printerr()
+>
+> Just FYI, before switching over to using Qemu+qboot, we had been using a
+> Qemu only solution (but not using an option rom) internally that worked
+> very well using no FW at all. We had Qemu simply parse the ELF file and
+> jump to the PVH entry point if one is found. The only gotcha was that we
+> had to include a pair of patches that were originally written by folks
+> at Intel as part of the clear containers work. Specifically, in order to
+> be able to skip firmware entirely, we had to do 2 additional things: (1)
+> ACPI tables generated by Qemu are usually patched up by FW. Since we
+> were running no FW, we needed to do that patching up of the ACPI tables
+> in Qemu when it was detected that we were going to enter the OS via the
+> PVH entry point. (2) We also needed to add a patch to Qemu to enable a
+> few PM registers -- something typically done by FW.
 
-> +    g_assert_not_reached();
-> +}
-> +
-> +static QOSGraphObject *raspi2_get_device(void *obj, const char *device)
-> +{
-> +    QRaspi2Machine *machine = obj;
-> +    if (!g_strcmp0(device, "generic-sdhci")) {
-> +        return &machine->sdhci.obj;
-> +    }
-> +
-> +    fprintf(stderr, "%s not present in arm/raspi2\n", device);
-> +    g_assert_not_reached();
-> +}
-> +
-> +static void raspi2_destructor(QOSGraphObject *obj)
-> +{
-> +    QRaspi2Machine *machine = (QRaspi2Machine *) obj;
-> +    alloc_destroy(&machine->alloc);
-> +}
-> +
-> +static void *qos_create_machine_arm_raspi2(QTestState *qts)
-> +{
-> +    QRaspi2Machine *machine = g_new0(QRaspi2Machine, 1);
-> +
-> +    alloc_init(&machine->alloc, 0,
-> +               RASPI2_RAM_ADDR + (1 << 20),
-> +               RASPI2_RAM_ADDR + RASPI2_RAM_SIZE,
+I had a look of qemu-lite, are you referring to this?
 
-This code is not obvious.
+>
+> But if SeaBIOS is involved in the solution you are working on, I guess
+> you won't really need those extra patches. Just figured I'd mention it
+> so you have the full picture.
 
-> +               ARM_PAGE_SIZE);
-> +    machine->obj.get_device = raspi2_get_device;
-> +    machine->obj.get_driver = raspi2_get_driver;
-> +    machine->obj.destructor = raspi2_destructor;
-> +    qos_init_sdhci_mm(&machine->sdhci, qts, 0x3f300000, &(QSDHCIProperties) {
-> +        .version = 3,
-> +        .baseclock = 52,
-> +        .capab.sdma = false,
-> +        .capab.reg = 0x052134b4
-> +    });
-> +    return &machine->obj;
-> +}
-> +
-> +static void raspi2_register_nodes(void)
-> +{
-> +    qos_node_create_machine("arm/raspi2", qos_create_machine_arm_raspi2);
-> +    qos_node_contains("arm/raspi2", "generic-sdhci", NULL);
+Thank you very much to share with me these details!
 
-Shouldn't we also register all the arm/ machines under the aarch64/
-node? If we simply duplicate the same tests, then no.
+Cheers,
+Stefano
 
-> +}
-> +
-> +libqos_init(raspi2_register_nodes);
-> 
+>
+> Thanks,
+> -Maran
+>
+> > I'll keep you updated on it!
+> >
+> > Cheers,
+> > Stefano
+> > On Wed, Dec 5, 2018 at 11:38 PM Liam Merwick <liam.merwick@oracle.com> wrote:
+> >> These changes (along with corresponding qboot and Linux kernel changes)
+> >> enable a guest to be booted using the x86/HVM direct boot ABI.
+> >>
+> >> This commit adds a load_elfboot() routine to pass the size and
+> >> location of the kernel entry point to qboot (which will fill in
+> >> the start_info struct information needed to to boot the guest).
+> >> Having loaded the ELF binary, load_linux() will run qboot
+> >> which continues the boot.
+> >>
+> >> The address for the kernel entry point has already been read
+> >> from an ELF Note in the uncompressed kernel binary earlier
+> >> in pc_memory_init().
+> >>
+> >> Signed-off-by: George Kennedy <George.Kennedy@oracle.com>
+> >> Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
+> >> ---
+> >>   hw/i386/pc.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >>   1 file changed, 72 insertions(+)
+> >>
+> >> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> >> index 056aa46d99b9..d3012cbd8597 100644
+> >> --- a/hw/i386/pc.c
+> >> +++ b/hw/i386/pc.c
+> >> @@ -54,6 +54,7 @@
+> >>   #include "sysemu/qtest.h"
+> >>   #include "kvm_i386.h"
+> >>   #include "hw/xen/xen.h"
+> >> +#include "hw/xen/start_info.h"
+> >>   #include "ui/qemu-spice.h"
+> >>   #include "exec/memory.h"
+> >>   #include "exec/address-spaces.h"
+> >> @@ -1098,6 +1099,50 @@ done:
+> >>       return pvh_start_addr != 0;
+> >>   }
+> >>
+> >> +static bool load_elfboot(const char *kernel_filename,
+> >> +                   int kernel_file_size,
+> >> +                   uint8_t *header,
+> >> +                   size_t pvh_xen_start_addr,
+> >> +                   FWCfgState *fw_cfg)
+> >> +{
+> >> +    uint32_t flags = 0;
+> >> +    uint32_t mh_load_addr = 0;
+> >> +    uint32_t elf_kernel_size = 0;
+> >> +    uint64_t elf_entry;
+> >> +    uint64_t elf_low, elf_high;
+> >> +    int kernel_size;
+> >> +
+> >> +    if (ldl_p(header) != 0x464c457f) {
+> >> +        return false; /* no elfboot */
+> >> +    }
+> >> +
+> >> +    bool elf_is64 = header[EI_CLASS] == ELFCLASS64;
+> >> +    flags = elf_is64 ?
+> >> +        ((Elf64_Ehdr *)header)->e_flags : ((Elf32_Ehdr *)header)->e_flags;
+> >> +
+> >> +    if (flags & 0x00010004) { /* LOAD_ELF_HEADER_HAS_ADDR */
+> >> +        error_report("elfboot unsupported flags = %x", flags);
+> >> +        exit(1);
+> >> +    }
+> >> +
+> >> +    kernel_size = load_elf(kernel_filename, NULL, NULL, &elf_entry,
+> >> +                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
+> >> +                           0, 0);
+> >> +
+> >> +    if (kernel_size < 0) {
+> >> +        error_report("Error while loading elf kernel");
+> >> +        exit(1);
+> >> +    }
+> >> +    mh_load_addr = elf_low;
+> >> +    elf_kernel_size = elf_high - elf_low;
+> >> +
+> >> +    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_xen_start_addr);
+> >> +    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
+> >> +    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
+> >> +
+> >> +    return true;
+> >> +}
+> >> +
+> >>   static void load_linux(PCMachineState *pcms,
+> >>                          FWCfgState *fw_cfg)
+> >>   {
+> >> @@ -1138,6 +1183,33 @@ static void load_linux(PCMachineState *pcms,
+> >>       if (ldl_p(header+0x202) == 0x53726448) {
+> >>           protocol = lduw_p(header+0x206);
+> >>       } else {
+> >> +        /* If the kernel address for using the x86/HVM direct boot ABI has
+> >> +         * been saved then proceed with booting the uncompressed kernel */
+> >> +        if (pvh_start_addr) {
+> >> +            if (load_elfboot(kernel_filename, kernel_size,
+> >> +                             header, pvh_start_addr, fw_cfg)) {
+> >> +                struct hvm_modlist_entry ramdisk_mod = { 0 };
+> >> +
+> >> +                fclose(f);
+> >> +
+> >> +                fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
+> >> +                    strlen(kernel_cmdline) + 1);
+> >> +                fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA, kernel_cmdline);
+> >> +
+> >> +                assert(machine->device_memory != NULL);
+> >> +                ramdisk_mod.paddr = machine->device_memory->base;
+> >> +                ramdisk_mod.size =
+> >> +                    memory_region_size(&machine->device_memory->mr);
+> >> +
+> >> +                fw_cfg_add_bytes(fw_cfg, FW_CFG_KERNEL_DATA, &ramdisk_mod,
+> >> +                                 sizeof(ramdisk_mod));
+> >> +                fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_SIZE, sizeof(header));
+> >> +                fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA,
+> >> +                                 header, sizeof(header));
+> >> +
+> >> +                return;
+> >> +            }
+> >> +        }
+> >>           /* This looks like a multiboot kernel. If it is, let's stop
+> >>              treating it like a Linux kernel. */
+> >>           if (load_multiboot(fw_cfg, f, kernel_filename, initrd_filename,
+> >> --
+> >> 1.8.3.1
+> >>
+> >
+>
 
-We could generate this file from a YAML :)
+
+-- 
+Stefano Garzarella
+Red Hat
