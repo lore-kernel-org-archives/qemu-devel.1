@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gX0rO-0006RV-6m
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:20 -0500
+	(envelope-from <bounces@canonical.com>) id 1gX0rN-0006Qj-Ay
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gX0rM-0005Du-EE
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:18 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58674)
+	(envelope-from <bounces@canonical.com>) id 1gX0rL-0005CQ-D7
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:17 -0500
+Received: from indium.canonical.com ([91.189.90.7]:58492)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gX0rM-0004zs-1p
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:16 -0500
+	id 1gX0rJ-0004xO-Ae
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:14 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gX0r7-0007X2-LR
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:31:01 +0000
+	id 1gX0r6-0007XQ-3U
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:31:00 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9D6C42E8195
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:31:00 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id C7B9E2E80D4
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:30:58 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Dec 2018 09:20:56 -0000
-From: Thomas Huth <1795527@bugs.launchpad.net>
-Reply-To: Bug 1795527 <1795527@bugs.launchpad.net>
+Date: Wed, 12 Dec 2018 09:16:04 -0000
+From: Thomas Huth <1804323@bugs.launchpad.net>
+Reply-To: Bug 1804323 <1804323@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <153843648798.30392.6657333416089253911.malonedeb@soybean.canonical.com>
-Message-Id: <154460645623.913.8282096746064641443.malone@chaenomeles.canonical.com>
+References: <154275217430.18542.5225566870592653176.malonedeb@gac.canonical.com>
+Message-Id: <154460616577.8511.6134741927885865709.launchpad@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1795527] Re: Malformed audio and video output
- stuttering after upgrade to QEMU 3.0
+Subject: [Qemu-devel] [Bug 1804323] Re: qemu segfaults in virtio-scsi driver
+ if underlying device returns -EIO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,8 +39,6 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D6cdc2d189cb60a9d13e
-
 ** Changed in: qemu
        Status: Fix Committed =3D> Fix Released
 
@@ -48,155 +46,172 @@ https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D6cdc2d189cb60a9d13e
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1795527
+https://bugs.launchpad.net/bugs/1804323
 
 Title:
-  Malformed audio and video output stuttering after upgrade to QEMU 3.0
+  qemu segfaults in virtio-scsi driver if underlying device returns -EIO
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  My host is an x86_64 Arch Linux OS with a recompiled 4.18.10 hardened
-  kernel, running a few KVM guests with varying OSes and configurations
-  managed through a Libvirt stack.
+  Reported downstream in Fedora:
+  https://bugzilla.redhat.com/show_bug.cgi?id=3D1650975
 
-  Among these guests I have two Windows 10 VMs with VGA passthrough and
-  PulseAudio-backed virtual audio devices.
+  Using qemu from git and reasonably recent nbdkit, this command injects -E=
+IO
+  errors into the block device which virtio-scsi is reading from:
 
-  After upgrading to QEMU 3.0.0, both of the Win10 guests started
-  showing corrupted audio output in the form of unnatural reproduction
-  speed and occasional but consistently misplaced audio fragments
-  originating from what seems to be a circular buffer wrapping over
-  itself (misbehaviour detected by starting some games with known OSTs
-  and dialogues: soundtracks sound accelerated and past dialogue lines
-  start replaying middle-sentence until the next line starts playing).
+  $ nbdkit --filter=3Derror memory size=3D64M error-rate=3D100% \
+      --run 'x86_64-softmmu/qemu-system-x86_64 -device virtio-scsi,id=3Dscs=
+i -drive file=3D$nbd,format=3Draw,id=3Dhd0,if=3Dnone -device scsi-hd,drive=
+=3Dhd0'
+  nbdkit: memory[1]: error: injecting EIO error into pread
+  nbdkit: memory[1]: error: injecting EIO error into pread
+  qemu-system-x86_64: hw/scsi/scsi-bus.c:1374: scsi_req_complete: Assertion=
+ `req->status =3D=3D -1' failed.
 
-  In addition, the video output of the malfunctioning VMs regularly
-  stutters roughly twice a second for a fraction of a second (sync'ed
-  with the suspected buffer wrapping and especially pronounced during
-  not-pre-rendered cutscenes), toghether with mouse freezes that look
-  like actual input misses more than simple lack of screen refreshes.
+  The stack trace is:
 
-  =
+  Thread 5 (Thread 0x7f33e1f8b700 (LWP 10474)):
+  #0  0x00007f33fe0bf371 in __GI___poll (fds=3D0x559b07199490, nfds=3D1, ti=
+meout=3D-1)
+      at ../sysdeps/unix/sysv/linux/poll.c:29
+  #1  0x00007f34061df5e6 in  () at /lib64/libglib-2.0.so.0
+  #2  0x00007f34061df710 in g_main_context_iteration ()
+      at /lib64/libglib-2.0.so.0
+  #3  0x00007f34061df761 in  () at /lib64/libglib-2.0.so.0
+  #4  0x00007f34062086ea in  () at /lib64/libglib-2.0.so.0
+  #5  0x00007f33fe19b58e in start_thread (arg=3D<optimized out>)
+      at pthread_create.c:486
+  #6  0x00007f33fe0ca593 in clone ()
+      at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
 
-  The issue was succesfully reproduced without the managing stack, directly=
- with the following command line, on the most capable Windows guest:
+  Thread 4 (Thread 0x7f33e3fff700 (LWP 10473)):
+  #0  0x00007f33fe1a4a8d in __lll_lock_wait ()
+      at ../sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:103
+  #1  0x00007f33fe19ddf8 in __GI___pthread_mutex_lock (mutex=3Dmutex@entry=
+=3D0x559b054697a0 <qemu_global_mutex>) at ../nptl/pthread_mutex_lock.c:78
+  #2  0x0000559b04f6b103 in qemu_mutex_lock_impl (mutex=3D0x559b054697a0 <q=
+emu_global_mutex>, file=3D0x559b04f87041 "/home/rjones/d/qemu/exec.c", line=
+=3D3197)
+      at util/qemu-thread-posix.c:66
+  #3  0x0000559b04b722ee in qemu_mutex_lock_iothread_impl (file=3Dfile@entr=
+y=3D0x559b04f87041 "/home/rjones/d/qemu/exec.c", line=3Dline@entry=3D3197)
+      at /home/rjones/d/qemu/cpus.c:1845
+  #4  0x0000559b04b31859 in prepare_mmio_access (mr=3D<optimized out>, mr=
+=3D<optimized out>) at /home/rjones/d/qemu/exec.c:3197
+  #5  0x0000559b04b381d4 in address_space_ldub (as=3D<optimized out>, addr=
+=3D<optimized out>, attrs=3D..., result=3Dresult@entry=3D0x0)
+      at /home/rjones/d/qemu/memory_ldst.inc.c:188
+  #6  0x0000559b04c61cd0 in helper_inb (env=3D<optimized out>, port=3D<opti=
+mized out>) at /home/rjones/d/qemu/target/i386/cpu.h:1846
+  #7  0x00007f33e889dc3e in code_gen_buffer ()
+  #8  0x0000559b04bb3b87 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D0x7f3=
+3e8876100 <code_gen_buffer+684243>) at /home/rjones/d/qemu/accel/tcg/cpu-ex=
+ec.c:171
+  #9  0x0000559b04bb3b87 in cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>=
+, last_tb=3D<synthetic pointer>, tb=3D<optimized out>, cpu=3D0x7f33e8876100=
+ <code_gen_buffer+684243>) at /home/rjones/d/qemu/accel/tcg/cpu-exec.c:615
+  #10 0x0000559b04bb3b87 in cpu_exec (cpu=3Dcpu@entry=3D0x559b05db57a0)
+      at /home/rjones/d/qemu/accel/tcg/cpu-exec.c:725
+  #11 0x0000559b04b7088f in tcg_cpu_exec (cpu=3D0x559b05db57a0)
+      at /home/rjones/d/qemu/cpus.c:1425
+  #12 0x0000559b04b72c03 in qemu_tcg_cpu_thread_fn (arg=3D0x559b05db57a0)
+      at /home/rjones/d/qemu/cpus.c:1729
+  #13 0x0000559b04b72c03 in qemu_tcg_cpu_thread_fn (arg=3Darg@entry=3D0x559=
+b05db57a0)
+      at /home/rjones/d/qemu/cpus.c:1703
+  #14 0x0000559b04f6afba in qemu_thread_start (args=3D<optimized out>)
+      at util/qemu-thread-posix.c:498
+  #15 0x00007f33fe19b58e in start_thread (arg=3D<optimized out>)
+      at pthread_create.c:486
+  #16 0x00007f33fe0ca593 in clone ()
+      at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
 
-   QEMU_AUDIO_DRV=3Dpa
-   QEMU_PA_SERVER=3D127.0.0.1
-   /usr/bin/qemu-system-x86_64 -name guest=3Dwin10_gms,debug-threads=3Don \
-   -machine pc-i440fx-3.0,accel=3Dkvm,usb=3Doff,vmport=3Doff,dump-guest-cor=
-e=3Doff \                                                                  =
-                                                                         =
+  Thread 3 (Thread 0x7f33e178a700 (LWP 10475)):
+  #0  0x00007f33fe0bf371 in __GI___poll (fds=3D0x559b071aa760, nfds=3D2, ti=
+meout=3D-1)
+      at ../sysdeps/unix/sysv/linux/poll.c:29
+  #1  0x00007f34061df5e6 in  () at /lib64/libglib-2.0.so.0
+  #2  0x00007f34061df9a2 in g_main_loop_run () at /lib64/libglib-2.0.so.0
+  #3  0x00007f34032ca90a in  () at /lib64/libgio-2.0.so.0
+  #4  0x00007f34062086ea in  () at /lib64/libglib-2.0.so.0
+  #5  0x00007f33fe19b58e in start_thread (arg=3D<optimized out>)
+      at pthread_create.c:486
+  #6  0x00007f33fe0ca593 in clone ()
+      at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
 
-   -cpu host,hv_time,hv_relaxed,hv_vapic,hv_spinlocks=3D0x1fff,hv_vendor_id=
-=3D123456789abc,kvm=3Doff \          =
+  Thread 2 (Thread 0x7f33eb050700 (LWP 10471)):
+  #0  0x00007f33fe1a5400 in __GI___nanosleep (requested_time=3D0x7f33eb04d2=
+70, remaining=3D0x7f33eb04d280) at ../sysdeps/unix/sysv/linux/nanosleep.c:28
+  #1  0x00007f3406209e17 in g_usleep () at /lib64/libglib-2.0.so.0
+  #2  0x0000559b04f7cb80 in call_rcu_thread (opaque=3Dopaque@entry=3D0x0)
+      at util/rcu.c:253
+  #3  0x0000559b04f6afba in qemu_thread_start (args=3D<optimized out>)
+      at util/qemu-thread-posix.c:498
+  #4  0x00007f33fe19b58e in start_thread (arg=3D<optimized out>)
+      at pthread_create.c:486
+  #5  0x00007f33fe0ca593 in clone ()
+      at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
 
-   -drive file=3D/usr/share/ovmf/x64/OVMF_CODE.fd,if=3Dpflash,format=3Draw,=
-unit=3D0,readonly=3Don \       =
+  Thread 1 (Thread 0x7f33eb9b42c0 (LWP 10470)):
+  #0  0x00007f33fe00553f in __GI_raise (sig=3Dsig@entry=3D6)
+      at ../sysdeps/unix/sysv/linux/raise.c:50
+  #1  0x00007f33fdfef895 in __GI_abort () at abort.c:79
+  #2  0x00007f33fdfef769 in __assert_fail_base (fmt=3D0x7f33fe156ea8 "%s%s%=
+s:%u: %s%sAssertion `%s' failed.\n%n", assertion=3D0x559b050203cf "req->sta=
+tus =3D=3D -1", file=3D0x559b050203aa "hw/scsi/scsi-bus.c", line=3D1374, fu=
+nction=3D0x559b05020dc0 <__PRETTY_FUNCTION__.32414> "scsi_req_complete") at=
+ assert.c:92
+  #3  0x00007f33fdffd9f6 in __GI___assert_fail (assertion=3Dassertion@entry=
+=3D0x559b050203cf "req->status =3D=3D -1", file=3Dfile@entry=3D0x559b050203=
+aa "hw/scsi/scsi-bus.c", line=3Dline@entry=3D1374, function=3Dfunction@entr=
+y=3D0x559b05020dc0 <__PRETTY_FUNCTION__.32414> "scsi_req_complete") at asse=
+rt.c:101
+  #4  0x0000559b04da23c0 in scsi_req_complete (req=3D<optimized out>, statu=
+s=3D<optimized out>) at hw/scsi/scsi-bus.c:1374
+  #5  0x0000559b04d9cc60 in scsi_dma_complete_noio (r=3D0x559b069c3600, ret=
+=3D<optimized out>) at hw/scsi/scsi-disk.c:281
+  #6  0x0000559b04d9cd0f in scsi_dma_complete (opaque=3D0x559b069c3600, ret=
+=3D-5)
+      at hw/scsi/scsi-disk.c:302
+  #7  0x0000559b04c91607 in dma_complete (ret=3D-5, dbs=3D0x559b07808000)
+      at dma-helpers.c:116
+  #8  0x0000559b04c91607 in dma_blk_cb (opaque=3D0x559b07808000, ret=3D-5)
+      at dma-helpers.c:138
+  #9  0x0000559b04ec411e in blk_aio_complete (acb=3D0x559b07514fa0)
+      at block/block-backend.c:1345
+  #10 0x0000559b04f7e32b in coroutine_trampoline (i0=3D<optimized out>, i1=
+=3D<optimized out>) at util/coroutine-ucontext.c:116
+  #11 0x00007f33fe01b200 in __start_context ()
+      at ../sysdeps/unix/sysv/linux/x86_64/__start_context.S:91
+  #12 0x00007ffc0896b040 in  ()
+  #13 0x0000000000000000 in  ()
 
-   -drive file=3D/var/lib/libvirt/qemu/nvram/win10_gms_VARS.fd,if=3Dpflash,=
-format=3Draw,unit=3D1 \
-   -m 5120 \                                                               =
-               =
+  I bisected this to:
 
-   -realtime mlock=3Doff \
-   -smp 3,sockets=3D1,cores=3D3,threads=3D1 \
-   -uuid 39b56ee2-6bae-4009-9108-7be26d5d63ac \
-   -display none \                             =
+  40dce4ee61c68395f6d463fae792f61b7c003bce is the first bad commit
+  commit 40dce4ee61c68395f6d463fae792f61b7c003bce
+  Author: Paolo Bonzini <pbonzini@redhat.com>
+  Date:   Sat Oct 13 11:52:34 2018 +0200
 
-   -no-user-config \
-   -nodefaults \    =
+      scsi-disk: fix rerror/werror=3Dignore
+      =
 
-   -rtc base=3Dlocaltime,driftfix=3Dslew \                                 =
-                                                                           =
-                                                                     =
+      rerror=3Dignore was returning true from scsi_handle_rw_error but the =
+callers were not
+      calling scsi_req_complete when rerror=3Dignore returns true (this is =
+the correct thing
+      to do when true is returned after executing a passthrough command).  =
+Fix this by
+      calling it in scsi_handle_rw_error.
+      =
 
-   -global kvm-pit.lost_tick_policy=3Ddelay \                              =
-                                    =
+      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-   -no-hpet \                              =
-
-   -no-shutdown \
-   -global PIIX4_PM.disable_s3=3D1 \
-   -global PIIX4_PM.disable_s4=3D1 \
-   -boot strict=3Don \              =
-
-   -device ich9-usb-ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0x4.0x7 \
-   -device ich9-usb-uhci1,masterbus=3Dusb.0,firstport=3D0,bus=3Dpci.0,multi=
-function=3Don,addr=3D0x4 \
-   -device ich9-usb-uhci2,masterbus=3Dusb.0,firstport=3D2,bus=3Dpci.0,addr=
-=3D0x4.0x1 \             =
-
-   -device ich9-usb-uhci3,masterbus=3Dusb.0,firstport=3D4,bus=3Dpci.0,addr=
-=3D0x4.0x2 \
-   -device ahci,id=3Dsata0,bus=3Dpci.0,addr=3D0x9 \                        =
-         =
-
-   -drive file=3D/dev/vms/win10_gaming,format=3Draw,if=3Dnone,id=3Ddrive-vi=
-rtio-disk0,cache=3Dnone,aio=3Dnative \
-   -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x5,drive=3Ddrive-v=
-irtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don \
-   -drive file=3D/dev/sr0,format=3Draw,if=3Dnone,id=3Ddrive-sata0-0-0,media=
-=3Dcdrom,readonly=3Don \                                    =
-
-   -device ide-cd,bus=3Dsata0.0,drive=3Ddrive-sata0-0-0,id=3Dsata0-0-0 \   =
-                  =
-
-   -device intel-hda,id=3Dsound0,bus=3Dpci.0,addr=3D0x3 \                  =
-                                                                           =
-                                                                       =
-
-   -device hda-duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 \          =
-                                   =
-
-   -device usb-host,hostbus=3D2,hostaddr=3D3,id=3Dhostdev0,bus=3Dusb.0,port=
-=3D1 \
-   -device vfio-pci,host=3D01:00.0,id=3Dhostdev1,bus=3Dpci.0,addr=3D0x6 \  =
-    =
-
-   -device vfio-pci,host=3D01:00.1,id=3Dhostdev2,bus=3Dpci.0,addr=3D0x7 \
-   -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x8 \   =
-
-   -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resour=
-cecontrol=3Ddeny \
-   -msg timestamp=3Don
-
-  =
-
-  By "purposedly misconfiguring" the codepaths and replacing "pc-i440fx-3.0=
-" with "pc-i440fx-2.11" (basically reverting the config changes I needed to=
- do in order to update the domain definitions), the stuttering seems to dis=
-appear (or at least becomes negligible) and the audio output, despite becom=
-ing incredibly distorted, is consistent in every other way, with in-order d=
-ialogues and (perceived) correct tempo.
-
-  =
-
-  In order to exclude eventual misconfigurations in the host's audio proces=
-sing pipeline, I proceeded to update the domain definition's codepath of an=
-other guest running Ubuntu 18.04 with a completely different hardware confi=
-guration (no video card passthrough and no PulseAudio backconnection, just =
-a plain emulated VirtIO display and Spice audio device).
-
-  The audio issue presented itself again in the form of slightly sped up au=
-dio playback from Internet videos interleaved with occasional "quenches" of=
- playing speed.
-  Stutters are difficult to detect because of the poor refresh rate of the =
-emulated VGA adapter, but I wouldn't be surprised to find them here too (ac=
-tually, I *think* I sensed them, but I'm not sure enough to assess their ex=
-istence).
-
-  Once again, by reverting to the old 2.11 directive everything is back
-  to normal.
-
-
-  Given the fact that no official upgrade directives regarding required sam=
-pling rate, period or sheduling adjustments were stated or handed-out to ad=
-ministrators, I decided to report this behaviour as a bug.
-  I hope this is the appropriate channel and that I didn't annoy anyone (th=
-is is my first proper bug report, please forgive me for any innaccuracy).
+  :040000 040000 311386b9b91d77840a849459ab6ae41a37fd7f42
+  8adcda67d7487bcc18966f096c9923da3b8dc0b9 M      hw
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1795527/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1804323/+subscriptions
