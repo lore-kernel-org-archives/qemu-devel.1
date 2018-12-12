@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6NA-0001Oi-Lc
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6NA-0001Op-O3
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6N6-0000gm-5o
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6N6-0000hT-Ix
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:28 -0500
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:39684)
+Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:55389)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gX6N5-0000WP-RT
+	id 1gX6N6-0000a7-9w
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:24 -0500
-Received: by mail-wr1-x42e.google.com with SMTP id t27so18088635wra.6
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:24:06 -0800 (PST)
+Received: by mail-wm1-x329.google.com with SMTP id y139so6134870wmc.5
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:24:13 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	u10sm15878859wrr.33.2018.12.12.07.24.04 for <qemu-devel@nongnu.org>
+	u10sm15878859wrr.33.2018.12.12.07.24.11 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 12 Dec 2018 07:24:04 -0800 (PST)
+	Wed, 12 Dec 2018 07:24:12 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 12 Dec 2018 16:23:05 +0100
-Message-Id: <1544628195-37728-45-git-send-email-pbonzini@redhat.com>
+Date: Wed, 12 Dec 2018 16:23:12 +0100
+Message-Id: <1544628195-37728-52-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
 References: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 44/54] vhost-net: compile it on all targets that
- have virtio-net.
+Subject: [Qemu-devel] [PULL 51/54] vhost-user-test: reduce usage of
+ global_qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,92 +37,166 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This shows a preexisting bug: if a KVM target did not have virtio-net enabled,
-it would fail with undefined symbols when vhost was enabled.  This must now
-be fixed, lest targets that have no virtio-net fail to compile.
+Whenever the code can run on multiple QTestStates, use them explicitly instead of
+global_qtest.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1543851204-41186-5-git-send-email-pbonzini@redhat.com>
+Message-Id: <1543851204-41186-12-git-send-email-pbonzini@redhat.com>
 ---
- configure              | 11 ++++-------
- hw/net/Makefile.objs   |  4 ++--
- include/exec/poison.h  |  1 -
- tests/Makefile.include |  5 +----
- 4 files changed, 7 insertions(+), 14 deletions(-)
+ tests/vhost-user-test.c | 38 +++++++++++++++++---------------------
+ 1 file changed, 17 insertions(+), 21 deletions(-)
 
-diff --git a/configure b/configure
-index b995d71..b26e4de 100755
---- a/configure
-+++ b/configure
-@@ -6514,7 +6514,10 @@ fi
- if test "$vhost_scsi" = "yes" ; then
-   echo "CONFIG_VHOST_SCSI=y" >> $config_host_mak
- fi
--if test "$vhost_net" = "yes" -a "$vhost_user" = "yes"; then
-+if test "$vhost_net" = "yes" ; then
-+  echo "CONFIG_VHOST_NET=y" >> $config_host_mak
-+fi
-+if test "$vhost_net_user" = "yes" ; then
-   echo "CONFIG_VHOST_NET_USER=y" >> $config_host_mak
- fi
- if test "$vhost_crypto" = "yes" ; then
-@@ -7276,12 +7279,6 @@ if supported_xen_target $target; then
- fi
- if supported_kvm_target $target; then
-     echo "CONFIG_KVM=y" >> $config_target_mak
--    if test "$vhost_net" = "yes" ; then
--        echo "CONFIG_VHOST_NET=y" >> $config_target_mak
--        if test "$vhost_user" = "yes" ; then
--            echo "CONFIG_VHOST_USER_NET_TEST_$target_name=y" >> $config_host_mak
--        fi
--    fi
- fi
- if supported_hax_target $target; then
-     echo "CONFIG_HAX=y" >> $config_target_mak
-diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
-index c2705e6..2d7ee0a 100644
---- a/hw/net/Makefile.objs
-+++ b/hw/net/Makefile.objs
-@@ -37,8 +37,8 @@ obj-$(CONFIG_PSERIES) += spapr_llan.o
- obj-$(CONFIG_XILINX_ETHLITE) += xilinx_ethlite.o
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index 59e1aec..c3a8af3 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -187,12 +187,12 @@ static char *get_qemu_cmd(TestServer *s,
+     }
+ }
  
- obj-$(CONFIG_VIRTIO_NET) += virtio-net.o
--obj-$(CONFIG_VHOST_NET) += vhost_net.o
--common-obj-$(call lnot,$(CONFIG_VHOST_NET)) += vhost_net-stub.o
-+common-obj-$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOST_NET)) += vhost_net.o
-+common-obj-$(call lnot,$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOST_NET))) += vhost_net-stub.o
- common-obj-$(CONFIG_ALL) += vhost_net-stub.o
+-static void init_virtio_dev(TestServer *s, uint32_t features_mask)
++static void init_virtio_dev(QTestState *qts, TestServer *s, uint32_t features_mask)
+ {
+     uint32_t features;
+     int i;
  
- obj-$(CONFIG_ETSEC) += fsl_etsec/etsec.o fsl_etsec/registers.o \
-diff --git a/include/exec/poison.h b/include/exec/poison.h
-index 32d5378..b158632 100644
---- a/include/exec/poison.h
-+++ b/include/exec/poison.h
-@@ -85,7 +85,6 @@
- #pragma GCC poison CONFIG_XTENSA_DIS
+-    s->bus = qpci_init_pc(global_qtest, NULL);
++    s->bus = qpci_init_pc(qts, NULL);
+     g_assert_nonnull(s->bus);
  
- #pragma GCC poison CONFIG_LINUX_USER
--#pragma GCC poison CONFIG_VHOST_NET
- #pragma GCC poison CONFIG_KVM
- #pragma GCC poison CONFIG_SOFTMMU
+     s->dev = qvirtio_pci_device_find(s->bus, VIRTIO_ID_NET);
+@@ -203,7 +203,7 @@ static void init_virtio_dev(TestServer *s, uint32_t features_mask)
+     qvirtio_set_acknowledge(&s->dev->vdev);
+     qvirtio_set_driver(&s->dev->vdev);
  
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 62915e4..ecb3318 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -204,10 +204,7 @@ check-qtest-i386-$(CONFIG_USB_XHCI_NEC) += tests/usb-hcd-xhci-test$(EXESUF)
- check-qtest-i386-y += tests/cpu-plug-test$(EXESUF)
- check-qtest-i386-y += tests/q35-test$(EXESUF)
- check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
--check-qtest-i386-$(CONFIG_VHOST_USER_NET_TEST_i386) += tests/vhost-user-test$(EXESUF)
--ifeq ($(CONFIG_VHOST_USER_NET_TEST_i386),)
--check-qtest-x86_64-$(CONFIG_VHOST_USER_NET_TEST_x86_64) += tests/vhost-user-test$(EXESUF)
--endif
-+check-qtest-i386-$(CONFIG_VHOST_NET_USER) += tests/vhost-user-test$(EXESUF)
- check-qtest-i386-$(CONFIG_TPM_CRB) += tests/tpm-crb-swtpm-test$(EXESUF)
- check-qtest-i386-$(CONFIG_TPM_CRB) += tests/tpm-crb-test$(EXESUF)
- check-qtest-i386-$(CONFIG_TPM_TIS) += tests/tpm-tis-swtpm-test$(EXESUF)
+-    s->alloc = pc_alloc_init(global_qtest);
++    s->alloc = pc_alloc_init(qts);
+ 
+     for (i = 0; i < s->queues * 2; i++) {
+         s->vq[i] = qvirtqueue_setup(&s->dev->vdev, s->alloc, i);
+@@ -265,7 +265,7 @@ static bool wait_for_fds(TestServer *s)
+     return got_region;
+ }
+ 
+-static void read_guest_mem_server(TestServer *s)
++static void read_guest_mem_server(QTestState *qts, TestServer *s)
+ {
+     uint8_t *guest_mem;
+     int i, j;
+@@ -293,7 +293,7 @@ static void read_guest_mem_server(TestServer *s)
+         guest_mem += (s->memory.regions[i].mmap_offset / sizeof(*guest_mem));
+ 
+         for (j = 0; j < 1024; j++) {
+-            uint32_t a = readb(s->memory.regions[i].guest_phys_addr + j);
++            uint32_t a = qtest_readb(qts, s->memory.regions[i].guest_phys_addr + j);
+             uint32_t b = guest_mem[j];
+ 
+             g_assert_cmpint(a, ==, b);
+@@ -670,13 +670,13 @@ static void test_read_guest_mem(const void *arg)
+     s = qtest_start(qemu_cmd);
+     g_free(qemu_cmd);
+ 
+-    init_virtio_dev(server, 1u << VIRTIO_NET_F_MAC);
++    init_virtio_dev(global_qtest, server, 1u << VIRTIO_NET_F_MAC);
+ 
+     if (!wait_for_fds(server)) {
+         goto exit;
+     }
+ 
+-    read_guest_mem_server(server);
++    read_guest_mem_server(global_qtest, server);
+ 
+ exit:
+     uninit_virtio_dev(server);
+@@ -690,7 +690,7 @@ static void test_migrate(void)
+     TestServer *s = test_server_new("src");
+     TestServer *dest = test_server_new("dest");
+     char *uri = g_strdup_printf("%s%s", "unix:", dest->mig_path);
+-    QTestState *global = global_qtest, *from, *to;
++    QTestState *from, *to;
+     GSource *source;
+     gchar *cmd, *tmp;
+     QDict *rsp;
+@@ -704,7 +704,7 @@ static void test_migrate(void)
+     from = qtest_start(cmd);
+     g_free(cmd);
+ 
+-    init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
++    init_virtio_dev(from, s, 1u << VIRTIO_NET_F_MAC);
+     if (!wait_for_fds(s)) {
+         goto exit;
+     }
+@@ -717,7 +717,7 @@ static void test_migrate(void)
+     g_free(tmp);
+     to = qtest_init(cmd);
+     g_free(cmd);
+-    init_virtio_dev(dest, 1u << VIRTIO_NET_F_MAC);
++    init_virtio_dev(to, dest, 1u << VIRTIO_NET_F_MAC);
+ 
+     source = g_source_new(&test_migrate_source_funcs,
+                           sizeof(TestMigrateSource));
+@@ -753,12 +753,10 @@ static void test_migrate(void)
+     qobject_unref(rsp);
+ 
+     qmp_eventwait("STOP");
++    qtest_qmp_eventwait(to, "RESUME");
+ 
+-    global_qtest = to;
+-    qmp_eventwait("RESUME");
+-
+-    g_assert(wait_for_fds(s));
+-    read_guest_mem_server(dest);
++    g_assert(wait_for_fds(dest));
++    read_guest_mem_server(to, dest);
+ 
+     uninit_virtio_dev(dest);
+     qtest_quit(to);
+@@ -773,8 +771,6 @@ exit:
+     qtest_quit(from);
+     test_server_free(s);
+     g_free(uri);
+-
+-    global_qtest = global;
+ }
+ 
+ static void wait_for_rings_started(TestServer *s, size_t count)
+@@ -831,7 +827,7 @@ static void test_reconnect_subprocess(void)
+     qtest_start(cmd);
+     g_free(cmd);
+ 
+-    init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
++    init_virtio_dev(global_qtest, s, 1u << VIRTIO_NET_F_MAC);
+     if (!wait_for_fds(s)) {
+         goto exit;
+     }
+@@ -873,7 +869,7 @@ static void test_connect_fail_subprocess(void)
+     qtest_start(cmd);
+     g_free(cmd);
+ 
+-    init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
++    init_virtio_dev(global_qtest, s, 1u << VIRTIO_NET_F_MAC);
+     if (!wait_for_fds(s)) {
+         goto exit;
+     }
+@@ -906,7 +902,7 @@ static void test_flags_mismatch_subprocess(void)
+     qtest_start(cmd);
+     g_free(cmd);
+ 
+-    init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
++    init_virtio_dev(global_qtest, s, 1u << VIRTIO_NET_F_MAC);
+     if (!wait_for_fds(s)) {
+         goto exit;
+     }
+@@ -957,7 +953,7 @@ static void test_multiqueue(void)
+     qtest_start(cmd);
+     g_free(cmd);
+ 
+-    init_virtio_dev(s, features_mask);
++    init_virtio_dev(global_qtest, s, features_mask);
+ 
+     wait_for_rings_started(s, s->queues * 2);
+ 
 -- 
 1.8.3.1
