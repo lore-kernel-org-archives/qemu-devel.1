@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gX0nz-0003BF-20
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:27:47 -0500
+	(envelope-from <david@redhat.com>) id 1gX0ok-0004Dx-3Y
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:28:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gX0ny-0001uJ-7C
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:27:46 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 12 Dec 2018 09:27:38 +0000
-Message-ID: <504d170c-56ee-0cf5-78e0-47aded4c132f@virtuozzo.com>
-References: <20180917145732.48590-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20180917145732.48590-1-vsementsov@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <877E9C41CB3CFA47AD35916947892875@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: [Qemu-devel] ping2 Re: [PATCH v4 0/8] dirty-bitmap: rewrite
- bdrv_dirty_iter_next_area
+	(envelope-from <david@redhat.com>) id 1gX0of-0002H3-N3
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:28:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54000)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gX0od-0002F2-Pd
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:28:29 -0500
+From: David Hildenbrand <david@redhat.com>
+Date: Wed, 12 Dec 2018 10:28:19 +0100
+Message-Id: <20181212092821.18260-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/2] qapi/range/memory-device: fixes and
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +22,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Hildenbrand <david@redhat.com>
 
-cGluZy4gTm8gZGVwZW5kZW5jaWVzLCBhcHBseSB0byBtYXN0ZXIuDQoNCjE3LjA5LjIwMTggMTc6
-NTcsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+IEhpIGFsbC4NCj4gDQo+
-IDEuIGJkcnZfZGlydHlfaXRlcl9uZXh0X2FyZWEgZG9uJ3QgdXNlIGhiaXRtYXBfbmV4dF96ZXJv
-IGFuZCB1c2VzDQo+IGluZWZmaWNpZW50IGxvb3AgaW5zdGVhZC4gTGV0J3MgaW1wcm92ZSBpdC4N
-Cj4gDQo+IDIuIGJkcnZfZGlydHlfaXRlcl9uZXh0X2FyZWEgZG9uJ3QgaGFuZGxlIHVuYWxpZ25l
-ZCBvZmZzZXQgYW5kDQo+IG1heF9vZmZzZXQgY29ycmVjdGx5LiBJJ20gbm90IHN1cmUgdGhhdCBp
-dCBpcyBhIHJlYWwgYnVnLiBCdXQgaWYgaXQgaXMsDQo+IHdlIG5lZWQgdGhlc2Ugc2VyaWVzIGlu
-IDMuMC4NCj4gDQo+IERldGFpbHMgYXJlIGluIDA1IGNvbW1pdCBtZXNzYWdlLg0KPiANCj4gTm90
-ZTogIltQQVRDSF0gbmJkL3NlcnZlcjogZml4IGJpdG1hcCBleHBvcnQiIHNob3VsZCBiZSBhcHBs
-aWVkIGZpcnN0Og0KPiBCYXNlZC1vbjogPDIwMTgwOTE0MTY1MTE2LjIzMTgyLTEtdnNlbWVudHNv
-dkB2aXJ0dW96em8uY29tPg0KPiANCj4gdjQ6DQo+IA0KPiBSZXdvcms6IHN3aXRjaCBpbnRlcmZh
-Y2UgdG8gc3RhcnQsY291bnQgLyBvZmZzZXQsYnl0ZXMgc3R5bGUuDQo+IEZpeCB3cm9uZyBoYW5k
-bGluZyBvZiB0aGUgY2FzZSB3aGVuIHJlcXVlc3RlZCByZWdpb24gZW5kIGV4Y2VlZHMNCj4gb3Zl
-cmFsbCBiaXRtYXAgZW5kLg0KPiBTb21lIG90aGVyIGNoYW5nZXMuDQo+IA0KPiAwNi0wODogYWRk
-IEpvaG4ncyByLWIuDQo+IA0KPiB2MzoNCj4gMDE6IC0gY2hhbmdlIGludGVyZmFjZSB0byBzdGFy
-dC9lbmQsIGFuZCAtMSBhcyBzcGVjaWFsIGVuZC1tYXJrZXIgaW5zdGVhZCBvZiAwDQo+ICAgICAg
-LSAibm90IGZvdW5kIiBmb3IgaW52YWxpZCByZWdpb25zIGluc3RlYWQgb2YgYXNzZXJ0DQo+IDAy
-OiByZWJhc2Ugb24gMDEgY2hhbmdlcw0KPiAwMzogLSBmaXggbWlzdGFrZSBpbiBoYml0bWFwX2l0
-ZXJfaW5pdCBhcmd1bWVudHMgKG1pc3Rha2UgaW4NCj4gICAgICAgIGhiaXRtYXBfbmV4dF96ZXJv
-IGFyZ3VtZW50cyBpcyBmaXhlZCBhdXRvbWF0aWNhbGx5IGR1ZSB0byAwMSBjaGFuZ2VzKQ0KPiAw
-NDogbmV3DQo+IA0KPiANCj4gdjI6DQo+IA0KPiAwMTogLSBpbXByb3ZlIGNvbW1lbnQNCj4gICAg
-ICAtIHMvYnl0ZXMvY291bnQvDQo+ICAgICAgLSBmaXggZm9yZ290dGVuIGZ1bmN0aW9uIGNhbGwg
-aW4gdGVzdA0KPiAgICAgIC0gaW50cm9kdWNlIG9yaWdfc2l6ZSBmaWVsZCBoZXJlIGZvciBIQml0
-bWFwLA0KPiAgICAgICAgbWFrZSBjaGVja2luZyBpbiBoYml0bWFwX25leHRfemVybyBtb3JlIGVm
-ZmVjdGl2ZSBhbmQgc2FmZQ0KPiAwMjogbmV3DQo+IDAzOiAtIG9yaWdfc2l6ZSBhbHJlYWR5IGlu
-dHJvZHVjZWQgaW4gMDENCj4gICAgICAtIGZpeCBoYml0bWFwX25leHRfZGlydHlfYXJlYSB0byBu
-b3QgcmV0dXJuIHZhbHVlIGxlc3MgdGhhbg0KPiAgICAgICAgb2Zmc2V0IG9uIHVuYWxpZ25lZCBy
-ZXF1ZXN0cw0KPiANCj4gVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSAoOCk6DQo+ICAgIGRp
-cnR5LWJpdG1hcDogaW1wcm92ZSBiZHJ2X2RpcnR5X2JpdG1hcF9uZXh0X3plcm8NCj4gICAgdGVz
-dHM6IGFkZCB0ZXN0cyBmb3IgaGJpdG1hcF9uZXh0X3plcm8gd2l0aCBzcGVjaWZpZWQgZW5kIHBh
-cmFtZXRlcg0KPiAgICBkaXJ0eS1iaXRtYXA6IGFkZCBiZHJ2X2RpcnR5X2JpdG1hcF9uZXh0X2Rp
-cnR5X2FyZWENCj4gICAgdGVzdHM6IGFkZCB0ZXN0cyBmb3IgaGJpdG1hcF9uZXh0X2RpcnR5X2Fy
-ZWENCj4gICAgYmxvY2svbWlycm9yOiBmaXggYW5kIGltcHJvdmUgZG9fc3luY190YXJnZXRfd3Jp
-dGUNCj4gICAgUmV2ZXJ0ICJibG9jay9kaXJ0eS1iaXRtYXA6IEFkZCBiZHJ2X2RpcnR5X2l0ZXJf
-bmV4dF9hcmVhIg0KPiAgICBSZXZlcnQgInRlc3QtaGJpdG1hcDogQWRkIG5vbi1hZHZhbmNpbmcg
-aXRlcl9uZXh0IHRlc3RzIg0KPiAgICBSZXZlcnQgImhiaXRtYXA6IEFkZCBAYWR2YW5jZSBwYXJh
-bSB0byBoYml0bWFwX2l0ZXJfbmV4dCgpIg0KPiANCj4gICBpbmNsdWRlL2Jsb2NrL2RpcnR5LWJp
-dG1hcC5oIHwgICA3ICstDQo+ICAgaW5jbHVkZS9xZW11L2hiaXRtYXAuaCAgICAgICB8ICAzMSAr
-KysrLS0NCj4gICBibG9jay9iYWNrdXAuYyAgICAgICAgICAgICAgIHwgICA1ICstDQo+ICAgYmxv
-Y2svZGlydHktYml0bWFwLmMgICAgICAgICB8ICA2OCArKy0tLS0tLS0tLS0tLQ0KPiAgIGJsb2Nr
-L21pcnJvci5jICAgICAgICAgICAgICAgfCAgMTcgKystLQ0KPiAgIG5iZC9zZXJ2ZXIuYyAgICAg
-ICAgICAgICAgICAgfCAgIDIgKy0NCj4gICB0ZXN0cy90ZXN0LWhiaXRtYXAuYyAgICAgICAgIHwg
-MTc3ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tDQo+ICAgdXRpbC9oYml0bWFw
-LmMgICAgICAgICAgICAgICB8ICA3NiArKysrKysrKysrKystLS0NCj4gICA4IGZpbGVzIGNoYW5n
-ZWQsIDI2MiBpbnNlcnRpb25zKCspLCAxMjEgZGVsZXRpb25zKC0pDQo+IA0KDQoNCi0tIA0KQmVz
-dCByZWdhcmRzLA0KVmxhZGltaXINCg==
+These are the two leftovers from
+    [PATCH v3 0/7] qapi/range/memory-device: fixes and cleanups
+
+The remaining patches extent the QEMU range code and rewrite
+memory-device code to make use of it.
+
+v3 -> v4:
+- "memory-device: rewrite address assignment using ranges"
+-- Use better error messages
+-- Fix one theretical overflow
+
+David Hildenbrand (2):
+  range: add some more functions
+  memory-device: rewrite address assignment using ranges
+
+ hw/mem/memory-device.c | 54 ++++++++++++++++++++----------------
+ include/qemu/range.h   | 62 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 93 insertions(+), 23 deletions(-)
+
+-- 
+2.17.2
