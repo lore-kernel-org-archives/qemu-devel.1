@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48570)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=8779827ad=Alistair.Francis@wdc.com>)
-	id 1gXAQM-0000t2-R5
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:44:03 -0500
+	id 1gXAQa-00013t-52
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:44:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=8779827ad=Alistair.Francis@wdc.com>)
-	id 1gXAQI-0001y8-6i
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:44:02 -0500
+	id 1gXAQW-00027I-2y
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:44:16 -0500
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Wed, 12 Dec 2018 19:43:46 +0000
-Message-ID: <d08ec7bc1447afe8037f5e78d034797d79332b3c.1544643238.git.alistair.francis@wdc.com>
+Date: Wed, 12 Dec 2018 19:44:05 +0000
+Message-ID: <9bfe565bb23718e4d7b534925275c2b2df8c2b48.1544643238.git.alistair.francis@wdc.com>
 References: <cover.1544643238.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1544643238.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v1 06/23] riscv: Add the tcg target registers
+Subject: [Qemu-devel] [PATCH v1 08/23] riscv: tcg-target: Add the immediate
+ encoders
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,145 +31,116 @@ Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistai
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/riscv/tcg-target.inc.c | 118 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 118 insertions(+)
- create mode 100644 tcg/riscv/tcg-target.inc.c
+ tcg/riscv/tcg-target.inc.c | 90 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 90 insertions(+)
 
 diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
-new file mode 100644
-index 0000000000..6c969e3973
---- /dev/null
+index f853d01803..08838027cd 100644
+--- a/tcg/riscv/tcg-target.inc.c
 +++ b/tcg/riscv/tcg-target.inc.c
-@@ -0,0 +1,118 @@
+@@ -284,3 +284,93 @@ typedef enum {
+=20
+     OPC_FENCE =3D 0x0000000f,
+ } RISCVInsn;
++
 +/*
-+ * Tiny Code Generator for QEMU
-+ *
-+ * Copyright (c) 2018 SiFive, Inc
-+ * Copyright (c) 2008-2009 Arnaud Patard <arnaud.patard@rtp-net.org>
-+ * Copyright (c) 2009 Aurelien Jarno <aurelien@aurel32.net>
-+ * Copyright (c) 2008 Fabrice Bellard
-+ *
-+ * Based on i386/tcg-target.c and mips/tcg-target.c
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a=
- copy
-+ * of this software and associated documentation files (the "Software"), t=
-o deal
-+ * in the Software without restriction, including without limitation the r=
-ights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or se=
-ll
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included=
- in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS=
- OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY=
-,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OT=
-HER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING=
- FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS =
-IN
-+ * THE SOFTWARE.
++ * RISC-V immediate and instruction encoders (excludes 16-bit RVC)
 + */
 +
-+#include "tcg-pool.inc.c"
++/* Type-R */
 +
-+#ifdef CONFIG_DEBUG_TCG
-+static const char * const tcg_target_reg_names[TCG_TARGET_NB_REGS] =3D {
-+    "zero",
-+    "ra",
-+    "sp",
-+    "gp",
-+    "tp",
-+    "t0",
-+    "t1",
-+    "t2",
-+    "s0",
-+    "s1",
-+    "a0",
-+    "a1",
-+    "a2",
-+    "a3",
-+    "a4",
-+    "a5",
-+    "a6",
-+    "a7",
-+    "s2",
-+    "s3",
-+    "s4",
-+    "s5",
-+    "s6",
-+    "s7",
-+    "s8",
-+    "s9",
-+    "s10",
-+    "s11",
-+    "t3",
-+    "t4",
-+    "t5",
-+    "t6"
-+};
-+#endif
++static int32_t encode_r(RISCVInsn opc, TCGReg rd, TCGReg rs1, TCGReg rs2)
++{
++    return opc | (rd & 0x1f) << 7 | (rs1 & 0x1f) << 15 | (rs2 & 0x1f) << 2=
+0;
++}
 +
-+static const int tcg_target_reg_alloc_order[] =3D {
-+    /* Call saved registers */
-+    /* TCG_REG_S0 reservered for TCG_AREG0 */
-+    TCG_REG_S1,
-+    TCG_REG_S2,
-+    TCG_REG_S3,
-+    TCG_REG_S4,
-+    TCG_REG_S5,
-+    TCG_REG_S6,
-+    TCG_REG_S7,
-+    TCG_REG_S8,
-+    TCG_REG_S9,
-+    TCG_REG_S10,
-+    TCG_REG_S11,
++/* Type-I */
 +
-+    /* Call clobbered registers */
-+    TCG_REG_T0,
-+    TCG_REG_T1,
-+    TCG_REG_T2,
-+    TCG_REG_T3,
-+    TCG_REG_T4,
-+    TCG_REG_T5,
-+    TCG_REG_T6,
++static int32_t encode_imm12(uint32_t imm)
++{
++    return (imm & 0xfff) << 20;
++}
 +
-+    /* Argument registers */
-+    TCG_REG_A0,
-+    TCG_REG_A1,
-+    TCG_REG_A2,
-+    TCG_REG_A3,
-+    TCG_REG_A4,
-+    TCG_REG_A5,
-+    TCG_REG_A6,
-+    TCG_REG_A7,
-+};
++static int32_t encode_i(RISCVInsn opc, TCGReg rd, TCGReg rs1, uint32_t imm=
+)
++{
++    return opc | (rd & 0x1f) << 7 | (rs1 & 0x1f) << 15 | encode_imm12(imm)=
+;
++}
 +
-+static const int tcg_target_call_iarg_regs[] =3D {
-+    TCG_REG_A0,
-+    TCG_REG_A1,
-+    TCG_REG_A2,
-+    TCG_REG_A3,
-+    TCG_REG_A4,
-+    TCG_REG_A5,
-+    TCG_REG_A6,
-+    TCG_REG_A7,
-+};
++/* Type-S */
 +
-+static const int tcg_target_call_oarg_regs[] =3D {
-+    TCG_REG_A0,
-+    TCG_REG_A1,
-+};
++static int32_t encode_simm12(uint32_t imm)
++{
++    int32_t ret =3D 0;
++
++    ret |=3D (imm & 0xFE0) << 20;
++    ret |=3D (imm & 0x1F) << 7;
++
++    return ret;
++}
++
++static int32_t encode_s(RISCVInsn opc, TCGReg rs1, TCGReg rs2, uint32_t im=
+m)
++{
++    return opc | (rs1 & 0x1f) << 15 | (rs2 & 0x1f) << 20 | encode_simm12(i=
+mm);
++}
++
++/* Type-SB */
++
++static int32_t encode_sbimm12(uint32_t imm)
++{
++    int32_t ret =3D 0;
++
++    ret |=3D (imm & 0x1000) << 19;
++    ret |=3D (imm & 0x7e0) << 20;
++    ret |=3D (imm & 0x1e) << 7;
++    ret |=3D (imm & 0x800) >> 4;
++
++    return ret;
++}
++
++static int32_t encode_sb(RISCVInsn opc, TCGReg rs1, TCGReg rs2, uint32_t i=
+mm)
++{
++    return opc | (rs1 & 0x1f) << 15 | (rs2 & 0x1f) << 20 | encode_sbimm12(=
+imm);
++}
++
++/* Type-U */
++
++static int32_t encode_uimm20(uint32_t imm)
++{
++    return imm & 0xfffff000;
++}
++
++static int32_t encode_u(RISCVInsn opc, TCGReg rd, uint32_t imm)
++{
++    return opc | (rd & 0x1f) << 7 | encode_uimm20(imm);
++}
++
++/* Type-UJ */
++
++static int32_t encode_ujimm20(uint32_t imm)
++{
++    int32_t ret =3D 0;
++
++    ret |=3D (imm & 0x0007fe) << (21 - 1);
++    ret |=3D (imm & 0x000800) << (20 - 11);
++    ret |=3D (imm & 0x0ff000) << (12 - 12);
++    ret |=3D (imm & 0x100000) << (31 - 20);
++
++    return ret;
++}
++
++static int32_t encode_uj(RISCVInsn opc, TCGReg rd, uint32_t imm)
++{
++    return opc | (rd & 0x1f) << 7 | encode_ujimm20(imm);
++}
 --=20
 2.19.1
