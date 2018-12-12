@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gX1qE-0005yn-6o
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 05:34:14 -0500
+	(envelope-from <berrange@redhat.com>) id 1gX2OO-0004Z5-Hg
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:09:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gX1qD-000656-78
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 05:34:10 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 12 Dec 2018 10:33:56 +0000
-Message-ID: <5ecd3506-6371-3804-d09d-d8cc93d817ed@virtuozzo.com>
-References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20180731173033.75467-1-vsementsov@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <12DEBC7222E451409714E01FD14ABBF8@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <berrange@redhat.com>) id 1gX2OL-0001uH-DF
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:09:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60238)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gX2OL-0001tD-4M
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:09:25 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EC84BC058CBE
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 11:09:23 +0000 (UTC)
+Received: from redhat.com (ovpn-112-73.ams2.redhat.com [10.36.112.73])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 53EB25C221
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 11:09:22 +0000 (UTC)
+Date: Wed, 12 Dec 2018 11:09:19 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181212110919.GB31033@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 MIME-Version: 1.0
-Subject: [Qemu-devel] ping Re: [PATCH v4 00/10] NBD reconnect
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Subject: [Qemu-devel] 4.0 changelog open - maintainers update after PULL is
+ merged
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,49 +35,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: qemu-devel@nongnu.org
 
-cGluZw0KDQozMS4wNy4yMDE4IDIwOjMwLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdy
-b3RlOg0KPiBIaSBhbGwuDQo+IA0KPiBIZXJlIGlzIE5CRCByZWNvbm5lY3QuIFByZXZpb3VzbHks
-IGlmIGNvbm5lY3Rpb24gZmFpbGVkIGFsbCBjdXJyZW50DQo+IGFuZCBmdXR1cmUgcmVxdWVzdHMg
-d2lsbCBmYWlsLiBBZnRlciB0aGUgc2VyaWVzLCBuYmQtY2xpZW50IGRyaXZlcg0KPiB3aWxsIHRy
-eSB0byByZWNvbm5lY3QgdW5saW1pdGVkIHRpbWVzLiBEdXJpbmcgZmlyc3QgQHJlY29ubmVjdC1k
-ZWxheQ0KPiBzZWNvbmRzIG9mIHJlY29ubmVjdGluZyBhbGwgcmVxdWVzdHMgd2lsbCB3YWl0IGZv
-ciB0aGUgY29ubmVjdGlvbiwNCj4gYW5kIGlmIGl0IGlzIGVzdGFibGlzaGVkIHJlcXVlc3RzIHdp
-bGwgYmUgcmVzZW50LiBBZnRlcg0KPiBAcmVjb25uZWN0LWRlbGF5IHBlcmlvZCBhbGwgcmVxdWVz
-dHMgd2lsbCBiZSBmYWlsZWQgKHVudGlsIHN1Y2Nlc3NmdWwNCj4gcmVjb25uZWN0KS4NCj4gDQo+
-IHY0OiAtIGFkZCBFcmljJ3Mgci1iIHRvIDAxLg0KPiAgICAgIC0gZHJvcCBDT05ORUNUSU5HX0lO
-SVQgbW9kZSwgZG9uJ3QgcmVjb25uZWN0IG9uIF9vcGVuLg0KPiAgICAgIC0gbmV3IGFwaTogb25s
-eSBvbmUgcGFyYW1ldGVyIEByZWNvbm5lY3QtZGVsYXkNCj4gICAgICAtIG5ldyBpbnRlcnZhbCBz
-Y2hlbWUgYmV0d2VlbiByZWNvbm5lY3QgYXR0ZW1wdHMNCj4gICAgICAgICAgKDEgLSAyIC0gNCAt
-IDggLSAxNiAtIDE2IC4uLiBzZWNvbmRzKQ0KPiAgICAgIC0gZml4ZXMgYW5kIHJlZmFjdG9yaW5n
-cyBpbiBtYWluIHBhdGNoICgwOSksIGluY2x1ZGluZyBtZXJnZSB3aXRoDQo+ICAgICAgICBvbGQg
-MDggcGF0Y2gNCj4gICAgICANCj4gDQo+IHYzOg0KPiAwNjogZml4IGJ1aWxkIGVycm9yIGluIGZ1
-bmN0aW9uICduYmRfY29fc2VuZF9yZXF1ZXN0JzoNCj4gICAgICAgZXJyb3I6ICdpJyBtYXkgYmUg
-dXNlZCB1bmluaXRpYWxpemVkIGluIHRoaXMgZnVuY3Rpb24NCj4gDQo+IHYyIG5vdGVzOg0KPiBI
-ZXJlIGlzIHYyIG9mIE5CRCByZWNvbm5lY3QsIGJ1dCBpdCBpcyB2ZXJ5IHZlcnkgZGlmZmVyZW50
-IGZyb20gdjEsIHNvLA0KPiBmb3JnZXQgYWJvdXQgdjEuDQo+IFRoZSBzZXJpZXMgaW5jbHVkZXMg
-bXkgIk5CRCByZWNvbm5lY3Q6IHByZWxpbWluYXJ5IHJlZmFjdG9yaW5nIiwgd2l0aA0KPiBjaGFu
-Z2VzIGluIDA1OiBsZWF2ZSBhc3NlcnRzIChFcmljKS4NCj4gDQo+IFZsYWRpbWlyIFNlbWVudHNv
-di1PZ2lldnNraXkgKDEwKToNCj4gICAgYmxvY2svbmJkLWNsaWVudDogc3BsaXQgY2hhbm5lbCBl
-cnJvcnMgZnJvbSBleHBvcnQgZXJyb3JzDQo+ICAgIGJsb2NrL25iZDogbW92ZSBjb25uZWN0aW9u
-IGNvZGUgZnJvbSBibG9jay9uYmQgdG8gYmxvY2svbmJkLWNsaWVudA0KPiAgICBibG9jay9uYmQt
-Y2xpZW50OiBzcGxpdCBjb25uZWN0aW9uIGZyb20gaW5pdGlhbGl6YXRpb24NCj4gICAgYmxvY2sv
-bmJkLWNsaWVudDogZml4IG5iZF9yZXBseV9jaHVua19pdGVyX3JlY2VpdmUNCj4gICAgYmxvY2sv
-bmJkLWNsaWVudDogZG9uJ3QgY2hlY2sgaW9jDQo+ICAgIGJsb2NrL25iZC1jbGllbnQ6IG1vdmUg
-ZnJvbSBxdWl0IHRvIHN0YXRlDQo+ICAgIGJsb2NrL25iZC1jbGllbnQ6IHJlbmFtZSByZWFkX3Jl
-cGx5X2NvIHRvIGNvbm5lY3Rpb25fY28NCj4gICAgYmxvY2svbmJkOiBhZGQgY21kbGluZSBhbmQg
-cWFwaSBwYXJhbWV0ZXIgcmVjb25uZWN0LWRlbGF5DQo+ICAgIGJsb2NrL25iZC1jbGllbnQ6IG5i
-ZCByZWNvbm5lY3QNCj4gICAgaW90ZXN0czogdGVzdCBuYmQgcmVjb25uZWN0DQo+IA0KPiAgIHFh
-cGkvYmxvY2stY29yZS5qc29uICAgICAgICAgIHwgIDEyICstDQo+ICAgYmxvY2svbmJkLWNsaWVu
-dC5oICAgICAgICAgICAgfCAgMjAgKy0NCj4gICBibG9jay9uYmQtY2xpZW50LmMgICAgICAgICAg
-ICB8IDUxNSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0NCj4gICBi
-bG9jay9uYmQuYyAgICAgICAgICAgICAgICAgICB8ICA1NiArKy0tLQ0KPiAgIHRlc3RzL3FlbXUt
-aW90ZXN0cy8yMjAgICAgICAgIHwgIDY3ICsrKysrKw0KPiAgIHRlc3RzL3FlbXUtaW90ZXN0cy8y
-MjAub3V0ICAgIHwgICA3ICsNCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvZ3JvdXAgICAgICB8ICAg
-MSArDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHkgfCAgIDQgKw0KPiAgIDggZmls
-ZXMgY2hhbmdlZCwgNTEyIGluc2VydGlvbnMoKyksIDE3MCBkZWxldGlvbnMoLSkNCj4gICBjcmVh
-dGUgbW9kZSAxMDA3NTUgdGVzdHMvcWVtdS1pb3Rlc3RzLzIyMA0KPiAgIGNyZWF0ZSBtb2RlIDEw
-MDY0NCB0ZXN0cy9xZW11LWlvdGVzdHMvMjIwLm91dA0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJk
-cywNClZsYWRpbWlyDQo=
+Rather than wait until the feature freeze to fill out the release changelog,
+lets try a new approach for 4.0 where we fill it out as code is merged.
+I've created a changelog template for 4.0:
+
+  https://wiki.qemu.org/ChangeLog/4.0
+
+Any maintainer who sends a PULL request, should make appropriate additions
+to the changelog once their PULL is merged by Peter, if it had any changes
+users need to be aware of.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
