@@ -1,30 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51832)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gX7ki-0006Xp-66
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 11:52:53 -0500
+	(envelope-from <groug@kaod.org>) id 1gX7mx-0007PH-Bl
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 11:55:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gX7ke-0007UB-VM
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 11:52:51 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:58980)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gX7ke-0007Oe-K6
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 11:52:48 -0500
-Date: Wed, 12 Dec 2018 18:52:30 +0200
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20181212165229.GA5747@lap1>
-References: <20181211132642.3027-1-ppandit@redhat.com>
-	<20181211132642.3027-5-ppandit@redhat.com>
-	<20181211164742.GA2923@lap1> <20181211172244.GD2923@lap1>
-	<nycvar.YSQ.7.76.1812120137210.7578@xnncv>
-	<nycvar.YSQ.7.76.1812121253200.10904@xnncv>
+	(envelope-from <groug@kaod.org>) id 1gX7mp-0003Ee-Cr
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 11:55:08 -0500
+Received: from 20.mo3.mail-out.ovh.net ([178.33.47.94]:55672)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gX7mj-0002oT-Iv
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 11:54:59 -0500
+Received: from player799.ha.ovh.net (unknown [10.109.160.39])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 2A8421ED0A6
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 17:54:49 +0100 (CET)
+Date: Wed, 12 Dec 2018 17:54:41 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20181212175441.382f36f0@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20181212002955.GD2719@umbus.fritz.box>
+References: <20181108014406.29818-1-aik@ozlabs.ru>
+	<20181111191047.7af39551@bahia.lan>
+	<efc67974-4118-7877-6f8d-ce0a09cb9999@ozlabs.ru>
+	<20181210062043.GS4261@umbus.fritz.box>
+	<20181210103032.088de905@bahia.lab.toulouse-stg.fr.ibm.com>
+	<d363fae5-d968-0bfb-0c27-adbbe427f642@ozlabs.ru>
+	<20181211105559.76040a70@bahia.lab.toulouse-stg.fr.ibm.com>
+	<20181212002955.GD2719@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <nycvar.YSQ.7.76.1812121253200.10904@xnncv>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/5] pvrdma: release ring object in case of
- an error
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	boundary="Sig_/u/PCgCC_taRl/0JJdq7gwq=";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH qemu] ppc/spapr: Receive and
+ store device tree blob from SLOF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,70 +38,268 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>, marcel.apfelbaum@gmail.com
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Saar Amar <saaramar5@gmail.com>, Li Qiang <liq3ea@163.com>, yuval.shaia@oracle.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On Wed, Dec 12, 2018 at 03:09:19PM +0530, P J P wrote:
-> +-- On Wed, 12 Dec 2018, P J P wrote --+
-> | | Also, can you rebase this patch on top of the patchset i posted las=
-t week:
-> | | https://patchwork.kernel.org/patch/10705439/
-> |=20
-> | Okay, I'll send revised patch set. Thanks so much for the prompt revi=
-ew.
->=20
-> I tried to git apply above patch-set over v3.1.0-rc2, v3.1.0-rc0, v3.0.=
-0. But=20
-> it does not seem to apply cleanly.
->=20
-> =3D=3D=3D
-> $ git branch rdma v3.1.0-rc0
-> $ git checkout rdma=20
-> Switched to branch 'rdma'
-> $ git apply --check /tmp/add-support-for-RDMA-MAD.patch
-> error: patch failed: Makefile.objs:1
-> error: Makefile.objs: patch does not apply
-> error: patch failed: hw/rdma/vmw/pvrdma_cmd.c:224
-> error: hw/rdma/vmw/pvrdma_cmd.c: patch does not apply
-> =3D=3D=3D
->=20
-> I skipped one of the makefile.objs/.json patch, applied others and then=
+--Sig_/u/PCgCC_taRl/0JJdq7gwq=
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, 12 Dec 2018 11:29:55 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> On Tue, Dec 11, 2018 at 10:55:59AM +0100, Greg Kurz wrote:
+> > On Tue, 11 Dec 2018 14:53:32 +1100
+> > Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> >  =20
+> > > On 10/12/2018 20:30, Greg Kurz wrote: =20
+> > > > On Mon, 10 Dec 2018 17:20:43 +1100
+> > > > David Gibson <david@gibson.dropbear.id.au> wrote:
+> > > >    =20
+> > > >> On Mon, Nov 12, 2018 at 03:12:26PM +1100, Alexey Kardashevskiy wro=
+te:   =20
+> > > >>>
+> > > >>>
+> > > >>> On 12/11/2018 05:10, Greg Kurz wrote:     =20
+> > > >>>> Hi Alexey,
+> > > >>>>
+> > > >>>> Just a few remarks. See below.
+> > > >>>>
+> > > >>>> On Thu,  8 Nov 2018 12:44:06 +1100
+> > > >>>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> > > >>>>      =20
+> > > >>>>> SLOF receives a device tree and updates it with various propert=
+ies
+> > > >>>>> before switching to the guest kernel and QEMU is not aware of a=
+ny changes
+> > > >>>>> made by SLOF. Since there is no real RTAS (QEMU implements it),=
+ it makes
+> > > >>>>> sense to pass the SLOF final device tree to QEMU to let it impl=
+ement
+> > > >>>>> RTAS related tasks better, such as PCI host bus adapter hotplug.
+> > > >>>>>
+> > > >>>>> Specifially, now QEMU can find out the actual XICS phandle (for=
+ PHB
+> > > >>>>> hotplug) and the RTAS linux,rtas-entry/base properties (for fir=
+mware
+> > > >>>>> assisted NMI - FWNMI).
+> > > >>>>>
+> > > >>>>> This stores the initial DT blob in the sPAPR machine and replac=
+es it
+> > > >>>>> in the KVMPPC_H_UPDATE_DT (new private hypercall) handler.
+> > > >>>>>
+> > > >>>>> This adds an @update_dt_enabled machine property to allow backw=
+ard
+> > > >>>>> migration.
+> > > >>>>>
+> > > >>>>> SLOF already has a hypercall since
+> > > >>>>> https://github.com/aik/SLOF/commit/e6fc84652c9c0073f9183
+> > > >>>>>
+> > > >>>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> > > >>>>> ---
+> > > >>>>>  include/hw/ppc/spapr.h |  7 ++++++-
+> > > >>>>>  hw/ppc/spapr.c         | 29 ++++++++++++++++++++++++++++-
+> > > >>>>>  hw/ppc/spapr_hcall.c   | 32 ++++++++++++++++++++++++++++++++
+> > > >>>>>  hw/ppc/trace-events    |  2 ++
+> > > >>>>>  4 files changed, 68 insertions(+), 2 deletions(-)
+> > > >>>>>
+> > > >>>>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> > > >>>>> index ad4d7cfd97..f5dcaf44cb 100644
+> > > >>>>> --- a/include/hw/ppc/spapr.h
+> > > >>>>> +++ b/include/hw/ppc/spapr.h
+> > > >>>>> @@ -100,6 +100,7 @@ struct sPAPRMachineClass {
+> > > >>>>> =20
+> > > >>>>>      /*< public >*/
+> > > >>>>>      bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotp=
+lug of LMBs */
+> > > >>>>> +    bool update_dt_enabled;    /* enable KVMPPC_H_UPDATE_DT */
+> > > >>>>>      bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI=
+ */
+> > > >>>>>      bool pre_2_10_has_unused_icps;
+> > > >>>>>      bool legacy_irq_allocation;
+> > > >>>>> @@ -136,6 +137,9 @@ struct sPAPRMachineState {
+> > > >>>>>      int vrma_adjust;
+> > > >>>>>      ssize_t rtas_size;
+> > > >>>>>      void *rtas_blob;
+> > > >>>>> +    uint32_t fdt_size;
+> > > >>>>> +    uint32_t fdt_initial_size;     =20
+> > > >>>>
+> > > >>>> I don't quite see the purpose of fdt_initial_size... it seems to=
+ be only
+> > > >>>> used to print a trace.     =20
+> > > >>>
+> > > >>>
+> > > >>> Ah, lost in rebase. The purpose was to test if the new device tre=
+e has
+> > > >>> not grown too much.
+> > > >>>
+> > > >>>
+> > > >>>      =20
+> > > >>>>      =20
+> > > >>>>> +    void *fdt_blob;
+> > > >>>>>      long kernel_size;
+> > > >>>>>      bool kernel_le;
+> > > >>>>>      uint32_t initrd_base;
+> > > >>>>> @@ -462,7 +466,8 @@ struct sPAPRMachineState {
+> > > >>>>>  #define KVMPPC_H_LOGICAL_MEMOP  (KVMPPC_HCALL_BASE + 0x1)
+> > > >>>>>  /* Client Architecture support */
+> > > >>>>>  #define KVMPPC_H_CAS            (KVMPPC_HCALL_BASE + 0x2)
+> > > >>>>> -#define KVMPPC_HCALL_MAX        KVMPPC_H_CAS
+> > > >>>>> +#define KVMPPC_H_UPDATE_DT      (KVMPPC_HCALL_BASE + 0x3)
+> > > >>>>> +#define KVMPPC_HCALL_MAX        KVMPPC_H_UPDATE_DT
+> > > >>>>> =20
+> > > >>>>>  typedef struct sPAPRDeviceTreeUpdateHeader {
+> > > >>>>>      uint32_t version_id;
+> > > >>>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > > >>>>> index c08130facb..5e2d4d211c 100644
+> > > >>>>> --- a/hw/ppc/spapr.c
+> > > >>>>> +++ b/hw/ppc/spapr.c
+> > > >>>>> @@ -1633,7 +1633,10 @@ static void spapr_machine_reset(void)
+> > > >>>>>      /* Load the fdt */
+> > > >>>>>      qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
+> > > >>>>>      cpu_physical_memory_write(fdt_addr, fdt, fdt_totalsize(fdt=
+));
+> > > >>>>> -    g_free(fdt);
+> > > >>>>> +    g_free(spapr->fdt_blob);
+> > > >>>>> +    spapr->fdt_size =3D fdt_totalsize(fdt);
+> > > >>>>> +    spapr->fdt_initial_size =3D spapr->fdt_size;
+> > > >>>>> +    spapr->fdt_blob =3D fdt;     =20
+> > > >>>>
+> > > >>>> Hmm... It looks weird to store state in a reset handler. I'd rat=
+her zeroe
+> > > >>>> both fdt_blob and fdt_size here.     =20
+> > > >>>
+> > > >>> The device tree is built from the reset handler and the idea is t=
+hat we
+> > > >>> want to always have some tree in the machine.     =20
+> > > >>
+> > > >> Yes, I think the approach here is fine.  Otherwise when we want to
+> > > >> look up the current fdt state in RTAS calls or whatever we'd always
+> > > >> have to do
+> > > >> 	if (fdt_blob)
+> > > >> 		look up that
+> > > >> 	else
+> > > >> 		look up qemu created fdt.
+> > > >>   =20
+> > > >=20
+> > > > No. We only have one fdt blob: the initial one, I'd rather
+> > > > call reset time one, or the updated one.   =20
+> > >=20
+> > > There is one fdt in the machine, always. Either initial or from cas. =
 =20
-> hand-fixed one of the patch pvrdma_cmd.c.
+> >=20
+> > Yeah, reset time fdt is either the initial one, either cas... and I'm n=
+ow
+> > wandering what happens if migration occurs between cas that sets cas_re=
+boot
+> > and the corresponding reset. With the current code base, I have the imp=
+ression
+> > that the destination will redo the full cas+cas_reboot cycle after rest=
+art or
+> > am I missing something ? =20
 >=20
-> After that when I try to build QEMU, it fails with
+> Yes, I believe that's correct.  It's kind of an edge case and that CAS
+> cycle should still complete ok, it'll just take a little longer to
+> boot, so I thought that was preferable to the complexity of migrating
+> the CAS state.
 >=20
-> =3D=3D=3D
->  $ ./configure --prefix=3D/tmp/ --enable-debug
->       --target-list=3D'x86_64-softmmu x86_64-linux-user'
->       --enable-rdma --with-sdlabi=3D2.0
->  $ make
-> ../qemu/hw/rdma/rdma_backend.c:1132:5: error: implicit declaration of f=
-unction=20
-> =E2=80=98qapi_event_send_rdma_gid_status_changed=E2=80=99 [-Werror=3Dim=
-plicit-function-declaration]  qapi_event_send_rdma_gid_status_changed(ifn=
-ame, true,
-> ...
-> ../qemu/hw/rdma/rdma_backend.c:22:10: fatal error: qapi/qapi-events-rdm=
-a.h: No=20
-> such file or directory
->  #include "qapi/qapi-events-rdma.h"
->           ^~~~~~~~~~~~~~~~~~~~~~~~~
-> compilation terminated.
-> =3D=3D=3D
+
+You're probably right.
+
+> > > >> Incidentally 'fdt' and 'fdt_blob' names do a terrible job of
+> > > >> distinguishing what the difference is.  Renaming fdt to fdt_initial
+> > > >> (to match fdt_initial_size) and fdt_blob to fdt should make that
+> > > >> clearer.
+> > > >>   =20
+> > > >=20
+> > > > As mentioned earlier in this thread, spapr->fdt_initial_size is onl=
+y used
+> > > > for tracing if the received fdt blob fails fdt_check_full()...
+> > > >=20
+> > > > $ git grep -H fdt_initial_size
+> > > > hw/ppc/spapr.c:    spapr->fdt_initial_size =3D spapr->fdt_size;
+> > > > hw/ppc/spapr.c:        VMSTATE_UINT32(fdt_initial_size, sPAPRMachin=
+eState),
+> > > > hw/ppc/spapr_hcall.c:        trace_spapr_update_dt_failed(spapr->fd=
+t_initial_size, cb,
+> > > > include/hw/ppc/spapr.h:    uint32_t fdt_initial_size;
+> > > >=20
+> > > > Not sure it is helpful, and anyway, it is expected to be the same i=
+n source
+> > > > and destination, so why put it in the migration stream ?   =20
+> > >=20
+> > >=20
+> > > Well, we do build the fdt anyway even when receive migration but we do
+> > > not have to and yes we can expect the fdt on the destination to be of
+> > > the same size since it is the same command line, it is just guessing =
+and
+> > > expecting vs. knowing and I prefer the latter as the reset time fdt a=
+nd
+> > > migration source fdt might have different size because of
+> > > host-model/host-serial/slot-label/similar properties. =20
+> >=20
+> > Right but I still don't see the usefulness of fdt_initial_size... =20
 >=20
-> Not sure if other patches are required. Any idea?
-
-Ok, you rebased your patches on latest upstream, lets deal with merge
-conflicts later.
-
-Marcel, any idea?
-Can Prasad take from your tree?
-
-Thanks,
-
+> So, it's there to address exactly the problem you pointed out elswhere
+> in the thread: the idea was to disallow the guest resubmitting an fdt
+> which is "too much" bigger than the original one, thereby consuming a
+> bunch of qemu memory.  The thought was that this is a bit more robust
+> that just checking against a fixed max size, especially if we need to
+> increase that fixed size in future to handle really big partitions.
 >=20
-> Thank you.
-> --
-> Prasad J Pandit / Red Hat Product Security Team
-> 47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+
+Yeah, I saw that with Alexey's new patch.
+
+Thanks for the detailed clarification !
+
+> > > > The only case where we want to migrate something is when h_update_d=
+t() has
+> > > > succeeded, ie, the guest passed a valid DT blob. This implies that =
+its
+> > > > size isn't 0, otherwise fdt_check_full() would return -FDT_ERR_TRUN=
+CATED.
+> > > >=20
+> > > > I would suggest rather to:
+> > > >=20
+> > > > - completely drop spapr->fdt_initial_size
+> > > > - clear spapr->fdt_size at machine reset
+> > > > - migrate if spapr->fdt_size is not zero
+> > > >=20
+> > > > Also, I've just realized another problem... nothing prevents a mali=
+cious
+> > > > guest to pass an insanely great size to h_update_dt, which would ca=
+use
+> > > > g_malloc0() to abort... The passed size should be checked against
+> > > > FDT_MAX_SIZE.   =20
+> > >=20
+> > > Good point. Just noticed - as posted, the checker actually checks the
+> > > reset time tree, not the updated one, my bad :)
+> > >=20
+> > >=20
+> > >  =20
+> >  =20
+>=20
+
+
+--Sig_/u/PCgCC_taRl/0JJdq7gwq=
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlwRPVEACgkQcdTV5YIv
+c9Za6w//fJ1ll5IKWxPk5vTncmhA8avYzFQ0HjdA1pPxQb1Xg+mtYGu1pxFuOLeF
+4gOfgNNja3WPbG2R4oLYcQHmb8pY6Y6HvecADTkw4ljt8gs5HRitNaI1S7Ym9sN4
+cCGKXhVQPe9EkDbqRSlCwHCUdHZiRXbB+3IGPnv1dViFWOU8zGwoOcAjVKeCyYr1
+ZWL2t99eBZFqxhkZJh6FPgF8YH2H/QAnajiMxO4ERfFC6wvPN042+TC/humYgb2g
+N/WXsNLsagrxmcrZivBFcil+oipKTSTenXsjHJCdYhZayaDOX/u6boDBXP14Gppa
+64FOwjOYFk05Aqm11DW++YgT6ZT/yzGTHGAflJ0IgAnK9p+UR9TJSsT37OKwdb4I
+t8EjvXlA0GAhf3pVPDZLF7O/3Sie3oDQSmWEK8o+kIE9Eh/tu8guTRTUGBsx5DoI
+JwodAWcMmN1YsB8IYMw8nE7UVWFEvalbDPYDBDLtnCHITf+F6SNw0MZKu7YH5ezw
+FsggGoRAntoFzv4sM6xvM6VonqH265l0cgv2U3+4Q0/kOSRGvknkrrt7AbkwBY4+
+Fpat2Z3/wUNIRfNiI+2AvTxgo1k3d97bvBYXzq5LofSjJj6uAabmKz6zxonZxC+j
+6w8Cqc205BQ5s//LpkYd9anWoepaqObUTjZooRtLtvqPlRCP/iU=
+=cDLI
+-----END PGP SIGNATURE-----
+
+--Sig_/u/PCgCC_taRl/0JJdq7gwq=--
