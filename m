@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gX9ZW-0002TZ-68
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 13:49:26 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gX9ft-0005gl-CX
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 13:56:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gX9ZR-0003rC-H6
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 13:49:24 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35329)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gX9ZK-0003ls-Qy
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 13:49:16 -0500
-Received: by mail-wm1-x342.google.com with SMTP id c126so7072210wmh.0
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 10:49:13 -0800 (PST)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gX9fq-0000yz-Lo
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 13:56:01 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:43858)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1gX9fq-0000yM-CB
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 13:55:58 -0500
+Date: Wed, 12 Dec 2018 20:55:34 +0200
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20181212185533.GG5747@lap1>
+References: <20181212114726.24060-1-ppandit@redhat.com>
+	<20181212114726.24060-6-ppandit@redhat.com>
 MIME-Version: 1.0
-References: <20181204142023.15982-1-marcandre.lureau@redhat.com>
-	<20181204142023.15982-16-marcandre.lureau@redhat.com>
-	<20181211170255.51dafe8d@redhat.com>
-In-Reply-To: <20181211170255.51dafe8d@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 12 Dec 2018 22:48:58 +0400
-Message-ID: <CAJ+F1CJ8sJEuUCKE=caOsz6-5f_RWAW4x8VGOhdY+rXxPvwx3w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v5 15/19] qom: add
- object_class_get_class_data()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181212114726.24060-6-ppandit@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 5/6] pvrdma: check return value from
+ pvrdma_idx_ring_has_ routines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,76 +29,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
+To: P J P <ppandit@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Saar Amar <saaramar5@gmail.com>, Li Qiang <liq3ea@163.com>, Prasad J Pandit <pjp@fedoraproject.org>, yuval.shaia@oracle.com
 
-Hi
+On Wed, Dec 12, 2018 at 05:17:25PM +0530, P J P wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+> 
+> pvrdma_idx_ring_has_[data/space] routines also return invalid
+> index PVRDMA_INVALID_IDX[=-1], if ring has no data/space. Check
+> return value from these routines to avoid plausible infinite loops.
+> 
+> Reported-by: Li Qiang <liq3ea@163.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> ---
+>  hw/rdma/vmw/pvrdma_dev_ring.c | 37 +++++++++++++++++------------------
+>  1 file changed, 18 insertions(+), 19 deletions(-)
+> 
+> Update v1: receive error code in idx variable, remove comments
+>   -> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg02342.html
+> 
+> diff --git a/hw/rdma/vmw/pvrdma_dev_ring.c b/hw/rdma/vmw/pvrdma_dev_ring.c
+> index 01247fc041..2dccac8442 100644
+> --- a/hw/rdma/vmw/pvrdma_dev_ring.c
+> +++ b/hw/rdma/vmw/pvrdma_dev_ring.c
+> @@ -73,23 +73,22 @@ out:
+>  
+>  void *pvrdma_ring_next_elem_read(PvrdmaRing *ring)
+>  {
+> -    unsigned int idx = 0, offset;
+> +    int idx;
+> +    unsigned int offset, head;
+>  
+> -    /*
+> -    pr_dbg("%s: t=%d, h=%d\n", ring->name, ring->ring_state->prod_tail,
+> -           ring->ring_state->cons_head);
+> -    */
+> -
+> -    if (!pvrdma_idx_ring_has_data(ring->ring_state, ring->max_elems, &idx)) {
+> +    idx = pvrdma_idx_ring_has_data(ring->ring_state, ring->max_elems, &head);
+> +    if (idx <= 0) {
+>          pr_dbg("No more data in ring\n");
+>          return NULL;
+>      }
+>  
+> +    idx = pvrdma_idx(&ring->ring_state->cons_head, ring->max_elems);
+> +    if (idx < 0 || head != idx) {
+> +        pr_dbg("invalid idx\n");
+> +        return NULL;
+> +    }
+> +
 
-On Tue, Dec 11, 2018 at 8:24 PM Igor Mammedov <imammedo@redhat.com> wrote:
->
-> On Tue,  4 Dec 2018 18:20:19 +0400
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
->
-> > Add a simple function to retrieve the associated class data.
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  include/qom/object.h | 9 +++++++++
-> >  qom/object.c         | 5 +++++
-> >  2 files changed, 14 insertions(+)
-> >
-> > diff --git a/include/qom/object.h b/include/qom/object.h
-> > index 5183c587f3..d5266405da 100644
-> > --- a/include/qom/object.h
-> > +++ b/include/qom/object.h
-> > @@ -916,6 +916,15 @@ ObjectClass *object_class_dynamic_cast(ObjectClass=
- *klass,
-> >   */
-> >  ObjectClass *object_class_get_parent(ObjectClass *klass);
-> >
-> > +
-> > +/**
-> > + * object_class_get_class_data:
-> > + * @klass: The class to obtain associated data.
-> > + *
-> > + * Returns: the class_data given when registering the type.
-> > + */
-> > +void *object_class_get_class_data(ObjectClass *klass);
-> > +
-> >  /**
-> >   * object_class_get_name:
-> >   * @klass: The class to obtain the QOM typename for.
-> > diff --git a/qom/object.c b/qom/object.c
-> > index aa6f3a2a71..bbc6fbbc01 100644
-> > --- a/qom/object.c
-> > +++ b/qom/object.c
-> > @@ -867,6 +867,11 @@ const char *object_class_get_name(ObjectClass *kla=
-ss)
-> >      return klass->type->name;
-> >  }
-> >
-> > +void *object_class_get_class_data(ObjectClass *klass)
-> > +{
-> > +    return klass->type->class_data;
-> > +}
-> > +
-> >  ObjectClass *object_class_by_name(const char *typename)
-> >  {
-> >      TypeImpl *type =3D type_get_by_name(typename);
->
-> alternatively to what's done in 16/19 which requires this helper
-> you can drop it and use x86 cpu approach, see:
->
-> static void x86_cpu_cpudef_class_init(ObjectClass *oc, void *data)
-> {
->     X86CPUDefinition *cpudef =3D data;
->     X86CPUClass *xcc =3D X86_CPU_CLASS(oc);
->
->     xcc->cpu_def =3D cpudef;
->     ...
->
+Sorry, i mislead you here, idx was already populated by
+pvrdma_idx_ring_has_data so call to pvrdma_idx just to retrieve the index
+is waste. Please revert back to using another variable to check the return
+value from pvrdma_idx_ring_has_data and drop this call to pvrdma_idx.
 
-Indeed, that's perhaps a better alternative. I'll update the patch.
-
---=20
-Marc-Andr=C3=A9 Lureau
+>      offset = idx * ring->elem_sz;
+> -    /*
+> -    pr_dbg("idx=%d\n", idx);
+> -    pr_dbg("offset=%d\n", offset);
+> -    */
+>      return ring->pages[offset / TARGET_PAGE_SIZE] + (offset % TARGET_PAGE_SIZE);
+>  }
+>  
+> @@ -105,20 +104,20 @@ void pvrdma_ring_read_inc(PvrdmaRing *ring)
+>  
+>  void *pvrdma_ring_next_elem_write(PvrdmaRing *ring)
+>  {
+> -    unsigned int idx, offset, tail;
+> +    int idx;
+> +    unsigned int offset, tail;
+>  
+> -    /*
+> -    pr_dbg("%s: t=%d, h=%d\n", ring->name, ring->ring_state->prod_tail,
+> -           ring->ring_state->cons_head);
+> -    */
+> -
+> -    if (!pvrdma_idx_ring_has_space(ring->ring_state, ring->max_elems, &tail)) {
+> +    idx = pvrdma_idx_ring_has_space(ring->ring_state, ring->max_elems, &tail);
+> +    if (idx <= 0) {
+>          pr_dbg("CQ is full\n");
+>          return NULL;
+>      }
+>  
+>      idx = pvrdma_idx(&ring->ring_state->prod_tail, ring->max_elems);
+> -    /* TODO: tail == idx */
+> +    if (idx < 0 || tail != idx) {
+> +        pr_dbg("invalid idx\n");
+> +        return NULL;
+> +    }
+>  
+>      offset = idx * ring->elem_sz;
+>      return ring->pages[offset / TARGET_PAGE_SIZE] + (offset % TARGET_PAGE_SIZE);
+> -- 
+> 2.19.2
+> 
