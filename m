@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6N8-0001NB-8h
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6N8-0001ND-9A
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6N5-0000gJ-QY
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6N5-0000g7-OU
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:26 -0500
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:32987)
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:32991)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gX6N5-0000VT-Gm
+	id 1gX6N5-0000Vq-Du
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:23 -0500
-Received: by mail-wr1-x42c.google.com with SMTP id c14so18140341wrr.0
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:24:04 -0800 (PST)
+Received: by mail-wr1-x430.google.com with SMTP id c14so18140375wrr.0
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:24:05 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	u10sm15878859wrr.33.2018.12.12.07.24.02 for <qemu-devel@nongnu.org>
+	u10sm15878859wrr.33.2018.12.12.07.24.03 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 12 Dec 2018 07:24:02 -0800 (PST)
+	Wed, 12 Dec 2018 07:24:03 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 12 Dec 2018 16:23:03 +0100
-Message-Id: <1544628195-37728-43-git-send-email-pbonzini@redhat.com>
+Date: Wed, 12 Dec 2018 16:23:04 +0100
+Message-Id: <1544628195-37728-44-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
 References: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 42/54] vhost-net-user: add stubs for when no
- virtio-net device is present
+Subject: [Qemu-devel] [PULL 43/54] vhost: restrict Linux dependency to
+ kernel vhost
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,132 +37,111 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-hw/net/vhost_net.c needs functions that are declared in net/vhost-user.c: the
-vhost-user code is always compiled into QEMU, only the constructor
-net_init_vhost_user is unreachable.  Also, net/vhost-user.c needs functions
-declared in hw/virtio/vhost-stub.c even if no virtio device exists.
-
-Break this dependency.  First, add a minimal version of net/vhost-user.c,
-with no functionality and no dependency on vhost code.  Second, #ifdef out
-the calls back to net/vhost-user.c from hw/net/vhost_net.c.
-
-While at it, this patch fixes the CONFIG_VHOST_NET_USE*D* typo.
+vhost-user does not depend on Linux; it can run on any POSIX system.  Restrict
+vhost-kernel to Linux in hw/virtio/vhost-backend.c, everything else can be
+compiled on all POSIX systems.
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <1543851204-41186-3-git-send-email-pbonzini@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1543851204-41186-4-git-send-email-pbonzini@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure             |  2 +-
- hw/net/vhost_net.c    |  4 ++++
- net/Makefile.objs     |  4 +++-
- net/net.c             |  2 +-
- net/vhost-user-stub.c | 23 +++++++++++++++++++++++
- 5 files changed, 32 insertions(+), 3 deletions(-)
- create mode 100644 net/vhost-user-stub.c
+ backends/Makefile.objs     |  5 ++---
+ default-configs/virtio.mak |  4 ++--
+ hw/virtio/Makefile.objs    |  5 +++--
+ hw/virtio/vhost-backend.c  | 11 +++++++++--
+ 4 files changed, 16 insertions(+), 9 deletions(-)
 
-diff --git a/configure b/configure
-index 131eae5..b995d71 100755
---- a/configure
-+++ b/configure
-@@ -6515,7 +6515,7 @@ if test "$vhost_scsi" = "yes" ; then
-   echo "CONFIG_VHOST_SCSI=y" >> $config_host_mak
- fi
- if test "$vhost_net" = "yes" -a "$vhost_user" = "yes"; then
--  echo "CONFIG_VHOST_NET_USED=y" >> $config_host_mak
-+  echo "CONFIG_VHOST_NET_USER=y" >> $config_host_mak
- fi
- if test "$vhost_crypto" = "yes" ; then
-   echo "CONFIG_VHOST_CRYPTO=y" >> $config_host_mak
-diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-index b901306..2a300ee 100644
---- a/hw/net/vhost_net.c
-+++ b/hw/net/vhost_net.c
-@@ -193,6 +193,7 @@ struct vhost_net *vhost_net_init(VhostNetOptions *options)
-     }
+diff --git a/backends/Makefile.objs b/backends/Makefile.objs
+index 717fcbd..ff619d3 100644
+--- a/backends/Makefile.objs
++++ b/backends/Makefile.objs
+@@ -9,10 +9,9 @@ common-obj-$(CONFIG_POSIX) += hostmem-file.o
+ common-obj-y += cryptodev.o
+ common-obj-y += cryptodev-builtin.o
  
-     /* Set sane init value. Override when guest acks. */
-+#ifdef CONFIG_VHOST_NET_USER
-     if (net->nc->info->type == NET_CLIENT_DRIVER_VHOST_USER) {
-         features = vhost_user_get_acked_features(net->nc);
-         if (~net->dev.features & features) {
-@@ -202,6 +203,7 @@ struct vhost_net *vhost_net_init(VhostNetOptions *options)
-             goto fail;
-         }
-     }
+-ifeq ($(CONFIG_VIRTIO),y)
++ifeq ($(CONFIG_VIRTIO_CRYPTO),y)
+ common-obj-y += cryptodev-vhost.o
+-common-obj-$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX)) += \
+-    cryptodev-vhost-user.o
++common-obj-$(CONFIG_VHOST_CRYPTO) += cryptodev-vhost-user.o
+ endif
+ 
+ common-obj-$(CONFIG_LINUX) += hostmem-memfd.o
+diff --git a/default-configs/virtio.mak b/default-configs/virtio.mak
+index 1304849..340050a 100644
+--- a/default-configs/virtio.mak
++++ b/default-configs/virtio.mak
+@@ -1,5 +1,5 @@
+-CONFIG_VHOST_USER_SCSI=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+-CONFIG_VHOST_USER_BLK=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
++CONFIG_VHOST_USER_SCSI=$(CONFIG_VHOST_USER)
++CONFIG_VHOST_USER_BLK=$(CONFIG_VHOST_USER)
+ CONFIG_VIRTIO=y
+ CONFIG_VIRTIO_9P=y
+ CONFIG_VIRTIO_BALLOON=y
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+index 1b2799c..e8eff80 100644
+--- a/hw/virtio/Makefile.objs
++++ b/hw/virtio/Makefile.objs
+@@ -9,9 +9,10 @@ obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon.o
+ obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-crypto.o
+ obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-pci.o
+ 
+-obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
++obj-$(CONFIG_VHOST_USER) += vhost-user.o
+ obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
++obj-$(call lor,$(CONFIG_VHOST_USER),$(CONFIG_LINUX)) += vhost.o vhost-backend.o
++common-obj-$(call lnot,$(call lor,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))) += vhost-stub.o
+ endif
+ 
+-common-obj-$(call lnot,$(call land,$(CONFIG_VIRTIO),$(CONFIG_LINUX))) += vhost-stub.o
+ common-obj-$(CONFIG_ALL) += vhost-stub.o
+diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
+index 7f09efa..b5d2e30 100644
+--- a/hw/virtio/vhost-backend.c
++++ b/hw/virtio/vhost-backend.c
+@@ -9,12 +9,14 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include <linux/vhost.h>
+-#include <sys/ioctl.h>
+ #include "hw/virtio/vhost.h"
+ #include "hw/virtio/vhost-backend.h"
+ #include "qemu/error-report.h"
+ 
++#ifdef CONFIG_LINUX
++#include <linux/vhost.h>
++#include <sys/ioctl.h>
++
+ static int vhost_kernel_call(struct vhost_dev *dev, unsigned long int request,
+                              void *arg)
+ {
+@@ -265,18 +267,23 @@ static const VhostOps kernel_ops = {
+         .vhost_set_iotlb_callback = vhost_kernel_set_iotlb_callback,
+         .vhost_send_device_iotlb_msg = vhost_kernel_send_device_iotlb_msg,
+ };
 +#endif
  
-     vhost_net_ack_features(net, features);
+ int vhost_set_backend_type(struct vhost_dev *dev, VhostBackendType backend_type)
+ {
+     int r = 0;
  
-@@ -413,10 +415,12 @@ VHostNetState *get_vhost_net(NetClientState *nc)
-     case NET_CLIENT_DRIVER_TAP:
-         vhost_net = tap_get_vhost_net(nc);
+     switch (backend_type) {
++#ifdef CONFIG_LINUX
+     case VHOST_BACKEND_TYPE_KERNEL:
+         dev->vhost_ops = &kernel_ops;
          break;
-+#ifdef CONFIG_VHOST_NET_USER
-     case NET_CLIENT_DRIVER_VHOST_USER:
-         vhost_net = vhost_user_get_vhost_net(nc);
-         assert(vhost_net);
++#endif
++#ifdef CONFIG_VHOST_USER
+     case VHOST_BACKEND_TYPE_USER:
+         dev->vhost_ops = &user_ops;
          break;
 +#endif
      default:
-         break;
-     }
-diff --git a/net/Makefile.objs b/net/Makefile.objs
-index b2bf88a..df2b409 100644
---- a/net/Makefile.objs
-+++ b/net/Makefile.objs
-@@ -3,7 +3,9 @@ common-obj-y += socket.o
- common-obj-y += dump.o
- common-obj-y += eth.o
- common-obj-$(CONFIG_L2TPV3) += l2tpv3.o
--common-obj-$(CONFIG_POSIX) += vhost-user.o
-+common-obj-$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOST_NET_USER)) += vhost-user.o
-+common-obj-$(call land,$(call lnot,$(CONFIG_VIRTIO_NET)),$(CONFIG_VHOST_NET_USER)) += vhost-user-stub.o
-+common-obj-$(CONFIG_ALL) += vhost-user-stub.o
- common-obj-$(CONFIG_SLIRP) += slirp.o
- common-obj-$(CONFIG_VDE) += vde.o
- common-obj-$(CONFIG_NETMAP) += netmap.o
-diff --git a/net/net.c b/net/net.c
-index 3acbdcc..ca0e14c 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -961,7 +961,7 @@ static int (* const net_client_init_fun[NET_CLIENT_DRIVER__MAX])(
-         [NET_CLIENT_DRIVER_BRIDGE]    = net_init_bridge,
- #endif
-         [NET_CLIENT_DRIVER_HUBPORT]   = net_init_hubport,
--#ifdef CONFIG_VHOST_NET_USED
-+#ifdef CONFIG_VHOST_NET_USER
-         [NET_CLIENT_DRIVER_VHOST_USER] = net_init_vhost_user,
- #endif
- #ifdef CONFIG_L2TPV3
-diff --git a/net/vhost-user-stub.c b/net/vhost-user-stub.c
-new file mode 100644
-index 0000000..52ab4e1
---- /dev/null
-+++ b/net/vhost-user-stub.c
-@@ -0,0 +1,23 @@
-+/*
-+ * vhost-user-stub.c
-+ *
-+ * Copyright (c) 2018 Red Hat, Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "clients.h"
-+#include "net/vhost_net.h"
-+#include "net/vhost-user.h"
-+#include "qemu/error-report.h"
-+#include "qapi/error.h"
-+
-+int net_init_vhost_user(const Netdev *netdev, const char *name,
-+                        NetClientState *peer, Error **errp)
-+{
-+    error_setg(errp, "vhost-user requires frontend driver virtio-net-*");
-+    return -1;
-+}
+         error_report("Unknown vhost backend type");
+         r = -1;
 -- 
 1.8.3.1
