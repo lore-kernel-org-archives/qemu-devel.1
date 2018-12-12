@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37822)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gX9ft-0005gl-CX
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 13:56:02 -0500
+	(envelope-from <eblake@redhat.com>) id 1gX9iP-0007Py-An
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 13:58:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gX9fq-0000yz-Lo
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 13:56:01 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:43858)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gX9fq-0000yM-CB
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 13:55:58 -0500
-Date: Wed, 12 Dec 2018 20:55:34 +0200
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20181212185533.GG5747@lap1>
-References: <20181212114726.24060-1-ppandit@redhat.com>
-	<20181212114726.24060-6-ppandit@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1gX9iO-0003Wu-FC
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 13:58:37 -0500
+References: <1544532681-53370-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <445d8c4a-0e07-7ab8-f7b2-f065cf67d751@redhat.com>
+Date: Wed, 12 Dec 2018 12:58:26 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181212114726.24060-6-ppandit@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1 5/6] pvrdma: check return value from
- pvrdma_idx_ring_has_ routines
+In-Reply-To: <1544532681-53370-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6] qemu-img info lists bitmap directory
+ entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,98 +24,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Saar Amar <saaramar5@gmail.com>, Li Qiang <liq3ea@163.com>, Prasad J Pandit <pjp@fedoraproject.org>, yuval.shaia@oracle.com
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-On Wed, Dec 12, 2018 at 05:17:25PM +0530, P J P wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
+On 12/11/18 6:51 AM, Andrey Shinkevich wrote:
+> In the 'Format specific information' section of the 'qemu-img info'
+> command output, the supplemental information about existing QCOW2
+> bitmaps will be shown, such as a bitmap name, flags and granularity:
 > 
-> pvrdma_idx_ring_has_[data/space] routines also return invalid
-> index PVRDMA_INVALID_IDX[=-1], if ring has no data/space. Check
-> return value from these routines to avoid plausible infinite loops.
+> image: /vz/vmprivate/VM1/harddisk.hdd
+> file format: qcow2
+> virtual size: 64G (68719476736 bytes)
+> disk size: 3.0M
+> cluster_size: 1048576
+> Format specific information:
+>      compat: 1.1
+>      lazy refcounts: true
+>      bitmaps:
+>          [0]:
+>              flags:
+>                  [0]: in-use
+>                  [1]: auto
+>              name: back-up1
+>              unknown flags: 4
+>              granularity: 65536
+>          [1]:
+>              flags:
+>                  [0]: in-use
+>                  [1]: auto
+>              name: back-up2
+>              unknown flags: 8
+>              granularity: 65536
+>      refcount bits: 16
+>      corrupt: false
 > 
-> Reported-by: Li Qiang <liq3ea@163.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 > ---
->  hw/rdma/vmw/pvrdma_dev_ring.c | 37 +++++++++++++++++------------------
->  1 file changed, 18 insertions(+), 19 deletions(-)
-> 
-> Update v1: receive error code in idx variable, remove comments
->   -> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg02342.html
-> 
-> diff --git a/hw/rdma/vmw/pvrdma_dev_ring.c b/hw/rdma/vmw/pvrdma_dev_ring.c
-> index 01247fc041..2dccac8442 100644
-> --- a/hw/rdma/vmw/pvrdma_dev_ring.c
-> +++ b/hw/rdma/vmw/pvrdma_dev_ring.c
-> @@ -73,23 +73,22 @@ out:
->  
->  void *pvrdma_ring_next_elem_read(PvrdmaRing *ring)
->  {
-> -    unsigned int idx = 0, offset;
-> +    int idx;
-> +    unsigned int offset, head;
->  
-> -    /*
-> -    pr_dbg("%s: t=%d, h=%d\n", ring->name, ring->ring_state->prod_tail,
-> -           ring->ring_state->cons_head);
-> -    */
-> -
-> -    if (!pvrdma_idx_ring_has_data(ring->ring_state, ring->max_elems, &idx)) {
-> +    idx = pvrdma_idx_ring_has_data(ring->ring_state, ring->max_elems, &head);
-> +    if (idx <= 0) {
->          pr_dbg("No more data in ring\n");
->          return NULL;
->      }
->  
-> +    idx = pvrdma_idx(&ring->ring_state->cons_head, ring->max_elems);
-> +    if (idx < 0 || head != idx) {
-> +        pr_dbg("invalid idx\n");
-> +        return NULL;
-> +    }
+
+
 > +
+> +Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
+> +                                                Error **errp)
+> +{
 
-Sorry, i mislead you here, idx was already populated by
-pvrdma_idx_ring_has_data so call to pvrdma_idx just to retrieve the index
-is waste. Please revert back to using another variable to check the return
-value from pvrdma_idx_ring_has_data and drop this call to pvrdma_idx.
+Might be worth a function comment that this returns NULL...
 
->      offset = idx * ring->elem_sz;
-> -    /*
-> -    pr_dbg("idx=%d\n", idx);
-> -    pr_dbg("offset=%d\n", offset);
-> -    */
->      return ring->pages[offset / TARGET_PAGE_SIZE] + (offset % TARGET_PAGE_SIZE);
->  }
->  
-> @@ -105,20 +104,20 @@ void pvrdma_ring_read_inc(PvrdmaRing *ring)
->  
->  void *pvrdma_ring_next_elem_write(PvrdmaRing *ring)
->  {
-> -    unsigned int idx, offset, tail;
-> +    int idx;
-> +    unsigned int offset, tail;
->  
-> -    /*
-> -    pr_dbg("%s: t=%d, h=%d\n", ring->name, ring->ring_state->prod_tail,
-> -           ring->ring_state->cons_head);
-> -    */
-> -
-> -    if (!pvrdma_idx_ring_has_space(ring->ring_state, ring->max_elems, &tail)) {
-> +    idx = pvrdma_idx_ring_has_space(ring->ring_state, ring->max_elems, &tail);
-> +    if (idx <= 0) {
->          pr_dbg("CQ is full\n");
->          return NULL;
->      }
->  
->      idx = pvrdma_idx(&ring->ring_state->prod_tail, ring->max_elems);
-> -    /* TODO: tail == idx */
-> +    if (idx < 0 || tail != idx) {
-> +        pr_dbg("invalid idx\n");
+> +    BDRVQcow2State *s = bs->opaque;
+> +    Qcow2BitmapList *bm_list;
+> +    Qcow2Bitmap *bm;
+> +    Qcow2BitmapInfoList *list = NULL;
+> +    Qcow2BitmapInfoList **plist = &list;
+> +
+> +    if (s->nb_bitmaps == 0) {
 > +        return NULL;
 > +    }
->  
->      offset = idx * ring->elem_sz;
->      return ring->pages[offset / TARGET_PAGE_SIZE] + (offset % TARGET_PAGE_SIZE);
-> -- 
-> 2.19.2
-> 
+
+...both when errp is clear (for a 0-length list in the QMP),
+
+> +
+> +    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
+> +                               s->bitmap_directory_size, errp);
+> +    if (bm_list == NULL) {
+> +        return NULL;
+> +    }
+
+...and when errp is set (for a problem in obtaining the information, for 
+omitting the list in QMP).
+
+> +++ b/block/qcow2.c
+> @@ -4270,6 +4270,10 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs)
+>               .refcount_bits      = s->refcount_bits,
+>           };
+>       } else if (s->qcow_version == 3) {
+> +        Qcow2BitmapInfoList *bitmaps;
+> +        Error *local_err = NULL;
+> +
+> +        bitmaps = qcow2_get_bitmap_info_list(bs, &local_err);
+>           *spec_info->u.qcow2.data = (ImageInfoSpecificQCow2){
+>               .compat             = g_strdup("1.1"),
+>               .lazy_refcounts     = s->compatible_features &
+> @@ -4279,7 +4283,12 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs)
+>                                     QCOW2_INCOMPAT_CORRUPT,
+>               .has_corrupt        = true,
+>               .refcount_bits      = s->refcount_bits,
+> +            .has_bitmaps        = !local_err,
+> +            .bitmaps            = bitmaps,
+>           };
+> +        /* TODO: Report the Error up to the caller when
+> +         * an error propagation algorithm is implemented */
+> +        error_free(local_err);
+
+Otherwise, this works for me.  Up to John if he wants to add a comment 
+as part of staging this, or require a v7, but either way, I'm happy with:
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
