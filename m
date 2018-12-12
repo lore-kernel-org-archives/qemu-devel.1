@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gX5as-0002Xp-Sd
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:34:35 -0500
+	(envelope-from <philmd@redhat.com>) id 1gX5bl-00034U-8t
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:35:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gX5ap-0008Pv-Jh
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:34:34 -0500
-Date: Wed, 12 Dec 2018 15:34:26 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181212153426.2ca5a481.cohuck@redhat.com>
-In-Reply-To: <1544623878-11248-1-git-send-email-jjherne@linux.ibm.com>
-References: <1544623878-11248-1-git-send-email-jjherne@linux.ibm.com>
+	(envelope-from <philmd@redhat.com>) id 1gX5bh-0000Qp-LQ
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:35:28 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:53660)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gX5bh-0000QC-28
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:35:25 -0500
+Received: by mail-wm1-f65.google.com with SMTP id y1so5967003wmi.3
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 06:35:24 -0800 (PST)
+References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
+	<1543851204-41186-23-git-send-email-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <f999872d-d940-7093-3c4c-f245e27c803f@redhat.com>
+Date: Wed, 12 Dec 2018 15:35:21 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 00/15] s390: vfio-ccw dasd ipl support
+In-Reply-To: <1543851204-41186-23-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 22/71] tests/libqos: sdhci driver and
+ interface nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,100 +31,293 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com, Thomas Huth <thuth@redhat.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <laurent@vivier.eu>
 
-On Wed, 12 Dec 2018 09:11:03 -0500
-"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+On 12/3/18 4:32 PM, Paolo Bonzini wrote:
+> From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+> 
+> Add qgraph nodes for sdhci-pci and generic-sdhci (memory mapped) drivers.
+> Both drivers implement (produce) the same interface sdhci, that provides the
+> readw - readq - writeq functions.
+> 
+> Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  tests/Makefile.include |   1 +
+>  tests/libqos/sdhci.c   | 163 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  tests/libqos/sdhci.h   |  70 +++++++++++++++++++++
+>  3 files changed, 234 insertions(+)
+>  create mode 100644 tests/libqos/sdhci.c
+>  create mode 100644 tests/libqos/sdhci.h
+> 
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 1266109..66c7848 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -678,6 +678,7 @@ libqos-virtio-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/virt
+>  # Devices
+>  qos-test-obj-y = tests/qos-test.o $(libqgraph-obj-y)
+>  qos-test-obj-y += $(libqos-pc-obj-y)
+> +qos-test-obj-y += tests/libqos/sdhci.o
+>  
+>  # Machines
+>  qos-test-obj-y += tests/libqos/x86_64_pc-machine.o
+> diff --git a/tests/libqos/sdhci.c b/tests/libqos/sdhci.c
+> new file mode 100644
+> index 0000000..0685bee
+> --- /dev/null
+> +++ b/tests/libqos/sdhci.c
+> @@ -0,0 +1,163 @@
+> +/*
+> + * libqos driver framework
+> + *
+> + * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License version 2 as published by the Free Software Foundation.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/licenses/>
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "libqtest.h"
+> +#include "libqos/qgraph.h"
+> +#include "pci.h"
+> +#include "sdhci.h"
+> +#include "hw/pci/pci.h"
+> +
+> +static void set_qsdhci_fields(QSDHCI *s, uint8_t version, uint8_t baseclock,
+> +                              bool sdma, uint64_t reg)
+> +{
+> +    s->props.version = version;
+> +    s->props.baseclock = baseclock;
+> +    s->props.capab.sdma = sdma;
+> +    s->props.capab.reg = reg;
+> +}
+> +
+> +/* Memory mapped implementation of QSDHCI */
+> +
+> +static uint16_t sdhci_mm_readw(QSDHCI *s, uint32_t reg)
+> +{
+> +    QSDHCI_MemoryMapped *smm = container_of(s, QSDHCI_MemoryMapped, sdhci);
+> +    return qtest_readw(smm->qts, smm->addr + reg);
+> +}
+> +
+> +static uint64_t sdhci_mm_readq(QSDHCI *s, uint32_t reg)
+> +{
+> +    QSDHCI_MemoryMapped *smm = container_of(s, QSDHCI_MemoryMapped, sdhci);
+> +    return qtest_readq(smm->qts, smm->addr + reg);
+> +}
+> +
+> +static void sdhci_mm_writeq(QSDHCI *s, uint32_t reg, uint64_t val)
+> +{
+> +    QSDHCI_MemoryMapped *smm = container_of(s, QSDHCI_MemoryMapped, sdhci);
+> +    qtest_writeq(smm->qts, smm->addr + reg, val);
+> +}
+> +
+> +static void *sdhci_mm_get_driver(void *obj, const char *interface)
+> +{
+> +    QSDHCI_MemoryMapped *smm = obj;
+> +    if (!g_strcmp0(interface, "sdhci")) {
+> +        return &smm->sdhci;
+> +    }
+> +    fprintf(stderr, "%s not present in generic-sdhci\n", interface);
+> +    g_assert_not_reached();
+> +}
+> +
+> +void qos_init_sdhci_mm(QSDHCI_MemoryMapped *sdhci, QTestState *qts,
+> +		       uint32_t addr, QSDHCIProperties *common)
+> +{
+> +    sdhci->obj.get_driver = sdhci_mm_get_driver;
+> +    sdhci->sdhci.readw = sdhci_mm_readw;
+> +    sdhci->sdhci.readq = sdhci_mm_readq;
+> +    sdhci->sdhci.writeq = sdhci_mm_writeq;
+> +    memcpy(&sdhci->sdhci.props, common, sizeof(QSDHCIProperties));
+> +    sdhci->addr = addr;
+> +    sdhci->qts = qts;
+> +}
+> +
+> +/* PCI implementation of QSDHCI */
+> +
+> +static uint16_t sdhci_pci_readw(QSDHCI *s, uint32_t reg)
+> +{
+> +    QSDHCI_PCI *spci = container_of(s, QSDHCI_PCI, sdhci);
+> +    return qpci_io_readw(&spci->dev, spci->mem_bar, reg);
+> +}
+> +
+> +static uint64_t sdhci_pci_readq(QSDHCI *s, uint32_t reg)
+> +{
+> +    QSDHCI_PCI *spci = container_of(s, QSDHCI_PCI, sdhci);
+> +    return qpci_io_readq(&spci->dev, spci->mem_bar, reg);
+> +}
+> +
+> +static void sdhci_pci_writeq(QSDHCI *s, uint32_t reg, uint64_t val)
+> +{
+> +    QSDHCI_PCI *spci = container_of(s, QSDHCI_PCI, sdhci);
+> +    return qpci_io_writeq(&spci->dev, spci->mem_bar, reg, val);
+> +}
+> +
+> +static void *sdhci_pci_get_driver(void *object, const char *interface)
+> +{
+> +    QSDHCI_PCI *spci = object;
+> +    if (!g_strcmp0(interface, "sdhci")) {
+> +        return &spci->sdhci;
+> +    }
+> +
+> +    fprintf(stderr, "%s not present in sdhci-pci\n", interface);
+> +    g_assert_not_reached();
+> +}
+> +
+> +static void sdhci_pci_start_hw(QOSGraphObject *obj)
+> +{
+> +    QSDHCI_PCI *spci = (QSDHCI_PCI *)obj;
+> +    qpci_device_enable(&spci->dev);
+> +}
+> +
+> +static void sdhci_destructor(QOSGraphObject *obj)
 
-Hm, I think you need to adjust your cc: list. I added some more folks
-(and removed Dong Jia, whose address is no longer valid AFAIK).
+sdhci_pci_destructor()
 
-> This is to support booting from vfio-ccw dasd devices. We basically implement
-> the real hardware ipl procedure. This allows for booting Linux guests on
-> vfio-ccw devices.
-> 
-> vfio-ccw's channel program prefetch algorithm complicates ipl because most ipl
-> channel programs dynamically modify themselves. Details on the ipl process and
-> how we worked around this issue can be found in docs/devel/s390-dasd-ipl.txt.
-> 
-> NOTE: It has been a while, but I've finally chased down my infamous "reset bug".
-> On subsystem reset (I see this right after host ipl) we sometimes end up getting
-> an unexpected unit check status from a dasd device. This causes the first start
-> subchannel instruction to fail due to the pending unit check status. My solution
-> to this problem, as advised by the kernel folks, is to simply retry my ssch
-> instructions before declaring failure when unexpected unit checks happen. In the
-> event of a persistent error, after two retries we'll give up and print some
-> useful error info for the user.
+> +{
+> +    QSDHCI_PCI *spci = (QSDHCI_PCI *)obj;
+> +    qpci_iounmap(&spci->dev, spci->mem_bar);
+> +}
+> +
+> +static void *sdhci_pci_create(void *pci_bus, QGuestAllocator *alloc, void *addr)
+> +{
+> +    QSDHCI_PCI *spci = g_new0(QSDHCI_PCI, 1);
+> +    QPCIBus *bus = pci_bus;
+> +    uint64_t barsize;
+> +
+> +    qpci_device_init(&spci->dev, bus, addr);
+> +    spci->mem_bar = qpci_iomap(&spci->dev, 0, &barsize);
+> +    spci->sdhci.readw = sdhci_pci_readw;
+> +    spci->sdhci.readq = sdhci_pci_readq;
+> +    spci->sdhci.writeq = sdhci_pci_writeq;
+> +    set_qsdhci_fields(&spci->sdhci, 2, 0, 1, 0x057834b4);
+> +
+> +    spci->obj.get_driver = sdhci_pci_get_driver;
+> +    spci->obj.start_hw = sdhci_pci_start_hw;
+> +    spci->obj.destructor = sdhci_destructor;
+> +    return &spci->obj;
+> +}
+> +
+> +static void qsdhci_register_nodes(void)
+> +{
+> +    QPCIAddress addr = {
+> +        .devfn = QPCI_DEVFN(4, 0),
+> +        .vendor_id = PCI_VENDOR_ID_REDHAT,
+> +        .device_id = PCI_DEVICE_ID_REDHAT_SDHCI,
+> +    };
+> +
+> +    QOSGraphEdgeOptions opts = {
+> +        .extra_device_opts = "addr=04.0",
 
-So, is that a status we only see because the vfio-ccw driver keeps the
-subchannel enabled (as by the other recent thread)?
+Shouldn't this be formatted from the previous QPCIAddress?
 
-Is there any value in distinguishing different unit checks, or is retry
-the best strategy in any case?
+> +    };
+> +
+> +    /* generic-sdhci */
+> +    qos_node_create_driver("generic-sdhci", NULL);
+> +    qos_node_produces("generic-sdhci", "sdhci");
+> +
+> +    /* sdhci-pci */
+> +    add_qpci_address(&opts, &addr);
+> +    qos_node_create_driver("sdhci-pci", sdhci_pci_create);
+> +    qos_node_produces("sdhci-pci", "sdhci");
+> +    qos_node_consumes("sdhci-pci", "pci-bus", &opts);
+> +
+> +}
+> +
+> +libqos_init(qsdhci_register_nodes);
+> diff --git a/tests/libqos/sdhci.h b/tests/libqos/sdhci.h
+> new file mode 100644
+> index 0000000..e9880fc
+> --- /dev/null
+> +++ b/tests/libqos/sdhci.h
+> @@ -0,0 +1,70 @@
+> +/*
+> + * libqos driver framework
+> + *
+> + * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License version 2 as published by the Free Software Foundation.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/licenses/>
+> + */
+> +
+> +#ifndef QGRAPH_QSDHCI
+> +#define QGRAPH_QSDHCI
+> +
+> +#include "libqos/qgraph.h"
+> +#include "pci.h"
+> +
+> +typedef struct QSDHCI QSDHCI;
+> +typedef struct QSDHCI_MemoryMapped QSDHCI_MemoryMapped;
+> +typedef struct QSDHCI_PCI  QSDHCI_PCI;
+> +typedef struct QSDHCIProperties QSDHCIProperties;
+> +
+> +/* Properties common to all QSDHCI devices */
+> +struct QSDHCIProperties {
+> +    uint8_t version;
+> +    uint8_t baseclock;
+> +    struct {
+> +        bool sdma;
+> +        uint64_t reg;
+> +    } capab;
+> +};
+> +
+> +struct QSDHCI {
+> +    uint16_t (*readw)(QSDHCI *s, uint32_t reg);
+> +    uint64_t (*readq)(QSDHCI *s, uint32_t reg);
+> +    void (*writeq)(QSDHCI *s, uint32_t reg, uint64_t val);
+> +    QSDHCIProperties props;
+> +};
+> +
+> +/* Memory Mapped implementation of QSDHCI */
+> +struct QSDHCI_MemoryMapped {
+> +    QOSGraphObject obj;
+> +    QTestState *qts;
 
+Maybe 'teststate' or 'state' rather than 'qts'.
+
+> +    QSDHCI sdhci;
+> +    uint64_t addr;
+> +};
+> +
+> +/* PCI implementation of QSDHCI */
+> +struct QSDHCI_PCI {
+> +    QOSGraphObject obj;
+> +    QPCIDevice dev;
+> +    QSDHCI sdhci;
+> +    QPCIBar mem_bar;
+> +};
+> +
+> +/**
+> + * qos_init_sdhci_mm(): external constructor used by all drivers/machines
+> + * that "contain" a #QSDHCI_MemoryMapped driver
+> + */
+> +void qos_init_sdhci_mm(QSDHCI_MemoryMapped *sdhci, QTestState *qts,
+> +		       uint32_t addr, QSDHCIProperties *common);
+> +
+> +#endif
 > 
-> Changelog
-> ==========
-> 
-> rfc -> v1
-> ---------
-> - Retry start subchannel operations on unexpected unit check status
-> - Print more complete state information on i/o error
-> - Fixed asm constraints (Q -> QS)
-> - Align lowcore to 8k boundary
-> - Initialize next_cpa in run_dynamic_ccw_program to avoid compiler warning
-> - Cleanup: Rework handling of i/o interrupts in assembler
-> - Fix netboot image (include cio.o in make file)
-> - Misc cleanups
-> 
-> Jason J. Herne (15):
->   s390 vfio-ccw: Add bootindex property and IPLB data
->   s390-bios: decouple cio setup from virtio
->   s390-bios: decouple common boot logic from virtio
->   s390-bios: Extend find_dev() for non-virtio devices
->   s390-bios: Factor finding boot device out of virtio code path
->   s390-bios: Clean up cio.h
->   s390-bios: Decouple channel i/o logic from virtio
->   s390-bios: Map low core memory
->   s390-bios: ptr2u32 and u32toptr
->   s390-bios: Support for running format-0/1 channel programs
->   s390-bios: cio error handling
->   s390-bios: Refactor virtio to run channel programs via cio
->   s390-bios: Use control unit type to determine boot method
->   s390-bios: Add channel command codes/structs needed for dasd-ipl
->   s390-bios: Support booting from real dasd device
-> 
->  docs/devel/s390-dasd-ipl.txt     | 132 ++++++++++++++
->  hw/s390x/ipl.c                   |  15 ++
->  hw/s390x/s390-ccw.c              |   9 +
->  hw/vfio/ccw.c                    |  13 +-
->  include/hw/s390x/s390-ccw.h      |   1 +
->  include/hw/s390x/vfio-ccw.h      |  38 ++++
->  pc-bios/s390-ccw/Makefile        |   2 +-
->  pc-bios/s390-ccw/cio.c           | 374 +++++++++++++++++++++++++++++++++++++++
->  pc-bios/s390-ccw/cio.h           | 236 +++++++++++++++++++-----
->  pc-bios/s390-ccw/dasd-ipl.c      | 249 ++++++++++++++++++++++++++
->  pc-bios/s390-ccw/dasd-ipl.h      |  16 ++
->  pc-bios/s390-ccw/libc.h          |  23 +++
->  pc-bios/s390-ccw/main.c          | 161 +++++++++++------
->  pc-bios/s390-ccw/netboot.mak     |   2 +-
->  pc-bios/s390-ccw/netmain.c       |   1 +
->  pc-bios/s390-ccw/s390-arch.h     | 113 ++++++++++++
->  pc-bios/s390-ccw/s390-ccw.h      |  10 +-
->  pc-bios/s390-ccw/start.S         |  33 +++-
->  pc-bios/s390-ccw/virtio-blkdev.c |   1 +
->  pc-bios/s390-ccw/virtio.c        |  46 +----
->  roms/SLOF                        |   2 +-
->  tests/boot-serial-test.c         |   2 +-
->  22 files changed, 1308 insertions(+), 171 deletions(-)
->  create mode 100644 docs/devel/s390-dasd-ipl.txt
->  create mode 100644 include/hw/s390x/vfio-ccw.h
->  create mode 100644 pc-bios/s390-ccw/cio.c
->  create mode 100644 pc-bios/s390-ccw/dasd-ipl.c
->  create mode 100644 pc-bios/s390-ccw/dasd-ipl.h
->  create mode 100644 pc-bios/s390-ccw/s390-arch.h
-> 
-> --
-> 2.7.4
-> 
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
