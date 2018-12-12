@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gX5FB-0003sU-Il
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:12:14 -0500
+	(envelope-from <philmd@redhat.com>) id 1gX5FW-00049Q-4M
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:12:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gX5F7-0007Se-9d
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:12:09 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43506)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1gX5F5-0007GH-A6
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:12:04 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wBCE9R00086059
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:11:47 -0500
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2pb2x7b0nx-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:11:47 -0500
-Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Wed, 12 Dec 2018 14:11:47 -0000
-From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Wed, 12 Dec 2018 09:11:17 -0500
-In-Reply-To: <1544623878-11248-1-git-send-email-jjherne@linux.ibm.com>
-References: <1544623878-11248-1-git-send-email-jjherne@linux.ibm.com>
-Message-Id: <1544623878-11248-15-git-send-email-jjherne@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH 14/15] s390-bios: Add channel command
- codes/structs needed for dasd-ipl
+	(envelope-from <philmd@redhat.com>) id 1gX5FR-0007jM-Tn
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:12:30 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:38419)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gX5FR-0007iV-Js
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:12:25 -0500
+Received: by mail-wm1-f65.google.com with SMTP id m22so6128485wml.3
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 06:12:25 -0800 (PST)
+References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
+	<1543851204-41186-18-git-send-email-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <2e26a7cc-8788-b16f-dd35-434570cd43d4@redhat.com>
+Date: Wed, 12 Dec 2018 15:12:21 +0100
+MIME-Version: 1.0
+In-Reply-To: <1543851204-41186-18-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 17/71] tests: remove rule for nonexisting
+ qdev-monitor-test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,69 +31,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com, borntraeger@de.ibm.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <laurent@vivier.eu>
 
-The dasd IPL procedure needs to execute a few previously unused
-channel commands. Let's define them and their associated data
-structures.
+On 12/3/18 4:32 PM, Paolo Bonzini wrote:
+> This test was merged into drive_del-test in 2014.
 
-Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
----
- pc-bios/s390-ccw/cio.h | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+in e2f3f221885.
 
-diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
-index 5c16635..3300295 100644
---- a/pc-bios/s390-ccw/cio.h
-+++ b/pc-bios/s390-ccw/cio.h
-@@ -200,11 +200,14 @@ typedef struct ccw1 {
- #define CCW_FLAG_IDA             0x04
- #define CCW_FLAG_SUSPEND         0x02
- 
-+/* Common CCW commands */
-+#define CCW_CMD_READ_IPL         0x02
- #define CCW_CMD_NOOP             0x03
- #define CCW_CMD_BASIC_SENSE      0x04
- #define CCW_CMD_TIC              0x08
- #define CCW_CMD_SENSE_ID         0xe4
- 
-+/* Virtio CCW commands */
- #define CCW_CMD_SET_VQ           0x13
- #define CCW_CMD_VDEV_RESET       0x33
- #define CCW_CMD_READ_FEAT        0x12
-@@ -216,6 +219,12 @@ typedef struct ccw1 {
- #define CCW_CMD_SET_CONF_IND     0x53
- #define CCW_CMD_READ_VQ_CONF     0x32
- 
-+/* DASD CCW commands */
-+#define CCW_CMD_DASD_READ             0x06
-+#define CCW_CMD_DASD_SEEK             0x07
-+#define CCW_CMD_DASD_SEARCH_ID_EQ     0x31
-+#define CCW_CMD_DASD_READ_MT          0x86
-+
- /*
-  * Command-mode operation request block
-  */
-@@ -328,6 +337,20 @@ typedef struct irb {
-     __u32 emw[8];
- }  __attribute__ ((packed, aligned(4))) Irb;
- 
-+/* Used for SEEK ccw commands */
-+typedef struct CcwSeekData {
-+    uint16_t reserved;
-+    uint16_t cyl;
-+    uint16_t head;
-+} __attribute__((packed)) CcwSeekData;
-+
-+/* Used for SEARCH ID ccw commands */
-+typedef struct CcwSearchIdData {
-+    uint16_t cyl;
-+    uint16_t head;
-+    uint8_t record;
-+} __attribute__((packed)) CcwSearchIdData;
-+
- int enable_mss_facility(void);
- void enable_subchannel(SubChannelId schid);
- uint16_t cu_type(SubChannelId schid);
--- 
-2.7.4
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> ---
+>  tests/Makefile.include | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 3e3b16b..2718548 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -726,7 +726,6 @@ tests/qom-test$(EXESUF): tests/qom-test.o
+>  tests/test-hmp$(EXESUF): tests/test-hmp.o
+>  tests/machine-none-test$(EXESUF): tests/machine-none-test.o
+>  tests/drive_del-test$(EXESUF): tests/drive_del-test.o $(libqos-virtio-obj-y)
+> -tests/qdev-monitor-test$(EXESUF): tests/qdev-monitor-test.o $(libqos-pc-obj-y)
+>  tests/nvme-test$(EXESUF): tests/nvme-test.o $(libqos-pc-obj-y)
+>  tests/pvpanic-test$(EXESUF): tests/pvpanic-test.o
+>  tests/i82801b11-test$(EXESUF): tests/i82801b11-test.o
+> 
