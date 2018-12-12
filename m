@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6Mg-0000yO-Gk
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6Mh-0000zi-7l
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6MZ-0000I6-Fb
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:58 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:33009)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6Mb-0000M4-Tw
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:59 -0500
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:39169)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gX6MY-0000As-JV
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:51 -0500
-Received: by mail-wm1-x341.google.com with SMTP id r24so11701302wmh.0
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:23:45 -0800 (PST)
+	id 1gX6Mb-0000Jk-Co
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:53 -0500
+Received: by mail-wm1-x334.google.com with SMTP id f81so6347102wmd.4
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:23:53 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	u10sm15878859wrr.33.2018.12.12.07.23.42 for <qemu-devel@nongnu.org>
+	u10sm15878859wrr.33.2018.12.12.07.23.50 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 12 Dec 2018 07:23:42 -0800 (PST)
+	Wed, 12 Dec 2018 07:23:51 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 12 Dec 2018 16:22:44 +0100
-Message-Id: <1544628195-37728-24-git-send-email-pbonzini@redhat.com>
+Date: Wed, 12 Dec 2018 16:22:52 +0100
+Message-Id: <1544628195-37728-32-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
 References: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 23/54] test: replace gtester with a TAP driver
+Subject: [Qemu-devel] [PULL 31/54] qemu/queue.h: simplify reverse access to
+ QTAILQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,746 +34,541 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-gtester is deprecated by upstream glib (see for example the announcement
-at https://blog.gtk.org/2018/07/11/news-from-glib-2-58/) and it does
-not support tests that call g_test_skip in some glib stable releases.
+The new definition of QTAILQ does not require passing the headname,
+remove it.
 
-glib suggests instead using Automake's TAP support, which gtest itself
-supports since version 2.38 (QEMU's minimum requirement is 2.40).
-We do not support Automake, but we can use Automake's code to beautify
-the TAP output.  I chose to use the Perl copy rather than the shell/awk
-one, with some changes so that it can accept TAP through stdin, in order
-to reuse Perl's TAP parsing package.  This also avoids duplicating the
-parser between tap-driver.pl and tap-merge.pl.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <1543513531-1151-3-git-send-email-pbonzini@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- scripts/gtester-cat                          |  26 --
- scripts/tap-driver.pl                        | 378 +++++++++++++++++++++++++++
- scripts/tap-merge.pl                         | 110 ++++++++
- tests/Makefile.include                       |  54 ++--
- tests/docker/dockerfiles/centos7.docker      |   1 +
- tests/docker/dockerfiles/debian-amd64.docker |   1 +
- tests/docker/dockerfiles/debian-ports.docker |   1 +
- tests/docker/dockerfiles/debian-sid.docker   |   1 +
- tests/docker/dockerfiles/debian8.docker      |   1 +
- tests/docker/dockerfiles/debian9.docker      |   1 +
- tests/docker/dockerfiles/fedora.docker       |   1 +
- tests/docker/dockerfiles/ubuntu.docker       |   1 +
- 12 files changed, 529 insertions(+), 47 deletions(-)
- delete mode 100755 scripts/gtester-cat
- create mode 100755 scripts/tap-driver.pl
- create mode 100755 scripts/tap-merge.pl
+ cpus-common.c                   |  2 +-
+ dump.c                          |  2 +-
+ hw/core/qdev.c                  |  4 ++--
+ hw/scsi/scsi-bus.c              |  2 +-
+ hw/usb/combined-packet.c        |  2 +-
+ hw/usb/dev-mtp.c                |  4 ++--
+ hw/usb/hcd-ehci.c               |  2 +-
+ hw/usb/hcd-ehci.h               |  2 +-
+ hw/usb/hcd-uhci.c               |  4 ++--
+ include/exec/memory.h           |  2 +-
+ include/hw/qdev-core.h          |  2 +-
+ include/hw/usb.h                |  2 +-
+ include/net/net.h               |  2 +-
+ include/qemu/option_int.h       |  2 +-
+ include/qemu/queue.h            | 16 ++++++++--------
+ include/sysemu/memory_mapping.h |  2 +-
+ memory.c                        | 17 ++++++-----------
+ memory_mapping.c                |  2 +-
+ net/filter.c                    |  2 +-
+ net/net.c                       |  2 +-
+ qga/commands-posix.c            |  2 +-
+ tcg/tcg.c                       |  2 +-
+ tcg/tcg.h                       |  4 ++--
+ tests/libqos/malloc.c           |  2 +-
+ tests/test-vmstate.c            |  8 ++++----
+ ui/console.c                    |  4 ++--
+ util/qemu-option.c              |  4 ++--
+ 27 files changed, 48 insertions(+), 53 deletions(-)
 
-diff --git a/scripts/gtester-cat b/scripts/gtester-cat
-deleted file mode 100755
-index 061a952..0000000
---- a/scripts/gtester-cat
-+++ /dev/null
-@@ -1,26 +0,0 @@
--#!/bin/sh
--#
--# Copyright IBM, Corp. 2012
--#
--# Authors:
--#  Anthony Liguori <aliguori@us.ibm.com>
--#
--# This work is licensed under the terms of the GNU GPLv2 or later.
--# See the COPYING file in the top-level directory.
--
--cat <<EOF
--<?xml version="1.0"?>
--<gtester>
-- <info>
--  <package>qemu</package>
--  <version>0.0</version>
--  <revision>rev</revision>
-- </info>
--EOF
--
--sed \
--  -e '/<?xml/d' \
--  -e '/^<gtester>$/d' \
--  -e '/<info>/,/<\/info>/d' \
--  -e '$b' \
--  -e '/^<\/gtester>$/d' "$@"
-diff --git a/scripts/tap-driver.pl b/scripts/tap-driver.pl
-new file mode 100755
-index 0000000..5e59b5d
---- /dev/null
-+++ b/scripts/tap-driver.pl
-@@ -0,0 +1,378 @@
-+#! /usr/bin/env perl
-+# Copyright (C) 2011-2013 Free Software Foundation, Inc.
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2, or (at your option)
-+# any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+
-+# As a special exception to the GNU General Public License, if you
-+# distribute this file as part of a program that contains a
-+# configuration script generated by Autoconf, you may include it under
-+# the same distribution terms that you use for the rest of that program.
-+
-+# ---------------------------------- #
-+#  Imports, static data, and setup.  #
-+# ---------------------------------- #
-+
-+use warnings FATAL => 'all';
-+use strict;
-+use Getopt::Long ();
-+use TAP::Parser;
-+use Term::ANSIColor qw(:constants);
-+
-+my $ME = "tap-driver.pl";
-+my $VERSION = "2018-11-30";
-+
-+my $USAGE = <<'END';
-+Usage:
-+  tap-driver [--test-name=TEST] [--color={always|never|auto}]
-+             [--verbose] [--show-failures-only]
-+END
-+
-+my $HELP = "$ME: TAP-aware test driver for QEMU testsuite harness." .
-+           "\n" . $USAGE;
-+
-+# It's important that NO_PLAN evaluates "false" as a boolean.
-+use constant NO_PLAN => 0;
-+use constant EARLY_PLAN => 1;
-+use constant LATE_PLAN => 2;
-+
-+use constant DIAG_STRING => "#";
-+
-+# ------------------- #
-+#  Global variables.  #
-+# ------------------- #
-+
-+my $testno = 0;     # Number of test results seen so far.
-+my $bailed_out = 0; # Whether a "Bail out!" directive has been seen.
-+my $failed = 0;     # Final exit code
-+
-+# Whether the TAP plan has been seen or not, and if yes, which kind
-+# it is ("early" is seen before any test result, "late" otherwise).
-+my $plan_seen = NO_PLAN;
-+
-+# ----------------- #
-+#  Option parsing.  #
-+# ----------------- #
-+
-+my %cfg = (
-+  "color" => 0,
-+  "verbose" => 0,
-+  "show-failures-only" => 0,
-+);
-+
-+my $color = "auto";
-+my $test_name = undef;
-+
-+# Perl's Getopt::Long allows options to take optional arguments after a space.
-+# Prevent --color by itself from consuming other arguments
-+foreach (@ARGV) {
-+  if ($_ eq "--color" || $_ eq "-color") {
-+    $_ = "--color=$color";
-+  }
-+}
-+
-+Getopt::Long::GetOptions
-+  (
-+    'help' => sub { print $HELP; exit 0; },
-+    'version' => sub { print "$ME $VERSION\n"; exit 0; },
-+    'test-name=s' => \$test_name,
-+    'color=s'  => \$color,
-+    'show-failures-only' => sub { $cfg{"show-failures-only"} = 1; },
-+    'verbose' => sub { $cfg{"verbose"} = 1; },
-+  ) or exit 1;
-+
-+if ($color =~ /^always$/i) {
-+  $cfg{'color'} = 1;
-+} elsif ($color =~ /^never$/i) {
-+  $cfg{'color'} = 0;
-+} elsif ($color =~ /^auto$/i) {
-+  $cfg{'color'} = (-t STDOUT);
-+} else {
-+  die "Invalid color mode: $color\n";
-+}
-+
-+# ------------- #
-+#  Prototypes.  #
-+# ------------- #
-+
-+sub colored ($$);
-+sub decorate_result ($);
-+sub extract_tap_comment ($);
-+sub handle_tap_bailout ($);
-+sub handle_tap_plan ($);
-+sub handle_tap_result ($);
-+sub is_null_string ($);
-+sub main ();
-+sub report ($;$);
-+sub stringify_result_obj ($);
-+sub testsuite_error ($);
-+
-+# -------------- #
-+#  Subroutines.  #
-+# -------------- #
-+
-+# If the given string is undefined or empty, return true, otherwise
-+# return false.  This function is useful to avoid pitfalls like:
-+#   if ($message) { print "$message\n"; }
-+# which wouldn't print anything if $message is the literal "0".
-+sub is_null_string ($)
-+{
-+  my $str = shift;
-+  return ! (defined $str and length $str);
-+}
-+
-+sub stringify_result_obj ($)
-+{
-+  my $result_obj = shift;
-+  if ($result_obj->is_unplanned || $result_obj->number != $testno)
-+    {
-+      return "ERROR";
-+    }
-+  elsif ($plan_seen == LATE_PLAN)
-+    {
-+      return "ERROR";
-+    }
-+  elsif (!$result_obj->directive)
-+    {
-+      return $result_obj->is_ok ? "PASS" : "FAIL";
-+    }
-+  elsif ($result_obj->has_todo)
-+    {
-+      return $result_obj->is_actual_ok ? "XPASS" : "XFAIL";
-+    }
-+  elsif ($result_obj->has_skip)
-+    {
-+      return $result_obj->is_ok ? "SKIP" : "FAIL";
-+    }
-+  die "$ME: INTERNAL ERROR"; # NOTREACHED
-+}
-+
-+sub colored ($$)
-+{
-+  my ($color_string, $text) = @_;
-+  return $color_string . $text . RESET;
-+}
-+
-+sub decorate_result ($)
-+{
-+  my $result = shift;
-+  return $result unless $cfg{"color"};
-+  my %color_for_result =
-+    (
-+      "ERROR" => BOLD.MAGENTA,
-+      "PASS"  => GREEN,
-+      "XPASS" => BOLD.YELLOW,
-+      "FAIL"  => BOLD.RED,
-+      "XFAIL" => YELLOW,
-+      "SKIP"  => BLUE,
-+    );
-+  if (my $color = $color_for_result{$result})
-+    {
-+      return colored ($color, $result);
-+    }
-+  else
-+    {
-+      return $result; # Don't colorize unknown stuff.
-+    }
-+}
-+
-+sub report ($;$)
-+{
-+  my ($msg, $result, $explanation) = (undef, @_);
-+  if ($result =~ /^(?:X?(?:PASS|FAIL)|SKIP|ERROR)/)
-+    {
-+      # Output on console might be colorized.
-+      $msg = decorate_result($result);
-+      if ($result =~ /^(?:PASS|XFAIL|SKIP)/)
-+        {
-+          return if $cfg{"show-failures-only"};
-+        }
-+      else
-+        {
-+          $failed = 1;
-+        }
-+    }
-+  elsif ($result eq "#")
-+    {
-+      $msg = "  ";
-+    }
-+  else
-+    {
-+      die "$ME: INTERNAL ERROR"; # NOTREACHED
-+    }
-+  $msg .= " $explanation" if defined $explanation;
-+  print $msg . "\n";
-+}
-+
-+sub testsuite_error ($)
-+{
-+  report "ERROR", "- $_[0]";
-+}
-+
-+sub handle_tap_result ($)
-+{
-+  $testno++;
-+  my $result_obj = shift;
-+
-+  my $test_result = stringify_result_obj $result_obj;
-+  my $string = $result_obj->number;
-+
-+  my $description = $result_obj->description;
-+  $string .= " $test_name" unless is_null_string $test_name;
-+  $string .= " $description" unless is_null_string $description;
-+
-+  if ($plan_seen == LATE_PLAN)
-+    {
-+      $string .= " # AFTER LATE PLAN";
-+    }
-+  elsif ($result_obj->is_unplanned)
-+    {
-+      $string .= " # UNPLANNED";
-+    }
-+  elsif ($result_obj->number != $testno)
-+    {
-+      $string .= " # OUT-OF-ORDER (expecting $testno)";
-+    }
-+  elsif (my $directive = $result_obj->directive)
-+    {
-+      $string .= " # $directive";
-+      my $explanation = $result_obj->explanation;
-+      $string .= " $explanation"
-+        unless is_null_string $explanation;
-+    }
-+
-+  report $test_result, $string;
-+}
-+
-+sub handle_tap_plan ($)
-+{
-+  my $plan = shift;
-+  if ($plan_seen)
-+    {
-+      # Error, only one plan per stream is acceptable.
-+      testsuite_error "multiple test plans";
-+      return;
-+    }
-+  # The TAP plan can come before or after *all* the TAP results; we speak
-+  # respectively of an "early" or a "late" plan.  If we see the plan line
-+  # after at least one TAP result has been seen, assume we have a late
-+  # plan; in this case, any further test result seen after the plan will
-+  # be flagged as an error.
-+  $plan_seen = ($testno >= 1 ? LATE_PLAN : EARLY_PLAN);
-+  # If $testno > 0, we have an error ("too many tests run") that will be
-+  # automatically dealt with later, so don't worry about it here.  If
-+  # $plan_seen is true, we have an error due to a repeated plan, and that
-+  # has already been dealt with above.  Otherwise, we have a valid "plan
-+  # with SKIP" specification, and should report it as a particular kind
-+  # of SKIP result.
-+  if ($plan->directive && $testno == 0)
-+    {
-+      my $explanation = is_null_string ($plan->explanation) ?
-+                        undef : "- " . $plan->explanation;
-+      report "SKIP", $explanation;
-+    }
-+}
-+
-+sub handle_tap_bailout ($)
-+{
-+  my ($bailout, $msg) = ($_[0], "Bail out!");
-+  $bailed_out = 1;
-+  $msg .= " " . $bailout->explanation
-+    unless is_null_string $bailout->explanation;
-+  testsuite_error $msg;
-+}
-+
-+sub extract_tap_comment ($)
-+{
-+  my $line = shift;
-+  if (index ($line, DIAG_STRING) == 0)
-+    {
-+      # Strip leading `DIAG_STRING' from `$line'.
-+      $line = substr ($line, length (DIAG_STRING));
-+      # And strip any leading and trailing whitespace left.
-+      $line =~ s/(?:^\s*|\s*$)//g;
-+      # Return what is left (if any).
-+      return $line;
-+    }
-+  return "";
-+}
-+
-+sub main ()
-+{
-+  my $iterator = TAP::Parser::Iterator::Stream->new(\*STDIN);
-+  my $parser = TAP::Parser->new ({iterator => $iterator });
-+
-+  while (defined (my $cur = $parser->next))
-+    {
-+      # Parsing of TAP input should stop after a "Bail out!" directive.
-+      next if $bailed_out;
-+
-+      if ($cur->is_plan)
-+        {
-+          handle_tap_plan ($cur);
-+        }
-+      elsif ($cur->is_test)
-+        {
-+          handle_tap_result ($cur);
-+        }
-+      elsif ($cur->is_bailout)
-+        {
-+          handle_tap_bailout ($cur);
-+        }
-+      elsif ($cfg{"verbose"})
-+        {
-+          my $comment = extract_tap_comment ($cur->raw);
-+          report "#", "$comment" if length $comment;
-+       }
-+    }
-+  # A "Bail out!" directive should cause us to ignore any following TAP
-+  # error.
-+  if (!$bailed_out)
-+    {
-+      if (!$plan_seen)
-+        {
-+          testsuite_error "missing test plan";
-+        }
-+      elsif ($parser->tests_planned != $parser->tests_run)
-+        {
-+          my ($planned, $run) = ($parser->tests_planned, $parser->tests_run);
-+          my $bad_amount = $run > $planned ? "many" : "few";
-+          testsuite_error (sprintf "too %s tests run (expected %d, got %d)",
-+                                   $bad_amount, $planned, $run);
-+        }
-+    }
-+}
-+
-+# ----------- #
-+#  Main code. #
-+# ----------- #
-+
-+main;
-+exit($failed);
-+
-+# Local Variables:
-+# perl-indent-level: 2
-+# perl-continued-statement-offset: 2
-+# perl-continued-brace-offset: 0
-+# perl-brace-offset: 0
-+# perl-brace-imaginary-offset: 0
-+# perl-label-offset: -2
-+# cperl-indent-level: 2
-+# cperl-brace-offset: 0
-+# cperl-continued-brace-offset: 0
-+# cperl-label-offset: -2
-+# cperl-extra-newline-before-brace: t
-+# cperl-merge-trailing-else: nil
-+# cperl-continued-statement-offset: 2
-+# End:
-diff --git a/scripts/tap-merge.pl b/scripts/tap-merge.pl
-new file mode 100755
-index 0000000..59e3fa5
---- /dev/null
-+++ b/scripts/tap-merge.pl
-@@ -0,0 +1,110 @@
-+#! /usr/bin/env perl
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# Author: Paolo Bonzini <pbonzini@redhat.com>
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2, or (at your option)
-+# any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+
-+# ---------------------------------- #
-+#  Imports, static data, and setup.  #
-+# ---------------------------------- #
-+
-+use warnings FATAL => 'all';
-+use strict;
-+use Getopt::Long ();
-+use TAP::Parser;
-+
-+my $ME = "tap-merge.pl";
-+my $VERSION = "2018-11-30";
-+
-+my $HELP = "$ME: merge multiple TAP inputs from stdin.";
-+
-+use constant DIAG_STRING => "#";
-+
-+# ----------------- #
-+#  Option parsing.  #
-+# ----------------- #
-+
-+Getopt::Long::GetOptions
-+  (
-+    'help' => sub { print $HELP; exit 0; },
-+    'version' => sub { print "$ME $VERSION\n"; exit 0; },
-+  );
-+
-+# -------------- #
-+#  Subroutines.  #
-+# -------------- #
-+
-+sub main ()
-+{
-+  my $iterator = TAP::Parser::Iterator::Stream->new(\*STDIN);
-+  my $parser = TAP::Parser->new ({iterator => $iterator });
-+  my $testno = 0;     # Number of test results seen so far.
-+  my $bailed_out = 0; # Whether a "Bail out!" directive has been seen.
-+
-+  while (defined (my $cur = $parser->next))
-+    {
-+      if ($cur->is_bailout)
-+        {
-+          $bailed_out = 1;
-+          print DIAG_STRING . " " . $cur->as_string . "\n";
-+          next;
-+        }
-+      elsif ($cur->is_plan)
-+        {
-+          $bailed_out = 0;
-+          next;
-+        }
-+      elsif ($cur->is_test)
-+        {
-+          $bailed_out = 0 if $cur->number == 1;
-+          $testno++;
-+          $cur = TAP::Parser::Result::Test->new({
-+                          ok => $cur->ok,
-+                          test_num => $testno,
-+                          directive => $cur->directive,
-+                          explanation => $cur->explanation,
-+                          description => $cur->description
-+                  });
-+        }
-+      elsif ($cur->is_version)
-+        {
-+          next if $testno > 0;
-+        }
-+      print $cur->as_string . "\n" unless $bailed_out;
-+    }
-+  print "1..$testno\n";
-+}
-+
-+# ----------- #
-+#  Main code. #
-+# ----------- #
-+
-+main;
-+
-+# Local Variables:
-+# perl-indent-level: 2
-+# perl-continued-statement-offset: 2
-+# perl-continued-brace-offset: 0
-+# perl-brace-offset: 0
-+# perl-brace-imaginary-offset: 0
-+# perl-label-offset: -2
-+# cperl-indent-level: 2
-+# cperl-brace-offset: 0
-+# cperl-continued-brace-offset: 0
-+# cperl-label-offset: -2
-+# cperl-extra-newline-before-brace: t
-+# cperl-merge-trailing-else: nil
-+# cperl-continued-statement-offset: 2
-+# End:
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index fb0b449..62915e4 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -799,41 +799,53 @@ tests/test-qga$(EXESUF): qemu-ga$(EXESUF)
- tests/test-qga$(EXESUF): tests/test-qga.o $(qtest-obj-y)
+diff --git a/cpus-common.c b/cpus-common.c
+index 98dd8c6..3ca58c6 100644
+--- a/cpus-common.c
++++ b/cpus-common.c
+@@ -99,7 +99,7 @@ void cpu_list_remove(CPUState *cpu)
+         return;
+     }
  
- SPEED = quick
--GTESTER_OPTIONS = -k $(if $(V),--verbose,-q)
--GCOV_OPTIONS = -n $(if $(V),-f,)
+-    assert(!(cpu_index_auto_assigned && cpu != QTAILQ_LAST(&cpus, CPUTailQ)));
++    assert(!(cpu_index_auto_assigned && cpu != QTAILQ_LAST(&cpus)));
  
- # gtester tests, possibly with verbose output
-+# do_test_tap runs all tests, even if some of them fail, while do_test_human
-+# stops at the first failure unless -k is given on the command line
-+
-+do_test_human = \
-+	$(call quiet-command, rc=0; \
-+	  { $(foreach COMMAND, $1, \
-+	    MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
-+	      $2 $(COMMAND) -m=$(SPEED) -k --tap \
-+	      | ./scripts/tap-driver.pl --test-name="$(notdir $(COMMAND))" --color=always $(if $(V),, --show-failures-only) \
-+	      || $(if $(findstring k, $(MAKEFLAGS)), rc=$$?, exit $$?); ) }; exit $$rc, \
-+	  "TEST", "$@")
-+
-+do_test_tap = \
-+	$(call quiet-command, \
-+	  { $(foreach COMMAND, $1, \
-+	    MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
-+	      $2 $(COMMAND) -m=$(SPEED) -k --tap | sed "s/^[a-z][a-z]* [0-9]* /&$(notdir $(COMMAND)) /" || true; ) } \
-+	      | ./scripts/tap-merge.pl | tee "$@" \
-+	      | ./scripts/tap-driver.pl --color=always $(if $(V),, --show-failures-only), \
-+	  "TAP","$@")
+     QTAILQ_REMOVE_RCU(&cpus, cpu, node);
+     cpu->cpu_index = UNASSIGNED_CPU_INDEX;
+diff --git a/dump.c b/dump.c
+index 4ec94c5..ef1d802 100644
+--- a/dump.c
++++ b/dump.c
+@@ -1557,7 +1557,7 @@ static void get_max_mapnr(DumpState *s)
+ {
+     GuestPhysBlock *last_block;
  
- .PHONY: $(patsubst %, check-qtest-%, $(QTEST_TARGETS))
- $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: subdir-%-softmmu $(check-qtest-y)
--	$(call quiet-command,QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
--		QTEST_QEMU_IMG=qemu-img$(EXESUF) \
--		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
--		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $(check-qtest-$*-y) $(check-qtest-generic-y),"GTESTER","$@")
-+	$(call do_test_human,$(check-qtest-$*-y) $(check-qtest-generic-y), \
-+	  QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
-+	  QTEST_QEMU_IMG=qemu-img$(EXESUF))
+-    last_block = QTAILQ_LAST(&s->guest_phys_blocks.head, GuestPhysBlockHead);
++    last_block = QTAILQ_LAST(&s->guest_phys_blocks.head);
+     s->max_mapnr = dump_paddr_to_pfn(s, last_block->target_end);
+ }
  
- .PHONY: $(patsubst %, check-%, $(check-unit-y) $(check-speed-y))
- $(patsubst %, check-%, $(check-unit-y) $(check-speed-y)): check-%: %
--	$(call quiet-command, \
--		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
--		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $*,"GTESTER","$*")
-+	$(call do_test_human, $*)
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 6b3cc55..a7dd4be 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -158,7 +158,7 @@ DeviceState *qdev_try_create(BusState *bus, const char *type)
+     return dev;
+ }
  
--# gtester tests with XML output
-+# gtester tests with TAP output
+-static QTAILQ_HEAD(device_listeners, DeviceListener) device_listeners
++static QTAILQ_HEAD(, DeviceListener) device_listeners
+     = QTAILQ_HEAD_INITIALIZER(device_listeners);
  
--$(patsubst %, check-report-qtest-%.xml, $(QTEST_TARGETS)): check-report-qtest-%.xml: $(check-qtest-y)
--	$(call quiet-command,QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
--		QTEST_QEMU_IMG=qemu-img$(EXESUF) \
--	  gtester -q $(GTESTER_OPTIONS) -o $@ -m=$(SPEED) $(check-qtest-$*-y) $(check-qtest-generic-y),"GTESTER","$@")
-+$(patsubst %, check-report-qtest-%.tap, $(QTEST_TARGETS)): check-report-qtest-%.tap: $(check-qtest-y)
-+	$(call do_test_tap, $(check-qtest-$*-y) $(check-qtest-generic-y), \
-+	  QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
-+	  QTEST_QEMU_IMG=qemu-img$(EXESUF))
+ enum ListenerDirection { Forward, Reverse };
+@@ -177,7 +177,7 @@ enum ListenerDirection { Forward, Reverse };
+             break;                                                \
+         case Reverse:                                             \
+             QTAILQ_FOREACH_REVERSE(_listener, &device_listeners,  \
+-                                   device_listeners, link) {      \
++                                   link) {                        \
+                 if (_listener->_callback) {                       \
+                     _listener->_callback(_listener, ##_args);     \
+                 }                                                 \
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index 97cd167..c480553 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -1554,7 +1554,7 @@ SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
+     BusChild *kid;
+     SCSIDevice *target_dev = NULL;
  
--check-report-unit.xml: $(check-unit-y)
--	$(call quiet-command,gtester -q $(GTESTER_OPTIONS) -o $@ -m=$(SPEED) $^,"GTESTER","$@")
-+check-report-unit.tap: $(check-unit-y)
-+	$(call do_test_tap,$^)
+-    QTAILQ_FOREACH_REVERSE(kid, &bus->qbus.children, ChildrenHead, sibling) {
++    QTAILQ_FOREACH_REVERSE(kid, &bus->qbus.children, sibling) {
+         DeviceState *qdev = kid->child;
+         SCSIDevice *dev = SCSI_DEVICE(qdev);
  
- # Reports and overall runs
+diff --git a/hw/usb/combined-packet.c b/hw/usb/combined-packet.c
+index 01a7ed0..fc98383 100644
+--- a/hw/usb/combined-packet.c
++++ b/hw/usb/combined-packet.c
+@@ -64,7 +64,7 @@ void usb_combined_input_packet_complete(USBDevice *dev, USBPacket *p)
  
--check-report.xml: $(patsubst %,check-report-qtest-%.xml, $(QTEST_TARGETS)) check-report-unit.xml
--	$(call quiet-command,$(SRC_PATH)/scripts/gtester-cat $^ > $@,"GEN","$@")
--
--check-report.html: check-report.xml
--	$(call quiet-command,gtester-report $< > $@,"GEN","$@")
-+check-report.tap: $(patsubst %,check-report-qtest-%.tap, $(QTEST_TARGETS)) check-report-unit.tap
-+	$(call quiet-command,./scripts/tap-merge.py $^ > $@,"GEN","$@")
+     status = combined->first->status;
+     actual_length = combined->first->actual_length;
+-    short_not_ok = QTAILQ_LAST(&combined->packets, packets_head)->short_not_ok;
++    short_not_ok = QTAILQ_LAST(&combined->packets)->short_not_ok;
  
- # Per guest TCG tests
+     QTAILQ_FOREACH_SAFE(p, &combined->packets, combined_entry, next) {
+         if (!done) {
+diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+index 100b717..c33d7d6 100644
+--- a/hw/usb/dev-mtp.c
++++ b/hw/usb/dev-mtp.c
+@@ -191,7 +191,7 @@ struct MTPState {
+ #ifdef CONFIG_INOTIFY1
+     /* inotify descriptor */
+     int          inotifyfd;
+-    QTAILQ_HEAD(events, MTPMonEntry) events;
++    QTAILQ_HEAD(, MTPMonEntry) events;
+ #endif
+     /* Responder is expecting a write operation */
+     bool write_pending;
+@@ -1982,7 +1982,7 @@ static void usb_mtp_handle_data(USBDevice *dev, USBPacket *p)
+     case EP_EVENT:
+ #ifdef CONFIG_INOTIFY1
+         if (!QTAILQ_EMPTY(&s->events)) {
+-            struct MTPMonEntry *e = QTAILQ_LAST(&s->events, events);
++            struct MTPMonEntry *e = QTAILQ_LAST(&s->events);
+             uint32_t handle;
+             int len = sizeof(container) + sizeof(uint32_t);
  
-diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/dockerfiles/centos7.docker
-index 0a04bfb..e0f18f5 100644
---- a/tests/docker/dockerfiles/centos7.docker
-+++ b/tests/docker/dockerfiles/centos7.docker
-@@ -22,6 +22,7 @@ ENV PACKAGES \
-     mesa-libEGL-devel \
-     mesa-libgbm-devel \
-     nettle-devel \
-+    perl-Test-Harness \
-     pixman-devel \
-     SDL-devel \
-     spice-glib-devel \
-diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/dockerfiles/debian-amd64.docker
-index 24b113b..c66e341 100644
---- a/tests/docker/dockerfiles/debian-amd64.docker
-+++ b/tests/docker/dockerfiles/debian-amd64.docker
-@@ -16,6 +16,7 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-         liblzo2-dev \
-         librdmacm-dev \
-         libsnappy-dev \
-+        libtest-harness-perl \
-         libvte-dev
+diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
+index e5acfc5..a2105c8 100644
+--- a/hw/usb/hcd-ehci.c
++++ b/hw/usb/hcd-ehci.c
+@@ -1815,7 +1815,7 @@ static int ehci_state_fetchqtd(EHCIQueue *q)
+             break;
+         case EHCI_ASYNC_INFLIGHT:
+             /* Check if the guest has added new tds to the queue */
+-            again = ehci_fill_queue(QTAILQ_LAST(&q->packets, pkts_head));
++            again = ehci_fill_queue(QTAILQ_LAST(&q->packets));
+             /* Unfinished async handled packet, go horizontal */
+             ehci_set_state(q->ehci, q->async, EST_HORIZONTALQH);
+             break;
+diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h
+index 0bc364b..e4460aa 100644
+--- a/hw/usb/hcd-ehci.h
++++ b/hw/usb/hcd-ehci.h
+@@ -247,7 +247,7 @@ struct EHCIQueue {
+     uint32_t qtdaddr;      /* address QTD read from                */
+     int last_pid;          /* pid of last packet executed          */
+     USBDevice *dev;
+-    QTAILQ_HEAD(pkts_head, EHCIPacket) packets;
++    QTAILQ_HEAD(, EHCIPacket) packets;
+ };
  
- # virgl
-diff --git a/tests/docker/dockerfiles/debian-ports.docker b/tests/docker/dockerfiles/debian-ports.docker
-index e05a9a9..514ab53 100644
---- a/tests/docker/dockerfiles/debian-ports.docker
-+++ b/tests/docker/dockerfiles/debian-ports.docker
-@@ -29,6 +29,7 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-         flex \
-         gettext \
-         git \
-+        libtest-harness-perl \
-         pkg-config \
-         psmisc \
-         python \
-diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/dockerfiles/debian-sid.docker
-index 9a3d168..b30cbe7 100644
---- a/tests/docker/dockerfiles/debian-sid.docker
-+++ b/tests/docker/dockerfiles/debian-sid.docker
-@@ -26,6 +26,7 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-         ca-certificates \
-         flex \
-         git \
-+        libtest-harness-perl \
-         pkg-config \
-         psmisc \
-         python \
-diff --git a/tests/docker/dockerfiles/debian8.docker b/tests/docker/dockerfiles/debian8.docker
-index 5294563..cdc3f11 100644
---- a/tests/docker/dockerfiles/debian8.docker
-+++ b/tests/docker/dockerfiles/debian8.docker
-@@ -29,6 +29,7 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-         gettext \
-         git \
-         gnupg \
-+        libtest-harness-perl \
-         pkg-config \
-         python-minimal
+ typedef QTAILQ_HEAD(EHCIQueueHead, EHCIQueue) EHCIQueueHead;
+diff --git a/hw/usb/hcd-uhci.c b/hw/usb/hcd-uhci.c
+index 836b11f..26f123e 100644
+--- a/hw/usb/hcd-uhci.c
++++ b/hw/usb/hcd-uhci.c
+@@ -99,7 +99,7 @@ struct UHCIQueue {
+     UHCIState *uhci;
+     USBEndpoint *ep;
+     QTAILQ_ENTRY(UHCIQueue) next;
+-    QTAILQ_HEAD(asyncs_head, UHCIAsync) asyncs;
++    QTAILQ_HEAD(, UHCIAsync) asyncs;
+     int8_t    valid;
+ };
  
-diff --git a/tests/docker/dockerfiles/debian9.docker b/tests/docker/dockerfiles/debian9.docker
-index 154ae2a..9561d4f 100644
---- a/tests/docker/dockerfiles/debian9.docker
-+++ b/tests/docker/dockerfiles/debian9.docker
-@@ -24,6 +24,7 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-         flex \
-         gettext \
-         git \
-+        libtest-harness-perl \
-         pkg-config \
-         psmisc \
-         python \
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-index 0c4eb9e..1d0e3dc 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -70,6 +70,7 @@ ENV PACKAGES \
-     nss-devel \
-     numactl-devel \
-     perl \
-+    perl-Test-Harness \
-     pixman-devel \
-     python3 \
-     PyYAML \
-diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/dockerfiles/ubuntu.docker
-index 36e2b17..229add5 100644
---- a/tests/docker/dockerfiles/ubuntu.docker
-+++ b/tests/docker/dockerfiles/ubuntu.docker
-@@ -45,6 +45,7 @@ ENV PACKAGES flex bison \
-     libspice-protocol-dev \
-     libspice-server-dev \
-     libssh2-1-dev \
-+    libtest-harness-perl \
-     libusb-1.0-0-dev \
-     libusbredirhost-dev \
-     libvdeplug-dev \
+@@ -837,7 +837,7 @@ static int uhci_handle_td(UHCIState *s, UHCIQueue *q, uint32_t qh_addr,
+         }
+         if (!async->done) {
+             UHCI_TD last_td;
+-            UHCIAsync *last = QTAILQ_LAST(&async->queue->asyncs, asyncs_head);
++            UHCIAsync *last = QTAILQ_LAST(&async->queue->asyncs);
+             /*
+              * While we are waiting for the current td to complete, the guest
+              * may have added more tds to the queue. Note we re-read the td
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index ce93068..7353fa2 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -445,7 +445,7 @@ struct AddressSpace {
+ 
+     int ioeventfd_nb;
+     struct MemoryRegionIoeventfd *ioeventfds;
+-    QTAILQ_HEAD(memory_listeners_as, MemoryListener) listeners;
++    QTAILQ_HEAD(, MemoryListener) listeners;
+     QTAILQ_ENTRY(AddressSpace) address_spaces_link;
+ };
+ 
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index a24d0dd..43f926f 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -206,7 +206,7 @@ struct BusState {
+     HotplugHandler *hotplug_handler;
+     int max_index;
+     bool realized;
+-    QTAILQ_HEAD(ChildrenHead, BusChild) children;
++    QTAILQ_HEAD(, BusChild) children;
+     QLIST_ENTRY(BusState) sibling;
+ };
+ 
+diff --git a/include/hw/usb.h b/include/hw/usb.h
+index a5080ad..f9431a0 100644
+--- a/include/hw/usb.h
++++ b/include/hw/usb.h
+@@ -408,7 +408,7 @@ struct USBPacket {
+ 
+ struct USBCombinedPacket {
+     USBPacket *first;
+-    QTAILQ_HEAD(packets_head, USBPacket) packets;
++    QTAILQ_HEAD(, USBPacket) packets;
+     QEMUIOVector iov;
+ };
+ 
+diff --git a/include/net/net.h b/include/net/net.h
+index ec13702..643295d 100644
+--- a/include/net/net.h
++++ b/include/net/net.h
+@@ -97,7 +97,7 @@ struct NetClientState {
+     unsigned rxfilter_notify_enabled:1;
+     int vring_enable;
+     int vnet_hdr_len;
+-    QTAILQ_HEAD(NetFilterHead, NetFilterState) filters;
++    QTAILQ_HEAD(, NetFilterState) filters;
+ };
+ 
+ typedef struct NICState {
+diff --git a/include/qemu/option_int.h b/include/qemu/option_int.h
+index 26b1d9e..5dd9a51 100644
+--- a/include/qemu/option_int.h
++++ b/include/qemu/option_int.h
+@@ -47,7 +47,7 @@ struct QemuOpts {
+     char *id;
+     QemuOptsList *list;
+     Location loc;
+-    QTAILQ_HEAD(QemuOptHead, QemuOpt) head;
++    QTAILQ_HEAD(, QemuOpt) head;
+     QTAILQ_ENTRY(QemuOpts) next;
+ };
+ 
+diff --git a/include/qemu/queue.h b/include/qemu/queue.h
+index a893fac..1f8e219 100644
+--- a/include/qemu/queue.h
++++ b/include/qemu/queue.h
+@@ -432,14 +432,14 @@ union {                                                                 \
+                 (var) && ((next_var) = ((var)->field.tqe_next), 1);     \
+                 (var) = (next_var))
+ 
+-#define QTAILQ_FOREACH_REVERSE(var, head, headname, field)              \
+-        for ((var) = QTAILQ_LAST(head, headname);                       \
++#define QTAILQ_FOREACH_REVERSE(var, head, field)                        \
++        for ((var) = QTAILQ_LAST(head);                                 \
+                 (var);                                                  \
+-                (var) = QTAILQ_PREV(var, headname, field))
++                (var) = QTAILQ_PREV(var, field))
+ 
+-#define QTAILQ_FOREACH_REVERSE_SAFE(var, head, headname, field, prev_var) \
+-        for ((var) = QTAILQ_LAST(head, headname);                       \
+-             (var) && ((prev_var) = QTAILQ_PREV(var, headname, field)); \
++#define QTAILQ_FOREACH_REVERSE_SAFE(var, head, field, prev_var)         \
++        for ((var) = QTAILQ_LAST(head);                                 \
++             (var) && ((prev_var) = QTAILQ_PREV(var, field));           \
+              (var) = (prev_var))
+ 
+ /*
+@@ -452,9 +452,9 @@ union {                                                                 \
+ 
+ #define QTAILQ_LINK_PREV(link)                                          \
+         ((link).tql_prev->tql_prev->tql_next)
+-#define QTAILQ_LAST(head, headname) \
++#define QTAILQ_LAST(head)                                               \
+         ((typeof((head)->tqh_first)) QTAILQ_LINK_PREV((head)->tqh_circ))
+-#define QTAILQ_PREV(elm, headname, field) \
++#define QTAILQ_PREV(elm, field)                                         \
+         ((typeof((elm)->field.tqe_next)) QTAILQ_LINK_PREV((elm)->field.tqe_circ))
+ 
+ #define field_at_offset(base, offset, type)                                    \
+diff --git a/include/sysemu/memory_mapping.h b/include/sysemu/memory_mapping.h
+index 706152d..5845245 100644
+--- a/include/sysemu/memory_mapping.h
++++ b/include/sysemu/memory_mapping.h
+@@ -36,7 +36,7 @@ typedef struct GuestPhysBlock {
+ /* point-in-time snapshot of guest-visible physical mappings */
+ typedef struct GuestPhysBlockList {
+     unsigned num;
+-    QTAILQ_HEAD(GuestPhysBlockHead, GuestPhysBlock) head;
++    QTAILQ_HEAD(, GuestPhysBlock) head;
+ } GuestPhysBlockList;
+ 
+ /* The physical and virtual address in the memory mapping are contiguous. */
+diff --git a/memory.c b/memory.c
+index 195c5cf..61d66e4 100644
+--- a/memory.c
++++ b/memory.c
+@@ -39,7 +39,7 @@ static bool memory_region_update_pending;
+ static bool ioeventfd_update_pending;
+ static bool global_dirty_log = false;
+ 
+-static QTAILQ_HEAD(memory_listeners, MemoryListener) memory_listeners
++static QTAILQ_HEAD(, MemoryListener) memory_listeners
+     = QTAILQ_HEAD_INITIALIZER(memory_listeners);
+ 
+ static QTAILQ_HEAD(, AddressSpace) address_spaces
+@@ -113,8 +113,7 @@ enum ListenerDirection { Forward, Reverse };
+             }                                                           \
+             break;                                                      \
+         case Reverse:                                                   \
+-            QTAILQ_FOREACH_REVERSE(_listener, &memory_listeners,        \
+-                                   memory_listeners, link) {            \
++            QTAILQ_FOREACH_REVERSE(_listener, &memory_listeners, link) { \
+                 if (_listener->_callback) {                             \
+                     _listener->_callback(_listener, ##_args);           \
+                 }                                                       \
+@@ -128,19 +127,17 @@ enum ListenerDirection { Forward, Reverse };
+ #define MEMORY_LISTENER_CALL(_as, _callback, _direction, _section, _args...) \
+     do {                                                                \
+         MemoryListener *_listener;                                      \
+-        struct memory_listeners_as *list = &(_as)->listeners;           \
+                                                                         \
+         switch (_direction) {                                           \
+         case Forward:                                                   \
+-            QTAILQ_FOREACH(_listener, list, link_as) {                  \
++            QTAILQ_FOREACH(_listener, &(_as)->listeners, link_as) {     \
+                 if (_listener->_callback) {                             \
+                     _listener->_callback(_listener, _section, ##_args); \
+                 }                                                       \
+             }                                                           \
+             break;                                                      \
+         case Reverse:                                                   \
+-            QTAILQ_FOREACH_REVERSE(_listener, list, memory_listeners_as, \
+-                                   link_as) {                           \
++            QTAILQ_FOREACH_REVERSE(_listener, &(_as)->listeners, link_as) { \
+                 if (_listener->_callback) {                             \
+                     _listener->_callback(_listener, _section, ##_args); \
+                 }                                                       \
+@@ -2691,8 +2688,7 @@ void memory_listener_register(MemoryListener *listener, AddressSpace *as)
+ 
+     listener->address_space = as;
+     if (QTAILQ_EMPTY(&memory_listeners)
+-        || listener->priority >= QTAILQ_LAST(&memory_listeners,
+-                                             memory_listeners)->priority) {
++        || listener->priority >= QTAILQ_LAST(&memory_listeners)->priority) {
+         QTAILQ_INSERT_TAIL(&memory_listeners, listener, link);
+     } else {
+         QTAILQ_FOREACH(other, &memory_listeners, link) {
+@@ -2704,8 +2700,7 @@ void memory_listener_register(MemoryListener *listener, AddressSpace *as)
+     }
+ 
+     if (QTAILQ_EMPTY(&as->listeners)
+-        || listener->priority >= QTAILQ_LAST(&as->listeners,
+-                                             memory_listeners)->priority) {
++        || listener->priority >= QTAILQ_LAST(&as->listeners)->priority) {
+         QTAILQ_INSERT_TAIL(&as->listeners, listener, link_as);
+     } else {
+         QTAILQ_FOREACH(other, &as->listeners, link_as) {
+diff --git a/memory_mapping.c b/memory_mapping.c
+index 724dd0b..e3ec706 100644
+--- a/memory_mapping.c
++++ b/memory_mapping.c
+@@ -223,7 +223,7 @@ static void guest_phys_blocks_region_add(MemoryListener *listener,
+     if (!QTAILQ_EMPTY(&g->list->head)) {
+         hwaddr predecessor_size;
+ 
+-        predecessor = QTAILQ_LAST(&g->list->head, GuestPhysBlockHead);
++        predecessor = QTAILQ_LAST(&g->list->head);
+         predecessor_size = predecessor->target_end - predecessor->target_start;
+ 
+         /* the memory API guarantees monotonically increasing traversal */
+diff --git a/net/filter.c b/net/filter.c
+index c9f9e5f..28d1930 100644
+--- a/net/filter.c
++++ b/net/filter.c
+@@ -55,7 +55,7 @@ static NetFilterState *netfilter_next(NetFilterState *nf,
+         next = QTAILQ_NEXT(nf, next);
+     } else {
+         /* reverse order */
+-        next = QTAILQ_PREV(nf, NetFilterHead, next);
++        next = QTAILQ_PREV(nf, next);
+     }
+ 
+     return next;
+diff --git a/net/net.c b/net/net.c
+index 1f7d626..3acbdcc 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -563,7 +563,7 @@ static ssize_t filter_receive_iov(NetClientState *nc,
+             }
+         }
+     } else {
+-        QTAILQ_FOREACH_REVERSE(nf, &nc->filters, NetFilterHead, next) {
++        QTAILQ_FOREACH_REVERSE(nf, &nc->filters, next) {
+             ret = qemu_netfilter_receive(nf, direction, sender, flags, iov,
+                                          iovcnt, sent_cb);
+             if (ret) {
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 1877976..18a4724 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -1291,7 +1291,7 @@ int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
+     /* cannot risk guest agent blocking itself on a write in this state */
+     ga_set_frozen(ga_state);
+ 
+-    QTAILQ_FOREACH_REVERSE(mount, &mounts, FsMountList, next) {
++    QTAILQ_FOREACH_REVERSE(mount, &mounts, next) {
+         /* To issue fsfreeze in the reverse order of mounts, check if the
+          * mount is listed in the list here */
+         if (has_mountpoints) {
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index e85133e..2e09093 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -2269,7 +2269,7 @@ static void liveness_pass_1(TCGContext *s)
+ 
+     tcg_la_func_end(s);
+ 
+-    QTAILQ_FOREACH_REVERSE_SAFE(op, &s->ops, TCGOpHead, link, op_prev) {
++    QTAILQ_FOREACH_REVERSE_SAFE(op, &s->ops, link, op_prev) {
+         int i, nb_iargs, nb_oargs;
+         TCGOpcode opc_new, opc_new2;
+         bool have_opc_new2;
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 1e9c87b..cbe4309 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -715,7 +715,7 @@ struct TCGContext {
+     TCGTempSet free_temps[TCG_TYPE_COUNT * 2];
+     TCGTemp temps[TCG_MAX_TEMPS]; /* globals first, temps after */
+ 
+-    QTAILQ_HEAD(TCGOpHead, TCGOp) ops, free_ops;
++    QTAILQ_HEAD(, TCGOp) ops, free_ops;
+ 
+     /* Tells which temporary holds a given register.
+        It does not take into account fixed registers */
+@@ -843,7 +843,7 @@ static inline void tcg_set_insn_start_param(TCGOp *op, int arg, target_ulong v)
+ /* The last op that was emitted.  */
+ static inline TCGOp *tcg_last_op(void)
+ {
+-    return QTAILQ_LAST(&tcg_ctx->ops, TCGOpHead);
++    return QTAILQ_LAST(&tcg_ctx->ops);
+ }
+ 
+ /* Test for whether to terminate the TB for using too many opcodes.  */
+diff --git a/tests/libqos/malloc.c b/tests/libqos/malloc.c
+index ac05874..f7bae47 100644
+--- a/tests/libqos/malloc.c
++++ b/tests/libqos/malloc.c
+@@ -104,7 +104,7 @@ static void mlist_coalesce(MemList *head, MemBlock *node)
+ 
+     do {
+         merge = 0;
+-        left = QTAILQ_PREV(node, MemList, MLIST_ENTNAME);
++        left = QTAILQ_PREV(node, MLIST_ENTNAME);
+         right = QTAILQ_NEXT(node, MLIST_ENTNAME);
+ 
+         /* clowns to the left of me */
+diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
+index 37a7a93..0ab29a8 100644
+--- a/tests/test-vmstate.c
++++ b/tests/test-vmstate.c
+@@ -630,7 +630,7 @@ struct TestQtailqElement {
+ 
+ typedef struct TestQtailq {
+     int16_t  i16;
+-    QTAILQ_HEAD(TestQtailqHead, TestQtailqElement) q;
++    QTAILQ_HEAD(, TestQtailqElement) q;
+     int32_t  i32;
+ } TestQtailq;
+ 
+@@ -735,9 +735,9 @@ static void test_load_q(void)
+     g_assert_cmpint(eof, ==, QEMU_VM_EOF);
+ 
+     TestQtailqElement *qele_from = QTAILQ_FIRST(&obj_q.q);
+-    TestQtailqElement *qlast_from = QTAILQ_LAST(&obj_q.q, TestQtailqHead);
++    TestQtailqElement *qlast_from = QTAILQ_LAST(&obj_q.q);
+     TestQtailqElement *qele_to = QTAILQ_FIRST(&tgt.q);
+-    TestQtailqElement *qlast_to = QTAILQ_LAST(&tgt.q, TestQtailqHead);
++    TestQtailqElement *qlast_to = QTAILQ_LAST(&tgt.q);
+ 
+     while (1) {
+         g_assert_cmpint(qele_to->b, ==, qele_from->b);
+@@ -755,7 +755,7 @@ static void test_load_q(void)
+     /* clean up */
+     TestQtailqElement *qele;
+     while (!QTAILQ_EMPTY(&tgt.q)) {
+-        qele = QTAILQ_LAST(&tgt.q, TestQtailqHead);
++        qele = QTAILQ_LAST(&tgt.q);
+         QTAILQ_REMOVE(&tgt.q, qele, next);
+         free(qele);
+         qele = NULL;
+diff --git a/ui/console.c b/ui/console.c
+index 3a285ba..5a904e6 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -182,7 +182,7 @@ struct DisplayState {
+ 
+ static DisplayState *display_state;
+ static QemuConsole *active_console;
+-static QTAILQ_HEAD(consoles_head, QemuConsole) consoles =
++static QTAILQ_HEAD(, QemuConsole) consoles =
+     QTAILQ_HEAD_INITIALIZER(consoles);
+ static bool cursor_visible_phase;
+ static QEMUTimer *cursor_timer;
+@@ -1303,7 +1303,7 @@ static QemuConsole *new_console(DisplayState *ds, console_type_t console_type,
+         s->index = 0;
+         QTAILQ_INSERT_TAIL(&consoles, s, next);
+     } else if (console_type != GRAPHIC_CONSOLE || qdev_hotplug) {
+-        QemuConsole *last = QTAILQ_LAST(&consoles, consoles_head);
++        QemuConsole *last = QTAILQ_LAST(&consoles);
+         s->index = last->index + 1;
+         QTAILQ_INSERT_TAIL(&consoles, s, next);
+     } else {
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index de42e2a..ef60af7 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -280,7 +280,7 @@ QemuOpt *qemu_opt_find(QemuOpts *opts, const char *name)
+ {
+     QemuOpt *opt;
+ 
+-    QTAILQ_FOREACH_REVERSE(opt, &opts->head, QemuOptHead, next) {
++    QTAILQ_FOREACH_REVERSE(opt, &opts->head, next) {
+         if (strcmp(opt->name, name) != 0)
+             continue;
+         return opt;
+@@ -379,7 +379,7 @@ bool qemu_opt_has_help_opt(QemuOpts *opts)
+ {
+     QemuOpt *opt;
+ 
+-    QTAILQ_FOREACH_REVERSE(opt, &opts->head, QemuOptHead, next) {
++    QTAILQ_FOREACH_REVERSE(opt, &opts->head, next) {
+         if (is_help_option(opt->name)) {
+             return true;
+         }
 -- 
 1.8.3.1
