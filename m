@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gXAMy-0005cW-2M
+	(envelope-from <lvivier@redhat.com>) id 1gXAMy-0005cT-1d
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:40:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gXAMv-0007lr-S6
+	(envelope-from <lvivier@redhat.com>) id 1gXAMv-0007kb-D3
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:40:31 -0500
 From: Laurent Vivier <lvivier@redhat.com>
-Date: Wed, 12 Dec 2018 20:40:09 +0100
-Message-Id: <20181212194009.2951-5-lvivier@redhat.com>
+Date: Wed, 12 Dec 2018 20:40:06 +0100
+Message-Id: <20181212194009.2951-2-lvivier@redhat.com>
 In-Reply-To: <20181212194009.2951-1-lvivier@redhat.com>
 References: <20181212194009.2951-1-lvivier@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 4/4] block/sheepdog: Convert from DPRINTF()
- macro to trace events
+Subject: [Qemu-devel] [PATCH 1/4] block/ssh: Convert from DPRINTF() macro to
+ trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,201 +27,210 @@ Cc: Liu Yuan <namei.unix@gmail.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <
 
 Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 ---
- block/sheepdog.c   | 47 +++++++++++++++++-----------------------------
- block/trace-events | 14 ++++++++++++++
- 2 files changed, 31 insertions(+), 30 deletions(-)
+ block/ssh.c        | 46 +++++++++++++++++-----------------------------
+ block/trace-events | 17 +++++++++++++++++
+ 2 files changed, 34 insertions(+), 29 deletions(-)
 
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 0125df9d49..a5000d271b 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -28,6 +28,7 @@
- #include "sysemu/block-backend.h"
- #include "qemu/bitops.h"
- #include "qemu/cutils.h"
+diff --git a/block/ssh.c b/block/ssh.c
+index 7fbc27abdf..bbc513e095 100644
+--- a/block/ssh.c
++++ b/block/ssh.c
+@@ -41,27 +41,17 @@
+ #include "qapi/qmp/qstring.h"
+ #include "qapi/qobject-input-visitor.h"
+ #include "qapi/qobject-output-visitor.h"
 +#include "trace.h"
 =20
- #define SD_PROTO_VER 0x01
+-/* DEBUG_SSH=3D1 enables the DPRINTF (debugging printf) statements in
+- * this block driver code.
+- *
++/*
+  * TRACE_LIBSSH2=3D<bitmask> enables tracing in libssh2 itself.  Note
+  * that this requires that libssh2 was specially compiled with the
+  * `./configure --enable-debug' option, so most likely you will have
+  * to compile it yourself.  The meaning of <bitmask> is described
+  * here: http://www.libssh2.org/libssh2_trace.html
+  */
+-#define DEBUG_SSH     0
+ #define TRACE_LIBSSH2 0 /* or try: LIBSSH2_TRACE_SFTP */
 =20
-@@ -299,19 +300,6 @@ static inline size_t count_data_objs(const struct Sh=
-eepdogInode *inode)
-                         (1UL << inode->block_size_shift));
- }
-=20
--#undef DPRINTF
--#ifdef DEBUG_SDOG
--#define DEBUG_SDOG_PRINT 1
--#else
--#define DEBUG_SDOG_PRINT 0
--#endif
--#define DPRINTF(fmt, args...)                                           =
-\
--    do {                                                                =
-\
--        if (DEBUG_SDOG_PRINT) {                                         =
-\
--            fprintf(stderr, "%s %d: " fmt, __func__, __LINE__, ##args); =
-\
--        }                                                               =
-\
+-#define DPRINTF(fmt, ...)                           \
+-    do {                                            \
+-        if (DEBUG_SSH) {                            \
+-            fprintf(stderr, "ssh: %-15s " fmt "\n", \
+-                    __func__, ##__VA_ARGS__);       \
+-        }                                           \
 -    } while (0)
 -
- typedef struct SheepdogAIOCB SheepdogAIOCB;
- typedef struct BDRVSheepdogState BDRVSheepdogState;
-=20
-@@ -750,7 +738,7 @@ static coroutine_fn void reconnect_to_sdog(void *opaq=
-ue)
-         Error *local_err =3D NULL;
-         s->fd =3D get_sheep_fd(s, &local_err);
-         if (s->fd < 0) {
--            DPRINTF("Wait for connection to be established\n");
-+            trace_sd_reconnect_to_sdog();
-             error_report_err(local_err);
-             qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, 1000000000ULL);
-         }
-@@ -847,7 +835,7 @@ static void coroutine_fn aio_read_response(void *opaq=
-ue)
+ typedef struct BDRVSSHState {
+     /* Coroutine. */
+     CoMutex lock;
+@@ -336,7 +326,7 @@ static int check_host_key_knownhosts(BDRVSSHState *s,
+     switch (r) {
+     case LIBSSH2_KNOWNHOST_CHECK_MATCH:
+         /* OK */
+-        DPRINTF("host key OK: %s", found->key);
++        trace_ssh_check_host_key_knownhosts(found->key);
          break;
-     case AIOCB_FLUSH_CACHE:
-         if (rsp.result =3D=3D SD_RES_INVALID_PARMS) {
--            DPRINTF("disable cache since the server doesn't support it\n=
-");
-+            trace_sd_aio_read_response();
-             s->cache_flags =3D SD_FLAG_CMD_DIRECT;
-             rsp.result =3D SD_RES_SUCCESS;
-         }
-@@ -1639,7 +1627,7 @@ static int sd_open(BlockDriverState *bs, QDict *opt=
-ions, int flags,
-     s->discard_supported =3D true;
-=20
-     if (snap_id || tag[0]) {
--        DPRINTF("%" PRIx32 " snapshot inode was open.\n", vid);
-+        trace_sd_open(vid);
-         s->is_snapshot =3D true;
+     case LIBSSH2_KNOWNHOST_CHECK_MISMATCH:
+         ret =3D -EINVAL;
+@@ -721,8 +711,7 @@ static int connect_to_ssh(BDRVSSHState *s, BlockdevOp=
+tionsSsh *opts,
      }
 =20
-@@ -2252,7 +2240,7 @@ static void sd_close(BlockDriverState *bs)
-     unsigned int wlen, rlen =3D 0;
-     int fd, ret;
+     /* Open the remote file. */
+-    DPRINTF("opening file %s flags=3D0x%x creat_mode=3D0%o",
+-            opts->path, ssh_flags, creat_mode);
++    trace_ssh_connect_to_ssh(opts->path, ssh_flags, creat_mode);
+     s->sftp_handle =3D libssh2_sftp_open(s->sftp, opts->path, ssh_flags,
+                                        creat_mode);
+     if (!s->sftp_handle) {
+@@ -890,7 +879,7 @@ static int coroutine_fn ssh_co_create_opts(const char=
+ *filename, QemuOpts *opts,
+     /* Get desired file size. */
+     ssh_opts->size =3D ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SI=
+ZE, 0),
+                               BDRV_SECTOR_SIZE);
+-    DPRINTF("total_size=3D%" PRIi64, ssh_opts->size);
++    trace_ssh_co_create_opts(ssh_opts->size);
 =20
--    DPRINTF("%s\n", s->name);
-+    trace_sd_close(s->name);
+     uri_options =3D qdict_new();
+     ret =3D parse_uri(filename, uri_options, errp);
+@@ -946,7 +935,7 @@ static void restart_coroutine(void *opaque)
+     BDRVSSHState *s =3D bs->opaque;
+     AioContext *ctx =3D bdrv_get_aio_context(bs);
 =20
-     fd =3D connect_to_sdog(s, &local_err);
-     if (fd < 0) {
-@@ -2429,7 +2417,7 @@ static int sd_create_branch(BDRVSheepdogState *s)
-     char *buf;
-     bool deleted;
+-    DPRINTF("co=3D%p", restart->co);
++    trace_ssh_restart_coroutine(restart->co);
+     aio_set_fd_handler(ctx, s->sock, false, NULL, NULL, NULL, NULL);
 =20
--    DPRINTF("%" PRIx32 " is snapshot.\n", s->inode.vdi_id);
-+    trace_sd_create_branch_snapshot(s->inode.vdi_id);
-=20
-     buf =3D g_malloc(SD_INODE_SIZE);
-=20
-@@ -2445,7 +2433,7 @@ static int sd_create_branch(BDRVSheepdogState *s)
-         goto out;
+     aio_co_wake(restart->co);
+@@ -974,13 +963,12 @@ static coroutine_fn void co_yield(BDRVSSHState *s, =
+BlockDriverState *bs)
+         wr_handler =3D restart_coroutine;
      }
 =20
--    DPRINTF("%" PRIx32 " is created.\n", vid);
-+    trace_sd_create_branch_created(vid);
+-    DPRINTF("s->sock=3D%d rd_handler=3D%p wr_handler=3D%p", s->sock,
+-            rd_handler, wr_handler);
++    trace_ssh_co_yield(s->sock, rd_handler, wr_handler);
 =20
-     fd =3D connect_to_sdog(s, &local_err);
-     if (fd < 0) {
-@@ -2467,7 +2455,7 @@ static int sd_create_branch(BDRVSheepdogState *s)
+     aio_set_fd_handler(bdrv_get_aio_context(bs), s->sock,
+                        false, rd_handler, wr_handler, NULL, &restart);
+     qemu_coroutine_yield();
+-    DPRINTF("s->sock=3D%d - back", s->sock);
++    trace_ssh_co_yield_back(s->sock);
+ }
 =20
-     s->is_snapshot =3D false;
-     ret =3D 0;
--    DPRINTF("%" PRIx32 " was newly created.\n", s->inode.vdi_id);
-+    trace_sd_create_branch_new(s->inode.vdi_id);
+ /* SFTP has a function `libssh2_sftp_seek64' which seeks to a position
+@@ -1003,7 +991,7 @@ static void ssh_seek(BDRVSSHState *s, int64_t offset=
+, int flags)
+     bool force =3D (flags & SSH_SEEK_FORCE) !=3D 0;
 =20
- out:
-     g_free(buf);
-@@ -2561,11 +2549,11 @@ static void coroutine_fn sd_co_rw_vector(Sheepdog=
-AIOCB *acb)
-         }
+     if (force || op_read !=3D s->offset_op_read || offset !=3D s->offset=
+) {
+-        DPRINTF("seeking to offset=3D%" PRIi64, offset);
++        trace_ssh_seek(offset);
+         libssh2_sftp_seek64(s->sftp_handle, offset);
+         s->offset =3D offset;
+         s->offset_op_read =3D op_read;
+@@ -1019,7 +1007,7 @@ static coroutine_fn int ssh_read(BDRVSSHState *s, B=
+lockDriverState *bs,
+     char *buf, *end_of_vec;
+     struct iovec *i;
 =20
-         if (create) {
--            DPRINTF("update ino (%" PRIu32 ") %" PRIu64 " %" PRIu64 " %l=
-d\n",
--                    inode->vdi_id, oid,
--                    vid_to_data_oid(inode->data_vdi_id[idx], idx), idx);
-+            trace_sd_co_rw_vector_update(inode->vdi_id, oid,
-+                                  vid_to_data_oid(inode->data_vdi_id[idx=
-], idx),
-+                                  idx);
-             oid =3D vid_to_data_oid(inode->vdi_id, idx);
--            DPRINTF("new oid %" PRIx64 "\n", oid);
-+            trace_sd_co_rw_vector_new(oid);
-         }
+-    DPRINTF("offset=3D%" PRIi64 " size=3D%zu", offset, size);
++    trace_ssh_read(offset, size);
 =20
-         aio_req =3D alloc_aio_req(s, acb, oid, len, offset, flags, creat=
-e,
-@@ -2670,9 +2658,8 @@ static int sd_snapshot_create(BlockDriverState *bs,=
- QEMUSnapshotInfo *sn_info)
-     SheepdogInode *inode;
-     unsigned int datalen;
+     ssh_seek(s, offset, SSH_SEEK_READ);
 =20
--    DPRINTF("sn_info: name %s id_str %s s: name %s vm_state_size %" PRId=
-64 " "
--            "is_snapshot %d\n", sn_info->name, sn_info->id_str,
--            s->name, sn_info->vm_state_size, s->is_snapshot);
-+    trace_sd_snapshot_create_info(sn_info->name, sn_info->id_str, s->nam=
-e,
-+                                  sn_info->vm_state_size, s->is_snapshot=
-);
+@@ -1038,9 +1026,9 @@ static coroutine_fn int ssh_read(BDRVSSHState *s, B=
+lockDriverState *bs,
+      */
+     for (got =3D 0; got < size; ) {
+     again:
+-        DPRINTF("sftp_read buf=3D%p size=3D%zu", buf, end_of_vec - buf);
++        trace_ssh_read_buf(buf, end_of_vec - buf);
+         r =3D libssh2_sftp_read(s->sftp_handle, buf, end_of_vec - buf);
+-        DPRINTF("sftp_read returned %zd", r);
++        trace_ssh_read_return(r);
 =20
-     if (s->is_snapshot) {
-         error_report("You can't create a snapshot of a snapshot VDI, "
-@@ -2681,7 +2668,7 @@ static int sd_snapshot_create(BlockDriverState *bs,=
- QEMUSnapshotInfo *sn_info)
-         return -EINVAL;
-     }
+         if (r =3D=3D LIBSSH2_ERROR_EAGAIN || r =3D=3D LIBSSH2_ERROR_TIME=
+OUT) {
+             co_yield(s, bs);
+@@ -1094,7 +1082,7 @@ static int ssh_write(BDRVSSHState *s, BlockDriverSt=
+ate *bs,
+     char *buf, *end_of_vec;
+     struct iovec *i;
 =20
--    DPRINTF("%s %s\n", sn_info->name, sn_info->id_str);
-+    trace_sd_snapshot_create(sn_info->name, sn_info->id_str);
+-    DPRINTF("offset=3D%" PRIi64 " size=3D%zu", offset, size);
++    trace_ssh_write(offset, size);
 =20
-     s->inode.vm_state_size =3D sn_info->vm_state_size;
-     s->inode.vm_clock_nsec =3D sn_info->vm_clock_nsec;
-@@ -2726,8 +2713,8 @@ static int sd_snapshot_create(BlockDriverState *bs,=
- QEMUSnapshotInfo *sn_info)
-     }
+     ssh_seek(s, offset, SSH_SEEK_WRITE);
 =20
-     memcpy(&s->inode, inode, datalen);
--    DPRINTF("s->inode: name %s snap_id %x oid %x\n",
--            s->inode.name, s->inode.snap_id, s->inode.vdi_id);
-+    trace_sd_snapshot_create_inode(s->inode.name, s->inode.snap_id,
-+                                   s->inode.vdi_id);
+@@ -1108,9 +1096,9 @@ static int ssh_write(BDRVSSHState *s, BlockDriverSt=
+ate *bs,
 =20
- cleanup:
-     g_free(inode);
+     for (written =3D 0; written < size; ) {
+     again:
+-        DPRINTF("sftp_write buf=3D%p size=3D%zu", buf, end_of_vec - buf)=
+;
++        trace_ssh_write_buf(buf, end_of_vec - buf);
+         r =3D libssh2_sftp_write(s->sftp_handle, buf, end_of_vec - buf);
+-        DPRINTF("sftp_write returned %zd", r);
++        trace_ssh_write_return(r);
+=20
+         if (r =3D=3D LIBSSH2_ERROR_EAGAIN || r =3D=3D LIBSSH2_ERROR_TIME=
+OUT) {
+             co_yield(s, bs);
+@@ -1187,7 +1175,7 @@ static coroutine_fn int ssh_flush(BDRVSSHState *s, =
+BlockDriverState *bs)
+ {
+     int r;
+=20
+-    DPRINTF("fsync");
++    trace_ssh_flush();
+  again:
+     r =3D libssh2_sftp_fsync(s->sftp_handle);
+     if (r =3D=3D LIBSSH2_ERROR_EAGAIN || r =3D=3D LIBSSH2_ERROR_TIMEOUT)=
+ {
+@@ -1238,7 +1226,7 @@ static int64_t ssh_getlength(BlockDriverState *bs)
+=20
+     /* Note we cannot make a libssh2 call here. */
+     length =3D (int64_t) s->attrs.filesize;
+-    DPRINTF("length=3D%" PRIi64, length);
++    trace_ssh_getlength(length);
+=20
+     return length;
+ }
 diff --git a/block/trace-events b/block/trace-events
-index 49f31966e7..7a92d7b3db 100644
+index 3e8c47bb24..b13b1e9706 100644
 --- a/block/trace-events
 +++ b/block/trace-events
-@@ -189,3 +189,17 @@ file_xfs_discard(const char* error) "cannot punch ho=
-le (%s)"
- file_FindEjectableOpticalMedia(const char *media) "Matching using %s"
- file_setup_cdrom(const char *partition) "Using %s as optical disc"
- file_hdev_is_sg(int type, int version) "SG device found: type=3D%d, vers=
-ion=3D%d"
+@@ -156,3 +156,20 @@ nvme_cmd_map_qiov_iov(void *s, int i, void *page, in=
+t pages) "s %p iov[%d] %p pa
+=20
+ # block/iscsi.c
+ iscsi_xcopy(void *src_lun, uint64_t src_off, void *dst_lun, uint64_t dst=
+_off, uint64_t bytes, int ret) "src_lun %p offset %"PRIu64" dst_lun %p of=
+fset %"PRIu64" bytes %"PRIu64" ret %d"
 +
-+# block/sheepdog.c
-+sd_reconnect_to_sdog(void) "Wait for connection to be established"
-+sd_aio_read_response(void) "disable cache since the server doesn't suppo=
-rt it"
-+sd_open(uint32_t vid) "0x%" PRIx32 " snapshot inode was open."
-+sd_close(const char *name) "%s"
-+sd_create_branch_snapshot(uint32_t vdi) "0x%" PRIx32 " is snapshot."
-+sd_create_branch_created(uint32_t vdi) "0x%" PRIx32 " is created."
-+sd_create_branch_new(uint32_t vdi) "0x%" PRIx32 " was newly created."
-+sd_co_rw_vector_update(uint32_t vdi, uint64_t oid, uint64_t data, long i=
-dx) "update ino (%" PRIu32 ") %" PRIu64 " %" PRIu64 " %ld"
-+sd_co_rw_vector_new(uint64_t oid) "new oid 0x%" PRIx64
-+sd_snapshot_create_info(const char *sn_name, const char *id, const char =
-*name, int64_t size, int is_snapshot) "sn_info: name %s id_str %s s: name=
- %s vm_state_size %" PRId64 " " "is_snapshot %d"
-+sd_snapshot_create(const char *sn_name, const char *id) "%s %s"
-+sd_snapshot_create_inode(const char *name, uint32_t snap, uint32_t vdi) =
-"s->inode: name %s snap_id 0x%x vdi 0x%x"
++# block/ssh.c
++ssh_restart_coroutine(void *co) "co=3D%p"
++ssh_flush(void) "fsync"
++ssh_check_host_key_knownhosts(const char *key) "host key OK: %s"
++ssh_connect_to_ssh(char *path, int flags, int mode) "opening file %s fla=
+gs=3D0x%x creat_mode=3D0%o"
++ssh_co_yield(int sock, void *rd_handler, void *wr_handler) "s->sock=3D%d=
+ rd_handler=3D%p wr_handler=3D%p"
++ssh_co_yield_back(int sock) "s->sock=3D%d - back"
++ssh_getlength(int64_t length) "length=3D%" PRIi64
++ssh_co_create_opts(uint64_t size) "total_size=3D%" PRIu64
++ssh_read(int64_t offset, size_t size) "offset=3D%" PRIi64 " size=3D%zu"
++ssh_read_buf(void *buf, size_t size) "sftp_read buf=3D%p size=3D%zu"
++ssh_read_return(size_t ret) "sftp_read returned %zd"
++ssh_write(int64_t offset, size_t size) "offset=3D%" PRIi64 " size=3D%zu"
++ssh_write_buf(void *buf, size_t size) "sftp_write buf=3D%p size=3D%zu"
++ssh_write_return(size_t ret) "sftp_write returned %zd"
++ssh_seek(uint64_t offset) "seeking to offset=3D%" PRIi64
 --=20
 2.19.2
