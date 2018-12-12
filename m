@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48386)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=8779827ad=Alistair.Francis@wdc.com>)
-	id 1gXAPm-0000Ld-5i
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:43:30 -0500
+	id 1gXAPu-0000TS-LN
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:43:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=8779827ad=Alistair.Francis@wdc.com>)
-	id 1gXAPi-0001NH-5Z
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:43:26 -0500
+	id 1gXAPq-0001Yp-Li
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:43:34 -0500
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Wed, 12 Dec 2018 19:43:18 +0000
-Message-ID: <8660772ee51af8d3904be1aacbe896aab88d6b03.1544643238.git.alistair.francis@wdc.com>
+Date: Wed, 12 Dec 2018 19:43:27 +0000
+Message-ID: <35decc9202e72f185897252900341f0b2807ba88.1544643238.git.alistair.francis@wdc.com>
 References: <cover.1544643238.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1544643238.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v1 03/23] linux-user: Add host dependency for
- RISC-V 64-bit
+Subject: [Qemu-devel] [PATCH v1 04/23] exec: Add RISC-V GCC poison macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,41 +32,20 @@ Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- MAINTAINERS                       |  1 +
- linux-user/host/riscv64/hostdep.h | 11 +++++++++++
- 2 files changed, 12 insertions(+)
- create mode 100644 linux-user/host/riscv64/hostdep.h
+ include/exec/poison.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 97071bcdf4..ddfeb32c6c 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -263,6 +263,7 @@ F: target/riscv/
- F: hw/riscv/
- F: include/hw/riscv/
- F: linux-user/host/riscv32/
-+F: linux-user/host/riscv64/
- F: disas/riscv.c
-=20
- S390
-diff --git a/linux-user/host/riscv64/hostdep.h b/linux-user/host/riscv64/ho=
-stdep.h
-new file mode 100644
-index 0000000000..28467ba00b
---- /dev/null
-+++ b/linux-user/host/riscv64/hostdep.h
-@@ -0,0 +1,11 @@
-+/*
-+ * hostdep.h : things which are dependent on the host architecture
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or late=
-r.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef RISCV64_HOSTDEP_H
-+#define RISCV64_HOSTDEP_H
-+
-+#endif
+diff --git a/include/exec/poison.h b/include/exec/poison.h
+index 32d53789f8..ecdc83c147 100644
+--- a/include/exec/poison.h
++++ b/include/exec/poison.h
+@@ -79,6 +79,7 @@
+ #pragma GCC poison CONFIG_MOXIE_DIS
+ #pragma GCC poison CONFIG_NIOS2_DIS
+ #pragma GCC poison CONFIG_PPC_DIS
++#pragma GCC poison CONFIG_RISCV_DIS
+ #pragma GCC poison CONFIG_S390_DIS
+ #pragma GCC poison CONFIG_SH4_DIS
+ #pragma GCC poison CONFIG_SPARC_DIS
 --=20
 2.19.1
