@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gX2ds-00039F-G2
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:25:29 -0500
+	(envelope-from <berrange@redhat.com>) id 1gX2e1-0003G9-LF
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:25:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gX2dq-0004U5-Aa
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:25:28 -0500
+	(envelope-from <berrange@redhat.com>) id 1gX2dz-0004ew-2A
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:25:37 -0500
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Wed, 12 Dec 2018 11:24:47 +0000
-Message-Id: <20181212112450.2103-4-berrange@redhat.com>
+Date: Wed, 12 Dec 2018 11:24:48 +0000
+Message-Id: <20181212112450.2103-5-berrange@redhat.com>
 In-Reply-To: <20181212112450.2103-1-berrange@redhat.com>
 References: <20181212112450.2103-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 3/6] crypto/block: refactor
- qcrypto_block_*crypt_helper functions
+Subject: [Qemu-devel] [PULL 4/6] crypto/block: rename
+ qcrypto_block_*crypt_helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,22 +28,180 @@ Cc: Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <be
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-qcrypto_block_encrypt_helper and qcrypto_block_decrypt_helper are
-almost identical, let's reduce code duplication and simplify further
-improvements.
+Rename qcrypto_block_*crypt_helper to qcrypto_block_cipher_*crypt_helper,
+as it's not about QCryptoBlock. This is needed to introduce
+qcrypto_block_*crypt_helper in the next commit, which will have
+QCryptoBlock pointer and than will be able to use additional fields of
+it, which in turn will be used to implement thread-safe QCryptoBlock
+operations.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- crypto/block.c | 81 +++++++++++++++++++-------------------------------
- 1 file changed, 31 insertions(+), 50 deletions(-)
+ crypto/block-luks.c | 44 ++++++++++++++--------------
+ crypto/block-qcow.c | 16 +++++------
+ crypto/block.c      | 70 +++++++++++++++++++++++----------------------
+ crypto/blockpriv.h  | 34 +++++++++++-----------
+ 4 files changed, 83 insertions(+), 81 deletions(-)
 
+diff --git a/crypto/block-luks.c b/crypto/block-luks.c
+index 51e24d23ca..353a400595 100644
+--- a/crypto/block-luks.c
++++ b/crypto/block-luks.c
+@@ -504,14 +504,14 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
+      * to reset the encryption cipher every time the master
+      * key crosses a sector boundary.
+      */
+-    if (qcrypto_block_decrypt_helper(cipher,
+-                                     niv,
+-                                     ivgen,
+-                                     QCRYPTO_BLOCK_LUKS_SECTOR_SIZE,
+-                                     0,
+-                                     splitkey,
+-                                     splitkeylen,
+-                                     errp) < 0) {
++    if (qcrypto_block_cipher_decrypt_helper(cipher,
++                                            niv,
++                                            ivgen,
++                                            QCRYPTO_BLOCK_LUKS_SECTOR_SI=
+ZE,
++                                            0,
++                                            splitkey,
++                                            splitkeylen,
++                                            errp) < 0) {
+         goto cleanup;
+     }
+=20
+@@ -1219,12 +1219,12 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+=20
+     /* Now we encrypt the split master key with the key generated
+      * from the user's password, before storing it */
+-    if (qcrypto_block_encrypt_helper(cipher, block->niv, ivgen,
+-                                     QCRYPTO_BLOCK_LUKS_SECTOR_SIZE,
+-                                     0,
+-                                     splitkey,
+-                                     splitkeylen,
+-                                     errp) < 0) {
++    if (qcrypto_block_cipher_encrypt_helper(cipher, block->niv, ivgen,
++                                            QCRYPTO_BLOCK_LUKS_SECTOR_SI=
+ZE,
++                                            0,
++                                            splitkey,
++                                            splitkeylen,
++                                            errp) < 0) {
+         goto error;
+     }
+=20
+@@ -1409,10 +1409,10 @@ qcrypto_block_luks_decrypt(QCryptoBlock *block,
+ {
+     assert(QEMU_IS_ALIGNED(offset, QCRYPTO_BLOCK_LUKS_SECTOR_SIZE));
+     assert(QEMU_IS_ALIGNED(len, QCRYPTO_BLOCK_LUKS_SECTOR_SIZE));
+-    return qcrypto_block_decrypt_helper(block->cipher,
+-                                        block->niv, block->ivgen,
+-                                        QCRYPTO_BLOCK_LUKS_SECTOR_SIZE,
+-                                        offset, buf, len, errp);
++    return qcrypto_block_cipher_decrypt_helper(block->cipher,
++                                               block->niv, block->ivgen,
++                                               QCRYPTO_BLOCK_LUKS_SECTOR=
+_SIZE,
++                                               offset, buf, len, errp);
+ }
+=20
+=20
+@@ -1425,10 +1425,10 @@ qcrypto_block_luks_encrypt(QCryptoBlock *block,
+ {
+     assert(QEMU_IS_ALIGNED(offset, QCRYPTO_BLOCK_LUKS_SECTOR_SIZE));
+     assert(QEMU_IS_ALIGNED(len, QCRYPTO_BLOCK_LUKS_SECTOR_SIZE));
+-    return qcrypto_block_encrypt_helper(block->cipher,
+-                                        block->niv, block->ivgen,
+-                                        QCRYPTO_BLOCK_LUKS_SECTOR_SIZE,
+-                                        offset, buf, len, errp);
++    return qcrypto_block_cipher_encrypt_helper(block->cipher,
++                                               block->niv, block->ivgen,
++                                               QCRYPTO_BLOCK_LUKS_SECTOR=
+_SIZE,
++                                               offset, buf, len, errp);
+ }
+=20
+=20
+diff --git a/crypto/block-qcow.c b/crypto/block-qcow.c
+index 7606231e79..3b6722deb0 100644
+--- a/crypto/block-qcow.c
++++ b/crypto/block-qcow.c
+@@ -152,10 +152,10 @@ qcrypto_block_qcow_decrypt(QCryptoBlock *block,
+ {
+     assert(QEMU_IS_ALIGNED(offset, QCRYPTO_BLOCK_QCOW_SECTOR_SIZE));
+     assert(QEMU_IS_ALIGNED(len, QCRYPTO_BLOCK_QCOW_SECTOR_SIZE));
+-    return qcrypto_block_decrypt_helper(block->cipher,
+-                                        block->niv, block->ivgen,
+-                                        QCRYPTO_BLOCK_QCOW_SECTOR_SIZE,
+-                                        offset, buf, len, errp);
++    return qcrypto_block_cipher_decrypt_helper(block->cipher,
++                                               block->niv, block->ivgen,
++                                               QCRYPTO_BLOCK_QCOW_SECTOR=
+_SIZE,
++                                               offset, buf, len, errp);
+ }
+=20
+=20
+@@ -168,10 +168,10 @@ qcrypto_block_qcow_encrypt(QCryptoBlock *block,
+ {
+     assert(QEMU_IS_ALIGNED(offset, QCRYPTO_BLOCK_QCOW_SECTOR_SIZE));
+     assert(QEMU_IS_ALIGNED(len, QCRYPTO_BLOCK_QCOW_SECTOR_SIZE));
+-    return qcrypto_block_encrypt_helper(block->cipher,
+-                                        block->niv, block->ivgen,
+-                                        QCRYPTO_BLOCK_QCOW_SECTOR_SIZE,
+-                                        offset, buf, len, errp);
++    return qcrypto_block_cipher_encrypt_helper(block->cipher,
++                                               block->niv, block->ivgen,
++                                               QCRYPTO_BLOCK_QCOW_SECTOR=
+_SIZE,
++                                               offset, buf, len, errp);
+ }
+=20
+=20
 diff --git a/crypto/block.c b/crypto/block.c
-index e59d1140fe..8d0e4bdbb2 100644
+index 8d0e4bdbb2..d43139dbc7 100644
 --- a/crypto/block.c
 +++ b/crypto/block.c
-@@ -190,14 +190,21 @@ void qcrypto_block_free(QCryptoBlock *block)
+@@ -191,20 +191,20 @@ void qcrypto_block_free(QCryptoBlock *block)
+=20
+=20
+ typedef int (*QCryptoCipherEncDecFunc)(QCryptoCipher *cipher,
+-                                       const void *in,
+-                                       void *out,
+-                                       size_t len,
+-                                       Error **errp);
+-
+-static int do_qcrypto_block_encdec(QCryptoCipher *cipher,
+-                                   size_t niv,
+-                                   QCryptoIVGen *ivgen,
+-                                   int sectorsize,
+-                                   uint64_t offset,
+-                                   uint8_t *buf,
+-                                   size_t len,
+-                                   QCryptoCipherEncDecFunc func,
+-                                   Error **errp)
++                                        const void *in,
++                                        void *out,
++                                        size_t len,
++                                        Error **errp);
++
++static int do_qcrypto_block_cipher_encdec(QCryptoCipher *cipher,
++                                          size_t niv,
++                                          QCryptoIVGen *ivgen,
++                                          int sectorsize,
++                                          uint64_t offset,
++                                          uint8_t *buf,
++                                          size_t len,
++                                          QCryptoCipherEncDecFunc func,
++                                          Error **errp)
+ {
+     uint8_t *iv;
+     int ret =3D -1;
+@@ -249,29 +249,31 @@ static int do_qcrypto_block_encdec(QCryptoCipher *c=
+ipher,
  }
 =20
 =20
@@ -55,109 +213,95 @@ index e59d1140fe..8d0e4bdbb2 100644
 -                                 uint8_t *buf,
 -                                 size_t len,
 -                                 Error **errp)
-+typedef int (*QCryptoCipherEncDecFunc)(QCryptoCipher *cipher,
-+                                       const void *in,
-+                                       void *out,
-+                                       size_t len,
-+                                       Error **errp);
-+
-+static int do_qcrypto_block_encdec(QCryptoCipher *cipher,
-+                                   size_t niv,
-+                                   QCryptoIVGen *ivgen,
-+                                   int sectorsize,
-+                                   uint64_t offset,
-+                                   uint8_t *buf,
-+                                   size_t len,
-+                                   QCryptoCipherEncDecFunc func,
-+                                   Error **errp)
++int qcrypto_block_cipher_decrypt_helper(QCryptoCipher *cipher,
++                                        size_t niv,
++                                        QCryptoIVGen *ivgen,
++                                        int sectorsize,
++                                        uint64_t offset,
++                                        uint8_t *buf,
++                                        size_t len,
++                                        Error **errp)
  {
-     uint8_t *iv;
-     int ret =3D -1;
-@@ -226,8 +233,7 @@ int qcrypto_block_decrypt_helper(QCryptoCipher *ciphe=
-r,
-         }
-=20
-         nbytes =3D len > sectorsize ? sectorsize : len;
--        if (qcrypto_cipher_decrypt(cipher, buf, buf,
--                                   nbytes, errp) < 0) {
-+        if (func(cipher, buf, buf, nbytes, errp) < 0) {
-             goto cleanup;
-         }
-=20
-@@ -243,7 +249,7 @@ int qcrypto_block_decrypt_helper(QCryptoCipher *ciphe=
-r,
+-    return do_qcrypto_block_encdec(cipher, niv, ivgen, sectorsize, offse=
+t,
+-                                   buf, len, qcrypto_cipher_decrypt, err=
+p);
++    return do_qcrypto_block_cipher_encdec(cipher, niv, ivgen, sectorsize=
+,
++                                          offset, buf, len,
++                                          qcrypto_cipher_decrypt, errp);
  }
 =20
 =20
 -int qcrypto_block_encrypt_helper(QCryptoCipher *cipher,
-+int qcrypto_block_decrypt_helper(QCryptoCipher *cipher,
-                                  size_t niv,
-                                  QCryptoIVGen *ivgen,
-                                  int sectorsize,
-@@ -252,45 +258,20 @@ int qcrypto_block_encrypt_helper(QCryptoCipher *cip=
-her,
-                                  size_t len,
-                                  Error **errp)
+-                                 size_t niv,
+-                                 QCryptoIVGen *ivgen,
+-                                 int sectorsize,
+-                                 uint64_t offset,
+-                                 uint8_t *buf,
+-                                 size_t len,
+-                                 Error **errp)
++int qcrypto_block_cipher_encrypt_helper(QCryptoCipher *cipher,
++                                        size_t niv,
++                                        QCryptoIVGen *ivgen,
++                                        int sectorsize,
++                                        uint64_t offset,
++                                        uint8_t *buf,
++                                        size_t len,
++                                        Error **errp)
  {
--    uint8_t *iv;
--    int ret =3D -1;
--    uint64_t startsector =3D offset / sectorsize;
--
--    assert(QEMU_IS_ALIGNED(offset, sectorsize));
--    assert(QEMU_IS_ALIGNED(len, sectorsize));
--
--    iv =3D niv ? g_new0(uint8_t, niv) : NULL;
--
--    while (len > 0) {
--        size_t nbytes;
--        if (niv) {
--            if (qcrypto_ivgen_calculate(ivgen,
--                                        startsector,
--                                        iv, niv,
--                                        errp) < 0) {
--                goto cleanup;
--            }
-+    return do_qcrypto_block_encdec(cipher, niv, ivgen, sectorsize, offse=
+-    return do_qcrypto_block_encdec(cipher, niv, ivgen, sectorsize, offse=
 t,
-+                                   buf, len, qcrypto_cipher_decrypt, err=
+-                                   buf, len, qcrypto_cipher_encrypt, err=
 p);
-+}
-=20
--            if (qcrypto_cipher_setiv(cipher,
--                                     iv, niv,
--                                     errp) < 0) {
--                goto cleanup;
--            }
--        }
-=20
--        nbytes =3D len > sectorsize ? sectorsize : len;
--        if (qcrypto_cipher_encrypt(cipher, buf, buf,
--                                   nbytes, errp) < 0) {
--            goto cleanup;
--        }
--
--        startsector++;
--        buf +=3D nbytes;
--        len -=3D nbytes;
--    }
--
--    ret =3D 0;
-- cleanup:
--    g_free(iv);
--    return ret;
-+int qcrypto_block_encrypt_helper(QCryptoCipher *cipher,
-+                                 size_t niv,
-+                                 QCryptoIVGen *ivgen,
-+                                 int sectorsize,
-+                                 uint64_t offset,
-+                                 uint8_t *buf,
-+                                 size_t len,
-+                                 Error **errp)
-+{
-+    return do_qcrypto_block_encdec(cipher, niv, ivgen, sectorsize, offse=
-t,
-+                                   buf, len, qcrypto_cipher_encrypt, err=
-p);
++    return do_qcrypto_block_cipher_encdec(cipher, niv, ivgen, sectorsize=
+,
++                                          offset, buf, len,
++                                          qcrypto_cipher_encrypt, errp);
  }
+diff --git a/crypto/blockpriv.h b/crypto/blockpriv.h
+index 41840abcec..54bbe1eb6a 100644
+--- a/crypto/blockpriv.h
++++ b/crypto/blockpriv.h
+@@ -78,22 +78,22 @@ struct QCryptoBlockDriver {
+ };
+=20
+=20
+-int qcrypto_block_decrypt_helper(QCryptoCipher *cipher,
+-                                 size_t niv,
+-                                 QCryptoIVGen *ivgen,
+-                                 int sectorsize,
+-                                 uint64_t offset,
+-                                 uint8_t *buf,
+-                                 size_t len,
+-                                 Error **errp);
+-
+-int qcrypto_block_encrypt_helper(QCryptoCipher *cipher,
+-                                 size_t niv,
+-                                 QCryptoIVGen *ivgen,
+-                                 int sectorsize,
+-                                 uint64_t offset,
+-                                 uint8_t *buf,
+-                                 size_t len,
+-                                 Error **errp);
++int qcrypto_block_cipher_decrypt_helper(QCryptoCipher *cipher,
++                                        size_t niv,
++                                        QCryptoIVGen *ivgen,
++                                        int sectorsize,
++                                        uint64_t offset,
++                                        uint8_t *buf,
++                                        size_t len,
++                                        Error **errp);
++
++int qcrypto_block_cipher_encrypt_helper(QCryptoCipher *cipher,
++                                        size_t niv,
++                                        QCryptoIVGen *ivgen,
++                                        int sectorsize,
++                                        uint64_t offset,
++                                        uint8_t *buf,
++                                        size_t len,
++                                        Error **errp);
+=20
+ #endif /* QCRYPTO_BLOCKPRIV_H */
 --=20
 2.19.2
