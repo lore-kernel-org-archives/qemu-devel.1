@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gX1L2-0003Xv-2g
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 05:01:56 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gX1L7-0003b6-1N
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 05:02:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gX1Ky-0003OB-T4
+	(envelope-from <alex.bennee@linaro.org>) id 1gX1L1-0003QO-9f
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 05:02:00 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46739)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gX1L1-0003PR-2o
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 05:01:55 -0500
-Resent-Message-Id: <E1gX1Ky-0003OB-T4@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21797)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gX1Ky-0003Mh-Kc
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 05:01:52 -0500
-In-Reply-To: <1544606032-16924-1-git-send-email-thuth@redhat.com>
-Message-ID: <154460890212.8343.10509987157027697685@02a1dbf831e2>
-Reply-To: <qemu-devel@nongnu.org>
+Received: by mail-wr1-x443.google.com with SMTP id l9so16972041wrt.13
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 02:01:55 -0800 (PST)
+References: <20181211174253.10947-1-alex.bennee@linaro.org>
+	<81aec30a-c599-9521-9571-c32de4087db4@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <81aec30a-c599-9521-9571-c32de4087db4@redhat.com>
+Date: Wed, 12 Dec 2018 10:01:52 +0000
+Message-ID: <87pnu712sv.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 12 Dec 2018 02:01:43 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 0/8] Set minimum compiler versions to GCC
- 4.8 and Clang 3.4
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] contrib: add a basic gitdm config
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: thuth@redhat.com
-Cc: famz@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, maxim.kuvyrkov@linaro.org, =?utf-8?Q?C=C3=A9dri?= =?utf-8?Q?c?= Le Goater <clg@kaod.org>, Greg Kurz <groug@kaod.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTQ0NjA2MDMyLTE2OTI0LTEt
-Z2l0LXNlbmQtZW1haWwtdGh1dGhAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWls
-ZWQgdGhlIGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRl
-c3RpbmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2Vy
-IGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBU
-RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1p
-bmd3QGZlZG9yYSBTSE9XX0VOVj0xIEo9OAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKCgoKVGhl
-IGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTQ0NjA2
-MDMyLTE2OTI0LTEtZ2l0LXNlbmQtZW1haWwtdGh1dGhAcmVkaGF0LmNvbS90ZXN0aW5nLmRvY2tl
-ci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
-aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
-IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+
+Thomas Huth <thuth@redhat.com> writes:
+
+> On 2018-12-11 18:42, Alex Benn=C3=A9e wrote:
+>> This is a QEMU specific version of a gitdm config for generating
+>> reports on the contributor base of the project. I've added enough
+>> group maps and domain aliases to ensure the current top ten is as
+>> reflective as it can be. As of this commit running:
+>>
+>>   git log --numstat --since "Last Year" | gitdm -n -l 16
+>>
+>> Reports:
+>>
+>>   Top changeset contributors by employer
+>>   RedHat                    3116 (43.8%)
+>>   Linaro                    1166 (16.4%)
+>>   f4bug@amsat.org            384 (5.4%)
+>>   IBM                        170 (2.4%)
+>>   Virtuozzo                  168 (2.4%)
+>>   mark.cave-ayland@ilande.co.uk  161 (2.3%)
+>>   cota@braap.org             134 (1.9%)
+>>   Xilinx                     102 (1.4%)
+>>   clg@kaod.org               100 (1.4%)
+>>   Igalia                      93 (1.3%)
+>>   Cadence Design Systems      88 (1.2%)
+>>   groug@kaod.org              78 (1.1%)
+>
+> You might also want to add a group-map-ibm file for groug and
+> clg@kaod.org ?
+
+Yes I finally tracked that down via what I presume are their github ids.
+The domain itself has a rather enigmatic but sparse homepage ;-)
+
+>
+>  Thomas
+
+
+--
+Alex Benn=C3=A9e
