@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gX31I-0003bv-N7
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:49:43 -0500
+	(envelope-from <ppandit@redhat.com>) id 1gX31N-0003eP-UU
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:49:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gX31E-00044S-O3
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:49:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55156)
+	(envelope-from <ppandit@redhat.com>) id 1gX31M-0004BO-Lx
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:49:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36906)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gX31E-00040d-GZ
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:49:36 -0500
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gX31M-0004Ad-Ca
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:49:44 -0500
 From: P J P <ppandit@redhat.com>
-Date: Wed, 12 Dec 2018 17:17:21 +0530
-Message-Id: <20181212114726.24060-2-ppandit@redhat.com>
+Date: Wed, 12 Dec 2018 17:17:24 +0530
+Message-Id: <20181212114726.24060-5-ppandit@redhat.com>
 In-Reply-To: <20181212114726.24060-1-ppandit@redhat.com>
 References: <20181212114726.24060-1-ppandit@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v1 1/6] rdma: check num_sge does not exceed
- MAX_SGE
+Subject: [Qemu-devel] [PATCH v1 4/6] pvrdma: release ring object in case of
+ an error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,51 +31,106 @@ Cc: Qemu Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel.apfelbaum@
 
 From: Prasad J Pandit <pjp@fedoraproject.org>
 
-rdma back-end has scatter/gather array ibv_sge[MAX_SGE=3D4] set
-to have 4 elements. A guest could send a 'PvrdmaSqWqe' ring element
-with 'num_sge' set to > MAX_SGE, which may lead to OOB access issue.
-Add check to avoid it.
+create_cq and create_qp routines allocate ring object, but it's
+not released in case of an error, leading to memory leakage.
 
-Reported-by: Saar Amar <saaramar5@gmail.com>
+Reported-by: Li Qiang <liq3ea@163.com>
 Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 ---
- hw/rdma/rdma_backend.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ hw/rdma/vmw/pvrdma_cmd.c | 36 +++++++++++++++++++++++++-----------
+ 1 file changed, 25 insertions(+), 11 deletions(-)
 
-Update v1: use new error code VENDOR_ERR_INV_NUM_SGE
-  -> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg02220.html
+Update v1: define new function to free PvrdmaRing object
+  -> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg02328.html
 
-diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-index ae1e4dcb29..bd4710d16f 100644
---- a/hw/rdma/rdma_backend.c
-+++ b/hw/rdma/rdma_backend.c
-@@ -476,9 +476,9 @@ void rdma_backend_post_send(RdmaBackendDev *backend_d=
-ev,
+diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
+index e37fb18280..7e29607d2f 100644
+--- a/hw/rdma/vmw/pvrdma_cmd.c
++++ b/hw/rdma/vmw/pvrdma_cmd.c
+@@ -313,6 +313,14 @@ out:
+     return rc;
+ }
+=20
++static void destroy_cq_ring(PvrdmaRing *ring)
++{
++    pvrdma_ring_free(ring);
++    /* ring_state was in slot 1, not 0 so need to jump back */
++    rdma_pci_dma_unmap(ring->dev, --ring->ring_state, TARGET_PAGE_SIZE);
++    g_free(ring);
++}
++
+ static int create_cq(PVRDMADev *dev, union pvrdma_cmd_req *req,
+                      union pvrdma_cmd_resp *rsp)
+ {
+@@ -335,6 +343,9 @@ static int create_cq(PVRDMADev *dev, union pvrdma_cmd=
+_req *req,
+=20
+     rc =3D rdma_rm_alloc_cq(&dev->rdma_dev_res, &dev->backend_dev, cmd->=
+cqe,
+                           &resp->cq_handle, ring);
++    if (rc) {
++        destroy_cq_ring(ring);
++    }
+=20
+     return rc;
+ }
+@@ -355,10 +366,7 @@ static int destroy_cq(PVRDMADev *dev, union pvrdma_c=
+md_req *req,
      }
 =20
-     pr_dbg("num_sge=3D%d\n", num_sge);
--    if (!num_sge) {
--        pr_dbg("num_sge=3D0\n");
--        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NO_SGE, ctx);
-+    if (!num_sge || num_sge > MAX_SGE) {
-+        pr_dbg("invalid num_sge=3D%d\n", num_sge);
-+        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_INV_NUM_SGE, ctx);
-         return;
+     ring =3D (PvrdmaRing *)cq->opaque;
+-    pvrdma_ring_free(ring);
+-    /* ring_state was in slot 1, not 0 so need to jump back */
+-    rdma_pci_dma_unmap(PCI_DEVICE(dev), --ring->ring_state, TARGET_PAGE_=
+SIZE);
+-    g_free(ring);
++    destroy_cq_ring(ring);
+=20
+     rdma_rm_dealloc_cq(&dev->rdma_dev_res, cmd->cq_handle);
+=20
+@@ -456,6 +464,17 @@ out:
+     return rc;
+ }
+=20
++static void destroy_qp_rings(PvrdmaRing *ring)
++{
++    pr_dbg("sring=3D%p\n", &ring[0]);
++    pvrdma_ring_free(&ring[0]);
++    pr_dbg("rring=3D%p\n", &ring[1]);
++    pvrdma_ring_free(&ring[1]);
++
++    rdma_pci_dma_unmap(ring->dev, ring->ring_state, TARGET_PAGE_SIZE);
++    g_free(ring);
++}
++
+ static int create_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
+                      union pvrdma_cmd_resp *rsp)
+ {
+@@ -485,6 +504,7 @@ static int create_qp(PVRDMADev *dev, union pvrdma_cmd=
+_req *req,
+                           cmd->max_recv_sge, cmd->recv_cq_handle, rings,
+                           &resp->qpn);
+     if (rc) {
++        destroy_qp_rings(rings);
+         return rc;
      }
 =20
-@@ -603,9 +603,9 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_d=
-ev,
-     }
+@@ -557,13 +577,7 @@ static int destroy_qp(PVRDMADev *dev, union pvrdma_c=
+md_req *req,
+     rdma_rm_dealloc_qp(&dev->rdma_dev_res, cmd->qp_handle);
 =20
-     pr_dbg("num_sge=3D%d\n", num_sge);
--    if (!num_sge) {
--        pr_dbg("num_sge=3D0\n");
--        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NO_SGE, ctx);
-+    if (!num_sge || num_sge > MAX_SGE) {
-+        pr_dbg("invalid num_sge=3D%d\n", num_sge);
-+        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_INV_NUM_SGE, ctx);
-         return;
-     }
+     ring =3D (PvrdmaRing *)qp->opaque;
+-    pr_dbg("sring=3D%p\n", &ring[0]);
+-    pvrdma_ring_free(&ring[0]);
+-    pr_dbg("rring=3D%p\n", &ring[1]);
+-    pvrdma_ring_free(&ring[1]);
+-
+-    rdma_pci_dma_unmap(PCI_DEVICE(dev), ring->ring_state, TARGET_PAGE_SI=
+ZE);
+-    g_free(ring);
++    destroy_qp_rings(ring);
 =20
+     return 0;
+ }
 --=20
 2.19.2
