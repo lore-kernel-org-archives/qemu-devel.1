@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gX1En-00063q-BY
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:55:30 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gX1Ep-000661-Ap
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:55:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gX1Ei-00069W-S2
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:55:28 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gX1En-0006Uw-9j
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:55:31 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Wed, 12 Dec 2018 10:55:13 +0100
-Message-Id: <20181212095519.6390-1-cohuck@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/6] s390x: first batch of 4.0 changes
+Date: Wed, 12 Dec 2018 10:55:14 +0100
+Message-Id: <20181212095519.6390-2-cohuck@redhat.com>
+In-Reply-To: <20181212095519.6390-1-cohuck@redhat.com>
+References: <20181212095519.6390-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PULL 1/6] s390x/zpci: drop msix.available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,53 +20,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
-The following changes since commit bb9bf94b3e8926553290bc9a7cb84315af4220=
-86:
+From: David Hildenbrand <david@redhat.com>
 
-  Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-r=
-equest' into staging (2018-12-11 19:18:58 +0000)
+I fail to see why this is useful as we require MSIX always and
+completely fail adding a device.
 
-are available in the Git repository at:
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20181105110313.29312-2-david@redhat.com>
+Fixes: 4f6482bfe3da1e6b51ad4722a0c22f22f0d54a3b
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Collin Walling <walling@linux.ibm.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ hw/s390x/s390-pci-bus.c | 2 --
+ hw/s390x/s390-pci-bus.h | 1 -
+ 2 files changed, 3 deletions(-)
 
-  https://github.com/cohuck/qemu tags/s390x-20181212
-
-for you to fetch changes up to c9aacaadeb42076c01b07e59dd94dcf73f751e05:
-
-  hw/s390x/virtio-ccw.c: Don't take address of fields in packed structs (=
-2018-12-12 10:39:28 +0100)
-
-----------------------------------------------------------------
-s390x patches for 4.0:
-- add 4.0 machine type
-- various fixes and small changes
-
-----------------------------------------------------------------
-
-Christian Borntraeger (1):
-  s390/MAINTAINERS: Add Halil as kvm and machine maintainer
-
-Cornelia Huck (2):
-  s390x: introduce 4.0 compat machine
-  vfio-ap: flag as compatible with balloon
-
-David Hildenbrand (2):
-  s390x/zpci: drop msix.available
-  s390x/tod: Properly stop the KVM TOD while the guest is not running
-
-Peter Maydell (1):
-  hw/s390x/virtio-ccw.c: Don't take address of fields in packed structs
-
- MAINTAINERS                |   4 +-
- hw/s390x/s390-pci-bus.c    |   2 -
- hw/s390x/s390-pci-bus.h    |   1 -
- hw/s390x/s390-virtio-ccw.c |  17 ++++++-
- hw/s390x/tod-kvm.c         | 102 ++++++++++++++++++++++++++++++++++++-
- hw/s390x/virtio-ccw.c      |  42 +++++++--------
- hw/vfio/ap.c               |   8 +++
- include/hw/s390x/tod.h     |   8 ++-
- 8 files changed, 156 insertions(+), 28 deletions(-)
-
---=20
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index 060ff062bc..99d0368868 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -745,7 +745,6 @@ static int s390_pci_msix_init(S390PCIBusDevice *pbdev)
+ 
+     pos = pci_find_capability(pbdev->pdev, PCI_CAP_ID_MSIX);
+     if (!pos) {
+-        pbdev->msix.available = false;
+         return -1;
+     }
+ 
+@@ -761,7 +760,6 @@ static int s390_pci_msix_init(S390PCIBusDevice *pbdev)
+     pbdev->msix.pba_bar = pba & PCI_MSIX_FLAGS_BIRMASK;
+     pbdev->msix.pba_offset = pba & ~PCI_MSIX_FLAGS_BIRMASK;
+     pbdev->msix.entries = (ctrl & PCI_MSIX_FLAGS_QSIZE) + 1;
+-    pbdev->msix.available = true;
+ 
+     name = g_strdup_printf("msix-s390-%04x", pbdev->uid);
+     memory_region_init_io(&pbdev->msix_notify_mr, OBJECT(pbdev),
+diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
+index 1f7f9b5814..f47a0f2da5 100644
+--- a/hw/s390x/s390-pci-bus.h
++++ b/hw/s390x/s390-pci-bus.h
+@@ -252,7 +252,6 @@ typedef struct ChscSeiNt2Res {
+ } QEMU_PACKED ChscSeiNt2Res;
+ 
+ typedef struct S390MsixInfo {
+-    bool available;
+     uint8_t table_bar;
+     uint8_t pba_bar;
+     uint16_t entries;
+-- 
 2.17.2
