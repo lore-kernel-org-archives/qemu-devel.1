@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6MO-0000f7-FZ
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6MO-0000f6-FA
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6MK-0008WJ-OP
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6MH-0008TV-4P
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:38 -0500
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:55383)
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:42670)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gX6MI-0008S8-Nm
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:36 -0500
-Received: by mail-wm1-x329.google.com with SMTP id y139so6132455wmc.5
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:23:32 -0800 (PST)
+	id 1gX6MG-0008KO-Pb
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:32 -0500
+Received: by mail-wr1-x436.google.com with SMTP id q18so18081052wrx.9
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:23:23 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
+	u10sm15878859wrr.33.2018.12.12.07.23.21 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 12 Dec 2018 07:23:21 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 12 Dec 2018 16:22:32 +0100
-Message-Id: <1544628195-37728-12-git-send-email-pbonzini@redhat.com>
+Date: Wed, 12 Dec 2018 16:22:25 +0100
+Message-Id: <1544628195-37728-5-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
 References: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 11/54] hax: Support for Linux hosts
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 04/54] checkpatch: check Signed-off-by in
+ --mailback mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +36,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alexandro Sanchez Bach <asanchez@kryptoslogic.com>
 
-From: Alexandro Sanchez Bach <asanchez@kryptoslogic.com>
+Pull the test before the anticipated exits from the process sub.
 
-Intel HAXM supports now 32-bit and 64-bit Linux hosts. This patch includes
-the corresponding userland changes.
-
-Since the Darwin userland backend is POSIX-compliant, the hax-darwin.{c,h}
-files have been renamed to hax-posix.{c,h}. This prefix is consistent with
-the naming used in the rest of QEMU.
-
-Signed-off-by: Alexandro Sanchez Bach <asanchez@kryptoslogic.com>
-Message-Id: <20181115013331.65820-1-asanchez@kryptoslogic.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/Makefile.objs                 | 6 +++---
- target/i386/hax-i386.h                    | 6 +++---
- target/i386/{hax-darwin.c => hax-posix.c} | 0
- target/i386/{hax-darwin.h => hax-posix.h} | 0
- 4 files changed, 6 insertions(+), 6 deletions(-)
- rename target/i386/{hax-darwin.c => hax-posix.c} (100%)
- rename target/i386/{hax-darwin.h => hax-posix.h} (100%)
+ scripts/checkpatch.pl | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/target/i386/Makefile.objs b/target/i386/Makefile.objs
-index 32bf966..cb9c265 100644
---- a/target/i386/Makefile.objs
-+++ b/target/i386/Makefile.objs
-@@ -12,10 +12,10 @@ obj-$(call lnot,$(CONFIG_HYPERV)) += hyperv-stub.o
- ifeq ($(CONFIG_WIN32),y)
- obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-windows.o
- endif
--ifeq ($(CONFIG_DARWIN),y)
--obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-darwin.o
--obj-$(CONFIG_HVF) += hvf/
-+ifeq ($(CONFIG_POSIX),y)
-+obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-posix.o
- endif
-+obj-$(CONFIG_HVF) += hvf/
- obj-$(CONFIG_WHPX) += whpx-all.o
- endif
- obj-$(CONFIG_SEV) += sev.o
-diff --git a/target/i386/hax-i386.h b/target/i386/hax-i386.h
-index 6abc156..f13fa46 100644
---- a/target/i386/hax-i386.h
-+++ b/target/i386/hax-i386.h
-@@ -16,7 +16,7 @@
- #include "cpu.h"
- #include "sysemu/hax.h"
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index b9974f0..506aa6c 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -2817,6 +2817,10 @@ sub process {
+ 		}
+ 	}
  
--#ifdef CONFIG_DARWIN
-+#ifdef CONFIG_POSIX
- typedef int hax_fd;
- #endif
++	if ($is_patch && $chk_signoff && $signoff == 0) {
++		ERROR("Missing Signed-off-by: line(s)\n");
++	}
++
+ 	# If we have no input at all, then there is nothing to report on
+ 	# so just keep quiet.
+ 	if ($#rawlines == -1) {
+@@ -2838,9 +2842,6 @@ sub process {
+ 	if (!$is_patch) {
+ 		ERROR("Does not appear to be a unified-diff format patch\n");
+ 	}
+-	if ($is_patch && $chk_signoff && $signoff == 0) {
+-		ERROR("Missing Signed-off-by: line(s)\n");
+-	}
  
-@@ -82,8 +82,8 @@ hax_fd hax_mod_open(void);
- void hax_memory_init(void);
- 
- 
--#ifdef CONFIG_DARWIN
--#include "target/i386/hax-darwin.h"
-+#ifdef CONFIG_POSIX
-+#include "target/i386/hax-posix.h"
- #endif
- 
- #ifdef CONFIG_WIN32
-diff --git a/target/i386/hax-darwin.c b/target/i386/hax-posix.c
-similarity index 100%
-rename from target/i386/hax-darwin.c
-rename to target/i386/hax-posix.c
-diff --git a/target/i386/hax-darwin.h b/target/i386/hax-posix.h
-similarity index 100%
-rename from target/i386/hax-darwin.h
-rename to target/i386/hax-posix.h
+ 	print report_dump();
+ 	if ($summary && !($clean == 1 && $quiet == 1)) {
 -- 
 1.8.3.1
