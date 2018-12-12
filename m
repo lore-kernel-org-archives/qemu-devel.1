@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gX7Jm-0007qv-UH
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 11:25:04 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gX7ki-0006Xp-66
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 11:52:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gX7Jh-0002Hr-DH
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 11:25:02 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:37709)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gX7Jf-0002Gb-PT
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 11:24:56 -0500
-Received: by mail-wr1-f67.google.com with SMTP id j10so18303457wru.4
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 08:24:55 -0800 (PST)
-References: <20180910083222.8245-1-marcandre.lureau@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <75f0819a-78dd-9ee2-5559-4d975412ffa3@redhat.com>
-Date: Wed, 12 Dec 2018 17:24:52 +0100
+	(envelope-from <yuval.shaia@oracle.com>) id 1gX7ke-0007UB-VM
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 11:52:51 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:58980)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1gX7ke-0007Oe-K6
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 11:52:48 -0500
+Date: Wed, 12 Dec 2018 18:52:30 +0200
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20181212165229.GA5747@lap1>
+References: <20181211132642.3027-1-ppandit@redhat.com>
+	<20181211132642.3027-5-ppandit@redhat.com>
+	<20181211164742.GA2923@lap1> <20181211172244.GD2923@lap1>
+	<nycvar.YSQ.7.76.1812120137210.7578@xnncv>
+	<nycvar.YSQ.7.76.1812121253200.10904@xnncv>
 MIME-Version: 1.0
-In-Reply-To: <20180910083222.8245-1-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v12 0/6] Add support for TPM Physical
- Presence interface
+Content-Disposition: inline
+In-Reply-To: <nycvar.YSQ.7.76.1812121253200.10904@xnncv>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/5] pvrdma: release ring object in case of
+ an error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +33,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, stefanb@linux.vnet.ibm.com, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>, Laszlo Ersek <lersek@redhat.com>
+To: P J P <ppandit@redhat.com>, marcel.apfelbaum@gmail.com
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Saar Amar <saaramar5@gmail.com>, Li Qiang <liq3ea@163.com>, yuval.shaia@oracle.com
 
-Hi Marc-André,
+On Wed, Dec 12, 2018 at 03:09:19PM +0530, P J P wrote:
+> +-- On Wed, 12 Dec 2018, P J P wrote --+
+> | | Also, can you rebase this patch on top of the patchset i posted las=
+t week:
+> | | https://patchwork.kernel.org/patch/10705439/
+> |=20
+> | Okay, I'll send revised patch set. Thanks so much for the prompt revi=
+ew.
+>=20
+> I tried to git apply above patch-set over v3.1.0-rc2, v3.1.0-rc0, v3.0.=
+0. But=20
+> it does not seem to apply cleanly.
+>=20
+> =3D=3D=3D
+> $ git branch rdma v3.1.0-rc0
+> $ git checkout rdma=20
+> Switched to branch 'rdma'
+> $ git apply --check /tmp/add-support-for-RDMA-MAD.patch
+> error: patch failed: Makefile.objs:1
+> error: Makefile.objs: patch does not apply
+> error: patch failed: hw/rdma/vmw/pvrdma_cmd.c:224
+> error: hw/rdma/vmw/pvrdma_cmd.c: patch does not apply
+> =3D=3D=3D
+>=20
+> I skipped one of the makefile.objs/.json patch, applied others and then=
+=20
+> hand-fixed one of the patch pvrdma_cmd.c.
+>=20
+> After that when I try to build QEMU, it fails with
+>=20
+> =3D=3D=3D
+>  $ ./configure --prefix=3D/tmp/ --enable-debug
+>       --target-list=3D'x86_64-softmmu x86_64-linux-user'
+>       --enable-rdma --with-sdlabi=3D2.0
+>  $ make
+> ../qemu/hw/rdma/rdma_backend.c:1132:5: error: implicit declaration of f=
+unction=20
+> =E2=80=98qapi_event_send_rdma_gid_status_changed=E2=80=99 [-Werror=3Dim=
+plicit-function-declaration]  qapi_event_send_rdma_gid_status_changed(ifn=
+ame, true,
+> ...
+> ../qemu/hw/rdma/rdma_backend.c:22:10: fatal error: qapi/qapi-events-rdm=
+a.h: No=20
+> such file or directory
+>  #include "qapi/qapi-events-rdma.h"
+>           ^~~~~~~~~~~~~~~~~~~~~~~~~
+> compilation terminated.
+> =3D=3D=3D
+>=20
+> Not sure if other patches are required. Any idea?
 
-On 9/10/18 10:32 AM, Marc-André Lureau wrote:
-> Hi,
-> 
-> The following patches implement the TPM Physical Presence Interface
-> that allows a user to set a command via ACPI (sysfs entry in Linux)
-> that, upon the next reboot, the firmware looks for and acts upon by
-> sending sequences of commands to the TPM.
-> 
-> A dedicated memory region is added to the TPM CRB & TIS devices, at
-> address/size 0xFED45000/0x400. A new "etc/tpm/config" fw_cfg entry
-> holds the location for that PPI region and some version details, to
-> allow for future flexibility.
-> 
-> With the associated edk2/ovmf firmware, the Windows HLK "PPI 1.3" test
-> now runs successfully.
-> 
-> It is based on previous work from Stefan Berger ("[PATCH v2 0/4]
-> Implement Physical Presence interface for TPM 1.2 and 2")
-> 
-> The edk2 support is merged upstream.
+Ok, you rebased your patches on latest upstream, lets deal with merge
+conflicts later.
 
-I made trivial review comments in indivial patches.
-Can you respin a rebased version for further testing?
+Marcel, any idea?
+Can Prasad take from your tree?
 
 Thanks,
 
-Phil.
+>=20
+> Thank you.
+> --
+> Prasad J Pandit / Red Hat Product Security Team
+> 47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
