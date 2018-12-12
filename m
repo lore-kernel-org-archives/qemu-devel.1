@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=8779827ad=Alistair.Francis@wdc.com>)
-	id 1gXASo-00033J-LH
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:46:38 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gXAYm-00081c-4N
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:52:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=8779827ad=Alistair.Francis@wdc.com>)
-	id 1gXASk-0003ZF-HZ
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:46:34 -0500
-From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Wed, 12 Dec 2018 19:46:25 +0000
-Message-ID: <d816afe4d7dfbade1743c440f4f277fe1c17662a.1544643238.git.alistair.francis@wdc.com>
-References: <cover.1544643238.git.alistair.francis@wdc.com>
-In-Reply-To: <cover.1544643238.git.alistair.francis@wdc.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <ehabkost@redhat.com>) id 1gXAYh-000814-88
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:52:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48372)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gXAYg-0007zq-JW
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:52:38 -0500
+Date: Wed, 12 Dec 2018 17:52:35 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181212195235.GX7141@habkost.net>
+References: <20181210183730.GJ4669@habkost.net> <20181210184153.GB5482@zn.tnic>
+	<20181210190600.GK4669@habkost.net> <20181210194258.GD5482@zn.tnic>
+	<20181210200843.GN4669@habkost.net>
+	<20181211103839.GC921@redhat.com>
+	<20181211115546.GQ4669@habkost.net>
+	<e4d9a943-2de2-34a7-3f52-ee3d64ea889a@redhat.com>
+	<20181211153017.GN921@redhat.com> <20181211161440.GG27375@zn.tnic>
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v1 23/23] configure: Add support for building
- RISC-V host
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181211161440.GG27375@zn.tnic>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] target-i386: Reenable RDTSCP support on
+ Opteron_G[345] CPU models
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,60 +34,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>
+To: Borislav Petkov <bp@alien8.de>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?iso-8859-1?Q?J=F6rg_R=F6del?= <joro@8bytes.org>, Andre Przywara <andre.przywara@arm.com>, kvm ML <kvm@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Michael Clark <mjc@sifive.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- configure | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+On Tue, Dec 11, 2018 at 05:14:40PM +0100, Borislav Petkov wrote:
+> + qemu-devel.
+>=20
+> On Tue, Dec 11, 2018 at 03:30:17PM +0000, Daniel P. Berrang=E9 wrote:
+> > Great, then, this is a non-issue - we just need to mention that fact
+> > in the commit that sets the min version for the kernel
+>=20
+> Ok, here's a first draft ontop of Eduardo's machine-next branch from
+> http://github.com/ehabkost/qemu
+>=20
+> Also, thanks for the help Eduardo! :-)
+>=20
+> ---
+> From: Borislav Petkov <bp@suse.de>
+> Date: Tue, 11 Dec 2018 17:01:00 +0100
+>=20
+> The missing functionality was added ~3 years ago with the Linux commit
+>=20
+>   46896c73c1a4 ("KVM: svm: add support for RDTSCP")
+>=20
+> so reenable RDTSCP support on those CPU models.
+>=20
+> Opteron_G2 - being family 15, model 6, doesn't have RDTSCP support
+> (the real hardware doesn't have it. K8 got RDTSCP support with the NPT
+> models, i.e., models >=3D 0x40).
+>=20
+> Document the host's minimum required kernel version, while at it.
+>=20
+> Signed-off-by: Borislav Petkov <bp@suse.de>
+> ---
+>  include/hw/i386/pc.h | 17 +++++++++++++----
+>  qemu-doc.texi        | 13 +++++++++++++
+>  target/i386/cpu.c    | 11 ++++-------
+>  3 files changed, 30 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 9d29c4b1df2a..ebc28e816b04 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -296,6 +296,19 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uin=
+t64_t *);
+> =20
+>  #define PC_COMPAT_3_1 \
+>      HW_COMPAT_3_1 \
+> +    {\
+> +        .driver   =3D "Opteron_G3" "-" TYPE_X86_CPU,\
+> +        .property =3D "rdtscp",\
+> +        .value    =3D "off",\
+> +    },{\
+> +        .driver   =3D "Opteron_G4" "-" TYPE_X86_CPU,\
+> +        .property =3D "rdtscp",\
+> +        .value    =3D "off",\
+> +    },{\
+> +        .driver   =3D "Opteron_G5" "-" TYPE_X86_CPU,\
+> +        .property =3D "rdtscp",\
+> +        .value    =3D "off",\
+> +    },
 
-diff --git a/configure b/configure
-index 0a3c6a72c3..2e13ee918d 100755
---- a/configure
-+++ b/configure
-@@ -709,6 +709,12 @@ elif check_define __s390__ ; then
-   else
-     cpu=3D"s390"
-   fi
-+elif check_define __riscv ; then
-+  if check_define _LP64 ; then
-+    cpu=3D"riscv64"
-+  else
-+    cpu=3D"riscv32"
-+  fi
- elif check_define __arm__ ; then
-   cpu=3D"arm"
- elif check_define __aarch64__ ; then
-@@ -721,7 +727,7 @@ ARCH=3D
- # Normalise host CPU name and set ARCH.
- # Note that this case should only have supported host CPUs, not guests.
- case "$cpu" in
--  ppc|ppc64|s390|s390x|sparc64|x32)
-+  ppc|ppc64|s390|s390x|sparc64|x32|riscv32|riscv64)
-     cpu=3D"$cpu"
-     supported_cpu=3D"yes"
-     eval "cross_cc_${cpu}=3D\$host_cc"
-@@ -6900,6 +6906,8 @@ elif test "$ARCH" =3D "x86_64" -o "$ARCH" =3D "x32" ;=
- then
-   QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/i386 $QEMU_INCLUDES"
- elif test "$ARCH" =3D "ppc64" ; then
-   QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/ppc $QEMU_INCLUDES"
-+elif test "$ARCH" =3D "riscv32" -o "$ARCH" =3D "riscv64" ; then
-+  QEMU_INCLUDES=3D"-I\$(SRC_PATH)/tcg/riscv $QEMU_INCLUDES"
- else
-   QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/\$(ARCH) $QEMU_INCLUDES"
- fi
-@@ -7397,7 +7405,7 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
-   ppc*)
-     disas_config "PPC"
-   ;;
--  riscv)
-+  riscv*)
-     disas_config "RISCV"
-   ;;
-   s390*)
+This looks correct.
+
+> =20
+>  #define PC_COMPAT_3_0 \
+>      HW_COMPAT_3_0 \
+> @@ -527,10 +540,6 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uin=
+t64_t *);
+>          .driver   =3D "qemu32" "-" TYPE_X86_CPU,\
+>          .property =3D "popcnt",\
+>          .value    =3D "on",\
+> -    },{\
+> -        .driver   =3D "Opteron_G2" "-" TYPE_X86_CPU,\
+> -        .property =3D "rdtscp",\
+> -        .value    =3D "on",\
+
+Why did you remove this entry from PC_COMPAT_2_4?
+
+We must keep compatibility with old behavior of Opteron_G2 on
+pc-2.4, even if the old behavior was incorrect.
+
+
+>      },{\
+>          .driver   =3D "Opteron_G3" "-" TYPE_X86_CPU,\
+>          .property =3D "rdtscp",\
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index f7ad1dfe4b69..16b955cbf985 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -37,6 +37,7 @@
+>  * QEMU System emulator for non PC targets::
+>  * QEMU Guest Agent::
+>  * QEMU User space emulator::
+> +* System requirements::
+>  * Implementation notes::
+>  * Deprecated features::
+>  * Supported build platforms::
+> @@ -2813,6 +2814,18 @@ Act as if the host page size was 'pagesize' byte=
+s
+>  Run the emulation in single step mode.
+>  @end table
+> =20
+> +@node System requirements
+> +@chapter System requirements
+> +
+> +@section KVM kernel module
+> +
+> +On x86_64 hosts, the default set of CPU features enabled by the KVM ac=
+celerator
+> +require the host to be running Linux v4.5 or newer.
+> +
+> +The OpteronG[345] CPU models require KVM support for RDTSCP, which was
+> +added with Linux 4.5 which is supported by the major distros. And even
+> +if RHEL7 has kernel 3.10, KVM there has the required functionality the=
+re
+> +to make it close to a 4.5 or newer kernel.
+> =20
+>  @include qemu-tech.texi
+> =20
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index f81d35e1f914..a7def11b27cd 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -2706,7 +2706,6 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+>              CPUID_DE | CPUID_FP87,
+>          .features[FEAT_1_ECX] =3D
+>              CPUID_EXT_CX16 | CPUID_EXT_SSE3,
+> -        /* Missing: CPUID_EXT2_RDTSCP */
+
+This is Opteron_G2, and feature is not being added.  Looks
+correct.
+
+>          .features[FEAT_8000_0001_EDX] =3D
+>              CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
+>          .features[FEAT_8000_0001_ECX] =3D
+> @@ -2730,9 +2729,9 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+>          .features[FEAT_1_ECX] =3D
+>              CPUID_EXT_POPCNT | CPUID_EXT_CX16 | CPUID_EXT_MONITOR |
+>              CPUID_EXT_SSE3,
+> -        /* Missing: CPUID_EXT2_RDTSCP */
+>          .features[FEAT_8000_0001_EDX] =3D
+> -            CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
+> +            CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL |
+> +            CPUID_EXT2_RDTSCP,
+
+This is Opteron_G3.  Looks correct.
+
+>          .features[FEAT_8000_0001_ECX] =3D
+>              CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A |
+>              CPUID_EXT3_ABM | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
+> @@ -2757,10 +2756,9 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+>              CPUID_EXT_POPCNT | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
+>              CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
+>              CPUID_EXT_SSE3,
+> -        /* Missing: CPUID_EXT2_RDTSCP */
+>          .features[FEAT_8000_0001_EDX] =3D
+>              CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_NX |
+> -            CPUID_EXT2_SYSCALL,
+> +            CPUID_EXT2_SYSCALL | CPUID_EXT2_RDTSCP,
+
+This is Opteron_G4.  Looks correct.
+
+
+>          .features[FEAT_8000_0001_ECX] =3D
+>              CPUID_EXT3_FMA4 | CPUID_EXT3_XOP |
+>              CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_MISALIGNSSE |
+> @@ -2788,10 +2786,9 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+>              CPUID_EXT_AES | CPUID_EXT_POPCNT | CPUID_EXT_SSE42 |
+>              CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_FMA |
+>              CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
+> -        /* Missing: CPUID_EXT2_RDTSCP */
+>          .features[FEAT_8000_0001_EDX] =3D
+>              CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_NX |
+> -            CPUID_EXT2_SYSCALL,
+> +            CPUID_EXT2_SYSCALL | CPUID_EXT2_RDTSCP,
+
+This is Opteron_G5.  Looks correct.
+
+>          .features[FEAT_8000_0001_ECX] =3D
+>              CPUID_EXT3_TBM | CPUID_EXT3_FMA4 | CPUID_EXT3_XOP |
+>              CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_MISALIGNSSE |
+> --=20
+> 2.19.1
+>=20
+> --=20
+> Regards/Gruss,
+>     Boris.
+>=20
+> Good mailing practices for 400: avoid top-posting and trim the reply.
+
 --=20
-2.19.1
+Eduardo
