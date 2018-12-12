@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gX31I-0003bt-MX
+	(envelope-from <ppandit@redhat.com>) id 1gX31I-0003bv-N7
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:49:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gX31E-000448-Jg
+	(envelope-from <ppandit@redhat.com>) id 1gX31E-00044S-O3
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:49:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54664)
+Received: from mx1.redhat.com ([209.132.183.28]:55156)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gX31D-0003yP-6d
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gX31E-00040d-GZ
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:49:36 -0500
 From: P J P <ppandit@redhat.com>
-Date: Wed, 12 Dec 2018 17:17:20 +0530
-Message-Id: <20181212114726.24060-1-ppandit@redhat.com>
+Date: Wed, 12 Dec 2018 17:17:21 +0530
+Message-Id: <20181212114726.24060-2-ppandit@redhat.com>
+In-Reply-To: <20181212114726.24060-1-ppandit@redhat.com>
+References: <20181212114726.24060-1-ppandit@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v1 0/6] rdma: various issues in rdma/pvrdma
- backend
+Subject: [Qemu-devel] [PATCH v1 1/6] rdma: check num_sge does not exceed
+ MAX_SGE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +31,51 @@ Cc: Qemu Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel.apfelbaum@
 
 From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Hello,
+rdma back-end has scatter/gather array ibv_sge[MAX_SGE=3D4] set
+to have 4 elements. A guest could send a 'PvrdmaSqWqe' ring element
+with 'num_sge' set to > MAX_SGE, which may lead to OOB access issue.
+Add check to avoid it.
 
-This is a revised version v1 of the earlier patch set to fix issues
-in the rdma/pvrdma backend.
+Reported-by: Saar Amar <saaramar5@gmail.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ hw/rdma/rdma_backend.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-Update to include review comments
-  -> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg02196.html
+Update v1: use new error code VENDOR_ERR_INV_NUM_SGE
+  -> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg02220.html
 
-Please note, this patch is created after merging another patch-set from
-
-  -> https://patchwork.kernel.org/patch/10705439/
-  -> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg02344.html
-
-And local update to create qapi/qapi-events-rdma.h, to fix compiler error=
-s.
-
-Thank you.
---
-Prasad J Pandit (6):
-  rdma: check num_sge does not exceed MAX_SGE
-  pvrdma: add uar_read routine
-  pvrdma: check number of pages when creating rings
-  pvrdma: release ring object in case of an error
-  pvrdma: check return value from pvrdma_idx_ring_has_ routines
-  rdma: remove unused VENDOR_ERR_NO_SGE macro
-
- hw/rdma/rdma_backend.c        | 15 ++++++-----
- hw/rdma/vmw/pvrdma_cmd.c      | 47 +++++++++++++++++++++++++++--------
- hw/rdma/vmw/pvrdma_dev_ring.c | 37 ++++++++++++++-------------
- hw/rdma/vmw/pvrdma_main.c     |  6 +++++
- 4 files changed, 67 insertions(+), 38 deletions(-)
-
+diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+index ae1e4dcb29..bd4710d16f 100644
+--- a/hw/rdma/rdma_backend.c
++++ b/hw/rdma/rdma_backend.c
+@@ -476,9 +476,9 @@ void rdma_backend_post_send(RdmaBackendDev *backend_d=
+ev,
+     }
+=20
+     pr_dbg("num_sge=3D%d\n", num_sge);
+-    if (!num_sge) {
+-        pr_dbg("num_sge=3D0\n");
+-        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NO_SGE, ctx);
++    if (!num_sge || num_sge > MAX_SGE) {
++        pr_dbg("invalid num_sge=3D%d\n", num_sge);
++        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_INV_NUM_SGE, ctx);
+         return;
+     }
+=20
+@@ -603,9 +603,9 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_d=
+ev,
+     }
+=20
+     pr_dbg("num_sge=3D%d\n", num_sge);
+-    if (!num_sge) {
+-        pr_dbg("num_sge=3D0\n");
+-        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NO_SGE, ctx);
++    if (!num_sge || num_sge > MAX_SGE) {
++        pr_dbg("invalid num_sge=3D%d\n", num_sge);
++        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_INV_NUM_SGE, ctx);
+         return;
+     }
+=20
 --=20
 2.19.2
