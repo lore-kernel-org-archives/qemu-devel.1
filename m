@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gX3xP-00081R-38
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 07:49:44 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gX3zh-0000Yb-QA
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 07:52:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gX3xM-00008r-PR
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 07:49:43 -0500
-References: <20180817122219.16206-1-vsementsov@virtuozzo.com>
-	<20180817122219.16206-8-vsementsov@virtuozzo.com>
-	<873684d4-5219-fa89-f393-2cea8b291dc6@virtuozzo.com>
-	<0a9f5768-1fb1-8ce3-4ace-e02589e261c0@virtuozzo.com>
-	<ceab5ff6-85c5-c938-3cf7-abafcd08dc35@virtuozzo.com>
-	<978aa0de-fee6-98d5-dd0d-8814e3c455de@redhat.com>
-	<24a32495-08b7-5bb4-0489-b5eeaaceaec3@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <b5022a5f-2ebd-4c2d-c5fa-1cf5514db653@redhat.com>
-Date: Wed, 12 Dec 2018 13:49:30 +0100
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gX3zg-0001mc-9J
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 07:52:05 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55831)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gX3zf-0001lR-WA
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 07:52:04 -0500
+Received: by mail-wm1-x343.google.com with SMTP id y139so5610216wmc.5
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 04:52:03 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <24a32495-08b7-5bb4-0489-b5eeaaceaec3@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="jcJQRY9lJ2pldBxJnSggP9aejnqS3iKSu"
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] block/qcow2-refcount: fix
- out-of-file L2 entries to be read-as-zero
+References: <20181211180129.7661-1-ehabkost@redhat.com>
+	<20181211180129.7661-14-ehabkost@redhat.com>
+In-Reply-To: <20181211180129.7661-14-ehabkost@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 12 Dec 2018 16:51:49 +0400
+Message-ID: <CAJ+F1CKq3wk_DMLtxFG316ZUuGELgytHVBuUYqGim7T=JjtZcA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 13/24] q35/440fx/arm/spapr: Add QEMU 4.0
+ machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,261 +31,239 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, alex.williamson@redhat.com, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---jcJQRY9lJ2pldBxJnSggP9aejnqS3iKSu
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
-Message-ID: <b5022a5f-2ebd-4c2d-c5fa-1cf5514db653@redhat.com>
-Subject: Re: [PATCH v2 7/7] block/qcow2-refcount: fix out-of-file L2 entries
- to be read-as-zero
-References: <20180817122219.16206-1-vsementsov@virtuozzo.com>
- <20180817122219.16206-8-vsementsov@virtuozzo.com>
- <873684d4-5219-fa89-f393-2cea8b291dc6@virtuozzo.com>
- <0a9f5768-1fb1-8ce3-4ace-e02589e261c0@virtuozzo.com>
- <ceab5ff6-85c5-c938-3cf7-abafcd08dc35@virtuozzo.com>
- <978aa0de-fee6-98d5-dd0d-8814e3c455de@redhat.com>
- <24a32495-08b7-5bb4-0489-b5eeaaceaec3@virtuozzo.com>
-In-Reply-To: <24a32495-08b7-5bb4-0489-b5eeaaceaec3@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi
 
-On 12.12.18 09:36, Vladimir Sementsov-Ogievskiy wrote:
-> 13.10.2018 15:58, Max Reitz wrote:
->> On 10.10.18 18:59, Vladimir Sementsov-Ogievskiy wrote:
->>> 10.10.2018 19:55, Vladimir Sementsov-Ogievskiy wrote:
->>>> 10.10.2018 19:39, Vladimir Sementsov-Ogievskiy wrote:
->>>>> 17.08.2018 15:22, Vladimir Sementsov-Ogievskiy wrote:
->>>>>> Rewrite corrupted L2 table entry, which reference space out of
->>>>>> underlying file.
->>>>>>
->>>>>> Make this L2 table entry read-as-all-zeros without any allocation.=
+On Tue, Dec 11, 2018 at 10:22 PM Eduardo Habkost <ehabkost@redhat.com> wrot=
+e:
+>
+> From: Alex Williamson <alex.williamson@redhat.com>
+>
+> Including all machine types that might have a pcie-root-port.
+>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Acked-by: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> Message-Id: <154394083644.28192.8501647946108201466.stgit@gimli.home>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> [ehabkost: fixed accidental recursion at spapr_machine_3_1_class_options(=
+)]
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
->>>>>>
->>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.=
-com>
->>>>>> ---
->>>>>>  =C2=A0 block/qcow2-refcount.c | 32 ++++++++++++++++++++++++++++++=
-++
->>>>>>  =C2=A0 1 file changed, 32 insertions(+)
->>>>>>
->>>>>> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
->>>>>> index 3c004e5bfe..3de3768a3c 100644
->>>>>> --- a/block/qcow2-refcount.c
->>>>>> +++ b/block/qcow2-refcount.c
->>>>>> @@ -1720,8 +1720,30 @@ static int
->>>>>> check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
->>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 /* Mark cluster as used */
->>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 csize =3D (((l2_entry >> s->csize_shift) &
->>>>>> s->csize_mask) + 1) *
->>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BDRV_SECTOR_=
-SIZE;
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- if (csize > s->cluster_size) {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D fix_l2_entry_to_zero(
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-bs, res, fix, l2_offset, i, active,
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-"compressed cluster larger than cluster:
->>>>>> size 0x%"
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-PRIx64, csize);
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto fail;
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 continue;
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- }
->>>>>> +
->>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 coffset =3D l2_entry & s->cluster_offset_mask &
->>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-~(BDRV_SECTOR_SIZE - 1);
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- if (coffset >=3D bdrv_getlength(bs->file->bs)) {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D fix_l2_entry_to_zero(
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-bs, res, fix, l2_offset, i, active,
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-"compressed cluster out of file: offset
->>>>>> 0x%" PRIx64,
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-coffset);
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto fail;
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 continue;
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- }
->>>>>> +
->>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 ret =3D qcow2_inc_refcounts_imrt(bs, res,
->>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 refcount_table,
->>>>>> refcount_table_size,
->>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 coffset, csize);
->>>>>> @@ -1748,6 +1770,16 @@ static int
->>>>>> check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
->>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 {
->>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 uint64_t offset =3D l2_entry & L2E_OFFSET_MASK;
->>>>>>  =C2=A0 +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 if (offset >=3D bdrv_getlength(bs->file->bs)) {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D fix_l2_entry_to_zero(
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-bs, res, fix, l2_offset, i, active,
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-"cluster out of file: offset 0x%" PRIx64,
->>>>>> offset);
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto fail;
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 continue;
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- }
->>>>>> +
->>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 if (flags & CHECK_FRAG_INFO) {
->>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 res->bfi.allocated_clusters++;
->>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (next_contiguous_offset &&
->>>>>
->>>>> hmm, interesting question here: in case of misaligned l2 entry, we
->>>>> zero it out only for QCOW2_CLUSTER_ZERO_ALLOC, but not for normal
->>>>> clusters? Why? I think it is ok to mark as zero misaligned normal
->>>>> cluster l2 entry, otherwise we'll have fatal corruption on any
->>>>> operation to this cluster.
->>
->> Because for zero clusters the solution is clear.  We just throw away t=
-he
->> obviously wrong preallocation information, but the cluster data stays
->> the same (zero).  So there is no data loss.
->>
->> For normal clusters, you definitely destroy the data by zeroing them o=
-ut.
->>
->>>> or we can just align them down.
->>
->> Which would destroy the data as well.
->>
->> You can argue that if the value is misaligned, it is extremely likely =
-to
->> be just garbage as a whole, though.  But in any case, it is not obviou=
-s
->> what to do and always means data loss (which is different from zero
->> clusters, where you can just keep them zero).
->>
->> The clearest and most obvious solution would be to allocate a new
->> cluster and copy the unaligned data there.  Maybe that doesn't make
->> sense because the data is probably garbage anyway, but it definitely
->> won't harm.
->=20
->=20
-> but what to copy? I think, it is mostly impossible that there is a misa=
-ligned
-> data cluster. More probable is just partly wrong l2 entry.
+Why was ccw dropped? (can't find the discussion)
+thanks
 
-What do you mean by "partly"?  I think having eight bytes "partly" wrong
-is not very probable either.
-
-I do agree that it's more likely that the L2 information is just garbage
-than that the cluster base really is misaligned.  But I think it would
-be garbage as a whole.
-
-> So, in your way we will lose this data (as we lose l2 entry, our last h=
-ope).
-
-So you think we should set the zero bit and leave the rest of the
-cluster as it is?  But the resulting image would not be correct (because
-the preallocation offset is wrong), so I don't see that as a good way of
-repairing.
-
-On one hand I think we want some repair option to explicitly acknowledge
-data loss.  Like invalid bitmaps being removed or invalid L2 entries
-being set to some value that is valid.
-
-On the other, I would imagine that one usually runs qemu-img check
-without -r on a broken image first to see what's up; at least if they
-intent to have a deep look into it at all.  I think people should be
-aware that -r all may destroy these kinds of leads.
-
-But in any case, since I think the chances of the L2 entry only being
-partly wrong are very small, I think it doesn't bring much to keep that
-data around anyway.  I only find it useful in finding out why the
-corruption occurred in the first place (by seeing what kind of data it
-was overwritten with).
-
-> Finally, what to do with
-> misaligned cluster on check? We definitely should do something, as tryi=
-ng to
-> access such cluster corrupts qcow2 in qemu.
-
-Well, I gave a description of what I think should be done; which is to
-allocate a new cluster, copy the unaligned data there, and then make the
-entry point to that new cluster.
-
-> What about an additional flag like "-align-misaligned-clusters-down"?
-
-It would probably make more sense to add flags to the qemu-img check
-infrastructure than adding a new -r mode, yes.
-
-Max
+> ---
+>  include/hw/compat.h  |  3 +++
+>  include/hw/i386/pc.h |  3 +++
+>  hw/arm/virt.c        | 19 +++++++++++++++++--
+>  hw/i386/pc_piix.c    | 15 ++++++++++++---
+>  hw/i386/pc_q35.c     | 13 +++++++++++--
+>  hw/ppc/spapr.c       | 25 ++++++++++++++++++++++---
+>  6 files changed, 68 insertions(+), 10 deletions(-)
+>
+> diff --git a/include/hw/compat.h b/include/hw/compat.h
+> index 6f4d5fc647..70958328fe 100644
+> --- a/include/hw/compat.h
+> +++ b/include/hw/compat.h
+> @@ -1,6 +1,9 @@
+>  #ifndef HW_COMPAT_H
+>  #define HW_COMPAT_H
+>
+> +#define HW_COMPAT_3_1 \
+> +    /* empty */
+> +
+>  #define HW_COMPAT_3_0 \
+>      /* empty */
+>
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 7bb52b4762..9d29c4b1df 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -294,6 +294,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
+>  int e820_get_num_entries(void);
+>  bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+>
+> +#define PC_COMPAT_3_1 \
+> +    HW_COMPAT_3_1 \
+> +
+>  #define PC_COMPAT_3_0 \
+>      HW_COMPAT_3_0 \
+>      {\
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index f69e7eb399..beaf6bc439 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1797,7 +1797,7 @@ static void machvirt_machine_init(void)
+>  }
+>  type_init(machvirt_machine_init);
+>
+> -static void virt_3_1_instance_init(Object *obj)
+> +static void virt_4_0_instance_init(Object *obj)
+>  {
+>      VirtMachineState *vms =3D VIRT_MACHINE(obj);
+>      VirtMachineClass *vmc =3D VIRT_MACHINE_GET_CLASS(vms);
+> @@ -1867,10 +1867,25 @@ static void virt_3_1_instance_init(Object *obj)
+>      vms->irqmap =3D a15irqmap;
+>  }
+>
+> +static void virt_machine_4_0_options(MachineClass *mc)
+> +{
+> +}
+> +DEFINE_VIRT_MACHINE_AS_LATEST(4, 0)
+> +
+> +#define VIRT_COMPAT_3_1 \
+> +    HW_COMPAT_3_1
+> +
+> +static void virt_3_1_instance_init(Object *obj)
+> +{
+> +    virt_4_0_instance_init(obj);
+> +}
+> +
+>  static void virt_machine_3_1_options(MachineClass *mc)
+>  {
+> +    virt_machine_4_0_options(mc);
+> +    SET_MACHINE_COMPAT(mc, VIRT_COMPAT_3_1);
+>  }
+> -DEFINE_VIRT_MACHINE_AS_LATEST(3, 1)
+> +DEFINE_VIRT_MACHINE(3, 1)
+>
+>  #define VIRT_COMPAT_3_0 \
+>      HW_COMPAT_3_0
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 2d996162f1..d9b04c8427 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -429,21 +429,30 @@ static void pc_i440fx_machine_options(MachineClass =
+*m)
+>      machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
+>  }
+>
+> -static void pc_i440fx_3_1_machine_options(MachineClass *m)
+> +static void pc_i440fx_4_0_machine_options(MachineClass *m)
+>  {
+>      pc_i440fx_machine_options(m);
+>      m->alias =3D "pc";
+>      m->is_default =3D 1;
+>  }
+>
+> +DEFINE_I440FX_MACHINE(v4_0, "pc-i440fx-4.0", NULL,
+> +                      pc_i440fx_4_0_machine_options);
+> +
+> +static void pc_i440fx_3_1_machine_options(MachineClass *m)
+> +{
+> +    pc_i440fx_4_0_machine_options(m);
+> +    m->is_default =3D 0;
+> +    m->alias =3D NULL;
+> +    SET_MACHINE_COMPAT(m, PC_COMPAT_3_1);
+> +}
+> +
+>  DEFINE_I440FX_MACHINE(v3_1, "pc-i440fx-3.1", NULL,
+>                        pc_i440fx_3_1_machine_options);
+>
+>  static void pc_i440fx_3_0_machine_options(MachineClass *m)
+>  {
+>      pc_i440fx_3_1_machine_options(m);
+> -    m->is_default =3D 0;
+> -    m->alias =3D NULL;
+>      SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
+>  }
+>
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index 6e3d81f5be..58459bdab5 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -311,19 +311,28 @@ static void pc_q35_machine_options(MachineClass *m)
+>      m->max_cpus =3D 288;
+>  }
+>
+> -static void pc_q35_3_1_machine_options(MachineClass *m)
+> +static void pc_q35_4_0_machine_options(MachineClass *m)
+>  {
+>      pc_q35_machine_options(m);
+>      m->alias =3D "q35";
+>  }
+>
+> +DEFINE_Q35_MACHINE(v4_0, "pc-q35-4.0", NULL,
+> +                   pc_q35_4_0_machine_options);
+> +
+> +static void pc_q35_3_1_machine_options(MachineClass *m)
+> +{
+> +    pc_q35_4_0_machine_options(m);
+> +    m->alias =3D NULL;
+> +    SET_MACHINE_COMPAT(m, PC_COMPAT_3_1);
+> +}
+> +
+>  DEFINE_Q35_MACHINE(v3_1, "pc-q35-3.1", NULL,
+>                     pc_q35_3_1_machine_options);
+>
+>  static void pc_q35_3_0_machine_options(MachineClass *m)
+>  {
+>      pc_q35_3_1_machine_options(m);
+> -    m->alias =3D NULL;
+>      SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
+>  }
+>
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 7afd1a175b..def3e502d8 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3956,19 +3956,38 @@ static const TypeInfo spapr_machine_info =3D {
+>      }                                                                \
+>      type_init(spapr_machine_register_##suffix)
+>
+> - /*
+> +/*
+> + * pseries-4.0
+> + */
+> +static void spapr_machine_4_0_instance_options(MachineState *machine)
+> +{
+> +}
+> +
+> +static void spapr_machine_4_0_class_options(MachineClass *mc)
+> +{
+> +    /* Defaults for the latest behaviour inherited from the base class *=
+/
+> +}
+> +
+> +DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
+> +
+> +/*
+>   * pseries-3.1
+>   */
+> +#define SPAPR_COMPAT_3_1                                              \
+> +    HW_COMPAT_3_1
+> +
+>  static void spapr_machine_3_1_instance_options(MachineState *machine)
+>  {
+> +    spapr_machine_4_0_instance_options(machine);
+>  }
+>
+>  static void spapr_machine_3_1_class_options(MachineClass *mc)
+>  {
+> -    /* Defaults for the latest behaviour inherited from the base class *=
+/
+> +    spapr_machine_4_0_class_options(mc);
+> +    SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_3_1);
+>  }
+>
+> -DEFINE_SPAPR_MACHINE(3_1, "3.1", true);
+> +DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
+>
+>  /*
+>   * pseries-3.0
+> --
+> 2.18.0.rc1.1.g3f1ff2140
+>
+>
 
 
---jcJQRY9lJ2pldBxJnSggP9aejnqS3iKSu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlwRA9oACgkQ9AfbAGHV
-z0AFGwf+IckMJuawqFDH6iVl/fXpTL+Tj/IvSXkWNOUxe95PN474YsplNefTV2lk
-Typ1OqhrbKu996FYnhfwVa6rRGrJ1bAxDgrduDMAZmddidFMv6gJ0E9rl4X4USYR
-sNo/8KsFHW1ZTN/0NplUuuTifmUmiEs6ByviSKZNL/QP9xHIPuHvwxQOOPCNx/ZF
-mcmTXEahLKVO/a+/5TRv4CpUz5wJakPm9pu0m8KrT8cRaZ59sjlyRSYCzenYAcEt
-qgY1s2X3kWKwJICzNaghAKfOJFGeYNIUvQ1O7wrsOnCrVqhfgyPcbcKLlg0qQMjp
-LaBI1Nt6hM8fAh3DT/DWR8rMHJxMnA==
-=DThk
------END PGP SIGNATURE-----
-
---jcJQRY9lJ2pldBxJnSggP9aejnqS3iKSu--
+--=20
+Marc-Andr=C3=A9 Lureau
