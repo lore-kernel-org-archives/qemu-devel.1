@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6N8-0001NJ-9T
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:28 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6NA-0001Oi-Lc
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6N3-0000eF-6S
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:26 -0500
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:33946)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6N6-0000gm-5o
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:28 -0500
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:39684)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gX6N1-0000Zl-1f
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:21 -0500
-Received: by mail-wm1-x335.google.com with SMTP id y185so11705808wmd.1
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:24:13 -0800 (PST)
+	id 1gX6N5-0000WP-RT
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:24 -0500
+Received: by mail-wr1-x42e.google.com with SMTP id t27so18088635wra.6
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:24:06 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	u10sm15878859wrr.33.2018.12.12.07.24.10 for <qemu-devel@nongnu.org>
+	u10sm15878859wrr.33.2018.12.12.07.24.04 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 12 Dec 2018 07:24:11 -0800 (PST)
+	Wed, 12 Dec 2018 07:24:04 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 12 Dec 2018 16:23:11 +0100
-Message-Id: <1544628195-37728-51-git-send-email-pbonzini@redhat.com>
+Date: Wed, 12 Dec 2018 16:23:05 +0100
+Message-Id: <1544628195-37728-45-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
 References: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 50/54] vhost-user-test: skip if there is no
- memory at address 0
+Subject: [Qemu-devel] [PULL 44/54] vhost-net: compile it on all targets that
+ have virtio-net.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,178 +37,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The virt machine cannot run the vhost-user qtests because they hardcode
-the presence of memory at address 0.  Report the tests as a skip so that
-they can be converted to use qgraph.
+This shows a preexisting bug: if a KVM target did not have virtio-net enabled,
+it would fail with undefined symbols when vhost was enabled.  This must now
+be fixed, lest targets that have no virtio-net fail to compile.
 
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <1543851204-41186-11-git-send-email-pbonzini@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1543851204-41186-5-git-send-email-pbonzini@redhat.com>
 ---
- tests/vhost-user-test.c | 58 ++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 45 insertions(+), 13 deletions(-)
+ configure              | 11 ++++-------
+ hw/net/Makefile.objs   |  4 ++--
+ include/exec/poison.h  |  1 -
+ tests/Makefile.include |  5 +----
+ 4 files changed, 7 insertions(+), 14 deletions(-)
 
-diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index 82fc6c5..59e1aec 100644
---- a/tests/vhost-user-test.c
-+++ b/tests/vhost-user-test.c
-@@ -228,9 +228,11 @@ static void uninit_virtio_dev(TestServer *s)
-     qvirtio_pci_device_free(s->dev);
- }
+diff --git a/configure b/configure
+index b995d71..b26e4de 100755
+--- a/configure
++++ b/configure
+@@ -6514,7 +6514,10 @@ fi
+ if test "$vhost_scsi" = "yes" ; then
+   echo "CONFIG_VHOST_SCSI=y" >> $config_host_mak
+ fi
+-if test "$vhost_net" = "yes" -a "$vhost_user" = "yes"; then
++if test "$vhost_net" = "yes" ; then
++  echo "CONFIG_VHOST_NET=y" >> $config_host_mak
++fi
++if test "$vhost_net_user" = "yes" ; then
+   echo "CONFIG_VHOST_NET_USER=y" >> $config_host_mak
+ fi
+ if test "$vhost_crypto" = "yes" ; then
+@@ -7276,12 +7279,6 @@ if supported_xen_target $target; then
+ fi
+ if supported_kvm_target $target; then
+     echo "CONFIG_KVM=y" >> $config_target_mak
+-    if test "$vhost_net" = "yes" ; then
+-        echo "CONFIG_VHOST_NET=y" >> $config_target_mak
+-        if test "$vhost_user" = "yes" ; then
+-            echo "CONFIG_VHOST_USER_NET_TEST_$target_name=y" >> $config_host_mak
+-        fi
+-    fi
+ fi
+ if supported_hax_target $target; then
+     echo "CONFIG_HAX=y" >> $config_target_mak
+diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
+index c2705e6..2d7ee0a 100644
+--- a/hw/net/Makefile.objs
++++ b/hw/net/Makefile.objs
+@@ -37,8 +37,8 @@ obj-$(CONFIG_PSERIES) += spapr_llan.o
+ obj-$(CONFIG_XILINX_ETHLITE) += xilinx_ethlite.o
  
--static void wait_for_fds(TestServer *s)
-+static bool wait_for_fds(TestServer *s)
- {
-     gint64 end_time;
-+    bool got_region;
-+    int i;
+ obj-$(CONFIG_VIRTIO_NET) += virtio-net.o
+-obj-$(CONFIG_VHOST_NET) += vhost_net.o
+-common-obj-$(call lnot,$(CONFIG_VHOST_NET)) += vhost_net-stub.o
++common-obj-$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOST_NET)) += vhost_net.o
++common-obj-$(call lnot,$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOST_NET))) += vhost_net-stub.o
+ common-obj-$(CONFIG_ALL) += vhost_net-stub.o
  
-     g_mutex_lock(&s->data_mutex);
+ obj-$(CONFIG_ETSEC) += fsl_etsec/etsec.o fsl_etsec/registers.o \
+diff --git a/include/exec/poison.h b/include/exec/poison.h
+index 32d5378..b158632 100644
+--- a/include/exec/poison.h
++++ b/include/exec/poison.h
+@@ -85,7 +85,6 @@
+ #pragma GCC poison CONFIG_XTENSA_DIS
  
-@@ -248,6 +250,19 @@ static void wait_for_fds(TestServer *s)
-     g_assert_cmpint(s->fds_num, ==, s->memory.nregions);
+ #pragma GCC poison CONFIG_LINUX_USER
+-#pragma GCC poison CONFIG_VHOST_NET
+ #pragma GCC poison CONFIG_KVM
+ #pragma GCC poison CONFIG_SOFTMMU
  
-     g_mutex_unlock(&s->data_mutex);
-+
-+    got_region = false;
-+    for (i = 0; i < s->memory.nregions; ++i) {
-+        VhostUserMemoryRegion *reg = &s->memory.regions[i];
-+        if (reg->guest_phys_addr == 0) {
-+            got_region = true;
-+            break;
-+        }
-+    }
-+    if (!got_region) {
-+        g_test_skip("No memory at address 0x0");
-+    }
-+    return got_region;
- }
- 
- static void read_guest_mem_server(TestServer *s)
-@@ -256,8 +271,6 @@ static void read_guest_mem_server(TestServer *s)
-     int i, j;
-     size_t size;
- 
--    wait_for_fds(s);
--
-     g_mutex_lock(&s->data_mutex);
- 
-     /* iterate all regions */
-@@ -577,8 +590,6 @@ static void write_guest_mem(TestServer *s, uint32_t seed)
-     int i, j;
-     size_t size;
- 
--    wait_for_fds(s);
--
-     /* iterate all regions */
-     for (i = 0; i < s->fds_num; i++) {
- 
-@@ -661,8 +672,13 @@ static void test_read_guest_mem(const void *arg)
- 
-     init_virtio_dev(server, 1u << VIRTIO_NET_F_MAC);
- 
-+    if (!wait_for_fds(server)) {
-+        goto exit;
-+    }
-+
-     read_guest_mem_server(server);
- 
-+exit:
-     uninit_virtio_dev(server);
- 
-     qtest_quit(s);
-@@ -689,8 +705,10 @@ static void test_migrate(void)
-     g_free(cmd);
- 
-     init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
--    init_virtio_dev(dest, 1u << VIRTIO_NET_F_MAC);
--    wait_for_fds(s);
-+    if (!wait_for_fds(s)) {
-+        goto exit;
-+    }
-+
-     size = get_log_size(s);
-     g_assert_cmpint(size, ==, (2 * 1024 * 1024) / (VHOST_LOG_PAGE * 8));
- 
-@@ -699,6 +717,7 @@ static void test_migrate(void)
-     g_free(tmp);
-     to = qtest_init(cmd);
-     g_free(cmd);
-+    init_virtio_dev(dest, 1u << VIRTIO_NET_F_MAC);
- 
-     source = g_source_new(&test_migrate_source_funcs,
-                           sizeof(TestMigrateSource));
-@@ -738,15 +757,18 @@ static void test_migrate(void)
-     global_qtest = to;
-     qmp_eventwait("RESUME");
- 
-+    g_assert(wait_for_fds(s));
-     read_guest_mem_server(dest);
- 
--    uninit_virtio_dev(s);
-     uninit_virtio_dev(dest);
-+    qtest_quit(to);
- 
-     g_source_destroy(source);
-     g_source_unref(source);
- 
--    qtest_quit(to);
-+exit:
-+    uninit_virtio_dev(s);
-+
-     test_server_free(dest);
-     qtest_quit(from);
-     test_server_free(s);
-@@ -810,16 +832,20 @@ static void test_reconnect_subprocess(void)
-     g_free(cmd);
- 
-     init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
--    wait_for_fds(s);
-+    if (!wait_for_fds(s)) {
-+        goto exit;
-+    }
-+
-     wait_for_rings_started(s, 2);
- 
-     /* reconnect */
-     s->fds_num = 0;
-     s->rings = 0;
-     g_idle_add(reconnect_cb, s);
--    wait_for_fds(s);
-+    g_assert(wait_for_fds(s));
-     wait_for_rings_started(s, 2);
- 
-+exit:
-     uninit_virtio_dev(s);
- 
-     qtest_end();
-@@ -848,9 +874,12 @@ static void test_connect_fail_subprocess(void)
-     g_free(cmd);
- 
-     init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
--    wait_for_fds(s);
-+    if (!wait_for_fds(s)) {
-+        goto exit;
-+    }
-     wait_for_rings_started(s, 2);
- 
-+exit:
-     uninit_virtio_dev(s);
- 
-     qtest_end();
-@@ -878,9 +907,12 @@ static void test_flags_mismatch_subprocess(void)
-     g_free(cmd);
- 
-     init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
--    wait_for_fds(s);
-+    if (!wait_for_fds(s)) {
-+        goto exit;
-+    }
-     wait_for_rings_started(s, 2);
- 
-+exit:
-     uninit_virtio_dev(s);
- 
-     qtest_end();
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 62915e4..ecb3318 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -204,10 +204,7 @@ check-qtest-i386-$(CONFIG_USB_XHCI_NEC) += tests/usb-hcd-xhci-test$(EXESUF)
+ check-qtest-i386-y += tests/cpu-plug-test$(EXESUF)
+ check-qtest-i386-y += tests/q35-test$(EXESUF)
+ check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
+-check-qtest-i386-$(CONFIG_VHOST_USER_NET_TEST_i386) += tests/vhost-user-test$(EXESUF)
+-ifeq ($(CONFIG_VHOST_USER_NET_TEST_i386),)
+-check-qtest-x86_64-$(CONFIG_VHOST_USER_NET_TEST_x86_64) += tests/vhost-user-test$(EXESUF)
+-endif
++check-qtest-i386-$(CONFIG_VHOST_NET_USER) += tests/vhost-user-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_TPM_CRB) += tests/tpm-crb-swtpm-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_TPM_CRB) += tests/tpm-crb-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_TPM_TIS) += tests/tpm-tis-swtpm-test$(EXESUF)
 -- 
 1.8.3.1
