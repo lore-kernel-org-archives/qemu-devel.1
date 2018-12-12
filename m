@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34977)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=877c75a5a=Paul.Durrant@citrix.com>)
-	id 1gX2VJ-0006p8-Aq
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:16:38 -0500
+	id 1gX2VK-0006q9-4k
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:16:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=877c75a5a=Paul.Durrant@citrix.com>)
-	id 1gX2VI-0003BZ-6R
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:16:37 -0500
+	id 1gX2VJ-0003HK-2X
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:16:38 -0500
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Wed, 12 Dec 2018 11:16:25 +0000
-Message-ID: <1544613386-22045-3-git-send-email-paul.durrant@citrix.com>
+Date: Wed, 12 Dec 2018 11:16:26 +0000
+Message-ID: <1544613386-22045-4-git-send-email-paul.durrant@citrix.com>
 In-Reply-To: <1544613386-22045-1-git-send-email-paul.durrant@citrix.com>
 References: <1544613386-22045-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 2/3] xen-block: improve response latency
+Subject: [Qemu-devel] [PATCH v3 3/3] xen-block: avoid repeated memory
+ allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,16 +29,16 @@ Cc: Tim Smith <tim.smith@citrix.com>, Paul Durrant <paul.durrant@citrix.com>, St
 
 From: Tim Smith <tim.smith@citrix.com>
 
-If the I/O ring is full, the guest cannot send any more requests
-until some responses are sent. Only sending all available responses
-just before checking for new work does not leave much time for the
-guest to supply new work, so this will cause stalls if the ring gets
-full. Also, not completing reads as soon as possible adds latency
-to the guest.
+The xen-block dataplane currently allocates memory to hold the data for
+each request as that request is used, and frees it afterwards. Because
+it requires page-aligned blocks, this interacts poorly with non-page-
+aligned allocations and balloons the heap.
 
-To alleviate that, complete IO requests as soon as they come back.
-xen_block_send_response() already returns a value indicating whether
-a notify should be sent, which is all the batching we need.
+Instead, allocate the maximum possible buffer size required for the
+protocol, which is BLKIF_MAX_SEGMENTS_PER_REQUEST (currently 11) pages
+when the request structure is created, and keep that buffer until it is
+destroyed. Since the requests are re-used via a free list, this should
+actually improve memory usage.
 
 Signed-off-by: Tim Smith <tim.smith@citrix.com>
 
@@ -51,151 +52,71 @@ Cc: Anthony Perard <anthony.perard@citrix.com>
 Cc: Kevin Wolf <kwolf@redhat.com>
 Cc: Max Reitz <mreitz@redhat.com>
 ---
- hw/block/dataplane/xen-block.c | 56 ++++++++++++++----------------------------
- 1 file changed, 18 insertions(+), 38 deletions(-)
+ hw/block/dataplane/xen-block.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
 diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-block.c
-index db17ab5..b4ff2e3 100644
+index b4ff2e3..21804d7 100644
 --- a/hw/block/dataplane/xen-block.c
 +++ b/hw/block/dataplane/xen-block.c
-@@ -55,11 +55,9 @@ struct XenBlockDataPlane {
-     blkif_back_rings_t rings;
-     int more_work;
-     QLIST_HEAD(inflight_head, XenBlockRequest) inflight;
--    QLIST_HEAD(finished_head, XenBlockRequest) finished;
-     QLIST_HEAD(freelist_head, XenBlockRequest) freelist;
-     int requests_total;
-     int requests_inflight;
--    int requests_finished;
-     unsigned int max_requests;
-     BlockBackend *blk;
-     QEMUBH *bh;
-@@ -116,12 +114,10 @@ static void xen_block_finish_request(XenBlockRequest *request)
-     XenBlockDataPlane *dataplane = request->dataplane;
+@@ -70,7 +70,6 @@ static void reset_request(XenBlockRequest *request)
+     memset(&request->req, 0, sizeof(request->req));
+     request->status = 0;
+     request->start = 0;
+-    request->buf = NULL;
+     request->size = 0;
+     request->presync = 0;
  
-     QLIST_REMOVE(request, list);
--    QLIST_INSERT_HEAD(&dataplane->finished, request, list);
-     dataplane->requests_inflight--;
--    dataplane->requests_finished++;
- }
- 
--static void xen_block_release_request(XenBlockRequest *request, bool finish)
-+static void xen_block_release_request(XenBlockRequest *request)
- {
-     XenBlockDataPlane *dataplane = request->dataplane;
- 
-@@ -129,11 +125,7 @@ static void xen_block_release_request(XenBlockRequest *request, bool finish)
-     reset_request(request);
-     request->dataplane = dataplane;
-     QLIST_INSERT_HEAD(&dataplane->freelist, request, list);
--    if (finish) {
--        dataplane->requests_finished--;
--    } else {
--        dataplane->requests_inflight--;
--    }
-+    dataplane->requests_inflight--;
- }
- 
- /*
-@@ -248,6 +240,7 @@ static int xen_block_copy_request(XenBlockRequest *request)
- }
- 
- static int xen_block_do_aio(XenBlockRequest *request);
-+static int xen_block_send_response(XenBlockRequest *request);
- 
- static void xen_block_complete_aio(void *opaque, int ret)
- {
-@@ -312,6 +305,18 @@ static void xen_block_complete_aio(void *opaque, int ret)
+@@ -95,6 +94,14 @@ static XenBlockRequest *xen_block_start_request(XenBlockDataPlane *dataplane)
+         /* allocate new struct */
+         request = g_malloc0(sizeof(*request));
+         request->dataplane = dataplane;
++        /*
++         * We cannot need more pages per requests than this, and since we
++         * re-use requests, allocate the memory once here. It will be freed
++         * xen_block_dataplane_destroy() when the request list is freed.
++         */
++        request->buf = qemu_memalign(XC_PAGE_SIZE,
++                                     BLKIF_MAX_SEGMENTS_PER_REQUEST *
++                                     XC_PAGE_SIZE);
+         dataplane->requests_total++;
+         qemu_iovec_init(&request->v, 1);
+     } else {
+@@ -272,14 +279,12 @@ static void xen_block_complete_aio(void *opaque, int ret)
+         if (ret == 0) {
+             xen_block_copy_request(request);
+         }
+-        qemu_vfree(request->buf);
+         break;
+     case BLKIF_OP_WRITE:
+     case BLKIF_OP_FLUSH_DISKCACHE:
+         if (!request->req.nr_segments) {
+             break;
+         }
+-        qemu_vfree(request->buf);
+         break;
      default:
          break;
-     }
-+    if (xen_block_send_response(request)) {
-+        Error *local_err = NULL;
-+
-+        xen_device_notify_event_channel(dataplane->xendev,
-+                                        dataplane->event_channel,
-+                                        &local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+        }
-+    }
-+    xen_block_release_request(request);
-+
-     qemu_bh_schedule(dataplane->bh);
- 
- done:
-@@ -419,7 +424,7 @@ err:
-     return -1;
- }
- 
--static int xen_block_send_response_one(XenBlockRequest *request)
-+static int xen_block_send_response(XenBlockRequest *request)
+@@ -360,12 +365,10 @@ static int xen_block_do_aio(XenBlockRequest *request)
  {
      XenBlockDataPlane *dataplane = request->dataplane;
-     int send_notify = 0;
-@@ -474,29 +479,6 @@ static int xen_block_send_response_one(XenBlockRequest *request)
-     return send_notify;
- }
  
--/* walk finished list, send outstanding responses, free requests */
--static void xen_block_send_response_all(XenBlockDataPlane *dataplane)
--{
--    XenBlockRequest *request;
--    int send_notify = 0;
--
--    while (!QLIST_EMPTY(&dataplane->finished)) {
--        request = QLIST_FIRST(&dataplane->finished);
--        send_notify += xen_block_send_response_one(request);
--        xen_block_release_request(request, true);
--    }
--    if (send_notify) {
--        Error *local_err = NULL;
--
--        xen_device_notify_event_channel(dataplane->xendev,
--                                        dataplane->event_channel,
--                                        &local_err);
--        if (local_err) {
--            error_report_err(local_err);
--        }
--    }
--}
--
- static int xen_block_get_request(XenBlockDataPlane *dataplane,
-                                  XenBlockRequest *request, RING_IDX rc)
- {
-@@ -547,7 +529,6 @@ static void xen_block_handle_requests(XenBlockDataPlane *dataplane)
-     rp = dataplane->rings.common.sring->req_prod;
-     xen_rmb(); /* Ensure we see queued requests up to 'rp'. */
+-    request->buf = qemu_memalign(XC_PAGE_SIZE, request->size);
+     if (request->req.nr_segments &&
+         (request->req.operation == BLKIF_OP_WRITE ||
+          request->req.operation == BLKIF_OP_FLUSH_DISKCACHE) &&
+         xen_block_copy_request(request)) {
+-        qemu_vfree(request->buf);
+         goto err;
+     }
  
--    xen_block_send_response_all(dataplane);
-     /*
-      * If there was more than IO_PLUG_THRESHOLD requests in flight
-      * when we got here, this is an indication that there the bottleneck
-@@ -591,7 +572,7 @@ static void xen_block_handle_requests(XenBlockDataPlane *dataplane)
-                 break;
-             };
+@@ -665,6 +668,7 @@ void xen_block_dataplane_destroy(XenBlockDataPlane *dataplane)
+         request = QLIST_FIRST(&dataplane->freelist);
+         QLIST_REMOVE(request, list);
+         qemu_iovec_destroy(&request->v);
++        qemu_vfree(request->buf);
+         g_free(request);
+     }
  
--            if (xen_block_send_response_one(request)) {
-+            if (xen_block_send_response(request)) {
-                 Error *local_err = NULL;
- 
-                 xen_device_notify_event_channel(dataplane->xendev,
-@@ -601,7 +582,7 @@ static void xen_block_handle_requests(XenBlockDataPlane *dataplane)
-                     error_report_err(local_err);
-                 }
-             }
--            xen_block_release_request(request, false);
-+            xen_block_release_request(request);
-             continue;
-         }
- 
-@@ -657,7 +638,6 @@ XenBlockDataPlane *xen_block_dataplane_create(XenDevice *xendev,
-     dataplane->file_size = blk_getlength(dataplane->blk);
- 
-     QLIST_INIT(&dataplane->inflight);
--    QLIST_INIT(&dataplane->finished);
-     QLIST_INIT(&dataplane->freelist);
- 
-     if (iothread) {
 -- 
 2.1.4
