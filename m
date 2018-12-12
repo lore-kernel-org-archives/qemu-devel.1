@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gX8vu-0000rY-TD
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 13:08:31 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gX8yR-0001bO-N7
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 13:11:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gX8vp-0004Nx-QT
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 13:08:30 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:58440)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gX8vo-0004L9-Vm
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 13:08:25 -0500
-Date: Wed, 12 Dec 2018 20:08:04 +0200
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20181212180804.GF5747@lap1>
-References: <20181211132642.3027-1-ppandit@redhat.com>
-	<20181211132642.3027-5-ppandit@redhat.com>
-	<20181211164742.GA2923@lap1> <20181211172244.GD2923@lap1>
-	<nycvar.YSQ.7.76.1812120137210.7578@xnncv>
-	<nycvar.YSQ.7.76.1812121253200.10904@xnncv>
+	(envelope-from <alex.bennee@linaro.org>) id 1gX8yN-0006Pb-Gk
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 13:11:07 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45994)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gX8yN-0006Ob-90
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 13:11:03 -0500
+Received: by mail-wr1-x442.google.com with SMTP id b14so18638696wru.12
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 10:11:02 -0800 (PST)
+References: <20181212102548.27626-1-alex.bennee@linaro.org>
+	<87mupafxm4.fsf@dusky.pond.sub.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <87mupafxm4.fsf@dusky.pond.sub.org>
+Date: Wed, 12 Dec 2018 18:11:00 +0000
+Message-ID: <87o99q1uq3.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <nycvar.YSQ.7.76.1812121253200.10904@xnncv>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/5] pvrdma: release ring object in case of
- an error
+Subject: Re: [Qemu-devel] [RFC PATCH v2] contrib: add a basic gitdm config
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,65 +30,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Saar Amar <saaramar5@gmail.com>, Li Qiang <liq3ea@163.com>, yuval.shaia@oracle.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, maxim.kuvyrkov@linaro.org
 
-On Wed, Dec 12, 2018 at 03:09:19PM +0530, P J P wrote:
-> +-- On Wed, 12 Dec 2018, P J P wrote --+
-> | | Also, can you rebase this patch on top of the patchset i posted las=
-t week:
-> | | https://patchwork.kernel.org/patch/10705439/
-> |=20
-> | Okay, I'll send revised patch set. Thanks so much for the prompt revi=
-ew.
->=20
-> I tried to git apply above patch-set over v3.1.0-rc2, v3.1.0-rc0, v3.0.=
-0. But=20
-> it does not seem to apply cleanly.
->=20
-> =3D=3D=3D
-> $ git branch rdma v3.1.0-rc0
 
-Can you try master?
-I just did a rebase on top of master and had no conflicts.
+Markus Armbruster <armbru@redhat.com> writes:
 
-> $ git checkout rdma=20
-> Switched to branch 'rdma'
-> $ git apply --check /tmp/add-support-for-RDMA-MAD.patch
-> error: patch failed: Makefile.objs:1
-> error: Makefile.objs: patch does not apply
-> error: patch failed: hw/rdma/vmw/pvrdma_cmd.c:224
-> error: hw/rdma/vmw/pvrdma_cmd.c: patch does not apply
-> =3D=3D=3D
->=20
-> I skipped one of the makefile.objs/.json patch, applied others and then=
-=20
-> hand-fixed one of the patch pvrdma_cmd.c.
->=20
-> After that when I try to build QEMU, it fails with
->=20
-> =3D=3D=3D
->  $ ./configure --prefix=3D/tmp/ --enable-debug
->       --target-list=3D'x86_64-softmmu x86_64-linux-user'
->       --enable-rdma --with-sdlabi=3D2.0
->  $ make
-> ../qemu/hw/rdma/rdma_backend.c:1132:5: error: implicit declaration of f=
-unction=20
-> =E2=80=98qapi_event_send_rdma_gid_status_changed=E2=80=99 [-Werror=3Dim=
-plicit-function-declaration]  qapi_event_send_rdma_gid_status_changed(ifn=
-ame, true,
-> ...
-> ../qemu/hw/rdma/rdma_backend.c:22:10: fatal error: qapi/qapi-events-rdm=
-a.h: No=20
-> such file or directory
->  #include "qapi/qapi-events-rdma.h"
->           ^~~~~~~~~~~~~~~~~~~~~~~~~
-> compilation terminated.
-> =3D=3D=3D
->=20
-> Not sure if other patches are required. Any idea?
->=20
-> Thank you.
-> --
-> Prasad J Pandit / Red Hat Product Security Team
-> 47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+>
+>> This is a QEMU specific version of a gitdm config for generating
+>> reports on the contributor base of the project. I've added enough
+>> group maps and domain aliases to ensure the current top ten is as
+>> reflective as it can be. As of this commit running:
+>>
+>>   git log --numstat --since "Last Year" | gitdm -n -l 10
+<snip>
+>> diff --git a/contrib/gitdm/filetypes.txt b/contrib/gitdm/filetypes.txt
+>> new file mode 100644
+>> index 0000000000..e24c396b48
+>> --- /dev/null
+>> +++ b/contrib/gitdm/filetypes.txt
+> [...]
+>
+> This is a verbatim copy of upstream's sample-config/filetypes.txt.  If
+> you have gitdm, you should have its filetypes.txt, shouldn't you?  Can
+> we think of a way to use that instead?
+
+Without introducing an explicit dependency which seems a little
+overkill. That said a lot of the entries in this file aren't used by
+QEMU so I could just trim it down.
+>> diff --git a/contrib/gitdm/group-map-redhat b/contrib/gitdm/group-map-re=
+dhat
+>> new file mode 100644
+>> index 0000000000..252742d131
+>> --- /dev/null
+>> +++ b/contrib/gitdm/group-map-redhat
+>> @@ -0,0 +1,7 @@
+>> +#
+>> +# RedHat contributors using non-corporate email
+>> +#
+>> +
+>> +david@gibson.dropbear.id.au
+>> +laurent@vivier.eu
+>> +pjp@fedoraproject.org
+>
+> There are about a dozen commits I accidentally signed with my private
+> address armbru@pond.sub.org.  Not sure we care.
+
+For running lifetime stats maybe - it certainly won't hurt.
+
+I really only concentrated of cleaning up the stats for the last year.
+>
+> Can't see anything bad, so
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+
+Thanks.
+
+--
+Alex Benn=C3=A9e
