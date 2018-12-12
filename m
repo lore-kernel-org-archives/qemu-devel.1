@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXBn8-0007Im-7X
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 16:11:39 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gXBrF-0000KA-GB
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 16:15:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXBn6-0007uZ-O1
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 16:11:38 -0500
-Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:47087)
+	(envelope-from <peter.maydell@linaro.org>) id 1gXBrE-0003TA-Km
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 16:15:53 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:42588)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gXBn6-0007tN-Dt
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 16:11:36 -0500
-Received: by mail-oi1-x22e.google.com with SMTP id x202so16226974oif.13
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 13:11:35 -0800 (PST)
+	id 1gXBr7-0003N8-DM
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 16:15:47 -0500
+Received: by mail-ot1-x343.google.com with SMTP id v23so19075258otk.9
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 13:15:41 -0800 (PST)
 MIME-Version: 1.0
-References: <20181211180352.19644-1-laurent@vivier.eu>
-In-Reply-To: <20181211180352.19644-1-laurent@vivier.eu>
+References: <20181210135803.20208-1-peter.maydell@linaro.org>
+	<20181210151310.3f13c28f.cohuck@redhat.com>
+	<CAFEAcA8q6sgirc9ydFRNGs5tCn0PjScHD_tHCR2XhxBM=CoZeg@mail.gmail.com>
+	<20181212183416.1972d450.cohuck@redhat.com>
+In-Reply-To: <20181212183416.1972d450.cohuck@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 12 Dec 2018 21:11:22 +0000
-Message-ID: <CAFEAcA_wRfVWjWOMjE36Fepmv7TPSf5JJNoKVZbs_JXe-_W69Q@mail.gmail.com>
+Date: Wed, 12 Dec 2018 21:15:29 +0000
+Message-ID: <CAFEAcA8kDDbeQwUYEAswvZ05dSHLLNpeYyT3Op8JeJefAE7ujw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/30] Trivial patches
+Subject: Re: [Qemu-devel] [PATCH] hw/s390/ccw.c: Don't take address of
+ packed members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +32,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, qemu-s390x <qemu-s390x@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Tue, 11 Dec 2018 at 18:13, Laurent Vivier <laurent@vivier.eu> wrote:
+On Wed, 12 Dec 2018 at 17:34, Cornelia Huck <cohuck@redhat.com> wrote:
 >
-> The following changes since commit 32a1a94dd324d33578dca1dc96d7896a0244d768:
+> On Mon, 10 Dec 2018 14:23:15 +0000
+> Peter Maydell <peter.maydell@linaro.org> wrote:
 >
->   Update version for v3.1.0 release (2018-12-11 17:18:37 +0000)
+> > On Mon, 10 Dec 2018 at 14:13, Cornelia Huck <cohuck@redhat.com> wrote:
+> > >
+> > > On Mon, 10 Dec 2018 13:58:03 +0000
+> > > Peter Maydell <peter.maydell@linaro.org> wrote:
+> > >
+> > > > Taking the address of a field in a packed struct is a bad idea, because
+> > > > it might not be actually aligned enough for that pointer type (and
+> > > > thus cause a crash on dereference on some host architectures). Newer
+> > > > versions of clang warn about this.
+> > > >
+> > > > Avoid the problem by using local copies of the PMCW and SCSW
+> > > > struct fields in copy_schib_from_guest() and copy_schib_to_guest().
+> > > >
+> > > > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> > > > ---
+> > > > This seemed like a not totally ugly and reasonably localised fix
+> > > > that satisfies clang. Oddly, this makes the generated object file
+> > > > 15K smaller (421K vs 406K), so it might even be better code...
+> > >
+> > > Nice :)
+> > >
+> > > >
+> > > >  hw/s390x/css.c | 20 ++++++++++++++++----
+> > > >  1 file changed, 16 insertions(+), 4 deletions(-)
+> > > >
+> > > > diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> > > > index 04ec5cc9705..ef07691e36b 100644
+> > > > --- a/hw/s390x/css.c
+> > > > +++ b/hw/s390x/css.c
+> > > > @@ -1290,9 +1290,15 @@ void copy_scsw_to_guest(SCSW *dest, const SCSW *src)
+> > > >  static void copy_schib_to_guest(SCHIB *dest, const SCHIB *src)
+> > > >  {
+> > > >      int i;
+> > > > +    PMCW srcpmcw, destpmcw;
+> > > > +    SCSW srcscsw, destscsw;
+> > >
+> > > <bikeshed>
+> > > I would find src_pmcw etc. easier to read. Other opinions?
+> > > </bikeshed>
+> >
+> > CODING_STYLE's "Naming" section agrees with you...
 >
-> are available in the Git repository at:
->
->   git://github.com/vivier/qemu.git tags/trivial-patches-pull-request
->
-> for you to fetch changes up to 82c48fb79df5596a9d0a3b6d998c4491e542aa7a:
->
->   Fixes i386 xchgq test (2018-12-11 18:41:25 +0100)
->
-> ----------------------------------------------------------------
-> Trivial patches (2018-12-11)
->
-> ----------------------------------------------------------------
+> Do you plan to send a v2, or should I just rename and apply?
 
-Applied, thanks.
+If you want to rename and apply that would be great; I can
+send a v2 if that's easier for you.
 
+thanks
 -- PMM
