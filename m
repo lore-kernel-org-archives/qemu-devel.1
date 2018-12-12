@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51442)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gX0Eh-0006V5-MA
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 03:51:20 -0500
+	(envelope-from <armbru@redhat.com>) id 1gX0Fr-0007Br-Si
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 03:52:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gX0Eb-0005Ae-VN
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 03:51:17 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42982)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gX0EZ-000580-Vc
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 03:51:13 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gX0EX-0007fa-Ay
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 08:51:09 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 519C52E8078
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 08:51:09 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1gX0Fo-0005pg-LG
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 03:52:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42822)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gX0Fo-0005p3-Fb
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 03:52:28 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181208111606.8505-1-marcandre.lureau@redhat.com>
+	<20181208111606.8505-3-marcandre.lureau@redhat.com>
+Date: Wed, 12 Dec 2018 09:52:21 +0100
+In-Reply-To: <20181208111606.8505-3-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Sat, 8 Dec 2018 15:15:41 +0400")
+Message-ID: <87woofjfei.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Dec 2018 08:35:59 -0000
-From: Thomas Huth <1785972@bugs.launchpad.net>
-Reply-To: Bug 1785972 <1785972@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153371136089.29473.12663307170219083138.malonedeb@chaenomeles.canonical.com>
-Message-Id: <154460375995.9175.13754369118352920739.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1785972] Re: v3.0.0-rc4: VM fails to start after
- vcpuhotunplug, managedsave sequence
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v7 02/27] qapi: do not define
+ enumeration value explicitly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,89 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dcc71c7760e263f808c424=
-0a
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-** Changed in: qemu
-       Status: Fix Committed =3D> Fix Released
+> The C standard has the initial value at 0 and the subsequent values
+> incremented by 1. No need to set this explicitely.
+>
+> This will prevent from artificial "gaps" when compiling out some enum
+> values and having unnecessarily large MAX values & enums arrays, or
+> simplifying iterating over valid enum values.
 
--- =
+Should mention that compiling out will only become possible later in
+this series.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1785972
+> Whenever config-host.h is changed, all the enum/types are recompiled.
 
-Title:
-  v3.0.0-rc4: VM fails to start after vcpuhotunplug, managedsave
-  sequence
+This soundness argument is incomplete.  Yes, our coding conventions
+ensure everything gets recompiled when config-host.h changes.  But
+nothing stops people from using 'if' conditions that depend on more than
+just config-host.h.
 
-Status in QEMU:
-  Fix Released
+What about this:
 
-Bug description:
-  VM fails to start after vcpu hot un-plug, managedsave sequence
+  qapi: Do not define enumeration value explicitly
 
-  Host info:
-  Kernel: 4.18.0-rc8-00002-g1236568ee3cb
+  The generated C enumeration types explicitly set the enumeration
+  constants to 0, 1, 2, ...  That's exactly what you get when you don't
+  supply values.
 
-  qemu: commit 6ad90805383e6d04b3ff49681b8519a48c9f4410 (HEAD -> master, ta=
-g: v3.0.0-rc4)
-  QEMU emulator version 2.12.94 (v3.0.0-rc4-dirty)
+  Drop the explicit values.  No change now, but it will avoid gaps in
+  the values when we later add support for 'if' conditions.  Avoiding
+  such gaps will save us the trouble of changing the ENUM_lookup[]
+  tables to work without a sentinel.
 
-  libvirt: commit 087de2f5a3dffb27d2eeb0c50a86d5d6984e5a5e (HEAD -> master)
-  libvirtd (libvirt) 4.6.0
+  We'll have to take care to ensure the headers required by the 'if'
+  conditions get always included before the generated QAPI code.
+  Fortunately, our convention to include "qemu/osdep.h" first in any .c
+  ensures that's the case for our CONFIG_FOO macros.
 
-  Guest Kernel: 4.18.0-rc8-00002-g1236568ee3cb
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-  =
-
-  Steps to reproduce:
-  1. Start a guest(VM) with 2 current , 4 max vcpus
-  virsh start vm1
-  Domain vm1 started
-
-  2. Hotplug 2 vcpus
-  virsh setvcpus vm1 4 --live
-
-  3. Hot unplug 2 vcpus
-  virsh setvcpus vm1 2 --live
-
-  4. Managedsave the VM
-  virsh managedsave vm1
-
-  Domain vm1 state saved by libvirt
-
-  5. Start the VM ---Fails to start
-  virsh start vm1
-
-  error: Failed to start domain avocado-vt-vm1
-  error: internal error: qemu unexpectedly closed the monitor: 2018-08-08T0=
-6:27:53.853818Z qemu: Unknown savevm section or instance 'spapr_cpu' 2
-  2018-08-08T06:27:53.854949Z qemu: load of migration failed: Invalid argum=
-ent
-
-
-  Testcase:
-  avocado run libvirt_vcpu_plug_unplug.positive_test.vcpu_set.live.vm_opera=
-te.managedsave_with_unplug --vt-type libvirt --vt-extra-params emulator_pat=
-h=3D/usr/share/avocado-plugins-vt/bin/qemu create_vm_libvirt=3Dyes kill_vm_=
-libvirt=3Dyes env_cleanup=3Dyes smp=3D8 backup_image_before_testing=3Dno li=
-bvirt_controller=3Dvirtio-scsi scsi_hba=3Dvirtio-scsi-pci drive_format=3Dsc=
-si-hd use_os_variant=3Dno restore_image_after_testing=3Dno vga=3Dnone displ=
-ay=3Dnographic kernel=3D/home/kvmci/linux/vmlinux kernel_args=3D'root=3D/de=
-v/sda2 rw console=3Dtty0 console=3DttyS0,115200 init=3D/sbin/init  initcall=
-_debug' take_regular_screendumps=3Dno --vt-guest-os JeOS.27.ppc64le
-  JOB ID     : 1f869477ad87e7d7e7e7777f631ae08965f41a74
-  JOB LOG    : /root/avocado/job-results/job-2018-08-08T02.42-1f86947/job.l=
-og
-   (1/1) type_specific.io-github-autotest-libvirt.libvirt_vcpu_plug_unplug.=
-positive_test.vcpu_set.live.vm_operate.managedsave_with_unplug: ERROR (91.5=
-8 s)
-  RESULTS    : PASS 0 | ERROR 1 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | =
-CANCEL 0
-  JOB TIME   : 95.89 s
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1785972/+subscriptions
+With an improved commit message:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
