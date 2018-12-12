@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gX4lj-0005Jk-EJ
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:41:44 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gX4wI-0005wB-Ic
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:52:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gX4li-0002Dt-8l
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:41:43 -0500
-Date: Wed, 12 Dec 2018 14:41:32 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181212144132.41a1409d.cohuck@redhat.com>
-In-Reply-To: <5c491972-5210-5ac6-6023-7365fb24dc3f@redhat.com>
-References: <1544135058-21380-1-git-send-email-walling@linux.ibm.com>
-	<1544135058-21380-3-git-send-email-walling@linux.ibm.com>
-	<20181207130853.20506345.cohuck@redhat.com>
-	<dbabb43d-01e7-d221-a761-ad5a53fd8f94@linux.ibm.com>
-	<aff40d67-9fcb-43fb-beeb-1dbe7a1e22f3@linux.ibm.com>
-	<5c491972-5210-5ac6-6023-7365fb24dc3f@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1gX4w5-00044J-N6
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:52:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41284)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gX4w3-00042V-Lc
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:52:25 -0500
+Date: Wed, 12 Dec 2018 13:52:03 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181212135203.GD2370@work-vm>
+References: <20181210173151.16629-1-dgilbert@redhat.com>
+	<20181212123059.GD31033@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 2/3] s390: cpu feature for
- diagnose 318 andlimit max VCPUs to 247
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181212123059.GD31033@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 0/7] virtio-fs: shared file system for
+ virtual machines3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,100 +29,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Collin Walling <walling@linux.ibm.com>, thuth@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, sweil@redhat.com, swhiteho@redhat.com, stefanha@redhat.com, vgoyal@redhat.com, miklos@szeredi.hu
 
-On Wed, 12 Dec 2018 12:20:08 +0100
-David Hildenbrand <david@redhat.com> wrote:
+* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> On Mon, Dec 10, 2018 at 05:31:44PM +0000, Dr. David Alan Gilbert (git) =
+wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> >=20
+> > Hi,
+> >   This is the first RFC for the QEMU side of 'virtio-fs';
+> > a new mechanism for mounting host directories into the guest
+> > in a fast, consistent and secure manner.  Our primary use
+> > case is kata containers, but it should be usable in other scenarios
+> > as well.
+> >=20
+> > There are corresponding patches being posted to Linux kernel,
+> > libfuse and kata lists.
+> >=20
+> > For a fuller design description, and benchmark numbers, please see
+> > Vivek's posting of the kernel set here:
+> >=20
+> > https://marc.info/?l=3Dlinux-kernel&m=3D154446243024251&w=3D2
+> >=20
+> > We've got a small website with instructions on how to use it, here:
+> >=20
+> > https://virtio-fs.gitlab.io/
+> >=20
+> > and all the code is available on gitlab at:
+> >=20
+> > https://gitlab.com/virtio-fs
+> >=20
+> > QEMU's changes
+> > --------------
+> >=20
+> > The QEMU changes are pretty small;=20
+> >=20
+> > There's a new vhost-user device, which is used to carry a stream of
+> > FUSE messages to an external daemon that actually performs
+> > all the file IO.  The FUSE daemon is an external process in order to
+> > achieve better isolation for security and resource control (e.g. numb=
+er
+> > of file descriptors) and also because it's cleaner than trying to
+> > integrate libfuse into QEMU.
+>=20
+> Overall I like the virtio-fs architecture more than the virtio-vsock+NF=
+S
+> approach, as virtio-fs feels simpler and closer to virtio-9p with the
+> latter's proxy backends.
+>=20
+> I never really liked the idea of having to mess around with the host
+> NFS server to exposed filesystems to guests, as that's systemwide
+> service.  The ability to have an isolated virtio-fs backend process
+> per filesystem share per guest is simpler from a mgmt pov.
+>=20
+> One think I would like to see though is a general purpose, production
+> quality backend impl that is shipped by the QEMU project.  It is fine
+> if projects like Kata want to write a custom impl tailored to their
+> specific needs, but I think QEMU should have something as standard that
+> isn't just demoware.=20
 
-> On 11.12.18 22:12, Collin Walling wrote:
-> > On 12/11/18 11:47 AM, Collin Walling wrote:  
-> >> On 12/7/18 7:08 AM, Cornelia Huck wrote:  
-> >>> On Thu,  6 Dec 2018 17:24:17 -0500
-> >>> Collin Walling <walling@linux.ibm.com> wrote:
-> >>>  
-> >>>> Diagnose 318 is a new z14.2 CPU feature. Since we are able to emulate
-> >>>> it entirely via KVM, we can add guest support for earlier models. A
-> >>>> new CPU feature for diagnose 318 (shortened to diag318) will be made
-> >>>> available to guests starting with the zEC12-full CPU model.
-> >>>>
-> >>>> The z14.2 adds a new read SCP info byte (let's call it byte 134) to
-> >>>> detect the availability of diag318. Because of this, we have room for
-> >>>> one less VCPU and thus limit the max VPUs supported in a configuration
-> >>>> to 247 (down from 248).
-> >>>>
-> >>>> Signed-off-by: Collin Walling <walling@linux.ibm.com>.
-> >>>> ---
-> >>>>  hw/s390x/sclp.c                 | 2 ++
-> >>>>  include/hw/s390x/sclp.h         | 2 ++
-> >>>>  target/s390x/cpu.h              | 2 +-
-> >>>>  target/s390x/cpu_features.c     | 3 +++
-> >>>>  target/s390x/cpu_features.h     | 1 +
-> >>>>  target/s390x/cpu_features_def.h | 3 +++
-> >>>>  target/s390x/gen-features.c     | 1 +
-> >>>>  target/s390x/kvm.c              | 1 +
-> >>>>  8 files changed, 14 insertions(+), 1 deletion(-)
-> >>>>  
-> >>>  
-> >>>> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> >>>> index 8c2320e..594b4a4 100644
-> >>>> --- a/target/s390x/cpu.h
-> >>>> +++ b/target/s390x/cpu.h
-> >>>> @@ -52,7 +52,7 @@
-> >>>>  
-> >>>>  #define MMU_USER_IDX 0
-> >>>>  
-> >>>> -#define S390_MAX_CPUS 248
-> >>>> +#define S390_MAX_CPUS 247  
-> >>>
-> >>> Isn't that already problematic if you try to migrate from an older QEMU
-> >>> with all possible vcpus defined? IOW, don't you really need a way that
-> >>> older machines can still run with one more vcpu?
-> >>>  
-> >>
-> >> Good call. I'll run some tests on this and see what happens. I'll report
-> >> here on those results.
-> >>  
-> > 
-> > Migrating to a machine that supports less vCPUs will report
-> > 
-> > error: unsupported configuration: Maximum CPUs greater than specified machine type limit
-> > 
-> > I revisited the code to see if there's a way to dynamically set the max vcpu count based 
-> > on the read scp info size, but it gets really tricky and code looks very complicated.
-> > (Having a packed struct contain the CPU entries whose maximum is determined by hardware
-> > limitations makes things difficult -- but who said s390 is easy? :) )
-> > 
-> > In reality, do we often have guests running with 248 or even 247 vcpus? If so, I imagine
-> > the performance isn't too significant?  
-> Gluing CPU feature availability to machines is plain ugly. This sounds
-> like going back to pre-cpu model times ;)
-> 
-> There are two alternatives:
-> 
-> a) Don't model it as a CPU feature in QEMU. Glue it completely to the
-> QEMU machine. This goes hand-in-hand with the proposal I made in the KVM
-> thread, that diag318 is to be handled completely in QEMU, always. The
-> KVM setting part is optional (if KVM + HW support it).
-> 
-> Then we can have two different max_cpus/ReadInfo layouts based on the
-> machine type. No need to worry about QEMU cpu features.
-> 
-> Once we have other SCLP features (eventually requiring KVM/HW support)
-> announced in the same feature block, things might get more involved, but
-> I guess we could handle it somehow.
+Our patches sent to libfuse may provide that - after we tidy them up a
+bit more; but it is the result of adding the fuse example code to qemu's
+contrib vhost-user example code.    Given that this is the intersection
+of so many projects I'm not sure I care which project distributes a
+working implementation.
 
-Perhaps via a capability to be enabled?
+Dave
 
-> 
-> 
-> b) Glue the ReadInfo layout to the CPU feature, we would have to
-> default-disable the CPU feature for legacy machines. And bail out if
-> more CPUs are used when the feature is enabled. Hairy.
-> 
-> 
-> I guess a) would be the best thing to do. After all this really does not
-> sound like a CPU feature but more like a machine feature. But there is
-> usually a fine line between them.
-
-a) sounds like the better option to me as well.
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
