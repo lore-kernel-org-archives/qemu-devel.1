@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6MZ-0000qR-JE
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:53 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6Ma-0000r2-4A
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6MY-0000Fd-0m
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:51 -0500
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:33923)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6MY-0000G7-9b
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:52 -0500
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:51736)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gX6MX-0000CR-J3
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:49 -0500
-Received: by mail-wr1-x42d.google.com with SMTP id j2so18126715wrw.1
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:23:47 -0800 (PST)
+	id 1gX6MX-00009q-R2
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:50 -0500
+Received: by mail-wm1-x333.google.com with SMTP id s14so6209893wmh.1
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:23:43 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	u10sm15878859wrr.33.2018.12.12.07.23.45 for <qemu-devel@nongnu.org>
+	u10sm15878859wrr.33.2018.12.12.07.23.41 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 12 Dec 2018 07:23:45 -0800 (PST)
+	Wed, 12 Dec 2018 07:23:41 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 12 Dec 2018 16:22:47 +0100
-Message-Id: <1544628195-37728-27-git-send-email-pbonzini@redhat.com>
+Date: Wed, 12 Dec 2018 16:22:43 +0100
+Message-Id: <1544628195-37728-23-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
 References: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 26/54] vfio: make vfio_address_spaces static
+Subject: [Qemu-devel] [PULL 22/54] test: execute g_test_run when tests are
+ skipped
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,40 +34,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-It is not used outside hw/vfio/common.c, so it does not need to
-be extern.
+Sometimes a test's main() function recognizes that the environment
+does not support the test, and therefore exits.  In this case, we
+still should run g_test_run() so that a TAP harness will print the
+test plan ("1..0") and the test will be marked as skipped.
 
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <1543513531-1151-2-git-send-email-pbonzini@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/vfio/common.c              | 2 +-
- include/hw/vfio/vfio-common.h | 1 -
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ tests/cdrom-test.c     | 2 +-
+ tests/migration-test.c | 8 ++++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 7c185e5a..7aa804e 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -39,7 +39,7 @@
+diff --git a/tests/cdrom-test.c b/tests/cdrom-test.c
+index 9b43dc9..14bd981 100644
+--- a/tests/cdrom-test.c
++++ b/tests/cdrom-test.c
+@@ -169,7 +169,7 @@ int main(int argc, char **argv)
  
- struct vfio_group_head vfio_group_list =
-     QLIST_HEAD_INITIALIZER(vfio_group_list);
--struct vfio_as_head vfio_address_spaces =
-+static QLIST_HEAD(, VFIOAddressSpace) vfio_address_spaces =
-     QLIST_HEAD_INITIALIZER(vfio_address_spaces);
+     if (exec_genisoimg(genisocheck)) {
+         /* genisoimage not available - so can't run tests */
+-        return 0;
++        return g_test_run();
+     }
  
- #ifdef CONFIG_KVM
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index 1b434d0..127ca47 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -181,7 +181,6 @@ int vfio_get_device(VFIOGroup *group, const char *name,
+     ret = prepare_image(arch, isoimage);
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 06ca506..8352612 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -789,7 +789,7 @@ int main(int argc, char **argv)
+     g_test_init(&argc, &argv, NULL);
  
- extern const MemoryRegionOps vfio_region_ops;
- extern QLIST_HEAD(vfio_group_head, VFIOGroup) vfio_group_list;
--extern QLIST_HEAD(vfio_as_head, VFIOAddressSpace) vfio_address_spaces;
+     if (!ufd_version_check()) {
+-        return 0;
++        return g_test_run();
+     }
  
- #ifdef CONFIG_LINUX
- int vfio_get_region_info(VFIODevice *vbasedev, int index,
+     /*
+@@ -800,7 +800,7 @@ int main(int argc, char **argv)
+     if (g_str_equal(qtest_get_arch(), "ppc64") &&
+         access("/sys/module/kvm_hv", F_OK)) {
+         g_test_message("Skipping test: kvm_hv not available");
+-        return 0;
++        return g_test_run();
+     }
+ 
+     /*
+@@ -811,11 +811,11 @@ int main(int argc, char **argv)
+ #if defined(HOST_S390X)
+         if (access("/dev/kvm", R_OK | W_OK)) {
+             g_test_message("Skipping test: kvm not available");
+-            return 0;
++            return g_test_run();
+         }
+ #else
+         g_test_message("Skipping test: Need s390x host to work properly");
+-        return 0;
++        return g_test_run();
+ #endif
+     }
+ 
 -- 
 1.8.3.1
