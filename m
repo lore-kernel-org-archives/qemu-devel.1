@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48907)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=8779827ad=Alistair.Francis@wdc.com>)
-	id 1gXARH-0001ja-EJ
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:45:01 -0500
+	id 1gXARR-0001t7-Nx
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:45:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=8779827ad=Alistair.Francis@wdc.com>)
-	id 1gXARD-0002aQ-AJ
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:44:59 -0500
+	id 1gXARN-0002fh-Ku
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:45:09 -0500
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Wed, 12 Dec 2018 19:44:51 +0000
-Message-ID: <da0e52f168e7a2e0cb28e0c424b100d30f31b4ac.1544643238.git.alistair.francis@wdc.com>
+Date: Wed, 12 Dec 2018 19:45:01 +0000
+Message-ID: <fc68dfb190490d351171183726d9c9234fff4cd3.1544643238.git.alistair.francis@wdc.com>
 References: <cover.1544643238.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1544643238.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v1 13/23] riscv: tcg-target: Add the out load
- and store instructions
+Subject: [Qemu-devel] [PATCH v1 14/23] riscv: tcg-target: Add the add2 and
+ sub2 instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,89 +30,75 @@ To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qe
 Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Michael Clark <mjc@sifive.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/riscv/tcg-target.inc.c | 65 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 65 insertions(+)
+ tcg/riscv/tcg-target.inc.c | 55 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 55 insertions(+)
 
 diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
-index 6d63541da0..57084e747b 100644
+index 57084e747b..586a8917c7 100644
 --- a/tcg/riscv/tcg-target.inc.c
 +++ b/tcg/riscv/tcg-target.inc.c
-@@ -616,3 +616,68 @@ static void tcg_out_ext32s(TCGContext *s, TCGReg ret, =
-TCGReg arg)
- {
-     tcg_out_opc_imm(s, OPC_ADDIW, ret, arg, 0);
+@@ -681,3 +681,58 @@ static bool tcg_out_sti(TCGContext *s, TCGType type, T=
+CGArg val,
+     }
+     return false;
  }
 +
-+static void tcg_out_ldst(TCGContext *s, RISCVInsn opc, TCGReg data,
-+                         TCGReg addr, intptr_t offset)
++static void tcg_out_addsub2(TCGContext *s,
++                            TCGReg rl, TCGReg rh,
++                            TCGReg al, TCGReg ah,
++                            TCGArg bl, TCGArg bh,
++                            bool cbl, bool cbh, bool is_sub, bool is32bit)
 +{
-+    intptr_t imm12 =3D sextreg(offset, 0, 12);
++    const RISCVInsn opc_add =3D is32bit ? OPC_ADDW : OPC_ADD;
++    const RISCVInsn opc_addi =3D is32bit ? OPC_ADDIW : OPC_ADDI;
++    const RISCVInsn opc_sub =3D is32bit ? OPC_SUBW : OPC_SUB;
++    TCGReg th =3D TCG_REG_TMP1;
 +
-+    if (offset !=3D imm12) {
-+        intptr_t diff =3D offset - (uintptr_t)s->code_ptr;
++    /* If we have a negative constant such that negating it would
++       make the high part zero, we can (usually) eliminate one insn.  */
++    if (cbl && cbh && bh =3D=3D -1 && bl !=3D 0) {
++        bl =3D -bl;
++        bh =3D 0;
++        is_sub =3D !is_sub;
++    }
 +
-+        if (addr =3D=3D TCG_REG_ZERO && diff =3D=3D (int32_t)diff) {
-+            imm12 =3D sextreg(diff, 0, 12);
-+            tcg_out_opc_upper(s, OPC_AUIPC, TCG_REG_TMP2, diff - imm12);
++    /* By operating on the high part first, we get to use the final
++       carry operation to move back from the temporary.  */
++    if (!cbh) {
++        tcg_out_opc_reg(s, (is_sub ? opc_sub : opc_add), th, ah, bh);
++    } else if (bh !=3D 0 || ah =3D=3D rl) {
++        tcg_out_opc_imm(s, opc_addi, th, ah, (is_sub ? -bh : bh));
++    } else {
++        th =3D ah;
++    }
++
++    /* Note that tcg optimization should eliminate the bl =3D=3D 0 case.  =
+*/
++    if (is_sub) {
++        if (cbl) {
++            tcg_out_opc_imm(s, OPC_SLTIU, TCG_REG_TMP0, al, bl);
++            tcg_out_opc_imm(s, opc_addi, rl, al, -bl);
 +        } else {
-+            tcg_out_movi(s, TCG_TYPE_PTR, TCG_REG_TMP2, offset - imm12);
-+            if (addr !=3D TCG_REG_ZERO) {
-+                tcg_out_opc_reg(s, OPC_ADD, TCG_REG_TMP2, TCG_REG_TMP2, ad=
-dr);
-+            }
++            tcg_out_opc_reg(s, OPC_SLTU, TCG_REG_TMP0, al, bl);
++            tcg_out_opc_reg(s, opc_sub, rl, al, bl);
 +        }
-+        addr =3D TCG_REG_TMP2;
++        tcg_out_opc_reg(s, opc_sub, rh, th, TCG_REG_TMP0);
++    } else {
++        if (cbl) {
++            tcg_out_opc_imm(s, opc_addi, rl, al, bl);
++            tcg_out_opc_imm(s, OPC_SLTIU, TCG_REG_TMP0, rl, bl);
++        } else if (rl =3D=3D al && rl =3D=3D bl) {
++            tcg_out_opc_imm(s, OPC_SLTI, TCG_REG_TMP0, al, 0);
++            tcg_out_opc_reg(s, opc_addi, rl, al, bl);
++        } else {
++            tcg_out_opc_reg(s, opc_add, rl, al, bl);
++            tcg_out_opc_reg(s, OPC_SLTU, TCG_REG_TMP0,
++                            rl, (rl =3D=3D bl ? al : bl));
++        }
++        tcg_out_opc_reg(s, opc_add, rh, th, TCG_REG_TMP0);
 +    }
-+
-+    switch (opc) {
-+    case OPC_SB:
-+    case OPC_SH:
-+    case OPC_SW:
-+    case OPC_SD:
-+        tcg_out_opc_store(s, opc, addr, data, imm12);
-+        break;
-+    case OPC_LB:
-+    case OPC_LBU:
-+    case OPC_LH:
-+    case OPC_LHU:
-+    case OPC_LW:
-+    case OPC_LWU:
-+    case OPC_LD:
-+        tcg_out_opc_imm(s, opc, data, addr, imm12);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+}
-+
-+static void tcg_out_ld(TCGContext *s, TCGType type, TCGReg arg,
-+                       TCGReg arg1, intptr_t arg2)
-+{
-+    bool is32bit =3D (TCG_TARGET_REG_BITS =3D=3D 32 || type =3D=3D TCG_TYP=
-E_I32);
-+    tcg_out_ldst(s, is32bit ? OPC_LW : OPC_LD, arg, arg1, arg2);
-+}
-+
-+static void tcg_out_st(TCGContext *s, TCGType type, TCGReg arg,
-+                       TCGReg arg1, intptr_t arg2)
-+{
-+    bool is32bit =3D (TCG_TARGET_REG_BITS =3D=3D 32 || type =3D=3D TCG_TYP=
-E_I32);
-+    tcg_out_ldst(s, is32bit ? OPC_SW : OPC_SD, arg, arg1, arg2);
-+}
-+
-+static bool tcg_out_sti(TCGContext *s, TCGType type, TCGArg val,
-+                        TCGReg base, intptr_t ofs)
-+{
-+    if (val =3D=3D 0) {
-+        tcg_out_st(s, type, TCG_REG_ZERO, base, ofs);
-+        return true;
-+    }
-+    return false;
 +}
 --=20
 2.19.1
