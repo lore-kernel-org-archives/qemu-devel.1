@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gXCPa-00041k-BX
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 16:51:23 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gXCPi-000498-Ak
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 16:51:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gXCPZ-0007CY-6r
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 16:51:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52154)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gXCPf-0007GF-1i
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 16:51:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53616)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gXCPY-0007C3-VL
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 16:51:21 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	id 1gXCPe-0007Fl-Or
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 16:51:26 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 593EE9D50B
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 21:51:20 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2C7D637EEF
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 21:51:26 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 13 Dec 2018 01:48:49 +0400
-Message-Id: <20181212214850.29953-28-marcandre.lureau@redhat.com>
+Date: Thu, 13 Dec 2018 01:48:50 +0400
+Message-Id: <20181212214850.29953-29-marcandre.lureau@redhat.com>
 In-Reply-To: <20181212214850.29953-1-marcandre.lureau@redhat.com>
 References: <20181212214850.29953-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 27/28] arm: replace instance_post_init()
+Subject: [Qemu-devel] [PATCH v6 28/28] hostmem: use object id for memory
+ region name with >= 4.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,193 +37,252 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: imammedo@redhat.com, ehabkost@redhat.com
 
-Replace arm_cpu_post_init() instance callback by calling it from leaf
-classes, to avoid potential ordering issue with other post_init callbacks=
-.
+hostmem-file and hostmem-memfd use the whole object path for the
+memory region name, and hostname-ram uses only the path component (the
+object id, or canonical path basename):
+
+qemu -m 1024 -object memory-backend-file,id=3Dmem,size=3D1G,mem-path=3D/t=
+mp/foo -numa node,memdev=3Dmem -monitor stdio
+(qemu) info ramblock
+              Block Name    PSize              Offset               Used =
+             Total
+            /objects/mem    4 KiB  0x0000000000000000 0x0000000040000000 =
+0x0000000040000000
+
+qemu -m 1024 -object memory-backend-memfd,id=3Dmem,size=3D1G -numa node,m=
+emdev=3Dmem -monitor stdio
+(qemu) info ramblock
+              Block Name    PSize              Offset               Used =
+             Total
+            /objects/mem    4 KiB  0x0000000000000000 0x0000000040000000 =
+0x0000000040000000
+
+qemu -m 1024 -object memory-backend-ram,id=3Dmem,size=3D1G -numa node,mem=
+dev=3Dmem -monitor stdio
+(qemu) info ramblock
+              Block Name    PSize              Offset               Used =
+             Total
+                     mem    4 KiB  0x0000000000000000 0x0000000040000000 =
+0x0000000040000000
+
+For consistency, change to use object id for -file and -memfd as well
+with >=3D 4.0.
+
+Having a consistent naming allows to migrate to different hostmem
+backends.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
 ---
- target/arm/cpu-qom.h |  3 +++
- target/arm/cpu.h     |  2 ++
- target/arm/cpu.c     | 30 ++++++++++++++++++++++++------
- target/arm/cpu64.c   | 24 ++++++++++++++++++++----
- 4 files changed, 49 insertions(+), 10 deletions(-)
+ include/sysemu/hostmem.h |  3 ++-
+ backends/hostmem-file.c  |  8 ++++----
+ backends/hostmem-memfd.c |  2 +-
+ backends/hostmem-ram.c   |  9 ++++-----
+ backends/hostmem.c       | 36 ++++++++++++++++++++++++++++++++++++
+ hw/core/machine.c        | 12 +++++++++++-
+ 6 files changed, 58 insertions(+), 12 deletions(-)
 
-diff --git a/target/arm/cpu-qom.h b/target/arm/cpu-qom.h
-index d135ff8e06..2049fa9612 100644
---- a/target/arm/cpu-qom.h
-+++ b/target/arm/cpu-qom.h
-@@ -35,6 +35,8 @@ struct arm_boot_info;
+diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
+index 6e6bd2c1cb..a023b372a4 100644
+--- a/include/sysemu/hostmem.h
++++ b/include/sysemu/hostmem.h
+@@ -53,7 +53,7 @@ struct HostMemoryBackend {
 =20
- #define TYPE_ARM_MAX_CPU "max-" TYPE_ARM_CPU
-=20
-+typedef struct ARMCPUInfo ARMCPUInfo;
-+
- /**
-  * ARMCPUClass:
-  * @parent_realize: The parent class' realize handler.
-@@ -47,6 +49,7 @@ typedef struct ARMCPUClass {
-     CPUClass parent_class;
-     /*< public >*/
-=20
-+    const ARMCPUInfo *info;
-     DeviceRealize parent_realize;
-     void (*parent_reset)(CPUState *cpu);
- } ARMCPUClass;
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 2a73fed9a0..84fba2b24b 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -884,6 +884,8 @@ static inline ARMCPU *arm_env_get_cpu(CPUARMState *en=
-v)
-     return container_of(env, ARMCPU, env);
- }
-=20
-+void arm_cpu_post_init(Object *obj);
-+
- uint64_t arm_cpu_mp_affinity(int idx, uint8_t clustersz);
-=20
- #define ENV_GET_CPU(e) CPU(arm_env_get_cpu(e))
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 60411f6bfe..68f65c15ba 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -734,7 +734,7 @@ static Property arm_cpu_pmsav7_dregion_property =3D
- static Property arm_cpu_initsvtor_property =3D
-             DEFINE_PROP_UINT32("init-svtor", ARMCPU, init_svtor, 0);
-=20
--static void arm_cpu_post_init(Object *obj)
-+void arm_cpu_post_init(Object *obj)
- {
-     ARMCPU *cpu =3D ARM_CPU(obj);
-=20
-@@ -1442,8 +1442,10 @@ static void cortex_m33_initfn(Object *obj)
-=20
- static void arm_v7m_class_init(ObjectClass *oc, void *data)
- {
-+    ARMCPUClass *acc =3D ARM_CPU_CLASS(oc);
-     CPUClass *cc =3D CPU_CLASS(oc);
-=20
-+    acc->info =3D data;
- #ifndef CONFIG_USER_ONLY
-     cc->do_interrupt =3D arm_v7m_cpu_do_interrupt;
- #endif
-@@ -1940,11 +1942,11 @@ static void arm_max_initfn(Object *obj)
-=20
- #endif /* !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64) */
-=20
--typedef struct ARMCPUInfo {
-+struct ARMCPUInfo {
-     const char *name;
-     void (*initfn)(Object *obj);
-     void (*class_init)(ObjectClass *oc, void *data);
--} ARMCPUInfo;
-+};
-=20
- static const ARMCPUInfo arm_cpus[] =3D {
- #if !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64)
-@@ -2094,6 +2096,7 @@ static void arm_host_initfn(Object *obj)
-     ARMCPU *cpu =3D ARM_CPU(obj);
-=20
-     kvm_arm_set_cpu_features_from_host(cpu);
-+    arm_cpu_post_init(ARM_CPU(obj));
- }
-=20
- static const TypeInfo host_arm_cpu_type_info =3D {
-@@ -2108,14 +2111,30 @@ static const TypeInfo host_arm_cpu_type_info =3D =
-{
+     /* protected */
+     uint64_t size;
+-    bool merge, dump;
++    bool merge, dump, use_canonical_path;
+     bool prealloc, force_prealloc, is_mapped, share;
+     DECLARE_BITMAP(host_nodes, MAX_NODES + 1);
+     HostMemPolicy policy;
+@@ -67,5 +67,6 @@ MemoryRegion *host_memory_backend_get_memory(HostMemory=
+Backend *backend);
+ void host_memory_backend_set_mapped(HostMemoryBackend *backend, bool map=
+ped);
+ bool host_memory_backend_is_mapped(HostMemoryBackend *backend);
+ size_t host_memory_backend_pagesize(HostMemoryBackend *memdev);
++char *host_memory_backend_get_name(HostMemoryBackend *backend);
 =20
  #endif
-=20
-+static void arm_cpu_instance_init(Object *obj)
-+{
-+    ARMCPUClass *acc =3D ARM_CPU_GET_CLASS(obj);
-+
-+    acc->info->initfn(obj);
-+    arm_cpu_post_init(obj);
-+}
-+
-+static void cpu_register_class_init(ObjectClass *oc, void *data)
-+{
-+    ARMCPUClass *acc =3D ARM_CPU_CLASS(oc);
-+
-+    acc->info =3D data;
-+}
-+
- static void cpu_register(const ARMCPUInfo *info)
+diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+index 78f058dee2..7a34e25c43 100644
+--- a/backends/hostmem-file.c
++++ b/backends/hostmem-file.c
+@@ -43,7 +43,7 @@ file_backend_memory_alloc(HostMemoryBackend *backend, E=
+rror **errp)
  {
-     TypeInfo type_info =3D {
-         .parent =3D TYPE_ARM_CPU,
-         .instance_size =3D sizeof(ARMCPU),
--        .instance_init =3D info->initfn,
-+        .instance_init =3D arm_cpu_instance_init,
-         .class_size =3D sizeof(ARMCPUClass),
--        .class_init =3D info->class_init,
-+        .class_init =3D info->class_init ?: cpu_register_class_init,
-+        .class_data =3D (void *)info,
-     };
+     HostMemoryBackendFile *fb =3D MEMORY_BACKEND_FILE(backend);
+ #ifdef CONFIG_POSIX
+-    gchar *path;
++    gchar *name;
+ #endif
 =20
-     type_info.name =3D g_strdup_printf("%s-" TYPE_ARM_CPU, info->name);
-@@ -2128,7 +2147,6 @@ static const TypeInfo arm_cpu_type_info =3D {
-     .parent =3D TYPE_CPU,
-     .instance_size =3D sizeof(ARMCPU),
-     .instance_init =3D arm_cpu_initfn,
--    .instance_post_init =3D arm_cpu_post_init,
-     .instance_finalize =3D arm_cpu_finalizefn,
-     .abstract =3D true,
-     .class_size =3D sizeof(ARMCPUClass),
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 873f059bf2..f09dc6b20d 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -359,11 +359,11 @@ static void aarch64_max_initfn(Object *obj)
+     if (!backend->size) {
+@@ -58,14 +58,14 @@ file_backend_memory_alloc(HostMemoryBackend *backend,=
+ Error **errp)
+     error_setg(errp, "-mem-path not supported on this host");
+ #else
+     backend->force_prealloc =3D mem_prealloc;
+-    path =3D object_get_canonical_path(OBJECT(backend));
++    name =3D host_memory_backend_get_name(backend);
+     memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
+-                                     path,
++                                     name,
+                                      backend->size, fb->align,
+                                      (backend->share ? RAM_SHARED : 0) |
+                                      (fb->is_pmem ? RAM_PMEM : 0),
+                                      fb->mem_path, errp);
+-    g_free(path);
++    g_free(name);
+ #endif
+ }
+=20
+diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
+index 2eb9c827a5..98c9bf3240 100644
+--- a/backends/hostmem-memfd.c
++++ b/backends/hostmem-memfd.c
+@@ -53,7 +53,7 @@ memfd_backend_memory_alloc(HostMemoryBackend *backend, =
+Error **errp)
+         return;
      }
- }
 =20
--typedef struct ARMCPUInfo {
-+struct ARMCPUInfo {
-     const char *name;
-     void (*initfn)(Object *obj);
-     void (*class_init)(ObjectClass *oc, void *data);
--} ARMCPUInfo;
-+};
+-    name =3D object_get_canonical_path(OBJECT(backend));
++    name =3D host_memory_backend_get_name(backend);
+     memory_region_init_ram_from_fd(&backend->mr, OBJECT(backend),
+                                    name, backend->size,
+                                    backend->share, fd, errp);
+diff --git a/backends/hostmem-ram.c b/backends/hostmem-ram.c
+index 7ddd08d370..24b65d9ae3 100644
+--- a/backends/hostmem-ram.c
++++ b/backends/hostmem-ram.c
+@@ -16,21 +16,20 @@
 =20
- static const ARMCPUInfo aarch64_cpus[] =3D {
-     { .name =3D "cortex-a57",         .initfn =3D aarch64_a57_initfn },
-@@ -447,14 +447,30 @@ static void aarch64_cpu_class_init(ObjectClass *oc,=
- void *data)
-     cc->gdb_arch_name =3D aarch64_gdb_arch_name;
- }
+ #define TYPE_MEMORY_BACKEND_RAM "memory-backend-ram"
 =20
-+static void aarch64_cpu_instance_init(Object *obj)
-+{
-+    ARMCPUClass *acc =3D ARM_CPU_GET_CLASS(obj);
-+
-+    acc->info->initfn(obj);
-+    arm_cpu_post_init(obj);
-+}
-+
-+static void cpu_register_class_init(ObjectClass *oc, void *data)
-+{
-+    ARMCPUClass *acc =3D ARM_CPU_CLASS(oc);
-+
-+    acc->info =3D data;
-+}
-+
- static void aarch64_cpu_register(const ARMCPUInfo *info)
+-
+ static void
+ ram_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
  {
-     TypeInfo type_info =3D {
-         .parent =3D TYPE_AARCH64_CPU,
-         .instance_size =3D sizeof(ARMCPU),
--        .instance_init =3D info->initfn,
-+        .instance_init =3D aarch64_cpu_instance_init,
-         .class_size =3D sizeof(ARMCPUClass),
--        .class_init =3D info->class_init,
-+        .class_init =3D info->class_init ?: cpu_register_class_init,
-+        .class_data =3D (void *)info,
-     };
+-    char *path;
++    char *name;
 =20
-     type_info.name =3D g_strdup_printf("%s-" TYPE_ARM_CPU, info->name);
+     if (!backend->size) {
+         error_setg(errp, "can't create backend with size 0");
+         return;
+     }
+=20
+-    path =3D object_get_canonical_path_component(OBJECT(backend));
+-    memory_region_init_ram_shared_nomigrate(&backend->mr, OBJECT(backend=
+), path,
++    name =3D host_memory_backend_get_name(backend);
++    memory_region_init_ram_shared_nomigrate(&backend->mr, OBJECT(backend=
+), name,
+                            backend->size, backend->share, errp);
+-    g_free(path);
++    g_free(name);
+ }
+=20
+ static void
+diff --git a/backends/hostmem.c b/backends/hostmem.c
+index af800284e0..ff67e39c83 100644
+--- a/backends/hostmem.c
++++ b/backends/hostmem.c
+@@ -28,6 +28,16 @@ QEMU_BUILD_BUG_ON(HOST_MEM_POLICY_BIND !=3D MPOL_BIND)=
+;
+ QEMU_BUILD_BUG_ON(HOST_MEM_POLICY_INTERLEAVE !=3D MPOL_INTERLEAVE);
+ #endif
+=20
++char *
++host_memory_backend_get_name(HostMemoryBackend *self)
++{
++    if (!self->use_canonical_path) {
++        return object_get_canonical_path_component(OBJECT(self));
++    }
++
++    return object_get_canonical_path(OBJECT(self));
++}
++
+ static void
+ host_memory_backend_get_size(Object *obj, Visitor *v, const char *name,
+                              void *opaque, Error **errp)
+@@ -247,6 +257,11 @@ static void host_memory_backend_init(Object *obj)
+     backend->prealloc =3D mem_prealloc;
+ }
+=20
++static void host_memory_backend_post_init(Object *obj)
++{
++    object_apply_compat_props(obj);
++}
++
+ bool host_memory_backend_mr_inited(HostMemoryBackend *backend)
+ {
+     /*
+@@ -395,6 +410,23 @@ static void host_memory_backend_set_share(Object *o,=
+ bool value, Error **errp)
+     backend->share =3D value;
+ }
+=20
++static bool
++host_memory_backend_get_use_canonical_path(Object *obj, Error **errp)
++{
++    HostMemoryBackend *self =3D MEMORY_BACKEND(obj);
++
++    return self->use_canonical_path;
++}
++
++static void
++host_memory_backend_set_use_canonical_path(Object *obj, bool value,
++                                           Error **errp)
++{
++    HostMemoryBackend *self =3D MEMORY_BACKEND(obj);
++
++    self->use_canonical_path =3D value;
++}
++
+ static void
+ host_memory_backend_class_init(ObjectClass *oc, void *data)
+ {
+@@ -441,6 +473,9 @@ host_memory_backend_class_init(ObjectClass *oc, void =
+*data)
+         &error_abort);
+     object_class_property_set_description(oc, "share",
+         "Mark the memory as private to QEMU or shared", &error_abort);
++    object_class_property_add_bool(oc, "x-use-canonical-path-for-rambloc=
+k-id",
++        host_memory_backend_get_use_canonical_path,
++        host_memory_backend_set_use_canonical_path, &error_abort);
+ }
+=20
+ static const TypeInfo host_memory_backend_info =3D {
+@@ -451,6 +486,7 @@ static const TypeInfo host_memory_backend_info =3D {
+     .class_init =3D host_memory_backend_class_init,
+     .instance_size =3D sizeof(HostMemoryBackend),
+     .instance_init =3D host_memory_backend_init,
++    .instance_post_init =3D host_memory_backend_post_init,
+     .interfaces =3D (InterfaceInfo[]) {
+         { TYPE_USER_CREATABLE },
+         { }
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 7570408caa..cba79ef7ff 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -23,7 +23,17 @@
+ #include "sysemu/qtest.h"
+ #include "hw/pci/pci.h"
+=20
+-GlobalProperty hw_compat_3_1[] =3D {};
++GlobalProperty hw_compat_3_1[] =3D {
++    {
++        .driver   =3D "memory-backend-file",
++        .property =3D "x-use-canonical-path-for-ramblock-id",
++        .value    =3D "true",
++    },{
++        .driver   =3D "memory-backend-memfd",
++        .property =3D "x-use-canonical-path-for-ramblock-id",
++        .value    =3D "true",
++    },
++};
+ const size_t hw_compat_3_1_len =3D G_N_ELEMENTS(hw_compat_3_1);
+=20
+ GlobalProperty hw_compat_3_0[] =3D {};
 --=20
 2.20.0
