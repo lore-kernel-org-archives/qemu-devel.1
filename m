@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gX3FU-0002m9-Ar
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 07:04:23 -0500
+	(envelope-from <matthias@weckbecker.name>) id 1gX3MJ-0004ed-Oo
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 07:11:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gX3FO-0001Rq-FZ
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 07:04:20 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <154115285434.11300.8459925605672823399.stgit@dhcp-3-135.uk.xensource.com>
-	<20181102110412.GD7521@dhcp-200-186.str.redhat.com>
-	<20181212085951.GA7604@aepfle.de>
-Date: Wed, 12 Dec 2018 13:04:04 +0100
-In-Reply-To: <20181212085951.GA7604@aepfle.de> (Olaf Hering's message of "Wed,
-	12 Dec 2018 09:59:51 +0100")
-Message-ID: <87y38vhryj.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Xen-devel] xen_disk qdevification
+	(envelope-from <matthias@weckbecker.name>) id 1gX3MD-0002c8-Ma
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 07:11:23 -0500
+Received: from weckbecker.name ([87.118.122.104]:64101)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <matthias@weckbecker.name>)
+	id 1gX3MA-0002Xt-Fi
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 07:11:15 -0500
+From: Matthias Weckbecker <matthias@weckbecker.name>
+Date: Wed, 12 Dec 2018 13:10:18 +0100
+Message-Id: <20181212121018.7716-1-matthias@weckbecker.name>
+Subject: [Qemu-devel] [PATCH v2] hw/pci-bridge: Fix invalid free()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +22,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Olaf Hering <olaf@aepfle.de>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-block@nongnu.org, Tim Smith <tim.smith@citrix.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Paul Durrant <Paul.Durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org
+To: qemu-devel@nongnu.org
+Cc: Matthias Weckbecker <matthias@weckbecker.name>
 
-Olaf Hering <olaf@aepfle.de> writes:
+When loadvm'ing a *running* snapshot qemu crashes due to an invalid
+free. It's fortunately caught early by glibc heap memory corruption
+protection and qemu gets killed with SIGABRT.
 
-> On Fri, Nov 02, Kevin Wolf wrote:
->
->> A while ago, a downstream patch review found out that there are some QMP
->> commands that would immediately crash if a xen_disk device were present
->> because of the lacking qdevification. This is not the code quality
->> standard I envision for QEMU. It's time for non-qdev devices to go.
->
-> Do you have that backwards by any chance? IMO the presence of assert()
-> contributes to bad code quality, not the drivers that trigger those
-> asserts. It is bad enough that two QEMU releases went out while being in
-> bad shape.
+Steps to reproduce:
 
-Converting block devices to the qdev infrastructure (introduced in 2009)
-has been a longwinded affair.  We've repeatedly reminded people in
-charge of the stragglers to update their code.
+1) Create VM (e.g w/ virsh define)
+2) Start the VM and take a snapshot while it's running and having a
+   PCI bridge attached
+3) Destroy the VM and revert the running snapshot.
 
-Neglecting to update code to current infrastructure creates a burden and
-a risk.  The burden is on the maintainers of the infrastructure: they
-get to drag along outmoded infrastructure.  The risk is on the users of
-the code: it becomes a special case, and eventually acquires its special
-bugs.
+This commit fixes the issue.
 
-Putting the blame for them entirely on the maintainers of the
-infrastructure is not fair.
+Signed-off-by: Matthias Weckbecker <matthias@weckbecker.name>
+---
+ hw/pci/pci_bridge.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Anyway, hopefully Paul or whoever will find the time and energy to
-> convert the code at some point.
-
-Yes, Paul's taking care of it.  Much appreciated.
+diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
+index ee9dff2d3a..b9143ac88b 100644
+--- a/hw/pci/pci_bridge.c
++++ b/hw/pci/pci_bridge.c
+@@ -241,9 +241,9 @@ void pci_bridge_update_mappings(PCIBridge *br)
+      * while another accesses an unaffected region. */
+     memory_region_transaction_begin();
+     pci_bridge_region_del(br, br->windows);
++    pci_bridge_region_cleanup(br, w);
+     br->windows = pci_bridge_region_init(br);
+     memory_region_transaction_commit();
+-    pci_bridge_region_cleanup(br, w);
+ }
+ 
+ /* default write_config function for PCI-to-PCI bridge */
+-- 
+2.16.3
