@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gXBMI-0000lt-7N
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:43:55 -0500
+	(envelope-from <prvs=8779827ad=Alistair.Francis@wdc.com>)
+	id 1gXBaK-0004OW-MK
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:58:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gXBME-0008E1-VW
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:43:54 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:45379)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gXBME-0008Cf-Ll
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:43:50 -0500
-References: <20181210165636.28366-1-peter.maydell@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <3afc2ab8-c6b6-7157-e744-e742b384b0da@vivier.eu>
-Date: Wed, 12 Dec 2018 21:43:47 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181210165636.28366-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <prvs=8779827ad=Alistair.Francis@wdc.com>)
+	id 1gXBaG-0003hE-Pi
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:58:24 -0500
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:4479)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prvs=8779827ad=Alistair.Francis@wdc.com>)
+	id 1gXBaD-0003cg-HJ
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:58:19 -0500
+From: Alistair Francis <Alistair.Francis@wdc.com>
+Date: Wed, 12 Dec 2018 20:58:11 +0000
+Message-ID: <7dfbddf7014a595150aa79011ddb342c3cc17ec3.1544648105.git.alistair.francis@wdc.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 0/3] target/m68k: convert to
- transaction_failed hook
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: [Qemu-devel] [PATCH v1 1/1] tcg: mips: Improve the add2/sub2
+ command to use TCG_TARGET_REG_BITS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, patches@linaro.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "aurelien@aurel32.net" <aurelien@aurel32.net>, "smarkovic@wavecomp.com" <smarkovic@wavecomp.com>, "rth@twiddle.net" <rth@twiddle.net>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>
 
-On 10/12/2018 17:56, Peter Maydell wrote:
-> This patchset converts the m68k target from the deprecated
-> unassigned_access hook to the new transaction_failed hook.
-> It's RFC for a couple of reasons:
->  * it's untested, since I don't have an m68k test image
->  * the second patch just makes "bus error while trying to
->    read page tables" be treated as a page fault, when it
->    should probably cause a fault reporting it as a bus error
->    of some kind
->  * I don't understand why the old unassigned_access hook
->    set the ATC bit in the MMU SSW, since the docs I have say
->    this should be set if the fault happened during a table
->    search, but cleared if it's just an ordinary bus-errored
->    data or insn access. Probably this is a pre-existing bug?
-> 
-> Anyway, I send it out as a skeleton for comments, because
-> it would be nice to get rid of the old unassigned_access
-> hook, which is fundamentally broken (it's still used by m68k,
-> microblaze, mips and sparc).
-> 
-> thanks
-> -- PMM
-> 
-> Peter Maydell (3):
->   target/m68k: In dump_address_map() check for memory access failures
->   target/m68k: In get_physical_address() check for memory access
->     failures
->   target/m68k: Switch to transaction_failed hook
-> 
->  target/m68k/cpu.h       |  7 ++--
->  target/m68k/cpu.c       |  2 +-
->  target/m68k/helper.c    | 84 ++++++++++++++++++++++++++++++++---------
->  target/m68k/op_helper.c | 20 ++++------
->  4 files changed, 80 insertions(+), 33 deletions(-)
-> 
+Instead of hard coding 31 for the shift right use
+TCG_TARGET_REG_BITS - 1.
 
-Tested-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ tcg/mips/tcg-target.inc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I'll try to review this later...
-
-Thanks,
-Laurent
+diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
+index cff525373b..aa7cdabf23 100644
+--- a/tcg/mips/tcg-target.inc.c
++++ b/tcg/mips/tcg-target.inc.c
+@@ -796,7 +796,7 @@ static void tcg_out_addsub2(TCGContext *s, TCGReg rl, T=
+CGReg rh, TCGReg al,
+             tcg_out_opc_imm(s, OPC_ADDIU, rl, al, bl);
+             tcg_out_opc_imm(s, OPC_SLTIU, TCG_TMP0, rl, bl);
+         } else if (rl =3D=3D al && rl =3D=3D bl) {
+-            tcg_out_opc_sa(s, OPC_SRL, TCG_TMP0, al, 31);
++            tcg_out_opc_sa(s, OPC_SRL, TCG_TMP0, al, TCG_TARGET_REG_BITS -=
+ 1);
+             tcg_out_opc_reg(s, OPC_ADDU, rl, al, bl);
+         } else {
+             tcg_out_opc_reg(s, OPC_ADDU, rl, al, bl);
+--=20
+2.19.1
