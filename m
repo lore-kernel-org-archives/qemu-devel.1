@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gX5Va-0000TZ-1r
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:29:12 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gX5W6-0000ga-CJ
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:29:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gX5VW-0004ma-Mh
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:29:05 -0500
-Received: from mail-wr1-f43.google.com ([209.85.221.43]:41577)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gX5VW-0004mB-Bp
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:29:02 -0500
-Received: by mail-wr1-f43.google.com with SMTP id x10so17876037wrs.8
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 06:29:02 -0800 (PST)
-References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
-	<1543851204-41186-29-git-send-email-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <3c07c948-6815-04ff-6750-a0153e503368@redhat.com>
-Date: Wed, 12 Dec 2018 15:28:59 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1gX5W3-00050k-45
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:29:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50766)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gX5W2-00050J-RM
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:29:35 -0500
+Date: Wed, 12 Dec 2018 12:29:26 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181212142926.GT7141@habkost.net>
+References: <20181211192527.13254-1-ehabkost@redhat.com>
+	<7525c0fa-037d-e408-cd49-244993ef5387@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1543851204-41186-29-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 28/71] qos-test: sdhci test node
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <7525c0fa-037d-e408-cd49-244993ef5387@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] x86: host-phys-bits-limit option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,325 +28,241 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <laurent@vivier.eu>
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: qemu-devel@nongnu.org, Andrea Arcangeli <aarcange@redhat.com>, paul.c.lai@intel.com, Bandan Das <bsd@redhat.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 12/3/18 4:32 PM, Paolo Bonzini wrote:
-> From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-> 
-> Convert tests/sdhci-test in first qgraph test node, sdhci-test. This test
-> consumes an sdhci interface and checks that its function return the
-> expected values.
-> 
-> Note that this test does not allocate any sdhci structure, it's all done by the
-> qtest walking graph mechanism
-> 
-> Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On Wed, Dec 12, 2018 at 12:08:08PM -0200, Wainer dos Santos Moschetta wro=
+te:
+>=20
+> On 12/11/2018 05:25 PM, Eduardo Habkost wrote:
+> > Some downstream distributions of QEMU set host-phys-bits=3Don by
+> > default.  This worked very well for most use cases, because
+> > phys-bits really didn't have huge consequences. The only
+> > difference was on the CPUID data seen by guests, and on the
+> > handling of reserved bits.
+> >=20
+> > This changed in KVM commit 855feb673640 ("KVM: MMU: Add 5 level
+> > EPT & Shadow page table support").  Now choosing a large
+> > phys-bits value for a VM has bigger impact: it will make KVM use
+> > 5-level EPT even when it's not really necessary.  This means
+> > using the host phys-bits value may not be the best choice.
+> >=20
+> > Management software could address this problem by manually
+> > configuring phys-bits depending on the size of the VM and the
+> > amount of MMIO address space required for hotplug.  But this is
+> > not trivial to implement.
+> >=20
+> > However, there's another workaround that would work for most
+> > cases: keep using the host phys-bits value, but only if it's
+> > smaller than 48.  This patch makes this possible by introducing a
+> > new "-cpu" option: "host-phys-bits-limit".  Management software
+> > or users can make sure they will always use 4-level EPT using:
+> > "host-phys-bits=3Don,host-phys-bits-limit=3D48".
+> >=20
+> > This behavior is still not enabled by default because QEMU
+> > doesn't enable host-phys-bits=3Don by default.  But users,
+> > management software, or downstream distributions may choose to
+> > change their defaults using the new option.
+> >=20
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> >   target/i386/cpu.h                 |  3 ++
+> >   target/i386/cpu.c                 |  5 ++
+> >   tests/acceptance/x86-phys-bits.py | 81 ++++++++++++++++++++++++++++=
++++
+> >   3 files changed, 89 insertions(+)
+> >   create mode 100644 tests/acceptance/x86-phys-bits.py
+> >=20
+> > diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> > index 9c52d0cbeb..a545b77c2c 100644
+> > --- a/target/i386/cpu.h
+> > +++ b/target/i386/cpu.h
+> > @@ -1457,6 +1457,9 @@ struct X86CPU {
+> >       /* if true override the phys_bits value with a value read from =
+the host */
+> >       bool host_phys_bits;
+> > +    /* if set, limit maximum value for phys_bits when host_phys_bits=
+ is true */
+> > +    uint8_t host_phys_bits_limit;
+> > +
+> >       /* Stop SMI delivery for migration compatibility with old machi=
+nes */
+> >       bool kvm_no_smi_migration;
+> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > index f81d35e1f9..df200754a2 100644
+> > --- a/target/i386/cpu.c
+> > +++ b/target/i386/cpu.c
+> > @@ -5152,6 +5152,10 @@ static void x86_cpu_realizefn(DeviceState *dev=
+, Error **errp)
+> >               if (cpu->host_phys_bits) {
+> >                   /* The user asked for us to use the host physical b=
+its */
+> >                   cpu->phys_bits =3D host_phys_bits;
+> > +                if (cpu->host_phys_bits_limit &&
+> > +                    cpu->phys_bits > cpu->host_phys_bits_limit) {
+> > +                    cpu->phys_bits =3D cpu->host_phys_bits_limit;
+> > +                }
+> >               }
+> >               /* Print a warning if the user set it to a value that's=
+ not the
+> > @@ -5739,6 +5743,7 @@ static Property x86_cpu_properties[] =3D {
+> >       DEFINE_PROP_BOOL("kvm", X86CPU, expose_kvm, true),
+> >       DEFINE_PROP_UINT32("phys-bits", X86CPU, phys_bits, 0),
+> >       DEFINE_PROP_BOOL("host-phys-bits", X86CPU, host_phys_bits, fals=
+e),
+> > +    DEFINE_PROP_UINT8("host-phys-bits-limit", X86CPU, host_phys_bits=
+_limit, 0),
+> >       DEFINE_PROP_BOOL("fill-mtrr-mask", X86CPU, fill_mtrr_mask, true=
+),
+> >       DEFINE_PROP_UINT32("level", X86CPU, env.cpuid_level, UINT32_MAX=
+),
+> >       DEFINE_PROP_UINT32("xlevel", X86CPU, env.cpuid_xlevel, UINT32_M=
+AX),
+>=20
+> The changes to introduce the host-phys-bits-limit option looks good to =
+me,
+> although I haven't much knowledge on this area anyway...
+>=20
+> > diff --git a/tests/acceptance/x86-phys-bits.py b/tests/acceptance/x86=
+-phys-bits.py
+> > new file mode 100644
+> > index 0000000000..ae85d7e4e7
+> > --- /dev/null
+> > +++ b/tests/acceptance/x86-phys-bits.py
+>=20
+> PEP8 does not have a convention for Python files naming, although it
+> suggests the use of underscore on module and package names. We already =
+have
+> the tests/acceptance/boot_linux_console.py with underscore, so I think =
+we
+> should make it a convention.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Agreed: it's better to be consistent.
 
-> ---
->  tests/Makefile.include |   7 +-
->  tests/sdhci-test.c     | 185 ++++++-------------------------------------------
->  2 files changed, 24 insertions(+), 168 deletions(-)
-> 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 752f2c2..e6be21c 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -216,7 +216,6 @@ check-qtest-i386-y += tests/migration-test$(EXESUF)
->  check-qtest-i386-y += tests/test-x86-cpuid-compat$(EXESUF)
->  check-qtest-i386-y += tests/numa-test$(EXESUF)
->  check-qtest-x86_64-y += $(check-qtest-i386-y)
-> -check-qtest-x86_64-$(CONFIG_SDHCI) += tests/sdhci-test$(EXESUF)
->  
->  check-qtest-alpha-y += tests/boot-serial-test$(EXESUF)
->  
-> @@ -278,11 +277,9 @@ check-qtest-arm-y += tests/m25p80-test$(EXESUF)
->  check-qtest-arm-y += tests/virtio-blk-test$(EXESUF)
->  check-qtest-arm-y += tests/test-arm-mptimer$(EXESUF)
->  check-qtest-arm-y += tests/boot-serial-test$(EXESUF)
-> -check-qtest-arm-$(CONFIG_SDHCI) += tests/sdhci-test$(EXESUF)
->  check-qtest-arm-y += tests/hexloader-test$(EXESUF)
->  
->  check-qtest-aarch64-y = tests/numa-test$(EXESUF)
-> -check-qtest-aarch64-$(CONFIG_SDHCI) += tests/sdhci-test$(EXESUF)
->  check-qtest-aarch64-y += tests/boot-serial-test$(EXESUF)
->  check-qtest-aarch64-y += tests/migration-test$(EXESUF)
->  
-> @@ -688,6 +685,9 @@ qos-test-obj-y += tests/libqos/arm-smdkc210-machine.o
->  qos-test-obj-y += tests/libqos/arm-xilinx-zynq-a9-machine.o
->  qos-test-obj-y += tests/libqos/x86_64_pc-machine.o
->  
-> +# Tests
-> +qos-test-obj-y += tests/sdhci-test.o
-> +
->  check-unit-y += tests/test-qgraph$(EXESUF)
->  tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
->  
-> @@ -780,7 +780,6 @@ tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
->  tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-util-obj-y)
->  tests/numa-test$(EXESUF): tests/numa-test.o
->  tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-sector.o tests/acpi-utils.o
-> -tests/sdhci-test$(EXESUF): tests/sdhci-test.o $(libqos-pc-obj-y)
->  tests/cdrom-test$(EXESUF): tests/cdrom-test.o tests/boot-sector.o $(libqos-obj-y)
->  
->  tests/migration/stress$(EXESUF): tests/migration/stress.o
-> diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
-> index 28d481b..2f177e5 100644
-> --- a/tests/sdhci-test.c
-> +++ b/tests/sdhci-test.c
-> @@ -12,6 +12,8 @@
->  #include "libqtest.h"
->  #include "libqos/pci-pc.h"
->  #include "hw/pci/pci.h"
-> +#include "libqos/qgraph.h"
-> +#include "libqos/sdhci.h"
->  
->  #define SDHC_CAPAB                      0x40
->  FIELD(SDHC_CAPAB, BASECLKFREQ,               8, 8); /* since v2 */
-> @@ -20,99 +22,11 @@ FIELD(SDHC_CAPAB, SDR,                      32, 3); /* since v3 */
->  FIELD(SDHC_CAPAB, DRIVER,                   36, 3); /* since v3 */
->  #define SDHC_HCVER                      0xFE
->  
-> -static const struct sdhci_t {
-> -    const char *arch, *machine;
-> -    struct {
-> -        uintptr_t addr;
-> -        uint8_t version;
-> -        uint8_t baseclock;
-> -        struct {
-> -            bool sdma;
-> -            uint64_t reg;
-> -        } capab;
-> -    } sdhci;
-> -    struct {
-> -        uint16_t vendor_id, device_id;
-> -    } pci;
-> -} models[] = {
-> -    /* PC via PCI */
-> -    { "x86_64", "pc",
-> -        {-1,         2, 0,  {1, 0x057834b4} },
-> -        .pci = { PCI_VENDOR_ID_REDHAT, PCI_DEVICE_ID_REDHAT_SDHCI } },
-> -
-> -    /* Exynos4210 */
-> -    { "arm",    "smdkc210",
-> -        {0x12510000, 2, 0,  {1, 0x5e80080} } },
-> -
-> -    /* i.MX 6 */
-> -    { "arm",    "sabrelite",
-> -        {0x02190000, 3, 0,  {1, 0x057834b4} } },
-> -
-> -    /* BCM2835 */
-> -    { "arm",    "raspi2",
-> -        {0x3f300000, 3, 52, {0, 0x052134b4} } },
-> -
-> -    /* Zynq-7000 */
-> -    { "arm",    "xilinx-zynq-a9",   /* Datasheet: UG585 (v1.12.1) */
-> -        {0xe0100000, 2, 0,  {1, 0x69ec0080} } },
-> -
-> -    /* ZynqMP */
-> -    { "aarch64", "xlnx-zcu102",     /* Datasheet: UG1085 (v1.7) */
-> -        {0xff160000, 3, 0,  {1, 0x280737ec6481} } },
-> -
-> -};
-> -
-> -typedef struct QSDHCI {
-> -    struct {
-> -        QPCIBus *bus;
-> -        QPCIDevice *dev;
-> -    } pci;
-> -    union {
-> -        QPCIBar mem_bar;
-> -        uint64_t addr;
-> -    };
-> -} QSDHCI;
-> -
-> -static uint16_t sdhci_readw(QSDHCI *s, uint32_t reg)
-> -{
-> -    uint16_t val;
-> -
-> -    if (s->pci.dev) {
-> -        val = qpci_io_readw(s->pci.dev, s->mem_bar, reg);
-> -    } else {
-> -        val = qtest_readw(global_qtest, s->addr + reg);
-> -    }
-> -
-> -    return val;
-> -}
-> -
-> -static uint64_t sdhci_readq(QSDHCI *s, uint32_t reg)
-> -{
-> -    uint64_t val;
-> -
-> -    if (s->pci.dev) {
-> -        val = qpci_io_readq(s->pci.dev, s->mem_bar, reg);
-> -    } else {
-> -        val = qtest_readq(global_qtest, s->addr + reg);
-> -    }
-> -
-> -    return val;
-> -}
-> -
-> -static void sdhci_writeq(QSDHCI *s, uint32_t reg, uint64_t val)
-> -{
-> -    if (s->pci.dev) {
-> -        qpci_io_writeq(s->pci.dev, s->mem_bar, reg, val);
-> -    } else {
-> -        qtest_writeq(global_qtest, s->addr + reg, val);
-> -    }
-> -}
-> -
->  static void check_specs_version(QSDHCI *s, uint8_t version)
->  {
->      uint32_t v;
->  
-> -    v = sdhci_readw(s, SDHC_HCVER);
-> +    v = s->readw(s, SDHC_HCVER);
->      v &= 0xff;
->      v += 1;
->      g_assert_cmpuint(v, ==, version);
-> @@ -122,7 +36,7 @@ static void check_capab_capareg(QSDHCI *s, uint64_t expec_capab)
->  {
->      uint64_t capab;
->  
-> -    capab = sdhci_readq(s, SDHC_CAPAB);
-> +    capab = s->readq(s, SDHC_CAPAB);
->      g_assert_cmphex(capab, ==, expec_capab);
->  }
->  
-> @@ -131,11 +45,11 @@ static void check_capab_readonly(QSDHCI *s)
->      const uint64_t vrand = 0x123456789abcdef;
->      uint64_t capab0, capab1;
->  
-> -    capab0 = sdhci_readq(s, SDHC_CAPAB);
-> +    capab0 = s->readq(s, SDHC_CAPAB);
->      g_assert_cmpuint(capab0, !=, vrand);
->  
-> -    sdhci_writeq(s, SDHC_CAPAB, vrand);
-> -    capab1 = sdhci_readq(s, SDHC_CAPAB);
-> +    s->writeq(s, SDHC_CAPAB, vrand);
-> +    capab1 = s->readq(s, SDHC_CAPAB);
->      g_assert_cmpuint(capab1, !=, vrand);
->      g_assert_cmpuint(capab1, ==, capab0);
->  }
-> @@ -147,7 +61,7 @@ static void check_capab_baseclock(QSDHCI *s, uint8_t expec_freq)
->      if (!expec_freq) {
->          return;
->      }
-> -    capab = sdhci_readq(s, SDHC_CAPAB);
-> +    capab = s->readq(s, SDHC_CAPAB);
->      capab_freq = FIELD_EX64(capab, SDHC_CAPAB, BASECLKFREQ);
->      g_assert_cmpuint(capab_freq, ==, expec_freq);
->  }
-> @@ -156,7 +70,7 @@ static void check_capab_sdma(QSDHCI *s, bool supported)
->  {
->      uint64_t capab, capab_sdma;
->  
-> -    capab = sdhci_readq(s, SDHC_CAPAB);
-> +    capab = s->readq(s, SDHC_CAPAB);
->      capab_sdma = FIELD_EX64(capab, SDHC_CAPAB, SDMA);
->      g_assert_cmpuint(capab_sdma, ==, supported);
->  }
-> @@ -167,7 +81,7 @@ static void check_capab_v3(QSDHCI *s, uint8_t version)
->  
->      if (version < 3) {
->          /* before v3 those fields are RESERVED */
-> -        capab = sdhci_readq(s, SDHC_CAPAB);
-> +        capab = s->readq(s, SDHC_CAPAB);
->          capab_v3 = FIELD_EX64(capab, SDHC_CAPAB, SDR);
->          g_assert_cmpuint(capab_v3, ==, 0);
->          capab_v3 = FIELD_EX64(capab, SDHC_CAPAB, DRIVER);
-> @@ -175,78 +89,21 @@ static void check_capab_v3(QSDHCI *s, uint8_t version)
->      }
->  }
->  
-> -static QSDHCI *machine_start(const struct sdhci_t *test)
-> -{
-> -    QSDHCI *s = g_new0(QSDHCI, 1);
-> -
-> -    if (test->pci.vendor_id) {
-> -        /* PCI */
-> -        uint16_t vendor_id, device_id;
-> -        uint64_t barsize;
-> -
-> -        global_qtest = qtest_initf("-machine %s -device sdhci-pci",
-> -                                   test->machine);
-> -
-> -        s->pci.bus = qpci_new_pc(global_qtest, NULL);
-> -
-> -        /* Find PCI device and verify it's the right one */
-> -        s->pci.dev = qpci_device_find(s->pci.bus, QPCI_DEVFN(4, 0));
-> -        g_assert_nonnull(s->pci.dev);
-> -        vendor_id = qpci_config_readw(s->pci.dev, PCI_VENDOR_ID);
-> -        device_id = qpci_config_readw(s->pci.dev, PCI_DEVICE_ID);
-> -        g_assert(vendor_id == test->pci.vendor_id);
-> -        g_assert(device_id == test->pci.device_id);
-> -        s->mem_bar = qpci_iomap(s->pci.dev, 0, &barsize);
-> -        qpci_device_enable(s->pci.dev);
-> -    } else {
-> -        /* SysBus */
-> -        global_qtest = qtest_initf("-machine %s", test->machine);
-> -        s->addr = test->sdhci.addr;
-> -    }
-> -
-> -    return s;
-> -}
-> -
-> -static void machine_stop(QSDHCI *s)
-> -{
-> -    qpci_free_pc(s->pci.bus);
-> -    g_free(s->pci.dev);
-> -    qtest_quit(global_qtest);
-> -    g_free(s);
-> -}
-> -
-> -static void test_machine(const void *data)
-> +static void test_registers(void *obj, void *data, QGuestAllocator *alloc)
->  {
-> -    const struct sdhci_t *test = data;
-> -    QSDHCI *s;
-> +    QSDHCI *s = obj;
->  
-> -    s = machine_start(test);
-> -
-> -    check_specs_version(s, test->sdhci.version);
-> -    check_capab_capareg(s, test->sdhci.capab.reg);
-> +    check_specs_version(s, s->props.version);
-> +    check_capab_capareg(s, s->props.capab.reg);
->      check_capab_readonly(s);
-> -    check_capab_v3(s, test->sdhci.version);
-> -    check_capab_sdma(s, test->sdhci.capab.sdma);
-> -    check_capab_baseclock(s, test->sdhci.baseclock);
-> -
-> -    machine_stop(s);
-> +    check_capab_v3(s, s->props.version);
-> +    check_capab_sdma(s, s->props.capab.sdma);
-> +    check_capab_baseclock(s, s->props.baseclock);
->  }
->  
-> -int main(int argc, char *argv[])
-> +static void register_sdhci_test(void)
->  {
-> -    const char *arch = qtest_get_arch();
-> -    char *name;
-> -    int i;
-> -
-> -    g_test_init(&argc, &argv, NULL);
-> -    for (i = 0; i < ARRAY_SIZE(models); i++) {
-> -        if (strcmp(arch, models[i].arch)) {
-> -            continue;
-> -        }
-> -        name = g_strdup_printf("sdhci/%s", models[i].machine);
-> -        qtest_add_data_func(name, &models[i], test_machine);
-> -        g_free(name);
-> -    }
-> -
-> -    return g_test_run();
-> +    qos_add_test("registers", "sdhci", test_registers, NULL);
->  }
-> +
-> +libqos_init(register_sdhci_test);
-> 
+>=20
+>=20
+> > @@ -0,0 +1,81 @@
+> > +# Test for host-phys-bits-limit option
+> > +#
+> > +# Copyright (c) 2018 Red Hat, Inc.
+> > +#
+> > +# Author:
+> > +#  Eduardo Habkost <ehabkost@redhat.com>
+> > +#
+> > +# This work is licensed under the terms of the GNU GPL, version 2 or
+> > +# later.  See the COPYING file in the top-level directory.
+> > +import re
+> > +
+> > +from avocado_qemu import Test
+> > +
+> > +class HostPhysbits(Test):
+> > +    """
+> > +    Check if `host-phys-bits` and `host-phys-bits` options work.
+>=20
+> Did you mean "`host-phys-bits` and `host-phys-bits-limit`?
+
+Yes, thanks for catching it!
+
+>=20
+> > +
+> > +    :avocado: enable
+> > +    :avocado: tags=3Dx86_64
+> > +    """
+> > +
+> > +    def cpu_qom_get(self, prop):
+> > +        qom_path =3D self.vm.command('query-cpus')[0]['qom_path']
+> > +        return self.vm.command('qom-get', path=3Dqom_path, property=3D=
+prop)
+> > +
+> > +    def cpu_phys_bits(self):
+> > +        return self.cpu_qom_get('phys-bits')
+> > +
+> > +    def host_phys_bits(self):
+> > +        cpuinfo =3D open('/proc/cpuinfo', 'rb').read()
+> > +        m =3D re.search(b'([0-9]+) bits physical', cpuinfo)
+>=20
+> pylint says:
+>=20
+> "tests/acceptance/x86-phys-bits.py:31:8: C0103: Variable name "m" doesn=
+'t
+> conform to snake_case naming style (invalid-name)"
+
+This is one of those cases where I think a more descriptive name
+would make the code less readable.
+
+>=20
+> It also warns about "Missing method docstring" for each test method. I =
+don't
+> know whether we should convention that every method must have a docstri=
+ng
+> explaining the test, or just ignore that warn.
+
+I don't think we should require docstrings for all test methods.
+I'm already bothered by the current amount of boilerplate
+required by the unittest-like Avocado API.
+
+>=20
+> > +        if m is None:
+> > +            self.cancel("Couldn't read phys-bits from /proc/cpuinfo"=
+)
+>=20
+> I suggest something like 'bits physical size' instead of 'phys-bits'.
+
+"physical address size" would be more accurate, I will change it.
+
+
+>=20
+> > +        return int(m.group(1))
+> > +
+> > +    def setUp(self):
+> > +        super(HostPhysbits, self).setUp()
+> > +        self.vm.add_args('-S', '-machine', 'accel=3Dkvm:tcg')
+>=20
+> I'm curious to know why you freeze the CPU at start (-S).
+
+Starting the VCPUs would be pointless, as there's no guest code
+to run at all.  It would just waste CPU cycles stuck in BIOS boot
+code.
+
+>=20
+> > +        self.vm.launch()
+> > +        if not self.vm.command('query-kvm')['enabled']:
+> > +            self.cancel("Test case requires KVM")
+> > +        self.vm.shutdown()
+> > +
+> > +
+> > +    def test_no_host_phys_bits(self):
+> > +        # default should be phys-bits=3D40 if host-phys-bits=3Doff
+>=20
+> Perhaps put that comment in a docstring block.
+
+I considered that, but then I thought that the comment doesn't
+describe the purpose of the test method at all.  It just
+clarifies why we are testing for phys-bits=3D40 below.
+
+
+>=20
+> > +        self.vm.add_args('-cpu', 'qemu64,host-phys-bits=3Doff')
+> > +        self.vm.launch()
+> > +        self.assertEqual(self.cpu_phys_bits(), 40)
+[...]
+>=20
+> Suppose an user sets both host-phys-bits and phys-bits by mistake. What=
+ is
+> the expected outcome? If this case is relevant...below test case fails
+> (phys-bits is set to host's):
+>=20
+> =A0=A0=A0 def test_manual_phys_bits_mistake(self):
+> =A0=A0=A0=A0=A0=A0=A0 """
+> =A0=A0=A0=A0=A0=A0=A0 By mistake set host-phys-bits=3Don and phys-bits
+> =A0=A0=A0=A0=A0=A0=A0 """
+> =A0=A0=A0=A0=A0=A0=A0 self.vm.add_args('-cpu', 'qemu64,host-phys-bits=3D=
+on,phys-bits=3D35')
+> =A0=A0=A0=A0=A0=A0=A0 self.vm.launch()
+> =A0=A0=A0=A0=A0=A0=A0 self.assertEqual(self.cpu_phys_bits(), 35)
+
+host-phys-bits overrides phys-bits, but I don't think we need to
+make it a supported use case.
+
+--=20
+Eduardo
