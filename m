@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gX31T-0003hf-LE
+	(envelope-from <ppandit@redhat.com>) id 1gX31T-0003he-LG
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:49:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gX31S-0004FA-Br
+	(envelope-from <ppandit@redhat.com>) id 1gX31P-0004DL-Jd
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:49:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49386)
+Received: from mx1.redhat.com ([209.132.183.28]:38186)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gX31S-0004Eh-5l
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:49:50 -0500
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gX31P-0004Cn-Bu
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:49:47 -0500
 From: P J P <ppandit@redhat.com>
-Date: Wed, 12 Dec 2018 17:17:26 +0530
-Message-Id: <20181212114726.24060-7-ppandit@redhat.com>
+Date: Wed, 12 Dec 2018 17:17:25 +0530
+Message-Id: <20181212114726.24060-6-ppandit@redhat.com>
 In-Reply-To: <20181212114726.24060-1-ppandit@redhat.com>
 References: <20181212114726.24060-1-ppandit@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v1 6/6] rdma: remove unused VENDOR_ERR_NO_SGE
- macro
+Subject: [Qemu-devel] [PATCH v1 5/6] pvrdma: check return value from
+ pvrdma_idx_ring_has_ routines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,31 +31,94 @@ Cc: Qemu Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel.apfelbaum@
 
 From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Replace VENDOR_ERR_NO_SGE macro with VENDOR_ERR_INV_NUM_SGE
-to indicate invalid number of scatter/gather elements.
+pvrdma_idx_ring_has_[data/space] routines also return invalid
+index PVRDMA_INVALID_IDX[=3D-1], if ring has no data/space. Check
+return value from these routines to avoid plausible infinite loops.
 
+Reported-by: Li Qiang <liq3ea@163.com>
 Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 ---
- hw/rdma/rdma_backend.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ hw/rdma/vmw/pvrdma_dev_ring.c | 37 +++++++++++++++++------------------
+ 1 file changed, 18 insertions(+), 19 deletions(-)
 
-diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-index bd4710d16f..c28bfbd44d 100644
---- a/hw/rdma/rdma_backend.c
-+++ b/hw/rdma/rdma_backend.c
-@@ -37,12 +37,11 @@
- #define VENDOR_ERR_TOO_MANY_SGES    0x202
- #define VENDOR_ERR_NOMEM            0x203
- #define VENDOR_ERR_QP0              0x204
--#define VENDOR_ERR_NO_SGE           0x205
-+#define VENDOR_ERR_INV_NUM_SGE      0x205
- #define VENDOR_ERR_MAD_SEND         0x206
- #define VENDOR_ERR_INVLKEY          0x207
- #define VENDOR_ERR_MR_SMALL         0x208
- #define VENDOR_ERR_INV_MAD_BUFF     0x209
--#define VENDOR_ERR_INV_NUM_SGE      0x210
+Update v1: receive error code in idx variable, remove comments
+  -> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg02342.html
+
+diff --git a/hw/rdma/vmw/pvrdma_dev_ring.c b/hw/rdma/vmw/pvrdma_dev_ring.=
+c
+index 01247fc041..2dccac8442 100644
+--- a/hw/rdma/vmw/pvrdma_dev_ring.c
++++ b/hw/rdma/vmw/pvrdma_dev_ring.c
+@@ -73,23 +73,22 @@ out:
 =20
- #define THR_NAME_LEN 16
- #define THR_POLL_TO  5000
+ void *pvrdma_ring_next_elem_read(PvrdmaRing *ring)
+ {
+-    unsigned int idx =3D 0, offset;
++    int idx;
++    unsigned int offset, head;
+=20
+-    /*
+-    pr_dbg("%s: t=3D%d, h=3D%d\n", ring->name, ring->ring_state->prod_ta=
+il,
+-           ring->ring_state->cons_head);
+-    */
+-
+-    if (!pvrdma_idx_ring_has_data(ring->ring_state, ring->max_elems, &id=
+x)) {
++    idx =3D pvrdma_idx_ring_has_data(ring->ring_state, ring->max_elems, =
+&head);
++    if (idx <=3D 0) {
+         pr_dbg("No more data in ring\n");
+         return NULL;
+     }
+=20
++    idx =3D pvrdma_idx(&ring->ring_state->cons_head, ring->max_elems);
++    if (idx < 0 || head !=3D idx) {
++        pr_dbg("invalid idx\n");
++        return NULL;
++    }
++
+     offset =3D idx * ring->elem_sz;
+-    /*
+-    pr_dbg("idx=3D%d\n", idx);
+-    pr_dbg("offset=3D%d\n", offset);
+-    */
+     return ring->pages[offset / TARGET_PAGE_SIZE] + (offset % TARGET_PAG=
+E_SIZE);
+ }
+=20
+@@ -105,20 +104,20 @@ void pvrdma_ring_read_inc(PvrdmaRing *ring)
+=20
+ void *pvrdma_ring_next_elem_write(PvrdmaRing *ring)
+ {
+-    unsigned int idx, offset, tail;
++    int idx;
++    unsigned int offset, tail;
+=20
+-    /*
+-    pr_dbg("%s: t=3D%d, h=3D%d\n", ring->name, ring->ring_state->prod_ta=
+il,
+-           ring->ring_state->cons_head);
+-    */
+-
+-    if (!pvrdma_idx_ring_has_space(ring->ring_state, ring->max_elems, &t=
+ail)) {
++    idx =3D pvrdma_idx_ring_has_space(ring->ring_state, ring->max_elems,=
+ &tail);
++    if (idx <=3D 0) {
+         pr_dbg("CQ is full\n");
+         return NULL;
+     }
+=20
+     idx =3D pvrdma_idx(&ring->ring_state->prod_tail, ring->max_elems);
+-    /* TODO: tail =3D=3D idx */
++    if (idx < 0 || tail !=3D idx) {
++        pr_dbg("invalid idx\n");
++        return NULL;
++    }
+=20
+     offset =3D idx * ring->elem_sz;
+     return ring->pages[offset / TARGET_PAGE_SIZE] + (offset % TARGET_PAG=
+E_SIZE);
 --=20
 2.19.2
