@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gX0eq-0003kj-UG
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:18:22 -0500
+	(envelope-from <prvs=877c75a5a=Paul.Durrant@citrix.com>)
+	id 1gX0iu-00075K-KL
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:22:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gX0ep-00064N-Dn
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:18:20 -0500
-Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:42232)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gX0ep-00063o-5m
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:18:19 -0500
-Received: by mail-yb1-xb43.google.com with SMTP id m129so1222149ybf.9
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 01:18:19 -0800 (PST)
+	(envelope-from <prvs=877c75a5a=Paul.Durrant@citrix.com>)
+	id 1gX0it-00086e-Oi
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:22:32 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Wed, 12 Dec 2018 09:22:23 +0000
+Message-ID: <c3e4bfee4a904eccb2be812a7f9eb641@AMSPEX02CL03.citrite.net>
+References: <154115285434.11300.8459925605672823399.stgit@dhcp-3-135.uk.xensource.com>
+	<20181102110412.GD7521@dhcp-200-186.str.redhat.com>
+	<20181212085951.GA7604@aepfle.de>
+In-Reply-To: <20181212085951.GA7604@aepfle.de>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20181206063552.6701-1-xieyongji@baidu.com>
-	<561e0d7a-af2f-caad-aec3-c15952665687@redhat.com>
-	<20181206085849-mutt-send-email-mst@kernel.org>
-	<cf555a3d-0312-0b61-d18a-12ca295520a0@redhat.com>
-	<CAONzpcaXTBgPTH0WSfq-=RwHLkuqi1mhKcv4C=0_O67_hV8A2Q@mail.gmail.com>
-	<5794e090-9a9b-ca30-1066-ef697c9b67be@redhat.com>
-	<CAONzpcZKAXrgbJc6H3d82zUt6VUVSo36HLg__OvuDWoBk9zTvg@mail.gmail.com>
-	<7520e2cd-59cc-c133-f913-e7397df684dd@redhat.com>
-	<CAONzpcbekTuN80r3Vb3CA7MqYBuVOOmV=6wfCNOb5z6QyrLZvg@mail.gmail.com>
-	<cc6a464a-3193-f95b-08e5-c67e95d72dd5@redhat.com>
-In-Reply-To: <cc6a464a-3193-f95b-08e5-c67e95d72dd5@redhat.com>
-From: Yongji Xie <elohimes@gmail.com>
-Date: Wed, 12 Dec 2018 17:18:05 +0800
-Message-ID: <CAONzpcZ_RqUujdSoVCPUHH0A2g4hHY=oM9x-04e-6WugYFQOiw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 0/6] vhost-user-blk: Add support
- for backend reconnecting
+Subject: Re: [Qemu-devel] [Xen-devel] xen_disk qdevification (was: [PATCH
+ 0/3] Performance improvements for xen_disk v2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,166 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jasowang@redhat.com
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, zhangyu31@baidu.com, Xie Yongji <xieyongji@baidu.com>, lilin24@baidu.com, qemu-devel@nongnu.org, chaiwen@baidu.com, marcandre.lureau@redhat.com, nixun@baidu.com
+To: 'Olaf Hering' <olaf@aepfle.de>, Kevin Wolf <kwolf@redhat.com>
+Cc: Tim Smith <tim.smith@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
 
-On Wed, 12 Dec 2018 at 15:47, Jason Wang <jasowang@redhat.com> wrote:
->
->
-> On 2018/12/12 =E4=B8=8B=E5=8D=882:41, Yongji Xie wrote:
-> > On Wed, 12 Dec 2018 at 12:07, Jason Wang <jasowang@redhat.com> wrote:
-> >>
-> >> On 2018/12/12 =E4=B8=8A=E5=8D=8811:21, Yongji Xie wrote:
-> >>> On Wed, 12 Dec 2018 at 11:00, Jason Wang <jasowang@redhat.com> wrote:
-> >>>> On 2018/12/12 =E4=B8=8A=E5=8D=8810:48, Yongji Xie wrote:
-> >>>>> On Mon, 10 Dec 2018 at 17:32, Jason Wang <jasowang@redhat.com> wrot=
-e:
-> >>>>>> On 2018/12/6 =E4=B8=8B=E5=8D=889:59, Michael S. Tsirkin wrote:
-> >>>>>>> On Thu, Dec 06, 2018 at 09:57:22PM +0800, Jason Wang wrote:
-> >>>>>>>> On 2018/12/6 =E4=B8=8B=E5=8D=882:35,elohimes@gmail.com  wrote:
-> >>>>>>>>> From: Xie Yongji<xieyongji@baidu.com>
-> >>>>>>>>>
-> >>>>>>>>> This patchset is aimed at supporting qemu to reconnect
-> >>>>>>>>> vhost-user-blk backend after vhost-user-blk backend crash or
-> >>>>>>>>> restart.
-> >>>>>>>>>
-> >>>>>>>>> The patch 1 tries to implenment the sync connection for
-> >>>>>>>>> "reconnect socket".
-> >>>>>>>>>
-> >>>>>>>>> The patch 2 introduces a new message VHOST_USER_SET_VRING_INFLI=
-GHT
-> >>>>>>>>> to support offering shared memory to backend to record
-> >>>>>>>>> its inflight I/O.
-> >>>>>>>>>
-> >>>>>>>>> The patch 3,4 are the corresponding libvhost-user patches of
-> >>>>>>>>> patch 2. Make libvhost-user support VHOST_USER_SET_VRING_INFLIG=
-HT.
-> >>>>>>>>>
-> >>>>>>>>> The patch 5 supports vhost-user-blk to reconnect backend when
-> >>>>>>>>> connection closed.
-> >>>>>>>>>
-> >>>>>>>>> The patch 6 tells qemu that we support reconnecting now.
-> >>>>>>>>>
-> >>>>>>>>> To use it, we could start qemu with:
-> >>>>>>>>>
-> >>>>>>>>> qemu-system-x86_64 \
-> >>>>>>>>>              -chardev socket,id=3Dchar0,path=3D/path/vhost.sock=
-et,reconnect=3D1,wait \
-> >>>>>>>>>              -device vhost-user-blk-pci,chardev=3Dchar0 \
-> >>>>>>>>>
-> >>>>>>>>> and start vhost-user-blk backend with:
-> >>>>>>>>>
-> >>>>>>>>> vhost-user-blk -b /path/file -s /path/vhost.socket
-> >>>>>>>>>
-> >>>>>>>>> Then we can restart vhost-user-blk at any time during VM runnin=
-g.
-> >>>>>>>> I wonder whether or not it's better to handle this at the level =
-of virtio
-> >>>>>>>> protocol itself instead of vhost-user level. E.g expose last_ava=
-il_idx to
-> >>>>>>>> driver might be sufficient?
-> >>>>>>>>
-> >>>>>>>> Another possible issue is, looks like you need to deal with diff=
-erent kinds
-> >>>>>>>> of ring layouts e.g packed virtqueues.
-> >>>>>>>>
-> >>>>>>>> Thanks
-> >>>>>>> I'm not sure I understand your comments here.
-> >>>>>>> All these would be guest-visible extensions.
-> >>>>>> Looks not, it only introduces a shared memory between qemu and
-> >>>>>> vhost-user backend?
-> >>>>>>
-> >>>>>>
-> >>>>>>> Possible for sure but how is this related to
-> >>>>>>> a patch supporting transparent reconnects?
-> >>>>>> I might miss something. My understanding is that we support transp=
-arent
-> >>>>>> reconnects, but we can't deduce an accurate last_avail_idx and thi=
-s is
-> >>>>>> what capability this series try to add. To me, this series is func=
-tional
-> >>>>>> equivalent to expose last_avail_idx (or avail_idx_cons) in availab=
-le
-> >>>>>> ring. So the information is inside guest memory, vhost-user backen=
-d can
-> >>>>>> access it and update it directly. I believe this is some modern NI=
-C did
-> >>>>>> as well (but index is in MMIO area of course).
-> >>>>>>
-> >>>>> Hi Jason,
-> >>>>>
-> >>>>> If my understand is correct, it might be not enough to only expose
-> >>>>> last_avail_idx.
-> >>>>> Because we would not process descriptors in the same order in which=
- they have
-> >>>>> been made available sometimes. If so, we can't get correct inflight
-> >>>>> I/O information
-> >>>>> from available ring.
-> >>>> You can get this with the help of the both used ring and last_avail_=
-idx
-> >>>> I believe. Or maybe you can give us an example?
-> >>>>
-> >>> A simple example, we assume ring size is 8:
-> >>>
-> >>> 1. guest fill avail ring
-> >>>
-> >>> avail ring: 0 1 2 3 4 5 6 7
-> >>> used ring:
-> >>>
-> >>> 2. vhost-user backend complete 4,5,6,7 and fill used ring
-> >>>
-> >>> avail ring: 0 1 2 3 4 5 6 7
-> >>> used ring: 4 5 6 7
-> >>>
-> >>> 3. guest fill avail ring again
-> >>>
-> >>> avail ring: 4 5 6 7 4 5 6 7
-> >>> used ring: 4 5 6 7
-> >>>
-> >>> 4. vhost-user backend crash
-> >>>
-> >>> The inflight descriptors 0, 1, 2, 3 lost.
-> >>>
-> >>> Thanks,
-> >>> Yongji
-> >>
-> >> Ok, then we can simply forbid increasing the avail_idx in this case?
-> >>
-> >> Basically, it's a question of whether or not it's better to done it in
-> >> the level of virtio instead of vhost. I'm pretty sure if we expose
-> >> sufficient information, it could be done without touching vhost-user.
-> >> And we won't deal with e.g migration and other cases.
-> >>
-> > OK, I get your point. That's indeed an alternative way. But this featur=
-e seems
-> > to be only useful to vhost-user backend.
->
->
-> I admit I could not think of a use case other than vhost-user.
->
->
-> >   I'm not sure whether it make sense to
-> > touch virtio protocol for this feature.
->
->
-> Some possible advantages:
->
-> - Feature could be determined and noticed by user or management layer.
->
-> - There's no need to invent ring layout specific protocol to record in
-> flight descriptors. E.g if my understanding is correct, for this series
-> and for the example above, it still can not work for packed virtqueue
-> since descriptor id is not sufficient (descriptor could be overwritten
-> by used one). You probably need to have a (partial) copy of descriptor
-> ring for this.
->
-> - No need to deal with migration, all information was in guest memory.
->
-
-Yes, we have those advantages. But seems like handle this in vhost-user
-level could be easier to be maintained in production environment. We can
-support old guest. And the bug fix will not depend on guest kernel updating=
-.
-
-Thanks,
-Yongji
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBPbGFmIEhlcmluZyBbbWFpbHRv
+Om9sYWZAYWVwZmxlLmRlXQ0KPiBTZW50OiAxMiBEZWNlbWJlciAyMDE4IDA5OjAwDQo+IFRvOiBL
+ZXZpbiBXb2xmIDxrd29sZkByZWRoYXQuY29tPg0KPiBDYzogVGltIFNtaXRoIDx0aW0uc21pdGhA
+Y2l0cml4LmNvbT47IFN0ZWZhbm8gU3RhYmVsbGluaQ0KPiA8c3N0YWJlbGxpbmlAa2VybmVsLm9y
+Zz47IHFlbXUtYmxvY2tAbm9uZ251Lm9yZzsgYXJtYnJ1QHJlZGhhdC5jb207IHFlbXUtDQo+IGRl
+dmVsQG5vbmdudS5vcmc7IE1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+OyBQYXVsIER1cnJh
+bnQNCj4gPFBhdWwuRHVycmFudEBjaXRyaXguY29tPjsgQW50aG9ueSBQZXJhcmQgPGFudGhvbnku
+cGVyYXJkQGNpdHJpeC5jb20+Ow0KPiB4ZW4tZGV2ZWxAbGlzdHMueGVucHJvamVjdC5vcmcNCj4g
+U3ViamVjdDogUmU6IFtYZW4tZGV2ZWxdIHhlbl9kaXNrIHFkZXZpZmljYXRpb24gKHdhczogW1BB
+VENIIDAvM10NCj4gUGVyZm9ybWFuY2UgaW1wcm92ZW1lbnRzIGZvciB4ZW5fZGlzayB2MikNCj4g
+DQo+IE9uIEZyaSwgTm92IDAyLCBLZXZpbiBXb2xmIHdyb3RlOg0KPiANCj4gPiBBIHdoaWxlIGFn
+bywgYSBkb3duc3RyZWFtIHBhdGNoIHJldmlldyBmb3VuZCBvdXQgdGhhdCB0aGVyZSBhcmUgc29t
+ZSBRTVANCj4gPiBjb21tYW5kcyB0aGF0IHdvdWxkIGltbWVkaWF0ZWx5IGNyYXNoIGlmIGEgeGVu
+X2Rpc2sgZGV2aWNlIHdlcmUgcHJlc2VudA0KPiA+IGJlY2F1c2Ugb2YgdGhlIGxhY2tpbmcgcWRl
+dmlmaWNhdGlvbi4gVGhpcyBpcyBub3QgdGhlIGNvZGUgcXVhbGl0eQ0KPiA+IHN0YW5kYXJkIEkg
+ZW52aXNpb24gZm9yIFFFTVUuIEl0J3MgdGltZSBmb3Igbm9uLXFkZXYgZGV2aWNlcyB0byBnby4N
+Cj4gDQo+IERvIHlvdSBoYXZlIHRoYXQgYmFja3dhcmRzIGJ5IGFueSBjaGFuY2U/IElNTyB0aGUg
+cHJlc2VuY2Ugb2YgYXNzZXJ0KCkNCj4gY29udHJpYnV0ZXMgdG8gYmFkIGNvZGUgcXVhbGl0eSwg
+bm90IHRoZSBkcml2ZXJzIHRoYXQgdHJpZ2dlciB0aG9zZQ0KPiBhc3NlcnRzLiBJdCBpcyBiYWQg
+ZW5vdWdoIHRoYXQgdHdvIFFFTVUgcmVsZWFzZXMgd2VudCBvdXQgd2hpbGUgYmVpbmcgaW4NCj4g
+YmFkIHNoYXBlLg0KPiANCj4gQW55d2F5LCBob3BlZnVsbHkgUGF1bCBvciB3aG9ldmVyIHdpbGwg
+ZmluZCB0aGUgdGltZSBhbmQgZW5lcmd5IHRvDQo+IGNvbnZlcnQgdGhlIGNvZGUgYXQgc29tZSBw
+b2ludC4NCg0KSXQncyBkb25lLiBWNCBvZiBteSBzZXJpZXMgaGFzIGFja3MgZnJvbSB0aGUgWGVu
+IG1haW50YWluZXJzLiBJIHRoaW5rIGl0IG5lZWRzIHNvbWUgb3RoZXIgYWNrcyBmcm9tIGJsb2Nr
+IG1haW50YWluZXJzIGJ1dCBpdCdzIGJhc2ljYWxseSByZWFkeSB0byBnbyBpbiAoYW5kIEkndmUg
+dmVyaWZpZWQgdGhhdCBubyBhc3NlcnQgaXMgdHJpcHBlZCBieSB4ZW50b3AgYXQgbGVhc3QpLiBB
+bHNvIEkgaG9wZSB0byBwb3N0IHRoZSByZS1iYXNlZCBwYXRjaGVzIGZyb20gVGltIChvbmUgb2Yg
+d2hpY2ggZml4ZXMgdGhlIG1lbW9yeSBpc3N1ZXMpIGxhdGVyIHRvZGF5Lg0KDQogIFBhdWwNCg0K
+PiANCj4gT2xhZg0K
