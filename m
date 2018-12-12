@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gX0e2-0002c2-92
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:17:33 -0500
+	(envelope-from <david@redhat.com>) id 1gX0e6-0002dg-KN
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:17:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gX0e1-0005c1-0L
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:17:30 -0500
+	(envelope-from <david@redhat.com>) id 1gX0e0-0005bo-LR
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:17:34 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Wed, 12 Dec 2018 10:16:21 +0100
-Message-Id: <20181212091623.16950-10-david@redhat.com>
+Date: Wed, 12 Dec 2018 10:16:20 +0100
+Message-Id: <20181212091623.16950-9-david@redhat.com>
 In-Reply-To: <20181212091623.16950-1-david@redhat.com>
 References: <20181212091623.16950-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 09/11] pci: Reuse pci-bridge hotplug handler
- handlers for pcie-pci-bridge
+Subject: [Qemu-devel] [PATCH v4 08/11] pci/pcie: perform unplug via the
+ hotplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,119 +23,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, qemu-ppc@nongnu.org, David Hildenbrand <david@redhat.com>
 
-These functions are essentially the same, we only have to use
-object_get_typename() for reporting errors. So let's share the
-implementation of hotplug handler callbacks.
+Introduce and use the "unplug" callback.
 
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
+This is a preparation for multi-stage hotplug handlers, whereby the bus
+hotplug handler is overwritten by the machine hotplug handler. This handler
+will then pass control to the bus hotplug handler. So to get this running
+cleanly, we also have to make sure to go via the hotplug handler chain when
+actually unplugging a device after an unplug request. Lookup the hotplug
+handler and call "unplug".
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/pci-bridge/pci_bridge_dev.c  | 12 ++++++------
- hw/pci-bridge/pcie_pci_bridge.c | 30 ++----------------------------
- include/hw/pci/pci_bridge.h     |  4 ++++
- 3 files changed, 12 insertions(+), 34 deletions(-)
+ hw/pci/pcie.c         | 10 +++++++++-
+ hw/pci/pcie_port.c    |  1 +
+ include/hw/pci/pcie.h |  2 ++
+ 3 files changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
-index e1df9a52ac..fa0be13ac4 100644
---- a/hw/pci-bridge/pci_bridge_dev.c
-+++ b/hw/pci-bridge/pci_bridge_dev.c
-@@ -206,27 +206,27 @@ static const VMStateDescription pci_bridge_dev_vmstate = {
+diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+index ccba29269e..ba3ea925e9 100644
+--- a/hw/pci/pcie.c
++++ b/hw/pci/pcie.c
+@@ -364,11 +364,19 @@ void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
      }
- };
- 
--static void pci_bridge_dev_plug_cb(HotplugHandler *hotplug_dev,
--                                   DeviceState *dev, Error **errp)
-+void pci_bridge_dev_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                            Error **errp)
- {
-     PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
- 
-     if (!shpc_present(pci_hotplug_dev)) {
-         error_setg(errp, "standard hotplug controller has been disabled for "
--                   "this %s", TYPE_PCI_BRIDGE_DEV);
-+                   "this %s", object_get_typename(OBJECT(hotplug_dev)));
-         return;
-     }
-     shpc_device_plug_cb(hotplug_dev, dev, errp);
  }
  
--static void pci_bridge_dev_unplug_request_cb(HotplugHandler *hotplug_dev,
--                                             DeviceState *dev, Error **errp)
-+void pci_bridge_dev_unplug_request_cb(HotplugHandler *hotplug_dev,
-+                                      DeviceState *dev, Error **errp)
+-static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque)
++void pcie_cap_slot_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
++                             Error **errp)
  {
-     PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
- 
-     if (!shpc_present(pci_hotplug_dev)) {
-         error_setg(errp, "standard hotplug controller has been disabled for "
--                   "this %s", TYPE_PCI_BRIDGE_DEV);
-+                   "this %s", object_get_typename(OBJECT(hotplug_dev)));
-         return;
-     }
-     shpc_device_unplug_request_cb(hotplug_dev, dev, errp);
-diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
-index c634353b06..0ffea680d5 100644
---- a/hw/pci-bridge/pcie_pci_bridge.c
-+++ b/hw/pci-bridge/pcie_pci_bridge.c
-@@ -137,32 +137,6 @@ static const VMStateDescription pcie_pci_bridge_dev_vmstate = {
-         }
- };
- 
--static void pcie_pci_bridge_plug_cb(HotplugHandler *hotplug_dev,
--                                    DeviceState *dev, Error **errp)
--{
--    PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
--
--    if (!shpc_present(pci_hotplug_dev)) {
--        error_setg(errp, "standard hotplug controller has been disabled for "
--                   "this %s", TYPE_PCIE_PCI_BRIDGE_DEV);
--        return;
--    }
--    shpc_device_plug_cb(hotplug_dev, dev, errp);
--}
--
--static void pcie_pci_bridge_unplug_request_cb(HotplugHandler *hotplug_dev,
--                                              DeviceState *dev, Error **errp)
--{
--    PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
--
--    if (!shpc_present(pci_hotplug_dev)) {
--        error_setg(errp, "standard hotplug controller has been disabled for "
--                   "this %s", TYPE_PCIE_PCI_BRIDGE_DEV);
--        return;
--    }
--    shpc_device_unplug_request_cb(hotplug_dev, dev, errp);
--}
--
- static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
- {
-     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-@@ -179,8 +153,8 @@ static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
-     dc->props = pcie_pci_bridge_dev_properties;
-     dc->reset = &pcie_pci_bridge_reset;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
--    hc->plug = pcie_pci_bridge_plug_cb;
--    hc->unplug_request = pcie_pci_bridge_unplug_request_cb;
-+    hc->plug = pci_bridge_dev_plug_cb;
-+    hc->unplug_request = pci_bridge_dev_unplug_request_cb;
+     object_unparent(OBJECT(dev));
  }
  
- static const TypeInfo pcie_pci_bridge_info = {
-diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
-index cdff7edfd1..6e37c7551a 100644
---- a/include/hw/pci/pci_bridge.h
-+++ b/include/hw/pci/pci_bridge.h
-@@ -99,6 +99,10 @@ void pci_bridge_reset(DeviceState *qdev);
- void pci_bridge_initfn(PCIDevice *pci_dev, const char *typename);
- void pci_bridge_exitfn(PCIDevice *pci_dev);
++static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque)
++{
++    HotplugHandler *hotplug_ctrl = qdev_get_hotplug_handler(DEVICE(dev));
++
++    hotplug_handler_unplug(hotplug_ctrl, DEVICE(dev), &error_abort);
++}
++
+ void pcie_cap_slot_unplug_request_cb(HotplugHandler *hotplug_dev,
+                                      DeviceState *dev, Error **errp)
+ {
+diff --git a/hw/pci/pcie_port.c b/hw/pci/pcie_port.c
+index 7982a87880..a30291ef54 100644
+--- a/hw/pci/pcie_port.c
++++ b/hw/pci/pcie_port.c
+@@ -156,6 +156,7 @@ static void pcie_slot_class_init(ObjectClass *oc, void *data)
+     dc->props = pcie_slot_props;
+     hc->pre_plug = pcie_cap_slot_pre_plug_cb;
+     hc->plug = pcie_cap_slot_plug_cb;
++    hc->unplug = pcie_cap_slot_unplug_cb;
+     hc->unplug_request = pcie_cap_slot_unplug_request_cb;
+ }
  
-+void pci_bridge_dev_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                            Error **errp);
-+void pci_bridge_dev_unplug_request_cb(HotplugHandler *hotplug_dev,
-+                                      DeviceState *dev, Error **errp);
- 
- /*
-  * before qdev initialization(qdev_init()), this function sets bus_name and
+diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+index d9fbcf4a4a..9ae6482658 100644
+--- a/include/hw/pci/pcie.h
++++ b/include/hw/pci/pcie.h
+@@ -135,6 +135,8 @@ void pcie_cap_slot_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+                                Error **errp);
+ void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+                            Error **errp);
++void pcie_cap_slot_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
++                             Error **errp);
+ void pcie_cap_slot_unplug_request_cb(HotplugHandler *hotplug_dev,
+                                      DeviceState *dev, Error **errp);
+ #endif /* QEMU_PCIE_H */
 -- 
 2.17.2
