@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6MY-0000mo-1v
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:51 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6MW-0000Dd-P7
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6MW-0000lG-Bw
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:49 -0500
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:41231)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6MU-0000C0-De
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:48 -0500
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:36633)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gX6MW-0008Np-Dz
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:48 -0500
-Received: by mail-wr1-x434.google.com with SMTP id x10so18065819wrs.8
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:23:28 -0800 (PST)
+	id 1gX6MS-0008JB-GF
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:45 -0500
+Received: by mail-wm1-x331.google.com with SMTP id a18so6412214wmj.1
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:23:22 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	u10sm15878859wrr.33.2018.12.12.07.23.25 for <qemu-devel@nongnu.org>
+	u10sm15878859wrr.33.2018.12.12.07.23.20 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 12 Dec 2018 07:23:25 -0800 (PST)
+	Wed, 12 Dec 2018 07:23:20 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 12 Dec 2018 16:22:28 +0100
-Message-Id: <1544628195-37728-8-git-send-email-pbonzini@redhat.com>
+Date: Wed, 12 Dec 2018 16:22:24 +0100
+Message-Id: <1544628195-37728-4-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
 References: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 07/54] pam: wrap MemoryRegion initialization in
- a transaction
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 03/54] checkpatch: fix premature exit when no
+ input or --mailback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,30 +37,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This avoids a few re-rendering of the memory AddressSpace.
+In some cases, checkpatch's process subroutine is exiting the
+whole process.  This is wrong, just return from the subroutine
+instead.
 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/pci-host/pam.c | 2 ++
- 1 file changed, 2 insertions(+)
+ scripts/checkpatch.pl | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/pci-host/pam.c b/hw/pci-host/pam.c
-index e361ecb..aa5ecfd 100644
---- a/hw/pci-host/pam.c
-+++ b/hw/pci-host/pam.c
-@@ -52,11 +52,13 @@ void init_pam(DeviceState *dev, MemoryRegion *ram_memory,
-     memory_region_init_alias(&mem->alias[2], OBJECT(dev), "pam-pci", ram_memory,
-                              start, size);
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 60f6f89..b9974f0 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -2820,19 +2820,19 @@ sub process {
+ 	# If we have no input at all, then there is nothing to report on
+ 	# so just keep quiet.
+ 	if ($#rawlines == -1) {
+-		exit(0);
++		return 1;
+ 	}
  
-+    memory_region_transaction_begin();
-     for (i = 0; i < 4; ++i) {
-         memory_region_set_enabled(&mem->alias[i], false);
-         memory_region_add_subregion_overlap(system_memory, start,
-                                             &mem->alias[i], 1);
-     }
-+    memory_region_transaction_commit();
-     mem->current = 0;
- }
+ 	# In mailback mode only produce a report in the negative, for
+ 	# things that appear to be patches.
+ 	if ($mailback && ($clean == 1 || !$is_patch)) {
+-		exit(0);
++		return 1;
+ 	}
  
+ 	# This is not a patch, and we are are in 'no-patch' mode so
+ 	# just keep quiet.
+ 	if (!$chk_patch && !$is_patch) {
+-		exit(0);
++		return 1;
+ 	}
+ 
+ 	if (!$is_patch) {
 -- 
 1.8.3.1
