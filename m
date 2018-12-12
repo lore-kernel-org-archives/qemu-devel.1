@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34985)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=877c75a5a=Paul.Durrant@citrix.com>)
-	id 1gX2VK-0006q9-4k
+	id 1gX2VK-0006qm-PN
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:16:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=877c75a5a=Paul.Durrant@citrix.com>)
-	id 1gX2VJ-0003HK-2X
+	id 1gX2VJ-0003L9-Mu
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:16:38 -0500
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Wed, 12 Dec 2018 11:16:26 +0000
-Message-ID: <1544613386-22045-4-git-send-email-paul.durrant@citrix.com>
+Date: Wed, 12 Dec 2018 11:16:24 +0000
+Message-ID: <1544613386-22045-2-git-send-email-paul.durrant@citrix.com>
 In-Reply-To: <1544613386-22045-1-git-send-email-paul.durrant@citrix.com>
 References: <1544613386-22045-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 3/3] xen-block: avoid repeated memory
- allocation
+Subject: [Qemu-devel] [PATCH v3 1/3] xen-block: improve batching behaviour
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,16 +28,12 @@ Cc: Tim Smith <tim.smith@citrix.com>, Paul Durrant <paul.durrant@citrix.com>, St
 
 From: Tim Smith <tim.smith@citrix.com>
 
-The xen-block dataplane currently allocates memory to hold the data for
-each request as that request is used, and frees it afterwards. Because
-it requires page-aligned blocks, this interacts poorly with non-page-
-aligned allocations and balloons the heap.
-
-Instead, allocate the maximum possible buffer size required for the
-protocol, which is BLKIF_MAX_SEGMENTS_PER_REQUEST (currently 11) pages
-when the request structure is created, and keep that buffer until it is
-destroyed. Since the requests are re-used via a free list, this should
-actually improve memory usage.
+When I/O consists of many small requests, performance is improved by
+batching them together in a single io_submit() call. When there are
+relatively few requests, the extra overhead is not worth it. This
+introduces a check to start batching I/O requests via blk_io_plug()/
+blk_io_unplug() in an amount proportional to the number which were
+already in flight at the time we started reading the ring.
 
 Signed-off-by: Tim Smith <tim.smith@citrix.com>
 
@@ -52,71 +47,73 @@ Cc: Anthony Perard <anthony.perard@citrix.com>
 Cc: Kevin Wolf <kwolf@redhat.com>
 Cc: Max Reitz <mreitz@redhat.com>
 ---
- hw/block/dataplane/xen-block.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ hw/block/dataplane/xen-block.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
 diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-block.c
-index b4ff2e3..21804d7 100644
+index 80df7da..db17ab5 100644
 --- a/hw/block/dataplane/xen-block.c
 +++ b/hw/block/dataplane/xen-block.c
-@@ -70,7 +70,6 @@ static void reset_request(XenBlockRequest *request)
-     memset(&request->req, 0, sizeof(request->req));
-     request->status = 0;
-     request->start = 0;
--    request->buf = NULL;
-     request->size = 0;
-     request->presync = 0;
+@@ -528,10 +528,18 @@ static int xen_block_get_request(XenBlockDataPlane *dataplane,
+     return 0;
+ }
  
-@@ -95,6 +94,14 @@ static XenBlockRequest *xen_block_start_request(XenBlockDataPlane *dataplane)
-         /* allocate new struct */
-         request = g_malloc0(sizeof(*request));
-         request->dataplane = dataplane;
-+        /*
-+         * We cannot need more pages per requests than this, and since we
-+         * re-use requests, allocate the memory once here. It will be freed
-+         * xen_block_dataplane_destroy() when the request list is freed.
-+         */
-+        request->buf = qemu_memalign(XC_PAGE_SIZE,
-+                                     BLKIF_MAX_SEGMENTS_PER_REQUEST *
-+                                     XC_PAGE_SIZE);
-         dataplane->requests_total++;
-         qemu_iovec_init(&request->v, 1);
-     } else {
-@@ -272,14 +279,12 @@ static void xen_block_complete_aio(void *opaque, int ret)
-         if (ret == 0) {
-             xen_block_copy_request(request);
-         }
--        qemu_vfree(request->buf);
-         break;
-     case BLKIF_OP_WRITE:
-     case BLKIF_OP_FLUSH_DISKCACHE:
-         if (!request->req.nr_segments) {
-             break;
-         }
--        qemu_vfree(request->buf);
-         break;
-     default:
-         break;
-@@ -360,12 +365,10 @@ static int xen_block_do_aio(XenBlockRequest *request)
++/*
++ * Threshold of in-flight requests above which we will start using
++ * blk_io_plug()/blk_io_unplug() to batch requests.
++ */
++#define IO_PLUG_THRESHOLD 1
++
+ static void xen_block_handle_requests(XenBlockDataPlane *dataplane)
  {
-     XenBlockDataPlane *dataplane = request->dataplane;
+     RING_IDX rc, rp;
+     XenBlockRequest *request;
++    int inflight_atstart = dataplane->requests_inflight;
++    int batched = 0;
  
--    request->buf = qemu_memalign(XC_PAGE_SIZE, request->size);
-     if (request->req.nr_segments &&
-         (request->req.operation == BLKIF_OP_WRITE ||
-          request->req.operation == BLKIF_OP_FLUSH_DISKCACHE) &&
-         xen_block_copy_request(request)) {
--        qemu_vfree(request->buf);
-         goto err;
+     dataplane->more_work = 0;
+ 
+@@ -540,6 +548,18 @@ static void xen_block_handle_requests(XenBlockDataPlane *dataplane)
+     xen_rmb(); /* Ensure we see queued requests up to 'rp'. */
+ 
+     xen_block_send_response_all(dataplane);
++    /*
++     * If there was more than IO_PLUG_THRESHOLD requests in flight
++     * when we got here, this is an indication that there the bottleneck
++     * is below us, so it's worth beginning to batch up I/O requests
++     * rather than submitting them immediately. The maximum number
++     * of requests we're willing to batch is the number already in
++     * flight, so it can grow up to max_requests when the bottleneck
++     * is below us.
++     */
++    if (inflight_atstart > IO_PLUG_THRESHOLD) {
++        blk_io_plug(dataplane->blk);
++    }
+     while (rc != rp) {
+         /* pull request from ring */
+         if (RING_REQUEST_CONS_OVERFLOW(&dataplane->rings.common, rc)) {
+@@ -585,7 +605,22 @@ static void xen_block_handle_requests(XenBlockDataPlane *dataplane)
+             continue;
+         }
+ 
++        if (inflight_atstart > IO_PLUG_THRESHOLD &&
++            batched >= inflight_atstart) {
++            blk_io_unplug(dataplane->blk);
++        }
+         xen_block_do_aio(request);
++        if (inflight_atstart > IO_PLUG_THRESHOLD) {
++            if (batched >= inflight_atstart) {
++                blk_io_plug(dataplane->blk);
++                batched = 0;
++            } else {
++                batched++;
++            }
++        }
++    }
++    if (inflight_atstart > IO_PLUG_THRESHOLD) {
++        blk_io_unplug(dataplane->blk);
      }
  
-@@ -665,6 +668,7 @@ void xen_block_dataplane_destroy(XenBlockDataPlane *dataplane)
-         request = QLIST_FIRST(&dataplane->freelist);
-         QLIST_REMOVE(request, list);
-         qemu_iovec_destroy(&request->v);
-+        qemu_vfree(request->buf);
-         g_free(request);
-     }
- 
+     if (dataplane->more_work &&
 -- 
 2.1.4
