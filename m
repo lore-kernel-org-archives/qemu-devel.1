@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Thomas.Lendacky@amd.com>) id 1gX7pW-0000YC-3U
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 11:57:52 -0500
+	(envelope-from <berrange@redhat.com>) id 1gX7t0-0003Hs-SJ
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:01:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Thomas.Lendacky@amd.com>) id 1gX7pT-0006NO-EN
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 11:57:50 -0500
-Received: from mail-eopbgr810053.outbound.protection.outlook.com
-	([40.107.81.53]:31072
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Thomas.Lendacky@amd.com>)
-	id 1gX7pT-0006Lf-1o
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 11:57:47 -0500
-From: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
-Date: Wed, 12 Dec 2018 16:57:42 +0000
-Message-ID: <c4bdc91b-3946-0345-bb57-f3e2e71b9ae3@amd.com>
+	(envelope-from <berrange@redhat.com>) id 1gX7su-0000G9-Ug
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:01:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33966)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gX7sr-0000Dh-Pj
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:01:19 -0500
+Date: Wed, 12 Dec 2018 17:01:10 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181212170110.GJ31033@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20181211205346.11118-1-ehabkost@redhat.com>
 	<20181211205346.11118-5-ehabkost@redhat.com>
-In-Reply-To: <20181211205346.11118-5-ehabkost@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <5F884494B3A6B44B90661219FADCE0FA@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	<c4bdc91b-3946-0345-bb57-f3e2e71b9ae3@amd.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <c4bdc91b-3946-0345-bb57-f3e2e71b9ae3@amd.com>
 Subject: Re: [Qemu-devel] [PULL 4/4] i386: Add "stibp" flag name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -32,32 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
+To: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-T24gMTIvMTEvMjAxOCAwMjo1MyBQTSwgRWR1YXJkbyBIYWJrb3N0IHdyb3RlOg0KPiBUaGUgU1RJ
-QlAgZmxhZyBtYXkgYmUgc3VwcG9ydGVkIGJ5IHRoZSBob3N0IEtWTSBtb2R1bGUsIHNvIFFFTVUN
-Cj4gY2FuIGFsbG93IGl0IHRvIGJlIGNvbmZpZ3VyZWQgbWFudWFsbHksIGFuZCBpdCBjYW4gYmUg
-ZXhwb3NlZCB0bw0KPiBndWVzdHMgd2hlbiB1c2luZyAiLWNwdSBob3N0Ii4NCj4gDQo+IE5vIGFk
-ZGl0aW9uYWwgbWlncmF0aW9uIGNvZGUgaXMgcmVxdWlyZWQgYmVjYXVzZSB0aGUgd2hvbGUNCj4g
-Y29udGVudHMgb2Ygc3BlY19jdHJsIGlzIGFscmVhZHkgbWlncmF0ZWQgaW4gdGhlICJjcHUvc3Bl
-Y19jdHJsIg0KPiBzZWN0aW9uLg0KPiANCj4gQ29ycmVzcG9uZGluZyBLVk0gcGF0Y2ggd2FzIHN1
-Ym1pdHRlZCBhdDoNCj4gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbGttbC8yMDE4MTIwNTE5MTk1
-Ni4zMTQ4MC0xLWVoYWJrb3N0QHJlZGhhdC5jb20vDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBFZHVh
-cmRvIEhhYmtvc3QgPGVoYWJrb3N0QHJlZGhhdC5jb20+DQo+IE1lc3NhZ2UtSWQ6IDwyMDE4MTIx
-MDE4MDI1MC4zMTI5OS0xLWVoYWJrb3N0QHJlZGhhdC5jb20+DQo+IFNpZ25lZC1vZmYtYnk6IEVk
-dWFyZG8gSGFia29zdCA8ZWhhYmtvc3RAcmVkaGF0LmNvbT4NCj4gLS0tDQo+ICB0YXJnZXQvaTM4
-Ni9jcHUuYyB8IDIgKy0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxl
-dGlvbigtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL3RhcmdldC9pMzg2L2NwdS5jIGIvdGFyZ2V0L2kz
-ODYvY3B1LmMNCj4gaW5kZXggODZhOTM0ZDQ1MC4uMTJmNTU5YjZhZiAxMDA2NDQNCj4gLS0tIGEv
-dGFyZ2V0L2kzODYvY3B1LmMNCj4gKysrIGIvdGFyZ2V0L2kzODYvY3B1LmMNCj4gQEAgLTEwNDIs
-NyArMTA0Miw3IEBAIHN0YXRpYyBGZWF0dXJlV29yZEluZm8gZmVhdHVyZV93b3JkX2luZm9bRkVB
-VFVSRV9XT1JEU10gPSB7DQo+ICAgICAgICAgICAgICBOVUxMLCBOVUxMLCBOVUxMLCBOVUxMLA0K
-PiAgICAgICAgICAgICAgTlVMTCwgTlVMTCwgInBjb25maWciLCBOVUxMLA0KPiAgICAgICAgICAg
-ICAgTlVMTCwgTlVMTCwgTlVMTCwgTlVMTCwNCj4gLSAgICAgICAgICAgIE5VTEwsIE5VTEwsICJz
-cGVjLWN0cmwiLCBOVUxMLA0KPiArICAgICAgICAgICAgTlVMTCwgTlVMTCwgInNwZWMtY3RybCIs
-ICJzdGlicCIsDQoNCkkgZ3Vlc3MgSSBtaXNzZWQgdGhpcyBlYXJsaWVyLiBJcyB0aGVyZSBhIGNv
-cnJlc3BvbmRpbmcgcGF0Y2ggZm9yIHRoZSBBTUQNClNUSUJQIGJpdCAoQ1BVSUQgMHg4MDAwMDAw
-OF9FQlhbMTVdKSB0aGF0IGlzIGluIEtWTT8NCg0KVGhhbmtzLA0KVG9tDQoNCj4gICAgICAgICAg
-ICAgIE5VTEwsICJhcmNoLWNhcGFiaWxpdGllcyIsIE5VTEwsICJzc2JkIiwNCj4gICAgICAgICAg
-fSwNCj4gICAgICAgICAgLmNwdWlkID0gew0KPiANCg==
+On Wed, Dec 12, 2018 at 04:57:42PM +0000, Lendacky, Thomas wrote:
+> On 12/11/2018 02:53 PM, Eduardo Habkost wrote:
+> > The STIBP flag may be supported by the host KVM module, so QEMU
+> > can allow it to be configured manually, and it can be exposed to
+> > guests when using "-cpu host".
+> > 
+> > No additional migration code is required because the whole
+> > contents of spec_ctrl is already migrated in the "cpu/spec_ctrl"
+> > section.
+> > 
+> > Corresponding KVM patch was submitted at:
+> > https://lore.kernel.org/lkml/20181205191956.31480-1-ehabkost@redhat.com/
+> > 
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > Message-Id: <20181210180250.31299-1-ehabkost@redhat.com>
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> >  target/i386/cpu.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > index 86a934d450..12f559b6af 100644
+> > --- a/target/i386/cpu.c
+> > +++ b/target/i386/cpu.c
+> > @@ -1042,7 +1042,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+> >              NULL, NULL, NULL, NULL,
+> >              NULL, NULL, "pconfig", NULL,
+> >              NULL, NULL, NULL, NULL,
+> > -            NULL, NULL, "spec-ctrl", NULL,
+> > +            NULL, NULL, "spec-ctrl", "stibp",
+> 
+> I guess I missed this earlier. Is there a corresponding patch for the AMD
+> STIBP bit (CPUID 0x80000008_EBX[15]) that is in KVM?
+
+This Intel STIBP patch is one that many distros have carried downstream
+since the flaw came to light.
+
+I've not seen any equiv patch for AMD STIBP bit, in either QMEU or libvirt,
+so guess that's a gap that needs filling.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
