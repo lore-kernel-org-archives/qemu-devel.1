@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gX0rN-0006Qj-Ay
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:23 -0500
+	(envelope-from <thuth@redhat.com>) id 1gX0v3-00015F-5s
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:35:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gX0rL-0005CQ-D7
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:17 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58492)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gX0rJ-0004xO-Ae
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:14 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gX0r6-0007XQ-3U
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:31:00 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C7B9E2E80D4
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:30:58 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1gX0uz-0001Vv-Pb
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:35:05 -0500
+References: <20181212003147.29604-1-ehabkost@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <b1fbe55c-6deb-5401-b4ed-9c4d6484ac55@redhat.com>
+Date: Wed, 12 Dec 2018 10:34:51 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Dec 2018 09:16:04 -0000
-From: Thomas Huth <1804323@bugs.launchpad.net>
-Reply-To: Bug 1804323 <1804323@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154275217430.18542.5225566870592653176.malonedeb@gac.canonical.com>
-Message-Id: <154460616577.8511.6134741927885865709.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1804323] Re: qemu segfaults in virtio-scsi driver
- if underlying device returns -EIO
+In-Reply-To: <20181212003147.29604-1-ehabkost@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] virt: Fix broken indentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,181 +23,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 
-** Changed in: qemu
-       Status: Fix Committed =3D> Fix Released
+On 2018-12-12 01:31, Eduardo Habkost wrote:
+> I introduced indentation using tabs instead of spaces in another
+> commit.  Peter reported the problem, and I failed to fix that
+> before sending my pull request.
+> 
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Fixes: 951597607696 ("virt: Eliminate separate instance_init functions")
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  hw/arm/virt.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 17f1b49d11..5b678237b7 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1854,7 +1854,7 @@ static const TypeInfo virt_machine_info = {
+>      .instance_size = sizeof(VirtMachineState),
+>      .class_size    = sizeof(VirtMachineClass),
+>      .class_init    = virt_machine_class_init,
+> -	.instance_init = virt_instance_init,
+> +    .instance_init = virt_instance_init,
+>      .interfaces = (InterfaceInfo[]) {
+>           { TYPE_HOTPLUG_HANDLER },
+>           { }
+> 
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1804323
-
-Title:
-  qemu segfaults in virtio-scsi driver if underlying device returns -EIO
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  Reported downstream in Fedora:
-  https://bugzilla.redhat.com/show_bug.cgi?id=3D1650975
-
-  Using qemu from git and reasonably recent nbdkit, this command injects -E=
-IO
-  errors into the block device which virtio-scsi is reading from:
-
-  $ nbdkit --filter=3Derror memory size=3D64M error-rate=3D100% \
-      --run 'x86_64-softmmu/qemu-system-x86_64 -device virtio-scsi,id=3Dscs=
-i -drive file=3D$nbd,format=3Draw,id=3Dhd0,if=3Dnone -device scsi-hd,drive=
-=3Dhd0'
-  nbdkit: memory[1]: error: injecting EIO error into pread
-  nbdkit: memory[1]: error: injecting EIO error into pread
-  qemu-system-x86_64: hw/scsi/scsi-bus.c:1374: scsi_req_complete: Assertion=
- `req->status =3D=3D -1' failed.
-
-  The stack trace is:
-
-  Thread 5 (Thread 0x7f33e1f8b700 (LWP 10474)):
-  #0  0x00007f33fe0bf371 in __GI___poll (fds=3D0x559b07199490, nfds=3D1, ti=
-meout=3D-1)
-      at ../sysdeps/unix/sysv/linux/poll.c:29
-  #1  0x00007f34061df5e6 in  () at /lib64/libglib-2.0.so.0
-  #2  0x00007f34061df710 in g_main_context_iteration ()
-      at /lib64/libglib-2.0.so.0
-  #3  0x00007f34061df761 in  () at /lib64/libglib-2.0.so.0
-  #4  0x00007f34062086ea in  () at /lib64/libglib-2.0.so.0
-  #5  0x00007f33fe19b58e in start_thread (arg=3D<optimized out>)
-      at pthread_create.c:486
-  #6  0x00007f33fe0ca593 in clone ()
-      at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
-
-  Thread 4 (Thread 0x7f33e3fff700 (LWP 10473)):
-  #0  0x00007f33fe1a4a8d in __lll_lock_wait ()
-      at ../sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:103
-  #1  0x00007f33fe19ddf8 in __GI___pthread_mutex_lock (mutex=3Dmutex@entry=
-=3D0x559b054697a0 <qemu_global_mutex>) at ../nptl/pthread_mutex_lock.c:78
-  #2  0x0000559b04f6b103 in qemu_mutex_lock_impl (mutex=3D0x559b054697a0 <q=
-emu_global_mutex>, file=3D0x559b04f87041 "/home/rjones/d/qemu/exec.c", line=
-=3D3197)
-      at util/qemu-thread-posix.c:66
-  #3  0x0000559b04b722ee in qemu_mutex_lock_iothread_impl (file=3Dfile@entr=
-y=3D0x559b04f87041 "/home/rjones/d/qemu/exec.c", line=3Dline@entry=3D3197)
-      at /home/rjones/d/qemu/cpus.c:1845
-  #4  0x0000559b04b31859 in prepare_mmio_access (mr=3D<optimized out>, mr=
-=3D<optimized out>) at /home/rjones/d/qemu/exec.c:3197
-  #5  0x0000559b04b381d4 in address_space_ldub (as=3D<optimized out>, addr=
-=3D<optimized out>, attrs=3D..., result=3Dresult@entry=3D0x0)
-      at /home/rjones/d/qemu/memory_ldst.inc.c:188
-  #6  0x0000559b04c61cd0 in helper_inb (env=3D<optimized out>, port=3D<opti=
-mized out>) at /home/rjones/d/qemu/target/i386/cpu.h:1846
-  #7  0x00007f33e889dc3e in code_gen_buffer ()
-  #8  0x0000559b04bb3b87 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D0x7f3=
-3e8876100 <code_gen_buffer+684243>) at /home/rjones/d/qemu/accel/tcg/cpu-ex=
-ec.c:171
-  #9  0x0000559b04bb3b87 in cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>=
-, last_tb=3D<synthetic pointer>, tb=3D<optimized out>, cpu=3D0x7f33e8876100=
- <code_gen_buffer+684243>) at /home/rjones/d/qemu/accel/tcg/cpu-exec.c:615
-  #10 0x0000559b04bb3b87 in cpu_exec (cpu=3Dcpu@entry=3D0x559b05db57a0)
-      at /home/rjones/d/qemu/accel/tcg/cpu-exec.c:725
-  #11 0x0000559b04b7088f in tcg_cpu_exec (cpu=3D0x559b05db57a0)
-      at /home/rjones/d/qemu/cpus.c:1425
-  #12 0x0000559b04b72c03 in qemu_tcg_cpu_thread_fn (arg=3D0x559b05db57a0)
-      at /home/rjones/d/qemu/cpus.c:1729
-  #13 0x0000559b04b72c03 in qemu_tcg_cpu_thread_fn (arg=3Darg@entry=3D0x559=
-b05db57a0)
-      at /home/rjones/d/qemu/cpus.c:1703
-  #14 0x0000559b04f6afba in qemu_thread_start (args=3D<optimized out>)
-      at util/qemu-thread-posix.c:498
-  #15 0x00007f33fe19b58e in start_thread (arg=3D<optimized out>)
-      at pthread_create.c:486
-  #16 0x00007f33fe0ca593 in clone ()
-      at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
-
-  Thread 3 (Thread 0x7f33e178a700 (LWP 10475)):
-  #0  0x00007f33fe0bf371 in __GI___poll (fds=3D0x559b071aa760, nfds=3D2, ti=
-meout=3D-1)
-      at ../sysdeps/unix/sysv/linux/poll.c:29
-  #1  0x00007f34061df5e6 in  () at /lib64/libglib-2.0.so.0
-  #2  0x00007f34061df9a2 in g_main_loop_run () at /lib64/libglib-2.0.so.0
-  #3  0x00007f34032ca90a in  () at /lib64/libgio-2.0.so.0
-  #4  0x00007f34062086ea in  () at /lib64/libglib-2.0.so.0
-  #5  0x00007f33fe19b58e in start_thread (arg=3D<optimized out>)
-      at pthread_create.c:486
-  #6  0x00007f33fe0ca593 in clone ()
-      at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
-
-  Thread 2 (Thread 0x7f33eb050700 (LWP 10471)):
-  #0  0x00007f33fe1a5400 in __GI___nanosleep (requested_time=3D0x7f33eb04d2=
-70, remaining=3D0x7f33eb04d280) at ../sysdeps/unix/sysv/linux/nanosleep.c:28
-  #1  0x00007f3406209e17 in g_usleep () at /lib64/libglib-2.0.so.0
-  #2  0x0000559b04f7cb80 in call_rcu_thread (opaque=3Dopaque@entry=3D0x0)
-      at util/rcu.c:253
-  #3  0x0000559b04f6afba in qemu_thread_start (args=3D<optimized out>)
-      at util/qemu-thread-posix.c:498
-  #4  0x00007f33fe19b58e in start_thread (arg=3D<optimized out>)
-      at pthread_create.c:486
-  #5  0x00007f33fe0ca593 in clone ()
-      at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
-
-  Thread 1 (Thread 0x7f33eb9b42c0 (LWP 10470)):
-  #0  0x00007f33fe00553f in __GI_raise (sig=3Dsig@entry=3D6)
-      at ../sysdeps/unix/sysv/linux/raise.c:50
-  #1  0x00007f33fdfef895 in __GI_abort () at abort.c:79
-  #2  0x00007f33fdfef769 in __assert_fail_base (fmt=3D0x7f33fe156ea8 "%s%s%=
-s:%u: %s%sAssertion `%s' failed.\n%n", assertion=3D0x559b050203cf "req->sta=
-tus =3D=3D -1", file=3D0x559b050203aa "hw/scsi/scsi-bus.c", line=3D1374, fu=
-nction=3D0x559b05020dc0 <__PRETTY_FUNCTION__.32414> "scsi_req_complete") at=
- assert.c:92
-  #3  0x00007f33fdffd9f6 in __GI___assert_fail (assertion=3Dassertion@entry=
-=3D0x559b050203cf "req->status =3D=3D -1", file=3Dfile@entry=3D0x559b050203=
-aa "hw/scsi/scsi-bus.c", line=3Dline@entry=3D1374, function=3Dfunction@entr=
-y=3D0x559b05020dc0 <__PRETTY_FUNCTION__.32414> "scsi_req_complete") at asse=
-rt.c:101
-  #4  0x0000559b04da23c0 in scsi_req_complete (req=3D<optimized out>, statu=
-s=3D<optimized out>) at hw/scsi/scsi-bus.c:1374
-  #5  0x0000559b04d9cc60 in scsi_dma_complete_noio (r=3D0x559b069c3600, ret=
-=3D<optimized out>) at hw/scsi/scsi-disk.c:281
-  #6  0x0000559b04d9cd0f in scsi_dma_complete (opaque=3D0x559b069c3600, ret=
-=3D-5)
-      at hw/scsi/scsi-disk.c:302
-  #7  0x0000559b04c91607 in dma_complete (ret=3D-5, dbs=3D0x559b07808000)
-      at dma-helpers.c:116
-  #8  0x0000559b04c91607 in dma_blk_cb (opaque=3D0x559b07808000, ret=3D-5)
-      at dma-helpers.c:138
-  #9  0x0000559b04ec411e in blk_aio_complete (acb=3D0x559b07514fa0)
-      at block/block-backend.c:1345
-  #10 0x0000559b04f7e32b in coroutine_trampoline (i0=3D<optimized out>, i1=
-=3D<optimized out>) at util/coroutine-ucontext.c:116
-  #11 0x00007f33fe01b200 in __start_context ()
-      at ../sysdeps/unix/sysv/linux/x86_64/__start_context.S:91
-  #12 0x00007ffc0896b040 in  ()
-  #13 0x0000000000000000 in  ()
-
-  I bisected this to:
-
-  40dce4ee61c68395f6d463fae792f61b7c003bce is the first bad commit
-  commit 40dce4ee61c68395f6d463fae792f61b7c003bce
-  Author: Paolo Bonzini <pbonzini@redhat.com>
-  Date:   Sat Oct 13 11:52:34 2018 +0200
-
-      scsi-disk: fix rerror/werror=3Dignore
-      =
-
-      rerror=3Dignore was returning true from scsi_handle_rw_error but the =
-callers were not
-      calling scsi_req_complete when rerror=3Dignore returns true (this is =
-the correct thing
-      to do when true is returned after executing a passthrough command).  =
-Fix this by
-      calling it in scsi_handle_rw_error.
-      =
-
-      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-  :040000 040000 311386b9b91d77840a849459ab6ae41a37fd7f42
-  8adcda67d7487bcc18966f096c9923da3b8dc0b9 M      hw
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1804323/+subscriptions
+Reviewed-by: Thomas Huth <thuth@redhat.com>
