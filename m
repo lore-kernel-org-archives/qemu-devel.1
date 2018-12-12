@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXDqf-0004ra-Ul
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 18:23:26 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gXE0Z-0007LA-Bo
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 18:33:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXDqc-000162-N8
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 18:23:25 -0500
-Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:39684)
+	(envelope-from <richard.henderson@linaro.org>) id 1gXE0W-0002Lx-2e
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 18:33:39 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42597)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gXDqY-0000yQ-Up
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 18:23:20 -0500
-Received: by mail-oi1-x229.google.com with SMTP id i6so133243oia.6
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 15:23:12 -0800 (PST)
+	id 1gXE0V-0002Iw-GS
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 18:33:35 -0500
+Received: by mail-ot1-x344.google.com with SMTP id v23so160139otk.9
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 15:33:35 -0800 (PST)
 References: <cover.1544643238.git.alistair.francis@wdc.com>
-	<2560616ffb8a0e8c3001e3c5490c8bc1463468d0.1544643238.git.alistair.francis@wdc.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <4c5a2e04-2c85-9c46-b807-31b447da8730@linaro.org>
-Date: Wed, 12 Dec 2018 17:23:08 -0600
+Message-ID: <89a7db22-6744-0fb5-e543-847569e942c4@linaro.org>
+Date: Wed, 12 Dec 2018 17:33:31 -0600
 MIME-Version: 1.0
-In-Reply-To: <2560616ffb8a0e8c3001e3c5490c8bc1463468d0.1544643238.git.alistair.francis@wdc.com>
+In-Reply-To: <cover.1544643238.git.alistair.francis@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 05/23] riscv: Add the tcg-target header
- file
+Subject: Re: [Qemu-devel] [PATCH v1 00/23] Add RISC-V TCG backend support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,21 +33,17 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
 Cc: "alistair23@gmail.com" <alistair23@gmail.com>
 
-On 12/12/18 1:43 PM, Alistair Francis wrote:
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index ddfeb32c6c..aa88ee176e 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -262,6 +262,7 @@ S: Maintained
->  F: target/riscv/
->  F: hw/riscv/
->  F: include/hw/riscv/
-> +F: tcg/riscv/
+On 12/12/18 1:42 PM, Alistair Francis wrote:
+> As this is all new work (so can't cause regressions) I'm starting the
+> patch series process with what we have so far. That way others can help
+> contribute and test. If anyone has strong feelings for missing functionality
+> let me know and we can work on adding that before this is merged.
 
-This section is for RISC-V the target.
-Your new entry belongs in RISC-V the TCG host.
+I'd be ok merging this immediately after the bswap patches currently queued on
+my tcg-next-2 branch.  Which for you just means defining
+TCG_TARGET_HAS_MEMORY_BSWAP to 0 and fixing the one MAINTAINERS entry.
 
-See the "Tiny Code Generator (TCG)" header.
+Anything else can be fixed or improved via normal development.
 
 
 r~
