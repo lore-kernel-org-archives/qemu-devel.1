@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6Mc-0000uK-OL
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:58 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6Mh-0000zk-8c
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6MZ-0000Ib-OV
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:54 -0500
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:40847)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6Mg-0000QG-2h
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:59 -0500
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:53269)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gX6MZ-0000Gj-EH
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:51 -0500
-Received: by mail-wm1-x334.google.com with SMTP id q26so6345460wmf.5
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:23:51 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	u10sm15878859wrr.33.2018.12.12.07.23.48 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 12 Dec 2018 07:23:48 -0800 (PST)
+	id 1gX6Mf-0000PV-R1
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:57 -0500
+Received: by mail-wm1-x335.google.com with SMTP id y1so6138256wmi.3
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:23:57 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 12 Dec 2018 16:22:50 +0100
-Message-Id: <1544628195-37728-30-git-send-email-pbonzini@redhat.com>
+Date: Wed, 12 Dec 2018 16:22:57 +0100
+Message-Id: <1544628195-37728-37-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
 References: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 29/54] qemu/queue.h: remove Q_TAILQ_{HEAD, ENTRY}
+Subject: [Qemu-devel] [PULL 36/54] tcg/tcg.h: Remove GCC check for
+ tcg_debug_assert() macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,77 +29,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>
 
-These are not present for other kinds of queue, and unused.
-Zap them before more changes are made to the QTAILQ
-implementation.
+From: Thomas Huth <thuth@redhat.com>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Both GCC v4.8 and Clang v3.4 support (our minimum versions) support
+__builtin_unreachable(), so we can remove the version check here now.
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1543937577-28256-5-git-send-email-thuth@redhat.com>
 ---
- include/qemu/queue.h       | 14 ++++++--------
- scripts/cocci-macro-file.h | 10 ----------
- 2 files changed, 6 insertions(+), 18 deletions(-)
+ tcg/tcg.h | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/include/qemu/queue.h b/include/qemu/queue.h
-index ac418ef..b9571e9 100644
---- a/include/qemu/queue.h
-+++ b/include/qemu/queue.h
-@@ -350,22 +350,20 @@ struct {                                                                \
- /*
-  * Tail queue definitions.
-  */
--#define Q_TAILQ_HEAD(name, type, qual)                                  \
-+#define QTAILQ_HEAD(name, type)                                         \
- struct name {                                                           \
--        qual type *tqh_first;           /* first element */             \
--        qual type *qual *tqh_last;      /* addr of last next element */ \
-+        type *tqh_first;      /* first element */                       \
-+        type **tqh_last;      /* addr of last next element */           \
- }
--#define QTAILQ_HEAD(name, type)  Q_TAILQ_HEAD(name, struct type,)
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index cbe4309..973a757 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -230,11 +230,9 @@ typedef uint64_t tcg_insn_unit;
  
- #define QTAILQ_HEAD_INITIALIZER(head)                                   \
-         { NULL, &(head).tqh_first }
+ #if defined CONFIG_DEBUG_TCG || defined QEMU_STATIC_ANALYSIS
+ # define tcg_debug_assert(X) do { assert(X); } while (0)
+-#elif QEMU_GNUC_PREREQ(4, 5)
++#else
+ # define tcg_debug_assert(X) \
+     do { if (!(X)) { __builtin_unreachable(); } } while (0)
+-#else
+-# define tcg_debug_assert(X) do { (void)(X); } while (0)
+ #endif
  
--#define Q_TAILQ_ENTRY(type, qual)                                       \
-+#define QTAILQ_ENTRY(type)                                              \
- struct {                                                                \
--        qual type *tqe_next;            /* next element */              \
--        qual type *qual *tqe_prev;      /* address of previous next element */\
-+        type *tqe_next;       /* next element */                   \
-+        type **tqe_prev;      /* address of previous next element */    \
- }
--#define QTAILQ_ENTRY(type)       Q_TAILQ_ENTRY(struct type,)
- 
- /*
-  * Tail queue functions.
-diff --git a/scripts/cocci-macro-file.h b/scripts/cocci-macro-file.h
-index 9f2e72e..5c49369 100644
---- a/scripts/cocci-macro-file.h
-+++ b/scripts/cocci-macro-file.h
-@@ -93,11 +93,6 @@ struct {                                                                \
- /*
-  * Tail queue definitions.
-  */
--#define Q_TAILQ_HEAD(name, type, qual)                                  \
--struct name {                                                           \
--        qual type *tqh_first;           /* first element */             \
--        qual type *qual *tqh_last;      /* addr of last next element */ \
--}
- #define QTAILQ_HEAD(name, type)                                         \
- struct name {                                                           \
-         type *tqh_first;      /* first element */                       \
-@@ -107,11 +102,6 @@ struct name {                                                           \
- #define QTAILQ_HEAD_INITIALIZER(head)                                   \
-         { NULL, &(head).tqh_first }
- 
--#define Q_TAILQ_ENTRY(type, qual)                                       \
--struct {                                                                \
--        qual type *tqe_next;            /* next element */              \
--        qual type *qual *tqe_prev;      /* address of previous next element */\
--}
- #define QTAILQ_ENTRY(type)                                              \
- struct {                                                                \
-         type *tqe_next;       /* next element */                        \
+ typedef struct TCGRelocation {
 -- 
 1.8.3.1
