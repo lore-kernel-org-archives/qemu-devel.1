@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gX40j-0001Qf-IY
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 07:53:10 -0500
+	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gX4Fp-0004dP-AZ
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:08:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gX40i-0002YB-5U
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 07:53:09 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:53188)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gX40h-0002Xl-Sl
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 07:53:08 -0500
-Received: by mail-wm1-x344.google.com with SMTP id m1so5031093wml.2
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 04:53:07 -0800 (PST)
-MIME-Version: 1.0
-References: <20181211180129.7661-1-ehabkost@redhat.com>
-	<20181211180129.7661-14-ehabkost@redhat.com>
-	<CAJ+F1CKq3wk_DMLtxFG316ZUuGELgytHVBuUYqGim7T=JjtZcA@mail.gmail.com>
-In-Reply-To: <CAJ+F1CKq3wk_DMLtxFG316ZUuGELgytHVBuUYqGim7T=JjtZcA@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 12 Dec 2018 16:52:54 +0400
-Message-ID: <CAJ+F1CKjdiRPK1WmW9Df_q38Yqv9MKqpzT3j9tmKW=1M+C7EXw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 13/24] q35/440fx/arm/spapr: Add QEMU 4.0
- machine type
+	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gX4Fi-0007iF-5j
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:08:43 -0500
+Received: from mga14.intel.com ([192.55.52.115]:56589)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yu.c.zhang@linux.intel.com>)
+	id 1gX4Fh-0007Zi-Kq
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:08:38 -0500
+From: Yu Zhang <yu.c.zhang@linux.intel.com>
+Date: Wed, 12 Dec 2018 21:05:38 +0800
+Message-Id: <1544619939-18102-2-git-send-email-yu.c.zhang@linux.intel.com>
+In-Reply-To: <1544619939-18102-1-git-send-email-yu.c.zhang@linux.intel.com>
+References: <1544619939-18102-1-git-send-email-yu.c.zhang@linux.intel.com>
+Subject: [Qemu-devel] [PATCH v3 1/2] intel-iommu: differentiate host address
+ width from IOVA address width.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,253 +25,273 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, alex.williamson@redhat.com, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>
 
-Hi
+Currently, vIOMMU is using the value of IOVA address width, instead of
+the host address width(HAW) to calculate the number of reserved bits in
+data structures such as root entries, context entries, and entries of
+DMA paging structures etc.
 
-On Wed, Dec 12, 2018 at 4:51 PM Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@gmail.com> wrote:
->
-> Hi
->
-> On Tue, Dec 11, 2018 at 10:22 PM Eduardo Habkost <ehabkost@redhat.com> wr=
-ote:
-> >
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> >
-> > Including all machine types that might have a pcie-root-port.
-> >
-> > Cc: Peter Maydell <peter.maydell@linaro.org>
-> > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Richard Henderson <rth@twiddle.net>
-> > Cc: Eduardo Habkost <ehabkost@redhat.com>
-> > Acked-by: David Gibson <david@gibson.dropbear.id.au>
-> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> > Message-Id: <154394083644.28192.8501647946108201466.stgit@gimli.home>
-> > Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> > [ehabkost: fixed accidental recursion at spapr_machine_3_1_class_option=
-s()]
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->
-> Why was ccw dropped? (can't find the discussion)
-> thanks
+However values of IOVA address width and of the HAW may not equal. For
+example, a 48-bit IOVA can only be mapped to host addresses no wider than
+46 bits. Using 48, instead of 46 to calculate the reserved bit may result
+in an invalid IOVA being accepted.
 
-Ah I see it is already in Cornelia pullreq, nevermind.
+To fix this, a new field - haw_bits is introduced in struct IntelIOMMUState,
+whose value is initialized based on the maximum physical address set to
+guest CPU. Also, definitions such as VTD_HOST_AW_39/48BIT etc. are renamed
+to clarify.
 
-> > ---
-> >  include/hw/compat.h  |  3 +++
-> >  include/hw/i386/pc.h |  3 +++
-> >  hw/arm/virt.c        | 19 +++++++++++++++++--
-> >  hw/i386/pc_piix.c    | 15 ++++++++++++---
-> >  hw/i386/pc_q35.c     | 13 +++++++++++--
-> >  hw/ppc/spapr.c       | 25 ++++++++++++++++++++++---
-> >  6 files changed, 68 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/include/hw/compat.h b/include/hw/compat.h
-> > index 6f4d5fc647..70958328fe 100644
-> > --- a/include/hw/compat.h
-> > +++ b/include/hw/compat.h
-> > @@ -1,6 +1,9 @@
-> >  #ifndef HW_COMPAT_H
-> >  #define HW_COMPAT_H
-> >
-> > +#define HW_COMPAT_3_1 \
-> > +    /* empty */
-> > +
-> >  #define HW_COMPAT_3_0 \
-> >      /* empty */
-> >
-> > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> > index 7bb52b4762..9d29c4b1df 100644
-> > --- a/include/hw/i386/pc.h
-> > +++ b/include/hw/i386/pc.h
-> > @@ -294,6 +294,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
-> >  int e820_get_num_entries(void);
-> >  bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-> >
-> > +#define PC_COMPAT_3_1 \
-> > +    HW_COMPAT_3_1 \
-> > +
-> >  #define PC_COMPAT_3_0 \
-> >      HW_COMPAT_3_0 \
-> >      {\
-> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> > index f69e7eb399..beaf6bc439 100644
-> > --- a/hw/arm/virt.c
-> > +++ b/hw/arm/virt.c
-> > @@ -1797,7 +1797,7 @@ static void machvirt_machine_init(void)
-> >  }
-> >  type_init(machvirt_machine_init);
-> >
-> > -static void virt_3_1_instance_init(Object *obj)
-> > +static void virt_4_0_instance_init(Object *obj)
-> >  {
-> >      VirtMachineState *vms =3D VIRT_MACHINE(obj);
-> >      VirtMachineClass *vmc =3D VIRT_MACHINE_GET_CLASS(vms);
-> > @@ -1867,10 +1867,25 @@ static void virt_3_1_instance_init(Object *obj)
-> >      vms->irqmap =3D a15irqmap;
-> >  }
-> >
-> > +static void virt_machine_4_0_options(MachineClass *mc)
-> > +{
-> > +}
-> > +DEFINE_VIRT_MACHINE_AS_LATEST(4, 0)
-> > +
-> > +#define VIRT_COMPAT_3_1 \
-> > +    HW_COMPAT_3_1
-> > +
-> > +static void virt_3_1_instance_init(Object *obj)
-> > +{
-> > +    virt_4_0_instance_init(obj);
-> > +}
-> > +
-> >  static void virt_machine_3_1_options(MachineClass *mc)
-> >  {
-> > +    virt_machine_4_0_options(mc);
-> > +    SET_MACHINE_COMPAT(mc, VIRT_COMPAT_3_1);
-> >  }
-> > -DEFINE_VIRT_MACHINE_AS_LATEST(3, 1)
-> > +DEFINE_VIRT_MACHINE(3, 1)
-> >
-> >  #define VIRT_COMPAT_3_0 \
-> >      HW_COMPAT_3_0
-> > diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> > index 2d996162f1..d9b04c8427 100644
-> > --- a/hw/i386/pc_piix.c
-> > +++ b/hw/i386/pc_piix.c
-> > @@ -429,21 +429,30 @@ static void pc_i440fx_machine_options(MachineClas=
-s *m)
-> >      machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
-> >  }
-> >
-> > -static void pc_i440fx_3_1_machine_options(MachineClass *m)
-> > +static void pc_i440fx_4_0_machine_options(MachineClass *m)
-> >  {
-> >      pc_i440fx_machine_options(m);
-> >      m->alias =3D "pc";
-> >      m->is_default =3D 1;
-> >  }
-> >
-> > +DEFINE_I440FX_MACHINE(v4_0, "pc-i440fx-4.0", NULL,
-> > +                      pc_i440fx_4_0_machine_options);
-> > +
-> > +static void pc_i440fx_3_1_machine_options(MachineClass *m)
-> > +{
-> > +    pc_i440fx_4_0_machine_options(m);
-> > +    m->is_default =3D 0;
-> > +    m->alias =3D NULL;
-> > +    SET_MACHINE_COMPAT(m, PC_COMPAT_3_1);
-> > +}
-> > +
-> >  DEFINE_I440FX_MACHINE(v3_1, "pc-i440fx-3.1", NULL,
-> >                        pc_i440fx_3_1_machine_options);
-> >
-> >  static void pc_i440fx_3_0_machine_options(MachineClass *m)
-> >  {
-> >      pc_i440fx_3_1_machine_options(m);
-> > -    m->is_default =3D 0;
-> > -    m->alias =3D NULL;
-> >      SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
-> >  }
-> >
-> > diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> > index 6e3d81f5be..58459bdab5 100644
-> > --- a/hw/i386/pc_q35.c
-> > +++ b/hw/i386/pc_q35.c
-> > @@ -311,19 +311,28 @@ static void pc_q35_machine_options(MachineClass *=
-m)
-> >      m->max_cpus =3D 288;
-> >  }
-> >
-> > -static void pc_q35_3_1_machine_options(MachineClass *m)
-> > +static void pc_q35_4_0_machine_options(MachineClass *m)
-> >  {
-> >      pc_q35_machine_options(m);
-> >      m->alias =3D "q35";
-> >  }
-> >
-> > +DEFINE_Q35_MACHINE(v4_0, "pc-q35-4.0", NULL,
-> > +                   pc_q35_4_0_machine_options);
-> > +
-> > +static void pc_q35_3_1_machine_options(MachineClass *m)
-> > +{
-> > +    pc_q35_4_0_machine_options(m);
-> > +    m->alias =3D NULL;
-> > +    SET_MACHINE_COMPAT(m, PC_COMPAT_3_1);
-> > +}
-> > +
-> >  DEFINE_Q35_MACHINE(v3_1, "pc-q35-3.1", NULL,
-> >                     pc_q35_3_1_machine_options);
-> >
-> >  static void pc_q35_3_0_machine_options(MachineClass *m)
-> >  {
-> >      pc_q35_3_1_machine_options(m);
-> > -    m->alias =3D NULL;
-> >      SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
-> >  }
-> >
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 7afd1a175b..def3e502d8 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -3956,19 +3956,38 @@ static const TypeInfo spapr_machine_info =3D {
-> >      }                                                                \
-> >      type_init(spapr_machine_register_##suffix)
-> >
-> > - /*
-> > +/*
-> > + * pseries-4.0
-> > + */
-> > +static void spapr_machine_4_0_instance_options(MachineState *machine)
-> > +{
-> > +}
-> > +
-> > +static void spapr_machine_4_0_class_options(MachineClass *mc)
-> > +{
-> > +    /* Defaults for the latest behaviour inherited from the base class=
- */
-> > +}
-> > +
-> > +DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
-> > +
-> > +/*
-> >   * pseries-3.1
-> >   */
-> > +#define SPAPR_COMPAT_3_1                                              =
-\
-> > +    HW_COMPAT_3_1
-> > +
-> >  static void spapr_machine_3_1_instance_options(MachineState *machine)
-> >  {
-> > +    spapr_machine_4_0_instance_options(machine);
-> >  }
-> >
-> >  static void spapr_machine_3_1_class_options(MachineClass *mc)
-> >  {
-> > -    /* Defaults for the latest behaviour inherited from the base class=
- */
-> > +    spapr_machine_4_0_class_options(mc);
-> > +    SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_3_1);
-> >  }
-> >
-> > -DEFINE_SPAPR_MACHINE(3_1, "3.1", true);
-> > +DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
-> >
-> >  /*
-> >   * pseries-3.0
-> > --
-> > 2.18.0.rc1.1.g3f1ff2140
-> >
-> >
->
->
-> --
-> Marc-Andr=C3=A9 Lureau
+Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+---
+Cc: "Michael S. Tsirkin" <mst@redhat.com> 
+Cc: Igor Mammedov <imammedo@redhat.com> 
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com> 
+Cc: Richard Henderson <rth@twiddle.net> 
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>
+---
+ hw/i386/acpi-build.c          |  2 +-
+ hw/i386/intel_iommu.c         | 55 ++++++++++++++++++++++++-------------------
+ include/hw/i386/intel_iommu.h |  9 +++----
+ 3 files changed, 37 insertions(+), 29 deletions(-)
 
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 236a20e..b989523 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2431,7 +2431,7 @@ build_dmar_q35(GArray *table_data, BIOSLinker *linker)
+     }
+ 
+     dmar = acpi_data_push(table_data, sizeof(*dmar));
+-    dmar->host_address_width = intel_iommu->aw_bits - 1;
++    dmar->host_address_width = intel_iommu->haw_bits - 1;
+     dmar->flags = dmar_flags;
+ 
+     /* DMAR Remapping Hardware Unit Definition structure */
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index d97bcbc..0e88c63 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -707,7 +707,8 @@ static VTDBus *vtd_find_as_from_bus_num(IntelIOMMUState *s, uint8_t bus_num)
+  */
+ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
+                              uint64_t *slptep, uint32_t *slpte_level,
+-                             bool *reads, bool *writes, uint8_t aw_bits)
++                             bool *reads, bool *writes, uint8_t aw_bits,
++                             uint8_t haw_bits)
+ {
+     dma_addr_t addr = vtd_ce_get_slpt_base(ce);
+     uint32_t level = vtd_ce_get_level(ce);
+@@ -760,7 +761,7 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
+             *slpte_level = level;
+             return 0;
+         }
+-        addr = vtd_get_slpte_addr(slpte, aw_bits);
++        addr = vtd_get_slpte_addr(slpte, haw_bits);
+         level--;
+     }
+ }
+@@ -783,6 +784,7 @@ typedef struct {
+     void *private;
+     bool notify_unmap;
+     uint8_t aw;
++    uint8_t haw;
+     uint16_t domain_id;
+ } vtd_page_walk_info;
+ 
+@@ -925,7 +927,7 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
+              * This is a valid PDE (or even bigger than PDE).  We need
+              * to walk one further level.
+              */
+-            ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, info->aw),
++            ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, info->haw),
+                                       iova, MIN(iova_next, end), level - 1,
+                                       read_cur, write_cur, info);
+         } else {
+@@ -942,7 +944,7 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
+             entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
+             entry.addr_mask = ~subpage_mask;
+             /* NOTE: this is only meaningful if entry_valid == true */
+-            entry.translated_addr = vtd_get_slpte_addr(slpte, info->aw);
++            entry.translated_addr = vtd_get_slpte_addr(slpte, info->haw);
+             ret = vtd_page_walk_one(&entry, info);
+         }
+ 
+@@ -1002,7 +1004,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
+         return -VTD_FR_ROOT_ENTRY_P;
+     }
+ 
+-    if (re.rsvd || (re.val & VTD_ROOT_ENTRY_RSVD(s->aw_bits))) {
++    if (re.rsvd || (re.val & VTD_ROOT_ENTRY_RSVD(s->haw_bits))) {
+         trace_vtd_re_invalid(re.rsvd, re.val);
+         return -VTD_FR_ROOT_ENTRY_RSVD;
+     }
+@@ -1019,7 +1021,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
+     }
+ 
+     if ((ce->hi & VTD_CONTEXT_ENTRY_RSVD_HI) ||
+-               (ce->lo & VTD_CONTEXT_ENTRY_RSVD_LO(s->aw_bits))) {
++               (ce->lo & VTD_CONTEXT_ENTRY_RSVD_LO(s->haw_bits))) {
+         trace_vtd_ce_invalid(ce->hi, ce->lo);
+         return -VTD_FR_CONTEXT_ENTRY_RSVD;
+     }
+@@ -1056,6 +1058,7 @@ static int vtd_sync_shadow_page_table_range(VTDAddressSpace *vtd_as,
+         .private = (void *)&vtd_as->iommu,
+         .notify_unmap = true,
+         .aw = s->aw_bits,
++        .haw = s->haw_bits,
+         .as = vtd_as,
+         .domain_id = VTD_CONTEXT_ENTRY_DID(ce->hi),
+     };
+@@ -1360,7 +1363,7 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+     }
+ 
+     ret_fr = vtd_iova_to_slpte(&ce, addr, is_write, &slpte, &level,
+-                               &reads, &writes, s->aw_bits);
++                               &reads, &writes, s->aw_bits, s->haw_bits);
+     if (ret_fr) {
+         ret_fr = -ret_fr;
+         if (is_fpd_set && vtd_is_qualified_fault(ret_fr)) {
+@@ -1378,7 +1381,7 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+ out:
+     vtd_iommu_unlock(s);
+     entry->iova = addr & page_mask;
+-    entry->translated_addr = vtd_get_slpte_addr(slpte, s->aw_bits) & page_mask;
++    entry->translated_addr = vtd_get_slpte_addr(slpte, s->haw_bits) & page_mask;
+     entry->addr_mask = ~page_mask;
+     entry->perm = access_flags;
+     return true;
+@@ -1396,7 +1399,7 @@ static void vtd_root_table_setup(IntelIOMMUState *s)
+ {
+     s->root = vtd_get_quad_raw(s, DMAR_RTADDR_REG);
+     s->root_extended = s->root & VTD_RTADDR_RTT;
+-    s->root &= VTD_RTADDR_ADDR_MASK(s->aw_bits);
++    s->root &= VTD_RTADDR_ADDR_MASK(s->haw_bits);
+ 
+     trace_vtd_reg_dmar_root(s->root, s->root_extended);
+ }
+@@ -1412,7 +1415,7 @@ static void vtd_interrupt_remap_table_setup(IntelIOMMUState *s)
+     uint64_t value = 0;
+     value = vtd_get_quad_raw(s, DMAR_IRTA_REG);
+     s->intr_size = 1UL << ((value & VTD_IRTA_SIZE_MASK) + 1);
+-    s->intr_root = value & VTD_IRTA_ADDR_MASK(s->aw_bits);
++    s->intr_root = value & VTD_IRTA_ADDR_MASK(s->haw_bits);
+     s->intr_eime = value & VTD_IRTA_EIME;
+ 
+     /* Notify global invalidation */
+@@ -1689,7 +1692,7 @@ static void vtd_handle_gcmd_qie(IntelIOMMUState *s, bool en)
+     trace_vtd_inv_qi_enable(en);
+ 
+     if (en) {
+-        s->iq = iqa_val & VTD_IQA_IQA_MASK(s->aw_bits);
++        s->iq = iqa_val & VTD_IQA_IQA_MASK(s->haw_bits);
+         /* 2^(x+8) entries */
+         s->iq_size = 1UL << ((iqa_val & VTD_IQA_QS) + 8);
+         s->qi_enabled = true;
+@@ -2629,7 +2632,7 @@ static Property vtd_properties[] = {
+                             ON_OFF_AUTO_AUTO),
+     DEFINE_PROP_BOOL("x-buggy-eim", IntelIOMMUState, buggy_eim, false),
+     DEFINE_PROP_UINT8("x-aw-bits", IntelIOMMUState, aw_bits,
+-                      VTD_HOST_ADDRESS_WIDTH),
++                      VTD_ADDRESS_WIDTH),
+     DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALSE),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+@@ -3080,6 +3083,7 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
+                 .private = (void *)n,
+                 .notify_unmap = false,
+                 .aw = s->aw_bits,
++                .haw = s->haw_bits,
+                 .as = vtd_as,
+                 .domain_id = VTD_CONTEXT_ENTRY_DID(ce.hi),
+             };
+@@ -3100,6 +3104,8 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
+ static void vtd_init(IntelIOMMUState *s)
+ {
+     X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
++    CPUState *cs = first_cpu;
++    X86CPU *cpu = X86_CPU(cs);
+ 
+     memset(s->csr, 0, DMAR_REG_SIZE);
+     memset(s->wmask, 0, DMAR_REG_SIZE);
+@@ -3119,23 +3125,24 @@ static void vtd_init(IntelIOMMUState *s)
+     s->cap = VTD_CAP_FRO | VTD_CAP_NFR | VTD_CAP_ND |
+              VTD_CAP_MAMV | VTD_CAP_PSI | VTD_CAP_SLLPS |
+              VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(s->aw_bits);
+-    if (s->aw_bits == VTD_HOST_AW_48BIT) {
++    if (s->aw_bits == VTD_AW_48BIT) {
+         s->cap |= VTD_CAP_SAGAW_48bit;
+     }
+     s->ecap = VTD_ECAP_QI | VTD_ECAP_IRO;
++    s->haw_bits = cpu->phys_bits;
+ 
+     /*
+      * Rsvd field masks for spte
+      */
+     vtd_paging_entry_rsvd_field[0] = ~0ULL;
+-    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->aw_bits);
+-    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->aw_bits);
+-    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->aw_bits);
+-    vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->aw_bits);
+-    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->aw_bits);
+-    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->aw_bits);
+-    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->aw_bits);
+-    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->aw_bits);
++    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->haw_bits);
++    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->haw_bits);
++    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->haw_bits);
++    vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->haw_bits);
++    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->haw_bits);
++    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->haw_bits);
++    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->haw_bits);
++    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->haw_bits);
+ 
+     if (x86_iommu->intr_supported) {
+         s->ecap |= VTD_ECAP_IR | VTD_ECAP_MHMV;
+@@ -3261,10 +3268,10 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+     }
+ 
+     /* Currently only address widths supported are 39 and 48 bits */
+-    if ((s->aw_bits != VTD_HOST_AW_39BIT) &&
+-        (s->aw_bits != VTD_HOST_AW_48BIT)) {
++    if ((s->aw_bits != VTD_AW_39BIT) &&
++        (s->aw_bits != VTD_AW_48BIT)) {
+         error_setg(errp, "Supported values for x-aw-bits are: %d, %d",
+-                   VTD_HOST_AW_39BIT, VTD_HOST_AW_48BIT);
++                   VTD_AW_39BIT, VTD_AW_48BIT);
+         return false;
+     }
+ 
+diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+index ed4e758..820451c 100644
+--- a/include/hw/i386/intel_iommu.h
++++ b/include/hw/i386/intel_iommu.h
+@@ -47,9 +47,9 @@
+ #define VTD_SID_TO_DEVFN(sid)       ((sid) & 0xff)
+ 
+ #define DMAR_REG_SIZE               0x230
+-#define VTD_HOST_AW_39BIT           39
+-#define VTD_HOST_AW_48BIT           48
+-#define VTD_HOST_ADDRESS_WIDTH      VTD_HOST_AW_39BIT
++#define VTD_AW_39BIT                39
++#define VTD_AW_48BIT                48
++#define VTD_ADDRESS_WIDTH           VTD_AW_39BIT
+ #define VTD_HAW_MASK(aw)            ((1ULL << (aw)) - 1)
+ 
+ #define DMAR_REPORT_F_INTR          (1)
+@@ -244,7 +244,8 @@ struct IntelIOMMUState {
+     bool intr_eime;                 /* Extended interrupt mode enabled */
+     OnOffAuto intr_eim;             /* Toggle for EIM cabability */
+     bool buggy_eim;                 /* Force buggy EIM unless eim=off */
+-    uint8_t aw_bits;                /* Host/IOVA address width (in bits) */
++    uint8_t aw_bits;                /* IOVA address width (in bits) */
++    uint8_t haw_bits;               /* Hardware address width (in bits) */
+ 
+     /*
+      * Protects IOMMU states in general.  Currently it protects the
+-- 
+1.9.1
