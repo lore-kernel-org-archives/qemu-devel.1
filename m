@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gXAMt-0005XP-JN
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:40:28 -0500
+	(envelope-from <lvivier@redhat.com>) id 1gXAMu-0005YN-IK
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:40:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gXAMq-0007gN-8j
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:40:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49324)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gXAMp-0007bm-VC
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:40:24 -0500
-From: Alex Williamson <alex.williamson@redhat.com>
-Date: Wed, 12 Dec 2018 12:40:09 -0700
-Message-ID: <154464360920.9828.6723013766146630942.stgit@gimli.home>
-In-Reply-To: <154464279386.9828.10219496338109023342.stgit@gimli.home>
-References: <154464279386.9828.10219496338109023342.stgit@gimli.home>
+	(envelope-from <lvivier@redhat.com>) id 1gXAMt-0007jA-ME
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:40:28 -0500
+From: Laurent Vivier <lvivier@redhat.com>
+Date: Wed, 12 Dec 2018 20:40:05 +0100
+Message-Id: <20181212194009.2951-1-lvivier@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v5 8/8] pcie: Fast PCIe root ports for new
- machines
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/4] block: Convert from DPRINTF() macro to
+ trace event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +21,24 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eric Auger <eric.auger@redhat.com>
+Cc: Liu Yuan <namei.unix@gmail.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-trivial@nongnu.org, "Richard W.M. Jones" <rjones@redhat.com>, qemu-block@nongnu.org, Laurent Vivier <lvivier@redhat.com>
 
-Change the default speed and width for new machine types to the
-fastest and widest currently supported.  This should be compatible to
-the PCIe 4.0 spec.  Pre-QEMU-4.0 machine types remain at 2.5GT/s, x1
-width.
+Convert all the remaining uses of DPRINTF() in the directory block.
 
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- hw/pci-bridge/gen_pcie_root_port.c |    4 ++--
- include/hw/compat.h                |   10 +++++++++-
- 2 files changed, 11 insertions(+), 3 deletions(-)
+Compiled for all target but only tested with "make check"
 
-diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
-index ca5418a89dd2..9766edb44596 100644
---- a/hw/pci-bridge/gen_pcie_root_port.c
-+++ b/hw/pci-bridge/gen_pcie_root_port.c
-@@ -125,9 +125,9 @@ static Property gen_rp_props[] = {
-     DEFINE_PROP_SIZE("pref64-reserve", GenPCIERootPort,
-                      res_reserve.mem_pref_64, -1),
-     DEFINE_PROP_PCIE_LINK_SPEED("x-speed", PCIESlot,
--                                speed, PCIE_LINK_SPEED_2_5),
-+                                speed, PCIE_LINK_SPEED_16),
-     DEFINE_PROP_PCIE_LINK_WIDTH("x-width", PCIESlot,
--                                width, PCIE_LINK_WIDTH_1),
-+                                width, PCIE_LINK_WIDTH_32),
-     DEFINE_PROP_END_OF_LIST()
- };
- 
-diff --git a/include/hw/compat.h b/include/hw/compat.h
-index 70958328fe7a..3ca85b037c04 100644
---- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -2,7 +2,15 @@
- #define HW_COMPAT_H
- 
- #define HW_COMPAT_3_1 \
--    /* empty */
-+    {\
-+        .driver   = "pcie-root-port",\
-+        .property = "x-speed",\
-+        .value    = "2_5",\
-+    },{\
-+        .driver   = "pcie-root-port",\
-+        .property = "x-width",\
-+        .value    = "1",\
-+    },
- 
- #define HW_COMPAT_3_0 \
-     /* empty */
+Laurent Vivier (4):
+  block/ssh: Convert from DPRINTF() macro to trace events
+  block/curl: Convert from DPRINTF() macro to trace events
+  block/file-posix: Convert from DPRINTF() macro to trace events
+  block/sheepdog: Convert from DPRINTF() macro to trace events
+
+ block/curl.c       | 29 ++++++++--------------------
+ block/file-posix.c | 25 ++++++------------------
+ block/sheepdog.c   | 47 +++++++++++++++++-----------------------------
+ block/ssh.c        | 46 +++++++++++++++++----------------------------
+ block/trace-events | 47 ++++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 95 insertions(+), 99 deletions(-)
+
+--=20
+2.19.2
