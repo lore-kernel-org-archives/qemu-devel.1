@@ -1,17 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gX0eI-0002qD-5U
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:17:47 -0500
+	(envelope-from <elohimes@gmail.com>) id 1gX0eq-0003kj-UG
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:18:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gX0eC-0005jz-2O
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:17:46 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Wed, 12 Dec 2018 10:16:23 +0100
-Message-Id: <20181212091623.16950-12-david@redhat.com>
-In-Reply-To: <20181212091623.16950-1-david@redhat.com>
-References: <20181212091623.16950-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 11/11] spapr_pci: perform unplug via the
- hotplug handler
+	(envelope-from <elohimes@gmail.com>) id 1gX0ep-00064N-Dn
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:18:20 -0500
+Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:42232)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gX0ep-00063o-5m
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:18:19 -0500
+Received: by mail-yb1-xb43.google.com with SMTP id m129so1222149ybf.9
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 01:18:19 -0800 (PST)
+MIME-Version: 1.0
+References: <20181206063552.6701-1-xieyongji@baidu.com>
+	<561e0d7a-af2f-caad-aec3-c15952665687@redhat.com>
+	<20181206085849-mutt-send-email-mst@kernel.org>
+	<cf555a3d-0312-0b61-d18a-12ca295520a0@redhat.com>
+	<CAONzpcaXTBgPTH0WSfq-=RwHLkuqi1mhKcv4C=0_O67_hV8A2Q@mail.gmail.com>
+	<5794e090-9a9b-ca30-1066-ef697c9b67be@redhat.com>
+	<CAONzpcZKAXrgbJc6H3d82zUt6VUVSo36HLg__OvuDWoBk9zTvg@mail.gmail.com>
+	<7520e2cd-59cc-c133-f913-e7397df684dd@redhat.com>
+	<CAONzpcbekTuN80r3Vb3CA7MqYBuVOOmV=6wfCNOb5z6QyrLZvg@mail.gmail.com>
+	<cc6a464a-3193-f95b-08e5-c67e95d72dd5@redhat.com>
+In-Reply-To: <cc6a464a-3193-f95b-08e5-c67e95d72dd5@redhat.com>
+From: Yongji Xie <elohimes@gmail.com>
+Date: Wed, 12 Dec 2018 17:18:05 +0800
+Message-ID: <CAONzpcZ_RqUujdSoVCPUHH0A2g4hHY=oM9x-04e-6WugYFQOiw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 0/6] vhost-user-blk: Add support
+ for backend reconnecting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,83 +38,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, qemu-ppc@nongnu.org, David Hildenbrand <david@redhat.com>
+To: jasowang@redhat.com
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, zhangyu31@baidu.com, Xie Yongji <xieyongji@baidu.com>, lilin24@baidu.com, qemu-devel@nongnu.org, chaiwen@baidu.com, marcandre.lureau@redhat.com, nixun@baidu.com
 
-Introduce and use the "unplug" callback.
+On Wed, 12 Dec 2018 at 15:47, Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> On 2018/12/12 =E4=B8=8B=E5=8D=882:41, Yongji Xie wrote:
+> > On Wed, 12 Dec 2018 at 12:07, Jason Wang <jasowang@redhat.com> wrote:
+> >>
+> >> On 2018/12/12 =E4=B8=8A=E5=8D=8811:21, Yongji Xie wrote:
+> >>> On Wed, 12 Dec 2018 at 11:00, Jason Wang <jasowang@redhat.com> wrote:
+> >>>> On 2018/12/12 =E4=B8=8A=E5=8D=8810:48, Yongji Xie wrote:
+> >>>>> On Mon, 10 Dec 2018 at 17:32, Jason Wang <jasowang@redhat.com> wrot=
+e:
+> >>>>>> On 2018/12/6 =E4=B8=8B=E5=8D=889:59, Michael S. Tsirkin wrote:
+> >>>>>>> On Thu, Dec 06, 2018 at 09:57:22PM +0800, Jason Wang wrote:
+> >>>>>>>> On 2018/12/6 =E4=B8=8B=E5=8D=882:35,elohimes@gmail.com  wrote:
+> >>>>>>>>> From: Xie Yongji<xieyongji@baidu.com>
+> >>>>>>>>>
+> >>>>>>>>> This patchset is aimed at supporting qemu to reconnect
+> >>>>>>>>> vhost-user-blk backend after vhost-user-blk backend crash or
+> >>>>>>>>> restart.
+> >>>>>>>>>
+> >>>>>>>>> The patch 1 tries to implenment the sync connection for
+> >>>>>>>>> "reconnect socket".
+> >>>>>>>>>
+> >>>>>>>>> The patch 2 introduces a new message VHOST_USER_SET_VRING_INFLI=
+GHT
+> >>>>>>>>> to support offering shared memory to backend to record
+> >>>>>>>>> its inflight I/O.
+> >>>>>>>>>
+> >>>>>>>>> The patch 3,4 are the corresponding libvhost-user patches of
+> >>>>>>>>> patch 2. Make libvhost-user support VHOST_USER_SET_VRING_INFLIG=
+HT.
+> >>>>>>>>>
+> >>>>>>>>> The patch 5 supports vhost-user-blk to reconnect backend when
+> >>>>>>>>> connection closed.
+> >>>>>>>>>
+> >>>>>>>>> The patch 6 tells qemu that we support reconnecting now.
+> >>>>>>>>>
+> >>>>>>>>> To use it, we could start qemu with:
+> >>>>>>>>>
+> >>>>>>>>> qemu-system-x86_64 \
+> >>>>>>>>>              -chardev socket,id=3Dchar0,path=3D/path/vhost.sock=
+et,reconnect=3D1,wait \
+> >>>>>>>>>              -device vhost-user-blk-pci,chardev=3Dchar0 \
+> >>>>>>>>>
+> >>>>>>>>> and start vhost-user-blk backend with:
+> >>>>>>>>>
+> >>>>>>>>> vhost-user-blk -b /path/file -s /path/vhost.socket
+> >>>>>>>>>
+> >>>>>>>>> Then we can restart vhost-user-blk at any time during VM runnin=
+g.
+> >>>>>>>> I wonder whether or not it's better to handle this at the level =
+of virtio
+> >>>>>>>> protocol itself instead of vhost-user level. E.g expose last_ava=
+il_idx to
+> >>>>>>>> driver might be sufficient?
+> >>>>>>>>
+> >>>>>>>> Another possible issue is, looks like you need to deal with diff=
+erent kinds
+> >>>>>>>> of ring layouts e.g packed virtqueues.
+> >>>>>>>>
+> >>>>>>>> Thanks
+> >>>>>>> I'm not sure I understand your comments here.
+> >>>>>>> All these would be guest-visible extensions.
+> >>>>>> Looks not, it only introduces a shared memory between qemu and
+> >>>>>> vhost-user backend?
+> >>>>>>
+> >>>>>>
+> >>>>>>> Possible for sure but how is this related to
+> >>>>>>> a patch supporting transparent reconnects?
+> >>>>>> I might miss something. My understanding is that we support transp=
+arent
+> >>>>>> reconnects, but we can't deduce an accurate last_avail_idx and thi=
+s is
+> >>>>>> what capability this series try to add. To me, this series is func=
+tional
+> >>>>>> equivalent to expose last_avail_idx (or avail_idx_cons) in availab=
+le
+> >>>>>> ring. So the information is inside guest memory, vhost-user backen=
+d can
+> >>>>>> access it and update it directly. I believe this is some modern NI=
+C did
+> >>>>>> as well (but index is in MMIO area of course).
+> >>>>>>
+> >>>>> Hi Jason,
+> >>>>>
+> >>>>> If my understand is correct, it might be not enough to only expose
+> >>>>> last_avail_idx.
+> >>>>> Because we would not process descriptors in the same order in which=
+ they have
+> >>>>> been made available sometimes. If so, we can't get correct inflight
+> >>>>> I/O information
+> >>>>> from available ring.
+> >>>> You can get this with the help of the both used ring and last_avail_=
+idx
+> >>>> I believe. Or maybe you can give us an example?
+> >>>>
+> >>> A simple example, we assume ring size is 8:
+> >>>
+> >>> 1. guest fill avail ring
+> >>>
+> >>> avail ring: 0 1 2 3 4 5 6 7
+> >>> used ring:
+> >>>
+> >>> 2. vhost-user backend complete 4,5,6,7 and fill used ring
+> >>>
+> >>> avail ring: 0 1 2 3 4 5 6 7
+> >>> used ring: 4 5 6 7
+> >>>
+> >>> 3. guest fill avail ring again
+> >>>
+> >>> avail ring: 4 5 6 7 4 5 6 7
+> >>> used ring: 4 5 6 7
+> >>>
+> >>> 4. vhost-user backend crash
+> >>>
+> >>> The inflight descriptors 0, 1, 2, 3 lost.
+> >>>
+> >>> Thanks,
+> >>> Yongji
+> >>
+> >> Ok, then we can simply forbid increasing the avail_idx in this case?
+> >>
+> >> Basically, it's a question of whether or not it's better to done it in
+> >> the level of virtio instead of vhost. I'm pretty sure if we expose
+> >> sufficient information, it could be done without touching vhost-user.
+> >> And we won't deal with e.g migration and other cases.
+> >>
+> > OK, I get your point. That's indeed an alternative way. But this featur=
+e seems
+> > to be only useful to vhost-user backend.
+>
+>
+> I admit I could not think of a use case other than vhost-user.
+>
+>
+> >   I'm not sure whether it make sense to
+> > touch virtio protocol for this feature.
+>
+>
+> Some possible advantages:
+>
+> - Feature could be determined and noticed by user or management layer.
+>
+> - There's no need to invent ring layout specific protocol to record in
+> flight descriptors. E.g if my understanding is correct, for this series
+> and for the example above, it still can not work for packed virtqueue
+> since descriptor id is not sufficient (descriptor could be overwritten
+> by used one). You probably need to have a (partial) copy of descriptor
+> ring for this.
+>
+> - No need to deal with migration, all information was in guest memory.
+>
 
-This is a preparation for multi-stage hotplug handlers, whereby the bus
-hotplug handler is overwritten by the machine hotplug handler. This handler
-will then pass control to the bus hotplug handler. So to get this running
-cleanly, we also have to make sure to go via the hotplug handler chain when
-actually unplugging a device after an unplug request. Lookup the hotplug
-handler and call "unplug".
+Yes, we have those advantages. But seems like handle this in vhost-user
+level could be easier to be maintained in production environment. We can
+support old guest. And the bug fix will not depend on guest kernel updating=
+.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/ppc/spapr_pci.c | 33 +++++++++++++++++++++------------
- 1 file changed, 21 insertions(+), 12 deletions(-)
-
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 2374d55fc1..bfb02ee96b 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1370,18 +1370,9 @@ static int spapr_create_pci_child_dt(sPAPRPHBState *phb, PCIDevice *dev,
- /* Callback to be called during DRC release. */
- void spapr_phb_remove_pci_device_cb(DeviceState *dev)
- {
--    /* some version guests do not wait for completion of a device
--     * cleanup (generally done asynchronously by the kernel) before
--     * signaling to QEMU that the device is safe, but instead sleep
--     * for some 'safe' period of time. unfortunately on a busy host
--     * this sleep isn't guaranteed to be long enough, resulting in
--     * bad things like IRQ lines being left asserted during final
--     * device removal. to deal with this we call reset just prior
--     * to finalizing the device, which will put the device back into
--     * an 'idle' state, as the device cleanup code expects.
--     */
--    pci_device_reset(PCI_DEVICE(dev));
--    object_unparent(OBJECT(dev));
-+    HotplugHandler *hotplug_ctrl = qdev_get_hotplug_handler(dev);
-+
-+    hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
- }
- 
- static sPAPRDRConnector *spapr_phb_get_pci_func_drc(sPAPRPHBState *phb,
-@@ -1490,6 +1481,23 @@ out:
-     }
- }
- 
-+static void spapr_pci_unplug(HotplugHandler *plug_handler,
-+                             DeviceState *plugged_dev, Error **errp)
-+{
-+    /* some version guests do not wait for completion of a device
-+     * cleanup (generally done asynchronously by the kernel) before
-+     * signaling to QEMU that the device is safe, but instead sleep
-+     * for some 'safe' period of time. unfortunately on a busy host
-+     * this sleep isn't guaranteed to be long enough, resulting in
-+     * bad things like IRQ lines being left asserted during final
-+     * device removal. to deal with this we call reset just prior
-+     * to finalizing the device, which will put the device back into
-+     * an 'idle' state, as the device cleanup code expects.
-+     */
-+    pci_device_reset(PCI_DEVICE(plugged_dev));
-+    object_unparent(OBJECT(plugged_dev));
-+}
-+
- static void spapr_pci_unplug_request(HotplugHandler *plug_handler,
-                                      DeviceState *plugged_dev, Error **errp)
- {
-@@ -1965,6 +1973,7 @@ static void spapr_phb_class_init(ObjectClass *klass, void *data)
-     dc->user_creatable = true;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-     hp->plug = spapr_pci_plug;
-+    hp->unplug = spapr_pci_unplug;
-     hp->unplug_request = spapr_pci_unplug_request;
- }
- 
--- 
-2.17.2
+Thanks,
+Yongji
