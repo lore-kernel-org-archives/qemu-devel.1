@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gX7t0-0003Hs-SJ
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:01:30 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gX7yO-0005Pv-Ly
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:07:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gX7su-0000G9-Ug
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:01:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33966)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gX7sr-0000Dh-Pj
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:01:19 -0500
-Date: Wed, 12 Dec 2018 17:01:10 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181212170110.GJ31033@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181211205346.11118-1-ehabkost@redhat.com>
-	<20181211205346.11118-5-ehabkost@redhat.com>
-	<c4bdc91b-3946-0345-bb57-f3e2e71b9ae3@amd.com>
+	(envelope-from <yuval.shaia@oracle.com>) id 1gX7yL-0005u7-G4
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:07:00 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:44914)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1gX7yL-0005r6-4N
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:06:57 -0500
+Date: Wed, 12 Dec 2018 19:06:36 +0200
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20181212170635.GB5747@lap1>
+References: <20181212114726.24060-1-ppandit@redhat.com>
+	<20181212114726.24060-4-ppandit@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c4bdc91b-3946-0345-bb57-f3e2e71b9ae3@amd.com>
-Subject: Re: [Qemu-devel] [PULL 4/4] i386: Add "stibp" flag name
+In-Reply-To: <20181212114726.24060-4-ppandit@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 3/6] pvrdma: check number of pages when
+ creating rings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: P J P <ppandit@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Saar Amar <saaramar5@gmail.com>, Li Qiang <liq3ea@163.com>, Prasad J Pandit <pjp@fedoraproject.org>, yuval.shaia@oracle.com
 
-On Wed, Dec 12, 2018 at 04:57:42PM +0000, Lendacky, Thomas wrote:
-> On 12/11/2018 02:53 PM, Eduardo Habkost wrote:
-> > The STIBP flag may be supported by the host KVM module, so QEMU
-> > can allow it to be configured manually, and it can be exposed to
-> > guests when using "-cpu host".
-> > 
-> > No additional migration code is required because the whole
-> > contents of spec_ctrl is already migrated in the "cpu/spec_ctrl"
-> > section.
-> > 
-> > Corresponding KVM patch was submitted at:
-> > https://lore.kernel.org/lkml/20181205191956.31480-1-ehabkost@redhat.com/
-> > 
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > Message-Id: <20181210180250.31299-1-ehabkost@redhat.com>
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >  target/i386/cpu.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index 86a934d450..12f559b6af 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -1042,7 +1042,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-> >              NULL, NULL, NULL, NULL,
-> >              NULL, NULL, "pconfig", NULL,
-> >              NULL, NULL, NULL, NULL,
-> > -            NULL, NULL, "spec-ctrl", NULL,
-> > +            NULL, NULL, "spec-ctrl", "stibp",
+On Wed, Dec 12, 2018 at 05:17:23PM +0530, P J P wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
 > 
-> I guess I missed this earlier. Is there a corresponding patch for the AMD
-> STIBP bit (CPUID 0x80000008_EBX[15]) that is in KVM?
+> When creating CQ/QP rings, an object can have up to
+> PVRDMA_MAX_FAST_REG_PAGES=128 pages. Check 'npages' parameter
+> to avoid excessive memory allocation or a null dereference.
+> 
+> Reported-by: Li Qiang <liq3ea@163.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> ---
+>  hw/rdma/vmw/pvrdma_cmd.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> Update v1: move check before page dir/tbl map
+>   -> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg02257.html
+> 
+> diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
+> index 4f616d4177..e37fb18280 100644
+> --- a/hw/rdma/vmw/pvrdma_cmd.c
+> +++ b/hw/rdma/vmw/pvrdma_cmd.c
+> @@ -259,6 +259,11 @@ static int create_cq_ring(PCIDevice *pci_dev , PvrdmaRing **ring,
+>      int rc = -EINVAL;
+>      char ring_name[MAX_RING_NAME_SZ];
+>  
+> +    if (!nchunks || nchunks > PVRDMA_MAX_FAST_REG_PAGES) {
+> +        pr_dbg("invalid nchunks: %d\n", nchunks);
+> +        return rc;
+> +    }
+> +
+>      pr_dbg("pdir_dma=0x%llx\n", (long long unsigned int)pdir_dma);
+>      dir = rdma_pci_dma_map(pci_dev, pdir_dma, TARGET_PAGE_SIZE);
+>      if (!dir) {
+> @@ -371,6 +376,12 @@ static int create_qp_rings(PCIDevice *pci_dev, uint64_t pdir_dma,
+>      char ring_name[MAX_RING_NAME_SZ];
+>      uint32_t wqe_sz;
+>  
+> +    if (!spages || spages > PVRDMA_MAX_FAST_REG_PAGES
+> +        || !rpages || rpages > PVRDMA_MAX_FAST_REG_PAGES) {
+> +        pr_dbg("invalid pages: %d, %d\n", spages, rpages);
+> +        return rc;
+> +    }
+> +
+>      pr_dbg("pdir_dma=0x%llx\n", (long long unsigned int)pdir_dma);
+>      dir = rdma_pci_dma_map(pci_dev, pdir_dma, TARGET_PAGE_SIZE);
+>      if (!dir) {
 
-This Intel STIBP patch is one that many distros have carried downstream
-since the flaw came to light.
+Thanks.
 
-I've not seen any equiv patch for AMD STIBP bit, in either QMEU or libvirt,
-so guess that's a gap that needs filling.
+Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> -- 
+> 2.19.2
+> 
