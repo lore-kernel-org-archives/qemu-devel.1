@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maran.wilson@oracle.com>) id 1gX8Qu-00035M-BO
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:36:29 -0500
+	(envelope-from <quintela@redhat.com>) id 1gX8Xo-0007pc-CG
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:43:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maran.wilson@oracle.com>) id 1gX8Ql-0006Mo-HR
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:36:28 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:44770)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maran.wilson@oracle.com>)
-	id 1gX8Qi-0006L4-AC
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:36:18 -0500
-References: <1544049446-6359-1-git-send-email-liam.merwick@oracle.com>
-	<1544049446-6359-4-git-send-email-liam.merwick@oracle.com>
-	<CAGxU2F4j11wVoDktowJwXDy42_PWbjwF0qAueFg+He4Tb86wgQ@mail.gmail.com>
-	<33fb9ea4-d6c5-ed23-2fb5-6f818e250043@oracle.com>
-	<CAGxU2F793nfiFADnJW-j-vLSS0Mp-XP54JFEq++0_JunHQj50w@mail.gmail.com>
-From: Maran Wilson <maran.wilson@oracle.com>
-Message-ID: <39cae0a5-954d-c6ea-86a8-c6a6cdb8ccdf@oracle.com>
-Date: Wed, 12 Dec 2018 09:36:11 -0800
+	(envelope-from <quintela@redhat.com>) id 1gX8Xk-0006J0-C8
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:43:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49030)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gX8Xk-0006I9-4t
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 12:43:32 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8B842C04958C
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 17:43:30 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <5fc8385c-6943-dc08-805e-9e9718cc8926@redhat.com> (Laurent
+	Vivier's message of "Wed, 28 Nov 2018 19:00:47 +0100")
+References: <20181126200009.862-1-quintela@redhat.com>
+	<20181126200009.862-3-quintela@redhat.com>
+	<5fc8385c-6943-dc08-805e-9e9718cc8926@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 12 Dec 2018 18:43:25 +0100
+Message-ID: <878t0uwshu.fsf@trasno.org>
 MIME-Version: 1.0
-In-Reply-To: <CAGxU2F793nfiFADnJW-j-vLSS0Mp-XP54JFEq++0_JunHQj50w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 3/3] pvh: Boot uncompressed kernel using
- direct boot ABI
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 02/16] virtio: split virtio input host
+ bits from virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,211 +36,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: liam.merwick@oracle.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, rth@twiddle.net, xen-devel@lists.xenproject.org, Michael Tsirkin <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, peterx@redhat.com
 
-On 12/12/2018 7:28 AM, Stefano Garzarella wrote:
-> On Tue, Dec 11, 2018 at 7:35 PM Maran Wilson <maran.wilson@oracle.com> =
-wrote:
->> On 12/11/2018 9:11 AM, Stefano Garzarella wrote:
->>> Hi Liam,
->>> in order to support PVH also with SeaBIOS, I'm going to work on a new
->>> option rom (like linuxboot/multiboot) that can be used in this case.
->> That is awesome. Yes, please keep us posted when you have something wo=
-rking.
-> Yes, I'll keep you updated!
+Laurent Vivier <lvivier@redhat.com> wrote:
+> On 26/11/2018 20:59, Juan Quintela wrote:
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  default-configs/virtio.mak        |  1 +
+>>  hw/virtio/Makefile.objs           |  1 +
+>>  hw/virtio/virtio-input-host-pci.c | 45 +++++++++++++++++++++++++++++++
+>>  hw/virtio/virtio-pci.c            | 20 --------------
+>>  hw/virtio/virtio-pci.h            | 14 ----------
+>>  5 files changed, 47 insertions(+), 34 deletions(-)
+>>  create mode 100644 hw/virtio/virtio-input-host-pci.c
+>> 
 >
->> Just FYI, before switching over to using Qemu+qboot, we had been using=
- a
->> Qemu only solution (but not using an option rom) internally that worke=
-d
->> very well using no FW at all. We had Qemu simply parse the ELF file an=
-d
->> jump to the PVH entry point if one is found. The only gotcha was that =
-we
->> had to include a pair of patches that were originally written by folks
->> at Intel as part of the clear containers work. Specifically, in order =
-to
->> be able to skip firmware entirely, we had to do 2 additional things: (=
-1)
->> ACPI tables generated by Qemu are usually patched up by FW. Since we
->> were running no FW, we needed to do that patching up of the ACPI table=
-s
->> in Qemu when it was detected that we were going to enter the OS via th=
-e
->> PVH entry point. (2) We also needed to add a patch to Qemu to enable a
->> few PM registers -- something typically done by FW.
-> I had a look of qemu-lite, are you referring to this?
-
-Yes. More specifically, we were using a modified version of this patch:
- =C2=A0=C2=A0 acpi: patch guest ACPI when loading firmware is skipped
-But unlike qemu-lite, we were not using a -nofw flag, instead, just=20
-choosing PVH vs legacy boot based on which -kernel binary was provided=20
-and whether it contained the PVH ELF note.
-
-So apply the above patch, you also need to pick up:
- =C2=A0=C2=A0 acpi: expose acpi_checksum()
-
-For a while, we had also been using patch:
- =C2=A0=C2=A0 ich9: enable pm registers when there is no firmware
-But that last patch can be avoided by simply selecting Hardware-Reduced=20
-ACPI mode when building the FADT in Qemu, when PVH boot is selected.
-
-But you probably wont need those patches at all if you are actually=20
-running some version of minimized SeaBIOS.
-
-Thanks,
--Maran
-
-
->> But if SeaBIOS is involved in the solution you are working on, I guess
->> you won't really need those extra patches. Just figured I'd mention it
->> so you have the full picture.
-> Thank you very much to share with me these details!
+> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 >
-> Cheers,
-> Stefano
->
->> Thanks,
->> -Maran
->>
->>> I'll keep you updated on it!
->>>
->>> Cheers,
->>> Stefano
->>> On Wed, Dec 5, 2018 at 11:38 PM Liam Merwick <liam.merwick@oracle.com=
-> wrote:
->>>> These changes (along with corresponding qboot and Linux kernel chang=
-es)
->>>> enable a guest to be booted using the x86/HVM direct boot ABI.
->>>>
->>>> This commit adds a load_elfboot() routine to pass the size and
->>>> location of the kernel entry point to qboot (which will fill in
->>>> the start_info struct information needed to to boot the guest).
->>>> Having loaded the ELF binary, load_linux() will run qboot
->>>> which continues the boot.
->>>>
->>>> The address for the kernel entry point has already been read
->>>> from an ELF Note in the uncompressed kernel binary earlier
->>>> in pc_memory_init().
->>>>
->>>> Signed-off-by: George Kennedy <George.Kennedy@oracle.com>
->>>> Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
->>>> ---
->>>>    hw/i386/pc.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++=
-+++++++++++++
->>>>    1 file changed, 72 insertions(+)
->>>>
->>>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->>>> index 056aa46d99b9..d3012cbd8597 100644
->>>> --- a/hw/i386/pc.c
->>>> +++ b/hw/i386/pc.c
->>>> @@ -54,6 +54,7 @@
->>>>    #include "sysemu/qtest.h"
->>>>    #include "kvm_i386.h"
->>>>    #include "hw/xen/xen.h"
->>>> +#include "hw/xen/start_info.h"
->>>>    #include "ui/qemu-spice.h"
->>>>    #include "exec/memory.h"
->>>>    #include "exec/address-spaces.h"
->>>> @@ -1098,6 +1099,50 @@ done:
->>>>        return pvh_start_addr !=3D 0;
->>>>    }
->>>>
->>>> +static bool load_elfboot(const char *kernel_filename,
->>>> +                   int kernel_file_size,
->>>> +                   uint8_t *header,
->>>> +                   size_t pvh_xen_start_addr,
->>>> +                   FWCfgState *fw_cfg)
->>>> +{
->>>> +    uint32_t flags =3D 0;
->>>> +    uint32_t mh_load_addr =3D 0;
->>>> +    uint32_t elf_kernel_size =3D 0;
->>>> +    uint64_t elf_entry;
->>>> +    uint64_t elf_low, elf_high;
->>>> +    int kernel_size;
->>>> +
->>>> +    if (ldl_p(header) !=3D 0x464c457f) {
->>>> +        return false; /* no elfboot */
->>>> +    }
->>>> +
->>>> +    bool elf_is64 =3D header[EI_CLASS] =3D=3D ELFCLASS64;
->>>> +    flags =3D elf_is64 ?
->>>> +        ((Elf64_Ehdr *)header)->e_flags : ((Elf32_Ehdr *)header)->e=
-_flags;
->>>> +
->>>> +    if (flags & 0x00010004) { /* LOAD_ELF_HEADER_HAS_ADDR */
->>>> +        error_report("elfboot unsupported flags =3D %x", flags);
->>>> +        exit(1);
->>>> +    }
->>>> +
->>>> +    kernel_size =3D load_elf(kernel_filename, NULL, NULL, &elf_entr=
-y,
->>>> +                           &elf_low, &elf_high, 0, I386_ELF_MACHINE=
-,
->>>> +                           0, 0);
->>>> +
->>>> +    if (kernel_size < 0) {
->>>> +        error_report("Error while loading elf kernel");
->>>> +        exit(1);
->>>> +    }
->>>> +    mh_load_addr =3D elf_low;
->>>> +    elf_kernel_size =3D elf_high - elf_low;
->>>> +
->>>> +    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_xen_start_addr)=
-;
->>>> +    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
->>>> +    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
->>>> +
->>>> +    return true;
->>>> +}
->>>> +
->>>>    static void load_linux(PCMachineState *pcms,
->>>>                           FWCfgState *fw_cfg)
->>>>    {
->>>> @@ -1138,6 +1183,33 @@ static void load_linux(PCMachineState *pcms,
->>>>        if (ldl_p(header+0x202) =3D=3D 0x53726448) {
->>>>            protocol =3D lduw_p(header+0x206);
->>>>        } else {
->>>> +        /* If the kernel address for using the x86/HVM direct boot =
-ABI has
->>>> +         * been saved then proceed with booting the uncompressed ke=
-rnel */
->>>> +        if (pvh_start_addr) {
->>>> +            if (load_elfboot(kernel_filename, kernel_size,
->>>> +                             header, pvh_start_addr, fw_cfg)) {
->>>> +                struct hvm_modlist_entry ramdisk_mod =3D { 0 };
->>>> +
->>>> +                fclose(f);
->>>> +
->>>> +                fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
->>>> +                    strlen(kernel_cmdline) + 1);
->>>> +                fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA, kern=
-el_cmdline);
->>>> +
->>>> +                assert(machine->device_memory !=3D NULL);
->>>> +                ramdisk_mod.paddr =3D machine->device_memory->base;
->>>> +                ramdisk_mod.size =3D
->>>> +                    memory_region_size(&machine->device_memory->mr)=
-;
->>>> +
->>>> +                fw_cfg_add_bytes(fw_cfg, FW_CFG_KERNEL_DATA, &ramdi=
-sk_mod,
->>>> +                                 sizeof(ramdisk_mod));
->>>> +                fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_SIZE, sizeof(he=
-ader));
->>>> +                fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA,
->>>> +                                 header, sizeof(header));
->>>> +
->>>> +                return;
->>>> +            }
->>>> +        }
->>>>            /* This looks like a multiboot kernel. If it is, let's st=
-op
->>>>               treating it like a Linux kernel. */
->>>>            if (load_multiboot(fw_cfg, f, kernel_filename, initrd_fil=
-ename,
->>>> --
->>>> 1.8.3.1
->>>>
->
+> You should add a note in the commit message you have renamed
+> virtio_host_initfn and virtio_host_pci_info to virtio_input_host_initfn
+> and virtio_input_host_info.
+
+Done.
