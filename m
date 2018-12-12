@@ -1,33 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gX1F5-0006Ni-V3
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:55:49 -0500
+	(envelope-from <david@redhat.com>) id 1gX1Gg-0007oi-15
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:57:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gX1F2-000769-Ne
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:55:47 -0500
-Received: from indium.canonical.com ([91.189.90.7]:36434)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gX1F2-00074z-H5
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:55:44 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gX1F1-0002dI-OW
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:55:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A15422E8058
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:55:43 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Dec 2018 09:44:49 -0000
-From: Thomas Huth <1528214@bugs.launchpad.net>
-Reply-To: Bug 1528214 <1528214@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20151221131340.12068.65353.malonedeb@chaenomeles.canonical.com>
-Message-Id: <154460788938.8400.13005326490384033017.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1528214] Re: qemu 1.7.0 vhost_net crash
+	(envelope-from <david@redhat.com>) id 1gX1Gc-0008FR-Di
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:57:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47244)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gX1Ga-0008EX-Bi
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:57:21 -0500
+From: David Hildenbrand <david@redhat.com>
+Date: Wed, 12 Dec 2018 10:57:07 +0100
+Message-Id: <20181212095707.19358-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1] pc: Use
+ hotplug_handler_(plug|unplug|unplug_request)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,71 +23,123 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>
 
-Looking through old bug tickets... can you still reproduce this issue
-with the latest version of QEMU and the kernel? Or could we close this
-ticket nowadays? ... also, since this looks like a kernel bug instead of
-a QEMU bug, have you tried to report it to the KVM or virtio mailing
-list instead?
+Let's avoid manually looking up the hotplug handler class. Use the
+existing wrappers instead.
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/i386/pc.c | 30 ++++++++----------------------
+ 1 file changed, 8 insertions(+), 22 deletions(-)
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1528214
-
-Title:
-  qemu 1.7.0 vhost_net crash
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  i find the crash in  /var/crash =
-
-  the crash content is :
-  <4>Pid: 6949, comm: qemu-system-x86 Not tainted 2.6.32-431.el6.x86_64 #1 =
-Powerleader PR2530G2/SC612DI-8F
-  <4>RIP: 0010:[<ffffffff8118a849>]  [<ffffffff8118a849>] fput+0x9/0x30
-  <4>RSP: 0018:ffff88015b601d98  EFLAGS: 00010292
-  <4>RAX: 0000000000000382 RBX: ffff881e46590000 RCX: 00000000000001c3
-  <4>RDX: 0000000000000000 RSI: ffff881e46590130 RDI: 0000000000000000
-  <4>RBP: ffff88015b601d98 R08: ffff881e46598518 R09: 0000000000000000
-  <4>R10: 0000000000000000 R11: 0000000000000246 R12: ffff881e46590010
-  <4>R13: 0000000000000000 R14: ffff880c29812748 R15: 0000000000000000
-  <4>FS:  00007f6a74d20700(0000) GS:ffff8810b8840000(0000) knlGS:0000000000=
-000000
-  <4>CS:  0010 DS: 002b ES: 002b CR0: 000000008005003b
-  <4>CR2: 0000000000000030 CR3: 0000001c544cc000 CR4: 00000000001427e0
-  <4>DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-  <4>DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
-  <4>Process qemu-system-x86 (pid: 6949, threadinfo ffff88015b600000, task =
-ffff880c1ed9c040)
-  <4>Stack:
-  <4> ffff88015b601e58 ffffffffa02ac3c8 ffff881e46590000 0000000000000000
-  <4><d> ffff881e46590080 ffff881e46590078 ffff88015b601e38 0000000000000286
-  <4><d> ffffffff00000000 0000000000000001 ffff88015b601e58 0000000000000282
-  <4>Call Trace:
-  <4> [<ffffffffa02ac3c8>] vhost_net_ioctl+0x328/0x5d0 [vhost_net]
-  <4> [<ffffffff8119db42>] vfs_ioctl+0x22/0xa0
-  <4> [<ffffffff8119dce4>] do_vfs_ioctl+0x84/0x580
-  <4> [<ffffffff8118a7d1>] ? __fput+0x1a1/0x210
-  <4> [<ffffffff8119e261>] sys_ioctl+0x81/0xa0
-  <4> [<ffffffff810e1e5e>] ? __audit_syscall_exit+0x25e/0x290
-  <4> [<ffffffff8100b072>] system_call_fastpath+0x16/0x1b
-  <4>Code: fe ff ff 31 d2 48 89 de 83 cf ff ff d0 e9 da fe ff ff 48 89 df e=
-8 28 64 04 00 e9 bb fe ff ff 0f 1f 00 55 48 89 e5 0f 1f 44 00 00 <f0> 48 ff=
- 4f 30 0f 94 c0 84 c0 75 0b c9 c3 66 0f 1f
-  84 00 00 00 =
-
-  <1>RIP  [<ffffffff8118a849>] fput+0x9/0x30
-  <4> RSP <ffff88015b601d98>
-  <4>CR2: 0000000000000030
-
-  how the bug occure
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1528214/+subscriptions
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 4cd2fbca4d..c8857138f9 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1711,7 +1711,6 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+ static void pc_memory_plug(HotplugHandler *hotplug_dev,
+                            DeviceState *dev, Error **errp)
+ {
+-    HotplugHandlerClass *hhc;
+     Error *local_err = NULL;
+     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+     bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+@@ -1725,8 +1724,7 @@ static void pc_memory_plug(HotplugHandler *hotplug_dev,
+         nvdimm_plug(&pcms->acpi_nvdimm_state);
+     }
+ 
+-    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
+-    hhc->plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &error_abort);
++    hotplug_handler_plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &error_abort);
+ out:
+     error_propagate(errp, local_err);
+ }
+@@ -1734,7 +1732,6 @@ out:
+ static void pc_memory_unplug_request(HotplugHandler *hotplug_dev,
+                                      DeviceState *dev, Error **errp)
+ {
+-    HotplugHandlerClass *hhc;
+     Error *local_err = NULL;
+     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+ 
+@@ -1755,9 +1752,8 @@ static void pc_memory_unplug_request(HotplugHandler *hotplug_dev,
+         goto out;
+     }
+ 
+-    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
+-    hhc->unplug_request(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
+-
++    hotplug_handler_unplug_request(HOTPLUG_HANDLER(pcms->acpi_dev), dev,
++                                   &local_err);
+ out:
+     error_propagate(errp, local_err);
+ }
+@@ -1766,12 +1762,9 @@ static void pc_memory_unplug(HotplugHandler *hotplug_dev,
+                              DeviceState *dev, Error **errp)
+ {
+     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+-    HotplugHandlerClass *hhc;
+     Error *local_err = NULL;
+ 
+-    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
+-    hhc->unplug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
+-
++    hotplug_handler_unplug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
+     if (local_err) {
+         goto out;
+     }
+@@ -1813,14 +1806,12 @@ static void pc_cpu_plug(HotplugHandler *hotplug_dev,
+                         DeviceState *dev, Error **errp)
+ {
+     CPUArchId *found_cpu;
+-    HotplugHandlerClass *hhc;
+     Error *local_err = NULL;
+     X86CPU *cpu = X86_CPU(dev);
+     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+ 
+     if (pcms->acpi_dev) {
+-        hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
+-        hhc->plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
++        hotplug_handler_plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
+         if (local_err) {
+             goto out;
+         }
+@@ -1844,7 +1835,6 @@ static void pc_cpu_unplug_request_cb(HotplugHandler *hotplug_dev,
+                                      DeviceState *dev, Error **errp)
+ {
+     int idx = -1;
+-    HotplugHandlerClass *hhc;
+     Error *local_err = NULL;
+     X86CPU *cpu = X86_CPU(dev);
+     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+@@ -1861,9 +1851,8 @@ static void pc_cpu_unplug_request_cb(HotplugHandler *hotplug_dev,
+         goto out;
+     }
+ 
+-    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
+-    hhc->unplug_request(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
+-
++    hotplug_handler_unplug_request(HOTPLUG_HANDLER(pcms->acpi_dev), dev,
++                                   &local_err);
+     if (local_err) {
+         goto out;
+     }
+@@ -1877,14 +1866,11 @@ static void pc_cpu_unplug_cb(HotplugHandler *hotplug_dev,
+                              DeviceState *dev, Error **errp)
+ {
+     CPUArchId *found_cpu;
+-    HotplugHandlerClass *hhc;
+     Error *local_err = NULL;
+     X86CPU *cpu = X86_CPU(dev);
+     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+ 
+-    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
+-    hhc->unplug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
+-
++    hotplug_handler_unplug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
+     if (local_err) {
+         goto out;
+     }
+-- 
+2.17.2
