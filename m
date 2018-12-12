@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gXAFY-0008Ay-3K
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:32:52 -0500
+	(envelope-from <ppandit@redhat.com>) id 1gXAFW-00087k-33
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:32:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gXAFX-0001S0-Au
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:32:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44380)
+	(envelope-from <ppandit@redhat.com>) id 1gXAFR-0001OM-JY
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:32:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:14526)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gXAFX-0001RX-4P
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:32:51 -0500
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gXAFR-0001Ns-Da
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 14:32:45 -0500
 From: P J P <ppandit@redhat.com>
-Date: Thu, 13 Dec 2018 01:00:35 +0530
-Message-Id: <20181212193039.11445-3-ppandit@redhat.com>
-In-Reply-To: <20181212193039.11445-1-ppandit@redhat.com>
-References: <20181212193039.11445-1-ppandit@redhat.com>
+Date: Thu, 13 Dec 2018 01:00:33 +0530
+Message-Id: <20181212193039.11445-1-ppandit@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 2/6] pvrdma: add uar_read routine
+Subject: [Qemu-devel] [PATCH v2 0/6] rdma: various issues in rdma/pvrdma
+ backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +29,29 @@ Cc: Qemu Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel.apfelbaum@
 
 From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Define skeleton 'uar_read' routine. Avoid NULL dereference.
+Hello,
 
-Reported-by: Li Qiang <liq3ea@163.com>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+This is a revised version v2 of the earlier patch set to fix issues
+in the rdma/pvrdma backend.
+
+Update to include review comments from
+  -> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg02616.html
+
+Thank you.
 ---
- hw/rdma/vmw/pvrdma_main.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Prasad J Pandit (6):
+  rdma: check num_sge does not exceed MAX_SGE
+  pvrdma: add uar_read routine
+  pvrdma: check number of pages when creating rings
+  pvrdma: release ring object in case of an error
+  rdma: remove unused VENDOR_ERR_NO_SGE macro
+  pvrdma: check return value from pvrdma_idx_ring_has_ routines
 
-Update: change return value from uar_read()
-  -> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg02787.html
+ hw/rdma/rdma_backend.c        | 15 ++++++-----
+ hw/rdma/vmw/pvrdma_cmd.c      | 47 +++++++++++++++++++++++++++--------
+ hw/rdma/vmw/pvrdma_dev_ring.c | 29 ++++++++-------------
+ hw/rdma/vmw/pvrdma_main.c     |  6 +++++
+ 4 files changed, 60 insertions(+), 37 deletions(-)
 
-diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-index 23dc9926e3..997d7f395a 100644
---- a/hw/rdma/vmw/pvrdma_main.c
-+++ b/hw/rdma/vmw/pvrdma_main.c
-@@ -448,6 +448,11 @@ static const MemoryRegionOps regs_ops =3D {
-     },
- };
-=20
-+static uint64_t uar_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    return 0xffffffff;
-+}
-+
- static void uar_write(void *opaque, hwaddr addr, uint64_t val, unsigned =
-size)
- {
-     PVRDMADev *dev =3D opaque;
-@@ -489,6 +494,7 @@ static void uar_write(void *opaque, hwaddr addr, uint=
-64_t val, unsigned size)
- }
-=20
- static const MemoryRegionOps uar_ops =3D {
-+    .read =3D uar_read,
-     .write =3D uar_write,
-     .endianness =3D DEVICE_LITTLE_ENDIAN,
-     .impl =3D {
 --=20
 2.19.2
