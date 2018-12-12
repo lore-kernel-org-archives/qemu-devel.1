@@ -1,29 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gXB1e-0002Jc-0j
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:22:35 -0500
+	(envelope-from <walling@linux.ibm.com>) id 1gXB5G-0003ZP-F8
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:26:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gXB1c-000098-T4
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:22:34 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44124)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gXB1c-00006L-IN
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:22:32 -0500
-Received: by mail-wr1-x441.google.com with SMTP id z5so18964187wrt.11
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 12:22:32 -0800 (PST)
+	(envelope-from <walling@linux.ibm.com>) id 1gXB57-0007jm-Bi
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:26:14 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46426)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+	id 1gXB56-0007fl-QW
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:26:09 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wBCKJI0t105638
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 15:26:06 -0500
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2pb7ahd4rc-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 15:26:05 -0500
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
+	Wed, 12 Dec 2018 20:26:05 -0000
+References: <20181022090255.19671-1-zyimin@linux.ibm.com>
+	<698a7fdd-47cc-cb3e-a280-3c4b656d92ef@redhat.com>
+	<20181023232517.6b93085b.cohuck@redhat.com>
+	<494ff50b-8b0f-1393-fbc5-bf5033a246ce@linux.ibm.com>
+	<20181031114954.5e51d0c2.cohuck@redhat.com>
+	<d8e0621a-d11e-a172-e40e-ec96dd92d5cd@linux.ibm.com>
+	<20181130102708.5d6ca0e0.cohuck@redhat.com>
+From: Collin Walling <walling@linux.ibm.com>
+Date: Wed, 12 Dec 2018 15:25:57 -0500
 MIME-Version: 1.0
-References: <20180910083222.8245-1-marcandre.lureau@redhat.com>
-	<20180910083222.8245-4-marcandre.lureau@redhat.com>
-	<d67240e3-7dd0-732f-62b4-bb6b332d8dfe@redhat.com>
-In-Reply-To: <d67240e3-7dd0-732f-62b4-bb6b332d8dfe@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 13 Dec 2018 00:22:18 +0400
-Message-ID: <CAJ+F1CJXwF3Gtd1G4GK3AfOYAEs7aNLBUhtRMksHNkpESdpiDw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20181130102708.5d6ca0e0.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Message-Id: <a1d0ebac-346a-18e0-b05b-42d2b051cff4@linux.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v12 3/6] tpm: allocate/map buffer for TPM
- Physical Presence interface
+Subject: Re: [Qemu-devel] [PATCH v2] s390x/pci: add common fmb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,230 +47,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: philmd@redhat.com
-Cc: QEMU <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Cornelia Huck <cohuck@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>
+Cc: qemu-s390x@nongnu.org, borntraeger@de.ibm.com, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Yi Min Zhao <zyimin@linux.ibm.com>
 
-Hi
+On 11/30/2018 04:27 AM, Cornelia Huck wrote:
+> On Fri, 30 Nov 2018 10:23:14 +0100
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
+>=20
+>> On 31/10/2018 11:49, Cornelia Huck wrote:
+>>> On Wed, 24 Oct 2018 11:58:33 +0800
+>>> Yi Min Zhao <zyimin@linux.ibm.com> wrote:
+>>>  =20
+>>>> =E5=9C=A8 2018/10/24 =E4=B8=8A=E5=8D=885:25, Cornelia Huck =E5=86=99=
+=E9=81=93: =20
+>>>>> On Mon, 22 Oct 2018 13:17:34 +0100
+>>>>> Thomas Huth <thuth@redhat.com> wrote:
+>>>>>    =20
+>>
+>> ...snip...
+>>
+>>>> If endianness has error, I think the values must looks wrong.
+>>>> The right thing is that values increase from 0 and intervally.
+>>>> =20
+>>>
+>>> Thanks for pointing me to that file; when I run under tcg, the values
+>>> indeed look like they have an endianness issue:
+>>>
+>>> Update interval: 4000 ms
+>>> Samples: 637534208
+>>> Last update TOD: f4c01d0098000000
+>>>             Load operations:	10520408729537478656
+>>>            Store operations:	5980780305148018688
+>>>      Store block operations:	0
+>>>          Refresh operations:	0
+>>>             Allocated pages:	0
+>>>                Mapped pages:	0
+>>>              Unmapped pages:	0
+>>>
+>>> (virtio-net-pci device on a just-booted guest)
+>>>  =20
+>>
+>> Hy Conny,
+>>
+>> I saw we lack a response to Thomas.
+>> Otherwise have you any remark?
+>=20
+> I don't remember anything beyond the endianess issue.
+>=20
 
-On Wed, Dec 12, 2018 at 8:13 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> Hi Stefan, Marc-Andr=C3=A9,
->
-> On 9/10/18 10:32 AM, Marc-Andr=C3=A9 Lureau wrote:
-> > From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> >
-> > Implement a virtual memory device for the TPM Physical Presence interfa=
-ce.
-> > The memory is located at 0xFED45000 and used by ACPI to send messages t=
-o the
-> > firmware (BIOS) and by the firmware to provide parameters for each one =
-of
-> > the supported codes.
-> >
-> > This interface should be used by all TPM devices on x86 and can be
-> > added by calling tpm_ppi_init_io().
-> >
-> > Note: bios_linker cannot be used to allocate the PPI memory region,
-> > since the reserved memory should stay stable across reboots, and might
-> > be needed before the ACPI tables are installed.
-> >
-> > Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> >  hw/tpm/tpm_ppi.h      | 26 ++++++++++++++++++++++++++
-> >  include/hw/acpi/tpm.h |  6 ++++++
-> >  hw/tpm/tpm_crb.c      |  8 ++++++++
-> >  hw/tpm/tpm_ppi.c      | 32 ++++++++++++++++++++++++++++++++
-> >  hw/tpm/tpm_tis.c      |  8 ++++++++
-> >  hw/tpm/Makefile.objs  |  1 +
-> >  6 files changed, 81 insertions(+)
-> >  create mode 100644 hw/tpm/tpm_ppi.h
-> >  create mode 100644 hw/tpm/tpm_ppi.c
-> >
-> > diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
-> > new file mode 100644
-> > index 0000000000..c2ab2ed300
-> > --- /dev/null
-> > +++ b/hw/tpm/tpm_ppi.h
-> > @@ -0,0 +1,26 @@
-> > +/*
-> > + * TPM Physical Presence Interface
-> > + *
-> > + * Copyright (C) 2018 IBM Corporation
-> > + *
-> > + * Authors:
-> > + *  Stefan Berger    <stefanb@us.ibm.com>
-> > + *
-> > + * This work is licensed under the terms of the GNU GPL, version 2 or =
-later.
-> > + * See the COPYING file in the top-level directory.
-> > + */
-> > +#ifndef TPM_TPM_PPI_H
-> > +#define TPM_TPM_PPI_H
-> > +
-> > +#include "hw/acpi/tpm.h"
-> > +#include "exec/address-spaces.h"
-> > +
-> > +typedef struct TPMPPI {
-> > +    MemoryRegion ram;
-> > +    uint8_t *buf;
-> > +} TPMPPI;
-> > +
->
-> Can you add a description for this public function?
+This patch looks sane to me (I've lost the parent email on my
+client, else I would've replied directly to that).
 
-ok
-
->
-> > +bool tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
-> > +                  hwaddr addr, Object *obj, Error **errp);
-> > +
-> > +#endif /* TPM_TPM_PPI_H */
-> > diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
-> > index 3580ffd50c..b8796df916 100644
-> > --- a/include/hw/acpi/tpm.h
-> > +++ b/include/hw/acpi/tpm.h
-> > @@ -188,4 +188,10 @@ REG32(CRB_DATA_BUFFER, 0x80)
-> >  #define TPM2_START_METHOD_MMIO      6
-> >  #define TPM2_START_METHOD_CRB       7
-> >
-> > +/*
-> > + * Physical Presence Interface
-> > + */
-> > +#define TPM_PPI_ADDR_SIZE           0x400
-> > +#define TPM_PPI_ADDR_BASE           0xFED45000
-> > +
-> >  #endif /* HW_ACPI_TPM_H */
-> > diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
-> > index d5b0ac5920..b243222fd6 100644
-> > --- a/hw/tpm/tpm_crb.c
-> > +++ b/hw/tpm/tpm_crb.c
-> > @@ -29,6 +29,7 @@
-> >  #include "sysemu/reset.h"
-> >  #include "tpm_int.h"
-> >  #include "tpm_util.h"
-> > +#include "tpm_ppi.h"
-> >  #include "trace.h"
-> >
-> >  typedef struct CRBState {
-> > @@ -43,6 +44,7 @@ typedef struct CRBState {
-> >      size_t be_buffer_size;
-> >
-> >      bool ppi_enabled;
-> > +    TPMPPI ppi;
-> >  } CRBState;
-> >
-> >  #define CRB(obj) OBJECT_CHECK(CRBState, (obj), TYPE_TPM_CRB)
-> > @@ -294,6 +296,12 @@ static void tpm_crb_realize(DeviceState *dev, Erro=
-r **errp)
-> >      memory_region_add_subregion(get_system_memory(),
-> >          TPM_CRB_ADDR_BASE + sizeof(s->regs), &s->cmdmem);
-> >
-> > +    if (s->ppi_enabled &&
-> > +        !tpm_ppi_init(&s->ppi, get_system_memory(),
-> > +                      TPM_PPI_ADDR_BASE, OBJECT(s), errp)) {
-> > +        return;
-> > +    }
-> > +
-> >      qemu_register_reset(tpm_crb_reset, dev);
-> >  }
-> >
-> > diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
-> > new file mode 100644
-> > index 0000000000..f2f07f895e
-> > --- /dev/null
-> > +++ b/hw/tpm/tpm_ppi.c
-> > @@ -0,0 +1,32 @@
-> > +/*
-> > + * tpm_ppi.c - TPM Physical Presence Interface
-> > + *
-> > + * Copyright (C) 2018 IBM Corporation
-> > + *
-> > + * Authors:
-> > + *  Stefan Berger <stefanb@us.ibm.com>
-> > + *
-> > + * This work is licensed under the terms of the GNU GPL, version 2 or =
-later.
-> > + * See the COPYING file in the top-level directory.
-> > + *
-> > + */
-> > +
-> > +#include "qemu/osdep.h"
-> > +
-> > +#include "qapi/error.h"
-> > +#include "cpu.h"
-> > +#include "sysemu/memory_mapping.h"
-> > +#include "migration/vmstate.h"
-> > +#include "tpm_ppi.h"
-> > +
-> > +bool tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
-> > +                  hwaddr addr, Object *obj, Error **errp)
-> > +{
-> > +    tpmppi->buf =3D g_malloc0(HOST_PAGE_ALIGN(TPM_PPI_ADDR_SIZE));
-> > +    memory_region_init_ram_device_ptr(&tpmppi->ram, obj, "tpm-ppi",
-> > +                                      TPM_PPI_ADDR_SIZE, tpmppi->buf);
-> > +    vmstate_register_ram(&tpmppi->ram, DEVICE(obj));
-> > +
-> > +    memory_region_add_subregion(m, addr, &tpmppi->ram);
-> > +    return true;
-> > +}
-> > diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-> > index d9ddf9b723..70432ffe8b 100644
-> > --- a/hw/tpm/tpm_tis.c
-> > +++ b/hw/tpm/tpm_tis.c
-> > @@ -31,6 +31,7 @@
-> >  #include "sysemu/tpm_backend.h"
-> >  #include "tpm_int.h"
-> >  #include "tpm_util.h"
-> > +#include "tpm_ppi.h"
-> >  #include "trace.h"
-> >
-> >  #define TPM_TIS_NUM_LOCALITIES      5     /* per spec */
-> > @@ -83,6 +84,7 @@ typedef struct TPMState {
-> >      size_t be_buffer_size;
-> >
-> >      bool ppi_enabled;
-> > +    TPMPPI ppi;
-> >  } TPMState;
-> >
-> >  #define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)
-> > @@ -979,6 +981,12 @@ static void tpm_tis_realizefn(DeviceState *dev, Er=
-ror **errp)
-> >
-> >      memory_region_add_subregion(isa_address_space(ISA_DEVICE(dev)),
-> >                                  TPM_TIS_ADDR_BASE, &s->mmio);
-> > +
-> > +    if (s->ppi_enabled &&
-> > +        !tpm_ppi_init(&s->ppi, isa_address_space(ISA_DEVICE(dev)),
-> > +                      TPM_PPI_ADDR_BASE, OBJECT(s), errp)) {
-> > +        return;
-> > +    }
-> >  }
-> >
->
-> Shouldn't you implement the unrealize() function, destroying the PPI buff=
-er?
-
-I don't think it's necessary since the TPM and PPI are not hotpluggable.
-
-> Patch looks good otherwise.
->
-> >  static void tpm_tis_initfn(Object *obj)
-> > diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
-> > index 1dc9f8bf2c..700c878622 100644
-> > --- a/hw/tpm/Makefile.objs
-> > +++ b/hw/tpm/Makefile.objs
-> > @@ -1,4 +1,5 @@
-> >  common-obj-y +=3D tpm_util.o
-> > +obj-y +=3D tpm_ppi.o
-> >  common-obj-$(CONFIG_TPM_TIS) +=3D tpm_tis.o
-> >  common-obj-$(CONFIG_TPM_CRB) +=3D tpm_crb.o
-> >  common-obj-$(CONFIG_TPM_PASSTHROUGH) +=3D tpm_passthrough.o
-> >
->
-
+I'm currently awaiting getting my system up-and-running to test
+this thoroughly. Shall we do one more round with the endianess=20
+addressed in the mean time?
 
 --=20
-Marc-Andr=C3=A9 Lureau
+Respectfully,
+- Collin Walling
