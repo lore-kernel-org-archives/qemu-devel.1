@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gWzEo-00040j-Sw
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 02:47:23 -0500
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gWzcd-0008Mc-P7
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 03:12:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gWzEj-0007Zi-QI
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 02:47:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41336)
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gWzca-0007oe-JG
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 03:11:59 -0500
+Received: from mga09.intel.com ([134.134.136.24]:14513)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gWzEj-0007ZS-Hr
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 02:47:17 -0500
-References: <20181206063552.6701-1-xieyongji@baidu.com>
-	<561e0d7a-af2f-caad-aec3-c15952665687@redhat.com>
-	<20181206085849-mutt-send-email-mst@kernel.org>
-	<cf555a3d-0312-0b61-d18a-12ca295520a0@redhat.com>
-	<CAONzpcaXTBgPTH0WSfq-=RwHLkuqi1mhKcv4C=0_O67_hV8A2Q@mail.gmail.com>
-	<5794e090-9a9b-ca30-1066-ef697c9b67be@redhat.com>
-	<CAONzpcZKAXrgbJc6H3d82zUt6VUVSo36HLg__OvuDWoBk9zTvg@mail.gmail.com>
-	<7520e2cd-59cc-c133-f913-e7397df684dd@redhat.com>
-	<CAONzpcbekTuN80r3Vb3CA7MqYBuVOOmV=6wfCNOb5z6QyrLZvg@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <cc6a464a-3193-f95b-08e5-c67e95d72dd5@redhat.com>
-Date: Wed, 12 Dec 2018 15:47:04 +0800
-MIME-Version: 1.0
-In-Reply-To: <CAONzpcbekTuN80r3Vb3CA7MqYBuVOOmV=6wfCNOb5z6QyrLZvg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 0/6] vhost-user-blk: Add support
- for backend reconnecting
+	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
+	id 1gWzca-0007nq-BE
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 03:11:56 -0500
+From: Zhang Yi <yi.z.zhang@linux.intel.com>
+Date: Wed, 12 Dec 2018 16:11:44 +0800
+Message-Id: <cover.1544598069.git.yi.z.zhang@linux.intel.com>
+Subject: [Qemu-devel] [PATCH V6 0/6] nvdimm: support MAP_SYNC for
+ memory-backend-file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,161 +23,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yongji Xie <elohimes@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, zhangyu31@baidu.com, Xie Yongji <xieyongji@baidu.com>, lilin24@baidu.com, qemu-devel@nongnu.org, chaiwen@baidu.com, marcandre.lureau@redhat.com, nixun@baidu.com
+To: xiaoguangrong.eric@gmail.com, dan.j.williams@intel.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com
+Cc: mst@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, ehabkost@redhat.com, Zhang Yi <yi.z.zhang@linux.intel.com>
 
+Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
+guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
+files on ext4/xfs file system mounted with '-o dax').
 
-On 2018/12/12 =E4=B8=8B=E5=8D=882:41, Yongji Xie wrote:
-> On Wed, 12 Dec 2018 at 12:07, Jason Wang <jasowang@redhat.com> wrote:
->>
->> On 2018/12/12 =E4=B8=8A=E5=8D=8811:21, Yongji Xie wrote:
->>> On Wed, 12 Dec 2018 at 11:00, Jason Wang <jasowang@redhat.com> wrote:
->>>> On 2018/12/12 =E4=B8=8A=E5=8D=8810:48, Yongji Xie wrote:
->>>>> On Mon, 10 Dec 2018 at 17:32, Jason Wang <jasowang@redhat.com> wrot=
-e:
->>>>>> On 2018/12/6 =E4=B8=8B=E5=8D=889:59, Michael S. Tsirkin wrote:
->>>>>>> On Thu, Dec 06, 2018 at 09:57:22PM +0800, Jason Wang wrote:
->>>>>>>> On 2018/12/6 =E4=B8=8B=E5=8D=882:35,elohimes@gmail.com  wrote:
->>>>>>>>> From: Xie Yongji<xieyongji@baidu.com>
->>>>>>>>>
->>>>>>>>> This patchset is aimed at supporting qemu to reconnect
->>>>>>>>> vhost-user-blk backend after vhost-user-blk backend crash or
->>>>>>>>> restart.
->>>>>>>>>
->>>>>>>>> The patch 1 tries to implenment the sync connection for
->>>>>>>>> "reconnect socket".
->>>>>>>>>
->>>>>>>>> The patch 2 introduces a new message VHOST_USER_SET_VRING_INFLI=
-GHT
->>>>>>>>> to support offering shared memory to backend to record
->>>>>>>>> its inflight I/O.
->>>>>>>>>
->>>>>>>>> The patch 3,4 are the corresponding libvhost-user patches of
->>>>>>>>> patch 2. Make libvhost-user support VHOST_USER_SET_VRING_INFLIG=
-HT.
->>>>>>>>>
->>>>>>>>> The patch 5 supports vhost-user-blk to reconnect backend when
->>>>>>>>> connection closed.
->>>>>>>>>
->>>>>>>>> The patch 6 tells qemu that we support reconnecting now.
->>>>>>>>>
->>>>>>>>> To use it, we could start qemu with:
->>>>>>>>>
->>>>>>>>> qemu-system-x86_64 \
->>>>>>>>>              -chardev socket,id=3Dchar0,path=3D/path/vhost.sock=
-et,reconnect=3D1,wait \
->>>>>>>>>              -device vhost-user-blk-pci,chardev=3Dchar0 \
->>>>>>>>>
->>>>>>>>> and start vhost-user-blk backend with:
->>>>>>>>>
->>>>>>>>> vhost-user-blk -b /path/file -s /path/vhost.socket
->>>>>>>>>
->>>>>>>>> Then we can restart vhost-user-blk at any time during VM runnin=
-g.
->>>>>>>> I wonder whether or not it's better to handle this at the level =
-of virtio
->>>>>>>> protocol itself instead of vhost-user level. E.g expose last_ava=
-il_idx to
->>>>>>>> driver might be sufficient?
->>>>>>>>
->>>>>>>> Another possible issue is, looks like you need to deal with diff=
-erent kinds
->>>>>>>> of ring layouts e.g packed virtqueues.
->>>>>>>>
->>>>>>>> Thanks
->>>>>>> I'm not sure I understand your comments here.
->>>>>>> All these would be guest-visible extensions.
->>>>>> Looks not, it only introduces a shared memory between qemu and
->>>>>> vhost-user backend?
->>>>>>
->>>>>>
->>>>>>> Possible for sure but how is this related to
->>>>>>> a patch supporting transparent reconnects?
->>>>>> I might miss something. My understanding is that we support transp=
-arent
->>>>>> reconnects, but we can't deduce an accurate last_avail_idx and thi=
-s is
->>>>>> what capability this series try to add. To me, this series is func=
-tional
->>>>>> equivalent to expose last_avail_idx (or avail_idx_cons) in availab=
-le
->>>>>> ring. So the information is inside guest memory, vhost-user backen=
-d can
->>>>>> access it and update it directly. I believe this is some modern NI=
-C did
->>>>>> as well (but index is in MMIO area of course).
->>>>>>
->>>>> Hi Jason,
->>>>>
->>>>> If my understand is correct, it might be not enough to only expose
->>>>> last_avail_idx.
->>>>> Because we would not process descriptors in the same order in which=
- they have
->>>>> been made available sometimes. If so, we can't get correct inflight
->>>>> I/O information
->>>>> from available ring.
->>>> You can get this with the help of the both used ring and last_avail_=
-idx
->>>> I believe. Or maybe you can give us an example?
->>>>
->>> A simple example, we assume ring size is 8:
->>>
->>> 1. guest fill avail ring
->>>
->>> avail ring: 0 1 2 3 4 5 6 7
->>> used ring:
->>>
->>> 2. vhost-user backend complete 4,5,6,7 and fill used ring
->>>
->>> avail ring: 0 1 2 3 4 5 6 7
->>> used ring: 4 5 6 7
->>>
->>> 3. guest fill avail ring again
->>>
->>> avail ring: 4 5 6 7 4 5 6 7
->>> used ring: 4 5 6 7
->>>
->>> 4. vhost-user backend crash
->>>
->>> The inflight descriptors 0, 1, 2, 3 lost.
->>>
->>> Thanks,
->>> Yongji
->>
->> Ok, then we can simply forbid increasing the avail_idx in this case?
->>
->> Basically, it's a question of whether or not it's better to done it in
->> the level of virtio instead of vhost. I'm pretty sure if we expose
->> sufficient information, it could be done without touching vhost-user.
->> And we won't deal with e.g migration and other cases.
->>
-> OK, I get your point. That's indeed an alternative way. But this featur=
-e seems
-> to be only useful to vhost-user backend.
+A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
+    https://patchwork.kernel.org/patch/10028151/
 
+In order to make sure that the file metadata is in sync after a fault 
+while we are writing a shared DAX supporting backend files, this
+patch-set enables QEMU to use MAP_SYNC flag for memory-backend-dax-file.
 
-I admit I could not think of a use case other than vhost-user.
+As the DAX vs DMA truncated issue was solved, we refined the code and
+send out this feature for the v5 version.
 
+A new auto on/off option 'sync' is added to memory-backend-file:
+ - on:  try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
+        'share=off', QEMU will abort
+ - off: never pass MAP_SYNC to mmap(2)
+ - auto (default): if MAP_SYNC is supported and 'share=on', work as if
+        'sync=on'; otherwise, work as if 'sync=off'
 
->   I'm not sure whether it make sense to
-> touch virtio protocol for this feature.
+Changes in v6:
+ * Pankaj: 3/7 are squashed with 2/7
+ * Pankaj: 7/7 update comments to "consistent filesystem metadata".
+ * Pankaj, Igor: 1/7 Added Reviewed-by in patch-1/7
+ * Stefan, 4/7 move the include header from "/linux/mman.h" to "osdep.h"
+ * Stefan, 5/7 Add missing "munmap"
+ * Stefan, 2/7 refine the shared/flag.
 
+Changes in v5:
+ * Add patch 1 to fix a memory leak issue.
+ * Refine the patch 4-6
+ * Remove the patch 3 as we already change the parameter from "shared" to
+   "flags"
 
-Some possible advantages:
+Changes in v4:
+ * Add patch 1-3 to switch some functions to a single 'flags'
+   parameters. (Michael S. Tsirkin)
+ * v3 patch 1-3 become v4 patch 4-6.
+ * Patch 4: move definitions of MAP_SYNC and MAP_SHARED_VALIDATE to a
+   new header file under include/standard-headers/linux/. (Michael S. Tsirkin)
+ * Patch 6: refine the description of the 'sync' option. (Michael S. Tsirkin)
 
-- Feature could be determined and noticed by user or management layer.
+Changes in v3:
+ * Patch 1: add MAP_SHARED_VALIDATE in both sync=on and sync=auto
+   cases, and add back the retry mechanism. MAP_SYNC will be ignored
+   by Linux kernel 4.15 if MAP_SHARED_VALIDATE is missed.
+ * Patch 1: define MAP_SYNC and MAP_SHARED_VALIDATE as 0 on non-Linux
+   platforms in order to make qemu_ram_mmap() compile on those platforms.
+ * Patch 2&3: include more information in error messages of
+   memory-backend in hope to help user to identify the error.
+   (Dr. David Alan Gilbert)
+ * Patch 3: fix typo in the commit message. (Dr. David Alan Gilbert)
 
-- There's no need to invent ring layout specific protocol to record in=20
-flight descriptors. E.g if my understanding is correct, for this series=20
-and for the example above, it still can not work for packed virtqueue=20
-since descriptor id is not sufficient (descriptor could be overwritten=20
-by used one). You probably need to have a (partial) copy of descriptor=20
-ring for this.
+Changes in v2:
+ * Add 'sync' option to control the use of MAP_SYNC. (Eduardo Habkost)
+ * Remove the unnecessary set of MAP_SHARED_VALIDATE in some cases and
+   the retry mechanism in qemu_ram_mmap(). (Michael S. Tsirkin)
+ * Move OS dependent definitions of MAP_SYNC and MAP_SHARED_VALIDATE
+   to osdep.h. (Michael S. Tsirkin)
 
-- No need to deal with migration, all information was in guest memory.
+Zhang Yi (6):
+  numa: Fixed the memory leak of numa error message
+  util/mmap-alloc: switch qemu_ram_mmap() to 'flags' parameter
+  util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
+  util/mmap-alloc: Switch the RAM_SYNC flags to OnOffAuto
+  hostmem: add more information in error messages
+  hostmem-file: add 'sync' option
 
-Thanks
+ backends/hostmem-file.c   | 45 +++++++++++++++++++++++++++++++++++++++++++--
+ backends/hostmem.c        |  8 +++++---
+ docs/nvdimm.txt           | 20 +++++++++++++++++++-
+ exec.c                    |  9 +++++----
+ include/exec/memory.h     | 18 ++++++++++++++++++
+ include/exec/ram_addr.h   |  1 +
+ include/qemu/mmap-alloc.h | 20 +++++++++++++++++++-
+ include/qemu/osdep.h      | 29 +++++++++++++++++++++++++++++
+ numa.c                    |  1 +
+ qemu-options.hx           | 22 +++++++++++++++++++++-
+ util/mmap-alloc.c         | 26 +++++++++++++++++++++-----
+ util/oslib-posix.c        |  8 +++++++-
+ 12 files changed, 189 insertions(+), 18 deletions(-)
 
->
-> Thanks,
-> Yongji
+-- 
+2.7.4
