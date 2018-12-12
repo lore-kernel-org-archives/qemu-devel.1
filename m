@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gX5FW-00049Q-4M
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:12:31 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gX5Fi-0004Jw-Ry
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:12:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gX5FR-0007jM-Tn
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:12:30 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:38419)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gX5FR-0007iV-Js
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:12:25 -0500
-Received: by mail-wm1-f65.google.com with SMTP id m22so6128485wml.3
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 06:12:25 -0800 (PST)
-References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
-	<1543851204-41186-18-git-send-email-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <2e26a7cc-8788-b16f-dd35-434570cd43d4@redhat.com>
-Date: Wed, 12 Dec 2018 15:12:21 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1gX5Fe-0007tl-T5
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:12:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37782)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gX5Fe-0007t2-MZ
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:12:38 -0500
+Date: Wed, 12 Dec 2018 12:12:33 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181212141233.GS7141@habkost.net>
+References: <20181211192527.13254-1-ehabkost@redhat.com>
+	<20181212090839.iuc5pebm7luitdsk@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1543851204-41186-18-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 17/71] tests: remove rule for nonexisting
- qdev-monitor-test
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181212090839.iuc5pebm7luitdsk@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH] x86: host-phys-bits-limit option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +27,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <laurent@vivier.eu>
+To: Yu Zhang <yu.c.zhang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Andrea Arcangeli <aarcange@redhat.com>, paul.c.lai@intel.com, Bandan Das <bsd@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 12/3/18 4:32 PM, Paolo Bonzini wrote:
-> This test was merged into drive_del-test in 2014.
-
-in e2f3f221885.
-
+On Wed, Dec 12, 2018 at 05:08:39PM +0800, Yu Zhang wrote:
+> On Tue, Dec 11, 2018 at 05:25:27PM -0200, Eduardo Habkost wrote:
+> > Some downstream distributions of QEMU set host-phys-bits=on by
+> > default.  This worked very well for most use cases, because
+> > phys-bits really didn't have huge consequences. The only
+> > difference was on the CPUID data seen by guests, and on the
+> > handling of reserved bits.
+> > 
+> > This changed in KVM commit 855feb673640 ("KVM: MMU: Add 5 level
+> > EPT & Shadow page table support").  Now choosing a large
+> > phys-bits value for a VM has bigger impact: it will make KVM use
+> > 5-level EPT even when it's not really necessary.  This means
+> > using the host phys-bits value may not be the best choice.
+> > 
+> > Management software could address this problem by manually
+> > configuring phys-bits depending on the size of the VM and the
+> > amount of MMIO address space required for hotplug.  But this is
+> > not trivial to implement.
+> > 
+> > However, there's another workaround that would work for most
+> > cases: keep using the host phys-bits value, but only if it's
+> > smaller than 48.  This patch makes this possible by introducing a
+> > new "-cpu" option: "host-phys-bits-limit".  Management software
+> > or users can make sure they will always use 4-level EPT using:
+> > "host-phys-bits=on,host-phys-bits-limit=48".
+> > 
+> > This behavior is still not enabled by default because QEMU
+> > doesn't enable host-phys-bits=on by default.  But users,
+> > management software, or downstream distributions may choose to
+> > change their defaults using the new option.
+> > 
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Thanks, Eduardo. One question is, should we check host-phys-bits-limit
+> against 48? If not, how about we just say in the commit message, that
+> the suggested value of host-phys-bits-limit is no bigger than 48 to
+> ensure a 4-level EPT? :-)
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+I'm not sure I understood the question.  I tried to document this
+at:
 
-> ---
->  tests/Makefile.include | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 3e3b16b..2718548 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -726,7 +726,6 @@ tests/qom-test$(EXESUF): tests/qom-test.o
->  tests/test-hmp$(EXESUF): tests/test-hmp.o
->  tests/machine-none-test$(EXESUF): tests/machine-none-test.o
->  tests/drive_del-test$(EXESUF): tests/drive_del-test.o $(libqos-virtio-obj-y)
-> -tests/qdev-monitor-test$(EXESUF): tests/qdev-monitor-test.o $(libqos-pc-obj-y)
->  tests/nvme-test$(EXESUF): tests/nvme-test.o $(libqos-pc-obj-y)
->  tests/pvpanic-test$(EXESUF): tests/pvpanic-test.o
->  tests/i82801b11-test$(EXESUF): tests/i82801b11-test.o
-> 
+|                                      [...]  Management software
+| or users can make sure they will always use 4-level EPT using:
+| "host-phys-bits=on,host-phys-bits-limit=48".
+
+-- 
+Eduardo
