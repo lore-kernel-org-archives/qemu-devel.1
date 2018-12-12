@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gX1L7-0003b6-1N
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 05:02:07 -0500
+	(envelope-from <bounces@canonical.com>) id 1gX1Oq-0006Lc-0C
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 05:05:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gX1L1-0003QO-9f
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 05:02:00 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46739)
+	(envelope-from <bounces@canonical.com>) id 1gX1Oi-0006S3-Bd
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 05:05:51 -0500
+Received: from indium.canonical.com ([91.189.90.7]:38232)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gX1L1-0003PR-2o
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 05:01:55 -0500
-Received: by mail-wr1-x443.google.com with SMTP id l9so16972041wrt.13
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 02:01:55 -0800 (PST)
-References: <20181211174253.10947-1-alex.bennee@linaro.org>
-	<81aec30a-c599-9521-9571-c32de4087db4@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <81aec30a-c599-9521-9571-c32de4087db4@redhat.com>
-Date: Wed, 12 Dec 2018 10:01:52 +0000
-Message-ID: <87pnu712sv.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gX1Of-0006P7-O8
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 05:05:42 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gX1Oe-0003rV-1h
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 10:05:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 046482E807E
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 10:05:40 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] contrib: add a basic gitdm config
+Date: Wed, 12 Dec 2018 09:45:50 -0000
+From: Thomas Huth <1528718@bugs.launchpad.net>
+Reply-To: Bug 1528718 <1528718@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20151223001438.12538.32747.malonedeb@chaenomeles.canonical.com>
+Message-Id: <154460795027.1805.15509552448677981116.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1528718] Re: Initial monitor does not output
+ anything on Windows (MSYS2 binary)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +37,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, maxim.kuvyrkov@linaro.org, =?utf-8?Q?C=C3=A9dri?= =?utf-8?Q?c?= Le Goater <clg@kaod.org>, Greg Kurz <groug@kaod.org>
+To: qemu-devel@nongnu.org
+
+Looking through old bug tickets... can you still reproduce this issue
+with the latest version of QEMU? Or could we close this ticket nowadays?
 
 
-Thomas Huth <thuth@redhat.com> writes:
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-> On 2018-12-11 18:42, Alex Benn=C3=A9e wrote:
->> This is a QEMU specific version of a gitdm config for generating
->> reports on the contributor base of the project. I've added enough
->> group maps and domain aliases to ensure the current top ten is as
->> reflective as it can be. As of this commit running:
->>
->>   git log --numstat --since "Last Year" | gitdm -n -l 16
->>
->> Reports:
->>
->>   Top changeset contributors by employer
->>   RedHat                    3116 (43.8%)
->>   Linaro                    1166 (16.4%)
->>   f4bug@amsat.org            384 (5.4%)
->>   IBM                        170 (2.4%)
->>   Virtuozzo                  168 (2.4%)
->>   mark.cave-ayland@ilande.co.uk  161 (2.3%)
->>   cota@braap.org             134 (1.9%)
->>   Xilinx                     102 (1.4%)
->>   clg@kaod.org               100 (1.4%)
->>   Igalia                      93 (1.3%)
->>   Cadence Design Systems      88 (1.2%)
->>   groug@kaod.org              78 (1.1%)
->
-> You might also want to add a group-map-ibm file for groug and
-> clg@kaod.org ?
+-- =
 
-Yes I finally tracked that down via what I presume are their github ids.
-The domain itself has a rather enigmatic but sparse homepage ;-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1528718
 
->
->  Thomas
+Title:
+  Initial monitor does not output anything on Windows (MSYS2 binary)
 
+Status in QEMU:
+  Incomplete
 
---
-Alex Benn=C3=A9e
+Bug description:
+  When running on Windows error messages before the UI is started are
+  not showing up.
+
+  For example when I run:
+
+  qemu-system-i386.exe -L /mingw32/etc/qemu/ -m 20G
+
+  It should display "ram size too large", according to gdb:
+
+  Breakpoint 1, error_report (fmt=3Dfmt@entry=3D0x71bdf6
+  <dma_aiocb_info+2426> "ram size too large") at
+  C:/build/mingw/mingw-w64-qemu/src/qemu-2.4.0/util/qemu-error.c:233
+
+  However the console does never receive that.
+
+  As far as I could find out vfprintf is called, but it doesn't output
+  anything.
+
+  Maybe the binary is build for the "win32" subsystem which does not
+  have a console window attached by default?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1528718/+subscriptions
