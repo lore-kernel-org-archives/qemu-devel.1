@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gX0rN-0006R1-L7
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:18 -0500
+	(envelope-from <bounces@canonical.com>) id 1gX0rN-0006R3-M8
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gX0rL-0005DK-VM
+	(envelope-from <bounces@canonical.com>) id 1gX0rL-0005DC-Tx
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:17 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59400)
+Received: from indium.canonical.com ([91.189.90.7]:59150)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gX0rL-0005Bv-KL
+	id 1gX0rL-00058n-IA
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:15 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gX0rK-0007uk-DW
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:31:14 +0000
+	id 1gX0rG-0007uW-6i
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:31:10 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 621292E807C
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:31:14 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 0A3052E80AB
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:31:10 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Dec 2018 09:21:23 -0000
-From: Thomas Huth <1716292@bugs.launchpad.net>
-Reply-To: Bug 1716292 <1716292@bugs.launchpad.net>
+Date: Wed, 12 Dec 2018 09:20:02 -0000
+From: Thomas Huth <1786343@bugs.launchpad.net>
+Reply-To: Bug 1786343 <1786343@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <150508616435.31900.3449336177179115668.malonedeb@soybean.canonical.com>
-Message-Id: <154460648389.8821.5759478063676115034.launchpad@gac.canonical.com>
+References: <153384533733.1481.3173989120968287826.malonedeb@gac.canonical.com>
+Message-Id: <154460640331.1338.18093229221020830496.launchpad@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1716292] Re: User mode emulation returns wrong
- value for write(fd, NULL, 0)
+Subject: [Qemu-devel] [Bug 1786343] Re: QEMU v3.0.0-rc4 configure fails with
+ --enable-mpath on CentOS 7.5
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,49 +46,59 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1716292
+https://bugs.launchpad.net/bugs/1786343
 
 Title:
-  User mode emulation returns wrong value for write(fd, NULL, 0)
+  QEMU v3.0.0-rc4 configure fails with --enable-mpath on CentOS 7.5
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  QEMU version: latest master (fcea73709b966a7ded9efa7b106ea50c7fe9025c)
-  OS version: Ubuntu 14.04.5
-  Configured with: ../configure --target-list=3Dx86_64-linux-user
+  QEMU v3.0.0-rc4 configure fails with --enable-mpath on CentOS 7.5.
 
-  QEMU Linux usermode emulation does not handle write() syscalls with
-  zero length and a null pointer correctly: on Linux this returns 0, but
-  in emulation this returns -1.
+  After commit b3f1c8c413bc83e4a2cc7a63e4eddf9fe6449052 "qemu-pr-helper: us=
+e new
+  libmultipath API", QEMU started using new libmultipath API, which is not
+  available on CentOS 7.5.  Reverting this commit, configure passes.
 
-  I ran into this while using an aarch64 abuild-tar from Alpine Linux in
-  user-mode emulation; here's the minimized reproduction test case:
+  Steps to reproduce (fails on x86_64 and ppc64le architectures):
 
-  zhuowei@zhuowei-tablet:/tmp$ cat writezerobytes.c
-  #include <stdio.h>
-  #include <unistd.h>
-  #include <fcntl.h>
+    $ git clone git://git.qemu.org/qemu.git
+    $ mkdir -p qemu/build && cd qemu/build
+    $ ../configure --enable-mpath
+    ERROR: Multipath requires libmpathpersist devel
 
-  int main() {
-  =C2=A0ssize_t ret =3D write(STDOUT_FILENO, NULL, 0);
-  =C2=A0fprintf(stderr, "write returned %ld\n", ret);
-  =C2=A0return 0;
-  }
-  zhuowei@zhuowei-tablet:/tmp$ gcc -o writezerobytes writezerobytes.c
-  zhuowei@zhuowei-tablet:/tmp$ uname -a
-  Linux zhuowei-tablet 3.13.0-129-generic #178-Ubuntu SMP Fri Aug 11 12:48:=
-20 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
-  zhuowei@zhuowei-tablet:/tmp$ ./writezerobytes
-  write returned 0
-  zhuowei@zhuowei-tablet:/tmp$ /media/zhuowei/redhd/docs/repos/qemu/build4/=
-x86_64-linux-user/qemu-x86_64 ./writezerobytes
-  write returned -1
-  zhuowei@zhuowei-tablet:/tmp$ /media/zhuowei/redhd/docs/repos/qemu/build4/=
-x86_64-linux-user/qemu-x86_64 --version
-  qemu-x86_64 version 2.10.50 (v2.10.0-471-gfcea737-dirty)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+    $ rpm -qa | grep device-mapper | sort
+    device-mapper-1.02.146-4.el7.ppc64le
+    device-mapper-devel-1.02.146-4.el7.ppc64le
+    device-mapper-libs-1.02.146-4.el7.ppc64le
+    device-mapper-multipath-0.4.9-119.el7.ppc64le
+    device-mapper-multipath-devel-0.4.9-119.el7.ppc64le
+    device-mapper-multipath-libs-0.4.9-119.el7.ppc64le
+
+  Snippet from config.log:
+
+    funcs: do_compiler do_cc compile_prog main
+    lines: 92 125 3580 0
+    cc -pthread -I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include -m64 =
+-D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE -Wstrict-prototy=
+pes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -f=
+no-strict-aliasing -fno-common -fwrapv -Wendif-labels -Wno-missing-include-=
+dirs -Wempty-body -Wnested-externs -Wformat-security -Wformat-y2k -Winit-se=
+lf -Wignored-qualifiers -Wold-style-declaration -Wold-style-definition -Wty=
+pe-limits -fstack-protector-strong -Wno-missing-braces -I/usr/include/p11-k=
+it-1 -I/usr/include/libpng15 -o config-temp/qemu-conf.exe config-temp/qemu-=
+conf.c -m64 -g -ludev -lmultipath -lmpathpersist
+    config-temp/qemu-conf.c: In function =E2=80=98main=E2=80=99:
+    config-temp/qemu-conf.c:15:5: error: too few arguments to function =E2=
+=80=98mpath_lib_init=E2=80=99
+         multipath_conf =3D mpath_lib_init();
+         ^
+    In file included from config-temp/qemu-conf.c:2:0:
+    /usr/include/mpath_persist.h:179:12: note: declared here
+     extern int mpath_lib_init (struct udev *udev);
+                ^
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1716292/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1786343/+subscriptions
