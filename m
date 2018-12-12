@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gX0qT-0005nJ-Ea
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:30:23 -0500
+	(envelope-from <bounces@canonical.com>) id 1gX0rL-0006Pn-RE
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gX0qQ-0003YM-5H
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:30:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48240)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gX0qP-0003WA-PC
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:30:18 -0500
-References: <20181211174253.10947-1-alex.bennee@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <81aec30a-c599-9521-9571-c32de4087db4@redhat.com>
-Date: Wed, 12 Dec 2018 10:30:13 +0100
+	(envelope-from <bounces@canonical.com>) id 1gX0rJ-0005Ai-G9
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:15 -0500
+Received: from indium.canonical.com ([91.189.90.7]:58672)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gX0rH-0004zt-Cs
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:31:12 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gX0r8-0007Wd-Ir
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:31:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9FE7D2E80DF
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:31:01 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20181211174253.10947-1-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] contrib: add a basic gitdm config
+Date: Wed, 12 Dec 2018 09:17:37 -0000
+From: Thomas Huth <1793119@bugs.launchpad.net>
+Reply-To: Bug 1793119 <1793119@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153726785322.19300.9182114718255539260.malonedeb@wampee.canonical.com>
+Message-Id: <154460625718.23822.6085974060385294768.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1793119] Re: Wrong floating-point emulation on
+ AArch64 with FPCR set to zero
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,34 +37,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-Cc: maxim.kuvyrkov@linaro.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Greg Kurz <groug@kaod.org>
+To: qemu-devel@nongnu.org
 
-On 2018-12-11 18:42, Alex Benn=C3=A9e wrote:
-> This is a QEMU specific version of a gitdm config for generating
-> reports on the contributor base of the project. I've added enough
-> group maps and domain aliases to ensure the current top ten is as
-> reflective as it can be. As of this commit running:
->=20
->   git log --numstat --since "Last Year" | gitdm -n -l 16
->=20
-> Reports:
->=20
->   Top changeset contributors by employer
->   RedHat                    3116 (43.8%)
->   Linaro                    1166 (16.4%)
->   f4bug@amsat.org            384 (5.4%)
->   IBM                        170 (2.4%)
->   Virtuozzo                  168 (2.4%)
->   mark.cave-ayland@ilande.co.uk  161 (2.3%)
->   cota@braap.org             134 (1.9%)
->   Xilinx                     102 (1.4%)
->   clg@kaod.org               100 (1.4%)
->   Igalia                      93 (1.3%)
->   Cadence Design Systems      88 (1.2%)
->   groug@kaod.org              78 (1.1%)
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D5dfbc9e4903c0121140f2
 
-You might also want to add a group-map-ibm file for groug and clg@kaod.or=
-g ?
+** Changed in: qemu
+       Status: Fix Committed =3D> Fix Released
 
- Thomas
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1793119
+
+Title:
+  Wrong floating-point emulation on AArch64 with FPCR set to zero
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  On AArch64, with FPCR set to Zero (i.e., FPU set to IEEE-754 compliant
+  mode), floating-point emulation does not produce the same results as
+  real hardware (e.g., Raspberry Pi 3 with AArch64 Linux).
+
+  I attached a sample that reproduces the issue. It divides `x` by `y`
+  and puts the result in `r`. The expected result of the operation is
+  `q`.
+
+  Output on real hardware:
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D
+  fpcr =3D 0x07000000.
+  x =3D 0x03250f416dcdc6d0. y =3D 0x00029f4e5837c977. r =3D 0x7ff0000000000=
+000. q =3D 0x43300fde9cbcf023.
+  fpcr =3D 0x00000000.
+  x =3D 0x03250f416dcdc6d0. y =3D 0x00029f4e5837c977. r =3D 0x43300fde9cbcf=
+023. q =3D 0x43300fde9cbcf023.
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D
+
+  Notice that after setting FPCR to zero, `r` equals `q`.
+
+  Output on qemu 3.0.0 (Linux user-mode emulation):
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D
+  fpcr =3D 0x07000000.
+  x =3D 0x03250f416dcdc6d0. y =3D 0x00029f4e5837c977. r =3D 0x7ff0000000000=
+000. q =3D 0x43300fde9cbcf023.
+  fpcr =3D 0x00000000.
+  x =3D 0x03250f416dcdc6d0. y =3D 0x00029f4e5837c977. r =3D 0x43300fde9cbcf=
+024. q =3D 0x43300fde9cbcf023.
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D
+
+  Notice that after setting FPCR to zero, `r` is not equal to `q`.
+
+  Also notice that, using another proprietary operating system, the same
+  issue arises between a real board and QEMU. This might be an issue in
+  emulation of the AArch64 instruction "fdiv".
+
+  Build command line: aarch64-linux-gnu-gcc -static -O0 -o sample1
+  sample1.c
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1793119/+subscriptions
