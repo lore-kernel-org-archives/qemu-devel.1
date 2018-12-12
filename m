@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gX4Z1-0003C7-2Y
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:28:35 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gX4Z5-0003Hg-5l
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:28:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gX4Z0-0001Z3-4c
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:28:35 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gX4Z4-0001cv-C2
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 08:28:39 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 12 Dec 2018 14:27:16 +0100
-Message-Id: <20181212132735.16080-23-kwolf@redhat.com>
+Date: Wed, 12 Dec 2018 14:27:21 +0100
+Message-Id: <20181212132735.16080-28-kwolf@redhat.com>
 In-Reply-To: <20181212132735.16080-1-kwolf@redhat.com>
 References: <20181212132735.16080-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 22/41] file-posix: Avoid aio_worker() for
- QEMU_AIO_READ/WRITE
+Subject: [Qemu-devel] [PULL 27/41] block: Use bdrv_reopen_set_read_only() in
+ bdrv_backing_update_filename()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,85 +25,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-aio_worker() doesn't add anything interesting, it's only a useless
-indirection. Call the handler function directly instead.
+From: Alberto Garcia <berto@igalia.com>
 
-As we know that this handler function is only called from coroutine
-context and the coroutine stays around until the worker thread finishes,
-we can keep RawPosixAIOData on the stack.
+This patch replaces the bdrv_reopen() calls that set and remove the
+BDRV_O_RDWR flag with the new bdrv_reopen_set_read_only() function.
 
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/file-posix.c | 27 +++++++++++++++++++--------
- 1 file changed, 19 insertions(+), 8 deletions(-)
+ block.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 877c0700e1..0f64c83639 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1300,8 +1300,9 @@ static ssize_t handle_aiocb_rw_linear(RawPosixAIODa=
-ta *aiocb, char *buf)
-     return offset;
- }
-=20
--static ssize_t handle_aiocb_rw(RawPosixAIOData *aiocb)
-+static int handle_aiocb_rw(void *opaque)
+diff --git a/block.c b/block.c
+index 7178872560..d7b94794f4 100644
+--- a/block.c
++++ b/block.c
+@@ -1079,11 +1079,11 @@ static int bdrv_backing_update_filename(BdrvChild=
+ *c, BlockDriverState *base,
+                                         const char *filename, Error **er=
+rp)
  {
-+    RawPosixAIOData *aiocb =3D opaque;
-     ssize_t nbytes;
-     char *buf;
+     BlockDriverState *parent =3D c->opaque;
+-    int orig_flags =3D bdrv_get_flags(parent);
++    bool read_only =3D bdrv_is_read_only(parent);
+     int ret;
 =20
-@@ -1793,15 +1794,11 @@ static int aio_worker(void *arg)
-     ssize_t ret =3D 0;
-=20
-     switch (aiocb->aio_type & QEMU_AIO_TYPE_MASK) {
--    case QEMU_AIO_READ:
--        ret =3D handle_aiocb_rw(aiocb);
--        break;
--    case QEMU_AIO_WRITE:
--        ret =3D handle_aiocb_rw(aiocb);
--        break;
-     case QEMU_AIO_IOCTL:
-         ret =3D handle_aiocb_ioctl(aiocb);
-         break;
-+    case QEMU_AIO_READ:
-+    case QEMU_AIO_WRITE:
-     case QEMU_AIO_FLUSH:
-     case QEMU_AIO_DISCARD:
-     case QEMU_AIO_WRITE_ZEROES:
-@@ -1865,6 +1862,7 @@ static int coroutine_fn raw_co_prw(BlockDriverState=
- *bs, uint64_t offset,
-                                    uint64_t bytes, QEMUIOVector *qiov, i=
-nt type)
- {
-     BDRVRawState *s =3D bs->opaque;
-+    RawPosixAIOData acb;
-=20
-     if (fd_open(bs) < 0)
-         return -EIO;
-@@ -1887,7 +1885,20 @@ static int coroutine_fn raw_co_prw(BlockDriverStat=
-e *bs, uint64_t offset,
+-    if (!(orig_flags & BDRV_O_RDWR)) {
+-        ret =3D bdrv_reopen(parent, orig_flags | BDRV_O_RDWR, errp);
++    if (read_only) {
++        ret =3D bdrv_reopen_set_read_only(parent, false, errp);
+         if (ret < 0) {
+             return ret;
          }
+@@ -1095,8 +1095,8 @@ static int bdrv_backing_update_filename(BdrvChild *=
+c, BlockDriverState *base,
+         error_setg_errno(errp, -ret, "Could not update backing file link=
+");
      }
 =20
--    return paio_submit_co(bs, s->fd, offset, qiov, bytes, type);
-+    acb =3D (RawPosixAIOData) {
-+        .bs             =3D bs,
-+        .aio_fildes     =3D s->fd,
-+        .aio_type       =3D type,
-+        .aio_offset     =3D offset,
-+        .aio_nbytes     =3D bytes,
-+        .io             =3D {
-+            .iov            =3D qiov->iov,
-+            .niov           =3D qiov->niov,
-+        },
-+    };
-+
-+    assert(qiov->size =3D=3D bytes);
-+    return raw_thread_pool_submit(bs, handle_aiocb_rw, &acb);
- }
+-    if (!(orig_flags & BDRV_O_RDWR)) {
+-        bdrv_reopen(parent, orig_flags, NULL);
++    if (read_only) {
++        bdrv_reopen_set_read_only(parent, true, NULL);
+     }
 =20
- static int coroutine_fn raw_co_preadv(BlockDriverState *bs, uint64_t off=
-set,
+     return ret;
 --=20
 2.19.2
