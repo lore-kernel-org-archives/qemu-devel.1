@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=8779827ad=Alistair.Francis@wdc.com>)
-	id 1gXBaK-0004OW-MK
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:58:25 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gXBn8-0007Im-7X
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 16:11:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=8779827ad=Alistair.Francis@wdc.com>)
-	id 1gXBaG-0003hE-Pi
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:58:24 -0500
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:4479)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=8779827ad=Alistair.Francis@wdc.com>)
-	id 1gXBaD-0003cg-HJ
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:58:19 -0500
-From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Wed, 12 Dec 2018 20:58:11 +0000
-Message-ID: <7dfbddf7014a595150aa79011ddb342c3cc17ec3.1544648105.git.alistair.francis@wdc.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <peter.maydell@linaro.org>) id 1gXBn6-0007uZ-O1
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 16:11:38 -0500
+Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:47087)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gXBn6-0007tN-Dt
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 16:11:36 -0500
+Received: by mail-oi1-x22e.google.com with SMTP id x202so16226974oif.13
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 13:11:35 -0800 (PST)
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v1 1/1] tcg: mips: Improve the add2/sub2
- command to use TCG_TARGET_REG_BITS
+References: <20181211180352.19644-1-laurent@vivier.eu>
+In-Reply-To: <20181211180352.19644-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 12 Dec 2018 21:11:22 +0000
+Message-ID: <CAFEAcA_wRfVWjWOMjE36Fepmv7TPSf5JJNoKVZbs_JXe-_W69Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/30] Trivial patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "aurelien@aurel32.net" <aurelien@aurel32.net>, "smarkovic@wavecomp.com" <smarkovic@wavecomp.com>, "rth@twiddle.net" <rth@twiddle.net>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Instead of hard coding 31 for the shift right use
-TCG_TARGET_REG_BITS - 1.
+On Tue, 11 Dec 2018 at 18:13, Laurent Vivier <laurent@vivier.eu> wrote:
+>
+> The following changes since commit 32a1a94dd324d33578dca1dc96d7896a0244d768:
+>
+>   Update version for v3.1.0 release (2018-12-11 17:18:37 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/vivier/qemu.git tags/trivial-patches-pull-request
+>
+> for you to fetch changes up to 82c48fb79df5596a9d0a3b6d998c4491e542aa7a:
+>
+>   Fixes i386 xchgq test (2018-12-11 18:41:25 +0100)
+>
+> ----------------------------------------------------------------
+> Trivial patches (2018-12-11)
+>
+> ----------------------------------------------------------------
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- tcg/mips/tcg-target.inc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Applied, thanks.
 
-diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
-index cff525373b..aa7cdabf23 100644
---- a/tcg/mips/tcg-target.inc.c
-+++ b/tcg/mips/tcg-target.inc.c
-@@ -796,7 +796,7 @@ static void tcg_out_addsub2(TCGContext *s, TCGReg rl, T=
-CGReg rh, TCGReg al,
-             tcg_out_opc_imm(s, OPC_ADDIU, rl, al, bl);
-             tcg_out_opc_imm(s, OPC_SLTIU, TCG_TMP0, rl, bl);
-         } else if (rl =3D=3D al && rl =3D=3D bl) {
--            tcg_out_opc_sa(s, OPC_SRL, TCG_TMP0, al, 31);
-+            tcg_out_opc_sa(s, OPC_SRL, TCG_TMP0, al, TCG_TARGET_REG_BITS -=
- 1);
-             tcg_out_opc_reg(s, OPC_ADDU, rl, al, bl);
-         } else {
-             tcg_out_opc_reg(s, OPC_ADDU, rl, al, bl);
---=20
-2.19.1
+-- PMM
