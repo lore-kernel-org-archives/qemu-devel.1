@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gXBKt-00084F-PQ
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:42:28 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gXBMI-0000lt-7N
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:43:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gXBKq-0005ec-0b
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:42:26 -0500
-References: <20180917145732.48590-1-vsementsov@virtuozzo.com>
-	<504d170c-56ee-0cf5-78e0-47aded4c132f@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <43def1dd-732e-a358-d15f-492eefae0a80@redhat.com>
-Date: Wed, 12 Dec 2018 15:41:58 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gXBME-0008E1-VW
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:43:54 -0500
+Received: from mout.kundenserver.de ([212.227.126.187]:45379)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gXBME-0008Cf-Ll
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 15:43:50 -0500
+References: <20181210165636.28366-1-peter.maydell@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <3afc2ab8-c6b6-7157-e744-e742b384b0da@vivier.eu>
+Date: Wed, 12 Dec 2018 21:43:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <504d170c-56ee-0cf5-78e0-47aded4c132f@virtuozzo.com>
+In-Reply-To: <20181210165636.28366-1-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] ping2 Re: [PATCH v4 0/8] dirty-bitmap: rewrite
- bdrv_dirty_iter_next_area
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 0/3] target/m68k: convert to
+ transaction_failed hook
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,92 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "famz@redhat.com" <famz@redhat.com>, Denis Lunev <den@virtuozzo.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, patches@linaro.org
 
+On 10/12/2018 17:56, Peter Maydell wrote:
+> This patchset converts the m68k target from the deprecated
+> unassigned_access hook to the new transaction_failed hook.
+> It's RFC for a couple of reasons:
+>  * it's untested, since I don't have an m68k test image
+>  * the second patch just makes "bus error while trying to
+>    read page tables" be treated as a page fault, when it
+>    should probably cause a fault reporting it as a bus error
+>    of some kind
+>  * I don't understand why the old unassigned_access hook
+>    set the ATC bit in the MMU SSW, since the docs I have say
+>    this should be set if the fault happened during a table
+>    search, but cleared if it's just an ordinary bus-errored
+>    data or insn access. Probably this is a pre-existing bug?
+> 
+> Anyway, I send it out as a skeleton for comments, because
+> it would be nice to get rid of the old unassigned_access
+> hook, which is fundamentally broken (it's still used by m68k,
+> microblaze, mips and sparc).
+> 
+> thanks
+> -- PMM
+> 
+> Peter Maydell (3):
+>   target/m68k: In dump_address_map() check for memory access failures
+>   target/m68k: In get_physical_address() check for memory access
+>     failures
+>   target/m68k: Switch to transaction_failed hook
+> 
+>  target/m68k/cpu.h       |  7 ++--
+>  target/m68k/cpu.c       |  2 +-
+>  target/m68k/helper.c    | 84 ++++++++++++++++++++++++++++++++---------
+>  target/m68k/op_helper.c | 20 ++++------
+>  4 files changed, 80 insertions(+), 33 deletions(-)
+> 
 
+Tested-by: Laurent Vivier <laurent@vivier.eu>
 
-On 12/12/18 4:27 AM, Vladimir Sementsov-Ogievskiy wrote:
-> ping. No dependencies, apply to master.
->=20
+I'll try to review this later...
 
-Sure thing.
-
-Staged to jsnow/bitmaps.
-
---js
-
-> 17.09.2018 17:57, Vladimir Sementsov-Ogievskiy wrote:
->> Hi all.
->>
->> 1. bdrv_dirty_iter_next_area don't use hbitmap_next_zero and uses
->> inefficient loop instead. Let's improve it.
->>
->> 2. bdrv_dirty_iter_next_area don't handle unaligned offset and
->> max_offset correctly. I'm not sure that it is a real bug. But if it is=
-,
->> we need these series in 3.0.
->>
->> Details are in 05 commit message.
->>
->> Note: "[PATCH] nbd/server: fix bitmap export" should be applied first:
->> Based-on: <20180914165116.23182-1-vsementsov@virtuozzo.com>
->>
->> v4:
->>
->> Rework: switch interface to start,count / offset,bytes style.
->> Fix wrong handling of the case when requested region end exceeds
->> overall bitmap end.
->> Some other changes.
->>
->> 06-08: add John's r-b.
->>
->> v3:
->> 01: - change interface to start/end, and -1 as special end-marker inst=
-ead of 0
->>      - "not found" for invalid regions instead of assert
->> 02: rebase on 01 changes
->> 03: - fix mistake in hbitmap_iter_init arguments (mistake in
->>        hbitmap_next_zero arguments is fixed automatically due to 01 ch=
-anges)
->> 04: new
->>
->>
->> v2:
->>
->> 01: - improve comment
->>      - s/bytes/count/
->>      - fix forgotten function call in test
->>      - introduce orig_size field here for HBitmap,
->>        make checking in hbitmap_next_zero more effective and safe
->> 02: new
->> 03: - orig_size already introduced in 01
->>      - fix hbitmap_next_dirty_area to not return value less than
->>        offset on unaligned requests
->>
->> Vladimir Sementsov-Ogievskiy (8):
->>    dirty-bitmap: improve bdrv_dirty_bitmap_next_zero
->>    tests: add tests for hbitmap_next_zero with specified end parameter
->>    dirty-bitmap: add bdrv_dirty_bitmap_next_dirty_area
->>    tests: add tests for hbitmap_next_dirty_area
->>    block/mirror: fix and improve do_sync_target_write
->>    Revert "block/dirty-bitmap: Add bdrv_dirty_iter_next_area"
->>    Revert "test-hbitmap: Add non-advancing iter_next tests"
->>    Revert "hbitmap: Add @advance param to hbitmap_iter_next()"
->>
->>   include/block/dirty-bitmap.h |   7 +-
->>   include/qemu/hbitmap.h       |  31 ++++--
->>   block/backup.c               |   5 +-
->>   block/dirty-bitmap.c         |  68 ++------------
->>   block/mirror.c               |  17 ++--
->>   nbd/server.c                 |   2 +-
->>   tests/test-hbitmap.c         | 177 +++++++++++++++++++++++++++++----=
---
->>   util/hbitmap.c               |  76 ++++++++++++---
->>   8 files changed, 262 insertions(+), 121 deletions(-)
->>
->=20
->=20
-
---=20
-=E2=80=94js
+Thanks,
+Laurent
