@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gX0aj-0008CW-E7
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:14:08 -0500
+	(envelope-from <thuth@redhat.com>) id 1gX0ah-0008Av-KM
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:14:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gX0ai-00049s-HG
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:14:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49292)
+	(envelope-from <thuth@redhat.com>) id 1gX0ag-00048h-HL
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:14:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56042)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gX0ai-00049S-B7
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:14:04 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gX0ag-000485-Bg
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:14:02 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 12 Dec 2018 10:13:52 +0100
-Message-Id: <1544606032-16924-9-git-send-email-thuth@redhat.com>
+Date: Wed, 12 Dec 2018 10:13:50 +0100
+Message-Id: <1544606032-16924-7-git-send-email-thuth@redhat.com>
 In-Reply-To: <1544606032-16924-1-git-send-email-thuth@redhat.com>
 References: <1544606032-16924-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 8/8] i2c: Move typedef of bitbang_i2c_interface
- to i2c.h
+Subject: [Qemu-devel] [PULL 6/8] includes: Replace QEMU_GNUC_PREREQ with
+ "__has_builtin || !defined(__clang__)"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +27,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-devel@nongnu.org
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+Since we require GCC version 4.8 or newer now, we can be sure that
+the builtin functions are always available on GCC. And for Clang,
+we can check the availablility with __has_builtin instead.
 
-Clang 3.4 considers duplicate typedef in ppc4xx_i2c.h and
-bitbang_i2c.h an error even if they are identical. Move it to a common
-place to allow building with this clang version.
-
-Reported-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/i2c/bitbang_i2c.h        | 2 --
- include/hw/i2c/i2c.h        | 2 ++
- include/hw/i2c/ppc4xx_i2c.h | 3 ---
- 3 files changed, 2 insertions(+), 5 deletions(-)
+ include/qemu/compiler.h   | 2 +-
+ include/qemu/host-utils.h | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/i2c/bitbang_i2c.h b/hw/i2c/bitbang_i2c.h
-index 3a7126d..9443021 100644
---- a/hw/i2c/bitbang_i2c.h
-+++ b/hw/i2c/bitbang_i2c.h
-@@ -3,8 +3,6 @@
-=20
- #include "hw/i2c/i2c.h"
-=20
--typedef struct bitbang_i2c_interface bitbang_i2c_interface;
--
- #define BITBANG_I2C_SDA 0
- #define BITBANG_I2C_SCL 1
-=20
-diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
-index 5dc1661..cf4c45a 100644
---- a/include/hw/i2c/i2c.h
-+++ b/include/hw/i2c/i2c.h
-@@ -82,6 +82,8 @@ int i2c_recv(I2CBus *bus);
-=20
- DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t add=
-r);
-=20
-+typedef struct bitbang_i2c_interface bitbang_i2c_interface;
-+
- /* lm832x.c */
- void lm832x_key_event(DeviceState *dev, int key, int state);
-=20
-diff --git a/include/hw/i2c/ppc4xx_i2c.h b/include/hw/i2c/ppc4xx_i2c.h
-index 0891a9c..b3450ba 100644
---- a/include/hw/i2c/ppc4xx_i2c.h
-+++ b/include/hw/i2c/ppc4xx_i2c.h
-@@ -31,9 +31,6 @@
- #include "hw/sysbus.h"
- #include "hw/i2c/i2c.h"
-=20
--/* from hw/i2c/bitbang_i2c.h */
--typedef struct bitbang_i2c_interface bitbang_i2c_interface;
--
- #define TYPE_PPC4xx_I2C "ppc4xx-i2c"
- #define PPC4xx_I2C(obj) OBJECT_CHECK(PPC4xxI2CState, (obj), TYPE_PPC4xx_=
-I2C)
-=20
---=20
+diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+index 6b92710..1593bca 100644
+--- a/include/qemu/compiler.h
++++ b/include/qemu/compiler.h
+@@ -127,7 +127,7 @@
+ #define __has_builtin(x) 0 /* compatibility with non-clang compilers */
+ #endif
+ 
+-#if __has_builtin(__builtin_assume_aligned) || QEMU_GNUC_PREREQ(4, 7)
++#if __has_builtin(__builtin_assume_aligned) || !defined(__clang__)
+ #define HAS_ASSUME_ALIGNED
+ #endif
+ 
+diff --git a/include/qemu/host-utils.h b/include/qemu/host-utils.h
+index 38da849..4cd170e 100644
+--- a/include/qemu/host-utils.h
++++ b/include/qemu/host-utils.h
+@@ -207,7 +207,7 @@ static inline int cto64(uint64_t val)
+  */
+ static inline int clrsb32(uint32_t val)
+ {
+-#if QEMU_GNUC_PREREQ(4, 7)
++#if __has_builtin(__builtin_clrsb) || !defined(__clang__)
+     return __builtin_clrsb(val);
+ #else
+     return clz32(val ^ ((int32_t)val >> 1)) - 1;
+@@ -223,7 +223,7 @@ static inline int clrsb32(uint32_t val)
+  */
+ static inline int clrsb64(uint64_t val)
+ {
+-#if QEMU_GNUC_PREREQ(4, 7)
++#if __has_builtin(__builtin_clrsbll) || !defined(__clang__)
+     return __builtin_clrsbll(val);
+ #else
+     return clz64(val ^ ((int64_t)val >> 1)) - 1;
+-- 
 1.8.3.1
