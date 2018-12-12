@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6Mh-0000zi-7l
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:02 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6Mh-0000zp-8t
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:24:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6Mb-0000M4-Tw
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6Mf-0000PQ-5v
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:59 -0500
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:39169)
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:39680)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gX6Mb-0000Jk-Co
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:53 -0500
-Received: by mail-wm1-x334.google.com with SMTP id f81so6347102wmd.4
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:23:53 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	u10sm15878859wrr.33.2018.12.12.07.23.50 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 12 Dec 2018 07:23:51 -0800 (PST)
+	id 1gX6Me-0000Oa-RQ
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:57 -0500
+Received: by mail-wr1-x42b.google.com with SMTP id t27so18088015wra.6
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:23:56 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 12 Dec 2018 16:22:52 +0100
-Message-Id: <1544628195-37728-32-git-send-email-pbonzini@redhat.com>
+Date: Wed, 12 Dec 2018 16:22:56 +0100
+Message-Id: <1544628195-37728-36-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
 References: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 31/54] qemu/queue.h: simplify reverse access to
- QTAILQ
+Subject: [Qemu-devel] [PULL 35/54] configure: Remove old -fno-gcse
+ workaround for GCC 4.6.x and 4.7.[012]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,542 +29,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>
 
-The new definition of QTAILQ does not require passing the headname,
-remove it.
+From: Thomas Huth <thuth@redhat.com>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Now that we require at least GCC 4.8, we don't need this als workaround
+for 4.6 and 4.7 anymore.
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1543937577-28256-4-git-send-email-thuth@redhat.com>
 ---
- cpus-common.c                   |  2 +-
- dump.c                          |  2 +-
- hw/core/qdev.c                  |  4 ++--
- hw/scsi/scsi-bus.c              |  2 +-
- hw/usb/combined-packet.c        |  2 +-
- hw/usb/dev-mtp.c                |  4 ++--
- hw/usb/hcd-ehci.c               |  2 +-
- hw/usb/hcd-ehci.h               |  2 +-
- hw/usb/hcd-uhci.c               |  4 ++--
- include/exec/memory.h           |  2 +-
- include/hw/qdev-core.h          |  2 +-
- include/hw/usb.h                |  2 +-
- include/net/net.h               |  2 +-
- include/qemu/option_int.h       |  2 +-
- include/qemu/queue.h            | 16 ++++++++--------
- include/sysemu/memory_mapping.h |  2 +-
- memory.c                        | 17 ++++++-----------
- memory_mapping.c                |  2 +-
- net/filter.c                    |  2 +-
- net/net.c                       |  2 +-
- qga/commands-posix.c            |  2 +-
- tcg/tcg.c                       |  2 +-
- tcg/tcg.h                       |  4 ++--
- tests/libqos/malloc.c           |  2 +-
- tests/test-vmstate.c            |  8 ++++----
- ui/console.c                    |  4 ++--
- util/qemu-option.c              |  4 ++--
- 27 files changed, 48 insertions(+), 53 deletions(-)
+ Makefile.target |  3 ---
+ configure       | 16 ----------------
+ 2 files changed, 19 deletions(-)
 
-diff --git a/cpus-common.c b/cpus-common.c
-index 98dd8c6..3ca58c6 100644
---- a/cpus-common.c
-+++ b/cpus-common.c
-@@ -99,7 +99,7 @@ void cpu_list_remove(CPUState *cpu)
-         return;
-     }
+diff --git a/Makefile.target b/Makefile.target
+index 4d56298..44ec4b6 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -158,9 +158,6 @@ GENERATED_FILES += hmp-commands.h hmp-commands-info.h
  
--    assert(!(cpu_index_auto_assigned && cpu != QTAILQ_LAST(&cpus, CPUTailQ)));
-+    assert(!(cpu_index_auto_assigned && cpu != QTAILQ_LAST(&cpus)));
+ endif # CONFIG_SOFTMMU
  
-     QTAILQ_REMOVE_RCU(&cpus, cpu, node);
-     cpu->cpu_index = UNASSIGNED_CPU_INDEX;
-diff --git a/dump.c b/dump.c
-index 4ec94c5..ef1d802 100644
---- a/dump.c
-+++ b/dump.c
-@@ -1557,7 +1557,7 @@ static void get_max_mapnr(DumpState *s)
- {
-     GuestPhysBlock *last_block;
+-# Workaround for http://gcc.gnu.org/PR55489, see configure.
+-%/translate.o: QEMU_CFLAGS += $(TRANSLATE_OPT_CFLAGS)
+-
+ dummy := $(call unnest-vars,,obj-y)
+ all-obj-y := $(obj-y)
  
--    last_block = QTAILQ_LAST(&s->guest_phys_blocks.head, GuestPhysBlockHead);
-+    last_block = QTAILQ_LAST(&s->guest_phys_blocks.head);
-     s->max_mapnr = dump_paddr_to_pfn(s, last_block->target_end);
- }
+diff --git a/configure b/configure
+index 3e401b7..131eae5 100755
+--- a/configure
++++ b/configure
+@@ -1933,21 +1933,6 @@ else
+   QEMU_CFLAGS="$QEMU_CFLAGS -Wno-missing-braces"
+ fi
  
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 6b3cc55..a7dd4be 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -158,7 +158,7 @@ DeviceState *qdev_try_create(BusState *bus, const char *type)
-     return dev;
- }
- 
--static QTAILQ_HEAD(device_listeners, DeviceListener) device_listeners
-+static QTAILQ_HEAD(, DeviceListener) device_listeners
-     = QTAILQ_HEAD_INITIALIZER(device_listeners);
- 
- enum ListenerDirection { Forward, Reverse };
-@@ -177,7 +177,7 @@ enum ListenerDirection { Forward, Reverse };
-             break;                                                \
-         case Reverse:                                             \
-             QTAILQ_FOREACH_REVERSE(_listener, &device_listeners,  \
--                                   device_listeners, link) {      \
-+                                   link) {                        \
-                 if (_listener->_callback) {                       \
-                     _listener->_callback(_listener, ##_args);     \
-                 }                                                 \
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index 97cd167..c480553 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -1554,7 +1554,7 @@ SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
-     BusChild *kid;
-     SCSIDevice *target_dev = NULL;
- 
--    QTAILQ_FOREACH_REVERSE(kid, &bus->qbus.children, ChildrenHead, sibling) {
-+    QTAILQ_FOREACH_REVERSE(kid, &bus->qbus.children, sibling) {
-         DeviceState *qdev = kid->child;
-         SCSIDevice *dev = SCSI_DEVICE(qdev);
- 
-diff --git a/hw/usb/combined-packet.c b/hw/usb/combined-packet.c
-index 01a7ed0..fc98383 100644
---- a/hw/usb/combined-packet.c
-+++ b/hw/usb/combined-packet.c
-@@ -64,7 +64,7 @@ void usb_combined_input_packet_complete(USBDevice *dev, USBPacket *p)
- 
-     status = combined->first->status;
-     actual_length = combined->first->actual_length;
--    short_not_ok = QTAILQ_LAST(&combined->packets, packets_head)->short_not_ok;
-+    short_not_ok = QTAILQ_LAST(&combined->packets)->short_not_ok;
- 
-     QTAILQ_FOREACH_SAFE(p, &combined->packets, combined_entry, next) {
-         if (!done) {
-diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index 100b717..c33d7d6 100644
---- a/hw/usb/dev-mtp.c
-+++ b/hw/usb/dev-mtp.c
-@@ -191,7 +191,7 @@ struct MTPState {
- #ifdef CONFIG_INOTIFY1
-     /* inotify descriptor */
-     int          inotifyfd;
--    QTAILQ_HEAD(events, MTPMonEntry) events;
-+    QTAILQ_HEAD(, MTPMonEntry) events;
- #endif
-     /* Responder is expecting a write operation */
-     bool write_pending;
-@@ -1982,7 +1982,7 @@ static void usb_mtp_handle_data(USBDevice *dev, USBPacket *p)
-     case EP_EVENT:
- #ifdef CONFIG_INOTIFY1
-         if (!QTAILQ_EMPTY(&s->events)) {
--            struct MTPMonEntry *e = QTAILQ_LAST(&s->events, events);
-+            struct MTPMonEntry *e = QTAILQ_LAST(&s->events);
-             uint32_t handle;
-             int len = sizeof(container) + sizeof(uint32_t);
- 
-diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
-index e5acfc5..a2105c8 100644
---- a/hw/usb/hcd-ehci.c
-+++ b/hw/usb/hcd-ehci.c
-@@ -1815,7 +1815,7 @@ static int ehci_state_fetchqtd(EHCIQueue *q)
-             break;
-         case EHCI_ASYNC_INFLIGHT:
-             /* Check if the guest has added new tds to the queue */
--            again = ehci_fill_queue(QTAILQ_LAST(&q->packets, pkts_head));
-+            again = ehci_fill_queue(QTAILQ_LAST(&q->packets));
-             /* Unfinished async handled packet, go horizontal */
-             ehci_set_state(q->ehci, q->async, EST_HORIZONTALQH);
-             break;
-diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h
-index 0bc364b..e4460aa 100644
---- a/hw/usb/hcd-ehci.h
-+++ b/hw/usb/hcd-ehci.h
-@@ -247,7 +247,7 @@ struct EHCIQueue {
-     uint32_t qtdaddr;      /* address QTD read from                */
-     int last_pid;          /* pid of last packet executed          */
-     USBDevice *dev;
--    QTAILQ_HEAD(pkts_head, EHCIPacket) packets;
-+    QTAILQ_HEAD(, EHCIPacket) packets;
- };
- 
- typedef QTAILQ_HEAD(EHCIQueueHead, EHCIQueue) EHCIQueueHead;
-diff --git a/hw/usb/hcd-uhci.c b/hw/usb/hcd-uhci.c
-index 836b11f..26f123e 100644
---- a/hw/usb/hcd-uhci.c
-+++ b/hw/usb/hcd-uhci.c
-@@ -99,7 +99,7 @@ struct UHCIQueue {
-     UHCIState *uhci;
-     USBEndpoint *ep;
-     QTAILQ_ENTRY(UHCIQueue) next;
--    QTAILQ_HEAD(asyncs_head, UHCIAsync) asyncs;
-+    QTAILQ_HEAD(, UHCIAsync) asyncs;
-     int8_t    valid;
- };
- 
-@@ -837,7 +837,7 @@ static int uhci_handle_td(UHCIState *s, UHCIQueue *q, uint32_t qh_addr,
-         }
-         if (!async->done) {
-             UHCI_TD last_td;
--            UHCIAsync *last = QTAILQ_LAST(&async->queue->asyncs, asyncs_head);
-+            UHCIAsync *last = QTAILQ_LAST(&async->queue->asyncs);
-             /*
-              * While we are waiting for the current td to complete, the guest
-              * may have added more tds to the queue. Note we re-read the td
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index ce93068..7353fa2 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -445,7 +445,7 @@ struct AddressSpace {
- 
-     int ioeventfd_nb;
-     struct MemoryRegionIoeventfd *ioeventfds;
--    QTAILQ_HEAD(memory_listeners_as, MemoryListener) listeners;
-+    QTAILQ_HEAD(, MemoryListener) listeners;
-     QTAILQ_ENTRY(AddressSpace) address_spaces_link;
- };
- 
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index a24d0dd..43f926f 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -206,7 +206,7 @@ struct BusState {
-     HotplugHandler *hotplug_handler;
-     int max_index;
-     bool realized;
--    QTAILQ_HEAD(ChildrenHead, BusChild) children;
-+    QTAILQ_HEAD(, BusChild) children;
-     QLIST_ENTRY(BusState) sibling;
- };
- 
-diff --git a/include/hw/usb.h b/include/hw/usb.h
-index a5080ad..f9431a0 100644
---- a/include/hw/usb.h
-+++ b/include/hw/usb.h
-@@ -408,7 +408,7 @@ struct USBPacket {
- 
- struct USBCombinedPacket {
-     USBPacket *first;
--    QTAILQ_HEAD(packets_head, USBPacket) packets;
-+    QTAILQ_HEAD(, USBPacket) packets;
-     QEMUIOVector iov;
- };
- 
-diff --git a/include/net/net.h b/include/net/net.h
-index ec13702..643295d 100644
---- a/include/net/net.h
-+++ b/include/net/net.h
-@@ -97,7 +97,7 @@ struct NetClientState {
-     unsigned rxfilter_notify_enabled:1;
-     int vring_enable;
-     int vnet_hdr_len;
--    QTAILQ_HEAD(NetFilterHead, NetFilterState) filters;
-+    QTAILQ_HEAD(, NetFilterState) filters;
- };
- 
- typedef struct NICState {
-diff --git a/include/qemu/option_int.h b/include/qemu/option_int.h
-index 26b1d9e..5dd9a51 100644
---- a/include/qemu/option_int.h
-+++ b/include/qemu/option_int.h
-@@ -47,7 +47,7 @@ struct QemuOpts {
-     char *id;
-     QemuOptsList *list;
-     Location loc;
--    QTAILQ_HEAD(QemuOptHead, QemuOpt) head;
-+    QTAILQ_HEAD(, QemuOpt) head;
-     QTAILQ_ENTRY(QemuOpts) next;
- };
- 
-diff --git a/include/qemu/queue.h b/include/qemu/queue.h
-index a893fac..1f8e219 100644
---- a/include/qemu/queue.h
-+++ b/include/qemu/queue.h
-@@ -432,14 +432,14 @@ union {                                                                 \
-                 (var) && ((next_var) = ((var)->field.tqe_next), 1);     \
-                 (var) = (next_var))
- 
--#define QTAILQ_FOREACH_REVERSE(var, head, headname, field)              \
--        for ((var) = QTAILQ_LAST(head, headname);                       \
-+#define QTAILQ_FOREACH_REVERSE(var, head, field)                        \
-+        for ((var) = QTAILQ_LAST(head);                                 \
-                 (var);                                                  \
--                (var) = QTAILQ_PREV(var, headname, field))
-+                (var) = QTAILQ_PREV(var, field))
- 
--#define QTAILQ_FOREACH_REVERSE_SAFE(var, head, headname, field, prev_var) \
--        for ((var) = QTAILQ_LAST(head, headname);                       \
--             (var) && ((prev_var) = QTAILQ_PREV(var, headname, field)); \
-+#define QTAILQ_FOREACH_REVERSE_SAFE(var, head, field, prev_var)         \
-+        for ((var) = QTAILQ_LAST(head);                                 \
-+             (var) && ((prev_var) = QTAILQ_PREV(var, field));           \
-              (var) = (prev_var))
- 
- /*
-@@ -452,9 +452,9 @@ union {                                                                 \
- 
- #define QTAILQ_LINK_PREV(link)                                          \
-         ((link).tql_prev->tql_prev->tql_next)
--#define QTAILQ_LAST(head, headname) \
-+#define QTAILQ_LAST(head)                                               \
-         ((typeof((head)->tqh_first)) QTAILQ_LINK_PREV((head)->tqh_circ))
--#define QTAILQ_PREV(elm, headname, field) \
-+#define QTAILQ_PREV(elm, field)                                         \
-         ((typeof((elm)->field.tqe_next)) QTAILQ_LINK_PREV((elm)->field.tqe_circ))
- 
- #define field_at_offset(base, offset, type)                                    \
-diff --git a/include/sysemu/memory_mapping.h b/include/sysemu/memory_mapping.h
-index 706152d..5845245 100644
---- a/include/sysemu/memory_mapping.h
-+++ b/include/sysemu/memory_mapping.h
-@@ -36,7 +36,7 @@ typedef struct GuestPhysBlock {
- /* point-in-time snapshot of guest-visible physical mappings */
- typedef struct GuestPhysBlockList {
-     unsigned num;
--    QTAILQ_HEAD(GuestPhysBlockHead, GuestPhysBlock) head;
-+    QTAILQ_HEAD(, GuestPhysBlock) head;
- } GuestPhysBlockList;
- 
- /* The physical and virtual address in the memory mapping are contiguous. */
-diff --git a/memory.c b/memory.c
-index 195c5cf..61d66e4 100644
---- a/memory.c
-+++ b/memory.c
-@@ -39,7 +39,7 @@ static bool memory_region_update_pending;
- static bool ioeventfd_update_pending;
- static bool global_dirty_log = false;
- 
--static QTAILQ_HEAD(memory_listeners, MemoryListener) memory_listeners
-+static QTAILQ_HEAD(, MemoryListener) memory_listeners
-     = QTAILQ_HEAD_INITIALIZER(memory_listeners);
- 
- static QTAILQ_HEAD(, AddressSpace) address_spaces
-@@ -113,8 +113,7 @@ enum ListenerDirection { Forward, Reverse };
-             }                                                           \
-             break;                                                      \
-         case Reverse:                                                   \
--            QTAILQ_FOREACH_REVERSE(_listener, &memory_listeners,        \
--                                   memory_listeners, link) {            \
-+            QTAILQ_FOREACH_REVERSE(_listener, &memory_listeners, link) { \
-                 if (_listener->_callback) {                             \
-                     _listener->_callback(_listener, ##_args);           \
-                 }                                                       \
-@@ -128,19 +127,17 @@ enum ListenerDirection { Forward, Reverse };
- #define MEMORY_LISTENER_CALL(_as, _callback, _direction, _section, _args...) \
-     do {                                                                \
-         MemoryListener *_listener;                                      \
--        struct memory_listeners_as *list = &(_as)->listeners;           \
-                                                                         \
-         switch (_direction) {                                           \
-         case Forward:                                                   \
--            QTAILQ_FOREACH(_listener, list, link_as) {                  \
-+            QTAILQ_FOREACH(_listener, &(_as)->listeners, link_as) {     \
-                 if (_listener->_callback) {                             \
-                     _listener->_callback(_listener, _section, ##_args); \
-                 }                                                       \
-             }                                                           \
-             break;                                                      \
-         case Reverse:                                                   \
--            QTAILQ_FOREACH_REVERSE(_listener, list, memory_listeners_as, \
--                                   link_as) {                           \
-+            QTAILQ_FOREACH_REVERSE(_listener, &(_as)->listeners, link_as) { \
-                 if (_listener->_callback) {                             \
-                     _listener->_callback(_listener, _section, ##_args); \
-                 }                                                       \
-@@ -2691,8 +2688,7 @@ void memory_listener_register(MemoryListener *listener, AddressSpace *as)
- 
-     listener->address_space = as;
-     if (QTAILQ_EMPTY(&memory_listeners)
--        || listener->priority >= QTAILQ_LAST(&memory_listeners,
--                                             memory_listeners)->priority) {
-+        || listener->priority >= QTAILQ_LAST(&memory_listeners)->priority) {
-         QTAILQ_INSERT_TAIL(&memory_listeners, listener, link);
-     } else {
-         QTAILQ_FOREACH(other, &memory_listeners, link) {
-@@ -2704,8 +2700,7 @@ void memory_listener_register(MemoryListener *listener, AddressSpace *as)
-     }
- 
-     if (QTAILQ_EMPTY(&as->listeners)
--        || listener->priority >= QTAILQ_LAST(&as->listeners,
--                                             memory_listeners)->priority) {
-+        || listener->priority >= QTAILQ_LAST(&as->listeners)->priority) {
-         QTAILQ_INSERT_TAIL(&as->listeners, listener, link_as);
-     } else {
-         QTAILQ_FOREACH(other, &as->listeners, link_as) {
-diff --git a/memory_mapping.c b/memory_mapping.c
-index 724dd0b..e3ec706 100644
---- a/memory_mapping.c
-+++ b/memory_mapping.c
-@@ -223,7 +223,7 @@ static void guest_phys_blocks_region_add(MemoryListener *listener,
-     if (!QTAILQ_EMPTY(&g->list->head)) {
-         hwaddr predecessor_size;
- 
--        predecessor = QTAILQ_LAST(&g->list->head, GuestPhysBlockHead);
-+        predecessor = QTAILQ_LAST(&g->list->head);
-         predecessor_size = predecessor->target_end - predecessor->target_start;
- 
-         /* the memory API guarantees monotonically increasing traversal */
-diff --git a/net/filter.c b/net/filter.c
-index c9f9e5f..28d1930 100644
---- a/net/filter.c
-+++ b/net/filter.c
-@@ -55,7 +55,7 @@ static NetFilterState *netfilter_next(NetFilterState *nf,
-         next = QTAILQ_NEXT(nf, next);
-     } else {
-         /* reverse order */
--        next = QTAILQ_PREV(nf, NetFilterHead, next);
-+        next = QTAILQ_PREV(nf, next);
-     }
- 
-     return next;
-diff --git a/net/net.c b/net/net.c
-index 1f7d626..3acbdcc 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -563,7 +563,7 @@ static ssize_t filter_receive_iov(NetClientState *nc,
-             }
-         }
-     } else {
--        QTAILQ_FOREACH_REVERSE(nf, &nc->filters, NetFilterHead, next) {
-+        QTAILQ_FOREACH_REVERSE(nf, &nc->filters, next) {
-             ret = qemu_netfilter_receive(nf, direction, sender, flags, iov,
-                                          iovcnt, sent_cb);
-             if (ret) {
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index 1877976..18a4724 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -1291,7 +1291,7 @@ int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
-     /* cannot risk guest agent blocking itself on a write in this state */
-     ga_set_frozen(ga_state);
- 
--    QTAILQ_FOREACH_REVERSE(mount, &mounts, FsMountList, next) {
-+    QTAILQ_FOREACH_REVERSE(mount, &mounts, next) {
-         /* To issue fsfreeze in the reverse order of mounts, check if the
-          * mount is listed in the list here */
-         if (has_mountpoints) {
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index e85133e..2e09093 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -2269,7 +2269,7 @@ static void liveness_pass_1(TCGContext *s)
- 
-     tcg_la_func_end(s);
- 
--    QTAILQ_FOREACH_REVERSE_SAFE(op, &s->ops, TCGOpHead, link, op_prev) {
-+    QTAILQ_FOREACH_REVERSE_SAFE(op, &s->ops, link, op_prev) {
-         int i, nb_iargs, nb_oargs;
-         TCGOpcode opc_new, opc_new2;
-         bool have_opc_new2;
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 1e9c87b..cbe4309 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -715,7 +715,7 @@ struct TCGContext {
-     TCGTempSet free_temps[TCG_TYPE_COUNT * 2];
-     TCGTemp temps[TCG_MAX_TEMPS]; /* globals first, temps after */
- 
--    QTAILQ_HEAD(TCGOpHead, TCGOp) ops, free_ops;
-+    QTAILQ_HEAD(, TCGOp) ops, free_ops;
- 
-     /* Tells which temporary holds a given register.
-        It does not take into account fixed registers */
-@@ -843,7 +843,7 @@ static inline void tcg_set_insn_start_param(TCGOp *op, int arg, target_ulong v)
- /* The last op that was emitted.  */
- static inline TCGOp *tcg_last_op(void)
- {
--    return QTAILQ_LAST(&tcg_ctx->ops, TCGOpHead);
-+    return QTAILQ_LAST(&tcg_ctx->ops);
- }
- 
- /* Test for whether to terminate the TB for using too many opcodes.  */
-diff --git a/tests/libqos/malloc.c b/tests/libqos/malloc.c
-index ac05874..f7bae47 100644
---- a/tests/libqos/malloc.c
-+++ b/tests/libqos/malloc.c
-@@ -104,7 +104,7 @@ static void mlist_coalesce(MemList *head, MemBlock *node)
- 
-     do {
-         merge = 0;
--        left = QTAILQ_PREV(node, MemList, MLIST_ENTNAME);
-+        left = QTAILQ_PREV(node, MLIST_ENTNAME);
-         right = QTAILQ_NEXT(node, MLIST_ENTNAME);
- 
-         /* clowns to the left of me */
-diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
-index 37a7a93..0ab29a8 100644
---- a/tests/test-vmstate.c
-+++ b/tests/test-vmstate.c
-@@ -630,7 +630,7 @@ struct TestQtailqElement {
- 
- typedef struct TestQtailq {
-     int16_t  i16;
--    QTAILQ_HEAD(TestQtailqHead, TestQtailqElement) q;
-+    QTAILQ_HEAD(, TestQtailqElement) q;
-     int32_t  i32;
- } TestQtailq;
- 
-@@ -735,9 +735,9 @@ static void test_load_q(void)
-     g_assert_cmpint(eof, ==, QEMU_VM_EOF);
- 
-     TestQtailqElement *qele_from = QTAILQ_FIRST(&obj_q.q);
--    TestQtailqElement *qlast_from = QTAILQ_LAST(&obj_q.q, TestQtailqHead);
-+    TestQtailqElement *qlast_from = QTAILQ_LAST(&obj_q.q);
-     TestQtailqElement *qele_to = QTAILQ_FIRST(&tgt.q);
--    TestQtailqElement *qlast_to = QTAILQ_LAST(&tgt.q, TestQtailqHead);
-+    TestQtailqElement *qlast_to = QTAILQ_LAST(&tgt.q);
- 
-     while (1) {
-         g_assert_cmpint(qele_to->b, ==, qele_from->b);
-@@ -755,7 +755,7 @@ static void test_load_q(void)
-     /* clean up */
-     TestQtailqElement *qele;
-     while (!QTAILQ_EMPTY(&tgt.q)) {
--        qele = QTAILQ_LAST(&tgt.q, TestQtailqHead);
-+        qele = QTAILQ_LAST(&tgt.q);
-         QTAILQ_REMOVE(&tgt.q, qele, next);
-         free(qele);
-         qele = NULL;
-diff --git a/ui/console.c b/ui/console.c
-index 3a285ba..5a904e6 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -182,7 +182,7 @@ struct DisplayState {
- 
- static DisplayState *display_state;
- static QemuConsole *active_console;
--static QTAILQ_HEAD(consoles_head, QemuConsole) consoles =
-+static QTAILQ_HEAD(, QemuConsole) consoles =
-     QTAILQ_HEAD_INITIALIZER(consoles);
- static bool cursor_visible_phase;
- static QEMUTimer *cursor_timer;
-@@ -1303,7 +1303,7 @@ static QemuConsole *new_console(DisplayState *ds, console_type_t console_type,
-         s->index = 0;
-         QTAILQ_INSERT_TAIL(&consoles, s, next);
-     } else if (console_type != GRAPHIC_CONSOLE || qdev_hotplug) {
--        QemuConsole *last = QTAILQ_LAST(&consoles, consoles_head);
-+        QemuConsole *last = QTAILQ_LAST(&consoles);
-         s->index = last->index + 1;
-         QTAILQ_INSERT_TAIL(&consoles, s, next);
-     } else {
-diff --git a/util/qemu-option.c b/util/qemu-option.c
-index de42e2a..ef60af7 100644
---- a/util/qemu-option.c
-+++ b/util/qemu-option.c
-@@ -280,7 +280,7 @@ QemuOpt *qemu_opt_find(QemuOpts *opts, const char *name)
- {
-     QemuOpt *opt;
- 
--    QTAILQ_FOREACH_REVERSE(opt, &opts->head, QemuOptHead, next) {
-+    QTAILQ_FOREACH_REVERSE(opt, &opts->head, next) {
-         if (strcmp(opt->name, name) != 0)
-             continue;
-         return opt;
-@@ -379,7 +379,7 @@ bool qemu_opt_has_help_opt(QemuOpts *opts)
- {
-     QemuOpt *opt;
- 
--    QTAILQ_FOREACH_REVERSE(opt, &opts->head, QemuOptHead, next) {
-+    QTAILQ_FOREACH_REVERSE(opt, &opts->head, next) {
-         if (is_help_option(opt->name)) {
-             return true;
-         }
+-# Workaround for http://gcc.gnu.org/PR55489.  Happens with -fPIE/-fPIC and
+-# large functions that use global variables.  The bug is in all releases of
+-# GCC, but it became particularly acute in 4.6.x and 4.7.x.  It is fixed in
+-# 4.7.3 and 4.8.0.  We should be able to delete this at the end of 2013.
+-cat > $TMPC << EOF
+-#if __GNUC__ == 4 && (__GNUC_MINOR__ == 6 || (__GNUC_MINOR__ == 7 && __GNUC_PATCHLEVEL__ <= 2))
+-int main(void) { return 0; }
+-#else
+-#error No bug in this compiler.
+-#endif
+-EOF
+-if compile_prog "-Werror -fno-gcse" "" ; then
+-  TRANSLATE_OPT_CFLAGS=-fno-gcse
+-fi
+-
+ if test "$static" = "yes" ; then
+   if test "$modules" = "yes" ; then
+     error_exit "static and modules are mutually incompatible"
+@@ -6980,7 +6965,6 @@ echo "LIBS_QGA+=$libs_qga" >> $config_host_mak
+ echo "TASN1_LIBS=$tasn1_libs" >> $config_host_mak
+ echo "TASN1_CFLAGS=$tasn1_cflags" >> $config_host_mak
+ echo "POD2MAN=$POD2MAN" >> $config_host_mak
+-echo "TRANSLATE_OPT_CFLAGS=$TRANSLATE_OPT_CFLAGS" >> $config_host_mak
+ if test "$gcov" = "yes" ; then
+   echo "CONFIG_GCOV=y" >> $config_host_mak
+   echo "GCOV=$gcov_tool" >> $config_host_mak
 -- 
 1.8.3.1
