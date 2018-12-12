@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gX1AN-0002wD-4O
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:50:55 -0500
+	(envelope-from <groug@kaod.org>) id 1gX1Bn-0003eb-64
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:52:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gX1AK-0002Gr-RQ
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:50:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:35904)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gX1AK-0002Ga-Jt
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:50:52 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gX1AJ-0002Eo-Bt
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:50:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id EF8DD2E80AD
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 09:50:50 +0000 (UTC)
+	(envelope-from <groug@kaod.org>) id 1gX1Bh-0002vW-QC
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:52:21 -0500
+Received: from 9.mo69.mail-out.ovh.net ([46.105.56.78]:46108)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gX1Bf-0002sW-Fy
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 04:52:16 -0500
+Received: from player797.ha.ovh.net (unknown [10.109.160.93])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id EE78E37CAF
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 10:52:10 +0100 (CET)
+Date: Wed, 12 Dec 2018 10:52:04 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20181212105204.64b1e917@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <81aec30a-c599-9521-9571-c32de4087db4@redhat.com>
+References: <20181211174253.10947-1-alex.bennee@linaro.org>
+	<81aec30a-c599-9521-9571-c32de4087db4@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Dec 2018 09:42:43 -0000
-From: Thomas Huth <1774677@bugs.launchpad.net>
-Reply-To: Bug 1774677 <1774677@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152787131775.31828.3557775502793493947.malonedeb@soybean.canonical.com>
-Message-Id: <154460776400.23503.13272234174007062257.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1774677] Re: -icount increases boot time by >10x
+Subject: Re: [Qemu-devel] [RFC PATCH] contrib: add a basic gitdm config
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,51 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, maxim.kuvyrkov@linaro.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
 
-** Changed in: qemu
-       Status: Fix Committed =3D> Fix Released
+On Wed, 12 Dec 2018 10:30:13 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
--- =
+> On 2018-12-11 18:42, Alex Benn=C3=A9e wrote:
+> > This is a QEMU specific version of a gitdm config for generating
+> > reports on the contributor base of the project. I've added enough
+> > group maps and domain aliases to ensure the current top ten is as
+> > reflective as it can be. As of this commit running:
+> >=20
+> >   git log --numstat --since "Last Year" | gitdm -n -l 16
+> >=20
+> > Reports:
+> >=20
+> >   Top changeset contributors by employer
+> >   RedHat                    3116 (43.8%)
+> >   Linaro                    1166 (16.4%)
+> >   f4bug@amsat.org            384 (5.4%)
+> >   IBM                        170 (2.4%)
+> >   Virtuozzo                  168 (2.4%)
+> >   mark.cave-ayland@ilande.co.uk  161 (2.3%)
+> >   cota@braap.org             134 (1.9%)
+> >   Xilinx                     102 (1.4%)
+> >   clg@kaod.org               100 (1.4%)
+> >   Igalia                      93 (1.3%)
+> >   Cadence Design Systems      88 (1.2%)
+> >   groug@kaod.org              78 (1.1%) =20
+>=20
+> You might also want to add a group-map-ibm file for groug and clg@kaod.or=
+g ?
+>=20
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1774677
++1
 
-Title:
-  -icount increases boot time by >10x
+Thanks Thomas for pointing that out.
 
-Status in QEMU:
-  Fix Released
+Cheers,
 
-Bug description:
-  When I specify the -icount option, some guest operations such as
-  booting a Linux kernel take more than 10 times longer than otherwise.
-  For example, the following will boot Aboriginal Linux to the login
-  prompt about 6 seconds on my system (using TCG, not KVM):
+--
+Greg
 
-  wget http://landley.net/aboriginal/downloads/old/binaries/1.4.5/system-im=
-age-i686.tar.gz
-  gunzip <system-image-i686.tar.gz | tar xfv -
-  cd system-image-i686
-  sh run-emulator.sh
-
-  If I replace the last line with
-
-  QEMU_EXTRA=3D"-icount shift=3Dauto" sh run-emulator.sh
-
-  booting to the login prompt takes about 1 minute 20 seconds.
-
-  I have tried different values for "shift" other than the "auto" used
-  above, but have not been able to find one that gives reasonable
-  performance.  Specifying "sleep=3Doff" also did not help.
-
-  During the slow boots, qemu appears to spend most of its time
-  sleeping, not using the host CPU.
-
-  I see this with multiple versions of qemu, including current git
-  sources (c181ddaa176856b3cd2dfd12bbcf25fa9c884a97), and on multiple
-  host OSes, including Debian 9 on x86_64.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1774677/+subscriptions
+>  Thomas
