@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gX6Ob-0002fn-1U
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:25:57 -0500
+	(envelope-from <philmd@redhat.com>) id 1gX6Ph-0003Yy-8P
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:27:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gX6OW-0001ia-48
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:25:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35468)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gX6OU-0001gC-4P
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:25:51 -0500
+	(envelope-from <philmd@redhat.com>) id 1gX6Pc-0002QQ-Ag
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:27:05 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:50386)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gX6Pc-0002Pv-2X
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:27:00 -0500
+Received: by mail-wm1-f65.google.com with SMTP id n190so6220786wmd.0
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:26:59 -0800 (PST)
 References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
-	<1543851204-41186-23-git-send-email-pbonzini@redhat.com>
-	<f999872d-d940-7093-3c4c-f245e27c803f@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <217295f3-ca0e-af08-face-08144088e27d@redhat.com>
-Date: Wed, 12 Dec 2018 16:25:41 +0100
+	<1543851204-41186-24-git-send-email-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d18fe1cd-eb5a-af4a-2d54-6f395c3a4bbc@redhat.com>
+Date: Wed, 12 Dec 2018 16:26:56 +0100
 MIME-Version: 1.0
-In-Reply-To: <f999872d-d940-7093-3c4c-f245e27c803f@redhat.com>
+In-Reply-To: <1543851204-41186-24-git-send-email-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 22/71] tests/libqos: sdhci driver and
- interface nodes
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 23/71] tests/libqos: arm/raspi2 machine node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +30,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 Cc: Thomas Huth <thuth@redhat.com>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <laurent@vivier.eu>
 
-On 12/12/18 15:35, Philippe Mathieu-Daud=C3=A9 wrote:
->> +}
->> +
->> +static void qsdhci_register_nodes(void)
->> +{
->> +    QPCIAddress addr =3D {
->> +        .devfn =3D QPCI_DEVFN(4, 0),
->> +        .vendor_id =3D PCI_VENDOR_ID_REDHAT,
->> +        .device_id =3D PCI_DEVICE_ID_REDHAT_SDHCI,
->> +    };
->> +
->> +    QOSGraphEdgeOptions opts =3D {
->> +        .extra_device_opts =3D "addr=3D04.0",
-> Shouldn't this be formatted from the previous QPCIAddress?
->=20
+Hi Paolo,
 
-Maybe, but there isn't a way to couple the two for now.  A device
-address allocator is on the todo list. :)
+On 12/3/18 4:32 PM, Paolo Bonzini wrote:
+> From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+> 
+> Add arm/raspi2 machine to the graph. This machine contains a generic-sdhci, so
+> its constructor must take care of setting it properly when called.
+> 
+> Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  tests/Makefile.include            |  1 +
+>  tests/libqos/arm-raspi2-machine.c | 91 +++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 92 insertions(+)
+>  create mode 100644 tests/libqos/arm-raspi2-machine.c
+> 
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 66c7848..75951f8 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -681,6 +681,7 @@ qos-test-obj-y += $(libqos-pc-obj-y)
+>  qos-test-obj-y += tests/libqos/sdhci.o
+>  
+>  # Machines
+> +qos-test-obj-y += tests/libqos/arm-raspi2-machine.o
+>  qos-test-obj-y += tests/libqos/x86_64_pc-machine.o
+>  
+>  check-unit-y += tests/test-qgraph$(EXESUF)
+> diff --git a/tests/libqos/arm-raspi2-machine.c b/tests/libqos/arm-raspi2-machine.c
+> new file mode 100644
+> index 0000000..3aff670
+> --- /dev/null
+> +++ b/tests/libqos/arm-raspi2-machine.c
+> @@ -0,0 +1,91 @@
+> +/*
+> + * libqos driver framework
+> + *
+> + * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License version 2 as published by the Free Software Foundation.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/licenses/>
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "libqtest.h"
+> +#include "libqos/malloc.h"
+> +#include "libqos/qgraph.h"
+> +#include "sdhci.h"
+> +
+> +#define ARM_PAGE_SIZE             4096
+> +#define RASPI2_RAM_ADDR           0
+> +#define RASPI2_RAM_SIZE           0x20000000
+> +
+> +typedef struct QRaspi2Machine QRaspi2Machine;
+> +
+> +struct QRaspi2Machine {
+> +    QOSGraphObject obj;
+> +    QGuestAllocator alloc;
+> +    QSDHCI_MemoryMapped sdhci;
+> +};
+> +
+> +static void *raspi2_get_driver(void *object, const char *interface)
+> +{
+> +    QRaspi2Machine *machine = object;
+> +    if (!g_strcmp0(interface, "memory")) {
+> +        return &machine->alloc;
+> +    }
+> +
+> +    fprintf(stderr, "%s not present in arm/raspi2\n", interface);
 
-Paolo
+I'd cocci-replace fprintf(stderr) -> g_printerr()
+
+> +    g_assert_not_reached();
+> +}
+> +
+> +static QOSGraphObject *raspi2_get_device(void *obj, const char *device)
+> +{
+> +    QRaspi2Machine *machine = obj;
+> +    if (!g_strcmp0(device, "generic-sdhci")) {
+> +        return &machine->sdhci.obj;
+> +    }
+> +
+> +    fprintf(stderr, "%s not present in arm/raspi2\n", device);
+> +    g_assert_not_reached();
+> +}
+> +
+> +static void raspi2_destructor(QOSGraphObject *obj)
+> +{
+> +    QRaspi2Machine *machine = (QRaspi2Machine *) obj;
+> +    alloc_destroy(&machine->alloc);
+> +}
+> +
+> +static void *qos_create_machine_arm_raspi2(QTestState *qts)
+> +{
+> +    QRaspi2Machine *machine = g_new0(QRaspi2Machine, 1);
+> +
+> +    alloc_init(&machine->alloc, 0,
+> +               RASPI2_RAM_ADDR + (1 << 20),
+> +               RASPI2_RAM_ADDR + RASPI2_RAM_SIZE,
+
+This code is not obvious.
+
+> +               ARM_PAGE_SIZE);
+> +    machine->obj.get_device = raspi2_get_device;
+> +    machine->obj.get_driver = raspi2_get_driver;
+> +    machine->obj.destructor = raspi2_destructor;
+> +    qos_init_sdhci_mm(&machine->sdhci, qts, 0x3f300000, &(QSDHCIProperties) {
+> +        .version = 3,
+> +        .baseclock = 52,
+> +        .capab.sdma = false,
+> +        .capab.reg = 0x052134b4
+> +    });
+> +    return &machine->obj;
+> +}
+> +
+> +static void raspi2_register_nodes(void)
+> +{
+> +    qos_node_create_machine("arm/raspi2", qos_create_machine_arm_raspi2);
+> +    qos_node_contains("arm/raspi2", "generic-sdhci", NULL);
+
+Shouldn't we also register all the arm/ machines under the aarch64/
+node? If we simply duplicate the same tests, then no.
+
+> +}
+> +
+> +libqos_init(raspi2_register_nodes);
+> 
+
+We could generate this file from a YAML :)
