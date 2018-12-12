@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gWtFB-0008TM-4O
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 20:23:23 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gWtOF-0001xG-U9
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 20:32:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gWtF6-0006rd-6T
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 20:23:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33874)
+	(envelope-from <ehabkost@redhat.com>) id 1gWtOB-0001rn-FB
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 20:32:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42844)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gWtF5-0006r5-B7
-	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 20:23:16 -0500
-Date: Tue, 11 Dec 2018 20:22:49 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181211202225-mutt-send-email-mst@kernel.org>
-References: <20181205195704.17605-1-ehabkost@redhat.com>
-	<20181212011851.GP7141@habkost.net>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gWtOB-0001mn-3M
+	for qemu-devel@nongnu.org; Tue, 11 Dec 2018 20:32:39 -0500
+Date: Tue, 11 Dec 2018 23:32:22 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181212013222.GQ7141@habkost.net>
+References: <20181211162846.31149-1-wainersm@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181212011851.GP7141@habkost.net>
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v4 0/2] virtio: Provide
- version-specific variants of virtio PCI devices
+In-Reply-To: <20181211162846.31149-1-wainersm@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] target/i386: Fixes to the check missing
+ features routine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,95 +27,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Amit Shah <amit@kernel.org>, Andrea Bolognani <abologna@redhat.com>, Cleber Rosa <crosa@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Fam Zheng <famz@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, libvir-list@redhat.com, Wainer dos Santos Moschetta <wainersm@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Markus Armbruster <armbru@redhat.com>, Laine Stump <laine@redhat.com>, Jason Wang <jasowang@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Caio Carrara <ccarrara@redhat.com>
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, eblake@redhat.com, crosa@redhat.com, ccarrara@redhat.com
 
-Nothing, I'm packing up the 1st pull request.
+On Tue, Dec 11, 2018 at 11:28:46AM -0500, Wainer dos Santos Moschetta wrote:
+> The x86_cpu_class_check_missing_features() returns a list
+> of unavailable features compared to the host CPU. Currently it may
+> return empty strings for unnamed features as well as duplicated
+> names.
+> 
+> For example, the qmp "query-cpu-definitions" below shows one empty
+> string and repeated "mpx" entries:
+> 
+> (...)
+> {"execute": "query-cpu-definitions"}
+> (...)
+>         {
+>             "name": "Cascadelake-Server",
+>             "typename": "Cascadelake-Server-x86_64-cpu",
+>             "unavailable-features": [
+>                 "hle",
+>                 "rtm",
+>                 "mpx",
+>                 "avx512f",
+>                 "avx512dq",
+>                 "rdseed",
+>                 "adx",
+>                 "smap",
+>                 "clflushopt",
+>                 "clwb",
+>                 "intel-pt",
+>                 "avx512cd",
+>                 "avx512bw",
+>                 "avx512vl",
+>                 "pku",
+>                 "",
 
-On Tue, Dec 11, 2018 at 11:18:51PM -0200, Eduardo Habkost wrote:
-> Friendly ping.  3.1.0 is tagged now, so there's anything else
-> blocking this series?
+I just noticed one thing: we probably want to find out the cause
+of this empty entry, instead of ignoring it in the code.  Named
+CPU models must only refer to named CPU features.
+
+I think this is caused by CPUID_7_0_ECX_OSPKE, I will
+investigate.  But this doesn't make your patch incorrect.
+
+
+>                 "avx512vnni",
+>                 "spec-ctrl",
+>                 "ssbd",
+>                 "3dnowprefetch",
+>                 "xsavec",
+>                 "xgetbv1",
+>                 "mpx",
+>                 "mpx",
+>                 "avx512f",
+>                 "avx512f",
+>                 "avx512f",
+>                 "pku"
+>             ],
+> (...)
 > 
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Caio Carrara <ccarrara@redhat.com>
+> ---
+> v2:
+>  * Fixed typos. [eblake]
+>  * Removed unwanted manual test case. [ccarrara, ehabkost]
+>  * Not passing 'accel=kvm' on test's VM. [ehabkost]
+>  * Removed unneeded g_strdup() call. [ehabkost]
+>  * Formatted comment according to QEMU's coding style. [ehabkost]
 > 
-> On Wed, Dec 05, 2018 at 05:57:02PM -0200, Eduardo Habkost wrote:
-> > Existing modern-only device types are not being touched by v3, as
-> > they don't need separate variants.  However, I plan to implement
-> > separate cleanups in the code that calls virtio_pci_force_virtio_1(),
-> > first, and then propose additional changes (e.g. deprecating
-> > disable-legacy and disable-modern in those device types).
-> > 
-> > Changes v3 -> v4:
-> > * Trivial comment fixes (Cornelia Huck)
-> > * Test code update (Caio Carrara)
-> > 
-> > Changes v2 -> v3:
-> > * Split into two separate patches (type registration helper
-> >   and introduction of new types)
-> > * Rewrote virtio_pci_types_register() completely:
-> >   * Replaced magic generation of type names with explicit fields in
-> >     VirtioPCIDeviceTypeInfo
-> >   * Removed modern_only field (not necessary anymore)
-> >   * Don't register a separate base type unless necessary
-> > 
-> > Changes v1 -> v2:
-> > * Removed *-0.9 devices.  Nobody will want to use them, if
-> >   transitional devices work with legacy drivers
-> >   (Gerd Hoffmann, Michael S. Tsirkin)
-> > * Drop virtio version from name: rename -1.0-transitional to
-> >   -transitional (Michael S. Tsirkin)
-> > * Renamed -1.0 to -non-transitional
-> > * Don't add any extra variants to modern-only device types
-> >   (they don't need it)
-> > * Fix typo on TYPE_VIRTIO_INPUT_HOST_PCI (crash reported by
-> >   Cornelia Huck)
-> > * No need to change cast macros for modern-only devices
-> > * Rename virtio_register_types() to virtio_pci_types_register()
-> > 
-> > Original patch description:
-> > 
-> > Many of the current virtio-*-pci device types actually represent
-> > 3 different types of devices:
-> > * virtio 1.0 non-transitional devices
-> > * virtio 1.0 transitional devices
-> > * virtio 0.9 ("legacy device" in virtio 1.0 terminology)
-> > 
-> > That would be just an annoyance if it didn't break our device/bus
-> > compatibility QMP interfaces.  With this multi-purpose device
-> > type, there's no way to tell management software that
-> > transitional devices and legacy devices require a Conventional
-> > PCI bus.
-> > 
-> > The multi-purpose device types would also prevent us from telling
-> > management software what's the PCI vendor/device ID for them,
-> > because their PCI IDs change at runtime depending on the bus
-> > where they were plugged.
-> > 
-> > This patch adds separate device types for each of those virtio
-> > device flavors:
-> > 
-> > * virtio-*-pci: the existing multi-purpose device types
-> > * virtio-*-pci-transitional: virtio-1.0 device supporting legacy drivers
-> > * virtio-*-pci-non-transitional: modern-only
-> > 
-> > Reference to previous discussion that originated this idea:
-> >   https://www.mail-archive.com/qemu-devel@nongnu.org/msg558389.html
-> > 
-> > Eduardo Habkost (2):
-> >   virtio: Helper for registering virtio device types
-> >   virtio: Provide version-specific variants of virtio PCI devices
-> > 
-> >  hw/virtio/virtio-pci.h             |  78 +++++++--
-> >  hw/display/virtio-gpu-pci.c        |   7 +-
-> >  hw/display/virtio-vga.c            |   7 +-
-> >  hw/virtio/virtio-crypto-pci.c      |   7 +-
-> >  hw/virtio/virtio-pci.c             | 267 ++++++++++++++++++++++-------
-> >  tests/acceptance/virtio_version.py | 176 +++++++++++++++++++
-> >  6 files changed, 452 insertions(+), 90 deletions(-)
-> >  create mode 100644 tests/acceptance/virtio_version.py
-> > 
-> > -- 
-> > 2.18.0.rc1.1.g3f1ff2140
-> > 
+> v1: https://www.mail-archive.com/qemu-devel@nongnu.org/msg579404.html
+> ---
+>  target/i386/cpu.c                   | 11 ++++++++-
+>  tests/acceptance/cpu_definitions.py | 35 +++++++++++++++++++++++++++++
+>  2 files changed, 45 insertions(+), 1 deletion(-)
+>  create mode 100644 tests/acceptance/cpu_definitions.py
 > 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index f81d35e1f9..014b91e608 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -3615,19 +3615,28 @@ static void x86_cpu_class_check_missing_features(X86CPUClass *xcc,
+>  
+>      x86_cpu_filter_features(xc);
+>  
+> +    /* Auxiliary dictionary to avoid duplicate entries in the list. */
+> +    QDict *unique_feats_dict = qdict_new();
+> +
+>      for (w = 0; w < FEATURE_WORDS; w++) {
+>          uint32_t filtered = xc->filtered_features[w];
+>          int i;
+>          for (i = 0; i < 32; i++) {
+>              if (filtered & (1UL << i)) {
+> +                const char *fname = x86_cpu_feature_name(w, i);
+> +                if (!fname || qdict_haskey(unique_feats_dict, fname)) {
+> +                    continue;
+> +                }
+>                  strList *new = g_new0(strList, 1);
+
+I like mixed declarations, but unfortunately they are not allowed
+by CODING_STYLE:
+
+	5. Declarations
+
+	Mixed declarations (interleaving statements and declarations within
+	blocks) are generally not allowed; declarations should be at the beginning
+	of blocks.
+
+
+The logic now looks good, though.
+
+> -                new->value = g_strdup(x86_cpu_feature_name(w, i));
+> +                new->value = g_strdup(fname);
+>                  *next = new;
+>                  next = &new->next;
+> +                qdict_put_null(unique_feats_dict, new->value);
+>              }
+>          }
+>      }
+>  
+> +    g_free(unique_feats_dict);
+>      object_unref(OBJECT(xc));
+>  }
+>  
+> diff --git a/tests/acceptance/cpu_definitions.py b/tests/acceptance/cpu_definitions.py
+> new file mode 100644
+> index 0000000000..4edad86799
+> --- /dev/null
+> +++ b/tests/acceptance/cpu_definitions.py
+> @@ -0,0 +1,35 @@
+> +# CPU definitions tests.
+> +#
+> +# Copyright (c) 2018 Red Hat, Inc.
+> +#
+> +# Author:
+> +#  Wainer dos Santos Moschetta <wainersm@redhat.com>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2 or
+> +# later.  See the COPYING file in the top-level directory.
+> +
+> +from avocado import skip
+> +from avocado_qemu import Test
+> +
+> +
+> +class CPUDefinitions(Test):
+> +    """
+> +    Tests for the CPU definitions.
+> +
+> +    :avocado: enable
+> +    :avocado: tags=x86_64
+> +    """
+> +    def test_unavailable_features(self):
+> +        self.vm.add_args("-machine", "q35")
+
+I thought the explicit -machine option was here only because of
+the old accel=kvm option, and the whole line would be removed.
+Why do you need to explicitly ask for a Q35 machine to test this?
+
+
+> +        self.vm.launch()
+> +        cpu_definitions = self.vm.command('query-cpu-definitions')
+> +        self.assertTrue(len(cpu_definitions) > 0)
+> +        for cpu_model in cpu_definitions:
+> +            name = cpu_model.get('name')
+> +            unavailable_features = cpu_model.get('unavailable-features')
+> +
+> +            self.assertNotIn("", unavailable_features,
+> +                             name + " has unamed feature")
+
+"unnamed"
+
+> +            self.assertEqual(len(unavailable_features),
+> +                             len(set(unavailable_features)),
+> +                             name + " has duplicate feature")
 > -- 
-> Eduardo
+> 2.19.1
+> 
+
+-- 
+Eduardo
