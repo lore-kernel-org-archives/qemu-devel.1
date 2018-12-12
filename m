@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gX5W6-0000ga-CJ
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:29:39 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gX5as-0002Xp-Sd
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:34:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gX5W3-00050k-45
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:29:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50766)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gX5W2-00050J-RM
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:29:35 -0500
-Date: Wed, 12 Dec 2018 12:29:26 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181212142926.GT7141@habkost.net>
-References: <20181211192527.13254-1-ehabkost@redhat.com>
-	<7525c0fa-037d-e408-cd49-244993ef5387@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1gX5ap-0008Pv-Jh
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 09:34:34 -0500
+Date: Wed, 12 Dec 2018 15:34:26 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181212153426.2ca5a481.cohuck@redhat.com>
+In-Reply-To: <1544623878-11248-1-git-send-email-jjherne@linux.ibm.com>
+References: <1544623878-11248-1-git-send-email-jjherne@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <7525c0fa-037d-e408-cd49-244993ef5387@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] x86: host-phys-bits-limit option
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 00/15] s390: vfio-ccw dasd ipl support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,241 +22,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Cc: qemu-devel@nongnu.org, Andrea Arcangeli <aarcange@redhat.com>, paul.c.lai@intel.com, Bandan Das <bsd@redhat.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com, Thomas Huth <thuth@redhat.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>
 
-On Wed, Dec 12, 2018 at 12:08:08PM -0200, Wainer dos Santos Moschetta wro=
-te:
->=20
-> On 12/11/2018 05:25 PM, Eduardo Habkost wrote:
-> > Some downstream distributions of QEMU set host-phys-bits=3Don by
-> > default.  This worked very well for most use cases, because
-> > phys-bits really didn't have huge consequences. The only
-> > difference was on the CPUID data seen by guests, and on the
-> > handling of reserved bits.
-> >=20
-> > This changed in KVM commit 855feb673640 ("KVM: MMU: Add 5 level
-> > EPT & Shadow page table support").  Now choosing a large
-> > phys-bits value for a VM has bigger impact: it will make KVM use
-> > 5-level EPT even when it's not really necessary.  This means
-> > using the host phys-bits value may not be the best choice.
-> >=20
-> > Management software could address this problem by manually
-> > configuring phys-bits depending on the size of the VM and the
-> > amount of MMIO address space required for hotplug.  But this is
-> > not trivial to implement.
-> >=20
-> > However, there's another workaround that would work for most
-> > cases: keep using the host phys-bits value, but only if it's
-> > smaller than 48.  This patch makes this possible by introducing a
-> > new "-cpu" option: "host-phys-bits-limit".  Management software
-> > or users can make sure they will always use 4-level EPT using:
-> > "host-phys-bits=3Don,host-phys-bits-limit=3D48".
-> >=20
-> > This behavior is still not enabled by default because QEMU
-> > doesn't enable host-phys-bits=3Don by default.  But users,
-> > management software, or downstream distributions may choose to
-> > change their defaults using the new option.
-> >=20
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >   target/i386/cpu.h                 |  3 ++
-> >   target/i386/cpu.c                 |  5 ++
-> >   tests/acceptance/x86-phys-bits.py | 81 ++++++++++++++++++++++++++++=
-+++
-> >   3 files changed, 89 insertions(+)
-> >   create mode 100644 tests/acceptance/x86-phys-bits.py
-> >=20
-> > diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> > index 9c52d0cbeb..a545b77c2c 100644
-> > --- a/target/i386/cpu.h
-> > +++ b/target/i386/cpu.h
-> > @@ -1457,6 +1457,9 @@ struct X86CPU {
-> >       /* if true override the phys_bits value with a value read from =
-the host */
-> >       bool host_phys_bits;
-> > +    /* if set, limit maximum value for phys_bits when host_phys_bits=
- is true */
-> > +    uint8_t host_phys_bits_limit;
-> > +
-> >       /* Stop SMI delivery for migration compatibility with old machi=
-nes */
-> >       bool kvm_no_smi_migration;
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index f81d35e1f9..df200754a2 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -5152,6 +5152,10 @@ static void x86_cpu_realizefn(DeviceState *dev=
-, Error **errp)
-> >               if (cpu->host_phys_bits) {
-> >                   /* The user asked for us to use the host physical b=
-its */
-> >                   cpu->phys_bits =3D host_phys_bits;
-> > +                if (cpu->host_phys_bits_limit &&
-> > +                    cpu->phys_bits > cpu->host_phys_bits_limit) {
-> > +                    cpu->phys_bits =3D cpu->host_phys_bits_limit;
-> > +                }
-> >               }
-> >               /* Print a warning if the user set it to a value that's=
- not the
-> > @@ -5739,6 +5743,7 @@ static Property x86_cpu_properties[] =3D {
-> >       DEFINE_PROP_BOOL("kvm", X86CPU, expose_kvm, true),
-> >       DEFINE_PROP_UINT32("phys-bits", X86CPU, phys_bits, 0),
-> >       DEFINE_PROP_BOOL("host-phys-bits", X86CPU, host_phys_bits, fals=
-e),
-> > +    DEFINE_PROP_UINT8("host-phys-bits-limit", X86CPU, host_phys_bits=
-_limit, 0),
-> >       DEFINE_PROP_BOOL("fill-mtrr-mask", X86CPU, fill_mtrr_mask, true=
-),
-> >       DEFINE_PROP_UINT32("level", X86CPU, env.cpuid_level, UINT32_MAX=
-),
-> >       DEFINE_PROP_UINT32("xlevel", X86CPU, env.cpuid_xlevel, UINT32_M=
-AX),
->=20
-> The changes to introduce the host-phys-bits-limit option looks good to =
-me,
-> although I haven't much knowledge on this area anyway...
->=20
-> > diff --git a/tests/acceptance/x86-phys-bits.py b/tests/acceptance/x86=
--phys-bits.py
-> > new file mode 100644
-> > index 0000000000..ae85d7e4e7
-> > --- /dev/null
-> > +++ b/tests/acceptance/x86-phys-bits.py
->=20
-> PEP8 does not have a convention for Python files naming, although it
-> suggests the use of underscore on module and package names. We already =
-have
-> the tests/acceptance/boot_linux_console.py with underscore, so I think =
-we
-> should make it a convention.
+On Wed, 12 Dec 2018 09:11:03 -0500
+"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
 
-Agreed: it's better to be consistent.
+Hm, I think you need to adjust your cc: list. I added some more folks
+(and removed Dong Jia, whose address is no longer valid AFAIK).
 
->=20
->=20
-> > @@ -0,0 +1,81 @@
-> > +# Test for host-phys-bits-limit option
-> > +#
-> > +# Copyright (c) 2018 Red Hat, Inc.
-> > +#
-> > +# Author:
-> > +#  Eduardo Habkost <ehabkost@redhat.com>
-> > +#
-> > +# This work is licensed under the terms of the GNU GPL, version 2 or
-> > +# later.  See the COPYING file in the top-level directory.
-> > +import re
-> > +
-> > +from avocado_qemu import Test
-> > +
-> > +class HostPhysbits(Test):
-> > +    """
-> > +    Check if `host-phys-bits` and `host-phys-bits` options work.
->=20
-> Did you mean "`host-phys-bits` and `host-phys-bits-limit`?
+> This is to support booting from vfio-ccw dasd devices. We basically implement
+> the real hardware ipl procedure. This allows for booting Linux guests on
+> vfio-ccw devices.
+> 
+> vfio-ccw's channel program prefetch algorithm complicates ipl because most ipl
+> channel programs dynamically modify themselves. Details on the ipl process and
+> how we worked around this issue can be found in docs/devel/s390-dasd-ipl.txt.
+> 
+> NOTE: It has been a while, but I've finally chased down my infamous "reset bug".
+> On subsystem reset (I see this right after host ipl) we sometimes end up getting
+> an unexpected unit check status from a dasd device. This causes the first start
+> subchannel instruction to fail due to the pending unit check status. My solution
+> to this problem, as advised by the kernel folks, is to simply retry my ssch
+> instructions before declaring failure when unexpected unit checks happen. In the
+> event of a persistent error, after two retries we'll give up and print some
+> useful error info for the user.
 
-Yes, thanks for catching it!
+So, is that a status we only see because the vfio-ccw driver keeps the
+subchannel enabled (as by the other recent thread)?
 
->=20
-> > +
-> > +    :avocado: enable
-> > +    :avocado: tags=3Dx86_64
-> > +    """
-> > +
-> > +    def cpu_qom_get(self, prop):
-> > +        qom_path =3D self.vm.command('query-cpus')[0]['qom_path']
-> > +        return self.vm.command('qom-get', path=3Dqom_path, property=3D=
-prop)
-> > +
-> > +    def cpu_phys_bits(self):
-> > +        return self.cpu_qom_get('phys-bits')
-> > +
-> > +    def host_phys_bits(self):
-> > +        cpuinfo =3D open('/proc/cpuinfo', 'rb').read()
-> > +        m =3D re.search(b'([0-9]+) bits physical', cpuinfo)
->=20
-> pylint says:
->=20
-> "tests/acceptance/x86-phys-bits.py:31:8: C0103: Variable name "m" doesn=
-'t
-> conform to snake_case naming style (invalid-name)"
+Is there any value in distinguishing different unit checks, or is retry
+the best strategy in any case?
 
-This is one of those cases where I think a more descriptive name
-would make the code less readable.
-
->=20
-> It also warns about "Missing method docstring" for each test method. I =
-don't
-> know whether we should convention that every method must have a docstri=
-ng
-> explaining the test, or just ignore that warn.
-
-I don't think we should require docstrings for all test methods.
-I'm already bothered by the current amount of boilerplate
-required by the unittest-like Avocado API.
-
->=20
-> > +        if m is None:
-> > +            self.cancel("Couldn't read phys-bits from /proc/cpuinfo"=
-)
->=20
-> I suggest something like 'bits physical size' instead of 'phys-bits'.
-
-"physical address size" would be more accurate, I will change it.
-
-
->=20
-> > +        return int(m.group(1))
-> > +
-> > +    def setUp(self):
-> > +        super(HostPhysbits, self).setUp()
-> > +        self.vm.add_args('-S', '-machine', 'accel=3Dkvm:tcg')
->=20
-> I'm curious to know why you freeze the CPU at start (-S).
-
-Starting the VCPUs would be pointless, as there's no guest code
-to run at all.  It would just waste CPU cycles stuck in BIOS boot
-code.
-
->=20
-> > +        self.vm.launch()
-> > +        if not self.vm.command('query-kvm')['enabled']:
-> > +            self.cancel("Test case requires KVM")
-> > +        self.vm.shutdown()
-> > +
-> > +
-> > +    def test_no_host_phys_bits(self):
-> > +        # default should be phys-bits=3D40 if host-phys-bits=3Doff
->=20
-> Perhaps put that comment in a docstring block.
-
-I considered that, but then I thought that the comment doesn't
-describe the purpose of the test method at all.  It just
-clarifies why we are testing for phys-bits=3D40 below.
-
-
->=20
-> > +        self.vm.add_args('-cpu', 'qemu64,host-phys-bits=3Doff')
-> > +        self.vm.launch()
-> > +        self.assertEqual(self.cpu_phys_bits(), 40)
-[...]
->=20
-> Suppose an user sets both host-phys-bits and phys-bits by mistake. What=
- is
-> the expected outcome? If this case is relevant...below test case fails
-> (phys-bits is set to host's):
->=20
-> =A0=A0=A0 def test_manual_phys_bits_mistake(self):
-> =A0=A0=A0=A0=A0=A0=A0 """
-> =A0=A0=A0=A0=A0=A0=A0 By mistake set host-phys-bits=3Don and phys-bits
-> =A0=A0=A0=A0=A0=A0=A0 """
-> =A0=A0=A0=A0=A0=A0=A0 self.vm.add_args('-cpu', 'qemu64,host-phys-bits=3D=
-on,phys-bits=3D35')
-> =A0=A0=A0=A0=A0=A0=A0 self.vm.launch()
-> =A0=A0=A0=A0=A0=A0=A0 self.assertEqual(self.cpu_phys_bits(), 35)
-
-host-phys-bits overrides phys-bits, but I don't think we need to
-make it a supported use case.
-
---=20
-Eduardo
+> 
+> Changelog
+> ==========
+> 
+> rfc -> v1
+> ---------
+> - Retry start subchannel operations on unexpected unit check status
+> - Print more complete state information on i/o error
+> - Fixed asm constraints (Q -> QS)
+> - Align lowcore to 8k boundary
+> - Initialize next_cpa in run_dynamic_ccw_program to avoid compiler warning
+> - Cleanup: Rework handling of i/o interrupts in assembler
+> - Fix netboot image (include cio.o in make file)
+> - Misc cleanups
+> 
+> Jason J. Herne (15):
+>   s390 vfio-ccw: Add bootindex property and IPLB data
+>   s390-bios: decouple cio setup from virtio
+>   s390-bios: decouple common boot logic from virtio
+>   s390-bios: Extend find_dev() for non-virtio devices
+>   s390-bios: Factor finding boot device out of virtio code path
+>   s390-bios: Clean up cio.h
+>   s390-bios: Decouple channel i/o logic from virtio
+>   s390-bios: Map low core memory
+>   s390-bios: ptr2u32 and u32toptr
+>   s390-bios: Support for running format-0/1 channel programs
+>   s390-bios: cio error handling
+>   s390-bios: Refactor virtio to run channel programs via cio
+>   s390-bios: Use control unit type to determine boot method
+>   s390-bios: Add channel command codes/structs needed for dasd-ipl
+>   s390-bios: Support booting from real dasd device
+> 
+>  docs/devel/s390-dasd-ipl.txt     | 132 ++++++++++++++
+>  hw/s390x/ipl.c                   |  15 ++
+>  hw/s390x/s390-ccw.c              |   9 +
+>  hw/vfio/ccw.c                    |  13 +-
+>  include/hw/s390x/s390-ccw.h      |   1 +
+>  include/hw/s390x/vfio-ccw.h      |  38 ++++
+>  pc-bios/s390-ccw/Makefile        |   2 +-
+>  pc-bios/s390-ccw/cio.c           | 374 +++++++++++++++++++++++++++++++++++++++
+>  pc-bios/s390-ccw/cio.h           | 236 +++++++++++++++++++-----
+>  pc-bios/s390-ccw/dasd-ipl.c      | 249 ++++++++++++++++++++++++++
+>  pc-bios/s390-ccw/dasd-ipl.h      |  16 ++
+>  pc-bios/s390-ccw/libc.h          |  23 +++
+>  pc-bios/s390-ccw/main.c          | 161 +++++++++++------
+>  pc-bios/s390-ccw/netboot.mak     |   2 +-
+>  pc-bios/s390-ccw/netmain.c       |   1 +
+>  pc-bios/s390-ccw/s390-arch.h     | 113 ++++++++++++
+>  pc-bios/s390-ccw/s390-ccw.h      |  10 +-
+>  pc-bios/s390-ccw/start.S         |  33 +++-
+>  pc-bios/s390-ccw/virtio-blkdev.c |   1 +
+>  pc-bios/s390-ccw/virtio.c        |  46 +----
+>  roms/SLOF                        |   2 +-
+>  tests/boot-serial-test.c         |   2 +-
+>  22 files changed, 1308 insertions(+), 171 deletions(-)
+>  create mode 100644 docs/devel/s390-dasd-ipl.txt
+>  create mode 100644 include/hw/s390x/vfio-ccw.h
+>  create mode 100644 pc-bios/s390-ccw/cio.c
+>  create mode 100644 pc-bios/s390-ccw/dasd-ipl.c
+>  create mode 100644 pc-bios/s390-ccw/dasd-ipl.h
+>  create mode 100644 pc-bios/s390-ccw/s390-arch.h
+> 
+> --
+> 2.7.4
+> 
