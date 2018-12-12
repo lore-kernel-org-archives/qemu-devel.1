@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gX2zc-0002Y7-5T
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:47:56 -0500
+	(envelope-from <thuth@redhat.com>) id 1gX31A-0003Xz-8Y
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:49:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gX2zX-0002mK-7V
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:47:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45628)
+	(envelope-from <thuth@redhat.com>) id 1gX314-0003st-Qz
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:49:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38682)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gX2zW-0002lZ-RG
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:47:51 -0500
-References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
-	<1543851204-41186-20-git-send-email-pbonzini@redhat.com>
-	<f525819f-816c-da64-0871-6921996b28fb@redhat.com>
-	<4e7e0f95-364d-7cdf-67f8-394d1c371870@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gX312-0003pa-Mf
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 06:49:26 -0500
+References: <154460890212.8343.10509987157027697685@02a1dbf831e2>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8cc60559-42b2-0951-7f99-c459cda4a327@redhat.com>
-Date: Wed, 12 Dec 2018 12:47:47 +0100
+Message-ID: <62c4d238-3a51-bc11-d2b4-3136ee4583d5@redhat.com>
+Date: Wed, 12 Dec 2018 12:49:19 +0100
 MIME-Version: 1.0
-In-Reply-To: <4e7e0f95-364d-7cdf-67f8-394d1c371870@redhat.com>
+In-Reply-To: <154460890212.8343.10509987157027697685@02a1dbf831e2>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 19/71] tests: qgraph API for the qtest
- driver framework
+Subject: Re: [Qemu-devel] [PULL 0/8] Set minimum compiler versions to GCC
+ 4.8 and Clang 3.4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,28 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org, no-reply@patchew.org
+Cc: peter.maydell@linaro.org, famz@redhat.com
 
-On 2018-12-12 12:09, Paolo Bonzini wrote:
-> On 07/12/18 16:38, Thomas Huth wrote:
->> I did not do a very detailed review, but from a quick glance, this looks
->> quite good to me already (apart from the few minor issues that I've
->> mentioned above)
->>
->>  Thomas
+On 2018-12-12 11:01, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/1544606032-16924-1-git-send-email-thuth@redhat.com/
 > 
-> Good, if this is okay for you, my plan is the following:
+> Hi,
 > 
-> - send patches 1-18 in my next pull request to Peter
+> This series failed the docker-mingw@fedora build test. Please find the testing commands and
+> their output below. If you have Docker installed, you can probably reproduce it
+> locally.
 > 
-> - send patches 15-19 for review as v2, for inclusion in your qtest tree
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> time make docker-test-mingw@fedora SHOW_ENV=1 J=8
+> === TEST SCRIPT END ===
 > 
-> - once that is done and the patches are included in your tree, send the
-> more "boring" patches 20-71 directly to you as a pull request, basically
-> the same as in this submission only with checkpatch fixed.
+> The full log is available at
+> http://patchew.org/logs/1544606032-16924-1-git-send-email-thuth@redhat.com/testing.docker-mingw@fedora/?type=message.
 
-Sounds like a plan, yes. (and yes, I still plan to review the remaining
-patches, I just did not have enough spare time for that yet ...)
+That looks like a networking error?
 
  Thomas
