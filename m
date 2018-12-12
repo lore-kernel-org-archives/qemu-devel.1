@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6MZ-0000qc-Oe
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:54 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6MZ-0000py-6b
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6MY-0000Fu-7b
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:51 -0500
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:36633)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gX6MX-0000Ee-B6
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:50 -0500
+Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:55390)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gX6MX-0008WP-RA
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:50 -0500
-Received: by mail-wm1-x32f.google.com with SMTP id a18so6413088wmj.1
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:23:37 -0800 (PST)
+	id 1gX6MW-0008Vd-Vo
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 10:23:49 -0500
+Received: by mail-wm1-x330.google.com with SMTP id y139so6132645wmc.5
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 07:23:36 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 12 Dec 2018 16:22:37 +0100
-Message-Id: <1544628195-37728-17-git-send-email-pbonzini@redhat.com>
+Date: Wed, 12 Dec 2018 16:22:36 +0100
+Message-Id: <1544628195-37728-16-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
 References: <1544628195-37728-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 16/54] esp-pci: Fix status register write erase
- control
+Subject: [Qemu-devel] [PULL 15/54] block/iscsi: cancel libiscsi task when
+ ABORT TASK TMF completes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +29,64 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Guenter Roeck <linux@roeck-us.net>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 
-From: Guenter Roeck <linux@roeck-us.net>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Per AM53C974 datasheet, definition of "SCSI Bus and Control (SBAC)"
-register:
+The libiscsi iscsi_task_mgmt_async() API documentation says:
 
-Bit 24 'STATUS' Write Erase Control
+  abort_task will also cancel the scsi task. The callback for the scsi
+  task will be invoked with SCSI_STATUS_CANCELLED
 
-This bit controls the Write Erase feature on bits 3:1 and bit 6 of the DMA
-Status Register ((B)+54h). When this bit is programmed to '1', the state
-of bits 3:1 are preserved when read. Bits 3:1 are only cleared when a '1'
-is written to the corresponding bit location. For example, to clear bit 1,
-the value of '0000_0010b' should be written to the register. When the DMA
-Status Preserve bit is '0', bits 3:1 are cleared when read.
+The libiscsi implementation does not fulfil this promise.  The task's
+callback is not invoked and its struct iscsi_pdu remains in the internal
+list (effectively leaked).
 
-The status register is currently defined to bit 12, not bit 24.
-Also, its implementation is reversed: The status is auto-cleared if
-the bit is set to 1, and must be cleared explicitly when the bit is
-set to 0. This results in spurious interrupts reported by the Linux
-kernel, and in some cases even results in stalled SCSI operations.
+This patch invokes the libiscsi iscsi_scsi_cancel_task() API to force
+the task's callback to be invoked with SCSI_STATUS_CANCELLED when the
+ABORT TASK TMF completes and the task's callback hasn't been invoked
+yet.
 
-Set SBAC_STATUS to bit 24 and reverse the logic to fix the problem.
-
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-Message-Id: <1543442171-24863-1-git-send-email-linux@roeck-us.net>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20180215111526.2464-1-stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/esp-pci.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ block/iscsi.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/hw/scsi/esp-pci.c b/hw/scsi/esp-pci.c
-index 419fc66..d956909 100644
---- a/hw/scsi/esp-pci.c
-+++ b/hw/scsi/esp-pci.c
-@@ -59,7 +59,7 @@
- #define DMA_STAT_SCSIINT 0x10
- #define DMA_STAT_BCMBLT  0x20
+diff --git a/block/iscsi.c b/block/iscsi.c
+index abb872d..a7e8c1f 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -295,8 +295,12 @@ iscsi_abort_task_cb(struct iscsi_context *iscsi, int status, void *command_data,
+ {
+     IscsiAIOCB *acb = private_data;
  
--#define SBAC_STATUS 0x1000
-+#define SBAC_STATUS (1 << 24)
+-    acb->status = -ECANCELED;
+-    iscsi_schedule_bh(acb);
++    /* If the command callback hasn't been called yet, drop the task */
++    if (!acb->bh) {
++        /* Call iscsi_aio_ioctl_cb() with SCSI_STATUS_CANCELLED */
++        iscsi_scsi_cancel_task(iscsi, acb->task);
++    }
++
+     qemu_aio_unref(acb); /* acquired in iscsi_aio_cancel() */
+ }
  
- typedef struct PCIESPState {
-     /*< private >*/
-@@ -136,7 +136,7 @@ static void esp_pci_dma_write(PCIESPState *pci, uint32_t saddr, uint32_t val)
-         pci->dma_regs[saddr] = val;
-         break;
-     case DMA_STAT:
--        if (!(pci->sbac & SBAC_STATUS)) {
-+        if (pci->sbac & SBAC_STATUS) {
-             /* clear some bits on write */
-             uint32_t mask = DMA_STAT_ERROR | DMA_STAT_ABORT | DMA_STAT_DONE;
-             pci->dma_regs[DMA_STAT] &= ~(val & mask);
-@@ -157,7 +157,7 @@ static uint32_t esp_pci_dma_read(PCIESPState *pci, uint32_t saddr)
-         if (pci->esp.rregs[ESP_RSTAT] & STAT_INT) {
-             val |= DMA_STAT_SCSIINT;
-         }
--        if (pci->sbac & SBAC_STATUS) {
-+        if (!(pci->sbac & SBAC_STATUS)) {
-             pci->dma_regs[DMA_STAT] &= ~(DMA_STAT_ERROR | DMA_STAT_ABORT |
-                                          DMA_STAT_DONE);
-         }
+@@ -947,6 +951,14 @@ iscsi_aio_ioctl_cb(struct iscsi_context *iscsi, int status,
+ {
+     IscsiAIOCB *acb = opaque;
+ 
++    if (status == SCSI_STATUS_CANCELLED) {
++        if (!acb->bh) {
++            acb->status = -ECANCELED;
++            iscsi_schedule_bh(acb);
++        }
++        return;
++    }
++
+     acb->status = 0;
+     if (status < 0) {
+         error_report("Failed to ioctl(SG_IO) to iSCSI lun. %s",
 -- 
 1.8.3.1
