@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lukas.juenger@rwth-aachen.de>) id 1gXSUM-00021D-9u
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:01:25 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gXT0e-00071q-AM
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:34:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lukas.juenger@rwth-aachen.de>) id 1gXSUG-0007Cx-Ow
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:01:18 -0500
-From: =?utf-8?B?SsO8bmdlciwgTHVrYXM=?= <lukas.juenger@rwth-aachen.de>
-Date: Thu, 13 Dec 2018 15:00:57 +0000
-Message-ID: <1544713257.4811.32.camel@rwth-aachen.de>
-References: <1544708743.4811.30.camel@rwth-aachen.de>
-	<CAFEAcA-p-LC2swC8-AQt60QBhQN=PNJvBjbGXrtdvvvDd-74QA@mail.gmail.com>
-In-Reply-To: <CAFEAcA-p-LC2swC8-AQt60QBhQN=PNJvBjbGXrtdvvvDd-74QA@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <79D5A096D1038B4F8E547A3B1A325D35@rwth-ad.de>
-Content-Transfer-Encoding: base64
+	(envelope-from <stefanha@redhat.com>) id 1gXT0a-0006Co-B9
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:34:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57470)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gXT0a-0006CP-3Q
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:34:40 -0500
+Date: Thu, 13 Dec 2018 15:34:34 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20181213153434.GL23318@stefanha-x1.localdomain>
+References: <5C10DAE9.3010605@huawei.com>
+	<20181212081902-mutt-send-email-mst@kernel.org>
+	<5C11D19C.4010007@huawei.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-arm] Warning when DTB memory nodes are noped
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="1X+6QtwRodzgDPAC"
+Content-Disposition: inline
+In-Reply-To: <5C11D19C.4010007@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH] vhost-vsock: support parse mergeable
+ feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,30 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "peter.maydell@linaro.org" <peter.maydell@linaro.org>
-Cc: "eric.auger@redhat.com" <eric.auger@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: jiangyiwen <jiangyiwen@huawei.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 
-T24gVGh1LCAyMDE4LTEyLTEzIGF0IDE0OjQ5ICswMDAwLCBQZXRlciBNYXlkZWxsIHdyb3RlOg0K
-PiBPbiBUaHUsIDEzIERlYyAyMDE4IGF0IDE0OjQyLCBKw7xuZ2VyLCBMdWthcw0KPiA8bHVrYXMu
-anVlbmdlckByd3RoLWFhY2hlbi5kZT4gd3JvdGU6DQo+ID4gDQo+ID4gSGkgYWxsLA0KPiA+IA0K
-PiA+IElmIEkgdW5kZXJzdGFuZCBjb3JyZWN0bHksIGFsbCBtZW1vcnkgbm9kZXMgY29udGFpbmVk
-IGluIGEgRFRCDQo+ID4gcGFzc2VkDQo+ID4gdmlhIHRoZSAtZHRiIG9wdGlvbiBhcmUgbm9wZWQg
-aW4gaHcvYXJtL2Jvb3QuYzo1NTYtNTY4Lg0KPiA+IEkgZGlkIG5vdCBleHBlY3QgdGhpcyB0byBo
-YXBwZW4gYW5kIG9ubHkgZmlndXJlZCBpdCBvdXQgYnkNCj4gPiBkZWJ1Z2dpbmcNCj4gPiB0aGUg
-a2VybmVsLg0KPiA+IERvIHlvdSB0aGluayBhIHdhcm5pbmcgc2hvdWxkIGJlIGlzc3VlZCBpZiBh
-IERUQiBjb250YWlucyBtZW1vcnkNCj4gPiByZWdpb25zIHRoYXQgYXJlIG5vcGVkPw0KPiANCj4g
-Tm8sIGJlY2F1c2UgZ2VuZXJhbGx5IHdlIGV4cGVjdCB0aGF0IHRvIGhhcHBlbjogdGhlIERUQiB3
-aWxsDQo+IGhhdmUgYSBtZW1vcnkgbm9kZSBmb3Igd2hhdGV2ZXIgdGhlIHN0b2NrIGFtb3VudCBv
-ZiBSQU0gb24gdGhlDQo+IHRhcmdldCBib2FyZCBpcywgYnV0IHdlIHdhbnQgdG8gZGVsZXRlIHRo
-YXQgc28gd2UgY2FuIHJlcGxhY2UNCj4gaXQgd2l0aCBhIG1lbW9yeSBub2RlIHNheWluZyB0aGF0
-IHRoZSBzeXN0ZW0gaGFzIGhvd2V2ZXIgbXVjaA0KPiBSQU0gdGhlIHVzZXIgYXNrZWQgZm9yIG9u
-IHRoZSBjb21tYW5kIGxpbmUuDQo+IA0KPiBXYXMgdGhlIGRlbGV0aW9uIG9mIHRoZSBtZW1vcnkg
-bm9kZSBhY3R1YWxseSB3cm9uZyBpbiB5b3VyIGNhc2U/DQo+IElmIHNvIHdlIHNob3VsZCBsb29r
-IGF0IGZpeGluZyB0aGUgd3JvbmcgYmVoYXZpb3VyLCByYXRoZXIgdGhhbg0KPiBqdXN0IGJlaW5n
-IG5vaXNpZXIgYWJvdXQgd2hhdCB3ZSdyZSBkb2luZy4uLg0KPiANCj4gdGhhbmtzDQo+IC0tIFBN
-TQ0KDQpJIHNlZS4gSW4gbXkgY2FzZSBJIHdhbnRlZCB0byBzcGVjaWZ5IHRoZSBtZW1vcnkgdXNp
-bmcgdGhlIERUQiB0aGF0IEkNCnBhc3NlZCB1c2luZyB0aGUgLWR0YiBvcHRpb24uIEkgaGFkIHR3
-byBtZW1vcnkgcmFuZ2VzIGluIHRoZSBkdGIgYW5kDQp0aGV5IGRpZG4ndCBzaG93IHVwIGluIHRo
-ZSBrZXJuZWwgbGF0ZXIgb24gYmVjYXVzZSB0aGV5IHdlcmUgbm9wZWQgYnkNClFFTVUuIEkgZm91
-bmQgaXQgY29uZnVzaW5nIHRoYXQgUUVNVSBtYWtlcyBjaGFuZ2VzIHRvIHRoZSBEVEIgdGhhdCBJ
-DQpwYXNzZWQgdmlhIC1kdGIuIA0KDQpUaGFua3MsDQpMdWthcw==
+
+--1X+6QtwRodzgDPAC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Dec 13, 2018 at 11:27:24AM +0800, jiangyiwen wrote:
+> On 2018/12/12 21:19, Michael S. Tsirkin wrote:
+> > On Wed, Dec 12, 2018 at 05:54:49PM +0800, jiangyiwen wrote:
+> >> Currently vhost-vsock doesn't have any feature bits, so it
+> >> don't support parse mergeable rx buffer feature. And the
+> >> feature is support in another series of patches named
+> >> "VSOCK: support mergeable rx buffer in vhost-vsock".
+> >>
+> >> So we neet to support parse mergeable feature in vhost-vsock
+> >> if above patches are merged.
+> >>
+> >> Signed-off-by: Yiwen Jiang <jiangyiwen@huawei.com>
+> >=20
+> > OK but what does it do? this just defines the feature bit ...
+> > Also pls copy virtio-dev whenever you change the host/guest
+> > interface.
+> >=20
+> > Thanks!
+> >=20
+>=20
+> Hi Michael,
+>=20
+> In my opinion, for vhost device, device feature bits need to be
+> intersected between vhost and qemu, so I add mergeable rx buffer feature
+> into vdev->host_features, and then intersected with vhost_dev features.
+>=20
+> Later if someone want to add new feature, it can use virtio_add_feature()
+> in vhost_vsock_get_features().
+
+Hi Yiwen,
+I think Michael's comment is about documenting the behavior of the new
+feature bit.
+
+Each change to a VIRTIO device host<->guest interface needs to be
+discussed in the VIRTIO community <virtio-dev@lists.oasis-open.org> and
+described in a patch to the VIRTIO specification
+(https://github.com/oasis-tcs/virtio-spec/).
+
+Stefan
+
+--1X+6QtwRodzgDPAC
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcEnwKAAoJEJykq7OBq3PIL5AH/3ACv1WfSyJU38p+hnlWyP5I
++Uk83FvKmBYGgcCmA2xpJKwyHiKC4QjBP+kJtlCKzXdMu0LwQNohqkGuX9fJqexG
+vJzye8CmCrzfYxQUQjwN23/nm4rNpG4lEwdC91E+33elTTmpYrk65htbm5WRDwCq
+xECVtsPTifVWrwJWxN0IoY3EsUaTFaovM/CYr6UnVpYAX0euotqUvX7ytylThbzI
++DpuBHnHlgE5GstOpHJYlIu7dgR+ABfwjW2pMn8Vcq3UZslBquwRNK0sA/DOi2gU
+ezfSFLOe8j+QHc5LRLJLdZ99BvbSsPvf/EBx4G4alG7anNuuE7VCxnMzw9H9lT4=
+=+9yy
+-----END PGP SIGNATURE-----
+
+--1X+6QtwRodzgDPAC--
