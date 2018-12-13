@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gXLfb-0001FQ-6i
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 02:44:33 -0500
+	(envelope-from <guangrong.xiao@gmail.com>) id 1gXLsQ-0003jo-TN
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 02:57:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gXLfX-0005al-PP
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 02:44:31 -0500
-Resent-Message-Id: <E1gXLfX-0005al-PP@eggs.gnu.org>
-In-Reply-To: <20181213040126.6768-1-david@gibson.dropbear.id.au>
-Message-ID: <154468701869.9757.9904985862866857416@02a1dbf831e2>
-Reply-To: <qemu-devel@nongnu.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 12 Dec 2018 23:43:40 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/27] ppc-for-4.0 queue 20181213
+	(envelope-from <guangrong.xiao@gmail.com>) id 1gXLsO-0001pQ-3Y
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 02:57:46 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:41381)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1gXLsL-0001jt-TB
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 02:57:43 -0500
+Received: by mail-pl1-x644.google.com with SMTP id u6so664497plm.8
+	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 23:57:38 -0800 (PST)
+From: guangrong.xiao@gmail.com
+Date: Thu, 13 Dec 2018 15:57:25 +0800
+Message-Id: <20181213075727.23540-1-xiaoguangrong@tencent.com>
+Subject: [Qemu-devel] [PATCH 0/2] optimize waiting for free thread to do
+ compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,125 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: david@gibson.dropbear.id.au
-Cc: fam@euphon.net, peter.maydell@linaro.org, lvivier@redhat.com, gkurz@kaod.org, qemu-devel@nongnu.org, spopovyc@redhat.com, qemu-ppc@nongnu.org, clg@kaod.org
+To: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, wei.w.wang@intel.com, eblake@redhat.com, quintela@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIxMzA0MDEyNi42NzY4
-LTEtZGF2aWRAZ2lic29uLmRyb3BiZWFyLmlkLmF1LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1z
-IHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9y
-Cm1vcmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxODEyMTMwNDAx
-MjYuNjc2OC0xLWRhdmlkQGdpYnNvbi5kcm9wYmVhci5pZC5hdQpTdWJqZWN0OiBbUWVtdS1kZXZl
-bF0gW1BVTEwgMDAvMjddIHBwYy1mb3ItNC4wIHF1ZXVlIDIwMTgxMjEzCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAt
-LW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQg
-bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
-CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
-bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
-cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
-ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
-VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
-NDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmFkMjBkMTUgc3Bh
-cHIveGl2ZTogdXNlIHRoZSBWQ1BVIGlkIGFzIGEgTlZUIGlkZW50aWZpZXIKOTM2YmNkNSBzcGFw
-ci94aXZlOiBpbnRyb2R1Y2UgYSBYSVZFIGludGVycnVwdCBjb250cm9sbGVyCmMxM2FiYzAgcHBj
-L3hpdmU6IG5vdGlmeSB0aGUgQ1BVIHdoZW4gdGhlIGludGVycnVwdCBwcmlvcml0eSBpcyBtb3Jl
-IHByaXZpbGVnZWQKNThhMDczNSBwcGMveGl2ZTogaW50cm9kdWNlIGEgc2ltcGxpZmllZCBYSVZF
-IHByZXNlbnRlcgpmNDYzMTk2IHBwYy94aXZlOiBpbnRyb2R1Y2UgdGhlIFhJVkUgaW50ZXJydXB0
-IHRocmVhZCBjb250ZXh0CmI1YjljODUgcHBjL3hpdmU6IGFkZCBzdXBwb3J0IGZvciB0aGUgRU5E
-IEV2ZW50IFN0YXRlIEJ1ZmZlcnMKMTFkMDQ2MCBDaGFuZ2VzIHJlcXVpcmVtZW50IGZvciAidnN1
-YnNicyIgaW5zdHJ1Y3Rpb24KMzdlNzUwMyBzcGFwcjogZXhwb3J0IGFuZCByZW5hbWUgdGhlIHhp
-Y3NfbWF4X3NlcnZlcl9udW1iZXIoKSByb3V0aW5lCjRkN2EwODEgc3BhcHI6IGludHJvZHVjZSBh
-IHNwYXByX2lycV9pbml0KCkgcm91dGluZQoyMmUxNGQ4IHNwYXByOiBpbml0aWFsaXplIFZTTVQg
-YmVmb3JlIGluaXRpYWxpemluZyB0aGUgSVJRIGJhY2tlbmQKZTg1ODIxZiBwcGMveGl2ZTogaW50
-cm9kdWNlIHRoZSBYSVZFIEV2ZW50IE5vdGlmaWNhdGlvbiBEZXNjcmlwdG9ycwozN2FkZjg0IHBw
-Yy94aXZlOiBpbnRyb2R1Y2UgdGhlIFhpdmVSb3V0ZXIgbW9kZWwKYjE3YzIxNiBwcGMveGl2ZTog
-aW50cm9kdWNlIHRoZSBYaXZlTm90aWZpZXIgaW50ZXJmYWNlCmU5YWEwYzkgcHBjL3hpdmU6IGFk
-ZCBzdXBwb3J0IGZvciB0aGUgTFNJIGludGVycnVwdCBzb3VyY2VzCmFmYTI2YTAgcHBjL3hpdmU6
-IGludHJvZHVjZSBhIFhJVkUgaW50ZXJydXB0IHNvdXJjZSBtb2RlbAo0MDUyYjFhIGU1MDA6IHNp
-bXBsaWZ5IElSUSB3aXJpbmcKZjAxZWRkNSBtYWNfbmV3d29ybGQ6IHNpbXBsaWZ5IElSUSB3aXJp
-bmcKZGQwOTE2OCB2aXJ0ZXhfbWw1MDc6IHVzZSBnX25ldyhULCBuKSBpbnN0ZWFkIG9mIGdfbWFs
-bG9jKHNpemVvZihUKSAqIG4pCjY2NjYwMDEgc2FtNDYwZXg6IHVzZSBnX25ldyhULCBuKSBpbnN0
-ZWFkIG9mIGdfbWFsbG9jKHNpemVvZihUKSAqIG4pCmFlMTJhNGMgcHBjNDQwX2JhbWJvbzogdXNl
-IGdfbmV3KFQsIG4pIGluc3RlYWQgb2YgZ19tYWxsb2Moc2l6ZW9mKFQpICogbikKMDEyNmFlZSBw
-cGM0MDVfdWM6IHVzZSBnX25ldyhULCBuKSBpbnN0ZWFkIG9mIGdfbWFsbG9jKHNpemVvZihUKSAq
-IG4pCmY5YTFkNTEgcHBjNDA1X2JvYXJkczogdXNlIGdfbmV3KFQsIG4pIGluc3RlYWQgb2YgZ19t
-YWxsb2Moc2l6ZW9mKFQpICogbikKMWRjMTI4MiBzcGFwcjogdXNlIGdfbmV3KFQsIG4pIGluc3Rl
-YWQgb2YgZ19tYWxsb2Moc2l6ZW9mKFQpICogbikKNjFlYjljNiB0YXJnZXQvcHBjOiB1c2UgZ19u
-ZXcoVCwgbikgaW5zdGVhZCBvZiBnX21hbGxvYyhzaXplb2YoVCkgKiBuKQpkYjY0OTJmIHNwYXBy
-OiBkcm9wIHJlZHVuZGFudCBzdGF0ZW1lbnQgaW4gc3BhcHJfcG9wdWxhdGVfZHJjb25mX21lbW9y
-eSgpCjYxZDYzNTIgdGFyZ2V0L3BwYzogdGNnOiBJbXBsZW1lbnQgYWRkZXggaW5zdHJ1Y3Rpb24K
-MTdlZTk0OSBzcGFwcjogRml4IGlibSwgbWF4LWFzc29jaWF0aXZpdHktZG9tYWlucyBwcm9wZXJ0
-eSBudW1iZXIgb2Ygbm9kZXMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEv
-Mjc6IHNwYXByOiBGaXggaWJtLCBtYXgtYXNzb2NpYXRpdml0eS1kb21haW5zIHByb3BlcnR5IG51
-bWJlciBvZiBub2Rlcy4uLgpDaGVja2luZyBQQVRDSCAyLzI3OiB0YXJnZXQvcHBjOiB0Y2c6IElt
-cGxlbWVudCBhZGRleCBpbnN0cnVjdGlvbi4uLgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIg
-dGhhdCAnLCcgKGN0eDpWeFYpCiM0MjogRklMRTogZGlzYXMvcHBjLmM6MzczNzoKK3sgImFkZGV4
-IiwgICBYTygzMSwxNzAsMCwwKSwgWE9fTUFTSywgICBQT1dFUjksICAgICAgICAgeyBSVCwgUkEs
-IFJCIH0gfSwKICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRl
-ciB0aGF0ICcsJyAoY3R4OlZ4VikKIzQyOiBGSUxFOiBkaXNhcy9wcGMuYzozNzM3OgoreyAiYWRk
-ZXgiLCAgIFhPKDMxLDE3MCwwLDApLCBYT19NQVNLLCAgIFBPV0VSOSwgICAgICAgICB7IFJULCBS
-QSwgUkIgfSB9LAogICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1aXJl
-ZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzQyOiBGSUxFOiBkaXNhcy9wcGMuYzozNzM3Ogor
-eyAiYWRkZXgiLCAgIFhPKDMxLDE3MCwwLDApLCBYT19NQVNLLCAgIFBPV0VSOSwgICAgICAgICB7
-IFJULCBSQSwgUkIgfSB9LAogICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDMgZXJy
-b3JzLCAwIHdhcm5pbmdzLCAxNTYgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMy8yNzogc3BhcHI6IGRyb3AgcmVkdW5k
-YW50IHN0YXRlbWVudCBpbiBzcGFwcl9wb3B1bGF0ZV9kcmNvbmZfbWVtb3J5KCkuLi4KQ2hlY2tp
-bmcgUEFUQ0ggNC8yNzogdGFyZ2V0L3BwYzogdXNlIGdfbmV3KFQsIG4pIGluc3RlYWQgb2YgZ19t
-YWxsb2Moc2l6ZW9mKFQpICogbikuLi4KQ2hlY2tpbmcgUEFUQ0ggNS8yNzogc3BhcHI6IHVzZSBn
-X25ldyhULCBuKSBpbnN0ZWFkIG9mIGdfbWFsbG9jKHNpemVvZihUKSAqIG4pLi4uCkNoZWNraW5n
-IFBBVENIIDYvMjc6IHBwYzQwNV9ib2FyZHM6IHVzZSBnX25ldyhULCBuKSBpbnN0ZWFkIG9mIGdf
-bWFsbG9jKHNpemVvZihUKSAqIG4pLi4uCkNoZWNraW5nIFBBVENIIDcvMjc6IHBwYzQwNV91Yzog
-dXNlIGdfbmV3KFQsIG4pIGluc3RlYWQgb2YgZ19tYWxsb2Moc2l6ZW9mKFQpICogbikuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggOC8yNzogcHBjNDQwX2JhbWJvbzogdXNlIGdfbmV3KFQsIG4pIGluc3RlYWQg
-b2YgZ19tYWxsb2Moc2l6ZW9mKFQpICogbikuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8yNzogc2FtNDYw
-ZXg6IHVzZSBnX25ldyhULCBuKSBpbnN0ZWFkIG9mIGdfbWFsbG9jKHNpemVvZihUKSAqIG4pLi4u
-CkNoZWNraW5nIFBBVENIIDEwLzI3OiB2aXJ0ZXhfbWw1MDc6IHVzZSBnX25ldyhULCBuKSBpbnN0
-ZWFkIG9mIGdfbWFsbG9jKHNpemVvZihUKSAqIG4pLi4uCkNoZWNraW5nIFBBVENIIDExLzI3OiBt
-YWNfbmV3d29ybGQ6IHNpbXBsaWZ5IElSUSB3aXJpbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMjc6
-IGU1MDA6IHNpbXBsaWZ5IElSUSB3aXJpbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMjc6IHBwYy94
-aXZlOiBpbnRyb2R1Y2UgYSBYSVZFIGludGVycnVwdCBzb3VyY2UgbW9kZWwuLi4KV0FSTklORzog
-YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
-ZGF0aW5nPwojNjE6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdh
-cm5pbmdzLCA2NTYgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgpDaGVja2luZyBQQVRDSCAxNC8yNzogcHBjL3hpdmU6IGFkZCBzdXBwb3J0IGZvciB0
-aGUgTFNJIGludGVycnVwdCBzb3VyY2VzLi4uCkNoZWNraW5nIFBBVENIIDE1LzI3OiBwcGMveGl2
-ZTogaW50cm9kdWNlIHRoZSBYaXZlTm90aWZpZXIgaW50ZXJmYWNlLi4uCkNoZWNraW5nIFBBVENI
-IDE2LzI3OiBwcGMveGl2ZTogaW50cm9kdWNlIHRoZSBYaXZlUm91dGVyIG1vZGVsLi4uCldBUk5J
-Tkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVl
-ZCB1cGRhdGluZz8KIzE3MDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMs
-IDEgd2FybmluZ3MsIDE3OSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDE3LzI3OiBwcGMveGl2ZTogaW50cm9kdWNlIHRo
-ZSBYSVZFIEV2ZW50IE5vdGlmaWNhdGlvbiBEZXNjcmlwdG9ycy4uLgpDaGVja2luZyBQQVRDSCAx
-OC8yNzogc3BhcHI6IGluaXRpYWxpemUgVlNNVCBiZWZvcmUgaW5pdGlhbGl6aW5nIHRoZSBJUlEg
-YmFja2VuZC4uLgpDaGVja2luZyBQQVRDSCAxOS8yNzogc3BhcHI6IGludHJvZHVjZSBhIHNwYXBy
-X2lycV9pbml0KCkgcm91dGluZS4uLgpDaGVja2luZyBQQVRDSCAyMC8yNzogc3BhcHI6IGV4cG9y
-dCBhbmQgcmVuYW1lIHRoZSB4aWNzX21heF9zZXJ2ZXJfbnVtYmVyKCkgcm91dGluZS4uLgpDaGVj
-a2luZyBQQVRDSCAyMS8yNzogQ2hhbmdlcyByZXF1aXJlbWVudCBmb3IgInZzdWJzYnMiIGluc3Ry
-dWN0aW9uLi4uCkNoZWNraW5nIFBBVENIIDIyLzI3OiBwcGMveGl2ZTogYWRkIHN1cHBvcnQgZm9y
-IHRoZSBFTkQgRXZlbnQgU3RhdGUgQnVmZmVycy4uLgpDaGVja2luZyBQQVRDSCAyMy8yNzogcHBj
-L3hpdmU6IGludHJvZHVjZSB0aGUgWElWRSBpbnRlcnJ1cHQgdGhyZWFkIGNvbnRleHQuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMjQvMjc6IHBwYy94aXZlOiBpbnRyb2R1Y2UgYSBzaW1wbGlmaWVkIFhJVkUg
-cHJlc2VudGVyLi4uCkNoZWNraW5nIFBBVENIIDI1LzI3OiBwcGMveGl2ZTogbm90aWZ5IHRoZSBD
-UFUgd2hlbiB0aGUgaW50ZXJydXB0IHByaW9yaXR5IGlzIG1vcmUgcHJpdmlsZWdlZC4uLgpDaGVj
-a2luZyBQQVRDSCAyNi8yNzogc3BhcHIveGl2ZTogaW50cm9kdWNlIGEgWElWRSBpbnRlcnJ1cHQg
-Y29udHJvbGxlci4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBk
-b2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1OTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0
-Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQyNSBsaW5lcyBjaGVja2VkCgpZb3VyIHBh
-dGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDI3LzI3OiBzcGFw
-ci94aXZlOiB1c2UgdGhlIFZDUFUgaWQgYXMgYSBOVlQgaWRlbnRpZmllci4uLgo9PT0gT1VUUFVU
-IEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9n
-IGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE4MTIxMzA0MDEyNi42
-NzY4LTEtZGF2aWRAZ2lic29uLmRyb3BiZWFyLmlkLmF1L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlw
-ZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
-aHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEByZWRoYXQuY29t
+From: Xiao Guangrong <xiaoguangrong@tencent.com>
+
+Currently we have two behaviors if all threads are busy to do compression,
+the main thread mush wait one of them becoming free if @compress-wait-thread
+set to on or the main thread can directly return without wait and post
+the page out as normal one
+
+Both of them have its profits and short-comes, however, if the bandwidth is
+not limited extremely so that compression can not use out all of it bandwidth,
+at the same time, the migration process is easily throttled if we posted too
+may pages as normal pages. None of them can work properly under this case
+
+In order to use the bandwidth more effectively, we introduce the third
+behavior, compress-wait-thread-adaptive, which make the main thread wait
+if there is no bandwidth left or let the page go out as normal page if there
+has enough bandwidth to make sure the migration process will not be
+throttled
+
+Another patch introduces a new statistic, pages-per-second, as bandwidth
+or mbps is not enough to measure the performance of posting pages out as
+we have compression, xbzrle, which can significantly reduce the amount of
+the data size, instead, pages-per-second if the one we want
+
+Performance data
+================
+We have limited the bandwidth to 300
+
+                                Used Bandwidth     Pages-per-Second
+compress-wait-thread = on         951.66 mbps         131784
+
+compress-wait-thread = off        2491.74 mbps        93495
+compress-wait-thread-adaptive     1982.94 mbps        162529
+   = on
+
+Xiao Guangrong (2):
+  migration: introduce compress-wait-thread-adaptive
+  migration: introduce pages-per-second
+
+ hmp.c                 |  13 ++++++
+ migration/migration.c |  49 +++++++++++++++++++-
+ migration/migration.h |  12 +++++
+ migration/ram.c       | 124 ++++++++++++++++++++++++++++++++++++++++++++++----
+ qapi/migration.json   |  31 +++++++++++--
+ 5 files changed, 215 insertions(+), 14 deletions(-)
+
+-- 
+2.14.5
