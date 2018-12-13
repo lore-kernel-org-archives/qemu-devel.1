@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gXJCw-0007x5-G3
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:49 -0500
+	(envelope-from <cota@braap.org>) id 1gXJCy-0007yl-8W
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gXJCv-00023C-E8
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:46 -0500
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:51775)
+	(envelope-from <cota@braap.org>) id 1gXJCw-00028H-HX
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:47 -0500
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:46771)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gXJCv-0001n1-6H
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:45 -0500
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gXJCw-0001oW-5E
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:46 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 13 Dec 2018 00:04:33 -0500
-Message-Id: <20181213050453.9677-54-cota@braap.org>
+Date: Thu, 13 Dec 2018 00:04:40 -0500
+Message-Id: <20181213050453.9677-61-cota@braap.org>
 In-Reply-To: <20181213050453.9677-1-cota@braap.org>
 References: <20181213050453.9677-1-cota@braap.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 53/73] alpha: convert to
- cpu_interrupt_request
+Subject: [Qemu-devel] [PATCH v5 60/73] cpu: convert to interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +26,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+This finishes the conversion to interrupt_request.
+
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/alpha/cpu.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ qom/cpu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
-index a953897fcc..4e8965fb6c 100644
---- a/target/alpha/cpu.c
-+++ b/target/alpha/cpu.c
-@@ -42,10 +42,10 @@ static bool alpha_cpu_has_work(CPUState *cs)
-        assume that if a CPU really wants to stay asleep, it will mask
-        interrupts at the chipset level, which will prevent these bits
-        from being set in the first place.  */
--    return cs->interrupt_request & (CPU_INTERRUPT_HARD
--                                    | CPU_INTERRUPT_TIMER
--                                    | CPU_INTERRUPT_SMP
--                                    | CPU_INTERRUPT_MCHK);
-+    return cpu_interrupt_request(cs) & (CPU_INTERRUPT_HARD
-+                                        | CPU_INTERRUPT_TIMER
-+                                        | CPU_INTERRUPT_SMP
-+                                        | CPU_INTERRUPT_MCHK);
- }
+diff --git a/qom/cpu.c b/qom/cpu.c
+index 44b78f1892..7452109833 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -275,7 +275,7 @@ static void cpu_common_reset(CPUState *cpu)
+         log_cpu_state(cpu, cc->reset_dump_flags);
+     }
  
- static void alpha_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
+-    cpu->interrupt_request = 0;
++    cpu_interrupt_request_set(cpu, 0);
+     cpu_halted_set(cpu, 0);
+     cpu->mem_io_pc = 0;
+     cpu->mem_io_vaddr = 0;
+@@ -410,7 +410,7 @@ static vaddr cpu_adjust_watchpoint_address(CPUState *cpu, vaddr addr, int len)
+ 
+ static void generic_handle_interrupt(CPUState *cpu, int mask)
+ {
+-    cpu->interrupt_request |= mask;
++    cpu_interrupt_request_or(cpu, mask);
+ 
+     if (!qemu_cpu_is_self(cpu)) {
+         qemu_cpu_kick(cpu);
 -- 
 2.17.1
