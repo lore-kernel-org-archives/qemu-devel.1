@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXVxv-0005pl-I9
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:08 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXVxr-0002i5-Kt
+	(envelope-from <armbru@redhat.com>) id 1gXVxr-0005l8-KX
 	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39508)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <armbru@redhat.com>) id 1gXVxn-0002Rm-TP
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46396)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXVxo-0001OY-H2
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:01 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXVxl-0001ie-Vh
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:43:58 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A40B881129
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 18:43:45 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4434C4E93D
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 18:43:50 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 13 Dec 2018 19:43:17 +0100
-Message-Id: <20181213184340.24037-10-armbru@redhat.com>
+Date: Thu, 13 Dec 2018 19:43:40 +0100
+Message-Id: <20181213184340.24037-33-armbru@redhat.com>
 In-Reply-To: <20181213184340.24037-1-armbru@redhat.com>
 References: <20181213184340.24037-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 09/32] test-string-input-visitor: Add range
- overflow tests
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 32/32] qapi: add conditions to REPLICATION
+ type/commands on the schema
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,62 +34,222 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: David Hildenbrand <david@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: David Hildenbrand <david@redhat.com>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Let's make sure that the range handling code can properly deal with
-ranges that end at the biggest possible number.
+Add #if defined(CONFIG_REPLICATION) in generated code, and adjust the
+code accordingly.
 
+Made conditional:
+
+* xen-set-replication, query-xen-replication-status,
+  xen-colo-do-checkpoint
+
+  Before the patch, we first register the commands unconditionally in
+  generated code (requires a stub), then conditionally unregister in
+  qmp_unregister_commands_hack().
+
+  Afterwards, we register only when CONFIG_REPLICATION.  The command
+  fails exactly the same, with CommandNotFound.
+
+  Improvement, because now query-qmp-schema is accurate, and we're one
+  step closer to killing qmp_unregister_commands_hack().
+
+* enum BlockdevDriver value "replication" in command blockdev-add
+
+* BlockdevOptions variant @replication
+
+and related structures.
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20181121164421.20780-10-david@redhat.com>
+Message-Id: <20181213123724.4866-23-marcandre.lureau@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/test-string-input-visitor.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ migration/colo.c     | 16 ++++------------
+ monitor.c            |  5 -----
+ qapi/block-core.json | 13 +++++++++----
+ qapi/migration.json  | 12 ++++++++----
+ 4 files changed, 21 insertions(+), 25 deletions(-)
 
-diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-visitor.c
-index 9b1dd44b2d..34b54dfc89 100644
---- a/tests/test-string-input-visitor.c
-+++ b/tests/test-string-input-visitor.c
-@@ -112,6 +112,7 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
-     int64_t expect2[] = { 32767, -32768, -32767 };
-     int64_t expect3[] = { INT64_MIN, INT64_MAX };
-     int64_t expect4[] = { 1 };
-+    int64_t expect5[] = { INT64_MAX - 2,  INT64_MAX - 1, INT64_MAX };
-     Error *err = NULL;
-     int64List *res = NULL;
-     Visitor *v;
-@@ -132,6 +133,10 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
-     v = visitor_input_test_init(data, "1-1");
-     check_ilist(v, expect4, ARRAY_SIZE(expect4));
- 
-+    v = visitor_input_test_init(data,
-+                                "9223372036854775805-9223372036854775807");
-+    check_ilist(v, expect5, ARRAY_SIZE(expect5));
-+
-     /* Value too large */
- 
-     v = visitor_input_test_init(data, "9223372036854775808");
-@@ -216,6 +221,7 @@ static void test_visitor_in_uintList(TestInputVisitorData *data,
-     uint64_t expect3[] = { INT64_MIN, INT64_MAX };
-     uint64_t expect4[] = { 1 };
-     uint64_t expect5[] = { UINT64_MAX };
-+    uint64_t expect6[] = { UINT64_MAX - 2,  UINT64_MAX - 1, UINT64_MAX };
-     Error *err = NULL;
-     uint64List *res = NULL;
-     Visitor *v;
-@@ -239,6 +245,10 @@ static void test_visitor_in_uintList(TestInputVisitorData *data,
-     v = visitor_input_test_init(data, "18446744073709551615");
-     check_ulist(v, expect5, ARRAY_SIZE(expect5));
- 
-+    v = visitor_input_test_init(data,
-+                                "18446744073709551613-18446744073709551615");
-+    check_ulist(v, expect6, ARRAY_SIZE(expect6));
-+
-     /* Value too large */
- 
-     v = visitor_input_test_init(data, "18446744073709551616");
--- 
+diff --git a/migration/colo.c b/migration/colo.c
+index fcff04c78c..398b239d1c 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -24,7 +24,9 @@
+ #include "trace.h"
+ #include "qemu/error-report.h"
+ #include "migration/failover.h"
++#ifdef CONFIG_REPLICATION
+ #include "replication.h"
++#endif
+ #include "net/colo-compare.h"
+ #include "net/colo.h"
+ #include "block/block.h"
+@@ -201,11 +203,11 @@ void colo_do_failover(MigrationState *s)
+     }
+ }
+=20
++#ifdef CONFIG_REPLICATION
+ void qmp_xen_set_replication(bool enable, bool primary,
+                              bool has_failover, bool failover,
+                              Error **errp)
+ {
+-#ifdef CONFIG_REPLICATION
+     ReplicationMode mode =3D primary ?
+                            REPLICATION_MODE_PRIMARY :
+                            REPLICATION_MODE_SECONDARY;
+@@ -224,14 +226,10 @@ void qmp_xen_set_replication(bool enable, bool prim=
+ary,
+         }
+         replication_stop_all(failover, failover ? NULL : errp);
+     }
+-#else
+-    abort();
+-#endif
+ }
+=20
+ ReplicationStatus *qmp_query_xen_replication_status(Error **errp)
+ {
+-#ifdef CONFIG_REPLICATION
+     Error *err =3D NULL;
+     ReplicationStatus *s =3D g_new0(ReplicationStatus, 1);
+=20
+@@ -246,19 +244,13 @@ ReplicationStatus *qmp_query_xen_replication_status=
+(Error **errp)
+=20
+     error_free(err);
+     return s;
+-#else
+-    abort();
+-#endif
+ }
+=20
+ void qmp_xen_colo_do_checkpoint(Error **errp)
+ {
+-#ifdef CONFIG_REPLICATION
+     replication_do_checkpoint_all(errp);
+-#else
+-    abort();
+-#endif
+ }
++#endif
+=20
+ COLOStatus *qmp_query_colo_status(Error **errp)
+ {
+diff --git a/monitor.c b/monitor.c
+index cf9cece965..7848a3cb0d 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1147,11 +1147,6 @@ static void qmp_query_qmp_schema(QDict *qdict, QOb=
+ject **ret_data,
+  */
+ static void qmp_unregister_commands_hack(void)
+ {
+-#ifndef CONFIG_REPLICATION
+-    qmp_unregister_command(&qmp_commands, "xen-set-replication");
+-    qmp_unregister_command(&qmp_commands, "query-xen-replication-status"=
+);
+-    qmp_unregister_command(&qmp_commands, "xen-colo-do-checkpoint");
+-#endif
+ #ifndef TARGET_I386
+     qmp_unregister_command(&qmp_commands, "rtc-reset-reinjection");
+     qmp_unregister_command(&qmp_commands, "query-sev");
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 92e0205d91..762000f31f 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2623,7 +2623,9 @@
+             'copy-on-read', 'dmg', 'file', 'ftp', 'ftps', 'gluster',
+             'host_cdrom', 'host_device', 'http', 'https', 'iscsi', 'luks=
+',
+             'nbd', 'nfs', 'null-aio', 'null-co', 'nvme', 'parallels', 'q=
+cow',
+-            'qcow2', 'qed', 'quorum', 'raw', 'rbd', 'replication', 'shee=
+pdog',
++            'qcow2', 'qed', 'quorum', 'raw', 'rbd',
++            { 'name': 'replication', 'if': 'defined(CONFIG_REPLICATION)'=
+ },
++            'sheepdog',
+             'ssh', 'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'v=
+xhs' ] }
+=20
+ ##
+@@ -3380,7 +3382,8 @@
+ #
+ # Since: 2.9
+ ##
+-{ 'enum' : 'ReplicationMode', 'data' : [ 'primary', 'secondary' ] }
++{ 'enum' : 'ReplicationMode', 'data' : [ 'primary', 'secondary' ],
++  'if': 'defined(CONFIG_REPLICATION)' }
+=20
+ ##
+ # @BlockdevOptionsReplication:
+@@ -3398,7 +3401,8 @@
+ { 'struct': 'BlockdevOptionsReplication',
+   'base': 'BlockdevOptionsGenericFormat',
+   'data': { 'mode': 'ReplicationMode',
+-            '*top-id': 'str' } }
++            '*top-id': 'str' },
++  'if': 'defined(CONFIG_REPLICATION)' }
+=20
+ ##
+ # @NFSTransport:
+@@ -3714,7 +3718,8 @@
+       'quorum':     'BlockdevOptionsQuorum',
+       'raw':        'BlockdevOptionsRaw',
+       'rbd':        'BlockdevOptionsRbd',
+-      'replication':'BlockdevOptionsReplication',
++      'replication': { 'type': 'BlockdevOptionsReplication',
++                       'if': 'defined(CONFIG_REPLICATION)' },
+       'sheepdog':   'BlockdevOptionsSheepdog',
+       'ssh':        'BlockdevOptionsSsh',
+       'throttle':   'BlockdevOptionsThrottle',
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 5fd33316a0..31b589ec26 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -1257,7 +1257,8 @@
+ # Since: 2.9
+ ##
+ { 'command': 'xen-set-replication',
+-  'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' } =
+}
++  'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' },
++  'if': 'defined(CONFIG_REPLICATION)' }
+=20
+ ##
+ # @ReplicationStatus:
+@@ -1272,7 +1273,8 @@
+ # Since: 2.9
+ ##
+ { 'struct': 'ReplicationStatus',
+-  'data': { 'error': 'bool', '*desc': 'str' } }
++  'data': { 'error': 'bool', '*desc': 'str' },
++  'if': 'defined(CONFIG_REPLICATION)' }
+=20
+ ##
+ # @query-xen-replication-status:
+@@ -1289,7 +1291,8 @@
+ # Since: 2.9
+ ##
+ { 'command': 'query-xen-replication-status',
+-  'returns': 'ReplicationStatus' }
++  'returns': 'ReplicationStatus',
++  'if': 'defined(CONFIG_REPLICATION)' }
+=20
+ ##
+ # @xen-colo-do-checkpoint:
+@@ -1305,7 +1308,8 @@
+ #
+ # Since: 2.9
+ ##
+-{ 'command': 'xen-colo-do-checkpoint' }
++{ 'command': 'xen-colo-do-checkpoint',
++  'if': 'defined(CONFIG_REPLICATION)' }
+=20
+ ##
+ # @COLOStatus:
+--=20
 2.17.2
