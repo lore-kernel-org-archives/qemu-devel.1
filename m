@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gXICA-0003kk-OS
+	(envelope-from <dgibson@ozlabs.org>) id 1gXICD-0003ln-Pu
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 23:01:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gXIC3-000271-Tm
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 23:01:54 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gXICA-0002KN-IA
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 23:01:57 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 13 Dec 2018 15:01:12 +1100
-Message-Id: <20181213040126.6768-14-david@gibson.dropbear.id.au>
+Date: Thu, 13 Dec 2018 15:01:24 +1100
+Message-Id: <20181213040126.6768-26-david@gibson.dropbear.id.au>
 In-Reply-To: <20181213040126.6768-1-david@gibson.dropbear.id.au>
 References: <20181213040126.6768-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 13/27] ppc/xive: introduce a XIVE interrupt
- source model
+Subject: [Qemu-devel] [PULL 25/27] ppc/xive: notify the CPU when the
+ interrupt priority is more privileged
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,749 +28,186 @@ Cc: gkurz@kaod.org, clg@kaod.org, lvivier@redhat.com, spopovyc@redhat.com, qemu-
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-The first sub-engine of the overall XIVE architecture is the Interrupt
-Virtualization Source Engine (IVSE). An IVSE can be integrated into
-another logic, like in a PCI PHB or in the main interrupt controller
-to manage IPIs.
+After the event data was enqueued in the O/S Event Queue, the IVPE
+raises the bit corresponding to the priority of the pending interrupt
+in the register IBP (Interrupt Pending Buffer) to indicate there is an
+event pending in one of the 8 priority queues. The Pending Interrupt
+Priority Register (PIPR) is also updated using the IPB. This register
+represent the priority of the most favored pending notification.
 
-Each IVSE instance is associated with an Event State Buffer (ESB) that
-contains a two bit state entry for each possible event source. When an
-event is signaled to the IVSE, by MMIO or some other means, the
-associated interrupt state bits are fetched from the ESB and
-modified. Depending on the resulting ESB state, the event is forwarded
-to the IVRE sub-engine of the controller doing the routing.
+The PIPR is then compared to the the Current Processor Priority
+Register (CPPR). If it is more favored (numerically less than), the
+CPU interrupt line is raised and the EO bit of the Notification Source
+Register (NSR) is updated to notify the presence of an exception for
+the O/S. The check needs to be done whenever the PIPR or the CPPR are
+changed.
 
-Each supported ESB entry is associated with either a single or a
-even/odd pair of pages which provides commands to manage the source:
-to EOI, to turn off the source for instance.
-
-On a sPAPR machine, the O/S will obtain the page address of the ESB
-entry associated with a source and its characteristic using the
-H_INT_GET_SOURCE_INFO hcall. On PowerNV, a similar OPAL call is used.
-
-The xive_source_notify() routine is in charge forwarding the source
-event notification to the routing engine. It will be filled later on.
+The O/S acknowledges the interrupt with a special load in the Thread
+Interrupt Management Area. If the EO bit of the NSR is set, the CPPR
+takes the value of PIPR. The bit number in the IBP corresponding to
+the priority of the pending interrupt is reseted and so is the EO bit
+of the NSR.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- default-configs/ppc64-softmmu.mak |   1 +
- hw/intc/Makefile.objs             |   1 +
- hw/intc/xive.c                    | 382 ++++++++++++++++++++++++++++++
- include/hw/ppc/xive.h             | 260 ++++++++++++++++++++
- 4 files changed, 644 insertions(+)
- create mode 100644 hw/intc/xive.c
- create mode 100644 include/hw/ppc/xive.h
+ hw/intc/xive.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 93 insertions(+), 1 deletion(-)
 
-diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-so=
-ftmmu.mak
-index aec2855750..2d1e7c5c46 100644
---- a/default-configs/ppc64-softmmu.mak
-+++ b/default-configs/ppc64-softmmu.mak
-@@ -16,6 +16,7 @@ CONFIG_VIRTIO_VGA=3Dy
- CONFIG_XICS=3D$(CONFIG_PSERIES)
- CONFIG_XICS_SPAPR=3D$(CONFIG_PSERIES)
- CONFIG_XICS_KVM=3D$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
-+CONFIG_XIVE=3D$(CONFIG_PSERIES)
- CONFIG_MEM_DEVICE=3Dy
- CONFIG_DIMM=3Dy
- CONFIG_SPAPR_RNG=3Dy
-diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
-index 0e9963f5ee..72a46ed91c 100644
---- a/hw/intc/Makefile.objs
-+++ b/hw/intc/Makefile.objs
-@@ -37,6 +37,7 @@ obj-$(CONFIG_SH4) +=3D sh_intc.o
- obj-$(CONFIG_XICS) +=3D xics.o
- obj-$(CONFIG_XICS_SPAPR) +=3D xics_spapr.o
- obj-$(CONFIG_XICS_KVM) +=3D xics_kvm.o
-+obj-$(CONFIG_XIVE) +=3D xive.o
- obj-$(CONFIG_POWERNV) +=3D xics_pnv.o
- obj-$(CONFIG_ALLWINNER_A10_PIC) +=3D allwinner-a10-pic.o
- obj-$(CONFIG_S390_FLIC) +=3D s390_flic.o
 diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-new file mode 100644
-index 0000000000..6389bd8323
---- /dev/null
+index 3eecffe99b..ea5385ff77 100644
+--- a/hw/intc/xive.c
 +++ b/hw/intc/xive.c
-@@ -0,0 +1,382 @@
-+/*
-+ * QEMU PowerPC XIVE interrupt controller model
-+ *
-+ * Copyright (c) 2017-2018, IBM Corporation.
-+ *
-+ * This code is licensed under the GPL version 2 or later. See the
-+ * COPYING file in the top-level directory.
+@@ -22,9 +22,73 @@
+  * XIVE Thread Interrupt Management context
+  */
+=20
++/* Convert a priority number to an Interrupt Pending Buffer (IPB)
++ * register, which indicates a pending interrupt at the priority
++ * corresponding to the bit number
 + */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "qapi/error.h"
-+#include "target/ppc/cpu.h"
-+#include "sysemu/cpus.h"
-+#include "sysemu/dma.h"
-+#include "hw/qdev-properties.h"
-+#include "monitor/monitor.h"
-+#include "hw/ppc/xive.h"
-+
-+/*
-+ * XIVE ESB helpers
-+ */
-+
-+static uint8_t xive_esb_set(uint8_t *pq, uint8_t value)
++static uint8_t priority_to_ipb(uint8_t priority)
 +{
-+    uint8_t old_pq =3D *pq & 0x3;
-+
-+    *pq &=3D ~0x3;
-+    *pq |=3D value & 0x3;
-+
-+    return old_pq;
++    return priority > XIVE_PRIORITY_MAX ?
++        0 : 1 << (XIVE_PRIORITY_MAX - priority);
 +}
 +
-+static bool xive_esb_trigger(uint8_t *pq)
++/* Convert an Interrupt Pending Buffer (IPB) register to a Pending
++ * Interrupt Priority Register (PIPR), which contains the priority of
++ * the most favored pending notification.
++ */
++static uint8_t ipb_to_pipr(uint8_t ibp)
 +{
-+    uint8_t old_pq =3D *pq & 0x3;
++    return ibp ? clz32((uint32_t)ibp << 24) : 0xff;
++}
 +
-+    switch (old_pq) {
-+    case XIVE_ESB_RESET:
-+        xive_esb_set(pq, XIVE_ESB_PENDING);
-+        return true;
-+    case XIVE_ESB_PENDING:
-+    case XIVE_ESB_QUEUED:
-+        xive_esb_set(pq, XIVE_ESB_QUEUED);
-+        return false;
-+    case XIVE_ESB_OFF:
-+        xive_esb_set(pq, XIVE_ESB_OFF);
-+        return false;
++static void ipb_update(uint8_t *regs, uint8_t priority)
++{
++    regs[TM_IPB] |=3D priority_to_ipb(priority);
++    regs[TM_PIPR] =3D ipb_to_pipr(regs[TM_IPB]);
++}
++
++static uint8_t exception_mask(uint8_t ring)
++{
++    switch (ring) {
++    case TM_QW1_OS:
++        return TM_QW1_NSR_EO;
 +    default:
-+         g_assert_not_reached();
++        g_assert_not_reached();
 +    }
 +}
 +
-+static bool xive_esb_eoi(uint8_t *pq)
-+{
-+    uint8_t old_pq =3D *pq & 0x3;
+ static uint64_t xive_tctx_accept(XiveTCTX *tctx, uint8_t ring)
+ {
+-    return 0;
++    uint8_t *regs =3D &tctx->regs[ring];
++    uint8_t nsr =3D regs[TM_NSR];
++    uint8_t mask =3D exception_mask(ring);
 +
-+    switch (old_pq) {
-+    case XIVE_ESB_RESET:
-+    case XIVE_ESB_PENDING:
-+        xive_esb_set(pq, XIVE_ESB_RESET);
-+        return false;
-+    case XIVE_ESB_QUEUED:
-+        xive_esb_set(pq, XIVE_ESB_PENDING);
-+        return true;
-+    case XIVE_ESB_OFF:
-+        xive_esb_set(pq, XIVE_ESB_OFF);
-+        return false;
-+    default:
-+         g_assert_not_reached();
-+    }
-+}
++    qemu_irq_lower(tctx->output);
 +
-+/*
-+ * XIVE Interrupt Source (or IVSE)
-+ */
++    if (regs[TM_NSR] & mask) {
++        uint8_t cppr =3D regs[TM_PIPR];
 +
-+uint8_t xive_source_esb_get(XiveSource *xsrc, uint32_t srcno)
-+{
-+    assert(srcno < xsrc->nr_irqs);
++        regs[TM_CPPR] =3D cppr;
 +
-+    return xsrc->status[srcno] & 0x3;
-+}
++        /* Reset the pending buffer bit */
++        regs[TM_IPB] &=3D ~priority_to_ipb(cppr);
++        regs[TM_PIPR] =3D ipb_to_pipr(regs[TM_IPB]);
 +
-+uint8_t xive_source_esb_set(XiveSource *xsrc, uint32_t srcno, uint8_t pq=
-)
-+{
-+    assert(srcno < xsrc->nr_irqs);
-+
-+    return xive_esb_set(&xsrc->status[srcno], pq);
-+}
-+
-+/*
-+ * Returns whether the event notification should be forwarded.
-+ */
-+static bool xive_source_esb_trigger(XiveSource *xsrc, uint32_t srcno)
-+{
-+    assert(srcno < xsrc->nr_irqs);
-+
-+    return xive_esb_trigger(&xsrc->status[srcno]);
-+}
-+
-+/*
-+ * Returns whether the event notification should be forwarded.
-+ */
-+static bool xive_source_esb_eoi(XiveSource *xsrc, uint32_t srcno)
-+{
-+    assert(srcno < xsrc->nr_irqs);
-+
-+    return xive_esb_eoi(&xsrc->status[srcno]);
-+}
-+
-+/*
-+ * Forward the source event notification to the Router
-+ */
-+static void xive_source_notify(XiveSource *xsrc, int srcno)
-+{
-+
-+}
-+
-+/*
-+ * In a two pages ESB MMIO setting, even page is the trigger page, odd
-+ * page is for management
-+ */
-+static inline bool addr_is_even(hwaddr addr, uint32_t shift)
-+{
-+    return !((addr >> shift) & 1);
-+}
-+
-+static inline bool xive_source_is_trigger_page(XiveSource *xsrc, hwaddr =
-addr)
-+{
-+    return xive_source_esb_has_2page(xsrc) &&
-+        addr_is_even(addr, xsrc->esb_shift - 1);
-+}
-+
-+/*
-+ * ESB MMIO loads
-+ *                      Trigger page    Management/EOI page
-+ *
-+ * ESB MMIO setting     2 pages         1 or 2 pages
-+ *
-+ * 0x000 .. 0x3FF       -1              EOI and return 0|1
-+ * 0x400 .. 0x7FF       -1              EOI and return 0|1
-+ * 0x800 .. 0xBFF       -1              return PQ
-+ * 0xC00 .. 0xCFF       -1              return PQ and atomically PQ=3D00
-+ * 0xD00 .. 0xDFF       -1              return PQ and atomically PQ=3D01
-+ * 0xE00 .. 0xDFF       -1              return PQ and atomically PQ=3D10
-+ * 0xF00 .. 0xDFF       -1              return PQ and atomically PQ=3D11
-+ */
-+static uint64_t xive_source_esb_read(void *opaque, hwaddr addr, unsigned=
- size)
-+{
-+    XiveSource *xsrc =3D XIVE_SOURCE(opaque);
-+    uint32_t offset =3D addr & 0xFFF;
-+    uint32_t srcno =3D addr >> xsrc->esb_shift;
-+    uint64_t ret =3D -1;
-+
-+    /* In a two pages ESB MMIO setting, trigger page should not be read =
-*/
-+    if (xive_source_is_trigger_page(xsrc, addr)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "XIVE: invalid load on IRQ %d trigger page at "
-+                      "0x%"HWADDR_PRIx"\n", srcno, addr);
-+        return -1;
++        /* Drop Exception bit */
++        regs[TM_NSR] &=3D ~mask;
 +    }
 +
-+    switch (offset) {
-+    case XIVE_ESB_LOAD_EOI ... XIVE_ESB_LOAD_EOI + 0x7FF:
-+        ret =3D xive_source_esb_eoi(xsrc, srcno);
-+
-+        /* Forward the source event notification for routing */
-+        if (ret) {
-+            xive_source_notify(xsrc, srcno);
-+        }
-+        break;
-+
-+    case XIVE_ESB_GET ... XIVE_ESB_GET + 0x3FF:
-+        ret =3D xive_source_esb_get(xsrc, srcno);
-+        break;
-+
-+    case XIVE_ESB_SET_PQ_00 ... XIVE_ESB_SET_PQ_00 + 0x0FF:
-+    case XIVE_ESB_SET_PQ_01 ... XIVE_ESB_SET_PQ_01 + 0x0FF:
-+    case XIVE_ESB_SET_PQ_10 ... XIVE_ESB_SET_PQ_10 + 0x0FF:
-+    case XIVE_ESB_SET_PQ_11 ... XIVE_ESB_SET_PQ_11 + 0x0FF:
-+        ret =3D xive_source_esb_set(xsrc, srcno, (offset >> 8) & 0x3);
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid ESB load addr %x\n=
-",
-+                      offset);
-+    }
-+
-+    return ret;
++    return (nsr << 8) | regs[TM_CPPR];
 +}
 +
-+/*
-+ * ESB MMIO stores
-+ *                      Trigger page    Management/EOI page
-+ *
-+ * ESB MMIO setting     2 pages         1 or 2 pages
-+ *
-+ * 0x000 .. 0x3FF       Trigger         Trigger
-+ * 0x400 .. 0x7FF       Trigger         EOI
-+ * 0x800 .. 0xBFF       Trigger         undefined
-+ * 0xC00 .. 0xCFF       Trigger         PQ=3D00
-+ * 0xD00 .. 0xDFF       Trigger         PQ=3D01
-+ * 0xE00 .. 0xDFF       Trigger         PQ=3D10
-+ * 0xF00 .. 0xDFF       Trigger         PQ=3D11
-+ */
-+static void xive_source_esb_write(void *opaque, hwaddr addr,
-+                                  uint64_t value, unsigned size)
++static void xive_tctx_notify(XiveTCTX *tctx, uint8_t ring)
 +{
-+    XiveSource *xsrc =3D XIVE_SOURCE(opaque);
-+    uint32_t offset =3D addr & 0xFFF;
-+    uint32_t srcno =3D addr >> xsrc->esb_shift;
-+    bool notify =3D false;
++    uint8_t *regs =3D &tctx->regs[ring];
 +
-+    /* In a two pages ESB MMIO setting, trigger page only triggers */
-+    if (xive_source_is_trigger_page(xsrc, addr)) {
-+        notify =3D xive_source_esb_trigger(xsrc, srcno);
-+        goto out;
++    if (regs[TM_PIPR] < regs[TM_CPPR]) {
++        regs[TM_NSR] |=3D exception_mask(ring);
++        qemu_irq_raise(tctx->output);
 +    }
+ }
+=20
+ static void xive_tctx_set_cppr(XiveTCTX *tctx, uint8_t ring, uint8_t cpp=
+r)
+@@ -34,6 +98,9 @@ static void xive_tctx_set_cppr(XiveTCTX *tctx, uint8_t =
+ring, uint8_t cppr)
+     }
+=20
+     tctx->regs[ring + TM_CPPR] =3D cppr;
 +
-+    switch (offset) {
-+    case 0 ... 0x3FF:
-+        notify =3D xive_source_esb_trigger(xsrc, srcno);
-+        break;
-+
-+    case XIVE_ESB_STORE_EOI ... XIVE_ESB_STORE_EOI + 0x3FF:
-+        if (!(xsrc->esb_flags & XIVE_SRC_STORE_EOI)) {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "XIVE: invalid Store EOI for IRQ %d\n", srcno)=
-;
-+            return;
-+        }
-+
-+        notify =3D xive_source_esb_eoi(xsrc, srcno);
-+        break;
-+
-+    case XIVE_ESB_SET_PQ_00 ... XIVE_ESB_SET_PQ_00 + 0x0FF:
-+    case XIVE_ESB_SET_PQ_01 ... XIVE_ESB_SET_PQ_01 + 0x0FF:
-+    case XIVE_ESB_SET_PQ_10 ... XIVE_ESB_SET_PQ_10 + 0x0FF:
-+    case XIVE_ESB_SET_PQ_11 ... XIVE_ESB_SET_PQ_11 + 0x0FF:
-+        xive_source_esb_set(xsrc, srcno, (offset >> 8) & 0x3);
-+        break;
-+
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid ESB write addr %x\=
-n",
-+                      offset);
-+        return;
-+    }
-+
-+out:
-+    /* Forward the source event notification for routing */
-+    if (notify) {
-+        xive_source_notify(xsrc, srcno);
-+    }
-+}
-+
-+static const MemoryRegionOps xive_source_esb_ops =3D {
-+    .read =3D xive_source_esb_read,
-+    .write =3D xive_source_esb_write,
-+    .endianness =3D DEVICE_BIG_ENDIAN,
-+    .valid =3D {
-+        .min_access_size =3D 8,
-+        .max_access_size =3D 8,
-+    },
-+    .impl =3D {
-+        .min_access_size =3D 8,
-+        .max_access_size =3D 8,
-+    },
-+};
-+
-+static void xive_source_set_irq(void *opaque, int srcno, int val)
-+{
-+    XiveSource *xsrc =3D XIVE_SOURCE(opaque);
-+    bool notify =3D false;
-+
-+    if (val) {
-+        notify =3D xive_source_esb_trigger(xsrc, srcno);
-+    }
-+
-+    /* Forward the source event notification for routing */
-+    if (notify) {
-+        xive_source_notify(xsrc, srcno);
-+    }
-+}
-+
-+void xive_source_pic_print_info(XiveSource *xsrc, uint32_t offset, Monit=
-or *mon)
-+{
-+    int i;
-+
-+    for (i =3D 0; i < xsrc->nr_irqs; i++) {
-+        uint8_t pq =3D xive_source_esb_get(xsrc, i);
-+
-+        if (pq =3D=3D XIVE_ESB_OFF) {
-+            continue;
-+        }
-+
-+        monitor_printf(mon, "  %08x %c%c\n", i + offset,
-+                       pq & XIVE_ESB_VAL_P ? 'P' : '-',
-+                       pq & XIVE_ESB_VAL_Q ? 'Q' : '-');
-+    }
-+}
-+
-+static void xive_source_reset(void *dev)
-+{
-+    XiveSource *xsrc =3D XIVE_SOURCE(dev);
-+
-+    /* PQs are initialized to 0b01 (Q=3D1) which corresponds to "ints of=
-f" */
-+    memset(xsrc->status, XIVE_ESB_OFF, xsrc->nr_irqs);
-+}
-+
-+static void xive_source_realize(DeviceState *dev, Error **errp)
-+{
-+    XiveSource *xsrc =3D XIVE_SOURCE(dev);
-+
-+    if (!xsrc->nr_irqs) {
-+        error_setg(errp, "Number of interrupt needs to be greater than 0=
-");
-+        return;
-+    }
-+
-+    if (xsrc->esb_shift !=3D XIVE_ESB_4K &&
-+        xsrc->esb_shift !=3D XIVE_ESB_4K_2PAGE &&
-+        xsrc->esb_shift !=3D XIVE_ESB_64K &&
-+        xsrc->esb_shift !=3D XIVE_ESB_64K_2PAGE) {
-+        error_setg(errp, "Invalid ESB shift setting");
-+        return;
-+    }
-+
-+    xsrc->status =3D g_malloc0(xsrc->nr_irqs);
-+
-+    memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
-+                          &xive_source_esb_ops, xsrc, "xive.esb",
-+                          (1ull << xsrc->esb_shift) * xsrc->nr_irqs);
-+
-+    xsrc->qirqs =3D qemu_allocate_irqs(xive_source_set_irq, xsrc,
-+                                     xsrc->nr_irqs);
-+
-+    qemu_register_reset(xive_source_reset, dev);
-+}
-+
-+static const VMStateDescription vmstate_xive_source =3D {
-+    .name =3D TYPE_XIVE_SOURCE,
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32_EQUAL(nr_irqs, XiveSource, NULL),
-+        VMSTATE_VBUFFER_UINT32(status, XiveSource, 1, NULL, nr_irqs),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+/*
-+ * The default XIVE interrupt source setting for the ESB MMIOs is two
-+ * 64k pages without Store EOI, to be in sync with KVM.
-+ */
-+static Property xive_source_properties[] =3D {
-+    DEFINE_PROP_UINT64("flags", XiveSource, esb_flags, 0),
-+    DEFINE_PROP_UINT32("nr-irqs", XiveSource, nr_irqs, 0),
-+    DEFINE_PROP_UINT32("shift", XiveSource, esb_shift, XIVE_ESB_64K_2PAG=
-E),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void xive_source_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+
-+    dc->desc    =3D "XIVE Interrupt Source";
-+    dc->props   =3D xive_source_properties;
-+    dc->realize =3D xive_source_realize;
-+    dc->vmsd    =3D &vmstate_xive_source;
-+}
-+
-+static const TypeInfo xive_source_info =3D {
-+    .name          =3D TYPE_XIVE_SOURCE,
-+    .parent        =3D TYPE_DEVICE,
-+    .instance_size =3D sizeof(XiveSource),
-+    .class_init    =3D xive_source_class_init,
-+};
-+
-+static void xive_register_types(void)
-+{
-+    type_register_static(&xive_source_info);
-+}
-+
-+type_init(xive_register_types)
-diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-new file mode 100644
-index 0000000000..7aa2e38012
---- /dev/null
-+++ b/include/hw/ppc/xive.h
-@@ -0,0 +1,260 @@
-+/*
-+ * QEMU PowerPC XIVE interrupt controller model
-+ *
-+ *
-+ * The POWER9 processor comes with a new interrupt controller, called
-+ * XIVE as "eXternal Interrupt Virtualization Engine".
-+ *
-+ * =3D Overall architecture
-+ *
-+ *
-+ *              XIVE Interrupt Controller
-+ *              +------------------------------------+      IPIs
-+ *              | +---------+ +---------+ +--------+ |    +-------+
-+ *              | |VC       | |CQ       | |PC      |----> | CORES |
-+ *              | |     esb | |         | |        |----> |       |
-+ *              | |     eas | |  Bridge | |   tctx |----> |       |
-+ *              | |SC   end | |         | |    nvt | |    |       |
-+ *  +------+    | +---------+ +----+----+ +--------+ |    +-+-+-+-+
-+ *  | RAM  |    +------------------|-----------------+      | | |
-+ *  |      |                       |                        | | |
-+ *  |      |                       |                        | | |
-+ *  |      |  +--------------------v------------------------v-v-v--+    =
-other
-+ *  |      <--+                     Power Bus                      +--> =
-chips
-+ *  |  esb |  +---------+-----------------------+------------------+
-+ *  |  eas |            |                       |
-+ *  |  end |         +--|------+                |
-+ *  |  nvt |       +----+----+ |           +----+----+
-+ *  +------+       |SC       | |           |SC       |
-+ *                 |         | |           |         |
-+ *                 | PQ-bits | |           | PQ-bits |
-+ *                 | local   |-+           |  in VC  |
-+ *                 +---------+             +---------+
-+ *                    PCIe                 NX,NPU,CAPI
-+ *
-+ *                   SC: Source Controller (aka. IVSE)
-+ *                   VC: Virtualization Controller (aka. IVRE)
-+ *                   PC: Presentation Controller (aka. IVPE)
-+ *                   CQ: Common Queue (Bridge)
-+ *
-+ *              PQ-bits: 2 bits source state machine (P:pending Q:queued=
-)
-+ *                  esb: Event State Buffer (Array of PQ bits in an IVSE=
-)
-+ *                  eas: Event Assignment Structure
-+ *                  end: Event Notification Descriptor
-+ *                  nvt: Notification Virtual Target
-+ *                 tctx: Thread interrupt Context
-+ *
-+ *
-+ * The XIVE IC is composed of three sub-engines :
-+ *
-+ * - Interrupt Virtualization Source Engine (IVSE), or Source
-+ *   Controller (SC). These are found in PCI PHBs, in the PSI host
-+ *   bridge controller, but also inside the main controller for the
-+ *   core IPIs and other sub-chips (NX, CAP, NPU) of the
-+ *   chip/processor. They are configured to feed the IVRE with events.
-+ *
-+ * - Interrupt Virtualization Routing Engine (IVRE) or Virtualization
-+ *   Controller (VC). Its job is to match an event source with an
-+ *   Event Notification Descriptor (END).
-+ *
-+ * - Interrupt Virtualization Presentation Engine (IVPE) or
-+ *   Presentation Controller (PC). It maintains the interrupt context
-+ *   state of each thread and handles the delivery of the external
-+ *   exception to the thread.
-+ *
-+ * In XIVE 1.0, the sub-engines used to be referred as:
-+ *
-+ *   SC     Source Controller
-+ *   VC     Virtualization Controller
-+ *   PC     Presentation Controller
-+ *   CQ     Common Queue (PowerBUS Bridge)
-+ *
-+ *
-+ * =3D XIVE internal tables
-+ *
-+ * Each of the sub-engines uses a set of tables to redirect exceptions
-+ * from event sources to CPU threads.
-+ *
-+ *                                           +-------+
-+ *   User or OS                              |  EQ   |
-+ *       or                          +------>|entries|
-+ *   Hypervisor                      |       |  ..   |
-+ *     Memory                        |       +-------+
-+ *                                   |           ^
-+ *                                   |           |
-+ *              +-------------------------------------------------+
-+ *                                   |           |
-+ *   Hypervisor      +------+    +---+--+    +---+--+   +------+
-+ *     Memory        | ESB  |    | EAT  |    | ENDT |   | NVTT |
-+ *    (skiboot)      +----+-+    +----+-+    +----+-+   +------+
-+ *                     ^  |        ^  |        ^  |       ^
-+ *                     |  |        |  |        |  |       |
-+ *              +-------------------------------------------------+
-+ *                     |  |        |  |        |  |       |
-+ *                     |  |        |  |        |  |       |
-+ *                +----|--|--------|--|--------|--|-+   +-|-----+    +--=
-----+
-+ *                |    |  |        |  |        |  | |   | | tctx|    |Th=
-read|
-+ *   IPI or   --> |    +  v        +  v        +  v |---| +  .. |-----> =
-    |
-+ *  HW events --> |                                 |   |       |    |  =
-    |
-+ *    IVSE        |             IVRE                |   | IVPE  |    +--=
-----+
-+ *                +---------------------------------+   +-------+
-+ *
-+ *
-+ *
-+ * The IVSE have a 2-bits state machine, P for pending and Q for queued,
-+ * for each source that allows events to be triggered. They are stored i=
-n
-+ * an Event State Buffer (ESB) array and can be controlled by MMIOs.
-+ *
-+ * If the event is let through, the IVRE looks up in the Event Assignmen=
-t
-+ * Structure (EAS) table for an Event Notification Descriptor (END)
-+ * configured for the source. Each Event Notification Descriptor defines
-+ * a notification path to a CPU and an in-memory Event Queue, in which
-+ * will be enqueued an EQ data for the OS to pull.
-+ *
-+ * The IVPE determines if a Notification Virtual Target (NVT) can
-+ * handle the event by scanning the thread contexts of the VCPUs
-+ * dispatched on the processor HW threads. It maintains the state of
-+ * the thread interrupt context (TCTX) of each thread in a NVT table.
-+ *
-+ * =3D Acronyms
-+ *
-+ *          Description                     In XIVE 1.0, used to be refe=
-rred as
-+ *
-+ *   EAS    Event Assignment Structure      IVE   Interrupt Virt. Entry
-+ *   EAT    Event Assignment Table          IVT   Interrupt Virt. Table
-+ *   ENDT   Event Notif. Descriptor Table   EQDT  Event Queue Desc. Tabl=
-e
-+ *   EQ     Event Queue                     same
-+ *   ESB    Event State Buffer              SBE   State Bit Entry
-+ *   NVT    Notif. Virtual Target           VPD   Virtual Processor Desc=
-.
-+ *   NVTT   Notif. Virtual Target Table     VPDT  Virtual Processor Desc=
-. Table
-+ *   TCTX   Thread interrupt Context
-+ *
-+ *
-+ * Copyright (c) 2017-2018, IBM Corporation.
-+ *
-+ * This code is licensed under the GPL version 2 or later. See the
-+ * COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef PPC_XIVE_H
-+#define PPC_XIVE_H
-+
-+#include "hw/qdev-core.h"
-+
-+/*
-+ * XIVE Interrupt Source
-+ */
-+
-+#define TYPE_XIVE_SOURCE "xive-source"
-+#define XIVE_SOURCE(obj) OBJECT_CHECK(XiveSource, (obj), TYPE_XIVE_SOURC=
-E)
-+
-+/*
-+ * XIVE Interrupt Source characteristics, which define how the ESB are
-+ * controlled.
-+ */
-+#define XIVE_SRC_H_INT_ESB     0x1 /* ESB managed with hcall H_INT_ESB *=
++    /* CPPR has changed, check if we need to raise a pending exception *=
 /
-+#define XIVE_SRC_STORE_EOI     0x2 /* Store EOI supported */
-+
-+typedef struct XiveSource {
-+    DeviceState parent;
-+
-+    /* IRQs */
-+    uint32_t        nr_irqs;
-+    qemu_irq        *qirqs;
-+
-+    /* PQ bits */
-+    uint8_t         *status;
-+
-+    /* ESB memory region */
-+    uint64_t        esb_flags;
-+    uint32_t        esb_shift;
-+    MemoryRegion    esb_mmio;
-+} XiveSource;
-+
++    xive_tctx_notify(tctx, ring);
+ }
+=20
+ /*
+@@ -189,6 +256,17 @@ static void xive_tm_set_os_cppr(XiveTCTX *tctx, hwad=
+dr offset,
+     xive_tctx_set_cppr(tctx, TM_QW1_OS, value & 0xff);
+ }
+=20
 +/*
-+ * ESB MMIO setting. Can be one page, for both source triggering and
-+ * source management, or two different pages. See below for magic
-+ * values.
++ * Adjust the IPB to allow a CPU to process event queues of other
++ * priorities during one physical interrupt cycle.
 + */
-+#define XIVE_ESB_4K          12 /* PSI HB only */
-+#define XIVE_ESB_4K_2PAGE    13
-+#define XIVE_ESB_64K         16
-+#define XIVE_ESB_64K_2PAGE   17
-+
-+static inline bool xive_source_esb_has_2page(XiveSource *xsrc)
++static void xive_tm_set_os_pending(XiveTCTX *tctx, hwaddr offset,
++                                   uint64_t value, unsigned size)
 +{
-+    return xsrc->esb_shift =3D=3D XIVE_ESB_64K_2PAGE ||
-+        xsrc->esb_shift =3D=3D XIVE_ESB_4K_2PAGE;
++    ipb_update(&tctx->regs[TM_QW1_OS], value & 0xff);
++    xive_tctx_notify(tctx, TM_QW1_OS);
 +}
 +
-+/* The trigger page is always the first/even page */
-+static inline hwaddr xive_source_esb_page(XiveSource *xsrc, uint32_t src=
-no)
-+{
-+    assert(srcno < xsrc->nr_irqs);
-+    return (1ull << xsrc->esb_shift) * srcno;
-+}
+ /*
+  * Define a mapping of "special" operations depending on the TIMA page
+  * offset and the size of the operation.
+@@ -211,6 +289,7 @@ static const XiveTmOp xive_tm_operations[] =3D {
+=20
+     /* MMIOs above 2K : special operations with side effects */
+     { XIVE_TM_OS_PAGE, TM_SPC_ACK_OS_REG,     2, NULL, xive_tm_ack_os_re=
+g },
++    { XIVE_TM_OS_PAGE, TM_SPC_SET_OS_PENDING, 1, xive_tm_set_os_pending,=
+ NULL },
+ };
+=20
+ static const XiveTmOp *xive_tm_find_op(hwaddr offset, unsigned size, boo=
+l write)
+@@ -373,6 +452,13 @@ static void xive_tctx_reset(void *dev)
+     tctx->regs[TM_QW1_OS + TM_LSMFB] =3D 0xFF;
+     tctx->regs[TM_QW1_OS + TM_ACK_CNT] =3D 0xFF;
+     tctx->regs[TM_QW1_OS + TM_AGE] =3D 0xFF;
 +
-+/* In a two pages ESB MMIO setting, the odd page is for management */
-+static inline hwaddr xive_source_esb_mgmt(XiveSource *xsrc, int srcno)
-+{
-+    hwaddr addr =3D xive_source_esb_page(xsrc, srcno);
++    /*
++     * Initialize PIPR to 0xFF to avoid phantom interrupts when the
++     * CPPR is first set.
++     */
++    tctx->regs[TM_QW1_OS + TM_PIPR] =3D
++        ipb_to_pipr(tctx->regs[TM_QW1_OS + TM_IPB]);
+ }
+=20
+ static void xive_tctx_realize(DeviceState *dev, Error **errp)
+@@ -1150,9 +1236,15 @@ static void xive_presenter_notify(XiveRouter *xrtr=
+, uint8_t format,
+     found =3D xive_presenter_match(xrtr, format, nvt_blk, nvt_idx, cam_i=
+gnore,
+                                  priority, logic_serv, &match);
+     if (found) {
++        ipb_update(&match.tctx->regs[match.ring], priority);
++        xive_tctx_notify(match.tctx, match.ring);
+         return;
+     }
+=20
++    /* Record the IPB in the associated NVT structure */
++    ipb_update((uint8_t *) &nvt.w4, priority);
++    xive_router_write_nvt(xrtr, nvt_blk, nvt_idx, &nvt, 4);
 +
-+    if (xive_source_esb_has_2page(xsrc)) {
-+        addr +=3D (1 << (xsrc->esb_shift - 1));
-+    }
-+
-+    return addr;
-+}
-+
-+/*
-+ * Each interrupt source has a 2-bit state machine which can be
-+ * controlled by MMIO. P indicates that an interrupt is pending (has
-+ * been sent to a queue and is waiting for an EOI). Q indicates that
-+ * the interrupt has been triggered while pending.
-+ *
-+ * This acts as a coalescing mechanism in order to guarantee that a
-+ * given interrupt only occurs at most once in a queue.
-+ *
-+ * When doing an EOI, the Q bit will indicate if the interrupt
-+ * needs to be re-triggered.
-+ */
-+#define XIVE_ESB_VAL_P        0x2
-+#define XIVE_ESB_VAL_Q        0x1
-+
-+#define XIVE_ESB_RESET        0x0
-+#define XIVE_ESB_PENDING      XIVE_ESB_VAL_P
-+#define XIVE_ESB_QUEUED       (XIVE_ESB_VAL_P | XIVE_ESB_VAL_Q)
-+#define XIVE_ESB_OFF          XIVE_ESB_VAL_Q
-+
-+/*
-+ * "magic" Event State Buffer (ESB) MMIO offsets.
-+ *
-+ * The following offsets into the ESB MMIO allow to read or manipulate
-+ * the PQ bits. They must be used with an 8-byte load instruction.
-+ * They all return the previous state of the interrupt (atomically).
-+ *
-+ * Additionally, some ESB pages support doing an EOI via a store and
-+ * some ESBs support doing a trigger via a separate trigger page.
-+ */
-+#define XIVE_ESB_STORE_EOI      0x400 /* Store */
-+#define XIVE_ESB_LOAD_EOI       0x000 /* Load */
-+#define XIVE_ESB_GET            0x800 /* Load */
-+#define XIVE_ESB_SET_PQ_00      0xc00 /* Load */
-+#define XIVE_ESB_SET_PQ_01      0xd00 /* Load */
-+#define XIVE_ESB_SET_PQ_10      0xe00 /* Load */
-+#define XIVE_ESB_SET_PQ_11      0xf00 /* Load */
-+
-+uint8_t xive_source_esb_get(XiveSource *xsrc, uint32_t srcno);
-+uint8_t xive_source_esb_set(XiveSource *xsrc, uint32_t srcno, uint8_t pq=
-);
-+
-+void xive_source_pic_print_info(XiveSource *xsrc, uint32_t offset,
-+                                Monitor *mon);
-+
-+static inline qemu_irq xive_source_qirq(XiveSource *xsrc, uint32_t srcno=
-)
-+{
-+    assert(srcno < xsrc->nr_irqs);
-+    return xsrc->qirqs[srcno];
-+}
-+
-+#endif /* PPC_XIVE_H */
+     /* If no matching NVT is dispatched on a HW thread :
+      * - update the NVT structure if backlog is activated
+      * - escalate (ESe PQ bits and EAS in w4-5) if escalation is
 --=20
 2.19.2
