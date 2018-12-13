@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gXICe-0004E3-Ov
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 23:02:26 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gXICg-0004Fq-ER
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 23:02:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gXICa-0002qI-Hb
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 23:02:22 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gXICc-0002sF-Dr
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 23:02:26 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 13 Dec 2018 15:01:25 +1100
-Message-Id: <20181213040126.6768-27-david@gibson.dropbear.id.au>
+Date: Thu, 13 Dec 2018 15:01:21 +1100
+Message-Id: <20181213040126.6768-23-david@gibson.dropbear.id.au>
 In-Reply-To: <20181213040126.6768-1-david@gibson.dropbear.id.au>
 References: <20181213040126.6768-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 26/27] spapr/xive: introduce a XIVE interrupt
- controller
+Subject: [Qemu-devel] [PULL 22/27] ppc/xive: add support for the END Event
+ State Buffers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,499 +28,255 @@ Cc: gkurz@kaod.org, clg@kaod.org, lvivier@redhat.com, spopovyc@redhat.com, qemu-
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-sPAPRXive models the XIVE interrupt controller of the sPAPR machine.
-It inherits from the XiveRouter and provisions storage for the routing
-tables :
+The Event Notification Descriptor (END) XIVE structure also contains
+two Event State Buffers providing further coalescing of interrupts,
+one for the notification event (ESn) and one for the escalation events
+(ESe). A MMIO page is assigned for each to control the EOI through
+loads only. Stores are not allowed.
 
-  - Event Assignment Structure (EAS)
-  - Event Notification Descriptor (END)
+The END ESBs are modeled through an object resembling the 'XiveSource'
+It is stateless as the END state bits are backed into the XiveEND
+structure under the XiveRouter and the MMIO accesses follow the same
+rules as for the XiveSource ESBs.
 
-The sPAPRXive model incorporates an internal XiveSource for the IPIs
-and for the interrupts of the virtual devices of the guest. This model
-is consistent with XIVE architecture which also incorporates an
-internal IVSE for IPIs and accelerator interrupts in the IVRE
-sub-engine.
-
-The sPAPRXive model exports two memory regions, one for the ESB
-trigger and management pages used to control the sources and one for
-the TIMA pages. They are mapped by default at the addresses found on
-chip 0 of a baremetal system. This is also consistent with the XIVE
-architecture which defines a Virtualization Controller BAR for the
-internal IVSE ESB pages and a Thread Managment BAR for the TIMA.
+END ESBs are not supported by the Linux drivers neither on OPAL nor on
+sPAPR. Nevetherless, it provides a mean to study the question in the
+future and validates a bit more the XIVE model.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- default-configs/ppc64-softmmu.mak |   1 +
- hw/intc/Makefile.objs             |   1 +
- hw/intc/spapr_xive.c              | 366 ++++++++++++++++++++++++++++++
- include/hw/ppc/spapr_xive.h       |  45 ++++
- 4 files changed, 413 insertions(+)
- create mode 100644 hw/intc/spapr_xive.c
- create mode 100644 include/hw/ppc/spapr_xive.h
+ hw/intc/xive.c        | 160 +++++++++++++++++++++++++++++++++++++++++-
+ include/hw/ppc/xive.h |  21 ++++++
+ 2 files changed, 179 insertions(+), 2 deletions(-)
 
-diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-so=
-ftmmu.mak
-index 2d1e7c5c46..7f34ad0528 100644
---- a/default-configs/ppc64-softmmu.mak
-+++ b/default-configs/ppc64-softmmu.mak
-@@ -17,6 +17,7 @@ CONFIG_XICS=3D$(CONFIG_PSERIES)
- CONFIG_XICS_SPAPR=3D$(CONFIG_PSERIES)
- CONFIG_XICS_KVM=3D$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
- CONFIG_XIVE=3D$(CONFIG_PSERIES)
-+CONFIG_XIVE_SPAPR=3D$(CONFIG_PSERIES)
- CONFIG_MEM_DEVICE=3Dy
- CONFIG_DIMM=3Dy
- CONFIG_SPAPR_RNG=3Dy
-diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
-index 72a46ed91c..301a8e972d 100644
---- a/hw/intc/Makefile.objs
-+++ b/hw/intc/Makefile.objs
-@@ -38,6 +38,7 @@ obj-$(CONFIG_XICS) +=3D xics.o
- obj-$(CONFIG_XICS_SPAPR) +=3D xics_spapr.o
- obj-$(CONFIG_XICS_KVM) +=3D xics_kvm.o
- obj-$(CONFIG_XIVE) +=3D xive.o
-+obj-$(CONFIG_XIVE_SPAPR) +=3D spapr_xive.o
- obj-$(CONFIG_POWERNV) +=3D xics_pnv.o
- obj-$(CONFIG_ALLWINNER_A10_PIC) +=3D allwinner-a10-pic.o
- obj-$(CONFIG_S390_FLIC) +=3D s390_flic.o
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-new file mode 100644
-index 0000000000..eef5830d45
---- /dev/null
-+++ b/hw/intc/spapr_xive.c
-@@ -0,0 +1,366 @@
-+/*
-+ * QEMU PowerPC sPAPR XIVE interrupt controller model
-+ *
-+ * Copyright (c) 2017-2018, IBM Corporation.
-+ *
-+ * This code is licensed under the GPL version 2 or later. See the
-+ * COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "qapi/error.h"
-+#include "qemu/error-report.h"
-+#include "target/ppc/cpu.h"
-+#include "sysemu/cpus.h"
-+#include "monitor/monitor.h"
-+#include "hw/ppc/spapr.h"
-+#include "hw/ppc/spapr_xive.h"
-+#include "hw/ppc/xive.h"
-+#include "hw/ppc/xive_regs.h"
-+
-+/*
-+ * XIVE Virtualization Controller BAR and Thread Managment BAR that we
-+ * use for the ESB pages and the TIMA pages
-+ */
-+#define SPAPR_XIVE_VC_BASE   0x0006010000000000ull
-+#define SPAPR_XIVE_TM_BASE   0x0006030203180000ull
-+
-+/*
-+ * On sPAPR machines, use a simplified output for the XIVE END
-+ * structure dumping only the information related to the OS EQ.
-+ */
-+static void spapr_xive_end_pic_print_info(sPAPRXive *xive, XiveEND *end,
-+                                          Monitor *mon)
-+{
-+    uint32_t qindex =3D GETFIELD_BE32(END_W1_PAGE_OFF, end->w1);
-+    uint32_t qgen =3D GETFIELD_BE32(END_W1_GENERATION, end->w1);
-+    uint32_t qsize =3D GETFIELD_BE32(END_W0_QSIZE, end->w0);
-+    uint32_t qentries =3D 1 << (qsize + 10);
-+    uint32_t nvt =3D GETFIELD_BE32(END_W6_NVT_INDEX, end->w6);
-+    uint8_t priority =3D GETFIELD_BE32(END_W7_F0_PRIORITY, end->w7);
-+
-+    monitor_printf(mon, "%3d/%d % 6d/%5d ^%d", nvt,
-+                   priority, qindex, qentries, qgen);
-+
-+    xive_end_queue_pic_print_info(end, 6, mon);
-+    monitor_printf(mon, "]");
-+}
-+
-+void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon)
-+{
-+    XiveSource *xsrc =3D &xive->source;
-+    int i;
-+
-+    monitor_printf(mon, "  LSIN         PQ    EISN     CPU/PRIO EQ\n");
-+
-+    for (i =3D 0; i < xive->nr_irqs; i++) {
-+        uint8_t pq =3D xive_source_esb_get(xsrc, i);
-+        XiveEAS *eas =3D &xive->eat[i];
-+
-+        if (!xive_eas_is_valid(eas)) {
-+            continue;
-+        }
-+
-+        monitor_printf(mon, "  %08x %s %c%c%c %s %08x ", i,
-+                       xive_source_irq_is_lsi(xsrc, i) ? "LSI" : "MSI",
-+                       pq & XIVE_ESB_VAL_P ? 'P' : '-',
-+                       pq & XIVE_ESB_VAL_Q ? 'Q' : '-',
-+                       xsrc->status[i] & XIVE_STATUS_ASSERTED ? 'A' : ' =
-',
-+                       xive_eas_is_masked(eas) ? "M" : " ",
-+                       (int) GETFIELD_BE64(EAS_END_DATA, eas->w));
-+
-+        if (!xive_eas_is_masked(eas)) {
-+            uint32_t end_idx =3D GETFIELD_BE64(EAS_END_INDEX, eas->w);
-+            XiveEND *end;
-+
-+            assert(end_idx < xive->nr_ends);
-+            end =3D &xive->endt[end_idx];
-+
-+            if (xive_end_is_valid(end)) {
-+                spapr_xive_end_pic_print_info(xive, end, mon);
-+            }
-+        }
-+        monitor_printf(mon, "\n");
-+    }
-+}
-+
-+static void spapr_xive_map_mmio(sPAPRXive *xive)
-+{
-+    sysbus_mmio_map(SYS_BUS_DEVICE(xive), 0, xive->vc_base);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(xive), 1, xive->end_base);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(xive), 2, xive->tm_base);
-+}
-+
-+static void spapr_xive_end_reset(XiveEND *end)
-+{
-+    memset(end, 0, sizeof(*end));
-+
-+    /* switch off the escalation and notification ESBs */
-+    end->w1 =3D cpu_to_be32(END_W1_ESe_Q | END_W1_ESn_Q);
-+}
-+
-+static void spapr_xive_reset(void *dev)
-+{
-+    sPAPRXive *xive =3D SPAPR_XIVE(dev);
-+    int i;
-+
-+    /*
-+     * The XiveSource has its own reset handler, which mask off all
-+     * IRQs (!P|Q)
-+     */
-+
-+    /* Mask all valid EASs in the IRQ number space. */
-+    for (i =3D 0; i < xive->nr_irqs; i++) {
-+        XiveEAS *eas =3D &xive->eat[i];
-+        if (xive_eas_is_valid(eas)) {
-+            eas->w =3D cpu_to_be64(EAS_VALID | EAS_MASKED);
-+        } else {
-+            eas->w =3D 0;
-+        }
-+    }
-+
-+    /* Clear all ENDs */
-+    for (i =3D 0; i < xive->nr_ends; i++) {
-+        spapr_xive_end_reset(&xive->endt[i]);
-+    }
-+}
-+
-+static void spapr_xive_instance_init(Object *obj)
-+{
-+    sPAPRXive *xive =3D SPAPR_XIVE(obj);
-+
-+    object_initialize(&xive->source, sizeof(xive->source), TYPE_XIVE_SOU=
-RCE);
-+    object_property_add_child(obj, "source", OBJECT(&xive->source), NULL=
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 41d8ba1540..2196ce8de0 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -612,8 +612,18 @@ static void xive_router_end_notify(XiveRouter *xrtr,=
+ uint8_t end_blk,
+      * even futher coalescing in the Router
+      */
+     if (!xive_end_is_notify(&end)) {
+-        qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implemented\n"=
 );
+-        return;
++        uint8_t pq =3D GETFIELD_BE32(END_W1_ESn, end.w1);
++        bool notify =3D xive_esb_trigger(&pq);
 +
-+    object_initialize(&xive->end_source, sizeof(xive->end_source),
-+                      TYPE_XIVE_END_SOURCE);
-+    object_property_add_child(obj, "end_source", OBJECT(&xive->end_sourc=
-e),
-+                              NULL);
++        if (pq !=3D GETFIELD_BE32(END_W1_ESn, end.w1)) {
++            end.w1 =3D SETFIELD_BE32(END_W1_ESn, end.w1, pq);
++            xive_router_write_end(xrtr, end_blk, end_idx, &end, 1);
++        }
++
++        /* ESn[Q]=3D1 : end of notification */
++        if (!notify) {
++            return;
++        }
+     }
+=20
+     /*
+@@ -692,6 +702,151 @@ void xive_eas_pic_print_info(XiveEAS *eas, uint32_t=
+ lisn, Monitor *mon)
+                    (uint32_t) GETFIELD_BE64(EAS_END_DATA, eas->w));
+ }
+=20
++/*
++ * END ESB MMIO loads
++ */
++static uint64_t xive_end_source_read(void *opaque, hwaddr addr, unsigned=
+ size)
++{
++    XiveENDSource *xsrc =3D XIVE_END_SOURCE(opaque);
++    uint32_t offset =3D addr & 0xFFF;
++    uint8_t end_blk;
++    uint32_t end_idx;
++    XiveEND end;
++    uint32_t end_esmask;
++    uint8_t pq;
++    uint64_t ret =3D -1;
++
++    end_blk =3D xsrc->block_id;
++    end_idx =3D addr >> (xsrc->esb_shift + 1);
++
++    if (xive_router_get_end(xsrc->xrtr, end_blk, end_idx, &end)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: No END %x/%x\n", end_blk,
++                      end_idx);
++        return -1;
++    }
++
++    if (!xive_end_is_valid(&end)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: END %x/%x is invalid\n",
++                      end_blk, end_idx);
++        return -1;
++    }
++
++    end_esmask =3D addr_is_even(addr, xsrc->esb_shift) ? END_W1_ESn : EN=
+D_W1_ESe;
++    pq =3D GETFIELD_BE32(end_esmask, end.w1);
++
++    switch (offset) {
++    case XIVE_ESB_LOAD_EOI ... XIVE_ESB_LOAD_EOI + 0x7FF:
++        ret =3D xive_esb_eoi(&pq);
++
++        /* Forward the source event notification for routing ?? */
++        break;
++
++    case XIVE_ESB_GET ... XIVE_ESB_GET + 0x3FF:
++        ret =3D pq;
++        break;
++
++    case XIVE_ESB_SET_PQ_00 ... XIVE_ESB_SET_PQ_00 + 0x0FF:
++    case XIVE_ESB_SET_PQ_01 ... XIVE_ESB_SET_PQ_01 + 0x0FF:
++    case XIVE_ESB_SET_PQ_10 ... XIVE_ESB_SET_PQ_10 + 0x0FF:
++    case XIVE_ESB_SET_PQ_11 ... XIVE_ESB_SET_PQ_11 + 0x0FF:
++        ret =3D xive_esb_set(&pq, (offset >> 8) & 0x3);
++        break;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid END ESB load addr =
+%d\n",
++                      offset);
++        return -1;
++    }
++
++    if (pq !=3D GETFIELD_BE32(end_esmask, end.w1)) {
++        end.w1 =3D SETFIELD_BE32(end_esmask, end.w1, pq);
++        xive_router_write_end(xsrc->xrtr, end_blk, end_idx, &end, 1);
++    }
++
++    return ret;
 +}
 +
-+static void spapr_xive_realize(DeviceState *dev, Error **errp)
++/*
++ * END ESB MMIO stores are invalid
++ */
++static void xive_end_source_write(void *opaque, hwaddr addr,
++                                  uint64_t value, unsigned size)
 +{
-+    sPAPRXive *xive =3D SPAPR_XIVE(dev);
-+    XiveSource *xsrc =3D &xive->source;
-+    XiveENDSource *end_xsrc =3D &xive->end_source;
++    qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid ESB write addr 0x%"
++                  HWADDR_PRIx"\n", addr);
++}
++
++static const MemoryRegionOps xive_end_source_ops =3D {
++    .read =3D xive_end_source_read,
++    .write =3D xive_end_source_write,
++    .endianness =3D DEVICE_BIG_ENDIAN,
++    .valid =3D {
++        .min_access_size =3D 8,
++        .max_access_size =3D 8,
++    },
++    .impl =3D {
++        .min_access_size =3D 8,
++        .max_access_size =3D 8,
++    },
++};
++
++static void xive_end_source_realize(DeviceState *dev, Error **errp)
++{
++    XiveENDSource *xsrc =3D XIVE_END_SOURCE(dev);
++    Object *obj;
 +    Error *local_err =3D NULL;
 +
-+    if (!xive->nr_irqs) {
-+        error_setg(errp, "Number of interrupt needs to be greater 0");
-+        return;
-+    }
-+
-+    if (!xive->nr_ends) {
-+        error_setg(errp, "Number of interrupt needs to be greater 0");
-+        return;
-+    }
-+
-+    /*
-+     * Initialize the internal sources, for IPIs and virtual devices.
-+     */
-+    object_property_set_int(OBJECT(xsrc), xive->nr_irqs, "nr-irqs",
-+                            &error_fatal);
-+    object_property_add_const_link(OBJECT(xsrc), "xive", OBJECT(xive),
-+                                   &error_fatal);
-+    object_property_set_bool(OBJECT(xsrc), true, "realized", &local_err)=
-;
-+    if (local_err) {
++    obj =3D object_property_get_link(OBJECT(dev), "xive", &local_err);
++    if (!obj) {
 +        error_propagate(errp, local_err);
++        error_prepend(errp, "required link 'xive' not found: ");
++        return;
++    }
++
++    xsrc->xrtr =3D XIVE_ROUTER(obj);
++
++    if (!xsrc->nr_ends) {
++        error_setg(errp, "Number of interrupt needs to be greater than 0=
+");
++        return;
++    }
++
++    if (xsrc->esb_shift !=3D XIVE_ESB_4K &&
++        xsrc->esb_shift !=3D XIVE_ESB_64K) {
++        error_setg(errp, "Invalid ESB shift setting");
 +        return;
 +    }
 +
 +    /*
-+     * Initialize the END ESB source
++     * Each END is assigned an even/odd pair of MMIO pages, the even pag=
+e
++     * manages the ESn field while the odd page manages the ESe field.
 +     */
-+    object_property_set_int(OBJECT(end_xsrc), xive->nr_irqs, "nr-ends",
-+                            &error_fatal);
-+    object_property_add_const_link(OBJECT(end_xsrc), "xive", OBJECT(xive=
-),
-+                                   &error_fatal);
-+    object_property_set_bool(OBJECT(end_xsrc), true, "realized", &local_=
-err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    /* Set the mapping address of the END ESB pages after the source ESB=
-s */
-+    xive->end_base =3D xive->vc_base + (1ull << xsrc->esb_shift) * xsrc-=
->nr_irqs;
-+
-+    /*
-+     * Allocate the routing tables
-+     */
-+    xive->eat =3D g_new0(XiveEAS, xive->nr_irqs);
-+    xive->endt =3D g_new0(XiveEND, xive->nr_ends);
-+
-+    /* TIMA initialization */
-+    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops, xi=
-ve,
-+                          "xive.tima", 4ull << TM_SHIFT);
-+
-+    /* Define all XIVE MMIO regions on SysBus */
-+    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xsrc->esb_mmio);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &end_xsrc->esb_mmio);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xive->tm_mmio);
-+
-+    /* Map all regions */
-+    spapr_xive_map_mmio(xive);
-+
-+    qemu_register_reset(spapr_xive_reset, dev);
++    memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
++                          &xive_end_source_ops, xsrc, "xive.end",
++                          (1ull << (xsrc->esb_shift + 1)) * xsrc->nr_end=
+s);
 +}
 +
-+static int spapr_xive_get_eas(XiveRouter *xrtr, uint8_t eas_blk,
-+                              uint32_t eas_idx, XiveEAS *eas)
-+{
-+    sPAPRXive *xive =3D SPAPR_XIVE(xrtr);
-+
-+    if (eas_idx >=3D xive->nr_irqs) {
-+        return -1;
-+    }
-+
-+    *eas =3D xive->eat[eas_idx];
-+    return 0;
-+}
-+
-+static int spapr_xive_get_end(XiveRouter *xrtr,
-+                              uint8_t end_blk, uint32_t end_idx, XiveEND=
- *end)
-+{
-+    sPAPRXive *xive =3D SPAPR_XIVE(xrtr);
-+
-+    if (end_idx >=3D xive->nr_ends) {
-+        return -1;
-+    }
-+
-+    memcpy(end, &xive->endt[end_idx], sizeof(XiveEND));
-+    return 0;
-+}
-+
-+static int spapr_xive_write_end(XiveRouter *xrtr, uint8_t end_blk,
-+                                uint32_t end_idx, XiveEND *end,
-+                                uint8_t word_number)
-+{
-+    sPAPRXive *xive =3D SPAPR_XIVE(xrtr);
-+
-+    if (end_idx >=3D xive->nr_ends) {
-+        return -1;
-+    }
-+
-+    memcpy(&xive->endt[end_idx], end, sizeof(XiveEND));
-+    return 0;
-+}
-+
-+static const VMStateDescription vmstate_spapr_xive_end =3D {
-+    .name =3D TYPE_SPAPR_XIVE "/end",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField []) {
-+        VMSTATE_UINT32(w0, XiveEND),
-+        VMSTATE_UINT32(w1, XiveEND),
-+        VMSTATE_UINT32(w2, XiveEND),
-+        VMSTATE_UINT32(w3, XiveEND),
-+        VMSTATE_UINT32(w4, XiveEND),
-+        VMSTATE_UINT32(w5, XiveEND),
-+        VMSTATE_UINT32(w6, XiveEND),
-+        VMSTATE_UINT32(w7, XiveEND),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static const VMStateDescription vmstate_spapr_xive_eas =3D {
-+    .name =3D TYPE_SPAPR_XIVE "/eas",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField []) {
-+        VMSTATE_UINT64(w, XiveEAS),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static const VMStateDescription vmstate_spapr_xive =3D {
-+    .name =3D TYPE_SPAPR_XIVE,
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32_EQUAL(nr_irqs, sPAPRXive, NULL),
-+        VMSTATE_STRUCT_VARRAY_POINTER_UINT32(eat, sPAPRXive, nr_irqs,
-+                                     vmstate_spapr_xive_eas, XiveEAS),
-+        VMSTATE_STRUCT_VARRAY_POINTER_UINT32(endt, sPAPRXive, nr_ends,
-+                                             vmstate_spapr_xive_end, Xiv=
-eEND),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static Property spapr_xive_properties[] =3D {
-+    DEFINE_PROP_UINT32("nr-irqs", sPAPRXive, nr_irqs, 0),
-+    DEFINE_PROP_UINT32("nr-ends", sPAPRXive, nr_ends, 0),
-+    DEFINE_PROP_UINT64("vc-base", sPAPRXive, vc_base, SPAPR_XIVE_VC_BASE=
-),
-+    DEFINE_PROP_UINT64("tm-base", sPAPRXive, tm_base, SPAPR_XIVE_TM_BASE=
-),
++static Property xive_end_source_properties[] =3D {
++    DEFINE_PROP_UINT8("block-id", XiveENDSource, block_id, 0),
++    DEFINE_PROP_UINT32("nr-ends", XiveENDSource, nr_ends, 0),
++    DEFINE_PROP_UINT32("shift", XiveENDSource, esb_shift, XIVE_ESB_64K),
 +    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void spapr_xive_class_init(ObjectClass *klass, void *data)
++static void xive_end_source_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    XiveRouterClass *xrc =3D XIVE_ROUTER_CLASS(klass);
 +
-+    dc->desc    =3D "sPAPR XIVE Interrupt Controller";
-+    dc->props   =3D spapr_xive_properties;
-+    dc->realize =3D spapr_xive_realize;
-+    dc->vmsd    =3D &vmstate_spapr_xive;
-+
-+    xrc->get_eas =3D spapr_xive_get_eas;
-+    xrc->get_end =3D spapr_xive_get_end;
-+    xrc->write_end =3D spapr_xive_write_end;
++    dc->desc    =3D "XIVE END Source";
++    dc->props   =3D xive_end_source_properties;
++    dc->realize =3D xive_end_source_realize;
 +}
 +
-+static const TypeInfo spapr_xive_info =3D {
-+    .name =3D TYPE_SPAPR_XIVE,
-+    .parent =3D TYPE_XIVE_ROUTER,
-+    .instance_init =3D spapr_xive_instance_init,
-+    .instance_size =3D sizeof(sPAPRXive),
-+    .class_init =3D spapr_xive_class_init,
++static const TypeInfo xive_end_source_info =3D {
++    .name          =3D TYPE_XIVE_END_SOURCE,
++    .parent        =3D TYPE_DEVICE,
++    .instance_size =3D sizeof(XiveENDSource),
++    .class_init    =3D xive_end_source_class_init,
 +};
 +
-+static void spapr_xive_register_types(void)
-+{
-+    type_register_static(&spapr_xive_info);
-+}
-+
-+type_init(spapr_xive_register_types)
-+
-+bool spapr_xive_irq_claim(sPAPRXive *xive, uint32_t lisn, bool lsi)
-+{
-+    XiveSource *xsrc =3D &xive->source;
-+
-+    if (lisn >=3D xive->nr_irqs) {
-+        return false;
-+    }
-+
-+    xive->eat[lisn].w |=3D cpu_to_be64(EAS_VALID);
-+    xive_source_irq_set(xsrc, lisn, lsi);
-+    return true;
-+}
-+
-+bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t lisn)
-+{
-+    XiveSource *xsrc =3D &xive->source;
-+
-+    if (lisn >=3D xive->nr_irqs) {
-+        return false;
-+    }
-+
-+    xive->eat[lisn].w &=3D cpu_to_be64(~EAS_VALID);
-+    xive_source_irq_set(xsrc, lisn, false);
-+    return true;
-+}
-+
-+qemu_irq spapr_xive_qirq(sPAPRXive *xive, uint32_t lisn)
-+{
-+    XiveSource *xsrc =3D &xive->source;
-+
-+    if (lisn >=3D xive->nr_irqs) {
-+        return NULL;
-+    }
-+
-+    /* The sPAPR machine/device should have claimed the IRQ before */
-+    assert(xive_eas_is_valid(&xive->eat[lisn]));
-+
-+    return xive_source_qirq(xsrc, lisn);
-+}
-diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-new file mode 100644
-index 0000000000..f087959b99
---- /dev/null
-+++ b/include/hw/ppc/spapr_xive.h
-@@ -0,0 +1,45 @@
+ /*
+  * XIVE Fabric
+  */
+@@ -706,6 +861,7 @@ static void xive_register_types(void)
+     type_register_static(&xive_source_info);
+     type_register_static(&xive_fabric_info);
+     type_register_static(&xive_router_info);
++    type_register_static(&xive_end_source_info);
+ }
+=20
+ type_init(xive_register_types)
+diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+index 4851d3b3a4..014f64aa98 100644
+--- a/include/hw/ppc/xive.h
++++ b/include/hw/ppc/xive.h
+@@ -336,6 +336,27 @@ int xive_router_get_end(XiveRouter *xrtr, uint8_t en=
+d_blk, uint32_t end_idx,
+ int xive_router_write_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t en=
+d_idx,
+                           XiveEND *end, uint8_t word_number);
+=20
 +/*
-+ * QEMU PowerPC sPAPR XIVE interrupt controller model
-+ *
-+ * Copyright (c) 2017-2018, IBM Corporation.
-+ *
-+ * This code is licensed under the GPL version 2 or later. See the
-+ * COPYING file in the top-level directory.
++ * XIVE END ESBs
 + */
 +
-+#ifndef PPC_SPAPR_XIVE_H
-+#define PPC_SPAPR_XIVE_H
++#define TYPE_XIVE_END_SOURCE "xive-end-source"
++#define XIVE_END_SOURCE(obj) \
++    OBJECT_CHECK(XiveENDSource, (obj), TYPE_XIVE_END_SOURCE)
 +
-+#include "hw/ppc/xive.h"
++typedef struct XiveENDSource {
++    DeviceState parent;
 +
-+#define TYPE_SPAPR_XIVE "spapr-xive"
-+#define SPAPR_XIVE(obj) OBJECT_CHECK(sPAPRXive, (obj), TYPE_SPAPR_XIVE)
++    uint32_t        nr_ends;
++    uint8_t         block_id;
 +
-+typedef struct sPAPRXive {
-+    XiveRouter    parent;
++    /* ESB memory region */
++    uint32_t        esb_shift;
++    MemoryRegion    esb_mmio;
 +
-+    /* Internal interrupt source for IPIs and virtual devices */
-+    XiveSource    source;
-+    hwaddr        vc_base;
++    XiveRouter      *xrtr;
++} XiveENDSource;
 +
-+    /* END ESB MMIOs */
-+    XiveENDSource end_source;
-+    hwaddr        end_base;
-+
-+    /* Routing table */
-+    XiveEAS       *eat;
-+    uint32_t      nr_irqs;
-+    XiveEND       *endt;
-+    uint32_t      nr_ends;
-+
-+    /* TIMA mapping address */
-+    hwaddr        tm_base;
-+    MemoryRegion  tm_mmio;
-+} sPAPRXive;
-+
-+bool spapr_xive_irq_claim(sPAPRXive *xive, uint32_t lisn, bool lsi);
-+bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t lisn);
-+void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
-+qemu_irq spapr_xive_qirq(sPAPRXive *xive, uint32_t lisn);
-+
-+#endif /* PPC_SPAPR_XIVE_H */
+ /*
+  * For legacy compatibility, the exceptions define up to 256 different
+  * priorities. P9 implements only 9 levels : 8 active levels [0 - 7]
 --=20
 2.19.2
