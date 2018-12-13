@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gXTRD-00045d-Jf
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 11:02:16 -0500
+	(envelope-from <bounces@canonical.com>) id 1gXTRM-00047X-KY
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 11:02:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gXTQv-0003fl-NC
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 11:02:02 -0500
-Resent-Message-Id: <E1gXTQv-0003fl-NC@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21804)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gXTQv-0002oW-CW
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 11:01:53 -0500
-In-Reply-To: <1544701071-2922-1-git-send-email-liq3ea@gmail.com>
-Message-ID: <154471686589.17726.17792356837247129570@02a1dbf831e2>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <bounces@canonical.com>) id 1gXTRG-0004C5-RY
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 11:02:20 -0500
+Received: from indium.canonical.com ([91.189.90.7]:54346)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gXTRG-0003t0-I4
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 11:02:14 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gXTR4-0001P6-MF
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 16:02:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A740D2E808D
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 16:02:02 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 13 Dec 2018 08:01:07 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2] util: check the return value of fcntl
- in qemu_set_{block, nonblock}
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 13 Dec 2018 15:49:18 -0000
+From: asd fghjkl <1703506@bugs.launchpad.net>
+Reply-To: Bug 1703506 <1703506@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149974876377.6612.10329067332937096720.malonedeb@gac.canonical.com>
+Message-Id: <154471615856.28534.5674193010214819135.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1703506] Re: SMT not supported by QEMU on AMD
+ Ryzen CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,22 +37,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: liq3ea@gmail.com
-Cc: fam@euphon.net, peter.maydell@linaro.org, marcandre.lureau@redhat.com, pbonzini@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTQ0NzAxMDcxLTI5MjItMS1n
-aXQtc2VuZC1lbWFpbC1saXEzZWFAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxl
-ZCB0aGUgZG9ja2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRl
-c3RpbmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2Vy
-IGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBU
-RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1
-aWNrQGNlbnRvczcgU0hPV19FTlY9MSBKPTgKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCmxpYnBt
-ZW0gc3VwcG9ydCAgIG5vCmxpYnVkZXYgICAgICAgICAgIG5vCgpXQVJOSU5HOiBVc2Ugb2YgU0RM
-IDEuMiBpcyBkZXByZWNhdGVkIGFuZCB3aWxsIGJlIHJlbW92ZWQgaW4KV0FSTklORzogZnV0dXJl
-IHJlbGVhc2VzLiBQbGVhc2Ugc3dpdGNoIHRvIHVzaW5nIFNETCAyLjAKCk5PVEU6IGNyb3NzLWNv
-bXBpbGVycyBlbmFibGVkOiAgJ2NjJwogIEdFTiAgICAgeDg2XzY0LXNvZnRtbXUvY29uZmlnLWRl
-dmljZXMubWFrLnRtcAoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNo
-ZXcub3JnL2xvZ3MvMTU0NDcwMTA3MS0yOTIyLTEtZ2l0LXNlbmQtZW1haWwtbGlxM2VhQGdtYWls
-LmNvbS90ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50b3M3Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
-bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
-XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+I got it to work:
+sudo nano /etc/modprobe.d/kvm.conf
+add "options kvm ignore_msrs=3D1" (without quotes)
+reboot
+
+Then changing "-machine q35" to "-machine pc" kept it from crashing
+randomly.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1703506
+
+Title:
+  SMT not supported by QEMU on AMD Ryzen CPU
+
+Status in QEMU:
+  New
+
+Bug description:
+  HyperThreading/SMT is supported by AMD Ryzen CPUs but results in this
+  message when setting the topology to threads=3D2:
+
+  qemu-system-x86_64: AMD CPU doesn't support hyperthreading. Please
+  configure -smp options properly.
+
+  Checking in a Windows 10 guest reveals that SMT is not enabled, and
+  from what I understand, QEMU converts the topology from threads to
+  cores internally on AMD CPUs. This appears to cause performance
+  problems in the guest perhaps because programs are assuming that these
+  threads are actual cores.
+
+  Software: Linux 4.12, qemu 2.9.0 host with KVM enabled, Windows 10 pro
+  guest
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1703506/+subscriptions
