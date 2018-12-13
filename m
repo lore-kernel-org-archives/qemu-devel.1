@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gXMFh-0002Du-F7
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 03:21:52 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gXMPx-0004bH-VK
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 03:32:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gXMFe-0001Pv-4e
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 03:21:49 -0500
-Date: Thu, 13 Dec 2018 09:21:38 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181213092138.5854d0fc.cohuck@redhat.com>
-In-Reply-To: <CAFEAcA8kDDbeQwUYEAswvZ05dSHLLNpeYyT3Op8JeJefAE7ujw@mail.gmail.com>
-References: <20181210135803.20208-1-peter.maydell@linaro.org>
-	<20181210151310.3f13c28f.cohuck@redhat.com>
-	<CAFEAcA8q6sgirc9ydFRNGs5tCn0PjScHD_tHCR2XhxBM=CoZeg@mail.gmail.com>
-	<20181212183416.1972d450.cohuck@redhat.com>
-	<CAFEAcA8kDDbeQwUYEAswvZ05dSHLLNpeYyT3Op8JeJefAE7ujw@mail.gmail.com>
+	(envelope-from <laurent@vivier.eu>) id 1gXMPp-0003ta-ND
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 03:32:24 -0500
+References: <20181203100415.53027-1-r.bolshakov@yadro.com>
+	<20181203100415.53027-2-r.bolshakov@yadro.com>
+	<20181212211646.vem27l5pe6pzujd4@SPB-NB-133.local>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <8ad0725d-50e5-4503-e380-acc5720b8fd3@vivier.eu>
+Date: Thu, 13 Dec 2018 09:32:04 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20181212211646.vem27l5pe6pzujd4@SPB-NB-133.local>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/s390/ccw.c: Don't take address of
- packed members
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH for-3.1 2/2] i386: hvf: drop
+ debug printf in decode_sldtgroup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,66 +26,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, qemu-s390x <qemu-s390x@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Roman Bolshakov <r.bolshakov@yadro.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, 12 Dec 2018 21:15:29 +0000
-Peter Maydell <peter.maydell@linaro.org> wrote:
-
-> On Wed, 12 Dec 2018 at 17:34, Cornelia Huck <cohuck@redhat.com> wrote:
-> >
-> > On Mon, 10 Dec 2018 14:23:15 +0000
-> > Peter Maydell <peter.maydell@linaro.org> wrote:
-> >  
-> > > On Mon, 10 Dec 2018 at 14:13, Cornelia Huck <cohuck@redhat.com> wrote:  
-> > > >
-> > > > On Mon, 10 Dec 2018 13:58:03 +0000
-> > > > Peter Maydell <peter.maydell@linaro.org> wrote:
-> > > >  
-> > > > > Taking the address of a field in a packed struct is a bad idea, because
-> > > > > it might not be actually aligned enough for that pointer type (and
-> > > > > thus cause a crash on dereference on some host architectures). Newer
-> > > > > versions of clang warn about this.
-> > > > >
-> > > > > Avoid the problem by using local copies of the PMCW and SCSW
-> > > > > struct fields in copy_schib_from_guest() and copy_schib_to_guest().
-> > > > >
-> > > > > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> > > > > ---
-> > > > > This seemed like a not totally ugly and reasonably localised fix
-> > > > > that satisfies clang. Oddly, this makes the generated object file
-> > > > > 15K smaller (421K vs 406K), so it might even be better code...  
-> > > >
-> > > > Nice :)
-> > > >  
-> > > > >
-> > > > >  hw/s390x/css.c | 20 ++++++++++++++++----
-> > > > >  1 file changed, 16 insertions(+), 4 deletions(-)
-> > > > >
-> > > > > diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> > > > > index 04ec5cc9705..ef07691e36b 100644
-> > > > > --- a/hw/s390x/css.c
-> > > > > +++ b/hw/s390x/css.c
-> > > > > @@ -1290,9 +1290,15 @@ void copy_scsw_to_guest(SCSW *dest, const SCSW *src)
-> > > > >  static void copy_schib_to_guest(SCHIB *dest, const SCHIB *src)
-> > > > >  {
-> > > > >      int i;
-> > > > > +    PMCW srcpmcw, destpmcw;
-> > > > > +    SCSW srcscsw, destscsw;  
-> > > >
-> > > > <bikeshed>
-> > > > I would find src_pmcw etc. easier to read. Other opinions?
-> > > > </bikeshed>  
-> > >
-> > > CODING_STYLE's "Naming" section agrees with you...  
-> >
-> > Do you plan to send a v2, or should I just rename and apply?  
+On 12/12/2018 22:16, Roman Bolshakov wrote:
+> On Mon, Dec 03, 2018 at 01:04:15PM +0300, Roman Bolshakov wrote:
+>> It's going to clutter QEMU logs if 0x0f00 is trapped.
+>>
+>> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+>> ---
+>>  target/i386/hvf/x86_decode.c | 2 --
+>>  1 file changed, 2 deletions(-)
+>>
+>> diff --git a/target/i386/hvf/x86_decode.c b/target/i386/hvf/x86_decode.c
+>> index d125a6ef83..5f513c5563 100644
+>> --- a/target/i386/hvf/x86_decode.c
+>> +++ b/target/i386/hvf/x86_decode.c
+>> @@ -525,8 +525,6 @@ static void decode_sldtgroup(CPUX86State *env, struct x86_decode *decode)
+>>          X86_DECODE_CMD_INVL
+>>      };
+>>      decode->cmd = group[decode->modrm.reg];
+>> -    printf("%llx: decode_sldtgroup: %d\n", env->hvf_emul->fetch_rip,
+>> -            decode->modrm.reg);
+>>  }
+>>  
+>>  static void decode_lidtgroup(CPUX86State *env, struct x86_decode *decode)
+>> -- 
+>> 2.17.2 (Apple Git-113)
+>>
 > 
-> If you want to rename and apply that would be great; I can
-> send a v2 if that's easier for you.
-> 
-> thanks
-> -- PMM
+> Could you please apply to trivial queue
+Applied to my trivial-patches branch.
 
-Given that Thomas also wanted a comment added, a v2 would be easier for
-me.
+Thanks,
+Laurent
