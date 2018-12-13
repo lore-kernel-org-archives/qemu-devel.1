@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gXSYi-000696-5N
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:05:53 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gXSbJ-00086v-3Y
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:08:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gXSYh-0005W5-0p
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:05:52 -0500
-References: <DB6PR07MB33330E3562B0AF0ECC8307BCAEA00@DB6PR07MB3333.eurprd07.prod.outlook.com>
-	<DB6PR07MB3333E95C513AF2EF14AAE615AEA00@DB6PR07MB3333.eurprd07.prod.outlook.com>
-	<14b32e39-a9f6-1a83-87e6-6e150954ddb7@redhat.com>
-	<20181213144914.GH5427@linux.fritz.box>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <db4f1763-e28f-387c-2652-ba71c29e97ff@redhat.com>
-Date: Thu, 13 Dec 2018 09:05:43 -0600
+	(envelope-from <kwolf@redhat.com>) id 1gXSbH-0000gN-76
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:08:33 -0500
+Date: Thu, 13 Dec 2018 16:08:18 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181213150818.GI5427@linux.fritz.box>
+References: <1544543862-9997-1-git-send-email-paul.durrant@citrix.com>
+	<1544543862-9997-17-git-send-email-paul.durrant@citrix.com>
+	<20181213115152.GA5427@linux.fritz.box>
+	<b323cd922b6d4a5798a2f3cfae2bd573@AMSPEX02CL03.citrite.net>
 MIME-Version: 1.0
-In-Reply-To: <20181213144914.GH5427@linux.fritz.box>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] Request for clarification on qemu-img
- convert behavior zeroing target host_device
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b323cd922b6d4a5798a2f3cfae2bd573@AMSPEX02CL03.citrite.net>
+Subject: Re: [Qemu-devel] [PATCH v4 16/18] xen: automatically create
+ XenBlockDevice-s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +26,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "De Backer, Fred (Nokia - BE/Antwerp)" <fred.de_backer@nokia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Nir Soffer <nsoffer@redhat.com>, qemu block <qemu-block@nongnu.org>, "Richard W.M. Jones" <rjones@redhat.com>, "Aamir T, Owais (Nokia - IN/Chennai)" <owais.aamir_t@nokia.com>
+To: Paul Durrant <Paul.Durrant@citrix.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-On 12/13/18 8:49 AM, Kevin Wolf wrote:
-
->>> We observe that in Fedora 29 the qemu-img, before imaging the disk, it fully zeroes it. Taking into account the disk size, the whole process now takes 35 minutes instead of 50 seconds. This causes the ironic-python-agent operation to time-out. The Fedora 27 qemu-img doesn't do that.
->>
->> Known issue; Nir and Rich have posted a previous thread on the topic, and
->> the conclusion is that we need to make qemu-img smarter about NOT requesting
->> pre-zeroing of devices where that is more expensive than just zeroing as we
->> go.
->> https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg01182.html
+Am 13.12.2018 um 13:44 hat Paul Durrant geschrieben:
+> > Essentially, what I'm wondering is whether we have anything that could
+> > be treated more or less like another monitor besides QMP and HMP, which
+> > would internally work similar to HMP, i.e. map (almost) everything to
+> > QMP commands.
 > 
-> Yes, we should be careful to avoid the fallback in this case.
-> 
-> However, how could this ever go from 50 seconds for writing the whole
-> image to 35 minutes?! Even if you end up writing the whole image twice
-> because you write zeros first and then overwrite them everywhere with
-> data, shouldn't the maximum be doubling the time, i.e. 100 seconds?
-> 
-> Why is the write_zeroes fallback _that_ slow? It will also hit guests
-> that request write_zeroes, so I feel this is worth investigating a bit
-> more nevertheless.
-> 
-> Can you check with strace which operation actually succeeds writing
-> zeros to /dev/sda? The first thing we try is fallocate with
-> FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE. This should always be fast,
-> so I suppose this fails in your case. The next thing is BLKZEROOUT,
-> which I think can do a fallback in the kernel. Does this return success?
-> Otherwise we have another fallback mechanism inside of QEMU, which would
-> use normal pwrite calls with a zeroed buffer.
+> Yes, it would be possible to have a separate 'compatibility' daemon to
+> watch xenstore and then formulate the correct sequence of QMP commands
+> to instantiate the backend, but that is more complicated and the right
+> answer of course is to have the toolstack send the QMP commands in the
+> first place.
 
-It may also be a case of poor lseek(SEEK_HOLE) performance on the source 
-(a known issue with at least some versions of tmpfs). The way qemu-img 
-queries for block status, it ends up repeatedly hammering on lseek(), 
-and if lseek() is already O(n) instead of O(1) in behavior, that 
-explodes into some O(n^2) scaling because qemu-img isn't caching the 
-answers it got previously.
+Okay, if someone is working on actually using QMP instead of xenstore,
+that's even better, of course. Disregard this point then.
 
+> > > +    drive_new(drive_opts, IF_NONE, &local_err);
+> > > +    if (local_err) {
+> > > +        error_propagate_prepend(errp, local_err,
+> > > +                                "failed to create drive: ");
+> > > +        goto done;
+> > > +    }
+> > 
+> > The other major point is that you're using the legacy drive_*()
+> > infrastructure, which should not only go away as soon as we can, but
+> > which is also full of magic and nasty surprises.
+> > 
+> > I think the best way would be to create only a block node
+> > (BlockDriverState) here, and get an automatically created anonymous
+> > BlockBackend from the qdev drive property.
+> > 
+> > There are two ways to achieve this: qmp_blockdev_add() would be optimal
+> > because that's a stable external interface. It would require you to
+> > specify a node-name (you already have the id parameter), and you'd use
+> > this node-name for the qdev drive property.
+> > 
+> > qmp_blockdev_add() requires a BlockdevOptions object, which you can
+> > either construct manually in C or use a visitor to convert from an
+> > options QDict. Maybe in this case, converting from a QDict is better
+> > because otherwise you need special code for each block driver.
+> > 
 > 
-> Once we know which mechanism is used, we can look into why it is so
-> abysmally slow.
+> I was using the legacy interfaces because this code is, as I said
+> above, supposed to be a mechanism only required for compatibility with
+> the way toolstacks currently operate (and so is essentially 'legacy')
+> but using the top-level QMP entry point to construct the does sound
+> do-able as long as the underlying file locking can still be avoided
+> with that mechanism. Since BlockdevOptions seems to be an
+> auto-generated structure, figuring out how to fill it in manually is
+> somewhat tricky so the QDict approach is preferable but I'll have to
+> figure out how to use a visitor to do the translation.
 
-Indeed, performance traces are important for issues like this.
+You can grep for qobject_input_visitor_new() for examples. Some block
+drivers use this internally to convert .bdrv_create options to a QAPI
+object, it looks like this:
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+    /* Now get the QAPI type BlockdevCreateOptions */
+    v = qobject_input_visitor_new_flat_confused(qdict, errp);
+    if (!v) {
+        ret = -EINVAL;
+        goto finish;
+    }
+
+    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
+    visit_free(v);
+
+    if (local_err) {
+        error_propagate(errp, local_err);
+        ret = -EINVAL;
+        goto finish;
+    }
+
+Obviously, you'd use visit_type_BlockdevOptions instead. You also might
+not need the _flat_confused variant, which is about QDicts where we
+don't know whether values are stored as their actual type or as strings.
+In your code, you have control over the types in the QDict, so this
+shouldn't be a problem.
+
+> > The other way would be calling bdrv_open() directly, which gives you a
+> > BlockDriverState, but it risks using legacy functionality that will be
+> > deprecated soon. Again, you'd take the node-name and pass it to the qdev
+> > drive option below.
+> 
+> Yes, xen_disk does things this way but then we end up with legacy
+> block device and still fall foul of the assertions buried in the code.
+
+Yes and no. xen_disk is better in that it avoids the drive_* things
+(which internally call bdrv_open() anyway), but it's worse in that it
+directly assigns blkdev->blk instead of using the qdev property.
+
+What I meant here is that you create the BDS with bdrv_open(), but then
+you wouldn't assign it directly to some field in the device state, but
+just put the node-name of the BDS into the qdev property 'drive'. This
+would be almost like qmp_blockdev_add(), except without validation
+against the QAPI schema.
+
+But if using qmp_blockdev_add() is easy enough, that's preferable.
+
+> > 
+> > > +
+> > > +done:
+> > > +    g_free(drive_optstr);
+> > > +    g_free(format);
+> > > +    g_free(file);
+> > > +}
+> > > +
+> > > +static void xen_block_device_create(BusState *bus, const char *name,
+> > > +                                    QDict *opts, Error **errp)
+> > > +{
+> > > +    unsigned long number;
+> > > +    const char *vdev, *device_type;
+> > > +    BlockBackend *blk = NULL;
+> > > +    IOThread *iothread = NULL;
+> > > +    DeviceState *dev = NULL;
+> > > +    Error *local_err = NULL;
+> > > +    const char *type;
+> > > +    XenBlockDevice *blockdev;
+> > > +
+> > > +    trace_xen_block_device_create(name);
+> > > +
+> > > +    if (qemu_strtoul(name, NULL, 10, &number)) {
+> > > +        error_setg(errp, "failed to parse name '%s'", name);
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    vdev = qdict_get_try_str(opts, "dev");
+> > > +    if (!vdev) {
+> > > +        error_setg(errp, "no dev parameter");
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    device_type = qdict_get_try_str(opts, "device-type");
+> > > +    if (!device_type) {
+> > > +        error_setg(errp, "no device-type parameter");
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    if (!strcmp(device_type, "disk")) {
+> > > +        type = TYPE_XEN_DISK_DEVICE;
+> > > +    } else if (!strcmp(device_type, "cdrom")) {
+> > > +        type = TYPE_XEN_CDROM_DEVICE;
+> > > +    } else {
+> > > +        error_setg(errp, "invalid device-type parameter '%s'",
+> > device_type);
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    xen_block_drive_create(vdev, device_type, opts, &local_err);
+> > > +    if (local_err) {
+> > > +        error_propagate(errp, local_err);
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    blk = blk_by_name(vdev);
+> > > +    g_assert(blk);
+> > > +
+> > > +    iothread = iothread_create(vdev, &local_err);
+> > > +    if (local_err) {
+> > > +        error_propagate(errp, local_err);
+> > > +        goto unref;
+> > > +    }
+> > > +
+> > > +    dev = qdev_create(bus, type);
+> > > +    blockdev = XEN_BLOCK_DEVICE(dev);
+> > > +
+> > > +    qdev_prop_set_string(dev, "vdev", vdev);
+> > > +    if (blockdev->vdev.number != number) {
+> > > +        error_setg(errp, "invalid dev parameter '%s'", vdev);
+> > > +        goto unref;
+> > > +    }
+> > > +
+> > > +    qdev_prop_set_drive(dev, "drive", blk, &local_err);
+> > > +    if (local_err) {
+> > > +        error_propagate_prepend(errp, local_err, "failed to set
+> > 'drive': ");
+> > > +        goto unref;
+> > > +    }
+> > 
+> > So here you would need to use something like this:
+> > 
+> > object_property_set_str(OBJECT(dev), vdev, "driver", &local_err);
+> > 
+> > > +
+> > > +    blockdev->auto_iothread = iothread;
+> > > +
+> > > +    object_property_set_bool(OBJECT(dev), true, "realized",
+> > &local_err);
+> > > +    if (local_err) {
+> > > +        error_propagate_prepend(errp, local_err,
+> > > +                                "initialization of device %s failed: ",
+> > > +                                type);
+> > > +        goto unref;
+> > > +    }
+> > > +
+> > > +    blockdev_mark_auto_del(blk);
+> > 
+> > You don't need this one any more then (if you look into the details,
+> > it's one of the more confusing parts of the drive_*() magic, so it's
+> > good to get rid of it). When you use the anonymous BlockBackend created
+> > by the qdev drive property (because you passed it a node-name rather
+> > than a BlockBackend name) means that the BlockBackend disappears
+> > together with the drive.
+> > 
+> 
+> Ok.
+> 
+> > Note that explicitly created block nodes must also be unreferenced
+> > explicitly (bdrv_open() should be paired with bdrv_unref() and
+> > qmp_blockdev_add() with qmp_blockdev_del()). Maybe XenBackendInfo needs
+> > a .destroy callback so we can do destruction symmetrically to device
+> > creation?
+> > 
+> 
+> Yes, I'd probably just add a callback function pointer into XenDevice
+> which only gets set for devices instantiated via this mechanism.
+
+I think it's a bit nicer to have it in XenBackendInfo for symmetry and
+because that sits outside the device, so the device doesn't destroy its
+own backend, just like it doesn't create it (even if it's the same
+source file).
+
+But yes, whatever works best for you.
+
+Kevin
