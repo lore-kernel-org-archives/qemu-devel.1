@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gXSP9-00055U-0s
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:55:59 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gXSP9-00055q-Cz
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:56:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gXSP7-00005m-6m
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:55:58 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:53512)
+	(envelope-from <pm215@archaic.org.uk>) id 1gXSP8-00008f-FV
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:55:59 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:53508)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gXSP6-0007J5-U0
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:55:57 -0500
+	id 1gXSP8-00071P-7R
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:55:58 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gXSOA-0007Ks-R9
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 14:54:58 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1gXSO9-0007KQ-RI
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 14:54:57 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 13 Dec 2018 14:54:32 +0000
-Message-Id: <20181213145445.17935-25-peter.maydell@linaro.org>
+Date: Thu, 13 Dec 2018 14:54:30 +0000
+Message-Id: <20181213145445.17935-23-peter.maydell@linaro.org>
 In-Reply-To: <20181213145445.17935-1-peter.maydell@linaro.org>
 References: <20181213145445.17935-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 24/37] hw/arm: versal: Remove bogus virtio-mmio
- creation
+Subject: [Qemu-devel] [PULL 22/37] xen_backend: remove xen_sysdev_init()
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +32,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 
-Remove bogus virtio-mmio creation. This was an accidental
-left-over an experiment.
+The init function doesn't do anything at all, so we
+just omit it.
 
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
-Message-id: 20181129163655.20370-2-edgar.iglesias@gmail.com
+Cc: sstabellini@kernel.org
+Cc: anthony.perard@citrix.com
+Cc: xen-devel@lists.xenproject.org
+Cc: peter.maydell@linaro.org
+
+Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+Message-id: 20181130093852.20739-21-maozhongyi@cmss.chinamobile.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/xlnx-versal-virt.c | 1 -
- 1 file changed, 1 deletion(-)
+ hw/xen/xen_backend.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
-diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
-index 1e31a3f4429..41b8d801c89 100644
---- a/hw/arm/xlnx-versal-virt.c
-+++ b/hw/arm/xlnx-versal-virt.c
-@@ -364,7 +364,6 @@ static void create_virtio_regions(VersalVirt *s)
-         sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic_irq);
-         mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
-         memory_region_add_subregion(&s->soc.mr_ps, base, mr);
--        sysbus_create_simple("virtio-mmio", base, pic_irq);
+diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
+index 9a8e8771eca..0bc6b1de60f 100644
+--- a/hw/xen/xen_backend.c
++++ b/hw/xen/xen_backend.c
+@@ -809,11 +809,6 @@ static const TypeInfo xensysbus_info = {
      }
+ };
  
-     for (i = 0; i < NUM_VIRTIO_TRANSPORT; i++) {
+-static int xen_sysdev_init(SysBusDevice *dev)
+-{
+-    return 0;
+-}
+-
+ static Property xen_sysdev_properties[] = {
+     {/* end of property list */},
+ };
+@@ -821,9 +816,7 @@ static Property xen_sysdev_properties[] = {
+ static void xen_sysdev_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+-    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
+ 
+-    k->init = xen_sysdev_init;
+     dc->props = xen_sysdev_properties;
+     dc->bus_type = TYPE_XENSYSBUS;
+ }
 -- 
 2.19.2
