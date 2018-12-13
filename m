@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gXVV0-0006d0-Cj
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:14:15 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gXVZS-0000Ei-RG
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:18:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gXVUv-0001Ow-PQ
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:14:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44292)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gXVUv-0001NN-GZ
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:14:09 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C9B4E308213C
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 18:14:06 +0000 (UTC)
-Received: from donizetti.redhat.com (ovpn-112-16.ams2.redhat.com
-	[10.36.112.16])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id BCB871054FD7
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 18:14:05 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 13 Dec 2018 19:14:02 +0100
-Message-Id: <20181213181402.24012-1-pbonzini@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1gXVZR-0004d0-TA
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:18:50 -0500
+References: <20180917145732.48590-1-vsementsov@virtuozzo.com>
+	<504d170c-56ee-0cf5-78e0-47aded4c132f@virtuozzo.com>
+	<43def1dd-732e-a358-d15f-492eefae0a80@redhat.com>
+	<c4c5d8ec-eb90-915c-03d3-95c7517b4b57@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <091d787b-c2e8-6296-792f-6223015f0d0e@redhat.com>
+Date: Thu, 13 Dec 2018 13:18:34 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 00/46] Misc patches for 2018-12-13
+In-Reply-To: <c4c5d8ec-eb90-915c-03d3-95c7517b4b57@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] ping2 Re: [PATCH v4 0/8] dirty-bitmap: rewrite
+ bdrv_dirty_iter_next_area
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,222 +27,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "famz@redhat.com" <famz@redhat.com>, Denis Lunev <den@virtuozzo.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 
-The following changes since commit bb9bf94b3e8926553290bc9a7cb84315af4220=
-86:
 
-  Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-r=
-equest' into staging (2018-12-11 19:18:58 +0000)
 
-are available in the Git repository at:
+On 12/13/18 6:07 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 12.12.2018 23:41, John Snow wrote:
+>>
+>>
+>> On 12/12/18 4:27 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> ping. No dependencies, apply to master.
+>>>
+>>
+>> Sure thing.
+>>
+>> Staged to jsnow/bitmaps.
+> 
+> 
+> Thank you!
+> 
+> Oops, I've missed your email about s/firt_dirty_off/first_dirty_off
+> 
+> I can resend, or you can fix in your branch, as you prefer.
+> The variable touches two commits in jsnow/bitmaps:
+> 
 
-  git://github.com/bonzini/qemu.git tags/for-upstream
+Whoops, I forgot too. I just remember that I was waiting on a requisite
+and it got lost so I was in a hurry to stage it for you. I'll just
+squash any fixes in.
 
-for you to fetch changes up to d115ceb731fc09134fb0816c956ab0eb88fbfa7b:
+I'll try to send the PR when the qemu-img bitmap info patch is ready,
+alongside my series to drop the x-prefix (and adjust the merge API.)
 
-  vhost-user-test: create a temporary directory per TestServer (2018-12-1=
-3 10:57:30 +0100)
+Anything else urgent for the start of the 4.0 window before we all
+disappear on holiday break?
 
-----------------------------------------------------------------
-* HAX support for Linux hosts (Alejandro)
-* esp bugfixes (Guenter)
-* Windows build cleanup (Marc-Andr=C3=A9)
-* checkpatch logic improvements (Paolo)
-* coalesced range bugfix (Paolo)
-* switch testsuite to TAP (Paolo)
-* QTAILQ rewrite (Paolo)
-* enable vhost for TCG and clean up vhost-user-test (Paolo)
-* block/iscsi.c cancellation fixes (Stefan)
-* improve selection of the default accelerator (Thomas)
+--js
 
-----------------------------------------------------------------
-Alexandro Sanchez Bach (1):
-      hax: Support for Linux hosts
-
-Guenter Roeck (2):
-      esp-pci: Fix status register write erase control
-      scsi: esp: Defer command completion until previous interrupts have =
-been handled
-
-Marc-Andr=C3=A9 Lureau (5):
-      vhost-user-bridge: fix "unknown type name" compilation error
-      build-sys: don't include windows.h, osdep.h does it
-      build-sys: move windows defines in osdep.h header
-      build-sys: build with Vista API by default
-      qga: drop < Vista compatibility
-
-Paolo Bonzini (32):
-      checkpatch: fix premature exit when no input or --mailback
-      checkpatch: check Signed-off-by in --mailback mode
-      checkpatch: improve handling of multiple patches or files
-      checkpatch: colorize output to terminal
-      pam: wrap MemoryRegion initialization in a transaction
-      memory: extract flat_range_coalesced_io_{del,add}
-      memory: avoid unnecessary coalesced_io_del operations
-      memory: update coalesced_range on transaction_commit
-      test: execute g_test_run when tests are skipped
-      test: replace gtester with a TAP driver
-      qemu/queue.h: do not access tqe_prev directly
-      vfio: make vfio_address_spaces static
-      qemu/queue.h: leave head structs anonymous unless necessary
-      qemu/queue.h: typedef QTAILQ heads
-      qemu/queue.h: remove Q_TAILQ_{HEAD,ENTRY}
-      qemu/queue.h: reimplement QTAILQ without pointer-to-pointers
-      qemu/queue.h: simplify reverse access to QTAILQ
-      checkpatch: warn about qemu/queue.h head structs that are not typed=
-ef-ed
-      vhost-net: move stubs to a separate file
-      vhost-net-user: add stubs for when no virtio-net device is present
-      vhost: restrict Linux dependency to kernel vhost
-      vhost-net: compile it on all targets that have virtio-net.
-      vhost-net: revamp configure logic
-      vhost-user-test: use g_cond_broadcast
-      vhost-user-test: signal data_cond when s->rings changes
-      vhost-user: support cross-endian vnet headers
-      vhost-user-test: support VHOST_USER_PROTOCOL_F_CROSS_ENDIAN
-      vhost-user-test: skip if there is no memory at address 0
-      vhost-user-test: reduce usage of global_qtest
-      vhost-user-test: create a main loop per TestServer
-      vhost-user-test: small changes to init_hugepagefs
-      vhost-user-test: create a temporary directory per TestServer
-
-Peng Hao (1):
-      hw/watchdog/wdt_i6300esb: remove a unnecessary comment
-
-Stefan Hajnoczi (4):
-      block/iscsi: drop unused IscsiAIOCB->buf field
-      block/iscsi: take iscsilun->mutex in iscsi_timed_check_events()
-      block/iscsi: fix ioctl cancel use-after-free
-      block/iscsi: cancel libiscsi task when ABORT TASK TMF completes
-
-Thomas Huth (1):
-      accel: Improve selection of the default accelerator
-
- accel/accel.c                                |  18 +-
- accel/kvm/kvm-all.c                          |   4 +-
- accel/tcg/translate-all.c                    |   4 -
- backends/Makefile.objs                       |   5 +-
- block/gluster.c                              |   2 +-
- block/iscsi.c                                |  47 +++-
- block/mirror.c                               |   2 +-
- block/qcow2-bitmap.c                         |   4 +-
- block/qcow2.h                                |   2 +-
- block/sheepdog.c                             |   6 +-
- block/vhdx.h                                 |   2 +-
- blockdev.c                                   |   4 +-
- configure                                    | 105 +++++---
- contrib/ivshmem-client/ivshmem-client.h      |   4 +-
- contrib/ivshmem-server/ivshmem-server.h      |   5 +-
- cpus-common.c                                |   2 +-
- default-configs/virtio.mak                   |   4 +-
- dump.c                                       |   2 +-
- exec.c                                       |   5 +-
- fsdev/qemu-fsdev.c                           |   2 +-
- hw/block/nvme.h                              |   8 +-
- hw/block/xen_disk.c                          |   6 +-
- hw/core/qdev.c                               |   4 +-
- hw/core/reset.c                              |   2 +-
- hw/i386/xen/xen-mapcache.c                   |   2 +-
- hw/net/Makefile.objs                         |   4 +-
- hw/net/vhost_net-stub.c                      |  92 +++++++
- hw/net/vhost_net.c                           |  78 +-----
- hw/pci-host/pam.c                            |   2 +
- hw/ppc/spapr_iommu.c                         |   2 +-
- hw/scsi/esp-pci.c                            |  10 +-
- hw/scsi/esp.c                                |  33 ++-
- hw/scsi/scsi-bus.c                           |   2 +-
- hw/scsi/trace-events                         |   1 +
- hw/usb/ccid-card-emulated.c                  |   4 +-
- hw/usb/combined-packet.c                     |   2 +-
- hw/usb/dev-mtp.c                             |   4 +-
- hw/usb/dev-network.c                         |   2 +-
- hw/usb/hcd-ehci.c                            |   2 +-
- hw/usb/hcd-ehci.h                            |   2 +-
- hw/usb/hcd-uhci.c                            |   4 +-
- hw/usb/xen-usb.c                             |   6 +-
- hw/vfio/common.c                             |   4 +-
- hw/virtio/Makefile.objs                      |   5 +-
- hw/virtio/vhost-backend.c                    |  11 +-
- hw/watchdog/watchdog.c                       |   2 +-
- hw/watchdog/wdt_i6300esb.c                   |   1 -
- hw/xen/xen_pvdev.c                           |   4 +-
- include/exec/memory.h                        |   6 +-
- include/exec/poison.h                        |   1 -
- include/hw/qdev-core.h                       |   2 +-
- include/hw/scsi/esp.h                        |   2 +
- include/hw/usb.h                             |   2 +-
- include/hw/vfio/vfio-common.h                |   4 +-
- include/hw/vfio/vfio-platform.h              |   2 +-
- include/net/net.h                            |   2 +-
- include/qemu/option_int.h                    |   2 +-
- include/qemu/osdep.h                         |  17 ++
- include/qemu/queue.h                         | 153 +++++------
- include/qemu/rcu_queue.h                     |  45 ++--
- include/qom/cpu.h                            |   9 +-
- include/sysemu/accel.h                       |   2 +-
- include/sysemu/kvm.h                         |   2 -
- include/sysemu/memory_mapping.h              |   2 +-
- include/sysemu/rng.h                         |   2 +-
- linux-user/elfload.c                         |   2 +-
- memory.c                                     |  97 ++++---
- memory_mapping.c                             |   2 +-
- migration/block-dirty-bitmap.c               |   2 +-
- migration/block.c                            |   4 +-
- migration/ram.c                              |   2 +-
- monitor.c                                    |   4 +-
- net/Makefile.objs                            |   4 +-
- net/filter.c                                 |   2 +-
- net/net.c                                    |   4 +-
- net/queue.c                                  |   2 +-
- net/slirp.c                                  |   2 +-
- net/vhost-user-stub.c                        |  23 ++
- net/vhost-user.c                             |  13 +
- qga/commands-posix.c                         |   2 +-
- qga/commands-win32.c                         |  70 +----
- scripts/checkpatch.pl                        |  95 +++++--
- scripts/cocci-macro-file.h                   |  24 +-
- scripts/gtester-cat                          |  26 --
- scripts/tap-driver.pl                        | 378 +++++++++++++++++++++=
-++++++
- scripts/tap-merge.pl                         | 110 ++++++++
- slirp/slirp.c                                |   2 +-
- target/arm/kvm.c                             |   2 +-
- target/i386/Makefile.objs                    |   6 +-
- target/i386/hax-i386.h                       |   6 +-
- target/i386/hax-mem.c                        |   2 +-
- target/i386/{hax-darwin.c =3D> hax-posix.c}    |   0
- target/i386/{hax-darwin.h =3D> hax-posix.h}    |   0
- tcg/tcg.c                                    |   2 +-
- tcg/tcg.h                                    |   6 +-
- tests/Makefile.include                       |  59 +++--
- tests/cdrom-test.c                           |   2 +-
- tests/docker/dockerfiles/centos7.docker      |   1 +
- tests/docker/dockerfiles/debian-amd64.docker |   1 +
- tests/docker/dockerfiles/debian-ports.docker |   1 +
- tests/docker/dockerfiles/debian-sid.docker   |   1 +
- tests/docker/dockerfiles/debian8.docker      |   1 +
- tests/docker/dockerfiles/debian9.docker      |   1 +
- tests/docker/dockerfiles/fedora.docker       |   1 +
- tests/docker/dockerfiles/ubuntu.docker       |   1 +
- tests/libqos/malloc.c                        |   2 +-
- tests/migration-test.c                       |   8 +-
- tests/test-rcu-list.c                        |   2 +-
- tests/test-vmstate.c                         |   8 +-
- tests/vhost-user-bridge.c                    |   3 +-
- tests/vhost-user-test.c                      | 234 +++++++++--------
- ui/console.c                                 |   4 +-
- ui/input.c                                   |  14 +-
- util/qemu-option.c                           |   4 +-
- util/qemu-thread-win32.c                     |   4 -
- vl.c                                         |   4 +-
- 116 files changed, 1336 insertions(+), 697 deletions(-)
- create mode 100644 hw/net/vhost_net-stub.c
- create mode 100644 net/vhost-user-stub.c
- delete mode 100755 scripts/gtester-cat
- create mode 100755 scripts/tap-driver.pl
- create mode 100755 scripts/tap-merge.pl
- rename target/i386/{hax-darwin.c =3D> hax-posix.c} (100%)
- rename target/i386/{hax-darwin.h =3D> hax-posix.h} (100%)
---=20
-2.19.2
+> commit f235204c39dd5ce122666d87f18005264eb56e51
+> Author: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Date:   Mon Sep 17 17:57:27 2018 +0300
+> 
+>      dirty-bitmap: add bdrv_dirty_bitmap_next_dirty_area
+> 
+> and the last one:
+> 
+> commit 7f73174ca1c8a92e4a5139b35f2a2273f59ce29b (jnsnow/bitmaps)
+> Author: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Date:   Mon Sep 17 17:57:32 2018 +0300
+> 
+>      Revert "hbitmap: Add @advance param to hbitmap_iter_next()"
+> 
+> 
+> 
+> 
