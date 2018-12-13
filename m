@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gXSO6-00041l-U2
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:55 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gXSO5-00076y-Sk
+	(envelope-from <pm215@archaic.org.uk>) id 1gXSO5-000407-Fl
 	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44588)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gXSO5-00074k-AH
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <pm215@archaic.org.uk>) id 1gXSO4-00074Q-Hl
 	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:53 -0500
-Date: Thu, 13 Dec 2018 09:54:43 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181213095048-mutt-send-email-mst@kernel.org>
-References: <5C10DAE9.3010605@huawei.com>
-	<20181212081902-mutt-send-email-mst@kernel.org>
-	<5C11D19C.4010007@huawei.com>
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:53504)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1gXSO4-0006w2-7L
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:52 -0500
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1gXSO2-0007HC-QL
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 14:54:50 +0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 13 Dec 2018 14:54:17 +0000
+Message-Id: <20181213145445.17935-10-peter.maydell@linaro.org>
+In-Reply-To: <20181213145445.17935-1-peter.maydell@linaro.org>
+References: <20181213145445.17935-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5C11D19C.4010007@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH] vhost-vsock: support parse mergeable
- feature
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 09/37] gpio/puv3_gpio: Convert sysbus init
+ function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,88 +31,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jiangyiwen <jiangyiwen@huawei.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Thu, Dec 13, 2018 at 11:27:24AM +0800, jiangyiwen wrote:
-> On 2018/12/12 21:19, Michael S. Tsirkin wrote:
-> > On Wed, Dec 12, 2018 at 05:54:49PM +0800, jiangyiwen wrote:
-> >> Currently vhost-vsock doesn't have any feature bits, so it
-> >> don't support parse mergeable rx buffer feature. And the
-> >> feature is support in another series of patches named
-> >> "VSOCK: support mergeable rx buffer in vhost-vsock".
-> >>
-> >> So we neet to support parse mergeable feature in vhost-vsock
-> >> if above patches are merged.
-> >>
-> >> Signed-off-by: Yiwen Jiang <jiangyiwen@huawei.com>
-> > 
-> > OK but what does it do? this just defines the feature bit ...
-> > Also pls copy virtio-dev whenever you change the host/guest
-> > interface.
-> > 
-> > Thanks!
-> > 
-> 
-> Hi Michael,
-> 
-> In my opinion, for vhost device, device feature bits need to be
-> intersected between vhost and qemu, so I add mergeable rx buffer feature
-> into vdev->host_features, and then intersected with vhost_dev features.
-> 
-> Later if someone want to add new feature, it can use virtio_add_feature()
-> in vhost_vsock_get_features().
-> 
-> Thanks,
-> Yiwen.
+From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 
-I understand. Sorry.  It seems that your patchset wasn't threaded
-properly, each patch was by its own. Can you pls take a look at fixing
-that?
+Use DeviceClass rather than SysBusDeviceClass in
+puv3_gpio_class_init().
 
-> >> ---
-> >>  hw/virtio/vhost-vsock.c                       | 9 +++++++--
-> >>  include/standard-headers/linux/virtio_vsock.h | 3 +++
-> >>  2 files changed, 10 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/hw/virtio/vhost-vsock.c b/hw/virtio/vhost-vsock.c
-> >> index aa5af92..5023c05 100644
-> >> --- a/hw/virtio/vhost-vsock.c
-> >> +++ b/hw/virtio/vhost-vsock.c
-> >> @@ -178,8 +178,13 @@ static uint64_t vhost_vsock_get_features(VirtIODevice *vdev,
-> >>                                           uint64_t requested_features,
-> >>                                           Error **errp)
-> >>  {
-> >> -    /* No feature bits used yet */
-> >> -    return requested_features;
-> >> +    VHostVSock *vsock = VHOST_VSOCK(vdev);
-> >> +    uint64_t features;
-> >> +
-> >> +    virtio_add_feature(&requested_features, VIRTIO_VSOCK_F_MRG_RXBUF);
-> >> +    features = requested_features & vsock->vhost_dev.features;
-> >> +
-> >> +    return features;
-> >>  }
-> >>
-> >>  static void vhost_vsock_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-> >> diff --git a/include/standard-headers/linux/virtio_vsock.h b/include/standard-headers/linux/virtio_vsock.h
-> >> index be44321..4c583ec 100644
-> >> --- a/include/standard-headers/linux/virtio_vsock.h
-> >> +++ b/include/standard-headers/linux/virtio_vsock.h
-> >> @@ -38,6 +38,9 @@
-> >>  #include "standard-headers/linux/virtio_ids.h"
-> >>  #include "standard-headers/linux/virtio_config.h"
-> >>
-> >> +/* Virtio-vsock feature */
-> >> +#define VIRTIO_VSOCK_F_MRG_RXBUF 0 /* Host can merge receive buffers. */
-> >> +
-> >>  struct virtio_vsock_config {
-> >>  	uint64_t guest_cid;
-> >>  } QEMU_PACKED;
-> >> -- 
-> >> 1.8.3.1
-> >>
-> > 
-> > .
-> > 
-> 
+Cc: gxt@mprc.pku.edu.cn
+Cc: peter.maydell@linaro.org
+
+Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20181130093852.20739-8-maozhongyi@cmss.chinamobile.com
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/gpio/puv3_gpio.c | 29 ++++++++++++++---------------
+ 1 file changed, 14 insertions(+), 15 deletions(-)
+
+diff --git a/hw/gpio/puv3_gpio.c b/hw/gpio/puv3_gpio.c
+index 445afccf9f5..33241b8564c 100644
+--- a/hw/gpio/puv3_gpio.c
++++ b/hw/gpio/puv3_gpio.c
+@@ -99,36 +99,35 @@ static const MemoryRegionOps puv3_gpio_ops = {
+     .endianness = DEVICE_NATIVE_ENDIAN,
+ };
+ 
+-static int puv3_gpio_init(SysBusDevice *dev)
++static void puv3_gpio_realize(DeviceState *dev, Error **errp)
+ {
+     PUV3GPIOState *s = PUV3_GPIO(dev);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+ 
+     s->reg_GPLR = 0;
+     s->reg_GPDR = 0;
+ 
+     /* FIXME: these irqs not handled yet */
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW0]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW1]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW2]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW3]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW4]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW5]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW6]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW7]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOHIGH]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW0]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW1]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW2]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW3]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW4]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW5]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW6]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW7]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOHIGH]);
+ 
+     memory_region_init_io(&s->iomem, OBJECT(s), &puv3_gpio_ops, s, "puv3_gpio",
+             PUV3_REGS_OFFSET);
+-    sysbus_init_mmio(dev, &s->iomem);
+-
+-    return 0;
++    sysbus_init_mmio(sbd, &s->iomem);
+ }
+ 
+ static void puv3_gpio_class_init(ObjectClass *klass, void *data)
+ {
+-    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
++    DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+-    sdc->init = puv3_gpio_init;
++    dc->realize = puv3_gpio_realize;
+ }
+ 
+ static const TypeInfo puv3_gpio_info = {
+-- 
+2.19.2
