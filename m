@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40032)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gXOqa-0003Dr-Vg
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:08:06 -0500
+	(envelope-from <philmd@redhat.com>) id 1gXOss-0005Es-4z
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:10:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gXOqZ-00084u-GE
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:08:04 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 13 Dec 2018 11:07:51 +0000
-Message-ID: <c4c5d8ec-eb90-915c-03d3-95c7517b4b57@virtuozzo.com>
-References: <20180917145732.48590-1-vsementsov@virtuozzo.com>
-	<504d170c-56ee-0cf5-78e0-47aded4c132f@virtuozzo.com>
-	<43def1dd-732e-a358-d15f-492eefae0a80@redhat.com>
-In-Reply-To: <43def1dd-732e-a358-d15f-492eefae0a80@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F28986A68489B647A789E741F9E99020@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <philmd@redhat.com>) id 1gXOsp-0001ij-32
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:10:26 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:50797)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gXOso-0001hY-Qe
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:10:23 -0500
+Received: by mail-wm1-f65.google.com with SMTP id n190so1932259wmd.0
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 03:10:22 -0800 (PST)
+References: <20181212222648.595-1-marcandre.lureau@redhat.com>
+	<20181212222648.595-3-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <0b0ad7c0-38c4-35be-3d98-571b319113bc@redhat.com>
+Date: Thu, 13 Dec 2018 12:10:18 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] ping2 Re: [PATCH v4 0/8] dirty-bitmap: rewrite
- bdrv_dirty_iter_next_area
+In-Reply-To: <20181212222648.595-3-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v13 2/6] tpm: allocate/map buffer for TPM
+ Physical Presence interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +31,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "famz@redhat.com" <famz@redhat.com>, Denis Lunev <den@virtuozzo.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, stefanb@linux.vnet.ibm.com, f4bug@amsat.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Berger <stefanb@linux.ibm.com>
 
-MTIuMTIuMjAxOCAyMzo0MSwgSm9obiBTbm93IHdyb3RlOg0KPiANCj4gDQo+IE9uIDEyLzEyLzE4
-IDQ6MjcgQU0sIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+PiBwaW5nLiBO
-byBkZXBlbmRlbmNpZXMsIGFwcGx5IHRvIG1hc3Rlci4NCj4+DQo+IA0KPiBTdXJlIHRoaW5nLg0K
-PiANCj4gU3RhZ2VkIHRvIGpzbm93L2JpdG1hcHMuDQoNCg0KVGhhbmsgeW91IQ0KDQpPb3BzLCBJ
-J3ZlIG1pc3NlZCB5b3VyIGVtYWlsIGFib3V0IHMvZmlydF9kaXJ0eV9vZmYvZmlyc3RfZGlydHlf
-b2ZmDQoNCkkgY2FuIHJlc2VuZCwgb3IgeW91IGNhbiBmaXggaW4geW91ciBicmFuY2gsIGFzIHlv
-dSBwcmVmZXIuDQpUaGUgdmFyaWFibGUgdG91Y2hlcyB0d28gY29tbWl0cyBpbiBqc25vdy9iaXRt
-YXBzOg0KDQpjb21taXQgZjIzNTIwNGMzOWRkNWNlMTIyNjY2ZDg3ZjE4MDA1MjY0ZWI1NmU1MQ0K
-QXV0aG9yOiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6
-by5jb20+DQpEYXRlOiAgIE1vbiBTZXAgMTcgMTc6NTc6MjcgMjAxOCArMDMwMA0KDQogICAgIGRp
-cnR5LWJpdG1hcDogYWRkIGJkcnZfZGlydHlfYml0bWFwX25leHRfZGlydHlfYXJlYQ0KDQphbmQg
-dGhlIGxhc3Qgb25lOg0KDQpjb21taXQgN2Y3MzE3NGNhMWM4YTkyZTRhNTEzOWIzNWYyYTIyNzNm
-NTljZTI5YiAoam5zbm93L2JpdG1hcHMpDQpBdXRob3I6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2ll
-dnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCkRhdGU6ICAgTW9uIFNlcCAxNyAxNzo1
-NzozMiAyMDE4ICswMzAwDQoNCiAgICAgUmV2ZXJ0ICJoYml0bWFwOiBBZGQgQGFkdmFuY2UgcGFy
-YW0gdG8gaGJpdG1hcF9pdGVyX25leHQoKSINCg0KDQoNCg0KPiANCj4gLS1qcw0KPiANCj4+IDE3
-LjA5LjIwMTggMTc6NTcsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4g
-SGkgYWxsLg0KPj4+DQo+Pj4gMS4gYmRydl9kaXJ0eV9pdGVyX25leHRfYXJlYSBkb24ndCB1c2Ug
-aGJpdG1hcF9uZXh0X3plcm8gYW5kIHVzZXMNCj4+PiBpbmVmZmljaWVudCBsb29wIGluc3RlYWQu
-IExldCdzIGltcHJvdmUgaXQuDQo+Pj4NCj4+PiAyLiBiZHJ2X2RpcnR5X2l0ZXJfbmV4dF9hcmVh
-IGRvbid0IGhhbmRsZSB1bmFsaWduZWQgb2Zmc2V0IGFuZA0KPj4+IG1heF9vZmZzZXQgY29ycmVj
-dGx5LiBJJ20gbm90IHN1cmUgdGhhdCBpdCBpcyBhIHJlYWwgYnVnLiBCdXQgaWYgaXQgaXMsDQo+
-Pj4gd2UgbmVlZCB0aGVzZSBzZXJpZXMgaW4gMy4wLg0KPj4+DQo+Pj4gRGV0YWlscyBhcmUgaW4g
-MDUgY29tbWl0IG1lc3NhZ2UuDQo+Pj4NCj4+PiBOb3RlOiAiW1BBVENIXSBuYmQvc2VydmVyOiBm
-aXggYml0bWFwIGV4cG9ydCIgc2hvdWxkIGJlIGFwcGxpZWQgZmlyc3Q6DQo+Pj4gQmFzZWQtb246
-IDwyMDE4MDkxNDE2NTExNi4yMzE4Mi0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+Pg0K
-Pj4+IHY0Og0KPj4+DQo+Pj4gUmV3b3JrOiBzd2l0Y2ggaW50ZXJmYWNlIHRvIHN0YXJ0LGNvdW50
-IC8gb2Zmc2V0LGJ5dGVzIHN0eWxlLg0KPj4+IEZpeCB3cm9uZyBoYW5kbGluZyBvZiB0aGUgY2Fz
-ZSB3aGVuIHJlcXVlc3RlZCByZWdpb24gZW5kIGV4Y2VlZHMNCj4+PiBvdmVyYWxsIGJpdG1hcCBl
-bmQuDQo+Pj4gU29tZSBvdGhlciBjaGFuZ2VzLg0KPj4+DQo+Pj4gMDYtMDg6IGFkZCBKb2huJ3Mg
-ci1iLg0KPj4+DQo+Pj4gdjM6DQo+Pj4gMDE6IC0gY2hhbmdlIGludGVyZmFjZSB0byBzdGFydC9l
-bmQsIGFuZCAtMSBhcyBzcGVjaWFsIGVuZC1tYXJrZXIgaW5zdGVhZCBvZiAwDQo+Pj4gICAgICAg
-LSAibm90IGZvdW5kIiBmb3IgaW52YWxpZCByZWdpb25zIGluc3RlYWQgb2YgYXNzZXJ0DQo+Pj4g
-MDI6IHJlYmFzZSBvbiAwMSBjaGFuZ2VzDQo+Pj4gMDM6IC0gZml4IG1pc3Rha2UgaW4gaGJpdG1h
-cF9pdGVyX2luaXQgYXJndW1lbnRzIChtaXN0YWtlIGluDQo+Pj4gICAgICAgICBoYml0bWFwX25l
-eHRfemVybyBhcmd1bWVudHMgaXMgZml4ZWQgYXV0b21hdGljYWxseSBkdWUgdG8gMDEgY2hhbmdl
-cykNCj4+PiAwNDogbmV3DQo+Pj4NCj4+Pg0KPj4+IHYyOg0KPj4+DQo+Pj4gMDE6IC0gaW1wcm92
-ZSBjb21tZW50DQo+Pj4gICAgICAgLSBzL2J5dGVzL2NvdW50Lw0KPj4+ICAgICAgIC0gZml4IGZv
-cmdvdHRlbiBmdW5jdGlvbiBjYWxsIGluIHRlc3QNCj4+PiAgICAgICAtIGludHJvZHVjZSBvcmln
-X3NpemUgZmllbGQgaGVyZSBmb3IgSEJpdG1hcCwNCj4+PiAgICAgICAgIG1ha2UgY2hlY2tpbmcg
-aW4gaGJpdG1hcF9uZXh0X3plcm8gbW9yZSBlZmZlY3RpdmUgYW5kIHNhZmUNCj4+PiAwMjogbmV3
-DQo+Pj4gMDM6IC0gb3JpZ19zaXplIGFscmVhZHkgaW50cm9kdWNlZCBpbiAwMQ0KPj4+ICAgICAg
-IC0gZml4IGhiaXRtYXBfbmV4dF9kaXJ0eV9hcmVhIHRvIG5vdCByZXR1cm4gdmFsdWUgbGVzcyB0
-aGFuDQo+Pj4gICAgICAgICBvZmZzZXQgb24gdW5hbGlnbmVkIHJlcXVlc3RzDQo+Pj4NCj4+PiBW
-bGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5ICg4KToNCj4+PiAgICAgZGlydHktYml0bWFwOiBp
-bXByb3ZlIGJkcnZfZGlydHlfYml0bWFwX25leHRfemVybw0KPj4+ICAgICB0ZXN0czogYWRkIHRl
-c3RzIGZvciBoYml0bWFwX25leHRfemVybyB3aXRoIHNwZWNpZmllZCBlbmQgcGFyYW1ldGVyDQo+
-Pj4gICAgIGRpcnR5LWJpdG1hcDogYWRkIGJkcnZfZGlydHlfYml0bWFwX25leHRfZGlydHlfYXJl
-YQ0KPj4+ICAgICB0ZXN0czogYWRkIHRlc3RzIGZvciBoYml0bWFwX25leHRfZGlydHlfYXJlYQ0K
-Pj4+ICAgICBibG9jay9taXJyb3I6IGZpeCBhbmQgaW1wcm92ZSBkb19zeW5jX3RhcmdldF93cml0
-ZQ0KPj4+ICAgICBSZXZlcnQgImJsb2NrL2RpcnR5LWJpdG1hcDogQWRkIGJkcnZfZGlydHlfaXRl
-cl9uZXh0X2FyZWEiDQo+Pj4gICAgIFJldmVydCAidGVzdC1oYml0bWFwOiBBZGQgbm9uLWFkdmFu
-Y2luZyBpdGVyX25leHQgdGVzdHMiDQo+Pj4gICAgIFJldmVydCAiaGJpdG1hcDogQWRkIEBhZHZh
-bmNlIHBhcmFtIHRvIGhiaXRtYXBfaXRlcl9uZXh0KCkiDQo+Pj4NCj4+PiAgICBpbmNsdWRlL2Js
-b2NrL2RpcnR5LWJpdG1hcC5oIHwgICA3ICstDQo+Pj4gICAgaW5jbHVkZS9xZW11L2hiaXRtYXAu
-aCAgICAgICB8ICAzMSArKysrLS0NCj4+PiAgICBibG9jay9iYWNrdXAuYyAgICAgICAgICAgICAg
-IHwgICA1ICstDQo+Pj4gICAgYmxvY2svZGlydHktYml0bWFwLmMgICAgICAgICB8ICA2OCArKy0t
-LS0tLS0tLS0tLQ0KPj4+ICAgIGJsb2NrL21pcnJvci5jICAgICAgICAgICAgICAgfCAgMTcgKyst
-LQ0KPj4+ICAgIG5iZC9zZXJ2ZXIuYyAgICAgICAgICAgICAgICAgfCAgIDIgKy0NCj4+PiAgICB0
-ZXN0cy90ZXN0LWhiaXRtYXAuYyAgICAgICAgIHwgMTc3ICsrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrLS0tLS0tDQo+Pj4gICAgdXRpbC9oYml0bWFwLmMgICAgICAgICAgICAgICB8ICA3NiAr
-KysrKysrKysrKystLS0NCj4+PiAgICA4IGZpbGVzIGNoYW5nZWQsIDI2MiBpbnNlcnRpb25zKCsp
-LCAxMjEgZGVsZXRpb25zKC0pDQo+Pj4NCj4+DQo+Pg0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJk
-cywNClZsYWRpbWlyDQo=
+On 12/12/18 11:26 PM, Marc-André Lureau wrote:
+> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> 
+> Implement a virtual memory device for the TPM Physical Presence interface.
+> The memory is located at 0xFED45000 and used by ACPI to send messages to the
+> firmware (BIOS) and by the firmware to provide parameters for each one of
+> the supported codes.
+> 
+> This interface should be used by all TPM devices on x86 and can be
+> added by calling tpm_ppi_init_io().
+> 
+> Note: bios_linker cannot be used to allocate the PPI memory region,
+> since the reserved memory should stay stable across reboots, and might
+> be needed before the ACPI tables are installed.
+> 
+> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  hw/tpm/tpm_ppi.h      | 37 +++++++++++++++++++++++++++++++++++++
+>  include/hw/acpi/tpm.h |  6 ++++++
+>  hw/tpm/tpm_crb.c      |  7 +++++++
+>  hw/tpm/tpm_ppi.c      | 31 +++++++++++++++++++++++++++++++
+>  hw/tpm/tpm_tis.c      |  7 +++++++
+>  hw/tpm/Makefile.objs  |  1 +
+>  6 files changed, 89 insertions(+)
+>  create mode 100644 hw/tpm/tpm_ppi.h
+>  create mode 100644 hw/tpm/tpm_ppi.c
+> 
+> diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
+> new file mode 100644
+> index 0000000000..1598e28262
+> --- /dev/null
+> +++ b/hw/tpm/tpm_ppi.h
+> @@ -0,0 +1,37 @@
+> +/*
+> + * TPM Physical Presence Interface
+> + *
+> + * Copyright (C) 2018 IBM Corporation
+> + *
+> + * Authors:
+> + *  Stefan Berger    <stefanb@us.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +#ifndef TPM_TPM_PPI_H
+> +#define TPM_TPM_PPI_H
+> +
+> +#include "hw/acpi/tpm.h"
+> +#include "exec/address-spaces.h"
+> +
+> +typedef struct TPMPPI {
+> +    MemoryRegion ram;
+> +    uint8_t *buf;
+> +} TPMPPI;
+> +
+> +/**
+> + * tpm_ppi_init:
+> + * @tpmppi: a TPMPPI
+> + * @m: the address-space / MemoryRegion to use
+> + * @addr: the address of the PPI region
+> + * @obj: the owner object
+> + * @errp: an Error**
+
+You removed errp.
+
+Without the'errp' line:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> + *
+> + * Register the TPM PPI memory region at @addr on the given address
+> + * space for the object @obj.
+> + **/
+> +void tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
+> +                  hwaddr addr, Object *obj);
+> +
+> +#endif /* TPM_TPM_PPI_H */
+> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+> index 3580ffd50c..b8796df916 100644
+> --- a/include/hw/acpi/tpm.h
+> +++ b/include/hw/acpi/tpm.h
+> @@ -188,4 +188,10 @@ REG32(CRB_DATA_BUFFER, 0x80)
+>  #define TPM2_START_METHOD_MMIO      6
+>  #define TPM2_START_METHOD_CRB       7
+>  
+> +/*
+> + * Physical Presence Interface
+> + */
+> +#define TPM_PPI_ADDR_SIZE           0x400
+> +#define TPM_PPI_ADDR_BASE           0xFED45000
+> +
+>  #endif /* HW_ACPI_TPM_H */
+> diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
+> index d5b0ac5920..012ec686d4 100644
+> --- a/hw/tpm/tpm_crb.c
+> +++ b/hw/tpm/tpm_crb.c
+> @@ -29,6 +29,7 @@
+>  #include "sysemu/reset.h"
+>  #include "tpm_int.h"
+>  #include "tpm_util.h"
+> +#include "tpm_ppi.h"
+>  #include "trace.h"
+>  
+>  typedef struct CRBState {
+> @@ -43,6 +44,7 @@ typedef struct CRBState {
+>      size_t be_buffer_size;
+>  
+>      bool ppi_enabled;
+> +    TPMPPI ppi;
+>  } CRBState;
+>  
+>  #define CRB(obj) OBJECT_CHECK(CRBState, (obj), TYPE_TPM_CRB)
+> @@ -294,6 +296,11 @@ static void tpm_crb_realize(DeviceState *dev, Error **errp)
+>      memory_region_add_subregion(get_system_memory(),
+>          TPM_CRB_ADDR_BASE + sizeof(s->regs), &s->cmdmem);
+>  
+> +    if (s->ppi_enabled) {
+> +        tpm_ppi_init(&s->ppi, get_system_memory(),
+> +                     TPM_PPI_ADDR_BASE, OBJECT(s));
+> +    }
+> +
+>      qemu_register_reset(tpm_crb_reset, dev);
+>  }
+>  
+> diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
+> new file mode 100644
+> index 0000000000..cf17779c20
+> --- /dev/null
+> +++ b/hw/tpm/tpm_ppi.c
+> @@ -0,0 +1,31 @@
+> +/*
+> + * tpm_ppi.c - TPM Physical Presence Interface
+> + *
+> + * Copyright (C) 2018 IBM Corporation
+> + *
+> + * Authors:
+> + *  Stefan Berger <stefanb@us.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +
+> +#include "qapi/error.h"
+> +#include "cpu.h"
+> +#include "sysemu/memory_mapping.h"
+> +#include "migration/vmstate.h"
+> +#include "tpm_ppi.h"
+> +
+> +void tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
+> +                  hwaddr addr, Object *obj)
+> +{
+> +    tpmppi->buf = g_malloc0(HOST_PAGE_ALIGN(TPM_PPI_ADDR_SIZE));
+> +    memory_region_init_ram_device_ptr(&tpmppi->ram, obj, "tpm-ppi",
+> +                                      TPM_PPI_ADDR_SIZE, tpmppi->buf);
+> +    vmstate_register_ram(&tpmppi->ram, DEVICE(obj));
+> +
+> +    memory_region_add_subregion(m, addr, &tpmppi->ram);
+> +}
+> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+> index cbb9a84a5b..da8af8e0e0 100644
+> --- a/hw/tpm/tpm_tis.c
+> +++ b/hw/tpm/tpm_tis.c
+> @@ -31,6 +31,7 @@
+>  #include "sysemu/tpm_backend.h"
+>  #include "tpm_int.h"
+>  #include "tpm_util.h"
+> +#include "tpm_ppi.h"
+>  #include "trace.h"
+>  
+>  #define TPM_TIS_NUM_LOCALITIES      5     /* per spec */
+> @@ -83,6 +84,7 @@ typedef struct TPMState {
+>      size_t be_buffer_size;
+>  
+>      bool ppi_enabled;
+> +    TPMPPI ppi;
+>  } TPMState;
+>  
+>  #define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)
+> @@ -979,6 +981,11 @@ static void tpm_tis_realizefn(DeviceState *dev, Error **errp)
+>  
+>      memory_region_add_subregion(isa_address_space(ISA_DEVICE(dev)),
+>                                  TPM_TIS_ADDR_BASE, &s->mmio);
+> +
+> +    if (s->ppi_enabled) {
+> +        tpm_ppi_init(&s->ppi, isa_address_space(ISA_DEVICE(dev)),
+> +                     TPM_PPI_ADDR_BASE, OBJECT(s));
+> +    }
+>  }
+>  
+>  static void tpm_tis_initfn(Object *obj)
+> diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
+> index 1dc9f8bf2c..700c878622 100644
+> --- a/hw/tpm/Makefile.objs
+> +++ b/hw/tpm/Makefile.objs
+> @@ -1,4 +1,5 @@
+>  common-obj-y += tpm_util.o
+> +obj-y += tpm_ppi.o
+>  common-obj-$(CONFIG_TPM_TIS) += tpm_tis.o
+>  common-obj-$(CONFIG_TPM_CRB) += tpm_crb.o
+>  common-obj-$(CONFIG_TPM_PASSTHROUGH) += tpm_passthrough.o
+> 
