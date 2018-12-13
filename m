@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gXJC7-0007Ep-Gm
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:05:56 -0500
+	(envelope-from <cota@braap.org>) id 1gXJC5-0007ES-O3
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:05:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gXJC4-0000vm-L1
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:05:54 -0500
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:56129)
+	(envelope-from <cota@braap.org>) id 1gXJC1-0000rj-NV
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:05:52 -0500
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:33841)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gXJC3-0000qq-S7
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:05:51 -0500
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gXJBx-0000gY-4i
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:05:47 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 13 Dec 2018 00:03:47 -0500
-Message-Id: <20181213050453.9677-8-cota@braap.org>
+Date: Thu, 13 Dec 2018 00:03:41 -0500
+Message-Id: <20181213050453.9677-2-cota@braap.org>
 In-Reply-To: <20181213050453.9677-1-cota@braap.org>
 References: <20181213050453.9677-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v5 07/73] cpu: make per-CPU locks an alias of
- the BQL in TCG rr mode
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 01/73] cpu: convert queued work to a QSIMPLEQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,252 +29,142 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Before we can switch from the BQL to per-CPU locks in
-the CPU loop, we have to accommodate the fact that TCG
-rr mode (i.e. !MTTCG) cannot work with separate per-vCPU
-locks. That would lead to deadlock since we need a single
-lock/condvar pair on which to wait for events that affect
-any vCPU, e.g. in qemu_tcg_rr_wait_io_event.
+Instead of open-coding it.
 
-At the same time, we are moving towards an interface where
-the BQL and CPU locks are independent, and the only requirement
-is that the locking order is respected, i.e. the BQL is
-acquired first if both locks have to be held at the same time.
+While at it, make sure that all accesses to the list are
+performed while holding the list's lock.
 
-In this patch we make the BQL a recursive lock under the hood.
-This allows us to (1) keep the BQL and CPU locks interfaces
-separate, and (2) use a single lock for all vCPUs in TCG rr mode.
-
-Note that the BQL's API (qemu_mutex_lock/unlock_iothread) remains
-non-recursive.
-
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- include/qom/cpu.h |  2 +-
- cpus-common.c     |  2 +-
- cpus.c            | 91 +++++++++++++++++++++++++++++++++++++++++------
- qom/cpu.c         |  1 -
- stubs/cpu-lock.c  |  6 ++--
- 5 files changed, 85 insertions(+), 17 deletions(-)
+ include/qom/cpu.h |  6 +++---
+ cpus-common.c     | 25 ++++++++-----------------
+ cpus.c            | 14 ++++++++++++--
+ qom/cpu.c         |  1 +
+ 4 files changed, 24 insertions(+), 22 deletions(-)
 
 diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index f0fc0bccd9..505daa6ce9 100644
+index 1396f53e5b..10a408c999 100644
 --- a/include/qom/cpu.h
 +++ b/include/qom/cpu.h
+@@ -315,8 +315,8 @@ struct qemu_work_item;
+  * @mem_io_pc: Host Program Counter at which the memory was accessed.
+  * @mem_io_vaddr: Target virtual address at which the memory was accessed.
+  * @kvm_fd: vCPU file descriptor for KVM.
+- * @work_mutex: Lock to prevent multiple access to queued_work_*.
+- * @queued_work_first: First asynchronous work pending.
++ * @work_mutex: Lock to prevent multiple access to @work_list.
++ * @work_list: List of pending asynchronous work.
+  * @trace_dstate_delayed: Delayed changes to trace_dstate (includes all changes
+  *                        to @trace_dstate).
+  * @trace_dstate: Dynamic tracing state of events for this vCPU (bitmask).
 @@ -357,7 +357,7 @@ struct CPUState {
-     int64_t icount_extra;
      sigjmp_buf jmp_env;
  
--    QemuMutex lock;
-+    QemuMutex *lock;
-     /* fields below protected by @lock */
-     QemuCond cond;
-     QSIMPLEQ_HEAD(, qemu_work_item) work_list;
+     QemuMutex work_mutex;
+-    struct qemu_work_item *queued_work_first, *queued_work_last;
++    QSIMPLEQ_HEAD(, qemu_work_item) work_list;
+ 
+     CPUAddressSpace *cpu_ases;
+     int num_ases;
 diff --git a/cpus-common.c b/cpus-common.c
-index c2ad554d54..36ce9872bd 100644
+index 98dd8c6ff1..a2a6cd93a1 100644
 --- a/cpus-common.c
 +++ b/cpus-common.c
-@@ -171,7 +171,7 @@ void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
-     while (!atomic_mb_read(&wi.done)) {
-         CPUState *self_cpu = current_cpu;
+@@ -107,7 +107,7 @@ void cpu_list_remove(CPUState *cpu)
+ }
  
--        qemu_cond_wait(&cpu->cond, &cpu->lock);
-+        qemu_cond_wait(&cpu->cond, cpu->lock);
-         current_cpu = self_cpu;
+ struct qemu_work_item {
+-    struct qemu_work_item *next;
++    QSIMPLEQ_ENTRY(qemu_work_item) node;
+     run_on_cpu_func func;
+     run_on_cpu_data data;
+     bool free, exclusive, done;
+@@ -116,13 +116,7 @@ struct qemu_work_item {
+ static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
+ {
+     qemu_mutex_lock(&cpu->work_mutex);
+-    if (cpu->queued_work_first == NULL) {
+-        cpu->queued_work_first = wi;
+-    } else {
+-        cpu->queued_work_last->next = wi;
+-    }
+-    cpu->queued_work_last = wi;
+-    wi->next = NULL;
++    QSIMPLEQ_INSERT_TAIL(&cpu->work_list, wi, node);
+     wi->done = false;
+     qemu_mutex_unlock(&cpu->work_mutex);
+ 
+@@ -314,17 +308,14 @@ void process_queued_cpu_work(CPUState *cpu)
+ {
+     struct qemu_work_item *wi;
+ 
+-    if (cpu->queued_work_first == NULL) {
++    qemu_mutex_lock(&cpu->work_mutex);
++    if (QSIMPLEQ_EMPTY(&cpu->work_list)) {
++        qemu_mutex_unlock(&cpu->work_mutex);
+         return;
      }
-     cpu_mutex_unlock(cpu);
+-
+-    qemu_mutex_lock(&cpu->work_mutex);
+-    while (cpu->queued_work_first != NULL) {
+-        wi = cpu->queued_work_first;
+-        cpu->queued_work_first = wi->next;
+-        if (!cpu->queued_work_first) {
+-            cpu->queued_work_last = NULL;
+-        }
++    while (!QSIMPLEQ_EMPTY(&cpu->work_list)) {
++        wi = QSIMPLEQ_FIRST(&cpu->work_list);
++        QSIMPLEQ_REMOVE_HEAD(&cpu->work_list, node);
+         qemu_mutex_unlock(&cpu->work_mutex);
+         if (wi->exclusive) {
+             /* Running work items outside the BQL avoids the following deadlock:
 diff --git a/cpus.c b/cpus.c
-index cc683895d8..e85dbbb166 100644
+index 0ddeeefc14..7531723d61 100644
 --- a/cpus.c
 +++ b/cpus.c
-@@ -83,6 +83,12 @@ static unsigned int throttle_percentage;
- #define CPU_THROTTLE_PCT_MAX 99
- #define CPU_THROTTLE_TIMESLICE_NS 10000000
+@@ -88,9 +88,19 @@ bool cpu_is_stopped(CPUState *cpu)
+     return cpu->stopped || !runstate_is_running();
+ }
  
-+static inline bool qemu_is_tcg_rr(void)
++static inline bool cpu_work_list_empty(CPUState *cpu)
 +{
-+    /* in `make check-qtest', "use_icount && !tcg_enabled()" might be true */
-+    return use_icount || (tcg_enabled() && !qemu_tcg_mttcg_enabled());
++    bool ret;
++
++    qemu_mutex_lock(&cpu->work_mutex);
++    ret = QSIMPLEQ_EMPTY(&cpu->work_list);
++    qemu_mutex_unlock(&cpu->work_mutex);
++    return ret;
 +}
 +
- /* XXX: is this really the max number of CPUs? */
- #define CPU_LOCK_BITMAP_SIZE 2048
- 
-@@ -98,25 +104,76 @@ bool no_cpu_mutex_locked(void)
-     return bitmap_empty(cpu_lock_bitmap, CPU_LOCK_BITMAP_SIZE);
- }
- 
--void cpu_mutex_lock_impl(CPUState *cpu, const char *file, int line)
-+static QemuMutex qemu_global_mutex;
-+static __thread bool iothread_locked;
-+/*
-+ * In TCG rr mode, we make the BQL a recursive mutex, so that we can use it for
-+ * all vCPUs while keeping the interface as if the locks were per-CPU.
-+ *
-+ * The fact that the BQL is implemented recursively is invisible to BQL users;
-+ * the mutex API we export (qemu_mutex_lock_iothread() etc.) is non-recursive.
-+ *
-+ * Locking order: the BQL is always acquired before CPU locks.
-+ */
-+static __thread int iothread_lock_count;
-+
-+static void rr_cpu_mutex_lock(void)
-+{
-+    if (iothread_lock_count++ == 0) {
-+        /*
-+         * Circumvent qemu_mutex_lock_iothread()'s state keeping by
-+         * acquiring the BQL directly.
-+         */
-+        qemu_mutex_lock(&qemu_global_mutex);
-+    }
-+}
-+
-+static void rr_cpu_mutex_unlock(void)
-+{
-+    g_assert(iothread_lock_count > 0);
-+    if (--iothread_lock_count == 0) {
-+        /*
-+         * Circumvent qemu_mutex_unlock_iothread()'s state keeping by
-+         * releasing the BQL directly.
-+         */
-+        qemu_mutex_unlock(&qemu_global_mutex);
-+    }
-+}
-+
-+static void do_cpu_mutex_lock(CPUState *cpu, const char *file, int line)
+ static bool cpu_thread_is_idle(CPUState *cpu)
  {
--/* coverity gets confused by the indirect function call */
-+    /* coverity gets confused by the indirect function call */
- #ifdef __COVERITY__
--    qemu_mutex_lock_impl(&cpu->lock, file, line);
-+    qemu_mutex_lock_impl(cpu->lock, file, line);
- #else
-     QemuMutexLockFunc f = atomic_read(&qemu_mutex_lock_func);
- 
-+    f(cpu->lock, file, line);
-+#endif
-+}
-+
-+void cpu_mutex_lock_impl(CPUState *cpu, const char *file, int line)
-+{
-     g_assert(!cpu_mutex_locked(cpu));
-     set_bit(cpu->cpu_index + 1, cpu_lock_bitmap);
--    f(&cpu->lock, file, line);
--#endif
-+
-+    if (qemu_is_tcg_rr()) {
-+        rr_cpu_mutex_lock();
-+    } else {
-+        do_cpu_mutex_lock(cpu, file, line);
-+    }
- }
- 
- void cpu_mutex_unlock_impl(CPUState *cpu, const char *file, int line)
- {
-     g_assert(cpu_mutex_locked(cpu));
--    qemu_mutex_unlock_impl(&cpu->lock, file, line);
-     clear_bit(cpu->cpu_index + 1, cpu_lock_bitmap);
-+
-+    if (qemu_is_tcg_rr()) {
-+        rr_cpu_mutex_unlock();
-+        return;
-+    }
-+    qemu_mutex_unlock_impl(cpu->lock, file, line);
- }
- 
- bool cpu_mutex_locked(const CPUState *cpu)
-@@ -1215,8 +1272,6 @@ static void qemu_init_sigbus(void)
- }
- #endif /* !CONFIG_LINUX */
- 
--static QemuMutex qemu_global_mutex;
--
- static QemuThread io_thread;
- 
- /* cpu creation */
-@@ -1876,8 +1931,6 @@ bool qemu_in_vcpu_thread(void)
-     return current_cpu && qemu_cpu_is_self(current_cpu);
- }
- 
--static __thread bool iothread_locked = false;
--
- bool qemu_mutex_iothread_locked(void)
- {
-     return iothread_locked;
-@@ -1896,6 +1949,8 @@ void qemu_mutex_lock_iothread_impl(const char *file, int line)
- 
-     g_assert(!qemu_mutex_iothread_locked());
-     bql_lock(&qemu_global_mutex, file, line);
-+    g_assert(iothread_lock_count == 0);
-+    iothread_lock_count++;
-     iothread_locked = true;
- }
- 
-@@ -1903,7 +1958,10 @@ void qemu_mutex_unlock_iothread(void)
- {
-     g_assert(qemu_mutex_iothread_locked());
-     iothread_locked = false;
--    qemu_mutex_unlock(&qemu_global_mutex);
-+    g_assert(iothread_lock_count > 0);
-+    if (--iothread_lock_count == 0) {
-+        qemu_mutex_unlock(&qemu_global_mutex);
-+    }
- }
- 
- static bool all_vcpus_paused(void)
-@@ -2127,6 +2185,17 @@ void qemu_init_vcpu(CPUState *cpu)
-         cpu_address_space_init(cpu, 0, "cpu-memory", cpu->memory);
+-    if (cpu->stop || cpu->queued_work_first) {
++    if (cpu->stop || !cpu_work_list_empty(cpu)) {
+         return false;
      }
+     if (cpu_is_stopped(cpu)) {
+@@ -1513,7 +1523,7 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+             cpu = first_cpu;
+         }
  
-+    /*
-+     * In TCG RR, cpu->lock is the BQL under the hood. In all other modes,
-+     * cpu->lock is a standalone per-CPU lock.
-+     */
-+    if (qemu_is_tcg_rr()) {
-+        cpu->lock = &qemu_global_mutex;
-+    } else {
-+        cpu->lock = g_malloc(sizeof(*cpu->lock));
-+        qemu_mutex_init(cpu->lock);
-+    }
-+
-     if (kvm_enabled()) {
-         qemu_kvm_start_vcpu(cpu);
-     } else if (hax_enabled()) {
+-        while (cpu && !cpu->queued_work_first && !cpu->exit_request) {
++        while (cpu && cpu_work_list_empty(cpu) && !cpu->exit_request) {
+ 
+             atomic_mb_set(&tcg_current_rr_cpu, cpu);
+             current_cpu = cpu;
 diff --git a/qom/cpu.c b/qom/cpu.c
-index aa15ea4af5..2ea5b1da08 100644
+index 9ad1372d57..eb270169ed 100644
 --- a/qom/cpu.c
 +++ b/qom/cpu.c
-@@ -371,7 +371,6 @@ static void cpu_common_initfn(Object *obj)
-     cpu->nr_cores = 1;
+@@ -372,6 +372,7 @@ static void cpu_common_initfn(Object *obj)
      cpu->nr_threads = 1;
  
--    qemu_mutex_init(&cpu->lock);
-     qemu_cond_init(&cpu->cond);
-     QSIMPLEQ_INIT(&cpu->work_list);
+     qemu_mutex_init(&cpu->work_mutex);
++    QSIMPLEQ_INIT(&cpu->work_list);
      QTAILQ_INIT(&cpu->breakpoints);
-diff --git a/stubs/cpu-lock.c b/stubs/cpu-lock.c
-index 3f07d3a28b..7406a66d97 100644
---- a/stubs/cpu-lock.c
-+++ b/stubs/cpu-lock.c
-@@ -5,16 +5,16 @@ void cpu_mutex_lock_impl(CPUState *cpu, const char *file, int line)
- {
- /* coverity gets confused by the indirect function call */
- #ifdef __COVERITY__
--    qemu_mutex_lock_impl(&cpu->lock, file, line);
-+    qemu_mutex_lock_impl(cpu->lock, file, line);
- #else
-     QemuMutexLockFunc f = atomic_read(&qemu_mutex_lock_func);
--    f(&cpu->lock, file, line);
-+    f(cpu->lock, file, line);
- #endif
- }
+     QTAILQ_INIT(&cpu->watchpoints);
  
- void cpu_mutex_unlock_impl(CPUState *cpu, const char *file, int line)
- {
--    qemu_mutex_unlock_impl(&cpu->lock, file, line);
-+    qemu_mutex_unlock_impl(cpu->lock, file, line);
- }
- 
- bool cpu_mutex_locked(const CPUState *cpu)
 -- 
 2.17.1
