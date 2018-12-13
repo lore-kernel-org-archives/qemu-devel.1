@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gXYXB-0004Vm-4Y
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 16:28:42 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gXYXi-0004xy-KW
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 16:29:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gXYX5-0007vr-Bz
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 16:28:41 -0500
-References: <20181213175807.12039-1-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9e685aeb-29f1-a755-cca1-b3b51da82472@redhat.com>
-Date: Thu, 13 Dec 2018 15:28:31 -0600
+	(envelope-from <no-reply@patchew.org>) id 1gXYXf-0001M2-Fp
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 16:29:14 -0500
+Resent-Message-Id: <E1gXYXf-0001M2-Fp@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21809)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gXYXf-0001JT-72
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 16:29:11 -0500
+In-Reply-To: <20181213130611.7496-1-tom.deseyn@gmail.com>
+Message-ID: <154473651696.18041.7389630431753887663@02a1dbf831e2>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20181213175807.12039-1-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] vl: Use error_fatal to simplify obvious
- fatal errors (again)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 13 Dec 2018 13:28:38 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] Add getsockopt for settable SOL_IPV6
+ options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,24 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
+To: tom.deseyn@gmail.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu
 
-On 12/13/18 11:58 AM, Markus Armbruster wrote:
-> Patch created mechanically by rerunning:
-> 
->      $ spatch --in-place --sp-file scripts/coccinelle/use-error_fatal.cocci \
->               --macro-file scripts/cocci-macro-file.h vl.c
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   vl.c | 7 ++-----
->   1 file changed, 2 insertions(+), 5 deletions(-)
-> 
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIxMzEzMDYxMS43NDk2
+LTEtdG9tLmRlc2V5bkBnbWFpbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
+ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
+bmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE4MTIxMzEzMDYxMS43NDk2
+LTEtdG9tLmRlc2V5bkBnbWFpbC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gQWRk
+IGdldHNvY2tvcHQgZm9yIHNldHRhYmxlIFNPTF9JUFY2IG9wdGlvbnMKCj09PSBURVNUIFNDUklQ
+VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0t
+b25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQg
+Y29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBs
+b2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8K
+ICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3Jt
+YXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2Ny
+aXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAg
+ICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBU
+RVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0
+NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11
+CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxODEyMTMyMTAwNTcuMzY3Ni0xLXF1aW50
+ZWxhQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MTIxMzIxMDA1Ny4zNjc2LTEtcXVpbnRlbGFA
+cmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjg1MWM4NjMgQWRkIGdl
+dHNvY2tvcHQgZm9yIHNldHRhYmxlIFNPTF9JUFY2IG9wdGlvbnMKCj09PSBPVVRQVVQgQkVHSU4g
+PT09CkNoZWNraW5nIFBBVENIIDEvMTogQWRkIGdldHNvY2tvcHQgZm9yIHNldHRhYmxlIFNPTF9J
+UFY2IG9wdGlvbnMuLi4KRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJt
+cyBvZiB0aGlzIHN0YXRlbWVudAojMzA6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjIzNjg6
+CisgICAgICAgICAgICBpZiAoZ2V0X3VzZXJfdTMyKGxlbiwgb3B0bGVuKSkKWy4uLl0KCkVSUk9S
+OiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQK
+IzMyOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzoyMzcwOgorICAgICAgICAgICAgaWYgKGxl
+biA8IDApClsuLi5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1z
+IG9mIHRoaXMgc3RhdGVtZW50CiMzNjogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6MjM3NDoK
+KyAgICAgICAgICAgIGlmIChyZXQgPCAwKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVj
+ZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNDQ6IEZJTEU6IGxpbnV4LXVz
+ZXIvc3lzY2FsbC5jOjIzODI6CisgICAgICAgICAgICAgICAgaWYgKGxlbiA+IHNpemVvZihpbnQp
+KQpbLi4uXQoKdG90YWw6IDQgZXJyb3JzLCAwIHdhcm5pbmdzLCA0NSBsaW5lcyBjaGVja2VkCgpZ
+b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
+aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
+aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0K
+ClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWls
+YWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE4MTIxMzEzMDYxMS43NDk2LTEtdG9t
+LmRlc2V5bkBnbWFpbC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpF
+bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
+cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5j
+b20=
