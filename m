@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXVcI-0001oe-C3
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:21:47 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gXVgz-0003s7-GF
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:26:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXVcG-0006c6-Sk
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:21:46 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33658)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gXVcG-0006b4-F5
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:21:44 -0500
-Received: by mail-ot1-x342.google.com with SMTP id i20so2863389otl.0
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 10:21:43 -0800 (PST)
+	(envelope-from <jsnow@redhat.com>) id 1gXVgy-00028X-Gu
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:26:37 -0500
+References: <20181213015013.15350-1-jsnow@redhat.com>
+	<20181213015013.15350-7-jsnow@redhat.com>
+	<dda19b8f-1320-7bd5-cc29-c113b0a590e8@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <371f152c-2299-aeb9-9999-de73a3a0d5a7@redhat.com>
+Date: Thu, 13 Dec 2018 13:26:27 -0500
 MIME-Version: 1.0
-References: <20181213175552.14857-1-wainersm@redhat.com>
-	<CAFEAcA86SDLGyqL3rG-fEDFsEj8-nz-Uqn5Mb9EeLqiFPeKZfA@mail.gmail.com>
-	<cccf3c43-0e51-bbbc-3676-17286b11ec99@redhat.com>
-In-Reply-To: <cccf3c43-0e51-bbbc-3676-17286b11ec99@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 13 Dec 2018 18:21:29 +0000
-Message-ID: <CAFEAcA9CpR=JGt74=xaUddYhf5SCOoeHH_v+O1L+rrTygZ7quQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/1] checkpatch: checker for comment block
+In-Reply-To: <dda19b8f-1320-7bd5-cc29-c113b0a590e8@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 6/7] iotests: allow pretty-print for
+ qmp_log
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +26,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Wainer dos Santos Moschetta <wainersm@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On Thu, 13 Dec 2018 at 18:07, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 13/12/18 19:01, Peter Maydell wrote:
-> > I sent a patch to do this a little while back:
-> >  https://patchwork.kernel.org/patch/10561557/
-> >
-> > It didn't get applied because Paolo disagreed with having
-> > our tools enforcing what our style guide says.
->
-> I didn't disagree with that---I disagreed with having a single style in
-> the style guide, because unlike most other blatant violations of the
-> coding style (eg. braces), this one is pervasive in maintained code and
-> I don't want code that I maintain to mix two comment styles.
->
-> So I proposed two alternatives:
->
-> - someone fixes all the comment blocks which are "starred" but don't
-> have a lone "/*" at the beginning, and then we can commit that patch;
->
-> - we allow "/* foo" on the first line, except for doc comments and for
-> the first line of the file (author/license block), and fix the style
-> guide accordingly.
 
-We came to a consensus on the comment style when we discussed
-the patch which updated CODING_STYLE. I'm not personally
-a fan of the result (I used to use "/* foo"), but what we have in the
-doc is what we achieved consensus for. I'm not going to reopen
-the "what should block comments look like" style debate.
 
-We have always had older code which isn't following the new style,
-and our general approach is that we don't do mass-style-fix patches
-across the whole codebase. If you as a maintainer of a particular
-sub-area want to do a style update you're free to do that.
+On 12/12/18 9:20 PM, Eric Blake wrote:
+> On 12/12/18 7:50 PM, John Snow wrote:
+>> If iotests have lines exceeding >998 characters long, git doesn't
+>> want to send it plaintext to the list. We can solve this by allowing
+>> the iotests to use pretty printed QMP output that we can match against
+>> instead.
+>>
+>> As a bonus, it's much nicer for human eyes, too.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>> =C2=A0 tests/qemu-iotests/iotests.py | 4 ++--
+>> =C2=A0 1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/tests/qemu-iotests/iotests.py
+>> b/tests/qemu-iotests/iotests.py
+>> index 9595429fea..dbbef4bad3 100644
+>> --- a/tests/qemu-iotests/iotests.py
+>> +++ b/tests/qemu-iotests/iotests.py
+>> @@ -447,12 +447,12 @@ class VM(qtest.QEMUQtestMachine):
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 result.append(filter_qmp_event(ev))
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return result
+>> =C2=A0 -=C2=A0=C2=A0=C2=A0 def qmp_log(self, cmd, filters=3D[filter_te=
+stfiles], **kwargs):
+>> +=C2=A0=C2=A0=C2=A0 def qmp_log(self, cmd, indent=3DNone, filters=3D[f=
+ilter_testfiles],
+>> **kwargs):
+>=20
+> Why None instead of False?
+>=20
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 logmsg =3D '{"e=
+xecute": "%s", "arguments": %s}' % \
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 (cmd, json.dumps(kwargs, sort_keys=3DTrue))
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 log(logmsg, fil=
+ters)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 result =3D self=
+.qmp(cmd, **kwargs)
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 log(json.dumps(result, sor=
+t_keys=3DTrue), filters)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 log(json.dumps(result, ind=
+ent=3Dindent, sort_keys=3DTrue), filters)
+>=20
+> But I'd actually have to read the contract to json.dumps() to learn wha=
+t
+> is expected.
+>=20
+> /me goes and does that...
+> https://docs.python.org/2/library/json.html
+>=20
+> If indent is a non-negative integer, then JSON array elements and objec=
+t
+> members will be pretty-printed with that indent level. An indent level
+> of 0, or negative, will only insert newlines. None (the default) select=
+s
+> the most compact representation.
+>=20
+> Okay, makes sense.
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
 
-thanks
--- PMM
+Yeah, it's a bubbling up of API in this case and a little messy, but it
+was the quickest route to making the output look pretty.
