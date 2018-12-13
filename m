@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gXSO4-0003z7-JJ
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:53 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gXSO5-00040Z-RS
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gXSO3-00072y-DW
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:52 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:53504)
+	(envelope-from <pm215@archaic.org.uk>) id 1gXSO4-00074s-QU
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:53 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:53508)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gXSO3-0006w2-30
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:51 -0500
+	id 1gXSO4-00071P-Ij
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:52 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gXSO1-0007GM-65
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 14:54:49 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1gXSO3-0007HS-Bd
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 14:54:51 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 13 Dec 2018 14:54:14 +0000
-Message-Id: <20181213145445.17935-7-peter.maydell@linaro.org>
+Date: Thu, 13 Dec 2018 14:54:18 +0000
+Message-Id: <20181213145445.17935-11-peter.maydell@linaro.org>
 In-Reply-To: <20181213145445.17935-1-peter.maydell@linaro.org>
 References: <20181213145445.17935-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 06/37] core/empty_slot: Convert sysbus init
+Subject: [Qemu-devel] [PULL 10/37] milkymist-softusb: Convert sysbus init
  function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -36,47 +36,72 @@ To: qemu-devel@nongnu.org
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 
 Use DeviceClass rather than SysBusDeviceClass in
-empty_slot_class_init().
+milkymist_softusb_class_init().
+
+Cc: michael@walle.cc
 
 Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20181130093852.20739-5-maozhongyi@cmss.chinamobile.com
+Message-id: 20181130093852.20739-9-maozhongyi@cmss.chinamobile.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/core/empty_slot.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ hw/input/milkymist-softusb.c | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
-diff --git a/hw/core/empty_slot.c b/hw/core/empty_slot.c
-index c1b9c2b1041..239f78e2a77 100644
---- a/hw/core/empty_slot.c
-+++ b/hw/core/empty_slot.c
-@@ -71,21 +71,20 @@ void empty_slot_init(hwaddr addr, uint64_t slot_size)
-     }
+diff --git a/hw/input/milkymist-softusb.c b/hw/input/milkymist-softusb.c
+index ef8f47cd834..8766a17d9e0 100644
+--- a/hw/input/milkymist-softusb.c
++++ b/hw/input/milkymist-softusb.c
+@@ -245,32 +245,31 @@ static void milkymist_softusb_reset(DeviceState *d)
+     s->regs[R_CTRL] = CTRL_RESET;
  }
  
--static int empty_slot_init1(SysBusDevice *dev)
-+static void empty_slot_realize(DeviceState *dev, Error **errp)
+-static int milkymist_softusb_init(SysBusDevice *dev)
++static void milkymist_softusb_realize(DeviceState *dev, Error **errp)
  {
-     EmptySlot *s = EMPTY_SLOT(dev);
+     MilkymistSoftUsbState *s = MILKYMIST_SOFTUSB(dev);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
  
-     memory_region_init_io(&s->iomem, OBJECT(s), &empty_slot_ops, s,
-                           "empty-slot", s->size);
--    sysbus_init_mmio(dev, &s->iomem);
+-    sysbus_init_irq(dev, &s->irq);
++    sysbus_init_irq(sbd, &s->irq);
+ 
+     memory_region_init_io(&s->regs_region, OBJECT(s), &softusb_mmio_ops, s,
+                           "milkymist-softusb", R_MAX * 4);
+-    sysbus_init_mmio(dev, &s->regs_region);
++    sysbus_init_mmio(sbd, &s->regs_region);
+ 
+     /* register pmem and dmem */
+     memory_region_init_ram_nomigrate(&s->pmem, OBJECT(s), "milkymist-softusb.pmem",
+                            s->pmem_size, &error_fatal);
+     vmstate_register_ram_global(&s->pmem);
+     s->pmem_ptr = memory_region_get_ram_ptr(&s->pmem);
+-    sysbus_init_mmio(dev, &s->pmem);
++    sysbus_init_mmio(sbd, &s->pmem);
+     memory_region_init_ram_nomigrate(&s->dmem, OBJECT(s), "milkymist-softusb.dmem",
+                            s->dmem_size, &error_fatal);
+     vmstate_register_ram_global(&s->dmem);
+     s->dmem_ptr = memory_region_get_ram_ptr(&s->dmem);
+-    sysbus_init_mmio(dev, &s->dmem);
++    sysbus_init_mmio(sbd, &s->dmem);
+ 
+     hid_init(&s->hid_kbd, HID_KEYBOARD, softusb_kbd_hid_datain);
+     hid_init(&s->hid_mouse, HID_MOUSE, softusb_mouse_hid_datain);
+-
 -    return 0;
-+    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
  }
  
- static void empty_slot_class_init(ObjectClass *klass, void *data)
+ static const VMStateDescription vmstate_milkymist_softusb = {
+@@ -296,9 +295,8 @@ static Property milkymist_softusb_properties[] = {
+ static void milkymist_softusb_class_init(ObjectClass *klass, void *data)
  {
+     DeviceClass *dc = DEVICE_CLASS(klass);
 -    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
-+    DeviceClass *dc = DEVICE_CLASS(klass);
  
--    k->init = empty_slot_init1;
-+    dc->realize = empty_slot_realize;
- }
- 
- static const TypeInfo empty_slot_info = {
+-    k->init = milkymist_softusb_init;
++    dc->realize = milkymist_softusb_realize;
+     dc->reset = milkymist_softusb_reset;
+     dc->vmsd = &vmstate_milkymist_softusb;
+     dc->props = milkymist_softusb_properties;
 -- 
 2.19.2
