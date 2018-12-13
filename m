@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gXZDI-0008B9-1Z
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 17:12:22 -0500
+	(envelope-from <nsoffer@redhat.com>) id 1gXZFU-0002YE-Rh
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 17:14:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gXZD9-00047d-9D
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 17:12:11 -0500
-Resent-Message-Id: <E1gXZD9-00047d-9D@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21745)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gXZD7-0003yv-VV
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 17:12:02 -0500
-In-Reply-To: <20181213133733.8110-1-tom.deseyn@gmail.com>
-Message-ID: <154473908671.18041.4273945971137512275@02a1dbf831e2>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <nsoffer@redhat.com>) id 1gXZFF-0001JW-Pk
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 17:14:19 -0500
+Received: from mail-vk1-f175.google.com ([209.85.221.175]:40080)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1gXZFB-0000uc-So
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 17:14:10 -0500
+Received: by mail-vk1-f175.google.com with SMTP id v70so829087vkv.7
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 14:14:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 13 Dec 2018 14:11:28 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2] Add getsockopt for settable SOL_IPV6
- options
+References: <20181212220410.569069-1-eblake@redhat.com>
+	<CAMRbyyuZ81fyHYTQSHPXhjYoLFz6nzsxc30PNJdWRkqm=14RRA@mail.gmail.com>
+	<20181213104704.GD5171@redhat.com>
+	<20181213140513.GD5427@linux.fritz.box>
+	<CAMRbyytod-tELpdzmgp_mzwut=AuH4J1JsQ93QiFqz9RORV28g@mail.gmail.com>
+	<ac589e0c-0294-8ce1-977b-eecdfea42eb8@redhat.com>
+In-Reply-To: <ac589e0c-0294-8ce1-977b-eecdfea42eb8@redhat.com>
+From: Nir Soffer <nsoffer@redhat.com>
+Date: Fri, 14 Dec 2018 00:13:53 +0200
+Message-ID: <CAMRbyyv5GE5EQ0e6DcHGdQWBTac+j6Rr2aVnAntoA_ri=Uojfg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC] qemu-io: Prefer stderr
+ for error messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +33,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: tom.deseyn@gmail.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu
+To: Eric Blake <eblake@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIxMzEzMzczMy44MTEw
-LTEtdG9tLmRlc2V5bkBnbWFpbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
-ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
-bmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE4MTIxMzEzMzczMy44MTEw
-LTEtdG9tLmRlc2V5bkBnbWFpbC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2Ml0g
-QWRkIGdldHNvY2tvcHQgZm9yIHNldHRhYmxlIFNPTF9JUFY2IG9wdGlvbnMKCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9n
-IC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdp
-dCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsg
-ZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1m
-b3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4v
-c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0x
-CiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09
-PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
-N2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYzdmMjA0YSBB
-ZGQgZ2V0c29ja29wdCBmb3Igc2V0dGFibGUgU09MX0lQVjYgb3B0aW9ucwoKPT09IE9VVFBVVCBC
-RUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBBZGQgZ2V0c29ja29wdCBmb3Igc2V0dGFibGUg
-U09MX0lQVjYgb3B0aW9ucy4uLgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFs
-bCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMzMDogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6
-MjM2ODoKKyAgICAgICAgICAgIGlmIChnZXRfdXNlcl91MzIobGVuLCBvcHRsZW4pKQpbLi4uXQoK
-RVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRl
-bWVudAojMzI6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjIzNzA6CisgICAgICAgICAgICBp
-ZiAobGVuIDwgMCkKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxs
-IGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzM2OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzoy
-Mzc0OgorICAgICAgICAgICAgaWYgKHJldCA8IDApClsuLi5dCgpFUlJPUjogYnJhY2VzIHt9IGFy
-ZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM0NDogRklMRTogbGlu
-dXgtdXNlci9zeXNjYWxsLmM6MjM4MjoKKyAgICAgICAgICAgICAgICBpZiAobGVuID4gc2l6ZW9m
-KGludCkpClsuLi5dCgp0b3RhbDogNCBlcnJvcnMsIDAgd2FybmluZ3MsIDQ0IGxpbmVzIGNoZWNr
-ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5E
-ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMg
-YXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTgxMjEzMTMzNzMzLjgxMTAt
-MS10b20uZGVzZXluQGdtYWlsLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4K
-LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRj
-aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVk
-aGF0LmNvbQ==
+On Thu, Dec 13, 2018 at 11:27 PM Eric Blake <eblake@redhat.com> wrote:
+
+> On 12/13/18 11:44 AM, Nir Soffer wrote:
+>
+> >> The things is, qemu-io was never meant to be used by other
+> >> applications that need to process the results, it's a tool for testing
+> >> and debugging. If we had meant it to be used by other programs, we would
+> >> have given it a machine-friendly interface.
+> >>
+> >> The machine-friendly interface to the QEMU block layer is qemu-nbd.
+> >>
+> >
+> > nbd is awesome, but much more complicated to use for testing. You need
+> to:
+> >
+> > 1. start qemu-nbd
+> > 2. wait until it is ready
+> > 3. use nbd client (we have one now), or connect the qemu-nbd to
+> /dev/ndbX,
+> > which on
+> >    Fedora 28 leaves stale /dev/nbdX devices after disconnection
+> >    (I reported this few month ago here).
+>
+> Is that true even when you use 'qemu-nbd -d /dev/nbdX' after you are done?
+>
+
+It was true when I reported this here:
+http://lists.nongnu.org/archive/html/qemu-block/2018-07/msg00168.html
