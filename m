@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gXTRM-00047X-KY
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 11:02:21 -0500
+	(envelope-from <rjones@redhat.com>) id 1gXTRZ-0004CG-5L
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 11:02:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gXTRG-0004C5-RY
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 11:02:20 -0500
-Received: from indium.canonical.com ([91.189.90.7]:54346)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gXTRG-0003t0-I4
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 11:02:14 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gXTR4-0001P6-MF
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 16:02:02 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A740D2E808D
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 16:02:02 +0000 (UTC)
+	(envelope-from <rjones@redhat.com>) id 1gXTRT-0004cg-6W
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 11:02:33 -0500
+Date: Thu, 13 Dec 2018 16:02:07 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20181213160207.GJ27120@redhat.com>
+References: <20181212220410.569069-1-eblake@redhat.com>
+	<20181213101154.GA5171@redhat.com>
+	<20181213142210.GE5427@linux.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181213142210.GE5427@linux.fritz.box>
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 13 Dec 2018 15:49:18 -0000
-From: asd fghjkl <1703506@bugs.launchpad.net>
-Reply-To: Bug 1703506 <1703506@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149974876377.6612.10329067332937096720.malonedeb@gac.canonical.com>
-Message-Id: <154471615856.28534.5674193010214819135.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1703506] Re: SMT not supported by QEMU on AMD
- Ryzen CPU
+Subject: Re: [Qemu-devel] [PATCH RFC] qemu-io: Prefer stderr for error
+ messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,43 +26,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-I got it to work:
-sudo nano /etc/modprobe.d/kvm.conf
-add "options kvm ignore_msrs=3D1" (without quotes)
-reboot
+On Thu, Dec 13, 2018 at 03:22:10PM +0100, Kevin Wolf wrote:
+> Am 13.12.2018 um 11:11 hat Daniel P. Berrang=C3=A9 geschrieben:
+> > On Wed, Dec 12, 2018 at 04:04:10PM -0600, Eric Blake wrote:
+> > > When a qemu-io command fails, it's best if the failure message
+> > > goes to stderr rather than stdout.
+> > >=20
+> > > Reported-by: Richard W.M. Jones <rjones@redhat.com>
+> > > Signed-off-by: Eric Blake <eblake@redhat.com>
+> > > ---
+> > >=20
+> > > RFC because at least iotest 60 (found by -qcow2 -g quick) breaks du=
+e
+> > > to reordering of output lines, and I'd rather know if we like this
+> > > idea before bothering to revisit all affected iotests (including
+> > > discovering if other slower ones have similar problems).
+> >=20
+> > I think the change is correct. Error messages should never go to stdo=
+ut.
+>=20
+> I'm not sure about this, to be honest. qemu-io is first and foremost an
+> interactive program, and spreading output across two streams, one
+> buffered and one unbuffered, in an interactive program feels like it ha=
+s
+> to result in surprises.
 
-Then changing "-machine q35" to "-machine pc" kept it from crashing
-randomly.
+Just for the record we're using qemu-io extensively for testing
+nbdkit, and it's always used non-interactively (ie. =E2=80=98qemu-io -c=E2=
+=80=99).
+The bug (if it is such) was found because I was using qemu-io to test
+for expected errors.
 
--- =
+https://github.com/libguestfs/nbdkit/search?q=3Dqemu-io
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1703506
+Rich.
 
-Title:
-  SMT not supported by QEMU on AMD Ryzen CPU
-
-Status in QEMU:
-  New
-
-Bug description:
-  HyperThreading/SMT is supported by AMD Ryzen CPUs but results in this
-  message when setting the topology to threads=3D2:
-
-  qemu-system-x86_64: AMD CPU doesn't support hyperthreading. Please
-  configure -smp options properly.
-
-  Checking in a Windows 10 guest reveals that SMT is not enabled, and
-  from what I understand, QEMU converts the topology from threads to
-  cores internally on AMD CPUs. This appears to cause performance
-  problems in the guest perhaps because programs are assuming that these
-  threads are actual cores.
-
-  Software: Linux 4.12, qemu 2.9.0 host with KVM enabled, Windows 10 pro
-  guest
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1703506/+subscriptions
+--=20
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rj=
+ones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-p2v converts physical machines to virtual machines.  Boot with a
+live CD or over the network (PXE) and turn machines into KVM guests.
+http://libguestfs.org/virt-v2v
