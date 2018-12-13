@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35804)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gXSO5-0003zs-8T
+	(envelope-from <pm215@archaic.org.uk>) id 1gXSO5-0003zb-5B
 	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gXSO3-000724-03
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:53 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:53506)
+	(envelope-from <pm215@archaic.org.uk>) id 1gXSO3-00073L-L0
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:52 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:53508)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gXSO2-0006zA-Ld
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:50 -0500
+	id 1gXSO3-00071P-C3
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:51 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gXSO1-0007Ge-NC
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 14:54:49 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1gXSO2-0007Gu-9J
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 14:54:50 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 13 Dec 2018 14:54:15 +0000
-Message-Id: <20181213145445.17935-8-peter.maydell@linaro.org>
+Date: Thu, 13 Dec 2018 14:54:16 +0000
+Message-Id: <20181213145445.17935-9-peter.maydell@linaro.org>
 In-Reply-To: <20181213145445.17935-1-peter.maydell@linaro.org>
 References: <20181213145445.17935-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 07/37] display/g364fb: Convert sysbus init
+Subject: [Qemu-devel] [PULL 08/37] dma/puv3_dma: Convert sysbus init
  function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -36,58 +36,52 @@ To: qemu-devel@nongnu.org
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 
 Use DeviceClass rather than SysBusDeviceClass in
-g364fb_sysbus_class_init().
+puv3_dma_class_init().
 
-Cc: pbonzini@redhat.com
-Cc: kraxel@redhat.com
-Cc: f4bug@amsat.org
-Cc: alistair.francis@wdc.com
+Cc: gxt@mprc.pku.edu.cn
 
 Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20181130093852.20739-6-maozhongyi@cmss.chinamobile.com
+Message-id: 20181130093852.20739-7-maozhongyi@cmss.chinamobile.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/display/g364fb.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ hw/dma/puv3_dma.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/hw/display/g364fb.c b/hw/display/g364fb.c
-index 8ad7e5d8242..3407adf98d2 100644
---- a/hw/display/g364fb.c
-+++ b/hw/display/g364fb.c
-@@ -489,18 +489,16 @@ typedef struct {
-     G364State g364;
- } G364SysBusState;
+diff --git a/hw/dma/puv3_dma.c b/hw/dma/puv3_dma.c
+index b97a6c1767c..c89eade0292 100644
+--- a/hw/dma/puv3_dma.c
++++ b/hw/dma/puv3_dma.c
+@@ -76,7 +76,7 @@ static const MemoryRegionOps puv3_dma_ops = {
+     .endianness = DEVICE_NATIVE_ENDIAN,
+ };
  
--static int g364fb_sysbus_init(SysBusDevice *sbd)
-+static void g364fb_sysbus_realize(DeviceState *dev, Error **errp)
+-static int puv3_dma_init(SysBusDevice *dev)
++static void puv3_dma_realize(DeviceState *dev, Error **errp)
  {
--    DeviceState *dev = DEVICE(sbd);
-     G364SysBusState *sbs = G364(dev);
-     G364State *s = &sbs->g364;
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+     PUV3DMAState *s = PUV3_DMA(dev);
+     int i;
+@@ -87,16 +87,14 @@ static int puv3_dma_init(SysBusDevice *dev)
  
-     g364fb_init(dev, s);
-     sysbus_init_irq(sbd, &s->irq);
-     sysbus_init_mmio(sbd, &s->mem_ctrl);
-     sysbus_init_mmio(sbd, &s->mem_vram);
+     memory_region_init_io(&s->iomem, OBJECT(s), &puv3_dma_ops, s, "puv3_dma",
+             PUV3_REGS_OFFSET);
+-    sysbus_init_mmio(dev, &s->iomem);
 -
 -    return 0;
++    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
  }
  
- static void g364fb_sysbus_reset(DeviceState *d)
-@@ -518,9 +516,8 @@ static Property g364fb_sysbus_properties[] = {
- static void g364fb_sysbus_class_init(ObjectClass *klass, void *data)
+ static void puv3_dma_class_init(ObjectClass *klass, void *data)
  {
-     DeviceClass *dc = DEVICE_CLASS(klass);
--    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
+-    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
++    DeviceClass *dc = DEVICE_CLASS(klass);
  
--    k->init = g364fb_sysbus_init;
-+    dc->realize = g364fb_sysbus_realize;
-     set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
-     dc->desc = "G364 framebuffer";
-     dc->reset = g364fb_sysbus_reset;
+-    sdc->init = puv3_dma_init;
++    dc->realize = puv3_dma_realize;
+ }
+ 
+ static const TypeInfo puv3_dma_info = {
 -- 
 2.19.2
