@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXSe5-0002o9-RY
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:11:27 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gXSnU-00032A-TU
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:21:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXSe4-0005Q2-LD
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:11:25 -0500
-Received: from mail-oi1-x233.google.com ([2607:f8b0:4864:20::233]:46843)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gXSe4-0005AB-6u
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:11:24 -0500
-Received: by mail-oi1-x233.google.com with SMTP id x202so1848914oif.13
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 07:11:17 -0800 (PST)
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gXSnO-000558-U9
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:21:05 -0500
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Date: Thu, 13 Dec 2018 15:20:51 +0000
+Message-ID: <9567be7b-f372-ef64-72f4-4ba2a361b9b9@virtuozzo.com>
+References: <20181130144705.77454-1-anton.nefedov@virtuozzo.com>
+	<20181130144705.77454-10-anton.nefedov@virtuozzo.com>
+	<8736r1bou7.fsf@dusky.pond.sub.org>
+In-Reply-To: <8736r1bou7.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <624148F38C44FE4CB9D2CED205E87F31@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <1544708743.4811.30.camel@rwth-aachen.de>
-	<CAFEAcA-p-LC2swC8-AQt60QBhQN=PNJvBjbGXrtdvvvDd-74QA@mail.gmail.com>
-	<1544713257.4811.32.camel@rwth-aachen.de>
-In-Reply-To: <1544713257.4811.32.camel@rwth-aachen.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 13 Dec 2018 15:11:05 +0000
-Message-ID: <CAFEAcA93tPS-jJBoT3fFekEvXx4pJPR_u3P-x1d3op470uexmQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] Warning when DTB memory nodes are noped
+Subject: Re: [Qemu-devel] [PATCH v6 9/9] qapi: query-blockstat: add driver
+ specific file-posix stats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +27,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: lukas.juenger@rwth-aachen.de
-Cc: Eric Auger <eric.auger@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "famz@redhat.com" <famz@redhat.com>, Denis Lunev <den@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "berto@igalia.com" <berto@igalia.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
 
-On Thu, 13 Dec 2018 at 15:00, J=C3=BCnger, Lukas
-<lukas.juenger@rwth-aachen.de> wrote:
->
-> On Thu, 2018-12-13 at 14:49 +0000, Peter Maydell wrote:
-> > Was the deletion of the memory node actually wrong in your case?
-> > If so we should look at fixing the wrong behaviour, rather than
-> > just being noisier about what we're doing...
-
-> I see. In my case I wanted to specify the memory using the DTB that I
-> passed using the -dtb option. I had two memory ranges in the dtb and
-> they didn't show up in the kernel later on because they were noped by
-> QEMU. I found it confusing that QEMU makes changes to the DTB that I
-> passed via -dtb.
-
-Yeah, we don't edit the DTB much but we do fix it up to
-indicate the memory, number of CPUs, kernel command line, etc
-passed on the QEMU command line.
-
-thanks
--- PMM
+T24gMTMvMTIvMjAxOCAzOjIwIFBNLCBNYXJrdXMgQXJtYnJ1c3RlciB3cm90ZToNCj4gSSdtIHJl
+dmlld2luZyBqdXN0IHRoZSBRQVBJIHNjaGVtYSB0b2RheS4NCj4gDQo+IEFudG9uIE5lZmVkb3Yg
+PGFudG9uLm5lZmVkb3ZAdmlydHVvenpvLmNvbT4gd3JpdGVzOg0KPiANCj4+IEEgYmxvY2sgZHJp
+dmVyIGNhbiBwcm92aWRlIGEgY2FsbGJhY2sgdG8gcmVwb3J0IGRyaXZlci1zcGVjaWZpYw0KPj4g
+c3RhdGlzdGljcy4NCj4+DQo+PiBmaWxlLXBvc2l4IGRyaXZlciBub3cgcmVwb3J0cyBkaXNjYXJk
+IHN0YXRpc3RpY3MNCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBBbnRvbiBOZWZlZG92IDxhbnRvbi5u
+ZWZlZG92QHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4+ICAgcWFwaS9ibG9jay1jb3JlLmpzb24g
+ICAgICB8IDM4ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+PiAgIGlu
+Y2x1ZGUvYmxvY2svYmxvY2suaCAgICAgfCAgMSArDQo+PiAgIGluY2x1ZGUvYmxvY2svYmxvY2tf
+aW50LmggfCAgMSArDQo+PiAgIGJsb2NrLmMgICAgICAgICAgICAgICAgICAgfCAgOSArKysrKysr
+KysNCj4+ICAgYmxvY2svZmlsZS1wb3NpeC5jICAgICAgICB8IDMyICsrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrDQo+PiAgIGJsb2NrL3FhcGkuYyAgICAgICAgICAgICAgfCAgNSArKysr
+Kw0KPj4gICA2IGZpbGVzIGNoYW5nZWQsIDg2IGluc2VydGlvbnMoKykNCj4+DQo+PiBkaWZmIC0t
+Z2l0IGEvcWFwaS9ibG9jay1jb3JlLmpzb24gYi9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPj4gaW5k
+ZXggOTU5MzU4Y2NjNC4uYjEwMGU4NTJjNyAxMDA2NDQNCj4+IC0tLSBhL3FhcGkvYmxvY2stY29y
+ZS5qc29uDQo+PiArKysgYi9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPj4gQEAgLTg3Nyw2ICs4Nzcs
+NDEgQEANCj4+ICAgICAgICAgICAgICAnKnhfd3JfbGF0ZW5jeV9oaXN0b2dyYW0nOiAnQmxvY2tM
+YXRlbmN5SGlzdG9ncmFtSW5mbycsDQo+PiAgICAgICAgICAgICAgJyp4X2ZsdXNoX2xhdGVuY3lf
+aGlzdG9ncmFtJzogJ0Jsb2NrTGF0ZW5jeUhpc3RvZ3JhbUluZm8nIH0gfQ0KPj4gICANCj4+ICsj
+Iw0KPj4gKyMgQEJsb2NrU3RhdHNTcGVjaWZpY0ZpbGU6DQo+PiArIw0KPj4gKyMgRmlsZSBkcml2
+ZXIgc3RhdGlzdGljcw0KPj4gKyMNCj4+ICsjIEBkaXNjYXJkLW5iLW9rOiBUaGUgbnVtYmVyIG9m
+IHN1Y2NlZWRlZCBkaXNjYXJkIG9wZXJhdGlvbnMgcGVyZm9ybWVkIGJ5DQo+IA0KPiBzdWNjZXNz
+ZnVsIGRpc2NhcmQgb3BlcmF0aW9ucw0KPiANCg0KRml4ZWQuDQoNCj4+ICsjICAgICAgICAgICAg
+ICAgICB0aGUgZHJpdmVyLg0KPj4gKyMNCj4+ICsjIEBkaXNjYXJkLW5iLWZhaWxlZDogVGhlIG51
+bWJlciBvZiBmYWlsZWQgZGlzY2FyZCBvcGVyYXRpb25zIHBlcmZvcm1lZCBieQ0KPj4gKyMgICAg
+ICAgICAgICAgICAgICAgICB0aGUgZHJpdmVyLg0KPj4gKyMNCj4+ICsjIEBkaXNjYXJkLWJ5dGVz
+LW9rOiBUaGUgbnVtYmVyIG9mIGJ5dGVzIGRpc2NhcmRlZCBieSB0aGUgZHJpdmVyLg0KPj4gKyMN
+Cj4+ICsjIFNpbmNlOiA0LjANCj4+ICsjIw0KPj4gK3sgJ3N0cnVjdCc6ICdCbG9ja1N0YXRzU3Bl
+Y2lmaWNGaWxlJywNCj4+ICsgICdkYXRhJzogew0KPj4gKyAgICAgICdkaXNjYXJkLW5iLW9rJzog
+J2ludCcsDQo+PiArICAgICAgJ2Rpc2NhcmQtbmItZmFpbGVkJzogJ2ludCcsDQo+PiArICAgICAg
+J2Rpc2NhcmQtYnl0ZXMtb2snOiAnaW50JyB9IH0NCj4gDQo+IFNob3VsZCB0aGVzZSBiZSB1bnNp
+Z25lZD8NCj4gDQo+IEZvciB3aGF0IGl0J3Mgd29ydGgsIHNpbWlsYXIgY291bnRlcnMgbmVhcmJ5
+IGFyZSBhbHNvICdpbnQnLg0KPiANCg0KQW5kIEkganVzdCBhZGRlZCB0aGVzZSBzeW1tZXRyaWNh
+bGx5Lg0KUHJvYmFibHkgc2hvdWxkbid0IGhhdmUgLSBsZXQgdGhlc2UgYmUgdWludDY0Lg0KDQo+
+PiArDQo+PiArIyMNCj4+ICsjIEBCbG9ja1N0YXRzU3BlY2lmaWM6DQo+PiArIw0KPj4gKyMgQmxv
+Y2sgZHJpdmVyIHNwZWNpZmljIHN0YXRpc3RpY3MNCj4+ICsjDQo+PiArIyBTaW5jZTogNC4wDQo+
+PiArIyMNCj4+ICt7ICd1bmlvbic6ICdCbG9ja1N0YXRzU3BlY2lmaWMnLA0KPj4gKyAgJ2Jhc2Un
+OiB7ICdkcml2ZXInOiAnQmxvY2tkZXZEcml2ZXInIH0sDQo+PiArICAnZGlzY3JpbWluYXRvcic6
+ICdkcml2ZXInLA0KPj4gKyAgJ2RhdGEnOiB7DQo+PiArICAgICAgJ2ZpbGUnOiAnQmxvY2tTdGF0
+c1NwZWNpZmljRmlsZScsDQo+PiArICAgICAgJ2hvc3RfZGV2aWNlJzogJ0Jsb2NrU3RhdHNTcGVj
+aWZpY0ZpbGUnIH0gfQ0KPj4gKw0KPj4gICAjIw0KPj4gICAjIEBCbG9ja1N0YXRzOg0KPj4gICAj
+DQo+PiBAQCAtODkyLDYgKzkyNyw4IEBADQo+PiAgICMNCj4+ICAgIyBAc3RhdHM6ICBBIEBCbG9j
+a0RldmljZVN0YXRzIGZvciB0aGUgZGV2aWNlLg0KPj4gICAjDQo+PiArIyBAZHJpdmVyLXNwZWNp
+ZmljOiBPcHRpb25hbCBkcml2ZXItc3BlY2lmaWMgc3RhdHMuIChTaW5jZSA0LjApDQo+PiArIw0K
+Pj4gICAjIEBwYXJlbnQ6IFRoaXMgZGVzY3JpYmVzIHRoZSBmaWxlIGJsb2NrIGRldmljZSBpZiBp
+dCBoYXMgb25lLg0KPj4gICAjICAgICAgICAgIENvbnRhaW5zIHJlY3Vyc2l2ZWx5IHRoZSBzdGF0
+aXN0aWNzIG9mIHRoZSB1bmRlcmx5aW5nDQo+PiAgICMgICAgICAgICAgcHJvdG9jb2wgKGUuZy4g
+dGhlIGhvc3QgZmlsZSBmb3IgYSBxY293MiBpbWFnZSkuIElmIHRoZXJlIGlzDQo+PiBAQCAtOTA1
+LDYgKzk0Miw3IEBADQo+PiAgIHsgJ3N0cnVjdCc6ICdCbG9ja1N0YXRzJywNCj4+ICAgICAnZGF0
+YSc6IHsnKmRldmljZSc6ICdzdHInLCAnKnFkZXYnOiAnc3RyJywgJypub2RlLW5hbWUnOiAnc3Ry
+JywNCj4+ICAgICAgICAgICAgICAnc3RhdHMnOiAnQmxvY2tEZXZpY2VTdGF0cycsDQo+PiArICAg
+ICAgICAgICAnKmRyaXZlci1zcGVjaWZpYyc6ICdCbG9ja1N0YXRzU3BlY2lmaWMnLA0KPj4gICAg
+ICAgICAgICAgICcqcGFyZW50JzogJ0Jsb2NrU3RhdHMnLA0KPj4gICAgICAgICAgICAgICcqYmFj
+a2luZyc6ICdCbG9ja1N0YXRzJ30gfQ0KPj4gICANCj4gDQo+IEZlZWxzIGF3a3dhcmQuDQo+IA0K
+PiBXaGVuIGlzIEBkcml2ZXItc3BlY2lmaWMgcHJlc2VudD8gIEV4YWN0bHkgd2hlbiB0aGUgZHJp
+dmVyIGlzICdmaWxlJyBvcg0KPiAnaG9zdF9kZXZpY2UnPyAgSWYgdGhhdCdzIGNvcnJlY3QsIHRo
+ZW4gdHVybmluZyBCbG9ja1N0YXRzIGludG8gYSB1bmlvbg0KPiB3b3VsZCBiZSBjbGVhcmVyIGFu
+ZCByZWR1Y2UgcGFyZW50aGVzaXNlcyBvbiB0aGUgd2lyZToNCj4gDQo+IHsgJ3VuaW9uJzogJ0Js
+b2NrU3RhdHMnLA0KPiAgICAnYmFzZSc6IHsNCj4gICAgICAgICdkcml2ZXInOiAnQmxvY2tkZXZE
+cml2ZXInLA0KPiAgICAgICAgLi4uIGFsbCB0aGUgb3RoZXIgZXhpc3RpbmcgbWVtYmVycyBvZiBC
+bG9ja1N0YXRzIC4uLiB9DQo+ICAgICdkaXNjcmltaW5hdG9yJzogJ2RyaXZlcicsDQo+ICAgICdk
+YXRhJzogew0KPiAgICAgICAgJ2ZpbGUnOiAnQmxvY2tTdGF0c1NwZWNpZmljRmlsZScsDQo+ICAg
+ICAgICAnaG9zdF9kZXZpY2UnOiAnQmxvY2tTdGF0c1NwZWNpZmljRmlsZScgfSB9DQo+IA0KPiBb
+Li4uXQ0KPiANCg0KdGhpcyBzZXJpZXMgZHJhZ3MgZm9yIHF1aXRlIGEgd2hpbGUgLSB3ZSBhbHJl
+YWR5IGRpc2N1c3NlZCB0aGlzIDopDQpJbiBzaG9ydDogQmxvY2tkZXYgZG9lcyBub3QgYWx3YXlz
+IGhhdmUgZHJpdmVyLCBzbyBpdCdzIGVpdGhlciB0aGlzDQpvciBhZGRpbmcgd2VpcmQgQmxvY2tk
+ZXZEcml2ZXIgdmFsdWVzIGxpa2UgIm5vbmUiLg0KDQpodHRwOi8vbGlzdHMubm9uZ251Lm9yZy9h
+cmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE4LTA2L21zZzAxODQ1Lmh0bWwNCg==
