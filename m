@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gXS4j-0000Jr-CM
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:34:59 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gXS5R-0000nC-Oe
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:35:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gXS4f-0005bo-2a
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:34:53 -0500
-Date: Thu, 13 Dec 2018 15:34:34 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181213143434.GF5427@linux.fritz.box>
-References: <20181212220410.569069-1-eblake@redhat.com>
-	<CAMRbyyuZ81fyHYTQSHPXhjYoLFz6nzsxc30PNJdWRkqm=14RRA@mail.gmail.com>
-	<20181213104704.GD5171@redhat.com>
-	<20181213140513.GD5427@linux.fritz.box>
-	<675b2641-a082-eeba-7584-602c16c7c259@redhat.com>
+	(envelope-from <mlureau@redhat.com>) id 1gXS5N-0006AM-Gr
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:35:37 -0500
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:34313)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gXS5N-0006AA-Bu
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:35:33 -0500
+Received: by mail-qk1-f195.google.com with SMTP id a132so1236508qkg.1
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 06:35:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <675b2641-a082-eeba-7584-602c16c7c259@redhat.com>
+References: <20181213123724.4866-1-marcandre.lureau@redhat.com>
+	<20181213123724.4866-7-marcandre.lureau@redhat.com>
+	<87r2elpkei.fsf@dusky.pond.sub.org>
+In-Reply-To: <87r2elpkei.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Thu, 13 Dec 2018 18:35:20 +0400
+Message-ID: <CAMxuvawGAg5LwsUyWLYE_Hv+gsCbjKuLFN=4MzNVNGSAgtFFZg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC] qemu-io: Prefer stderr
- for error messages
+Subject: Re: [Qemu-devel] [PATCH v8 06/22] qapi: add a dictionary form with
+ 'name' key for enum members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,110 +31,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Nir Soffer <nsoffer@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: "Armbruster, Markus" <armbru@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-Am 13.12.2018 um 15:23 hat Eric Blake geschrieben:
-> On 12/13/18 8:05 AM, Kevin Wolf wrote:
-> > Am 13.12.2018 um 11:47 hat Daniel P. Berrang=E9 geschrieben:
-> > > On Thu, Dec 13, 2018 at 01:52:29AM +0200, Nir Soffer wrote:
-> > > > On Thu, Dec 13, 2018 at 12:13 AM Eric Blake <eblake@redhat.com> w=
-rote:
-> > > > >=20
-> > > > > When a qemu-io command fails, it's best if the failure message
-> > > > > goes to stderr rather than stdout.
-> > > >=20
-> > > > This makes sense, but it will break users like this:
-> > > >=20
-> > > > https://github.com/oVirt/vdsm/blob/a2836b1d58ffaa0f48cc9c814b6002=
-161a81f044/tests/storage/qemuio.py#L45
-> > > >=20
-> > > > We need a way to detect qemu-io verification failures, maybe a sp=
-ecial
-> > > > exit code?
-> > > >=20
-> > > > 0 - verification succeeded
-> > > > 1 - verification failed
-> > > > 2 - other error (e.g no such file)
-> > >=20
-> > > This makes sense. We should *never* expect applications to parse th=
-e
-> > > messages on stdout/err, because we reserve the right to change text
-> > > arbitrarily at any time. So we need to use exit status IMHO.
-> >=20
-> > qemu-io processes more than just a single command. What would the exi=
-t
-> > code be if one of the commands succeeds, one gets an I/O error, and t=
-he
-> > third one succeeds for I/O, but fails pattern verification?
-> >=20
-> > The things is, qemu-io was never meant to be used by other
-> > applications that need to process the results, it's a tool for testin=
-g
-> > and debugging. If we had meant it to be used by other programs, we wo=
-uld
-> > have given it a machine-friendly interface.
-> >=20
-> > The machine-friendly interface to the QEMU block layer is qemu-nbd.
-> >=20
-> > > > Or, if qemu-io had a way to read data and write it to stdout, we =
-could
-> > > > compare the data and avoid the need for special exit code.
-> > >=20
-> > > That should be trivial to do, and quite desirable too IMHO - libvir=
-t would
-> > > in fact quite like such a feature, as it would let us support forma=
-t
-> > > conversions when using our upload/download APIs, without having to =
-create
-> > > intermediate files.  Alternatively 'qemu-img convert' could allow f=
-or
-> > > /dev/stdin and /dev/stdout as raw files, but that looks considerabl=
-y
-> > > harder to implement.
-> > >=20
-> > > For your usecase that feels rather inefficient as you're introducin=
-g
-> > > multiple data copies, which will be bad for large images. Much bett=
-er
-> > > if we just make qemu-io set good exit codes.
-> >=20
-> > 'read -v' produces a hex dump on stdout, but you still need to separa=
-te
-> > it from the other output and then parse the hexdump.
-> >=20
-> > The human interface of qemu-io is honestly just not the right tool fo=
-r
-> > the job, and adding one-off tweaks to make it a little bit less horri=
-ble
-> > to use for machines isn't the right approach because it's still not a
-> > proper machine protocol.
->=20
-> I actually agree with that sentiment - qemu-io is NOT a program where w=
-e
-> promise backwards compatibility (we're not going to break it without re=
-ason,
-> because we DO have to keep iotests running, but outside of iotests, we =
-are
-> less concerned if other uses break).
->=20
-> But it DOES sound like teaching 'qemu-img convert' to optionally conver=
-t
-> only a subset of a file may be useful (I already tried once to make
-> 'qemu-img dd' smarter, and the conclusion at the time is that it would =
-be
-> better to just make qemu-img dd be syntactic sugar for a full-featured
-> qemu-img convert, which means making convert take an offset and range l=
-imit
-> to the source, as well as a separate offset into the destination, for e=
-asily
-> extracting portions of one file into portions of another).  And I also =
-agree
-> that qemu-nbd already has offset and range support.
+On Thu, Dec 13, 2018 at 6:32 PM Markus Armbruster <armbru@redhat.com> wrote=
+:
+>
+> One little thing...
+>
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+> > Desugar the enum NAME form to { 'name': NAME }. This will allow to add
+> > new enum members, such as 'if' in the following patch.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> [...]
+> > diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+> > index f205805751..bb928d2f7d 100644
+> > --- a/scripts/qapi/common.py
+> > +++ b/scripts/qapi/common.py
+> [...]
+> > @@ -847,19 +851,29 @@ def check_alternate(expr, info):
+> >              types_seen[qt] =3D key
+> >
+> >
+> > +def normalize_enum(expr):
+> > +    if isinstance(expr['data'], list):
+> > +        expr['data'] =3D [m if isinstance(m, dict) else {'name': m}
+> > +                        for m in expr['data']]
+> > +
+> > +
+> >  def check_enum(expr, info):
+> >      name =3D expr['enum']
+> > -    members =3D expr.get('data')
+> > +    members =3D expr['data']
+> >      prefix =3D expr.get('prefix')
+> >
+> > -    if not isinstance(members, list):
+> > -        raise QAPISemError(info,
+> > -                           "Enum '%s' requires an array for 'data'" % =
+name)
+> >      if prefix is not None and not isinstance(prefix, str):
+> >          raise QAPISemError(info,
+> >                             "Enum '%s' requires a string for 'prefix'" =
+% name)
+> > +
+> > +    if not isinstance(members, list):
+> > +        raise QAPISemError(info,
+> > +                           "Enum '%s' requires an array for 'data'" % =
+name)
+> > +
+>
+> The move of the "requires an array" check looks accidental.  I'll back
+> it out unless you tell me it's needed.
 
-Can't you actually already achieve this with --image-opts and a raw
-filter that has the offset/size options set?
+ack
 
-It's not as nice as with a separate option, but it should do the job.
-
-Kevin
+>
+> >      for member in members:
+> > -        check_name(info, "Member of enum '%s'" % name, member,
+> > +        source =3D "dictionary member of enum '%s'" % name
+> > +        check_known_keys(info, source, member, ['name'], [])
+> > +        check_name(info, "Member of enum '%s'" % name, member['name'],
+> >                     enum_member=3DTrue)
+> >
+> >
+> [...]
