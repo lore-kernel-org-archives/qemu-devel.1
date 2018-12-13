@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gXRV1-0004d3-Cd
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:58:00 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gXRVc-0005Jp-Sf
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:58:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gXRV0-0008FC-96
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:57:59 -0500
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Thu, 13 Dec 2018 13:57:49 +0000
-Message-ID: <6243b734-b759-865e-391b-f46fcd9f7f96@virtuozzo.com>
-References: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
-	<20181203101429.88735-9-anton.nefedov@virtuozzo.com>
-	<1133b70c-6b8f-1622-18a8-188a4b9fe142@virtuozzo.com>
-In-Reply-To: <1133b70c-6b8f-1622-18a8-188a4b9fe142@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <DEED82E8F9625D479A83685FD94C6494@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <laurent@vivier.eu>) id 1gXRVZ-0000lQ-Dc
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:58:36 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:52071)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gXRVZ-0000kl-3j
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:58:33 -0500
+References: <20181213130611.7496-1-tom.deseyn@gmail.com>
+	<20181213133733.8110-1-tom.deseyn@gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <b95d4a9c-4bee-5e0d-5ec6-02edf3aefcc1@vivier.eu>
+Date: Thu, 13 Dec 2018 14:57:51 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v10 8/9] qcow2: skip writing zero buffers
- to empty COW areas
+In-Reply-To: <20181213133733.8110-1-tom.deseyn@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] Add getsockopt for settable SOL_IPV6
+ options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,98 +29,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
+To: tom.deseyn@gmail.com, qemu-devel@nongnu.org
+Cc: riku.voipio@iki.fi
 
-T24gMTMvMTIvMjAxOCAzOjAyIFBNLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3Rl
-Og0KPiAwMy4xMi4yMDE4IDEzOjE0LCBBbnRvbiBOZWZlZG92IHdyb3RlOg0KPj4gSWYgQ09XIGFy
-ZWFzIG9mIHRoZSBuZXdseSBhbGxvY2F0ZWQgY2x1c3RlcnMgYXJlIHplcm9lcyBvbiB0aGUgYmFj
-a2luZyBpbWFnZSwNCj4+IGVmZmljaWVudCBiZHJ2X3dyaXRlX3plcm9lcyhmbGFncz1CRFJWX1JF
-UV9BTExPQ0FURSkgY2FuIGJlIHVzZWQgb24gdGhlIHdob2xlDQo+PiBjbHVzdGVyIGluc3RlYWQg
-b2Ygd3JpdGluZyBleHBsaWNpdCB6ZXJvIGJ1ZmZlcnMgbGF0ZXIgaW4gcGVyZm9ybV9jb3coKS4N
-Cj4+DQo+IA0KPiBbLi4uXQ0KPiANCj4+IC0tLSBhL2Jsb2NrL3Fjb3cyLmMNCj4+ICsrKyBiL2Js
-b2NrL3Fjb3cyLmMNCj4+IEBAIC0yMDE1LDYgKzIwMTUsMTEgQEAgc3RhdGljIGJvb2wgbWVyZ2Vf
-Y293KHVpbnQ2NF90IG9mZnNldCwgdW5zaWduZWQgYnl0ZXMsDQo+PiAgICAgICAgICAgICAgICBj
-b250aW51ZTsNCj4+ICAgICAgICAgICAgfQ0KPj4gICAgDQo+PiArICAgICAgICAvKiBJZiBDT1cg
-cmVnaW9ucyBhcmUgaGFuZGxlZCBhbHJlYWR5LCBza2lwIHRoaXMgdG9vICovDQo+PiArICAgICAg
-ICBpZiAobS0+c2tpcF9jb3cpIHsNCj4+ICsgICAgICAgICAgICBjb250aW51ZTsNCj4+ICsgICAg
-ICAgIH0NCj4+ICsNCj4+ICAgICAgICAgICAgLyogVGhlIGRhdGEgKG1pZGRsZSkgcmVnaW9uIG11
-c3QgYmUgaW1tZWRpYXRlbHkgYWZ0ZXIgdGhlDQo+PiAgICAgICAgICAgICAqIHN0YXJ0IHJlZ2lv
-biAqLw0KPj4gICAgICAgICAgICBpZiAobDJtZXRhX2Nvd19zdGFydChtKSArIG0tPmNvd19zdGFy
-dC5uYl9ieXRlcyAhPSBvZmZzZXQpIHsNCj4+IEBAIC0yMDQwLDYgKzIwNDUsNjggQEAgc3RhdGlj
-IGJvb2wgbWVyZ2VfY293KHVpbnQ2NF90IG9mZnNldCwgdW5zaWduZWQgYnl0ZXMsDQo+PiAgICAg
-ICAgcmV0dXJuIGZhbHNlOw0KPj4gICAgfQ0KPj4gICAgDQo+PiArc3RhdGljIGJvb2wgaXNfdW5h
-bGxvY2F0ZWQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIGludDY0X3Qgb2Zmc2V0LCBpbnQ2NF90IGJ5
-dGVzKQ0KPj4gK3sNCj4+ICsgICAgaW50NjRfdCBucjsNCj4+ICsgICAgcmV0dXJuICFieXRlcyB8
-fA0KPj4gKyAgICAgICAgKCFiZHJ2X2lzX2FsbG9jYXRlZF9hYm92ZShicywgTlVMTCwgb2Zmc2V0
-LCBieXRlcywgJm5yKSAmJiBuciA9PSBieXRlcyk7DQo+IA0KPiBobSwgbnIgbWF5IGJlIDwgYnl0
-ZXMgaWYgaXQgaXMgdXAgdG8gZmlsZSBsZW5ndGguIEFuZCB3ZSBsb3NlIHRoaXMgY2FzZSwgd2hl
-biwgaXQNCj4gbWF5IGJlIGNvbnNpZGVyZWQgYXMgdW5hbGxvY2F0ZWQgdG9vLg0KPiANCj4gRG9l
-c24ndCBoYXJtLCBob3dldmVyLg0KPiANCg0KVGhhbmtzIGd1eXMgZm9yIHlvdXIgcmV2aWV3Lg0K
-DQpUaGlzIGNhc2UgSSB0aGluayBpcyB0b28gcmFyZSB0byBjYXJlIGFib3V0Lg0KDQo+PiArfQ0K
-Pj4gKw0KPj4gK3N0YXRpYyBib29sIGlzX3plcm9fY293KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBR
-Q293TDJNZXRhICptKQ0KPj4gK3sNCj4+ICsgICAgLyogVGhpcyBjaGVjayBpcyBkZXNpZ25lZCBm
-b3Igb3B0aW1pemF0aW9uIHNob3J0Y3V0IHNvIGl0IG11c3QgYmUNCj4+ICsgICAgICogZWZmaWNp
-ZW50Lg0KPj4gKyAgICAgKiBJbnN0ZWFkIG9mIGlzX3plcm8oKSwgdXNlIGlzX3VuYWxsb2NhdGVk
-KCkgYXMgaXQgaXMgZmFzdGVyIChidXQgbm90DQo+PiArICAgICAqIGFzIGFjY3VyYXRlIGFuZCBj
-YW4gcmVzdWx0IGluIGZhbHNlIG5lZ2F0aXZlcykuICovDQo+IA0KPiBCdXQsIGluIGNhc2Ugb2Yg
-YWxsb2NhdGVkIHplcm9zLCB3ZSdsbCByZWFkIHRoZW0gYW55d2F5IChhcyBwYXJ0IG9mIENPVyBw
-cm9jZXNzKSwNCj4gc28sIGl0IG1heSBiZSBoYW5kbGVkIGluIHRoZSBzYW1lIHdheSB0b28uIE1h
-eSBiZSBub3QgaGVyZSwgYnV0IGFmdGVyIHJlYWQgd2UgY2FuDQo+IGNoZWNrIGZvciB6ZXJvZXMs
-IGFuZCBhZ2FpbiBlZmZlY3RpdmVseSB3cml0ZSB6ZXJvcyB0byB0aGUgd2hvbGUgY2x1c3Rlci4N
-Cj4gDQo+IEFnYWluIGl0IG1heSBiZSBkb25lIHNlcGFyYXRlbHksIEkgZG9uJ3Qgc3VyZSBpdCB3
-b3J0aCBkb2luZy4NCj4gDQoNCkRldGVjdGluZyB6ZXJvZXMgYWZ0ZXIgd2UgcmVhZCB0aGVtIChh
-bmQgbm90IGhlcmUpIG1pZ2h0IG1ha2Ugc2Vuc2U7DQpwZXJmb3JtYW5jZSBnYWluIHNob3VsZCBi
-ZSBhYm91dCB0aGUgc2FtZSAobWludXMgc29tZSBDUFUgdG8gY2hlY2sgdGhlDQpyZWFkIGJ1ZmZl
-ciBmb3IgemVyb2VzKS4NCg0KVGhlIHF1ZXN0aW9uIGlzIGhvdyBmcmVxdWVudCBpdCBtaWdodCBo
-aXQ6DQogIC0gcmF3IGJhY2tpbmcgaW1hZ2Ugd2l0aCBob2xlcw0KICAtIHFjb3cyIGJhY2tpbmcg
-aW1hZ2Ugd2l0aCBzdWItY2x1c3RlciB6ZXJvIGFyZWFzDQogICAgKGUuZy4gc21hbGxlciBjbHVz
-dGVyIHNpemUpDQogIC0gYmFja2luZyBpbWFnZSBjb250YWlucyBsb3RzIG9mIHNwYWNlIHdpdGgg
-ZXhwbGljaXQgemVyb2VzDQogICAgKGUuZy4gZ3Vlc3QgRlMgd2l0aCAnc2hyZWQnIGV4dGVuc2l2
-ZWx5IHVzZWQgdG8gZGVsZXRlIGZpbGVzKQ0KDQpOb25lIG9mIHRoZXNlIHByb2JhYmx5IG9jY3Vy
-IHRoYXQgZnJlcXVlbnQuDQpCdXQgbWlnaHQgYmUgYSBuZXh0IHN0ZXAgYW5kIGEgc2VwYXJhdGUg
-c2VyaWVzLg0KDQo+PiArICAgIHJldHVybiBpc191bmFsbG9jYXRlZChicywgbS0+b2Zmc2V0ICsg
-bS0+Y293X3N0YXJ0Lm9mZnNldCwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgIG0tPmNv
-d19zdGFydC5uYl9ieXRlcykgJiYNCj4+ICsgICAgICAgICAgIGlzX3VuYWxsb2NhdGVkKGJzLCBt
-LT5vZmZzZXQgKyBtLT5jb3dfZW5kLm9mZnNldCwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAg
-ICAgIG0tPmNvd19lbmQubmJfYnl0ZXMpOw0KPj4gK30NCj4+ICsNCj4+ICtzdGF0aWMgaW50IGhh
-bmRsZV9hbGxvY19zcGFjZShCbG9ja0RyaXZlclN0YXRlICpicywgUUNvd0wyTWV0YSAqbDJtZXRh
-KQ0KPj4gK3sNCj4+ICsgICAgQkRSVlFjb3cyU3RhdGUgKnMgPSBicy0+b3BhcXVlOw0KPj4gKyAg
-ICBRQ293TDJNZXRhICptOw0KPj4gKw0KPj4gKyAgICBpZiAoIShicy0+ZmlsZS0+YnMtPnN1cHBv
-cnRlZF96ZXJvX2ZsYWdzICYgQkRSVl9SRVFfQUxMT0NBVEUpKSB7DQo+PiArICAgICAgICByZXR1
-cm4gMDsNCj4+ICsgICAgfQ0KPj4gKw0KPj4gKyAgICBpZiAoYnMtPmVuY3J5cHRlZCkgew0KPj4g
-KyAgICAgICAgcmV0dXJuIDA7DQo+PiArICAgIH0NCj4+ICsNCj4+ICsgICAgZm9yIChtID0gbDJt
-ZXRhOyBtICE9IE5VTEw7IG0gPSBtLT5uZXh0KSB7DQo+PiArICAgICAgICBpbnQgcmV0Ow0KPj4g
-Kw0KPj4gKyAgICAgICAgaWYgKCFtLT5jb3dfc3RhcnQubmJfYnl0ZXMgJiYgIW0tPmNvd19lbmQu
-bmJfYnl0ZXMpIHsNCj4+ICsgICAgICAgICAgICBjb250aW51ZTsNCj4+ICsgICAgICAgIH0NCj4+
-ICsNCj4+ICsgICAgICAgIGlmICghaXNfemVyb19jb3coYnMsIG0pKSB7DQo+PiArICAgICAgICAg
-ICAgY29udGludWU7DQo+PiArICAgICAgICB9DQo+IA0KPiBwcmVfd3JpdGVfb3ZlcmxhcF9jaGVj
-ayBzaG91bGQgYmUgaGVyZQ0KPiANCg0KRXhpc3RpbmcgcHJlX3dyaXRlX292ZXJsYXBfY2hlY2sg
-aW4gcWNvdzJfY29fcHdyaXRldigpIHNob3VsZCBjb3ZlciBpdCwNCnNpbmNlIHRoZSBjaGVjayBh
-bGlnbnMgdGhlIHJhbmdlIHRvIGNsdXN0ZXIgYm91bmRhcmllcy4NCg0KSG93ZXZlciBJIHRoaW5r
-IEkgbWlzc2VkIGEgY29tbWVudCBhYm91dCBpdCBoZXJlLiBGb3Igc3VzcGljaW91cw0KcmVhZGVy
-cyA6KSBhbmQganVzdCBpbiBjYXNlIHNvbWVvbmUgc3RhcnRzIG1vdmluZyB0aGlzIGNvZGUgYXJv
-dW5kLg0KDQpJIHByb3Bvc2U6DQoNCmRpZmYgLS1naXQgYS9ibG9jay9xY293Mi5jIGIvYmxvY2sv
-cWNvdzIuYw0KaW5kZXggMDI3MTg4YTFhMy4uYjNiMzEyNDA4MyAxMDA2NDQNCi0tLSBhL2Jsb2Nr
-L3Fjb3cyLmMNCisrKyBiL2Jsb2NrL3Fjb3cyLmMNCkBAIC0yMDg4LDYgKzIwODgsOSBAQCBzdGF0
-aWMgaW50IGhhbmRsZV9hbGxvY19zcGFjZShCbG9ja0RyaXZlclN0YXRlIA0KKmJzLCBRQ293TDJN
-ZXRhICpsMm1ldGEpDQogICAgICAgICAgICAgIGNvbnRpbnVlOw0KICAgICAgICAgIH0NCg0KKyAg
-ICAgICAgLyogQ29udmVudGlvbmFsIHBsYWNlIGZvciBxY293Ml9wcmVfd3JpdGVfb3ZlcmxhcF9j
-aGVjaygpIGJ1dCANCmluIHRoaXMNCisgICAgICAgICAgIGNhc2UgaXQgaXMgYWxyZWFkeSBkb25l
-IGZvciB0aGVzZSBjbHVzdGVycyAqLw0KKw0KICAgICAgICAgIEJMS0RCR19FVkVOVChicy0+Zmls
-ZSwgQkxLREJHX0NMVVNURVJfQUxMT0NfU1BBQ0UpOw0KICAgICAgICAgIC8qIGluc3RlYWQgb2Yg
-d3JpdGluZyB6ZXJvIENPVyBidWZmZXJzLA0KICAgICAgICAgICAgIGVmZmljaWVudGx5IHplcm8g
-b3V0IHRoZSB3aG9sZSBjbHVzdGVycyAqLw0KDQoNCj4+ICsNCj4+ICsgICAgICAgIEJMS0RCR19F
-VkVOVChicy0+ZmlsZSwgQkxLREJHX0NMVVNURVJfQUxMT0NfU1BBQ0UpOw0KPj4gKyAgICAgICAg
-LyogaW5zdGVhZCBvZiB3cml0aW5nIHplcm8gQ09XIGJ1ZmZlcnMsDQo+PiArICAgICAgICAgICBl
-ZmZpY2llbnRseSB6ZXJvIG91dCB0aGUgd2hvbGUgY2x1c3RlcnMgKi8NCj4+ICsgICAgICAgIHJl
-dCA9IGJkcnZfY29fcHdyaXRlX3plcm9lcyhicy0+ZmlsZSwgbS0+YWxsb2Nfb2Zmc2V0LA0KPj4g
-KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIG0tPm5iX2NsdXN0ZXJzICogcy0+
-Y2x1c3Rlcl9zaXplLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEJE
-UlZfUkVRX0FMTE9DQVRFKTsNCj4+ICsgICAgICAgIGlmIChyZXQgPCAwKSB7DQo+PiArICAgICAg
-ICAgICAgaWYgKHJldCAhPSAtRU5PVFNVUCAmJiByZXQgIT0gLUVBR0FJTikgew0KPj4gKyAgICAg
-ICAgICAgICAgICByZXR1cm4gcmV0Ow0KPj4gKyAgICAgICAgICAgIH0NCj4+ICsgICAgICAgICAg
-ICBjb250aW51ZTsNCj4+ICsgICAgICAgIH0NCj4+ICsNCj4+ICsgICAgICAgIHRyYWNlX3Fjb3cy
-X3NraXBfY293KHFlbXVfY29yb3V0aW5lX3NlbGYoKSwgbS0+b2Zmc2V0LCBtLT5uYl9jbHVzdGVy
-cyk7DQo+PiArICAgICAgICBtLT5za2lwX2NvdyA9IHRydWU7DQo+PiArICAgIH0NCj4+ICsgICAg
-cmV0dXJuIDA7DQo+PiArfQ0KPj4gKw0KPiANCj4gDQo=
+On 13/12/2018 14:37, tom.deseyn@gmail.com wrote:
+> From: Tom Deseyn <tom.deseyn@gmail.com>
+> 
+> Signed-off-by: Tom Deseyn <tom.deseyn@gmail.com>
+> ---
+
+Please add here an history of the changes between the version 1 and 2:
+
+v2: ?????
+
+>  linux-user/syscall.c | 38 ++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 38 insertions(+)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 280137da8c..ad52cfbd54 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -2352,6 +2352,44 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
+>              break;
+>          }
+>          break;
+> +    case SOL_IPV6:
+> +        switch (optname) {
+> +        case IPV6_MTU_DISCOVER:
+> +        case IPV6_MTU:
+> +        case IPV6_V6ONLY:
+> +        case IPV6_RECVPKTINFO:
+> +        case IPV6_UNICAST_HOPS:
+> +        case IPV6_MULTICAST_HOPS:
+> +        case IPV6_MULTICAST_LOOP:
+> +        case IPV6_RECVERR:
+> +        case IPV6_RECVHOPLIMIT:
+> +        case IPV6_2292HOPLIMIT:
+> +        case IPV6_CHECKSUM:
+> +            if (get_user_u32(len, optlen))
+> +                return -TARGET_EFAULT;
+> +            if (len < 0)
+> +                return -TARGET_EINVAL;
+> +            lv = sizeof(lv);
+> +            ret = get_errno(getsockopt(sockfd, level, optname, &val, &lv));
+> +            if (ret < 0)
+> +                return ret;
+> +            if (len < sizeof(int) && len > 0 && val >= 0 && val < 255) {
+> +                len = 1;
+> +                if (put_user_u32(len, optlen)
+> +                    || put_user_u8(val, optval_addr))
+> +                    return -TARGET_EFAULT;
+> +            } else {
+> +                if (len > sizeof(int))
+> +                    len = sizeof(int);
+> +                if (put_user_u32(len, optlen)
+> +                    || put_user_u32(val, optval_addr))
+> +                    return -TARGET_EFAULT;
+> +            }
+
+This way to compute the size of the result is good for SOL_IP, but not
+for SOL_IPV6, in kernel do_ip_getsockopt() we have:
+
+       if (len < sizeof(int) && len > 0 && val >= 0 && val <= 255) {
+                unsigned char ucval = (unsigned char)val;
+                len = 1;
+                if (put_user(len, optlen))
+                        return -EFAULT;
+                if (copy_to_user(optval, &ucval, 1))
+                        return -EFAULT;
+        } else {
+                len = min_t(unsigned int, sizeof(int), len);
+                if (put_user(len, optlen))
+                        return -EFAULT;
+                if (copy_to_user(optval, &val, len))
+                        return -EFAULT;
+        }
+
+Whereas in kernel do_ipv6_getsockopt():
+
+        default:
+                return -ENOPROTOOPT;
+        }
+        len = min_t(unsigned int, sizeof(int), len);
+        if (put_user(len, optlen))
+                return -EFAULT;
+        if (copy_to_user(optval, &val, len))
+                return -EFAULT;
+        return 0;
+
+
+So in QEMU for SOL_IPV6 to mimic this I think you should use something like:
+
+    len = min(lv, sizeof(val));
+    if (put_user_u32(len, optlen) {
+         return -TARGET_EFAULT;
+    }
+    target_addr =  lock_user(VERIFY_WRITE, optval_addr, len, 0);
+    tswap32s(&val);
+    memcpy(target_addr, &val, len);
+    unlock_user(target_addr, optval_addr, len);
+
+Thanks,
+Laurent
