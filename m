@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gXSOX-0004Ux-K5
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:55:22 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gXSOh-0004dn-FZ
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:55:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gXSOS-0007bD-1d
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:55:18 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:53512)
+	(envelope-from <pm215@archaic.org.uk>) id 1gXSOf-0007tP-PK
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:55:31 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:53510)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gXSOR-0007J5-Dl
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:55:15 -0500
+	id 1gXSOd-000747-Td
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:55:29 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gXSOF-0007Mw-T0
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 14:55:03 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1gXSOI-0007Nx-2d
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 14:55:06 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 13 Dec 2018 14:54:41 +0000
-Message-Id: <20181213145445.17935-34-peter.maydell@linaro.org>
+Date: Thu, 13 Dec 2018 14:54:45 +0000
+Message-Id: <20181213145445.17935-38-peter.maydell@linaro.org>
 In-Reply-To: <20181213145445.17935-1-peter.maydell@linaro.org>
 References: <20181213145445.17935-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 33/37] target/arm: Implement the ARMv8.1-HPD
+Subject: [Qemu-devel] [PULL 37/37] target/arm: Implement the ARMv8.1-LOR
  extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -34,102 +34,192 @@ To: qemu-devel@nongnu.org
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Since the TCR_*.HPD bits were RES0 in ARMv8.0, we can simply
-interpret the bits as if ARMv8.1-HPD is present without checking.
-We will need a slightly different check for hpd for aarch32.
+Provide a trivial implementation with zero limited ordering regions,
+which causes the LDLAR and STLLR instructions to devolve into the
+LDAR and STLR instructions from the base ARMv8.0 instruction set.
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20181203203839.757-10-richard.henderson@linaro.org
+Message-id: 20181210150501.7990-4-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu64.c  |  4 ++++
- target/arm/helper.c | 27 ++++++++++++++++++++-------
- 2 files changed, 24 insertions(+), 7 deletions(-)
+ target/arm/cpu.h           |  5 +++
+ target/arm/cpu64.c         |  1 +
+ target/arm/helper.c        | 75 ++++++++++++++++++++++++++++++++++++++
+ target/arm/translate-a64.c | 12 ++++++
+ 4 files changed, 93 insertions(+)
 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 05ac883b6be..c943f35dd92 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3340,6 +3340,11 @@ static inline bool isar_feature_aa64_sve(const ARMISARegisters *id)
+     return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, SVE) != 0;
+ }
+ 
++static inline bool isar_feature_aa64_lor(const ARMISARegisters *id)
++{
++    return FIELD_EX64(id->id_aa64mmfr1, ID_AA64MMFR1, LO) != 0;
++}
++
+ /*
+  * Forward to the above feature tests given an ARMCPU pointer.
+  */
 diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 0babe483ac2..1a4289c9dda 100644
+index 1a4289c9dda..1d57be0c910 100644
 --- a/target/arm/cpu64.c
 +++ b/target/arm/cpu64.c
-@@ -324,6 +324,10 @@ static void aarch64_max_initfn(Object *obj)
-         t = FIELD_DP64(t, ID_AA64PFR0, ADVSIMD, 1);
-         cpu->isar.id_aa64pfr0 = t;
+@@ -326,6 +326,7 @@ static void aarch64_max_initfn(Object *obj)
  
-+        t = cpu->isar.id_aa64mmfr1;
-+        t = FIELD_DP64(t, ID_AA64MMFR1, HPDS, 1); /* HPD */
-+        cpu->isar.id_aa64mmfr1 = t;
-+
+         t = cpu->isar.id_aa64mmfr1;
+         t = FIELD_DP64(t, ID_AA64MMFR1, HPDS, 1); /* HPD */
++        t = FIELD_DP64(t, ID_AA64MMFR1, LO, 1);
+         cpu->isar.id_aa64mmfr1 = t;
+ 
          /* Replicate the same data to the 32-bit id registers.  */
-         u = cpu->isar.id_isar5;
-         u = FIELD_DP32(u, ID_ISAR5, AES, 2); /* AES + PMULL */
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 1dad277804f..57af6b77a1b 100644
+index d6f8be9f4e1..644599b29d6 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -9636,6 +9636,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-     bool ttbr1_valid = true;
-     uint64_t descaddrmask;
-     bool aarch64 = arm_el_is_aa64(env, el);
-+    bool hpd = false;
+@@ -1281,6 +1281,7 @@ static void scr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+ {
+     /* Begin with base v8.0 state.  */
+     uint32_t valid_mask = 0x3fff;
++    ARMCPU *cpu = arm_env_get_cpu(env);
  
-     /* TODO:
-      * This code does not handle the different format TCR for VTCR_EL2.
-@@ -9750,6 +9751,13 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-         if (tg == 2) { /* 16KB pages */
-             stride = 11;
+     if (arm_el_is_aa64(env, 3)) {
+         value |= SCR_FW | SCR_AW;   /* these two bits are RES1.  */
+@@ -1303,6 +1304,9 @@ static void scr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+             valid_mask &= ~SCR_SMD;
          }
-+        if (aarch64) {
-+            if (el > 1) {
-+                hpd = extract64(tcr->raw_tcr, 24, 1);
-+            } else {
-+                hpd = extract64(tcr->raw_tcr, 41, 1);
-+            }
-+        }
-     } else {
-         /* We should only be here if TTBR1 is valid */
-         assert(ttbr1_valid);
-@@ -9765,6 +9773,9 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-         if (tg == 1) { /* 16KB pages */
-             stride = 11;
-         }
-+        if (aarch64) {
-+            hpd = extract64(tcr->raw_tcr, 42, 1);
-+        }
+     }
++    if (cpu_isar_feature(aa64_lor, cpu)) {
++        valid_mask |= SCR_TLOR;
++    }
+ 
+     /* Clear all-context RES0 bits.  */
+     value &= valid_mask;
+@@ -3963,6 +3967,9 @@ static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+          */
+         valid_mask &= ~HCR_TSC;
+     }
++    if (cpu_isar_feature(aa64_lor, cpu)) {
++        valid_mask |= HCR_TLOR;
++    }
+ 
+     /* Clear RES0 bits.  */
+     value &= valid_mask;
+@@ -5018,6 +5025,42 @@ static uint64_t id_aa64pfr0_read(CPUARMState *env, const ARMCPRegInfo *ri)
+     return pfr0;
+ }
+ 
++/* Shared logic between LORID and the rest of the LOR* registers.
++ * Secure state has already been delt with.
++ */
++static CPAccessResult access_lor_ns(CPUARMState *env)
++{
++    int el = arm_current_el(env);
++
++    if (el < 2 && (arm_hcr_el2_eff(env) & HCR_TLOR)) {
++        return CP_ACCESS_TRAP_EL2;
++    }
++    if (el < 3 && (env->cp15.scr_el3 & SCR_TLOR)) {
++        return CP_ACCESS_TRAP_EL3;
++    }
++    return CP_ACCESS_OK;
++}
++
++static CPAccessResult access_lorid(CPUARMState *env, const ARMCPRegInfo *ri,
++                                   bool isread)
++{
++    if (arm_is_secure_below_el3(env)) {
++        /* Access ok in secure mode.  */
++        return CP_ACCESS_OK;
++    }
++    return access_lor_ns(env);
++}
++
++static CPAccessResult access_lor_other(CPUARMState *env,
++                                       const ARMCPRegInfo *ri, bool isread)
++{
++    if (arm_is_secure_below_el3(env)) {
++        /* Access denied in secure mode.  */
++        return CP_ACCESS_TRAP;
++    }
++    return access_lor_ns(env);
++}
++
+ void register_cp_regs_for_features(ARMCPU *cpu)
+ {
+     /* Register all the coprocessor registers based on feature bits */
+@@ -5759,6 +5802,38 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+         define_one_arm_cp_reg(cpu, &sctlr);
      }
  
-     /* Here we should have set up all the parameters for the translation:
-@@ -9858,7 +9869,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-         descaddr = descriptor & descaddrmask;
- 
-         if ((descriptor & 2) && (level < 3)) {
--            /* Table entry. The top five bits are attributes which  may
-+            /* Table entry. The top five bits are attributes which may
-              * propagate down through lower levels of the table (and
-              * which are all arranged so that 0 means "no effect", so
-              * we can gather them up by ORing in the bits at each level).
-@@ -9883,15 +9894,17 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-             break;
++    if (cpu_isar_feature(aa64_lor, cpu)) {
++        /*
++         * A trivial implementation of ARMv8.1-LOR leaves all of these
++         * registers fixed at 0, which indicates that there are zero
++         * supported Limited Ordering regions.
++         */
++        static const ARMCPRegInfo lor_reginfo[] = {
++            { .name = "LORSA_EL1", .state = ARM_CP_STATE_AA64,
++              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 0,
++              .access = PL1_RW, .accessfn = access_lor_other,
++              .type = ARM_CP_CONST, .resetvalue = 0 },
++            { .name = "LOREA_EL1", .state = ARM_CP_STATE_AA64,
++              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 1,
++              .access = PL1_RW, .accessfn = access_lor_other,
++              .type = ARM_CP_CONST, .resetvalue = 0 },
++            { .name = "LORN_EL1", .state = ARM_CP_STATE_AA64,
++              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 2,
++              .access = PL1_RW, .accessfn = access_lor_other,
++              .type = ARM_CP_CONST, .resetvalue = 0 },
++            { .name = "LORC_EL1", .state = ARM_CP_STATE_AA64,
++              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 3,
++              .access = PL1_RW, .accessfn = access_lor_other,
++              .type = ARM_CP_CONST, .resetvalue = 0 },
++            { .name = "LORID_EL1", .state = ARM_CP_STATE_AA64,
++              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 7,
++              .access = PL1_R, .accessfn = access_lorid,
++              .type = ARM_CP_CONST, .resetvalue = 0 },
++            REGINFO_SENTINEL
++        };
++        define_arm_cp_regs(cpu, lor_reginfo);
++    }
++
+     if (cpu_isar_feature(aa64_sve, cpu)) {
+         define_one_arm_cp_reg(cpu, &zcr_el1_reginfo);
+         if (arm_feature(env, ARM_FEATURE_EL2)) {
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index fd36425f1ae..e1da1e4d6f5 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -2290,6 +2290,12 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
          }
-         /* Merge in attributes from table descriptors */
--        attrs |= extract32(tableattrs, 0, 2) << 11; /* XN, PXN */
--        attrs |= extract32(tableattrs, 3, 1) << 5; /* APTable[1] => AP[2] */
-+        attrs |= nstable << 3; /* NS */
-+        if (hpd) {
-+            /* HPD disables all the table attributes except NSTable.  */
+         return;
+ 
++    case 0x8: /* STLLR */
++        if (!dc_isar_feature(aa64_lor, s)) {
 +            break;
 +        }
-+        attrs |= extract32(tableattrs, 0, 2) << 11;     /* XN, PXN */
-         /* The sense of AP[1] vs APTable[0] is reversed, as APTable[0] == 1
-          * means "force PL1 access only", which means forcing AP[1] to 0.
-          */
--        if (extract32(tableattrs, 2, 1)) {
--            attrs &= ~(1 << 4);
--        }
--        attrs |= nstable << 3; /* NS */
-+        attrs &= ~(extract32(tableattrs, 2, 1) << 4);   /* !APT[0] => AP[1] */
-+        attrs |= extract32(tableattrs, 3, 1) << 5;      /* APT[1] => AP[2] */
-         break;
-     }
-     /* Here descaddr is the final physical address, and attributes
++        /* StoreLORelease is the same as Store-Release for QEMU.  */
++        /* fall through */
+     case 0x9: /* STLR */
+         /* Generate ISS for non-exclusive accesses including LASR.  */
+         if (rn == 31) {
+@@ -2301,6 +2307,12 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
+                   disas_ldst_compute_iss_sf(size, false, 0), is_lasr);
+         return;
+ 
++    case 0xc: /* LDLAR */
++        if (!dc_isar_feature(aa64_lor, s)) {
++            break;
++        }
++        /* LoadLOAcquire is the same as Load-Acquire for QEMU.  */
++        /* fall through */
+     case 0xd: /* LDAR */
+         /* Generate ISS for non-exclusive accesses including LASR.  */
+         if (rn == 31) {
 -- 
 2.19.2
