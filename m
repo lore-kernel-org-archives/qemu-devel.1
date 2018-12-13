@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXVxo-0005hb-HE
+	(envelope-from <armbru@redhat.com>) id 1gXVxo-0005hZ-Gt
 	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXVxj-0002A5-N3
+	(envelope-from <armbru@redhat.com>) id 1gXVxk-0002Bz-6P
 	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:43:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36084)
+Received: from mx1.redhat.com ([209.132.183.28]:34312)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXVxj-0001eP-Bv
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXVxj-0001iW-Hd
 	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:43:55 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 726DC30832D2
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 18:43:49 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 40AF3300238C
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 18:43:50 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 13 Dec 2018 19:43:35 +0100
-Message-Id: <20181213184340.24037-28-armbru@redhat.com>
+Date: Thu, 13 Dec 2018 19:43:36 +0100
+Message-Id: <20181213184340.24037-29-armbru@redhat.com>
 In-Reply-To: <20181213184340.24037-1-armbru@redhat.com>
 References: <20181213184340.24037-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 27/32] qapi: add #if conditions to generated
- code members
+Subject: [Qemu-devel] [PULL 28/32] qapi: add 'If:' condition to enum values
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,198 +38,137 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Wrap generated enum and struct members and their supporting code with
+Use a common function to generate the "If:..." line.
 
-We do enum and struct in a single patch because union tag enum and the
-associated variants tie them together, and dealing with that to split
-the patch doesn't seem worthwhile.
+While at it, get rid of the existing \n\n (no idea why it was
+there). Use a line-break in member description, this seems to look
+slightly better in the plaintext version.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20181213123724.4866-19-marcandre.lureau@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20181213123724.4866-18-marcandre.lureau@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi/common.py     |  4 ++++
- scripts/qapi/introspect.py | 14 ++++++++++----
- scripts/qapi/types.py      |  4 ++++
- scripts/qapi/visit.py      |  6 ++++++
- 4 files changed, 24 insertions(+), 4 deletions(-)
+ scripts/qapi/doc.py             | 25 ++++++++++++++++---------
+ tests/qapi-schema/doc-good.json |  4 +++-
+ tests/qapi-schema/doc-good.out  |  1 +
+ tests/qapi-schema/doc-good.texi |  2 +-
+ 4 files changed, 21 insertions(+), 11 deletions(-)
 
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 17707b6de7..8c2d97369e 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -2078,11 +2078,13 @@ const QEnumLookup %(c_name)s_lookup =3D {
- ''',
-                 c_name=3Dc_name(name))
-     for m in members:
-+        ret +=3D gen_if(m.ifcond)
-         index =3D c_enum_const(name, m.name, prefix)
-         ret +=3D mcgen('''
-         [%(index)s] =3D "%(name)s",
- ''',
-                      index=3Dindex, name=3Dm.name)
-+        ret +=3D gen_endif(m.ifcond)
-=20
-     ret +=3D mcgen('''
-     },
-@@ -2104,10 +2106,12 @@ typedef enum %(c_name)s {
-                 c_name=3Dc_name(name))
-=20
-     for m in enum_members:
-+        ret +=3D gen_if(m.ifcond)
-         ret +=3D mcgen('''
-     %(c_enum)s,
- ''',
-                      c_enum=3Dc_enum_const(name, m.name, prefix))
-+        ret +=3D gen_endif(m.ifcond)
-=20
-     ret +=3D mcgen('''
- } %(c_name)s;
-diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-index 417625d54b..f7f2ca07e4 100644
---- a/scripts/qapi/introspect.py
-+++ b/scripts/qapi/introspect.py
-@@ -162,6 +162,8 @@ const QLitObject %(c_name)s =3D %(c_string)s;
-         ret =3D {'name': member.name, 'type': self._use_type(member.type=
-)}
-         if member.optional:
-             ret['default'] =3D None
-+        if member.ifcond:
-+            ret =3D (ret, {'if': member.ifcond})
-         return ret
-=20
-     def _gen_variants(self, tag_name, variants):
-@@ -169,14 +171,17 @@ const QLitObject %(c_name)s =3D %(c_string)s;
-                 'variants': [self._gen_variant(v) for v in variants]}
-=20
-     def _gen_variant(self, variant):
--        return {'case': variant.name, 'type': self._use_type(variant.typ=
-e)}
-+        return ({'case': variant.name, 'type': self._use_type(variant.ty=
-pe)},
-+                {'if': variant.ifcond})
-=20
-     def visit_builtin_type(self, name, info, json_type):
-         self._gen_qlit(name, 'builtin', {'json-type': json_type}, [])
-=20
-     def visit_enum_type(self, name, info, ifcond, members, prefix):
-         self._gen_qlit(name, 'enum',
--                       {'values': [m.name for m in members]}, ifcond)
-+                       {'values':
-+                        [(m.name, {'if': m.ifcond}) for m in members]},
-+                       ifcond)
-=20
-     def visit_array_type(self, name, info, ifcond, element_type):
-         element =3D self._use_type(element_type)
-@@ -192,8 +197,9 @@ const QLitObject %(c_name)s =3D %(c_string)s;
-=20
-     def visit_alternate_type(self, name, info, ifcond, variants):
-         self._gen_qlit(name, 'alternate',
--                       {'members': [{'type': self._use_type(m.type)}
--                                    for m in variants.variants]}, ifcond=
-)
-+                       {'members': [
-+                           ({'type': self._use_type(m.type)}, {'if': m.i=
-fcond})
-+                           for m in variants.variants]}, ifcond)
-=20
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
-                       success_response, boxed, allow_oob, allow_preconfi=
-g):
-diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
-index e8d22c5081..62d4cf9f95 100644
---- a/scripts/qapi/types.py
-+++ b/scripts/qapi/types.py
-@@ -43,6 +43,7 @@ struct %(c_name)s {
- def gen_struct_members(members):
-     ret =3D ''
-     for memb in members:
-+        ret +=3D gen_if(memb.ifcond)
-         if memb.optional:
-             ret +=3D mcgen('''
-     bool has_%(c_name)s;
-@@ -52,6 +53,7 @@ def gen_struct_members(members):
-     %(c_type)s %(c_name)s;
- ''',
-                      c_type=3Dmemb.type.c_type(), c_name=3Dc_name(memb.n=
-ame))
-+        ret +=3D gen_endif(memb.ifcond)
-     return ret
+diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
+index 76cb186ff9..ab36b9dec6 100755
+--- a/scripts/qapi/doc.py
++++ b/scripts/qapi/doc.py
+@@ -126,19 +126,27 @@ def texi_body(doc):
+     return texi_format(doc.body.text)
 =20
 =20
-@@ -131,11 +133,13 @@ def gen_variants(variants):
-     for var in variants.variants:
-         if var.type.name =3D=3D 'q_empty':
-             continue
-+        ret +=3D gen_if(var.ifcond)
-         ret +=3D mcgen('''
-         %(c_type)s %(c_name)s;
- ''',
-                      c_type=3Dvar.type.c_unboxed_type(),
-                      c_name=3Dc_name(var.name))
-+        ret +=3D gen_endif(var.ifcond)
+-def texi_enum_value(value):
++def texi_if(ifcond, prefix=3D'\n', suffix=3D'\n'):
++    """Format the #if condition"""
++    if not ifcond:
++        return ''
++    return '%s@b{If:} @code{%s}%s' % (prefix, ', '.join(ifcond), suffix)
++
++
++def texi_enum_value(value, desc, suffix):
+     """Format a table of members item for an enumeration value"""
+-    return '@item @code{%s}\n' % value.name
++    return '@item @code{%s}\n%s%s' % (
++        value.name, desc, texi_if(value.ifcond, prefix=3D'@*'))
 =20
-     ret +=3D mcgen('''
-     } u;
-diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
-index 24f85a2e85..82eab72b21 100644
---- a/scripts/qapi/visit.py
-+++ b/scripts/qapi/visit.py
-@@ -54,6 +54,7 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name=
-)s *obj, Error **errp)
-                      c_type=3Dbase.c_name())
 =20
-     for memb in members:
-+        ret +=3D gen_if(memb.ifcond)
-         if memb.optional:
-             ret +=3D mcgen('''
-     if (visit_optional(v, "%(name)s", &obj->has_%(c_name)s)) {
-@@ -73,6 +74,7 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name=
-)s *obj, Error **errp)
-             ret +=3D mcgen('''
-     }
- ''')
-+        ret +=3D gen_endif(memb.ifcond)
+-def texi_member(member, suffix=3D''):
++def texi_member(member, desc, suffix):
+     """Format a table of members item for an object type member"""
+     typ =3D member.type.doc_type()
+     membertype =3D ': ' + typ if typ else ''
+-    return '@item @code{%s%s}%s%s\n' % (
++    return '@item @code{%s%s}%s%s\n%s' % (
+         member.name, membertype,
+         ' (optional)' if member.optional else '',
+-        suffix)
++        suffix, desc)
 =20
+=20
+ def texi_members(doc, what, base, variants, member_func):
+@@ -155,7 +163,7 @@ def texi_members(doc, what, base, variants, member_fu=
+nc):
+             desc =3D 'One of ' + members_text + '\n'
+         else:
+             desc =3D 'Not documented\n'
+-        items +=3D member_func(section.member) + desc
++        items +=3D member_func(section.member, desc, suffix=3D'')
+     if base:
+         items +=3D '@item The members of @code{%s}\n' % base.doc_type()
      if variants:
-         ret +=3D mcgen('''
-@@ -84,6 +86,7 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name=
-)s *obj, Error **errp)
-             case_str =3D c_enum_const(variants.tag_member.type.name,
-                                     var.name,
-                                     variants.tag_member.type.prefix)
-+            ret +=3D gen_if(var.ifcond)
-             if var.type.name =3D=3D 'q_empty':
-                 # valid variant and nothing to do
-                 ret +=3D mcgen('''
-@@ -100,6 +103,7 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_na=
-me)s *obj, Error **errp)
-                              case=3Dcase_str,
-                              c_type=3Dvar.type.c_name(), c_name=3Dc_name=
-(var.name))
+@@ -165,7 +173,7 @@ def texi_members(doc, what, base, variants, member_fu=
+nc):
+             if v.type.is_implicit():
+                 assert not v.type.base and not v.type.variants
+                 for m in v.type.local_members:
+-                    items +=3D member_func(m, when)
++                    items +=3D member_func(m, desc=3D'', suffix=3Dwhen)
+             else:
+                 items +=3D '@item The members of @code{%s}%s\n' % (
+                     v.type.doc_type(), when)
+@@ -185,8 +193,7 @@ def texi_sections(doc, ifcond):
+             body +=3D texi_example(section.text)
+         else:
+             body +=3D texi_format(section.text)
+-    if ifcond:
+-        body +=3D '\n\n@b{If:} @code{%s}' % ", ".join(ifcond)
++    body +=3D texi_if(ifcond, suffix=3D'')
+     return body
 =20
-+            ret +=3D gen_endif(var.ifcond)
-         ret +=3D mcgen('''
-     default:
-         abort();
-@@ -190,6 +194,7 @@ void visit_type_%(c_name)s(Visitor *v, const char *na=
-me, %(c_name)s **obj, Error
-                 c_name=3Dc_name(name))
 =20
-     for var in variants.variants:
-+        ret +=3D gen_if(var.ifcond)
-         ret +=3D mcgen('''
-     case %(case)s:
- ''',
-@@ -217,6 +222,7 @@ void visit_type_%(c_name)s(Visitor *v, const char *na=
-me, %(c_name)s **obj, Error
-         ret +=3D mcgen('''
-         break;
- ''')
-+        ret +=3D gen_endif(var.ifcond)
+diff --git a/tests/qapi-schema/doc-good.json b/tests/qapi-schema/doc-good=
+.json
+index 984cd8ed06..1cd4935710 100644
+--- a/tests/qapi-schema/doc-good.json
++++ b/tests/qapi-schema/doc-good.json
+@@ -55,7 +55,9 @@
+ #
+ # @two is undocumented
+ ##
+-{ 'enum': 'Enum', 'data': [ 'one', 'two' ], 'if': 'defined(IFCOND)' }
++{ 'enum': 'Enum', 'data':
++  [ { 'name': 'one', 'if': 'defined(IFONE)' }, 'two' ],
++  'if': 'defined(IFCOND)' }
 =20
-     ret +=3D mcgen('''
-     case QTYPE_NONE:
+ ##
+ # @Base:
+diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.=
+out
+index c2fc5c774a..53bd177f7d 100644
+--- a/tests/qapi-schema/doc-good.out
++++ b/tests/qapi-schema/doc-good.out
+@@ -11,6 +11,7 @@ enum QType
+ module doc-good.json
+ enum Enum
+     member one
++        if ['defined(IFONE)']
+     member two
+     if ['defined(IFCOND)']
+ object Base
+diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good=
+.texi
+index e42eace474..405055b146 100644
+--- a/tests/qapi-schema/doc-good.texi
++++ b/tests/qapi-schema/doc-good.texi
+@@ -84,12 +84,12 @@ Examples:
+ @table @asis
+ @item @code{one}
+ The @emph{one} @{and only@}
++@*@b{If:} @code{defined(IFONE)}
+ @item @code{two}
+ Not documented
+ @end table
+ @code{two} is undocumented
+=20
+-
+ @b{If:} @code{defined(IFCOND)}
+ @end deftp
+=20
 --=20
 2.17.2
