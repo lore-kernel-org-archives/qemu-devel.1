@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gXJD0-00083M-SW
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:53 -0500
+	(envelope-from <cota@braap.org>) id 1gXJD0-00083A-Ra
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gXJCy-0002C6-E6
+	(envelope-from <cota@braap.org>) id 1gXJCy-0002Ba-82
 	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:50 -0500
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:41161)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gXJCx-0001r0-QD
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:47 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 13 Dec 2018 00:04:24 -0500
-Message-Id: <20181213050453.9677-45-cota@braap.org>
+Date: Thu, 13 Dec 2018 00:04:48 -0500
+Message-Id: <20181213050453.9677-69-cota@braap.org>
 In-Reply-To: <20181213050453.9677-1-cota@braap.org>
 References: <20181213050453.9677-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v5 44/73] ppc: convert to cpu_interrupt_request
+Subject: [Qemu-devel] [PATCH v5 68/73] xtensa: convert to
+ cpu_has_work_with_iothread_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,134 +25,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
 
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>
-Cc: qemu-ppc@nongnu.org
+Soon we will call cpu_has_work without the BQL.
+
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- hw/ppc/ppc.c                    |  2 +-
- target/ppc/excp_helper.c        |  2 +-
- target/ppc/kvm.c                |  4 ++--
- target/ppc/translate_init.inc.c | 14 +++++++-------
- 4 files changed, 11 insertions(+), 11 deletions(-)
+ target/xtensa/cpu.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
-index d1a5a0b877..bc1cefa13f 100644
---- a/hw/ppc/ppc.c
-+++ b/hw/ppc/ppc.c
-@@ -91,7 +91,7 @@ void ppc_set_irq(PowerPCCPU *cpu, int n_IRQ, int level)
+diff --git a/target/xtensa/cpu.c b/target/xtensa/cpu.c
+index d4ca35e6cc..5f3b4a70b0 100644
+--- a/target/xtensa/cpu.c
++++ b/target/xtensa/cpu.c
+@@ -47,6 +47,8 @@ static bool xtensa_cpu_has_work(CPUState *cs)
+ #ifndef CONFIG_USER_ONLY
+     XtensaCPU *cpu = XTENSA_CPU(cs);
  
-     LOG_IRQ("%s: %p n_IRQ %d level %d => pending %08" PRIx32
-                 "req %08x\n", __func__, env, n_IRQ, level,
--                env->pending_interrupts, CPU(cpu)->interrupt_request);
-+                env->pending_interrupts, cpu_interrupt_request(CPU(cpu)));
++    g_assert(qemu_mutex_iothread_locked());
++
+     return !cpu->env.runstall && cpu->env.pending_irq_level;
+ #else
+     return true;
+@@ -173,7 +175,7 @@ static void xtensa_cpu_class_init(ObjectClass *oc, void *data)
+     cc->reset = xtensa_cpu_reset;
  
-     if (locked) {
-         qemu_mutex_unlock_iothread();
-diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-index 737c9c72be..75a434f46b 100644
---- a/target/ppc/excp_helper.c
-+++ b/target/ppc/excp_helper.c
-@@ -753,7 +753,7 @@ static void ppc_hw_interrupt(CPUPPCState *env)
- 
-     qemu_log_mask(CPU_LOG_INT, "%s: %p pending %08x req %08x me %d ee %d\n",
-                   __func__, env, env->pending_interrupts,
--                  cs->interrupt_request, (int)msr_me, (int)msr_ee);
-+                  cpu_interrupt_request(cs), (int)msr_me, (int)msr_ee);
- #endif
-     /* External reset */
-     if (env->pending_interrupts & (1 << PPC_INTERRUPT_RESET)) {
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 557faa3637..cebb73bd98 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -1336,7 +1336,7 @@ void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
-      * interrupt, reset, etc) in PPC-specific env->irq_input_state. */
-     if (!cap_interrupt_level &&
-         run->ready_for_interrupt_injection &&
--        (cs->interrupt_request & CPU_INTERRUPT_HARD) &&
-+        (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) &&
-         (env->irq_input_state & (1<<PPC_INPUT_INT)))
-     {
-         /* For now KVM disregards the 'irq' argument. However, in the
-@@ -1378,7 +1378,7 @@ static int kvmppc_handle_halt(PowerPCCPU *cpu)
-     CPUState *cs = CPU(cpu);
-     CPUPPCState *env = &cpu->env;
- 
--    if (!(cs->interrupt_request & CPU_INTERRUPT_HARD) && (msr_ee)) {
-+    if (!(cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) && (msr_ee)) {
-         cpu_halted_set(cs, 1);
-         cs->exception_index = EXCP_HLT;
-     }
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index 986bbd7eb4..757eb6df16 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -8463,7 +8463,7 @@ static bool cpu_has_work_POWER7(CPUState *cs)
-     CPUPPCState *env = &cpu->env;
- 
-     if (cpu_halted(cs)) {
--        if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
-+        if (!(cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD)) {
-             return false;
-         }
-         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_EXT)) &&
-@@ -8487,7 +8487,7 @@ static bool cpu_has_work_POWER7(CPUState *cs)
-         }
-         return false;
-     } else {
--        return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
-+        return msr_ee && (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD);
-     }
- }
- 
-@@ -8617,7 +8617,7 @@ static bool cpu_has_work_POWER8(CPUState *cs)
-     CPUPPCState *env = &cpu->env;
- 
-     if (cpu_halted(cs)) {
--        if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
-+        if (!(cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD)) {
-             return false;
-         }
-         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_EXT)) &&
-@@ -8649,7 +8649,7 @@ static bool cpu_has_work_POWER8(CPUState *cs)
-         }
-         return false;
-     } else {
--        return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
-+        return msr_ee && (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD);
-     }
- }
- 
-@@ -8809,7 +8809,7 @@ static bool cpu_has_work_POWER9(CPUState *cs)
-     CPUPPCState *env = &cpu->env;
- 
-     if (cpu_halted(cs)) {
--        if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
-+        if (!(cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD)) {
-             return false;
-         }
-         /* External Exception */
-@@ -8842,7 +8842,7 @@ static bool cpu_has_work_POWER9(CPUState *cs)
-         }
-         return false;
-     } else {
--        return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
-+        return msr_ee && (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD);
-     }
- }
- 
-@@ -10253,7 +10253,7 @@ static bool ppc_cpu_has_work(CPUState *cs)
-     PowerPCCPU *cpu = POWERPC_CPU(cs);
-     CPUPPCState *env = &cpu->env;
- 
--    return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
-+    return msr_ee && (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD);
- }
- 
- /* CPUClass::reset() */
+     cc->class_by_name = xtensa_cpu_class_by_name;
+-    cc->has_work = xtensa_cpu_has_work;
++    cc->has_work_with_iothread_lock = xtensa_cpu_has_work;
+     cc->do_interrupt = xtensa_cpu_do_interrupt;
+     cc->cpu_exec_interrupt = xtensa_cpu_exec_interrupt;
+     cc->dump_state = xtensa_cpu_dump_state;
 -- 
 2.17.1
