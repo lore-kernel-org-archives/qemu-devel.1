@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gXJD2-000859-Gy
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:53 -0500
+	(envelope-from <armbru@redhat.com>) id 1gXJHX-00040v-5W
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:11:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gXJCz-0002DQ-Ld
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:52 -0500
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:39995)
+	(envelope-from <armbru@redhat.com>) id 1gXJHT-0007Uj-Nt
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:11:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57006)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gXJCz-0001td-9d
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:49 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 13 Dec 2018 00:04:52 -0500
-Message-Id: <20181213050453.9677-73-cota@braap.org>
-In-Reply-To: <20181213050453.9677-1-cota@braap.org>
-References: <20181213050453.9677-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v5 72/73] cpu: add async_run_on_cpu_no_bql
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXJHP-0007LA-NA
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:11:25 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181208111606.8505-1-marcandre.lureau@redhat.com>
+	<87va3yfytv.fsf@dusky.pond.sub.org>
+	<CAJ+F1CJ-=Nk5_PDT5u+Jv3+8Yecu7GFrBCih-tnMvNnqvWxQnw@mail.gmail.com>
+Date: Thu, 13 Dec 2018 06:11:14 +0100
+In-Reply-To: <CAJ+F1CJ-=Nk5_PDT5u+Jv3+8Yecu7GFrBCih-tnMvNnqvWxQnw@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 12 Dec 2018
+	22:13:01 +0400")
+Message-ID: <8736r2dn9p.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v7 00/27] Hi,
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,131 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Markus Armbruster <armbru@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-Some async jobs do not need the BQL.
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- include/qom/cpu.h | 14 ++++++++++++++
- cpus-common.c     | 39 ++++++++++++++++++++++++++++++++++-----
- 2 files changed, 48 insertions(+), 5 deletions(-)
+> Hi
+>
+> On Wed, Dec 12, 2018 at 9:18 PM Markus Armbruster <armbru@redhat.com> wro=
+te:
+>>
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>>
+>> > This is the second part of the "add #if pre-processor conditions to
+>> > generated code" series, adding schema member conditions (roughly
+>> > 16-38/49).
+>> >
+>> > Members can be exploded as dictionnary with 'type'/'if' keys:
+>> >
+>> > { 'struct': 'TestIfStruct', 'data':
+>> >   { 'foo': 'int',
+>> >     'bar': { 'type': 'int', 'if': 'defined(TEST_IF_STRUCT_BAR)'} } }
+>> >
+>> > Enum values can be exploded as dictionnary with 'type'/'if' keys:
+>> >
+>> > { 'enum': 'TestIfEnum', 'data':
+>> >   [ 'foo',
+>> >     { 'name' : 'bar', 'if': 'defined(TEST_IF_ENUM_BAR)' } ] }
+>>
+>> PATCH 03,18,20,25 are only losely related to this second part.  They are
+>> also ready.  Queued on branch qapi-next in my public repository, with
+>> PATCH 18 and 20 squashed together.
+>>
+>> I took the liberty to implement the the idea on normalization I
+>> mentioned in review of PATCH 08.  I also squashed a few patches that are
+>> essentially fixups into the patches they fix.  I did not address any
+>> other review comments.  Result is on branch qapi-if-2.  Please have a
+>> look.
+>>
+>
+> Looks good to me.  Is there something left to rework from this branch
+> or it is good to go?
+> thanks
 
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index bcb46c3946..7ef0120213 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -876,9 +876,23 @@ void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data);
-  * @data: Data to pass to the function.
-  *
-  * Schedules the function @func for execution on the vCPU @cpu asynchronously.
-+ * See also: async_run_on_cpu_no_bql()
-  */
- void async_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data);
- 
-+/**
-+ * async_run_on_cpu_no_bql:
-+ * @cpu: The vCPU to run on.
-+ * @func: The function to be executed.
-+ * @data: Data to pass to the function.
-+ *
-+ * Schedules the function @func for execution on the vCPU @cpu asynchronously.
-+ * This function is run outside the BQL.
-+ * See also: async_run_on_cpu()
-+ */
-+void async_run_on_cpu_no_bql(CPUState *cpu, run_on_cpu_func func,
-+                             run_on_cpu_data data);
-+
- /**
-  * async_safe_run_on_cpu:
-  * @cpu: The vCPU to run on.
-diff --git a/cpus-common.c b/cpus-common.c
-index 08031e37f4..a8f913b918 100644
---- a/cpus-common.c
-+++ b/cpus-common.c
-@@ -109,6 +109,7 @@ struct qemu_work_item {
-     run_on_cpu_func func;
-     run_on_cpu_data data;
-     bool free, exclusive, done;
-+    bool bql;
- };
- 
- /* Called with the CPU's lock held */
-@@ -155,6 +156,7 @@ void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
-     wi.done = false;
-     wi.free = false;
-     wi.exclusive = false;
-+    wi.bql = true;
- 
-     cpu_mutex_lock(cpu);
-     queue_work_on_cpu_locked(cpu, &wi);
-@@ -179,6 +181,21 @@ void async_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
-     wi->func = func;
-     wi->data = data;
-     wi->free = true;
-+    wi->bql = true;
-+
-+    queue_work_on_cpu(cpu, wi);
-+}
-+
-+void async_run_on_cpu_no_bql(CPUState *cpu, run_on_cpu_func func,
-+                             run_on_cpu_data data)
-+{
-+    struct qemu_work_item *wi;
-+
-+    wi = g_malloc0(sizeof(struct qemu_work_item));
-+    wi->func = func;
-+    wi->data = data;
-+    wi->free = true;
-+    /* wi->bql initialized to false */
- 
-     queue_work_on_cpu(cpu, wi);
- }
-@@ -323,6 +340,7 @@ void async_safe_run_on_cpu(CPUState *cpu, run_on_cpu_func func,
-     wi->data = data;
-     wi->free = true;
-     wi->exclusive = true;
-+    /* wi->bql initialized to false */
- 
-     queue_work_on_cpu(cpu, wi);
- }
-@@ -347,6 +365,7 @@ static void process_queued_cpu_work_locked(CPUState *cpu)
-              * BQL, so it goes to sleep; start_exclusive() is sleeping too, so
-              * neither CPU can proceed.
-              */
-+            g_assert(!wi->bql);
-             if (has_bql) {
-                 qemu_mutex_unlock_iothread();
-             }
-@@ -357,12 +376,22 @@ static void process_queued_cpu_work_locked(CPUState *cpu)
-                 qemu_mutex_lock_iothread();
-             }
-         } else {
--            if (has_bql) {
--                wi->func(cpu, wi->data);
-+            if (wi->bql) {
-+                if (has_bql) {
-+                    wi->func(cpu, wi->data);
-+                } else {
-+                    qemu_mutex_lock_iothread();
-+                    wi->func(cpu, wi->data);
-+                    qemu_mutex_unlock_iothread();
-+                }
-             } else {
--                qemu_mutex_lock_iothread();
--                wi->func(cpu, wi->data);
--                qemu_mutex_unlock_iothread();
-+                if (has_bql) {
-+                    qemu_mutex_unlock_iothread();
-+                    wi->func(cpu, wi->data);
-+                    qemu_mutex_lock_iothread();
-+                } else {
-+                    wi->func(cpu, wi->data);
-+                }
-             }
-         }
-         cpu_mutex_lock(cpu);
--- 
-2.17.1
+I adressed only the one review comment that was hard to explain, plus
+some patch squashing.  The other review comments still need to be
+considered and worked in.
