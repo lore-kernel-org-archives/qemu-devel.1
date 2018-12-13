@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXVxo-0005hd-Hg
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:02 -0500
+	(envelope-from <armbru@redhat.com>) id 1gXVxr-0005lA-MN
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXVxj-00029v-KT
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:43:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32852)
+	(envelope-from <armbru@redhat.com>) id 1gXVxo-0002SN-FG
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59748)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXVxj-0001Gx-3P
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:43:55 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXVxm-0001dD-1y
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:43:59 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 389F6C0BEAB4
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 18:43:44 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C7A7B3001FCD
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 18:43:48 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 13 Dec 2018 19:43:10 +0100
-Message-Id: <20181213184340.24037-3-armbru@redhat.com>
+Date: Thu, 13 Dec 2018 19:43:27 +0100
+Message-Id: <20181213184340.24037-20-armbru@redhat.com>
 In-Reply-To: <20181213184340.24037-1-armbru@redhat.com>
 References: <20181213184340.24037-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 02/32] cutils: Fix qemu_strtosz() & friends to
- reject non-finite sizes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 19/32] qapi: improve reporting of unknown or
+ missing keys
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,197 +34,104 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: David Hildenbrand <david@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: David Hildenbrand <david@redhat.com>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-qemu_strtosz() & friends reject NaNs, but happily accept infinities.
-They shouldn't. Fix that.
+Report the set of missing or unknown keys. And give a hint about the
+accepted keys.
 
-The fix makes use of qemu_strtod_finite(). To avoid ugly casts,
-change the @end parameter of qemu_strtosz() & friends from char **
-to const char **.
+The error message for multiple meta type members (visible in
+tests/qapi-schema/double-type.err) is not improved.
 
-Also, add two test cases, testing that "inf" and "NaN" are properly
-rejected. While at it, also fixup the function documentation.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20181121164421.20780-3-david@redhat.com>
+Message-Id: <20181213123724.4866-6-marcandre.lureau@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/qemu/cutils.h |  6 +++---
- monitor.c             |  2 +-
- tests/test-cutils.c   | 24 +++++++++++++++++-------
- util/cutils.c         | 18 ++++++++----------
- 4 files changed, 29 insertions(+), 21 deletions(-)
+ scripts/qapi/common.py                  | 21 ++++++++++++++-------
+ tests/qapi-schema/alternate-base.err    |  1 +
+ tests/qapi-schema/double-type.err       |  1 +
+ tests/qapi-schema/unknown-expr-key.err  |  3 ++-
+ tests/qapi-schema/unknown-expr-key.json |  2 +-
+ 5 files changed, 19 insertions(+), 9 deletions(-)
 
-diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
-index 756b41c193..d2dad3057c 100644
---- a/include/qemu/cutils.h
-+++ b/include/qemu/cutils.h
-@@ -153,9 +153,9 @@ int parse_uint(const char *s, unsigned long long *value, char **endptr,
-                int base);
- int parse_uint_full(const char *s, unsigned long long *value, int base);
- 
--int qemu_strtosz(const char *nptr, char **end, uint64_t *result);
--int qemu_strtosz_MiB(const char *nptr, char **end, uint64_t *result);
--int qemu_strtosz_metric(const char *nptr, char **end, uint64_t *result);
-+int qemu_strtosz(const char *nptr, const char **end, uint64_t *result);
-+int qemu_strtosz_MiB(const char *nptr, const char **end, uint64_t *result);
-+int qemu_strtosz_metric(const char *nptr, const char **end, uint64_t *result);
- 
- /* used to print char* safely */
- #define STR_OR_NULL(str) ((str) ? (str) : "null")
-diff --git a/monitor.c b/monitor.c
-index 6e81b09294..cf9cece965 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -3232,7 +3232,7 @@ static QDict *monitor_parse_arguments(Monitor *mon,
-             {
-                 int ret;
-                 uint64_t val;
--                char *end;
-+                const char *end;
- 
-                 while (qemu_isspace(*p)) {
-                     p++;
-diff --git a/tests/test-cutils.c b/tests/test-cutils.c
-index d85c3e0f6d..1aa8351520 100644
---- a/tests/test-cutils.c
-+++ b/tests/test-cutils.c
-@@ -1950,7 +1950,7 @@ static void test_qemu_strtou64_full_max(void)
- static void test_qemu_strtosz_simple(void)
- {
-     const char *str;
--    char *endptr = NULL;
-+    const char *endptr;
-     int err;
-     uint64_t res = 0xbaadf00d;
- 
-@@ -2017,7 +2017,7 @@ static void test_qemu_strtosz_units(void)
-     const char *p = "1P";
-     const char *e = "1E";
-     int err;
--    char *endptr = NULL;
-+    const char *endptr;
-     uint64_t res = 0xbaadf00d;
- 
-     /* default is M */
-@@ -2066,7 +2066,7 @@ static void test_qemu_strtosz_float(void)
- {
-     const char *str = "12.345M";
-     int err;
--    char *endptr = NULL;
-+    const char *endptr;
-     uint64_t res = 0xbaadf00d;
- 
-     err = qemu_strtosz(str, &endptr, &res);
-@@ -2078,7 +2078,7 @@ static void test_qemu_strtosz_float(void)
- static void test_qemu_strtosz_invalid(void)
- {
-     const char *str;
--    char *endptr = NULL;
-+    const char *endptr;
-     int err;
-     uint64_t res = 0xbaadf00d;
- 
-@@ -2096,12 +2096,22 @@ static void test_qemu_strtosz_invalid(void)
-     err = qemu_strtosz(str, &endptr, &res);
-     g_assert_cmpint(err, ==, -EINVAL);
-     g_assert(endptr == str);
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 18f5872808..f205805751 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -874,14 +874,21 @@ def check_struct(expr, info):
+=20
+=20
+ def check_known_keys(info, source, keys, required, optional):
+-    for key in keys:
+-        if key not in required and key not in optional:
+-            raise QAPISemError(info, "Unknown key '%s' in %s" % (key, so=
+urce))
+=20
+-    for key in required:
+-        if key not in keys:
+-            raise QAPISemError(info, "Key '%s' is missing from %s"
+-                               % (key, source))
++    def pprint(elems):
++        return ', '.join("'" + e + "'" for e in sorted(elems))
 +
-+    str = "inf";
-+    err = qemu_strtosz(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, -EINVAL);
-+    g_assert(endptr == str);
-+
-+    str = "NaN";
-+    err = qemu_strtosz(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, -EINVAL);
-+    g_assert(endptr == str);
- }
- 
- static void test_qemu_strtosz_trailing(void)
- {
-     const char *str;
--    char *endptr = NULL;
-+    const char *endptr;
-     int err;
-     uint64_t res = 0xbaadf00d;
- 
-@@ -2126,7 +2136,7 @@ static void test_qemu_strtosz_trailing(void)
- static void test_qemu_strtosz_erange(void)
- {
-     const char *str;
--    char *endptr = NULL;
-+    const char *endptr;
-     int err;
-     uint64_t res = 0xbaadf00d;
- 
-@@ -2160,7 +2170,7 @@ static void test_qemu_strtosz_metric(void)
- {
-     const char *str = "12345k";
-     int err;
--    char *endptr = NULL;
-+    const char *endptr;
-     uint64_t res = 0xbaadf00d;
- 
-     err = qemu_strtosz_metric(str, &endptr, &res);
-diff --git a/util/cutils.c b/util/cutils.c
-index ec0a401d9a..e098debdc0 100644
---- a/util/cutils.c
-+++ b/util/cutils.c
-@@ -203,23 +203,21 @@ static int64_t suffix_mul(char suffix, int64_t unit)
- /*
-  * Convert string to bytes, allowing either B/b for bytes, K/k for KB,
-  * M/m for MB, G/g for GB or T/t for TB. End pointer will be returned
-- * in *end, if not NULL. Return -ERANGE on overflow, Return -EINVAL on
-+ * in *end, if not NULL. Return -ERANGE on overflow, and -EINVAL on
-  * other error.
-  */
--static int do_strtosz(const char *nptr, char **end,
-+static int do_strtosz(const char *nptr, const char **end,
-                       const char default_suffix, int64_t unit,
-                       uint64_t *result)
- {
-     int retval;
--    char *endptr;
-+    const char *endptr;
-     unsigned char c;
-     int mul_required = 0;
-     double val, mul, integral, fraction;
- 
--    errno = 0;
--    val = strtod(nptr, &endptr);
--    if (isnan(val) || endptr == nptr || errno != 0) {
--        retval = -EINVAL;
-+    retval = qemu_strtod_finite(nptr, &endptr, &val);
-+    if (retval) {
-         goto out;
-     }
-     fraction = modf(val, &integral);
-@@ -259,17 +257,17 @@ out:
-     return retval;
- }
- 
--int qemu_strtosz(const char *nptr, char **end, uint64_t *result)
-+int qemu_strtosz(const char *nptr, const char **end, uint64_t *result)
- {
-     return do_strtosz(nptr, end, 'B', 1024, result);
- }
- 
--int qemu_strtosz_MiB(const char *nptr, char **end, uint64_t *result)
-+int qemu_strtosz_MiB(const char *nptr, const char **end, uint64_t *result)
- {
-     return do_strtosz(nptr, end, 'M', 1024, result);
- }
- 
--int qemu_strtosz_metric(const char *nptr, char **end, uint64_t *result)
-+int qemu_strtosz_metric(const char *nptr, const char **end, uint64_t *result)
- {
-     return do_strtosz(nptr, end, 'B', 1000, result);
- }
--- 
++    missing =3D set(required) - set(keys)
++    if missing:
++        raise QAPISemError(info, "Key%s %s %s missing from %s"
++                           % ('s' if len(missing) > 1 else '', pprint(mi=
+ssing),
++                              'are' if len(missing) > 1 else 'is', sourc=
+e))
++    allowed =3D set(required + optional)
++    unknown =3D set(keys) - allowed
++    if unknown:
++        raise QAPISemError(info, "Unknown key%s %s in %s\nValid keys are=
+ %s."
++                           % ('s' if len(unknown) > 1 else '', pprint(un=
+known),
++                              source, pprint(allowed)))
+=20
+=20
+ def check_keys(expr_elem, meta, required, optional=3D[]):
+diff --git a/tests/qapi-schema/alternate-base.err b/tests/qapi-schema/alt=
+ernate-base.err
+index 30d8a34373..ebe05bc898 100644
+--- a/tests/qapi-schema/alternate-base.err
++++ b/tests/qapi-schema/alternate-base.err
+@@ -1 +1,2 @@
+ tests/qapi-schema/alternate-base.json:4: Unknown key 'base' in alternate=
+ 'Alt'
++Valid keys are 'alternate', 'data', 'if'.
+diff --git a/tests/qapi-schema/double-type.err b/tests/qapi-schema/double=
+-type.err
+index f9613c6d6b..799193dba1 100644
+--- a/tests/qapi-schema/double-type.err
++++ b/tests/qapi-schema/double-type.err
+@@ -1 +1,2 @@
+ tests/qapi-schema/double-type.json:2: Unknown key 'command' in struct 'b=
+ar'
++Valid keys are 'base', 'data', 'if', 'struct'.
+diff --git a/tests/qapi-schema/unknown-expr-key.err b/tests/qapi-schema/u=
+nknown-expr-key.err
+index 12f5ed5b43..6ff8bb99c5 100644
+--- a/tests/qapi-schema/unknown-expr-key.err
++++ b/tests/qapi-schema/unknown-expr-key.err
+@@ -1 +1,2 @@
+-tests/qapi-schema/unknown-expr-key.json:2: Unknown key 'bogus' in struct=
+ 'bar'
++tests/qapi-schema/unknown-expr-key.json:2: Unknown keys 'bogus', 'phony'=
+ in struct 'bar'
++Valid keys are 'base', 'data', 'if', 'struct'.
+diff --git a/tests/qapi-schema/unknown-expr-key.json b/tests/qapi-schema/=
+unknown-expr-key.json
+index 3b2be00cc4..13292d75ed 100644
+--- a/tests/qapi-schema/unknown-expr-key.json
++++ b/tests/qapi-schema/unknown-expr-key.json
+@@ -1,2 +1,2 @@
+ # we reject an expression with unknown top-level keys
+-{ 'struct': 'bar', 'data': { 'string': 'str'}, 'bogus': { } }
++{ 'struct': 'bar', 'data': { 'string': 'str'}, 'bogus': { }, 'phony': { =
+} }
+--=20
 2.17.2
