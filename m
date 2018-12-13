@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=878dab2db=Paul.Durrant@citrix.com>)
-	id 1gXPkF-0007iE-CZ
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:05:40 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gXPld-0000dn-Ge
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:07:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=878dab2db=Paul.Durrant@citrix.com>)
-	id 1gXPkE-0004rZ-BM
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:05:35 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Thu, 13 Dec 2018 12:05:23 +0000
-Message-ID: <c3bea77151d04732a98bbe1a04b62e67@AMSPEX02CL03.citrite.net>
-References: <20181211160224.22181-1-olaf@aepfle.de>
-	<20181213113333.GZ18875@perard.uk.xensource.com>
-In-Reply-To: <20181213113333.GZ18875@perard.uk.xensource.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <imammedo@redhat.com>) id 1gXPlb-0007hv-3b
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:07:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38866)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gXPla-0007fO-QD
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:06:59 -0500
+Date: Thu, 13 Dec 2018 13:06:54 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181213130654.1eb72eb1@redhat.com>
+In-Reply-To: <CAJ+F1CJ55pcq6OZdnSBVNGQwRSE=gQD0swPeHw_Roj2qVOnxSA@mail.gmail.com>
+References: <20181204142023.15982-1-marcandre.lureau@redhat.com>
+	<20181204142023.15982-8-marcandre.lureau@redhat.com>
+	<20181210174522.04b21215@Igors-MacBook-Pro.local>
+	<20181210175441.7d6e0dcd@Igors-MacBook-Pro.local>
+	<CAJ+F1CJ55pcq6OZdnSBVNGQwRSE=gQD0swPeHw_Roj2qVOnxSA@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH v1] xen_disk: fix memory leak
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v5 07/19] hw: apply accel compat
+ properties without touching globals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,50 +31,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony Perard <anthony.perard@citrix.com>, Olaf Hering <olaf@aepfle.de>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, "open list:Block layer core" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, "open list:X86" <xen-devel@lists.xenproject.org>
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@gmail.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBYZW4tZGV2ZWwgW21haWx0bzp4
-ZW4tZGV2ZWwtYm91bmNlc0BsaXN0cy54ZW5wcm9qZWN0Lm9yZ10gT24gQmVoYWxmDQo+IE9mIEFu
-dGhvbnkgUEVSQVJEDQo+IFNlbnQ6IDEzIERlY2VtYmVyIDIwMTggMTE6MzQNCj4gVG86IE9sYWYg
-SGVyaW5nIDxvbGFmQGFlcGZsZS5kZT4NCj4gQ2M6IEtldmluIFdvbGYgPGt3b2xmQHJlZGhhdC5j
-b20+OyBTdGVmYW5vIFN0YWJlbGxpbmkNCj4gPHNzdGFiZWxsaW5pQGtlcm5lbC5vcmc+OyBvcGVu
-IGxpc3Q6QmxvY2sgbGF5ZXIgY29yZSA8cWVtdS0NCj4gYmxvY2tAbm9uZ251Lm9yZz47IHFlbXUt
-ZGV2ZWxAbm9uZ251Lm9yZzsgTWF4IFJlaXR6IDxtcmVpdHpAcmVkaGF0LmNvbT47DQo+IG9wZW4g
-bGlzdDpYODYgPHhlbi1kZXZlbEBsaXN0cy54ZW5wcm9qZWN0Lm9yZz4NCj4gU3ViamVjdDogUmU6
-IFtYZW4tZGV2ZWxdIFtQQVRDSCB2MV0geGVuX2Rpc2s6IGZpeCBtZW1vcnkgbGVhaw0KPiANCj4g
-T24gVHVlLCBEZWMgMTEsIDIwMTggYXQgMDU6MDI6MjRQTSArMDEwMCwgT2xhZiBIZXJpbmcgd3Jv
-dGU6DQo+ID4gVGhlcmUgYXJlIHNvbWUgY29kZSBwYXRocyB0aGF0IGNsb2JiZXIgaW9yZXEtPmJ1
-Ziwgd2hpY2ggbGVhZHMgdG8gYSBodWdlDQo+ID4gbWVtb3J5IGxlYWsgYWZ0ZXIgYSBmZXcgaG91
-cnMgb2YgcnVudGltZS4gT25lIGNvZGUgcGF0aCBpcw0KPiA+IHFlbXVfYWlvX2NvbXBsZXRlLCB3
-aGljaCBtaWdodCBiZSBjYWxsZWQgcmVjdXJzaXZlLiBBbm90aGVyIG9uZSBpcw0KPiANCj4gSSB0
-aGluayBpdCdzIHMvcmVjdXJzaXZlL3JlY3Vyc2l2ZWx5Ly4NCj4gDQo+ID4gaW9yZXFfcmVzZXQs
-IHdoaWNoIG1pZ2h0IGNsb2JiZXIgaW9yZXEtPmJ1ZiBhcyB3ZWxsLg0KPiA+DQo+ID4gQWRkIHdy
-YXBwZXJzIHRvIGZyZWUgaW9yZXEtPmJ1ZiBiZWZvcmUgcmVhc3NpZ25tZW50Lg0KPiA+DQo+ID4g
-U2lnbmVkLW9mZi1ieTogT2xhZiBIZXJpbmcgPG9sYWZAYWVwZmxlLmRlPg0KPiANCj4gVGhhdCBw
-YXRjaCBzZWVtcyBmaW5lLCB3aXRoIGEgZmV3IGNvZGluZyBzdHlsZSBpc3N1ZXMsIGFuZCBpcyBn
-b2luZyB0bw0KPiBiZSBuZWVkZWQgdG8gYmUgZm9yd2FyZCBwb3J0ZWQgdG8gUGF1bCdzIHJlaW1w
-bGVtZW50YXRpb24gKG5vdCB5ZXQNCj4gbWVyZ2VkKS4NCg0KSSBhbHJlYWR5IHBvc3RlZCBhIHBh
-dGNoIGZyb20gVGltIFNtaXRoIChyZS1iYXNlZCB0byB0aGUgbmV3IHhlbi1ibG9jayBkYXRhcGF0
-aCkgdGhhdCBzaG91bGQgZml4IHRoaXMgaXNzdWUuDQoNCiAgUGF1bA0KDQo+IA0KPiA+IC0tLQ0K
-PiA+ICBody9ibG9jay94ZW5fZGlzay5jIHwgMjIgKysrKysrKysrKysrKysrKystLS0tLQ0KPiA+
-ICAxIGZpbGUgY2hhbmdlZCwgMTcgaW5zZXJ0aW9ucygrKSwgNSBkZWxldGlvbnMoLSkNCj4gPg0K
-PiA+IGRpZmYgLS1naXQgYS9ody9ibG9jay94ZW5fZGlzay5jIGIvaHcvYmxvY2sveGVuX2Rpc2su
-Yw0KPiA+IGluZGV4IDM2ZWZmOTRmODQuLmUxNWVlZmU2MjUgMTAwNjQ0DQo+ID4gLS0tIGEvaHcv
-YmxvY2sveGVuX2Rpc2suYw0KPiA+ICsrKyBiL2h3L2Jsb2NrL3hlbl9kaXNrLmMNCj4gPiBAQCAt
-MTAzLDEyICsxMDMsMjQgQEAgc3RydWN0IFhlbkJsa0RldiB7DQo+ID4NCj4gPiAgLyogLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSAq
-Lw0KPiA+DQo+ID4gK3N0YXRpYyB2b2lkIGlvcmVxX2J1Zl9hbGxvYyhzdHJ1Y3QgaW9yZXEgKmlv
-cmVxLCBzaXplX3QgYWxpZ25tZW50KQ0KPiANCj4gWW91IGhhdmUgdGhlIHBhcmFtZXRlciBgYWxp
-Z25tZW50YCBidXQgZG9uJ3QgYWN0dWFsbHkgdXNlIGl0LCBJIGRvbid0DQo+IHRoaW5rIGl0J3Mg
-bmVlZGVkLg0KPiANCj4gPiArew0KPiA+ICsgICAgaWYgKGlvcmVxLT5idWYpDQo+ID4gKyAgICAg
-ICAgcWVtdV92ZnJlZShpb3JlcS0+YnVmKTsNCj4gDQo+IFlvdSBjb3VsZCBjYWxsIGlvcmVxX2J1
-Zl9mcmVlIGhlcmUgaW5zdGVhZCBvZiBkdXBsaWNhdGluZyB0aGUgY29kZS4NCj4gDQo+ID4gKyAg
-ICBpb3JlcS0+YnVmID0gcWVtdV9tZW1hbGlnbihYQ19QQUdFX1NJWkUsIGlvcmVxLT5zaXplKTsN
-Cj4gPiArfQ0KPiA+ICtzdGF0aWMgdm9pZCBpb3JlcV9idWZfZnJlZShzdHJ1Y3QgaW9yZXEgKmlv
-cmVxKQ0KPiA+ICt7DQo+ID4gKyAgICBpZiAoaW9yZXEtPmJ1ZikNCj4gPiArICAgICAgICBxZW11
-X3ZmcmVlKGlvcmVxLT5idWYpOw0KPiA+ICsgICAgaW9yZXEtPmJ1ZiA9IE5VTEw7DQo+ID4gK30N
-Cj4gDQo+IFRoYW5rcywNCj4gDQo+IC0tDQo+IEFudGhvbnkgUEVSQVJEDQo+IA0KPiBfX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXw0KPiBYZW4tZGV2ZWwgbWFp
-bGluZyBsaXN0DQo+IFhlbi1kZXZlbEBsaXN0cy54ZW5wcm9qZWN0Lm9yZw0KPiBodHRwczovL2xp
-c3RzLnhlbnByb2plY3Qub3JnL21haWxtYW4vbGlzdGluZm8veGVuLWRldmVsDQo=
+On Wed, 12 Dec 2018 16:00:06 +0400
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
+
+> Hi
+> On Mon, Dec 10, 2018 at 8:55 PM Igor Mammedov <imammedo@redhat.com> wrote:
+> >
+> > On Mon, 10 Dec 2018 17:45:22 +0100
+> > Igor Mammedov <imammedo@redhat.com> wrote:
+> > =20
+> > > On Tue,  4 Dec 2018 18:20:11 +0400
+> > > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+> > > =20
+> > > > Instead of registering compat properties as globals, let's keep them
+> > > > in their own array, to avoid mixing with user globals.
+> > > >
+> > > > Introduce object_apply_global_props() function, to apply compatibil=
+ity
+> > > > properties from a GPtrArray.
+> > > >
+> > > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > > > ---
+> > > >  include/hw/qdev-core.h | 10 ++++++++++
+> > > >  include/qom/object.h   |  3 +++
+> > > >  include/sysemu/accel.h |  4 +---
+> > > >  accel/accel.c          | 12 ------------
+> > > >  hw/core/qdev.c         |  9 +++++++++
+> > > >  hw/xen/xen-common.c    |  9 ++++++---
+> > > >  qom/object.c           | 25 +++++++++++++++++++++++++
+> > > >  vl.c                   |  1 -
+> > > >  8 files changed, 54 insertions(+), 19 deletions(-)
+> > > > =20
+> > > [...] =20
+> > > > diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
+> > > > index 6ec14c73ca..4532aa8632 100644
+> > > > --- a/hw/xen/xen-common.c
+> > > > +++ b/hw/xen/xen-common.c
+> > > > @@ -174,18 +174,21 @@ static GlobalProperty xen_compat_props[] =3D {
+> > > >          .driver =3D "migration",
+> > > >          .property =3D "send-section-footer",
+> > > >          .value =3D "off",
+> > > > -    },
+> > > > -    { /* end of list */ },
+> > > > +    }
+> > > >  };
+> > > >
+> > > >  static void xen_accel_class_init(ObjectClass *oc, void *data)
+> > > >  {
+> > > >      AccelClass *ac =3D ACCEL_CLASS(oc);
+> > > > +
+> > > >      ac->name =3D "Xen";
+> > > >      ac->init_machine =3D xen_init;
+> > > >      ac->setup_post =3D xen_setup_post;
+> > > >      ac->allowed =3D &xen_allowed;
+> > > > -    ac->global_props =3D xen_compat_props;
+> > > > +    ac->compat_props =3D g_ptr_array_new(); =20
+> > > where is matching free for that? =20
+> > can we at least annotate it somehow so that valgrind won't complain abo=
+ut this leak? =20
+>=20
+> If you check my commits on qemu, you should see that I do care (too
+> much?) about leaks :)
+>=20
+> In this case though, I don't see valgrind or asan complaining, I guess
+> it's still a reachable reference.
+> Do you think a FIXME comment would be helpful?
+I've looked at other cases were we leak, and well we leak a lot so it's
+probably futile exercise. But the comment won't hurt and will work as remai=
+nder.
+
+
+> (/me wish we had a proper object system, GObject, but that ship as
+> long sailed..)
+>=20
+> > =20
+> > > =20
+> > > > +
+> > > > +    compat_props_add(ac->compat_props,
+> > > > +                     xen_compat_props, G_N_ELEMENTS(xen_compat_pro=
+ps));
+> > > >  }
+> > > >
+> > > >  #define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")
+> > > > diff --git a/qom/object.c b/qom/object.c
+> > > > index 17921c0a71..dbdab0aead 100644
+> > > > --- a/qom/object.c
+> > > > +++ b/qom/object.c
+> > > > @@ -370,6 +370,31 @@ static void object_post_init_with_type(Object =
+*obj, TypeImpl *ti)
+> > > >      }
+> > > >  }
+> > > >
+> > > > +void object_apply_global_props(Object *obj, const GPtrArray *props=
+, Error **errp)
+> > > > +{
+> > > > +    Error *err =3D NULL;
+> > > > +    int i;
+> > > > +
+> > > > +    if (!props) {
+> > > > +        return;
+> > > > +    }
+> > > > +
+> > > > +    for (i =3D 0; i < props->len; i++) {
+> > > > +        GlobalProperty *p =3D g_ptr_array_index(props, i);
+> > > > +
+> > > > +        if (object_dynamic_cast(obj, p->driver) =3D=3D NULL) {
+> > > > +            continue;
+> > > > +        }
+> > > > +        p->used =3D true;
+> > > > +        object_property_parse(obj, p->value, p->property, &err);
+> > > > +        if (err !=3D NULL) {
+> > > > +            error_prepend(&err, "can't apply global %s.%s=3D%s: ",
+> > > > +                          p->driver, p->property, p->value);
+> > > > +            error_propagate(errp, err);
+> > > > +        }
+> > > > +    }
+> > > > +}
+> > > > +
+> > > >  static void object_initialize_with_type(void *data, size_t size, T=
+ypeImpl *type)
+> > > >  {
+> > > >      Object *obj =3D data;
+> > > > diff --git a/vl.c b/vl.c
+> > > > index a5ae5f23d2..88ba658572 100644
+> > > > --- a/vl.c
+> > > > +++ b/vl.c
+> > > > @@ -2968,7 +2968,6 @@ static void user_register_global_props(void)
+> > > >   */
+> > > >  static void register_global_properties(MachineState *ms)
+> > > >  {
+> > > > -    accel_register_compat_props(ms->accelerator);
+> > > >      machine_register_compat_props(ms);
+> > > >      user_register_global_props();
+> > > >  } =20
+> > >
+> > > =20
+> >
+> > =20
+>=20
+>=20
