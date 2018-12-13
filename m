@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gXYXi-0004xy-KW
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 16:29:16 -0500
+	(envelope-from <eblake@redhat.com>) id 1gXYmT-0003MO-VX
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 16:44:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gXYXf-0001M2-Fp
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 16:29:14 -0500
-Resent-Message-Id: <E1gXYXf-0001M2-Fp@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21809)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gXYXf-0001JT-72
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 16:29:11 -0500
-In-Reply-To: <20181213130611.7496-1-tom.deseyn@gmail.com>
-Message-ID: <154473651696.18041.7389630431753887663@02a1dbf831e2>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <eblake@redhat.com>) id 1gXYmK-0004dw-9J
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 16:44:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50120)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gXYmA-0003Ev-Ui
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 16:44:14 -0500
+References: <20181130144404.GA32091@mswork1>
+	<faae3e4a-bce7-849a-b510-1c94ffb03413@redhat.com>
+	<20181213183253.GE10456@mswork1>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <93edfff5-9cc2-8b19-b5a5-48ee4c7c0007@redhat.com>
+Date: Thu, 13 Dec 2018 15:43:52 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 13 Dec 2018 13:28:38 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] Add getsockopt for settable SOL_IPV6
- options
+In-Reply-To: <20181213183253.GE10456@mswork1>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Loading snapshot with readonly qcow2 image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +29,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: tom.deseyn@gmail.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu
+To: Michael Spradling <michael@os.amperecomputing.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIxMzEzMDYxMS43NDk2
-LTEtdG9tLmRlc2V5bkBnbWFpbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
-ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
-bmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE4MTIxMzEzMDYxMS43NDk2
-LTEtdG9tLmRlc2V5bkBnbWFpbC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gQWRk
-IGdldHNvY2tvcHQgZm9yIHNldHRhYmxlIFNPTF9JUFY2IG9wdGlvbnMKCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0t
-b25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBs
-b2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8K
-ICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3Jt
-YXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2Ny
-aXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAg
-ICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBU
-RVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0
-NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11
-CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxODEyMTMyMTAwNTcuMzY3Ni0xLXF1aW50
-ZWxhQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MTIxMzIxMDA1Ny4zNjc2LTEtcXVpbnRlbGFA
-cmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjg1MWM4NjMgQWRkIGdl
-dHNvY2tvcHQgZm9yIHNldHRhYmxlIFNPTF9JUFY2IG9wdGlvbnMKCj09PSBPVVRQVVQgQkVHSU4g
-PT09CkNoZWNraW5nIFBBVENIIDEvMTogQWRkIGdldHNvY2tvcHQgZm9yIHNldHRhYmxlIFNPTF9J
-UFY2IG9wdGlvbnMuLi4KRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJt
-cyBvZiB0aGlzIHN0YXRlbWVudAojMzA6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjIzNjg6
-CisgICAgICAgICAgICBpZiAoZ2V0X3VzZXJfdTMyKGxlbiwgb3B0bGVuKSkKWy4uLl0KCkVSUk9S
-OiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQK
-IzMyOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzoyMzcwOgorICAgICAgICAgICAgaWYgKGxl
-biA8IDApClsuLi5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1z
-IG9mIHRoaXMgc3RhdGVtZW50CiMzNjogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6MjM3NDoK
-KyAgICAgICAgICAgIGlmIChyZXQgPCAwKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVj
-ZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNDQ6IEZJTEU6IGxpbnV4LXVz
-ZXIvc3lzY2FsbC5jOjIzODI6CisgICAgICAgICAgICAgICAgaWYgKGxlbiA+IHNpemVvZihpbnQp
-KQpbLi4uXQoKdG90YWw6IDQgZXJyb3JzLCAwIHdhcm5pbmdzLCA0NSBsaW5lcyBjaGVja2VkCgpZ
-b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0K
-ClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWls
-YWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE4MTIxMzEzMDYxMS43NDk2LTEtdG9t
-LmRlc2V5bkBnbWFpbC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpF
-bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
-cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5j
-b20=
+On 12/13/18 12:33 PM, Michael Spradling wrote:
+
+>>> My question is has anyone looked into loading snapshots from a backing
+>>> file?  I have attempted to look through the code and this looks to be
+>>> difficult.  If I attempt to add support for this is there any general
+>>> advice to follow?  Any other ideas?
+>>
+>> 'qemu-nbd -l' can serve snapshots from a qcow2 file; perhaps that can be
+>> used to cobble together something that works for your needs?
+>>
+
+> 
+> I looked at "qemu-nbd -l" and this seems to only export a readonly
+> interface.  Really, what I need is a writable temp file that can load a
+> snapshot snapshot.
+
+Can you combine -s (create a writable temp file) with -l to get what you 
+want?
+
+/me tries:
+
+$ qemu-img create -f qcow2 a 1M
+Formatting 'a', fmt=qcow2 size=1048576 cluster_size=65536 
+lazy_refcounts=off refcount_bits=16
+$ qemu-io -c 'w -P 1 0 512' a
+wrote 512/512 bytes at offset 0
+512 bytes, 1 ops; 0.0487 sec (10.257 KiB/sec and 20.5137 ops/sec)
+$ qemu-img snapshot -c snap a
+$ qemu-io -c 'w -P 2 0 512' a
+wrote 512/512 bytes at offset 0
+512 bytes, 1 ops; 0.0752 sec (6.645 KiB/sec and 13.2903 ops/sec)
+$ qemu-nbd -l snap -s a
+Failed to load snapshot: Can't find snapshot
+
+I can confirm that 'qemu-nbd -s a' lets me write data that is discarded 
+on disconnect (lsof says a temp file in /var/tmp/vl.XXXXXX was created); 
+and that 'qemu-nbd -l snap a' lets me read the snapshot data. But mixing 
+the two fails, and it would be a nice bug to fix.
+
+> 
+> Please excuse and correct me if I get some of the terminology of the
+> sections below wrong.
+> 
+> I went down the path of hacking up some of the qemu qcow2 file system
+> code to see if I can achieve the ability to restore a snapshot from a
+> backing file to the temporarily created "-snapshot" qcow2 image.  The
+> backing file has been marked readonly by the filesystem and the active
+> image file was created with the "-snapshot" option.  I spend some time
+> reading the qcow2 documentation and it seems I have to copy the l1 and
+> l2 table values(are these actual host clusters) from the backing file
+> snapshot to the active images l1 and l2 tables.  Is there anything else
+> that may need updated that I have not yet stumbled upon?
+
+Mucking with the l1 and l2 tables implies that you are directly 
+manipulating qcow2 contents.  It's much nicer if you can come up with a 
+solution where qemu-img does all the qcow2 work for you, and you just 
+worry about guest-visible data.  Or are you actually patching the code 
+compiled into qemu-img?
+
+> 
+> I still don't have this working yet and I believe my area of problems is
+> qcow2_update_snapshot_refcount.  Can anyone explain what this does
+> exactly.  It seems the function does three different things based on the
+> value of addend, either -1, 0, 1, but its somewhat unclear.
+
+Every cluster of qcow2 is reference-counted, to track which portions of 
+the file are (supposed to be) in use according to following the metadata 
+trails.  When internal snapshots are used, this is implemented by 
+incrementing the refcount for each cluster that is reachable both from 
+the snapshot and from the current L1 table (update_snapshot_refcount 
++1), then when writing to the cluster we break the reference count by 
+writing the new data to a new allocation and decrementing the reference 
+count of the old cluster. When trimming clusters, we decrement the 
+refcount, and if it goes to 0 the cluster can be reused for something else.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
