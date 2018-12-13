@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gXPQB-0001aY-Hd
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:44:52 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gXPQt-0001yA-AB
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:45:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gXPQ8-0008Oq-Dd
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:44:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49696)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gXPQ8-0008Od-81
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:44:48 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 719B2307D96E
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 11:44:47 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <c52f04d6-dced-1cb7-23b8-f301254dc366@redhat.com> (Laurent
-	Vivier's message of "Wed, 28 Nov 2018 21:48:04 +0100")
-References: <20181126200009.862-1-quintela@redhat.com>
-	<20181126200009.862-17-quintela@redhat.com>
-	<c52f04d6-dced-1cb7-23b8-f301254dc366@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Thu, 13 Dec 2018 12:44:38 +0100
-Message-ID: <87r2elveft.fsf@trasno.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1gXPQs-0000XR-Nu
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:45:35 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:43945)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gXPQs-0000X6-IT
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:45:34 -0500
+Received: by mail-oi1-x243.google.com with SMTP id u18so1352871oie.10
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 03:45:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 16/16] virtio: virtio 9p really requires
- CONFIG_VIRTFS to work
+References: <1544701071-2922-1-git-send-email-liq3ea@gmail.com>
+In-Reply-To: <1544701071-2922-1-git-send-email-liq3ea@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 13 Dec 2018 11:45:22 +0000
+Message-ID: <CAFEAcA8tG-mXv63dDuJ-DFNDmxvv=AzK2rJXVFG5mnpPadGjGQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2] util: check the return value of fcntl
+ in qemu_set_{block, nonblock}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,50 +29,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, peterx@redhat.com
+To: Li Qiang <liq3ea@gmail.com>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Laurent Vivier <lvivier@redhat.com> wrote:
-> On 26/11/2018 21:00, Juan Quintela wrote:
->> Otherwise, it has no implementation.
->> 
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> ---
->>  default-configs/virtio.mak | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->> 
->> diff --git a/default-configs/virtio.mak b/default-configs/virtio.mak
->> index 5ae4a61018..ecb4420e74 100644
->> --- a/default-configs/virtio.mak
->> +++ b/default-configs/virtio.mak
->> @@ -1,7 +1,7 @@
->>  CONFIG_VHOST_USER_SCSI=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
->>  CONFIG_VHOST_USER_BLK=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
->>  CONFIG_VIRTIO=y
->> -CONFIG_VIRTIO_9P=y
->> +CONFIG_VIRTIO_9P=$(CONFIG_VIRTFS)
->>  CONFIG_VIRTIO_BALLOON=y
->>  CONFIG_VIRTIO_BLK=y
->>  CONFIG_VIRTIO_CRYPTO=y
->> 
+On Thu, 13 Dec 2018 at 11:37, Li Qiang <liq3ea@gmail.com> wrote:
 >
-> I think you should also replace "#ifdef CONFIG_VIRTFS" by "#ifdef
-> CONFIG_VIRTIO_9P" in:
+> Also add diagnostics info in 'qemu_set_cloexec' so that we can know
+> what happen when error occurs.
 >
-> hw/s390x/virtio-ccw.h
-> include/hw/xen/xen_backend.h
-> hw/xen/xen_backend.c
+> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> ---
+> Change since v1: add diagnostics info
 
-After trying again, I remember why it failed.
+We need to fix the assert in the test suite first...
 
-CONFIG_VIRTFS is defined in config-host.mak (and everyting in
-config-host.mak is defined also in config-host.h).
-
-CONFIG_VIRTIO_* is defined on config-devices.mak, and that is not
-defined in any include file.
-
-Sniff.
-
-Removed (again) that bit.
-
-Later, Juan.
+thanks
+-- PMM
