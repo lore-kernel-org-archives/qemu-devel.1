@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gXVZS-0000Ei-RG
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:18:51 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gXVcI-0001oe-C3
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:21:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gXVZR-0004d0-TA
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:18:50 -0500
-References: <20180917145732.48590-1-vsementsov@virtuozzo.com>
-	<504d170c-56ee-0cf5-78e0-47aded4c132f@virtuozzo.com>
-	<43def1dd-732e-a358-d15f-492eefae0a80@redhat.com>
-	<c4c5d8ec-eb90-915c-03d3-95c7517b4b57@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <091d787b-c2e8-6296-792f-6223015f0d0e@redhat.com>
-Date: Thu, 13 Dec 2018 13:18:34 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gXVcG-0006c6-Sk
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:21:46 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33658)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gXVcG-0006b4-F5
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:21:44 -0500
+Received: by mail-ot1-x342.google.com with SMTP id i20so2863389otl.0
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 10:21:43 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <c4c5d8ec-eb90-915c-03d3-95c7517b4b57@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] ping2 Re: [PATCH v4 0/8] dirty-bitmap: rewrite
- bdrv_dirty_iter_next_area
+References: <20181213175552.14857-1-wainersm@redhat.com>
+	<CAFEAcA86SDLGyqL3rG-fEDFsEj8-nz-Uqn5Mb9EeLqiFPeKZfA@mail.gmail.com>
+	<cccf3c43-0e51-bbbc-3676-17286b11ec99@redhat.com>
+In-Reply-To: <cccf3c43-0e51-bbbc-3676-17286b11ec99@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 13 Dec 2018 18:21:29 +0000
+Message-ID: <CAFEAcA9CpR=JGt74=xaUddYhf5SCOoeHH_v+O1L+rrTygZ7quQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/1] checkpatch: checker for comment block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +30,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "famz@redhat.com" <famz@redhat.com>, Denis Lunev <den@virtuozzo.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Wainer dos Santos Moschetta <wainersm@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
+On Thu, 13 Dec 2018 at 18:07, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 13/12/18 19:01, Peter Maydell wrote:
+> > I sent a patch to do this a little while back:
+> >  https://patchwork.kernel.org/patch/10561557/
+> >
+> > It didn't get applied because Paolo disagreed with having
+> > our tools enforcing what our style guide says.
+>
+> I didn't disagree with that---I disagreed with having a single style in
+> the style guide, because unlike most other blatant violations of the
+> coding style (eg. braces), this one is pervasive in maintained code and
+> I don't want code that I maintain to mix two comment styles.
+>
+> So I proposed two alternatives:
+>
+> - someone fixes all the comment blocks which are "starred" but don't
+> have a lone "/*" at the beginning, and then we can commit that patch;
+>
+> - we allow "/* foo" on the first line, except for doc comments and for
+> the first line of the file (author/license block), and fix the style
+> guide accordingly.
 
+We came to a consensus on the comment style when we discussed
+the patch which updated CODING_STYLE. I'm not personally
+a fan of the result (I used to use "/* foo"), but what we have in the
+doc is what we achieved consensus for. I'm not going to reopen
+the "what should block comments look like" style debate.
 
-On 12/13/18 6:07 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 12.12.2018 23:41, John Snow wrote:
->>
->>
->> On 12/12/18 4:27 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> ping. No dependencies, apply to master.
->>>
->>
->> Sure thing.
->>
->> Staged to jsnow/bitmaps.
-> 
-> 
-> Thank you!
-> 
-> Oops, I've missed your email about s/firt_dirty_off/first_dirty_off
-> 
-> I can resend, or you can fix in your branch, as you prefer.
-> The variable touches two commits in jsnow/bitmaps:
-> 
+We have always had older code which isn't following the new style,
+and our general approach is that we don't do mass-style-fix patches
+across the whole codebase. If you as a maintainer of a particular
+sub-area want to do a style update you're free to do that.
 
-Whoops, I forgot too. I just remember that I was waiting on a requisite
-and it got lost so I was in a hurry to stage it for you. I'll just
-squash any fixes in.
-
-I'll try to send the PR when the qemu-img bitmap info patch is ready,
-alongside my series to drop the x-prefix (and adjust the merge API.)
-
-Anything else urgent for the start of the 4.0 window before we all
-disappear on holiday break?
-
---js
-
-> commit f235204c39dd5ce122666d87f18005264eb56e51
-> Author: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Date:   Mon Sep 17 17:57:27 2018 +0300
-> 
->      dirty-bitmap: add bdrv_dirty_bitmap_next_dirty_area
-> 
-> and the last one:
-> 
-> commit 7f73174ca1c8a92e4a5139b35f2a2273f59ce29b (jnsnow/bitmaps)
-> Author: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Date:   Mon Sep 17 17:57:32 2018 +0300
-> 
->      Revert "hbitmap: Add @advance param to hbitmap_iter_next()"
-> 
-> 
-> 
-> 
+thanks
+-- PMM
