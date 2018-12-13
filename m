@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gXQJA-0003cH-0Y
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:41:41 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gXQJl-0004Hi-Da
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:42:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gXQJ5-0005QB-EU
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:41:39 -0500
-Date: Thu, 13 Dec 2018 23:08:19 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181213120819.GF29278@umbus.fritz.box>
-References: <20181213040126.6768-1-david@gibson.dropbear.id.au>
-	<154468701869.9757.9904985862866857416@02a1dbf831e2>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gXQJg-00083M-AE
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:42:17 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 13 Dec 2018 12:42:07 +0000
+Message-ID: <afc020d9-b3be-21b6-764c-a4a2fb1a7cd1@virtuozzo.com>
+References: <20181213015013.15350-1-jsnow@redhat.com>
+	<20181213015013.15350-5-jsnow@redhat.com>
+In-Reply-To: <20181213015013.15350-5-jsnow@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <CB1818DE58FFEB4CB1B86E2347F95E17@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="2FkSFaIQeDFoAt0B"
-Content-Disposition: inline
-In-Reply-To: <154468701869.9757.9904985862866857416@02a1dbf831e2>
-Subject: Re: [Qemu-devel] [PULL 00/27] ppc-for-4.0 queue 20181213
+Subject: Re: [Qemu-devel] [PATCH v2 4/7] iotests.py: don't abort if
+ IMGKEYSECRET is undefined
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,102 +26,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, peter.maydell@linaro.org, lvivier@redhat.com, gkurz@kaod.org, spopovyc@redhat.com, qemu-ppc@nongnu.org, clg@kaod.org
+To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-
---2FkSFaIQeDFoAt0B
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Dec 12, 2018 at 11:43:40PM -0800, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20181213040126.6768-1-david@gibson.=
-dropbear.id.au/
->=20
->=20
->=20
-> Hi,
->=20
-> This series seems to have some coding style problems. See output below for
-> more information:
->=20
-> Type: series
-> Message-id: 20181213040126.6768-1-david@gibson.dropbear.id.au
-> Subject: [Qemu-devel] [PULL 00/27] ppc-for-4.0 queue 20181213
-
-[snip]
-> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
-> Checking PATCH 1/27: spapr: Fix ibm, max-associativity-domains property n=
-umber of nodes...
-> Checking PATCH 2/27: target/ppc: tcg: Implement addex instruction...
-> ERROR: space required after that ',' (ctx:VxV)
-> #42: FILE: disas/ppc.c:3737:
-> +{ "addex",   XO(31,170,0,0), XO_MASK,   POWER9,         { RT, RA, RB } },
->                    ^
->=20
-> ERROR: space required after that ',' (ctx:VxV)
-> #42: FILE: disas/ppc.c:3737:
-> +{ "addex",   XO(31,170,0,0), XO_MASK,   POWER9,         { RT, RA, RB } },
->                        ^
->=20
-> ERROR: space required after that ',' (ctx:VxV)
-> #42: FILE: disas/ppc.c:3737:
-> +{ "addex",   XO(31,170,0,0), XO_MASK,   POWER9,         { RT, RA, RB } },
->                          ^
->=20
-> total: 3 errors, 0 warnings, 156 lines checked
-
-These are sorta-false positives.  There's a whole old set of macro
-conventions in that file that are a real mess coding style wise
-(amongst other ways).  For the time being, internal consistency is
-more important than consistency outside here.
-
-[snip]
-> Checking PATCH 13/27: ppc/xive: introduce a XIVE interrupt source model...
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #61:=20
-> new file mode 100644
->=20
-> total: 0 errors, 1 warnings, 656 lines checked
->=20
-> Your patch has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> Checking PATCH 14/27: ppc/xive: add support for the LSI interrupt sources=
-=2E..
-> Checking PATCH 15/27: ppc/xive: introduce the XiveNotifier interface...
-> Checking PATCH 16/27: ppc/xive: introduce the XiveRouter model...
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #170:=20
-> new file mode 100644
-
-These do need a MAINTAINERS update, which I plan to do in followup.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---2FkSFaIQeDFoAt0B
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwSS7EACgkQbDjKyiDZ
-s5IsyBAAmDuto/x1LK5u3J9+OTne/dqFDyzoYieptMl07Ecgh6tfDlyyi+nznivC
-y0wDCc15rH8DcSMqlwKiZws0ZHd81jX6BbLfZkbTk0qcwTFFstFxw7e4IA2WYNLI
-75keP8KrQRveTyJZbBbB/dOdqrGjH2WjY/8p4yytFtQ9xeXYz10Nr8YIKtAg52QU
-lEc9KF8rZiEQUPyqASePfheGyI8YlB3p9VKJkYzC7eSf3k0zRHhFMC/t88UIqzqE
-kzHAKke7oT24tW4qkvFySYlO41jtqf/8I1mWOkbYo5KQykGg/h8ArAaTNZ2YtDyZ
-rd6ydU4U36meUJyc/+QJ8c2aVe3V40sKOrw7v3tUBrNv08lysoGNc0UqnxDbSN7a
-z6yvCLafyELrcDmKFE7R/36ZBdf0tb8vZdPrynoFDilJzvqbqahzvY9kDD11Ujrc
-7+7+/Q0xTVpgjS6/i0hXjDj1fSvLK9tF36u6zH0jhjZJA6nAWIGacb9WWBEOq+hF
-x4cI5MpNjaH52seP/p057MxbKUI079w+SiAO8AWJ8x+71KIAx8hVm1H8V9r+Fa++
-a1MV4bQNgYDXIe4jOugn9y+J4Mgn9eIaxDdy4LFRhYnNrmg1dy0YXDXXCudBiZ2k
-uHwtjtY4vFooIFD/UATGn8j5Hia6BsqxIfMwqkx2jiasIFAFeWY=
-=GjcT
------END PGP SIGNATURE-----
-
---2FkSFaIQeDFoAt0B--
+MTMuMTIuMjAxOCA0OjUwLCBKb2huIFNub3cgd3JvdGU6DQo+IEluc3RlYWQgb2YgdXNpbmcgb3Mu
+ZW52aXJvbltdLCB1c2UgLmdldCB3aXRoIGEgZGVmYXVsdCBvZiBlbXB0eSBzdHJpbmcNCj4gdG8g
+bWF0Y2ggdGhlIHNldHVwIGluIGNoZWNrIHRvIGFsbG93IHVzIHRvIGltcG9ydCB0aGUgaW90ZXN0
+cyBtb2R1bGUNCj4gKGZvciBkZWJ1Z2dpbmcsIHNheSkgd2l0aG91dCBuZWVkaW5nIGEgY3JhZnRl
+ZCBlbnZpcm9ubWVudCBqdXN0IHRvDQo+IGltcG9ydCB0aGUgbW9kdWxlLg0KPiANCj4gU2lnbmVk
+LW9mZi1ieTogSm9obiBTbm93IDxqc25vd0ByZWRoYXQuY29tPg0KDQoNClJldmlld2VkLWJ5OiBW
+bGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoN
+Cj4gLS0tDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHkgfCAyICstDQo+ICAgMSBm
+aWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pDQo+IA0KPiBkaWZmIC0t
+Z2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHkgYi90ZXN0cy9xZW11LWlvdGVzdHMv
+aW90ZXN0cy5weQ0KPiBpbmRleCBkNTM3NTM4YmEwLi5hMzRlNjY4MTNhIDEwMDY0NA0KPiAtLS0g
+YS90ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weQ0KPiArKysgYi90ZXN0cy9xZW11LWlvdGVz
+dHMvaW90ZXN0cy5weQ0KPiBAQCAtNjMsNyArNjMsNyBAQCBzb2NrZXRfc2NtX2hlbHBlciA9IG9z
+LmVudmlyb24uZ2V0KCdTT0NLRVRfU0NNX0hFTFBFUicsICdzb2NrZXRfc2NtX2hlbHBlcicpDQo+
+ICAgZGVidWcgPSBGYWxzZQ0KPiAgIA0KPiAgIGx1a3NfZGVmYXVsdF9zZWNyZXRfb2JqZWN0ID0g
+J3NlY3JldCxpZD1rZXlzZWMwLGRhdGE9JyArIFwNCj4gLSAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgb3MuZW52aXJvblsnSU1HS0VZU0VDUkVUJ10NCj4gKyAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgb3MuZW52aXJvbi5nZXQoJ0lNR0tFWVNFQ1JFVCcsICcnKQ0KPiAgIGx1a3NfZGVm
+YXVsdF9rZXlfc2VjcmV0X29wdCA9ICdrZXktc2VjcmV0PWtleXNlYzAnDQo+ICAgDQo+ICAgDQo+
+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
