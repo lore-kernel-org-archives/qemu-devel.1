@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXP9g-0004A7-IQ
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:27:49 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gXPFG-0006w9-82
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:33:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXP9f-0006eM-R1
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:27:48 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:33737)
+	(envelope-from <peter.maydell@linaro.org>) id 1gXPFF-00085w-GE
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:33:34 -0500
+Received: from mail-oi1-x22d.google.com ([2607:f8b0:4864:20::22d]:46556)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gXP9f-0006ck-CD
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:27:47 -0500
-Received: by mail-ot1-x343.google.com with SMTP id i20so1595414otl.0
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 03:27:47 -0800 (PST)
+	id 1gXPFF-00081M-AT
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:33:33 -0500
+Received: by mail-oi1-x22d.google.com with SMTP id x202so1319062oif.13
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 03:33:33 -0800 (PST)
 MIME-Version: 1.0
-References: <1544666977-4816-1-git-send-email-liq3ea@gmail.com>
-	<20181213101940.GC5171@redhat.com>
-In-Reply-To: <20181213101940.GC5171@redhat.com>
+References: <20181211205654.3550341-1-stefanb@linux.vnet.ibm.com>
+In-Reply-To: <20181211205654.3550341-1-stefanb@linux.vnet.ibm.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 13 Dec 2018 11:27:35 +0000
-Message-ID: <CAFEAcA_rBakXJZuPGgcsvC9m75oeTbg=q-=mOCFJuungF-VR8g@mail.gmail.com>
+Date: Thu, 13 Dec 2018 11:33:21 +0000
+Message-ID: <CAFEAcA-Ao54gvA631bcOrMAK2s0x+PtpE6M5MQ1AFpAz-g8PdA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] util: check the return value of fcntl in
- qemu_set_{block, noblock}
+Subject: Re: [Qemu-devel] [PULL v2 0/3] Merge tpm 2018/12/04 v1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Li Qiang <liq3ea@gmail.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, 13 Dec 2018 at 10:19, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
- wrote:
+On Tue, 11 Dec 2018 at 20:57, Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
 >
-> On Wed, Dec 12, 2018 at 06:09:37PM -0800, Li Qiang wrote:
-> > Assert that the return value is not an error. This is like commit
-> > 7e6478e7d4f for qemu_set_cloexec.
-> >
-> > Signed-off-by: Li Qiang <liq3ea@gmail.com>
-> > ---
-> >  util/oslib-posix.c | 8 ++++++--
-> >  1 file changed, 6 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> > index c1bee2a581..4ce1ba9ca4 100644
-> > --- a/util/oslib-posix.c
-> > +++ b/util/oslib-posix.c
-> > @@ -233,14 +233,18 @@ void qemu_set_block(int fd)
-> >  {
-> >      int f;
-> >      f =3D fcntl(fd, F_GETFL);
-> > -    fcntl(fd, F_SETFL, f & ~O_NONBLOCK);
-> > +    assert(f !=3D -1);
+> This series of patches removes an unnecessary parameter from tpm_tis_abort()
+> and adds a locality range check (using assert()) to tpm_tis_prep_abort() and
+> tpm_tis_request_completed().
 >
-> This leads to *awful* diagnostics. We need to print something
-> useful when it fails so we stand a chance of understanding what
-> is wrong.
+>    Stefan
+>
+> The following changes since commit 83ea23cd207a03c5736be0231acbf7f8b05dbf52:
+>
+>   i386: hvf: Fix overrun of _decode_tbl1 (2018-12-03 15:09:55 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2018-12-04-1
+>
+> for you to fetch changes up to a639f96111eadb3b8e3021fd3f27e2948ad1c640:
+>
+>   tpm: Make sure the locality received from backend is valid (2018-12-04 10:21:25 -0500)
+>
+> ----------------------------------------------------------------
+> Stefan Berger (3):
+>       tpm: Remove unused locty parameter from tpm_tis_abort()
+>       tpm: Make sure new locality passed to tpm_tis_prep_abort() is valid
+>       tpm: Make sure the locality received from backend is valid
+>
 
-It's the same thing we do in qemu_set_cloexec(), though,
-and nobody's complained about that that I know of. I think
-we need to understand whether we're getting asserts in
-vhost_user_test because of something silly like passing -1
-as the fd, or because the fcntl() can legitimately fail.
-If the former, the assert isn't a big deal because when
-we hit it in newly developed code the problem is going
-to be obvious when run under a debugger. If the latter,
-we need to actually pass out the error status and fix
-all the callers to check it...
+Applied, thanks.
 
-thanks
 -- PMM
