@@ -1,30 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gXZc2-0004qq-A2
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 17:37:47 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gXZcF-0005NF-RH
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 17:38:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gXZbx-0002Wm-6c
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 17:37:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58422)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gXZbw-0002UI-TL
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 17:37:41 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D340C31256C8
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 22:37:39 +0000 (UTC)
-Received: from donizetti.redhat.com (ovpn-112-17.ams2.redhat.com
-	[10.36.112.17])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 057BC6012E
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 22:37:38 +0000 (UTC)
+	(envelope-from <pbonzini@redhat.com>) id 1gXZcD-0003BR-Jb
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 17:37:59 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 13 Dec 2018 23:37:35 +0100
-Message-Id: <20181213223737.11793-1-pbonzini@redhat.com>
+Date: Thu, 13 Dec 2018 23:37:36 +0100
+Message-Id: <20181213223737.11793-2-pbonzini@redhat.com>
+In-Reply-To: <20181213223737.11793-1-pbonzini@redhat.com>
+References: <20181213223737.11793-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 0/2] Fix TABs in many files
+Subject: [Qemu-devel] [PATCH 1/2] remove space-tab sequences
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,143 +22,514 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Richard Henderson <rth@twiddle.net>, Andrzej Zaborowski <balrogg@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Gerd Hoffmann <kraxel@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, "open list:ARM target" <qemu-arm@nongnu.org>
 
-Space-tab sequences at the beginning of the line are always a mistake,
-so patch 1 fixes them.  I am not touching space-tab in the middle of
-the line, many of which are in #define lines.
+There are not many, and they are all simple mistakes that ended up
+being committed.  Remove them.
 
-In addition, about a third of the files with TABs have only a few of
-them and it's worth converting them for consistency.  Of the files
-touched by patch 2, hw/ide/core.c is the worst in absolute terms, with
-over 50 occurrences in a 3000 lines file; hw/char/xen_console.c has
-about a third TABs and two-thirds spaces but it is small so I included it=
-.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ bsd-user/x86_64/target_syscall.h   |  2 +-
+ crypto/aes.c                       | 28 ++++++++++++++--------------
+ disas/alpha.c                      |  8 ++++----
+ disas/arm.c                        |  2 +-
+ disas/i386.c                       |  4 ++--
+ disas/m68k.c                       |  4 ++--
+ hw/usb/hcd-uhci.c                  |  4 ++--
+ include/hw/elf_ops.h               |  2 +-
+ linux-user/linuxload.c             |  2 +-
+ linux-user/syscall.c               |  2 +-
+ linux-user/syscall_defs.h          |  4 ++--
+ linux-user/x86_64/target_syscall.h |  2 +-
+ slirp/ip_input.c                   |  4 ++--
+ slirp/tcp_input.c                  | 10 +++++-----
+ slirp/tcp_output.c                 |  4 ++--
+ slirp/tcp_timer.c                  |  2 +-
+ slirp/udp.c                        |  2 +-
+ tests/tcg/arm/hello-arm.c          | 10 +++++-----
+ 18 files changed, 48 insertions(+), 48 deletions(-)
 
-The files were selected by hand starting from a list of .c and .h
-files in the tree, sorted by number of occurrences.  I left out
-files that for example were using TABs consistently for structs,
-on the grounds that those were probably copied from Linux.  I also
-left out slirp from patch 2 because I did not want to complicate the
-ongoing surgery to extract it from QEMU.
-
-Thanks,
-
-Paolo
-
-Paolo Bonzini (2):
-  remove space-tab sequences
-  avoid TABs in files that only contain a few
-
- block/bochs.c                              | 22 ++---
- block/file-posix.c                         |  2 +-
- block/file-win32.c                         |  8 +-
- block/linux-aio.c                          |  4 +-
- block/qcow2-cluster.c                      |  2 +-
- block/vpc.c                                |  2 +-
- bsd-user/elfload.c                         |  2 +-
- bsd-user/x86_64/target_syscall.h           |  2 +-
- contrib/elf2dmp/main.c                     |  2 +-
- crypto/aes.c                               | 28 +++----
- disas/alpha.c                              |  8 +-
- disas/arm.c                                |  2 +-
- disas/i386.c                               |  4 +-
- disas/m68k.c                               |  4 +-
- hw/alpha/typhoon.c                         | 12 +--
- hw/arm/stellaris.c                         |  2 +-
- hw/arm/virt.c                              |  2 +-
- hw/char/sh_serial.c                        | 18 ++---
- hw/char/virtio-serial-bus.c                |  2 +-
- hw/char/xen_console.c                      | 58 ++++++-------
- hw/core/loader.c                           | 28 +++----
- hw/display/tc6393xb.c                      |  6 +-
- hw/display/vga.c                           |  8 +-
- hw/display/virtio-gpu-3d.c                 |  6 +-
- hw/dma/pxa2xx_dma.c                        |  4 +-
- hw/dma/soc_dma.c                           |  2 +-
- hw/gpio/max7310.c                          |  2 +-
- hw/i386/xen/xen-hvm.c                      |  4 +-
- hw/ide/core.c                              | 94 +++++++++++-----------
- hw/input/lm832x.c                          |  2 +-
- hw/input/pckbd.c                           |  2 +-
- hw/input/tsc210x.c                         |  2 +-
- hw/intc/apic.c                             |  2 +-
- hw/mips/gt64xxx_pci.c                      |  6 +-
- hw/mips/mips_r4k.c                         |  4 +-
- hw/misc/max111x.c                          |  6 +-
- hw/misc/omap_l4.c                          |  4 +-
- hw/net/mipsnet.c                           | 16 ++--
- hw/net/ne2000.c                            | 44 +++++-----
- hw/net/rocker/rocker.c                     |  2 +-
- hw/net/virtio-net.c                        |  4 +-
- hw/net/vmxnet3.c                           |  6 +-
- hw/pci/msix.c                              |  2 +-
- hw/pci/pci.c                               | 44 +++++-----
- hw/pci/pci_bridge.c                        |  2 +-
- hw/ppc/ppc405_uc.c                         |  2 +-
- hw/ppc/prep.c                              |  4 +-
- hw/scsi/lsi53c895a.c                       |  6 +-
- hw/sh4/r2d.c                               | 16 ++--
- hw/usb/dev-bluetooth.c                     |  2 +-
- hw/usb/dev-hid.c                           |  6 +-
- hw/usb/dev-hub.c                           | 14 ++--
- hw/usb/hcd-uhci.c                          |  4 +-
- hw/xen/xen_devconfig.c                     |  2 +-
- hw/xenpv/xen_domainbuild.c                 |  8 +-
- include/elf.h                              | 10 +--
- include/hw/acpi/acpi.h                     | 14 ++--
- include/hw/elf_ops.h                       |  2 +-
- include/hw/ide/internal.h                  |  2 +-
- include/hw/sh4/sh_intc.h                   | 20 ++---
- include/hw/xen/io/ring.h                   |  4 +-
- include/qemu/acl.h                         | 14 ++--
- include/qemu/iov.h                         |  2 +-
- include/scsi/constants.h                   |  2 +-
- include/sysemu/balloon.h                   |  2 +-
- linux-user/linuxload.c                     | 14 ++--
- linux-user/main.c                          |  4 +-
- linux-user/mmap.c                          | 10 +--
- linux-user/qemu.h                          |  4 +-
- linux-user/signal.c                        | 16 ++--
- linux-user/strace.c                        |  4 +-
- linux-user/syscall.c                       |  2 +-
- linux-user/syscall_defs.h                  |  4 +-
- linux-user/uaccess.c                       |  2 +-
- linux-user/vm86.c                          |  2 +-
- linux-user/x86_64/target_syscall.h         |  2 +-
- nbd/client.c                               |  2 +-
- net/checksum.c                             |  2 +-
- qtest.c                                    |  4 +-
- slirp/ip_input.c                           |  4 +-
- slirp/tcp_input.c                          | 10 +--
- slirp/tcp_output.c                         |  4 +-
- slirp/tcp_timer.c                          |  2 +-
- slirp/udp.c                                |  2 +-
- target/alpha/translate.c                   |  2 +-
- target/cris/helper.c                       |  2 +-
- target/cris/mmu.h                          | 10 +--
- target/cris/translate_v10.inc.c            |  2 +-
- target/i386/translate.c                    | 12 +--
- target/mips/translate.c                    |  2 +-
- target/tilegx/translate.c                  |  2 +-
- tcg/i386/tcg-target.inc.c                  |  4 +-
- tests/tcg/alpha/test-cond.c                |  4 +-
- tests/tcg/arm/hello-arm.c                  | 20 ++---
- tests/tcg/cris/check_glibc_kernelversion.c |  8 +-
- tests/tcg/cris/check_mmap3.c               |  2 +-
- tests/tcg/cris/check_openpf1.c             |  2 +-
- tests/tcg/cris/check_settls1.c             |  2 +-
- tests/tcg/i386/hello-i386.c                | 14 ++--
- tests/tcg/mips/hello-mips.c                | 10 +--
- tests/tcg/multiarch/sha1.c                 | 12 +--
- tests/vhost-user-test.c                    |  4 +-
- ui/keymaps.h                               |  4 +-
- ui/qemu-pixman.c                           |  2 +-
- ui/vnc-enc-zywrle-template.c               |  4 +-
- ui/vnc.c                                   |  4 +-
- util/bitops.c                              |  4 +-
- util/osdep.c                               |  4 +-
- util/qemu-sockets.c                        |  4 +-
- 109 files changed, 429 insertions(+), 429 deletions(-)
-
+diff --git a/bsd-user/x86_64/target_syscall.h b/bsd-user/x86_64/target_sy=
+scall.h
+index 211ce29e90..a5d779884f 100644
+--- a/bsd-user/x86_64/target_syscall.h
++++ b/bsd-user/x86_64/target_syscall.h
+@@ -12,7 +12,7 @@ struct target_pt_regs {
+ 	abi_ulong rbp;
+ 	abi_ulong rbx;
+ /* arguments: non interrupts/non tracing syscalls only save up to here *=
+/
+- 	abi_ulong r11;
++	abi_ulong r11;
+ 	abi_ulong r10;
+ 	abi_ulong r9;
+ 	abi_ulong r8;
+diff --git a/crypto/aes.c b/crypto/aes.c
+index 3456eacd08..773d246b00 100644
+--- a/crypto/aes.c
++++ b/crypto/aes.c
+@@ -1071,7 +1071,7 @@ int AES_set_encrypt_key(const unsigned char *userKe=
+y, const int bits,
+ 			AES_KEY *key) {
+=20
+ 	u32 *rk;
+-   	int i =3D 0;
++	int i =3D 0;
+ 	u32 temp;
+=20
+ 	if (!userKey || !key)
+@@ -1160,7 +1160,7 @@ int AES_set_encrypt_key(const unsigned char *userKe=
+y, const int bits,
+ 			rk[15] =3D rk[ 7] ^ rk[14];
+=20
+ 			rk +=3D 8;
+-        	}
++		}
+ 	}
+         abort();
+ }
+@@ -1247,7 +1247,7 @@ void AES_encrypt(const unsigned char *in, unsigned =
+char *out,
+         t1 =3D AES_Te0[s1 >> 24] ^ AES_Te1[(s2 >> 16) & 0xff] ^ AES_Te2[=
+(s3 >>  8) & 0xff] ^ AES_Te3[s0 & 0xff] ^ rk[ 5];
+         t2 =3D AES_Te0[s2 >> 24] ^ AES_Te1[(s3 >> 16) & 0xff] ^ AES_Te2[=
+(s0 >>  8) & 0xff] ^ AES_Te3[s1 & 0xff] ^ rk[ 6];
+         t3 =3D AES_Te0[s3 >> 24] ^ AES_Te1[(s0 >> 16) & 0xff] ^ AES_Te2[=
+(s1 >>  8) & 0xff] ^ AES_Te3[s2 & 0xff] ^ rk[ 7];
+-   	/* round 2: */
++	/* round 2: */
+         s0 =3D AES_Te0[t0 >> 24] ^ AES_Te1[(t1 >> 16) & 0xff] ^ AES_Te2[=
+(t2 >>  8) & 0xff] ^ AES_Te3[t3 & 0xff] ^ rk[ 8];
+         s1 =3D AES_Te0[t1 >> 24] ^ AES_Te1[(t2 >> 16) & 0xff] ^ AES_Te2[=
+(t3 >>  8) & 0xff] ^ AES_Te3[t0 & 0xff] ^ rk[ 9];
+         s2 =3D AES_Te0[t2 >> 24] ^ AES_Te1[(t3 >> 16) & 0xff] ^ AES_Te2[=
+(t0 >>  8) & 0xff] ^ AES_Te3[t1 & 0xff] ^ rk[10];
+@@ -1257,7 +1257,7 @@ void AES_encrypt(const unsigned char *in, unsigned =
+char *out,
+         t1 =3D AES_Te0[s1 >> 24] ^ AES_Te1[(s2 >> 16) & 0xff] ^ AES_Te2[=
+(s3 >>  8) & 0xff] ^ AES_Te3[s0 & 0xff] ^ rk[13];
+         t2 =3D AES_Te0[s2 >> 24] ^ AES_Te1[(s3 >> 16) & 0xff] ^ AES_Te2[=
+(s0 >>  8) & 0xff] ^ AES_Te3[s1 & 0xff] ^ rk[14];
+         t3 =3D AES_Te0[s3 >> 24] ^ AES_Te1[(s0 >> 16) & 0xff] ^ AES_Te2[=
+(s1 >>  8) & 0xff] ^ AES_Te3[s2 & 0xff] ^ rk[15];
+-   	/* round 4: */
++	/* round 4: */
+         s0 =3D AES_Te0[t0 >> 24] ^ AES_Te1[(t1 >> 16) & 0xff] ^ AES_Te2[=
+(t2 >>  8) & 0xff] ^ AES_Te3[t3 & 0xff] ^ rk[16];
+         s1 =3D AES_Te0[t1 >> 24] ^ AES_Te1[(t2 >> 16) & 0xff] ^ AES_Te2[=
+(t3 >>  8) & 0xff] ^ AES_Te3[t0 & 0xff] ^ rk[17];
+         s2 =3D AES_Te0[t2 >> 24] ^ AES_Te1[(t3 >> 16) & 0xff] ^ AES_Te2[=
+(t0 >>  8) & 0xff] ^ AES_Te3[t1 & 0xff] ^ rk[18];
+@@ -1267,7 +1267,7 @@ void AES_encrypt(const unsigned char *in, unsigned =
+char *out,
+         t1 =3D AES_Te0[s1 >> 24] ^ AES_Te1[(s2 >> 16) & 0xff] ^ AES_Te2[=
+(s3 >>  8) & 0xff] ^ AES_Te3[s0 & 0xff] ^ rk[21];
+         t2 =3D AES_Te0[s2 >> 24] ^ AES_Te1[(s3 >> 16) & 0xff] ^ AES_Te2[=
+(s0 >>  8) & 0xff] ^ AES_Te3[s1 & 0xff] ^ rk[22];
+         t3 =3D AES_Te0[s3 >> 24] ^ AES_Te1[(s0 >> 16) & 0xff] ^ AES_Te2[=
+(s1 >>  8) & 0xff] ^ AES_Te3[s2 & 0xff] ^ rk[23];
+-   	/* round 6: */
++	/* round 6: */
+         s0 =3D AES_Te0[t0 >> 24] ^ AES_Te1[(t1 >> 16) & 0xff] ^ AES_Te2[=
+(t2 >>  8) & 0xff] ^ AES_Te3[t3 & 0xff] ^ rk[24];
+         s1 =3D AES_Te0[t1 >> 24] ^ AES_Te1[(t2 >> 16) & 0xff] ^ AES_Te2[=
+(t3 >>  8) & 0xff] ^ AES_Te3[t0 & 0xff] ^ rk[25];
+         s2 =3D AES_Te0[t2 >> 24] ^ AES_Te1[(t3 >> 16) & 0xff] ^ AES_Te2[=
+(t0 >>  8) & 0xff] ^ AES_Te3[t1 & 0xff] ^ rk[26];
+@@ -1277,7 +1277,7 @@ void AES_encrypt(const unsigned char *in, unsigned =
+char *out,
+         t1 =3D AES_Te0[s1 >> 24] ^ AES_Te1[(s2 >> 16) & 0xff] ^ AES_Te2[=
+(s3 >>  8) & 0xff] ^ AES_Te3[s0 & 0xff] ^ rk[29];
+         t2 =3D AES_Te0[s2 >> 24] ^ AES_Te1[(s3 >> 16) & 0xff] ^ AES_Te2[=
+(s0 >>  8) & 0xff] ^ AES_Te3[s1 & 0xff] ^ rk[30];
+         t3 =3D AES_Te0[s3 >> 24] ^ AES_Te1[(s0 >> 16) & 0xff] ^ AES_Te2[=
+(s1 >>  8) & 0xff] ^ AES_Te3[s2 & 0xff] ^ rk[31];
+-   	/* round 8: */
++	/* round 8: */
+         s0 =3D AES_Te0[t0 >> 24] ^ AES_Te1[(t1 >> 16) & 0xff] ^ AES_Te2[=
+(t2 >>  8) & 0xff] ^ AES_Te3[t3 & 0xff] ^ rk[32];
+         s1 =3D AES_Te0[t1 >> 24] ^ AES_Te1[(t2 >> 16) & 0xff] ^ AES_Te2[=
+(t3 >>  8) & 0xff] ^ AES_Te3[t0 & 0xff] ^ rk[33];
+         s2 =3D AES_Te0[t2 >> 24] ^ AES_Te1[(t3 >> 16) & 0xff] ^ AES_Te2[=
+(t0 >>  8) & 0xff] ^ AES_Te3[t1 & 0xff] ^ rk[34];
+@@ -1569,33 +1569,33 @@ void AES_decrypt(const unsigned char *in, unsigne=
+d char *out,
+ 	 * apply last round and
+ 	 * map cipher state to byte array block:
+ 	 */
+-   	s0 =3D
++	s0 =3D
+                 (AES_Td4[(t0 >> 24)       ] & 0xff000000) ^
+                 (AES_Td4[(t3 >> 16) & 0xff] & 0x00ff0000) ^
+                 (AES_Td4[(t2 >>  8) & 0xff] & 0x0000ff00) ^
+                 (AES_Td4[(t1      ) & 0xff] & 0x000000ff) ^
+-   		rk[0];
++		rk[0];
+ 	PUTU32(out     , s0);
+-   	s1 =3D
++	s1 =3D
+                 (AES_Td4[(t1 >> 24)       ] & 0xff000000) ^
+                 (AES_Td4[(t0 >> 16) & 0xff] & 0x00ff0000) ^
+                 (AES_Td4[(t3 >>  8) & 0xff] & 0x0000ff00) ^
+                 (AES_Td4[(t2      ) & 0xff] & 0x000000ff) ^
+-   		rk[1];
++		rk[1];
+ 	PUTU32(out +  4, s1);
+-   	s2 =3D
++	s2 =3D
+                 (AES_Td4[(t2 >> 24)       ] & 0xff000000) ^
+                 (AES_Td4[(t1 >> 16) & 0xff] & 0x00ff0000) ^
+                 (AES_Td4[(t0 >>  8) & 0xff] & 0x0000ff00) ^
+                 (AES_Td4[(t3      ) & 0xff] & 0x000000ff) ^
+-   		rk[2];
++		rk[2];
+ 	PUTU32(out +  8, s2);
+-   	s3 =3D
++	s3 =3D
+                 (AES_Td4[(t3 >> 24)       ] & 0xff000000) ^
+                 (AES_Td4[(t2 >> 16) & 0xff] & 0x00ff0000) ^
+                 (AES_Td4[(t1 >>  8) & 0xff] & 0x0000ff00) ^
+                 (AES_Td4[(t0      ) & 0xff] & 0x000000ff) ^
+-   		rk[3];
++		rk[3];
+ 	PUTU32(out + 12, s3);
+ }
+=20
+diff --git a/disas/alpha.c b/disas/alpha.c
+index b7b0ae0d92..a0c9ecd49d 100644
+--- a/disas/alpha.c
++++ b/disas/alpha.c
+@@ -672,7 +672,7 @@ extract_ev6hwjhint(unsigned insn, int *invalid ATTRIB=
+UTE_UNUSED)
+    OPCODE	is the instruction opcode.
+=20
+    MASK		is the opcode mask; this is used to tell the disassembler
+-            	which bits in the actual opcode must match OPCODE.
++		which bits in the actual opcode must match OPCODE.
+=20
+    OPERANDS	is the list of operands.
+=20
+@@ -699,10 +699,10 @@ extract_ev6hwjhint(unsigned insn, int *invalid ATTR=
+IBUTE_UNUSED)
+    And two annotations:
+=20
+    EV56 BUT	opcodes that are officially introduced as of the ev56,
+-   		but with defined results on previous implementations.
++		but with defined results on previous implementations.
+=20
+    EV56 UNA	opcodes that were introduced as of the ev56 with
+-   		presumably undefined results on previous implementations
++		presumably undefined results on previous implementations
+ 		that were not assigned to a particular extension.
+ */
+=20
+@@ -832,7 +832,7 @@ const struct alpha_opcode alpha_opcodes[] =3D {
+   { "cmovgt",		OPR(0x11,0x66), BASE, ARG_OPR },
+   { "cmovgt",		OPRL(0x11,0x66), BASE, ARG_OPRL },
+   { "implver",		OPRL_(0x11,0x6C)|(31<<21)|(1<<13),
+-    			0xFFFFFFE0, BASE, { RC } },		/* ev56 but */
++			0xFFFFFFE0, BASE, { RC } },		/* ev56 but */
+=20
+   { "mskbl",		OPR(0x12,0x02), BASE, ARG_OPR },
+   { "mskbl",		OPRL(0x12,0x02), BASE, ARG_OPRL },
+diff --git a/disas/arm.c b/disas/arm.c
+index dda7b2a943..17ea120b44 100644
+--- a/disas/arm.c
++++ b/disas/arm.c
+@@ -1077,7 +1077,7 @@ static const struct opcode32 arm_opcodes[] =3D
+    %S                   print Thumb register (bits 3..5 as high number i=
+f bit 6 set)
+    %D                   print Thumb register (bits 0..2 as high number i=
+f bit 7 set)
+    %<bitfield>I         print bitfield as a signed decimal
+-   				(top bit of range being the sign bit)
++				(top bit of range being the sign bit)
+    %N                   print Thumb register mask (with LR)
+    %O                   print Thumb register mask (with PC)
+    %M                   print Thumb register mask
+diff --git a/disas/i386.c b/disas/i386.c
+index a557e678ec..fc03b9f06a 100644
+--- a/disas/i386.c
++++ b/disas/i386.c
+@@ -6075,7 +6075,7 @@ OP_EM (int bytemode, int sizeflag)
+ 	{
+ 	  bytemode =3D (prefixes & PREFIX_DATA) ? x_mode : q_mode;
+ 	  used_prefixes |=3D (prefixes & PREFIX_DATA);
+- 	}
++	}
+       OP_E (bytemode, sizeflag);
+       return;
+     }
+@@ -6112,7 +6112,7 @@ OP_EMC (int bytemode, int sizeflag)
+ 	{
+ 	  bytemode =3D (prefixes & PREFIX_DATA) ? x_mode : q_mode;
+ 	  used_prefixes |=3D (prefixes & PREFIX_DATA);
+- 	}
++	}
+       OP_E (bytemode, sizeflag);
+       return;
+     }
+diff --git a/disas/m68k.c b/disas/m68k.c
+index 0dc8aa1a3c..e544c7137f 100644
+--- a/disas/m68k.c
++++ b/disas/m68k.c
+@@ -350,7 +350,7 @@ struct m68k_opcode_alias
+=20
+    *  all					(modes 0-6,7.0-4)
+    ~  alterable memory				(modes 2-6,7.0,7.1)
+-   						(not 0,1,7.2-4)
++						(not 0,1,7.2-4)
+    %  alterable					(modes 0-6,7.0,7.1)
+ 						(not 7.2-4)
+    ;  data					(modes 0,2-6,7.0-4)
+@@ -1647,7 +1647,7 @@ print_insn_arg (const char *d,
+ 	  case 0x15: name =3D "%val"; break;
+ 	  case 0x16: name =3D "%scc"; break;
+ 	  case 0x17: name =3D "%ac"; break;
+- 	  case 0x18: name =3D "%psr"; break;
++	  case 0x18: name =3D "%psr"; break;
+ 	  case 0x19: name =3D "%pcsr"; break;
+ 	  case 0x1c:
+ 	  case 0x1d:
+diff --git a/hw/usb/hcd-uhci.c b/hw/usb/hcd-uhci.c
+index 26f123ed78..e694b62086 100644
+--- a/hw/usb/hcd-uhci.c
++++ b/hw/usb/hcd-uhci.c
+@@ -1056,8 +1056,8 @@ static void uhci_process_frame(UHCIState *s)
+                 link =3D qh.link;
+             } else {
+                 /* QH with elements */
+-            	curr_qh =3D link;
+-            	link =3D qh.el_link;
++                curr_qh =3D link;
++                link =3D qh.el_link;
+             }
+             continue;
+         }
+diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+index 81cecaf27e..3b6398cb39 100644
+--- a/include/hw/elf_ops.h
++++ b/include/hw/elf_ops.h
+@@ -343,7 +343,7 @@ static int glue(load_elf, SZ)(const char *name, int f=
+d,
+     }
+=20
+     if (pentry)
+-   	*pentry =3D (uint64_t)(elf_sword)ehdr.e_entry;
++	*pentry =3D (uint64_t)(elf_sword)ehdr.e_entry;
+=20
+     glue(load_symbols, SZ)(&ehdr, fd, must_swab, clear_lsb, sym_cb);
+=20
+diff --git a/linux-user/linuxload.c b/linux-user/linuxload.c
+index 6f0d6054ce..6717c9c6f0 100644
+--- a/linux-user/linuxload.c
++++ b/linux-user/linuxload.c
+@@ -54,7 +54,7 @@ static int prepare_binprm(struct linux_binprm *bprm)
+=20
+     /* Set-uid? */
+     if(mode & S_ISUID) {
+-    	bprm->e_uid =3D st.st_uid;
++	bprm->e_uid =3D st.st_uid;
+     }
+=20
+     /* Set-gid? */
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 280137da8c..5c53e84b7a 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -902,7 +902,7 @@ abi_long do_brk(abi_ulong new_brk)
+         }
+ 	target_brk =3D new_brk;
+         DEBUGF_BRK(TARGET_ABI_FMT_lx " (new_brk <=3D brk_page)\n", targe=
+t_brk);
+-    	return target_brk;
++	return target_brk;
+     }
+=20
+     /* We need to allocate more memory after the brk... Note that
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 99bbce083c..12c8407144 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -1807,7 +1807,7 @@ struct target_stat {
+ 	abi_ulong	st_rdev;
+ 	abi_long	st_size;
+ 	abi_long	st_blksize;
+-    	abi_long	st_blocks;	/* Number 512-byte blocks allocated. */
++	abi_long	st_blocks;	/* Number 512-byte blocks allocated. */
+=20
+ 	abi_ulong	target_st_atime;
+ 	abi_ulong 	target_st_atime_nsec;=20
+@@ -1816,7 +1816,7 @@ struct target_stat {
+ 	abi_ulong	target_st_ctime;
+ 	abi_ulong       target_st_ctime_nsec;
+=20
+-  	abi_long	__unused[3];
++	abi_long	__unused[3];
+ };
+ #elif defined(TARGET_S390X)
+ struct target_stat {
+diff --git a/linux-user/x86_64/target_syscall.h b/linux-user/x86_64/targe=
+t_syscall.h
+index 983fb23d9b..5e221e1d9d 100644
+--- a/linux-user/x86_64/target_syscall.h
++++ b/linux-user/x86_64/target_syscall.h
+@@ -12,7 +12,7 @@ struct target_pt_regs {
+ 	abi_ulong rbp;
+ 	abi_ulong rbx;
+ /* arguments: non interrupts/non tracing syscalls only save up to here *=
+/
+- 	abi_ulong r11;
++	abi_ulong r11;
+ 	abi_ulong r10;
+ 	abi_ulong r9;
+ 	abi_ulong r8;
+diff --git a/slirp/ip_input.c b/slirp/ip_input.c
+index 348e1dca5a..094a807d41 100644
+--- a/slirp/ip_input.c
++++ b/slirp/ip_input.c
+@@ -193,7 +193,7 @@ ip_input(struct mbuf *m)
+ 			m =3D dtom(slirp, ip);
+ 		} else
+ 			if (fp)
+-		   	   ip_freef(slirp, fp);
++			   ip_freef(slirp, fp);
+=20
+ 	} else
+ 		ip->ip_len -=3D hlen;
+@@ -537,7 +537,7 @@ typedef uint32_t n_time;
+ 			if (opt =3D=3D IPOPT_SSRR) {
+ #define	INA	struct in_ifaddr *
+ #define	SA	struct sockaddr *
+- 			    if ((ia =3D (INA)ifa_ifwithdstaddr((SA)&ipaddr)) =3D=3D 0)
++			    if ((ia =3D (INA)ifa_ifwithdstaddr((SA)&ipaddr)) =3D=3D 0)
+ 				ia =3D (INA)ifa_ifwithnet((SA)&ipaddr);
+ 			} else
+ 				ia =3D ip_rtaddr(ipaddr.sin_addr);
+diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
+index d073ef9525..09bdf9b482 100644
+--- a/slirp/tcp_input.c
++++ b/slirp/tcp_input.c
+@@ -74,7 +74,7 @@
+                if (so->so_emu) { \
+ 		       if (tcp_emu((so),(m))) sbappend((so), (m)); \
+ 	       } else \
+-	       	       sbappend((so), (m)); \
++		       sbappend((so), (m)); \
+ 	} else {\
+                (flags) =3D tcp_reass((tp), (ti), (m)); \
+                tp->t_flags |=3D TF_ACKNOW; \
+@@ -1175,7 +1175,7 @@ trimthenstep6:
+ 			}
+ 			break;
+=20
+-	 	/*
++		/*
+ 		 * In CLOSING STATE in addition to the processing for
+ 		 * the ESTABLISHED state if the ACK acknowledges our FIN
+ 		 * then enter the TIME-WAIT state, otherwise ignore
+@@ -1325,7 +1325,7 @@ dodata:
+ 		}
+ 		switch (tp->t_state) {
+=20
+-	 	/*
++		/*
+ 		 * In SYN_RECEIVED and ESTABLISHED STATES
+ 		 * enter the CLOSE_WAIT state.
+ 		 */
+@@ -1337,7 +1337,7 @@ dodata:
+ 		    tp->t_state =3D TCPS_CLOSE_WAIT;
+ 		  break;
+=20
+-	 	/*
++		/*
+ 		 * If still in FIN_WAIT_1 STATE FIN has not been acked so
+ 		 * enter the CLOSING state.
+ 		 */
+@@ -1345,7 +1345,7 @@ dodata:
+ 			tp->t_state =3D TCPS_CLOSING;
+ 			break;
+=20
+-	 	/*
++		/*
+ 		 * In FIN_WAIT_2 state enter the TIME_WAIT state,
+ 		 * starting the time-wait timer, turning off the other
+ 		 * standard timers.
+diff --git a/slirp/tcp_output.c b/slirp/tcp_output.c
+index 90b5c376f7..c835432812 100644
+--- a/slirp/tcp_output.c
++++ b/slirp/tcp_output.c
+@@ -275,9 +275,9 @@ send:
+ 			memcpy((caddr_t)(opt + 2), (caddr_t)&mss, sizeof(mss));
+ 			optlen =3D 4;
+ 		}
+- 	}
++	}
+=20
+- 	hdrlen +=3D optlen;
++	hdrlen +=3D optlen;
+=20
+ 	/*
+ 	 * Adjust data length if insertion of options will
+diff --git a/slirp/tcp_timer.c b/slirp/tcp_timer.c
+index 52ef5f9100..dc8288b511 100644
+--- a/slirp/tcp_timer.c
++++ b/slirp/tcp_timer.c
+@@ -263,7 +263,7 @@ tcp_timers(register struct tcpcb *tp, int timer)
+ 			goto dropit;
+=20
+ 		if ((SO_OPTIONS) && tp->t_state <=3D TCPS_CLOSE_WAIT) {
+-		    	if (tp->t_idle >=3D TCPTV_KEEP_IDLE + TCP_MAXIDLE)
++			if (tp->t_idle >=3D TCPTV_KEEP_IDLE + TCP_MAXIDLE)
+ 				goto dropit;
+ 			/*
+ 			 * Send a packet designed to force a response
+diff --git a/slirp/udp.c b/slirp/udp.c
+index c47870a61b..5bb196c907 100644
+--- a/slirp/udp.c
++++ b/slirp/udp.c
+@@ -310,7 +310,7 @@ udp_tos(struct socket *so)
+ 	while(udptos[i].tos) {
+ 		if ((udptos[i].fport && ntohs(so->so_fport) =3D=3D udptos[i].fport) ||
+ 		    (udptos[i].lport && ntohs(so->so_lport) =3D=3D udptos[i].lport)) {
+-		    	so->so_emu =3D udptos[i].emu;
++			so->so_emu =3D udptos[i].emu;
+ 			return udptos[i].tos;
+ 		}
+ 		i++;
+diff --git a/tests/tcg/arm/hello-arm.c b/tests/tcg/arm/hello-arm.c
+index e0daa7ad98..6e5a93bccf 100644
+--- a/tests/tcg/arm/hello-arm.c
++++ b/tests/tcg/arm/hello-arm.c
+@@ -78,9 +78,9 @@ type name(type1 arg1, type2 arg2, type3 arg3, type4 arg=
+4) {				\
+   "mov\tr3,%4\n\t"									\
+   __syscall(name)									\
+   "mov\t%0,r0"										\
+-  	: "=3Dr" (__res)									\
+-  	: "r" ((long)(arg1)),"r" ((long)(arg2)),"r" ((long)(arg3)),"r" ((long=
+)(arg4))	\
+-  	: "r0","r1","r2","r3","lr");							\
++	: "=3Dr" (__res)									\
++	: "r" ((long)(arg1)),"r" ((long)(arg2)),"r" ((long)(arg3)),"r" ((long)(=
+arg4))	\
++	: "r0","r1","r2","r3","lr");							\
+   __syscall_return(type,__res);								\
+ }
+=20
+@@ -96,8 +96,8 @@ type name(type1 arg1, type2 arg2, type3 arg3, type4 arg=
+4, type5 arg5) {			\
+   "mov\tr4,%5\n\t"									\
+   __syscall(name)									\
+   "mov\t%0,r0"										\
+-  	: "=3Dr" (__res)									\
+-  	: "r" ((long)(arg1)),"r" ((long)(arg2)),"r" ((long)(arg3)),"r" ((long=
+)(arg4)),	\
++	: "=3Dr" (__res)									\
++	: "r" ((long)(arg1)),"r" ((long)(arg2)),"r" ((long)(arg3)),"r" ((long)(=
+arg4)),	\
+ 	  "r" ((long)(arg5))								\
+ 	: "r0","r1","r2","r3","r4","lr");						\
+   __syscall_return(type,__res);								\
 --=20
 2.19.2
