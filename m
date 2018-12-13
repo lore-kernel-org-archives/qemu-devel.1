@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gXKYC-0001Ft-Iv
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 01:32:49 -0500
+	(envelope-from <thuth@redhat.com>) id 1gXKdX-00031b-He
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 01:38:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gXKY7-0005fs-Ja
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 01:32:48 -0500
-References: <20181210135803.20208-1-peter.maydell@linaro.org>
+	(envelope-from <thuth@redhat.com>) id 1gXKdN-0002Xv-MT
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 01:38:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44450)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gXKdM-0002TE-UE
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 01:38:09 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 46A54308A973
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 06:38:05 +0000 (UTC)
+References: <20181030123526.26415-1-kchamart@redhat.com>
+	<20181030123526.26415-2-kchamart@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b26019e6-9ad7-229b-4ad5-c47273919bba@redhat.com>
-Date: Thu, 13 Dec 2018 07:32:29 +0100
+Message-ID: <db1d11e0-ea3d-cb52-ee35-67ac473b1dee@redhat.com>
+Date: Thu, 13 Dec 2018 07:38:03 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181210135803.20208-1-peter.maydell@linaro.org>
+In-Reply-To: <20181030123526.26415-2-kchamart@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] hw/s390/ccw.c: Don't take
- address of packed members
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] Deprecate QMP `cpu-add`
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +34,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, patches@linaro.org, Richard Henderson <rth@twiddle.net>
+To: Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, armbru@redhat.com, imammedo@redhat.com
 
-On 2018-12-10 14:58, Peter Maydell wrote:
-> Taking the address of a field in a packed struct is a bad idea, because
-> it might not be actually aligned enough for that pointer type (and
-> thus cause a crash on dereference on some host architectures). Newer
-> versions of clang warn about this.
+On 2018-10-30 13:35, Kashyap Chamarthy wrote:
+> The intended functionality of QMP `cpu-add` is replaced with
+> `device_add` (and `query-hotpluggable-cpus`).  So let's deprecate
+> `cpu-add`.
 > 
-> Avoid the problem by using local copies of the PMCW and SCSW
-> struct fields in copy_schib_from_guest() and copy_schib_to_guest().
+> A complete example of vCPU hotplug with the recommended way (using
+> `device_add`) is provided as part of a seperate docs patch.
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Suggested-by: Eduardo Habkost <ehabkost@redhat.com
+> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
 > ---
-> This seemed like a not totally ugly and reasonably localised fix
-> that satisfies clang. Oddly, this makes the generated object file
-> 15K smaller (421K vs 406K), so it might even be better code...
-> 
->  hw/s390x/css.c | 20 ++++++++++++++++----
->  1 file changed, 16 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 04ec5cc9705..ef07691e36b 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -1290,9 +1290,15 @@ void copy_scsw_to_guest(SCSW *dest, const SCSW *src)
->  static void copy_schib_to_guest(SCHIB *dest, const SCHIB *src)
->  {
->      int i;
-> +    PMCW srcpmcw, destpmcw;
-> +    SCSW srcscsw, destscsw;
+[...]
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index 1b9c007f12..c86924ad9a 100644
+> --- a/qemu-deprecated.texi
+> +++ b/qemu-deprecated.texi
+> @@ -155,6 +155,11 @@ The ``query-cpus'' command is replaced by the ``query-cpus-fast'' command.
+>  The ``arch'' output member of the ``query-cpus-fast'' command is
+>  replaced by the ``target'' output member.
 >  
-> -    copy_pmcw_to_guest(&dest->pmcw, &src->pmcw);
-> -    copy_scsw_to_guest(&dest->scsw, &src->scsw);
-> +    srcpmcw = src->pmcw;
-> +    copy_pmcw_to_guest(&destpmcw, &srcpmcw);
-> +    dest->pmcw = destpmcw;
-> +    srcscsw = src->scsw;
-> +    copy_scsw_to_guest(&destscsw, &srcscsw);
-> +    dest->scsw = destscsw;
->      dest->mba = cpu_to_be64(src->mba);
->      for (i = 0; i < ARRAY_SIZE(dest->mda); i++) {
->          dest->mda[i] = src->mda[i];
-> @@ -1339,9 +1345,15 @@ static void copy_scsw_from_guest(SCSW *dest, const SCSW *src)
->  static void copy_schib_from_guest(SCHIB *dest, const SCHIB *src)
->  {
->      int i;
-> +    PMCW srcpmcw, destpmcw;
-> +    SCSW srcscsw, destscsw;
->  
-> -    copy_pmcw_from_guest(&dest->pmcw, &src->pmcw);
-> -    copy_scsw_from_guest(&dest->scsw, &src->scsw);
-> +    srcpmcw = src->pmcw;
-> +    copy_pmcw_from_guest(&destpmcw, &srcpmcw);
-> +    dest->pmcw = destpmcw;
-> +    srcscsw = src->scsw;
-> +    copy_scsw_from_guest(&destscsw, &srcscsw);
-> +    dest->scsw = destscsw;
->      dest->mba = be64_to_cpu(src->mba);
->      for (i = 0; i < ARRAY_SIZE(dest->mda); i++) {
->          dest->mda[i] = src->mda[i];
-> 
+> +@subsection cpu-add (since 3.1)
 
-May I suggest to add a comment to the code here a la:
+ Hi Kashyap,
 
-  /* Use a local copy to avoid unaligned access to packed structs */
+could you please send a follow-up patch to change this into 4.0 now?
 
-or something similar? Otherwise, I'm pretty sure somebody will revert
-this in a couple of years because they thinks the local copy is not
-really necessary here...
+Please also provide a patch to add the HMP command to
+qemu-deprecated.texi, too.
 
- Thomas
+ Thanks,
+  Thomas
