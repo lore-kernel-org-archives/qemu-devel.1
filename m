@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gXICB-0003kl-1M
+	(envelope-from <dgibson@ozlabs.org>) id 1gXICA-0003kj-Lh
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 23:01:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gXIC6-0002BR-1M
+	(envelope-from <dgibson@ozlabs.org>) id 1gXIC7-0002D6-0M
 	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 23:01:54 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 13 Dec 2018 15:01:17 +1100
-Message-Id: <20181213040126.6768-19-david@gibson.dropbear.id.au>
+Date: Thu, 13 Dec 2018 15:01:13 +1100
+Message-Id: <20181213040126.6768-15-david@gibson.dropbear.id.au>
 In-Reply-To: <20181213040126.6768-1-david@gibson.dropbear.id.au>
 References: <20181213040126.6768-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 18/27] spapr: initialize VSMT before
- initializing the IRQ backend
+Subject: [Qemu-devel] [PULL 14/27] ppc/xive: add support for the LSI
+ interrupt sources
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +28,192 @@ Cc: gkurz@kaod.org, clg@kaod.org, lvivier@redhat.com, spopovyc@redhat.com, qemu-
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-We will need to use xics_max_server_number() to create the sPAPRXive
-object modeling the interrupt controller of the machine which is
-created before the CPUs.
+The 'sent' status of the LSI interrupt source is modeled with the 'P'
+bit of the ESB and the assertion status of the source is maintained
+with an extra bit under the main XiveSource object. The type of the
+source is stored in the same array for practical reasons.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ hw/intc/xive.c        | 66 +++++++++++++++++++++++++++++++++++++++----
+ include/hw/ppc/xive.h | 19 ++++++++++++-
+ 2 files changed, 78 insertions(+), 7 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 051d080fe5..5862c6d4fa 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2464,11 +2464,6 @@ static void spapr_init_cpus(sPAPRMachineState *spa=
-pr)
-         boot_cores_nr =3D possible_cpus->len;
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 6389bd8323..11c7aac962 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -89,14 +89,42 @@ uint8_t xive_source_esb_set(XiveSource *xsrc, uint32_=
+t srcno, uint8_t pq)
+     return xive_esb_set(&xsrc->status[srcno], pq);
+ }
+=20
++/*
++ * Returns whether the event notification should be forwarded.
++ */
++static bool xive_source_lsi_trigger(XiveSource *xsrc, uint32_t srcno)
++{
++    uint8_t old_pq =3D xive_source_esb_get(xsrc, srcno);
++
++    xsrc->status[srcno] |=3D XIVE_STATUS_ASSERTED;
++
++    switch (old_pq) {
++    case XIVE_ESB_RESET:
++        xive_source_esb_set(xsrc, srcno, XIVE_ESB_PENDING);
++        return true;
++    default:
++        return false;
++    }
++}
++
+ /*
+  * Returns whether the event notification should be forwarded.
+  */
+ static bool xive_source_esb_trigger(XiveSource *xsrc, uint32_t srcno)
+ {
++    bool ret;
++
+     assert(srcno < xsrc->nr_irqs);
+=20
+-    return xive_esb_trigger(&xsrc->status[srcno]);
++    ret =3D xive_esb_trigger(&xsrc->status[srcno]);
++
++    if (xive_source_irq_is_lsi(xsrc, srcno) &&
++        xive_source_esb_get(xsrc, srcno) =3D=3D XIVE_ESB_QUEUED) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "XIVE: queued an event on LSI IRQ %d\n", srcno);
++    }
++
++    return ret;
+ }
+=20
+ /*
+@@ -104,9 +132,22 @@ static bool xive_source_esb_trigger(XiveSource *xsrc=
+, uint32_t srcno)
+  */
+ static bool xive_source_esb_eoi(XiveSource *xsrc, uint32_t srcno)
+ {
++    bool ret;
++
+     assert(srcno < xsrc->nr_irqs);
+=20
+-    return xive_esb_eoi(&xsrc->status[srcno]);
++    ret =3D xive_esb_eoi(&xsrc->status[srcno]);
++
++    /* LSI sources do not set the Q bit but they can still be
++     * asserted, in which case we should forward a new event
++     * notification
++     */
++    if (xive_source_irq_is_lsi(xsrc, srcno) &&
++        xsrc->status[srcno] & XIVE_STATUS_ASSERTED) {
++        ret =3D xive_source_lsi_trigger(xsrc, srcno);
++    }
++
++    return ret;
+ }
+=20
+ /*
+@@ -271,8 +312,16 @@ static void xive_source_set_irq(void *opaque, int sr=
+cno, int val)
+     XiveSource *xsrc =3D XIVE_SOURCE(opaque);
+     bool notify =3D false;
+=20
+-    if (val) {
+-        notify =3D xive_source_esb_trigger(xsrc, srcno);
++    if (xive_source_irq_is_lsi(xsrc, srcno)) {
++        if (val) {
++            notify =3D xive_source_lsi_trigger(xsrc, srcno);
++        } else {
++            xsrc->status[srcno] &=3D ~XIVE_STATUS_ASSERTED;
++        }
++    } else {
++        if (val) {
++            notify =3D xive_source_esb_trigger(xsrc, srcno);
++        }
      }
 =20
--    /* VSMT must be set in order to be able to compute VCPU ids, ie to
--     * call xics_max_server_number() or spapr_vcpu_id().
--     */
--    spapr_set_vsmt_mode(spapr, &error_fatal);
--
-     if (smc->pre_2_10_has_unused_icps) {
-         int i;
+     /* Forward the source event notification for routing */
+@@ -292,9 +341,11 @@ void xive_source_pic_print_info(XiveSource *xsrc, ui=
+nt32_t offset, Monitor *mon)
+             continue;
+         }
 =20
-@@ -2591,6 +2586,11 @@ static void spapr_machine_init(MachineState *machi=
-ne)
-     /* Setup a load limit for the ramdisk leaving room for SLOF and FDT =
-*/
-     load_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FW_OVERHEAD;
+-        monitor_printf(mon, "  %08x %c%c\n", i + offset,
++        monitor_printf(mon, "  %08x %s %c%c%c\n", i + offset,
++                       xive_source_irq_is_lsi(xsrc, i) ? "LSI" : "MSI",
+                        pq & XIVE_ESB_VAL_P ? 'P' : '-',
+-                       pq & XIVE_ESB_VAL_Q ? 'Q' : '-');
++                       pq & XIVE_ESB_VAL_Q ? 'Q' : '-',
++                       xsrc->status[i] & XIVE_STATUS_ASSERTED ? 'A' : ' =
+');
+     }
+ }
 =20
-+    /* VSMT must be set in order to be able to compute VCPU ids, ie to
-+     * call xics_max_server_number() or spapr_vcpu_id().
-+     */
-+    spapr_set_vsmt_mode(spapr, &error_fatal);
+@@ -302,6 +353,8 @@ static void xive_source_reset(void *dev)
+ {
+     XiveSource *xsrc =3D XIVE_SOURCE(dev);
+=20
++    /* Do not clear the LSI bitmap */
 +
-     /* Set up Interrupt Controller before we create the VCPUs */
-     smc->irq->init(spapr, &error_fatal);
+     /* PQs are initialized to 0b01 (Q=3D1) which corresponds to "ints of=
+f" */
+     memset(xsrc->status, XIVE_ESB_OFF, xsrc->nr_irqs);
+ }
+@@ -324,6 +377,7 @@ static void xive_source_realize(DeviceState *dev, Err=
+or **errp)
+     }
 =20
+     xsrc->status =3D g_malloc0(xsrc->nr_irqs);
++    xsrc->lsi_map =3D bitmap_new(xsrc->nr_irqs);
+=20
+     memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
+                           &xive_source_esb_ops, xsrc, "xive.esb",
+diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+index 7aa2e38012..7cebc32eba 100644
+--- a/include/hw/ppc/xive.h
++++ b/include/hw/ppc/xive.h
+@@ -162,8 +162,9 @@ typedef struct XiveSource {
+     /* IRQs */
+     uint32_t        nr_irqs;
+     qemu_irq        *qirqs;
++    unsigned long   *lsi_map;
+=20
+-    /* PQ bits */
++    /* PQ bits and LSI assertion bit */
+     uint8_t         *status;
+=20
+     /* ESB memory region */
+@@ -219,6 +220,7 @@ static inline hwaddr xive_source_esb_mgmt(XiveSource =
+*xsrc, int srcno)
+  * When doing an EOI, the Q bit will indicate if the interrupt
+  * needs to be re-triggered.
+  */
++#define XIVE_STATUS_ASSERTED  0x4  /* Extra bit for LSI */
+ #define XIVE_ESB_VAL_P        0x2
+ #define XIVE_ESB_VAL_Q        0x1
+=20
+@@ -257,4 +259,19 @@ static inline qemu_irq xive_source_qirq(XiveSource *=
+xsrc, uint32_t srcno)
+     return xsrc->qirqs[srcno];
+ }
+=20
++static inline bool xive_source_irq_is_lsi(XiveSource *xsrc, uint32_t src=
+no)
++{
++    assert(srcno < xsrc->nr_irqs);
++    return test_bit(srcno, xsrc->lsi_map);
++}
++
++static inline void xive_source_irq_set(XiveSource *xsrc, uint32_t srcno,
++                                       bool lsi)
++{
++    assert(srcno < xsrc->nr_irqs);
++    if (lsi) {
++        bitmap_set(xsrc->lsi_map, srcno, 1);
++    }
++}
++
+ #endif /* PPC_XIVE_H */
 --=20
 2.19.2
