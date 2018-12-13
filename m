@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gXMut-0005NE-BI
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 04:04:28 -0500
+	(envelope-from <philmd@redhat.com>) id 1gXN7N-0001eV-RA
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 04:17:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gXMuh-0001O5-Of
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 04:04:23 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38724)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gXMuh-0001Kt-C8
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 04:04:11 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wBD8xAAE033857
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 04:04:08 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2pbkg83y7q-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 04:04:08 -0500
-Received: from localhost
-	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Thu, 13 Dec 2018 09:04:05 -0000
-From: Greg Kurz <groug@kaod.org>
-Date: Thu, 13 Dec 2018 10:03:43 +0100
-In-Reply-To: <20181213090343.1137475-1-groug@kaod.org>
-References: <20181213090343.1137475-1-groug@kaod.org>
-Message-Id: <20181213090343.1137475-4-groug@kaod.org>
-Subject: [Qemu-devel] [PULL 3/3] 9p: remove support for the "handle" backend
+	(envelope-from <philmd@redhat.com>) id 1gXN7J-0006wp-VT
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 04:17:17 -0500
+Received: from mail-wm1-f41.google.com ([209.85.128.41]:56109)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gXN7J-0006vB-Hq
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 04:17:13 -0500
+Received: by mail-wm1-f41.google.com with SMTP id y139so1507451wmc.5
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 01:17:12 -0800 (PST)
+References: <20181212194009.2951-1-lvivier@redhat.com>
+	<20181212194009.2951-2-lvivier@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <0437051b-f816-6afb-e0d1-8f67a84dd59c@redhat.com>
+Date: Thu, 13 Dec 2018 10:17:09 +0100
+MIME-Version: 1.0
+In-Reply-To: <20181212194009.2951-2-lvivier@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/4] block/ssh: Convert from DPRINTF()
+ macro to trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,848 +31,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-trivial@nongnu.org, "Richard W.M. Jones" <rjones@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Liu Yuan <namei.unix@gmail.com>, Max Reitz <mreitz@redhat.com>
 
-The "handle" fsdev backend was deprecated in QEMU 2.12.0 with:
+On 12/12/18 8:40 PM, Laurent Vivier wrote:
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> ---
+>  block/ssh.c        | 46 +++++++++++++++++-----------------------------
+>  block/trace-events | 17 +++++++++++++++++
+>  2 files changed, 34 insertions(+), 29 deletions(-)
+> 
+> diff --git a/block/ssh.c b/block/ssh.c
+> index 7fbc27abdf..bbc513e095 100644
+> --- a/block/ssh.c
+> +++ b/block/ssh.c
+> @@ -41,27 +41,17 @@
+>  #include "qapi/qmp/qstring.h"
+>  #include "qapi/qobject-input-visitor.h"
+>  #include "qapi/qobject-output-visitor.h"
+> +#include "trace.h"
+>  
+> -/* DEBUG_SSH=1 enables the DPRINTF (debugging printf) statements in
+> - * this block driver code.
+> - *
+> +/*
+>   * TRACE_LIBSSH2=<bitmask> enables tracing in libssh2 itself.  Note
+>   * that this requires that libssh2 was specially compiled with the
+>   * `./configure --enable-debug' option, so most likely you will have
+>   * to compile it yourself.  The meaning of <bitmask> is described
+>   * here: http://www.libssh2.org/libssh2_trace.html
+>   */
+> -#define DEBUG_SSH     0
+>  #define TRACE_LIBSSH2 0 /* or try: LIBSSH2_TRACE_SFTP */
+>  
+> -#define DPRINTF(fmt, ...)                           \
+> -    do {                                            \
+> -        if (DEBUG_SSH) {                            \
+> -            fprintf(stderr, "ssh: %-15s " fmt "\n", \
+> -                    __func__, ##__VA_ARGS__);       \
+> -        }                                           \
+> -    } while (0)
+> -
+>  typedef struct BDRVSSHState {
+>      /* Coroutine. */
+>      CoMutex lock;
+> @@ -336,7 +326,7 @@ static int check_host_key_knownhosts(BDRVSSHState *s,
+>      switch (r) {
+>      case LIBSSH2_KNOWNHOST_CHECK_MATCH:
+>          /* OK */
+> -        DPRINTF("host key OK: %s", found->key);
+> +        trace_ssh_check_host_key_knownhosts(found->key);
+>          break;
+>      case LIBSSH2_KNOWNHOST_CHECK_MISMATCH:
+>          ret = -EINVAL;
+> @@ -721,8 +711,7 @@ static int connect_to_ssh(BDRVSSHState *s, BlockdevOptionsSsh *opts,
+>      }
+>  
+>      /* Open the remote file. */
+> -    DPRINTF("opening file %s flags=0x%x creat_mode=0%o",
+> -            opts->path, ssh_flags, creat_mode);
+> +    trace_ssh_connect_to_ssh(opts->path, ssh_flags, creat_mode);
+>      s->sftp_handle = libssh2_sftp_open(s->sftp, opts->path, ssh_flags,
+>                                         creat_mode);
+>      if (!s->sftp_handle) {
+> @@ -890,7 +879,7 @@ static int coroutine_fn ssh_co_create_opts(const char *filename, QemuOpts *opts,
+>      /* Get desired file size. */
+>      ssh_opts->size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+>                                BDRV_SECTOR_SIZE);
+> -    DPRINTF("total_size=%" PRIi64, ssh_opts->size);
+> +    trace_ssh_co_create_opts(ssh_opts->size);
+>  
+>      uri_options = qdict_new();
+>      ret = parse_uri(filename, uri_options, errp);
+> @@ -946,7 +935,7 @@ static void restart_coroutine(void *opaque)
+>      BDRVSSHState *s = bs->opaque;
+>      AioContext *ctx = bdrv_get_aio_context(bs);
+>  
+> -    DPRINTF("co=%p", restart->co);
+> +    trace_ssh_restart_coroutine(restart->co);
+>      aio_set_fd_handler(ctx, s->sock, false, NULL, NULL, NULL, NULL);
+>  
+>      aio_co_wake(restart->co);
+> @@ -974,13 +963,12 @@ static coroutine_fn void co_yield(BDRVSSHState *s, BlockDriverState *bs)
+>          wr_handler = restart_coroutine;
+>      }
+>  
+> -    DPRINTF("s->sock=%d rd_handler=%p wr_handler=%p", s->sock,
+> -            rd_handler, wr_handler);
+> +    trace_ssh_co_yield(s->sock, rd_handler, wr_handler);
+>  
+>      aio_set_fd_handler(bdrv_get_aio_context(bs), s->sock,
+>                         false, rd_handler, wr_handler, NULL, &restart);
+>      qemu_coroutine_yield();
+> -    DPRINTF("s->sock=%d - back", s->sock);
+> +    trace_ssh_co_yield_back(s->sock);
+>  }
+>  
+>  /* SFTP has a function `libssh2_sftp_seek64' which seeks to a position
+> @@ -1003,7 +991,7 @@ static void ssh_seek(BDRVSSHState *s, int64_t offset, int flags)
+>      bool force = (flags & SSH_SEEK_FORCE) != 0;
+>  
+>      if (force || op_read != s->offset_op_read || offset != s->offset) {
+> -        DPRINTF("seeking to offset=%" PRIi64, offset);
+> +        trace_ssh_seek(offset);
+>          libssh2_sftp_seek64(s->sftp_handle, offset);
+>          s->offset = offset;
+>          s->offset_op_read = op_read;
+> @@ -1019,7 +1007,7 @@ static coroutine_fn int ssh_read(BDRVSSHState *s, BlockDriverState *bs,
+>      char *buf, *end_of_vec;
+>      struct iovec *i;
+>  
+> -    DPRINTF("offset=%" PRIi64 " size=%zu", offset, size);
+> +    trace_ssh_read(offset, size);
+>  
+>      ssh_seek(s, offset, SSH_SEEK_READ);
+>  
+> @@ -1038,9 +1026,9 @@ static coroutine_fn int ssh_read(BDRVSSHState *s, BlockDriverState *bs,
+>       */
+>      for (got = 0; got < size; ) {
+>      again:
+> -        DPRINTF("sftp_read buf=%p size=%zu", buf, end_of_vec - buf);
+> +        trace_ssh_read_buf(buf, end_of_vec - buf);
+>          r = libssh2_sftp_read(s->sftp_handle, buf, end_of_vec - buf);
+> -        DPRINTF("sftp_read returned %zd", r);
+> +        trace_ssh_read_return(r);
+>  
+>          if (r == LIBSSH2_ERROR_EAGAIN || r == LIBSSH2_ERROR_TIMEOUT) {
+>              co_yield(s, bs);
+> @@ -1094,7 +1082,7 @@ static int ssh_write(BDRVSSHState *s, BlockDriverState *bs,
+>      char *buf, *end_of_vec;
+>      struct iovec *i;
+>  
+> -    DPRINTF("offset=%" PRIi64 " size=%zu", offset, size);
+> +    trace_ssh_write(offset, size);
+>  
+>      ssh_seek(s, offset, SSH_SEEK_WRITE);
+>  
+> @@ -1108,9 +1096,9 @@ static int ssh_write(BDRVSSHState *s, BlockDriverState *bs,
+>  
+>      for (written = 0; written < size; ) {
+>      again:
+> -        DPRINTF("sftp_write buf=%p size=%zu", buf, end_of_vec - buf);
+> +        trace_ssh_write_buf(buf, end_of_vec - buf);
+>          r = libssh2_sftp_write(s->sftp_handle, buf, end_of_vec - buf);
+> -        DPRINTF("sftp_write returned %zd", r);
+> +        trace_ssh_write_return(r);
+>  
+>          if (r == LIBSSH2_ERROR_EAGAIN || r == LIBSSH2_ERROR_TIMEOUT) {
+>              co_yield(s, bs);
+> @@ -1187,7 +1175,7 @@ static coroutine_fn int ssh_flush(BDRVSSHState *s, BlockDriverState *bs)
+>  {
+>      int r;
+>  
+> -    DPRINTF("fsync");
+> +    trace_ssh_flush();
+>   again:
+>      r = libssh2_sftp_fsync(s->sftp_handle);
+>      if (r == LIBSSH2_ERROR_EAGAIN || r == LIBSSH2_ERROR_TIMEOUT) {
+> @@ -1238,7 +1226,7 @@ static int64_t ssh_getlength(BlockDriverState *bs)
+>  
+>      /* Note we cannot make a libssh2 call here. */
+>      length = (int64_t) s->attrs.filesize;
+> -    DPRINTF("length=%" PRIi64, length);
+> +    trace_ssh_getlength(length);
+>  
+>      return length;
+>  }
+> diff --git a/block/trace-events b/block/trace-events
+> index 3e8c47bb24..b13b1e9706 100644
+> --- a/block/trace-events
+> +++ b/block/trace-events
+> @@ -156,3 +156,20 @@ nvme_cmd_map_qiov_iov(void *s, int i, void *page, int pages) "s %p iov[%d] %p pa
+>  
+>  # block/iscsi.c
+>  iscsi_xcopy(void *src_lun, uint64_t src_off, void *dst_lun, uint64_t dst_off, uint64_t bytes, int ret) "src_lun %p offset %"PRIu64" dst_lun %p offset %"PRIu64" bytes %"PRIu64" ret %d"
+> +
+> +# block/ssh.c
+> +ssh_restart_coroutine(void *co) "co=%p"
+> +ssh_flush(void) "fsync"
+> +ssh_check_host_key_knownhosts(const char *key) "host key OK: %s"
+> +ssh_connect_to_ssh(char *path, int flags, int mode) "opening file %s flags=0x%x creat_mode=0%o"
+> +ssh_co_yield(int sock, void *rd_handler, void *wr_handler) "s->sock=%d rd_handler=%p wr_handler=%p"
+> +ssh_co_yield_back(int sock) "s->sock=%d - back"
+> +ssh_getlength(int64_t length) "length=%" PRIi64
+> +ssh_co_create_opts(uint64_t size) "total_size=%" PRIu64
+> +ssh_read(int64_t offset, size_t size) "offset=%" PRIi64 " size=%zu"
+> +ssh_read_buf(void *buf, size_t size) "sftp_read buf=%p size=%zu"
+> +ssh_read_return(size_t ret) "sftp_read returned %zd"
+> +ssh_write(int64_t offset, size_t size) "offset=%" PRIi64 " size=%zu"
+> +ssh_write_buf(void *buf, size_t size) "sftp_write buf=%p size=%zu"
+> +ssh_write_return(size_t ret) "sftp_write returned %zd"
 
-commit db3b3c7281ca82e2647e072a1f97db111313dd73
-Author: Greg Kurz <groug@kaod.org>
-Date:   Mon Jan 8 11:18:23 2018 +0100
+%zu?
 
-    9pfs: deprecate handle backend
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-    This backend raise some concerns:
-
-    - doesn't support symlinks
-    - fails +100 tests in the PJD POSIX file system test suite [1]
-    - requires the QEMU process to run with the CAP_DAC_READ_SEARCH
-      capability, which isn't recommended for security reasons
-
-    This backend should not be used and wil be removed. The 'local'
-    backend is the recommended alternative.
-
-    [1] https://www.tuxera.com/community/posix-test-suite/
-
-    Signed-off-by: Greg Kurz <groug@kaod.org>
-    Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-    Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
-
-It has passed the two release cooling period without any complaint.
-
-Remove it now.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- fsdev/qemu-fsdev.c    |   3 -
- hw/9pfs/9p-handle.c   | 710 ------------------------------------------
- hw/9pfs/Makefile.objs |   1 -
- qemu-deprecated.texi  |   8 -
- qemu-options.hx       |   8 +-
- 5 files changed, 4 insertions(+), 726 deletions(-)
- delete mode 100644 hw/9pfs/9p-handle.c
-
-diff --git a/fsdev/qemu-fsdev.c b/fsdev/qemu-fsdev.c
-index 7a3b87cc9e38..4536fd977d50 100644
---- a/fsdev/qemu-fsdev.c
-+++ b/fsdev/qemu-fsdev.c
-@@ -23,9 +23,6 @@ static QTAILQ_HEAD(FsDriverEntry_head, FsDriverListEntry) fsdriver_entries =
- 
- static FsDriverTable FsDrivers[] = {
-     { .name = "local", .ops = &local_ops},
--#ifdef CONFIG_OPEN_BY_HANDLE
--    { .name = "handle", .ops = &handle_ops},
--#endif
-     { .name = "synth", .ops = &synth_ops},
-     { .name = "proxy", .ops = &proxy_ops},
- };
-diff --git a/hw/9pfs/9p-handle.c b/hw/9pfs/9p-handle.c
-deleted file mode 100644
-index 3465b1ef3063..000000000000
---- a/hw/9pfs/9p-handle.c
-+++ /dev/null
-@@ -1,710 +0,0 @@
--/*
-- * 9p handle callback
-- *
-- * Copyright IBM, Corp. 2011
-- *
-- * Authors:
-- *    Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
-- *
-- * This work is licensed under the terms of the GNU GPL, version 2.  See
-- * the COPYING file in the top-level directory.
-- *
-- */
--
--#include "qemu/osdep.h"
--#include "9p.h"
--#include "9p-xattr.h"
--#include <arpa/inet.h>
--#include <pwd.h>
--#include <grp.h>
--#include <sys/socket.h>
--#include <sys/un.h>
--#include "qapi/error.h"
--#include "qemu/xattr.h"
--#include "qemu/cutils.h"
--#include "qemu/error-report.h"
--#include "qemu/option.h"
--#include <linux/fs.h>
--#ifdef CONFIG_LINUX_MAGIC_H
--#include <linux/magic.h>
--#endif
--#include <sys/ioctl.h>
--
--#ifndef XFS_SUPER_MAGIC
--#define XFS_SUPER_MAGIC  0x58465342
--#endif
--#ifndef EXT2_SUPER_MAGIC
--#define EXT2_SUPER_MAGIC 0xEF53
--#endif
--#ifndef REISERFS_SUPER_MAGIC
--#define REISERFS_SUPER_MAGIC 0x52654973
--#endif
--#ifndef BTRFS_SUPER_MAGIC
--#define BTRFS_SUPER_MAGIC 0x9123683E
--#endif
--
--typedef struct HandleData {
--    int mountfd;
--    int handle_bytes;
--} HandleData;
--
--static inline int name_to_handle(int dirfd, const char *name,
--                                 struct file_handle *fh, int *mnt_id, int flags)
--{
--    return name_to_handle_at(dirfd, name, fh, mnt_id, flags);
--}
--
--static inline int open_by_handle(int mountfd, const char *fh, int flags)
--{
--    return open_by_handle_at(mountfd, (struct file_handle *)fh, flags);
--}
--
--static int handle_update_file_cred(int dirfd, const char *name, FsCred *credp)
--{
--    int fd, ret;
--    fd = openat(dirfd, name, O_NONBLOCK | O_NOFOLLOW);
--    if (fd < 0) {
--        return fd;
--    }
--    ret = fchownat(fd, "", credp->fc_uid, credp->fc_gid, AT_EMPTY_PATH);
--    if (ret < 0) {
--        goto err_out;
--    }
--    ret = fchmod(fd, credp->fc_mode & 07777);
--err_out:
--    close(fd);
--    return ret;
--}
--
--
--static int handle_lstat(FsContext *fs_ctx, V9fsPath *fs_path,
--                        struct stat *stbuf)
--{
--    int fd, ret;
--    HandleData *data = (HandleData *) fs_ctx->private;
--
--    fd = open_by_handle(data->mountfd, fs_path->data, O_PATH);
--    if (fd < 0) {
--        return fd;
--    }
--    ret = fstatat(fd, "", stbuf, AT_EMPTY_PATH);
--    close(fd);
--    return ret;
--}
--
--static ssize_t handle_readlink(FsContext *fs_ctx, V9fsPath *fs_path,
--                               char *buf, size_t bufsz)
--{
--    int fd, ret;
--    HandleData *data = (HandleData *) fs_ctx->private;
--
--    fd = open_by_handle(data->mountfd, fs_path->data, O_PATH);
--    if (fd < 0) {
--        return fd;
--    }
--    ret = readlinkat(fd, "", buf, bufsz);
--    close(fd);
--    return ret;
--}
--
--static int handle_close(FsContext *ctx, V9fsFidOpenState *fs)
--{
--    return close(fs->fd);
--}
--
--static int handle_closedir(FsContext *ctx, V9fsFidOpenState *fs)
--{
--    return closedir(fs->dir.stream);
--}
--
--static int handle_open(FsContext *ctx, V9fsPath *fs_path,
--                       int flags, V9fsFidOpenState *fs)
--{
--    HandleData *data = (HandleData *) ctx->private;
--
--    fs->fd = open_by_handle(data->mountfd, fs_path->data, flags);
--    return fs->fd;
--}
--
--static int handle_opendir(FsContext *ctx,
--                          V9fsPath *fs_path, V9fsFidOpenState *fs)
--{
--    int ret;
--    ret = handle_open(ctx, fs_path, O_DIRECTORY, fs);
--    if (ret < 0) {
--        return -1;
--    }
--    fs->dir.stream = fdopendir(ret);
--    if (!fs->dir.stream) {
--        return -1;
--    }
--    return 0;
--}
--
--static void handle_rewinddir(FsContext *ctx, V9fsFidOpenState *fs)
--{
--    rewinddir(fs->dir.stream);
--}
--
--static off_t handle_telldir(FsContext *ctx, V9fsFidOpenState *fs)
--{
--    return telldir(fs->dir.stream);
--}
--
--static struct dirent *handle_readdir(FsContext *ctx, V9fsFidOpenState *fs)
--{
--    return readdir(fs->dir.stream);
--}
--
--static void handle_seekdir(FsContext *ctx, V9fsFidOpenState *fs, off_t off)
--{
--    seekdir(fs->dir.stream, off);
--}
--
--static ssize_t handle_preadv(FsContext *ctx, V9fsFidOpenState *fs,
--                             const struct iovec *iov,
--                             int iovcnt, off_t offset)
--{
--#ifdef CONFIG_PREADV
--    return preadv(fs->fd, iov, iovcnt, offset);
--#else
--    int err = lseek(fs->fd, offset, SEEK_SET);
--    if (err == -1) {
--        return err;
--    } else {
--        return readv(fs->fd, iov, iovcnt);
--    }
--#endif
--}
--
--static ssize_t handle_pwritev(FsContext *ctx, V9fsFidOpenState *fs,
--                              const struct iovec *iov,
--                              int iovcnt, off_t offset)
--{
--    ssize_t ret;
--#ifdef CONFIG_PREADV
--    ret = pwritev(fs->fd, iov, iovcnt, offset);
--#else
--    int err = lseek(fs->fd, offset, SEEK_SET);
--    if (err == -1) {
--        return err;
--    } else {
--        ret = writev(fs->fd, iov, iovcnt);
--    }
--#endif
--#ifdef CONFIG_SYNC_FILE_RANGE
--    if (ret > 0 && ctx->export_flags & V9FS_IMMEDIATE_WRITEOUT) {
--        /*
--         * Initiate a writeback. This is not a data integrity sync.
--         * We want to ensure that we don't leave dirty pages in the cache
--         * after write when writeout=immediate is sepcified.
--         */
--        sync_file_range(fs->fd, offset, ret,
--                        SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WRITE);
--    }
--#endif
--    return ret;
--}
--
--static int handle_chmod(FsContext *fs_ctx, V9fsPath *fs_path, FsCred *credp)
--{
--    int fd, ret;
--    HandleData *data = (HandleData *) fs_ctx->private;
--
--    fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK);
--    if (fd < 0) {
--        return fd;
--    }
--    ret = fchmod(fd, credp->fc_mode);
--    close(fd);
--    return ret;
--}
--
--static int handle_mknod(FsContext *fs_ctx, V9fsPath *dir_path,
--                       const char *name, FsCred *credp)
--{
--    int dirfd, ret;
--    HandleData *data = (HandleData *) fs_ctx->private;
--
--    dirfd = open_by_handle(data->mountfd, dir_path->data, O_PATH);
--    if (dirfd < 0) {
--        return dirfd;
--    }
--    ret = mknodat(dirfd, name, credp->fc_mode, credp->fc_rdev);
--    if (!ret) {
--        ret = handle_update_file_cred(dirfd, name, credp);
--    }
--    close(dirfd);
--    return ret;
--}
--
--static int handle_mkdir(FsContext *fs_ctx, V9fsPath *dir_path,
--                       const char *name, FsCred *credp)
--{
--    int dirfd, ret;
--    HandleData *data = (HandleData *) fs_ctx->private;
--
--    dirfd = open_by_handle(data->mountfd, dir_path->data, O_PATH);
--    if (dirfd < 0) {
--        return dirfd;
--    }
--    ret = mkdirat(dirfd, name, credp->fc_mode);
--    if (!ret) {
--        ret = handle_update_file_cred(dirfd, name, credp);
--    }
--    close(dirfd);
--    return ret;
--}
--
--static int handle_fstat(FsContext *fs_ctx, int fid_type,
--                        V9fsFidOpenState *fs, struct stat *stbuf)
--{
--    int fd;
--
--    if (fid_type == P9_FID_DIR) {
--        fd = dirfd(fs->dir.stream);
--    } else {
--        fd = fs->fd;
--    }
--    return fstat(fd, stbuf);
--}
--
--static int handle_open2(FsContext *fs_ctx, V9fsPath *dir_path, const char *name,
--                        int flags, FsCred *credp, V9fsFidOpenState *fs)
--{
--    int ret;
--    int dirfd, fd;
--    HandleData *data = (HandleData *) fs_ctx->private;
--
--    dirfd = open_by_handle(data->mountfd, dir_path->data, O_PATH);
--    if (dirfd < 0) {
--        return dirfd;
--    }
--    fd = openat(dirfd, name, flags | O_NOFOLLOW, credp->fc_mode);
--    if (fd >= 0) {
--        ret = handle_update_file_cred(dirfd, name, credp);
--        if (ret < 0) {
--            close(fd);
--            fd = ret;
--        } else {
--            fs->fd = fd;
--        }
--    }
--    close(dirfd);
--    return fd;
--}
--
--
--static int handle_symlink(FsContext *fs_ctx, const char *oldpath,
--                          V9fsPath *dir_path, const char *name, FsCred *credp)
--{
--    int fd, dirfd, ret;
--    HandleData *data = (HandleData *) fs_ctx->private;
--
--    dirfd = open_by_handle(data->mountfd, dir_path->data, O_PATH);
--    if (dirfd < 0) {
--        return dirfd;
--    }
--    ret = symlinkat(oldpath, dirfd, name);
--    if (!ret) {
--        fd = openat(dirfd, name, O_PATH | O_NOFOLLOW);
--        if (fd < 0) {
--            ret = fd;
--            goto err_out;
--        }
--        ret = fchownat(fd, "", credp->fc_uid, credp->fc_gid, AT_EMPTY_PATH);
--        close(fd);
--    }
--err_out:
--    close(dirfd);
--    return ret;
--}
--
--static int handle_link(FsContext *ctx, V9fsPath *oldpath,
--                       V9fsPath *dirpath, const char *name)
--{
--    int oldfd, newdirfd, ret;
--    HandleData *data = (HandleData *) ctx->private;
--
--    oldfd = open_by_handle(data->mountfd, oldpath->data, O_PATH);
--    if (oldfd < 0) {
--        return oldfd;
--    }
--    newdirfd = open_by_handle(data->mountfd, dirpath->data, O_PATH);
--    if (newdirfd < 0) {
--        close(oldfd);
--        return newdirfd;
--    }
--    ret = linkat(oldfd, "", newdirfd, name, AT_EMPTY_PATH);
--    close(newdirfd);
--    close(oldfd);
--    return ret;
--}
--
--static int handle_truncate(FsContext *ctx, V9fsPath *fs_path, off_t size)
--{
--    int fd, ret;
--    HandleData *data = (HandleData *) ctx->private;
--
--    fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK | O_WRONLY);
--    if (fd < 0) {
--        return fd;
--    }
--    ret = ftruncate(fd, size);
--    close(fd);
--    return ret;
--}
--
--static int handle_rename(FsContext *ctx, const char *oldpath,
--                         const char *newpath)
--{
--    errno = EOPNOTSUPP;
--    return -1;
--}
--
--static int handle_chown(FsContext *fs_ctx, V9fsPath *fs_path, FsCred *credp)
--{
--    int fd, ret;
--    HandleData *data = (HandleData *) fs_ctx->private;
--
--    fd = open_by_handle(data->mountfd, fs_path->data, O_PATH);
--    if (fd < 0) {
--        return fd;
--    }
--    ret = fchownat(fd, "", credp->fc_uid, credp->fc_gid, AT_EMPTY_PATH);
--    close(fd);
--    return ret;
--}
--
--static int handle_utimensat(FsContext *ctx, V9fsPath *fs_path,
--                            const struct timespec *buf)
--{
--    int ret;
--    int fd;
--    HandleData *data = (HandleData *) ctx->private;
--
--    fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK);
--    if (fd < 0) {
--        return fd;
--    }
--    ret = futimens(fd, buf);
--    close(fd);
--    return ret;
--}
--
--static int handle_remove(FsContext *ctx, const char *path)
--{
--    errno = EOPNOTSUPP;
--    return -1;
--}
--
--static int handle_fsync(FsContext *ctx, int fid_type,
--                        V9fsFidOpenState *fs, int datasync)
--{
--    int fd;
--
--    if (fid_type == P9_FID_DIR) {
--        fd = dirfd(fs->dir.stream);
--    } else {
--        fd = fs->fd;
--    }
--
--    if (datasync) {
--        return qemu_fdatasync(fd);
--    } else {
--        return fsync(fd);
--    }
--}
--
--static int handle_statfs(FsContext *ctx, V9fsPath *fs_path,
--                         struct statfs *stbuf)
--{
--    int fd, ret;
--    HandleData *data = (HandleData *) ctx->private;
--
--    fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK);
--    if (fd < 0) {
--        return fd;
--    }
--    ret = fstatfs(fd, stbuf);
--    close(fd);
--    return ret;
--}
--
--static ssize_t handle_lgetxattr(FsContext *ctx, V9fsPath *fs_path,
--                                const char *name, void *value, size_t size)
--{
--    int fd, ret;
--    HandleData *data = (HandleData *) ctx->private;
--
--    fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK);
--    if (fd < 0) {
--        return fd;
--    }
--    ret = fgetxattr(fd, name, value, size);
--    close(fd);
--    return ret;
--}
--
--static ssize_t handle_llistxattr(FsContext *ctx, V9fsPath *fs_path,
--                                 void *value, size_t size)
--{
--    int fd, ret;
--    HandleData *data = (HandleData *) ctx->private;
--
--    fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK);
--    if (fd < 0) {
--        return fd;
--    }
--    ret = flistxattr(fd, value, size);
--    close(fd);
--    return ret;
--}
--
--static int handle_lsetxattr(FsContext *ctx, V9fsPath *fs_path, const char *name,
--                            void *value, size_t size, int flags)
--{
--    int fd, ret;
--    HandleData *data = (HandleData *) ctx->private;
--
--    fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK);
--    if (fd < 0) {
--        return fd;
--    }
--    ret = fsetxattr(fd, name, value, size, flags);
--    close(fd);
--    return ret;
--}
--
--static int handle_lremovexattr(FsContext *ctx, V9fsPath *fs_path,
--                               const char *name)
--{
--    int fd, ret;
--    HandleData *data = (HandleData *) ctx->private;
--
--    fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK);
--    if (fd < 0) {
--        return fd;
--    }
--    ret = fremovexattr(fd, name);
--    close(fd);
--    return ret;
--}
--
--static int handle_name_to_path(FsContext *ctx, V9fsPath *dir_path,
--                              const char *name, V9fsPath *target)
--{
--    char *buffer;
--    struct file_handle *fh;
--    int dirfd, ret, mnt_id;
--    HandleData *data = (HandleData *) ctx->private;
--
--    /* "." and ".." are not allowed */
--    if (!strcmp(name, ".") || !strcmp(name, "..")) {
--        errno = EINVAL;
--        return -1;
--
--    }
--    if (dir_path) {
--        dirfd = open_by_handle(data->mountfd, dir_path->data, O_PATH);
--    } else {
--        /* relative to export root */
--        buffer = rpath(ctx, ".");
--        dirfd = open(buffer, O_DIRECTORY);
--        g_free(buffer);
--    }
--    if (dirfd < 0) {
--        return dirfd;
--    }
--    fh = g_malloc(sizeof(struct file_handle) + data->handle_bytes);
--    fh->handle_bytes = data->handle_bytes;
--    /* add a "./" at the beginning of the path */
--    buffer = g_strdup_printf("./%s", name);
--    /* flag = 0 imply don't follow symlink */
--    ret = name_to_handle(dirfd, buffer, fh, &mnt_id, 0);
--    if (!ret) {
--        target->data = (char *)fh;
--        target->size = sizeof(struct file_handle) + data->handle_bytes;
--    } else {
--        g_free(fh);
--    }
--    close(dirfd);
--    g_free(buffer);
--    return ret;
--}
--
--static int handle_renameat(FsContext *ctx, V9fsPath *olddir,
--                           const char *old_name, V9fsPath *newdir,
--                           const char *new_name)
--{
--    int olddirfd, newdirfd, ret;
--    HandleData *data = (HandleData *) ctx->private;
--
--    olddirfd = open_by_handle(data->mountfd, olddir->data, O_PATH);
--    if (olddirfd < 0) {
--        return olddirfd;
--    }
--    newdirfd = open_by_handle(data->mountfd, newdir->data, O_PATH);
--    if (newdirfd < 0) {
--        close(olddirfd);
--        return newdirfd;
--    }
--    ret = renameat(olddirfd, old_name, newdirfd, new_name);
--    close(newdirfd);
--    close(olddirfd);
--    return ret;
--}
--
--static int handle_unlinkat(FsContext *ctx, V9fsPath *dir,
--                           const char *name, int flags)
--{
--    int dirfd, ret;
--    HandleData *data = (HandleData *) ctx->private;
--
--    dirfd = open_by_handle(data->mountfd, dir->data, O_PATH);
--    if (dirfd < 0) {
--        return dirfd;
--    }
--
--    ret = unlinkat(dirfd, name, flags);
--
--    close(dirfd);
--    return ret;
--}
--
--static int handle_ioc_getversion(FsContext *ctx, V9fsPath *path,
--                                 mode_t st_mode, uint64_t *st_gen)
--{
--#ifdef FS_IOC_GETVERSION
--    int err;
--    V9fsFidOpenState fid_open;
--
--    /*
--     * Do not try to open special files like device nodes, fifos etc
--     * We can get fd for regular files and directories only
--     */
--    if (!S_ISREG(st_mode) && !S_ISDIR(st_mode)) {
--        errno = ENOTTY;
--        return -1;
--    }
--    err = handle_open(ctx, path, O_RDONLY, &fid_open);
--    if (err < 0) {
--        return err;
--    }
--    err = ioctl(fid_open.fd, FS_IOC_GETVERSION, st_gen);
--    handle_close(ctx, &fid_open);
--    return err;
--#else
--    errno = ENOTTY;
--    return -1;
--#endif
--}
--
--static int handle_init(FsContext *ctx, Error **errp)
--{
--    int ret, mnt_id;
--    struct statfs stbuf;
--    struct file_handle fh;
--    HandleData *data = g_malloc(sizeof(HandleData));
--
--    data->mountfd = open(ctx->fs_root, O_DIRECTORY);
--    if (data->mountfd < 0) {
--        ret = data->mountfd;
--        goto err_out;
--    }
--    ret = statfs(ctx->fs_root, &stbuf);
--    if (!ret) {
--        switch (stbuf.f_type) {
--        case EXT2_SUPER_MAGIC:
--        case BTRFS_SUPER_MAGIC:
--        case REISERFS_SUPER_MAGIC:
--        case XFS_SUPER_MAGIC:
--            ctx->exops.get_st_gen = handle_ioc_getversion;
--            break;
--        }
--    }
--    memset(&fh, 0, sizeof(struct file_handle));
--    ret = name_to_handle(data->mountfd, ".", &fh, &mnt_id, 0);
--    if (ret && errno == EOVERFLOW) {
--        data->handle_bytes = fh.handle_bytes;
--        ctx->private = data;
--        ret = 0;
--        goto out;
--    }
--    /* we got 0 byte handle ? */
--    ret = -1;
--    close(data->mountfd);
--err_out:
--    g_free(data);
--out:
--    return ret;
--}
--
--static void handle_cleanup(FsContext *ctx)
--{
--    HandleData *data = ctx->private;
--
--    close(data->mountfd);
--    g_free(data);
--}
--
--static int handle_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
--{
--    const char *sec_model = qemu_opt_get(opts, "security_model");
--    const char *path = qemu_opt_get(opts, "path");
--
--    warn_report("handle backend is deprecated");
--
--    if (sec_model) {
--        error_setg(errp,
--                   "Invalid argument security_model specified with handle fsdriver");
--        return -1;
--    }
--
--    if (!path) {
--        error_setg(errp, "fsdev: No path specified");
--        return -1;
--    }
--    fse->path = g_strdup(path);
--    return 0;
--
--}
--
--FileOperations handle_ops = {
--    .parse_opts   = handle_parse_opts,
--    .init         = handle_init,
--    .cleanup      = handle_cleanup,
--    .lstat        = handle_lstat,
--    .readlink     = handle_readlink,
--    .close        = handle_close,
--    .closedir     = handle_closedir,
--    .open         = handle_open,
--    .opendir      = handle_opendir,
--    .rewinddir    = handle_rewinddir,
--    .telldir      = handle_telldir,
--    .readdir      = handle_readdir,
--    .seekdir      = handle_seekdir,
--    .preadv       = handle_preadv,
--    .pwritev      = handle_pwritev,
--    .chmod        = handle_chmod,
--    .mknod        = handle_mknod,
--    .mkdir        = handle_mkdir,
--    .fstat        = handle_fstat,
--    .open2        = handle_open2,
--    .symlink      = handle_symlink,
--    .link         = handle_link,
--    .truncate     = handle_truncate,
--    .rename       = handle_rename,
--    .chown        = handle_chown,
--    .utimensat    = handle_utimensat,
--    .remove       = handle_remove,
--    .fsync        = handle_fsync,
--    .statfs       = handle_statfs,
--    .lgetxattr    = handle_lgetxattr,
--    .llistxattr   = handle_llistxattr,
--    .lsetxattr    = handle_lsetxattr,
--    .lremovexattr = handle_lremovexattr,
--    .name_to_path = handle_name_to_path,
--    .renameat     = handle_renameat,
--    .unlinkat     = handle_unlinkat,
--};
-diff --git a/hw/9pfs/Makefile.objs b/hw/9pfs/Makefile.objs
-index e3fa673665e4..8ac04962bd13 100644
---- a/hw/9pfs/Makefile.objs
-+++ b/hw/9pfs/Makefile.objs
-@@ -4,7 +4,6 @@ common-obj-y += 9p-local.o 9p-xattr.o
- common-obj-y += 9p-xattr-user.o 9p-posix-acl.o
- common-obj-y += coth.o cofs.o codir.o cofile.o
- common-obj-y += coxattr.o 9p-synth.o
--common-obj-$(CONFIG_OPEN_BY_HANDLE) +=  9p-handle.o
- common-obj-y += 9p-proxy.o
- endif
- 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 72b8191d6014..e362d3722543 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -46,14 +46,6 @@ would automatically enable USB support on the machine type.
- If using the new syntax, USB support must be explicitly
- enabled via the ``-machine usb=on'' argument.
- 
--@subsection -fsdev handle (since 2.12.0)
--
--The ``handle'' fsdev backend does not support symlinks and causes the 9p
--filesystem in the guest to fail a fair amount of tests from the PJD POSIX
--filesystem test suite. Also it requires the CAP_DAC_READ_SEARCH capability,
--which is not the recommended way to run QEMU. This backend should not be
--used and it will be removed with no replacement.
--
- @subsection -no-frame (since 2.12.0)
- 
- The @code{--no-frame} argument works with SDL 1.2 only. The other user
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 269eda7a5da3..df42116eccc7 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1019,7 +1019,7 @@ Define a new file system device. Valid options are:
- @table @option
- @item @var{fsdriver}
- This option specifies the fs driver backend to use.
--Currently "local", "handle" and "proxy" file system drivers are supported.
-+Currently "local" and "proxy" file system drivers are supported.
- @item id=@var{id}
- Specifies identifier for this device
- @item path=@var{path}
-@@ -1037,7 +1037,7 @@ hidden .virtfs_metadata directory. Directories exported by this security model c
- interact with other unix tools. "none" security model is same as
- passthrough except the sever won't report failures if it fails to
- set file attributes like ownership. Security model is mandatory
--only for local fsdriver. Other fsdrivers (like handle, proxy) don't take
-+only for local fsdriver. Other fsdrivers (like proxy) don't take
- security model as a parameter.
- @item writeout=@var{writeout}
- This is an optional argument. The only supported value is "immediate".
-@@ -1088,7 +1088,7 @@ The general form of a Virtual File system pass-through options are:
- @table @option
- @item @var{fsdriver}
- This option specifies the fs driver backend to use.
--Currently "local", "handle" and "proxy" file system drivers are supported.
-+Currently "local" and "proxy" file system drivers are supported.
- @item id=@var{id}
- Specifies identifier for this device
- @item path=@var{path}
-@@ -1106,7 +1106,7 @@ hidden .virtfs_metadata directory. Directories exported by this security model c
- interact with other unix tools. "none" security model is same as
- passthrough except the sever won't report failures if it fails to
- set file attributes like ownership. Security model is mandatory only
--for local fsdriver. Other fsdrivers (like handle, proxy) don't take security
-+for local fsdriver. Other fsdrivers (like proxy) don't take security
- model as a parameter.
- @item writeout=@var{writeout}
- This is an optional argument. The only supported value is "immediate".
--- 
-2.17.2
+> +ssh_seek(uint64_t offset) "seeking to offset=%" PRIi64
+> 
