@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXPym-0007RY-15
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:20:36 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gXPzM-0007lP-Eu
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:21:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXPyj-0008Ld-Tf
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:20:35 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181130144705.77454-1-anton.nefedov@virtuozzo.com>
-	<20181130144705.77454-10-anton.nefedov@virtuozzo.com>
-Date: Thu, 13 Dec 2018 13:20:16 +0100
-In-Reply-To: <20181130144705.77454-10-anton.nefedov@virtuozzo.com> (Anton
-	Nefedov's message of "Fri, 30 Nov 2018 14:47:27 +0000")
-Message-ID: <8736r1bou7.fsf@dusky.pond.sub.org>
+	(envelope-from <kwolf@redhat.com>) id 1gXPzE-0003ih-Gi
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:21:09 -0500
+Date: Thu, 13 Dec 2018 13:20:39 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181213122039.GC5427@linux.fritz.box>
+References: <20181205122326.26625-1-dplotnikov@virtuozzo.com>
+	<20181207122647.GE5119@linux.fritz.box>
+	<bb51b8f9-a3a4-90e6-2f69-57e90ccd623a@virtuozzo.com>
+	<20181212122457.GB5415@linux.fritz.box>
+	<d0d2cab4-2157-1f9f-3bc9-a70f28a211b0@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 9/9] qapi: query-blockstat: add driver
- specific file-posix stats
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d0d2cab4-2157-1f9f-3bc9-a70f28a211b0@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH] blk: postpone request execution on a
+ context protected with "drained section"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,113 +27,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "famz@redhat.com" <famz@redhat.com>, Denis Lunev <den@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "berto@igalia.com" <berto@igalia.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Cc: "keith.busch@intel.com" <keith.busch@intel.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>, "famz@redhat.com" <famz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-I'm reviewing just the QAPI schema today.
+Am 13.12.2018 um 12:07 hat Denis Plotnikov geschrieben:
+> On 12.12.2018 15:24, Kevin Wolf wrote:
+> > Am 11.12.2018 um 17:55 hat Denis Plotnikov geschrieben:
+> >>> Why involve the AioContext at all? This could all be kept at the
+> >>> BlockBackend level without extending the layering violation that
+> >>> aio_disable_external() is.
+> >>>
+> >>> BlockBackends get notified when their root node is drained, so hooking
+> >>> things up there should be as easy, if not even easier than in
+> >>> AioContext.
+> >>
+> >> Just want to make sure that I understood correctly what you meant by
+> >> "BlockBackends get notified". Did you mean that bdrv_drain_end calls
+> >> child's role callback blk_root_drained_end by calling
+> >> bdrv_parent_drained_end?
+> > 
+> > Yes, blk_root_drained_begin/end calls are all you need. Specifically,
+> > their adjustments to blk->quiesce_counter that are already there, and in
+> > the 'if (--blk->quiesce_counter == 0)' block of blk_root_drained_end()
+> > we can resume the queued requests.
+> Sounds it should be so, but it doesn't work that way and that's why:
+> when doing mirror we may resume postponed coroutines too early when the 
+> underlying bs is protected from writing at and thus we encounter the 
+> assert on a write request execution at bdrv_co_write_req_prepare when 
+> resuming the postponed coroutines.
+> 
+> The thing is that the bs is protected for writing before execution of 
+> bdrv_replace_node at mirror_exit_common and bdrv_replace_node calls 
+> bdrv_replace_child_noperm which, in turn, calls child->role->drained_end 
+> where one of the callbacks is blk_root_drained_end which check 
+> if(--blk->quiesce_counter == 0) and runs the postponed requests 
+> (coroutines) if the coundition is true.
 
-Anton Nefedov <anton.nefedov@virtuozzo.com> writes:
+Hm, so something is messed up with the drain sections in the mirror
+driver. We have:
 
-> A block driver can provide a callback to report driver-specific
-> statistics.
->
-> file-posix driver now reports discard statistics
->
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> ---
->  qapi/block-core.json      | 38 ++++++++++++++++++++++++++++++++++++++
->  include/block/block.h     |  1 +
->  include/block/block_int.h |  1 +
->  block.c                   |  9 +++++++++
->  block/file-posix.c        | 32 ++++++++++++++++++++++++++++++++
->  block/qapi.c              |  5 +++++
->  6 files changed, 86 insertions(+)
->
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 959358ccc4..b100e852c7 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -877,6 +877,41 @@
->             '*x_wr_latency_histogram': 'BlockLatencyHistogramInfo',
->             '*x_flush_latency_histogram': 'BlockLatencyHistogramInfo' } }
->  
-> +##
-> +# @BlockStatsSpecificFile:
-> +#
-> +# File driver statistics
-> +#
-> +# @discard-nb-ok: The number of succeeded discard operations performed by
+    bdrv_drained_begin(target_bs);
+    bdrv_replace_node(to_replace, target_bs, &local_err);
+    bdrv_drained_end(target_bs);
 
-successful discard operations
+Obviously, the intention was to keep the BlockBackend drained during
+bdrv_replace_node(). So how could blk->quiesce_counter ever get to 0
+inside bdrv_replace_node() when target_bs is drained?
 
-> +#                 the driver.
-> +#
-> +# @discard-nb-failed: The number of failed discard operations performed by
-> +#                     the driver.
-> +#
-> +# @discard-bytes-ok: The number of bytes discarded by the driver.
-> +#
-> +# Since: 4.0
-> +##
-> +{ 'struct': 'BlockStatsSpecificFile',
-> +  'data': {
-> +      'discard-nb-ok': 'int',
-> +      'discard-nb-failed': 'int',
-> +      'discard-bytes-ok': 'int' } }
+Looking at bdrv_replace_child_noperm(), it seems that the function has
+a bug: Even if old_bs and new_bs are both drained, the quiesce_counter
+for the parent reaches 0 for a moment because we call .drained_end for
+the old child first and .drained_begin for the new one later.
 
-Should these be unsigned?
+So it seems the fix would be to reverse the order and first call
+.drained_begin for the new child and then .drained_end for the old
+child. Sounds like a good new testcase for tests/test-bdrv-drain.c, too.
 
-For what it's worth, similar counters nearby are also 'int'.
+> In seems that if the external requests disabled on the context we can't 
+> rely on anything or should check where the underlying bs and its 
+> underlying nodes are ready to receive requests which sounds quite 
+> complicated.
+> Please correct me if still don't understand something in that routine.
 
-> +
-> +##
-> +# @BlockStatsSpecific:
-> +#
-> +# Block driver specific statistics
-> +#
-> +# Since: 4.0
-> +##
-> +{ 'union': 'BlockStatsSpecific',
-> +  'base': { 'driver': 'BlockdevDriver' },
-> +  'discriminator': 'driver',
-> +  'data': {
-> +      'file': 'BlockStatsSpecificFile',
-> +      'host_device': 'BlockStatsSpecificFile' } }
-> +
->  ##
->  # @BlockStats:
->  #
-> @@ -892,6 +927,8 @@
->  #
->  # @stats:  A @BlockDeviceStats for the device.
->  #
-> +# @driver-specific: Optional driver-specific stats. (Since 4.0)
-> +#
->  # @parent: This describes the file block device if it has one.
->  #          Contains recursively the statistics of the underlying
->  #          protocol (e.g. the host file for a qcow2 image). If there is
-> @@ -905,6 +942,7 @@
->  { 'struct': 'BlockStats',
->    'data': {'*device': 'str', '*qdev': 'str', '*node-name': 'str',
->             'stats': 'BlockDeviceStats',
-> +           '*driver-specific': 'BlockStatsSpecific',
->             '*parent': 'BlockStats',
->             '*backing': 'BlockStats'} }
->  
+I think the reason why reyling on aio_disable_external() works is simply
+because src is also drained, which keeps external events in the
+AioContext disabled despite the bug in draining the target node.
 
-Feels awkward.
+The bug would become apparent even with aio_disable_external() if we
+didn't drain src, or even if we just supported src and target being in
+different AioContexts.
 
-When is @driver-specific present?  Exactly when the driver is 'file' or
-'host_device'?  If that's correct, then turning BlockStats into a union
-would be clearer and reduce parenthesises on the wire:
-
-{ 'union': 'BlockStats',
-  'base': {
-      'driver': 'BlockdevDriver',
-      ... all the other existing members of BlockStats ... }
-  'discriminator': 'driver',
-  'data': {
-      'file': 'BlockStatsSpecificFile',
-      'host_device': 'BlockStatsSpecificFile' } }
-
-[...]
+Kevin
