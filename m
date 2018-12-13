@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gXOqB-0002gv-Cj
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:07:40 -0500
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gXOqZ-0003Cg-Fe
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:08:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gXOq8-0007ti-3j
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:07:39 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:38203)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gXOq7-0007tR-TU
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:07:36 -0500
-Received: by mail-wr1-f65.google.com with SMTP id v13so1555315wrw.5
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 03:07:35 -0800 (PST)
-References: <20181212222648.595-1-marcandre.lureau@redhat.com>
-	<20181212222648.595-2-marcandre.lureau@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <6ca032b5-f623-d9b3-13cd-2fda914bc6a5@redhat.com>
-Date: Thu, 13 Dec 2018 12:07:32 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181212222648.595-2-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gXOqW-000839-67
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:08:03 -0500
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Date: Thu, 13 Dec 2018 11:07:55 +0000
+Message-ID: <d0d2cab4-2157-1f9f-3bc9-a70f28a211b0@virtuozzo.com>
+References: <20181205122326.26625-1-dplotnikov@virtuozzo.com>
+	<20181207122647.GE5119@linux.fritz.box>
+	<bb51b8f9-a3a4-90e6-2f69-57e90ccd623a@virtuozzo.com>
+	<20181212122457.GB5415@linux.fritz.box>
+In-Reply-To: <20181212122457.GB5415@linux.fritz.box>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v13 1/6] tpm: add a "ppi" boolean property
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <ED680ECCA1F6974CA8C813A7BC0ADA42@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] blk: postpone request execution on a
+ context protected with "drained section"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,87 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, stefanb@linux.vnet.ibm.com, f4bug@amsat.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Berger <stefanb@linux.ibm.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "keith.busch@intel.com" <keith.busch@intel.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>, "famz@redhat.com" <famz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On 12/12/18 11:26 PM, Marc-André Lureau wrote:
-> The following patches implement the TPM Physical Presence Interface,
-> make use of a new memory region and a fw_cfg entry. Enable PPI by
-> default with >=4.0 machine type, to avoid migration issues.
-> 
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> ---
->  include/hw/compat.h | 11 ++++++++++-
->  hw/tpm/tpm_crb.c    |  3 +++
->  hw/tpm/tpm_tis.c    |  3 +++
->  3 files changed, 16 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/hw/compat.h b/include/hw/compat.h
-> index 70958328fe..db368c5c74 100644
-> --- a/include/hw/compat.h
-> +++ b/include/hw/compat.h
-> @@ -2,7 +2,16 @@
->  #define HW_COMPAT_H
->  
->  #define HW_COMPAT_3_1 \
-> -    /* empty */
-> +    { \
-> +        .driver   = "tpm-crb", \
-> +        .property = "ppi", \
-> +        .value    = "false", \
-> +    }, \
-> +    { \
-> +        .driver   = "tpm-tis", \
-> +        .property = "ppi", \
-> +        .value    = "false", \
-> +    },
->  
->  #define HW_COMPAT_3_0 \
->      /* empty */
-> diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
-> index a92dd50437..d5b0ac5920 100644
-> --- a/hw/tpm/tpm_crb.c
-> +++ b/hw/tpm/tpm_crb.c
-> @@ -41,6 +41,8 @@ typedef struct CRBState {
->      MemoryRegion cmdmem;
->  
->      size_t be_buffer_size;
-> +
-> +    bool ppi_enabled;
->  } CRBState;
->  
->  #define CRB(obj) OBJECT_CHECK(CRBState, (obj), TYPE_TPM_CRB)
-> @@ -221,6 +223,7 @@ static const VMStateDescription vmstate_tpm_crb = {
->  
->  static Property tpm_crb_properties[] = {
->      DEFINE_PROP_TPMBE("tpmdev", CRBState, tpmbe),
-> +    DEFINE_PROP_BOOL("ppi", CRBState, ppi_enabled, true),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-> index d9322692ee..cbb9a84a5b 100644
-> --- a/hw/tpm/tpm_tis.c
-> +++ b/hw/tpm/tpm_tis.c
-> @@ -81,6 +81,8 @@ typedef struct TPMState {
->      TPMVersion be_tpm_version;
->  
->      size_t be_buffer_size;
-> +
-> +    bool ppi_enabled;
->  } TPMState;
->  
->  #define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)
-> @@ -950,6 +952,7 @@ static const VMStateDescription vmstate_tpm_tis = {
->  static Property tpm_tis_properties[] = {
->      DEFINE_PROP_UINT32("irq", TPMState, irq_num, TPM_TIS_IRQ),
->      DEFINE_PROP_TPMBE("tpmdev", TPMState, be_driver),
-> +    DEFINE_PROP_BOOL("ppi", TPMState, ppi_enabled, true),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> 
+DQoNCk9uIDEyLjEyLjIwMTggMTU6MjQsIEtldmluIFdvbGYgd3JvdGU6DQo+IEFtIDExLjEyLjIw
+MTggdW0gMTc6NTUgaGF0IERlbmlzIFBsb3RuaWtvdiBnZXNjaHJpZWJlbjoNCj4+PiBXaHkgaW52
+b2x2ZSB0aGUgQWlvQ29udGV4dCBhdCBhbGw/IFRoaXMgY291bGQgYWxsIGJlIGtlcHQgYXQgdGhl
+DQo+Pj4gQmxvY2tCYWNrZW5kIGxldmVsIHdpdGhvdXQgZXh0ZW5kaW5nIHRoZSBsYXllcmluZyB2
+aW9sYXRpb24gdGhhdA0KPj4+IGFpb19kaXNhYmxlX2V4dGVybmFsKCkgaXMuDQo+Pj4NCj4+PiBC
+bG9ja0JhY2tlbmRzIGdldCBub3RpZmllZCB3aGVuIHRoZWlyIHJvb3Qgbm9kZSBpcyBkcmFpbmVk
+LCBzbyBob29raW5nDQo+Pj4gdGhpbmdzIHVwIHRoZXJlIHNob3VsZCBiZSBhcyBlYXN5LCBpZiBu
+b3QgZXZlbiBlYXNpZXIgdGhhbiBpbg0KPj4+IEFpb0NvbnRleHQuDQo+Pg0KPj4gSnVzdCB3YW50
+IHRvIG1ha2Ugc3VyZSB0aGF0IEkgdW5kZXJzdG9vZCBjb3JyZWN0bHkgd2hhdCB5b3UgbWVhbnQg
+YnkNCj4+ICJCbG9ja0JhY2tlbmRzIGdldCBub3RpZmllZCIuIERpZCB5b3UgbWVhbiB0aGF0IGJk
+cnZfZHJhaW5fZW5kIGNhbGxzDQo+PiBjaGlsZCdzIHJvbGUgY2FsbGJhY2sgYmxrX3Jvb3RfZHJh
+aW5lZF9lbmQgYnkgY2FsbGluZw0KPj4gYmRydl9wYXJlbnRfZHJhaW5lZF9lbmQ/DQo+IA0KPiBZ
+ZXMsIGJsa19yb290X2RyYWluZWRfYmVnaW4vZW5kIGNhbGxzIGFyZSBhbGwgeW91IG5lZWQuIFNw
+ZWNpZmljYWxseSwNCj4gdGhlaXIgYWRqdXN0bWVudHMgdG8gYmxrLT5xdWllc2NlX2NvdW50ZXIg
+dGhhdCBhcmUgYWxyZWFkeSB0aGVyZSwgYW5kIGluDQo+IHRoZSAnaWYgKC0tYmxrLT5xdWllc2Nl
+X2NvdW50ZXIgPT0gMCknIGJsb2NrIG9mIGJsa19yb290X2RyYWluZWRfZW5kKCkNCj4gd2UgY2Fu
+IHJlc3VtZSB0aGUgcXVldWVkIHJlcXVlc3RzLg0KU291bmRzIGl0IHNob3VsZCBiZSBzbywgYnV0
+IGl0IGRvZXNuJ3Qgd29yayB0aGF0IHdheSBhbmQgdGhhdCdzIHdoeToNCndoZW4gZG9pbmcgbWly
+cm9yIHdlIG1heSByZXN1bWUgcG9zdHBvbmVkIGNvcm91dGluZXMgdG9vIGVhcmx5IHdoZW4gdGhl
+IA0KdW5kZXJseWluZyBicyBpcyBwcm90ZWN0ZWQgZnJvbSB3cml0aW5nIGF0IGFuZCB0aHVzIHdl
+IGVuY291bnRlciB0aGUgDQphc3NlcnQgb24gYSB3cml0ZSByZXF1ZXN0IGV4ZWN1dGlvbiBhdCBi
+ZHJ2X2NvX3dyaXRlX3JlcV9wcmVwYXJlIHdoZW4gDQpyZXN1bWluZyB0aGUgcG9zdHBvbmVkIGNv
+cm91dGluZXMuDQoNClRoZSB0aGluZyBpcyB0aGF0IHRoZSBicyBpcyBwcm90ZWN0ZWQgZm9yIHdy
+aXRpbmcgYmVmb3JlIGV4ZWN1dGlvbiBvZiANCmJkcnZfcmVwbGFjZV9ub2RlIGF0IG1pcnJvcl9l
+eGl0X2NvbW1vbiBhbmQgYmRydl9yZXBsYWNlX25vZGUgY2FsbHMgDQpiZHJ2X3JlcGxhY2VfY2hp
+bGRfbm9wZXJtIHdoaWNoLCBpbiB0dXJuLCBjYWxscyBjaGlsZC0+cm9sZS0+ZHJhaW5lZF9lbmQg
+DQp3aGVyZSBvbmUgb2YgdGhlIGNhbGxiYWNrcyBpcyBibGtfcm9vdF9kcmFpbmVkX2VuZCB3aGlj
+aCBjaGVjayANCmlmKC0tYmxrLT5xdWllc2NlX2NvdW50ZXIgPT0gMCkgYW5kIHJ1bnMgdGhlIHBv
+c3Rwb25lZCByZXF1ZXN0cyANCihjb3JvdXRpbmVzKSBpZiB0aGUgY291bmRpdGlvbiBpcyB0cnVl
+Lg0KDQpJbiBzZWVtcyB0aGF0IGlmIHRoZSBleHRlcm5hbCByZXF1ZXN0cyBkaXNhYmxlZCBvbiB0
+aGUgY29udGV4dCB3ZSBjYW4ndCANCnJlbHkgb24gYW55dGhpbmcgb3Igc2hvdWxkIGNoZWNrIHdo
+ZXJlIHRoZSB1bmRlcmx5aW5nIGJzIGFuZCBpdHMgDQp1bmRlcmx5aW5nIG5vZGVzIGFyZSByZWFk
+eSB0byByZWNlaXZlIHJlcXVlc3RzIHdoaWNoIHNvdW5kcyBxdWl0ZSANCmNvbXBsaWNhdGVkLg0K
+UGxlYXNlIGNvcnJlY3QgbWUgaWYgc3RpbGwgZG9uJ3QgdW5kZXJzdGFuZCBzb21ldGhpbmcgaW4g
+dGhhdCByb3V0aW5lLg0KDQpEZW5pcw0KPj4gSW4gY2FzZSBpZiBpdCdzIHNvLCBpdCB3b24ndCB3
+b3JrIGlmIHJlc3VtZSBwb3N0cG9uZWQgcmVxdWVzdHMgaW4NCj4+IGJsa19yb290X2RyYWluZWRf
+ZW5kIHNpbmNlIHdlIGNhbid0IGtub3cgaWYgZXh0ZXJuYWwgaXMgZGlzYWJsZWQgZm9yIHRoZQ0K
+Pj4gY29udGV4dCBiZWNhdXNlIHRoZSBjb3VudGVyIHNob3dpbmcgdGhhdCBpcyBkZWNyZWFzZWQg
+b25seSBhZnRlciByb2xlcycNCj4+IGRyYWluZWQgY2FsbGJhY2tzIGFyZSBmaW5pc2hlZCBhdCBi
+ZHJ2X2RvX2RyYWluZWRfZW5kLg0KPj4gUGxlYXNlIGNvcnJlY3QgbWUgaWYgSSdtIHdyb25nLg0K
+PiANCj4gWW91IGRvbid0IG5lZWQgdG8ga25vdyBhYm91dCB0aGUgQWlvQ29udGV4dCBzdGF0ZSwg
+dGhpcyBpcyB0aGUgd2hvbGUNCj4gcG9pbnQuIGJsay0+cXVpZXNjZV9jb3VudGVyIGlzIHdoYXQg
+dGVsbHMgeW91IHdoZXRoZXIgdG8gcG9zdHBvbmUNCj4gcmVxdWVzdHMuDQo+IA0KPj4gTG9va2lu
+ZyBhdCB0aGUgcGF0Y2ggYWdhaW4sIEkgdGhpbmsgdGhhdCBpdCBtaWdodCBiZSB1c2VmdWwgdG8g
+a2VlcCB0aGUNCj4+IHJlcXVlc3RzIGluIHRoZSBzdHJ1Y3R1cmUgdGhhdCBsaW1pdHMgdGhlaXIg
+ZXhlY3V0aW9uIGFuZCBhbHNvIHByb3RlY3RzDQo+PiB0aGUgYWNjZXNzIChjb250ZXh0IGFjcXVp
+cmUvcmVsZWFzZSkgYWx0aG91Z2ggaXQncyBpbmRlZWQgdGhlIGxheWVyaW5nDQo+PiB2aW9sYXRp
+b24gYnV0IGF0IGxlYXN0IHdlIGNhbiBzdG9yZSB0aGUgcGFydHMgcmVsYXRlZCBhdCB0aGUgc2Ft
+ZSBwbGFjZQ0KPj4gYW5kIGxhdGVyIG9uIG1vdmUgc29tZXdoZXJlIGVsc2UgYWxvbmdzaWRlIHRo
+ZSByZXF1ZXN0IHJlc3RyaWN0b3IuDQo+IA0KPiBZb3UgY2FuIGtlZXAgZXZlcnl0aGluZyB5b3Ug
+bmVlZCBpbiBCbG9ja0JhY2tlbmQgKGFuZCB0aGF0J3MgYWxzbyB3aGVyZQ0KPiB5b3VyIGNvZGUg
+aXMgdGhhdCByZWFsbHkgcG9zdHBvbmVzIHJlcXVlc3QpLg0KPiANCj4gS2V2aW4NCj4gDQoNCi0t
+IA0KQmVzdCwNCkRlbmlzDQo=
