@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gXQHP-0001t6-Rx
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gXQHS-0001uW-2W
 	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:39:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gXQHL-0001Dc-Oo
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:39:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:21226)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gXQHL-000133-ED
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:39:47 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5D18D8EA34
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 12:39:44 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 13 Dec 2018 16:37:23 +0400
-Message-Id: <20181213123724.4866-22-marcandre.lureau@redhat.com>
-In-Reply-To: <20181213123724.4866-1-marcandre.lureau@redhat.com>
-References: <20181213123724.4866-1-marcandre.lureau@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gXQHM-0001HF-Ow
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:39:53 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 13 Dec 2018 12:39:36 +0000
+Message-ID: <c6be4ab4-2505-9361-485f-b1db0ecc4b0a@virtuozzo.com>
+References: <20181213015013.15350-1-jsnow@redhat.com>
+	<20181213015013.15350-4-jsnow@redhat.com>
+In-Reply-To: <20181213015013.15350-4-jsnow@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <28A71FAAB4E7CC48AF0B8D8B20942621@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v8 21/22] qapi: add more conditions to SPICE
+Subject: Re: [Qemu-devel] [PATCH v2 3/7] block: remove 'x' prefix from
+ experimental bitmap APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,64 +26,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com
+To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Now that member can be made conditional, let's make SPICE chardev
-conditional:
-
-* spiceport, spicevmc
-
-  Before and after the patch for !CONFIG_SPICE, the error is the
-  same ('spiceport' is not a valid char driver name).
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
----
- qapi/char.json | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/qapi/char.json b/qapi/char.json
-index 24628331ec..77ed847972 100644
---- a/qapi/char.json
-+++ b/qapi/char.json
-@@ -332,8 +332,8 @@
- ##
- { 'struct': 'ChardevSpiceChannel',
-   'data': { 'type': 'str' },
--  'base': 'ChardevCommon' }
--# TODO: 'if': 'defined(CONFIG_SPICE)'
-+  'base': 'ChardevCommon',
-+  'if': 'defined(CONFIG_SPICE)' }
-=20
- ##
- # @ChardevSpicePort:
-@@ -346,8 +346,8 @@
- ##
- { 'struct': 'ChardevSpicePort',
-   'data': { 'fqdn': 'str' },
--  'base': 'ChardevCommon' }
--# TODO: 'if': 'defined(CONFIG_SPICE)'
-+  'base': 'ChardevCommon',
-+  'if': 'defined(CONFIG_SPICE)' }
-=20
- ##
- # @ChardevVC:
-@@ -404,10 +404,10 @@
-             'testdev': 'ChardevCommon',
-             'stdio': 'ChardevStdio',
-             'console': 'ChardevCommon',
--            'spicevmc': 'ChardevSpiceChannel',
--# TODO: { 'type': 'ChardevSpiceChannel', 'if': 'defined(CONFIG_SPICE)' }=
-,
--            'spiceport': 'ChardevSpicePort',
--# TODO: { 'type': 'ChardevSpicePort', 'if': 'defined(CONFIG_SPICE)' },
-+            'spicevmc': { 'type': 'ChardevSpiceChannel',
-+                          'if': 'defined(CONFIG_SPICE)' },
-+            'spiceport': { 'type': 'ChardevSpicePort',
-+                           'if': 'defined(CONFIG_SPICE)' },
-             'vc': 'ChardevVC',
-             'ringbuf': 'ChardevRingbuf',
-             # next one is just for compatibility
---=20
-2.20.0
+MTMuMTIuMjAxOCA0OjUwLCBKb2huIFNub3cgd3JvdGU6DQo+IFRoZSAneCcgcHJlZml4IHdhcyBh
+ZGRlZCBiZWNhdXNlIEkgd2FzIHVuY2VydGFpbiBvZiB0aGUgZGlyZWN0aW9uIHdlJ2QNCj4gdGFr
+ZSBmb3IgdGhlIGxpYnZpcnQgQVBJLiBXaXRoIHRoZSBnZW5lcmFsIGFwcHJvYWNoIHNvbGlkaWZp
+ZWQsIEkgZmVlbA0KPiBjb21mb3J0YWJsZSBjb21taXR0aW5nIHRvIHRoaXMgQVBJIGZvciA0LjAu
+DQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBKb2huIFNub3c8anNub3dAcmVkaGF0LmNvbT4NCj4gUmV2
+aWV3ZWQtYnk6IEVyaWMgQmxha2U8ZWJsYWtlQHJlZGhhdC5jb20+DQoNCg0KUmV2aWV3ZWQtYnk6
+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4N
+Cg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
