@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=8789a7fed=anthony.perard@citrix.com>)
-	id 1gXOoN-0001eV-3G
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:05:56 -0500
+	(envelope-from <philmd@redhat.com>) id 1gXOqB-0002gv-Cj
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:07:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=8789a7fed=anthony.perard@citrix.com>)
-	id 1gXOoI-0006K3-AL
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:05:46 -0500
-Received: from smtp03.citrix.com ([162.221.156.55]:5212)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <prvs=8789a7fed=anthony.perard@citrix.com>)
-	id 1gXOoH-0006HA-GE
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:05:41 -0500
-Date: Thu, 13 Dec 2018 11:05:25 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20181213110525.GY18875@perard.uk.xensource.com>
-References: <20181026101016.28584-1-olaf@aepfle.de>
+	(envelope-from <philmd@redhat.com>) id 1gXOq8-0007ti-3j
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:07:39 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:38203)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gXOq7-0007tR-TU
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:07:36 -0500
+Received: by mail-wr1-f65.google.com with SMTP id v13so1555315wrw.5
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 03:07:35 -0800 (PST)
+References: <20181212222648.595-1-marcandre.lureau@redhat.com>
+	<20181212222648.595-2-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <6ca032b5-f623-d9b3-13cd-2fda914bc6a5@redhat.com>
+Date: Thu, 13 Dec 2018 12:07:32 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20181026101016.28584-1-olaf@aepfle.de>
-Subject: Re: [Qemu-devel] [PATCH v1] xen: preserve COMPAT in CFLAGS
+In-Reply-To: <20181212222648.595-2-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v13 1/6] tpm: add a "ppi" boolean property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +30,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Olaf Hering <olaf@aepfle.de>, Ian Jackson <ian.jackson@citrix.com>
-Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, "open list:X86" <xen-devel@lists.xenproject.org>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, stefanb@linux.vnet.ibm.com, f4bug@amsat.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Berger <stefanb@linux.ibm.com>
 
-Hi,
-
-Ian, we have those XC_WANT_COMPAT_* #defines to allow consumers of Xen
-libs be able to use old interfaces. Do you think it's a good idea to
-have this consumers (QEMU here) #undef the flag when it has implemented
-the newer interface?
-
-I guess the issue we have here is that when libxc interface are
-re-implemented into a xen libs, the meaning of XC_WANT_COMPAT_* flags is
-changed. And the QEMU fails to build even with the flags supplied in
-cflags.
-
-There is another thread that Olaf have started here:
-<20181025140808.13eefc21.olaf@aepfle.de>
-https://lists.xenproject.org/archives/html/xen-devel/2018-10/msg01950.html
-
-On Fri, Oct 26, 2018 at 12:10:16PM +0200, Olaf Hering wrote:
-> A given Qemu version can not predict what version of Xen it will run on.
-> There are some checks in configure to decide what Xen libraries and
-> functions are available. How exactly these functions must be accessed
-> has to be decided by configure and the user who is compiling Qemu.
-> In no way some random header file must override this decision.
+On 12/12/18 11:26 PM, Marc-André Lureau wrote:
+> The following patches implement the TPM Physical Presence Interface,
+> make use of a new memory region and a fw_cfg entry. Enable PPI by
+> default with >=4.0 machine type, to avoid migration issues.
 > 
-> Remove the breakage introduced by commit 5eeb39c24b, which would always
-> hide the libxc interfaces the given version of Qemu knows about.
-> 
-> The current symptom of such breakage is a build failure with qemu-2.9
-> and older, in combination with Xen 4.12.
-> 
-> Fixes: 5eeb39c24b7d4da5d129bfdd9c4fd21cfb3d28d6
-> Signed-off-by: Olaf Hering <olaf@aepfle.de>
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
 > ---
->  include/hw/xen/xen_common.h | 9 ---------
->  1 file changed, 9 deletions(-)
+>  include/hw/compat.h | 11 ++++++++++-
+>  hw/tpm/tpm_crb.c    |  3 +++
+>  hw/tpm/tpm_tis.c    |  3 +++
+>  3 files changed, 16 insertions(+), 1 deletion(-)
 > 
-> diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-> index 5f1402b494..33fa2d3497 100644
-> --- a/include/hw/xen/xen_common.h
-> +++ b/include/hw/xen/xen_common.h
-> @@ -1,15 +1,6 @@
->  #ifndef QEMU_HW_XEN_COMMON_H
->  #define QEMU_HW_XEN_COMMON_H
+> diff --git a/include/hw/compat.h b/include/hw/compat.h
+> index 70958328fe..db368c5c74 100644
+> --- a/include/hw/compat.h
+> +++ b/include/hw/compat.h
+> @@ -2,7 +2,16 @@
+>  #define HW_COMPAT_H
 >  
-> -/*
-> - * If we have new enough libxenctrl then we do not want/need these compat
-> - * interfaces, despite what the user supplied cflags might say. They
-> - * must be undefined before including xenctrl.h
-> - */
-> -#undef XC_WANT_COMPAT_EVTCHN_API
-> -#undef XC_WANT_COMPAT_GNTTAB_API
-> -#undef XC_WANT_COMPAT_MAP_FOREIGN_API
-> -
->  #include <xenctrl.h>
->  #include <xenstore.h>
->  #include <xen/io/xenbus.h>
-
--- 
-Anthony PERARD
+>  #define HW_COMPAT_3_1 \
+> -    /* empty */
+> +    { \
+> +        .driver   = "tpm-crb", \
+> +        .property = "ppi", \
+> +        .value    = "false", \
+> +    }, \
+> +    { \
+> +        .driver   = "tpm-tis", \
+> +        .property = "ppi", \
+> +        .value    = "false", \
+> +    },
+>  
+>  #define HW_COMPAT_3_0 \
+>      /* empty */
+> diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
+> index a92dd50437..d5b0ac5920 100644
+> --- a/hw/tpm/tpm_crb.c
+> +++ b/hw/tpm/tpm_crb.c
+> @@ -41,6 +41,8 @@ typedef struct CRBState {
+>      MemoryRegion cmdmem;
+>  
+>      size_t be_buffer_size;
+> +
+> +    bool ppi_enabled;
+>  } CRBState;
+>  
+>  #define CRB(obj) OBJECT_CHECK(CRBState, (obj), TYPE_TPM_CRB)
+> @@ -221,6 +223,7 @@ static const VMStateDescription vmstate_tpm_crb = {
+>  
+>  static Property tpm_crb_properties[] = {
+>      DEFINE_PROP_TPMBE("tpmdev", CRBState, tpmbe),
+> +    DEFINE_PROP_BOOL("ppi", CRBState, ppi_enabled, true),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+> index d9322692ee..cbb9a84a5b 100644
+> --- a/hw/tpm/tpm_tis.c
+> +++ b/hw/tpm/tpm_tis.c
+> @@ -81,6 +81,8 @@ typedef struct TPMState {
+>      TPMVersion be_tpm_version;
+>  
+>      size_t be_buffer_size;
+> +
+> +    bool ppi_enabled;
+>  } TPMState;
+>  
+>  #define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)
+> @@ -950,6 +952,7 @@ static const VMStateDescription vmstate_tpm_tis = {
+>  static Property tpm_tis_properties[] = {
+>      DEFINE_PROP_UINT32("irq", TPMState, irq_num, TPM_TIS_IRQ),
+>      DEFINE_PROP_TPMBE("tpmdev", TPMState, be_driver),
+> +    DEFINE_PROP_BOOL("ppi", TPMState, ppi_enabled, true),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> 
