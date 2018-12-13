@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXVyG-0006Ba-I6
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:29 -0500
+	(envelope-from <armbru@redhat.com>) id 1gXVyF-0006AM-AH
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXVyF-0004Oc-O5
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47442)
+	(envelope-from <armbru@redhat.com>) id 1gXVy9-0003zH-G2
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47446)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXVyF-0001cd-EE
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:27 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXVy6-0001dh-80
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:19 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A5FCD9B427
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 18:43:48 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 258A62BE87
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 18:43:49 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 13 Dec 2018 19:43:30 +0100
-Message-Id: <20181213184340.24037-23-armbru@redhat.com>
+Date: Thu, 13 Dec 2018 19:43:31 +0100
+Message-Id: <20181213184340.24037-24-armbru@redhat.com>
 In-Reply-To: <20181213184340.24037-1-armbru@redhat.com>
 References: <20181213184340.24037-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 22/32] qapi-events: add 'if' condition to
- implicit event enum
+Subject: [Qemu-devel] [PULL 23/32] qapi: add a dictionary form for TYPE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,34 +37,610 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Add condition to QAPIEvent enum members based on the event 'if'.
+Wherever a struct/union/alternate/command/event member with NAME: TYPE
+form is accepted, desugar it to a NAME: { 'type': TYPE } form.
 
-The generated code remains unconditional for now. Later patches
-generate the conditionals (also there is no additional coverage of
-this change in qapi-schema-test.out since the event_names enum is an
-implicit type created by qapi/events.py).
+This will allow to add new member details, such as 'if' in the
+following patch to introduce conditionals, or 'default' for default
+values etc.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20181213123724.4866-13-marcandre.lureau@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20181213123724.4866-11-marcandre.lureau@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi/events.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/qapi/common.py                        | 70 ++++++++++++-------
+ tests/Makefile.include                        |  6 ++
+ tests/qapi-schema/alternate-invalid-dict.err  |  1 +
+ tests/qapi-schema/alternate-invalid-dict.exit |  1 +
+ tests/qapi-schema/alternate-invalid-dict.json |  4 ++
+ tests/qapi-schema/alternate-invalid-dict.out  |  0
+ .../qapi-schema/event-member-invalid-dict.err |  1 +
+ .../event-member-invalid-dict.exit            |  1 +
+ .../event-member-invalid-dict.json            |  2 +
+ .../qapi-schema/event-member-invalid-dict.out |  0
+ tests/qapi-schema/event-nest-struct.json      |  2 +-
+ .../flat-union-inline-invalid-dict.err        |  1 +
+ .../flat-union-inline-invalid-dict.exit       |  1 +
+ .../flat-union-inline-invalid-dict.json       | 11 +++
+ .../flat-union-inline-invalid-dict.out        |  0
+ tests/qapi-schema/flat-union-inline.json      |  2 +-
+ .../nested-struct-data-invalid-dict.err       |  1 +
+ .../nested-struct-data-invalid-dict.exit      |  1 +
+ .../nested-struct-data-invalid-dict.json      |  3 +
+ .../nested-struct-data-invalid-dict.out       |  0
+ tests/qapi-schema/nested-struct-data.json     |  2 +-
+ tests/qapi-schema/qapi-schema-test.json       | 10 +--
+ .../struct-member-invalid-dict.err            |  1 +
+ .../struct-member-invalid-dict.exit           |  1 +
+ .../struct-member-invalid-dict.json           |  3 +
+ .../struct-member-invalid-dict.out            |  0
+ .../qapi-schema/union-branch-invalid-dict.err |  1 +
+ .../union-branch-invalid-dict.exit            |  1 +
+ .../union-branch-invalid-dict.json            |  4 ++
+ .../qapi-schema/union-branch-invalid-dict.out |  0
+ 30 files changed, 99 insertions(+), 32 deletions(-)
+ create mode 100644 tests/qapi-schema/alternate-invalid-dict.err
+ create mode 100644 tests/qapi-schema/alternate-invalid-dict.exit
+ create mode 100644 tests/qapi-schema/alternate-invalid-dict.json
+ create mode 100644 tests/qapi-schema/alternate-invalid-dict.out
+ create mode 100644 tests/qapi-schema/event-member-invalid-dict.err
+ create mode 100644 tests/qapi-schema/event-member-invalid-dict.exit
+ create mode 100644 tests/qapi-schema/event-member-invalid-dict.json
+ create mode 100644 tests/qapi-schema/event-member-invalid-dict.out
+ create mode 100644 tests/qapi-schema/flat-union-inline-invalid-dict.err
+ create mode 100644 tests/qapi-schema/flat-union-inline-invalid-dict.exit
+ create mode 100644 tests/qapi-schema/flat-union-inline-invalid-dict.json
+ create mode 100644 tests/qapi-schema/flat-union-inline-invalid-dict.out
+ create mode 100644 tests/qapi-schema/nested-struct-data-invalid-dict.err
+ create mode 100644 tests/qapi-schema/nested-struct-data-invalid-dict.exi=
+t
+ create mode 100644 tests/qapi-schema/nested-struct-data-invalid-dict.jso=
+n
+ create mode 100644 tests/qapi-schema/nested-struct-data-invalid-dict.out
+ create mode 100644 tests/qapi-schema/struct-member-invalid-dict.err
+ create mode 100644 tests/qapi-schema/struct-member-invalid-dict.exit
+ create mode 100644 tests/qapi-schema/struct-member-invalid-dict.json
+ create mode 100644 tests/qapi-schema/struct-member-invalid-dict.out
+ create mode 100644 tests/qapi-schema/union-branch-invalid-dict.err
+ create mode 100644 tests/qapi-schema/union-branch-invalid-dict.exit
+ create mode 100644 tests/qapi-schema/union-branch-invalid-dict.json
+ create mode 100644 tests/qapi-schema/union-branch-invalid-dict.out
 
-diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
-index f1b88d8786..37ee5de682 100644
---- a/scripts/qapi/events.py
-+++ b/scripts/qapi/events.py
-@@ -179,7 +179,7 @@ class QAPISchemaGenEventVisitor(QAPISchemaModularCVis=
-itor):
-             self._genh.add(gen_event_send_decl(name, arg_type, boxed))
-             self._genc.add(gen_event_send(name, arg_type, boxed,
-                                           self._event_enum_name))
--        self._event_enum_members.append(QAPISchemaMember(name))
-+        self._event_enum_members.append(QAPISchemaMember(name, ifcond))
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index a609ffcfee..cdfe2bf2a5 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -588,11 +588,11 @@ def discriminator_find_enum_define(expr):
+     if not base_members:
+         return None
+=20
+-    discriminator_type =3D base_members.get(discriminator)
+-    if not discriminator_type:
++    discriminator_value =3D base_members.get(discriminator)
++    if not discriminator_value:
+         return None
+=20
+-    return enum_types.get(discriminator_type)
++    return enum_types.get(discriminator_value['type'])
 =20
 =20
- def gen_events(schema, output_dir, prefix):
+ # Names must be letters, numbers, -, and _.  They must start with letter=
+,
+@@ -704,8 +704,10 @@ def check_type(info, source, value, allow_array=3DFa=
+lse,
+                                % (source, key))
+         # Todo: allow dictionaries to represent default values of
+         # an optional argument.
+-        check_type(info, "Member '%s' of %s" % (key, source), arg,
+-                   allow_array=3DTrue,
++        check_known_keys(info, "member '%s' of %s" % (key, source),
++                         arg, ['type'], [])
++        check_type(info, "Member '%s' of %s" % (key, source),
++                   arg['type'], allow_array=3DTrue,
+                    allow_metas=3D['built-in', 'union', 'alternate', 'str=
+uct',
+                                 'enum'])
+=20
+@@ -776,13 +778,13 @@ def check_union(expr, info):
+         # member of the base struct.
+         check_name(info, "Discriminator of flat union '%s'" % name,
+                    discriminator)
+-        discriminator_type =3D base_members.get(discriminator)
+-        if not discriminator_type:
++        discriminator_value =3D base_members.get(discriminator)
++        if not discriminator_value:
+             raise QAPISemError(info,
+                                "Discriminator '%s' is not a member of ba=
+se "
+                                "struct '%s'"
+                                % (discriminator, base))
+-        enum_define =3D enum_types.get(discriminator_type)
++        enum_define =3D enum_types.get(discriminator_value['type'])
+         allow_metas =3D ['struct']
+         # Do not allow string discriminator
+         if not enum_define:
+@@ -796,9 +798,12 @@ def check_union(expr, info):
+     for (key, value) in members.items():
+         check_name(info, "Member of union '%s'" % name, key)
+=20
++        check_known_keys(info, "member '%s' of union '%s'" % (key, name)=
+,
++                         value, ['type'], [])
+         # Each value must name a known type
+         check_type(info, "Member '%s' of union '%s'" % (key, name),
+-                   value, allow_array=3Dnot base, allow_metas=3Dallow_me=
+tas)
++                   value['type'],
++                   allow_array=3Dnot base, allow_metas=3Dallow_metas)
+=20
+         # If the discriminator names an enum type, then all members
+         # of 'data' must also be members of the enum type.
+@@ -822,18 +827,21 @@ def check_alternate(expr, info):
+                            "in 'data'" % name)
+     for (key, value) in members.items():
+         check_name(info, "Member of alternate '%s'" % name, key)
++        check_known_keys(info,
++                         "member '%s' of alternate '%s'" % (key, name),
++                         value, ['type'], [])
++        typ =3D value['type']
+=20
+         # Ensure alternates have no type conflicts.
+-        check_type(info, "Member '%s' of alternate '%s'" % (key, name),
+-                   value,
++        check_type(info, "Member '%s' of alternate '%s'" % (key, name), =
+typ,
+                    allow_metas=3D['built-in', 'union', 'struct', 'enum']=
+)
+-        qtype =3D find_alternate_member_qtype(value)
++        qtype =3D find_alternate_member_qtype(typ)
+         if not qtype:
+             raise QAPISemError(info, "Alternate '%s' member '%s' cannot =
+use "
+-                               "type '%s'" % (name, key, value))
++                               "type '%s'" % (name, key, typ))
+         conflicting =3D set([qtype])
+         if qtype =3D=3D 'QTYPE_QSTRING':
+-            enum_expr =3D enum_types.get(value)
++            enum_expr =3D enum_types.get(typ)
+             if enum_expr:
+                 for v in enum_get_names(enum_expr):
+                     if v in ['on', 'off']:
+@@ -851,12 +859,6 @@ def check_alternate(expr, info):
+             types_seen[qt] =3D key
+=20
+=20
+-def normalize_enum(expr):
+-    if isinstance(expr['data'], list):
+-        expr['data'] =3D [m if isinstance(m, dict) else {'name': m}
+-                        for m in expr['data']]
+-
+-
+ def check_enum(expr, info):
+     name =3D expr['enum']
+     members =3D expr['data']
+@@ -928,6 +930,20 @@ def check_keys(expr_elem, meta, required, optional=3D=
+[]):
+             check_if(expr, info)
+=20
+=20
++def normalize_enum(expr):
++    if isinstance(expr['data'], list):
++        expr['data'] =3D [m if isinstance(m, dict) else {'name': m}
++                        for m in expr['data']]
++
++
++def normalize_members(members):
++    if isinstance(members, OrderedDict):
++        for key, arg in members.items():
++            if isinstance(arg, dict):
++                continue
++            members[key] =3D {'type': arg}
++
++
+ def check_exprs(exprs):
+     global all_names
+=20
+@@ -957,22 +973,28 @@ def check_exprs(exprs):
+             meta =3D 'union'
+             check_keys(expr_elem, 'union', ['data'],
+                        ['base', 'discriminator', 'if'])
++            normalize_members(expr.get('base'))
++            normalize_members(expr['data'])
+             union_types[expr[meta]] =3D expr
+         elif 'alternate' in expr:
+             meta =3D 'alternate'
+             check_keys(expr_elem, 'alternate', ['data'], ['if'])
++            normalize_members(expr['data'])
+         elif 'struct' in expr:
+             meta =3D 'struct'
+             check_keys(expr_elem, 'struct', ['data'], ['base', 'if'])
++            normalize_members(expr['data'])
+             struct_types[expr[meta]] =3D expr
+         elif 'command' in expr:
+             meta =3D 'command'
+             check_keys(expr_elem, 'command', [],
+                        ['data', 'returns', 'gen', 'success-response',
+                         'boxed', 'allow-oob', 'allow-preconfig', 'if'])
++            normalize_members(expr.get('data'))
+         elif 'event' in expr:
+             meta =3D 'event'
+             check_keys(expr_elem, 'event', [], ['data', 'boxed', 'if'])
++            normalize_members(expr.get('data'))
+         else:
+             raise QAPISemError(expr_elem['info'],
+                                "Expression is missing metatype")
+@@ -1716,7 +1738,7 @@ class QAPISchema(object):
+         return QAPISchemaObjectTypeMember(name, typ, optional)
+=20
+     def _make_members(self, data, info):
+-        return [self._make_member(key, value, info)
++        return [self._make_member(key, value['type'], info)
+                 for (key, value) in data.items()]
+=20
+     def _def_struct_type(self, expr, info, doc):
+@@ -1752,11 +1774,11 @@ class QAPISchema(object):
+                 name, info, doc, ifcond,
+                 'base', self._make_members(base, info))
+         if tag_name:
+-            variants =3D [self._make_variant(key, value)
++            variants =3D [self._make_variant(key, value['type'])
+                         for (key, value) in data.items()]
+             members =3D []
+         else:
+-            variants =3D [self._make_simple_variant(key, value, info)
++            variants =3D [self._make_simple_variant(key, value['type'], =
+info)
+                         for (key, value) in data.items()]
+             enum =3D [{'name': v.name} for v in variants]
+             typ =3D self._make_implicit_enum_type(name, info, ifcond, en=
+um)
+@@ -1772,7 +1794,7 @@ class QAPISchema(object):
+         name =3D expr['alternate']
+         data =3D expr['data']
+         ifcond =3D expr.get('if')
+-        variants =3D [self._make_variant(key, value)
++        variants =3D [self._make_variant(key, value['type'])
+                     for (key, value) in data.items()]
+         tag_member =3D QAPISchemaObjectTypeMember('type', 'QType', False=
+)
+         self._def_entity(
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3c9eea27fd..ea5d1e8787 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -318,6 +318,7 @@ qapi-schema +=3D alternate-conflict-string.json
+ qapi-schema +=3D alternate-conflict-bool-string.json
+ qapi-schema +=3D alternate-conflict-num-string.json
+ qapi-schema +=3D alternate-empty.json
++qapi-schema +=3D alternate-invalid-dict.json
+ qapi-schema +=3D alternate-nested.json
+ qapi-schema +=3D alternate-unknown.json
+ qapi-schema +=3D args-alternate.json
+@@ -394,6 +395,7 @@ qapi-schema +=3D escape-too-big.json
+ qapi-schema +=3D escape-too-short.json
+ qapi-schema +=3D event-boxed-empty.json
+ qapi-schema +=3D event-case.json
++qapi-schema +=3D event-member-invalid-dict.json
+ qapi-schema +=3D event-nest-struct.json
+ qapi-schema +=3D flat-union-array-branch.json
+ qapi-schema +=3D flat-union-bad-base.json
+@@ -403,6 +405,7 @@ qapi-schema +=3D flat-union-base-union.json
+ qapi-schema +=3D flat-union-clash-member.json
+ qapi-schema +=3D flat-union-empty.json
+ qapi-schema +=3D flat-union-inline.json
++qapi-schema +=3D flat-union-inline-invalid-dict.json
+ qapi-schema +=3D flat-union-int-branch.json
+ qapi-schema +=3D flat-union-invalid-branch-key.json
+ qapi-schema +=3D flat-union-invalid-discriminator.json
+@@ -430,6 +433,7 @@ qapi-schema +=3D missing-comma-list.json
+ qapi-schema +=3D missing-comma-object.json
+ qapi-schema +=3D missing-type.json
+ qapi-schema +=3D nested-struct-data.json
++qapi-schema +=3D nested-struct-data-invalid-dict.json
+ qapi-schema +=3D non-objects.json
+ qapi-schema +=3D oob-test.json
+ qapi-schema +=3D allow-preconfig-test.json
+@@ -460,6 +464,7 @@ qapi-schema +=3D returns-whitelist.json
+ qapi-schema +=3D struct-base-clash-deep.json
+ qapi-schema +=3D struct-base-clash.json
+ qapi-schema +=3D struct-data-invalid.json
++qapi-schema +=3D struct-member-invalid-dict.json
+ qapi-schema +=3D struct-member-invalid.json
+ qapi-schema +=3D trailing-comma-list.json
+ qapi-schema +=3D trailing-comma-object.json
+@@ -471,6 +476,7 @@ qapi-schema +=3D unicode-str.json
+ qapi-schema +=3D union-base-empty.json
+ qapi-schema +=3D union-base-no-discriminator.json
+ qapi-schema +=3D union-branch-case.json
++qapi-schema +=3D union-branch-invalid-dict.json
+ qapi-schema +=3D union-clash-branches.json
+ qapi-schema +=3D union-empty.json
+ qapi-schema +=3D union-invalid-base.json
+diff --git a/tests/qapi-schema/alternate-invalid-dict.err b/tests/qapi-sc=
+hema/alternate-invalid-dict.err
+new file mode 100644
+index 0000000000..631d46628e
+--- /dev/null
++++ b/tests/qapi-schema/alternate-invalid-dict.err
+@@ -0,0 +1 @@
++tests/qapi-schema/alternate-invalid-dict.json:2: Key 'type' is missing f=
+rom member 'two' of alternate 'Alt'
+diff --git a/tests/qapi-schema/alternate-invalid-dict.exit b/tests/qapi-s=
+chema/alternate-invalid-dict.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/alternate-invalid-dict.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/alternate-invalid-dict.json b/tests/qapi-s=
+chema/alternate-invalid-dict.json
+new file mode 100644
+index 0000000000..8e0b2ac287
+--- /dev/null
++++ b/tests/qapi-schema/alternate-invalid-dict.json
+@@ -0,0 +1,4 @@
++# exploded member form must have a 'type'
++{ 'alternate': 'Alt',
++  'data': { 'one': 'str',
++            'two': { 'if': 'foo' } } }
+diff --git a/tests/qapi-schema/alternate-invalid-dict.out b/tests/qapi-sc=
+hema/alternate-invalid-dict.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/event-member-invalid-dict.err b/tests/qapi=
+-schema/event-member-invalid-dict.err
+new file mode 100644
+index 0000000000..1a57fa29b0
+--- /dev/null
++++ b/tests/qapi-schema/event-member-invalid-dict.err
+@@ -0,0 +1 @@
++tests/qapi-schema/event-member-invalid-dict.json:1: Key 'type' is missin=
+g from member 'a' of 'data' for event 'EVENT_A'
+diff --git a/tests/qapi-schema/event-member-invalid-dict.exit b/tests/qap=
+i-schema/event-member-invalid-dict.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/event-member-invalid-dict.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/event-member-invalid-dict.json b/tests/qap=
+i-schema/event-member-invalid-dict.json
+new file mode 100644
+index 0000000000..ee6f3ecb6f
+--- /dev/null
++++ b/tests/qapi-schema/event-member-invalid-dict.json
+@@ -0,0 +1,2 @@
++{ 'event': 'EVENT_A',
++  'data': { 'a' : { 'string' : 'str', 'integer': 'int' }, 'b' : 'str' } =
+}
+diff --git a/tests/qapi-schema/event-member-invalid-dict.out b/tests/qapi=
+-schema/event-member-invalid-dict.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/event-nest-struct.json b/tests/qapi-schema=
+/event-nest-struct.json
+index ee6f3ecb6f..355ddaeff1 100644
+--- a/tests/qapi-schema/event-nest-struct.json
++++ b/tests/qapi-schema/event-nest-struct.json
+@@ -1,2 +1,2 @@
+ { 'event': 'EVENT_A',
+-  'data': { 'a' : { 'string' : 'str', 'integer': 'int' }, 'b' : 'str' } =
+}
++  'data': { 'a' : { 'type' : { 'integer': 'int' } }, 'b' : 'str' } }
+diff --git a/tests/qapi-schema/flat-union-inline-invalid-dict.err b/tests=
+/qapi-schema/flat-union-inline-invalid-dict.err
+new file mode 100644
+index 0000000000..9c4c45b7f0
+--- /dev/null
++++ b/tests/qapi-schema/flat-union-inline-invalid-dict.err
+@@ -0,0 +1 @@
++tests/qapi-schema/flat-union-inline-invalid-dict.json:7: Key 'type' is m=
+issing from member 'value1' of union 'TestUnion'
+diff --git a/tests/qapi-schema/flat-union-inline-invalid-dict.exit b/test=
+s/qapi-schema/flat-union-inline-invalid-dict.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/flat-union-inline-invalid-dict.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/flat-union-inline-invalid-dict.json b/test=
+s/qapi-schema/flat-union-inline-invalid-dict.json
+new file mode 100644
+index 0000000000..62c7cda617
+--- /dev/null
++++ b/tests/qapi-schema/flat-union-inline-invalid-dict.json
+@@ -0,0 +1,11 @@
++# we require branches to be a struct name
++# TODO: should we allow anonymous inline branch types?
++{ 'enum': 'TestEnum',
++  'data': [ 'value1', 'value2' ] }
++{ 'struct': 'Base',
++  'data': { 'enum1': 'TestEnum', 'kind': 'str' } }
++{ 'union': 'TestUnion',
++  'base': 'Base',
++  'discriminator': 'enum1',
++  'data': { 'value1': { 'string': 'str' },
++            'value2': { 'integer': 'int' } } }
+diff --git a/tests/qapi-schema/flat-union-inline-invalid-dict.out b/tests=
+/qapi-schema/flat-union-inline-invalid-dict.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/flat-union-inline.json b/tests/qapi-schema=
+/flat-union-inline.json
+index 62c7cda617..a9b3ce3f0d 100644
+--- a/tests/qapi-schema/flat-union-inline.json
++++ b/tests/qapi-schema/flat-union-inline.json
+@@ -7,5 +7,5 @@
+ { 'union': 'TestUnion',
+   'base': 'Base',
+   'discriminator': 'enum1',
+-  'data': { 'value1': { 'string': 'str' },
++  'data': { 'value1': { 'type': {} },
+             'value2': { 'integer': 'int' } } }
+diff --git a/tests/qapi-schema/nested-struct-data-invalid-dict.err b/test=
+s/qapi-schema/nested-struct-data-invalid-dict.err
+new file mode 100644
+index 0000000000..5bd364e8d9
+--- /dev/null
++++ b/tests/qapi-schema/nested-struct-data-invalid-dict.err
+@@ -0,0 +1 @@
++tests/qapi-schema/nested-struct-data-invalid-dict.json:2: Key 'type' is =
+missing from member 'a' of 'data' for command 'foo'
+diff --git a/tests/qapi-schema/nested-struct-data-invalid-dict.exit b/tes=
+ts/qapi-schema/nested-struct-data-invalid-dict.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/nested-struct-data-invalid-dict.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/nested-struct-data-invalid-dict.json b/tes=
+ts/qapi-schema/nested-struct-data-invalid-dict.json
+new file mode 100644
+index 0000000000..efbe773ded
+--- /dev/null
++++ b/tests/qapi-schema/nested-struct-data-invalid-dict.json
+@@ -0,0 +1,3 @@
++# inline subtypes collide with our desired future use of defaults
++{ 'command': 'foo',
++  'data': { 'a' : { 'string' : 'str', 'integer': 'int' }, 'b' : 'str' } =
+}
+diff --git a/tests/qapi-schema/nested-struct-data-invalid-dict.out b/test=
+s/qapi-schema/nested-struct-data-invalid-dict.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/nested-struct-data.json b/tests/qapi-schem=
+a/nested-struct-data.json
+index efbe773ded..5b8a40cca3 100644
+--- a/tests/qapi-schema/nested-struct-data.json
++++ b/tests/qapi-schema/nested-struct-data.json
+@@ -1,3 +1,3 @@
+ # inline subtypes collide with our desired future use of defaults
+ { 'command': 'foo',
+-  'data': { 'a' : { 'string' : 'str', 'integer': 'int' }, 'b' : 'str' } =
+}
++  'data': { 'a' : { 'type': {} }, 'b' : 'str' } }
+diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
+qapi-schema-test.json
+index 8bfaf5aedd..40b162664d 100644
+--- a/tests/qapi-schema/qapi-schema-test.json
++++ b/tests/qapi-schema/qapi-schema-test.json
+@@ -11,7 +11,7 @@
+         'guest-sync' ] } }
+=20
+ { 'struct': 'TestStruct',
+-  'data': { 'integer': 'int', 'boolean': 'bool', 'string': 'str' } }
++  'data': { 'integer': {'type': 'int'}, 'boolean': 'bool', 'string': 'st=
+r' } }
+=20
+ # for testing enums
+ { 'struct': 'NestedEnumsOne',
+@@ -77,7 +77,7 @@
+ { 'union': 'UserDefFlatUnion',
+   'base': 'UserDefUnionBase',   # intentional forward reference
+   'discriminator': 'enum1',
+-  'data': { 'value1' : 'UserDefA',
++  'data': { 'value1' : {'type': 'UserDefA'},
+             'value2' : 'UserDefB',
+             'value3' : 'UserDefB'
+             # 'value4' defaults to empty
+@@ -98,7 +98,7 @@
+ { 'struct': 'WrapAlternate',
+   'data': { 'alt': 'UserDefAlternate' } }
+ { 'alternate': 'UserDefAlternate',
+-  'data': { 'udfu': 'UserDefFlatUnion', 'e': 'EnumOne', 'i': 'int',
++  'data': { 'udfu': {'type': 'UserDefFlatUnion'}, 'e': 'EnumOne', 'i': '=
+int',
+             'n': 'null' } }
+=20
+ { 'struct': 'UserDefC',
+@@ -134,7 +134,7 @@
+ { 'command': 'user_def_cmd', 'data': {} }
+ { 'command': 'user_def_cmd1', 'data': {'ud1a': 'UserDefOne'} }
+ { 'command': 'user_def_cmd2',
+-  'data': {'ud1a': 'UserDefOne', '*ud1b': 'UserDefOne'},
++  'data': {'ud1a': {'type': 'UserDefOne'}, '*ud1b': 'UserDefOne'},
+   'returns': 'UserDefTwo' }
+=20
+ { 'command': 'cmd-success-response', 'data': {}, 'success-response': fal=
+se }
+@@ -166,7 +166,7 @@
+=20
+ # testing event
+ { 'struct': 'EventStructOne',
+-  'data': { 'struct1': 'UserDefOne', 'string': 'str', '*enum2': 'EnumOne=
+' } }
++  'data': { 'struct1': {'type': 'UserDefOne'}, 'string': 'str', '*enum2'=
+: 'EnumOne' } }
+=20
+ { 'event': 'EVENT_A' }
+ { 'event': 'EVENT_B',
+diff --git a/tests/qapi-schema/struct-member-invalid-dict.err b/tests/qap=
+i-schema/struct-member-invalid-dict.err
+new file mode 100644
+index 0000000000..6a765bc668
+--- /dev/null
++++ b/tests/qapi-schema/struct-member-invalid-dict.err
+@@ -0,0 +1 @@
++tests/qapi-schema/struct-member-invalid-dict.json:2: Key 'type' is missi=
+ng from member '*a' of 'data' for struct 'foo'
+diff --git a/tests/qapi-schema/struct-member-invalid-dict.exit b/tests/qa=
+pi-schema/struct-member-invalid-dict.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/struct-member-invalid-dict.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/struct-member-invalid-dict.json b/tests/qa=
+pi-schema/struct-member-invalid-dict.json
+new file mode 100644
+index 0000000000..9fe0d455a9
+--- /dev/null
++++ b/tests/qapi-schema/struct-member-invalid-dict.json
+@@ -0,0 +1,3 @@
++# Long form of member must have a value member 'type'
++{ 'struct': 'foo',
++  'data': { '*a': { 'case': 'foo' } } }
+diff --git a/tests/qapi-schema/struct-member-invalid-dict.out b/tests/qap=
+i-schema/struct-member-invalid-dict.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/union-branch-invalid-dict.err b/tests/qapi=
+-schema/union-branch-invalid-dict.err
+new file mode 100644
+index 0000000000..89f9b36791
+--- /dev/null
++++ b/tests/qapi-schema/union-branch-invalid-dict.err
+@@ -0,0 +1 @@
++tests/qapi-schema/union-branch-invalid-dict.json:2: Key 'type' is missin=
+g from member 'integer' of union 'UnionInvalidBranch'
+diff --git a/tests/qapi-schema/union-branch-invalid-dict.exit b/tests/qap=
+i-schema/union-branch-invalid-dict.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/union-branch-invalid-dict.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/union-branch-invalid-dict.json b/tests/qap=
+i-schema/union-branch-invalid-dict.json
+new file mode 100644
+index 0000000000..9778598dbd
+--- /dev/null
++++ b/tests/qapi-schema/union-branch-invalid-dict.json
+@@ -0,0 +1,4 @@
++# Long form of member must have a value member 'type'
++{ 'union': 'UnionInvalidBranch',
++  'data': { 'integer': { 'if': 'foo'},
++            's8': 'int8' } }
+diff --git a/tests/qapi-schema/union-branch-invalid-dict.out b/tests/qapi=
+-schema/union-branch-invalid-dict.out
+new file mode 100644
+index 0000000000..e69de29bb2
 --=20
 2.17.2
