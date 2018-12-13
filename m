@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gXJCn-0007o8-LC
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:39 -0500
+	(envelope-from <cota@braap.org>) id 1gXJCr-0007rR-TJ
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gXJCl-0001p2-Ow
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:37 -0500
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:45205)
+	(envelope-from <cota@braap.org>) id 1gXJCo-0001ts-Go
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:41 -0500
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:54881)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gXJCl-0001Um-6m
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:35 -0500
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gXJCn-0001ZO-K6
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:38 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 13 Dec 2018 00:04:11 -0500
-Message-Id: <20181213050453.9677-32-cota@braap.org>
+Date: Thu, 13 Dec 2018 00:04:19 -0500
+Message-Id: <20181213050453.9677-40-cota@braap.org>
 In-Reply-To: <20181213050453.9677-1-cota@braap.org>
 References: <20181213050453.9677-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v5 31/73] cpu: convert to cpu_halted
+Subject: [Qemu-devel] [PATCH v5 39/73] i386: convert to cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,66 +26,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This finishes the conversion to cpu_halted.
-
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- cpus.c    | 8 ++++----
- qom/cpu.c | 2 +-
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ target/i386/cpu.c        | 2 +-
+ target/i386/helper.c     | 4 ++--
+ target/i386/svm_helper.c | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/cpus.c b/cpus.c
-index e85dbbb166..fa66d84bc7 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -204,7 +204,7 @@ static bool cpu_thread_is_idle(CPUState *cpu)
-     if (cpu_is_stopped(cpu)) {
-         return true;
-     }
--    if (!cpu->halted || cpu_has_work(cpu) ||
-+    if (!cpu_halted(cpu) || cpu_has_work(cpu) ||
-         kvm_halt_in_kernel()) {
-         return false;
-     }
-@@ -1686,7 +1686,7 @@ static void *qemu_hax_cpu_thread_fn(void *arg)
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 22cca17b9e..35d1d2d10a 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5641,7 +5641,7 @@ int x86_cpu_pending_interrupt(CPUState *cs, int interrupt_request)
  
-     cpu->thread_id = qemu_get_thread_id();
-     cpu->created = true;
--    cpu->halted = 0;
-+    cpu_halted_set(cpu, 0);
-     current_cpu = cpu;
+ static bool x86_cpu_has_work(CPUState *cs)
+ {
+-    return x86_cpu_pending_interrupt(cs, cs->interrupt_request) != 0;
++    return x86_cpu_pending_interrupt(cs, cpu_interrupt_request(cs)) != 0;
+ }
  
-     hax_init_vcpu(cpu);
-@@ -1845,7 +1845,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
-                  *
-                  * cpu->halted should ensure we sleep in wait_io_event
-                  */
--                g_assert(cpu->halted);
-+                g_assert(cpu_halted(cpu));
-                 break;
-             case EXCP_ATOMIC:
-                 qemu_mutex_unlock_iothread();
-@@ -2342,7 +2342,7 @@ CpuInfoList *qmp_query_cpus(Error **errp)
-         info->value = g_malloc0(sizeof(*info->value));
-         info->value->CPU = cpu->cpu_index;
-         info->value->current = (cpu == first_cpu);
--        info->value->halted = cpu->halted;
-+        info->value->halted = cpu_halted(cpu);
-         info->value->qom_path = object_get_canonical_path(OBJECT(cpu));
-         info->value->thread_id = cpu->thread_id;
- #if defined(TARGET_I386)
-diff --git a/qom/cpu.c b/qom/cpu.c
-index 2ea5b1da08..4e964255bf 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -261,7 +261,7 @@ static void cpu_common_reset(CPUState *cpu)
+ static void x86_disas_set_info(CPUState *cs, disassemble_info *info)
+diff --git a/target/i386/helper.c b/target/i386/helper.c
+index a75278f954..9197fb4edc 100644
+--- a/target/i386/helper.c
++++ b/target/i386/helper.c
+@@ -1035,12 +1035,12 @@ void do_cpu_init(X86CPU *cpu)
+     CPUState *cs = CPU(cpu);
+     CPUX86State *env = &cpu->env;
+     CPUX86State *save = g_new(CPUX86State, 1);
+-    int sipi = cs->interrupt_request & CPU_INTERRUPT_SIPI;
++    int sipi = cpu_interrupt_request(cs) & CPU_INTERRUPT_SIPI;
+ 
+     *save = *env;
+ 
+     cpu_reset(cs);
+-    cs->interrupt_request = sipi;
++    cpu_interrupt_request_set(cs, sipi);
+     memcpy(&env->start_init_save, &save->start_init_save,
+            offsetof(CPUX86State, end_init_save) -
+            offsetof(CPUX86State, start_init_save));
+diff --git a/target/i386/svm_helper.c b/target/i386/svm_helper.c
+index a6d33e55d8..ebf3643ba7 100644
+--- a/target/i386/svm_helper.c
++++ b/target/i386/svm_helper.c
+@@ -316,7 +316,7 @@ void helper_vmrun(CPUX86State *env, int aflag, int next_eip_addend)
+     if (int_ctl & V_IRQ_MASK) {
+         CPUState *cs = CPU(x86_env_get_cpu(env));
+ 
+-        cs->interrupt_request |= CPU_INTERRUPT_VIRQ;
++        cpu_interrupt_request_or(cs, CPU_INTERRUPT_VIRQ);
      }
  
-     cpu->interrupt_request = 0;
--    cpu->halted = 0;
-+    cpu_halted_set(cpu, 0);
-     cpu->mem_io_pc = 0;
-     cpu->mem_io_vaddr = 0;
-     cpu->icount_extra = 0;
+     /* maybe we need to inject an event */
+@@ -674,7 +674,7 @@ void do_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1)
+                        env->vm_vmcb + offsetof(struct vmcb, control.int_ctl));
+     int_ctl &= ~(V_TPR_MASK | V_IRQ_MASK);
+     int_ctl |= env->v_tpr & V_TPR_MASK;
+-    if (cs->interrupt_request & CPU_INTERRUPT_VIRQ) {
++    if (cpu_interrupt_request(cs) & CPU_INTERRUPT_VIRQ) {
+         int_ctl |= V_IRQ_MASK;
+     }
+     x86_stl_phys(cs,
 -- 
 2.17.1
