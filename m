@@ -1,23 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gXQjr-0002sN-UB
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:09:20 -0500
+	(envelope-from <alifm@linux.ibm.com>) id 1gXQpM-0007ST-LY
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:14:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gXQjo-0004fW-MD
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:09:15 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 13 Dec 2018 13:09:08 +0000
-Message-ID: <43e3e755-e4d3-5342-2829-e7c309d675e4@virtuozzo.com>
-References: <20181213015013.15350-1-jsnow@redhat.com>
-	<20181213015013.15350-7-jsnow@redhat.com>
-In-Reply-To: <20181213015013.15350-7-jsnow@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <9884DBD528C0284CB6E87E000912C8F7@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <alifm@linux.ibm.com>) id 1gXQpJ-0000XV-BY
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:14:56 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54190
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1gXQpJ-0000UY-1m
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:14:53 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wBDDEDch126093
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 08:14:49 -0500
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2pbquvgyh4-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 08:14:49 -0500
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
+	Thu, 13 Dec 2018 13:14:48 -0000
+References: <1544623878-11248-1-git-send-email-jjherne@linux.ibm.com>
+	<1544623878-11248-3-git-send-email-jjherne@linux.ibm.com>
+From: Farhan Ali <alifm@linux.ibm.com>
+Date: Thu, 13 Dec 2018 08:14:37 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 6/7] iotests: allow pretty-print for
- qmp_log
+In-Reply-To: <1544623878-11248-3-git-send-email-jjherne@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <1e022a58-46be-5dd2-80ba-8d02732c2c30@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 02/15] s390-bios: decouple cio setup from
+ virtio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,47 +43,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com, borntraeger@de.ibm.com
 
-MTMuMTIuMjAxOCA0OjUwLCBKb2huIFNub3cgd3JvdGU6DQo+IElmIGlvdGVzdHMgaGF2ZSBsaW5l
-cyBleGNlZWRpbmcgPjk5OCBjaGFyYWN0ZXJzIGxvbmcsIGdpdCBkb2Vzbid0DQo+IHdhbnQgdG8g
-c2VuZCBpdCBwbGFpbnRleHQgdG8gdGhlIGxpc3QuIFdlIGNhbiBzb2x2ZSB0aGlzIGJ5IGFsbG93
-aW5nDQo+IHRoZSBpb3Rlc3RzIHRvIHVzZSBwcmV0dHkgcHJpbnRlZCBRTVAgb3V0cHV0IHRoYXQg
-d2UgY2FuIG1hdGNoIGFnYWluc3QNCj4gaW5zdGVhZC4NCj4gDQo+IEFzIGEgYm9udXMsIGl0J3Mg
-bXVjaCBuaWNlciBmb3IgaHVtYW4gZXllcywgdG9vLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSm9o
-biBTbm93IDxqc25vd0ByZWRoYXQuY29tPg0KPiAtLS0NCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMv
-aW90ZXN0cy5weSB8IDQgKystLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyks
-IDIgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzL2lv
-dGVzdHMucHkgYi90ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weQ0KPiBpbmRleCA5NTk1NDI5
-ZmVhLi5kYmJlZjRiYWQzIDEwMDY0NA0KPiAtLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0
-cy5weQ0KPiArKysgYi90ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weQ0KPiBAQCAtNDQ3LDEy
-ICs0NDcsMTIgQEAgY2xhc3MgVk0ocXRlc3QuUUVNVVF0ZXN0TWFjaGluZSk6DQo+ICAgICAgICAg
-ICAgICAgcmVzdWx0LmFwcGVuZChmaWx0ZXJfcW1wX2V2ZW50KGV2KSkNCj4gICAgICAgICAgIHJl
-dHVybiByZXN1bHQNCj4gICANCj4gLSAgICBkZWYgcW1wX2xvZyhzZWxmLCBjbWQsIGZpbHRlcnM9
-W2ZpbHRlcl90ZXN0ZmlsZXNdLCAqKmt3YXJncyk6DQo+ICsgICAgZGVmIHFtcF9sb2coc2VsZiwg
-Y21kLCBpbmRlbnQ9Tm9uZSwgZmlsdGVycz1bZmlsdGVyX3Rlc3RmaWxlc10sICoqa3dhcmdzKToN
-Cj4gICAgICAgICAgIGxvZ21zZyA9ICd7ImV4ZWN1dGUiOiAiJXMiLCAiYXJndW1lbnRzIjogJXN9
-JyAlIFwNCj4gICAgICAgICAgICAgICAoY21kLCBqc29uLmR1bXBzKGt3YXJncywgc29ydF9rZXlz
-PVRydWUpKQ0KPiAgICAgICAgICAgbG9nKGxvZ21zZywgZmlsdGVycykNCg0Kd2h5IG5vdCB0byBw
-cmV0dGlmeSBjbWQganNvbiB0b28/IEp1c3QgbWFrZSBmdWxsb2JqID0geyJleGVjdXRlIjogY21k
-LCAiYXJndW1lbnRzIjoga3dhcmdzfSwgYW5kIHByZXR0aWZ5IGl0Lg0KKGhtbSwgdW5mb3J0dW5h
-dGVseSwgImV4ZWN1dGUiIDwgImFyZ3VtZW50cyIsIGFuZCB0aGV5IHdpbGwgYmUgcmVhcnJhbmdl
-ZCkNCg0Kd2l0aCBvciB3aXRob3V0IChhcyB0aGUgcGF0Y2ggZG9uJ3QgYWltIHRvIHByZXR0aWZ5
-IGV2ZXJ5dGhpbmcpOg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkg
-PHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KPiAgICAgICAgICAgcmVzdWx0ID0gc2VsZi5x
-bXAoY21kLCAqKmt3YXJncykNCj4gLSAgICAgICAgbG9nKGpzb24uZHVtcHMocmVzdWx0LCBzb3J0
-X2tleXM9VHJ1ZSksIGZpbHRlcnMpDQo+ICsgICAgICAgIGxvZyhqc29uLmR1bXBzKHJlc3VsdCwg
-aW5kZW50PWluZGVudCwgc29ydF9rZXlzPVRydWUpLCBmaWx0ZXJzKQ0KPiAgICAgICAgICAgcmV0
-dXJuIHJlc3VsdA0KDQpobW0sIGRvaW5nIHRoZSBzYW1lIHRoaW5nIGFzIEVyaWMgKGNoZWNrIHNw
-ZWNzKSwgSSBzZWUgdGhlIGZvbGxvd2luZyBub3RlOg0KDQogPiBOb3RlOiBTaW5jZSB0aGUgZGVm
-YXVsdCBpdGVtIHNlcGFyYXRvciBpcyAnLCAnLCB0aGUgb3V0cHV0IG1pZ2h0IGluY2x1ZGUgdHJh
-aWxpbmcgd2hpdGVzcGFjZSB3aGVuIGluZGVudCBpcyBzcGVjaWZpZWQuDQoNCkFuZCBJIHJlbWVt
-YmVyIGEgcGFpbiBvZiB0cmFpbGluZyB3aGl0ZXNwYWNlcyBpbiBpb3Rlc3RzIG9uLCBtYXkgYmUs
-IGJhY2twb3J0aW5nLCBvciBzb21ldGhpbmcgbGlrZSB0aGlzIHNvbWUgdGltZSBhZ28uDQpJdCdz
-IG9mIGNvdXJzZSBub3QgYWJvdXQgdGhpcyBwYXRjaCwgYnV0IEkgdGhpbmsgaXQgaXMgYSBnb29k
-IGlkZWEgdG8gYXZvaWQgdHJhaWxpbmcgd2hpdGVzcGFjZXMgaW4gdGVzdCBvdXRwdXQsIGF0IGxl
-YXN0DQppbiBjb21tb24gaGVscGVycy4gTWF5IGJlIGJlc3QgcGxhY2UgdG8gZml4IGlzIGlvdGVz
-dHMubG9nKCkgZnVuY3Rpb24NCg0KPiAgIA0KPiAgICAgICBkZWYgcnVuX2pvYihzZWxmLCBqb2Is
-IGF1dG9fZmluYWxpemU9VHJ1ZSwgYXV0b19kaXNtaXNzPUZhbHNlKToNCj4gDQoNCg0KLS0gDQpC
-ZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+
+
+On 12/12/2018 09:11 AM, Jason J. Herne wrote:
+> Move channel i/o setup code out to a separate function. This decouples cio
+> setup from the virtio code path and allows us to make use of it for booting
+> dasd devices.
+> 
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Reviewed-by: Collin Walling <walling@linux.ibm.com>
+> ---
+>   pc-bios/s390-ccw/main.c | 20 +++++++++++++-------
+>   1 file changed, 13 insertions(+), 7 deletions(-)
+> 
+> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+> index 544851d..e82fe2c 100644
+> --- a/pc-bios/s390-ccw/main.c
+> +++ b/pc-bios/s390-ccw/main.c
+> @@ -99,6 +99,18 @@ static void menu_setup(void)
+>       }
+>   }
+> 
+> +/*
+> + * Initialize the channel I/O subsystem so we can talk to our ipl/boot device.
+> + */
+> +static void css_setup(void)
+> +{
+> +    /*
+> +     * Unconditionally enable mss support. In every sane configuration this
+> +     * will succeed; and even if it doesn't, stsch_err() can handle it.
+> +     */
+> +    enable_mss_facility();
+> +}
+> +
+>   static void virtio_setup(void)
+>   {
+>       Schib schib;
+> @@ -109,13 +121,6 @@ static void virtio_setup(void)
+>       VDev *vdev = virtio_get_device();
+>       QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
+> 
+> -    /*
+> -     * We unconditionally enable mss support. In every sane configuration,
+> -     * this will succeed; and even if it doesn't, stsch_err() can deal
+> -     * with the consequences.
+> -     */
+> -    enable_mss_facility();
+> -
+>       sclp_get_loadparm_ascii(loadparm_str);
+>       memcpy(ldp + 10, loadparm_str, LOADPARM_LEN);
+>       sclp_print(ldp);
+> @@ -168,6 +173,7 @@ static void virtio_setup(void)
+>   int main(void)
+>   {
+>       sclp_setup();
+> +    css_setup();
+>       virtio_setup();
+> 
+>       zipl_load(); /* no return */
+> 
+
+Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
