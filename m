@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gXQGV-0000zZ-PD
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:38:57 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gXQGi-0001Dp-Bi
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:39:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gXQGT-0007tK-V5
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:38:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59130)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gXQGb-00084p-Ey
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:39:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44188)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gXQGT-0007rU-HD
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:38:53 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	id 1gXQGa-0007zN-Ns
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:39:01 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 854D430016E7
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 12:38:52 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B5AC73082E53
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 12:38:57 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 13 Dec 2018 16:37:18 +0400
-Message-Id: <20181213123724.4866-17-marcandre.lureau@redhat.com>
+Date: Thu, 13 Dec 2018 16:37:19 +0400
+Message-Id: <20181213123724.4866-18-marcandre.lureau@redhat.com>
 In-Reply-To: <20181213123724.4866-1-marcandre.lureau@redhat.com>
 References: <20181213123724.4866-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v8 16/22] qapi: add 'if' to alternate members
+Subject: [Qemu-devel] [PATCH v8 17/22] qapi: add #if conditions to generated
+ code members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,113 +37,196 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com
 
-Add 'if' key to alternate members:
+Wrap generated enum and struct members and their supporting code with
 
-{ 'alternate': 'TestIfAlternate', 'data':
-  { 'alt': { 'type': 'TestStruct', 'if': 'COND' } } }
-
-Generated code is not changed by this patch but with "qapi: add #if
-conditions to generated code".
+We do enum and struct in a single patch because union tag enum and the
+associated variants tie them together, and dealing with that to split
+the patch doesn't seem worthwhile.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi/common.py                  | 10 +++++-----
- docs/devel/qapi-code-gen.txt            |  2 +-
- tests/qapi-schema/qapi-schema-test.json |  4 +++-
- tests/qapi-schema/qapi-schema-test.out  |  1 +
- 4 files changed, 10 insertions(+), 7 deletions(-)
+ scripts/qapi/common.py     |  4 ++++
+ scripts/qapi/introspect.py | 14 ++++++++++----
+ scripts/qapi/types.py      |  4 ++++
+ scripts/qapi/visit.py      |  6 ++++++
+ 4 files changed, 24 insertions(+), 4 deletions(-)
 
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 5c57eca953..d622702111 100644
+index d622702111..c5b25cf256 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -833,7 +833,7 @@ def check_alternate(expr, info):
-         check_name(info, "Member of alternate '%s'" % name, key)
-         check_known_keys(info,
-                          "member '%s' of alternate '%s'" % (key, name),
--                         value, ['type'], [])
-+                         value, ['type'], ['if'])
-         typ =3D value['type']
+@@ -2078,11 +2078,13 @@ const QEnumLookup %(c_name)s_lookup =3D {
+ ''',
+                 c_name=3Dc_name(name))
+     for m in members:
++        ret +=3D gen_if(m.ifcond)
+         index =3D c_enum_const(name, m.name, prefix)
+         ret +=3D mcgen('''
+         [%(index)s] =3D "%(name)s",
+ ''',
+                      index=3Dindex, name=3Dm.name)
++        ret +=3D gen_endif(m.ifcond)
 =20
-         # Ensure alternates have no type conflicts.
-@@ -1754,8 +1754,8 @@ class QAPISchema(object):
-                                               self._make_members(data, i=
-nfo),
-                                               None))
+     ret +=3D mcgen('''
+     },
+@@ -2104,10 +2106,12 @@ typedef enum %(c_name)s {
+                 c_name=3Dc_name(name))
 =20
--    def _make_variant(self, case, typ):
--        return QAPISchemaObjectTypeVariant(case, typ)
-+    def _make_variant(self, case, typ, ifcond):
-+        return QAPISchemaObjectTypeVariant(case, typ, ifcond)
+     for m in enum_members:
++        ret +=3D gen_if(m.ifcond)
+         ret +=3D mcgen('''
+     %(c_enum)s,
+ ''',
+                      c_enum=3Dc_enum_const(name, m.name, prefix))
++        ret +=3D gen_endif(m.ifcond)
 =20
-     def _make_simple_variant(self, case, typ, ifcond, info):
-         if isinstance(typ, list):
-@@ -1778,7 +1778,7 @@ class QAPISchema(object):
-                 name, info, doc, ifcond,
-                 'base', self._make_members(base, info))
-         if tag_name:
--            variants =3D [self._make_variant(key, value['type'])
-+            variants =3D [self._make_variant(key, value['type'], value.g=
-et('if'))
-                         for (key, value) in data.items()]
-             members =3D []
-         else:
-@@ -1799,7 +1799,7 @@ class QAPISchema(object):
-         name =3D expr['alternate']
-         data =3D expr['data']
-         ifcond =3D expr.get('if')
--        variants =3D [self._make_variant(key, value['type'])
-+        variants =3D [self._make_variant(key, value['type'], value.get('=
-if'))
-                     for (key, value) in data.items()]
-         tag_member =3D QAPISchemaObjectTypeMember('type', 'QType', False=
+     ret +=3D mcgen('''
+ } %(c_name)s;
+diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+index 417625d54b..f7f2ca07e4 100644
+--- a/scripts/qapi/introspect.py
++++ b/scripts/qapi/introspect.py
+@@ -162,6 +162,8 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+         ret =3D {'name': member.name, 'type': self._use_type(member.type=
+)}
+         if member.optional:
+             ret['default'] =3D None
++        if member.ifcond:
++            ret =3D (ret, {'if': member.ifcond})
+         return ret
+=20
+     def _gen_variants(self, tag_name, variants):
+@@ -169,14 +171,17 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+                 'variants': [self._gen_variant(v) for v in variants]}
+=20
+     def _gen_variant(self, variant):
+-        return {'case': variant.name, 'type': self._use_type(variant.typ=
+e)}
++        return ({'case': variant.name, 'type': self._use_type(variant.ty=
+pe)},
++                {'if': variant.ifcond})
+=20
+     def visit_builtin_type(self, name, info, json_type):
+         self._gen_qlit(name, 'builtin', {'json-type': json_type}, [])
+=20
+     def visit_enum_type(self, name, info, ifcond, members, prefix):
+         self._gen_qlit(name, 'enum',
+-                       {'values': [m.name for m in members]}, ifcond)
++                       {'values':
++                        [(m.name, {'if': m.ifcond}) for m in members]},
++                       ifcond)
+=20
+     def visit_array_type(self, name, info, ifcond, element_type):
+         element =3D self._use_type(element_type)
+@@ -192,8 +197,9 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+=20
+     def visit_alternate_type(self, name, info, ifcond, variants):
+         self._gen_qlit(name, 'alternate',
+-                       {'members': [{'type': self._use_type(m.type)}
+-                                    for m in variants.variants]}, ifcond=
 )
-         self._def_entity(
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 0a0e53ede5..43bd853e69 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -754,7 +754,7 @@ gets its generated code guarded like this:
++                       {'members': [
++                           ({'type': self._use_type(m.type)}, {'if': m.i=
+fcond})
++                           for m in variants.variants]}, ifcond)
 =20
- Where a member can be defined with a single string value for its type,
- it is also possible to supply a dictionary instead with both 'type'
--and 'if' keys. (TODO: alternate)
-+and 'if' keys.
+     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
+                       success_response, boxed, allow_oob, allow_preconfi=
+g):
+diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
+index e8d22c5081..62d4cf9f95 100644
+--- a/scripts/qapi/types.py
++++ b/scripts/qapi/types.py
+@@ -43,6 +43,7 @@ struct %(c_name)s {
+ def gen_struct_members(members):
+     ret =3D ''
+     for memb in members:
++        ret +=3D gen_if(memb.ifcond)
+         if memb.optional:
+             ret +=3D mcgen('''
+     bool has_%(c_name)s;
+@@ -52,6 +53,7 @@ def gen_struct_members(members):
+     %(c_type)s %(c_name)s;
+ ''',
+                      c_type=3Dmemb.type.c_type(), c_name=3Dc_name(memb.n=
+ame))
++        ret +=3D gen_endif(memb.ifcond)
+     return ret
 =20
- Example: a conditional 'bar' member
 =20
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
-qapi-schema-test.json
-index a33eff8f86..cb0857df52 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -218,7 +218,9 @@
- { 'command': 'TestIfUnionCmd', 'data': { 'union_cmd_arg': 'TestIfUnion' =
-},
-   'if': 'defined(TEST_IF_UNION)' }
+@@ -131,11 +133,13 @@ def gen_variants(variants):
+     for var in variants.variants:
+         if var.type.name =3D=3D 'q_empty':
+             continue
++        ret +=3D gen_if(var.ifcond)
+         ret +=3D mcgen('''
+         %(c_type)s %(c_name)s;
+ ''',
+                      c_type=3Dvar.type.c_unboxed_type(),
+                      c_name=3Dc_name(var.name))
++        ret +=3D gen_endif(var.ifcond)
 =20
--{ 'alternate': 'TestIfAlternate', 'data': { 'foo': 'int', 'bar': 'TestSt=
-ruct' },
-+{ 'alternate': 'TestIfAlternate', 'data':
-+  { 'foo': 'int',
-+    'bar': { 'type': 'TestStruct', 'if': 'defined(TEST_IF_ALT_BAR)'} },
-   'if': 'defined(TEST_IF_ALT) && defined(TEST_IF_STRUCT)' }
+     ret +=3D mcgen('''
+     } u;
+diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
+index 24f85a2e85..82eab72b21 100644
+--- a/scripts/qapi/visit.py
++++ b/scripts/qapi/visit.py
+@@ -54,6 +54,7 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name=
+)s *obj, Error **errp)
+                      c_type=3Dbase.c_name())
 =20
- { 'command': 'TestIfAlternateCmd', 'data': { 'alt_cmd_arg': 'TestIfAlter=
-nate' },
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
-api-schema-test.out
-index f4c11f1e6a..9464101d26 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -300,6 +300,7 @@ alternate TestIfAlternate
-     tag type
-     case foo: int
-     case bar: TestStruct
-+        if ['defined(TEST_IF_ALT_BAR)']
-     if ['defined(TEST_IF_ALT) && defined(TEST_IF_STRUCT)']
- object q_obj_TestIfAlternateCmd-arg
-     member alt_cmd_arg: TestIfAlternate optional=3DFalse
+     for memb in members:
++        ret +=3D gen_if(memb.ifcond)
+         if memb.optional:
+             ret +=3D mcgen('''
+     if (visit_optional(v, "%(name)s", &obj->has_%(c_name)s)) {
+@@ -73,6 +74,7 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name=
+)s *obj, Error **errp)
+             ret +=3D mcgen('''
+     }
+ ''')
++        ret +=3D gen_endif(memb.ifcond)
+=20
+     if variants:
+         ret +=3D mcgen('''
+@@ -84,6 +86,7 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name=
+)s *obj, Error **errp)
+             case_str =3D c_enum_const(variants.tag_member.type.name,
+                                     var.name,
+                                     variants.tag_member.type.prefix)
++            ret +=3D gen_if(var.ifcond)
+             if var.type.name =3D=3D 'q_empty':
+                 # valid variant and nothing to do
+                 ret +=3D mcgen('''
+@@ -100,6 +103,7 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_na=
+me)s *obj, Error **errp)
+                              case=3Dcase_str,
+                              c_type=3Dvar.type.c_name(), c_name=3Dc_name=
+(var.name))
+=20
++            ret +=3D gen_endif(var.ifcond)
+         ret +=3D mcgen('''
+     default:
+         abort();
+@@ -190,6 +194,7 @@ void visit_type_%(c_name)s(Visitor *v, const char *na=
+me, %(c_name)s **obj, Error
+                 c_name=3Dc_name(name))
+=20
+     for var in variants.variants:
++        ret +=3D gen_if(var.ifcond)
+         ret +=3D mcgen('''
+     case %(case)s:
+ ''',
+@@ -217,6 +222,7 @@ void visit_type_%(c_name)s(Visitor *v, const char *na=
+me, %(c_name)s **obj, Error
+         ret +=3D mcgen('''
+         break;
+ ''')
++        ret +=3D gen_endif(var.ifcond)
+=20
+     ret +=3D mcgen('''
+     case QTYPE_NONE:
 --=20
 2.20.0
