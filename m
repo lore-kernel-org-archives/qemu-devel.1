@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXQG4-0000Yg-R0
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:38:29 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gXQG4-0000YZ-NL
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:38:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXQG3-0006vx-34
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gXQG2-0006tP-Me
 	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:38:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44022)
+Received: from mx1.redhat.com ([209.132.183.28]:34354)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXQG2-0006nb-Nz
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1gXQG0-0006MU-Th
 	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:38:26 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1544701071-2922-1-git-send-email-liq3ea@gmail.com>
-Date: Thu, 13 Dec 2018 13:38:20 +0100
-In-Reply-To: <1544701071-2922-1-git-send-email-liq3ea@gmail.com> (Li Qiang's
-	message of "Thu, 13 Dec 2018 03:37:51 -0800")
-Message-ID: <87k1kda9fn.fsf@dusky.pond.sub.org>
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9136F8DA34
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 12:38:15 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu, 13 Dec 2018 16:37:11 +0400
+Message-Id: <20181213123724.4866-10-marcandre.lureau@redhat.com>
+In-Reply-To: <20181213123724.4866-1-marcandre.lureau@redhat.com>
+References: <20181213123724.4866-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2] util: check the return value of fcntl
- in qemu_set_{block, nonblock}
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v8 09/22] qapi: add 'if' to enum members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,56 +33,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>
-Cc: peter.maydell@linaro.org, marcandre.lureau@redhat.com, pbonzini@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com
 
-Li Qiang <liq3ea@gmail.com> writes:
+QAPISchemaMember gains .ifcond for enum members: inherited classes,
+such as QAPISchemaObjectTypeMember, will thus have an ifcond member
+after this (those different types will also use the .ifcond to store
+the condition and generate conditional code in the following patches).
 
-> Also add diagnostics info in 'qemu_set_cloexec' so that we can know
-> what happen when error occurs.
->
-> Signed-off-by: Li Qiang <liq3ea@gmail.com>
-> ---
-> Change since v1: add diagnostics info
->  
->  util/oslib-posix.c | 37 ++++++++++++++++++++++++++++++++-----
->  1 file changed, 32 insertions(+), 5 deletions(-)
->
-> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> index c1bee2a581..14cbef1e35 100644
-> --- a/util/oslib-posix.c
-> +++ b/util/oslib-posix.c
-> @@ -38,6 +38,7 @@
->  #include <libgen.h>
->  #include <sys/signal.h>
->  #include "qemu/cutils.h"
-> +#include "qemu/error-report.h"
->  
->  #ifdef CONFIG_LINUX
->  #include <sys/syscall.h>
-> @@ -233,14 +234,32 @@ void qemu_set_block(int fd)
->  {
->      int f;
->      f = fcntl(fd, F_GETFL);
-> -    fcntl(fd, F_SETFL, f & ~O_NONBLOCK);
-> +    if (f < 0) {
-> +        error_report("Unable to get file status flag on fd %d: %s(errno=%d)",
-> +                    fd, strerror(errno), errno);
-> +        abort();
-> +    }
-> +    if (fcntl(fd, F_SETFL, f & ~O_NONBLOCK) < 0) {
-> +        error_report("Unable to set blocking flag on fd %d: %s(errno=%d)",
-> +                    fd, strerror(errno), errno);
-> +        abort();
-> +    }
->  }
+The generated code remains unconditional for now. Later patches
+generate the conditionals.
 
-If this is a programming error, i.e. one that can happen only when the
-function gets misused, then abort() is appropriate, but error_report()
-is putting lipstick on the pig.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+---
+ scripts/qapi/common.py                         | 8 +++++---
+ docs/devel/qapi-code-gen.txt                   | 9 +++++++++
+ tests/Makefile.include                         | 1 +
+ tests/qapi-schema/enum-dict-member-unknown.err | 2 +-
+ tests/qapi-schema/enum-if-invalid.err          | 1 +
+ tests/qapi-schema/enum-if-invalid.exit         | 1 +
+ tests/qapi-schema/enum-if-invalid.json         | 3 +++
+ tests/qapi-schema/enum-if-invalid.out          | 0
+ tests/qapi-schema/qapi-schema-test.json        | 5 +++--
+ tests/qapi-schema/qapi-schema-test.out         | 2 ++
+ tests/qapi-schema/test-qapi.py                 | 1 +
+ 11 files changed, 27 insertions(+), 6 deletions(-)
+ create mode 100644 tests/qapi-schema/enum-if-invalid.err
+ create mode 100644 tests/qapi-schema/enum-if-invalid.exit
+ create mode 100644 tests/qapi-schema/enum-if-invalid.json
+ create mode 100644 tests/qapi-schema/enum-if-invalid.out
 
-If it's not a programming error, but something outside QEMU misbehaves
-(user error, network outage, ...), then error_report() is appropriate,
-but abort() is not.  exit(1) then.
-
-[...]
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 510b177e6a..3897bf23eb 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -872,7 +872,8 @@ def check_enum(expr, info):
+=20
+     for member in members:
+         source =3D "dictionary member of enum '%s'" % name
+-        check_known_keys(info, source, member, ['name'], [])
++        check_known_keys(info, source, member, ['name'], ['if'])
++        check_if(member, info)
+         check_name(info, "Member of enum '%s'" % name, member['name'],
+                    enum_member=3DTrue)
+=20
+@@ -1346,9 +1347,10 @@ class QAPISchemaObjectType(QAPISchemaType):
+ class QAPISchemaMember(object):
+     role =3D 'member'
+=20
+-    def __init__(self, name):
++    def __init__(self, name, ifcond=3DNone):
+         assert isinstance(name, str)
+         self.name =3D name
++        self.ifcond =3D listify_cond(ifcond)
+         self.owner =3D None
+=20
+     def set_owner(self, name):
+@@ -1656,7 +1658,7 @@ class QAPISchema(object):
+                                             qtype_values, 'QTYPE'))
+=20
+     def _make_enum_members(self, values):
+-        return [QAPISchemaMember(v['name']) for v in values]
++        return [QAPISchemaMember(v['name'], v.get('if')) for v in values=
+]
+=20
+     def _make_implicit_enum_type(self, name, info, ifcond, values):
+         # See also QAPISchemaObjectTypeMember._pretty_owner()
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index 2c8b392b20..7ba9066eac 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -752,6 +752,15 @@ gets its generated code guarded like this:
+  #endif /* defined(HAVE_BAR) */
+  #endif /* defined(CONFIG_FOO) */
+=20
++An enum value can be replaced by a dictionary with a 'name' and a 'if'
++key.
++
++Example: a conditional 'bar' enum member.
++
++{ 'enum': 'IfEnum', 'data':
++  [ 'foo',
++    { 'name' : 'bar', 'if': 'defined(IFCOND)' } ] }
++
+ Please note that you are responsible to ensure that the C code will
+ compile with an arbitrary combination of conditions, since the
+ generators are unable to check it at this point.
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 2e894c1037..3c9eea27fd 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -384,6 +384,7 @@ qapi-schema +=3D enum-bad-name.json
+ qapi-schema +=3D enum-bad-prefix.json
+ qapi-schema +=3D enum-clash-member.json
+ qapi-schema +=3D enum-dict-member-unknown.json
++qapi-schema +=3D enum-if-invalid.json
+ qapi-schema +=3D enum-int-member.json
+ qapi-schema +=3D enum-member-case.json
+ qapi-schema +=3D enum-missing-data.json
+diff --git a/tests/qapi-schema/enum-dict-member-unknown.err b/tests/qapi-=
+schema/enum-dict-member-unknown.err
+index 76bd0471db..2aae618be0 100644
+--- a/tests/qapi-schema/enum-dict-member-unknown.err
++++ b/tests/qapi-schema/enum-dict-member-unknown.err
+@@ -1,2 +1,2 @@
+ tests/qapi-schema/enum-dict-member-unknown.json:2: Unknown key 'bad-key'=
+ in dictionary member of enum 'MyEnum'
+-Valid keys are 'name'.
++Valid keys are 'if', 'name'.
+diff --git a/tests/qapi-schema/enum-if-invalid.err b/tests/qapi-schema/en=
+um-if-invalid.err
+new file mode 100644
+index 0000000000..54c3cf887b
+--- /dev/null
++++ b/tests/qapi-schema/enum-if-invalid.err
+@@ -0,0 +1 @@
++tests/qapi-schema/enum-if-invalid.json:2: 'if' condition must be a strin=
+g or a list of strings
+diff --git a/tests/qapi-schema/enum-if-invalid.exit b/tests/qapi-schema/e=
+num-if-invalid.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/enum-if-invalid.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/enum-if-invalid.json b/tests/qapi-schema/e=
+num-if-invalid.json
+new file mode 100644
+index 0000000000..60bd0ef1d7
+--- /dev/null
++++ b/tests/qapi-schema/enum-if-invalid.json
+@@ -0,0 +1,3 @@
++# check invalid 'if' type
++{ 'enum': 'TestIfEnum', 'data':
++  [ 'foo', { 'name' : 'bar', 'if': { 'val': 'foo' } } ] }
+diff --git a/tests/qapi-schema/enum-if-invalid.out b/tests/qapi-schema/en=
+um-if-invalid.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
+qapi-schema-test.json
+index 15388ae9a4..8bfaf5aedd 100644
+--- a/tests/qapi-schema/qapi-schema-test.json
++++ b/tests/qapi-schema/qapi-schema-test.json
+@@ -204,7 +204,8 @@
+ { 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
+   'if': 'defined(TEST_IF_STRUCT)' }
+=20
+-{ 'enum': 'TestIfEnum', 'data': [ 'foo', 'bar' ],
++{ 'enum': 'TestIfEnum', 'data':
++  [ 'foo', { 'name' : 'bar', 'if': 'defined(TEST_IF_ENUM_BAR)' } ],
+   'if': 'defined(TEST_IF_ENUM)' }
+=20
+ { 'union': 'TestIfUnion', 'data': { 'foo': 'TestStruct' },
+@@ -219,7 +220,7 @@
+ { 'command': 'TestIfAlternateCmd', 'data': { 'alt_cmd_arg': 'TestIfAlter=
+nate' },
+   'if': 'defined(TEST_IF_ALT)' }
+=20
+-{ 'command': 'TestIfCmd', 'data': { 'foo': 'TestIfStruct' },
++{ 'command': 'TestIfCmd', 'data': { 'foo': 'TestIfStruct', 'bar': 'TestI=
+fEnum' },
+   'returns': 'UserDefThree',
+   'if': ['defined(TEST_IF_CMD)', 'defined(TEST_IF_STRUCT)'] }
+=20
+diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
+api-schema-test.out
+index 06e80e5b04..d90d987651 100644
+--- a/tests/qapi-schema/qapi-schema-test.out
++++ b/tests/qapi-schema/qapi-schema-test.out
+@@ -272,6 +272,7 @@ object TestIfStruct
+ enum TestIfEnum
+     member foo
+     member bar
++        if ['defined(TEST_IF_ENUM_BAR)']
+     if ['defined(TEST_IF_ENUM)']
+ object q_obj_TestStruct-wrapper
+     member data: TestStruct optional=3DFalse
+@@ -302,6 +303,7 @@ command TestIfAlternateCmd q_obj_TestIfAlternateCmd-a=
+rg -> None
+     if ['defined(TEST_IF_ALT)']
+ object q_obj_TestIfCmd-arg
+     member foo: TestIfStruct optional=3DFalse
++    member bar: TestIfEnum optional=3DFalse
+     if ['defined(TEST_IF_CMD)', 'defined(TEST_IF_STRUCT)']
+ command TestIfCmd q_obj_TestIfCmd-arg -> UserDefThree
+    gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfi=
+g=3DFalse
+diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
+.py
+index 641a18f06d..aadf252d9d 100644
+--- a/tests/qapi-schema/test-qapi.py
++++ b/tests/qapi-schema/test-qapi.py
+@@ -29,6 +29,7 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+             print('    prefix %s' % prefix)
+         for m in members:
+             print('    member %s' % m.name)
++            self._print_if(m.ifcond, indent=3D8)
+         self._print_if(ifcond)
+=20
+     def visit_object_type(self, name, info, ifcond, base, members, varia=
+nts):
+--=20
+2.20.0
