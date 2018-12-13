@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gXPld-0000dn-Ge
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:07:06 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gXPok-0003MG-2g
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:10:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gXPlb-0007hv-3b
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:07:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38866)
+	(envelope-from <imammedo@redhat.com>) id 1gXPob-0005A8-VO
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:10:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50060)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gXPla-0007fO-QD
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:06:59 -0500
-Date: Thu, 13 Dec 2018 13:06:54 +0100
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gXPoZ-00058q-RE
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:10:05 -0500
+Date: Thu, 13 Dec 2018 13:09:59 +0100
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181213130654.1eb72eb1@redhat.com>
-In-Reply-To: <CAJ+F1CJ55pcq6OZdnSBVNGQwRSE=gQD0swPeHw_Roj2qVOnxSA@mail.gmail.com>
-References: <20181204142023.15982-1-marcandre.lureau@redhat.com>
-	<20181204142023.15982-8-marcandre.lureau@redhat.com>
-	<20181210174522.04b21215@Igors-MacBook-Pro.local>
-	<20181210175441.7d6e0dcd@Igors-MacBook-Pro.local>
-	<CAJ+F1CJ55pcq6OZdnSBVNGQwRSE=gQD0swPeHw_Roj2qVOnxSA@mail.gmail.com>
+Message-ID: <20181213130959.4c863705@redhat.com>
+In-Reply-To: <ee5f36b2-e0a0-cdee-ad9a-dbeb36f1583c@linux.ibm.com>
+References: <1544469254-11629-1-git-send-email-akrowiak@linux.ibm.com>
+	<20181211162303.2e581899@redhat.com>
+	<ee5f36b2-e0a0-cdee-ad9a-dbeb36f1583c@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v5 07/19] hw: apply accel compat
- properties without touching globals
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qdev/core: Can not replug device on bus
+ that allows one device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,145 +29,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@gmail.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>
+To: Tony Krowiak <akrowiak@linux.ibm.com>
+Cc: thuth@redhat.com, armbru@redhat.com, f4bug@amsat.org, qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com, pbonzini@redhat.com
 
-On Wed, 12 Dec 2018 16:00:06 +0400
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
+On Tue, 11 Dec 2018 14:41:00 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-> Hi
-> On Mon, Dec 10, 2018 at 8:55 PM Igor Mammedov <imammedo@redhat.com> wrote:
-> >
-> > On Mon, 10 Dec 2018 17:45:22 +0100
-> > Igor Mammedov <imammedo@redhat.com> wrote:
-> > =20
-> > > On Tue,  4 Dec 2018 18:20:11 +0400
-> > > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
-> > > =20
-> > > > Instead of registering compat properties as globals, let's keep them
-> > > > in their own array, to avoid mixing with user globals.
-> > > >
-> > > > Introduce object_apply_global_props() function, to apply compatibil=
-ity
-> > > > properties from a GPtrArray.
-> > > >
-> > > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > > > ---
-> > > >  include/hw/qdev-core.h | 10 ++++++++++
-> > > >  include/qom/object.h   |  3 +++
-> > > >  include/sysemu/accel.h |  4 +---
-> > > >  accel/accel.c          | 12 ------------
-> > > >  hw/core/qdev.c         |  9 +++++++++
-> > > >  hw/xen/xen-common.c    |  9 ++++++---
-> > > >  qom/object.c           | 25 +++++++++++++++++++++++++
-> > > >  vl.c                   |  1 -
-> > > >  8 files changed, 54 insertions(+), 19 deletions(-)
-> > > > =20
-> > > [...] =20
-> > > > diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
-> > > > index 6ec14c73ca..4532aa8632 100644
-> > > > --- a/hw/xen/xen-common.c
-> > > > +++ b/hw/xen/xen-common.c
-> > > > @@ -174,18 +174,21 @@ static GlobalProperty xen_compat_props[] =3D {
-> > > >          .driver =3D "migration",
-> > > >          .property =3D "send-section-footer",
-> > > >          .value =3D "off",
-> > > > -    },
-> > > > -    { /* end of list */ },
-> > > > +    }
-> > > >  };
-> > > >
-> > > >  static void xen_accel_class_init(ObjectClass *oc, void *data)
-> > > >  {
-> > > >      AccelClass *ac =3D ACCEL_CLASS(oc);
-> > > > +
-> > > >      ac->name =3D "Xen";
-> > > >      ac->init_machine =3D xen_init;
-> > > >      ac->setup_post =3D xen_setup_post;
-> > > >      ac->allowed =3D &xen_allowed;
-> > > > -    ac->global_props =3D xen_compat_props;
-> > > > +    ac->compat_props =3D g_ptr_array_new(); =20
-> > > where is matching free for that? =20
-> > can we at least annotate it somehow so that valgrind won't complain abo=
-ut this leak? =20
->=20
-> If you check my commits on qemu, you should see that I do care (too
-> much?) about leaks :)
->=20
-> In this case though, I don't see valgrind or asan complaining, I guess
-> it's still a reachable reference.
-> Do you think a FIXME comment would be helpful?
-I've looked at other cases were we leak, and well we leak a lot so it's
-probably futile exercise. But the comment won't hurt and will work as remai=
-nder.
+> On 12/11/18 10:23 AM, Igor Mammedov wrote:
+> > On Mon, 10 Dec 2018 14:14:14 -0500
+> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+> >   
+> >> If the maximum number of devices allowed on a bus is 1 and a device
+> >> which is plugged into the bus is subsequently unplugged, attempting to replug
+> >> the device fails with error "Bus 'xxx' does not support hotplugging".
+> >> The "error" is detected in the qbus_is_full(BusState *bus) function
+> >> (qdev_monitor.c) because bus->max_index >= bus_class->max_dev. The
+> >> root of the problem is that the bus->max_index is not decremented when a device
+> >> is unplugged from the bus. This patch fixes that problem.
+> >>
+> >> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> >> ---
+> >>   hw/core/qdev.c | 2 ++
+> >>   1 file changed, 2 insertions(+)
+> >>
+> >> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> >> index 6b3cc55b27c2..b35b0bf27925 100644
+> >> --- a/hw/core/qdev.c
+> >> +++ b/hw/core/qdev.c
+> >> @@ -59,6 +59,8 @@ static void bus_remove_child(BusState *bus, DeviceState *child)
+> >>               snprintf(name, sizeof(name), "child[%d]", kid->index);
+> >>               QTAILQ_REMOVE(&bus->children, kid, sibling);
+> >>   
+> >> +            bus->max_index--;  
+> > that might cause problem when bus is allowed to has more than 1 device
+> > and unplugged device is not the last one.
+> > In that case bus_add_child() might create a child with duplicate name.  
+> 
+> I see what you are saying. The max_index is assigned to the child device
+> index in the bus_add_child() function. The child device index is used to
+> generate a unique name for the child device. The generated name is then
+> used to link the child as a property to the bus. When the child is
+> removed from the bus, the name is regenerated from the child device
+> index and the named property is . It would therefore appear that the
+> real purpose of the max_index is to generate indexes for children of
+> the bus thus ensuring each child has a unique index. In other words,
+> the max_index value is only tangentially connected to indexing the list
+> of children.
+> 
+> This results in a disconnect between the usage of the max_index value
+> when adding and removing a child from the bus, and the check in the
+> qbus_is_full() function which compares the max_index to the maximum
+> number of devices allowed on the bus. If a child has been removed from
+> the bus, the max_index value does not indicate whether the bus is
+> full, it only specifies the index to be assigned to the next child to be
+> added to the bus.
+> 
+> To resolve this problem, I propose the following:
+> 
+> Add the following field to struct BusState (include/hw/qdev_core.h):
+> 
+> struct BusState {
+>      Object obj;
+>      DeviceState *parent;
+>      char *name;
+>      HotplugHandler *hotplug_handler;
+>      int max_index;
+>      bool realized;
+> +    int num_children;
+>      QTAILQ_HEAD(ChildrenHead, BusChild) children;
+>      QLIST_ENTRY(BusState) sibling;
+> };
+> 
+> Add the following lines of code to the add/remove child functions in
+> hw/core/qdev.c:
+> 
+> static void bus_add_child(BusState *bus, DeviceState *child)
+> {
+>      char name[32];
+>      BusChild *kid = g_malloc0(sizeof(*kid));
+> 
+>      kid->index = bus->max_index++;
+>      kid->child = child;
+>      object_ref(OBJECT(kid->child));
+> 
+>      QTAILQ_INSERT_HEAD(&bus->children, kid, sibling);
+> 
+>      /* This transfers ownership of kid->child to the property.  */
+>      snprintf(name, sizeof(name), "child[%d]", kid->index);
+>      object_property_add_link(OBJECT(bus), name,
+>                               object_get_typename(OBJECT(child)),
+>                               (Object **)&kid->child,
+>                               NULL, /* read-only property */
+>                               0, /* return ownership on prop deletion */
+>                               NULL);
+> 
+> +    bus->num_children++;
+> }
+> 
+> static void bus_remove_child(BusState *bus, DeviceState *child)
+> {
+>      BusChild *kid;
+> 
+>      QTAILQ_FOREACH(kid, &bus->children, sibling) {
+>          if (kid->child == child) {
+>              char name[32];
+> 
+>              snprintf(name, sizeof(name), "child[%d]", kid->index);
+>              QTAILQ_REMOVE(&bus->children, kid, sibling);
+> 
+>              /* This gives back ownership of kid->child back to us.  */
+>              object_property_del(OBJECT(bus), name, NULL);
+>              object_unref(OBJECT(kid->child));
+>              g_free(kid);
+> 
+> +           bus->num_children--;
+> 
+>              return;
+>          }
+>      }
+> }
+> 
+> Change the line of code in the qbus_is_full() function in
+> qdev_monitor.c:
+> 
+> 
+> static inline bool qbus_is_full(BusState *bus)
+> {
+>      BusClass *bus_class = BUS_GET_CLASS(bus);
+> -    return bus_class->max_dev &&
+> -           bus->max_index >= bus_class->max_dev;
+> +    return bus_class->max_dev &&
+> +           bus->num_children >= bus_class->max_dev;
+> }
+> 
 
-
-> (/me wish we had a proper object system, GObject, but that ship as
-> long sailed..)
->=20
-> > =20
-> > > =20
-> > > > +
-> > > > +    compat_props_add(ac->compat_props,
-> > > > +                     xen_compat_props, G_N_ELEMENTS(xen_compat_pro=
-ps));
-> > > >  }
-> > > >
-> > > >  #define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")
-> > > > diff --git a/qom/object.c b/qom/object.c
-> > > > index 17921c0a71..dbdab0aead 100644
-> > > > --- a/qom/object.c
-> > > > +++ b/qom/object.c
-> > > > @@ -370,6 +370,31 @@ static void object_post_init_with_type(Object =
-*obj, TypeImpl *ti)
-> > > >      }
-> > > >  }
-> > > >
-> > > > +void object_apply_global_props(Object *obj, const GPtrArray *props=
-, Error **errp)
-> > > > +{
-> > > > +    Error *err =3D NULL;
-> > > > +    int i;
-> > > > +
-> > > > +    if (!props) {
-> > > > +        return;
-> > > > +    }
-> > > > +
-> > > > +    for (i =3D 0; i < props->len; i++) {
-> > > > +        GlobalProperty *p =3D g_ptr_array_index(props, i);
-> > > > +
-> > > > +        if (object_dynamic_cast(obj, p->driver) =3D=3D NULL) {
-> > > > +            continue;
-> > > > +        }
-> > > > +        p->used =3D true;
-> > > > +        object_property_parse(obj, p->value, p->property, &err);
-> > > > +        if (err !=3D NULL) {
-> > > > +            error_prepend(&err, "can't apply global %s.%s=3D%s: ",
-> > > > +                          p->driver, p->property, p->value);
-> > > > +            error_propagate(errp, err);
-> > > > +        }
-> > > > +    }
-> > > > +}
-> > > > +
-> > > >  static void object_initialize_with_type(void *data, size_t size, T=
-ypeImpl *type)
-> > > >  {
-> > > >      Object *obj =3D data;
-> > > > diff --git a/vl.c b/vl.c
-> > > > index a5ae5f23d2..88ba658572 100644
-> > > > --- a/vl.c
-> > > > +++ b/vl.c
-> > > > @@ -2968,7 +2968,6 @@ static void user_register_global_props(void)
-> > > >   */
-> > > >  static void register_global_properties(MachineState *ms)
-> > > >  {
-> > > > -    accel_register_compat_props(ms->accelerator);
-> > > >      machine_register_compat_props(ms);
-> > > >      user_register_global_props();
-> > > >  } =20
-> > >
-> > > =20
-> >
-> > =20
->=20
->=20
+looks good to me
+[...]
