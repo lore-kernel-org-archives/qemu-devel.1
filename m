@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXV9X-00063a-3k
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 12:52:03 -0500
+	(envelope-from <wainersm@redhat.com>) id 1gXVDY-0007oy-Tl
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 12:56:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXV9W-0004d1-DS
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 12:52:02 -0500
-From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 13 Dec 2018 18:51:54 +0100
-Message-Id: <20181213175154.5242-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH] block: Replace qdict_put() by qdict_put_obj()
- where appropriate
+	(envelope-from <wainersm@redhat.com>) id 1gXVDV-0004Tn-Ns
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 12:56:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40270)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1gXVDV-0004Sm-HQ
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 12:56:09 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C4858C049587
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 17:56:08 +0000 (UTC)
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Date: Thu, 13 Dec 2018 12:55:51 -0500
+Message-Id: <20181213175552.14857-1-wainersm@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/1] checkpatch: checker for comment block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,35 +30,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: ari@tuxera.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
+Cc: stefanha@redhat.com, pbonzini@redhat.com, thuth@redhat.com, ehabkost@redhat.com, Wainer dos Santos Moschetta <wainersm@redhat.com>
 
-Patch created mechanically by rerunning:
+Eduardo Habkost pointed out a malformed block of comments on my
+patch [1] that I had ran checkpatch.pl and no warn/error was
+reported. Then I realized the script does not catch such as
+case (or it had a bug).
 
-  $  spatch --sp-file scripts/coccinelle/qobject.cocci \
-	    --macro-file scripts/cocci-macro-file.h \
-	    --dir block --in-place
+It turns out that checkpatch.pl does not parse comment blocks (If I under=
+stood
+its code correctly...). So I implemented a checker that warns about:
+1. block doesn't begin on its own line.
+Example:
+  /* blah blah
+   * and blah blah
+   */
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- block/blklogwrites.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+2. line in the block doesn't start with asterisk.
+Example:
+  /*
+    foo bar
+    bar foo
+   */
+Note: only the first occurence (i.e 'foo bar') is reported.
 
-diff --git a/block/blklogwrites.c b/block/blklogwrites.c
-index ff98cd5533..d2e01bdb1d 100644
---- a/block/blklogwrites.c
-+++ b/block/blklogwrites.c
-@@ -295,10 +295,9 @@ static void blk_log_writes_refresh_filename(BlockDriverState *bs,
-         qdict_put_str(opts, "driver", "blklogwrites");
- 
-         qobject_ref(bs->file->bs->full_open_options);
--        qdict_put_obj(opts, "file", QOBJECT(bs->file->bs->full_open_options));
-+        qdict_put(opts, "file", bs->file->bs->full_open_options);
-         qobject_ref(s->log_file->bs->full_open_options);
--        qdict_put_obj(opts, "log",
--                      QOBJECT(s->log_file->bs->full_open_options));
-+        qdict_put(opts, "log", s->log_file->bs->full_open_options);
-         qdict_put_int(opts, "log-sector-size", s->sectorsize);
- 
-         bs->full_open_options = opts;
--- 
-2.17.2
+3. block doesn't end on its own line.
+Example:
+  /*
+   * blah blah
+   * and blah */
+
+References:
+[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg580091.html
+
+ps: last time I wrote Perl code was about 13 years ago. That remember me
+of good times. :)
+
+Wainer dos Santos Moschetta (1):
+  checkpatch: check for malformed comment block.
+
+ scripts/checkpatch.pl | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+
+--=20
+2.19.1
