@@ -1,23 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gXUT3-0000fJ-1X
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 12:08:09 -0500
+	(envelope-from <alifm@linux.ibm.com>) id 1gXUWN-0001ho-8K
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 12:11:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gXUSz-0003NJ-Tj
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 12:08:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50372)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gXUSz-0003Lj-LM
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 12:08:05 -0500
-Date: Thu, 13 Dec 2018 22:37:55 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <877egda8i3.fsf@dusky.pond.sub.org>
-Message-ID: <nycvar.YSQ.7.76.1812132233490.12493@xnncv>
-References: <20181213122511.13853-1-kraxel@redhat.com>
-	<877egda8i3.fsf@dusky.pond.sub.org>
+	(envelope-from <alifm@linux.ibm.com>) id 1gXUWK-0000s7-2C
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 12:11:35 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53688)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1gXUWJ-0000qj-Pq
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 12:11:31 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wBDH4IEP083685
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 12:11:30 -0500
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2pbtm4kh0w-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 12:11:29 -0500
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
+	Thu, 13 Dec 2018 17:11:28 -0000
+References: <1544623878-11248-1-git-send-email-jjherne@linux.ibm.com>
+	<1544623878-11248-12-git-send-email-jjherne@linux.ibm.com>
+From: Farhan Ali <alifm@linux.ibm.com>
+Date: Thu, 13 Dec 2018 12:11:23 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH] usb-mtp: use O_NOFOLLOW and O_CLOEXEC.
+In-Reply-To: <1544623878-11248-12-git-send-email-jjherne@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <3b40d49e-a757-ea4b-930e-91996f90ab1b@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 11/15] s390-bios: cio error handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,39 +41,314 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Bandan Das <bsd@redhat.com>, public@hansmi.ch
+To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com, borntraeger@de.ibm.com
 
-  Hello Gerd,
 
-+-- On Thu, 13 Dec 2018, Markus Armbruster wrote --+
-| Gerd Hoffmann <kraxel@redhat.com> writes:
-| > Open files and directories with O_NOFOLLOW to avoid symlinks attacks.
-| > While being at it also add O_CLOEXEC.
-| >
-| > usb-mtp only handles regular files and directories and ignores
-| > everything else, so users should not see a difference.
-| >
-| > Because qemu ignores symlinks carrying out an successfull symlink attack
 
-   symlinks, carrying out a successful ...
+On 12/12/2018 09:11 AM, Jason J. Herne wrote:
+> Add verbose error output for when unexpected i/o errors happen. This eases the
+> burden of debugging and reporting i/o errors. No error information is printed
+> in the success case, here is an example of what is output on error:
+> 
+> vfio-ccw device I/O error - Interrupt Response Block Data:
+>      Function Ctrl : [Start]
+>      Activity Ctrl : [Start-Pending]
+>      Status Ctrl : [Alert] [Primary] [Secondary] [Status-Pending]
+>      Device Status : [Unit-Check]
+>      Channel Status :
+>      cpa=: 0x0000000001e67098
+>      prev_ccw=: 0x0000000000000000
+>      this_ccw=: 0x0000000000000000
+> 
+> Sense Data (fmt 32-bytes):
+>      Sense Condition Flags : [Equipment-Check]
+>      Residual Count     =: 0x0000000000000000
+>      Phys Drive ID      =: 0x000000000000009e
+>      low cyl address    =: 0x0000000000000000
+>      head addr & hi cyl =: 0x0000000000000000
+>      format/message     =: 0x0000000000000008
+>      fmt-dependent[0-7] =: 0x0000000000000004
+>      fmt-dependent[8-15]=: 0xe561282305082fff
+>      prog action code   =: 0x0000000000000016
+>      Configuration info =: 0x00000000000040e0
+>      mcode / hi-cyl     =: 0x0000000000000000
+>      cyl & head addr [0]=: 0x0000000000000000
+>      cyl & head addr [1]=: 0x0000000000000000
+>      cyl & head addr [2]=: 0x0000000000000000
+> 
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> ---
+>   pc-bios/s390-ccw/cio.c  | 225 ++++++++++++++++++++++++++++++++++++++++++++++++
+>   pc-bios/s390-ccw/libc.h |  11 +++
+>   2 files changed, 236 insertions(+)
+> 
+> diff --git a/pc-bios/s390-ccw/cio.c b/pc-bios/s390-ccw/cio.c
+> index 9019250..c72e13c 100644
+> --- a/pc-bios/s390-ccw/cio.c
+> +++ b/pc-bios/s390-ccw/cio.c
+> @@ -83,6 +83,228 @@ static bool irb_error(Irb *irb)
+>       return irb->scsw.dstat != 0xc;
+>   }
+> 
+> +static void print_sense_data(SenseData *sd)
+> +{
+> +    char msgline[512];
+> +
+> +    if (sd->config_info & 0x8000) {
+> +        sclp_print("Sense Data (fmt 24-bytes):\n");
+> +    } else {
+> +        sclp_print("Sense Data (fmt 32-bytes):\n");
+> +    }
+> +
+> +    strcat(msgline, "    Sense Condition Flags :");
+> +    if (sd->status[0] & SNS0_CMD_REJECT) {
+> +        strcat(msgline, " [Cmd-Reject]");
+> +    }
+> +    if (sd->status[0] & SNS0_INTERVENTION_REQ) {
+> +        strcat(msgline, " [Intervention-Required]");
+> +    }
+> +    if (sd->status[0] & SNS0_BUS_OUT_CHECK) {
+> +        strcat(msgline, " [Bus-Out-Parity-Check]");
+> +    }
+> +    if (sd->status[0] & SNS0_EQUIPMENT_CHECK) {
+> +        strcat(msgline, " [Equipment-Check]");
+> +    }
+> +    if (sd->status[0] & SNS0_DATA_CHECK) {
+> +        strcat(msgline, " [Data-Check]");
+> +    }
+> +    if (sd->status[0] & SNS0_OVERRUN) {
+> +        strcat(msgline, " [Overrun]");
+> +    }
+> +    if (sd->status[0] & SNS0_INCOMPL_DOMAIN) {
+> +        strcat(msgline, " [Incomplete-Domain]");
+> +    }
+> +
+> +    if (sd->status[1] & SNS1_PERM_ERR) {
+> +        strcat(msgline, " [Permanent-Error]");
+> +    }
+> +    if (sd->status[1] & SNS1_INV_TRACK_FORMAT) {
+> +        strcat(msgline, " [Invalid-Track-Fmt]");
+> +    }
+> +    if (sd->status[1] & SNS1_EOC) {
+> +        strcat(msgline, " [End-of-Cyl]");
+> +    }
+> +    if (sd->status[1] & SNS1_MESSAGE_TO_OPER) {
+> +        strcat(msgline, " [Operator-Msg]");
+> +    }
+> +    if (sd->status[1] & SNS1_NO_REC_FOUND) {
+> +        strcat(msgline, " [No-Record-Found]");
+> +    }
+> +    if (sd->status[1] & SNS1_FILE_PROTECTED) {
+> +        strcat(msgline, " [File-Protected]");
+> +    }
+> +    if (sd->status[1] & SNS1_WRITE_INHIBITED) {
+> +        strcat(msgline, " [Write-Inhibited]");
+> +    }
+> +    if (sd->status[1] & SNS1_INPRECISE_END) {
+> +        strcat(msgline, " [Imprecise-Ending]");
+> +    }
+> +
+> +    if (sd->status[2] & SNS2_REQ_INH_WRITE) {
+> +        strcat(msgline, " [Req-Inhibit-Write]");
+> +    }
+> +    if (sd->status[2] & SNS2_CORRECTABLE) {
+> +        strcat(msgline, " [Correctable-Data-Check]");
+> +    }
+> +    if (sd->status[2] & SNS2_FIRST_LOG_ERR) {
+> +        strcat(msgline, " [First-Error-Log]");
+> +    }
+> +    if (sd->status[2] & SNS2_ENV_DATA_PRESENT) {
+> +        strcat(msgline, " [Env-Data-Present]");
+> +    }
+> +    if (sd->status[2] & SNS2_INPRECISE_END) {
+> +        strcat(msgline, " [Imprecise-End]");
+> +    }
+> +    strcat(msgline, "\n");
+> +    sclp_print(msgline);
+> +
+> +    print_int("    Residual Count     =", sd->res_count);
+> +    print_int("    Phys Drive ID      =", sd->phys_drive_id);
+> +    print_int("    low cyl address    =", sd->low_cyl_addr);
+> +    print_int("    head addr & hi cyl =", sd->head_high_cyl_addr);
+> +    print_int("    format/message     =", sd->fmt_msg);
+> +    print_int("    fmt-dependent[0-7] =", sd->fmt_dependent_info[0]);
+> +    print_int("    fmt-dependent[8-15]=", sd->fmt_dependent_info[1]);
+> +    print_int("    prog action code   =", sd->program_action_code);
+> +    print_int("    Configuration info =", sd->config_info);
+> +    print_int("    mcode / hi-cyl     =", sd->mcode_hicyl);
+> +    print_int("    cyl & head addr [0]=", sd->cyl_head_addr[0]);
+> +    print_int("    cyl & head addr [1]=", sd->cyl_head_addr[1]);
+> +    print_int("    cyl & head addr [2]=", sd->cyl_head_addr[2]);
+> +}
+> +
+> +static void print_irb_err(Irb *irb)
+> +{
+> +    Ccw0 *this_ccw = u32toptr(irb->scsw.cpa);
+> +    Ccw0 *prev_ccw = u32toptr(irb->scsw.cpa - 8);
+> +    char msgline[256];
+> +
+> +    sclp_print("vfio-ccw device I/O error - Interrupt Response Block Data:\n");
+> +
+> +    strcat(msgline, "    Function Ctrl :");
+> +    if (irb->scsw.ctrl & SCSW_FCTL_START_FUNC) {
+> +        strcat(msgline, " [Start]");
+> +    }
+> +    if (irb->scsw.ctrl & SCSW_FCTL_HALT_FUNC) {
+> +        strcat(msgline, " [Halt]");
+> +    }
+> +    if (irb->scsw.ctrl & SCSW_FCTL_CLEAR_FUNC) {
+> +        strcat(msgline, " [Clear]");
+> +    }
+> +    strcat(msgline, "\n");
+> +    sclp_print(msgline);
+> +
+> +    msgline[0] = '\0';
+> +    strcat(msgline, "    Activity Ctrl :");
+> +    if (irb->scsw.ctrl & SCSW_ACTL_RESUME_PEND) {
+> +        strcat(msgline, " [Resume-Pending]");
+> +    }
+> +    if (irb->scsw.ctrl & SCSW_ACTL_START_PEND) {
+> +        strcat(msgline, " [Start-Pending]");
+> +    }
+> +    if (irb->scsw.ctrl & SCSW_ACTL_HALT_PEND) {
+> +        strcat(msgline, " [Halt-Pending]");
+> +    }
+> +    if (irb->scsw.ctrl & SCSW_ACTL_CLEAR_PEND) {
+> +        strcat(msgline, " [Clear-Pending]");
+> +    }
+> +    if (irb->scsw.ctrl & SCSW_ACTL_CH_ACTIVE) {
+> +        strcat(msgline, " [Channel-Active]");
+> +    }
+> +    if (irb->scsw.ctrl & SCSW_ACTL_DEV_ACTIVE) {
+> +        strcat(msgline, " [Device-Active]");
+> +    }
+> +    if (irb->scsw.ctrl & SCSW_ACTL_SUSPENDED) {
+> +        strcat(msgline, " [Suspended]");
+> +    }
+> +    strcat(msgline, "\n");
+> +    sclp_print(msgline);
+> +
+> +    msgline[0] = '\0';
+> +    strcat(msgline, "    Status Ctrl :");
+> +    if (irb->scsw.ctrl & SCSW_SCTL_ALERT) {
+> +        strcat(msgline, " [Alert]");
+> +    }
+> +    if (irb->scsw.ctrl & SCSW_SCTL_INTERMED) {
+> +        strcat(msgline, " [Intermediate]");
+> +    }
+> +    if (irb->scsw.ctrl & SCSW_SCTL_PRIMARY) {
+> +        strcat(msgline, " [Primary]");
+> +    }
+> +    if (irb->scsw.ctrl & SCSW_SCTL_SECONDARY) {
+> +        strcat(msgline, " [Secondary]");
+> +    }
+> +    if (irb->scsw.ctrl & SCSW_SCTL_STATUS_PEND) {
+> +        strcat(msgline, " [Status-Pending]");
+> +    }
+> +
+> +    strcat(msgline, "\n");
+> +    sclp_print(msgline);
+> +
+> +    msgline[0] = '\0';
+> +    strcat(msgline, "    Device Status :");
+> +    if (irb->scsw.dstat & SCSW_DSTAT_ATTN) {
+> +        strcat(msgline, " [Attention]");
+> +    }
+> +    if (irb->scsw.dstat & SCSW_DSTAT_STATMOD) {
+> +        strcat(msgline, " [Status-Modifier]");
+> +    }
+> +    if (irb->scsw.dstat & SCSW_DSTAT_CUEND) {
+> +        strcat(msgline, " [Ctrl-Unit-End]");
+> +    }
+> +    if (irb->scsw.dstat & SCSW_DSTAT_BUSY) {
+> +        strcat(msgline, " [Busy]");
+> +    }
+> +    if (irb->scsw.dstat & SCSW_DSTAT_CHEND) {
+> +        strcat(msgline, " [Channel-End]");
+> +    }
+> +    if (irb->scsw.dstat & SCSW_DSTAT_DEVEND) {
+> +        strcat(msgline, " [Device-End]");
+> +    }
+> +    if (irb->scsw.dstat & SCSW_DSTAT_UCHK) {
+> +        strcat(msgline, " [Unit-Check]");
+> +    }
+> +    if (irb->scsw.dstat & SCSW_DSTAT_UEXCP) {
+> +        strcat(msgline, " [Unit-Exception]");
+> +    }
+> +    strcat(msgline, "\n");
+> +    sclp_print(msgline);
+> +
+> +    msgline[0] = '\0';
+> +    strcat(msgline, "    Channel Status :");
+> +    if (irb->scsw.cstat & SCSW_CSTAT_PCINT) {
+> +        strcat(msgline, " [Program-Ctrl-Interruption]");
+> +    }
+> +    if (irb->scsw.cstat & SCSW_CSTAT_BADLEN) {
+> +        strcat(msgline, " [Incorrect-Length]");
+> +    }
+> +    if (irb->scsw.cstat & SCSW_CSTAT_PROGCHK) {
+> +        strcat(msgline, " [Program-Check]");
+> +    }
+> +    if (irb->scsw.cstat & SCSW_CSTAT_PROTCHK) {
+> +        strcat(msgline, " [Protection-Check]");
+> +    }
+> +    if (irb->scsw.cstat & SCSW_CSTAT_CHDCHK) {
+> +        strcat(msgline, " [Channel-Data-Check]");
+> +    }
+> +    if (irb->scsw.cstat & SCSW_CSTAT_CHCCHK) {
+> +        strcat(msgline, " [Channel-Ctrl-Check]");
+> +    }
+> +    if (irb->scsw.cstat & SCSW_CSTAT_ICCHK) {
+> +        strcat(msgline, " [Interface-Ctrl-Check]");
+> +    }
+> +    if (irb->scsw.cstat & SCSW_CSTAT_CHAINCHK) {
+> +        strcat(msgline, " [Chaining-Check]");
+> +    }
+> +    strcat(msgline, "\n");
+> +    sclp_print(msgline);
+> +
+> +    print_int("    cpa=", irb->scsw.cpa);
+> +    print_int("    prev_ccw=", *((uint64_t *)prev_ccw));
+> +    print_int("    this_ccw=", *((uint64_t *)this_ccw));
+> +}
+> +
+>   /* Executes a channel program at a given subchannel. The request to run the
+>    * channel program is sent to the subchannel, we then wait for the interrupt
+>    * singaling completion of the I/O operation(s) perfomed by the channel
+> @@ -142,6 +364,9 @@ int do_cio(SubChannelId schid, uint32_t ccw_addr, int fmt)
+>               continue;
+>           }
+> 
+> +        print_irb_err(&irb);
+> +        basic_sense(schid, &sd);
+> +        print_sense_data(&sd);
+>           break;
+>       }
+> 
+> diff --git a/pc-bios/s390-ccw/libc.h b/pc-bios/s390-ccw/libc.h
+> index e198f0b..01b5de0 100644
+> --- a/pc-bios/s390-ccw/libc.h
+> +++ b/pc-bios/s390-ccw/libc.h
+> @@ -79,6 +79,17 @@ static inline size_t strlen(const char *str)
+>       return i;
+>   }
+> 
+> +static inline char *strcat(char *dest, const char *src)
+> +{
+> +    int i;
+> +    char *dest_end = dest + strlen(dest);
+> +
+> +    for (i = 0; i <= strlen(src); i++) {
+> +        dest_end[i] = src[i];
+> +    }
+> +    return dest;
+> +}
+> +
 
-| > requires swapping an existing file or directory below rootdir for a
-| > symlink and winning the race against the inotify notification to qemu.
-| >
-| > Note that the impact of this bug is rather low when qemu is managed by
-| > libvirt due to qemu running sandboxed, so there isn't much you can gain
-| > access to that way.
-| >
-| > Fixes: CVE-2018-pjp-please-get-one
-| 
-| Ah, looks like we've run out of numbers.
+We are not doing any sort of buffer overflow checks here, I think it 
+would be nice to have some sort of checks.
 
-Heh..:)
-
-It's CVE-2018-16872. Thank you so much for the fix patch.
-
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+>   static inline int isdigit(int c)
+>   {
+>       return (c >= '0') && (c <= '9');
+> 
