@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gXPZ0-0006oy-Fx
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:53:59 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gXPaB-0007dO-RY
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:55:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gXPYv-0005PJ-7E
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:53:58 -0500
-Received: from mga07.intel.com ([134.134.136.100]:2122)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gXPYu-0005JV-Tm
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:53:53 -0500
-Date: Thu, 13 Dec 2018 19:50:23 +0800
-From: Yang Zhong <yang.zhong@intel.com>
-Message-ID: <20181213115023.GA15355@yangzhon-Virtual>
-References: <7c2b477e-bdac-c887-2510-82fe04acdcfe@redhat.com>
-	<87b22690-e39c-3b46-dcb4-f6abc3213142@redhat.com>
-	<CAFEAcA8yHb4MdtsJuXcswQp93DN5tSeN9dn8AWWL9se0DKvdcg@mail.gmail.com>
-	<41ceda53-467e-32a1-8fa6-13f0f9c08ad1@redhat.com>
-	<CAFEAcA9oCs+Y1fnY8dOR16n_Hn7PaHziL7K0HZK6=BAd_Gyecg@mail.gmail.com>
-	<e496287e-f8ba-3608-42e1-efb697cfc784@redhat.com>
-	<20181107154114.GC27585@caravaggio>
-	<dd68d3e8-6448-3a67-3212-fd3d3bfba2e2@redhat.com>
-	<20181107192414.GH12503@habkost.net>
-	<20181108110650.GB32519@caravaggio>
+	(envelope-from <alex.bennee@linaro.org>) id 1gXPa6-00006a-0e
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:55:10 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55522)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gXPa5-00004y-Qe
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:55:05 -0500
+Received: by mail-wm1-x344.google.com with SMTP id y139so2023569wmc.5
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 03:55:05 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Thu, 13 Dec 2018 11:55:01 +0000
+Message-Id: <20181213115503.24188-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181108110650.GB32519@caravaggio>
-Subject: Re: [Qemu-devel] QEMU and Kconfig
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v1 0/2] Fix kvm guest debugging of AA32 guests
+ on AA64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,38 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Samuel Ortiz <sameo@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, "Zhong, Yang" <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, mark.rutland@arm.com, ard.biesheuvel@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Hello Paolo and all,
+Hi,
 
-The Kconfig has been completed the porting from your repo and
-now i can sucessfully build x86_64-softmmu binary. But there
-are still some issues:
-   1) Only support x86_64 platform.
-      Other platform, especially for ARM platforms, it's hard for me to define 
-      detailed boards like pc or q35 in x86.
+This is an attempt to fix debugging of AArch32 binaries when running
+under KVM on AArch64 hardware. There are two parts to this, the first is
+a handling the possibility of AArch32 software breakpoints with a
+heuristic based on the current execution mode. The second part is
+delaying the setup of aarch64 debugging until the shared arm_cpu_realize
+function is run by which point we have parsed and decoded the actual
+execution mode of the guest. This doesn't solve the problem of split
+mode guests which switch between an AA64 EL1 and an AA32 EL0 though.
 
-   2) Only support "defconfig". 
-      "randconfig" build has some issues, which are mostly related with CONFIG* in Kconfig.host, 
-      some CONFIG* has different setting value in config-host.mak and %/config-device.mak. like
-      CONFIG_OPENGL=y in %/config-device.mak and CONFIG_OPENGL=n in config-host.mak, which result
-      in build failure.
+I still ran into a problem with single-step. Even with Mark's
+single-step fixup series:
 
-The current configure and build command are almost same with before and if we want to disable or enable
-some features, like "tcg", we still need add "--enable/--disable-tcg" in configure command line. If we want
-to disable one emulation device, we can disable this in related Kconfig file in hw/ directory.
+  To: linux-arm-kernel@lists.infradead.org
+  Cc: kvmarm@lists.cs.columbia.edu,
+  Subject: [PATCH 0/2] kvm/arm: make singlestep behaviour consistent
+  Date: Fri, 9 Nov 2018 15:07:09 +0000
+  Message-Id: <20181109150711.45864-1-mark.rutland@arm.com>
 
-There are still some left issues
-   a) How to replace the CONFIG* in configure, Some CONFIG* need some logic to generate, 
-      those are hard to input this CONFIG* in Kconfig.host or Kconfig* file.
+some instructions do single-step but sometimes the single-step doesn't
+return leading to a runaway until it hits a breakpoint. I'm not sure why
+this is the case because the SS state machine shouldn't be instruction
+sensitive.
 
-   b) The CONFIG* in %/config-target.mak file, this is still related with configure. 
-        
-   c) If a) and b) can be fixed, randconfig is not critical issue.
+However these two patches at least make it possible to debug an AArch32
+guest.
 
-I will send RFC patches to QEMU community and please all give some comments. many thanks!
+Alex Bennée (2):
+  target/arm: kvm64 make guest debug AA32 break point aware
+  target/arm: defer setting up of aarch64 gdb until arm_cpu_realize
 
-Regards,
+ include/hw/arm/arm.h |  2 ++
+ target/arm/cpu.c     |  4 ++++
+ target/arm/cpu64.c   | 20 +++++++++++++++-----
+ target/arm/kvm64.c   | 13 ++++++++++---
+ 4 files changed, 31 insertions(+), 8 deletions(-)
 
-Yang
+-- 
+2.17.1
