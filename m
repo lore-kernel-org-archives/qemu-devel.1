@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gXSPS-0005MZ-CR
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:56:19 -0500
+	(envelope-from <mst@redhat.com>) id 1gXSPU-0005PC-P7
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:56:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gXSPR-0000eo-FI
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:56:18 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:53510)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gXSPR-000747-6p
+	(envelope-from <mst@redhat.com>) id 1gXSPR-0000ex-Hh
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:56:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59542)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gXSPR-0000bw-8Q
 	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:56:17 -0500
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gXSO7-0007JI-AW
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 14:54:55 +0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 13 Dec 2018 14:54:25 +0000
-Message-Id: <20181213145445.17935-18-peter.maydell@linaro.org>
-In-Reply-To: <20181213145445.17935-1-peter.maydell@linaro.org>
-References: <20181213145445.17935-1-peter.maydell@linaro.org>
+Date: Thu, 13 Dec 2018 09:56:06 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181213095516-mutt-send-email-mst@kernel.org>
+References: <cf555a3d-0312-0b61-d18a-12ca295520a0@redhat.com>
+	<CAONzpcaXTBgPTH0WSfq-=RwHLkuqi1mhKcv4C=0_O67_hV8A2Q@mail.gmail.com>
+	<5794e090-9a9b-ca30-1066-ef697c9b67be@redhat.com>
+	<CAONzpcZKAXrgbJc6H3d82zUt6VUVSo36HLg__OvuDWoBk9zTvg@mail.gmail.com>
+	<7520e2cd-59cc-c133-f913-e7397df684dd@redhat.com>
+	<CAONzpcbekTuN80r3Vb3CA7MqYBuVOOmV=6wfCNOb5z6QyrLZvg@mail.gmail.com>
+	<cc6a464a-3193-f95b-08e5-c67e95d72dd5@redhat.com>
+	<CAONzpcZ_RqUujdSoVCPUHH0A2g4hHY=oM9x-04e-6WugYFQOiw@mail.gmail.com>
+	<ce6eb03a-8157-bd4a-a467-9c2d6b2fa7fd@redhat.com>
+	<CAONzpcaGgS0mDm-9q7BZOvuMmCBokwXXkL-ZCUJfedX5m0HoCA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 17/37] pci-bridge/dec: Convert sysbus init
- function to realize function
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAONzpcaGgS0mDm-9q7BZOvuMmCBokwXXkL-ZCUJfedX5m0HoCA@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 0/6] vhost-user-blk: Add support
+ for backend reconnecting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +37,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Yongji Xie <elohimes@gmail.com>
+Cc: jasowang@redhat.com, zhangyu31@baidu.com, Xie Yongji <xieyongji@baidu.com>, lilin24@baidu.com, qemu-devel@nongnu.org, chaiwen@baidu.com, marcandre.lureau@redhat.com, nixun@baidu.com
 
-From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+On Thu, Dec 13, 2018 at 11:41:06AM +0800, Yongji Xie wrote:
+> On Thu, 13 Dec 2018 at 10:58, Jason Wang <jasowang@redhat.com> wrote:
+> >
+> >
+> > On 2018/12/12 =E4=B8=8B=E5=8D=885:18, Yongji Xie wrote:
+> > >>>> Ok, then we can simply forbid increasing the avail_idx in this c=
+ase?
+> > >>>>
+> > >>>> Basically, it's a question of whether or not it's better to done=
+ it in
+> > >>>> the level of virtio instead of vhost. I'm pretty sure if we expo=
+se
+> > >>>> sufficient information, it could be done without touching vhost-=
+user.
+> > >>>> And we won't deal with e.g migration and other cases.
+> > >>>>
+> > >>> OK, I get your point. That's indeed an alternative way. But this =
+feature seems
+> > >>> to be only useful to vhost-user backend.
+> > >> I admit I could not think of a use case other than vhost-user.
+> > >>
+> > >>
+> > >>>    I'm not sure whether it make sense to
+> > >>> touch virtio protocol for this feature.
+> > >> Some possible advantages:
+> > >>
+> > >> - Feature could be determined and noticed by user or management la=
+yer.
+> > >>
+> > >> - There's no need to invent ring layout specific protocol to recor=
+d in
+> > >> flight descriptors. E.g if my understanding is correct, for this s=
+eries
+> > >> and for the example above, it still can not work for packed virtqu=
+eue
+> > >> since descriptor id is not sufficient (descriptor could be overwri=
+tten
+> > >> by used one). You probably need to have a (partial) copy of descri=
+ptor
+> > >> ring for this.
+> > >>
+> > >> - No need to deal with migration, all information was in guest mem=
+ory.
+> > >>
+> > > Yes, we have those advantages. But seems like handle this in vhost-=
+user
+> > > level could be easier to be maintained in production environment. W=
+e can
+> > > support old guest. And the bug fix will not depend on guest kernel =
+updating.
+> >
+> >
+> > Yes. But the my main concern is the layout specific data structure. I=
+f
+> > it could be done through a generic structure (can it?), it would be
+> > fine. Otherwise, I believe we don't want another negotiation about wh=
+at
+> > kind of layout that backend support for reconnect.
+> >
+>=20
+> Yes, the current layout in shared memory didn't support packed virtqueu=
+e because
+> the information of one descriptor in descriptor ring will not be
+> available once device fetch it.
+>=20
+> I also thought about a generic structure before. But I failed... So I
+> tried another way
+> to acheive that in this series. In QEMU side, we just provide a shared
+> memory to backend
+> and we didn't define anything for this memory. In backend side, they
+> should know how to
+> use those memory to record inflight I/O no matter what kind of
+> virtqueue they used.
+> Thus,  If we updates virtqueue for new virtio spec in the feature, we
+> don't need to touch
+> QEMU and guest. What do you think about it?
+>=20
+> Thanks,
+> Yongji
 
-Use DeviceClass rather than SysBusDeviceClass in
-pci_dec_21154_device_class_init().
+I think that's a good direction to take, yes.
+Backends need to be very careful about the layout,
+with versioning etc.
 
-Cc: david@gibson.dropbear.id.au
-Cc: mst@redhat.com
-Cc: marcel.apfelbaum@gmail.com
-Cc: qemu-ppc@nongnu.org
-
-Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-Message-id: 20181130093852.20739-16-maozhongyi@cmss.chinamobile.com
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/pci-bridge/dec.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/hw/pci-bridge/dec.c b/hw/pci-bridge/dec.c
-index 84492d5e5f9..8484bfd4345 100644
---- a/hw/pci-bridge/dec.c
-+++ b/hw/pci-bridge/dec.c
-@@ -98,9 +98,10 @@ PCIBus *pci_dec_21154_init(PCIBus *parent_bus, int devfn)
-     return pci_bridge_get_sec_bus(br);
- }
- 
--static int pci_dec_21154_device_init(SysBusDevice *dev)
-+static void pci_dec_21154_device_realize(DeviceState *dev, Error **errp)
- {
-     PCIHostState *phb;
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
- 
-     phb = PCI_HOST_BRIDGE(dev);
- 
-@@ -108,9 +109,8 @@ static int pci_dec_21154_device_init(SysBusDevice *dev)
-                           dev, "pci-conf-idx", 0x1000);
-     memory_region_init_io(&phb->data_mem, OBJECT(dev), &pci_host_data_le_ops,
-                           dev, "pci-data-idx", 0x1000);
--    sysbus_init_mmio(dev, &phb->conf_mem);
--    sysbus_init_mmio(dev, &phb->data_mem);
--    return 0;
-+    sysbus_init_mmio(sbd, &phb->conf_mem);
-+    sysbus_init_mmio(sbd, &phb->data_mem);
- }
- 
- static void dec_21154_pci_host_realize(PCIDevice *d, Error **errp)
-@@ -150,9 +150,9 @@ static const TypeInfo dec_21154_pci_host_info = {
- 
- static void pci_dec_21154_device_class_init(ObjectClass *klass, void *data)
- {
--    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
-+    DeviceClass *dc = DEVICE_CLASS(klass);
- 
--    sdc->init = pci_dec_21154_device_init;
-+    dc->realize = pci_dec_21154_device_realize;
- }
- 
- static const TypeInfo pci_dec_21154_device_info = {
--- 
-2.19.2
+--=20
+MST
