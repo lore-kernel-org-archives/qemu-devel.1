@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gXP3W-000135-Ar
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:21:28 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gXP6s-0002mK-HR
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:24:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gXP3T-0006he-N7
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:21:26 -0500
-Resent-Message-Id: <E1gXP3T-0006he-N7@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21830)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gXP3R-0006Vi-7l
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:21:22 -0500
-In-Reply-To: <20181213090343.1137475-1-groug@kaod.org>
-Message-ID: <154470004963.15371.12464064082311637710@02a1dbf831e2>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <stefanha@redhat.com>) id 1gXP6r-0000vn-KO
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:24:54 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Thu, 13 Dec 2018 11:24:34 +0000
+Message-Id: <20181213112434.20039-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 13 Dec 2018 03:20:50 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 0/3] 9p patches 2018-12-13
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] block/mirror: add missing coroutine_fn
+ annotations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +20,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: groug@kaod.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIxMzA5MDM0My4xMTM3
-NDc1LTEtZ3JvdWdAa2FvZC5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
-b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
-cm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE4MTIxMzA5MDM0My4xMTM3NDc1
-LTEtZ3JvdWdAa2FvZC5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAvM10gOXAgcGF0
-Y2hlcyAyMDE4LTEyLTEzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpC
-QVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpm
-YWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3Jp
-dGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAk
-QkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAk
-bi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0
-IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
-YWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQo
-KG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
-bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NAplcnJvcjogUlBDIGZh
-aWxlZDsgcmVzdWx0PTE4LCBIVFRQIGNvZGUgPSAyMDAKZmF0YWw6IFRoZSByZW1vdGUgZW5kIGh1
-bmcgdXAgdW5leHBlY3RlZGx5CmVycm9yOiBDb3VsZCBub3QgZmV0Y2ggM2M4Y2Y1YTljMjFmZjg3
-ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFz
-dCk6CiAgRmlsZSAicGF0Y2hldy10ZXN0ZXIvc3JjL3BhdGNoZXctY2xpIiwgbGluZSA1MjEsIGlu
-IHRlc3Rfb25lCiAgICBnaXRfY2xvbmVfcmVwbyhjbG9uZSwgclsicmVwbyJdLCByWyJoZWFkIl0s
-IGxvZ2YsIFRydWUpCiAgRmlsZSAicGF0Y2hldy10ZXN0ZXIvc3JjL3BhdGNoZXctY2xpIiwgbGlu
-ZSA0OCwgaW4gZ2l0X2Nsb25lX3JlcG8KICAgIHN0ZG91dD1sb2dmLCBzdGRlcnI9bG9nZikKICBG
-aWxlICIvdXNyL2xpYjY0L3B5dGhvbjMuNC9zdWJwcm9jZXNzLnB5IiwgbGluZSA1NTgsIGluIGNo
-ZWNrX2NhbGwKICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnBy
-b2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ2dpdCcsICdyZW1vdGUnLCAnYWRk
-JywgJy1mJywgJy0tbWlycm9yPWZldGNoJywgJzNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
-YmQ4ODg3MTMzODQnLCAnaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11J10n
-IHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDEKCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWls
-YWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE4MTIxMzA5MDM0My4xMTM3NDc1LTEt
-Z3JvdWdAa2FvZC5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
-bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
-XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Marking a function coroutine_fn currently has no effect on the compiler,
+but it documents that this function must be called from coroutine
+context and it may yield.  This is important information for the
+programmer.
+
+Also, if we ever transition to a stackless coroutine implementation,
+then it's likely that the annotation will become mandatory so the
+compiler can use the correct calling convention for coroutine functions.
+
+Cc: Max Reitz <mreitz@redhat.com>
+Cc: John Snow <jsnow@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ block/mirror.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
+
+diff --git a/block/mirror.c b/block/mirror.c
+index 8f52c6215d..408c49248f 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -277,7 +277,8 @@ static int mirror_cow_align(MirrorBlockJob *s, int64_=
+t *offset,
+     return ret;
+ }
+=20
+-static inline void mirror_wait_for_any_operation(MirrorBlockJob *s, bool=
+ active)
++static inline void coroutine_fn
++mirror_wait_for_any_operation(MirrorBlockJob *s, bool active)
+ {
+     MirrorOp *op;
+=20
+@@ -295,7 +296,8 @@ static inline void mirror_wait_for_any_operation(Mirr=
+orBlockJob *s, bool active)
+     abort();
+ }
+=20
+-static inline void mirror_wait_for_free_in_flight_slot(MirrorBlockJob *s=
+)
++static inline void coroutine_fn
++mirror_wait_for_free_in_flight_slot(MirrorBlockJob *s)
+ {
+     /* Only non-active operations use up in-flight slots */
+     mirror_wait_for_any_operation(s, false);
+@@ -598,7 +600,7 @@ static void mirror_free_init(MirrorBlockJob *s)
+  * mirror_resume() because mirror_run() will begin iterating again
+  * when the job is resumed.
+  */
+-static void mirror_wait_for_all_io(MirrorBlockJob *s)
++static void coroutine_fn mirror_wait_for_all_io(MirrorBlockJob *s)
+ {
+     while (s->in_flight > 0) {
+         mirror_wait_for_free_in_flight_slot(s);
+@@ -731,7 +733,7 @@ static void mirror_abort(Job *job)
+     assert(ret =3D=3D 0);
+ }
+=20
+-static void mirror_throttle(MirrorBlockJob *s)
++static void coroutine_fn mirror_throttle(MirrorBlockJob *s)
+ {
+     int64_t now =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+=20
+@@ -1106,7 +1108,7 @@ static void mirror_complete(Job *job, Error **errp)
+     job_enter(job);
+ }
+=20
+-static void mirror_pause(Job *job)
++static void coroutine_fn mirror_pause(Job *job)
+ {
+     MirrorBlockJob *s =3D container_of(job, MirrorBlockJob, common.job);
+=20
+@@ -1177,9 +1179,10 @@ static const BlockJobDriver commit_active_job_driv=
+er =3D {
+     .drain                  =3D mirror_drain,
+ };
+=20
+-static void do_sync_target_write(MirrorBlockJob *job, MirrorMethod metho=
+d,
+-                                 uint64_t offset, uint64_t bytes,
+-                                 QEMUIOVector *qiov, int flags)
++static void coroutine_fn
++do_sync_target_write(MirrorBlockJob *job, MirrorMethod method,
++                     uint64_t offset, uint64_t bytes,
++                     QEMUIOVector *qiov, int flags)
+ {
+     BdrvDirtyBitmapIter *iter;
+     QEMUIOVector target_qiov;
+--=20
+2.19.2
