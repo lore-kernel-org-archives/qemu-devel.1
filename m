@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gXSO5-0003zu-9L
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:54 -0500
+	(envelope-from <david@redhat.com>) id 1gXSO7-00041u-02
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gXSO4-00073q-3y
+	(envelope-from <david@redhat.com>) id 1gXSO5-00076U-K3
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46350)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gXSO5-000749-7M
 	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:53 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:53506)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gXSO3-0006zA-Ry
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:52 -0500
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gXSNy-0007FP-Vg
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 14:54:46 +0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 13 Dec 2018 14:54:10 +0000
-Message-Id: <20181213145445.17935-3-peter.maydell@linaro.org>
-In-Reply-To: <20181213145445.17935-1-peter.maydell@linaro.org>
-References: <20181213145445.17935-1-peter.maydell@linaro.org>
+References: <20181212092821.18260-1-david@redhat.com>
+	<20181212092821.18260-3-david@redhat.com>
+	<20181213132850.2b79d12f@redhat.com>
+	<0ba15f35-4827-f6f9-7a62-94a13027c727@redhat.com>
+	<20181213154838.5c7af97a@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <7e959e03-b914-474f-7d99-4c170816bcaa@redhat.com>
+Date: Thu, 13 Dec 2018 15:54:47 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 02/37] Allow AArch64 processors to boot from a
- kernel placed over 4GB
+In-Reply-To: <20181213154838.5c7af97a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 2/2] memory-device: rewrite address
+ assignment using ranges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,108 +32,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-From: Ricardo Perez Blanco <ricardo.perez_blanco@nokia.com>
+On 13.12.18 15:48, Igor Mammedov wrote:
+> On Thu, 13 Dec 2018 13:35:28 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> On 13.12.18 13:28, Igor Mammedov wrote:
+>>> On Wed, 12 Dec 2018 10:28:21 +0100
+>>> David Hildenbrand <david@redhat.com> wrote:
+>>>   
+>>>> Let's rewrite it properly using ranges. This fixes certain overflows that
+>>>> are right now possible. E.g.
+>>>>
+>>>> qemu-system-x86_64 -m 4G,slots=20,maxmem=40G -M pc \
+>>>>     -object memory-backend-file,id=mem1,share,mem-path=/dev/zero,size=2G
+>>>>     -device pc-dimm,memdev=mem1,id=dimm1,addr=-0x40000000
+>>>>
+>>>> Now properly errors out instead of succeeding. (Note that qapi
+>>>> parsing of huge uint64_t values is broken and fixes are on the way)
+>>>>
+>>>> "can't add memory device [0xffffffffa0000000:0x80000000], usable range for
+>>>> memory devices [0x140000000:0xe00000000]"
+>>>>
+>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>> ---
+>>>>  hw/mem/memory-device.c | 54 ++++++++++++++++++++++++------------------
+>>>>  1 file changed, 31 insertions(+), 23 deletions(-)
+>>>>
+>>>> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+>>>> index 8be63c8032..28e871f562 100644
+>>>> --- a/hw/mem/memory-device.c
+>>>> +++ b/hw/mem/memory-device.c
+>>>> @@ -100,9 +100,8 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+>>>>                                              uint64_t align, uint64_t size,
+>>>>                                              Error **errp)
+>>>>  {
+>>>> -    uint64_t address_space_start, address_space_end;
+>>>>      GSList *list = NULL, *item;
+>>>> -    uint64_t new_addr = 0;
+>>>> +    Range as, new = range_empty;
+>>>>  
+>>>>      if (!ms->device_memory) {
+>>>>          error_setg(errp, "memory devices (e.g. for memory hotplug) are not "
+>>>> @@ -115,13 +114,11 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+>>>>                           "enabled, please specify the maxmem option");
+>>>>          return 0;
+>>>>      }
+>>>> -    address_space_start = ms->device_memory->base;
+>>>> -    address_space_end = address_space_start +
+>>>> -                        memory_region_size(&ms->device_memory->mr);
+>>>> -    g_assert(address_space_end >= address_space_start);
+>>>> +    range_init_nofail(&as, ms->device_memory->base,
+>>>> +                      memory_region_size(&ms->device_memory->mr));
+>>>>  
+>>>> -    /* address_space_start indicates the maximum alignment we expect */
+>>>> -    if (!QEMU_IS_ALIGNED(address_space_start, align)) {
+>>>> +    /* start of address space indicates the maximum alignment we expect */
+>>>> +    if (!QEMU_IS_ALIGNED(range_lob(&as), align)) {
+>>>>          error_setg(errp, "the alignment (0x%" PRIx64 ") is not supported",
+>>>>                     align);
+>>>>          return 0;
+>>>> @@ -145,20 +142,25 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+>>>>      }
+>>>>  
+>>>>      if (hint) {
+>>>> -        new_addr = *hint;
+>>>> -        if (new_addr < address_space_start) {
+>>>> +        if (range_init(&new, *hint, size)) {
+>>>>              error_setg(errp, "can't add memory device [0x%" PRIx64 ":0x%" PRIx64
+>>>> -                       "] before 0x%" PRIx64, new_addr, size,
+>>>> -                       address_space_start);
+>>>> +                       "], usable range for memory devices [0x%" PRIx64 ":0x%"
+>>>> +                       PRIx64 "]", *hint, size, range_lob(&as),
+>>>> +                       range_size(&as));  
+>>> this changes error message to be the same as the next one and looses 'before' meaning
+>>> so if you'd like to have the same error message, then prbably merging both branches would be better.  
+>>
+>> I can do that, but I'll have to refer to "*hint" and "size" then instead
+>> of range_lob(&new) and range_size(&new), because the range might not be
+>> initialized.
+> either that or better make errors different to avoid confusion.
+> 
 
-Architecturally, it's possible for an AArch64 machine to have
-all of its RAM over the 4GB mark, but our kernel/initrd loading
-code in boot.c assumes that the upper half of the addresses
-to load these images to is always zero. Write the whole 64 bit
-address into the bootloader code fragment, not just the low half.
+Will see what turns out better. As we indicate the ranges the user can
+figure out what is going wrong.
 
-Note that, currently, none of the existing QEMU machines have
-their main memory over 4GBs, so this was not a user-visible bug.
+> [...]
+>>>> -            new_addr = QEMU_ALIGN_UP(md_addr + md_size, align);
+>>>> +
+>>>> +            next_addr = QEMU_ALIGN_UP(range_upb(&tmp) + 1, align);
+>>>> +            if (!next_addr || range_init(&new, next_addr, range_size(&new))) {
+>>>> +                range_make_empty(&new);
+>>>> +                break;
+>>>> +            }
+>>>>          }
+>>>>      }
+>>>>  
+>>>> -    if (new_addr + size > address_space_end) {
+>>>> +    if (!range_contains_range(&as, &new)) {
+>>>>          error_setg(errp, "could not find position in guest address space for "
+>>>>                     "memory device - memory fragmented due to alignments");  
+>>> it could happen due to fragmentation but also in case remaining free space is no enough  
+>>
+>> That should be handled via memory_device_check_addable(), which is
+>> called at the beginning of the function. It checks for general size
+>> availability.
+> 
+> I've meant
+>  AS_LOB                 AS_UPB
+>    100                   1000
+>  MEM1_LOB  MEM1_UPB
+>    100     900
+> then hotplugging MEM2 with size 200 would fail with this message,
+> which could be a bit confusing.
+> Maybe "not enough space to plug device of size %d" would be better?
 
-Signed-off-by: Ricardo Perez Blanco <ricardo.perez_blanco@nokia.com>
-[PMM: revised commit message and tweaked some long lines]
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/arm/boot.c | 35 ++++++++++++++++++++++-------------
- 1 file changed, 22 insertions(+), 13 deletions(-)
 
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index 586baa9b647..94fce128028 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -63,8 +63,10 @@ typedef enum {
-     FIXUP_TERMINATOR,   /* end of insns */
-     FIXUP_BOARDID,      /* overwrite with board ID number */
-     FIXUP_BOARD_SETUP,  /* overwrite with board specific setup code address */
--    FIXUP_ARGPTR,       /* overwrite with pointer to kernel args */
--    FIXUP_ENTRYPOINT,   /* overwrite with kernel entry point */
-+    FIXUP_ARGPTR_LO,    /* overwrite with pointer to kernel args */
-+    FIXUP_ARGPTR_HI,    /* overwrite with pointer to kernel args (high half) */
-+    FIXUP_ENTRYPOINT_LO, /* overwrite with kernel entry point */
-+    FIXUP_ENTRYPOINT_HI, /* overwrite with kernel entry point (high half) */
-     FIXUP_GIC_CPU_IF,   /* overwrite with GIC CPU interface address */
-     FIXUP_BOOTREG,      /* overwrite with boot register address */
-     FIXUP_DSB,          /* overwrite with correct DSB insn for cpu */
-@@ -83,10 +85,10 @@ static const ARMInsnFixup bootloader_aarch64[] = {
-     { 0xaa1f03e3 }, /* mov x3, xzr */
-     { 0x58000084 }, /* ldr x4, entry ; Load the lower 32-bits of kernel entry */
-     { 0xd61f0080 }, /* br x4      ; Jump to the kernel entry point */
--    { 0, FIXUP_ARGPTR }, /* arg: .word @DTB Lower 32-bits */
--    { 0 }, /* .word @DTB Higher 32-bits */
--    { 0, FIXUP_ENTRYPOINT }, /* entry: .word @Kernel Entry Lower 32-bits */
--    { 0 }, /* .word @Kernel Entry Higher 32-bits */
-+    { 0, FIXUP_ARGPTR_LO }, /* arg: .word @DTB Lower 32-bits */
-+    { 0, FIXUP_ARGPTR_HI}, /* .word @DTB Higher 32-bits */
-+    { 0, FIXUP_ENTRYPOINT_LO }, /* entry: .word @Kernel Entry Lower 32-bits */
-+    { 0, FIXUP_ENTRYPOINT_HI }, /* .word @Kernel Entry Higher 32-bits */
-     { 0, FIXUP_TERMINATOR }
- };
- 
-@@ -106,8 +108,8 @@ static const ARMInsnFixup bootloader[] = {
-     { 0xe59f2004 }, /* ldr     r2, [pc, #4] */
-     { 0xe59ff004 }, /* ldr     pc, [pc, #4] */
-     { 0, FIXUP_BOARDID },
--    { 0, FIXUP_ARGPTR },
--    { 0, FIXUP_ENTRYPOINT },
-+    { 0, FIXUP_ARGPTR_LO },
-+    { 0, FIXUP_ENTRYPOINT_LO },
-     { 0, FIXUP_TERMINATOR }
- };
- 
-@@ -174,8 +176,10 @@ static void write_bootloader(const char *name, hwaddr addr,
-             break;
-         case FIXUP_BOARDID:
-         case FIXUP_BOARD_SETUP:
--        case FIXUP_ARGPTR:
--        case FIXUP_ENTRYPOINT:
-+        case FIXUP_ARGPTR_LO:
-+        case FIXUP_ARGPTR_HI:
-+        case FIXUP_ENTRYPOINT_LO:
-+        case FIXUP_ENTRYPOINT_HI:
-         case FIXUP_GIC_CPU_IF:
-         case FIXUP_BOOTREG:
-         case FIXUP_DSB:
-@@ -1152,9 +1156,13 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
-             /* Place the DTB after the initrd in memory with alignment. */
-             info->dtb_start = QEMU_ALIGN_UP(info->initrd_start + initrd_size,
-                                            align);
--            fixupcontext[FIXUP_ARGPTR] = info->dtb_start;
-+            fixupcontext[FIXUP_ARGPTR_LO] = info->dtb_start;
-+            fixupcontext[FIXUP_ARGPTR_HI] = info->dtb_start >> 32;
-         } else {
--            fixupcontext[FIXUP_ARGPTR] = info->loader_start + KERNEL_ARGS_ADDR;
-+            fixupcontext[FIXUP_ARGPTR_LO] =
-+                info->loader_start + KERNEL_ARGS_ADDR;
-+            fixupcontext[FIXUP_ARGPTR_HI] =
-+                (info->loader_start + KERNEL_ARGS_ADDR) >> 32;
-             if (info->ram_size >= (1ULL << 32)) {
-                 error_report("RAM size must be less than 4GB to boot"
-                              " Linux kernel using ATAGS (try passing a device tree"
-@@ -1162,7 +1170,8 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
-                 exit(1);
-             }
-         }
--        fixupcontext[FIXUP_ENTRYPOINT] = entry;
-+        fixupcontext[FIXUP_ENTRYPOINT_LO] = entry;
-+        fixupcontext[FIXUP_ENTRYPOINT_HI] = entry >> 32;
- 
-         write_bootloader("bootloader", info->loader_start,
-                          primary_loader, fixupcontext, as);
+That should be covered by memory_device_check_addable() if I am not wrong.
+
+used_region_size + size > ms->maxram_size - ms->ram_size
+
+For your example (if I don't mess up the numbers):
+
+ms->maxram_size - ms->ram_size = 900
+used_region_size = 800
+
+So trying to add anything > 100 will bail out.
+
+
+>    
+>>
+>> Thanks!
+>>
+> 
+
+
 -- 
-2.19.2
+
+Thanks,
+
+David / dhildenb
