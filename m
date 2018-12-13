@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1gXLsS-0003jr-DM
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 02:57:50 -0500
+	(envelope-from <groug@kaod.org>) id 1gXLtt-00058a-8a
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 02:59:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1gXLsO-0001qk-Ol
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 02:57:48 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:38865)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1gXLsO-0001lq-2t
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 02:57:44 -0500
-Received: by mail-pf1-x444.google.com with SMTP id q1so704856pfi.5
-	for <qemu-devel@nongnu.org>; Wed, 12 Dec 2018 23:57:42 -0800 (PST)
-From: guangrong.xiao@gmail.com
-Date: Thu, 13 Dec 2018 15:57:26 +0800
-Message-Id: <20181213075727.23540-2-xiaoguangrong@tencent.com>
-In-Reply-To: <20181213075727.23540-1-xiaoguangrong@tencent.com>
-References: <20181213075727.23540-1-xiaoguangrong@tencent.com>
-Subject: [Qemu-devel] [PATCH 1/2] migration: introduce
- compress-wait-thread-adaptive
+	(envelope-from <groug@kaod.org>) id 1gXLtn-0003PP-Fi
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 02:59:15 -0500
+Received: from 10.mo3.mail-out.ovh.net ([87.98.165.232]:53873)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gXLtn-0003Mt-4t
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 02:59:11 -0500
+Received: from player735.ha.ovh.net (unknown [10.109.143.209])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 114FF1EDA8F
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 08:59:09 +0100 (CET)
+Date: Thu, 13 Dec 2018 08:59:01 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20181213085901.3934fbee@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <8492b43c-931c-19d5-38b6-2b8e0dee2e9a@ozlabs.ru>
+References: <20181211054926.56717-1-aik@ozlabs.ru>
+	<20181211054926.56717-3-aik@ozlabs.ru>
+	<20181211173520.785736ae@bahia.lab.toulouse-stg.fr.ibm.com>
+	<a24cf2a7-2e96-318f-8ac1-1ab71f331303@ozlabs.ru>
+	<20181212104622.5095be55@bahia.lab.toulouse-stg.fr.ibm.com>
+	<8492b43c-931c-19d5-38b6-2b8e0dee2e9a@ozlabs.ru>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH qemu 2/3] ppc/spapr: Receive and
+ store device tree blob from SLOF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,466 +35,271 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, wei.w.wang@intel.com, eblake@redhat.com, quintela@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, "Daniel P . =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Xiao Guangrong <xiaoguangrong@tencent.com>
+On Thu, 13 Dec 2018 13:53:54 +1100
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 
-Currently we have two behaviors if all threads are busy to do compression,
-the main thread mush wait one of them becoming free if @compress-wait-thread
-set to on or the main thread can directly return without wait and post
-the page out as normal one
+> On 12/12/2018 20:46, Greg Kurz wrote:
+> > On Wed, 12 Dec 2018 10:57:20 +1100
+> > Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> >   
+> >> On 12/12/2018 03:35, Greg Kurz wrote:  
+> >>> On Tue, 11 Dec 2018 16:49:25 +1100
+> >>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> >>>     
+> >>>> SLOF receives a device tree and updates it with various properties
+> >>>> before switching to the guest kernel and QEMU is not aware of any changes
+> >>>> made by SLOF. Since there is no real RTAS (QEMU implements it), it makes
+> >>>> sense to pass the SLOF final device tree to QEMU to let it implement
+> >>>> RTAS related tasks better, such as PCI host bus adapter hotplug.
+> >>>>
+> >>>> Specifially, now QEMU can find out the actual XICS phandle (for PHB
+> >>>> hotplug) and the RTAS linux,rtas-entry/base properties (for firmware
+> >>>> assisted NMI - FWNMI).
+> >>>>
+> >>>> This stores the initial DT blob in the sPAPR machine and replaces it
+> >>>> in the KVMPPC_H_UPDATE_DT (new private hypercall) handler.
+> >>>>
+> >>>> This adds an @update_dt_enabled machine property to allow backward
+> >>>> migration.
+> >>>>
+> >>>> SLOF already has a hypercall since
+> >>>> https://github.com/aik/SLOF/commit/e6fc84652c9c0073f9183
+> >>>>
+> >>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> >>>> ---
+> >>>>  include/hw/ppc/spapr.h |  7 ++++++-
+> >>>>  hw/ppc/spapr.c         | 31 ++++++++++++++++++++++++++++++-
+> >>>>  hw/ppc/spapr_hcall.c   | 42 ++++++++++++++++++++++++++++++++++++++++++
+> >>>>  hw/ppc/trace-events    |  3 +++
+> >>>>  4 files changed, 81 insertions(+), 2 deletions(-)
+> >>>>
+> >>>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> >>>> index 1987640..86c90df 100644
+> >>>> --- a/include/hw/ppc/spapr.h
+> >>>> +++ b/include/hw/ppc/spapr.h
+> >>>> @@ -102,6 +102,7 @@ struct sPAPRMachineClass {
+> >>>>  
+> >>>>      /*< public >*/
+> >>>>      bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMBs */
+> >>>> +    bool update_dt_enabled;    /* enable KVMPPC_H_UPDATE_DT */
+> >>>>      bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
+> >>>>      bool pre_2_10_has_unused_icps;
+> >>>>      bool legacy_irq_allocation;
+> >>>> @@ -138,6 +139,9 @@ struct sPAPRMachineState {
+> >>>>      int vrma_adjust;
+> >>>>      ssize_t rtas_size;
+> >>>>      void *rtas_blob;
+> >>>> +    uint32_t fdt_size;
+> >>>> +    uint32_t fdt_initial_size;
+> >>>> +    void *fdt_blob;
+> >>>>      long kernel_size;
+> >>>>      bool kernel_le;
+> >>>>      uint32_t initrd_base;
+> >>>> @@ -464,7 +468,8 @@ struct sPAPRMachineState {
+> >>>>  #define KVMPPC_H_LOGICAL_MEMOP  (KVMPPC_HCALL_BASE + 0x1)
+> >>>>  /* Client Architecture support */
+> >>>>  #define KVMPPC_H_CAS            (KVMPPC_HCALL_BASE + 0x2)
+> >>>> -#define KVMPPC_HCALL_MAX        KVMPPC_H_CAS
+> >>>> +#define KVMPPC_H_UPDATE_DT      (KVMPPC_HCALL_BASE + 0x3)
+> >>>> +#define KVMPPC_HCALL_MAX        KVMPPC_H_UPDATE_DT
+> >>>>  
+> >>>>  typedef struct sPAPRDeviceTreeUpdateHeader {
+> >>>>      uint32_t version_id;
+> >>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> >>>> index 8a18250..984bf32 100644
+> >>>> --- a/hw/ppc/spapr.c
+> >>>> +++ b/hw/ppc/spapr.c
+> >>>> @@ -1654,7 +1654,10 @@ static void spapr_machine_reset(void)
+> >>>>      /* Load the fdt */
+> >>>>      qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
+> >>>>      cpu_physical_memory_write(fdt_addr, fdt, fdt_totalsize(fdt));
+> >>>> -    g_free(fdt);
+> >>>> +    g_free(spapr->fdt_blob);
+> >>>> +    spapr->fdt_size = fdt_totalsize(fdt);
+> >>>> +    spapr->fdt_initial_size = spapr->fdt_size;
+> >>>> +    spapr->fdt_blob = fdt;
+> >>>>  
+> >>>>      /* Set up the entry state */
+> >>>>      spapr_cpu_set_entry_state(first_ppc_cpu, SPAPR_ENTRY_POINT, fdt_addr);
+> >>>> @@ -1908,6 +1911,27 @@ static const VMStateDescription vmstate_spapr_irq_map = {
+> >>>>      },
+> >>>>  };
+> >>>>  
+> >>>> +static bool spapr_dtb_needed(void *opaque)
+> >>>> +{
+> >>>> +    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(opaque);
+> >>>> +
+> >>>> +    return smc->update_dt_enabled;
+> >>>> +}
+> >>>> +
+> >>>> +static const VMStateDescription vmstate_spapr_dtb = {
+> >>>> +    .name = "spapr_dtb",
+> >>>> +    .version_id = 1,
+> >>>> +    .minimum_version_id = 1,
+> >>>> +    .needed = spapr_dtb_needed,
+> >>>> +    .fields = (VMStateField[]) {
+> >>>> +        VMSTATE_UINT32(fdt_initial_size, sPAPRMachineState),
+> >>>> +        VMSTATE_UINT32(fdt_size, sPAPRMachineState),
+> >>>> +        VMSTATE_VBUFFER_ALLOC_UINT32(fdt_blob, sPAPRMachineState, 0, NULL,
+> >>>> +                                     fdt_size),    
+> >>>
+> >>> Unless I'm missing something, it looks like the initial spapr->fdt_blob in the
+> >>> destination might be leaked...    
+> >>
+> >> ah true.
+> >>
+> >>  
+> >>>     
+> >>>> +        VMSTATE_END_OF_LIST()
+> >>>> +    },
+> >>>> +};
+> >>>> +
+> >>>>  static const VMStateDescription vmstate_spapr = {
+> >>>>      .name = "spapr",
+> >>>>      .version_id = 3,
+> >>>> @@ -1937,6 +1961,7 @@ static const VMStateDescription vmstate_spapr = {
+> >>>>          &vmstate_spapr_cap_ibs,
+> >>>>          &vmstate_spapr_irq_map,
+> >>>>          &vmstate_spapr_cap_nested_kvm_hv,
+> >>>> +        &vmstate_spapr_dtb,
+> >>>>          NULL
+> >>>>      }
+> >>>>  };
+> >>>> @@ -3871,6 +3896,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+> >>>>      hc->unplug = spapr_machine_device_unplug;
+> >>>>  
+> >>>>      smc->dr_lmb_enabled = true;
+> >>>> +    smc->update_dt_enabled = true;
+> >>>>      mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power8_v2.0");
+> >>>>      mc->has_hotpluggable_cpus = true;
+> >>>>      smc->resize_hpt_default = SPAPR_RESIZE_HPT_ENABLED;
+> >>>> @@ -3981,8 +4007,11 @@ static void spapr_machine_3_1_instance_options(MachineState *machine)
+> >>>>  
+> >>>>  static void spapr_machine_3_1_class_options(MachineClass *mc)
+> >>>>  {
+> >>>> +    sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
+> >>>> +
+> >>>>      spapr_machine_4_0_class_options(mc);
+> >>>>      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_3_1);
+> >>>> +    smc->update_dt_enabled = false;
+> >>>>  }
+> >>>>  
+> >>>>  DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
+> >>>> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> >>>> index ae913d0..dfd3cf3 100644
+> >>>> --- a/hw/ppc/spapr_hcall.c
+> >>>> +++ b/hw/ppc/spapr_hcall.c
+> >>>> @@ -1717,6 +1717,46 @@ static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
+> >>>>  
+> >>>>      args[0] = characteristics;
+> >>>>      args[1] = behaviour;
+> >>>> +    return H_SUCCESS;
+> >>>> +}
+> >>>> +
+> >>>> +static target_ulong h_update_dt(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+> >>>> +                                target_ulong opcode, target_ulong *args)
+> >>>> +{
+> >>>> +    target_ulong dt = ppc64_phys_to_real(args[0]);
+> >>>> +    struct fdt_header hdr = { 0 };
+> >>>> +    unsigned cb;
+> >>>> +    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
+> >>>> +    void *fdt;
+> >>>> +
+> >>>> +    cpu_physical_memory_read(dt, &hdr, sizeof(hdr));
+> >>>> +    cb = fdt32_to_cpu(hdr.totalsize);
+> >>>> +
+> >>>> +    if (!smc->update_dt_enabled) {
+> >>>> +        return H_SUCCESS;
+> >>>> +    }
+> >>>> +
+> >>>> +    /* Check that the fdt did not grow out of proportion */
+> >>>> +    if (cb > spapr->fdt_initial_size * 2) {    
+> >>>
+> >>> Ok, so this caps the new fdt tree to 2 megs, which seems reasonable.    
+> >>
+> >> Why _megs_? It is 2 _times_. We do not expect big growth, it should be  
+> > 
+> > The initial or cas fdt is capped to 1 meg (FDT_MAX_SIZE), isn't it ? So
+> > this check would allow the new fdt to be theoretically up to 2 meg.  
+> 
+> 
+> Sure but I do not set the limit here, why would you bring it up here? Or
+> the idea was to do "if(cb > FDT_MAX_SIZE)return H_PARAMETER"? It is
+> probably a good idea, David? Thanks,
+> 
 
-Both of them have its profits and short-comes, however, if the bandwidth is
-not limited extremely so that compression can not use out all of it bandwidth,
-at the same time, the migration process is easily throttled if we posted too
-may pages as normal pages. None of them can work properly under this case
+David already explained elsewhere he preferred checking that the fdt
+hasn't grown too much, to checking against a fixed size. 
 
-In order to use the bandwidth more effectively, we introduce the third
-behavior, compress-wait-thread-adaptive, which make the main thread wait
-if there is no bandwidth left or let the page go out as normal page if there
-has enough bandwidth to make sure the migration process will not be
-throttled
+My point was more about the x2 growth factor which looks quite big
+compared to the 10% you're mentioning. But since this is just a
+single allocation and the size is _small_, I guest it's ok.
 
-Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
----
- hmp.c                 |  11 +++++
- migration/migration.c |  37 ++++++++++++++++
- migration/migration.h |   4 ++
- migration/ram.c       | 118 +++++++++++++++++++++++++++++++++++++++++++++-----
- qapi/migration.json   |  26 ++++++++++-
- 5 files changed, 184 insertions(+), 12 deletions(-)
-
-diff --git a/hmp.c b/hmp.c
-index 43ae9ec61a..2c5bb504d4 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -282,6 +282,8 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
-                        info->compression->compressed_size);
-         monitor_printf(mon, "compression rate: %0.2f\n",
-                        info->compression->compression_rate);
-+        monitor_printf(mon, "compress-no-wait-weight: %"PRIu64"\n",
-+                       info->compression->compress_no_wait_weight);
-     }
- 
-     if (info->has_cpu_throttle_percentage) {
-@@ -344,6 +346,11 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
-         monitor_printf(mon, "%s: %s\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_COMPRESS_WAIT_THREAD),
-             params->compress_wait_thread ? "on" : "off");
-+        assert(params->has_compress_wait_thread_adaptive);
-+        monitor_printf(mon, "%s: %s\n",
-+            MigrationParameter_str(
-+                MIGRATION_PARAMETER_COMPRESS_WAIT_THREAD_ADAPTIVE),
-+            params->compress_wait_thread_adaptive ? "on" : "off");
-         assert(params->has_decompress_threads);
-         monitor_printf(mon, "%s: %u\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_DECOMPRESS_THREADS),
-@@ -1676,6 +1683,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
-         p->has_compress_wait_thread = true;
-         visit_type_bool(v, param, &p->compress_wait_thread, &err);
-         break;
-+    case MIGRATION_PARAMETER_COMPRESS_WAIT_THREAD_ADAPTIVE:
-+        p->has_compress_wait_thread_adaptive = true;
-+        visit_type_bool(v, param, &p->compress_wait_thread_adaptive, &err);
-+        break;
-     case MIGRATION_PARAMETER_DECOMPRESS_THREADS:
-         p->has_decompress_threads = true;
-         visit_type_int(v, param, &p->decompress_threads, &err);
-diff --git a/migration/migration.c b/migration/migration.c
-index 49ffb9997a..d19935b529 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -706,6 +706,9 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
-     params->compress_threads = s->parameters.compress_threads;
-     params->has_compress_wait_thread = true;
-     params->compress_wait_thread = s->parameters.compress_wait_thread;
-+    params->has_compress_wait_thread_adaptive = true;
-+    params->compress_wait_thread_adaptive =
-+                            s->parameters.compress_wait_thread_adaptive;
-     params->has_decompress_threads = true;
-     params->decompress_threads = s->parameters.decompress_threads;
-     params->has_cpu_throttle_initial = true;
-@@ -799,6 +802,8 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
-                                     compression_counters.compressed_size;
-         info->compression->compression_rate =
-                                     compression_counters.compression_rate;
-+        info->compression->compress_no_wait_weight =
-+                                compression_counters.compress_no_wait_weight;
-     }
- 
-     if (cpu_throttle_active()) {
-@@ -1132,6 +1137,11 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
-         dest->compress_wait_thread = params->compress_wait_thread;
-     }
- 
-+    if (params->has_compress_wait_thread_adaptive) {
-+        dest->compress_wait_thread_adaptive =
-+            params->compress_wait_thread_adaptive;
-+    }
-+
-     if (params->has_decompress_threads) {
-         dest->decompress_threads = params->decompress_threads;
-     }
-@@ -1204,6 +1214,11 @@ static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
-         s->parameters.compress_wait_thread = params->compress_wait_thread;
-     }
- 
-+    if (params->has_compress_wait_thread_adaptive) {
-+        s->parameters.compress_wait_thread_adaptive =
-+            params->compress_wait_thread_adaptive;
-+    }
-+
-     if (params->has_decompress_threads) {
-         s->parameters.decompress_threads = params->decompress_threads;
-     }
-@@ -1925,6 +1940,15 @@ bool migrate_postcopy_blocktime(void)
-     return s->enabled_capabilities[MIGRATION_CAPABILITY_POSTCOPY_BLOCKTIME];
- }
- 
-+int64_t migration_max_bandwidth(void)
-+{
-+    MigrationState *s;
-+
-+    s = migrate_get_current();
-+
-+    return s->parameters.max_bandwidth;
-+}
-+
- bool migrate_use_compression(void)
- {
-     MigrationState *s;
-@@ -1961,6 +1985,15 @@ int migrate_compress_wait_thread(void)
-     return s->parameters.compress_wait_thread;
- }
- 
-+int migrate_compress_wait_thread_adaptive(void)
-+{
-+    MigrationState *s;
-+
-+    s = migrate_get_current();
-+
-+    return s->parameters.compress_wait_thread_adaptive;
-+}
-+
- int migrate_decompress_threads(void)
- {
-     MigrationState *s;
-@@ -2898,6 +2931,8 @@ static void migration_update_counters(MigrationState *s,
-     s->mbps = (((double) transferred * 8.0) /
-                ((double) time_spent / 1000.0)) / 1000.0 / 1000.0;
- 
-+    compress_adaptive_update(s->mbps);
-+
-     /*
-      * if we haven't sent anything, we don't want to
-      * recalculate. 10000 is a small enough number for our purposes
-@@ -3232,6 +3267,8 @@ static Property migration_properties[] = {
-                       DEFAULT_MIGRATE_COMPRESS_THREAD_COUNT),
-     DEFINE_PROP_BOOL("x-compress-wait-thread", MigrationState,
-                       parameters.compress_wait_thread, true),
-+    DEFINE_PROP_BOOL("x-ccompress-wait-thread-adaptive", MigrationState,
-+                      parameters.compress_wait_thread_adaptive, false),
-     DEFINE_PROP_UINT8("x-decompress-threads", MigrationState,
-                       parameters.decompress_threads,
-                       DEFAULT_MIGRATE_DECOMPRESS_THREAD_COUNT),
-diff --git a/migration/migration.h b/migration/migration.h
-index e413d4d8b6..d631776230 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -270,11 +270,15 @@ bool migrate_use_block(void);
- bool migrate_use_block_incremental(void);
- int migrate_max_cpu_throttle(void);
- bool migrate_use_return_path(void);
-+int64_t migration_max_bandwidth(void);
- 
- bool migrate_use_compression(void);
- int migrate_compress_level(void);
- int migrate_compress_threads(void);
- int migrate_compress_wait_thread(void);
-+int migrate_compress_wait_thread_adaptive(void);
-+void compress_adaptive_update(double mbps);
-+
- int migrate_decompress_threads(void);
- bool migrate_use_events(void);
- bool migrate_postcopy_blocktime(void);
-diff --git a/migration/ram.c b/migration/ram.c
-index 7e7deec4d8..3b08a605e4 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -276,6 +276,8 @@ struct RAMSrcPageRequest {
-     QSIMPLEQ_ENTRY(RAMSrcPageRequest) next_req;
- };
- 
-+#define COMPRESS_BUSY_COUNT_PERIOD 100
-+
- /* State of RAM for migration */
- struct RAMState {
-     /* QEMUFile used for this migration */
-@@ -292,6 +294,19 @@ struct RAMState {
-     bool ram_bulk_stage;
-     /* How many times we have dirty too many pages */
-     int dirty_rate_high_cnt;
-+
-+    /* used by by compress-wait-thread-adaptive */
-+    /*
-+     * the count for the case that all compress threads are busy to
-+     * handle a page in a period
-+     */
-+    uint8_t compress_busy_count;
-+    /*
-+     * the number of pages that can be directly posted as normal page when
-+     * all compress threads are busy in a period
-+     */
-+    uint8_t compress_no_wait_left;
-+
-     /* these variables are used for bitmap sync */
-     /* last time we did a full bitmap_sync */
-     int64_t time_last_bitmap_sync;
-@@ -470,6 +485,8 @@ static void compress_threads_save_cleanup(void)
-     comp_param = NULL;
- }
- 
-+static void compress_adaptive_init(void);
-+
- static int compress_threads_save_setup(void)
- {
-     int i, thread_count;
-@@ -477,6 +494,9 @@ static int compress_threads_save_setup(void)
-     if (!migrate_use_compression()) {
-         return 0;
-     }
-+
-+    compress_adaptive_init();
-+
-     thread_count = migrate_compress_threads();
-     compress_threads = g_new0(QemuThread, thread_count);
-     comp_param = g_new0(CompressParam, thread_count);
-@@ -1593,6 +1613,67 @@ uint64_t ram_pagesize_summary(void)
-     return summary;
- }
- 
-+static void compress_adaptive_init(void)
-+{
-+    /* fully wait on default. */
-+     compression_counters.compress_no_wait_weight = 0;
-+     ram_state->compress_no_wait_left = 0;
-+     ram_state->compress_busy_count = 0;
-+}
-+
-+void compress_adaptive_update(double mbps)
-+{
-+    int64_t rate_limit, remain_bw, max_bw = migration_max_bandwidth();
-+
-+    if (!migrate_use_compression() ||
-+        !migrate_compress_wait_thread_adaptive()) {
-+        return;
-+    }
-+
-+    /* no bandwith is set to the file then we can not do adaptive adjustment */
-+    rate_limit = qemu_file_get_rate_limit(migrate_get_current()->to_dst_file);
-+    if (rate_limit == 0 || rate_limit == INT64_MAX) {
-+        return;
-+    }
-+
-+    max_bw = (max_bw >> 20) * 8;
-+    remain_bw = abs(max_bw - (int64_t)(mbps));
-+    if (remain_bw <= ((max_bw / 10) * 2)) {
-+        /* if we have used all the bandwidth, let's compress more. */
-+        if (compression_counters.compress_no_wait_weight) {
-+            compression_counters.compress_no_wait_weight--;
-+        }
-+        goto exit;
-+    }
-+
-+    /* have enough bandwidth left, do not need to compress so aggressively */
-+    if (compression_counters.compress_no_wait_weight !=
-+        COMPRESS_BUSY_COUNT_PERIOD) {
-+        compression_counters.compress_no_wait_weight++;
-+    }
-+
-+exit:
-+    ram_state->compress_busy_count = 0;
-+    ram_state->compress_no_wait_left =
-+                            compression_counters.compress_no_wait_weight;
-+}
-+
-+static bool compress_adaptive_need_wait(void)
-+{
-+    if (++ram_state->compress_busy_count == COMPRESS_BUSY_COUNT_PERIOD) {
-+        ram_state->compress_busy_count = 0;
-+        ram_state->compress_no_wait_left =
-+                    compression_counters.compress_no_wait_weight;
-+    }
-+
-+    if (ram_state->compress_no_wait_left) {
-+        ram_state->compress_no_wait_left--;
-+        return false;
-+    }
-+
-+    return true;
-+}
-+
- static void migration_update_rates(RAMState *rs, int64_t end_time)
- {
-     uint64_t page_count = rs->target_page_count - rs->target_page_count_prev;
-@@ -1970,6 +2051,15 @@ static int compress_page_with_multi_thread(RAMState *rs, RAMBlock *block,
- {
-     int idx, thread_count, bytes_xmit = -1, pages = -1;
-     bool wait = migrate_compress_wait_thread();
-+    bool adaptive = migrate_compress_wait_thread_adaptive();
-+
-+    /*
-+     * 'compress-wait-thread-adaptive' has higher priority than
-+     * 'compress-wait-thread'.
-+     */
-+    if (adaptive) {
-+        wait = false;
-+    }
- 
-     thread_count = migrate_compress_threads();
-     qemu_mutex_lock(&comp_done_lock);
-@@ -1984,20 +2074,29 @@ retry:
-             qemu_mutex_unlock(&comp_param[idx].mutex);
-             pages = 1;
-             update_compress_thread_counts(&comp_param[idx], bytes_xmit);
--            break;
-+            goto exit;
-         }
-     }
- 
-+    if (adaptive && !wait) {
-+        /* it is the first time go to the loop */
-+        wait = compress_adaptive_need_wait();
-+    }
-+
-     /*
--     * wait for the free thread if the user specifies 'compress-wait-thread',
--     * otherwise we will post the page out in the main thread as normal page.
-+     * wait for the free thread if the user specifies
-+     * 'compress-wait-thread-adaptive' that detected the bandwidth is
-+     * not enough or compress-wait-thread', otherwise we will post the
-+     * page out in the main thread as normal page.
-      */
--    if (pages < 0 && wait) {
-+    if (wait) {
-         qemu_cond_wait(&comp_done_cond, &comp_done_lock);
-         goto retry;
-     }
--    qemu_mutex_unlock(&comp_done_lock);
- 
-+
-+exit:
-+    qemu_mutex_unlock(&comp_done_lock);
-     return pages;
- }
- 
-@@ -3147,19 +3246,18 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
-     RAMState **rsp = opaque;
-     RAMBlock *block;
- 
--    if (compress_threads_save_setup()) {
--        return -1;
--    }
--
-     /* migration has already setup the bitmap, reuse it. */
-     if (!migration_in_colo_state()) {
-         if (ram_init_all(rsp) != 0) {
--            compress_threads_save_cleanup();
-             return -1;
-         }
-     }
-     (*rsp)->f = f;
- 
-+    if (compress_threads_save_setup()) {
-+        return -1;
-+    }
-+
-     rcu_read_lock();
- 
-     qemu_put_be64(f, ram_bytes_total() | RAM_SAVE_FLAG_MEM_SIZE);
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 38d4c41d88..6d925c73fc 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -90,11 +90,16 @@
- #
- # @compression-rate: rate of compressed size
- #
-+# @compress-no-wait-weight: it controls how many pages are directly posted
-+#     out as normal page when all compression threads are currently busy.
-+#     Only available if compress-wait-thread-adaptive is on. (Since 3.2)
-+#
- # Since: 3.1
- ##
- { 'struct': 'CompressionStats',
-   'data': {'pages': 'int', 'busy': 'int', 'busy-rate': 'number',
--	   'compressed-size': 'int', 'compression-rate': 'number' } }
-+	   'compressed-size': 'int', 'compression-rate': 'number',
-+	   'compress-no-wait-weight': 'int'} }
- 
- ##
- # @MigrationStatus:
-@@ -490,6 +495,11 @@
- #                        compression thread to become available; otherwise,
- #                        send the page uncompressed. (Since 3.1)
- #
-+# @compress-wait-thread-adaptive: Adaptively controls compress-wait-thread
-+#          based on the rate limit and it's off on default. When it is on
-+#          and it has enough bandwidth, it acts as compress-wait-thread is
-+#          off. (Since 3.2)
-+#
- # @decompress-threads: Set decompression thread count to be used in live
- #          migration, the decompression thread count is an integer between 1
- #          and 255. Usually, decompression is at least 4 times as fast as
-@@ -558,7 +568,7 @@
- ##
- { 'enum': 'MigrationParameter',
-   'data': ['compress-level', 'compress-threads', 'decompress-threads',
--           'compress-wait-thread',
-+           'compress-wait-thread', 'compress-wait-thread-adaptive',
-            'cpu-throttle-initial', 'cpu-throttle-increment',
-            'tls-creds', 'tls-hostname', 'max-bandwidth',
-            'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
-@@ -578,6 +588,11 @@
- #                        compression thread to become available; otherwise,
- #                        send the page uncompressed. (Since 3.1)
- #
-+# @compress-wait-thread-adaptive: Adaptively controls compress-wait-thread
-+#          based on the rate limit and it's off on default. When it is on
-+#          and it has enough bandwidth, it acts as compress-wait-thread is
-+#          off. (Since 3.2)
-+#
- # @decompress-threads: decompression thread count
- #
- # @cpu-throttle-initial: Initial percentage of time guest cpus are
-@@ -653,6 +668,7 @@
-   'data': { '*compress-level': 'int',
-             '*compress-threads': 'int',
-             '*compress-wait-thread': 'bool',
-+            '*compress-wait-thread-adaptive': 'bool',
-             '*decompress-threads': 'int',
-             '*cpu-throttle-initial': 'int',
-             '*cpu-throttle-increment': 'int',
-@@ -698,6 +714,11 @@
- #                        compression thread to become available; otherwise,
- #                        send the page uncompressed. (Since 3.1)
- #
-+# @compress-wait-thread-adaptive: Adaptively controls compress-wait-thread
-+#          based on the rate limit and it's off on default. When it is on
-+#          and it has enough bandwidth, it acts as compress-wait-thread is
-+#          off. (Since 3.2)
-+#
- # @decompress-threads: decompression thread count
- #
- # @cpu-throttle-initial: Initial percentage of time guest cpus are
-@@ -769,6 +790,7 @@
-   'data': { '*compress-level': 'uint8',
-             '*compress-threads': 'uint8',
-             '*compress-wait-thread': 'bool',
-+            '*compress-wait-thread-adaptive': 'bool',
-             '*decompress-threads': 'uint8',
-             '*cpu-throttle-initial': 'uint8',
-             '*cpu-throttle-increment': 'uint8',
--- 
-2.14.5
+> 
+> 
+> 
+> 
+> >   
+> >> phandles and some slof nodes (packages, options,...), pretty much. Right
+> >> now it is 10% bigger than the initial fdt.
+> >>  
+> > 
+> > Expecting up to 100% may seem overkill then but even with a big initial/cas
+> > fdt, it would _only_ be 2 megs, which is a reasonable limit for a guest
+> > triggered allocation I guess.
+> >   
+> >>  
+> >>> BTW, why 2 and not some other growth factor ?
+> >>>     
+> >>>> +        trace_spapr_update_dt_failed_size(spapr->fdt_initial_size, cb,
+> >>>> +            fdt32_to_cpu(hdr.magic));
+> >>>> +        return H_PARAMETER;
+> >>>> +    }
+> >>>> +
+> >>>> +    fdt = g_malloc0(cb);
+> >>>> +    cpu_physical_memory_read(dt, fdt, cb);
+> >>>> +
+> >>>> +    /* Check the fdt consostency */
+> >>>> +    if (fdt_check_full(fdt, cb)) {
+> >>>> +        trace_spapr_update_dt_failed_check(spapr->fdt_initial_size, cb,
+> >>>> +            fdt32_to_cpu(hdr.magic));
+> >>>> +        return H_PARAMETER;
+> >>>> +    }
+> >>>> +
+> >>>> +    g_free(spapr->fdt_blob);
+> >>>> +    spapr->fdt_size = cb;
+> >>>> +    spapr->fdt_blob = fdt;
+> >>>> +    trace_spapr_update_dt(cb);
+> >>>>  
+> >>>>      return H_SUCCESS;
+> >>>>  }
+> >>>> @@ -1822,6 +1862,8 @@ static void hypercall_register_types(void)
+> >>>>  
+> >>>>      /* ibm,client-architecture-support support */
+> >>>>      spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_support);
+> >>>> +
+> >>>> +    spapr_register_hypercall(KVMPPC_H_UPDATE_DT, h_update_dt);
+> >>>>  }
+> >>>>  
+> >>>>  type_init(hypercall_register_types)
+> >>>> diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
+> >>>> index dc5e65a..0af155e 100644
+> >>>> --- a/hw/ppc/trace-events
+> >>>> +++ b/hw/ppc/trace-events
+> >>>> @@ -22,6 +22,9 @@ spapr_cas_pvr_try(uint32_t pvr) "0x%x"
+> >>>>  spapr_cas_pvr(uint32_t cur_pvr, bool explicit_match, uint32_t new_pvr) "current=0x%x, explicit_match=%u, new=0x%x"
+> >>>>  spapr_h_resize_hpt_prepare(uint64_t flags, uint64_t shift) "flags=0x%"PRIx64", shift=%"PRIu64
+> >>>>  spapr_h_resize_hpt_commit(uint64_t flags, uint64_t shift) "flags=0x%"PRIx64", shift=%"PRIu64
+> >>>> +spapr_update_dt(unsigned cb) "New blob %u bytes"
+> >>>> +spapr_update_dt_failed_size(unsigned cbold, unsigned cbnew, unsigned magic) "Old blob %u bytes, new blob %u bytes, magic 0x%x"
+> >>>> +spapr_update_dt_failed_check(unsigned cbold, unsigned cbnew, unsigned magic) "Old blob %u bytes, new blob %u bytes, magic 0x%x"
+> >>>>  
+> >>>>  # hw/ppc/spapr_iommu.c
+> >>>>  spapr_iommu_put(uint64_t liobn, uint64_t ioba, uint64_t tce, uint64_t ret) "liobn=0x%"PRIx64" ioba=0x%"PRIx64" tce=0x%"PRIx64" ret=%"PRId64    
+> >>>     
+> >>  
+> >   
+> 
