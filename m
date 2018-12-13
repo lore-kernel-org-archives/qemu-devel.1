@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gXQG3-0000XT-Tg
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gXQG4-0000Y2-3e
 	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:38:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gXQG2-0006v9-Uw
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:38:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54796)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gXQG2-0006vS-WF
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:38:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44034)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gXQG2-0006bW-Jm
+	id 1gXQG2-0006qU-Km
 	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:38:26 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 92A689D50B
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 12:38:20 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 98C7F3082E06
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 12:38:25 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 13 Dec 2018 16:37:12 +0400
-Message-Id: <20181213123724.4866-11-marcandre.lureau@redhat.com>
+Date: Thu, 13 Dec 2018 16:37:13 +0400
+Message-Id: <20181213123724.4866-12-marcandre.lureau@redhat.com>
 In-Reply-To: <20181213123724.4866-1-marcandre.lureau@redhat.com>
 References: <20181213123724.4866-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v8 10/22] qapi-events: add 'if' condition to
- implicit event enum
+Subject: [Qemu-devel] [PATCH v8 11/22] qapi: rename allow_dict to
+ allow_implicit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,32 +37,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com
 
-Add condition to QAPIEvent enum members based on the event 'if'.
+This makes it a bit clearer what is the intent of the dictionnary for
+the check_type() function, since there was some confusion on a
+previous iteration of this series.
 
-The generated code remains unconditional for now. Later patches
-generate the conditionals (also there is no additional coverage of
-this change in qapi-schema-test.out since the event_names enum is an
-implicit type created by qapi/events.py).
-
+Suggested-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi/events.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/qapi/common.py | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
-index f1b88d8786..37ee5de682 100644
---- a/scripts/qapi/events.py
-+++ b/scripts/qapi/events.py
-@@ -179,7 +179,7 @@ class QAPISchemaGenEventVisitor(QAPISchemaModularCVis=
-itor):
-             self._genh.add(gen_event_send_decl(name, arg_type, boxed))
-             self._genc.add(gen_event_send(name, arg_type, boxed,
-                                           self._event_enum_name))
--        self._event_enum_members.append(QAPISchemaMember(name))
-+        self._event_enum_members.append(QAPISchemaMember(name, ifcond))
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 3897bf23eb..e4525c43a0 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -661,7 +661,7 @@ def check_if(expr, info):
 =20
 =20
- def gen_events(schema, output_dir, prefix):
+ def check_type(info, source, value, allow_array=3DFalse,
+-               allow_dict=3DFalse, allow_optional=3DFalse,
++               allow_implicit=3DFalse, allow_optional=3DFalse,
+                allow_metas=3D[]):
+     global all_names
+=20
+@@ -688,7 +688,7 @@ def check_type(info, source, value, allow_array=3DFal=
+se,
+                                (source, all_names[value], value))
+         return
+=20
+-    if not allow_dict:
++    if not allow_implicit:
+         raise QAPISemError(info, "%s should be a type name" % source)
+=20
+     if not isinstance(value, OrderedDict):
+@@ -718,7 +718,7 @@ def check_command(expr, info):
+     if boxed:
+         args_meta +=3D ['union', 'alternate']
+     check_type(info, "'data' for command '%s'" % name,
+-               expr.get('data'), allow_dict=3Dnot boxed, allow_optional=3D=
+True,
++               expr.get('data'), allow_implicit=3Dnot boxed, allow_optio=
+nal=3DTrue,
+                allow_metas=3Dargs_meta)
+     returns_meta =3D ['union', 'struct']
+     if name in returns_whitelist:
+@@ -736,7 +736,7 @@ def check_event(expr, info):
+     if boxed:
+         meta +=3D ['union', 'alternate']
+     check_type(info, "'data' for event '%s'" % name,
+-               expr.get('data'), allow_dict=3Dnot boxed, allow_optional=3D=
+True,
++               expr.get('data'), allow_implicit=3Dnot boxed, allow_optio=
+nal=3DTrue,
+                allow_metas=3Dmeta)
+=20
+=20
+@@ -764,7 +764,7 @@ def check_union(expr, info):
+     else:
+         # The object must have a string or dictionary 'base'.
+         check_type(info, "'base' for union '%s'" % name,
+-                   base, allow_dict=3DTrue, allow_optional=3DTrue,
++                   base, allow_implicit=3DTrue, allow_optional=3DTrue,
+                    allow_metas=3D['struct'])
+         if not base:
+             raise QAPISemError(info, "Flat union '%s' must have a base"
+@@ -883,7 +883,7 @@ def check_struct(expr, info):
+     members =3D expr['data']
+=20
+     check_type(info, "'data' for struct '%s'" % name, members,
+-               allow_dict=3DTrue, allow_optional=3DTrue)
++               allow_implicit=3DTrue, allow_optional=3DTrue)
+     check_type(info, "'base' for struct '%s'" % name, expr.get('base'),
+                allow_metas=3D['struct'])
+=20
 --=20
 2.20.0
