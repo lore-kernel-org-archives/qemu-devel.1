@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gXJC7-0007Eq-Gq
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:05:56 -0500
+	(envelope-from <cota@braap.org>) id 1gXJCD-0007If-Tm
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gXJC4-0000w7-Nw
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:05:54 -0500
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:35369)
+	(envelope-from <cota@braap.org>) id 1gXJC6-0000yR-Gn
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:05:55 -0500
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:40667)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gXJC3-0000gi-TW
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:05:52 -0500
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gXJC4-0000qy-Ll
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:05:53 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 13 Dec 2018 00:03:44 -0500
-Message-Id: <20181213050453.9677-5-cota@braap.org>
+Date: Thu, 13 Dec 2018 00:03:51 -0500
+Message-Id: <20181213050453.9677-12-cota@braap.org>
 In-Reply-To: <20181213050453.9677-1-cota@braap.org>
 References: <20181213050453.9677-1-cota@braap.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 04/73] cpu: make qemu_work_cond per-cpu
+Subject: [Qemu-devel] [PATCH v5 11/73] hppa: convert to helper_cpu_halted_set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,222 +29,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This eliminates the need to use the BQL to queue CPU work.
-
-While at it, give the per-cpu field a generic name ("cond") since
-it will soon be used for more than just queueing CPU work.
-
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- include/qom/cpu.h |  6 ++--
- cpus-common.c     | 72 ++++++++++++++++++++++++++++++++++++++---------
- cpus.c            |  2 +-
- qom/cpu.c         |  1 +
- 4 files changed, 63 insertions(+), 18 deletions(-)
+ target/hppa/translate.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index bb5a36a324..aff42c41dd 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -316,6 +316,7 @@ struct qemu_work_item;
-  * @mem_io_vaddr: Target virtual address at which the memory was accessed.
-  * @kvm_fd: vCPU file descriptor for KVM.
-  * @lock: Lock to prevent multiple access to per-CPU fields.
-+ * @cond: Condition variable for per-CPU events.
-  * @work_list: List of pending asynchronous work.
-  * @trace_dstate_delayed: Delayed changes to trace_dstate (includes all changes
-  *                        to @trace_dstate).
-@@ -358,6 +359,7 @@ struct CPUState {
+diff --git a/target/hppa/translate.c b/target/hppa/translate.c
+index ce05d5619d..df9179e70f 100644
+--- a/target/hppa/translate.c
++++ b/target/hppa/translate.c
+@@ -2845,8 +2845,7 @@ static DisasJumpType trans_pause(DisasContext *ctx, uint32_t insn,
  
-     QemuMutex lock;
-     /* fields below protected by @lock */
-+    QemuCond cond;
-     QSIMPLEQ_HEAD(, qemu_work_item) work_list;
+     /* Tell the qemu main loop to halt until this cpu has work.  */
+     tmp = tcg_const_i32(1);
+-    tcg_gen_st_i32(tmp, cpu_env, -offsetof(HPPACPU, env) +
+-                                 offsetof(CPUState, halted));
++    gen_helper_cpu_halted_set(cpu_env, tmp);
+     tcg_temp_free_i32(tmp);
+     gen_excp_1(EXCP_HALTED);
  
-     CPUAddressSpace *cpu_ases;
-@@ -763,12 +765,10 @@ bool cpu_is_stopped(CPUState *cpu);
-  * @cpu: The vCPU to run on.
-  * @func: The function to be executed.
-  * @data: Data to pass to the function.
-- * @mutex: Mutex to release while waiting for @func to run.
-  *
-  * Used internally in the implementation of run_on_cpu.
-  */
--void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data,
--                   QemuMutex *mutex);
-+void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data);
- 
- /**
-  * run_on_cpu:
-diff --git a/cpus-common.c b/cpus-common.c
-index 2913294cb7..71469c85ce 100644
---- a/cpus-common.c
-+++ b/cpus-common.c
-@@ -26,7 +26,6 @@
- static QemuMutex qemu_cpu_list_lock;
- static QemuCond exclusive_cond;
- static QemuCond exclusive_resume;
--static QemuCond qemu_work_cond;
- 
- /* >= 1 if a thread is inside start_exclusive/end_exclusive.  Written
-  * under qemu_cpu_list_lock, read with atomic operations.
-@@ -42,7 +41,6 @@ void qemu_init_cpu_list(void)
-     qemu_mutex_init(&qemu_cpu_list_lock);
-     qemu_cond_init(&exclusive_cond);
-     qemu_cond_init(&exclusive_resume);
--    qemu_cond_init(&qemu_work_cond);
- }
- 
- void cpu_list_lock(void)
-@@ -113,23 +111,37 @@ struct qemu_work_item {
-     bool free, exclusive, done;
- };
- 
--static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
-+/* Called with the CPU's lock held */
-+static void queue_work_on_cpu_locked(CPUState *cpu, struct qemu_work_item *wi)
- {
--    qemu_mutex_lock(&cpu->lock);
-     QSIMPLEQ_INSERT_TAIL(&cpu->work_list, wi, node);
-     wi->done = false;
--    qemu_mutex_unlock(&cpu->lock);
- 
-     qemu_cpu_kick(cpu);
- }
- 
--void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data,
--                   QemuMutex *mutex)
-+static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
-+{
-+    cpu_mutex_lock(cpu);
-+    queue_work_on_cpu_locked(cpu, wi);
-+    cpu_mutex_unlock(cpu);
-+}
-+
-+void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
- {
-     struct qemu_work_item wi;
-+    bool has_bql = qemu_mutex_iothread_locked();
-+
-+    g_assert(no_cpu_mutex_locked());
- 
-     if (qemu_cpu_is_self(cpu)) {
--        func(cpu, data);
-+        if (has_bql) {
-+            func(cpu, data);
-+        } else {
-+            qemu_mutex_lock_iothread();
-+            func(cpu, data);
-+            qemu_mutex_unlock_iothread();
-+        }
-         return;
-     }
- 
-@@ -139,13 +151,34 @@ void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data,
-     wi.free = false;
-     wi.exclusive = false;
- 
--    queue_work_on_cpu(cpu, &wi);
-+    cpu_mutex_lock(cpu);
-+    queue_work_on_cpu_locked(cpu, &wi);
-+
-+    /*
-+     * We are going to sleep on the CPU lock, so release the BQL.
-+     *
-+     * During the transition to per-CPU locks, we release the BQL _after_
-+     * having kicked the destination CPU (from queue_work_on_cpu_locked above).
-+     * This makes sure that the enqueued work will be seen by the CPU
-+     * after being woken up from the kick, since the CPU sleeps on the BQL.
-+     * Once we complete the transition to per-CPU locks, we will release
-+     * the BQL earlier in this function.
-+     */
-+    if (has_bql) {
-+        qemu_mutex_unlock_iothread();
-+    }
-+
-     while (!atomic_mb_read(&wi.done)) {
-         CPUState *self_cpu = current_cpu;
- 
--        qemu_cond_wait(&qemu_work_cond, mutex);
-+        qemu_cond_wait(&cpu->cond, &cpu->lock);
-         current_cpu = self_cpu;
-     }
-+    cpu_mutex_unlock(cpu);
-+
-+    if (has_bql) {
-+        qemu_mutex_lock_iothread();
-+    }
- }
- 
- void async_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
-@@ -307,6 +340,7 @@ void async_safe_run_on_cpu(CPUState *cpu, run_on_cpu_func func,
- void process_queued_cpu_work(CPUState *cpu)
- {
-     struct qemu_work_item *wi;
-+    bool has_bql = qemu_mutex_iothread_locked();
- 
-     qemu_mutex_lock(&cpu->lock);
-     if (QSIMPLEQ_EMPTY(&cpu->work_list)) {
-@@ -324,13 +358,23 @@ void process_queued_cpu_work(CPUState *cpu)
-              * BQL, so it goes to sleep; start_exclusive() is sleeping too, so
-              * neither CPU can proceed.
-              */
--            qemu_mutex_unlock_iothread();
-+            if (has_bql) {
-+                qemu_mutex_unlock_iothread();
-+            }
-             start_exclusive();
-             wi->func(cpu, wi->data);
-             end_exclusive();
--            qemu_mutex_lock_iothread();
-+            if (has_bql) {
-+                qemu_mutex_lock_iothread();
-+            }
-         } else {
--            wi->func(cpu, wi->data);
-+            if (has_bql) {
-+                wi->func(cpu, wi->data);
-+            } else {
-+                qemu_mutex_lock_iothread();
-+                wi->func(cpu, wi->data);
-+                qemu_mutex_unlock_iothread();
-+            }
-         }
-         qemu_mutex_lock(&cpu->lock);
-         if (wi->free) {
-@@ -340,5 +384,5 @@ void process_queued_cpu_work(CPUState *cpu)
-         }
-     }
-     qemu_mutex_unlock(&cpu->lock);
--    qemu_cond_broadcast(&qemu_work_cond);
-+    qemu_cond_broadcast(&cpu->cond);
- }
-diff --git a/cpus.c b/cpus.c
-index 980d62cd58..7ae859f35c 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1236,7 +1236,7 @@ void qemu_init_cpu_loop(void)
- 
- void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
- {
--    do_run_on_cpu(cpu, func, data, &qemu_global_mutex);
-+    do_run_on_cpu(cpu, func, data);
- }
- 
- static void qemu_kvm_destroy_vcpu(CPUState *cpu)
-diff --git a/qom/cpu.c b/qom/cpu.c
-index 411b9b2eec..aa15ea4af5 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -372,6 +372,7 @@ static void cpu_common_initfn(Object *obj)
-     cpu->nr_threads = 1;
- 
-     qemu_mutex_init(&cpu->lock);
-+    qemu_cond_init(&cpu->cond);
-     QSIMPLEQ_INIT(&cpu->work_list);
-     QTAILQ_INIT(&cpu->breakpoints);
-     QTAILQ_INIT(&cpu->watchpoints);
 -- 
 2.17.1
