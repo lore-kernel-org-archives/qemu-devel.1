@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXVxr-0005l8-KX
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:05 -0500
+	(envelope-from <armbru@redhat.com>) id 1gXVy7-00062I-1l
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXVxn-0002Rm-TP
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46396)
+	(envelope-from <armbru@redhat.com>) id 1gXVxx-00036Q-98
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38365)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXVxl-0001ie-Vh
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:43:58 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXVxr-0001dC-Om
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:05 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4434C4E93D
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 18:43:50 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C77E931256B2
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 18:43:48 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 13 Dec 2018 19:43:40 +0100
-Message-Id: <20181213184340.24037-33-armbru@redhat.com>
+Date: Thu, 13 Dec 2018 19:43:34 +0100
+Message-Id: <20181213184340.24037-27-armbru@redhat.com>
 In-Reply-To: <20181213184340.24037-1-armbru@redhat.com>
 References: <20181213184340.24037-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 32/32] qapi: add conditions to REPLICATION
- type/commands on the schema
+Subject: [Qemu-devel] [PULL 26/32] qapi: add 'if' to alternate members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,218 +37,115 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Add #if defined(CONFIG_REPLICATION) in generated code, and adjust the
-code accordingly.
+Add 'if' key to alternate members:
 
-Made conditional:
+{ 'alternate': 'TestIfAlternate', 'data':
+  { 'alt': { 'type': 'TestStruct', 'if': 'COND' } } }
 
-* xen-set-replication, query-xen-replication-status,
-  xen-colo-do-checkpoint
-
-  Before the patch, we first register the commands unconditionally in
-  generated code (requires a stub), then conditionally unregister in
-  qmp_unregister_commands_hack().
-
-  Afterwards, we register only when CONFIG_REPLICATION.  The command
-  fails exactly the same, with CommandNotFound.
-
-  Improvement, because now query-qmp-schema is accurate, and we're one
-  step closer to killing qmp_unregister_commands_hack().
-
-* enum BlockdevDriver value "replication" in command blockdev-add
-
-* BlockdevOptions variant @replication
-
-and related structures.
+Generated code is not changed by this patch but with "qapi: add #if
+conditions to generated code".
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20181213123724.4866-23-marcandre.lureau@redhat.com>
+Message-Id: <20181213123724.4866-17-marcandre.lureau@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- migration/colo.c     | 16 ++++------------
- monitor.c            |  5 -----
- qapi/block-core.json | 13 +++++++++----
- qapi/migration.json  | 12 ++++++++----
- 4 files changed, 21 insertions(+), 25 deletions(-)
+ docs/devel/qapi-code-gen.txt            |  2 +-
+ scripts/qapi/common.py                  | 10 +++++-----
+ tests/qapi-schema/qapi-schema-test.json |  4 +++-
+ tests/qapi-schema/qapi-schema-test.out  |  1 +
+ 4 files changed, 10 insertions(+), 7 deletions(-)
 
-diff --git a/migration/colo.c b/migration/colo.c
-index fcff04c78c..398b239d1c 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -24,7 +24,9 @@
- #include "trace.h"
- #include "qemu/error-report.h"
- #include "migration/failover.h"
-+#ifdef CONFIG_REPLICATION
- #include "replication.h"
-+#endif
- #include "net/colo-compare.h"
- #include "net/colo.h"
- #include "block/block.h"
-@@ -201,11 +203,11 @@ void colo_do_failover(MigrationState *s)
-     }
- }
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index 0a0e53ede5..43bd853e69 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -754,7 +754,7 @@ gets its generated code guarded like this:
 =20
-+#ifdef CONFIG_REPLICATION
- void qmp_xen_set_replication(bool enable, bool primary,
-                              bool has_failover, bool failover,
-                              Error **errp)
- {
--#ifdef CONFIG_REPLICATION
-     ReplicationMode mode =3D primary ?
-                            REPLICATION_MODE_PRIMARY :
-                            REPLICATION_MODE_SECONDARY;
-@@ -224,14 +226,10 @@ void qmp_xen_set_replication(bool enable, bool prim=
-ary,
-         }
-         replication_stop_all(failover, failover ? NULL : errp);
-     }
--#else
--    abort();
--#endif
- }
+ Where a member can be defined with a single string value for its type,
+ it is also possible to supply a dictionary instead with both 'type'
+-and 'if' keys. (TODO: alternate)
++and 'if' keys.
 =20
- ReplicationStatus *qmp_query_xen_replication_status(Error **errp)
- {
--#ifdef CONFIG_REPLICATION
-     Error *err =3D NULL;
-     ReplicationStatus *s =3D g_new0(ReplicationStatus, 1);
+ Example: a conditional 'bar' member
 =20
-@@ -246,19 +244,13 @@ ReplicationStatus *qmp_query_xen_replication_status=
-(Error **errp)
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 44fe8868ed..17707b6de7 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -833,7 +833,7 @@ def check_alternate(expr, info):
+         check_name(info, "Member of alternate '%s'" % name, key)
+         check_known_keys(info,
+                          "member '%s' of alternate '%s'" % (key, name),
+-                         value, ['type'], [])
++                         value, ['type'], ['if'])
+         typ =3D value['type']
 =20
-     error_free(err);
-     return s;
--#else
--    abort();
--#endif
- }
+         # Ensure alternates have no type conflicts.
+@@ -1754,8 +1754,8 @@ class QAPISchema(object):
+                                               self._make_members(data, i=
+nfo),
+                                               None))
 =20
- void qmp_xen_colo_do_checkpoint(Error **errp)
- {
--#ifdef CONFIG_REPLICATION
-     replication_do_checkpoint_all(errp);
--#else
--    abort();
--#endif
- }
-+#endif
+-    def _make_variant(self, case, typ):
+-        return QAPISchemaObjectTypeVariant(case, typ)
++    def _make_variant(self, case, typ, ifcond):
++        return QAPISchemaObjectTypeVariant(case, typ, ifcond)
 =20
- COLOStatus *qmp_query_colo_status(Error **errp)
- {
-diff --git a/monitor.c b/monitor.c
-index cf9cece965..7848a3cb0d 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1147,11 +1147,6 @@ static void qmp_query_qmp_schema(QDict *qdict, QOb=
-ject **ret_data,
-  */
- static void qmp_unregister_commands_hack(void)
- {
--#ifndef CONFIG_REPLICATION
--    qmp_unregister_command(&qmp_commands, "xen-set-replication");
--    qmp_unregister_command(&qmp_commands, "query-xen-replication-status"=
-);
--    qmp_unregister_command(&qmp_commands, "xen-colo-do-checkpoint");
--#endif
- #ifndef TARGET_I386
-     qmp_unregister_command(&qmp_commands, "rtc-reset-reinjection");
-     qmp_unregister_command(&qmp_commands, "query-sev");
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 92e0205d91..762000f31f 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2623,7 +2623,9 @@
-             'copy-on-read', 'dmg', 'file', 'ftp', 'ftps', 'gluster',
-             'host_cdrom', 'host_device', 'http', 'https', 'iscsi', 'luks=
-',
-             'nbd', 'nfs', 'null-aio', 'null-co', 'nvme', 'parallels', 'q=
-cow',
--            'qcow2', 'qed', 'quorum', 'raw', 'rbd', 'replication', 'shee=
-pdog',
-+            'qcow2', 'qed', 'quorum', 'raw', 'rbd',
-+            { 'name': 'replication', 'if': 'defined(CONFIG_REPLICATION)'=
- },
-+            'sheepdog',
-             'ssh', 'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'v=
-xhs' ] }
+     def _make_simple_variant(self, case, typ, ifcond, info):
+         if isinstance(typ, list):
+@@ -1778,7 +1778,7 @@ class QAPISchema(object):
+                 name, info, doc, ifcond,
+                 'base', self._make_members(base, info))
+         if tag_name:
+-            variants =3D [self._make_variant(key, value['type'])
++            variants =3D [self._make_variant(key, value['type'], value.g=
+et('if'))
+                         for (key, value) in data.items()]
+             members =3D []
+         else:
+@@ -1799,7 +1799,7 @@ class QAPISchema(object):
+         name =3D expr['alternate']
+         data =3D expr['data']
+         ifcond =3D expr.get('if')
+-        variants =3D [self._make_variant(key, value['type'])
++        variants =3D [self._make_variant(key, value['type'], value.get('=
+if'))
+                     for (key, value) in data.items()]
+         tag_member =3D QAPISchemaObjectTypeMember('type', 'QType', False=
+)
+         self._def_entity(
+diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
+qapi-schema-test.json
+index a33eff8f86..cb0857df52 100644
+--- a/tests/qapi-schema/qapi-schema-test.json
++++ b/tests/qapi-schema/qapi-schema-test.json
+@@ -218,7 +218,9 @@
+ { 'command': 'TestIfUnionCmd', 'data': { 'union_cmd_arg': 'TestIfUnion' =
+},
+   'if': 'defined(TEST_IF_UNION)' }
 =20
- ##
-@@ -3380,7 +3382,8 @@
- #
- # Since: 2.9
- ##
--{ 'enum' : 'ReplicationMode', 'data' : [ 'primary', 'secondary' ] }
-+{ 'enum' : 'ReplicationMode', 'data' : [ 'primary', 'secondary' ],
-+  'if': 'defined(CONFIG_REPLICATION)' }
+-{ 'alternate': 'TestIfAlternate', 'data': { 'foo': 'int', 'bar': 'TestSt=
+ruct' },
++{ 'alternate': 'TestIfAlternate', 'data':
++  { 'foo': 'int',
++    'bar': { 'type': 'TestStruct', 'if': 'defined(TEST_IF_ALT_BAR)'} },
+   'if': 'defined(TEST_IF_ALT) && defined(TEST_IF_STRUCT)' }
 =20
- ##
- # @BlockdevOptionsReplication:
-@@ -3398,7 +3401,8 @@
- { 'struct': 'BlockdevOptionsReplication',
-   'base': 'BlockdevOptionsGenericFormat',
-   'data': { 'mode': 'ReplicationMode',
--            '*top-id': 'str' } }
-+            '*top-id': 'str' },
-+  'if': 'defined(CONFIG_REPLICATION)' }
-=20
- ##
- # @NFSTransport:
-@@ -3714,7 +3718,8 @@
-       'quorum':     'BlockdevOptionsQuorum',
-       'raw':        'BlockdevOptionsRaw',
-       'rbd':        'BlockdevOptionsRbd',
--      'replication':'BlockdevOptionsReplication',
-+      'replication': { 'type': 'BlockdevOptionsReplication',
-+                       'if': 'defined(CONFIG_REPLICATION)' },
-       'sheepdog':   'BlockdevOptionsSheepdog',
-       'ssh':        'BlockdevOptionsSsh',
-       'throttle':   'BlockdevOptionsThrottle',
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 5fd33316a0..31b589ec26 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -1257,7 +1257,8 @@
- # Since: 2.9
- ##
- { 'command': 'xen-set-replication',
--  'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' } =
-}
-+  'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' },
-+  'if': 'defined(CONFIG_REPLICATION)' }
-=20
- ##
- # @ReplicationStatus:
-@@ -1272,7 +1273,8 @@
- # Since: 2.9
- ##
- { 'struct': 'ReplicationStatus',
--  'data': { 'error': 'bool', '*desc': 'str' } }
-+  'data': { 'error': 'bool', '*desc': 'str' },
-+  'if': 'defined(CONFIG_REPLICATION)' }
-=20
- ##
- # @query-xen-replication-status:
-@@ -1289,7 +1291,8 @@
- # Since: 2.9
- ##
- { 'command': 'query-xen-replication-status',
--  'returns': 'ReplicationStatus' }
-+  'returns': 'ReplicationStatus',
-+  'if': 'defined(CONFIG_REPLICATION)' }
-=20
- ##
- # @xen-colo-do-checkpoint:
-@@ -1305,7 +1308,8 @@
- #
- # Since: 2.9
- ##
--{ 'command': 'xen-colo-do-checkpoint' }
-+{ 'command': 'xen-colo-do-checkpoint',
-+  'if': 'defined(CONFIG_REPLICATION)' }
-=20
- ##
- # @COLOStatus:
+ { 'command': 'TestIfAlternateCmd', 'data': { 'alt_cmd_arg': 'TestIfAlter=
+nate' },
+diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
+api-schema-test.out
+index f4c11f1e6a..9464101d26 100644
+--- a/tests/qapi-schema/qapi-schema-test.out
++++ b/tests/qapi-schema/qapi-schema-test.out
+@@ -300,6 +300,7 @@ alternate TestIfAlternate
+     tag type
+     case foo: int
+     case bar: TestStruct
++        if ['defined(TEST_IF_ALT_BAR)']
+     if ['defined(TEST_IF_ALT) && defined(TEST_IF_STRUCT)']
+ object q_obj_TestIfAlternateCmd-arg
+     member alt_cmd_arg: TestIfAlternate optional=3DFalse
 --=20
 2.17.2
