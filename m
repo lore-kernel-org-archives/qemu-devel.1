@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXVxr-0005l9-Lw
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:05 -0500
+	(envelope-from <armbru@redhat.com>) id 1gXVxo-0005hd-Hg
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXVxp-0002XU-M2
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32894)
+	(envelope-from <armbru@redhat.com>) id 1gXVxj-00029v-KT
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:43:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32852)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXVxn-0001c1-Pp
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:00 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXVxj-0001Gx-3P
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:43:55 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 99988C0050CC
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 18:43:48 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 389F6C0BEAB4
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 18:43:44 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 13 Dec 2018 19:43:25 +0100
-Message-Id: <20181213184340.24037-18-armbru@redhat.com>
+Date: Thu, 13 Dec 2018 19:43:10 +0100
+Message-Id: <20181213184340.24037-3-armbru@redhat.com>
 In-Reply-To: <20181213184340.24037-1-armbru@redhat.com>
 References: <20181213184340.24037-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 17/32] tests: print enum type members more like
- object type members
+Subject: [Qemu-devel] [PULL 02/32] cutils: Fix qemu_strtosz() & friends to
+ reject non-finite sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,417 +31,197 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+From: David Hildenbrand <david@redhat.com>
 
-Commit 93bda4dd461 changed the internal representation of enum type
-members from str to QAPISchemaMember, but we still print only a
-string.  Has been good enough, as the name is the member's only
-attribute of interest, but that's about to change.  To prepare, print
-them more like object type members.
+qemu_strtosz() & friends reject NaNs, but happily accept infinities.
+They shouldn't. Fix that.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+The fix makes use of qemu_strtod_finite(). To avoid ugly casts,
+change the @end parameter of qemu_strtosz() & friends from char **
+to const char **.
+
+Also, add two test cases, testing that "inf" and "NaN" are properly
+rejected. While at it, also fixup the function documentation.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20181213123724.4866-4-marcandre.lureau@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20181121164421.20780-3-david@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/qapi-schema/comments.out           | 14 ++++++-
- tests/qapi-schema/doc-bad-section.out    | 13 +++++-
- tests/qapi-schema/doc-good.out           | 17 ++++++--
- tests/qapi-schema/empty.out              |  9 ++++-
- tests/qapi-schema/event-case.out         |  9 ++++-
- tests/qapi-schema/ident-with-escape.out  |  9 ++++-
- tests/qapi-schema/include-relpath.out    | 14 ++++++-
- tests/qapi-schema/include-repetition.out | 14 ++++++-
- tests/qapi-schema/include-simple.out     | 14 ++++++-
- tests/qapi-schema/indented-expr.out      |  9 ++++-
- tests/qapi-schema/qapi-schema-test.out   | 50 +++++++++++++++++++-----
- tests/qapi-schema/test-qapi.py           |  4 +-
- 12 files changed, 149 insertions(+), 27 deletions(-)
+ include/qemu/cutils.h |  6 +++---
+ monitor.c             |  2 +-
+ tests/test-cutils.c   | 24 +++++++++++++++++-------
+ util/cutils.c         | 18 ++++++++----------
+ 4 files changed, 29 insertions(+), 21 deletions(-)
 
-diff --git a/tests/qapi-schema/comments.out b/tests/qapi-schema/comments.=
-out
-index 8d2f1ce8a2..d1abc4b5a1 100644
---- a/tests/qapi-schema/comments.out
-+++ b/tests/qapi-schema/comments.out
-@@ -1,5 +1,15 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
- module comments.json
--enum Status ['good', 'bad', 'ugly']
-+enum Status
-+    member good
-+    member bad
-+    member ugly
-diff --git a/tests/qapi-schema/doc-bad-section.out b/tests/qapi-schema/do=
-c-bad-section.out
-index cd28721568..db8014eed0 100644
---- a/tests/qapi-schema/doc-bad-section.out
-+++ b/tests/qapi-schema/doc-bad-section.out
-@@ -1,8 +1,17 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
- module doc-bad-section.json
--enum Enum ['one', 'two']
-+enum Enum
-+    member one
-+    member two
- doc symbol=3DEnum
-     body=3D
- =3D=3D Produces *invalid* texinfo
-diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.=
-out
-index 35f3f1164c..c2fc5c774a 100644
---- a/tests/qapi-schema/doc-good.out
-+++ b/tests/qapi-schema/doc-good.out
-@@ -1,8 +1,17 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
- module doc-good.json
--enum Enum ['one', 'two']
-+enum Enum
-+    member one
-+    member two
-     if ['defined(IFCOND)']
- object Base
-     member base1: Enum optional=3DFalse
-@@ -18,7 +27,9 @@ object q_obj_Variant1-wrapper
-     member data: Variant1 optional=3DFalse
- object q_obj_Variant2-wrapper
-     member data: Variant2 optional=3DFalse
--enum SugaredUnionKind ['one', 'two']
-+enum SugaredUnionKind
-+    member one
-+    member two
- object SugaredUnion
-     member type: SugaredUnionKind optional=3DFalse
-     tag type
-diff --git a/tests/qapi-schema/empty.out b/tests/qapi-schema/empty.out
-index 0ec234eec4..5483cb7bc6 100644
---- a/tests/qapi-schema/empty.out
-+++ b/tests/qapi-schema/empty.out
-@@ -1,3 +1,10 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
-diff --git a/tests/qapi-schema/event-case.out b/tests/qapi-schema/event-c=
-ase.out
-index 88c0964917..f69d4ffe4e 100644
---- a/tests/qapi-schema/event-case.out
-+++ b/tests/qapi-schema/event-case.out
-@@ -1,6 +1,13 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
- module event-case.json
- event oops None
-    boxed=3DFalse
-diff --git a/tests/qapi-schema/ident-with-escape.out b/tests/qapi-schema/=
-ident-with-escape.out
-index 24c976f473..7f891f7e90 100644
---- a/tests/qapi-schema/ident-with-escape.out
-+++ b/tests/qapi-schema/ident-with-escape.out
-@@ -1,6 +1,13 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
- module ident-with-escape.json
- object q_obj_fooA-arg
-     member bar1: str optional=3DFalse
-diff --git a/tests/qapi-schema/include-relpath.out b/tests/qapi-schema/in=
-clude-relpath.out
-index ebbabd7a18..783ccfc855 100644
---- a/tests/qapi-schema/include-relpath.out
-+++ b/tests/qapi-schema/include-relpath.out
-@@ -1,9 +1,19 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
- module include-relpath.json
- include include/relpath.json
- module include/relpath.json
- include include-relpath-sub.json
- module include-relpath-sub.json
--enum Status ['good', 'bad', 'ugly']
-+enum Status
-+    member good
-+    member bad
-+    member ugly
-diff --git a/tests/qapi-schema/include-repetition.out b/tests/qapi-schema=
-/include-repetition.out
-index 7235e055bc..d45977ee56 100644
---- a/tests/qapi-schema/include-repetition.out
-+++ b/tests/qapi-schema/include-repetition.out
-@@ -1,10 +1,20 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
- module include-repetition.json
- include comments.json
- module comments.json
--enum Status ['good', 'bad', 'ugly']
-+enum Status
-+    member good
-+    member bad
-+    member ugly
- module include-repetition.json
- include include-repetition-sub.json
- module include-repetition-sub.json
-diff --git a/tests/qapi-schema/include-simple.out b/tests/qapi-schema/inc=
-lude-simple.out
-index 006f723eeb..1afe20802a 100644
---- a/tests/qapi-schema/include-simple.out
-+++ b/tests/qapi-schema/include-simple.out
-@@ -1,7 +1,17 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
- module include-simple.json
- include include-simple-sub.json
- module include-simple-sub.json
--enum Status ['good', 'bad', 'ugly']
-+enum Status
-+    member good
-+    member bad
-+    member ugly
-diff --git a/tests/qapi-schema/indented-expr.out b/tests/qapi-schema/inde=
-nted-expr.out
-index bd8a48630e..c0cf3243f3 100644
---- a/tests/qapi-schema/indented-expr.out
-+++ b/tests/qapi-schema/indented-expr.out
-@@ -1,6 +1,13 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
- module indented-expr.json
- command eins None -> None
-    gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfi=
-g=3DFalse
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
-api-schema-test.out
-index 3ca858dd0e..06e80e5b04 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -1,6 +1,13 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
- module qapi-schema-test.json
- object TestStruct
-     member integer: int optional=3DFalse
-@@ -11,19 +18,25 @@ object NestedEnumsOne
-     member enum2: EnumOne optional=3DTrue
-     member enum3: EnumOne optional=3DFalse
-     member enum4: EnumOne optional=3DTrue
--enum MyEnum []
-+enum MyEnum
- object Empty1
- object Empty2
-     base Empty1
- command user_def_cmd0 Empty2 -> Empty2
-    gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfi=
-g=3DFalse
--enum QEnumTwo ['value1', 'value2']
-+enum QEnumTwo
-     prefix QENUM_TWO
-+    member value1
-+    member value2
- object UserDefOne
-     base UserDefZero
-     member string: str optional=3DFalse
-     member enum1: EnumOne optional=3DTrue
--enum EnumOne ['value1', 'value2', 'value3', 'value4']
-+enum EnumOne
-+    member value1
-+    member value2
-+    member value3
-+    member value4
- object UserDefZero
-     member integer: int optional=3DFalse
- object UserDefTwoDictDict
-@@ -127,7 +140,21 @@ object q_obj_sizeList-wrapper
-     member data: sizeList optional=3DFalse
- object q_obj_anyList-wrapper
-     member data: anyList optional=3DFalse
--enum UserDefNativeListUnionKind ['integer', 's8', 's16', 's32', 's64', '=
-u8', 'u16', 'u32', 'u64', 'number', 'boolean', 'string', 'sizes', 'any']
-+enum UserDefNativeListUnionKind
-+    member integer
-+    member s8
-+    member s16
-+    member s32
-+    member s64
-+    member u8
-+    member u16
-+    member u32
-+    member u64
-+    member number
-+    member boolean
-+    member string
-+    member sizes
-+    member any
- object UserDefNativeListUnion
-     member type: UserDefNativeListUnionKind optional=3DFalse
-     tag type
-@@ -204,7 +231,8 @@ event EVENT_E UserDefZero
-    boxed=3DTrue
- event EVENT_F UserDefAlternate
-    boxed=3DTrue
--enum __org.qemu_x-Enum ['__org.qemu_x-value']
-+enum __org.qemu_x-Enum
-+    member __org.qemu_x-value
- object __org.qemu_x-Base
-     member __org.qemu_x-member1: __org.qemu_x-Enum optional=3DFalse
- object __org.qemu_x-Struct
-@@ -213,7 +241,8 @@ object __org.qemu_x-Struct
-     member wchar-t: int optional=3DTrue
- object q_obj_str-wrapper
-     member data: str optional=3DFalse
--enum __org.qemu_x-Union1Kind ['__org.qemu_x-branch']
-+enum __org.qemu_x-Union1Kind
-+    member __org.qemu_x-branch
- object __org.qemu_x-Union1
-     member type: __org.qemu_x-Union1Kind optional=3DFalse
-     tag type
-@@ -240,11 +269,14 @@ command __org.qemu_x-command q_obj___org.qemu_x-com=
-mand-arg -> __org.qemu_x-Unio
- object TestIfStruct
-     member foo: int optional=3DFalse
-     if ['defined(TEST_IF_STRUCT)']
--enum TestIfEnum ['foo', 'bar']
-+enum TestIfEnum
-+    member foo
-+    member bar
-     if ['defined(TEST_IF_ENUM)']
- object q_obj_TestStruct-wrapper
-     member data: TestStruct optional=3DFalse
--enum TestIfUnionKind ['foo']
-+enum TestIfUnionKind
-+    member foo
-     if ['defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)']
- object TestIfUnion
-     member type: TestIfUnionKind optional=3DFalse
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
-.py
-index 27f776693e..641a18f06d 100644
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -24,9 +24,11 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-         print('include %s' % name)
-=20
-     def visit_enum_type(self, name, info, ifcond, members, prefix):
--        print('enum %s %s' % (name, [m.name for m in members]))
-+        print('enum %s' % name)
-         if prefix:
-             print('    prefix %s' % prefix)
-+        for m in members:
-+            print('    member %s' % m.name)
-         self._print_if(ifcond)
-=20
-     def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts):
---=20
+diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
+index 756b41c193..d2dad3057c 100644
+--- a/include/qemu/cutils.h
++++ b/include/qemu/cutils.h
+@@ -153,9 +153,9 @@ int parse_uint(const char *s, unsigned long long *value, char **endptr,
+                int base);
+ int parse_uint_full(const char *s, unsigned long long *value, int base);
+ 
+-int qemu_strtosz(const char *nptr, char **end, uint64_t *result);
+-int qemu_strtosz_MiB(const char *nptr, char **end, uint64_t *result);
+-int qemu_strtosz_metric(const char *nptr, char **end, uint64_t *result);
++int qemu_strtosz(const char *nptr, const char **end, uint64_t *result);
++int qemu_strtosz_MiB(const char *nptr, const char **end, uint64_t *result);
++int qemu_strtosz_metric(const char *nptr, const char **end, uint64_t *result);
+ 
+ /* used to print char* safely */
+ #define STR_OR_NULL(str) ((str) ? (str) : "null")
+diff --git a/monitor.c b/monitor.c
+index 6e81b09294..cf9cece965 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -3232,7 +3232,7 @@ static QDict *monitor_parse_arguments(Monitor *mon,
+             {
+                 int ret;
+                 uint64_t val;
+-                char *end;
++                const char *end;
+ 
+                 while (qemu_isspace(*p)) {
+                     p++;
+diff --git a/tests/test-cutils.c b/tests/test-cutils.c
+index d85c3e0f6d..1aa8351520 100644
+--- a/tests/test-cutils.c
++++ b/tests/test-cutils.c
+@@ -1950,7 +1950,7 @@ static void test_qemu_strtou64_full_max(void)
+ static void test_qemu_strtosz_simple(void)
+ {
+     const char *str;
+-    char *endptr = NULL;
++    const char *endptr;
+     int err;
+     uint64_t res = 0xbaadf00d;
+ 
+@@ -2017,7 +2017,7 @@ static void test_qemu_strtosz_units(void)
+     const char *p = "1P";
+     const char *e = "1E";
+     int err;
+-    char *endptr = NULL;
++    const char *endptr;
+     uint64_t res = 0xbaadf00d;
+ 
+     /* default is M */
+@@ -2066,7 +2066,7 @@ static void test_qemu_strtosz_float(void)
+ {
+     const char *str = "12.345M";
+     int err;
+-    char *endptr = NULL;
++    const char *endptr;
+     uint64_t res = 0xbaadf00d;
+ 
+     err = qemu_strtosz(str, &endptr, &res);
+@@ -2078,7 +2078,7 @@ static void test_qemu_strtosz_float(void)
+ static void test_qemu_strtosz_invalid(void)
+ {
+     const char *str;
+-    char *endptr = NULL;
++    const char *endptr;
+     int err;
+     uint64_t res = 0xbaadf00d;
+ 
+@@ -2096,12 +2096,22 @@ static void test_qemu_strtosz_invalid(void)
+     err = qemu_strtosz(str, &endptr, &res);
+     g_assert_cmpint(err, ==, -EINVAL);
+     g_assert(endptr == str);
++
++    str = "inf";
++    err = qemu_strtosz(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
++
++    str = "NaN";
++    err = qemu_strtosz(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
+ }
+ 
+ static void test_qemu_strtosz_trailing(void)
+ {
+     const char *str;
+-    char *endptr = NULL;
++    const char *endptr;
+     int err;
+     uint64_t res = 0xbaadf00d;
+ 
+@@ -2126,7 +2136,7 @@ static void test_qemu_strtosz_trailing(void)
+ static void test_qemu_strtosz_erange(void)
+ {
+     const char *str;
+-    char *endptr = NULL;
++    const char *endptr;
+     int err;
+     uint64_t res = 0xbaadf00d;
+ 
+@@ -2160,7 +2170,7 @@ static void test_qemu_strtosz_metric(void)
+ {
+     const char *str = "12345k";
+     int err;
+-    char *endptr = NULL;
++    const char *endptr;
+     uint64_t res = 0xbaadf00d;
+ 
+     err = qemu_strtosz_metric(str, &endptr, &res);
+diff --git a/util/cutils.c b/util/cutils.c
+index ec0a401d9a..e098debdc0 100644
+--- a/util/cutils.c
++++ b/util/cutils.c
+@@ -203,23 +203,21 @@ static int64_t suffix_mul(char suffix, int64_t unit)
+ /*
+  * Convert string to bytes, allowing either B/b for bytes, K/k for KB,
+  * M/m for MB, G/g for GB or T/t for TB. End pointer will be returned
+- * in *end, if not NULL. Return -ERANGE on overflow, Return -EINVAL on
++ * in *end, if not NULL. Return -ERANGE on overflow, and -EINVAL on
+  * other error.
+  */
+-static int do_strtosz(const char *nptr, char **end,
++static int do_strtosz(const char *nptr, const char **end,
+                       const char default_suffix, int64_t unit,
+                       uint64_t *result)
+ {
+     int retval;
+-    char *endptr;
++    const char *endptr;
+     unsigned char c;
+     int mul_required = 0;
+     double val, mul, integral, fraction;
+ 
+-    errno = 0;
+-    val = strtod(nptr, &endptr);
+-    if (isnan(val) || endptr == nptr || errno != 0) {
+-        retval = -EINVAL;
++    retval = qemu_strtod_finite(nptr, &endptr, &val);
++    if (retval) {
+         goto out;
+     }
+     fraction = modf(val, &integral);
+@@ -259,17 +257,17 @@ out:
+     return retval;
+ }
+ 
+-int qemu_strtosz(const char *nptr, char **end, uint64_t *result)
++int qemu_strtosz(const char *nptr, const char **end, uint64_t *result)
+ {
+     return do_strtosz(nptr, end, 'B', 1024, result);
+ }
+ 
+-int qemu_strtosz_MiB(const char *nptr, char **end, uint64_t *result)
++int qemu_strtosz_MiB(const char *nptr, const char **end, uint64_t *result)
+ {
+     return do_strtosz(nptr, end, 'M', 1024, result);
+ }
+ 
+-int qemu_strtosz_metric(const char *nptr, char **end, uint64_t *result)
++int qemu_strtosz_metric(const char *nptr, const char **end, uint64_t *result)
+ {
+     return do_strtosz(nptr, end, 'B', 1000, result);
+ }
+-- 
 2.17.2
