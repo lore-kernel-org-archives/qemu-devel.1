@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1gXPgj-0004t3-P1
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:02:03 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gXPgu-00051t-4R
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:02:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1gXPge-0007q6-Ol
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:01:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56280)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1gXPge-0007m8-I3
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:01:52 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E5E2731256A8
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 12:01:51 +0000 (UTC)
-Date: Thu, 13 Dec 2018 13:01:48 +0100
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20181213120148.GN14101@paraplu>
-References: <20181030123526.26415-1-kchamart@redhat.com>
-	<20181030123526.26415-2-kchamart@redhat.com>
-	<db1d11e0-ea3d-cb52-ee35-67ac473b1dee@redhat.com>
-	<20181213110505.GL14101@paraplu>
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gXPgr-0000EY-Jn
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:02:07 -0500
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Date: Thu, 13 Dec 2018 12:01:55 +0000
+Message-ID: <ab3c2681-0d84-4672-aff2-1865fc25ba86@virtuozzo.com>
+References: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
+	<20181203101429.88735-7-anton.nefedov@virtuozzo.com>
+	<7ca3779c-b552-97f1-8ce2-860db23be045@virtuozzo.com>
+	<ba2723a2-fd5d-6e96-002f-70c14092ded8@virtuozzo.com>
+	<312f075e-6e7f-5e8b-e7c9-e0d4c94e5ede@virtuozzo.com>
+In-Reply-To: <312f075e-6e7f-5e8b-e7c9-e0d4c94e5ede@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A20E301C83C2FA4EBE06A53C0149EE66@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181213110505.GL14101@paraplu>
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] Deprecate QMP `cpu-add`
+Subject: Re: [Qemu-devel] [PATCH v10 6/9] file-posix: support
+ BDRV_REQ_ALLOCATE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,39 +29,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, armbru@redhat.com, imammedo@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
 
-On Thu, Dec 13, 2018 at 12:05:05PM +0100, Kashyap Chamarthy wrote:
-> On Thu, Dec 13, 2018 at 07:38:03AM +0100, Thomas Huth wrote:
-> > On 2018-10-30 13:35, Kashyap Chamarthy wrote:
-
-[...]
-
-> > > index 1b9c007f12..c86924ad9a 100644
-> > > --- a/qemu-deprecated.texi
-> > > +++ b/qemu-deprecated.texi
-> > > @@ -155,6 +155,11 @@ The ``query-cpus'' command is replaced by the ``query-cpus-fast'' command.
-> > >  The ``arch'' output member of the ``query-cpus-fast'' command is
-> > >  replaced by the ``target'' output member.
-> > >  
-> > > +@subsection cpu-add (since 3.1)
-> > 
-> >  Hi Kashyap,
-> > 
-> > could you please send a follow-up patch to change this into 4.0 now?
-> 
-> Ah, sure.
-> 
-> > Please also provide a patch to add the HMP command to
-> > qemu-deprecated.texi, too.
-> 
-> Is it okay if both the above are done in the same patch?  Since they're
-> related.  Or am I missing a reason to do them separately?
-
-Okay, please disregard the above; Dave Gilbert reminded that it's
-preferable that I send two separate patches (part of a "series"), as
-they're different things.
-
--- 
-/kashyap
+T24gMTIvMTIvMjAxOCA4OjE5IFBNLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3Rl
+Og0KPiAwNS4xMi4yMDE4IDE3OjExLCBBbnRvbiBOZWZlZG92IHdyb3RlOg0KPj4gT24gNS8xMi8y
+MDE4IDQ6MjUgUE0sIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4gMDMu
+MTIuMjAxOCAxMzoxNCwgQW50b24gTmVmZWRvdiB3cm90ZToNCj4+Pj4gICAgICAgICAgfQ0KPj4+
+PiAgICAgICNlbmRpZg0KPj4+PiAgICAgIA0KPj4+PiAtICAgIGJzLT5zdXBwb3J0ZWRfemVyb19m
+bGFncyA9IEJEUlZfUkVRX01BWV9VTk1BUDsNCj4+Pj4gKyAgICBicy0+c3VwcG9ydGVkX3plcm9f
+ZmxhZ3MgfD0gQkRSVl9SRVFfTUFZX1VOTUFQOw0KPj4+PiAgICAgICAgICByZXQgPSAwOw0KPj4+
+PiAgICAgIGZhaWw6DQo+Pj4+ICAgICAgICAgIGlmIChmaWxlbmFtZSAmJiAoYmRydl9mbGFncyAm
+IEJEUlZfT19URU1QT1JBUlkpKSB7DQo+Pj4+IEBAIC0xNTIwLDYgKzE1MjIsMTAgQEAgc3RhdGlj
+IHNzaXplX3QgaGFuZGxlX2Fpb2NiX3dyaXRlX3plcm9lcyhSYXdQb3NpeEFJT0RhdGEgKmFpb2Ni
+KQ0KPj4+PiAgICAgICAgICAgICAgfQ0KPj4+PiAgICAgICAgICAgICAgcy0+aGFzX2ZhbGxvY2F0
+ZSA9IGZhbHNlOw0KPj4+PiAgICAgICAgICB9DQo+Pj4+ICsNCj4+Pj4gKyAgICBpZiAoIXMtPmhh
+c19mYWxsb2NhdGUpIHsNCj4+Pj4gKyAgICAgICAgYWlvY2ItPmJzLT5zdXBwb3J0ZWRfemVyb19m
+bGFncyAmPSB+QkRSVl9SRVFfQUxMT0NBVEU7DQo+Pj4+ICsgICAgfQ0KID4+Pj4+ICAgICAjZW5k
+aWYNCj4gDQo+IGhtLCBpZiBDT05GSUdfRkFMTE9DQVRFIGlzIGRpc2FibGVkLCBmbGFnIHdpbGwg
+cmVtYWluIGluIHN1cHBvcnRlZF96ZXJvX2ZsYWdzDQo+IA0KDQpyaWdodC4uDQpJIHRoaW5rIHRo
+ZXJlIHNob3VsZCBiZSBhIHNlcGFyYXRlIHBhdGNoIHRvIHJlc2V0IHMtPmhhc18qIGluDQpub24t
+Q09ORklHX0ZBTExPQ0FURSogY2FzZXMuIFRoZW4gSSdsbCBtb3ZlIHRoaXMgaHVuayBqdXN0IG9u
+ZSBsaW5lIGRvd24NCnVuZGVyIHRoZSBmb2xsb3dpbmcgI2VuZGlmDQo=
