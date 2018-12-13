@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gXR1V-0006g2-Hu
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:27:30 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gXR1p-0006qC-UL
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:27:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gXR1U-0001vo-2V
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:27:29 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:37816)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1gXR1S-0001qX-0U
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:27:27 -0500
-Received: by mail-oi1-x243.google.com with SMTP id y23so1601856oia.4
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 05:27:17 -0800 (PST)
+	(envelope-from <pbonzini@redhat.com>) id 1gXR1l-0002Em-La
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:27:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40796)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gXR1l-0002DF-8r
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:27:45 -0500
+References: <7c2b477e-bdac-c887-2510-82fe04acdcfe@redhat.com>
+	<87b22690-e39c-3b46-dcb4-f6abc3213142@redhat.com>
+	<CAFEAcA8yHb4MdtsJuXcswQp93DN5tSeN9dn8AWWL9se0DKvdcg@mail.gmail.com>
+	<41ceda53-467e-32a1-8fa6-13f0f9c08ad1@redhat.com>
+	<CAFEAcA9oCs+Y1fnY8dOR16n_Hn7PaHziL7K0HZK6=BAd_Gyecg@mail.gmail.com>
+	<e496287e-f8ba-3608-42e1-efb697cfc784@redhat.com>
+	<20181107154114.GC27585@caravaggio>
+	<dd68d3e8-6448-3a67-3212-fd3d3bfba2e2@redhat.com>
+	<20181107192414.GH12503@habkost.net>
+	<20181108110650.GB32519@caravaggio>
+	<20181213115023.GA15355@yangzhon-Virtual>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f550da1d-1f1b-e36d-55a0-d67a33550b0e@redhat.com>
+Date: Thu, 13 Dec 2018 14:27:39 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=jFj3SjX-yiTWYx9MCKTwfX4F-4jw9fVmVVK4So=bdPzA@mail.gmail.com>
-References: <20181212102548.27626-1-alex.bennee@linaro.org>
-	<CAL1e-=jFj3SjX-yiTWYx9MCKTwfX4F-4jw9fVmVVK4So=bdPzA@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 13 Dec 2018 14:27:15 +0100
-Message-ID: <CAL1e-=jJHGH+zB0FJWxX3QTZNy1t3kGT1BX2hZUrQomtvwtV8Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2] contrib: add a basic gitdm config
+In-Reply-To: <20181213115023.GA15355@yangzhon-Virtual>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] QEMU and Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,115 +37,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+To: Yang Zhong <yang.zhong@intel.com>
+Cc: Samuel Ortiz <sameo@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Dec 13, 2018 2:45 AM, aleksandar.m.mail@gmail.com wrote:
->
->
-> On Dec 12, 2018 11:26 AM, "Alex Benn=C3=A9e" <alex.bennee@linaro.org> wro=
-te:
-> >
-> > This is a QEMU specific version of a gitdm config for generating
-> > reports on the contributor base of the project. I've added enough
-> > group maps and domain aliases to ensure the current top ten is as
-> > reflective as it can be. As of this commit running:
-> >
-> >   git log --numstat --since "Last Year" | gitdm -n -l 10
-> >
-> > Reports:
-> >
-> >   Top changeset contributors by employer
-> >   Red Hat                   3126 (44.0%)
-> >   Linaro                    1166 (16.4%)
-> >   (None)                     684 (9.6%)
-> >   IBM                        348 (4.9%)
-> >   Virtuozzo                  168 (2.4%)
-> >   Xilinx                     102 (1.4%)
-> >   Wave Computing             101 (1.4%)
-> >   Igalia                      93 (1.3%)
-> >   Cadence Design Systems      88 (1.2%)
-> >   SiFive                      59 (0.8%)
-> >
-> >   Top lines changed by employer
-> >   Red Hat                   143166 (27.9%)
-> >   Cadence Design Systems    126554 (24.6%)
-> >   Linaro                    78845 (15.3%)
-> >   Wave Computing            32263 (6.3%)
-> >   (None)                    21789 (4.2%)
-> >   SiFive                    14392 (2.8%)
-> >   IBM                       12219 (2.4%)
-> >   Virtuozzo                 10445 (2.0%)
-> >   CodeWeavers               9179 (1.8%)
-> >   Xilinx                    4572 (0.9%)
-> >
-> > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> >
-> > ---
-> > v2
-> >   - use aliases instead of .mailmap
-> >   - add more companies to domainmap
-> >   - add more groups to cover non-corporate email
-> >   - add an individuals group-map for (None)
-> >   - limit the stats to top ten
-> > ---
-> >  contrib/gitdm/aliases               |  27 +++
-> >  contrib/gitdm/domain-map            |  18 ++
-> >  contrib/gitdm/filetypes.txt         | 362 ++++++++++++++++++++++++++++
-> >  contrib/gitdm/group-map-cadence     |   3 +
-> >  contrib/gitdm/group-map-codeweavers |   1 +
-> >  contrib/gitdm/group-map-ibm         |   6 +
-> >  contrib/gitdm/group-map-redhat      |   7 +
-> >  contrib/gitdm/group-map-wavecomp    |   9 +
-> >  gitdm.config                        |  48 ++++
-> >  9 files changed, 481 insertions(+)
-> >
->
-> ...
->
-> > +++ b/contrib/gitdm/group-map-wavecomp
-> > @@ -0,0 +1,9 @@
-> > +#
-> > +# Wave Computing acquired MIPS in June 2018 from imgtec
-> > +#
-> > +
-> > +amarkovic@wavecomp.com
-> > +smarkovic@wavecomp.com
-> > +paul.burton@imgtec.com
-> > +yongbok.kim@imgtec.com
-> > +yongbok.kim@mips.com
->
-> Alex! Thanks for this idea, and efforts!
->
-> However, the ownership of MIPS was more complex than stated in the
-comment above. Up to Feb 2013 we had mips.com mails, then up to Oct 2017
-imgtec.com mails, then up to June 2018 again mips.com mails, and from then
-on wavecomp.com mails. See Wikipedia article for mips for details. I would
-modify the comment above to say:
->
-> " Wave Computing acquired MIPS in June 2018. Also, from February 2013 to
-October 2017, MIPS was owned by Imagination Technologies."
->
-> Also, the email list should be extended to be something like this:
->
-> amarkovic@wavecomp.com
-> arikalo@wavecomp.com
-> dnikolic@wavecomp.com
-> pburton@wavecomp.com
-> smarkovic@wavecomp.com
-> ysu@wavecomp.com
-> aleksandar.markovic@imgtec.com
-> paul.burton@imgtec.com
-> yongbok.kim@imgtec.com
-> aleksandar.markovic@mips.com
-> matthew.fortune@mips.com
-> yongbok.kim@mips.com
->
-I forgot
+On 13/12/18 12:50, Yang Zhong wrote:
+> Hello Paolo and all,
+> 
+> The Kconfig has been completed the porting from your repo and
+> now i can sucessfully build x86_64-softmmu binary. But there
+> are still some issues:
+>    1) Only support x86_64 platform.
+>       Other platform, especially for ARM platforms, it's hard for me to define 
+>       detailed boards like pc or q35 in x86.
 
-james.hogan@mips.com
+No problem, Philippe can look at least at ARM and MIPS.
 
-who also had some contribution in August this year.
+>    2) Only support "defconfig". 
+>       "randconfig" build has some issues, which are mostly related with CONFIG* in Kconfig.host, 
+>       some CONFIG* has different setting value in config-host.mak and %/config-device.mak. like
+>       CONFIG_OPENGL=y in %/config-device.mak and CONFIG_OPENGL=n in config-host.mak, which result
+>       in build failure.
 
-> Otherwise:
->
-> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+This is probably a bug or missing features in minikconf; values from
+config-host.mak and config-target.mak should not be included in
+config-devices.mak.
+
+> The current configure and build command are almost same with before and if we want to disable or enable
+> some features, like "tcg", we still need add "--enable/--disable-tcg" in configure command line. If we want
+> to disable one emulation device, we can disable this in related Kconfig file in hw/ directory.
+
+Yes, this is expected.
+
+> There are still some left issues
+>    a) How to replace the CONFIG* in configure, Some CONFIG* need some logic to generate, 
+>       those are hard to input this CONFIG* in Kconfig.host or Kconfig* file.
+> 
+>    b) The CONFIG* in %/config-target.mak file, this is still related with configure. 
+>         
+>    c) If a) and b) can be fixed, randconfig is not critical issue.
+> 
+> I will send RFC patches to QEMU community and please all give some comments. many thanks!
+
+Great, this way people can experiment it and we can finalize the design
+before continuing the work.
+
+Thanks,
+
+Paolo
