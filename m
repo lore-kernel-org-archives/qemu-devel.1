@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gXJDA-0008FE-Ps
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:07:01 -0500
+	(envelope-from <cota@braap.org>) id 1gXJD2-000859-Gy
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gXJD8-0002KI-Fc
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:07:00 -0500
+	(envelope-from <cota@braap.org>) id 1gXJCz-0002DQ-Ld
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:52 -0500
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:39995)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gXJCz-0001td-9d
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:49 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 13 Dec 2018 00:04:45 -0500
-Message-Id: <20181213050453.9677-66-cota@braap.org>
+Date: Thu, 13 Dec 2018 00:04:52 -0500
+Message-Id: <20181213050453.9677-73-cota@braap.org>
 In-Reply-To: <20181213050453.9677-1-cota@braap.org>
 References: <20181213050453.9677-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v5 65/73] s390x: convert to
- cpu_has_work_with_iothread_lock
+Subject: [Qemu-devel] [PATCH v5 72/73] cpu: add async_run_on_cpu_no_bql
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,41 +24,130 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Soon we will call cpu_has_work without the BQL.
+Some async jobs do not need the BQL.
 
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: Alexander Graf <agraf@suse.de>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/s390x/cpu.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ include/qom/cpu.h | 14 ++++++++++++++
+ cpus-common.c     | 39 ++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 48 insertions(+), 5 deletions(-)
 
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index d1594c90d9..5c38abaa49 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -59,6 +59,8 @@ static bool s390_cpu_has_work(CPUState *cs)
- {
-     S390CPU *cpu = S390_CPU(cs);
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index bcb46c3946..7ef0120213 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -876,9 +876,23 @@ void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data);
+  * @data: Data to pass to the function.
+  *
+  * Schedules the function @func for execution on the vCPU @cpu asynchronously.
++ * See also: async_run_on_cpu_no_bql()
+  */
+ void async_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data);
  
-+    g_assert(qemu_mutex_iothread_locked());
++/**
++ * async_run_on_cpu_no_bql:
++ * @cpu: The vCPU to run on.
++ * @func: The function to be executed.
++ * @data: Data to pass to the function.
++ *
++ * Schedules the function @func for execution on the vCPU @cpu asynchronously.
++ * This function is run outside the BQL.
++ * See also: async_run_on_cpu()
++ */
++void async_run_on_cpu_no_bql(CPUState *cpu, run_on_cpu_func func,
++                             run_on_cpu_data data);
 +
-     /* STOPPED cpus can never wake up */
-     if (s390_cpu_get_state(cpu) != S390_CPU_STATE_LOAD &&
-         s390_cpu_get_state(cpu) != S390_CPU_STATE_OPERATING) {
-@@ -473,7 +475,7 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
-     scc->initial_cpu_reset = s390_cpu_initial_reset;
-     cc->reset = s390_cpu_full_reset;
-     cc->class_by_name = s390_cpu_class_by_name,
--    cc->has_work = s390_cpu_has_work;
-+    cc->has_work_with_iothread_lock = s390_cpu_has_work;
- #ifdef CONFIG_TCG
-     cc->do_interrupt = s390_cpu_do_interrupt;
- #endif
+ /**
+  * async_safe_run_on_cpu:
+  * @cpu: The vCPU to run on.
+diff --git a/cpus-common.c b/cpus-common.c
+index 08031e37f4..a8f913b918 100644
+--- a/cpus-common.c
++++ b/cpus-common.c
+@@ -109,6 +109,7 @@ struct qemu_work_item {
+     run_on_cpu_func func;
+     run_on_cpu_data data;
+     bool free, exclusive, done;
++    bool bql;
+ };
+ 
+ /* Called with the CPU's lock held */
+@@ -155,6 +156,7 @@ void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+     wi.done = false;
+     wi.free = false;
+     wi.exclusive = false;
++    wi.bql = true;
+ 
+     cpu_mutex_lock(cpu);
+     queue_work_on_cpu_locked(cpu, &wi);
+@@ -179,6 +181,21 @@ void async_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+     wi->func = func;
+     wi->data = data;
+     wi->free = true;
++    wi->bql = true;
++
++    queue_work_on_cpu(cpu, wi);
++}
++
++void async_run_on_cpu_no_bql(CPUState *cpu, run_on_cpu_func func,
++                             run_on_cpu_data data)
++{
++    struct qemu_work_item *wi;
++
++    wi = g_malloc0(sizeof(struct qemu_work_item));
++    wi->func = func;
++    wi->data = data;
++    wi->free = true;
++    /* wi->bql initialized to false */
+ 
+     queue_work_on_cpu(cpu, wi);
+ }
+@@ -323,6 +340,7 @@ void async_safe_run_on_cpu(CPUState *cpu, run_on_cpu_func func,
+     wi->data = data;
+     wi->free = true;
+     wi->exclusive = true;
++    /* wi->bql initialized to false */
+ 
+     queue_work_on_cpu(cpu, wi);
+ }
+@@ -347,6 +365,7 @@ static void process_queued_cpu_work_locked(CPUState *cpu)
+              * BQL, so it goes to sleep; start_exclusive() is sleeping too, so
+              * neither CPU can proceed.
+              */
++            g_assert(!wi->bql);
+             if (has_bql) {
+                 qemu_mutex_unlock_iothread();
+             }
+@@ -357,12 +376,22 @@ static void process_queued_cpu_work_locked(CPUState *cpu)
+                 qemu_mutex_lock_iothread();
+             }
+         } else {
+-            if (has_bql) {
+-                wi->func(cpu, wi->data);
++            if (wi->bql) {
++                if (has_bql) {
++                    wi->func(cpu, wi->data);
++                } else {
++                    qemu_mutex_lock_iothread();
++                    wi->func(cpu, wi->data);
++                    qemu_mutex_unlock_iothread();
++                }
+             } else {
+-                qemu_mutex_lock_iothread();
+-                wi->func(cpu, wi->data);
+-                qemu_mutex_unlock_iothread();
++                if (has_bql) {
++                    qemu_mutex_unlock_iothread();
++                    wi->func(cpu, wi->data);
++                    qemu_mutex_lock_iothread();
++                } else {
++                    wi->func(cpu, wi->data);
++                }
+             }
+         }
+         cpu_mutex_lock(cpu);
 -- 
 2.17.1
