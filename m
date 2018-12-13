@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gXTRZ-0004CG-5L
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 11:02:40 -0500
+	(envelope-from <armbru@redhat.com>) id 1gXTUw-0006i3-97
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 11:06:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gXTRT-0004cg-6W
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 11:02:33 -0500
-Date: Thu, 13 Dec 2018 16:02:07 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20181213160207.GJ27120@redhat.com>
-References: <20181212220410.569069-1-eblake@redhat.com>
-	<20181213101154.GA5171@redhat.com>
-	<20181213142210.GE5427@linux.fritz.box>
+	(envelope-from <armbru@redhat.com>) id 1gXTUr-0000a3-I2
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 11:06:02 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181130144705.77454-1-anton.nefedov@virtuozzo.com>
+	<20181130144705.77454-10-anton.nefedov@virtuozzo.com>
+	<8736r1bou7.fsf@dusky.pond.sub.org>
+	<9567be7b-f372-ef64-72f4-4ba2a361b9b9@virtuozzo.com>
+Date: Thu, 13 Dec 2018 17:05:30 +0100
+In-Reply-To: <9567be7b-f372-ef64-72f4-4ba2a361b9b9@virtuozzo.com> (Anton
+	Nefedov's message of "Thu, 13 Dec 2018 15:20:51 +0000")
+Message-ID: <87pnu5mmyd.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181213142210.GE5427@linux.fritz.box>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC] qemu-io: Prefer stderr for error
- messages
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v6 9/9] qapi: query-blockstat: add driver
+ specific file-posix stats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,48 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "famz@redhat.com" <famz@redhat.com>, Denis Lunev <den@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "berto@igalia.com" <berto@igalia.com>, "jsnow@redhat.com" <jsnow@redhat.com>
 
-On Thu, Dec 13, 2018 at 03:22:10PM +0100, Kevin Wolf wrote:
-> Am 13.12.2018 um 11:11 hat Daniel P. Berrang=C3=A9 geschrieben:
-> > On Wed, Dec 12, 2018 at 04:04:10PM -0600, Eric Blake wrote:
-> > > When a qemu-io command fails, it's best if the failure message
-> > > goes to stderr rather than stdout.
-> > >=20
-> > > Reported-by: Richard W.M. Jones <rjones@redhat.com>
-> > > Signed-off-by: Eric Blake <eblake@redhat.com>
-> > > ---
-> > >=20
-> > > RFC because at least iotest 60 (found by -qcow2 -g quick) breaks du=
-e
-> > > to reordering of output lines, and I'd rather know if we like this
-> > > idea before bothering to revisit all affected iotests (including
-> > > discovering if other slower ones have similar problems).
-> >=20
-> > I think the change is correct. Error messages should never go to stdo=
-ut.
->=20
-> I'm not sure about this, to be honest. qemu-io is first and foremost an
-> interactive program, and spreading output across two streams, one
-> buffered and one unbuffered, in an interactive program feels like it ha=
-s
-> to result in surprises.
+Anton Nefedov <anton.nefedov@virtuozzo.com> writes:
 
-Just for the record we're using qemu-io extensively for testing
-nbdkit, and it's always used non-interactively (ie. =E2=80=98qemu-io -c=E2=
-=80=99).
-The bug (if it is such) was found because I was using qemu-io to test
-for expected errors.
+> On 13/12/2018 3:20 PM, Markus Armbruster wrote:
+>> I'm reviewing just the QAPI schema today.
+>> 
+>> Anton Nefedov <anton.nefedov@virtuozzo.com> writes:
+>> 
+>>> A block driver can provide a callback to report driver-specific
+>>> statistics.
+>>>
+>>> file-posix driver now reports discard statistics
+>>>
+>>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+[...]
+>>> @@ -892,6 +927,8 @@
+>>>   #
+>>>   # @stats:  A @BlockDeviceStats for the device.
+>>>   #
+>>> +# @driver-specific: Optional driver-specific stats. (Since 4.0)
+>>> +#
+>>>   # @parent: This describes the file block device if it has one.
+>>>   #          Contains recursively the statistics of the underlying
+>>>   #          protocol (e.g. the host file for a qcow2 image). If there is
+>>> @@ -905,6 +942,7 @@
+>>>   { 'struct': 'BlockStats',
+>>>     'data': {'*device': 'str', '*qdev': 'str', '*node-name': 'str',
+>>>              'stats': 'BlockDeviceStats',
+>>> +           '*driver-specific': 'BlockStatsSpecific',
+>>>              '*parent': 'BlockStats',
+>>>              '*backing': 'BlockStats'} }
+>>>   
+>> 
+>> Feels awkward.
+>> 
+>> When is @driver-specific present?  Exactly when the driver is 'file' or
+>> 'host_device'?  If that's correct, then turning BlockStats into a union
+>> would be clearer and reduce parenthesises on the wire:
+>> 
+>> { 'union': 'BlockStats',
+>>    'base': {
+>>        'driver': 'BlockdevDriver',
+>>        ... all the other existing members of BlockStats ... }
+>>    'discriminator': 'driver',
+>>    'data': {
+>>        'file': 'BlockStatsSpecificFile',
+>>        'host_device': 'BlockStatsSpecificFile' } }
+>> 
+>> [...]
+>> 
+>
+> this series drags for quite a while - we already discussed this :)
+> In short: Blockdev does not always have driver, so it's either this
+> or adding weird BlockdevDriver values like "none".
+>
+> http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg01845.html
 
-https://github.com/libguestfs/nbdkit/search?q=3Dqemu-io
-
-Rich.
-
---=20
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rj=
-ones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-p2v converts physical machines to virtual machines.  Boot with a
-live CD or over the network (PXE) and turn machines into KVM guests.
-http://libguestfs.org/virt-v2v
+You're right.
