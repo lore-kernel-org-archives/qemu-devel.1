@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gXSnU-00032A-TU
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:21:13 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gXSuq-0001lj-Ly
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:28:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gXSnO-000558-U9
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:21:05 -0500
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Thu, 13 Dec 2018 15:20:51 +0000
-Message-ID: <9567be7b-f372-ef64-72f4-4ba2a361b9b9@virtuozzo.com>
-References: <20181130144705.77454-1-anton.nefedov@virtuozzo.com>
-	<20181130144705.77454-10-anton.nefedov@virtuozzo.com>
-	<8736r1bou7.fsf@dusky.pond.sub.org>
-In-Reply-To: <8736r1bou7.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <624148F38C44FE4CB9D2CED205E87F31@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <alex.bennee@linaro.org>) id 1gXSum-0004j2-Lv
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:28:44 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36875)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gXSum-0004iO-EE
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:28:40 -0500
+Received: by mail-wr1-x442.google.com with SMTP id s12so2004187wrt.4
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 07:28:40 -0800 (PST)
+References: <20181213115503.24188-1-alex.bennee@linaro.org>
+	<20181213115745.ronekr5cz67nap4b@lakrids.cambridge.arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181213115745.ronekr5cz67nap4b@lakrids.cambridge.arm.com>
+Date: Thu, 13 Dec 2018 15:28:37 +0000
+Message-ID: <87lg4t1m56.fsf@linaro.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v6 9/9] qapi: query-blockstat: add driver
- specific file-posix stats
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 0/2] Fix kvm guest debugging of AA32
+ guests on AA64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,74 +31,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "famz@redhat.com" <famz@redhat.com>, Denis Lunev <den@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "berto@igalia.com" <berto@igalia.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, ard.biesheuvel@linaro.org, marc.zyngier@arm.com
 
-T24gMTMvMTIvMjAxOCAzOjIwIFBNLCBNYXJrdXMgQXJtYnJ1c3RlciB3cm90ZToNCj4gSSdtIHJl
-dmlld2luZyBqdXN0IHRoZSBRQVBJIHNjaGVtYSB0b2RheS4NCj4gDQo+IEFudG9uIE5lZmVkb3Yg
-PGFudG9uLm5lZmVkb3ZAdmlydHVvenpvLmNvbT4gd3JpdGVzOg0KPiANCj4+IEEgYmxvY2sgZHJp
-dmVyIGNhbiBwcm92aWRlIGEgY2FsbGJhY2sgdG8gcmVwb3J0IGRyaXZlci1zcGVjaWZpYw0KPj4g
-c3RhdGlzdGljcy4NCj4+DQo+PiBmaWxlLXBvc2l4IGRyaXZlciBub3cgcmVwb3J0cyBkaXNjYXJk
-IHN0YXRpc3RpY3MNCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBBbnRvbiBOZWZlZG92IDxhbnRvbi5u
-ZWZlZG92QHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4+ICAgcWFwaS9ibG9jay1jb3JlLmpzb24g
-ICAgICB8IDM4ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+PiAgIGlu
-Y2x1ZGUvYmxvY2svYmxvY2suaCAgICAgfCAgMSArDQo+PiAgIGluY2x1ZGUvYmxvY2svYmxvY2tf
-aW50LmggfCAgMSArDQo+PiAgIGJsb2NrLmMgICAgICAgICAgICAgICAgICAgfCAgOSArKysrKysr
-KysNCj4+ICAgYmxvY2svZmlsZS1wb3NpeC5jICAgICAgICB8IDMyICsrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrDQo+PiAgIGJsb2NrL3FhcGkuYyAgICAgICAgICAgICAgfCAgNSArKysr
-Kw0KPj4gICA2IGZpbGVzIGNoYW5nZWQsIDg2IGluc2VydGlvbnMoKykNCj4+DQo+PiBkaWZmIC0t
-Z2l0IGEvcWFwaS9ibG9jay1jb3JlLmpzb24gYi9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPj4gaW5k
-ZXggOTU5MzU4Y2NjNC4uYjEwMGU4NTJjNyAxMDA2NDQNCj4+IC0tLSBhL3FhcGkvYmxvY2stY29y
-ZS5qc29uDQo+PiArKysgYi9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPj4gQEAgLTg3Nyw2ICs4Nzcs
-NDEgQEANCj4+ICAgICAgICAgICAgICAnKnhfd3JfbGF0ZW5jeV9oaXN0b2dyYW0nOiAnQmxvY2tM
-YXRlbmN5SGlzdG9ncmFtSW5mbycsDQo+PiAgICAgICAgICAgICAgJyp4X2ZsdXNoX2xhdGVuY3lf
-aGlzdG9ncmFtJzogJ0Jsb2NrTGF0ZW5jeUhpc3RvZ3JhbUluZm8nIH0gfQ0KPj4gICANCj4+ICsj
-Iw0KPj4gKyMgQEJsb2NrU3RhdHNTcGVjaWZpY0ZpbGU6DQo+PiArIw0KPj4gKyMgRmlsZSBkcml2
-ZXIgc3RhdGlzdGljcw0KPj4gKyMNCj4+ICsjIEBkaXNjYXJkLW5iLW9rOiBUaGUgbnVtYmVyIG9m
-IHN1Y2NlZWRlZCBkaXNjYXJkIG9wZXJhdGlvbnMgcGVyZm9ybWVkIGJ5DQo+IA0KPiBzdWNjZXNz
-ZnVsIGRpc2NhcmQgb3BlcmF0aW9ucw0KPiANCg0KRml4ZWQuDQoNCj4+ICsjICAgICAgICAgICAg
-ICAgICB0aGUgZHJpdmVyLg0KPj4gKyMNCj4+ICsjIEBkaXNjYXJkLW5iLWZhaWxlZDogVGhlIG51
-bWJlciBvZiBmYWlsZWQgZGlzY2FyZCBvcGVyYXRpb25zIHBlcmZvcm1lZCBieQ0KPj4gKyMgICAg
-ICAgICAgICAgICAgICAgICB0aGUgZHJpdmVyLg0KPj4gKyMNCj4+ICsjIEBkaXNjYXJkLWJ5dGVz
-LW9rOiBUaGUgbnVtYmVyIG9mIGJ5dGVzIGRpc2NhcmRlZCBieSB0aGUgZHJpdmVyLg0KPj4gKyMN
-Cj4+ICsjIFNpbmNlOiA0LjANCj4+ICsjIw0KPj4gK3sgJ3N0cnVjdCc6ICdCbG9ja1N0YXRzU3Bl
-Y2lmaWNGaWxlJywNCj4+ICsgICdkYXRhJzogew0KPj4gKyAgICAgICdkaXNjYXJkLW5iLW9rJzog
-J2ludCcsDQo+PiArICAgICAgJ2Rpc2NhcmQtbmItZmFpbGVkJzogJ2ludCcsDQo+PiArICAgICAg
-J2Rpc2NhcmQtYnl0ZXMtb2snOiAnaW50JyB9IH0NCj4gDQo+IFNob3VsZCB0aGVzZSBiZSB1bnNp
-Z25lZD8NCj4gDQo+IEZvciB3aGF0IGl0J3Mgd29ydGgsIHNpbWlsYXIgY291bnRlcnMgbmVhcmJ5
-IGFyZSBhbHNvICdpbnQnLg0KPiANCg0KQW5kIEkganVzdCBhZGRlZCB0aGVzZSBzeW1tZXRyaWNh
-bGx5Lg0KUHJvYmFibHkgc2hvdWxkbid0IGhhdmUgLSBsZXQgdGhlc2UgYmUgdWludDY0Lg0KDQo+
-PiArDQo+PiArIyMNCj4+ICsjIEBCbG9ja1N0YXRzU3BlY2lmaWM6DQo+PiArIw0KPj4gKyMgQmxv
-Y2sgZHJpdmVyIHNwZWNpZmljIHN0YXRpc3RpY3MNCj4+ICsjDQo+PiArIyBTaW5jZTogNC4wDQo+
-PiArIyMNCj4+ICt7ICd1bmlvbic6ICdCbG9ja1N0YXRzU3BlY2lmaWMnLA0KPj4gKyAgJ2Jhc2Un
-OiB7ICdkcml2ZXInOiAnQmxvY2tkZXZEcml2ZXInIH0sDQo+PiArICAnZGlzY3JpbWluYXRvcic6
-ICdkcml2ZXInLA0KPj4gKyAgJ2RhdGEnOiB7DQo+PiArICAgICAgJ2ZpbGUnOiAnQmxvY2tTdGF0
-c1NwZWNpZmljRmlsZScsDQo+PiArICAgICAgJ2hvc3RfZGV2aWNlJzogJ0Jsb2NrU3RhdHNTcGVj
-aWZpY0ZpbGUnIH0gfQ0KPj4gKw0KPj4gICAjIw0KPj4gICAjIEBCbG9ja1N0YXRzOg0KPj4gICAj
-DQo+PiBAQCAtODkyLDYgKzkyNyw4IEBADQo+PiAgICMNCj4+ICAgIyBAc3RhdHM6ICBBIEBCbG9j
-a0RldmljZVN0YXRzIGZvciB0aGUgZGV2aWNlLg0KPj4gICAjDQo+PiArIyBAZHJpdmVyLXNwZWNp
-ZmljOiBPcHRpb25hbCBkcml2ZXItc3BlY2lmaWMgc3RhdHMuIChTaW5jZSA0LjApDQo+PiArIw0K
-Pj4gICAjIEBwYXJlbnQ6IFRoaXMgZGVzY3JpYmVzIHRoZSBmaWxlIGJsb2NrIGRldmljZSBpZiBp
-dCBoYXMgb25lLg0KPj4gICAjICAgICAgICAgIENvbnRhaW5zIHJlY3Vyc2l2ZWx5IHRoZSBzdGF0
-aXN0aWNzIG9mIHRoZSB1bmRlcmx5aW5nDQo+PiAgICMgICAgICAgICAgcHJvdG9jb2wgKGUuZy4g
-dGhlIGhvc3QgZmlsZSBmb3IgYSBxY293MiBpbWFnZSkuIElmIHRoZXJlIGlzDQo+PiBAQCAtOTA1
-LDYgKzk0Miw3IEBADQo+PiAgIHsgJ3N0cnVjdCc6ICdCbG9ja1N0YXRzJywNCj4+ICAgICAnZGF0
-YSc6IHsnKmRldmljZSc6ICdzdHInLCAnKnFkZXYnOiAnc3RyJywgJypub2RlLW5hbWUnOiAnc3Ry
-JywNCj4+ICAgICAgICAgICAgICAnc3RhdHMnOiAnQmxvY2tEZXZpY2VTdGF0cycsDQo+PiArICAg
-ICAgICAgICAnKmRyaXZlci1zcGVjaWZpYyc6ICdCbG9ja1N0YXRzU3BlY2lmaWMnLA0KPj4gICAg
-ICAgICAgICAgICcqcGFyZW50JzogJ0Jsb2NrU3RhdHMnLA0KPj4gICAgICAgICAgICAgICcqYmFj
-a2luZyc6ICdCbG9ja1N0YXRzJ30gfQ0KPj4gICANCj4gDQo+IEZlZWxzIGF3a3dhcmQuDQo+IA0K
-PiBXaGVuIGlzIEBkcml2ZXItc3BlY2lmaWMgcHJlc2VudD8gIEV4YWN0bHkgd2hlbiB0aGUgZHJp
-dmVyIGlzICdmaWxlJyBvcg0KPiAnaG9zdF9kZXZpY2UnPyAgSWYgdGhhdCdzIGNvcnJlY3QsIHRo
-ZW4gdHVybmluZyBCbG9ja1N0YXRzIGludG8gYSB1bmlvbg0KPiB3b3VsZCBiZSBjbGVhcmVyIGFu
-ZCByZWR1Y2UgcGFyZW50aGVzaXNlcyBvbiB0aGUgd2lyZToNCj4gDQo+IHsgJ3VuaW9uJzogJ0Js
-b2NrU3RhdHMnLA0KPiAgICAnYmFzZSc6IHsNCj4gICAgICAgICdkcml2ZXInOiAnQmxvY2tkZXZE
-cml2ZXInLA0KPiAgICAgICAgLi4uIGFsbCB0aGUgb3RoZXIgZXhpc3RpbmcgbWVtYmVycyBvZiBC
-bG9ja1N0YXRzIC4uLiB9DQo+ICAgICdkaXNjcmltaW5hdG9yJzogJ2RyaXZlcicsDQo+ICAgICdk
-YXRhJzogew0KPiAgICAgICAgJ2ZpbGUnOiAnQmxvY2tTdGF0c1NwZWNpZmljRmlsZScsDQo+ICAg
-ICAgICAnaG9zdF9kZXZpY2UnOiAnQmxvY2tTdGF0c1NwZWNpZmljRmlsZScgfSB9DQo+IA0KPiBb
-Li4uXQ0KPiANCg0KdGhpcyBzZXJpZXMgZHJhZ3MgZm9yIHF1aXRlIGEgd2hpbGUgLSB3ZSBhbHJl
-YWR5IGRpc2N1c3NlZCB0aGlzIDopDQpJbiBzaG9ydDogQmxvY2tkZXYgZG9lcyBub3QgYWx3YXlz
-IGhhdmUgZHJpdmVyLCBzbyBpdCdzIGVpdGhlciB0aGlzDQpvciBhZGRpbmcgd2VpcmQgQmxvY2tk
-ZXZEcml2ZXIgdmFsdWVzIGxpa2UgIm5vbmUiLg0KDQpodHRwOi8vbGlzdHMubm9uZ251Lm9yZy9h
-cmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE4LTA2L21zZzAxODQ1Lmh0bWwNCg==
+
+Mark Rutland <mark.rutland@arm.com> writes:
+
+> Hi Alex,
+>
+> On Thu, Dec 13, 2018 at 11:55:01AM +0000, Alex Benn=C3=A9e wrote:
+>> Hi,
+>>
+>> This is an attempt to fix debugging of AArch32 binaries when running
+>> under KVM on AArch64 hardware. There are two parts to this, the first is
+>> a handling the possibility of AArch32 software breakpoints with a
+>> heuristic based on the current execution mode. The second part is
+>> delaying the setup of aarch64 debugging until the shared arm_cpu_realize
+>> function is run by which point we have parsed and decoded the actual
+>> execution mode of the guest. This doesn't solve the problem of split
+>> mode guests which switch between an AA64 EL1 and an AA32 EL0 though.
+>>
+>> I still ran into a problem with single-step. Even with Mark's
+>> single-step fixup series:
+>>
+>>   To: linux-arm-kernel@lists.infradead.org
+>>   Cc: kvmarm@lists.cs.columbia.edu,
+>>   Subject: [PATCH 0/2] kvm/arm: make singlestep behaviour consistent
+>>   Date: Fri, 9 Nov 2018 15:07:09 +0000
+>>   Message-Id: <20181109150711.45864-1-mark.rutland@arm.com>
+>>
+>> some instructions do single-step but sometimes the single-step doesn't
+>> return leading to a runaway until it hits a breakpoint. I'm not sure why
+>> this is the case because the SS state machine shouldn't be instruction
+>> sensitive.
+>
+> Could you please give an example sequence where this occurs? I'd be
+> happy to take a look.
+
+Here is a trace in gdb:
+
+=3D> 0x0: b       0x1000
+   0x4:                 ; <UNDEFINED> instruction: 0xffffffff
+   0x8:                 ; <UNDEFINED> instruction: 0xffffffff
+   0xc:                 ; <UNDEFINED> instruction: 0xffffffff
+   0x10:                        ; <UNDEFINED> instruction: 0xffffffff
+   0x1000:      bl      0x372c
+   0x1004:      andeq   r12, r0, r1, asr r12
+   0x1008:      rors    pc, lr, r0      ; <UNPREDICTABLE>
+   0x100c:      andeq   r0, r0, r0
+   0x1010:      cfstr32hi       mvfx14, [r12], {120}    ; 0x78
+   0x372c:      bl      0x39d4
+   0x3730:      bl      0x39cc
+   0x3734:      mov     r5, r0
+   0x3738:      bl      0x39e8
+   0x373c:      movw    r1, #0
+   0x39d4:      bx      lr
+   0x39d8:      and     r1, r0, #255    ; 0xff
+   0x39dc:      and     r0, r0, #65280  ; 0xff00
+   0x39e0:      add     r0, r1, r0, lsr #7
+   0x39e4:      bx      lr
+Hardware assisted breakpoint 1 at 0x39d4
+0x00001000 in ?? ()
+=3D> 0x1000:      bl      0x372c
+   0x1004:      andeq   r12, r0, r1, asr r12
+   0x1008:      rors    pc, lr, r0      ; <UNPREDICTABLE>
+
+Thread 1 hit Breakpoint 1, 0x000039d4 in ?? ()
+=3D> 0x39d4:      bx      lr
+   0x39d8:      and     r1, r0, #255    ; 0xff
+   0x39dc:      and     r0, r0, #65280  ; 0xff00
+0x1000: 0xeb0009c9      0x0000cc51
+
+The second instruction (bl 0x372c) didn't single-step and we eventually
+hit the hbreak I set at 0x39d4.
+
+This is from ard's QEMU_EFI.fd build:
+
+ http://snapshots.linaro.org/components/kernel/leg-virt-tianocore-edk2-upst=
+ream/3373/QEMU-ARM/DEBUG_GCC5/QEMU_EFI.img.gz
+
+Running with:
+
+ ./aarch64-softmmu/qemu-system-aarch64 -M virt -cpu host,aarch64=3Doff -ena=
+ble-kvm -net none -nographic -bios ~/QEMU_EFI_aarch32.img -smp 2 -s -S
+
+And:
+
+ gdb -ex "target remote localhost:1234"
+
+>
+> Thanks,
+> Mark.
+
+
+--
+Alex Benn=C3=A9e
