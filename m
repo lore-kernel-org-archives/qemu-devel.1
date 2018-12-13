@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gXSO3-0003wH-7h
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:52 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gXSO5-0003zs-8T
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gXSO2-00070x-98
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:51 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:53504)
+	(envelope-from <pm215@archaic.org.uk>) id 1gXSO3-000724-03
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:53 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:53506)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gXSO1-0006w2-VW
+	id 1gXSO2-0006zA-Ld
 	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:54:50 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gXSO0-0007Fr-3W
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 14:54:48 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1gXSO1-0007Ge-NC
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 14:54:49 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 13 Dec 2018 14:54:12 +0000
-Message-Id: <20181213145445.17935-5-peter.maydell@linaro.org>
+Date: Thu, 13 Dec 2018 14:54:15 +0000
+Message-Id: <20181213145445.17935-8-peter.maydell@linaro.org>
 In-Reply-To: <20181213145445.17935-1-peter.maydell@linaro.org>
 References: <20181213145445.17935-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 04/37] block/noenand: Convert sysbus init
+Subject: [Qemu-devel] [PULL 07/37] display/g364fb: Convert sysbus init
  function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -36,74 +36,58 @@ To: qemu-devel@nongnu.org
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 
 Use DeviceClass rather than SysBusDeviceClass in
-onenand_class_init().
+g364fb_sysbus_class_init().
 
-Cc: kwolf@redhat.com
-Cc: mreitz@redhat.com
-Cc: qemu-block@nongnu.org
+Cc: pbonzini@redhat.com
+Cc: kraxel@redhat.com
+Cc: f4bug@amsat.org
+Cc: alistair.francis@wdc.com
 
 Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20181130093852.20739-3-maozhongyi@cmss.chinamobile.com
+Message-id: 20181130093852.20739-6-maozhongyi@cmss.chinamobile.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/block/onenand.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+ hw/display/g364fb.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/hw/block/onenand.c b/hw/block/onenand.c
-index 2b48609776d..f11118a6876 100644
---- a/hw/block/onenand.c
-+++ b/hw/block/onenand.c
-@@ -772,9 +772,9 @@ static const MemoryRegionOps onenand_ops = {
-     .endianness = DEVICE_NATIVE_ENDIAN,
- };
+diff --git a/hw/display/g364fb.c b/hw/display/g364fb.c
+index 8ad7e5d8242..3407adf98d2 100644
+--- a/hw/display/g364fb.c
++++ b/hw/display/g364fb.c
+@@ -489,18 +489,16 @@ typedef struct {
+     G364State g364;
+ } G364SysBusState;
  
--static int onenand_initfn(SysBusDevice *sbd)
-+static void onenand_realize(DeviceState *dev, Error **errp)
+-static int g364fb_sysbus_init(SysBusDevice *sbd)
++static void g364fb_sysbus_realize(DeviceState *dev, Error **errp)
  {
 -    DeviceState *dev = DEVICE(sbd);
+     G364SysBusState *sbs = G364(dev);
+     G364State *s = &sbs->g364;
 +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-     OneNANDState *s = ONE_NAND(dev);
-     uint32_t size = 1 << (24 + ((s->id.dev >> 4) & 7));
-     void *ram;
-@@ -794,14 +794,14 @@ static int onenand_initfn(SysBusDevice *sbd)
-                           0xff, size + (size >> 5));
-     } else {
-         if (blk_is_read_only(s->blk)) {
--            error_report("Can't use a read-only drive");
--            return -1;
-+            error_setg(errp, "Can't use a read-only drive");
-+            return;
-         }
-         blk_set_perm(s->blk, BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE,
-                      BLK_PERM_ALL, &local_err);
-         if (local_err) {
--            error_report_err(local_err);
--            return -1;
-+            error_propagate(errp, local_err);
-+            return;
-         }
-         s->blk_cur = s->blk;
-     }
-@@ -826,7 +826,6 @@ static int onenand_initfn(SysBusDevice *sbd)
-                      | ((s->id.dev & 0xff) << 8)
-                      | (s->id.ver & 0xff),
-                      &vmstate_onenand, s);
+ 
+     g364fb_init(dev, s);
+     sysbus_init_irq(sbd, &s->irq);
+     sysbus_init_mmio(sbd, &s->mem_ctrl);
+     sysbus_init_mmio(sbd, &s->mem_vram);
+-
 -    return 0;
  }
  
- static Property onenand_properties[] = {
-@@ -841,9 +840,8 @@ static Property onenand_properties[] = {
- static void onenand_class_init(ObjectClass *klass, void *data)
+ static void g364fb_sysbus_reset(DeviceState *d)
+@@ -518,9 +516,8 @@ static Property g364fb_sysbus_properties[] = {
+ static void g364fb_sysbus_class_init(ObjectClass *klass, void *data)
  {
      DeviceClass *dc = DEVICE_CLASS(klass);
 -    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
  
--    k->init = onenand_initfn;
-+    dc->realize = onenand_realize;
-     dc->reset = onenand_system_reset;
-     dc->props = onenand_properties;
- }
+-    k->init = g364fb_sysbus_init;
++    dc->realize = g364fb_sysbus_realize;
+     set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
+     dc->desc = "G364 framebuffer";
+     dc->reset = g364fb_sysbus_reset;
 -- 
 2.19.2
