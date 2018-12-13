@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gXN7N-0001eV-RA
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 04:17:19 -0500
+	(envelope-from <philmd@redhat.com>) id 1gXN8Q-0002Bj-UM
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 04:18:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gXN7J-0006wp-VT
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 04:17:17 -0500
-Received: from mail-wm1-f41.google.com ([209.85.128.41]:56109)
+	(envelope-from <philmd@redhat.com>) id 1gXN8M-0007u1-S1
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 04:18:22 -0500
+Received: from mail-wr1-f41.google.com ([209.85.221.41]:44240)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gXN7J-0006vB-Hq
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 04:17:13 -0500
-Received: by mail-wm1-f41.google.com with SMTP id y139so1507451wmc.5
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 01:17:12 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gXN8M-0007se-EP
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 04:18:18 -0500
+Received: by mail-wr1-f41.google.com with SMTP id z5so1164636wrt.11
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 01:18:18 -0800 (PST)
 References: <20181212194009.2951-1-lvivier@redhat.com>
-	<20181212194009.2951-2-lvivier@redhat.com>
+	<20181212194009.2951-4-lvivier@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0437051b-f816-6afb-e0d1-8f67a84dd59c@redhat.com>
-Date: Thu, 13 Dec 2018 10:17:09 +0100
+Message-ID: <2282b7a4-70fb-bcb1-bc06-3265a2ab6a67@redhat.com>
+Date: Thu, 13 Dec 2018 10:18:15 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181212194009.2951-2-lvivier@redhat.com>
+In-Reply-To: <20181212194009.2951-4-lvivier@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/4] block/ssh: Convert from DPRINTF()
- macro to trace events
+Subject: Re: [Qemu-devel] [PATCH 3/4] block/file-posix: Convert from
+ DPRINTF() macro to trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,195 +36,98 @@ Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-trivial@nongnu.or
 
 On 12/12/18 8:40 PM, Laurent Vivier wrote:
 > Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->  block/ssh.c        | 46 +++++++++++++++++-----------------------------
->  block/trace-events | 17 +++++++++++++++++
->  2 files changed, 34 insertions(+), 29 deletions(-)
-> 
-> diff --git a/block/ssh.c b/block/ssh.c
-> index 7fbc27abdf..bbc513e095 100644
-> --- a/block/ssh.c
-> +++ b/block/ssh.c
-> @@ -41,27 +41,17 @@
->  #include "qapi/qmp/qstring.h"
->  #include "qapi/qobject-input-visitor.h"
->  #include "qapi/qobject-output-visitor.h"
-> +#include "trace.h"
->  
-> -/* DEBUG_SSH=1 enables the DPRINTF (debugging printf) statements in
-> - * this block driver code.
-> - *
-> +/*
->   * TRACE_LIBSSH2=<bitmask> enables tracing in libssh2 itself.  Note
->   * that this requires that libssh2 was specially compiled with the
->   * `./configure --enable-debug' option, so most likely you will have
->   * to compile it yourself.  The meaning of <bitmask> is described
->   * here: http://www.libssh2.org/libssh2_trace.html
->   */
-> -#define DEBUG_SSH     0
->  #define TRACE_LIBSSH2 0 /* or try: LIBSSH2_TRACE_SFTP */
->  
-> -#define DPRINTF(fmt, ...)                           \
-> -    do {                                            \
-> -        if (DEBUG_SSH) {                            \
-> -            fprintf(stderr, "ssh: %-15s " fmt "\n", \
-> -                    __func__, ##__VA_ARGS__);       \
-> -        }                                           \
-> -    } while (0)
-> -
->  typedef struct BDRVSSHState {
->      /* Coroutine. */
->      CoMutex lock;
-> @@ -336,7 +326,7 @@ static int check_host_key_knownhosts(BDRVSSHState *s,
->      switch (r) {
->      case LIBSSH2_KNOWNHOST_CHECK_MATCH:
->          /* OK */
-> -        DPRINTF("host key OK: %s", found->key);
-> +        trace_ssh_check_host_key_knownhosts(found->key);
->          break;
->      case LIBSSH2_KNOWNHOST_CHECK_MISMATCH:
->          ret = -EINVAL;
-> @@ -721,8 +711,7 @@ static int connect_to_ssh(BDRVSSHState *s, BlockdevOptionsSsh *opts,
->      }
->  
->      /* Open the remote file. */
-> -    DPRINTF("opening file %s flags=0x%x creat_mode=0%o",
-> -            opts->path, ssh_flags, creat_mode);
-> +    trace_ssh_connect_to_ssh(opts->path, ssh_flags, creat_mode);
->      s->sftp_handle = libssh2_sftp_open(s->sftp, opts->path, ssh_flags,
->                                         creat_mode);
->      if (!s->sftp_handle) {
-> @@ -890,7 +879,7 @@ static int coroutine_fn ssh_co_create_opts(const char *filename, QemuOpts *opts,
->      /* Get desired file size. */
->      ssh_opts->size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
->                                BDRV_SECTOR_SIZE);
-> -    DPRINTF("total_size=%" PRIi64, ssh_opts->size);
-> +    trace_ssh_co_create_opts(ssh_opts->size);
->  
->      uri_options = qdict_new();
->      ret = parse_uri(filename, uri_options, errp);
-> @@ -946,7 +935,7 @@ static void restart_coroutine(void *opaque)
->      BDRVSSHState *s = bs->opaque;
->      AioContext *ctx = bdrv_get_aio_context(bs);
->  
-> -    DPRINTF("co=%p", restart->co);
-> +    trace_ssh_restart_coroutine(restart->co);
->      aio_set_fd_handler(ctx, s->sock, false, NULL, NULL, NULL, NULL);
->  
->      aio_co_wake(restart->co);
-> @@ -974,13 +963,12 @@ static coroutine_fn void co_yield(BDRVSSHState *s, BlockDriverState *bs)
->          wr_handler = restart_coroutine;
->      }
->  
-> -    DPRINTF("s->sock=%d rd_handler=%p wr_handler=%p", s->sock,
-> -            rd_handler, wr_handler);
-> +    trace_ssh_co_yield(s->sock, rd_handler, wr_handler);
->  
->      aio_set_fd_handler(bdrv_get_aio_context(bs), s->sock,
->                         false, rd_handler, wr_handler, NULL, &restart);
->      qemu_coroutine_yield();
-> -    DPRINTF("s->sock=%d - back", s->sock);
-> +    trace_ssh_co_yield_back(s->sock);
->  }
->  
->  /* SFTP has a function `libssh2_sftp_seek64' which seeks to a position
-> @@ -1003,7 +991,7 @@ static void ssh_seek(BDRVSSHState *s, int64_t offset, int flags)
->      bool force = (flags & SSH_SEEK_FORCE) != 0;
->  
->      if (force || op_read != s->offset_op_read || offset != s->offset) {
-> -        DPRINTF("seeking to offset=%" PRIi64, offset);
-> +        trace_ssh_seek(offset);
->          libssh2_sftp_seek64(s->sftp_handle, offset);
->          s->offset = offset;
->          s->offset_op_read = op_read;
-> @@ -1019,7 +1007,7 @@ static coroutine_fn int ssh_read(BDRVSSHState *s, BlockDriverState *bs,
->      char *buf, *end_of_vec;
->      struct iovec *i;
->  
-> -    DPRINTF("offset=%" PRIi64 " size=%zu", offset, size);
-> +    trace_ssh_read(offset, size);
->  
->      ssh_seek(s, offset, SSH_SEEK_READ);
->  
-> @@ -1038,9 +1026,9 @@ static coroutine_fn int ssh_read(BDRVSSHState *s, BlockDriverState *bs,
->       */
->      for (got = 0; got < size; ) {
->      again:
-> -        DPRINTF("sftp_read buf=%p size=%zu", buf, end_of_vec - buf);
-> +        trace_ssh_read_buf(buf, end_of_vec - buf);
->          r = libssh2_sftp_read(s->sftp_handle, buf, end_of_vec - buf);
-> -        DPRINTF("sftp_read returned %zd", r);
-> +        trace_ssh_read_return(r);
->  
->          if (r == LIBSSH2_ERROR_EAGAIN || r == LIBSSH2_ERROR_TIMEOUT) {
->              co_yield(s, bs);
-> @@ -1094,7 +1082,7 @@ static int ssh_write(BDRVSSHState *s, BlockDriverState *bs,
->      char *buf, *end_of_vec;
->      struct iovec *i;
->  
-> -    DPRINTF("offset=%" PRIi64 " size=%zu", offset, size);
-> +    trace_ssh_write(offset, size);
->  
->      ssh_seek(s, offset, SSH_SEEK_WRITE);
->  
-> @@ -1108,9 +1096,9 @@ static int ssh_write(BDRVSSHState *s, BlockDriverState *bs,
->  
->      for (written = 0; written < size; ) {
->      again:
-> -        DPRINTF("sftp_write buf=%p size=%zu", buf, end_of_vec - buf);
-> +        trace_ssh_write_buf(buf, end_of_vec - buf);
->          r = libssh2_sftp_write(s->sftp_handle, buf, end_of_vec - buf);
-> -        DPRINTF("sftp_write returned %zd", r);
-> +        trace_ssh_write_return(r);
->  
->          if (r == LIBSSH2_ERROR_EAGAIN || r == LIBSSH2_ERROR_TIMEOUT) {
->              co_yield(s, bs);
-> @@ -1187,7 +1175,7 @@ static coroutine_fn int ssh_flush(BDRVSSHState *s, BlockDriverState *bs)
->  {
->      int r;
->  
-> -    DPRINTF("fsync");
-> +    trace_ssh_flush();
->   again:
->      r = libssh2_sftp_fsync(s->sftp_handle);
->      if (r == LIBSSH2_ERROR_EAGAIN || r == LIBSSH2_ERROR_TIMEOUT) {
-> @@ -1238,7 +1226,7 @@ static int64_t ssh_getlength(BlockDriverState *bs)
->  
->      /* Note we cannot make a libssh2 call here. */
->      length = (int64_t) s->attrs.filesize;
-> -    DPRINTF("length=%" PRIi64, length);
-> +    trace_ssh_getlength(length);
->  
->      return length;
->  }
-> diff --git a/block/trace-events b/block/trace-events
-> index 3e8c47bb24..b13b1e9706 100644
-> --- a/block/trace-events
-> +++ b/block/trace-events
-> @@ -156,3 +156,20 @@ nvme_cmd_map_qiov_iov(void *s, int i, void *page, int pages) "s %p iov[%d] %p pa
->  
->  # block/iscsi.c
->  iscsi_xcopy(void *src_lun, uint64_t src_off, void *dst_lun, uint64_t dst_off, uint64_t bytes, int ret) "src_lun %p offset %"PRIu64" dst_lun %p offset %"PRIu64" bytes %"PRIu64" ret %d"
-> +
-> +# block/ssh.c
-> +ssh_restart_coroutine(void *co) "co=%p"
-> +ssh_flush(void) "fsync"
-> +ssh_check_host_key_knownhosts(const char *key) "host key OK: %s"
-> +ssh_connect_to_ssh(char *path, int flags, int mode) "opening file %s flags=0x%x creat_mode=0%o"
-> +ssh_co_yield(int sock, void *rd_handler, void *wr_handler) "s->sock=%d rd_handler=%p wr_handler=%p"
-> +ssh_co_yield_back(int sock) "s->sock=%d - back"
-> +ssh_getlength(int64_t length) "length=%" PRIi64
-> +ssh_co_create_opts(uint64_t size) "total_size=%" PRIu64
-> +ssh_read(int64_t offset, size_t size) "offset=%" PRIi64 " size=%zu"
-> +ssh_read_buf(void *buf, size_t size) "sftp_read buf=%p size=%zu"
-> +ssh_read_return(size_t ret) "sftp_read returned %zd"
-> +ssh_write(int64_t offset, size_t size) "offset=%" PRIi64 " size=%zu"
-> +ssh_write_buf(void *buf, size_t size) "sftp_write buf=%p size=%zu"
-> +ssh_write_return(size_t ret) "sftp_write returned %zd"
-
-%zu?
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> +ssh_seek(uint64_t offset) "seeking to offset=%" PRIi64
+> ---
+>  block/file-posix.c | 25 ++++++-------------------
+>  block/trace-events |  7 +++++++
+>  2 files changed, 13 insertions(+), 19 deletions(-)
+> 
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 07bbdab953..cf90899a6e 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -102,19 +102,7 @@
+>  #include <xfs/xfs.h>
+>  #endif
+>  
+> -//#define DEBUG_BLOCK
+> -
+> -#ifdef DEBUG_BLOCK
+> -# define DEBUG_BLOCK_PRINT 1
+> -#else
+> -# define DEBUG_BLOCK_PRINT 0
+> -#endif
+> -#define DPRINTF(fmt, ...) \
+> -do { \
+> -    if (DEBUG_BLOCK_PRINT) { \
+> -        printf(fmt, ## __VA_ARGS__); \
+> -    } \
+> -} while (0)
+> +#include "trace.h"
+>  
+>  /* OS X does not have O_DSYNC */
+>  #ifndef O_DSYNC
+> @@ -1386,7 +1374,7 @@ static int xfs_write_zeroes(BDRVRawState *s, int64_t offset, uint64_t bytes)
+>  
+>      if (xfsctl(NULL, s->fd, XFS_IOC_ZERO_RANGE, &fl) < 0) {
+>          err = errno;
+> -        DPRINTF("cannot write zero range (%s)\n", strerror(errno));
+> +        trace_file_xfs_write_zeroes(strerror(errno));
+>          return -err;
+>      }
+>  
+> @@ -1405,7 +1393,7 @@ static int xfs_discard(BDRVRawState *s, int64_t offset, uint64_t bytes)
+>  
+>      if (xfsctl(NULL, s->fd, XFS_IOC_UNRESVSP64, &fl) < 0) {
+>          err = errno;
+> -        DPRINTF("cannot punch hole (%s)\n", strerror(errno));
+> +        trace_file_xfs_discard(strerror(errno));
+>          return -err;
+>      }
+>  
+> @@ -2798,7 +2786,7 @@ static char *FindEjectableOpticalMedia(io_iterator_t *mediaIterator)
+>  
+>          /* If a match was found, leave the loop */
+>          if (*mediaIterator != 0) {
+> -            DPRINTF("Matching using %s\n", matching_array[index]);
+> +            trace_file_FindEjectableOpticalMedia(matching_array[index]);
+>              mediaType = g_strdup(matching_array[index]);
+>              break;
+>          }
+> @@ -2858,7 +2846,7 @@ static bool setup_cdrom(char *bsd_path, Error **errp)
+>      if (partition_found == false) {
+>          error_setg(errp, "Failed to find a working partition on disc");
+>      } else {
+> -        DPRINTF("Using %s as optical disc\n", test_partition);
+> +        trace_file_setup_cdrom(test_partition);
+>          pstrcpy(bsd_path, MAXPATHLEN, test_partition);
+>      }
+>      return partition_found;
+> @@ -2953,8 +2941,7 @@ static bool hdev_is_sg(BlockDriverState *bs)
+>  
+>      ret = ioctl(s->fd, SG_GET_SCSI_ID, &scsiid);
+>      if (ret >= 0) {
+> -        DPRINTF("SG device found: type=%d, version=%d\n",
+> -            scsiid.scsi_type, sg_version);
+> +        trace_file_hdev_is_sg(scsiid.scsi_type, sg_version);
+>          return true;
+>      }
+>  
+> diff --git a/block/trace-events b/block/trace-events
+> index 5b83280b02..49f31966e7 100644
+> --- a/block/trace-events
+> +++ b/block/trace-events
+> @@ -182,3 +182,10 @@ curl_open(const char *file) "opening %s"
+>  curl_open_size(uint64_t size) "size = %" PRIu64
+>  curl_setup_preadv(uint64_t bytes, uint64_t start, const char *range) "reading %" PRIu64 " at %" PRIu64 " (%s)"
+>  curl_close(void) "close"
+> +
+> +# block/file-posix.c
+> +file_xfs_write_zeroes(const char *error) "cannot write zero range (%s)"
+> +file_xfs_discard(const char* error) "cannot punch hole (%s)"
+> +file_FindEjectableOpticalMedia(const char *media) "Matching using %s"
+> +file_setup_cdrom(const char *partition) "Using %s as optical disc"
+> +file_hdev_is_sg(int type, int version) "SG device found: type=%d, version=%d"
 > 
