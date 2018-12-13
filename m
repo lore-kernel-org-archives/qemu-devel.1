@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXQgx-0008Kf-3q
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:06:20 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gXQjr-0002sN-UB
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:09:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXQgh-0002ht-Nw
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:06:01 -0500
-Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:47026)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gXQgh-0002hJ-IG
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:05:59 -0500
-Received: by mail-ot1-x331.google.com with SMTP id w25so1775666otm.13
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 05:05:59 -0800 (PST)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gXQjo-0004fW-MD
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:09:15 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 13 Dec 2018 13:09:08 +0000
+Message-ID: <43e3e755-e4d3-5342-2829-e7c309d675e4@virtuozzo.com>
+References: <20181213015013.15350-1-jsnow@redhat.com>
+	<20181213015013.15350-7-jsnow@redhat.com>
+In-Reply-To: <20181213015013.15350-7-jsnow@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <9884DBD528C0284CB6E87E000912C8F7@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20181212095252.20349-1-stefanha@redhat.com>
-In-Reply-To: <20181212095252.20349-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 13 Dec 2018 13:05:47 +0000
-Message-ID: <CAFEAcA9R6S-_=3Ae2aYodnovpWex=B3=8Q5rGAOPO2ewzRpZnA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] Block patches
+Subject: Re: [Qemu-devel] [PATCH v2 6/7] iotests: allow pretty-print for
+ qmp_log
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +26,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>
+To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On Wed, 12 Dec 2018 at 09:53, Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> The following changes since commit bb9bf94b3e8926553290bc9a7cb84315af422086:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-request' into staging (2018-12-11 19:18:58 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/stefanha/qemu.git tags/block-pull-request
->
-> for you to fetch changes up to e61809ed8ac3a2f68eb1cc231244f84eb06adacf:
->
->   virtio-blk: fix comment for virtio_blk_rw_complete as nalloc is initially -1 (2018-12-12 09:16:55 +0000)
->
-> ----------------------------------------------------------------
-> Pull request
->
-> Minor virtio-blk fixes.
->
-> ----------------------------------------------------------------
->
-> Dongli Zhang (2):
->   virtio-blk: rename iov to out_iov in virtio_blk_handle_request()
->   virtio-blk: fix comment for virtio_blk_rw_complete as nalloc is
->     initially -1
->
-
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
-
--- PMM
+MTMuMTIuMjAxOCA0OjUwLCBKb2huIFNub3cgd3JvdGU6DQo+IElmIGlvdGVzdHMgaGF2ZSBsaW5l
+cyBleGNlZWRpbmcgPjk5OCBjaGFyYWN0ZXJzIGxvbmcsIGdpdCBkb2Vzbid0DQo+IHdhbnQgdG8g
+c2VuZCBpdCBwbGFpbnRleHQgdG8gdGhlIGxpc3QuIFdlIGNhbiBzb2x2ZSB0aGlzIGJ5IGFsbG93
+aW5nDQo+IHRoZSBpb3Rlc3RzIHRvIHVzZSBwcmV0dHkgcHJpbnRlZCBRTVAgb3V0cHV0IHRoYXQg
+d2UgY2FuIG1hdGNoIGFnYWluc3QNCj4gaW5zdGVhZC4NCj4gDQo+IEFzIGEgYm9udXMsIGl0J3Mg
+bXVjaCBuaWNlciBmb3IgaHVtYW4gZXllcywgdG9vLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSm9o
+biBTbm93IDxqc25vd0ByZWRoYXQuY29tPg0KPiAtLS0NCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMv
+aW90ZXN0cy5weSB8IDQgKystLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyks
+IDIgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzL2lv
+dGVzdHMucHkgYi90ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weQ0KPiBpbmRleCA5NTk1NDI5
+ZmVhLi5kYmJlZjRiYWQzIDEwMDY0NA0KPiAtLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0
+cy5weQ0KPiArKysgYi90ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weQ0KPiBAQCAtNDQ3LDEy
+ICs0NDcsMTIgQEAgY2xhc3MgVk0ocXRlc3QuUUVNVVF0ZXN0TWFjaGluZSk6DQo+ICAgICAgICAg
+ICAgICAgcmVzdWx0LmFwcGVuZChmaWx0ZXJfcW1wX2V2ZW50KGV2KSkNCj4gICAgICAgICAgIHJl
+dHVybiByZXN1bHQNCj4gICANCj4gLSAgICBkZWYgcW1wX2xvZyhzZWxmLCBjbWQsIGZpbHRlcnM9
+W2ZpbHRlcl90ZXN0ZmlsZXNdLCAqKmt3YXJncyk6DQo+ICsgICAgZGVmIHFtcF9sb2coc2VsZiwg
+Y21kLCBpbmRlbnQ9Tm9uZSwgZmlsdGVycz1bZmlsdGVyX3Rlc3RmaWxlc10sICoqa3dhcmdzKToN
+Cj4gICAgICAgICAgIGxvZ21zZyA9ICd7ImV4ZWN1dGUiOiAiJXMiLCAiYXJndW1lbnRzIjogJXN9
+JyAlIFwNCj4gICAgICAgICAgICAgICAoY21kLCBqc29uLmR1bXBzKGt3YXJncywgc29ydF9rZXlz
+PVRydWUpKQ0KPiAgICAgICAgICAgbG9nKGxvZ21zZywgZmlsdGVycykNCg0Kd2h5IG5vdCB0byBw
+cmV0dGlmeSBjbWQganNvbiB0b28/IEp1c3QgbWFrZSBmdWxsb2JqID0geyJleGVjdXRlIjogY21k
+LCAiYXJndW1lbnRzIjoga3dhcmdzfSwgYW5kIHByZXR0aWZ5IGl0Lg0KKGhtbSwgdW5mb3J0dW5h
+dGVseSwgImV4ZWN1dGUiIDwgImFyZ3VtZW50cyIsIGFuZCB0aGV5IHdpbGwgYmUgcmVhcnJhbmdl
+ZCkNCg0Kd2l0aCBvciB3aXRob3V0IChhcyB0aGUgcGF0Y2ggZG9uJ3QgYWltIHRvIHByZXR0aWZ5
+IGV2ZXJ5dGhpbmcpOg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkg
+PHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KPiAgICAgICAgICAgcmVzdWx0ID0gc2VsZi5x
+bXAoY21kLCAqKmt3YXJncykNCj4gLSAgICAgICAgbG9nKGpzb24uZHVtcHMocmVzdWx0LCBzb3J0
+X2tleXM9VHJ1ZSksIGZpbHRlcnMpDQo+ICsgICAgICAgIGxvZyhqc29uLmR1bXBzKHJlc3VsdCwg
+aW5kZW50PWluZGVudCwgc29ydF9rZXlzPVRydWUpLCBmaWx0ZXJzKQ0KPiAgICAgICAgICAgcmV0
+dXJuIHJlc3VsdA0KDQpobW0sIGRvaW5nIHRoZSBzYW1lIHRoaW5nIGFzIEVyaWMgKGNoZWNrIHNw
+ZWNzKSwgSSBzZWUgdGhlIGZvbGxvd2luZyBub3RlOg0KDQogPiBOb3RlOiBTaW5jZSB0aGUgZGVm
+YXVsdCBpdGVtIHNlcGFyYXRvciBpcyAnLCAnLCB0aGUgb3V0cHV0IG1pZ2h0IGluY2x1ZGUgdHJh
+aWxpbmcgd2hpdGVzcGFjZSB3aGVuIGluZGVudCBpcyBzcGVjaWZpZWQuDQoNCkFuZCBJIHJlbWVt
+YmVyIGEgcGFpbiBvZiB0cmFpbGluZyB3aGl0ZXNwYWNlcyBpbiBpb3Rlc3RzIG9uLCBtYXkgYmUs
+IGJhY2twb3J0aW5nLCBvciBzb21ldGhpbmcgbGlrZSB0aGlzIHNvbWUgdGltZSBhZ28uDQpJdCdz
+IG9mIGNvdXJzZSBub3QgYWJvdXQgdGhpcyBwYXRjaCwgYnV0IEkgdGhpbmsgaXQgaXMgYSBnb29k
+IGlkZWEgdG8gYXZvaWQgdHJhaWxpbmcgd2hpdGVzcGFjZXMgaW4gdGVzdCBvdXRwdXQsIGF0IGxl
+YXN0DQppbiBjb21tb24gaGVscGVycy4gTWF5IGJlIGJlc3QgcGxhY2UgdG8gZml4IGlzIGlvdGVz
+dHMubG9nKCkgZnVuY3Rpb24NCg0KPiAgIA0KPiAgICAgICBkZWYgcnVuX2pvYihzZWxmLCBqb2Is
+IGF1dG9fZmluYWxpemU9VHJ1ZSwgYXV0b19kaXNtaXNzPUZhbHNlKToNCj4gDQoNCg0KLS0gDQpC
+ZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
