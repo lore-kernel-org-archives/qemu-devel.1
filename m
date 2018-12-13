@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXVxr-0005lG-Or
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:07 -0500
+	(envelope-from <armbru@redhat.com>) id 1gXVxv-0005pn-IS
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXVxn-0002Rh-TK
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34300)
+	(envelope-from <armbru@redhat.com>) id 1gXVxr-0002i0-L5
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41472)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXVxm-0001d7-03
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:43:58 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXVxo-0001eh-Gh
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:01 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BBAC73082211
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 18:43:48 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9775180496
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 18:43:49 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 13 Dec 2018 19:43:22 +0100
-Message-Id: <20181213184340.24037-15-armbru@redhat.com>
+Date: Thu, 13 Dec 2018 19:43:29 +0100
+Message-Id: <20181213184340.24037-22-armbru@redhat.com>
 In-Reply-To: <20181213184340.24037-1-armbru@redhat.com>
 References: <20181213184340.24037-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 14/32] qapi: break long lines at 'data' member
+Subject: [Qemu-devel] [PULL 21/32] qapi: add 'if' to enum members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,427 +37,207 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Let's break the line before 'data'. While at it, improve a bit
-indentation/spacing. (I removed some alignment which are not helping
-much readability and become quickly inconsistent)
+QAPISchemaMember gains .ifcond for enum members: inherited classes,
+such as QAPISchemaObjectTypeMember, will thus have an ifcond member
+after this (those different types will also use the .ifcond to store
+the condition and generate conditional code in the following patches).
 
-Suggested-by: Markus Armbruster <armbru@redhat.com>
+The generated code remains unconditional for now. Later patches
+generate the conditionals.
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20181208111606.8505-26-marcandre.lureau@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20181213123724.4866-10-marcandre.lureau@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- qapi/block-core.json |  13 ++--
- qapi/char.json       | 138 +++++++++++++++++++++++++------------------
- qapi/migration.json  |   3 +-
- qapi/misc.json       |   7 ++-
- qapi/net.json        |   3 +-
- qapi/tpm.json        |   5 +-
- qapi/ui.json         |   3 +-
- 7 files changed, 101 insertions(+), 71 deletions(-)
+ docs/devel/qapi-code-gen.txt                   | 9 +++++++++
+ scripts/qapi/common.py                         | 8 +++++---
+ tests/Makefile.include                         | 1 +
+ tests/qapi-schema/enum-dict-member-unknown.err | 2 +-
+ tests/qapi-schema/enum-if-invalid.err          | 1 +
+ tests/qapi-schema/enum-if-invalid.exit         | 1 +
+ tests/qapi-schema/enum-if-invalid.json         | 3 +++
+ tests/qapi-schema/enum-if-invalid.out          | 0
+ tests/qapi-schema/qapi-schema-test.json        | 5 +++--
+ tests/qapi-schema/qapi-schema-test.out         | 2 ++
+ tests/qapi-schema/test-qapi.py                 | 1 +
+ 11 files changed, 27 insertions(+), 6 deletions(-)
+ create mode 100644 tests/qapi-schema/enum-if-invalid.err
+ create mode 100644 tests/qapi-schema/enum-if-invalid.exit
+ create mode 100644 tests/qapi-schema/enum-if-invalid.json
+ create mode 100644 tests/qapi-schema/enum-if-invalid.out
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index d4fe710836..92e0205d91 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1143,8 +1143,10 @@
- # This command is now obsolete and will always return an error since 2.1=
-0
- #
- ##
--{ 'command': 'block_passwd', 'data': {'*device': 'str',
--                                      '*node-name': 'str', 'password': '=
-str'} }
-+{ 'command': 'block_passwd',
-+  'data': { '*device': 'str',
-+            '*node-name': 'str',
-+            'password': 'str' } }
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index 2c8b392b20..7ba9066eac 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -752,6 +752,15 @@ gets its generated code guarded like this:
+  #endif /* defined(HAVE_BAR) */
+  #endif /* defined(CONFIG_FOO) */
 =20
- ##
- # @block_resize:
-@@ -1171,9 +1173,10 @@
- # <- { "return": {} }
- #
- ##
--{ 'command': 'block_resize', 'data': { '*device': 'str',
--                                       '*node-name': 'str',
--                                       'size': 'int' }}
-+{ 'command': 'block_resize',
-+  'data': { '*device': 'str',
-+            '*node-name': 'str',
-+            'size': 'int' } }
++An enum value can be replaced by a dictionary with a 'name' and a 'if'
++key.
++
++Example: a conditional 'bar' enum member.
++
++{ 'enum': 'IfEnum', 'data':
++  [ 'foo',
++    { 'name' : 'bar', 'if': 'defined(IFCOND)' } ] }
++
+ Please note that you are responsible to ensure that the C code will
+ compile with an arbitrary combination of conditions, since the
+ generators are unable to check it at this point.
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index b1cf33af21..a609ffcfee 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -871,7 +871,8 @@ def check_enum(expr, info):
 =20
- ##
- # @NewImageMode:
-diff --git a/qapi/char.json b/qapi/char.json
-index 79bac598a0..24628331ec 100644
---- a/qapi/char.json
-+++ b/qapi/char.json
-@@ -25,9 +25,10 @@
- #
- # Since: 0.14.0
- ##
--{ 'struct': 'ChardevInfo', 'data': {'label': 'str',
--                                  'filename': 'str',
--                                  'frontend-open': 'bool'} }
-+{ 'struct': 'ChardevInfo',
-+  'data': { 'label': 'str',
-+            'filename': 'str',
-+            'frontend-open': 'bool' } }
+     for member in members:
+         source =3D "dictionary member of enum '%s'" % name
+-        check_known_keys(info, source, member, ['name'], [])
++        check_known_keys(info, source, member, ['name'], ['if'])
++        check_if(member, info)
+         check_name(info, "Member of enum '%s'" % name, member['name'],
+                    enum_member=3DTrue)
 =20
- ##
- # @query-chardev:
-@@ -152,7 +153,8 @@
- #
- ##
- { 'command': 'ringbuf-write',
--  'data': {'device': 'str', 'data': 'str',
-+  'data': { 'device': 'str',
-+            'data': 'str',
-            '*format': 'DataFormat'} }
+@@ -1345,9 +1346,10 @@ class QAPISchemaObjectType(QAPISchemaType):
+ class QAPISchemaMember(object):
+     role =3D 'member'
 =20
- ##
-@@ -202,8 +204,9 @@
- #
- # Since: 2.6
- ##
--{ 'struct': 'ChardevCommon', 'data': { '*logfile': 'str',
--                                       '*logappend': 'bool' } }
-+{ 'struct': 'ChardevCommon',
-+  'data': { '*logfile': 'str',
-+            '*logappend': 'bool' } }
+-    def __init__(self, name):
++    def __init__(self, name, ifcond=3DNone):
+         assert isinstance(name, str)
+         self.name =3D name
++        self.ifcond =3D listify_cond(ifcond)
+         self.owner =3D None
 =20
- ##
- # @ChardevFile:
-@@ -217,9 +220,10 @@
- #
- # Since: 1.4
- ##
--{ 'struct': 'ChardevFile', 'data': { '*in' : 'str',
--                                   'out' : 'str',
--                                   '*append': 'bool' },
-+{ 'struct': 'ChardevFile',
-+  'data': { '*in': 'str',
-+            'out': 'str',
-+            '*append': 'bool' },
-   'base': 'ChardevCommon' }
+     def set_owner(self, name):
+@@ -1656,7 +1658,7 @@ class QAPISchema(object):
+                                             qtype_values, 'QTYPE'))
 =20
- ##
-@@ -232,7 +236,8 @@
- #
- # Since: 1.4
- ##
--{ 'struct': 'ChardevHostdev', 'data': { 'device' : 'str' },
-+{ 'struct': 'ChardevHostdev',
-+  'data': { 'device': 'str' },
-   'base': 'ChardevCommon' }
+     def _make_enum_members(self, values):
+-        return [QAPISchemaMember(v['name']) for v in values]
++        return [QAPISchemaMember(v['name'], v.get('if')) for v in values=
+]
 =20
- ##
-@@ -260,15 +265,16 @@
- #
- # Since: 1.4
- ##
--{ 'struct': 'ChardevSocket', 'data': { 'addr'       : 'SocketAddressLega=
-cy',
--                                     '*tls-creds'  : 'str',
--                                     '*server'    : 'bool',
--                                     '*wait'      : 'bool',
--                                     '*nodelay'   : 'bool',
--                                     '*telnet'    : 'bool',
--                                     '*tn3270'    : 'bool',
--                                     '*websocket' : 'bool',
--                                     '*reconnect' : 'int' },
-+{ 'struct': 'ChardevSocket',
-+  'data': { 'addr': 'SocketAddressLegacy',
-+            '*tls-creds': 'str',
-+            '*server': 'bool',
-+            '*wait': 'bool',
-+            '*nodelay': 'bool',
-+            '*telnet': 'bool',
-+            '*tn3270': 'bool',
-+            '*websocket': 'bool',
-+            '*reconnect': 'int' },
-   'base': 'ChardevCommon' }
+     def _make_implicit_enum_type(self, name, info, ifcond, values):
+         # See also QAPISchemaObjectTypeMember._pretty_owner()
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 2e894c1037..3c9eea27fd 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -384,6 +384,7 @@ qapi-schema +=3D enum-bad-name.json
+ qapi-schema +=3D enum-bad-prefix.json
+ qapi-schema +=3D enum-clash-member.json
+ qapi-schema +=3D enum-dict-member-unknown.json
++qapi-schema +=3D enum-if-invalid.json
+ qapi-schema +=3D enum-int-member.json
+ qapi-schema +=3D enum-member-case.json
+ qapi-schema +=3D enum-missing-data.json
+diff --git a/tests/qapi-schema/enum-dict-member-unknown.err b/tests/qapi-=
+schema/enum-dict-member-unknown.err
+index 76bd0471db..2aae618be0 100644
+--- a/tests/qapi-schema/enum-dict-member-unknown.err
++++ b/tests/qapi-schema/enum-dict-member-unknown.err
+@@ -1,2 +1,2 @@
+ tests/qapi-schema/enum-dict-member-unknown.json:2: Unknown key 'bad-key'=
+ in dictionary member of enum 'MyEnum'
+-Valid keys are 'name'.
++Valid keys are 'if', 'name'.
+diff --git a/tests/qapi-schema/enum-if-invalid.err b/tests/qapi-schema/en=
+um-if-invalid.err
+new file mode 100644
+index 0000000000..54c3cf887b
+--- /dev/null
++++ b/tests/qapi-schema/enum-if-invalid.err
+@@ -0,0 +1 @@
++tests/qapi-schema/enum-if-invalid.json:2: 'if' condition must be a strin=
+g or a list of strings
+diff --git a/tests/qapi-schema/enum-if-invalid.exit b/tests/qapi-schema/e=
+num-if-invalid.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/enum-if-invalid.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/enum-if-invalid.json b/tests/qapi-schema/e=
+num-if-invalid.json
+new file mode 100644
+index 0000000000..60bd0ef1d7
+--- /dev/null
++++ b/tests/qapi-schema/enum-if-invalid.json
+@@ -0,0 +1,3 @@
++# check invalid 'if' type
++{ 'enum': 'TestIfEnum', 'data':
++  [ 'foo', { 'name' : 'bar', 'if': { 'val': 'foo' } } ] }
+diff --git a/tests/qapi-schema/enum-if-invalid.out b/tests/qapi-schema/en=
+um-if-invalid.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
+qapi-schema-test.json
+index 15388ae9a4..8bfaf5aedd 100644
+--- a/tests/qapi-schema/qapi-schema-test.json
++++ b/tests/qapi-schema/qapi-schema-test.json
+@@ -204,7 +204,8 @@
+ { 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
+   'if': 'defined(TEST_IF_STRUCT)' }
 =20
- ##
-@@ -281,8 +287,9 @@
- #
- # Since: 1.5
- ##
--{ 'struct': 'ChardevUdp', 'data': { 'remote' : 'SocketAddressLegacy',
--                                  '*local' : 'SocketAddressLegacy' },
-+{ 'struct': 'ChardevUdp',
-+  'data': { 'remote': 'SocketAddressLegacy',
-+            '*local': 'SocketAddressLegacy' },
-   'base': 'ChardevCommon' }
+-{ 'enum': 'TestIfEnum', 'data': [ 'foo', 'bar' ],
++{ 'enum': 'TestIfEnum', 'data':
++  [ 'foo', { 'name' : 'bar', 'if': 'defined(TEST_IF_ENUM_BAR)' } ],
+   'if': 'defined(TEST_IF_ENUM)' }
 =20
- ##
-@@ -294,7 +301,8 @@
- #
- # Since: 1.5
- ##
--{ 'struct': 'ChardevMux', 'data': { 'chardev' : 'str' },
-+{ 'struct': 'ChardevMux',
-+  'data': { 'chardev': 'str' },
-   'base': 'ChardevCommon' }
+ { 'union': 'TestIfUnion', 'data': { 'foo': 'TestStruct' },
+@@ -219,7 +220,7 @@
+ { 'command': 'TestIfAlternateCmd', 'data': { 'alt_cmd_arg': 'TestIfAlter=
+nate' },
+   'if': 'defined(TEST_IF_ALT)' }
 =20
- ##
-@@ -308,7 +316,8 @@
- #
- # Since: 1.5
- ##
--{ 'struct': 'ChardevStdio', 'data': { '*signal' : 'bool' },
-+{ 'struct': 'ChardevStdio',
-+  'data': { '*signal': 'bool' },
-   'base': 'ChardevCommon' }
+-{ 'command': 'TestIfCmd', 'data': { 'foo': 'TestIfStruct' },
++{ 'command': 'TestIfCmd', 'data': { 'foo': 'TestIfStruct', 'bar': 'TestI=
+fEnum' },
+   'returns': 'UserDefThree',
+   'if': ['defined(TEST_IF_CMD)', 'defined(TEST_IF_STRUCT)'] }
 =20
+diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
+api-schema-test.out
+index 06e80e5b04..d90d987651 100644
+--- a/tests/qapi-schema/qapi-schema-test.out
++++ b/tests/qapi-schema/qapi-schema-test.out
+@@ -272,6 +272,7 @@ object TestIfStruct
+ enum TestIfEnum
+     member foo
+     member bar
++        if ['defined(TEST_IF_ENUM_BAR)']
+     if ['defined(TEST_IF_ENUM)']
+ object q_obj_TestStruct-wrapper
+     member data: TestStruct optional=3DFalse
+@@ -302,6 +303,7 @@ command TestIfAlternateCmd q_obj_TestIfAlternateCmd-a=
+rg -> None
+     if ['defined(TEST_IF_ALT)']
+ object q_obj_TestIfCmd-arg
+     member foo: TestIfStruct optional=3DFalse
++    member bar: TestIfEnum optional=3DFalse
+     if ['defined(TEST_IF_CMD)', 'defined(TEST_IF_STRUCT)']
+ command TestIfCmd q_obj_TestIfCmd-arg -> UserDefThree
+    gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfi=
+g=3DFalse
+diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
+.py
+index 641a18f06d..aadf252d9d 100644
+--- a/tests/qapi-schema/test-qapi.py
++++ b/tests/qapi-schema/test-qapi.py
+@@ -29,6 +29,7 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+             print('    prefix %s' % prefix)
+         for m in members:
+             print('    member %s' % m.name)
++            self._print_if(m.ifcond, indent=3D8)
+         self._print_if(ifcond)
 =20
-@@ -321,7 +330,8 @@
- #
- # Since: 1.5
- ##
--{ 'struct': 'ChardevSpiceChannel', 'data': { 'type'  : 'str' },
-+{ 'struct': 'ChardevSpiceChannel',
-+  'data': { 'type': 'str' },
-   'base': 'ChardevCommon' }
- # TODO: 'if': 'defined(CONFIG_SPICE)'
-=20
-@@ -334,7 +344,8 @@
- #
- # Since: 1.5
- ##
--{ 'struct': 'ChardevSpicePort', 'data': { 'fqdn'  : 'str' },
-+{ 'struct': 'ChardevSpicePort',
-+  'data': { 'fqdn': 'str' },
-   'base': 'ChardevCommon' }
- # TODO: 'if': 'defined(CONFIG_SPICE)'
-=20
-@@ -350,10 +361,11 @@
- #
- # Since: 1.5
- ##
--{ 'struct': 'ChardevVC', 'data': { '*width'  : 'int',
--                                 '*height' : 'int',
--                                 '*cols'   : 'int',
--                                 '*rows'   : 'int' },
-+{ 'struct': 'ChardevVC',
-+  'data': { '*width': 'int',
-+            '*height': 'int',
-+            '*cols': 'int',
-+            '*rows': 'int' },
-   'base': 'ChardevCommon' }
-=20
- ##
-@@ -365,7 +377,8 @@
- #
- # Since: 1.5
- ##
--{ 'struct': 'ChardevRingbuf', 'data': { '*size'  : 'int' },
-+{ 'struct': 'ChardevRingbuf',
-+  'data': { '*size': 'int' },
-   'base': 'ChardevCommon' }
-=20
- ##
-@@ -375,29 +388,30 @@
- #
- # Since: 1.4 (testdev since 2.2, wctablet since 2.9)
- ##
--{ 'union': 'ChardevBackend', 'data': { 'file'   : 'ChardevFile',
--                                       'serial' : 'ChardevHostdev',
--                                       'parallel': 'ChardevHostdev',
--                                       'pipe'   : 'ChardevHostdev',
--                                       'socket' : 'ChardevSocket',
--                                       'udp'    : 'ChardevUdp',
--                                       'pty'    : 'ChardevCommon',
--                                       'null'   : 'ChardevCommon',
--                                       'mux'    : 'ChardevMux',
--                                       'msmouse': 'ChardevCommon',
--                                       'wctablet' : 'ChardevCommon',
--                                       'braille': 'ChardevCommon',
--                                       'testdev': 'ChardevCommon',
--                                       'stdio'  : 'ChardevStdio',
--                                       'console': 'ChardevCommon',
--                                       'spicevmc': 'ChardevSpiceChannel'=
-,
-+{ 'union': 'ChardevBackend',
-+  'data': { 'file': 'ChardevFile',
-+            'serial': 'ChardevHostdev',
-+            'parallel': 'ChardevHostdev',
-+            'pipe': 'ChardevHostdev',
-+            'socket': 'ChardevSocket',
-+            'udp': 'ChardevUdp',
-+            'pty': 'ChardevCommon',
-+            'null': 'ChardevCommon',
-+            'mux': 'ChardevMux',
-+            'msmouse': 'ChardevCommon',
-+            'wctablet': 'ChardevCommon',
-+            'braille': 'ChardevCommon',
-+            'testdev': 'ChardevCommon',
-+            'stdio': 'ChardevStdio',
-+            'console': 'ChardevCommon',
-+            'spicevmc': 'ChardevSpiceChannel',
- # TODO: { 'type': 'ChardevSpiceChannel', 'if': 'defined(CONFIG_SPICE)' }=
-,
--                                       'spiceport': 'ChardevSpicePort',
-+            'spiceport': 'ChardevSpicePort',
- # TODO: { 'type': 'ChardevSpicePort', 'if': 'defined(CONFIG_SPICE)' },
--                                       'vc'     : 'ChardevVC',
--                                       'ringbuf': 'ChardevRingbuf',
--                                       # next one is just for compatibil=
-ity
--                                       'memory' : 'ChardevRingbuf' } }
-+            'vc': 'ChardevVC',
-+            'ringbuf': 'ChardevRingbuf',
-+            # next one is just for compatibility
-+            'memory': 'ChardevRingbuf' } }
-=20
- ##
- # @ChardevReturn:
-@@ -409,7 +423,8 @@
- #
- # Since: 1.4
- ##
--{ 'struct' : 'ChardevReturn', 'data': { '*pty' : 'str' } }
-+{ 'struct' : 'ChardevReturn',
-+  'data': { '*pty': 'str' } }
-=20
- ##
- # @chardev-add:
-@@ -442,8 +457,9 @@
- # <- { "return": { "pty" : "/dev/pty/42" } }
- #
- ##
--{ 'command': 'chardev-add', 'data': {'id'      : 'str',
--                                     'backend' : 'ChardevBackend' },
-+{ 'command': 'chardev-add',
-+  'data': { 'id': 'str',
-+            'backend': 'ChardevBackend' },
-   'returns': 'ChardevReturn' }
-=20
- ##
-@@ -482,8 +498,9 @@
- # <- {"return": {}}
- #
- ##
--{ 'command': 'chardev-change', 'data': {'id'      : 'str',
--                                        'backend' : 'ChardevBackend' },
-+{ 'command': 'chardev-change',
-+  'data': { 'id': 'str',
-+            'backend': 'ChardevBackend' },
-   'returns': 'ChardevReturn' }
-=20
- ##
-@@ -503,7 +520,8 @@
- # <- { "return": {} }
- #
- ##
--{ 'command': 'chardev-remove', 'data': {'id': 'str'} }
-+{ 'command': 'chardev-remove',
-+  'data': { 'id': 'str' } }
-=20
- ##
- # @chardev-send-break:
-@@ -522,7 +540,8 @@
- # <- { "return": {} }
- #
- ##
--{ 'command': 'chardev-send-break', 'data': {'id': 'str'} }
-+{ 'command': 'chardev-send-break',
-+  'data': { 'id': 'str' } }
-=20
- ##
- # @VSERPORT_CHANGE:
-@@ -543,4 +562,5 @@
- #
- ##
- { 'event': 'VSERPORT_CHANGE',
--  'data': { 'id': 'str', 'open': 'bool' } }
-+  'data': { 'id': 'str',
-+            'open': 'bool' } }
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 38d4c41d88..5fd33316a0 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -1356,7 +1356,8 @@
- #
- # Since: 3.0
- ##
--{ 'command': 'migrate-recover', 'data': { 'uri': 'str' },
-+{ 'command': 'migrate-recover',
-+  'data': { 'uri': 'str' },
-   'allow-oob': true }
-=20
- ##
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 4211a732f3..8325e0dc9c 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -2385,7 +2385,9 @@
- # <- { "return": { "fdset-id": 1, "fd": 3 } }
- #
- ##
--{ 'command': 'add-fd', 'data': {'*fdset-id': 'int', '*opaque': 'str'},
-+{ 'command': 'add-fd',
-+  'data': { '*fdset-id': 'int',
-+            '*opaque': 'str' },
-   'returns': 'AddfdInfo' }
-=20
- ##
-@@ -2657,7 +2659,8 @@
- #    }
- #
- ##
--{'command': 'query-command-line-options', 'data': { '*option': 'str' },
-+{'command': 'query-command-line-options',
-+ 'data': { '*option': 'str' },
-  'returns': ['CommandLineOptionInfo'],
-  'allow-preconfig': true }
-=20
-diff --git a/qapi/net.json b/qapi/net.json
-index 8f99fd911d..a1a0f39f74 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -657,7 +657,8 @@
- #    }
- #
- ##
--{ 'command': 'query-rx-filter', 'data': { '*name': 'str' },
-+{ 'command': 'query-rx-filter',
-+  'data': { '*name': 'str' },
-   'returns': ['RxFilterInfo'] }
-=20
- ##
-diff --git a/qapi/tpm.json b/qapi/tpm.json
-index d50deef5e9..b30323bb6b 100644
---- a/qapi/tpm.json
-+++ b/qapi/tpm.json
-@@ -76,8 +76,9 @@
- #
- # Since: 1.5
- ##
--{ 'struct': 'TPMPassthroughOptions', 'data': { '*path' : 'str',
--                                             '*cancel-path' : 'str'} }
-+{ 'struct': 'TPMPassthroughOptions',
-+  'data': { '*path': 'str',
-+            '*cancel-path': 'str' } }
-=20
- ##
- # @TPMEmulatorOptions:
-diff --git a/qapi/ui.json b/qapi/ui.json
-index fd39acb5c3..5ad13248d5 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -598,7 +598,8 @@
- # Notes:  An empty password in this command will set the password to the=
- empty
- #         string.  Existing clients are unaffected by executing this com=
-mand.
- ##
--{ 'command': 'change-vnc-password', 'data': {'password': 'str'},
-+{ 'command': 'change-vnc-password',
-+  'data': { 'password': 'str' },
-   'if': 'defined(CONFIG_VNC)' }
-=20
- ##
+     def visit_object_type(self, name, info, ifcond, base, members, varia=
+nts):
 --=20
 2.17.2
