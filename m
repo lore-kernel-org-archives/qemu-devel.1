@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gXS5R-0000nC-Oe
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:35:38 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gXS8K-0002Bm-BL
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:38:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gXS5N-0006AM-Gr
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:35:37 -0500
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:34313)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gXS5N-0006AA-Bu
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:35:33 -0500
-Received: by mail-qk1-f195.google.com with SMTP id a132so1236508qkg.1
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 06:35:33 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1gXS8G-0008QJ-2H
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:38:36 -0500
+Date: Thu, 13 Dec 2018 15:38:17 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181213143817.GG5427@linux.fritz.box>
+References: <20181212220410.569069-1-eblake@redhat.com>
 MIME-Version: 1.0
-References: <20181213123724.4866-1-marcandre.lureau@redhat.com>
-	<20181213123724.4866-7-marcandre.lureau@redhat.com>
-	<87r2elpkei.fsf@dusky.pond.sub.org>
-In-Reply-To: <87r2elpkei.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Thu, 13 Dec 2018 18:35:20 +0400
-Message-ID: <CAMxuvawGAg5LwsUyWLYE_Hv+gsCbjKuLFN=4MzNVNGSAgtFFZg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 06/22] qapi: add a dictionary form with
- 'name' key for enum members
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181212220410.569069-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC] qemu-io: Prefer stderr for error
+ messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,70 +23,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Armbruster, Markus" <armbru@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, rjones@redhat.com, Max Reitz <mreitz@redhat.com>
 
-On Thu, Dec 13, 2018 at 6:32 PM Markus Armbruster <armbru@redhat.com> wrote=
-:
->
-> One little thing...
->
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->
-> > Desugar the enum NAME form to { 'name': NAME }. This will allow to add
-> > new enum members, such as 'if' in the following patch.
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> [...]
-> > diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-> > index f205805751..bb928d2f7d 100644
-> > --- a/scripts/qapi/common.py
-> > +++ b/scripts/qapi/common.py
-> [...]
-> > @@ -847,19 +851,29 @@ def check_alternate(expr, info):
-> >              types_seen[qt] =3D key
-> >
-> >
-> > +def normalize_enum(expr):
-> > +    if isinstance(expr['data'], list):
-> > +        expr['data'] =3D [m if isinstance(m, dict) else {'name': m}
-> > +                        for m in expr['data']]
-> > +
-> > +
-> >  def check_enum(expr, info):
-> >      name =3D expr['enum']
-> > -    members =3D expr.get('data')
-> > +    members =3D expr['data']
-> >      prefix =3D expr.get('prefix')
-> >
-> > -    if not isinstance(members, list):
-> > -        raise QAPISemError(info,
-> > -                           "Enum '%s' requires an array for 'data'" % =
-name)
-> >      if prefix is not None and not isinstance(prefix, str):
-> >          raise QAPISemError(info,
-> >                             "Enum '%s' requires a string for 'prefix'" =
-% name)
-> > +
-> > +    if not isinstance(members, list):
-> > +        raise QAPISemError(info,
-> > +                           "Enum '%s' requires an array for 'data'" % =
-name)
-> > +
->
-> The move of the "requires an array" check looks accidental.  I'll back
-> it out unless you tell me it's needed.
+Am 12.12.2018 um 23:04 hat Eric Blake geschrieben:
+> When a qemu-io command fails, it's best if the failure message
+> goes to stderr rather than stdout.
+> 
+> Reported-by: Richard W.M. Jones <rjones@redhat.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+> 
+> RFC because at least iotest 60 (found by -qcow2 -g quick) breaks due
+> to reordering of output lines, and I'd rather know if we like this
+> idea before bothering to revisit all affected iotests (including
+> discovering if other slower ones have similar problems).
 
-ack
+So if we decide to actually do this, should this be error_report()
+instead so that HMP 'qemu-io' gets the errors printed to the monitor
+rather than stderr? Though I think in that case, we'd also want to
+redirect the messages that still go stdout to the monitor as well.
 
->
-> >      for member in members:
-> > -        check_name(info, "Member of enum '%s'" % name, member,
-> > +        source =3D "dictionary member of enum '%s'" % name
-> > +        check_known_keys(info, source, member, ['name'], [])
-> > +        check_name(info, "Member of enum '%s'" % name, member['name'],
-> >                     enum_member=3DTrue)
-> >
-> >
-> [...]
+But as I said in another reply, I'm not sure if mixing stdout and stderr
+with their different buffering settings is even a good idea in a mostly
+interactive program.
+
+Kevin
