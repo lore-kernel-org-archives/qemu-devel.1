@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cfergeau@redhat.com>) id 1gXRxc-0002UE-Lm
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:27:33 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gXRyW-0003sJ-KS
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:28:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cfergeau@redhat.com>) id 1gXRxY-0000Fv-Ap
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:27:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51972)
+	(envelope-from <dgilbert@redhat.com>) id 1gXRyS-0000nL-DU
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:28:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33922)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cfergeau@redhat.com>) id 1gXRxY-0000FR-1M
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:27:28 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 52B3736887
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 14:27:27 +0000 (UTC)
-Received: from natto.ory.fergeau.eu (ovpn-117-65.ams2.redhat.com
-	[10.36.117.65])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id D209960C6C
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 14:27:26 +0000 (UTC)
-From: Christophe Fergeau <cfergeau@redhat.com>
-Date: Thu, 13 Dec 2018 15:27:19 +0100
-Message-Id: <20181213142719.592-1-cfergeau@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gXRyS-0000mi-7T
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:28:24 -0500
+Date: Thu, 13 Dec 2018 14:28:01 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181213142800.GO2313@work-vm>
+References: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
+	<1544516693-5395-2-git-send-email-wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3] log: Make glib logging go through QEMU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1544516693-5395-2-git-send-email-wei.w.wang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v11 1/7] bitmap: fix bitmap_count_one
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,204 +27,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com
 
-This commit adds a qemu_init_logging() helper which calls
-g_log_set_default_handler() so that glib logs (g_log, g_warning, ...)
-are handled similarly to other QEMU logs. This means they will get a
-timestamp if timestamps are enabled, and they will go through the
-monitor if one is configured.
-This commit also adds a call to qemu_init_logging() to the binaries
-installed by QEMU.
-glib debug messages are enabled through G_MESSAGES_DEBUG similarly to
-glib default log handler.
+* Wei Wang (wei.w.wang@intel.com) wrote:
+> BITMAP_LAST_WORD_MASK(nbits) returns 0xffffffff when "nbits=0", which
+> makes bitmap_count_one fail to handle the "nbits=0" case. It appears to be
+> preferred to remain BITMAP_LAST_WORD_MASK identical to the kernel
+> implementation that it is ported from.
+> 
+> So this patch fixes bitmap_count_one to handle the nbits=0 case.
 
-At the moment, this change will mostly impact SPICE logging if your
-spice version is >=3D 0.14.1. With older spice versions, this is not goin=
-g
-to work as expected, but will not have any ill effect, so this call is
-not conditional on the SPICE version.
-
-Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
----
-Changes since v2:
-- report G_LOG_LEVEL_CRITICAL using error_report() instead of
-  warn_report()
-- print G_LOG_LEVEL_DEBUG messages when G_MESSAGES_DEBUG is set
-- prepend glib log domain to messages
-
-Changes since v1:
-- introduced a qemu_init_logging() helper, and call that in more
-  binaries than just vl.c
+OK; it's a little odd that it's only bitmap_count_one that's being fixed
+for this case; but OK.
 
 
- bsd-user/main.c             |  1 +
- include/qemu/error-report.h |  2 ++
- linux-user/main.c           |  1 +
- qemu-img.c                  |  1 +
- qemu-io.c                   |  1 +
- qemu-nbd.c                  |  1 +
- scsi/qemu-pr-helper.c       |  1 +
- util/qemu-error.c           | 47 +++++++++++++++++++++++++++++++++++++
- vl.c                        |  1 +
- 9 files changed, 56 insertions(+)
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-diff --git a/bsd-user/main.c b/bsd-user/main.c
-index 0d3156974c..96787b27ef 100644
---- a/bsd-user/main.c
-+++ b/bsd-user/main.c
-@@ -743,6 +743,7 @@ int main(int argc, char **argv)
-     if (argc <=3D 1)
-         usage();
-=20
-+    qemu_init_logging();
-     module_call_init(MODULE_INIT_TRACE);
-     qemu_init_cpu_list();
-     module_call_init(MODULE_INIT_QOM);
-diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
-index 0a8d9cc9ea..2852e9df2a 100644
---- a/include/qemu/error-report.h
-+++ b/include/qemu/error-report.h
-@@ -49,6 +49,8 @@ bool error_report_once_cond(bool *printed, const char *=
-fmt, ...)
- bool warn_report_once_cond(bool *printed, const char *fmt, ...)
-     GCC_FMT_ATTR(2, 3);
-=20
-+void qemu_init_logging(void);
-+
- /*
-  * Similar to error_report(), except it prints the message just once.
-  * Return true when it prints, false otherwise.
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 923cbb753a..de9ff462e9 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -600,6 +600,7 @@ int main(int argc, char **argv, char **envp)
-     int ret;
-     int execfd;
-=20
-+    qemu_init_logging();
-     module_call_init(MODULE_INIT_TRACE);
-     qemu_init_cpu_list();
-     module_call_init(MODULE_INIT_QOM);
-diff --git a/qemu-img.c b/qemu-img.c
-index ad04f59565..9214392565 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -4912,6 +4912,7 @@ int main(int argc, char **argv)
-     signal(SIGPIPE, SIG_IGN);
- #endif
-=20
-+    qemu_init_logging();
-     module_call_init(MODULE_INIT_TRACE);
-     error_set_progname(argv[0]);
-     qemu_init_exec_dir(argv[0]);
-diff --git a/qemu-io.c b/qemu-io.c
-index 6df7731af4..ad38d12e68 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
-@@ -524,6 +524,7 @@ int main(int argc, char **argv)
-     signal(SIGPIPE, SIG_IGN);
- #endif
-=20
-+    qemu_init_logging();
-     module_call_init(MODULE_INIT_TRACE);
-     progname =3D g_path_get_basename(argv[0]);
-     qemu_init_exec_dir(argv[0]);
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index ca7109652e..2cac038230 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -570,6 +570,7 @@ int main(int argc, char **argv)
-     signal(SIGPIPE, SIG_IGN);
- #endif
-=20
-+    qemu_init_logging();
-     module_call_init(MODULE_INIT_TRACE);
-     qcrypto_init(&error_fatal);
-=20
-diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
-index e7af637232..523f8b237c 100644
---- a/scsi/qemu-pr-helper.c
-+++ b/scsi/qemu-pr-helper.c
-@@ -895,6 +895,7 @@ int main(int argc, char **argv)
-=20
-     signal(SIGPIPE, SIG_IGN);
-=20
-+    qemu_init_logging();
-     module_call_init(MODULE_INIT_TRACE);
-     module_call_init(MODULE_INIT_QOM);
-     qemu_add_opts(&qemu_trace_opts);
-diff --git a/util/qemu-error.c b/util/qemu-error.c
-index fcbe8a1f74..38a1d79d33 100644
---- a/util/qemu-error.c
-+++ b/util/qemu-error.c
-@@ -345,3 +345,50 @@ bool warn_report_once_cond(bool *printed, const char=
- *fmt, ...)
-     va_end(ap);
-     return true;
- }
-+
-+static char *qemu_glog_domains;
-+
-+static void qemu_log_func(const gchar *log_domain,
-+                          GLogLevelFlags log_level,
-+                          const gchar *message,
-+                          gpointer user_data)
-+{
-+    switch (log_level & G_LOG_LEVEL_MASK) {
-+    case G_LOG_LEVEL_DEBUG:
-+        /* Use same G_MESSAGES_DEBUG logic as glib to enable/disable deb=
-ug
-+         * messages
-+         */
-+        if (qemu_glog_domains =3D=3D NULL) {
-+            break;
-+        }
-+        if (strcmp (qemu_glog_domains, "all") !=3D 0 &&
-+          (log_domain =3D=3D NULL || !strstr (qemu_glog_domains, log_dom=
-ain))) {
-+            break;
-+        }
-+        /* Fall through */
-+    case G_LOG_LEVEL_INFO:
-+        /* Fall through */
-+    case G_LOG_LEVEL_MESSAGE:
-+        info_report("%s: %s", log_domain, message);
-+        break;
-+    case G_LOG_LEVEL_WARNING:
-+        warn_report("%s: %s", log_domain, message);
-+        break;
-+    case G_LOG_LEVEL_CRITICAL:
-+        /* Fall through */
-+    case G_LOG_LEVEL_ERROR:
-+        error_report("%s: %s", log_domain, message);
-+        break;
-+    }
-+}
-+
-+/*
-+ * Init QEMU logging subsystem. This sets up glib logging so libraries u=
-sing it
-+ * also print their logs through {info,warn,error}_report.
-+ */
-+void qemu_init_logging(void)
-+{
-+    g_log_set_default_handler(qemu_log_func, NULL);
-+    g_warn_if_fail(qemu_glog_domains =3D=3D NULL);
-+    qemu_glog_domains =3D g_strdup(g_getenv("G_MESSAGES_DEBUG"));
-+}
-diff --git a/vl.c b/vl.c
-index a5ae5f23d2..d986fd93ab 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3015,6 +3015,7 @@ int main(int argc, char **argv, char **envp)
-     QSIMPLEQ_HEAD(, BlockdevOptions_queue) bdo_queue
-         =3D QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
-=20
-+    qemu_init_logging();
-     module_call_init(MODULE_INIT_TRACE);
-=20
-     qemu_init_cpu_list();
---=20
-2.19.2
+> Inital Discussion Link:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg554316.html
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> CC: Juan Quintela <quintela@redhat.com>
+> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> CC: Peter Xu <peterx@redhat.com>
+> ---
+>  include/qemu/bitmap.h | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
+> index 509eedd..679f1bd 100644
+> --- a/include/qemu/bitmap.h
+> +++ b/include/qemu/bitmap.h
+> @@ -221,6 +221,10 @@ static inline int bitmap_intersects(const unsigned long *src1,
+>  
+>  static inline long bitmap_count_one(const unsigned long *bitmap, long nbits)
+>  {
+> +    if (unlikely(!nbits)) {
+> +        return 0;
+> +    }
+> +
+>      if (small_nbits(nbits)) {
+>          return ctpopl(*bitmap & BITMAP_LAST_WORD_MASK(nbits));
+>      } else {
+> -- 
+> 1.8.3.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
