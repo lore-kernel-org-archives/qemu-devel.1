@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41144)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gXSbJ-00086v-3Y
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:08:39 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gXSe5-0002o9-RY
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:11:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gXSbH-0000gN-76
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:08:33 -0500
-Date: Thu, 13 Dec 2018 16:08:18 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181213150818.GI5427@linux.fritz.box>
-References: <1544543862-9997-1-git-send-email-paul.durrant@citrix.com>
-	<1544543862-9997-17-git-send-email-paul.durrant@citrix.com>
-	<20181213115152.GA5427@linux.fritz.box>
-	<b323cd922b6d4a5798a2f3cfae2bd573@AMSPEX02CL03.citrite.net>
+	(envelope-from <peter.maydell@linaro.org>) id 1gXSe4-0005Q2-LD
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:11:25 -0500
+Received: from mail-oi1-x233.google.com ([2607:f8b0:4864:20::233]:46843)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gXSe4-0005AB-6u
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 10:11:24 -0500
+Received: by mail-oi1-x233.google.com with SMTP id x202so1848914oif.13
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 07:11:17 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b323cd922b6d4a5798a2f3cfae2bd573@AMSPEX02CL03.citrite.net>
-Subject: Re: [Qemu-devel] [PATCH v4 16/18] xen: automatically create
- XenBlockDevice-s
+References: <1544708743.4811.30.camel@rwth-aachen.de>
+	<CAFEAcA-p-LC2swC8-AQt60QBhQN=PNJvBjbGXrtdvvvDd-74QA@mail.gmail.com>
+	<1544713257.4811.32.camel@rwth-aachen.de>
+In-Reply-To: <1544713257.4811.32.camel@rwth-aachen.de>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 13 Dec 2018 15:11:05 +0000
+Message-ID: <CAFEAcA93tPS-jJBoT3fFekEvXx4pJPR_u3P-x1d3op470uexmQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] Warning when DTB memory nodes are noped
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,229 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+To: lukas.juenger@rwth-aachen.de
+Cc: Eric Auger <eric.auger@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Am 13.12.2018 um 13:44 hat Paul Durrant geschrieben:
-> > Essentially, what I'm wondering is whether we have anything that could
-> > be treated more or less like another monitor besides QMP and HMP, which
-> > would internally work similar to HMP, i.e. map (almost) everything to
-> > QMP commands.
-> 
-> Yes, it would be possible to have a separate 'compatibility' daemon to
-> watch xenstore and then formulate the correct sequence of QMP commands
-> to instantiate the backend, but that is more complicated and the right
-> answer of course is to have the toolstack send the QMP commands in the
-> first place.
+On Thu, 13 Dec 2018 at 15:00, J=C3=BCnger, Lukas
+<lukas.juenger@rwth-aachen.de> wrote:
+>
+> On Thu, 2018-12-13 at 14:49 +0000, Peter Maydell wrote:
+> > Was the deletion of the memory node actually wrong in your case?
+> > If so we should look at fixing the wrong behaviour, rather than
+> > just being noisier about what we're doing...
 
-Okay, if someone is working on actually using QMP instead of xenstore,
-that's even better, of course. Disregard this point then.
+> I see. In my case I wanted to specify the memory using the DTB that I
+> passed using the -dtb option. I had two memory ranges in the dtb and
+> they didn't show up in the kernel later on because they were noped by
+> QEMU. I found it confusing that QEMU makes changes to the DTB that I
+> passed via -dtb.
 
-> > > +    drive_new(drive_opts, IF_NONE, &local_err);
-> > > +    if (local_err) {
-> > > +        error_propagate_prepend(errp, local_err,
-> > > +                                "failed to create drive: ");
-> > > +        goto done;
-> > > +    }
-> > 
-> > The other major point is that you're using the legacy drive_*()
-> > infrastructure, which should not only go away as soon as we can, but
-> > which is also full of magic and nasty surprises.
-> > 
-> > I think the best way would be to create only a block node
-> > (BlockDriverState) here, and get an automatically created anonymous
-> > BlockBackend from the qdev drive property.
-> > 
-> > There are two ways to achieve this: qmp_blockdev_add() would be optimal
-> > because that's a stable external interface. It would require you to
-> > specify a node-name (you already have the id parameter), and you'd use
-> > this node-name for the qdev drive property.
-> > 
-> > qmp_blockdev_add() requires a BlockdevOptions object, which you can
-> > either construct manually in C or use a visitor to convert from an
-> > options QDict. Maybe in this case, converting from a QDict is better
-> > because otherwise you need special code for each block driver.
-> > 
-> 
-> I was using the legacy interfaces because this code is, as I said
-> above, supposed to be a mechanism only required for compatibility with
-> the way toolstacks currently operate (and so is essentially 'legacy')
-> but using the top-level QMP entry point to construct the does sound
-> do-able as long as the underlying file locking can still be avoided
-> with that mechanism. Since BlockdevOptions seems to be an
-> auto-generated structure, figuring out how to fill it in manually is
-> somewhat tricky so the QDict approach is preferable but I'll have to
-> figure out how to use a visitor to do the translation.
+Yeah, we don't edit the DTB much but we do fix it up to
+indicate the memory, number of CPUs, kernel command line, etc
+passed on the QEMU command line.
 
-You can grep for qobject_input_visitor_new() for examples. Some block
-drivers use this internally to convert .bdrv_create options to a QAPI
-object, it looks like this:
-
-    /* Now get the QAPI type BlockdevCreateOptions */
-    v = qobject_input_visitor_new_flat_confused(qdict, errp);
-    if (!v) {
-        ret = -EINVAL;
-        goto finish;
-    }
-
-    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-    visit_free(v);
-
-    if (local_err) {
-        error_propagate(errp, local_err);
-        ret = -EINVAL;
-        goto finish;
-    }
-
-Obviously, you'd use visit_type_BlockdevOptions instead. You also might
-not need the _flat_confused variant, which is about QDicts where we
-don't know whether values are stored as their actual type or as strings.
-In your code, you have control over the types in the QDict, so this
-shouldn't be a problem.
-
-> > The other way would be calling bdrv_open() directly, which gives you a
-> > BlockDriverState, but it risks using legacy functionality that will be
-> > deprecated soon. Again, you'd take the node-name and pass it to the qdev
-> > drive option below.
-> 
-> Yes, xen_disk does things this way but then we end up with legacy
-> block device and still fall foul of the assertions buried in the code.
-
-Yes and no. xen_disk is better in that it avoids the drive_* things
-(which internally call bdrv_open() anyway), but it's worse in that it
-directly assigns blkdev->blk instead of using the qdev property.
-
-What I meant here is that you create the BDS with bdrv_open(), but then
-you wouldn't assign it directly to some field in the device state, but
-just put the node-name of the BDS into the qdev property 'drive'. This
-would be almost like qmp_blockdev_add(), except without validation
-against the QAPI schema.
-
-But if using qmp_blockdev_add() is easy enough, that's preferable.
-
-> > 
-> > > +
-> > > +done:
-> > > +    g_free(drive_optstr);
-> > > +    g_free(format);
-> > > +    g_free(file);
-> > > +}
-> > > +
-> > > +static void xen_block_device_create(BusState *bus, const char *name,
-> > > +                                    QDict *opts, Error **errp)
-> > > +{
-> > > +    unsigned long number;
-> > > +    const char *vdev, *device_type;
-> > > +    BlockBackend *blk = NULL;
-> > > +    IOThread *iothread = NULL;
-> > > +    DeviceState *dev = NULL;
-> > > +    Error *local_err = NULL;
-> > > +    const char *type;
-> > > +    XenBlockDevice *blockdev;
-> > > +
-> > > +    trace_xen_block_device_create(name);
-> > > +
-> > > +    if (qemu_strtoul(name, NULL, 10, &number)) {
-> > > +        error_setg(errp, "failed to parse name '%s'", name);
-> > > +        return;
-> > > +    }
-> > > +
-> > > +    vdev = qdict_get_try_str(opts, "dev");
-> > > +    if (!vdev) {
-> > > +        error_setg(errp, "no dev parameter");
-> > > +        return;
-> > > +    }
-> > > +
-> > > +    device_type = qdict_get_try_str(opts, "device-type");
-> > > +    if (!device_type) {
-> > > +        error_setg(errp, "no device-type parameter");
-> > > +        return;
-> > > +    }
-> > > +
-> > > +    if (!strcmp(device_type, "disk")) {
-> > > +        type = TYPE_XEN_DISK_DEVICE;
-> > > +    } else if (!strcmp(device_type, "cdrom")) {
-> > > +        type = TYPE_XEN_CDROM_DEVICE;
-> > > +    } else {
-> > > +        error_setg(errp, "invalid device-type parameter '%s'",
-> > device_type);
-> > > +        return;
-> > > +    }
-> > > +
-> > > +    xen_block_drive_create(vdev, device_type, opts, &local_err);
-> > > +    if (local_err) {
-> > > +        error_propagate(errp, local_err);
-> > > +        return;
-> > > +    }
-> > > +
-> > > +    blk = blk_by_name(vdev);
-> > > +    g_assert(blk);
-> > > +
-> > > +    iothread = iothread_create(vdev, &local_err);
-> > > +    if (local_err) {
-> > > +        error_propagate(errp, local_err);
-> > > +        goto unref;
-> > > +    }
-> > > +
-> > > +    dev = qdev_create(bus, type);
-> > > +    blockdev = XEN_BLOCK_DEVICE(dev);
-> > > +
-> > > +    qdev_prop_set_string(dev, "vdev", vdev);
-> > > +    if (blockdev->vdev.number != number) {
-> > > +        error_setg(errp, "invalid dev parameter '%s'", vdev);
-> > > +        goto unref;
-> > > +    }
-> > > +
-> > > +    qdev_prop_set_drive(dev, "drive", blk, &local_err);
-> > > +    if (local_err) {
-> > > +        error_propagate_prepend(errp, local_err, "failed to set
-> > 'drive': ");
-> > > +        goto unref;
-> > > +    }
-> > 
-> > So here you would need to use something like this:
-> > 
-> > object_property_set_str(OBJECT(dev), vdev, "driver", &local_err);
-> > 
-> > > +
-> > > +    blockdev->auto_iothread = iothread;
-> > > +
-> > > +    object_property_set_bool(OBJECT(dev), true, "realized",
-> > &local_err);
-> > > +    if (local_err) {
-> > > +        error_propagate_prepend(errp, local_err,
-> > > +                                "initialization of device %s failed: ",
-> > > +                                type);
-> > > +        goto unref;
-> > > +    }
-> > > +
-> > > +    blockdev_mark_auto_del(blk);
-> > 
-> > You don't need this one any more then (if you look into the details,
-> > it's one of the more confusing parts of the drive_*() magic, so it's
-> > good to get rid of it). When you use the anonymous BlockBackend created
-> > by the qdev drive property (because you passed it a node-name rather
-> > than a BlockBackend name) means that the BlockBackend disappears
-> > together with the drive.
-> > 
-> 
-> Ok.
-> 
-> > Note that explicitly created block nodes must also be unreferenced
-> > explicitly (bdrv_open() should be paired with bdrv_unref() and
-> > qmp_blockdev_add() with qmp_blockdev_del()). Maybe XenBackendInfo needs
-> > a .destroy callback so we can do destruction symmetrically to device
-> > creation?
-> > 
-> 
-> Yes, I'd probably just add a callback function pointer into XenDevice
-> which only gets set for devices instantiated via this mechanism.
-
-I think it's a bit nicer to have it in XenBackendInfo for symmetry and
-because that sits outside the device, so the device doesn't destroy its
-own backend, just like it doesn't create it (even if it's the same
-source file).
-
-But yes, whatever works best for you.
-
-Kevin
+thanks
+-- PMM
