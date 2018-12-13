@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gXPXC-0004oF-NX
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:52:08 -0500
+	(envelope-from <berrange@redhat.com>) id 1gXPXP-0004w0-Rw
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:52:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gXPXA-0001pV-VF
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:52:06 -0500
-Date: Thu, 13 Dec 2018 12:51:52 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181213115152.GA5427@linux.fritz.box>
-References: <1544543862-9997-1-git-send-email-paul.durrant@citrix.com>
-	<1544543862-9997-17-git-send-email-paul.durrant@citrix.com>
+	(envelope-from <berrange@redhat.com>) id 1gXPXM-0002Gv-Mg
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:52:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52090)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gXPXM-0002D0-Fo
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 06:52:16 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D2284307D861
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 11:52:15 +0000 (UTC)
+Date: Thu, 13 Dec 2018 11:52:12 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181213115212.GF5171@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181213112612.31242-1-cfergeau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1544543862-9997-17-git-send-email-paul.durrant@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH v4 16/18] xen: automatically create
- XenBlockDevice-s
+In-Reply-To: <20181213112612.31242-1-cfergeau@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] log: Make glib logging go through QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,330 +33,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+To: Christophe Fergeau <cfergeau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Am 11.12.2018 um 16:57 hat Paul Durrant geschrieben:
-> This patch adds a creator function for XenBlockDevice-s so that they can
-> be created automatically when the Xen toolstack instantiates a new
-> PV backend. When the XenBlockDevice is created this way it is also
-> necessary to create a drive which matches the configuration that the Xen
-> toolstack has written into xenstore. This drive is marked 'auto_del' so
-> that it will be removed when the XenBlockDevice is destroyed. Also, for
-> compatibility with the legacy 'xen_disk' implementation, an iothread
-> is automatically created for the new XenBlockDevice. This will also be
-> removed when the XenBlockDevice is destroyed.
+On Thu, Dec 13, 2018 at 12:26:12PM +0100, Christophe Fergeau wrote:
+> This commit adds a qemu_init_logging() helper which calls
+> g_log_set_default_handler() so that glib logs (g_log, g_warning, ...)
+> are handled similarly to other QEMU logs. This means they will get a
+> timestamp if timestamps are enabled, and they will go through the
+> monitor if one is configured.
+> This commit also adds a call to qemu_init_logging() to the binaries
+> installed by QEMU.
 > 
-> Correspondingly the legacy backend scan for 'qdisk' is removed.
+> At the moment, this change will mostly impact SPICE logging if your
+> spice version is >= 0.14.1. With older spice versions, this is not going
+> to work as expected, but will not have any ill effect, so this call is
+> not conditional on the SPICE version.
 > 
-> After this patch is applied the legacy 'xen_disk' code is redundant. It
-> will be removed by a subsequent patch.
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-> Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
+> Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
+> ---
+> Changes since v1:
+> - introduced a qemu_init_logging() helper, and call that in more
+>   binaries than just vl.c
 
-So I have two points for this patch.
-
-The first is that devices creating their own backends feels so wrong. I
-know that the old xen_disk did the same, and fixing it might neither be
-easy nor directly related to the qdevification, so requiring that from
-you would probably be unfair. But I still have to make the note, and
-hopefully we can get to it eventually (or maybe it is even easy enough
-that we can indeed address it in this series).
-
-My problem here is that I don't really understand the Xen mechanisms.
-Could you give me a very high-level overview of how adding a disk works
-and which component communicates with which other component to get the
-information down to QEMU and eventually the newly added
-xen_block_device_create()?
-
-Essentially, what I'm wondering is whether we have anything that could
-be treated more or less like another monitor besides QMP and HMP, which
-would internally work similar to HMP, i.e. map (almost) everything to
-QMP commands. I see that there is this XenWatch infrastructure to get
-notified about changes (which would be treated like monitor commands),
-but I'm not sure if everything would be covered by this mechanism or
-whether some things must be fetched explicitly.
-
-Anyway, this is probably for later.
-
-> +static void xen_block_drive_create(const char *id, const char *device_type,
-> +                                   QDict *opts, Error **errp)
+> +static void qemu_log_func(const gchar *log_domain,
+> +                          GLogLevelFlags log_level,
+> +                          const gchar *message,
+> +                          gpointer user_data)
 > +{
-> +    const char *params = qdict_get_try_str(opts, "params");
-> +    const char *mode = qdict_get_try_str(opts, "mode");
-> +    const char *direct_io_safe = qdict_get_try_str(opts, "direct-io-safe");
-> +    const char *discard_enable = qdict_get_try_str(opts, "discard-enable");
-> +    char *format = NULL;
-> +    char *file = NULL;
-> +    char *drive_optstr = NULL;
-> +    QemuOpts *drive_opts;
-> +    Error *local_err = NULL;
-> +
-> +    if (params) {
-> +        char **v = g_strsplit(params, ":", 2);
-> +
-> +        if (v[1] == NULL) {
-> +            file = g_strdup(v[0]);
-> +        } else {
-> +            if (strcmp(v[0], "aio") == 0) {
-> +                format = g_strdup("raw");
-> +            } else if (strcmp(v[0], "vhd") == 0) {
-> +                format = g_strdup("vpc");
-> +            } else {
-> +                format = g_strdup(v[0]);
-> +            }
-> +            file = g_strdup(v[1]);
-> +        }
-> +
-> +        g_strfreev(v);
-> +    }
-> +
-> +    if (!file) {
-> +        error_setg(errp, "no file parameter");
-> +        return;
-> +    }
-> +
-> +    drive_optstr = g_strdup_printf("id=%s", id);
-> +    drive_opts = drive_def(drive_optstr);
-> +    if (!drive_opts) {
-> +        error_setg(errp, "failed to create drive options");
-> +        goto done;
-> +    }
-> +
-> +    qemu_opt_set(drive_opts, "file", file, &local_err);
-> +    if (local_err) {
-> +        error_propagate_prepend(errp, local_err, "failed to set 'file': ");
-> +        goto done;
-> +    }
-> +
-> +    qemu_opt_set(drive_opts, "media", device_type, &local_err);
-> +    if (local_err) {
-> +        error_propagate_prepend(errp, local_err,
-> +                                "failed to set 'media': ");
-> +        goto done;
-> +    }
-> +
-> +    if (format) {
-> +        qemu_opt_set(drive_opts, "format", format, &local_err);
-> +        if (local_err) {
-> +            error_propagate_prepend(errp, local_err,
-> +                                    "failed to set 'format': ");
-> +            goto done;
-> +        }
-> +    }
-> +
-> +    if (mode && *mode != 'w') {
-> +        qemu_opt_set_bool(drive_opts, BDRV_OPT_READ_ONLY, true, &local_err);
-> +        if (local_err) {
-> +            error_propagate_prepend(errp, local_err, "failed to set '%s': ",
-> +                                    BDRV_OPT_READ_ONLY);
-> +            goto done;
-> +        }
-> +    }
-> +
-> +    /*
-> +     * It is necessary to turn file locking off as an emulated device
-> +     * my have already opened the same image file.
-> +     */
-> +    qemu_opt_set(drive_opts, "file.locking", "off", &local_err);
-> +    if (local_err) {
-> +        error_propagate_prepend(errp, local_err,
-> +                                "failed to set 'file.locking': ");
-> +        goto done;
-> +    }
-> +
-> +    qemu_opt_set_bool(drive_opts, BDRV_OPT_CACHE_WB, true, &local_err);
-> +    if (local_err) {
-> +        error_propagate_prepend(errp, local_err, "failed to set '%s': ",
-> +                                BDRV_OPT_CACHE_WB);
-> +        goto done;
-> +    }
-> +
-> +    if (direct_io_safe) {
-> +        qemu_opt_set_bool(drive_opts, BDRV_OPT_CACHE_DIRECT, true,
-> +                          &local_err);
-> +        if (local_err) {
-> +            error_propagate_prepend(errp, local_err, "failed to set '%s': ",
-> +                                    BDRV_OPT_CACHE_DIRECT);
-> +            goto done;
-> +        }
-> +
-> +        qemu_opt_set(drive_opts, "aio", "native", &local_err);
-> +        if (local_err) {
-> +            error_propagate_prepend(errp, local_err,
-> +                                    "failed to set 'aio': ");
-> +            goto done;
-> +        }
-> +    }
-> +
-> +    if (discard_enable) {
-> +        unsigned long value;
-> +
-> +        if (!qemu_strtoul(discard_enable, NULL, 2, &value)) {
-> +            qemu_opt_set_bool(drive_opts, BDRV_OPT_DISCARD, !!value,
-> +                              &local_err);
-> +            if (local_err) {
-> +                error_propagate_prepend(errp, local_err,
-> +                                        "failed to set '%s': ",
-> +                                        BDRV_OPT_DISCARD);
-> +                goto done;
-> +            }
-> +        }
-> +    }
-> +
-> +    drive_new(drive_opts, IF_NONE, &local_err);
-> +    if (local_err) {
-> +        error_propagate_prepend(errp, local_err,
-> +                                "failed to create drive: ");
-> +        goto done;
-> +    }
+> +    switch (log_level & G_LOG_LEVEL_MASK) {
+> +    case G_LOG_LEVEL_DEBUG:
+> +        break;
+> +    case G_LOG_LEVEL_INFO:
+> +        /* Fall through */
+> +    case G_LOG_LEVEL_MESSAGE:
+> +        info_report("%s", message);
+> +        break;
+> +    case G_LOG_LEVEL_WARNING:
+> +        /* Fall through */
+> +    case G_LOG_LEVEL_CRITICAL:
+> +        warn_report("%s", message);
+> +        break;
 
-The other major point is that you're using the legacy drive_*()
-infrastructure, which should not only go away as soon as we can, but
-which is also full of magic and nasty surprises.
+This didn't adress my previous comment that _CRITICAL should do an
+error_report, not warn_reoprt.
 
-I think the best way would be to create only a block node
-(BlockDriverState) here, and get an automatically created anonymous
-BlockBackend from the qdev drive property.
-
-There are two ways to achieve this: qmp_blockdev_add() would be optimal
-because that's a stable external interface. It would require you to
-specify a node-name (you already have the id parameter), and you'd use
-this node-name for the qdev drive property.
-
-qmp_blockdev_add() requires a BlockdevOptions object, which you can
-either construct manually in C or use a visitor to convert from an
-options QDict. Maybe in this case, converting from a QDict is better
-because otherwise you need special code for each block driver.
-
-The other way would be calling bdrv_open() directly, which gives you a
-BlockDriverState, but it risks using legacy functionality that will be
-deprecated soon. Again, you'd take the node-name and pass it to the qdev
-drive option below.
-
-> +
-> +done:
-> +    g_free(drive_optstr);
-> +    g_free(format);
-> +    g_free(file);
-> +}
-> +
-> +static void xen_block_device_create(BusState *bus, const char *name,
-> +                                    QDict *opts, Error **errp)
-> +{
-> +    unsigned long number;
-> +    const char *vdev, *device_type;
-> +    BlockBackend *blk = NULL;
-> +    IOThread *iothread = NULL;
-> +    DeviceState *dev = NULL;
-> +    Error *local_err = NULL;
-> +    const char *type;
-> +    XenBlockDevice *blockdev;
-> +
-> +    trace_xen_block_device_create(name);
-> +
-> +    if (qemu_strtoul(name, NULL, 10, &number)) {
-> +        error_setg(errp, "failed to parse name '%s'", name);
-> +        return;
-> +    }
-> +
-> +    vdev = qdict_get_try_str(opts, "dev");
-> +    if (!vdev) {
-> +        error_setg(errp, "no dev parameter");
-> +        return;
-> +    }
-> +
-> +    device_type = qdict_get_try_str(opts, "device-type");
-> +    if (!device_type) {
-> +        error_setg(errp, "no device-type parameter");
-> +        return;
-> +    }
-> +
-> +    if (!strcmp(device_type, "disk")) {
-> +        type = TYPE_XEN_DISK_DEVICE;
-> +    } else if (!strcmp(device_type, "cdrom")) {
-> +        type = TYPE_XEN_CDROM_DEVICE;
-> +    } else {
-> +        error_setg(errp, "invalid device-type parameter '%s'", device_type);
-> +        return;
-> +    }
-> +
-> +    xen_block_drive_create(vdev, device_type, opts, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +
-> +    blk = blk_by_name(vdev);
-> +    g_assert(blk);
-> +
-> +    iothread = iothread_create(vdev, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        goto unref;
-> +    }
-> +
-> +    dev = qdev_create(bus, type);
-> +    blockdev = XEN_BLOCK_DEVICE(dev);
-> +
-> +    qdev_prop_set_string(dev, "vdev", vdev);
-> +    if (blockdev->vdev.number != number) {
-> +        error_setg(errp, "invalid dev parameter '%s'", vdev);
-> +        goto unref;
-> +    }
-> +
-> +    qdev_prop_set_drive(dev, "drive", blk, &local_err);
-> +    if (local_err) {
-> +        error_propagate_prepend(errp, local_err, "failed to set 'drive': ");
-> +        goto unref;
-> +    }
-
-So here you would need to use something like this:
-
-object_property_set_str(OBJECT(dev), vdev, "driver", &local_err);
-
-> +
-> +    blockdev->auto_iothread = iothread;
-> +
-> +    object_property_set_bool(OBJECT(dev), true, "realized", &local_err);
-> +    if (local_err) {
-> +        error_propagate_prepend(errp, local_err,
-> +                                "initialization of device %s failed: ",
-> +                                type);
-> +        goto unref;
-> +    }
-> +
-> +    blockdev_mark_auto_del(blk);
-
-You don't need this one any more then (if you look into the details,
-it's one of the more confusing parts of the drive_*() magic, so it's
-good to get rid of it). When you use the anonymous BlockBackend created
-by the qdev drive property (because you passed it a node-name rather
-than a BlockBackend name) means that the BlockBackend disappears
-together with the drive.
-
-Note that explicitly created block nodes must also be unreferenced
-explicitly (bdrv_open() should be paired with bdrv_unref() and
-qmp_blockdev_add() with qmp_blockdev_del()). Maybe XenBackendInfo needs
-a .destroy callback so we can do destruction symmetrically to device
-creation?
-
-> +    return;
-> +
-> +unref:
-> +    if (dev) {
-> +        object_unparent(OBJECT(dev));
-> +    }
-> +
-> +    if (iothread) {
-> +        iothread_destroy(iothread);
-> +    }
-> +
-> +    if (blk) {
-> +        monitor_remove_blk(blk);
-> +        blk_unref(blk);
+> +    case G_LOG_LEVEL_ERROR:
+> +        error_report("%s", message);
+> +        break;
 > +    }
 > +}
 
-Kevin
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
