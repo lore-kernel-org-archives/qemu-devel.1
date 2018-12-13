@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gXPjj-0007Gk-Fq
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:05:08 -0500
+	(envelope-from <prvs=878dab2db=Paul.Durrant@citrix.com>)
+	id 1gXPkF-0007iE-CZ
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:05:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gXPje-0004Ce-6U
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:05:03 -0500
-Received: from 19.mo3.mail-out.ovh.net ([178.32.98.231]:51678)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gXPjd-0004C3-U4
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:04:58 -0500
-Received: from player778.ha.ovh.net (unknown [10.109.160.93])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 09F7D1EDD6C
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 13:04:55 +0100 (CET)
-Date: Thu, 13 Dec 2018 13:04:51 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20181213130451.7c607540@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <154470004963.15371.12464064082311637710@02a1dbf831e2>
-References: <20181213090343.1137475-1-groug@kaod.org>
-	<154470004963.15371.12464064082311637710@02a1dbf831e2>
+	(envelope-from <prvs=878dab2db=Paul.Durrant@citrix.com>)
+	id 1gXPkE-0004rZ-BM
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:05:35 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Thu, 13 Dec 2018 12:05:23 +0000
+Message-ID: <c3bea77151d04732a98bbe1a04b62e67@AMSPEX02CL03.citrite.net>
+References: <20181211160224.22181-1-olaf@aepfle.de>
+	<20181213113333.GZ18875@perard.uk.xensource.com>
+In-Reply-To: <20181213113333.GZ18875@perard.uk.xensource.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 0/3] 9p patches 2018-12-13
+Subject: Re: [Qemu-devel] [Xen-devel] [PATCH v1] xen_disk: fix memory leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +26,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, peter.maydell@linaro.org
+To: Anthony Perard <anthony.perard@citrix.com>, Olaf Hering <olaf@aepfle.de>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, "open list:Block layer core" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, "open list:X86" <xen-devel@lists.xenproject.org>
 
-On Thu, 13 Dec 2018 03:20:50 -0800 (PST)
-no-reply@patchew.org wrote:
-
-> Patchew URL: https://patchew.org/QEMU/20181213090343.1137475-1-groug@kaod.org/
-> 
-> 
-> 
-> Hi,
-> 
-> This series seems to have some coding style problems. See output below for
-> more information:
-> 
-> Type: series
-> Message-id: 20181213090343.1137475-1-groug@kaod.org
-> Subject: [Qemu-devel] [PULL 0/3] 9p patches 2018-12-13
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> 
-> BASE=base
-> n=1
-> total=$(git log --oneline $BASE.. | wc -l)
-> failed=0
-> 
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
-> git config --local diff.algorithm histogram
-> 
-> commits="$(git log --format=%H --reverse $BASE..)"
-> for c in $commits; do
->     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
->     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
->         failed=1
->         echo
->     fi
->     n=$((n+1))
-> done
-> 
-> exit $failed
-> === TEST SCRIPT END ===
-> 
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> error: RPC failed; result=18, HTTP code = 200
-> fatal: The remote end hung up unexpectedly
-> error: Could not fetch 3c8cf5a9c21ff8782164d1def7f44bd888713384
-
-Huh... I really don't know where this SHA1 is coming from...
-
-Fam, any idea what's going on here ?
-
-
-> Traceback (most recent call last):
->   File "patchew-tester/src/patchew-cli", line 521, in test_one
->     git_clone_repo(clone, r["repo"], r["head"], logf, True)
->   File "patchew-tester/src/patchew-cli", line 48, in git_clone_repo
->     stdout=logf, stderr=logf)
->   File "/usr/lib64/python3.4/subprocess.py", line 558, in check_call
->     raise CalledProcessError(retcode, cmd)
-> subprocess.CalledProcessError: Command '['git', 'remote', 'add', '-f', '--mirror=fetch', '3c8cf5a9c21ff8782164d1def7f44bd888713384', 'https://github.com/patchew-project/qemu']' returned non-zero exit status 1
-> 
-> 
-> 
-> The full log is available at
-> http://patchew.org/logs/20181213090343.1137475-1-groug@kaod.org/testing.checkpatch/?type=message.
-> ---
-> Email generated automatically by Patchew [http://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBYZW4tZGV2ZWwgW21haWx0bzp4
+ZW4tZGV2ZWwtYm91bmNlc0BsaXN0cy54ZW5wcm9qZWN0Lm9yZ10gT24gQmVoYWxmDQo+IE9mIEFu
+dGhvbnkgUEVSQVJEDQo+IFNlbnQ6IDEzIERlY2VtYmVyIDIwMTggMTE6MzQNCj4gVG86IE9sYWYg
+SGVyaW5nIDxvbGFmQGFlcGZsZS5kZT4NCj4gQ2M6IEtldmluIFdvbGYgPGt3b2xmQHJlZGhhdC5j
+b20+OyBTdGVmYW5vIFN0YWJlbGxpbmkNCj4gPHNzdGFiZWxsaW5pQGtlcm5lbC5vcmc+OyBvcGVu
+IGxpc3Q6QmxvY2sgbGF5ZXIgY29yZSA8cWVtdS0NCj4gYmxvY2tAbm9uZ251Lm9yZz47IHFlbXUt
+ZGV2ZWxAbm9uZ251Lm9yZzsgTWF4IFJlaXR6IDxtcmVpdHpAcmVkaGF0LmNvbT47DQo+IG9wZW4g
+bGlzdDpYODYgPHhlbi1kZXZlbEBsaXN0cy54ZW5wcm9qZWN0Lm9yZz4NCj4gU3ViamVjdDogUmU6
+IFtYZW4tZGV2ZWxdIFtQQVRDSCB2MV0geGVuX2Rpc2s6IGZpeCBtZW1vcnkgbGVhaw0KPiANCj4g
+T24gVHVlLCBEZWMgMTEsIDIwMTggYXQgMDU6MDI6MjRQTSArMDEwMCwgT2xhZiBIZXJpbmcgd3Jv
+dGU6DQo+ID4gVGhlcmUgYXJlIHNvbWUgY29kZSBwYXRocyB0aGF0IGNsb2JiZXIgaW9yZXEtPmJ1
+Ziwgd2hpY2ggbGVhZHMgdG8gYSBodWdlDQo+ID4gbWVtb3J5IGxlYWsgYWZ0ZXIgYSBmZXcgaG91
+cnMgb2YgcnVudGltZS4gT25lIGNvZGUgcGF0aCBpcw0KPiA+IHFlbXVfYWlvX2NvbXBsZXRlLCB3
+aGljaCBtaWdodCBiZSBjYWxsZWQgcmVjdXJzaXZlLiBBbm90aGVyIG9uZSBpcw0KPiANCj4gSSB0
+aGluayBpdCdzIHMvcmVjdXJzaXZlL3JlY3Vyc2l2ZWx5Ly4NCj4gDQo+ID4gaW9yZXFfcmVzZXQs
+IHdoaWNoIG1pZ2h0IGNsb2JiZXIgaW9yZXEtPmJ1ZiBhcyB3ZWxsLg0KPiA+DQo+ID4gQWRkIHdy
+YXBwZXJzIHRvIGZyZWUgaW9yZXEtPmJ1ZiBiZWZvcmUgcmVhc3NpZ25tZW50Lg0KPiA+DQo+ID4g
+U2lnbmVkLW9mZi1ieTogT2xhZiBIZXJpbmcgPG9sYWZAYWVwZmxlLmRlPg0KPiANCj4gVGhhdCBw
+YXRjaCBzZWVtcyBmaW5lLCB3aXRoIGEgZmV3IGNvZGluZyBzdHlsZSBpc3N1ZXMsIGFuZCBpcyBn
+b2luZyB0bw0KPiBiZSBuZWVkZWQgdG8gYmUgZm9yd2FyZCBwb3J0ZWQgdG8gUGF1bCdzIHJlaW1w
+bGVtZW50YXRpb24gKG5vdCB5ZXQNCj4gbWVyZ2VkKS4NCg0KSSBhbHJlYWR5IHBvc3RlZCBhIHBh
+dGNoIGZyb20gVGltIFNtaXRoIChyZS1iYXNlZCB0byB0aGUgbmV3IHhlbi1ibG9jayBkYXRhcGF0
+aCkgdGhhdCBzaG91bGQgZml4IHRoaXMgaXNzdWUuDQoNCiAgUGF1bA0KDQo+IA0KPiA+IC0tLQ0K
+PiA+ICBody9ibG9jay94ZW5fZGlzay5jIHwgMjIgKysrKysrKysrKysrKysrKystLS0tLQ0KPiA+
+ICAxIGZpbGUgY2hhbmdlZCwgMTcgaW5zZXJ0aW9ucygrKSwgNSBkZWxldGlvbnMoLSkNCj4gPg0K
+PiA+IGRpZmYgLS1naXQgYS9ody9ibG9jay94ZW5fZGlzay5jIGIvaHcvYmxvY2sveGVuX2Rpc2su
+Yw0KPiA+IGluZGV4IDM2ZWZmOTRmODQuLmUxNWVlZmU2MjUgMTAwNjQ0DQo+ID4gLS0tIGEvaHcv
+YmxvY2sveGVuX2Rpc2suYw0KPiA+ICsrKyBiL2h3L2Jsb2NrL3hlbl9kaXNrLmMNCj4gPiBAQCAt
+MTAzLDEyICsxMDMsMjQgQEAgc3RydWN0IFhlbkJsa0RldiB7DQo+ID4NCj4gPiAgLyogLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSAq
+Lw0KPiA+DQo+ID4gK3N0YXRpYyB2b2lkIGlvcmVxX2J1Zl9hbGxvYyhzdHJ1Y3QgaW9yZXEgKmlv
+cmVxLCBzaXplX3QgYWxpZ25tZW50KQ0KPiANCj4gWW91IGhhdmUgdGhlIHBhcmFtZXRlciBgYWxp
+Z25tZW50YCBidXQgZG9uJ3QgYWN0dWFsbHkgdXNlIGl0LCBJIGRvbid0DQo+IHRoaW5rIGl0J3Mg
+bmVlZGVkLg0KPiANCj4gPiArew0KPiA+ICsgICAgaWYgKGlvcmVxLT5idWYpDQo+ID4gKyAgICAg
+ICAgcWVtdV92ZnJlZShpb3JlcS0+YnVmKTsNCj4gDQo+IFlvdSBjb3VsZCBjYWxsIGlvcmVxX2J1
+Zl9mcmVlIGhlcmUgaW5zdGVhZCBvZiBkdXBsaWNhdGluZyB0aGUgY29kZS4NCj4gDQo+ID4gKyAg
+ICBpb3JlcS0+YnVmID0gcWVtdV9tZW1hbGlnbihYQ19QQUdFX1NJWkUsIGlvcmVxLT5zaXplKTsN
+Cj4gPiArfQ0KPiA+ICtzdGF0aWMgdm9pZCBpb3JlcV9idWZfZnJlZShzdHJ1Y3QgaW9yZXEgKmlv
+cmVxKQ0KPiA+ICt7DQo+ID4gKyAgICBpZiAoaW9yZXEtPmJ1ZikNCj4gPiArICAgICAgICBxZW11
+X3ZmcmVlKGlvcmVxLT5idWYpOw0KPiA+ICsgICAgaW9yZXEtPmJ1ZiA9IE5VTEw7DQo+ID4gK30N
+Cj4gDQo+IFRoYW5rcywNCj4gDQo+IC0tDQo+IEFudGhvbnkgUEVSQVJEDQo+IA0KPiBfX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXw0KPiBYZW4tZGV2ZWwgbWFp
+bGluZyBsaXN0DQo+IFhlbi1kZXZlbEBsaXN0cy54ZW5wcm9qZWN0Lm9yZw0KPiBodHRwczovL2xp
+c3RzLnhlbnByb2plY3Qub3JnL21haWxtYW4vbGlzdGluZm8veGVuLWRldmVsDQo=
