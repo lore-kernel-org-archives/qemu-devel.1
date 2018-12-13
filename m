@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1gXasT-0000UR-Ug
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 18:58:51 -0500
+	(envelope-from <benh@kernel.crashing.org>) id 1gXasV-0000Ub-7R
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 18:58:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1gXasS-0007Db-Hz
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 18:58:49 -0500
-Received: from gate.crashing.org ([63.228.1.57]:37794)
+	(envelope-from <benh@kernel.crashing.org>) id 1gXasU-0007Hm-9C
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 18:58:51 -0500
+Received: from gate.crashing.org ([63.228.1.57]:37797)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <benh@kernel.crashing.org>)
-	id 1gXasS-00079K-38
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 18:58:48 -0500
+	id 1gXasT-0007F5-Ue
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 18:58:50 -0500
 From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Date: Fri, 14 Dec 2018 10:58:03 +1100
-Message-Id: <20181213235804.14956-2-benh@kernel.crashing.org>
+Date: Fri, 14 Dec 2018 10:58:04 +1100
+Message-Id: <20181213235804.14956-3-benh@kernel.crashing.org>
 In-Reply-To: <20181213235804.14956-1-benh@kernel.crashing.org>
 References: <20181213235804.14956-1-benh@kernel.crashing.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 2/3] i386: Atomically update PTEs with mttcg
+Subject: [Qemu-devel] [PATCH 3/3] ppc: Fix radix RC updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,231 +29,146 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-Afaik, this isn't well documented (at least it wasn't when I last looked)
-but OSes such as Linux rely on this behaviour:
+They should be atomic for MTTCG. Note: a real POWER9 core doesn't actually
+implement atomic PTE updates, it always fault for SW to handle it. Only
+the nest MMU (used by some accelerator devices and GPUs) implements
+those HW updates.
 
-The HW updates to the page tables need to be done atomically with the
-checking of the present bit (and other permissions).
-
-This is what allows Linux to do simple xchg of PTEs with 0 and assume
-the value read has "final" stable dirty and accessed bits (the TLB
-invalidation is deferred).
+However, the architecture does allow the core to do it, and doing so
+in TCG is faster than letting the guest do it.
 
 Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 ---
- target/i386/excp_helper.c | 104 +++++++++++++++++++++++++++++---------
- 1 file changed, 80 insertions(+), 24 deletions(-)
+ target/ppc/cpu.h         |  1 +
+ target/ppc/mmu-radix64.c | 70 +++++++++++++++++++++++++++++++++-------
+ 2 files changed, 59 insertions(+), 12 deletions(-)
 
-diff --git a/target/i386/excp_helper.c b/target/i386/excp_helper.c
-index 49231f6b69..93fc24c011 100644
---- a/target/i386/excp_helper.c
-+++ b/target/i386/excp_helper.c
-@@ -157,11 +157,45 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index ab68abe8a2..afdef2af2f 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -493,6 +493,7 @@ struct ppc_slb_t {
+ #define DSISR_AMR                0x00200000
+ /* Unsupported Radix Tree Configuration */
+ #define DSISR_R_BADCONFIG        0x00080000
++#define DSISR_ATOMIC_RC          0x00040000
  
- #else
+ /* SRR1 error code fields */
  
-+static inline uint64_t update_entry(CPUState *cs, target_ulong addr,
-+                                    uint64_t orig_entry, uint32_t bits)
+diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
+index ab76cbc835..dba95aabdc 100644
+--- a/target/ppc/mmu-radix64.c
++++ b/target/ppc/mmu-radix64.c
+@@ -28,6 +28,15 @@
+ #include "mmu-radix64.h"
+ #include "mmu-book3s-v3.h"
+ 
++static inline bool ppc_radix64_hw_rc_updates(CPUPPCState *env)
 +{
-+    uint64_t new_entry = orig_entry | bits;
++#ifdef CONFIG_ATOMIC64
++    return true;
++#else
++    return !qemu_tcg_mttcg_enabled();
++#endif
++}
 +
-+    /* Write the updated bottom 32-bits */
+ static bool ppc_radix64_get_fully_qualified_addr(CPUPPCState *env, vaddr eaddr,
+                                                  uint64_t *lpid, uint64_t *pid)
+ {
+@@ -120,11 +129,18 @@ static bool ppc_radix64_check_prot(PowerPCCPU *cpu, int rwx, uint64_t pte,
+         return true;
+     }
+ 
++    /* Check RC bits if necessary */
++    if (!ppc_radix64_hw_rc_updates(env)) {
++        if (!(pte & R_PTE_R) || ((rwx == 1) && !(pte & R_PTE_C))) {
++            *fault_cause |= DSISR_ATOMIC_RC;
++            return true;
++        }
++    }
++
+     return false;
+ }
+ 
+-static void ppc_radix64_set_rc(PowerPCCPU *cpu, int rwx, uint64_t pte,
+-                               hwaddr pte_addr, int *prot)
++static uint64_t ppc_radix64_set_rc(PowerPCCPU *cpu, int rwx, uint64_t pte, hwaddr pte_addr)
+ {
+     CPUState *cs = CPU(cpu);
+     uint64_t npte;
+@@ -133,17 +149,38 @@ static void ppc_radix64_set_rc(PowerPCCPU *cpu, int rwx, uint64_t pte,
+ 
+     if (rwx == 1) { /* Store/Write */
+         npte |= R_PTE_C; /* Set change bit */
+-    } else {
+-        /*
+-         * Treat the page as read-only for now, so that a later write
+-         * will pass through this function again to set the C bit.
+-         */
+-        *prot &= ~PAGE_WRITE;
+     }
++    if (pte == npte) {
++        return pte;
++    }
++
++#ifdef CONFIG_ATOMIC64
 +    if (qemu_tcg_mttcg_enabled()) {
-+        uint32_t old_le = cpu_to_le32(orig_entry);
-+        uint32_t new_le = cpu_to_le32(new_entry);
++        uint64_t old_be = cpu_to_be32(pte);
++        uint64_t new_be = cpu_to_be32(npte);
 +        MemTxResult result;
-+        uint32_t old_ret;
++        uint64_t old_ret;
 +
-+        old_ret = address_space_cmpxchgl_notdirty(cs->as, addr,
-+                                                  old_le, new_le,
++        old_ret = address_space_cmpxchgq_notdirty(cs->as, pte_addr,
++                                                  old_be, new_be,
 +                                                  MEMTXATTRS_UNSPECIFIED,
 +                                                  &result);
 +        if (result == MEMTX_OK) {
-+            if (old_ret != old_le && old_ret != new_le) {
-+                new_entry = 0;
++            if (old_ret != old_be && old_ret != new_be) {
++                return 0;
 +            }
-+            return new_entry;
++            return npte;
 +        }
-+
+ 
+-    if (pte ^ npte) { /* If pte has changed then write it back */
+-        stq_phys(cs->as, pte_addr, npte);
 +        /* Do we need to support this case where PTEs aren't in RAM ?
 +         *
 +         * For now fallback to non-atomic case
 +         */
-+    }
-+
-+    x86_stl_phys_notdirty(cs, addr, new_entry);
-+
-+    return new_entry;
-+}
-+
- static hwaddr get_hphys(CPUState *cs, hwaddr gphys, MMUAccessType access_type,
-                         int *prot)
- {
-     CPUX86State *env = &X86_CPU(cs)->env;
--    uint64_t rsvd_mask = PG_HI_RSVD_MASK;
-+    uint64_t rsvd_mask;
-     uint64_t ptep, pte;
-     uint64_t exit_info_1 = 0;
-     target_ulong pde_addr, pte_addr;
-@@ -172,6 +206,8 @@ static hwaddr get_hphys(CPUState *cs, hwaddr gphys, MMUAccessType access_type,
-         return gphys;
      }
++#endif
++
++    stq_phys(cs->as, pte_addr, npte);
++    return npte;
+ }
  
+ static uint64_t ppc_radix64_walk_tree(PowerPCCPU *cpu, vaddr eaddr,
+@@ -234,6 +271,7 @@ int ppc_radix64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+ 
+     /* Walk Radix Tree from Process Table Entry to Convert EA to RA */
+     page_size = PRTBE_R_GET_RTS(prtbe0);
 + restart:
-+    rsvd_mask = PG_HI_RSVD_MASK;
-     if (!(env->nested_pg_mode & SVM_NPT_NXE)) {
-         rsvd_mask |= PG_NX_MASK;
-     }
-@@ -198,8 +234,10 @@ static hwaddr get_hphys(CPUState *cs, hwaddr gphys, MMUAccessType access_type,
-                 goto do_fault_rsvd;
-             }
-             if (!(pml4e & PG_ACCESSED_MASK)) {
--                pml4e |= PG_ACCESSED_MASK;
--                x86_stl_phys_notdirty(cs, pml4e_addr, pml4e);
-+                pml4e = update_entry(cs, pml4e_addr, pml4e, PG_ACCESSED_MASK);
-+                if (!pml4e) {
-+                    goto restart;
-+                }
-             }
-             ptep &= pml4e ^ PG_NX_MASK;
-             pdpe_addr = (pml4e & PG_ADDRESS_MASK) +
-@@ -213,8 +251,10 @@ static hwaddr get_hphys(CPUState *cs, hwaddr gphys, MMUAccessType access_type,
-             }
-             ptep &= pdpe ^ PG_NX_MASK;
-             if (!(pdpe & PG_ACCESSED_MASK)) {
--                pdpe |= PG_ACCESSED_MASK;
--                x86_stl_phys_notdirty(cs, pdpe_addr, pdpe);
-+                pdpe = update_entry(cs, pdpe_addr, pdpe, PG_ACCESSED_MASK);
-+                if (!pdpe) {
-+                    goto restart;
-+                }
-             }
-             if (pdpe & PG_PSE_MASK) {
-                 /* 1 GB page */
-@@ -256,8 +296,10 @@ static hwaddr get_hphys(CPUState *cs, hwaddr gphys, MMUAccessType access_type,
-         }
-         /* 4 KB page */
-         if (!(pde & PG_ACCESSED_MASK)) {
--            pde |= PG_ACCESSED_MASK;
--            x86_stl_phys_notdirty(cs, pde_addr, pde);
-+            pde = update_entry(cs, pde_addr, pde, PG_ACCESSED_MASK);
-+            if (!pde) {
-+                goto restart;
-+            }
-         }
-         pte_addr = (pde & PG_ADDRESS_MASK) + (((gphys >> 12) & 0x1ff) << 3);
-         pte = x86_ldq_phys(cs, pte_addr);
-@@ -295,8 +337,10 @@ static hwaddr get_hphys(CPUState *cs, hwaddr gphys, MMUAccessType access_type,
-         }
- 
-         if (!(pde & PG_ACCESSED_MASK)) {
--            pde |= PG_ACCESSED_MASK;
--            x86_stl_phys_notdirty(cs, pde_addr, pde);
-+            pde = update_entry(cs, pde_addr, pde, PG_ACCESSED_MASK);
-+            if (!pde) {
-+                goto restart;
-+            }
-         }
- 
-         /* page directory entry */
-@@ -376,7 +420,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
-     int error_code = 0;
-     int is_dirty, prot, page_size, is_write, is_user;
-     hwaddr paddr;
--    uint64_t rsvd_mask = PG_HI_RSVD_MASK;
-+    uint64_t rsvd_mask;
-     uint32_t page_offset;
-     target_ulong vaddr;
- 
-@@ -401,6 +445,8 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
-         goto do_mapping;
+     pte = ppc_radix64_walk_tree(cpu, eaddr & R_EADDR_MASK,
+                                 prtbe0 & PRTBE_R_RPDB, prtbe0 & PRTBE_R_RPDS,
+                                 &raddr, &page_size, &fault_cause, &pte_addr);
+@@ -244,8 +282,16 @@ int ppc_radix64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
      }
  
-+ restart:
-+    rsvd_mask = PG_HI_RSVD_MASK;
-     if (!(env->efer & MSR_EFER_NXE)) {
-         rsvd_mask |= PG_NX_MASK;
-     }
-@@ -436,8 +482,10 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
-                     goto do_fault_rsvd;
-                 }
-                 if (!(pml5e & PG_ACCESSED_MASK)) {
--                    pml5e |= PG_ACCESSED_MASK;
--                    x86_stl_phys_notdirty(cs, pml5e_addr, pml5e);
-+                    pml5e = update_entry(cs, pml5e_addr, pml5e, PG_ACCESSED_MASK);
-+                    if (!pml5e) {
-+                        goto restart;
-+                    }
-                 }
-                 ptep = pml5e ^ PG_NX_MASK;
-             } else {
-@@ -456,8 +504,10 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
-                 goto do_fault_rsvd;
-             }
-             if (!(pml4e & PG_ACCESSED_MASK)) {
--                pml4e |= PG_ACCESSED_MASK;
--                x86_stl_phys_notdirty(cs, pml4e_addr, pml4e);
-+                pml4e = update_entry(cs, pml4e_addr, pml4e, PG_ACCESSED_MASK);
-+                if (!pml4e) {
-+                    goto restart;
-+                }
-             }
-             ptep &= pml4e ^ PG_NX_MASK;
-             pdpe_addr = ((pml4e & PG_ADDRESS_MASK) + (((addr >> 30) & 0x1ff) << 3)) &
-@@ -472,8 +522,10 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
-             }
-             ptep &= pdpe ^ PG_NX_MASK;
-             if (!(pdpe & PG_ACCESSED_MASK)) {
--                pdpe |= PG_ACCESSED_MASK;
--                x86_stl_phys_notdirty(cs, pdpe_addr, pdpe);
-+                pdpe = update_entry(cs, pdpe_addr, pdpe, PG_ACCESSED_MASK);
-+                if (!pdpe) {
-+                    goto restart;
-+                }
-             }
-             if (pdpe & PG_PSE_MASK) {
-                 /* 1 GB page */
-@@ -520,8 +572,10 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
-         }
-         /* 4 KB page */
-         if (!(pde & PG_ACCESSED_MASK)) {
--            pde |= PG_ACCESSED_MASK;
--            x86_stl_phys_notdirty(cs, pde_addr, pde);
-+            pde = update_entry(cs, pde_addr, pde, PG_ACCESSED_MASK);
-+            if (!pde) {
-+                goto restart;
-+            }
-         }
-         pte_addr = ((pde & PG_ADDRESS_MASK) + (((addr >> 12) & 0x1ff) << 3)) &
-             a20_mask;
-@@ -563,8 +617,10 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
-         }
- 
-         if (!(pde & PG_ACCESSED_MASK)) {
--            pde |= PG_ACCESSED_MASK;
--            x86_stl_phys_notdirty(cs, pde_addr, pde);
-+            pde = update_entry(cs, pde_addr, pde, PG_ACCESSED_MASK);
-+            if (!pde) {
-+                goto restart;
-+            }
-         }
- 
-         /* page directory entry */
-@@ -634,11 +690,11 @@ do_check_protect_pse36:
-     /* yes, it can! */
-     is_dirty = is_write && !(pte & PG_DIRTY_MASK);
-     if (!(pte & PG_ACCESSED_MASK) || is_dirty) {
--        pte |= PG_ACCESSED_MASK;
--        if (is_dirty) {
--            pte |= PG_DIRTY_MASK;
-+        pte = update_entry(cs, pte_addr, pte,
-+                           PG_ACCESSED_MASK | (is_dirty ? PG_DIRTY_MASK : 0));
+     /* Update Reference and Change Bits */
+-    ppc_radix64_set_rc(cpu, rwx, pte, pte_addr, &prot);
+-
++    if (ppc_radix64_hw_rc_updates(env)) {
++        pte = ppc_radix64_set_rc(cpu, rwx, pte, pte_addr);
 +        if (!pte) {
 +            goto restart;
-         }
--        x86_stl_phys_notdirty(cs, pte_addr, pte);
-     }
- 
-     if (!(pte & PG_DIRTY_MASK)) {
++        }
++    }
++    /* If the page doesn't have C, treat it as read only */
++    if (!(pte & R_PTE_C)) {
++        prot &= ~PAGE_WRITE;
++    }
+     tlb_set_page(cs, eaddr & TARGET_PAGE_MASK, raddr & TARGET_PAGE_MASK,
+                  prot, mmu_idx, 1UL << page_size);
+     return 0;
 -- 
 2.19.2
