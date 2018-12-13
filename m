@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXZ5X-0004gQ-Ed
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 17:04:15 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gXZDI-0008B9-1Z
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 17:12:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXZ5J-0005eg-BC
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 17:04:05 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:37679)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gXZ5H-0002tO-IG
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 17:03:56 -0500
-Received: by mail-oi1-x242.google.com with SMTP id y23so2946314oia.4
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 14:02:58 -0800 (PST)
-References: <20181213183249.3468-1-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <090c809e-bdf5-37a4-ef80-d03abd44ec9d@linaro.org>
-Date: Thu, 13 Dec 2018 16:02:48 -0600
+	(envelope-from <no-reply@patchew.org>) id 1gXZD9-00047d-9D
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 17:12:11 -0500
+Resent-Message-Id: <E1gXZD9-00047d-9D@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21745)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gXZD7-0003yv-VV
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 17:12:02 -0500
+In-Reply-To: <20181213133733.8110-1-tom.deseyn@gmail.com>
+Message-ID: <154473908671.18041.4273945971137512275@02a1dbf831e2>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20181213183249.3468-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/misc/tz-mpc: Fix value of BLK_MAX
- register
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 13 Dec 2018 14:11:28 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2] Add getsockopt for settable SOL_IPV6
+ options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,28 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: tom.deseyn@gmail.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu
 
-On 12/13/18 12:32 PM, Peter Maydell wrote:
-> In the TZ Memory Protection Controller, the BLK_MAX register is supposed
-> to return the maximum permitted value of the BLK_IDX register. Our
-> implementation incorrectly returned max+1 (ie the total number of
-> valid index values, since BLK_IDX is zero-based).
-> 
-> Correct this off-by-one error. Since we consistently initialize
-> and use s->blk_max throughout the implementation as the 'size'
-> of the LUT, just adjust the value we return when the guest reads
-> the BLK_MAX register, rather than trying to change the semantics
-> of the s->blk_max internal struct field.
-> 
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1806824
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/misc/tz-mpc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIxMzEzMzczMy44MTEw
+LTEtdG9tLmRlc2V5bkBnbWFpbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
+ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
+bmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE4MTIxMzEzMzczMy44MTEw
+LTEtdG9tLmRlc2V5bkBnbWFpbC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2Ml0g
+QWRkIGdldHNvY2tvcHQgZm9yIHNldHRhYmxlIFNPTF9JUFY2IG9wdGlvbnMKCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9n
+IC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdp
+dCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsg
+ZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1m
+b3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4v
+c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0x
+CiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09
+PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
+N2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYzdmMjA0YSBB
+ZGQgZ2V0c29ja29wdCBmb3Igc2V0dGFibGUgU09MX0lQVjYgb3B0aW9ucwoKPT09IE9VVFBVVCBC
+RUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBBZGQgZ2V0c29ja29wdCBmb3Igc2V0dGFibGUg
+U09MX0lQVjYgb3B0aW9ucy4uLgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFs
+bCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMzMDogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6
+MjM2ODoKKyAgICAgICAgICAgIGlmIChnZXRfdXNlcl91MzIobGVuLCBvcHRsZW4pKQpbLi4uXQoK
+RVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRl
+bWVudAojMzI6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjIzNzA6CisgICAgICAgICAgICBp
+ZiAobGVuIDwgMCkKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxs
+IGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzM2OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzoy
+Mzc0OgorICAgICAgICAgICAgaWYgKHJldCA8IDApClsuLi5dCgpFUlJPUjogYnJhY2VzIHt9IGFy
+ZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM0NDogRklMRTogbGlu
+dXgtdXNlci9zeXNjYWxsLmM6MjM4MjoKKyAgICAgICAgICAgICAgICBpZiAobGVuID4gc2l6ZW9m
+KGludCkpClsuLi5dCgp0b3RhbDogNCBlcnJvcnMsIDAgd2FybmluZ3MsIDQ0IGxpbmVzIGNoZWNr
+ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5E
+ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMg
+YXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTgxMjEzMTMzNzMzLjgxMTAt
+MS10b20uZGVzZXluQGdtYWlsLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4K
+LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRj
+aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVk
+aGF0LmNvbQ==
