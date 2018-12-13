@@ -1,23 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gXPhp-0005kb-Gj
+	(envelope-from <pm215@archaic.org.uk>) id 1gXPhs-0005lt-O0
 	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:03:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gXPhj-0006II-97
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:03:05 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 13 Dec 2018 12:02:35 +0000
-Message-ID: <1133b70c-6b8f-1622-18a8-188a4b9fe142@virtuozzo.com>
-References: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
-	<20181203101429.88735-9-anton.nefedov@virtuozzo.com>
-In-Reply-To: <20181203101429.88735-9-anton.nefedov@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F971CFA3796A644A9D7FF43E616EB7BE@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <pm215@archaic.org.uk>) id 1gXPhm-0006tG-Li
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 07:03:08 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 13 Dec 2018 12:02:52 +0000
+Message-Id: <20181213120252.21697-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v10 8/9] qcow2: skip writing zero buffers
- to empty COW areas
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2] hw/s390/ccw.c: Don't take address of packed
+ members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,69 +20,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, qemu-s390x@nongnu.org, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Farhan Ali <alifm@linux.ibm.com>
 
-MDMuMTIuMjAxOCAxMzoxNCwgQW50b24gTmVmZWRvdiB3cm90ZToNCj4gSWYgQ09XIGFyZWFzIG9m
-IHRoZSBuZXdseSBhbGxvY2F0ZWQgY2x1c3RlcnMgYXJlIHplcm9lcyBvbiB0aGUgYmFja2luZyBp
-bWFnZSwNCj4gZWZmaWNpZW50IGJkcnZfd3JpdGVfemVyb2VzKGZsYWdzPUJEUlZfUkVRX0FMTE9D
-QVRFKSBjYW4gYmUgdXNlZCBvbiB0aGUgd2hvbGUNCj4gY2x1c3RlciBpbnN0ZWFkIG9mIHdyaXRp
-bmcgZXhwbGljaXQgemVybyBidWZmZXJzIGxhdGVyIGluIHBlcmZvcm1fY293KCkuDQo+IA0KDQpb
-Li4uXQ0KDQo+IC0tLSBhL2Jsb2NrL3Fjb3cyLmMNCj4gKysrIGIvYmxvY2svcWNvdzIuYw0KPiBA
-QCAtMjAxNSw2ICsyMDE1LDExIEBAIHN0YXRpYyBib29sIG1lcmdlX2Nvdyh1aW50NjRfdCBvZmZz
-ZXQsIHVuc2lnbmVkIGJ5dGVzLA0KPiAgICAgICAgICAgICAgIGNvbnRpbnVlOw0KPiAgICAgICAg
-ICAgfQ0KPiAgIA0KPiArICAgICAgICAvKiBJZiBDT1cgcmVnaW9ucyBhcmUgaGFuZGxlZCBhbHJl
-YWR5LCBza2lwIHRoaXMgdG9vICovDQo+ICsgICAgICAgIGlmIChtLT5za2lwX2Nvdykgew0KPiAr
-ICAgICAgICAgICAgY29udGludWU7DQo+ICsgICAgICAgIH0NCj4gKw0KPiAgICAgICAgICAgLyog
-VGhlIGRhdGEgKG1pZGRsZSkgcmVnaW9uIG11c3QgYmUgaW1tZWRpYXRlbHkgYWZ0ZXIgdGhlDQo+
-ICAgICAgICAgICAgKiBzdGFydCByZWdpb24gKi8NCj4gICAgICAgICAgIGlmIChsMm1ldGFfY293
-X3N0YXJ0KG0pICsgbS0+Y293X3N0YXJ0Lm5iX2J5dGVzICE9IG9mZnNldCkgew0KPiBAQCAtMjA0
-MCw2ICsyMDQ1LDY4IEBAIHN0YXRpYyBib29sIG1lcmdlX2Nvdyh1aW50NjRfdCBvZmZzZXQsIHVu
-c2lnbmVkIGJ5dGVzLA0KPiAgICAgICByZXR1cm4gZmFsc2U7DQo+ICAgfQ0KPiAgIA0KPiArc3Rh
-dGljIGJvb2wgaXNfdW5hbGxvY2F0ZWQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIGludDY0X3Qgb2Zm
-c2V0LCBpbnQ2NF90IGJ5dGVzKQ0KPiArew0KPiArICAgIGludDY0X3QgbnI7DQo+ICsgICAgcmV0
-dXJuICFieXRlcyB8fA0KPiArICAgICAgICAoIWJkcnZfaXNfYWxsb2NhdGVkX2Fib3ZlKGJzLCBO
-VUxMLCBvZmZzZXQsIGJ5dGVzLCAmbnIpICYmIG5yID09IGJ5dGVzKTsNCg0KaG0sIG5yIG1heSBi
-ZSA8IGJ5dGVzIGlmIGl0IGlzIHVwIHRvIGZpbGUgbGVuZ3RoLiBBbmQgd2UgbG9zZSB0aGlzIGNh
-c2UsIHdoZW4sIGl0DQptYXkgYmUgY29uc2lkZXJlZCBhcyB1bmFsbG9jYXRlZCB0b28uDQoNCkRv
-ZXNuJ3QgaGFybSwgaG93ZXZlci4NCg0KPiArfQ0KPiArDQo+ICtzdGF0aWMgYm9vbCBpc196ZXJv
-X2NvdyhCbG9ja0RyaXZlclN0YXRlICpicywgUUNvd0wyTWV0YSAqbSkNCj4gK3sNCj4gKyAgICAv
-KiBUaGlzIGNoZWNrIGlzIGRlc2lnbmVkIGZvciBvcHRpbWl6YXRpb24gc2hvcnRjdXQgc28gaXQg
-bXVzdCBiZQ0KPiArICAgICAqIGVmZmljaWVudC4NCj4gKyAgICAgKiBJbnN0ZWFkIG9mIGlzX3pl
-cm8oKSwgdXNlIGlzX3VuYWxsb2NhdGVkKCkgYXMgaXQgaXMgZmFzdGVyIChidXQgbm90DQo+ICsg
-ICAgICogYXMgYWNjdXJhdGUgYW5kIGNhbiByZXN1bHQgaW4gZmFsc2UgbmVnYXRpdmVzKS4gKi8N
-Cg0KQnV0LCBpbiBjYXNlIG9mIGFsbG9jYXRlZCB6ZXJvcywgd2UnbGwgcmVhZCB0aGVtIGFueXdh
-eSAoYXMgcGFydCBvZiBDT1cgcHJvY2VzcyksDQpzbywgaXQgbWF5IGJlIGhhbmRsZWQgaW4gdGhl
-IHNhbWUgd2F5IHRvby4gTWF5IGJlIG5vdCBoZXJlLCBidXQgYWZ0ZXIgcmVhZCB3ZSBjYW4NCmNo
-ZWNrIGZvciB6ZXJvZXMsIGFuZCBhZ2FpbiBlZmZlY3RpdmVseSB3cml0ZSB6ZXJvcyB0byB0aGUg
-d2hvbGUgY2x1c3Rlci4NCg0KQWdhaW4gaXQgbWF5IGJlIGRvbmUgc2VwYXJhdGVseSwgSSBkb24n
-dCBzdXJlIGl0IHdvcnRoIGRvaW5nLg0KDQo+ICsgICAgcmV0dXJuIGlzX3VuYWxsb2NhdGVkKGJz
-LCBtLT5vZmZzZXQgKyBtLT5jb3dfc3RhcnQub2Zmc2V0LA0KPiArICAgICAgICAgICAgICAgICAg
-ICAgICAgICBtLT5jb3dfc3RhcnQubmJfYnl0ZXMpICYmDQo+ICsgICAgICAgICAgIGlzX3VuYWxs
-b2NhdGVkKGJzLCBtLT5vZmZzZXQgKyBtLT5jb3dfZW5kLm9mZnNldCwNCj4gKyAgICAgICAgICAg
-ICAgICAgICAgICAgICAgbS0+Y293X2VuZC5uYl9ieXRlcyk7DQo+ICt9DQo+ICsNCj4gK3N0YXRp
-YyBpbnQgaGFuZGxlX2FsbG9jX3NwYWNlKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBRQ293TDJNZXRh
-ICpsMm1ldGEpDQo+ICt7DQo+ICsgICAgQkRSVlFjb3cyU3RhdGUgKnMgPSBicy0+b3BhcXVlOw0K
-PiArICAgIFFDb3dMMk1ldGEgKm07DQo+ICsNCj4gKyAgICBpZiAoIShicy0+ZmlsZS0+YnMtPnN1
-cHBvcnRlZF96ZXJvX2ZsYWdzICYgQkRSVl9SRVFfQUxMT0NBVEUpKSB7DQo+ICsgICAgICAgIHJl
-dHVybiAwOw0KPiArICAgIH0NCj4gKw0KPiArICAgIGlmIChicy0+ZW5jcnlwdGVkKSB7DQo+ICsg
-ICAgICAgIHJldHVybiAwOw0KPiArICAgIH0NCj4gKw0KPiArICAgIGZvciAobSA9IGwybWV0YTsg
-bSAhPSBOVUxMOyBtID0gbS0+bmV4dCkgew0KPiArICAgICAgICBpbnQgcmV0Ow0KPiArDQo+ICsg
-ICAgICAgIGlmICghbS0+Y293X3N0YXJ0Lm5iX2J5dGVzICYmICFtLT5jb3dfZW5kLm5iX2J5dGVz
-KSB7DQo+ICsgICAgICAgICAgICBjb250aW51ZTsNCj4gKyAgICAgICAgfQ0KPiArDQo+ICsgICAg
-ICAgIGlmICghaXNfemVyb19jb3coYnMsIG0pKSB7DQo+ICsgICAgICAgICAgICBjb250aW51ZTsN
-Cj4gKyAgICAgICAgfQ0KDQpwcmVfd3JpdGVfb3ZlcmxhcF9jaGVjayBzaG91bGQgYmUgaGVyZQ0K
-DQo+ICsNCj4gKyAgICAgICAgQkxLREJHX0VWRU5UKGJzLT5maWxlLCBCTEtEQkdfQ0xVU1RFUl9B
-TExPQ19TUEFDRSk7DQo+ICsgICAgICAgIC8qIGluc3RlYWQgb2Ygd3JpdGluZyB6ZXJvIENPVyBi
-dWZmZXJzLA0KPiArICAgICAgICAgICBlZmZpY2llbnRseSB6ZXJvIG91dCB0aGUgd2hvbGUgY2x1
-c3RlcnMgKi8NCj4gKyAgICAgICAgcmV0ID0gYmRydl9jb19wd3JpdGVfemVyb2VzKGJzLT5maWxl
-LCBtLT5hbGxvY19vZmZzZXQsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBtLT5uYl9jbHVzdGVycyAqIHMtPmNsdXN0ZXJfc2l6ZSwNCj4gKyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIEJEUlZfUkVRX0FMTE9DQVRFKTsNCj4gKyAgICAgICAgaWYgKHJl
-dCA8IDApIHsNCj4gKyAgICAgICAgICAgIGlmIChyZXQgIT0gLUVOT1RTVVAgJiYgcmV0ICE9IC1F
-QUdBSU4pIHsNCj4gKyAgICAgICAgICAgICAgICByZXR1cm4gcmV0Ow0KPiArICAgICAgICAgICAg
-fQ0KPiArICAgICAgICAgICAgY29udGludWU7DQo+ICsgICAgICAgIH0NCj4gKw0KPiArICAgICAg
-ICB0cmFjZV9xY293Ml9za2lwX2NvdyhxZW11X2Nvcm91dGluZV9zZWxmKCksIG0tPm9mZnNldCwg
-bS0+bmJfY2x1c3RlcnMpOw0KPiArICAgICAgICBtLT5za2lwX2NvdyA9IHRydWU7DQo+ICsgICAg
-fQ0KPiArICAgIHJldHVybiAwOw0KPiArfQ0KPiArDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpW
-bGFkaW1pcg0K
+Taking the address of a field in a packed struct is a bad idea, because
+it might not be actually aligned enough for that pointer type (and
+thus cause a crash on dereference on some host architectures). Newer
+versions of clang warn about this.
+
+Avoid the problem by using local copies of the PMCW and SCSW
+struct fields in copy_schib_from_guest() and copy_schib_to_guest().
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+v1->v2 changes:
+ * add comment about why we're using locals
+ * name locals with underscores, as QEMU's naming conventions recommend
+
+
+ hw/s390x/css.c | 28 ++++++++++++++++++++++++----
+ 1 file changed, 24 insertions(+), 4 deletions(-)
+
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index 04ec5cc9705..f92b046cd33 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -1290,9 +1290,19 @@ void copy_scsw_to_guest(SCSW *dest, const SCSW *src)
+ static void copy_schib_to_guest(SCHIB *dest, const SCHIB *src)
+ {
+     int i;
++    /*
++     * We copy the PMCW and SCSW in and out of local variables to
++     * avoid taking the address of members of a packed struct.
++     */
++    PMCW src_pmcw, dest_pmcw;
++    SCSW src_scsw, dest_scsw;
+ 
+-    copy_pmcw_to_guest(&dest->pmcw, &src->pmcw);
+-    copy_scsw_to_guest(&dest->scsw, &src->scsw);
++    src_pmcw = src->pmcw;
++    copy_pmcw_to_guest(&dest_pmcw, &src_pmcw);
++    dest->pmcw = dest_pmcw;
++    src_scsw = src->scsw;
++    copy_scsw_to_guest(&dest_scsw, &src_scsw);
++    dest->scsw = dest_scsw;
+     dest->mba = cpu_to_be64(src->mba);
+     for (i = 0; i < ARRAY_SIZE(dest->mda); i++) {
+         dest->mda[i] = src->mda[i];
+@@ -1339,9 +1349,19 @@ static void copy_scsw_from_guest(SCSW *dest, const SCSW *src)
+ static void copy_schib_from_guest(SCHIB *dest, const SCHIB *src)
+ {
+     int i;
++    /*
++     * We copy the PMCW and SCSW in and out of local variables to
++     * avoid taking the address of members of a packed struct.
++     */
++    PMCW src_pmcw, dest_pmcw;
++    SCSW src_scsw, dest_scsw;
+ 
+-    copy_pmcw_from_guest(&dest->pmcw, &src->pmcw);
+-    copy_scsw_from_guest(&dest->scsw, &src->scsw);
++    src_pmcw = src->pmcw;
++    copy_pmcw_from_guest(&dest_pmcw, &src_pmcw);
++    dest->pmcw = dest_pmcw;
++    src_scsw = src->scsw;
++    copy_scsw_from_guest(&dest_scsw, &src_scsw);
++    dest->scsw = dest_scsw;
+     dest->mba = be64_to_cpu(src->mba);
+     for (i = 0; i < ARRAY_SIZE(dest->mda); i++) {
+         dest->mda[i] = src->mda[i];
+-- 
+2.19.2
