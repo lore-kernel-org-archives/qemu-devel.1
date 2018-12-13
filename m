@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40268)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gXFHr-0007gK-Mx
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 19:55:36 -0500
+	(envelope-from <eblake@redhat.com>) id 1gXFm9-0005uk-W1
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 20:26:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gXFHk-00038S-CE
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 19:55:33 -0500
-Received: from mga05.intel.com ([192.55.52.43]:19852)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yu.c.zhang@linux.intel.com>)
-	id 1gXFHj-00034y-T1
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 19:55:28 -0500
-Date: Thu, 13 Dec 2018 08:52:31 +0800
-From: Yu Zhang <yu.c.zhang@linux.intel.com>
-Message-ID: <20181213005231.753cnlhxnibmc5d2@linux.intel.com>
-References: <20181211192527.13254-1-ehabkost@redhat.com>
-	<20181212090839.iuc5pebm7luitdsk@linux.intel.com>
-	<20181212141233.GS7141@habkost.net>
+	(envelope-from <eblake@redhat.com>) id 1gXFm8-0005QU-Or
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 20:26:53 -0500
+References: <20181212220410.569069-1-eblake@redhat.com>
+	<CAMRbyyuZ81fyHYTQSHPXhjYoLFz6nzsxc30PNJdWRkqm=14RRA@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <526c4d1c-9ad5-e8dc-d2ba-c043a76749ab@redhat.com>
+Date: Wed, 12 Dec 2018 19:26:27 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181212141233.GS7141@habkost.net>
-Subject: Re: [Qemu-devel] [PATCH] x86: host-phys-bits-limit option
+In-Reply-To: <CAMRbyyuZ81fyHYTQSHPXhjYoLFz6nzsxc30PNJdWRkqm=14RRA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC] qemu-io: Prefer stderr
+ for error messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +25,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Andrea Arcangeli <aarcange@redhat.com>, paul.c.lai@intel.com, qemu-devel@nongnu.org, Bandan Das <bsd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Nir Soffer <nsoffer@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-On Wed, Dec 12, 2018 at 12:12:33PM -0200, Eduardo Habkost wrote:
-> On Wed, Dec 12, 2018 at 05:08:39PM +0800, Yu Zhang wrote:
-> > On Tue, Dec 11, 2018 at 05:25:27PM -0200, Eduardo Habkost wrote:
-> > > Some downstream distributions of QEMU set host-phys-bits=on by
-> > > default.  This worked very well for most use cases, because
-> > > phys-bits really didn't have huge consequences. The only
-> > > difference was on the CPUID data seen by guests, and on the
-> > > handling of reserved bits.
-> > > 
-> > > This changed in KVM commit 855feb673640 ("KVM: MMU: Add 5 level
-> > > EPT & Shadow page table support").  Now choosing a large
-> > > phys-bits value for a VM has bigger impact: it will make KVM use
-> > > 5-level EPT even when it's not really necessary.  This means
-> > > using the host phys-bits value may not be the best choice.
-> > > 
-> > > Management software could address this problem by manually
-> > > configuring phys-bits depending on the size of the VM and the
-> > > amount of MMIO address space required for hotplug.  But this is
-> > > not trivial to implement.
-> > > 
-> > > However, there's another workaround that would work for most
-> > > cases: keep using the host phys-bits value, but only if it's
-> > > smaller than 48.  This patch makes this possible by introducing a
-> > > new "-cpu" option: "host-phys-bits-limit".  Management software
-> > > or users can make sure they will always use 4-level EPT using:
-> > > "host-phys-bits=on,host-phys-bits-limit=48".
-> > > 
-> > > This behavior is still not enabled by default because QEMU
-> > > doesn't enable host-phys-bits=on by default.  But users,
-> > > management software, or downstream distributions may choose to
-> > > change their defaults using the new option.
-> > > 
-> > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > 
-> > Thanks, Eduardo. One question is, should we check host-phys-bits-limit
-> > against 48? If not, how about we just say in the commit message, that
-> > the suggested value of host-phys-bits-limit is no bigger than 48 to
-> > ensure a 4-level EPT? :-)
+On 12/12/18 5:52 PM, Nir Soffer wrote:
+> On Thu, Dec 13, 2018 at 12:13 AM Eric Blake <eblake@redhat.com> wrote:
+>>
+>> When a qemu-io command fails, it's best if the failure message
+>> goes to stderr rather than stdout.
 > 
-> I'm not sure I understood the question.  I tried to document this
-> at:
+> This makes sense, but it will break users like this:
 > 
-> |                                      [...]  Management software
-> | or users can make sure they will always use 4-level EPT using:
-> | "host-phys-bits=on,host-phys-bits-limit=48".
+> https://github.com/oVirt/vdsm/blob/a2836b1d58ffaa0f48cc9c814b6002161a81f044/tests/storage/qemuio.py#L45
+> 
+> We need a way to detect qemu-io verification failures, maybe a special
+> exit code?
+> 
+> 0 - verification succeeded
+> 1 - verification failed
+> 2 - other error (e.g no such file)
+> 
+> Or, if qemu-io had a way to read data and write it to stdout, we could
+> compare the data and avoid the need for special exit code.
 > 
 
-Oh, I was just saying that host-phys-bits-limit can be of any
-value less than 48, instead of just 48, to ensure a 4-level EPT.
-Not a big deal. I guess readers can get the point in your commit
-message.  
+>> @@ -723,8 +725,8 @@ static int read_f(BlockBackend *blk, int argc, char **argv)
+>>           print_cvtnum_err(count, argv[optind]);
+>>           return count;
+>>       } else if (count > BDRV_REQUEST_MAX_BYTES) {
+>> -        printf("length cannot exceed %" PRIu64 ", given %s\n",
+>> -               (uint64_t)BDRV_REQUEST_MAX_BYTES, argv[optind]);
+>> +        fprintf(stderr, "length cannot exceed %" PRIu64 ", given %s\n",
+>> +                (uint64_t)BDRV_REQUEST_MAX_BYTES, argv[optind]);
+>>           return -EINVAL;
+>>       }
+>>
+>> @@ -738,19 +740,22 @@ static int read_f(BlockBackend *blk, int argc, char **argv)
+>>       }
+>>
+>>       if ((pattern_count < 0) || (pattern_count + pattern_offset > count))  {
+>> -        printf("pattern verification range exceeds end of read data\n");
+>> +        fprintf(stderr,
+>> +                "pattern verification range exceeds end of read data\n");
+>>           return -EINVAL;
 
-Another question is, should we check the value of host-phys-bits?
-Shall we accept values greater than 48(may be a useless configuration,
-but still acceptible), or less than 32? 
+Note that 'read -P ...' can fail for both pattern verification failure, 
+and for other reasons, both before and after this patch. The only thing 
+this patch is doing is changing where the failure messages are output. 
+Or is your complaint that your existing code is already catering to 
+older qemu that had 0 exit status, and parsing stdout for a specific 
+string rather than trusting exit status, and now stdout won't have that 
+specific string?  qemu-io is not quite as worried about backwards 
+compatibility as qemu-img or qemu proper, but at least knowing what 
+might break might help us design something more user-friendly.
 
-Thanks
-Yu
+Can you redirect qemu-io to output both stdout and stderr to the same 
+file, if you have to parse the answers to learn if verification has failed?
 
-> -- 
-> Eduardo
-> 
+And your idea of having distinguished error codes for verification fail 
+vs. overall failure makes some sense, but it would require some major 
+rework (right now, returning -errno codes does not really tell the 
+caller what exit status to report).
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
