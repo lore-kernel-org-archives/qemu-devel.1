@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54667)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gXRyW-0003sJ-KS
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:28:29 -0500
+	(envelope-from <armbru@redhat.com>) id 1gXS0F-0005Bl-KO
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:30:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gXRyS-0000nL-DU
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:28:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33922)
+	(envelope-from <armbru@redhat.com>) id 1gXS07-0001pB-5W
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:30:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:65179)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gXRyS-0000mi-7T
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:28:24 -0500
-Date: Thu, 13 Dec 2018 14:28:01 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181213142800.GO2313@work-vm>
-References: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
-	<1544516693-5395-2-git-send-email-wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXS03-0001kz-O3
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 09:30:04 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D52D33081D90
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 14:30:01 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181213123724.4866-1-marcandre.lureau@redhat.com>
+	<20181213123724.4866-8-marcandre.lureau@redhat.com>
+Date: Thu, 13 Dec 2018 15:29:57 +0100
+In-Reply-To: <20181213123724.4866-8-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Thu, 13 Dec 2018 16:37:09 +0400")
+Message-ID: <87sgz1pkii.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1544516693-5395-2-git-send-email-wei.w.wang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v11 1/7] bitmap: fix bitmap_count_one
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v8 07/22] qapi: pass long form enum to
+ make_enum_members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,50 +36,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-* Wei Wang (wei.w.wang@intel.com) wrote:
-> BITMAP_LAST_WORD_MASK(nbits) returns 0xffffffff when "nbits=0", which
-> makes bitmap_count_one fail to handle the "nbits=0" case. It appears to be
-> preferred to remain BITMAP_LAST_WORD_MASK identical to the kernel
-> implementation that it is ported from.
-> 
-> So this patch fixes bitmap_count_one to handle the nbits=0 case.
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-OK; it's a little odd that it's only bitmap_count_one that's being fixed
-for this case; but OK.
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> Inital Discussion Link:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg554316.html
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> CC: Juan Quintela <quintela@redhat.com>
-> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> CC: Peter Xu <peterx@redhat.com>
+> This will allow to get rid of short form handling in a following
+> patch.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Suggested-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  include/qemu/bitmap.h | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
-> index 509eedd..679f1bd 100644
-> --- a/include/qemu/bitmap.h
-> +++ b/include/qemu/bitmap.h
-> @@ -221,6 +221,10 @@ static inline int bitmap_intersects(const unsigned long *src1,
->  
->  static inline long bitmap_count_one(const unsigned long *bitmap, long nbits)
->  {
-> +    if (unlikely(!nbits)) {
-> +        return 0;
-> +    }
+>  scripts/qapi/common.py | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+>
+> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+> index bb928d2f7d..569e397147 100644
+> --- a/scripts/qapi/common.py
+> +++ b/scripts/qapi/common.py
+> @@ -1648,9 +1648,10 @@ class QAPISchema(object):
+>          self.the_empty_object_type =3D QAPISchemaObjectType(
+>              'q_empty', None, None, None, None, [], None)
+>          self._def_entity(self.the_empty_object_type)
+> -        qtype_values =3D self._make_enum_members(['none', 'qnull', 'qnum=
+',
+> -                                                'qstring', 'qdict', 'qli=
+st',
+> -                                                'qbool'])
 > +
->      if (small_nbits(nbits)) {
->          return ctpopl(*bitmap & BITMAP_LAST_WORD_MASK(nbits));
->      } else {
-> -- 
-> 1.8.3.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> +        qtypes =3D ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist'=
+, 'qbool']
+
+pycodestyle-3 complains:
+
+    scripts/qapi/common.py:1652:80: E501 line too long (80 > 79 characters)
+
+Can tidy up when I apply.
+
+> +        qtype_values =3D self._make_enum_members([{'name': n} for n in q=
+types])
+> +
+>          self._def_entity(QAPISchemaEnumType('QType', None, None, None,
+>                                              qtype_values, 'QTYPE'))
