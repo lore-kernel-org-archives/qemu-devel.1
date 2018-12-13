@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gXKLb-0006XR-SB
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 01:19:48 -0500
+	(envelope-from <thuth@redhat.com>) id 1gXKYC-0001Ft-Iv
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 01:32:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gXKLY-0007ZF-Hw
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 01:19:47 -0500
-Resent-Message-Id: <E1gXKLY-0007ZF-Hw@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21746)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gXKLY-0007Ws-7b
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 01:19:44 -0500
-In-Reply-To: <20181213015013.15350-1-jsnow@redhat.com>
-Message-ID: <154468195986.9757.4891655970247696579@02a1dbf831e2>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <thuth@redhat.com>) id 1gXKY7-0005fs-Ja
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 01:32:48 -0500
+References: <20181210135803.20208-1-peter.maydell@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <b26019e6-9ad7-229b-4ad5-c47273919bba@redhat.com>
+Date: Thu, 13 Dec 2018 07:32:29 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 12 Dec 2018 22:19:21 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] bitmaps: remove x- prefix from QMP
- api
+In-Reply-To: <20181210135803.20208-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] hw/s390/ccw.c: Don't take
+ address of packed members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +24,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jsnow@redhat.com
-Cc: fam@euphon.net, qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, vsementsov@virtuozzo.com, armbru@redhat.com, mreitz@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, patches@linaro.org, Richard Henderson <rth@twiddle.net>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIxMzAxNTAxMy4xNTM1
-MC0xLWpzbm93QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
-b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
-cm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE4MTIxMzAxNTAxMy4xNTM1MC0x
-LWpzbm93QHJlZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwLzddIGJp
-dG1hcHM6IHJlbW92ZSB4LSBwcmVmaXggZnJvbSBRTVAgYXBpCgo9PT0gVEVTVCBTQ1JJUFQgQkVH
-SU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxp
-bmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0t
-Zm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBl
-Y2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVz
-ICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMv
-Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAg
-IGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBT
-Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
-ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjdlZGNhMzIgaW90ZXN0czog
-YWRkIGlvdGVzdCAyMzYgZm9yIHRlc3RpbmcgYml0bWFwIG1lcmdlCjQ3NjBmMTIgaW90ZXN0czog
-YWxsb3cgcHJldHR5LXByaW50IGZvciBxbXBfbG9nCjE4NDc5YjYgaW90ZXN0czogYWRkIGZpbHRl
-cl9nZW5lcmF0ZWRfbm9kZV9pZHMKZTc0ZDhjNSBpb3Rlc3RzLnB5OiBkb24ndCBhYm9ydCBpZiBJ
-TUdLRVlTRUNSRVQgaXMgdW5kZWZpbmVkCjMyZDY4YmQ0IGJsb2NrOiByZW1vdmUgJ3gnIHByZWZp
-eCBmcm9tIGV4cGVyaW1lbnRhbCBiaXRtYXAgQVBJcwo4MjA1OWQ3IGJsb2NrZGV2OiBuLWFyeSBi
-aXRtYXAgbWVyZ2UKNTFiNmY0OCBibG9ja2RldjogYWJvcnQgdHJhbnNhY3Rpb25zIGluIHJldmVy
-c2Ugb3JkZXIKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNzogYmxvY2tk
-ZXY6IGFib3J0IHRyYW5zYWN0aW9ucyBpbiByZXZlcnNlIG9yZGVyLi4uCkNoZWNraW5nIFBBVENI
-IDIvNzogYmxvY2tkZXY6IG4tYXJ5IGJpdG1hcCBtZXJnZS4uLgpFUlJPUjogZXh0ZXJucyBzaG91
-bGQgYmUgYXZvaWRlZCBpbiAuYyBmaWxlcwojMjc6IEZJTEU6IGJsb2NrZGV2LmM6MjEyNToKK3Zv
-aWQgZG9fYmxvY2tfZGlydHlfYml0bWFwX21lcmdlKGNvbnN0IGNoYXIgKm5vZGUsIGNvbnN0IGNo
-YXIgKnRhcmdldCwKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTQ3IGxpbmVzIGNoZWNr
-ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENI
-IDMvNzogYmxvY2s6IHJlbW92ZSAneCcgcHJlZml4IGZyb20gZXhwZXJpbWVudGFsIGJpdG1hcCBB
-UElzLi4uCkNoZWNraW5nIFBBVENIIDQvNzogaW90ZXN0cy5weTogZG9uJ3QgYWJvcnQgaWYgSU1H
-S0VZU0VDUkVUIGlzIHVuZGVmaW5lZC4uLgpDaGVja2luZyBQQVRDSCA1Lzc6IGlvdGVzdHM6IGFk
-ZCBmaWx0ZXJfZ2VuZXJhdGVkX25vZGVfaWRzLi4uCkNoZWNraW5nIFBBVENIIDYvNzogaW90ZXN0
-czogYWxsb3cgcHJldHR5LXByaW50IGZvciBxbXBfbG9nLi4uCkNoZWNraW5nIFBBVENIIDcvNzog
-aW90ZXN0czogYWRkIGlvdGVzdCAyMzYgZm9yIHRlc3RpbmcgYml0bWFwIG1lcmdlLi4uCldBUk5J
-Tkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVl
-ZCB1cGRhdGluZz8KIzEyOiAKbmV3IGZpbGUgbW9kZSAxMDA3NTUKCnRvdGFsOiAwIGVycm9ycywg
-MSB3YXJuaW5ncywgMzkyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3Jn
-L2xvZ3MvMjAxODEyMTMwMTUwMTMuMTUzNTAtMS1qc25vd0ByZWRoYXQuY29tL3Rlc3RpbmcuY2hl
-Y2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
-YnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
-Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 2018-12-10 14:58, Peter Maydell wrote:
+> Taking the address of a field in a packed struct is a bad idea, because
+> it might not be actually aligned enough for that pointer type (and
+> thus cause a crash on dereference on some host architectures). Newer
+> versions of clang warn about this.
+> 
+> Avoid the problem by using local copies of the PMCW and SCSW
+> struct fields in copy_schib_from_guest() and copy_schib_to_guest().
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> This seemed like a not totally ugly and reasonably localised fix
+> that satisfies clang. Oddly, this makes the generated object file
+> 15K smaller (421K vs 406K), so it might even be better code...
+> 
+>  hw/s390x/css.c | 20 ++++++++++++++++----
+>  1 file changed, 16 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> index 04ec5cc9705..ef07691e36b 100644
+> --- a/hw/s390x/css.c
+> +++ b/hw/s390x/css.c
+> @@ -1290,9 +1290,15 @@ void copy_scsw_to_guest(SCSW *dest, const SCSW *src)
+>  static void copy_schib_to_guest(SCHIB *dest, const SCHIB *src)
+>  {
+>      int i;
+> +    PMCW srcpmcw, destpmcw;
+> +    SCSW srcscsw, destscsw;
+>  
+> -    copy_pmcw_to_guest(&dest->pmcw, &src->pmcw);
+> -    copy_scsw_to_guest(&dest->scsw, &src->scsw);
+> +    srcpmcw = src->pmcw;
+> +    copy_pmcw_to_guest(&destpmcw, &srcpmcw);
+> +    dest->pmcw = destpmcw;
+> +    srcscsw = src->scsw;
+> +    copy_scsw_to_guest(&destscsw, &srcscsw);
+> +    dest->scsw = destscsw;
+>      dest->mba = cpu_to_be64(src->mba);
+>      for (i = 0; i < ARRAY_SIZE(dest->mda); i++) {
+>          dest->mda[i] = src->mda[i];
+> @@ -1339,9 +1345,15 @@ static void copy_scsw_from_guest(SCSW *dest, const SCSW *src)
+>  static void copy_schib_from_guest(SCHIB *dest, const SCHIB *src)
+>  {
+>      int i;
+> +    PMCW srcpmcw, destpmcw;
+> +    SCSW srcscsw, destscsw;
+>  
+> -    copy_pmcw_from_guest(&dest->pmcw, &src->pmcw);
+> -    copy_scsw_from_guest(&dest->scsw, &src->scsw);
+> +    srcpmcw = src->pmcw;
+> +    copy_pmcw_from_guest(&destpmcw, &srcpmcw);
+> +    dest->pmcw = destpmcw;
+> +    srcscsw = src->scsw;
+> +    copy_scsw_from_guest(&destscsw, &srcscsw);
+> +    dest->scsw = destscsw;
+>      dest->mba = be64_to_cpu(src->mba);
+>      for (i = 0; i < ARRAY_SIZE(dest->mda); i++) {
+>          dest->mda[i] = src->mda[i];
+> 
+
+May I suggest to add a comment to the code here a la:
+
+  /* Use a local copy to avoid unaligned access to packed structs */
+
+or something similar? Otherwise, I'm pretty sure somebody will revert
+this in a couple of years because they thinks the local copy is not
+really necessary here...
+
+ Thomas
