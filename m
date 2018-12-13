@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXVxv-0005pn-IS
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:09 -0500
+	(envelope-from <armbru@redhat.com>) id 1gXVxv-0005pm-IG
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXVxr-0002i0-L5
+	(envelope-from <armbru@redhat.com>) id 1gXVxr-0002iW-NZ
 	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41472)
+Received: from mx1.redhat.com ([209.132.183.28]:47410)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXVxo-0001eh-Gh
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:01 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXVxp-0001JY-L0
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:44:03 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9775180496
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 18:43:49 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8924A9D50B
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 18:43:44 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 13 Dec 2018 19:43:29 +0100
-Message-Id: <20181213184340.24037-22-armbru@redhat.com>
+Date: Thu, 13 Dec 2018 19:43:09 +0100
+Message-Id: <20181213184340.24037-2-armbru@redhat.com>
 In-Reply-To: <20181213184340.24037-1-armbru@redhat.com>
 References: <20181213184340.24037-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 21/32] qapi: add 'if' to enum members
+Subject: [Qemu-devel] [PULL 01/32] cutils: Add qemu_strtod() and
+ qemu_strtod_finite()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,211 +31,109 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+From: David Hildenbrand <david@redhat.com>
 
-QAPISchemaMember gains .ifcond for enum members: inherited classes,
-such as QAPISchemaObjectTypeMember, will thus have an ifcond member
-after this (those different types will also use the .ifcond to store
-the condition and generate conditional code in the following patches).
+Let's provide a wrapper for strtod().
 
-The generated code remains unconditional for now. Later patches
-generate the conditionals.
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20181213123724.4866-10-marcandre.lureau@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20181121164421.20780-2-david@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- docs/devel/qapi-code-gen.txt                   | 9 +++++++++
- scripts/qapi/common.py                         | 8 +++++---
- tests/Makefile.include                         | 1 +
- tests/qapi-schema/enum-dict-member-unknown.err | 2 +-
- tests/qapi-schema/enum-if-invalid.err          | 1 +
- tests/qapi-schema/enum-if-invalid.exit         | 1 +
- tests/qapi-schema/enum-if-invalid.json         | 3 +++
- tests/qapi-schema/enum-if-invalid.out          | 0
- tests/qapi-schema/qapi-schema-test.json        | 5 +++--
- tests/qapi-schema/qapi-schema-test.out         | 2 ++
- tests/qapi-schema/test-qapi.py                 | 1 +
- 11 files changed, 27 insertions(+), 6 deletions(-)
- create mode 100644 tests/qapi-schema/enum-if-invalid.err
- create mode 100644 tests/qapi-schema/enum-if-invalid.exit
- create mode 100644 tests/qapi-schema/enum-if-invalid.json
- create mode 100644 tests/qapi-schema/enum-if-invalid.out
+ include/qemu/cutils.h |  2 ++
+ util/cutils.c         | 65 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 67 insertions(+)
 
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 2c8b392b20..7ba9066eac 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -752,6 +752,15 @@ gets its generated code guarded like this:
-  #endif /* defined(HAVE_BAR) */
-  #endif /* defined(CONFIG_FOO) */
-=20
-+An enum value can be replaced by a dictionary with a 'name' and a 'if'
-+key.
+diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
+index 7071bfe2d4..756b41c193 100644
+--- a/include/qemu/cutils.h
++++ b/include/qemu/cutils.h
+@@ -146,6 +146,8 @@ int qemu_strtoi64(const char *nptr, const char **endptr, int base,
+                   int64_t *result);
+ int qemu_strtou64(const char *nptr, const char **endptr, int base,
+                   uint64_t *result);
++int qemu_strtod(const char *nptr, const char **endptr, double *result);
++int qemu_strtod_finite(const char *nptr, const char **endptr, double *result);
+ 
+ int parse_uint(const char *s, unsigned long long *value, char **endptr,
+                int base);
+diff --git a/util/cutils.c b/util/cutils.c
+index 0621565930..ec0a401d9a 100644
+--- a/util/cutils.c
++++ b/util/cutils.c
+@@ -551,6 +551,71 @@ int qemu_strtou64(const char *nptr, const char **endptr, int base,
+     return check_strtox_error(nptr, ep, endptr, errno);
+ }
+ 
++/**
++ * Convert string @nptr to a double.
++  *
++ * This is a wrapper around strtod() that is harder to misuse.
++ * Semantics of @nptr and @endptr match strtod() with differences
++ * noted below.
++ *
++ * @nptr may be null, and no conversion is performed then.
++ *
++ * If no conversion is performed, store @nptr in *@endptr and return
++ * -EINVAL.
++ *
++ * If @endptr is null, and the string isn't fully converted, return
++ * -EINVAL. This is the case when the pointer that would be stored in
++ * a non-null @endptr points to a character other than '\0'.
++ *
++ * If the conversion overflows, store +/-HUGE_VAL in @result, depending
++ * on the sign, and return -ERANGE.
++ *
++ * If the conversion underflows, store +/-0.0 in @result, depending on the
++ * sign, and return -ERANGE.
++ *
++ * Else store the converted value in @result, and return zero.
++ */
++int qemu_strtod(const char *nptr, const char **endptr, double *result)
++{
++    char *ep;
 +
-+Example: a conditional 'bar' enum member.
++    if (!nptr) {
++        if (endptr) {
++            *endptr = nptr;
++        }
++        return -EINVAL;
++    }
 +
-+{ 'enum': 'IfEnum', 'data':
-+  [ 'foo',
-+    { 'name' : 'bar', 'if': 'defined(IFCOND)' } ] }
++    errno = 0;
++    *result = strtod(nptr, &ep);
++    return check_strtox_error(nptr, ep, endptr, errno);
++}
 +
- Please note that you are responsible to ensure that the C code will
- compile with an arbitrary combination of conditions, since the
- generators are unable to check it at this point.
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index b1cf33af21..a609ffcfee 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -871,7 +871,8 @@ def check_enum(expr, info):
-=20
-     for member in members:
-         source =3D "dictionary member of enum '%s'" % name
--        check_known_keys(info, source, member, ['name'], [])
-+        check_known_keys(info, source, member, ['name'], ['if'])
-+        check_if(member, info)
-         check_name(info, "Member of enum '%s'" % name, member['name'],
-                    enum_member=3DTrue)
-=20
-@@ -1345,9 +1346,10 @@ class QAPISchemaObjectType(QAPISchemaType):
- class QAPISchemaMember(object):
-     role =3D 'member'
-=20
--    def __init__(self, name):
-+    def __init__(self, name, ifcond=3DNone):
-         assert isinstance(name, str)
-         self.name =3D name
-+        self.ifcond =3D listify_cond(ifcond)
-         self.owner =3D None
-=20
-     def set_owner(self, name):
-@@ -1656,7 +1658,7 @@ class QAPISchema(object):
-                                             qtype_values, 'QTYPE'))
-=20
-     def _make_enum_members(self, values):
--        return [QAPISchemaMember(v['name']) for v in values]
-+        return [QAPISchemaMember(v['name'], v.get('if')) for v in values=
-]
-=20
-     def _make_implicit_enum_type(self, name, info, ifcond, values):
-         # See also QAPISchemaObjectTypeMember._pretty_owner()
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 2e894c1037..3c9eea27fd 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -384,6 +384,7 @@ qapi-schema +=3D enum-bad-name.json
- qapi-schema +=3D enum-bad-prefix.json
- qapi-schema +=3D enum-clash-member.json
- qapi-schema +=3D enum-dict-member-unknown.json
-+qapi-schema +=3D enum-if-invalid.json
- qapi-schema +=3D enum-int-member.json
- qapi-schema +=3D enum-member-case.json
- qapi-schema +=3D enum-missing-data.json
-diff --git a/tests/qapi-schema/enum-dict-member-unknown.err b/tests/qapi-=
-schema/enum-dict-member-unknown.err
-index 76bd0471db..2aae618be0 100644
---- a/tests/qapi-schema/enum-dict-member-unknown.err
-+++ b/tests/qapi-schema/enum-dict-member-unknown.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/enum-dict-member-unknown.json:2: Unknown key 'bad-key'=
- in dictionary member of enum 'MyEnum'
--Valid keys are 'name'.
-+Valid keys are 'if', 'name'.
-diff --git a/tests/qapi-schema/enum-if-invalid.err b/tests/qapi-schema/en=
-um-if-invalid.err
-new file mode 100644
-index 0000000000..54c3cf887b
---- /dev/null
-+++ b/tests/qapi-schema/enum-if-invalid.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/enum-if-invalid.json:2: 'if' condition must be a strin=
-g or a list of strings
-diff --git a/tests/qapi-schema/enum-if-invalid.exit b/tests/qapi-schema/e=
-num-if-invalid.exit
-new file mode 100644
-index 0000000000..d00491fd7e
---- /dev/null
-+++ b/tests/qapi-schema/enum-if-invalid.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/enum-if-invalid.json b/tests/qapi-schema/e=
-num-if-invalid.json
-new file mode 100644
-index 0000000000..60bd0ef1d7
---- /dev/null
-+++ b/tests/qapi-schema/enum-if-invalid.json
-@@ -0,0 +1,3 @@
-+# check invalid 'if' type
-+{ 'enum': 'TestIfEnum', 'data':
-+  [ 'foo', { 'name' : 'bar', 'if': { 'val': 'foo' } } ] }
-diff --git a/tests/qapi-schema/enum-if-invalid.out b/tests/qapi-schema/en=
-um-if-invalid.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
-qapi-schema-test.json
-index 15388ae9a4..8bfaf5aedd 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -204,7 +204,8 @@
- { 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
-   'if': 'defined(TEST_IF_STRUCT)' }
-=20
--{ 'enum': 'TestIfEnum', 'data': [ 'foo', 'bar' ],
-+{ 'enum': 'TestIfEnum', 'data':
-+  [ 'foo', { 'name' : 'bar', 'if': 'defined(TEST_IF_ENUM_BAR)' } ],
-   'if': 'defined(TEST_IF_ENUM)' }
-=20
- { 'union': 'TestIfUnion', 'data': { 'foo': 'TestStruct' },
-@@ -219,7 +220,7 @@
- { 'command': 'TestIfAlternateCmd', 'data': { 'alt_cmd_arg': 'TestIfAlter=
-nate' },
-   'if': 'defined(TEST_IF_ALT)' }
-=20
--{ 'command': 'TestIfCmd', 'data': { 'foo': 'TestIfStruct' },
-+{ 'command': 'TestIfCmd', 'data': { 'foo': 'TestIfStruct', 'bar': 'TestI=
-fEnum' },
-   'returns': 'UserDefThree',
-   'if': ['defined(TEST_IF_CMD)', 'defined(TEST_IF_STRUCT)'] }
-=20
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
-api-schema-test.out
-index 06e80e5b04..d90d987651 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -272,6 +272,7 @@ object TestIfStruct
- enum TestIfEnum
-     member foo
-     member bar
-+        if ['defined(TEST_IF_ENUM_BAR)']
-     if ['defined(TEST_IF_ENUM)']
- object q_obj_TestStruct-wrapper
-     member data: TestStruct optional=3DFalse
-@@ -302,6 +303,7 @@ command TestIfAlternateCmd q_obj_TestIfAlternateCmd-a=
-rg -> None
-     if ['defined(TEST_IF_ALT)']
- object q_obj_TestIfCmd-arg
-     member foo: TestIfStruct optional=3DFalse
-+    member bar: TestIfEnum optional=3DFalse
-     if ['defined(TEST_IF_CMD)', 'defined(TEST_IF_STRUCT)']
- command TestIfCmd q_obj_TestIfCmd-arg -> UserDefThree
-    gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfi=
-g=3DFalse
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
-.py
-index 641a18f06d..aadf252d9d 100644
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -29,6 +29,7 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-             print('    prefix %s' % prefix)
-         for m in members:
-             print('    member %s' % m.name)
-+            self._print_if(m.ifcond, indent=3D8)
-         self._print_if(ifcond)
-=20
-     def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts):
---=20
++/**
++ * Convert string @nptr to a finite double.
++ *
++ * Works like qemu_strtod(), except that "NaN" and "inf" are rejected
++ * with -EINVAL and no conversion is performed.
++ */
++int qemu_strtod_finite(const char *nptr, const char **endptr, double *result)
++{
++    double tmp;
++    int ret;
++
++    ret = qemu_strtod(nptr, endptr, &tmp);
++    if (!ret && !isfinite(tmp)) {
++        if (endptr) {
++            *endptr = nptr;
++        }
++        ret = -EINVAL;
++    }
++
++    if (ret != -EINVAL) {
++        *result = tmp;
++    }
++    return ret;
++}
++
+ /**
+  * Searches for the first occurrence of 'c' in 's', and returns a pointer
+  * to the trailing null byte if none was found.
+-- 
 2.17.2
