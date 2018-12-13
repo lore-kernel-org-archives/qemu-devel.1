@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXKJr-00055c-1b
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 01:18:00 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gXKLb-0006XR-SB
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 01:19:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXKJl-0005aI-H1
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 01:17:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55412)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXKJj-0005WF-CD
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 01:17:53 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181211095057.14623-1-fli@suse.com>
-	<20181211095057.14623-4-fli@suse.com>
-Date: Thu, 13 Dec 2018 07:17:46 +0100
-In-Reply-To: <20181211095057.14623-4-fli@suse.com> (Fei Li's message of "Tue,
-	11 Dec 2018 17:50:53 +0800")
-Message-ID: <87wooec5md.fsf@dusky.pond.sub.org>
+	(envelope-from <no-reply@patchew.org>) id 1gXKLY-0007ZF-Hw
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 01:19:47 -0500
+Resent-Message-Id: <E1gXKLY-0007ZF-Hw@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21746)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gXKLY-0007Ws-7b
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 01:19:44 -0500
+In-Reply-To: <20181213015013.15350-1-jsnow@redhat.com>
+Message-ID: <154468195986.9757.4891655970247696579@02a1dbf831e2>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v8 3/7] migration: fix the multifd
- code when receiving less channels
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 12 Dec 2018 22:19:21 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] bitmaps: remove x- prefix from QMP
+ api
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,176 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <fli@suse.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: jsnow@redhat.com
+Cc: fam@euphon.net, qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, vsementsov@virtuozzo.com, armbru@redhat.com, mreitz@redhat.com
 
-Fei Li <fli@suse.com> writes:
-
-> In our current code, when multifd is used during migration, if there
-> is an error before the destination receives all new channels, the
-> source keeps running, however the destination does not exit but keeps
-> waiting until the source is killed deliberately.
->
-> Fix this by dumping the specific error and let users decide whether
-> to quit from the destination side when failing to receive packet via
-> some channel.
->
-> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Fei Li <fli@suse.com>
-> Reviewed-by: Peter Xu <peterx@redhat.com>
-> ---
->  migration/channel.c   | 11 ++++++-----
->  migration/migration.c |  9 +++++++--
->  migration/migration.h |  2 +-
->  migration/ram.c       | 10 ++++++++--
->  migration/ram.h       |  2 +-
->  5 files changed, 23 insertions(+), 11 deletions(-)
->
-> diff --git a/migration/channel.c b/migration/channel.c
-> index 33e0e9b82f..20e4c8e2dc 100644
-> --- a/migration/channel.c
-> +++ b/migration/channel.c
-> @@ -30,6 +30,7 @@
->  void migration_channel_process_incoming(QIOChannel *ioc)
->  {
->      MigrationState *s = migrate_get_current();
-> +    Error *local_err = NULL;
->  
->      trace_migration_set_incoming_channel(
->          ioc, object_get_typename(OBJECT(ioc)));
-> @@ -38,13 +39,13 @@ void migration_channel_process_incoming(QIOChannel *ioc)
->          *s->parameters.tls_creds &&
->          !object_dynamic_cast(OBJECT(ioc),
->                               TYPE_QIO_CHANNEL_TLS)) {
-> -        Error *local_err = NULL;
->          migration_tls_channel_process_incoming(s, ioc, &local_err);
-> -        if (local_err) {
-> -            error_report_err(local_err);
-> -        }
->      } else {
-> -        migration_ioc_process_incoming(ioc);
-> +        migration_ioc_process_incoming(ioc, &local_err);
-> +    }
-> +
-> +    if (local_err) {
-> +        error_report_err(local_err);
->      }
->  }
->  
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 49ffb9997a..72106bddf0 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -541,7 +541,7 @@ void migration_fd_process_incoming(QEMUFile *f)
->      migration_incoming_process();
->  }
->  
-> -void migration_ioc_process_incoming(QIOChannel *ioc)
-> +void migration_ioc_process_incoming(QIOChannel *ioc, Error **errp)
->  {
->      MigrationIncomingState *mis = migration_incoming_get_current();
->      bool start_migration;
-> @@ -563,9 +563,14 @@ void migration_ioc_process_incoming(QIOChannel *ioc)
->           */
->          start_migration = !migrate_use_multifd();
->      } else {
-> +        Error *local_err = NULL;
->          /* Multiple connections */
->          assert(migrate_use_multifd());
-> -        start_migration = multifd_recv_new_channel(ioc);
-> +        start_migration = multifd_recv_new_channel(ioc, &local_err);
-> +        if (local_err) {
-> +            error_propagate(errp, local_err);
-> +            return;
-> +        }
->      }
->  
->      if (start_migration) {
-> diff --git a/migration/migration.h b/migration/migration.h
-> index e413d4d8b6..02b7304610 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -229,7 +229,7 @@ struct MigrationState
->  void migrate_set_state(int *state, int old_state, int new_state);
->  
->  void migration_fd_process_incoming(QEMUFile *f);
-> -void migration_ioc_process_incoming(QIOChannel *ioc);
-> +void migration_ioc_process_incoming(QIOChannel *ioc, Error **errp);
->  void migration_incoming_process(void);
->  
->  bool  migration_has_all_channels(void);
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 7e7deec4d8..c7e3d6b0fd 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -1323,7 +1323,7 @@ bool multifd_recv_all_channels_created(void)
->  }
->  
->  /* Return true if multifd is ready for the migration, otherwise false */
-> -bool multifd_recv_new_channel(QIOChannel *ioc)
-> +bool multifd_recv_new_channel(QIOChannel *ioc, Error **errp)
->  {
->      MultiFDRecvParams *p;
->      Error *local_err = NULL;
-> @@ -1331,6 +1331,10 @@ bool multifd_recv_new_channel(QIOChannel *ioc)
->  
->      id = multifd_recv_initial_packet(ioc, &local_err);
->      if (id < 0) {
-> +        error_propagate_prepend(errp, local_err,
-> +                                "failed to receive packet"
-> +                                " via multifd channel %d: ",
-> +                                atomic_read(&multifd_recv_state->count));
->          multifd_recv_terminate_threads(local_err);
->          return false;
-
-Here, we return false without setting an error.
-
->      }
-> @@ -1340,6 +1344,7 @@ bool multifd_recv_new_channel(QIOChannel *ioc)
->          error_setg(&local_err, "multifd: received id '%d' already setup'",
->                     id);
->          multifd_recv_terminate_threads(local_err);
-> +        error_propagate(errp, local_err);
->          return false;
-
-Here, we return false with setting an error.
-
->      }
->      p->c = ioc;
-> @@ -1351,7 +1356,8 @@ bool multifd_recv_new_channel(QIOChannel *ioc)
->      qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
->                         QEMU_THREAD_JOINABLE);
->      atomic_inc(&multifd_recv_state->count);
-> -    return multifd_recv_state->count == migrate_multifd_channels();
-> +    return atomic_read(&multifd_recv_state->count) ==
-> +           migrate_multifd_channels();
-
-Here, we return either true of false without setting an error.
-
-Taken together, there are three cases:
-
-1. Succeed and return true
-
-2. Succeed and return false
-
-3. Fail (set an error) and return false.
-
-Assuming that's what we want: please update the function comment to
-spell them out.
-
->  }
->  
->  /**
-> diff --git a/migration/ram.h b/migration/ram.h
-> index 83ff1bc11a..046d3074be 100644
-> --- a/migration/ram.h
-> +++ b/migration/ram.h
-> @@ -47,7 +47,7 @@ int multifd_save_cleanup(Error **errp);
->  int multifd_load_setup(void);
->  int multifd_load_cleanup(Error **errp);
->  bool multifd_recv_all_channels_created(void);
-> -bool multifd_recv_new_channel(QIOChannel *ioc);
-> +bool multifd_recv_new_channel(QIOChannel *ioc, Error **errp);
->  
->  uint64_t ram_pagesize_summary(void);
->  int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIxMzAxNTAxMy4xNTM1
+MC0xLWpzbm93QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
+b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
+cm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE4MTIxMzAxNTAxMy4xNTM1MC0x
+LWpzbm93QHJlZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwLzddIGJp
+dG1hcHM6IHJlbW92ZSB4LSBwcmVmaXggZnJvbSBRTVAgYXBpCgo9PT0gVEVTVCBTQ1JJUFQgQkVH
+SU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxp
+bmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0t
+Zm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBl
+Y2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVz
+ICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMv
+Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAg
+IGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBT
+Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
+ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjdlZGNhMzIgaW90ZXN0czog
+YWRkIGlvdGVzdCAyMzYgZm9yIHRlc3RpbmcgYml0bWFwIG1lcmdlCjQ3NjBmMTIgaW90ZXN0czog
+YWxsb3cgcHJldHR5LXByaW50IGZvciBxbXBfbG9nCjE4NDc5YjYgaW90ZXN0czogYWRkIGZpbHRl
+cl9nZW5lcmF0ZWRfbm9kZV9pZHMKZTc0ZDhjNSBpb3Rlc3RzLnB5OiBkb24ndCBhYm9ydCBpZiBJ
+TUdLRVlTRUNSRVQgaXMgdW5kZWZpbmVkCjMyZDY4YmQ0IGJsb2NrOiByZW1vdmUgJ3gnIHByZWZp
+eCBmcm9tIGV4cGVyaW1lbnRhbCBiaXRtYXAgQVBJcwo4MjA1OWQ3IGJsb2NrZGV2OiBuLWFyeSBi
+aXRtYXAgbWVyZ2UKNTFiNmY0OCBibG9ja2RldjogYWJvcnQgdHJhbnNhY3Rpb25zIGluIHJldmVy
+c2Ugb3JkZXIKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNzogYmxvY2tk
+ZXY6IGFib3J0IHRyYW5zYWN0aW9ucyBpbiByZXZlcnNlIG9yZGVyLi4uCkNoZWNraW5nIFBBVENI
+IDIvNzogYmxvY2tkZXY6IG4tYXJ5IGJpdG1hcCBtZXJnZS4uLgpFUlJPUjogZXh0ZXJucyBzaG91
+bGQgYmUgYXZvaWRlZCBpbiAuYyBmaWxlcwojMjc6IEZJTEU6IGJsb2NrZGV2LmM6MjEyNToKK3Zv
+aWQgZG9fYmxvY2tfZGlydHlfYml0bWFwX21lcmdlKGNvbnN0IGNoYXIgKm5vZGUsIGNvbnN0IGNo
+YXIgKnRhcmdldCwKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTQ3IGxpbmVzIGNoZWNr
+ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENI
+IDMvNzogYmxvY2s6IHJlbW92ZSAneCcgcHJlZml4IGZyb20gZXhwZXJpbWVudGFsIGJpdG1hcCBB
+UElzLi4uCkNoZWNraW5nIFBBVENIIDQvNzogaW90ZXN0cy5weTogZG9uJ3QgYWJvcnQgaWYgSU1H
+S0VZU0VDUkVUIGlzIHVuZGVmaW5lZC4uLgpDaGVja2luZyBQQVRDSCA1Lzc6IGlvdGVzdHM6IGFk
+ZCBmaWx0ZXJfZ2VuZXJhdGVkX25vZGVfaWRzLi4uCkNoZWNraW5nIFBBVENIIDYvNzogaW90ZXN0
+czogYWxsb3cgcHJldHR5LXByaW50IGZvciBxbXBfbG9nLi4uCkNoZWNraW5nIFBBVENIIDcvNzog
+aW90ZXN0czogYWRkIGlvdGVzdCAyMzYgZm9yIHRlc3RpbmcgYml0bWFwIG1lcmdlLi4uCldBUk5J
+Tkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVl
+ZCB1cGRhdGluZz8KIzEyOiAKbmV3IGZpbGUgbW9kZSAxMDA3NTUKCnRvdGFsOiAwIGVycm9ycywg
+MSB3YXJuaW5ncywgMzkyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
+Y29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3Jn
+L2xvZ3MvMjAxODEyMTMwMTUwMTMuMTUzNTAtMS1qc25vd0ByZWRoYXQuY29tL3Rlc3RpbmcuY2hl
+Y2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
+YnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
+Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
