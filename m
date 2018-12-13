@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <michael@os.amperecomputing.com>) id 1gXVnK-0006cD-FJ
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:33:13 -0500
+	(envelope-from <prvs=87864c7eb=Alistair.Francis@wdc.com>)
+	id 1gXVpe-0000Qm-3C
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:35:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <michael@os.amperecomputing.com>) id 1gXVnG-00051F-Fw
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:33:10 -0500
-Received: from mail-eopbgr770109.outbound.protection.outlook.com
-	([40.107.77.109]:6328
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <michael@os.amperecomputing.com>)
-	id 1gXVnG-0004xz-2e
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:33:06 -0500
-From: Michael Spradling <michael@os.amperecomputing.com>
-Date: Thu, 13 Dec 2018 18:33:02 +0000
-Message-ID: <20181213183253.GE10456@mswork1>
-References: <20181130144404.GA32091@mswork1>
-	<faae3e4a-bce7-849a-b510-1c94ffb03413@redhat.com>
-In-Reply-To: <faae3e4a-bce7-849a-b510-1c94ffb03413@redhat.com>
+	(envelope-from <prvs=87864c7eb=Alistair.Francis@wdc.com>)
+	id 1gXVpZ-0003WA-S9
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:35:33 -0500
+From: Alistair Francis <Alistair.Francis@wdc.com>
+Date: Thu, 13 Dec 2018 18:34:52 +0000
+Message-ID: <17339beb25e8db709cd55882df726200de31b2b0.1544726044.git.alistair.francis@wdc.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <E9AD210760480B43A519A694E6E3D597@prod.exchangelabs.com>
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Loading snapshot with readonly qcow2 image
+Subject: [Qemu-devel] [PATCH v1 1/1] sifive_u: Add clock DT node for GEM
+ ethernet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,72 +24,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>, Anup Patel <Anup.Patel@wdc.com>
 
-On Nov 30 08:58, Eric Blake wrote:
-> On 11/30/18 8:44 AM, Michael Spradling wrote:
-> > Hello,
-> >=20
-> > I would like to resume a snapshot via the command line option -loadvm
-> > with a read only QCOW2 file.  For my use case, I would ideally like to
-> > load multiple instances of different snapshots from the same QCOW2 imag=
-e.
-> >=20
-> > It seems this is not possible at the moment as when a snapshot is loade=
-d, QEMU
-> > copies some meta data around in the qcow2 image.
-> >=20
-> > I have also tried to use the "-snapshot" option, which to my understand=
-ing
-> > creates a new temporary QCOW2 file with a backing file pointing the ori=
-ginal
-> > image passed on the command line.  This also does not work, when lookin=
-g
-> > through the source it appears QEMU only supports loading snapshots from=
- writable
-> > QCOW2 images and doesn't support loading from images in backing files.
-> >=20
-> > My question is has anyone looked into loading snapshots from a backing
-> > file?  I have attempted to look through the code and this looks to be
-> > difficult.  If I attempt to add support for this is there any general
-> > advice to follow?  Any other ideas?
->=20
-> 'qemu-nbd -l' can serve snapshots from a qcow2 file; perhaps that can be
-> used to cobble together something that works for your needs?
->=20
-> Sadly, internal snapshots don't get much attention these days, so there m=
-ay
-> well be missing functionality, but no one is really stepping up to provid=
-e
-> patches.
->=20
-> --=20
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
+From: Anup Patel <anup@brainfault.org>
 
-I looked at "qemu-nbd -l" and this seems to only export a readonly
-interface.  Really, what I need is a writable temp file that can load a
-snapshot snapshot.
+The GEM ethernet on SiFive unleashed has fixed input clock
+of 125MHz as-per SiFive FU540 manual. This patch updates FDT
+generation for QEMU sifive_u machine to provide fixed-rate
+clock for GEM ethernet.
 
-Please excuse and correct me if I get some of the terminology of the
-sections below wrong.
+Signed-off-by: Anup Patel <anup@brainfault.org>
+Signed-off-by: Anup Patel <anup.patel@wdc.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ hw/riscv/sifive_u.c         | 18 +++++++++++++++++-
+ include/hw/riscv/sifive_u.h |  3 ++-
+ 2 files changed, 19 insertions(+), 2 deletions(-)
 
-I went down the path of hacking up some of the qemu qcow2 file system
-code to see if I can achieve the ability to restore a snapshot from a
-backing file to the temporarily created "-snapshot" qcow2 image.  The
-backing file has been marked readonly by the filesystem and the active
-image file was created with the "-snapshot" option.  I spend some time
-reading the qcow2 documentation and it seems I have to copy the l1 and
-l2 table values(are these actual host clusters) from the backing file
-snapshot to the active images l1 and l2 tables.  Is there anything else
-that may need updated that I have not yet stumbled upon?
-
-I still don't have this working yet and I believe my area of problems is
-qcow2_update_snapshot_refcount.  Can anyone explain what this does
-exactly.  It seems the function does three different things based on the
-value of addend, either -1, 0, 1, but its somewhat unclear.
-
-Thanks,
-Michael
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index ef07df2442..5c41ee5017 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -85,7 +85,8 @@ static void create_fdt(SiFiveUState *s, const struct Memm=
+apEntry *memmap,
+     int cpu;
+     uint32_t *cells;
+     char *nodename;
+-    uint32_t plic_phandle;
++    char ethclk_names[] =3D "pclk\0hclk\0tx_clk";
++    uint32_t plic_phandle, ethclk_phandle;
+=20
+     fdt =3D s->fdt =3D create_device_tree(&s->fdt_size);
+     if (!fdt) {
+@@ -197,6 +198,17 @@ static void create_fdt(SiFiveUState *s, const struct M=
+emmapEntry *memmap,
+     g_free(cells);
+     g_free(nodename);
+=20
++    nodename =3D g_strdup_printf("/soc/ethclk");
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_string(fdt, nodename, "compatible", "fixed-clock");
++    qemu_fdt_setprop_cell(fdt, nodename, "#clock-cells", 0x0);
++    qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
++        SIFIVE_U_GEM_CLOCK_FREQ);
++    qemu_fdt_setprop_cell(fdt, nodename, "phandle", 3);
++    qemu_fdt_setprop_cell(fdt, nodename, "linux,phandle", 3);
++    ethclk_phandle =3D qemu_fdt_get_phandle(fdt, nodename);
++    g_free(nodename);
++
+     nodename =3D g_strdup_printf("/soc/ethernet@%lx",
+         (long)memmap[SIFIVE_U_GEM].base);
+     qemu_fdt_add_subnode(fdt, nodename);
+@@ -208,6 +220,10 @@ static void create_fdt(SiFiveUState *s, const struct M=
+emmapEntry *memmap,
+     qemu_fdt_setprop_string(fdt, nodename, "phy-mode", "gmii");
+     qemu_fdt_setprop_cells(fdt, nodename, "interrupt-parent", plic_phandle=
+);
+     qemu_fdt_setprop_cells(fdt, nodename, "interrupts", SIFIVE_U_GEM_IRQ);
++    qemu_fdt_setprop_cells(fdt, nodename, "clocks",
++        ethclk_phandle, ethclk_phandle, ethclk_phandle);
++    qemu_fdt_setprop(fdt, nodename, "clocks-names", ethclk_names,
++        sizeof(ethclk_names));
+     qemu_fdt_setprop_cells(fdt, nodename, "#address-cells", 1);
+     qemu_fdt_setprop_cells(fdt, nodename, "#size-cells", 0);
+     g_free(nodename);
+diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+index e8b4d9ffa3..be13cc1304 100644
+--- a/include/hw/riscv/sifive_u.h
++++ b/include/hw/riscv/sifive_u.h
+@@ -63,7 +63,8 @@ enum {
+ };
+=20
+ enum {
+-    SIFIVE_U_CLOCK_FREQ =3D 1000000000
++    SIFIVE_U_CLOCK_FREQ =3D 1000000000,
++    SIFIVE_U_GEM_CLOCK_FREQ =3D 125000000
+ };
+=20
+ #define SIFIVE_U_PLIC_HART_CONFIG "MS"
+--=20
+2.19.1
