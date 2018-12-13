@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gXJCm-0007nw-T7
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:39 -0500
+	(envelope-from <cota@braap.org>) id 1gXJCp-0007oI-8B
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gXJCl-0001oB-9S
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:36 -0500
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:48279)
+	(envelope-from <cota@braap.org>) id 1gXJCn-0001rI-0w
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:38 -0500
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:50433)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gXJCk-0001Tz-Rs
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:34 -0500
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gXJCm-0001Uf-Cg
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:36 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 13 Dec 2018 00:04:10 -0500
-Message-Id: <20181213050453.9677-31-cota@braap.org>
+Date: Thu, 13 Dec 2018 00:04:12 -0500
+Message-Id: <20181213050453.9677-33-cota@braap.org>
 In-Reply-To: <20181213050453.9677-1-cota@braap.org>
 References: <20181213050453.9677-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v5 30/73] cpu-exec: convert to cpu_halted
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 32/73] cpu: define cpu_interrupt_request
+ helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,72 +30,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
+Add a comment about how atomic_read works here. The comment refers to
+a "BQL-less CPU loop", which will materialize toward the end
+of this series.
+
+Note that the modifications to cpu_reset_interrupt are there to
+avoid deadlock during the CPU lock transition; once that is complete,
+cpu_interrupt_request will be simple again.
+
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/cpu-exec.c | 25 +++++++++++++++++++++----
- 1 file changed, 21 insertions(+), 4 deletions(-)
+ include/qom/cpu.h | 37 +++++++++++++++++++++++++++++++++++++
+ qom/cpu.c         | 27 +++++++++++++++++++++------
+ 2 files changed, 58 insertions(+), 6 deletions(-)
 
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index 870027d435..b4f46134d3 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -422,14 +422,21 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
-     return tb;
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 9c5aad1797..95747f5abf 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -505,6 +505,43 @@ static inline void cpu_halted_set(CPUState *cpu, uint32_t val)
+     cpu_mutex_unlock(cpu);
  }
  
--static inline bool cpu_handle_halt(CPUState *cpu)
-+static inline bool cpu_handle_halt_locked(CPUState *cpu)
- {
--    if (cpu->halted) {
-+    g_assert(cpu_mutex_locked(cpu));
-+
-+    if (cpu_halted(cpu)) {
- #if defined(TARGET_I386) && !defined(CONFIG_USER_ONLY)
-         if ((cpu->interrupt_request & CPU_INTERRUPT_POLL)
-             && replay_interrupt()) {
-             X86CPU *x86_cpu = X86_CPU(cpu);
-+
-+            /* prevent deadlock; cpu_mutex must be acquired _after_ the BQL */
-+            cpu_mutex_unlock(cpu);
-             qemu_mutex_lock_iothread();
-+            cpu_mutex_lock(cpu);
-+
-             apic_poll_irq(x86_cpu->apic_state);
-             cpu_reset_interrupt(cpu, CPU_INTERRUPT_POLL);
-             qemu_mutex_unlock_iothread();
-@@ -439,12 +446,22 @@ static inline bool cpu_handle_halt(CPUState *cpu)
-             return true;
-         }
- 
--        cpu->halted = 0;
-+        cpu_halted_set(cpu, 0);
-     }
- 
-     return false;
- }
- 
-+static inline bool cpu_handle_halt(CPUState *cpu)
++/*
++ * When sending an interrupt, setters OR the appropriate bit and kick the
++ * destination vCPU. The latter can then read interrupt_request without
++ * acquiring the CPU lock, because once the kick-induced completes, they'll read
++ * an up-to-date interrupt_request.
++ * Setters always acquire the lock, which guarantees that (1) concurrent
++ * updates from different threads won't result in data races, and (2) the
++ * BQL-less CPU loop will always see an up-to-date interrupt_request, since the
++ * loop holds the CPU lock.
++ */
++static inline uint32_t cpu_interrupt_request(CPUState *cpu)
 +{
-+    bool ret;
-+
-+    cpu_mutex_lock(cpu);
-+    ret = cpu_handle_halt_locked(cpu);
-+    cpu_mutex_unlock(cpu);
-+    return ret;
++    return atomic_read(&cpu->interrupt_request);
 +}
 +
- static inline void cpu_handle_debug_exception(CPUState *cpu)
++static inline void cpu_interrupt_request_or(CPUState *cpu, uint32_t mask)
++{
++    if (cpu_mutex_locked(cpu)) {
++        atomic_set(&cpu->interrupt_request, cpu->interrupt_request | mask);
++        return;
++    }
++    cpu_mutex_lock(cpu);
++    atomic_set(&cpu->interrupt_request, cpu->interrupt_request | mask);
++    cpu_mutex_unlock(cpu);
++}
++
++static inline void cpu_interrupt_request_set(CPUState *cpu, uint32_t val)
++{
++    if (cpu_mutex_locked(cpu)) {
++        atomic_set(&cpu->interrupt_request, val);
++        return;
++    }
++    cpu_mutex_lock(cpu);
++    atomic_set(&cpu->interrupt_request, val);
++    cpu_mutex_unlock(cpu);
++}
++
+ static inline void cpu_tb_jmp_cache_clear(CPUState *cpu)
  {
-     CPUClass *cc = CPU_GET_CLASS(cpu);
-@@ -543,7 +560,7 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
-         } else if (interrupt_request & CPU_INTERRUPT_HALT) {
-             replay_interrupt();
-             cpu->interrupt_request &= ~CPU_INTERRUPT_HALT;
--            cpu->halted = 1;
-+            cpu_halted_set(cpu, 1);
-             cpu->exception_index = EXCP_HLT;
-             qemu_mutex_unlock_iothread();
-             return true;
+     unsigned int i;
+diff --git a/qom/cpu.c b/qom/cpu.c
+index 4e964255bf..44b78f1892 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -98,14 +98,29 @@ static void cpu_common_get_memory_mapping(CPUState *cpu,
+  * BQL here if we need to.  cpu_interrupt assumes it is held.*/
+ void cpu_reset_interrupt(CPUState *cpu, int mask)
+ {
+-    bool need_lock = !qemu_mutex_iothread_locked();
++    bool has_bql = qemu_mutex_iothread_locked();
++    bool has_cpu_lock = cpu_mutex_locked(cpu);
+ 
+-    if (need_lock) {
+-        qemu_mutex_lock_iothread();
++    if (has_bql) {
++        if (has_cpu_lock) {
++            atomic_set(&cpu->interrupt_request, cpu->interrupt_request & ~mask);
++        } else {
++            cpu_mutex_lock(cpu);
++            atomic_set(&cpu->interrupt_request, cpu->interrupt_request & ~mask);
++            cpu_mutex_unlock(cpu);
++        }
++        return;
++    }
++
++    if (has_cpu_lock) {
++        cpu_mutex_unlock(cpu);
+     }
+-    cpu->interrupt_request &= ~mask;
+-    if (need_lock) {
+-        qemu_mutex_unlock_iothread();
++    qemu_mutex_lock_iothread();
++    cpu_mutex_lock(cpu);
++    atomic_set(&cpu->interrupt_request, cpu->interrupt_request & ~mask);
++    qemu_mutex_unlock_iothread();
++    if (!has_cpu_lock) {
++        cpu_mutex_unlock(cpu);
+     }
+ }
+ 
 -- 
 2.17.1
