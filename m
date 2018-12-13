@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gXJCx-0007yC-IA
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:50 -0500
+	(envelope-from <cota@braap.org>) id 1gXJCw-0007x5-G3
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gXJCw-00026l-2i
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:47 -0500
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:60223)
+	(envelope-from <cota@braap.org>) id 1gXJCv-00023C-E8
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:46 -0500
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:51775)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gXJCv-0001nz-Qy
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gXJCv-0001n1-6H
 	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 00:06:45 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu, 13 Dec 2018 00:04:36 -0500
-Message-Id: <20181213050453.9677-57-cota@braap.org>
+Date: Thu, 13 Dec 2018 00:04:33 -0500
+Message-Id: <20181213050453.9677-54-cota@braap.org>
 In-Reply-To: <20181213050453.9677-1-cota@braap.org>
 References: <20181213050453.9677-1-cota@braap.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 56/73] openrisc: convert to
+Subject: [Qemu-devel] [PATCH v5 53/73] alpha: convert to
  cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,44 +28,33 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Stafford Horne <shorne@gmail.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Cc: Stafford Horne <shorne@gmail.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- hw/openrisc/cputimer.c | 2 +-
- target/openrisc/cpu.c  | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ target/alpha/cpu.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/openrisc/cputimer.c b/hw/openrisc/cputimer.c
-index 850f88761c..739404e4f5 100644
---- a/hw/openrisc/cputimer.c
-+++ b/hw/openrisc/cputimer.c
-@@ -102,7 +102,7 @@ static void openrisc_timer_cb(void *opaque)
-         CPUState *cs = CPU(cpu);
- 
-         cpu->env.ttmr |= TTMR_IP;
--        cs->interrupt_request |= CPU_INTERRUPT_TIMER;
-+        cpu_interrupt_request_or(cs, CPU_INTERRUPT_TIMER);
-     }
- 
-     switch (cpu->env.ttmr & TTMR_M) {
-diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
-index fb7cb5c507..cdbc9353b7 100644
---- a/target/openrisc/cpu.c
-+++ b/target/openrisc/cpu.c
-@@ -32,8 +32,8 @@ static void openrisc_cpu_set_pc(CPUState *cs, vaddr value)
- 
- static bool openrisc_cpu_has_work(CPUState *cs)
- {
--    return cs->interrupt_request & (CPU_INTERRUPT_HARD |
--                                    CPU_INTERRUPT_TIMER);
-+    return cpu_interrupt_request(cs) & (CPU_INTERRUPT_HARD |
-+                                        CPU_INTERRUPT_TIMER);
+diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
+index a953897fcc..4e8965fb6c 100644
+--- a/target/alpha/cpu.c
++++ b/target/alpha/cpu.c
+@@ -42,10 +42,10 @@ static bool alpha_cpu_has_work(CPUState *cs)
+        assume that if a CPU really wants to stay asleep, it will mask
+        interrupts at the chipset level, which will prevent these bits
+        from being set in the first place.  */
+-    return cs->interrupt_request & (CPU_INTERRUPT_HARD
+-                                    | CPU_INTERRUPT_TIMER
+-                                    | CPU_INTERRUPT_SMP
+-                                    | CPU_INTERRUPT_MCHK);
++    return cpu_interrupt_request(cs) & (CPU_INTERRUPT_HARD
++                                        | CPU_INTERRUPT_TIMER
++                                        | CPU_INTERRUPT_SMP
++                                        | CPU_INTERRUPT_MCHK);
  }
  
- static void openrisc_disas_set_info(CPUState *cpu, disassemble_info *info)
+ static void alpha_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
 -- 
 2.17.1
