@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gXHce-0003ie-Ti
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 22:25:13 -0500
+	(envelope-from <jiangyiwen@huawei.com>) id 1gXHf2-0004Ob-2h
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 22:27:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gXHcb-000554-Nz
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 22:25:12 -0500
-Received: from ozlabs.org ([203.11.71.1]:51563)
+	(envelope-from <jiangyiwen@huawei.com>) id 1gXHey-0000Qg-8a
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 22:27:40 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:40067 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1gXHcV-0004u8-3d
-	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 22:25:05 -0500
-Date: Thu, 13 Dec 2018 14:24:52 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181213032452.GA25689@umbus.fritz.box>
-References: <20180830143348.10595-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <jiangyiwen@huawei.com>)
+	id 1gXHeu-0000Gx-LQ
+	for qemu-devel@nongnu.org; Wed, 12 Dec 2018 22:27:34 -0500
+References: <5C10DAE9.3010605@huawei.com>
+	<20181212081902-mutt-send-email-mst@kernel.org>
+From: jiangyiwen <jiangyiwen@huawei.com>
+Message-ID: <5C11D19C.4010007@huawei.com>
+Date: Thu, 13 Dec 2018 11:27:24 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="pf9I7BMVVzbSWLtt"
-Content-Disposition: inline
-In-Reply-To: <20180830143348.10595-1-marcandre.lureau@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] seccomp: check TSYNC host capability
+In-Reply-To: <20181212081902-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] vhost-vsock: support parse mergeable
+ feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,77 +29,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, otubo@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 
+On 2018/12/12 21:19, Michael S. Tsirkin wrote:
+> On Wed, Dec 12, 2018 at 05:54:49PM +0800, jiangyiwen wrote:
+>> Currently vhost-vsock doesn't have any feature bits, so it
+>> don't support parse mergeable rx buffer feature. And the
+>> feature is support in another series of patches named
+>> "VSOCK: support mergeable rx buffer in vhost-vsock".
+>>
+>> So we neet to support parse mergeable feature in vhost-vsock
+>> if above patches are merged.
+>>
+>> Signed-off-by: Yiwen Jiang <jiangyiwen@huawei.com>
+> 
+> OK but what does it do? this just defines the feature bit ...
+> Also pls copy virtio-dev whenever you change the host/guest
+> interface.
+> 
+> Thanks!
+> 
 
---pf9I7BMVVzbSWLtt
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Michael,
 
-On Thu, Aug 30, 2018 at 04:33:48PM +0200, Marc-Andr=E9 Lureau wrote:
-> Remove -sandbox option if the host is not capable of TSYNC, since the
-> sandbox will fail at setup time otherwise. This will help libvirt, for
-> ex, to figure out if -sandbox will work.
->=20
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+In my opinion, for vhost device, device feature bits need to be
+intersected between vhost and qemu, so I add mergeable rx buffer feature
+into vdev->host_features, and then intersected with vhost_dev features.
 
-This seems to have introduced a regression, which I found when
-preparing a ppc pull request.  Specifically when running with RHEL7 on
-a POWER host, using "-sandbox off" which one of my tests did, causes a
-cryptic error followed by a SEGV:
+Later if someone want to add new feature, it can use virtio_add_feature()
+in vhost_vsock_get_features().
 
-$ ./ppc64-softmmu/qemu-system-ppc64 -sandbox off
-qemu-system-ppc64: -sandbox off: There is no option group 'sandbox'
-Segmentation fault
-$ ./x86_64-softmmu/qemu-system-x86_64 -sandbox off
-qemu-system-x86_64: -sandbox off: There is no option group 'sandbox'
-Segmentation fault
+Thanks,
+Yiwen.
 
-I think the problem is that while this wrapped one use of the sandbox
-option group to produce a sensible error, it didn't do the same for
-another call to qemu_opts_parse_noisily():
-
-(gdb) bt
-#0  0x00000000105b36d8 in opts_parse (list=3D0x0, params=3D0x3ffffffffab5 "=
-off", permit_abbrev=3Dtrue, defaults=3Dfalse, errp=3D0x3ffffffff080)
-    at util/qemu-option.c:829
-#1  0x00000000105b3b74 in qemu_opts_parse_noisily (list=3D<optimized out>, =
-params=3D<optimized out>, permit_abbrev=3D<optimized out>) at util/qemu-opt=
-ion.c:890
-#2  0x0000000010024964 in main (argc=3D<optimized out>, argv=3D<optimized o=
-ut>, envp=3D<optimized out>) at vl.c:3589
-
-I'm guessing RHEL7 triggers it because that has a version of
-libseccomp that doesn't support the feature needed to complete
-registration (maybe on ppc host only; I haven't had a chance to try on
-an x86 RHEL7 host).
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---pf9I7BMVVzbSWLtt
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwR0QIACgkQbDjKyiDZ
-s5LB5xAAwVlekPEQ30LyWDPSiN3NiCm3tmoyFVIZy4SBFscIhzKC4n+6K1QUmLIL
-Uvm4P51Z7qBFQqrbilu9kyKrPgeMKvYs4ipDhTGn+rbiuotOMsh5Op/qGNcbDZfh
-VTtV3xF7z1StoxH8/Ba27kDp9FDnNOdL0aN2Zsxc61P+NpqPUpl1k+qT1A7FB4Yz
-Nz5MdKGEqexCzmCpHp/0ZgVeoCeBXJvVcfBQtK04TI5AHOsGVHZAVoJYZstEDbN4
-EnEMC3q+YIPyQ+D7sqHt3pTgu22LmzRZbSFUNVZ+HDD5lGpXO6fnuweTyCqA5un/
-4IUiDSpUFLcEAMq3WDHkuTVUU29u1j09SGs+bCgOYwE6cUOwJ0mvQUVEGMBgUKjy
-3NT+PM4McXt0L1WvD6Wn5VGs7b0oTUdDorhmTCAee+Bn8oWP3aJH0FXJhauBq9FO
-1rlRLlEpED3lsU60ZSOIoqdohlfcdSSZ00yDJHKkTOuH6OGIJl6IAytUqql6unzc
-pPd2bl0XyRtn4HHp32srIBBxNkdpeIrfTftfE+l7uE2vV5Uoh3DDja6yCjsFb2t3
-zjfrl1SK86/rZqFiScTyq+xQFwvTtW+gC+LMWKpQ+JqkuzriJKdqYjbxfa1olfHo
-eeSDxiWH5xcebTAv9cLeGypUUoDTmJyV9IavvbldcWDeibRLwQI=
-=dP5h
------END PGP SIGNATURE-----
-
---pf9I7BMVVzbSWLtt--
+>> ---
+>>  hw/virtio/vhost-vsock.c                       | 9 +++++++--
+>>  include/standard-headers/linux/virtio_vsock.h | 3 +++
+>>  2 files changed, 10 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/virtio/vhost-vsock.c b/hw/virtio/vhost-vsock.c
+>> index aa5af92..5023c05 100644
+>> --- a/hw/virtio/vhost-vsock.c
+>> +++ b/hw/virtio/vhost-vsock.c
+>> @@ -178,8 +178,13 @@ static uint64_t vhost_vsock_get_features(VirtIODevice *vdev,
+>>                                           uint64_t requested_features,
+>>                                           Error **errp)
+>>  {
+>> -    /* No feature bits used yet */
+>> -    return requested_features;
+>> +    VHostVSock *vsock = VHOST_VSOCK(vdev);
+>> +    uint64_t features;
+>> +
+>> +    virtio_add_feature(&requested_features, VIRTIO_VSOCK_F_MRG_RXBUF);
+>> +    features = requested_features & vsock->vhost_dev.features;
+>> +
+>> +    return features;
+>>  }
+>>
+>>  static void vhost_vsock_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+>> diff --git a/include/standard-headers/linux/virtio_vsock.h b/include/standard-headers/linux/virtio_vsock.h
+>> index be44321..4c583ec 100644
+>> --- a/include/standard-headers/linux/virtio_vsock.h
+>> +++ b/include/standard-headers/linux/virtio_vsock.h
+>> @@ -38,6 +38,9 @@
+>>  #include "standard-headers/linux/virtio_ids.h"
+>>  #include "standard-headers/linux/virtio_config.h"
+>>
+>> +/* Virtio-vsock feature */
+>> +#define VIRTIO_VSOCK_F_MRG_RXBUF 0 /* Host can merge receive buffers. */
+>> +
+>>  struct virtio_vsock_config {
+>>  	uint64_t guest_cid;
+>>  } QEMU_PACKED;
+>> -- 
+>> 1.8.3.1
+>>
+> 
+> .
+> 
