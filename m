@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gXVsj-0002tT-BG
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:38:46 -0500
+	(envelope-from <armbru@redhat.com>) id 1gXVxi-0005c8-8W
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:43:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gXVsh-0005pe-Bh
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:38:44 -0500
-References: <20181213015013.15350-1-jsnow@redhat.com>
-	<20181213015013.15350-8-jsnow@redhat.com>
-	<2818268a-ed9e-a106-720c-d65c816d2f2c@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <a04fe821-e0c7-a99c-ded4-fc4354437883@redhat.com>
-Date: Thu, 13 Dec 2018 13:38:32 -0500
-MIME-Version: 1.0
-In-Reply-To: <2818268a-ed9e-a106-720c-d65c816d2f2c@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] iotests: add iotest 236 for testing
- bitmap merge
+	(envelope-from <armbru@redhat.com>) id 1gXVxc-0001Zj-OB
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:43:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43090)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXVxc-0001Gc-D9
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 13:43:48 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 130A13086249
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 18:43:44 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Thu, 13 Dec 2018 19:43:11 +0100
+Message-Id: <20181213184340.24037-4-armbru@redhat.com>
+In-Reply-To: <20181213184340.24037-1-armbru@redhat.com>
+References: <20181213184340.24037-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PULL 03/32] qapi: Fix string-input-visitor to reject
+ NaN and infinities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,153 +30,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: David Hildenbrand <david@redhat.com>
 
+From: David Hildenbrand <david@redhat.com>
 
+The string-input-visitor happily accepts NaN and infinities when parsing
+numbers (doubles). They shouldn't. Fix that.
 
-On 12/13/18 8:50 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 13.12.2018 4:50, John Snow wrote:
->> New interface, new smoke test.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>   tests/qemu-iotests/236     | 123 +++++++++++++++++
->>   tests/qemu-iotests/236.out | 265 +++++++++++++++++++++++++++++++++++++
->>   tests/qemu-iotests/group   |   1 +
->>   3 files changed, 389 insertions(+)
->>   create mode 100755 tests/qemu-iotests/236
->>   create mode 100644 tests/qemu-iotests/236.out
->>
->> diff --git a/tests/qemu-iotests/236 b/tests/qemu-iotests/236
->> new file mode 100755
->> index 0000000000..3d162e967b
->> --- /dev/null
->> +++ b/tests/qemu-iotests/236
->> @@ -0,0 +1,123 @@
->> +#!/usr/bin/env python
->> +#
->> +# Test bitmap merges.
->> +#
->> +# Copyright (c) 2018 John Snow for Red Hat, Inc.
->> +#
->> +# This program is free software; you can redistribute it and/or modify
->> +# it under the terms of the GNU General Public License as published by
->> +# the Free Software Foundation; either version 2 of the License, or
->> +# (at your option) any later version.
->> +#
->> +# This program is distributed in the hope that it will be useful,
->> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
->> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> +# GNU General Public License for more details.
->> +#
->> +# You should have received a copy of the GNU General Public License
->> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
->> +#
->> +# owner=jsnow@redhat.com
->> +
->> +import sys
->> +import os
->> +import iotests
->> +from iotests import log
->> +sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'scripts'))
->> +from qemu import QEMUMachine
-> 
-> unused, with previous line and, therefore, os and sys modules)
-> 
+Also, add two test cases, testing if "NaN" and "inf" is properly
+rejected.
 
-Forgive the copy and paste. I'll trim it down.
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20181121164421.20780-4-david@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ qapi/string-input-visitor.c       |  6 ++----
+ tests/test-string-input-visitor.c | 13 +++++++++++++
+ 2 files changed, 15 insertions(+), 4 deletions(-)
 
->> +
->> +iotests.verify_image_format(supported_fmts=['qcow2'])
->> +
->> +patterns = [("0x5d", "0",         "64k"),
->> +            ("0xd5", "1M",        "64k"),
->> +            ("0xdc", "32M",       "64k"),
->> +            ("0xcd", "0x3ff0000", "64k")]  # 64M - 64K
->> +
->> +overwrite = [("0xab", "0",         "64k"), # Full overwrite
->> +             ("0xad", "0x00f8000", "64k"), # Partial-left (1M-32K)
->> +             ("0x1d", "0x2008000", "64k"), # Partial-right (32M+32K)
->> +             ("0xea", "0x3fe0000", "64k")] # Adjacent-left (64M - 128K)
->> +
->> +with iotests.FilePath('img') as img_path, \
->> +     iotests.VM() as vm:
->> +
->> +    log('--- Preparing image & VM ---\n')
->> +    iotests.qemu_img_pipe('create', '-f', iotests.imgfmt, img_path, '64M')
-> 
-> hm, actually null device is enough here.
-> 
-
-Sure.
-
->> +    vm.add_drive(img_path)
->> +    vm.launch()
->> +
->> +    log('--- Adding preliminary bitmaps A & B ---\n')
->> +    vm.qmp_log("block-dirty-bitmap-add", node="drive0", name="bitmapA")
->> +    vm.qmp_log("block-dirty-bitmap-add", node="drive0", name="bitmapB")
->> +
->> +    # Dirties 4 clusters. count=262144 > +    log('')
->> +    log('--- Emulating writes ---\n')
->> +    for p in patterns:
->> +        cmd = "write -P%s %s %s" % p
->> +        log(cmd)
->> +        log(vm.hmp_qemu_io("drive0", cmd))
->> +
->> +    vm.qmp_log("query-block", indent=2,
->> +               filters=[iotests.filter_generated_node_ids,
->> +                        iotests.filter_testfiles])
-> 
-> I'm against. query-block prints a lot of unrelated things, which may change from
-> version to version (for example, Andrey is now adding bitmap information to qcow2
-> format-specific info), then, backported test may fail for previous versions (or just
-> different config) because of something absolutely unrelated to bitmaps.
-> 
-
-You have a point. I'm only interested in the bitmap info structures, here.
-
-> I think, it should be shortened to result[0]['device'], result[0]['dirty-bitmaps']
-> 
-
-OK, let me look at printing something like
-
-{
-  "device0": bitmapInfo0,
-  "device1": bitmapInfo1,
-  ...
-}
-
-to the log.
-
-> And, I think, any way it would be good to create a separate helper for printing
-> current state of bitmaps (which may output their sha256 too)
-> 
-
-Yeah, I was working on a command to do just this but I ran into troubles
-with caching the bitmap info for computing it and wound up shelving the
-series and I got sidetracked on other issues...
-
->> +
->> +    log('')
->> +    log('--- Disabling B & Adding C ---\n')
-> 
-> why not just
-> log('\n--- Disabling B & Adding C ---\n')
-> 
-
-Just preference, there's no reason.
-
-I have a habit of avoiding pre-pending control characters to string
-lines, but don't have an aversion to appending them.
-
-I can change it if it sticks out as too unusual.
-
-> [...]
-> 
-> Otherwise, the test looks fine for me
-> 
-> 
-
-Thanks for looking!
+diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
+index b3fdd0827d..b89c6c4e06 100644
+--- a/qapi/string-input-visitor.c
++++ b/qapi/string-input-visitor.c
+@@ -20,6 +20,7 @@
+ #include "qemu/option.h"
+ #include "qemu/queue.h"
+ #include "qemu/range.h"
++#include "qemu/cutils.h"
+ 
+ 
+ struct StringInputVisitor
+@@ -313,12 +314,9 @@ static void parse_type_number(Visitor *v, const char *name, double *obj,
+                               Error **errp)
+ {
+     StringInputVisitor *siv = to_siv(v);
+-    char *endp = (char *) siv->string;
+     double val;
+ 
+-    errno = 0;
+-    val = strtod(siv->string, &endp);
+-    if (errno || endp == siv->string || *endp) {
++    if (qemu_strtod_finite(siv->string, NULL, &val)) {
+         error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
+                    "number");
+         return;
+diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-visitor.c
+index 88e0e1aa9a..1efba06948 100644
+--- a/tests/test-string-input-visitor.c
++++ b/tests/test-string-input-visitor.c
+@@ -252,6 +252,19 @@ static void test_visitor_in_number(TestInputVisitorData *data,
+     visit_type_number(v, NULL, &res, &err);
+     g_assert(!err);
+     g_assert_cmpfloat(res, ==, value);
++
++    /* NaN and infinity has to be rejected */
++
++    v = visitor_input_test_init(data, "NaN");
++
++    visit_type_number(v, NULL, &res, &err);
++    error_free_or_abort(&err);
++
++    v = visitor_input_test_init(data, "inf");
++
++    visit_type_number(v, NULL, &res, &err);
++    error_free_or_abort(&err);
++
+ }
+ 
+ static void test_visitor_in_string(TestInputVisitorData *data,
+-- 
+2.17.2
