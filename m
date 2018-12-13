@@ -1,40 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1gXRTN-0003y5-78
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:56:18 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gXRV1-0004d3-Cd
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:58:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1gXRTJ-0005sE-OR
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:56:17 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38116
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1gXRTJ-0005rs-HK
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:56:13 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wBDDsFGQ102607
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 08:56:12 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2pbqb2cdxn-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 08:56:12 -0500
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
-	Thu, 13 Dec 2018 13:56:11 -0000
-References: <1544623878-11248-1-git-send-email-jjherne@linux.ibm.com>
-	<1544623878-11248-6-git-send-email-jjherne@linux.ibm.com>
-From: Farhan Ali <alifm@linux.ibm.com>
-Date: Thu, 13 Dec 2018 08:55:54 -0500
-MIME-Version: 1.0
-In-Reply-To: <1544623878-11248-6-git-send-email-jjherne@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gXRV0-0008FC-96
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 08:57:59 -0500
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Date: Thu, 13 Dec 2018 13:57:49 +0000
+Message-ID: <6243b734-b759-865e-391b-f46fcd9f7f96@virtuozzo.com>
+References: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
+	<20181203101429.88735-9-anton.nefedov@virtuozzo.com>
+	<1133b70c-6b8f-1622-18a8-188a4b9fe142@virtuozzo.com>
+In-Reply-To: <1133b70c-6b8f-1622-18a8-188a4b9fe142@virtuozzo.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <9e5bb504-fb73-01bb-779f-49ca5780280f@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 05/15] s390-bios: Factor finding boot
- device out of virtio code path
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <DEED82E8F9625D479A83685FD94C6494@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v10 8/9] qcow2: skip writing zero buffers
+ to empty COW areas
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,182 +27,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com, borntraeger@de.ibm.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
 
-
-
-On 12/12/2018 09:11 AM, Jason J. Herne wrote:
-> Make a new routine find_boot_device to locate the boot device for all
-> cases. not just virtio.
-
-I don't think there should be a period after cases?
-
-> 
-> In one case no boot device is specified and a suitable boot device can not
-> be auto detected. The error message for this case was specific to virtio
-> devices. We update this message to remove virtio specific wording.
-> 
-> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-> ---
->   pc-bios/s390-ccw/main.c  | 87 ++++++++++++++++++++++++++----------------------
->   tests/boot-serial-test.c |  2 +-
->   2 files changed, 49 insertions(+), 40 deletions(-)
-> 
-> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-> index 7e3f65e..2457752 100644
-> --- a/pc-bios/s390-ccw/main.c
-> +++ b/pc-bios/s390-ccw/main.c
-> @@ -55,17 +55,18 @@ unsigned int get_loadparm_index(void)
->    * NOTE: The global variable blk_schid is updated to contain the subchannel
->    * information.
->    */
-> -static bool find_dev(Schib *schib, int dev_no)
-> +static bool find_subch(int dev_no)
->   {
-> +    Schib schib;
->       int i, r;
-> 
->       for (i = 0; i < 0x10000; i++) {
->           blk_schid.sch_no = i;
-> -        r = stsch_err(blk_schid, schib);
-> +        r = stsch_err(blk_schid, &schib);
->           if ((r == 3) || (r == -EIO)) {
->               break;
->           }
-> -        if (!schib->pmcw.dnv) {
-> +        if (!schib.pmcw.dnv) {
->               continue;
->           }
-> 
-> @@ -77,7 +78,7 @@ static bool find_dev(Schib *schib, int dev_no)
->               continue;
->           }
-> 
-> -        if ((dev_no < 0) || (schib->pmcw.dev == dev_no)) {
-> +        if ((dev_no < 0) || (schib.pmcw.dev == dev_no)) {
->               return true;
->           }
->       }
-> @@ -133,56 +134,63 @@ static void boot_setup(void)
->       have_iplb = store_iplb(&iplb);
->   }
-> 
-> -static void virtio_setup(void)
-> +static void find_boot_device(void)
->   {
-> -    Schib schib;
-> -    int ssid;
-> -    bool found = false;
-> -    uint16_t dev_no;
->       VDev *vdev = virtio_get_device();
-> -    QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
-> -
-> -    memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
-> +    int ssid;
-> +    bool found;
-> 
-> -    if (have_iplb) {
-> -        switch (iplb.pbt) {
-> -        case S390_IPL_TYPE_CCW:
-> -            dev_no = iplb.ccw.devno;
-> -            debug_print_int("device no. ", dev_no);
-> -            blk_schid.ssid = iplb.ccw.ssid & 0x3;
-> -            debug_print_int("ssid ", blk_schid.ssid);
-> -            found = find_dev(&schib, dev_no);
-> -            break;
-> -        case S390_IPL_TYPE_QEMU_SCSI:
-> -            vdev->scsi_device_selected = true;
-> -            vdev->selected_scsi_device.channel = iplb.scsi.channel;
-> -            vdev->selected_scsi_device.target = iplb.scsi.target;
-> -            vdev->selected_scsi_device.lun = iplb.scsi.lun;
-> -            blk_schid.ssid = iplb.scsi.ssid & 0x3;
-> -            found = find_dev(&schib, iplb.scsi.devno);
-> -            break;
-> -        default:
-> -            panic("List-directed IPL not supported yet!\n");
-> -        }
-> -        menu_setup();
-> -    } else {
-> +    if (!have_iplb) {
->           for (ssid = 0; ssid < 0x3; ssid++) {
->               blk_schid.ssid = ssid;
-> -            found = find_dev(&schib, -1);
-> +            found = find_subch(-1);
->               if (found) {
-> -                break;
-> +                return;
->               }
->           }
-> +        panic("Could not find a suitable boot device (none specified)\n");
->       }
-> 
-> -    IPL_assert(found, "No virtio device found");
-> +    switch (iplb.pbt) {
-> +    case S390_IPL_TYPE_CCW:
-> +        debug_print_int("device no. ", iplb.ccw.devno);
-> +        blk_schid.ssid = iplb.ccw.ssid & 0x3;
-> +        debug_print_int("ssid ", blk_schid.ssid);
-> +        found = find_subch(iplb.ccw.devno);
-> +        break;
-> +    case S390_IPL_TYPE_QEMU_SCSI:
-> +        vdev->scsi_device_selected = true;
-> +        vdev->selected_scsi_device.channel = iplb.scsi.channel;
-> +        vdev->selected_scsi_device.target = iplb.scsi.target;
-> +        vdev->selected_scsi_device.lun = iplb.scsi.lun;
-> +        blk_schid.ssid = iplb.scsi.ssid & 0x3;
-> +        found = find_subch(iplb.scsi.devno);
-> +        break;
-> +    default:
-> +        panic("List-directed IPL not supported yet!\n");
-> +    }
-> +
-> +    if (!found) {
-> +        IPL_assert(found, "Boot device not found\n");
-> +    }
-> +}
-> +
-> +static void virtio_setup(void)
-> +{
-> +    VDev *vdev = virtio_get_device();
-> +    QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
-> +
-> +    memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
-> +
-> +    if (have_iplb) {
-> +        menu_setup();
-> +    }
-> 
->       if (virtio_get_device_type() == VIRTIO_ID_NET) {
->           sclp_print("Network boot device detected\n");
->           vdev->netboot_start_addr = qipl.netboot_start_addr;
->       } else {
->           virtio_blk_setup_device(blk_schid);
-> -
->           IPL_assert(virtio_ipl_disk_is_valid(), "No valid IPL device detected");
->       }
->   }
-> @@ -192,8 +200,9 @@ int main(void)
->       sclp_setup();
->       css_setup();
->       boot_setup();
-> -    virtio_setup();
-> +    find_boot_device();
-> 
-> +    virtio_setup();
->       zipl_load(); /* no return */
-> 
->       panic("Failed to load OS from hard disk\n");
-> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-> index 8ec6aed..064f5de 100644
-> --- a/tests/boot-serial-test.c
-> +++ b/tests/boot-serial-test.c
-> @@ -112,7 +112,7 @@ static testdef_t tests[] = {
->       { "sparc", "SS-4", "", "MB86904" },
->       { "sparc", "SS-600MP", "", "TMS390Z55" },
->       { "sparc64", "sun4u", "", "UltraSPARC" },
-> -    { "s390x", "s390-ccw-virtio", "", "virtio device" },
-> +    { "s390x", "s390-ccw-virtio", "", "device" },
->       { "m68k", "mcf5208evb", "", "TT", sizeof(kernel_mcf5208), kernel_mcf5208 },
->       { "microblaze", "petalogix-s3adsp1800", "", "TT",
->         sizeof(kernel_pls3adsp1800), kernel_pls3adsp1800 },
-> 
+T24gMTMvMTIvMjAxOCAzOjAyIFBNLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3Rl
+Og0KPiAwMy4xMi4yMDE4IDEzOjE0LCBBbnRvbiBOZWZlZG92IHdyb3RlOg0KPj4gSWYgQ09XIGFy
+ZWFzIG9mIHRoZSBuZXdseSBhbGxvY2F0ZWQgY2x1c3RlcnMgYXJlIHplcm9lcyBvbiB0aGUgYmFj
+a2luZyBpbWFnZSwNCj4+IGVmZmljaWVudCBiZHJ2X3dyaXRlX3plcm9lcyhmbGFncz1CRFJWX1JF
+UV9BTExPQ0FURSkgY2FuIGJlIHVzZWQgb24gdGhlIHdob2xlDQo+PiBjbHVzdGVyIGluc3RlYWQg
+b2Ygd3JpdGluZyBleHBsaWNpdCB6ZXJvIGJ1ZmZlcnMgbGF0ZXIgaW4gcGVyZm9ybV9jb3coKS4N
+Cj4+DQo+IA0KPiBbLi4uXQ0KPiANCj4+IC0tLSBhL2Jsb2NrL3Fjb3cyLmMNCj4+ICsrKyBiL2Js
+b2NrL3Fjb3cyLmMNCj4+IEBAIC0yMDE1LDYgKzIwMTUsMTEgQEAgc3RhdGljIGJvb2wgbWVyZ2Vf
+Y293KHVpbnQ2NF90IG9mZnNldCwgdW5zaWduZWQgYnl0ZXMsDQo+PiAgICAgICAgICAgICAgICBj
+b250aW51ZTsNCj4+ICAgICAgICAgICAgfQ0KPj4gICAgDQo+PiArICAgICAgICAvKiBJZiBDT1cg
+cmVnaW9ucyBhcmUgaGFuZGxlZCBhbHJlYWR5LCBza2lwIHRoaXMgdG9vICovDQo+PiArICAgICAg
+ICBpZiAobS0+c2tpcF9jb3cpIHsNCj4+ICsgICAgICAgICAgICBjb250aW51ZTsNCj4+ICsgICAg
+ICAgIH0NCj4+ICsNCj4+ICAgICAgICAgICAgLyogVGhlIGRhdGEgKG1pZGRsZSkgcmVnaW9uIG11
+c3QgYmUgaW1tZWRpYXRlbHkgYWZ0ZXIgdGhlDQo+PiAgICAgICAgICAgICAqIHN0YXJ0IHJlZ2lv
+biAqLw0KPj4gICAgICAgICAgICBpZiAobDJtZXRhX2Nvd19zdGFydChtKSArIG0tPmNvd19zdGFy
+dC5uYl9ieXRlcyAhPSBvZmZzZXQpIHsNCj4+IEBAIC0yMDQwLDYgKzIwNDUsNjggQEAgc3RhdGlj
+IGJvb2wgbWVyZ2VfY293KHVpbnQ2NF90IG9mZnNldCwgdW5zaWduZWQgYnl0ZXMsDQo+PiAgICAg
+ICAgcmV0dXJuIGZhbHNlOw0KPj4gICAgfQ0KPj4gICAgDQo+PiArc3RhdGljIGJvb2wgaXNfdW5h
+bGxvY2F0ZWQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIGludDY0X3Qgb2Zmc2V0LCBpbnQ2NF90IGJ5
+dGVzKQ0KPj4gK3sNCj4+ICsgICAgaW50NjRfdCBucjsNCj4+ICsgICAgcmV0dXJuICFieXRlcyB8
+fA0KPj4gKyAgICAgICAgKCFiZHJ2X2lzX2FsbG9jYXRlZF9hYm92ZShicywgTlVMTCwgb2Zmc2V0
+LCBieXRlcywgJm5yKSAmJiBuciA9PSBieXRlcyk7DQo+IA0KPiBobSwgbnIgbWF5IGJlIDwgYnl0
+ZXMgaWYgaXQgaXMgdXAgdG8gZmlsZSBsZW5ndGguIEFuZCB3ZSBsb3NlIHRoaXMgY2FzZSwgd2hl
+biwgaXQNCj4gbWF5IGJlIGNvbnNpZGVyZWQgYXMgdW5hbGxvY2F0ZWQgdG9vLg0KPiANCj4gRG9l
+c24ndCBoYXJtLCBob3dldmVyLg0KPiANCg0KVGhhbmtzIGd1eXMgZm9yIHlvdXIgcmV2aWV3Lg0K
+DQpUaGlzIGNhc2UgSSB0aGluayBpcyB0b28gcmFyZSB0byBjYXJlIGFib3V0Lg0KDQo+PiArfQ0K
+Pj4gKw0KPj4gK3N0YXRpYyBib29sIGlzX3plcm9fY293KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBR
+Q293TDJNZXRhICptKQ0KPj4gK3sNCj4+ICsgICAgLyogVGhpcyBjaGVjayBpcyBkZXNpZ25lZCBm
+b3Igb3B0aW1pemF0aW9uIHNob3J0Y3V0IHNvIGl0IG11c3QgYmUNCj4+ICsgICAgICogZWZmaWNp
+ZW50Lg0KPj4gKyAgICAgKiBJbnN0ZWFkIG9mIGlzX3plcm8oKSwgdXNlIGlzX3VuYWxsb2NhdGVk
+KCkgYXMgaXQgaXMgZmFzdGVyIChidXQgbm90DQo+PiArICAgICAqIGFzIGFjY3VyYXRlIGFuZCBj
+YW4gcmVzdWx0IGluIGZhbHNlIG5lZ2F0aXZlcykuICovDQo+IA0KPiBCdXQsIGluIGNhc2Ugb2Yg
+YWxsb2NhdGVkIHplcm9zLCB3ZSdsbCByZWFkIHRoZW0gYW55d2F5IChhcyBwYXJ0IG9mIENPVyBw
+cm9jZXNzKSwNCj4gc28sIGl0IG1heSBiZSBoYW5kbGVkIGluIHRoZSBzYW1lIHdheSB0b28uIE1h
+eSBiZSBub3QgaGVyZSwgYnV0IGFmdGVyIHJlYWQgd2UgY2FuDQo+IGNoZWNrIGZvciB6ZXJvZXMs
+IGFuZCBhZ2FpbiBlZmZlY3RpdmVseSB3cml0ZSB6ZXJvcyB0byB0aGUgd2hvbGUgY2x1c3Rlci4N
+Cj4gDQo+IEFnYWluIGl0IG1heSBiZSBkb25lIHNlcGFyYXRlbHksIEkgZG9uJ3Qgc3VyZSBpdCB3
+b3J0aCBkb2luZy4NCj4gDQoNCkRldGVjdGluZyB6ZXJvZXMgYWZ0ZXIgd2UgcmVhZCB0aGVtIChh
+bmQgbm90IGhlcmUpIG1pZ2h0IG1ha2Ugc2Vuc2U7DQpwZXJmb3JtYW5jZSBnYWluIHNob3VsZCBi
+ZSBhYm91dCB0aGUgc2FtZSAobWludXMgc29tZSBDUFUgdG8gY2hlY2sgdGhlDQpyZWFkIGJ1ZmZl
+ciBmb3IgemVyb2VzKS4NCg0KVGhlIHF1ZXN0aW9uIGlzIGhvdyBmcmVxdWVudCBpdCBtaWdodCBo
+aXQ6DQogIC0gcmF3IGJhY2tpbmcgaW1hZ2Ugd2l0aCBob2xlcw0KICAtIHFjb3cyIGJhY2tpbmcg
+aW1hZ2Ugd2l0aCBzdWItY2x1c3RlciB6ZXJvIGFyZWFzDQogICAgKGUuZy4gc21hbGxlciBjbHVz
+dGVyIHNpemUpDQogIC0gYmFja2luZyBpbWFnZSBjb250YWlucyBsb3RzIG9mIHNwYWNlIHdpdGgg
+ZXhwbGljaXQgemVyb2VzDQogICAgKGUuZy4gZ3Vlc3QgRlMgd2l0aCAnc2hyZWQnIGV4dGVuc2l2
+ZWx5IHVzZWQgdG8gZGVsZXRlIGZpbGVzKQ0KDQpOb25lIG9mIHRoZXNlIHByb2JhYmx5IG9jY3Vy
+IHRoYXQgZnJlcXVlbnQuDQpCdXQgbWlnaHQgYmUgYSBuZXh0IHN0ZXAgYW5kIGEgc2VwYXJhdGUg
+c2VyaWVzLg0KDQo+PiArICAgIHJldHVybiBpc191bmFsbG9jYXRlZChicywgbS0+b2Zmc2V0ICsg
+bS0+Y293X3N0YXJ0Lm9mZnNldCwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgIG0tPmNv
+d19zdGFydC5uYl9ieXRlcykgJiYNCj4+ICsgICAgICAgICAgIGlzX3VuYWxsb2NhdGVkKGJzLCBt
+LT5vZmZzZXQgKyBtLT5jb3dfZW5kLm9mZnNldCwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAg
+ICAgIG0tPmNvd19lbmQubmJfYnl0ZXMpOw0KPj4gK30NCj4+ICsNCj4+ICtzdGF0aWMgaW50IGhh
+bmRsZV9hbGxvY19zcGFjZShCbG9ja0RyaXZlclN0YXRlICpicywgUUNvd0wyTWV0YSAqbDJtZXRh
+KQ0KPj4gK3sNCj4+ICsgICAgQkRSVlFjb3cyU3RhdGUgKnMgPSBicy0+b3BhcXVlOw0KPj4gKyAg
+ICBRQ293TDJNZXRhICptOw0KPj4gKw0KPj4gKyAgICBpZiAoIShicy0+ZmlsZS0+YnMtPnN1cHBv
+cnRlZF96ZXJvX2ZsYWdzICYgQkRSVl9SRVFfQUxMT0NBVEUpKSB7DQo+PiArICAgICAgICByZXR1
+cm4gMDsNCj4+ICsgICAgfQ0KPj4gKw0KPj4gKyAgICBpZiAoYnMtPmVuY3J5cHRlZCkgew0KPj4g
+KyAgICAgICAgcmV0dXJuIDA7DQo+PiArICAgIH0NCj4+ICsNCj4+ICsgICAgZm9yIChtID0gbDJt
+ZXRhOyBtICE9IE5VTEw7IG0gPSBtLT5uZXh0KSB7DQo+PiArICAgICAgICBpbnQgcmV0Ow0KPj4g
+Kw0KPj4gKyAgICAgICAgaWYgKCFtLT5jb3dfc3RhcnQubmJfYnl0ZXMgJiYgIW0tPmNvd19lbmQu
+bmJfYnl0ZXMpIHsNCj4+ICsgICAgICAgICAgICBjb250aW51ZTsNCj4+ICsgICAgICAgIH0NCj4+
+ICsNCj4+ICsgICAgICAgIGlmICghaXNfemVyb19jb3coYnMsIG0pKSB7DQo+PiArICAgICAgICAg
+ICAgY29udGludWU7DQo+PiArICAgICAgICB9DQo+IA0KPiBwcmVfd3JpdGVfb3ZlcmxhcF9jaGVj
+ayBzaG91bGQgYmUgaGVyZQ0KPiANCg0KRXhpc3RpbmcgcHJlX3dyaXRlX292ZXJsYXBfY2hlY2sg
+aW4gcWNvdzJfY29fcHdyaXRldigpIHNob3VsZCBjb3ZlciBpdCwNCnNpbmNlIHRoZSBjaGVjayBh
+bGlnbnMgdGhlIHJhbmdlIHRvIGNsdXN0ZXIgYm91bmRhcmllcy4NCg0KSG93ZXZlciBJIHRoaW5r
+IEkgbWlzc2VkIGEgY29tbWVudCBhYm91dCBpdCBoZXJlLiBGb3Igc3VzcGljaW91cw0KcmVhZGVy
+cyA6KSBhbmQganVzdCBpbiBjYXNlIHNvbWVvbmUgc3RhcnRzIG1vdmluZyB0aGlzIGNvZGUgYXJv
+dW5kLg0KDQpJIHByb3Bvc2U6DQoNCmRpZmYgLS1naXQgYS9ibG9jay9xY293Mi5jIGIvYmxvY2sv
+cWNvdzIuYw0KaW5kZXggMDI3MTg4YTFhMy4uYjNiMzEyNDA4MyAxMDA2NDQNCi0tLSBhL2Jsb2Nr
+L3Fjb3cyLmMNCisrKyBiL2Jsb2NrL3Fjb3cyLmMNCkBAIC0yMDg4LDYgKzIwODgsOSBAQCBzdGF0
+aWMgaW50IGhhbmRsZV9hbGxvY19zcGFjZShCbG9ja0RyaXZlclN0YXRlIA0KKmJzLCBRQ293TDJN
+ZXRhICpsMm1ldGEpDQogICAgICAgICAgICAgIGNvbnRpbnVlOw0KICAgICAgICAgIH0NCg0KKyAg
+ICAgICAgLyogQ29udmVudGlvbmFsIHBsYWNlIGZvciBxY293Ml9wcmVfd3JpdGVfb3ZlcmxhcF9j
+aGVjaygpIGJ1dCANCmluIHRoaXMNCisgICAgICAgICAgIGNhc2UgaXQgaXMgYWxyZWFkeSBkb25l
+IGZvciB0aGVzZSBjbHVzdGVycyAqLw0KKw0KICAgICAgICAgIEJMS0RCR19FVkVOVChicy0+Zmls
+ZSwgQkxLREJHX0NMVVNURVJfQUxMT0NfU1BBQ0UpOw0KICAgICAgICAgIC8qIGluc3RlYWQgb2Yg
+d3JpdGluZyB6ZXJvIENPVyBidWZmZXJzLA0KICAgICAgICAgICAgIGVmZmljaWVudGx5IHplcm8g
+b3V0IHRoZSB3aG9sZSBjbHVzdGVycyAqLw0KDQoNCj4+ICsNCj4+ICsgICAgICAgIEJMS0RCR19F
+VkVOVChicy0+ZmlsZSwgQkxLREJHX0NMVVNURVJfQUxMT0NfU1BBQ0UpOw0KPj4gKyAgICAgICAg
+LyogaW5zdGVhZCBvZiB3cml0aW5nIHplcm8gQ09XIGJ1ZmZlcnMsDQo+PiArICAgICAgICAgICBl
+ZmZpY2llbnRseSB6ZXJvIG91dCB0aGUgd2hvbGUgY2x1c3RlcnMgKi8NCj4+ICsgICAgICAgIHJl
+dCA9IGJkcnZfY29fcHdyaXRlX3plcm9lcyhicy0+ZmlsZSwgbS0+YWxsb2Nfb2Zmc2V0LA0KPj4g
+KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIG0tPm5iX2NsdXN0ZXJzICogcy0+
+Y2x1c3Rlcl9zaXplLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEJE
+UlZfUkVRX0FMTE9DQVRFKTsNCj4+ICsgICAgICAgIGlmIChyZXQgPCAwKSB7DQo+PiArICAgICAg
+ICAgICAgaWYgKHJldCAhPSAtRU5PVFNVUCAmJiByZXQgIT0gLUVBR0FJTikgew0KPj4gKyAgICAg
+ICAgICAgICAgICByZXR1cm4gcmV0Ow0KPj4gKyAgICAgICAgICAgIH0NCj4+ICsgICAgICAgICAg
+ICBjb250aW51ZTsNCj4+ICsgICAgICAgIH0NCj4+ICsNCj4+ICsgICAgICAgIHRyYWNlX3Fjb3cy
+X3NraXBfY293KHFlbXVfY29yb3V0aW5lX3NlbGYoKSwgbS0+b2Zmc2V0LCBtLT5uYl9jbHVzdGVy
+cyk7DQo+PiArICAgICAgICBtLT5za2lwX2NvdyA9IHRydWU7DQo+PiArICAgIH0NCj4+ICsgICAg
+cmV0dXJuIDA7DQo+PiArfQ0KPj4gKw0KPiANCj4gDQo=
