@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([208.118.235.92]:54097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gXmT7-0001Ir-96
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:21:26 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gXmYg-0002vx-53
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:27:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gXmT4-0007gw-Kw
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:21:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50538)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gXmT1-0007ea-8t
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:21:20 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A71544ACD6
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 12:21:16 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 14 Dec 2018 13:21:13 +0100
-Message-Id: <1544790073-23049-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] Remove deprecated -enable-hax option
+	(envelope-from <kwolf@redhat.com>) id 1gXmYf-0001qK-Al
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:27:10 -0500
+Date: Fri, 14 Dec 2018 13:26:59 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181214122659.GB4341@dhcp-200-186.str.redhat.com>
+References: <DB6PR07MB33330E3562B0AF0ECC8307BCAEA00@DB6PR07MB3333.eurprd07.prod.outlook.com>
+	<DB6PR07MB3333E95C513AF2EF14AAE615AEA00@DB6PR07MB3333.eurprd07.prod.outlook.com>
+	<14b32e39-a9f6-1a83-87e6-6e150954ddb7@redhat.com>
+	<20181213144914.GH5427@linux.fritz.box>
+	<db4f1763-e28f-387c-2652-ba71c29e97ff@redhat.com>
+	<DB6PR07MB3333BA55F6C06E1DB3388D55AEA00@DB6PR07MB3333.eurprd07.prod.outlook.com>
+	<CAMRbyyug2e_MK+Nzdzso9RheENVzuTba5nYzjBNZbrXCaB2hrw@mail.gmail.com>
+	<VI1PR07MB3344412C5DE71936F9689909AEA10@VI1PR07MB3344.eurprd07.prod.outlook.com>
+	<VI1PR07MB334400B255A91277D3597F79AEA10@VI1PR07MB3344.eurprd07.prod.outlook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <VI1PR07MB334400B255A91277D3597F79AEA10@VI1PR07MB3344.eurprd07.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] Request for clarification on qemu-img
+ convert behavior zeroing target host_device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,75 +32,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: "De Backer, Fred (Nokia - BE/Antwerp)" <fred.de_backer@nokia.com>
+Cc: Nir Soffer <nsoffer@redhat.com>, Eric Blake <eblake@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, "Richard W.M. Jones" <rjones@redhat.com>, "Aamir T, Owais (Nokia - IN/Chennai)" <owais.aamir_t@nokia.com>
 
-Our command line interface is really quite overcrowded, we should avoid
-duplicated options that do the same thing in just a slightly different
-way. "-accel hax" is shorter and more generic that "-enable-hax", so
-there is really no real usage for the latter option. "-enable-hax" has
-been deprecated since two releases, and nobody complained so far, so
-it's time to remove this now.
+Am 14.12.2018 um 11:59 hat De Backer, Fred (Nokia - BE/Antwerp) geschrieb=
+en:
+> >>> Indeed, performance traces are important for issues like this.
+> >>See strace of both FC27 and FC29 attached
+>=20
+> >Looks like you traced only the main thread. All the I/O is done in oth=
+er threads.
+> >These flags would be useful:
+> >
+> >=A0 =A0 strace -o log -f -T -tt
+>=20
+> New straces attached with mentioned flags.  Both truncated due to file
+> size at what I believe to be the same position in the "write-phase".
+> FC29 has the "zeroing-phase" in front.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- qemu-deprecated.texi |  5 -----
- qemu-options.hx      | 11 -----------
- vl.c                 |  5 -----
- 3 files changed, 21 deletions(-)
+So this is indeed using BLKZEROOUT, which has a slow fallback in the
+kernel (slow means ~12 seconds for each 2 GB chunk).
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 5cc18b4..f3a1184 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -65,11 +65,6 @@ removed together with SDL 1.2 support.
- The @code{-clock} option is ignored since QEMU version 1.7.0. There is no
- replacement since it is not needed anymore.
- 
--@subsection -enable-hax (since 3.0.0)
--
--The @option{-enable-hax} option has been replaced by @option{-accel hax}.
--Both options have been introduced in QEMU version 2.9.0.
--
- @subsection -drive file=json:@{...@{'driver':'file'@}@} (since 3.0)
- 
- The 'file' driver for drives is no longer appropriate for character or host
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 5330603..c4e9690 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3381,17 +3381,6 @@ Enable KVM full virtualization support. This option is only available
- if KVM support is enabled when compiling.
- ETEXI
- 
--DEF("enable-hax", 0, QEMU_OPTION_enable_hax, \
--    "-enable-hax     enable HAX virtualization support\n", QEMU_ARCH_I386)
--STEXI
--@item -enable-hax
--@findex -enable-hax
--Enable HAX (Hardware-based Acceleration eXecution) support. This option
--is only available if HAX support is enabled when compiling. HAX is only
--applicable to MAC and Windows platform, and thus does not conflict with
--KVM. This option is deprecated, use @option{-accel hax} instead.
--ETEXI
--
- DEF("xen-domid", HAS_ARG, QEMU_OPTION_xen_domid,
-     "-xen-domid id   specify xen guest domain id\n", QEMU_ARCH_ALL)
- DEF("xen-create", 0, QEMU_OPTION_xen_create,
-diff --git a/vl.c b/vl.c
-index 52881be..5093764 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3579,11 +3579,6 @@ int main(int argc, char **argv, char **envp)
-                 olist = qemu_find_opts("machine");
-                 qemu_opts_parse_noisily(olist, "accel=kvm", false);
-                 break;
--            case QEMU_OPTION_enable_hax:
--                warn_report("Option is deprecated, use '-accel hax' instead");
--                olist = qemu_find_opts("machine");
--                qemu_opts_parse_noisily(olist, "accel=hax", false);
--                break;
-             case QEMU_OPTION_M:
-             case QEMU_OPTION_machine:
-                 olist = qemu_find_opts("machine");
--- 
-1.8.3.1
+We need to avoid calling BLKZEROOUT in the context of pre-zeroing the
+image for qemu-img convert.
+
+Of course, we should also think about the other problem you mentioned,
+related to copying a smaller image to a larger block device. Does this
+require zeroing the parts after the image or should we leave them alone?
+
+I'd tend to say that since you're passing the whole block device as a
+target to 'qemu-img convert', and the whole block device will be visible
+to a guest run with the same block device configuration, we should
+indeed zero out the whole device. But then we would declare the F27
+behaviour buggy and this case would stay slow (it would become slightly
+faster because we avoid the double writes, but we wouldn't save the
+writes to the unused space).
+
+Or we could just refuse to convert if source and target aren't the same
+size. Then you would have to use a raw filter driver to select a part
+from the target image with the offset/size options. But this would break
+backwards compatibility, and its use is not very intuitive either.
+
+Unfortunately, this is just the kind of problems that raw images give
+you. :-/
+
+Kevin
