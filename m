@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXmcy-0005al-DK
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:31:37 -0500
+	(envelope-from <philmd@redhat.com>) id 1gXmg1-0007GM-UA
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:34:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXmcu-0004Dp-94
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:31:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58516)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXmcu-0004DN-36
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:31:32 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181213175552.14857-1-wainersm@redhat.com>
-	<CAFEAcA86SDLGyqL3rG-fEDFsEj8-nz-Uqn5Mb9EeLqiFPeKZfA@mail.gmail.com>
-	<cccf3c43-0e51-bbbc-3676-17286b11ec99@redhat.com>
-	<CAFEAcA9CpR=JGt74=xaUddYhf5SCOoeHH_v+O1L+rrTygZ7quQ@mail.gmail.com>
-	<860b98f8-02d0-4c96-ccf2-d582ca295b95@redhat.com>
-	<871s6kfwoo.fsf@dusky.pond.sub.org>
-	<CAFEAcA_KP532BBsESjO1NuKSeefSKH7RdpCdSDLfgMCtc6D5nw@mail.gmail.com>
-Date: Fri, 14 Dec 2018 13:31:18 +0100
-In-Reply-To: <CAFEAcA_KP532BBsESjO1NuKSeefSKH7RdpCdSDLfgMCtc6D5nw@mail.gmail.com>
-	(Peter Maydell's message of "Fri, 14 Dec 2018 11:20:10 +0000")
-Message-ID: <87tvjgp9wp.fsf@dusky.pond.sub.org>
+	(envelope-from <philmd@redhat.com>) id 1gXmfx-0005Vb-Mk
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:34:45 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:42134)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gXmfx-0005V6-DV
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:34:41 -0500
+Received: by mail-wr1-f67.google.com with SMTP id q18so5274867wrx.9
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 04:34:41 -0800 (PST)
+References: <1544790073-23049-1-git-send-email-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <05d18c75-9611-2da5-081b-fee276c98ed4@redhat.com>
+Date: Fri, 14 Dec 2018 13:34:38 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 0/1] checkpatch: checker for comment block
+In-Reply-To: <1544790073-23049-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] Remove deprecated -enable-hax option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,39 +29,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+On 12/14/18 1:21 PM, Thomas Huth wrote:
+> Our command line interface is really quite overcrowded, we should avoid
+> duplicated options that do the same thing in just a slightly different
+> way. "-accel hax" is shorter and more generic that "-enable-hax", so
+> there is really no real usage for the latter option. "-enable-hax" has
+> been deprecated since two releases, and nobody complained so far, so
+> it's time to remove this now.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-> On Fri, 14 Dec 2018 at 06:29, Markus Armbruster <armbru@redhat.com> wrote:
->>
->> Paolo Bonzini <pbonzini@redhat.com> writes:
->>
->> > On 13/12/18 19:21, Peter Maydell wrote:
->> >> On Thu, 13 Dec 2018 at 18:07, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> >>> On 13/12/18 19:01, Peter Maydell wrote:
->> >>>> I sent a patch to do this a little while back:
->> >>>>  https://patchwork.kernel.org/patch/10561557/
->
->> >>>> Personally I think we should just commit my patch, and then
->> >>>> we can stop having people manually pointing out where
->> >>>> submitters' patches don't match CODING_STYLE.
->>
->> Concur.  It has my R-by, modulo a commit message tweak.
->
-> I have to admit I never really understood what tweak
-> you wanted making to the commit message. I'm happy
-> to make it clearer: do you want to suggest a rewording?
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-The commit message claims "(The only changes needed are that Linux's
-checkpatch.pl WARN() function takes an extra argument that ours does
-not.)"  This isn't the case.  You also dropped the kernel's "Networking
-with an initial /*" special case.
-
-The simplest way to fix an incorrect claim is to delete it :)
-
-If you want to explain what you changed, you could say something like
-"(The only changes needed are that Linux's checkpatch.pl WARN() function
-takes an extra argument that ours does not, and the kernel has a special
-case for networking code we don't want.)"
+> ---
+>  qemu-deprecated.texi |  5 -----
+>  qemu-options.hx      | 11 -----------
+>  vl.c                 |  5 -----
+>  3 files changed, 21 deletions(-)
+> 
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index 5cc18b4..f3a1184 100644
+> --- a/qemu-deprecated.texi
+> +++ b/qemu-deprecated.texi
+> @@ -65,11 +65,6 @@ removed together with SDL 1.2 support.
+>  The @code{-clock} option is ignored since QEMU version 1.7.0. There is no
+>  replacement since it is not needed anymore.
+>  
+> -@subsection -enable-hax (since 3.0.0)
+> -
+> -The @option{-enable-hax} option has been replaced by @option{-accel hax}.
+> -Both options have been introduced in QEMU version 2.9.0.
+> -
+>  @subsection -drive file=json:@{...@{'driver':'file'@}@} (since 3.0)
+>  
+>  The 'file' driver for drives is no longer appropriate for character or host
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 5330603..c4e9690 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -3381,17 +3381,6 @@ Enable KVM full virtualization support. This option is only available
+>  if KVM support is enabled when compiling.
+>  ETEXI
+>  
+> -DEF("enable-hax", 0, QEMU_OPTION_enable_hax, \
+> -    "-enable-hax     enable HAX virtualization support\n", QEMU_ARCH_I386)
+> -STEXI
+> -@item -enable-hax
+> -@findex -enable-hax
+> -Enable HAX (Hardware-based Acceleration eXecution) support. This option
+> -is only available if HAX support is enabled when compiling. HAX is only
+> -applicable to MAC and Windows platform, and thus does not conflict with
+> -KVM. This option is deprecated, use @option{-accel hax} instead.
+> -ETEXI
+> -
+>  DEF("xen-domid", HAS_ARG, QEMU_OPTION_xen_domid,
+>      "-xen-domid id   specify xen guest domain id\n", QEMU_ARCH_ALL)
+>  DEF("xen-create", 0, QEMU_OPTION_xen_create,
+> diff --git a/vl.c b/vl.c
+> index 52881be..5093764 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3579,11 +3579,6 @@ int main(int argc, char **argv, char **envp)
+>                  olist = qemu_find_opts("machine");
+>                  qemu_opts_parse_noisily(olist, "accel=kvm", false);
+>                  break;
+> -            case QEMU_OPTION_enable_hax:
+> -                warn_report("Option is deprecated, use '-accel hax' instead");
+> -                olist = qemu_find_opts("machine");
+> -                qemu_opts_parse_noisily(olist, "accel=hax", false);
+> -                break;
+>              case QEMU_OPTION_M:
+>              case QEMU_OPTION_machine:
+>                  olist = qemu_find_opts("machine");
+> 
