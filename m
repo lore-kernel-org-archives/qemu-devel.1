@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXrHT-0008Te-Vs
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 12:29:44 -0500
+	(envelope-from <i.maximets@samsung.com>) id 1gXrJR-0000p7-A3
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 12:31:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXrHT-0001yj-5C
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 12:29:43 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:42116)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gXrHS-0001yO-ML
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 12:29:43 -0500
-Received: by mail-ot1-x343.google.com with SMTP id v23so6105049otk.9
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 09:29:42 -0800 (PST)
-MIME-Version: 1.0
-References: <20181213181402.24012-1-pbonzini@redhat.com>
-In-Reply-To: <20181213181402.24012-1-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 14 Dec 2018 17:29:29 +0000
-Message-ID: <CAFEAcA-uqJgDOE7aFY7gCuq17WjsdH0CxAD-He0Ym0Dm-oR2cA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v2 00/46] Misc patches for 2018-12-13
+	(envelope-from <i.maximets@samsung.com>) id 1gXrJN-0003SA-8M
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 12:31:45 -0500
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:52012)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <i.maximets@samsung.com>)
+	id 1gXrJM-0003P8-O0
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 12:31:41 -0500
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id
+	20181214173130euoutp01142082c16c53d9c40562c44332466415~wQ1HAEyOh2686126861euoutp01g
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 17:31:30 +0000 (GMT)
+From: Ilya Maximets <i.maximets@samsung.com>
+Date: Fri, 14 Dec 2018 20:31:23 +0300
+Message-Id: <20181214173123.31223-1-i.maximets@samsung.com>
+Content-Type: text/plain; charset="utf-8"
+References: <CGME20181214173128eucas1p25789b473622f9506c239c6a02d95e8b6@eucas1p2.samsung.com>
+Subject: [Qemu-devel] [PATCH] virtio: add ORDER_PLATFORM feature support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +28,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Michael S . Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Tiwei Bie <tiwei.bie@intel.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Xiao Wang <xiao.w.wang@intel.com>, Ilya Maximets <i.maximets@samsung.com>
 
-On Thu, 13 Dec 2018 at 18:15, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> The following changes since commit bb9bf94b3e8926553290bc9a7cb84315af4220=
-86:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-r=
-equest' into staging (2018-12-11 19:18:58 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to d115ceb731fc09134fb0816c956ab0eb88fbfa7b:
->
->   vhost-user-test: create a temporary directory per TestServer (2018-12-1=
-3 10:57:30 +0100)
->
-> ----------------------------------------------------------------
-> * HAX support for Linux hosts (Alejandro)
-> * esp bugfixes (Guenter)
-> * Windows build cleanup (Marc-Andr=C3=A9)
-> * checkpatch logic improvements (Paolo)
-> * coalesced range bugfix (Paolo)
-> * switch testsuite to TAP (Paolo)
-> * QTAILQ rewrite (Paolo)
-> * enable vhost for TCG and clean up vhost-user-test (Paolo)
-> * block/iscsi.c cancellation fixes (Stefan)
-> * improve selection of the default accelerator (Thomas)
->
-> ----------------------------------------------------------------
+This patch adds new property "order_platform" which is required to
+allow VIRTIO_F_ORDER_PLATFORM feature negotiation. Disabled by
+default because needed only for HW assited vhost backends.
 
-Compile issues, I'm afraid (and a monitor.c conflict, but that
-was trivial so I fixed it up):
+Enabling of this feature will request guest drivers to use heavier
+(platform dependent) techniques for memory ordering if negotiated.
 
-Compile failures on OpenBSD, NetBSD, FreeBSD, OSX trying to use a linux hea=
-der:
+Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
+---
 
-hw/net/vhost_net.c:26:10: fatal error: 'linux/vhost.h' file not found
-#include <linux/vhost.h>
-         ^~~~~~~~~~~~~~~
+Note: Patch to change the name of the feature from VIRTIO_F_IO_BARRIER
+      to VIRTIO_F_ORDER_PLATFORM is not merged yet:
+      https://www.mail-archive.com/virtio-dev@lists.oasis-open.org/msg04114.html
 
-and one on sparc Linux:
-In file included from /home/pm215/qemu/hw/net/vhost_net.c:28:
-/home/pm215/qemu/linux-headers/linux/kvm.h:14:10: fatal error:
-asm/kvm.h: No such file or directory
- #include <asm/kvm.h>
-          ^~~~~~~~~~~
+Patch for DPDK virtio driver available here:
+      http://patches.dpdk.org/patch/48886/
 
-trying to use our linux-headers headers on a host architecture
-which isn't a KVM-supporting one (those are the only ones we
-sync headers for).
+ hw/net/vhost_net.c         |  1 +
+ include/hw/virtio/virtio.h | 13 ++++++++++++-
+ 2 files changed, 13 insertions(+), 1 deletion(-)
 
-thanks
--- PMM
+diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+index e037db63a3..71877e46a5 100644
+--- a/hw/net/vhost_net.c
++++ b/hw/net/vhost_net.c
+@@ -78,6 +78,7 @@ static const int user_feature_bits[] = {
+     VIRTIO_NET_F_MRG_RXBUF,
+     VIRTIO_NET_F_MTU,
+     VIRTIO_F_IOMMU_PLATFORM,
++    VIRTIO_F_ORDER_PLATFORM,
+ 
+     /* This bit implies RARP isn't sent by QEMU out of band */
+     VIRTIO_NET_F_GUEST_ANNOUNCE,
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index 9c1fa07d6d..7e206dadbc 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -29,6 +29,15 @@
+                                 (0x1ULL << VIRTIO_F_NOTIFY_ON_EMPTY) | \
+                                 (0x1ULL << VIRTIO_F_ANY_LAYOUT))
+ 
++#ifndef VIRTIO_F_ORDER_PLATFORM
++/*
++ * This feature indicates that memory accesses by the driver and the device
++ * are ordered in a way described by the platform.
++ * Not yet defined in Linux, i.e. not in standard-headers.
++ */
++#define VIRTIO_F_ORDER_PLATFORM 36
++#endif
++
+ struct VirtQueue;
+ 
+ static inline hwaddr vring_align(hwaddr addr,
+@@ -264,7 +273,9 @@ typedef struct VirtIORNGConf VirtIORNGConf;
+     DEFINE_PROP_BIT64("any_layout", _state, _field, \
+                       VIRTIO_F_ANY_LAYOUT, true), \
+     DEFINE_PROP_BIT64("iommu_platform", _state, _field, \
+-                      VIRTIO_F_IOMMU_PLATFORM, false)
++                      VIRTIO_F_IOMMU_PLATFORM, false),  \
++    DEFINE_PROP_BIT64("order_platform", _state, _field, \
++                      VIRTIO_F_ORDER_PLATFORM, false)
+ 
+ hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n);
+ hwaddr virtio_queue_get_avail_addr(VirtIODevice *vdev, int n);
+-- 
+2.17.1
