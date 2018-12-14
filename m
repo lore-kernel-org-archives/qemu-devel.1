@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37822)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=879e7201e=Alistair.Francis@wdc.com>)
-	id 1gXstB-0003lf-N5
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 14:12:46 -0500
+	(envelope-from <cota@braap.org>) id 1gXtK9-0006LL-Dd
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 14:40:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=879e7201e=Alistair.Francis@wdc.com>)
-	id 1gXst5-0000M4-9a
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 14:12:45 -0500
-From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Fri, 14 Dec 2018 19:12:32 +0000
-Message-ID: <bc916ed1c5ec1c34c005c1f1b4b533f693912eb5.1544814722.git.alistair.francis@wdc.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <cota@braap.org>) id 1gXtK6-0003vH-Oq
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 14:40:37 -0500
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:49677)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gXtK6-0003uc-CJ
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 14:40:34 -0500
+Date: Fri, 14 Dec 2018 14:40:31 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181214194031.GA12657@flamenco>
+References: <20181209193749.12277-1-cota@braap.org>
+	<20181209193749.12277-6-cota@braap.org>
+	<20181214155724.GB4314@quinoa.localdomain>
+	<20181214170822.GA15965@flamenco> <20181214175022.GA18314@flamenco>
+	<20181214184733.GA12361@quinoa.localdomain>
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v1 1/1] target/riscv/pmp.c: Fix
- pmp_decode_napot()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181214184733.GA12361@quinoa.localdomain>
+Subject: Re: [Qemu-devel] [RFC v2 05/38] plugin: add user-facing API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>
+To: Aaron Lindsay <aaron@os.amperecomputing.com>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-From: Anup Patel <anup@brainfault.org>
+On Fri, Dec 14, 2018 at 18:47:42 +0000, Aaron Lindsay wrote:
+> On Dec 14 12:50, Emilio G. Cota wrote:
+> > On Fri, Dec 14, 2018 at 12:08:22 -0500, Emilio G. Cota wrote:
+> > > On Fri, Dec 14, 2018 at 15:57:32 +0000, Aaron Lindsay wrote:
+> > (snip)
+> > > > I added a function to the user-facing plugin API in my own version of
+> > > > Pavel's plugin patchset to clear all existing plugin instrumentation,
+> > (snip)
+> > > I think the following API call would do what you need:
+> > > 
+> > >   typedef int (*qemu_plugin_reset_cb_t)(qemu_plugin_id_t id);
+> > >   void qemu_plugin_reset(qemu_plugin_id_t id, qemu_plugin_reset_cb_t cb);
+> > > 
+> > > (or maybe qemu_plugin_reinstall?)
+> > 
+> > An alternative is to track the TBs that a plugin has inserted
+> > instrumentation into, and only flush those. This would require
+> > us to do an additional hash table insert when adding a
+> > direct callback, but it allow us to avoid exporting tb_flush indirectly
+> > to plugins, which could be abused by malicious plugins to perform
+> > a DoS attack.
+> 
+> I don't think I have a preference. Though now I'm curious - when/why do
+> you expect users might run plugins that could be malicious in this way?
 
-Currently, start and end address of a PMP region are not decoded
-correctly by pmp_decode_napot().
+When this work started, others expressed concern about potentially
+malicious plugins, although I think they were thinking of preventing
+plugins from gaining access to data structures that could affect
+the guest, e.g. CPUState. That's why I'm using a hash table for
+the plugin context id, although that's probably overkill (do we
+care about malicious plugins messing with the subscriptions of
+other plugins? Not sure we should.)
 
-Let's say we have a 128KB PMP region with base address as 0x80000000.
-Now, the PMPADDRx CSR value for this region will be 0x20003fff.
+Here I'm thinking more about giving plugin developers too much rope to
+hang themselves with, e.g. calling repeatedly plugin_reset() out
+of convenience, without realising the performance impact that
+it entails. That's why I'd like to explore the alternative.
 
-The current pmp_decode_napot() implementation will decode PMPADDRx
-CSR as t1=3D14, base=3D0x100000000, and range=3D0x1ffff whereas it should
-have decoded PMPADDRx CSR as t1=3D14, base=3D0x80000000, and range=3D0x1fff=
-.
-
-This patch fixes the base value decoding in pmp_decode_napot() when
-PMPADDRx CSR is not -1 (i.e. 0xffffffffffffffff).
-
-Signed-off-by: Anup Patel <anup@brainfault.org>
-Signed-off-by: Anup Patel <anup.patel@wdc.com>
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/pmp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
-index 03abd8fe5e..15a5366616 100644
---- a/target/riscv/pmp.c
-+++ b/target/riscv/pmp.c
-@@ -138,7 +138,7 @@ static void pmp_decode_napot(target_ulong a, target_ulo=
-ng *sa, target_ulong *ea)
-         return;
-     } else {
-         target_ulong t1 =3D ctz64(~a);
--        target_ulong base =3D (a & ~(((target_ulong)1 << t1) - 1)) << 3;
-+        target_ulong base =3D (a & ~(((target_ulong)1 << t1) - 1)) << 2;
-         target_ulong range =3D ((target_ulong)1 << (t1 + 3)) - 1;
-         *sa =3D base;
-         *ea =3D base + range;
---=20
-2.19.1
+		Emilio
