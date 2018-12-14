@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXn2c-00009V-QR
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:58:07 -0500
+	(envelope-from <mst@redhat.com>) id 1gXn3d-00016q-GC
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:59:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXn2b-0007nK-Rx
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:58:06 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:43748)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gXn2b-0007kM-EU
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:58:05 -0500
-Received: by mail-ot1-x342.google.com with SMTP id a11so5251196otr.10
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 04:58:05 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1gXn3a-0001AO-PS
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:59:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50588)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gXn3a-0001AG-Gc
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:59:06 -0500
+Date: Fri, 14 Dec 2018 07:58:59 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181214075842-mutt-send-email-mst@kernel.org>
+References: <5C10DAE9.3010605@huawei.com>
+	<20181212081902-mutt-send-email-mst@kernel.org>
+	<5C11D19C.4010007@huawei.com>
+	<20181213095048-mutt-send-email-mst@kernel.org>
+	<5C137B40.1070408@huawei.com>
 MIME-Version: 1.0
-References: <20181213175552.14857-1-wainersm@redhat.com>
-	<CAFEAcA86SDLGyqL3rG-fEDFsEj8-nz-Uqn5Mb9EeLqiFPeKZfA@mail.gmail.com>
-	<cccf3c43-0e51-bbbc-3676-17286b11ec99@redhat.com>
-	<CAFEAcA9CpR=JGt74=xaUddYhf5SCOoeHH_v+O1L+rrTygZ7quQ@mail.gmail.com>
-	<860b98f8-02d0-4c96-ccf2-d582ca295b95@redhat.com>
-	<871s6kfwoo.fsf@dusky.pond.sub.org>
-	<CAFEAcA_KP532BBsESjO1NuKSeefSKH7RdpCdSDLfgMCtc6D5nw@mail.gmail.com>
-	<87tvjgp9wp.fsf@dusky.pond.sub.org>
-In-Reply-To: <87tvjgp9wp.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 14 Dec 2018 12:57:52 +0000
-Message-ID: <CAFEAcA_iCUoJJdVZYsw8yhviCgp-qFPfaJP6UYZGYP_WyMzp-g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/1] checkpatch: checker for comment block
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5C137B40.1070408@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH] vhost-vsock: support parse mergeable
+ feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,36 +31,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: jiangyiwen <jiangyiwen@huawei.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 
-On Fri, 14 Dec 2018 at 12:31, Markus Armbruster <armbru@redhat.com> wrote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
-> > On Fri, 14 Dec 2018 at 06:29, Markus Armbruster <armbru@redhat.com> wrote:
-> > I have to admit I never really understood what tweak
-> > you wanted making to the commit message. I'm happy
-> > to make it clearer: do you want to suggest a rewording?
->
-> The commit message claims "(The only changes needed are that Linux's
-> checkpatch.pl WARN() function takes an extra argument that ours does
-> not.)"  This isn't the case.  You also dropped the kernel's "Networking
-> with an initial /*" special case.
+On Fri, Dec 14, 2018 at 05:43:28PM +0800, jiangyiwen wrote:
+> On 2018/12/13 22:54, Michael S. Tsirkin wrote:
+> > On Thu, Dec 13, 2018 at 11:27:24AM +0800, jiangyiwen wrote:
+> >> On 2018/12/12 21:19, Michael S. Tsirkin wrote:
+> >>> On Wed, Dec 12, 2018 at 05:54:49PM +0800, jiangyiwen wrote:
+> >>>> Currently vhost-vsock doesn't have any feature bits, so it
+> >>>> don't support parse mergeable rx buffer feature. And the
+> >>>> feature is support in another series of patches named
+> >>>> "VSOCK: support mergeable rx buffer in vhost-vsock".
+> >>>>
+> >>>> So we neet to support parse mergeable feature in vhost-vsock
+> >>>> if above patches are merged.
+> >>>>
+> >>>> Signed-off-by: Yiwen Jiang <jiangyiwen@huawei.com>
+> >>>
+> >>> OK but what does it do? this just defines the feature bit ...
+> >>> Also pls copy virtio-dev whenever you change the host/guest
+> >>> interface.
+> >>>
+> >>> Thanks!
+> >>>
+> >>
+> >> Hi Michael,
+> >>
+> >> In my opinion, for vhost device, device feature bits need to be
+> >> intersected between vhost and qemu, so I add mergeable rx buffer feature
+> >> into vdev->host_features, and then intersected with vhost_dev features.
+> >>
+> >> Later if someone want to add new feature, it can use virtio_add_feature()
+> >> in vhost_vsock_get_features().
+> >>
+> >> Thanks,
+> >> Yiwen.
+> > 
+> > I understand. Sorry.  It seems that your patchset wasn't threaded
+> > properly, each patch was by its own. Can you pls take a look at fixing
+> > that?
+> > 
+> 
+> Hi Michael,
+> 
+> Thanks your suggestions, I want to how to send patch when
+> patch involving multiple communities, like qemu
+> and linux kernel. In this case, how should we send them?
+> 
+> Thanks,
+> Yiwen.
 
-The bit of the commit message you didn't quote says
-"by backporting the relevant
-parts of the Linux kernel's checkpatch.pl. (The only changes
-needed are that Linux's checkpatch.pl WARN() function takes
-an extra argument that ours does not.)"
 
-The networking special case is not a "relevant part", which
-is why it's not in the patch. The bracketed statement applies
-to the code in the patch, not any lumps of code in the
-kernel's checkpatch that are not in the patch.
-Anyway, I've adjusted the commit message as you suggest.
+Both use the same threading so just copy both.
 
-Since we seem to now have consensus on the checkpatch patch,
-I'm going to put it into the "misc" pull request I'm putting
-together.
 
-thanks
--- PMM
+> >>>> ---
+> >>>>  hw/virtio/vhost-vsock.c                       | 9 +++++++--
+> >>>>  include/standard-headers/linux/virtio_vsock.h | 3 +++
+> >>>>  2 files changed, 10 insertions(+), 2 deletions(-)
+> >>>>
+> >>>> diff --git a/hw/virtio/vhost-vsock.c b/hw/virtio/vhost-vsock.c
+> >>>> index aa5af92..5023c05 100644
+> >>>> --- a/hw/virtio/vhost-vsock.c
+> >>>> +++ b/hw/virtio/vhost-vsock.c
+> >>>> @@ -178,8 +178,13 @@ static uint64_t vhost_vsock_get_features(VirtIODevice *vdev,
+> >>>>                                           uint64_t requested_features,
+> >>>>                                           Error **errp)
+> >>>>  {
+> >>>> -    /* No feature bits used yet */
+> >>>> -    return requested_features;
+> >>>> +    VHostVSock *vsock = VHOST_VSOCK(vdev);
+> >>>> +    uint64_t features;
+> >>>> +
+> >>>> +    virtio_add_feature(&requested_features, VIRTIO_VSOCK_F_MRG_RXBUF);
+> >>>> +    features = requested_features & vsock->vhost_dev.features;
+> >>>> +
+> >>>> +    return features;
+> >>>>  }
+> >>>>
+> >>>>  static void vhost_vsock_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+> >>>> diff --git a/include/standard-headers/linux/virtio_vsock.h b/include/standard-headers/linux/virtio_vsock.h
+> >>>> index be44321..4c583ec 100644
+> >>>> --- a/include/standard-headers/linux/virtio_vsock.h
+> >>>> +++ b/include/standard-headers/linux/virtio_vsock.h
+> >>>> @@ -38,6 +38,9 @@
+> >>>>  #include "standard-headers/linux/virtio_ids.h"
+> >>>>  #include "standard-headers/linux/virtio_config.h"
+> >>>>
+> >>>> +/* Virtio-vsock feature */
+> >>>> +#define VIRTIO_VSOCK_F_MRG_RXBUF 0 /* Host can merge receive buffers. */
+> >>>> +
+> >>>>  struct virtio_vsock_config {
+> >>>>  	uint64_t guest_cid;
+> >>>>  } QEMU_PACKED;
+> >>>> -- 
+> >>>> 1.8.3.1
+> >>>>
+> >>>
+> >>> .
+> >>>
+> >>
+> > 
+> > .
+> > 
+> 
