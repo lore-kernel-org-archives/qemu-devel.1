@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gXnvg-0008Kv-D8
+	(envelope-from <alex.bennee@linaro.org>) id 1gXnvg-0008Kt-D5
 	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gXnve-0001vI-Ix
+	(envelope-from <alex.bennee@linaro.org>) id 1gXnvd-0001un-6o
 	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:00 -0500
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:36222)
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:32785)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gXnve-0001ur-CL
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:54:58 -0500
-Received: by mail-wr1-x436.google.com with SMTP id u4so4543847wrp.3
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 05:54:57 -0800 (PST)
+	id 1gXnvd-0001t1-0A
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:54:57 -0500
+Received: by mail-wr1-x432.google.com with SMTP id c14so5549783wrr.0
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 05:54:56 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 14 Dec 2018 13:54:40 +0000
-Message-Id: <20181214135452.25936-4-alex.bennee@linaro.org>
+Date: Fri, 14 Dec 2018 13:54:41 +0000
+Message-Id: <20181214135452.25936-5-alex.bennee@linaro.org>
 In-Reply-To: <20181214135452.25936-1-alex.bennee@linaro.org>
 References: <20181214135452.25936-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 03/15] fp-test: pick TARGET_ARM to get its
- specialization
+Subject: [Qemu-devel] [PULL 04/15] softfloat: add float{32, 64}_is_{de,
+ }normal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,36 +35,50 @@ Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20B
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-This gets rid of the muladd errors due to not raising the invalid flag.
+This paves the way for upcoming work.
 
-- Before:
-Errors found in f64_mulAdd, rounding near_even, tininess before rounding:
-+000.0000000000000  +7FF.0000000000000  +7FF.FFFFFFFFFFFFF
-        => +7FF.FFFFFFFFFFFFF .....  expected -7FF.FFFFFFFFFFFFF v....
-[...]
-
-- After:
-In 6133248 tests, no errors found in f64_mulAdd, rounding near_even, tininess before rounding.
-[...]
-
+Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/tests/fp/Makefile b/tests/fp/Makefile
-index d649a5a1db..49cdcd1bd2 100644
---- a/tests/fp/Makefile
-+++ b/tests/fp/Makefile
-@@ -29,6 +29,9 @@ QEMU_INCLUDES += -I$(TF_SOURCE_DIR)
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index 8fd9f9bbae..9eeccd88a5 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -464,6 +464,16 @@ static inline int float32_is_zero_or_denormal(float32 a)
+     return (float32_val(a) & 0x7f800000) == 0;
+ }
  
- # work around TARGET_* poisoning
- QEMU_CFLAGS += -DHW_POISON_H
-+# define a target to match testfloat's implementation-defined choices, such as
-+# whether to raise the invalid flag when dealing with NaNs in muladd.
-+QEMU_CFLAGS += -DTARGET_ARM
++static inline bool float32_is_normal(float32 a)
++{
++    return ((float32_val(a) + 0x00800000) & 0x7fffffff) >= 0x01000000;
++}
++
++static inline bool float32_is_denormal(float32 a)
++{
++    return float32_is_zero_or_denormal(a) && !float32_is_zero(a);
++}
++
+ static inline float32 float32_set_sign(float32 a, int sign)
+ {
+     return make_float32((float32_val(a) & 0x7fffffff) | (sign << 31));
+@@ -605,6 +615,16 @@ static inline int float64_is_zero_or_denormal(float64 a)
+     return (float64_val(a) & 0x7ff0000000000000LL) == 0;
+ }
  
- # capstone has a platform.h file that clashes with softfloat's
- QEMU_CFLAGS := $(filter-out %capstone, $(QEMU_CFLAGS))
++static inline bool float64_is_normal(float64 a)
++{
++    return ((float64_val(a) + (1ULL << 52)) & -1ULL >> 1) >= 1ULL << 53;
++}
++
++static inline bool float64_is_denormal(float64 a)
++{
++    return float64_is_zero_or_denormal(a) && !float64_is_zero(a);
++}
++
+ static inline float64 float64_set_sign(float64 a, int sign)
+ {
+     return make_float64((float64_val(a) & 0x7fffffffffffffffULL)
 -- 
 2.17.1
