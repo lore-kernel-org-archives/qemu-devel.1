@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gXnvj-0008N4-VO
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:05 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gXnvk-0008N7-Mt
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gXnvh-0001xO-W1
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:03 -0500
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:52326)
+	(envelope-from <alex.bennee@linaro.org>) id 1gXnvi-0001xm-Kp
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:04 -0500
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:32779)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gXnvh-0001wf-NV
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:01 -0500
-Received: by mail-wm1-x334.google.com with SMTP id m1so5774237wml.2
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 05:55:01 -0800 (PST)
+	id 1gXnvi-0001xA-7a
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:02 -0500
+Received: by mail-wr1-x42b.google.com with SMTP id c14so5550057wrr.0
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 05:55:02 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 14 Dec 2018 13:54:46 +0000
-Message-Id: <20181214135452.25936-10-alex.bennee@linaro.org>
+Date: Fri, 14 Dec 2018 13:54:45 +0000
+Message-Id: <20181214135452.25936-9-alex.bennee@linaro.org>
 In-Reply-To: <20181214135452.25936-1-alex.bennee@linaro.org>
 References: <20181214135452.25936-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 09/15] fpu: introduce hardfloat
+Subject: [Qemu-devel] [PULL 08/15] tests/fp: add fp-bench
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,374 +34,684 @@ Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20B
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-The appended paves the way for leveraging the host FPU for a subset
-of guest FP operations. For most guest workloads (e.g. FP flags
-aren't ever cleared, inexact occurs often and rounding is set to the
-default [to nearest]) this will yield sizable performance speedups.
-
-The approach followed here avoids checking the FP exception flags register.
-See the added comment for details.
-
-This assumes that QEMU is running on an IEEE754-compliant FPU and
-that the rounding is set to the default (to nearest). The
-implementation-dependent specifics of the FPU should not matter; things
-like tininess detection and snan representation are still dealt with in
-soft-fp. However, this approach will break on most hosts if we compile
-QEMU with flags that break IEEE compatibility. There is no way to detect
-all of these flags at compilation time, but at least we check for
--ffast-math (which defines __FAST_MATH__) and disable hardfloat
-(plus emit a #warning) when it is set.
-
-This patch just adds common code. Some operations will be migrated
-to hardfloat in subsequent patches to ease bisection.
-
-Note: some architectures (at least PPC, there might be others) clear
-the status flags passed to softfloat before most FP operations. This
-precludes the use of hardfloat, so to avoid introducing a performance
-regression for those targets, we add a flag to disable hardfloat.
-In the long run though it would be good to fix the targets so that
-at least the inexact flag passed to softfloat is indeed sticky.
+These microbenchmarks will allow us to measure the performance impact of
+FP emulation optimizations. Note that we can measure both directly the impact
+on the softfloat functions (with "-t soft"), or the impact on an
+emulated workload (call with "-t host" and run under qemu user-mode).
 
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index ecdc00c633..468c4554d5 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -83,6 +83,7 @@ this code that are retained.
-  * target-dependent and needs the TARGET_* macros.
-  */
- #include "qemu/osdep.h"
+diff --git a/tests/fp/.gitignore b/tests/fp/.gitignore
+index 8d45d18ac4..704fd42992 100644
+--- a/tests/fp/.gitignore
++++ b/tests/fp/.gitignore
+@@ -1 +1,2 @@
+ fp-test
++fp-bench
+diff --git a/tests/fp/Makefile b/tests/fp/Makefile
+index 49cdcd1bd2..5019dcdca0 100644
+--- a/tests/fp/Makefile
++++ b/tests/fp/Makefile
+@@ -553,7 +553,7 @@ TF_OBJS_LIB += $(TF_OBJS_WRITECASE)
+ TF_OBJS_LIB += testLoops_common.o
+ TF_OBJS_LIB += $(TF_OBJS_TEST)
+ 
+-BINARIES := fp-test$(EXESUF)
++BINARIES := fp-test$(EXESUF) fp-bench$(EXESUF)
+ 
+ # everything depends on config-host.h because platform.h includes it
+ all: $(BUILD_DIR)/config-host.h
+@@ -590,10 +590,13 @@ $(TF_OBJS_LIB) slowfloat.o: %.o: $(TF_SOURCE_DIR)/%.c
+ 
+ libtestfloat.a: $(TF_OBJS_LIB)
+ 
++fp-bench$(EXESUF): fp-bench.o $(QEMU_SOFTFLOAT_OBJ) $(LIBQEMUUTIL)
++
+ clean:
+ 	rm -f *.o *.d $(BINARIES)
+ 	rm -f *.gcno *.gcda *.gcov
+ 	rm -f fp-test$(EXESUF)
++	rm -f fp-bench$(EXESUF)
+ 	rm -f libsoftfloat.a
+ 	rm -f libtestfloat.a
+ 
+diff --git a/tests/fp/fp-bench.c b/tests/fp/fp-bench.c
+new file mode 100644
+index 0000000000..f5bc5edebf
+--- /dev/null
++++ b/tests/fp/fp-bench.c
+@@ -0,0 +1,630 @@
++/*
++ * fp-bench.c - A collection of simple floating point microbenchmarks.
++ *
++ * Copyright (C) 2018, Emilio G. Cota <cota@braap.org>
++ *
++ * License: GNU GPL, version 2 or later.
++ *   See the COPYING file in the top-level directory.
++ */
++#ifndef HW_POISON_H
++#error Must define HW_POISON_H to work around TARGET_* poisoning
++#endif
++
++#include "qemu/osdep.h"
 +#include <math.h>
- #include "qemu/bitops.h"
- #include "fpu/softfloat.h"
- 
-@@ -95,6 +96,324 @@ this code that are retained.
- *----------------------------------------------------------------------------*/
- #include "fpu/softfloat-macros.h"
- 
++#include <fenv.h>
++#include "qemu/timer.h"
++#include "fpu/softfloat.h"
++
++/* amortize the computation of random inputs */
++#define OPS_PER_ITER     50000
++
++#define MAX_OPERANDS 3
++
++#define SEED_A 0xdeadfacedeadface
++#define SEED_B 0xbadc0feebadc0fee
++#define SEED_C 0xbeefdeadbeefdead
++
++enum op {
++    OP_ADD,
++    OP_SUB,
++    OP_MUL,
++    OP_DIV,
++    OP_FMA,
++    OP_SQRT,
++    OP_CMP,
++    OP_MAX_NR,
++};
++
++static const char * const op_names[] = {
++    [OP_ADD] = "add",
++    [OP_SUB] = "sub",
++    [OP_MUL] = "mul",
++    [OP_DIV] = "div",
++    [OP_FMA] = "mulAdd",
++    [OP_SQRT] = "sqrt",
++    [OP_CMP] = "cmp",
++    [OP_MAX_NR] = NULL,
++};
++
++enum precision {
++    PREC_SINGLE,
++    PREC_DOUBLE,
++    PREC_FLOAT32,
++    PREC_FLOAT64,
++    PREC_MAX_NR,
++};
++
++enum rounding {
++    ROUND_EVEN,
++    ROUND_ZERO,
++    ROUND_DOWN,
++    ROUND_UP,
++    ROUND_TIEAWAY,
++    N_ROUND_MODES,
++};
++
++static const char * const round_names[] = {
++    [ROUND_EVEN] = "even",
++    [ROUND_ZERO] = "zero",
++    [ROUND_DOWN] = "down",
++    [ROUND_UP] = "up",
++    [ROUND_TIEAWAY] = "tieaway",
++};
++
++enum tester {
++    TESTER_SOFT,
++    TESTER_HOST,
++    TESTER_MAX_NR,
++};
++
++static const char * const tester_names[] = {
++    [TESTER_SOFT] = "soft",
++    [TESTER_HOST] = "host",
++    [TESTER_MAX_NR] = NULL,
++};
++
++union fp {
++    float f;
++    double d;
++    float32 f32;
++    float64 f64;
++    uint64_t u64;
++};
++
++struct op_state;
++
++typedef float (*float_func_t)(const struct op_state *s);
++typedef double (*double_func_t)(const struct op_state *s);
++
++union fp_func {
++    float_func_t float_func;
++    double_func_t double_func;
++};
++
++typedef void (*bench_func_t)(void);
++
++struct op_desc {
++    const char * const name;
++};
++
++#define DEFAULT_DURATION_SECS 1
++
++static uint64_t random_ops[MAX_OPERANDS] = {
++    SEED_A, SEED_B, SEED_C,
++};
++static float_status soft_status;
++static enum precision precision;
++static enum op operation;
++static enum tester tester;
++static uint64_t n_completed_ops;
++static unsigned int duration = DEFAULT_DURATION_SECS;
++static int64_t ns_elapsed;
++/* disable optimizations with volatile */
++static volatile union fp res;
++
 +/*
-+ * Hardfloat
-+ *
-+ * Fast emulation of guest FP instructions is challenging for two reasons.
-+ * First, FP instruction semantics are similar but not identical, particularly
-+ * when handling NaNs. Second, emulating at reasonable speed the guest FP
-+ * exception flags is not trivial: reading the host's flags register with a
-+ * feclearexcept & fetestexcept pair is slow [slightly slower than soft-fp],
-+ * and trapping on every FP exception is not fast nor pleasant to work with.
-+ *
-+ * We address these challenges by leveraging the host FPU for a subset of the
-+ * operations. To do this we expand on the idea presented in this paper:
-+ *
-+ * Guo, Yu-Chuan, et al. "Translating the ARM Neon and VFP instructions in a
-+ * binary translator." Software: Practice and Experience 46.12 (2016):1591-1615.
-+ *
-+ * The idea is thus to leverage the host FPU to (1) compute FP operations
-+ * and (2) identify whether FP exceptions occurred while avoiding
-+ * expensive exception flag register accesses.
-+ *
-+ * An important optimization shown in the paper is that given that exception
-+ * flags are rarely cleared by the guest, we can avoid recomputing some flags.
-+ * This is particularly useful for the inexact flag, which is very frequently
-+ * raised in floating-point workloads.
-+ *
-+ * We optimize the code further by deferring to soft-fp whenever FP exception
-+ * detection might get hairy. Two examples: (1) when at least one operand is
-+ * denormal/inf/NaN; (2) when operands are not guaranteed to lead to a 0 result
-+ * and the result is < the minimum normal.
++ * From: https://en.wikipedia.org/wiki/Xorshift
++ * This is faster than rand_r(), and gives us a wider range (RAND_MAX is only
++ * guaranteed to be >= INT_MAX).
 + */
-+#define GEN_INPUT_FLUSH__NOCHECK(name, soft_t)                          \
-+    static inline void name(soft_t *a, float_status *s)                 \
-+    {                                                                   \
-+        if (unlikely(soft_t ## _is_denormal(*a))) {                     \
-+            *a = soft_t ## _set_sign(soft_t ## _zero,                   \
-+                                     soft_t ## _is_neg(*a));            \
-+            s->float_exception_flags |= float_flag_input_denormal;      \
-+        }                                                               \
++static uint64_t xorshift64star(uint64_t x)
++{
++    x ^= x >> 12; /* a */
++    x ^= x << 25; /* b */
++    x ^= x >> 27; /* c */
++    return x * UINT64_C(2685821657736338717);
++}
++
++static void update_random_ops(int n_ops, enum precision prec)
++{
++    int i;
++
++    for (i = 0; i < n_ops; i++) {
++        uint64_t r = random_ops[i];
++
++        if (prec == PREC_SINGLE || PREC_FLOAT32) {
++            do {
++                r = xorshift64star(r);
++            } while (!float32_is_normal(r));
++        } else if (prec == PREC_DOUBLE || PREC_FLOAT64) {
++            do {
++                r = xorshift64star(r);
++            } while (!float64_is_normal(r));
++        } else {
++            g_assert_not_reached();
++        }
++        random_ops[i] = r;
 +    }
++}
 +
-+GEN_INPUT_FLUSH__NOCHECK(float32_input_flush__nocheck, float32)
-+GEN_INPUT_FLUSH__NOCHECK(float64_input_flush__nocheck, float64)
-+#undef GEN_INPUT_FLUSH__NOCHECK
++static void fill_random(union fp *ops, int n_ops, enum precision prec,
++                        bool no_neg)
++{
++    int i;
 +
-+#define GEN_INPUT_FLUSH1(name, soft_t)                  \
-+    static inline void name(soft_t *a, float_status *s) \
++    for (i = 0; i < n_ops; i++) {
++        switch (prec) {
++        case PREC_SINGLE:
++        case PREC_FLOAT32:
++            ops[i].f32 = make_float32(random_ops[i]);
++            if (no_neg && float32_is_neg(ops[i].f32)) {
++                ops[i].f32 = float32_chs(ops[i].f32);
++            }
++            /* raise the exponent to limit the frequency of denormal results */
++            ops[i].f32 |= 0x40000000;
++            break;
++        case PREC_DOUBLE:
++        case PREC_FLOAT64:
++            ops[i].f64 = make_float64(random_ops[i]);
++            if (no_neg && float64_is_neg(ops[i].f64)) {
++                ops[i].f64 = float64_chs(ops[i].f64);
++            }
++            /* raise the exponent to limit the frequency of denormal results */
++            ops[i].f64 |= LIT64(0x4000000000000000);
++            break;
++        default:
++            g_assert_not_reached();
++        }
++    }
++}
++
++/*
++ * The main benchmark function. Instead of (ab)using macros, we rely
++ * on the compiler to unfold this at compile-time.
++ */
++static void bench(enum precision prec, enum op op, int n_ops, bool no_neg)
++{
++    int64_t tf = get_clock() + duration * 1000000000LL;
++
++    while (get_clock() < tf) {
++        union fp ops[MAX_OPERANDS];
++        int64_t t0;
++        int i;
++
++        update_random_ops(n_ops, prec);
++        switch (prec) {
++        case PREC_SINGLE:
++            fill_random(ops, n_ops, prec, no_neg);
++            t0 = get_clock();
++            for (i = 0; i < OPS_PER_ITER; i++) {
++                float a = ops[0].f;
++                float b = ops[1].f;
++                float c = ops[2].f;
++
++                switch (op) {
++                case OP_ADD:
++                    res.f = a + b;
++                    break;
++                case OP_SUB:
++                    res.f = a - b;
++                    break;
++                case OP_MUL:
++                    res.f = a * b;
++                    break;
++                case OP_DIV:
++                    res.f = a / b;
++                    break;
++                case OP_FMA:
++                    res.f = fmaf(a, b, c);
++                    break;
++                case OP_SQRT:
++                    res.f = sqrtf(a);
++                    break;
++                case OP_CMP:
++                    res.u64 = isgreater(a, b);
++                    break;
++                default:
++                    g_assert_not_reached();
++                }
++            }
++            break;
++        case PREC_DOUBLE:
++            fill_random(ops, n_ops, prec, no_neg);
++            t0 = get_clock();
++            for (i = 0; i < OPS_PER_ITER; i++) {
++                double a = ops[0].d;
++                double b = ops[1].d;
++                double c = ops[2].d;
++
++                switch (op) {
++                case OP_ADD:
++                    res.d = a + b;
++                    break;
++                case OP_SUB:
++                    res.d = a - b;
++                    break;
++                case OP_MUL:
++                    res.d = a * b;
++                    break;
++                case OP_DIV:
++                    res.d = a / b;
++                    break;
++                case OP_FMA:
++                    res.d = fma(a, b, c);
++                    break;
++                case OP_SQRT:
++                    res.d = sqrt(a);
++                    break;
++                case OP_CMP:
++                    res.u64 = isgreater(a, b);
++                    break;
++                default:
++                    g_assert_not_reached();
++                }
++            }
++            break;
++        case PREC_FLOAT32:
++            fill_random(ops, n_ops, prec, no_neg);
++            t0 = get_clock();
++            for (i = 0; i < OPS_PER_ITER; i++) {
++                float32 a = ops[0].f32;
++                float32 b = ops[1].f32;
++                float32 c = ops[2].f32;
++
++                switch (op) {
++                case OP_ADD:
++                    res.f32 = float32_add(a, b, &soft_status);
++                    break;
++                case OP_SUB:
++                    res.f32 = float32_sub(a, b, &soft_status);
++                    break;
++                case OP_MUL:
++                    res.f = float32_mul(a, b, &soft_status);
++                    break;
++                case OP_DIV:
++                    res.f32 = float32_div(a, b, &soft_status);
++                    break;
++                case OP_FMA:
++                    res.f32 = float32_muladd(a, b, c, 0, &soft_status);
++                    break;
++                case OP_SQRT:
++                    res.f32 = float32_sqrt(a, &soft_status);
++                    break;
++                case OP_CMP:
++                    res.u64 = float32_compare_quiet(a, b, &soft_status);
++                    break;
++                default:
++                    g_assert_not_reached();
++                }
++            }
++            break;
++        case PREC_FLOAT64:
++            fill_random(ops, n_ops, prec, no_neg);
++            t0 = get_clock();
++            for (i = 0; i < OPS_PER_ITER; i++) {
++                float64 a = ops[0].f64;
++                float64 b = ops[1].f64;
++                float64 c = ops[2].f64;
++
++                switch (op) {
++                case OP_ADD:
++                    res.f64 = float64_add(a, b, &soft_status);
++                    break;
++                case OP_SUB:
++                    res.f64 = float64_sub(a, b, &soft_status);
++                    break;
++                case OP_MUL:
++                    res.f = float64_mul(a, b, &soft_status);
++                    break;
++                case OP_DIV:
++                    res.f64 = float64_div(a, b, &soft_status);
++                    break;
++                case OP_FMA:
++                    res.f64 = float64_muladd(a, b, c, 0, &soft_status);
++                    break;
++                case OP_SQRT:
++                    res.f64 = float64_sqrt(a, &soft_status);
++                    break;
++                case OP_CMP:
++                    res.u64 = float64_compare_quiet(a, b, &soft_status);
++                    break;
++                default:
++                    g_assert_not_reached();
++                }
++            }
++            break;
++        default:
++            g_assert_not_reached();
++        }
++        ns_elapsed += get_clock() - t0;
++        n_completed_ops += OPS_PER_ITER;
++    }
++}
++
++#define GEN_BENCH(name, type, prec, op, n_ops)          \
++    static void __attribute__((flatten)) name(void)     \
 +    {                                                   \
-+        if (likely(!s->flush_inputs_to_zero)) {         \
-+            return;                                     \
-+        }                                               \
-+        soft_t ## _input_flush__nocheck(a, s);          \
++        bench(prec, op, n_ops, false);                  \
 +    }
 +
-+GEN_INPUT_FLUSH1(float32_input_flush1, float32)
-+GEN_INPUT_FLUSH1(float64_input_flush1, float64)
-+#undef GEN_INPUT_FLUSH1
-+
-+#define GEN_INPUT_FLUSH2(name, soft_t)                                  \
-+    static inline void name(soft_t *a, soft_t *b, float_status *s)      \
-+    {                                                                   \
-+        if (likely(!s->flush_inputs_to_zero)) {                         \
-+            return;                                                     \
-+        }                                                               \
-+        soft_t ## _input_flush__nocheck(a, s);                          \
-+        soft_t ## _input_flush__nocheck(b, s);                          \
++#define GEN_BENCH_NO_NEG(name, type, prec, op, n_ops)   \
++    static void __attribute__((flatten)) name(void)     \
++    {                                                   \
++        bench(prec, op, n_ops, true);                   \
 +    }
 +
-+GEN_INPUT_FLUSH2(float32_input_flush2, float32)
-+GEN_INPUT_FLUSH2(float64_input_flush2, float64)
-+#undef GEN_INPUT_FLUSH2
++#define GEN_BENCH_ALL_TYPES(opname, op, n_ops)                          \
++    GEN_BENCH(bench_ ## opname ## _float, float, PREC_SINGLE, op, n_ops) \
++    GEN_BENCH(bench_ ## opname ## _double, double, PREC_DOUBLE, op, n_ops) \
++    GEN_BENCH(bench_ ## opname ## _float32, float32, PREC_FLOAT32, op, n_ops) \
++    GEN_BENCH(bench_ ## opname ## _float64, float64, PREC_FLOAT64, op, n_ops)
 +
-+#define GEN_INPUT_FLUSH3(name, soft_t)                                  \
-+    static inline void name(soft_t *a, soft_t *b, soft_t *c, float_status *s) \
-+    {                                                                   \
-+        if (likely(!s->flush_inputs_to_zero)) {                         \
-+            return;                                                     \
-+        }                                                               \
-+        soft_t ## _input_flush__nocheck(a, s);                          \
-+        soft_t ## _input_flush__nocheck(b, s);                          \
-+        soft_t ## _input_flush__nocheck(c, s);                          \
++GEN_BENCH_ALL_TYPES(add, OP_ADD, 2)
++GEN_BENCH_ALL_TYPES(sub, OP_SUB, 2)
++GEN_BENCH_ALL_TYPES(mul, OP_MUL, 2)
++GEN_BENCH_ALL_TYPES(div, OP_DIV, 2)
++GEN_BENCH_ALL_TYPES(fma, OP_FMA, 3)
++GEN_BENCH_ALL_TYPES(cmp, OP_CMP, 2)
++#undef GEN_BENCH_ALL_TYPES
++
++#define GEN_BENCH_ALL_TYPES_NO_NEG(name, op, n)                         \
++    GEN_BENCH_NO_NEG(bench_ ## name ## _float, float, PREC_SINGLE, op, n) \
++    GEN_BENCH_NO_NEG(bench_ ## name ## _double, double, PREC_DOUBLE, op, n) \
++    GEN_BENCH_NO_NEG(bench_ ## name ## _float32, float32, PREC_FLOAT32, op, n) \
++    GEN_BENCH_NO_NEG(bench_ ## name ## _float64, float64, PREC_FLOAT64, op, n)
++
++GEN_BENCH_ALL_TYPES_NO_NEG(sqrt, OP_SQRT, 1)
++#undef GEN_BENCH_ALL_TYPES_NO_NEG
++
++#undef GEN_BENCH_NO_NEG
++#undef GEN_BENCH
++
++#define GEN_BENCH_FUNCS(opname, op)                             \
++    [op] = {                                                    \
++        [PREC_SINGLE]    = bench_ ## opname ## _float,          \
++        [PREC_DOUBLE]    = bench_ ## opname ## _double,         \
++        [PREC_FLOAT32]   = bench_ ## opname ## _float32,        \
++        [PREC_FLOAT64]   = bench_ ## opname ## _float64,        \
 +    }
 +
-+GEN_INPUT_FLUSH3(float32_input_flush3, float32)
-+GEN_INPUT_FLUSH3(float64_input_flush3, float64)
-+#undef GEN_INPUT_FLUSH3
++static const bench_func_t bench_funcs[OP_MAX_NR][PREC_MAX_NR] = {
++    GEN_BENCH_FUNCS(add, OP_ADD),
++    GEN_BENCH_FUNCS(sub, OP_SUB),
++    GEN_BENCH_FUNCS(mul, OP_MUL),
++    GEN_BENCH_FUNCS(div, OP_DIV),
++    GEN_BENCH_FUNCS(fma, OP_FMA),
++    GEN_BENCH_FUNCS(sqrt, OP_SQRT),
++    GEN_BENCH_FUNCS(cmp, OP_CMP),
++};
 +
-+/*
-+ * Choose whether to use fpclassify or float32/64_* primitives in the generated
-+ * hardfloat functions. Each combination of number of inputs and float size
-+ * gets its own value.
-+ */
-+#if defined(__x86_64__)
-+# define QEMU_HARDFLOAT_1F32_USE_FP 0
-+# define QEMU_HARDFLOAT_1F64_USE_FP 1
-+# define QEMU_HARDFLOAT_2F32_USE_FP 0
-+# define QEMU_HARDFLOAT_2F64_USE_FP 1
-+# define QEMU_HARDFLOAT_3F32_USE_FP 0
-+# define QEMU_HARDFLOAT_3F64_USE_FP 1
-+#else
-+# define QEMU_HARDFLOAT_1F32_USE_FP 0
-+# define QEMU_HARDFLOAT_1F64_USE_FP 0
-+# define QEMU_HARDFLOAT_2F32_USE_FP 0
-+# define QEMU_HARDFLOAT_2F64_USE_FP 0
-+# define QEMU_HARDFLOAT_3F32_USE_FP 0
-+# define QEMU_HARDFLOAT_3F64_USE_FP 0
-+#endif
++#undef GEN_BENCH_FUNCS
 +
-+/*
-+ * QEMU_HARDFLOAT_USE_ISINF chooses whether to use isinf() over
-+ * float{32,64}_is_infinity when !USE_FP.
-+ * On x86_64/aarch64, using the former over the latter can yield a ~6% speedup.
-+ * On power64 however, using isinf() reduces fp-bench performance by up to 50%.
-+ */
-+#if defined(__x86_64__) || defined(__aarch64__)
-+# define QEMU_HARDFLOAT_USE_ISINF   1
-+#else
-+# define QEMU_HARDFLOAT_USE_ISINF   0
-+#endif
-+
-+/*
-+ * Some targets clear the FP flags before most FP operations. This prevents
-+ * the use of hardfloat, since hardfloat relies on the inexact flag being
-+ * already set.
-+ */
-+#if defined(TARGET_PPC) || defined(__FAST_MATH__)
-+# if defined(__FAST_MATH__)
-+#  warning disabling hardfloat due to -ffast-math: hardfloat requires an exact \
-+    IEEE implementation
-+# endif
-+# define QEMU_NO_HARDFLOAT 1
-+# define QEMU_SOFTFLOAT_ATTR QEMU_FLATTEN
-+#else
-+# define QEMU_NO_HARDFLOAT 0
-+# define QEMU_SOFTFLOAT_ATTR QEMU_FLATTEN __attribute__((noinline))
-+#endif
-+
-+static inline bool can_use_fpu(const float_status *s)
++static void run_bench(void)
 +{
-+    if (QEMU_NO_HARDFLOAT) {
-+        return false;
-+    }
-+    return likely(s->float_exception_flags & float_flag_inexact &&
-+                  s->float_rounding_mode == float_round_nearest_even);
++    bench_func_t f;
++
++    f = bench_funcs[operation][precision];
++    g_assert(f);
++    f();
 +}
 +
-+/*
-+ * Hardfloat generation functions. Each operation can have two flavors:
-+ * either using softfloat primitives (e.g. float32_is_zero_or_normal) for
-+ * most condition checks, or native ones (e.g. fpclassify).
-+ *
-+ * The flavor is chosen by the callers. Instead of using macros, we rely on the
-+ * compiler to propagate constants and inline everything into the callers.
-+ *
-+ * We only generate functions for operations with two inputs, since only
-+ * these are common enough to justify consolidating them into common code.
-+ */
-+
-+typedef union {
-+    float32 s;
-+    float h;
-+} union_float32;
-+
-+typedef union {
-+    float64 s;
-+    double h;
-+} union_float64;
-+
-+typedef bool (*f32_check_fn)(union_float32 a, union_float32 b);
-+typedef bool (*f64_check_fn)(union_float64 a, union_float64 b);
-+
-+typedef float32 (*soft_f32_op2_fn)(float32 a, float32 b, float_status *s);
-+typedef float64 (*soft_f64_op2_fn)(float64 a, float64 b, float_status *s);
-+typedef float   (*hard_f32_op2_fn)(float a, float b);
-+typedef double  (*hard_f64_op2_fn)(double a, double b);
-+
-+/* 2-input is-zero-or-normal */
-+static inline bool f32_is_zon2(union_float32 a, union_float32 b)
++/* @arr must be NULL-terminated */
++static int find_name(const char * const *arr, const char *name)
 +{
-+    if (QEMU_HARDFLOAT_2F32_USE_FP) {
-+        /*
-+         * Not using a temp variable for consecutive fpclassify calls ends up
-+         * generating faster code.
-+         */
-+        return (fpclassify(a.h) == FP_NORMAL || fpclassify(a.h) == FP_ZERO) &&
-+               (fpclassify(b.h) == FP_NORMAL || fpclassify(b.h) == FP_ZERO);
-+    }
-+    return float32_is_zero_or_normal(a.s) &&
-+           float32_is_zero_or_normal(b.s);
-+}
++    int i;
 +
-+static inline bool f64_is_zon2(union_float64 a, union_float64 b)
-+{
-+    if (QEMU_HARDFLOAT_2F64_USE_FP) {
-+        return (fpclassify(a.h) == FP_NORMAL || fpclassify(a.h) == FP_ZERO) &&
-+               (fpclassify(b.h) == FP_NORMAL || fpclassify(b.h) == FP_ZERO);
-+    }
-+    return float64_is_zero_or_normal(a.s) &&
-+           float64_is_zero_or_normal(b.s);
-+}
-+
-+/* 3-input is-zero-or-normal */
-+static inline
-+bool f32_is_zon3(union_float32 a, union_float32 b, union_float32 c)
-+{
-+    if (QEMU_HARDFLOAT_3F32_USE_FP) {
-+        return (fpclassify(a.h) == FP_NORMAL || fpclassify(a.h) == FP_ZERO) &&
-+               (fpclassify(b.h) == FP_NORMAL || fpclassify(b.h) == FP_ZERO) &&
-+               (fpclassify(c.h) == FP_NORMAL || fpclassify(c.h) == FP_ZERO);
-+    }
-+    return float32_is_zero_or_normal(a.s) &&
-+           float32_is_zero_or_normal(b.s) &&
-+           float32_is_zero_or_normal(c.s);
-+}
-+
-+static inline
-+bool f64_is_zon3(union_float64 a, union_float64 b, union_float64 c)
-+{
-+    if (QEMU_HARDFLOAT_3F64_USE_FP) {
-+        return (fpclassify(a.h) == FP_NORMAL || fpclassify(a.h) == FP_ZERO) &&
-+               (fpclassify(b.h) == FP_NORMAL || fpclassify(b.h) == FP_ZERO) &&
-+               (fpclassify(c.h) == FP_NORMAL || fpclassify(c.h) == FP_ZERO);
-+    }
-+    return float64_is_zero_or_normal(a.s) &&
-+           float64_is_zero_or_normal(b.s) &&
-+           float64_is_zero_or_normal(c.s);
-+}
-+
-+static inline bool f32_is_inf(union_float32 a)
-+{
-+    if (QEMU_HARDFLOAT_USE_ISINF) {
-+        return isinf(a.h);
-+    }
-+    return float32_is_infinity(a.s);
-+}
-+
-+static inline bool f64_is_inf(union_float64 a)
-+{
-+    if (QEMU_HARDFLOAT_USE_ISINF) {
-+        return isinf(a.h);
-+    }
-+    return float64_is_infinity(a.s);
-+}
-+
-+/* Note: @fast_test and @post can be NULL */
-+static inline float32
-+float32_gen2(float32 xa, float32 xb, float_status *s,
-+             hard_f32_op2_fn hard, soft_f32_op2_fn soft,
-+             f32_check_fn pre, f32_check_fn post,
-+             f32_check_fn fast_test, soft_f32_op2_fn fast_op)
-+{
-+    union_float32 ua, ub, ur;
-+
-+    ua.s = xa;
-+    ub.s = xb;
-+
-+    if (unlikely(!can_use_fpu(s))) {
-+        goto soft;
-+    }
-+
-+    float32_input_flush2(&ua.s, &ub.s, s);
-+    if (unlikely(!pre(ua, ub))) {
-+        goto soft;
-+    }
-+    if (fast_test && fast_test(ua, ub)) {
-+        return fast_op(ua.s, ub.s, s);
-+    }
-+
-+    ur.h = hard(ua.h, ub.h);
-+    if (unlikely(f32_is_inf(ur))) {
-+        s->float_exception_flags |= float_flag_overflow;
-+    } else if (unlikely(fabsf(ur.h) <= FLT_MIN)) {
-+        if (post == NULL || post(ua, ub)) {
-+            goto soft;
++    for (i = 0; arr[i] != NULL; i++) {
++        if (strcmp(name, arr[i]) == 0) {
++            return i;
 +        }
 +    }
-+    return ur.s;
-+
-+ soft:
-+    return soft(ua.s, ub.s, s);
++    return -1;
 +}
 +
-+static inline float64
-+float64_gen2(float64 xa, float64 xb, float_status *s,
-+             hard_f64_op2_fn hard, soft_f64_op2_fn soft,
-+             f64_check_fn pre, f64_check_fn post,
-+             f64_check_fn fast_test, soft_f64_op2_fn fast_op)
++static void usage_complete(int argc, char *argv[])
 +{
-+    union_float64 ua, ub, ur;
++    gchar *op_list = g_strjoinv(", ", (gchar **)op_names);
++    gchar *tester_list = g_strjoinv(", ", (gchar **)tester_names);
 +
-+    ua.s = xa;
-+    ub.s = xb;
++    fprintf(stderr, "Usage: %s [options]\n", argv[0]);
++    fprintf(stderr, "options:\n");
++    fprintf(stderr, " -d = duration, in seconds. Default: %d\n",
++            DEFAULT_DURATION_SECS);
++    fprintf(stderr, " -h = show this help message.\n");
++    fprintf(stderr, " -o = floating point operation (%s). Default: %s\n",
++            op_list, op_names[0]);
++    fprintf(stderr, " -p = floating point precision (single, double). "
++            "Default: single\n");
++    fprintf(stderr, " -r = rounding mode (even, zero, down, up, tieaway). "
++            "Default: even\n");
++    fprintf(stderr, " -t = tester (%s). Default: %s\n",
++            tester_list, tester_names[0]);
++    fprintf(stderr, " -z = flush inputs to zero (soft tester only). "
++            "Default: disabled\n");
++    fprintf(stderr, " -Z = flush output to zero (soft tester only). "
++            "Default: disabled\n");
 +
-+    if (unlikely(!can_use_fpu(s))) {
-+        goto soft;
-+    }
++    g_free(tester_list);
++    g_free(op_list);
++}
 +
-+    float64_input_flush2(&ua.s, &ub.s, s);
-+    if (unlikely(!pre(ua, ub))) {
-+        goto soft;
-+    }
-+    if (fast_test && fast_test(ua, ub)) {
-+        return fast_op(ua.s, ub.s, s);
-+    }
++static int round_name_to_mode(const char *name)
++{
++    int i;
 +
-+    ur.h = hard(ua.h, ub.h);
-+    if (unlikely(f64_is_inf(ur))) {
-+        s->float_exception_flags |= float_flag_overflow;
-+    } else if (unlikely(fabs(ur.h) <= DBL_MIN)) {
-+        if (post == NULL || post(ua, ub)) {
-+            goto soft;
++    for (i = 0; i < N_ROUND_MODES; i++) {
++        if (!strcmp(round_names[i], name)) {
++            return i;
 +        }
 +    }
-+    return ur.s;
-+
-+ soft:
-+    return soft(ua.s, ub.s, s);
++    return -1;
 +}
 +
- /*----------------------------------------------------------------------------
- | Returns the fraction bits of the half-precision floating-point value `a'.
- *----------------------------------------------------------------------------*/
++static void QEMU_NORETURN die_host_rounding(enum rounding rounding)
++{
++    fprintf(stderr, "fatal: '%s' rounding not supported on this host\n",
++            round_names[rounding]);
++    exit(EXIT_FAILURE);
++}
++
++static void set_host_precision(enum rounding rounding)
++{
++    int rhost;
++
++    switch (rounding) {
++    case ROUND_EVEN:
++        rhost = FE_TONEAREST;
++        break;
++    case ROUND_ZERO:
++        rhost = FE_TOWARDZERO;
++        break;
++    case ROUND_DOWN:
++        rhost = FE_DOWNWARD;
++        break;
++    case ROUND_UP:
++        rhost = FE_UPWARD;
++        break;
++    case ROUND_TIEAWAY:
++        die_host_rounding(rounding);
++        return;
++    default:
++        g_assert_not_reached();
++    }
++
++    if (fesetround(rhost)) {
++        die_host_rounding(rounding);
++    }
++}
++
++static void set_soft_precision(enum rounding rounding)
++{
++    signed char mode;
++
++    switch (rounding) {
++    case ROUND_EVEN:
++        mode = float_round_nearest_even;
++        break;
++    case ROUND_ZERO:
++        mode = float_round_to_zero;
++        break;
++    case ROUND_DOWN:
++        mode = float_round_down;
++        break;
++    case ROUND_UP:
++        mode = float_round_up;
++        break;
++    case ROUND_TIEAWAY:
++        mode = float_round_ties_away;
++        break;
++    default:
++        g_assert_not_reached();
++    }
++    soft_status.float_rounding_mode = mode;
++}
++
++static void parse_args(int argc, char *argv[])
++{
++    int c;
++    int val;
++    int rounding = ROUND_EVEN;
++
++    for (;;) {
++        c = getopt(argc, argv, "d:ho:p:r:t:zZ");
++        if (c < 0) {
++            break;
++        }
++        switch (c) {
++        case 'd':
++            duration = atoi(optarg);
++            break;
++        case 'h':
++            usage_complete(argc, argv);
++            exit(EXIT_SUCCESS);
++        case 'o':
++            val = find_name(op_names, optarg);
++            if (val < 0) {
++                fprintf(stderr, "Unsupported op '%s'\n", optarg);
++                exit(EXIT_FAILURE);
++            }
++            operation = val;
++            break;
++        case 'p':
++            if (!strcmp(optarg, "single")) {
++                precision = PREC_SINGLE;
++            } else if (!strcmp(optarg, "double")) {
++                precision = PREC_DOUBLE;
++            } else {
++                fprintf(stderr, "Unsupported precision '%s'\n", optarg);
++                exit(EXIT_FAILURE);
++            }
++            break;
++        case 'r':
++            rounding = round_name_to_mode(optarg);
++            if (rounding < 0) {
++                fprintf(stderr, "fatal: invalid rounding mode '%s'\n", optarg);
++                exit(EXIT_FAILURE);
++            }
++            break;
++        case 't':
++            val = find_name(tester_names, optarg);
++            if (val < 0) {
++                fprintf(stderr, "Unsupported tester '%s'\n", optarg);
++                exit(EXIT_FAILURE);
++            }
++            tester = val;
++            break;
++        case 'z':
++            soft_status.flush_inputs_to_zero = 1;
++            break;
++        case 'Z':
++            soft_status.flush_to_zero = 1;
++            break;
++        }
++    }
++
++    /* set precision and rounding mode based on the tester */
++    switch (tester) {
++    case TESTER_HOST:
++        set_host_precision(rounding);
++        break;
++    case TESTER_SOFT:
++        set_soft_precision(rounding);
++        switch (precision) {
++        case PREC_SINGLE:
++            precision = PREC_FLOAT32;
++            break;
++        case PREC_DOUBLE:
++            precision = PREC_FLOAT64;
++            break;
++        default:
++            g_assert_not_reached();
++        }
++        break;
++    default:
++        g_assert_not_reached();
++    }
++}
++
++static void pr_stats(void)
++{
++    printf("%.2f MFlops\n", (double)n_completed_ops / ns_elapsed * 1e3);
++}
++
++int main(int argc, char *argv[])
++{
++    parse_args(argc, argv);
++    run_bench();
++    pr_stats();
++    return 0;
++}
 -- 
 2.17.1
