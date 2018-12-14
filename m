@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXgcp-0005Sx-Vy
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 01:07:04 -0500
+	(envelope-from <armbru@redhat.com>) id 1gXgeh-0007OF-Tl
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 01:09:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXgcm-000298-Ry
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 01:07:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49312)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXgcm-00028k-LG
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 01:07:00 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DA7BF300207A
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 06:06:59 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1gXgeh-0004Fe-7p
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 01:08:59 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <20181213184340.24037-1-armbru@redhat.com>
-	<20181213184340.24037-28-armbru@redhat.com>
-	<45516d95-2271-5577-8cad-38d66ff2181f@redhat.com>
-Date: Fri, 14 Dec 2018 07:06:56 +0100
-In-Reply-To: <45516d95-2271-5577-8cad-38d66ff2181f@redhat.com> (Eric Blake's
-	message of "Thu, 13 Dec 2018 15:52:58 -0600")
-Message-ID: <87ftv0fxq7.fsf@dusky.pond.sub.org>
+References: <20181213223737.11793-1-pbonzini@redhat.com>
+	<20181213223737.11793-2-pbonzini@redhat.com>
+Date: Fri, 14 Dec 2018 07:08:49 +0100
+In-Reply-To: <20181213223737.11793-2-pbonzini@redhat.com> (Paolo Bonzini's
+	message of "Thu, 13 Dec 2018 23:37:36 +0100")
+Message-ID: <87bm5ofxn2.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 27/32] qapi: add #if conditions to generated
- code members
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/2] remove space-tab sequences
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,31 +23,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, "open list:ARM target" <qemu-arm@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Richard Henderson <rth@twiddle.net>
 
-Eric Blake <eblake@redhat.com> writes:
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> On 12/13/18 12:43 PM, Markus Armbruster wrote:
->> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>
->> Wrap generated enum and struct members and their supporting code with
->>
+> There are not many, and they are all simple mistakes that ended up
+> being committed.  Remove them.
 >
-> Git ate the line because it started with #.  Not sure if you can sneak
-> in a v2 pull request that puts something sane here...
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-v2 sent, and my .gitconfig now has
-
-    [commit]
-            cleanup =3D scissors
-
-Let's see how I fare with that.
-
-Thanks!
-
->
->> We do enum and struct in a single patch because union tag enum and the
->> associated variants tie them together, and dealing with that to split
->> the patch doesn't seem worthwhile.
->>
+The cover letter states "I am not touching space-tab in the middle of
+the line, many of which are in #define lines."  I think the actual
+commit should, too.
