@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.de_backer@nokia.com>) id 1gXmxM-0005SS-T9
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:52:41 -0500
+	(envelope-from <mst@redhat.com>) id 1gXmy4-0006gC-PA
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:53:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.de_backer@nokia.com>) id 1gXmxJ-0001mn-ID
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:52:40 -0500
-From: "De Backer, Fred (Nokia - BE/Antwerp)" <fred.de_backer@nokia.com>
-Date: Fri, 14 Dec 2018 12:52:34 +0000
-Message-ID: <VI1PR07MB334480C3525B865AE5052903AEA10@VI1PR07MB3344.eurprd07.prod.outlook.com>
-References: <DB6PR07MB33330E3562B0AF0ECC8307BCAEA00@DB6PR07MB3333.eurprd07.prod.outlook.com>
-	<DB6PR07MB3333E95C513AF2EF14AAE615AEA00@DB6PR07MB3333.eurprd07.prod.outlook.com>
-	<14b32e39-a9f6-1a83-87e6-6e150954ddb7@redhat.com>
-	<20181213144914.GH5427@linux.fritz.box>
-	<db4f1763-e28f-387c-2652-ba71c29e97ff@redhat.com>
-	<DB6PR07MB3333BA55F6C06E1DB3388D55AEA00@DB6PR07MB3333.eurprd07.prod.outlook.com>
-	<CAMRbyyug2e_MK+Nzdzso9RheENVzuTba5nYzjBNZbrXCaB2hrw@mail.gmail.com>
-	<VI1PR07MB3344412C5DE71936F9689909AEA10@VI1PR07MB3344.eurprd07.prod.outlook.com>
-	<VI1PR07MB334400B255A91277D3597F79AEA10@VI1PR07MB3344.eurprd07.prod.outlook.com>
-	<20181214122659.GB4341@dhcp-200-186.str.redhat.com>
-In-Reply-To: <20181214122659.GB4341@dhcp-200-186.str.redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <mst@redhat.com>) id 1gXmy1-0002qv-Cc
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:53:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57632)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gXmy1-0002qQ-4P
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:53:21 -0500
+Date: Fri, 14 Dec 2018 07:53:15 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181214075249-mutt-send-email-mst@kernel.org>
+References: <20181213210057.3676-1-quintela@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DB1BECBE@dggeml511-mbx.china.huawei.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-block] Request for clarification on qemu-img
- convert behavior zeroing target host_device
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DB1BECBE@dggeml511-mbx.china.huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v3 00/16] Virtio devices split from
+ virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,33 +28,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Nir Soffer <nsoffer@redhat.com>, Eric Blake <eblake@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, "Richard W.M. Jones" <rjones@redhat.com>, "Aamir T, Owais (Nokia -
-	IN/Chennai)" <owais.aamir_t@nokia.com>
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc: Juan Quintela <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
->Of course, we should also think about the other problem you mentioned, rel=
-ated to copying a smaller image to a larger block device. Does this require=
- zeroing the parts after the image or should we leave them alone?
->
->I'd tend to say that since you're passing the whole block device as a targ=
-et to 'qemu-img convert', and the whole block device will be visible to a g=
-uest run with the same block device configuration, we should indeed zero ou=
-t the whole device. But then we would declare the F27 behaviour buggy and t=
-his case would stay slow (it would become slightly faster because we avoid =
-the double writes, but we wouldn't save the writes to the unused space).
+On Fri, Dec 14, 2018 at 07:07:44AM +0000, Gonglei (Arei) wrote:
+> 
+> > -----Original Message-----
+> > From: Juan Quintela [mailto:quintela@redhat.com]
+> > Sent: Friday, December 14, 2018 5:01 AM
+> > To: qemu-devel@nongnu.org
+> > Cc: Michael S. Tsirkin <mst@redhat.com>; Thomas Huth <thuth@redhat.com>;
+> > Gerd Hoffmann <kraxel@redhat.com>; Gonglei (Arei)
+> > <arei.gonglei@huawei.com>; Juan Quintela <quintela@redhat.com>
+> > Subject: [PATCH v3 00/16] Virtio devices split from virtio-pci
+> > 
+> > Hi
+> > 
+> > v3:
+> > - rebase to master
+> > - only compile them if CONFIG_PCI is set (thomas)
+> > 
+> > Please review.
+> > 
+> > Later, Juan.
+> > 
+> > V2:
+> > 
+> > - Rebase on top of master
+> > 
+> > Please review.
+> > 
+> > Later, Juan.
+> > 
+> > [v1]
+> > From previous verision (in the middle of make check tests):
+> > - split also the bits of virtio-pci.h (mst suggestion)
+> > - add gpu, crypt and gpg bits
+> > - more cleanups
+> > - fix all the copyrights (the ones not changed have been there
+> >   foverever)
+> > - be consistent with naming, vhost-* or virtio-*
+> > 
+> > Please review, Juan.
+> > 
+> > Juan Quintela (16):
+> >   virtio: split vhost vsock bits from virtio-pci
+> >   virtio: split virtio input host bits from virtio-pci
+> >   virtio: split virtio input bits from virtio-pci
+> >   virtio: split virtio rng bits from virtio-pci
+> >   virtio: split virtio balloon bits from virtio-pci
+> >   virtio: split virtio 9p bits from virtio-pci
+> >   virtio: split vhost user blk bits from virtio-pci
+> >   virtio: split vhost user scsi bits from virtio-pci
+> >   virtio: split vhost scsi bits from virtio-pci
+> >   virtio: split virtio scsi bits from virtio-pci
+> >   virtio: split virtio blk bits rom virtio-pci
+> >   virtio: split virtio net bits rom virtio-pci
+> >   virtio: split virtio serial bits rom virtio-pci
+> >   virtio: split virtio gpu bits rom virtio-pci.h
+> >   virtio: split virtio crypto bits rom virtio-pci.h
+> >   virtio: virtio 9p really requires CONFIG_VIRTFS to work
+> > 
+> >  default-configs/virtio.mak        |   3 +-
+> >  hw/display/virtio-gpu-pci.c       |  14 +
+> >  hw/display/virtio-vga.c           |   1 +
+> >  hw/virtio/Makefile.objs           |  15 +
+> >  hw/virtio/vhost-scsi-pci.c        |  95 ++++
+> >  hw/virtio/vhost-user-blk-pci.c    | 101 ++++
+> >  hw/virtio/vhost-user-scsi-pci.c   | 101 ++++
+> >  hw/virtio/vhost-vsock-pci.c       |  82 ++++
+> >  hw/virtio/virtio-9p-pci.c         |  86 ++++
+> >  hw/virtio/virtio-balloon-pci.c    |  94 ++++
+> >  hw/virtio/virtio-blk-pci.c        |  97 ++++
+> >  hw/virtio/virtio-crypto-pci.c     |  14 +
+> >  hw/virtio/virtio-input-host-pci.c |  45 ++
+> >  hw/virtio/virtio-input-pci.c      | 154 ++++++
+> >  hw/virtio/virtio-net-pci.c        |  96 ++++
+> >  hw/virtio/virtio-pci.c            | 783 ------------------------------
+> >  hw/virtio/virtio-pci.h            | 234 ---------
+> >  hw/virtio/virtio-rng-pci.c        |  86 ++++
+> >  hw/virtio/virtio-scsi-pci.c       | 106 ++++
+> >  hw/virtio/virtio-serial-pci.c     | 112 +++++
+> >  tests/Makefile.include            |  20 +-
+> >  21 files changed, 1311 insertions(+), 1028 deletions(-)
+> >  create mode 100644 hw/virtio/vhost-scsi-pci.c
+> >  create mode 100644 hw/virtio/vhost-user-blk-pci.c
+> >  create mode 100644 hw/virtio/vhost-user-scsi-pci.c
+> >  create mode 100644 hw/virtio/vhost-vsock-pci.c
+> >  create mode 100644 hw/virtio/virtio-9p-pci.c
+> >  create mode 100644 hw/virtio/virtio-balloon-pci.c
+> >  create mode 100644 hw/virtio/virtio-blk-pci.c
+> >  create mode 100644 hw/virtio/virtio-input-host-pci.c
+> >  create mode 100644 hw/virtio/virtio-input-pci.c
+> >  create mode 100644 hw/virtio/virtio-net-pci.c
+> >  create mode 100644 hw/virtio/virtio-rng-pci.c
+> >  create mode 100644 hw/virtio/virtio-scsi-pci.c
+> >  create mode 100644 hw/virtio/virtio-serial-pci.c
+> > 
+> > --
+> > 2.19.2
+> 
+> For series:
+> 	Reviewed-by: Gonglei <arei.gonglei@huawei.com>
+> 
+>  
+> Thanks,
+> -Gonglei
 
-As long as it's outside the region of the source image I think you can leav=
-e it alone. Similar to deleting a file on a disk also doesn't zero out the =
-sectors that were used to store that file before.
-
->Or we could just refuse to convert if source and target aren't the same si=
-ze. Then you would have to use a raw filter driver to select a part from th=
-e target image with the offset/size options. But this would break backwards=
- compatibility, and its use is not very intuitive either.
-
-Going that path would certainly break the way Openstack Ironic project uses=
- qemu-img via the ironic-python-agent to image baremetal servers. And I can=
- imagine there are other cases out there using qemu-img to write out disk i=
-mages to blockdevices.
-
-Fred
+Thanks!
+Can you pls align Reviewed-by: tag at the 1st column in the future?
+Makes it easier to apply the tag.
