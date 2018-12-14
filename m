@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXfxY-0004PT-RG
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:27 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gXfxi-0004TS-G9
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXfxX-0005MD-Ie
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:24 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:33365)
+	(envelope-from <richard.henderson@linaro.org>) id 1gXfxd-0005PX-Cs
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:32 -0500
+Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:33295)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gXfxX-0005LC-B3
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:23 -0500
-Received: by mail-oi1-x242.google.com with SMTP id c206so3659560oib.0
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 21:24:22 -0800 (PST)
+	id 1gXfxd-0005Ot-7c
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:29 -0500
+Received: by mail-oi1-x231.google.com with SMTP id c206so3659730oib.0
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 21:24:29 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 13 Dec 2018 23:23:50 -0600
-Message-Id: <20181214052410.11863-8-richard.henderson@linaro.org>
+Date: Thu, 13 Dec 2018 23:23:56 -0600
+Message-Id: <20181214052410.11863-14-richard.henderson@linaro.org>
 In-Reply-To: <20181214052410.11863-1-richard.henderson@linaro.org>
 References: <20181214052410.11863-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 07/27] target/arm: Decode PAuth within
- disas_data_proc_1src
+Subject: [Qemu-devel] [PATCH v2 13/27] target/arm: Decode Load/store
+ register (pac)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,175 +30,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
+Not that there are any stores involved, but why argue with ARM's
+naming convention.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 146 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 146 insertions(+)
+ target/arm/translate-a64.c | 62 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 62 insertions(+)
 
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index c5ec430b42..7ba4c996cf 100644
+index e62d248894..c57c89d98a 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -4564,6 +4564,7 @@ static void handle_rev16(DisasContext *s, unsigned int sf,
- static void disas_data_proc_1src(DisasContext *s, uint32_t insn)
- {
-     unsigned int sf, opcode, opcode2, rn, rd;
-+    TCGv_i64 tcg_rd;
+@@ -3146,6 +3146,65 @@ static void disas_ldst_atomic(DisasContext *s, uint32_t insn,
+        s->be_data | size | MO_ALIGN);
+ }
  
-     if (extract32(insn, 29, 1)) {
-         unallocated_encoding(s);
-@@ -4602,7 +4603,152 @@ static void disas_data_proc_1src(DisasContext *s, uint32_t insn)
-     case MAP(1, 0x00, 0x05):
-         handle_cls(s, sf, rn, rd);
++/* PAC memory operations
++ *
++ *  31  30      27  26    24    22  21       12  11  10    5     0
++ * +------+-------+---+-----+-----+---+--------+---+---+----+-----+
++ * | size | 1 1 1 | V | 0 0 | M S | 1 |  imm9  | W | 1 | Rn |  Rt |
++ * +------+-------+---+-----+-----+------------+---+---+----+-----+
++ *
++ * Rt: the result register
++ * Rn: base address or SP
++ * Rs: the source register for the operation
++ * V: vector flag (always 0 as of v8.3)
++ * M: clear for key DA, set for key DB
++ * W: pre-indexing flag
++ * S: sign for imm9.
++ */
++static void disas_ldst_pac(DisasContext *s, uint32_t insn,
++                           int size, int rt, bool is_vector)
++{
++    int rn = extract32(insn, 5, 5);
++    bool is_wback = extract32(insn, 11, 1);
++    bool use_key_a = !extract32(insn, 23, 1);
++    int offset, memidx;
++    TCGv_i64 tcg_addr, tcg_rt;
++
++    if (size != 3 || is_vector || !dc_isar_feature(aa64_pauth, s)) {
++        unallocated_encoding(s);
++        return;
++    }
++
++    if (rn == 31) {
++        gen_check_sp_alignment(s);
++    }
++    tcg_addr = read_cpu_reg_sp(s, rn, 1);
++
++    if (s->pauth_active) {
++        if (use_key_a) {
++            gen_helper_autda(tcg_addr, cpu_env, tcg_addr, cpu_X[31]);
++        } else {
++            gen_helper_autdb(tcg_addr, cpu_env, tcg_addr, cpu_X[31]);
++        }
++    }
++
++    /* Form the 10-bit signed, scaled offset.  */
++    offset = (extract32(insn, 22, 1) << 9) | extract32(insn, 12, 9);
++    offset = sextract32(offset << size, 10 + size, 0);
++    tcg_gen_addi_i64(tcg_addr, tcg_addr, offset);
++
++    tcg_rt = cpu_reg(s, rt);
++    memidx = get_mem_index(s);
++    do_gpr_ld_memidx(s, tcg_rt, tcg_addr, size,
++                     /* is_signed */ false, /* extend */ false, memidx,
++                     /* iss_valid */ true, /* iss_srt */ rt,
++                     /* iss_sf */ true, /* iss_ar */ false);
++
++    if (is_wback) {
++        tcg_gen_mov_i64(cpu_reg_sp(s, rn), tcg_addr);
++    }
++}
++
+ /* Load/store register (all forms) */
+ static void disas_ldst_reg(DisasContext *s, uint32_t insn)
+ {
+@@ -3171,6 +3230,9 @@ static void disas_ldst_reg(DisasContext *s, uint32_t insn)
+         case 2:
+             disas_ldst_reg_roffset(s, insn, opc, size, rt, is_vector);
+             return;
++        default:
++            disas_ldst_pac(s, insn, size, rt, is_vector);
++            return;
+         }
          break;
-+    case MAP(1, 0x01, 0x00): /* PACIA */
-+        if (s->pauth_active) {
-+            tcg_rd = cpu_reg(s, rd);
-+            gen_helper_pacia(tcg_rd, cpu_env, tcg_rd, cpu_reg_sp(s, rn));
-+        } else if (!dc_isar_feature(aa64_pauth, s)) {
-+            goto do_unallocated;
-+        }
-+        break;
-+    case MAP(1, 0x01, 0x01): /* PACIB */
-+        if (s->pauth_active) {
-+            tcg_rd = cpu_reg(s, rd);
-+            gen_helper_pacib(tcg_rd, cpu_env, tcg_rd, cpu_reg_sp(s, rn));
-+        } else if (!dc_isar_feature(aa64_pauth, s)) {
-+            goto do_unallocated;
-+        }
-+        break;
-+    case MAP(1, 0x01, 0x02): /* PACDA */
-+        if (s->pauth_active) {
-+            tcg_rd = cpu_reg(s, rd);
-+            gen_helper_pacda(tcg_rd, cpu_env, tcg_rd, cpu_reg_sp(s, rn));
-+        } else if (!dc_isar_feature(aa64_pauth, s)) {
-+            goto do_unallocated;
-+        }
-+        break;
-+    case MAP(1, 0x01, 0x03): /* PACDB */
-+        if (s->pauth_active) {
-+            tcg_rd = cpu_reg(s, rd);
-+            gen_helper_pacdb(tcg_rd, cpu_env, tcg_rd, cpu_reg_sp(s, rn));
-+        } else if (!dc_isar_feature(aa64_pauth, s)) {
-+            goto do_unallocated;
-+        }
-+        break;
-+    case MAP(1, 0x01, 0x04): /* AUTIA */
-+        if (s->pauth_active) {
-+            tcg_rd = cpu_reg(s, rd);
-+            gen_helper_autia(tcg_rd, cpu_env, tcg_rd, cpu_reg_sp(s, rn));
-+        } else if (!dc_isar_feature(aa64_pauth, s)) {
-+            goto do_unallocated;
-+        }
-+        break;
-+    case MAP(1, 0x01, 0x05): /* AUTIB */
-+        if (s->pauth_active) {
-+            tcg_rd = cpu_reg(s, rd);
-+            gen_helper_autib(tcg_rd, cpu_env, tcg_rd, cpu_reg_sp(s, rn));
-+        } else if (!dc_isar_feature(aa64_pauth, s)) {
-+            goto do_unallocated;
-+        }
-+        break;
-+    case MAP(1, 0x01, 0x06): /* AUTDA */
-+        if (s->pauth_active) {
-+            tcg_rd = cpu_reg(s, rd);
-+            gen_helper_autda(tcg_rd, cpu_env, tcg_rd, cpu_reg_sp(s, rn));
-+        } else if (!dc_isar_feature(aa64_pauth, s)) {
-+            goto do_unallocated;
-+        }
-+        break;
-+    case MAP(1, 0x01, 0x07): /* AUTDB */
-+        if (s->pauth_active) {
-+            tcg_rd = cpu_reg(s, rd);
-+            gen_helper_autdb(tcg_rd, cpu_env, tcg_rd, cpu_reg_sp(s, rn));
-+        } else if (!dc_isar_feature(aa64_pauth, s)) {
-+            goto do_unallocated;
-+        }
-+        break;
-+    case MAP(1, 0x01, 0x08): /* PACIZA */
-+        if (!dc_isar_feature(aa64_pauth, s) || rn != 31) {
-+            goto do_unallocated;
-+        } else if (s->pauth_active) {
-+            tcg_rd = cpu_reg(s, rd);
-+            gen_helper_pacia(tcg_rd, cpu_env, tcg_rd, new_tmp_a64_zero(s));
-+        }
-+        break;
-+    case MAP(1, 0x01, 0x09): /* PACIZB */
-+        if (!dc_isar_feature(aa64_pauth, s) || rn != 31) {
-+            goto do_unallocated;
-+        } else if (s->pauth_active) {
-+            tcg_rd = cpu_reg(s, rd);
-+            gen_helper_pacib(tcg_rd, cpu_env, tcg_rd, new_tmp_a64_zero(s));
-+        }
-+        break;
-+    case MAP(1, 0x01, 0x0a): /* PACDZA */
-+        if (!dc_isar_feature(aa64_pauth, s) || rn != 31) {
-+            goto do_unallocated;
-+        } else if (s->pauth_active) {
-+            tcg_rd = cpu_reg(s, rd);
-+            gen_helper_pacda(tcg_rd, cpu_env, tcg_rd, new_tmp_a64_zero(s));
-+        }
-+        break;
-+    case MAP(1, 0x01, 0x0b): /* PACDZB */
-+        if (!dc_isar_feature(aa64_pauth, s) || rn != 31) {
-+            goto do_unallocated;
-+        } else if (s->pauth_active) {
-+            tcg_rd = cpu_reg(s, rd);
-+            gen_helper_pacdb(tcg_rd, cpu_env, tcg_rd, new_tmp_a64_zero(s));
-+        }
-+        break;
-+    case MAP(1, 0x01, 0x0c): /* AUTIZA */
-+        if (!dc_isar_feature(aa64_pauth, s) || rn != 31) {
-+            goto do_unallocated;
-+        } else if (s->pauth_active) {
-+            tcg_rd = cpu_reg(s, rd);
-+            gen_helper_autia(tcg_rd, cpu_env, tcg_rd, new_tmp_a64_zero(s));
-+        }
-+        break;
-+    case MAP(1, 0x01, 0x0d): /* AUTIZB */
-+        if (!dc_isar_feature(aa64_pauth, s) || rn != 31) {
-+            goto do_unallocated;
-+        } else if (s->pauth_active) {
-+            tcg_rd = cpu_reg(s, rd);
-+            gen_helper_autib(tcg_rd, cpu_env, tcg_rd, new_tmp_a64_zero(s));
-+        }
-+        break;
-+    case MAP(1, 0x01, 0x0e): /* AUTDZA */
-+        if (!dc_isar_feature(aa64_pauth, s) || rn != 31) {
-+            goto do_unallocated;
-+        } else if (s->pauth_active) {
-+            tcg_rd = cpu_reg(s, rd);
-+            gen_helper_autda(tcg_rd, cpu_env, tcg_rd, new_tmp_a64_zero(s));
-+        }
-+        break;
-+    case MAP(1, 0x01, 0x0f): /* AUTDZB */
-+        if (!dc_isar_feature(aa64_pauth, s) || rn != 31) {
-+            goto do_unallocated;
-+        } else if (s->pauth_active) {
-+            tcg_rd = cpu_reg(s, rd);
-+            gen_helper_autdb(tcg_rd, cpu_env, tcg_rd, new_tmp_a64_zero(s));
-+        }
-+        break;
-+    case MAP(1, 0x01, 0x10): /* XPACI */
-+        if (!dc_isar_feature(aa64_pauth, s) || rn != 31) {
-+            goto do_unallocated;
-+        } else if (s->pauth_active) {
-+            tcg_rd = cpu_reg(s, rd);
-+            gen_helper_xpaci(tcg_rd, cpu_env, tcg_rd);
-+        }
-+        break;
-+    case MAP(1, 0x01, 0x11): /* XPACD */
-+        if (!dc_isar_feature(aa64_pauth, s) || rn != 31) {
-+            goto do_unallocated;
-+        } else if (s->pauth_active) {
-+            tcg_rd = cpu_reg(s, rd);
-+            gen_helper_xpacd(tcg_rd, cpu_env, tcg_rd);
-+        }
-+        break;
-     default:
-+    do_unallocated:
-         unallocated_encoding(s);
-         break;
-     }
+     case 1:
 -- 
 2.17.2
