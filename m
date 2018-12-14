@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gXiM9-00046G-4b
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 02:57:57 -0500
+	(envelope-from <thuth@redhat.com>) id 1gXiRA-0005ty-0c
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 03:03:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gXiM5-00036V-S4
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 02:57:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57086)
+	(envelope-from <thuth@redhat.com>) id 1gXiR6-000632-K1
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 03:03:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47714)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gXiM5-000362-M5
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 02:57:53 -0500
-Date: Fri, 14 Dec 2018 08:57:51 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181214075751.tr4lhpywq55avstt@sirius.home.kraxel.org>
-References: <ab70659d8d5c580bdf150a5f7d5cc60c8e374ffc.1544740018.git.public@hansmi.ch>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gXiR6-0005xV-Bd
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 03:03:04 -0500
+References: <20181213210057.3676-1-quintela@redhat.com>
+	<20181213210057.3676-2-quintela@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <c4900e48-c39d-dfe2-8a45-b4a53ff04da5@redhat.com>
+Date: Fri, 14 Dec 2018 09:02:49 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ab70659d8d5c580bdf150a5f7d5cc60c8e374ffc.1544740018.git.public@hansmi.ch>
-Subject: Re: [Qemu-devel] [PATCH] usb-mtp: Limit filename to object
- information size
+In-Reply-To: <20181213210057.3676-2-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 01/16] virtio: split vhost vsock bits
+ from virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,19 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Hanselmann <public@hansmi.ch>
-Cc: qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Gonglei <arei.gonglei@huawei.com>
 
-On Thu, Dec 13, 2018 at 10:37:06PM +0000, Michael Hanselmann wrote:
-> The filename length in MTP metadata is specified by the guest. By
-> trusting it directly it'd theoretically be possible to get the host to
-> write memory parts outside the filename buffer into a filename. In
-> practice though there are usually NUL bytes stopping the string
-> operations.
+On 2018-12-13 22:00, Juan Quintela wrote:
+> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > 
-> Also use the opportunity to not assign the filename member twice.
+> ---
+> 
+> Updated copyright info
+> Also split virtio-pci.h bits
+> ---
+>  hw/virtio/Makefile.objs     |  3 ++
+>  hw/virtio/vhost-vsock-pci.c | 82 +++++++++++++++++++++++++++++++++++++
+>  hw/virtio/virtio-pci.c      | 51 -----------------------
+>  hw/virtio/virtio-pci.h      | 18 --------
+>  4 files changed, 85 insertions(+), 69 deletions(-)
+>  create mode 100644 hw/virtio/vhost-vsock-pci.c
 
-Added to usb patch queue.
-
-thanks,
-  Gerd
+Reviewed-by: Thomas Huth <thuth@redhat.com>
