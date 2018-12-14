@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXgbM-0004Wk-QQ
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 01:05:34 -0500
+	(envelope-from <armbru@redhat.com>) id 1gXgbM-0004Wl-Vy
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 01:05:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gXgbJ-0000r3-Jx
+	(envelope-from <armbru@redhat.com>) id 1gXgbL-0000sH-Ok
 	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 01:05:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36098)
+Received: from mx1.redhat.com ([209.132.183.28]:57038)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXgbJ-0000pi-Bn
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 01:05:29 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXgbL-0000s0-GU
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 01:05:31 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 858862D7E4
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 06:05:28 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-56.ams2.redhat.com
-	[10.36.116.56])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C2EA60624
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 06:05:28 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id DB74D8B10C
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 06:05:30 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 14 Dec 2018 07:05:25 +0100
-Message-Id: <20181214060526.30042-1-armbru@redhat.com>
+Date: Fri, 14 Dec 2018 07:05:26 +0100
+Message-Id: <20181214060526.30042-2-armbru@redhat.com>
+In-Reply-To: <20181214060526.30042-1-armbru@redhat.com>
+References: <20181214060526.30042-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 00/32] QAPI patches for 2018-12-13
+Subject: [Qemu-devel] [PULL v2 27/32] qapi: Add #if conditions to generated
+ code members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,213 +34,203 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-git-request-pull master public pull-qapi-2018-12-13-v2
-The following changes since commit c3ec0fa1a8e815ecfec9eabb9c20ee206c313e=
-07:
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-monitor-2018-12-=
-12' into staging (2018-12-13 13:41:44 +0000)
+Wrap generated enum and struct members and their supporting code with
+#if/#endif, using the .ifcond members added in the previous patches.
 
-are available in the Git repository at:
+We do enum and struct in a single patch because union tag enum and the
+associated variants tie them together, and dealing with that to split
+the patch doesn't seem worthwhile.
 
-  git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2018-12-13-v2
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20181213123724.4866-18-marcandre.lureau@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ scripts/qapi/common.py     |  4 ++++
+ scripts/qapi/introspect.py | 14 ++++++++++----
+ scripts/qapi/types.py      |  4 ++++
+ scripts/qapi/visit.py      |  6 ++++++
+ 4 files changed, 24 insertions(+), 4 deletions(-)
 
-for you to fetch changes up to 335d10cd8e2c3bb6067804b095aaf6371fc1983e:
-
-  qapi: add conditions to REPLICATION type/commands on the schema (2018-1=
-2-14 06:52:48 +0100)
-
-----------------------------------------------------------------
-QAPI patches for 2018-12-13
-
-* Rewrite the ugly parts of string-input-visitor
-* Support conditional QAPI enum, struct, union and alternate members
-
-----------------------------------------------------------------
-David Hildenbrand (9):
-      cutils: Add qemu_strtod() and qemu_strtod_finite()
-      cutils: Fix qemu_strtosz() & friends to reject non-finite sizes
-      qapi: Fix string-input-visitor to reject NaN and infinities
-      qapi: Use qemu_strtod_finite() in qobject-input-visitor
-      test-string-input-visitor: Add more tests
-      qapi: Rewrite string-input-visitor's integer and list parsing
-      test-string-input-visitor: Use virtual walk
-      test-string-input-visitor: Split off uint64 list tests
-      test-string-input-visitor: Add range overflow tests
-
-Eric Blake (1):
-      docs: Update references to JSON RFC
-
-Marc-Andr=C3=A9 Lureau (21):
-      tests/qapi: Cover commands with 'if' and union / alternate 'data'
-      qapi: rename QAPISchemaEnumType.values to .members
-      qapi: break long lines at 'data' member
-      qapi: Do not define enumeration value explicitly
-      qapi: change enum visitor and gen_enum* to take QAPISchemaMember
-      tests: print enum type members more like object type members
-      qapi: factor out checking for keys
-      qapi: improve reporting of unknown or missing keys
-      qapi: add a dictionary form with 'name' key for enum members
-      qapi: add 'if' to enum members
-      qapi-events: add 'if' condition to implicit event enum
-      qapi: add a dictionary form for TYPE
-      qapi: Add 'if' to implicit struct members
-      qapi: add 'if' to union members
-      qapi: add 'if' to alternate members
-      qapi: Add #if conditions to generated code members
-      qapi: add 'If:' condition to enum values documentation
-      qapi: add 'If:' condition to struct members documentation
-      qapi: add condition to variants documentation
-      qapi: add more conditions to SPICE
-      qapi: add conditions to REPLICATION type/commands on the schema
-
-Markus Armbruster (1):
-      json: Fix to reject duplicate object member names
-
- docs/devel/qapi-code-gen.txt                       |  21 +-
- docs/interop/qmp-spec.txt                          |   2 +-
- include/qapi/string-input-visitor.h                |   4 +-
- include/qemu/cutils.h                              |   8 +-
- migration/colo.c                                   |  16 +-
- monitor.c                                          |   7 +-
- qapi/block-core.json                               |  26 +-
- qapi/char.json                                     | 150 ++++----
- qapi/migration.json                                |  15 +-
- qapi/misc.json                                     |   7 +-
- qapi/net.json                                      |   3 +-
- qapi/qobject-input-visitor.c                       |   9 +-
- qapi/string-input-visitor.c                        | 407 ++++++++++++---=
-------
- qapi/tpm.json                                      |   5 +-
- qapi/ui.json                                       |   3 +-
- qobject/json-parser.c                              |   5 +
- scripts/qapi/common.py                             | 207 +++++++----
- scripts/qapi/doc.py                                |  31 +-
- scripts/qapi/events.py                             |  13 +-
- scripts/qapi/introspect.py                         |  17 +-
- scripts/qapi/types.py                              |  10 +-
- scripts/qapi/visit.py                              |   8 +-
- tests/Makefile.include                             |  11 +-
- tests/qapi-schema/alternate-base.err               |   1 +
- tests/qapi-schema/alternate-invalid-dict.err       |   1 +
- ...ict-member.exit =3D> alternate-invalid-dict.exit} |   0
- tests/qapi-schema/alternate-invalid-dict.json      |   4 +
- ...-dict-member.out =3D> alternate-invalid-dict.out} |   0
- tests/qapi-schema/comments.out                     |  14 +-
- tests/qapi-schema/doc-bad-section.out              |  13 +-
- tests/qapi-schema/doc-good.json                    |  11 +-
- tests/qapi-schema/doc-good.out                     |  22 +-
- tests/qapi-schema/doc-good.texi                    |   7 +-
- tests/qapi-schema/double-type.err                  |   1 +
- tests/qapi-schema/empty.out                        |   9 +-
- tests/qapi-schema/enum-bad-member.err              |   1 +
- tests/qapi-schema/enum-bad-member.exit             |   1 +
- tests/qapi-schema/enum-bad-member.json             |   2 +
- tests/qapi-schema/enum-bad-member.out              |   0
- tests/qapi-schema/enum-dict-member-unknown.err     |   2 +
- tests/qapi-schema/enum-dict-member-unknown.exit    |   1 +
- tests/qapi-schema/enum-dict-member-unknown.json    |   2 +
- tests/qapi-schema/enum-dict-member-unknown.out     |   0
- tests/qapi-schema/enum-dict-member.err             |   1 -
- tests/qapi-schema/enum-dict-member.json            |   2 -
- tests/qapi-schema/enum-if-invalid.err              |   1 +
- tests/qapi-schema/enum-if-invalid.exit             |   1 +
- tests/qapi-schema/enum-if-invalid.json             |   3 +
- tests/qapi-schema/enum-if-invalid.out              |   0
- tests/qapi-schema/event-case.out                   |   9 +-
- tests/qapi-schema/event-member-invalid-dict.err    |   1 +
- tests/qapi-schema/event-member-invalid-dict.exit   |   1 +
- tests/qapi-schema/event-member-invalid-dict.json   |   2 +
- tests/qapi-schema/event-member-invalid-dict.out    |   0
- tests/qapi-schema/event-nest-struct.json           |   2 +-
- .../qapi-schema/flat-union-inline-invalid-dict.err |   1 +
- .../flat-union-inline-invalid-dict.exit            |   1 +
- .../flat-union-inline-invalid-dict.json            |  11 +
- .../qapi-schema/flat-union-inline-invalid-dict.out |   0
- tests/qapi-schema/flat-union-inline.json           |   2 +-
- .../flat-union-invalid-if-discriminator.err        |   1 +
- .../flat-union-invalid-if-discriminator.exit       |   1 +
- .../flat-union-invalid-if-discriminator.json       |  17 +
- .../flat-union-invalid-if-discriminator.out        |   0
- tests/qapi-schema/ident-with-escape.out            |   9 +-
- tests/qapi-schema/include-relpath.out              |  14 +-
- tests/qapi-schema/include-repetition.out           |  14 +-
- tests/qapi-schema/include-simple.out               |  14 +-
- tests/qapi-schema/indented-expr.out                |   9 +-
- .../nested-struct-data-invalid-dict.err            |   1 +
- .../nested-struct-data-invalid-dict.exit           |   1 +
- .../nested-struct-data-invalid-dict.json           |   3 +
- .../nested-struct-data-invalid-dict.out            |   0
- tests/qapi-schema/nested-struct-data.json          |   2 +-
- tests/qapi-schema/qapi-schema-test.json            |  39 +-
- tests/qapi-schema/qapi-schema-test.out             |  74 +++-
- tests/qapi-schema/struct-member-invalid-dict.err   |   1 +
- tests/qapi-schema/struct-member-invalid-dict.exit  |   1 +
- tests/qapi-schema/struct-member-invalid-dict.json  |   3 +
- tests/qapi-schema/struct-member-invalid-dict.out   |   0
- tests/qapi-schema/test-qapi.py                     |   9 +-
- tests/qapi-schema/union-branch-invalid-dict.err    |   1 +
- tests/qapi-schema/union-branch-invalid-dict.exit   |   1 +
- tests/qapi-schema/union-branch-invalid-dict.json   |   4 +
- tests/qapi-schema/union-branch-invalid-dict.out    |   0
- tests/qapi-schema/unknown-expr-key.err             |   3 +-
- tests/qapi-schema/unknown-expr-key.json            |   2 +-
- tests/qemu-iotests/229                             |   1 -
- tests/test-cutils.c                                |  24 +-
- tests/test-string-input-visitor.c                  | 223 +++++++++--
- util/cutils.c                                      |  83 ++++-
- 91 files changed, 1163 insertions(+), 507 deletions(-)
- create mode 100644 tests/qapi-schema/alternate-invalid-dict.err
- rename tests/qapi-schema/{enum-dict-member.exit =3D> alternate-invalid-d=
-ict.exit} (100%)
- create mode 100644 tests/qapi-schema/alternate-invalid-dict.json
- rename tests/qapi-schema/{enum-dict-member.out =3D> alternate-invalid-di=
-ct.out} (100%)
- create mode 100644 tests/qapi-schema/enum-bad-member.err
- create mode 100644 tests/qapi-schema/enum-bad-member.exit
- create mode 100644 tests/qapi-schema/enum-bad-member.json
- create mode 100644 tests/qapi-schema/enum-bad-member.out
- create mode 100644 tests/qapi-schema/enum-dict-member-unknown.err
- create mode 100644 tests/qapi-schema/enum-dict-member-unknown.exit
- create mode 100644 tests/qapi-schema/enum-dict-member-unknown.json
- create mode 100644 tests/qapi-schema/enum-dict-member-unknown.out
- delete mode 100644 tests/qapi-schema/enum-dict-member.err
- delete mode 100644 tests/qapi-schema/enum-dict-member.json
- create mode 100644 tests/qapi-schema/enum-if-invalid.err
- create mode 100644 tests/qapi-schema/enum-if-invalid.exit
- create mode 100644 tests/qapi-schema/enum-if-invalid.json
- create mode 100644 tests/qapi-schema/enum-if-invalid.out
- create mode 100644 tests/qapi-schema/event-member-invalid-dict.err
- create mode 100644 tests/qapi-schema/event-member-invalid-dict.exit
- create mode 100644 tests/qapi-schema/event-member-invalid-dict.json
- create mode 100644 tests/qapi-schema/event-member-invalid-dict.out
- create mode 100644 tests/qapi-schema/flat-union-inline-invalid-dict.err
- create mode 100644 tests/qapi-schema/flat-union-inline-invalid-dict.exit
- create mode 100644 tests/qapi-schema/flat-union-inline-invalid-dict.json
- create mode 100644 tests/qapi-schema/flat-union-inline-invalid-dict.out
- create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
-.err
- create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
-.exit
- create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
-.json
- create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
-.out
- create mode 100644 tests/qapi-schema/nested-struct-data-invalid-dict.err
- create mode 100644 tests/qapi-schema/nested-struct-data-invalid-dict.exi=
-t
- create mode 100644 tests/qapi-schema/nested-struct-data-invalid-dict.jso=
-n
- create mode 100644 tests/qapi-schema/nested-struct-data-invalid-dict.out
- create mode 100644 tests/qapi-schema/struct-member-invalid-dict.err
- create mode 100644 tests/qapi-schema/struct-member-invalid-dict.exit
- create mode 100644 tests/qapi-schema/struct-member-invalid-dict.json
- create mode 100644 tests/qapi-schema/struct-member-invalid-dict.out
- create mode 100644 tests/qapi-schema/union-branch-invalid-dict.err
- create mode 100644 tests/qapi-schema/union-branch-invalid-dict.exit
- create mode 100644 tests/qapi-schema/union-branch-invalid-dict.json
- create mode 100644 tests/qapi-schema/union-branch-invalid-dict.out
-
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 17707b6de7..8c2d97369e 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -2078,11 +2078,13 @@ const QEnumLookup %(c_name)s_lookup =3D {
+ ''',
+                 c_name=3Dc_name(name))
+     for m in members:
++        ret +=3D gen_if(m.ifcond)
+         index =3D c_enum_const(name, m.name, prefix)
+         ret +=3D mcgen('''
+         [%(index)s] =3D "%(name)s",
+ ''',
+                      index=3Dindex, name=3Dm.name)
++        ret +=3D gen_endif(m.ifcond)
+=20
+     ret +=3D mcgen('''
+     },
+@@ -2104,10 +2106,12 @@ typedef enum %(c_name)s {
+                 c_name=3Dc_name(name))
+=20
+     for m in enum_members:
++        ret +=3D gen_if(m.ifcond)
+         ret +=3D mcgen('''
+     %(c_enum)s,
+ ''',
+                      c_enum=3Dc_enum_const(name, m.name, prefix))
++        ret +=3D gen_endif(m.ifcond)
+=20
+     ret +=3D mcgen('''
+ } %(c_name)s;
+diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+index 417625d54b..f7f2ca07e4 100644
+--- a/scripts/qapi/introspect.py
++++ b/scripts/qapi/introspect.py
+@@ -162,6 +162,8 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+         ret =3D {'name': member.name, 'type': self._use_type(member.type=
+)}
+         if member.optional:
+             ret['default'] =3D None
++        if member.ifcond:
++            ret =3D (ret, {'if': member.ifcond})
+         return ret
+=20
+     def _gen_variants(self, tag_name, variants):
+@@ -169,14 +171,17 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+                 'variants': [self._gen_variant(v) for v in variants]}
+=20
+     def _gen_variant(self, variant):
+-        return {'case': variant.name, 'type': self._use_type(variant.typ=
+e)}
++        return ({'case': variant.name, 'type': self._use_type(variant.ty=
+pe)},
++                {'if': variant.ifcond})
+=20
+     def visit_builtin_type(self, name, info, json_type):
+         self._gen_qlit(name, 'builtin', {'json-type': json_type}, [])
+=20
+     def visit_enum_type(self, name, info, ifcond, members, prefix):
+         self._gen_qlit(name, 'enum',
+-                       {'values': [m.name for m in members]}, ifcond)
++                       {'values':
++                        [(m.name, {'if': m.ifcond}) for m in members]},
++                       ifcond)
+=20
+     def visit_array_type(self, name, info, ifcond, element_type):
+         element =3D self._use_type(element_type)
+@@ -192,8 +197,9 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+=20
+     def visit_alternate_type(self, name, info, ifcond, variants):
+         self._gen_qlit(name, 'alternate',
+-                       {'members': [{'type': self._use_type(m.type)}
+-                                    for m in variants.variants]}, ifcond=
+)
++                       {'members': [
++                           ({'type': self._use_type(m.type)}, {'if': m.i=
+fcond})
++                           for m in variants.variants]}, ifcond)
+=20
+     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
+                       success_response, boxed, allow_oob, allow_preconfi=
+g):
+diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
+index e8d22c5081..62d4cf9f95 100644
+--- a/scripts/qapi/types.py
++++ b/scripts/qapi/types.py
+@@ -43,6 +43,7 @@ struct %(c_name)s {
+ def gen_struct_members(members):
+     ret =3D ''
+     for memb in members:
++        ret +=3D gen_if(memb.ifcond)
+         if memb.optional:
+             ret +=3D mcgen('''
+     bool has_%(c_name)s;
+@@ -52,6 +53,7 @@ def gen_struct_members(members):
+     %(c_type)s %(c_name)s;
+ ''',
+                      c_type=3Dmemb.type.c_type(), c_name=3Dc_name(memb.n=
+ame))
++        ret +=3D gen_endif(memb.ifcond)
+     return ret
+=20
+=20
+@@ -131,11 +133,13 @@ def gen_variants(variants):
+     for var in variants.variants:
+         if var.type.name =3D=3D 'q_empty':
+             continue
++        ret +=3D gen_if(var.ifcond)
+         ret +=3D mcgen('''
+         %(c_type)s %(c_name)s;
+ ''',
+                      c_type=3Dvar.type.c_unboxed_type(),
+                      c_name=3Dc_name(var.name))
++        ret +=3D gen_endif(var.ifcond)
+=20
+     ret +=3D mcgen('''
+     } u;
+diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
+index 24f85a2e85..82eab72b21 100644
+--- a/scripts/qapi/visit.py
++++ b/scripts/qapi/visit.py
+@@ -54,6 +54,7 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name=
+)s *obj, Error **errp)
+                      c_type=3Dbase.c_name())
+=20
+     for memb in members:
++        ret +=3D gen_if(memb.ifcond)
+         if memb.optional:
+             ret +=3D mcgen('''
+     if (visit_optional(v, "%(name)s", &obj->has_%(c_name)s)) {
+@@ -73,6 +74,7 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name=
+)s *obj, Error **errp)
+             ret +=3D mcgen('''
+     }
+ ''')
++        ret +=3D gen_endif(memb.ifcond)
+=20
+     if variants:
+         ret +=3D mcgen('''
+@@ -84,6 +86,7 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name=
+)s *obj, Error **errp)
+             case_str =3D c_enum_const(variants.tag_member.type.name,
+                                     var.name,
+                                     variants.tag_member.type.prefix)
++            ret +=3D gen_if(var.ifcond)
+             if var.type.name =3D=3D 'q_empty':
+                 # valid variant and nothing to do
+                 ret +=3D mcgen('''
+@@ -100,6 +103,7 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_na=
+me)s *obj, Error **errp)
+                              case=3Dcase_str,
+                              c_type=3Dvar.type.c_name(), c_name=3Dc_name=
+(var.name))
+=20
++            ret +=3D gen_endif(var.ifcond)
+         ret +=3D mcgen('''
+     default:
+         abort();
+@@ -190,6 +194,7 @@ void visit_type_%(c_name)s(Visitor *v, const char *na=
+me, %(c_name)s **obj, Error
+                 c_name=3Dc_name(name))
+=20
+     for var in variants.variants:
++        ret +=3D gen_if(var.ifcond)
+         ret +=3D mcgen('''
+     case %(case)s:
+ ''',
+@@ -217,6 +222,7 @@ void visit_type_%(c_name)s(Visitor *v, const char *na=
+me, %(c_name)s **obj, Error
+         ret +=3D mcgen('''
+         break;
+ ''')
++        ret +=3D gen_endif(var.ifcond)
+=20
+     ret +=3D mcgen('''
+     case QTYPE_NONE:
 --=20
 2.17.2
