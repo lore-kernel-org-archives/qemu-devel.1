@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <omair.javaid@linaro.org>) id 1gXizE-0004O8-SE
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 03:38:24 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gXjyv-0003Yr-Jb
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:42:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <omair.javaid@linaro.org>) id 1gXizD-0003N4-P0
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 03:38:20 -0500
-Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:46931)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gXjyq-0002mn-Di
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:42:05 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:33402)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <omair.javaid@linaro.org>)
-	id 1gXizD-0003J0-E9
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 03:38:19 -0500
-Received: by mail-qk1-x743.google.com with SMTP id q1so2767880qkf.13
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 00:38:18 -0800 (PST)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1gXjyq-0002js-5k
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:42:00 -0500
+Received: by mail-wm1-x341.google.com with SMTP id r24so15806188wmh.0
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 01:41:54 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 14 Dec 2018 10:41:51 +0100
+Message-Id: <20181214094151.16996-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <20181213115503.24188-1-alex.bennee@linaro.org>
-	<20181213115503.24188-2-alex.bennee@linaro.org>
-In-Reply-To: <20181213115503.24188-2-alex.bennee@linaro.org>
-From: Omair Javaid <omair.javaid@linaro.org>
-Date: Fri, 14 Dec 2018 13:37:51 +0500
-Message-ID: <CANW4E-1UmZOGHya4jHxj10O2Ki7MPGMqme7wT0jaCO8Ufrii6g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 1/2] target/arm: kvm64 make guest debug
- AA32 break point aware
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] scripts: add script to convert multiline
+ comments into 4-line format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,98 +28,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, mark.rutland@arm.com, ard.biesheuvel@linaro.org, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, armbru@redhat.com
 
-On Thu, 13 Dec 2018 at 16:55, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
->
-> When supported by the hardware we can run AA32 guests or even AA64 EL1
-> code with AA32 EL0 mode code. Inserting a AA64 break point into AA32
-> code tends to break things. This is especially acute with gdb as it
-> inserts temporary breakpoints when stepping through code.
+Since we're adding checkpatch rules to enforce 4-line multiline comment
+format, i.e. with lone /* and */, this script can be run on existing
+code so that the comment style does not become inconsistent within a
+file.
 
-Hi Alex,
+The alternative to awk-in-a-shell-script could be Perl, which also
+supports -i directly, but a2p seems to have bitrotten and I didn't quite
+feel like writing this twice...
 
-Are you expecting GDB to switch targets (from AArch64 to AArch32 or
-vice versa) when there is mode switch for example a AArch64 binary
-calling a AArch32 library function.
-I think GDB will behave nicely when doing 1 type of debug but seamless
-switching between modes is still tricky for GDB. There has been some
-work in last few months on this but not sure where it has reached.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ scripts/fix-multiline-comments.sh | 60 +++++++++++++++++++++++++++++++
+ 1 file changed, 60 insertions(+)
+ create mode 100755 scripts/fix-multiline-comments.sh
 
->
-> The heuristic of checking the current mode works but it's not perfect.
-> A user could be placing a break point in code after a mode switch and
-> that will still fail. However there doesn't seem to be a way to force
-> a hbreak by default. According to "set breakpoint auto-hw on":
-
-On mode switch we ll have to switch target architecture on GDB side
-and GDB may not be able to do that seamlessly. Have you tried
-debugging such an example?
-
->
->   This is the default behavior. When GDB sets a breakpoint, it will try
->   to use the target memory map to decide if software or hardware
->   breakpoint must be used.
->
-> Reported-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Cc: Omair Javaid <omair.javaid@linaro.org>
-> ---
->  target/arm/kvm64.c | 13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
->
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index 0a502091e7..dd564a59b7 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -989,14 +989,20 @@ int kvm_arch_get_registers(CPUState *cs)
->      return ret;
->  }
->
-> -/* C6.6.29 BRK instruction */
-> +/* BRK (A64) and BKPT (A32) instructions */
->  static const uint32_t brk_insn =3D 0xd4200000;
-> +static const uint32_t bkpt_insn =3D 0xe1200070;
->
->  int kvm_arch_insert_sw_breakpoint(CPUState *cs, struct kvm_sw_breakpoint=
- *bp)
->  {
-> +    CPUARMState *env =3D &ARM_CPU(cs)->env;
-> +    int el =3D arm_current_el(env);
-> +    bool is_aa64 =3D arm_el_is_aa64(env, el);
-> +    const uint32_t *bpi =3D is_aa64 ? &brk_insn : &bkpt_insn;
-> +
->      if (have_guest_debug) {
->          if (cpu_memory_rw_debug(cs, bp->pc, (uint8_t *)&bp->saved_insn, =
-4, 0) ||
-> -            cpu_memory_rw_debug(cs, bp->pc, (uint8_t *)&brk_insn, 4, 1))=
- {
-> +            cpu_memory_rw_debug(cs, bp->pc, (uint8_t *)bpi, 4, 1)) {
->              return -EINVAL;
->          }
->          return 0;
-> @@ -1012,7 +1018,7 @@ int kvm_arch_remove_sw_breakpoint(CPUState *cs, str=
-uct kvm_sw_breakpoint *bp)
->
->      if (have_guest_debug) {
->          if (cpu_memory_rw_debug(cs, bp->pc, (uint8_t *)&brk, 4, 0) ||
-> -            brk !=3D brk_insn ||
-> +            !(brk =3D=3D brk_insn || brk =3D=3D bkpt_insn) ||
->              cpu_memory_rw_debug(cs, bp->pc, (uint8_t *)&bp->saved_insn, =
-4, 1)) {
->              return -EINVAL;
->          }
-> @@ -1055,6 +1061,7 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm_=
-debug_exit_arch *debug_exit)
->              return false;
->          }
->          break;
-> +    case EC_AA32_BKPT:
->      case EC_AA64_BKPT:
->          if (kvm_find_sw_breakpoint(cs, env->pc)) {
->              return true;
-> --
-> 2.17.1
->
+diff --git a/scripts/fix-multiline-comments.sh b/scripts/fix-multiline-comments.sh
+new file mode 100755
+index 0000000000..09ac6803c2
+--- /dev/null
++++ b/scripts/fix-multiline-comments.sh
+@@ -0,0 +1,60 @@
++#! /bin/sh
++#
++# Fix multiline comments to match CODING_STYLE
++#
++# Copyright (C) 2018 Red Hat, Inc.
++#
++# Author: Paolo Bonzini
++#
++# Usage: scripts/fix-multiline-comments.sh [-i] FILE...
++#
++# -i edits the file in place (requires gawk 4.1.0).
++#
++# Set the AWK environment variable to choose the awk interpreter to use
++# (default 'awk')
++
++if test "$1" = -i; then
++  # gawk extension
++  inplace="-i inplace"
++  shift
++fi
++${AWK-awk} $inplace 'BEGIN { indent = -1 }
++{
++    line = $0
++    # apply a star to the indent on lines after the first
++    if (indent != -1) {
++        if (line == "") {
++            line = sp " *"
++        } else if (substr(line, 1, indent + 2) == sp "  ") {
++            line = sp " *" substr(line, indent + 3)
++        }
++    }
++
++    is_lead = (line ~ /^[ \t]*\/\*/)
++    is_trail = (line ~ /\*\//)
++    if (is_lead && !is_trail) {
++        # grab the indent at the start of a comment, but not for
++        # single-line comments
++        match(line, /^[ \t]*\/\*/)
++        indent = RLENGTH - 2
++        sp = substr(line, 1, indent)
++    }
++
++    # the regular expression filters out lone /*, /**, or */
++    if (indent != -1 && !(line ~ /^[ \t]*(\/\*+|\*\/)[ \t]*$/)) {
++        if (is_lead) {
++            # split the leading /* on a separate line
++            match(line, /^[ \t]*\/\*+[ \t]*/)
++            line = sp "/*\n" sp " *" substr(line, RLENGTH)
++        }
++        if (is_trail) {
++            # split the trailing */ on a separate line
++            match(line, /[ \t]*\*\//)
++            line = substr(line, 1, RSTART - 1) "\n" sp " */"
++        }
++    }
++    if (is_trail) {
++        indent = -1
++    }
++    print line
++}' "$@"
+-- 
+2.19.2
