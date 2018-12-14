@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXe0u-0005zj-AN
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 22:19:45 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXe0t-0006vU-BX
+	(envelope-from <richard.henderson@linaro.org>) id 1gXe0t-0005yg-E2
 	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 22:19:44 -0500
-Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:36795)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <richard.henderson@linaro.org>) id 1gXe0s-0006rv-3x
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 22:19:43 -0500
+Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:43030)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gXe0s-0006tM-VJ
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 22:19:43 -0500
-Received: by mail-oi1-x234.google.com with SMTP id x23so3480325oix.3
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 19:19:42 -0800 (PST)
+	id 1gXe0r-0006qJ-UU
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 22:19:42 -0500
+Received: by mail-ot1-x330.google.com with SMTP id a11so4088270otr.10
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 19:19:41 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 13 Dec 2018 21:19:05 -0600
-Message-Id: <20181214031923.29527-16-richard.henderson@linaro.org>
+Date: Thu, 13 Dec 2018 21:19:04 -0600
+Message-Id: <20181214031923.29527-15-richard.henderson@linaro.org>
 In-Reply-To: <20181214031923.29527-1-richard.henderson@linaro.org>
 References: <20181214031923.29527-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 14/32] tcg/arm: Return false on failure from
+Subject: [Qemu-devel] [PULL 13/32] tcg/aarch64: Return false on failure from
  patch_reloc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -39,71 +39,86 @@ to replace the assert that we're moving.
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/arm/tcg-target.inc.c | 22 ++++++++++++++++------
- 1 file changed, 16 insertions(+), 6 deletions(-)
+ tcg/aarch64/tcg-target.inc.c | 37 ++++++++++++++++++++----------------
+ 1 file changed, 21 insertions(+), 16 deletions(-)
 
-diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
-index deefa20fbf..49f57d655e 100644
---- a/tcg/arm/tcg-target.inc.c
-+++ b/tcg/arm/tcg-target.inc.c
-@@ -187,10 +187,14 @@ static const uint8_t tcg_cond_to_arm_cond[] = {
-     [TCG_COND_GTU] = COND_HI,
- };
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+index 16f08c59c4..0562e0aa40 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc.c
+@@ -78,20 +78,26 @@ static const int tcg_target_call_oarg_regs[1] = {
+ #define TCG_REG_GUEST_BASE TCG_REG_X28
+ #endif
  
--static inline void reloc_pc24(tcg_insn_unit *code_ptr, tcg_insn_unit *target)
-+static inline bool reloc_pc24(tcg_insn_unit *code_ptr, tcg_insn_unit *target)
+-static inline void reloc_pc26(tcg_insn_unit *code_ptr, tcg_insn_unit *target)
++static inline bool reloc_pc26(tcg_insn_unit *code_ptr, tcg_insn_unit *target)
  {
-     ptrdiff_t offset = (tcg_ptr_byte_diff(target, code_ptr) - 8) >> 2;
--    *code_ptr = (*code_ptr & ~0xffffff) | (offset & 0xffffff);
-+    if (offset == sextract32(offset, 0, 24)) {
-+        *code_ptr = (*code_ptr & ~0xffffff) | (offset & 0xffffff);
+     ptrdiff_t offset = target - code_ptr;
+-    tcg_debug_assert(offset == sextract64(offset, 0, 26));
+-    /* read instruction, mask away previous PC_REL26 parameter contents,
+-       set the proper offset, then write back the instruction. */
+-    *code_ptr = deposit32(*code_ptr, 0, 26, offset);
++    if (offset == sextract64(offset, 0, 26)) {
++        /* read instruction, mask away previous PC_REL26 parameter contents,
++           set the proper offset, then write back the instruction. */
++        *code_ptr = deposit32(*code_ptr, 0, 26, offset);
 +        return true;
 +    }
 +    return false;
  }
  
- static bool patch_reloc(tcg_insn_unit *code_ptr, int type,
-@@ -199,7 +203,7 @@ static bool patch_reloc(tcg_insn_unit *code_ptr, int type,
-     tcg_debug_assert(addend == 0);
+-static inline void reloc_pc19(tcg_insn_unit *code_ptr, tcg_insn_unit *target)
++static inline bool reloc_pc19(tcg_insn_unit *code_ptr, tcg_insn_unit *target)
+ {
+     ptrdiff_t offset = target - code_ptr;
+-    tcg_debug_assert(offset == sextract64(offset, 0, 19));
+-    *code_ptr = deposit32(*code_ptr, 5, 19, offset);
++    if (offset == sextract64(offset, 0, 19)) {
++        *code_ptr = deposit32(*code_ptr, 5, 19, offset);
++        return true;
++    }
++    return false;
+ }
  
-     if (type == R_ARM_PC24) {
--        reloc_pc24(code_ptr, (tcg_insn_unit *)value);
-+        return reloc_pc24(code_ptr, (tcg_insn_unit *)value);
-     } else if (type == R_ARM_PC13) {
-         intptr_t diff = value - (uintptr_t)(code_ptr + 2);
-         tcg_insn_unit insn = *code_ptr;
-@@ -213,7 +217,11 @@ static bool patch_reloc(tcg_insn_unit *code_ptr, int type,
-         } else {
-             int rd = extract32(insn, 12, 4);
-             int rt = rd == TCG_REG_PC ? TCG_REG_TMP : rd;
--            assert(diff >= 0x1000 && diff < 0x100000);
-+
-+            if (diff < 0x1000 || diff >= 0x100000) {
-+                return false;
-+            }
-+
-             /* add rt, pc, #high */
-             *code_ptr++ = ((insn & 0xf0000000) | (1 << 25) | ARITH_ADD
-                            | (TCG_REG_PC << 16) | (rt << 12)
-@@ -1372,7 +1380,8 @@ static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+ static inline bool patch_reloc(tcg_insn_unit *code_ptr, int type,
+@@ -101,15 +107,12 @@ static inline bool patch_reloc(tcg_insn_unit *code_ptr, int type,
+     switch (type) {
+     case R_AARCH64_JUMP26:
+     case R_AARCH64_CALL26:
+-        reloc_pc26(code_ptr, (tcg_insn_unit *)value);
+-        break;
++        return reloc_pc26(code_ptr, (tcg_insn_unit *)value);
+     case R_AARCH64_CONDBR19:
+-        reloc_pc19(code_ptr, (tcg_insn_unit *)value);
+-        break;
++        return reloc_pc19(code_ptr, (tcg_insn_unit *)value);
+     default:
+-        tcg_abort();
++        g_assert_not_reached();
+     }
+-    return true;
+ }
+ 
+ #define TCG_CT_CONST_AIMM 0x100
+@@ -1387,7 +1390,8 @@ static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
      TCGMemOp opc = get_memop(oi);
-     void *func;
+     TCGMemOp size = opc & MO_SIZE;
  
--    reloc_pc24(lb->label_ptr[0], s->code_ptr);
-+    bool ok = reloc_pc24(lb->label_ptr[0], s->code_ptr);
+-    reloc_pc19(lb->label_ptr[0], s->code_ptr);
++    bool ok = reloc_pc19(lb->label_ptr[0], s->code_ptr);
 +    tcg_debug_assert(ok);
  
-     argreg = tcg_out_arg_reg32(s, TCG_REG_R0, TCG_AREG0);
-     if (TARGET_LONG_BITS == 64) {
-@@ -1432,7 +1441,8 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
-     TCGMemOpIdx oi = lb->oi;
+     tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_X0, TCG_AREG0);
+     tcg_out_mov(s, TARGET_LONG_BITS == 64, TCG_REG_X1, lb->addrlo_reg);
+@@ -1409,7 +1413,8 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
      TCGMemOp opc = get_memop(oi);
+     TCGMemOp size = opc & MO_SIZE;
  
--    reloc_pc24(lb->label_ptr[0], s->code_ptr);
-+    bool ok = reloc_pc24(lb->label_ptr[0], s->code_ptr);
+-    reloc_pc19(lb->label_ptr[0], s->code_ptr);
++    bool ok = reloc_pc19(lb->label_ptr[0], s->code_ptr);
 +    tcg_debug_assert(ok);
  
-     argreg = TCG_REG_R0;
-     argreg = tcg_out_arg_reg32(s, argreg, TCG_AREG0);
+     tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_X0, TCG_AREG0);
+     tcg_out_mov(s, TARGET_LONG_BITS == 64, TCG_REG_X1, lb->addrlo_reg);
 -- 
 2.17.2
