@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXnu0-0007QW-IB
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:53:17 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gXnuf-0007n2-Vo
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:53:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXntx-0001E4-CJ
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:53:16 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33814)
+	(envelope-from <alex.bennee@linaro.org>) id 1gXnub-0001ZC-ID
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:53:57 -0500
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:35352)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gXntw-0001DI-W6
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:53:13 -0500
-Received: by mail-ot1-x342.google.com with SMTP id t5so5464359otk.1
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 05:53:12 -0800 (PST)
-References: <20181213115503.24188-1-alex.bennee@linaro.org>
-	<20181213115503.24188-2-alex.bennee@linaro.org>
-	<CANW4E-1UmZOGHya4jHxj10O2Ki7MPGMqme7wT0jaCO8Ufrii6g@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d82faf0e-87d4-984a-0db8-558d4e8bda13@linaro.org>
-Date: Fri, 14 Dec 2018 07:53:06 -0600
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gXnub-0001Yw-7u
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:53:53 -0500
+Received: by mail-wr1-x433.google.com with SMTP id 96so5525231wrb.2
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 05:53:53 -0800 (PST)
+References: <154399222698.26202.11105511106314070474.malonedeb@gac.canonical.com>
+	<154472615125.23782.34468593847836502.malone@soybean.canonical.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <154472615125.23782.34468593847836502.malone@soybean.canonical.com>
+Date: Fri, 14 Dec 2018 13:53:50 +0000
+Message-ID: <87k1kc1afl.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CANW4E-1UmZOGHya4jHxj10O2Ki7MPGMqme7wT0jaCO8Ufrii6g@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 1/2] target/arm: kvm64 make guest debug
- AA32 break point aware
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Bug 1806824] Re: SIE-200 (TrustZone) MPC: BLK_MAX
+ returns an incorrect value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,20 +31,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Omair Javaid <omair.javaid@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: mark.rutland@arm.com, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, ard.biesheuvel@linaro.org
-
-On 12/14/18 2:37 AM, Omair Javaid wrote:
-> Are you expecting GDB to switch targets (from AArch64 to AArch32 or
-> vice versa) when there is mode switch for example a AArch64 binary
-> calling a AArch32 library function.
-
-Mode changes happen only at privilege level changes.  E.g. AArch32 binary makes
-a system call to an AArch64 kernel, or an AArch32 guest kernel takes an i/o
-emulation trap to an AArch64 hypervisor.
-
-But for this sort of system debugging, it would be nice to be able to
-single-step through the whole operation.
+To: Bug 1806824 <1806824@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org
 
 
-r~
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> Thanks for the bug report and the test program. The fix seems straightfor=
+ward -- just adjust what we return for the register value. I've sent a patc=
+h:
+> http://patchwork.ozlabs.org/patch/1013034/
+
+I know you had a bunch of M-profile test cases. Once we get tcg system
+tests enabled would it be worth porting some of those into the QEMU src
+tree?
+
+There is already one other ARM system test pending for the microbit
+tests.
+
+
+>
+>
+> ** Changed in: qemu
+>        Status: New =3D> In Progress
+
+
+--
+Alex Benn=C3=A9e
