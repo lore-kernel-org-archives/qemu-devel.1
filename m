@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXfxk-0004Vs-JZ
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:37 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gXfxo-0004hC-6k
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXfxi-0005Rj-5Z
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:36 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:45885)
+	(envelope-from <richard.henderson@linaro.org>) id 1gXfxk-0005Se-Ik
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:40 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:45884)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gXfxf-0005Qx-Aa
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:32 -0500
-Received: by mail-ot1-x344.google.com with SMTP id 32so4274401ota.12
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 21:24:31 -0800 (PST)
+	id 1gXfxi-0005RY-GZ
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:36 -0500
+Received: by mail-ot1-x342.google.com with SMTP id 32so4274462ota.12
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 21:24:33 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 13 Dec 2018 23:23:58 -0600
-Message-Id: <20181214052410.11863-16-richard.henderson@linaro.org>
+Date: Thu, 13 Dec 2018 23:24:00 -0600
+Message-Id: <20181214052410.11863-18-richard.henderson@linaro.org>
 In-Reply-To: <20181214052410.11863-1-richard.henderson@linaro.org>
 References: <20181214052410.11863-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 15/27] target/arm: Introduce arm_mmu_idx
+Subject: [Qemu-devel] [PATCH v2 17/27] target/arm: Create ARMVAParameters
+ and helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,132 +30,395 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-The pattern
+Split out functions to extract the virtual address parameters.
+Let the functions choose T0 or T1 address space half, if present.
+Extract (most of) the control bits that vary between EL or Tx.
 
-  ARMMMUIdx mmu_idx = core_to_arm_mmu_idx(env, cpu_mmu_index(env, false));
-
-is computing the full ARMMMUIdx, stripping off the ARM bits,
-and then putting them back.
-
-Avoid the extra two steps with the appropriate helper function.
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ----
-v2: Move arm_mmu_idx declaration to internals.h.
+v2: Incorporate feedback wrt VTCR, HTCR, and more.
 ---
- target/arm/cpu.h       |  9 ++++++++-
- target/arm/internals.h |  8 ++++++++
- target/arm/helper.c    | 27 ++++++++++++++++-----------
- 3 files changed, 32 insertions(+), 12 deletions(-)
+ target/arm/internals.h |  16 +++
+ target/arm/helper.c    | 286 +++++++++++++++++++++++------------------
+ 2 files changed, 174 insertions(+), 128 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 6435997111..3cc7a069ce 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -2747,7 +2747,14 @@ ARMMMUIdx arm_v7m_mmu_idx_for_secstate_and_priv(CPUARMState *env,
- /* Return the MMU index for a v7M CPU in the specified security state */
- ARMMMUIdx arm_v7m_mmu_idx_for_secstate(CPUARMState *env, bool secstate);
- 
--/* Determine the current mmu_idx to use for normal loads/stores */
-+/**
-+ * cpu_mmu_index:
-+ * @env: The cpu environment
-+ * @ifetch: True for code access, false for data access.
-+ *
-+ * Return the core mmu index for the current translation regime.
-+ * This function is used by generic TCG code paths.
-+ */
- int cpu_mmu_index(CPUARMState *env, bool ifetch);
- 
- /* Indexes used when registering address spaces with cpu_address_space_init */
 diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 6bc0daf560..4a52fe58b6 100644
+index 1d0d0392c9..9ef9d01ee2 100644
 --- a/target/arm/internals.h
 +++ b/target/arm/internals.h
-@@ -912,4 +912,12 @@ void arm_cpu_update_virq(ARMCPU *cpu);
-  */
- void arm_cpu_update_vfiq(ARMCPU *cpu);
+@@ -935,4 +935,20 @@ static inline ARMMMUIdx arm_stage1_mmu_idx(CPUARMState *env)
+ ARMMMUIdx arm_stage1_mmu_idx(CPUARMState *env);
+ #endif
  
-+/**
-+ * arm_mmu_idx:
-+ * @env: The cpu environment
-+ *
-+ * Return the full ARMMMUIdx for the current translation regime.
++/*
++ * Parameters of a given virtual address, as extracted from a the
++ * translation control register (TCR) for a given regime.
 + */
-+ARMMMUIdx arm_mmu_idx(CPUARMState *env);
++typedef struct ARMVAParameters {
++    unsigned tsz    : 8;
++    unsigned select : 1;
++    bool tbi        : 1;
++    bool epd        : 1;
++    bool hpd        : 1;
++    bool ha         : 1;
++    bool hd         : 1;
++    bool using16k   : 1;
++    bool using64k   : 1;
++} ARMVAParameters;
 +
  #endif
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 56960411e3..50c1db16dd 100644
+index b1c0ff923f..3422fa5943 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -7117,7 +7117,7 @@ static bool v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain,
-             limit = env->v7m.msplim[M_REG_S];
-         }
-     } else {
--        mmu_idx = core_to_arm_mmu_idx(env, cpu_mmu_index(env, false));
-+        mmu_idx = arm_mmu_idx(env);
-         frame_sp_p = &env->regs[13];
-         limit = v7m_sp_limit(env);
-     }
-@@ -7298,7 +7298,7 @@ static bool v7m_push_stack(ARMCPU *cpu)
-     CPUARMState *env = &cpu->env;
-     uint32_t xpsr = xpsr_read(env);
-     uint32_t frameptr = env->regs[13];
--    ARMMMUIdx mmu_idx = core_to_arm_mmu_idx(env, cpu_mmu_index(env, false));
-+    ARMMMUIdx mmu_idx = arm_mmu_idx(env);
- 
-     /* Align stack pointer if the guest wants that */
-     if ((frameptr & 4) &&
-@@ -11073,7 +11073,7 @@ hwaddr arm_cpu_get_phys_page_attrs_debug(CPUState *cs, vaddr addr,
-     int prot;
-     bool ret;
-     ARMMMUFaultInfo fi = {};
--    ARMMMUIdx mmu_idx = core_to_arm_mmu_idx(env, cpu_mmu_index(env, false));
-+    ARMMMUIdx mmu_idx = arm_mmu_idx(env);
- 
-     *attrs = (MemTxAttrs) {};
- 
-@@ -12977,26 +12977,31 @@ ARMMMUIdx arm_v7m_mmu_idx_for_secstate(CPUARMState *env, bool secstate)
-     return arm_v7m_mmu_idx_for_secstate_and_priv(env, secstate, priv);
+@@ -9744,6 +9744,133 @@ static uint8_t convert_stage2_attrs(CPUARMState *env, uint8_t s2attrs)
+     return (hiattr << 6) | (hihint << 4) | (loattr << 2) | lohint;
  }
  
--int cpu_mmu_index(CPUARMState *env, bool ifetch)
-+ARMMMUIdx arm_mmu_idx(CPUARMState *env)
- {
--    int el = arm_current_el(env);
-+    int el;
- 
-     if (arm_feature(env, ARM_FEATURE_M)) {
--        ARMMMUIdx mmu_idx = arm_v7m_mmu_idx_for_secstate(env, env->v7m.secure);
--
--        return arm_to_core_mmu_idx(mmu_idx);
-+        return arm_v7m_mmu_idx_for_secstate(env, env->v7m.secure);
-     }
- 
-+    el = arm_current_el(env);
-     if (el < 2 && arm_is_secure_below_el3(env)) {
--        return arm_to_core_mmu_idx(ARMMMUIdx_S1SE0 + el);
-+        return ARMMMUIdx_S1SE0 + el;
++static ARMVAParameters aa64_va_parameters(CPUARMState *env, uint64_t va,
++                                          ARMMMUIdx mmu_idx, bool data)
++{
++    uint64_t tcr = regime_tcr(env, mmu_idx)->raw_tcr;
++    uint32_t el = regime_el(env, mmu_idx);
++    bool tbi, tbid, epd, hpd, ha, hd, using16k, using64k;
++    int select, tsz;
++
++    /* Bit 55 is always between the two regions, and is canonical for
++     * determining if address tagging is enabled.
++     */
++    select = extract64(va, 55, 1);
++
++    if (el > 1) {
++        tsz = extract32(tcr, 0, 6);
++        using64k = extract32(tcr, 14, 1);
++        using16k = extract32(tcr, 15, 1);
++        if (mmu_idx == ARMMMUIdx_S2NS) {
++            /* VTCR_EL2 */
++            tbi = tbid = hpd = false;
++        } else {
++            tbi = extract32(tcr, 20, 1);
++            hpd = extract32(tcr, 24, 1);
++            tbid = extract32(tcr, 29, 1);
++        }
++        ha = extract32(tcr, 21, 1);
++        hd = extract32(tcr, 22, 1);
++        epd = false;
++    } else if (!select) {
++        tsz = extract32(tcr, 0, 6);
++        epd = extract32(tcr, 7, 1);
++        using64k = extract32(tcr, 14, 1);
++        using16k = extract32(tcr, 15, 1);
++        tbi = extract64(tcr, 37, 1);
++        ha = extract64(tcr, 39, 1);
++        hd = extract64(tcr, 40, 1);
++        hpd = extract64(tcr, 41, 1);
++        tbid = extract64(tcr, 51, 1);
 +    } else {
-+        return ARMMMUIdx_S12NSE0 + el;
-     }
--    return el;
++        int tg = extract32(tcr, 30, 2);
++        using16k = tg == 1;
++        using64k = tg == 3;
++        tsz = extract32(tcr, 16, 6);
++        epd = extract32(tcr, 23, 1);
++        tbi = extract64(tcr, 38, 1);
++        ha = extract64(tcr, 39, 1);
++        hd = extract64(tcr, 40, 1);
++        hpd = extract64(tcr, 42, 1);
++        tbid = extract64(tcr, 52, 1);
++    }
++    tsz = MIN(tsz, 39);  /* TODO: ARMv8.4-TTST */
++    tsz = MAX(tsz, 16);  /* TODO: ARMv8.2-LVA  */
++
++    return (ARMVAParameters) {
++        .tsz = tsz,
++        .select = select,
++        .tbi = tbi & (data | !tbid),
++        .epd = epd,
++        .hpd = hpd,
++        .ha = ha,
++        .hd = hd,
++        .using16k = using16k,
++        .using64k = using64k,
++    };
 +}
 +
-+int cpu_mmu_index(CPUARMState *env, bool ifetch)
++static ARMVAParameters aa32_va_parameters(CPUARMState *env, uint32_t va,
++                                          ARMMMUIdx mmu_idx)
 +{
-+    return arm_to_core_mmu_idx(arm_mmu_idx(env));
- }
++    uint64_t tcr = regime_tcr(env, mmu_idx)->raw_tcr;
++    uint32_t el = regime_el(env, mmu_idx);
++    int select, tsz;
++    bool epd, hpd;
++
++    if (mmu_idx == ARMMMUIdx_S2NS) {
++        /* VTCR */
++        bool sext = extract32(tcr, 4, 1);
++        bool sign = extract32(tcr, 3, 1);
++
++        /* If the sign-extend bit is not the same as t0sz[3], the result
++         * is unpredictable. Flag this as a guest error.
++         */
++        if (sign != sext) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "AArch32: VTCR.S / VTCR.T0SZ[3] mismatch\n");
++        }
++        tsz = sextract32(tcr, 0, 4) + 8;
++        select = 0;
++        hpd = false;
++        epd = false;
++    } else if (el == 2) {
++        /* HTCR */
++        tsz = extract32(tcr, 0, 3);
++        select = 0;
++        hpd = extract64(tcr, 24, 1);
++        epd = false;
++    } else {
++        int t0sz = extract32(tcr, 0, 3);
++        int t1sz = extract32(tcr, 16, 3);
++
++        if (t1sz == 0) {
++            select = va > (0xffffffffu >> t0sz);
++        } else {
++            /* Note that we will detect errors later.  */
++            select = va >= ~(0xffffffffu >> t1sz);
++        }
++        if (!select) {
++            tsz = t0sz;
++            epd = extract32(tcr, 7, 1);
++            hpd = extract64(tcr, 41, 1);
++        } else {
++            tsz = t1sz;
++            epd = extract32(tcr, 23, 1);
++            hpd = extract64(tcr, 42, 1);
++        }
++        /* For aarch32, hpd0 is not enabled without t2e as well.  */
++        hpd &= extract32(tcr, 6, 1);
++    }
++
++    return (ARMVAParameters) {
++        .tsz = tsz,
++        .select = select,
++        .epd = epd,
++        .hpd = hpd,
++    };
++}
++
+ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+                                MMUAccessType access_type, ARMMMUIdx mmu_idx,
+                                hwaddr *phys_ptr, MemTxAttrs *txattrs, int *prot,
+@@ -9755,26 +9882,20 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+     /* Read an LPAE long-descriptor translation table. */
+     ARMFaultType fault_type = ARMFault_Translation;
+     uint32_t level;
+-    uint32_t epd = 0;
+-    int32_t t0sz, t1sz;
+-    uint32_t tg;
++    ARMVAParameters param;
+     uint64_t ttbr;
+-    int ttbr_select;
+     hwaddr descaddr, indexmask, indexmask_grainsize;
+     uint32_t tableattrs;
+-    target_ulong page_size;
++    target_ulong page_size, top_bits;
+     uint32_t attrs;
+-    int32_t stride = 9;
+-    int32_t addrsize;
+-    int inputsize;
+-    int32_t tbi = 0;
++    int32_t stride;
++    int addrsize, inputsize;
+     TCR *tcr = regime_tcr(env, mmu_idx);
+     int ap, ns, xn, pxn;
+     uint32_t el = regime_el(env, mmu_idx);
+-    bool ttbr1_valid = true;
++    bool ttbr1_valid;
+     uint64_t descaddrmask;
+     bool aarch64 = arm_el_is_aa64(env, el);
+-    bool hpd = false;
  
- void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-                           target_ulong *cs_base, uint32_t *pflags)
- {
--    ARMMMUIdx mmu_idx = core_to_arm_mmu_idx(env, cpu_mmu_index(env, false));
-+    ARMMMUIdx mmu_idx = arm_mmu_idx(env);
-     int current_el = arm_current_el(env);
-     int fp_el = fp_exception_el(env, current_el);
-     uint32_t flags;
+     /* TODO:
+      * This code does not handle the different format TCR for VTCR_EL2.
+@@ -9783,91 +9904,43 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+      * support for those page table walks.
+      */
+     if (aarch64) {
++        param = aa64_va_parameters(env, address, mmu_idx,
++                                   access_type != MMU_INST_FETCH);
+         level = 0;
+-        addrsize = 64;
+-        if (el > 1) {
+-            if (mmu_idx != ARMMMUIdx_S2NS) {
+-                tbi = extract64(tcr->raw_tcr, 20, 1);
+-            }
+-        } else {
+-            if (extract64(address, 55, 1)) {
+-                tbi = extract64(tcr->raw_tcr, 38, 1);
+-            } else {
+-                tbi = extract64(tcr->raw_tcr, 37, 1);
+-            }
+-        }
+-        tbi *= 8;
+-
+         /* If we are in 64-bit EL2 or EL3 then there is no TTBR1, so mark it
+          * invalid.
+          */
+-        if (el > 1) {
+-            ttbr1_valid = false;
+-        }
++        ttbr1_valid = (el < 2);
++        addrsize = 64 - 8 * param.tbi;
++        inputsize = 64 - param.tsz;
+     } else {
++        param = aa32_va_parameters(env, address, mmu_idx);
+         level = 1;
+-        addrsize = 32;
+         /* There is no TTBR1 for EL2 */
+-        if (el == 2) {
+-            ttbr1_valid = false;
+-        }
++        ttbr1_valid = (el != 2);
++        addrsize = (mmu_idx == ARMMMUIdx_S2NS ? 40 : 32);
++        inputsize = addrsize - param.tsz;
+     }
+ 
+-    /* Determine whether this address is in the region controlled by
+-     * TTBR0 or TTBR1 (or if it is in neither region and should fault).
+-     * This is a Non-secure PL0/1 stage 1 translation, so controlled by
+-     * TTBCR/TTBR0/TTBR1 in accordance with ARM ARM DDI0406C table B-32:
++    /* We determined the region when collecting the parameters, but we
++     * have not yet validated that the address is valid for the region.
++     * Extract the top bits and verify that they all match select.
+      */
+-    if (aarch64) {
+-        /* AArch64 translation.  */
+-        t0sz = extract32(tcr->raw_tcr, 0, 6);
+-        t0sz = MIN(t0sz, 39);
+-        t0sz = MAX(t0sz, 16);
+-    } else if (mmu_idx != ARMMMUIdx_S2NS) {
+-        /* AArch32 stage 1 translation.  */
+-        t0sz = extract32(tcr->raw_tcr, 0, 3);
+-    } else {
+-        /* AArch32 stage 2 translation.  */
+-        bool sext = extract32(tcr->raw_tcr, 4, 1);
+-        bool sign = extract32(tcr->raw_tcr, 3, 1);
+-        /* Address size is 40-bit for a stage 2 translation,
+-         * and t0sz can be negative (from -8 to 7),
+-         * so we need to adjust it to use the TTBR selecting logic below.
+-         */
+-        addrsize = 40;
+-        t0sz = sextract32(tcr->raw_tcr, 0, 4) + 8;
+-
+-        /* If the sign-extend bit is not the same as t0sz[3], the result
+-         * is unpredictable. Flag this as a guest error.  */
+-        if (sign != sext) {
+-            qemu_log_mask(LOG_GUEST_ERROR,
+-                          "AArch32: VTCR.S / VTCR.T0SZ[3] mismatch\n");
+-        }
+-    }
+-    t1sz = extract32(tcr->raw_tcr, 16, 6);
+-    if (aarch64) {
+-        t1sz = MIN(t1sz, 39);
+-        t1sz = MAX(t1sz, 16);
+-    }
+-    if (t0sz && !extract64(address, addrsize - t0sz, t0sz - tbi)) {
+-        /* there is a ttbr0 region and we are in it (high bits all zero) */
+-        ttbr_select = 0;
+-    } else if (ttbr1_valid && t1sz &&
+-               !extract64(~address, addrsize - t1sz, t1sz - tbi)) {
+-        /* there is a ttbr1 region and we are in it (high bits all one) */
+-        ttbr_select = 1;
+-    } else if (!t0sz) {
+-        /* ttbr0 region is "everything not in the ttbr1 region" */
+-        ttbr_select = 0;
+-    } else if (!t1sz && ttbr1_valid) {
+-        /* ttbr1 region is "everything not in the ttbr0 region" */
+-        ttbr_select = 1;
+-    } else {
+-        /* in the gap between the two regions, this is a Translation fault */
++    top_bits = sextract64(address, inputsize, addrsize - inputsize);
++    if (-top_bits != param.select || (param.select && !ttbr1_valid)) {
++        /* In the gap between the two regions, this is a Translation fault */
+         fault_type = ARMFault_Translation;
+         goto do_fault;
+     }
+ 
++    if (param.using64k) {
++        stride = 13;
++    } else if (param.using16k) {
++        stride = 11;
++    } else {
++        stride = 9;
++    }
++
+     /* Note that QEMU ignores shareability and cacheability attributes,
+      * so we don't need to do anything with the SH, ORGN, IRGN fields
+      * in the TTBCR.  Similarly, TTBCR:A1 selects whether we get the
+@@ -9875,56 +9948,13 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+      * implement any ASID-like capability so we can ignore it (instead
+      * we will always flush the TLB any time the ASID is changed).
+      */
+-    if (ttbr_select == 0) {
+-        ttbr = regime_ttbr(env, mmu_idx, 0);
+-        if (el < 2) {
+-            epd = extract32(tcr->raw_tcr, 7, 1);
+-        }
+-        inputsize = addrsize - t0sz;
+-
+-        tg = extract32(tcr->raw_tcr, 14, 2);
+-        if (tg == 1) { /* 64KB pages */
+-            stride = 13;
+-        }
+-        if (tg == 2) { /* 16KB pages */
+-            stride = 11;
+-        }
+-        if (aarch64 && el > 1) {
+-            hpd = extract64(tcr->raw_tcr, 24, 1);
+-        } else {
+-            hpd = extract64(tcr->raw_tcr, 41, 1);
+-        }
+-        if (!aarch64) {
+-            /* For aarch32, hpd0 is not enabled without t2e as well.  */
+-            hpd &= extract64(tcr->raw_tcr, 6, 1);
+-        }
+-    } else {
+-        /* We should only be here if TTBR1 is valid */
+-        assert(ttbr1_valid);
+-
+-        ttbr = regime_ttbr(env, mmu_idx, 1);
+-        epd = extract32(tcr->raw_tcr, 23, 1);
+-        inputsize = addrsize - t1sz;
+-
+-        tg = extract32(tcr->raw_tcr, 30, 2);
+-        if (tg == 3)  { /* 64KB pages */
+-            stride = 13;
+-        }
+-        if (tg == 1) { /* 16KB pages */
+-            stride = 11;
+-        }
+-        hpd = extract64(tcr->raw_tcr, 42, 1);
+-        if (!aarch64) {
+-            /* For aarch32, hpd1 is not enabled without t2e as well.  */
+-            hpd &= extract64(tcr->raw_tcr, 6, 1);
+-        }
+-    }
++    ttbr = regime_ttbr(env, mmu_idx, param.select);
+ 
+     /* Here we should have set up all the parameters for the translation:
+      * inputsize, ttbr, epd, stride, tbi
+      */
+ 
+-    if (epd) {
++    if (param.epd) {
+         /* Translation table walk disabled => Translation fault on TLB miss
+          * Note: This is always 0 on 64-bit EL2 and EL3.
+          */
+@@ -10037,7 +10067,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+         }
+         /* Merge in attributes from table descriptors */
+         attrs |= nstable << 3; /* NS */
+-        if (hpd) {
++        if (param.hpd) {
+             /* HPD disables all the table attributes except NSTable.  */
+             break;
+         }
 -- 
 2.17.2
