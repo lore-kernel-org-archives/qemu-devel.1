@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37792)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=879e7201e=Alistair.Francis@wdc.com>)
-	id 1gXbC0-0000bw-Jr
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 19:19:01 -0500
+	id 1gXbCD-0000kF-80
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 19:19:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=879e7201e=Alistair.Francis@wdc.com>)
-	id 1gXbBx-0003AW-Ep
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 19:19:00 -0500
+	id 1gXbC6-0003Vv-E4
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 19:19:10 -0500
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Fri, 14 Dec 2018 00:18:54 +0000
-Message-ID: <126c481d658afcc297317b2f6844a48ffe591de2.1544746653.git.alistair.francis@wdc.com>
+Date: Fri, 14 Dec 2018 00:19:03 +0000
+Message-ID: <cac7c30e993d969f89b001d6cb88829c1f6c0073.1544746653.git.alistair.francis@wdc.com>
 References: <cover.1544746653.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1544746653.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v1 3/5] RISC-V: Fix PLIC pending bitfield reads
+Subject: [Qemu-devel] [PATCH v1 4/5] RISC-V: Enable second UART on sifive_e
+ and sifive_u
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +31,59 @@ Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistai
 
 From: Michael Clark <mjc@sifive.com>
 
-The address calculation for the pending bitfield had
-a copy paste bug. This bug went unnoticed because the Linux
-PLIC driver does not read the pending bitfield, rather it
-reads pending interrupt numbers from the claim register
-and writes acknowledgements back to the claim register.
+Previously the second UARTs on the sifive_e and sifive_u machines
+where disabled due to check-qtest-riscv32 and check-qtest-riscv64
+failures. Recent changes in the QEMU core serial code have
+resolved these failures so the second UARTs can be instantiated.
 
 Cc: Palmer Dabbelt <palmer@sifive.com>
 Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Cc: Alistair Francis <Alistair.Francis@wdc.com>
-Reported-by: Vincent Siles <vincent.siles@ens-lyon.org>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- hw/riscv/sifive_plic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/riscv/sifive_e.c | 5 ++---
+ hw/riscv/sifive_u.c | 5 ++---
+ 2 files changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
-index 9cf9a1f986..d12ec3fc9a 100644
---- a/hw/riscv/sifive_plic.c
-+++ b/hw/riscv/sifive_plic.c
-@@ -214,7 +214,7 @@ static uint64_t sifive_plic_read(void *opaque, hwaddr a=
-ddr, unsigned size)
-     } else if (addr >=3D plic->pending_base && /* 1 bit per source */
-                addr < plic->pending_base + (plic->num_sources >> 3))
-     {
--        uint32_t word =3D (addr - plic->priority_base) >> 2;
-+        uint32_t word =3D (addr - plic->pending_base) >> 2;
-         if (RISCV_DEBUG_PLIC) {
-             qemu_log("plic: read pending: word=3D%d value=3D%d\n",
-                 word, plic->pending[word]);
+diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+index cb513cc3bb..5d9d65ff29 100644
+--- a/hw/riscv/sifive_e.c
++++ b/hw/riscv/sifive_e.c
+@@ -192,9 +192,8 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev=
+, Error **errp)
+         memmap[SIFIVE_E_QSPI0].base, memmap[SIFIVE_E_QSPI0].size);
+     sifive_mmio_emulate(sys_mem, "riscv.sifive.e.pwm0",
+         memmap[SIFIVE_E_PWM0].base, memmap[SIFIVE_E_PWM0].size);
+-    /* sifive_uart_create(sys_mem, memmap[SIFIVE_E_UART1].base,
+-        serial_hd(1), qdev_get_gpio_in(DEVICE(s->plic),
+-                                       SIFIVE_E_UART1_IRQ)); */
++    sifive_uart_create(sys_mem, memmap[SIFIVE_E_UART1].base,
++        serial_hd(1), qdev_get_gpio_in(DEVICE(s->plic), SIFIVE_E_UART1_IRQ=
+));
+     sifive_mmio_emulate(sys_mem, "riscv.sifive.e.qspi1",
+         memmap[SIFIVE_E_QSPI1].base, memmap[SIFIVE_E_QSPI1].size);
+     sifive_mmio_emulate(sys_mem, "riscv.sifive.e.pwm1",
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index ef07df2442..3591898011 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -350,9 +350,8 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev=
+, Error **errp)
+         memmap[SIFIVE_U_PLIC].size);
+     sifive_uart_create(system_memory, memmap[SIFIVE_U_UART0].base,
+         serial_hd(0), qdev_get_gpio_in(DEVICE(s->plic), SIFIVE_U_UART0_IRQ=
+));
+-    /* sifive_uart_create(system_memory, memmap[SIFIVE_U_UART1].base,
+-        serial_hd(1), qdev_get_gpio_in(DEVICE(s->plic),
+-                                       SIFIVE_U_UART1_IRQ)); */
++    sifive_uart_create(system_memory, memmap[SIFIVE_U_UART1].base,
++        serial_hd(1), qdev_get_gpio_in(DEVICE(s->plic), SIFIVE_U_UART1_IRQ=
+));
+     sifive_clint_create(memmap[SIFIVE_U_CLINT].base,
+         memmap[SIFIVE_U_CLINT].size, smp_cpus,
+         SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
 --=20
 2.19.1
