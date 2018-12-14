@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37692)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=879e7201e=Alistair.Francis@wdc.com>)
-	id 1gXbBc-0000MN-Lm
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 19:18:37 -0500
+	id 1gXbBm-0000SI-PA
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 19:18:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=879e7201e=Alistair.Francis@wdc.com>)
-	id 1gXbBZ-0002Cc-Gf
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 19:18:36 -0500
+	id 1gXbBj-0002bU-KJ
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 19:18:46 -0500
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Fri, 14 Dec 2018 00:18:30 +0000
-Message-ID: <12779d199ff308501e5cb35b70ee04dc8f5edd22.1544746653.git.alistair.francis@wdc.com>
+Date: Fri, 14 Dec 2018 00:18:39 +0000
+Message-ID: <66f87c98f9a2122262d7c3179052df95e42b6917.1544746653.git.alistair.francis@wdc.com>
 References: <cover.1544746653.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1544746653.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v1 1/5] RISC-V: Add hartid and \n to interrupt
- logging
+Subject: [Qemu-devel] [PATCH v1 2/5] RISC-V: Fix CLINT timecmp low 32-bit
+ writes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,70 +31,54 @@ Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistai
 
 From: Michael Clark <mjc@sifive.com>
 
-Add carriage return that was erroneously removed
-when converting to qemu_log. Change hard coded
-core number to the actual hartid.
+A missing shift made updates to the low order bits
+of timecmp erroneously copy the old low order bits
+into the high order bits of the 64-bit timecmp
+register. Add the missing shift and rename timecmp
+local variables to timecmp_hi and timecmp_lo.
 
+This bug didn't show up as the low order bits are
+usually written first followed by the high order
+bits meaning the high order bits contained an invalid
+value between the timecmp_lo and timecmp_hi update.
+
+Cc: Palmer Dabbelt <palmer@sifive.com>
 Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: Palmer Dabbelt <palmer@sifive.com>
 Cc: Alistair Francis <Alistair.Francis@wdc.com>
+Co-Authored-by: Johannes Haring <johannes.haring@gmx.net>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/cpu_helper.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+ hw/riscv/sifive_clint.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 86f9f4730c..0234c2d528 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -445,11 +445,13 @@ void riscv_cpu_do_interrupt(CPUState *cs)
-     if (RISCV_DEBUG_INTERRUPT) {
-         int log_cause =3D cs->exception_index & RISCV_EXCP_INT_MASK;
-         if (cs->exception_index & RISCV_EXCP_INT_FLAG) {
--            qemu_log_mask(LOG_TRACE, "core   0: trap %s, epc 0x" TARGET_FM=
-T_lx,
--                riscv_intr_names[log_cause], env->pc);
-+            qemu_log_mask(LOG_TRACE, "core "
-+                TARGET_FMT_ld ": trap %s, epc 0x" TARGET_FMT_lx "\n",
-+                env->mhartid, riscv_intr_names[log_cause], env->pc);
+diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
+index 0d2fd52487..d4c159e937 100644
+--- a/hw/riscv/sifive_clint.c
++++ b/hw/riscv/sifive_clint.c
+@@ -146,15 +146,15 @@ static void sifive_clint_write(void *opaque, hwaddr a=
+ddr, uint64_t value,
+             error_report("clint: invalid timecmp hartid: %zu", hartid);
+         } else if ((addr & 0x7) =3D=3D 0) {
+             /* timecmp_lo */
+-            uint64_t timecmp =3D env->timecmp;
++            uint64_t timecmp_hi =3D env->timecmp >> 32;
+             sifive_clint_write_timecmp(RISCV_CPU(cpu),
+-                timecmp << 32 | (value & 0xFFFFFFFF));
++                timecmp_hi << 32 | (value & 0xFFFFFFFF));
+             return;
+         } else if ((addr & 0x7) =3D=3D 4) {
+             /* timecmp_hi */
+-            uint64_t timecmp =3D env->timecmp;
++            uint64_t timecmp_lo =3D env->timecmp;
+             sifive_clint_write_timecmp(RISCV_CPU(cpu),
+-                value << 32 | (timecmp & 0xFFFFFFFF));
++                value << 32 | (timecmp_lo & 0xFFFFFFFF));
          } else {
--            qemu_log_mask(LOG_TRACE, "core   0: intr %s, epc 0x" TARGET_FM=
-T_lx,
--                riscv_excp_names[log_cause], env->pc);
-+            qemu_log_mask(LOG_TRACE, "core "
-+                TARGET_FMT_ld ": intr %s, epc 0x" TARGET_FMT_lx "\n",
-+                env->mhartid, riscv_excp_names[log_cause], env->pc);
+             error_report("clint: invalid timecmp write: %08x", (uint32_t)a=
+ddr);
          }
-     }
-=20
-@@ -511,8 +513,8 @@ void riscv_cpu_do_interrupt(CPUState *cs)
-=20
-         if (hasbadaddr) {
-             if (RISCV_DEBUG_INTERRUPT) {
--                qemu_log_mask(LOG_TRACE, "core " TARGET_FMT_ld
--                    ": badaddr 0x" TARGET_FMT_lx, env->mhartid, env->badad=
-dr);
-+                qemu_log_mask(LOG_TRACE, "core " TARGET_FMT_ld ": badaddr =
-0x"
-+                    TARGET_FMT_lx "\n", env->mhartid, env->badaddr);
-             }
-             env->sbadaddr =3D env->badaddr;
-         } else {
-@@ -536,8 +538,8 @@ void riscv_cpu_do_interrupt(CPUState *cs)
-=20
-         if (hasbadaddr) {
-             if (RISCV_DEBUG_INTERRUPT) {
--                qemu_log_mask(LOG_TRACE, "core " TARGET_FMT_ld
--                    ": badaddr 0x" TARGET_FMT_lx, env->mhartid, env->badad=
-dr);
-+                qemu_log_mask(LOG_TRACE, "core " TARGET_FMT_ld ": badaddr =
-0x"
-+                    TARGET_FMT_lx "\n", env->mhartid, env->badaddr);
-             }
-             env->mbadaddr =3D env->badaddr;
-         } else {
 --=20
 2.19.1
