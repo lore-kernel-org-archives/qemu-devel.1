@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gXjpy-0008V8-AY
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:32:52 -0500
+	(envelope-from <omair.javaid@linaro.org>) id 1gXizE-0004O8-SE
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 03:38:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gXjpu-0001Ut-Ry
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:32:50 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:54731)
+	(envelope-from <omair.javaid@linaro.org>) id 1gXizD-0003N4-P0
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 03:38:20 -0500
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:46931)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gXjpu-0001NM-It
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:32:46 -0500
-Received: by mail-wm1-f67.google.com with SMTP id a62so4990841wmh.4
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 01:32:46 -0800 (PST)
-References: <20181213175552.14857-1-wainersm@redhat.com>
-	<CAFEAcA86SDLGyqL3rG-fEDFsEj8-nz-Uqn5Mb9EeLqiFPeKZfA@mail.gmail.com>
-	<cccf3c43-0e51-bbbc-3676-17286b11ec99@redhat.com>
-	<CAFEAcA9CpR=JGt74=xaUddYhf5SCOoeHH_v+O1L+rrTygZ7quQ@mail.gmail.com>
-	<860b98f8-02d0-4c96-ccf2-d582ca295b95@redhat.com>
-	<871s6kfwoo.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a4f68f44-a5c1-ced4-30d2-99d0083a1214@redhat.com>
-Date: Fri, 14 Dec 2018 10:32:43 +0100
+	(Exim 4.71) (envelope-from <omair.javaid@linaro.org>)
+	id 1gXizD-0003J0-E9
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 03:38:19 -0500
+Received: by mail-qk1-x743.google.com with SMTP id q1so2767880qkf.13
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 00:38:18 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <871s6kfwoo.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/1] checkpatch: checker for comment block
+References: <20181213115503.24188-1-alex.bennee@linaro.org>
+	<20181213115503.24188-2-alex.bennee@linaro.org>
+In-Reply-To: <20181213115503.24188-2-alex.bennee@linaro.org>
+From: Omair Javaid <omair.javaid@linaro.org>
+Date: Fri, 14 Dec 2018 13:37:51 +0500
+Message-ID: <CANW4E-1UmZOGHya4jHxj10O2Ki7MPGMqme7wT0jaCO8Ufrii6g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 1/2] target/arm: kvm64 make guest debug
+ AA32 break point aware
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,126 +31,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, mark.rutland@arm.com, ard.biesheuvel@linaro.org, Peter Maydell <peter.maydell@linaro.org>
 
-On 14/12/18 07:29, Markus Armbruster wrote:
-> Paolo Bonzini <pbonzini@redhat.com> writes:
-> 
->> On 13/12/18 19:21, Peter Maydell wrote:
->>> On Thu, 13 Dec 2018 at 18:07, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>>> On 13/12/18 19:01, Peter Maydell wrote:
->>>>> I sent a patch to do this a little while back:
->>>>>  https://patchwork.kernel.org/patch/10561557/
->>>>>
->>>>> It didn't get applied because Paolo disagreed with having
->>>>> our tools enforcing what our style guide says.
->>>>
->>>> I didn't disagree with that---I disagreed with having a single style in
->>>> the style guide, because unlike most other blatant violations of the
->>>> coding style (eg. braces), this one is pervasive in maintained code and
->>>> I don't want code that I maintain to mix two comment styles.
->>>>
->>>> So I proposed two alternatives:
->>>>
->>>> - someone fixes all the comment blocks which are "starred" but don't
->>>> have a lone "/*" at the beginning, and then we can commit that patch;
->>>>
->>>> - we allow "/* foo" on the first line, except for doc comments and for
->>>> the first line of the file (author/license block), and fix the style
->>>> guide accordingly.
->>>
->>> We came to a consensus on the comment style when we discussed
->>> the patch which updated CODING_STYLE. I'm not personally
->>> a fan of the result (I used to use "/* foo"), but what we have in the
->>> doc is what we achieved consensus for. I'm not going to reopen
->>> the "what should block comments look like" style debate.
->>
->> Sure, I don't want to do that either.  I accept the result of the
->> discussion; I don't accept introducing a new warning that will cause
->> over 700 files to become inconsistent sooner or later.
-> 
-> By design, checkpatch.pl only checks *patches*.  Existing code doesn't
-> trigger warnings until it gets touched.  And then it should arguably be
-> made to conform to CODING_STYLE.  So, what's the problem again?  :)
+On Thu, 13 Dec 2018 at 16:55, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+> When supported by the hardware we can run AA32 guests or even AA64 EL1
+> code with AA32 EL0 mode code. Inserting a AA64 break point into AA32
+> code tends to break things. This is especially acute with gdb as it
+> inserts temporary breakpoints when stepping through code.
 
-Once you add multiline comments to a file that has 3-line comments, they
-have to be 4-line in order to appease checkpatch, and this create
-inconsistencies.
+Hi Alex,
 
-In other words, it's not about checkpatch complaining on existing code.
- However, by running checkpatch on existing maintained code, you get a
-measure of which files will grow an inconsistent style unless cleaned up
-wholesale.
+Are you expecting GDB to switch targets (from AArch64 to AArch32 or
+vice versa) when there is mode switch for example a AArch64 binary
+calling a AArch32 library function.
+I think GDB will behave nicely when doing 1 type of debug but seamless
+switching between modes is still tricky for GDB. There has been some
+work in last few months on this but not sure where it has reached.
 
-Anyway, in order to conclude the discussion and walk the walk, here is
-the script.  It also converts GNU style to the anointed one.  I now
-support applying Peter's patch, after the script is reviewed I'll send
-it as a formal patch.
+>
+> The heuristic of checking the current mode works but it's not perfect.
+> A user could be placing a break point in code after a mode switch and
+> that will still fail. However there doesn't seem to be a way to force
+> a hbreak by default. According to "set breakpoint auto-hw on":
 
-#! /bin/sh
-#
-# Fix multiline comments to match CODING_STYLE
-#
-# Copyright (C) 2018 Red Hat, Inc.
-#
-# Author: Paolo Bonzini
-#
-# Usage: scripts/fix-multiline-comments.sh [-i] FILE...
-#
-# -i edits the file in place (requires gawk 4.1.0).
-#
-# Set the AWK environment variable to choose the awk interpreter to use
-# (default 'awk')
+On mode switch we ll have to switch target architecture on GDB side
+and GDB may not be able to do that seamlessly. Have you tried
+debugging such an example?
 
-if test "$1" = -i; then
-  # gawk extension
-  inplace="-i inplace"
-  shift
-fi
-${AWK-awk} $inplace 'BEGIN {
-    getline first
-    indent = -1
-    while ((getline second) > 0) {
-        # apply a star to the indent on lines after the first
-        if (indent != -1) {
-            if (first == "") {
-                first = sp " *"
-            } else if (substr(first, 1, indent + 2) == sp "  ") {
-                first = sp " *" substr(first, indent + 3)
-            }
-        }
-
-        is_lead = (first ~ /^[ \t]*\/\*/)
-        is_trail = (first ~ /\*\//)
-        if (is_lead && !is_trail) {
-            # grab the indent at the start of a comment, but not for
-            # single-line comments
-            match(first, /^[ \t]*\/\*/)
-            indent = RLENGTH - 2
-            sp = substr(first, 1, indent)
-        }
-
-        # the regular expression filters out lone /*, /**, or */
-        if (indent != -1 && !(first ~ /^[ \t]*(\/\*+|\*\/)[ \t]*$/)) {
-            if (is_trail) {
-                # split the trailing */ on a separate line
-                match(first, /[ \t]*\*\//)
-                first = substr(first, 1, RSTART - 1) "\n" sp " */"
-            }
-            if (is_lead) {
-                # split the leading /* on a separate line
-                match(first, /^[ \t]*\/\*+[ \t]*/)
-                first = sp "/*\n" sp " *" substr(first, RLENGTH)
-            }
-        }
-        if (is_trail) {
-            indent = -1
-        }
-        print first
-        first = second
-    }
-    print first
-}' "$@"
-
-Paolo
+>
+>   This is the default behavior. When GDB sets a breakpoint, it will try
+>   to use the target memory map to decide if software or hardware
+>   breakpoint must be used.
+>
+> Reported-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Cc: Omair Javaid <omair.javaid@linaro.org>
+> ---
+>  target/arm/kvm64.c | 13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
+>
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index 0a502091e7..dd564a59b7 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -989,14 +989,20 @@ int kvm_arch_get_registers(CPUState *cs)
+>      return ret;
+>  }
+>
+> -/* C6.6.29 BRK instruction */
+> +/* BRK (A64) and BKPT (A32) instructions */
+>  static const uint32_t brk_insn =3D 0xd4200000;
+> +static const uint32_t bkpt_insn =3D 0xe1200070;
+>
+>  int kvm_arch_insert_sw_breakpoint(CPUState *cs, struct kvm_sw_breakpoint=
+ *bp)
+>  {
+> +    CPUARMState *env =3D &ARM_CPU(cs)->env;
+> +    int el =3D arm_current_el(env);
+> +    bool is_aa64 =3D arm_el_is_aa64(env, el);
+> +    const uint32_t *bpi =3D is_aa64 ? &brk_insn : &bkpt_insn;
+> +
+>      if (have_guest_debug) {
+>          if (cpu_memory_rw_debug(cs, bp->pc, (uint8_t *)&bp->saved_insn, =
+4, 0) ||
+> -            cpu_memory_rw_debug(cs, bp->pc, (uint8_t *)&brk_insn, 4, 1))=
+ {
+> +            cpu_memory_rw_debug(cs, bp->pc, (uint8_t *)bpi, 4, 1)) {
+>              return -EINVAL;
+>          }
+>          return 0;
+> @@ -1012,7 +1018,7 @@ int kvm_arch_remove_sw_breakpoint(CPUState *cs, str=
+uct kvm_sw_breakpoint *bp)
+>
+>      if (have_guest_debug) {
+>          if (cpu_memory_rw_debug(cs, bp->pc, (uint8_t *)&brk, 4, 0) ||
+> -            brk !=3D brk_insn ||
+> +            !(brk =3D=3D brk_insn || brk =3D=3D bkpt_insn) ||
+>              cpu_memory_rw_debug(cs, bp->pc, (uint8_t *)&bp->saved_insn, =
+4, 1)) {
+>              return -EINVAL;
+>          }
+> @@ -1055,6 +1061,7 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm_=
+debug_exit_arch *debug_exit)
+>              return false;
+>          }
+>          break;
+> +    case EC_AA32_BKPT:
+>      case EC_AA64_BKPT:
+>          if (kvm_find_sw_breakpoint(cs, env->pc)) {
+>              return true;
+> --
+> 2.17.1
+>
