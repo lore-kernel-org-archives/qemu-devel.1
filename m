@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXkAm-00041k-G4
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:54:21 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gXkDO-0005KN-0h
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:57:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXkAl-0004QQ-JY
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:54:20 -0500
-Received: from mail-oi1-x230.google.com ([2607:f8b0:4864:20::230]:43473)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gXkAl-0004Kg-4D
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:54:19 -0500
-Received: by mail-oi1-x230.google.com with SMTP id u18so4065955oie.10
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 01:54:18 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1gXkDL-0006ht-Kj
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:57:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48542)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gXkDL-0006h6-Dz
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:56:59 -0500
+Date: Fri, 14 Dec 2018 09:56:47 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181214095646.GB2454@work-vm>
+References: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
+	<1544516693-5395-8-git-send-email-wei.w.wang@intel.com>
+	<20181213154548.GP2313@work-vm> <5C135017.3070203@intel.com>
 MIME-Version: 1.0
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 14 Dec 2018 09:54:06 +0000
-Message-ID: <CAFEAcA_=XAXoFRFUjZsDWb-8puO4b9CbB85DO+iRXiDrO9O7NA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] patchew.org using expired https certificate
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5C135017.3070203@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v11 7/7] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_HINT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,18 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com
 
-Connecting to https://patchew.org/ makes my browser complain:
+* Wei Wang (wei.w.wang@intel.com) wrote:
+> On 12/13/2018 11:45 PM, Dr. David Alan Gilbert wrote:
+> > * Wei Wang (wei.w.wang@intel.com) wrote:
+> > > The new feature enables the virtio-balloon device to receive hints of
+> > > guest free pages from the free page vq.
+> > > 
+> > > A notifier is registered to the migration precopy notifier chain. The
+> > > notifier calls free_page_start after the migration thread syncs the dirty
+> > > bitmap, so that the free page optimization starts to clear bits of free
+> > > pages from the bitmap. It calls the free_page_stop before the migration
+> > > thread syncs the bitmap, which is the end of the current round of ram
+> > > save. The free_page_stop is also called to stop the optimization in the
+> > > case when there is an error occurred in the process of ram saving.
+> > > 
+> > > Note: balloon will report pages which were free at the time of this call.
+> > > As the reporting happens asynchronously, dirty bit logging must be
+> > > enabled before this free_page_start call is made. Guest reporting must be
+> > > disabled before the migration dirty bitmap is synchronized.
+> > > 
+> > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> > > CC: Michael S. Tsirkin <mst@redhat.com>
+> > > CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > CC: Juan Quintela <quintela@redhat.com>
+> > > CC: Peter Xu <peterx@redhat.com>
+> > I think I'm OK for this from the migration side, I'd appreciate
+> > someone checking the virtio and aio bits.
+> > 
+> > I'm not too sure how it gets switched on and off - i.e. if we get a nice
+> > new qemu on a new kernel, what happens when I try and migrate to the
+> > same qemu on an older kernel without these hints?
+> > 
+> 
+> This feature doesn't rely on the host kernel. Those hints are reported from
+> the guest kernel.
+> So migration across different hosts wouldn't affect the use of this feature.
+> Please correct me if I didn't get your point.
 
-# patchew.org uses an invalid security certificate.
-# The certificate expired on 19 November 2017, 00:27:00 GMT.
-# The current time is 14 December 2018, 09:52.
-# Error code: SEC_ERROR_EXPIRED_CERTIFICATE
+Ah OK, yes;  now what about migrating from new->old qemu with a new
+guest but old machine type?
 
-which is a bit odd, given I don't think this has been
-broken since 2017. Did a cert-renewal script go wrong?
+Dave
 
-thanks
--- PMM
+> Best,
+> Wei
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
