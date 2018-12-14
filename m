@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42718)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1gXh38-0006Ew-1s
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 01:34:14 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1gXhZm-0006be-V2
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 02:08:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1gXh34-0001Wy-PE
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 01:34:14 -0500
-Received: from mga07.intel.com ([134.134.136.100]:52882)
+	(envelope-from <arei.gonglei@huawei.com>) id 1gXhZj-0003yo-Ph
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 02:07:58 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2868 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1gXh34-0001WN-G4
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 01:34:10 -0500
-Message-ID: <5C135017.3070203@intel.com>
-Date: Fri, 14 Dec 2018 14:39:19 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
+	id 1gXhZj-0003xf-CR
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 02:07:55 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Fri, 14 Dec 2018 07:07:44 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DB1BECBE@dggeml511-mbx.china.huawei.com>
+References: <20181213210057.3676-1-quintela@redhat.com>
+In-Reply-To: <20181213210057.3676-1-quintela@redhat.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
-	<1544516693-5395-8-git-send-email-wei.w.wang@intel.com>
-	<20181213154548.GP2313@work-vm>
-In-Reply-To: <20181213154548.GP2313@work-vm>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v11 7/7] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_HINT
+Subject: Re: [Qemu-devel] [PATCH v3 00/16] Virtio devices split from
+ virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +29,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com
+To: Juan Quintela <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On 12/13/2018 11:45 PM, Dr. David Alan Gilbert wrote:
-> * Wei Wang (wei.w.wang@intel.com) wrote:
->> The new feature enables the virtio-balloon device to receive hints of
->> guest free pages from the free page vq.
->>
->> A notifier is registered to the migration precopy notifier chain. The
->> notifier calls free_page_start after the migration thread syncs the dirty
->> bitmap, so that the free page optimization starts to clear bits of free
->> pages from the bitmap. It calls the free_page_stop before the migration
->> thread syncs the bitmap, which is the end of the current round of ram
->> save. The free_page_stop is also called to stop the optimization in the
->> case when there is an error occurred in the process of ram saving.
->>
->> Note: balloon will report pages which were free at the time of this call.
->> As the reporting happens asynchronously, dirty bit logging must be
->> enabled before this free_page_start call is made. Guest reporting must be
->> disabled before the migration dirty bitmap is synchronized.
->>
->> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
->> CC: Michael S. Tsirkin <mst@redhat.com>
->> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> CC: Juan Quintela <quintela@redhat.com>
->> CC: Peter Xu <peterx@redhat.com>
-> I think I'm OK for this from the migration side, I'd appreciate
-> someone checking the virtio and aio bits.
->
-> I'm not too sure how it gets switched on and off - i.e. if we get a nice
-> new qemu on a new kernel, what happens when I try and migrate to the
-> same qemu on an older kernel without these hints?
->
 
-This feature doesn't rely on the host kernel. Those hints are reported 
-from the guest kernel.
-So migration across different hosts wouldn't affect the use of this feature.
-Please correct me if I didn't get your point.
+> -----Original Message-----
+> From: Juan Quintela [mailto:quintela@redhat.com]
+> Sent: Friday, December 14, 2018 5:01 AM
+> To: qemu-devel@nongnu.org
+> Cc: Michael S. Tsirkin <mst@redhat.com>; Thomas Huth <thuth@redhat.com>;
+> Gerd Hoffmann <kraxel@redhat.com>; Gonglei (Arei)
+> <arei.gonglei@huawei.com>; Juan Quintela <quintela@redhat.com>
+> Subject: [PATCH v3 00/16] Virtio devices split from virtio-pci
+>=20
+> Hi
+>=20
+> v3:
+> - rebase to master
+> - only compile them if CONFIG_PCI is set (thomas)
+>=20
+> Please review.
+>=20
+> Later, Juan.
+>=20
+> V2:
+>=20
+> - Rebase on top of master
+>=20
+> Please review.
+>=20
+> Later, Juan.
+>=20
+> [v1]
+> From previous verision (in the middle of make check tests):
+> - split also the bits of virtio-pci.h (mst suggestion)
+> - add gpu, crypt and gpg bits
+> - more cleanups
+> - fix all the copyrights (the ones not changed have been there
+>   foverever)
+> - be consistent with naming, vhost-* or virtio-*
+>=20
+> Please review, Juan.
+>=20
+> Juan Quintela (16):
+>   virtio: split vhost vsock bits from virtio-pci
+>   virtio: split virtio input host bits from virtio-pci
+>   virtio: split virtio input bits from virtio-pci
+>   virtio: split virtio rng bits from virtio-pci
+>   virtio: split virtio balloon bits from virtio-pci
+>   virtio: split virtio 9p bits from virtio-pci
+>   virtio: split vhost user blk bits from virtio-pci
+>   virtio: split vhost user scsi bits from virtio-pci
+>   virtio: split vhost scsi bits from virtio-pci
+>   virtio: split virtio scsi bits from virtio-pci
+>   virtio: split virtio blk bits rom virtio-pci
+>   virtio: split virtio net bits rom virtio-pci
+>   virtio: split virtio serial bits rom virtio-pci
+>   virtio: split virtio gpu bits rom virtio-pci.h
+>   virtio: split virtio crypto bits rom virtio-pci.h
+>   virtio: virtio 9p really requires CONFIG_VIRTFS to work
+>=20
+>  default-configs/virtio.mak        |   3 +-
+>  hw/display/virtio-gpu-pci.c       |  14 +
+>  hw/display/virtio-vga.c           |   1 +
+>  hw/virtio/Makefile.objs           |  15 +
+>  hw/virtio/vhost-scsi-pci.c        |  95 ++++
+>  hw/virtio/vhost-user-blk-pci.c    | 101 ++++
+>  hw/virtio/vhost-user-scsi-pci.c   | 101 ++++
+>  hw/virtio/vhost-vsock-pci.c       |  82 ++++
+>  hw/virtio/virtio-9p-pci.c         |  86 ++++
+>  hw/virtio/virtio-balloon-pci.c    |  94 ++++
+>  hw/virtio/virtio-blk-pci.c        |  97 ++++
+>  hw/virtio/virtio-crypto-pci.c     |  14 +
+>  hw/virtio/virtio-input-host-pci.c |  45 ++
+>  hw/virtio/virtio-input-pci.c      | 154 ++++++
+>  hw/virtio/virtio-net-pci.c        |  96 ++++
+>  hw/virtio/virtio-pci.c            | 783 ------------------------------
+>  hw/virtio/virtio-pci.h            | 234 ---------
+>  hw/virtio/virtio-rng-pci.c        |  86 ++++
+>  hw/virtio/virtio-scsi-pci.c       | 106 ++++
+>  hw/virtio/virtio-serial-pci.c     | 112 +++++
+>  tests/Makefile.include            |  20 +-
+>  21 files changed, 1311 insertions(+), 1028 deletions(-)
+>  create mode 100644 hw/virtio/vhost-scsi-pci.c
+>  create mode 100644 hw/virtio/vhost-user-blk-pci.c
+>  create mode 100644 hw/virtio/vhost-user-scsi-pci.c
+>  create mode 100644 hw/virtio/vhost-vsock-pci.c
+>  create mode 100644 hw/virtio/virtio-9p-pci.c
+>  create mode 100644 hw/virtio/virtio-balloon-pci.c
+>  create mode 100644 hw/virtio/virtio-blk-pci.c
+>  create mode 100644 hw/virtio/virtio-input-host-pci.c
+>  create mode 100644 hw/virtio/virtio-input-pci.c
+>  create mode 100644 hw/virtio/virtio-net-pci.c
+>  create mode 100644 hw/virtio/virtio-rng-pci.c
+>  create mode 100644 hw/virtio/virtio-scsi-pci.c
+>  create mode 100644 hw/virtio/virtio-serial-pci.c
+>=20
+> --
+> 2.19.2
 
-Best,
-Wei
+For series:
+	Reviewed-by: Gonglei <arei.gonglei@huawei.com>
+
+=20
+Thanks,
+-Gonglei
