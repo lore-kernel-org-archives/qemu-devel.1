@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56439)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gXmy4-0006gC-PA
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:53:25 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gXn2c-00009V-QR
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:58:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gXmy1-0002qv-Cc
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:53:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57632)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gXmy1-0002qQ-4P
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:53:21 -0500
-Date: Fri, 14 Dec 2018 07:53:15 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181214075249-mutt-send-email-mst@kernel.org>
-References: <20181213210057.3676-1-quintela@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DB1BECBE@dggeml511-mbx.china.huawei.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gXn2b-0007nK-Rx
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:58:06 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:43748)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gXn2b-0007kM-EU
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:58:05 -0500
+Received: by mail-ot1-x342.google.com with SMTP id a11so5251196otr.10
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 04:58:05 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DB1BECBE@dggeml511-mbx.china.huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v3 00/16] Virtio devices split from
- virtio-pci
+References: <20181213175552.14857-1-wainersm@redhat.com>
+	<CAFEAcA86SDLGyqL3rG-fEDFsEj8-nz-Uqn5Mb9EeLqiFPeKZfA@mail.gmail.com>
+	<cccf3c43-0e51-bbbc-3676-17286b11ec99@redhat.com>
+	<CAFEAcA9CpR=JGt74=xaUddYhf5SCOoeHH_v+O1L+rrTygZ7quQ@mail.gmail.com>
+	<860b98f8-02d0-4c96-ccf2-d582ca295b95@redhat.com>
+	<871s6kfwoo.fsf@dusky.pond.sub.org>
+	<CAFEAcA_KP532BBsESjO1NuKSeefSKH7RdpCdSDLfgMCtc6D5nw@mail.gmail.com>
+	<87tvjgp9wp.fsf@dusky.pond.sub.org>
+In-Reply-To: <87tvjgp9wp.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 14 Dec 2018 12:57:52 +0000
+Message-ID: <CAFEAcA_iCUoJJdVZYsw8yhviCgp-qFPfaJP6UYZGYP_WyMzp-g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/1] checkpatch: checker for comment block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,113 +35,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc: Juan Quintela <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Fri, Dec 14, 2018 at 07:07:44AM +0000, Gonglei (Arei) wrote:
-> 
-> > -----Original Message-----
-> > From: Juan Quintela [mailto:quintela@redhat.com]
-> > Sent: Friday, December 14, 2018 5:01 AM
-> > To: qemu-devel@nongnu.org
-> > Cc: Michael S. Tsirkin <mst@redhat.com>; Thomas Huth <thuth@redhat.com>;
-> > Gerd Hoffmann <kraxel@redhat.com>; Gonglei (Arei)
-> > <arei.gonglei@huawei.com>; Juan Quintela <quintela@redhat.com>
-> > Subject: [PATCH v3 00/16] Virtio devices split from virtio-pci
-> > 
-> > Hi
-> > 
-> > v3:
-> > - rebase to master
-> > - only compile them if CONFIG_PCI is set (thomas)
-> > 
-> > Please review.
-> > 
-> > Later, Juan.
-> > 
-> > V2:
-> > 
-> > - Rebase on top of master
-> > 
-> > Please review.
-> > 
-> > Later, Juan.
-> > 
-> > [v1]
-> > From previous verision (in the middle of make check tests):
-> > - split also the bits of virtio-pci.h (mst suggestion)
-> > - add gpu, crypt and gpg bits
-> > - more cleanups
-> > - fix all the copyrights (the ones not changed have been there
-> >   foverever)
-> > - be consistent with naming, vhost-* or virtio-*
-> > 
-> > Please review, Juan.
-> > 
-> > Juan Quintela (16):
-> >   virtio: split vhost vsock bits from virtio-pci
-> >   virtio: split virtio input host bits from virtio-pci
-> >   virtio: split virtio input bits from virtio-pci
-> >   virtio: split virtio rng bits from virtio-pci
-> >   virtio: split virtio balloon bits from virtio-pci
-> >   virtio: split virtio 9p bits from virtio-pci
-> >   virtio: split vhost user blk bits from virtio-pci
-> >   virtio: split vhost user scsi bits from virtio-pci
-> >   virtio: split vhost scsi bits from virtio-pci
-> >   virtio: split virtio scsi bits from virtio-pci
-> >   virtio: split virtio blk bits rom virtio-pci
-> >   virtio: split virtio net bits rom virtio-pci
-> >   virtio: split virtio serial bits rom virtio-pci
-> >   virtio: split virtio gpu bits rom virtio-pci.h
-> >   virtio: split virtio crypto bits rom virtio-pci.h
-> >   virtio: virtio 9p really requires CONFIG_VIRTFS to work
-> > 
-> >  default-configs/virtio.mak        |   3 +-
-> >  hw/display/virtio-gpu-pci.c       |  14 +
-> >  hw/display/virtio-vga.c           |   1 +
-> >  hw/virtio/Makefile.objs           |  15 +
-> >  hw/virtio/vhost-scsi-pci.c        |  95 ++++
-> >  hw/virtio/vhost-user-blk-pci.c    | 101 ++++
-> >  hw/virtio/vhost-user-scsi-pci.c   | 101 ++++
-> >  hw/virtio/vhost-vsock-pci.c       |  82 ++++
-> >  hw/virtio/virtio-9p-pci.c         |  86 ++++
-> >  hw/virtio/virtio-balloon-pci.c    |  94 ++++
-> >  hw/virtio/virtio-blk-pci.c        |  97 ++++
-> >  hw/virtio/virtio-crypto-pci.c     |  14 +
-> >  hw/virtio/virtio-input-host-pci.c |  45 ++
-> >  hw/virtio/virtio-input-pci.c      | 154 ++++++
-> >  hw/virtio/virtio-net-pci.c        |  96 ++++
-> >  hw/virtio/virtio-pci.c            | 783 ------------------------------
-> >  hw/virtio/virtio-pci.h            | 234 ---------
-> >  hw/virtio/virtio-rng-pci.c        |  86 ++++
-> >  hw/virtio/virtio-scsi-pci.c       | 106 ++++
-> >  hw/virtio/virtio-serial-pci.c     | 112 +++++
-> >  tests/Makefile.include            |  20 +-
-> >  21 files changed, 1311 insertions(+), 1028 deletions(-)
-> >  create mode 100644 hw/virtio/vhost-scsi-pci.c
-> >  create mode 100644 hw/virtio/vhost-user-blk-pci.c
-> >  create mode 100644 hw/virtio/vhost-user-scsi-pci.c
-> >  create mode 100644 hw/virtio/vhost-vsock-pci.c
-> >  create mode 100644 hw/virtio/virtio-9p-pci.c
-> >  create mode 100644 hw/virtio/virtio-balloon-pci.c
-> >  create mode 100644 hw/virtio/virtio-blk-pci.c
-> >  create mode 100644 hw/virtio/virtio-input-host-pci.c
-> >  create mode 100644 hw/virtio/virtio-input-pci.c
-> >  create mode 100644 hw/virtio/virtio-net-pci.c
-> >  create mode 100644 hw/virtio/virtio-rng-pci.c
-> >  create mode 100644 hw/virtio/virtio-scsi-pci.c
-> >  create mode 100644 hw/virtio/virtio-serial-pci.c
-> > 
-> > --
-> > 2.19.2
-> 
-> For series:
-> 	Reviewed-by: Gonglei <arei.gonglei@huawei.com>
-> 
->  
-> Thanks,
-> -Gonglei
+On Fri, 14 Dec 2018 at 12:31, Markus Armbruster <armbru@redhat.com> wrote:
+> Peter Maydell <peter.maydell@linaro.org> writes:
+> > On Fri, 14 Dec 2018 at 06:29, Markus Armbruster <armbru@redhat.com> wrote:
+> > I have to admit I never really understood what tweak
+> > you wanted making to the commit message. I'm happy
+> > to make it clearer: do you want to suggest a rewording?
+>
+> The commit message claims "(The only changes needed are that Linux's
+> checkpatch.pl WARN() function takes an extra argument that ours does
+> not.)"  This isn't the case.  You also dropped the kernel's "Networking
+> with an initial /*" special case.
 
-Thanks!
-Can you pls align Reviewed-by: tag at the 1st column in the future?
-Makes it easier to apply the tag.
+The bit of the commit message you didn't quote says
+"by backporting the relevant
+parts of the Linux kernel's checkpatch.pl. (The only changes
+needed are that Linux's checkpatch.pl WARN() function takes
+an extra argument that ours does not.)"
+
+The networking special case is not a "relevant part", which
+is why it's not in the patch. The bracketed statement applies
+to the code in the patch, not any lumps of code in the
+kernel's checkpatch that are not in the patch.
+Anyway, I've adjusted the commit message as you suggest.
+
+Since we seem to now have consensus on the checkpatch patch,
+I'm going to put it into the "misc" pull request I'm putting
+together.
+
+thanks
+-- PMM
