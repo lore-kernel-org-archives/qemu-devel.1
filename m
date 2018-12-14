@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gXks3-0008Ta-A6
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 05:39:05 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gXks3-0008TX-9a
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 05:39:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gXks0-00056V-En
+	(envelope-from <kraxel@redhat.com>) id 1gXks0-000565-4m
 	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 05:39:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36988)
+Received: from mx1.redhat.com ([209.132.183.28]:46512)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gXks0-00055h-5b
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 05:39:00 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3E369307EAA0
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 10:38:59 +0000 (UTC)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gXkrz-00055X-RA
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 05:38:59 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 14 Dec 2018 11:38:53 +0100
-Message-Id: <20181214103854.13820-5-kraxel@redhat.com>
+Date: Fri, 14 Dec 2018 11:38:50 +0100
+Message-Id: <20181214103854.13820-2-kraxel@redhat.com>
 In-Reply-To: <20181214103854.13820-1-kraxel@redhat.com>
 References: <20181214103854.13820-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 4/5] usb-mtp: use O_NOFOLLOW and O_CLOEXEC.
+Subject: [Qemu-devel] [PULL 1/5] pvusb: set max grants only in initialise
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +24,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Prasad J Pandit <ppandit@redhat.com>, Bandan Das <bsd@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Juergen Gross <jgross@suse.com>
 
-Open files and directories with O_NOFOLLOW to avoid symlinks attacks.
-While being at it also add O_CLOEXEC.
+From: Juergen Gross <jgross@suse.com>
 
-usb-mtp only handles regular files and directories and ignores
-everything else, so users should not see a difference.
+Don't call xen_be_set_max_grant_refs() in usbback_alloc(), as the
+gnttabdev pointer won't be initialised yet. The call can easily be
+moved to usbback_connect().
 
-Because qemu ignores symlinks, carrying out a successful symlink attack
-requires swapping an existing file or directory below rootdir for a
-symlink and winning the race against the inotify notification to qemu.
-
-Fixes: CVE-2018-16872
-Cc: Prasad J Pandit <ppandit@redhat.com>
-Cc: Bandan Das <bsd@redhat.com>
-Reported-by: Michael Hanselmann <public@hansmi.ch>
+Signed-off-by: Juergen Gross <jgross@suse.com>
+Message-id: 20181206133923.30105-1-jgross@suse.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Michael Hanselmann <public@hansmi.ch>
-Message-id: 20181213122511.13853-1-kraxel@redhat.com
 ---
- hw/usb/dev-mtp.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ hw/usb/xen-usb.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index 100b7171f4..36c43b8c20 100644
---- a/hw/usb/dev-mtp.c
-+++ b/hw/usb/dev-mtp.c
-@@ -653,13 +653,18 @@ static void usb_mtp_object_readdir(MTPState *s, MTPObject *o)
+diff --git a/hw/usb/xen-usb.c b/hw/usb/xen-usb.c
+index 5b2e21ed18..f5d5c91094 100644
+--- a/hw/usb/xen-usb.c
++++ b/hw/usb/xen-usb.c
+@@ -860,10 +860,14 @@ static int usbback_connect(struct XenDevice *xendev)
+     struct usbif_conn_sring *conn_sring;
+     int urb_ring_ref;
+     int conn_ring_ref;
+-    unsigned int i;
++    unsigned int i, max_grants;
+ 
+     TR_BUS(xendev, "start\n");
+ 
++    /* max_grants: for each request and for the rings (request and connect). */
++    max_grants = USBIF_MAX_SEGMENTS_PER_REQUEST * USB_URB_RING_SIZE + 2;
++    xen_be_set_max_grant_refs(xendev, max_grants);
++
+     usbif = container_of(xendev, struct usbback_info, xendev);
+ 
+     if (xenstore_read_fe_int(xendev, "urb-ring-ref", &urb_ring_ref)) {
+@@ -1005,7 +1009,7 @@ static void usbback_alloc(struct XenDevice *xendev)
  {
-     struct dirent *entry;
-     DIR *dir;
-+    int fd;
+     struct usbback_info *usbif;
+     USBPort *p;
+-    unsigned int i, max_grants;
++    unsigned int i;
  
-     if (o->have_children) {
-         return;
-     }
-     o->have_children = true;
+     usbif = container_of(xendev, struct usbback_info, xendev);
  
--    dir = opendir(o->path);
-+    fd = open(o->path, O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW);
-+    if (fd < 0) {
-+        return;
-+    }
-+    dir = fdopendir(fd);
-     if (!dir) {
-         return;
-     }
-@@ -1007,7 +1012,7 @@ static MTPData *usb_mtp_get_object(MTPState *s, MTPControl *c,
+@@ -1021,10 +1025,6 @@ static void usbback_alloc(struct XenDevice *xendev)
+     QTAILQ_INIT(&usbif->req_free_q);
+     QSIMPLEQ_INIT(&usbif->hotplug_q);
+     usbif->bh = qemu_bh_new(usbback_bh, usbif);
+-
+-    /* max_grants: for each request and for the rings (request and connect). */
+-    max_grants = USBIF_MAX_SEGMENTS_PER_REQUEST * USB_URB_RING_SIZE + 2;
+-    xen_be_set_max_grant_refs(xendev, max_grants);
+ }
  
-     trace_usb_mtp_op_get_object(s->dev.addr, o->handle, o->path);
- 
--    d->fd = open(o->path, O_RDONLY);
-+    d->fd = open(o->path, O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
-     if (d->fd == -1) {
-         usb_mtp_data_free(d);
-         return NULL;
-@@ -1031,7 +1036,7 @@ static MTPData *usb_mtp_get_partial_object(MTPState *s, MTPControl *c,
-                                         c->argv[1], c->argv[2]);
- 
-     d = usb_mtp_data_alloc(c);
--    d->fd = open(o->path, O_RDONLY);
-+    d->fd = open(o->path, O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
-     if (d->fd == -1) {
-         usb_mtp_data_free(d);
-         return NULL;
-@@ -1658,7 +1663,7 @@ static void usb_mtp_write_data(MTPState *s)
-                                  0, 0, 0, 0);
-             goto done;
-         }
--        d->fd = open(path, O_CREAT | O_WRONLY, mask);
-+        d->fd = open(path, O_CREAT | O_WRONLY | O_CLOEXEC | O_NOFOLLOW, mask);
-         if (d->fd == -1) {
-             usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
-                                  0, 0, 0, 0);
+ static int usbback_free(struct XenDevice *xendev)
 -- 
 2.9.3
