@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXfxu-0004md-64
+	(envelope-from <richard.henderson@linaro.org>) id 1gXfxu-0004mf-6W
 	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXfxs-0005Vv-EO
+	(envelope-from <richard.henderson@linaro.org>) id 1gXfxo-0005UB-AH
 	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:46 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41376)
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:41519)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gXfxs-0005VX-3P
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:44 -0500
-Received: by mail-ot1-x343.google.com with SMTP id u16so4301790otk.8
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 21:24:43 -0800 (PST)
+	id 1gXfxo-0005Sa-2l
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:40 -0500
+Received: by mail-oi1-x243.google.com with SMTP id j21so3624865oii.8
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 21:24:36 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 13 Dec 2018 23:24:09 -0600
-Message-Id: <20181214052410.11863-27-richard.henderson@linaro.org>
+Date: Thu, 13 Dec 2018 23:24:03 -0600
+Message-Id: <20181214052410.11863-21-richard.henderson@linaro.org>
 In-Reply-To: <20181214052410.11863-1-richard.henderson@linaro.org>
 References: <20181214052410.11863-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 26/27] target/arm: Enable PAuth for
- user-only, part 2
+Subject: [Qemu-devel] [PATCH v2 20/27] target/arm: Implement pauth_strip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +29,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-FIXME: We should have an attribute that controls the EL1 enable bits.
-We may not always want to turn on pointer authentication with -cpu max.
+Stripping out the authentication data does not require any crypto,
+it merely requires the virtual address parameters.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ target/arm/helper-a64.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 0b185f8d30..bc2c9eb551 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -162,6 +162,12 @@ static void arm_cpu_reset(CPUState *s)
-         env->pstate = PSTATE_MODE_EL0t;
-         /* Userspace expects access to DC ZVA, CTL_EL0 and the cache ops */
-         env->cp15.sctlr_el[1] |= SCTLR_UCT | SCTLR_UCI | SCTLR_DZE;
-+        /* Enable all PAC keys. */
-+        env->cp15.sctlr_el[1] |= SCTLR_EnIA | SCTLR_EnIB;
-+        env->cp15.sctlr_el[1] |= SCTLR_EnDA | SCTLR_EnDB;
-+        /* Enable all PAC instructions */
-+        env->cp15.hcr_el2 |= HCR_API;
-+        env->cp15.scr_el3 |= SCR_API;
-         /* and to the FP/Neon instructions */
-         env->cp15.cpacr_el1 = deposit64(env->cp15.cpacr_el1, 20, 2, 3);
-         /* and to the SVE instructions */
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index 79cc9cf47b..329af51232 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -1069,6 +1069,15 @@ static uint64_t pauth_addpac(CPUARMState *env, uint64_t ptr, uint64_t modifier,
+     g_assert_not_reached(); /* FIXME */
+ }
+ 
++static uint64_t pauth_original_ptr(uint64_t ptr, ARMVAParameters param)
++{
++    uint64_t extfield = -param.select;
++    int bot_pac_bit = 64 - param.tsz;
++    int top_pac_bit = 64 - 8 * param.tbi;
++
++    return deposit64(ptr, bot_pac_bit, top_pac_bit - bot_pac_bit, extfield);
++}
++
+ static uint64_t pauth_auth(CPUARMState *env, uint64_t ptr, uint64_t modifier,
+                            ARMPACKey *key, bool data, int keynumber)
+ {
+@@ -1077,7 +1086,10 @@ static uint64_t pauth_auth(CPUARMState *env, uint64_t ptr, uint64_t modifier,
+ 
+ static uint64_t pauth_strip(CPUARMState *env, uint64_t ptr, bool data)
+ {
+-    g_assert_not_reached(); /* FIXME */
++    ARMMMUIdx mmu_idx = arm_stage1_mmu_idx(env);
++    ARMVAParameters param = aa64_va_parameters(env, ptr, mmu_idx, data);
++
++    return pauth_original_ptr(ptr, param);
+ }
+ 
+ static void QEMU_NORETURN pauth_trap(CPUARMState *env, int target_el,
 -- 
 2.17.2
