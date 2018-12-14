@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gXnvl-0008O3-QL
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:08 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gXnvg-0008Ku-D3
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gXnvk-0001yn-O1
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:05 -0500
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:32782)
+	(envelope-from <alex.bennee@linaro.org>) id 1gXnvb-0001sm-Vr
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:00 -0500
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:36220)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gXnvk-0001yD-H0
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:04 -0500
-Received: by mail-wr1-x42e.google.com with SMTP id c14so5550189wrr.0
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 05:55:04 -0800 (PST)
+	id 1gXnvb-0001s1-Ny
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:54:55 -0500
+Received: by mail-wr1-x434.google.com with SMTP id u4so4543706wrp.3
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 05:54:55 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 14 Dec 2018 13:54:48 +0000
-Message-Id: <20181214135452.25936-12-alex.bennee@linaro.org>
-In-Reply-To: <20181214135452.25936-1-alex.bennee@linaro.org>
-References: <20181214135452.25936-1-alex.bennee@linaro.org>
+Date: Fri, 14 Dec 2018 13:54:37 +0000
+Message-Id: <20181214135452.25936-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 11/15] hardfloat: implement float32/64
- multiplication
+Subject: [Qemu-devel] [PULL 00/15] Hardfloat + softfloat maintainers update
+ and gitdm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,118 +29,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: "Emilio G. Cota" <cota@braap.org>
+The following changes since commit d8d5fefd8657d4f7b380b3a1533340434b5b9def:
 
-Performance results for fp-bench:
+  Merge remote-tracking branch 'remotes/berrange/tags/qcrypto-next-pull-request' into staging (2018-12-13 18:45:18 +0000)
 
-1. Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
-- before:
-mul-single: 126.91 MFlops
-mul-double: 118.28 MFlops
-- after:
-mul-single: 258.02 MFlops
-mul-double: 197.96 MFlops
+are available in the Git repository at:
 
-2. ARM Aarch64 A57 @ 2.4GHz
-- before:
-mul-single: 37.42 MFlops
-mul-double: 38.77 MFlops
-- after:
-mul-single: 73.41 MFlops
-mul-double: 76.93 MFlops
+  https://github.com/stsquad/qemu.git tags/pull-hardfloat-and-gitdm-141218-1
 
-3. IBM POWER8E @ 2.1 GHz
-- before:
-mul-single: 58.40 MFlops
-mul-double: 59.33 MFlops
-- after:
-mul-single: 60.25 MFlops
-mul-double: 94.79 MFlops
+for you to fetch changes up to 26c535d8522296399d43ebf39c109f6d8628c096:
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+  hardfloat: implement float32/64 comparison (2018-12-14 11:43:00 +0000)
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 08afa861a7..dad2ce2d9f 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -1236,7 +1236,8 @@ float16 QEMU_FLATTEN float16_mul(float16 a, float16 b, float_status *status)
-     return float16_round_pack_canonical(pr, status);
- }
- 
--float32 QEMU_FLATTEN float32_mul(float32 a, float32 b, float_status *status)
-+static float32 QEMU_SOFTFLOAT_ATTR
-+soft_f32_mul(float32 a, float32 b, float_status *status)
- {
-     FloatParts pa = float32_unpack_canonical(a, status);
-     FloatParts pb = float32_unpack_canonical(b, status);
-@@ -1245,7 +1246,8 @@ float32 QEMU_FLATTEN float32_mul(float32 a, float32 b, float_status *status)
-     return float32_round_pack_canonical(pr, status);
- }
- 
--float64 QEMU_FLATTEN float64_mul(float64 a, float64 b, float_status *status)
-+static float64 QEMU_SOFTFLOAT_ATTR
-+soft_f64_mul(float64 a, float64 b, float_status *status)
- {
-     FloatParts pa = float64_unpack_canonical(a, status);
-     FloatParts pb = float64_unpack_canonical(b, status);
-@@ -1254,6 +1256,54 @@ float64 QEMU_FLATTEN float64_mul(float64 a, float64 b, float_status *status)
-     return float64_round_pack_canonical(pr, status);
- }
- 
-+static float hard_f32_mul(float a, float b)
-+{
-+    return a * b;
-+}
-+
-+static double hard_f64_mul(double a, double b)
-+{
-+    return a * b;
-+}
-+
-+static bool f32_mul_fast_test(union_float32 a, union_float32 b)
-+{
-+    return float32_is_zero(a.s) || float32_is_zero(b.s);
-+}
-+
-+static bool f64_mul_fast_test(union_float64 a, union_float64 b)
-+{
-+    return float64_is_zero(a.s) || float64_is_zero(b.s);
-+}
-+
-+static float32 f32_mul_fast_op(float32 a, float32 b, float_status *s)
-+{
-+    bool signbit = float32_is_neg(a) ^ float32_is_neg(b);
-+
-+    return float32_set_sign(float32_zero, signbit);
-+}
-+
-+static float64 f64_mul_fast_op(float64 a, float64 b, float_status *s)
-+{
-+    bool signbit = float64_is_neg(a) ^ float64_is_neg(b);
-+
-+    return float64_set_sign(float64_zero, signbit);
-+}
-+
-+float32 QEMU_FLATTEN
-+float32_mul(float32 a, float32 b, float_status *s)
-+{
-+    return float32_gen2(a, b, s, hard_f32_mul, soft_f32_mul,
-+                        f32_is_zon2, NULL, f32_mul_fast_test, f32_mul_fast_op);
-+}
-+
-+float64 QEMU_FLATTEN
-+float64_mul(float64 a, float64 b, float_status *s)
-+{
-+    return float64_gen2(a, b, s, hard_f64_mul, soft_f64_mul,
-+                        f64_is_zon2, NULL, f64_mul_fast_test, f64_mul_fast_op);
-+}
-+
- /*
-  * Returns the result of multiplying the floating-point values `a' and
-  * `b' then adding 'c', with no intermediate rounding step after the
+----------------------------------------------------------------
+Hardfloat + maintainers and gitdm
+
+----------------------------------------------------------------
+Alex Bennée (2):
+      contrib: add a basic gitdm config
+      MAINTAINERS: update status of FPU emulation
+
+Emilio G. Cota (13):
+      fp-test: pick TARGET_ARM to get its specialization
+      softfloat: add float{32,64}_is_{de,}normal
+      target/tricore: use float32_is_denormal
+      softfloat: rename canonicalize to sf_canonicalize
+      softfloat: add float{32,64}_is_zero_or_normal
+      tests/fp: add fp-bench
+      fpu: introduce hardfloat
+      hardfloat: implement float32/64 addition and subtraction
+      hardfloat: implement float32/64 multiplication
+      hardfloat: implement float32/64 division
+      hardfloat: implement float32/64 fused multiply-add
+      hardfloat: implement float32/64 square root
+      hardfloat: implement float32/64 comparison
+
+ MAINTAINERS                         |   4 +-
+ contrib/gitdm/aliases               |  27 ++
+ contrib/gitdm/domain-map            |  19 +
+ contrib/gitdm/filetypes.txt         | 146 ++++++
+ contrib/gitdm/group-map-cadence     |   3 +
+ contrib/gitdm/group-map-codeweavers |   1 +
+ contrib/gitdm/group-map-ibm         |   6 +
+ contrib/gitdm/group-map-redhat      |   7 +
+ contrib/gitdm/group-map-wavecomp    |  18 +
+ fpu/softfloat.c                     | 865 ++++++++++++++++++++++++++++++++++--
+ gitdm.config                        |  50 +++
+ include/fpu/softfloat.h             |  30 ++
+ target/tricore/fpu_helper.c         |   9 +-
+ tests/fp/.gitignore                 |   1 +
+ tests/fp/Makefile                   |   8 +-
+ tests/fp/fp-bench.c                 | 630 ++++++++++++++++++++++++++
+ 16 files changed, 1767 insertions(+), 57 deletions(-)
+ create mode 100644 contrib/gitdm/aliases
+ create mode 100644 contrib/gitdm/domain-map
+ create mode 100644 contrib/gitdm/filetypes.txt
+ create mode 100644 contrib/gitdm/group-map-cadence
+ create mode 100644 contrib/gitdm/group-map-codeweavers
+ create mode 100644 contrib/gitdm/group-map-ibm
+ create mode 100644 contrib/gitdm/group-map-redhat
+ create mode 100644 contrib/gitdm/group-map-wavecomp
+ create mode 100644 gitdm.config
+ create mode 100644 tests/fp/fp-bench.c
+
 -- 
 2.17.1
