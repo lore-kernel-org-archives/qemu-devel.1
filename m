@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXfxW-0004Oo-C2
+	(envelope-from <richard.henderson@linaro.org>) id 1gXfxW-0004On-Bx
 	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXfxP-0005J7-LP
+	(envelope-from <richard.henderson@linaro.org>) id 1gXfxR-0005Jj-GQ
 	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:21 -0500
-Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:40157)
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46940)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gXfxP-0005In-40
+	id 1gXfxP-0005Iy-K2
 	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:15 -0500
-Received: by mail-oi1-x232.google.com with SMTP id t204so3623784oie.7
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 21:24:14 -0800 (PST)
+Received: by mail-oi1-x242.google.com with SMTP id x202so3606881oif.13
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 21:24:15 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 13 Dec 2018 23:23:43 -0600
-Message-Id: <20181214052410.11863-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 00/27] target/arm: Implement ARMv8.3-PAuth
+Date: Thu, 13 Dec 2018 23:23:44 -0600
+Message-Id: <20181214052410.11863-2-richard.henderson@linaro.org>
+In-Reply-To: <20181214052410.11863-1-richard.henderson@linaro.org>
+References: <20181214052410.11863-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v2 01/27] target/arm: Add state for the
+ ARMv8.3-PAuth extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +30,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Lots of little changes since v1, but many of which are noted
-within each patch.  This version works in system mode, using
+Add storage space for the 5 encryption keys.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git/log/?h=for-next/core
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+----
+v2: Remove pointless double migration.
+    Use a struct to make it clear which half is which.
+---
+ target/arm/cpu.h | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
-
-r~
-
-Richard Henderson (27):
-  target/arm: Add state for the ARMv8.3-PAuth extension
-  target/arm: Add SCTLR bits through ARMv8.5
-  target/arm: Add PAuth active bit to tbflags
-  target/arm: Add PAuth helpers
-  target/arm: Decode PAuth within system hint space
-  target/arm: Rearrange decode in disas_data_proc_1src
-  target/arm: Decode PAuth within disas_data_proc_1src
-  target/arm: Decode PAuth within disas_data_proc_2src
-  target/arm: Move helper_exception_return to helper-a64.c
-  target/arm: Add new_pc argument to helper_exception_return
-  target/arm: Rearrange decode in disas_uncond_b_reg
-  target/arm: Decode PAuth within disas_uncond_b_reg
-  target/arm: Decode Load/store register (pac)
-  target/arm: Move cpu_mmu_index out of line
-  target/arm: Introduce arm_mmu_idx
-  target/arm: Introduce arm_stage1_mmu_idx
-  target/arm: Create ARMVAParameters and helpers
-  target/arm: Reuse aa64_va_parameters for setting tbflags
-  target/arm: Export aa64_va_parameters to internals.h
-  target/arm: Implement pauth_strip
-  target/arm: Implement pauth_auth
-  target/arm: Implement pauth_addpac
-  target/arm: Implement pauth_computepac
-  target/arm: Add PAuth system registers
-  target/arm: Enable PAuth for -cpu max
-  target/arm: Enable PAuth for user-only, part 2
-  target/arm: Tidy TBI handling in gen_a64_set_pc
-
- target/arm/cpu.h           | 171 +++++-----
- target/arm/helper-a64.h    |  14 +
- target/arm/helper.h        |   1 -
- target/arm/internals.h     |  62 ++++
- target/arm/translate.h     |   2 +
- target/arm/cpu.c           |   6 +
- target/arm/cpu64.c         |   4 +
- target/arm/helper-a64.c    | 629 +++++++++++++++++++++++++++++++++++++
- target/arm/helper.c        | 500 ++++++++++++++++++-----------
- target/arm/op_helper.c     | 155 ---------
- target/arm/translate-a64.c | 534 ++++++++++++++++++++++++++-----
- 11 files changed, 1581 insertions(+), 497 deletions(-)
-
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index c943f35dd9..39d4afdfe6 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -201,11 +201,16 @@ typedef struct ARMVectorReg {
+     uint64_t d[2 * ARM_MAX_VQ] QEMU_ALIGNED(16);
+ } ARMVectorReg;
+ 
+-/* In AArch32 mode, predicate registers do not exist at all.  */
+ #ifdef TARGET_AARCH64
++/* In AArch32 mode, predicate registers do not exist at all.  */
+ typedef struct ARMPredicateReg {
+     uint64_t p[2 * ARM_MAX_VQ / 8] QEMU_ALIGNED(16);
+ } ARMPredicateReg;
++
++/* In AArch32 mode, PAC keys do not exist at all.  */
++typedef struct ARMPACKey {
++    uint64_t lo, hi;
++} ARMPACKey;
+ #endif
+ 
+ 
+@@ -605,6 +610,14 @@ typedef struct CPUARMState {
+         uint32_t cregs[16];
+     } iwmmxt;
+ 
++#ifdef TARGET_AARCH64
++    ARMPACKey apia_key;
++    ARMPACKey apib_key;
++    ARMPACKey apda_key;
++    ARMPACKey apdb_key;
++    ARMPACKey apga_key;
++#endif
++
+ #if defined(CONFIG_USER_ONLY)
+     /* For usermode syscall translation.  */
+     int eabi;
+@@ -3324,6 +3337,21 @@ static inline bool isar_feature_aa64_fcma(const ARMISARegisters *id)
+     return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, FCMA) != 0;
+ }
+ 
++static inline bool isar_feature_aa64_pauth(const ARMISARegisters *id)
++{
++    /*
++     * Note that while QEMU will only implement the architected algorithm
++     * QARMA, and thus APA+GPA, the host cpu for kvm may use implementation
++     * defined algorithms, and thus API+GPI, and this predicate controls
++     * migration of the 128-bit keys.
++     */
++    return (id->id_aa64isar1 &
++            (FIELD_DP64(0, ID_AA64ISAR1, APA, -1) |
++             FIELD_DP64(0, ID_AA64ISAR1, API, -1) |
++             FIELD_DP64(0, ID_AA64ISAR1, GPA, -1) |
++             FIELD_DP64(0, ID_AA64ISAR1, GPI, -1))) != 0;
++}
++
+ static inline bool isar_feature_aa64_fp16(const ARMISARegisters *id)
+ {
+     /* We always set the AdvSIMD and FP fields identically wrt FP16.  */
 -- 
 2.17.2
