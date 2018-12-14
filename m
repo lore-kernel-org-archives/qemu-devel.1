@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gXks3-0008TW-9Y
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 05:39:04 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gXks3-0008TV-9X
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 05:39:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gXks0-00055x-3R
+	(envelope-from <kraxel@redhat.com>) id 1gXks0-00056H-DJ
 	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 05:39:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49108)
+Received: from mx1.redhat.com ([209.132.183.28]:49112)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gXkrz-00055K-RA
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 05:38:59 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E3499BDC1
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 10:38:57 +0000 (UTC)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gXks0-00055d-3x
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 05:39:00 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 14 Dec 2018 11:38:49 +0100
-Message-Id: <20181214103854.13820-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 0/5] Usb 20181214 patches
+Date: Fri, 14 Dec 2018 11:38:54 +0100
+Message-Id: <20181214103854.13820-6-kraxel@redhat.com>
+In-Reply-To: <20181214103854.13820-1-kraxel@redhat.com>
+References: <20181214103854.13820-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 5/5] usb-mtp: Limit filename to object
+ information size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +25,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Michael Hanselmann <public@hansmi.ch>
 
-The following changes since commit 4f818e7b7f8ecb5c166d093b8859fec2ddeca2ef:
+From: Michael Hanselmann <public@hansmi.ch>
 
-  Update version for v3.1.0-rc5 release (2018-12-06 17:07:12 +0000)
+The filename length in MTP metadata is specified by the guest. By
+trusting it directly it'd theoretically be possible to get the host to
+write memory parts outside the filename buffer into a filename. In
+practice though there are usually NUL bytes stopping the string
+operations.
 
-are available in the git repository at:
+Also use the opportunity to not assign the filename member twice.
 
-  git://git.kraxel.org/qemu tags/usb-20181214-pull-request
+Signed-off-by: Michael Hanselmann <public@hansmi.ch>
+Message-id: ab70659d8d5c580bdf150a5f7d5cc60c8e374ffc.1544740018.git.public@hansmi.ch
 
-for you to fetch changes up to 90c1a74271ce4667d16eeca575dfa78a6c7d465c:
+[ kraxel: codestyle fix: break a long line ]
 
-  usb-mtp: Limit filename to object information size (2018-12-14 08:57:17 +0100)
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/usb/dev-mtp.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-----------------------------------------------------------------
-usb: fixes for mtp, ehci, usb-host and pvusb (xen).
-
-----------------------------------------------------------------
-
-Gerd Hoffmann (2):
-  ehci: fix fetch qtd race
-  usb-mtp: use O_NOFOLLOW and O_CLOEXEC.
-
-Juergen Gross (1):
-  pvusb: set max grants only in initialise
-
-Michael Hanselmann (1):
-  usb-mtp: Limit filename to object information size
-
-linzhecheng (1):
-  usb-host: reset and close libusb_device_handle before qemu exit
-
- hw/usb/dev-mtp.c     | 22 ++++++++++++++--------
- hw/usb/hcd-ehci.c    | 12 ++++++++++--
- hw/usb/host-libusb.c |  2 ++
- hw/usb/xen-usb.c     | 12 ++++++------
- 4 files changed, 32 insertions(+), 16 deletions(-)
-
+diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+index 36c43b8c20..6098005cd4 100644
+--- a/hw/usb/dev-mtp.c
++++ b/hw/usb/dev-mtp.c
+@@ -1710,7 +1710,7 @@ free:
+     s->write_pending = false;
+ }
+ 
+-static void usb_mtp_write_metadata(MTPState *s)
++static void usb_mtp_write_metadata(MTPState *s, uint64_t dlen)
+ {
+     MTPData *d = s->data_out;
+     ObjectInfo *dataset = (ObjectInfo *)d->data;
+@@ -1722,7 +1722,9 @@ static void usb_mtp_write_metadata(MTPState *s)
+     assert(!s->write_pending);
+     assert(p != NULL);
+ 
+-    filename = utf16_to_str(dataset->length, dataset->filename);
++    filename = utf16_to_str(MIN(dataset->length,
++                                dlen - offsetof(ObjectInfo, filename)),
++                            dataset->filename);
+ 
+     if (strchr(filename, '/')) {
+         usb_mtp_queue_result(s, RES_PARAMETER_NOT_SUPPORTED, d->trans,
+@@ -1738,7 +1740,6 @@ static void usb_mtp_write_metadata(MTPState *s)
+     s->dataset.filename = filename;
+     s->dataset.format = dataset->format;
+     s->dataset.size = dataset->size;
+-    s->dataset.filename = filename;
+     s->write_pending = true;
+ 
+     if (s->dataset.format == FMT_ASSOCIATION) {
+@@ -1807,7 +1808,7 @@ static void usb_mtp_get_data(MTPState *s, mtp_container *container,
+         if (d->offset == d->length) {
+             /* The operation might have already failed */
+             if (!s->result) {
+-                usb_mtp_write_metadata(s);
++                usb_mtp_write_metadata(s, dlen);
+             }
+             usb_mtp_data_free(s->data_out);
+             s->data_out = NULL;
 -- 
 2.9.3
