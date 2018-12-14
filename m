@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gXmYg-0002vx-53
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:27:10 -0500
+	(envelope-from <armbru@redhat.com>) id 1gXmcy-0005al-DK
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:31:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gXmYf-0001qK-Al
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:27:10 -0500
-Date: Fri, 14 Dec 2018 13:26:59 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181214122659.GB4341@dhcp-200-186.str.redhat.com>
-References: <DB6PR07MB33330E3562B0AF0ECC8307BCAEA00@DB6PR07MB3333.eurprd07.prod.outlook.com>
-	<DB6PR07MB3333E95C513AF2EF14AAE615AEA00@DB6PR07MB3333.eurprd07.prod.outlook.com>
-	<14b32e39-a9f6-1a83-87e6-6e150954ddb7@redhat.com>
-	<20181213144914.GH5427@linux.fritz.box>
-	<db4f1763-e28f-387c-2652-ba71c29e97ff@redhat.com>
-	<DB6PR07MB3333BA55F6C06E1DB3388D55AEA00@DB6PR07MB3333.eurprd07.prod.outlook.com>
-	<CAMRbyyug2e_MK+Nzdzso9RheENVzuTba5nYzjBNZbrXCaB2hrw@mail.gmail.com>
-	<VI1PR07MB3344412C5DE71936F9689909AEA10@VI1PR07MB3344.eurprd07.prod.outlook.com>
-	<VI1PR07MB334400B255A91277D3597F79AEA10@VI1PR07MB3344.eurprd07.prod.outlook.com>
+	(envelope-from <armbru@redhat.com>) id 1gXmcu-0004Dp-94
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:31:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58516)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXmcu-0004DN-36
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 07:31:32 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181213175552.14857-1-wainersm@redhat.com>
+	<CAFEAcA86SDLGyqL3rG-fEDFsEj8-nz-Uqn5Mb9EeLqiFPeKZfA@mail.gmail.com>
+	<cccf3c43-0e51-bbbc-3676-17286b11ec99@redhat.com>
+	<CAFEAcA9CpR=JGt74=xaUddYhf5SCOoeHH_v+O1L+rrTygZ7quQ@mail.gmail.com>
+	<860b98f8-02d0-4c96-ccf2-d582ca295b95@redhat.com>
+	<871s6kfwoo.fsf@dusky.pond.sub.org>
+	<CAFEAcA_KP532BBsESjO1NuKSeefSKH7RdpCdSDLfgMCtc6D5nw@mail.gmail.com>
+Date: Fri, 14 Dec 2018 13:31:18 +0100
+In-Reply-To: <CAFEAcA_KP532BBsESjO1NuKSeefSKH7RdpCdSDLfgMCtc6D5nw@mail.gmail.com>
+	(Peter Maydell's message of "Fri, 14 Dec 2018 11:20:10 +0000")
+Message-ID: <87tvjgp9wp.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <VI1PR07MB334400B255A91277D3597F79AEA10@VI1PR07MB3344.eurprd07.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] Request for clarification on qemu-img
- convert behavior zeroing target host_device
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 0/1] checkpatch: checker for comment block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,48 +32,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "De Backer, Fred (Nokia - BE/Antwerp)" <fred.de_backer@nokia.com>
-Cc: Nir Soffer <nsoffer@redhat.com>, Eric Blake <eblake@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, "Richard W.M. Jones" <rjones@redhat.com>, "Aamir T, Owais (Nokia - IN/Chennai)" <owais.aamir_t@nokia.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Am 14.12.2018 um 11:59 hat De Backer, Fred (Nokia - BE/Antwerp) geschrieb=
-en:
-> >>> Indeed, performance traces are important for issues like this.
-> >>See strace of both FC27 and FC29 attached
->=20
-> >Looks like you traced only the main thread. All the I/O is done in oth=
-er threads.
-> >These flags would be useful:
-> >
-> >=A0 =A0 strace -o log -f -T -tt
->=20
-> New straces attached with mentioned flags.  Both truncated due to file
-> size at what I believe to be the same position in the "write-phase".
-> FC29 has the "zeroing-phase" in front.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-So this is indeed using BLKZEROOUT, which has a slow fallback in the
-kernel (slow means ~12 seconds for each 2 GB chunk).
+> On Fri, 14 Dec 2018 at 06:29, Markus Armbruster <armbru@redhat.com> wrote:
+>>
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>>
+>> > On 13/12/18 19:21, Peter Maydell wrote:
+>> >> On Thu, 13 Dec 2018 at 18:07, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> >>> On 13/12/18 19:01, Peter Maydell wrote:
+>> >>>> I sent a patch to do this a little while back:
+>> >>>>  https://patchwork.kernel.org/patch/10561557/
+>
+>> >>>> Personally I think we should just commit my patch, and then
+>> >>>> we can stop having people manually pointing out where
+>> >>>> submitters' patches don't match CODING_STYLE.
+>>
+>> Concur.  It has my R-by, modulo a commit message tweak.
+>
+> I have to admit I never really understood what tweak
+> you wanted making to the commit message. I'm happy
+> to make it clearer: do you want to suggest a rewording?
 
-We need to avoid calling BLKZEROOUT in the context of pre-zeroing the
-image for qemu-img convert.
+The commit message claims "(The only changes needed are that Linux's
+checkpatch.pl WARN() function takes an extra argument that ours does
+not.)"  This isn't the case.  You also dropped the kernel's "Networking
+with an initial /*" special case.
 
-Of course, we should also think about the other problem you mentioned,
-related to copying a smaller image to a larger block device. Does this
-require zeroing the parts after the image or should we leave them alone?
+The simplest way to fix an incorrect claim is to delete it :)
 
-I'd tend to say that since you're passing the whole block device as a
-target to 'qemu-img convert', and the whole block device will be visible
-to a guest run with the same block device configuration, we should
-indeed zero out the whole device. But then we would declare the F27
-behaviour buggy and this case would stay slow (it would become slightly
-faster because we avoid the double writes, but we wouldn't save the
-writes to the unused space).
-
-Or we could just refuse to convert if source and target aren't the same
-size. Then you would have to use a raw filter driver to select a part
-from the target image with the offset/size options. But this would break
-backwards compatibility, and its use is not very intuitive either.
-
-Unfortunately, this is just the kind of problems that raw images give
-you. :-/
-
-Kevin
+If you want to explain what you changed, you could say something like
+"(The only changes needed are that Linux's checkpatch.pl WARN() function
+takes an extra argument that ours does not, and the kernel has a special
+case for networking code we don't want.)"
