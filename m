@@ -1,17 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gXnk0-00014I-C6
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:42:59 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gXnu0-0007QW-IB
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:53:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gXnju-0005jV-RN
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:42:56 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 14 Dec 2018 16:42:39 +0300
-Message-Id: <20181214134240.217870-5-vsementsov@virtuozzo.com>
-In-Reply-To: <20181214134240.217870-1-vsementsov@virtuozzo.com>
-References: <20181214134240.217870-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v4 4/5] qcow2-refcount: check_refcounts_l2:
- don't count fixed cluster as allocated
+	(envelope-from <richard.henderson@linaro.org>) id 1gXntx-0001E4-CJ
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:53:16 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33814)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gXntw-0001DI-W6
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:53:13 -0500
+Received: by mail-ot1-x342.google.com with SMTP id t5so5464359otk.1
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 05:53:12 -0800 (PST)
+References: <20181213115503.24188-1-alex.bennee@linaro.org>
+	<20181213115503.24188-2-alex.bennee@linaro.org>
+	<CANW4E-1UmZOGHya4jHxj10O2Ki7MPGMqme7wT0jaCO8Ufrii6g@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <d82faf0e-87d4-984a-0db8-558d4e8bda13@linaro.org>
+Date: Fri, 14 Dec 2018 07:53:06 -0600
+MIME-Version: 1.0
+In-Reply-To: <CANW4E-1UmZOGHya4jHxj10O2Ki7MPGMqme7wT0jaCO8Ufrii6g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 1/2] target/arm: kvm64 make guest debug
+ AA32 break point aware
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,51 +33,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
+To: Omair Javaid <omair.javaid@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: mark.rutland@arm.com, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, ard.biesheuvel@linaro.org
 
-Do not count a cluster which is fixed to be ZERO as allocated.
+On 12/14/18 2:37 AM, Omair Javaid wrote:
+> Are you expecting GDB to switch targets (from AArch64 to AArch32 or
+> vice versa) when there is mode switch for example a AArch64 binary
+> calling a AArch32 library function.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/qcow2-refcount.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+Mode changes happen only at privilege level changes.  E.g. AArch32 binary makes
+a system call to an AArch64 kernel, or an AArch32 guest kernel takes an i/o
+emulation trap to an AArch64 hypervisor.
 
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index e76085d9aa..8da0e91dd3 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -1637,15 +1637,6 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
-         {
-             uint64_t offset = l2_entry & L2E_OFFSET_MASK;
- 
--            if (flags & CHECK_FRAG_INFO) {
--                res->bfi.allocated_clusters++;
--                if (next_contiguous_offset &&
--                    offset != next_contiguous_offset) {
--                    res->bfi.fragmented_clusters++;
--                }
--                next_contiguous_offset = offset + s->cluster_size;
--            }
--
-             /* Correct offsets are cluster aligned */
-             if (offset_into_cluster(s, offset)) {
-                 if (qcow2_get_cluster_type(l2_entry) ==
-@@ -1698,6 +1689,15 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
-                 }
-             }
- 
-+            if (flags & CHECK_FRAG_INFO) {
-+                res->bfi.allocated_clusters++;
-+                if (next_contiguous_offset &&
-+                    offset != next_contiguous_offset) {
-+                    res->bfi.fragmented_clusters++;
-+                }
-+                next_contiguous_offset = offset + s->cluster_size;
-+            }
-+
-             /* Mark cluster as used */
-             ret = qcow2_inc_refcounts_imrt(bs, res,
-                                            refcount_table, refcount_table_size,
--- 
-2.18.0
+But for this sort of system debugging, it would be nice to be able to
+single-step through the whole operation.
+
+
+r~
