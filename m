@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37730)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=879e7201e=Alistair.Francis@wdc.com>)
-	id 1gXbBm-0000SI-PA
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 19:18:49 -0500
+	id 1gXbC0-0000bw-Jr
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 19:19:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=879e7201e=Alistair.Francis@wdc.com>)
-	id 1gXbBj-0002bU-KJ
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 19:18:46 -0500
+	id 1gXbBx-0003AW-Ep
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 19:19:00 -0500
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Fri, 14 Dec 2018 00:18:39 +0000
-Message-ID: <66f87c98f9a2122262d7c3179052df95e42b6917.1544746653.git.alistair.francis@wdc.com>
+Date: Fri, 14 Dec 2018 00:18:54 +0000
+Message-ID: <126c481d658afcc297317b2f6844a48ffe591de2.1544746653.git.alistair.francis@wdc.com>
 References: <cover.1544746653.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1544746653.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v1 2/5] RISC-V: Fix CLINT timecmp low 32-bit
- writes
+Subject: [Qemu-devel] [PATCH v1 3/5] RISC-V: Fix PLIC pending bitfield reads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +30,37 @@ Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistai
 
 From: Michael Clark <mjc@sifive.com>
 
-A missing shift made updates to the low order bits
-of timecmp erroneously copy the old low order bits
-into the high order bits of the 64-bit timecmp
-register. Add the missing shift and rename timecmp
-local variables to timecmp_hi and timecmp_lo.
-
-This bug didn't show up as the low order bits are
-usually written first followed by the high order
-bits meaning the high order bits contained an invalid
-value between the timecmp_lo and timecmp_hi update.
+The address calculation for the pending bitfield had
+a copy paste bug. This bug went unnoticed because the Linux
+PLIC driver does not read the pending bitfield, rather it
+reads pending interrupt numbers from the claim register
+and writes acknowledgements back to the claim register.
 
 Cc: Palmer Dabbelt <palmer@sifive.com>
 Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Cc: Alistair Francis <Alistair.Francis@wdc.com>
-Co-Authored-by: Johannes Haring <johannes.haring@gmx.net>
+Reported-by: Vincent Siles <vincent.siles@ens-lyon.org>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- hw/riscv/sifive_clint.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ hw/riscv/sifive_plic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
-index 0d2fd52487..d4c159e937 100644
---- a/hw/riscv/sifive_clint.c
-+++ b/hw/riscv/sifive_clint.c
-@@ -146,15 +146,15 @@ static void sifive_clint_write(void *opaque, hwaddr a=
-ddr, uint64_t value,
-             error_report("clint: invalid timecmp hartid: %zu", hartid);
-         } else if ((addr & 0x7) =3D=3D 0) {
-             /* timecmp_lo */
--            uint64_t timecmp =3D env->timecmp;
-+            uint64_t timecmp_hi =3D env->timecmp >> 32;
-             sifive_clint_write_timecmp(RISCV_CPU(cpu),
--                timecmp << 32 | (value & 0xFFFFFFFF));
-+                timecmp_hi << 32 | (value & 0xFFFFFFFF));
-             return;
-         } else if ((addr & 0x7) =3D=3D 4) {
-             /* timecmp_hi */
--            uint64_t timecmp =3D env->timecmp;
-+            uint64_t timecmp_lo =3D env->timecmp;
-             sifive_clint_write_timecmp(RISCV_CPU(cpu),
--                value << 32 | (timecmp & 0xFFFFFFFF));
-+                value << 32 | (timecmp_lo & 0xFFFFFFFF));
-         } else {
-             error_report("clint: invalid timecmp write: %08x", (uint32_t)a=
-ddr);
-         }
+diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
+index 9cf9a1f986..d12ec3fc9a 100644
+--- a/hw/riscv/sifive_plic.c
++++ b/hw/riscv/sifive_plic.c
+@@ -214,7 +214,7 @@ static uint64_t sifive_plic_read(void *opaque, hwaddr a=
+ddr, unsigned size)
+     } else if (addr >=3D plic->pending_base && /* 1 bit per source */
+                addr < plic->pending_base + (plic->num_sources >> 3))
+     {
+-        uint32_t word =3D (addr - plic->priority_base) >> 2;
++        uint32_t word =3D (addr - plic->pending_base) >> 2;
+         if (RISCV_DEBUG_PLIC) {
+             qemu_log("plic: read pending: word=3D%d value=3D%d\n",
+                 word, plic->pending[word]);
 --=20
 2.19.1
