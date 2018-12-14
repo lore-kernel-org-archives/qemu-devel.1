@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gXllv-0006hL-6M
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 06:36:48 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gXlzB-0002zb-Kl
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 06:50:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gXllq-00057J-3F
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 06:36:47 -0500
-References: <20181213223737.11793-1-pbonzini@redhat.com>
-	<20181213223737.11793-3-pbonzini@redhat.com>
-	<20181214102211.GF4265@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a01bfb15-d1b7-d2e1-bd29-6e7a9899ed0d@redhat.com>
-Date: Fri, 14 Dec 2018 12:35:53 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1gXlzA-0002ij-Ml
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 06:50:29 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:38314)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gXlzA-0002h3-98
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 06:50:28 -0500
+Received: by mail-ot1-x344.google.com with SMTP id e12so5118809otl.5
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 03:50:28 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20181214102211.GF4265@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/2] avoid TABs in files that only contain
- a few
+References: <20181119162658.30358-1-peter.maydell@linaro.org>
+	<20181126150307.GM2448@perard.uk.xensource.com>
+In-Reply-To: <20181126150307.GM2448@perard.uk.xensource.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 14 Dec 2018 11:50:16 +0000
+Message-ID: <CAFEAcA8Z+g8HQq=HeY=2YbY1ToPyNpL8FO2mvfACS=sK-SBGfg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-3.1] hw/xen/xen_pt_graphics: Don't
+ trust the BIOS ROM contents so much
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,16 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Weil <sw@weilnetz.de>, Viktor Prutyanov <viktor.prutyanov@phystech.edu>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Amit Shah <amit@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Andrzej Zaborowski <balrogg@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, John Snow <jsnow@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, Jason Wang <jasowang@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Fam Zheng <famz@redhat.com>, Magnus Damm <magnus.damm@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, "open list:bochs" <qemu-block@nongnu.org>, "open list:Stellaris" <qemu-arm@nongnu.org>, "open list:X86" <xen-devel@lists.xenproject.org>, "open list:ppc4xx" <qemu-ppc@nongnu.org>
+To: Anthony PERARD <anthony.perard@citrix.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, "open list:X86" <xen-devel@lists.xenproject.org>
 
-On 14/12/18 11:22, Daniel P. Berrang=C3=A9 wrote:
->>     crypto/aes.c
->>     crypto/desrfb.c
+On Mon, 26 Nov 2018 at 15:03, Anthony PERARD <anthony.perard@citrix.com> wrote:
 >
-> I'd rather like this to be cleaned to finish the job for
-> crypto/.
+> On Mon, Nov 19, 2018 at 04:26:58PM +0000, Peter Maydell wrote:
+> > Coverity (CID 796599) points out that xen_pt_setup_vga() trusts
+> > the rom->size field in the BIOS ROM from a PCI passthrough VGA
+> > device, and uses it as an index into the memory which contains
+> > the BIOS image. A corrupt BIOS ROM could therefore cause us to
+> > index off the end of the buffer.
+> >
+> > Check that the size is within bounds before we use it.
+> >
+> > We are also trusting the pcioffset field, and assuming that
+> > the whole rom_header is present; Coverity doesn't notice these,
+> > but check them too.
+> >
+> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> > ---
+> > Disclaimer: compile tested only, as I don't have a Xen setup,
+> > let alone one with pass-through PCI graphics.
+> >
+> > Note that https://xenbits.xen.org/xsa/advisory-124.html
+> > defines that bugs which are only exploitable by a malicious
+> > piece of hardware that is passed through to the guest are
+> > not security vulnerabilities as far as the Xen Project is
+> > concerned, and are treated like normal non-security-related bugs.
+> > So this is just a bugfix, not a security issue.
+> >
+> > Marked "for-3.1" because it would let us squash another Coverity
+> > issue, and it is a bug fix; on the other hand it's an obscure
+> > corner case and has been this way since forever.
+>
+> I haven't tested that patch either, but the changes looks fine, so:
+>
+> Acked-by: Anthony PERARD <anthony.perard@citrix.com>
 
-Ok, will do.
+Ping! Would the Xen folks like to test this and/or send it in
+via a xen pullreq now that 4.0 has reopened for development?
 
-Paolo
+Alternatively I can put it in via a pullreq I'm currently
+doing in its current "not tested but looks fine" state :-)
+
+thanks
+-- PMM
