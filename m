@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fam@euphon.net>) id 1gXkby-0000gl-Ox
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 05:22:28 -0500
+	(envelope-from <berrange@redhat.com>) id 1gXkcg-00015V-QT
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 05:23:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fam@euphon.net>) id 1gXkbu-0001ub-4I
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 05:22:26 -0500
-Received: from sender2-op-o12.zoho.com.cn ([163.53.93.243]:17474
-	helo=sender1.zoho.com.cn) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fam@euphon.net>) id 1gXkbo-0001nX-A4
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 05:22:18 -0500
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.1 \(3445.101.1\))
-From: Fam Zheng <fam@euphon.net>
-In-Reply-To: <20181214101355.GA31340@stefanha-x1.localdomain>
-Date: Fri, 14 Dec 2018 18:21:32 +0800
+	(envelope-from <berrange@redhat.com>) id 1gXkcf-0002Ow-Rf
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 05:23:10 -0500
+Date: Fri, 14 Dec 2018 10:22:11 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181214102211.GF4265@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181213223737.11793-1-pbonzini@redhat.com>
+	<20181213223737.11793-3-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181213223737.11793-3-pbonzini@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <181B5FB7-07A4-4B1F-9C8A-4633A5928577@euphon.net>
-References: <CAFEAcA_=XAXoFRFUjZsDWb-8puO4b9CbB85DO+iRXiDrO9O7NA@mail.gmail.com>
-	<20181214101355.GA31340@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] patchew.org using expired https certificate
+Subject: Re: [Qemu-devel] [PATCH 2/2] avoid TABs in files that only contain
+ a few
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +26,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Weil <sw@weilnetz.de>, Viktor Prutyanov <viktor.prutyanov@phystech.edu>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Amit Shah <amit@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Andrzej Zaborowski <balrogg@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, John Snow <jsnow@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, Jason Wang <jasowang@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>, Fam Zheng <famz@redhat.com>, Magnus Damm <magnus.damm@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, "open list:bochs" <qemu-block@nongnu.org>, "open list:Stellaris" <qemu-arm@nongnu.org>, "open list:X86" <xen-devel@lists.xenproject.org>, "open list:ppc4xx" <qemu-ppc@nongnu.org>
 
-
-
-> On Dec 14, 2018, at 18:13, Stefan Hajnoczi <stefanha@redhat.com> =
-wrote:
+On Thu, Dec 13, 2018 at 11:37:37PM +0100, Paolo Bonzini wrote:
+> Most files that have TABs only contain a handful of them.  Change
+> them to spaces so that we don't confuse people.
 >=20
-> On Fri, Dec 14, 2018 at 09:54:06AM +0000, Peter Maydell wrote:
->> Connecting to https://patchew.org/ makes my browser complain:
->>=20
->> # patchew.org uses an invalid security certificate.
->> # The certificate expired on 19 November 2017, 00:27:00 GMT.
->> # The current time is 14 December 2018, 09:52.
->> # Error code: SEC_ERROR_EXPIRED_CERTIFICATE
->>=20
->> which is a bit odd, given I don't think this has been
->> broken since 2017. Did a cert-renewal script go wrong?
->=20
-> Hi Fam,
-> Let's Encrypt isn't set up correctly on patchew.org.  Any ideas?
+> disas, standard-headers, linux-headers and libdecnumber are imported
+> from other projects and probably should be exempted from the check.
+> Outside those, after this patch the following files still contain both
+> 8-space and TAB sequences at the beginning of the line.  Many of them
+> have a majority of TABs, or were initially committed with all tabs.
 
-I tried to solve a coming expiration but some misconfiguration and =
-mistakes by me stoped it from working today, and I=E2=80=99m =
-unfortunately hitting a rate limit of certbot operations. I=E2=80=99ll =
-fix it when the limit is cleared (next week, hopefully). And until then, =
-we=E2=80=99ll have to use HTTP. :(
+>     crypto/aes.c
 
-Fam
+Since you already cleaned some tabs in the previous patch, and the
+rest of crypto/ except desrfb.c is tab-clean, I'd like this to be
+fully cleaned too.
 
->=20
-> Also, is there a backup admin for the patchew VM at OSUOSL?  I have =
-root
-> access but I'd prefer for someone with patchew internals knowledge to =
-be
-> backup admin:
-> https://wiki.qemu.org/AdminContacts
->=20
-> Stefan
+
+>     ui/vnc-enc-hextile-template.h
+>     ui/vnc-enc-zywrle.h
+
+The VNC code was historically heavily tab-damaged and we've
+progressively cleaned it up when making changes.=20
+
+> The following have only TABs:
+
+>     crypto/desrfb.c
+
+I'd rather like this to be cleaned to finish the job for
+crypto/.
+
+
+
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+
+
+>  ui/vnc-enc-zywrle-template.c               |  4 +-
+>  ui/vnc.c                                   |  4 +-
+
+That you've finished tab-cleaning of these files, reinforces to
+me that we should clean those other vnc files listed above.
+
+None the less
+
+  Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+
+since those ones mentioned above can still be done as a separate
+commit to this.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
