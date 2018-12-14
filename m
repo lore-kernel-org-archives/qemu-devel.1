@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gXrU3-0006BE-GL
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 12:42:47 -0500
+	(envelope-from <bounces@canonical.com>) id 1gXrWs-0000a6-8B
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 12:45:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gXrTy-0000jD-Jk
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 12:42:43 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:53571)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gXrTy-0000hO-1E
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 12:42:38 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Date: Fri, 14 Dec 2018 12:42:33 -0500
-Message-Id: <20181214174233.18027-4-cota@braap.org>
-In-Reply-To: <20181214174233.18027-1-cota@braap.org>
-References: <20181214174233.18027-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v5 3/3] tcg/i386: enable dynamic TLB sizing
+	(envelope-from <bounces@canonical.com>) id 1gXrWp-0002Ot-2r
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 12:45:38 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47054)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gXrWo-0002ML-Sd
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 12:45:35 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gXrWn-0005GX-At
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 17:45:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 49B9E2E8078
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 17:45:33 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 14 Dec 2018 17:39:42 -0000
+From: Alan Jones <1808563@bugs.launchpad.net>
+Reply-To: Bug 1808563 <1808563@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154480918291.23267.15132018418369155034.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1808563] [NEW] Listing the contents of / lists
+ QEMU_LD_PREFIX instead
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,224 +37,67 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-As the following experiments show, this series is a net perf gain,
-particularly for memory-heavy workloads. Experiments are run on an
-Intel(R) Xeon(R) Gold 6142 CPU @ 2.60GHz.
+Public bug reported:
 
-1. System boot + shudown, debian aarch64:
+Seeing this in qemu-user version 3.1.0
 
-- Before (v3.1.0):
- Performance counter stats for './die.sh v3.1.0' (10 runs):
+Demo:
+$ QEMU_LD_PREFIX=3D$(pwd)/usr/armv7a-cros-linux-gnueabi ../run/qemu-arm /tm=
+p/coreutils --coreutils-prog=3Dls / =
 
-       9019.797015      task-clock (msec)         #    0.993 CPUs utilized            ( +-  0.23% )
-    29,910,312,379      cycles                    #    3.316 GHz                      ( +-  0.14% )
-    54,699,252,014      instructions              #    1.83  insn per cycle           ( +-  0.08% )
-    10,061,951,686      branches                  # 1115.541 M/sec                    ( +-  0.08% )
-       172,966,530      branch-misses             #    1.72% of all branches          ( +-  0.07% )
+etc  lib  usr
+$ ls /
+boot  etc   lib     lib64   lost+found  mnt    root  sbin  sys  usr
+bin   dev   export  home    lib32       net    proc  run   tmp  var
+$ ls usr/armv7a-cros-linux-gnueabi
+etc  lib  usr
 
-       9.084039051 seconds time elapsed                                          ( +-  0.23% )
+In strace, the openat for "/" is remapped to the directory specified in QEM=
+U_LD_PREFIX:
+[pid  5302] openat(AT_FDCWD, "/tmp/qemu/usr/armv7a-cros-linux-gnueabi", O_R=
+DONLY|O_NONBLOCK|O_DIRECTORY|O_CLOEXEC) =3D 3
 
-- After:
- Performance counter stats for './die.sh tlb-dyn-v5' (10 runs):
+As an aside, if I change the code to do chdir("/"); opendir("."); it
+works fine.
 
-       8624.084842      task-clock (msec)         #    0.993 CPUs utilized            ( +-  0.23% )
-    28,556,123,404      cycles                    #    3.311 GHz                      ( +-  0.13% )
-    51,755,089,512      instructions              #    1.81  insn per cycle           ( +-  0.05% )
-     9,526,513,946      branches                  # 1104.641 M/sec                    ( +-  0.05% )
-       166,578,509      branch-misses             #    1.75% of all branches          ( +-  0.19% )
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-       8.680540350 seconds time elapsed                                          ( +-  0.24% )
+-- =
 
-That is, a 4.4% perf increase.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1808563
 
-2. System boot + shutdown, ubuntu 18.04 x86_64:
+Title:
+  Listing the contents of / lists QEMU_LD_PREFIX instead
 
-- Before (v3.1.0):
-      56100.574751      task-clock (msec)         #    1.016 CPUs utilized            ( +-  4.81% )
-   200,745,466,128      cycles                    #    3.578 GHz                      ( +-  5.24% )
-   431,949,100,608      instructions              #    2.15  insn per cycle           ( +-  5.65% )
-    77,502,383,330      branches                  # 1381.490 M/sec                    ( +-  6.18% )
-       844,681,191      branch-misses             #    1.09% of all branches          ( +-  3.82% )
+Status in QEMU:
+  New
 
-      55.221556378 seconds time elapsed                                          ( +-  5.01% )
+Bug description:
+  Seeing this in qemu-user version 3.1.0
 
-- After:
-      56603.419540      task-clock (msec)         #    1.019 CPUs utilized            ( +- 10.19% )
-   202,217,930,479      cycles                    #    3.573 GHz                      ( +- 10.69% )
-   439,336,291,626      instructions              #    2.17  insn per cycle           ( +- 14.14% )
-    80,538,357,447      branches                  # 1422.853 M/sec                    ( +- 16.09% )
-       776,321,622      branch-misses             #    0.96% of all branches          ( +-  3.77% )
+  Demo:
+  $ QEMU_LD_PREFIX=3D$(pwd)/usr/armv7a-cros-linux-gnueabi ../run/qemu-arm /=
+tmp/coreutils --coreutils-prog=3Dls / =
 
-      55.549661409 seconds time elapsed                                          ( +- 10.44% )
+  etc  lib  usr
+  $ ls /
+  boot  etc   lib     lib64   lost+found  mnt    root  sbin  sys  usr
+  bin   dev   export  home    lib32       net    proc  run   tmp  var
+  $ ls usr/armv7a-cros-linux-gnueabi
+  etc  lib  usr
 
-No improvement (within noise range). Note that for this workload,
-increasing the time window too much can lead to perf degradation,
-since it flushes the TLB *very* frequently.
+  In strace, the openat for "/" is remapped to the directory specified in Q=
+EMU_LD_PREFIX:
+  [pid  5302] openat(AT_FDCWD, "/tmp/qemu/usr/armv7a-cros-linux-gnueabi", O=
+_RDONLY|O_NONBLOCK|O_DIRECTORY|O_CLOEXEC) =3D 3
 
-3. x86_64 SPEC06int:
+  As an aside, if I change the code to do chdir("/"); opendir("."); it
+  works fine.
 
-           x86_64-softmmu speedup vs. v3.1.0 for SPEC06int (test set)
-            Host: Intel(R) Xeon(R) Gold 6142 CPU @ 2.60GHz (Skylake)
-
-5.5 +------------------------------------------------------------------------+
-    |                   +-+                                                  |
-  5 |-+.................+-+...............................tlb-dyn-v5.......+-|
-    |                   * *                                                  |
-4.5 |-+.................*.*................................................+-|
-    |                   * *                                                  |
-  4 |-+.................*.*................................................+-|
-    |                   * *                                                  |
-3.5 |-+.................*.*................................................+-|
-    |                   * *                                                  |
-  3 |-+......+-+*.......*.*................................................+-|
-    |        *  *       * *                                                  |
-2.5 |-+......*..*.......*.*.................................+-+*...........+-|
-    |        *  *       * *                                 *  *             |
-  2 |-+......*..*.......*.*.................................*..*...........+-|
-    |        *  *       * *                                 *  *  +-+        |
-1.5 |-+......*..*.......*.*.................................*..*.*+-+.*+-+.+-|
-    |        *  * *+-+  * *  +-+       *+-+  +-+       +-+  *  * *  * *  *   |
-  1 |++++-+*+*++*+*++*++*+*++*+*+++-+*+*+-++*+-++++-++++-+++*++*+*++*+*++*+++|
-    |   *  * *  * *  *  * *  * *  *  * *  * *  *  * *  * *  *  * *  * *  *   |
-0.5 +------------------------------------------------------------------------+
-  400.perlb401.bzip403.g429445.g456.hm462.libq464.h471.omn47483.xalancbgeomean
-  png: https://imgur.com/YRF90f7
-
-That is, a 1.51x average speedup over the baseline, with a max speedup
-of 5.17x.
-
-Here's a different look at the SPEC06int results, using KVM as the baseline:
-
-             x86_64-softmmu slowdown vs. KVM for SPEC06int (test set)
-             Host: Intel(R) Xeon(R) Gold 6142 CPU @ 2.60GHz (Skylake)
-
-25 +---------------------------------------------------------------------------+
-   |                   +-+                                        +-+          |
-   |                   * *                             +-+      v3.1.0         |
-   |                   * *                             +-+  tlb-dyn-v5         |
-   |                   * *                             * *        +-+          |
-20 |-+.................*.*.............................*.+-+......*.*........+-|
-   |                   * *                             * # #      * *          |
-   |        +-+        * *                             * # #      * *          |
-   |        * *        * *                             * # #      * *          |
-15 |-+......*.*........*.*.............................*.#.#......*.+-+......+-|
-   |        * *        * *                             * # #      * #|#        |
-   |        * *        * *        +-+                  * # #      * +-+        |
-   |        * *  +-+   * *        ++-+       +-+       * # #      * # # +-+    |
-   |        * *  +-+   * *        * ##       *|   +-+  * # #      * # # +-+    |
-10 |-+......*.*..*.+-+.*.*........*.##.......++-+.*.+-+*.#.#......*.#.#.*.*..+-|
-   |        * *  * +-+ * *        * ## +-+   *# # * # #* # # +-+  * # # * *    |
-   |        * *  * # # * *  +-+   * ## * +-+ *# # * # #* # # * *  * # # *+-+   |
-   |        * *  * # # * *  * +-+ * ## * # # *# # * # #* # # * *  * # # * ##   |
- 5 |-+......*.+-+*.#.#.*.*..*.#.#.*.##.*.#.#.*#.#.*.#.#*.#.#.*.*..*.#.#.*.##.+-|
-   |        * # #* # # * +-+* # # * ## * # # *# # * # #* # # * *  * # # * ##   |
-   |        * # #* # # * # #* # # * ## * # # *# # * # #* # # * +-+* # # * ##   |
-   |   ++-+ * # #* # # * # #* # # * ## * # # *# # * # #* # # * # #* # # * ##   |
-   |+++*#+#+*+#+#*+#+#+*+#+#*+#+#+*+##+*+#+#+*#+#+*+#+#*+#+#+*+#+#*+#+#+*+##+++|
- 0 +---------------------------------------------------------------------------+
- 400.perlbe401.bzi403.gc429445.go456.h462.libqu464.h471.omne4483.xalancbmgeomean
-  png: https://imgur.com/YzAMNEV
-
-After this series, we bring down the average SPEC06int slowdown vs KVM
-from 11.47x to 7.58x.
-
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- tcg/i386/tcg-target.h     |  2 +-
- tcg/i386/tcg-target.inc.c | 28 ++++++++++++++--------------
- 2 files changed, 15 insertions(+), 15 deletions(-)
-
-diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index 9e4bfa90d1..8b6475d786 100644
---- a/tcg/i386/tcg-target.h
-+++ b/tcg/i386/tcg-target.h
-@@ -27,7 +27,7 @@
- 
- #define TCG_TARGET_INSN_UNIT_SIZE  1
- #define TCG_TARGET_TLB_DISPLACEMENT_BITS 31
--#define TCG_TARGET_IMPLEMENTS_DYN_TLB 0
-+#define TCG_TARGET_IMPLEMENTS_DYN_TLB 1
- 
- #ifdef __x86_64__
- # define TCG_TARGET_REG_BITS  64
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index 436195894b..5cbb07deab 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -330,6 +330,7 @@ static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
- #define OPC_ARITH_GvEv	(0x03)		/* ... plus (ARITH_FOO << 3) */
- #define OPC_ANDN        (0xf2 | P_EXT38)
- #define OPC_ADD_GvEv	(OPC_ARITH_GvEv | (ARITH_ADD << 3))
-+#define OPC_AND_GvEv    (OPC_ARITH_GvEv | (ARITH_AND << 3))
- #define OPC_BLENDPS     (0x0c | P_EXT3A | P_DATA16)
- #define OPC_BSF         (0xbc | P_EXT)
- #define OPC_BSR         (0xbd | P_EXT)
-@@ -1625,7 +1626,7 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
-         }
-         if (TCG_TYPE_PTR == TCG_TYPE_I64) {
-             hrexw = P_REXW;
--            if (TARGET_PAGE_BITS + CPU_TLB_BITS > 32) {
-+            if (TARGET_PAGE_BITS + CPU_TLB_DYN_MAX_BITS > 32) {
-                 tlbtype = TCG_TYPE_I64;
-                 tlbrexw = P_REXW;
-             }
-@@ -1633,6 +1634,15 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
-     }
- 
-     tcg_out_mov(s, tlbtype, r0, addrlo);
-+    tcg_out_shifti(s, SHIFT_SHR + tlbrexw, r0,
-+                   TARGET_PAGE_BITS - CPU_TLB_ENTRY_BITS);
-+
-+    tcg_out_modrm_offset(s, OPC_AND_GvEv + trexw, r0, TCG_AREG0,
-+                         offsetof(CPUArchState, tlb_mask[mem_index]));
-+
-+    tcg_out_modrm_offset(s, OPC_ADD_GvEv + hrexw, r0, TCG_AREG0,
-+                         offsetof(CPUArchState, tlb_table[mem_index]));
-+
-     /* If the required alignment is at least as large as the access, simply
-        copy the address and mask.  For lesser alignments, check that we don't
-        cross pages for the complete access.  */
-@@ -1642,20 +1652,10 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
-         tcg_out_modrm_offset(s, OPC_LEA + trexw, r1, addrlo, s_mask - a_mask);
-     }
-     tlb_mask = (target_ulong)TARGET_PAGE_MASK | a_mask;
--
--    tcg_out_shifti(s, SHIFT_SHR + tlbrexw, r0,
--                   TARGET_PAGE_BITS - CPU_TLB_ENTRY_BITS);
--
-     tgen_arithi(s, ARITH_AND + trexw, r1, tlb_mask, 0);
--    tgen_arithi(s, ARITH_AND + tlbrexw, r0,
--                (CPU_TLB_SIZE - 1) << CPU_TLB_ENTRY_BITS, 0);
--
--    tcg_out_modrm_sib_offset(s, OPC_LEA + hrexw, r0, TCG_AREG0, r0, 0,
--                             offsetof(CPUArchState, tlb_table[mem_index][0])
--                             + which);
- 
-     /* cmp 0(r0), r1 */
--    tcg_out_modrm_offset(s, OPC_CMP_GvEv + trexw, r1, r0, 0);
-+    tcg_out_modrm_offset(s, OPC_CMP_GvEv + trexw, r1, r0, which);
- 
-     /* Prepare for both the fast path add of the tlb addend, and the slow
-        path function argument setup.  There are two cases worth note:
-@@ -1672,7 +1672,7 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
- 
-     if (TARGET_LONG_BITS > TCG_TARGET_REG_BITS) {
-         /* cmp 4(r0), addrhi */
--        tcg_out_modrm_offset(s, OPC_CMP_GvEv, addrhi, r0, 4);
-+        tcg_out_modrm_offset(s, OPC_CMP_GvEv, addrhi, r0, which + 4);
- 
-         /* jne slow_path */
-         tcg_out_opc(s, OPC_JCC_long + JCC_JNE, 0, 0, 0);
-@@ -1684,7 +1684,7 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
- 
-     /* add addend(r0), r1 */
-     tcg_out_modrm_offset(s, OPC_ADD_GvEv + hrexw, r1, r0,
--                         offsetof(CPUTLBEntry, addend) - which);
-+                         offsetof(CPUTLBEntry, addend));
- }
- 
- /*
--- 
-2.17.1
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1808563/+subscriptions
