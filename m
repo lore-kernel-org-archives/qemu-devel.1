@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35390)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gXucm-0000S0-II
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 16:03:58 -0500
+	(envelope-from <mst@redhat.com>) id 1gXulE-00031u-PC
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 16:12:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gXuch-00019W-Jg
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 16:03:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54196)
+	(envelope-from <mst@redhat.com>) id 1gXul9-0000yl-Q6
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 16:12:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57604)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gXuch-00018Y-BA
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 16:03:51 -0500
-Date: Fri, 14 Dec 2018 16:03:43 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gXul9-0000yV-HV
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 16:12:35 -0500
+Date: Fri, 14 Dec 2018 16:12:32 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181214160308-mutt-send-email-mst@kernel.org>
-References: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
+Message-ID: <20181214160903-mutt-send-email-mst@kernel.org>
+References: <1544002886-11333-1-git-send-email-huan.xiong@hxt-semitech.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v11 0/7] virtio-balloon: free page hint
- support
+In-Reply-To: <1544002886-11333-1-git-send-email-huan.xiong@hxt-semitech.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/pci-bridge: check invalid slot number
+ for root and downstream port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,87 +27,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com
+To: Huan Xiong <huan.xiong@hxt-semitech.com>
+Cc: qemu-devel@nongnu.org, marcel.apfelbaum@gmail.com
 
-On Tue, Dec 11, 2018 at 04:24:46PM +0800, Wei Wang wrote:
-> This is the deivce part implementation to add a new feature,
-> VIRTIO_BALLOON_F_FREE_PAGE_HINT to the virtio-balloon device. The device
-> receives the guest free page hints from the driver and clears the
-> corresponding bits in the dirty bitmap, so that those free pages are
-> not sent by the migration thread to the destination.
+On Wed, Dec 05, 2018 at 05:41:26PM +0800, Huan Xiong wrote:
+> Since root and downstream port have only one slot, device should be
+> connected to them using slot 0. QEMU doesn't have a check for that
+> and starts up when a non-zero slot is specified, though the device
+> is not seen in guest OS.
+> 
+> The change fixes that by adding a check in PCI device "attr" property
+> setter function. The check is performed only if a PCI device has been
+> connected to a bus, otherwise it does nothing. The latter occurs because
+> setter function is also called in object instantiation phase to set
+> property default value.
+> 
+> Signed-off-by: Huan Xiong <huan.xiong@hxt-semitech.com>
 
-For virtio bits:
-
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-
-I think this is primarily a migration feature so please merge
-through the migration tree.
+I thought that a non 0 slot is useful for ARI. No?
 
 
+> ---
+>  hw/core/qdev-properties.c          |  5 ++++-
+>  hw/pci-bridge/pcie_root_port.c     |  2 +-
+>  hw/pci-bridge/xio3130_downstream.c |  2 +-
+>  hw/pci/pci.c                       | 13 +++++++++++++
+>  include/hw/pci/pci.h               |  1 +
+>  5 files changed, 20 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index 35072de..6e79219 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -654,6 +654,8 @@ static void set_pci_devfn(Object *obj, Visitor *v, const char *name,
+>                            void *opaque, Error **errp)
+>  {
+>      DeviceState *dev = DEVICE(obj);
+> +    BusState *bus = qdev_get_parent_bus(dev);
+> +    BusClass *bus_class = bus ? BUS_GET_CLASS(bus) : NULL;
+>      Property *prop = opaque;
+>      int32_t value, *ptr = qdev_get_prop_ptr(dev, prop);
+>      unsigned int slot, fn, n;
+> @@ -687,7 +689,8 @@ static void set_pci_devfn(Object *obj, Visitor *v, const char *name,
+>              goto invalid;
+>          }
+>      }
+> -    if (str[n] != '\0' || fn > 7 || slot > 31) {
+> +    if (str[n] != '\0' || fn > 7 || slot > 31 || (bus_class &&
+> +        bus_class->max_dev != 0 && slot >= bus_class->max_dev)) {
+>          goto invalid;
+>      }
 
-> *Tests
-> 1 Test Environment
->     Host: Intel(R) Xeon(R) CPU E5-2699 v4 @ 2.20GHz
->     Migration setup: migrate_set_speed 100G, migrate_set_downtime 400ms
-> 
-> 2 Test Results (results are averaged over several repeated runs)
->     2.1 Guest setup: 8G RAM, 4 vCPU
->         2.1.1 Idle guest live migration time
->             Optimization v.s. Legacy = 620ms vs 2970ms
->             --> ~79% reduction
->         2.1.2 Guest live migration with Linux compilation workload
->           (i.e. make bzImage -j4) running
->           1) Live Migration Time:
->              Optimization v.s. Legacy = 2273ms v.s. 4502ms
->              --> ~50% reduction
->           2) Linux Compilation Time:
->              Optimization v.s. Legacy = 8min42s v.s. 8min43s
->              --> no obvious difference
-> 
->     2.2 Guest setup: 128G RAM, 4 vCPU
->         2.2.1 Idle guest live migration time
->             Optimization v.s. Legacy = 5294ms vs 41651ms
->             --> ~87% reduction
->         2.2.2 Guest live migration with Linux compilation workload
->           1) Live Migration Time:
->             Optimization v.s. Legacy = 8816ms v.s. 54201ms
->             --> 84% reduction
->           2) Linux Compilation Time:
->             Optimization v.s. Legacy = 8min30s v.s. 8min36s
->             --> no obvious difference
-> 
-> ChangeLog:
-> v10->v11:
-> migration:
->     - qemu_guest_free_page_hint:
->         - "offset >= block->used_length", instead of
->           "offset > block->used_length";
->     - RAMState: enable the "fpo_enabled" flag, when the free page
->       optimization feature is used, instead of disabling ram_bulk_stage.
->       Please see patch 6 commit log for details.
-> 
-> Previous changelog:
-> http://lists.nongnu.org/archive/html/qemu-devel/2018-12/msg00055.html
-> 
-> Wei Wang (7):
->   bitmap: fix bitmap_count_one
->   bitmap: bitmap_count_one_with_offset
->   migration: use bitmap_mutex in migration_bitmap_clear_dirty
->   migration: API to clear bits of guest free pages from the dirty bitmap
->   migration/ram.c: add a notifier chain for precopy
->   migration/ram.c: add the free page optimization enable flag
->   virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT
-> 
->  hw/virtio/virtio-balloon.c                      | 263 ++++++++++++++++++++++++
->  include/hw/virtio/virtio-balloon.h              |  28 ++-
->  include/migration/misc.h                        |  22 ++
->  include/qemu/bitmap.h                           |  17 ++
->  include/standard-headers/linux/virtio_balloon.h |   5 +
->  migration/ram.c                                 | 121 ++++++++++-
->  migration/savevm.c                              |  15 ++
->  vl.c                                            |   1 +
->  8 files changed, 466 insertions(+), 6 deletions(-)
-> 
+This looks kind of complicated. Isn't there an easier way?
+
+>      *ptr = slot << 3 | fn;
+> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+> index 45f9e8c..ee42411 100644
+> --- a/hw/pci-bridge/pcie_root_port.c
+> +++ b/hw/pci-bridge/pcie_root_port.c
+> @@ -61,7 +61,7 @@ static void rp_realize(PCIDevice *d, Error **errp)
+>      int rc;
+>  
+>      pci_config_set_interrupt_pin(d->config, 1);
+> -    pci_bridge_initfn(d, TYPE_PCIE_BUS);
+> +    pci_bridge_initfn(d, TYPE_PCIE_DOWNSTREAM_BUS);
+>      pcie_port_init_reg(d);
+>  
+>      rc = pci_bridge_ssvid_init(d, rpc->ssvid_offset, dc->vendor_id,
+> diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
+> index 467bbab..960a90c 100644
+> --- a/hw/pci-bridge/xio3130_downstream.c
+> +++ b/hw/pci-bridge/xio3130_downstream.c
+> @@ -62,7 +62,7 @@ static void xio3130_downstream_realize(PCIDevice *d, Error **errp)
+>      PCIESlot *s = PCIE_SLOT(d);
+>      int rc;
+>  
+> -    pci_bridge_initfn(d, TYPE_PCIE_BUS);
+> +    pci_bridge_initfn(d, TYPE_PCIE_DOWNSTREAM_BUS);
+>      pcie_port_init_reg(d);
+>  
+>      rc = msi_init(d, XIO3130_MSI_OFFSET, XIO3130_MSI_NR_VECTOR,
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 56b13b3..457736d 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -187,6 +187,18 @@ static const TypeInfo pcie_bus_info = {
+>      .parent = TYPE_PCI_BUS,
+>  };
+>  
+> +static void pcie_downstream_bus_class_init(ObjectClass *klass, void *data)
+> +{
+> +    BusClass *k = BUS_CLASS(klass);
+> +    k->max_dev = 1;
+> +}
+> +
+> +static const TypeInfo pcie_downstream_bus_info = {
+> +    .name = TYPE_PCIE_DOWNSTREAM_BUS,
+> +    .parent = TYPE_PCIE_BUS,
+> +    .class_init = pcie_downstream_bus_class_init,
+> +};
+> +
+>  static PCIBus *pci_find_bus_nr(PCIBus *bus, int bus_num);
+>  static void pci_update_mappings(PCIDevice *d);
+>  static void pci_irq_handler(void *opaque, int irq_num, int level);
+> @@ -2681,6 +2693,7 @@ static void pci_register_types(void)
+>  {
+>      type_register_static(&pci_bus_info);
+>      type_register_static(&pcie_bus_info);
+> +    type_register_static(&pcie_downstream_bus_info);
+>      type_register_static(&conventional_pci_interface_info);
+>      type_register_static(&pcie_interface_info);
+>      type_register_static(&pci_device_type_info);
+> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> index e6514bb..2253757 100644
+> --- a/include/hw/pci/pci.h
+> +++ b/include/hw/pci/pci.h
+> @@ -393,6 +393,7 @@ typedef PCIINTxRoute (*pci_route_irq_fn)(void *opaque, int pin);
+>  #define PCI_BUS_CLASS(klass) OBJECT_CLASS_CHECK(PCIBusClass, (klass), TYPE_PCI_BUS)
+>  #define PCI_BUS_GET_CLASS(obj) OBJECT_GET_CLASS(PCIBusClass, (obj), TYPE_PCI_BUS)
+>  #define TYPE_PCIE_BUS "PCIE"
+> +#define TYPE_PCIE_DOWNSTREAM_BUS "PCIE-downstream"
+>  
+>  bool pci_bus_is_express(PCIBus *bus);
+>  bool pci_bus_is_root(PCIBus *bus);
 > -- 
-> 1.8.3.1
+> 2.7.4
