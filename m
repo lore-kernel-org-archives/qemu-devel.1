@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gXiqW-0007Vy-Ma
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 03:29:21 -0500
+	(envelope-from <armbru@redhat.com>) id 1gXj5R-00021D-7j
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 03:44:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gXiqT-0007lK-F0
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 03:29:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58794)
+	(envelope-from <armbru@redhat.com>) id 1gXj5P-0000vx-Rd
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 03:44:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52196)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gXiqT-0007l2-6z
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 03:29:17 -0500
-References: <20181213210057.3676-1-quintela@redhat.com>
-	<20181213210057.3676-3-quintela@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <ac6aa09d-def9-d334-f7f8-68958f67736e@redhat.com>
-Date: Fri, 14 Dec 2018 09:29:09 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181213210057.3676-3-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 02/16] virtio: split virtio input host
- bits from virtio-pci
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gXj5P-0000rp-2M
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 03:44:43 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B812458E4F
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 08:44:29 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-56.ams2.redhat.com
+	[10.36.116.56])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 83B4426FAD
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 08:44:29 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Fri, 14 Dec 2018 09:44:26 +0100
+Message-Id: <20181214084427.23622-2-armbru@redhat.com>
+In-Reply-To: <20181214084427.23622-1-armbru@redhat.com>
+References: <20181214084427.23622-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH] build: Remake config-host.mak when VERSION
+ changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,22 +34,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Gonglei <arei.gonglei@huawei.com>
+To: qemu-devel@nongnu.org
 
-On 2018-12-13 22:00, Juan Quintela wrote:
-> For consistency with other devices, rename
-> virtio_host_{initfn,pci_info} to virtio_input_host_{initfn,info}.
-> 
-> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  default-configs/virtio.mak        |  1 +
->  hw/virtio/Makefile.objs           |  1 +
->  hw/virtio/virtio-input-host-pci.c | 45 +++++++++++++++++++++++++++++++
->  hw/virtio/virtio-pci.c            | 20 --------------
->  hw/virtio/virtio-pci.h            | 14 ----------
->  5 files changed, 47 insertions(+), 34 deletions(-)
->  create mode 100644 hw/virtio/virtio-input-host-pci.c
+configure gets the version number from VERSION, and writes it to
+config-host.mak.  The make dependency for that is missing.  Because of
+that, a rebuild after a VERSION change may not pick up the change.
+Fix that.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index c8b9efdad4..038780c6d0 100644
+--- a/Makefile
++++ b/Makefile
+@@ -67,7 +67,7 @@ CONFIG_ALL=y
+ -include config-all-devices.mak
+ -include config-all-disas.mak
+ 
+-config-host.mak: $(SRC_PATH)/configure $(SRC_PATH)/pc-bios
++config-host.mak: $(SRC_PATH)/configure $(SRC_PATH)/pc-bios $(SRC_PATH)/VERSION
+ 	@echo $@ is out-of-date, running configure
+ 	@# TODO: The next lines include code which supports a smooth
+ 	@# transition from old configurations without config.status.
+-- 
+2.17.2
