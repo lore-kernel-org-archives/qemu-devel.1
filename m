@@ -1,21 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60481)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gXn8v-0003aM-4d
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:04:37 -0500
+	(envelope-from <thuth@redhat.com>) id 1gXnCV-0005pC-A6
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:08:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gXn8r-0006Nz-T8
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:04:36 -0500
-Date: Fri, 14 Dec 2018 14:04:28 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181214140428.6c677a48.cohuck@redhat.com>
-In-Reply-To: <1544623878-11248-13-git-send-email-jjherne@linux.ibm.com>
-References: <1544623878-11248-1-git-send-email-jjherne@linux.ibm.com>
-	<1544623878-11248-13-git-send-email-jjherne@linux.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 12/15] s390-bios: Refactor virtio to run
- channel programs via cio
+	(envelope-from <thuth@redhat.com>) id 1gXnCS-0007PW-Jl
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:08:19 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Fri, 14 Dec 2018 14:08:07 +0100
+Message-Id: <1544792887-14575-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/s390x: Fix bad mask in time2tod()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +17,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com, borntraeger@de.ibm.com
+To: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-stable@nongnu.org
 
-On Wed, 12 Dec 2018 09:11:15 -0500
-"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+The time2tod() function tries to deal with the 9 uppermost bits in the
+time value, but uses the wrong mask for this: 0xff80000000000000 should
+be used instead of 0xff10000000000000 here.
 
-> Now that we have a Channel I/O library let's modify virtio boot code to
-> make use of it for running channel programs.
-> 
-> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-> ---
->  pc-bios/s390-ccw/virtio.c | 21 ++-------------------
->  1 file changed, 2 insertions(+), 19 deletions(-)
-> 
-> diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-> index aa9da72..5fb49e2 100644
-> --- a/pc-bios/s390-ccw/virtio.c
-> +++ b/pc-bios/s390-ccw/virtio.c
-> @@ -92,30 +92,13 @@ int drain_irqs(SubChannelId schid)
->  static int run_ccw(VDev *vdev, int cmd, void *ptr, int len)
->  {
->      Ccw1 ccw = {};
-> -    CmdOrb orb = {};
-> -    int r;
-> -
-> -    enable_subchannel(vdev->schid);
-> -
-> -    /* start subchannel command */
-> -    orb.fmt = 1;
-> -    orb.cpa = (u32)(long)&ccw;
-> -    orb.lpm = 0x80;
->  
->      ccw.cmd_code = cmd;
->      ccw.cda = (long)ptr;
->      ccw.count = len;
->  
-> -    r = ssch(vdev->schid, &orb);
-> -    /*
-> -     * XXX Wait until device is done processing the CCW. For now we can
-> -     *     assume that a simple tsch will have finished the CCW processing,
-> -     *     but the architecture allows for asynchronous operation
-> -     */
-> -    if (!r) {
-> -        r = drain_irqs(vdev->schid);
-> -    }
-> -    return r;
-> +    enable_subchannel(vdev->schid);
+Fixes: 14055ce53c2d901d826ffad7fb7d6bb8ab46bdfd
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ include/hw/s390x/tod.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Preexisting, but I'm wondering why we enable the subchannel here and
-not just once?
-
-> +    return do_cio(vdev->schid, ptr2u32(&ccw), CCW_FMT1);
->  }
->  
->  static void vring_init(VRing *vr, VqInfo *info)
+diff --git a/include/hw/s390x/tod.h b/include/hw/s390x/tod.h
+index cbd7552..47ef9de 100644
+--- a/include/hw/s390x/tod.h
++++ b/include/hw/s390x/tod.h
+@@ -56,7 +56,7 @@ typedef struct S390TODClass {
+ /* Converts ns to s390's clock format */
+ static inline uint64_t time2tod(uint64_t ns)
+ {
+-    return (ns << 9) / 125 + (((ns & 0xff10000000000000ull) / 125) << 9);
++    return (ns << 9) / 125 + (((ns & 0xff80000000000000ull) / 125) << 9);
+ }
+ 
+ /* Converts s390's clock format to ns */
+-- 
+1.8.3.1
