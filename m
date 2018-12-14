@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gXjaO-0008TT-7B
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:16:46 -0500
+	(envelope-from <thuth@redhat.com>) id 1gXjdW-0002cV-A8
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:20:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gXjaJ-0002u9-RC
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:16:43 -0500
-Received: from mail-it1-x143.google.com ([2607:f8b0:4864:20::143]:51667)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gXjaJ-0002i5-HO
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:16:39 -0500
-Received: by mail-it1-x143.google.com with SMTP id x19so7990226itl.1
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 01:16:30 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1gXjdR-0006Nt-A8
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:19:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58480)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gXjdQ-0006LH-Ul
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:19:53 -0500
+References: <20181213210057.3676-1-quintela@redhat.com>
+	<20181213210057.3676-10-quintela@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6793abab-886c-b8f4-fe5f-a94150119f5f@redhat.com>
+Date: Fri, 14 Dec 2018 10:19:38 +0100
 MIME-Version: 1.0
-References: <1544701071-2922-1-git-send-email-liq3ea@gmail.com>
-	<154471686589.17726.17792356837247129570@02a1dbf831e2>
-	<CAKXe6SLLrFDCaqBW8B_qBmcrYm6HM9jzv5C2VNyph+218sMeWA@mail.gmail.com>
-In-Reply-To: <CAKXe6SLLrFDCaqBW8B_qBmcrYm6HM9jzv5C2VNyph+218sMeWA@mail.gmail.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Fri, 14 Dec 2018 17:15:52 +0800
-Message-ID: <CAKXe6S+S4dsKkk-FGQeaXQgT6p=ijMojtMiHHNd9ss54etg03Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] util: check the return value of fcntl
- in qemu_set_{block, nonblock}
+In-Reply-To: <20181213210057.3676-10-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 09/16] virtio: split vhost scsi bits
+ from virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,191 +29,256 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu Developers <qemu-devel@nongnu.org>
-Cc: fam@euphon.net, Peter Maydell <peter.maydell@linaro.org>, marcandre lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, mst@redhat.com, Jason Wang <jasowang@redhat.com>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Nicholas Bellinger <nab@risingtidesystems.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Gonglei <arei.gonglei@huawei.com>
 
-Li Qiang <liq3ea@gmail.com> =E4=BA=8E2018=E5=B9=B412=E6=9C=8814=E6=97=A5=E5=
-=91=A8=E4=BA=94 =E4=B8=8A=E5=8D=889:46=E5=86=99=E9=81=93=EF=BC=9A
+On 2018-12-13 22:00, Juan Quintela wrote:
+> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  hw/virtio/Makefile.objs    |  1 +
+>  hw/virtio/vhost-scsi-pci.c | 95 ++++++++++++++++++++++++++++++++++++++
+>  hw/virtio/virtio-pci.c     | 59 -----------------------
+>  hw/virtio/virtio-pci.h     | 19 --------
+>  4 files changed, 96 insertions(+), 78 deletions(-)
+>  create mode 100644 hw/virtio/vhost-scsi-pci.c
+> 
+> diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+> index f851a6f2b5..0a56946c1a 100644
+> --- a/hw/virtio/Makefile.objs
+> +++ b/hw/virtio/Makefile.objs
+> @@ -15,6 +15,7 @@ ifeq ($(CONFIG_PCI),y)
+>  obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
+>  obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk-pci.o
+>  obj-$(CONFIG_VHOST_USER_SCSI) += vhost-user-scsi-pci.o
+> +obj-$(CONFIG_VHOST_SCSI) += vhost-scsi-pci.o
+>  obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
+>  obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
+>  obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
+> diff --git a/hw/virtio/vhost-scsi-pci.c b/hw/virtio/vhost-scsi-pci.c
+> new file mode 100644
+> index 0000000000..2be2c567ea
+> --- /dev/null
+> +++ b/hw/virtio/vhost-scsi-pci.c
+> @@ -0,0 +1,95 @@
+> +/*
+> + * Vhost scsi PCI bindings
+> + *
+> + * Copyright IBM, Corp. 2011
+> + *
+> + * Authors:
+> + *  Stefan Hajnoczi   <stefanha@linux.vnet.ibm.com>
+> + *
+> + * Changes for QEMU mainline + tcm_vhost kernel upstream:
+> + *  Nicholas Bellinger <nab@risingtidesystems.com>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2 or later.
+> + * See the COPYING.LIB file in the top-level directory.
 
-> Hi all,
->
-> Here is the error.
->
->   GTESTER check-qtest-x86_64
-> Unable to get file status flag on fd 21860: Bad file descriptor(errno=3D9=
-)
->   GTESTER check-qtest-aarch64
-> Broken pipe
-> GTester: last random seed: R02S3f0d6981dd97231d06e0b2966baf94b9
-> Unable to get file status flag on fd 21965: Bad file descriptor(errno=3D9=
-)
-> Broken pipe
-> GTester: last random seed: R02S29fde958e7ee4c26c4f295ff4dbd47d4
-> Unable to get file status flag on fd 21890: Bad file descriptor(errno=3D9=
-)
-> Broken pipe
-> GTester: last random seed: R02S6d074187e5c8501255c96b247f5c8e3f
-> Unable to get file status flag on fd 21923: Bad file descriptor(errno=3D9=
-)
-> Broken pipe
-> GTester: last random seed: R02S446127f38eb9e8b4f181e6fc95026ba0
->   GTESTER tests/test-qht-par
-> Could not access KVM kernel module: No such file or directory
->
->
-> The fd '21860' '21965', '21890', '21923' is a little strange. Following i=
-s
-> my guess.
->
-> 21280 --> 0x5564
-> 21965 --> 0x55CD
-> 21890 --> 0x5582
-> 21923 --> 0x55A3
->
-> Seems they are stack uninitialized value which 'fd's memory holds.
-> Seems 'qemu_chr_fe_get_msgfds' first failed, then the 'fd' is an
-> uninitialized value
-> cause my first patch 'assert' fails.
->
->
+Let's double-check: Stefan, Nicholas, should this file be LGPLv2.1+
+(like hw/scsi/vhost-scsi.c) or rather GPLv2+ (like hw/virtio/virtio-pci.c) ?
 
-First of all I want to know does the following error means?
-doesn't it mean "the x86 qtest is ok and aarch64 is not ok"?
-
-
-  GTESTER check-qtest-x86_64
-  GTESTER check-qtest-aarch64
-vhost-user-test: /tmp/qemu-test/src/util/oslib-posix.c:245:
-qemu_set_nonblock: Assertion `f !=3D -1' failed.
-Broken pipe
-GTester: last random seed: R02S61a1e35369394d7efb0a0e96d8af615d
-  GTESTER tests/test-qht-par
-vhost-user-test: /tmp/qemu-test/src/util/oslib-posix.c:245:
-qemu_set_nonblock: Assertion `f !=3D -1' failed.
-Broken pipe
-GTester: last random seed: R02Sbf8c21ef5f216840e073ff3e487dedbc
-vhost-user-test: /tmp/qemu-test/src/util/oslib-posix.c:245:
-qemu_set_nonblock: Assertion `f !=3D -1' failed.
-Broken pipe
-GTester: last random seed: R02Sfe8cd276fddf3a92891cf274bf88e888
-vhost-user-test: /tmp/qemu-test/src/util/oslib-posix.c:245:
-qemu_set_nonblock: Assertion `f !=3D -1' failed.
-Broken pipe
-GTester: last random seed: R02S7487fc065e22541ba4c78c0db6c61d3c
-Could not access KVM kernel module: No such file or directory
+ Thomas
 
 
-This issue is caused by 'chr_read' in vhost-user-test.c processes
-'VHOST_USER_SET_VRING_CALL'.
-qemu_chr_fe_get_msgfds->tcp_get_msgfds
-
-static int tcp_get_msgfds(Chardev *chr, int *fds, int num)
-{
-    SocketChardev *s =3D SOCKET_CHARDEV(chr);
-
-    int to_copy =3D (s->read_msgfds_num < num) ? s->read_msgfds_num : num;
-
-    assert(num <=3D TCP_MAX_FDS);
-
-    if (to_copy) {
-        int i;
-
-        memcpy(fds, s->read_msgfds, to_copy * sizeof(int));
-
-        /* Close unused fds */
-        for (i =3D to_copy; i < s->read_msgfds_num; i++) {
-            close(s->read_msgfds[i]);
-        }
-
-        g_free(s->read_msgfds);
-        s->read_msgfds =3D 0;
-        s->read_msgfds_num =3D 0;
-    }
-
-    return to_copy;
-}
-
-The 's->read_msgfds_num' is 0, so qemu_chr_fe_get_msgfds returns 0, and
-'fd' be an uninitialized stack value.
-
-The reason why 's->read_msgfds_num' is 0 is that in 'vhost_set_vring_file'.
-the 'ioeventfd_enabled()' returns 0 and 'kvm_eventfds_allowed' is 0 which
-means the
-kernel doesn't support eventfd.
-
-static int vhost_set_vring_file(struct vhost_dev *dev,
-                                VhostUserRequest request,
-                                struct vhost_vring_file *file)
-{
-
-    if (ioeventfd_enabled() && file->fd > 0) {
-        fds[fd_num++] =3D file->fd;
-    } else {
-        msg.payload.u64 |=3D VHOST_USER_VRING_NOFD_MASK;
-    }
-  ...
-    return 0;
-}
-
-
-
-After I look at the kernel, the arm platform seems doesn't support eventfd.
-
-So if my understanding is correct in the first, '"the x86 qtest is ok and
-aarch64 is not ok".
-This can be explainable. But if not, there maybe another issue.
-
-Since this is related with vhost-user-test, Cc Jason and Michael .
-
-Thanks,
-Li Qiang
-
-
-
-> Thanks,
-> Li Qiang
->
->
->
-> <no-reply@patchew.org> =E4=BA=8E2018=E5=B9=B412=E6=9C=8814=E6=97=A5=E5=91=
-=A8=E4=BA=94 =E4=B8=8A=E5=8D=8812:01=E5=86=99=E9=81=93=EF=BC=9A
->
->> Patchew URL:
->> https://patchew.org/QEMU/1544701071-2922-1-git-send-email-liq3ea@gmail.c=
-om/
->>
->>
->>
->> Hi,
->>
->> This series failed the docker-quick@centos7 build test. Please find the
->> testing commands and
->> their output below. If you have Docker installed, you can probably
->> reproduce it
->> locally.
->>
->> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
->> #!/bin/bash
->> time make docker-test-quick@centos7 SHOW_ENV=3D1 J=3D8
->> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
->>
->> libpmem support   no
->> libudev           no
->>
->> WARNING: Use of SDL 1.2 is deprecated and will be removed in
->> WARNING: future releases. Please switch to using SDL 2.0
->>
->> NOTE: cross-compilers enabled:  'cc'
->>   GEN     x86_64-softmmu/config-devices.mak.tmp
->>
->>
->> The full log is available at
->>
->> http://patchew.org/logs/1544701071-2922-1-git-send-email-liq3ea@gmail.co=
-m/testing.docker-quick@centos7/?type=3Dmessage
->> .
->> ---
->> Email generated automatically by Patchew [http://patchew.org/].
->> Please send your feedback to patchew-devel@redhat.com
->
->
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +
+> +#include "standard-headers/linux/virtio_pci.h"
+> +#include "hw/virtio/vhost-scsi.h"
+> +#include "qapi/error.h"
+> +#include "virtio-pci.h"
+> +
+> +typedef struct VHostSCSIPCI VHostSCSIPCI;
+> +
+> +/*
+> + * vhost-scsi-pci: This extends VirtioPCIProxy.
+> + */
+> +#define TYPE_VHOST_SCSI_PCI "vhost-scsi-pci"
+> +#define VHOST_SCSI_PCI(obj) \
+> +        OBJECT_CHECK(VHostSCSIPCI, (obj), TYPE_VHOST_SCSI_PCI)
+> +
+> +struct VHostSCSIPCI {
+> +    VirtIOPCIProxy parent_obj;
+> +    VHostSCSI vdev;
+> +};
+> +
+> +static Property vhost_scsi_pci_properties[] = {
+> +    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
+> +                       DEV_NVECTORS_UNSPECIFIED),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void vhost_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+> +{
+> +    VHostSCSIPCI *dev = VHOST_SCSI_PCI(vpci_dev);
+> +    DeviceState *vdev = DEVICE(&dev->vdev);
+> +    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
+> +
+> +    if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
+> +        vpci_dev->nvectors = vs->conf.num_queues + 3;
+> +    }
+> +
+> +    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
+> +    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
+> +}
+> +
+> +static void vhost_scsi_pci_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
+> +    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
+> +    k->realize = vhost_scsi_pci_realize;
+> +    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+> +    dc->props = vhost_scsi_pci_properties;
+> +    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
+> +    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_SCSI;
+> +    pcidev_k->revision = 0x00;
+> +    pcidev_k->class_id = PCI_CLASS_STORAGE_SCSI;
+> +}
+> +
+> +static void vhost_scsi_pci_instance_init(Object *obj)
+> +{
+> +    VHostSCSIPCI *dev = VHOST_SCSI_PCI(obj);
+> +
+> +    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
+> +                                TYPE_VHOST_SCSI);
+> +    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
+> +                              "bootindex", &error_abort);
+> +}
+> +
+> +static const TypeInfo vhost_scsi_pci_info = {
+> +    .name          = TYPE_VHOST_SCSI_PCI,
+> +    .parent        = TYPE_VIRTIO_PCI,
+> +    .instance_size = sizeof(VHostSCSIPCI),
+> +    .instance_init = vhost_scsi_pci_instance_init,
+> +    .class_init    = vhost_scsi_pci_class_init,
+> +};
+> +
+> +static void vhost_scsi_pci_register(void)
+> +{
+> +    type_register_static(&vhost_scsi_pci_info);
+> +}
+> +
+> +type_init(vhost_scsi_pci_register)
+> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> index 7c99d9385a..6c42074d37 100644
+> --- a/hw/virtio/virtio-pci.c
+> +++ b/hw/virtio/virtio-pci.c
+> @@ -2019,62 +2019,6 @@ static const TypeInfo virtio_scsi_pci_info = {
+>      .class_init    = virtio_scsi_pci_class_init,
+>  };
+>  
+> -/* vhost-scsi-pci */
+> -
+> -#ifdef CONFIG_VHOST_SCSI
+> -static Property vhost_scsi_pci_properties[] = {
+> -    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
+> -                       DEV_NVECTORS_UNSPECIFIED),
+> -    DEFINE_PROP_END_OF_LIST(),
+> -};
+> -
+> -static void vhost_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+> -{
+> -    VHostSCSIPCI *dev = VHOST_SCSI_PCI(vpci_dev);
+> -    DeviceState *vdev = DEVICE(&dev->vdev);
+> -    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
+> -
+> -    if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
+> -        vpci_dev->nvectors = vs->conf.num_queues + 3;
+> -    }
+> -
+> -    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
+> -    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
+> -}
+> -
+> -static void vhost_scsi_pci_class_init(ObjectClass *klass, void *data)
+> -{
+> -    DeviceClass *dc = DEVICE_CLASS(klass);
+> -    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
+> -    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
+> -    k->realize = vhost_scsi_pci_realize;
+> -    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+> -    dc->props = vhost_scsi_pci_properties;
+> -    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
+> -    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_SCSI;
+> -    pcidev_k->revision = 0x00;
+> -    pcidev_k->class_id = PCI_CLASS_STORAGE_SCSI;
+> -}
+> -
+> -static void vhost_scsi_pci_instance_init(Object *obj)
+> -{
+> -    VHostSCSIPCI *dev = VHOST_SCSI_PCI(obj);
+> -
+> -    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
+> -                                TYPE_VHOST_SCSI);
+> -    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
+> -                              "bootindex", &error_abort);
+> -}
+> -
+> -static const TypeInfo vhost_scsi_pci_info = {
+> -    .name          = TYPE_VHOST_SCSI_PCI,
+> -    .parent        = TYPE_VIRTIO_PCI,
+> -    .instance_size = sizeof(VHostSCSIPCI),
+> -    .instance_init = vhost_scsi_pci_instance_init,
+> -    .class_init    = vhost_scsi_pci_class_init,
+> -};
+> -#endif
+> -
+>  /* virtio-serial-pci */
+>  
+>  static void virtio_serial_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+> @@ -2256,9 +2200,6 @@ static void virtio_pci_register_types(void)
+>      type_register_static(&virtio_scsi_pci_info);
+>      type_register_static(&virtio_serial_pci_info);
+>      type_register_static(&virtio_net_pci_info);
+> -#ifdef CONFIG_VHOST_SCSI
+> -    type_register_static(&vhost_scsi_pci_info);
+> -#endif
+>  }
+>  
+>  type_init(virtio_pci_register_types)
+> diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+> index 7f06d7f331..eb7cdbad25 100644
+> --- a/hw/virtio/virtio-pci.h
+> +++ b/hw/virtio/virtio-pci.h
+> @@ -24,16 +24,11 @@
+>  #include "hw/virtio/virtio-gpu.h"
+>  #include "hw/virtio/virtio-crypto.h"
+>  
+> -#ifdef CONFIG_VHOST_SCSI
+> -#include "hw/virtio/vhost-scsi.h"
+> -#endif
+> -
+>  typedef struct VirtIOPCIProxy VirtIOPCIProxy;
+>  typedef struct VirtIOBlkPCI VirtIOBlkPCI;
+>  typedef struct VirtIOSCSIPCI VirtIOSCSIPCI;
+>  typedef struct VirtIOSerialPCI VirtIOSerialPCI;
+>  typedef struct VirtIONetPCI VirtIONetPCI;
+> -typedef struct VHostSCSIPCI VHostSCSIPCI;
+>  typedef struct VirtIOGPUPCI VirtIOGPUPCI;
+>  typedef struct VirtIOCryptoPCI VirtIOCryptoPCI;
+>  
+> @@ -204,20 +199,6 @@ struct VirtIOSCSIPCI {
+>      VirtIOSCSI vdev;
+>  };
+>  
+> -#ifdef CONFIG_VHOST_SCSI
+> -/*
+> - * vhost-scsi-pci: This extends VirtioPCIProxy.
+> - */
+> -#define TYPE_VHOST_SCSI_PCI "vhost-scsi-pci"
+> -#define VHOST_SCSI_PCI(obj) \
+> -        OBJECT_CHECK(VHostSCSIPCI, (obj), TYPE_VHOST_SCSI_PCI)
+> -
+> -struct VHostSCSIPCI {
+> -    VirtIOPCIProxy parent_obj;
+> -    VHostSCSI vdev;
+> -};
+> -#endif
+> -
+>  /*
+>   * virtio-blk-pci: This extends VirtioPCIProxy.
+>   */
+> 
