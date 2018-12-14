@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48072)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gXlT8-0005p1-Oh
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 06:17:23 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gXlW6-0007H4-Ua
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 06:20:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gXlT5-0001uN-3i
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 06:17:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54104)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gXlT4-0001sk-QU
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 06:17:19 -0500
-Date: Fri, 14 Dec 2018 11:17:06 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181214111705.GD2454@work-vm>
-References: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
-	<1544516693-5395-8-git-send-email-wei.w.wang@intel.com>
-	<20181213154548.GP2313@work-vm> <5C135017.3070203@intel.com>
-	<20181214095646.GB2454@work-vm> <5C13862B.1010905@intel.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gXlW4-0004Wc-Tz
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 06:20:26 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:34627)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gXlW2-0004Ts-Qj
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 06:20:23 -0500
+Received: by mail-ot1-x344.google.com with SMTP id t5so5072077otk.1
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 03:20:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5C13862B.1010905@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v11 7/7] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_HINT
+References: <20181213175552.14857-1-wainersm@redhat.com>
+	<CAFEAcA86SDLGyqL3rG-fEDFsEj8-nz-Uqn5Mb9EeLqiFPeKZfA@mail.gmail.com>
+	<cccf3c43-0e51-bbbc-3676-17286b11ec99@redhat.com>
+	<CAFEAcA9CpR=JGt74=xaUddYhf5SCOoeHH_v+O1L+rrTygZ7quQ@mail.gmail.com>
+	<860b98f8-02d0-4c96-ccf2-d582ca295b95@redhat.com>
+	<871s6kfwoo.fsf@dusky.pond.sub.org>
+In-Reply-To: <871s6kfwoo.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 14 Dec 2018 11:20:10 +0000
+Message-ID: <CAFEAcA_KP532BBsESjO1NuKSeefSKH7RdpCdSDLfgMCtc6D5nw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/1] checkpatch: checker for comment block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,68 +33,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-* Wei Wang (wei.w.wang@intel.com) wrote:
-> On 12/14/2018 05:56 PM, Dr. David Alan Gilbert wrote:
-> > * Wei Wang (wei.w.wang@intel.com) wrote:
-> > > On 12/13/2018 11:45 PM, Dr. David Alan Gilbert wrote:
-> > > > * Wei Wang (wei.w.wang@intel.com) wrote:
-> > > > > The new feature enables the virtio-balloon device to receive hints of
-> > > > > guest free pages from the free page vq.
-> > > > > 
-> > > > > A notifier is registered to the migration precopy notifier chain. The
-> > > > > notifier calls free_page_start after the migration thread syncs the dirty
-> > > > > bitmap, so that the free page optimization starts to clear bits of free
-> > > > > pages from the bitmap. It calls the free_page_stop before the migration
-> > > > > thread syncs the bitmap, which is the end of the current round of ram
-> > > > > save. The free_page_stop is also called to stop the optimization in the
-> > > > > case when there is an error occurred in the process of ram saving.
-> > > > > 
-> > > > > Note: balloon will report pages which were free at the time of this call.
-> > > > > As the reporting happens asynchronously, dirty bit logging must be
-> > > > > enabled before this free_page_start call is made. Guest reporting must be
-> > > > > disabled before the migration dirty bitmap is synchronized.
-> > > > > 
-> > > > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> > > > > CC: Michael S. Tsirkin <mst@redhat.com>
-> > > > > CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > > > CC: Juan Quintela <quintela@redhat.com>
-> > > > > CC: Peter Xu <peterx@redhat.com>
-> > > > I think I'm OK for this from the migration side, I'd appreciate
-> > > > someone checking the virtio and aio bits.
-> > > > 
-> > > > I'm not too sure how it gets switched on and off - i.e. if we get a nice
-> > > > new qemu on a new kernel, what happens when I try and migrate to the
-> > > > same qemu on an older kernel without these hints?
-> > > > 
-> > > This feature doesn't rely on the host kernel. Those hints are reported from
-> > > the guest kernel.
-> > > So migration across different hosts wouldn't affect the use of this feature.
-> > > Please correct me if I didn't get your point.
-> > Ah OK, yes;  now what about migrating from new->old qemu with a new
-> > guest but old machine type?
-> > 
-> 
-> I think normally, the source QEMU and destination QEMU should have the same
-> QEMU booting parameter. If the destination QEMU doesn't support
-> "--device virtio-balloon,free-page-hint=true", which the source QEMU has,
-> the
-> destination side QEMU will fail to boot, and migration will not happen then.
+On Fri, 14 Dec 2018 at 06:29, Markus Armbruster <armbru@redhat.com> wrote:
+>
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+>
+> > On 13/12/18 19:21, Peter Maydell wrote:
+> >> On Thu, 13 Dec 2018 at 18:07, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >>> On 13/12/18 19:01, Peter Maydell wrote:
+> >>>> I sent a patch to do this a little while back:
+> >>>>  https://patchwork.kernel.org/patch/10561557/
 
-Ah that's OK; as long as free-page-hint is false by default that will
-work fine.
+> >>>> Personally I think we should just commit my patch, and then
+> >>>> we can stop having people manually pointing out where
+> >>>> submitters' patches don't match CODING_STYLE.
+>
+> Concur.  It has my R-by, modulo a commit message tweak.
 
-Dave
+I have to admit I never really understood what tweak
+you wanted making to the commit message. I'm happy
+to make it clearer: do you want to suggest a rewording?
 
-> But I think there is still an option to make the migration possible. The
-> "free-page-hint"
-> can be set to false via e.g. QMP on the source side, then the destination
-> side QEMU
-> can boot without "free-page-hint".
-> 
-> Best,
-> Wei
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
