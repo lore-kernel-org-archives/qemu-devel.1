@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXfxW-0004On-Bx
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:23 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gXfxX-0004P2-Nt
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXfxR-0005Jj-GQ
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:21 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46940)
+	(envelope-from <richard.henderson@linaro.org>) id 1gXfxW-0005LM-Cb
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:23 -0500
+Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:45304)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gXfxP-0005Iy-K2
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:15 -0500
-Received: by mail-oi1-x242.google.com with SMTP id x202so3606881oif.13
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 21:24:15 -0800 (PST)
+	id 1gXfxT-0005K2-Fq
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 00:24:21 -0500
+Received: by mail-oi1-x236.google.com with SMTP id y1so3607062oie.12
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 21:24:18 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 13 Dec 2018 23:23:44 -0600
-Message-Id: <20181214052410.11863-2-richard.henderson@linaro.org>
+Date: Thu, 13 Dec 2018 23:23:47 -0600
+Message-Id: <20181214052410.11863-5-richard.henderson@linaro.org>
 In-Reply-To: <20181214052410.11863-1-richard.henderson@linaro.org>
 References: <20181214052410.11863-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 01/27] target/arm: Add state for the
- ARMv8.3-PAuth extension
+Subject: [Qemu-devel] [PATCH v2 04/27] target/arm: Add PAuth helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +29,237 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Add storage space for the 5 encryption keys.
+The cryptographic internals are stubbed out for now,
+but the enable and trap bits are checked.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ----
-v2: Remove pointless double migration.
-    Use a struct to make it clear which half is which.
+v2: Remove trap from xpac* helpers; these are now side-effect free.
+    Use struct ARMPACKey.
 ---
- target/arm/cpu.h | 30 +++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+ target/arm/helper-a64.h |  12 +++
+ target/arm/internals.h  |   6 ++
+ target/arm/helper-a64.c | 166 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 184 insertions(+)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index c943f35dd9..39d4afdfe6 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -201,11 +201,16 @@ typedef struct ARMVectorReg {
-     uint64_t d[2 * ARM_MAX_VQ] QEMU_ALIGNED(16);
- } ARMVectorReg;
- 
--/* In AArch32 mode, predicate registers do not exist at all.  */
- #ifdef TARGET_AARCH64
-+/* In AArch32 mode, predicate registers do not exist at all.  */
- typedef struct ARMPredicateReg {
-     uint64_t p[2 * ARM_MAX_VQ / 8] QEMU_ALIGNED(16);
- } ARMPredicateReg;
+diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
+index 9d3a907049..28aa0af69d 100644
+--- a/target/arm/helper-a64.h
++++ b/target/arm/helper-a64.h
+@@ -85,3 +85,15 @@ DEF_HELPER_2(advsimd_rinth, f16, f16, ptr)
+ DEF_HELPER_2(advsimd_f16tosinth, i32, f16, ptr)
+ DEF_HELPER_2(advsimd_f16touinth, i32, f16, ptr)
+ DEF_HELPER_2(sqrt_f16, f16, f16, ptr)
 +
-+/* In AArch32 mode, PAC keys do not exist at all.  */
-+typedef struct ARMPACKey {
-+    uint64_t lo, hi;
-+} ARMPACKey;
- #endif
- 
- 
-@@ -605,6 +610,14 @@ typedef struct CPUARMState {
-         uint32_t cregs[16];
-     } iwmmxt;
- 
-+#ifdef TARGET_AARCH64
-+    ARMPACKey apia_key;
-+    ARMPACKey apib_key;
-+    ARMPACKey apda_key;
-+    ARMPACKey apdb_key;
-+    ARMPACKey apga_key;
-+#endif
-+
- #if defined(CONFIG_USER_ONLY)
-     /* For usermode syscall translation.  */
-     int eabi;
-@@ -3324,6 +3337,21 @@ static inline bool isar_feature_aa64_fcma(const ARMISARegisters *id)
-     return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, FCMA) != 0;
++DEF_HELPER_FLAGS_3(pacia, TCG_CALL_NO_WG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_3(pacib, TCG_CALL_NO_WG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_3(pacda, TCG_CALL_NO_WG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_3(pacdb, TCG_CALL_NO_WG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_3(pacga, TCG_CALL_NO_WG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_3(autia, TCG_CALL_NO_WG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_3(autib, TCG_CALL_NO_WG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_3(autda, TCG_CALL_NO_WG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_3(autdb, TCG_CALL_NO_WG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_2(xpaci, TCG_CALL_NO_RWG_SE, i64, env, i64)
++DEF_HELPER_FLAGS_2(xpacd, TCG_CALL_NO_RWG_SE, i64, env, i64)
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index 78e026d6e9..6bc0daf560 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -259,6 +259,7 @@ enum arm_exception_class {
+     EC_CP14DTTRAP             = 0x06,
+     EC_ADVSIMDFPACCESSTRAP    = 0x07,
+     EC_FPIDTRAP               = 0x08,
++    EC_PACTRAP                = 0x09,
+     EC_CP14RRTTRAP            = 0x0c,
+     EC_ILLEGALSTATE           = 0x0e,
+     EC_AA32_SVC               = 0x11,
+@@ -426,6 +427,11 @@ static inline uint32_t syn_sve_access_trap(void)
+     return EC_SVEACCESSTRAP << ARM_EL_EC_SHIFT;
  }
  
-+static inline bool isar_feature_aa64_pauth(const ARMISARegisters *id)
++static inline uint32_t syn_pactrap(void)
 +{
-+    /*
-+     * Note that while QEMU will only implement the architected algorithm
-+     * QARMA, and thus APA+GPA, the host cpu for kvm may use implementation
-+     * defined algorithms, and thus API+GPI, and this predicate controls
-+     * migration of the 128-bit keys.
-+     */
-+    return (id->id_aa64isar1 &
-+            (FIELD_DP64(0, ID_AA64ISAR1, APA, -1) |
-+             FIELD_DP64(0, ID_AA64ISAR1, API, -1) |
-+             FIELD_DP64(0, ID_AA64ISAR1, GPA, -1) |
-+             FIELD_DP64(0, ID_AA64ISAR1, GPI, -1))) != 0;
++    return EC_PACTRAP << ARM_EL_EC_SHIFT;
 +}
 +
- static inline bool isar_feature_aa64_fp16(const ARMISARegisters *id)
+ static inline uint32_t syn_insn_abort(int same_el, int ea, int s1ptw, int fsc)
  {
-     /* We always set the AdvSIMD and FP fields identically wrt FP16.  */
+     return (EC_INSNABORT << ARM_EL_EC_SHIFT) | (same_el << ARM_EL_EC_SHIFT)
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index 61799d20e1..bb64700e10 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -898,4 +898,170 @@ uint32_t HELPER(sqrt_f16)(uint32_t a, void *fpstp)
+     return float16_sqrt(a, s);
+ }
+ 
++/*
++ * Helpers for ARMv8.3-PAuth.
++ */
+ 
++static uint64_t pauth_computepac(uint64_t data, uint64_t modifier,
++                                 ARMPACKey key)
++{
++    g_assert_not_reached(); /* FIXME */
++}
++
++static uint64_t pauth_addpac(CPUARMState *env, uint64_t ptr, uint64_t modifier,
++                             ARMPACKey *key, bool data)
++{
++    g_assert_not_reached(); /* FIXME */
++}
++
++static uint64_t pauth_auth(CPUARMState *env, uint64_t ptr, uint64_t modifier,
++                           ARMPACKey *key, bool data, int keynumber)
++{
++    g_assert_not_reached(); /* FIXME */
++}
++
++static uint64_t pauth_strip(CPUARMState *env, uint64_t ptr, bool data)
++{
++    g_assert_not_reached(); /* FIXME */
++}
++
++static void QEMU_NORETURN pauth_trap(CPUARMState *env, int target_el,
++                                     uintptr_t ra)
++{
++    CPUState *cs = ENV_GET_CPU(env);
++
++    cs->exception_index = EXCP_UDEF;
++    env->exception.syndrome = syn_pactrap();
++    env->exception.target_el = target_el;
++    cpu_loop_exit_restore(cs, ra);
++}
++
++static void pauth_check_trap(CPUARMState *env, int el, uintptr_t ra)
++{
++    if (el < 2 && arm_feature(env, ARM_FEATURE_EL2)) {
++        uint64_t hcr = arm_hcr_el2_eff(env);
++        bool trap = !(hcr & HCR_API);
++        /* FIXME: ARMv8.1-VHE: trap only applies to EL1&0 regime.  */
++        /* FIXME: ARMv8.3-NV: HCR_NV trap takes precedence for ERETA[AB].  */
++        if (trap) {
++            pauth_trap(env, 2, ra);
++        }
++    }
++    if (el < 3 && arm_feature(env, ARM_FEATURE_EL3)) {
++        if (!(env->cp15.scr_el3 & SCR_API)) {
++            pauth_trap(env, 3, ra);
++        }
++    }
++}
++
++static bool pauth_key_enabled(CPUARMState *env, int el, uint32_t bit)
++{
++    uint32_t sctlr;
++    if (el == 0) {
++        /* FIXME: ARMv8.1-VHE S2 translation regime.  */
++        sctlr = env->cp15.sctlr_el[1];
++    } else {
++        sctlr = env->cp15.sctlr_el[el];
++    }
++    return (sctlr & bit) != 0;
++}
++
++uint64_t HELPER(pacia)(CPUARMState *env, uint64_t x, uint64_t y)
++{
++    int el = arm_current_el(env);
++    if (!pauth_key_enabled(env, el, SCTLR_EnIA)) {
++        return x;
++    }
++    pauth_check_trap(env, el, GETPC());
++    return pauth_addpac(env, x, y, &env->apia_key, false);
++}
++
++uint64_t HELPER(pacib)(CPUARMState *env, uint64_t x, uint64_t y)
++{
++    int el = arm_current_el(env);
++    if (!pauth_key_enabled(env, el, SCTLR_EnIB)) {
++        return x;
++    }
++    pauth_check_trap(env, el, GETPC());
++    return pauth_addpac(env, x, y, &env->apib_key, false);
++}
++
++uint64_t HELPER(pacda)(CPUARMState *env, uint64_t x, uint64_t y)
++{
++    int el = arm_current_el(env);
++    if (!pauth_key_enabled(env, el, SCTLR_EnDA)) {
++        return x;
++    }
++    pauth_check_trap(env, el, GETPC());
++    return pauth_addpac(env, x, y, &env->apda_key, true);
++}
++
++uint64_t HELPER(pacdb)(CPUARMState *env, uint64_t x, uint64_t y)
++{
++    int el = arm_current_el(env);
++    if (!pauth_key_enabled(env, el, SCTLR_EnDB)) {
++        return x;
++    }
++    pauth_check_trap(env, el, GETPC());
++    return pauth_addpac(env, x, y, &env->apdb_key, true);
++}
++
++uint64_t HELPER(pacga)(CPUARMState *env, uint64_t x, uint64_t y)
++{
++    uint64_t pac;
++
++    pauth_check_trap(env, arm_current_el(env), GETPC());
++    pac = pauth_computepac(x, y, env->apga_key);
++
++    return pac & 0xffffffff00000000ull;
++}
++
++uint64_t HELPER(autia)(CPUARMState *env, uint64_t x, uint64_t y)
++{
++    int el = arm_current_el(env);
++    if (!pauth_key_enabled(env, el, SCTLR_EnIA)) {
++        return x;
++    }
++    pauth_check_trap(env, el, GETPC());
++    return pauth_auth(env, x, y, &env->apia_key, false, 0);
++}
++
++uint64_t HELPER(autib)(CPUARMState *env, uint64_t x, uint64_t y)
++{
++    int el = arm_current_el(env);
++    if (!pauth_key_enabled(env, el, SCTLR_EnIB)) {
++        return x;
++    }
++    pauth_check_trap(env, el, GETPC());
++    return pauth_auth(env, x, y, &env->apib_key, false, 1);
++}
++
++uint64_t HELPER(autda)(CPUARMState *env, uint64_t x, uint64_t y)
++{
++    int el = arm_current_el(env);
++    if (!pauth_key_enabled(env, el, SCTLR_EnDA)) {
++        return x;
++    }
++    pauth_check_trap(env, el, GETPC());
++    return pauth_auth(env, x, y, &env->apda_key, true, 0);
++}
++
++uint64_t HELPER(autdb)(CPUARMState *env, uint64_t x, uint64_t y)
++{
++    int el = arm_current_el(env);
++    if (!pauth_key_enabled(env, el, SCTLR_EnDB)) {
++        return x;
++    }
++    pauth_check_trap(env, el, GETPC());
++    return pauth_auth(env, x, y, &env->apdb_key, true, 1);
++}
++
++uint64_t HELPER(xpaci)(CPUARMState *env, uint64_t a)
++{
++    return pauth_strip(env, a, false);
++}
++
++uint64_t HELPER(xpacd)(CPUARMState *env, uint64_t a)
++{
++    return pauth_strip(env, a, true);
++}
 -- 
 2.17.2
