@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXe0y-000635-Bw
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 22:19:50 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gXe12-00068F-K5
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 22:19:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXe0u-0006yP-Ak
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 22:19:46 -0500
-Received: from mail-oi1-x233.google.com ([2607:f8b0:4864:20::233]:45961)
+	(envelope-from <richard.henderson@linaro.org>) id 1gXe10-0007Eu-Mo
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 22:19:52 -0500
+Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:36802)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gXe0u-0006wi-2W
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 22:19:44 -0500
-Received: by mail-oi1-x233.google.com with SMTP id y1so3443140oie.12
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 19:19:44 -0800 (PST)
+	id 1gXe0y-00072h-I6
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 22:19:50 -0500
+Received: by mail-ot1-x32b.google.com with SMTP id k98so4130215otk.3
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 19:19:46 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 13 Dec 2018 21:19:06 -0600
-Message-Id: <20181214031923.29527-17-richard.henderson@linaro.org>
+Date: Thu, 13 Dec 2018 21:19:08 -0600
+Message-Id: <20181214031923.29527-19-richard.henderson@linaro.org>
 In-Reply-To: <20181214031923.29527-1-richard.henderson@linaro.org>
 References: <20181214031923.29527-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 15/32] tcg/ppc: Return false on failure from
- patch_reloc
+Subject: [Qemu-devel] [PULL 17/32] tcg/i386: Propagate is64 to
+ tcg_out_qemu_ld_direct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,95 +30,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-The reloc_pc{14,24}_val routines retain their asserts.
-Use these directly within the slow paths.
+This helps preserve the invariant that all TCG_TYPE_I32 values
+are stored zero-extended in the 64-bit host registers.
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/ppc/tcg-target.inc.c | 32 +++++++++++++++++++++-----------
- 1 file changed, 21 insertions(+), 11 deletions(-)
+ tcg/i386/tcg-target.inc.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index 860b0d36e1..8c1cfdd7ac 100644
---- a/tcg/ppc/tcg-target.inc.c
-+++ b/tcg/ppc/tcg-target.inc.c
-@@ -193,9 +193,14 @@ static uint32_t reloc_pc24_val(tcg_insn_unit *pc, tcg_insn_unit *target)
-     return disp & 0x3fffffc;
- }
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index 28192f4608..6bf4f84b20 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -1883,10 +1883,11 @@ static inline void setup_guest_base_seg(void) { }
  
--static void reloc_pc24(tcg_insn_unit *pc, tcg_insn_unit *target)
-+static bool reloc_pc24(tcg_insn_unit *pc, tcg_insn_unit *target)
+ static void tcg_out_qemu_ld_direct(TCGContext *s, TCGReg datalo, TCGReg datahi,
+                                    TCGReg base, int index, intptr_t ofs,
+-                                   int seg, TCGMemOp memop)
++                                   int seg, bool is64, TCGMemOp memop)
  {
--    *pc = (*pc & ~0x3fffffc) | reloc_pc24_val(pc, target);
-+    ptrdiff_t disp = tcg_ptr_byte_diff(target, pc);
-+    if (in_range_b(disp)) {
-+        *pc = (*pc & ~0x3fffffc) | (disp & 0x3fffffc);
-+        return true;
-+    }
-+    return false;
- }
+     const TCGMemOp real_bswap = memop & MO_BSWAP;
+     TCGMemOp bswap = real_bswap;
++    int rexw = is64 * P_REXW;
+     int movop = OPC_MOVL_GvEv;
  
- static uint16_t reloc_pc14_val(tcg_insn_unit *pc, tcg_insn_unit *target)
-@@ -205,9 +210,14 @@ static uint16_t reloc_pc14_val(tcg_insn_unit *pc, tcg_insn_unit *target)
-     return disp & 0xfffc;
- }
- 
--static void reloc_pc14(tcg_insn_unit *pc, tcg_insn_unit *target)
-+static bool reloc_pc14(tcg_insn_unit *pc, tcg_insn_unit *target)
- {
--    *pc = (*pc & ~0xfffc) | reloc_pc14_val(pc, target);
-+    ptrdiff_t disp = tcg_ptr_byte_diff(target, pc);
-+    if (disp == (int16_t) disp) {
-+        *pc = (*pc & ~0xfffc) | (disp & 0xfffc);
-+        return true;
-+    }
-+    return false;
- }
- 
- /* parse target specific constraints */
-@@ -524,11 +534,9 @@ static bool patch_reloc(tcg_insn_unit *code_ptr, int type,
- 
-     switch (type) {
-     case R_PPC_REL14:
--        reloc_pc14(code_ptr, target);
--        break;
-+        return reloc_pc14(code_ptr, target);
-     case R_PPC_REL24:
--        reloc_pc24(code_ptr, target);
--        break;
-+        return reloc_pc24(code_ptr, target);
-     case R_PPC_ADDR16:
-         /* We are abusing this relocation type.  This points to a pair
-            of insns, addis + load.  If the displacement is small, we
-@@ -540,7 +548,9 @@ static bool patch_reloc(tcg_insn_unit *code_ptr, int type,
+     if (have_movbe && real_bswap) {
+@@ -1900,7 +1901,7 @@ static void tcg_out_qemu_ld_direct(TCGContext *s, TCGReg datalo, TCGReg datahi,
+                                  base, index, 0, ofs);
+         break;
+     case MO_SB:
+-        tcg_out_modrm_sib_offset(s, OPC_MOVSBL + P_REXW + seg, datalo,
++        tcg_out_modrm_sib_offset(s, OPC_MOVSBL + rexw + seg, datalo,
+                                  base, index, 0, ofs);
+         break;
+     case MO_UW:
+@@ -1920,9 +1921,9 @@ static void tcg_out_qemu_ld_direct(TCGContext *s, TCGReg datalo, TCGReg datahi,
+                                          base, index, 0, ofs);
+                 tcg_out_rolw_8(s, datalo);
+             }
+-            tcg_out_modrm(s, OPC_MOVSWL + P_REXW, datalo, datalo);
++            tcg_out_modrm(s, OPC_MOVSWL + rexw, datalo, datalo);
          } else {
-             int16_t lo = value;
-             int hi = value - lo;
--            assert(hi + lo == value);
-+            if (hi + lo != value) {
-+                return false;
-+            }
-             code_ptr[0] = deposit32(code_ptr[0], 0, 16, hi >> 16);
-             code_ptr[1] = deposit32(code_ptr[1], 0, 16, lo);
+-            tcg_out_modrm_sib_offset(s, OPC_MOVSWL + P_REXW + seg,
++            tcg_out_modrm_sib_offset(s, OPC_MOVSWL + rexw + seg,
+                                      datalo, base, index, 0, ofs);
          }
-@@ -1638,7 +1648,7 @@ static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
-     TCGMemOp opc = get_memop(oi);
-     TCGReg hi, lo, arg = TCG_REG_R3;
+         break;
+@@ -2010,7 +2011,7 @@ static void tcg_out_qemu_ld(TCGContext *s, const TCGArg *args, bool is64)
+                      label_ptr, offsetof(CPUTLBEntry, addr_read));
  
--    reloc_pc14(lb->label_ptr[0], s->code_ptr);
-+    **lb->label_ptr |= reloc_pc14_val(*lb->label_ptr, s->code_ptr);
+     /* TLB Hit.  */
+-    tcg_out_qemu_ld_direct(s, datalo, datahi, TCG_REG_L1, -1, 0, 0, opc);
++    tcg_out_qemu_ld_direct(s, datalo, datahi, TCG_REG_L1, -1, 0, 0, is64, opc);
  
-     tcg_out_mov(s, TCG_TYPE_PTR, arg++, TCG_AREG0);
+     /* Record the current context of a load into ldst label */
+     add_qemu_ldst_label(s, true, oi, datalo, datahi, addrlo, addrhi,
+@@ -2045,7 +2046,7 @@ static void tcg_out_qemu_ld(TCGContext *s, const TCGArg *args, bool is64)
+         }
  
-@@ -1683,7 +1693,7 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
-     TCGMemOp s_bits = opc & MO_SIZE;
-     TCGReg hi, lo, arg = TCG_REG_R3;
- 
--    reloc_pc14(lb->label_ptr[0], s->code_ptr);
-+    **lb->label_ptr |= reloc_pc14_val(*lb->label_ptr, s->code_ptr);
- 
-     tcg_out_mov(s, TCG_TYPE_PTR, arg++, TCG_AREG0);
- 
+         tcg_out_qemu_ld_direct(s, datalo, datahi,
+-                               base, index, offset, seg, opc);
++                               base, index, offset, seg, is64, opc);
+     }
+ #endif
+ }
 -- 
 2.17.2
