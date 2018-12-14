@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gXnvs-0008VR-7B
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:13 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gXo2c-0006hT-7R
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 09:02:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gXnvm-0001zQ-0l
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:12 -0500
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:54268)
+	(envelope-from <alex.bennee@linaro.org>) id 1gXo2b-0005VI-AL
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 09:02:10 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54230)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gXnvl-0001yv-Pm
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:05 -0500
-Received: by mail-wm1-x329.google.com with SMTP id y1so5744184wmi.3
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 05:55:05 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 14 Dec 2018 13:54:49 +0000
-Message-Id: <20181214135452.25936-13-alex.bennee@linaro.org>
-In-Reply-To: <20181214135452.25936-1-alex.bennee@linaro.org>
-References: <20181214135452.25936-1-alex.bennee@linaro.org>
+	id 1gXo2b-0005Tv-32
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 09:02:09 -0500
+Received: by mail-wm1-x342.google.com with SMTP id y1so5766248wmi.3
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 06:02:07 -0800 (PST)
+References: <20181213223737.11793-1-pbonzini@redhat.com>
+	<20181213223737.11793-3-pbonzini@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181213223737.11793-3-pbonzini@redhat.com>
+Date: Fri, 14 Dec 2018 14:02:04 +0000
+Message-ID: <87imzw1a1v.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 12/15] hardfloat: implement float32/64 division
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/2] avoid TABs in files that only contain
+ a few
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,132 +31,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Weil <sw@weilnetz.de>, Viktor Prutyanov <viktor.prutyanov@phystech.edu>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Amit Shah <amit@kernel.org>, "Michael S.
+	Tsirkin" <mst@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Andrzej Zaborowski <balrogg@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, John Snow <jsnow@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, Jason Wang <jasowang@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, =?utf-8?Q?Herv=C3=A9?= Poussineau <hpoussin@reactos.org>, Fam Zheng <famz@redhat.com>, Magnus Damm <magnus.damm@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, "open list:bochs" <qemu-block@nongnu.org>, "open list:Stellaris" <qemu-arm@nongnu.org>, "open list:X86" <xen-devel@lists.xenproject.org>, "open list:ppc4xx" <qemu-ppc@nongnu.org>
 
-From: "Emilio G. Cota" <cota@braap.org>
 
-Performance results for fp-bench:
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-1. Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
-- before:
-div-single: 34.84 MFlops
-div-double: 34.04 MFlops
-- after:
-div-single: 275.23 MFlops
-div-double: 216.38 MFlops
+> Most files that have TABs only contain a handful of them.  Change
+> them to spaces so that we don't confuse people.
+>
+> disas, standard-headers, linux-headers and libdecnumber are imported
+> from other projects and probably should be exempted from the check.
+> Outside those, after this patch the following files still contain both
+> 8-space and TAB sequences at the beginning of the line.  Many of them
+> have a majority of TABs, or were initially committed with all tabs.
+>
 
-2. ARM Aarch64 A57 @ 2.4GHz
-- before:
-div-single: 9.33 MFlops
-div-double: 9.30 MFlops
-- after:
-div-single: 51.55 MFlops
-div-double: 15.09 MFlops
+For the following:
 
-3. IBM POWER8E @ 2.1 GHz
-- before:
-div-single: 25.65 MFlops
-div-double: 24.91 MFlops
-- after:
-div-single: 96.83 MFlops
-div-double: 31.01 MFlops
+<snip>
+>     tests/tcg/cris/check_addo.c
+>     tests/tcg/cris/check_moveq.c
+>     tests/tcg/cris/check_swap.c
+>     tests/tcg/multiarch/test-mmap.c
 
-Here setting 2FP64_USE_FP to 1 pays off for x86_64:
-[1] 215.97 vs [0] 62.15 MFlops
+>     tests/tcg/cris/check_abs.c
+>     tests/tcg/cris/check_addc.c
+>     tests/tcg/cris/check_addcm.c
+>     tests/tcg/cris/check_addoq.c
+>     tests/tcg/cris/check_bound.c
+>     tests/tcg/cris/check_ftag.c
+>     tests/tcg/cris/check_int64.c
+>     tests/tcg/cris/check_lz.c
+>     tests/tcg/cris/check_openpf5.c
+>     tests/tcg/cris/check_sigalrm.c
+>     tests/tcg/cris/crisutils.h
+>     tests/tcg/cris/sys.c
+>     tests/tcg/i386/test-i386-ssse3.c
+<snip>
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index dad2ce2d9f..82294458fe 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -1628,7 +1628,8 @@ float16 float16_div(float16 a, float16 b, float_status *status)
-     return float16_round_pack_canonical(pr, status);
- }
- 
--float32 float32_div(float32 a, float32 b, float_status *status)
-+static float32 QEMU_SOFTFLOAT_ATTR
-+soft_f32_div(float32 a, float32 b, float_status *status)
- {
-     FloatParts pa = float32_unpack_canonical(a, status);
-     FloatParts pb = float32_unpack_canonical(b, status);
-@@ -1637,7 +1638,8 @@ float32 float32_div(float32 a, float32 b, float_status *status)
-     return float32_round_pack_canonical(pr, status);
- }
- 
--float64 float64_div(float64 a, float64 b, float_status *status)
-+static float64 QEMU_SOFTFLOAT_ATTR
-+soft_f64_div(float64 a, float64 b, float_status *status)
- {
-     FloatParts pa = float64_unpack_canonical(a, status);
-     FloatParts pb = float64_unpack_canonical(b, status);
-@@ -1646,6 +1648,64 @@ float64 float64_div(float64 a, float64 b, float_status *status)
-     return float64_round_pack_canonical(pr, status);
- }
- 
-+static float hard_f32_div(float a, float b)
-+{
-+    return a / b;
-+}
-+
-+static double hard_f64_div(double a, double b)
-+{
-+    return a / b;
-+}
-+
-+static bool f32_div_pre(union_float32 a, union_float32 b)
-+{
-+    if (QEMU_HARDFLOAT_2F32_USE_FP) {
-+        return (fpclassify(a.h) == FP_NORMAL || fpclassify(a.h) == FP_ZERO) &&
-+               fpclassify(b.h) == FP_NORMAL;
-+    }
-+    return float32_is_zero_or_normal(a.s) && float32_is_normal(b.s);
-+}
-+
-+static bool f64_div_pre(union_float64 a, union_float64 b)
-+{
-+    if (QEMU_HARDFLOAT_2F64_USE_FP) {
-+        return (fpclassify(a.h) == FP_NORMAL || fpclassify(a.h) == FP_ZERO) &&
-+               fpclassify(b.h) == FP_NORMAL;
-+    }
-+    return float64_is_zero_or_normal(a.s) && float64_is_normal(b.s);
-+}
-+
-+static bool f32_div_post(union_float32 a, union_float32 b)
-+{
-+    if (QEMU_HARDFLOAT_2F32_USE_FP) {
-+        return fpclassify(a.h) != FP_ZERO;
-+    }
-+    return !float32_is_zero(a.s);
-+}
-+
-+static bool f64_div_post(union_float64 a, union_float64 b)
-+{
-+    if (QEMU_HARDFLOAT_2F64_USE_FP) {
-+        return fpclassify(a.h) != FP_ZERO;
-+    }
-+    return !float64_is_zero(a.s);
-+}
-+
-+float32 QEMU_FLATTEN
-+float32_div(float32 a, float32 b, float_status *s)
-+{
-+    return float32_gen2(a, b, s, hard_f32_div, soft_f32_div,
-+                        f32_div_pre, f32_div_post, NULL, NULL);
-+}
-+
-+float64 QEMU_FLATTEN
-+float64_div(float64 a, float64 b, float_status *s)
-+{
-+    return float64_gen2(a, b, s, hard_f64_div, soft_f64_div,
-+                        f64_div_pre, f64_div_post, NULL, NULL);
-+}
-+
- /*
-  * Float to Float conversions
-  *
--- 
-2.17.1
+
+--
+Alex Benn=C3=A9e
