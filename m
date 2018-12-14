@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXlzB-0002zb-Kl
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 06:50:30 -0500
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gXm3P-0004ma-Kx
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 06:54:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXlzA-0002ij-Ml
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 06:50:29 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:38314)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gXlzA-0002h3-98
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 06:50:28 -0500
-Received: by mail-ot1-x344.google.com with SMTP id e12so5118809otl.5
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 03:50:28 -0800 (PST)
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gXm3L-0001YP-Dg
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 06:54:51 -0500
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Date: Fri, 14 Dec 2018 11:54:39 +0000
+Message-ID: <f2fcbcc2-5e0f-053d-f4c7-fe0f5f6092f0@virtuozzo.com>
+References: <20181205122326.26625-1-dplotnikov@virtuozzo.com>
+	<20181207122647.GE5119@linux.fritz.box>
+	<bb51b8f9-a3a4-90e6-2f69-57e90ccd623a@virtuozzo.com>
+	<20181212122457.GB5415@linux.fritz.box>
+	<d0d2cab4-2157-1f9f-3bc9-a70f28a211b0@virtuozzo.com>
+	<20181213122039.GC5427@linux.fritz.box>
+In-Reply-To: <20181213122039.GC5427@linux.fritz.box>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <AD46DCB9D036934DB018F3EB109F73C5@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20181119162658.30358-1-peter.maydell@linaro.org>
-	<20181126150307.GM2448@perard.uk.xensource.com>
-In-Reply-To: <20181126150307.GM2448@perard.uk.xensource.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 14 Dec 2018 11:50:16 +0000
-Message-ID: <CAFEAcA8Z+g8HQq=HeY=2YbY1ToPyNpL8FO2mvfACS=sK-SBGfg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.1] hw/xen/xen_pt_graphics: Don't
- trust the BIOS ROM contents so much
+Subject: Re: [Qemu-devel] [PATCH] blk: postpone request execution on a
+ context protected with "drained section"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +30,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, "open list:X86" <xen-devel@lists.xenproject.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "keith.busch@intel.com" <keith.busch@intel.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>, "famz@redhat.com" <famz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On Mon, 26 Nov 2018 at 15:03, Anthony PERARD <anthony.perard@citrix.com> wrote:
->
-> On Mon, Nov 19, 2018 at 04:26:58PM +0000, Peter Maydell wrote:
-> > Coverity (CID 796599) points out that xen_pt_setup_vga() trusts
-> > the rom->size field in the BIOS ROM from a PCI passthrough VGA
-> > device, and uses it as an index into the memory which contains
-> > the BIOS image. A corrupt BIOS ROM could therefore cause us to
-> > index off the end of the buffer.
-> >
-> > Check that the size is within bounds before we use it.
-> >
-> > We are also trusting the pcioffset field, and assuming that
-> > the whole rom_header is present; Coverity doesn't notice these,
-> > but check them too.
-> >
-> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> > ---
-> > Disclaimer: compile tested only, as I don't have a Xen setup,
-> > let alone one with pass-through PCI graphics.
-> >
-> > Note that https://xenbits.xen.org/xsa/advisory-124.html
-> > defines that bugs which are only exploitable by a malicious
-> > piece of hardware that is passed through to the guest are
-> > not security vulnerabilities as far as the Xen Project is
-> > concerned, and are treated like normal non-security-related bugs.
-> > So this is just a bugfix, not a security issue.
-> >
-> > Marked "for-3.1" because it would let us squash another Coverity
-> > issue, and it is a bug fix; on the other hand it's an obscure
-> > corner case and has been this way since forever.
->
-> I haven't tested that patch either, but the changes looks fine, so:
->
-> Acked-by: Anthony PERARD <anthony.perard@citrix.com>
-
-Ping! Would the Xen folks like to test this and/or send it in
-via a xen pullreq now that 4.0 has reopened for development?
-
-Alternatively I can put it in via a pullreq I'm currently
-doing in its current "not tested but looks fine" state :-)
-
-thanks
--- PMM
+DQoNCk9uIDEzLjEyLjIwMTggMTU6MjAsIEtldmluIFdvbGYgd3JvdGU6DQo+IEFtIDEzLjEyLjIw
+MTggdW0gMTI6MDcgaGF0IERlbmlzIFBsb3RuaWtvdiBnZXNjaHJpZWJlbjoNCj4+IE9uIDEyLjEy
+LjIwMTggMTU6MjQsIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4gQW0gMTEuMTIuMjAxOCB1bSAxNzo1
+NSBoYXQgRGVuaXMgUGxvdG5pa292IGdlc2NocmllYmVuOg0KPj4+Pj4gV2h5IGludm9sdmUgdGhl
+IEFpb0NvbnRleHQgYXQgYWxsPyBUaGlzIGNvdWxkIGFsbCBiZSBrZXB0IGF0IHRoZQ0KPj4+Pj4g
+QmxvY2tCYWNrZW5kIGxldmVsIHdpdGhvdXQgZXh0ZW5kaW5nIHRoZSBsYXllcmluZyB2aW9sYXRp
+b24gdGhhdA0KPj4+Pj4gYWlvX2Rpc2FibGVfZXh0ZXJuYWwoKSBpcy4NCj4+Pj4+DQo+Pj4+PiBC
+bG9ja0JhY2tlbmRzIGdldCBub3RpZmllZCB3aGVuIHRoZWlyIHJvb3Qgbm9kZSBpcyBkcmFpbmVk
+LCBzbyBob29raW5nDQo+Pj4+PiB0aGluZ3MgdXAgdGhlcmUgc2hvdWxkIGJlIGFzIGVhc3ksIGlm
+IG5vdCBldmVuIGVhc2llciB0aGFuIGluDQo+Pj4+PiBBaW9Db250ZXh0Lg0KPj4+Pg0KPj4+PiBK
+dXN0IHdhbnQgdG8gbWFrZSBzdXJlIHRoYXQgSSB1bmRlcnN0b29kIGNvcnJlY3RseSB3aGF0IHlv
+dSBtZWFudCBieQ0KPj4+PiAiQmxvY2tCYWNrZW5kcyBnZXQgbm90aWZpZWQiLiBEaWQgeW91IG1l
+YW4gdGhhdCBiZHJ2X2RyYWluX2VuZCBjYWxscw0KPj4+PiBjaGlsZCdzIHJvbGUgY2FsbGJhY2sg
+YmxrX3Jvb3RfZHJhaW5lZF9lbmQgYnkgY2FsbGluZw0KPj4+PiBiZHJ2X3BhcmVudF9kcmFpbmVk
+X2VuZD8NCj4+Pg0KPj4+IFllcywgYmxrX3Jvb3RfZHJhaW5lZF9iZWdpbi9lbmQgY2FsbHMgYXJl
+IGFsbCB5b3UgbmVlZC4gU3BlY2lmaWNhbGx5LA0KPj4+IHRoZWlyIGFkanVzdG1lbnRzIHRvIGJs
+ay0+cXVpZXNjZV9jb3VudGVyIHRoYXQgYXJlIGFscmVhZHkgdGhlcmUsIGFuZCBpbg0KPj4+IHRo
+ZSAnaWYgKC0tYmxrLT5xdWllc2NlX2NvdW50ZXIgPT0gMCknIGJsb2NrIG9mIGJsa19yb290X2Ry
+YWluZWRfZW5kKCkNCj4+PiB3ZSBjYW4gcmVzdW1lIHRoZSBxdWV1ZWQgcmVxdWVzdHMuDQo+PiBT
+b3VuZHMgaXQgc2hvdWxkIGJlIHNvLCBidXQgaXQgZG9lc24ndCB3b3JrIHRoYXQgd2F5IGFuZCB0
+aGF0J3Mgd2h5Og0KPj4gd2hlbiBkb2luZyBtaXJyb3Igd2UgbWF5IHJlc3VtZSBwb3N0cG9uZWQg
+Y29yb3V0aW5lcyB0b28gZWFybHkgd2hlbiB0aGUNCj4+IHVuZGVybHlpbmcgYnMgaXMgcHJvdGVj
+dGVkIGZyb20gd3JpdGluZyBhdCBhbmQgdGh1cyB3ZSBlbmNvdW50ZXIgdGhlDQo+PiBhc3NlcnQg
+b24gYSB3cml0ZSByZXF1ZXN0IGV4ZWN1dGlvbiBhdCBiZHJ2X2NvX3dyaXRlX3JlcV9wcmVwYXJl
+IHdoZW4NCj4+IHJlc3VtaW5nIHRoZSBwb3N0cG9uZWQgY29yb3V0aW5lcy4NCj4+DQo+PiBUaGUg
+dGhpbmcgaXMgdGhhdCB0aGUgYnMgaXMgcHJvdGVjdGVkIGZvciB3cml0aW5nIGJlZm9yZSBleGVj
+dXRpb24gb2YNCj4+IGJkcnZfcmVwbGFjZV9ub2RlIGF0IG1pcnJvcl9leGl0X2NvbW1vbiBhbmQg
+YmRydl9yZXBsYWNlX25vZGUgY2FsbHMNCj4+IGJkcnZfcmVwbGFjZV9jaGlsZF9ub3Blcm0gd2hp
+Y2gsIGluIHR1cm4sIGNhbGxzIGNoaWxkLT5yb2xlLT5kcmFpbmVkX2VuZA0KPj4gd2hlcmUgb25l
+IG9mIHRoZSBjYWxsYmFja3MgaXMgYmxrX3Jvb3RfZHJhaW5lZF9lbmQgd2hpY2ggY2hlY2sNCj4+
+IGlmKC0tYmxrLT5xdWllc2NlX2NvdW50ZXIgPT0gMCkgYW5kIHJ1bnMgdGhlIHBvc3Rwb25lZCBy
+ZXF1ZXN0cw0KPj4gKGNvcm91dGluZXMpIGlmIHRoZSBjb3VuZGl0aW9uIGlzIHRydWUuDQo+IA0K
+PiBIbSwgc28gc29tZXRoaW5nIGlzIG1lc3NlZCB1cCB3aXRoIHRoZSBkcmFpbiBzZWN0aW9ucyBp
+biB0aGUgbWlycm9yDQo+IGRyaXZlci4gV2UgaGF2ZToNCj4gDQo+ICAgICAgYmRydl9kcmFpbmVk
+X2JlZ2luKHRhcmdldF9icyk7DQo+ICAgICAgYmRydl9yZXBsYWNlX25vZGUodG9fcmVwbGFjZSwg
+dGFyZ2V0X2JzLCAmbG9jYWxfZXJyKTsNCj4gICAgICBiZHJ2X2RyYWluZWRfZW5kKHRhcmdldF9i
+cyk7DQo+IA0KPiBPYnZpb3VzbHksIHRoZSBpbnRlbnRpb24gd2FzIHRvIGtlZXAgdGhlIEJsb2Nr
+QmFja2VuZCBkcmFpbmVkIGR1cmluZw0KPiBiZHJ2X3JlcGxhY2Vfbm9kZSgpLiBTbyBob3cgY291
+bGQgYmxrLT5xdWllc2NlX2NvdW50ZXIgZXZlciBnZXQgdG8gMA0KPiBpbnNpZGUgYmRydl9yZXBs
+YWNlX25vZGUoKSB3aGVuIHRhcmdldF9icyBpcyBkcmFpbmVkPw0KPiANCj4gTG9va2luZyBhdCBi
+ZHJ2X3JlcGxhY2VfY2hpbGRfbm9wZXJtKCksIGl0IHNlZW1zIHRoYXQgdGhlIGZ1bmN0aW9uIGhh
+cw0KPiBhIGJ1ZzogRXZlbiBpZiBvbGRfYnMgYW5kIG5ld19icyBhcmUgYm90aCBkcmFpbmVkLCB0
+aGUgcXVpZXNjZV9jb3VudGVyDQo+IGZvciB0aGUgcGFyZW50IHJlYWNoZXMgMCBmb3IgYSBtb21l
+bnQgYmVjYXVzZSB3ZSBjYWxsIC5kcmFpbmVkX2VuZCBmb3INCj4gdGhlIG9sZCBjaGlsZCBmaXJz
+dCBhbmQgLmRyYWluZWRfYmVnaW4gZm9yIHRoZSBuZXcgb25lIGxhdGVyLg0KPiANCj4gU28gaXQg
+c2VlbXMgdGhlIGZpeCB3b3VsZCBiZSB0byByZXZlcnNlIHRoZSBvcmRlciBhbmQgZmlyc3QgY2Fs
+bA0KPiAuZHJhaW5lZF9iZWdpbiBmb3IgdGhlIG5ldyBjaGlsZCBhbmQgdGhlbiAuZHJhaW5lZF9l
+bmQgZm9yIHRoZSBvbGQNCj4gY2hpbGQuIFNvdW5kcyBsaWtlIGEgZ29vZCBuZXcgdGVzdGNhc2Ug
+Zm9yIHRlc3RzL3Rlc3QtYmRydi1kcmFpbi5jLCB0b28uDQpZZXMsIGl0J3MgdHJ1ZSwgYnV0IGl0
+J3Mgbm90IGVub3VnaC4uLg0KSW4gbWlycm9yX2V4aXRfY29tbW9uKCkgd2UgYWN0aXZlbHkgbWFu
+aXB1bGF0ZSB3aXRoIGJsb2NrIGRyaXZlciBzdGF0ZXMuDQpXaGVuIHdlIHJlcGxhY2VkIGEgbm9k
+ZSBpbiB0aGUgc25pcHBldCB5b3Ugc2hvd2VkIHdlIGNhbid0IGFsbG93IHRoZSANCnBvc3Rwb25l
+ZCBjb3JvdXRpbmVzIHRvIHJ1biBiZWNhdXNlIHRoZSBibG9jayB0cmVlIGlzbid0IHJlYWR5IHRv
+IA0KcmVjZWl2ZSB0aGUgcmVxdWVzdHMgeWV0Lg0KVG8gYmUgcmVhZHksIHdlIG5lZWQgdG8gaW5z
+ZXJ0IGEgcHJvcGVyIGJsb2NrIGRyaXZlciBzdGF0ZSB0byB0aGUgYmxvY2sgDQpiYWNrZW5kIHdo
+aWNoIGlzIGRvbmUgaGVyZQ0KDQogICAgIGJsa19yZW1vdmVfYnMoYmpvYi0+YmxrKTsNCiAgICAg
+YmxrX3NldF9wZXJtKGJqb2ItPmJsaywgMCwgQkxLX1BFUk1fQUxMLCAmZXJyb3JfYWJvcnQpOw0K
+ICAgICBibGtfaW5zZXJ0X2JzKGJqb2ItPmJsaywgbWlycm9yX3RvcF9icywgJmVycm9yX2Fib3J0
+KTsgPDwgPDwgPDwgPDwNCg0KICAgICBic19vcGFxdWUtPmpvYiA9IE5VTEw7DQoNCiAgICAgYmRy
+dl9kcmFpbmVkX2VuZChzcmMpOw0KDQpJZiB0aGUgdHJlZSBpc24ndCByZWFkeSBhbmQgd2UgcmVz
+dW1lIHRoZSBjb3JvdXRpbmVzLCB3ZSdsbCBlbmQgdXAgd2l0aCANCnRoZSByZXF1ZXN0IGxhbmRl
+ZCBpbiBhIHdyb25nIGJsb2NrIGRyaXZlciBzdGF0ZS4NCg0KU28sIHdlIGV4cGxpY2l0bHkgc2hv
+dWxkIHN0b3AgYWxsIGFjdGl2aXRpZXMgb24gYWxsIHRoZSBkcml2ZXIgc3RhdGVzDQphbmQgaXRz
+IHBhcmVudHMgYW5kIGFsbG93IHRoZSBhY3Rpdml0aWVzIHdoZW4gZXZlcnl0aGluZyBpcyByZWFk
+eSB0byBnby4NCg0KV2h5IGV4cGxpY2l0bHksIGJlY2F1c2UgdGhlIGJsb2NrIGRyaXZlciBzdGF0
+ZXMgbWF5IGJlbG9uZyB0byBkaWZmZXJlbnQgDQpibG9jayBiYWNrZW5kcyBhdCB0aGUgbW9tZW50
+IG9mIHRoZSBtYW5pcHVsYXRpb24gYmVnaW5uaW5nLg0KDQpTbywgaXQgc2VlbXMgd2UgbmVlZCB0
+byBkaXNhYmxlIGFsbCB0aGVpciBjb250ZXh0cyB1bnRpbCB0aGUgDQptYW5pcHVsYXRpb24gZW5k
+cy4NCg0KUGxlYXNlLCBjb3JyZWN0IG1lIGlmIEknbSB3cm9uZy4NCg0KPiANCj4+IEluIHNlZW1z
+IHRoYXQgaWYgdGhlIGV4dGVybmFsIHJlcXVlc3RzIGRpc2FibGVkIG9uIHRoZSBjb250ZXh0IHdl
+IGNhbid0DQo+PiByZWx5IG9uIGFueXRoaW5nIG9yIHNob3VsZCBjaGVjayB3aGVyZSB0aGUgdW5k
+ZXJseWluZyBicyBhbmQgaXRzDQo+PiB1bmRlcmx5aW5nIG5vZGVzIGFyZSByZWFkeSB0byByZWNl
+aXZlIHJlcXVlc3RzIHdoaWNoIHNvdW5kcyBxdWl0ZQ0KPj4gY29tcGxpY2F0ZWQuDQo+PiBQbGVh
+c2UgY29ycmVjdCBtZSBpZiBzdGlsbCBkb24ndCB1bmRlcnN0YW5kIHNvbWV0aGluZyBpbiB0aGF0
+IHJvdXRpbmUuDQo+IA0KPiBJIHRoaW5rIHRoZSByZWFzb24gd2h5IHJleWxpbmcgb24gYWlvX2Rp
+c2FibGVfZXh0ZXJuYWwoKSB3b3JrcyBpcyBzaW1wbHkNCj4gYmVjYXVzZSBzcmMgaXMgYWxzbyBk
+cmFpbmVkLCB3aGljaCBrZWVwcyBleHRlcm5hbCBldmVudHMgaW4gdGhlDQo+IEFpb0NvbnRleHQg
+ZGlzYWJsZWQgZGVzcGl0ZSB0aGUgYnVnIGluIGRyYWluaW5nIHRoZSB0YXJnZXQgbm9kZS4NCj4g
+DQo+IFRoZSBidWcgd291bGQgYmVjb21lIGFwcGFyZW50IGV2ZW4gd2l0aCBhaW9fZGlzYWJsZV9l
+eHRlcm5hbCgpIGlmIHdlDQo+IGRpZG4ndCBkcmFpbiBzcmMsIG9yIGV2ZW4gaWYgd2UganVzdCBz
+dXBwb3J0ZWQgc3JjIGFuZCB0YXJnZXQgYmVpbmcgaW4NCj4gZGlmZmVyZW50IEFpb0NvbnRleHRz
+Lg0KDQpXaHkgZG9uJ3Qgd2UgZGlzYWJsZSBhbGwgdGhvc2UgY29udGV4dHMgaW52b2x2ZWQgdW50
+aWwgdGhlIGVuZCBvZiB0aGUgDQpibG9jayBkZXZpY2UgdHJlZSByZWNvbnN0cnVjdGlvbj8NCg0K
+VGhhbmtzIQ0KDQpEZW5pcw0KPiANCj4gS2V2aW4NCj4gDQoNCi0tIA0KQmVzdCwNCkRlbmlzDQo=
