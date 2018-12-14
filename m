@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1gXs6n-0000t5-Lj
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 13:22:46 -0500
+	(envelope-from <cota@braap.org>) id 1gXs82-0002Wj-A8
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 13:24:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1gXs6j-0005l6-LX
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 13:22:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45650)
+	(envelope-from <cota@braap.org>) id 1gXs7y-0007Ey-9o
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 13:24:02 -0500
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:42439)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1gXs6h-0005jH-I2
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 13:22:40 -0500
-References: <20181214094828.18343-1-pbonzini@redhat.com>
-	<6e191a36-7283-ed82-5f1f-3a8f4f818d62@redhat.com>
-	<48697d08-5230-bba3-7de9-2aef7054a7ed@redhat.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <318c6986-2699-79fd-90cd-b8a61e2ee725@redhat.com>
-Date: Fri, 14 Dec 2018 16:22:33 -0200
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gXs7y-0007Es-49
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 13:23:58 -0500
+Date: Fri, 14 Dec 2018 13:23:55 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181214182355.GA25356@flamenco>
+References: <20181209193749.12277-1-cota@braap.org>
+	<20181209193749.12277-6-cota@braap.org>
+	<20181214155724.GB4314@quinoa.localdomain>
+	<20181214170822.GA15965@flamenco>
+	<20181214175915.GD4314@quinoa.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <48697d08-5230-bba3-7de9-2aef7054a7ed@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] scripts: add script to convert
- multiline comments into 4-line format
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181214175915.GD4314@quinoa.localdomain>
+Subject: Re: [Qemu-devel] [RFC v2 05/38] plugin: add user-facing API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +30,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, armbru@redhat.com
+To: Aaron Lindsay <aaron@os.amperecomputing.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
+On Fri, Dec 14, 2018 at 17:59:20 +0000, Aaron Lindsay wrote:
+> On Dec 14 12:08, Emilio G. Cota wrote:
+(snip)
+> > The idea is that a plugin can "reset" itself, so that (1) all
+> > its CBs are cleared and (2) the plugin can register new callbacks.
+> > This would all happen in an atomic context (no vCPU running), so
+> > that the plugin would miss no CPU events.
+> 
+> The implication being that there would not be the same possibility of
+> other callbacks being called between when qemu_plugin_reset and the
+> qemu_plugin_reset_cb_t callback are called as there is at plugin
+> un-installation time?
 
-On 12/14/2018 04:15 PM, Paolo Bonzini wrote:
-> On 14/12/18 19:06, Wainer dos Santos Moschetta wrote:
->> IIUC above block handles the lines between lead and trail. So it would
->> fix (but it doesn't) this:
->>
->> # cat foo
->> /*
->>  =C2=A0comment 1
->>  =C2=A0comment 2
->>  =C2=A0*/
->>
->> # scripts/fix-multiline-comments.sh foo
->> /*
->>  =C2=A0comment 1
->>  =C2=A0comment 2
->>  =C2=A0*/
-> Not enough spaces :)  It would fix
->
->   /*
->      comment 1
->      comment 2
->    */
->
-> or what is actually found in QEMU:
->
->     /* comment 1
->        comment 2 */
+The callback is needed for the same reason -- we can only guarantee
+that there will be no callbacks once the current RCU read critical section
+expires.
 
-I tried hard but I failed to find problems. :)
+> > How does this sound?
+> 
+> I think what you describe is exactly what I'm interested in.
 
-Thus,
+Nice. I'll work on this for v3.
 
-Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Thanks,
 
-
->
-> Thanks,
->
-> Paolo
+		Emilio
