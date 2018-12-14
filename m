@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXe1B-0006FO-1c
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 22:20:02 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gXe1C-0006Gd-63
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 22:20:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gXe16-0007Uc-RY
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 22:19:59 -0500
-Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:45952)
+	(envelope-from <richard.henderson@linaro.org>) id 1gXe1B-0007fY-1q
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 22:20:01 -0500
+Received: from mail-ot1-x32c.google.com ([2607:f8b0:4864:20::32c]:37718)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gXe14-0007Eg-8A
-	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 22:19:55 -0500
-Received: by mail-oi1-x229.google.com with SMTP id y1so3443290oie.12
-	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 19:19:50 -0800 (PST)
+	id 1gXe18-0007KD-O1
+	for qemu-devel@nongnu.org; Thu, 13 Dec 2018 22:19:59 -0500
+Received: by mail-ot1-x32c.google.com with SMTP id 40so4122092oth.4
+	for <qemu-devel@nongnu.org>; Thu, 13 Dec 2018 19:19:53 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 13 Dec 2018 21:19:12 -0600
-Message-Id: <20181214031923.29527-23-richard.henderson@linaro.org>
+Date: Thu, 13 Dec 2018 21:19:14 -0600
+Message-Id: <20181214031923.29527-25-richard.henderson@linaro.org>
 In-Reply-To: <20181214031923.29527-1-richard.henderson@linaro.org>
 References: <20181214031923.29527-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 21/32] tcg/i386: Precompute all guest_base
- parameters
+Subject: [Qemu-devel] [PULL 23/32] tcg: Clean up generic bswap32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,161 +29,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-These values are constant between all qemu_ld/st invocations;
-there is no need to figure this out each time.  If we cannot
-use a segment or an offset directly for guest_base, load the
-value into a register in the prologue.
+Based on the only current user, Sparc:
 
-Reviewed-by: Emilio G. Cota <cota@braap.org>
+New code uses 1 constant that takes 2 insns to create, plus 8.
+Old code used 2 constants that took 2 insns to create, plus 9.
+The result is a new total of 10 vs an old total of 13.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/i386/tcg-target.inc.c | 101 +++++++++++++++-----------------------
- 1 file changed, 40 insertions(+), 61 deletions(-)
+ tcg/tcg-op.c | 54 ++++++++++++++++++++++++++--------------------------
+ 1 file changed, 27 insertions(+), 27 deletions(-)
 
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index f7b548545a..3fb2f4b971 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -1857,22 +1857,31 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
-     tcg_out_push(s, retaddr);
-     tcg_out_jmp(s, qemu_st_helpers[opc & (MO_BSWAP | MO_SIZE)]);
- }
--#elif defined(__x86_64__) && defined(__linux__)
--# include <asm/prctl.h>
--# include <sys/prctl.h>
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index 7a8015c5a9..a956499e46 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -1012,22 +1012,22 @@ void tcg_gen_bswap32_i32(TCGv_i32 ret, TCGv_i32 arg)
+     if (TCG_TARGET_HAS_bswap32_i32) {
+         tcg_gen_op2_i32(INDEX_op_bswap32_i32, ret, arg);
+     } else {
+-        TCGv_i32 t0, t1;
+-        t0 = tcg_temp_new_i32();
+-        t1 = tcg_temp_new_i32();
++        TCGv_i32 t0 = tcg_temp_new_i32();
++        TCGv_i32 t1 = tcg_temp_new_i32();
++        TCGv_i32 t2 = tcg_const_i32(0x00ff00ff);
+ 
+-        tcg_gen_shli_i32(t0, arg, 24);
++                                        /* arg = abcd */
++        tcg_gen_shri_i32(t0, arg, 8);   /*  t0 = .abc */
++        tcg_gen_and_i32(t1, arg, t2);   /*  t1 = .b.d */
++        tcg_gen_and_i32(t0, t0, t2);    /*  t0 = .a.c */
++        tcg_temp_free_i32(t2);
++        tcg_gen_shli_i32(t1, t1, 8);    /*  t1 = b.d. */
++        tcg_gen_or_i32(ret, t0, t1);    /* ret = badc */
+ 
+-        tcg_gen_andi_i32(t1, arg, 0x0000ff00);
+-        tcg_gen_shli_i32(t1, t1, 8);
+-        tcg_gen_or_i32(t0, t0, t1);
++        tcg_gen_shri_i32(t0, ret, 16);  /*  t0 = ..ba */
++        tcg_gen_shli_i32(t1, ret, 16);  /*  t1 = dc.. */
++        tcg_gen_or_i32(ret, t0, t1);    /* ret = dcba */
+ 
+-        tcg_gen_shri_i32(t1, arg, 8);
+-        tcg_gen_andi_i32(t1, t1, 0x0000ff00);
+-        tcg_gen_or_i32(t0, t0, t1);
 -
-+#elif TCG_TARGET_REG_BITS == 32
-+# define x86_guest_base_seg     0
-+# define x86_guest_base_index   -1
-+# define x86_guest_base_offset  guest_base
-+#else
-+static int x86_guest_base_seg;
-+static int x86_guest_base_index = -1;
-+static int32_t x86_guest_base_offset;
-+# if defined(__x86_64__) && defined(__linux__)
-+#  include <asm/prctl.h>
-+#  include <sys/prctl.h>
- int arch_prctl(int code, unsigned long addr);
--
--static int guest_base_flags;
--static inline void setup_guest_base_seg(void)
-+static inline int setup_guest_base_seg(void)
- {
-     if (arch_prctl(ARCH_SET_GS, guest_base) == 0) {
--        guest_base_flags = P_GS;
-+        return P_GS;
+-        tcg_gen_shri_i32(t1, arg, 24);
+-        tcg_gen_or_i32(ret, t0, t1);
+         tcg_temp_free_i32(t0);
+         tcg_temp_free_i32(t1);
      }
-+    return 0;
- }
--#else
--# define guest_base_flags 0
--static inline void setup_guest_base_seg(void) { }
-+# else
-+static inline int setup_guest_base_seg(void)
-+{
-+    return 0;
-+}
-+# endif
- #endif /* SOFTMMU */
+@@ -1638,23 +1638,23 @@ void tcg_gen_bswap32_i64(TCGv_i64 ret, TCGv_i64 arg)
+     } else if (TCG_TARGET_HAS_bswap32_i64) {
+         tcg_gen_op2_i64(INDEX_op_bswap32_i64, ret, arg);
+     } else {
+-        TCGv_i64 t0, t1;
+-        t0 = tcg_temp_new_i64();
+-        t1 = tcg_temp_new_i64();
++        TCGv_i64 t0 = tcg_temp_new_i64();
++        TCGv_i64 t1 = tcg_temp_new_i64();
++        TCGv_i64 t2 = tcg_const_i64(0x00ff00ff);
  
- static void tcg_out_qemu_ld_direct(TCGContext *s, TCGReg datalo, TCGReg datahi,
-@@ -2011,27 +2020,9 @@ static void tcg_out_qemu_ld(TCGContext *s, const TCGArg *args, bool is64)
-     add_qemu_ldst_label(s, true, is64, oi, datalo, datahi, addrlo, addrhi,
-                         s->code_ptr, label_ptr);
- #else
--    {
--        int32_t offset = guest_base;
--        int index = -1;
--        int seg = 0;
--
--        /*
--         * Recall we store 32-bit values zero-extended.  No need for
--         * further manual extension or an addr32 (0x67) prefix.
--         */
--        if (guest_base == 0 || guest_base_flags) {
--            seg = guest_base_flags;
--            offset = 0;
--        } else if (TCG_TARGET_REG_BITS == 64 && offset != guest_base) {
--            tcg_out_movi(s, TCG_TYPE_I64, TCG_REG_L1, guest_base);
--            index = TCG_REG_L1;
--            offset = 0;
--        }
--
--        tcg_out_qemu_ld_direct(s, datalo, datahi,
--                               addrlo, index, offset, seg, is64, opc);
--    }
-+    tcg_out_qemu_ld_direct(s, datalo, datahi, addrlo, x86_guest_base_index,
-+                           x86_guest_base_offset, x86_guest_base_seg,
-+                           is64, opc);
- #endif
- }
+-        tcg_gen_shli_i64(t0, arg, 24);
+-        tcg_gen_ext32u_i64(t0, t0);
++                                        /* arg = ....abcd */
++        tcg_gen_shri_i64(t0, arg, 8);   /*  t0 = .....abc */
++        tcg_gen_and_i64(t1, arg, t2);   /*  t1 = .....b.d */
++        tcg_gen_and_i64(t0, t0, t2);    /*  t0 = .....a.c */
++        tcg_temp_free_i64(t2);
++        tcg_gen_shli_i64(t1, t1, 8);    /*  t1 = ....b.d. */
++        tcg_gen_or_i64(ret, t0, t1);    /* ret = ....badc */
  
-@@ -2147,28 +2138,8 @@ static void tcg_out_qemu_st(TCGContext *s, const TCGArg *args, bool is64)
-     add_qemu_ldst_label(s, false, is64, oi, datalo, datahi, addrlo, addrhi,
-                         s->code_ptr, label_ptr);
- #else
--    {
--        int32_t offset = guest_base;
--        int index = -1;
--        int seg = 0;
--
--        /*
--         * Recall we store 32-bit values zero-extended.  No need for
--         * further manual extension or an addr32 (0x67) prefix.
--         */
--        if (guest_base == 0 || guest_base_flags) {
--            seg = guest_base_flags;
--            offset = 0;
--        } else if (TCG_TARGET_REG_BITS == 64 && offset != guest_base) {
--            /* ??? Note that we require L0 free for bswap.  */
--            tcg_out_movi(s, TCG_TYPE_I64, TCG_REG_L1, guest_base);
--            index = TCG_REG_L1;
--            offset = 0;
--        }
--
--        tcg_out_qemu_st_direct(s, datalo, datahi,
--                               addrlo, index, offset, seg, opc);
--    }
-+    tcg_out_qemu_st_direct(s, datalo, datahi, addrlo, x86_guest_base_index,
-+                           x86_guest_base_offset, x86_guest_base_seg, opc);
- #endif
- }
+-        tcg_gen_andi_i64(t1, arg, 0x0000ff00);
+-        tcg_gen_shli_i64(t1, t1, 8);
+-        tcg_gen_or_i64(t0, t0, t1);
++        tcg_gen_shli_i64(t1, ret, 48);  /*  t1 = dc...... */
++        tcg_gen_shri_i64(t0, ret, 16);  /*  t0 = ......ba */
++        tcg_gen_shri_i64(t1, ret, 32);  /*  t1 = ....dc.. */
++        tcg_gen_or_i64(ret, t0, t1);    /* ret = ....dcba */
  
-@@ -3415,6 +3386,21 @@ static void tcg_target_qemu_prologue(TCGContext *s)
- 		         (ARRAY_SIZE(tcg_target_callee_save_regs) + 2) * 4
- 			 + stack_addend);
- #else
-+# if !defined(CONFIG_SOFTMMU) && TCG_TARGET_REG_BITS == 64
-+    if (guest_base) {
-+        int seg = setup_guest_base_seg();
-+        if (seg != 0) {
-+            x86_guest_base_seg = seg;
-+        } else if (guest_base == (int32_t)guest_base) {
-+            x86_guest_base_offset = guest_base;
-+        } else {
-+            /* Choose R12 because, as a base, it requires a SIB byte. */
-+            x86_guest_base_index = TCG_REG_R12;
-+            tcg_out_mov(s, TCG_TYPE_PTR, x86_guest_base_index, guest_base);
-+            tcg_regset_set_reg(s->reserved_regs, x86_guest_base_index);
-+        }
-+    }
-+# endif
-     tcg_out_mov(s, TCG_TYPE_PTR, TCG_AREG0, tcg_target_call_iarg_regs[0]);
-     tcg_out_addi(s, TCG_REG_ESP, -stack_addend);
-     /* jmp *tb.  */
-@@ -3440,13 +3426,6 @@ static void tcg_target_qemu_prologue(TCGContext *s)
-         tcg_out_pop(s, tcg_target_callee_save_regs[i]);
+-        tcg_gen_shri_i64(t1, arg, 8);
+-        tcg_gen_andi_i64(t1, t1, 0x0000ff00);
+-        tcg_gen_or_i64(t0, t0, t1);
+-
+-        tcg_gen_shri_i64(t1, arg, 24);
+-        tcg_gen_or_i64(ret, t0, t1);
+         tcg_temp_free_i64(t0);
+         tcg_temp_free_i64(t1);
      }
-     tcg_out_opc(s, OPC_RET, 0, 0, 0);
--
--#if !defined(CONFIG_SOFTMMU)
--    /* Try to set up a segment register to point to guest_base.  */
--    if (guest_base) {
--        setup_guest_base_seg();
--    }
--#endif
- }
- 
- static void tcg_out_nop_fill(tcg_insn_unit *p, int count)
 -- 
 2.17.2
