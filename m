@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXk79-0001iW-U3
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:50:36 -0500
+	(envelope-from <berto@igalia.com>) id 1gXk9W-00032W-Lu
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:53:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXk78-0008Bs-Vc
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:50:35 -0500
-Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:34948)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gXk78-0008BT-Nl
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:50:34 -0500
-Received: by mail-oi1-x22f.google.com with SMTP id v6so4092133oif.2
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 01:50:34 -0800 (PST)
+	(envelope-from <berto@igalia.com>) id 1gXk9R-00029u-Op
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:53:02 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20181114145857.19720-1-berto@igalia.com>
+References: <20181114145857.19720-1-berto@igalia.com>
+Date: Fri, 14 Dec 2018 10:52:54 +0100
+Message-ID: <w51pnu4cu4p.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-References: <20181212112450.2103-1-berrange@redhat.com>
-In-Reply-To: <20181212112450.2103-1-berrange@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 14 Dec 2018 09:50:23 +0000
-Message-ID: <CAFEAcA-M72owjhqbgG6G-fsaTThEMD2uUnpwXbMVnhGP4x3K0g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/6] Qcrypto next patches
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2] qcow2: Assert that refcount block
+ offsets fit in the refcount table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +22,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On Wed, 12 Dec 2018 at 11:24, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
- wrote:
->
-> The following changes since commit bb9bf94b3e8926553290bc9a7cb84315af4220=
-86:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-r=
-equest' into staging (2018-12-11 19:18:58 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/berrange/qemu tags/qcrypto-next-pull-request
->
-> for you to fetch changes up to c972fa123c73501b4b0c6de7873754ea3205a5eb:
->
->   crypto: support multiple threads accessing one QCryptoBlock (2018-12-12=
- 11:16:49 +0000)
->
-> ----------------------------------------------------------------
-> Merge crypto patches 2018/12/12
->
->  - Fix documentation about default LUKS algorithms
->  - Support for multi-threaded block crypto
->
-> ----------------------------------------------------------------
->
+ping
 
-Applied, thanks.
+I suppose this one can go in now.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
-
--- PMM
+On Wed 14 Nov 2018 03:58:57 PM CET, Alberto Garcia wrote:
+> Refcount table entries have a field to store the offset of the
+> refcount block. The rest of the bits of the entry are currently
+> reserved.
+>
+> The offset is always taken from the entry using REFT_OFFSET_MASK to
+> ensure that we only use the bits that belong to that field.
+>
+> While that mask is used every time we read from the refcount table, it
+> is never used when we write to it. Due to the other constraints of the
+> qcow2 format QEMU can never produce refcount block offsets that don't
+> fit in that field so any such offset when allocating a refcount block
+> would indicate a bug in QEMU.
+>
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
+> v2: Add missing Signed-off-by: line
+> ---
+>  block/qcow2-refcount.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+> index 46082aeac1..31a2e1f845 100644
+> --- a/block/qcow2-refcount.c
+> +++ b/block/qcow2-refcount.c
+> @@ -367,6 +367,9 @@ static int alloc_refcount_block(BlockDriverState *bs,
+>          return new_block;
+>      }
+>  
+> +    /* The offset must fit in the offset field of the refcount table entry */
+> +    assert((new_block & REFT_OFFSET_MASK) == new_block);
+> +
+>      /* If we're allocating the block at offset 0 then something is wrong */
+>      if (new_block == 0) {
+>          qcow2_signal_corruption(bs, true, -1, -1, "Preventing invalid "
+> -- 
+> 2.11.0
