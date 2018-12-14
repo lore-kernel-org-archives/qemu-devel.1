@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gXk4C-0007ds-3Z
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:47:34 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gXk5E-0000J4-JW
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:48:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gXk4A-0005vF-Q3
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:47:32 -0500
-Date: Fri, 14 Dec 2018 17:01:26 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181214060126.GH29278@umbus.fritz.box>
-References: <20181214042122.101921-1-aik@ozlabs.ru>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gXk59-0006mO-K3
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:48:36 -0500
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:55681)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1gXk59-0006l9-DT
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 04:48:31 -0500
+Received: by mail-wm1-x334.google.com with SMTP id y139so5000560wmc.5
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 01:48:31 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 14 Dec 2018 10:48:28 +0100
+Message-Id: <20181214094828.18343-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="4LFBTxd4L5NLO6ly"
-Content-Disposition: inline
-In-Reply-To: <20181214042122.101921-1-aik@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH qemu v2] spapr-iommu: Always advertise the
- maximum possible DMA window size
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2] scripts: add script to convert multiline
+ comments into 4-line format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,129 +28,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, armbru@redhat.com, richard.henderson@linaro.org
 
+Since we're adding checkpatch rules to enforce 4-line multiline comment
+format, i.e. with lone /* and */, this script can be run on existing
+code so that the comment style does not become inconsistent within a
+file.
 
---4LFBTxd4L5NLO6ly
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The alternative to awk-in-a-shell-script could be Perl, which also
+supports -i directly, but a2p seems to have bitrotten and I didn't quite
+feel like writing this twice...
 
-On Fri, Dec 14, 2018 at 03:21:22PM +1100, Alexey Kardashevskiy wrote:
-> When deciding about the huge DMA window, the typical Linux pseries guest
-> uses the maximum allowed RAM size as the upper limit. We did the same
-> on QEMU side to match that logic. Now we are going to support a GPU RAM
-> pass through which is not available at the guest boot time as it requires
-> the guest driver interaction. As the result, the guest requests a smaller
-> window than it should. Therefore the guest needs to be patched to
-> understand this new memory and so does QEMU.
->=20
-> Instead of reimplementing here whatever solution we choose for the guest,
-> this advertises the biggest possible window size limited by 32 bit
-> (as defined by LoPAPR). Since the window size has to be power-of-two
-> (the create rtas call receives a window shift, not a size),
-> this uses 0x8000.0000 as the maximum number of TCEs possible (rather than
-> 32bit maximum of 0xffff.ffff).
->=20
-> This is safe as:
-> 1. The guest visible emulated table is allocated in KVM (actual pages
-> are allocated in page fault handler) and QEMU (actual pages are allocated
-> when updated);
-> 2. The hardware table (and corresponding userspace address table)
-> supports sparse allocation and also checks for locked_vm limit so
-> it is unable to cause the host any damage.
->=20
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+        v1->v2: fix handling of multiline doc comments without lone /**
+---
+ scripts/fix-multiline-comments.sh | 62 +++++++++++++++++++++++++++++++
+ 1 file changed, 62 insertions(+)
+ create mode 100755 scripts/fix-multiline-comments.sh
 
-Applied to ppc-for-4.0.
-
-> ---
-> Changes:
-> v2:
-> * replaced 0xFFFFFFFF with 0x80000000 as a top limit
-> ---
->  hw/ppc/spapr_rtas_ddw.c | 19 +++----------------
->  1 file changed, 3 insertions(+), 16 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_rtas_ddw.c b/hw/ppc/spapr_rtas_ddw.c
-> index 329feb1..cb8a410 100644
-> --- a/hw/ppc/spapr_rtas_ddw.c
-> +++ b/hw/ppc/spapr_rtas_ddw.c
-> @@ -96,9 +96,8 @@ static void rtas_ibm_query_pe_dma_window(PowerPCCPU *cp=
-u,
->                                           uint32_t nret, target_ulong ret=
-s)
->  {
->      sPAPRPHBState *sphb;
-> -    uint64_t buid, max_window_size;
-> +    uint64_t buid;
->      uint32_t avail, addr, pgmask =3D 0;
-> -    MachineState *machine =3D MACHINE(spapr);
-> =20
->      if ((nargs !=3D 3) || (nret !=3D 5)) {
->          goto param_error_exit;
-> @@ -114,27 +113,15 @@ static void rtas_ibm_query_pe_dma_window(PowerPCCPU=
- *cpu,
->      /* Translate page mask to LoPAPR format */
->      pgmask =3D spapr_page_mask_to_query_mask(sphb->page_size_mask);
-> =20
-> -    /*
-> -     * This is "Largest contiguous block of TCEs allocated specifically
-> -     * for (that is, are reserved for) this PE".
-> -     * Return the maximum number as maximum supported RAM size was in 4K=
- pages.
-> -     */
-> -    if (machine->ram_size =3D=3D machine->maxram_size) {
-> -        max_window_size =3D machine->ram_size;
-> -    } else {
-> -        max_window_size =3D machine->device_memory->base +
-> -                          memory_region_size(&machine->device_memory->mr=
-);
-> -    }
-> -
->      avail =3D SPAPR_PCI_DMA_MAX_WINDOWS - spapr_phb_get_active_win_num(s=
-phb);
-> =20
->      rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->      rtas_st(rets, 1, avail);
-> -    rtas_st(rets, 2, max_window_size >> SPAPR_TCE_PAGE_SHIFT);
-> +    rtas_st(rets, 2, 0x80000000); /* The largest window we can possibly =
-have */
->      rtas_st(rets, 3, pgmask);
->      rtas_st(rets, 4, 0); /* DMA migration mask, not supported */
-> =20
-> -    trace_spapr_iommu_ddw_query(buid, addr, avail, max_window_size, pgma=
-sk);
-> +    trace_spapr_iommu_ddw_query(buid, addr, avail, 0x80000000, pgmask);
->      return;
-> =20
->  param_error_exit:
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---4LFBTxd4L5NLO6ly
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwTRzIACgkQbDjKyiDZ
-s5IelQ//VlmzaFH+PniYwaQUSb618OLXAgNvTNnUH6UAI3w6WeISz0skOvU5FEv9
-89jljN7FlhzHKXbq8RxaAFBiotDM2UvfZ7y3vQzUJ98I/fI+mVjdoeKFxslzecJd
-qm7wycKufA0V7ezN2wR7JqVacRAR+WbK3I/6gnEuMwqOlp1IcA2vvd98y/QtynYS
-d2Px93XLU6dIb3xPiu7M/H+XCN5IF04aTg/17m0f8GloVPbuPN4bntDZhAbonEBl
-TlanORDRl3+86jU7JqZ5yufcr+9f1LXEnaSoJDqt1FOd46VuLsGGXmkVjs8WjsHO
-VidSiCK5wpNtluLFKu/4JFTHWOA3Wto3JTjxj/a2Dny6M8wTnBEFpR9TEUYvoOY6
-LonEuPw6gf9VPWHsSMmn8yKGtSHsLhslJxFo+SImPsP35otaiBhF2hufejI65Twe
-n+TX6U+f9xUD2HK6AZ133T+0uLO2KrnyWWgzFhAmUvM/cXcblqA+fW8wwNaILuqD
-ONS9Kc59QKT5VVKULyQk+7fm/y036zh7xRHFhAA5BJ24VCRY9N5zY+OMbhgDi49h
-rhn1wjqqZl3374hGckB8vPrCKW2f1zFE3zg4ICRzIe8AsbVdQI9yvhpCV1F7546N
-KH2E/H01O0ZyxKSYVVtvzyq6ZgMJ/PuLfNUyqbAVtwRvT4p3+ac=
-=4Ngl
------END PGP SIGNATURE-----
-
---4LFBTxd4L5NLO6ly--
+diff --git a/scripts/fix-multiline-comments.sh b/scripts/fix-multiline-comments.sh
+new file mode 100755
+index 0000000000..93f9b10669
+--- /dev/null
++++ b/scripts/fix-multiline-comments.sh
+@@ -0,0 +1,62 @@
++#! /bin/sh
++#
++# Fix multiline comments to match CODING_STYLE
++#
++# Copyright (C) 2018 Red Hat, Inc.
++#
++# Author: Paolo Bonzini
++#
++# Usage: scripts/fix-multiline-comments.sh [-i] FILE...
++#
++# -i edits the file in place (requires gawk 4.1.0).
++#
++# Set the AWK environment variable to choose the awk interpreter to use
++# (default 'awk')
++
++if test "$1" = -i; then
++  # gawk extension
++  inplace="-i inplace"
++  shift
++fi
++${AWK-awk} $inplace 'BEGIN { indent = -1 }
++{
++    line = $0
++    # apply a star to the indent on lines after the first
++    if (indent != -1) {
++        if (line == "") {
++            line = sp " *"
++        } else if (substr(line, 1, indent + 2) == sp "  ") {
++            line = sp " *" substr(line, indent + 3)
++        }
++    }
++
++    is_lead = (line ~ /^[ \t]*\/\*/)
++    is_trail = (line ~ /\*\//)
++    if (is_lead && !is_trail) {
++        # grab the indent at the start of a comment, but not for
++        # single-line comments
++        match(line, /^[ \t]*\/\*/)
++        indent = RLENGTH - 2
++        sp = substr(line, 1, indent)
++    }
++
++    # the regular expression filters out lone /*, /**, or */
++    if (indent != -1 && !(line ~ /^[ \t]*(\/\*+|\*\/)[ \t]*$/)) {
++        if (is_lead) {
++            # split the leading /* or /** on a separate line
++            match(line, /^[ \t]*\/\*+/)
++            lead = substr(line, 1, RLENGTH)
++            match(line, /^[ \t]*\/\*+[ \t]*/)
++            line = lead "\n" sp " *" substr(line, RLENGTH)
++        }
++        if (is_trail) {
++            # split the trailing */ on a separate line
++            match(line, /[ \t]*\*\//)
++            line = substr(line, 1, RSTART - 1) "\n" sp " */"
++        }
++    }
++    if (is_trail) {
++        indent = -1
++    }
++    print line
++}' "$@"
+-- 
+2.19.2
