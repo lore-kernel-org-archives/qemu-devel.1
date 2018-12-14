@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXn4i-0001pO-Vr
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:00:26 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gXn8v-0003aM-4d
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:04:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gXn4f-0002cv-9v
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:00:16 -0500
-Received: from mail-ot1-x32c.google.com ([2607:f8b0:4864:20::32c]:33511)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gXn4f-0002Uq-03
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:00:13 -0500
-Received: by mail-ot1-x32c.google.com with SMTP id i20so5318281otl.0
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 05:00:10 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1gXn8r-0006Nz-T8
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:04:36 -0500
+Date: Fri, 14 Dec 2018 14:04:28 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181214140428.6c677a48.cohuck@redhat.com>
+In-Reply-To: <1544623878-11248-13-git-send-email-jjherne@linux.ibm.com>
+References: <1544623878-11248-1-git-send-email-jjherne@linux.ibm.com>
+	<1544623878-11248-13-git-send-email-jjherne@linux.ibm.com>
 MIME-Version: 1.0
-References: <1544606032-16924-1-git-send-email-thuth@redhat.com>
-In-Reply-To: <1544606032-16924-1-git-send-email-thuth@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 14 Dec 2018 12:59:59 +0000
-Message-ID: <CAFEAcA_S91c1bD2qNTrVpyNrHRgwMJOF1o2FYs5FwouW3QpVLw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/8] Set minimum compiler versions to GCC
- 4.8 and Clang 3.4
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 12/15] s390-bios: Refactor virtio to run
+ channel programs via cio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com, borntraeger@de.ibm.com
 
-On Wed, 12 Dec 2018 at 09:13, Thomas Huth <thuth@redhat.com> wrote:
->
->  Hi Peter,
->
-> the following changes since commit bb9bf94b3e8926553290bc9a7cb84315af422086:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-request' into staging (2018-12-11 19:18:58 +0000)
->
-> are available in the git repository at:
->
->   https://gitlab.com/huth/qemu.git tags/pull-request-2018-12-12
->
-> for you to fetch changes up to 2b4c1125ac3db2734222ff43c25388a16aca4a99:
->
->   i2c: Move typedef of bitbang_i2c_interface to i2c.h (2018-12-12 10:01:13 +0100)
->
-> ----------------------------------------------------------------
-> Explicitly check for minimum compiler versions.
-> Remove obsolete code for old compilers that is now not required anymore.
-> Fix a duplicated typedef for Clang 3.4.
+On Wed, 12 Dec 2018 09:11:15 -0500
+"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
 
-Applied, thanks.
+> Now that we have a Channel I/O library let's modify virtio boot code to
+> make use of it for running channel programs.
+> 
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> ---
+>  pc-bios/s390-ccw/virtio.c | 21 ++-------------------
+>  1 file changed, 2 insertions(+), 19 deletions(-)
+> 
+> diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
+> index aa9da72..5fb49e2 100644
+> --- a/pc-bios/s390-ccw/virtio.c
+> +++ b/pc-bios/s390-ccw/virtio.c
+> @@ -92,30 +92,13 @@ int drain_irqs(SubChannelId schid)
+>  static int run_ccw(VDev *vdev, int cmd, void *ptr, int len)
+>  {
+>      Ccw1 ccw = {};
+> -    CmdOrb orb = {};
+> -    int r;
+> -
+> -    enable_subchannel(vdev->schid);
+> -
+> -    /* start subchannel command */
+> -    orb.fmt = 1;
+> -    orb.cpa = (u32)(long)&ccw;
+> -    orb.lpm = 0x80;
+>  
+>      ccw.cmd_code = cmd;
+>      ccw.cda = (long)ptr;
+>      ccw.count = len;
+>  
+> -    r = ssch(vdev->schid, &orb);
+> -    /*
+> -     * XXX Wait until device is done processing the CCW. For now we can
+> -     *     assume that a simple tsch will have finished the CCW processing,
+> -     *     but the architecture allows for asynchronous operation
+> -     */
+> -    if (!r) {
+> -        r = drain_irqs(vdev->schid);
+> -    }
+> -    return r;
+> +    enable_subchannel(vdev->schid);
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes (we have a section for build environment
-requirements at the bottom).
+Preexisting, but I'm wondering why we enable the subchannel here and
+not just once?
 
--- PMM
+> +    return do_cio(vdev->schid, ptr2u32(&ccw), CCW_FMT1);
+>  }
+>  
+>  static void vring_init(VRing *vr, VqInfo *info)
