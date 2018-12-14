@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=8792ba347=Paul.Durrant@citrix.com>)
-	id 1gXpZJ-00076Q-Hk
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 10:40:03 -0500
+	(envelope-from <tom.deseyn@gmail.com>) id 1gXpca-0000Rw-V8
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 10:43:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=8792ba347=Paul.Durrant@citrix.com>)
-	id 1gXpZG-00014X-CI
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 10:40:01 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Fri, 14 Dec 2018 15:39:54 +0000
-Message-ID: <0fcaf42a67b449138726391fed187589@AMSPEX02CL02.citrite.net>
-References: <1544543862-9997-1-git-send-email-paul.durrant@citrix.com>
-	<1544543862-9997-17-git-send-email-paul.durrant@citrix.com>
-	<20181213115152.GA5427@linux.fritz.box>
-	<6291f3bff540494a9f1b2e7ce72570ac@AMSPEX02CL02.citrite.net>
-In-Reply-To: <6291f3bff540494a9f1b2e7ce72570ac@AMSPEX02CL02.citrite.net>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <tom.deseyn@gmail.com>) id 1gXpcW-0003Yc-O3
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 10:43:24 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37165)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tom.deseyn@gmail.com>)
+	id 1gXpcU-0003TO-NX
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 10:43:18 -0500
+Received: by mail-wr1-x442.google.com with SMTP id s12so5428666wrt.4
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 07:43:17 -0800 (PST)
+From: tom.deseyn@gmail.com
+Date: Fri, 14 Dec 2018 16:41:31 +0100
+Message-Id: <20181214154130.4069-1-tom.deseyn@gmail.com>
+In-Reply-To: <b95d4a9c-4bee-5e0d-5ec6-02edf3aefcc1@vivier.eu>
+References: <b95d4a9c-4bee-5e0d-5ec6-02edf3aefcc1@vivier.eu>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 16/18] xen: automatically create
- XenBlockDevice-s
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3] Add getsockopt for settable SOL_IPV6 options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +28,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>, 'Kevin Wolf' <kwolf@redhat.com>
-Cc: "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Stefano Stabellini <sstabellini@kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: riku.voipio@iki.fi, laurent@vivier.eu, Tom Deseyn <tom.deseyn@gmail.com>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBYZW4tZGV2ZWwgW21haWx0bzp4
-ZW4tZGV2ZWwtYm91bmNlc0BsaXN0cy54ZW5wcm9qZWN0Lm9yZ10gT24gQmVoYWxmDQo+IE9mIFBh
-dWwgRHVycmFudA0KPiBTZW50OiAxNCBEZWNlbWJlciAyMDE4IDE0OjUwDQo+IFRvOiAnS2V2aW4g
-V29sZicgPGt3b2xmQHJlZGhhdC5jb20+DQo+IENjOiB4ZW4tZGV2ZWxAbGlzdHMueGVucHJvamVj
-dC5vcmc7IFN0ZWZhbm8gU3RhYmVsbGluaQ0KPiA8c3N0YWJlbGxpbmlAa2VybmVsLm9yZz47IHFl
-bXUtZGV2ZWxAbm9uZ251Lm9yZzsgcWVtdS1ibG9ja0Bub25nbnUub3JnOw0KPiBNYXggUmVpdHog
-PG1yZWl0ekByZWRoYXQuY29tPg0KPiBTdWJqZWN0OiBSZTogW1hlbi1kZXZlbF0gW1BBVENIIHY0
-IDE2LzE4XSB4ZW46IGF1dG9tYXRpY2FsbHkgY3JlYXRlDQo+IFhlbkJsb2NrRGV2aWNlLXMNCj4g
-DQo+ID4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gW3NuaXBdDQo+ID4gPiArDQo+ID4g
-PiArICAgIGJsb2NrZGV2LT5hdXRvX2lvdGhyZWFkID0gaW90aHJlYWQ7DQo+ID4gPiArDQo+ID4g
-PiArICAgIG9iamVjdF9wcm9wZXJ0eV9zZXRfYm9vbChPQkpFQ1QoZGV2KSwgdHJ1ZSwgInJlYWxp
-emVkIiwNCj4gPiAmbG9jYWxfZXJyKTsNCj4gPiA+ICsgICAgaWYgKGxvY2FsX2Vycikgew0KPiA+
-ID4gKyAgICAgICAgZXJyb3JfcHJvcGFnYXRlX3ByZXBlbmQoZXJycCwgbG9jYWxfZXJyLA0KPiA+
-ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgImluaXRpYWxpemF0aW9uIG9mIGRl
-dmljZSAlcyBmYWlsZWQ6DQo+ICIsDQo+ID4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICB0eXBlKTsNCj4gPiA+ICsgICAgICAgIGdvdG8gdW5yZWY7DQo+ID4gPiArICAgIH0NCj4g
-PiA+ICsNCj4gPiA+ICsgICAgYmxvY2tkZXZfbWFya19hdXRvX2RlbChibGspOw0KPiA+DQo+ID4g
-WW91IGRvbid0IG5lZWQgdGhpcyBvbmUgYW55IG1vcmUgdGhlbiAoaWYgeW91IGxvb2sgaW50byB0
-aGUgZGV0YWlscywNCj4gPiBpdCdzIG9uZSBvZiB0aGUgbW9yZSBjb25mdXNpbmcgcGFydHMgb2Yg
-dGhlIGRyaXZlXyooKSBtYWdpYywgc28gaXQncw0KPiA+IGdvb2QgdG8gZ2V0IHJpZCBvZiBpdCku
-IFdoZW4geW91IHVzZSB0aGUgYW5vbnltb3VzIEJsb2NrQmFja2VuZCBjcmVhdGVkDQo+ID4gYnkg
-dGhlIHFkZXYgZHJpdmUgcHJvcGVydHkgKGJlY2F1c2UgeW91IHBhc3NlZCBpdCBhIG5vZGUtbmFt
-ZSByYXRoZXINCj4gPiB0aGFuIGEgQmxvY2tCYWNrZW5kIG5hbWUpIG1lYW5zIHRoYXQgdGhlIEJs
-b2NrQmFja2VuZCBkaXNhcHBlYXJzDQo+ID4gdG9nZXRoZXIgd2l0aCB0aGUgZHJpdmUuDQo+ID4N
-Cj4gPiBOb3RlIHRoYXQgZXhwbGljaXRseSBjcmVhdGVkIGJsb2NrIG5vZGVzIG11c3QgYWxzbyBi
-ZSB1bnJlZmVyZW5jZWQNCj4gPiBleHBsaWNpdGx5IChiZHJ2X29wZW4oKSBzaG91bGQgYmUgcGFp
-cmVkIHdpdGggYmRydl91bnJlZigpIGFuZA0KPiA+IHFtcF9ibG9ja2Rldl9hZGQoKSB3aXRoIHFt
-cF9ibG9ja2Rldl9kZWwoKSkuIE1heWJlIFhlbkJhY2tlbmRJbmZvIG5lZWRzDQo+ID4gYSAuZGVz
-dHJveSBjYWxsYmFjayBzbyB3ZSBjYW4gZG8gZGVzdHJ1Y3Rpb24gc3ltbWV0cmljYWxseSB0byBk
-ZXZpY2UNCj4gPiBjcmVhdGlvbj8NCj4gPg0KPiANCj4gSSBoYXZlIHNvbWV0aGluZyBpbXBsZW1l
-bnRlZCB1c2luZyBxbXBfYmxvY2tkZXZfYWRkKCkgbm93IGFuZCBpdCBzZWVtcyB0bw0KPiB3b3Jr
-LCBidXQgd2hlbiBJIGNhbGwgaW50byBxbXBfYmxvY2tkZXZfZGVsKCkgKHBhc3NpbmcgaW4gdGhl
-IG5vZGUtbmFtZSBJDQo+IHVzZWQgdG8gdGhlIHNldCB0aGUgImRyaXZlIiBwYXJhbWV0ZXIpIGR1
-cmluZyB1bnJlYWxpemUgdGhlbiBpdCB0ZWxscyBtZQ0KPiB0aGF0IHRoZSBkZXZpY2UgaXMgaW4g
-dXNlLiBEbyBJIG5lZWQgYSBjYWxsYmFjayB0aGF0IHJ1bnMgYWZ0ZXIgdW5yZWFsaXplDQo+IG9m
-IHRoZSBkZXZpY2U/DQoNCkkgaGF2ZSBjb2RlZCBpdCB1cCBub3cgYW5kIGFwcGFyZW50bHkgSSBk
-by4NCg0KICBQYXVsDQoNCj4gDQo+ICAgUGF1bA0KPiANCj4gPiA+ICsgICAgcmV0dXJuOw0KPiA+
-ID4gKw0KPiA+ID4gK3VucmVmOg0KPiA+ID4gKyAgICBpZiAoZGV2KSB7DQo+ID4gPiArICAgICAg
-ICBvYmplY3RfdW5wYXJlbnQoT0JKRUNUKGRldikpOw0KPiA+ID4gKyAgICB9DQo+ID4gPiArDQo+
-ID4gPiArICAgIGlmIChpb3RocmVhZCkgew0KPiA+ID4gKyAgICAgICAgaW90aHJlYWRfZGVzdHJv
-eShpb3RocmVhZCk7DQo+ID4gPiArICAgIH0NCj4gPiA+ICsNCj4gPiA+ICsgICAgaWYgKGJsaykg
-ew0KPiA+ID4gKyAgICAgICAgbW9uaXRvcl9yZW1vdmVfYmxrKGJsayk7DQo+ID4gPiArICAgICAg
-ICBibGtfdW5yZWYoYmxrKTsNCj4gPiA+ICsgICAgfQ0KPiA+ID4gK30NCj4gPg0KPiA+IEtldmlu
-DQo+IA0KPiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXw0K
-PiBYZW4tZGV2ZWwgbWFpbGluZyBsaXN0DQo+IFhlbi1kZXZlbEBsaXN0cy54ZW5wcm9qZWN0Lm9y
-Zw0KPiBodHRwczovL2xpc3RzLnhlbnByb2plY3Qub3JnL21haWxtYW4vbGlzdGluZm8veGVuLWRl
-dmVsDQo=
+From: Tom Deseyn <tom.deseyn@gmail.com>
+
+Thank you for reviewing Laurant.
+Sorry for missing history, I'm not used to sending patches via mail.
+I got an email about code style. For now, I'm sticking to the style
+that is used in the function.
+
+v2: default to unimplemented
+v3: match kernel behavior
+
+Signed-off-by: Tom Deseyn <tom.deseyn@gmail.com>
+---
+ linux-user/syscall.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 280137da8c..f103437f26 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -2352,6 +2352,42 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
+             break;
+         }
+         break;
++    case SOL_IPV6:
++        switch (optname) {
++        case IPV6_MTU_DISCOVER:
++        case IPV6_MTU:
++        case IPV6_V6ONLY:
++        case IPV6_RECVPKTINFO:
++        case IPV6_UNICAST_HOPS:
++        case IPV6_MULTICAST_HOPS:
++        case IPV6_MULTICAST_LOOP:
++        case IPV6_RECVERR:
++        case IPV6_RECVHOPLIMIT:
++        case IPV6_2292HOPLIMIT:
++        case IPV6_CHECKSUM: {
++            void* target_addr;
++            if (get_user_u32(len, optlen))
++                return -TARGET_EFAULT;
++            if (len < 0)
++                return -TARGET_EINVAL;
++            lv = sizeof(val);
++            ret = get_errno(getsockopt(sockfd, level, optname, &val, &lv));
++            if (ret < 0)
++                return ret;
++            if (lv < len)
++                len = lv;
++            if (put_user_u32(len, optlen))
++                return -TARGET_EFAULT;
++            target_addr = lock_user(VERIFY_WRITE, optval_addr, len, 0);
++            tswap32s((uint32_t*)&val);
++            memcpy(target_addr, &val, len);
++            unlock_user(target_addr, optval_addr, len);
++            break;
++        }
++        default:
++            goto unimplemented;
++        }
++        break;
+     default:
+     unimplemented:
+         gemu_log("getsockopt level=%d optname=%d not yet supported\n",
+-- 
+2.19.2
