@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gXnvp-0008SU-QG
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:11 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gXnvo-00020H-D7
+	(envelope-from <alex.bennee@linaro.org>) id 1gXnvo-0008Rc-Vr
 	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:09 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51437)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <alex.bennee@linaro.org>) id 1gXnvm-0001zh-Hc
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:08 -0500
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:40595)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gXnvn-0001zw-Hd
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:08 -0500
-Received: by mail-wm1-x342.google.com with SMTP id s14so5782287wmh.1
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 05:55:07 -0800 (PST)
+	id 1gXnvm-0001zF-AB
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:06 -0500
+Received: by mail-wm1-x333.google.com with SMTP id q26so5857356wmf.5
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 05:55:06 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 14 Dec 2018 13:54:52 +0000
-Message-Id: <20181214135452.25936-16-alex.bennee@linaro.org>
+Date: Fri, 14 Dec 2018 13:54:51 +0000
+Message-Id: <20181214135452.25936-15-alex.bennee@linaro.org>
 In-Reply-To: <20181214135452.25936-1-alex.bennee@linaro.org>
 References: <20181214135452.25936-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 15/15] hardfloat: implement float32/64 comparison
+Subject: [Qemu-devel] [PULL 14/15] hardfloat: implement float32/64 square
+ root
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,198 +39,101 @@ Performance results for fp-bench:
 
 Host: Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
 - before:
-cmp-single: 110.98 MFlops
-cmp-double: 107.12 MFlops
+sqrt-single: 42.30 MFlops
+sqrt-double: 22.97 MFlops
 - after:
-cmp-single: 506.28 MFlops
-cmp-double: 524.77 MFlops
+sqrt-single: 311.42 MFlops
+sqrt-double: 311.08 MFlops
 
-Note that flattening both eq and eq_signaling versions
-would give us extra performance (695v506, 615v524 Mflops
-for single/double, respectively) but this would emit two
-essentially identical functions for each eq/signaling pair,
-which is a waste.
-
-Aggregate performance improvement for the last few patches:
-[ all charts in png: https://imgur.com/a/4yV8p ]
-
-1. Host: Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
-
-                   qemu-aarch64 NBench score; higher is better
-                 Host: Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
-
-  16 +-+-----------+-------------+----===-------+---===-------+-----------+-+
-  14 +-+..........................@@@&&.=.......@@@&&.=...................+-+
-  12 +-+..........................@.@.&.=.......@.@.&.=.....+befor===     +-+
-  10 +-+..........................@.@.&.=.......@.@.&.=.....+ad@@&& =     +-+
-   8 +-+.......................$$$%.@.&.=.......@.@.&.=.....+  @@u& =     +-+
-   6 +-+............@@@&&=+***##.$%.@.&.=***##$$%+@.&.=..###$$%%@i& =     +-+
-   4 +-+.......###$%%.@.&=.*.*.#.$%.@.&.=*.*.#.$%.@.&.=+**.#+$ +@m& =     +-+
-   2 +-+.....***.#$.%.@.&=.*.*.#.$%.@.&.=*.*.#.$%.@.&.=.**.#+$+sqr& =     +-+
-   0 +-+-----***##$%%@@&&=-***##$$%@@&&==***##$$%@@&&==-**##$$%+cmp==-----+-+
-            FOURIER    NEURAL NELU DECOMPOSITION         gmean
-
-                              qemu-aarch64 SPEC06fp (test set) speedup over QEMU 4c2c1015905
-                                      Host: Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
-                                            error bars: 95% confidence interval
-
-  4.5 +-+---+-----+----+-----+-----+-&---+-----+----+-----+-----+-----+----+-----+-----+-----+-----+----+-----+---+-+
-    4 +-+..........................+@@+...........................................................................+-+
-  3.5 +-+..............%%@&.........@@..............%%@&............................................+++dsub       +-+
-  2.5 +-+....&&+.......%%@&.......+%%@..+%%&+..@@&+.%%@&....................................+%%&+.+%@&++%%@&      +-+
-    2 +-+..+%%&..+%@&+.%%@&...+++..%%@...%%&.+$$@&..%%@&..%%@&.......+%%&+.%%@&+......+%%@&.+%%&++$$@&++d%@&  %%@&+-+
-  1.5 +-+**#$%&**#$@&**#%@&**$%@**#$%@**#$%&**#$@&**$%@&*#$%@**#$%@**#$%&**#%@&**$%@&*#$%@**#$%&**#$@&*+f%@&**$%@&+-+
-  0.5 +-+**#$%&**#$@&**#%@&**$%@**#$%@**#$%&**#$@&**$%@&*#$%@**#$%@**#$%&**#%@&**$%@&*#$%@**#$%&**#$@&+sqr@&**$%@&+-+
-    0 +-+**#$%&**#$@&**#%@&**$%@**#$%@**#$%&**#$@&**$%@&*#$%@**#$%@**#$%&**#%@&**$%@&*#$%@**#$%&**#$@&*+cmp&**$%@&+-+
-  410.bw416.gam433.434.z435.436.cac437.lesli444.447.de450.so453454.ca459.GemsF465.tont470.lb4482.sphinxgeomean
-
-2. Host: ARM Aarch64 A57 @ 2.4GHz
-
-                    qemu-aarch64 NBench score; higher is better
-                 Host: Applied Micro X-Gene, Aarch64 A57 @ 2.4 GHz
-
-    5 +-+-----------+-------------+-------------+-------------+-----------+-+
-  4.5 +-+........................................@@@&==...................+-+
-  3 4 +-+..........................@@@&==........@.@&.=.....+before       +-+
-    3 +-+..........................@.@&.=........@.@&.=.....+ad@@@&==     +-+
-  2.5 +-+.....................##$$%%.@&.=........@.@&.=.....+  @m@& =     +-+
-    2 +-+............@@@&==.***#.$.%.@&.=.***#$$%%.@&.=.***#$$%%d@& =     +-+
-  1.5 +-+.....***#$$%%.@&.=.*.*#.$.%.@&.=.*.*#.$.%.@&.=.*.*#+$ +f@& =     +-+
-  0.5 +-+.....*.*#.$.%.@&.=.*.*#.$.%.@&.=.*.*#.$.%.@&.=.*.*#+$+sqr& =     +-+
-    0 +-+-----***#$$%%@@&==-***#$$%%@@&==-***#$$%%@@&==-***#$$%+cmp==-----+-+
-             FOURIER    NEURAL NLU DECOMPOSITION         gmean
+Here USE_FP makes a huge difference for f64's, with throughput
+going from ~200 MFlops to ~300 MFlops.
 
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
 diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index fbd66fd8dc..59eac97d10 100644
+index 7554d63495..fbd66fd8dc 100644
 --- a/fpu/softfloat.c
 +++ b/fpu/softfloat.c
-@@ -2903,28 +2903,109 @@ static int compare_floats(FloatParts a, FloatParts b, bool is_quiet,
-     }
+@@ -3044,20 +3044,76 @@ float16 QEMU_FLATTEN float16_sqrt(float16 a, float_status *status)
+     return float16_round_pack_canonical(pr, status);
  }
  
--#define COMPARE(sz)                                                     \
--int float ## sz ## _compare(float ## sz a, float ## sz b,               \
--                            float_status *s)                            \
-+#define COMPARE(name, attr, sz)                                         \
-+static int attr                                                         \
-+name(float ## sz a, float ## sz b, bool is_quiet, float_status *s)      \
- {                                                                       \
-     FloatParts pa = float ## sz ## _unpack_canonical(a, s);             \
-     FloatParts pb = float ## sz ## _unpack_canonical(b, s);             \
--    return compare_floats(pa, pb, false, s);                            \
--}                                                                       \
--int float ## sz ## _compare_quiet(float ## sz a, float ## sz b,         \
--                                  float_status *s)                      \
--{                                                                       \
--    FloatParts pa = float ## sz ## _unpack_canonical(a, s);             \
--    FloatParts pb = float ## sz ## _unpack_canonical(b, s);             \
--    return compare_floats(pa, pb, true, s);                             \
-+    return compare_floats(pa, pb, is_quiet, s);                         \
- }
- 
--COMPARE(16)
--COMPARE(32)
--COMPARE(64)
-+COMPARE(soft_f16_compare, QEMU_FLATTEN, 16)
-+COMPARE(soft_f32_compare, QEMU_SOFTFLOAT_ATTR, 32)
-+COMPARE(soft_f64_compare, QEMU_SOFTFLOAT_ATTR, 64)
- 
- #undef COMPARE
- 
-+int float16_compare(float16 a, float16 b, float_status *s)
-+{
-+    return soft_f16_compare(a, b, false, s);
-+}
-+
-+int float16_compare_quiet(float16 a, float16 b, float_status *s)
-+{
-+    return soft_f16_compare(a, b, true, s);
-+}
-+
-+static int QEMU_FLATTEN
-+f32_compare(float32 xa, float32 xb, bool is_quiet, float_status *s)
-+{
-+    union_float32 ua, ub;
-+
-+    ua.s = xa;
-+    ub.s = xb;
-+
-+    if (QEMU_NO_HARDFLOAT) {
-+        goto soft;
-+    }
-+
-+    float32_input_flush2(&ua.s, &ub.s, s);
-+    if (isgreaterequal(ua.h, ub.h)) {
-+        if (isgreater(ua.h, ub.h)) {
-+            return float_relation_greater;
-+        }
-+        return float_relation_equal;
-+    }
-+    if (likely(isless(ua.h, ub.h))) {
-+        return float_relation_less;
-+    }
-+    /* The only condition remaining is unordered.
-+     * Fall through to set flags.
-+     */
-+ soft:
-+    return soft_f32_compare(ua.s, ub.s, is_quiet, s);
-+}
-+
-+int float32_compare(float32 a, float32 b, float_status *s)
-+{
-+    return f32_compare(a, b, false, s);
-+}
-+
-+int float32_compare_quiet(float32 a, float32 b, float_status *s)
-+{
-+    return f32_compare(a, b, true, s);
-+}
-+
-+static int QEMU_FLATTEN
-+f64_compare(float64 xa, float64 xb, bool is_quiet, float_status *s)
-+{
-+    union_float64 ua, ub;
-+
-+    ua.s = xa;
-+    ub.s = xb;
-+
-+    if (QEMU_NO_HARDFLOAT) {
-+        goto soft;
-+    }
-+
-+    float64_input_flush2(&ua.s, &ub.s, s);
-+    if (isgreaterequal(ua.h, ub.h)) {
-+        if (isgreater(ua.h, ub.h)) {
-+            return float_relation_greater;
-+        }
-+        return float_relation_equal;
-+    }
-+    if (likely(isless(ua.h, ub.h))) {
-+        return float_relation_less;
-+    }
-+    /* The only condition remaining is unordered.
-+     * Fall through to set flags.
-+     */
-+ soft:
-+    return soft_f64_compare(ua.s, ub.s, is_quiet, s);
-+}
-+
-+int float64_compare(float64 a, float64 b, float_status *s)
-+{
-+    return f64_compare(a, b, false, s);
-+}
-+
-+int float64_compare_quiet(float64 a, float64 b, float_status *s)
-+{
-+    return f64_compare(a, b, true, s);
-+}
-+
- /* Multiply A by 2 raised to the power N.  */
- static FloatParts scalbn_decomposed(FloatParts a, int n, float_status *s)
+-float32 QEMU_FLATTEN float32_sqrt(float32 a, float_status *status)
++static float32 QEMU_SOFTFLOAT_ATTR
++soft_f32_sqrt(float32 a, float_status *status)
  {
+     FloatParts pa = float32_unpack_canonical(a, status);
+     FloatParts pr = sqrt_float(pa, status, &float32_params);
+     return float32_round_pack_canonical(pr, status);
+ }
+ 
+-float64 QEMU_FLATTEN float64_sqrt(float64 a, float_status *status)
++static float64 QEMU_SOFTFLOAT_ATTR
++soft_f64_sqrt(float64 a, float_status *status)
+ {
+     FloatParts pa = float64_unpack_canonical(a, status);
+     FloatParts pr = sqrt_float(pa, status, &float64_params);
+     return float64_round_pack_canonical(pr, status);
+ }
+ 
++float32 QEMU_FLATTEN float32_sqrt(float32 xa, float_status *s)
++{
++    union_float32 ua, ur;
++
++    ua.s = xa;
++    if (unlikely(!can_use_fpu(s))) {
++        goto soft;
++    }
++
++    float32_input_flush1(&ua.s, s);
++    if (QEMU_HARDFLOAT_1F32_USE_FP) {
++        if (unlikely(!(fpclassify(ua.h) == FP_NORMAL ||
++                       fpclassify(ua.h) == FP_ZERO) ||
++                     signbit(ua.h))) {
++            goto soft;
++        }
++    } else if (unlikely(!float32_is_zero_or_normal(ua.s) ||
++                        float32_is_neg(ua.s))) {
++        goto soft;
++    }
++    ur.h = sqrtf(ua.h);
++    return ur.s;
++
++ soft:
++    return soft_f32_sqrt(ua.s, s);
++}
++
++float64 QEMU_FLATTEN float64_sqrt(float64 xa, float_status *s)
++{
++    union_float64 ua, ur;
++
++    ua.s = xa;
++    if (unlikely(!can_use_fpu(s))) {
++        goto soft;
++    }
++
++    float64_input_flush1(&ua.s, s);
++    if (QEMU_HARDFLOAT_1F64_USE_FP) {
++        if (unlikely(!(fpclassify(ua.h) == FP_NORMAL ||
++                       fpclassify(ua.h) == FP_ZERO) ||
++                     signbit(ua.h))) {
++            goto soft;
++        }
++    } else if (unlikely(!float64_is_zero_or_normal(ua.s) ||
++                        float64_is_neg(ua.s))) {
++        goto soft;
++    }
++    ur.h = sqrt(ua.h);
++    return ur.s;
++
++ soft:
++    return soft_f64_sqrt(ua.s, s);
++}
++
+ /*----------------------------------------------------------------------------
+ | The pattern for a default generated NaN.
+ *----------------------------------------------------------------------------*/
 -- 
 2.17.1
