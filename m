@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gXqCq-0004FW-Lx
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 11:20:53 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gXqI5-0006NQ-KP
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 11:26:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gXqCp-0006Xc-Me
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 11:20:52 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 14 Dec 2018 16:20:40 +0000
-Message-ID: <407c1184-67fa-1d0f-a1f7-c4050521d332@virtuozzo.com>
-References: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
-	<20181203101429.88735-9-anton.nefedov@virtuozzo.com>
-In-Reply-To: <20181203101429.88735-9-anton.nefedov@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <685E9D21B7E73144BED4F2988638F109@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <alex.bennee@linaro.org>) id 1gXqI0-0001UY-Lg
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 11:26:17 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39332)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gXqHz-0001S1-IF
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 11:26:11 -0500
+Received: by mail-wm1-x341.google.com with SMTP id f81so6343304wmd.4
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 08:26:10 -0800 (PST)
+References: <20181213115503.24188-1-alex.bennee@linaro.org>
+	<20181213115503.24188-2-alex.bennee@linaro.org>
+	<CAKv+Gu_C78f-a1MdsdXHi6u_gyhRh3djbzM3_vZ3K=AtWzqXGg@mail.gmail.com>
+	<87mup91nox.fsf@linaro.org>
+	<a78b697f-4bb8-f54e-28a9-34ecf6a40f29@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <a78b697f-4bb8-f54e-28a9-34ecf6a40f29@linaro.org>
+Date: Fri, 14 Dec 2018 16:26:08 +0000
+Message-ID: <87ftv013dr.fsf@linaro.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v10 8/9] qcow2: skip writing zero buffers
- to empty COW areas
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 1/2] target/arm: kvm64 make guest debug
+ AA32 break point aware
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,71 +34,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, omair.javaid@linaro.org
 
-MDMuMTIuMjAxOCAxMzoxNCwgQW50b24gTmVmZWRvdiB3cm90ZToNCj4gSWYgQ09XIGFyZWFzIG9m
-IHRoZSBuZXdseSBhbGxvY2F0ZWQgY2x1c3RlcnMgYXJlIHplcm9lcyBvbiB0aGUgYmFja2luZyBp
-bWFnZSwNCj4gZWZmaWNpZW50IGJkcnZfd3JpdGVfemVyb2VzKGZsYWdzPUJEUlZfUkVRX0FMTE9D
-QVRFKSBjYW4gYmUgdXNlZCBvbiB0aGUgd2hvbGUNCj4gY2x1c3RlciBpbnN0ZWFkIG9mIHdyaXRp
-bmcgZXhwbGljaXQgemVybyBidWZmZXJzIGxhdGVyIGluIHBlcmZvcm1fY293KCkuDQo+IA0KPiBp
-b3Rlc3QgMDYwOg0KPiB3cml0ZSB0byB0aGUgZGlzY2FyZGVkIGNsdXN0ZXIgZG9lcyBub3QgdHJp
-Z2dlciBDT1cgYW55bW9yZS4NCj4gVXNlIGEgYmFja2luZyBpbWFnZSBpbnN0ZWFkLg0KPiANCg0K
-Wy4uXQ0KDQo+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8wNjANCj4gKysrIGIvdGVzdHMvcWVt
-dS1pb3Rlc3RzLzA2MA0KPiBAQCAtMTUwLDI3ICsxNTAsMzMgQEAgJFFFTVVfSU8gLWMgIiRPUEVO
-X1JPIiAtYyAicmVhZCAtUCAxIDAgNTEyIiB8IF9maWx0ZXJfcWVtdV9pbw0KPiAgIGVjaG8NCj4g
-ICBlY2hvICI9PT0gVGVzdGluZyBvdmVybGFwIHdoaWxlIENPVyBpcyBpbiBmbGlnaHQgPT09Ig0K
-PiAgIGVjaG8NCj4gK0JBQ0tJTkdfSU1HPSRURVNUX0lNRy5iYXNlDQo+ICtURVNUX0lNRz0kQkFD
-S0lOR19JTUcgX21ha2VfdGVzdF9pbWcgMUcNCj4gKw0KPiArJFFFTVVfSU8gLWMgJ3dyaXRlIDY0
-ayA2NGsnICIkQkFDS0lOR19JTUciIHwgX2ZpbHRlcl9xZW11X2lvDQo+ICsNCj4gICAjIGNvbXBh
-dD0wLjEwIGlzIHJlcXVpcmVkIGluIG9yZGVyIHRvIG1ha2UgdGhlIGZvbGxvd2luZyBkaXNjYXJk
-IGFjdHVhbGx5DQo+IC0jIHVuYWxsb2NhdGUgdGhlIHNlY3RvciByYXRoZXIgdGhhbiBtYWtlIGl0
-IGEgemVybyBzZWN0b3IgLSB3ZSB3YW50IENPVywgYWZ0ZXINCj4gLSMgYWxsLg0KPiAtSU1HT1BU
-Uz0nY29tcGF0PTAuMTAnIF9tYWtlX3Rlc3RfaW1nIDFHDQo+ICsjIHVuYWxsb2NhdGUgdGhlIHNl
-Y3RvciByYXRoZXIgdGhhbiBtYWtlIGl0IGEgemVybyBzZWN0b3IgYXMgd2Ugd291bGQgbGlrZQ0K
-PiArIyB0byByZXVzZSBpdCBmb3IgYW5vdGhlciBndWVzdCBvZmZzZXQNCj4gK0lNR09QVFM9J2Nv
-bXBhdD0wLjEwJyBfbWFrZV90ZXN0X2ltZyAtYiAiJEJBQ0tJTkdfSU1HIiAxRw0KPiAgICMgV3Jp
-dGUgdHdvIGNsdXN0ZXJzLCB0aGUgc2Vjb25kIG9uZSBlbmZvcmNlcyBjcmVhdGlvbiBvZiBhbiBM
-MiB0YWJsZSBhZnRlcg0KPiAgICMgdGhlIGZpcnN0IGRhdGEgY2x1c3Rlci4NCj4gICAkUUVNVV9J
-TyAtYyAnd3JpdGUgMGsgNjRrJyAtYyAnd3JpdGUgNTEyTSA2NGsnICIkVEVTVF9JTUciIHwgX2Zp
-bHRlcl9xZW11X2lvDQo+IC0jIERpc2NhcmQgdGhlIGZpcnN0IGNsdXN0ZXIuIFRoaXMgY2x1c3Rl
-ciB3aWxsIHNvb24gZW5vdWdoIGJlIHJlYWxsb2NhdGVkIGFuZA0KPiAtIyB1c2VkIGZvciBDT1cu
-DQo+ICsjIERpc2NhcmQgdGhlIGZpcnN0IGNsdXN0ZXIuIFRoaXMgY2x1c3RlciB3aWxsIHNvb24g
-ZW5vdWdoIGJlIHJlYWxsb2NhdGVkDQo+ICAgJFFFTVVfSU8gLWMgJ2Rpc2NhcmQgMGsgNjRrJyAi
-JFRFU1RfSU1HIiB8IF9maWx0ZXJfcWVtdV9pbw0KPiAgICMgTm93LCBjb3JydXB0IHRoZSBpbWFn
-ZSBieSBtYXJraW5nIHRoZSBzZWNvbmQgTDIgdGFibGUgY2x1c3RlciBhcyBmcmVlLg0KPiAgIHBv
-a2VfZmlsZSAiJFRFU1RfSU1HIiAnMTMxMDg0JyAiXHgwMFx4MDAiICMgMHgyMDAwYw0KPiAtIyBT
-dGFydCBhIHdyaXRlIG9wZXJhdGlvbiByZXF1aXJpbmcgQ09XIG9uIHRoZSBpbWFnZSBzdG9wcGlu
-ZyBpdCByaWdodCBiZWZvcmUNCj4gLSMgZG9pbmcgdGhlIHJlYWQ7IHRoZW4sIHRyaWdnZXIgdGhl
-IGNvcnJ1cHRpb24gcHJldmVudGlvbiBieSB3cml0aW5nIGFueXRoaW5nIHRvDQo+IC0jIGFueSB1
-bmFsbG9jYXRlZCBjbHVzdGVyLCBsZWFkaW5nIHRvIGFuIGF0dGVtcHQgdG8gb3ZlcndyaXRlIHRo
-ZSBzZWNvbmQgTDINCj4gKyMgU3RhcnQgYSB3cml0ZSBvcGVyYXRpb24gcmVxdWlyaW5nIENPVyBv
-biB0aGUgaW1hZ2U7DQo+ICsjIHRoaXMgd3JpdGUgd2lsbCByZXVzZSB0aGUgaG9zdCBvZmZzZXQg
-cmVsZWFzZWQgYnkgYSBwcmV2aW91cyBkaXNjYXJkLg0KPiArIyBTdG9wIGl0IHJpZ2h0IGJlZm9y
-ZSBkb2luZyB0aGUgcmVhZC4NCj4gKyMgVGhlbiwgdHJpZ2dlciB0aGUgY29ycnVwdGlvbiBwcmV2
-ZW50aW9uIGJ5IHdyaXRpbmcgYW55dGhpbmcgdG8NCj4gKyMgYW5vdGhlciB1bmFsbG9jYXRlZCBj
-bHVzdGVyLCBsZWFkaW5nIHRvIGFuIGF0dGVtcHQgdG8gb3ZlcndyaXRlIHRoZSBzZWNvbmQgTDIN
-Cj4gICAjIHRhYmxlLiBGaW5hbGx5LCByZXN1bWUgdGhlIENPVyB3cml0ZSBhbmQgc2VlIGl0IGZh
-aWwgKGJ1dCBub3QgY3Jhc2gpLg0KPiAgIGVjaG8gIm9wZW4gLW8gZmlsZS5kcml2ZXI9YmxrZGVi
-dWcgJFRFU1RfSU1HDQo+ICAgYnJlYWsgY293X3JlYWQgMA0KPiAtYWlvX3dyaXRlIDBrIDFrDQo+
-ICthaW9fd3JpdGUgNjRrIDFrDQo+ICAgd2FpdF9icmVhayAwDQo+IC13cml0ZSA2NGsgNjRrDQo+
-ICt3cml0ZSAxMjhrIDY0aw0KDQpkb24ndCB1bmRlcnN0YW5kIHdoeSB5b3UgbmVlZCB0aGVzZSBj
-aGFuZ2VzLg0KDQp3b3JrcyBmb3IgbWUsIHdpdGhvdXQgdGhlbSwgaWYgd3JpdGUgdG8gYmFja2lu
-ZyBhdCAwIG9mZnNldCwgb2YgY291cnNlLg0KDQpBcyBJIHVuZGVyc3RhbmQsIGRpc2NhcmQgY3Jl
-YXRlIHVuYWxsb2NhdGVkIGhvbGVzIGluIHRvcCBxY293MiBmb3Igb2xkIHFjb3cyIHZlcnNpb24u
-DQoNCj4gICByZXN1bWUgMCIgfCAkUUVNVV9JTyB8IF9maWx0ZXJfcWVtdV9pbw0KPiAgIA0KPiAg
-IGVjaG8NCj4gZGlmZiAtLWdpdCBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8wNjAub3V0IGIvdGVzdHMv
-cWVtdS1pb3Rlc3RzLzA2MC5vdXQNCj4gaW5kZXggZDY3YzYyMzRhNC4uZWM4ZjE1ZDJmMCAxMDA2
-NDQNCj4gLS0tIGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzA2MC5vdXQNCj4gKysrIGIvdGVzdHMvcWVt
-dS1pb3Rlc3RzLzA2MC5vdXQNCj4gQEAgLTk3LDcgKzk3LDEwIEBAIHJlYWQgNTEyLzUxMiBieXRl
-cyBhdCBvZmZzZXQgMA0KPiAgIA0KPiAgID09PSBUZXN0aW5nIG92ZXJsYXAgd2hpbGUgQ09XIGlz
-IGluIGZsaWdodCA9PT0NCj4gICANCj4gLUZvcm1hdHRpbmcgJ1RFU1RfRElSL3QuSU1HRk1UJywg
-Zm10PUlNR0ZNVCBzaXplPTEwNzM3NDE4MjQNCj4gK0Zvcm1hdHRpbmcgJ1RFU1RfRElSL3QuSU1H
-Rk1ULmJhc2UnLCBmbXQ9SU1HRk1UIHNpemU9MTA3Mzc0MTgyNA0KPiArd3JvdGUgNjU1MzYvNjU1
-MzYgYnl0ZXMgYXQgb2Zmc2V0IDY1NTM2DQo+ICs2NCBLaUIsIFggb3BzOyBYWDpYWDpYWC5YIChY
-WFggWVlZL3NlYyBhbmQgWFhYIG9wcy9zZWMpDQo+ICtGb3JtYXR0aW5nICdURVNUX0RJUi90LklN
-R0ZNVCcsIGZtdD1JTUdGTVQgc2l6ZT0xMDczNzQxODI0IGJhY2tpbmdfZmlsZT1URVNUX0RJUi90
-LklNR0ZNVC5iYXNlDQo+ICAgd3JvdGUgNjU1MzYvNjU1MzYgYnl0ZXMgYXQgb2Zmc2V0IDANCj4g
-ICA2NCBLaUIsIFggb3BzOyBYWDpYWDpYWC5YIChYWFggWVlZL3NlYyBhbmQgWFhYIG9wcy9zZWMp
-DQo+ICAgd3JvdGUgNjU1MzYvNjU1MzYgYnl0ZXMgYXQgb2Zmc2V0IDUzNjg3MDkxMg0KPiANCg0K
-DQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+
+Richard Henderson <richard.henderson@linaro.org> writes:
+
+> On 12/13/18 8:55 AM, Alex Benn=C3=A9e wrote:
+>>
+>> Ard Biesheuvel <ard.biesheuvel@linaro.org> writes:
+>>
+>>> Hi Alex,
+>>>
+>>> Thanks again for looking into this.
+>>>
+>>> On Thu, 13 Dec 2018 at 12:55, Alex Benn=C3=A9e <alex.bennee@linaro.org>=
+ wrote:
+>> <snip>
+>>>
+>>>>
+>>>>  int kvm_arch_insert_sw_breakpoint(CPUState *cs, struct kvm_sw_breakpo=
+int *bp)
+>>>>  {
+>>>> +    CPUARMState *env =3D &ARM_CPU(cs)->env;
+>>>> +    int el =3D arm_current_el(env);
+>>>> +    bool is_aa64 =3D arm_el_is_aa64(env, el);
+>>>> +    const uint32_t *bpi =3D is_aa64 ? &brk_insn : &bkpt_insn;
+>>>> +
+>>>>      if (have_guest_debug) {
+>>>>          if (cpu_memory_rw_debug(cs, bp->pc, (uint8_t *)&bp->saved_ins=
+n, 4, 0) ||
+>>>> -            cpu_memory_rw_debug(cs, bp->pc, (uint8_t *)&brk_insn, 4, =
+1)) {
+>>>> +            cpu_memory_rw_debug(cs, bp->pc, (uint8_t *)bpi, 4, 1)) {
+>>>
+>>> Should we be dealing with endianness here?
+>>>
+>> <snip>
+>>
+>> I don't think so - everything eventually ends up (ld|st)n_p which deals
+>> with the endianness details.
+>
+> I think Ard is right.  You need to consider dynamic endianness with
+>
+>     bswap_code(arm_sctlr_b(env))
+
+*sigh* I guess. It of course still a heuristic that can break because we
+don't know if the system will have switched mode by the time it gets to
+the breakpoint.
+
+--
+Alex Benn=C3=A9e
