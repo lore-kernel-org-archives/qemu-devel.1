@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gXnvg-0008Ks-Bn
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:01 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gXnvl-0008O3-QL
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gXnvc-0001sv-0T
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:00 -0500
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:40592)
+	(envelope-from <alex.bennee@linaro.org>) id 1gXnvk-0001yn-O1
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:05 -0500
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:32782)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gXnvb-0001s5-PP
-	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:54:55 -0500
-Received: by mail-wm1-x331.google.com with SMTP id q26so5856834wmf.5
-	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 05:54:55 -0800 (PST)
+	id 1gXnvk-0001yD-H0
+	for qemu-devel@nongnu.org; Fri, 14 Dec 2018 08:55:04 -0500
+Received: by mail-wr1-x42e.google.com with SMTP id c14so5550189wrr.0
+	for <qemu-devel@nongnu.org>; Fri, 14 Dec 2018 05:55:04 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 14 Dec 2018 13:54:39 +0000
-Message-Id: <20181214135452.25936-3-alex.bennee@linaro.org>
+Date: Fri, 14 Dec 2018 13:54:48 +0000
+Message-Id: <20181214135452.25936-12-alex.bennee@linaro.org>
 In-Reply-To: <20181214135452.25936-1-alex.bennee@linaro.org>
 References: <20181214135452.25936-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 02/15] MAINTAINERS: update status of FPU
- emulation
+Subject: [Qemu-devel] [PULL 11/15] hardfloat: implement float32/64
+ multiplication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +31,118 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-Given I've spent a fair amount of time around this code now I'm
-putting myself forward as a maintainer. Also given that the code has
-been extensively re-written and has testing and new incoming features
-it is probably more than just Odd Fixes.
+From: "Emilio G. Cota" <cota@braap.org>
 
+Performance results for fp-bench:
+
+1. Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+- before:
+mul-single: 126.91 MFlops
+mul-double: 118.28 MFlops
+- after:
+mul-single: 258.02 MFlops
+mul-double: 197.96 MFlops
+
+2. ARM Aarch64 A57 @ 2.4GHz
+- before:
+mul-single: 37.42 MFlops
+mul-double: 38.77 MFlops
+- after:
+mul-single: 73.41 MFlops
+mul-double: 76.93 MFlops
+
+3. IBM POWER8E @ 2.1 GHz
+- before:
+mul-single: 58.40 MFlops
+mul-double: 59.33 MFlops
+- after:
+mul-single: 60.25 MFlops
+mul-double: 94.79 MFlops
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 83c127f0d6..d676c73f88 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -127,9 +127,11 @@ F: include/sysemu/cpus.h
- FPU emulation
- M: Aurelien Jarno <aurelien@aurel32.net>
- M: Peter Maydell <peter.maydell@linaro.org>
--S: Odd Fixes
-+M: Alex Bennée <alex.bennee@linaro.org>
-+S: Maintained
- F: fpu/
- F: include/fpu/
-+F: tests/fp/
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 08afa861a7..dad2ce2d9f 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -1236,7 +1236,8 @@ float16 QEMU_FLATTEN float16_mul(float16 a, float16 b, float_status *status)
+     return float16_round_pack_canonical(pr, status);
+ }
  
- Alpha
- M: Richard Henderson <rth@twiddle.net>
+-float32 QEMU_FLATTEN float32_mul(float32 a, float32 b, float_status *status)
++static float32 QEMU_SOFTFLOAT_ATTR
++soft_f32_mul(float32 a, float32 b, float_status *status)
+ {
+     FloatParts pa = float32_unpack_canonical(a, status);
+     FloatParts pb = float32_unpack_canonical(b, status);
+@@ -1245,7 +1246,8 @@ float32 QEMU_FLATTEN float32_mul(float32 a, float32 b, float_status *status)
+     return float32_round_pack_canonical(pr, status);
+ }
+ 
+-float64 QEMU_FLATTEN float64_mul(float64 a, float64 b, float_status *status)
++static float64 QEMU_SOFTFLOAT_ATTR
++soft_f64_mul(float64 a, float64 b, float_status *status)
+ {
+     FloatParts pa = float64_unpack_canonical(a, status);
+     FloatParts pb = float64_unpack_canonical(b, status);
+@@ -1254,6 +1256,54 @@ float64 QEMU_FLATTEN float64_mul(float64 a, float64 b, float_status *status)
+     return float64_round_pack_canonical(pr, status);
+ }
+ 
++static float hard_f32_mul(float a, float b)
++{
++    return a * b;
++}
++
++static double hard_f64_mul(double a, double b)
++{
++    return a * b;
++}
++
++static bool f32_mul_fast_test(union_float32 a, union_float32 b)
++{
++    return float32_is_zero(a.s) || float32_is_zero(b.s);
++}
++
++static bool f64_mul_fast_test(union_float64 a, union_float64 b)
++{
++    return float64_is_zero(a.s) || float64_is_zero(b.s);
++}
++
++static float32 f32_mul_fast_op(float32 a, float32 b, float_status *s)
++{
++    bool signbit = float32_is_neg(a) ^ float32_is_neg(b);
++
++    return float32_set_sign(float32_zero, signbit);
++}
++
++static float64 f64_mul_fast_op(float64 a, float64 b, float_status *s)
++{
++    bool signbit = float64_is_neg(a) ^ float64_is_neg(b);
++
++    return float64_set_sign(float64_zero, signbit);
++}
++
++float32 QEMU_FLATTEN
++float32_mul(float32 a, float32 b, float_status *s)
++{
++    return float32_gen2(a, b, s, hard_f32_mul, soft_f32_mul,
++                        f32_is_zon2, NULL, f32_mul_fast_test, f32_mul_fast_op);
++}
++
++float64 QEMU_FLATTEN
++float64_mul(float64 a, float64 b, float_status *s)
++{
++    return float64_gen2(a, b, s, hard_f64_mul, soft_f64_mul,
++                        f64_is_zon2, NULL, f64_mul_fast_test, f64_mul_fast_op);
++}
++
+ /*
+  * Returns the result of multiplying the floating-point values `a' and
+  * `b' then adding 'c', with no intermediate rounding step after the
 -- 
 2.17.1
