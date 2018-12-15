@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gYAOF-0004qq-P9
-	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 08:54:01 -0500
+	(envelope-from <eblake@redhat.com>) id 1gYAOF-0004qf-Na
+	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 08:54:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gYAOE-0008DM-8I
+	(envelope-from <eblake@redhat.com>) id 1gYAOE-0008E2-Lc
 	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 08:53:59 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Sat, 15 Dec 2018 07:53:12 -0600
-Message-Id: <20181215135324.152629-11-eblake@redhat.com>
+Date: Sat, 15 Dec 2018 07:53:14 -0600
+Message-Id: <20181215135324.152629-13-eblake@redhat.com>
 In-Reply-To: <20181215135324.152629-1-eblake@redhat.com>
 References: <20181215135324.152629-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 10/22] nbd/client: Move export name into
- NBDExportInfo
+Subject: [Qemu-devel] [PATCH v2 12/22] nbd/client: Improve error handling in
+ nbd_negotiate_simple_meta_context()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,244 +21,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: nsoffer@redhat.com, jsnow@redhat.com, rjones@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: nsoffer@redhat.com, jsnow@redhat.com, rjones@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-Refactor the 'name' parameter of nbd_receive_negotiate() from
-being a separate parameter into being part of the in-out 'info'.
-This also spills over to a simplification of nbd_opt_go().
+Always allocate space for the reply returned by the server and
+hoist the trace earlier, as it is more interesting to trace the
+server's reply (even if it is unexpected) than parroting our
+request only on success.  After all, skipping the allocation
+for a wrong size was merely a micro-optimization that only
+benefitted a broken server, rather than the common case of a
+compliant server that meets our expectations.
 
-The main driver for this refactoring is that an upcoming patch
-would like to add support to qemu-nbd to list information about
-all exports available on a server, where the name(s) will be
-provided by the server instead of the client.  But another benefit
-is that we can now allow the client to explicitly specify the
-empty export name "" even when connecting to an oldstyle server
-(even if qemu is no longer such a server after commit 7f7dfe2a).
+Then turn the reply handling into a loop (even though we still
+never iterate more than once), to make this code easier to use
+when later patches do support multiple server replies.  This
+changes the error message for a server with two replies (a
+corner case we are unlikely to hit in practice) from:
+
+Unexpected reply type 4 (meta context), expected 0 (ack)
+
+to:
+
+Server replied with more than one context
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 ---
-v2: Fix g_free usage [Vladimir]
+v2: split patch into easier-to-review pieces [Rich, Vladimir]
 ---
- include/block/nbd.h |  8 ++++----
- block/nbd-client.c  |  5 +++--
- nbd/client.c        | 39 ++++++++++++++++++---------------------
- qemu-nbd.c          |  6 ++++--
- nbd/trace-events    |  2 +-
- 5 files changed, 30 insertions(+), 30 deletions(-)
+ nbd/client.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 6a5bfe5d559..65feff8ba96 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -262,6 +262,7 @@ struct NBDExportInfo {
-     /* Set by client before nbd_receive_negotiate() */
-     bool request_sizes;
-     char *x_dirty_bitmap;
-+    char *name; /* must be non-NULL */
-
-     /* In-out fields, set by client before nbd_receive_negotiate() and
-      * updated by server results during nbd_receive_negotiate() */
-@@ -279,10 +280,9 @@ struct NBDExportInfo {
- };
- typedef struct NBDExportInfo NBDExportInfo;
-
--int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
--                          QCryptoTLSCreds *tlscreds, const char *hostname,
--                          QIOChannel **outioc, NBDExportInfo *info,
--                          Error **errp);
-+int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
-+                          const char *hostname, QIOChannel **outioc,
-+                          NBDExportInfo *info, Error **errp);
- int nbd_init(int fd, QIOChannelSocket *sioc, NBDExportInfo *info,
-              Error **errp);
- int nbd_send_request(QIOChannel *ioc, NBDRequest *request);
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index fc5b7eda8ee..417971d8b05 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -984,10 +984,11 @@ int nbd_client_init(BlockDriverState *bs,
-     client->info.structured_reply = true;
-     client->info.base_allocation = true;
-     client->info.x_dirty_bitmap = g_strdup(x_dirty_bitmap);
--    ret = nbd_receive_negotiate(QIO_CHANNEL(sioc), export,
--                                tlscreds, hostname,
-+    client->info.name = g_strdup(export ?: "");
-+    ret = nbd_receive_negotiate(QIO_CHANNEL(sioc), tlscreds, hostname,
-                                 &client->ioc, &client->info, errp);
-     g_free(client->info.x_dirty_bitmap);
-+    g_free(client->info.name);
-     if (ret < 0) {
-         logout("Failed to negotiate with the NBD server\n");
-         return ret;
 diff --git a/nbd/client.c b/nbd/client.c
-index 28f5a286cba..7462fa5ae0e 100644
+index bcccd5f555e..b6a85fc3ef8 100644
 --- a/nbd/client.c
 +++ b/nbd/client.c
-@@ -328,15 +328,14 @@ static int nbd_receive_list(QIOChannel *ioc, char **name, char **description,
- }
-
-
--/* Returns -1 if NBD_OPT_GO proves the export @wantname cannot be
-+/* Returns -1 if NBD_OPT_GO proves the export @info->name cannot be
-  * used, 0 if NBD_OPT_GO is unsupported (fall back to NBD_OPT_LIST and
-  * NBD_OPT_EXPORT_NAME in that case), and > 0 if the export is good to
-- * go (with @info populated). */
--static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
--                      NBDExportInfo *info, Error **errp)
-+ * go (with the rest of @info populated). */
-+static int nbd_opt_go(QIOChannel *ioc, NBDExportInfo *info, Error **errp)
- {
-     NBDOptionReply reply;
--    uint32_t len = strlen(wantname);
-+    uint32_t len = strlen(info->name);
-     uint16_t type;
-     int error;
-     char *buf;
-@@ -346,10 +345,10 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
-      * flags still 0 is a witness of a broken server. */
-     info->flags = 0;
-
--    trace_nbd_opt_go_start(wantname);
-+    trace_nbd_opt_go_start(info->name);
-     buf = g_malloc(4 + len + 2 + 2 * info->request_sizes + 1);
-     stl_be_p(buf, len);
--    memcpy(buf + 4, wantname, len);
-+    memcpy(buf + 4, info->name, len);
-     /* At most one request, everything else up to server */
-     stw_be_p(buf + 4 + len, info->request_sizes);
-     if (info->request_sizes) {
-@@ -751,10 +750,9 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
-     return 0;
- }
-
--int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
--                          QCryptoTLSCreds *tlscreds, const char *hostname,
--                          QIOChannel **outioc, NBDExportInfo *info,
--                          Error **errp)
-+int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
-+                          const char *hostname, QIOChannel **outioc,
-+                          NBDExportInfo *info, Error **errp)
- {
-     uint64_t magic;
-     int rc;
-@@ -764,6 +762,8 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-
-     trace_nbd_receive_negotiate(tlscreds, hostname ? hostname : "<null>");
-
-+    assert(info->name);
-+    trace_nbd_receive_negotiate_name(info->name);
-     info->structured_reply = false;
-     info->base_allocation = false;
-     rc = -EINVAL;
-@@ -832,10 +832,6 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-                 goto fail;
-             }
-         }
--        if (!name) {
--            trace_nbd_receive_negotiate_default_name();
--            name = "";
--        }
-         if (fixedNewStyle) {
-             int result;
-
-@@ -851,7 +847,8 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-
-             if (info->structured_reply && base_allocation) {
-                 result = nbd_negotiate_simple_meta_context(
--                        ioc, name, info->x_dirty_bitmap ?: "base:allocation",
-+                        ioc, info->name,
-+                        info->x_dirty_bitmap ?: "base:allocation",
-                         &info->meta_base_allocation_id, errp);
-                 if (result < 0) {
-                     goto fail;
-@@ -864,7 +861,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-              * TLS).  If it is not available, fall back to
-              * NBD_OPT_LIST for nicer error messages about a missing
-              * export, then use NBD_OPT_EXPORT_NAME.  */
--            result = nbd_opt_go(ioc, name, info, errp);
-+            result = nbd_opt_go(ioc, info, errp);
-             if (result < 0) {
-                 goto fail;
-             }
-@@ -877,12 +874,12 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-              * query gives us better error reporting if the
-              * export name is not available.
-              */
--            if (nbd_receive_query_exports(ioc, name, errp) < 0) {
-+            if (nbd_receive_query_exports(ioc, info->name, errp) < 0) {
-                 goto fail;
-             }
-         }
-         /* write the export name request */
--        if (nbd_send_option_request(ioc, NBD_OPT_EXPORT_NAME, -1, name,
-+        if (nbd_send_option_request(ioc, NBD_OPT_EXPORT_NAME, -1, info->name,
-                                     errp) < 0) {
-             goto fail;
-         }
-@@ -902,8 +899,8 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-     } else if (magic == NBD_CLIENT_MAGIC) {
-         uint32_t oldflags;
-
--        if (name) {
--            error_setg(errp, "Server does not support export names");
-+        if (*info->name) {
-+            error_setg(errp, "Server does not support non-empty export names");
-             goto fail;
-         }
-         if (tlscreds) {
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index e3f739671b5..545a6dfbbc7 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -263,7 +263,7 @@ static void *show_parts(void *arg)
- static void *nbd_client_thread(void *arg)
- {
-     char *device = arg;
--    NBDExportInfo info = { .request_sizes = false, };
-+    NBDExportInfo info = { .request_sizes = false, .name = g_strdup("") };
-     QIOChannelSocket *sioc;
-     int fd;
-     int ret;
-@@ -278,7 +278,7 @@ static void *nbd_client_thread(void *arg)
-         goto out;
+@@ -684,10 +684,11 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+         return ret;
      }
 
--    ret = nbd_receive_negotiate(QIO_CHANNEL(sioc), NULL,
-+    ret = nbd_receive_negotiate(QIO_CHANNEL(sioc),
-                                 NULL, NULL, NULL, &info, &local_error);
-     if (ret < 0) {
-         if (local_error) {
-@@ -317,6 +317,7 @@ static void *nbd_client_thread(void *arg)
-     }
-     close(fd);
-     object_unref(OBJECT(sioc));
-+    g_free(info.name);
-     kill(getpid(), SIGTERM);
-     return (void *) EXIT_SUCCESS;
+-    if (reply.type == NBD_REP_META_CONTEXT) {
++    while (reply.type == NBD_REP_META_CONTEXT) {
+         char *name;
 
-@@ -325,6 +326,7 @@ out_fd:
- out_socket:
-     object_unref(OBJECT(sioc));
- out:
-+    g_free(info.name);
-     kill(getpid(), SIGTERM);
-     return (void *) EXIT_FAILURE;
- }
-diff --git a/nbd/trace-events b/nbd/trace-events
-index 8e9fc024c28..446d10b8603 100644
---- a/nbd/trace-events
-+++ b/nbd/trace-events
-@@ -16,7 +16,7 @@ nbd_opt_meta_reply(const char *context, uint32_t id) "Received mapping of contex
- nbd_receive_negotiate(void *tlscreds, const char *hostname) "Receiving negotiation tlscreds=%p hostname=%s"
- nbd_receive_negotiate_magic(uint64_t magic) "Magic is 0x%" PRIx64
- nbd_receive_negotiate_server_flags(uint32_t globalflags) "Global flags are 0x%" PRIx32
--nbd_receive_negotiate_default_name(void) "Using default NBD export name \"\""
-+nbd_receive_negotiate_name(const char *name) "Requesting NBD export name '%s'"
- nbd_receive_negotiate_size_flags(uint64_t size, uint16_t flags) "Size is %" PRIu64 ", export flags 0x%" PRIx16
- nbd_init_set_socket(void) "Setting NBD socket"
- nbd_init_set_block_size(unsigned long block_size) "Setting block size to %lu"
+-        if (reply.length != sizeof(info->context_id) + context_len) {
++        if (reply.length <= sizeof(info->context_id) ||
++            reply.length > NBD_MAX_BUFFER_SIZE) {
+             error_setg(errp, "Failed to negotiate meta context '%s', server "
+                        "answered with unexpected length %" PRIu32, context,
+                        reply.length);
+@@ -708,6 +709,15 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+             return -1;
+         }
+         name[reply.length] = '\0';
++        trace_nbd_opt_meta_reply(name, info->context_id);
++
++        if (received) {
++            error_setg(errp, "Server replied with more than one context");
++            g_free(name);
++            nbd_send_opt_abort(ioc);
++            return -1;
++        }
++
+         if (strcmp(context, name)) {
+             error_setg(errp, "Failed to negotiate meta context '%s', server "
+                        "answered with different context '%s'", context,
+@@ -717,8 +727,6 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+             return -1;
+         }
+         g_free(name);
+-
+-        trace_nbd_opt_meta_reply(context, info->context_id);
+         received = true;
+
+         /* receive NBD_REP_ACK */
 -- 
 2.17.2
