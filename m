@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gYBjA-00080D-Tv
-	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 10:19:42 -0500
+	(envelope-from <rjones@redhat.com>) id 1gYBmP-0000xI-6Z
+	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 10:23:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gYBj9-0003AA-Pb
-	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 10:19:40 -0500
-Date: Sat, 15 Dec 2018 15:19:29 +0000
+	(envelope-from <rjones@redhat.com>) id 1gYBmO-0005oy-1s
+	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 10:23:01 -0500
+Date: Sat, 15 Dec 2018 15:22:49 +0000
 From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20181215151929.GY27120@redhat.com>
+Message-ID: <20181215152249.GZ27120@redhat.com>
 References: <20181215135324.152629-1-eblake@redhat.com>
-	<20181215135324.152629-13-eblake@redhat.com>
+	<20181215135324.152629-14-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181215135324.152629-13-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 12/22] nbd/client: Improve error
- handling in nbd_negotiate_simple_meta_context()
+In-Reply-To: <20181215135324.152629-14-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 13/22] nbd/client: Split out
+ nbd_send_one_meta_context()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,95 +27,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Eric Blake <eblake@redhat.com>
 Cc: qemu-devel@nongnu.org, nsoffer@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-On Sat, Dec 15, 2018 at 07:53:14AM -0600, Eric Blake wrote:
-> Always allocate space for the reply returned by the server and
-> hoist the trace earlier, as it is more interesting to trace the
-> server's reply (even if it is unexpected) than parroting our
-> request only on success.  After all, skipping the allocation
-> for a wrong size was merely a micro-optimization that only
-> benefitted a broken server, rather than the common case of a
-> compliant server that meets our expectations.
-> 
-> Then turn the reply handling into a loop (even though we still
-> never iterate more than once), to make this code easier to use
-> when later patches do support multiple server replies.  This
-> changes the error message for a server with two replies (a
-> corner case we are unlikely to hit in practice) from:
-> 
-> Unexpected reply type 4 (meta context), expected 0 (ack)
-> 
-> to:
-> 
-> Server replied with more than one context
+On Sat, Dec 15, 2018 at 07:53:15AM -0600, Eric Blake wrote:
+> Refactor nbd_negotiate_simple_meta_context() to pull out the
+> code that can be reused to send a LIST request for 0 or 1 query.
+> No semantic change.
 > 
 > Signed-off-by: Eric Blake <eblake@redhat.com>
 > 
 > ---
 > v2: split patch into easier-to-review pieces [Rich, Vladimir]
 > ---
->  nbd/client.c | 16 ++++++++++++----
->  1 file changed, 12 insertions(+), 4 deletions(-)
+>  nbd/client.c     | 64 ++++++++++++++++++++++++++++++++++--------------
+>  nbd/trace-events |  2 +-
+>  2 files changed, 46 insertions(+), 20 deletions(-)
 > 
 > diff --git a/nbd/client.c b/nbd/client.c
-> index bcccd5f555e..b6a85fc3ef8 100644
+> index b6a85fc3ef8..5b6b9964097 100644
 > --- a/nbd/client.c
 > +++ b/nbd/client.c
-> @@ -684,10 +684,11 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
->          return ret;
+> @@ -627,6 +627,48 @@ static QIOChannel *nbd_receive_starttls(QIOChannel *ioc,
+>      return QIO_CHANNEL(tioc);
+>  }
+> 
+> +/* nbd_send_one_meta_context:
+> + * Send 0 or 1 set/list meta context queries.
+> + * return 0 on success, -1 with errp set for any error
+> + */
+> +static int nbd_send_one_meta_context(QIOChannel *ioc,
+> +                                     uint32_t opt,
+> +                                     const char *export,
+> +                                     const char *query,
+> +                                     Error **errp)
+> +{
+> +    int ret;
+> +    uint32_t export_len = strlen(export);
+> +    uint32_t queries = !!query;
+> +    uint32_t context_len = 0;
+> +    uint32_t data_len;
+> +    char *data;
+> +    char *p;
+> +
+> +    data_len = sizeof(export_len) + export_len + sizeof(queries);
+> +    if (query) {
+> +        context_len = strlen(query);
+> +        data_len += sizeof(context_len) + context_len;
+> +    } else {
+> +        assert(opt == NBD_OPT_LIST_META_CONTEXT);
+> +    }
+> +    data = g_malloc(data_len);
+> +    p = data;
+> +
+> +    trace_nbd_opt_meta_request(nbd_opt_lookup(opt), query ?: "(all)", export);
+> +    stl_be_p(p, export_len);
+> +    memcpy(p += sizeof(export_len), export, export_len);
+> +    stl_be_p(p += export_len, queries);
+> +    if (query) {
+> +        stl_be_p(p += sizeof(uint32_t), context_len);
+> +        memcpy(p += sizeof(context_len), query, context_len);
+> +    }
+> +
+> +    ret = nbd_send_option_request(ioc, opt, data_len, data, errp);
+> +    g_free(data);
+> +    return ret;
+> +}
+> +
+>  /* nbd_negotiate_simple_meta_context:
+>   * Request the server to set the meta context for export @info->name
+>   * using @info->x_dirty_bitmap with a fallback to "base:allocation",
+> @@ -651,26 +693,10 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+>      NBDOptionReply reply;
+>      const char *context = info->x_dirty_bitmap ?: "base:allocation";
+>      bool received = false;
+> -    uint32_t export_len = strlen(info->name);
+> -    uint32_t context_len = strlen(context);
+> -    uint32_t data_len = sizeof(export_len) + export_len +
+> -                        sizeof(uint32_t) + /* number of queries */
+> -                        sizeof(context_len) + context_len;
+> -    char *data = g_malloc(data_len);
+> -    char *p = data;
+> 
+> -    trace_nbd_opt_meta_request(context, info->name);
+> -    stl_be_p(p, export_len);
+> -    memcpy(p += sizeof(export_len), info->name, export_len);
+> -    stl_be_p(p += export_len, 1);
+> -    stl_be_p(p += sizeof(uint32_t), context_len);
+> -    memcpy(p += sizeof(context_len), context, context_len);
+> -
+> -    ret = nbd_send_option_request(ioc, NBD_OPT_SET_META_CONTEXT, data_len, data,
+> -                                  errp);
+> -    g_free(data);
+> -    if (ret < 0) {
+> -        return ret;
+> +    if (nbd_send_one_meta_context(ioc, NBD_OPT_SET_META_CONTEXT,
+> +                                  info->name, context, errp) < 0) {
+> +        return -1;
 >      }
 > 
-> -    if (reply.type == NBD_REP_META_CONTEXT) {
-> +    while (reply.type == NBD_REP_META_CONTEXT) {
+>      if (nbd_receive_option_reply(ioc, NBD_OPT_SET_META_CONTEXT, &reply,
+> diff --git a/nbd/trace-events b/nbd/trace-events
+> index 446d10b8603..00872a6f9d4 100644
+> --- a/nbd/trace-events
+> +++ b/nbd/trace-events
+> @@ -11,7 +11,7 @@ nbd_receive_query_exports_start(const char *wantname) "Querying export list for
+>  nbd_receive_query_exports_success(const char *wantname) "Found desired export name '%s'"
+>  nbd_receive_starttls_new_client(void) "Setting up TLS"
+>  nbd_receive_starttls_tls_handshake(void) "Starting TLS handshake"
+> -nbd_opt_meta_request(const char *context, const char *export) "Requesting to set meta context %s for export %s"
+> +nbd_opt_meta_request(const char *optname, const char *context, const char *export) "Requesting %s %s for export %s"
+>  nbd_opt_meta_reply(const char *context, uint32_t id) "Received mapping of context %s to id %" PRIu32
+>  nbd_receive_negotiate(void *tlscreds, const char *hostname) "Receiving negotiation tlscreds=%p hostname=%s"
+>  nbd_receive_negotiate_magic(uint64_t magic) "Magic is 0x%" PRIx64
 
-I'm not sure I understand why this change is safe.
+Although a straightforward refactoring, we still lost the comment
+/* number of queries */.  I'd still perhaps like to see a bit more
+explanation of the layout and reasoning behind the data buffer.
+But anyway ..
 
-As far as I can see reply.type is only updated in the loop by
-nbd_receive_option_reply, and that reads from the server, and so the
-server might keep sending NBD_REP_META_CONTEXT packets (instead of the
-expected NBD_REP_ACK), so it could now loop forever against a
-malicious server?  (This is not taking into account any later patches)
+Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
 
 Rich.
-
->          char *name;
-> 
-> -        if (reply.length != sizeof(info->context_id) + context_len) {
-> +        if (reply.length <= sizeof(info->context_id) ||
-> +            reply.length > NBD_MAX_BUFFER_SIZE) {
->              error_setg(errp, "Failed to negotiate meta context '%s', server "
->                         "answered with unexpected length %" PRIu32, context,
->                         reply.length);
-> @@ -708,6 +709,15 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
->              return -1;
->          }
->          name[reply.length] = '\0';
-> +        trace_nbd_opt_meta_reply(name, info->context_id);
-> +
-> +        if (received) {
-> +            error_setg(errp, "Server replied with more than one context");
-> +            g_free(name);
-> +            nbd_send_opt_abort(ioc);
-> +            return -1;
-> +        }
-> +
->          if (strcmp(context, name)) {
->              error_setg(errp, "Failed to negotiate meta context '%s', server "
->                         "answered with different context '%s'", context,
-> @@ -717,8 +727,6 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
->              return -1;
->          }
->          g_free(name);
-> -
-> -        trace_nbd_opt_meta_reply(context, info->context_id);
->          received = true;
-> 
->          /* receive NBD_REP_ACK */
-> -- 
-> 2.17.2
 
 -- 
 Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
 Read my programming and virtualization blog: http://rwmj.wordpress.com
-Fedora Windows cross-compiler. Compile Windows programs, test, and
-build Windows installers. Over 100 libraries supported.
-http://fedoraproject.org/wiki/MinGW
+virt-builder quickly builds VMs from scratch
+http://libguestfs.org/virt-builder.1.html
