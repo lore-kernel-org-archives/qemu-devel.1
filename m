@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1gY2UW-0007bp-By
-	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 00:27:58 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gY57R-0002xh-27
+	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 03:16:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1gY2UT-0001Ca-4w
-	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 00:27:56 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2869 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
-	id 1gY2UR-0000rW-N9
-	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 00:27:53 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Sat, 15 Dec 2018 05:27:43 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DB1C9EF3@dggeml531-mbs.china.huawei.com>
-References: <20181213210057.3676-1-quintela@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DB1BECBE@dggeml511-mbx.china.huawei.com>
-	<20181214075249-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20181214075249-mutt-send-email-mst@kernel.org>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <dgibson@ozlabs.org>) id 1gY57O-0008DG-OB
+	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 03:16:16 -0500
+Date: Sat, 15 Dec 2018 19:03:43 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20181215080343.GK29278@umbus.fritz.box>
+References: <20181209194610.29727-1-clg@kaod.org>
+	<20181209194610.29727-19-clg@kaod.org>
+	<39e8edd0-6056-5b51-174b-631dcb267ff5@kaod.org>
+	<20181211020620.GG4261@umbus.fritz.box>
+	<744ff9f8-6f84-00d4-a2e0-84652658762e@kaod.org>
+	<23f5d148-5b11-bc33-6a88-7df9e591f9d0@kaod.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 00/16] Virtio devices split from
- virtio-pci
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="M0YLxmUXciMpOLPE"
+Content-Disposition: inline
+In-Reply-To: <23f5d148-5b11-bc33-6a88-7df9e591f9d0@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v7 18/19] spapr: add a 'pseries-4.0-xive'
+ machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,128 +29,327 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-> -----Original Message-----
-> From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> Sent: Friday, December 14, 2018 8:53 PM
-> To: Gonglei (Arei) <arei.gonglei@huawei.com>
-> Cc: Juan Quintela <quintela@redhat.com>; qemu-devel@nongnu.org; Thomas
-> Huth <thuth@redhat.com>; Gerd Hoffmann <kraxel@redhat.com>
-> Subject: Re: [PATCH v3 00/16] Virtio devices split from virtio-pci
+
+--M0YLxmUXciMpOLPE
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Dec 11, 2018 at 05:44:26PM +0100, C=E9dric Le Goater wrote:
+> On 12/11/18 11:42 AM, C=E9dric Le Goater wrote:
+> > On 12/11/18 3:06 AM, David Gibson wrote:
+> >> On Mon, Dec 10, 2018 at 11:17:33PM +0100, C=E9dric Le Goater wrote:
+> >>> On 12/9/18 8:46 PM, C=E9dric Le Goater wrote:
+> >>>> This pseries machine makes use of a new sPAPR IRQ backend supporting
+> >>>> the XIVE interrupt mode.
+> >>>>
+> >>>> The guest OS is required to have support for the XIVE exploitation
+> >>>> mode of the POWER9 interrupt controller.
+> >>>>
+> >>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >>>> ---
+> >>>>  hw/ppc/spapr.c | 15 +++++++++++++++
+> >>>>  1 file changed, 15 insertions(+)
+> >>>>
+> >>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> >>>> index 4012ebd794a4..3cc134a0b673 100644
+> >>>> --- a/hw/ppc/spapr.c
+> >>>> +++ b/hw/ppc/spapr.c
+> >>>> @@ -3985,6 +3985,21 @@ static void spapr_machine_4_0_class_options(M=
+achineClass *mc)
+> >>>> =20
+> >>>>  DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
+> >>>> =20
+> >>>> +static void spapr_machine_4_0_xive_instance_options(MachineState *m=
+achine)
+> >>>> +{
+> >>>> +    spapr_machine_4_0_instance_options(machine);
+> >>>> +}
+> >>>> +
+> >>>> +static void spapr_machine_4_0_xive_class_options(MachineClass *mc)
+> >>>> +{
+> >>>> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+> >>>> +
+> >>>> +    spapr_machine_4_0_class_options(mc);> +    smc->irq =3D &spapr_=
+irq_xive;
+> >>>
+> >>> I have been adding checks on the CPU model to export the XIVE capabil=
+ity=20
+> >>> only on POWER9 processors but it breaks some of the tests.
+> >>>
+> >>> I was wondering if we could add a default POWER9 CPU to the -xive mac=
+hine :=20
+> >>>
+> >>>   + mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power9_v2.0");
+> >>>
+> >>> and if we could change tests/cpu-plug-test.c with :
+> >>>
+> >>>   @@ -198,8 +198,13 @@ static void add_pseries_test_case(const
+> >>>        }
+> >>>        data =3D g_new(PlugTestData, 1);
+> >>>        data->machine =3D g_strdup(mname);
+> >>>   -    data->cpu_model =3D "power8_v2.0";
+> >>>   -    data->device_model =3D g_strdup("power8_v2.0-spapr-cpu-core");
+> >>>   +    if (g_str_has_suffix(mname, "xive")) {
+> >>>   +        data->cpu_model =3D "power9_v2.0";
+> >>>   +        data->device_model =3D g_strdup("power9_v2.0-spapr-cpu-cor=
+e");
+> >>>   +    } else {
+> >>>   +        data->cpu_model =3D "power8_v2.0";
+> >>>   +        data->device_model =3D g_strdup("power8_v2.0-spapr-cpu-cor=
+e");
+> >>>   +    }
+> >>>        data->sockets =3D 2;
+> >>>        data->cores =3D 3;
+> >>>        data->threads =3D 1;
+> >>>
+> >>> or if there is a better way ?
+> >>
+> >> So, I'd actually prefer a machine option, rather than wholly separate
+> >> machine types to select xics/xive/dual.  Machine types was fine while
+> >> prototyping this, but I don't think we want to actually merge new
+> >> machine types for it.
+> >=20
+> > I agree.=20
+> >=20
+> >> So, instead I think we want a machine option which can be set to
+> >> xics/xive/dual, with xics being the default for earlier machine types
+> >> and dual the default for 4.0 onwards.
+> >=20
+> > I will revive an old patch doing just that.=20
+> >=20
+> > The question now is how to link the sPAPRMachineState instance to=20
+> > the selected sPAPR IRQ backend.=20
 >=20
-> On Fri, Dec 14, 2018 at 07:07:44AM +0000, Gonglei (Arei) wrote:
-> >
-> > > -----Original Message-----
-> > > From: Juan Quintela [mailto:quintela@redhat.com]
-> > > Sent: Friday, December 14, 2018 5:01 AM
-> > > To: qemu-devel@nongnu.org
-> > > Cc: Michael S. Tsirkin <mst@redhat.com>; Thomas Huth
-> <thuth@redhat.com>;
-> > > Gerd Hoffmann <kraxel@redhat.com>; Gonglei (Arei)
-> > > <arei.gonglei@huawei.com>; Juan Quintela <quintela@redhat.com>
-> > > Subject: [PATCH v3 00/16] Virtio devices split from virtio-pci
-> > >
-> > > Hi
-> > >
-> > > v3:
-> > > - rebase to master
-> > > - only compile them if CONFIG_PCI is set (thomas)
-> > >
-> > > Please review.
-> > >
-> > > Later, Juan.
-> > >
-> > > V2:
-> > >
-> > > - Rebase on top of master
-> > >
-> > > Please review.
-> > >
-> > > Later, Juan.
-> > >
-> > > [v1]
-> > > From previous verision (in the middle of make check tests):
-> > > - split also the bits of virtio-pci.h (mst suggestion)
-> > > - add gpu, crypt and gpg bits
-> > > - more cleanups
-> > > - fix all the copyrights (the ones not changed have been there
-> > >   foverever)
-> > > - be consistent with naming, vhost-* or virtio-*
-> > >
-> > > Please review, Juan.
-> > >
-> > > Juan Quintela (16):
-> > >   virtio: split vhost vsock bits from virtio-pci
-> > >   virtio: split virtio input host bits from virtio-pci
-> > >   virtio: split virtio input bits from virtio-pci
-> > >   virtio: split virtio rng bits from virtio-pci
-> > >   virtio: split virtio balloon bits from virtio-pci
-> > >   virtio: split virtio 9p bits from virtio-pci
-> > >   virtio: split vhost user blk bits from virtio-pci
-> > >   virtio: split vhost user scsi bits from virtio-pci
-> > >   virtio: split vhost scsi bits from virtio-pci
-> > >   virtio: split virtio scsi bits from virtio-pci
-> > >   virtio: split virtio blk bits rom virtio-pci
-> > >   virtio: split virtio net bits rom virtio-pci
-> > >   virtio: split virtio serial bits rom virtio-pci
-> > >   virtio: split virtio gpu bits rom virtio-pci.h
-> > >   virtio: split virtio crypto bits rom virtio-pci.h
-> > >   virtio: virtio 9p really requires CONFIG_VIRTFS to work
-> > >
-> > >  default-configs/virtio.mak        |   3 +-
-> > >  hw/display/virtio-gpu-pci.c       |  14 +
-> > >  hw/display/virtio-vga.c           |   1 +
-> > >  hw/virtio/Makefile.objs           |  15 +
-> > >  hw/virtio/vhost-scsi-pci.c        |  95 ++++
-> > >  hw/virtio/vhost-user-blk-pci.c    | 101 ++++
-> > >  hw/virtio/vhost-user-scsi-pci.c   | 101 ++++
-> > >  hw/virtio/vhost-vsock-pci.c       |  82 ++++
-> > >  hw/virtio/virtio-9p-pci.c         |  86 ++++
-> > >  hw/virtio/virtio-balloon-pci.c    |  94 ++++
-> > >  hw/virtio/virtio-blk-pci.c        |  97 ++++
-> > >  hw/virtio/virtio-crypto-pci.c     |  14 +
-> > >  hw/virtio/virtio-input-host-pci.c |  45 ++
-> > >  hw/virtio/virtio-input-pci.c      | 154 ++++++
-> > >  hw/virtio/virtio-net-pci.c        |  96 ++++
-> > >  hw/virtio/virtio-pci.c            | 783 ----------------------------=
---
-> > >  hw/virtio/virtio-pci.h            | 234 ---------
-> > >  hw/virtio/virtio-rng-pci.c        |  86 ++++
-> > >  hw/virtio/virtio-scsi-pci.c       | 106 ++++
-> > >  hw/virtio/virtio-serial-pci.c     | 112 +++++
-> > >  tests/Makefile.include            |  20 +-
-> > >  21 files changed, 1311 insertions(+), 1028 deletions(-)
-> > >  create mode 100644 hw/virtio/vhost-scsi-pci.c
-> > >  create mode 100644 hw/virtio/vhost-user-blk-pci.c
-> > >  create mode 100644 hw/virtio/vhost-user-scsi-pci.c
-> > >  create mode 100644 hw/virtio/vhost-vsock-pci.c
-> > >  create mode 100644 hw/virtio/virtio-9p-pci.c
-> > >  create mode 100644 hw/virtio/virtio-balloon-pci.c
-> > >  create mode 100644 hw/virtio/virtio-blk-pci.c
-> > >  create mode 100644 hw/virtio/virtio-input-host-pci.c
-> > >  create mode 100644 hw/virtio/virtio-input-pci.c
-> > >  create mode 100644 hw/virtio/virtio-net-pci.c
-> > >  create mode 100644 hw/virtio/virtio-rng-pci.c
-> > >  create mode 100644 hw/virtio/virtio-scsi-pci.c
-> > >  create mode 100644 hw/virtio/virtio-serial-pci.c
-> > >
-> > > --
-> > > 2.19.2
-> >
-> > For series:
-> > 	Reviewed-by: Gonglei <arei.gonglei@huawei.com>
-> >
-> >
-> > Thanks,
-> > -Gonglei
+> Would something like below be acceptable ? If so I will change the=20
+> remaining patches to use 'spapr->irq' and not 'smc->irq' anymore.
+
+Yeah, I think that looks ok.
+
+> =20
+> Thanks,
 >=20
-> Thanks!
-> Can you pls align Reviewed-by: tag at the 1st column in the future?
-> Makes it easier to apply the tag.
+> C.
+>=20
+> Index: qemu-xive.git/include/hw/ppc/spapr.h
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> --- qemu-xive.git.orig/include/hw/ppc/spapr.h
+> +++ qemu-xive.git/include/hw/ppc/spapr.h
+> @@ -177,6 +177,7 @@ struct sPAPRMachineState {
+>      int32_t irq_map_nr;
+>      unsigned long *irq_map;
+>      sPAPRXive  *xive;
+> +    sPAPRIrq *irq;
+> =20
+>      bool cmd_line_caps[SPAPR_CAP_NUM];
+>      sPAPRCapabilities def, eff, mig;
+> Index: qemu-xive.git/hw/ppc/spapr.c
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> --- qemu-xive.git.orig/hw/ppc/spapr.c
+> +++ qemu-xive.git/hw/ppc/spapr.c
+> @@ -1302,7 +1301,7 @@ static void *spapr_build_fdt(sPAPRMachin
+>      }
+> =20
+>      QLIST_FOREACH(phb, &spapr->phbs, list) {
+> -        ret =3D spapr_populate_pci_dt(phb, PHANDLE_XICP, fdt, smc->irq->=
+nr_msis);
+> +        ret =3D spapr_populate_pci_dt(phb, PHANDLE_XICP, fdt, spapr->irq=
+->nr_msis);
+>          if (ret < 0) {
+>              error_report("couldn't setup PCI devices in fdt");
+>              exit(1);
+> @@ -3056,9 +3055,38 @@ static void spapr_set_vsmt(Object *obj,
+>      visit_type_uint32(v, name, (uint32_t *)opaque, errp);
+>  }
+> =20
+> +static char *spapr_get_irq(Object *obj, Error **errp)
+> +{
+> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+> +
+> +    if (spapr->irq =3D=3D &spapr_irq_xics_legacy) {
+> +        return g_strdup("legacy");
+> +    } else if (spapr->irq =3D=3D &spapr_irq_xics) {
+> +        return g_strdup("xics");
+> +    } else if (spapr->irq =3D=3D &spapr_irq_xive) {
+> +        return g_strdup("xive");
+> +    }
+> +    g_assert_not_reached();
+> +}
+> +
+> +static void spapr_set_irq(Object *obj, const char *value, Error **errp)
+> +{
+> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+> +
+> +    /* We don't want to set the legacy IRQ backend */
+> +    if (strcmp(value, "xics") =3D=3D 0) {
+> +        spapr->irq =3D &spapr_irq_xics;
+> +    } else if (strcmp(value, "xive") =3D=3D 0) {
+> +        spapr->irq =3D &spapr_irq_xive;
+> +    } else {
+> +        error_setg(errp, "Bad value for \"irq\" property");
+> +    }
+> +}
+> +
+>  static void spapr_instance_init(Object *obj)
+>  {
+>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> =20
+>      spapr->htab_fd =3D -1;
+>      spapr->use_hotplug_event_source =3D true;
+> @@ -3092,6 +3120,13 @@ static void spapr_instance_init(Object *
+>                                      " the host's SMT mode", &error_abort=
+);
+>      object_property_add_bool(obj, "vfio-no-msix-emulation",
+>                               spapr_get_msix_emulation, NULL, NULL);
+> +
+> +    /* Get the default from the machine class */
+> +    spapr->irq =3D smc->irq;
+> +    object_property_add_str(obj, "irq", spapr_get_irq, spapr_set_irq, NU=
+LL);
+> +    object_property_set_description(obj, "irq",
+> +                 "Specifies the interrupt controller mode (xics, xive)",
+> +                 NULL);
+>  }
+> =20
+>  static void spapr_machine_finalizefn(Object *obj)
+> @@ -3814,9 +3849,8 @@ static void spapr_pic_print_info(Interru
+>                                   Monitor *mon)
+>  {
+>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+> -    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> =20
+> -    smc->irq->print_info(spapr, mon);
+> +    spapr->irq->print_info(spapr, mon);
+>  }
+> =20
+>  int spapr_get_vcpu_id(PowerPCCPU *cpu)
+> Index: qemu-xive.git/hw/ppc/spapr_irq.c
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> --- qemu-xive.git.orig/hw/ppc/spapr_irq.c
+> +++ qemu-xive.git/hw/ppc/spapr_irq.c
+> @@ -94,8 +94,7 @@ error:
+>  static void spapr_irq_init_xics(sPAPRMachineState *spapr, Error **errp)
+>  {
+>      MachineState *machine =3D MACHINE(spapr);
+> -    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> -    int nr_irqs =3D smc->irq->nr_irqs;
+> +    int nr_irqs =3D spapr->irq->nr_irqs;
+>      Error *local_err =3D NULL;
+> =20
+>      if (kvm_enabled()) {
+> @@ -234,7 +233,6 @@ sPAPRIrq spapr_irq_xics =3D {
+>  static void spapr_irq_init_xive(sPAPRMachineState *spapr, Error **errp)
+>  {
+>      MachineState *machine =3D MACHINE(spapr);
+> -    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+>      uint32_t nr_servers =3D spapr_max_server_number(spapr);
+>      DeviceState *dev;
+>      int i;
+> @@ -248,7 +246,7 @@ static void spapr_irq_init_xive(sPAPRMac
+>      }
+> =20
+>      dev =3D qdev_create(NULL, TYPE_SPAPR_XIVE);
+> -    qdev_prop_set_uint32(dev, "nr-irqs", smc->irq->nr_irqs);
+> +    qdev_prop_set_uint32(dev, "nr-irqs", spapr->irq->nr_irqs);
+>      /*
+>       * 8 XIVE END structures per CPU. One for each available priority
+>       */
+> @@ -353,50 +351,38 @@ sPAPRIrq spapr_irq_xive =3D {
+>   */
+>  void spapr_irq_init(sPAPRMachineState *spapr, Error **errp)
+>  {
+> -    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> -
+>      /* Initialize the MSI IRQ allocator. */
+>      if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+> -        spapr_irq_msi_init(spapr, smc->irq->nr_msis);
+> +        spapr_irq_msi_init(spapr, spapr->irq->nr_msis);
+>      }
+> =20
+> -    smc->irq->init(spapr, errp);
+> +    spapr->irq->init(spapr, errp);
+>  }
+> =20
+>  int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
+*errp)
+>  {
+> -    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> -
+> -    return smc->irq->claim(spapr, irq, lsi, errp);
+> +    return spapr->irq->claim(spapr, irq, lsi, errp);
+>  }
+> =20
+>  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num)
+>  {
+> -    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> -
+> -    smc->irq->free(spapr, irq, num);
+> +    spapr->irq->free(spapr, irq, num);
+>  }
+> =20
+>  qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq)
+>  {
+> -    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> -
+> -    return smc->irq->qirq(spapr, irq);
+> +    return spapr->irq->qirq(spapr, irq);
+>  }
+> =20
+>  int spapr_irq_post_load(sPAPRMachineState *spapr, int version_id)
+>  {
+> -    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> -
+> -    return smc->irq->post_load(spapr, version_id);
+> +    return spapr->irq->post_load(spapr, version_id);
+>  }
+> =20
+>  void spapr_irq_reset(sPAPRMachineState *spapr, Error **errp)
+>  {
+> -    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> -
+> -    if (smc->irq->reset) {
+> -        smc->irq->reset(spapr, errp);
+> +    if (spapr->irq->reset) {
+> +        spapr->irq->reset(spapr, errp);
+>      }
+>  }
+> =20
+>=20
 
-OK, I will, thanks :)
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Thanks,
--Gonglei
+--M0YLxmUXciMpOLPE
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwUtVwACgkQbDjKyiDZ
+s5LbQA/+MmyTl36sbNNKA5wgEqrvSFd5Vsg5xvZM/A9UEP4iMilJkQLOB8yc8Iun
+3RATib/YcBmKlKWLY964GqWd0x6rMr4P07QxjxPCH7GhXGjEXW4kJhAYNAvvTOwq
+aOd79VJh1WygpcCRzwRtSTDa6zvjx2EfympwWv2X4L/tflcYj68bU3il+gZr2tS8
+x+Q6xdLg6lvjW1sTRbiRVYwTaBaBkf8FTmV3H8EdWrn/WfT676R+ayuMv2KNGcLt
+S+sogo9po/cJigsqCJvDyD2tatgSqk4eAQdkreST6UvltchASXD+XqERr2upWtPl
+FzQ0Z4X5S+7U1I8YaJEkN2s1s1e8U3jc+yVn8o+Oe3gRhARsNzvWjNI8rb6rj3Uw
+c+WlzLtEEuNZP33TL6QKgbpBTN/j3NJ4r42BEDunbDZJoX4uzl241kUxdncBY0Az
+WqGIkBFwZAuAB9PiuvHAG1VwCHQ2qIkCDg75kSuqYawKhaw8P5Pl460ARtz31WvZ
+HWH76K/rFAY2YJK8sYOEBSiS8ZkYecm4ycmFCPp+lJU3vhP5vWFCDJ4QCh3K+6pu
+b+3ehbCuQiQhIvyb1rakxLEAC9HMuadgX/t8brdVvxCowtgcoDB3FaOGJczJIvuI
+TqRstQv651so9BzgrncpUe/ovJIc6CGzGy3gX/qdFm0e10XXcsE=
+=MgR4
+-----END PGP SIGNATURE-----
+
+--M0YLxmUXciMpOLPE--
