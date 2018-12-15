@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34326)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gYAO4-0004hM-Bw
+	(envelope-from <eblake@redhat.com>) id 1gYAO4-0004hO-Cd
 	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 08:53:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gYAO3-00084a-95
+	(envelope-from <eblake@redhat.com>) id 1gYAO2-00084I-Vq
 	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 08:53:48 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Sat, 15 Dec 2018 07:53:08 -0600
-Message-Id: <20181215135324.152629-7-eblake@redhat.com>
+Date: Sat, 15 Dec 2018 07:53:06 -0600
+Message-Id: <20181215135324.152629-5-eblake@redhat.com>
 In-Reply-To: <20181215135324.152629-1-eblake@redhat.com>
 References: <20181215135324.152629-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 06/22] qemu-nbd: Fail earlier for -c/-d on
- non-linux
+Subject: [Qemu-devel] [PATCH v2 04/22] qemu-nbd: Enhance man page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,142 +22,165 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: nsoffer@redhat.com, jsnow@redhat.com, rjones@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-Connecting to a /dev/nbdN device is a Linux-specific action.
-We were already masking -c and -d from 'qemu-nbd --help' on
-non-linux.  However, while -d fails with a sensible error
-message, it took hunting through a couple of files to prove
-that.  What's more, the code for -c doesn't fail until after
-it has created a pthread and tried to open a device - possibly
-even printing an error message with %m on a non-Linux platform
-in spite of the comment that %m is glibc-specific.  Make the
-failure happen sooner, then get rid of stubs that are no
-longer needed because of the early exits.
-
-While at it: tweak the blank newlines in --help output to be
-consistent, whether or not built on Linux.
+Document some useful qemu-nbd command lines. Mention some restrictions
+on particular options, like -p being only for MBR images, or -c/-d
+being Linux-only.  Update some text given the recent change to no
+longer serve oldstyle protocol (missed in commit 7f7dfe2a).  Also,
+consistently use trailing '.' in describing options.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v2: Hoist -c error message to share with -d message [Vladimir]
-Bonus: gets rid of a stray TAB in nbd/client.c
+v2: new patch
 ---
- nbd/client.c | 18 +-----------------
- qemu-nbd.c   | 21 +++++++++++++++++++--
- 2 files changed, 20 insertions(+), 19 deletions(-)
+ qemu-nbd.texi | 85 +++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 66 insertions(+), 19 deletions(-)
 
-diff --git a/nbd/client.c b/nbd/client.c
-index 5d59d5ba78a..3d9086af39d 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -1029,23 +1029,7 @@ int nbd_disconnect(int fd)
-     return 0;
- }
+diff --git a/qemu-nbd.texi b/qemu-nbd.texi
+index 9a84e81eed9..0e24c2801ee 100644
+--- a/qemu-nbd.texi
++++ b/qemu-nbd.texi
+@@ -8,7 +8,10 @@
 
--#else
--int nbd_init(int fd, QIOChannelSocket *ioc, NBDExportInfo *info,
--	     Error **errp)
--{
--    error_setg(errp, "nbd_init is only supported on Linux");
--    return -ENOTSUP;
--}
--
--int nbd_client(int fd)
--{
--    return -ENOTSUP;
--}
--int nbd_disconnect(int fd)
--{
--    return -ENOTSUP;
--}
--#endif
-+#endif /* __linux__ */
+ @c man begin DESCRIPTION
 
- int nbd_send_request(QIOChannel *ioc, NBDRequest *request)
- {
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index e169b839ece..2807e132396 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -43,6 +43,12 @@
- #include "trace/control.h"
- #include "qemu-version.h"
+-Export a QEMU disk image using the NBD protocol.
++Provide access to various QEMU NBD features.  Most commonly used to
++export a QEMU disk image using the NBD protocol as a server, but can
++also be used (on Linux) to manage kernel bindings of a /dev/nbdX
++block device to a QEMU server.
 
-+#ifdef __linux__
-+#define HAVE_NBD_DEVICE 1
-+#else
-+#define HAVE_NBD_DEVICE 0
-+#endif
+ @c man end
+
+@@ -27,28 +30,29 @@ supported. The common object types that it makes sense to define are the
+ keys, and the @code{tls-creds} object, which is used to supply TLS
+ credentials for the qemu-nbd server.
+ @item -p, --port=@var{port}
+-The TCP port to listen on (default @samp{10809})
++The TCP port to listen on (default @samp{10809}).
+ @item -o, --offset=@var{offset}
+-The offset into the image
++The offset into the image.
+ @item -b, --bind=@var{iface}
+-The interface to bind to (default @samp{0.0.0.0})
++The interface to bind to (default @samp{0.0.0.0}).
+ @item -k, --socket=@var{path}
+-Use a unix socket with path @var{path}
++Use a unix socket with path @var{path}.
+ @item --image-opts
+ Treat @var{filename} as a set of image options, instead of a plain
+ filename. If this flag is specified, the @var{-f} flag should
+ not be used, instead the '@code{format=}' option should be set.
+ @item -f, --format=@var{fmt}
+ Force the use of the block driver for format @var{fmt} instead of
+-auto-detecting
++auto-detecting.
+ @item -r, --read-only
+-Export the disk as read-only
++Export the disk as read-only.
+ @item -P, --partition=@var{num}
+-Only expose partition @var{num}
++Only expose MBR partition @var{num}.  Understands physical partitions
++1-4 and logical partitions 5-8.
+ @item -s, --snapshot
+ Use @var{filename} as an external snapshot, create a temporary
+ file with backing_file=@var{filename}, redirect the write to
+-the temporary one
++the temporary one.
+ @item -l, --load-snapshot=@var{snapshot_param}
+ Load an internal snapshot inside @var{filename} and export it
+ as an read-only device, @var{snapshot_param} format is
+@@ -72,19 +76,18 @@ driver-specific optimized zero write commands.  @var{detect-zeroes} is one of
+ converts a zero write to an unmap operation and can only be used if
+ @var{discard} is set to @samp{unmap}.  The default is @samp{off}.
+ @item -c, --connect=@var{dev}
+-Connect @var{filename} to NBD device @var{dev}
++Connect @var{filename} to NBD device @var{dev} (Linux only).
+ @item -d, --disconnect
+-Disconnect the device @var{dev}
++Disconnect the device @var{dev} (Linux only).
+ @item -e, --shared=@var{num}
+-Allow up to @var{num} clients to share the device (default @samp{1})
++Allow up to @var{num} clients to share the device (default @samp{1}).
+ @item -t, --persistent
+-Don't exit on the last connection
++Don't exit on the last connection.
+ @item -x, --export-name=@var{name}
+-Set the NBD volume export name. This switches the server to use
+-the new style NBD protocol negotiation
++Set the NBD volume export name (default of a zero-length string).
+ @item -D, --description=@var{description}
+ Set the NBD volume export description, as a human-readable
+-string. Requires the use of @option{-x}
++string.
+ @item --tls-creds=ID
+ Enable mandatory TLS encryption for the server by setting the ID
+ of the TLS credentials object previously created with the --object
+@@ -92,11 +95,11 @@ option.
+ @item --fork
+ Fork off the server process and exit the parent once the server is running.
+ @item -v, --verbose
+-Display extra debugging information
++Display extra debugging information.
+ @item -h, --help
+-Display this help and exit
++Display this help and exit.
+ @item -V, --version
+-Display version information and exit
++Display version information and exit.
+ @item -T, --trace [[enable=]@var{pattern}][,events=@var{file}][,file=@var{file}]
+ @findex --trace
+ @include qemu-option-trace.texi
+@@ -104,6 +107,50 @@ Display version information and exit
+
+ @c man end
+
++@c man begin EXAMPLES
++Start a server listening on port 10809 that exposes only the
++guest-visible contents of a qcow2 file, with no TLS encryption, and
++with the default export name (an empty string). The command will block
++until the first successful client disconnects:
 +
- #define SOCKET_PATH                "/var/lock/qemu-nbd-%s"
- #define QEMU_NBD_OPT_CACHE         256
- #define QEMU_NBD_OPT_AIO           257
-@@ -98,11 +104,11 @@ static void usage(const char *name)
- "                            specify tracing options\n"
- "  --fork                    fork off the server process and exit the parent\n"
- "                            once the server is running\n"
--#ifdef __linux__
-+#if HAVE_NBD_DEVICE
-+"\n"
- "Kernel NBD client support:\n"
- "  -c, --connect=DEV         connect FILE to the local NBD device DEV\n"
- "  -d, --disconnect          disconnect the specified device\n"
--"\n"
- #endif
- "\n"
- "Block device options:\n"
-@@ -236,6 +242,7 @@ static void termsig_handler(int signum)
- }
++@example
++qemu-nbd -f qcow2 file.qcow2
++@end example
++
++Start a server listening with encryption on port 10810, and require
++the client to have a correct X.509 certificate to connect to a 1
++megabyte subset of a raw file, using the export name 'subset':
++
++@example
++qemu-nbd \
++  --object tls-creds-x509,id=tls0,endpoint=server,dir=/path/to/qemutls \
++  --tls-creds tls0 -x subset -p 10810 \
++  --image-opts driver=raw,offset=1M,length=1M,file.driver=file,file.filename=file.raw
++@end example
++
++Serve a read-only copy of just the first MBR partition of a guest
++image over a Unix socket with as many as 5 simultaneous readers, with
++a persistent process forked as a daemon:
++
++@example
++qemu-nbd --fork -t -e 5 -s /path/to/sock -p 1 -r -f qcow2 file.qcow2
++@end example
++
++Expose the guest-visible contents of a qcow2 file via a block device
++/dev/nbd0 (and possibly creating /dev/nbd0p1 and friends for
++partitions found within), then disconnect the device when done.
++@emph{CAUTION}: Do not use this method to mount filesystems from an
++untrusted guest image - a malicious guest may have prepared the image
++to attempt to trigger kernel bugs in partition probing or file system
++mounting.
++
++@example
++qemu-nbd -c /dev/nbd0 -f qcow2 file.qcow2
++qemu-nbd -d /dev/nbd0
++@end example
++
++@c man end
++
+ @ignore
 
-
-+#if HAVE_NBD_DEVICE
- static void *show_parts(void *arg)
- {
-     char *device = arg;
-@@ -321,6 +328,7 @@ out:
-     kill(getpid(), SIGTERM);
-     return (void *) EXIT_FAILURE;
- }
-+#endif /* HAVE_NBD_DEVICE */
-
- static int nbd_can_accept(void)
- {
-@@ -814,6 +822,12 @@ int main(int argc, char **argv)
-         }
-     }
-
-+#if !HAVE_NBD_DEVICE
-+    if (disconnect || device) {
-+        error_report("Kernel /dev/nbdN support not available");
-+        exit(EXIT_FAILURE);
-+    }
-+#else /* HAVE_NBD_DEVICE */
-     if (disconnect) {
-         int nbdfd = open(argv[optind], O_RDWR);
-         if (nbdfd < 0) {
-@@ -829,6 +843,7 @@ int main(int argc, char **argv)
-
-         return 0;
-     }
-+#endif
-
-     if ((device && !verbose) || fork_process) {
-         int stderr_fd[2];
-@@ -1006,6 +1021,7 @@ int main(int argc, char **argv)
-     nbd_export_set_description(exp, export_description);
-
-     if (device) {
-+#if HAVE_NBD_DEVICE
-         int ret;
-
-         ret = pthread_create(&client_thread, NULL, nbd_client_thread, device);
-@@ -1013,6 +1029,7 @@ int main(int argc, char **argv)
-             error_report("Failed to create client thread: %s", strerror(ret));
-             exit(EXIT_FAILURE);
-         }
-+#endif
-     } else {
-         /* Shut up GCC warnings.  */
-         memset(&client_thread, 0, sizeof(client_thread));
+ @setfilename qemu-nbd
 -- 
 2.17.2
