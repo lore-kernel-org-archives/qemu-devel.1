@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gYAh3-0003ol-0P
-	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 09:13:26 -0500
+	(envelope-from <rjones@redhat.com>) id 1gYAhV-0004dJ-2F
+	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 09:14:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gYAWr-0004Xf-SR
-	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 09:02:55 -0500
-Date: Sat, 15 Dec 2018 14:02:37 +0000
+	(envelope-from <rjones@redhat.com>) id 1gYAhO-0007TR-AB
+	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 09:13:52 -0500
+Date: Sat, 15 Dec 2018 14:13:05 +0000
 From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20181215140237.GR27120@redhat.com>
+Message-ID: <20181215141305.GT27120@redhat.com>
 References: <20181215135324.152629-1-eblake@redhat.com>
-	<20181215135324.152629-3-eblake@redhat.com>
+	<20181215135324.152629-5-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181215135324.152629-3-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 02/22] nbd: Document timeline of various
- features
+In-Reply-To: <20181215135324.152629-5-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 04/22] qemu-nbd: Enhance man page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,76 +26,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Eric Blake <eblake@redhat.com>
 Cc: qemu-devel@nongnu.org, nsoffer@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-On Sat, Dec 15, 2018 at 07:53:04AM -0600, Eric Blake wrote:
-> It can be useful to figure out which NBD protocol features are
-> exposed by a server, as well as what features a client will
-> take advantage of if available, for a given qemu release.  It's
-> not always precise to base features on version numbers (thanks
-> to downstream backports), but any documentation is better than
-> making users search through git logs themselves.
+On Sat, Dec 15, 2018 at 07:53:06AM -0600, Eric Blake wrote:
+> Document some useful qemu-nbd command lines. Mention some restrictions
+> on particular options, like -p being only for MBR images, or -c/-d
+> being Linux-only.  Update some text given the recent change to no
+> longer serve oldstyle protocol (missed in commit 7f7dfe2a).  Also,
+> consistently use trailing '.' in describing options.
 > 
-> This patch originally stemmed from a request to document that
-> pristine 3.0 has a known bug where NBD_OPT_LIST_META_CONTEXT
-> with 0 queries forgot to advertise an available
-> "qemu:dirty-bitmap" context, but documenting bugs like this (or
-> the fact that 3.0 also botched NBD_CMD_CACHE) gets to be too
-> much details, especially since buggy releases will be less
-> likely connection targets over time.  Instead, I chose to just
-> remind users to check stable release branches.
-> 
-> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > Signed-off-by: Eric Blake <eblake@redhat.com>
 > 
 > ---
 > v2: new patch
 > ---
->  docs/interop/nbd.txt | 19 ++++++++++++++++++-
->  1 file changed, 18 insertions(+), 1 deletion(-)
+>  qemu-nbd.texi | 85 +++++++++++++++++++++++++++++++++++++++------------
+>  1 file changed, 66 insertions(+), 19 deletions(-)
 > 
-> diff --git a/docs/interop/nbd.txt b/docs/interop/nbd.txt
-> index 77b5f459111..2b25f871e7c 100644
-> --- a/docs/interop/nbd.txt
-> +++ b/docs/interop/nbd.txt
-> @@ -15,7 +15,6 @@ Qemu supports the "base:allocation" metadata context as defined in the
->  NBD protocol specification, and also defines an additional metadata
->  namespace "qemu".
+> diff --git a/qemu-nbd.texi b/qemu-nbd.texi
+> index 9a84e81eed9..0e24c2801ee 100644
+> --- a/qemu-nbd.texi
+> +++ b/qemu-nbd.texi
+> @@ -8,7 +8,10 @@
 > 
-> -
->  == "qemu" namespace ==
+>  @c man begin DESCRIPTION
 > 
->  The "qemu" namespace currently contains only one type of context,
-> @@ -36,3 +35,21 @@ in addition to "qemu:dirty-bitmap:<dirty-bitmap-export-name>":
->              namespace.
->  * "qemu:dirty-bitmap:" - returns list of all available dirty-bitmap
->                           metadata contexts.
-> +
-> += Features by version =
-> +
-> +The following list documents which qemu version first implemented
-> +various features (both as a server exposing the feature, and as a
-> +client taking advantage of the feature when present), to make it
-> +easier to plan for cross-version interoperability.  Note that in
-> +several cases, the initial release containing a feature may require
-> +additional patches from the corresponding stable branch to fix bugs in
-> +the operation of that feature.
-> +
-> +* 2.6: NBD_OPT_STARTTLS with TLS X.509 Certificates
-> +* 2.8: NBD_CMD_WRITE_ZEROES
-> +* 2.10: NBD_OPT_GO, NBD_INFO_BLOCK
-> +* 2.11: NBD_OPT_STRUCTURED_READ
-> +* 2.12: NBD_CMD_BLOCK_STATUS for "base:allocation"
-> +* 3.0: NBD_OPT_STARTTLS with TLS Pre-Shared Keys (PSK),
-> +NBD_CMD_BLOCK_STATUS for "qemu:dirty-bitmap:", NBD_CMD_CACHE
+> -Export a QEMU disk image using the NBD protocol.
+> +Provide access to various QEMU NBD features.  Most commonly used to
+> +export a QEMU disk image using the NBD protocol as a server, but can
+> +also be used (on Linux) to manage kernel bindings of a /dev/nbdX
+> +block device to a QEMU server.
 
-Sensible documentation change.
+This is only a minor quibble, but I thought the original text was a
+good summary, and only needs additional paragraphs describing the more
+minor use cases.  Thus the description would become by the end of the
+patch series:
 
-Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
+  DESCRIPTION
+
+  Export a QEMU disk image using the NBD protocol.
+
+  Other uses:
+  * (On Linux) bind /dev/nbdX block device to a QEMU server.
+  * As a client to query exports of a remote NBD server.
+
+> +@c man begin EXAMPLES
+> +Start a server listening on port 10809 that exposes only the
+> +guest-visible contents of a qcow2 file, with no TLS encryption, and
+> +with the default export name (an empty string). The command will block
+> +until the first successful client disconnects:
+
+TBH I'd always include the -t option in every example.  I don't
+understand (except for backwards compatibility) why it isn't the
+default since it's something I always trip over when using qemu-nbd.
 
 Rich.
 
 -- 
 Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
 Read my programming and virtualization blog: http://rwmj.wordpress.com
-Fedora Windows cross-compiler. Compile Windows programs, test, and
-build Windows installers. Over 100 libraries supported.
-http://fedoraproject.org/wiki/MinGW
+libguestfs lets you edit virtual machines.  Supports shell scripting,
+bindings from many languages.  http://libguestfs.org
