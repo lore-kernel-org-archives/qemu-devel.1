@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gYC7w-0005rQ-IE
-	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 10:45:18 -0500
+	(envelope-from <rjones@redhat.com>) id 1gYCLT-0002fy-8k
+	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 10:59:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gYBti-0001xy-JQ
-	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 10:30:35 -0500
-Date: Sat, 15 Dec 2018 15:30:21 +0000
+	(envelope-from <rjones@redhat.com>) id 1gYCLS-0004VM-4B
+	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 10:59:15 -0500
+Date: Sat, 15 Dec 2018 15:59:03 +0000
 From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20181215153021.GA27120@redhat.com>
+Message-ID: <20181215155903.GD27120@redhat.com>
 References: <20181215135324.152629-1-eblake@redhat.com>
-	<20181215135324.152629-15-eblake@redhat.com>
+	<20181215135324.152629-20-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181215135324.152629-15-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 14/22] nbd/client: Split out
- nbd_receive_one_meta_context()
+In-Reply-To: <20181215135324.152629-20-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 19/22] nbd/client: Add meta contexts to
+ nbd_receive_export_list()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,233 +25,123 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, nsoffer@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, nsoffer@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Sat, Dec 15, 2018 at 07:53:16AM -0600, Eric Blake wrote:
-> Refactor nbd_negotiate_simple_meta_context() to more closely
-> resemble the pattern of nbd_receive_list(), separating the
-> argument validation for one pass from the caller making a loop
-> over passes. No major semantic change (although one error
-> message loses the original query).  The diff may be a bit hard
-> to follow due to indentation changes and handling ACK first
-> rather than last.
+On Sat, Dec 15, 2018 at 07:53:21AM -0600, Eric Blake wrote:
+> We want to be able to detect whether a given qemu NBD server is
+> exposing the right export(s) and dirty bitmaps, at least for
+> regression testing.  We could use 'nbd-client -l' from the upstream
+> NBD project to list exports, but it's annoying to rely on
+> out-of-tree binaries; furthermore, nbd-client doesn't necessarily
+> know about all of the qemu NBD extensions.  Thus, we plan on adding
+> a new mode to qemu-nbd that merely sniffs all possible information
+> from the server during handshake phase, then disconnects and dumps
+> the information.
+> 
+> This patch continues the work of the previous patch, by adding the
+> ability to track the list of available meta contexts into
+> NBDExportInfo.  It benefits from the recent refactoring patches
+> with a new nbd_list_meta_contexts() that reuses much of the same
+> framework as setting a meta context.
 > 
 > Signed-off-by: Eric Blake <eblake@redhat.com>
 > 
 > ---
-> v2: split patch into easier-to-review pieces [Rich, Vladimir]
+> v2: new patch to split out collection of meta context collection
+> s/free/g_free/ [Vladimir]
 > ---
->  nbd/client.c     | 144 +++++++++++++++++++++++++++--------------------
->  nbd/trace-events |   2 +-
->  2 files changed, 84 insertions(+), 62 deletions(-)
+>  include/block/nbd.h |  2 ++
+>  nbd/client.c        | 41 +++++++++++++++++++++++++++++++++++++++--
+>  2 files changed, 41 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/block/nbd.h b/include/block/nbd.h
+> index 09d2157efe0..6d9fbb941d7 100644
+> --- a/include/block/nbd.h
+> +++ b/include/block/nbd.h
+> @@ -284,6 +284,8 @@ struct NBDExportInfo {
+> 
+>      /* Set by server results during nbd_receive_export_list() */
+>      char *description;
+> +    int n_contexts;
+> +    char **contexts;
+>  };
+>  typedef struct NBDExportInfo NBDExportInfo;
 > 
 > diff --git a/nbd/client.c b/nbd/client.c
-> index 5b6b9964097..0e5a9d59dbd 100644
+> index 0e6c575ccad..d392b5e8bee 100644
 > --- a/nbd/client.c
 > +++ b/nbd/client.c
-> @@ -669,6 +669,83 @@ static int nbd_send_one_meta_context(QIOChannel *ioc,
->      return ret;
+> @@ -808,6 +808,36 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+>      }
 >  }
 > 
-> +/* nbd_receive_one_meta_context:
-> + * Called in a loop to receive and trace one set/list meta context reply.
-> + * Pass non-NULL @name or @id to collect results back to the caller, which
-> + * must eventually call g_free().
-> + * return 1 if more contexts are expected,
-> + *        0 if operation is complete,
-> + *        -1 with errp set for any error
+> +/*
+> + * nbd_list_meta_contexts:
+> + * Request the server to list all meta contexts for export @info->name.
+> + * return 0 if list is complete (even if empty),
+> + *        -1 with errp set for any other error
 > + */
-> +static int nbd_receive_one_meta_context(QIOChannel *ioc,
-> +                                        uint32_t opt,
-> +                                        char **name,
-> +                                        uint32_t *id,
-> +                                        Error **errp)
+> +static int nbd_list_meta_contexts(QIOChannel *ioc,
+> +                                  NBDExportInfo *info,
+> +                                  Error **errp)
 > +{
 > +    int ret;
-> +    NBDOptionReply reply;
-> +    char *local_name = NULL;
-> +    uint32_t local_id;
 > +
-> +    if (nbd_receive_option_reply(ioc, opt, &reply, errp) < 0) {
+> +    if (nbd_send_one_meta_context(ioc, NBD_OPT_LIST_META_CONTEXT,
+> +                                  info->name, NULL, errp) < 0) {
 > +        return -1;
 > +    }
 > +
-> +    ret = nbd_handle_reply_err(ioc, &reply, errp);
-> +    if (ret <= 0) {
-> +        return ret;
-> +    }
+> +    while (1) {
+> +        char *context;
 > +
-> +    if (reply.type == NBD_REP_ACK) {
-> +        if (reply.length != 0) {
-> +            error_setg(errp, "Unexpected length to ACK response");
-> +            nbd_send_opt_abort(ioc);
-> +            return -1;
+> +        ret = nbd_receive_one_meta_context(ioc, NBD_OPT_LIST_META_CONTEXT,
+> +                                           &context, NULL, errp);
+> +        if (ret <= 0) {
+> +            return ret;
 > +        }
-> +        return 0;
-> +    } else if (reply.type != NBD_REP_META_CONTEXT) {
-> +        error_setg(errp, "Unexpected reply type %u (%s), expected %u (%s)",
-> +                   reply.type, nbd_rep_lookup(reply.type),
-> +                   NBD_REP_META_CONTEXT, nbd_rep_lookup(NBD_REP_META_CONTEXT));
-> +        nbd_send_opt_abort(ioc);
-> +        return -1;
+> +        info->contexts = g_renew(char *, info->contexts, ++info->n_contexts);
+> +        info->contexts[info->n_contexts - 1] = context;
 > +    }
-> +
-> +    if (reply.length <= sizeof(local_id) ||
-> +        reply.length > NBD_MAX_BUFFER_SIZE) {
-> +        error_setg(errp, "Failed to negotiate meta context, server "
-> +                   "answered with unexpected length %" PRIu32,
-> +                   reply.length);
-> +        nbd_send_opt_abort(ioc);
-> +        return -1;
-> +    }
-> +
-> +    if (nbd_read(ioc, &local_id, sizeof(local_id), errp) < 0) {
-> +        return -1;
-> +    }
-> +    local_id = be32_to_cpu(local_id);
-> +
-> +    reply.length -= sizeof(local_id);
-> +    local_name = g_malloc(reply.length + 1);
-> +    if (nbd_read(ioc, local_name, reply.length, errp) < 0) {
-> +        g_free(local_name);
-> +        return -1;
-> +    }
-> +    local_name[reply.length] = '\0';
-> +    trace_nbd_opt_meta_reply(nbd_opt_lookup(opt), local_name, local_id);
-> +
-> +    if (name) {
-> +        *name = local_name;
-> +    } else {
-> +        g_free(local_name);
-> +    }
-> +    if (id) {
-> +        *id = local_id;
-> +    }
-> +    return 1;
 > +}
 > +
->  /* nbd_negotiate_simple_meta_context:
->   * Request the server to set the meta context for export @info->name
->   * using @info->x_dirty_bitmap with a fallback to "base:allocation",
-> @@ -690,7 +767,6 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
->       * function should lose the term _simple.
->       */
->      int ret;
-> -    NBDOptionReply reply;
->      const char *context = info->x_dirty_bitmap ?: "base:allocation";
->      bool received = false;
+>  /*
+>   * nbd_start_negotiate:
+>   * Start the handshake to the server.  After a positive return, the server
+> @@ -1054,7 +1084,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
+>  /* Clean up result of nbd_receive_export_list */
+>  void nbd_free_export_list(NBDExportInfo *info, int count)
+>  {
+> -    int i;
+> +    int i, j;
 > 
-> @@ -699,44 +775,17 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
->          return -1;
+>      if (!info) {
+>          return;
+> @@ -1063,6 +1093,10 @@ void nbd_free_export_list(NBDExportInfo *info, int count)
+>      for (i = 0; i < count; i++) {
+>          g_free(info[i].name);
+>          g_free(info[i].description);
+> +        for (j = 0; j < info[i].n_contexts; j++) {
+> +            g_free(info[i].contexts[j]);
+> +        }
+> +        g_free(info[i].contexts);
 >      }
-> 
-> -    if (nbd_receive_option_reply(ioc, NBD_OPT_SET_META_CONTEXT, &reply,
-> -                                 errp) < 0)
-> -    {
-> -        return -1;
-> -    }
-> -
-> -    ret = nbd_handle_reply_err(ioc, &reply, errp);
-> -    if (ret <= 0) {
-> -        return ret;
-> -    }
-> -
-> -    while (reply.type == NBD_REP_META_CONTEXT) {
-> +    while (1) {
->          char *name;
-> 
-> -        if (reply.length <= sizeof(info->context_id) ||
-> -            reply.length > NBD_MAX_BUFFER_SIZE) {
-> -            error_setg(errp, "Failed to negotiate meta context '%s', server "
-> -                       "answered with unexpected length %" PRIu32, context,
-> -                       reply.length);
-> -            nbd_send_opt_abort(ioc);
-> +        ret = nbd_receive_one_meta_context(ioc, NBD_OPT_SET_META_CONTEXT,
-> +                                           &name, &info->context_id, errp);
-> +        if (ret < 0) {
->              return -1;
-> +        } else if (ret == 0) {
-> +            return received;
->          }
-> 
-> -        if (nbd_read(ioc, &info->context_id, sizeof(info->context_id),
-> -                     errp) < 0) {
-> -            return -1;
-> -        }
-> -        info->context_id = be32_to_cpu(info->context_id);
-> -
-> -        reply.length -= sizeof(info->context_id);
-> -        name = g_malloc(reply.length + 1);
-> -        if (nbd_read(ioc, name, reply.length, errp) < 0) {
-> -            g_free(name);
-> -            return -1;
-> -        }
-> -        name[reply.length] = '\0';
-> -        trace_nbd_opt_meta_reply(name, info->context_id);
-> -
->          if (received) {
->              error_setg(errp, "Server replied with more than one context");
->              g_free(name);
-> @@ -754,34 +803,7 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
->          }
->          g_free(name);
->          received = true;
-> -
-> -        /* receive NBD_REP_ACK */
-> -        if (nbd_receive_option_reply(ioc, NBD_OPT_SET_META_CONTEXT, &reply,
-> -                                     errp) < 0)
-> -        {
-> -            return -1;
-> -        }
-> -
-> -        ret = nbd_handle_reply_err(ioc, &reply, errp);
-> -        if (ret <= 0) {
-> -            return ret;
-> -        }
->      }
-> -
-> -    if (reply.type != NBD_REP_ACK) {
-> -        error_setg(errp, "Unexpected reply type %u (%s), expected %u (%s)",
-> -                   reply.type, nbd_rep_lookup(reply.type),
-> -                   NBD_REP_ACK, nbd_rep_lookup(NBD_REP_ACK));
-> -        nbd_send_opt_abort(ioc);
-> -        return -1;
-> -    }
-> -    if (reply.length) {
-> -        error_setg(errp, "Unexpected length to ACK response");
-> -        nbd_send_opt_abort(ioc);
-> -        return -1;
-> -    }
-> -
-> -    return received;
+>      g_free(info);
 >  }
+> @@ -1130,7 +1164,10 @@ int nbd_receive_export_list(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
+>                  break;
+>              }
 > 
->  int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
-> diff --git a/nbd/trace-events b/nbd/trace-events
-> index 00872a6f9d4..02956c96042 100644
-> --- a/nbd/trace-events
-> +++ b/nbd/trace-events
-> @@ -12,7 +12,7 @@ nbd_receive_query_exports_success(const char *wantname) "Found desired export na
->  nbd_receive_starttls_new_client(void) "Setting up TLS"
->  nbd_receive_starttls_tls_handshake(void) "Starting TLS handshake"
->  nbd_opt_meta_request(const char *optname, const char *context, const char *export) "Requesting %s %s for export %s"
-> -nbd_opt_meta_reply(const char *context, uint32_t id) "Received mapping of context %s to id %" PRIu32
-> +nbd_opt_meta_reply(const char *optname, const char *context, uint32_t id) "Received %s mapping of %s to id %" PRIu32
->  nbd_receive_negotiate(void *tlscreds, const char *hostname) "Receiving negotiation tlscreds=%p hostname=%s"
->  nbd_receive_negotiate_magic(uint64_t magic) "Magic is 0x%" PRIx64
->  nbd_receive_negotiate_server_flags(uint32_t globalflags) "Global flags are 0x%" PRIx32
-
-So I looked at both the changes you've made and the overall effect on
-the code.
-
-I think the individual changes are correct, albeit quite convoluted to
-follow because of (as you say in the commit) moving the test for
-NBD_REP_ACK first and also a few conditionals which are inverted.
-
-However importantly the overall effect on the code after the patch is
-applied makes it much easier to understand than before.
-
-Therefore:
+> -            /* TODO: Grab meta contexts */
+> +            if (result == 3 &&
+> +                nbd_list_meta_contexts(ioc, &array[i], errp) < 0) {
+> +                goto out;
+> +            }
+>          }
+> 
+>          /* Send NBD_OPT_ABORT as a courtesy before hanging up */
+> -- 
+> 2.17.2
 
 Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
 
@@ -260,6 +150,5 @@ Rich.
 -- 
 Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
 Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-df lists disk usage of guests without needing to install any
-software inside the virtual machine.  Supports Linux and Windows.
-http://people.redhat.com/~rjones/virt-df/
+libguestfs lets you edit virtual machines.  Supports shell scripting,
+bindings from many languages.  http://libguestfs.org
