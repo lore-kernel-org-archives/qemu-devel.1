@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gYAOA-0004n1-98
-	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 08:53:58 -0500
+	(envelope-from <eblake@redhat.com>) id 1gYAOF-0004qT-JN
+	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 08:54:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gYAO8-00088w-H7
-	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 08:53:54 -0500
+	(envelope-from <eblake@redhat.com>) id 1gYAOE-0008DV-A1
+	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 08:53:59 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Sat, 15 Dec 2018 07:53:09 -0600
-Message-Id: <20181215135324.152629-8-eblake@redhat.com>
+Date: Sat, 15 Dec 2018 07:53:13 -0600
+Message-Id: <20181215135324.152629-12-eblake@redhat.com>
 In-Reply-To: <20181215135324.152629-1-eblake@redhat.com>
 References: <20181215135324.152629-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 07/22] qemu-nbd: Avoid strtol open-coding
+Subject: [Qemu-devel] [PATCH v2 11/22] nbd/client: Change signature of
+ nbd_negotiate_simple_meta_context()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,104 +21,175 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: nsoffer@redhat.com, jsnow@redhat.com, rjones@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
+Cc: nsoffer@redhat.com, jsnow@redhat.com, rjones@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Our copy-and-pasted open-coding of strtol handling forgot to
-handle overflow conditions.  Use qemu_strto*() instead.
-
-In the case of --partition, since we insist on a user-supplied
-partition to be non-zero, we can use 0 rather than -1 for our
-initial value to distinguish when a partition is not being
-served, for slightly more optimal code.
-
-The error messages for out-of-bounds values are less specific,
-but should not be a terrible loss in quality.
+Pass 'info' instead of three separate parameters related to info,
+when requesting the server to set the meta context.  Update the
+NBDExportInfo struct to rename the received id field to match the
+fact that we are currently overloading the field to match whatever
+context the user supplied through the x-dirty-bitmap hack, as well
+as adding a TODO comment to remind future patches about a desire
+to request two contexts at once.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-
 ---
-v2: Retitle, catch more uses of strtol
-[Hmm - this depends on int64_t and off_t being compatible; if they
-aren't that way on all platforms, I'll need a temporary variable]
+v2: split patch into easier-to-review pieces [Rich, Vladimir]
+rename NBDExportInfo meta_base_allocation_id [Vladimir]
 ---
- qemu-nbd.c | 33 ++++++++++-----------------------
- 1 file changed, 10 insertions(+), 23 deletions(-)
+ include/block/nbd.h |  2 +-
+ block/nbd-client.c  |  4 ++--
+ nbd/client.c        | 53 +++++++++++++++++++++------------------------
+ 3 files changed, 28 insertions(+), 31 deletions(-)
 
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index 2807e132396..e3f739671b5 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -544,9 +544,8 @@ int main(int argc, char **argv)
-     };
-     int ch;
-     int opt_ind = 0;
--    char *end;
-     int flags = BDRV_O_RDWR;
--    int partition = -1;
-+    int partition = 0;
-     int ret = 0;
-     bool seen_cache = false;
-     bool seen_discard = false;
-@@ -657,13 +656,9 @@ int main(int argc, char **argv)
-             port = optarg;
-             break;
-         case 'o':
--                dev_offset = strtoll (optarg, &end, 0);
--            if (*end) {
--                error_report("Invalid offset `%s'", optarg);
--                exit(EXIT_FAILURE);
--            }
--            if (dev_offset < 0) {
--                error_report("Offset must be positive `%s'", optarg);
-+            if (qemu_strtoi64(optarg, NULL, 0, &dev_offset) < 0 ||
-+                dev_offset < 0) {
-+                error_report("Invalid offset '%s'", optarg);
-                 exit(EXIT_FAILURE);
-             }
-             break;
-@@ -685,13 +680,9 @@ int main(int argc, char **argv)
-             flags &= ~BDRV_O_RDWR;
-             break;
-         case 'P':
--            partition = strtol(optarg, &end, 0);
--            if (*end) {
--                error_report("Invalid partition `%s'", optarg);
--                exit(EXIT_FAILURE);
--            }
--            if (partition < 1 || partition > 8) {
--                error_report("Invalid partition %d", partition);
-+            if (qemu_strtoi(optarg, NULL, 0, &partition) < 0 ||
-+                partition < 1 || partition > 8) {
-+                error_report("Invalid partition '%s'", optarg);
-                 exit(EXIT_FAILURE);
-             }
-             break;
-@@ -709,15 +700,11 @@ int main(int argc, char **argv)
-             device = optarg;
-             break;
-         case 'e':
--            shared = strtol(optarg, &end, 0);
--            if (*end) {
-+            if (qemu_strtoi(optarg, NULL, 0, &shared) < 0 ||
-+                shared < 1) {
-                 error_report("Invalid shared device number '%s'", optarg);
-                 exit(EXIT_FAILURE);
-             }
--            if (shared < 1) {
--                error_report("Shared device number must be greater than 0");
--                exit(EXIT_FAILURE);
--            }
-             break;
-         case 'f':
-             fmt = optarg;
-@@ -1006,7 +993,7 @@ int main(int argc, char **argv)
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index 65feff8ba96..ae5fe28f486 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -276,7 +276,7 @@ struct NBDExportInfo {
+     uint32_t opt_block;
+     uint32_t max_block;
+
+-    uint32_t meta_base_allocation_id;
++    uint32_t context_id;
+ };
+ typedef struct NBDExportInfo NBDExportInfo;
+
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 417971d8b05..608b578e1d3 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -246,11 +246,11 @@ static int nbd_parse_blockstatus_payload(NBDClientSession *client,
      }
-     fd_size -= dev_offset;
 
--    if (partition != -1) {
-+    if (partition) {
-         ret = find_partition(blk, partition, &dev_offset, &fd_size);
-         if (ret < 0) {
-             error_report("Could not find partition %d: %s", partition,
+     context_id = payload_advance32(&payload);
+-    if (client->info.meta_base_allocation_id != context_id) {
++    if (client->info.context_id != context_id) {
+         error_setg(errp, "Protocol error: unexpected context id %d for "
+                          "NBD_REPLY_TYPE_BLOCK_STATUS, when negotiated context "
+                          "id is %d", context_id,
+-                         client->info.meta_base_allocation_id);
++                         client->info.context_id);
+         return -EINVAL;
+     }
+
+diff --git a/nbd/client.c b/nbd/client.c
+index 7462fa5ae0e..bcccd5f555e 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -628,26 +628,30 @@ static QIOChannel *nbd_receive_starttls(QIOChannel *ioc,
+ }
+
+ /* nbd_negotiate_simple_meta_context:
+- * Set one meta context. Simple means that reply must contain zero (not
+- * negotiated) or one (negotiated) contexts. More contexts would be considered
+- * as a protocol error. It's also implied that meta-data query equals queried
+- * context name, so, if server replies with something different than @context,
+- * it is considered an error too.
+- * return 1 for successful negotiation, context_id is set
++ * Request the server to set the meta context for export @info->name
++ * using @info->x_dirty_bitmap with a fallback to "base:allocation",
++ * setting @info->context_id to the resulting id. Fail if the server
++ * responds with more than one context or with a context different
++ * than the query.
++ * return 1 for successful negotiation,
+  *        0 if operation is unsupported,
+  *        -1 with errp set for any other error
+  */
+ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+-                                             const char *export,
+-                                             const char *context,
+-                                             uint32_t *context_id,
++                                             NBDExportInfo *info,
+                                              Error **errp)
+ {
++    /*
++     * TODO: Removing the x_dirty_bitmap hack will mean refactoring
++     * this function to request and store ids for multiple contexts
++     * (both base:allocation and a dirty bitmap), at which point this
++     * function should lose the term _simple.
++     */
+     int ret;
+     NBDOptionReply reply;
+-    uint32_t received_id = 0;
++    const char *context = info->x_dirty_bitmap ?: "base:allocation";
+     bool received = false;
+-    uint32_t export_len = strlen(export);
++    uint32_t export_len = strlen(info->name);
+     uint32_t context_len = strlen(context);
+     uint32_t data_len = sizeof(export_len) + export_len +
+                         sizeof(uint32_t) + /* number of queries */
+@@ -655,9 +659,9 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+     char *data = g_malloc(data_len);
+     char *p = data;
+
+-    trace_nbd_opt_meta_request(context, export);
++    trace_nbd_opt_meta_request(context, info->name);
+     stl_be_p(p, export_len);
+-    memcpy(p += sizeof(export_len), export, export_len);
++    memcpy(p += sizeof(export_len), info->name, export_len);
+     stl_be_p(p += export_len, 1);
+     stl_be_p(p += sizeof(uint32_t), context_len);
+     memcpy(p += sizeof(context_len), context, context_len);
+@@ -683,7 +687,7 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+     if (reply.type == NBD_REP_META_CONTEXT) {
+         char *name;
+
+-        if (reply.length != sizeof(received_id) + context_len) {
++        if (reply.length != sizeof(info->context_id) + context_len) {
+             error_setg(errp, "Failed to negotiate meta context '%s', server "
+                        "answered with unexpected length %" PRIu32, context,
+                        reply.length);
+@@ -691,12 +695,13 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+             return -1;
+         }
+
+-        if (nbd_read(ioc, &received_id, sizeof(received_id), errp) < 0) {
++        if (nbd_read(ioc, &info->context_id, sizeof(info->context_id),
++                     errp) < 0) {
+             return -1;
+         }
+-        received_id = be32_to_cpu(received_id);
++        info->context_id = be32_to_cpu(info->context_id);
+
+-        reply.length -= sizeof(received_id);
++        reply.length -= sizeof(info->context_id);
+         name = g_malloc(reply.length + 1);
+         if (nbd_read(ioc, name, reply.length, errp) < 0) {
+             g_free(name);
+@@ -713,7 +718,7 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+         }
+         g_free(name);
+
+-        trace_nbd_opt_meta_reply(context, received_id);
++        trace_nbd_opt_meta_reply(context, info->context_id);
+         received = true;
+
+         /* receive NBD_REP_ACK */
+@@ -742,12 +747,7 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+         return -1;
+     }
+
+-    if (received) {
+-        *context_id = received_id;
+-        return 1;
+-    }
+-
+-    return 0;
++    return received;
+ }
+
+ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
+@@ -846,10 +846,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
+             }
+
+             if (info->structured_reply && base_allocation) {
+-                result = nbd_negotiate_simple_meta_context(
+-                        ioc, info->name,
+-                        info->x_dirty_bitmap ?: "base:allocation",
+-                        &info->meta_base_allocation_id, errp);
++                result = nbd_negotiate_simple_meta_context(ioc, info, errp);
+                 if (result < 0) {
+                     goto fail;
+                 }
 -- 
 2.17.2
