@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gYX6k-0001B4-1s
-	for qemu-devel@nongnu.org; Sun, 16 Dec 2018 09:09:27 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gYX6m-0001DP-Rm
+	for qemu-devel@nongnu.org; Sun, 16 Dec 2018 09:09:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gYX6f-0004tF-3H
-	for qemu-devel@nongnu.org; Sun, 16 Dec 2018 09:09:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49770)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gYX6k-0004xH-QL
+	for qemu-devel@nongnu.org; Sun, 16 Dec 2018 09:09:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57886)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gYX6e-0004st-Qy
-	for qemu-devel@nongnu.org; Sun, 16 Dec 2018 09:09:21 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	id 1gYX6k-0004wO-F2
+	for qemu-devel@nongnu.org; Sun, 16 Dec 2018 09:09:26 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 37DE75F72C
-	for <qemu-devel@nongnu.org>; Sun, 16 Dec 2018 14:09:20 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id CB68EC05D410
+	for <qemu-devel@nongnu.org>; Sun, 16 Dec 2018 14:09:25 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Sun, 16 Dec 2018 18:08:52 +0400
-Message-Id: <20181216140902.23986-4-marcandre.lureau@redhat.com>
+Date: Sun, 16 Dec 2018 18:08:53 +0400
+Message-Id: <20181216140902.23986-5-marcandre.lureau@redhat.com>
 In-Reply-To: <20181216140902.23986-1-marcandre.lureau@redhat.com>
 References: <20181216140902.23986-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 03/13] qapi-commands: rename init_marshal() to
- register_commands()
+Subject: [Qemu-devel] [PATCH 04/13] RFC: qapi: learn to split the schema by
+ 'top-unit'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,104 +37,454 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com
 
-The function only calls various register_command() now, use a more
-descriptive name.
+A module can declare belonging to a 'top-unit', with the corresponding
+pragma value (the default 'top-unit' is None).
+
+The generators have a chance to break the generated output by
+units (top-units are visited first).  Generated types, visitors,
+events and commands are split by 'top-unit'. Generated introspection
+and documentation remain monolithic.
+
+In the following commits, a 'target' unit is introduced. The generated
+'target' files will be allowed to used poisoned defines for
+conditional compilation, since they will be built with the target
+objects.
+
+TODO: if this approach is acceptable, split the patch, write tests & doc.
+Note: I don't really have better ideas, but open for suggestions...
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- scripts/qapi/commands.py     | 4 ++--
- monitor.c                    | 2 +-
- qga/main.c                   | 2 +-
- tests/test-qmp-cmds.c        | 2 +-
- docs/devel/qapi-code-gen.txt | 4 ++--
- 5 files changed, 7 insertions(+), 7 deletions(-)
+ scripts/qapi/commands.py |  22 +++++---
+ scripts/qapi/common.py   | 105 +++++++++++++++++++++++++++++++--------
+ scripts/qapi/events.py   |  37 ++++++++------
+ scripts/qapi/types.py    |   8 +--
+ scripts/qapi/visit.py    |   8 +--
+ 5 files changed, 130 insertions(+), 50 deletions(-)
 
 diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
-index a9b2ecb304..94313b8aef 100644
+index 94313b8aef..e4dc92e70b 100644
 --- a/scripts/qapi/commands.py
 +++ b/scripts/qapi/commands.py
-@@ -220,7 +220,7 @@ def gen_register_command(name, success_response, allo=
-w_oob, allow_preconfig):
- def gen_registry(registry, prefix):
-     ret =3D mcgen('''
+@@ -237,14 +237,20 @@ class QAPISchemaGenCommandVisitor(QAPISchemaModular=
+CVisitor):
+         QAPISchemaModularCVisitor.__init__(
+             self, prefix, 'qapi-commands',
+             ' * Schema-defined QAPI/QMP commands', __doc__)
++
++    def visit_unit_begin(self, unit):
++        super(self.__class__, self).visit_unit_begin(unit)
+         self._regy =3D QAPIGenCCode()
+         self._visited_ret_types =3D {}
 =20
--void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds)
-+void %(c_prefix)sqmp_register_commands(QmpCommandList *cmds)
- {
+-    def _begin_module(self, name):
++    def _begin_module(self, name, main_module):
+         self._visited_ret_types[self._genc] =3D set()
+-        commands =3D self._module_basename('qapi-commands', name)
+-        types =3D self._module_basename('qapi-types', name)
+-        visit =3D self._module_basename('qapi-visit', name)
++        commands =3D self._module_basename('qapi-commands', name,
++                                         self._unit, main_module)
++        types =3D self._module_basename('qapi-types', name,
++                                      self._unit, main_module)
++        visit =3D self._module_basename('qapi-visit', name,
++                                      self._unit, main_module)
+         self._genc.add(mcgen('''
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+@@ -267,13 +273,13 @@ class QAPISchemaGenCommandVisitor(QAPISchemaModular=
+CVisitor):
  ''',
-                 c_prefix=3Dc_name(prefix, protect=3DFalse))
-@@ -270,7 +270,7 @@ class QAPISchemaGenCommandVisitor(QAPISchemaModularCV=
-isitor):
-     def visit_end(self):
-         (genc, genh) =3D self._module[self._main_module]
+                              types=3Dtypes))
+=20
+-    def visit_end(self):
+-        (genc, genh) =3D self._module[self._main_module]
++    def visit_unit_end(self):
++        (genc, genh) =3D self.get_module_gen(self._main_module)
          genh.add(mcgen('''
--void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
-+void %(c_prefix)sqmp_register_commands(QmpCommandList *cmds);
+ void %(c_prefix)sqmp_register_commands(QmpCommandList *cmds);
  ''',
-                        c_prefix=3Dc_name(self._prefix, protect=3DFalse))=
+-                       c_prefix=3Dc_name(self._prefix, protect=3DFalse))=
 )
-         genc.add(gen_registry(self._regy.get_content(), self._prefix))
-diff --git a/monitor.c b/monitor.c
-index 30e8926002..720d8d98a7 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1182,7 +1182,7 @@ static void monitor_init_qmp_commands(void)
-      */
+-        genc.add(gen_registry(self._regy.get_content(), self._prefix))
++                       c_prefix=3Dc_name(self._prefix_unit(), protect=3D=
+False)))
++        genc.add(gen_registry(self._regy.get_content(), self._prefix_uni=
+t()))
 =20
-     QTAILQ_INIT(&qmp_commands);
--    qmp_init_marshal(&qmp_commands);
-+    qmp_register_commands(&qmp_commands);
+     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
+                       success_response, boxed, allow_oob, allow_preconfi=
+g):
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 8c2d97369e..1ef3a4f70b 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -269,11 +269,12 @@ class QAPISchemaParser(object):
+         self.exprs =3D []
+         self.docs =3D []
+         self.accept()
++        self._top_unit =3D None
+         cur_doc =3D None
 =20
-     qmp_register_command(&qmp_commands, "query-qmp-schema",
-                          qmp_query_qmp_schema, QCO_ALLOW_PRECONFIG);
-diff --git a/qga/main.c b/qga/main.c
-index 1d6c1024c9..75496fa793 100644
---- a/qga/main.c
-+++ b/qga/main.c
-@@ -1487,7 +1487,7 @@ int main(int argc, char **argv)
-     config->log_level =3D G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL;
+         while self.tok is not None:
+             info =3D {'file': self.fname, 'line': self.line,
+-                    'parent': self.incl_info}
++                    'parent': self.incl_info, 'top-unit': self._top_unit=
+}
+             if self.tok =3D=3D '#':
+                 self.reject_expr_doc(cur_doc)
+                 cur_doc =3D self.get_doc(info)
+@@ -296,6 +297,9 @@ class QAPISchemaParser(object):
+                 exprs_include =3D self._include(include, info, incl_fnam=
+e,
+                                               previously_included)
+                 if exprs_include:
++                    incl_info =3D self.exprs[-1]['info']
++                    if exprs_include._top_unit:
++                        incl_info['has-pragma-top-unit'] =3D exprs_inclu=
+de._top_unit
+                     self.exprs.extend(exprs_include.exprs)
+                     self.docs.extend(exprs_include.docs)
+             elif "pragma" in expr:
+@@ -357,6 +361,11 @@ class QAPISchemaParser(object):
+                 raise QAPISemError(info,
+                                    "Pragma 'doc-required' must be boolea=
+n")
+             doc_required =3D value
++        elif name =3D=3D 'top-unit':
++            if not isinstance(value, str):
++                raise QAPISemError(info,
++                                   "Pragma 'top-unit' must be a string")
++            self._top_unit =3D value
+         elif name =3D=3D 'returns-whitelist':
+             if (not isinstance(value, list)
+                     or any([not isinstance(elt, str) for elt in value]))=
+:
+@@ -1081,6 +1090,11 @@ class QAPISchemaEntity(object):
+     def c_name(self):
+         return c_name(self.name)
 =20
-     QTAILQ_INIT(&ga_commands);
--    qga_qmp_init_marshal(&ga_commands);
-+    qga_qmp_register_commands(&ga_commands);
++    def get_top_unit(self):
++        if self.info:
++            return self.info['top-unit']
++        return None
++
+     def check(self, schema):
+         if isinstance(self._ifcond, QAPISchemaType):
+             # inherit the condition from a type
+@@ -1101,6 +1115,12 @@ class QAPISchemaVisitor(object):
+     def visit_begin(self, schema):
+         pass
 =20
-     init_dfl_pathnames();
-     config_load(config);
-diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
-index bbd52cfb69..039ffcc6a9 100644
---- a/tests/test-qmp-cmds.c
-+++ b/tests/test-qmp-cmds.c
-@@ -326,7 +326,7 @@ int main(int argc, char **argv)
-     g_test_add_func("/qmp/dealloc_partial", test_dealloc_partial);
++    def visit_unit_begin(self, unit):
++        pass
++
++    def visit_unit_end(self):
++        pass
++
+     def visit_end(self):
+         pass
 =20
-     QTAILQ_INIT(&qmp_commands);
--    test_qmp_init_marshal(&qmp_commands);
-+    test_qmp_register_commands(&qmp_commands);
-     g_test_run();
+@@ -1610,7 +1630,7 @@ class QAPISchema(object):
+         parser =3D QAPISchemaParser(f)
+         exprs =3D check_exprs(parser.exprs)
+         self.docs =3D parser.docs
+-        self._entity_list =3D []
++        self._entity_list =3D {} # dict of unit name -> list of entity
+         self._entity_dict =3D {}
+         self._predefining =3D True
+         self._def_predefineds()
+@@ -1622,7 +1642,8 @@ class QAPISchema(object):
+         # Only the predefined types are allowed to not have info
+         assert ent.info or self._predefining
+         assert ent.name is None or ent.name not in self._entity_dict
+-        self._entity_list.append(ent)
++        entity_list =3D self._entity_list.setdefault(ent.get_top_unit(),=
+ [])
++        entity_list.append(ent)
+         if ent.name is not None:
+             self._entity_dict[ent.name] =3D ent
+         if ent.info:
+@@ -1861,18 +1882,23 @@ class QAPISchema(object):
+                 assert False
 =20
-     return 0;
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 681177dec1..79a38c21e6 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -1271,7 +1271,7 @@ Example:
+     def check(self):
+-        for ent in self._entity_list:
+-            ent.check(self)
++        for unit in self._entity_list:
++            for ent in self._entity_list[unit]:
++                ent.check(self)
 =20
-     UserDefOne *qmp_my_command(UserDefOneList *arg1, Error **errp);
-     void qmp_marshal_my_command(QDict *args, QObject **ret, Error **errp=
-);
--    void example_qmp_init_marshal(QmpCommandList *cmds);
-+    void example_qmp_register_commands(QmpCommandList *cmds);
+     def visit(self, visitor):
+         visitor.visit_begin(self)
+-        module =3D None
+-        for entity in self._entity_list:
+-            if visitor.visit_needed(entity):
++        for unit in self._entity_list:
++            module =3D None
++            visitor.visit_unit_begin(unit)
++            for entity in self._entity_list[unit]:
++                if not visitor.visit_needed(entity):
++                    continue
+                 if entity.module !=3D module:
+                     module =3D entity.module
+                     visitor.visit_module(module)
+                 entity.visit(visitor)
++            visitor.visit_unit_end()
+         visitor.visit_end()
 =20
-     #endif /* EXAMPLE_QAPI_COMMANDS_H */
-     $ cat qapi-generated/example-qapi-commands.c
-@@ -1332,7 +1332,7 @@ Example:
-         visit_free(v);
+=20
+@@ -2313,6 +2339,19 @@ class QAPISchemaMonolithicCVisitor(QAPISchemaVisit=
+or):
+         self._genh.write(output_dir, self._prefix + self._what + '.h')
+=20
+=20
++class QAPIGenCModule(object):
++
++    def __init__(self, blurb, pydoc, unit, main_module=3DFalse):
++        self.genc =3D QAPIGenC(blurb, pydoc)
++        self.genh =3D QAPIGenH(blurb, pydoc)
++        self.unit =3D unit
++        self.main_module =3D main_module
++
++    def write(self, output_dir, basename):
++        self.genc.write(output_dir, basename + '.c')
++        self.genh.write(output_dir, basename + '.h')
++
++
+ class QAPISchemaModularCVisitor(QAPISchemaVisitor):
+=20
+     def __init__(self, prefix, what, blurb, pydoc):
+@@ -2321,48 +2360,70 @@ class QAPISchemaModularCVisitor(QAPISchemaVisitor=
+):
+         self._blurb =3D blurb
+         self._pydoc =3D pydoc
+         self._module =3D {}
++        self._unit =3D None
+         self._main_module =3D None
+=20
+-    def _module_basename(self, what, name):
++    def _module_basename(self, what, name, unit=3DNone, main_module=3DFa=
+lse):
+         if name is None:
+             return re.sub(r'-', '-builtin-', what)
+         basename =3D os.path.join(os.path.dirname(name),
+                                 self._prefix + what)
+-        if name =3D=3D self._main_module:
++        if unit:
++            basename =3D unit + '-' + basename
++        if main_module:
+             return basename
+         return basename + '-' + os.path.splitext(os.path.basename(name))=
+[0]
+=20
++    def _prefix_unit(self):
++        if self._unit:
++            return self._prefix + self._unit + '-'
++        return self._prefix
++
++    def visit_unit_begin(self, unit):
++        self._unit =3D unit
++        self._main_module =3D None
++
+     def _add_module(self, name, blurb):
+-        if self._main_module is None and name is not None:
++        main_module =3D False
++        if (name is not None and
++            ((self._unit is None and self._main_module is None) or
++             (self._unit =3D=3D os.path.splitext(os.path.basename(name))=
+[0]))):
+             self._main_module =3D name
+-        genc =3D QAPIGenC(blurb, self._pydoc)
+-        genh =3D QAPIGenH(blurb, self._pydoc)
+-        self._module[name] =3D (genc, genh)
++            main_module =3D True
++        self._module[name] =3D QAPIGenCModule(blurb, self._pydoc,
++                                            self._unit, main_module)
+         self._set_module(name)
++        return main_module
++
++    def get_module_gen(self, name):
++        mod =3D self._module[name]
++        return mod.genc, mod.genh
+=20
+     def _set_module(self, name):
+-        self._genc, self._genh =3D self._module[name]
++        self._genc, self._genh =3D self.get_module_gen(name)
+=20
+     def write(self, output_dir, opt_builtins=3DFalse):
+         for name in self._module:
+             if name is None and not opt_builtins:
+                 continue
+-            basename =3D self._module_basename(self._what, name)
+-            (genc, genh) =3D self._module[name]
+-            genc.write(output_dir, basename + '.c')
+-            genh.write(output_dir, basename + '.h')
++            module =3D self._module[name]
++            basename =3D self._module_basename(self._what, name,
++                                             module.unit, module.main_mo=
+dule)
++            module.write(output_dir, basename)
+=20
+-    def _begin_module(self, name):
++    def _begin_module(self, name, main_module):
+         pass
+=20
+     def visit_module(self, name):
+         if name in self._module:
+             self._set_module(name)
+             return
+-        self._add_module(name, self._blurb)
+-        self._begin_module(name)
++        main_module =3D self._add_module(name, self._blurb)
++        self._begin_module(name, main_module)
+=20
+     def visit_include(self, name, info):
++        if 'has-pragma-top-unit' in info:
++            return
+         basename =3D self._module_basename(self._what, name)
+         self._genh.preamble_add(mcgen('''
+ #include "%(basename)s.h"
+diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
+index 37ee5de682..b73e10e16d 100644
+--- a/scripts/qapi/events.py
++++ b/scripts/qapi/events.py
+@@ -58,7 +58,12 @@ def gen_param_var(typ):
+     return ret
+=20
+=20
+-def gen_event_send(name, arg_type, boxed, event_enum_name):
++def gen_event_send(unit, name, arg_type, boxed, event_enum_name):
++    if not unit:
++        unit =3D ''
++    else:
++        unit +=3D '_'
++
+     # FIXME: Our declaration of local variables (and of 'errp' in the
+     # parameter list) can collide with exploded members of the event's
+     # data type passed in as parameters.  If this collision ever hits in
+@@ -86,7 +91,7 @@ def gen_event_send(name, arg_type, boxed, event_enum_na=
+me):
+=20
+     ret +=3D mcgen('''
+=20
+-    emit =3D qmp_event_get_func_emit();
++    emit =3D %(unit)sqmp_event_get_func_emit();
+     if (!emit) {
+         return;
      }
+@@ -94,7 +99,7 @@ def gen_event_send(name, arg_type, boxed, event_enum_na=
+me):
+     qmp =3D qmp_event_build_dict("%(name)s");
 =20
--    void example_qmp_init_marshal(QmpCommandList *cmds)
-+    void example_qmp_register_commands(QmpCommandList *cmds)
-     {
-         qmp_register_command(cmds, "my-command",
-                              qmp_marshal_my_command, QCO_NO_OPTIONS);
+ ''',
+-                 name=3Dname)
++                 name=3Dname, unit=3Dunit)
+=20
+     if arg_type and not arg_type.is_empty():
+         ret +=3D mcgen('''
+@@ -143,12 +148,17 @@ class QAPISchemaGenEventVisitor(QAPISchemaModularCV=
+isitor):
+         QAPISchemaModularCVisitor.__init__(
+             self, prefix, 'qapi-events',
+             ' * Schema-defined QAPI/QMP events', __doc__)
+-        self._event_enum_name =3D c_name(prefix + 'QAPIEvent', protect=3D=
+False)
++
++    def visit_unit_begin(self, unit):
++        super(self.__class__, self).visit_unit_begin(unit)
++        self._event_enum_name =3D c_name(self._prefix_unit() + 'QAPIEven=
+t', protect=3DFalse)
+         self._event_enum_members =3D []
+=20
+-    def _begin_module(self, name):
+-        types =3D self._module_basename('qapi-types', name)
+-        visit =3D self._module_basename('qapi-visit', name)
++    def _begin_module(self, name, main_module):
++        types =3D self._module_basename('qapi-types', name,
++                                      self._unit, main_module)
++        visit =3D self._module_basename('qapi-visit', name,
++                                      self._unit, main_module)
+         self._genc.add(mcgen('''
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+@@ -160,7 +170,7 @@ class QAPISchemaGenEventVisitor(QAPISchemaModularCVis=
+itor):
+ #include "qapi/qmp-event.h"
+=20
+ ''',
+-                             visit=3Dvisit, prefix=3Dself._prefix))
++                             visit=3Dvisit, prefix=3Dself._prefix_unit()=
+))
+         self._genh.add(mcgen('''
+ #include "qapi/util.h"
+ #include "%(types)s.h"
+@@ -168,17 +178,16 @@ class QAPISchemaGenEventVisitor(QAPISchemaModularCV=
+isitor):
+ ''',
+                              types=3Dtypes))
+=20
+-    def visit_end(self):
+-        (genc, genh) =3D self._module[self._main_module]
++    def visit_unit_end(self):
++        (genc, genh) =3D self.get_module_gen(self._main_module)
+         genh.add(gen_enum(self._event_enum_name, self._event_enum_member=
+s))
+-        genc.add(gen_enum_lookup(self._event_enum_name,
+-                                 self._event_enum_members))
++        genc.add(gen_enum_lookup(self._event_enum_name, self._event_enum=
+_members))
+=20
+     def visit_event(self, name, info, ifcond, arg_type, boxed):
+         with ifcontext(ifcond, self._genh, self._genc):
+             self._genh.add(gen_event_send_decl(name, arg_type, boxed))
+-            self._genc.add(gen_event_send(name, arg_type, boxed,
+-                                          self._event_enum_name))
++            self._genc.add(gen_event_send(self._unit, name,
++                                          arg_type, boxed, self._event_e=
+num_name))
+         self._event_enum_members.append(QAPISchemaMember(name, ifcond))
+=20
+=20
+diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
+index 62d4cf9f95..db85cf9b9b 100644
+--- a/scripts/qapi/types.py
++++ b/scripts/qapi/types.py
+@@ -194,9 +194,11 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVis=
+itor):
+ #include "qapi/util.h"
+ '''))
+=20
+-    def _begin_module(self, name):
+-        types =3D self._module_basename('qapi-types', name)
+-        visit =3D self._module_basename('qapi-visit', name)
++    def _begin_module(self, name, main_module):
++        types =3D self._module_basename('qapi-types', name,
++                                      self._unit, main_module)
++        visit =3D self._module_basename('qapi-visit', name,
++                                      self._unit, main_module)
+         self._genc.preamble_add(mcgen('''
+ #include "qemu/osdep.h"
+ #include "qapi/dealloc-visitor.h"
+diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
+index 82eab72b21..258ebdb690 100644
+--- a/scripts/qapi/visit.py
++++ b/scripts/qapi/visit.py
+@@ -298,9 +298,11 @@ class QAPISchemaGenVisitVisitor(QAPISchemaModularCVi=
+sitor):
+ ''',
+                                       prefix=3Dprefix))
+=20
+-    def _begin_module(self, name):
+-        types =3D self._module_basename('qapi-types', name)
+-        visit =3D self._module_basename('qapi-visit', name)
++    def _begin_module(self, name, main_module):
++        types =3D self._module_basename('qapi-types', name,
++                                      self._unit, main_module)
++        visit =3D self._module_basename('qapi-visit', name,
++                                      self._unit, main_module)
+         self._genc.preamble_add(mcgen('''
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
 --=20
 2.20.0
