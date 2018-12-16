@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gYX6v-0001JX-Gl
-	for qemu-devel@nongnu.org; Sun, 16 Dec 2018 09:09:39 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gYX6x-0001Mh-PS
+	for qemu-devel@nongnu.org; Sun, 16 Dec 2018 09:09:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gYX6q-00052H-Fj
-	for qemu-devel@nongnu.org; Sun, 16 Dec 2018 09:09:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45610)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gYX6v-000565-OA
+	for qemu-devel@nongnu.org; Sun, 16 Dec 2018 09:09:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38936)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gYX6q-00051T-4w
-	for qemu-devel@nongnu.org; Sun, 16 Dec 2018 09:09:32 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	id 1gYX6v-00055P-DV
+	for qemu-devel@nongnu.org; Sun, 16 Dec 2018 09:09:37 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5ABB781F0C
-	for <qemu-devel@nongnu.org>; Sun, 16 Dec 2018 14:09:31 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C16B389AD1
+	for <qemu-devel@nongnu.org>; Sun, 16 Dec 2018 14:09:36 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Sun, 16 Dec 2018 18:08:54 +0400
-Message-Id: <20181216140902.23986-6-marcandre.lureau@redhat.com>
+Date: Sun, 16 Dec 2018 18:08:55 +0400
+Message-Id: <20181216140902.23986-7-marcandre.lureau@redhat.com>
 In-Reply-To: <20181216140902.23986-1-marcandre.lureau@redhat.com>
 References: <20181216140902.23986-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 05/13] qapi: add a top-unit 'target' schema
+Subject: [Qemu-devel] [PATCH 06/13] qapi: make rtc-reset-reinjection and SEV
+ depend on TARGET_I386
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,561 +37,473 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com
 
-Add a 'target' top-unit to be compiled seperately from the common qapi
-modules. This will allow poisoned target #ifdef usage.
-
-The generated commands must be registered seperately.
-
-The events have a different enum, and must thus use a different
-emitter/limiter.
-
-The DUMMY event is there to force the visit of target, ensuring files
-are built. It is removed in next commit.
+Move rtc-reset-reinjection and SEV in target.json and make them
+conditional on TARGET_I386.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- qapi/qapi-schema.json    |   1 +
- qapi/target.json         |  13 +++
- include/qapi/qmp-event.h |   4 +
- monitor.c                | 216 ++++++++++++++++++++++++++-------------
- qapi/qmp-event.c         |  11 ++
- Makefile                 |   7 +-
- Makefile.target          |   2 +
- 7 files changed, 181 insertions(+), 73 deletions(-)
- create mode 100644 qapi/target.json
+ qapi/misc.json         | 166 --------------------------------------
+ qapi/target.json       | 175 ++++++++++++++++++++++++++++++++++++++++-
+ target/i386/sev_i386.h |   2 +-
+ hw/timer/mc146818rtc.c |   2 +-
+ monitor.c              |  31 --------
+ 5 files changed, 175 insertions(+), 201 deletions(-)
 
-diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-index 65b6dc2f6f..4a836d6c9f 100644
---- a/qapi/qapi-schema.json
-+++ b/qapi/qapi-schema.json
-@@ -94,3 +94,4 @@
- { 'include': 'trace.json' }
- { 'include': 'introspect.json' }
- { 'include': 'misc.json' }
-+{ 'include': 'target.json' }
-diff --git a/qapi/target.json b/qapi/target.json
-new file mode 100644
-index 0000000000..be2360ca34
---- /dev/null
-+++ b/qapi/target.json
-@@ -0,0 +1,13 @@
-+# -*- Mode: Python -*-
-+#
-+
-+##
-+# =3D Target-specific commands & events
-+##
-+
-+{ 'pragma': { 'top-unit': 'target' } }
-+
-+##
-+# @DUMMY:
-+##
-+{ 'event': 'DUMMY' }
-diff --git a/include/qapi/qmp-event.h b/include/qapi/qmp-event.h
-index 23e588ccf8..da752f8371 100644
---- a/include/qapi/qmp-event.h
-+++ b/include/qapi/qmp-event.h
-@@ -20,5 +20,9 @@ void qmp_event_set_func_emit(QMPEventFuncEmit emit);
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 8325e0dc9c..688e874fb8 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -3053,24 +3053,6 @@
+ { 'event': 'ACPI_DEVICE_OST',
+      'data': { 'info': 'ACPIOSTInfo' } }
 =20
- QMPEventFuncEmit qmp_event_get_func_emit(void);
-=20
-+void target_qmp_event_set_func_emit(QMPEventFuncEmit emit);
-+
-+QMPEventFuncEmit target_qmp_event_get_func_emit(void);
-+
- QDict *qmp_event_build_dict(const char *event_name);
- #endif
-diff --git a/monitor.c b/monitor.c
-index 720d8d98a7..86f3193158 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -76,6 +76,8 @@
- #include "block/qapi.h"
- #include "qapi/qapi-commands.h"
- #include "qapi/qapi-events.h"
-+#include "qapi/target-qapi-commands.h"
-+#include "qapi/target-qapi-events.h"
- #include "qapi/error.h"
- #include "qapi/qmp-event.h"
- #include "qapi/qapi-introspect.h"
-@@ -185,22 +187,25 @@ typedef struct {
-     GQueue *qmp_requests;
- } MonitorQMP;
-=20
-+typedef struct {
-+    GHashTable *state;
-+    const size_t size;    /* size of array =3D=3D number of events */
-+    const int64_t rate[]; /* Minimum time (in ns) between two events */
-+} MonitorEventRateLimit;
-+
- /*
-  * To prevent flooding clients, events can be throttled. The
-  * throttling is calculated globally, rather than per-Monitor
-  * instance.
-  */
- typedef struct MonitorQAPIEventState {
--    QAPIEvent event;    /* Throttling state for this event type and... *=
-/
-+    const MonitorEventRateLimit *limiter;
-+    unsigned event;     /* Throttling state for this event type and... *=
-/
-     QDict *data;        /* ... data, see qapi_event_throttle_equal() */
-     QEMUTimer *timer;   /* Timer for handling delayed events */
-     QDict *qdict;       /* Delayed event (if any) */
- } MonitorQAPIEventState;
-=20
--typedef struct {
--    int64_t rate;       /* Minimum time (in ns) between two events */
--} MonitorQAPIEventConf;
+-##
+-# @rtc-reset-reinjection:
+-#
+-# This command will reset the RTC interrupt reinjection backlog.
+-# Can be used if another mechanism to synchronize guest time
+-# is in effect, for example QEMU guest agent's guest-set-time
+-# command.
+-#
+-# Since: 2.1
+-#
+-# Example:
+-#
+-# -> { "execute": "rtc-reset-reinjection" }
+-# <- { "return": {} }
+-#
+-##
+-{ 'command': 'rtc-reset-reinjection' }
 -
- struct Monitor {
-     CharBackend chr;
-     int reset_seen;
-@@ -263,9 +268,8 @@ typedef struct QMPRequest QMPRequest;
- /* QMP checker flags */
- #define QMP_ACCEPT_UNKNOWNS 1
+ ##
+ # @RTC_CHANGE:
+ #
+@@ -3299,154 +3281,6 @@
+ ##
+ { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
 =20
--/* Protects mon_list, monitor_qapi_event_state, monitor_destroyed.  */
-+/* Protects mon_list, limiter, monitor_qapi_event_state, monitor_destroy=
-ed. */
- static QemuMutex monitor_lock;
--static GHashTable *monitor_qapi_event_state;
- static QTAILQ_HEAD(mon_list, Monitor) mon_list;
- static bool monitor_destroyed;
-=20
-@@ -500,22 +504,12 @@ static void qmp_send_response(Monitor *mon, const Q=
-Dict *rsp)
-     qobject_unref(json);
- }
-=20
--static MonitorQAPIEventConf monitor_qapi_event_conf[QAPI_EVENT__MAX] =3D=
- {
--    /* Limit guest-triggerable events to 1 per second */
--    [QAPI_EVENT_RTC_CHANGE]        =3D { 1000 * SCALE_MS },
--    [QAPI_EVENT_WATCHDOG]          =3D { 1000 * SCALE_MS },
--    [QAPI_EVENT_BALLOON_CHANGE]    =3D { 1000 * SCALE_MS },
--    [QAPI_EVENT_QUORUM_REPORT_BAD] =3D { 1000 * SCALE_MS },
--    [QAPI_EVENT_QUORUM_FAILURE]    =3D { 1000 * SCALE_MS },
--    [QAPI_EVENT_VSERPORT_CHANGE]   =3D { 1000 * SCALE_MS },
--};
 -
- /*
-  * Broadcast an event to all monitors.
-  * @qdict is the event object.  Its member "event" must match @event.
-  * Caller must hold monitor_lock.
-  */
--static void monitor_qapi_event_emit(QAPIEvent event, QDict *qdict)
-+static void monitor_qapi_event_emit(unsigned event, QDict *qdict)
- {
-     Monitor *mon;
-=20
-@@ -535,30 +529,31 @@ static void monitor_qapi_event_handler(void *opaque=
-);
-  * applying any rate limiting if required.
-  */
- static void
--monitor_qapi_event_queue_no_reenter(QAPIEvent event, QDict *qdict)
-+monitor_qapi_event_queue_no_reenter(const MonitorEventRateLimit *limiter=
-,
-+                                    unsigned event, QDict *qdict)
- {
--    MonitorQAPIEventConf *evconf;
-+    int64_t rate;
-     MonitorQAPIEventState *evstate;
-=20
--    assert(event < QAPI_EVENT__MAX);
--    evconf =3D &monitor_qapi_event_conf[event];
--    trace_monitor_protocol_event_queue(event, qdict, evconf->rate);
-+    assert(event < limiter->size);
-+    rate =3D limiter->rate[event];
-+    trace_monitor_protocol_event_queue(event, qdict, rate);
-=20
-     qemu_mutex_lock(&monitor_lock);
-=20
--    if (!evconf->rate) {
-+    if (!rate) {
-         /* Unthrottled event */
-         monitor_qapi_event_emit(event, qdict);
-     } else {
-         QDict *data =3D qobject_to(QDict, qdict_get(qdict, "data"));
-         MonitorQAPIEventState key =3D { .event =3D event, .data =3D data=
- };
-=20
--        evstate =3D g_hash_table_lookup(monitor_qapi_event_state, &key);
-+        evstate =3D g_hash_table_lookup(limiter->state, &key);
-         assert(!evstate || timer_pending(evstate->timer));
-=20
-         if (evstate) {
-             /*
--             * Timer is pending for (at least) evconf->rate ns after
-+             * Timer is pending for (at least) rate ns after
-              * last send.  Store event for sending when timer fires,
-              * replacing a prior stored event if any.
-              */
-@@ -566,9 +561,9 @@ monitor_qapi_event_queue_no_reenter(QAPIEvent event, =
-QDict *qdict)
-             evstate->qdict =3D qobject_ref(qdict);
-         } else {
-             /*
--             * Last send was (at least) evconf->rate ns ago.
-+             * Last send was (at least) rate ns ago.
-              * Send immediately, and arm the timer to call
--             * monitor_qapi_event_handler() in evconf->rate ns.  Any
-+             * monitor_qapi_event_handler() in rate ns.  Any
-              * events arriving before then will be delayed until then.
-              */
-             int64_t now =3D qemu_clock_get_ns(monitor_get_event_clock())=
-;
-@@ -576,14 +571,15 @@ monitor_qapi_event_queue_no_reenter(QAPIEvent event=
-, QDict *qdict)
-             monitor_qapi_event_emit(event, qdict);
-=20
-             evstate =3D g_new(MonitorQAPIEventState, 1);
-+            evstate->limiter =3D limiter;
-             evstate->event =3D event;
-             evstate->data =3D qobject_ref(data);
-             evstate->qdict =3D NULL;
-             evstate->timer =3D timer_new_ns(monitor_get_event_clock(),
-                                           monitor_qapi_event_handler,
-                                           evstate);
--            g_hash_table_add(monitor_qapi_event_state, evstate);
--            timer_mod_ns(evstate->timer, now + evconf->rate);
-+            g_hash_table_add(limiter->state, evstate);
-+            timer_mod_ns(evstate->timer, now + rate);
-         }
-     }
-=20
-@@ -591,7 +587,8 @@ monitor_qapi_event_queue_no_reenter(QAPIEvent event, =
-QDict *qdict)
- }
-=20
- static void
--monitor_qapi_event_queue(QAPIEvent event, QDict *qdict)
-+monitor_qapi_event_queue_limit(const MonitorEventRateLimit *limiter,
-+                               QAPIEvent event, QDict *qdict)
- {
-     /*
-      * monitor_qapi_event_queue_no_reenter() is not reentrant: it
-@@ -624,7 +621,7 @@ monitor_qapi_event_queue(QAPIEvent event, QDict *qdic=
-t)
-=20
-     while ((ev =3D QSIMPLEQ_FIRST(&event_queue)) !=3D NULL) {
-         QSIMPLEQ_REMOVE_HEAD(&event_queue, entry);
--        monitor_qapi_event_queue_no_reenter(ev->event, ev->qdict);
-+        monitor_qapi_event_queue_no_reenter(limiter, ev->event, ev->qdic=
-t);
-         qobject_unref(ev->qdict);
-         g_free(ev);
-     }
-@@ -632,36 +629,6 @@ monitor_qapi_event_queue(QAPIEvent event, QDict *qdi=
-ct)
-     reentered =3D false;
- }
-=20
--/*
-- * This function runs evconf->rate ns after sending a throttled
-- * event.
-- * If another event has since been stored, send it.
-- */
--static void monitor_qapi_event_handler(void *opaque)
--{
--    MonitorQAPIEventState *evstate =3D opaque;
--    MonitorQAPIEventConf *evconf =3D &monitor_qapi_event_conf[evstate->e=
-vent];
+-##
+-# @SevState:
+-#
+-# An enumeration of SEV state information used during @query-sev.
+-#
+-# @uninit: The guest is uninitialized.
+-#
+-# @launch-update: The guest is currently being launched; plaintext data =
+and
+-#                 register state is being imported.
+-#
+-# @launch-secret: The guest is currently being launched; ciphertext data
+-#                 is being imported.
+-#
+-# @running: The guest is fully launched or migrated in.
+-#
+-# @send-update: The guest is currently being migrated out to another mac=
+hine.
+-#
+-# @receive-update: The guest is currently being migrated from another ma=
+chine.
+-#
+-# Since: 2.12
+-##
+-{ 'enum': 'SevState',
+-  'data': ['uninit', 'launch-update', 'launch-secret', 'running',
+-           'send-update', 'receive-update' ] }
 -
--    trace_monitor_protocol_event_handler(evstate->event, evstate->qdict)=
-;
--    qemu_mutex_lock(&monitor_lock);
--
--    if (evstate->qdict) {
--        int64_t now =3D qemu_clock_get_ns(monitor_get_event_clock());
--
--        monitor_qapi_event_emit(evstate->event, evstate->qdict);
--        qobject_unref(evstate->qdict);
--        evstate->qdict =3D NULL;
--        timer_mod_ns(evstate->timer, now + evconf->rate);
--    } else {
--        g_hash_table_remove(monitor_qapi_event_state, evstate);
--        qobject_unref(evstate->data);
--        timer_free(evstate->timer);
--        g_free(evstate);
--    }
--
--    qemu_mutex_unlock(&monitor_lock);
+-##
+-# @SevInfo:
+-#
+-# Information about Secure Encrypted Virtualization (SEV) support
+-#
+-# @enabled: true if SEV is active
+-#
+-# @api-major: SEV API major version
+-#
+-# @api-minor: SEV API minor version
+-#
+-# @build-id: SEV FW build id
+-#
+-# @policy: SEV policy value
+-#
+-# @state: SEV guest state
+-#
+-# @handle: SEV firmware handle
+-#
+-# Since: 2.12
+-##
+-{ 'struct': 'SevInfo',
+-    'data': { 'enabled': 'bool',
+-              'api-major': 'uint8',
+-              'api-minor' : 'uint8',
+-              'build-id' : 'uint8',
+-              'policy' : 'uint32',
+-              'state' : 'SevState',
+-              'handle' : 'uint32'
+-            }
 -}
 -
- static unsigned int qapi_event_throttle_hash(const void *key)
+-##
+-# @query-sev:
+-#
+-# Returns information about SEV
+-#
+-# Returns: @SevInfo
+-#
+-# Since: 2.12
+-#
+-# Example:
+-#
+-# -> { "execute": "query-sev" }
+-# <- { "return": { "enabled": true, "api-major" : 0, "api-minor" : 0,
+-#                  "build-id" : 0, "policy" : 0, "state" : "running",
+-#                  "handle" : 1 } }
+-#
+-##
+-{ 'command': 'query-sev', 'returns': 'SevInfo' }
+-
+-##
+-# @SevLaunchMeasureInfo:
+-#
+-# SEV Guest Launch measurement information
+-#
+-# @data: the measurement value encoded in base64
+-#
+-# Since: 2.12
+-#
+-##
+-{ 'struct': 'SevLaunchMeasureInfo', 'data': {'data': 'str'} }
+-
+-##
+-# @query-sev-launch-measure:
+-#
+-# Query the SEV guest launch information.
+-#
+-# Returns: The @SevLaunchMeasureInfo for the guest
+-#
+-# Since: 2.12
+-#
+-# Example:
+-#
+-# -> { "execute": "query-sev-launch-measure" }
+-# <- { "return": { "data": "4l8LXeNlSPUDlXPJG5966/8%YZ" } }
+-#
+-##
+-{ 'command': 'query-sev-launch-measure', 'returns': 'SevLaunchMeasureInf=
+o' }
+-
+-##
+-# @SevCapability:
+-#
+-# The struct describes capability for a Secure Encrypted Virtualization
+-# feature.
+-#
+-# @pdh:  Platform Diffie-Hellman key (base64 encoded)
+-#
+-# @cert-chain:  PDH certificate chain (base64 encoded)
+-#
+-# @cbitpos: C-bit location in page table entry
+-#
+-# @reduced-phys-bits: Number of physical Address bit reduction when SEV =
+is
+-#                     enabled
+-#
+-# Since: 2.12
+-##
+-{ 'struct': 'SevCapability',
+-  'data': { 'pdh': 'str',
+-            'cert-chain': 'str',
+-            'cbitpos': 'int',
+-            'reduced-phys-bits': 'int'} }
+-
+-##
+-# @query-sev-capabilities:
+-#
+-# This command is used to get the SEV capabilities, and is supported on =
+AMD
+-# X86 platforms only.
+-#
+-# Returns: SevCapability objects.
+-#
+-# Since: 2.12
+-#
+-# Example:
+-#
+-# -> { "execute": "query-sev-capabilities" }
+-# <- { "return": { "pdh": "8CCDD8DDD", "cert-chain": "888CCCDDDEE",
+-#                  "cbitpos": 47, "reduced-phys-bits": 5}}
+-#
+-##
+-{ 'command': 'query-sev-capabilities', 'returns': 'SevCapability' }
+-
+ ##
+ # @set-numa-node:
+ #
+diff --git a/qapi/target.json b/qapi/target.json
+index be2360ca34..f277b69a2a 100644
+--- a/qapi/target.json
++++ b/qapi/target.json
+@@ -8,6 +8,177 @@
+ { 'pragma': { 'top-unit': 'target' } }
+=20
+ ##
+-# @DUMMY:
++# @rtc-reset-reinjection:
++#
++# This command will reset the RTC interrupt reinjection backlog.
++# Can be used if another mechanism to synchronize guest time
++# is in effect, for example QEMU guest agent's guest-set-time
++# command.
++#
++# Since: 2.1
++#
++# Example:
++#
++# -> { "execute": "rtc-reset-reinjection" }
++# <- { "return": {} }
++#
++##
++{ 'command': 'rtc-reset-reinjection',
++  'if': 'defined(TARGET_I386)' }
++
++
++##
++# @SevState:
++#
++# An enumeration of SEV state information used during @query-sev.
++#
++# @uninit: The guest is uninitialized.
++#
++# @launch-update: The guest is currently being launched; plaintext data =
+and
++#                 register state is being imported.
++#
++# @launch-secret: The guest is currently being launched; ciphertext data
++#                 is being imported.
++#
++# @running: The guest is fully launched or migrated in.
++#
++# @send-update: The guest is currently being migrated out to another mac=
+hine.
++#
++# @receive-update: The guest is currently being migrated from another ma=
+chine.
++#
++# Since: 2.12
++##
++{ 'enum': 'SevState',
++  'data': ['uninit', 'launch-update', 'launch-secret', 'running',
++           'send-update', 'receive-update' ],
++  'if': 'defined(TARGET_I386)' }
++
++##
++# @SevInfo:
++#
++# Information about Secure Encrypted Virtualization (SEV) support
++#
++# @enabled: true if SEV is active
++#
++# @api-major: SEV API major version
++#
++# @api-minor: SEV API minor version
++#
++# @build-id: SEV FW build id
++#
++# @policy: SEV policy value
++#
++# @state: SEV guest state
++#
++# @handle: SEV firmware handle
++#
++# Since: 2.12
++##
++{ 'struct': 'SevInfo',
++    'data': { 'enabled': 'bool',
++              'api-major': 'uint8',
++              'api-minor' : 'uint8',
++              'build-id' : 'uint8',
++              'policy' : 'uint32',
++              'state' : 'SevState',
++              'handle' : 'uint32'
++            },
++  'if': 'defined(TARGET_I386)'
++}
++
++##
++# @query-sev:
++#
++# Returns information about SEV
++#
++# Returns: @SevInfo
++#
++# Since: 2.12
++#
++# Example:
++#
++# -> { "execute": "query-sev" }
++# <- { "return": { "enabled": true, "api-major" : 0, "api-minor" : 0,
++#                  "build-id" : 0, "policy" : 0, "state" : "running",
++#                  "handle" : 1 } }
++#
++##
++{ 'command': 'query-sev', 'returns': 'SevInfo',
++  'if': 'defined(TARGET_I386)' }
++
++
++##
++# @SevLaunchMeasureInfo:
++#
++# SEV Guest Launch measurement information
++#
++# @data: the measurement value encoded in base64
++#
++# Since: 2.12
++#
++##
++{ 'struct': 'SevLaunchMeasureInfo', 'data': {'data': 'str'},
++  'if': 'defined(TARGET_I386)' }
++
++##
++# @query-sev-launch-measure:
++#
++# Query the SEV guest launch information.
++#
++# Returns: The @SevLaunchMeasureInfo for the guest
++#
++# Since: 2.12
++#
++# Example:
++#
++# -> { "execute": "query-sev-launch-measure" }
++# <- { "return": { "data": "4l8LXeNlSPUDlXPJG5966/8%YZ" } }
++#
++##
++{ 'command': 'query-sev-launch-measure', 'returns': 'SevLaunchMeasureInf=
+o',
++  'if': 'defined(TARGET_I386)' }
++
++
++##
++# @SevCapability:
++#
++# The struct describes capability for a Secure Encrypted Virtualization
++# feature.
++#
++# @pdh:  Platform Diffie-Hellman key (base64 encoded)
++#
++# @cert-chain:  PDH certificate chain (base64 encoded)
++#
++# @cbitpos: C-bit location in page table entry
++#
++# @reduced-phys-bits: Number of physical Address bit reduction when SEV =
+is
++#                     enabled
++#
++# Since: 2.12
++##
++{ 'struct': 'SevCapability',
++  'data': { 'pdh': 'str',
++            'cert-chain': 'str',
++            'cbitpos': 'int',
++            'reduced-phys-bits': 'int'},
++  'if': 'defined(TARGET_I386)' }
++
++##
++# @query-sev-capabilities:
++#
++# This command is used to get the SEV capabilities, and is supported on =
+AMD
++# X86 platforms only.
++#
++# Returns: SevCapability objects.
++#
++# Since: 2.12
++#
++# Example:
++#
++# -> { "execute": "query-sev-capabilities" }
++# <- { "return": { "pdh": "8CCDD8DDD", "cert-chain": "888CCCDDDEE",
++#                  "cbitpos": 47, "reduced-phys-bits": 5}}
++#
+ ##
+-{ 'event': 'DUMMY' }
++{ 'command': 'query-sev-capabilities', 'returns': 'SevCapability',
++  'if': 'defined(TARGET_I386)' }
+diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
+index b8622dfb1e..8f88f86952 100644
+--- a/target/i386/sev_i386.h
++++ b/target/i386/sev_i386.h
+@@ -19,7 +19,7 @@
+ #include "sysemu/kvm.h"
+ #include "sysemu/sev.h"
+ #include "qemu/error-report.h"
+-#include "qapi/qapi-commands-misc.h"
++#include "qapi/target-qapi-commands.h"
+=20
+ #define SEV_POLICY_NODBG        0x1
+ #define SEV_POLICY_NOKS         0x2
+diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+index e4e4de8b8a..a27b389f8e 100644
+--- a/hw/timer/mc146818rtc.c
++++ b/hw/timer/mc146818rtc.c
+@@ -31,7 +31,7 @@
+ #include "sysemu/replay.h"
+ #include "hw/timer/mc146818rtc.h"
+ #include "qapi/error.h"
+-#include "qapi/qapi-commands-misc.h"
++#include "qapi/target-qapi-commands.h"
+ #include "qapi/qapi-events-misc.h"
+ #include "qapi/visitor.h"
+ #include "exec/address-spaces.h"
+diff --git a/monitor.c b/monitor.c
+index 86f3193158..4b3059614f 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1218,12 +1218,6 @@ static void qmp_query_qmp_schema(QDict *qdict, QOb=
+ject **ret_data,
+  */
+ static void qmp_unregister_commands_hack(void)
  {
-     const MonitorQAPIEventState *evstate =3D key;
-@@ -700,11 +667,103 @@ static gboolean qapi_event_throttle_equal(const vo=
-id *a, const void *b)
-     return TRUE;
- }
+-#ifndef TARGET_I386
+-    qmp_unregister_command(&qmp_commands, "rtc-reset-reinjection");
+-    qmp_unregister_command(&qmp_commands, "query-sev");
+-    qmp_unregister_command(&qmp_commands, "query-sev-launch-measure");
+-    qmp_unregister_command(&qmp_commands, "query-sev-capabilities");
+-#endif
+ #ifndef TARGET_S390X
+     qmp_unregister_command(&qmp_commands, "dump-skeys");
+ #endif
+@@ -4740,31 +4734,6 @@ QemuOptsList qemu_mon_opts =3D {
+     },
+ };
 =20
-+static void
-+monitor_qapi_event_queue(unsigned event, QDict *qdict)
-+{
-+    static MonitorEventRateLimit limiter =3D {
-+        .size =3D QAPI_EVENT__MAX,
-+        .rate =3D {
-+            /* Limit guest-triggerable events to 1 per second */
-+            [QAPI_EVENT_RTC_CHANGE]        =3D 1000 * SCALE_MS,
-+            [QAPI_EVENT_WATCHDOG]          =3D 1000 * SCALE_MS,
-+            [QAPI_EVENT_BALLOON_CHANGE]    =3D 1000 * SCALE_MS,
-+            [QAPI_EVENT_QUORUM_REPORT_BAD] =3D 1000 * SCALE_MS,
-+            [QAPI_EVENT_QUORUM_FAILURE]    =3D 1000 * SCALE_MS,
-+            [QAPI_EVENT_VSERPORT_CHANGE]   =3D 1000 * SCALE_MS,
-+            [QAPI_EVENT__MAX]              =3D 0,
-+        },
-+    };
-+
-+    if (!limiter.state) {
-+        limiter.state =3D g_hash_table_new(qapi_event_throttle_hash,
-+                                         qapi_event_throttle_equal);
-+    }
-+
-+    monitor_qapi_event_queue_limit(&limiter, event, qdict);
-+}
-+
-+static unsigned int target_qapi_event_throttle_hash(const void *key)
-+{
-+    const MonitorQAPIEventState *evstate =3D key;
-+    unsigned int hash =3D evstate->event * 255;
-+
-+    return hash;
-+}
-+
-+static gboolean target_qapi_event_throttle_equal(const void *a, const vo=
-id *b)
-+{
-+    const MonitorQAPIEventState *eva =3D a;
-+    const MonitorQAPIEventState *evb =3D b;
-+
-+    if (eva->event !=3D evb->event) {
-+        return FALSE;
-+    }
-+
-+    return TRUE;
-+}
-+
-+static void
-+target_monitor_qapi_event_queue(unsigned event, QDict *qdict)
-+{
-+    static MonitorEventRateLimit limiter =3D {
-+        .size =3D TARGET_QAPI_EVENT__MAX,
-+        .rate =3D {
-+            [TARGET_QAPI_EVENT__MAX]       =3D 0,
-+        },
-+    };
-+
-+    if (!limiter.state) {
-+        limiter.state =3D g_hash_table_new(target_qapi_event_throttle_ha=
-sh,
-+                                         target_qapi_event_throttle_equa=
-l);
-+    }
-+    monitor_qapi_event_queue_limit(&limiter, event, qdict);
-+}
-+
-+/*
-+ * This function runs evconf->rate ns after sending a throttled
-+ * event.
-+ * If another event has since been stored, send it.
-+ */
-+static void monitor_qapi_event_handler(void *opaque)
-+{
-+    MonitorQAPIEventState *evstate =3D opaque;
-+    const MonitorEventRateLimit *limiter =3D evstate->limiter;
-+    int64_t rate =3D limiter->rate[evstate->event];
-+
-+    trace_monitor_protocol_event_handler(evstate->event, evstate->qdict)=
-;
-+    qemu_mutex_lock(&monitor_lock);
-+
-+    if (evstate->qdict) {
-+        int64_t now =3D qemu_clock_get_ns(monitor_get_event_clock());
-+
-+        monitor_qapi_event_emit(evstate->event, evstate->qdict);
-+        qobject_unref(evstate->qdict);
-+        evstate->qdict =3D NULL;
-+        timer_mod_ns(evstate->timer, now + rate);
-+    } else {
-+        g_hash_table_remove(limiter->state, evstate);
-+        qobject_unref(evstate->data);
-+        timer_free(evstate->timer);
-+        g_free(evstate);
-+    }
-+
-+    qemu_mutex_unlock(&monitor_lock);
-+}
-+
- static void monitor_qapi_event_init(void)
+-#ifndef TARGET_I386
+-void qmp_rtc_reset_reinjection(Error **errp)
+-{
+-    error_setg(errp, QERR_FEATURE_DISABLED, "rtc-reset-reinjection");
+-}
+-
+-SevInfo *qmp_query_sev(Error **errp)
+-{
+-    error_setg(errp, QERR_FEATURE_DISABLED, "query-sev");
+-    return NULL;
+-}
+-
+-SevLaunchMeasureInfo *qmp_query_sev_launch_measure(Error **errp)
+-{
+-    error_setg(errp, QERR_FEATURE_DISABLED, "query-sev-launch-measure");
+-    return NULL;
+-}
+-
+-SevCapability *qmp_query_sev_capabilities(Error **errp)
+-{
+-    error_setg(errp, QERR_FEATURE_DISABLED, "query-sev-capabilities");
+-    return NULL;
+-}
+-#endif
+-
+ #ifndef TARGET_S390X
+ void qmp_dump_skeys(const char *filename, Error **errp)
  {
--    monitor_qapi_event_state =3D g_hash_table_new(qapi_event_throttle_ha=
-sh,
--                                                qapi_event_throttle_equa=
-l);
-     qmp_event_set_func_emit(monitor_qapi_event_queue);
-+    target_qmp_event_set_func_emit(target_monitor_qapi_event_queue);
- }
-=20
- static void handle_hmp_command(Monitor *mon, const char *cmdline);
-@@ -1099,9 +1158,10 @@ CommandInfoList *qmp_query_commands(Error **errp)
-     return list;
- }
-=20
--EventInfoList *qmp_query_events(Error **errp)
-+static void qmp_query_events_list(EventInfoList **list,
-+                                  const QEnumLookup *qenum, int max)
- {
--    EventInfoList *info, *ev_list =3D NULL;
-+    EventInfoList *info;
-     QAPIEvent e;
-=20
-     for (e =3D 0 ; e < QAPI_EVENT__MAX ; e++) {
-@@ -1111,11 +1171,22 @@ EventInfoList *qmp_query_events(Error **errp)
-         info->value =3D g_malloc0(sizeof(*info->value));
-         info->value->name =3D g_strdup(event_name);
-=20
--        info->next =3D ev_list;
--        ev_list =3D info;
-+        info->next =3D *list;
-+        *list =3D info;
-     }
-=20
--    return ev_list;
-+}
-+
-+EventInfoList *qmp_query_events(Error **errp)
-+{
-+    EventInfoList *list =3D NULL;
-+
-+    qmp_query_events_list(&list, &QAPIEvent_lookup,
-+                          QAPI_EVENT__MAX);
-+    qmp_query_events_list(&list, &target_QAPIEvent_lookup,
-+                          TARGET_QAPI_EVENT__MAX);
-+
-+    return list;
- }
-=20
- /*
-@@ -1183,6 +1254,7 @@ static void monitor_init_qmp_commands(void)
-=20
-     QTAILQ_INIT(&qmp_commands);
-     qmp_register_commands(&qmp_commands);
-+    target_qmp_register_commands(&qmp_commands);
-=20
-     qmp_register_command(&qmp_commands, "query-qmp-schema",
-                          qmp_query_qmp_schema, QCO_ALLOW_PRECONFIG);
-@@ -2941,11 +3013,11 @@ static int default_fmt_size =3D 4;
- static int is_valid_option(const char *c, const char *typestr)
- {
-     char option[3];
-- =20
-+
-     option[0] =3D '-';
-     option[1] =3D *c;
-     option[2] =3D '\0';
-- =20
-+
-     typestr =3D strstr(typestr, option);
-     return (typestr !=3D NULL);
- }
-@@ -3318,7 +3390,7 @@ static QDict *monitor_parse_arguments(Monitor *mon,
-                     p++;
-                     if(c !=3D *p) {
-                         if(!is_valid_option(p, typestr)) {
--                 =20
-+
-                             monitor_printf(mon, "%s: unsupported option =
--%c\n",
-                                            cmd->name, *p);
-                             goto fail;
-diff --git a/qapi/qmp-event.c b/qapi/qmp-event.c
-index 5b8854043e..a0f7dd8ac2 100644
---- a/qapi/qmp-event.c
-+++ b/qapi/qmp-event.c
-@@ -20,6 +20,7 @@
- #include "qapi/qmp/qjson.h"
-=20
- static QMPEventFuncEmit qmp_emit;
-+static QMPEventFuncEmit target_qmp_emit;
-=20
- void qmp_event_set_func_emit(QMPEventFuncEmit emit)
- {
-@@ -31,6 +32,16 @@ QMPEventFuncEmit qmp_event_get_func_emit(void)
-     return qmp_emit;
- }
-=20
-+void target_qmp_event_set_func_emit(QMPEventFuncEmit emit)
-+{
-+    target_qmp_emit =3D emit;
-+}
-+
-+QMPEventFuncEmit target_qmp_event_get_func_emit(void)
-+{
-+    return target_qmp_emit;
-+}
-+
- static void timestamp_put(QDict *qdict)
- {
-     int err;
-diff --git a/Makefile b/Makefile
-index c8b9efdad4..01a31e2ea5 100644
---- a/Makefile
-+++ b/Makefile
-@@ -92,16 +92,20 @@ GENERATED_FILES =3D qemu-version.h config-host.h qemu=
--options.def
- #see Makefile.objs for the definition of QAPI_MODULES
- GENERATED_QAPI_FILES =3D qapi/qapi-builtin-types.h qapi/qapi-builtin-typ=
-es.c
- GENERATED_QAPI_FILES +=3D qapi/qapi-types.h qapi/qapi-types.c
-+GENERATED_QAPI_FILES +=3D qapi/target-qapi-types.h qapi/target-qapi-type=
-s.c
- GENERATED_QAPI_FILES +=3D $(QAPI_MODULES:%=3Dqapi/qapi-types-%.h)
- GENERATED_QAPI_FILES +=3D $(QAPI_MODULES:%=3Dqapi/qapi-types-%.c)
- GENERATED_QAPI_FILES +=3D qapi/qapi-builtin-visit.h qapi/qapi-builtin-vi=
-sit.c
- GENERATED_QAPI_FILES +=3D qapi/qapi-visit.h qapi/qapi-visit.c
-+GENERATED_QAPI_FILES +=3D qapi/target-qapi-visit.h qapi/target-qapi-visi=
-t.c
- GENERATED_QAPI_FILES +=3D $(QAPI_MODULES:%=3Dqapi/qapi-visit-%.h)
- GENERATED_QAPI_FILES +=3D $(QAPI_MODULES:%=3Dqapi/qapi-visit-%.c)
- GENERATED_QAPI_FILES +=3D qapi/qapi-commands.h qapi/qapi-commands.c
-+GENERATED_QAPI_FILES +=3D qapi/target-qapi-commands.h qapi/target-qapi-c=
-ommands.c
- GENERATED_QAPI_FILES +=3D $(QAPI_MODULES:%=3Dqapi/qapi-commands-%.h)
- GENERATED_QAPI_FILES +=3D $(QAPI_MODULES:%=3Dqapi/qapi-commands-%.c)
- GENERATED_QAPI_FILES +=3D qapi/qapi-events.h qapi/qapi-events.c
-+GENERATED_QAPI_FILES +=3D qapi/target-qapi-events.h qapi/target-qapi-eve=
-nts.c
- GENERATED_QAPI_FILES +=3D $(QAPI_MODULES:%=3Dqapi/qapi-events-%.h)
- GENERATED_QAPI_FILES +=3D $(QAPI_MODULES:%=3Dqapi/qapi-events-%.c)
- GENERATED_QAPI_FILES +=3D qapi/qapi-introspect.c qapi/qapi-introspect.h
-@@ -528,7 +532,8 @@ qga/qapi-generated/qapi-gen-timestamp: $(SRC_PATH)/qg=
-a/qapi-schema.json $(qapi-p
- 	@>$@
-=20
- qapi-modules =3D $(SRC_PATH)/qapi/qapi-schema.json \
--               $(QAPI_MODULES:%=3D$(SRC_PATH)/qapi/%.json)
-+               $(QAPI_MODULES:%=3D$(SRC_PATH)/qapi/%.json) \
-+               $(SRC_PATH)/qapi/target.json
-=20
- $(GENERATED_QAPI_FILES): qapi-gen-timestamp ;
- qapi-gen-timestamp: $(qapi-modules) $(qapi-py)
-diff --git a/Makefile.target b/Makefile.target
-index c882292ae1..95ebaf1fa7 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -156,6 +156,8 @@ endif
-=20
- GENERATED_FILES +=3D hmp-commands.h hmp-commands-info.h
-=20
-+obj-y +=3D qapi/target-qapi-types.o qapi/target-qapi-visit.o
-+obj-y +=3D qapi/target-qapi-events.o qapi/target-qapi-commands.o
- obj-y +=3D qapi/qapi-introspect.o
-=20
- endif # CONFIG_SOFTMMU
 --=20
 2.20.0
