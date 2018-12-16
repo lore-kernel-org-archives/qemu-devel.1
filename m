@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gYIOd-0001aP-HB
-	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 17:26:56 -0500
+	(envelope-from <jamespharvey20@gmail.com>) id 1gYPAw-0007lm-1I
+	for qemu-devel@nongnu.org; Sun, 16 Dec 2018 00:41:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gYIOc-0000Wp-Fs
-	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 17:26:55 -0500
-Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:42737)
+	(envelope-from <jamespharvey20@gmail.com>) id 1gYPAu-0007aT-8G
+	for qemu-devel@nongnu.org; Sun, 16 Dec 2018 00:41:13 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:38424)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gYIOc-0000UW-7f
-	for qemu-devel@nongnu.org; Sat, 15 Dec 2018 17:26:54 -0500
-Received: by mail-oi1-x22c.google.com with SMTP id w13so7393140oiw.9
-	for <qemu-devel@nongnu.org>; Sat, 15 Dec 2018 14:26:54 -0800 (PST)
+	(Exim 4.71) (envelope-from <jamespharvey20@gmail.com>)
+	id 1gYPAt-0007Yx-ST
+	for qemu-devel@nongnu.org; Sun, 16 Dec 2018 00:41:12 -0500
+Received: by mail-ot1-x344.google.com with SMTP id e12so9318192otl.5
+	for <qemu-devel@nongnu.org>; Sat, 15 Dec 2018 21:41:09 -0800 (PST)
 MIME-Version: 1.0
-References: <20181214060526.30042-1-armbru@redhat.com>
-In-Reply-To: <20181214060526.30042-1-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 15 Dec 2018 22:26:41 +0000
-Message-ID: <CAFEAcA_OV6a++hcRnpdhKbrQeS9HR6NwU68mOtteZPLWCcOF1Q@mail.gmail.com>
+From: james harvey <jamespharvey20@gmail.com>
+Date: Sun, 16 Dec 2018 00:40:58 -0500
+Message-ID: <CA+X5Wn6-3RHWt7QAeud-53nio9gT+9mo4M_PN6-m561CyQFNmQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/32] QAPI patches for 2018-12-13
+Subject: [Qemu-devel] hw/input/ps2.c : BTN_SIDE and BTN_EXTRA not forwarded
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +26,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, fabian@lesniak-it.de, kraxel@redhat.com, Eric Blake <eblake@redhat.com>
 
-On Fri, 14 Dec 2018 at 06:06, Markus Armbruster <armbru@redhat.com> wrote:
->
-> git-request-pull master public pull-qapi-2018-12-13-v2
-> The following changes since commit c3ec0fa1a8e815ecfec9eabb9c20ee206c313e07:
->
->   Merge remote-tracking branch 'remotes/armbru/tags/pull-monitor-2018-12-12' into staging (2018-12-13 13:41:44 +0000)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2018-12-13-v2
->
-> for you to fetch changes up to 335d10cd8e2c3bb6067804b095aaf6371fc1983e:
->
->   qapi: add conditions to REPLICATION type/commands on the schema (2018-12-14 06:52:48 +0100)
->
-> ----------------------------------------------------------------
-> QAPI patches for 2018-12-13
->
-> * Rewrite the ugly parts of string-input-visitor
-> * Support conditional QAPI enum, struct, union and alternate members
->
-> ----------------------------------------------------------------
+Running qemu 3.1.0.  virt-viewer 7.0.  spice, spice-gtk, and
+spice-protocol all git versions from the past week or so.
 
-Applied, thanks.
+I have a Logitech G600 mouse.  The scroll wheel can be pushed left or right.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+On Arch Linux host, "evtest" shows these as event codes 275 (BTN_SIDE)
+and 276 (BTN_EXTRA.)  In host, they work as expected, by default as
+back and forward in supporting programs such as web browsers.
 
--- PMM
+On Arch Linux guest, "evtest" shows these events as supported for the
+"ImExPS/2 Generic Explorer Mouse", but it doesn't show those events as
+happening when I push the scroll wheel left or right.  Other events
+work fine.
+
+On Windows 7 guest, there's no effect from pushing the scroll wheel
+left or right, either.
+
+I'm happy to help debug where the event forwarding is breaking down,
+but have no idea how to do that.
+
+
+Patch v1 for these buttons from Nov 24, 2016:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg415246.html
+
+Patch v2 from Nov 28, 2016:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg415690.html
+
+Patch v3 from Dec 6, 2016:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg417007.html
+
+
+The v1 notes say: 'Note that the guest has to switch the ps2 mouse
+into IMEX mode, otherwise events of the extra buttons are ignored. For
+example on a Windows guest one needs to manually select the "Microsoft
+PS/2 Mouse" driver.'
+
+I'll admit I'm not sure what IMEX mode is.  QEMU is providing the PS/2
+mouse emulation by default, and I don't see a way to give qemu options
+for it.
+
+Regardless, following this note's instructions for "IMEX mode", in
+Windows 7 guest, changing the driver from the default "Microsoft -
+PS/2 Compatible Mouse" to "Microsoft - Microsoft PS/2 Mouse" and
+rebooting guest has no effect.  The extra buttons still don't work.
+
+Windows 7 Device Manager does show 2 "Mice and other pointing
+devices".  First is "HID-compliant mouse"
+(HID\VID_0627&PID_0001&REV_0000) which shows it's USB, so I'm guessing
+that's the absolute movement EvTouch USB Graphics Tablet.  Second is
+the PS/2 - currently set to "Microsoft PS/2 Mouse" (ACPI\PNP0F13).
