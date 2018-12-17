@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gZ1dX-00086O-LB
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:45:21 -0500
+	(envelope-from <mst@redhat.com>) id 1gZ1pE-00018b-Mk
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:57:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gZ1dW-0006jY-3p
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:45:19 -0500
-From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 17 Dec 2018 23:43:48 +0100
-Message-Id: <20181217224348.14922-32-mreitz@redhat.com>
-In-Reply-To: <20181217224348.14922-1-mreitz@redhat.com>
-References: <20181217224348.14922-1-mreitz@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1gZ1p6-0000fk-J3
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:57:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60890)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZ1p6-0000en-Ar
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:57:16 -0500
+Date: Mon, 17 Dec 2018 17:57:09 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181217175701-mutt-send-email-mst@kernel.org>
+References: <1545065857-31164-1-git-send-email-thuth@redhat.com>
+	<20181217193522.GK7141@habkost.net>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v12 31/31] iotests: Test json:{} filenames of
- internal BDSs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181217193522.GK7141@habkost.net>
+Subject: Re: [Qemu-devel] [QEMU PATCH] hw/i386: Remove deprecated machines
+ pc-0.10 and pc-0.11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,226 +28,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, libvir-list@redhat.com
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
----
- tests/qemu-iotests/224     | 139 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/224.out |  18 +++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 158 insertions(+)
- create mode 100755 tests/qemu-iotests/224
- create mode 100644 tests/qemu-iotests/224.out
+On Mon, Dec 17, 2018 at 05:35:22PM -0200, Eduardo Habkost wrote:
+> On Mon, Dec 17, 2018 at 05:57:37PM +0100, Thomas Huth wrote:
+> > They've been deprecated for two releases and nobody complained that they
+> > are still required anymore, so it's time to remove these now.
+> > And while we're at it, mark the other remaining old 0.x machine types
+> > as deprecated (since they can not properly be used for live-migration
+> > anyway).
+> 
+> Do you know why exactly they can't be used for live-migration?
+> 
+> Maybe we should split the removal of pc <= 0.10 and deprecation
+> of pc <= 0.15 into separate patches?
+> 
+> In either case:
+> 
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> 
+> Michael, should I queue this, or should it go through your tree?
 
-diff --git a/tests/qemu-iotests/224 b/tests/qemu-iotests/224
-new file mode 100755
-index 0000000000..ef652ad488
---- /dev/null
-+++ b/tests/qemu-iotests/224
-@@ -0,0 +1,139 @@
-+#!/usr/bin/env python
-+#
-+# Test json:{} filenames with qemu-internal BDSs
-+# (the one of commit, to be precise)
-+#
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+# Creator/Owner: Max Reitz <mreitz@redhat.com>
-+
-+import iotests
-+from iotests import log, qemu_img, qemu_io_silent, filter_testfiles, \
-+                    filter_imgfmt
-+import json
-+
-+# Need backing file support (for arbitrary backing formats)
-+iotests.verify_image_format(supported_fmts=3D['qcow2', 'qcow', 'qed'])
-+iotests.verify_platform(['linux'])
-+
-+
-+# There are two variations of this test:
-+# (1) We do not set filter_node_name.  In that case, the commit_top
-+#     driver should not appear anywhere.
-+# (2) We do set filter_node_name.  In that case, it should appear.
-+#
-+# This for loop executes both.
-+for filter_node_name in False, True:
-+    log('')
-+    log('--- filter_node_name: %s ---' % filter_node_name)
-+    log('')
-+
-+    with iotests.FilePath('base.img') as base_img_path, \
-+         iotests.FilePath('mid.img') as mid_img_path, \
-+         iotests.FilePath('top.img') as top_img_path, \
-+         iotests.VM() as vm:
-+
-+        assert qemu_img('create', '-f', iotests.imgfmt,
-+                        base_img_path, '64M') =3D=3D 0
-+        assert qemu_img('create', '-f', iotests.imgfmt, '-b', base_img_p=
-ath,
-+                        mid_img_path) =3D=3D 0
-+        assert qemu_img('create', '-f', iotests.imgfmt, '-b', mid_img_pa=
-th,
-+                        top_img_path) =3D=3D 0
-+
-+        # Something to commit
-+        assert qemu_io_silent(mid_img_path, '-c', 'write -P 1 0 1M') =3D=
-=3D 0
-+
-+        vm.launch()
-+
-+        # Change the bottom-most image's backing file (to null-co://)
-+        # to enforce json:{} filenames
-+        vm.qmp_log('blockdev-add',
-+                    node_name=3D'top',
-+                    driver=3Diotests.imgfmt,
-+                    file=3D{
-+                        'driver': 'file',
-+                        'filename': top_img_path
-+                    },
-+                    backing=3D{
-+                        'node-name': 'mid',
-+                        'driver': iotests.imgfmt,
-+                        'file': {
-+                            'driver': 'file',
-+                            'filename': mid_img_path
-+                        },
-+                        'backing': {
-+                            'node-name': 'base',
-+                            'driver': iotests.imgfmt,
-+                            'file': {
-+                                'driver': 'file',
-+                                'filename': base_img_path
-+                            },
-+                            'backing': {
-+                                'driver': 'null-co'
-+                            }
-+                        }
-+                    },
-+                    filters=3D[filter_testfiles, filter_imgfmt])
-+
-+        # As long as block-commit does not accept node names, we have to
-+        # get our mid/base filenames here
-+        mid_name =3D vm.node_info('mid')['image']['filename']
-+        base_name =3D vm.node_info('base')['image']['filename']
-+
-+        assert mid_name[:5] =3D=3D 'json:'
-+        assert base_name[:5] =3D=3D 'json:'
-+
-+        # Start the block job
-+        if filter_node_name:
-+            vm.qmp_log('block-commit',
-+                        job_id=3D'commit',
-+                        device=3D'top',
-+                        filter_node_name=3D'filter_node',
-+                        top=3Dmid_name,
-+                        base=3Dbase_name,
-+                        speed=3D1,
-+                        filters=3D[filter_testfiles, filter_imgfmt])
-+        else:
-+            vm.qmp_log('block-commit',
-+                        job_id=3D'commit',
-+                        device=3D'top',
-+                        top=3Dmid_name,
-+                        base=3Dbase_name,
-+                        speed=3D1,
-+                        filters=3D[filter_testfiles, filter_imgfmt])
-+
-+        vm.qmp_log('job-pause', id=3D'commit')
-+
-+        # Get and parse top's json:{} filename
-+        top_name =3D vm.node_info('top')['image']['filename']
-+
-+        vm.shutdown()
-+
-+        assert top_name[:5] =3D=3D 'json:'
-+        top_options =3D json.loads(top_name[5:])
-+
-+        if filter_node_name:
-+            # This should be present and set
-+            assert top_options['backing']['driver'] =3D=3D 'commit_top'
-+            # And the mid image is commit_top's backing image
-+            mid_options =3D top_options['backing']['backing']
-+        else:
-+            # The mid image should appear as the immediate backing BDS
-+            # of top
-+            mid_options =3D top_options['backing']
-+
-+        assert mid_options['driver'] =3D=3D iotests.imgfmt
-+        assert mid_options['file']['filename'] =3D=3D mid_img_path
-diff --git a/tests/qemu-iotests/224.out b/tests/qemu-iotests/224.out
-new file mode 100644
-index 0000000000..2eb34438cf
---- /dev/null
-+++ b/tests/qemu-iotests/224.out
-@@ -0,0 +1,18 @@
-+
-+--- filter_node_name: False ---
-+
-+{"execute": "blockdev-add", "arguments": {"backing": {"backing": {"backi=
-ng": {"driver": "null-co"}, "driver": "IMGFMT", "file": {"driver": "file"=
-, "filename": "TEST_DIR/PID-base.img"}, "node-name": "base"}, "driver": "=
-IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/PID-mid.img"}, =
-"node-name": "mid"}, "driver": "IMGFMT", "file": {"driver": "file", "file=
-name": "TEST_DIR/PID-top.img"}, "node_name": "top"}}
-+{"return": {}}
-+{"execute": "block-commit", "arguments": {"base": "json:{\"backing\": {\=
-"driver\": \"null-co\"}, \"driver\": \"IMGFMT\", \"file\": {\"driver\": \=
-"file\", \"filename\": \"TEST_DIR/PID-base.img\"}}", "device": "top", "jo=
-b_id": "commit", "speed": 1, "top": "json:{\"backing\": {\"backing\": {\"=
-driver\": \"null-co\"}, \"driver\": \"IMGFMT\", \"file\": {\"driver\": \"=
-file\", \"filename\": \"TEST_DIR/PID-base.img\"}}, \"driver\": \"IMGFMT\"=
-, \"file\": {\"driver\": \"file\", \"filename\": \"TEST_DIR/PID-mid.img\"=
-}}"}}
-+{"return": {}}
-+{"execute": "job-pause", "arguments": {"id": "commit"}}
-+{"return": {}}
-+
-+--- filter_node_name: True ---
-+
-+{"execute": "blockdev-add", "arguments": {"backing": {"backing": {"backi=
-ng": {"driver": "null-co"}, "driver": "IMGFMT", "file": {"driver": "file"=
-, "filename": "TEST_DIR/PID-base.img"}, "node-name": "base"}, "driver": "=
-IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/PID-mid.img"}, =
-"node-name": "mid"}, "driver": "IMGFMT", "file": {"driver": "file", "file=
-name": "TEST_DIR/PID-top.img"}, "node_name": "top"}}
-+{"return": {}}
-+{"execute": "block-commit", "arguments": {"base": "json:{\"backing\": {\=
-"driver\": \"null-co\"}, \"driver\": \"IMGFMT\", \"file\": {\"driver\": \=
-"file\", \"filename\": \"TEST_DIR/PID-base.img\"}}", "device": "top", "fi=
-lter_node_name": "filter_node", "job_id": "commit", "speed": 1, "top": "j=
-son:{\"backing\": {\"backing\": {\"driver\": \"null-co\"}, \"driver\": \"=
-IMGFMT\", \"file\": {\"driver\": \"file\", \"filename\": \"TEST_DIR/PID-b=
-ase.img\"}}, \"driver\": \"IMGFMT\", \"file\": {\"driver\": \"file\", \"f=
-ilename\": \"TEST_DIR/PID-mid.img\"}}"}}
-+{"return": {}}
-+{"execute": "job-pause", "arguments": {"id": "commit"}}
-+{"return": {}}
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 98a895e7e8..2f70e0f8cb 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -224,6 +224,7 @@
- 221 rw auto quick
- 222 rw auto quick
- 223 rw auto quick
-+224 rw auto quick
- 225 rw auto quick
- 226 auto quick
- 227 auto quick
---=20
-2.19.2
+I'll queue it.
+
+> 
+> > 
+> > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > ---
+> >  hw/i386/pc_piix.c     | 70 ++-------------------------------------------------
+> >  qemu-deprecated.texi  |  2 +-
+> >  tests/cpu-plug-test.c |  4 +--
+> >  3 files changed, 4 insertions(+), 72 deletions(-)
+> > 
+> > diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> > index 6981cfa..7653fbb 100644
+> > --- a/hw/i386/pc_piix.c
+> > +++ b/hw/i386/pc_piix.c
+> > @@ -368,7 +368,7 @@ static void pc_compat_1_2(MachineState *machine)
+> >      x86_cpu_change_kvm_default("kvm-pv-eoi", NULL);
+> >  }
+> >  
+> > -/* PC compat function for pc-0.10 to pc-0.13 */
+> > +/* PC compat function for pc-0.12 and pc-0.13 */
+> >  static void pc_compat_0_13(MachineState *machine)
+> >  {
+> >      pc_compat_1_2(machine);
+> > @@ -834,6 +834,7 @@ static void pc_i440fx_0_15_machine_options(MachineClass *m)
+> >  {
+> >      pc_i440fx_1_0_machine_options(m);
+> >      m->hw_version = "0.15";
+> > +    m->deprecation_reason = "use a newer machine type instead";
+> >      SET_MACHINE_COMPAT(m, PC_COMPAT_0_15);
+> >  }
+> >  
+> > @@ -951,73 +952,6 @@ static void pc_i440fx_0_12_machine_options(MachineClass *m)
+> >  DEFINE_I440FX_MACHINE(v0_12, "pc-0.12", pc_compat_0_13,
+> >                        pc_i440fx_0_12_machine_options);
+> >  
+> > -
+> > -#define PC_COMPAT_0_11 \
+> > -        PC_CPU_MODEL_IDS("0.11") \
+> > -        {\
+> > -            .driver   = "virtio-blk-pci",\
+> > -            .property = "vectors",\
+> > -            .value    = stringify(0),\
+> > -        },{\
+> > -            .driver   = TYPE_PCI_DEVICE,\
+> > -            .property = "rombar",\
+> > -            .value    = stringify(0),\
+> > -        },{\
+> > -            .driver   = "ide-drive",\
+> > -            .property = "ver",\
+> > -            .value    = "0.11",\
+> > -        },{\
+> > -            .driver   = "scsi-disk",\
+> > -            .property = "ver",\
+> > -            .value    = "0.11",\
+> > -        },
+> > -
+> > -static void pc_i440fx_0_11_machine_options(MachineClass *m)
+> > -{
+> > -    pc_i440fx_0_12_machine_options(m);
+> > -    m->hw_version = "0.11";
+> > -    m->deprecation_reason = "use a newer machine type instead";
+> > -    SET_MACHINE_COMPAT(m, PC_COMPAT_0_11);
+> > -}
+> > -
+> > -DEFINE_I440FX_MACHINE(v0_11, "pc-0.11", pc_compat_0_13,
+> > -                      pc_i440fx_0_11_machine_options);
+> > -
+> > -
+> > -#define PC_COMPAT_0_10 \
+> > -    PC_CPU_MODEL_IDS("0.10") \
+> > -    {\
+> > -        .driver   = "virtio-blk-pci",\
+> > -        .property = "class",\
+> > -        .value    = stringify(PCI_CLASS_STORAGE_OTHER),\
+> > -    },{\
+> > -        .driver   = "virtio-serial-pci",\
+> > -        .property = "class",\
+> > -        .value    = stringify(PCI_CLASS_DISPLAY_OTHER),\
+> > -    },{\
+> > -        .driver   = "virtio-net-pci",\
+> > -        .property = "vectors",\
+> > -        .value    = stringify(0),\
+> > -    },{\
+> > -        .driver   = "ide-drive",\
+> > -        .property = "ver",\
+> > -        .value    = "0.10",\
+> > -    },{\
+> > -        .driver   = "scsi-disk",\
+> > -        .property = "ver",\
+> > -        .value    = "0.10",\
+> > -    },
+> > -
+> > -static void pc_i440fx_0_10_machine_options(MachineClass *m)
+> > -{
+> > -    pc_i440fx_0_11_machine_options(m);
+> > -    m->hw_version = "0.10";
+> > -    SET_MACHINE_COMPAT(m, PC_COMPAT_0_10);
+> > -}
+> > -
+> > -DEFINE_I440FX_MACHINE(v0_10, "pc-0.10", pc_compat_0_13,
+> > -                      pc_i440fx_0_10_machine_options);
+> > -
+> >  typedef struct {
+> >      uint16_t gpu_device_id;
+> >      uint16_t pch_device_id;
+> > diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> > index 2912084..190250f 100644
+> > --- a/qemu-deprecated.texi
+> > +++ b/qemu-deprecated.texi
+> > @@ -124,7 +124,7 @@ their usecases.
+> >  
+> >  @section System emulator machines
+> >  
+> > -@subsection pc-0.10 and pc-0.11 (since 3.0)
+> > +@subsection pc-0.12, pc-0.13, pc-0.14 and pc-0.15 (since 4.0)
+> >  
+> >  These machine types are very old and likely can not be used for live migration
+> >  from old QEMU versions anymore. A newer machine type should be used instead.
+> > diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
+> > index f4a677d..668f001 100644
+> > --- a/tests/cpu-plug-test.c
+> > +++ b/tests/cpu-plug-test.c
+> > @@ -157,9 +157,7 @@ static void add_pc_test_case(const char *mname)
+> >          (strcmp(mname, "pc-0.15") == 0) ||
+> >          (strcmp(mname, "pc-0.14") == 0) ||
+> >          (strcmp(mname, "pc-0.13") == 0) ||
+> > -        (strcmp(mname, "pc-0.12") == 0) ||
+> > -        (strcmp(mname, "pc-0.11") == 0) ||
+> > -        (strcmp(mname, "pc-0.10") == 0)) {
+> > +        (strcmp(mname, "pc-0.12") == 0)) {
+> >          path = g_strdup_printf("cpu-plug/%s/init/%ux%ux%u&maxcpus=%u",
+> >                                 mname, data->sockets, data->cores,
+> >                                 data->threads, data->maxcpus);
+> > -- 
+> > 1.8.3.1
+> > 
+> 
+> -- 
+> Eduardo
