@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1gYvjm-0005BH-L9
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:27:23 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gYvoz-0001dO-US
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:32:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1gYvjk-0004cn-ET
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:27:22 -0500
-Date: Mon, 17 Dec 2018 17:27:01 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20181217162701.nzdqhccpnhypj2z7@kamzik.brq.redhat.com>
-References: <20181206170733.7469-1-eric.auger@redhat.com>
-	<20181206170733.7469-3-eric.auger@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181206170733.7469-3-eric.auger@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH-for-4.0 v2 2/2] hw/arm/virt-acpi-build:
- IORT Update for revision D
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gYvow-0000Hy-JZ
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:32:45 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33948)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1gYvow-0000FH-CE
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:32:42 -0500
+Received: by mail-wr1-x442.google.com with SMTP id j2so12972952wrw.1
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 08:32:42 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 17 Dec 2018 17:32:38 +0100
+Message-Id: <1545064358-4601-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] usb: move ehci_create_ich9_with_companions
+ to hw/i386
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,120 +26,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shannon.zhaosl@gmail.com, shameerali.kolothum.thodi@huawei.com
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com
 
-On Thu, Dec 06, 2018 at 06:07:33PM +0100, Eric Auger wrote:
-> Let's update the structs according to revision D of the IORT
-> specification and set the IORT node revision fields.
-> 
-> In IORT smmuv3 node: the new proximity field is not used as
-> the proximity domain valid flag is not set. The new DeviceId
-> mapping index is not used either as all the SMMU control
-> interrupts are GSIV based.
-> 
-> In IORT RC node: the new memory address size limit field is
-> set to 64 bits.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> 
-> v1 -> v2:
-> - separate patches for SMMUv3 DMA coherency issue and struct
->   update to revision D.
-> - revision fields set
-> ---
->  hw/arm/virt-acpi-build.c    |  4 ++++
->  include/hw/acpi/acpi-defs.h | 10 +++++++++-
->  2 files changed, 13 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index aa177ba64d..a34a0958a5 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -423,6 +423,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->       */
->      iort_node_offset = sizeof(*iort);
->      iort->node_offset = cpu_to_le32(iort_node_offset);
-> +    iort->revision = 0;
->  
->      /* ITS group node */
->      node_size =  sizeof(*its) + sizeof(uint32_t);
-> @@ -445,6 +446,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->  
->          smmu->type = ACPI_IORT_NODE_SMMU_V3;
->          smmu->length = cpu_to_le16(node_size);
-> +        smmu->revision = cpu_to_le32(2);
->          smmu->mapping_count = cpu_to_le32(1);
->          smmu->mapping_offset = cpu_to_le32(sizeof(*smmu));
->          smmu->base_address = cpu_to_le64(vms->memmap[VIRT_SMMU].base);
-> @@ -470,6 +472,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->  
->      rc->type = ACPI_IORT_NODE_PCI_ROOT_COMPLEX;
->      rc->length = cpu_to_le16(node_size);
-> +    rc->revision = cpu_to_le32(1);
->      rc->mapping_count = cpu_to_le32(1);
->      rc->mapping_offset = cpu_to_le32(sizeof(*rc));
->  
-> @@ -477,6 +480,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->      rc->memory_properties.cache_coherency = cpu_to_le32(1);
->      rc->memory_properties.memory_flags = 0x3; /* CCA = CPM = DCAS = 1 */
->      rc->pci_segment_number = 0; /* MCFG pci_segment */
-> +    rc->memory_address_limit = 64;
+This function is only needed when Q35 is in use.  Moving it to
+the same file that uses it lets you disable the entire USB
+subsystem in x86_64-softmmu.mak; of course doing that will
+cause -usb to break horribly, but one thing at a time.
 
-Hmmm... IIUC this provides the size of the IOVA space. When it's 64 the
-size of the space is U64_MAX, which gets added to the DMA base (also 64
-bits) when calculating things like the last PFN. It seems strange to use
-a value that will surely overflow those calculations. Is it common to
-put 64 here? Can you elaborate on this?
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/i386/pc_q35.c      | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/usb/hcd-ehci-pci.c | 53 ---------------------------------------------------
+ include/hw/usb.h      |  2 --
+ 3 files changed, 53 insertions(+), 55 deletions(-)
 
->  
->      /* Identity RID mapping covering the whole input RID range */
->      idmap = &rc->id_mapping_array[0];
-> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-> index 532eaf79bd..b4a5104367 100644
-> --- a/include/hw/acpi/acpi-defs.h
-> +++ b/include/hw/acpi/acpi-defs.h
-> @@ -628,7 +628,11 @@ struct AcpiIortItsGroup {
->  } QEMU_PACKED;
->  typedef struct AcpiIortItsGroup AcpiIortItsGroup;
->  
-> -#define ACPI_IORT_SMMU_V3_COHACC_OVERRIDE 1
-> +enum {
-> +    ACPI_IORT_SMMU_V3_COHACC_OVERRIDE = 1 << 0,
-> +    ACPI_IORT_SMMU_V3_HTTU_OVERRIDE   = 3 << 1,
-> +    ACPI_IORT_SMMU_V3_PXM_VALID       = 1 << 3
-> +};
-
-We don't usually add flag definitions until we need them. Indeed it'll
-just be more code to delete when switching to the aml_append* API.
-
->  
->  struct AcpiIortSmmu3 {
->      ACPI_IORT_NODE_HEADER_DEF
-> @@ -641,6 +645,8 @@ struct AcpiIortSmmu3 {
->      uint32_t pri_gsiv;
->      uint32_t gerr_gsiv;
->      uint32_t sync_gsiv;
-> +    uint32_t pxm;
-> +    uint32_t id_mapping_index;
->      AcpiIortIdMapping id_mapping_array[0];
->  } QEMU_PACKED;
->  typedef struct AcpiIortSmmu3 AcpiIortSmmu3;
-> @@ -650,6 +656,8 @@ struct AcpiIortRC {
->      AcpiIortMemoryAccess memory_properties;
->      uint32_t ats_attribute;
->      uint32_t pci_segment_number;
-> +    uint8_t memory_address_limit;
-> +    uint8_t reserved2[3];
->      AcpiIortIdMapping id_mapping_array[0];
->  } QEMU_PACKED;
->  typedef struct AcpiIortRC AcpiIortRC;
-> -- 
-> 2.17.2
-> 
->
-
-Thanks,
-drew
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 58459bd..6eaad21 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -58,6 +58,59 @@
+ /* ICH9 AHCI has 6 ports */
+ #define MAX_SATA_PORTS     6
+ 
++struct ehci_companions {
++    const char *name;
++    int func;
++    int port;
++};
++
++static const struct ehci_companions ich9_1d[] = {
++    { .name = "ich9-usb-uhci1", .func = 0, .port = 0 },
++    { .name = "ich9-usb-uhci2", .func = 1, .port = 2 },
++    { .name = "ich9-usb-uhci3", .func = 2, .port = 4 },
++};
++
++static const struct ehci_companions ich9_1a[] = {
++    { .name = "ich9-usb-uhci4", .func = 0, .port = 0 },
++    { .name = "ich9-usb-uhci5", .func = 1, .port = 2 },
++    { .name = "ich9-usb-uhci6", .func = 2, .port = 4 },
++};
++
++static int ehci_create_ich9_with_companions(PCIBus *bus, int slot)
++{
++    const struct ehci_companions *comp;
++    PCIDevice *ehci, *uhci;
++    BusState *usbbus;
++    const char *name;
++    int i;
++
++    switch (slot) {
++    case 0x1d:
++        name = "ich9-usb-ehci1";
++        comp = ich9_1d;
++        break;
++    case 0x1a:
++        name = "ich9-usb-ehci2";
++        comp = ich9_1a;
++        break;
++    default:
++        return -1;
++    }
++
++    ehci = pci_create_multifunction(bus, PCI_DEVFN(slot, 7), true, name);
++    qdev_init_nofail(&ehci->qdev);
++    usbbus = QLIST_FIRST(&ehci->qdev.child_bus);
++
++    for (i = 0; i < 3; i++) {
++        uhci = pci_create_multifunction(bus, PCI_DEVFN(slot, comp[i].func),
++                                        true, comp[i].name);
++        qdev_prop_set_string(&uhci->qdev, "masterbus", usbbus->name);
++        qdev_prop_set_uint32(&uhci->qdev, "firstport", comp[i].port);
++        qdev_init_nofail(&uhci->qdev);
++    }
++    return 0;
++}
++
+ /* PC hardware initialisation */
+ static void pc_q35_init(MachineState *machine)
+ {
+diff --git a/hw/usb/hcd-ehci-pci.c b/hw/usb/hcd-ehci-pci.c
+index 8c0fc53..69abbf7 100644
+--- a/hw/usb/hcd-ehci-pci.c
++++ b/hw/usb/hcd-ehci-pci.c
+@@ -230,56 +230,3 @@ static void ehci_pci_register_types(void)
+ }
+ 
+ type_init(ehci_pci_register_types)
+-
+-struct ehci_companions {
+-    const char *name;
+-    int func;
+-    int port;
+-};
+-
+-static const struct ehci_companions ich9_1d[] = {
+-    { .name = "ich9-usb-uhci1", .func = 0, .port = 0 },
+-    { .name = "ich9-usb-uhci2", .func = 1, .port = 2 },
+-    { .name = "ich9-usb-uhci3", .func = 2, .port = 4 },
+-};
+-
+-static const struct ehci_companions ich9_1a[] = {
+-    { .name = "ich9-usb-uhci4", .func = 0, .port = 0 },
+-    { .name = "ich9-usb-uhci5", .func = 1, .port = 2 },
+-    { .name = "ich9-usb-uhci6", .func = 2, .port = 4 },
+-};
+-
+-int ehci_create_ich9_with_companions(PCIBus *bus, int slot)
+-{
+-    const struct ehci_companions *comp;
+-    PCIDevice *ehci, *uhci;
+-    BusState *usbbus;
+-    const char *name;
+-    int i;
+-
+-    switch (slot) {
+-    case 0x1d:
+-        name = "ich9-usb-ehci1";
+-        comp = ich9_1d;
+-        break;
+-    case 0x1a:
+-        name = "ich9-usb-ehci2";
+-        comp = ich9_1a;
+-        break;
+-    default:
+-        return -1;
+-    }
+-
+-    ehci = pci_create_multifunction(bus, PCI_DEVFN(slot, 7), true, name);
+-    qdev_init_nofail(&ehci->qdev);
+-    usbbus = QLIST_FIRST(&ehci->qdev.child_bus);
+-
+-    for (i = 0; i < 3; i++) {
+-        uhci = pci_create_multifunction(bus, PCI_DEVFN(slot, comp[i].func),
+-                                        true, comp[i].name);
+-        qdev_prop_set_string(&uhci->qdev, "masterbus", usbbus->name);
+-        qdev_prop_set_uint32(&uhci->qdev, "firstport", comp[i].port);
+-        qdev_init_nofail(&uhci->qdev);
+-    }
+-    return 0;
+-}
+diff --git a/include/hw/usb.h b/include/hw/usb.h
+index f9431a0..c21f41c 100644
+--- a/include/hw/usb.h
++++ b/include/hw/usb.h
+@@ -593,8 +593,6 @@ const char *usb_device_get_product_desc(USBDevice *dev);
+ 
+ const USBDesc *usb_device_get_usb_desc(USBDevice *dev);
+ 
+-int ehci_create_ich9_with_companions(PCIBus *bus, int slot);
+-
+ /* quirks.c */
+ 
+ /* In bulk endpoints are streaming data sources (iow behave like isoc eps) */
+-- 
+1.8.3.1
