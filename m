@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=8828e3297=Paul.Durrant@citrix.com>)
-	id 1gYsLh-0008IP-Gd
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:50:18 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gYsOv-00014s-Um
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:53:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=8828e3297=Paul.Durrant@citrix.com>)
-	id 1gYsLe-00081Q-8V
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:50:17 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Mon, 17 Dec 2018 12:50:11 +0000
-Message-ID: <a3de4105b65041e188fae80a3dfad688@AMSPEX02CL02.citrite.net>
-References: <1545046848-14891-1-git-send-email-paul.durrant@citrix.com>
-	<1545046848-14891-10-git-send-email-paul.durrant@citrix.com>
-	<20181217122820.GA5866@perard.uk.xensource.com>
-In-Reply-To: <20181217122820.GA5866@perard.uk.xensource.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gYsOs-0005ne-0g
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:53:37 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:52769
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1gYsOr-0005lP-PO
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:53:33 -0500
+References: <20181213050453.9677-1-cota@braap.org>
+	<20181213050453.9677-27-cota@braap.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <f6c1ead8-5191-5ea8-cc89-1d025342ad50@ilande.co.uk>
+Date: Mon, 17 Dec 2018 12:53:20 +0000
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH v5 09/18] xen: remove
- unnecessary code from dataplane/xen-block.c
+In-Reply-To: <20181213050453.9677-27-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 26/73] sparc: convert to cpu_halted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,107 +30,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony Perard <anthony.perard@citrix.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Kevin Wolf <kwolf@redhat.com>, Stefano
-	Stabellini <sstabellini@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fabien Chouteau <chouteau@adacore.com>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-> -----Original Message-----
-> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
-> Sent: 17 December 2018 12:28
-> To: Paul Durrant <Paul.Durrant@citrix.com>
-> Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
-> devel@lists.xenproject.org; Kevin Wolf <kwolf@redhat.com>; Stefano
-> Stabellini <sstabellini@kernel.org>; Stefan Hajnoczi
-> <stefanha@redhat.com>; Max Reitz <mreitz@redhat.com>
-> Subject: Re: [Xen-devel] [PATCH v5 09/18] xen: remove unnecessary code
-> from dataplane/xen-block.c
->=20
-> On Mon, Dec 17, 2018 at 11:40:39AM +0000, Paul Durrant wrote:
-> > Not all of the code duplicated from xen_disk.c is required as the basis
-> for
-> > the new dataplane implementation so this patch removes extraneous code,
-> > along with the legacy #includes and calls to the legacy xen_pv_printf()
-> > function. Error messages are changed to be reported using
-> error_report().
-> >
-> > NOTE: The code is still not yet built. Further transformations will be
-> >       required to make it correctly interface to the new
-> XenBus/XenDevice
-> >       framework. They will be delivered in a subsequent patch.
-> >
-> > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-> > Acked-by: Anthony Perard <anthony.perard@citrix.com>
-> > ---
-> > Cc: Stefano Stabellini <sstabellini@kernel.org>
-> > Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> > Cc: Kevin Wolf <kwolf@redhat.com>
-> > Cc: Max Reitz <mreitz@redhat.com>
-> >
-> > v2:
-> >  - Leave existing boilerplate alone, other than removing the now-
-> incorrect
-> >    description
-> > ---
-> >  hw/block/dataplane/xen-block.c | 409 ++-------------------------------=
--
-> -------
-> >  1 file changed, 16 insertions(+), 393 deletions(-)
-> >
-> > diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-
-> block.c
-> > index 9fae505..98f987d 100644
-> > --- a/hw/block/dataplane/xen-block.c
-> > +++ b/hw/block/dataplane/xen-block.c
-> > @@ -1,6 +1,4 @@
-> >  /*
-> > - *  xen paravirt block device backend
-> > - *
-> >   *  (c) Gerd Hoffmann <kraxel@redhat.com>
-> >   *
-> >   *  This program is free software; you can redistribute it and/or
-> modify
-> > @@ -19,26 +17,12 @@
-> >   *  GNU GPL, version 2 or (at your option) any later version.
-> >   */
-> >
-> > -#include "qemu/osdep.h"
-> > -#include "qemu/units.h"
-> > -#include <sys/ioctl.h>
-> > -#include <sys/uio.h>
-> > -
-> > -#include "hw/hw.h"
-> > -#include "hw/xen/xen_backend.h"
-> > -#include "xen_blkif.h"
-> > -#include "sysemu/blockdev.h"
-> > -#include "sysemu/iothread.h"
-> > -#include "sysemu/block-backend.h"
-> > -#include "qapi/error.h"
-> > -#include "qapi/qmp/qdict.h"
-> > -#include "qapi/qmp/qstring.h"
-> > -#include "trace.h"
-> > -
-> > -/* ------------------------------------------------------------- */
-> > -
-> > -#define BLOCK_SIZE  512
-> > -#define IOCB_COUNT  (BLKIF_MAX_SEGMENTS_PER_REQUEST + 2)
-> > +/*
-> > + * Copyright (c) 2018  Citrix Systems Inc.
-> > + *
-> > + * This work is licensed under the terms of the GNU GPL, version 2 or
-> later.
-> > + * See the COPYING file in the top-level directory.
-> > + */
->=20
-> This patch obviously comes from v3 of the patch series. v4 was fine.
-> Please check comments on v1 v2 and v3.
+On 13/12/2018 05:04, Emilio G. Cota wrote:
 
-Damn it. Somehow my local 'qom29' repo had diverged from xenbits. I'll repl=
-ace that patch from there.
+> Cc: Fabien Chouteau <chouteau@adacore.com>
+> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  hw/sparc/leon3.c      | 2 +-
+>  hw/sparc/sun4m.c      | 8 ++++----
+>  hw/sparc64/sparc64.c  | 4 ++--
+>  target/sparc/helper.c | 2 +-
+>  4 files changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+> index fa98ab8177..0746001f91 100644
+> --- a/hw/sparc/leon3.c
+> +++ b/hw/sparc/leon3.c
+> @@ -61,7 +61,7 @@ static void main_cpu_reset(void *opaque)
+>  
+>      cpu_reset(cpu);
+>  
+> -    cpu->halted = 0;
+> +    cpu_halted_set(cpu, 0);
+>      env->pc     = s->entry;
+>      env->npc    = s->entry + 4;
+>      env->regbase[6] = s->sp;
+> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+> index 3c29b68e67..5bd6512b2b 100644
+> --- a/hw/sparc/sun4m.c
+> +++ b/hw/sparc/sun4m.c
+> @@ -168,7 +168,7 @@ static void cpu_kick_irq(SPARCCPU *cpu)
+>      CPUSPARCState *env = &cpu->env;
+>      CPUState *cs = CPU(cpu);
+>  
+> -    cs->halted = 0;
+> +    cpu_halted_set(cs, 0);
+>      cpu_check_irqs(env);
+>      qemu_cpu_kick(cs);
+>  }
+> @@ -199,7 +199,7 @@ static void main_cpu_reset(void *opaque)
+>      CPUState *cs = CPU(cpu);
+>  
+>      cpu_reset(cs);
+> -    cs->halted = 0;
+> +    cpu_halted_set(cs, 0);
+>  }
+>  
+>  static void secondary_cpu_reset(void *opaque)
+> @@ -208,7 +208,7 @@ static void secondary_cpu_reset(void *opaque)
+>      CPUState *cs = CPU(cpu);
+>  
+>      cpu_reset(cs);
+> -    cs->halted = 1;
+> +    cpu_halted_set(cs, 1);
+>  }
+>  
+>  static void cpu_halt_signal(void *opaque, int irq, int level)
+> @@ -825,7 +825,7 @@ static void cpu_devinit(const char *cpu_type, unsigned int id,
+>      } else {
+>          qemu_register_reset(secondary_cpu_reset, cpu);
+>          cs = CPU(cpu);
+> -        cs->halted = 1;
+> +        cpu_halted_set(cs, 1);
+>      }
+>      *cpu_irqs = qemu_allocate_irqs(cpu_set_irq, cpu, MAX_PILS);
+>      env->prom_addr = prom_addr;
+> diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
+> index 408388945e..372bbd4f5b 100644
+> --- a/hw/sparc64/sparc64.c
+> +++ b/hw/sparc64/sparc64.c
+> @@ -100,7 +100,7 @@ static void cpu_kick_irq(SPARCCPU *cpu)
+>      CPUState *cs = CPU(cpu);
+>      CPUSPARCState *env = &cpu->env;
+>  
+> -    cs->halted = 0;
+> +    cpu_halted_set(cs, 0);
+>      cpu_check_irqs(env);
+>      qemu_cpu_kick(cs);
+>  }
+> @@ -115,7 +115,7 @@ void sparc64_cpu_set_ivec_irq(void *opaque, int irq, int level)
+>          if (!(env->ivec_status & 0x20)) {
+>              trace_sparc64_cpu_ivec_raise_irq(irq);
+>              cs = CPU(cpu);
+> -            cs->halted = 0;
+> +            cpu_halted_set(cs, 0);
+>              env->interrupt_index = TT_IVEC;
+>              env->ivec_status |= 0x20;
+>              env->ivec_data[0] = (0x1f << 6) | irq;
+> diff --git a/target/sparc/helper.c b/target/sparc/helper.c
+> index 46232788c8..dd00cf7cac 100644
+> --- a/target/sparc/helper.c
+> +++ b/target/sparc/helper.c
+> @@ -245,7 +245,7 @@ void helper_power_down(CPUSPARCState *env)
+>  {
+>      CPUState *cs = CPU(sparc_env_get_cpu(env));
+>  
+> -    cs->halted = 1;
+> +    cpu_halted_set(cs, 1);
+>      cs->exception_index = EXCP_HLT;
+>      env->pc = env->npc;
+>      env->npc = env->pc + 4;
 
-  Paul
+Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
->=20
-> Thanks,
->=20
-> --
-> Anthony PERARD
+
+ATB,
+
+Mark.
