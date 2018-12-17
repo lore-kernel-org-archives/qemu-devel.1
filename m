@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gYz8h-0005P1-N1
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gYz8h-0005P0-Mz
 	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 15:05:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gYz8Q-0001Ul-3N
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gYz8R-0001Wn-Sf
 	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 15:05:09 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:42708 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:42730 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gYz8N-0001RM-Gg
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 15:05:01 -0500
+	id 1gYz8R-0001V3-BI
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 15:05:03 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 17 Dec 2018 21:04:39 +0100
-Message-Id: <20181217200444.14812-2-aleksandar.markovic@rt-rk.com>
+Date: Mon, 17 Dec 2018 21:04:43 +0100
+Message-Id: <20181217200444.14812-6-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <20181217200444.14812-1-aleksandar.markovic@rt-rk.com>
 References: <20181217200444.14812-1-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/6] target/mips: MXU: Add missing
- opcodes/decoding for LX* instructions
+Subject: [Qemu-devel] [PATCH 5/6] target/mips: MXU: Add handlers for max/min
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,347 +29,393 @@ To: qemu-devel@nongnu.org, jancraig@amazon.com, smarkovic@wavecomp.com, amarkovi
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add missing opcodes and decoding engine for LXB, LXH, LXW, LXBU,
-and LXHU instructions. They were for some reason forgotten in
-previous commits. The MXU opcode list and decoding engine should
-be now complete.
+Add translation handlers for max/min MXU instructions.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 140 +++++++++++++++++++++++++++++-----------
- 1 file changed, 102 insertions(+), 38 deletions(-)
+ target/mips/translate.c | 356 +++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 335 insertions(+), 21 deletions(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index e9c23a594b..e0c8d8c2f7 100644
+index c74a831a17..339de8c32b 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -1663,12 +1663,21 @@ enum {
-  *          =E2=94=82                               20..18
-  *          =E2=94=9C=E2=94=80 100111 =E2=94=80 OPC_MXU__POOL16 =E2=94=80=
-=E2=94=AC=E2=94=80 000 =E2=94=80 OPC_MXU_D32SARW
-  *          =E2=94=82                            =E2=94=9C=E2=94=80 001 =
-=E2=94=80 OPC_MXU_S32ALN
-- *          =E2=94=9C=E2=94=80 101000 =E2=94=80 OPC_MXU_LXB      =E2=94=9C=
-=E2=94=80 010 =E2=94=80 OPC_MXU_S32ALNI
-- *          =E2=94=9C=E2=94=80 101001 =E2=94=80 <not assigned>   =E2=94=9C=
-=E2=94=80 011 =E2=94=80 OPC_MXU_S32NOR
-- *          =E2=94=9C=E2=94=80 101010 =E2=94=80 OPC_MXU_S16LDD   =E2=94=9C=
-=E2=94=80 100 =E2=94=80 OPC_MXU_S32AND
-- *          =E2=94=9C=E2=94=80 101011 =E2=94=80 OPC_MXU_S16STD   =E2=94=9C=
-=E2=94=80 101 =E2=94=80 OPC_MXU_S32OR
-- *          =E2=94=9C=E2=94=80 101100 =E2=94=80 OPC_MXU_S16LDI   =E2=94=9C=
-=E2=94=80 110 =E2=94=80 OPC_MXU_S32XOR
-- *          =E2=94=9C=E2=94=80 101101 =E2=94=80 OPC_MXU_S16SDI   =E2=94=94=
-=E2=94=80 111 =E2=94=80 OPC_MXU_S32LUI
-+ *          =E2=94=82                            =E2=94=9C=E2=94=80 010 =
-=E2=94=80 OPC_MXU_S32ALNI
-+ *          =E2=94=82                            =E2=94=9C=E2=94=80 011 =
-=E2=94=80 OPC_MXU_S32NOR
-+ *          =E2=94=82                            =E2=94=9C=E2=94=80 100 =
-=E2=94=80 OPC_MXU_S32AND
-+ *          =E2=94=82                            =E2=94=9C=E2=94=80 101 =
-=E2=94=80 OPC_MXU_S32OR
-+ *          =E2=94=82                            =E2=94=9C=E2=94=80 110 =
-=E2=94=80 OPC_MXU_S32XOR
-+ *          =E2=94=82                            =E2=94=94=E2=94=80 111 =
-=E2=94=80 OPC_MXU_S32LUI
-+ *          =E2=94=82
-+ *          =E2=94=82                               7..5
-+ *          =E2=94=9C=E2=94=80 101000 =E2=94=80 OPC_MXU__POOL17 =E2=94=80=
-=E2=94=AC=E2=94=80 000 =E2=94=80 OPC_MXU_LXB
-+ *          =E2=94=82                            =E2=94=9C=E2=94=80 001 =
-=E2=94=80 OPC_MXU_LXH
-+ *          =E2=94=9C=E2=94=80 101001 =E2=94=80 <not assigned>   =E2=94=9C=
-=E2=94=80 011 =E2=94=80 OPC_MXU_LXW
-+ *          =E2=94=9C=E2=94=80 101010 =E2=94=80 OPC_MXU_S16LDD   =E2=94=9C=
-=E2=94=80 100 =E2=94=80 OPC_MXU_LXBU
-+ *          =E2=94=9C=E2=94=80 101011 =E2=94=80 OPC_MXU_S16STD   =E2=94=94=
-=E2=94=80 101 =E2=94=80 OPC_MXU_LXHU
-+ *          =E2=94=9C=E2=94=80 101100 =E2=94=80 OPC_MXU_S16LDI
-+ *          =E2=94=9C=E2=94=80 101101 =E2=94=80 OPC_MXU_S16SDI
-  *          =E2=94=9C=E2=94=80 101110 =E2=94=80 OPC_MXU_S32M2I
-  *          =E2=94=9C=E2=94=80 101111 =E2=94=80 OPC_MXU_S32I2M
-  *          =E2=94=9C=E2=94=80 110000 =E2=94=80 OPC_MXU_D32SLL
-@@ -1678,15 +1687,15 @@ enum {
-  *          =E2=94=9C=E2=94=80 110100 =E2=94=80 OPC_MXU_Q16SLL   =E2=94=9C=
-=E2=94=80 010 =E2=94=80 OPC_MXU_D32SARV
-  *          =E2=94=9C=E2=94=80 110101 =E2=94=80 OPC_MXU_Q16SLR   =E2=94=9C=
-=E2=94=80 011 =E2=94=80 OPC_MXU_Q16SLLV
-  *          =E2=94=82                            =E2=94=9C=E2=94=80 100 =
-=E2=94=80 OPC_MXU_Q16SLRV
-- *          =E2=94=9C=E2=94=80 110110 =E2=94=80 OPC_MXU__POOL17 =E2=94=80=
-=E2=94=B4=E2=94=80 101 =E2=94=80 OPC_MXU_Q16SARV
-+ *          =E2=94=9C=E2=94=80 110110 =E2=94=80 OPC_MXU__POOL18 =E2=94=80=
-=E2=94=B4=E2=94=80 101 =E2=94=80 OPC_MXU_Q16SARV
-  *          =E2=94=82
-  *          =E2=94=9C=E2=94=80 110111 =E2=94=80 OPC_MXU_Q16SAR
-  *          =E2=94=82                               23..22
-- *          =E2=94=9C=E2=94=80 111000 =E2=94=80 OPC_MXU__POOL18 =E2=94=80=
-=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_Q8MUL
-+ *          =E2=94=9C=E2=94=80 111000 =E2=94=80 OPC_MXU__POOL19 =E2=94=80=
-=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_Q8MUL
-  *          =E2=94=82                            =E2=94=94=E2=94=80 01 =E2=
-=94=80 OPC_MXU_Q8MULSU
-  *          =E2=94=82
-  *          =E2=94=82                               20..18
-- *          =E2=94=9C=E2=94=80 111001 =E2=94=80 OPC_MXU__POOL19 =E2=94=80=
-=E2=94=AC=E2=94=80 000 =E2=94=80 OPC_MXU_Q8MOVZ
-+ *          =E2=94=9C=E2=94=80 111001 =E2=94=80 OPC_MXU__POOL20 =E2=94=80=
-=E2=94=AC=E2=94=80 000 =E2=94=80 OPC_MXU_Q8MOVZ
-  *          =E2=94=82                            =E2=94=9C=E2=94=80 001 =
-=E2=94=80 OPC_MXU_Q8MOVN
-  *          =E2=94=82                            =E2=94=9C=E2=94=80 010 =
-=E2=94=80 OPC_MXU_D16MOVZ
-  *          =E2=94=82                            =E2=94=9C=E2=94=80 011 =
-=E2=94=80 OPC_MXU_D16MOVN
-@@ -1694,7 +1703,7 @@ enum {
-  *          =E2=94=82                            =E2=94=94=E2=94=80 101 =
-=E2=94=80 OPC_MXU_S32MOV
-  *          =E2=94=82
-  *          =E2=94=82                               23..22
-- *          =E2=94=9C=E2=94=80 111010 =E2=94=80 OPC_MXU__POOL20 =E2=94=80=
-=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_Q8MAC
-+ *          =E2=94=9C=E2=94=80 111010 =E2=94=80 OPC_MXU__POOL21 =E2=94=80=
-=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_Q8MAC
-  *          =E2=94=82                            =E2=94=94=E2=94=80 10 =E2=
-=94=80 OPC_MXU_Q8MACSU
-  *          =E2=94=9C=E2=94=80 111011 =E2=94=80 OPC_MXU_Q16SCOP
-  *          =E2=94=9C=E2=94=80 111100 =E2=94=80 OPC_MXU_Q8MADL
-@@ -1750,7 +1759,7 @@ enum {
-     OPC_MXU_S8SDI    =3D 0x25,
-     OPC_MXU__POOL15  =3D 0x26,
-     OPC_MXU__POOL16  =3D 0x27,
--    OPC_MXU_LXB      =3D 0x28,
-+    OPC_MXU__POOL17  =3D 0x28,
-     /* not assigned 0x29 */
-     OPC_MXU_S16LDD   =3D 0x2A,
-     OPC_MXU_S16STD   =3D 0x2B,
-@@ -1764,11 +1773,11 @@ enum {
-     OPC_MXU_D32SAR   =3D 0x33,
-     OPC_MXU_Q16SLL   =3D 0x34,
-     OPC_MXU_Q16SLR   =3D 0x35,
--    OPC_MXU__POOL17  =3D 0x36,
-+    OPC_MXU__POOL18  =3D 0x36,
-     OPC_MXU_Q16SAR   =3D 0x37,
--    OPC_MXU__POOL18  =3D 0x38,
--    OPC_MXU__POOL19  =3D 0x39,
--    OPC_MXU__POOL20  =3D 0x3A,
-+    OPC_MXU__POOL19  =3D 0x38,
-+    OPC_MXU__POOL20  =3D 0x39,
-+    OPC_MXU__POOL21  =3D 0x3A,
-     OPC_MXU_Q16SCOP  =3D 0x3B,
-     OPC_MXU_Q8MADL   =3D 0x3C,
-     OPC_MXU_S32SFL   =3D 0x3D,
-@@ -1940,6 +1949,17 @@ enum {
- /*
-  * MXU pool 17
-  */
-+enum {
-+    OPC_MXU_LXB      =3D 0x00,
-+    OPC_MXU_LXH      =3D 0x01,
-+    OPC_MXU_LXW      =3D 0x03,
-+    OPC_MXU_LXBU     =3D 0x04,
-+    OPC_MXU_LXHU     =3D 0x05,
-+};
+@@ -24815,6 +24815,338 @@ static void gen_mxu_S32XOR(DisasContext *ctx)
+ }
+ 
+ 
++/*
++ *                   MXU instruction category max/min
++ *                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++ *
++ *                     S32MAX     D16MAX     Q8MAX
++ *                     S32MIN     D16MIN     Q8MIN
++ */
 +
 +/*
-+ * MXU pool 18
-+ */
- enum {
-     OPC_MXU_D32SLLV  =3D 0x00,
-     OPC_MXU_D32SLRV  =3D 0x01,
-@@ -1950,7 +1970,7 @@ enum {
- };
-=20
- /*
-- * MXU pool 18
-+ * MXU pool 19
-  */
- enum {
-     OPC_MXU_Q8MUL    =3D 0x00,
-@@ -1958,7 +1978,7 @@ enum {
- };
-=20
- /*
-- * MXU pool 19
-+ * MXU pool 20
-  */
- enum {
-     OPC_MXU_Q8MOVZ   =3D 0x00,
-@@ -1970,7 +1990,7 @@ enum {
- };
-=20
- /*
-- * MXU pool 20
-+ * MXU pool 21
-  */
- enum {
-     OPC_MXU_Q8MAC    =3D 0x00,
-@@ -25331,12 +25351,58 @@ static void decode_opc_mxu__pool16(CPUMIPSState=
- *env, DisasContext *ctx)
-  * Decode MXU pool17
-  *
-  *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-+ *  +-----------+---------+---------+---+---------+-----+-----------+
-+ *  |  SPECIAL2 |    rs   |    rt   |0 0|    rd   |x x x|MXU__POOL15|
-+ *  +-----------+---------+---------+---+---------+-----+-----------+
++ *  S32MAX XRa, XRb, XRc
++ *    Update XRa with the maximum of signed 32-bit integers contained
++ *    in XRb and XRc.
 + *
-+ */
-+static void decode_opc_mxu__pool17(CPUMIPSState *env, DisasContext *ctx)
-+{
-+    uint32_t opcode =3D extract32(ctx->opcode, 6, 2);
-+
-+    switch (opcode) {
-+    case OPC_MXU_LXW:
-+        /* TODO: Implement emulation of LXW instruction. */
-+        MIPS_INVAL("OPC_MXU_LXW");
-+        generate_exception_end(ctx, EXCP_RI);
-+        break;
-+    case OPC_MXU_LXH:
-+        /* TODO: Implement emulation of LXH instruction. */
-+        MIPS_INVAL("OPC_MXU_LXH");
-+        generate_exception_end(ctx, EXCP_RI);
-+        break;
-+    case OPC_MXU_LXHU:
-+        /* TODO: Implement emulation of LXHU instruction. */
-+        MIPS_INVAL("OPC_MXU_LXHU");
-+        generate_exception_end(ctx, EXCP_RI);
-+        break;
-+    case OPC_MXU_LXB:
-+        /* TODO: Implement emulation of LXB instruction. */
-+        MIPS_INVAL("OPC_MXU_LXB");
-+        generate_exception_end(ctx, EXCP_RI);
-+        break;
-+    case OPC_MXU_LXBU:
-+        /* TODO: Implement emulation of LXBU instruction. */
-+        MIPS_INVAL("OPC_MXU_LXBU");
-+        generate_exception_end(ctx, EXCP_RI);
-+        break;
-+    default:
-+        MIPS_INVAL("decode_opc_mxu");
-+        generate_exception_end(ctx, EXCP_RI);
-+        break;
-+    }
-+}
-+/*
-+ *
-+ * Decode MXU pool18
++ *  S32MIN XRa, XRb, XRc
++ *    Update XRa with the minimum of signed 32-bit integers contained
++ *    in XRb and XRc.
 + *
 + *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-  *  +-----------+---------+-----+-------+-------+-------+-----------+
-- *  |  SPECIAL2 |    rb   |x x x|  XRd  |  XRa  |0 0 0 0|MXU__POOL17|
-+ *  |  SPECIAL2 |    rb   |x x x|  XRd  |  XRa  |0 0 0 0|MXU__POOL18|
-  *  +-----------+---------+-----+-------+-------+-------+-----------+
-  *
-  */
--static void decode_opc_mxu__pool17(CPUMIPSState *env, DisasContext *ctx)
-+static void decode_opc_mxu__pool18(CPUMIPSState *env, DisasContext *ctx)
- {
-     uint32_t opcode =3D extract32(ctx->opcode, 18, 3);
-=20
-@@ -25380,15 +25446,15 @@ static void decode_opc_mxu__pool17(CPUMIPSState=
- *env, DisasContext *ctx)
-=20
++ *  +-----------+---------+-----+-------+-------+-------+-----------+
++ *  |  SPECIAL2 |0 0 0 0 0| opc |  XRc  |  XRb  |  XRa  |MXU__POOL00|
++ *  +-----------+---------+-----+-------+-------+-------+-----------+
++ */
++static void gen_mxu_S32MAX_S32MIN(DisasContext *ctx)
++{
++    uint32_t pad, opc, XRc, XRb, XRa;
++
++    pad = extract32(ctx->opcode, 21, 5);
++    opc = extract32(ctx->opcode, 18, 3);
++    XRc = extract32(ctx->opcode, 14, 4);
++    XRb = extract32(ctx->opcode, 10, 4);
++    XRa = extract32(ctx->opcode,  6, 4);
++
++    if (unlikely(pad != 0)) {
++        /* opcode padding incorrect -> do nothing */
++    } else if (unlikely(XRa == 0)) {
++        /* destination is zero register -> do nothing */
++    } else if (unlikely((XRb == 0) && (XRc == 0))) {
++        /* both operands zero registers -> just set destination to zero */
++        tcg_gen_movi_i32(mxu_gpr[XRa - 1], 0);
++    } else if (unlikely((XRb == 0) || (XRc == 0))) {
++        /* exactly one operand is zero register - find which one is not...*/
++        uint32_t XRx = XRb ? XRb : XRc;
++        /* ...and do max/min operation with one operand 0 */
++        if (opc == OPC_MXU_S32MAX) {
++            tcg_gen_smax_i32(mxu_gpr[XRa - 1], mxu_gpr[XRx - 1], 0);
++        } else {
++            tcg_gen_smin_i32(mxu_gpr[XRa - 1], mxu_gpr[XRx - 1], 0);
++        }
++    } else if (unlikely(XRb == XRc)) {
++        /* both operands same -> just set destination to one of them */
++        tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1]);
++    } else {
++        /* the most general case */
++        if (opc == OPC_MXU_S32MAX) {
++            tcg_gen_smax_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1],
++                                               mxu_gpr[XRc - 1]);
++        } else {
++            tcg_gen_smin_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1],
++                                               mxu_gpr[XRc - 1]);
++        }
++    }
++}
++
++/*
++ *  D16MAX
++ *    Update XRa with the 16-bit-wise maximums of signed integers
++ *    contained in XRb and XRc.
++ *
++ *  D16MIN
++ *    Update XRa with the 16-bit-wise minimums of signed integers
++ *    contained in XRb and XRc.
++ *
++ *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
++ *  +-----------+---------+-----+-------+-------+-------+-----------+
++ *  |  SPECIAL2 |0 0 0 0 0| opc |  XRc  |  XRb  |  XRa  |MXU__POOL00|
++ *  +-----------+---------+-----+-------+-------+-------+-----------+
++ */
++static void gen_mxu_D16MAX_D16MIN(DisasContext *ctx)
++{
++    uint32_t pad, opc, XRc, XRb, XRa;
++
++    pad = extract32(ctx->opcode, 21, 5);
++    opc = extract32(ctx->opcode, 18, 3);
++    XRc = extract32(ctx->opcode, 14, 4);
++    XRb = extract32(ctx->opcode, 10, 4);
++    XRa = extract32(ctx->opcode,  6, 4);
++
++    if (unlikely(pad != 0)) {
++        /* opcode padding incorrect -> do nothing */
++    } else if (unlikely(XRc == 0)) {
++        /* destination is zero register -> do nothing */
++    } else if (unlikely((XRb == 0) && (XRa == 0))) {
++        /* both operands zero registers -> just set destination to zero */
++        tcg_gen_movi_i32(mxu_gpr[XRc - 1], 0);
++    } else if (unlikely((XRb == 0) || (XRa == 0))) {
++        /* exactly one operand is zero register - find which one is not...*/
++        uint32_t XRx = XRb ? XRb : XRc;
++        /* ...and do half-word-wise max/min with one operand 0 */
++        TCGv_i32 t0 = tcg_temp_new();
++        TCGv_i32 t1 = tcg_const_i32(0);
++
++        /* the left half-word first */
++        tcg_gen_andi_i32(t0, mxu_gpr[XRx - 1], 0xFFFF0000);
++        if (opc == OPC_MXU_D16MAX) {
++            tcg_gen_smax_i32(mxu_gpr[XRa - 1], t0, t1);
++        } else {
++            tcg_gen_smin_i32(mxu_gpr[XRa - 1], t0, t1);
++        }
++
++        /* the right half-word */
++        tcg_gen_andi_i32(t0, mxu_gpr[XRx - 1], 0x0000FFFF);
++        /* move half-words to the leftmost position */
++        tcg_gen_shli_i32(t0, t0, 16);
++        /* t0 will be max/min of t0 and t1 */
++        if (opc == OPC_MXU_D16MAX) {
++            tcg_gen_smax_i32(t0, t0, t1);
++        } else {
++            tcg_gen_smin_i32(t0, t0, t1);
++        }
++        /* return resulting half-words to its original position */
++        tcg_gen_shri_i32(t0, t0, 16);
++        /* finaly update the destination */
++        tcg_gen_or_i32(mxu_gpr[XRa - 1], mxu_gpr[XRa - 1], t0);
++
++        tcg_temp_free(t1);
++        tcg_temp_free(t0);
++    } else if (unlikely(XRb == XRc)) {
++        /* both operands same -> just set destination to one of them */
++        tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1]);
++    } else {
++        /* the most general case */
++        TCGv_i32 t0 = tcg_temp_new();
++        TCGv_i32 t1 = tcg_temp_new();
++
++        /* the left half-word first */
++        tcg_gen_andi_i32(t0, mxu_gpr[XRb - 1], 0xFFFF0000);
++        tcg_gen_andi_i32(t1, mxu_gpr[XRc - 1], 0xFFFF0000);
++        if (opc == OPC_MXU_D16MAX) {
++            tcg_gen_smax_i32(mxu_gpr[XRa - 1], t0, t1);
++        } else {
++            tcg_gen_smin_i32(mxu_gpr[XRa - 1], t0, t1);
++        }
++
++        /* the right half-word */
++        tcg_gen_andi_i32(t0, mxu_gpr[XRb - 1], 0x0000FFFF);
++        tcg_gen_andi_i32(t1, mxu_gpr[XRc - 1], 0x0000FFFF);
++        /* move half-words to the leftmost position */
++        tcg_gen_shli_i32(t0, t0, 16);
++        tcg_gen_shli_i32(t1, t1, 16);
++        /* t0 will be max/min of t0 and t1 */
++        if (opc == OPC_MXU_D16MAX) {
++            tcg_gen_smax_i32(t0, t0, t1);
++        } else {
++            tcg_gen_smin_i32(t0, t0, t1);
++        }
++        /* return resulting half-words to its original position */
++        tcg_gen_shri_i32(t0, t0, 16);
++        /* finaly update the destination */
++        tcg_gen_or_i32(mxu_gpr[XRa - 1], mxu_gpr[XRa - 1], t0);
++
++        tcg_temp_free(t1);
++        tcg_temp_free(t0);
++    }
++}
++
++/*
++ *  Q8MAX
++ *    Update XRa with the 8-bit-wise maximums of signed integers
++ *    contained in XRb and XRc.
++ *
++ *  Q8MIN
++ *    Update XRa with the 8-bit-wise minimums of signed integers
++ *    contained in XRb and XRc.
++ *
++ *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
++ *  +-----------+---------+-----+-------+-------+-------+-----------+
++ *  |  SPECIAL2 |0 0 0 0 0| opc |  XRc  |  XRb  |  XRa  |MXU__POOL00|
++ *  +-----------+---------+-----+-------+-------+-------+-----------+
++ */
++static void gen_mxu_Q8MAX_Q8MIN(DisasContext *ctx)
++{
++    uint32_t pad, opc, XRc, XRb, XRa;
++
++    pad = extract32(ctx->opcode, 21, 5);
++    opc = extract32(ctx->opcode, 18, 3);
++    XRc = extract32(ctx->opcode, 14, 4);
++    XRb = extract32(ctx->opcode, 10, 4);
++    XRa = extract32(ctx->opcode,  6, 4);
++
++    if (unlikely(pad != 0)) {
++        /* opcode padding incorrect -> do nothing */
++    } else if (unlikely(XRa == 0)) {
++        /* destination is zero register -> do nothing */
++    } else if (unlikely((XRb == 0) && (XRc == 0))) {
++        /* both operands zero registers -> just set destination to zero */
++        tcg_gen_movi_i32(mxu_gpr[XRa - 1], 0);
++    } else if (unlikely((XRb == 0) || (XRc == 0))) {
++        /* exactly one operand is zero register - make it be the first...*/
++        uint32_t XRx = XRb ? XRb : XRc;
++        /* ...and do byte-wise max/min with one operand 0 */
++        TCGv_i32 t0 = tcg_temp_new();
++        TCGv_i32 t1 = tcg_const_i32(0);
++
++        /* the leftmost byte (byte 3) first */
++        tcg_gen_andi_i32(t0, mxu_gpr[XRx - 1], 0xFF000000);
++        if (opc == OPC_MXU_Q8MAX) {
++            tcg_gen_smax_i32(mxu_gpr[XRa - 1], t0, t1);
++        } else {
++            tcg_gen_smin_i32(mxu_gpr[XRa - 1], t0, t1);
++        }
++
++        /* byte 2 */
++        tcg_gen_andi_i32(t0, mxu_gpr[XRx - 1], 0x00FF0000);
++        /* move half-words to the leftmost position */
++        tcg_gen_shli_i32(t0, t0, 8);
++        /* t0 will be max/min of t0 and t1 */
++        if (opc == OPC_MXU_Q8MAX) {
++            tcg_gen_smax_i32(t0, t0, t1);
++        } else {
++            tcg_gen_smin_i32(t0, t0, t1);
++        }
++        /* return resulting byte to its original position */
++        tcg_gen_shri_i32(t0, t0, 8);
++        /* finaly update the destination */
++        tcg_gen_or_i32(mxu_gpr[XRa - 1], mxu_gpr[XRa - 1], t0);
++
++        /* byte 1 */
++        tcg_gen_andi_i32(t0, mxu_gpr[XRx - 1], 0x0000FF00);
++        /* move half-words to the leftmost position */
++        tcg_gen_shli_i32(t0, t0, 16);
++        /* t0 will be max/min of t0 and t1 */
++        if (opc == OPC_MXU_Q8MAX) {
++            tcg_gen_smax_i32(t0, t0, t1);
++        } else {
++            tcg_gen_smin_i32(t0, t0, t1);
++        }
++        /* return resulting byte to its original position */
++        tcg_gen_shri_i32(t0, t0, 24);
++        /* finaly update the destination */
++        tcg_gen_or_i32(mxu_gpr[XRa - 1], mxu_gpr[XRa - 1], t0);
++
++        /* byte 0 */
++        tcg_gen_andi_i32(t0, mxu_gpr[XRx - 1], 0x000000FF);
++        /* move half-words to the leftmost position */
++        tcg_gen_shli_i32(t0, t0, 24);
++        /* t0 will be max/min of t0 and t1 */
++        if (opc == OPC_MXU_Q8MAX) {
++            tcg_gen_smax_i32(t0, t0, t1);
++        } else {
++            tcg_gen_smin_i32(t0, t0, t1);
++        }
++        /* return resulting byte to its original position */
++        tcg_gen_shri_i32(t0, t0, 8);
++        /* finaly update the destination */
++        tcg_gen_or_i32(mxu_gpr[XRa - 1], mxu_gpr[XRa - 1], t0);
++
++        tcg_temp_free(t1);
++        tcg_temp_free(t0);
++    } else if (unlikely(XRb == XRc)) {
++        /* both operands same -> just set destination to one of them */
++        tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1]);
++    } else {
++        /* the most general case */
++        TCGv_i32 t0 = tcg_temp_new();
++        TCGv_i32 t1 = tcg_temp_new();
++
++        /* the leftmost byte (byte 3) first */
++        tcg_gen_andi_i32(t0, mxu_gpr[XRb - 1], 0xFF000000);
++        tcg_gen_andi_i32(t1, mxu_gpr[XRc - 1], 0xFF000000);
++        if (opc == OPC_MXU_Q8MAX) {
++            tcg_gen_smax_i32(mxu_gpr[XRa - 1], t0, t1);
++        } else {
++            tcg_gen_smin_i32(mxu_gpr[XRa - 1], t0, t1);
++        }
++
++        /* byte 2 */
++        tcg_gen_andi_i32(t0, mxu_gpr[XRb - 1], 0x00FF0000);
++        tcg_gen_andi_i32(t1, mxu_gpr[XRc - 1], 0x00FF0000);
++        /* move half-words to the leftmost position */
++        tcg_gen_shli_i32(t0, t0, 8);
++        tcg_gen_shli_i32(t1, t1, 8);
++        /* t0 will be max/min of t0 and t1 */
++        if (opc == OPC_MXU_Q8MAX) {
++            tcg_gen_smax_i32(t0, t0, t1);
++        } else {
++            tcg_gen_smin_i32(t0, t0, t1);
++        }
++        /* return resulting byte to its original position */
++        tcg_gen_shri_i32(t0, t0, 8);
++        /* finaly update the destination */
++        tcg_gen_or_i32(mxu_gpr[XRa - 1], mxu_gpr[XRa - 1], t0);
++
++        /* byte 1 */
++        tcg_gen_andi_i32(t0, mxu_gpr[XRb - 1], 0x0000FF00);
++        tcg_gen_andi_i32(t1, mxu_gpr[XRc - 1], 0x0000FF00);
++        /* move half-words to the leftmost position */
++        tcg_gen_shli_i32(t0, t0, 16);
++        tcg_gen_shli_i32(t1, t1, 16);
++        /* t0 will be max/min of t0 and t1 */
++        if (opc == OPC_MXU_Q8MAX) {
++            tcg_gen_smax_i32(t0, t0, t1);
++        } else {
++            tcg_gen_smin_i32(t0, t0, t1);
++        }
++        /* return resulting byte to its original position */
++        tcg_gen_shri_i32(t0, t0, 24);
++        /* finaly update the destination */
++        tcg_gen_or_i32(mxu_gpr[XRa - 1], mxu_gpr[XRa - 1], t0);
++
++        /* byte 0 */
++        tcg_gen_andi_i32(t0, mxu_gpr[XRb - 1], 0x000000FF);
++        tcg_gen_andi_i32(t1, mxu_gpr[XRc - 1], 0x000000FF);
++        /* move half-words to the leftmost position */
++        tcg_gen_shli_i32(t0, t0, 24);
++        tcg_gen_shli_i32(t1, t1, 24);
++        /* t0 will be max/min of t0 and t1 */
++        if (opc == OPC_MXU_Q8MAX) {
++            tcg_gen_smax_i32(t0, t0, t1);
++        } else {
++            tcg_gen_smin_i32(t0, t0, t1);
++        }
++        /* return resulting byte to its original position */
++        tcg_gen_shri_i32(t0, t0, 8);
++        /* finaly update the destination */
++        tcg_gen_or_i32(mxu_gpr[XRa - 1], mxu_gpr[XRa - 1], t0);
++
++        tcg_temp_free(t1);
++        tcg_temp_free(t0);
++    }
++}
++
++
  /*
-  *
-- * Decode MXU pool18
-+ * Decode MXU pool19
-  *
-  *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-  *  +-----------+---+---+-------+-------+-------+-------+-----------+
-- *  |  SPECIAL2 |0 0|x x|  XRd  |  XRc  |  XRb  |  XRa  |MXU__POOL18|
-+ *  |  SPECIAL2 |0 0|x x|  XRd  |  XRc  |  XRb  |  XRa  |MXU__POOL19|
-  *  +-----------+---+---+-------+-------+-------+-------+-----------+
-  *
-  */
--static void decode_opc_mxu__pool18(CPUMIPSState *env, DisasContext *ctx)
-+static void decode_opc_mxu__pool19(CPUMIPSState *env, DisasContext *ctx)
- {
-     uint32_t opcode =3D extract32(ctx->opcode, 22, 2);
-=20
-@@ -25406,15 +25472,15 @@ static void decode_opc_mxu__pool18(CPUMIPSState=
- *env, DisasContext *ctx)
-=20
- /*
-  *
-- * Decode MXU pool19
-+ * Decode MXU pool20
-  *
-  *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-  *  +-----------+---------+-----+-------+-------+-------+-----------+
-- *  |  SPECIAL2 |0 0 0 0 0|x x x|  XRc  |  XRb  |  XRa  |MXU__POOL19|
-+ *  |  SPECIAL2 |0 0 0 0 0|x x x|  XRc  |  XRb  |  XRa  |MXU__POOL20|
-  *  +-----------+---------+-----+-------+-------+-------+-----------+
-  *
-  */
--static void decode_opc_mxu__pool19(CPUMIPSState *env, DisasContext *ctx)
-+static void decode_opc_mxu__pool20(CPUMIPSState *env, DisasContext *ctx)
- {
-     uint32_t opcode =3D extract32(ctx->opcode, 18, 3);
-=20
-@@ -25458,15 +25524,15 @@ static void decode_opc_mxu__pool19(CPUMIPSState=
- *env, DisasContext *ctx)
-=20
- /*
-  *
-- * Decode MXU pool20
-+ * Decode MXU pool21
-  *
-  *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-  *  +-----------+---+---+-------+-------+-------+-------+-----------+
-- *  |  SPECIAL2 |an2|x x|  XRd  |  XRc  |  XRb  |  XRa  |MXU__POOL20|
-+ *  |  SPECIAL2 |an2|x x|  XRd  |  XRc  |  XRb  |  XRa  |MXU__POOL21|
-  *  +-----------+---+---+-------+-------+-------+-------+-----------+
-  *
-  */
--static void decode_opc_mxu__pool20(CPUMIPSState *env, DisasContext *ctx)
-+static void decode_opc_mxu__pool21(CPUMIPSState *env, DisasContext *ctx)
- {
-     uint32_t opcode =3D extract32(ctx->opcode, 22, 2);
-=20
-@@ -25669,10 +25735,8 @@ static void decode_opc_mxu(CPUMIPSState *env, Di=
-sasContext *ctx)
-         case OPC_MXU__POOL16:
-             decode_opc_mxu__pool16(env, ctx);
-             break;
--        case OPC_MXU_LXB:
--            /* TODO: Implement emulation of LXB instruction. */
--            MIPS_INVAL("OPC_MXU_LXB");
--            generate_exception_end(ctx, EXCP_RI);
-+        case OPC_MXU__POOL17:
-+            decode_opc_mxu__pool17(env, ctx);
-             break;
-         case OPC_MXU_S16LDD:
-             /* TODO: Implement emulation of S16LDD instruction. */
-@@ -25724,23 +25788,23 @@ static void decode_opc_mxu(CPUMIPSState *env, D=
-isasContext *ctx)
-             MIPS_INVAL("OPC_MXU_Q16SLR");
-             generate_exception_end(ctx, EXCP_RI);
-             break;
--        case OPC_MXU__POOL17:
--            decode_opc_mxu__pool17(env, ctx);
-+        case OPC_MXU__POOL18:
-+            decode_opc_mxu__pool18(env, ctx);
-             break;
-         case OPC_MXU_Q16SAR:
-             /* TODO: Implement emulation of Q16SAR instruction. */
-             MIPS_INVAL("OPC_MXU_Q16SAR");
-             generate_exception_end(ctx, EXCP_RI);
-             break;
--        case OPC_MXU__POOL18:
--            decode_opc_mxu__pool18(env, ctx);
--            break;
-         case OPC_MXU__POOL19:
-             decode_opc_mxu__pool19(env, ctx);
-             break;
-         case OPC_MXU__POOL20:
-             decode_opc_mxu__pool20(env, ctx);
-             break;
-+        case OPC_MXU__POOL21:
-+            decode_opc_mxu__pool21(env, ctx);
-+            break;
-         case OPC_MXU_Q16SCOP:
-             /* TODO: Implement emulation of Q16SCOP instruction. */
-             MIPS_INVAL("OPC_MXU_Q16SCOP");
---=20
+  * Decoding engine for MXU
+  * =======================
+@@ -24836,34 +25168,16 @@ static void decode_opc_mxu__pool00(CPUMIPSState *env, DisasContext *ctx)
+ 
+     switch (opcode) {
+     case OPC_MXU_S32MAX:
+-        /* TODO: Implement emulation of S32MAX instruction. */
+-        MIPS_INVAL("OPC_MXU_S32MAX");
+-        generate_exception_end(ctx, EXCP_RI);
+-        break;
+     case OPC_MXU_S32MIN:
+-        /* TODO: Implement emulation of S32MIN instruction. */
+-        MIPS_INVAL("OPC_MXU_S32MIN");
+-        generate_exception_end(ctx, EXCP_RI);
++        gen_mxu_S32MAX_S32MIN(ctx);
+         break;
+     case OPC_MXU_D16MAX:
+-        /* TODO: Implement emulation of D16MAX instruction. */
+-        MIPS_INVAL("OPC_MXU_D16MAX");
+-        generate_exception_end(ctx, EXCP_RI);
+-        break;
+     case OPC_MXU_D16MIN:
+-        /* TODO: Implement emulation of D16MIN instruction. */
+-        MIPS_INVAL("OPC_MXU_D16MIN");
+-        generate_exception_end(ctx, EXCP_RI);
++        gen_mxu_D16MAX_D16MIN(ctx);
+         break;
+     case OPC_MXU_Q8MAX:
+-        /* TODO: Implement emulation of Q8MAX instruction. */
+-        MIPS_INVAL("OPC_MXU_Q8MAX");
+-        generate_exception_end(ctx, EXCP_RI);
+-        break;
+     case OPC_MXU_Q8MIN:
+-        /* TODO: Implement emulation of Q8MIN instruction. */
+-        MIPS_INVAL("OPC_MXU_Q8MIN");
+-        generate_exception_end(ctx, EXCP_RI);
++        gen_mxu_Q8MAX_Q8MIN(ctx);
+         break;
+     case OPC_MXU_Q8SLT:
+         /* TODO: Implement emulation of Q8SLT instruction. */
+-- 
 2.17.1
