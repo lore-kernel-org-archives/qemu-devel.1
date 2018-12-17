@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gYv8j-00027r-1G
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 10:49:06 -0500
+	(envelope-from <akrowiak@linux.ibm.com>) id 1gYvH7-0004l6-0Z
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 10:57:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gYv8e-0007QP-Km
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 10:49:04 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 17 Dec 2018 15:48:55 +0000
-Message-ID: <3832143d-136d-d282-e487-376f1f38ad44@virtuozzo.com>
-References: <20181214231512.5295-1-jsnow@redhat.com>
-	<20181214231512.5295-8-jsnow@redhat.com>
-In-Reply-To: <20181214231512.5295-8-jsnow@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8CE77BBEB84B17499872D31F7560DE75@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 7/7] iotests: add iotest 236 for testing
- bitmap merge
+	(envelope-from <akrowiak@linux.ibm.com>) id 1gYvH2-00070T-2j
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 10:57:44 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35638
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
+	id 1gYvH1-0006ze-TT
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 10:57:40 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wBHFrVPl129197
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 10:57:38 -0500
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2peee19h79-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 10:57:38 -0500
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
+	Mon, 17 Dec 2018 15:57:37 -0000
+From: Tony Krowiak <akrowiak@linux.ibm.com>
+Date: Mon, 17 Dec 2018 10:57:30 -0500
+Message-Id: <1545062250-7573-1-git-send-email-akrowiak@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v3] qdev/core: fix qbus_is_full()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,69 +36,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Markus Armbruster <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: pasic@linux.ibm.com, imammedo@redhat.com, pmorel@linux.ibm.com, Tony Krowiak <akrowiak@linux.ibm.com>
 
-MTUuMTIuMjAxOCAyOjE1LCBKb2huIFNub3cgd3JvdGU6DQo+IE5ldyBpbnRlcmZhY2UsIG5ldyBz
-bW9rZSB0ZXN0Lg0KPiAtLS0NCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvMjM2ICAgICB8IDEyNCAr
-KysrKysrKysrKysrKysrKysrKysrKw0KPiAgIHRlc3RzL3FlbXUtaW90ZXN0cy8yMzYub3V0IHwg
-MjAwICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4gICB0ZXN0cy9xZW11
-LWlvdGVzdHMvZ3JvdXAgICB8ICAgMSArDQo+ICAgMyBmaWxlcyBjaGFuZ2VkLCAzMjUgaW5zZXJ0
-aW9ucygrKQ0KPiAgIGNyZWF0ZSBtb2RlIDEwMDc1NSB0ZXN0cy9xZW11LWlvdGVzdHMvMjM2DQo+
-ICAgY3JlYXRlIG1vZGUgMTAwNjQ0IHRlc3RzL3FlbXUtaW90ZXN0cy8yMzYub3V0DQo+IA0KPiBk
-aWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzIzNiBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8y
-MzYNCj4gbmV3IGZpbGUgbW9kZSAxMDA3NTUNCj4gaW5kZXggMDAwMDAwMDAwMC4uZWRmMTZjNGFi
-MQ0KPiAtLS0gL2Rldi9udWxsDQo+ICsrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8yMzYNCj4gQEAg
-LTAsMCArMSwxMjQgQEANCj4gKyMhL3Vzci9iaW4vZW52IHB5dGhvbg0KPiArIw0KPiArIyBUZXN0
-IGJpdG1hcCBtZXJnZXMuDQo+ICsjDQo+ICsjIENvcHlyaWdodCAoYykgMjAxOCBKb2huIFNub3cg
-Zm9yIFJlZCBIYXQsIEluYy4NCj4gKyMNCj4gKyMgVGhpcyBwcm9ncmFtIGlzIGZyZWUgc29mdHdh
-cmU7IHlvdSBjYW4gcmVkaXN0cmlidXRlIGl0IGFuZC9vciBtb2RpZnkNCj4gKyMgaXQgdW5kZXIg
-dGhlIHRlcm1zIG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZSBhcyBwdWJsaXNoZWQg
-YnkNCj4gKyMgdGhlIEZyZWUgU29mdHdhcmUgRm91bmRhdGlvbjsgZWl0aGVyIHZlcnNpb24gMiBv
-ZiB0aGUgTGljZW5zZSwgb3INCj4gKyMgKGF0IHlvdXIgb3B0aW9uKSBhbnkgbGF0ZXIgdmVyc2lv
-bi4NCj4gKyMNCj4gKyMgVGhpcyBwcm9ncmFtIGlzIGRpc3RyaWJ1dGVkIGluIHRoZSBob3BlIHRo
-YXQgaXQgd2lsbCBiZSB1c2VmdWwsDQo+ICsjIGJ1dCBXSVRIT1VUIEFOWSBXQVJSQU5UWTsgd2l0
-aG91dCBldmVuIHRoZSBpbXBsaWVkIHdhcnJhbnR5IG9mDQo+ICsjIE1FUkNIQU5UQUJJTElUWSBv
-ciBGSVRORVNTIEZPUiBBIFBBUlRJQ1VMQVIgUFVSUE9TRS4gIFNlZSB0aGUNCj4gKyMgR05VIEdl
-bmVyYWwgUHVibGljIExpY2Vuc2UgZm9yIG1vcmUgZGV0YWlscy4NCj4gKyMNCj4gKyMgWW91IHNo
-b3VsZCBoYXZlIHJlY2VpdmVkIGEgY29weSBvZiB0aGUgR05VIEdlbmVyYWwgUHVibGljIExpY2Vu
-c2UNCj4gKyMgYWxvbmcgd2l0aCB0aGlzIHByb2dyYW0uICBJZiBub3QsIHNlZSA8aHR0cDovL3d3
-dy5nbnUub3JnL2xpY2Vuc2VzLz4uDQo+ICsjDQo+ICsjIG93bmVyPWpzbm93QHJlZGhhdC5jb20N
-Cj4gKw0KPiAraW1wb3J0IGpzb24NCj4gK2ltcG9ydCBpb3Rlc3RzDQo+ICtmcm9tIGlvdGVzdHMg
-aW1wb3J0IGxvZw0KPiArDQo+ICtpb3Rlc3RzLnZlcmlmeV9pbWFnZV9mb3JtYXQoc3VwcG9ydGVk
-X2ZtdHM9WydxY293MiddKQ0KPiArDQoNCndlIGhhcmRjb2RlIHBhdHRlcm5zLCBzbyBpdCdzIGJl
-dHRlciB0byBoYXJkY29kZSBzaXplIGhlcmUgdG9vOg0KDQpzaXplID0gNjQgKiAxMDI0ICogMTAy
-NA0KDQo+ICtwYXR0ZXJucyA9IFsoIjB4NWQiLCAiMCIsICAgICAgICAgIjY0ayIpLA0KPiArICAg
-ICAgICAgICAgKCIweGQ1IiwgIjFNIiwgICAgICAgICI2NGsiKSwNCj4gKyAgICAgICAgICAgICgi
-MHhkYyIsICIzMk0iLCAgICAgICAiNjRrIiksDQo+ICsgICAgICAgICAgICAoIjB4Y2QiLCAiMHgz
-ZmYwMDAwIiwgIjY0ayIpXSAgIyA2NE0gLSA2NEsNCj4gKw0KPiArb3ZlcndyaXRlID0gWygiMHhh
-YiIsICIwIiwgICAgICAgICAiNjRrIiksICMgRnVsbCBvdmVyd3JpdGUNCj4gKyAgICAgICAgICAg
-ICAoIjB4YWQiLCAiMHgwMGY4MDAwIiwgIjY0ayIpLCAjIFBhcnRpYWwtbGVmdCAoMU0tMzJLKQ0K
-PiArICAgICAgICAgICAgICgiMHgxZCIsICIweDIwMDgwMDAiLCAiNjRrIiksICMgUGFydGlhbC1y
-aWdodCAoMzJNKzMySykNCj4gKyAgICAgICAgICAgICAoIjB4ZWEiLCAiMHgzZmUwMDAwIiwgIjY0
-ayIpXSAjIEFkamFjZW50LWxlZnQgKDY0TSAtIDEyOEspDQo+ICsNCj4gK2RlZiBxdWVyeV9iaXRt
-YXBzKHZtKToNCj4gKyAgICByZXMgPSB2bS5xbXAoInF1ZXJ5LWJsb2NrIikNCj4gKyAgICByZXR1
-cm4ge2RldmljZVsnZGV2aWNlJ106IGRldmljZVsnZGlydHktYml0bWFwcyddIGZvcg0KPiArICAg
-ICAgICAgICAgZGV2aWNlIGluIHJlc1sncmV0dXJuJ119DQo+ICsNCj4gK3dpdGggaW90ZXN0cy5G
-aWxlUGF0aCgnaW1nJykgYXMgaW1nX3BhdGgsIFwNCj4gKyAgICAgaW90ZXN0cy5WTSgpIGFzIHZt
-Og0KPiArDQo+ICsgICAgbG9nKCctLS0gUHJlcGFyaW5nIGltYWdlICYgVk0gLS0tXG4nKQ0KPiAr
-ICAgIGlvdGVzdHMucWVtdV9pbWdfcGlwZSgnY3JlYXRlJywgJy1mJywgaW90ZXN0cy5pbWdmbXQs
-IGltZ19wYXRoLCAnNjRNJykNCg0Kbm8gbmVlZHMgZm9yIHFlbXVfaW1nX3BpcGUsIGFzIHlvdSBk
-b24ndCB1c2UgaXRzIG91dHB1dCwgcWVtdV9pbWcoKSBpcyBlbm91Z2ggYW5kIHFlbXVfaW1nX2Ny
-ZWF0ZSgpIGlzIGJldHRlciwNCmFuZCB0aGUgYmVzdCBJIHRoaW5rIGlzIGp1c3Q6DQoNCnZtLmFk
-ZF9kcml2ZV9yYXcoJ2lkPWRyaXZlMCxkcml2ZXI9bnVsbC1jbyxzaXplPScgKyBzdHIoc2l6ZSkp
-DQoNCmFzIHFjb3cyIChhbmQgcmVhbCBkaXNrIGluIGdlbmVyYWwpIGlzIGFjdHVhbGx5IHVucmVs
-YXRlZCB0byB0aGUgdGVzdC4NCg0KDQo+ICsgICAgdm0uYWRkX2RyaXZlKGltZ19wYXRoKQ0KPiAr
-ICAgIHZtLmxhdW5jaCgpDQo+ICsNCj4gKyAgICBsb2coJy0tLSBBZGRpbmcgcHJlbGltaW5hcnkg
-Yml0bWFwcyBBICYgQiAtLS1cbicpDQo+ICsgICAgdm0ucW1wX2xvZygiYmxvY2stZGlydHktYml0
-bWFwLWFkZCIsIG5vZGU9ImRyaXZlMCIsIG5hbWU9ImJpdG1hcEEiKQ0KPiArICAgIHZtLnFtcF9s
-b2coImJsb2NrLWRpcnR5LWJpdG1hcC1hZGQiLCBub2RlPSJkcml2ZTAiLCBuYW1lPSJiaXRtYXBC
-IikNCj4gKw0KPiArICAgICMgRGlydGllcyA0IGNsdXN0ZXJzLiBjb3VudD0yNjIxNDQNCj4gKyAg
-ICBsb2coJycpDQo+ICsgICAgbG9nKCctLS0gRW11bGF0aW5nIHdyaXRlcyAtLS1cbicpDQo+ICsg
-ICAgZm9yIHAgaW4gcGF0dGVybnM6DQo+ICsgICAgICAgIGNtZCA9ICJ3cml0ZSAtUCVzICVzICVz
-IiAlIHANCj4gKyAgICAgICAgbG9nKGNtZCkNCj4gKyAgICAgICAgbG9nKHZtLmhtcF9xZW11X2lv
-KCJkcml2ZTAiLCBjbWQpKQ0KPiArDQo+ICsgICAgbG9nKGpzb24uZHVtcHMocXVlcnlfYml0bWFw
-cyh2bSksIGluZGVudD0yLCBzZXBhcmF0b3JzPSgnLCcsICc6ICcpKSkNCg0KbG9nIGNhbiBkbyBq
-c29uLmR1bXBzLCBzbyBpdCdzIHN0cmFuZ2UgdG8gZG8gaXQgaGVyZSwgYW5kIEkgZG9uJ3QgbGlr
-ZSAnLCcgc2VwYXJhdG9yLCBhcyBJIGRlc2NyaWJlZA0KDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMs
-DQpWbGFkaW1pcg0K
+The qbus_is_full(BusState *bus) function (qdev_monitor.c) compares the max_index
+value of the BusState structure with the max_dev value of the BusClass structure
+to determine whether the maximum number of children has been reached for the
+bus. The problem is, the max_index field of the BusState structure does not
+necessarily reflect the number of devices that have been plugged into
+the bus.
+
+Whenever a child device is plugged into the bus, the bus's max_index value is
+assigned to the child device and then incremented. If the child is subsequently
+unplugged, the value of the max_index does not change and no longer reflects the
+number of children.
+
+When the bus's max_index value reaches the maximum number of devices
+allowed for the bus (i.e., the max_dev field in the BusClass structure),
+attempts to plug another device will be rejected claiming that the bus is
+full -- even if the bus is actually empty.
+
+To resolve the problem, a new 'num_children' field is being added to the
+BusState structure to keep track of the number of children plugged into the
+bus. It will be incremented when a child is plugged, and decremented when a
+child is unplugged.
+
+Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
+Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+---
+ hw/core/qdev.c         | 3 +++
+ include/hw/qdev-core.h | 1 +
+ qdev-monitor.c         | 2 +-
+ 3 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 6b3cc55b27c2..956923f33520 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -59,6 +59,8 @@ static void bus_remove_child(BusState *bus, DeviceState *child)
+             snprintf(name, sizeof(name), "child[%d]", kid->index);
+             QTAILQ_REMOVE(&bus->children, kid, sibling);
+ 
++            bus->num_children--;
++
+             /* This gives back ownership of kid->child back to us.  */
+             object_property_del(OBJECT(bus), name, NULL);
+             object_unref(OBJECT(kid->child));
+@@ -73,6 +75,7 @@ static void bus_add_child(BusState *bus, DeviceState *child)
+     char name[32];
+     BusChild *kid = g_malloc0(sizeof(*kid));
+ 
++    bus->num_children++;
+     kid->index = bus->max_index++;
+     kid->child = child;
+     object_ref(OBJECT(kid->child));
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index a24d0dd566e3..521f0a947ead 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -206,6 +206,7 @@ struct BusState {
+     HotplugHandler *hotplug_handler;
+     int max_index;
+     bool realized;
++    int num_children;
+     QTAILQ_HEAD(ChildrenHead, BusChild) children;
+     QLIST_ENTRY(BusState) sibling;
+ };
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index 07147c63bf8b..45a8ba49644c 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -414,7 +414,7 @@ static DeviceState *qbus_find_dev(BusState *bus, char *elem)
+ static inline bool qbus_is_full(BusState *bus)
+ {
+     BusClass *bus_class = BUS_GET_CLASS(bus);
+-    return bus_class->max_dev && bus->max_index >= bus_class->max_dev;
++    return bus_class->max_dev && bus->num_children >= bus_class->max_dev;
+ }
+ 
+ /*
+-- 
+2.7.4
