@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gZ0tD-0007eg-1P
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 16:57:27 -0500
+	(envelope-from <clg@kaod.org>) id 1gZ1Th-0007Sa-Bp
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:35:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gZ0t8-0006fl-Vc
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 16:57:26 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:49283)
+	(envelope-from <clg@kaod.org>) id 1gZ1Tc-0007Lq-HK
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:35:09 -0500
+Received: from 3.mo178.mail-out.ovh.net ([46.105.44.197]:58035)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gZ0t5-0006Ya-I0
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 16:57:21 -0500
-Date: Mon, 17 Dec 2018 22:57:14 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20181217150028.GL30264@redhat.com>
-Message-ID: <alpine.BSF.2.21.9999.1812172255250.25213@zero.eik.bme.hu>
-References: <alpine.BSF.2.21.1803202324320.13789@zero.eik.bme.hu>
-	<20180321140654.7h3nkkdlztu6mtrq@sirius.home.kraxel.org>
-	<alpine.BSF.2.21.1803211803590.78606@zero.eik.bme.hu>
-	<alpine.BSF.2.21.9999.1812171549220.8888@zero.eik.bme.hu>
-	<20181217150028.GL30264@redhat.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gZ1TY-0007FU-KL
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:35:03 -0500
+Received: from player718.ha.ovh.net (unknown [10.109.159.157])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 123F8430E2
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 23:34:56 +0100 (CET)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Mon, 17 Dec 2018 23:34:38 +0100
+Message-Id: <20181217223445.28594-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Monitor and serial output window broken with SDL2
+Subject: [Qemu-devel] [PATCH v9 0/7] ppc: support for the XIVE interrupt
+ controller (POWER9)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +28,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-On Mon, 17 Dec 2018, Daniel P. Berrang=C3=A9 wrote:
-> On Mon, Dec 17, 2018 at 03:56:49PM +0100, BALATON Zoltan wrote:
->> On Wed, 21 Mar 2018, BALATON Zoltan wrote:
->>> On Wed, 21 Mar 2018, Gerd Hoffmann wrote:
->>>>> while the serial output seems to be behind the monitor output in th=
-e window
->>>>> opening with Ctrl+Alt+2 and flashes when I type in this window. (Th=
-is
->>>>> doesn't seem to happen with qemu-system-x86_64, maybe that's why
->>>>> it was not catched.)
->>>>
->>>> Doesn't reproduce too.  It's also not clear why x86_64 should behave
->>>> different that ppc.  There is no arch-specific code ui/, so there sh=
-ould
->>>> be no difference, exept for hardware like paralle ports which are no=
-t
->>>> supported by all machine types.
->>>>
->>>> Any chance you have tested an old ppc binary?
->>>
->>> Not likely because I did make distclean and a clean build before test=
-ing
->>> to avoid any possible mismatch. It still does not work for me though.
->>> While
->>
->> I still have this problem after updating everything on my machine, lat=
-est
->> QEMU and SDL 2.0.9 so it's not likely to be a bug in some external
->> component. If I just start qemu-system-ppc (compiled with --disable-gt=
-k) and
->> try to open monitor console with Ctrl-Alt-2 I see QEMU monitor but whe=
-n I
->> type in this window the serial output window contents flash in this wi=
-ndow.
->> At the same time the window that opens for Ctrl-Alt-3 which should hav=
-e the
->> serial output is empty. It looks like an index may be off somewhere or
->> window contents are not associated with the right window but I have no=
- idea
->> where to look for it. Can you reproduce it now and do you have any ide=
-a what
->> could cause this?
->
-> Could you share an example command line which can be used to reproduce
-> the problem.
+Hello,
 
-As I wrote above ust "qemu-system-ppc" without any options reproduces the=
+Here is the version 9 of the QEMU models adding support for the XIVE
+interrupt controller to the sPAPR machine, under TCG only.=20
+
+The 'dual' machine, supporting both interrupt modes, is nearly complete,
+only remains the question on the qirq array, which will be addressed
+in early 2019 with the support for KVM.
+
+Thanks,
+
+C.
+
+Changes in v9 (sPAPR only) :
+
+ - fixed compile breakage on windows
+ - reworked XIVE capability in ibm,arch-vec-5-platform-support=20
+ - fixed default CPU type on 3.1 machines
+ - updated MAINTAINERS file
 =20
-problem here.
+* GitHub trees
+=20
+QEMU sPAPR:
 
-Regards,
-BALATON Zoltan
+  https://github.com/legoater/qemu/commits/xive-v9-4.0
+ =20
+QEMU PowerNV:
+
+  https://github.com/legoater/qemu/commits/powernv-3.1
+
+Linux/KVM:
+
+  https://github.com/legoater/linux/commits/xive-4.20
+
+OPAL:
+
+  https://github.com/legoater/skiboot/commits/xive
+
+C=C3=A9dric Le Goater (7):
+  target/ppc: fix the PPC_BIT definitions
+  target/ppc: replace __builtin_ffssl() by the equivalent ctz routines
+  spapr/xive: fix compilation breakage on windows
+  spapr: add an extra OV5 field to the sPAPR IRQ backend
+  spapr: introduce an 'ic-mode' machine option
+  spapr: change default CPU type to POWER9
+  MAINTAINERS: PPC: add a XIVE section
+
+ include/hw/ppc/spapr.h     |  7 ++++
+ include/hw/ppc/spapr_irq.h |  1 +
+ target/ppc/cpu.h           | 21 +++++-----
+ hw/intc/spapr_xive.c       | 46 +++++++++++++---------
+ hw/ppc/spapr.c             | 80 ++++++++++++++++++++++++++++++++------
+ hw/ppc/spapr_cpu_core.c    |  3 +-
+ hw/ppc/spapr_irq.c         | 37 +++++++-----------
+ MAINTAINERS                |  8 ++++
+ 8 files changed, 138 insertions(+), 65 deletions(-)
+
+--=20
+2.17.2
