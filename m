@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gZ1Th-0007Sa-Bp
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:35:10 -0500
+	(envelope-from <clg@kaod.org>) id 1gZ1Tm-0007Uq-LI
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:35:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gZ1Tc-0007Lq-HK
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:35:09 -0500
-Received: from 3.mo178.mail-out.ovh.net ([46.105.44.197]:58035)
+	(envelope-from <clg@kaod.org>) id 1gZ1Ti-0007Py-0T
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:35:13 -0500
+Received: from 7.mo178.mail-out.ovh.net ([46.105.58.91]:45581)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gZ1TY-0007FU-KL
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:35:03 -0500
-Received: from player718.ha.ovh.net (unknown [10.109.159.157])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 123F8430E2
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 23:34:56 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gZ1Th-0007NM-Kx
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:35:09 -0500
+Received: from player718.ha.ovh.net (unknown [10.109.159.132])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 9D69F430E2
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 23:35:06 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Mon, 17 Dec 2018 23:34:38 +0100
-Message-Id: <20181217223445.28594-1-clg@kaod.org>
+Date: Mon, 17 Dec 2018 23:34:40 +0100
+Message-Id: <20181217223445.28594-3-clg@kaod.org>
+In-Reply-To: <20181217223445.28594-1-clg@kaod.org>
+References: <20181217223445.28594-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v9 0/7] ppc: support for the XIVE interrupt
- controller (POWER9)
+Subject: [Qemu-devel] [PATCH v9 2/7] target/ppc: replace __builtin_ffssl()
+ by the equivalent ctz routines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,62 +33,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Hello,
+And remove the intermediate MASK_TO_LSH macro which does not add any valu=
+e.
 
-Here is the version 9 of the QEMU models adding support for the XIVE
-interrupt controller to the sPAPR machine, under TCG only.=20
+This fixes a compile breakage on windows.
 
-The 'dual' machine, supporting both interrupt modes, is nearly complete,
-only remains the question on the qirq array, which will be addressed
-in early 2019 with the support for KVM.
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ target/ppc/cpu.h | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-Thanks,
-
-C.
-
-Changes in v9 (sPAPR only) :
-
- - fixed compile breakage on windows
- - reworked XIVE capability in ibm,arch-vec-5-platform-support=20
- - fixed default CPU type on 3.1 machines
- - updated MAINTAINERS file
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 527181c0f09f..f4ef4f214564 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -78,18 +78,21 @@
+                                  PPC_BIT32(bs))
+ #define PPC_BITMASK8(bs, be)    ((PPC_BIT8(bs) - PPC_BIT8(be)) | PPC_BIT=
+8(bs))
 =20
-* GitHub trees
++/*
++ * OPAL PPC bitmask field manipulation, used in XIVE, PHB3 and PHB4
++ */
+ #if HOST_LONG_BITS =3D=3D 32
+-# define MASK_TO_LSH(m)          (__builtin_ffsll(m) - 1)
++#  define GETFIELD(m, v)        (((v) & (m)) >> ctz32(m))
++#  define SETFIELD(m, v, val)                                   \
++    (((v) & ~(m)) | ((((typeof(v))(val)) << ctz32(m)) & (m)))
+ #elif HOST_LONG_BITS =3D=3D 64
+-# define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
++#  define GETFIELD(m, v)        (((v) & (m)) >> ctz64(m))
++#  define SETFIELD(m, v, val)                                   \
++    (((v) & ~(m)) | ((((typeof(v))(val)) << ctz64(m)) & (m)))
+ #else
+ # error Unknown sizeof long
+ #endif
 =20
-QEMU sPAPR:
-
-  https://github.com/legoater/qemu/commits/xive-v9-4.0
- =20
-QEMU PowerNV:
-
-  https://github.com/legoater/qemu/commits/powernv-3.1
-
-Linux/KVM:
-
-  https://github.com/legoater/linux/commits/xive-4.20
-
-OPAL:
-
-  https://github.com/legoater/skiboot/commits/xive
-
-C=C3=A9dric Le Goater (7):
-  target/ppc: fix the PPC_BIT definitions
-  target/ppc: replace __builtin_ffssl() by the equivalent ctz routines
-  spapr/xive: fix compilation breakage on windows
-  spapr: add an extra OV5 field to the sPAPR IRQ backend
-  spapr: introduce an 'ic-mode' machine option
-  spapr: change default CPU type to POWER9
-  MAINTAINERS: PPC: add a XIVE section
-
- include/hw/ppc/spapr.h     |  7 ++++
- include/hw/ppc/spapr_irq.h |  1 +
- target/ppc/cpu.h           | 21 +++++-----
- hw/intc/spapr_xive.c       | 46 +++++++++++++---------
- hw/ppc/spapr.c             | 80 ++++++++++++++++++++++++++++++++------
- hw/ppc/spapr_cpu_core.c    |  3 +-
- hw/ppc/spapr_irq.c         | 37 +++++++-----------
- MAINTAINERS                |  8 ++++
- 8 files changed, 138 insertions(+), 65 deletions(-)
-
+-#define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
+-#define SETFIELD(m, v, val)                             \
+-        (((v) & ~(m)) | ((((typeof(v))(val)) << MASK_TO_LSH(m)) & (m)))
+-
+ /***********************************************************************=
+******/
+ /* Exception vectors definitions                                        =
+     */
+ enum {
 --=20
 2.17.2
