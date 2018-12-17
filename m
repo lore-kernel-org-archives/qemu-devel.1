@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gYrt7-0000L9-Qx
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:20:50 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gYrwt-0001nN-NZ
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:24:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gYrt6-0002Wx-RW
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:20:45 -0500
-Date: Mon, 17 Dec 2018 13:20:28 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181217132028.4e387d2d@Igors-MacBook-Pro.local>
-In-Reply-To: <20181217104838.18957-8-sameo@linux.intel.com>
-References: <20181217104838.18957-1-sameo@linux.intel.com>
-	<20181217104838.18957-8-sameo@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 7/8] hw: acpi: Export and share the ARM
- RSDP build
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gYrwp-0004ws-N5
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:24:39 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Mon, 17 Dec 2018 12:23:56 +0000
+Message-Id: <20181217122405.18732-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [RFC PATCH v2 0/9] target/ppc: convert VMX
+ instructions to use TCG vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,125 +18,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Ortiz <sameo@linux.intel.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, richard.henderson@linaro.org, lvivier@redhat.com
 
-On Mon, 17 Dec 2018 11:48:37 +0100
-Samuel Ortiz <sameo@linux.intel.com> wrote:
+This patchset is an attempt at trying to improve the VMX (Altivec) instruction
+performance by making use of the new TCG vector operations where possible.
 
-> Now that build_rsdp() supports building both legacy and current RSDP
-> tables, we can move it to a generic folder (hw/acpi) and have the i386
-> ACPI code reuse it in order to reduce code duplication.
->=20
-> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-for future reference, if one changes patch in a significant way,
-one is supposed to drop Tested/Reviewed-by tags so that reviewers
-would look at it again and we by mistake won't merge not actually
-reviewed changes.
+In order to use TCG vector operations, the registers must be accessible from cpu_env
+whilst currently they are accessed via arrays of static TCG globals. Patches 1-3
+are therefore mechanical patches which introduce access helpers for FPR, AVR and VSR
+registers using the supplied TCGv_i64 parameter. Meanwhile patch 4 fixes a minor issue
+spotted by Richard during review to ensure that AVR registers are not modified until
+after exceptions are processing during register load.
 
-[...]
+Once this is done, patch 5 enables us to remove the static TCG global arrays and updates
+the access helpers to read/write to the relevant fields in cpu_env directly.
 
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index fb877648ac..846cb6d755 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -2547,35 +2547,6 @@ build_amd_iommu(GArray *table_data, BIOSLinker *li=
-nker)
->                   "IVRS", table_data->len - iommu_start, 1, NULL, NULL);
->  }
-> =20
-> -static void
-> -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_off=
-set)
-> -{
-> -    /* AcpiRsdpDescriptor describes revision 2 RSDP table and as result =
-we
-> -     * allocate extra 16 bytes for pc/q35 RSDP rev1 as well. Keep extra =
-16 bytes
-> -     * wasted to make sure we won't breake migration for machine types o=
-lder
-> -     * than 2.3 due to size mismatch.
-> -     */
-> -    AcpiRsdpDescriptor *rsdp =3D acpi_data_push(rsdp_table, sizeof *rsdp=
-);
-> -    unsigned rsdt_pa_size =3D sizeof(rsdp->rsdt_physical_address);
-> -    unsigned rsdt_pa_offset =3D
-> -        (char *)&rsdp->rsdt_physical_address - rsdp_table->data;
-> -
-> -    bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, rsdp_table, 1=
-6,
-> -                             true /* fseg memory */);
-> -
-> -    memcpy(&rsdp->signature, "RSD PTR ", 8);
-> -    memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, 6);
-> -    /* Address to be filled by Guest linker */
-> -    bios_linker_loader_add_pointer(linker,
-> -        ACPI_BUILD_RSDP_FILE, rsdt_pa_offset, rsdt_pa_size,
-> -        ACPI_BUILD_TABLE_FILE, rsdt_tbl_offset);
-> -
-> -    /* Checksum to be filled by Guest linker */
-> -    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-> -        (char *)rsdp - rsdp_table->data, 20 /* ACPI rev 1.0 RSDP size */,
-> -        (char *)&rsdp->checksum - rsdp_table->data);
-> -}
-> -
->  typedef
->  struct AcpiBuildState {
->      /* Copy of table in RAM (for patching). */
-> @@ -2732,7 +2703,25 @@ void acpi_build(AcpiBuildTables *tables, MachineSt=
-ate *machine)
->                 slic_oem.id, slic_oem.table_id);
-> =20
->      /* RSDP is in FSEG memory, so allocate it separately */
-> -    build_rsdp(tables->rsdp, tables->linker, rsdt);
-> +    {
-> +        AcpiRsdpData rsdp_data =3D {
-> +            .revision =3D 0,
-> +            .oem_id =3D ACPI_BUILD_APPNAME6,
-> +            .xsdt_tbl_offset =3D NULL,
-> +            .rsdt_tbl_offset =3D &rsdt,
-> +        };
-> +        build_rsdp(tables->rsdp, tables->linker, &rsdp_data);
-> +        if (!pcmc->rsdp_in_ram) {
-> +            /*
-> +             * Legacy machine types (2.2 and older) expect to get a comp=
-lete
-> +             * revision 2 RSDP table, even though they only look at the
-not true, rev is set to 0 for pc machines, the point of the original commen=
-t was
-that we allocate extra 16 bytes but not actually using them and why it's bad
-to drop it suddenly.
+Patches 6 and 7 perform the legwork required to enable VSX instructions to be converted
+to use TCG vector operations in future by rearranging the FP, VMX and VSX registers into
+a single aligned VSR register array (the scope of this patchset is VMX only).
 
-> +             * revision 0 fields (xsdt pointer is not set). So in order =
-to
-> +             * not break migration to those machine types we waste 16 by=
-tes
-> +             * that we amend to the RSDP revision 0 structure.
-                          ^^^ added
-> +             */
-Perhaps amended original comment would be clearer:
+The final patches 8 and 9 convert the VMX logical instructions and addition/subtraction
+instructions respectively over to the TCG vector operations.
 
-   /* We used to allocate extra space for RSDP rev 2 but used only space for
-    * legacy RSDP and extra bytes were zeroed out. Keep wasting extra 16 by=
-tes
-    * to make sure we won't breake migration for machine types 2.2 and older
-    * due to RSDP blob size mismatch.
-    */
+NOTE: there are a lot of instructions that cannot (yet) be optimised to use TCG vector
+operations, however it struck me that there may be some potential for converting
+saturating add/sub and cmp instructions if there were a mechanism to return a set of
+flags indicating the result of the saturation/comparison.
 
-> +            build_append_int_noprefix(tables->rsdp, 0, 16);
-> +        }
-> +    }
-> =20
->      /* We'll expose it all to Guest so we want to reduce
->       * chance of size changes.
+Finally thanks to Richard for taking the time to answer some of my (mostly beginner)
+questions related to TCG.
 
-With comment fixed:
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-since it's minor fixup and doesn't affect applying remaining patches you ca=
-n post
-v5 7/8 as reply to v4 7/8
+
+v2:
+- Rebase onto master
+- Add comment explaining rationale for FPR helpers in description for patch 1
+- Add R-B tags from Richard
+- Add patch 3 to delay AVR register writeback as spotted by Richard
+- Add patches 6 and 7 to merge FPR, VMX and VSX registers into the vsr array
+  to facilitate conversion of VSX instructions to vector operations later
+- Fix accidental bug whereby the conversion of get_vsr()/set_vsr() to access
+  data from cpu_env was incorrectly squashed into patch 3
+- Move set_fpr() further down in gen_fsqrts() and gen_frsqrtes() in patch 1
+
+
+Mark Cave-Ayland (9):
+  target/ppc: introduce get_fpr() and set_fpr() helpers for FP register
+    access
+  target/ppc: introduce get_avr64() and set_avr64() helpers for VMX
+    register access
+  target/ppc: introduce get_cpu_vsr{l,h}() and set_cpu_vsr{l,h}()
+    helpers for VSR register access
+  target/ppc: delay writeback of avr{l,h} during lvx instruction
+  target/ppc: switch FPR, VMX and VSX helpers to access data directly
+    from cpu_env
+  target/ppc: merge ppc_vsr_t and ppc_avr_t union types
+  target/ppc: move FP and VMX registers into aligned vsr register array
+  target/ppc: convert VMX logical instructions to use vector operations
+  target/ppc: convert vaddu[b,h,w,d] and vsubu[b,h,w,d] over to use
+    vector operations
+
+ linux-user/ppc/signal.c             |  24 +-
+ target/ppc/arch_dump.c              |  12 +-
+ target/ppc/cpu.h                    |  26 +-
+ target/ppc/gdbstub.c                |   8 +-
+ target/ppc/helper.h                 |   8 -
+ target/ppc/int_helper.c             |  63 ++-
+ target/ppc/internal.h               |  29 +-
+ target/ppc/machine.c                |  72 +++-
+ target/ppc/monitor.c                |   4 +-
+ target/ppc/translate.c              |  74 ++--
+ target/ppc/translate/dfp-impl.inc.c |   2 +-
+ target/ppc/translate/fp-impl.inc.c  | 490 +++++++++++++++++-----
+ target/ppc/translate/vmx-impl.inc.c | 186 ++++++---
+ target/ppc/translate/vsx-impl.inc.c | 782 ++++++++++++++++++++++++++----------
+ target/ppc/translate_init.inc.c     |  24 +-
+ 15 files changed, 1262 insertions(+), 542 deletions(-)
+
+-- 
+2.11.0
