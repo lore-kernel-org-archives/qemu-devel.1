@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gYvY7-0004JZ-6Y
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:15:22 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gYvY7-0004Ja-7b
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:15:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gYvY1-0004Es-DE
+	(envelope-from <eric.auger@redhat.com>) id 1gYvY5-0004H0-7K
 	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:15:19 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35774)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gYvY0-0004Dr-Fv
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:15:13 -0500
-Received: by mail-wr1-x442.google.com with SMTP id 96so12899957wrb.2
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 08:15:12 -0800 (PST)
-References: <20181217150116.10446-1-alex.bennee@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181217150116.10446-1-alex.bennee@linaro.org>
-Date: Mon, 17 Dec 2018 16:15:10 +0000
-Message-ID: <87mup4gmep.fsf@linaro.org>
+References: <20181206170733.7469-1-eric.auger@redhat.com>
+	<20181206170733.7469-2-eric.auger@redhat.com>
+	<20181217160208.uhz5pjr2yxxosljw@kamzik.brq.redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <879821e3-7667-18d0-20d9-c4c573e1caeb@redhat.com>
+Date: Mon, 17 Dec 2018 17:14:54 +0100
 MIME-Version: 1.0
+In-Reply-To: <20181217160208.uhz5pjr2yxxosljw@kamzik.brq.redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH  v1 0/4] de-macrofy softmmu
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH-for-4.0 v2 1/2] hw/arm/virt-acpi-build: Set
+ COHACC override flag in IORT SMMUv3 node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +26,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: cota@braap.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, shameerali.kolothum.thodi@huawei.com, shannon.zhaosl@gmail.com, qemu-arm@nongnu.org, eric.auger.pro@gmail.com
 
+Hi Drew,
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+On 12/17/18 5:02 PM, Andrew Jones wrote:
+> On Thu, Dec 06, 2018 at 06:07:32PM +0100, Eric Auger wrote:
+>> Let's report IO-coherent access is supported for translation
+>> table walks, descriptor fetches and queues by setting the COHACC
+>> override flag. Without that, we observe wrong command opcodes.
+>> The DT description also advertises the dma coherency.
+>>
+>> Fixes a703b4f6c1ee ("hw/arm/virt-acpi-build: Add smmuv3 node in IORT table")
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Reported-by: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+>> Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+>>
+>> ---
+>>
+>> - change the commit title
+>> - addition of new fields (pxm and id_mapping_index) done in a
+>>   separate patch
+>> ---
+>>  hw/arm/virt-acpi-build.c    | 1 +
+>>  include/hw/acpi/acpi-defs.h | 2 ++
+>>  2 files changed, 3 insertions(+)
+>>
+>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+>> index 5785fb697c..aa177ba64d 100644
+>> --- a/hw/arm/virt-acpi-build.c
+>> +++ b/hw/arm/virt-acpi-build.c
+>> @@ -448,6 +448,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>>          smmu->mapping_count = cpu_to_le32(1);
+>>          smmu->mapping_offset = cpu_to_le32(sizeof(*smmu));
+>>          smmu->base_address = cpu_to_le64(vms->memmap[VIRT_SMMU].base);
+>> +        smmu->flags = ACPI_IORT_SMMU_V3_COHACC_OVERRIDE;
+> 
+> Flags are 4 bytes in length, so you need cpu_to_le32()
+Hum right!
+> 
+>>          smmu->event_gsiv = cpu_to_le32(irq);
+>>          smmu->pri_gsiv = cpu_to_le32(irq + 1);
+>>          smmu->gerr_gsiv = cpu_to_le32(irq + 2);
+>> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+>> index af8e023968..532eaf79bd 100644
+>> --- a/include/hw/acpi/acpi-defs.h
+>> +++ b/include/hw/acpi/acpi-defs.h
+>> @@ -628,6 +628,8 @@ struct AcpiIortItsGroup {
+>>  } QEMU_PACKED;
+>>  typedef struct AcpiIortItsGroup AcpiIortItsGroup;
+>>  
+>> +#define ACPI_IORT_SMMU_V3_COHACC_OVERRIDE 1
+>> +
+>>  struct AcpiIortSmmu3 {
+>>      ACPI_IORT_NODE_HEADER_DEF
+>>      uint64_t base_address;
+>> -- 
+>> 2.17.2
+>>
+>>
+> 
+> Probably not necessary for this series, but we should really switch all
+> table generators to the aml_append* API.
+Agreed, I will prepare a separate series for that improvement.
 
-> Hi,
->
-<snip>
->
-> Unfortunately in my simple boot test I see a slight performance
-> degradation:
->
-> original: 10 times (100.00%), avg time 5.358 (0.02 varience/0.13 deviatio=
-n)
-> demacro: 10 times (100.00%), avg time 5.760 (0.08 varience/0.29 deviation)
+> 
+> Besides the missing cpu_to_le32(),
+> 
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+Thanks
 
-Moving stuff back into cputlb seems to help:
-
- 10 times (100.00%), avg time 5.583 (0.03 varience/0.17 deviation)
-
->
-> Emilio,
->
-> Any chance you could run this through your more comprehensive benchmark
-> suite?
->
-> Alex Benn=C3=A9e (4):
->   accel/tcg: export some cputlb functions
->   accel/tcg: introduce softmmu.c
->   accel/tcg: use TLB helpers from softmmu.o
->   accel/tcg: remove softmmu_template.h
->
->  accel/tcg/Makefile.objs      |   1 +
->  accel/tcg/cputlb.c           |  63 +----
->  accel/tcg/cputlb.h           |  21 ++
->  accel/tcg/softmmu.c          | 452 +++++++++++++++++++++++++++++++++++
->  accel/tcg/softmmu_template.h | 446 ----------------------------------
->  5 files changed, 485 insertions(+), 498 deletions(-)
->  create mode 100644 accel/tcg/cputlb.h
->  create mode 100644 accel/tcg/softmmu.c
->  delete mode 100644 accel/tcg/softmmu_template.h
-
-
---
-Alex Benn=C3=A9e
+Eric
+> 
