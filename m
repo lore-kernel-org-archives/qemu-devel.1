@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gYwDO-0006gT-DS
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:57:59 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gYwDx-00072B-VR
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:58:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gYwDJ-0008PU-WA
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:57:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47798)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gYwDI-0008Lg-3E
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:57:53 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 17 Dec 2018 17:57:37 +0100
-Message-Id: <1545065857-31164-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [QEMU PATCH] hw/i386: Remove deprecated machines
- pc-0.10 and pc-0.11
+	(envelope-from <richard.henderson@linaro.org>) id 1gYwDt-0000r6-R4
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:58:33 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:43222)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gYwDt-0000pv-BU
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:58:29 -0500
+Received: by mail-pl1-x643.google.com with SMTP id gn14so6404358plb.10
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 08:58:28 -0800 (PST)
+References: <20181217122405.18732-1-mark.cave-ayland@ilande.co.uk>
+	<20181217122405.18732-8-mark.cave-ayland@ilande.co.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <36820305-1771-7ff2-805b-7111d3abddf4@linaro.org>
+Date: Mon, 17 Dec 2018 08:58:25 -0800
+MIME-Version: 1.0
+In-Reply-To: <20181217122405.18732-8-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH v2 7/9] target/ppc: move FP and VMX
+ registers into aligned vsr register array
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,144 +32,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, libvir-list@redhat.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, lvivier@redhat.com
 
-They've been deprecated for two releases and nobody complained that they
-are still required anymore, so it's time to remove these now.
-And while we're at it, mark the other remaining old 0.x machine types
-as deprecated (since they can not properly be used for live-migration
-anyway).
+On 12/17/18 4:24 AM, Mark Cave-Ayland wrote:
+> -            cpu_fprintf(f, " %016" PRIx64, *((uint64_t *)&env->fpr[i]));
+> +            cpu_fprintf(f, " %016" PRIx64, *((uint64_t *)&env->vsr[i].u64[0]));
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/i386/pc_piix.c     | 70 ++-------------------------------------------------
- qemu-deprecated.texi  |  2 +-
- tests/cpu-plug-test.c |  4 +--
- 3 files changed, 4 insertions(+), 72 deletions(-)
+There's no longer a need for a cast.  Otherwise,
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 6981cfa..7653fbb 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -368,7 +368,7 @@ static void pc_compat_1_2(MachineState *machine)
-     x86_cpu_change_kvm_default("kvm-pv-eoi", NULL);
- }
- 
--/* PC compat function for pc-0.10 to pc-0.13 */
-+/* PC compat function for pc-0.12 and pc-0.13 */
- static void pc_compat_0_13(MachineState *machine)
- {
-     pc_compat_1_2(machine);
-@@ -834,6 +834,7 @@ static void pc_i440fx_0_15_machine_options(MachineClass *m)
- {
-     pc_i440fx_1_0_machine_options(m);
-     m->hw_version = "0.15";
-+    m->deprecation_reason = "use a newer machine type instead";
-     SET_MACHINE_COMPAT(m, PC_COMPAT_0_15);
- }
- 
-@@ -951,73 +952,6 @@ static void pc_i440fx_0_12_machine_options(MachineClass *m)
- DEFINE_I440FX_MACHINE(v0_12, "pc-0.12", pc_compat_0_13,
-                       pc_i440fx_0_12_machine_options);
- 
--
--#define PC_COMPAT_0_11 \
--        PC_CPU_MODEL_IDS("0.11") \
--        {\
--            .driver   = "virtio-blk-pci",\
--            .property = "vectors",\
--            .value    = stringify(0),\
--        },{\
--            .driver   = TYPE_PCI_DEVICE,\
--            .property = "rombar",\
--            .value    = stringify(0),\
--        },{\
--            .driver   = "ide-drive",\
--            .property = "ver",\
--            .value    = "0.11",\
--        },{\
--            .driver   = "scsi-disk",\
--            .property = "ver",\
--            .value    = "0.11",\
--        },
--
--static void pc_i440fx_0_11_machine_options(MachineClass *m)
--{
--    pc_i440fx_0_12_machine_options(m);
--    m->hw_version = "0.11";
--    m->deprecation_reason = "use a newer machine type instead";
--    SET_MACHINE_COMPAT(m, PC_COMPAT_0_11);
--}
--
--DEFINE_I440FX_MACHINE(v0_11, "pc-0.11", pc_compat_0_13,
--                      pc_i440fx_0_11_machine_options);
--
--
--#define PC_COMPAT_0_10 \
--    PC_CPU_MODEL_IDS("0.10") \
--    {\
--        .driver   = "virtio-blk-pci",\
--        .property = "class",\
--        .value    = stringify(PCI_CLASS_STORAGE_OTHER),\
--    },{\
--        .driver   = "virtio-serial-pci",\
--        .property = "class",\
--        .value    = stringify(PCI_CLASS_DISPLAY_OTHER),\
--    },{\
--        .driver   = "virtio-net-pci",\
--        .property = "vectors",\
--        .value    = stringify(0),\
--    },{\
--        .driver   = "ide-drive",\
--        .property = "ver",\
--        .value    = "0.10",\
--    },{\
--        .driver   = "scsi-disk",\
--        .property = "ver",\
--        .value    = "0.10",\
--    },
--
--static void pc_i440fx_0_10_machine_options(MachineClass *m)
--{
--    pc_i440fx_0_11_machine_options(m);
--    m->hw_version = "0.10";
--    SET_MACHINE_COMPAT(m, PC_COMPAT_0_10);
--}
--
--DEFINE_I440FX_MACHINE(v0_10, "pc-0.10", pc_compat_0_13,
--                      pc_i440fx_0_10_machine_options);
--
- typedef struct {
-     uint16_t gpu_device_id;
-     uint16_t pch_device_id;
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 2912084..190250f 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -124,7 +124,7 @@ their usecases.
- 
- @section System emulator machines
- 
--@subsection pc-0.10 and pc-0.11 (since 3.0)
-+@subsection pc-0.12, pc-0.13, pc-0.14 and pc-0.15 (since 4.0)
- 
- These machine types are very old and likely can not be used for live migration
- from old QEMU versions anymore. A newer machine type should be used instead.
-diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
-index f4a677d..668f001 100644
---- a/tests/cpu-plug-test.c
-+++ b/tests/cpu-plug-test.c
-@@ -157,9 +157,7 @@ static void add_pc_test_case(const char *mname)
-         (strcmp(mname, "pc-0.15") == 0) ||
-         (strcmp(mname, "pc-0.14") == 0) ||
-         (strcmp(mname, "pc-0.13") == 0) ||
--        (strcmp(mname, "pc-0.12") == 0) ||
--        (strcmp(mname, "pc-0.11") == 0) ||
--        (strcmp(mname, "pc-0.10") == 0)) {
-+        (strcmp(mname, "pc-0.12") == 0)) {
-         path = g_strdup_printf("cpu-plug/%s/init/%ux%ux%u&maxcpus=%u",
-                                mname, data->sockets, data->cores,
-                                data->threads, data->maxcpus);
--- 
-1.8.3.1
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
