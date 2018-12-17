@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gZ1cK-0006p8-Fd
+	(envelope-from <mreitz@redhat.com>) id 1gZ1cK-0006p7-Fc
 	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:44:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gZ1cJ-0005yO-6o
+	(envelope-from <mreitz@redhat.com>) id 1gZ1cI-0005y1-Qc
 	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:44:04 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 17 Dec 2018 23:43:19 +0100
-Message-Id: <20181217224348.14922-3-mreitz@redhat.com>
+Date: Mon, 17 Dec 2018 23:43:20 +0100
+Message-Id: <20181217224348.14922-4-mreitz@redhat.com>
 In-Reply-To: <20181217224348.14922-1-mreitz@redhat.com>
 References: <20181217224348.14922-1-mreitz@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v12 02/31] block: Use children list in
- bdrv_refresh_filename
+Subject: [Qemu-devel] [PATCH v12 03/31] block: Skip implicit nodes for
+ filename info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,122 +25,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>
 
-bdrv_refresh_filename() should invoke itself recursively on all
-children, not just on file.
-
-With that change, we can remove the manual invocations in blkverify,
-quorum, commit, mirror, and blklogwrites.
+bdrv_refresh_filename() should simply skip all implicit nodes.  They are
+supposed to be invisible to the user, so they should not appear in
+filename information.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block.c              | 9 +++++----
- block/blklogwrites.c | 3 ---
- block/blkverify.c    | 3 ---
- block/commit.c       | 1 -
- block/mirror.c       | 1 -
- block/quorum.c       | 1 -
- 6 files changed, 5 insertions(+), 13 deletions(-)
+ block.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
 diff --git a/block.c b/block.c
-index 2f29c56536..6c6ccb1749 100644
+index 6c6ccb1749..589d43e18a 100644
 --- a/block.c
 +++ b/block.c
-@@ -5318,16 +5318,17 @@ static bool append_open_options(QDict *d, BlockDr=
-iverState *bs)
- void bdrv_refresh_filename(BlockDriverState *bs)
- {
-     BlockDriver *drv =3D bs->drv;
-+    BdrvChild *child;
-     QDict *opts;
-=20
-     if (!drv) {
-         return;
+@@ -5331,6 +5331,20 @@ void bdrv_refresh_filename(BlockDriverState *bs)
+         bdrv_refresh_filename(child->bs);
      }
 =20
--    /* This BDS's file name will most probably depend on its file's name=
-, so
--     * refresh that first */
--    if (bs->file) {
--        bdrv_refresh_filename(bs->file->bs);
-+    /* This BDS's file name may depend on any of its children's file nam=
-es, so
-+     * refresh those first */
-+    QLIST_FOREACH(child, &bs->children, next) {
-+        bdrv_refresh_filename(child->bs);
-     }
-=20
++    if (bs->implicit) {
++        /* For implicit nodes, just copy everything from the single chil=
+d */
++        child =3D QLIST_FIRST(&bs->children);
++        assert(QLIST_NEXT(child, next) =3D=3D NULL);
++
++        pstrcpy(bs->exact_filename, sizeof(bs->exact_filename),
++                child->bs->exact_filename);
++        pstrcpy(bs->filename, sizeof(bs->filename), child->bs->filename)=
+;
++
++        bs->full_open_options =3D qobject_ref(child->bs->full_open_optio=
+ns);
++
++        return;
++    }
++
      if (drv->bdrv_refresh_filename) {
-diff --git a/block/blklogwrites.c b/block/blklogwrites.c
-index ff98cd5533..8f1b589d54 100644
---- a/block/blklogwrites.c
-+++ b/block/blklogwrites.c
-@@ -285,9 +285,6 @@ static void blk_log_writes_refresh_filename(BlockDriv=
-erState *bs,
- {
-     BDRVBlkLogWritesState *s =3D bs->opaque;
-=20
--    /* bs->file->bs has already been refreshed */
--    bdrv_refresh_filename(s->log_file->bs);
--
-     if (bs->file->bs->full_open_options
-         && s->log_file->bs->full_open_options)
-     {
-diff --git a/block/blkverify.c b/block/blkverify.c
-index 89bf4386e3..035d77b64a 100644
---- a/block/blkverify.c
-+++ b/block/blkverify.c
-@@ -285,9 +285,6 @@ static void blkverify_refresh_filename(BlockDriverSta=
-te *bs, QDict *options)
- {
-     BDRVBlkverifyState *s =3D bs->opaque;
-=20
--    /* bs->file->bs has already been refreshed */
--    bdrv_refresh_filename(s->test_file->bs);
--
-     if (bs->file->bs->full_open_options
-         && s->test_file->bs->full_open_options)
-     {
-diff --git a/block/commit.c b/block/commit.c
-index 53148e610b..093b1505de 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -232,7 +232,6 @@ static int coroutine_fn bdrv_commit_top_preadv(BlockD=
-riverState *bs,
-=20
- static void bdrv_commit_top_refresh_filename(BlockDriverState *bs, QDict=
- *opts)
- {
--    bdrv_refresh_filename(bs->backing->bs);
-     pstrcpy(bs->exact_filename, sizeof(bs->exact_filename),
-             bs->backing->bs->filename);
- }
-diff --git a/block/mirror.c b/block/mirror.c
-index ab59ad77e8..c965b2d3e1 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1439,7 +1439,6 @@ static void bdrv_mirror_top_refresh_filename(BlockD=
-riverState *bs, QDict *opts)
-          * bdrv_set_backing_hd */
-         return;
-     }
--    bdrv_refresh_filename(bs->backing->bs);
-     pstrcpy(bs->exact_filename, sizeof(bs->exact_filename),
-             bs->backing->bs->filename);
- }
-diff --git a/block/quorum.c b/block/quorum.c
-index 16b3c8067c..cf9d7c16c2 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -1073,7 +1073,6 @@ static void quorum_refresh_filename(BlockDriverStat=
-e *bs, QDict *options)
-     int i;
-=20
-     for (i =3D 0; i < s->num_children; i++) {
--        bdrv_refresh_filename(s->children[i]->bs);
-         if (!s->children[i]->bs->full_open_options) {
-             return;
-         }
+         /* Obsolete information is of no use here, so drop the old file =
+name
+          * information before refreshing it */
 --=20
 2.19.2
