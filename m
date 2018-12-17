@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gYySi-0007Hu-Mt
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 14:21:57 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gYygS-00043l-1h
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 14:36:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gYySh-0008Fm-OI
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 14:21:56 -0500
-References: <20181214231512.5295-1-jsnow@redhat.com>
-	<20181214231512.5295-7-jsnow@redhat.com>
-	<0780ebaa-3e11-c197-85f9-9133dc227d65@virtuozzo.com>
-	<de056aa7-d383-af0f-6059-44e008c1649e@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <009ac77d-84c2-3123-f710-755a5bcf2452@redhat.com>
-Date: Mon, 17 Dec 2018 14:21:45 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gYygM-0004tG-3n
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 14:36:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57138)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gYygL-0003km-F8
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 14:36:01 -0500
+Date: Mon, 17 Dec 2018 17:35:22 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181217193522.GK7141@habkost.net>
+References: <1545065857-31164-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <de056aa7-d383-af0f-6059-44e008c1649e@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] iotests: allow pretty-print for
- qmp_log
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1545065857-31164-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [QEMU PATCH] hw/i386: Remove deprecated machines
+ pc-0.10 and pc-0.11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,100 +27,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Markus Armbruster <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com
+
+On Mon, Dec 17, 2018 at 05:57:37PM +0100, Thomas Huth wrote:
+> They've been deprecated for two releases and nobody complained that they
+> are still required anymore, so it's time to remove these now.
+> And while we're at it, mark the other remaining old 0.x machine types
+> as deprecated (since they can not properly be used for live-migration
+> anyway).
+
+Do you know why exactly they can't be used for live-migration?
+
+Maybe we should split the removal of pc <= 0.10 and deprecation
+of pc <= 0.15 into separate patches?
+
+In either case:
+
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+
+Michael, should I queue this, or should it go through your tree?
 
 
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/i386/pc_piix.c     | 70 ++-------------------------------------------------
+>  qemu-deprecated.texi  |  2 +-
+>  tests/cpu-plug-test.c |  4 +--
+>  3 files changed, 4 insertions(+), 72 deletions(-)
+> 
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 6981cfa..7653fbb 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -368,7 +368,7 @@ static void pc_compat_1_2(MachineState *machine)
+>      x86_cpu_change_kvm_default("kvm-pv-eoi", NULL);
+>  }
+>  
+> -/* PC compat function for pc-0.10 to pc-0.13 */
+> +/* PC compat function for pc-0.12 and pc-0.13 */
+>  static void pc_compat_0_13(MachineState *machine)
+>  {
+>      pc_compat_1_2(machine);
+> @@ -834,6 +834,7 @@ static void pc_i440fx_0_15_machine_options(MachineClass *m)
+>  {
+>      pc_i440fx_1_0_machine_options(m);
+>      m->hw_version = "0.15";
+> +    m->deprecation_reason = "use a newer machine type instead";
+>      SET_MACHINE_COMPAT(m, PC_COMPAT_0_15);
+>  }
+>  
+> @@ -951,73 +952,6 @@ static void pc_i440fx_0_12_machine_options(MachineClass *m)
+>  DEFINE_I440FX_MACHINE(v0_12, "pc-0.12", pc_compat_0_13,
+>                        pc_i440fx_0_12_machine_options);
+>  
+> -
+> -#define PC_COMPAT_0_11 \
+> -        PC_CPU_MODEL_IDS("0.11") \
+> -        {\
+> -            .driver   = "virtio-blk-pci",\
+> -            .property = "vectors",\
+> -            .value    = stringify(0),\
+> -        },{\
+> -            .driver   = TYPE_PCI_DEVICE,\
+> -            .property = "rombar",\
+> -            .value    = stringify(0),\
+> -        },{\
+> -            .driver   = "ide-drive",\
+> -            .property = "ver",\
+> -            .value    = "0.11",\
+> -        },{\
+> -            .driver   = "scsi-disk",\
+> -            .property = "ver",\
+> -            .value    = "0.11",\
+> -        },
+> -
+> -static void pc_i440fx_0_11_machine_options(MachineClass *m)
+> -{
+> -    pc_i440fx_0_12_machine_options(m);
+> -    m->hw_version = "0.11";
+> -    m->deprecation_reason = "use a newer machine type instead";
+> -    SET_MACHINE_COMPAT(m, PC_COMPAT_0_11);
+> -}
+> -
+> -DEFINE_I440FX_MACHINE(v0_11, "pc-0.11", pc_compat_0_13,
+> -                      pc_i440fx_0_11_machine_options);
+> -
+> -
+> -#define PC_COMPAT_0_10 \
+> -    PC_CPU_MODEL_IDS("0.10") \
+> -    {\
+> -        .driver   = "virtio-blk-pci",\
+> -        .property = "class",\
+> -        .value    = stringify(PCI_CLASS_STORAGE_OTHER),\
+> -    },{\
+> -        .driver   = "virtio-serial-pci",\
+> -        .property = "class",\
+> -        .value    = stringify(PCI_CLASS_DISPLAY_OTHER),\
+> -    },{\
+> -        .driver   = "virtio-net-pci",\
+> -        .property = "vectors",\
+> -        .value    = stringify(0),\
+> -    },{\
+> -        .driver   = "ide-drive",\
+> -        .property = "ver",\
+> -        .value    = "0.10",\
+> -    },{\
+> -        .driver   = "scsi-disk",\
+> -        .property = "ver",\
+> -        .value    = "0.10",\
+> -    },
+> -
+> -static void pc_i440fx_0_10_machine_options(MachineClass *m)
+> -{
+> -    pc_i440fx_0_11_machine_options(m);
+> -    m->hw_version = "0.10";
+> -    SET_MACHINE_COMPAT(m, PC_COMPAT_0_10);
+> -}
+> -
+> -DEFINE_I440FX_MACHINE(v0_10, "pc-0.10", pc_compat_0_13,
+> -                      pc_i440fx_0_10_machine_options);
+> -
+>  typedef struct {
+>      uint16_t gpu_device_id;
+>      uint16_t pch_device_id;
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index 2912084..190250f 100644
+> --- a/qemu-deprecated.texi
+> +++ b/qemu-deprecated.texi
+> @@ -124,7 +124,7 @@ their usecases.
+>  
+>  @section System emulator machines
+>  
+> -@subsection pc-0.10 and pc-0.11 (since 3.0)
+> +@subsection pc-0.12, pc-0.13, pc-0.14 and pc-0.15 (since 4.0)
+>  
+>  These machine types are very old and likely can not be used for live migration
+>  from old QEMU versions anymore. A newer machine type should be used instead.
+> diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
+> index f4a677d..668f001 100644
+> --- a/tests/cpu-plug-test.c
+> +++ b/tests/cpu-plug-test.c
+> @@ -157,9 +157,7 @@ static void add_pc_test_case(const char *mname)
+>          (strcmp(mname, "pc-0.15") == 0) ||
+>          (strcmp(mname, "pc-0.14") == 0) ||
+>          (strcmp(mname, "pc-0.13") == 0) ||
+> -        (strcmp(mname, "pc-0.12") == 0) ||
+> -        (strcmp(mname, "pc-0.11") == 0) ||
+> -        (strcmp(mname, "pc-0.10") == 0)) {
+> +        (strcmp(mname, "pc-0.12") == 0)) {
+>          path = g_strdup_printf("cpu-plug/%s/init/%ux%ux%u&maxcpus=%u",
+>                                 mname, data->sockets, data->cores,
+>                                 data->threads, data->maxcpus);
+> -- 
+> 1.8.3.1
+> 
 
-On 12/17/18 11:37 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 17.12.2018 17:26, Vladimir Sementsov-Ogievskiy wrote:
->> 15.12.2018 2:15, John Snow wrote:
->>> If iotests have lines exceeding >998 characters long, git doesn't
->>> want to send it plaintext to the list. We can solve this by allowing
->>> the iotests to use pretty printed QMP output that we can match agains=
-t
->>> instead.
->>>
->>> As a bonus, it's much nicer for human eyes, too.
->>>
->>> Note that this changes the sort order for "command" and "arguments",
->>> so I restrict this reordering to occur only when the indent is specif=
-ied.
->>> ---
->>> =C2=A0 tests/qemu-iotests/iotests.py | 17 +++++++++++++----
->>> =C2=A0 1 file changed, 13 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotes=
-ts.py
->>> index 9595429fea..ab5823c011 100644
->>> --- a/tests/qemu-iotests/iotests.py
->>> +++ b/tests/qemu-iotests/iotests.py
->>> @@ -447,12 +447,21 @@ class VM(qtest.QEMUQtestMachine):
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 result.append(filter_qmp_event(ev))
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return result
->>> -=C2=A0=C2=A0=C2=A0 def qmp_log(self, cmd, filters=3D[filter_testfile=
-s], **kwargs):
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 logmsg =3D '{"execute": "=
-%s", "arguments": %s}' % \
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (=
-cmd, json.dumps(kwargs, sort_keys=3DTrue))
->>> +=C2=A0=C2=A0=C2=A0 def qmp_log(self, cmd, indent=3DNone, filters=3D[=
-filter_testfiles], **kwargs):
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Python < 3.4 needs to k=
-now not to add whitespace when pretty-printing:
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 separators =3D (',', ': '=
-) if indent is not None else (',', ': ')
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if indent is not None:
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 f=
-ullcmd =3D { "execute": cmd,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "ar=
-guments": kwargs }
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 l=
-ogmsg =3D json.dumps(fullcmd, indent=3Dindent, separators=3Dseparators,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sort_keys=3DTrue)
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else:
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 l=
-ogmsg =3D '{"execute": "%s", "arguments": %s}' % \
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 (cmd, json.dumps(kwargs, sort_keys=3DTrue))
->>
->> definitely overlogic on None/is not None, but anyway, ',' separator le=
-ads to less
->> beautiful output. So, I think it is better to do just "re.sub(r'\s+\n'=
-, '\n', longmsg)"
->> on final message, here or in log(), or in both.
-
-I can't use "if indent" because 0 is a valid indentation, and I decided
-to keep the "correct" order for execute/arguments if no indentation is
-requested.
-
-How is ',' less beautiful? When pretty-printing output ',' only occurs
-at the end of a line anyway. I don't understand the critique.
-
->=20
-> find myself composing counter-proposal patch, will send soon...
->=20
->>
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 log(logmsg, fi=
-lters)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 result =3D sel=
-f.qmp(cmd, **kwargs)
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 log(json.dumps(result, so=
-rt_keys=3DTrue), filters)
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 log(json.dumps(result, in=
-dent=3Dindent, separators=3Dseparators,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sort_keys=
-=3DTrue), filters)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return result
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 def run_job(self, job, auto_finalize=3D=
-True, auto_dismiss=3DFalse):
->>>
->>
->>
->=20
->=20
+-- 
+Eduardo
