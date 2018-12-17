@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55793)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=8828e3297=Paul.Durrant@citrix.com>)
-	id 1gYsyY-0003Fj-8D
+	id 1gYsyY-0003Fk-8V
 	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 08:30:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=8828e3297=Paul.Durrant@citrix.com>)
-	id 1gYsyR-0005XS-14
+	id 1gYsyR-0005YW-4z
 	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 08:30:24 -0500
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Mon, 17 Dec 2018 13:29:59 +0000
-Message-ID: <20181217133011.31433-7-paul.durrant@citrix.com>
+Date: Mon, 17 Dec 2018 13:29:55 +0000
+Message-ID: <20181217133011.31433-3-paul.durrant@citrix.com>
 In-Reply-To: <20181217133011.31433-1-paul.durrant@citrix.com>
 References: <20181217133011.31433-1-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v6 06/18] xen: add grant table interface for
- XenDevice-s
+Subject: [Qemu-devel] [PATCH v6 02/18] xen: introduce new 'XenBus' and
+ 'XenDevice' object hierarchy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,232 +26,304 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>
+Cc: Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-The legacy PV backend infrastructure provides functions to map, unmap and
-copy pages granted by frontends. Similar functionality will be required
-by XenDevice implementations so this patch adds the necessary support.
+This patch adds the basic boilerplate for a 'XenBus' object that will act
+as a parent to 'XenDevice' PV backends.
+A new 'XenBridge' object is also added to connect XenBus to the system bus.
+
+The XenBus object is instantiated by a new xen_bus_init() function called
+from the same sites as the legacy xen_be_init() function.
+
+Subsequent patches will flesh-out the functionality of these objects.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
 ---
 Cc: Stefano Stabellini <sstabellini@kernel.org>
----
- hw/xen/xen-bus.c         | 146 +++++++++++++++++++++++++++++++++++++++
- include/hw/xen/xen-bus.h |  25 +++++++
- 2 files changed, 171 insertions(+)
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 
+v3:
+ - Don't use local_err unless it is needed
+
+v2:
+ - Fix boilerplate
+ - Make xen-bus hotplug capable
+---
+ hw/i386/xen/xen-hvm.c     |   3 +
+ hw/xen/Makefile.objs      |   2 +-
+ hw/xen/trace-events       |   6 ++
+ hw/xen/xen-bus.c          | 127 ++++++++++++++++++++++++++++++++++++++
+ hw/xenpv/xen_machine_pv.c |   3 +
+ include/hw/xen/xen-bus.h  |  55 +++++++++++++++++
+ 6 files changed, 195 insertions(+), 1 deletion(-)
+ create mode 100644 hw/xen/xen-bus.c
+ create mode 100644 include/hw/xen/xen-bus.h
+
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index 1d637639c7..4497f751d2 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -17,6 +17,7 @@
+ #include "hw/i386/apic-msidef.h"
+ #include "hw/xen/xen_common.h"
+ #include "hw/xen/xen-legacy-backend.h"
++#include "hw/xen/xen-bus.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-commands-misc.h"
+ #include "qemu/error-report.h"
+@@ -1479,6 +1480,8 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
+     QLIST_INIT(&state->dev_list);
+     device_listener_register(&state->device_listener);
+ 
++    xen_bus_init();
++
+     /* Initialize backend core & drivers */
+     if (xen_be_init() != 0) {
+         error_report("xen backend core setup failed");
+diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
+index 3f64a44051..d9d6d7b4f9 100644
+--- a/hw/xen/Makefile.objs
++++ b/hw/xen/Makefile.objs
+@@ -1,5 +1,5 @@
+ # xen backend driver support
+-common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o
++common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o xen-bus.o
+ 
+ obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen-host-pci-device.o
+ obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt.o xen_pt_config_init.o xen_pt_graphics.o xen_pt_msi.o
+diff --git a/hw/xen/trace-events b/hw/xen/trace-events
+index c7e7a3b523..0172cd4e26 100644
+--- a/hw/xen/trace-events
++++ b/hw/xen/trace-events
+@@ -12,3 +12,9 @@ xen_unmap_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id:
+ xen_map_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
+ xen_unmap_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
+ xen_domid_restrict(int err) "err: %u"
++
++# include/hw/xen/xen-bus.c
++xen_bus_realize(void) ""
++xen_bus_unrealize(void) ""
++xen_device_realize(const char *type) "type: %s"
++xen_device_unrealize(const char *type) "type: %s"
 diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-index 5e19592190..faa9fd3577 100644
---- a/hw/xen/xen-bus.c
+new file mode 100644
+index 0000000000..bc04da748b
+--- /dev/null
 +++ b/hw/xen/xen-bus.c
-@@ -485,6 +485,138 @@ static void xen_device_frontend_destroy(XenDevice *xendev)
+@@ -0,0 +1,127 @@
++/*
++ * Copyright (c) 2018  Citrix Systems Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/hw.h"
++#include "hw/sysbus.h"
++#include "hw/xen/xen-bus.h"
++#include "qapi/error.h"
++#include "trace.h"
++
++static void xen_bus_unrealize(BusState *bus, Error **errp)
++{
++    trace_xen_bus_unrealize();
++}
++
++static void xen_bus_realize(BusState *bus, Error **errp)
++{
++    trace_xen_bus_realize();
++}
++
++static void xen_bus_class_init(ObjectClass *class, void *data)
++{
++    BusClass *bus_class = BUS_CLASS(class);
++
++    bus_class->realize = xen_bus_realize;
++    bus_class->unrealize = xen_bus_unrealize;
++}
++
++static const TypeInfo xen_bus_type_info = {
++    .name = TYPE_XEN_BUS,
++    .parent = TYPE_BUS,
++    .instance_size = sizeof(XenBus),
++    .class_size = sizeof(XenBusClass),
++    .class_init = xen_bus_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_HOTPLUG_HANDLER },
++        { }
++    },
++};
++
++static void xen_device_unrealize(DeviceState *dev, Error **errp)
++{
++    XenDevice *xendev = XEN_DEVICE(dev);
++    XenDeviceClass *xendev_class = XEN_DEVICE_GET_CLASS(xendev);
++    const char *type = object_get_typename(OBJECT(xendev));
++
++    trace_xen_device_unrealize(type);
++
++    if (xendev_class->unrealize) {
++        xendev_class->unrealize(xendev, errp);
++    }
++}
++
++static void xen_device_realize(DeviceState *dev, Error **errp)
++{
++    XenDevice *xendev = XEN_DEVICE(dev);
++    XenDeviceClass *xendev_class = XEN_DEVICE_GET_CLASS(xendev);
++    const char *type = object_get_typename(OBJECT(xendev));
++    Error *local_err = NULL;
++
++    trace_xen_device_realize(type);
++
++    if (xendev_class->realize) {
++        xendev_class->realize(xendev, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            goto unrealize;
++        }
++    }
++
++    return;
++
++unrealize:
++    xen_device_unrealize(dev, &error_abort);
++}
++
++static void xen_device_class_init(ObjectClass *class, void *data)
++{
++    DeviceClass *dev_class = DEVICE_CLASS(class);
++
++    dev_class->realize = xen_device_realize;
++    dev_class->unrealize = xen_device_unrealize;
++    dev_class->bus_type = TYPE_XEN_BUS;
++}
++
++static const TypeInfo xen_device_type_info = {
++    .name = TYPE_XEN_DEVICE,
++    .parent = TYPE_DEVICE,
++    .instance_size = sizeof(XenDevice),
++    .abstract = true,
++    .class_size = sizeof(XenDeviceClass),
++    .class_init = xen_device_class_init,
++};
++
++typedef struct XenBridge {
++    SysBusDevice busdev;
++} XenBridge;
++
++#define TYPE_XEN_BRIDGE "xen-bridge"
++
++static const TypeInfo xen_bridge_type_info = {
++    .name = TYPE_XEN_BRIDGE,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(XenBridge),
++};
++
++static void xen_register_types(void)
++{
++    type_register_static(&xen_bridge_type_info);
++    type_register_static(&xen_bus_type_info);
++    type_register_static(&xen_device_type_info);
++}
++
++type_init(xen_register_types)
++
++void xen_bus_init(void)
++{
++    DeviceState *dev = qdev_create(NULL, TYPE_XEN_BRIDGE);
++    BusState *bus = qbus_create(TYPE_XEN_BUS, dev, NULL);
++
++    qdev_init_nofail(dev);
++    qbus_set_bus_hotplug_handler(bus, &error_abort);
++}
+diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
+index 8c86fb7031..608e591bcc 100644
+--- a/hw/xenpv/xen_machine_pv.c
++++ b/hw/xenpv/xen_machine_pv.c
+@@ -27,6 +27,7 @@
+ #include "hw/hw.h"
+ #include "hw/boards.h"
+ #include "hw/xen/xen-legacy-backend.h"
++#include "hw/xen/xen-bus.h"
+ #include "xen_domainbuild.h"
+ #include "sysemu/block-backend.h"
+ 
+@@ -93,6 +94,8 @@ static void xen_init_pv(MachineState *machine)
+         xen_config_dev_nic(nd_table + i);
      }
+ 
++    xen_bus_init();
++
+     /* config cleanup hook */
+     atexit(xen_config_cleanup);
  }
- 
-+void xen_device_set_max_grant_refs(XenDevice *xendev, unsigned int nr_refs,
-+                                   Error **errp)
-+{
-+    if (xengnttab_set_max_grants(xendev->xgth, nr_refs)) {
-+        error_setg_errno(errp, errno, "xengnttab_set_max_grants failed");
-+    }
-+}
-+
-+void *xen_device_map_grant_refs(XenDevice *xendev, uint32_t *refs,
-+                                unsigned int nr_refs, int prot,
-+                                Error **errp)
-+{
-+    void *map = xengnttab_map_domain_grant_refs(xendev->xgth, nr_refs,
-+                                                xendev->frontend_id, refs,
-+                                                prot);
-+
-+    if (!map) {
-+        error_setg_errno(errp, errno,
-+                         "xengnttab_map_domain_grant_refs failed");
-+    }
-+
-+    return map;
-+}
-+
-+void xen_device_unmap_grant_refs(XenDevice *xendev, void *map,
-+                                 unsigned int nr_refs, Error **errp)
-+{
-+    if (xengnttab_unmap(xendev->xgth, map, nr_refs)) {
-+        error_setg_errno(errp, errno, "xengnttab_unmap failed");
-+    }
-+}
-+
-+static void compat_copy_grant_refs(XenDevice *xendev, bool to_domain,
-+                                   XenDeviceGrantCopySegment segs[],
-+                                   unsigned int nr_segs, Error **errp)
-+{
-+    uint32_t *refs = g_new(uint32_t, nr_segs);
-+    int prot = to_domain ? PROT_WRITE : PROT_READ;
-+    void *map;
-+    unsigned int i;
-+
-+    for (i = 0; i < nr_segs; i++) {
-+        XenDeviceGrantCopySegment *seg = &segs[i];
-+
-+        refs[i] = to_domain ? seg->dest.foreign.ref :
-+            seg->source.foreign.ref;
-+    }
-+
-+    map = xengnttab_map_domain_grant_refs(xendev->xgth, nr_segs,
-+                                          xendev->frontend_id, refs,
-+                                          prot);
-+    if (!map) {
-+        error_setg_errno(errp, errno,
-+                         "xengnttab_map_domain_grant_refs failed");
-+        goto done;
-+    }
-+
-+    for (i = 0; i < nr_segs; i++) {
-+        XenDeviceGrantCopySegment *seg = &segs[i];
-+        void *page = map + (i * XC_PAGE_SIZE);
-+
-+        if (to_domain) {
-+            memcpy(page + seg->dest.foreign.offset, seg->source.virt,
-+                   seg->len);
-+        } else {
-+            memcpy(seg->dest.virt, page + seg->source.foreign.offset,
-+                   seg->len);
-+        }
-+    }
-+
-+    if (xengnttab_unmap(xendev->xgth, map, nr_segs)) {
-+        error_setg_errno(errp, errno, "xengnttab_unmap failed");
-+    }
-+
-+done:
-+    g_free(refs);
-+}
-+
-+void xen_device_copy_grant_refs(XenDevice *xendev, bool to_domain,
-+                                XenDeviceGrantCopySegment segs[],
-+                                unsigned int nr_segs, Error **errp)
-+{
-+    xengnttab_grant_copy_segment_t *xengnttab_segs;
-+    unsigned int i;
-+
-+    if (!xendev->feature_grant_copy) {
-+        compat_copy_grant_refs(xendev, to_domain, segs, nr_segs, errp);
-+        return;
-+    }
-+
-+    xengnttab_segs = g_new0(xengnttab_grant_copy_segment_t, nr_segs);
-+
-+    for (i = 0; i < nr_segs; i++) {
-+        XenDeviceGrantCopySegment *seg = &segs[i];
-+        xengnttab_grant_copy_segment_t *xengnttab_seg = &xengnttab_segs[i];
-+
-+        if (to_domain) {
-+            xengnttab_seg->flags = GNTCOPY_dest_gref;
-+            xengnttab_seg->dest.foreign.domid = xendev->frontend_id;
-+            xengnttab_seg->dest.foreign.ref = seg->dest.foreign.ref;
-+            xengnttab_seg->dest.foreign.offset = seg->dest.foreign.offset;
-+            xengnttab_seg->source.virt = seg->source.virt;
-+        } else {
-+            xengnttab_seg->flags = GNTCOPY_source_gref;
-+            xengnttab_seg->source.foreign.domid = xendev->frontend_id;
-+            xengnttab_seg->source.foreign.ref = seg->source.foreign.ref;
-+            xengnttab_seg->source.foreign.offset =
-+                seg->source.foreign.offset;
-+            xengnttab_seg->dest.virt = seg->dest.virt;
-+        }
-+
-+        xengnttab_seg->len = seg->len;
-+    }
-+
-+    if (xengnttab_grant_copy(xendev->xgth, nr_segs, xengnttab_segs)) {
-+        error_setg_errno(errp, errno, "xengnttab_grant_copy failed");
-+        goto done;
-+    }
-+
-+    for (i = 0; i < nr_segs; i++) {
-+        xengnttab_grant_copy_segment_t *xengnttab_seg = &xengnttab_segs[i];
-+
-+        if (xengnttab_seg->status != GNTST_okay) {
-+            error_setg(errp, "xengnttab_grant_copy seg[%u] failed", i);
-+            break;
-+        }
-+    }
-+
-+done:
-+    g_free(xengnttab_segs);
-+}
-+
- static void xen_device_unrealize(DeviceState *dev, Error **errp)
- {
-     XenDevice *xendev = XEN_DEVICE(dev);
-@@ -509,6 +641,11 @@ static void xen_device_unrealize(DeviceState *dev, Error **errp)
-     xen_device_frontend_destroy(xendev);
-     xen_device_backend_destroy(xendev);
- 
-+    if (xendev->xgth) {
-+        xengnttab_close(xendev->xgth);
-+        xendev->xgth = NULL;
-+    }
-+
-     g_free(xendev->name);
-     xendev->name = NULL;
- }
-@@ -551,6 +688,15 @@ static void xen_device_realize(DeviceState *dev, Error **errp)
- 
-     trace_xen_device_realize(type, xendev->name);
- 
-+    xendev->xgth = xengnttab_open(NULL, 0);
-+    if (!xendev->xgth) {
-+        error_setg_errno(errp, errno, "failed xengnttab_open");
-+        goto unrealize;
-+    }
-+
-+    xendev->feature_grant_copy =
-+        (xengnttab_grant_copy(xendev->xgth, 0, NULL) == 0);
-+
-     xen_device_backend_create(xendev, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
 diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-index df73674fcd..63a09b67ee 100644
---- a/include/hw/xen/xen-bus.h
+new file mode 100644
+index 0000000000..0cb12464ce
+--- /dev/null
 +++ b/include/hw/xen/xen-bus.h
-@@ -24,6 +24,8 @@ typedef struct XenDevice {
-     enum xenbus_state backend_state, frontend_state;
-     Notifier exit;
-     XenWatch *frontend_state_watch;
-+    xengnttab_handle *xgth;
-+    bool feature_grant_copy;
- } XenDevice;
- 
- typedef char *(*XenDeviceGetName)(XenDevice *xendev, Error **errp);
-@@ -79,4 +81,27 @@ void xen_device_backend_set_state(XenDevice *xendev,
-                                   enum xenbus_state state);
- enum xenbus_state xen_device_backend_get_state(XenDevice *xendev);
- 
-+void xen_device_set_max_grant_refs(XenDevice *xendev, unsigned int nr_refs,
-+                                   Error **errp);
-+void *xen_device_map_grant_refs(XenDevice *xendev, uint32_t *refs,
-+                                unsigned int nr_refs, int prot,
-+                                Error **errp);
-+void xen_device_unmap_grant_refs(XenDevice *xendev, void *map,
-+                                 unsigned int nr_refs, Error **errp);
+@@ -0,0 +1,55 @@
++/*
++ * Copyright (c) 2018  Citrix Systems Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +
-+typedef struct XenDeviceGrantCopySegment {
-+    union {
-+        void *virt;
-+        struct {
-+            uint32_t ref;
-+            off_t offset;
-+        } foreign;
-+    } source, dest;
-+    size_t len;
-+} XenDeviceGrantCopySegment;
++#ifndef HW_XEN_BUS_H
++#define HW_XEN_BUS_H
 +
-+void xen_device_copy_grant_refs(XenDevice *xendev, bool to_domain,
-+                                XenDeviceGrantCopySegment segs[],
-+                                unsigned int nr_segs, Error **errp);
++#include "hw/sysbus.h"
 +
- #endif /* HW_XEN_BUS_H */
++typedef struct XenDevice {
++    DeviceState qdev;
++} XenDevice;
++
++typedef void (*XenDeviceRealize)(XenDevice *xendev, Error **errp);
++typedef void (*XenDeviceUnrealize)(XenDevice *xendev, Error **errp);
++
++typedef struct XenDeviceClass {
++    /*< private >*/
++    DeviceClass parent_class;
++    /*< public >*/
++    XenDeviceRealize realize;
++    XenDeviceUnrealize unrealize;
++} XenDeviceClass;
++
++#define TYPE_XEN_DEVICE "xen-device"
++#define XEN_DEVICE(obj) \
++     OBJECT_CHECK(XenDevice, (obj), TYPE_XEN_DEVICE)
++#define XEN_DEVICE_CLASS(class) \
++     OBJECT_CLASS_CHECK(XenDeviceClass, (class), TYPE_XEN_DEVICE)
++#define XEN_DEVICE_GET_CLASS(obj) \
++     OBJECT_GET_CLASS(XenDeviceClass, (obj), TYPE_XEN_DEVICE)
++
++typedef struct XenBus {
++    BusState qbus;
++} XenBus;
++
++typedef struct XenBusClass {
++    /*< private >*/
++    BusClass parent_class;
++} XenBusClass;
++
++#define TYPE_XEN_BUS "xen-bus"
++#define XEN_BUS(obj) \
++    OBJECT_CHECK(XenBus, (obj), TYPE_XEN_BUS)
++#define XEN_BUS_CLASS(class) \
++    OBJECT_CLASS_CHECK(XenBusClass, (class), TYPE_XEN_BUS)
++#define XEN_BUS_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(XenBusClass, (obj), TYPE_XEN_BUS)
++
++void xen_bus_init(void);
++
++#endif /* HW_XEN_BUS_H */
 -- 
 2.20.1.2.gb21ebb6
