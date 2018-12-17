@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gYpxb-0002fh-RN
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 05:17:17 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gYpyX-0003F3-O8
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 05:18:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gYpxV-0004Uc-FS
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 05:17:13 -0500
-Received: from 17.mo4.mail-out.ovh.net ([46.105.41.16]:56214)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gYpxV-0004Sg-4a
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 05:17:09 -0500
-Received: from player786.ha.ovh.net (unknown [10.109.146.175])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 7EAAA1C3376
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 11:17:06 +0100 (CET)
-References: <20181211223823.13770-1-clg@kaod.org>
-	<20181217052902.GD5597@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <862a7ab2-90b1-f7a8-1327-92687b3f4e4d@kaod.org>
-Date: Mon, 17 Dec 2018 11:16:55 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181217052902.GD5597@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gYpyU-0005Qj-Vv
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 05:18:13 -0500
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Date: Mon, 17 Dec 2018 10:17:49 +0000
+Message-ID: <08bc9976-7702-0410-557f-03b72fe6c8da@virtuozzo.com>
+References: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
+	<20181203101429.88735-9-anton.nefedov@virtuozzo.com>
+	<407c1184-67fa-1d0f-a1f7-c4050521d332@virtuozzo.com>
+In-Reply-To: <407c1184-67fa-1d0f-a1f7-c4050521d332@virtuozzo.com>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 00/12] ppc: support for the XIVE
- interrupt controller (POWER9)
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <05F2B2EF818E4A4B885C923C7641E6A3@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v10 8/9] qcow2: skip writing zero buffers
+ to empty COW areas
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +27,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
 
-On 12/17/18 6:29 AM, David Gibson wrote:
-> On Tue, Dec 11, 2018 at 11:38:11PM +0100, C=E9dric Le Goater wrote:
->> Hello,
->>
->> Here is the version 8 of the QEMU models adding support for the XIVE
->> interrupt controller to the sPAPR machine, under TCG only. KVM support
->> will be proposed in an other patchset, along with the KVM XIVE device
->> patchset, so will PowerNV.
->>
->> The most important changes for sPAPR are the introduction of a 'ic-mod=
-e'
->> machine option to select the interrupt mode of the machine and the fix
->> for CPU hotplug.
->=20
-> I've applied 1-6, I have some minor comments on 7, still reviewing the
-> remainder.
->=20
-> We also need to fix that Windows build bug - I'm planning to fold /
-> insert that fix into the series so as not to break bisection.
-
-ok. I will keep the Windows build fixes as standalone patches.=20
-
-There is another one the hcalls, but, may be, you can fold the fix in=20
-the hcall patch directly. =20
-=20
-Thanks,
-
-C.
+DQoNCk9uIDE0LzEyLzIwMTggNzoyMCBQTSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3
+cm90ZToNCj4gMDMuMTIuMjAxOCAxMzoxNCwgQW50b24gTmVmZWRvdiB3cm90ZToNCj4+IElmIENP
+VyBhcmVhcyBvZiB0aGUgbmV3bHkgYWxsb2NhdGVkIGNsdXN0ZXJzIGFyZSB6ZXJvZXMgb24gdGhl
+IGJhY2tpbmcgaW1hZ2UsDQo+PiBlZmZpY2llbnQgYmRydl93cml0ZV96ZXJvZXMoZmxhZ3M9QkRS
+Vl9SRVFfQUxMT0NBVEUpIGNhbiBiZSB1c2VkIG9uIHRoZSB3aG9sZQ0KPj4gY2x1c3RlciBpbnN0
+ZWFkIG9mIHdyaXRpbmcgZXhwbGljaXQgemVybyBidWZmZXJzIGxhdGVyIGluIHBlcmZvcm1fY293
+KCkuDQo+Pg0KPj4gaW90ZXN0IDA2MDoNCj4+IHdyaXRlIHRvIHRoZSBkaXNjYXJkZWQgY2x1c3Rl
+ciBkb2VzIG5vdCB0cmlnZ2VyIENPVyBhbnltb3JlLg0KPj4gVXNlIGEgYmFja2luZyBpbWFnZSBp
+bnN0ZWFkLg0KPj4NCj4gDQo+IFsuLl0NCj4gDQo+PiAtLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMv
+MDYwDQo+PiArKysgYi90ZXN0cy9xZW11LWlvdGVzdHMvMDYwDQo+PiBAQCAtMTUwLDI3ICsxNTAs
+MzMgQEAgJFFFTVVfSU8gLWMgIiRPUEVOX1JPIiAtYyAicmVhZCAtUCAxIDAgNTEyIiB8IF9maWx0
+ZXJfcWVtdV9pbw0KPj4gICAgZWNobw0KPj4gICAgZWNobyAiPT09IFRlc3Rpbmcgb3ZlcmxhcCB3
+aGlsZSBDT1cgaXMgaW4gZmxpZ2h0ID09PSINCj4+ICAgIGVjaG8NCj4+ICtCQUNLSU5HX0lNRz0k
+VEVTVF9JTUcuYmFzZQ0KPj4gK1RFU1RfSU1HPSRCQUNLSU5HX0lNRyBfbWFrZV90ZXN0X2ltZyAx
+Rw0KPj4gKw0KPj4gKyRRRU1VX0lPIC1jICd3cml0ZSA2NGsgNjRrJyAiJEJBQ0tJTkdfSU1HIiB8
+IF9maWx0ZXJfcWVtdV9pbw0KPj4gKw0KPj4gICAgIyBjb21wYXQ9MC4xMCBpcyByZXF1aXJlZCBp
+biBvcmRlciB0byBtYWtlIHRoZSBmb2xsb3dpbmcgZGlzY2FyZCBhY3R1YWxseQ0KPj4gLSMgdW5h
+bGxvY2F0ZSB0aGUgc2VjdG9yIHJhdGhlciB0aGFuIG1ha2UgaXQgYSB6ZXJvIHNlY3RvciAtIHdl
+IHdhbnQgQ09XLCBhZnRlcg0KPj4gLSMgYWxsLg0KPj4gLUlNR09QVFM9J2NvbXBhdD0wLjEwJyBf
+bWFrZV90ZXN0X2ltZyAxRw0KPj4gKyMgdW5hbGxvY2F0ZSB0aGUgc2VjdG9yIHJhdGhlciB0aGFu
+IG1ha2UgaXQgYSB6ZXJvIHNlY3RvciBhcyB3ZSB3b3VsZCBsaWtlDQo+PiArIyB0byByZXVzZSBp
+dCBmb3IgYW5vdGhlciBndWVzdCBvZmZzZXQNCj4+ICtJTUdPUFRTPSdjb21wYXQ9MC4xMCcgX21h
+a2VfdGVzdF9pbWcgLWIgIiRCQUNLSU5HX0lNRyIgMUcNCj4+ICAgICMgV3JpdGUgdHdvIGNsdXN0
+ZXJzLCB0aGUgc2Vjb25kIG9uZSBlbmZvcmNlcyBjcmVhdGlvbiBvZiBhbiBMMiB0YWJsZSBhZnRl
+cg0KPj4gICAgIyB0aGUgZmlyc3QgZGF0YSBjbHVzdGVyLg0KPj4gICAgJFFFTVVfSU8gLWMgJ3dy
+aXRlIDBrIDY0aycgLWMgJ3dyaXRlIDUxMk0gNjRrJyAiJFRFU1RfSU1HIiB8IF9maWx0ZXJfcWVt
+dV9pbw0KPj4gLSMgRGlzY2FyZCB0aGUgZmlyc3QgY2x1c3Rlci4gVGhpcyBjbHVzdGVyIHdpbGwg
+c29vbiBlbm91Z2ggYmUgcmVhbGxvY2F0ZWQgYW5kDQo+PiAtIyB1c2VkIGZvciBDT1cuDQo+PiAr
+IyBEaXNjYXJkIHRoZSBmaXJzdCBjbHVzdGVyLiBUaGlzIGNsdXN0ZXIgd2lsbCBzb29uIGVub3Vn
+aCBiZSByZWFsbG9jYXRlZA0KPj4gICAgJFFFTVVfSU8gLWMgJ2Rpc2NhcmQgMGsgNjRrJyAiJFRF
+U1RfSU1HIiB8IF9maWx0ZXJfcWVtdV9pbw0KPj4gICAgIyBOb3csIGNvcnJ1cHQgdGhlIGltYWdl
+IGJ5IG1hcmtpbmcgdGhlIHNlY29uZCBMMiB0YWJsZSBjbHVzdGVyIGFzIGZyZWUuDQo+PiAgICBw
+b2tlX2ZpbGUgIiRURVNUX0lNRyIgJzEzMTA4NCcgIlx4MDBceDAwIiAjIDB4MjAwMGMNCj4+IC0j
+IFN0YXJ0IGEgd3JpdGUgb3BlcmF0aW9uIHJlcXVpcmluZyBDT1cgb24gdGhlIGltYWdlIHN0b3Bw
+aW5nIGl0IHJpZ2h0IGJlZm9yZQ0KPj4gLSMgZG9pbmcgdGhlIHJlYWQ7IHRoZW4sIHRyaWdnZXIg
+dGhlIGNvcnJ1cHRpb24gcHJldmVudGlvbiBieSB3cml0aW5nIGFueXRoaW5nIHRvDQo+PiAtIyBh
+bnkgdW5hbGxvY2F0ZWQgY2x1c3RlciwgbGVhZGluZyB0byBhbiBhdHRlbXB0IHRvIG92ZXJ3cml0
+ZSB0aGUgc2Vjb25kIEwyDQo+PiArIyBTdGFydCBhIHdyaXRlIG9wZXJhdGlvbiByZXF1aXJpbmcg
+Q09XIG9uIHRoZSBpbWFnZTsNCj4+ICsjIHRoaXMgd3JpdGUgd2lsbCByZXVzZSB0aGUgaG9zdCBv
+ZmZzZXQgcmVsZWFzZWQgYnkgYSBwcmV2aW91cyBkaXNjYXJkLg0KPj4gKyMgU3RvcCBpdCByaWdo
+dCBiZWZvcmUgZG9pbmcgdGhlIHJlYWQuDQo+PiArIyBUaGVuLCB0cmlnZ2VyIHRoZSBjb3JydXB0
+aW9uIHByZXZlbnRpb24gYnkgd3JpdGluZyBhbnl0aGluZyB0bw0KPj4gKyMgYW5vdGhlciB1bmFs
+bG9jYXRlZCBjbHVzdGVyLCBsZWFkaW5nIHRvIGFuIGF0dGVtcHQgdG8gb3ZlcndyaXRlIHRoZSBz
+ZWNvbmQgTDINCj4+ICAgICMgdGFibGUuIEZpbmFsbHksIHJlc3VtZSB0aGUgQ09XIHdyaXRlIGFu
+ZCBzZWUgaXQgZmFpbCAoYnV0IG5vdCBjcmFzaCkuDQo+PiAgICBlY2hvICJvcGVuIC1vIGZpbGUu
+ZHJpdmVyPWJsa2RlYnVnICRURVNUX0lNRw0KPj4gICAgYnJlYWsgY293X3JlYWQgMA0KPj4gLWFp
+b193cml0ZSAwayAxaw0KPj4gK2Fpb193cml0ZSA2NGsgMWsNCj4+ICAgIHdhaXRfYnJlYWsgMA0K
+Pj4gLXdyaXRlIDY0ayA2NGsNCj4+ICt3cml0ZSAxMjhrIDY0aw0KPiANCj4gZG9uJ3QgdW5kZXJz
+dGFuZCB3aHkgeW91IG5lZWQgdGhlc2UgY2hhbmdlcy4NCj4gDQo+IHdvcmtzIGZvciBtZSwgd2l0
+aG91dCB0aGVtLCBpZiB3cml0ZSB0byBiYWNraW5nIGF0IDAgb2Zmc2V0LCBvZiBjb3Vyc2UuDQo+
+IA0KPiBBcyBJIHVuZGVyc3RhbmQsIGRpc2NhcmQgY3JlYXRlIHVuYWxsb2NhdGVkIGhvbGVzIGlu
+IHRvcCBxY293MiBmb3Igb2xkIHFjb3cyIHZlcnNpb24uDQo+IA0KDQpPaywgc28gQ09XIGhhcHBl
+bnMgcmVnYXJkbGVzcyBpZiB0aGlzIGd1ZXN0IG9mZnNldCBoYXMgYmVlbiBkaXNjYXJkZWQNCmJl
+Zm9yZS4gVGhlc2Ugb2Zmc2V0IGNoYW5nZXMgYXJlIGluZGVlZCBub3QgbmVlZGVkLiBKdXN0IHRo
+ZSBiYWNraW5nDQpmaWxlLg0K
