@@ -1,27 +1,26 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:37274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gYqbo-0002Y7-Rf
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 05:58:49 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gYqbq-0002Y7-Ox
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 05:58:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gYqa2-00008P-E6
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 05:56:59 -0500
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:45113)
+	(envelope-from <alex.bennee@linaro.org>) id 1gYqZy-00006M-Vo
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 05:56:58 -0500
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:34774)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gYqa2-00007h-42
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 05:56:58 -0500
-Received: by mail-wr1-x42b.google.com with SMTP id t6so11595125wrr.12
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 02:56:58 -0800 (PST)
+	id 1gYqZy-00005a-Ky
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 05:56:54 -0500
+Received: by mail-wm1-x32f.google.com with SMTP id y185so4430320wmd.1
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 02:56:54 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 17 Dec 2018 10:56:41 +0000
-Message-Id: <20181217105650.27361-7-alex.bennee@linaro.org>
+Date: Mon, 17 Dec 2018 10:56:36 +0000
+Message-Id: <20181217105650.27361-2-alex.bennee@linaro.org>
 In-Reply-To: <20181217105650.27361-1-alex.bennee@linaro.org>
 References: <20181217105650.27361-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v3 06/15] softfloat: rename canonicalize to
- sf_canonicalize
+Subject: [Qemu-devel] [PULL v3 01/15] contrib: add a basic gitdm config
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +30,412 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: "Emilio G. Cota" <cota@braap.org>
+This is a QEMU specific version of a gitdm config for generating
+reports on the contributor base of the project. I've added enough
+group maps and domain aliases to ensure the current top ten is as
+reflective as it can be. As of this commit running:
 
-glibc >= 2.25 defines canonicalize in commit eaf5ad0
-(Add canonicalize, canonicalizef, canonicalizel., 2016-10-26).
+  git log --numstat --since "Last Year" | gitdm -n -l 10
 
-Given that we'll be including <math.h> soon, prepare
-for this by prefixing our canonicalize() with sf_ to avoid
-clashing with the libc's canonicalize().
+Reports:
 
-Reported-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Tested-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
+  Top changeset contributors by employer
+  Red Hat                   3172 (44.3%)
+  Linaro                    1153 (16.1%)
+  (None)                     549 (7.7%)
+  IBM                        348 (4.9%)
+  Academics (various)        170 (2.4%)
+  Virtuozzo                  168 (2.3%)
+  Wave Computing             118 (1.6%)
+  Xilinx                     102 (1.4%)
+  Igalia                      93 (1.3%)
+  Cadence Design Systems      88 (1.2%)
+
+  Top lines changed by employer
+  Red Hat                   144092 (28.1%)
+  Cadence Design Systems    126554 (24.6%)
+  Linaro                    77480 (15.1%)
+  Wave Computing            33134 (6.5%)
+  SiFive                    14392 (2.8%)
+  IBM                       12219 (2.4%)
+  (None)                    11948 (2.3%)
+  Academics (various)       10447 (2.0%)
+  Virtuozzo                 10445 (2.0%)
+  CodeWeavers               9179 (1.8%)
+
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index e1eef954e6..ecdc00c633 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -336,8 +336,8 @@ static inline float64 float64_pack_raw(FloatParts p)
- #include "softfloat-specialize.h"
- 
- /* Canonicalize EXP and FRAC, setting CLS.  */
--static FloatParts canonicalize(FloatParts part, const FloatFmt *parm,
--                               float_status *status)
-+static FloatParts sf_canonicalize(FloatParts part, const FloatFmt *parm,
-+                                  float_status *status)
- {
-     if (part.exp == parm->exp_max && !parm->arm_althp) {
-         if (part.frac == 0) {
-@@ -513,7 +513,7 @@ static FloatParts round_canonical(FloatParts p, float_status *s,
- static FloatParts float16a_unpack_canonical(float16 f, float_status *s,
-                                             const FloatFmt *params)
- {
--    return canonicalize(float16_unpack_raw(f), params, s);
-+    return sf_canonicalize(float16_unpack_raw(f), params, s);
- }
- 
- static FloatParts float16_unpack_canonical(float16 f, float_status *s)
-@@ -534,7 +534,7 @@ static float16 float16_round_pack_canonical(FloatParts p, float_status *s)
- 
- static FloatParts float32_unpack_canonical(float32 f, float_status *s)
- {
--    return canonicalize(float32_unpack_raw(f), &float32_params, s);
-+    return sf_canonicalize(float32_unpack_raw(f), &float32_params, s);
- }
- 
- static float32 float32_round_pack_canonical(FloatParts p, float_status *s)
-@@ -544,7 +544,7 @@ static float32 float32_round_pack_canonical(FloatParts p, float_status *s)
- 
- static FloatParts float64_unpack_canonical(float64 f, float_status *s)
- {
--    return canonicalize(float64_unpack_raw(f), &float64_params, s);
-+    return sf_canonicalize(float64_unpack_raw(f), &float64_params, s);
- }
- 
- static float64 float64_round_pack_canonical(FloatParts p, float_status *s)
+diff --git a/contrib/gitdm/aliases b/contrib/gitdm/aliases
+new file mode 100644
+index 0000000000..07fd3391a5
+--- /dev/null
++++ b/contrib/gitdm/aliases
+@@ -0,0 +1,27 @@
++#
++# This is the email aliases file, mapping secondary addresses
++# onto a single, canonical address. Duplicates some info from .mailmap
++#
++
++# weird commits
++balrog@c046a42c-6fe2-441c-8c8c-71466251a162 balrogg@gmail.com
++aliguori@c046a42c-6fe2-441c-8c8c-71466251a162 anthony@codemonkey.ws
++aurel32@c046a42c-6fe2-441c-8c8c-71466251a162 aurelien@aurel32.net
++blueswir1@c046a42c-6fe2-441c-8c8c-71466251a162 blauwirbel@gmail.com
++edgar_igl@c046a42c-6fe2-441c-8c8c-71466251a162 edgar.iglesias@gmail.com
++bellard@c046a42c-6fe2-441c-8c8c-71466251a162 fabrice@bellard.org
++j_mayer@c046a42c-6fe2-441c-8c8c-71466251a162 l_indien@magic.fr
++pbrook@c046a42c-6fe2-441c-8c8c-71466251a162 paul@codesourcery.com
++ths@c046a42c-6fe2-441c-8c8c-71466251a162 ths@networkno.de
++malc@c046a42c-6fe2-441c-8c8c-71466251a162 av1474@comtv.ru
++
++# There is also a:
++#    (no author) <(no author)@c046a42c-6fe2-441c-8c8c-71466251a162>
++# for the cvs2svn initialization commit e63c3dc74bf.
++
++# Next, translate a few commits where mailman rewrote the From: line due
++# to strict SPF, although we prefer to avoid adding more entries like that.
++"Ed Swierk via Qemu-devel" eswierk@skyportsystems.com
++"Ian McKellar via Qemu-devel" ianloic@google.com
++"Julia Suvorova via Qemu-devel" jusual@mail.ru
++"Justin Terry (VM) via Qemu-devel" juterry@microsoft.com
+diff --git a/contrib/gitdm/domain-map b/contrib/gitdm/domain-map
+new file mode 100644
+index 0000000000..8cbbcfe93d
+--- /dev/null
++++ b/contrib/gitdm/domain-map
+@@ -0,0 +1,19 @@
++#
++# QEMU gitdm domain-map
++#
++# This maps email domains to nice easy to read company names
++#
++
++amd.com         AMD
++greensocs.com   GreenSocs
++ibm.com         IBM
++igalia.com      Igalia
++linaro.org      Linaro
++oracle.com      Oracle
++redhat.com      Red Hat
++siemens.com     Siemens
++sifive.com      SiFive
++suse.de         SUSE
++virtuozzo.com   Virtuozzo
++wdc.com         Western Digital
++xilinx.com      Xilinx
+diff --git a/contrib/gitdm/filetypes.txt b/contrib/gitdm/filetypes.txt
+new file mode 100644
+index 0000000000..15d6f803b9
+--- /dev/null
++++ b/contrib/gitdm/filetypes.txt
+@@ -0,0 +1,146 @@
++# -*- coding:utf-8 -*-
++# Copyright (C)  2006 Libresoft
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option  any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU Library General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++#
++# Authors : Gregorio Robles <grex@gsyc.escet.urjc.es>
++# Authors : Germán Póo-Caamaño <gpoo@gnome.org>
++#
++# This QEMU version is a cut-down version of what originally shipped
++# in the gitdm sample-config directory.
++#
++# This file contains associations parameters regarding filetypes
++# (documentation, develompent, multimedia, images...)
++#
++# format:
++# filetype <type> <regex> [<comment>]
++#
++# Order:
++#   The list should keep an order, so filetypes can be counted properly.
++#   ie. we want ltmain.sh -> 'build' instead of 'code'.
++#
++#   If there is an filetype which is not in order but has values, it will
++#   be added at the end.
++#
++order build,tests,code,documentation,devel-doc,blobs
++
++#
++#
++# Code files (headers and the like included
++# (most common languages first
++#
++filetype code \.c$	# C
++filetype code \.inc.c$	# C
++filetype code \.C$	# C++
++filetype code \.cpp$	# C++
++filetype code \.c\+\+$	# C++
++filetype code \.cxx$	# C++
++filetype code \.cc$	# C++
++filetype code \.h$	# C or C++ header
++filetype code \.hh$	# C++ header
++filetype code \.hpp$	# C++ header
++filetype code \.hxx$	# C++ header
++filetype code \.sh$	# Shell
++filetype code \.pl$	# Perl
++filetype code \.py$	# Python
++filetype code \.s$	# Assembly
++filetype code \.S$	# Assembly
++filetype code \.asm$	# Assembly
++filetype code \.awk$	# awk
++filetype code ^common$  # script fragements
++filetype code ^common.*$  # script fragements
++filetype code (qom|qmp)-\w+$  # python script fragments
++
++#
++# Interface/api files
++#
++filetype interface \.json$   # json
++filetype interface \.hx$     # documented options
++
++#
++# Test related blobs (unfortunately we can't filter out test code)
++#
++filetype tests \.hex$
++filetype tests \d{2,3}$     # test data 00-999
++filetype tests ^[A-Z]{4}$   # ACPI test data
++filetype tests ^[A-Z]{4}\.*$   # ACPI test data
++filetype tests \.out$
++filetype tests \.out\.nocache$
++filetype tests \.err$
++filetype tests \.exit$      # bad-if-FOO.exit etc
++filetype tests \.decode$
++filetype tests \.yml$        # travis/shippable config
++
++#
++# Development documentation files (for hacking generally)
++#
++filetype devel-doc ^readme.*$
++filetype devel-doc ^changelog.*
++filetype devel-doc ^hacking.*$
++filetype devel-doc ^licen(s|c)e.*$
++filetype devel-doc ^copying.*$
++filetype devel-doc ^MAINTAINERS$
++filetype devel-doc ^BSD-2-Clause$
++filetype devel-doc ^BSD-3-Clause$
++filetype devel-doc ^GPL-2.0$
++filetype devel-doc \.txt$
++filetype devel-doc \.rst$
++filetype devel-doc \.texi$
++filetype devel-doc \.pod$
++
++#
++# Building, compiling, and configuration admin files
++#
++filetype build configure.*$
++filetype build Makefile$
++filetype build Makefile\.*$
++filetype build config$
++filetype build conf$
++filetype build \.cfg$
++filetype build \.mk$
++filetype build \.mak$
++filetype build \.docker$
++filetype build \.pre$
++filetype build ^.gitignore$
++filetype build ^.gitmodules$
++filetype build ^.gitpublish$
++filetype build ^.mailmap$
++filetype build ^.dir-locals.el$
++filetype build ^.editorconfig$
++filetype build ^.exrc$
++filetype build ^.gdbinit$
++filetype build \.cocci$         # Coccinelle semantic patches
++
++#
++# Misc blobs
++#
++filetype blobs \.bin$
++filetype blobs \.dtb$
++filetype blobs \.dts$
++filetype blobs \.rom$
++filetype blobs \.img$
++filetype blobs \.ndrv$
++filetype blobs \.bmp$
++filetype blobs \.svg$
++filetype blobs ^pi_10.com$
++
++
++#
++# Documentation files
++#
++filetype documentation \.html$
++filetype documentation \.txt$
++filetype documentation \.texi$
++filetype documentation \.po$            # translation files
+diff --git a/contrib/gitdm/group-map-academics b/contrib/gitdm/group-map-academics
+new file mode 100644
+index 0000000000..08f9d81d13
+--- /dev/null
++++ b/contrib/gitdm/group-map-academics
+@@ -0,0 +1,14 @@
++#
++# QEMU is quite often used for academic research purposes and we like
++# it even better when the work is up-streamed so the project can
++# benefit.
++#
++# We group our academic contributors here
++#
++
++# Institute for System Programming of Russian Academy of Science
++ispras.ru
++
++# Columbia University
++cs.columbia.edu
++cota@braap.org
+diff --git a/contrib/gitdm/group-map-cadence b/contrib/gitdm/group-map-cadence
+new file mode 100644
+index 0000000000..ab97dd2fc3
+--- /dev/null
++++ b/contrib/gitdm/group-map-cadence
+@@ -0,0 +1,3 @@
++# Cadence Design Systems
++
++jcmvbkbc@gmail.com
+diff --git a/contrib/gitdm/group-map-codeweavers b/contrib/gitdm/group-map-codeweavers
+new file mode 100644
+index 0000000000..c4803489e2
+--- /dev/null
++++ b/contrib/gitdm/group-map-codeweavers
+@@ -0,0 +1 @@
++sergio.g.delreal@gmail.com
+diff --git a/contrib/gitdm/group-map-ibm b/contrib/gitdm/group-map-ibm
+new file mode 100644
+index 0000000000..b66db5f4a8
+--- /dev/null
++++ b/contrib/gitdm/group-map-ibm
+@@ -0,0 +1,6 @@
++#
++# Some IBM contributors submit via another domain
++#
++
++clg@kaod.org
++groug@kaod.org
+diff --git a/contrib/gitdm/group-map-individuals b/contrib/gitdm/group-map-individuals
+new file mode 100644
+index 0000000000..afdbe7d460
+--- /dev/null
++++ b/contrib/gitdm/group-map-individuals
+@@ -0,0 +1,10 @@
++#
++# Individual and personal contributors
++#
++# This is simply to allow prolific developers with no company
++# affiliations to be grouped together in the summary stats.
++#
++
++f4bug@amsat.org
++mjt@tls.msk.ru
++mark.cave-ayland@ilande.co.uk
+diff --git a/contrib/gitdm/group-map-redhat b/contrib/gitdm/group-map-redhat
+new file mode 100644
+index 0000000000..6d05c6b54f
+--- /dev/null
++++ b/contrib/gitdm/group-map-redhat
+@@ -0,0 +1,7 @@
++#
++# Red Hat contributors using non-corporate email
++#
++
++david@gibson.dropbear.id.au
++laurent@vivier.eu
++pjp@fedoraproject.org
+diff --git a/contrib/gitdm/group-map-wavecomp b/contrib/gitdm/group-map-wavecomp
+new file mode 100644
+index 0000000000..c571a52c65
+--- /dev/null
++++ b/contrib/gitdm/group-map-wavecomp
+@@ -0,0 +1,18 @@
++#
++# Wave Computing acquired MIPS in June 2018. Also, from February 2013
++# to October 2017, MIPS was owned by Imagination Technologies.
++#
++
++aleksandar.markovic@imgtec.com
++aleksandar.markovic@mips.com
++amarkovic@wavecomp.com
++arikalo@wavecomp.com
++dnikolic@wavecomp.com
++james.hogan@mips.com
++matthew.fortune@mips.com
++paul.burton@imgtec.com
++pburton@wavecomp.com
++smarkovic@wavecomp.com
++yongbok.kim@imgtec.com
++yongbok.kim@mips.com
++ysu@wavecomp.com
+diff --git a/gitdm.config b/gitdm.config
+new file mode 100644
+index 0000000000..7472d4b8be
+--- /dev/null
++++ b/gitdm.config
+@@ -0,0 +1,50 @@
++#
++# This is the gitdm configuration file for QEMU.
++#
++# It is to be used with LWN's git dataminer tool for generating
++# reports about development activity in the QEMU repo. The LWN gitdm
++# tool can be found at:
++#
++#   git://git.lwn.net/gitdm.git
++#
++# A run to generate a report for the last year of activity would be
++#
++#   git log --numstat --since "Last Year" | gitdm -n -l 10
++#
++
++# EmailAliases lets us cope with developers who use more
++# than one address or have changed addresses. This duplicates some of
++# the information in the existing .mailmap but in a slightly different
++# form.
++#
++EmailAliases contrib/gitdm/aliases
++
++#
++# EmailMap does the main work of mapping addresses onto
++# employers.
++#
++EmailMap contrib/gitdm/domain-map
++
++#
++# Use GroupMap to map a file full of addresses to the
++# same employer. This is used for people that don't post from easily
++# identifiable corporate emails.
++#
++
++GroupMap contrib/gitdm/group-map-redhat Red Hat
++GroupMap contrib/gitdm/group-map-wavecomp Wave Computing
++GroupMap contrib/gitdm/group-map-cadence Cadence Design Systems
++GroupMap contrib/gitdm/group-map-codeweavers CodeWeavers
++GroupMap contrib/gitdm/group-map-ibm IBM
++
++# Also group together our prolific individual contributors
++# and those working under academic auspices
++GroupMap contrib/gitdm/group-map-individuals (None)
++GroupMap contrib/gitdm/group-map-academics Academics (various)
++
++#
++#
++# Use FileTypeMap to map a file types to file names using regular
++# regular expressions.
++#
++FileTypeMap contrib/gitdm/filetypes.txt
 -- 
 2.17.1
