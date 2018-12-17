@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gYxuz-0005XZ-Sc
+	(envelope-from <yuval.shaia@oracle.com>) id 1gYxv3-0005Xo-0B
 	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 13:47:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gYxuw-0001pU-DL
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 13:47:05 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:33348)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gYxuz-0001rs-9x
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 13:47:08 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:33372)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gYxuw-0001od-0m
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 13:47:02 -0500
+	id 1gYxuy-0001r0-V0
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 13:47:05 -0500
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Mon, 17 Dec 2018 20:45:18 +0200
-Message-Id: <20181217184540.4571-2-yuval.shaia@oracle.com>
+Date: Mon, 17 Dec 2018 20:45:19 +0200
+Message-Id: <20181217184540.4571-3-yuval.shaia@oracle.com>
 In-Reply-To: <20181217184540.4571-1-yuval.shaia@oracle.com>
 References: <20181217184540.4571-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v8 01/23] contrib/rdmacm-mux: Add
- implementation of RDMA User MAD multiplexer
+Subject: [Qemu-devel] [PATCH v8 02/23] hw/rdma: Add ability to force
+ notification without re-arm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,978 +27,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
 
-RDMA MAD kernel module (ibcm) disallow more than one MAD-agent for a
-given MAD class.
-This does not go hand-by-hand with qemu pvrdma device's requirements
-where each VM is MAD agent.
-Fix it by adding implementation of RDMA MAD multiplexer service which on
-one hand register as a sole MAD agent with the kernel module and on the
-other hand gives service to more than one VM.
+Upon completion of incoming packet the device pushes CQE to driver's RX
+ring and notify the driver (msix).
+While for data-path incoming packets the driver needs the ability to
+control whether it wished to receive interrupts or not, for control-path
+packets such as incoming MAD the driver needs to be notified anyway, it
+even do not need to re-arm the notification bit.
 
-Design Overview:
-----------------
-A server process is registered to UMAD framework (for this to work the
-rdma_cm kernel module needs to be unloaded) and creates a unix socket to
-listen to incoming request from clients.
-A client process (such as QEMU) connects to this unix socket and
-registers with its own GID.
-
-TX:
----
-When client needs to send rdma_cm MAD message it construct it the same
-way as without this multiplexer, i.e. creates a umad packet but this
-time it writes its content to the socket instead of calling umad_send().
-The server, upon receiving such a message fetch local_comm_id from it so
-a context for this session can be maintain and relay the message to UMAD
-layer by calling umad_send().
-
-RX:
----
-The server creates a worker thread to process incoming rdma_cm MAD
-messages. When an incoming message arrived (umad_recv()) the server,
-depending on the message type (attr_id) looks for target client by
-either searching in gid->fd table or in local_comm_id->fd table. With
-the extracted fd the server relays to incoming message to the client.
+Enhance the notification field to support this.
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-Reviewed-by: Shamir Rabinovitch <shamir.rabinovitch@oracle.com>
+Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- MAINTAINERS                      |   1 +
- Makefile                         |   3 +
- Makefile.objs                    |   1 +
- contrib/rdmacm-mux/Makefile.objs |   4 +
- contrib/rdmacm-mux/main.c        | 798 +++++++++++++++++++++++++++++++
- contrib/rdmacm-mux/rdmacm-mux.h  |  61 +++
- 6 files changed, 868 insertions(+)
- create mode 100644 contrib/rdmacm-mux/Makefile.objs
- create mode 100644 contrib/rdmacm-mux/main.c
- create mode 100644 contrib/rdmacm-mux/rdmacm-mux.h
+ hw/rdma/rdma_rm.c           | 12 ++++++++++--
+ hw/rdma/rdma_rm_defs.h      |  8 +++++++-
+ hw/rdma/vmw/pvrdma_qp_ops.c |  6 ++++--
+ 3 files changed, 21 insertions(+), 5 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1032406c56..7b68080094 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2334,6 +2334,7 @@ S: Maintained
- F: hw/rdma/*
- F: hw/rdma/vmw/*
- F: docs/pvrdma.txt
-+F: contrib/rdmacm-mux/*
+diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+index 8d59a42cd1..4f10fcabcc 100644
+--- a/hw/rdma/rdma_rm.c
++++ b/hw/rdma/rdma_rm.c
+@@ -263,7 +263,7 @@ int rdma_rm_alloc_cq(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
+     }
  
- Build and test automation
- -------------------------
-diff --git a/Makefile b/Makefile
-index c8b9efdad4..2b46880eb6 100644
---- a/Makefile
-+++ b/Makefile
-@@ -362,6 +362,7 @@ dummy := $(call unnest-vars,, \
-                 elf2dmp-obj-y \
-                 ivshmem-client-obj-y \
-                 ivshmem-server-obj-y \
-+                rdmacm-mux-obj-y \
-                 libvhost-user-obj-y \
-                 vhost-user-scsi-obj-y \
-                 vhost-user-blk-obj-y \
-@@ -579,6 +580,8 @@ vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) libvhost-user.a
- 	$(call LINK, $^)
- vhost-user-blk$(EXESUF): $(vhost-user-blk-obj-y) libvhost-user.a
- 	$(call LINK, $^)
-+rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
-+	$(call LINK, $^)
+     cq->opaque = opaque;
+-    cq->notify = false;
++    cq->notify = CNT_CLEAR;
  
- module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
- 	$(call quiet-command,$(PYTHON) $< $@ \
-diff --git a/Makefile.objs b/Makefile.objs
-index 56af0347d3..319f14d937 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -133,6 +133,7 @@ vhost-user-scsi.o-cflags := $(LIBISCSI_CFLAGS)
- vhost-user-scsi.o-libs := $(LIBISCSI_LIBS)
- vhost-user-scsi-obj-y = contrib/vhost-user-scsi/
- vhost-user-blk-obj-y = contrib/vhost-user-blk/
-+rdmacm-mux-obj-y = contrib/rdmacm-mux/
+     rc = rdma_backend_create_cq(backend_dev, &cq->backend_cq, cqe);
+     if (rc) {
+@@ -291,7 +291,10 @@ void rdma_rm_req_notify_cq(RdmaDeviceResources *dev_res, uint32_t cq_handle,
+         return;
+     }
  
- ######################################################################
- trace-events-subdirs =
-diff --git a/contrib/rdmacm-mux/Makefile.objs b/contrib/rdmacm-mux/Makefile.objs
-new file mode 100644
-index 0000000000..be3eacb6f7
---- /dev/null
-+++ b/contrib/rdmacm-mux/Makefile.objs
-@@ -0,0 +1,4 @@
-+ifdef CONFIG_PVRDMA
-+CFLAGS += -libumad -Wno-format-truncation
-+rdmacm-mux-obj-y = main.o
-+endif
-diff --git a/contrib/rdmacm-mux/main.c b/contrib/rdmacm-mux/main.c
-new file mode 100644
-index 0000000000..835a7f9214
---- /dev/null
-+++ b/contrib/rdmacm-mux/main.c
-@@ -0,0 +1,798 @@
-+/*
-+ * QEMU paravirtual RDMA - rdmacm-mux implementation
-+ *
-+ * Copyright (C) 2018 Oracle
-+ * Copyright (C) 2018 Red Hat Inc
-+ *
-+ * Authors:
-+ *     Yuval Shaia <yuval.shaia@oracle.com>
-+ *     Marcel Apfelbaum <marcel@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
+-    cq->notify = notify;
++    if (cq->notify != CNT_SET) {
++        cq->notify = notify ? CNT_ARM : CNT_CLEAR;
++    }
 +
-+#include "qemu/osdep.h"
-+#include "sys/poll.h"
-+#include "sys/ioctl.h"
-+#include "pthread.h"
-+#include "syslog.h"
+     pr_dbg("notify=%d\n", cq->notify);
+ }
+ 
+@@ -349,6 +352,11 @@ int rdma_rm_alloc_qp(RdmaDeviceResources *dev_res, uint32_t pd_handle,
+         return -EINVAL;
+     }
+ 
++    if (qp_type == IBV_QPT_GSI) {
++        scq->notify = CNT_SET;
++        rcq->notify = CNT_SET;
++    }
 +
-+#include "infiniband/verbs.h"
-+#include "infiniband/umad.h"
-+#include "infiniband/umad_types.h"
-+#include "infiniband/umad_sa.h"
-+#include "infiniband/umad_cm.h"
+     qp = res_tbl_alloc(&dev_res->qp_tbl, &rm_qpn);
+     if (!qp) {
+         return -ENOMEM;
+diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
+index 7228151239..9b399063d3 100644
+--- a/hw/rdma/rdma_rm_defs.h
++++ b/hw/rdma/rdma_rm_defs.h
+@@ -49,10 +49,16 @@ typedef struct RdmaRmPD {
+     uint32_t ctx_handle;
+ } RdmaRmPD;
+ 
++typedef enum CQNotificationType {
++    CNT_CLEAR,
++    CNT_ARM,
++    CNT_SET,
++} CQNotificationType;
 +
-+#include "rdmacm-mux.h"
-+
-+#define SCALE_US 1000
-+#define COMMID_TTL 2 /* How many SCALE_US a context of MAD session is saved */
-+#define SLEEP_SECS 5 /* This is used both in poll() and thread */
-+#define SERVER_LISTEN_BACKLOG 10
-+#define MAX_CLIENTS 4096
-+#define MAD_RMPP_VERSION 0
-+#define MAD_METHOD_MASK0 0x8
-+
-+#define IB_USER_MAD_LONGS_PER_METHOD_MASK (128 / (8 * sizeof(long)))
-+
-+#define CM_REQ_DGID_POS      80
-+#define CM_SIDR_REQ_DGID_POS 44
-+
-+/* The below can be override by command line parameter */
-+#define UNIX_SOCKET_PATH "/var/run/rdmacm-mux"
-+#define RDMA_PORT_NUM 1
-+
-+typedef struct RdmaCmServerArgs {
-+    char unix_socket_path[PATH_MAX];
-+    char rdma_dev_name[NAME_MAX];
-+    int rdma_port_num;
-+} RdmaCMServerArgs;
-+
-+typedef struct CommId2FdEntry {
-+    int fd;
-+    int ttl; /* Initialized to 2, decrement each timeout, entry delete when 0 */
-+    __be64 gid_ifid;
-+} CommId2FdEntry;
-+
-+typedef struct RdmaCmUMadAgent {
-+    int port_id;
-+    int agent_id;
-+    GHashTable *gid2fd; /* Used to find fd of a given gid */
-+    GHashTable *commid2fd; /* Used to find fd on of a given comm_id */
-+} RdmaCmUMadAgent;
-+
-+typedef struct RdmaCmServer {
-+    bool run;
-+    RdmaCMServerArgs args;
-+    struct pollfd fds[MAX_CLIENTS];
-+    int nfds;
-+    RdmaCmUMadAgent umad_agent;
-+    pthread_t umad_recv_thread;
-+    pthread_rwlock_t lock;
-+} RdmaCMServer;
-+
-+static RdmaCMServer server = {0};
-+
-+static void usage(const char *progname)
-+{
-+    printf("Usage: %s [OPTION]...\n"
-+           "Start a RDMA-CM multiplexer\n"
-+           "\n"
-+           "\t-h                    Show this help\n"
-+           "\t-d rdma-device-name   Name of RDMA device to register with\n"
-+           "\t-s unix-socket-path   Path to unix socket to listen on (default %s)\n"
-+           "\t-p rdma-device-port   Port number of RDMA device to register with (default %d)\n",
-+           progname, UNIX_SOCKET_PATH, RDMA_PORT_NUM);
-+}
-+
-+static void help(const char *progname)
-+{
-+    fprintf(stderr, "Try '%s -h' for more information.\n", progname);
-+}
-+
-+static void parse_args(int argc, char *argv[])
-+{
-+    int c;
-+    char unix_socket_path[PATH_MAX];
-+
-+    strcpy(server.args.rdma_dev_name, "");
-+    strcpy(unix_socket_path, UNIX_SOCKET_PATH);
-+    server.args.rdma_port_num = RDMA_PORT_NUM;
-+
-+    while ((c = getopt(argc, argv, "hs:d:p:")) != -1) {
-+        switch (c) {
-+        case 'h':
-+            usage(argv[0]);
-+            exit(0);
-+
-+        case 'd':
-+            strncpy(server.args.rdma_dev_name, optarg, NAME_MAX - 1);
-+            break;
-+
-+        case 's':
-+            /* This is temporary, final name will build below */
-+            strncpy(unix_socket_path, optarg, PATH_MAX);
-+            break;
-+
-+        case 'p':
-+            server.args.rdma_port_num = atoi(optarg);
-+            break;
-+
-+        default:
-+            help(argv[0]);
-+            exit(1);
+ typedef struct RdmaRmCQ {
+     RdmaBackendCQ backend_cq;
+     void *opaque;
+-    bool notify;
++    CQNotificationType notify;
+ } RdmaRmCQ;
+ 
+ /* MR (DMA region) */
+diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
+index c668afd0ed..762700a205 100644
+--- a/hw/rdma/vmw/pvrdma_qp_ops.c
++++ b/hw/rdma/vmw/pvrdma_qp_ops.c
+@@ -89,8 +89,10 @@ static int pvrdma_post_cqe(PVRDMADev *dev, uint32_t cq_handle,
+     pvrdma_ring_write_inc(&dev->dsr_info.cq);
+ 
+     pr_dbg("cq->notify=%d\n", cq->notify);
+-    if (cq->notify) {
+-        cq->notify = false;
++    if (cq->notify != CNT_CLEAR) {
++        if (cq->notify == CNT_ARM) {
++            cq->notify = CNT_CLEAR;
 +        }
-+    }
-+
-+    if (!strcmp(server.args.rdma_dev_name, "")) {
-+        fprintf(stderr, "Missing RDMA device name\n");
-+        help(argv[0]);
-+        exit(1);
-+    }
-+
-+    /* Build unique unix-socket file name */
-+    snprintf(server.args.unix_socket_path, PATH_MAX, "%s-%s-%d",
-+             unix_socket_path, server.args.rdma_dev_name,
-+             server.args.rdma_port_num);
-+
-+    syslog(LOG_INFO, "unix_socket_path=%s", server.args.unix_socket_path);
-+    syslog(LOG_INFO, "rdma-device-name=%s", server.args.rdma_dev_name);
-+    syslog(LOG_INFO, "rdma-device-port=%d", server.args.rdma_port_num);
-+}
-+
-+static void hash_tbl_alloc(void)
-+{
-+
-+    server.umad_agent.gid2fd = g_hash_table_new_full(g_int64_hash,
-+                                                     g_int64_equal,
-+                                                     g_free, g_free);
-+    server.umad_agent.commid2fd = g_hash_table_new_full(g_int_hash,
-+                                                        g_int_equal,
-+                                                        g_free, g_free);
-+}
-+
-+static void hash_tbl_free(void)
-+{
-+    if (server.umad_agent.commid2fd) {
-+        g_hash_table_destroy(server.umad_agent.commid2fd);
-+    }
-+    if (server.umad_agent.gid2fd) {
-+        g_hash_table_destroy(server.umad_agent.gid2fd);
-+    }
-+}
-+
-+
-+static int _hash_tbl_search_fd_by_ifid(__be64 *gid_ifid)
-+{
-+    int *fd;
-+
-+    fd = g_hash_table_lookup(server.umad_agent.gid2fd, gid_ifid);
-+    if (!fd) {
-+        /* Let's try IPv4 */
-+        *gid_ifid |= 0x00000000ffff0000;
-+        fd = g_hash_table_lookup(server.umad_agent.gid2fd, gid_ifid);
-+    }
-+
-+    return fd ? *fd : 0;
-+}
-+
-+static int hash_tbl_search_fd_by_ifid(int *fd, __be64 *gid_ifid)
-+{
-+    pthread_rwlock_rdlock(&server.lock);
-+    *fd = _hash_tbl_search_fd_by_ifid(gid_ifid);
-+    pthread_rwlock_unlock(&server.lock);
-+
-+    if (!fd) {
-+        syslog(LOG_WARNING, "Can't find matching for ifid 0x%llx\n", *gid_ifid);
-+        return -ENOENT;
-+    }
-+
-+    return 0;
-+}
-+
-+static int hash_tbl_search_fd_by_comm_id(uint32_t comm_id, int *fd,
-+                                         __be64 *gid_idid)
-+{
-+    CommId2FdEntry *fde;
-+
-+    pthread_rwlock_rdlock(&server.lock);
-+    fde = g_hash_table_lookup(server.umad_agent.commid2fd, &comm_id);
-+    pthread_rwlock_unlock(&server.lock);
-+
-+    if (!fde) {
-+        syslog(LOG_WARNING, "Can't find matching for comm_id 0x%x\n", comm_id);
-+        return -ENOENT;
-+    }
-+
-+    *fd = fde->fd;
-+    *gid_idid = fde->gid_ifid;
-+
-+    return 0;
-+}
-+
-+static RdmaCmMuxErrCode add_fd_ifid_pair(int fd, __be64 gid_ifid)
-+{
-+    int fd1;
-+
-+    pthread_rwlock_wrlock(&server.lock);
-+
-+    fd1 = _hash_tbl_search_fd_by_ifid(&gid_ifid);
-+    if (fd1) { /* record already exist - an error */
-+        pthread_rwlock_unlock(&server.lock);
-+        return fd == fd1 ? RDMACM_MUX_ERR_CODE_EEXIST :
-+                           RDMACM_MUX_ERR_CODE_EACCES;
-+    }
-+
-+    g_hash_table_insert(server.umad_agent.gid2fd, g_memdup(&gid_ifid,
-+                        sizeof(gid_ifid)), g_memdup(&fd, sizeof(fd)));
-+
-+    pthread_rwlock_unlock(&server.lock);
-+
-+    syslog(LOG_INFO, "0x%lx registered on socket %d",
-+           be64toh((uint64_t)gid_ifid), fd);
-+
-+    return RDMACM_MUX_ERR_CODE_OK;
-+}
-+
-+static RdmaCmMuxErrCode delete_fd_ifid_pair(int fd, __be64 gid_ifid)
-+{
-+    int fd1;
-+
-+    pthread_rwlock_wrlock(&server.lock);
-+
-+    fd1 = _hash_tbl_search_fd_by_ifid(&gid_ifid);
-+    if (!fd1) { /* record not exist - an error */
-+        pthread_rwlock_unlock(&server.lock);
-+        return RDMACM_MUX_ERR_CODE_ENOTFOUND;
-+    }
-+
-+    g_hash_table_remove(server.umad_agent.gid2fd, g_memdup(&gid_ifid,
-+                        sizeof(gid_ifid)));
-+    pthread_rwlock_unlock(&server.lock);
-+
-+    syslog(LOG_INFO, "0x%lx unregistered on socket %d",
-+           be64toh((uint64_t)gid_ifid), fd);
-+
-+    return RDMACM_MUX_ERR_CODE_OK;
-+}
-+
-+static void hash_tbl_save_fd_comm_id_pair(int fd, uint32_t comm_id,
-+                                          uint64_t gid_ifid)
-+{
-+    CommId2FdEntry fde = {fd, COMMID_TTL, gid_ifid};
-+
-+    pthread_rwlock_wrlock(&server.lock);
-+    g_hash_table_insert(server.umad_agent.commid2fd,
-+                        g_memdup(&comm_id, sizeof(comm_id)),
-+                        g_memdup(&fde, sizeof(fde)));
-+    pthread_rwlock_unlock(&server.lock);
-+}
-+
-+static gboolean remove_old_comm_ids(gpointer key, gpointer value,
-+                                    gpointer user_data)
-+{
-+    CommId2FdEntry *fde = (CommId2FdEntry *)value;
-+
-+    return !fde->ttl--;
-+}
-+
-+static gboolean remove_entry_from_gid2fd(gpointer key, gpointer value,
-+                                         gpointer user_data)
-+{
-+    if (*(int *)value == *(int *)user_data) {
-+        syslog(LOG_INFO, "0x%lx unregistered on socket %d",
-+               be64toh(*(uint64_t *)key), *(int *)value);
-+        return true;
-+    }
-+
-+    return false;
-+}
-+
-+static void hash_tbl_remove_fd_ifid_pair(int fd)
-+{
-+    pthread_rwlock_wrlock(&server.lock);
-+    g_hash_table_foreach_remove(server.umad_agent.gid2fd,
-+                                remove_entry_from_gid2fd, (gpointer)&fd);
-+    pthread_rwlock_unlock(&server.lock);
-+}
-+
-+static int get_fd(const char *mad, int *fd, __be64 *gid_ifid)
-+{
-+    struct umad_hdr *hdr = (struct umad_hdr *)mad;
-+    char *data = (char *)hdr + sizeof(*hdr);
-+    int32_t comm_id = 0;
-+    uint16_t attr_id = be16toh(hdr->attr_id);
-+    int rc = 0;
-+
-+    switch (attr_id) {
-+    case UMAD_CM_ATTR_REQ:
-+        memcpy(gid_ifid, data + CM_REQ_DGID_POS, sizeof(*gid_ifid));
-+        rc = hash_tbl_search_fd_by_ifid(fd, gid_ifid);
-+        break;
-+
-+    case UMAD_CM_ATTR_SIDR_REQ:
-+        memcpy(gid_ifid, data + CM_SIDR_REQ_DGID_POS, sizeof(*gid_ifid));
-+        rc = hash_tbl_search_fd_by_ifid(fd, gid_ifid);
-+        break;
-+
-+    case UMAD_CM_ATTR_REP:
-+        /* Fall through */
-+    case UMAD_CM_ATTR_REJ:
-+        /* Fall through */
-+    case UMAD_CM_ATTR_DREQ:
-+        /* Fall through */
-+    case UMAD_CM_ATTR_DREP:
-+        /* Fall through */
-+    case UMAD_CM_ATTR_RTU:
-+        data += sizeof(comm_id);
-+        /* Fall through */
-+    case UMAD_CM_ATTR_SIDR_REP:
-+        memcpy(&comm_id, data, sizeof(comm_id));
-+        if (comm_id) {
-+            rc = hash_tbl_search_fd_by_comm_id(comm_id, fd, gid_ifid);
-+        }
-+        break;
-+
-+    default:
-+        rc = -EINVAL;
-+        syslog(LOG_WARNING, "Unsupported attr_id 0x%x\n", attr_id);
-+    }
-+
-+    syslog(LOG_DEBUG, "mad_to_vm: %d 0x%x 0x%x\n", *fd, attr_id, comm_id);
-+
-+    return rc;
-+}
-+
-+static void *umad_recv_thread_func(void *args)
-+{
-+    int rc;
-+    RdmaCmMuxMsg msg = {0};
-+    int fd = -2;
-+
-+    msg.hdr.msg_type = RDMACM_MUX_MSG_TYPE_REQ;
-+    msg.hdr.op_code = RDMACM_MUX_OP_CODE_MAD;
-+
-+    while (server.run) {
-+        do {
-+            msg.umad_len = sizeof(msg.umad.mad);
-+            rc = umad_recv(server.umad_agent.port_id, &msg.umad, &msg.umad_len,
-+                           SLEEP_SECS * SCALE_US);
-+            if ((rc == -EIO) || (rc == -EINVAL)) {
-+                syslog(LOG_CRIT, "Fatal error while trying to read MAD");
-+            }
-+
-+            if (rc == -ETIMEDOUT) {
-+                g_hash_table_foreach_remove(server.umad_agent.commid2fd,
-+                                            remove_old_comm_ids, NULL);
-+            }
-+        } while (rc && server.run);
-+
-+        if (server.run) {
-+            rc = get_fd(msg.umad.mad, &fd, &msg.hdr.sgid.global.interface_id);
-+            if (rc) {
-+                continue;
-+            }
-+
-+            send(fd, &msg, sizeof(msg), 0);
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
-+static int read_and_process(int fd)
-+{
-+    int rc;
-+    RdmaCmMuxMsg msg = {0};
-+    struct umad_hdr *hdr;
-+    uint32_t *comm_id = 0;
-+    uint16_t attr_id;
-+
-+    rc = recv(fd, &msg, sizeof(msg), 0);
-+    syslog(LOG_DEBUG, "Socket %d, recv %d\n", fd, rc);
-+
-+    if (rc < 0 && errno != EWOULDBLOCK) {
-+        syslog(LOG_ERR, "Fail to read from socket %d\n", fd);
-+        return -EIO;
-+    }
-+
-+    if (!rc) {
-+        syslog(LOG_ERR, "Fail to read from socket %d\n", fd);
-+        return -EPIPE;
-+    }
-+
-+    if (msg.hdr.msg_type != RDMACM_MUX_MSG_TYPE_REQ) {
-+        syslog(LOG_WARNING, "Got non-request message (%d) from socket %d\n",
-+               msg.hdr.msg_type, fd);
-+        return -EPERM;
-+    }
-+
-+    switch (msg.hdr.op_code) {
-+    case RDMACM_MUX_OP_CODE_REG:
-+        rc = add_fd_ifid_pair(fd, msg.hdr.sgid.global.interface_id);
-+        break;
-+
-+    case RDMACM_MUX_OP_CODE_UNREG:
-+        rc = delete_fd_ifid_pair(fd, msg.hdr.sgid.global.interface_id);
-+        break;
-+
-+    case RDMACM_MUX_OP_CODE_MAD:
-+        /* If this is REQ or REP then store the pair comm_id,fd to be later
-+         * used for other messages where gid is unknown */
-+        hdr = (struct umad_hdr *)msg.umad.mad;
-+        attr_id = be16toh(hdr->attr_id);
-+        if ((attr_id == UMAD_CM_ATTR_REQ) || (attr_id == UMAD_CM_ATTR_DREQ) ||
-+            (attr_id == UMAD_CM_ATTR_SIDR_REQ) ||
-+            (attr_id == UMAD_CM_ATTR_REP) || (attr_id == UMAD_CM_ATTR_DREP)) {
-+            comm_id = (uint32_t *)(msg.umad.mad + sizeof(*hdr));
-+            hash_tbl_save_fd_comm_id_pair(fd, *comm_id,
-+                                          msg.hdr.sgid.global.interface_id);
-+        }
-+
-+        syslog(LOG_DEBUG, "vm_to_mad: %d 0x%x 0x%x\n", fd, attr_id,
-+               comm_id ? *comm_id : 0);
-+        rc = umad_send(server.umad_agent.port_id, server.umad_agent.agent_id,
-+                       &msg.umad, msg.umad_len, 1, 0);
-+        if (rc) {
-+            syslog(LOG_ERR,
-+                  "Fail to send MAD message (0x%x) from socket %d, err=%d",
-+                  attr_id, fd, rc);
-+        }
-+        break;
-+
-+    default:
-+        syslog(LOG_ERR, "Got invalid op_code (%d) from socket %d",
-+               msg.hdr.msg_type, fd);
-+        rc = RDMACM_MUX_ERR_CODE_EINVAL;
-+    }
-+
-+    msg.hdr.msg_type = RDMACM_MUX_MSG_TYPE_RESP;
-+    msg.hdr.err_code = rc;
-+    rc = send(fd, &msg, sizeof(msg), 0);
-+
-+    return rc == sizeof(msg) ? 0 : -EPIPE;
-+}
-+
-+static int accept_all(void)
-+{
-+    int fd, rc = 0;;
-+
-+    pthread_rwlock_wrlock(&server.lock);
-+
-+    do {
-+        if ((server.nfds + 1) > MAX_CLIENTS) {
-+            syslog(LOG_WARNING, "Too many clients (%d)", server.nfds);
-+            rc = -EIO;
-+            goto out;
-+        }
-+
-+        fd = accept(server.fds[0].fd, NULL, NULL);
-+        if (fd < 0) {
-+            if (errno != EWOULDBLOCK) {
-+                syslog(LOG_WARNING, "accept() failed");
-+                rc = -EIO;
-+                goto out;
-+            }
-+            break;
-+        }
-+
-+        syslog(LOG_INFO, "Client connected on socket %d\n", fd);
-+        server.fds[server.nfds].fd = fd;
-+        server.fds[server.nfds].events = POLLIN;
-+        server.nfds++;
-+    } while (fd != -1);
-+
-+out:
-+    pthread_rwlock_unlock(&server.lock);
-+    return rc;
-+}
-+
-+static void compress_fds(void)
-+{
-+    int i, j;
-+    int closed = 0;
-+
-+    pthread_rwlock_wrlock(&server.lock);
-+
-+    for (i = 1; i < server.nfds; i++) {
-+        if (!server.fds[i].fd) {
-+            closed++;
-+            for (j = i; j < server.nfds - 1; j++) {
-+                server.fds[j] = server.fds[j + 1];
-+            }
-+        }
-+    }
-+
-+    server.nfds -= closed;
-+
-+    pthread_rwlock_unlock(&server.lock);
-+}
-+
-+static void close_fd(int idx)
-+{
-+    close(server.fds[idx].fd);
-+    syslog(LOG_INFO, "Socket %d closed\n", server.fds[idx].fd);
-+    hash_tbl_remove_fd_ifid_pair(server.fds[idx].fd);
-+    server.fds[idx].fd = 0;
-+}
-+
-+static void run(void)
-+{
-+    int rc, nfds, i;
-+    bool compress = false;
-+
-+    syslog(LOG_INFO, "Service started");
-+
-+    while (server.run) {
-+        rc = poll(server.fds, server.nfds, SLEEP_SECS * SCALE_US);
-+        if (rc < 0) {
-+            if (errno != EINTR) {
-+                syslog(LOG_WARNING, "poll() failed");
-+            }
-+            continue;
-+        }
-+
-+        if (rc == 0) {
-+            continue;
-+        }
-+
-+        nfds = server.nfds;
-+        for (i = 0; i < nfds; i++) {
-+            syslog(LOG_DEBUG, "pollfd[%d]: revents 0x%x, events 0x%x\n", i,
-+                   server.fds[i].revents, server.fds[i].events);
-+            if (server.fds[i].revents == 0) {
-+                continue;
-+            }
-+
-+            if (server.fds[i].revents != POLLIN) {
-+                if (i == 0) {
-+                    syslog(LOG_NOTICE, "Unexpected poll() event (0x%x)\n",
-+                           server.fds[i].revents);
-+                } else {
-+                    close_fd(i);
-+                    compress = true;
-+                }
-+                continue;
-+            }
-+
-+            if (i == 0) {
-+                rc = accept_all();
-+                if (rc) {
-+                    continue;
-+                }
-+            } else {
-+                rc = read_and_process(server.fds[i].fd);
-+                if (rc) {
-+                    close_fd(i);
-+                    compress = true;
-+                }
-+            }
-+        }
-+
-+        if (compress) {
-+            compress = false;
-+            compress_fds();
-+        }
-+    }
-+}
-+
-+static void fini_listener(void)
-+{
-+    int i;
-+
-+    if (server.fds[0].fd <= 0) {
-+        return;
-+    }
-+
-+    for (i = server.nfds - 1; i >= 0; i--) {
-+        if (server.fds[i].fd) {
-+            close(server.fds[i].fd);
-+        }
-+    }
-+
-+    unlink(server.args.unix_socket_path);
-+}
-+
-+static void fini_umad(void)
-+{
-+    if (server.umad_agent.agent_id) {
-+        umad_unregister(server.umad_agent.port_id, server.umad_agent.agent_id);
-+    }
-+
-+    if (server.umad_agent.port_id) {
-+        umad_close_port(server.umad_agent.port_id);
-+    }
-+
-+    hash_tbl_free();
-+}
-+
-+static void fini(void)
-+{
-+    if (server.umad_recv_thread) {
-+        pthread_join(server.umad_recv_thread, NULL);
-+        server.umad_recv_thread = 0;
-+    }
-+    fini_umad();
-+    fini_listener();
-+    pthread_rwlock_destroy(&server.lock);
-+
-+    syslog(LOG_INFO, "Service going down");
-+}
-+
-+static int init_listener(void)
-+{
-+    struct sockaddr_un sun;
-+    int rc, on = 1;
-+
-+    server.fds[0].fd = socket(AF_UNIX, SOCK_STREAM, 0);
-+    if (server.fds[0].fd < 0) {
-+        syslog(LOG_ALERT, "socket() failed");
-+        return -EIO;
-+    }
-+
-+    rc = setsockopt(server.fds[0].fd, SOL_SOCKET, SO_REUSEADDR, (char *)&on,
-+                    sizeof(on));
-+    if (rc < 0) {
-+        syslog(LOG_ALERT, "setsockopt() failed");
-+        rc = -EIO;
-+        goto err;
-+    }
-+
-+    rc = ioctl(server.fds[0].fd, FIONBIO, (char *)&on);
-+    if (rc < 0) {
-+        syslog(LOG_ALERT, "ioctl() failed");
-+        rc = -EIO;
-+        goto err;
-+    }
-+
-+    if (strlen(server.args.unix_socket_path) >= sizeof(sun.sun_path)) {
-+        syslog(LOG_ALERT,
-+               "Invalid unix_socket_path, size must be less than %ld\n",
-+               sizeof(sun.sun_path));
-+        rc = -EINVAL;
-+        goto err;
-+    }
-+
-+    sun.sun_family = AF_UNIX;
-+    rc = snprintf(sun.sun_path, sizeof(sun.sun_path), "%s",
-+                  server.args.unix_socket_path);
-+    if (rc < 0 || rc >= sizeof(sun.sun_path)) {
-+        syslog(LOG_ALERT, "Could not copy unix socket path\n");
-+        rc = -EINVAL;
-+        goto err;
-+    }
-+
-+    rc = bind(server.fds[0].fd, (struct sockaddr *)&sun, sizeof(sun));
-+    if (rc < 0) {
-+        syslog(LOG_ALERT, "bind() failed");
-+        rc = -EIO;
-+        goto err;
-+    }
-+
-+    rc = listen(server.fds[0].fd, SERVER_LISTEN_BACKLOG);
-+    if (rc < 0) {
-+        syslog(LOG_ALERT, "listen() failed");
-+        rc = -EIO;
-+        goto err;
-+    }
-+
-+    server.fds[0].events = POLLIN;
-+    server.nfds = 1;
-+    server.run = true;
-+
-+    return 0;
-+
-+err:
-+    close(server.fds[0].fd);
-+    return rc;
-+}
-+
-+static int init_umad(void)
-+{
-+    long method_mask[IB_USER_MAD_LONGS_PER_METHOD_MASK];
-+
-+    server.umad_agent.port_id = umad_open_port(server.args.rdma_dev_name,
-+                                               server.args.rdma_port_num);
-+
-+    if (server.umad_agent.port_id < 0) {
-+        syslog(LOG_WARNING, "umad_open_port() failed");
-+        return -EIO;
-+    }
-+
-+    memset(&method_mask, 0, sizeof(method_mask));
-+    method_mask[0] = MAD_METHOD_MASK0;
-+    server.umad_agent.agent_id = umad_register(server.umad_agent.port_id,
-+                                               UMAD_CLASS_CM,
-+                                               UMAD_SA_CLASS_VERSION,
-+                                               MAD_RMPP_VERSION, method_mask);
-+    if (server.umad_agent.agent_id < 0) {
-+        syslog(LOG_WARNING, "umad_register() failed");
-+        return -EIO;
-+    }
-+
-+    hash_tbl_alloc();
-+
-+    return 0;
-+}
-+
-+static void signal_handler(int sig, siginfo_t *siginfo, void *context)
-+{
-+    static bool warned;
-+
-+    /* Prevent stop if clients are connected */
-+    if (server.nfds != 1) {
-+        if (!warned) {
-+            syslog(LOG_WARNING,
-+                   "Can't stop while active client exist, resend SIGINT to overid");
-+            warned = true;
-+            return;
-+        }
-+    }
-+
-+    if (sig == SIGINT) {
-+        server.run = false;
-+        fini();
-+    }
-+
-+    exit(0);
-+}
-+
-+static int init(void)
-+{
-+    int rc;
-+    struct sigaction sig = {0};
-+
-+    rc = init_listener();
-+    if (rc) {
-+        return rc;
-+    }
-+
-+    rc = init_umad();
-+    if (rc) {
-+        return rc;
-+    }
-+
-+    pthread_rwlock_init(&server.lock, 0);
-+
-+    rc = pthread_create(&server.umad_recv_thread, NULL, umad_recv_thread_func,
-+                        NULL);
-+    if (rc) {
-+        syslog(LOG_ERR, "Fail to create UMAD receiver thread (%d)\n", rc);
-+        return rc;
-+    }
-+
-+    sig.sa_sigaction = &signal_handler;
-+    sig.sa_flags = SA_SIGINFO;
-+    rc = sigaction(SIGINT, &sig, NULL);
-+    if (rc < 0) {
-+        syslog(LOG_ERR, "Fail to install SIGINT handler (%d)\n", errno);
-+        return rc;
-+    }
-+
-+    return 0;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+    int rc;
-+
-+    memset(&server, 0, sizeof(server));
-+
-+    parse_args(argc, argv);
-+
-+    rc = init();
-+    if (rc) {
-+        syslog(LOG_ERR, "Fail to initialize server (%d)\n", rc);
-+        rc = -EAGAIN;
-+        goto out;
-+    }
-+
-+    run();
-+
-+out:
-+    fini();
-+
-+    return rc;
-+}
-diff --git a/contrib/rdmacm-mux/rdmacm-mux.h b/contrib/rdmacm-mux/rdmacm-mux.h
-new file mode 100644
-index 0000000000..942a802c47
---- /dev/null
-+++ b/contrib/rdmacm-mux/rdmacm-mux.h
-@@ -0,0 +1,61 @@
-+/*
-+ * QEMU paravirtual RDMA - rdmacm-mux declarations
-+ *
-+ * Copyright (C) 2018 Oracle
-+ * Copyright (C) 2018 Red Hat Inc
-+ *
-+ * Authors:
-+ *     Yuval Shaia <yuval.shaia@oracle.com>
-+ *     Marcel Apfelbaum <marcel@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef RDMACM_MUX_H
-+#define RDMACM_MUX_H
-+
-+#include "linux/if.h"
-+#include "infiniband/verbs.h"
-+#include "infiniband/umad.h"
-+#include "rdma/rdma_user_cm.h"
-+
-+typedef enum RdmaCmMuxMsgType {
-+    RDMACM_MUX_MSG_TYPE_REQ   = 0,
-+    RDMACM_MUX_MSG_TYPE_RESP  = 1,
-+} RdmaCmMuxMsgType;
-+
-+typedef enum RdmaCmMuxOpCode {
-+    RDMACM_MUX_OP_CODE_REG   = 0,
-+    RDMACM_MUX_OP_CODE_UNREG = 1,
-+    RDMACM_MUX_OP_CODE_MAD   = 2,
-+} RdmaCmMuxOpCode;
-+
-+typedef enum RdmaCmMuxErrCode {
-+    RDMACM_MUX_ERR_CODE_OK        = 0,
-+    RDMACM_MUX_ERR_CODE_EINVAL    = 1,
-+    RDMACM_MUX_ERR_CODE_EEXIST    = 2,
-+    RDMACM_MUX_ERR_CODE_EACCES    = 3,
-+    RDMACM_MUX_ERR_CODE_ENOTFOUND = 4,
-+} RdmaCmMuxErrCode;
-+
-+typedef struct RdmaCmMuxHdr {
-+    RdmaCmMuxMsgType msg_type;
-+    RdmaCmMuxOpCode op_code;
-+    union ibv_gid sgid;
-+    RdmaCmMuxErrCode err_code;
-+} RdmaCmUHdr;
-+
-+typedef struct RdmaCmUMad {
-+    struct ib_user_mad hdr;
-+    char mad[RDMA_MAX_PRIVATE_DATA];
-+} RdmaCmUMad;
-+
-+typedef struct RdmaCmMuxMsg {
-+    RdmaCmUHdr hdr;
-+    int umad_len;
-+    RdmaCmUMad umad;
-+} RdmaCmMuxMsg;
-+
-+#endif
+         post_interrupt(dev, INTR_VEC_CMD_COMPLETION_Q);
+     }
+ 
 -- 
 2.17.2
