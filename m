@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gYpyX-0003F3-O8
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 05:18:15 -0500
+	(envelope-from <thuth@redhat.com>) id 1gYqJL-0007oJ-Gc
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 05:39:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gYpyU-0005Qj-Vv
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 05:18:13 -0500
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Mon, 17 Dec 2018 10:17:49 +0000
-Message-ID: <08bc9976-7702-0410-557f-03b72fe6c8da@virtuozzo.com>
-References: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
-	<20181203101429.88735-9-anton.nefedov@virtuozzo.com>
-	<407c1184-67fa-1d0f-a1f7-c4050521d332@virtuozzo.com>
-In-Reply-To: <407c1184-67fa-1d0f-a1f7-c4050521d332@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <05F2B2EF818E4A4B885C923C7641E6A3@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <thuth@redhat.com>) id 1gYqJI-0002yF-9r
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 05:39:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51908)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gYqJI-0002wX-2L
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 05:39:40 -0500
+References: <20181217035816.21777-1-richard.henderson@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e6ac1cea-5500-c479-389d-da99b0ac9ae5@redhat.com>
+Date: Mon, 17 Dec 2018 11:39:34 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v10 8/9] qcow2: skip writing zero buffers
- to empty COW areas
+In-Reply-To: <20181217035816.21777-1-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tests: Exit boot-serial-test loop if child
+ dies
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,61 +28,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-DQoNCk9uIDE0LzEyLzIwMTggNzoyMCBQTSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3
-cm90ZToNCj4gMDMuMTIuMjAxOCAxMzoxNCwgQW50b24gTmVmZWRvdiB3cm90ZToNCj4+IElmIENP
-VyBhcmVhcyBvZiB0aGUgbmV3bHkgYWxsb2NhdGVkIGNsdXN0ZXJzIGFyZSB6ZXJvZXMgb24gdGhl
-IGJhY2tpbmcgaW1hZ2UsDQo+PiBlZmZpY2llbnQgYmRydl93cml0ZV96ZXJvZXMoZmxhZ3M9QkRS
-Vl9SRVFfQUxMT0NBVEUpIGNhbiBiZSB1c2VkIG9uIHRoZSB3aG9sZQ0KPj4gY2x1c3RlciBpbnN0
-ZWFkIG9mIHdyaXRpbmcgZXhwbGljaXQgemVybyBidWZmZXJzIGxhdGVyIGluIHBlcmZvcm1fY293
-KCkuDQo+Pg0KPj4gaW90ZXN0IDA2MDoNCj4+IHdyaXRlIHRvIHRoZSBkaXNjYXJkZWQgY2x1c3Rl
-ciBkb2VzIG5vdCB0cmlnZ2VyIENPVyBhbnltb3JlLg0KPj4gVXNlIGEgYmFja2luZyBpbWFnZSBp
-bnN0ZWFkLg0KPj4NCj4gDQo+IFsuLl0NCj4gDQo+PiAtLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMv
-MDYwDQo+PiArKysgYi90ZXN0cy9xZW11LWlvdGVzdHMvMDYwDQo+PiBAQCAtMTUwLDI3ICsxNTAs
-MzMgQEAgJFFFTVVfSU8gLWMgIiRPUEVOX1JPIiAtYyAicmVhZCAtUCAxIDAgNTEyIiB8IF9maWx0
-ZXJfcWVtdV9pbw0KPj4gICAgZWNobw0KPj4gICAgZWNobyAiPT09IFRlc3Rpbmcgb3ZlcmxhcCB3
-aGlsZSBDT1cgaXMgaW4gZmxpZ2h0ID09PSINCj4+ICAgIGVjaG8NCj4+ICtCQUNLSU5HX0lNRz0k
-VEVTVF9JTUcuYmFzZQ0KPj4gK1RFU1RfSU1HPSRCQUNLSU5HX0lNRyBfbWFrZV90ZXN0X2ltZyAx
-Rw0KPj4gKw0KPj4gKyRRRU1VX0lPIC1jICd3cml0ZSA2NGsgNjRrJyAiJEJBQ0tJTkdfSU1HIiB8
-IF9maWx0ZXJfcWVtdV9pbw0KPj4gKw0KPj4gICAgIyBjb21wYXQ9MC4xMCBpcyByZXF1aXJlZCBp
-biBvcmRlciB0byBtYWtlIHRoZSBmb2xsb3dpbmcgZGlzY2FyZCBhY3R1YWxseQ0KPj4gLSMgdW5h
-bGxvY2F0ZSB0aGUgc2VjdG9yIHJhdGhlciB0aGFuIG1ha2UgaXQgYSB6ZXJvIHNlY3RvciAtIHdl
-IHdhbnQgQ09XLCBhZnRlcg0KPj4gLSMgYWxsLg0KPj4gLUlNR09QVFM9J2NvbXBhdD0wLjEwJyBf
-bWFrZV90ZXN0X2ltZyAxRw0KPj4gKyMgdW5hbGxvY2F0ZSB0aGUgc2VjdG9yIHJhdGhlciB0aGFu
-IG1ha2UgaXQgYSB6ZXJvIHNlY3RvciBhcyB3ZSB3b3VsZCBsaWtlDQo+PiArIyB0byByZXVzZSBp
-dCBmb3IgYW5vdGhlciBndWVzdCBvZmZzZXQNCj4+ICtJTUdPUFRTPSdjb21wYXQ9MC4xMCcgX21h
-a2VfdGVzdF9pbWcgLWIgIiRCQUNLSU5HX0lNRyIgMUcNCj4+ICAgICMgV3JpdGUgdHdvIGNsdXN0
-ZXJzLCB0aGUgc2Vjb25kIG9uZSBlbmZvcmNlcyBjcmVhdGlvbiBvZiBhbiBMMiB0YWJsZSBhZnRl
-cg0KPj4gICAgIyB0aGUgZmlyc3QgZGF0YSBjbHVzdGVyLg0KPj4gICAgJFFFTVVfSU8gLWMgJ3dy
-aXRlIDBrIDY0aycgLWMgJ3dyaXRlIDUxMk0gNjRrJyAiJFRFU1RfSU1HIiB8IF9maWx0ZXJfcWVt
-dV9pbw0KPj4gLSMgRGlzY2FyZCB0aGUgZmlyc3QgY2x1c3Rlci4gVGhpcyBjbHVzdGVyIHdpbGwg
-c29vbiBlbm91Z2ggYmUgcmVhbGxvY2F0ZWQgYW5kDQo+PiAtIyB1c2VkIGZvciBDT1cuDQo+PiAr
-IyBEaXNjYXJkIHRoZSBmaXJzdCBjbHVzdGVyLiBUaGlzIGNsdXN0ZXIgd2lsbCBzb29uIGVub3Vn
-aCBiZSByZWFsbG9jYXRlZA0KPj4gICAgJFFFTVVfSU8gLWMgJ2Rpc2NhcmQgMGsgNjRrJyAiJFRF
-U1RfSU1HIiB8IF9maWx0ZXJfcWVtdV9pbw0KPj4gICAgIyBOb3csIGNvcnJ1cHQgdGhlIGltYWdl
-IGJ5IG1hcmtpbmcgdGhlIHNlY29uZCBMMiB0YWJsZSBjbHVzdGVyIGFzIGZyZWUuDQo+PiAgICBw
-b2tlX2ZpbGUgIiRURVNUX0lNRyIgJzEzMTA4NCcgIlx4MDBceDAwIiAjIDB4MjAwMGMNCj4+IC0j
-IFN0YXJ0IGEgd3JpdGUgb3BlcmF0aW9uIHJlcXVpcmluZyBDT1cgb24gdGhlIGltYWdlIHN0b3Bw
-aW5nIGl0IHJpZ2h0IGJlZm9yZQ0KPj4gLSMgZG9pbmcgdGhlIHJlYWQ7IHRoZW4sIHRyaWdnZXIg
-dGhlIGNvcnJ1cHRpb24gcHJldmVudGlvbiBieSB3cml0aW5nIGFueXRoaW5nIHRvDQo+PiAtIyBh
-bnkgdW5hbGxvY2F0ZWQgY2x1c3RlciwgbGVhZGluZyB0byBhbiBhdHRlbXB0IHRvIG92ZXJ3cml0
-ZSB0aGUgc2Vjb25kIEwyDQo+PiArIyBTdGFydCBhIHdyaXRlIG9wZXJhdGlvbiByZXF1aXJpbmcg
-Q09XIG9uIHRoZSBpbWFnZTsNCj4+ICsjIHRoaXMgd3JpdGUgd2lsbCByZXVzZSB0aGUgaG9zdCBv
-ZmZzZXQgcmVsZWFzZWQgYnkgYSBwcmV2aW91cyBkaXNjYXJkLg0KPj4gKyMgU3RvcCBpdCByaWdo
-dCBiZWZvcmUgZG9pbmcgdGhlIHJlYWQuDQo+PiArIyBUaGVuLCB0cmlnZ2VyIHRoZSBjb3JydXB0
-aW9uIHByZXZlbnRpb24gYnkgd3JpdGluZyBhbnl0aGluZyB0bw0KPj4gKyMgYW5vdGhlciB1bmFs
-bG9jYXRlZCBjbHVzdGVyLCBsZWFkaW5nIHRvIGFuIGF0dGVtcHQgdG8gb3ZlcndyaXRlIHRoZSBz
-ZWNvbmQgTDINCj4+ICAgICMgdGFibGUuIEZpbmFsbHksIHJlc3VtZSB0aGUgQ09XIHdyaXRlIGFu
-ZCBzZWUgaXQgZmFpbCAoYnV0IG5vdCBjcmFzaCkuDQo+PiAgICBlY2hvICJvcGVuIC1vIGZpbGUu
-ZHJpdmVyPWJsa2RlYnVnICRURVNUX0lNRw0KPj4gICAgYnJlYWsgY293X3JlYWQgMA0KPj4gLWFp
-b193cml0ZSAwayAxaw0KPj4gK2Fpb193cml0ZSA2NGsgMWsNCj4+ICAgIHdhaXRfYnJlYWsgMA0K
-Pj4gLXdyaXRlIDY0ayA2NGsNCj4+ICt3cml0ZSAxMjhrIDY0aw0KPiANCj4gZG9uJ3QgdW5kZXJz
-dGFuZCB3aHkgeW91IG5lZWQgdGhlc2UgY2hhbmdlcy4NCj4gDQo+IHdvcmtzIGZvciBtZSwgd2l0
-aG91dCB0aGVtLCBpZiB3cml0ZSB0byBiYWNraW5nIGF0IDAgb2Zmc2V0LCBvZiBjb3Vyc2UuDQo+
-IA0KPiBBcyBJIHVuZGVyc3RhbmQsIGRpc2NhcmQgY3JlYXRlIHVuYWxsb2NhdGVkIGhvbGVzIGlu
-IHRvcCBxY293MiBmb3Igb2xkIHFjb3cyIHZlcnNpb24uDQo+IA0KDQpPaywgc28gQ09XIGhhcHBl
-bnMgcmVnYXJkbGVzcyBpZiB0aGlzIGd1ZXN0IG9mZnNldCBoYXMgYmVlbiBkaXNjYXJkZWQNCmJl
-Zm9yZS4gVGhlc2Ugb2Zmc2V0IGNoYW5nZXMgYXJlIGluZGVlZCBub3QgbmVlZGVkLiBKdXN0IHRo
-ZSBiYWNraW5nDQpmaWxlLg0K
+On 2018-12-17 04:58, Richard Henderson wrote:
+> There's no point in waiting 5 full minutes when there will be
+> no more output.
+
+Sounds like a very good idea, indeed.
+
+As a follow up patch, we should likely use this in the other tests that
+use TCG, too (i.e. in boot_sector_test() in tests/boot-sector.c).
+
+>  Compute timeout based on elapsed wall clock
+> time instead of N * delays, as the delay is a minimum sleep time.
+>=20
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Laurent Vivier <lvivier@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  tests/libqtest.h         |  8 +++++
+>  tests/boot-serial-test.c | 16 +++++++--
+>  tests/libqtest.c         | 70 +++++++++++++++++++++++++---------------
+>  3 files changed, 65 insertions(+), 29 deletions(-)
+>=20
+> diff --git a/tests/libqtest.h b/tests/libqtest.h
+> index 96a6c01352..9758c51be6 100644
+> --- a/tests/libqtest.h
+> +++ b/tests/libqtest.h
+> @@ -1011,4 +1011,12 @@ bool qmp_rsp_is_err(QDict *rsp);
+>   */
+>  void qmp_assert_error_class(QDict *rsp, const char *class);
+> =20
+> +/**
+> + * qtest_probe_child:
+> + * @s: QTestState instance to operate on.
+> + *
+> + * Returns: true if the child is still alive.
+> + */
+> +bool qtest_probe_child(QTestState *s);
+> +
+>  #endif
+> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+> index 8ec6aed35d..54b9347325 100644
+> --- a/tests/boot-serial-test.c
+> +++ b/tests/boot-serial-test.c
+> @@ -130,11 +130,12 @@ static testdef_t tests[] =3D {
+> =20
+>  static bool check_guest_output(const testdef_t *test, int fd)
+>  {
+> -    int i, nbr =3D 0, pos =3D 0, ccnt;
+> +    int nbr =3D 0, pos =3D 0, ccnt;
+> +    time_t now, start =3D time(NULL);
+>      char ch;
+> =20
+> -    /* Poll serial output... Wait at most 360 seconds */
+> -    for (i =3D 0; i < 36000; ++i) {
+> +    /* Poll serial output... */
+> +    while (1) {
+>          ccnt =3D 0;
+>          while (ccnt++ < 512 && (nbr =3D read(fd, &ch, 1)) =3D=3D 1) {
+>              if (ch =3D=3D test->expect[pos]) {
+> @@ -148,6 +149,15 @@ static bool check_guest_output(const testdef_t *te=
+st, int fd)
+>              }
+>          }
+>          g_assert(nbr >=3D 0);
+> +        /* Wait only if the child is still alive.  */
+> +        if (!qtest_probe_child(global_qtest)) {
+> +            break;
+> +        }
+> +        /* Wait at most 360 seconds.  */
+> +        now =3D time(NULL);
+> +        if (now - start >=3D 360) {
+> +            break;
+> +        }
+>          g_usleep(10000);
+>      }
+> =20
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index 43be078518..1d75d3c936 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -39,10 +39,11 @@ struct QTestState
+>  {
+>      int fd;
+>      int qmp_fd;
+> +    pid_t qemu_pid;  /* our child QEMU process */
+> +    int wstatus;
+> +    bool big_endian;
+>      bool irq_level[MAX_IRQ];
+>      GString *rx;
+> -    pid_t qemu_pid;  /* our child QEMU process */
+> -    bool big_endian;
+>  };
+> =20
+>  static GHookList abrt_hooks;
+> @@ -96,36 +97,52 @@ static int socket_accept(int sock)
+>      return ret;
+>  }
+> =20
+> +bool qtest_probe_child(QTestState *s)
+> +{
+> +    pid_t pid =3D s->qemu_pid;
+> +
+> +    if (pid !=3D -1) {
+> +        pid =3D waitpid(pid, &s->wstatus, WNOHANG);
+> +        if (pid =3D=3D 0) {
+> +            return true;
+> +        }
+> +        s->qemu_pid =3D -1;
+> +    }
+> +    return false;
+> +}
+> +
+>  static void kill_qemu(QTestState *s)
+>  {
+> -    if (s->qemu_pid !=3D -1) {
+> -        int wstatus =3D 0;
+> -        pid_t pid;
+> -
+> -        kill(s->qemu_pid, SIGTERM);
+> -        TFR(pid =3D waitpid(s->qemu_pid, &wstatus, 0));
+> +    pid_t pid =3D s->qemu_pid;
+> +    int wstatus;
+> =20
+> +    /* Skip wait if qtest_probe_child already reaped.  */
+> +    if (pid !=3D -1) {
+> +        kill(pid, SIGTERM);
+> +        TFR(pid =3D waitpid(s->qemu_pid, &s->wstatus, 0));
+>          assert(pid =3D=3D s->qemu_pid);
+> -        /*
+> -         * We expect qemu to exit with status 0; anything else is
+> -         * fishy and should be logged with as much detail as possible.
+> -         */
+> -        if (wstatus) {
+> -            if (WIFEXITED(wstatus)) {
+> -                fprintf(stderr, "%s:%d: kill_qemu() tried to terminate=
+ QEMU "
+> -                        "process but encountered exit status %d\n",
+> -                        __FILE__, __LINE__, WEXITSTATUS(wstatus));
+> -            } else if (WIFSIGNALED(wstatus)) {
+> -                int sig =3D WTERMSIG(wstatus);
+> -                const char *signame =3D strsignal(sig) ?: "unknown ???=
+";
+> -                const char *dump =3D WCOREDUMP(wstatus) ? " (core dump=
+ed)" : "";
+> +    }
+> =20
+> -                fprintf(stderr, "%s:%d: kill_qemu() detected QEMU deat=
+h "
+> -                        "from signal %d (%s)%s\n",
+> -                        __FILE__, __LINE__, sig, signame, dump);
+> -            }
+> -            abort();
+> +    /*
+> +     * We expect qemu to exit with status 0; anything else is
+> +     * fishy and should be logged with as much detail as possible.
+> +     */
+> +    wstatus =3D s->wstatus;
+> +    if (wstatus) {
+> +        if (WIFEXITED(wstatus)) {
+> +            fprintf(stderr, "%s:%d: kill_qemu() tried to terminate QEM=
+U "
+> +                    "process but encountered exit status %d\n",
+
+The string is not 100% accurate now anymore - we might not have tried to
+kill QEMU here since it exited earlier already. It's not that important,
+but in case you respin, you could maybe adjust this text a little bit.
+
+> +                    __FILE__, __LINE__, WEXITSTATUS(wstatus));
+> +        } else if (WIFSIGNALED(wstatus)) {
+> +            int sig =3D WTERMSIG(wstatus);
+> +            const char *signame =3D strsignal(sig) ?: "unknown ???";
+> +            const char *dump =3D WCOREDUMP(wstatus) ? " (core dumped)"=
+ : "";
+> +
+> +            fprintf(stderr, "%s:%d: kill_qemu() detected QEMU death "
+> +                    "from signal %d (%s)%s\n",
+> +                    __FILE__, __LINE__, sig, signame, dump);
+>          }
+> +        abort();
+>      }
+>  }
+> =20
+> @@ -228,6 +245,7 @@ QTestState *qtest_init_without_qmp_handshake(const =
+char *extra_args)
+> =20
+>      g_test_message("starting QEMU: %s", command);
+> =20
+> +    s->wstatus =3D 0;
+>      s->qemu_pid =3D fork();
+>      if (s->qemu_pid =3D=3D 0) {
+>          setenv("QEMU_AUDIO_DRV", "none", true);
+>=20
+
+Patch looks fine to me, I'm going to queue this for the next qtests pull
+request (unless you want to respin because of the error string or other
+reasons).
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
