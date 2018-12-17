@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gYy8B-0000hH-Py
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 14:00:44 -0500
+	(envelope-from <armbru@redhat.com>) id 1gYy9a-0001m9-Fk
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 14:02:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gYy87-00062s-UT
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 14:00:43 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:37836)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gYy87-00060M-Ev
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 14:00:39 -0500
-Date: Mon, 17 Dec 2018 21:00:25 +0200
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20181217190024.GA18696@lap1>
-References: <20181212193039.11445-1-ppandit@redhat.com>
-	<20181212193039.11445-4-ppandit@redhat.com>
-	<20181216203052.GA5065@lap1>
-	<nycvar.YSQ.7.76.1812180006430.28971@xnncv>
+	(envelope-from <armbru@redhat.com>) id 1gYy9X-000723-Qp
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 14:02:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57992)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gYy9X-00071d-Ke
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 14:02:07 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1543467132-2873-1-git-send-email-liq3ea@gmail.com>
+	<1543467132-2873-3-git-send-email-liq3ea@gmail.com>
+	<644186db-32d3-7c83-8b37-02e8427ef217@redhat.com>
+Date: Mon, 17 Dec 2018 20:01:57 +0100
+In-Reply-To: <644186db-32d3-7c83-8b37-02e8427ef217@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon,
+	17 Dec 2018 13:43:30 +0100")
+Message-ID: <87o99kj7tm.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <nycvar.YSQ.7.76.1812180006430.28971@xnncv>
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] pvrdma: check number of pages when
- creating rings
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] hw: vmmouse: Use link instead of
+ pointer property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Saar Amar <saaramar5@gmail.com>, Li Qiang <liq3ea@163.com>, yuval.shaia@oracle.com
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Li Qiang <liq3ea@gmail.com>, mst@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, Thomas Huth <thuth@redhat.com>, darren.kenny@oracle.com, qemu-devel@nongnu.org, rth@twiddle.net
 
-On Tue, Dec 18, 2018 at 12:17:59AM +0530, P J P wrote:
->   Hello Yuval,
-> 
-> +-- On Sun, 16 Dec 2018, Yuval Shaia wrote --+
-> | With this patch the last step fails, the guest OS hangs, trying to probably 
-> | unload pvrdma driver and finally gave up after 3 minutes.
-> 
-> Strange...
->  
-> | Anyways with debug turned on i have noticed that there is one case that 
-> | devices gets 129 nchunks (i think in MPI) while your patch limits it to 128.
-> | >From pvrdma source code  we can see that first page is dedicated to ring
-> | state, this means that it maybe correct that 128 is the limit but we
-> | should check that nchunks does not exceed 129, not 128.
-> | 
-> | What do you think?
-> 
->  -> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/infiniband/hw/vmw_pvrdma/pvrdma_mr.c?id=fdf82a7856b32d905c39afc85e34364491e46346#n201
-> 
-> the vmw_pvrdma kernel driver also seems to set MAX_FAST_REG_PAGE = 128.
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-So does the user-space library.
-Maybe the mr_type is IB_MR_TYPE_MEM_REG.
+> Hi Li,
+>
+> On 11/29/18 5:52 AM, Li Qiang wrote:
+>> According to qdev-properties.h, properties of pointer type should
+>> be avoided. Turn "ps2_mouse" into a link.
+>>=20
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>> Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+>> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+>> ---
+[...]
+>> diff --git a/hw/i386/vmmouse.c b/hw/i386/vmmouse.c
+>> index 4412eaf604..f63aac6673 100644
+>> --- a/hw/i386/vmmouse.c
+>> +++ b/hw/i386/vmmouse.c
+[...]
+>> @@ -283,8 +289,6 @@ static void vmmouse_class_initfn(ObjectClass *klass,=
+ void *data)
+>>      dc->realize =3D vmmouse_realizefn;
+>>      dc->reset =3D vmmouse_reset;
+>>      dc->vmsd =3D &vmstate_vmmouse;
+>> -    dc->props =3D vmmouse_properties;
+>> -    /* Reason: pointer property "ps2_mouse" */
+>>      dc->user_creatable =3D false;
+>
+> "user_creatable =3D false" must have an justification comment.
 
-> 
-> 
-> | Ie. to replace this line from create_cq_ring
-> | +    if (!nchunks || nchunks > PVRDMA_MAX_FAST_REG_PAGES) {
-> | with this
-> | +    if (!nchunks || nchunks > PVRDMA_MAX_FAST_REG_PAGES + 1) {
-> | 
-> | Let me know your opinion.
-> 
-> While it may help to fix the regression. I'm not sure it's a right fix.
-> 129 seems a little odd number to have as limit.
+Correct.
 
-Agree, let's stick with this patch.
+> Can you keep 'Reason: link property "ps2_mouse"'?
 
-> 
-> Is it possible MPI is erring in getting 129 chunks?
+Is this a valid reason?
 
-Yeah but still the driver is holding the shutdown, not MPI.
+A pointer property is one, because it can only be set by code.
 
-Anyways, I found a wrong setting of respose to driver in "Add support for
-RDMA MAD" patchset v6 and fixed that.
-Now the regression is fine, i.e. VM goes down smoothly.
-
-> 
-> IMO it's better to confirm the right value for 'MAX_FAST_REG_PAGES', before 
-> going with > PVRDMA_MAX_FAS_REG_PAGES(=128) + 1.
-
-Agree.
-
-> 
-> Thank you.
-> --
-> Prasad J Pandit / Red Hat Product Security Team
-> 47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+> Eventually the maintainer taking this patch can fix this for you.
+>
+> With the comment:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>
+>>  }
+[...]
