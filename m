@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gYnQF-00048k-IN
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 02:34:46 -0500
+	(envelope-from <hsp.cat7@gmail.com>) id 1gYnXB-0000zU-N9
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 02:41:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gYnLc-0000mS-H2
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 02:29:59 -0500
-Received: from mx2.suse.de ([195.135.220.15]:57880 helo=mx1.suse.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gYnLb-0008JJ-SV
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 02:29:52 -0500
-References: <20181211095057.14623-1-fli@suse.com>
-	<20181211095057.14623-7-fli@suse.com>
-	<87y38tc2fb.fsf@dusky.pond.sub.org>
-From: Fei Li <fli@suse.com>
-Message-ID: <3645fb54-3651-f63b-c416-b22634e1f992@suse.com>
-Date: Mon, 17 Dec 2018 15:29:20 +0800
+	(envelope-from <hsp.cat7@gmail.com>) id 1gYnX8-0003Rv-LN
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 02:41:49 -0500
 MIME-Version: 1.0
-In-Reply-To: <87y38tc2fb.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-Content-Type: text/plain; charset=utf-8; format=flowed
+References: <20181213040126.6768-1-david@gibson.dropbear.id.au>
+	<CAFEAcA_4xV2M0Tgw6KSSQ7DOhv3r=FhETH_Yhmg2h0UT3AYS9g@mail.gmail.com>
+	<950689dd-1946-a42f-6a68-2944b46d53fc@kaod.org>
+	<20181217010344.GA5597@umbus.fritz.box>
+In-Reply-To: <20181217010344.GA5597@umbus.fritz.box>
+From: Howard Spoelstra <hsp.cat7@gmail.com>
+Date: Mon, 17 Dec 2018 08:41:32 +0100
+Message-ID: <CABLmASGjBW++0SYTvW75XF2tDUX7-EBGYm3jd5OnbRyA8FU_=w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v8 6/7] qemu_thread_create:
- propagate the error to callers to handle
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 00/27] ppc-for-4.0 queue 20181213
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,1159 +25,359 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <dgibson@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, gkurz@kaod.org, QEMU Developers <qemu-devel@nongnu.org>, spopovyc@redhat.com, qemu-ppc <qemu-ppc@nongnu.org>
 
-
-
-On 12/13/2018 03:26 PM, Markus Armbruster wrote:
-> There's a question for David Gibson inline.  Please search for /ppc/.
+On Mon, Dec 17, 2018 at 4:31 AM David Gibson
+<david@gibson.dropbear.id.au> wrote:
 >
-> Fei Li <fli@suse.com> writes:
+> On Fri, Dec 14, 2018 at 06:49:55PM +0100, C=C3=A9dric Le Goater wrote:
+> > On 12/14/18 5:03 PM, Peter Maydell wrote:
+> > > On Thu, 13 Dec 2018 at 04:01, David Gibson <david@gibson.dropbear.id.=
+au> wrote:
+> > >>
+> > >> The following changes since commit 4b3aab204204ca742836219b97b538d90=
+584f4f2:
+> > >>
+> > >>   Merge remote-tracking branch 'remotes/vivier2/tags/trivial-patches=
+-pull-request' into staging (2018-12-11 22:26:44 +0000)
+> > >>
+> > >> are available in the Git repository at:
+> > >>
+> > >>   git://github.com/dgibson/qemu.git tags/ppc-for-4.0-20181213
+> > >>
+> > >> for you to fetch changes up to 67888a17b6683600ae3fa64ca275c737ba8a9=
+a45:
+> > >>
+> > >>   spapr/xive: use the VCPU id as a NVT identifier (2018-12-13 09:44:=
+04 +1100)
+> > >>
+> > >> ----------------------------------------------------------------
+> > >> ppc patch queue 2018-12-13
+> > >>
+> > >> Here's the first ppc and spapr pull request for 4.0.  Highlights are=
+:
+> > >>
+> > >>  * The start of support for the POWER9 "XIVE" interrupt controller
+> > >>    (not complete enough to use yet, but we're getting there)
+> > >>  * A number of g_new vs. g_malloc cleanups
+> > >>  * Some IRQ wiring cleanups
+> > >>  * A fix for how we advertise NUMA nodes to the guest for pseries
+> > >>
+> > >> ---------------------------------------------------------------
+> > >
+> > >
+> > > Compile errors in the windows cross-build.
+> >
+> > are you compiling with the mingw64-* packages ? as documented in :
+> >
+> >       https://wiki.qemu.org/Hosts/W32
+> >
+> > > These look like
+> > > they're assumptions that "long" is 64 bits, which it is not on Window=
+s.
+> > > For instance the PPC_BIT macro should be using the ULL suffix, not UL
+> > > ("UL" is almost always a bug: either the constant is 32-bit, in
+> > > which case "U" is what you want, or it's 64-bit and you need "ULL").
+> >
+> > ok. These definitions come from our skiboot firmware which I wanted
+> > to keep as it was. It seems I will need to adapt.
+> >
+> > > Using __builtin_ffsl() directly in target/ppc/cpu.h also looks
+> > > a bit dubious -- this should be rephrased to use ctz32() or ctz64()
+> > > instead.
+> >
+> > ok. I will work on a fix.
 >
->> Make qemu_thread_create() return a Boolean to indicate if it succeeds
->> rather than failing with an error. And add an Error parameter to hold
->> the error message and let the callers handle it.
-> The "rather than failing with an error" is misleading.  Before the
-> patch, we report to stderr and abort().  What about:
->
->      qemu-thread: Make qemu_thread_create() handle errors properly
->
->      qemu_thread_create() abort()s on error.  Not nice.  Give it a
->      return value and an Error ** argument, so it can return success /
->      failure.
-A nice commit-amend! Thanks!
-> Still missing from the commit message then: how you update the callers.
-Yes, agree. I think the-how should also be noted here, like
-- propagating the err to callers whose call trace already have the Error=20
-paramater;
-- just add an &error_abort for qemu_thread_create() and make it a "TODO:=20
-xxx";
-> Let's see below.
->
->> Cc: Markus Armbruster <armbru@redhat.com>
->> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> Signed-off-by: Fei Li <fli@suse.com>
->> ---
->>   cpus.c                      | 45 ++++++++++++++++++++++++-----------=
---
->>   dump.c                      |  6 +++--
->>   hw/misc/edu.c               |  6 +++--
->>   hw/ppc/spapr_hcall.c        | 10 +++++++--
->>   hw/rdma/rdma_backend.c      |  4 +++-
->>   hw/usb/ccid-card-emulated.c | 16 ++++++++++----
->>   include/qemu/thread.h       |  4 ++--
->>   io/task.c                   |  3 ++-
->>   iothread.c                  | 16 +++++++++-----
->>   migration/migration.c       | 54 +++++++++++++++++++++++++++++------=
-----------
->>   migration/postcopy-ram.c    | 14 ++++++++++--
->>   migration/ram.c             | 40 ++++++++++++++++++++++++---------
->>   migration/savevm.c          | 11 ++++++---
->>   tests/atomic_add-bench.c    |  3 ++-
->>   tests/iothread.c            |  2 +-
->>   tests/qht-bench.c           |  3 ++-
->>   tests/rcutorture.c          |  3 ++-
->>   tests/test-aio.c            |  2 +-
->>   tests/test-rcu-list.c       |  3 ++-
->>   ui/vnc-jobs.c               | 17 +++++++++-----
->>   ui/vnc-jobs.h               |  2 +-
->>   ui/vnc.c                    |  4 +++-
->>   util/compatfd.c             | 12 ++++++++--
->>   util/oslib-posix.c          | 17 ++++++++++----
->>   util/qemu-thread-posix.c    | 24 +++++++++++++-------
->>   util/qemu-thread-win32.c    | 16 ++++++++++----
->>   util/rcu.c                  |  3 ++-
->>   util/thread-pool.c          |  4 +++-
->>   28 files changed, 243 insertions(+), 101 deletions(-)
->>
->> diff --git a/cpus.c b/cpus.c
->> index 7b091bda53..e8450e518a 100644
->> --- a/cpus.c
->> +++ b/cpus.c
->> @@ -1961,15 +1961,20 @@ static void qemu_tcg_init_vcpu(CPUState *cpu, =
-Error **errp)
->>               snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG=
-",
->>                    cpu->cpu_index);
->>  =20
->> -            qemu_thread_create(cpu->thread, thread_name, qemu_tcg_cpu=
-_thread_fn,
->> -                               cpu, QEMU_THREAD_JOINABLE);
->> +            if (!qemu_thread_create(cpu->thread, thread_name,
->> +                                    qemu_tcg_cpu_thread_fn, cpu,
->> +                                    QEMU_THREAD_JOINABLE, errp)) {
->> +                return;
->> +            }
->>  =20
->>           } else {
->>               /* share a single thread for all cpus with TCG */
->>               snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "ALL CPUs/T=
-CG");
->> -            qemu_thread_create(cpu->thread, thread_name,
->> -                               qemu_tcg_rr_cpu_thread_fn,
->> -                               cpu, QEMU_THREAD_JOINABLE);
->> +            if (!qemu_thread_create(cpu->thread, thread_name,
->> +                                    qemu_tcg_rr_cpu_thread_fn, cpu,
->> +                                    QEMU_THREAD_JOINABLE, errp)) {
->> +                return;
->> +            }
->>  =20
->>               single_tcg_halt_cond =3D cpu->halt_cond;
->>               single_tcg_cpu_thread =3D cpu->thread;
-> This is a caller that sets an error on failure.  You make it set an
-> error on qemu_thread_create() failure.  Makes sense.
-Thanks for the comment!
->> @@ -1997,8 +2002,10 @@ static void qemu_hax_start_vcpu(CPUState *cpu, =
-Error **errp)
->>  =20
->>       snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/HAX",
->>                cpu->cpu_index);
->> -    qemu_thread_create(cpu->thread, thread_name, qemu_hax_cpu_thread_=
-fn,
->> -                       cpu, QEMU_THREAD_JOINABLE);
->> +    if (!qemu_thread_create(cpu->thread, thread_name, qemu_hax_cpu_th=
-read_fn,
->> +                            cpu, QEMU_THREAD_JOINABLE, errp)) {
->> +        return;
->> +    }
->>   #ifdef _WIN32
->>       cpu->hThread =3D qemu_thread_get_handle(cpu->thread);
->>   #endif
-> Likewise.  I'll stop commenting on this pattern now.
->
->> @@ -2013,8 +2020,10 @@ static void qemu_kvm_start_vcpu(CPUState *cpu, =
-Error **errp)
->>       qemu_cond_init(cpu->halt_cond);
->>       snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/KVM",
->>                cpu->cpu_index);
->> -    qemu_thread_create(cpu->thread, thread_name, qemu_kvm_cpu_thread_=
-fn,
->> -                       cpu, QEMU_THREAD_JOINABLE);
->> +    if (!qemu_thread_create(cpu->thread, thread_name, qemu_kvm_cpu_th=
-read_fn,
->> +                            cpu, QEMU_THREAD_JOINABLE, errp)) {
->> +        /* keep 'if' here in case there is further error handling log=
-ic */
->> +    }
->>   }
->>  =20
->>   static void qemu_hvf_start_vcpu(CPUState *cpu, Error **errp)
->> @@ -2031,8 +2040,10 @@ static void qemu_hvf_start_vcpu(CPUState *cpu, =
-Error **errp)
->>  =20
->>       snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/HVF",
->>                cpu->cpu_index);
->> -    qemu_thread_create(cpu->thread, thread_name, qemu_hvf_cpu_thread_=
-fn,
->> -                       cpu, QEMU_THREAD_JOINABLE);
->> +    if (!qemu_thread_create(cpu->thread, thread_name, qemu_hvf_cpu_th=
-read_fn,
->> +                            cpu, QEMU_THREAD_JOINABLE, errp)) {
->> +        /* keep 'if' here in case there is further error handling log=
-ic */
->> +    }
->>   }
->>  =20
->>   static void qemu_whpx_start_vcpu(CPUState *cpu, Error **errp)
->> @@ -2044,8 +2055,10 @@ static void qemu_whpx_start_vcpu(CPUState *cpu,=
- Error **errp)
->>       qemu_cond_init(cpu->halt_cond);
->>       snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/WHPX",
->>                cpu->cpu_index);
->> -    qemu_thread_create(cpu->thread, thread_name, qemu_whpx_cpu_thread=
-_fn,
->> -                       cpu, QEMU_THREAD_JOINABLE);
->> +    if (!qemu_thread_create(cpu->thread, thread_name, qemu_whpx_cpu_t=
-hread_fn,
->> +                            cpu, QEMU_THREAD_JOINABLE, errp)) {
->> +        return;
->> +    }
->>   #ifdef _WIN32
->>       cpu->hThread =3D qemu_thread_get_handle(cpu->thread);
->>   #endif
->> @@ -2060,8 +2073,10 @@ static void qemu_dummy_start_vcpu(CPUState *cpu=
-, Error **errp)
->>       qemu_cond_init(cpu->halt_cond);
->>       snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/DUMMY",
->>                cpu->cpu_index);
->> -    qemu_thread_create(cpu->thread, thread_name, qemu_dummy_cpu_threa=
-d_fn, cpu,
->> -                       QEMU_THREAD_JOINABLE);
->> +    if (!qemu_thread_create(cpu->thread, thread_name, qemu_dummy_cpu_=
-thread_fn,
->> +                            cpu, QEMU_THREAD_JOINABLE, errp)) {
->> +        /* keep 'if' here in case there is further error handling log=
-ic */
->> +    }
->>   }
->>  =20
->>   bool qemu_init_vcpu(CPUState *cpu, Error **errp)
->> diff --git a/dump.c b/dump.c
->> index 4ec94c5e25..1f003aff9a 100644
->> --- a/dump.c
->> +++ b/dump.c
->> @@ -2020,8 +2020,10 @@ void qmp_dump_guest_memory(bool paging, const c=
-har *file,
->>       if (detach_p) {
->>           /* detached dump */
->>           s->detached =3D true;
->> -        qemu_thread_create(&s->dump_thread, "dump_thread", dump_threa=
-d,
->> -                           s, QEMU_THREAD_DETACHED);
->> +        if (!qemu_thread_create(&s->dump_thread, "dump_thread", dump_=
-thread,
->> +                                s, QEMU_THREAD_DETACHED, errp)) {
->> +            /* keep 'if' here in case there is further error handling=
- logic */
->> +        }
->>       } else {
->>           /* sync dump */
->>           dump_process(s, errp);
->> diff --git a/hw/misc/edu.c b/hw/misc/edu.c
->> index cdcf550dd7..6684c60a96 100644
->> --- a/hw/misc/edu.c
->> +++ b/hw/misc/edu.c
->> @@ -355,8 +355,10 @@ static void pci_edu_realize(PCIDevice *pdev, Erro=
-r **errp)
->>  =20
->>       qemu_mutex_init(&edu->thr_mutex);
->>       qemu_cond_init(&edu->thr_cond);
->> -    qemu_thread_create(&edu->thread, "edu", edu_fact_thread,
->> -                       edu, QEMU_THREAD_JOINABLE);
->> +    if (!qemu_thread_create(&edu->thread, "edu", edu_fact_thread,
->> +                            edu, QEMU_THREAD_JOINABLE, errp)) {
->> +        return;
->> +    }
->>  =20
->>       memory_region_init_io(&edu->mmio, OBJECT(edu), &edu_mmio_ops, ed=
-u,
->>                       "edu-mmio", 1 * MiB);
->> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
->> index ae913d070f..7c16ade04a 100644
->> --- a/hw/ppc/spapr_hcall.c
->> +++ b/hw/ppc/spapr_hcall.c
->> @@ -478,6 +478,7 @@ static target_ulong h_resize_hpt_prepare(PowerPCCP=
-U *cpu,
->>       sPAPRPendingHPT *pending =3D spapr->pending_hpt;
->>       uint64_t current_ram_size;
->>       int rc;
->> +    Error *local_err =3D NULL;
->>  =20
->>       if (spapr->resize_hpt =3D=3D SPAPR_RESIZE_HPT_DISABLED) {
->>           return H_AUTHORITY;
->> @@ -538,8 +539,13 @@ static target_ulong h_resize_hpt_prepare(PowerPCC=
-PU *cpu,
->>       pending->shift =3D shift;
->>       pending->ret =3D H_HARDWARE;
->>  =20
->> -    qemu_thread_create(&pending->thread, "sPAPR HPT prepare",
->> -                       hpt_prepare_thread, pending, QEMU_THREAD_DETAC=
-HED);
->> +    if (!qemu_thread_create(&pending->thread, "sPAPR HPT prepare",
->> +                            hpt_prepare_thread, pending,
->> +                            QEMU_THREAD_DETACHED, &local_err)) {
->> +        error_reportf_err(local_err, "failed to create hpt_prepare_th=
-read: ");
->> +        g_free(pending);
->> +        return H_RESOURCE;
->> +    }
->>  =20
->>       spapr->pending_hpt =3D pending;
->>  =20
-> This is a caller that returns an error code on failure.  You change it
-> to report the error, then return failure.  The return failure part look=
-s
-> fine.  Whether reporting the error is appropriate I can't say for sure.
-> No other failure mode reports anything.  David, what do you think?
-Just as David explains. :)
-> Fei Li, you could pass &error_abort to side-step this question for now.
->
->> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
->> index d7a4bbd91f..53a2bd0d85 100644
->> --- a/hw/rdma/rdma_backend.c
->> +++ b/hw/rdma/rdma_backend.c
->> @@ -164,8 +164,10 @@ static void start_comp_thread(RdmaBackendDev *bac=
-kend_dev)
->>       snprintf(thread_name, sizeof(thread_name), "rdma_comp_%s",
->>                ibv_get_device_name(backend_dev->ib_dev));
->>       backend_dev->comp_thread.run =3D true;
->> +    /* FIXME: let the further caller handle the error instead of abor=
-t() here */
->>       qemu_thread_create(&backend_dev->comp_thread.thread, thread_name=
-,
->> -                       comp_handler_thread, backend_dev, QEMU_THREAD_=
-DETACHED);
->> +                       comp_handler_thread, backend_dev,
->> +                       QEMU_THREAD_DETACHED, &error_abort);
->>   }
->>  =20
-> This is a caller that can't return failure.  You pass &error_abort.  No
-> behavioral change.
-Actually, yes..The reason why I did not do some change is that I am not=20
-quite
-sure about how to fix for the rdma device, esp. setting certain value=20
-for the
-dev->regs_data[idx] when it fails.
-> I think I'd mark the spot TODO, not FIXME.  Matter of taste, I guess.
-Sounds good, thanks!
->>   void rdma_backend_register_comp_handler(void (*handler)(int status,
->> diff --git a/hw/usb/ccid-card-emulated.c b/hw/usb/ccid-card-emulated.c
->> index 25976ed84f..c6783f124a 100644
->> --- a/hw/usb/ccid-card-emulated.c
->> +++ b/hw/usb/ccid-card-emulated.c
->> @@ -33,6 +33,7 @@
->>   #include "qemu/main-loop.h"
->>   #include "ccid.h"
->>   #include "qapi/error.h"
->> +#include "qemu/error-report.h"
->>  =20
->>   #define DPRINTF(card, lvl, fmt, ...) \
->>   do {\
->> @@ -544,10 +545,17 @@ static void emulated_realize(CCIDCardState *base=
-, Error **errp)
->>           error_setg(errp, "%s: failed to initialize vcard", TYPE_EMUL=
-ATED_CCID);
->>           goto out2;
->>       }
->> -    qemu_thread_create(&card->event_thread_id, "ccid/event", event_th=
-read,
->> -                       card, QEMU_THREAD_JOINABLE);
->> -    qemu_thread_create(&card->apdu_thread_id, "ccid/apdu", handle_apd=
-u_thread,
->> -                       card, QEMU_THREAD_JOINABLE);
->> +    if (!qemu_thread_create(&card->event_thread_id, "ccid/event", eve=
-nt_thread,
->> +                            card, QEMU_THREAD_JOINABLE, errp)) {
->> +        error_report("failed to create event_thread");
->> +        goto out2;
->> +    }
->> +    if (!qemu_thread_create(&card->apdu_thread_id, "ccid/apdu",
->> +                            handle_apdu_thread, card,
->> +                            QEMU_THREAD_JOINABLE, errp)) {
->> +        error_report("failed to create handle_apdu_thread");
->> +        goto out2;
->> +    }
->>  =20
->>   out2:
->>       clean_event_notifier(card);
-> error_report() in a realize() method is almost certainly wrong.
-Ok, I will remove these two.
->> diff --git a/include/qemu/thread.h b/include/qemu/thread.h
->> index 55d83a907c..12291f4ccd 100644
->> --- a/include/qemu/thread.h
->> +++ b/include/qemu/thread.h
->> @@ -152,9 +152,9 @@ void qemu_event_reset(QemuEvent *ev);
->>   void qemu_event_wait(QemuEvent *ev);
->>   void qemu_event_destroy(QemuEvent *ev);
->>  =20
->> -void qemu_thread_create(QemuThread *thread, const char *name,
->> +bool qemu_thread_create(QemuThread *thread, const char *name,
->>                           void *(*start_routine)(void *),
->> -                        void *arg, int mode);
->> +                        void *arg, int mode, Error **errp);
->>   void *qemu_thread_join(QemuThread *thread);
->>   void qemu_thread_get_self(QemuThread *thread);
->>   bool qemu_thread_is_self(QemuThread *thread);
->> diff --git a/io/task.c b/io/task.c
->> index 2886a2c1bc..6d3a18ab80 100644
->> --- a/io/task.c
->> +++ b/io/task.c
->> @@ -149,7 +149,8 @@ void qio_task_run_in_thread(QIOTask *task,
->>                          "io-task-worker",
->>                          qio_task_thread_worker,
->>                          data,
->> -                       QEMU_THREAD_DETACHED);
->> +                       QEMU_THREAD_DETACHED,
->> +                       &error_abort);
->>   }
->>  =20
->>  =20
-> This is a caller that can't return failure.  You pass &error_abort.  No
-> behavioral change.  Unlike above, you don't mark this spot FIXME.  Any
-> particular reason for marking one, but not the other?
-Emm, it is a little difficult to add a Error parameter for its callers an=
-d
-the callers seem does not need the Error. Thus I think passing
-&error_abort in this function instead of its further callers is more=20
-direct. :)
-The same reasons for the several below.
-
-But just as you mentioned, maybe we should add a "TODO: xxxx" for the dir=
-ect
-&error_abort case in case the callers need the Error parameter in future.
-> I'll stop commenting on this pattern now.
->
->> diff --git a/iothread.c b/iothread.c
->> index 2fb1cdf55d..7335dacf0b 100644
->> --- a/iothread.c
->> +++ b/iothread.c
->> @@ -164,9 +164,7 @@ static void iothread_complete(UserCreatable *obj, =
-Error **errp)
->>                                   &local_error);
->>       if (local_error) {
->>           error_propagate(errp, local_error);
->> -        aio_context_unref(iothread->ctx);
->> -        iothread->ctx =3D NULL;
->> -        return;
->> +        goto fail;
->>       }
->>  =20
->>       qemu_mutex_init(&iothread->init_done_lock);
->> @@ -178,8 +176,12 @@ static void iothread_complete(UserCreatable *obj,=
- Error **errp)
->>        */
->>       name =3D object_get_canonical_path_component(OBJECT(obj));
->>       thread_name =3D g_strdup_printf("IO %s", name);
->> -    qemu_thread_create(&iothread->thread, thread_name, iothread_run,
->> -                       iothread, QEMU_THREAD_JOINABLE);
->> +    if (!qemu_thread_create(&iothread->thread, thread_name, iothread_=
-run,
->> +                            iothread, QEMU_THREAD_JOINABLE, errp)) {
->> +        g_free(thread_name);
->> +        g_free(name);
->> +        goto fail;
->> +    }
->>       g_free(thread_name);
->>       g_free(name);
->>  =20
->> @@ -190,6 +192,10 @@ static void iothread_complete(UserCreatable *obj,=
- Error **errp)
->>                          &iothread->init_done_lock);
->>       }
->>       qemu_mutex_unlock(&iothread->init_done_lock);
->> +    return;
->> +fail:
->> +    aio_context_unref(iothread->ctx);
->> +    iothread->ctx =3D NULL;
->>   }
->>  =20
->>   typedef struct {
->> diff --git a/migration/migration.c b/migration/migration.c
->> index 0537fc0c26..af6c72ac5d 100644
->> --- a/migration/migration.c
->> +++ b/migration/migration.c
->> @@ -438,19 +438,22 @@ static void process_incoming_migration_co(void *=
-opaque)
->>           /* Make sure all file formats flush their mutable metadata *=
-/
->>           bdrv_invalidate_cache_all(&local_err);
->>           if (local_err) {
->> -            migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
->> -                    MIGRATION_STATUS_FAILED);
->>               error_report_err(local_err);
->> -            exit(EXIT_FAILURE);
->> +            goto fail;
->>           }
->>  =20
->>           if (colo_init_ram_cache() < 0) {
->>               error_report("Init ram cache failed");
->> -            exit(EXIT_FAILURE);
->> +            goto fail;
->>           }
->>  =20
->> -        qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming=
-",
->> -             colo_process_incoming_thread, mis, QEMU_THREAD_JOINABLE)=
-;
->> +        if (!qemu_thread_create(&mis->colo_incoming_thread, "COLO inc=
-oming",
->> +                                colo_process_incoming_thread, mis,
->> +                                QEMU_THREAD_JOINABLE, &local_err)) {
->> +            error_reportf_err(local_err, "failed to create "
->> +                              "colo_process_incoming_thread: ");
->> +            goto fail;
->> +        }
->>           mis->have_colo_incoming_thread =3D true;
->>           qemu_coroutine_yield();
->>  =20
->> @@ -461,20 +464,22 @@ static void process_incoming_migration_co(void *=
-opaque)
->>       }
->>  =20
->>       if (ret < 0) {
->> -        Error *local_err =3D NULL;
->> -
->> -        migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
->> -                          MIGRATION_STATUS_FAILED);
->>           error_report("load of migration failed: %s", strerror(-ret))=
-;
->> -        qemu_fclose(mis->from_src_file);
->> -        if (multifd_load_cleanup(&local_err) !=3D 0) {
->> -            error_report_err(local_err);
->> -        }
->> -        exit(EXIT_FAILURE);
->> +        goto fail;
->>       }
->>       mis->bh =3D qemu_bh_new(process_incoming_migration_bh, mis);
->>       qemu_bh_schedule(mis->bh);
->>       mis->migration_incoming_co =3D NULL;
->> +    return;
->> +fail:
->> +    local_err =3D NULL;
->> +    migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
->> +                      MIGRATION_STATUS_FAILED);
->> +    qemu_fclose(mis->from_src_file);
->> +    if (multifd_load_cleanup(&local_err) !=3D 0) {
->> +        error_report_err(local_err);
->> +    }
->> +    exit(EXIT_FAILURE);
->>   }
-> You change handling of errors other than qemu_thread_create().  Separat=
-e
-> patch, please.  I'd put it before this one.
-Ok, thanks for the reminder. Will update in the next version.
->>  =20
->>   static void migration_incoming_setup(QEMUFile *f)
->> @@ -2345,6 +2350,7 @@ out:
->>   static int open_return_path_on_source(MigrationState *ms,
->>                                         bool create_thread)
->>   {
->> +    Error *local_err =3D NULL;
->>  =20
->>       ms->rp_state.from_dst_file =3D qemu_file_get_return_path(ms->to_=
-dst_file);
->>       if (!ms->rp_state.from_dst_file) {
->> @@ -2358,8 +2364,13 @@ static int open_return_path_on_source(Migration=
-State *ms,
->>           return 0;
->>       }
->>  =20
->> -    qemu_thread_create(&ms->rp_state.rp_thread, "return path",
->> -                       source_return_path_thread, ms, QEMU_THREAD_JOI=
-NABLE);
->> +    if (!qemu_thread_create(&ms->rp_state.rp_thread, "return path",
->> +                            source_return_path_thread, ms,
->> +                            QEMU_THREAD_JOINABLE, &local_err)) {
->> +        error_reportf_err(local_err,
->> +                          "failed to create source_return_path_thread=
-: ");
->> +        return -1;
->> +    }
->>  =20
->>       trace_open_return_path_on_source_continue();
->>  =20
-> This is a caller that returns an error code on failure.  You change it
-> to report the error, then return failure.  This is okay, because its
-> sole caller also reports errors that way.
-Thanks.
->> @@ -3189,8 +3200,13 @@ void migrate_fd_connect(MigrationState *s, Erro=
-r *error_in)
->>           migrate_fd_cleanup(s);
->>           return;
->>       }
->> -    qemu_thread_create(&s->thread, "live_migration", migration_thread=
-, s,
->> -                       QEMU_THREAD_JOINABLE);
->> +    if (!qemu_thread_create(&s->thread, "live_migration", migration_t=
-hread,
->> +                            s, QEMU_THREAD_JOINABLE, &error_in)) {
->> +        error_reportf_err(error_in, "failed to create migration_threa=
-d: ");
->> +        migrate_set_state(&s->state, s->state, MIGRATION_STATUS_FAILE=
-D);
->> +        migrate_fd_cleanup(s);
->> +        return;
->> +    }
->>       s->migration_thread_running =3D true;
->>   }
-> This is a caller that reports errors.  You make it handle
-> qemu_thread_create() the same way.  Good.
-Thanks!
->>  =20
->> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
->> index fa09dba534..80bfa9c4a2 100644
->> --- a/migration/postcopy-ram.c
->> +++ b/migration/postcopy-ram.c
->> @@ -1083,6 +1083,8 @@ retry:
->>  =20
->>   int postcopy_ram_enable_notify(MigrationIncomingState *mis)
->>   {
->> +    Error *local_err =3D NULL;
->> +
->>       /* Open the fd for the kernel to give us userfaults */
->>       mis->userfault_fd =3D syscall(__NR_userfaultfd, O_CLOEXEC | O_NO=
-NBLOCK);
->>       if (mis->userfault_fd =3D=3D -1) {
->> @@ -1109,8 +1111,16 @@ int postcopy_ram_enable_notify(MigrationIncomin=
-gState *mis)
->>       }
->>  =20
->>       qemu_sem_init(&mis->fault_thread_sem, 0);
->> -    qemu_thread_create(&mis->fault_thread, "postcopy/fault",
->> -                       postcopy_ram_fault_thread, mis, QEMU_THREAD_JO=
-INABLE);
->> +    if (!qemu_thread_create(&mis->fault_thread, "postcopy/fault",
->> +                            postcopy_ram_fault_thread, mis,
->> +                            QEMU_THREAD_JOINABLE, &local_err)) {
->> +        error_reportf_err(local_err,
->> +                          "failed to create postcopy_ram_fault_thread=
-: ");
->> +        close(mis->userfault_event_fd);
->> +        close(mis->userfault_fd);
->> +        qemu_sem_destroy(&mis->fault_thread_sem);
->> +        return -1;
->> +    }
->>       qemu_sem_wait(&mis->fault_thread_sem);
->>       qemu_sem_destroy(&mis->fault_thread_sem);
->>       mis->have_fault_thread =3D true;
-> This is a caller that reports errors, then returns failure.  You make i=
+> So, I tried to confirm the problem, before applying C=C3=A9dric's fix, bu=
 t
-> handle qemu_thread_create() the same way.  Good.
+> I don't seem to be able to.  I'm getting a bunch of failures in the
+> windows cross-build on master, which look like gcc8 problems - but
+> nothing new or different in my tree.
 >
-> Not related to this patch, just spotted while reviewing it:
+> $ ./configure --cross-prefix=3Di686-w64-mingw32-
 >
->         /* Mark so that we get notified of accesses to unwritten areas =
-*/
->         if (qemu_ram_foreach_migratable_block(ram_block_enable_notify, =
-mis)) {
->             error_report("ram_block_enable_notify failed");
->             return -1;
->         }
+> [...]
 >
-> Do we leak mis->userfault_fd, mis->userfault_event_fd,
-> mis->fault_thread_sem here?
-Actually the patch 5/7 fixes this: we leave the cleanup() handling to
-postcopy_ram_incoming_cleanup() when failing to notify here.
-Looking back to the history, I falsely did close(these_fds) just here but
-David corrected me, and the following is quoted from his earlier comment:
-"
-I don't think these close() calls are safe.=C2=A0 This code is just after
-starting the fault thread, and the fault thread has a poll() call on
-these fd's, so we can't close them until we've instructed that thread
-to exit.
+> $ make -k
+>
+>         CHK version_gen.h
+>   CC      block/sheepdog.o
+> block/sheepdog.c: In function 'find_vdi_name':
+> block/sheepdog.c:1239:5: error: 'strncpy' specified bound 256 equals dest=
+ination size [-Werror=3Dstringop-truncation]
+>      strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
+>      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
+> make: *** [/home/dwg/src/qemu/rules.mak:69: block/sheepdog.o] Error 1
+>   CC      hw/acpi/core.o
+> In function 'acpi_table_install',
+>     inlined from 'acpi_table_add' at hw/acpi/core.c:296:5:
+> hw/acpi/core.c:184:9: error: 'strncpy' specified bound 4 equals destinati=
+on size [-Werror=3Dstringop-truncation]
+>          strncpy(ext_hdr->sig, hdrs->sig, sizeof ext_hdr->sig);
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> hw/acpi/core.c:203:9: error: 'strncpy' specified bound 6 equals destinati=
+on size [-Werror=3Dstringop-truncation]
+>          strncpy(ext_hdr->oem_id, hdrs->oem_id, sizeof ext_hdr->oem_id);
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> hw/acpi/core.c:207:9: error: 'strncpy' specified bound 8 equals destinati=
+on size [-Werror=3Dstringop-truncation]
+>          strncpy(ext_hdr->oem_table_id, hdrs->oem_table_id,
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>                  sizeof ext_hdr->oem_table_id);
+>                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> hw/acpi/core.c:216:9: error: 'strncpy' specified bound 4 equals destinati=
+on size [-Werror=3Dstringop-truncation]
+>          strncpy(ext_hdr->asl_compiler_id, hdrs->asl_compiler_id,
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>                  sizeof ext_hdr->asl_compiler_id);
+>                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
+> make: *** [/home/dwg/src/qemu/rules.mak:69: hw/acpi/core.o] Error 1
+>   CC      hw/acpi/aml-build.o
+> hw/acpi/aml-build.c: In function 'build_header':
+> hw/acpi/aml-build.c:1535:9: error: 'strncpy' specified bound 6 equals des=
+tination size [-Werror=3Dstringop-truncation]
+>          strncpy((char *)h->oem_id, oem_id, sizeof h->oem_id);
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> hw/acpi/aml-build.c:1541:9: error: 'strncpy' specified bound 8 equals des=
+tination size [-Werror=3Dstringop-truncation]
+>          strncpy((char *)h->oem_table_id, oem_table_id, sizeof(h->oem_tab=
+le_id));
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~~~~~~
+> cc1: all warnings being treated as errors
+> make: *** [/home/dwg/src/qemu/rules.mak:69: hw/acpi/aml-build.o] Error 1
+>   CC      migration/global_state.o
+> migration/global_state.c: In function 'global_state_store_running':
+> migration/global_state.c:45:5: error: 'strncpy' specified bound 100 equal=
+s destination size [-Werror=3Dstringop-truncation]
+>      strncpy((char *)global_state.runstate,
+>      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>             state, sizeof(global_state.runstate));
+>             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
+> make: *** [/home/dwg/src/qemu/rules.mak:69: migration/global_state.o] Err=
+or 1
+> make: Target 'all' not remade because of errors.
+>
+>
+> >
+> > Thanks,
+> >
+> > C.
+> >
+> >
+> > > In file included from /home/petmay01/qemu-for-merges/hw/intc/xive.c:1=
+3:0:
+> > > /home/petmay01/qemu-for-merges/hw/intc/xive.c: In function 'xive_rout=
+er_notify':
+> > > /home/petmay01/qemu-for-merges/target/ppc/cpu.h:76:33: error: overflo=
+w
+> > > in implicit constant conversion [-Werror=3Doverflow]
+> > >  #define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_B=
+IT(bs))
+> > >                                  ^
+> > > /home/petmay01/qemu-for-merges/target/ppc/cpu.h:84:50: note: in
+> > > definition of macro 'MASK_TO_LSH'
+> > >  # define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
+> > >                                                   ^
+> > > /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:129:34:
+> > > note: in expansion of macro 'GETFIELD'
+> > >  #define GETFIELD_BE64(m, v)      GETFIELD(m, be64_to_cpu(v))
+> > >                                   ^
+> > > /home/petmay01/qemu-for-merges/hw/intc/xive.c:1366:28: note: in
+> > > expansion of macro 'GETFIELD_BE64'
+> > >                             GETFIELD_BE64(EAS_END_BLOCK, eas.w),
+> > >                             ^
+> > > /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:120:25:
+> > > note: in expansion of macro 'PPC_BITMASK'
+> > >  #define EAS_END_BLOCK   PPC_BITMASK(4, 7)        /* Destination END =
+block# */
+> > >                          ^
+> > > /home/petmay01/qemu-for-merges/hw/intc/xive.c:1366:42: note: in
+> > > expansion of macro 'EAS_END_BLOCK'
+> > >                             GETFIELD_BE64(EAS_END_BLOCK, eas.w),
+> > >                                           ^
+> > > /home/petmay01/qemu-for-merges/target/ppc/cpu.h:89:46: error: right
+> > > shift count is negative [-Werror=3Dshift-count-negative]
+> > >  #define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
+> > >                                               ^
+> > > /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:129:34:
+> > > note: in expansion of macro 'GETFIELD'
+> > >  #define GETFIELD_BE64(m, v)      GETFIELD(m, be64_to_cpu(v))
+> > >                                   ^
+> > > /home/petmay01/qemu-for-merges/hw/intc/xive.c:1366:28: note: in
+> > > expansion of macro 'GETFIELD_BE64'
+> > >                             GETFIELD_BE64(EAS_END_BLOCK, eas.w),
+> > >                             ^
+> > > /home/petmay01/qemu-for-merges/target/ppc/cpu.h:76:33: error: overflo=
+w
+> > > in implicit constant conversion [-Werror=3Doverflow]
+> > >  #define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_B=
+IT(bs))
+> > >                                  ^
+> > > /home/petmay01/qemu-for-merges/target/ppc/cpu.h:84:50: note: in
+> > > definition of macro 'MASK_TO_LSH'
+> > >  # define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
+> > >                                                   ^
+> > > /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:129:34:
+> > > note: in expansion of macro 'GETFIELD'
+> > >  #define GETFIELD_BE64(m, v)      GETFIELD(m, be64_to_cpu(v))
+> > >                                   ^
+> > > /home/petmay01/qemu-for-merges/hw/intc/xive.c:1367:28: note: in
+> > > expansion of macro 'GETFIELD_BE64'
+> > >                             GETFIELD_BE64(EAS_END_INDEX, eas.w),
+> > >                             ^
+> > > /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:121:25:
+> > > note: in expansion of macro 'PPC_BITMASK'
+> > >  #define EAS_END_INDEX   PPC_BITMASK(8, 31)       /* Destination END =
+index */
+> > >                          ^
+> > > /home/petmay01/qemu-for-merges/hw/intc/xive.c:1367:42: note: in
+> > > expansion of macro 'EAS_END_INDEX'
+> > >                             GETFIELD_BE64(EAS_END_INDEX, eas.w),
+> > >                                           ^
+> > > /home/petmay01/qemu-for-merges/target/ppc/cpu.h:89:46: error: right
+> > > shift count is negative [-Werror=3Dshift-count-negative]
+> > >  #define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
+> > >                                               ^
+> > > /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:129:34:
+> > > note: in expansion of macro 'GETFIELD'
+> > >  #define GETFIELD_BE64(m, v)      GETFIELD(m, be64_to_cpu(v))
+> > >                                   ^
+> > > /home/petmay01/qemu-for-merges/hw/intc/xive.c:1367:28: note: in
+> > > expansion of macro 'GETFIELD_BE64'
+> > >                             GETFIELD_BE64(EAS_END_INDEX, eas.w),
+> > >                             ^
+> > > /home/petmay01/qemu-for-merges/hw/intc/xive.c: In function
+> > > 'xive_eas_pic_print_info':
+> > > /home/petmay01/qemu-for-merges/target/ppc/cpu.h:76:33: error: overflo=
+w
+> > > in implicit constant conversion [-Werror=3Doverflow]
+> > >  #define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_B=
+IT(bs))
+> > >                                  ^
+> > > /home/petmay01/qemu-for-merges/target/ppc/cpu.h:84:50: note: in
+> > > definition of macro 'MASK_TO_LSH'
+> > >  # define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
+> > >                                                   ^
+> > > /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:129:34:
+> > > note: in expansion of macro 'GETFIELD'
+> > >  #define GETFIELD_BE64(m, v)      GETFIELD(m, be64_to_cpu(v))
+> > >                                   ^
+> > > /home/petmay01/qemu-for-merges/hw/intc/xive.c:1400:31: note: in
+> > > expansion of macro 'GETFIELD_BE64'
+> > >                     (uint8_t)  GETFIELD_BE64(EAS_END_BLOCK, eas->w),
+> > >                                ^
+> > > /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:120:25:
+> > > note: in expansion of macro 'PPC_BITMASK'
+> > >  #define EAS_END_BLOCK   PPC_BITMASK(4, 7)        /* Destination END =
+block# */
+> > >                          ^
+> > > /home/petmay01/qemu-for-merges/hw/intc/xive.c:1400:45: note: in
+> > > expansion of macro 'EAS_END_BLOCK'
+> > >                     (uint8_t)  GETFIELD_BE64(EAS_END_BLOCK, eas->w),
+> > >                                              ^
+> > > /home/petmay01/qemu-for-merges/target/ppc/cpu.h:89:46: error: right
+> > > shift count is negative [-Werror=3Dshift-count-negative]
+> > >  #define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
+> > >                                               ^
+> > > /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:129:34:
+> > > note: in expansion of macro 'GETFIELD'
+> > >  #define GETFIELD_BE64(m, v)      GETFIELD(m, be64_to_cpu(v))
+> > >                                   ^
+> > > /home/petmay01/qemu-for-merges/hw/intc/xive.c:1400:31: note: in
+> > > expansion of macro 'GETFIELD_BE64'
+> > >                     (uint8_t)  GETFIELD_BE64(EAS_END_BLOCK, eas->w),
+> > >                                ^
+> > > /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:120:25:
+> > > note: in expansion of macro 'PPC_BITMASK'
+> > >  #define EAS_END_BLOCK   PPC_BITMASK(4, 7)        /* Destination END =
+block# */
+> > >                          ^
+> > > /home/petmay01/qemu-for-merges/hw/intc/xive.c:1400:45: note: in
+> > > expansion of macro 'EAS_END_BLOCK'
+> > >                     (uint8_t)  GETFIELD_BE64(EAS_END_BLOCK, eas->w),
+> > >                                              ^
+> > > /home/petmay01/qemu-for-merges/target/ppc/cpu.h:89:46: error: right
+> > > shift count is negative [-Werror=3Dshift-count-negative]
+> > >  #define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
+> > >                                               ^
+> > > /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:129:34:
+> > > note: in expansion of macro 'GETFIELD'
+> > >  #define GETFIELD_BE64(m, v)      GETFIELD(m, be64_to_cpu(v))
+> > >                                   ^
+> > > /home/petmay01/qemu-for-merges/hw/intc/xive.c:1400:31: note: in
+> > > expansion of macro 'GETFIELD_BE64'
+> > >                     (uint8_t)  GETFIELD_BE64(EAS_END_BLOCK, eas->w),
+> > >                                ^
+> > > /home/petmay01/qemu-for-merges/target/ppc/cpu.h:76:33: error: overflo=
+w
+> > > in implicit constant conversion [-Werror=3Doverflow]
+> > >  #define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_B=
+IT(bs))
+> > >                                  ^
+> > > /home/petmay01/qemu-for-merges/target/ppc/cpu.h:84:50: note: in
+> > > definition of macro 'MASK_TO_LSH'
+> > >  # define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
+> > >                                                   ^
+> > > /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:129:34:
+> > > note: in expansion of macro 'GETFIELD'
+> > >  #define GETFIELD_BE64(m, v)      GETFIELD(m, be64_to_cpu(v))
+> > >                                   ^
+> > > /home/petmay01/qemu-for-merges/hw/intc/xive.c:1401:31: note: in
+> > > expansion of macro 'GETFIELD_BE64'
+> > >                     (uint32_t) GETFIELD_BE64(EAS_END_INDEX, eas->w),
+> > >                                ^
+> > > /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:121:25:
+> > > note: in expansion of macro 'PPC_BITMASK'
+> > >  #define EAS_END_INDEX   PPC_BITMASK(8, 31)       /* Destination END =
+index */
+> > >                          ^
+> > > /home/petmay01/qemu-for-merges/hw/intc/xive.c:1401:45: note: in
+> > > expansion of macro 'EAS_END_INDEX'
+> > >                     (uint32_t) GETFIELD_BE64(EAS_END_INDEX, eas->w),
+> > >                                              ^
+> > > /home/petmay01/qemu-for-merges/target/ppc/cpu.h:89:46: error: right
+> > > shift count is negative [-Werror=3Dshift-count-negative]
+> > >  #define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
+> > >                                               ^
+> > > /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:129:34:
+> > > note: in expansion of macro 'GETFIELD'
+> > >  #define GETFIELD_BE64(m, v)      GETFIELD(m, be64_to_cpu(v))
+> > >                                   ^
+> > > /home/petmay01/qemu-for-merges/hw/intc/xive.c:1401:31: note: in
+> > > expansion of macro 'GETFIELD_BE64'
+> > >                     (uint32_t) GETFIELD_BE64(EAS_END_INDEX, eas->w),
+> > >                                ^
+> > >
+> > >
+> > > thanks
+> > > -- PMM
+> > >
+> >
+>
+> --
+> David Gibson                    | I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au  | minimalist, thank you.  NOT _the_ _othe=
+r_
+>                                 | _way_ _around_!
+> http://www.ozlabs.org/~dgibson
 
-We should fall out through postcopy_ram_incoming_cleanup, and because
-the thread exists it should do a notify to the thread, a join and then
-only later do the close calls.
-"
->> diff --git a/migration/ram.c b/migration/ram.c
->> index 658dfa88a3..6e0cccf066 100644
->> --- a/migration/ram.c
->> +++ b/migration/ram.c
->> @@ -473,6 +473,7 @@ static void compress_threads_save_cleanup(void)
->>   static int compress_threads_save_setup(void)
->>   {
->>       int i, thread_count;
->> +    Error *local_err =3D NULL;
->>  =20
->>       if (!migrate_use_compression()) {
->>           return 0;
->> @@ -502,9 +503,12 @@ static int compress_threads_save_setup(void)
->>           comp_param[i].quit =3D false;
->>           qemu_mutex_init(&comp_param[i].mutex);
->>           qemu_cond_init(&comp_param[i].cond);
->> -        qemu_thread_create(compress_threads + i, "compress",
->> -                           do_data_compress, comp_param + i,
->> -                           QEMU_THREAD_JOINABLE);
->> +        if (!qemu_thread_create(compress_threads + i, "compress",
->> +                                do_data_compress, comp_param + i,
->> +                                QEMU_THREAD_JOINABLE, &local_err)) {
->> +            error_reportf_err(local_err, "failed to create do_data_co=
-mpress: ");
->> +            goto exit;
->> +        }
->>       }
->>       return 0;
->>  =20
-> Reviewing the migration changes is getting tiresome...
-Yes, indeed, the migration involves a lot! Thanks so much for helping to=20
-review!
->   Is reporting the
-> error appropriate here, and why?
-I think the qemu monitor should display the obvious and exact failing
-reason for administrators, esp considering that qemu_thread_create()
-itself does not print any message thus we have no idea which direct
-function fails if gdb is not enabled.
-IOW, I think David's answer to that ppc's error_reportf_err() also apply=20
-here:
+Hi,
 
-"The error returns are for the guest, the reported errors are for the=20
-guest administrator or management layers."
+We had a discussion about the strncpy errors and windows builds
+SIGSEGV-ing here:
+https://lists.nongnu.org/archive/html/qemu-devel/2018-08/msg03310.html
 
->
->> @@ -1075,8 +1079,14 @@ static void multifd_new_send_channel_async(QIOT=
-ask *task, gpointer opaque)
->>           p->c =3D QIO_CHANNEL(sioc);
->>           qio_channel_set_delay(p->c, false);
->>           p->running =3D true;
->> -        qemu_thread_create(&p->thread, p->name, multifd_send_thread, =
-p,
->> -                           QEMU_THREAD_JOINABLE);
->> +        if (!qemu_thread_create(&p->thread, p->name, multifd_send_thr=
-ead, p,
->> +                                QEMU_THREAD_JOINABLE, &local_err)) {
->> +            migrate_set_error(migrate_get_current(), local_err);
->> +            error_reportf_err(local_err,
->> +                              "failed to create multifd_send_thread: =
-");
->> +            multifd_save_cleanup();
->> +            return;
->> +        }
->>  =20
->>           atomic_inc(&multifd_send_state->count);
->>       }
-> Same question.
->
->> @@ -1350,8 +1360,13 @@ bool multifd_recv_new_channel(QIOChannel *ioc, =
-Error **errp)
->>       p->num_packets =3D 1;
->>  =20
->>       p->running =3D true;
->> -    qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
->> -                       QEMU_THREAD_JOINABLE);
->> +    if (!qemu_thread_create(&p->thread, p->name, multifd_recv_thread,
->> +                            p, QEMU_THREAD_JOINABLE, &local_err)) {
->> +        error_propagate_prepend(errp, local_err,
->> +                                "failed to create multifd_recv_thread=
-: ");
->> +        multifd_recv_terminate_threads(local_err);
->> +        return false;
->> +    }
->>       atomic_inc(&multifd_recv_state->count);
->>       return atomic_read(&multifd_recv_state->count) =3D=3D
->>              migrate_multifd_channels();
->> @@ -3617,6 +3632,7 @@ static void compress_threads_load_cleanup(void)
->>   static int compress_threads_load_setup(QEMUFile *f)
->>   {
->>       int i, thread_count;
->> +    Error *local_err =3D NULL;
->>  =20
->>       if (!migrate_use_compression()) {
->>           return 0;
->> @@ -3638,9 +3654,13 @@ static int compress_threads_load_setup(QEMUFile=
- *f)
->>           qemu_cond_init(&decomp_param[i].cond);
->>           decomp_param[i].done =3D true;
->>           decomp_param[i].quit =3D false;
->> -        qemu_thread_create(decompress_threads + i, "decompress",
->> -                           do_data_decompress, decomp_param + i,
->> -                           QEMU_THREAD_JOINABLE);
->> +        if (!qemu_thread_create(decompress_threads + i, "decompress",
->> +                                do_data_decompress, decomp_param + i,
->> +                                QEMU_THREAD_JOINABLE, &local_err)) {
->> +            error_reportf_err(local_err,
->> +                              "failed to create do_data_decompress: "=
-);
->> +            goto exit;
->> +        }
->>       }
->>       return 0;
->>   exit:
-> Same question.
->
->> diff --git a/migration/savevm.c b/migration/savevm.c
->> index d784e8aa40..b8bdcde5d8 100644
->> --- a/migration/savevm.c
->> +++ b/migration/savevm.c
->> @@ -1747,9 +1747,14 @@ static int loadvm_postcopy_handle_listen(Migrat=
-ionIncomingState *mis)
->>       mis->have_listen_thread =3D true;
->>       /* Start up the listening thread and wait for it to signal ready=
- */
->>       qemu_sem_init(&mis->listen_thread_sem, 0);
->> -    qemu_thread_create(&mis->listen_thread, "postcopy/listen",
->> -                       postcopy_ram_listen_thread, NULL,
->> -                       QEMU_THREAD_DETACHED);
->> +    if (!qemu_thread_create(&mis->listen_thread, "postcopy/listen",
->> +                            postcopy_ram_listen_thread, NULL,
->> +                            QEMU_THREAD_DETACHED, &local_err)) {
->> +        error_reportf_err(local_err,
->> +                          "failed to create postcopy_ram_listen_threa=
-d: ");
->> +        qemu_sem_destroy(&mis->listen_thread_sem);
->> +        return -1;
->> +    }
->>       qemu_sem_wait(&mis->listen_thread_sem);
->>       qemu_sem_destroy(&mis->listen_thread_sem);
->>  =20
-> This is a caller that reports errors, then returns failure.  You make i=
-t
-> handle qemu_thread_create() the same way.  Good.
->
-> I'll stop commenting on this pattern now.
-Thanks.
->> diff --git a/tests/atomic_add-bench.c b/tests/atomic_add-bench.c
->> index 2f6c72f63a..338b9563e3 100644
->> --- a/tests/atomic_add-bench.c
->> +++ b/tests/atomic_add-bench.c
->> @@ -2,6 +2,7 @@
->>   #include "qemu/thread.h"
->>   #include "qemu/host-utils.h"
->>   #include "qemu/processor.h"
->> +#include "qapi/error.h"
->>  =20
->>   struct thread_info {
->>       uint64_t r;
->> @@ -110,7 +111,7 @@ static void create_threads(void)
->>  =20
->>           info->r =3D (i + 1) ^ time(NULL);
->>           qemu_thread_create(&threads[i], NULL, thread_func, info,
->> -                           QEMU_THREAD_JOINABLE);
->> +                           QEMU_THREAD_JOINABLE, &error_abort);
->>       }
->>   }
-... snip for all tests/xxx.c as all the passed parameter is &error_abort =
-...
->>  =20
->> diff --git a/ui/vnc-jobs.c b/ui/vnc-jobs.c
->> index 929391f85d..35a652d1fd 100644
->> --- a/ui/vnc-jobs.c
->> +++ b/ui/vnc-jobs.c
->> @@ -31,6 +31,7 @@
->>   #include "vnc-jobs.h"
->>   #include "qemu/sockets.h"
->>   #include "qemu/main-loop.h"
->> +#include "qapi/error.h"
->>   #include "block/aio.h"
->>  =20
->>   /*
->> @@ -331,15 +332,21 @@ static bool vnc_worker_thread_running(void)
->>       return queue; /* Check global queue */
->>   }
->>  =20
->> -void vnc_start_worker_thread(void)
->> +bool vnc_start_worker_thread(Error **errp)
->>   {
->>       VncJobQueue *q;
->>  =20
->> -    if (vnc_worker_thread_running())
->> -        return ;
->> +    if (vnc_worker_thread_running()) {
->> +        goto out;
->> +    }
->>  =20
->>       q =3D vnc_queue_init();
->> -    qemu_thread_create(&q->thread, "vnc_worker", vnc_worker_thread, q=
-,
->> -                       QEMU_THREAD_DETACHED);
->> +    if (!qemu_thread_create(&q->thread, "vnc_worker", vnc_worker_thre=
-ad,
->> +                            q, QEMU_THREAD_DETACHED, errp)) {
->> +        vnc_queue_clear(q);
->> +        return false;
->> +    }
->>       queue =3D q; /* Set global queue */
->> +out:
->> +    return true;
->>   }
-> I recommend to pass &error_abort to qemu_thread_create() in this patch,
-> then convert vnc_start_worker_thread() to Error in a subsequent patch.
-Ok, thanks! This makes this patch shorter. :)
-BTW, would it be better by adding a "TODO: xxx" comment before the
-&error_abort in this patch, and remove it in the subsequent patch?
-If it is ok, I will do the same adding for the latter touch_all_pages().
->> diff --git a/ui/vnc-jobs.h b/ui/vnc-jobs.h
->> index 59f66bcc35..14640593db 100644
->> --- a/ui/vnc-jobs.h
->> +++ b/ui/vnc-jobs.h
->> @@ -37,7 +37,7 @@ void vnc_job_push(VncJob *job);
->>   void vnc_jobs_join(VncState *vs);
->>  =20
->>   void vnc_jobs_consume_buffer(VncState *vs);
->> -void vnc_start_worker_thread(void);
->> +bool vnc_start_worker_thread(Error **errp);
->>  =20
->>   /* Locks */
->>   static inline int vnc_trylock_display(VncDisplay *vd)
->> diff --git a/ui/vnc.c b/ui/vnc.c
->> index 0c1b477425..0ffe9e6a5d 100644
->> --- a/ui/vnc.c
->> +++ b/ui/vnc.c
->> @@ -3236,7 +3236,9 @@ void vnc_display_init(const char *id, Error **er=
-rp)
->>       vd->connections_limit =3D 32;
->>  =20
->>       qemu_mutex_init(&vd->mutex);
->> -    vnc_start_worker_thread();
->> +    if (!vnc_start_worker_thread(errp)) {
->> +        return;
->> +    }
->>  =20
->>       vd->dcl.ops =3D &dcl_ops;
->>       register_displaychangelistener(&vd->dcl);
-> These two hunks then also go into the subsequent patch.
-Ok.
->> diff --git a/util/compatfd.c b/util/compatfd.c
->> index 980bd33e52..886aa249f9 100644
->> --- a/util/compatfd.c
->> +++ b/util/compatfd.c
->> @@ -16,6 +16,7 @@
->>   #include "qemu/osdep.h"
->>   #include "qemu-common.h"
->>   #include "qemu/thread.h"
->> +#include "qapi/error.h"
->>  =20
->>   #include <sys/syscall.h>
->>  =20
->> @@ -70,6 +71,7 @@ static int qemu_signalfd_compat(const sigset_t *mask=
-)
->>       struct sigfd_compat_info *info;
->>       QemuThread thread;
->>       int fds[2];
->> +    Error *local_err =3D NULL;
->>  =20
->>       info =3D malloc(sizeof(*info));
->>       if (info =3D=3D NULL) {
->> @@ -88,8 +90,14 @@ static int qemu_signalfd_compat(const sigset_t *mas=
-k)
->>       memcpy(&info->mask, mask, sizeof(*mask));
->>       info->fd =3D fds[1];
->>  =20
->> -    qemu_thread_create(&thread, "signalfd_compat", sigwait_compat, in=
-fo,
->> -                       QEMU_THREAD_DETACHED);
->> +    if (!qemu_thread_create(&thread, "signalfd_compat", sigwait_compa=
-t,
->> +                            info, QEMU_THREAD_DETACHED, &local_err)) =
-{
->> +        error_reportf_err(local_err, "failed to create sigwait_compat=
-: ");
->> +        close(fds[0]);
->> +        close(fds[1]);
->> +        free(info);
->> +        return -1;
->> +    }
->>  =20
->>       return fds[0];
->>   }
-> This function is implements signalfd() when the kernel doesn't provide
-> it.
->
-> signalfd() sets errno on failure.  The replacement's existing failure
-> modes set errno.  You add a failure mode that doesn't set errno.  That'=
-s
-> a bug.  To fix it, you can either make qemu_thread_create() set errno,
-> or you can make it return a value you can use to set errno.  The common
-> way to do the latter is returning a *negated* errno value.
-Oops, I forgot setting the errno for Linux implementation! My fault..
-I will set errno inside qemu_thread_create() as follows:
- =C2=A0=C2=A0=C2=A0=C2=A0 err =3D pthread_attr_init(&attr);
- =C2=A0=C2=A0=C2=A0=C2=A0 if (err) {
--=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg_errno(errp, -err, =
-"pthread_attr_init failed: %s",
--=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-strerror(err));
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 errno =3D err;
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg_errno(errp, errno,=
- "pthread_attr_init failed");
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return false;
- =C2=A0=C2=A0=C2=A0=C2=A0 }
+A solution was suggested here:
+https://lists.nongnu.org/archive/html/qemu-devel/2018-08/msg03761.html.
 
-> signalfd() doesn't print anything on failure.  The replacement's
-> existing failure modes don't print anything.  You add a failure mode
-> that does print.  I think it shouldn't.
-Ok, I will remove it. Thanks!
->> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
->> index c1bee2a581..2c779fd634 100644
->> --- a/util/oslib-posix.c
->> +++ b/util/oslib-posix.c
->> @@ -437,9 +437,12 @@ static bool touch_all_pages(char *area, size_t hp=
-agesize, size_t numpages,
->>       size_t size_per_thread;
->>       char *addr =3D area;
->>       int i =3D 0;
->> +    int started_thread =3D 0;
->> +    Error *local_err =3D NULL;
->>  =20
->>       memset_thread_failed =3D false;
->>       memset_num_threads =3D get_memset_num_threads(smp_cpus);
->> +    started_thread =3D memset_num_threads;
->>       memset_thread =3D g_new0(MemsetThread, memset_num_threads);
->>       numpages_per_thread =3D (numpages / memset_num_threads);
->>       size_per_thread =3D (hpagesize * numpages_per_thread);
->> @@ -448,13 +451,19 @@ static bool touch_all_pages(char *area, size_t h=
-pagesize, size_t numpages,
->>           memset_thread[i].numpages =3D (i =3D=3D (memset_num_threads =
-- 1)) ?
->>                                       numpages : numpages_per_thread;
->>           memset_thread[i].hpagesize =3D hpagesize;
->> -        qemu_thread_create(&memset_thread[i].pgthread, "touch_pages",
->> -                           do_touch_pages, &memset_thread[i],
->> -                           QEMU_THREAD_JOINABLE);
->> +        if (!qemu_thread_create(&memset_thread[i].pgthread, "touch_pa=
-ges",
->> +                                do_touch_pages, &memset_thread[i],
->> +                                QEMU_THREAD_JOINABLE, &local_err)) {
->> +            error_reportf_err(local_err, "failed to create do_touch_p=
-ages: ");
->> +            memset_thread_failed =3D true;
->> +            started_thread =3D i;
->> +            goto out;
->> +        }
->>           addr +=3D size_per_thread;
->>           numpages -=3D numpages_per_thread;
->>       }
->> -    for (i =3D 0; i < memset_num_threads; i++) {
->> +out:
->> +    for (i =3D 0; i < started_thread; i++) {
->>           qemu_thread_join(&memset_thread[i].pgthread);
->>       }
->>       g_free(memset_thread);
-> You need to convert this function to Error instead, because its caller
-> os_mem_prealloc() sets an error on failure.  I recommend to pass
-> &error_abort in this patch, and convert to Error in a subsequent patch.
-Ok, thanks for the advice.
->> diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
->> index 865e476df5..81b40a1ece 100644
->> --- a/util/qemu-thread-posix.c
->> +++ b/util/qemu-thread-posix.c
->> @@ -15,6 +15,7 @@
->>   #include "qemu/atomic.h"
->>   #include "qemu/notify.h"
->>   #include "qemu-thread-common.h"
->> +#include "qapi/error.h"
->>  =20
->>   static bool name_threads;
->>  =20
->> @@ -500,9 +501,9 @@ static void *qemu_thread_start(void *args)
->>       return r;
->>   }
->>  =20
->> -void qemu_thread_create(QemuThread *thread, const char *name,
->> -                       void *(*start_routine)(void*),
->> -                       void *arg, int mode)
->> +bool qemu_thread_create(QemuThread *thread, const char *name,
->> +                        void *(*start_routine)(void *),
->> +                        void *arg, int mode, Error **errp)
->>   {
->>       sigset_t set, oldset;
->>       int err;
->> @@ -511,7 +512,9 @@ void qemu_thread_create(QemuThread *thread, const =
-char *name,
->>  =20
->>       err =3D pthread_attr_init(&attr);
->>       if (err) {
->> -        error_exit(err, __func__);
->> +        error_setg_errno(errp, -err, "pthread_attr_init failed: %s",
->> +                         strerror(err));
->> +        return false;
->>       }
->>  =20
->>       if (mode =3D=3D QEMU_THREAD_DETACHED) {
->> @@ -526,16 +529,21 @@ void qemu_thread_create(QemuThread *thread, cons=
-t char *name,
->>       qemu_thread_args->name =3D g_strdup(name);
->>       qemu_thread_args->start_routine =3D start_routine;
->>       qemu_thread_args->arg =3D arg;
->> -
-> Let's keep the blank line.
-ok.
+Nevertheless, I still compile with --disable-werror and
+--disable-stack-protector to get a working binary. (Cross-compiling on
+Fedora 29).
 
-Thanks so much for the review! Have a nice day. :)
-Fei
->>       err =3D pthread_create(&thread->thread, &attr,
->>                            qemu_thread_start, qemu_thread_args);
->> -
->> -    if (err)
->> -        error_exit(err, __func__);
->> +    if (err) {
->> +        error_setg_errno(errp, -err, "pthread_create failed: %s",
->> +                         strerror(err));
->> +        pthread_attr_destroy(&attr);
->> +        g_free(qemu_thread_args->name);
->> +        g_free(qemu_thread_args);
->> +        return false;
->> +    }
->>  =20
->>       pthread_sigmask(SIG_SETMASK, &oldset, NULL);
->>  =20
->>       pthread_attr_destroy(&attr);
->> +    return true;
->>   }
->>  =20
->>   void qemu_thread_get_self(QemuThread *thread)
->> diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
->> index 4a363ca675..57b1143e97 100644
->> --- a/util/qemu-thread-win32.c
->> +++ b/util/qemu-thread-win32.c
->> @@ -20,6 +20,7 @@
->>   #include "qemu/thread.h"
->>   #include "qemu/notify.h"
->>   #include "qemu-thread-common.h"
->> +#include "qapi/error.h"
->>   #include <process.h>
->>  =20
->>   static bool name_threads;
->> @@ -388,9 +389,9 @@ void *qemu_thread_join(QemuThread *thread)
->>       return ret;
->>   }
->>  =20
->> -void qemu_thread_create(QemuThread *thread, const char *name,
->> -                       void *(*start_routine)(void *),
->> -                       void *arg, int mode)
->> +bool qemu_thread_create(QemuThread *thread, const char *name,
->> +                        void *(*start_routine)(void *),
->> +                        void *arg, int mode, Error **errp)
->>   {
->>       HANDLE hThread;
->>       struct QemuThreadData *data;
->> @@ -409,10 +410,17 @@ void qemu_thread_create(QemuThread *thread, cons=
-t char *name,
->>       hThread =3D (HANDLE) _beginthreadex(NULL, 0, win32_start_routine=
-,
->>                                         data, 0, &thread->tid);
->>       if (!hThread) {
->> -        error_exit(GetLastError(), __func__);
->> +        if (data->mode !=3D QEMU_THREAD_DETACHED) {
->> +            DeleteCriticalSection(&data->cs);
->> +        }
->> +        error_setg_errno(errp, errno,
->> +                         "failed to create win32_start_routine");
->> +        g_free(data);
->> +        return false;
->>       }
->>       CloseHandle(hThread);
->>       thread->data =3D data;
->> +    return true;
->>   }
->>  =20
->>   void qemu_thread_get_self(QemuThread *thread)
->> diff --git a/util/rcu.c b/util/rcu.c
->> index 5676c22bd1..145dcdb0c6 100644
->> --- a/util/rcu.c
->> +++ b/util/rcu.c
->> @@ -32,6 +32,7 @@
->>   #include "qemu/atomic.h"
->>   #include "qemu/thread.h"
->>   #include "qemu/main-loop.h"
->> +#include "qapi/error.h"
->>   #if defined(CONFIG_MALLOC_TRIM)
->>   #include <malloc.h>
->>   #endif
->> @@ -325,7 +326,7 @@ static void rcu_init_complete(void)
->>        * must have been quiescent even after forking, just recreate it=
-.
->>        */
->>       qemu_thread_create(&thread, "call_rcu", call_rcu_thread,
->> -                       NULL, QEMU_THREAD_DETACHED);
->> +                       NULL, QEMU_THREAD_DETACHED, &error_abort);
->>  =20
->>       rcu_register_thread();
->>   }
->> diff --git a/util/thread-pool.c b/util/thread-pool.c
->> index 610646d131..ad0f980783 100644
->> --- a/util/thread-pool.c
->> +++ b/util/thread-pool.c
->> @@ -22,6 +22,7 @@
->>   #include "trace.h"
->>   #include "block/thread-pool.h"
->>   #include "qemu/main-loop.h"
->> +#include "qapi/error.h"
->>  =20
->>   static void do_spawn_thread(ThreadPool *pool);
->>  =20
->> @@ -132,7 +133,8 @@ static void do_spawn_thread(ThreadPool *pool)
->>       pool->new_threads--;
->>       pool->pending_threads++;
->>  =20
->> -    qemu_thread_create(&t, "worker", worker_thread, pool, QEMU_THREAD=
-_DETACHED);
->> +    qemu_thread_create(&t, "worker", worker_thread, pool,
->> +                       QEMU_THREAD_DETACHED, &error_abort);
->>   }
->>  =20
->>   static void spawn_thread_bh_fn(void *opaque)
->
+Best,
+Howard
