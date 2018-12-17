@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gYp06-0005Ay-Us
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 04:15:48 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gYpDy-0007xQ-LC
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 04:30:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gYp03-0000bc-H7
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 04:15:46 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 17 Dec 2018 09:15:34 +0000
-Message-ID: <3dea4976-e751-7d3b-2049-38b1540f894e@virtuozzo.com>
-References: <20181213015013.15350-1-jsnow@redhat.com>
-	<20181213015013.15350-7-jsnow@redhat.com>
-	<43e3e755-e4d3-5342-2829-e7c309d675e4@virtuozzo.com>
-	<4893f07b-a38b-1f36-ffcb-424df9af8d0e@redhat.com>
-In-Reply-To: <4893f07b-a38b-1f36-ffcb-424df9af8d0e@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D8CC28E14BF7274C8890264C91EC7EFC@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <alex.bennee@linaro.org>) id 1gYpDq-0000a9-Dd
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 04:30:04 -0500
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:46801)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gYpDq-0000XE-6P
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 04:29:58 -0500
+Received: by mail-wr1-x429.google.com with SMTP id l9so11444221wrt.13
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 01:29:57 -0800 (PST)
+References: <20181214135452.25936-1-alex.bennee@linaro.org>
+	<CAFEAcA-89Eq7ucC2bqh2M_XJzfaY9AF=7zdyWQCOyd9OpSeF8A@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA-89Eq7ucC2bqh2M_XJzfaY9AF=7zdyWQCOyd9OpSeF8A@mail.gmail.com>
+Date: Mon, 17 Dec 2018 09:29:54 +0000
+Message-ID: <871s6gtsa5.fsf@linaro.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 6/7] iotests: allow pretty-print for
- qmp_log
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/15] Hardfloat + softfloat maintainers
+ update and gitdm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +31,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-MTQuMTIuMjAxOCAyMzo1MSwgSm9obiBTbm93IHdyb3RlOg0KPiANCj4gDQo+IE9uIDEyLzEzLzE4
-IDg6MDkgQU0sIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+PiAxMy4xMi4y
-MDE4IDQ6NTAsIEpvaG4gU25vdyB3cm90ZToNCj4+PiBJZiBpb3Rlc3RzIGhhdmUgbGluZXMgZXhj
-ZWVkaW5nID45OTggY2hhcmFjdGVycyBsb25nLCBnaXQgZG9lc24ndA0KPj4+IHdhbnQgdG8gc2Vu
-ZCBpdCBwbGFpbnRleHQgdG8gdGhlIGxpc3QuIFdlIGNhbiBzb2x2ZSB0aGlzIGJ5IGFsbG93aW5n
-DQo+Pj4gdGhlIGlvdGVzdHMgdG8gdXNlIHByZXR0eSBwcmludGVkIFFNUCBvdXRwdXQgdGhhdCB3
-ZSBjYW4gbWF0Y2ggYWdhaW5zdA0KPj4+IGluc3RlYWQuDQo+Pj4NCj4+PiBBcyBhIGJvbnVzLCBp
-dCdzIG11Y2ggbmljZXIgZm9yIGh1bWFuIGV5ZXMsIHRvby4NCj4+Pg0KPj4+IFNpZ25lZC1vZmYt
-Ynk6IEpvaG4gU25vdyA8anNub3dAcmVkaGF0LmNvbT4NCj4+PiAtLS0NCj4+PiAgICB0ZXN0cy9x
-ZW11LWlvdGVzdHMvaW90ZXN0cy5weSB8IDQgKystLQ0KPj4+ICAgIDEgZmlsZSBjaGFuZ2VkLCAy
-IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+Pj4NCj4+PiBkaWZmIC0tZ2l0IGEvdGVz
-dHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHkgYi90ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5w
-eQ0KPj4+IGluZGV4IDk1OTU0MjlmZWEuLmRiYmVmNGJhZDMgMTAwNjQ0DQo+Pj4gLS0tIGEvdGVz
-dHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHkNCj4+PiArKysgYi90ZXN0cy9xZW11LWlvdGVzdHMv
-aW90ZXN0cy5weQ0KPj4+IEBAIC00NDcsMTIgKzQ0NywxMiBAQCBjbGFzcyBWTShxdGVzdC5RRU1V
-UXRlc3RNYWNoaW5lKToNCj4+PiAgICAgICAgICAgICAgICByZXN1bHQuYXBwZW5kKGZpbHRlcl9x
-bXBfZXZlbnQoZXYpKQ0KPj4+ICAgICAgICAgICAgcmV0dXJuIHJlc3VsdA0KPj4+ICAgIA0KPj4+
-IC0gICAgZGVmIHFtcF9sb2coc2VsZiwgY21kLCBmaWx0ZXJzPVtmaWx0ZXJfdGVzdGZpbGVzXSwg
-Kiprd2FyZ3MpOg0KPj4+ICsgICAgZGVmIHFtcF9sb2coc2VsZiwgY21kLCBpbmRlbnQ9Tm9uZSwg
-ZmlsdGVycz1bZmlsdGVyX3Rlc3RmaWxlc10sICoqa3dhcmdzKToNCj4+PiAgICAgICAgICAgIGxv
-Z21zZyA9ICd7ImV4ZWN1dGUiOiAiJXMiLCAiYXJndW1lbnRzIjogJXN9JyAlIFwNCj4+PiAgICAg
-ICAgICAgICAgICAoY21kLCBqc29uLmR1bXBzKGt3YXJncywgc29ydF9rZXlzPVRydWUpKQ0KPj4+
-ICAgICAgICAgICAgbG9nKGxvZ21zZywgZmlsdGVycykNCj4+DQo+PiB3aHkgbm90IHRvIHByZXR0
-aWZ5IGNtZCBqc29uIHRvbz8gSnVzdCBtYWtlIGZ1bGxvYmogPSB7ImV4ZWN1dGUiOiBjbWQsICJh
-cmd1bWVudHMiOiBrd2FyZ3N9LCBhbmQgcHJldHRpZnkgaXQuDQo+PiAoaG1tLCB1bmZvcnR1bmF0
-ZWx5LCAiZXhlY3V0ZSIgPCAiYXJndW1lbnRzIiwgYW5kIHRoZXkgd2lsbCBiZSByZWFycmFuZ2Vk
-KQ0KPj4NCj4gDQo+IEl0IHdhc24ndCBsb25nIGVub3VnaCB0byBpcnJpdGF0ZSBtZSA6KQ0KPiBi
-dXQgd2UncmUgaGVyZSwgc28gSSdsbCBkbyB0aGF0IHRvby4NCj4gDQo+PiB3aXRoIG9yIHdpdGhv
-dXQgKGFzIHRoZSBwYXRjaCBkb24ndCBhaW0gdG8gcHJldHRpZnkgZXZlcnl0aGluZyk6DQo+PiBS
-ZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0
-dW96em8uY29tPg0KPj4NCj4+PiAgICAgICAgICAgIHJlc3VsdCA9IHNlbGYucW1wKGNtZCwgKipr
-d2FyZ3MpDQo+Pj4gLSAgICAgICAgbG9nKGpzb24uZHVtcHMocmVzdWx0LCBzb3J0X2tleXM9VHJ1
-ZSksIGZpbHRlcnMpDQo+Pj4gKyAgICAgICAgbG9nKGpzb24uZHVtcHMocmVzdWx0LCBpbmRlbnQ9
-aW5kZW50LCBzb3J0X2tleXM9VHJ1ZSksIGZpbHRlcnMpDQo+Pj4gICAgICAgICAgICByZXR1cm4g
-cmVzdWx0DQo+Pg0KPj4gaG1tLCBkb2luZyB0aGUgc2FtZSB0aGluZyBhcyBFcmljIChjaGVjayBz
-cGVjcyksIEkgc2VlIHRoZSBmb2xsb3dpbmcgbm90ZToNCj4+DQo+PiAgID4gTm90ZTogU2luY2Ug
-dGhlIGRlZmF1bHQgaXRlbSBzZXBhcmF0b3IgaXMgJywgJywgdGhlIG91dHB1dCBtaWdodCBpbmNs
-dWRlIHRyYWlsaW5nIHdoaXRlc3BhY2Ugd2hlbiBpbmRlbnQgaXMgc3BlY2lmaWVkLg0KPj4NCj4+
-IEFuZCBJIHJlbWVtYmVyIGEgcGFpbiBvZiB0cmFpbGluZyB3aGl0ZXNwYWNlcyBpbiBpb3Rlc3Rz
-IG9uLCBtYXkgYmUsIGJhY2twb3J0aW5nLCBvciBzb21ldGhpbmcgbGlrZSB0aGlzIHNvbWUgdGlt
-ZSBhZ28uDQo+PiBJdCdzIG9mIGNvdXJzZSBub3QgYWJvdXQgdGhpcyBwYXRjaCwgYnV0IEkgdGhp
-bmsgaXQgaXMgYSBnb29kIGlkZWEgdG8gYXZvaWQgdHJhaWxpbmcgd2hpdGVzcGFjZXMgaW4gdGVz
-dCBvdXRwdXQsIGF0IGxlYXN0DQo+PiBpbiBjb21tb24gaGVscGVycy4gTWF5IGJlIGJlc3QgcGxh
-Y2UgdG8gZml4IGlzIGlvdGVzdHMubG9nKCkgZnVuY3Rpb24NCj4+DQo+IA0KPiBPaCwgZ29vZCBz
-cG90LiBJIGFjdHVhbGx5IGRpZCBydW4gaW50byB0aGlzIGFuZCB3YXNuJ3QgYXdhcmUgb2Ygd2hh
-dA0KPiBjYXVzZWQgaXQhIEkgd2lsbCBjaGFuZ2UgdGhlIGRlZmF1bHQgc2VwYXJhdG9yLg0KDQpJ
-biB0aGlzIGNhc2Ugb3V0cHV0IHdvdWxkIGJlIGxlc3MgcHJldHR5LiBJJ2QgcHJlZmVyIGp1c3Qg
-cmVtb3ZlIHRyYWlsaW5nIHdoaXRlc3BhY2UgYXMgcGFydCBvZiBmaWx0ZXJpbmcgcHJvY2VzcyBp
-biBsb2coKS4NCg0KPiANCj4+PiAgICANCj4+PiAgICAgICAgZGVmIHJ1bl9qb2Ioc2VsZiwgam9i
-LCBhdXRvX2ZpbmFsaXplPVRydWUsIGF1dG9fZGlzbWlzcz1GYWxzZSk6DQo+Pj4NCj4+DQo+Pg0K
-DQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> On Fri, 14 Dec 2018 at 13:54, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+>>
+>> The following changes since commit d8d5fefd8657d4f7b380b3a1533340434b5b9=
+def:
+>>
+>>   Merge remote-tracking branch 'remotes/berrange/tags/qcrypto-next-pull-=
+request' into staging (2018-12-13 18:45:18 +0000)
+>>
+>> are available in the Git repository at:
+>>
+>>   https://github.com/stsquad/qemu.git tags/pull-hardfloat-and-gitdm-1412=
+18-1
+>>
+>> for you to fetch changes up to 26c535d8522296399d43ebf39c109f6d8628c096:
+>>
+>>   hardfloat: implement float32/64 comparison (2018-12-14 11:43:00 +0000)
+>>
+>> ----------------------------------------------------------------
+>> Hardfloat + maintainers and gitdm
+>>
+>> ----------------------------------------------------------------
+>
+> Hi Alex -- this doesn't appear to be signed with the GPG key
+> I have on record for you...
+
+Hmm.. I did create a sub-key for one of my other machines - I wonder if
+that has taken precedence....
+
+>
+> thanks
+> -- PMM
+
+
+--
+Alex Benn=C3=A9e
