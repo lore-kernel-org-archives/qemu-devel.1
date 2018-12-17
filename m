@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZ1zw-0001oL-9I
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:08:29 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gZ27t-0008EX-GA
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:16:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZ1zs-0005Z3-Ba
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:08:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56336)
+	(envelope-from <pbonzini@redhat.com>) id 1gZ27r-0001rY-3V
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:16:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47680)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZ1zs-0005Yg-53
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:08:24 -0500
-Date: Mon, 17 Dec 2018 18:08:19 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181217180801-mutt-send-email-mst@kernel.org>
-References: <20181214131043.25071-1-david@redhat.com>
-	<20181217102841-mutt-send-email-mst@kernel.org>
-	<20181217230624.GM7141@habkost.net>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gZ27q-0001qe-PU
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:16:38 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4C700C7A33
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 23:16:37 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 18 Dec 2018 00:16:29 +0100
+Message-Id: <20181217231629.24147-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181217230624.GM7141@habkost.net>
-Subject: Re: [Qemu-devel] [PATCH v5 0/2] range/memory-device: fixes and
- cleanups
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] ui: vnc: finish removing TABs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,24 +29,854 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, Dec 17, 2018 at 09:06:24PM -0200, Eduardo Habkost wrote:
-> On Mon, Dec 17, 2018 at 10:28:58AM -0500, Michael S. Tsirkin wrote:
-> > On Fri, Dec 14, 2018 at 02:10:41PM +0100, David Hildenbrand wrote:
-> > > These are the two leftovers from
-> > >     [PATCH v3 0/7] qapi/range/memory-device: fixes and cleanups
-> > 
-> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> > 
-> > Who's merging this Eduardo?
-> 
-> As I have merged memory-device cleanups before, I can merge it,
-> despite MAINTAINERS listing hw/mem/* as part of the ACPI/SMBIOS
-> section.  What do you prefer?
+Suggested-by: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ ui/vnc-enc-hextile-template.h | 268 +++++++++++------------
+ ui/vnc-enc-zywrle.h           | 394 +++++++++++++++++-----------------
+ 2 files changed, 331 insertions(+), 331 deletions(-)
 
-Pls go ahead.
-
-> -- 
-> Eduardo
+diff --git a/ui/vnc-enc-hextile-template.h b/ui/vnc-enc-hextile-template.=
+h
+index d868d75720..0c56262aff 100644
+--- a/ui/vnc-enc-hextile-template.h
++++ b/ui/vnc-enc-hextile-template.h
+@@ -30,127 +30,127 @@ static void CONCAT(send_hextile_tile_, NAME)(VncSta=
+te *vs,
+     int n_subtiles =3D 0;
+=20
+     for (j =3D 0; j < h; j++) {
+-	for (i =3D 0; i < w; i++) {
+-	    switch (n_colors) {
+-	    case 0:
+-		bg =3D irow[i];
+-		n_colors =3D 1;
+-		break;
+-	    case 1:
+-		if (irow[i] !=3D bg) {
+-		    fg =3D irow[i];
+-		    n_colors =3D 2;
+-		}
+-		break;
+-	    case 2:
+-		if (irow[i] !=3D bg && irow[i] !=3D fg) {
+-		    n_colors =3D 3;
+-		} else {
+-		    if (irow[i] =3D=3D bg)
+-			bg_count++;
+-		    else if (irow[i] =3D=3D fg)
+-			fg_count++;
+-		}
+-		break;
+-	    default:
+-		break;
+-	    }
+-	}
+-	if (n_colors > 2)
+-	    break;
+-	irow +=3D vnc_server_fb_stride(vd) / sizeof(pixel_t);
++        for (i =3D 0; i < w; i++) {
++            switch (n_colors) {
++            case 0:
++                bg =3D irow[i];
++                n_colors =3D 1;
++                break;
++            case 1:
++                if (irow[i] !=3D bg) {
++                    fg =3D irow[i];
++                    n_colors =3D 2;
++                }
++                break;
++            case 2:
++                if (irow[i] !=3D bg && irow[i] !=3D fg) {
++                    n_colors =3D 3;
++                } else {
++                    if (irow[i] =3D=3D bg)
++                        bg_count++;
++                    else if (irow[i] =3D=3D fg)
++                        fg_count++;
++                }
++                break;
++            default:
++                break;
++            }
++        }
++        if (n_colors > 2)
++            break;
++        irow +=3D vnc_server_fb_stride(vd) / sizeof(pixel_t);
+     }
+=20
+     if (n_colors > 1 && fg_count > bg_count) {
+-	pixel_t tmp =3D fg;
+-	fg =3D bg;
+-	bg =3D tmp;
++        pixel_t tmp =3D fg;
++        fg =3D bg;
++        bg =3D tmp;
+     }
+=20
+     if (!*has_bg || *last_bg !=3D bg) {
+-	flags |=3D 0x02;
+-	*has_bg =3D 1;
+-	*last_bg =3D bg;
++        flags |=3D 0x02;
++        *has_bg =3D 1;
++        *last_bg =3D bg;
+     }
+=20
+     if (n_colors < 3 && (!*has_fg || *last_fg !=3D fg)) {
+-	flags |=3D 0x04;
+-	*has_fg =3D 1;
+-	*last_fg =3D fg;
++        flags |=3D 0x04;
++        *has_fg =3D 1;
++        *last_fg =3D fg;
+     }
+=20
+     switch (n_colors) {
+     case 1:
+-	n_data =3D 0;
+-	break;
++        n_data =3D 0;
++        break;
+     case 2:
+-	flags |=3D 0x08;
+-
+-	irow =3D (pixel_t *)row;
+-
+-	for (j =3D 0; j < h; j++) {
+-	    int min_x =3D -1;
+-	    for (i =3D 0; i < w; i++) {
+-		if (irow[i] =3D=3D fg) {
+-		    if (min_x =3D=3D -1)
+-			min_x =3D i;
+-		} else if (min_x !=3D -1) {
+-		    hextile_enc_cord(data + n_data, min_x, j, i - min_x, 1);
+-		    n_data +=3D 2;
+-		    n_subtiles++;
+-		    min_x =3D -1;
+-		}
+-	    }
+-	    if (min_x !=3D -1) {
+-		hextile_enc_cord(data + n_data, min_x, j, i - min_x, 1);
+-		n_data +=3D 2;
+-		n_subtiles++;
+-	    }
+-	    irow +=3D vnc_server_fb_stride(vd) / sizeof(pixel_t);
+-	}
+-	break;
++        flags |=3D 0x08;
++
++        irow =3D (pixel_t *)row;
++
++        for (j =3D 0; j < h; j++) {
++            int min_x =3D -1;
++            for (i =3D 0; i < w; i++) {
++                if (irow[i] =3D=3D fg) {
++                    if (min_x =3D=3D -1)
++                        min_x =3D i;
++                } else if (min_x !=3D -1) {
++                    hextile_enc_cord(data + n_data, min_x, j, i - min_x,=
+ 1);
++                    n_data +=3D 2;
++                    n_subtiles++;
++                    min_x =3D -1;
++                }
++            }
++            if (min_x !=3D -1) {
++                hextile_enc_cord(data + n_data, min_x, j, i - min_x, 1);
++                n_data +=3D 2;
++                n_subtiles++;
++            }
++            irow +=3D vnc_server_fb_stride(vd) / sizeof(pixel_t);
++        }
++        break;
+     case 3:
+-	flags |=3D 0x18;
+-
+-	irow =3D (pixel_t *)row;
+-
+-	if (!*has_bg || *last_bg !=3D bg)
+-	    flags |=3D 0x02;
+-
+-	for (j =3D 0; j < h; j++) {
+-	    int has_color =3D 0;
+-	    int min_x =3D -1;
+-	    pixel_t color =3D 0; /* shut up gcc */
+-
+-	    for (i =3D 0; i < w; i++) {
+-		if (!has_color) {
+-		    if (irow[i] =3D=3D bg)
+-			continue;
+-		    color =3D irow[i];
+-		    min_x =3D i;
+-		    has_color =3D 1;
+-		} else if (irow[i] !=3D color) {
+-		    has_color =3D 0;
++        flags |=3D 0x18;
++
++        irow =3D (pixel_t *)row;
++
++        if (!*has_bg || *last_bg !=3D bg)
++            flags |=3D 0x02;
++
++        for (j =3D 0; j < h; j++) {
++            int has_color =3D 0;
++            int min_x =3D -1;
++            pixel_t color =3D 0; /* shut up gcc */
++
++            for (i =3D 0; i < w; i++) {
++                if (!has_color) {
++                    if (irow[i] =3D=3D bg)
++                        continue;
++                    color =3D irow[i];
++                    min_x =3D i;
++                    has_color =3D 1;
++                } else if (irow[i] !=3D color) {
++                    has_color =3D 0;
+ #ifdef GENERIC
+                     vnc_convert_pixel(vs, data + n_data, color);
+                     n_data +=3D vs->client_pf.bytes_per_pixel;
+ #else
+-		    memcpy(data + n_data, &color, sizeof(color));
++                    memcpy(data + n_data, &color, sizeof(color));
+                     n_data +=3D sizeof(pixel_t);
+ #endif
+-		    hextile_enc_cord(data + n_data, min_x, j, i - min_x, 1);
+-		    n_data +=3D 2;
+-		    n_subtiles++;
+-
+-		    min_x =3D -1;
+-		    if (irow[i] !=3D bg) {
+-			color =3D irow[i];
+-			min_x =3D i;
+-			has_color =3D 1;
+-		    }
+-		}
+-	    }
+-	    if (has_color) {
++                    hextile_enc_cord(data + n_data, min_x, j, i - min_x,=
+ 1);
++                    n_data +=3D 2;
++                    n_subtiles++;
++
++                    min_x =3D -1;
++                    if (irow[i] !=3D bg) {
++                        color =3D irow[i];
++                        min_x =3D i;
++                        has_color =3D 1;
++                    }
++                }
++            }
++            if (has_color) {
+ #ifdef GENERIC
+                 vnc_convert_pixel(vs, data + n_data, color);
+                 n_data +=3D vs->client_pf.bytes_per_pixel;
+@@ -158,50 +158,50 @@ static void CONCAT(send_hextile_tile_, NAME)(VncSta=
+te *vs,
+                 memcpy(data + n_data, &color, sizeof(color));
+                 n_data +=3D sizeof(pixel_t);
+ #endif
+-		hextile_enc_cord(data + n_data, min_x, j, i - min_x, 1);
+-		n_data +=3D 2;
+-		n_subtiles++;
+-	    }
+-	    irow +=3D vnc_server_fb_stride(vd) / sizeof(pixel_t);
+-	}
+-
+-	/* A SubrectsColoured subtile invalidates the foreground color */
+-	*has_fg =3D 0;
+-	if (n_data > (w * h * sizeof(pixel_t))) {
+-	    n_colors =3D 4;
+-	    flags =3D 0x01;
+-	    *has_bg =3D 0;
+-
+-	    /* we really don't have to invalidate either the bg or fg
+-	       but we've lost the old values.  oh well. */
+-	}
++                hextile_enc_cord(data + n_data, min_x, j, i - min_x, 1);
++                n_data +=3D 2;
++                n_subtiles++;
++            }
++            irow +=3D vnc_server_fb_stride(vd) / sizeof(pixel_t);
++        }
++
++        /* A SubrectsColoured subtile invalidates the foreground color *=
+/
++        *has_fg =3D 0;
++        if (n_data > (w * h * sizeof(pixel_t))) {
++            n_colors =3D 4;
++            flags =3D 0x01;
++            *has_bg =3D 0;
++
++            /* we really don't have to invalidate either the bg or fg
++               but we've lost the old values.  oh well. */
++        }
+         break;
+     default:
+-	break;
++        break;
+     }
+=20
+     if (n_colors > 3) {
+-	flags =3D 0x01;
+-	*has_fg =3D 0;
+-	*has_bg =3D 0;
+-	n_colors =3D 4;
++        flags =3D 0x01;
++        *has_fg =3D 0;
++        *has_bg =3D 0;
++        n_colors =3D 4;
+     }
+=20
+     vnc_write_u8(vs, flags);
+     if (n_colors < 4) {
+-	if (flags & 0x02)
+-	    vs->write_pixels(vs, last_bg, sizeof(pixel_t));
+-	if (flags & 0x04)
+-	    vs->write_pixels(vs, last_fg, sizeof(pixel_t));
+-	if (n_subtiles) {
+-	    vnc_write_u8(vs, n_subtiles);
+-	    vnc_write(vs, data, n_data);
+-	}
++        if (flags & 0x02)
++            vs->write_pixels(vs, last_bg, sizeof(pixel_t));
++        if (flags & 0x04)
++            vs->write_pixels(vs, last_fg, sizeof(pixel_t));
++        if (n_subtiles) {
++            vnc_write_u8(vs, n_subtiles);
++            vnc_write(vs, data, n_data);
++        }
+     } else {
+-	for (j =3D 0; j < h; j++) {
+-	    vs->write_pixels(vs, row, w * 4);
+-	    row +=3D vnc_server_fb_stride(vd);
+-	}
++        for (j =3D 0; j < h; j++) {
++            vs->write_pixels(vs, row, w * 4);
++            row +=3D vnc_server_fb_stride(vd);
++        }
+     }
+ }
+=20
+diff --git a/ui/vnc-enc-zywrle.h b/ui/vnc-enc-zywrle.h
+index 610bd79d1a..9b7f698975 100644
+--- a/ui/vnc-enc-zywrle.h
++++ b/ui/vnc-enc-zywrle.h
+@@ -48,162 +48,162 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILIT=
+Y OF SUCH DAMAGE.
+ #ifndef ZYWRLE_QUANTIZE
+ /* Type A:lower bit omitting of EZW style. */
+ static const unsigned int zywrle_param[3][3]=3D{
+-	{0x0000F000, 0x00000000, 0x00000000},
+-	{0x0000C000, 0x00F0F0F0, 0x00000000},
+-	{0x0000C000, 0x00C0C0C0, 0x00F0F0F0},
++        {0x0000F000, 0x00000000, 0x00000000},
++        {0x0000C000, 0x00F0F0F0, 0x00000000},
++        {0x0000C000, 0x00C0C0C0, 0x00F0F0F0},
+ /*	{0x0000FF00, 0x00000000, 0x00000000},
+-	{0x0000FF00, 0x00FFFFFF, 0x00000000},
+-	{0x0000FF00, 0x00FFFFFF, 0x00FFFFFF}, */
++        {0x0000FF00, 0x00FFFFFF, 0x00000000},
++        {0x0000FF00, 0x00FFFFFF, 0x00FFFFFF}, */
+ };
+ #else
+ /* Type B:Non liner quantization filter. */
+ static const int8_t zywrle_conv[4][256]=3D{
+ {	/* bi=3D5, bo=3D5 r=3D0.0:PSNR=3D24.849 */
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
+ },
+ {	/* bi=3D5, bo=3D5 r=3D2.0:PSNR=3D74.031 */
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 32,
+-	32, 32, 32, 32, 32, 32, 32, 32,
+-	32, 32, 32, 32, 32, 32, 32, 32,
+-	48, 48, 48, 48, 48, 48, 48, 48,
+-	48, 48, 48, 56, 56, 56, 56, 56,
+-	56, 56, 56, 56, 64, 64, 64, 64,
+-	64, 64, 64, 64, 72, 72, 72, 72,
+-	72, 72, 72, 72, 80, 80, 80, 80,
+-	80, 80, 88, 88, 88, 88, 88, 88,
+-	88, 88, 88, 88, 88, 88, 96, 96,
+-	96, 96, 96, 104, 104, 104, 104, 104,
+-	104, 104, 104, 104, 104, 112, 112, 112,
+-	112, 112, 112, 112, 112, 112, 120, 120,
+-	120, 120, 120, 120, 120, 120, 120, 120,
+-	0, -120, -120, -120, -120, -120, -120, -120,
+-	-120, -120, -120, -112, -112, -112, -112, -112,
+-	-112, -112, -112, -112, -104, -104, -104, -104,
+-	-104, -104, -104, -104, -104, -104, -96, -96,
+-	-96, -96, -96, -88, -88, -88, -88, -88,
+-	-88, -88, -88, -88, -88, -88, -88, -80,
+-	-80, -80, -80, -80, -80, -72, -72, -72,
+-	-72, -72, -72, -72, -72, -64, -64, -64,
+-	-64, -64, -64, -64, -64, -56, -56, -56,
+-	-56, -56, -56, -56, -56, -56, -48, -48,
+-	-48, -48, -48, -48, -48, -48, -48, -48,
+-	-48, -32, -32, -32, -32, -32, -32, -32,
+-	-32, -32, -32, -32, -32, -32, -32, -32,
+-	-32, -32, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 32,
++        32, 32, 32, 32, 32, 32, 32, 32,
++        32, 32, 32, 32, 32, 32, 32, 32,
++        48, 48, 48, 48, 48, 48, 48, 48,
++        48, 48, 48, 56, 56, 56, 56, 56,
++        56, 56, 56, 56, 64, 64, 64, 64,
++        64, 64, 64, 64, 72, 72, 72, 72,
++        72, 72, 72, 72, 80, 80, 80, 80,
++        80, 80, 88, 88, 88, 88, 88, 88,
++        88, 88, 88, 88, 88, 88, 96, 96,
++        96, 96, 96, 104, 104, 104, 104, 104,
++        104, 104, 104, 104, 104, 112, 112, 112,
++        112, 112, 112, 112, 112, 112, 120, 120,
++        120, 120, 120, 120, 120, 120, 120, 120,
++        0, -120, -120, -120, -120, -120, -120, -120,
++        -120, -120, -120, -112, -112, -112, -112, -112,
++        -112, -112, -112, -112, -104, -104, -104, -104,
++        -104, -104, -104, -104, -104, -104, -96, -96,
++        -96, -96, -96, -88, -88, -88, -88, -88,
++        -88, -88, -88, -88, -88, -88, -88, -80,
++        -80, -80, -80, -80, -80, -72, -72, -72,
++        -72, -72, -72, -72, -72, -64, -64, -64,
++        -64, -64, -64, -64, -64, -56, -56, -56,
++        -56, -56, -56, -56, -56, -56, -48, -48,
++        -48, -48, -48, -48, -48, -48, -48, -48,
++        -48, -32, -32, -32, -32, -32, -32, -32,
++        -32, -32, -32, -32, -32, -32, -32, -32,
++        -32, -32, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
+ },
+ {	/* bi=3D5, bo=3D4 r=3D2.0:PSNR=3D64.441 */
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	48, 48, 48, 48, 48, 48, 48, 48,
+-	48, 48, 48, 48, 48, 48, 48, 48,
+-	48, 48, 48, 48, 48, 48, 48, 48,
+-	64, 64, 64, 64, 64, 64, 64, 64,
+-	64, 64, 64, 64, 64, 64, 64, 64,
+-	80, 80, 80, 80, 80, 80, 80, 80,
+-	80, 80, 80, 80, 80, 88, 88, 88,
+-	88, 88, 88, 88, 88, 88, 88, 88,
+-	104, 104, 104, 104, 104, 104, 104, 104,
+-	104, 104, 104, 112, 112, 112, 112, 112,
+-	112, 112, 112, 112, 120, 120, 120, 120,
+-	120, 120, 120, 120, 120, 120, 120, 120,
+-	0, -120, -120, -120, -120, -120, -120, -120,
+-	-120, -120, -120, -120, -120, -112, -112, -112,
+-	-112, -112, -112, -112, -112, -112, -104, -104,
+-	-104, -104, -104, -104, -104, -104, -104, -104,
+-	-104, -88, -88, -88, -88, -88, -88, -88,
+-	-88, -88, -88, -88, -80, -80, -80, -80,
+-	-80, -80, -80, -80, -80, -80, -80, -80,
+-	-80, -64, -64, -64, -64, -64, -64, -64,
+-	-64, -64, -64, -64, -64, -64, -64, -64,
+-	-64, -48, -48, -48, -48, -48, -48, -48,
+-	-48, -48, -48, -48, -48, -48, -48, -48,
+-	-48, -48, -48, -48, -48, -48, -48, -48,
+-	-48, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        48, 48, 48, 48, 48, 48, 48, 48,
++        48, 48, 48, 48, 48, 48, 48, 48,
++        48, 48, 48, 48, 48, 48, 48, 48,
++        64, 64, 64, 64, 64, 64, 64, 64,
++        64, 64, 64, 64, 64, 64, 64, 64,
++        80, 80, 80, 80, 80, 80, 80, 80,
++        80, 80, 80, 80, 80, 88, 88, 88,
++        88, 88, 88, 88, 88, 88, 88, 88,
++        104, 104, 104, 104, 104, 104, 104, 104,
++        104, 104, 104, 112, 112, 112, 112, 112,
++        112, 112, 112, 112, 120, 120, 120, 120,
++        120, 120, 120, 120, 120, 120, 120, 120,
++        0, -120, -120, -120, -120, -120, -120, -120,
++        -120, -120, -120, -120, -120, -112, -112, -112,
++        -112, -112, -112, -112, -112, -112, -104, -104,
++        -104, -104, -104, -104, -104, -104, -104, -104,
++        -104, -88, -88, -88, -88, -88, -88, -88,
++        -88, -88, -88, -88, -80, -80, -80, -80,
++        -80, -80, -80, -80, -80, -80, -80, -80,
++        -80, -64, -64, -64, -64, -64, -64, -64,
++        -64, -64, -64, -64, -64, -64, -64, -64,
++        -64, -48, -48, -48, -48, -48, -48, -48,
++        -48, -48, -48, -48, -48, -48, -48, -48,
++        -48, -48, -48, -48, -48, -48, -48, -48,
++        -48, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
+ },
+ {	/* bi=3D5, bo=3D2 r=3D2.0:PSNR=3D43.175 */
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	88, 88, 88, 88, 88, 88, 88, 88,
+-	88, 88, 88, 88, 88, 88, 88, 88,
+-	88, 88, 88, 88, 88, 88, 88, 88,
+-	88, 88, 88, 88, 88, 88, 88, 88,
+-	88, 88, 88, 88, 88, 88, 88, 88,
+-	88, 88, 88, 88, 88, 88, 88, 88,
+-	88, 88, 88, 88, 88, 88, 88, 88,
+-	88, 88, 88, 88, 88, 88, 88, 88,
+-	0, -88, -88, -88, -88, -88, -88, -88,
+-	-88, -88, -88, -88, -88, -88, -88, -88,
+-	-88, -88, -88, -88, -88, -88, -88, -88,
+-	-88, -88, -88, -88, -88, -88, -88, -88,
+-	-88, -88, -88, -88, -88, -88, -88, -88,
+-	-88, -88, -88, -88, -88, -88, -88, -88,
+-	-88, -88, -88, -88, -88, -88, -88, -88,
+-	-88, -88, -88, -88, -88, -88, -88, -88,
+-	-88, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-	0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        88, 88, 88, 88, 88, 88, 88, 88,
++        88, 88, 88, 88, 88, 88, 88, 88,
++        88, 88, 88, 88, 88, 88, 88, 88,
++        88, 88, 88, 88, 88, 88, 88, 88,
++        88, 88, 88, 88, 88, 88, 88, 88,
++        88, 88, 88, 88, 88, 88, 88, 88,
++        88, 88, 88, 88, 88, 88, 88, 88,
++        88, 88, 88, 88, 88, 88, 88, 88,
++        0, -88, -88, -88, -88, -88, -88, -88,
++        -88, -88, -88, -88, -88, -88, -88, -88,
++        -88, -88, -88, -88, -88, -88, -88, -88,
++        -88, -88, -88, -88, -88, -88, -88, -88,
++        -88, -88, -88, -88, -88, -88, -88, -88,
++        -88, -88, -88, -88, -88, -88, -88, -88,
++        -88, -88, -88, -88, -88, -88, -88, -88,
++        -88, -88, -88, -88, -88, -88, -88, -88,
++        -88, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
++        0, 0, 0, 0, 0, 0, 0, 0,
+ }
+ };
+=20
+ static const int8_t *zywrle_param[3][3][3]=3D{
+-	{{zywrle_conv[0], zywrle_conv[2], zywrle_conv[0]},
++        {{zywrle_conv[0], zywrle_conv[2], zywrle_conv[0]},
+          {zywrle_conv[0], zywrle_conv[0], zywrle_conv[0]},
+          {zywrle_conv[0], zywrle_conv[0], zywrle_conv[0]}},
+-	{{zywrle_conv[0], zywrle_conv[3], zywrle_conv[0]},
++        {{zywrle_conv[0], zywrle_conv[3], zywrle_conv[0]},
+          {zywrle_conv[1], zywrle_conv[1], zywrle_conv[1]},
+          {zywrle_conv[0], zywrle_conv[0], zywrle_conv[0]}},
+-	{{zywrle_conv[0], zywrle_conv[3], zywrle_conv[0]},
++        {{zywrle_conv[0], zywrle_conv[3], zywrle_conv[0]},
+          {zywrle_conv[2], zywrle_conv[2], zywrle_conv[2]},
+          {zywrle_conv[1], zywrle_conv[1], zywrle_conv[1]}},
+ };
+@@ -214,53 +214,53 @@ static const int8_t *zywrle_param[3][3][3]=3D{
+ #define ZYWRLE_UVMASK15 0xFFFFFFF8
+ #define ZYWRLE_LOAD_PIXEL15(src, r, g, b)                               =
+\
+     do {                                                                =
+\
+-	r =3D (((uint8_t*)src)[S_1]<< 1)& 0xF8;                           \
+-	g =3D (((uint8_t*)src)[S_1]<< 6) | (((uint8_t*)src)[S_0]>> 2);    \
++        r =3D (((uint8_t*)src)[S_1]<< 1)& 0xF8;                         =
+  \
++        g =3D (((uint8_t*)src)[S_1]<< 6) | (((uint8_t*)src)[S_0]>> 2);  =
+  \
+         g &=3D 0xF8;                                                    =
+  \
+-	b =3D  (((uint8_t*)src)[S_0]<< 3)& 0xF8;                          \
++        b =3D  (((uint8_t*)src)[S_0]<< 3)& 0xF8;                        =
+  \
+     } while (0)
+=20
+ #define ZYWRLE_SAVE_PIXEL15(dst, r, g, b)                               =
+\
+     do {                                                                =
+\
+-	r &=3D 0xF8;                                                      \
+-	g &=3D 0xF8;                                                      \
+-	b &=3D 0xF8;                                                      \
+-	((uint8_t*)dst)[S_1] =3D (uint8_t)((r >> 1)|(g >> 6));            \
+-	((uint8_t*)dst)[S_0] =3D (uint8_t)(((b >> 3)|(g << 2))& 0xFF);    \
++        r &=3D 0xF8;                                                    =
+  \
++        g &=3D 0xF8;                                                    =
+  \
++        b &=3D 0xF8;                                                    =
+  \
++        ((uint8_t*)dst)[S_1] =3D (uint8_t)((r >> 1)|(g >> 6));          =
+  \
++        ((uint8_t*)dst)[S_0] =3D (uint8_t)(((b >> 3)|(g << 2))& 0xFF);  =
+  \
+     } while (0)
+=20
+ #define ZYWRLE_YMASK16  0xFFFFFFFC
+ #define ZYWRLE_UVMASK16 0xFFFFFFF8
+ #define ZYWRLE_LOAD_PIXEL16(src, r, g, b)                               =
+\
+     do {                                                                =
+\
+-	r =3D ((uint8_t*)src)[S_1] & 0xF8;                                \
+-	g =3D (((uint8_t*)src)[S_1]<< 5) | (((uint8_t*)src)[S_0] >> 3);   \
++        r =3D ((uint8_t*)src)[S_1] & 0xF8;                              =
+  \
++        g =3D (((uint8_t*)src)[S_1]<< 5) | (((uint8_t*)src)[S_0] >> 3); =
+  \
+         g &=3D 0xFC;                                                    =
+  \
+-	b =3D (((uint8_t*)src)[S_0]<< 3) & 0xF8;                          \
++        b =3D (((uint8_t*)src)[S_0]<< 3) & 0xF8;                        =
+  \
+     } while (0)
+=20
+ #define ZYWRLE_SAVE_PIXEL16(dst, r, g,b)                                =
+\
+     do {                                                                =
+\
+-	r &=3D 0xF8;                                                      \
+-	g &=3D 0xFC;                                                      \
+-	b &=3D 0xF8;                                                      \
+-	((uint8_t*)dst)[S_1] =3D (uint8_t)(r | (g >> 5));                 \
+-	((uint8_t*)dst)[S_0] =3D (uint8_t)(((b >> 3)|(g << 3)) & 0xFF);   \
++        r &=3D 0xF8;                                                    =
+  \
++        g &=3D 0xFC;                                                    =
+  \
++        b &=3D 0xF8;                                                    =
+  \
++        ((uint8_t*)dst)[S_1] =3D (uint8_t)(r | (g >> 5));               =
+  \
++        ((uint8_t*)dst)[S_0] =3D (uint8_t)(((b >> 3)|(g << 3)) & 0xFF); =
+  \
+     } while (0)
+=20
+ #define ZYWRLE_YMASK32  0xFFFFFFFF
+ #define ZYWRLE_UVMASK32 0xFFFFFFFF
+ #define ZYWRLE_LOAD_PIXEL32(src, r, g, b)     \
+     do {                                      \
+-	r =3D ((uint8_t*)src)[L_2];             \
+-	g =3D ((uint8_t*)src)[L_1];             \
+-	b =3D ((uint8_t*)src)[L_0];             \
++        r =3D ((uint8_t*)src)[L_2];             \
++        g =3D ((uint8_t*)src)[L_1];             \
++        b =3D ((uint8_t*)src)[L_0];             \
+     } while (0)
+ #define ZYWRLE_SAVE_PIXEL32(dst, r, g, b)             \
+     do {                                              \
+-	((uint8_t*)dst)[L_2] =3D (uint8_t)r;            \
+-	((uint8_t*)dst)[L_1] =3D (uint8_t)g;            \
+-	((uint8_t*)dst)[L_0] =3D (uint8_t)b;            \
++        ((uint8_t*)dst)[L_2] =3D (uint8_t)r;            \
++        ((uint8_t*)dst)[L_1] =3D (uint8_t)g;            \
++        ((uint8_t*)dst)[L_0] =3D (uint8_t)b;            \
+     } while (0)
+=20
+ static inline void harr(int8_t *px0, int8_t *px1)
+@@ -443,27 +443,27 @@ static inline void filter_wavelet_square(int *buf, =
+int width, int height,
+=20
+ static inline void wavelet(int *buf, int width, int height, int level)
+ {
+-	int l, s;
+-	int *top;
+-	int *end;
+-
+-	for (l =3D 0; l < level; l++) {
+-		top =3D buf;
+-		end =3D buf + height * width;
+-		s =3D width << l;
+-		while (top < end) {
+-			wavelet_level(top, width, l, 1);
+-			top +=3D s;
+-		}
+-		top =3D buf;
+-		end =3D buf + width;
+-		s =3D 1<<l;
+-		while (top < end) {
+-			wavelet_level(top, height, l, width);
+-			top +=3D s;
+-		}
+-		filter_wavelet_square(buf, width, height, level, l);
+-	}
++        int l, s;
++        int *top;
++        int *end;
++
++        for (l =3D 0; l < level; l++) {
++                top =3D buf;
++                end =3D buf + height * width;
++                s =3D width << l;
++                while (top < end) {
++                        wavelet_level(top, width, l, 1);
++                        top +=3D s;
++                }
++                top =3D buf;
++                end =3D buf + width;
++                s =3D 1<<l;
++                while (top < end) {
++                        wavelet_level(top, height, l, width);
++                        top +=3D s;
++                }
++                filter_wavelet_square(buf, width, height, level, l);
++        }
+ }
+=20
+=20
+@@ -471,16 +471,16 @@ static inline void wavelet(int *buf, int width, int=
+ height, int level)
+  Coefficients manages as 24 bits little-endian pixel. */
+ #define ZYWRLE_LOAD_COEFF(src, r, g, b)         \
+     do {                                        \
+-	r =3D ((int8_t*)src)[2];                  \
+-	g =3D ((int8_t*)src)[1];                  \
+-	b =3D ((int8_t*)src)[0];                  \
++        r =3D ((int8_t*)src)[2];                  \
++        g =3D ((int8_t*)src)[1];                  \
++        b =3D ((int8_t*)src)[0];                  \
+     } while (0)
+=20
+ #define ZYWRLE_SAVE_COEFF(dst, r, g, b)       \
+     do {                                      \
+-	((int8_t*)dst)[2] =3D (int8_t)r;        \
+-	((int8_t*)dst)[1] =3D (int8_t)g;        \
+-	((int8_t*)dst)[0] =3D (int8_t)b;        \
++        ((int8_t*)dst)[2] =3D (int8_t)r;        \
++        ((int8_t*)dst)[1] =3D (int8_t)g;        \
++        ((int8_t*)dst)[0] =3D (int8_t)b;        \
+     } while (0)
+=20
+ /*
+@@ -502,22 +502,22 @@ static inline void wavelet(int *buf, int width, int=
+ height, int level)
+    More exact PLHarr, we reduce to odd range(-127<=3Dx<=3D127). */
+ #define ZYWRLE_RGBYUV_(r, g, b, y, u, v, ymask, uvmask)          \
+     do {                                                         \
+-	y =3D (r + (g << 1) + b) >> 2;                             \
+-	u =3D  b - g;                                              \
+-	v =3D  r - g;                                              \
+-	y -=3D 128;                                                \
+-	u >>=3D 1;                                                 \
+-	v >>=3D 1;                                                 \
+-	y &=3D ymask;                                              \
+-	u &=3D uvmask;                                             \
+-	v &=3D uvmask;                                             \
+-	if (y =3D=3D -128) {                                         \
++        y =3D (r + (g << 1) + b) >> 2;                             \
++        u =3D  b - g;                                              \
++        v =3D  r - g;                                              \
++        y -=3D 128;                                                \
++        u >>=3D 1;                                                 \
++        v >>=3D 1;                                                 \
++        y &=3D ymask;                                              \
++        u &=3D uvmask;                                             \
++        v &=3D uvmask;                                             \
++        if (y =3D=3D -128) {                                         \
+             y +=3D (0xFFFFFFFF - ymask + 1);                       \
+         }                                                        \
+-	if (u =3D=3D -128) {                                         \
++        if (u =3D=3D -128) {                                         \
+             u +=3D (0xFFFFFFFF - uvmask + 1);                      \
+         }                                                        \
+-	if (v =3D=3D -128) {                                         \
++        if (v =3D=3D -128) {                                         \
+             v +=3D (0xFFFFFFFF - uvmask + 1);                      \
+         }                                                        \
+     } while (0)
+--=20
+2.20.1
