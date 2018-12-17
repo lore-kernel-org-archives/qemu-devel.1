@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gYuw0-0003iW-To
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 10:35:57 -0500
+	(envelope-from <eblake@redhat.com>) id 1gYv3F-0007sB-F0
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 10:43:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gYuvz-0005tc-Ol
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 10:35:56 -0500
-Date: Mon, 17 Dec 2018 16:35:36 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181217163536.034fd13c@Igors-MacBook-Pro.local>
-In-Reply-To: <20181217134959.GB4456@caravaggio>
-References: <20181217104838.18957-1-sameo@linux.intel.com>
-	<20181217104838.18957-8-sameo@linux.intel.com>
-	<20181217132028.4e387d2d@Igors-MacBook-Pro.local>
-	<20181217134959.GB4456@caravaggio>
+	(envelope-from <eblake@redhat.com>) id 1gYv3D-0003YF-Ky
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 10:43:25 -0500
+References: <20181215135324.152629-1-eblake@redhat.com>
+	<20181215135324.152629-19-eblake@redhat.com>
+	<20181215154231.GC27120@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4b749c0b-aff3-458a-1f49-2337f29706c4@redhat.com>
+Date: Mon, 17 Dec 2018 09:43:12 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20181215154231.GC27120@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 7/8] hw: acpi: Export and share the ARM
- RSDP build
+Subject: Re: [Qemu-devel] [PATCH v2 18/22] nbd/client: Add
+ nbd_receive_export_list()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,153 +26,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Ortiz <sameo@linux.intel.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S.
-	Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: qemu-devel@nongnu.org, nsoffer@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Mon, 17 Dec 2018 14:49:59 +0100
-Samuel Ortiz <sameo@linux.intel.com> wrote:
+On 12/15/18 9:42 AM, Richard W.M. Jones wrote:
+> On Sat, Dec 15, 2018 at 07:53:20AM -0600, Eric Blake wrote:
+>> We want to be able to detect whether a given qemu NBD server is
+>> exposing the right export(s) and dirty bitmaps, at least for
+>> regression testing.  We could use 'nbd-client -l' from the upstream
+>> NBD project to list exports, but it's annoying to rely on
+>> out-of-tree binaries; furthermore, nbd-client doesn't necessarily
+>> know about all of the qemu NBD extensions.  Thus, we plan on adding
+>> a new mode to qemu-nbd that merely sniffs all possible information
+>> from the server during handshake phase, then disconnects and dumps
+>> the information.
+>>
+>> This patch adds the low-level client code for grabbing the list
+>> of exports.  It benefits from the recent refactoring patches, as
+>> well as a minor tweak of changing nbd_opt_go() to nbd_opt_info_or_go()=
+,
+>> in order to share as much code as possible when it comes to doing
+>> validation of server replies.  The resulting information is stored
+>> in an array of NBDExportInfo which has been expanded to any
+>> description string, along with a convenience function for freeing
+>> the list.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>
+>> ---
 
-> On Mon, Dec 17, 2018 at 01:20:28PM +0100, Igor Mammedov wrote:
-> > On Mon, 17 Dec 2018 11:48:37 +0100
-> > Samuel Ortiz <sameo@linux.intel.com> wrote:
-> >=20
-> > > Now that build_rsdp() supports building both legacy and current RSDP
-> > > tables, we can move it to a generic folder (hw/acpi) and have the i386
-> > > ACPI code reuse it in order to reduce code duplication.
-> > >=20
-> > > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> > > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > > Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > > Reviewed-by: Andrew Jones <drjones@redhat.com>
-> > > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> > for future reference, if one changes patch in a significant way,
-> > one is supposed to drop Tested/Reviewed-by tags so that reviewers
-> > would look at it again and we by mistake won't merge not actually
-> > reviewed changes.
-> >=20
-> > [...]
-> >=20
-> > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > > index fb877648ac..846cb6d755 100644
-> > > --- a/hw/i386/acpi-build.c
-> > > +++ b/hw/i386/acpi-build.c
-> > > @@ -2547,35 +2547,6 @@ build_amd_iommu(GArray *table_data, BIOSLinker=
- *linker)
-> > >                   "IVRS", table_data->len - iommu_start, 1, NULL, NUL=
-L);
-> > >  }
-> > > =20
-> > > -static void
-> > > -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl=
-_offset)
-> > > -{
-> > > -    /* AcpiRsdpDescriptor describes revision 2 RSDP table and as res=
-ult we
-> > > -     * allocate extra 16 bytes for pc/q35 RSDP rev1 as well. Keep ex=
-tra 16 bytes
-> > > -     * wasted to make sure we won't breake migration for machine typ=
-es older
-> > > -     * than 2.3 due to size mismatch.
-> > > -     */
-> > > -    AcpiRsdpDescriptor *rsdp =3D acpi_data_push(rsdp_table, sizeof *=
-rsdp);
-> > > -    unsigned rsdt_pa_size =3D sizeof(rsdp->rsdt_physical_address);
-> > > -    unsigned rsdt_pa_offset =3D
-> > > -        (char *)&rsdp->rsdt_physical_address - rsdp_table->data;
-> > > -
-> > > -    bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, rsdp_tabl=
-e, 16,
-> > > -                             true /* fseg memory */);
-> > > -
-> > > -    memcpy(&rsdp->signature, "RSD PTR ", 8);
-> > > -    memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, 6);
-> > > -    /* Address to be filled by Guest linker */
-> > > -    bios_linker_loader_add_pointer(linker,
-> > > -        ACPI_BUILD_RSDP_FILE, rsdt_pa_offset, rsdt_pa_size,
-> > > -        ACPI_BUILD_TABLE_FILE, rsdt_tbl_offset);
-> > > -
-> > > -    /* Checksum to be filled by Guest linker */
-> > > -    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-> > > -        (char *)rsdp - rsdp_table->data, 20 /* ACPI rev 1.0 RSDP siz=
-e */,
-> > > -        (char *)&rsdp->checksum - rsdp_table->data);
-> > > -}
-> > > -
-> > >  typedef
-> > >  struct AcpiBuildState {
-> > >      /* Copy of table in RAM (for patching). */
-> > > @@ -2732,7 +2703,25 @@ void acpi_build(AcpiBuildTables *tables, Machi=
-neState *machine)
-> > >                 slic_oem.id, slic_oem.table_id);
-> > > =20
-> > >      /* RSDP is in FSEG memory, so allocate it separately */
-> > > -    build_rsdp(tables->rsdp, tables->linker, rsdt);
-> > > +    {
-> > > +        AcpiRsdpData rsdp_data =3D {
-> > > +            .revision =3D 0,
-> > > +            .oem_id =3D ACPI_BUILD_APPNAME6,
-> > > +            .xsdt_tbl_offset =3D NULL,
-> > > +            .rsdt_tbl_offset =3D &rsdt,
-> > > +        };
-> > > +        build_rsdp(tables->rsdp, tables->linker, &rsdp_data);
-> > > +        if (!pcmc->rsdp_in_ram) {
-> > > +            /*
-> > > +             * Legacy machine types (2.2 and older) expect to get a =
-complete
-> > > +             * revision 2 RSDP table, even though they only look at =
-the
-> > not true, rev is set to 0 for pc machines,
-> Rev is set to 0 but they effectively expect to get a structure which
-> size is the rev 2 one. That's what I meant.
+>> +        while (1) {
+>> +            char *name;
+>> +            char *desc;
+>> +
+>> +            rc =3D nbd_receive_list(ioc, &name, &desc, errp);
+>> +            if (rc < 0) {
+>> +                goto out;
+>> +            } else if (rc =3D=3D 0) {
+>> +                break;
+>> +            }
+>> +            array =3D g_renew(NBDExportInfo, array, ++count);
+>> +            memset(&array[count - 1], 0, sizeof(*array));
+>> +            array[count - 1].name =3D name;
+>> +            array[count - 1].description =3D desc;
+>> +            array[count - 1].structured_reply =3D result =3D=3D 3;
+>> +        }
 >=20
-> > the point of the original comment was
-> > that we allocate extra 16 bytes but not actually using them and why it'=
-s bad
-> > to drop it suddenly.
-> >
-> > > +             * revision 0 fields (xsdt pointer is not set). So in or=
-der to
-> > > +             * not break migration to those machine types we waste 1=
-6 bytes
-> > > +             * that we amend to the RSDP revision 0 structure.
-> >                           ^^^ added
-> > > +             */
-> > Perhaps amended original comment would be clearer:
-> >=20
-> >    /* We used to allocate extra space for RSDP rev 2 but used only spac=
-e for
-> >     * legacy RSDP and extra bytes were zeroed out. Keep wasting extra 1=
-6 bytes
-> >     * to make sure we won't breake migration for machine types 2.2 and =
-older
-> >     * due to RSDP blob size mismatch.
-> >     */
-> >=20
-> > > +            build_append_int_noprefix(tables->rsdp, 0, 16);
-Looks like I've haven't noticed, it might work but are you sure?
-0 here is uint64_t and then it's shifted 16 times which is sort of gray are=
-a (undefined behavior)
+> Do we care about limiting =E2=80=98count=E2=80=99 to some reasonable va=
+lue here?
 
-using g_array_append_val[s]() here might be better
+Maybe.
 
-> > > +        }
-> > > +    }
-> > > =20
-> > >      /* We'll expose it all to Guest so we want to reduce
-> > >       * chance of size changes.
-> >=20
-> > With comment fixed:
-> > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> >=20
-> > since it's minor fixup and doesn't affect applying remaining patches yo=
-u can post
-> > v5 7/8 as reply to v4 7/8
-> I'll do that.
-> Since I assume the 16 bytes addition is a significant change, I'll also r=
-emove all
-> reviewed-by/tested-by tags from this patch, except yours.
 >=20
-> Cheers,
-> Samuel.
->=20
+> I tried to look at the protocol document to see if there's a limit on
+> the number of exports that a server can have, but if there is I cannot
+> find it.  I don't know how much we care about malicious NBD servers --
+> mostly I'm interested in malicious NBD clients :-)
+
+You brought up the same question earlier in the series, and we already=20
+have a pre-existing repeat of the situation with NBD_OPT_LIST for=20
+servers that lack NBD_OPT_GO.
+
+A client can always hang up on a server that it doesn't like; so maybe=20
+we could set our own limit - but what is a good limit?  An NBD server=20
+set up to export every file in a given directory, where that directory=20
+has over 1k files, doesn't seem too far-fetched.  Having 1000 contexts=20
+available in NBD_OPT_LIST_META_CONTEXT, on the other hand, is less likely=
+.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
