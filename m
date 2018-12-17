@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=8828e3297=Paul.Durrant@citrix.com>)
-	id 1gYrY9-0007f2-1T
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 06:59:07 -0500
+	(envelope-from <berrange@redhat.com>) id 1gYrqq-0007vh-Cp
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:18:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=8828e3297=Paul.Durrant@citrix.com>)
-	id 1gYrY4-0003cl-Ax
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 06:59:04 -0500
-From: Paul Durrant <paul.durrant@citrix.com>
-Date: Mon, 17 Dec 2018 11:40:44 +0000
-Message-ID: <1545046848-14891-15-git-send-email-paul.durrant@citrix.com>
-In-Reply-To: <1545046848-14891-1-git-send-email-paul.durrant@citrix.com>
-References: <1545046848-14891-1-git-send-email-paul.durrant@citrix.com>
+	(envelope-from <berrange@redhat.com>) id 1gYrqm-0000vr-FV
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:18:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58796)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gYrqm-0000ux-6H
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:18:20 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BC4D82DE3B
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 12:18:17 +0000 (UTC)
+Date: Mon, 17 Dec 2018 12:18:12 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181217121812.GF30264@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181207165414.17566-1-berrange@redhat.com>
+	<294b4695-8eeb-da79-f40c-74b57f6ca629@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v5 14/18] xen: add implementations of xen-block
- connect and disconnect functions...
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <294b4695-8eeb-da79-f40c-74b57f6ca629@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-web PATCH v2] Add license files for GPLv2+
+ and CC-BY-SA-4.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,643 +36,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
 
-...and wire in the dataplane.
+On Mon, Dec 17, 2018 at 11:57:27AM +0100, Thomas Huth wrote:
+> On 2018-12-07 17:54, Daniel P. Berrang=C3=A9 wrote:
+> > The intent is that from this point onwards, content for this reposito=
+ry
+> > is dual-licensed under the GPLv2+ and CC-BY-SA-4.0
+>=20
+> Thanks for taking care of this!
+>=20
+> Some remarks / questions below...
+>=20
+> [...]
+> > ---
+> >  LICENSE-CC-BY-3.0.md     | 324 +++++++++++++++++++++++++++++++++++
+> >  LICENSE-CC-BY-SA-4.0.md  | 356 +++++++++++++++++++++++++++++++++++++=
+++
+> >  LICENSE-GPL.md           | 346 +++++++++++++++++++++++++++++++++++++
+> >  LICENSE.md               |  18 ++
+> >  _includes/copyright.html |   7 +-
+> >  5 files changed, 1047 insertions(+), 4 deletions(-)
+> >  create mode 100644 LICENSE-CC-BY-3.0.md
+> >  create mode 100644 LICENSE-CC-BY-SA-4.0.md
+> >  create mode 100644 LICENSE-GPL.md
+> >  create mode 100644 LICENSE.md
+> >=20
+> > diff --git a/LICENSE-CC-BY-3.0.md b/LICENSE-CC-BY-3.0.md
+> > new file mode 100644
+> > index 0000000..42693c3
+> > --- /dev/null
+> > +++ b/LICENSE-CC-BY-3.0.md
+> > @@ -0,0 +1,324 @@
+> > +---
+> > +permalink: /license-cc-by-3.0/
+> > +title: Creative Commons Attribution 3.0 Unported
+> > +---
+> > +
+> > +Creative Commons Legal Code
+> > +
+> > +Attribution 3.0 Unported
+> > +
+> > +    CREATIVE COMMONS CORPORATION IS NOT A LAW FIRM AND DOES NOT PROV=
+IDE
+> > +    LEGAL SERVICES. DISTRIBUTION OF THIS LICENSE DOES NOT CREATE AN
+> > +    ATTORNEY-CLIENT RELATIONSHIP. CREATIVE COMMONS PROVIDES THIS
+> > +    INFORMATION ON AN "AS-IS" BASIS. CREATIVE COMMONS MAKES NO WARRA=
+NTIES
+> > +    REGARDING THE INFORMATION PROVIDED, AND DISCLAIMS LIABILITY FOR
+> > +    DAMAGES RESULTING FROM ITS USE.
+> > +
+> > +License
+> > +
+> > +THE WORK (AS DEFINED BELOW) IS PROVIDED UNDER THE TERMS OF THIS CREA=
+TIVE
+> > +COMMONS PUBLIC LICENSE ("CCPL" OR "LICENSE"). THE WORK IS PROTECTED =
+BY
+> > +COPYRIGHT AND/OR OTHER APPLICABLE LAW. ANY USE OF THE WORK OTHER THA=
+N AS
+> > +AUTHORIZED UNDER THIS LICENSE OR COPYRIGHT LAW IS PROHIBITED.
+> > +
+> > +BY EXERCISING ANY RIGHTS TO THE WORK PROVIDED HERE, YOU ACCEPT AND A=
+GREE
+> > +TO BE BOUND BY THE TERMS OF THIS LICENSE. TO THE EXTENT THIS LICENSE=
+ MAY
+> > +BE CONSIDERED TO BE A CONTRACT, THE LICENSOR GRANTS YOU THE RIGHTS
+> > +CONTAINED HERE IN CONSIDERATION OF YOUR ACCEPTANCE OF SUCH TERMS AND
+> > +CONDITIONS.
+> > +
+> > +1. Definitions
+> > +
+> > + a. "Adaptation" means a work based upon the Work, or upon the Work =
+and
+> > +    other pre-existing works, such as a translation, adaptation,
+> > +    derivative work, arrangement of music or other alterations of a
+> > +    literary or artistic work, or phonogram or performance and inclu=
+des
+> > +    cinematographic adaptations or any other form in which the Work =
+may be
+> > +    recast, transformed, or adapted including in any form recognizab=
+ly
+> > +    derived from the original, except that a work that constitutes a
+> > +    Collection will not be considered an Adaptation for the purpose =
+of
+> > +    this License. For the avoidance of doubt, where the Work is a mu=
+sical
+> > +    work, performance or phonogram, the synchronization of the Work =
+in
+> > +    timed-relation with a moving image ("synching") will be consider=
+ed an
+> > +    Adaptation for the purpose of this License.
+> [...]
+>=20
+> You did not use <pre>-tags for the CC-BY-3.0 license, only for the othe=
+r
+> two. Thus the pre-formatting gets completely lost in the web browser
+> here, making the text quite hard to read. I'd suggest to use <pre> here=
+,
+> too (I can add the tags before committing in case you don't want to res=
+pin).
 
-This patch adds the remaining code to make the xen-block XenDevice
-functional. The parameters that a block frontend expects to find are
-populated in the backend xenstore area, and the 'ring-ref' and
-'event-channel' values specified in the frontend xenstore area are
-mapped/bound and used to set up the dataplane.
+Yes, my bad. Please do add the <pre> yourself.
 
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
----
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
+> [...]
+> > diff --git a/LICENSE.md b/LICENSE.md
+> > new file mode 100644
+> > index 0000000..ba73300
+> > --- /dev/null
+> > +++ b/LICENSE.md
+> > @@ -0,0 +1,18 @@
+> > +---
+> > +permalink: /license
+> > +title: QEMU website licensing
+> > +---
+> > +
+> > +Except where otherwise noted, the content in this repository is prov=
+ided under
+> > +a choice of two licenses:
+>=20
+> I'd maybe replace "in this repository" with "on this website", since
+> it's not quite obvious for the normal user that the website is stored i=
+n
+> a git repository, too. (If you agree, I can fix this also up in case yo=
+u
+> don't want to respin)
 
-v5:
- - Re-base
+Yes, it is fine if you change that when pushing.
 
-v3:
- - Add missing return statement to xen_block_realize()
- - Set device name to 'vbd' now the backend is functional
- - Add an unplug handler
- - Move backend watch code from subsequent patch since it's now needed
-   to handle unplug
-
-v2:
- - Tidy up header inclusions
- - Stop leaking ring_ref on error
- - Auto-create drive for CDRom devices
----
- hw/block/xen-block.c       | 166 ++++++++++++++++++++++++++++++++++++++++
- hw/xen/trace-events        |   3 +
- hw/xen/xen-bus.c           | 187 +++++++++++++++++++++++++++++++++++++++------
- include/hw/xen/xen-block.h |   9 +++
- include/hw/xen/xen-bus.h   |  14 +++-
- 5 files changed, 353 insertions(+), 26 deletions(-)
-
-diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-index 3a963b0..a7c37c1 100644
---- a/hw/block/xen-block.c
-+++ b/hw/block/xen-block.c
-@@ -10,7 +10,13 @@
- #include "qapi/error.h"
- #include "qapi/visitor.h"
- #include "hw/hw.h"
-+#include "hw/xen/xen_common.h"
-+#include "hw/block/xen_blkif.h"
- #include "hw/xen/xen-block.h"
-+#include "sysemu/blockdev.h"
-+#include "sysemu/block-backend.h"
-+#include "sysemu/iothread.h"
-+#include "dataplane/xen-block.h"
- #include "trace.h"
- 
- static char *xen_block_get_name(XenDevice *xendev, Error **errp)
-@@ -28,6 +34,8 @@ static void xen_block_disconnect(XenDevice *xendev, Error **errp)
-     XenBlockVdev *vdev = &blockdev->props.vdev;
- 
-     trace_xen_block_disconnect(type, vdev->disk, vdev->partition);
-+
-+    xen_block_dataplane_stop(blockdev->dataplane);
- }
- 
- static void xen_block_connect(XenDevice *xendev, Error **errp)
-@@ -35,8 +43,72 @@ static void xen_block_connect(XenDevice *xendev, Error **errp)
-     XenBlockDevice *blockdev = XEN_BLOCK_DEVICE(xendev);
-     const char *type = object_get_typename(OBJECT(blockdev));
-     XenBlockVdev *vdev = &blockdev->props.vdev;
-+    unsigned int order, nr_ring_ref, *ring_ref, event_channel, protocol;
-+    char *str;
- 
-     trace_xen_block_connect(type, vdev->disk, vdev->partition);
-+
-+    if (xen_device_frontend_scanf(xendev, "ring-page-order", "%u",
-+                                  &order) != 1) {
-+        nr_ring_ref = 1;
-+        ring_ref = g_new(unsigned int, nr_ring_ref);
-+
-+        if (xen_device_frontend_scanf(xendev, "ring-ref", "%u",
-+                                      &ring_ref[0]) != 1) {
-+            error_setg(errp, "failed to read ring-ref");
-+            g_free(ring_ref);
-+            return;
-+        }
-+    } else if (order <= blockdev->props.max_ring_page_order) {
-+        unsigned int i;
-+
-+        nr_ring_ref = 1 << order;
-+        ring_ref = g_new(unsigned int, nr_ring_ref);
-+
-+        for (i = 0; i < nr_ring_ref; i++) {
-+            const char *key = g_strdup_printf("ring-ref%u", i);
-+
-+            if (xen_device_frontend_scanf(xendev, key, "%u",
-+                                          &ring_ref[i]) != 1) {
-+                error_setg(errp, "failed to read %s", key);
-+                g_free((gpointer)key);
-+                g_free(ring_ref);
-+                return;
-+            }
-+
-+            g_free((gpointer)key);
-+        }
-+    } else {
-+        error_setg(errp, "invalid ring-page-order (%d)", order);
-+        return;
-+    }
-+
-+    if (xen_device_frontend_scanf(xendev, "event-channel", "%u",
-+                                  &event_channel) != 1) {
-+        error_setg(errp, "failed to read event-channel");
-+        g_free(ring_ref);
-+        return;
-+    }
-+
-+    if (xen_device_frontend_scanf(xendev, "protocol", "%ms",
-+                                  &str) != 1) {
-+        protocol = BLKIF_PROTOCOL_NATIVE;
-+    } else {
-+        if (strcmp(str, XEN_IO_PROTO_ABI_X86_32) == 0) {
-+            protocol = BLKIF_PROTOCOL_X86_32;
-+        } else if (strcmp(str, XEN_IO_PROTO_ABI_X86_64) == 0) {
-+            protocol = BLKIF_PROTOCOL_X86_64;
-+        } else {
-+            protocol = BLKIF_PROTOCOL_NATIVE;
-+        }
-+
-+        free(str);
-+    }
-+
-+    xen_block_dataplane_start(blockdev->dataplane, ring_ref, nr_ring_ref,
-+                              event_channel, protocol, errp);
-+
-+    g_free(ring_ref);
- }
- 
- static void xen_block_unrealize(XenDevice *xendev, Error **errp)
-@@ -56,6 +128,9 @@ static void xen_block_unrealize(XenDevice *xendev, Error **errp)
-     /* Disconnect from the frontend in case this has not already happened */
-     xen_block_disconnect(xendev, NULL);
- 
-+    xen_block_dataplane_destroy(blockdev->dataplane);
-+    blockdev->dataplane = NULL;
-+
-     if (blockdev_class->unrealize) {
-         blockdev_class->unrealize(blockdev, errp);
-     }
-@@ -68,6 +143,7 @@ static void xen_block_realize(XenDevice *xendev, Error **errp)
-         XEN_BLOCK_DEVICE_GET_CLASS(xendev);
-     const char *type = object_get_typename(OBJECT(blockdev));
-     XenBlockVdev *vdev = &blockdev->props.vdev;
-+    BlockConf *conf = &blockdev->props.conf;
-     Error *local_err = NULL;
- 
-     if (vdev->type == XEN_BLOCK_VDEV_TYPE_INVALID) {
-@@ -81,8 +157,62 @@ static void xen_block_realize(XenDevice *xendev, Error **errp)
-         blockdev_class->realize(blockdev, &local_err);
-         if (local_err) {
-             error_propagate(errp, local_err);
-+            return;
-         }
-     }
-+
-+    /*
-+     * The blkif protocol does not deal with removable media, so it must
-+     * always be present, even for CDRom devices.
-+     */
-+    assert(conf->blk);
-+    if (!blk_is_inserted(conf->blk)) {
-+        error_setg(errp, "device needs media, but drive is empty");
-+        return;
-+    }
-+
-+    if (!blkconf_apply_backend_options(conf, blockdev->info & VDISK_READONLY,
-+                                       false, errp)) {
-+        return;
-+    }
-+
-+    if (!(blockdev->info & VDISK_CDROM) &&
-+        !blkconf_geometry(conf, NULL, 65535, 255, 255, errp)) {
-+        return;
-+    }
-+
-+    blkconf_blocksizes(conf);
-+
-+    if (conf->logical_block_size > conf->physical_block_size) {
-+        error_setg(
-+            errp, "logical_block_size > physical_block_size not supported");
-+        return;
-+    }
-+
-+    blk_set_guest_block_size(conf->blk, conf->logical_block_size);
-+
-+    if (conf->discard_granularity > 0) {
-+        xen_device_backend_printf(xendev, "feature-discard", "%u", 1);
-+    }
-+
-+    xen_device_backend_printf(xendev, "feature-flush-cache", "%u", 1);
-+    xen_device_backend_printf(xendev, "max-ring-page-order", "%u",
-+                              blockdev->props.max_ring_page_order);
-+    xen_device_backend_printf(xendev, "info", "%u", blockdev->info);
-+
-+    xen_device_frontend_printf(xendev, "virtual-device", "%lu",
-+                               vdev->number);
-+    xen_device_frontend_printf(xendev, "device-type", "%s",
-+                               blockdev->device_type);
-+
-+    xen_device_backend_printf(xendev, "sector-size", "%u",
-+                              conf->logical_block_size);
-+    xen_device_backend_printf(xendev, "sectors", "%lu",
-+                              blk_getlength(conf->blk) /
-+                              conf->logical_block_size);
-+
-+    blockdev->dataplane =
-+        xen_block_dataplane_create(xendev, conf, blockdev->props.iothread);
- }
- 
- static void xen_block_frontend_changed(XenDevice *xendev,
-@@ -331,6 +461,11 @@ const PropertyInfo xen_block_prop_vdev = {
- static Property xen_block_props[] = {
-     DEFINE_PROP("vdev", XenBlockDevice, props.vdev,
-                 xen_block_prop_vdev, XenBlockVdev),
-+    DEFINE_BLOCK_PROPERTIES(XenBlockDevice, props.conf),
-+    DEFINE_PROP_UINT32("max-ring-page-order", XenBlockDevice,
-+                       props.max_ring_page_order, 4),
-+    DEFINE_PROP_LINK("iothread", XenBlockDevice, props.iothread,
-+                     TYPE_IOTHREAD, IOThread *),
-     DEFINE_PROP_END_OF_LIST()
- };
- 
-@@ -339,6 +474,7 @@ static void xen_block_class_init(ObjectClass *class, void *data)
-     DeviceClass *dev_class = DEVICE_CLASS(class);
-     XenDeviceClass *xendev_class = XEN_DEVICE_CLASS(class);
- 
-+    xendev_class->device = "vbd";
-     xendev_class->get_name = xen_block_get_name;
-     xendev_class->realize = xen_block_realize;
-     xendev_class->frontend_changed = xen_block_frontend_changed;
-@@ -363,7 +499,18 @@ static void xen_disk_unrealize(XenBlockDevice *blockdev, Error **errp)
- 
- static void xen_disk_realize(XenBlockDevice *blockdev, Error **errp)
- {
-+    BlockConf *conf = &blockdev->props.conf;
-+
-     trace_xen_disk_realize();
-+
-+    blockdev->device_type = "disk";
-+
-+    if (!conf->blk) {
-+        error_setg(errp, "drive property not set");
-+        return;
-+    }
-+
-+    blockdev->info = blk_is_read_only(conf->blk) ? VDISK_READONLY : 0;
- }
- 
- static void xen_disk_class_init(ObjectClass *class, void *data)
-@@ -391,7 +538,26 @@ static void xen_cdrom_unrealize(XenBlockDevice *blockdev, Error **errp)
- 
- static void xen_cdrom_realize(XenBlockDevice *blockdev, Error **errp)
- {
-+    BlockConf *conf = &blockdev->props.conf;
-+
-     trace_xen_cdrom_realize();
-+
-+    blockdev->device_type = "cdrom";
-+
-+    if (!conf->blk) {
-+        int rc;
-+
-+        /* Set up an empty drive */
-+        conf->blk = blk_new(0, BLK_PERM_ALL);
-+
-+        rc = blk_attach_dev(conf->blk, DEVICE(blockdev));
-+        if (!rc) {
-+            error_setg_errno(errp, -rc, "failed to create drive");
-+            return;
-+        }
-+    }
-+
-+    blockdev->info = VDISK_READONLY | VDISK_CDROM;
- }
- 
- static void xen_cdrom_class_init(ObjectClass *class, void *data)
-diff --git a/hw/xen/trace-events b/hw/xen/trace-events
-index 22055b5..d4651bd 100644
---- a/hw/xen/trace-events
-+++ b/hw/xen/trace-events
-@@ -22,8 +22,11 @@ xen_bus_watch(const char *token) "token: %s"
- xen_device_realize(const char *type, char *name) "type: %s name: %s"
- xen_device_unrealize(const char *type, char *name) "type: %s name: %s"
- xen_device_backend_state(const char *type, char *name, const char *state) "type: %s name: %s -> %s"
-+xen_device_backend_online(const char *type, char *name, bool online) "type: %s name: %s -> %u"
-+xen_device_backend_changed(const char *type, char *name) "type: %s name: %s"
- xen_device_frontend_state(const char *type, char *name, const char *state) "type: %s name: %s -> %s"
- xen_device_frontend_changed(const char *type, char *name) "type: %s name: %s"
-+xen_device_unplug(const char *type, char *name) "type: %s name: %s"
- 
- # include/hw/xen/xen-bus-helper.c
- xs_node_create(const char *node) "%s"
-diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-index 9443f27..a22aa49 100644
---- a/hw/xen/xen-bus.c
-+++ b/hw/xen/xen-bus.c
-@@ -48,6 +48,54 @@ static char *xen_device_get_frontend_path(XenDevice *xendev)
-                            xendev->frontend_id, device, xendev->name);
- }
- 
-+static void xen_device_unplug(XenDevice *xendev, Error **errp)
-+{
-+    XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-+    const char *type = object_get_typename(OBJECT(xendev));
-+    Error *local_err = NULL;
-+    xs_transaction_t tid;
-+
-+    trace_xen_device_unplug(type, xendev->name);
-+
-+    /* Mimic the way the Xen toolstack does an unplug */
-+again:
-+    tid = xs_transaction_start(xenbus->xsh);
-+    if (tid == XBT_NULL) {
-+        error_setg_errno(errp, errno, "failed xs_transaction_start");
-+        return;
-+    }
-+
-+    xs_node_printf(xenbus->xsh, tid, xendev->backend_path, "online",
-+                   &local_err, "%u", 0);
-+    if (local_err) {
-+        goto abort;
-+    }
-+
-+    xs_node_printf(xenbus->xsh, tid, xendev->backend_path, "state",
-+                   &local_err, "%u", XenbusStateClosing);
-+    if (local_err) {
-+        goto abort;
-+    }
-+
-+    if (!xs_transaction_end(xenbus->xsh, tid, false)) {
-+        if (errno == EAGAIN) {
-+            goto again;
-+        }
-+
-+        error_setg_errno(errp, errno, "failed xs_transaction_end");
-+    }
-+
-+    return;
-+
-+abort:
-+    /*
-+     * We only abort if there is already a failure so ignore any error
-+     * from ending the transaction.
-+     */
-+    xs_transaction_end(xenbus->xsh, tid, true);
-+    error_propagate(errp, local_err);
-+}
-+
- static void xen_bus_print_dev(Monitor *mon, DeviceState *dev, int indent)
- {
-     XenDevice *xendev = XEN_DEVICE(dev);
-@@ -208,14 +256,26 @@ fail:
-     xen_bus_unrealize(bus, &error_abort);
- }
- 
-+static void xen_bus_unplug_request(HotplugHandler *hotplug,
-+                                   DeviceState *dev,
-+                                   Error **errp)
-+{
-+    XenDevice *xendev = XEN_DEVICE(dev);
-+
-+    xen_device_unplug(xendev, errp);
-+}
-+
- static void xen_bus_class_init(ObjectClass *class, void *data)
- {
-     BusClass *bus_class = BUS_CLASS(class);
-+    HotplugHandlerClass *hotplug_class = HOTPLUG_HANDLER_CLASS(class);
- 
-     bus_class->print_dev = xen_bus_print_dev;
-     bus_class->get_dev_path = xen_bus_get_dev_path;
-     bus_class->realize = xen_bus_realize;
-     bus_class->unrealize = xen_bus_unrealize;
-+
-+    hotplug_class->unplug_request = xen_bus_unplug_request;
- }
- 
- static const TypeInfo xen_bus_type_info = {
-@@ -230,8 +290,8 @@ static const TypeInfo xen_bus_type_info = {
-     },
- };
- 
--static void xen_device_backend_printf(XenDevice *xendev, const char *key,
--                                      const char *fmt, ...)
-+void xen_device_backend_printf(XenDevice *xendev, const char *key,
-+                               const char *fmt, ...)
- {
-     XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-     Error *local_err = NULL;
-@@ -287,6 +347,70 @@ enum xenbus_state xen_device_backend_get_state(XenDevice *xendev)
-     return xendev->backend_state;
- }
- 
-+static void xen_device_backend_set_online(XenDevice *xendev, bool online)
-+{
-+    const char *type = object_get_typename(OBJECT(xendev));
-+
-+    if (xendev->backend_online == online) {
-+        return;
-+    }
-+
-+    trace_xen_device_backend_online(type, xendev->name, online);
-+
-+    xendev->backend_online = online;
-+    xen_device_backend_printf(xendev, "online", "%u", online);
-+}
-+
-+static void xen_device_backend_changed(void *opaque)
-+{
-+    XenDevice *xendev = opaque;
-+    const char *type = object_get_typename(OBJECT(xendev));
-+    enum xenbus_state state;
-+    unsigned int online;
-+
-+    trace_xen_device_backend_changed(type, xendev->name);
-+
-+    if (xen_device_backend_scanf(xendev, "state", "%u", &state) != 1) {
-+        state = XenbusStateUnknown;
-+    }
-+
-+    xen_device_backend_set_state(xendev, state);
-+
-+    if (xen_device_backend_scanf(xendev, "online", "%u", &online) != 1) {
-+        online = 0;
-+    }
-+
-+    xen_device_backend_set_online(xendev, !!online);
-+
-+    /*
-+     * If the toolstack (or unplug request callback) has set the backend
-+     * state to Closing, but there is no active frontend (i.e. the
-+     * state is not Connected) then set the backend state to Closed.
-+     */
-+    if (xendev->backend_state == XenbusStateClosing &&
-+        xendev->frontend_state != XenbusStateConnected) {
-+        xen_device_backend_set_state(xendev, XenbusStateClosed);
-+    }
-+
-+    /*
-+     * If a backend is still 'online' then its state should be cycled
-+     * back round to InitWait in order for a new frontend instance to
-+     * connect. This may happen when, for example, a frontend driver is
-+     * re-installed or updated.
-+     * If a backend is not 'online' then the device should be destroyed.
-+     */
-+    if (xendev->backend_online &&
-+        xendev->backend_state == XenbusStateClosed) {
-+        xen_device_backend_set_state(xendev, XenbusStateInitWait);
-+    } else if (!xendev->backend_online &&
-+               (xendev->backend_state == XenbusStateClosed ||
-+                xendev->backend_state == XenbusStateInitialising ||
-+                xendev->backend_state == XenbusStateInitWait ||
-+                xendev->backend_state == XenbusStateUnknown)) {
-+        object_unparent(OBJECT(xendev));
-+    }
-+}
-+
- static void xen_device_backend_create(XenDevice *xendev, Error **errp)
- {
-     XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-@@ -307,6 +431,27 @@ static void xen_device_backend_create(XenDevice *xendev, Error **errp)
-     if (local_err) {
-         error_propagate_prepend(errp, local_err,
-                                 "failed to create backend: ");
-+        return;
-+    }
-+
-+    xendev->backend_state_watch =
-+        xen_bus_add_watch(xenbus, xendev->backend_path,
-+                          "state", xen_device_backend_changed,
-+                          xendev, &local_err);
-+    if (local_err) {
-+        error_propagate_prepend(errp, local_err,
-+                                "failed to watch backend state: ");
-+        return;
-+    }
-+
-+    xendev->backend_online_watch =
-+        xen_bus_add_watch(xenbus, xendev->backend_path,
-+                          "online", xen_device_backend_changed,
-+                          xendev, &local_err);
-+    if (local_err) {
-+        error_propagate_prepend(errp, local_err,
-+                                "failed to watch backend online: ");
-+        return;
-     }
- }
- 
-@@ -315,6 +460,16 @@ static void xen_device_backend_destroy(XenDevice *xendev)
-     XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-     Error *local_err = NULL;
- 
-+    if (xendev->backend_online_watch) {
-+        xen_bus_remove_watch(xenbus, xendev->backend_online_watch, NULL);
-+        xendev->backend_online_watch = NULL;
-+    }
-+
-+    if (xendev->backend_state_watch) {
-+        xen_bus_remove_watch(xenbus, xendev->backend_state_watch, NULL);
-+        xendev->backend_state_watch = NULL;
-+    }
-+
-     if (!xendev->backend_path) {
-         return;
-     }
-@@ -331,8 +486,8 @@ static void xen_device_backend_destroy(XenDevice *xendev)
-     }
- }
- 
--static void xen_device_frontend_printf(XenDevice *xendev, const char *key,
--                                       const char *fmt, ...)
-+void xen_device_frontend_printf(XenDevice *xendev, const char *key,
-+                                const char *fmt, ...)
- {
-     XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-     Error *local_err = NULL;
-@@ -350,8 +505,8 @@ static void xen_device_frontend_printf(XenDevice *xendev, const char *key,
-     }
- }
- 
--static int xen_device_frontend_scanf(XenDevice *xendev, const char *key,
--                                     const char *fmt, ...)
-+int xen_device_frontend_scanf(XenDevice *xendev, const char *key,
-+                              const char *fmt, ...)
- {
-     XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-     va_list ap;
-@@ -407,24 +562,6 @@ static void xen_device_frontend_changed(void *opaque)
-             error_reportf_err(local_err, "frontend change error: ");
-         }
-     }
--
--    /*
--     * If a backend is still 'online' then its state should be cycled
--     * back round to InitWait in order for a new frontend instance to
--     * connect. This may happen when, for example, a frontend driver is
--     * re-installed or updated.
--     */
--    if (xendev->backend_state == XenbusStateClosed) {
--        unsigned int online;
--
--        if (xen_device_backend_scanf(xendev, "online", "%u", &online) != 1) {
--            online = 0;
--        }
--
--        if (online) {
--            xen_device_backend_set_state(xendev, XenbusStateInitWait);
--        }
--    }
- }
- 
- static void xen_device_frontend_create(XenDevice *xendev, Error **errp)
-@@ -822,9 +959,9 @@ static void xen_device_realize(DeviceState *dev, Error **errp)
-                               xendev->frontend_path);
-     xen_device_backend_printf(xendev, "frontend-id", "%u",
-                               xendev->frontend_id);
--    xen_device_backend_printf(xendev, "online", "%u", 1);
-     xen_device_backend_printf(xendev, "hotplug-status", "connected");
- 
-+    xen_device_backend_set_online(xendev, true);
-     xen_device_backend_set_state(xendev, XenbusStateInitWait);
- 
-     xen_device_frontend_printf(xendev, "backend", "%s",
-diff --git a/include/hw/xen/xen-block.h b/include/hw/xen/xen-block.h
-index 2941325..c4223f9 100644
---- a/include/hw/xen/xen-block.h
-+++ b/include/hw/xen/xen-block.h
-@@ -9,6 +9,9 @@
- #define HW_XEN_BLOCK_H
- 
- #include "hw/xen/xen-bus.h"
-+#include "hw/block/block.h"
-+#include "hw/block/dataplane/xen-block.h"
-+#include "sysemu/iothread.h"
- 
- typedef enum XenBlockVdevType {
-     XEN_BLOCK_VDEV_TYPE_INVALID,
-@@ -28,11 +31,17 @@ typedef struct XenBlockVdev {
- 
- typedef struct XenBlockProperties {
-     XenBlockVdev vdev;
-+    BlockConf conf;
-+    unsigned int max_ring_page_order;
-+    IOThread *iothread;
- } XenBlockProperties;
- 
- typedef struct XenBlockDevice {
-     XenDevice xendev;
-     XenBlockProperties props;
-+    const char *device_type;
-+    unsigned int info;
-+    XenBlockDataPlane *dataplane;
- } XenBlockDevice;
- 
- typedef void (*XenBlockDeviceRealize)(XenBlockDevice *blockdev, Error **errp);
-diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-index f83a95c..0834cb3 100644
---- a/include/hw/xen/xen-bus.h
-+++ b/include/hw/xen/xen-bus.h
-@@ -23,7 +23,9 @@ typedef struct XenDevice {
-     char *backend_path, *frontend_path;
-     enum xenbus_state backend_state, frontend_state;
-     Notifier exit;
--    XenWatch *frontend_state_watch;
-+    XenWatch *backend_state_watch, *frontend_state_watch;
-+    bool backend_online;
-+    XenWatch *backend_online_watch;
-     xengnttab_handle *xgth;
-     bool feature_grant_copy;
-     xenevtchn_handle *xeh;
-@@ -84,6 +86,16 @@ void xen_device_backend_set_state(XenDevice *xendev,
-                                   enum xenbus_state state);
- enum xenbus_state xen_device_backend_get_state(XenDevice *xendev);
- 
-+void xen_device_backend_printf(XenDevice *xendev, const char *key,
-+                               const char *fmt, ...)
-+    GCC_FMT_ATTR(3, 4);
-+void xen_device_frontend_printf(XenDevice *xendev, const char *key,
-+                                const char *fmt, ...)
-+    GCC_FMT_ATTR(3, 4);
-+
-+int xen_device_frontend_scanf(XenDevice *xendev, const char *key,
-+                              const char *fmt, ...);
-+
- void xen_device_set_max_grant_refs(XenDevice *xendev, unsigned int nr_refs,
-                                    Error **errp);
- void *xen_device_map_grant_refs(XenDevice *xendev, uint32_t *refs,
--- 
-2.1.4
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
