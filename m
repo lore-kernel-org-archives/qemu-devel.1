@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gYupW-0000dI-6e
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 10:29:14 -0500
+	(envelope-from <eblake@redhat.com>) id 1gYur7-0001aw-Ne
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 10:30:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gYupS-0008Uo-4B
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 10:29:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32796)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gYupR-0008SR-SQ
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 10:29:10 -0500
-Date: Mon, 17 Dec 2018 10:28:58 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181217102841-mutt-send-email-mst@kernel.org>
-References: <20181214131043.25071-1-david@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1gYur2-0001fo-SL
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 10:30:51 -0500
+References: <20181215135324.152629-1-eblake@redhat.com>
+	<20181215135324.152629-13-eblake@redhat.com>
+	<20181215151929.GY27120@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <39d9eca0-239c-d145-9bb5-fda68ac40bdc@redhat.com>
+Date: Mon, 17 Dec 2018 09:30:30 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181214131043.25071-1-david@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 0/2] range/memory-device: fixes and
- cleanups
+In-Reply-To: <20181215151929.GY27120@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 12/22] nbd/client: Improve error
+ handling in nbd_negotiate_simple_meta_context()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,36 +26,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: qemu-devel@nongnu.org, nsoffer@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-On Fri, Dec 14, 2018 at 02:10:41PM +0100, David Hildenbrand wrote:
-> These are the two leftovers from
->     [PATCH v3 0/7] qapi/range/memory-device: fixes and cleanups
+On 12/15/18 9:19 AM, Richard W.M. Jones wrote:
+> On Sat, Dec 15, 2018 at 07:53:14AM -0600, Eric Blake wrote:
+>> Always allocate space for the reply returned by the server and
+>> hoist the trace earlier, as it is more interesting to trace the
+>> server's reply (even if it is unexpected) than parroting our
+>> request only on success.  After all, skipping the allocation
+>> for a wrong size was merely a micro-optimization that only
+>> benefitted a broken server, rather than the common case of a
+>> compliant server that meets our expectations.
+>>
+>> Then turn the reply handling into a loop (even though we still
+>> never iterate more than once), to make this code easier to use
+>> when later patches do support multiple server replies.  This
+>> changes the error message for a server with two replies (a
+>> corner case we are unlikely to hit in practice) from:
+>>
+>> Unexpected reply type 4 (meta context), expected 0 (ack)
+>>
+>> to:
+>>
+>> Server replied with more than one context
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>
+>> ---
+>> v2: split patch into easier-to-review pieces [Rich, Vladimir]
+>> ---
+>>   nbd/client.c | 16 ++++++++++++----
+>>   1 file changed, 12 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/nbd/client.c b/nbd/client.c
+>> index bcccd5f555e..b6a85fc3ef8 100644
+>> --- a/nbd/client.c
+>> +++ b/nbd/client.c
+>> @@ -684,10 +684,11 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+>>           return ret;
+>>       }
+>>
+>> -    if (reply.type == NBD_REP_META_CONTEXT) {
+>> +    while (reply.type == NBD_REP_META_CONTEXT) {
+> 
+> I'm not sure I understand why this change is safe.
+> 
+> As far as I can see reply.type is only updated in the loop by
+> nbd_receive_option_reply, and that reads from the server, and so the
+> server might keep sending NBD_REP_META_CONTEXT packets (instead of the
+> expected NBD_REP_ACK), so it could now loop forever against a
+> malicious server?  (This is not taking into account any later patches)
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Hmm - now that I've already responded to why the conversion to a loop 
+does not change this code, I'm now wondering if I even need this patch. 
+In v1 of the series, both SET and LIST shared a common function, and 
+since LIST needs the loop, converting SET to use a loop that exits early 
+if it executes more than once was needed to make the two actions share a 
+common entry point.  But since v2 uses different entry points (because 
+it separated the common code into separate helper functions, leaving the 
+SET entry point unchanged and adding a new LIST entry point), where only 
+the LIST entry point actually has to loop, I might be able to just drop 
+this patch entirely and still achieve the same effect.
 
-Who's merging this Eduardo?
-
-> The remaining patches extent the QEMU range code and rewrite
-> memory-device code to make use of it.
-> 
-> v34 -> v5:
-> - "memory-device: rewrite address assignment using ranges"
-> -- Squash to error pathes that resulted in the same error message
-> 
-> v3 -> v4:
-> - "memory-device: rewrite address assignment using ranges"
-> -- Use better error messages
-> -- Fix one theretical overflow
-> 
-> David Hildenbrand (2):
->   range: add some more functions
->   memory-device: rewrite address assignment using ranges
-> 
->  hw/mem/memory-device.c | 51 +++++++++++++++++-----------------
->  include/qemu/range.h   | 62 ++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 88 insertions(+), 25 deletions(-)
-> 
-> -- 
-> 2.17.2
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
