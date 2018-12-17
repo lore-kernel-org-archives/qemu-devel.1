@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gZ28y-0000ds-G3
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:17:49 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gZ290-0000fP-4U
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:17:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gZ28x-0003r5-Gg
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:17:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56056)
+	(envelope-from <pbonzini@redhat.com>) id 1gZ28z-0003sI-6f
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:17:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60900)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gZ28x-0003qe-9M
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:17:47 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gZ28y-0003rg-Tz
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:17:49 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 91ACE821CB
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 23:17:46 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 284A523E6C1
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 23:17:48 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 18 Dec 2018 00:16:44 +0100
-Message-Id: <20181217231700.24482-20-pbonzini@redhat.com>
+Date: Tue, 18 Dec 2018 00:16:45 +0100
+Message-Id: <20181217231700.24482-21-pbonzini@redhat.com>
 In-Reply-To: <20181217231700.24482-1-pbonzini@redhat.com>
 References: <20181217231700.24482-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 19/35] build-sys: move windows defines in
- osdep.h header
+Subject: [Qemu-devel] [PULL 20/35] build-sys: build with Vista API by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,70 +37,71 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-This removes some clutter in compilation logging, and allows some
-easier tweaking per compilation unit/CFLAGS overriding.
+Both qemu & qga build with Vista API by default already, by defining
+_WIN32_WINNT 0x0600. Set it globally in osdep.h instead.
 
-Note that we can't move those define in os-win32.h, since they must be
-set before the first system headers are included.
+This replaces WINVER by _WIN32_WINNT in osdep.h. WINVER doesn't seem
+to be really useful these days.
+(see also https://blogs.msdn.microsoft.com/oldnewthing/20070411-00/?p=3D2=
+7283)
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20181122110039.15972-3-marcandre.lureau@redhat.com>
+Message-Id: <20181122110039.15972-4-marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure            |  3 ---
- include/qemu/osdep.h | 17 +++++++++++++++++
- 2 files changed, 17 insertions(+), 3 deletions(-)
+ include/qemu/osdep.h     | 4 ++--
+ qga/commands-win32.c     | 6 +-----
+ util/qemu-thread-win32.c | 4 ----
+ 3 files changed, 3 insertions(+), 11 deletions(-)
 
-diff --git a/configure b/configure
-index 0886f45bf4..b4f7279f4d 100755
---- a/configure
-+++ b/configure
-@@ -905,9 +905,6 @@ fi
- if test "$mingw32" =3D "yes" ; then
-   EXESUF=3D".exe"
-   DSOSUF=3D".dll"
--  QEMU_CFLAGS=3D"-DWIN32_LEAN_AND_MEAN -DWINVER=3D0x501 $QEMU_CFLAGS"
--  # enable C99/POSIX format strings (needs mingw32-runtime 3.15 or later=
-)
--  QEMU_CFLAGS=3D"-D__USE_MINGW_ANSI_STDIO=3D1 $QEMU_CFLAGS"
-   # MinGW needs -mthreads for TLS and macro _MT.
-   QEMU_CFLAGS=3D"-mthreads $QEMU_CFLAGS"
-   LIBS=3D"-lwinmm -lws2_32 -liphlpapi $LIBS"
 diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index 3bf48bcdec..7b6e5db9d0 100644
+index 7b6e5db9d0..80df7253db 100644
 --- a/include/qemu/osdep.h
 +++ b/include/qemu/osdep.h
-@@ -74,13 +74,30 @@ typedef __float128 _Float128;
- extern int daemon(int, int);
- #endif
+@@ -76,8 +76,8 @@ extern int daemon(int, int);
 =20
-+#ifdef _WIN32
-+/* as defined in sdkddkver.h */
-+#ifndef WINVER
-+#define WINVER 0x0501 /* XP */
-+#endif
-+/* reduces the number of implicitly included headers */
-+#ifndef WIN32_LEAN_AND_MEAN
-+#define WIN32_LEAN_AND_MEAN
-+#endif
-+#endif
+ #ifdef _WIN32
+ /* as defined in sdkddkver.h */
+-#ifndef WINVER
+-#define WINVER 0x0501 /* XP */
++#ifndef _WIN32_WINNT
++#define _WIN32_WINNT 0x0600 /* Vista */
+ #endif
+ /* reduces the number of implicitly included headers */
+ #ifndef WIN32_LEAN_AND_MEAN
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index 62e1b51dfe..f03b9c1d89 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -10,12 +10,8 @@
+  * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+  * See the COPYING file in the top-level directory.
+  */
+-
+-#ifndef _WIN32_WINNT
+-#   define _WIN32_WINNT 0x0600
+-#endif
+-
+ #include "qemu/osdep.h"
 +
- #include <stdarg.h>
- #include <stddef.h>
- #include <stdbool.h>
- #include <stdint.h>
- #include <sys/types.h>
- #include <stdlib.h>
-+
-+/* enable C99/POSIX format strings (needs mingw32-runtime 3.15 or later)=
- */
-+#ifdef __MINGW32__
-+#define __USE_MINGW_ANSI_STDIO 1
-+#endif
- #include <stdio.h>
-+
- #include <string.h>
- #include <strings.h>
- #include <inttypes.h>
+ #include <wtypes.h>
+ #include <powrprof.h>
+ #include <winsock2.h>
+diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
+index 4a363ca675..572f88535d 100644
+--- a/util/qemu-thread-win32.c
++++ b/util/qemu-thread-win32.c
+@@ -11,10 +11,6 @@
+  *
+  */
+=20
+-#ifndef _WIN32_WINNT
+-#define _WIN32_WINNT 0x0600
+-#endif
+-
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "qemu/thread.h"
 --=20
 2.20.1
