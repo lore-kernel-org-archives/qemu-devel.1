@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46690)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gYsOv-00014s-Um
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:53:38 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gYsSh-000267-5L
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:57:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gYsOs-0005ne-0g
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:53:37 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:52769
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gYsSc-0001mQ-AY
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:57:31 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:52786
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1gYsOr-0005lP-PO
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:53:33 -0500
+	id 1gYsSc-0001lT-3y
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:57:26 -0500
 References: <20181213050453.9677-1-cota@braap.org>
-	<20181213050453.9677-27-cota@braap.org>
+	<20181213050453.9677-56-cota@braap.org>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <f6c1ead8-5191-5ea8-cc89-1d025342ad50@ilande.co.uk>
-Date: Mon, 17 Dec 2018 12:53:20 +0000
+Message-ID: <33d65215-74ee-cd80-589e-f7244f3d66bd@ilande.co.uk>
+Date: Mon, 17 Dec 2018 12:57:16 +0000
 MIME-Version: 1.0
-In-Reply-To: <20181213050453.9677-27-cota@braap.org>
+In-Reply-To: <20181213050453.9677-56-cota@braap.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 26/73] sparc: convert to cpu_halted
+Subject: Re: [Qemu-devel] [PATCH v5 55/73] sparc: convert to
+ cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,111 +32,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fabien Chouteau <chouteau@adacore.com>, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Artyom Tarasenko <atar4qemu@gmail.com>
 
 On 13/12/2018 05:04, Emilio G. Cota wrote:
 
-> Cc: Fabien Chouteau <chouteau@adacore.com>
 > Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > Cc: Artyom Tarasenko <atar4qemu@gmail.com>
 > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 > Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 > Signed-off-by: Emilio G. Cota <cota@braap.org>
 > ---
->  hw/sparc/leon3.c      | 2 +-
->  hw/sparc/sun4m.c      | 8 ++++----
->  hw/sparc64/sparc64.c  | 4 ++--
->  target/sparc/helper.c | 2 +-
->  4 files changed, 8 insertions(+), 8 deletions(-)
+>  hw/sparc64/sparc64.c | 4 ++--
+>  target/sparc/cpu.c   | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-> index fa98ab8177..0746001f91 100644
-> --- a/hw/sparc/leon3.c
-> +++ b/hw/sparc/leon3.c
-> @@ -61,7 +61,7 @@ static void main_cpu_reset(void *opaque)
->  
->      cpu_reset(cpu);
->  
-> -    cpu->halted = 0;
-> +    cpu_halted_set(cpu, 0);
->      env->pc     = s->entry;
->      env->npc    = s->entry + 4;
->      env->regbase[6] = s->sp;
-> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-> index 3c29b68e67..5bd6512b2b 100644
-> --- a/hw/sparc/sun4m.c
-> +++ b/hw/sparc/sun4m.c
-> @@ -168,7 +168,7 @@ static void cpu_kick_irq(SPARCCPU *cpu)
->      CPUSPARCState *env = &cpu->env;
->      CPUState *cs = CPU(cpu);
->  
-> -    cs->halted = 0;
-> +    cpu_halted_set(cs, 0);
->      cpu_check_irqs(env);
->      qemu_cpu_kick(cs);
->  }
-> @@ -199,7 +199,7 @@ static void main_cpu_reset(void *opaque)
->      CPUState *cs = CPU(cpu);
->  
->      cpu_reset(cs);
-> -    cs->halted = 0;
-> +    cpu_halted_set(cs, 0);
->  }
->  
->  static void secondary_cpu_reset(void *opaque)
-> @@ -208,7 +208,7 @@ static void secondary_cpu_reset(void *opaque)
->      CPUState *cs = CPU(cpu);
->  
->      cpu_reset(cs);
-> -    cs->halted = 1;
-> +    cpu_halted_set(cs, 1);
->  }
->  
->  static void cpu_halt_signal(void *opaque, int irq, int level)
-> @@ -825,7 +825,7 @@ static void cpu_devinit(const char *cpu_type, unsigned int id,
->      } else {
->          qemu_register_reset(secondary_cpu_reset, cpu);
->          cs = CPU(cpu);
-> -        cs->halted = 1;
-> +        cpu_halted_set(cs, 1);
->      }
->      *cpu_irqs = qemu_allocate_irqs(cpu_set_irq, cpu, MAX_PILS);
->      env->prom_addr = prom_addr;
 > diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
-> index 408388945e..372bbd4f5b 100644
+> index 372bbd4f5b..58faeb111a 100644
 > --- a/hw/sparc64/sparc64.c
 > +++ b/hw/sparc64/sparc64.c
-> @@ -100,7 +100,7 @@ static void cpu_kick_irq(SPARCCPU *cpu)
->      CPUState *cs = CPU(cpu);
+> @@ -56,7 +56,7 @@ void cpu_check_irqs(CPUSPARCState *env)
+>      /* The bit corresponding to psrpil is (1<< psrpil), the next bit
+>         is (2 << psrpil). */
+>      if (pil < (2 << env->psrpil)) {
+> -        if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
+> +        if (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) {
+>              trace_sparc64_cpu_check_irqs_reset_irq(env->interrupt_index);
+>              env->interrupt_index = 0;
+>              cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
+> @@ -87,7 +87,7 @@ void cpu_check_irqs(CPUSPARCState *env)
+>                  break;
+>              }
+>          }
+> -    } else if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
+> +    } else if (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) {
+>          trace_sparc64_cpu_check_irqs_disabled(pil, env->pil_in, env->softint,
+>                                                env->interrupt_index);
+>          env->interrupt_index = 0;
+> diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
+> index 0f090ece54..88427283c1 100644
+> --- a/target/sparc/cpu.c
+> +++ b/target/sparc/cpu.c
+> @@ -709,7 +709,7 @@ static bool sparc_cpu_has_work(CPUState *cs)
+>      SPARCCPU *cpu = SPARC_CPU(cs);
 >      CPUSPARCState *env = &cpu->env;
 >  
-> -    cs->halted = 0;
-> +    cpu_halted_set(cs, 0);
->      cpu_check_irqs(env);
->      qemu_cpu_kick(cs);
+> -    return (cs->interrupt_request & CPU_INTERRUPT_HARD) &&
+> +    return (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) &&
+>             cpu_interrupts_enabled(env);
 >  }
-> @@ -115,7 +115,7 @@ void sparc64_cpu_set_ivec_irq(void *opaque, int irq, int level)
->          if (!(env->ivec_status & 0x20)) {
->              trace_sparc64_cpu_ivec_raise_irq(irq);
->              cs = CPU(cpu);
-> -            cs->halted = 0;
-> +            cpu_halted_set(cs, 0);
->              env->interrupt_index = TT_IVEC;
->              env->ivec_status |= 0x20;
->              env->ivec_data[0] = (0x1f << 6) | irq;
-> diff --git a/target/sparc/helper.c b/target/sparc/helper.c
-> index 46232788c8..dd00cf7cac 100644
-> --- a/target/sparc/helper.c
-> +++ b/target/sparc/helper.c
-> @@ -245,7 +245,7 @@ void helper_power_down(CPUSPARCState *env)
->  {
->      CPUState *cs = CPU(sparc_env_get_cpu(env));
->  
-> -    cs->halted = 1;
-> +    cpu_halted_set(cs, 1);
->      cs->exception_index = EXCP_HLT;
->      env->pc = env->npc;
->      env->npc = env->pc + 4;
 
 Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
