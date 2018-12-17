@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gYsSh-000267-5L
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:57:32 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gYsUO-00035e-SS
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:59:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gYsSc-0001mQ-AY
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:57:31 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:52786
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gYsUK-0006GQ-1p
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:59:16 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:52795
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1gYsSc-0001lT-3y
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:57:26 -0500
+	id 1gYsUI-00064n-1M
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:59:11 -0500
 References: <20181213050453.9677-1-cota@braap.org>
-	<20181213050453.9677-56-cota@braap.org>
+	<20181213050453.9677-68-cota@braap.org>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <33d65215-74ee-cd80-589e-f7244f3d66bd@ilande.co.uk>
-Date: Mon, 17 Dec 2018 12:57:16 +0000
+Message-ID: <b0ebafa1-bbab-b93f-961e-afb3a376d8da@ilande.co.uk>
+Date: Mon, 17 Dec 2018 12:58:58 +0000
 MIME-Version: 1.0
-In-Reply-To: <20181213050453.9677-56-cota@braap.org>
+In-Reply-To: <20181213050453.9677-68-cota@braap.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 55/73] sparc: convert to
- cpu_interrupt_request
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 67/73] sparc: convert to
+ cpu_has_work_with_iothread_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,52 +36,40 @@ Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@re
 
 On 13/12/2018 05:04, Emilio G. Cota wrote:
 
+> Soon we will call cpu_has_work without the BQL.
+> 
 > Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > Cc: Artyom Tarasenko <atar4qemu@gmail.com>
 > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 > Signed-off-by: Emilio G. Cota <cota@braap.org>
 > ---
->  hw/sparc64/sparc64.c | 4 ++--
->  target/sparc/cpu.c   | 2 +-
->  2 files changed, 3 insertions(+), 3 deletions(-)
+>  target/sparc/cpu.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
-> diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
-> index 372bbd4f5b..58faeb111a 100644
-> --- a/hw/sparc64/sparc64.c
-> +++ b/hw/sparc64/sparc64.c
-> @@ -56,7 +56,7 @@ void cpu_check_irqs(CPUSPARCState *env)
->      /* The bit corresponding to psrpil is (1<< psrpil), the next bit
->         is (2 << psrpil). */
->      if (pil < (2 << env->psrpil)) {
-> -        if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
-> +        if (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) {
->              trace_sparc64_cpu_check_irqs_reset_irq(env->interrupt_index);
->              env->interrupt_index = 0;
->              cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
-> @@ -87,7 +87,7 @@ void cpu_check_irqs(CPUSPARCState *env)
->                  break;
->              }
->          }
-> -    } else if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
-> +    } else if (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) {
->          trace_sparc64_cpu_check_irqs_disabled(pil, env->pil_in, env->softint,
->                                                env->interrupt_index);
->          env->interrupt_index = 0;
 > diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-> index 0f090ece54..88427283c1 100644
+> index 88427283c1..54bffc1a6c 100644
 > --- a/target/sparc/cpu.c
 > +++ b/target/sparc/cpu.c
-> @@ -709,7 +709,7 @@ static bool sparc_cpu_has_work(CPUState *cs)
+> @@ -709,6 +709,8 @@ static bool sparc_cpu_has_work(CPUState *cs)
 >      SPARCCPU *cpu = SPARC_CPU(cs);
 >      CPUSPARCState *env = &cpu->env;
 >  
-> -    return (cs->interrupt_request & CPU_INTERRUPT_HARD) &&
-> +    return (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) &&
+> +    g_assert(qemu_mutex_iothread_locked());
+> +
+>      return (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD) &&
 >             cpu_interrupts_enabled(env);
 >  }
+> @@ -870,7 +872,7 @@ static void sparc_cpu_class_init(ObjectClass *oc, void *data)
+>  
+>      cc->class_by_name = sparc_cpu_class_by_name;
+>      cc->parse_features = sparc_cpu_parse_features;
+> -    cc->has_work = sparc_cpu_has_work;
+> +    cc->has_work_with_iothread_lock = sparc_cpu_has_work;
+>      cc->do_interrupt = sparc_cpu_do_interrupt;
+>      cc->cpu_exec_interrupt = sparc_cpu_exec_interrupt;
+>      cc->dump_state = sparc_cpu_dump_state;
 
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Acked-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
 
 ATB,
