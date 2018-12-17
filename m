@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gYlr2-000258-UD
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 00:54:14 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gYm4R-0004y5-2g
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 01:08:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gYlqz-0006PH-ON
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 00:54:12 -0500
-Received: from mga01.intel.com ([192.55.52.88]:34203)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1gYlqz-0006IS-4m
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 00:54:09 -0500
-Date: Mon, 17 Dec 2018 13:53:54 +0800
-From: Yi Zhang <yi.z.zhang@linux.intel.com>
-Message-ID: <20181217055354.GA67329@tiger-server>
-References: <cover.1544598069.git.yi.z.zhang@linux.intel.com>
-	<20181212100106-mutt-send-email-mst@kernel.org>
+	(envelope-from <dgibson@ozlabs.org>) id 1gYm4Q-0008U0-0O
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 01:08:03 -0500
+Date: Mon, 17 Dec 2018 17:04:11 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20181217060411.GH5597@umbus.fritz.box>
+References: <20181211223823.13770-1-clg@kaod.org>
+	<20181211223823.13770-11-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="J/zg8ciPNcraoWb6"
 Content-Disposition: inline
-In-Reply-To: <20181212100106-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH V6 0/6] nvdimm: support MAP_SYNC for
- memory-backend-file
+In-Reply-To: <20181211223823.13770-11-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v8 10/12] spapr: enable XIVE MMIOs at reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,106 +24,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: xiaoguangrong.eric@gmail.com, dan.j.williams@intel.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, qemu-devel@nongnu.org, imammedo@redhat.com, ehabkost@redhat.com
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On 2018-12-12 at 10:06:13 -0500, Michael S. Tsirkin wrote:
-> On Wed, Dec 12, 2018 at 04:11:44PM +0800, Zhang Yi wrote:
-> > Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
-> > guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
-> > files on ext4/xfs file system mounted with '-o dax').
-> > 
-> > A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
-> >     https://patchwork.kernel.org/patch/10028151/
-> > 
-> > In order to make sure that the file metadata is in sync after a fault 
-> > while we are writing a shared DAX supporting backend files, this
-> > patch-set enables QEMU to use MAP_SYNC flag for memory-backend-dax-file.
-> > 
-> > As the DAX vs DMA truncated issue was solved, we refined the code and
-> > send out this feature for the v5 version.
-> > 
-> > A new auto on/off option 'sync' is added to memory-backend-file:
-> >  - on:  try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
-> >         'share=off', QEMU will abort
-> >  - off: never pass MAP_SYNC to mmap(2)
-> >  - auto (default): if MAP_SYNC is supported and 'share=on', work as if
-> >         'sync=on'; otherwise, work as if 'sync=off'
-> 
-> Can this change be limited to a real DAX device?
-> Then you won't need to bother with flags at all.
-Thanks Micheal's review,
 
-For real dax device, we still need to have a option to turn sync off.
-> 
-> And am I mistaken in thinking that this will affect all
-> guest memory with share=on? Or do I misunderstand?
+--J/zg8ciPNcraoWb6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Only file-backend memory with share=on.
-> 
-> 
-> 
-> > Changes in v6:
-> >  * Pankaj: 3/7 are squashed with 2/7
-> >  * Pankaj: 7/7 update comments to "consistent filesystem metadata".
-> >  * Pankaj, Igor: 1/7 Added Reviewed-by in patch-1/7
-> >  * Stefan, 4/7 move the include header from "/linux/mman.h" to "osdep.h"
-> >  * Stefan, 5/7 Add missing "munmap"
-> >  * Stefan, 2/7 refine the shared/flag.
-> > 
-> > Changes in v5:
-> >  * Add patch 1 to fix a memory leak issue.
-> >  * Refine the patch 4-6
-> >  * Remove the patch 3 as we already change the parameter from "shared" to
-> >    "flags"
-> > 
-> > Changes in v4:
-> >  * Add patch 1-3 to switch some functions to a single 'flags'
-> >    parameters. (Michael S. Tsirkin)
-> >  * v3 patch 1-3 become v4 patch 4-6.
-> >  * Patch 4: move definitions of MAP_SYNC and MAP_SHARED_VALIDATE to a
-> >    new header file under include/standard-headers/linux/. (Michael S. Tsirkin)
-> >  * Patch 6: refine the description of the 'sync' option. (Michael S. Tsirkin)
-> > 
-> > Changes in v3:
-> >  * Patch 1: add MAP_SHARED_VALIDATE in both sync=on and sync=auto
-> >    cases, and add back the retry mechanism. MAP_SYNC will be ignored
-> >    by Linux kernel 4.15 if MAP_SHARED_VALIDATE is missed.
-> >  * Patch 1: define MAP_SYNC and MAP_SHARED_VALIDATE as 0 on non-Linux
-> >    platforms in order to make qemu_ram_mmap() compile on those platforms.
-> >  * Patch 2&3: include more information in error messages of
-> >    memory-backend in hope to help user to identify the error.
-> >    (Dr. David Alan Gilbert)
-> >  * Patch 3: fix typo in the commit message. (Dr. David Alan Gilbert)
-> > 
-> > Changes in v2:
-> >  * Add 'sync' option to control the use of MAP_SYNC. (Eduardo Habkost)
-> >  * Remove the unnecessary set of MAP_SHARED_VALIDATE in some cases and
-> >    the retry mechanism in qemu_ram_mmap(). (Michael S. Tsirkin)
-> >  * Move OS dependent definitions of MAP_SYNC and MAP_SHARED_VALIDATE
-> >    to osdep.h. (Michael S. Tsirkin)
-> > 
-> > Zhang Yi (6):
-> >   numa: Fixed the memory leak of numa error message
-> >   util/mmap-alloc: switch qemu_ram_mmap() to 'flags' parameter
-> >   util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
-> >   util/mmap-alloc: Switch the RAM_SYNC flags to OnOffAuto
-> >   hostmem: add more information in error messages
-> >   hostmem-file: add 'sync' option
-> > 
-> >  backends/hostmem-file.c   | 45 +++++++++++++++++++++++++++++++++++++++++++--
-> >  backends/hostmem.c        |  8 +++++---
-> >  docs/nvdimm.txt           | 20 +++++++++++++++++++-
-> >  exec.c                    |  9 +++++----
-> >  include/exec/memory.h     | 18 ++++++++++++++++++
-> >  include/exec/ram_addr.h   |  1 +
-> >  include/qemu/mmap-alloc.h | 20 +++++++++++++++++++-
-> >  include/qemu/osdep.h      | 29 +++++++++++++++++++++++++++++
-> >  numa.c                    |  1 +
-> >  qemu-options.hx           | 22 +++++++++++++++++++++-
-> >  util/mmap-alloc.c         | 26 +++++++++++++++++++++-----
-> >  util/oslib-posix.c        |  8 +++++++-
-> >  12 files changed, 189 insertions(+), 18 deletions(-)
-> > 
-> > -- 
-> > 2.7.4
+On Tue, Dec 11, 2018 at 11:38:21PM +0100, C=E9dric Le Goater wrote:
+> Depending on the interrupt mode of the machine, enable or disable the
+> XIVE MMIOs.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> ---
+>=20
+>  Changes since v7:
+>=20
+>  - renamed spapr_xive_enable_mmio() to spapr_xive_mmio_set_enabled()
+>=20
+>  include/hw/ppc/spapr_xive.h | 1 +
+>  hw/intc/spapr_xive.c        | 9 +++++++++
+>  hw/ppc/spapr_irq.c          | 8 ++++++++
+>  3 files changed, 18 insertions(+)
+>=20
+> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+> index 728735dbcfbe..9b49871bdb1a 100644
+> --- a/include/hw/ppc/spapr_xive.h
+> +++ b/include/hw/ppc/spapr_xive.h
+> @@ -48,5 +48,6 @@ void spapr_xive_hcall_init(sPAPRMachineState *spapr);
+>  void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void *=
+fdt,
+>                     uint32_t phandle);
+>  void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx);
+> +void spapr_xive_mmio_set_enabled(sPAPRXive *xive, bool enable);
+> =20
+>  #endif /* PPC_SPAPR_XIVE_H */
+> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> index aaa5865c4080..cd1b2c06f88b 100644
+> --- a/hw/intc/spapr_xive.c
+> +++ b/hw/intc/spapr_xive.c
+> @@ -179,6 +179,15 @@ static void spapr_xive_map_mmio(sPAPRXive *xive)
+>      sysbus_mmio_map(SYS_BUS_DEVICE(xive), 2, xive->tm_base);
+>  }
+> =20
+> +void spapr_xive_mmio_set_enabled(sPAPRXive *xive, bool enable)
+> +{
+> +    memory_region_set_enabled(&xive->source.esb_mmio, enable);
+> +    memory_region_set_enabled(&xive->tm_mmio, enable);
+> +
+> +    /* Disable the END ESBs until a guest OS makes use of them */
+> +    memory_region_set_enabled(&xive->end_source.esb_mmio, false);
+> +}
+> +
+>  /*
+>   * When a Virtual Processor is scheduled to run on a HW thread, the
+>   * hypervisor pushes its identifier in the OS CAM line. Emulate the
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 814500f22d34..b1319905327f 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -216,6 +216,11 @@ static void spapr_irq_reset_xics(sPAPRMachineState *=
+spapr, Error **errp)
+>      CPU_FOREACH(cs) {
+>          spapr_cpu_core_set_intc(POWERPC_CPU(cs), spapr->icp_type);
+>      }
+> +
+> +    /* Deactivate the XIVE MMIOs */
+> +    if (spapr->xive) {
+> +        spapr_xive_mmio_set_enabled(spapr->xive, false);
+> +    }
+
+Rather than having the XICS reset reach across and disable the XIVE
+MMIO, I think it would be preferable for the common wrapper to disable
+both XICS and XIVE, then have the intc specific hook re-enable the
+correct one.
+
+>  }
+> =20
+>  #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
+> @@ -341,6 +346,9 @@ static void spapr_irq_reset_xive(sPAPRMachineState *s=
+papr, Error **errp)
+>          /* (TCG) Set the OS CAM line of the thread interrupt context. */
+>          spapr_xive_set_tctx_os_cam(XIVE_TCTX(cpu->intc));
+>      }
+> +
+> +    /* Activate the XIVE MMIOs */
+> +    spapr_xive_mmio_set_enabled(spapr->xive, true);
+>  }
+> =20
+>  /*
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--J/zg8ciPNcraoWb6
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwXPFsACgkQbDjKyiDZ
+s5LAIhAA536DhAahFXyCzL0oWVYzOuRRjc2x2pNlsOlJsFmHQr7lXxcSjl6Uy2Km
+cCB25KWjfKqtus6HAJptmKAG+zJlvLFP0RAf1qED3bs9AHRePWIQfq1bZInz2Dzd
+ERBiLmciSbvZlXDF1ZcOrJ9QT01M2N75kJ+dyUV5bcxbKjyodf6QZwbZNevR99j5
+GBKRKpn3VABFKTAQhWOPXUuZQMNdP6zukuIYhteablMSThFPGxSy7fjdAbUyuhnE
+1JO+TXd4GAsUU1Gu9OARvkMJrlNDd1T81dfCrBv/Ldg0lZz+vzMdzPXp0Hv5zfjX
+YB7mfsLpXYr/jVOMMKX4HiAp6vQ7qkzwTQ+67r3B/4u969cSBoCqinGoXM9Ymu8m
+vharu9MaCIu5FQWG3vbmlQQG/e/kCPrweDApIigayix2VecScO5ya9T/X74qQHwx
+6nNAFP3qKl5NCvK1JTGuXtICEfXE8lkSsGOkPPyzNvFj8Q+gWqFPtrVP+c3+F8gZ
+lgz/kjvzg0XFpY+7P4/M6mJ7pV3kg7TzNKX4W0s2vpD8vb77ce2WOKvkTV6/eeK1
+5rf6t8prcmCrR3feD0pF01FR2meijQ121skJk2/rVphryDxSbVmQxDpxcd+OjEbh
+a3ePCeptN0jTP7BbUzWyGISz8CVqCsr13CdMbU5LraJJ3+fIViI=
+=7qz/
+-----END PGP SIGNATURE-----
+
+--J/zg8ciPNcraoWb6--
