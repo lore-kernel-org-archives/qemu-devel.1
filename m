@@ -1,26 +1,27 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:37274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gYqbp-0002Y7-QF
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 05:58:50 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gYqbw-0002Y7-Hb
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 05:59:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gYqa1-00007m-C2
+	(envelope-from <alex.bennee@linaro.org>) id 1gYqa0-000070-0U
 	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 05:56:58 -0500
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:39549)
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:40650)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gYqa1-00007O-5r
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 05:56:57 -0500
-Received: by mail-wr1-x436.google.com with SMTP id t27so11779150wra.6
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 02:56:57 -0800 (PST)
+	id 1gYqZz-00006U-QP
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 05:56:55 -0500
+Received: by mail-wm1-x336.google.com with SMTP id q26so12077886wmf.5
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 02:56:55 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 17 Dec 2018 10:56:40 +0000
-Message-Id: <20181217105650.27361-6-alex.bennee@linaro.org>
+Date: Mon, 17 Dec 2018 10:56:39 +0000
+Message-Id: <20181217105650.27361-5-alex.bennee@linaro.org>
 In-Reply-To: <20181217105650.27361-1-alex.bennee@linaro.org>
 References: <20181217105650.27361-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v3 05/15] target/tricore: use float32_is_denormal
+Subject: [Qemu-devel] [PULL v3 04/15] softfloat: add float{32, 64}_is_{de,
+ }normal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +31,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
+This paves the way for upcoming work.
+
 Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/target/tricore/fpu_helper.c b/target/tricore/fpu_helper.c
-index df162902d6..31df462e4a 100644
---- a/target/tricore/fpu_helper.c
-+++ b/target/tricore/fpu_helper.c
-@@ -44,11 +44,6 @@ static inline uint8_t f_get_excp_flags(CPUTriCoreState *env)
-               | float_flag_inexact);
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index 8fd9f9bbae..9eeccd88a5 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -464,6 +464,16 @@ static inline int float32_is_zero_or_denormal(float32 a)
+     return (float32_val(a) & 0x7f800000) == 0;
  }
  
--static inline bool f_is_denormal(float32 arg)
--{
--    return float32_is_zero_or_denormal(arg) && !float32_is_zero(arg);
--}
--
- static inline float32 f_maddsub_nan_result(float32 arg1, float32 arg2,
-                                            float32 arg3, float32 result,
-                                            uint32_t muladd_negate_c)
-@@ -260,8 +255,8 @@ uint32_t helper_fcmp(CPUTriCoreState *env, uint32_t r1, uint32_t r2)
-     set_flush_inputs_to_zero(0, &env->fp_status);
++static inline bool float32_is_normal(float32 a)
++{
++    return ((float32_val(a) + 0x00800000) & 0x7fffffff) >= 0x01000000;
++}
++
++static inline bool float32_is_denormal(float32 a)
++{
++    return float32_is_zero_or_denormal(a) && !float32_is_zero(a);
++}
++
+ static inline float32 float32_set_sign(float32 a, int sign)
+ {
+     return make_float32((float32_val(a) & 0x7fffffff) | (sign << 31));
+@@ -605,6 +615,16 @@ static inline int float64_is_zero_or_denormal(float64 a)
+     return (float64_val(a) & 0x7ff0000000000000LL) == 0;
+ }
  
-     result = 1 << (float32_compare_quiet(arg1, arg2, &env->fp_status) + 1);
--    result |= f_is_denormal(arg1) << 4;
--    result |= f_is_denormal(arg2) << 5;
-+    result |= float32_is_denormal(arg1) << 4;
-+    result |= float32_is_denormal(arg2) << 5;
- 
-     flags = f_get_excp_flags(env);
-     if (flags) {
++static inline bool float64_is_normal(float64 a)
++{
++    return ((float64_val(a) + (1ULL << 52)) & -1ULL >> 1) >= 1ULL << 53;
++}
++
++static inline bool float64_is_denormal(float64 a)
++{
++    return float64_is_zero_or_denormal(a) && !float64_is_zero(a);
++}
++
+ static inline float64 float64_set_sign(float64 a, int sign)
+ {
+     return make_float64((float64_val(a) & 0x7fffffffffffffffULL)
 -- 
 2.17.1
