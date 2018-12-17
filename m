@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gYnq8-0005LL-Oe
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 03:01:25 -0500
+	(envelope-from <clg@kaod.org>) id 1gYnrN-0005ur-4K
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 03:02:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gYnq2-0007J3-IB
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 03:01:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38004)
+	(envelope-from <clg@kaod.org>) id 1gYnrI-00008U-VL
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 03:02:41 -0500
+Received: from 8.mo179.mail-out.ovh.net ([46.105.75.26]:42769)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gYnpz-0007Dy-SF
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 03:01:17 -0500
-Date: Mon, 17 Dec 2018 09:00:59 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181217090104.3f113551@Igors-MacBook-Pro.local>
-In-Reply-To: <20181214131043.25071-3-david@redhat.com>
-References: <20181214131043.25071-1-david@redhat.com>
-	<20181214131043.25071-3-david@redhat.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gYnrI-000061-Lf
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 03:02:36 -0500
+Received: from player729.ha.ovh.net (unknown [10.109.143.220])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 1065A10BF53
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 09:02:34 +0100 (CET)
+References: <20181211223823.13770-1-clg@kaod.org>
+	<20181211223823.13770-8-clg@kaod.org>
+	<20181217052758.GC5597@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <0011604a-35bf-0797-507c-77cf283b418f@kaod.org>
+Date: Mon, 17 Dec 2018 09:02:13 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] memory-device: rewrite address
- assignment using ranges
+In-Reply-To: <20181217052758.GC5597@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v8 07/12] spapr: add an extra OV5 field to
+ the sPAPR IRQ backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,136 +33,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On Fri, 14 Dec 2018 14:10:43 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On 12/17/18 6:27 AM, David Gibson wrote:
+> On Tue, Dec 11, 2018 at 11:38:18PM +0100, C=E9dric Le Goater wrote:
+>> The interrupt modes supported by the hypervisor are advertised to the
+>> guest with new bits definitions of the option vector 5 of property
+>> "ibm,arch-vec-5-platform-support. The byte 23 bits 0-1 of the OV5 are
+>> defined as follow :
+>>
+>>   0b00   PAPR 2.7 and earlier (Legacy systems)
+>>   0b01   XIVE Exploitation mode only
+>>   0b10   Either available
+>>
+>> If the client/guest selects the XIVE interrupt mode, it informs the
+>> hypervisor by returning the value 0b01 in byte 23 bits 0-1. A 0b00
+>> value indicates the use of the XICS interrupt mode (Legacy systems).
+>>
+>> The sPAPR IRQ backend is extended with these definitions and the
+>> values are directly used to populate the "ibm,arch-vec-5-platform-supp=
+ort"
+>> property. The interrupt mode is advertised under TCG and under KVM.
+>> Although a KVM XIVE device is not yet available, the machine can still
+>> operate with kernel_irqchip=3Doff. However, we apply a restriction on
+>> the CPU which is required to be a POWER9 when a XIVE interrupt
+>> controller is in use.
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> ---
+>>
+>>  Changes since v7:
+>>
+>>  - improved commit log
+>>  - introduced a check on CPU type.
+>>
+>>  include/hw/ppc/spapr.h     |  6 ++++++
+>>  include/hw/ppc/spapr_irq.h |  1 +
+>>  hw/ppc/spapr.c             | 36 ++++++++++++++++++++++++++++++------
+>>  hw/ppc/spapr_irq.c         |  3 +++
+>>  4 files changed, 40 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>> index 6bf028a02fe2..06765b4e9d79 100644
+>> --- a/include/hw/ppc/spapr.h
+>> +++ b/include/hw/ppc/spapr.h
+>> @@ -824,5 +824,11 @@ int spapr_caps_post_migration(sPAPRMachineState *=
+spapr);
+>> =20
+>>  void spapr_check_pagesize(sPAPRMachineState *spapr, hwaddr pagesize,
+>>                            Error **errp);
+>> +/*
+>> + * XIVE definitions
+>> + */
+>> +#define SPAPR_OV5_XIVE_LEGACY   0x0
+>> +#define SPAPR_OV5_XIVE_EXPLOIT  0x40
+>> +#define SPAPR_OV5_XIVE_BOTH     0x80 /* Only to advertise on the plat=
+form */
+>> =20
+>>  #endif /* HW_SPAPR_H */
+>> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+>> index 63061a009b4c..b34d5a00381b 100644
+>> --- a/include/hw/ppc/spapr_irq.h
+>> +++ b/include/hw/ppc/spapr_irq.h
+>> @@ -33,6 +33,7 @@ void spapr_irq_msi_reset(sPAPRMachineState *spapr);
+>>  typedef struct sPAPRIrq {
+>>      uint32_t    nr_irqs;
+>>      uint32_t    nr_msis;
+>> +    uint8_t     ov5;
+>> =20
+>>      void (*init)(sPAPRMachineState *spapr, Error **errp);
+>>      int (*claim)(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
+*errp);
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index 57c0066edd56..ff138f224a87 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -1095,12 +1095,14 @@ static void spapr_dt_rtas(sPAPRMachineState *s=
+papr, void *fdt)
+>>      spapr_dt_rtas_tokens(fdt, rtas);
+>>  }
+>> =20
+>> -/* Prepare ibm,arch-vec-5-platform-support, which indicates the MMU f=
+eatures
+>> - * that the guest may request and thus the valid values for bytes 24.=
+.26 of
+>> - * option vector 5: */
+>> -static void spapr_dt_ov5_platform_support(void *fdt, int chosen)
+>> +/* Prepare ibm,arch-vec-5-platform-support, which indicates the MMU
+>> + * and the XIVE features that the guest may request and thus the vali=
+d
+>> + * values for bytes 23..26 of option vector 5: */
+>> +static void spapr_dt_ov5_platform_support(sPAPRMachineState *spapr, v=
+oid *fdt,
+>> +                                          int chosen)
+>>  {
+>>      PowerPCCPU *first_ppc_cpu =3D POWERPC_CPU(first_cpu);
+>> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+>> =20
+>>      char val[2 * 4] =3D {
+>>          23, 0x00, /* Xive mode, filled in below. */
+>> @@ -1111,9 +1113,17 @@ static void spapr_dt_ov5_platform_support(void =
+*fdt, int chosen)
+>> =20
+>>      if (!ppc_check_compat(first_ppc_cpu, CPU_POWERPC_LOGICAL_3_00, 0,
+>>                            first_ppc_cpu->compat_pvr)) {
+>> -        /* If we're in a pre POWER9 compat mode then the guest should=
+ do hash */
+>> +        /* If we're in a pre POWER9 compat mode then the guest should=
+ do hash
+>> +         * and use the legacy interrupt mode
+>> +         */
+>> +        val[1] =3D 0x00; /* XICS */
+>>          val[3] =3D 0x00; /* Hash */
+>>      } else if (kvm_enabled()) {
+>> +        /* If the KVM XIVE device is not available, the machine can
+>> +         * still operate with kernel_irqchip=3Doff
+>> +         */
+>> +        val[1] =3D smc->irq->ov5;
+>=20
+>=20
+> I know it means another layer of if, but I'd prefer to rearrange this
+> so setting the intc value is outside the if (kvm_enabled())..
 
-> Let's rewrite it properly using ranges. This fixes certain overflows that
-> are right now possible. E.g.
-> 
-> qemu-system-x86_64 -m 4G,slots=20,maxmem=40G -M pc \
->     -object memory-backend-file,id=mem1,share,mem-path=/dev/zero,size=2G
->     -device pc-dimm,memdev=mem1,id=dimm1,addr=-0x40000000
-> 
-> Now properly errors out instead of succeeding. (Note that qapi
-> parsing of huge uint64_t values is broken and fixes are on the way)
-> 
-> "can't add memory device [0xffffffffa0000000:0x80000000], usable range for
-> memory devices [0x140000000:0xe00000000]"
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+That's ok. I expected some discussion on the cpu->intc pointer and we=20
+have the cross build problem to fix also.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>> +
+>>          if (kvmppc_has_cap_mmu_radix() && kvmppc_has_cap_mmu_hash_v3(=
+)) {
+>>              val[3] =3D 0x80; /* OV5_MMU_BOTH */
+>>          } else if (kvmppc_has_cap_mmu_radix()) {
+>> @@ -1122,6 +1132,9 @@ static void spapr_dt_ov5_platform_support(void *=
+fdt, int chosen)
+>>              val[3] =3D 0x00; /* Hash */
+>>          }
+>>      } else {
+>> +        /* In TCG, the interrupt mode is defined by the pseries machi=
+ne */
+>> +        val[1] =3D smc->irq->ov5;
+>=20
+> ..rather than duplicated in each branch.
 
-> ---
->  hw/mem/memory-device.c | 51 +++++++++++++++++++++---------------------
->  1 file changed, 26 insertions(+), 25 deletions(-)
-> 
-> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-> index 8be63c8032..5f2c408036 100644
-> --- a/hw/mem/memory-device.c
-> +++ b/hw/mem/memory-device.c
-> @@ -100,9 +100,8 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
->                                              uint64_t align, uint64_t size,
->                                              Error **errp)
->  {
-> -    uint64_t address_space_start, address_space_end;
->      GSList *list = NULL, *item;
-> -    uint64_t new_addr = 0;
-> +    Range as, new = range_empty;
->  
->      if (!ms->device_memory) {
->          error_setg(errp, "memory devices (e.g. for memory hotplug) are not "
-> @@ -115,13 +114,11 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
->                           "enabled, please specify the maxmem option");
->          return 0;
->      }
-> -    address_space_start = ms->device_memory->base;
-> -    address_space_end = address_space_start +
-> -                        memory_region_size(&ms->device_memory->mr);
-> -    g_assert(address_space_end >= address_space_start);
-> +    range_init_nofail(&as, ms->device_memory->base,
-> +                      memory_region_size(&ms->device_memory->mr));
->  
-> -    /* address_space_start indicates the maximum alignment we expect */
-> -    if (!QEMU_IS_ALIGNED(address_space_start, align)) {
-> +    /* start of address space indicates the maximum alignment we expect */
-> +    if (!QEMU_IS_ALIGNED(range_lob(&as), align)) {
->          error_setg(errp, "the alignment (0x%" PRIx64 ") is not supported",
->                     align);
->          return 0;
-> @@ -145,20 +142,18 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
->      }
->  
->      if (hint) {
-> -        new_addr = *hint;
-> -        if (new_addr < address_space_start) {
-> +        if (range_init(&new, *hint, size) || !range_contains_range(&as, &new)) {
->              error_setg(errp, "can't add memory device [0x%" PRIx64 ":0x%" PRIx64
-> -                       "] before 0x%" PRIx64, new_addr, size,
-> -                       address_space_start);
-> -            return 0;
-> -        } else if ((new_addr + size) > address_space_end) {
-> -            error_setg(errp, "can't add memory device [0x%" PRIx64 ":0x%" PRIx64
-> -                       "] beyond 0x%" PRIx64, new_addr, size,
-> -                       address_space_end);
-> +                       "], usable range for memory devices [0x%" PRIx64 ":0x%"
-> +                       PRIx64 "]", *hint, size, range_lob(&as),
-> +                       range_size(&as));
->              return 0;
->          }
->      } else {
-> -        new_addr = address_space_start;
-> +        if (range_init(&new, range_lob(&as), size)) {
-> +            error_setg(errp, "can't add memory device, device too big");
-> +            return 0;
-> +        }
->      }
->  
->      /* find address range that will fit new memory device */
-> @@ -166,30 +161,36 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
->      for (item = list; item; item = g_slist_next(item)) {
->          const MemoryDeviceState *md = item->data;
->          const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(OBJECT(md));
-> -        uint64_t md_size, md_addr;
-> +        uint64_t next_addr;
-> +        Range tmp;
->  
-> -        md_addr = mdc->get_addr(md);
-> -        md_size = memory_device_get_region_size(md, &error_abort);
-> +        range_init_nofail(&tmp, mdc->get_addr(md),
-> +                          memory_device_get_region_size(md, &error_abort));
->  
-> -        if (ranges_overlap(md_addr, md_size, new_addr, size)) {
-> +        if (range_overlaps_range(&tmp, &new)) {
->              if (hint) {
->                  const DeviceState *d = DEVICE(md);
->                  error_setg(errp, "address range conflicts with memory device"
->                             " id='%s'", d->id ? d->id : "(unnamed)");
->                  goto out;
->              }
-> -            new_addr = QEMU_ALIGN_UP(md_addr + md_size, align);
-> +
-> +            next_addr = QEMU_ALIGN_UP(range_upb(&tmp) + 1, align);
-> +            if (!next_addr || range_init(&new, next_addr, range_size(&new))) {
-> +                range_make_empty(&new);
-> +                break;
-> +            }
->          }
->      }
->  
-> -    if (new_addr + size > address_space_end) {
-> +    if (!range_contains_range(&as, &new)) {
->          error_setg(errp, "could not find position in guest address space for "
->                     "memory device - memory fragmented due to alignments");
->          goto out;
->      }
->  out:
->      g_slist_free(list);
-> -    return new_addr;
-> +    return range_lob(&new);
->  }
->  
->  MemoryDeviceInfoList *qmp_memory_device_list(void)
+ok.
+
+Thanks,
+
+C.
+
+
+>> +
+>>          /* V3 MMU supports both hash and radix in tcg (with dynamic s=
+witching) */
+>>          val[3] =3D 0xC0;
+>>      }
+>> @@ -1189,7 +1202,7 @@ static void spapr_dt_chosen(sPAPRMachineState *s=
+papr, void *fdt)
+>>          _FDT(fdt_setprop_string(fdt, chosen, "stdout-path", stdout_pa=
+th));
+>>      }
+>> =20
+>> -    spapr_dt_ov5_platform_support(fdt, chosen);
+>> +    spapr_dt_ov5_platform_support(spapr, fdt, chosen);
+>> =20
+>>      g_free(stdout_path);
+>>      g_free(bootlist);
+>> @@ -2622,6 +2635,17 @@ static void spapr_machine_init(MachineState *ma=
+chine)
+>>      /* advertise support for ibm,dyamic-memory-v2 */
+>>      spapr_ovec_set(spapr->ov5, OV5_DRMEM_V2);
+>> =20
+>> +    /* advertise XIVE on POWER9 machines */
+>> +    if (smc->irq->ov5 & SPAPR_OV5_XIVE_EXPLOIT) {
+>> +        if (ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGI=
+CAL_3_00,
+>> +                                  0, spapr->max_compat_pvr)) {
+>> +            spapr_ovec_set(spapr->ov5, OV5_XIVE_EXPLOIT);
+>> +        } else {
+>> +            error_report("XIVE-only machines require a POWER9 CPU");
+>> +            exit(1);
+>> +        }
+>> +    }
+>> +
+>>      /* init CPUs */
+>>      spapr_init_cpus(spapr);
+>> =20
+>> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+>> index f835ea939cbf..79f06308995b 100644
+>> --- a/hw/ppc/spapr_irq.c
+>> +++ b/hw/ppc/spapr_irq.c
+>> @@ -216,6 +216,7 @@ static int spapr_irq_post_load_xics(sPAPRMachineSt=
+ate *spapr, int version_id)
+>>  sPAPRIrq spapr_irq_xics =3D {
+>>      .nr_irqs     =3D SPAPR_IRQ_XICS_NR_IRQS,
+>>      .nr_msis     =3D SPAPR_IRQ_XICS_NR_MSIS,
+>> +    .ov5         =3D SPAPR_OV5_XIVE_LEGACY,
+>> =20
+>>      .init        =3D spapr_irq_init_xics,
+>>      .claim       =3D spapr_irq_claim_xics,
+>> @@ -342,6 +343,7 @@ static void spapr_irq_reset_xive(sPAPRMachineState=
+ *spapr, Error **errp)
+>>  sPAPRIrq spapr_irq_xive =3D {
+>>      .nr_irqs     =3D SPAPR_IRQ_XIVE_NR_IRQS,
+>>      .nr_msis     =3D SPAPR_IRQ_XIVE_NR_MSIS,
+>> +    .ov5         =3D SPAPR_OV5_XIVE_EXPLOIT,
+>> =20
+>>      .init        =3D spapr_irq_init_xive,
+>>      .claim       =3D spapr_irq_claim_xive,
+>> @@ -466,6 +468,7 @@ int spapr_irq_find(sPAPRMachineState *spapr, int n=
+um, bool align, Error **errp)
+>>  sPAPRIrq spapr_irq_xics_legacy =3D {
+>>      .nr_irqs     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
+>>      .nr_msis     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
+>> +    .ov5         =3D SPAPR_OV5_XIVE_LEGACY,
+>> =20
+>>      .init        =3D spapr_irq_init_xics,
+>>      .claim       =3D spapr_irq_claim_xics,
+>=20
