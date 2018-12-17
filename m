@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gYnoI-0004S9-0i
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 02:59:30 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gYnq8-0005LL-Oe
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 03:01:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gYnoC-0004jZ-In
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 02:59:29 -0500
-Received: from 12.mo5.mail-out.ovh.net ([46.105.39.65]:55552)
+	(envelope-from <imammedo@redhat.com>) id 1gYnq2-0007J3-IB
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 03:01:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38004)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gYnoC-0004Vt-5D
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 02:59:24 -0500
-Received: from player738.ha.ovh.net (unknown [10.109.160.5])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 6AE2020B081
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 08:59:16 +0100 (CET)
-References: <20181215184222.15127-1-clg@kaod.org>
-	<20181217045022.GB5597@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <fe0dab0a-42a9-1a54-eb3d-57f6ab5a4ceb@kaod.org>
-Date: Mon, 17 Dec 2018 08:58:45 +0100
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gYnpz-0007Dy-SF
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 03:01:17 -0500
+Date: Mon, 17 Dec 2018 09:00:59 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181217090104.3f113551@Igors-MacBook-Pro.local>
+In-Reply-To: <20181214131043.25071-3-david@redhat.com>
+References: <20181214131043.25071-1-david@redhat.com>
+	<20181214131043.25071-3-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181217045022.GB5597@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: fix compilation breakage on
- windows
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 2/2] memory-device: rewrite address
+ assignment using ranges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,89 +28,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 12/17/18 5:50 AM, David Gibson wrote:
-> On Sat, Dec 15, 2018 at 07:42:22PM +0100, C=E9dric Le Goater wrote:
->> Fix the PPC_BIT definitions to use ULL instead in UL and replace
->> __builtin_ffssl() by the equivalent ctz routines.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>
->>  Compile tested with --cross-prefix=3Dx86_64-w64-mingw32-. When I have
->>  some more time, I might try runtime on windows also.
->=20
-> Which version of the mingw compiler do you have?  As I've noted
-> elsewhere, I haven't been able to reproduce the problem with the mingw
-> in Fedora 29.
+On Fri, 14 Dec 2018 14:10:43 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-I have :
+> Let's rewrite it properly using ranges. This fixes certain overflows that
+> are right now possible. E.g.
+> 
+> qemu-system-x86_64 -m 4G,slots=20,maxmem=40G -M pc \
+>     -object memory-backend-file,id=mem1,share,mem-path=/dev/zero,size=2G
+>     -device pc-dimm,memdev=mem1,id=dimm1,addr=-0x40000000
+> 
+> Now properly errors out instead of succeeding. (Note that qapi
+> parsing of huge uint64_t values is broken and fixes are on the way)
+> 
+> "can't add memory device [0xffffffffa0000000:0x80000000], usable range for
+> memory devices [0x140000000:0xe00000000]"
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-	mingw64-gcc-7.3.0-1.fc28.x86_64
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
->>  The PPC compile failures have been there for a while (pre 2.12) and
->>  the MASK_TO_LSH macro was not used until the XIVE definitions were
->>  introduced.
->>
->>  I let you guys decide on how you want to proceed, but I think it is
->>  safe to merge this patch as a prereq of the pull request.
->>
->>  Thanks,
->>
->>  C.
->>
->>  target/ppc/cpu.h | 10 +++++-----
->>  1 file changed, 5 insertions(+), 5 deletions(-)
->>
->> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
->> index ab68abe8a23c..a3d3e91eb4ce 100644
->> --- a/target/ppc/cpu.h
->> +++ b/target/ppc/cpu.h
->> @@ -70,18 +70,18 @@
->>  #define PPC_ELF_MACHINE     EM_PPC
->>  #endif
->> =20
->> -#define PPC_BIT(bit)            (0x8000000000000000UL >> (bit))
->> -#define PPC_BIT32(bit)          (0x80000000UL >> (bit))
->> -#define PPC_BIT8(bit)           (0x80UL >> (bit))
->> +#define PPC_BIT(bit)            (0x8000000000000000ULL >> (bit))
->> +#define PPC_BIT32(bit)          (0x80000000ULL >> (bit))
->> +#define PPC_BIT8(bit)           (0x80ULL >> (bit))
->=20
-> We shouldn't need the ULL for the 32-bit and (especially) 8-bit
-> versions.
->=20
->>  #define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_BI=
-T(bs))
->>  #define PPC_BITMASK32(bs, be)   ((PPC_BIT32(bs) - PPC_BIT32(be)) | \
->>                                   PPC_BIT32(bs))
->>  #define PPC_BITMASK8(bs, be)    ((PPC_BIT8(bs) - PPC_BIT8(be)) | PPC_=
-BIT8(bs))
->> =20
->>  #if HOST_LONG_BITS =3D=3D 32
->> -# define MASK_TO_LSH(m)          (__builtin_ffsll(m) - 1)
->> +# define MASK_TO_LSH(m)          ctz32(m)
->>  #elif HOST_LONG_BITS =3D=3D 64
->> -# define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
->> +# define MASK_TO_LSH(m)          ctz64(m)
->=20
-> Having another look at this, this seems bogus: we're defining an
-> interface that's only correct on a *host long*.  But when we use it
-> we're almost certain to be working on guest values with a fixed size,
-> so using this wrapper just adds confusion.
->=20
-> I'm not really seeing any reason to use MASK_TO_LSH() rather than
-> using ctz32() and ctz64() explicitly.
-
-Does that mean you think we should define GETFIELD32/64 and=20
-SETFIELD32/64 macros ?=20
-
-or should we use the extract32/64 and deposit32/64 helpers instead ? =20
-That's a bigger change but may be a better one. =20
-
-Also, in the definitions above, only PPC_BIT() needs to use a ULL.
-
-
-C.
+> ---
+>  hw/mem/memory-device.c | 51 +++++++++++++++++++++---------------------
+>  1 file changed, 26 insertions(+), 25 deletions(-)
+> 
+> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+> index 8be63c8032..5f2c408036 100644
+> --- a/hw/mem/memory-device.c
+> +++ b/hw/mem/memory-device.c
+> @@ -100,9 +100,8 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+>                                              uint64_t align, uint64_t size,
+>                                              Error **errp)
+>  {
+> -    uint64_t address_space_start, address_space_end;
+>      GSList *list = NULL, *item;
+> -    uint64_t new_addr = 0;
+> +    Range as, new = range_empty;
+>  
+>      if (!ms->device_memory) {
+>          error_setg(errp, "memory devices (e.g. for memory hotplug) are not "
+> @@ -115,13 +114,11 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+>                           "enabled, please specify the maxmem option");
+>          return 0;
+>      }
+> -    address_space_start = ms->device_memory->base;
+> -    address_space_end = address_space_start +
+> -                        memory_region_size(&ms->device_memory->mr);
+> -    g_assert(address_space_end >= address_space_start);
+> +    range_init_nofail(&as, ms->device_memory->base,
+> +                      memory_region_size(&ms->device_memory->mr));
+>  
+> -    /* address_space_start indicates the maximum alignment we expect */
+> -    if (!QEMU_IS_ALIGNED(address_space_start, align)) {
+> +    /* start of address space indicates the maximum alignment we expect */
+> +    if (!QEMU_IS_ALIGNED(range_lob(&as), align)) {
+>          error_setg(errp, "the alignment (0x%" PRIx64 ") is not supported",
+>                     align);
+>          return 0;
+> @@ -145,20 +142,18 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+>      }
+>  
+>      if (hint) {
+> -        new_addr = *hint;
+> -        if (new_addr < address_space_start) {
+> +        if (range_init(&new, *hint, size) || !range_contains_range(&as, &new)) {
+>              error_setg(errp, "can't add memory device [0x%" PRIx64 ":0x%" PRIx64
+> -                       "] before 0x%" PRIx64, new_addr, size,
+> -                       address_space_start);
+> -            return 0;
+> -        } else if ((new_addr + size) > address_space_end) {
+> -            error_setg(errp, "can't add memory device [0x%" PRIx64 ":0x%" PRIx64
+> -                       "] beyond 0x%" PRIx64, new_addr, size,
+> -                       address_space_end);
+> +                       "], usable range for memory devices [0x%" PRIx64 ":0x%"
+> +                       PRIx64 "]", *hint, size, range_lob(&as),
+> +                       range_size(&as));
+>              return 0;
+>          }
+>      } else {
+> -        new_addr = address_space_start;
+> +        if (range_init(&new, range_lob(&as), size)) {
+> +            error_setg(errp, "can't add memory device, device too big");
+> +            return 0;
+> +        }
+>      }
+>  
+>      /* find address range that will fit new memory device */
+> @@ -166,30 +161,36 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+>      for (item = list; item; item = g_slist_next(item)) {
+>          const MemoryDeviceState *md = item->data;
+>          const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(OBJECT(md));
+> -        uint64_t md_size, md_addr;
+> +        uint64_t next_addr;
+> +        Range tmp;
+>  
+> -        md_addr = mdc->get_addr(md);
+> -        md_size = memory_device_get_region_size(md, &error_abort);
+> +        range_init_nofail(&tmp, mdc->get_addr(md),
+> +                          memory_device_get_region_size(md, &error_abort));
+>  
+> -        if (ranges_overlap(md_addr, md_size, new_addr, size)) {
+> +        if (range_overlaps_range(&tmp, &new)) {
+>              if (hint) {
+>                  const DeviceState *d = DEVICE(md);
+>                  error_setg(errp, "address range conflicts with memory device"
+>                             " id='%s'", d->id ? d->id : "(unnamed)");
+>                  goto out;
+>              }
+> -            new_addr = QEMU_ALIGN_UP(md_addr + md_size, align);
+> +
+> +            next_addr = QEMU_ALIGN_UP(range_upb(&tmp) + 1, align);
+> +            if (!next_addr || range_init(&new, next_addr, range_size(&new))) {
+> +                range_make_empty(&new);
+> +                break;
+> +            }
+>          }
+>      }
+>  
+> -    if (new_addr + size > address_space_end) {
+> +    if (!range_contains_range(&as, &new)) {
+>          error_setg(errp, "could not find position in guest address space for "
+>                     "memory device - memory fragmented due to alignments");
+>          goto out;
+>      }
+>  out:
+>      g_slist_free(list);
+> -    return new_addr;
+> +    return range_lob(&new);
+>  }
+>  
+>  MemoryDeviceInfoList *qmp_memory_device_list(void)
