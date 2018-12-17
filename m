@@ -1,31 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gZ1aA-0004zY-WE
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:41:55 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gZ1cD-0006i0-2y
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:44:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gZ1a6-0004PJ-5C
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:41:50 -0500
-Received: from 6.mo5.mail-out.ovh.net ([178.32.119.138]:33539)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gZ1a5-0004Mt-NQ
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:41:46 -0500
-Received: from player157.ha.ovh.net (unknown [10.109.160.40])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id B97352043A2
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 23:41:40 +0100 (CET)
-References: <20181211223823.13770-1-clg@kaod.org>
-	<20181211223823.13770-10-clg@kaod.org>
-	<4a9ab4ce-c7d7-9744-e5ea-10df38806e9a@kaod.org>
-	<20181217060139.GG5597@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <6f685f79-56b2-7ea4-57b6-e1f21bd34326@kaod.org>
-Date: Mon, 17 Dec 2018 23:41:34 +0100
+	(envelope-from <mreitz@redhat.com>) id 1gZ1cB-0005sm-K0
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:43:56 -0500
+From: Max Reitz <mreitz@redhat.com>
+Date: Mon, 17 Dec 2018 23:43:17 +0100
+Message-Id: <20181217224348.14922-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181217060139.GG5597@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 09/12] spapr: set the interrupt
- presenter at reset
+Subject: [Qemu-devel] [PATCH v12 00/31] block: Fix some filename generation
+ issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,155 +21,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>
 
-On 12/17/18 7:01 AM, David Gibson wrote:
-> On Thu, Dec 13, 2018 at 01:52:14PM +0100, C=E9dric Le Goater wrote:
->> On 12/11/18 11:38 PM, C=E9dric Le Goater wrote:
->>> Currently, the interrupt presenter of the vCPU is set at realize
->>> time. Setting it at reset will become necessary when the new machine
->>> supporting both interrupt modes is introduced. In this machine, the
->>> interrupt mode is chosen at CAS time and activated after a reset.
->>
->> I think we need a second '->intc' pointer specific to XIVE instead.=20
->> How about ->intc_xive ?
->=20
-> Ah, interesting.  If we're going to need that, we might as well go
-> to specific ->icp and ->tctx pointers with the right types.
+Once more, I=E2=80=99ll spare both me and you another iteration of the co=
+ver
+letter, so I direct you to the previous version=E2=80=99s cover letter (w=
+hich
+will direct you further):
 
-Hmm, PowerPCCPU is defined under target/ppc and adding the type might=20
-add some noise. I will check.
+http://lists.nongnu.org/archive/html/qemu-block/2018-10/msg00229.html
 
-> I don't particularly like having those machine specific pointers
-> within the cpu structure, but we can look at fixing that later by
-> reviving my patches to move various machine specific stuff within the
-> cpu into a separate sub-allocation.
+There are only minor changes in this version.  Provided no major
+complaints arise, I intend to merge this series in the next month.
 
-ok.
 
-Thanks,
+git-backport-diff against v11:
 
-C.=20
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream pat=
+ch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
+tively
 
->>
->> We could just drop this patch and easly get rid of the XiveTCTX object=
-=20
->> leak in spapr_unrealize_vcpu().
->>
->> C.=20
->>
->>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->>> ---
->>>
->>>  Changes since v7:
->>>
->>>  - introduced spapr_irq_reset_xics().=20
->>>
->>>  include/hw/ppc/spapr_cpu_core.h |  2 ++
->>>  hw/ppc/spapr_cpu_core.c         | 26 ++++++++++++++++++++++++++
->>>  hw/ppc/spapr_irq.c              | 13 +++++++++++++
->>>  3 files changed, 41 insertions(+)
->>>
->>> diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_c=
-pu_core.h
->>> index 9e2821e4b31f..fc8ea9021656 100644
->>> --- a/include/hw/ppc/spapr_cpu_core.h
->>> +++ b/include/hw/ppc/spapr_cpu_core.h
->>> @@ -53,4 +53,6 @@ static inline sPAPRCPUState *spapr_cpu_state(PowerP=
-CCPU *cpu)
->>>      return (sPAPRCPUState *)cpu->machine_data;
->>>  }
->>> =20
->>> +void spapr_cpu_core_set_intc(PowerPCCPU *cpu, const char *intc_type)=
-;
->>> +
->>>  #endif
->>> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
->>> index 82666436e9b4..afc5d4f4e739 100644
->>> --- a/hw/ppc/spapr_cpu_core.c
->>> +++ b/hw/ppc/spapr_cpu_core.c
->>> @@ -397,3 +397,29 @@ static const TypeInfo spapr_cpu_core_type_infos[=
-] =3D {
->>>  };
->>> =20
->>>  DEFINE_TYPES(spapr_cpu_core_type_infos)
->>> +
->>> +typedef struct ForeachFindIntCArgs {
->>> +    const char *intc_type;
->>> +    Object *intc;
->>> +} ForeachFindIntCArgs;
->>> +
->>> +static int spapr_cpu_core_find_intc(Object *child, void *opaque)
->>> +{
->>> +    ForeachFindIntCArgs *args =3D opaque;
->>> +
->>> +    if (object_dynamic_cast(child, args->intc_type)) {
->>> +        args->intc =3D child;
->>> +    }
->>> +
->>> +    return args->intc !=3D NULL;
->>> +}
->>> +
->>> +void spapr_cpu_core_set_intc(PowerPCCPU *cpu, const char *intc_type)
->>> +{
->>> +    ForeachFindIntCArgs args =3D { intc_type, NULL };
->>> +
->>> +    object_child_foreach(OBJECT(cpu), spapr_cpu_core_find_intc, &arg=
-s);
->>> +    g_assert(args.intc);
->>> +
->>> +    cpu->intc =3D args.intc;
->>> +}
->>> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
->>> index 0999a2b2d69c..814500f22d34 100644
->>> --- a/hw/ppc/spapr_irq.c
->>> +++ b/hw/ppc/spapr_irq.c
->>> @@ -12,6 +12,7 @@
->>>  #include "qemu/error-report.h"
->>>  #include "qapi/error.h"
->>>  #include "hw/ppc/spapr.h"
->>> +#include "hw/ppc/spapr_cpu_core.h"
->>>  #include "hw/ppc/spapr_xive.h"
->>>  #include "hw/ppc/xics.h"
->>>  #include "sysemu/kvm.h"
->>> @@ -208,6 +209,15 @@ static int spapr_irq_post_load_xics(sPAPRMachine=
-State *spapr, int version_id)
->>>      return 0;
->>>  }
->>> =20
->>> +static void spapr_irq_reset_xics(sPAPRMachineState *spapr, Error **e=
-rrp)
->>> +{
->>> +   CPUState *cs;
->>> +
->>> +    CPU_FOREACH(cs) {
->>> +        spapr_cpu_core_set_intc(POWERPC_CPU(cs), spapr->icp_type);
->>> +    }
->>> +}
->>> +
->>>  #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
->>>  #define SPAPR_IRQ_XICS_NR_MSIS     \
->>>      (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
->>> @@ -225,6 +235,7 @@ sPAPRIrq spapr_irq_xics =3D {
->>>      .dt_populate =3D spapr_dt_xics,
->>>      .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
->>>      .post_load   =3D spapr_irq_post_load_xics,
->>> +    .reset       =3D spapr_irq_reset_xics,
->>>  };
->>> =20
->>>  /*
->>> @@ -325,6 +336,8 @@ static void spapr_irq_reset_xive(sPAPRMachineStat=
-e *spapr, Error **errp)
->>>      CPU_FOREACH(cs) {
->>>          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
->>> =20
->>> +        spapr_cpu_core_set_intc(cpu, TYPE_XIVE_TCTX);
->>> +
->>>          /* (TCG) Set the OS CAM line of the thread interrupt context=
-. */
->>>          spapr_xive_set_tctx_os_cam(XIVE_TCTX(cpu->intc));
->>>      }
->>>
->>
->=20
+001/31:[0015] [FC] 'block: Use bdrv_refresh_filename() to pull'
+002/31:[----] [--] 'block: Use children list in bdrv_refresh_filename'
+003/31:[----] [--] 'block: Skip implicit nodes for filename info'
+004/31:[----] [--] 'block: Add BDS.auto_backing_file'
+005/31:[----] [--] 'block: Respect backing bs in bdrv_refresh_filename'
+006/31:[----] [--] 'iotests.py: Add filter_imgfmt()'
+007/31:[----] [--] 'iotests.py: Add node_info()'
+008/31:[0072] [FC] 'iotests: Add test for backing file overrides'
+009/31:[----] [--] 'block: Make path_combine() return the path'
+010/31:[----] [-C] 'block: bdrv_get_full_backing_filename_from_...'s ret.=
+ val.'
+011/31:[----] [--] 'block: bdrv_get_full_backing_filename's ret. val.'
+012/31:[----] [--] 'block: Add bdrv_make_absolute_filename()'
+013/31:[----] [--] 'block: Fix bdrv_find_backing_image()'
+014/31:[----] [--] 'block: Add bdrv_dirname()'
+015/31:[----] [--] 'blkverify: Make bdrv_dirname() return NULL'
+016/31:[----] [--] 'quorum: Make bdrv_dirname() return NULL'
+017/31:[----] [--] 'block/nbd: Make bdrv_dirname() return NULL'
+018/31:[----] [--] 'block/nfs: Implement bdrv_dirname()'
+019/31:[----] [--] 'block: Use bdrv_dirname() for relative filenames'
+020/31:[----] [--] 'iotests: Add quorum case to test 110'
+021/31:[----] [--] 'block: Add strong_runtime_opts to BlockDriver'
+022/31:[----] [--] 'block: Add BlockDriver.bdrv_gather_child_options'
+023/31:[----] [--] 'block: Generically refresh runtime options'
+024/31:[----] [--] 'block: Purify .bdrv_refresh_filename()'
+025/31:[----] [--] 'block: Do not copy exact_filename from format file'
+026/31:[----] [--] 'block/nvme: Fix bdrv_refresh_filename()'
+027/31:[----] [--] 'block/curl: Harmonize option defaults'
+028/31:[----] [--] 'block/curl: Implement bdrv_refresh_filename()'
+029/31:[----] [--] 'block/null: Generate filename even with latency-ns'
+030/31:[----] [--] 'block: BDS options may lack the "driver" option'
+031/31:[0024] [FC] 'iotests: Test json:{} filenames of internal BDSs'
+
+
+v12:
+- Patch 1:
+  - Due to rebase, one hunk was dropped (vpc has one instance of
+    "bs->filename" less)
+  - I grepped through everything ("->filename") again and noticed I did
+    not refresh the filename before qemu-img.c's accesses to
+    bs->filename.  Now it probably isn't necessary to do this (because
+    we don't use complex graph features there, and even more so no graph
+    modifications can occur at runtime), but then again I believe it
+    doesn't hurt to refresh the filename even here.
+    So there are four additional hunks in qemu-img.c now.
+- Patches 8 and 31:
+  Had to adjust the reference output due to the Python2/3 compatibility
+  patches (kept the R-b, because the changes are obvious, I believe)
+
+
+Max Reitz (31):
+  block: Use bdrv_refresh_filename() to pull
+  block: Use children list in bdrv_refresh_filename
+  block: Skip implicit nodes for filename info
+  block: Add BDS.auto_backing_file
+  block: Respect backing bs in bdrv_refresh_filename
+  iotests.py: Add filter_imgfmt()
+  iotests.py: Add node_info()
+  iotests: Add test for backing file overrides
+  block: Make path_combine() return the path
+  block: bdrv_get_full_backing_filename_from_...'s ret. val.
+  block: bdrv_get_full_backing_filename's ret. val.
+  block: Add bdrv_make_absolute_filename()
+  block: Fix bdrv_find_backing_image()
+  block: Add bdrv_dirname()
+  blkverify: Make bdrv_dirname() return NULL
+  quorum: Make bdrv_dirname() return NULL
+  block/nbd: Make bdrv_dirname() return NULL
+  block/nfs: Implement bdrv_dirname()
+  block: Use bdrv_dirname() for relative filenames
+  iotests: Add quorum case to test 110
+  block: Add strong_runtime_opts to BlockDriver
+  block: Add BlockDriver.bdrv_gather_child_options
+  block: Generically refresh runtime options
+  block: Purify .bdrv_refresh_filename()
+  block: Do not copy exact_filename from format file
+  block/nvme: Fix bdrv_refresh_filename()
+  block/curl: Harmonize option defaults
+  block/curl: Implement bdrv_refresh_filename()
+  block/null: Generate filename even with latency-ns
+  block: BDS options may lack the "driver" option
+  iotests: Test json:{} filenames of internal BDSs
+
+ include/block/block.h         |  16 +-
+ include/block/block_int.h     |  48 +++-
+ block.c                       | 503 ++++++++++++++++++++++------------
+ block/blkdebug.c              |  70 ++---
+ block/blklogwrites.c          |  34 +--
+ block/blkverify.c             |  29 +-
+ block/commit.c                |   3 +-
+ block/crypto.c                |   8 +
+ block/curl.c                  |  55 +++-
+ block/gluster.c               |  19 ++
+ block/iscsi.c                 |  18 ++
+ block/mirror.c                |   3 +-
+ block/nbd.c                   |  46 ++--
+ block/nfs.c                   |  54 ++--
+ block/null.c                  |  32 ++-
+ block/nvme.c                  |  27 +-
+ block/qapi.c                  |  16 +-
+ block/qcow.c                  |  14 +-
+ block/qcow2.c                 |  17 +-
+ block/qed.c                   |   7 +-
+ block/quorum.c                |  71 +++--
+ block/raw-format.c            |  11 +-
+ block/rbd.c                   |  14 +
+ block/replication.c           |  10 +-
+ block/sheepdog.c              |  12 +
+ block/ssh.c                   |  12 +
+ block/throttle.c              |   7 +
+ block/vhdx-log.c              |   1 +
+ block/vmdk.c                  |  43 ++-
+ block/vpc.c                   |   7 +
+ block/vvfat.c                 |  12 +
+ block/vxhs.c                  |  11 +
+ blockdev.c                    |   8 +
+ qemu-img.c                    |  23 +-
+ tests/qemu-iotests/051.out    |   8 +-
+ tests/qemu-iotests/051.pc.out |   8 +-
+ tests/qemu-iotests/110        |  29 +-
+ tests/qemu-iotests/110.out    |   9 +-
+ tests/qemu-iotests/224        | 139 ++++++++++
+ tests/qemu-iotests/224.out    |  18 ++
+ tests/qemu-iotests/228        | 235 ++++++++++++++++
+ tests/qemu-iotests/228.out    |  84 ++++++
+ tests/qemu-iotests/group      |   2 +
+ tests/qemu-iotests/iotests.py |  10 +
+ 44 files changed, 1398 insertions(+), 405 deletions(-)
+ create mode 100755 tests/qemu-iotests/224
+ create mode 100644 tests/qemu-iotests/224.out
+ create mode 100755 tests/qemu-iotests/228
+ create mode 100644 tests/qemu-iotests/228.out
+
+--=20
+2.19.2
