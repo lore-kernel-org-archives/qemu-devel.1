@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52851)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=8828e3297=Paul.Durrant@citrix.com>)
-	id 1gYrGc-00048r-QX
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 06:41:00 -0500
+	id 1gYrGd-00048w-9t
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 06:41:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=8828e3297=Paul.Durrant@citrix.com>)
-	id 1gYrGa-0006ZT-3x
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 06:40:58 -0500
+	id 1gYrGb-0006aZ-Ou
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 06:40:59 -0500
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Mon, 17 Dec 2018 11:40:37 +0000
-Message-ID: <1545046848-14891-8-git-send-email-paul.durrant@citrix.com>
-In-Reply-To: <1545046848-14891-1-git-send-email-paul.durrant@citrix.com>
-References: <1545046848-14891-1-git-send-email-paul.durrant@citrix.com>
+Date: Mon, 17 Dec 2018 11:40:30 +0000
+Message-ID: <1545046848-14891-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v5 07/18] xen: add event channel interface for
- XenDevice-s
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 00/18] Xen PV backend 'qdevification'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,191 +23,135 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>
+Cc: Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Greg Kurz <groug@kaod.org>, Jason Wang <jasowang@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Tim Smith <tim.smith@citrix.com>
 
-The legacy PV backend infrastructure provides functions to bind, unbind
-and send notifications to event channnels. Similar functionality will be
-required by XenDevice implementations so this patch adds the necessary
-support.
+This series introduces a new QOM compliant framework for Xen PV backends.
+This is achieved by first moving the current non-compliant framework aside,
+before building up a new framework incrementally.
 
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
+This series was prompted by a thread [1] started by Kevin Wolf in response
+to patches against xen_disk.c posted by Tim Smith. Therefore, alongside
+the patches introducing the new framework, other patches build up a QOM
+compliant replacement for 'xen_disk', called 'xen-qdisk'. Patch #16 swaps
+this new device into place (having establisheda mechanism to auto-
+instantiate devices that is compliant with existing Xen toolstacks in
+patch #15) and patch #18 then removes the old xen_disk code.
+
+Subsequent series will port other Xen PV backends across to the new
+framework.
+
+The series is also available as a repository branch [2] on xenbits.xen.org.
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg00259.html
+[2] http://xenbits.xen.org/gitweb/?p=people/pauldu/qemu.git;a=shortlog;h=refs/heads/qom30
+
+Paul Durrant (18):
+  xen: re-name XenDevice to XenLegacyDevice...
+  xen: introduce new 'XenBus' and 'XenDevice' object hierarchy
+  xen: introduce 'xen-block', 'xen-disk' and 'xen-cdrom'
+  xen: create xenstore areas for XenDevice-s
+  xen: add xenstore watcher infrastructure
+  xen: add grant table interface for XenDevice-s
+  xen: add event channel interface for XenDevice-s
+  xen: duplicate xen_disk.c as basis of dataplane/xen-block.c
+  xen: remove unnecessary code from dataplane/xen-block.c
+  xen: add header and build dataplane/xen-block.c
+  xen: remove 'XenBlkDev' and 'blkdev' names from dataplane/xen-block
+  xen: remove 'ioreq' struct/varable/field names from
+    dataplane/xen-block.c
+  xen: purge 'blk' and 'ioreq' from function names in
+    dataplane/xen-block.c
+  xen: add implementations of xen-block connect and disconnect
+    functions...
+  xen: add a mechanism to automatically create XenDevice-s...
+  xen: automatically create XenBlockDevice-s
+  MAINTAINERS: add myself as a Xen maintainer
+  xen: remove the legacy 'xen_disk' backend
+
+ MAINTAINERS                         |    5 +-
+ hw/9pfs/xen-9p-backend.c            |   16 +-
+ hw/block/Makefile.objs              |    2 +-
+ hw/block/dataplane/Makefile.objs    |    1 +
+ hw/block/dataplane/xen-block.c      |  814 ++++++++++++++++++++++++
+ hw/block/dataplane/xen-block.h      |   29 +
+ hw/block/trace-events               |   14 +
+ hw/block/xen-block.c                | 1007 +++++++++++++++++++++++++++++
+ hw/block/xen_disk.c                 | 1011 -----------------------------
+ hw/char/xen_console.c               |   12 +-
+ hw/display/xenfb.c                  |   25 +-
+ hw/i386/xen/xen-hvm.c               |    5 +-
+ hw/i386/xen/xen-mapcache.c          |    2 +-
+ hw/i386/xen/xen_platform.c          |    2 +-
+ hw/net/xen_nic.c                    |   14 +-
+ hw/usb/xen-usb.c                    |   25 +-
+ hw/xen/Makefile.objs                |    2 +-
+ hw/xen/trace-events                 |   26 +
+ hw/xen/xen-backend.c                |  165 +++++
+ hw/xen/xen-bus-helper.c             |  184 ++++++
+ hw/xen/xen-bus.c                    | 1197 +++++++++++++++++++++++++++++++++++
+ hw/xen/xen-common.c                 |    2 +-
+ hw/xen/xen-legacy-backend.c         |  853 +++++++++++++++++++++++++
+ hw/xen/xen_backend.c                |  845 -------------------------
+ hw/xen/xen_devconfig.c              |    2 +-
+ hw/xen/xen_pt.c                     |    2 +-
+ hw/xen/xen_pt_config_init.c         |    2 +-
+ hw/xen/xen_pt_graphics.c            |    2 +-
+ hw/xen/xen_pt_msi.c                 |    2 +-
+ hw/xen/xen_pvdev.c                  |   20 +-
+ hw/xenpv/xen_domainbuild.c          |    2 +-
+ hw/xenpv/xen_machine_pv.c           |    5 +-
+ include/hw/xen/xen-backend.h        |   39 ++
+ include/hw/xen/xen-block.h          |   95 +++
+ include/hw/xen/xen-bus-helper.h     |   45 ++
+ include/hw/xen/xen-bus.h            |  138 ++++
+ include/hw/xen/xen-legacy-backend.h |  104 +++
+ include/hw/xen/xen_backend.h        |   99 ---
+ include/hw/xen/xen_pvdev.h          |   38 +-
+ include/qemu/module.h               |    3 +
+ 40 files changed, 4814 insertions(+), 2042 deletions(-)
+ create mode 100644 hw/block/dataplane/xen-block.c
+ create mode 100644 hw/block/dataplane/xen-block.h
+ create mode 100644 hw/block/xen-block.c
+ delete mode 100644 hw/block/xen_disk.c
+ create mode 100644 hw/xen/xen-backend.c
+ create mode 100644 hw/xen/xen-bus-helper.c
+ create mode 100644 hw/xen/xen-bus.c
+ create mode 100644 hw/xen/xen-legacy-backend.c
+ delete mode 100644 hw/xen/xen_backend.c
+ create mode 100644 include/hw/xen/xen-backend.h
+ create mode 100644 include/hw/xen/xen-block.h
+ create mode 100644 include/hw/xen/xen-bus-helper.h
+ create mode 100644 include/hw/xen/xen-bus.h
+ create mode 100644 include/hw/xen/xen-legacy-backend.h
+ delete mode 100644 include/hw/xen/xen_backend.h
 ---
+Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: "Marc-André Lureau" <marcandre.lureau@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Max Reitz <mreitz@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Tim Smith <tim.smith@citrix.com>
+
+v5:
+ - Re-worked backend auto-creation
+
+v4:
+ - Add missing boilerplate fix
+
+v3:
+ - Various fixes, including unplug
 
 v2:
- - Added error pointers to notify and unbind
----
- hw/xen/xen-bus.c         | 101 +++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/xen/xen-bus.h |  18 +++++++++
- 2 files changed, 119 insertions(+)
+ - Fix boilerplates of introduced files and leave existing ones alone
 
-diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-index faa9fd3..9443f27 100644
---- a/hw/xen/xen-bus.c
-+++ b/hw/xen/xen-bus.c
-@@ -617,6 +617,81 @@ done:
-     g_free(xengnttab_segs);
- }
- 
-+struct XenEventChannel {
-+    unsigned int local_port;
-+    XenEventHandler handler;
-+    void *opaque;
-+    Notifier notifier;
-+};
-+
-+static void event_notify(Notifier *n, void *data)
-+{
-+    XenEventChannel *channel = container_of(n, XenEventChannel, notifier);
-+    unsigned long port = (unsigned long)data;
-+
-+    if (port == channel->local_port) {
-+        channel->handler(channel->opaque);
-+    }
-+}
-+
-+XenEventChannel *xen_device_bind_event_channel(XenDevice *xendev,
-+                                               unsigned int port,
-+                                               XenEventHandler handler,
-+                                               void *opaque, Error **errp)
-+{
-+    XenEventChannel *channel = g_new0(XenEventChannel, 1);
-+
-+    channel->local_port = xenevtchn_bind_interdomain(xendev->xeh,
-+                                                     xendev->frontend_id,
-+                                                     port);
-+    if (xendev->local_port < 0) {
-+        error_setg_errno(errp, errno, "xenevtchn_bind_interdomain failed");
-+
-+        g_free(channel);
-+        return NULL;
-+    }
-+
-+    channel->handler = handler;
-+    channel->opaque = opaque;
-+    channel->notifier.notify = event_notify;
-+
-+    notifier_list_add(&xendev->event_notifiers, &channel->notifier);
-+
-+    return channel;
-+}
-+
-+void xen_device_notify_event_channel(XenDevice *xendev,
-+                                     XenEventChannel *channel,
-+                                     Error **errp)
-+{
-+    if (!channel) {
-+        error_setg(errp, "bad channel");
-+        return;
-+    }
-+
-+    if (xenevtchn_notify(xendev->xeh, channel->local_port) < 0) {
-+        error_setg_errno(errp, errno, "xenevtchn_notify failed");
-+    }
-+}
-+
-+void xen_device_unbind_event_channel(XenDevice *xendev,
-+                                     XenEventChannel *channel,
-+                                     Error **errp)
-+{
-+    if (!channel) {
-+        error_setg(errp, "bad channel");
-+        return;
-+    }
-+
-+    notifier_remove(&channel->notifier);
-+
-+    if (xenevtchn_unbind(xendev->xeh, channel->local_port) < 0) {
-+        error_setg_errno(errp, errno, "xenevtchn_unbind failed");
-+    }
-+
-+    g_free(channel);
-+}
-+
- static void xen_device_unrealize(DeviceState *dev, Error **errp)
- {
-     XenDevice *xendev = XEN_DEVICE(dev);
-@@ -641,6 +716,12 @@ static void xen_device_unrealize(DeviceState *dev, Error **errp)
-     xen_device_frontend_destroy(xendev);
-     xen_device_backend_destroy(xendev);
- 
-+    if (xendev->xeh) {
-+        qemu_set_fd_handler(xenevtchn_fd(xendev->xeh), NULL, NULL, NULL);
-+        xenevtchn_close(xendev->xeh);
-+        xendev->xeh = NULL;
-+    }
-+
-     if (xendev->xgth) {
-         xengnttab_close(xendev->xgth);
-         xendev->xgth = NULL;
-@@ -657,6 +738,16 @@ static void xen_device_exit(Notifier *n, void *data)
-     xen_device_unrealize(DEVICE(xendev), &error_abort);
- }
- 
-+static void xen_device_event(void *opaque)
-+{
-+    XenDevice *xendev = opaque;
-+    unsigned long port = xenevtchn_pending(xendev->xeh);
-+
-+    notifier_list_notify(&xendev->event_notifiers, (void *)port);
-+
-+    xenevtchn_unmask(xendev->xeh, port);
-+}
-+
- static void xen_device_realize(DeviceState *dev, Error **errp)
- {
-     XenDevice *xendev = XEN_DEVICE(dev);
-@@ -697,6 +788,16 @@ static void xen_device_realize(DeviceState *dev, Error **errp)
-     xendev->feature_grant_copy =
-         (xengnttab_grant_copy(xendev->xgth, 0, NULL) == 0);
- 
-+    xendev->xeh = xenevtchn_open(NULL, 0);
-+    if (!xendev->xeh) {
-+        error_setg_errno(errp, errno, "failed xenevtchn_open");
-+        goto unrealize;
-+    }
-+
-+    notifier_list_init(&xendev->event_notifiers);
-+    qemu_set_fd_handler(xenevtchn_fd(xendev->xeh), xen_device_event, NULL,
-+                        xendev);
-+
-     xen_device_backend_create(xendev, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-index 63a09b6..f83a95c 100644
---- a/include/hw/xen/xen-bus.h
-+++ b/include/hw/xen/xen-bus.h
-@@ -26,6 +26,9 @@ typedef struct XenDevice {
-     XenWatch *frontend_state_watch;
-     xengnttab_handle *xgth;
-     bool feature_grant_copy;
-+    xenevtchn_handle *xeh;
-+    xenevtchn_port_or_error_t local_port;
-+    NotifierList event_notifiers;
- } XenDevice;
- 
- typedef char *(*XenDeviceGetName)(XenDevice *xendev, Error **errp);
-@@ -104,4 +107,19 @@ void xen_device_copy_grant_refs(XenDevice *xendev, bool to_domain,
-                                 XenDeviceGrantCopySegment segs[],
-                                 unsigned int nr_segs, Error **errp);
- 
-+typedef struct XenEventChannel XenEventChannel;
-+
-+typedef void (*XenEventHandler)(void *opaque);
-+
-+XenEventChannel *xen_device_bind_event_channel(XenDevice *xendev,
-+                                               unsigned int port,
-+                                               XenEventHandler handler,
-+                                               void *opaque, Error **errp);
-+void xen_device_notify_event_channel(XenDevice *xendev,
-+                                     XenEventChannel *channel,
-+                                     Error **errp);
-+void xen_device_unbind_event_channel(XenDevice *xendev,
-+                                     XenEventChannel *channel,
-+                                     Error **errp);
-+
- #endif /* HW_XEN_BUS_H */
 -- 
 2.1.4
