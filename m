@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <remy.noel@blade-group.com>) id 1gYw79-0004Ux-Pp
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:51:33 -0500
+	(envelope-from <thuth@redhat.com>) id 1gYwDO-0006gT-DS
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:57:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <remy.noel@blade-group.com>) id 1gYw74-0000ct-ME
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:51:31 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51306)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <remy.noel@blade-group.com>)
-	id 1gYw74-0000bm-Cy
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:51:26 -0500
-Received: by mail-wm1-x341.google.com with SMTP id s14so13072669wmh.1
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 08:51:26 -0800 (PST)
-From: remy.noel@blade-group.com
-Date: Mon, 17 Dec 2018 17:48:47 +0100
-Message-Id: <20181217164847.24411-1-remy.noel@blade-group.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [QEMU-devel][PATCH v3] aio-posix: Fix concurrent
- aio_poll/set_fd_handler.
+	(envelope-from <thuth@redhat.com>) id 1gYwDJ-0008PU-WA
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:57:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47798)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gYwDI-0008Lg-3E
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:57:53 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon, 17 Dec 2018 17:57:37 +0100
+Message-Id: <1545065857-31164-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [QEMU PATCH] hw/i386: Remove deprecated machines
+ pc-0.10 and pc-0.11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,264 +22,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Remy Noel <remy.noel@blade-group.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Weil <sw@weilnetz.de>, "open list:Block I/O path" <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, libvir-list@redhat.com
 
-From: Remy Noel <remy.noel@blade-group.com>
+They've been deprecated for two releases and nobody complained that they
+are still required anymore, so it's time to remove these now.
+And while we're at it, mark the other remaining old 0.x machine types
+as deprecated (since they can not properly be used for live-migration
+anyway).
 
-It is possible for an io_poll callback to be concurrently executed along
-with an aio_set_fd_handlers. This can cause all sorts of problems, like
-a NULL callback or a bad opaque pointer.
-
-This changes set_fd_handlers so that it no longer modify existing handlers
-entries and instead, always insert those after having proper initialisation.
-
-Also, we do not call aio_epoll_update for deleted handlers as this has
-no impact whatsoever.
-
-Signed-off-by: Remy Noel <remy.noel@blade-group.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- util/aio-posix.c | 86 ++++++++++++++++++++++++++++--------------------
- util/aio-win32.c | 67 ++++++++++++++++---------------------
- 2 files changed, 79 insertions(+), 74 deletions(-)
+ hw/i386/pc_piix.c     | 70 ++-------------------------------------------------
+ qemu-deprecated.texi  |  2 +-
+ tests/cpu-plug-test.c |  4 +--
+ 3 files changed, 4 insertions(+), 72 deletions(-)
 
-diff --git a/util/aio-posix.c b/util/aio-posix.c
-index 51c41ed3c9..d658cf3007 100644
---- a/util/aio-posix.c
-+++ b/util/aio-posix.c
-@@ -200,6 +200,31 @@ static AioHandler *find_aio_handler(AioContext *ctx, int fd)
-     return NULL;
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 6981cfa..7653fbb 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -368,7 +368,7 @@ static void pc_compat_1_2(MachineState *machine)
+     x86_cpu_change_kvm_default("kvm-pv-eoi", NULL);
  }
  
-+static bool aio_remove_fd_handler(AioContext *ctx, AioHandler *node)
-+{
-+    /* If the GSource is in the process of being destroyed then
-+     * g_source_remove_poll() causes an assertion failure.  Skip
-+     * removal in that case, because glib cleans up its state during
-+     * destruction anyway.
-+     */
-+    if (!g_source_is_destroyed(&ctx->source)) {
-+        g_source_remove_poll(&ctx->source, &node->pfd);
-+    }
-+
-+    /* If a read is in progress, just mark the node as deleted */
-+    if (qemu_lockcnt_count(&ctx->list_lock)) {
-+        node->deleted = 1;
-+        node->pfd.revents = 0;
-+        return false;
-+    }
-+    /* Otherwise, delete it for real.  We can't just mark it as
-+     * deleted because deleted nodes are only cleaned up while
-+     * no one is walking the handlers list.
-+     */
-+    QLIST_REMOVE(node, node);
-+    return true;
-+}
-+
- void aio_set_fd_handler(AioContext *ctx,
-                         int fd,
-                         bool is_external,
-@@ -209,6 +234,7 @@ void aio_set_fd_handler(AioContext *ctx,
-                         void *opaque)
+-/* PC compat function for pc-0.10 to pc-0.13 */
++/* PC compat function for pc-0.12 and pc-0.13 */
+ static void pc_compat_0_13(MachineState *machine)
  {
-     AioHandler *node;
-+    AioHandler *new_node = NULL;
-     bool is_new = false;
-     bool deleted = false;
-     int poll_disable_change;
-@@ -223,50 +249,36 @@ void aio_set_fd_handler(AioContext *ctx,
-             qemu_lockcnt_unlock(&ctx->list_lock);
-             return;
-         }
--
--        /* If the GSource is in the process of being destroyed then
--         * g_source_remove_poll() causes an assertion failure.  Skip
--         * removal in that case, because glib cleans up its state during
--         * destruction anyway.
--         */
--        if (!g_source_is_destroyed(&ctx->source)) {
--            g_source_remove_poll(&ctx->source, &node->pfd);
--        }
--
--        /* If a read is in progress, just mark the node as deleted */
--        if (qemu_lockcnt_count(&ctx->list_lock)) {
--            node->deleted = 1;
--            node->pfd.revents = 0;
--        } else {
--            /* Otherwise, delete it for real.  We can't just mark it as
--             * deleted because deleted nodes are only cleaned up while
--             * no one is walking the handlers list.
--             */
--            QLIST_REMOVE(node, node);
--            deleted = true;
--        }
-         poll_disable_change = -!node->io_poll;
-     } else {
-         poll_disable_change = !io_poll - (node && !node->io_poll);
-         if (node == NULL) {
--            /* Alloc and insert if it's not already there */
--            node = g_new0(AioHandler, 1);
--            node->pfd.fd = fd;
--            QLIST_INSERT_HEAD_RCU(&ctx->aio_handlers, node, node);
--
--            g_source_add_poll(&ctx->source, &node->pfd);
-             is_new = true;
-         }
-+        /* Alloc and insert if it's not already there */
-+        new_node = g_new0(AioHandler, 1);
- 
-         /* Update handler with latest information */
--        node->io_read = io_read;
--        node->io_write = io_write;
--        node->io_poll = io_poll;
--        node->opaque = opaque;
--        node->is_external = is_external;
-+        new_node->io_read = io_read;
-+        new_node->io_write = io_write;
-+        new_node->io_poll = io_poll;
-+        new_node->opaque = opaque;
-+        new_node->is_external = is_external;
-+
-+        if (is_new) {
-+            new_node->pfd.fd = fd;
-+        } else {
-+            new_node->pfd = node->pfd;
-+        }
-+        g_source_add_poll(&ctx->source, &new_node->pfd);
-+
-+        new_node->pfd.events = (io_read ? G_IO_IN | G_IO_HUP | G_IO_ERR : 0);
-+        new_node->pfd.events |= (io_write ? G_IO_OUT | G_IO_ERR : 0);
- 
--        node->pfd.events = (io_read ? G_IO_IN | G_IO_HUP | G_IO_ERR : 0);
--        node->pfd.events |= (io_write ? G_IO_OUT | G_IO_ERR : 0);
-+        QLIST_INSERT_HEAD_RCU(&ctx->aio_handlers, new_node, node);
-+    }
-+    if (node) {
-+        deleted = aio_remove_fd_handler(ctx, node);
-     }
- 
-     /* No need to order poll_disable_cnt writes against other updates;
-@@ -278,7 +290,9 @@ void aio_set_fd_handler(AioContext *ctx,
-     atomic_set(&ctx->poll_disable_cnt,
-                atomic_read(&ctx->poll_disable_cnt) + poll_disable_change);
- 
--    aio_epoll_update(ctx, node, is_new);
-+    if (new_node) {
-+        aio_epoll_update(ctx, new_node, is_new);
-+    }
-     qemu_lockcnt_unlock(&ctx->list_lock);
-     aio_notify(ctx);
- 
-diff --git a/util/aio-win32.c b/util/aio-win32.c
-index c58957cc4b..a23b9c364d 100644
---- a/util/aio-win32.c
-+++ b/util/aio-win32.c
-@@ -35,6 +35,22 @@ struct AioHandler {
-     QLIST_ENTRY(AioHandler) node;
- };
- 
-+static void aio_remove_fd_handler(AioContext *ctx, AioHandler *node)
-+{
-+    /* If aio_poll is in progress, just mark the node as deleted */
-+    if (qemu_lockcnt_count(&ctx->list_lock)) {
-+        node->deleted = 1;
-+        node->pfd.revents = 0;
-+    } else {
-+        /* Otherwise, delete it for real.  We can't just mark it as
-+         * deleted because deleted nodes are only cleaned up after
-+         * releasing the list_lock.
-+         */
-+        QLIST_REMOVE(node, node);
-+        g_free(node);
-+    }
-+}
-+
- void aio_set_fd_handler(AioContext *ctx,
-                         int fd,
-                         bool is_external,
-@@ -44,41 +60,23 @@ void aio_set_fd_handler(AioContext *ctx,
-                         void *opaque)
+     pc_compat_1_2(machine);
+@@ -834,6 +834,7 @@ static void pc_i440fx_0_15_machine_options(MachineClass *m)
  {
-     /* fd is a SOCKET in our case */
--    AioHandler *node;
-+    AioHandler *old_node;
-+    AioHandler *node = NULL;
+     pc_i440fx_1_0_machine_options(m);
+     m->hw_version = "0.15";
++    m->deprecation_reason = "use a newer machine type instead";
+     SET_MACHINE_COMPAT(m, PC_COMPAT_0_15);
+ }
  
-     qemu_lockcnt_lock(&ctx->list_lock);
--    QLIST_FOREACH(node, &ctx->aio_handlers, node) {
--        if (node->pfd.fd == fd && !node->deleted) {
-+    QLIST_FOREACH(old_node, &ctx->aio_handlers, node) {
-+        if (old_node->pfd.fd == fd && !old_node->deleted) {
-             break;
-         }
-     }
+@@ -951,73 +952,6 @@ static void pc_i440fx_0_12_machine_options(MachineClass *m)
+ DEFINE_I440FX_MACHINE(v0_12, "pc-0.12", pc_compat_0_13,
+                       pc_i440fx_0_12_machine_options);
  
--    /* Are we deleting the fd handler? */
--    if (!io_read && !io_write) {
--        if (node) {
--            /* If aio_poll is in progress, just mark the node as deleted */
--            if (qemu_lockcnt_count(&ctx->list_lock)) {
--                node->deleted = 1;
--                node->pfd.revents = 0;
--            } else {
--                /* Otherwise, delete it for real.  We can't just mark it as
--                 * deleted because deleted nodes are only cleaned up after
--                 * releasing the list_lock.
--                 */
--                QLIST_REMOVE(node, node);
--                g_free(node);
--            }
--        }
--    } else {
-+    if (io_read || io_write) {
-         HANDLE event;
-         long bitmask = 0;
+-
+-#define PC_COMPAT_0_11 \
+-        PC_CPU_MODEL_IDS("0.11") \
+-        {\
+-            .driver   = "virtio-blk-pci",\
+-            .property = "vectors",\
+-            .value    = stringify(0),\
+-        },{\
+-            .driver   = TYPE_PCI_DEVICE,\
+-            .property = "rombar",\
+-            .value    = stringify(0),\
+-        },{\
+-            .driver   = "ide-drive",\
+-            .property = "ver",\
+-            .value    = "0.11",\
+-        },{\
+-            .driver   = "scsi-disk",\
+-            .property = "ver",\
+-            .value    = "0.11",\
+-        },
+-
+-static void pc_i440fx_0_11_machine_options(MachineClass *m)
+-{
+-    pc_i440fx_0_12_machine_options(m);
+-    m->hw_version = "0.11";
+-    m->deprecation_reason = "use a newer machine type instead";
+-    SET_MACHINE_COMPAT(m, PC_COMPAT_0_11);
+-}
+-
+-DEFINE_I440FX_MACHINE(v0_11, "pc-0.11", pc_compat_0_13,
+-                      pc_i440fx_0_11_machine_options);
+-
+-
+-#define PC_COMPAT_0_10 \
+-    PC_CPU_MODEL_IDS("0.10") \
+-    {\
+-        .driver   = "virtio-blk-pci",\
+-        .property = "class",\
+-        .value    = stringify(PCI_CLASS_STORAGE_OTHER),\
+-    },{\
+-        .driver   = "virtio-serial-pci",\
+-        .property = "class",\
+-        .value    = stringify(PCI_CLASS_DISPLAY_OTHER),\
+-    },{\
+-        .driver   = "virtio-net-pci",\
+-        .property = "vectors",\
+-        .value    = stringify(0),\
+-    },{\
+-        .driver   = "ide-drive",\
+-        .property = "ver",\
+-        .value    = "0.10",\
+-    },{\
+-        .driver   = "scsi-disk",\
+-        .property = "ver",\
+-        .value    = "0.10",\
+-    },
+-
+-static void pc_i440fx_0_10_machine_options(MachineClass *m)
+-{
+-    pc_i440fx_0_11_machine_options(m);
+-    m->hw_version = "0.10";
+-    SET_MACHINE_COMPAT(m, PC_COMPAT_0_10);
+-}
+-
+-DEFINE_I440FX_MACHINE(v0_10, "pc-0.10", pc_compat_0_13,
+-                      pc_i440fx_0_10_machine_options);
+-
+ typedef struct {
+     uint16_t gpu_device_id;
+     uint16_t pch_device_id;
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 2912084..190250f 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -124,7 +124,7 @@ their usecases.
  
--        if (node == NULL) {
--            /* Alloc and insert if it's not already there */
--            node = g_new0(AioHandler, 1);
--            node->pfd.fd = fd;
--            QLIST_INSERT_HEAD_RCU(&ctx->aio_handlers, node, node);
--        }
-+        /* Alloc and insert if it's not already there */
-+        node = g_new0(AioHandler, 1);
-+        node->pfd.fd = fd;
+ @section System emulator machines
  
-         node->pfd.events = 0;
-         if (node->io_read) {
-@@ -104,9 +102,13 @@ void aio_set_fd_handler(AioContext *ctx,
-             bitmask |= FD_WRITE | FD_CONNECT;
-         }
+-@subsection pc-0.10 and pc-0.11 (since 3.0)
++@subsection pc-0.12, pc-0.13, pc-0.14 and pc-0.15 (since 4.0)
  
-+        QLIST_INSERT_HEAD_RCU(&ctx->aio_handlers, node, node);
-         event = event_notifier_get_handle(&ctx->notifier);
-         WSAEventSelect(node->pfd.fd, event, bitmask);
-     }
-+    if (old_node) {
-+        aio_remove_fd_handler(ctx, old_node);
-+    }
- 
-     qemu_lockcnt_unlock(&ctx->list_lock);
-     aio_notify(ctx);
-@@ -139,18 +141,7 @@ void aio_set_event_notifier(AioContext *ctx,
-         if (node) {
-             g_source_remove_poll(&ctx->source, &node->pfd);
- 
--            /* aio_poll is in progress, just mark the node as deleted */
--            if (qemu_lockcnt_count(&ctx->list_lock)) {
--                node->deleted = 1;
--                node->pfd.revents = 0;
--            } else {
--                /* Otherwise, delete it for real.  We can't just mark it as
--                 * deleted because deleted nodes are only cleaned up after
--                 * releasing the list_lock.
--                 */
--                QLIST_REMOVE(node, node);
--                g_free(node);
--            }
-+            aio_remove_fd_handler(ctx, node);
-         }
-     } else {
-         if (node == NULL) {
+ These machine types are very old and likely can not be used for live migration
+ from old QEMU versions anymore. A newer machine type should be used instead.
+diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
+index f4a677d..668f001 100644
+--- a/tests/cpu-plug-test.c
++++ b/tests/cpu-plug-test.c
+@@ -157,9 +157,7 @@ static void add_pc_test_case(const char *mname)
+         (strcmp(mname, "pc-0.15") == 0) ||
+         (strcmp(mname, "pc-0.14") == 0) ||
+         (strcmp(mname, "pc-0.13") == 0) ||
+-        (strcmp(mname, "pc-0.12") == 0) ||
+-        (strcmp(mname, "pc-0.11") == 0) ||
+-        (strcmp(mname, "pc-0.10") == 0)) {
++        (strcmp(mname, "pc-0.12") == 0)) {
+         path = g_strdup_printf("cpu-plug/%s/init/%ux%ux%u&maxcpus=%u",
+                                mname, data->sockets, data->cores,
+                                data->threads, data->maxcpus);
 -- 
-2.19.2
+1.8.3.1
