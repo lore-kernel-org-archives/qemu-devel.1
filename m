@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gYqf9-0005Rj-MT
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 06:02:21 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1gYqwW-0002w1-A5
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 06:20:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gYqf4-00047E-HO
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 06:02:14 -0500
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:40695)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gYqf4-00046h-AT
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 06:02:10 -0500
-Received: by mail-wm1-x336.google.com with SMTP id q26so12097184wmf.5
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 03:02:10 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 17 Dec 2018 10:56:48 +0000
-Message-Id: <20181217105650.27361-14-alex.bennee@linaro.org>
-In-Reply-To: <20181217105650.27361-1-alex.bennee@linaro.org>
-References: <20181217105650.27361-1-alex.bennee@linaro.org>
+	(envelope-from <arei.gonglei@huawei.com>) id 1gYqwS-0006ES-LO
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 06:20:12 -0500
+Received: from szxga08-in.huawei.com ([45.249.212.255]:50129 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
+	id 1gYqwR-00068E-9c
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 06:20:07 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Mon, 17 Dec 2018 11:19:49 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DB1D1315@dggeml531-mbs.china.huawei.com>
+References: <1542746383-18288-1-git-send-email-kwankhede@nvidia.com>
+	<1542746383-18288-4-git-send-email-kwankhede@nvidia.com>
+In-Reply-To: <1542746383-18288-4-git-send-email-kwankhede@nvidia.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v3 13/15] hardfloat: implement float32/64 fused
- multiply-add
+Subject: Re: [Qemu-devel] [PATCH 3/5] Add migration functions for VFIO
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,200 +30,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Kirti Wankhede <kwankhede@nvidia.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "cjia@nvidia.com" <cjia@nvidia.com>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "yi.l.liu@intel.com" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>, "ziye.yang@intel.com" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "cohuck@redhat.com" <cohuck@redhat.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "zhi.a.wang@intel.com" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>, "eauger@redhat.com" <eauger@redhat.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "changpeng.liu@intel.com" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Zhao,
+	Yan Y" <yan.y.zhao@intel.com>, "Hu, Robert" <robert.hu@intel.com>, Huangzhichao <huangzhichao@huawei.com>, "Liujinsong (Paul)" <liu.jinsong@huawei.com>
 
-From: "Emilio G. Cota" <cota@braap.org>
+Hi,
 
-Performance results for fp-bench:
+It's great to see this patch series, which is a very important step, althou=
+gh=20
+currently only consider GPU mdev devices to support hot migration.=20
 
-1. Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
-- before:
-fma-single: 74.73 MFlops
-fma-double: 74.54 MFlops
-- after:
-fma-single: 203.37 MFlops
-fma-double: 169.37 MFlops
+However, this is based on the VFIO framework after all, so we expect=20
+that we can make this live migration framework more general.
 
-2. ARM Aarch64 A57 @ 2.4GHz
-- before:
-fma-single: 23.24 MFlops
-fma-double: 23.70 MFlops
-- after:
-fma-single: 66.14 MFlops
-fma-double: 63.10 MFlops
+For example, the vfio_save_pending() callback is used to obtain device
+memory (such as GPU memory), but if the device (such as network card)=20
+has no special proprietary memory, but only system memory?=20
+It is too much to perform a null operation for this kind of device by writi=
+ng
+memory to the vendor driver of kernel space.=20
 
-3. IBM POWER8E @ 2.1 GHz
-- before:
-fma-single: 37.26 MFlops
-fma-double: 37.29 MFlops
-- after:
-fma-single: 48.90 MFlops
-fma-double: 59.51 MFlops
+I think we can acquire the capability from the vendor driver before using t=
+his.=20
+If there is device memory that needs iterative copying, the vendor driver r=
+eturn
+ture, otherwise return false. Then QEMU implement the specific logic,=20
+otherwise return directly. Just like getting the capability list of KVM
+module, can we?
 
-Here having 3FP64 set to 1 pays off for x86_64:
-[1] 170.15 vs [0] 153.12 MFlops
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Regards,
+-Gonglei
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 82294458fe..7554d63495 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -1518,8 +1518,9 @@ float16 QEMU_FLATTEN float16_muladd(float16 a, float16 b, float16 c,
-     return float16_round_pack_canonical(pr, status);
- }
- 
--float32 QEMU_FLATTEN float32_muladd(float32 a, float32 b, float32 c,
--                                                int flags, float_status *status)
-+static float32 QEMU_SOFTFLOAT_ATTR
-+soft_f32_muladd(float32 a, float32 b, float32 c, int flags,
-+                float_status *status)
- {
-     FloatParts pa = float32_unpack_canonical(a, status);
-     FloatParts pb = float32_unpack_canonical(b, status);
-@@ -1529,8 +1530,9 @@ float32 QEMU_FLATTEN float32_muladd(float32 a, float32 b, float32 c,
-     return float32_round_pack_canonical(pr, status);
- }
- 
--float64 QEMU_FLATTEN float64_muladd(float64 a, float64 b, float64 c,
--                                                int flags, float_status *status)
-+static float64 QEMU_SOFTFLOAT_ATTR
-+soft_f64_muladd(float64 a, float64 b, float64 c, int flags,
-+                float_status *status)
- {
-     FloatParts pa = float64_unpack_canonical(a, status);
-     FloatParts pb = float64_unpack_canonical(b, status);
-@@ -1540,6 +1542,128 @@ float64 QEMU_FLATTEN float64_muladd(float64 a, float64 b, float64 c,
-     return float64_round_pack_canonical(pr, status);
- }
- 
-+float32 QEMU_FLATTEN
-+float32_muladd(float32 xa, float32 xb, float32 xc, int flags, float_status *s)
-+{
-+    union_float32 ua, ub, uc, ur;
-+
-+    ua.s = xa;
-+    ub.s = xb;
-+    uc.s = xc;
-+
-+    if (unlikely(!can_use_fpu(s))) {
-+        goto soft;
-+    }
-+    if (unlikely(flags & float_muladd_halve_result)) {
-+        goto soft;
-+    }
-+
-+    float32_input_flush3(&ua.s, &ub.s, &uc.s, s);
-+    if (unlikely(!f32_is_zon3(ua, ub, uc))) {
-+        goto soft;
-+    }
-+    /*
-+     * When (a || b) == 0, there's no need to check for under/over flow,
-+     * since we know the addend is (normal || 0) and the product is 0.
-+     */
-+    if (float32_is_zero(ua.s) || float32_is_zero(ub.s)) {
-+        union_float32 up;
-+        bool prod_sign;
-+
-+        prod_sign = float32_is_neg(ua.s) ^ float32_is_neg(ub.s);
-+        prod_sign ^= !!(flags & float_muladd_negate_product);
-+        up.s = float32_set_sign(float32_zero, prod_sign);
-+
-+        if (flags & float_muladd_negate_c) {
-+            uc.h = -uc.h;
-+        }
-+        ur.h = up.h + uc.h;
-+    } else {
-+        if (flags & float_muladd_negate_product) {
-+            ua.h = -ua.h;
-+        }
-+        if (flags & float_muladd_negate_c) {
-+            uc.h = -uc.h;
-+        }
-+
-+        ur.h = fmaf(ua.h, ub.h, uc.h);
-+
-+        if (unlikely(f32_is_inf(ur))) {
-+            s->float_exception_flags |= float_flag_overflow;
-+        } else if (unlikely(fabsf(ur.h) <= FLT_MIN)) {
-+            goto soft;
-+        }
-+    }
-+    if (flags & float_muladd_negate_result) {
-+        return float32_chs(ur.s);
-+    }
-+    return ur.s;
-+
-+ soft:
-+    return soft_f32_muladd(ua.s, ub.s, uc.s, flags, s);
-+}
-+
-+float64 QEMU_FLATTEN
-+float64_muladd(float64 xa, float64 xb, float64 xc, int flags, float_status *s)
-+{
-+    union_float64 ua, ub, uc, ur;
-+
-+    ua.s = xa;
-+    ub.s = xb;
-+    uc.s = xc;
-+
-+    if (unlikely(!can_use_fpu(s))) {
-+        goto soft;
-+    }
-+    if (unlikely(flags & float_muladd_halve_result)) {
-+        goto soft;
-+    }
-+
-+    float64_input_flush3(&ua.s, &ub.s, &uc.s, s);
-+    if (unlikely(!f64_is_zon3(ua, ub, uc))) {
-+        goto soft;
-+    }
-+    /*
-+     * When (a || b) == 0, there's no need to check for under/over flow,
-+     * since we know the addend is (normal || 0) and the product is 0.
-+     */
-+    if (float64_is_zero(ua.s) || float64_is_zero(ub.s)) {
-+        union_float64 up;
-+        bool prod_sign;
-+
-+        prod_sign = float64_is_neg(ua.s) ^ float64_is_neg(ub.s);
-+        prod_sign ^= !!(flags & float_muladd_negate_product);
-+        up.s = float64_set_sign(float64_zero, prod_sign);
-+
-+        if (flags & float_muladd_negate_c) {
-+            uc.h = -uc.h;
-+        }
-+        ur.h = up.h + uc.h;
-+    } else {
-+        if (flags & float_muladd_negate_product) {
-+            ua.h = -ua.h;
-+        }
-+        if (flags & float_muladd_negate_c) {
-+            uc.h = -uc.h;
-+        }
-+
-+        ur.h = fma(ua.h, ub.h, uc.h);
-+
-+        if (unlikely(f64_is_inf(ur))) {
-+            s->float_exception_flags |= float_flag_overflow;
-+        } else if (unlikely(fabs(ur.h) <= FLT_MIN)) {
-+            goto soft;
-+        }
-+    }
-+    if (flags & float_muladd_negate_result) {
-+        return float64_chs(ur.s);
-+    }
-+    return ur.s;
-+
-+ soft:
-+    return soft_f64_muladd(ua.s, ub.s, uc.s, flags, s);
-+}
-+
- /*
-  * Returns the result of dividing the floating-point value `a' by the
-  * corresponding value `b'. The operation is performed according to
--- 
-2.17.1
+
+> -----Original Message-----
+> From: Qemu-devel
+> [mailto:qemu-devel-bounces+arei.gonglei=3Dhuawei.com@nongnu.org] On
+> Behalf Of Kirti Wankhede
+> Sent: Wednesday, November 21, 2018 4:40 AM
+> To: alex.williamson@redhat.com; cjia@nvidia.com
+> Cc: Zhengxiao.zx@Alibaba-inc.com; kevin.tian@intel.com; yi.l.liu@intel.co=
+m;
+> eskultet@redhat.com; ziye.yang@intel.com; qemu-devel@nongnu.org;
+> cohuck@redhat.com; shuangtai.tst@alibaba-inc.com; dgilbert@redhat.com;
+> zhi.a.wang@intel.com; mlevitsk@redhat.com; pasic@linux.ibm.com;
+> aik@ozlabs.ru; Kirti Wankhede <kwankhede@nvidia.com>;
+> eauger@redhat.com; felipe@nutanix.com; jonathan.davies@nutanix.com;
+> changpeng.liu@intel.com; Ken.Xue@amd.com
+> Subject: [Qemu-devel] [PATCH 3/5] Add migration functions for VFIO device=
+s
+>=20
+> - Migration function are implemented for VFIO_DEVICE_TYPE_PCI device.
+> - Added SaveVMHandlers and implemented all basic functions required for l=
+ive
+>   migration.
+> - Added VM state change handler to know running or stopped state of VM.
+> - Added migration state change notifier to get notification on migration =
+state
+>   change. This state is translated to VFIO device state and conveyed to v=
+endor
+>   driver.
+> - VFIO device supportd migration or not is decided based of migration reg=
+ion
+>   query. If migration region query is successful then migration is suppor=
+ted
+>   else migration is blocked.
+> - Structure vfio_device_migration_info is mapped at 0th offset of migrati=
+on
+>   region and should always trapped by VFIO device's driver. Added both ty=
+pe of
+>   access support, trapped or mmapped, for data section of the region.
+> - To save device state, read data offset and size using structure
+>   vfio_device_migration_info.data, accordingly copy data from the region.
+> - To restore device state, write data offset and size in the structure an=
+d write
+>   data in the region.
+> - To get dirty page bitmap, write start address and pfn count then read c=
+ount of
+>   pfns copied and accordingly read those from the rest of the region or
+> mmaped
+>   part of the region. This copy is iterated till page bitmap for all requ=
+ested
+>   pfns are copied.
+>=20
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> ---
+>  hw/vfio/Makefile.objs         |   2 +-
+>  hw/vfio/migration.c           | 729
+> ++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/vfio/vfio-common.h |  23 ++
+>  3 files changed, 753 insertions(+), 1 deletion(-)
+>  create mode 100644 hw/vfio/migration.c
+>=20
+[skip]
+
+> +
+> +static SaveVMHandlers savevm_vfio_handlers =3D {
+> +    .save_setup =3D vfio_save_setup,
+> +    .save_live_iterate =3D vfio_save_iterate,
+> +    .save_live_complete_precopy =3D vfio_save_complete_precopy,
+> +    .save_live_pending =3D vfio_save_pending,
+> +    .save_cleanup =3D vfio_save_cleanup,
+> +    .load_state =3D vfio_load_state,
+> +    .load_setup =3D vfio_load_setup,
+> +    .load_cleanup =3D vfio_load_cleanup,
+> +    .is_active_iterate =3D vfio_is_active_iterate,
+> +};
+> +
+
+=20
