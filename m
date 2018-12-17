@@ -1,17 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gYrxD-00023Q-RY
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:25:01 -0500
+	(envelope-from <prvs=882e40eea=anthony.perard@citrix.com>)
+	id 1gYs0t-0005BX-22
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:28:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gYrx9-00059p-50
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:24:59 -0500
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Mon, 17 Dec 2018 12:24:04 +0000
-Message-Id: <20181217122405.18732-9-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20181217122405.18732-1-mark.cave-ayland@ilande.co.uk>
-References: <20181217122405.18732-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [RFC PATCH v2 8/9] target/ppc: convert VMX logical
- instructions to use vector operations
+	(envelope-from <prvs=882e40eea=anthony.perard@citrix.com>)
+	id 1gYs0n-0008U0-Pt
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 07:28:46 -0500
+Date: Mon, 17 Dec 2018 12:28:20 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20181217122820.GA5866@perard.uk.xensource.com>
+References: <1545046848-14891-1-git-send-email-paul.durrant@citrix.com>
+	<1545046848-14891-10-git-send-email-paul.durrant@citrix.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1545046848-14891-10-git-send-email-paul.durrant@citrix.com>
+Subject: Re: [Qemu-devel] [Xen-devel] [PATCH v5 09/18] xen: remove
+ unnecessary code from dataplane/xen-block.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,106 +26,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, richard.henderson@linaro.org, lvivier@redhat.com
+To: Paul Durrant <paul.durrant@citrix.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org, Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/ppc/translate.c              |  1 +
- target/ppc/translate/vmx-impl.inc.c | 59 +++++++++++++++++++++----------------
- 2 files changed, 35 insertions(+), 25 deletions(-)
+On Mon, Dec 17, 2018 at 11:40:39AM +0000, Paul Durrant wrote:
+> Not all of the code duplicated from xen_disk.c is required as the basis for
+> the new dataplane implementation so this patch removes extraneous code,
+> along with the legacy #includes and calls to the legacy xen_pv_printf()
+> function. Error messages are changed to be reported using error_report().
+> 
+> NOTE: The code is still not yet built. Further transformations will be
+>       required to make it correctly interface to the new XenBus/XenDevice
+>       framework. They will be delivered in a subsequent patch.
+> 
+> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> Acked-by: Anthony Perard <anthony.perard@citrix.com>
+> ---
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> 
+> v2:
+>  - Leave existing boilerplate alone, other than removing the now-incorrect
+>    description
+> ---
+>  hw/block/dataplane/xen-block.c | 409 ++---------------------------------------
+>  1 file changed, 16 insertions(+), 393 deletions(-)
+> 
+> diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-block.c
+> index 9fae505..98f987d 100644
+> --- a/hw/block/dataplane/xen-block.c
+> +++ b/hw/block/dataplane/xen-block.c
+> @@ -1,6 +1,4 @@
+>  /*
+> - *  xen paravirt block device backend
+> - *
+>   *  (c) Gerd Hoffmann <kraxel@redhat.com>
+>   *
+>   *  This program is free software; you can redistribute it and/or modify
+> @@ -19,26 +17,12 @@
+>   *  GNU GPL, version 2 or (at your option) any later version.
+>   */
+>  
+> -#include "qemu/osdep.h"
+> -#include "qemu/units.h"
+> -#include <sys/ioctl.h>
+> -#include <sys/uio.h>
+> -
+> -#include "hw/hw.h"
+> -#include "hw/xen/xen_backend.h"
+> -#include "xen_blkif.h"
+> -#include "sysemu/blockdev.h"
+> -#include "sysemu/iothread.h"
+> -#include "sysemu/block-backend.h"
+> -#include "qapi/error.h"
+> -#include "qapi/qmp/qdict.h"
+> -#include "qapi/qmp/qstring.h"
+> -#include "trace.h"
+> -
+> -/* ------------------------------------------------------------- */
+> -
+> -#define BLOCK_SIZE  512
+> -#define IOCB_COUNT  (BLKIF_MAX_SEGMENTS_PER_REQUEST + 2)
+> +/*
+> + * Copyright (c) 2018  Citrix Systems Inc.
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 8e89aec14d..1b61bfa093 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -24,6 +24,7 @@
- #include "disas/disas.h"
- #include "exec/exec-all.h"
- #include "tcg-op.h"
-+#include "tcg-op-gvec.h"
- #include "qemu/host-utils.h"
- #include "exec/cpu_ldst.h"
- 
-diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index f2836fb750..ca24676719 100644
---- a/target/ppc/translate/vmx-impl.inc.c
-+++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -264,41 +264,50 @@ GEN_VX_VMUL10(vmul10euq, 1, 0);
- GEN_VX_VMUL10(vmul10cuq, 0, 1);
- GEN_VX_VMUL10(vmul10ecuq, 1, 1);
- 
--/* Logical operations */
--#define GEN_VX_LOGICAL(name, tcg_op, opc2, opc3)                        \
--static void glue(gen_, name)(DisasContext *ctx)                                 \
-+#define GEN_VXFORM_V(name, vece, tcg_op, opc2, opc3)                    \
-+static void glue(gen_, name)(DisasContext *ctx)                         \
- {                                                                       \
--    TCGv_i64 t0 = tcg_temp_new_i64();                                   \
--    TCGv_i64 t1 = tcg_temp_new_i64();                                   \
--    TCGv_i64 avr = tcg_temp_new_i64();                                  \
-+    if (unlikely(!ctx->altivec_enabled)) {                              \
-+        gen_exception(ctx, POWERPC_EXCP_VPU);                           \
-+        return;                                                         \
-+    }                                                                   \
-                                                                         \
-+    tcg_op(vece,                                                        \
-+           avr64_offset(rD(ctx->opcode), true),                         \
-+           avr64_offset(rA(ctx->opcode), true),                         \
-+           avr64_offset(rB(ctx->opcode), true),                         \
-+           16, 16);                                                     \
-+}
-+
-+#define GEN_VXFORM_VN(name, vece, tcg_op, opc2, opc3)                   \
-+static void glue(gen_, name)(DisasContext *ctx)                         \
-+{                                                                       \
-     if (unlikely(!ctx->altivec_enabled)) {                              \
-         gen_exception(ctx, POWERPC_EXCP_VPU);                           \
-         return;                                                         \
-     }                                                                   \
--    get_avr64(t0, rA(ctx->opcode), true);                               \
--    get_avr64(t1, rB(ctx->opcode), true);                               \
--    tcg_op(avr, t0, t1);                                                \
--    set_avr64(rD(ctx->opcode), avr, true);                              \
-                                                                         \
--    get_avr64(t0, rA(ctx->opcode), false);                              \
--    get_avr64(t1, rB(ctx->opcode), false);                              \
--    tcg_op(avr, t0, t1);                                                \
--    set_avr64(rD(ctx->opcode), avr, false);                             \
-+    tcg_op(vece,                                                        \
-+           avr64_offset(rD(ctx->opcode), true),                         \
-+           avr64_offset(rA(ctx->opcode), true),                         \
-+           avr64_offset(rB(ctx->opcode), true),                         \
-+           16, 16);                                                     \
-                                                                         \
--    tcg_temp_free_i64(t0);                                              \
--    tcg_temp_free_i64(t1);                                              \
--    tcg_temp_free_i64(avr);                                             \
-+    tcg_gen_gvec_not(vece,                                              \
-+                     avr64_offset(rD(ctx->opcode), true),               \
-+                     avr64_offset(rD(ctx->opcode), true),               \
-+                     16, 16);                                           \
- }
- 
--GEN_VX_LOGICAL(vand, tcg_gen_and_i64, 2, 16);
--GEN_VX_LOGICAL(vandc, tcg_gen_andc_i64, 2, 17);
--GEN_VX_LOGICAL(vor, tcg_gen_or_i64, 2, 18);
--GEN_VX_LOGICAL(vxor, tcg_gen_xor_i64, 2, 19);
--GEN_VX_LOGICAL(vnor, tcg_gen_nor_i64, 2, 20);
--GEN_VX_LOGICAL(veqv, tcg_gen_eqv_i64, 2, 26);
--GEN_VX_LOGICAL(vnand, tcg_gen_nand_i64, 2, 22);
--GEN_VX_LOGICAL(vorc, tcg_gen_orc_i64, 2, 21);
-+/* Logical operations */
-+GEN_VXFORM_V(vand, MO_64, tcg_gen_gvec_and, 2, 16);
-+GEN_VXFORM_V(vandc, MO_64, tcg_gen_gvec_andc, 2, 17);
-+GEN_VXFORM_V(vor, MO_64, tcg_gen_gvec_or, 2, 18);
-+GEN_VXFORM_V(vxor, MO_64, tcg_gen_gvec_xor, 2, 19);
-+GEN_VXFORM_VN(vnor, MO_64, tcg_gen_gvec_or, 2, 20);
-+GEN_VXFORM_VN(veqv, MO_64, tcg_gen_gvec_xor, 2, 26);
-+GEN_VXFORM_VN(vnand, MO_64, tcg_gen_gvec_and, 2, 22);
-+GEN_VXFORM_V(vorc, MO_64, tcg_gen_gvec_orc, 2, 21);
- 
- #define GEN_VXFORM(name, opc2, opc3)                                    \
- static void glue(gen_, name)(DisasContext *ctx)                                 \
+This patch obviously comes from v3 of the patch series. v4 was fine.
+Please check comments on v1 v2 and v3.
+
+Thanks,
+
 -- 
-2.11.0
+Anthony PERARD
