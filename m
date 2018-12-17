@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gZ1U3-0007kY-E3
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:35:34 -0500
+	(envelope-from <clg@kaod.org>) id 1gZ1U7-0007oW-Nz
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:35:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gZ1U0-0007eI-3n
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:35:31 -0500
-Received: from 1.mo177.mail-out.ovh.net ([178.33.107.143]:45359)
+	(envelope-from <clg@kaod.org>) id 1gZ1U4-0007uQ-Jj
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:35:35 -0500
+Received: from 5.mo2.mail-out.ovh.net ([87.98.181.248]:50960)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gZ1Tz-0007cr-45
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:35:27 -0500
-Received: from player718.ha.ovh.net (unknown [10.109.143.208])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id B7332D5554
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 23:35:25 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gZ1U4-0007oE-Cx
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 17:35:32 -0500
+Received: from player718.ha.ovh.net (unknown [10.109.160.5])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id D30C3177501
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 23:35:30 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Mon, 17 Dec 2018 23:34:44 +0100
-Message-Id: <20181217223445.28594-7-clg@kaod.org>
+Date: Mon, 17 Dec 2018 23:34:45 +0100
+Message-Id: <20181217223445.28594-8-clg@kaod.org>
 In-Reply-To: <20181217223445.28594-1-clg@kaod.org>
 References: <20181217223445.28594-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v9 6/7] spapr: change default CPU type to POWER9
+Subject: [Qemu-devel] [PATCH v9 7/7] MAINTAINERS: PPC: add a XIVE section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,31 +34,27 @@ Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goa
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/ppc/spapr.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ MAINTAINERS | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index aefa0f4ea430..8ea680fcde1e 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3967,7 +3967,7 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 83c127f0d6e4..6a648d29a9bd 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1009,6 +1009,14 @@ F: tests/libqos/*spapr*
+ F: tests/rtas*
+ F: tests/libqos/rtas*
 =20
-     smc->dr_lmb_enabled =3D true;
-     smc->update_dt_enabled =3D true;
--    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
-+    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power9_v2.0");
-     mc->has_hotpluggable_cpus =3D true;
-     smc->resize_hpt_default =3D SPAPR_RESIZE_HPT_ENABLED;
-     fwc->get_dev_path =3D spapr_get_fw_dev_path;
-@@ -4066,6 +4066,7 @@ static void spapr_machine_3_1_class_options(Machine=
-Class *mc)
-=20
-     spapr_machine_4_0_class_options(mc);
-     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_3_1);
-+    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
-     smc->update_dt_enabled =3D false;
- }
-=20
++XIVE
++M: David Gibson <david@gibson.dropbear.id.au>
++M: C=C3=A9dric Le Goater <clg@kaod.org>
++L: qemu-ppc@nongnu.org
++S: Supported
++F: hw/*/*xive*
++F: include/hw/*/*xive*
++
+ virtex_ml507
+ M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+ L: qemu-ppc@nongnu.org
 --=20
 2.17.2
