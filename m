@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gZ28p-0000Uk-93
+	(envelope-from <pbonzini@redhat.com>) id 1gZ28p-0000Ul-9c
 	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:17:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gZ28l-0003iP-3b
+	(envelope-from <pbonzini@redhat.com>) id 1gZ28n-0003jY-SJ
 	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:17:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44218)
+Received: from mx1.redhat.com ([209.132.183.28]:54626)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gZ28h-0003KG-Sj
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:17:33 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gZ28l-0003NR-0P
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:17:35 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 18 Dec 2018 00:16:35 +0100
-Message-Id: <20181217231700.24482-11-pbonzini@redhat.com>
+Date: Tue, 18 Dec 2018 00:16:36 +0100
+Message-Id: <20181217231700.24482-12-pbonzini@redhat.com>
 In-Reply-To: <20181217231700.24482-1-pbonzini@redhat.com>
 References: <20181217231700.24482-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 10/35] memory: update coalesced_range on
- transaction_commit
+Subject: [Qemu-devel] [PULL 11/35] hax: Support for Linux hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,116 +26,81 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Atsushi Nemoto <atsushi.nemoto@sord.co.jp>
+Cc: Alexandro Sanchez Bach <asanchez@kryptoslogic.com>
 
-The e1000 driver calls memory_region_add_coalescing but
-kvm_coalesce_mmio_region is never called for those regions.  The bug
-dates back to the introduction of the memory region API; to fix it,
-delete and re-add coalesced MMIO ranges when building the FlatViews.
+From: Alexandro Sanchez Bach <asanchez@kryptoslogic.com>
 
-Because coalesced MMIO regions apply to all address spaces, the
-has_coalesced_range flag has to be changed into an int.
+Intel HAXM supports now 32-bit and 64-bit Linux hosts. This patch include=
+s
+the corresponding userland changes.
 
-Fixes: 093bc2cd885e ("Hierarchical memory region API")
-Reported-by: Atsushi Nemoto <atsushi.nemoto@sord.co.jp>
+Since the Darwin userland backend is POSIX-compliant, the hax-darwin.{c,h=
+}
+files have been renamed to hax-posix.{c,h}. This prefix is consistent wit=
+h
+the naming used in the rest of QEMU.
+
+Signed-off-by: Alexandro Sanchez Bach <asanchez@kryptoslogic.com>
+Message-Id: <20181115013331.65820-1-asanchez@kryptoslogic.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- memory.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+ target/i386/Makefile.objs                 | 6 +++---
+ target/i386/hax-i386.h                    | 6 +++---
+ target/i386/{hax-darwin.c =3D> hax-posix.c} | 0
+ target/i386/{hax-darwin.h =3D> hax-posix.h} | 0
+ 4 files changed, 6 insertions(+), 6 deletions(-)
+ rename target/i386/{hax-darwin.c =3D> hax-posix.c} (100%)
+ rename target/i386/{hax-darwin.h =3D> hax-posix.h} (100%)
 
-diff --git a/memory.c b/memory.c
-index 072769aa06..5759f74034 100644
---- a/memory.c
-+++ b/memory.c
-@@ -217,7 +217,7 @@ struct FlatRange {
-     bool romd_mode;
-     bool readonly;
-     bool nonvolatile;
--    bool has_coalesced_range;
-+    int has_coalesced_range;
- };
+diff --git a/target/i386/Makefile.objs b/target/i386/Makefile.objs
+index 32bf966300..cb9c265525 100644
+--- a/target/i386/Makefile.objs
++++ b/target/i386/Makefile.objs
+@@ -12,10 +12,10 @@ obj-$(call lnot,$(CONFIG_HYPERV)) +=3D hyperv-stub.o
+ ifeq ($(CONFIG_WIN32),y)
+ obj-$(CONFIG_HAX) +=3D hax-all.o hax-mem.o hax-windows.o
+ endif
+-ifeq ($(CONFIG_DARWIN),y)
+-obj-$(CONFIG_HAX) +=3D hax-all.o hax-mem.o hax-darwin.o
+-obj-$(CONFIG_HVF) +=3D hvf/
++ifeq ($(CONFIG_POSIX),y)
++obj-$(CONFIG_HAX) +=3D hax-all.o hax-mem.o hax-posix.o
+ endif
++obj-$(CONFIG_HVF) +=3D hvf/
+ obj-$(CONFIG_WHPX) +=3D whpx-all.o
+ endif
+ obj-$(CONFIG_SEV) +=3D sev.o
+diff --git a/target/i386/hax-i386.h b/target/i386/hax-i386.h
+index 6abc156f88..f13fa4638f 100644
+--- a/target/i386/hax-i386.h
++++ b/target/i386/hax-i386.h
+@@ -16,7 +16,7 @@
+ #include "cpu.h"
+ #include "sysemu/hax.h"
 =20
- #define FOR_EACH_FLAT_RANGE(var, view)          \
-@@ -651,7 +651,7 @@ static void render_memory_region(FlatView *view,
-     fr.romd_mode =3D mr->romd_mode;
-     fr.readonly =3D readonly;
-     fr.nonvolatile =3D nonvolatile;
--    fr.has_coalesced_range =3D false;
-+    fr.has_coalesced_range =3D 0;
+-#ifdef CONFIG_DARWIN
++#ifdef CONFIG_POSIX
+ typedef int hax_fd;
+ #endif
 =20
-     /* Render the region itself into any gaps left by the current view. =
-*/
-     for (i =3D 0; i < view->nr && int128_nz(remain); ++i) {
-@@ -858,6 +858,10 @@ static void flat_range_coalesced_io_del(FlatRange *f=
-r, AddressSpace *as)
-         return;
-     }
+@@ -82,8 +82,8 @@ hax_fd hax_mod_open(void);
+ void hax_memory_init(void);
 =20
-+    if (--fr->has_coalesced_range > 0) {
-+        return;
-+    }
-+
-     MEMORY_LISTENER_UPDATE_REGION(fr, as, Reverse, coalesced_io_del,
-                                   int128_get64(fr->addr.start),
-                                   int128_get64(fr->addr.size));
-@@ -873,7 +877,10 @@ static void flat_range_coalesced_io_add(FlatRange *f=
-r, AddressSpace *as)
-         return;
-     }
 =20
--    fr->has_coalesced_range =3D true;
-+    if (fr->has_coalesced_range++) {
-+        return;
-+    }
-+
-     QTAILQ_FOREACH(cmr, &mr->coalesced, link) {
-         tmp =3D addrrange_shift(cmr->addr,
-                               int128_sub(fr->addr.start,
-@@ -920,6 +927,7 @@ static void address_space_update_topology_pass(Addres=
-sSpace *as,
-             /* In old but not in new, or in both but attributes changed.=
- */
+-#ifdef CONFIG_DARWIN
+-#include "target/i386/hax-darwin.h"
++#ifdef CONFIG_POSIX
++#include "target/i386/hax-posix.h"
+ #endif
 =20
-             if (!adding) {
-+                flat_range_coalesced_io_del(frold, as);
-                 MEMORY_LISTENER_UPDATE_REGION(frold, as, Reverse, region=
-_del);
-             }
-=20
-@@ -927,7 +935,9 @@ static void address_space_update_topology_pass(Addres=
-sSpace *as,
-         } else if (frold && frnew && flatrange_equal(frold, frnew)) {
-             /* In both and unchanged (except logging may have changed) *=
-/
-=20
--            if (adding) {
-+            if (!adding) {
-+                flat_range_coalesced_io_del(frold, as);
-+            } else {
-                 MEMORY_LISTENER_UPDATE_REGION(frnew, as, Forward, region=
-_nop);
-                 if (frnew->dirty_log_mask & ~frold->dirty_log_mask) {
-                     MEMORY_LISTENER_UPDATE_REGION(frnew, as, Forward, lo=
-g_start,
-@@ -939,6 +949,7 @@ static void address_space_update_topology_pass(Addres=
-sSpace *as,
-                                                   frold->dirty_log_mask,
-                                                   frnew->dirty_log_mask)=
-;
-                 }
-+                flat_range_coalesced_io_add(frnew, as);
-             }
-=20
-             ++iold;
-@@ -948,6 +959,7 @@ static void address_space_update_topology_pass(Addres=
-sSpace *as,
-=20
-             if (adding) {
-                 MEMORY_LISTENER_UPDATE_REGION(frnew, as, Forward, region=
-_add);
-+                flat_range_coalesced_io_add(frnew, as);
-             }
-=20
-             ++inew;
+ #ifdef CONFIG_WIN32
+diff --git a/target/i386/hax-darwin.c b/target/i386/hax-posix.c
+similarity index 100%
+rename from target/i386/hax-darwin.c
+rename to target/i386/hax-posix.c
+diff --git a/target/i386/hax-darwin.h b/target/i386/hax-posix.h
+similarity index 100%
+rename from target/i386/hax-darwin.h
+rename to target/i386/hax-posix.h
 --=20
 2.20.1
