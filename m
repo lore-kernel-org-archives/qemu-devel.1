@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gYvoz-0001dO-US
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:32:47 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gYvuC-0005ES-4p
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:38:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gYvow-0000Hy-JZ
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:32:45 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33948)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gYvow-0000FH-CE
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:32:42 -0500
-Received: by mail-wr1-x442.google.com with SMTP id j2so12972952wrw.1
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 08:32:42 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 17 Dec 2018 17:32:38 +0100
-Message-Id: <1545064358-4601-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] usb: move ehci_create_ich9_with_companions
- to hw/i386
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gYvu7-0004wS-95
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:38:08 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 17 Dec 2018 16:37:57 +0000
+Message-ID: <de056aa7-d383-af0f-6059-44e008c1649e@virtuozzo.com>
+References: <20181214231512.5295-1-jsnow@redhat.com>
+	<20181214231512.5295-7-jsnow@redhat.com>
+	<0780ebaa-3e11-c197-85f9-9133dc227d65@virtuozzo.com>
+In-Reply-To: <0780ebaa-3e11-c197-85f9-9133dc227d65@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <3D4A82D55EE79745A71E821F93EA8A2B@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 6/7] iotests: allow pretty-print for
+ qmp_log
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,158 +27,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com
+To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-This function is only needed when Q35 is in use.  Moving it to
-the same file that uses it lets you disable the entire USB
-subsystem in x86_64-softmmu.mak; of course doing that will
-cause -usb to break horribly, but one thing at a time.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/i386/pc_q35.c      | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++
- hw/usb/hcd-ehci-pci.c | 53 ---------------------------------------------------
- include/hw/usb.h      |  2 --
- 3 files changed, 53 insertions(+), 55 deletions(-)
-
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 58459bd..6eaad21 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -58,6 +58,59 @@
- /* ICH9 AHCI has 6 ports */
- #define MAX_SATA_PORTS     6
- 
-+struct ehci_companions {
-+    const char *name;
-+    int func;
-+    int port;
-+};
-+
-+static const struct ehci_companions ich9_1d[] = {
-+    { .name = "ich9-usb-uhci1", .func = 0, .port = 0 },
-+    { .name = "ich9-usb-uhci2", .func = 1, .port = 2 },
-+    { .name = "ich9-usb-uhci3", .func = 2, .port = 4 },
-+};
-+
-+static const struct ehci_companions ich9_1a[] = {
-+    { .name = "ich9-usb-uhci4", .func = 0, .port = 0 },
-+    { .name = "ich9-usb-uhci5", .func = 1, .port = 2 },
-+    { .name = "ich9-usb-uhci6", .func = 2, .port = 4 },
-+};
-+
-+static int ehci_create_ich9_with_companions(PCIBus *bus, int slot)
-+{
-+    const struct ehci_companions *comp;
-+    PCIDevice *ehci, *uhci;
-+    BusState *usbbus;
-+    const char *name;
-+    int i;
-+
-+    switch (slot) {
-+    case 0x1d:
-+        name = "ich9-usb-ehci1";
-+        comp = ich9_1d;
-+        break;
-+    case 0x1a:
-+        name = "ich9-usb-ehci2";
-+        comp = ich9_1a;
-+        break;
-+    default:
-+        return -1;
-+    }
-+
-+    ehci = pci_create_multifunction(bus, PCI_DEVFN(slot, 7), true, name);
-+    qdev_init_nofail(&ehci->qdev);
-+    usbbus = QLIST_FIRST(&ehci->qdev.child_bus);
-+
-+    for (i = 0; i < 3; i++) {
-+        uhci = pci_create_multifunction(bus, PCI_DEVFN(slot, comp[i].func),
-+                                        true, comp[i].name);
-+        qdev_prop_set_string(&uhci->qdev, "masterbus", usbbus->name);
-+        qdev_prop_set_uint32(&uhci->qdev, "firstport", comp[i].port);
-+        qdev_init_nofail(&uhci->qdev);
-+    }
-+    return 0;
-+}
-+
- /* PC hardware initialisation */
- static void pc_q35_init(MachineState *machine)
- {
-diff --git a/hw/usb/hcd-ehci-pci.c b/hw/usb/hcd-ehci-pci.c
-index 8c0fc53..69abbf7 100644
---- a/hw/usb/hcd-ehci-pci.c
-+++ b/hw/usb/hcd-ehci-pci.c
-@@ -230,56 +230,3 @@ static void ehci_pci_register_types(void)
- }
- 
- type_init(ehci_pci_register_types)
--
--struct ehci_companions {
--    const char *name;
--    int func;
--    int port;
--};
--
--static const struct ehci_companions ich9_1d[] = {
--    { .name = "ich9-usb-uhci1", .func = 0, .port = 0 },
--    { .name = "ich9-usb-uhci2", .func = 1, .port = 2 },
--    { .name = "ich9-usb-uhci3", .func = 2, .port = 4 },
--};
--
--static const struct ehci_companions ich9_1a[] = {
--    { .name = "ich9-usb-uhci4", .func = 0, .port = 0 },
--    { .name = "ich9-usb-uhci5", .func = 1, .port = 2 },
--    { .name = "ich9-usb-uhci6", .func = 2, .port = 4 },
--};
--
--int ehci_create_ich9_with_companions(PCIBus *bus, int slot)
--{
--    const struct ehci_companions *comp;
--    PCIDevice *ehci, *uhci;
--    BusState *usbbus;
--    const char *name;
--    int i;
--
--    switch (slot) {
--    case 0x1d:
--        name = "ich9-usb-ehci1";
--        comp = ich9_1d;
--        break;
--    case 0x1a:
--        name = "ich9-usb-ehci2";
--        comp = ich9_1a;
--        break;
--    default:
--        return -1;
--    }
--
--    ehci = pci_create_multifunction(bus, PCI_DEVFN(slot, 7), true, name);
--    qdev_init_nofail(&ehci->qdev);
--    usbbus = QLIST_FIRST(&ehci->qdev.child_bus);
--
--    for (i = 0; i < 3; i++) {
--        uhci = pci_create_multifunction(bus, PCI_DEVFN(slot, comp[i].func),
--                                        true, comp[i].name);
--        qdev_prop_set_string(&uhci->qdev, "masterbus", usbbus->name);
--        qdev_prop_set_uint32(&uhci->qdev, "firstport", comp[i].port);
--        qdev_init_nofail(&uhci->qdev);
--    }
--    return 0;
--}
-diff --git a/include/hw/usb.h b/include/hw/usb.h
-index f9431a0..c21f41c 100644
---- a/include/hw/usb.h
-+++ b/include/hw/usb.h
-@@ -593,8 +593,6 @@ const char *usb_device_get_product_desc(USBDevice *dev);
- 
- const USBDesc *usb_device_get_usb_desc(USBDevice *dev);
- 
--int ehci_create_ich9_with_companions(PCIBus *bus, int slot);
--
- /* quirks.c */
- 
- /* In bulk endpoints are streaming data sources (iow behave like isoc eps) */
--- 
-1.8.3.1
+MTcuMTIuMjAxOCAxNzoyNiwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
+MTUuMTIuMjAxOCAyOjE1LCBKb2huIFNub3cgd3JvdGU6DQo+PiBJZiBpb3Rlc3RzIGhhdmUgbGlu
+ZXMgZXhjZWVkaW5nID45OTggY2hhcmFjdGVycyBsb25nLCBnaXQgZG9lc24ndA0KPj4gd2FudCB0
+byBzZW5kIGl0IHBsYWludGV4dCB0byB0aGUgbGlzdC4gV2UgY2FuIHNvbHZlIHRoaXMgYnkgYWxs
+b3dpbmcNCj4+IHRoZSBpb3Rlc3RzIHRvIHVzZSBwcmV0dHkgcHJpbnRlZCBRTVAgb3V0cHV0IHRo
+YXQgd2UgY2FuIG1hdGNoIGFnYWluc3QNCj4+IGluc3RlYWQuDQo+Pg0KPj4gQXMgYSBib251cywg
+aXQncyBtdWNoIG5pY2VyIGZvciBodW1hbiBleWVzLCB0b28uDQo+Pg0KPj4gTm90ZSB0aGF0IHRo
+aXMgY2hhbmdlcyB0aGUgc29ydCBvcmRlciBmb3IgImNvbW1hbmQiIGFuZCAiYXJndW1lbnRzIiwN
+Cj4+IHNvIEkgcmVzdHJpY3QgdGhpcyByZW9yZGVyaW5nIHRvIG9jY3VyIG9ubHkgd2hlbiB0aGUg
+aW5kZW50IGlzIHNwZWNpZmllZC4NCj4+IC0tLQ0KPj4gwqAgdGVzdHMvcWVtdS1pb3Rlc3RzL2lv
+dGVzdHMucHkgfCAxNyArKysrKysrKysrKysrLS0tLQ0KPj4gwqAgMSBmaWxlIGNoYW5nZWQsIDEz
+IGluc2VydGlvbnMoKyksIDQgZGVsZXRpb25zKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL3Rlc3Rz
+L3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5IGIvdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHkN
+Cj4+IGluZGV4IDk1OTU0MjlmZWEuLmFiNTgyM2MwMTEgMTAwNjQ0DQo+PiAtLS0gYS90ZXN0cy9x
+ZW11LWlvdGVzdHMvaW90ZXN0cy5weQ0KPj4gKysrIGIvdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVz
+dHMucHkNCj4+IEBAIC00NDcsMTIgKzQ0NywyMSBAQCBjbGFzcyBWTShxdGVzdC5RRU1VUXRlc3RN
+YWNoaW5lKToNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJlc3VsdC5hcHBlbmQoZmls
+dGVyX3FtcF9ldmVudChldikpDQo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuIHJlc3VsdA0K
+Pj4gLcKgwqDCoCBkZWYgcW1wX2xvZyhzZWxmLCBjbWQsIGZpbHRlcnM9W2ZpbHRlcl90ZXN0Zmls
+ZXNdLCAqKmt3YXJncyk6DQo+PiAtwqDCoMKgwqDCoMKgwqAgbG9nbXNnID0gJ3siZXhlY3V0ZSI6
+ICIlcyIsICJhcmd1bWVudHMiOiAlc30nICUgXA0KPj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
+KGNtZCwganNvbi5kdW1wcyhrd2FyZ3MsIHNvcnRfa2V5cz1UcnVlKSkNCj4+ICvCoMKgwqAgZGVm
+IHFtcF9sb2coc2VsZiwgY21kLCBpbmRlbnQ9Tm9uZSwgZmlsdGVycz1bZmlsdGVyX3Rlc3RmaWxl
+c10sICoqa3dhcmdzKToNCj4+ICvCoMKgwqDCoMKgwqDCoCAjIFB5dGhvbiA8IDMuNCBuZWVkcyB0
+byBrbm93IG5vdCB0byBhZGQgd2hpdGVzcGFjZSB3aGVuIHByZXR0eS1wcmludGluZzoNCj4+ICvC
+oMKgwqDCoMKgwqDCoCBzZXBhcmF0b3JzID0gKCcsJywgJzogJykgaWYgaW5kZW50IGlzIG5vdCBO
+b25lIGVsc2UgKCcsJywgJzogJykNCj4+ICvCoMKgwqDCoMKgwqDCoCBpZiBpbmRlbnQgaXMgbm90
+IE5vbmU6DQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBmdWxsY21kID0geyAiZXhlY3V0ZSI6
+IGNtZCwNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+ICJhcmd1bWVudHMiOiBrd2FyZ3MgfQ0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgbG9nbXNn
+ID0ganNvbi5kdW1wcyhmdWxsY21kLCBpbmRlbnQ9aW5kZW50LCBzZXBhcmF0b3JzPXNlcGFyYXRv
+cnMsDQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqAgc29ydF9rZXlzPVRydWUpDQo+PiArwqDCoMKgwqDCoMKgwqAgZWxzZToN
+Cj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGxvZ21zZyA9ICd7ImV4ZWN1dGUiOiAiJXMiLCAi
+YXJndW1lbnRzIjogJXN9JyAlIFwNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
+KGNtZCwganNvbi5kdW1wcyhrd2FyZ3MsIHNvcnRfa2V5cz1UcnVlKSkNCj4gDQo+IGRlZmluaXRl
+bHkgb3ZlcmxvZ2ljIG9uIE5vbmUvaXMgbm90IE5vbmUsIGJ1dCBhbnl3YXksICcsJyBzZXBhcmF0
+b3IgbGVhZHMgdG8gbGVzcw0KPiBiZWF1dGlmdWwgb3V0cHV0LiBTbywgSSB0aGluayBpdCBpcyBi
+ZXR0ZXIgdG8gZG8ganVzdCAicmUuc3ViKHInXHMrXG4nLCAnXG4nLCBsb25nbXNnKSINCj4gb24g
+ZmluYWwgbWVzc2FnZSwgaGVyZSBvciBpbiBsb2coKSwgb3IgaW4gYm90aC4NCg0KZmluZCBteXNl
+bGYgY29tcG9zaW5nIGNvdW50ZXItcHJvcG9zYWwgcGF0Y2gsIHdpbGwgc2VuZCBzb29uLi4uDQoN
+Cj4gDQo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgbG9nKGxvZ21zZywgZmlsdGVycykNCj4+IMKgwqDC
+oMKgwqDCoMKgwqDCoCByZXN1bHQgPSBzZWxmLnFtcChjbWQsICoqa3dhcmdzKQ0KPj4gLcKgwqDC
+oMKgwqDCoMKgIGxvZyhqc29uLmR1bXBzKHJlc3VsdCwgc29ydF9rZXlzPVRydWUpLCBmaWx0ZXJz
+KQ0KPj4gK8KgwqDCoMKgwqDCoMKgIGxvZyhqc29uLmR1bXBzKHJlc3VsdCwgaW5kZW50PWluZGVu
+dCwgc2VwYXJhdG9ycz1zZXBhcmF0b3JzLA0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIHNvcnRfa2V5cz1UcnVlKSwgZmlsdGVycykNCj4+IMKgwqDCoMKg
+wqDCoMKgwqDCoCByZXR1cm4gcmVzdWx0DQo+PiDCoMKgwqDCoMKgIGRlZiBydW5fam9iKHNlbGYs
+IGpvYiwgYXV0b19maW5hbGl6ZT1UcnVlLCBhdXRvX2Rpc21pc3M9RmFsc2UpOg0KPj4NCj4gDQo+
+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
