@@ -1,27 +1,26 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:42988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gYnQ5-00048k-1F
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 02:34:34 -0500
+	(envelope-from <peterx@redhat.com>) id 1gYnQA-00048k-LB
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 02:34:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gYnNQ-0002u4-2n
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 02:31:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57466)
+	(envelope-from <peterx@redhat.com>) id 1gYnND-0002hK-02
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 02:31:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57384)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gYnNP-0002tM-Mj
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 02:31:44 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gYnNC-0002gX-QN
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 02:31:30 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 99C86C05000C
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 07:31:42 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 05C96C04FFEA
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 07:31:30 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Mon, 17 Dec 2018 15:31:12 +0800
-Message-Id: <20181217073114.11984-4-peterx@redhat.com>
+Date: Mon, 17 Dec 2018 15:31:10 +0800
+Message-Id: <20181217073114.11984-2-peterx@redhat.com>
 In-Reply-To: <20181217073114.11984-1-peterx@redhat.com>
 References: <20181217073114.11984-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/5] intel_iommu: dma read/write draining
- support
+Subject: [Qemu-devel] [PATCH 1/5] intel_iommu: dump correct iova when failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,101 +30,28 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>, Yu Wang <wyu@redhat.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>
 
-Support DMA read/write draining should be easy for existing VT-d
-emulation since the emulation itself does not have any request queue
-there so we don't need to do anything to flush the un-commited queue.
-What we need to do is to declare the support.
+The iotlb.iova can be zero if failure really happened.  Dump the addr
+instead.
 
-These capabilities are required to pass Windows SVVP test program.  It
-is verified that when with parameters "x-aw-bits=48,caching-mode=off"
-we can pass the Windows SVVP test with this patch applied.  Otherwise
-we'll fail with:
-
-        IOMMU[0] - DWD (DMA write draining) not supported
-        IOMMU[0] - DWD (DMA read draining) not supported
-        Segment 0 has no DMA remapping capable IOMMU units
-
-However since these bits are not declared support for QEMU<=3.1, we'll
-need a compatibility bit for it and we turn this on by default only
-for QEMU>=4.0.
-
-Please refer to VT-d spec 6.5.4 for more information.
-
-CC: Yu Wang <wyu@redhat.com>
-Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1654550
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- hw/i386/intel_iommu.c          | 4 ++++
- hw/i386/intel_iommu_internal.h | 3 +++
- include/hw/i386/intel_iommu.h  | 1 +
- include/hw/i386/pc.h           | 5 +++++
- 4 files changed, 13 insertions(+)
+ hw/i386/intel_iommu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 4806d7edb4..26cc731c7b 100644
+index d97bcbc2f7..f21988f396 100644
 --- a/hw/i386/intel_iommu.c
 +++ b/hw/i386/intel_iommu.c
-@@ -2659,6 +2659,7 @@ static Property vtd_properties[] = {
-     DEFINE_PROP_UINT8("x-aw-bits", IntelIOMMUState, aw_bits,
-                       VTD_HOST_ADDRESS_WIDTH),
-     DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALSE),
-+    DEFINE_PROP_BOOL("dma-drain", IntelIOMMUState, dma_drain, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-@@ -3147,6 +3148,9 @@ static void vtd_init(IntelIOMMUState *s)
-     s->cap = VTD_CAP_FRO | VTD_CAP_NFR | VTD_CAP_ND |
-              VTD_CAP_MAMV | VTD_CAP_PSI | VTD_CAP_SLLPS |
-              VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(s->aw_bits);
-+    if (s->dma_drain) {
-+        s->cap |= VTD_CAP_DRAIN;
-+    }
-     if (s->aw_bits == VTD_HOST_AW_48BIT) {
-         s->cap |= VTD_CAP_SAGAW_48bit;
+@@ -2540,7 +2540,7 @@ static IOMMUTLBEntry vtd_iommu_translate(IOMMUMemoryRegion *iommu, hwaddr addr,
+                           __func__, pci_bus_num(vtd_as->bus),
+                           VTD_PCI_SLOT(vtd_as->devfn),
+                           VTD_PCI_FUNC(vtd_as->devfn),
+-                          iotlb.iova);
++                          addr);
      }
-diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-index d084099ed9..00e9edbc66 100644
---- a/hw/i386/intel_iommu_internal.h
-+++ b/hw/i386/intel_iommu_internal.h
-@@ -203,6 +203,9 @@
- #define VTD_CAP_MAMV                (VTD_MAMV << 48)
- #define VTD_CAP_PSI                 (1ULL << 39)
- #define VTD_CAP_SLLPS               ((1ULL << 34) | (1ULL << 35))
-+#define VTD_CAP_DRAIN_WRITE         (1ULL << 54)
-+#define VTD_CAP_DRAIN_READ          (1ULL << 55)
-+#define VTD_CAP_DRAIN               (VTD_CAP_DRAIN_READ | VTD_CAP_DRAIN_WRITE)
- #define VTD_CAP_CM                  (1ULL << 7)
  
- /* Supported Adjusted Guest Address Widths */
-diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-index ed4e758273..a321cc9691 100644
---- a/include/hw/i386/intel_iommu.h
-+++ b/include/hw/i386/intel_iommu.h
-@@ -245,6 +245,7 @@ struct IntelIOMMUState {
-     OnOffAuto intr_eim;             /* Toggle for EIM cabability */
-     bool buggy_eim;                 /* Force buggy EIM unless eim=off */
-     uint8_t aw_bits;                /* Host/IOVA address width (in bits) */
-+    bool dma_drain;                 /* Whether DMA r/w draining enabled */
- 
-     /*
-      * Protects IOMMU states in general.  Currently it protects the
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 9d29c4b1df..c7c0c944e8 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -296,6 +296,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
- 
- #define PC_COMPAT_3_1 \
-     HW_COMPAT_3_1 \
-+    {\
-+        .driver   = "intel-iommu",\
-+        .property = "dma-drain",\
-+        .value    = "off",\
-+    },
- 
- #define PC_COMPAT_3_0 \
-     HW_COMPAT_3_0 \
+     return iotlb;
 -- 
 2.17.1
