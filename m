@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gYveI-0000Q3-Ih
+	(envelope-from <thuth@redhat.com>) id 1gYveI-0000Q0-IM
 	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:21:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gYveE-00007n-J2
+	(envelope-from <thuth@redhat.com>) id 1gYveD-00006U-Mf
 	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:21:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56634)
+Received: from mx1.redhat.com ([209.132.183.28]:58288)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gYveE-00006I-2e
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:21:38 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gYveD-00004v-4I
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:21:37 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6F16C3E2CF
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 16:21:37 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6E676552C7
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 16:21:36 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 17 Dec 2018 17:21:18 +0100
-Message-Id: <1545063690-10116-2-git-send-email-thuth@redhat.com>
-In-Reply-To: <1545063690-10116-1-git-send-email-thuth@redhat.com>
-References: <1545063690-10116-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PULL 01/13] tests/libqos/pci: Make PCI access
- functions independent of global_qtest
+Date: Mon, 17 Dec 2018 17:21:17 +0100
+Message-Id: <1545063690-10116-1-git-send-email-thuth@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/13] qtest patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,214 +33,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-QPCIBus already tracks QTestState, so use that state instead of an
-implicit reliance on global_qtest.
+ Hi Peter,
 
-Based on an earlier patch ("libqos: Use explicit QTestState for pci
-operations") from Eric Blake.
+the following changes since commit 139108f68486550869bd201f903f1884b78a4a=
+e1:
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/libqos/pci-pc.c    | 47 ++++++++++++++++++++++++-----------------------
- tests/libqos/pci-spapr.c | 20 ++++++++++----------
- 2 files changed, 34 insertions(+), 33 deletions(-)
+  .shippable.yml: disable the win cross tests (2018-12-17 13:02:12 +0000)
 
-diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
-index 585f528..a4fc02b 100644
---- a/tests/libqos/pci-pc.c
-+++ b/tests/libqos/pci-pc.c
-@@ -29,90 +29,91 @@ typedef struct QPCIBusPC
- 
- static uint8_t qpci_pc_pio_readb(QPCIBus *bus, uint32_t addr)
- {
--    return inb(addr);
-+    return qtest_inb(bus->qts, addr);
- }
- 
- static void qpci_pc_pio_writeb(QPCIBus *bus, uint32_t addr, uint8_t val)
- {
--    outb(addr, val);
-+    qtest_outb(bus->qts, addr, val);
- }
- 
- static uint16_t qpci_pc_pio_readw(QPCIBus *bus, uint32_t addr)
- {
--    return inw(addr);
-+    return qtest_inw(bus->qts, addr);
- }
- 
- static void qpci_pc_pio_writew(QPCIBus *bus, uint32_t addr, uint16_t val)
- {
--    outw(addr, val);
-+    qtest_outw(bus->qts, addr, val);
- }
- 
- static uint32_t qpci_pc_pio_readl(QPCIBus *bus, uint32_t addr)
- {
--    return inl(addr);
-+    return qtest_inl(bus->qts, addr);
- }
- 
- static void qpci_pc_pio_writel(QPCIBus *bus, uint32_t addr, uint32_t val)
- {
--    outl(addr, val);
-+    qtest_outl(bus->qts, addr, val);
- }
- 
- static uint64_t qpci_pc_pio_readq(QPCIBus *bus, uint32_t addr)
- {
--    return (uint64_t)inl(addr) + ((uint64_t)inl(addr + 4) << 32);
-+    return (uint64_t)qtest_inl(bus->qts, addr) +
-+        ((uint64_t)qtest_inl(bus->qts, addr + 4) << 32);
- }
- 
- static void qpci_pc_pio_writeq(QPCIBus *bus, uint32_t addr, uint64_t val)
- {
--    outl(addr, val & 0xffffffff);
--    outl(addr + 4, val >> 32);
-+    qtest_outl(bus->qts, addr, val & 0xffffffff);
-+    qtest_outl(bus->qts, addr + 4, val >> 32);
- }
- 
- static void qpci_pc_memread(QPCIBus *bus, uint32_t addr, void *buf, size_t len)
- {
--    memread(addr, buf, len);
-+    qtest_memread(bus->qts, addr, buf, len);
- }
- 
- static void qpci_pc_memwrite(QPCIBus *bus, uint32_t addr,
-                              const void *buf, size_t len)
- {
--    memwrite(addr, buf, len);
-+    qtest_memwrite(bus->qts, addr, buf, len);
- }
- 
- static uint8_t qpci_pc_config_readb(QPCIBus *bus, int devfn, uint8_t offset)
- {
--    outl(0xcf8, (1U << 31) | (devfn << 8) | offset);
--    return inb(0xcfc);
-+    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
-+    return qtest_inb(bus->qts, 0xcfc);
- }
- 
- static uint16_t qpci_pc_config_readw(QPCIBus *bus, int devfn, uint8_t offset)
- {
--    outl(0xcf8, (1U << 31) | (devfn << 8) | offset);
--    return inw(0xcfc);
-+    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
-+    return qtest_inw(bus->qts, 0xcfc);
- }
- 
- static uint32_t qpci_pc_config_readl(QPCIBus *bus, int devfn, uint8_t offset)
- {
--    outl(0xcf8, (1U << 31) | (devfn << 8) | offset);
--    return inl(0xcfc);
-+    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
-+    return qtest_inl(bus->qts, 0xcfc);
- }
- 
- static void qpci_pc_config_writeb(QPCIBus *bus, int devfn, uint8_t offset, uint8_t value)
- {
--    outl(0xcf8, (1U << 31) | (devfn << 8) | offset);
--    outb(0xcfc, value);
-+    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
-+    qtest_outb(bus->qts, 0xcfc, value);
- }
- 
- static void qpci_pc_config_writew(QPCIBus *bus, int devfn, uint8_t offset, uint16_t value)
- {
--    outl(0xcf8, (1U << 31) | (devfn << 8) | offset);
--    outw(0xcfc, value);
-+    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
-+    qtest_outw(bus->qts, 0xcfc, value);
- }
- 
- static void qpci_pc_config_writel(QPCIBus *bus, int devfn, uint8_t offset, uint32_t value)
- {
--    outl(0xcf8, (1U << 31) | (devfn << 8) | offset);
--    outl(0xcfc, value);
-+    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
-+    qtest_outl(bus->qts, 0xcfc, value);
- }
- 
- QPCIBus *qpci_init_pc(QTestState *qts, QGuestAllocator *alloc)
-diff --git a/tests/libqos/pci-spapr.c b/tests/libqos/pci-spapr.c
-index c0f7e6d..4c29889 100644
---- a/tests/libqos/pci-spapr.c
-+++ b/tests/libqos/pci-spapr.c
-@@ -45,63 +45,63 @@ typedef struct QPCIBusSPAPR {
- static uint8_t qpci_spapr_pio_readb(QPCIBus *bus, uint32_t addr)
- {
-     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
--    return readb(s->pio_cpu_base + addr);
-+    return qtest_readb(bus->qts, s->pio_cpu_base + addr);
- }
- 
- static void qpci_spapr_pio_writeb(QPCIBus *bus, uint32_t addr, uint8_t val)
- {
-     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
--    writeb(s->pio_cpu_base + addr, val);
-+    qtest_writeb(bus->qts, s->pio_cpu_base + addr, val);
- }
- 
- static uint16_t qpci_spapr_pio_readw(QPCIBus *bus, uint32_t addr)
- {
-     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
--    return bswap16(readw(s->pio_cpu_base + addr));
-+    return bswap16(qtest_readw(bus->qts, s->pio_cpu_base + addr));
- }
- 
- static void qpci_spapr_pio_writew(QPCIBus *bus, uint32_t addr, uint16_t val)
- {
-     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
--    writew(s->pio_cpu_base + addr, bswap16(val));
-+    qtest_writew(bus->qts, s->pio_cpu_base + addr, bswap16(val));
- }
- 
- static uint32_t qpci_spapr_pio_readl(QPCIBus *bus, uint32_t addr)
- {
-     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
--    return bswap32(readl(s->pio_cpu_base + addr));
-+    return bswap32(qtest_readl(bus->qts, s->pio_cpu_base + addr));
- }
- 
- static void qpci_spapr_pio_writel(QPCIBus *bus, uint32_t addr, uint32_t val)
- {
-     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
--    writel(s->pio_cpu_base + addr, bswap32(val));
-+    qtest_writel(bus->qts, s->pio_cpu_base + addr, bswap32(val));
- }
- 
- static uint64_t qpci_spapr_pio_readq(QPCIBus *bus, uint32_t addr)
- {
-     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
--    return bswap64(readq(s->pio_cpu_base + addr));
-+    return bswap64(qtest_readq(bus->qts, s->pio_cpu_base + addr));
- }
- 
- static void qpci_spapr_pio_writeq(QPCIBus *bus, uint32_t addr, uint64_t val)
- {
-     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
--    writeq(s->pio_cpu_base + addr, bswap64(val));
-+    qtest_writeq(bus->qts, s->pio_cpu_base + addr, bswap64(val));
- }
- 
- static void qpci_spapr_memread(QPCIBus *bus, uint32_t addr,
-                                void *buf, size_t len)
- {
-     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
--    memread(s->mmio32_cpu_base + addr, buf, len);
-+    qtest_memread(bus->qts, s->mmio32_cpu_base + addr, buf, len);
- }
- 
- static void qpci_spapr_memwrite(QPCIBus *bus, uint32_t addr,
-                                 const void *buf, size_t len)
- {
-     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
--    memwrite(s->mmio32_cpu_base + addr, buf, len);
-+    qtest_memwrite(bus->qts, s->mmio32_cpu_base + addr, buf, len);
- }
- 
- static uint8_t qpci_spapr_config_readb(QPCIBus *bus, int devfn, uint8_t offset)
--- 
-1.8.3.1
+are available in the git repository at:
+
+  https://gitlab.com/huth/qemu.git tags/pull-request-2018-12-17
+
+for you to fetch changes up to fe17cca6bd2cdfb9cc7f29da8e71aa1238bcdba7:
+
+  tests/bios-tables-test: Sanitize test verbose output (2018-12-17 16:21:=
+51 +0100)
+
+----------------------------------------------------------------
+- Replace global_qtest in some tests
+- Exit boot-serial-test loop if child dies
+- Sanitize verbose output in biot-tables-test
+----------------------------------------------------------------
+
+Eric Blake (2):
+      ivshmem-test: Drop dependence on global_qtest
+      tests/acpi-utils: Drop dependence on global_qtest
+
+Igor Mammedov (1):
+      tests: acpi: remove not used ACPI_READ_GENERIC_ADDRESS macro
+
+Philippe Mathieu-Daud=C3=A9 (1):
+      tests/bios-tables-test: Sanitize test verbose output
+
+Richard Henderson (1):
+      tests: Exit boot-serial-test loop if child dies
+
+Thomas Huth (8):
+      tests/libqos/pci: Make PCI access functions independent of global_q=
+test
+      tests/vmgenid: Make test independent of global_qtest
+      tests/pvpanic: Make the pvpanic test independent of global_qtest
+      tests/boot-serial: Get rid of global_qtest variable
+      tests/test-filter: Make tests independent of global_qtest
+      tests/machine-none: Make test independent of global_qtest
+      tests/prom-env: Make test independent of global_qtest
+      tests/pxe: Make test independent of global_qtest
+
+ tests/acpi-utils.c             | 19 ++++-----
+ tests/acpi-utils.h             | 57 ++++++++++++---------------
+ tests/bios-tables-test.c       | 89 ++++++++++++++++++++++--------------=
+------
+ tests/boot-serial-test.c       | 33 ++++++++++------
+ tests/ivshmem-test.c           | 18 +--------
+ tests/libqos/pci-pc.c          | 47 +++++++++++-----------
+ tests/libqos/pci-spapr.c       | 20 +++++-----
+ tests/libqtest.c               | 72 +++++++++++++++++++++-------------
+ tests/libqtest.h               |  8 ++++
+ tests/machine-none-test.c      |  7 ++--
+ tests/prom-env-test.c          | 17 ++++----
+ tests/pvpanic-test.c           | 14 ++++---
+ tests/pxe-test.c               |  7 ++--
+ tests/test-filter-mirror.c     |  9 +++--
+ tests/test-filter-redirector.c | 16 ++++----
+ tests/vmgenid-test.c           | 53 +++++++++++++------------
+ 16 files changed, 258 insertions(+), 228 deletions(-)
