@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gYxmh-0002me-OA
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 13:38:32 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gYxuy-0005Wg-Fu
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 13:47:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gYxmf-0002U1-UB
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 13:38:31 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44512)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gYxmf-0002SP-KU
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 13:38:29 -0500
-Received: by mail-wr1-x441.google.com with SMTP id z5so13341087wrt.11
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 10:38:27 -0800 (PST)
-MIME-Version: 1.0
-References: <20181213184340.24037-1-armbru@redhat.com>
-	<20181213184340.24037-33-armbru@redhat.com>
-	<fde45953-c713-daf7-f3ce-47d63b050f7a@redhat.com>
-In-Reply-To: <fde45953-c713-daf7-f3ce-47d63b050f7a@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 17 Dec 2018 22:38:14 +0400
-Message-ID: <CAJ+F1CLEDbur0x1H59U52F2kyKUhn55qJHPOBhcdeTvJdaSJLw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 32/32] qapi: add conditions to REPLICATION
- type/commands on the schema
+	(envelope-from <yuval.shaia@oracle.com>) id 1gYxuv-0001oT-3W
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 13:47:04 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:49602)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1gYxuu-0001nV-O4
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 13:47:00 -0500
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Date: Mon, 17 Dec 2018 20:45:17 +0200
+Message-Id: <20181217184540.4571-1-yuval.shaia@oracle.com>
+Subject: [Qemu-devel] [PATCH v8 00/23] Add support for RDMA MAD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,65 +22,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, QEMU <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
 
-Hi
+Hi all.
 
-On Mon, Dec 17, 2018 at 8:01 PM Thomas Huth <thuth@redhat.com> wrote:
->
-> On 2018-12-13 19:43, Markus Armbruster wrote:
-> > From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >
-> > Add #if defined(CONFIG_REPLICATION) in generated code, and adjust the
-> > code accordingly.
-> >
-> > Made conditional:
-> >
-> > * xen-set-replication, query-xen-replication-status,
-> >   xen-colo-do-checkpoint
-> >
-> >   Before the patch, we first register the commands unconditionally in
-> >   generated code (requires a stub), then conditionally unregister in
-> >   qmp_unregister_commands_hack().
-> >
-> >   Afterwards, we register only when CONFIG_REPLICATION.  The command
-> >   fails exactly the same, with CommandNotFound.
-> >
-> >   Improvement, because now query-qmp-schema is accurate, and we're one
-> >   step closer to killing qmp_unregister_commands_hack().
-> >
-> > * enum BlockdevDriver value "replication" in command blockdev-add
-> >
-> > * BlockdevOptions variant @replication
-> >
-> > and related structures.
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> > Message-Id: <20181213123724.4866-23-marcandre.lureau@redhat.com>
-> > Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> > ---
-> >  migration/colo.c     | 16 ++++------------
-> >  monitor.c            |  5 -----
-> >  qapi/block-core.json | 13 +++++++++----
-> >  qapi/migration.json  | 12 ++++++++----
-> >  4 files changed, 21 insertions(+), 25 deletions(-)
->
-> I think this might have broken compilation with --disable-replication:
->
->  https://gitlab.com/huth/qemu/-/jobs/135648240
->
-> Any ideas how to fix it?
+This is a major enhancement to the pvrdma device to allow it to work with
+state of the art applications such as MPI.
 
-We introduced a regression by dropping osdep.h include from headers.
+As described in patch #5, MAD packets are management packets that are used
+for many purposes including but not limited to communication layer above IB
+verbs API.
 
-To me, it's best to include osdep.h in headers, since the ifdef exist
-there. But I have been told we include it in .c instead. I'll upstream
-the qapi/scripts to include it.
+Patch 1 exposes new external executable (under contrib) that aims to
+address a specific limitation in the RDMA usrespace MAD stack.
 
-thanks for the report, sorry for the regression
+This patch-set mainly present MAD enhancement but during the work on it i
+came across some bugs and enhancement needed to be implemented before doing
+any MAD coding. This is the role of patches 2 to 4, 7 to 9 and 15 to 17.
 
+Patches 6 and 18 are cosmetic changes while not relevant to this patchset
+still introduce with it since (at least for 6) hard to decouple.
 
---=20
-Marc-Andr=C3=A9 Lureau
+Patches 12 to 15 couple pvrdma device with vmxnet3 device as this is the
+configuration enforced by pvrdma driver in guest - a vmxnet3 device in
+function 0 and pvrdma device in function 1 in the same PCI slot. Patch 12
+moves needed code from vmxnet3 device to a new header file that can be used
+by pvrdma code while Patches 13 to 15 use of it.
+
+Along with this patch-set there is a parallel patch posted to libvirt to
+apply the change needed there as part of the process implemented in patches
+10 and 11. This change is needed so that guest would be able to configure
+any IP to the Ethernet function of the pvrdma device.
+https://www.redhat.com/archives/libvir-list/2018-November/msg00135.html
+
+Since we maintain external resources such as GIDs on host GID table we need
+to do some cleanup before going down. This is the job of patches 19 and 20.
+
+Patches 21 to 22 contain a fixes for bugs detected during the work on
+processing VM shutdown notification.
+
+Patch 23 fixes documentation.
+
+Optional second review is welcome for:
+[10] qapi: Define new QMP message for pvrdma
+[17] hw/pvrdma: Fill error code in command's response
+
+v1 -> v2:
+    * Fix compilation issue detected when compiling for mingw.
+    * Address comment from Eric Blake re version of QEMU in json
+      message.
+    * Fix example from QMP message in json file.
+    * Fix case where a VM tries to remove an invalid GID from GID table.
+    * rdmacm-mux: Cleanup entries in socket-gids table when socket is
+      closed.
+    * Cleanup resources (GIDs, QPs etc) when VM goes down.
+
+v2 -> v3:
+    * Address comment from Cornelia Huck for patch #19.
+    * Add some R-Bs from Marcel Apfelbaum and Dmitry Fleytman.
+    * Update docs/pvrdma.txt with the changes made by this patchset.
+    * Address comments from Shamir Rabinovitch for UMAD multiplexer.
+
+v3 -> v4:
+    * Address some comments from Marcel.
+    * Add some R-Bs from Cornelia Huck and Shamir Rabinovitch.
+
+v4 -> v5:
+    * Add one more patch that deletes code that performs unneeded (and
+      buggy) cleanup of resources during VM shutdown.
+    * Fix race condition that might happen when MAD response arrive before
+      ack for the send is received.
+    * Based qapi patch on Eric Blake's patch "qapi: Reduce Makefile
+      boilerplate" per Markus Armbruster's suggestion.
+      Please note that this will cause build error until Eric's patch will
+      be applied.
+    * Add some debug log messages to rdmacm-mux.
+
+v5 -> v6
+    * Add some R-Bs from Marcel.
+    * Set hop_limit to 0xFF in mad_send.
+    * Accept comment from Marcel re clearing response in execute_command.
+    * Change version for QMP message per Eric Blake comment.
+    * Add some notes to docs/pvrdma.txt as suggested by Marcel.
+    * in rdmacm-mux, do not default to rxe0.
+
+v6 -> v7:
+    * Fix formating (checkpatch) in patch #17.
+    * Undo wrong setting done in patch #17 (found after testing with
+      Prasad's patchset).
+    * Add Marcel's r-b for patches #11 and #17.
+
+v7 -> v8:
+    * Accept Eric's comments for patch 10 and 11
+
+Thanks,
+Yuval
+
+Yuval Shaia (23):
+  contrib/rdmacm-mux: Add implementation of RDMA User MAD multiplexer
+  hw/rdma: Add ability to force notification without re-arm
+  hw/rdma: Return qpn 1 if ibqp is NULL
+  hw/rdma: Abort send-op if fail to create addr handler
+  hw/rdma: Add support for MAD packets
+  hw/pvrdma: Make function reset_device return void
+  hw/pvrdma: Make default pkey 0xFFFF
+  hw/pvrdma: Set the correct opcode for recv completion
+  hw/pvrdma: Set the correct opcode for send completion
+  qapi: Define new QMP message for pvrdma
+  hw/pvrdma: Add support to allow guest to configure GID table
+  vmxnet3: Move some definitions to header file
+  hw/pvrdma: Make sure PCI function 0 is vmxnet3
+  hw/rdma: Initialize node_guid from vmxnet3 mac address
+  hw/pvrdma: Make device state depend on Ethernet function state
+  hw/pvrdma: Fill all CQE fields
+  hw/pvrdma: Fill error code in command's response
+  hw/rdma: Remove unneeded code that handles more that one port
+  vl: Introduce shutdown_notifiers
+  hw/pvrdma: Clean device's resource when system is shutdown
+  hw/rdma: Do not use bitmap_zero_extend to free bitmap
+  hw/rdma: Do not call rdma_backend_del_gid on an empty gid
+  docs: Update pvrdma device documentation
+
+ MAINTAINERS                      |   2 +
+ Makefile                         |   3 +
+ Makefile.objs                    |   4 +-
+ contrib/rdmacm-mux/Makefile.objs |   4 +
+ contrib/rdmacm-mux/main.c        | 798 +++++++++++++++++++++++++++++++
+ contrib/rdmacm-mux/rdmacm-mux.h  |  61 +++
+ docs/pvrdma.txt                  | 126 ++++-
+ hw/net/vmxnet3.c                 | 116 +----
+ hw/net/vmxnet3_defs.h            | 133 ++++++
+ hw/rdma/rdma_backend.c           | 515 +++++++++++++++++---
+ hw/rdma/rdma_backend.h           |  28 +-
+ hw/rdma/rdma_backend_defs.h      |  19 +-
+ hw/rdma/rdma_rm.c                | 120 ++++-
+ hw/rdma/rdma_rm.h                |  17 +-
+ hw/rdma/rdma_rm_defs.h           |  21 +-
+ hw/rdma/rdma_utils.h             |  25 +
+ hw/rdma/vmw/pvrdma.h             |  10 +-
+ hw/rdma/vmw/pvrdma_cmd.c         | 225 ++++-----
+ hw/rdma/vmw/pvrdma_main.c        |  61 ++-
+ hw/rdma/vmw/pvrdma_qp_ops.c      |  62 ++-
+ include/sysemu/sysemu.h          |   1 +
+ qapi/qapi-schema.json            |   1 +
+ qapi/rdma.json                   |  38 ++
+ vl.c                             |  15 +-
+ 24 files changed, 2022 insertions(+), 383 deletions(-)
+ create mode 100644 contrib/rdmacm-mux/Makefile.objs
+ create mode 100644 contrib/rdmacm-mux/main.c
+ create mode 100644 contrib/rdmacm-mux/rdmacm-mux.h
+ create mode 100644 hw/net/vmxnet3_defs.h
+ create mode 100644 qapi/rdma.json
+
+-- 
+2.17.2
