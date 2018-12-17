@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1gYv64-0000gD-FR
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 10:46:21 -0500
+	(envelope-from <bounces@canonical.com>) id 1gYuhJ-0005je-OG
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 10:20:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1gYv63-0005to-8i
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 10:46:20 -0500
-Date: Mon, 17 Dec 2018 16:45:58 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20181217154558.hrnt2scjppa2jwsa@kamzik.brq.redhat.com>
-References: <20181217104838.18957-8-sameo@linux.intel.com>
-	<20181217153448.GF4456@caravaggio>
+	(envelope-from <bounces@canonical.com>) id 1gYuhE-0007Nr-RY
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 10:20:45 -0500
+Received: from indium.canonical.com ([91.189.90.7]:49106)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gYuhE-0007L4-Gz
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 10:20:40 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gYuhD-00057u-9p
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 15:20:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0C8612E80D1
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 15:20:39 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181217153448.GF4456@caravaggio>
-Subject: Re: [Qemu-devel] [PATCH v5 7/8] hw: acpi: Export and share the ARM
- RSDP build
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 17 Dec 2018 15:09:01 -0000
+From: William Razgunas <bjraz@abstractions.me>
+Reply-To: Bug 1808824 <1808824@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154505934144.23344.12423865582266502170.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1808824] [NEW] Mouse leaves VM window when Grab
+ on Hover isn't selected Windows 10 and Intel HAX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,25 +36,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Ortiz <sameo@linux.intel.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-On Mon, Dec 17, 2018 at 04:34:48PM +0100, Samuel Ortiz wrote:
-> 
-> From: Samuel Ortiz <sameo@linux.intel.com>
-> 
-> Now that build_rsdp() supports building both legacy and current RSDP
-> tables, we can move it to a generic folder (hw/acpi) and have the i386
-> ACPI code reuse it in order to reduce code duplication.
-> 
-> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->  include/hw/acpi/aml-build.h |  2 ++
->  hw/acpi/aml-build.c         | 68 +++++++++++++++++++++++++++++++++++++
->  hw/arm/virt-acpi-build.c    | 65 -----------------------------------
->  hw/i386/acpi-build.c        | 49 +++++++++++---------------
->  4 files changed, 89 insertions(+), 95 deletions(-)
->
+Public bug reported:
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+On Windows 10.0.17134 I have been having the problem that the mouse will
+leave the VM window after a short time when grab on hover isn't
+selected.  The VM will then try to grab on Hover and the mouse will grab
+in weird places and it will become very unwieldy to control the mouse in
+the VM window.
+
+This is exasperated by super slow response making it nearly unusable  if
+the Intel=C2=AE Hardware Accelerated Execution Manager (Intel=C2=AE HAXM) i=
+s not
+currently installed on my machine.
+
+I know they are different things but they compounded on each other when
+you have a mouse that is not staying in the VM window and the VM's
+visualized cpu is acting VERY slow the system is unusable.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1808824
+
+Title:
+  Mouse leaves VM window when Grab on Hover isn't selected Windows 10
+  and Intel HAX
+
+Status in QEMU:
+  New
+
+Bug description:
+  On Windows 10.0.17134 I have been having the problem that the mouse
+  will leave the VM window after a short time when grab on hover isn't
+  selected.  The VM will then try to grab on Hover and the mouse will
+  grab in weird places and it will become very unwieldy to control the
+  mouse in the VM window.
+
+  This is exasperated by super slow response making it nearly unusable
+  if the Intel=C2=AE Hardware Accelerated Execution Manager (Intel=C2=AE HA=
+XM) is
+  not currently installed on my machine.
+
+  I know they are different things but they compounded on each other
+  when you have a mouse that is not staying in the VM window and the
+  VM's visualized cpu is acting VERY slow the system is unusable.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1808824/+subscriptions
