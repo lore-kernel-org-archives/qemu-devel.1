@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gYxw1-0006N6-R0
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 13:48:10 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gYxxx-0008Fh-TO
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 13:50:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gYxvy-0002kv-Ff
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 13:48:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35140)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gYxvy-0002j7-7z
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 13:48:06 -0500
-Date: Tue, 18 Dec 2018 00:17:59 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <20181216203052.GA5065@lap1>
-Message-ID: <nycvar.YSQ.7.76.1812180006430.28971@xnncv>
-References: <20181212193039.11445-1-ppandit@redhat.com>
-	<20181212193039.11445-4-ppandit@redhat.com>
-	<20181216203052.GA5065@lap1>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gYxxu-00045v-4w
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 13:50:09 -0500
+References: <20181217122405.18732-1-mark.cave-ayland@ilande.co.uk>
+	<2d7d128f-6cdc-11bf-af7d-8ba8ffa4d3fb@linaro.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <143f049f-1d0f-f0d8-f9d0-23bcf015444b@ilande.co.uk>
+Date: Mon, 17 Dec 2018 18:49:47 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] pvrdma: check number of pages when
- creating rings
+In-Reply-To: <2d7d128f-6cdc-11bf-af7d-8ba8ffa4d3fb@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH v2 0/9] target/ppc: convert VMX
+ instructions to use TCG vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +25,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Saar Amar <saaramar5@gmail.com>, Li Qiang <liq3ea@163.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, lvivier@redhat.com
 
-  Hello Yuval,
+On 17/12/2018 17:39, Richard Henderson wrote:
 
-+-- On Sun, 16 Dec 2018, Yuval Shaia wrote --+
-| With this patch the last step fails, the guest OS hangs, trying to probably 
-| unload pvrdma driver and finally gave up after 3 minutes.
+> On 12/17/18 4:23 AM, Mark Cave-Ayland wrote:
+>> NOTE: there are a lot of instructions that cannot (yet) be optimised to use TCG vector
+>> operations, however it struck me that there may be some potential for converting
+>> saturating add/sub and cmp instructions if there were a mechanism to return a set of
+>> flags indicating the result of the saturation/comparison.
+> 
+> There are also a lot of instructions that can be converted, but aren't:
+> 
+> * vspltis[bhw] can use tcg_gen_gvec_dup{8,16,32}i.
+> 
+> * vsplt{b,h,w} can use tcg_gen_gvec_dup_mem.
+> 
+>   Note that you'll need something like vec_reg_offset from
+>   target/arm/translate-a64.h to compute the offset of the
+>   specific byte/word/long from which we are to splat.
 
-Strange...
- 
-| Anyways with debug turned on i have noticed that there is one case that 
-| devices gets 129 nchunks (i think in MPI) while your patch limits it to 128.
-| >From pvrdma source code  we can see that first page is dedicated to ring
-| state, this means that it maybe correct that 128 is the limit but we
-| should check that nchunks does not exceed 129, not 128.
-| 
-| What do you think?
+Oh okay, thanks for the hints - I remember thinking that I couldn't much with splat,
+but I'll go and look again.
 
- -> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/infiniband/hw/vmw_pvrdma/pvrdma_mr.c?id=fdf82a7856b32d905c39afc85e34364491e46346#n201
+> * vmr should be handled by having tcg_gen_gvec_or notice aofs == bofs.
+>   For ARM, we do special case this during translation.
+>   But since tcg/tcg-op.c does these things for tcg_gen_or_i64,
+>   we should probably handle the same set of transformations.
+> 
+> * vnot would need to be handled by actually adding a tcg_gen_gvec_nor
+>   and then also noticing aofs == bofs.
 
-the vmw_pvrdma kernel driver also seems to set MAX_FAST_REG_PAGE = 128.
+And I'll revisit these ones too.
+
+> For saturation, I think the easiest thing to do is represent SAT as a
+> ppc_avr_t.  We notice saturation by also computing normal arithmetic and
+> comparing to see if they differ.  E.g.
+> 
+>     tcg_gen_gvec_add(vece, offsetof_avr_tmp,
+>                      offsetof(ra), offsetof(rb), 16, 16);
+>     tcg_gen_gvec_ssadd(vece, offsetof(rt),
+>                        offsetof(ra), offsetof(rb), 16, 16);
+>     tcg_gen_gvec_cmp(TCG_COND_NE, vece, offsetof_avr_tmp,
+>                      offsetof_avr_tmp, offsetof(rt), 16, 16);
+>     tcg_gen_gvec_or(vece, offsetof_avr_sat, offsetof_avr_sat,
+>                     offsetof_avr_tmp, 16, 16);
+> 
+> You only need to convert the ppc_avr_t to a single bit when reading VSCR.
+
+I actually had a PoC that looked somewhat similar to this, except that I abandoned
+the idea as I thought that the penalty of doing the add twice (plus comparison) would
+slow down everything by several orders of magnitude for backends that didn't support
+vector instructions. What's the best way to handle this?
+
+> For comparisons... that's tricky.  I wonder if there's anything better than
+> 
+>     tcg_gen_gvec_cmp(TCG_COND_FOO, vece, offsetof(rt),
+>                      offsetof(ra), offsetof(rb), 16, 16);
+>     if (rc) {
+>         TCGv_i64 hi, lo, t, f;
+> 
+>         tcg_gen_ld_i64(hi, cpu_env, offsetof(rt));
+>         tcg_gen_ld_i64(lo, cpu_env, offsetof(rt) + 8);
+> 
+>         tcg_gen_and_i64(t, hi, lo);
+>         tcg_gen_or_i64(f, hi, lo);
+>         tcg_gen_setcondi_i64(TCG_COND_EQ, t, t, -1);
+>         tcg_gen_setcondi_i64(TCG_COND_EQ, f, f, 0);
+> 
+>         // truncate to i32, shift, or, and set to cr6.
+>     }
+
+Certainly I can look at this approach, but again my concern is that we end up heavily
+penalising the backends without vector instruction support :/
 
 
-| Ie. to replace this line from create_cq_ring
-| +    if (!nchunks || nchunks > PVRDMA_MAX_FAST_REG_PAGES) {
-| with this
-| +    if (!nchunks || nchunks > PVRDMA_MAX_FAST_REG_PAGES + 1) {
-| 
-| Let me know your opinion.
+ATB,
 
-While it may help to fix the regression. I'm not sure it's a right fix.
-129 seems a little odd number to have as limit.
-
-Is it possible MPI is erring in getting 129 chunks?
-
-IMO it's better to confirm the right value for 'MAX_FAST_REG_PAGES', before 
-going with > PVRDMA_MAX_FAS_REG_PAGES(=128) + 1.
-
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+Mark.
