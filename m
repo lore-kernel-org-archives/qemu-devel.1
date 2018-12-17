@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gYk2z-0006Kq-5R
-	for qemu-devel@nongnu.org; Sun, 16 Dec 2018 22:58:26 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gYl20-00087c-EG
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 00:01:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gYk2v-0004jP-Vk
-	for qemu-devel@nongnu.org; Sun, 16 Dec 2018 22:58:25 -0500
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:36882)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gYk2v-0004fT-Ds
-	for qemu-devel@nongnu.org; Sun, 16 Dec 2018 22:58:21 -0500
-Received: by mail-pg1-x541.google.com with SMTP id c25so3934189pgb.4
-	for <qemu-devel@nongnu.org>; Sun, 16 Dec 2018 19:58:20 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 16 Dec 2018 19:58:16 -0800
-Message-Id: <20181217035816.21777-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH] tests: Exit boot-serial-test loop if child dies
+	(envelope-from <dgibson@ozlabs.org>) id 1gYl1x-0007TE-7E
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 00:01:28 -0500
+Date: Mon, 17 Dec 2018 15:50:22 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20181217045022.GB5597@umbus.fritz.box>
+References: <20181215184222.15127-1-clg@kaod.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="9zSXsLTf0vkW971A"
+Content-Disposition: inline
+In-Reply-To: <20181215184222.15127-1-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH] target/ppc: fix compilation breakage on
+ windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,178 +24,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
-There's no point in waiting 5 full minutes when there will be
-no more output.  Compute timeout based on elapsed wall clock
-time instead of N * delays, as the delay is a minimum sleep time.
 
-Cc: Thomas Huth <thuth@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tests/libqtest.h         |  8 +++++
- tests/boot-serial-test.c | 16 +++++++--
- tests/libqtest.c         | 70 +++++++++++++++++++++++++---------------
- 3 files changed, 65 insertions(+), 29 deletions(-)
+--9zSXsLTf0vkW971A
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/tests/libqtest.h b/tests/libqtest.h
-index 96a6c01352..9758c51be6 100644
---- a/tests/libqtest.h
-+++ b/tests/libqtest.h
-@@ -1011,4 +1011,12 @@ bool qmp_rsp_is_err(QDict *rsp);
-  */
- void qmp_assert_error_class(QDict *rsp, const char *class);
- 
-+/**
-+ * qtest_probe_child:
-+ * @s: QTestState instance to operate on.
-+ *
-+ * Returns: true if the child is still alive.
-+ */
-+bool qtest_probe_child(QTestState *s);
-+
- #endif
-diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-index 8ec6aed35d..54b9347325 100644
---- a/tests/boot-serial-test.c
-+++ b/tests/boot-serial-test.c
-@@ -130,11 +130,12 @@ static testdef_t tests[] = {
- 
- static bool check_guest_output(const testdef_t *test, int fd)
- {
--    int i, nbr = 0, pos = 0, ccnt;
-+    int nbr = 0, pos = 0, ccnt;
-+    time_t now, start = time(NULL);
-     char ch;
- 
--    /* Poll serial output... Wait at most 360 seconds */
--    for (i = 0; i < 36000; ++i) {
-+    /* Poll serial output... */
-+    while (1) {
-         ccnt = 0;
-         while (ccnt++ < 512 && (nbr = read(fd, &ch, 1)) == 1) {
-             if (ch == test->expect[pos]) {
-@@ -148,6 +149,15 @@ static bool check_guest_output(const testdef_t *test, int fd)
-             }
-         }
-         g_assert(nbr >= 0);
-+        /* Wait only if the child is still alive.  */
-+        if (!qtest_probe_child(global_qtest)) {
-+            break;
-+        }
-+        /* Wait at most 360 seconds.  */
-+        now = time(NULL);
-+        if (now - start >= 360) {
-+            break;
-+        }
-         g_usleep(10000);
-     }
- 
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 43be078518..1d75d3c936 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -39,10 +39,11 @@ struct QTestState
- {
-     int fd;
-     int qmp_fd;
-+    pid_t qemu_pid;  /* our child QEMU process */
-+    int wstatus;
-+    bool big_endian;
-     bool irq_level[MAX_IRQ];
-     GString *rx;
--    pid_t qemu_pid;  /* our child QEMU process */
--    bool big_endian;
- };
- 
- static GHookList abrt_hooks;
-@@ -96,36 +97,52 @@ static int socket_accept(int sock)
-     return ret;
- }
- 
-+bool qtest_probe_child(QTestState *s)
-+{
-+    pid_t pid = s->qemu_pid;
-+
-+    if (pid != -1) {
-+        pid = waitpid(pid, &s->wstatus, WNOHANG);
-+        if (pid == 0) {
-+            return true;
-+        }
-+        s->qemu_pid = -1;
-+    }
-+    return false;
-+}
-+
- static void kill_qemu(QTestState *s)
- {
--    if (s->qemu_pid != -1) {
--        int wstatus = 0;
--        pid_t pid;
--
--        kill(s->qemu_pid, SIGTERM);
--        TFR(pid = waitpid(s->qemu_pid, &wstatus, 0));
-+    pid_t pid = s->qemu_pid;
-+    int wstatus;
- 
-+    /* Skip wait if qtest_probe_child already reaped.  */
-+    if (pid != -1) {
-+        kill(pid, SIGTERM);
-+        TFR(pid = waitpid(s->qemu_pid, &s->wstatus, 0));
-         assert(pid == s->qemu_pid);
--        /*
--         * We expect qemu to exit with status 0; anything else is
--         * fishy and should be logged with as much detail as possible.
--         */
--        if (wstatus) {
--            if (WIFEXITED(wstatus)) {
--                fprintf(stderr, "%s:%d: kill_qemu() tried to terminate QEMU "
--                        "process but encountered exit status %d\n",
--                        __FILE__, __LINE__, WEXITSTATUS(wstatus));
--            } else if (WIFSIGNALED(wstatus)) {
--                int sig = WTERMSIG(wstatus);
--                const char *signame = strsignal(sig) ?: "unknown ???";
--                const char *dump = WCOREDUMP(wstatus) ? " (core dumped)" : "";
-+    }
- 
--                fprintf(stderr, "%s:%d: kill_qemu() detected QEMU death "
--                        "from signal %d (%s)%s\n",
--                        __FILE__, __LINE__, sig, signame, dump);
--            }
--            abort();
-+    /*
-+     * We expect qemu to exit with status 0; anything else is
-+     * fishy and should be logged with as much detail as possible.
-+     */
-+    wstatus = s->wstatus;
-+    if (wstatus) {
-+        if (WIFEXITED(wstatus)) {
-+            fprintf(stderr, "%s:%d: kill_qemu() tried to terminate QEMU "
-+                    "process but encountered exit status %d\n",
-+                    __FILE__, __LINE__, WEXITSTATUS(wstatus));
-+        } else if (WIFSIGNALED(wstatus)) {
-+            int sig = WTERMSIG(wstatus);
-+            const char *signame = strsignal(sig) ?: "unknown ???";
-+            const char *dump = WCOREDUMP(wstatus) ? " (core dumped)" : "";
-+
-+            fprintf(stderr, "%s:%d: kill_qemu() detected QEMU death "
-+                    "from signal %d (%s)%s\n",
-+                    __FILE__, __LINE__, sig, signame, dump);
-         }
-+        abort();
-     }
- }
- 
-@@ -228,6 +245,7 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
- 
-     g_test_message("starting QEMU: %s", command);
- 
-+    s->wstatus = 0;
-     s->qemu_pid = fork();
-     if (s->qemu_pid == 0) {
-         setenv("QEMU_AUDIO_DRV", "none", true);
--- 
-2.17.2
+On Sat, Dec 15, 2018 at 07:42:22PM +0100, C=E9dric Le Goater wrote:
+> Fix the PPC_BIT definitions to use ULL instead in UL and replace
+> __builtin_ffssl() by the equivalent ctz routines.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> ---
+>=20
+>  Compile tested with --cross-prefix=3Dx86_64-w64-mingw32-. When I have
+>  some more time, I might try runtime on windows also.
+
+Which version of the mingw compiler do you have?  As I've noted
+elsewhere, I haven't been able to reproduce the problem with the mingw
+in Fedora 29.
+
+>  The PPC compile failures have been there for a while (pre 2.12) and
+>  the MASK_TO_LSH macro was not used until the XIVE definitions were
+>  introduced.
+>=20
+>  I let you guys decide on how you want to proceed, but I think it is
+>  safe to merge this patch as a prereq of the pull request.
+>=20
+>  Thanks,
+>=20
+>  C.
+>=20
+>  target/ppc/cpu.h | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index ab68abe8a23c..a3d3e91eb4ce 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -70,18 +70,18 @@
+>  #define PPC_ELF_MACHINE     EM_PPC
+>  #endif
+> =20
+> -#define PPC_BIT(bit)            (0x8000000000000000UL >> (bit))
+> -#define PPC_BIT32(bit)          (0x80000000UL >> (bit))
+> -#define PPC_BIT8(bit)           (0x80UL >> (bit))
+> +#define PPC_BIT(bit)            (0x8000000000000000ULL >> (bit))
+> +#define PPC_BIT32(bit)          (0x80000000ULL >> (bit))
+> +#define PPC_BIT8(bit)           (0x80ULL >> (bit))
+
+We shouldn't need the ULL for the 32-bit and (especially) 8-bit
+versions.
+
+>  #define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_BIT(b=
+s))
+>  #define PPC_BITMASK32(bs, be)   ((PPC_BIT32(bs) - PPC_BIT32(be)) | \
+>                                   PPC_BIT32(bs))
+>  #define PPC_BITMASK8(bs, be)    ((PPC_BIT8(bs) - PPC_BIT8(be)) | PPC_BIT=
+8(bs))
+> =20
+>  #if HOST_LONG_BITS =3D=3D 32
+> -# define MASK_TO_LSH(m)          (__builtin_ffsll(m) - 1)
+> +# define MASK_TO_LSH(m)          ctz32(m)
+>  #elif HOST_LONG_BITS =3D=3D 64
+> -# define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
+> +# define MASK_TO_LSH(m)          ctz64(m)
+
+Having another look at this, this seems bogus: we're defining an
+interface that's only correct on a *host long*.  But when we use it
+we're almost certain to be working on guest values with a fixed size,
+so using this wrapper just adds confusion.
+
+I'm not really seeing any reason to use MASK_TO_LSH() rather than
+using ctz32() and ctz64() explicitly.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--9zSXsLTf0vkW971A
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwXKwwACgkQbDjKyiDZ
+s5JVHxAAwqFXLiV9SlmEI/FbOUjnWMUZsq0fn97lyZo6YVLwWd/Uh41heNVJmW2e
+i/GJ2li0hy8bZfJ6kydcjEgR2InVFhMu8H8KJMgJJ5VpndFaDeJjpzUI8enV0RSA
+ymvXTlAFykN8jW+gqRLycZLTZFtl0cYmvRC8gW03Rg4N9dFjRontTAhqiBJrisdo
+xqfJiZiXbcYPvjf5qhw52BKR7sGhGObdvJf85ZRkhVL79pHiCL2L51zw8YDTj6xM
+GHWc2xeMbAsKo/f/oNDbAH17qcu+dqj+0ybHSNoKiGFODNwJZQNa+550NciC30rP
+hjwj7/wz4H1LUVRzA4NA0z28RdRo3piR5YatqVU0ohue7ibcLh9kGuqM4Rb+NxKZ
+g3McxfZS6/z4x8r0H0TdBXdXq2qriK4QWr6M4U4NlEtqI8YjtkpxwoUiUxFyyVV0
+lknir8KQfBvS/M3GxAvapOMQz4y528BI/pnQ8uUiji64e9eYI8TJnapU2ARxJI7B
+IyK98kuTFzupEidLVkHU72j7gFUX/zzA/9wmpQCEvj5X3wRH7RdNamiB3XBIpZbb
+Jn/6q4chG5FZHIEPgMhPno1ScCoCcnXuI/tQH93vGqeZQmWGq3d1UMWcXADhCLRs
+Ig4tbJc7JNlBGa2c7AejyHWhuR42gPOWCcF05Ee75zkpdmL+ms0=
+=2NZ0
+-----END PGP SIGNATURE-----
+
+--9zSXsLTf0vkW971A--
