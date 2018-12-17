@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gYnrN-0005ur-4K
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 03:02:42 -0500
+	(envelope-from <clg@kaod.org>) id 1gYntW-0007Wa-V0
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 03:04:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gYnrI-00008U-VL
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 03:02:41 -0500
-Received: from 8.mo179.mail-out.ovh.net ([46.105.75.26]:42769)
+	(envelope-from <clg@kaod.org>) id 1gYntR-000360-EL
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 03:04:54 -0500
+Received: from 11.mo4.mail-out.ovh.net ([46.105.34.195]:45486)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gYnrI-000061-Lf
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 03:02:36 -0500
-Received: from player729.ha.ovh.net (unknown [10.109.143.220])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 1065A10BF53
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 09:02:34 +0100 (CET)
-References: <20181211223823.13770-1-clg@kaod.org>
-	<20181211223823.13770-8-clg@kaod.org>
-	<20181217052758.GC5597@umbus.fritz.box>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gYntR-00030q-3M
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 03:04:49 -0500
+Received: from player699.ha.ovh.net (unknown [10.109.160.93])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id BAF091C6800
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 09:04:45 +0100 (CET)
+References: <20181213040126.6768-1-david@gibson.dropbear.id.au>
+	<CAFEAcA_4xV2M0Tgw6KSSQ7DOhv3r=FhETH_Yhmg2h0UT3AYS9g@mail.gmail.com>
+	<950689dd-1946-a42f-6a68-2944b46d53fc@kaod.org>
+	<20181217010344.GA5597@umbus.fritz.box>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <0011604a-35bf-0797-507c-77cf283b418f@kaod.org>
-Date: Mon, 17 Dec 2018 09:02:13 +0100
+Message-ID: <b66a8dcb-dadc-ff8b-d054-14620961cb4a@kaod.org>
+Date: Mon, 17 Dec 2018 09:04:26 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181217052758.GC5597@umbus.fritz.box>
+In-Reply-To: <20181217010344.GA5597@umbus.fritz.box>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 07/12] spapr: add an extra OV5 field to
- the sPAPR IRQ backend
+Subject: Re: [Qemu-devel] [PULL 00/27] ppc-for-4.0 queue 20181213
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,219 +34,342 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, gkurz@kaod.org, Laurent Vivier <lvivier@redhat.com>, spopovyc@redhat.com, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 12/17/18 6:27 AM, David Gibson wrote:
-> On Tue, Dec 11, 2018 at 11:38:18PM +0100, C=E9dric Le Goater wrote:
->> The interrupt modes supported by the hypervisor are advertised to the
->> guest with new bits definitions of the option vector 5 of property
->> "ibm,arch-vec-5-platform-support. The byte 23 bits 0-1 of the OV5 are
->> defined as follow :
+On 12/17/18 2:03 AM, David Gibson wrote:
+> On Fri, Dec 14, 2018 at 06:49:55PM +0100, C=E9dric Le Goater wrote:
+>> On 12/14/18 5:03 PM, Peter Maydell wrote:
+>>> On Thu, 13 Dec 2018 at 04:01, David Gibson <david@gibson.dropbear.id.=
+au> wrote:
+>>>>
+>>>> The following changes since commit 4b3aab204204ca742836219b97b538d90=
+584f4f2:
+>>>>
+>>>>   Merge remote-tracking branch 'remotes/vivier2/tags/trivial-patches=
+-pull-request' into staging (2018-12-11 22:26:44 +0000)
+>>>>
+>>>> are available in the Git repository at:
+>>>>
+>>>>   git://github.com/dgibson/qemu.git tags/ppc-for-4.0-20181213
+>>>>
+>>>> for you to fetch changes up to 67888a17b6683600ae3fa64ca275c737ba8a9=
+a45:
+>>>>
+>>>>   spapr/xive: use the VCPU id as a NVT identifier (2018-12-13 09:44:=
+04 +1100)
+>>>>
+>>>> ----------------------------------------------------------------
+>>>> ppc patch queue 2018-12-13
+>>>>
+>>>> Here's the first ppc and spapr pull request for 4.0.  Highlights are=
+:
+>>>>
+>>>>  * The start of support for the POWER9 "XIVE" interrupt controller
+>>>>    (not complete enough to use yet, but we're getting there)
+>>>>  * A number of g_new vs. g_malloc cleanups
+>>>>  * Some IRQ wiring cleanups
+>>>>  * A fix for how we advertise NUMA nodes to the guest for pseries
+>>>>
+>>>> ---------------------------------------------------------------
+>>>
+>>>
+>>> Compile errors in the windows cross-build.=20
 >>
->>   0b00   PAPR 2.7 and earlier (Legacy systems)
->>   0b01   XIVE Exploitation mode only
->>   0b10   Either available
+>> are you compiling with the mingw64-* packages ? as documented in :
 >>
->> If the client/guest selects the XIVE interrupt mode, it informs the
->> hypervisor by returning the value 0b01 in byte 23 bits 0-1. A 0b00
->> value indicates the use of the XICS interrupt mode (Legacy systems).
+>> 	https://wiki.qemu.org/Hosts/W32
 >>
->> The sPAPR IRQ backend is extended with these definitions and the
->> values are directly used to populate the "ibm,arch-vec-5-platform-supp=
-ort"
->> property. The interrupt mode is advertised under TCG and under KVM.
->> Although a KVM XIVE device is not yet available, the machine can still
->> operate with kernel_irqchip=3Doff. However, we apply a restriction on
->> the CPU which is required to be a POWER9 when a XIVE interrupt
->> controller is in use.
+>>> These look like
+>>> they're assumptions that "long" is 64 bits, which it is not on Window=
+s.
+>>> For instance the PPC_BIT macro should be using the ULL suffix, not UL
+>>> ("UL" is almost always a bug: either the constant is 32-bit, in
+>>> which case "U" is what you want, or it's 64-bit and you need "ULL").
 >>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
+>> ok. These definitions come from our skiboot firmware which I wanted=20
+>> to keep as it was. It seems I will need to adapt.
 >>
->>  Changes since v7:
+>>> Using __builtin_ffsl() directly in target/ppc/cpu.h also looks
+>>> a bit dubious -- this should be rephrased to use ctz32() or ctz64()
+>>> instead.
 >>
->>  - improved commit log
->>  - introduced a check on CPU type.
->>
->>  include/hw/ppc/spapr.h     |  6 ++++++
->>  include/hw/ppc/spapr_irq.h |  1 +
->>  hw/ppc/spapr.c             | 36 ++++++++++++++++++++++++++++++------
->>  hw/ppc/spapr_irq.c         |  3 +++
->>  4 files changed, 40 insertions(+), 6 deletions(-)
->>
->> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
->> index 6bf028a02fe2..06765b4e9d79 100644
->> --- a/include/hw/ppc/spapr.h
->> +++ b/include/hw/ppc/spapr.h
->> @@ -824,5 +824,11 @@ int spapr_caps_post_migration(sPAPRMachineState *=
-spapr);
->> =20
->>  void spapr_check_pagesize(sPAPRMachineState *spapr, hwaddr pagesize,
->>                            Error **errp);
->> +/*
->> + * XIVE definitions
->> + */
->> +#define SPAPR_OV5_XIVE_LEGACY   0x0
->> +#define SPAPR_OV5_XIVE_EXPLOIT  0x40
->> +#define SPAPR_OV5_XIVE_BOTH     0x80 /* Only to advertise on the plat=
-form */
->> =20
->>  #endif /* HW_SPAPR_H */
->> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
->> index 63061a009b4c..b34d5a00381b 100644
->> --- a/include/hw/ppc/spapr_irq.h
->> +++ b/include/hw/ppc/spapr_irq.h
->> @@ -33,6 +33,7 @@ void spapr_irq_msi_reset(sPAPRMachineState *spapr);
->>  typedef struct sPAPRIrq {
->>      uint32_t    nr_irqs;
->>      uint32_t    nr_msis;
->> +    uint8_t     ov5;
->> =20
->>      void (*init)(sPAPRMachineState *spapr, Error **errp);
->>      int (*claim)(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
-*errp);
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index 57c0066edd56..ff138f224a87 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -1095,12 +1095,14 @@ static void spapr_dt_rtas(sPAPRMachineState *s=
-papr, void *fdt)
->>      spapr_dt_rtas_tokens(fdt, rtas);
->>  }
->> =20
->> -/* Prepare ibm,arch-vec-5-platform-support, which indicates the MMU f=
-eatures
->> - * that the guest may request and thus the valid values for bytes 24.=
-.26 of
->> - * option vector 5: */
->> -static void spapr_dt_ov5_platform_support(void *fdt, int chosen)
->> +/* Prepare ibm,arch-vec-5-platform-support, which indicates the MMU
->> + * and the XIVE features that the guest may request and thus the vali=
-d
->> + * values for bytes 23..26 of option vector 5: */
->> +static void spapr_dt_ov5_platform_support(sPAPRMachineState *spapr, v=
-oid *fdt,
->> +                                          int chosen)
->>  {
->>      PowerPCCPU *first_ppc_cpu =3D POWERPC_CPU(first_cpu);
->> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
->> =20
->>      char val[2 * 4] =3D {
->>          23, 0x00, /* Xive mode, filled in below. */
->> @@ -1111,9 +1113,17 @@ static void spapr_dt_ov5_platform_support(void =
-*fdt, int chosen)
->> =20
->>      if (!ppc_check_compat(first_ppc_cpu, CPU_POWERPC_LOGICAL_3_00, 0,
->>                            first_ppc_cpu->compat_pvr)) {
->> -        /* If we're in a pre POWER9 compat mode then the guest should=
- do hash */
->> +        /* If we're in a pre POWER9 compat mode then the guest should=
- do hash
->> +         * and use the legacy interrupt mode
->> +         */
->> +        val[1] =3D 0x00; /* XICS */
->>          val[3] =3D 0x00; /* Hash */
->>      } else if (kvm_enabled()) {
->> +        /* If the KVM XIVE device is not available, the machine can
->> +         * still operate with kernel_irqchip=3Doff
->> +         */
->> +        val[1] =3D smc->irq->ov5;
+>> ok. I will work on a fix.
 >=20
+> So, I tried to confirm the problem, before applying C=E9dric's fix, but
+> I don't seem to be able to.  I'm getting a bunch of failures in the
+> windows cross-build on master, which look like gcc8 problems - but
+> nothing new or different in my tree.
 >=20
-> I know it means another layer of if, but I'd prefer to rearrange this
-> so setting the intc value is outside the if (kvm_enabled())..
+> $ ./configure --cross-prefix=3Di686-w64-mingw32-
 
-That's ok. I expected some discussion on the cpu->intc pointer and we=20
-have the cross build problem to fix also.
-
->> +
->>          if (kvmppc_has_cap_mmu_radix() && kvmppc_has_cap_mmu_hash_v3(=
-)) {
->>              val[3] =3D 0x80; /* OV5_MMU_BOTH */
->>          } else if (kvmppc_has_cap_mmu_radix()) {
->> @@ -1122,6 +1132,9 @@ static void spapr_dt_ov5_platform_support(void *=
-fdt, int chosen)
->>              val[3] =3D 0x00; /* Hash */
->>          }
->>      } else {
->> +        /* In TCG, the interrupt mode is defined by the pseries machi=
-ne */
->> +        val[1] =3D smc->irq->ov5;
->=20
-> ..rather than duplicated in each branch.
-
-ok.
+I am still using f28. Another reason to update.
 
 Thanks,
 
 C.
 
-
->> +
->>          /* V3 MMU supports both hash and radix in tcg (with dynamic s=
-witching) */
->>          val[3] =3D 0xC0;
->>      }
->> @@ -1189,7 +1202,7 @@ static void spapr_dt_chosen(sPAPRMachineState *s=
-papr, void *fdt)
->>          _FDT(fdt_setprop_string(fdt, chosen, "stdout-path", stdout_pa=
-th));
->>      }
->> =20
->> -    spapr_dt_ov5_platform_support(fdt, chosen);
->> +    spapr_dt_ov5_platform_support(spapr, fdt, chosen);
->> =20
->>      g_free(stdout_path);
->>      g_free(bootlist);
->> @@ -2622,6 +2635,17 @@ static void spapr_machine_init(MachineState *ma=
-chine)
->>      /* advertise support for ibm,dyamic-memory-v2 */
->>      spapr_ovec_set(spapr->ov5, OV5_DRMEM_V2);
->> =20
->> +    /* advertise XIVE on POWER9 machines */
->> +    if (smc->irq->ov5 & SPAPR_OV5_XIVE_EXPLOIT) {
->> +        if (ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGI=
-CAL_3_00,
->> +                                  0, spapr->max_compat_pvr)) {
->> +            spapr_ovec_set(spapr->ov5, OV5_XIVE_EXPLOIT);
->> +        } else {
->> +            error_report("XIVE-only machines require a POWER9 CPU");
->> +            exit(1);
->> +        }
->> +    }
->> +
->>      /* init CPUs */
->>      spapr_init_cpus(spapr);
->> =20
->> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
->> index f835ea939cbf..79f06308995b 100644
->> --- a/hw/ppc/spapr_irq.c
->> +++ b/hw/ppc/spapr_irq.c
->> @@ -216,6 +216,7 @@ static int spapr_irq_post_load_xics(sPAPRMachineSt=
-ate *spapr, int version_id)
->>  sPAPRIrq spapr_irq_xics =3D {
->>      .nr_irqs     =3D SPAPR_IRQ_XICS_NR_IRQS,
->>      .nr_msis     =3D SPAPR_IRQ_XICS_NR_MSIS,
->> +    .ov5         =3D SPAPR_OV5_XIVE_LEGACY,
->> =20
->>      .init        =3D spapr_irq_init_xics,
->>      .claim       =3D spapr_irq_claim_xics,
->> @@ -342,6 +343,7 @@ static void spapr_irq_reset_xive(sPAPRMachineState=
- *spapr, Error **errp)
->>  sPAPRIrq spapr_irq_xive =3D {
->>      .nr_irqs     =3D SPAPR_IRQ_XIVE_NR_IRQS,
->>      .nr_msis     =3D SPAPR_IRQ_XIVE_NR_MSIS,
->> +    .ov5         =3D SPAPR_OV5_XIVE_EXPLOIT,
->> =20
->>      .init        =3D spapr_irq_init_xive,
->>      .claim       =3D spapr_irq_claim_xive,
->> @@ -466,6 +468,7 @@ int spapr_irq_find(sPAPRMachineState *spapr, int n=
-um, bool align, Error **errp)
->>  sPAPRIrq spapr_irq_xics_legacy =3D {
->>      .nr_irqs     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
->>      .nr_msis     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
->> +    .ov5         =3D SPAPR_OV5_XIVE_LEGACY,
->> =20
->>      .init        =3D spapr_irq_init_xics,
->>      .claim       =3D spapr_irq_claim_xics,
+=20
+> [...]
+>=20
+> $ make -k
+>=20
+> 	CHK version_gen.h
+>   CC      block/sheepdog.o
+> block/sheepdog.c: In function 'find_vdi_name':
+> block/sheepdog.c:1239:5: error: 'strncpy' specified bound 256 equals de=
+stination size [-Werror=3Dstringop-truncation]
+>      strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
+>      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
+> make: *** [/home/dwg/src/qemu/rules.mak:69: block/sheepdog.o] Error 1
+>   CC      hw/acpi/core.o
+> In function 'acpi_table_install',
+>     inlined from 'acpi_table_add' at hw/acpi/core.c:296:5:
+> hw/acpi/core.c:184:9: error: 'strncpy' specified bound 4 equals destina=
+tion size [-Werror=3Dstringop-truncation]
+>          strncpy(ext_hdr->sig, hdrs->sig, sizeof ext_hdr->sig);
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> hw/acpi/core.c:203:9: error: 'strncpy' specified bound 6 equals destina=
+tion size [-Werror=3Dstringop-truncation]
+>          strncpy(ext_hdr->oem_id, hdrs->oem_id, sizeof ext_hdr->oem_id)=
+;
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> hw/acpi/core.c:207:9: error: 'strncpy' specified bound 8 equals destina=
+tion size [-Werror=3Dstringop-truncation]
+>          strncpy(ext_hdr->oem_table_id, hdrs->oem_table_id,
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>                  sizeof ext_hdr->oem_table_id);
+>                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> hw/acpi/core.c:216:9: error: 'strncpy' specified bound 4 equals destina=
+tion size [-Werror=3Dstringop-truncation]
+>          strncpy(ext_hdr->asl_compiler_id, hdrs->asl_compiler_id,
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>                  sizeof ext_hdr->asl_compiler_id);
+>                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
+> make: *** [/home/dwg/src/qemu/rules.mak:69: hw/acpi/core.o] Error 1
+>   CC      hw/acpi/aml-build.o
+> hw/acpi/aml-build.c: In function 'build_header':
+> hw/acpi/aml-build.c:1535:9: error: 'strncpy' specified bound 6 equals d=
+estination size [-Werror=3Dstringop-truncation]
+>          strncpy((char *)h->oem_id, oem_id, sizeof h->oem_id);
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> hw/acpi/aml-build.c:1541:9: error: 'strncpy' specified bound 8 equals d=
+estination size [-Werror=3Dstringop-truncation]
+>          strncpy((char *)h->oem_table_id, oem_table_id, sizeof(h->oem_t=
+able_id));
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~~~~~~~~
+> cc1: all warnings being treated as errors
+> make: *** [/home/dwg/src/qemu/rules.mak:69: hw/acpi/aml-build.o] Error =
+1
+>   CC      migration/global_state.o
+> migration/global_state.c: In function 'global_state_store_running':
+> migration/global_state.c:45:5: error: 'strncpy' specified bound 100 equ=
+als destination size [-Werror=3Dstringop-truncation]
+>      strncpy((char *)global_state.runstate,
+>      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>             state, sizeof(global_state.runstate));
+>             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
+> make: *** [/home/dwg/src/qemu/rules.mak:69: migration/global_state.o] E=
+rror 1
+> make: Target 'all' not remade because of errors.
+>=20
+>=20
+>>
+>> Thanks,
+>>
+>> C.
+>>
+>>
+>>> In file included from /home/petmay01/qemu-for-merges/hw/intc/xive.c:1=
+3:0:
+>>> /home/petmay01/qemu-for-merges/hw/intc/xive.c: In function 'xive_rout=
+er_notify':
+>>> /home/petmay01/qemu-for-merges/target/ppc/cpu.h:76:33: error: overflo=
+w
+>>> in implicit constant conversion [-Werror=3Doverflow]
+>>>  #define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_B=
+IT(bs))
+>>>                                  ^
+>>> /home/petmay01/qemu-for-merges/target/ppc/cpu.h:84:50: note: in
+>>> definition of macro 'MASK_TO_LSH'
+>>>  # define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
+>>>                                                   ^
+>>> /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:129:34:
+>>> note: in expansion of macro 'GETFIELD'
+>>>  #define GETFIELD_BE64(m, v)      GETFIELD(m, be64_to_cpu(v))
+>>>                                   ^
+>>> /home/petmay01/qemu-for-merges/hw/intc/xive.c:1366:28: note: in
+>>> expansion of macro 'GETFIELD_BE64'
+>>>                             GETFIELD_BE64(EAS_END_BLOCK, eas.w),
+>>>                             ^
+>>> /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:120:25:
+>>> note: in expansion of macro 'PPC_BITMASK'
+>>>  #define EAS_END_BLOCK   PPC_BITMASK(4, 7)        /* Destination END =
+block# */
+>>>                          ^
+>>> /home/petmay01/qemu-for-merges/hw/intc/xive.c:1366:42: note: in
+>>> expansion of macro 'EAS_END_BLOCK'
+>>>                             GETFIELD_BE64(EAS_END_BLOCK, eas.w),
+>>>                                           ^
+>>> /home/petmay01/qemu-for-merges/target/ppc/cpu.h:89:46: error: right
+>>> shift count is negative [-Werror=3Dshift-count-negative]
+>>>  #define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
+>>>                                               ^
+>>> /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:129:34:
+>>> note: in expansion of macro 'GETFIELD'
+>>>  #define GETFIELD_BE64(m, v)      GETFIELD(m, be64_to_cpu(v))
+>>>                                   ^
+>>> /home/petmay01/qemu-for-merges/hw/intc/xive.c:1366:28: note: in
+>>> expansion of macro 'GETFIELD_BE64'
+>>>                             GETFIELD_BE64(EAS_END_BLOCK, eas.w),
+>>>                             ^
+>>> /home/petmay01/qemu-for-merges/target/ppc/cpu.h:76:33: error: overflo=
+w
+>>> in implicit constant conversion [-Werror=3Doverflow]
+>>>  #define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_B=
+IT(bs))
+>>>                                  ^
+>>> /home/petmay01/qemu-for-merges/target/ppc/cpu.h:84:50: note: in
+>>> definition of macro 'MASK_TO_LSH'
+>>>  # define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
+>>>                                                   ^
+>>> /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:129:34:
+>>> note: in expansion of macro 'GETFIELD'
+>>>  #define GETFIELD_BE64(m, v)      GETFIELD(m, be64_to_cpu(v))
+>>>                                   ^
+>>> /home/petmay01/qemu-for-merges/hw/intc/xive.c:1367:28: note: in
+>>> expansion of macro 'GETFIELD_BE64'
+>>>                             GETFIELD_BE64(EAS_END_INDEX, eas.w),
+>>>                             ^
+>>> /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:121:25:
+>>> note: in expansion of macro 'PPC_BITMASK'
+>>>  #define EAS_END_INDEX   PPC_BITMASK(8, 31)       /* Destination END =
+index */
+>>>                          ^
+>>> /home/petmay01/qemu-for-merges/hw/intc/xive.c:1367:42: note: in
+>>> expansion of macro 'EAS_END_INDEX'
+>>>                             GETFIELD_BE64(EAS_END_INDEX, eas.w),
+>>>                                           ^
+>>> /home/petmay01/qemu-for-merges/target/ppc/cpu.h:89:46: error: right
+>>> shift count is negative [-Werror=3Dshift-count-negative]
+>>>  #define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
+>>>                                               ^
+>>> /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:129:34:
+>>> note: in expansion of macro 'GETFIELD'
+>>>  #define GETFIELD_BE64(m, v)      GETFIELD(m, be64_to_cpu(v))
+>>>                                   ^
+>>> /home/petmay01/qemu-for-merges/hw/intc/xive.c:1367:28: note: in
+>>> expansion of macro 'GETFIELD_BE64'
+>>>                             GETFIELD_BE64(EAS_END_INDEX, eas.w),
+>>>                             ^
+>>> /home/petmay01/qemu-for-merges/hw/intc/xive.c: In function
+>>> 'xive_eas_pic_print_info':
+>>> /home/petmay01/qemu-for-merges/target/ppc/cpu.h:76:33: error: overflo=
+w
+>>> in implicit constant conversion [-Werror=3Doverflow]
+>>>  #define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_B=
+IT(bs))
+>>>                                  ^
+>>> /home/petmay01/qemu-for-merges/target/ppc/cpu.h:84:50: note: in
+>>> definition of macro 'MASK_TO_LSH'
+>>>  # define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
+>>>                                                   ^
+>>> /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:129:34:
+>>> note: in expansion of macro 'GETFIELD'
+>>>  #define GETFIELD_BE64(m, v)      GETFIELD(m, be64_to_cpu(v))
+>>>                                   ^
+>>> /home/petmay01/qemu-for-merges/hw/intc/xive.c:1400:31: note: in
+>>> expansion of macro 'GETFIELD_BE64'
+>>>                     (uint8_t)  GETFIELD_BE64(EAS_END_BLOCK, eas->w),
+>>>                                ^
+>>> /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:120:25:
+>>> note: in expansion of macro 'PPC_BITMASK'
+>>>  #define EAS_END_BLOCK   PPC_BITMASK(4, 7)        /* Destination END =
+block# */
+>>>                          ^
+>>> /home/petmay01/qemu-for-merges/hw/intc/xive.c:1400:45: note: in
+>>> expansion of macro 'EAS_END_BLOCK'
+>>>                     (uint8_t)  GETFIELD_BE64(EAS_END_BLOCK, eas->w),
+>>>                                              ^
+>>> /home/petmay01/qemu-for-merges/target/ppc/cpu.h:89:46: error: right
+>>> shift count is negative [-Werror=3Dshift-count-negative]
+>>>  #define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
+>>>                                               ^
+>>> /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:129:34:
+>>> note: in expansion of macro 'GETFIELD'
+>>>  #define GETFIELD_BE64(m, v)      GETFIELD(m, be64_to_cpu(v))
+>>>                                   ^
+>>> /home/petmay01/qemu-for-merges/hw/intc/xive.c:1400:31: note: in
+>>> expansion of macro 'GETFIELD_BE64'
+>>>                     (uint8_t)  GETFIELD_BE64(EAS_END_BLOCK, eas->w),
+>>>                                ^
+>>> /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:120:25:
+>>> note: in expansion of macro 'PPC_BITMASK'
+>>>  #define EAS_END_BLOCK   PPC_BITMASK(4, 7)        /* Destination END =
+block# */
+>>>                          ^
+>>> /home/petmay01/qemu-for-merges/hw/intc/xive.c:1400:45: note: in
+>>> expansion of macro 'EAS_END_BLOCK'
+>>>                     (uint8_t)  GETFIELD_BE64(EAS_END_BLOCK, eas->w),
+>>>                                              ^
+>>> /home/petmay01/qemu-for-merges/target/ppc/cpu.h:89:46: error: right
+>>> shift count is negative [-Werror=3Dshift-count-negative]
+>>>  #define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
+>>>                                               ^
+>>> /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:129:34:
+>>> note: in expansion of macro 'GETFIELD'
+>>>  #define GETFIELD_BE64(m, v)      GETFIELD(m, be64_to_cpu(v))
+>>>                                   ^
+>>> /home/petmay01/qemu-for-merges/hw/intc/xive.c:1400:31: note: in
+>>> expansion of macro 'GETFIELD_BE64'
+>>>                     (uint8_t)  GETFIELD_BE64(EAS_END_BLOCK, eas->w),
+>>>                                ^
+>>> /home/petmay01/qemu-for-merges/target/ppc/cpu.h:76:33: error: overflo=
+w
+>>> in implicit constant conversion [-Werror=3Doverflow]
+>>>  #define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_B=
+IT(bs))
+>>>                                  ^
+>>> /home/petmay01/qemu-for-merges/target/ppc/cpu.h:84:50: note: in
+>>> definition of macro 'MASK_TO_LSH'
+>>>  # define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
+>>>                                                   ^
+>>> /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:129:34:
+>>> note: in expansion of macro 'GETFIELD'
+>>>  #define GETFIELD_BE64(m, v)      GETFIELD(m, be64_to_cpu(v))
+>>>                                   ^
+>>> /home/petmay01/qemu-for-merges/hw/intc/xive.c:1401:31: note: in
+>>> expansion of macro 'GETFIELD_BE64'
+>>>                     (uint32_t) GETFIELD_BE64(EAS_END_INDEX, eas->w),
+>>>                                ^
+>>> /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:121:25:
+>>> note: in expansion of macro 'PPC_BITMASK'
+>>>  #define EAS_END_INDEX   PPC_BITMASK(8, 31)       /* Destination END =
+index */
+>>>                          ^
+>>> /home/petmay01/qemu-for-merges/hw/intc/xive.c:1401:45: note: in
+>>> expansion of macro 'EAS_END_INDEX'
+>>>                     (uint32_t) GETFIELD_BE64(EAS_END_INDEX, eas->w),
+>>>                                              ^
+>>> /home/petmay01/qemu-for-merges/target/ppc/cpu.h:89:46: error: right
+>>> shift count is negative [-Werror=3Dshift-count-negative]
+>>>  #define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
+>>>                                               ^
+>>> /home/petmay01/qemu-for-merges/include/hw/ppc/xive_regs.h:129:34:
+>>> note: in expansion of macro 'GETFIELD'
+>>>  #define GETFIELD_BE64(m, v)      GETFIELD(m, be64_to_cpu(v))
+>>>                                   ^
+>>> /home/petmay01/qemu-for-merges/hw/intc/xive.c:1401:31: note: in
+>>> expansion of macro 'GETFIELD_BE64'
+>>>                     (uint32_t) GETFIELD_BE64(EAS_END_INDEX, eas->w),
+>>>                                ^
+>>>
+>>>
+>>> thanks
+>>> -- PMM
+>>>
+>>
 >=20
