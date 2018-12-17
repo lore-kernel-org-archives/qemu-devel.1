@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35711)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=8828e3297=Paul.Durrant@citrix.com>)
-	id 1gYtQG-0003UD-Cv
+	id 1gYtQH-0003Uo-Dr
 	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 08:59:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=8828e3297=Paul.Durrant@citrix.com>)
-	id 1gYtQD-0007hh-OI
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 08:59:04 -0500
+	id 1gYtQE-0007iF-Dk
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 08:59:05 -0500
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Mon, 17 Dec 2018 13:30:05 +0000
-Message-ID: <20181217133011.31433-13-paul.durrant@citrix.com>
+Date: Mon, 17 Dec 2018 13:30:06 +0000
+Message-ID: <20181217133011.31433-14-paul.durrant@citrix.com>
 In-Reply-To: <20181217133011.31433-1-paul.durrant@citrix.com>
 References: <20181217133011.31433-1-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v6 12/18] xen: remove 'ioreq'
- struct/varable/field names from dataplane/xen-block.c
+Subject: [Qemu-devel] [PATCH v6 13/18] xen: purge 'blk' and 'ioreq' from
+ function names in dataplane/xen-block.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,671 +26,354 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-This is a purely cosmetic patch that purges the name 'ioreq' from struct,
-variable and field names. (This name has been problematic for a long time
-as 'ioreq' is the name used for generic I/O requests coming from Xen).
-The patch replaces 'struct ioreq' with a new 'XenBlockRequest' type and
-'ioreq' field/variable names with 'request', and then does necessary
-fix-up to adhere to coding style.
-
-Function names are not modified by this patch. They will be dealt with in
-a subsequent patch.
+This is a purely cosmetic patch that purges remaining use of 'blk' and
+'ioreq' in local function names, and then makes sure all functions are
+prefixed with 'xen_block_'.
 
 No functional change.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 Acked-by: Anthony Perard <anthony.perard@citrix.com>
 ---
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
 Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 Cc: Kevin Wolf <kwolf@redhat.com>
 Cc: Max Reitz <mreitz@redhat.com>
+
+v2:
+ - Add 'xen_block_' prefix
 ---
- hw/block/dataplane/xen-block.c | 310 +++++++++++++++++----------------
- 1 file changed, 156 insertions(+), 154 deletions(-)
+ hw/block/dataplane/xen-block.c | 90 +++++++++++++++++-----------------
+ 1 file changed, 46 insertions(+), 44 deletions(-)
 
 diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-block.c
-index 1ff464973c..6788bbf338 100644
+index 6788bbf338..8e3965e171 100644
 --- a/hw/block/dataplane/xen-block.c
 +++ b/hw/block/dataplane/xen-block.c
-@@ -28,7 +28,7 @@
- #include "sysemu/iothread.h"
- #include "xen-block.h"
- 
--struct ioreq {
-+typedef struct XenBlockRequest {
-     blkif_request_t req;
-     int16_t status;
-     off_t start;
-@@ -39,9 +39,9 @@ struct ioreq {
-     int aio_inflight;
-     int aio_errors;
-     XenBlockDataPlane *dataplane;
--    QLIST_ENTRY(ioreq) list;
-+    QLIST_ENTRY(XenBlockRequest) list;
-     BlockAcctCookie acct;
--};
-+} XenBlockRequest;
- 
- struct XenBlockDataPlane {
-     XenDevice *xendev;
-@@ -54,9 +54,9 @@ struct XenBlockDataPlane {
-     int protocol;
-     blkif_back_rings_t rings;
-     int more_work;
--    QLIST_HEAD(inflight_head, ioreq) inflight;
--    QLIST_HEAD(finished_head, ioreq) finished;
--    QLIST_HEAD(freelist_head, ioreq) freelist;
-+    QLIST_HEAD(inflight_head, XenBlockRequest) inflight;
-+    QLIST_HEAD(finished_head, XenBlockRequest) finished;
-+    QLIST_HEAD(freelist_head, XenBlockRequest) freelist;
-     int requests_total;
-     int requests_inflight;
-     int requests_finished;
-@@ -67,68 +67,68 @@ struct XenBlockDataPlane {
+@@ -67,7 +67,7 @@ struct XenBlockDataPlane {
      AioContext *ctx;
  };
  
--static void ioreq_reset(struct ioreq *ioreq)
-+static void ioreq_reset(XenBlockRequest *request)
+-static void ioreq_reset(XenBlockRequest *request)
++static void reset_request(XenBlockRequest *request)
  {
--    memset(&ioreq->req, 0, sizeof(ioreq->req));
--    ioreq->status = 0;
--    ioreq->start = 0;
--    ioreq->buf = NULL;
--    ioreq->size = 0;
--    ioreq->presync = 0;
-+    memset(&request->req, 0, sizeof(request->req));
-+    request->status = 0;
-+    request->start = 0;
-+    request->buf = NULL;
-+    request->size = 0;
-+    request->presync = 0;
- 
--    ioreq->aio_inflight = 0;
--    ioreq->aio_errors = 0;
-+    request->aio_inflight = 0;
-+    request->aio_errors = 0;
- 
--    ioreq->dataplane = NULL;
--    memset(&ioreq->list, 0, sizeof(ioreq->list));
--    memset(&ioreq->acct, 0, sizeof(ioreq->acct));
-+    request->dataplane = NULL;
-+    memset(&request->list, 0, sizeof(request->list));
-+    memset(&request->acct, 0, sizeof(request->acct));
- 
--    qemu_iovec_reset(&ioreq->v);
-+    qemu_iovec_reset(&request->v);
+     memset(&request->req, 0, sizeof(request->req));
+     request->status = 0;
+@@ -86,7 +86,7 @@ static void ioreq_reset(XenBlockRequest *request)
+     qemu_iovec_reset(&request->v);
  }
  
--static struct ioreq *ioreq_start(XenBlockDataPlane *dataplane)
-+static XenBlockRequest *ioreq_start(XenBlockDataPlane *dataplane)
+-static XenBlockRequest *ioreq_start(XenBlockDataPlane *dataplane)
++static XenBlockRequest *xen_block_start_request(XenBlockDataPlane *dataplane)
  {
--    struct ioreq *ioreq = NULL;
-+    XenBlockRequest *request = NULL;
+     XenBlockRequest *request = NULL;
  
-     if (QLIST_EMPTY(&dataplane->freelist)) {
-         if (dataplane->requests_total >= dataplane->max_requests) {
-             goto out;
-         }
-         /* allocate new struct */
--        ioreq = g_malloc0(sizeof(*ioreq));
--        ioreq->dataplane = dataplane;
-+        request = g_malloc0(sizeof(*request));
-+        request->dataplane = dataplane;
-         dataplane->requests_total++;
--        qemu_iovec_init(&ioreq->v, 1);
-+        qemu_iovec_init(&request->v, 1);
-     } else {
-         /* get one from freelist */
--        ioreq = QLIST_FIRST(&dataplane->freelist);
--        QLIST_REMOVE(ioreq, list);
-+        request = QLIST_FIRST(&dataplane->freelist);
-+        QLIST_REMOVE(request, list);
-     }
--    QLIST_INSERT_HEAD(&dataplane->inflight, ioreq, list);
-+    QLIST_INSERT_HEAD(&dataplane->inflight, request, list);
-     dataplane->requests_inflight++;
- 
- out:
--    return ioreq;
-+    return request;
+@@ -111,7 +111,7 @@ out:
+     return request;
  }
  
--static void ioreq_finish(struct ioreq *ioreq)
-+static void ioreq_finish(XenBlockRequest *request)
+-static void ioreq_finish(XenBlockRequest *request)
++static void xen_block_finish_request(XenBlockRequest *request)
  {
--    XenBlockDataPlane *dataplane = ioreq->dataplane;
-+    XenBlockDataPlane *dataplane = request->dataplane;
+     XenBlockDataPlane *dataplane = request->dataplane;
  
--    QLIST_REMOVE(ioreq, list);
--    QLIST_INSERT_HEAD(&dataplane->finished, ioreq, list);
-+    QLIST_REMOVE(request, list);
-+    QLIST_INSERT_HEAD(&dataplane->finished, request, list);
-     dataplane->requests_inflight--;
+@@ -121,12 +121,12 @@ static void ioreq_finish(XenBlockRequest *request)
      dataplane->requests_finished++;
  }
  
--static void ioreq_release(struct ioreq *ioreq, bool finish)
-+static void ioreq_release(XenBlockRequest *request, bool finish)
+-static void ioreq_release(XenBlockRequest *request, bool finish)
++static void xen_block_release_request(XenBlockRequest *request, bool finish)
  {
--    XenBlockDataPlane *dataplane = ioreq->dataplane;
-+    XenBlockDataPlane *dataplane = request->dataplane;
+     XenBlockDataPlane *dataplane = request->dataplane;
  
--    QLIST_REMOVE(ioreq, list);
--    ioreq_reset(ioreq);
--    ioreq->dataplane = dataplane;
--    QLIST_INSERT_HEAD(&dataplane->freelist, ioreq, list);
-+    QLIST_REMOVE(request, list);
-+    ioreq_reset(request);
-+    request->dataplane = dataplane;
-+    QLIST_INSERT_HEAD(&dataplane->freelist, request, list);
+     QLIST_REMOVE(request, list);
+-    ioreq_reset(request);
++    reset_request(request);
+     request->dataplane = dataplane;
+     QLIST_INSERT_HEAD(&dataplane->freelist, request, list);
      if (finish) {
-         dataplane->requests_finished--;
-     } else {
-@@ -140,18 +140,18 @@ static void ioreq_release(struct ioreq *ioreq, bool finish)
+@@ -140,7 +140,7 @@ static void ioreq_release(XenBlockRequest *request, bool finish)
   * translate request into iovec + start offset
   * do sanity checks along the way
   */
--static int ioreq_parse(struct ioreq *ioreq)
-+static int ioreq_parse(XenBlockRequest *request)
+-static int ioreq_parse(XenBlockRequest *request)
++static int xen_block_parse_request(XenBlockRequest *request)
  {
--    XenBlockDataPlane *dataplane = ioreq->dataplane;
-+    XenBlockDataPlane *dataplane = request->dataplane;
+     XenBlockDataPlane *dataplane = request->dataplane;
      size_t len;
-     int i;
- 
--    switch (ioreq->req.operation) {
-+    switch (request->req.operation) {
-     case BLKIF_OP_READ:
-         break;
-     case BLKIF_OP_FLUSH_DISKCACHE:
--        ioreq->presync = 1;
--        if (!ioreq->req.nr_segments) {
-+        request->presync = 1;
-+        if (!request->req.nr_segments) {
-             return 0;
-         }
-         /* fall through */
-@@ -160,77 +160,78 @@ static int ioreq_parse(struct ioreq *ioreq)
-     case BLKIF_OP_DISCARD:
-         return 0;
-     default:
--        error_report("error: unknown operation (%d)", ioreq->req.operation);
-+        error_report("error: unknown operation (%d)", request->req.operation);
-         goto err;
-     };
- 
--    if (ioreq->req.operation != BLKIF_OP_READ &&
-+    if (request->req.operation != BLKIF_OP_READ &&
-         blk_is_read_only(dataplane->blk)) {
-         error_report("error: write req for ro device");
-         goto err;
-     }
- 
--    ioreq->start = ioreq->req.sector_number * dataplane->file_blk;
--    for (i = 0; i < ioreq->req.nr_segments; i++) {
-+    request->start = request->req.sector_number * dataplane->file_blk;
-+    for (i = 0; i < request->req.nr_segments; i++) {
-         if (i == BLKIF_MAX_SEGMENTS_PER_REQUEST) {
-             error_report("error: nr_segments too big");
-             goto err;
-         }
--        if (ioreq->req.seg[i].first_sect > ioreq->req.seg[i].last_sect) {
-+        if (request->req.seg[i].first_sect > request->req.seg[i].last_sect) {
-             error_report("error: first > last sector");
-             goto err;
-         }
--        if (ioreq->req.seg[i].last_sect * dataplane->file_blk >= XC_PAGE_SIZE) {
-+        if (request->req.seg[i].last_sect * dataplane->file_blk >=
-+            XC_PAGE_SIZE) {
-             error_report("error: page crossing");
-             goto err;
-         }
- 
--        len = (ioreq->req.seg[i].last_sect -
--               ioreq->req.seg[i].first_sect + 1) * dataplane->file_blk;
--        ioreq->size += len;
-+        len = (request->req.seg[i].last_sect -
-+               request->req.seg[i].first_sect + 1) * dataplane->file_blk;
-+        request->size += len;
-     }
--    if (ioreq->start + ioreq->size > dataplane->file_size) {
-+    if (request->start + request->size > dataplane->file_size) {
-         error_report("error: access beyond end of file");
-         goto err;
-     }
-     return 0;
- 
- err:
--    ioreq->status = BLKIF_RSP_ERROR;
-+    request->status = BLKIF_RSP_ERROR;
+@@ -201,7 +201,7 @@ err:
      return -1;
  }
  
--static int ioreq_grant_copy(struct ioreq *ioreq)
-+static int ioreq_grant_copy(XenBlockRequest *request)
+-static int ioreq_grant_copy(XenBlockRequest *request)
++static int xen_block_copy_request(XenBlockRequest *request)
  {
--    XenBlockDataPlane *dataplane = ioreq->dataplane;
-+    XenBlockDataPlane *dataplane = request->dataplane;
+     XenBlockDataPlane *dataplane = request->dataplane;
      XenDevice *xendev = dataplane->xendev;
-     XenDeviceGrantCopySegment segs[BLKIF_MAX_SEGMENTS_PER_REQUEST];
-     int i, count;
-     int64_t file_blk = dataplane->file_blk;
--    bool to_domain = (ioreq->req.operation == BLKIF_OP_READ);
--    void *virt = ioreq->buf;
-+    bool to_domain = (request->req.operation == BLKIF_OP_READ);
-+    void *virt = request->buf;
-     Error *local_err = NULL;
- 
--    if (ioreq->req.nr_segments == 0) {
-+    if (request->req.nr_segments == 0) {
-         return 0;
-     }
- 
--    count = ioreq->req.nr_segments;
-+    count = request->req.nr_segments;
- 
-     for (i = 0; i < count; i++) {
-         if (to_domain) {
--            segs[i].dest.foreign.ref = ioreq->req.seg[i].gref;
--            segs[i].dest.foreign.offset = ioreq->req.seg[i].first_sect *
-+            segs[i].dest.foreign.ref = request->req.seg[i].gref;
-+            segs[i].dest.foreign.offset = request->req.seg[i].first_sect *
-                 file_blk;
-             segs[i].source.virt = virt;
-         } else {
--            segs[i].source.foreign.ref = ioreq->req.seg[i].gref;
--            segs[i].source.foreign.offset = ioreq->req.seg[i].first_sect *
-+            segs[i].source.foreign.ref = request->req.seg[i].gref;
-+            segs[i].source.foreign.offset = request->req.seg[i].first_sect *
-                 file_blk;
-             segs[i].dest.virt = virt;
-         }
--        segs[i].len = (ioreq->req.seg[i].last_sect -
--                       ioreq->req.seg[i].first_sect + 1) * file_blk;
-+        segs[i].len = (request->req.seg[i].last_sect -
-+                       request->req.seg[i].first_sect + 1) * file_blk;
-         virt += segs[i].len;
-     }
- 
-@@ -239,72 +240,72 @@ static int ioreq_grant_copy(struct ioreq *ioreq)
-     if (local_err) {
-         error_reportf_err(local_err, "failed to copy data: ");
- 
--        ioreq->aio_errors++;
-+        request->aio_errors++;
-         return -1;
-     }
- 
+@@ -247,9 +247,9 @@ static int ioreq_grant_copy(XenBlockRequest *request)
      return 0;
  }
  
--static int ioreq_runio_qemu_aio(struct ioreq *ioreq);
-+static int ioreq_runio_qemu_aio(XenBlockRequest *request);
+-static int ioreq_runio_qemu_aio(XenBlockRequest *request);
++static int xen_block_do_aio(XenBlockRequest *request);
  
- static void qemu_aio_complete(void *opaque, int ret)
+-static void qemu_aio_complete(void *opaque, int ret)
++static void xen_block_complete_aio(void *opaque, int ret)
  {
--    struct ioreq *ioreq = opaque;
--    XenBlockDataPlane *dataplane = ioreq->dataplane;
-+    XenBlockRequest *request = opaque;
-+    XenBlockDataPlane *dataplane = request->dataplane;
- 
-     aio_context_acquire(dataplane->ctx);
- 
-     if (ret != 0) {
-         error_report("%s I/O error",
--                     ioreq->req.operation == BLKIF_OP_READ ?
-+                     request->req.operation == BLKIF_OP_READ ?
-                      "read" : "write");
--        ioreq->aio_errors++;
-+        request->aio_errors++;
-     }
- 
--    ioreq->aio_inflight--;
--    if (ioreq->presync) {
--        ioreq->presync = 0;
--        ioreq_runio_qemu_aio(ioreq);
-+    request->aio_inflight--;
-+    if (request->presync) {
-+        request->presync = 0;
-+        ioreq_runio_qemu_aio(request);
+     XenBlockRequest *request = opaque;
+     XenBlockDataPlane *dataplane = request->dataplane;
+@@ -266,7 +266,7 @@ static void qemu_aio_complete(void *opaque, int ret)
+     request->aio_inflight--;
+     if (request->presync) {
+         request->presync = 0;
+-        ioreq_runio_qemu_aio(request);
++        xen_block_do_aio(request);
          goto done;
      }
--    if (ioreq->aio_inflight > 0) {
-+    if (request->aio_inflight > 0) {
-         goto done;
-     }
- 
--    switch (ioreq->req.operation) {
-+    switch (request->req.operation) {
+     if (request->aio_inflight > 0) {
+@@ -277,7 +277,7 @@ static void qemu_aio_complete(void *opaque, int ret)
      case BLKIF_OP_READ:
--        /* in case of failure ioreq->aio_errors is increased */
-+        /* in case of failure request->aio_errors is increased */
+         /* in case of failure request->aio_errors is increased */
          if (ret == 0) {
--            ioreq_grant_copy(ioreq);
-+            ioreq_grant_copy(request);
+-            ioreq_grant_copy(request);
++            xen_block_copy_request(request);
          }
--        qemu_vfree(ioreq->buf);
-+        qemu_vfree(request->buf);
+         qemu_vfree(request->buf);
          break;
-     case BLKIF_OP_WRITE:
-     case BLKIF_OP_FLUSH_DISKCACHE:
--        if (!ioreq->req.nr_segments) {
-+        if (!request->req.nr_segments) {
-             break;
-         }
--        qemu_vfree(ioreq->buf);
-+        qemu_vfree(request->buf);
-         break;
-     default:
-         break;
+@@ -293,7 +293,7 @@ static void qemu_aio_complete(void *opaque, int ret)
      }
  
--    ioreq->status = ioreq->aio_errors ? BLKIF_RSP_ERROR : BLKIF_RSP_OKAY;
--    ioreq_finish(ioreq);
-+    request->status = request->aio_errors ? BLKIF_RSP_ERROR : BLKIF_RSP_OKAY;
-+    ioreq_finish(request);
+     request->status = request->aio_errors ? BLKIF_RSP_ERROR : BLKIF_RSP_OKAY;
+-    ioreq_finish(request);
++    xen_block_finish_request(request);
  
--    switch (ioreq->req.operation) {
-+    switch (request->req.operation) {
+     switch (request->req.operation) {
      case BLKIF_OP_WRITE:
-     case BLKIF_OP_FLUSH_DISKCACHE:
--        if (!ioreq->req.nr_segments) {
-+        if (!request->req.nr_segments) {
-             break;
-         }
-     case BLKIF_OP_READ:
--        if (ioreq->status == BLKIF_RSP_OKAY) {
--            block_acct_done(blk_get_stats(dataplane->blk), &ioreq->acct);
-+        if (request->status == BLKIF_RSP_OKAY) {
-+            block_acct_done(blk_get_stats(dataplane->blk), &request->acct);
-         } else {
--            block_acct_failed(blk_get_stats(dataplane->blk), &ioreq->acct);
-+            block_acct_failed(blk_get_stats(dataplane->blk), &request->acct);
-         }
-         break;
-     case BLKIF_OP_DISCARD:
-@@ -317,10 +318,11 @@ done:
+@@ -318,9 +318,9 @@ done:
      aio_context_release(dataplane->ctx);
  }
  
--static bool blk_split_discard(struct ioreq *ioreq, blkif_sector_t sector_number,
-+static bool blk_split_discard(XenBlockRequest *request,
-+                              blkif_sector_t sector_number,
-                               uint64_t nr_sectors)
+-static bool blk_split_discard(XenBlockRequest *request,
+-                              blkif_sector_t sector_number,
+-                              uint64_t nr_sectors)
++static bool xen_block_split_discard(XenBlockRequest *request,
++                                    blkif_sector_t sector_number,
++                                    uint64_t nr_sectors)
  {
--    XenBlockDataPlane *dataplane = ioreq->dataplane;
-+    XenBlockDataPlane *dataplane = request->dataplane;
+     XenBlockDataPlane *dataplane = request->dataplane;
      int64_t byte_offset;
-     int byte_chunk;
-     uint64_t byte_remaining, limit;
-@@ -339,9 +341,9 @@ static bool blk_split_discard(struct ioreq *ioreq, blkif_sector_t sector_number,
- 
-     do {
+@@ -343,7 +343,7 @@ static bool blk_split_discard(XenBlockRequest *request,
          byte_chunk = byte_remaining > limit ? limit : byte_remaining;
--        ioreq->aio_inflight++;
-+        request->aio_inflight++;
+         request->aio_inflight++;
          blk_aio_pdiscard(dataplane->blk, byte_offset, byte_chunk,
--                         qemu_aio_complete, ioreq);
-+                         qemu_aio_complete, request);
+-                         qemu_aio_complete, request);
++                         xen_block_complete_aio, request);
          byte_remaining -= byte_chunk;
          byte_offset += byte_chunk;
      } while (byte_remaining > 0);
-@@ -349,53 +351,53 @@ static bool blk_split_discard(struct ioreq *ioreq, blkif_sector_t sector_number,
+@@ -351,7 +351,7 @@ static bool blk_split_discard(XenBlockRequest *request,
      return true;
  }
  
--static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
-+static int ioreq_runio_qemu_aio(XenBlockRequest *request)
+-static int ioreq_runio_qemu_aio(XenBlockRequest *request)
++static int xen_block_do_aio(XenBlockRequest *request)
  {
--    XenBlockDataPlane *dataplane = ioreq->dataplane;
--
--    ioreq->buf = qemu_memalign(XC_PAGE_SIZE, ioreq->size);
--    if (ioreq->req.nr_segments &&
--        (ioreq->req.operation == BLKIF_OP_WRITE ||
--         ioreq->req.operation == BLKIF_OP_FLUSH_DISKCACHE) &&
--        ioreq_grant_copy(ioreq)) {
--        qemu_vfree(ioreq->buf);
-+    XenBlockDataPlane *dataplane = request->dataplane;
-+
-+    request->buf = qemu_memalign(XC_PAGE_SIZE, request->size);
-+    if (request->req.nr_segments &&
-+        (request->req.operation == BLKIF_OP_WRITE ||
-+         request->req.operation == BLKIF_OP_FLUSH_DISKCACHE) &&
-+        ioreq_grant_copy(request)) {
-+        qemu_vfree(request->buf);
+     XenBlockDataPlane *dataplane = request->dataplane;
+ 
+@@ -359,14 +359,15 @@ static int ioreq_runio_qemu_aio(XenBlockRequest *request)
+     if (request->req.nr_segments &&
+         (request->req.operation == BLKIF_OP_WRITE ||
+          request->req.operation == BLKIF_OP_FLUSH_DISKCACHE) &&
+-        ioreq_grant_copy(request)) {
++        xen_block_copy_request(request)) {
+         qemu_vfree(request->buf);
          goto err;
      }
  
--    ioreq->aio_inflight++;
--    if (ioreq->presync) {
--        blk_aio_flush(ioreq->dataplane->blk, qemu_aio_complete, ioreq);
-+    request->aio_inflight++;
-+    if (request->presync) {
-+        blk_aio_flush(request->dataplane->blk, qemu_aio_complete, request);
+     request->aio_inflight++;
+     if (request->presync) {
+-        blk_aio_flush(request->dataplane->blk, qemu_aio_complete, request);
++        blk_aio_flush(request->dataplane->blk, xen_block_complete_aio,
++                      request);
          return 0;
      }
  
--    switch (ioreq->req.operation) {
-+    switch (request->req.operation) {
-     case BLKIF_OP_READ:
--        qemu_iovec_add(&ioreq->v, ioreq->buf, ioreq->size);
--        block_acct_start(blk_get_stats(dataplane->blk), &ioreq->acct,
--                         ioreq->v.size, BLOCK_ACCT_READ);
--        ioreq->aio_inflight++;
--        blk_aio_preadv(dataplane->blk, ioreq->start, &ioreq->v, 0,
--                       qemu_aio_complete, ioreq);
-+        qemu_iovec_add(&request->v, request->buf, request->size);
-+        block_acct_start(blk_get_stats(dataplane->blk), &request->acct,
-+                         request->v.size, BLOCK_ACCT_READ);
-+        request->aio_inflight++;
-+        blk_aio_preadv(dataplane->blk, request->start, &request->v, 0,
-+                       qemu_aio_complete, request);
+@@ -377,7 +378,7 @@ static int ioreq_runio_qemu_aio(XenBlockRequest *request)
+                          request->v.size, BLOCK_ACCT_READ);
+         request->aio_inflight++;
+         blk_aio_preadv(dataplane->blk, request->start, &request->v, 0,
+-                       qemu_aio_complete, request);
++                       xen_block_complete_aio, request);
          break;
      case BLKIF_OP_WRITE:
      case BLKIF_OP_FLUSH_DISKCACHE:
--        if (!ioreq->req.nr_segments) {
-+        if (!request->req.nr_segments) {
-             break;
-         }
- 
--        qemu_iovec_add(&ioreq->v, ioreq->buf, ioreq->size);
--        block_acct_start(blk_get_stats(dataplane->blk), &ioreq->acct,
--                         ioreq->v.size,
--                         ioreq->req.operation == BLKIF_OP_WRITE ?
-+        qemu_iovec_add(&request->v, request->buf, request->size);
-+        block_acct_start(blk_get_stats(dataplane->blk), &request->acct,
-+                         request->v.size,
-+                         request->req.operation == BLKIF_OP_WRITE ?
+@@ -392,12 +393,13 @@ static int ioreq_runio_qemu_aio(XenBlockRequest *request)
                           BLOCK_ACCT_WRITE : BLOCK_ACCT_FLUSH);
--        ioreq->aio_inflight++;
--        blk_aio_pwritev(dataplane->blk, ioreq->start, &ioreq->v, 0,
--                        qemu_aio_complete, ioreq);
-+        request->aio_inflight++;
-+        blk_aio_pwritev(dataplane->blk, request->start, &request->v, 0,
-+                        qemu_aio_complete, request);
+         request->aio_inflight++;
+         blk_aio_pwritev(dataplane->blk, request->start, &request->v, 0,
+-                        qemu_aio_complete, request);
++                        xen_block_complete_aio, request);
          break;
      case BLKIF_OP_DISCARD:
      {
--        struct blkif_request_discard *req = (void *)&ioreq->req;
--        if (!blk_split_discard(ioreq, req->sector_number, req->nr_sectors)) {
-+        struct blkif_request_discard *req = (void *)&request->req;
-+        if (!blk_split_discard(request, req->sector_number, req->nr_sectors)) {
+         struct blkif_request_discard *req = (void *)&request->req;
+-        if (!blk_split_discard(request, req->sector_number, req->nr_sectors)) {
++        if (!xen_block_split_discard(request, req->sector_number,
++                                     req->nr_sectors)) {
              goto err;
          }
          break;
-@@ -405,19 +407,19 @@ static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
+@@ -407,17 +409,17 @@ static int ioreq_runio_qemu_aio(XenBlockRequest *request)
          goto err;
      }
  
--    qemu_aio_complete(ioreq, 0);
-+    qemu_aio_complete(request, 0);
+-    qemu_aio_complete(request, 0);
++    xen_block_complete_aio(request, 0);
  
      return 0;
  
  err:
--    ioreq_finish(ioreq);
--    ioreq->status = BLKIF_RSP_ERROR;
-+    ioreq_finish(request);
-+    request->status = BLKIF_RSP_ERROR;
+-    ioreq_finish(request);
++    xen_block_finish_request(request);
+     request->status = BLKIF_RSP_ERROR;
      return -1;
  }
  
--static int blk_send_response_one(struct ioreq *ioreq)
-+static int blk_send_response_one(XenBlockRequest *request)
+-static int blk_send_response_one(XenBlockRequest *request)
++static int xen_block_send_response_one(XenBlockRequest *request)
  {
--    XenBlockDataPlane *dataplane = ioreq->dataplane;
-+    XenBlockDataPlane *dataplane = request->dataplane;
+     XenBlockDataPlane *dataplane = request->dataplane;
      int send_notify = 0;
-     int have_requests = 0;
-     blkif_response_t *resp;
-@@ -443,9 +445,9 @@ static int blk_send_response_one(struct ioreq *ioreq)
-         return 0;
-     }
+@@ -473,15 +475,15 @@ static int blk_send_response_one(XenBlockRequest *request)
+ }
  
--    resp->id = ioreq->req.id;
--    resp->operation = ioreq->req.operation;
--    resp->status = ioreq->status;
-+    resp->id = request->req.id;
-+    resp->operation = request->req.operation;
-+    resp->status = request->status;
- 
-     dataplane->rings.common.rsp_prod_pvt++;
- 
-@@ -473,13 +475,13 @@ static int blk_send_response_one(struct ioreq *ioreq)
  /* walk finished list, send outstanding responses, free requests */
- static void blk_send_response_all(XenBlockDataPlane *dataplane)
+-static void blk_send_response_all(XenBlockDataPlane *dataplane)
++static void xen_block_send_response_all(XenBlockDataPlane *dataplane)
  {
--    struct ioreq *ioreq;
-+    XenBlockRequest *request;
+     XenBlockRequest *request;
      int send_notify = 0;
  
      while (!QLIST_EMPTY(&dataplane->finished)) {
--        ioreq = QLIST_FIRST(&dataplane->finished);
--        send_notify += blk_send_response_one(ioreq);
--        ioreq_release(ioreq, true);
-+        request = QLIST_FIRST(&dataplane->finished);
-+        send_notify += blk_send_response_one(request);
-+        ioreq_release(request, true);
+         request = QLIST_FIRST(&dataplane->finished);
+-        send_notify += blk_send_response_one(request);
+-        ioreq_release(request, true);
++        send_notify += xen_block_send_response_one(request);
++        xen_block_release_request(request, true);
      }
      if (send_notify) {
          Error *local_err = NULL;
-@@ -493,29 +495,29 @@ static void blk_send_response_all(XenBlockDataPlane *dataplane)
+@@ -495,8 +497,8 @@ static void blk_send_response_all(XenBlockDataPlane *dataplane)
      }
  }
  
--static int blk_get_request(XenBlockDataPlane *dataplane, struct ioreq *ioreq,
--                           RING_IDX rc)
-+static int blk_get_request(XenBlockDataPlane *dataplane,
-+                           XenBlockRequest *request, RING_IDX rc)
+-static int blk_get_request(XenBlockDataPlane *dataplane,
+-                           XenBlockRequest *request, RING_IDX rc)
++static int xen_block_get_request(XenBlockDataPlane *dataplane,
++                                 XenBlockRequest *request, RING_IDX rc)
  {
      switch (dataplane->protocol) {
      case BLKIF_PROTOCOL_NATIVE: {
-         blkif_request_t *req =
-             RING_GET_REQUEST(&dataplane->rings.native, rc);
+@@ -526,7 +528,7 @@ static int blk_get_request(XenBlockDataPlane *dataplane,
+     return 0;
+ }
  
--        memcpy(&ioreq->req, req, sizeof(ioreq->req));
-+        memcpy(&request->req, req, sizeof(request->req));
-         break;
-     }
-     case BLKIF_PROTOCOL_X86_32: {
-         blkif_x86_32_request_t *req =
-             RING_GET_REQUEST(&dataplane->rings.x86_32_part, rc);
- 
--        blkif_get_x86_32_req(&ioreq->req, req);
-+        blkif_get_x86_32_req(&request->req, req);
-         break;
-     }
-     case BLKIF_PROTOCOL_X86_64: {
-         blkif_x86_64_request_t *req =
-             RING_GET_REQUEST(&dataplane->rings.x86_64_part, rc);
- 
--        blkif_get_x86_64_req(&ioreq->req, req);
-+        blkif_get_x86_64_req(&request->req, req);
-         break;
-     }
-     }
-@@ -527,7 +529,7 @@ static int blk_get_request(XenBlockDataPlane *dataplane, struct ioreq *ioreq,
- static void blk_handle_requests(XenBlockDataPlane *dataplane)
+-static void blk_handle_requests(XenBlockDataPlane *dataplane)
++static void xen_block_handle_requests(XenBlockDataPlane *dataplane)
  {
      RING_IDX rc, rp;
--    struct ioreq *ioreq;
-+    XenBlockRequest *request;
+     XenBlockRequest *request;
+@@ -537,23 +539,22 @@ static void blk_handle_requests(XenBlockDataPlane *dataplane)
+     rp = dataplane->rings.common.sring->req_prod;
+     xen_rmb(); /* Ensure we see queued requests up to 'rp'. */
  
-     dataplane->more_work = 0;
- 
-@@ -541,18 +543,18 @@ static void blk_handle_requests(XenBlockDataPlane *dataplane)
+-    blk_send_response_all(dataplane);
++    xen_block_send_response_all(dataplane);
+     while (rc != rp) {
+         /* pull request from ring */
          if (RING_REQUEST_CONS_OVERFLOW(&dataplane->rings.common, rc)) {
              break;
          }
--        ioreq = ioreq_start(dataplane);
--        if (ioreq == NULL) {
-+        request = ioreq_start(dataplane);
-+        if (request == NULL) {
+-        request = ioreq_start(dataplane);
++        request = xen_block_start_request(dataplane);
+         if (request == NULL) {
              dataplane->more_work++;
              break;
          }
--        blk_get_request(dataplane, ioreq, rc);
-+        blk_get_request(dataplane, request, rc);
+-        blk_get_request(dataplane, request, rc);
++        xen_block_get_request(dataplane, request, rc);
          dataplane->rings.common.req_cons = ++rc;
  
          /* parse them */
--        if (ioreq_parse(ioreq) != 0) {
-+        if (ioreq_parse(request) != 0) {
- 
--            switch (ioreq->req.operation) {
-+            switch (request->req.operation) {
+-        if (ioreq_parse(request) != 0) {
+-
++        if (xen_block_parse_request(request) != 0) {
+             switch (request->req.operation) {
              case BLKIF_OP_READ:
                  block_acct_invalid(blk_get_stats(dataplane->blk),
-                                    BLOCK_ACCT_READ);
-@@ -568,7 +570,7 @@ static void blk_handle_requests(XenBlockDataPlane *dataplane)
+@@ -570,7 +571,7 @@ static void blk_handle_requests(XenBlockDataPlane *dataplane)
                  break;
              };
  
--            if (blk_send_response_one(ioreq)) {
-+            if (blk_send_response_one(request)) {
+-            if (blk_send_response_one(request)) {
++            if (xen_block_send_response_one(request)) {
                  Error *local_err = NULL;
  
                  xen_device_notify_event_channel(dataplane->xendev,
-@@ -578,11 +580,11 @@ static void blk_handle_requests(XenBlockDataPlane *dataplane)
+@@ -580,11 +581,11 @@ static void blk_handle_requests(XenBlockDataPlane *dataplane)
                      error_report_err(local_err);
                  }
              }
--            ioreq_release(ioreq, false);
-+            ioreq_release(request, false);
+-            ioreq_release(request, false);
++            xen_block_release_request(request, false);
              continue;
          }
  
--        ioreq_runio_qemu_aio(ioreq);
-+        ioreq_runio_qemu_aio(request);
+-        ioreq_runio_qemu_aio(request);
++        xen_block_do_aio(request);
      }
  
      if (dataplane->more_work &&
-@@ -636,17 +638,17 @@ XenBlockDataPlane *xen_block_dataplane_create(XenDevice *xendev,
+@@ -593,16 +594,16 @@ static void blk_handle_requests(XenBlockDataPlane *dataplane)
+     }
+ }
  
- void xen_block_dataplane_destroy(XenBlockDataPlane *dataplane)
+-static void blk_bh(void *opaque)
++static void xen_block_dataplane_bh(void *opaque)
  {
--    struct ioreq *ioreq;
-+    XenBlockRequest *request;
+     XenBlockDataPlane *dataplane = opaque;
  
-     if (!dataplane) {
-         return;
+     aio_context_acquire(dataplane->ctx);
+-    blk_handle_requests(dataplane);
++    xen_block_handle_requests(dataplane);
+     aio_context_release(dataplane->ctx);
+ }
+ 
+-static void blk_event(void *opaque)
++static void xen_block_dataplane_event(void *opaque)
+ {
+     XenBlockDataPlane *dataplane = opaque;
+ 
+@@ -631,7 +632,8 @@ XenBlockDataPlane *xen_block_dataplane_create(XenDevice *xendev,
+     } else {
+         dataplane->ctx = qemu_get_aio_context();
      }
+-    dataplane->bh = aio_bh_new(dataplane->ctx, blk_bh, dataplane);
++    dataplane->bh = aio_bh_new(dataplane->ctx, xen_block_dataplane_bh,
++                               dataplane);
  
-     while (!QLIST_EMPTY(&dataplane->freelist)) {
--        ioreq = QLIST_FIRST(&dataplane->freelist);
--        QLIST_REMOVE(ioreq, list);
--        qemu_iovec_destroy(&ioreq->v);
--        g_free(ioreq);
-+        request = QLIST_FIRST(&dataplane->freelist);
-+        QLIST_REMOVE(request, list);
-+        qemu_iovec_destroy(&request->v);
-+        g_free(request);
-     }
+     return dataplane;
+ }
+@@ -789,7 +791,7 @@ void xen_block_dataplane_start(XenBlockDataPlane *dataplane,
  
-     qemu_bh_delete(dataplane->bh);
+     dataplane->event_channel =
+         xen_device_bind_event_channel(xendev, event_channel,
+-                                      blk_event, dataplane,
++                                      xen_block_dataplane_event, dataplane,
+                                       &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
 -- 
 2.20.1.2.gb21ebb6
