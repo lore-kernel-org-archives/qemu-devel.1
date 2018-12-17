@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gYvuC-0005ES-4p
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:38:09 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gYvwk-0006VS-Cp
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:40:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gYvu7-0004wS-95
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:38:08 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 17 Dec 2018 16:37:57 +0000
-Message-ID: <de056aa7-d383-af0f-6059-44e008c1649e@virtuozzo.com>
-References: <20181214231512.5295-1-jsnow@redhat.com>
-	<20181214231512.5295-7-jsnow@redhat.com>
-	<0780ebaa-3e11-c197-85f9-9133dc227d65@virtuozzo.com>
-In-Reply-To: <0780ebaa-3e11-c197-85f9-9133dc227d65@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3D4A82D55EE79745A71E821F93EA8A2B@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <richard.henderson@linaro.org>) id 1gYvwf-00077L-5U
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:40:46 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:39150)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gYvwe-00074E-A1
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 11:40:40 -0500
+Received: by mail-pl1-x644.google.com with SMTP id 101so6390721pld.6
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 08:40:37 -0800 (PST)
+References: <20181217122405.18732-1-mark.cave-ayland@ilande.co.uk>
+	<20181217122405.18732-2-mark.cave-ayland@ilande.co.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <06de2004-b85c-bf5d-844c-c15fe78efe63@linaro.org>
+Date: Mon, 17 Dec 2018 08:40:33 -0800
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] iotests: allow pretty-print for
- qmp_log
+In-Reply-To: <20181217122405.18732-2-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH v2 1/9] target/ppc: introduce get_fpr()
+ and set_fpr() helpers for FP register access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,56 +32,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Markus Armbruster <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, lvivier@redhat.com
 
-MTcuMTIuMjAxOCAxNzoyNiwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
-MTUuMTIuMjAxOCAyOjE1LCBKb2huIFNub3cgd3JvdGU6DQo+PiBJZiBpb3Rlc3RzIGhhdmUgbGlu
-ZXMgZXhjZWVkaW5nID45OTggY2hhcmFjdGVycyBsb25nLCBnaXQgZG9lc24ndA0KPj4gd2FudCB0
-byBzZW5kIGl0IHBsYWludGV4dCB0byB0aGUgbGlzdC4gV2UgY2FuIHNvbHZlIHRoaXMgYnkgYWxs
-b3dpbmcNCj4+IHRoZSBpb3Rlc3RzIHRvIHVzZSBwcmV0dHkgcHJpbnRlZCBRTVAgb3V0cHV0IHRo
-YXQgd2UgY2FuIG1hdGNoIGFnYWluc3QNCj4+IGluc3RlYWQuDQo+Pg0KPj4gQXMgYSBib251cywg
-aXQncyBtdWNoIG5pY2VyIGZvciBodW1hbiBleWVzLCB0b28uDQo+Pg0KPj4gTm90ZSB0aGF0IHRo
-aXMgY2hhbmdlcyB0aGUgc29ydCBvcmRlciBmb3IgImNvbW1hbmQiIGFuZCAiYXJndW1lbnRzIiwN
-Cj4+IHNvIEkgcmVzdHJpY3QgdGhpcyByZW9yZGVyaW5nIHRvIG9jY3VyIG9ubHkgd2hlbiB0aGUg
-aW5kZW50IGlzIHNwZWNpZmllZC4NCj4+IC0tLQ0KPj4gwqAgdGVzdHMvcWVtdS1pb3Rlc3RzL2lv
-dGVzdHMucHkgfCAxNyArKysrKysrKysrKysrLS0tLQ0KPj4gwqAgMSBmaWxlIGNoYW5nZWQsIDEz
-IGluc2VydGlvbnMoKyksIDQgZGVsZXRpb25zKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL3Rlc3Rz
-L3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5IGIvdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHkN
-Cj4+IGluZGV4IDk1OTU0MjlmZWEuLmFiNTgyM2MwMTEgMTAwNjQ0DQo+PiAtLS0gYS90ZXN0cy9x
-ZW11LWlvdGVzdHMvaW90ZXN0cy5weQ0KPj4gKysrIGIvdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVz
-dHMucHkNCj4+IEBAIC00NDcsMTIgKzQ0NywyMSBAQCBjbGFzcyBWTShxdGVzdC5RRU1VUXRlc3RN
-YWNoaW5lKToNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJlc3VsdC5hcHBlbmQoZmls
-dGVyX3FtcF9ldmVudChldikpDQo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuIHJlc3VsdA0K
-Pj4gLcKgwqDCoCBkZWYgcW1wX2xvZyhzZWxmLCBjbWQsIGZpbHRlcnM9W2ZpbHRlcl90ZXN0Zmls
-ZXNdLCAqKmt3YXJncyk6DQo+PiAtwqDCoMKgwqDCoMKgwqAgbG9nbXNnID0gJ3siZXhlY3V0ZSI6
-ICIlcyIsICJhcmd1bWVudHMiOiAlc30nICUgXA0KPj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
-KGNtZCwganNvbi5kdW1wcyhrd2FyZ3MsIHNvcnRfa2V5cz1UcnVlKSkNCj4+ICvCoMKgwqAgZGVm
-IHFtcF9sb2coc2VsZiwgY21kLCBpbmRlbnQ9Tm9uZSwgZmlsdGVycz1bZmlsdGVyX3Rlc3RmaWxl
-c10sICoqa3dhcmdzKToNCj4+ICvCoMKgwqDCoMKgwqDCoCAjIFB5dGhvbiA8IDMuNCBuZWVkcyB0
-byBrbm93IG5vdCB0byBhZGQgd2hpdGVzcGFjZSB3aGVuIHByZXR0eS1wcmludGluZzoNCj4+ICvC
-oMKgwqDCoMKgwqDCoCBzZXBhcmF0b3JzID0gKCcsJywgJzogJykgaWYgaW5kZW50IGlzIG5vdCBO
-b25lIGVsc2UgKCcsJywgJzogJykNCj4+ICvCoMKgwqDCoMKgwqDCoCBpZiBpbmRlbnQgaXMgbm90
-IE5vbmU6DQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBmdWxsY21kID0geyAiZXhlY3V0ZSI6
-IGNtZCwNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-ICJhcmd1bWVudHMiOiBrd2FyZ3MgfQ0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgbG9nbXNn
-ID0ganNvbi5kdW1wcyhmdWxsY21kLCBpbmRlbnQ9aW5kZW50LCBzZXBhcmF0b3JzPXNlcGFyYXRv
-cnMsDQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgc29ydF9rZXlzPVRydWUpDQo+PiArwqDCoMKgwqDCoMKgwqAgZWxzZToN
-Cj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGxvZ21zZyA9ICd7ImV4ZWN1dGUiOiAiJXMiLCAi
-YXJndW1lbnRzIjogJXN9JyAlIFwNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
-KGNtZCwganNvbi5kdW1wcyhrd2FyZ3MsIHNvcnRfa2V5cz1UcnVlKSkNCj4gDQo+IGRlZmluaXRl
-bHkgb3ZlcmxvZ2ljIG9uIE5vbmUvaXMgbm90IE5vbmUsIGJ1dCBhbnl3YXksICcsJyBzZXBhcmF0
-b3IgbGVhZHMgdG8gbGVzcw0KPiBiZWF1dGlmdWwgb3V0cHV0LiBTbywgSSB0aGluayBpdCBpcyBi
-ZXR0ZXIgdG8gZG8ganVzdCAicmUuc3ViKHInXHMrXG4nLCAnXG4nLCBsb25nbXNnKSINCj4gb24g
-ZmluYWwgbWVzc2FnZSwgaGVyZSBvciBpbiBsb2coKSwgb3IgaW4gYm90aC4NCg0KZmluZCBteXNl
-bGYgY29tcG9zaW5nIGNvdW50ZXItcHJvcG9zYWwgcGF0Y2gsIHdpbGwgc2VuZCBzb29uLi4uDQoN
-Cj4gDQo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgbG9nKGxvZ21zZywgZmlsdGVycykNCj4+IMKgwqDC
-oMKgwqDCoMKgwqDCoCByZXN1bHQgPSBzZWxmLnFtcChjbWQsICoqa3dhcmdzKQ0KPj4gLcKgwqDC
-oMKgwqDCoMKgIGxvZyhqc29uLmR1bXBzKHJlc3VsdCwgc29ydF9rZXlzPVRydWUpLCBmaWx0ZXJz
-KQ0KPj4gK8KgwqDCoMKgwqDCoMKgIGxvZyhqc29uLmR1bXBzKHJlc3VsdCwgaW5kZW50PWluZGVu
-dCwgc2VwYXJhdG9ycz1zZXBhcmF0b3JzLA0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgIHNvcnRfa2V5cz1UcnVlKSwgZmlsdGVycykNCj4+IMKgwqDCoMKg
-wqDCoMKgwqDCoCByZXR1cm4gcmVzdWx0DQo+PiDCoMKgwqDCoMKgIGRlZiBydW5fam9iKHNlbGYs
-IGpvYiwgYXV0b19maW5hbGl6ZT1UcnVlLCBhdXRvX2Rpc21pc3M9RmFsc2UpOg0KPj4NCj4gDQo+
-IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+On 12/17/18 4:23 AM, Mark Cave-Ayland wrote:
+> These helpers allow us to move FP register values to/from the specified TCGv_i64
+> argument in the VSR helpers to be introduced shortly.
+> 
+> To prevent FP helpers accessing the cpu_fpr array directly, add extra TCG
+> temporaries as required.
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  target/ppc/translate.c             |  10 +
+>  target/ppc/translate/fp-impl.inc.c | 490 ++++++++++++++++++++++++++++---------
+>  2 files changed, 390 insertions(+), 110 deletions(-)
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
