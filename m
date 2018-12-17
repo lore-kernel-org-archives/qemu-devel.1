@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gZ29P-0001GC-QK
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:18:18 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gZ29a-0001PP-NW
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:18:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gZ29N-000546-G4
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:18:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48234)
+	(envelope-from <pbonzini@redhat.com>) id 1gZ29X-00057m-GI
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:18:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52798)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gZ29N-0004vE-5i
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:18:13 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A5C5F9F754
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 23:18:11 +0000 (UTC)
-Received: from donizetti.redhat.com (unknown [10.36.112.10])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 563FD5D9C8
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 23:18:09 +0000 (UTC)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gZ29X-00057W-7j
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 18:18:23 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 18 Dec 2018 00:16:55 +0100
-Message-Id: <20181217231700.24482-31-pbonzini@redhat.com>
+Date: Tue, 18 Dec 2018 00:16:59 +0100
+Message-Id: <20181217231700.24482-35-pbonzini@redhat.com>
 In-Reply-To: <20181217231700.24482-1-pbonzini@redhat.com>
 References: <20181217231700.24482-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 30/35] qemu/queue.h: simplify reverse access to
- QTAILQ
+Subject: [Qemu-devel] [PULL 34/35] remove space-tab sequences
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,625 +26,518 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Wainer dos Santos Moschetta <wainersm@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
 
-The new definition of QTAILQ does not require passing the headname,
-remove it.
+There are not many, and they are all simple mistakes that ended up
+being committed.  Remove them.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <20181213223737.11793-2-pbonzini@redhat.com>
+Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Acked-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- cpus-common.c                   |  2 +-
- dump.c                          |  2 +-
- hw/core/qdev.c                  |  4 ++--
- hw/scsi/scsi-bus.c              |  2 +-
- hw/usb/combined-packet.c        |  2 +-
- hw/usb/dev-mtp.c                |  4 ++--
- hw/usb/hcd-ehci.c               |  2 +-
- hw/usb/hcd-ehci.h               |  2 +-
- hw/usb/hcd-uhci.c               |  4 ++--
- include/exec/memory.h           |  2 +-
- include/hw/qdev-core.h          |  2 +-
- include/hw/usb.h                |  2 +-
- include/net/net.h               |  2 +-
- include/qemu/option_int.h       |  2 +-
- include/qemu/queue.h            | 16 ++++++++--------
- include/sysemu/memory_mapping.h |  2 +-
- memory.c                        | 17 ++++++-----------
- memory_mapping.c                |  2 +-
- net/filter.c                    |  2 +-
- net/net.c                       |  2 +-
- qga/commands-posix.c            |  2 +-
- tcg/tcg.c                       |  2 +-
- tcg/tcg.h                       |  4 ++--
- tests/libqos/malloc.c           |  2 +-
- tests/test-vmstate.c            |  8 ++++----
- ui/console.c                    |  4 ++--
- util/qemu-option.c              |  4 ++--
- 27 files changed, 48 insertions(+), 53 deletions(-)
+ bsd-user/x86_64/target_syscall.h   |  2 +-
+ crypto/aes.c                       | 28 ++++++++++++++--------------
+ disas/alpha.c                      |  8 ++++----
+ disas/arm.c                        |  2 +-
+ disas/i386.c                       |  4 ++--
+ disas/m68k.c                       |  4 ++--
+ hw/usb/hcd-uhci.c                  |  4 ++--
+ include/hw/elf_ops.h               |  2 +-
+ linux-user/linuxload.c             |  2 +-
+ linux-user/syscall.c               |  2 +-
+ linux-user/syscall_defs.h          |  4 ++--
+ linux-user/x86_64/target_syscall.h |  2 +-
+ slirp/ip_input.c                   |  4 ++--
+ slirp/tcp_input.c                  | 10 +++++-----
+ slirp/tcp_output.c                 |  4 ++--
+ slirp/tcp_timer.c                  |  2 +-
+ slirp/udp.c                        |  2 +-
+ tests/tcg/arm/hello-arm.c          | 10 +++++-----
+ 18 files changed, 48 insertions(+), 48 deletions(-)
 
-diff --git a/cpus-common.c b/cpus-common.c
-index 98dd8c6ff1..3ca58c64e8 100644
---- a/cpus-common.c
-+++ b/cpus-common.c
-@@ -99,7 +99,7 @@ void cpu_list_remove(CPUState *cpu)
-         return;
+diff --git a/bsd-user/x86_64/target_syscall.h b/bsd-user/x86_64/target_sy=
+scall.h
+index 211ce29e90..a5d779884f 100644
+--- a/bsd-user/x86_64/target_syscall.h
++++ b/bsd-user/x86_64/target_syscall.h
+@@ -12,7 +12,7 @@ struct target_pt_regs {
+ 	abi_ulong rbp;
+ 	abi_ulong rbx;
+ /* arguments: non interrupts/non tracing syscalls only save up to here *=
+/
+- 	abi_ulong r11;
++	abi_ulong r11;
+ 	abi_ulong r10;
+ 	abi_ulong r9;
+ 	abi_ulong r8;
+diff --git a/crypto/aes.c b/crypto/aes.c
+index 3456eacd08..773d246b00 100644
+--- a/crypto/aes.c
++++ b/crypto/aes.c
+@@ -1071,7 +1071,7 @@ int AES_set_encrypt_key(const unsigned char *userKe=
+y, const int bits,
+ 			AES_KEY *key) {
+=20
+ 	u32 *rk;
+-   	int i =3D 0;
++	int i =3D 0;
+ 	u32 temp;
+=20
+ 	if (!userKey || !key)
+@@ -1160,7 +1160,7 @@ int AES_set_encrypt_key(const unsigned char *userKe=
+y, const int bits,
+ 			rk[15] =3D rk[ 7] ^ rk[14];
+=20
+ 			rk +=3D 8;
+-        	}
++		}
+ 	}
+         abort();
+ }
+@@ -1247,7 +1247,7 @@ void AES_encrypt(const unsigned char *in, unsigned =
+char *out,
+         t1 =3D AES_Te0[s1 >> 24] ^ AES_Te1[(s2 >> 16) & 0xff] ^ AES_Te2[=
+(s3 >>  8) & 0xff] ^ AES_Te3[s0 & 0xff] ^ rk[ 5];
+         t2 =3D AES_Te0[s2 >> 24] ^ AES_Te1[(s3 >> 16) & 0xff] ^ AES_Te2[=
+(s0 >>  8) & 0xff] ^ AES_Te3[s1 & 0xff] ^ rk[ 6];
+         t3 =3D AES_Te0[s3 >> 24] ^ AES_Te1[(s0 >> 16) & 0xff] ^ AES_Te2[=
+(s1 >>  8) & 0xff] ^ AES_Te3[s2 & 0xff] ^ rk[ 7];
+-   	/* round 2: */
++	/* round 2: */
+         s0 =3D AES_Te0[t0 >> 24] ^ AES_Te1[(t1 >> 16) & 0xff] ^ AES_Te2[=
+(t2 >>  8) & 0xff] ^ AES_Te3[t3 & 0xff] ^ rk[ 8];
+         s1 =3D AES_Te0[t1 >> 24] ^ AES_Te1[(t2 >> 16) & 0xff] ^ AES_Te2[=
+(t3 >>  8) & 0xff] ^ AES_Te3[t0 & 0xff] ^ rk[ 9];
+         s2 =3D AES_Te0[t2 >> 24] ^ AES_Te1[(t3 >> 16) & 0xff] ^ AES_Te2[=
+(t0 >>  8) & 0xff] ^ AES_Te3[t1 & 0xff] ^ rk[10];
+@@ -1257,7 +1257,7 @@ void AES_encrypt(const unsigned char *in, unsigned =
+char *out,
+         t1 =3D AES_Te0[s1 >> 24] ^ AES_Te1[(s2 >> 16) & 0xff] ^ AES_Te2[=
+(s3 >>  8) & 0xff] ^ AES_Te3[s0 & 0xff] ^ rk[13];
+         t2 =3D AES_Te0[s2 >> 24] ^ AES_Te1[(s3 >> 16) & 0xff] ^ AES_Te2[=
+(s0 >>  8) & 0xff] ^ AES_Te3[s1 & 0xff] ^ rk[14];
+         t3 =3D AES_Te0[s3 >> 24] ^ AES_Te1[(s0 >> 16) & 0xff] ^ AES_Te2[=
+(s1 >>  8) & 0xff] ^ AES_Te3[s2 & 0xff] ^ rk[15];
+-   	/* round 4: */
++	/* round 4: */
+         s0 =3D AES_Te0[t0 >> 24] ^ AES_Te1[(t1 >> 16) & 0xff] ^ AES_Te2[=
+(t2 >>  8) & 0xff] ^ AES_Te3[t3 & 0xff] ^ rk[16];
+         s1 =3D AES_Te0[t1 >> 24] ^ AES_Te1[(t2 >> 16) & 0xff] ^ AES_Te2[=
+(t3 >>  8) & 0xff] ^ AES_Te3[t0 & 0xff] ^ rk[17];
+         s2 =3D AES_Te0[t2 >> 24] ^ AES_Te1[(t3 >> 16) & 0xff] ^ AES_Te2[=
+(t0 >>  8) & 0xff] ^ AES_Te3[t1 & 0xff] ^ rk[18];
+@@ -1267,7 +1267,7 @@ void AES_encrypt(const unsigned char *in, unsigned =
+char *out,
+         t1 =3D AES_Te0[s1 >> 24] ^ AES_Te1[(s2 >> 16) & 0xff] ^ AES_Te2[=
+(s3 >>  8) & 0xff] ^ AES_Te3[s0 & 0xff] ^ rk[21];
+         t2 =3D AES_Te0[s2 >> 24] ^ AES_Te1[(s3 >> 16) & 0xff] ^ AES_Te2[=
+(s0 >>  8) & 0xff] ^ AES_Te3[s1 & 0xff] ^ rk[22];
+         t3 =3D AES_Te0[s3 >> 24] ^ AES_Te1[(s0 >> 16) & 0xff] ^ AES_Te2[=
+(s1 >>  8) & 0xff] ^ AES_Te3[s2 & 0xff] ^ rk[23];
+-   	/* round 6: */
++	/* round 6: */
+         s0 =3D AES_Te0[t0 >> 24] ^ AES_Te1[(t1 >> 16) & 0xff] ^ AES_Te2[=
+(t2 >>  8) & 0xff] ^ AES_Te3[t3 & 0xff] ^ rk[24];
+         s1 =3D AES_Te0[t1 >> 24] ^ AES_Te1[(t2 >> 16) & 0xff] ^ AES_Te2[=
+(t3 >>  8) & 0xff] ^ AES_Te3[t0 & 0xff] ^ rk[25];
+         s2 =3D AES_Te0[t2 >> 24] ^ AES_Te1[(t3 >> 16) & 0xff] ^ AES_Te2[=
+(t0 >>  8) & 0xff] ^ AES_Te3[t1 & 0xff] ^ rk[26];
+@@ -1277,7 +1277,7 @@ void AES_encrypt(const unsigned char *in, unsigned =
+char *out,
+         t1 =3D AES_Te0[s1 >> 24] ^ AES_Te1[(s2 >> 16) & 0xff] ^ AES_Te2[=
+(s3 >>  8) & 0xff] ^ AES_Te3[s0 & 0xff] ^ rk[29];
+         t2 =3D AES_Te0[s2 >> 24] ^ AES_Te1[(s3 >> 16) & 0xff] ^ AES_Te2[=
+(s0 >>  8) & 0xff] ^ AES_Te3[s1 & 0xff] ^ rk[30];
+         t3 =3D AES_Te0[s3 >> 24] ^ AES_Te1[(s0 >> 16) & 0xff] ^ AES_Te2[=
+(s1 >>  8) & 0xff] ^ AES_Te3[s2 & 0xff] ^ rk[31];
+-   	/* round 8: */
++	/* round 8: */
+         s0 =3D AES_Te0[t0 >> 24] ^ AES_Te1[(t1 >> 16) & 0xff] ^ AES_Te2[=
+(t2 >>  8) & 0xff] ^ AES_Te3[t3 & 0xff] ^ rk[32];
+         s1 =3D AES_Te0[t1 >> 24] ^ AES_Te1[(t2 >> 16) & 0xff] ^ AES_Te2[=
+(t3 >>  8) & 0xff] ^ AES_Te3[t0 & 0xff] ^ rk[33];
+         s2 =3D AES_Te0[t2 >> 24] ^ AES_Te1[(t3 >> 16) & 0xff] ^ AES_Te2[=
+(t0 >>  8) & 0xff] ^ AES_Te3[t1 & 0xff] ^ rk[34];
+@@ -1569,33 +1569,33 @@ void AES_decrypt(const unsigned char *in, unsigne=
+d char *out,
+ 	 * apply last round and
+ 	 * map cipher state to byte array block:
+ 	 */
+-   	s0 =3D
++	s0 =3D
+                 (AES_Td4[(t0 >> 24)       ] & 0xff000000) ^
+                 (AES_Td4[(t3 >> 16) & 0xff] & 0x00ff0000) ^
+                 (AES_Td4[(t2 >>  8) & 0xff] & 0x0000ff00) ^
+                 (AES_Td4[(t1      ) & 0xff] & 0x000000ff) ^
+-   		rk[0];
++		rk[0];
+ 	PUTU32(out     , s0);
+-   	s1 =3D
++	s1 =3D
+                 (AES_Td4[(t1 >> 24)       ] & 0xff000000) ^
+                 (AES_Td4[(t0 >> 16) & 0xff] & 0x00ff0000) ^
+                 (AES_Td4[(t3 >>  8) & 0xff] & 0x0000ff00) ^
+                 (AES_Td4[(t2      ) & 0xff] & 0x000000ff) ^
+-   		rk[1];
++		rk[1];
+ 	PUTU32(out +  4, s1);
+-   	s2 =3D
++	s2 =3D
+                 (AES_Td4[(t2 >> 24)       ] & 0xff000000) ^
+                 (AES_Td4[(t1 >> 16) & 0xff] & 0x00ff0000) ^
+                 (AES_Td4[(t0 >>  8) & 0xff] & 0x0000ff00) ^
+                 (AES_Td4[(t3      ) & 0xff] & 0x000000ff) ^
+-   		rk[2];
++		rk[2];
+ 	PUTU32(out +  8, s2);
+-   	s3 =3D
++	s3 =3D
+                 (AES_Td4[(t3 >> 24)       ] & 0xff000000) ^
+                 (AES_Td4[(t2 >> 16) & 0xff] & 0x00ff0000) ^
+                 (AES_Td4[(t1 >>  8) & 0xff] & 0x0000ff00) ^
+                 (AES_Td4[(t0      ) & 0xff] & 0x000000ff) ^
+-   		rk[3];
++		rk[3];
+ 	PUTU32(out + 12, s3);
+ }
+=20
+diff --git a/disas/alpha.c b/disas/alpha.c
+index b7b0ae0d92..a0c9ecd49d 100644
+--- a/disas/alpha.c
++++ b/disas/alpha.c
+@@ -672,7 +672,7 @@ extract_ev6hwjhint(unsigned insn, int *invalid ATTRIB=
+UTE_UNUSED)
+    OPCODE	is the instruction opcode.
+=20
+    MASK		is the opcode mask; this is used to tell the disassembler
+-            	which bits in the actual opcode must match OPCODE.
++		which bits in the actual opcode must match OPCODE.
+=20
+    OPERANDS	is the list of operands.
+=20
+@@ -699,10 +699,10 @@ extract_ev6hwjhint(unsigned insn, int *invalid ATTR=
+IBUTE_UNUSED)
+    And two annotations:
+=20
+    EV56 BUT	opcodes that are officially introduced as of the ev56,
+-   		but with defined results on previous implementations.
++		but with defined results on previous implementations.
+=20
+    EV56 UNA	opcodes that were introduced as of the ev56 with
+-   		presumably undefined results on previous implementations
++		presumably undefined results on previous implementations
+ 		that were not assigned to a particular extension.
+ */
+=20
+@@ -832,7 +832,7 @@ const struct alpha_opcode alpha_opcodes[] =3D {
+   { "cmovgt",		OPR(0x11,0x66), BASE, ARG_OPR },
+   { "cmovgt",		OPRL(0x11,0x66), BASE, ARG_OPRL },
+   { "implver",		OPRL_(0x11,0x6C)|(31<<21)|(1<<13),
+-    			0xFFFFFFE0, BASE, { RC } },		/* ev56 but */
++			0xFFFFFFE0, BASE, { RC } },		/* ev56 but */
+=20
+   { "mskbl",		OPR(0x12,0x02), BASE, ARG_OPR },
+   { "mskbl",		OPRL(0x12,0x02), BASE, ARG_OPRL },
+diff --git a/disas/arm.c b/disas/arm.c
+index dda7b2a943..17ea120b44 100644
+--- a/disas/arm.c
++++ b/disas/arm.c
+@@ -1077,7 +1077,7 @@ static const struct opcode32 arm_opcodes[] =3D
+    %S                   print Thumb register (bits 3..5 as high number i=
+f bit 6 set)
+    %D                   print Thumb register (bits 0..2 as high number i=
+f bit 7 set)
+    %<bitfield>I         print bitfield as a signed decimal
+-   				(top bit of range being the sign bit)
++				(top bit of range being the sign bit)
+    %N                   print Thumb register mask (with LR)
+    %O                   print Thumb register mask (with PC)
+    %M                   print Thumb register mask
+diff --git a/disas/i386.c b/disas/i386.c
+index a557e678ec..fc03b9f06a 100644
+--- a/disas/i386.c
++++ b/disas/i386.c
+@@ -6075,7 +6075,7 @@ OP_EM (int bytemode, int sizeflag)
+ 	{
+ 	  bytemode =3D (prefixes & PREFIX_DATA) ? x_mode : q_mode;
+ 	  used_prefixes |=3D (prefixes & PREFIX_DATA);
+- 	}
++	}
+       OP_E (bytemode, sizeflag);
+       return;
      }
+@@ -6112,7 +6112,7 @@ OP_EMC (int bytemode, int sizeflag)
+ 	{
+ 	  bytemode =3D (prefixes & PREFIX_DATA) ? x_mode : q_mode;
+ 	  used_prefixes |=3D (prefixes & PREFIX_DATA);
+- 	}
++	}
+       OP_E (bytemode, sizeflag);
+       return;
+     }
+diff --git a/disas/m68k.c b/disas/m68k.c
+index 0dc8aa1a3c..e544c7137f 100644
+--- a/disas/m68k.c
++++ b/disas/m68k.c
+@@ -350,7 +350,7 @@ struct m68k_opcode_alias
 =20
--    assert(!(cpu_index_auto_assigned && cpu !=3D QTAILQ_LAST(&cpus, CPUT=
-ailQ)));
-+    assert(!(cpu_index_auto_assigned && cpu !=3D QTAILQ_LAST(&cpus)));
-=20
-     QTAILQ_REMOVE_RCU(&cpus, cpu, node);
-     cpu->cpu_index =3D UNASSIGNED_CPU_INDEX;
-diff --git a/dump.c b/dump.c
-index 4ec94c5e25..ef1d8025c9 100644
---- a/dump.c
-+++ b/dump.c
-@@ -1557,7 +1557,7 @@ static void get_max_mapnr(DumpState *s)
- {
-     GuestPhysBlock *last_block;
-=20
--    last_block =3D QTAILQ_LAST(&s->guest_phys_blocks.head, GuestPhysBloc=
-kHead);
-+    last_block =3D QTAILQ_LAST(&s->guest_phys_blocks.head);
-     s->max_mapnr =3D dump_paddr_to_pfn(s, last_block->target_end);
- }
-=20
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 6b3cc55b27..a7dd4bebd6 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -158,7 +158,7 @@ DeviceState *qdev_try_create(BusState *bus, const cha=
-r *type)
-     return dev;
- }
-=20
--static QTAILQ_HEAD(device_listeners, DeviceListener) device_listeners
-+static QTAILQ_HEAD(, DeviceListener) device_listeners
-     =3D QTAILQ_HEAD_INITIALIZER(device_listeners);
-=20
- enum ListenerDirection { Forward, Reverse };
-@@ -177,7 +177,7 @@ enum ListenerDirection { Forward, Reverse };
-             break;                                                \
-         case Reverse:                                             \
-             QTAILQ_FOREACH_REVERSE(_listener, &device_listeners,  \
--                                   device_listeners, link) {      \
-+                                   link) {                        \
-                 if (_listener->_callback) {                       \
-                     _listener->_callback(_listener, ##_args);     \
-                 }                                                 \
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index 97cd167114..c480553083 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -1554,7 +1554,7 @@ SCSIDevice *scsi_device_find(SCSIBus *bus, int chan=
-nel, int id, int lun)
-     BusChild *kid;
-     SCSIDevice *target_dev =3D NULL;
-=20
--    QTAILQ_FOREACH_REVERSE(kid, &bus->qbus.children, ChildrenHead, sibli=
-ng) {
-+    QTAILQ_FOREACH_REVERSE(kid, &bus->qbus.children, sibling) {
-         DeviceState *qdev =3D kid->child;
-         SCSIDevice *dev =3D SCSI_DEVICE(qdev);
-=20
-diff --git a/hw/usb/combined-packet.c b/hw/usb/combined-packet.c
-index 01a7ed0848..fc98383d30 100644
---- a/hw/usb/combined-packet.c
-+++ b/hw/usb/combined-packet.c
-@@ -64,7 +64,7 @@ void usb_combined_input_packet_complete(USBDevice *dev,=
- USBPacket *p)
-=20
-     status =3D combined->first->status;
-     actual_length =3D combined->first->actual_length;
--    short_not_ok =3D QTAILQ_LAST(&combined->packets, packets_head)->shor=
-t_not_ok;
-+    short_not_ok =3D QTAILQ_LAST(&combined->packets)->short_not_ok;
-=20
-     QTAILQ_FOREACH_SAFE(p, &combined->packets, combined_entry, next) {
-         if (!done) {
-diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index 100b7171f4..c33d7d6b1f 100644
---- a/hw/usb/dev-mtp.c
-+++ b/hw/usb/dev-mtp.c
-@@ -191,7 +191,7 @@ struct MTPState {
- #ifdef CONFIG_INOTIFY1
-     /* inotify descriptor */
-     int          inotifyfd;
--    QTAILQ_HEAD(events, MTPMonEntry) events;
-+    QTAILQ_HEAD(, MTPMonEntry) events;
- #endif
-     /* Responder is expecting a write operation */
-     bool write_pending;
-@@ -1982,7 +1982,7 @@ static void usb_mtp_handle_data(USBDevice *dev, USB=
-Packet *p)
-     case EP_EVENT:
- #ifdef CONFIG_INOTIFY1
-         if (!QTAILQ_EMPTY(&s->events)) {
--            struct MTPMonEntry *e =3D QTAILQ_LAST(&s->events, events);
-+            struct MTPMonEntry *e =3D QTAILQ_LAST(&s->events);
-             uint32_t handle;
-             int len =3D sizeof(container) + sizeof(uint32_t);
-=20
-diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
-index e5acfc5ba5..a2105c8ab1 100644
---- a/hw/usb/hcd-ehci.c
-+++ b/hw/usb/hcd-ehci.c
-@@ -1815,7 +1815,7 @@ static int ehci_state_fetchqtd(EHCIQueue *q)
-             break;
-         case EHCI_ASYNC_INFLIGHT:
-             /* Check if the guest has added new tds to the queue */
--            again =3D ehci_fill_queue(QTAILQ_LAST(&q->packets, pkts_head=
-));
-+            again =3D ehci_fill_queue(QTAILQ_LAST(&q->packets));
-             /* Unfinished async handled packet, go horizontal */
-             ehci_set_state(q->ehci, q->async, EST_HORIZONTALQH);
-             break;
-diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h
-index 0bc364b286..e4460aa1a8 100644
---- a/hw/usb/hcd-ehci.h
-+++ b/hw/usb/hcd-ehci.h
-@@ -247,7 +247,7 @@ struct EHCIQueue {
-     uint32_t qtdaddr;      /* address QTD read from                */
-     int last_pid;          /* pid of last packet executed          */
-     USBDevice *dev;
--    QTAILQ_HEAD(pkts_head, EHCIPacket) packets;
-+    QTAILQ_HEAD(, EHCIPacket) packets;
- };
-=20
- typedef QTAILQ_HEAD(EHCIQueueHead, EHCIQueue) EHCIQueueHead;
+    *  all					(modes 0-6,7.0-4)
+    ~  alterable memory				(modes 2-6,7.0,7.1)
+-   						(not 0,1,7.2-4)
++						(not 0,1,7.2-4)
+    %  alterable					(modes 0-6,7.0,7.1)
+ 						(not 7.2-4)
+    ;  data					(modes 0,2-6,7.0-4)
+@@ -1647,7 +1647,7 @@ print_insn_arg (const char *d,
+ 	  case 0x15: name =3D "%val"; break;
+ 	  case 0x16: name =3D "%scc"; break;
+ 	  case 0x17: name =3D "%ac"; break;
+- 	  case 0x18: name =3D "%psr"; break;
++	  case 0x18: name =3D "%psr"; break;
+ 	  case 0x19: name =3D "%pcsr"; break;
+ 	  case 0x1c:
+ 	  case 0x1d:
 diff --git a/hw/usb/hcd-uhci.c b/hw/usb/hcd-uhci.c
-index 836b11f177..26f123ed78 100644
+index 26f123ed78..e694b62086 100644
 --- a/hw/usb/hcd-uhci.c
 +++ b/hw/usb/hcd-uhci.c
-@@ -99,7 +99,7 @@ struct UHCIQueue {
-     UHCIState *uhci;
-     USBEndpoint *ep;
-     QTAILQ_ENTRY(UHCIQueue) next;
--    QTAILQ_HEAD(asyncs_head, UHCIAsync) asyncs;
-+    QTAILQ_HEAD(, UHCIAsync) asyncs;
-     int8_t    valid;
- };
-=20
-@@ -837,7 +837,7 @@ static int uhci_handle_td(UHCIState *s, UHCIQueue *q,=
- uint32_t qh_addr,
-         }
-         if (!async->done) {
-             UHCI_TD last_td;
--            UHCIAsync *last =3D QTAILQ_LAST(&async->queue->asyncs, async=
-s_head);
-+            UHCIAsync *last =3D QTAILQ_LAST(&async->queue->asyncs);
-             /*
-              * While we are waiting for the current td to complete, the =
-guest
-              * may have added more tds to the queue. Note we re-read the=
- td
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index ce930689cf..7353fa2ac6 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -445,7 +445,7 @@ struct AddressSpace {
-=20
-     int ioeventfd_nb;
-     struct MemoryRegionIoeventfd *ioeventfds;
--    QTAILQ_HEAD(memory_listeners_as, MemoryListener) listeners;
-+    QTAILQ_HEAD(, MemoryListener) listeners;
-     QTAILQ_ENTRY(AddressSpace) address_spaces_link;
- };
-=20
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 92851e55df..615b2b54ed 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -206,7 +206,7 @@ struct BusState {
-     HotplugHandler *hotplug_handler;
-     int max_index;
-     bool realized;
--    QTAILQ_HEAD(ChildrenHead, BusChild) children;
-+    QTAILQ_HEAD(, BusChild) children;
-     QLIST_ENTRY(BusState) sibling;
- };
-=20
-diff --git a/include/hw/usb.h b/include/hw/usb.h
-index a5080adecc..f9431a0ebc 100644
---- a/include/hw/usb.h
-+++ b/include/hw/usb.h
-@@ -408,7 +408,7 @@ struct USBPacket {
-=20
- struct USBCombinedPacket {
-     USBPacket *first;
--    QTAILQ_HEAD(packets_head, USBPacket) packets;
-+    QTAILQ_HEAD(, USBPacket) packets;
-     QEMUIOVector iov;
- };
-=20
-diff --git a/include/net/net.h b/include/net/net.h
-index ec13702dbf..643295d163 100644
---- a/include/net/net.h
-+++ b/include/net/net.h
-@@ -97,7 +97,7 @@ struct NetClientState {
-     unsigned rxfilter_notify_enabled:1;
-     int vring_enable;
-     int vnet_hdr_len;
--    QTAILQ_HEAD(NetFilterHead, NetFilterState) filters;
-+    QTAILQ_HEAD(, NetFilterState) filters;
- };
-=20
- typedef struct NICState {
-diff --git a/include/qemu/option_int.h b/include/qemu/option_int.h
-index 26b1d9e4d6..5dd9a5162d 100644
---- a/include/qemu/option_int.h
-+++ b/include/qemu/option_int.h
-@@ -47,7 +47,7 @@ struct QemuOpts {
-     char *id;
-     QemuOptsList *list;
-     Location loc;
--    QTAILQ_HEAD(QemuOptHead, QemuOpt) head;
-+    QTAILQ_HEAD(, QemuOpt) head;
-     QTAILQ_ENTRY(QemuOpts) next;
- };
-=20
-diff --git a/include/qemu/queue.h b/include/qemu/queue.h
-index a893facb86..1f8e219412 100644
---- a/include/qemu/queue.h
-+++ b/include/qemu/queue.h
-@@ -432,14 +432,14 @@ union {                                            =
-                     \
-                 (var) && ((next_var) =3D ((var)->field.tqe_next), 1);   =
-  \
-                 (var) =3D (next_var))
-=20
--#define QTAILQ_FOREACH_REVERSE(var, head, headname, field)              =
-\
--        for ((var) =3D QTAILQ_LAST(head, headname);                     =
-  \
-+#define QTAILQ_FOREACH_REVERSE(var, head, field)                        =
-\
-+        for ((var) =3D QTAILQ_LAST(head);                               =
-  \
-                 (var);                                                  =
-\
--                (var) =3D QTAILQ_PREV(var, headname, field))
-+                (var) =3D QTAILQ_PREV(var, field))
-=20
--#define QTAILQ_FOREACH_REVERSE_SAFE(var, head, headname, field, prev_var=
-) \
--        for ((var) =3D QTAILQ_LAST(head, headname);                     =
-  \
--             (var) && ((prev_var) =3D QTAILQ_PREV(var, headname, field))=
-; \
-+#define QTAILQ_FOREACH_REVERSE_SAFE(var, head, field, prev_var)         =
-\
-+        for ((var) =3D QTAILQ_LAST(head);                               =
-  \
-+             (var) && ((prev_var) =3D QTAILQ_PREV(var, field));         =
-  \
-              (var) =3D (prev_var))
-=20
- /*
-@@ -452,9 +452,9 @@ union {                                              =
-                   \
-=20
- #define QTAILQ_LINK_PREV(link)                                          =
-\
-         ((link).tql_prev->tql_prev->tql_next)
--#define QTAILQ_LAST(head, headname) \
-+#define QTAILQ_LAST(head)                                               =
-\
-         ((typeof((head)->tqh_first)) QTAILQ_LINK_PREV((head)->tqh_circ))
--#define QTAILQ_PREV(elm, headname, field) \
-+#define QTAILQ_PREV(elm, field)                                         =
-\
-         ((typeof((elm)->field.tqe_next)) QTAILQ_LINK_PREV((elm)->field.t=
-qe_circ))
-=20
- #define field_at_offset(base, offset, type)                             =
-       \
-diff --git a/include/sysemu/memory_mapping.h b/include/sysemu/memory_mapp=
-ing.h
-index 706152d533..58452457ce 100644
---- a/include/sysemu/memory_mapping.h
-+++ b/include/sysemu/memory_mapping.h
-@@ -36,7 +36,7 @@ typedef struct GuestPhysBlock {
- /* point-in-time snapshot of guest-visible physical mappings */
- typedef struct GuestPhysBlockList {
-     unsigned num;
--    QTAILQ_HEAD(GuestPhysBlockHead, GuestPhysBlock) head;
-+    QTAILQ_HEAD(, GuestPhysBlock) head;
- } GuestPhysBlockList;
-=20
- /* The physical and virtual address in the memory mapping are contiguous=
-. */
-diff --git a/memory.c b/memory.c
-index 195c5cf639..61d66e4441 100644
---- a/memory.c
-+++ b/memory.c
-@@ -39,7 +39,7 @@ static bool memory_region_update_pending;
- static bool ioeventfd_update_pending;
- static bool global_dirty_log =3D false;
-=20
--static QTAILQ_HEAD(memory_listeners, MemoryListener) memory_listeners
-+static QTAILQ_HEAD(, MemoryListener) memory_listeners
-     =3D QTAILQ_HEAD_INITIALIZER(memory_listeners);
-=20
- static QTAILQ_HEAD(, AddressSpace) address_spaces
-@@ -113,8 +113,7 @@ enum ListenerDirection { Forward, Reverse };
-             }                                                           =
-\
-             break;                                                      =
-\
-         case Reverse:                                                   =
-\
--            QTAILQ_FOREACH_REVERSE(_listener, &memory_listeners,        =
-\
--                                   memory_listeners, link) {            =
-\
-+            QTAILQ_FOREACH_REVERSE(_listener, &memory_listeners, link) {=
- \
-                 if (_listener->_callback) {                             =
-\
-                     _listener->_callback(_listener, ##_args);           =
-\
-                 }                                                       =
-\
-@@ -128,19 +127,17 @@ enum ListenerDirection { Forward, Reverse };
- #define MEMORY_LISTENER_CALL(_as, _callback, _direction, _section, _args=
-...) \
-     do {                                                                =
-\
-         MemoryListener *_listener;                                      =
-\
--        struct memory_listeners_as *list =3D &(_as)->listeners;         =
-  \
-                                                                         =
-\
-         switch (_direction) {                                           =
-\
-         case Forward:                                                   =
-\
--            QTAILQ_FOREACH(_listener, list, link_as) {                  =
-\
-+            QTAILQ_FOREACH(_listener, &(_as)->listeners, link_as) {     =
-\
-                 if (_listener->_callback) {                             =
-\
-                     _listener->_callback(_listener, _section, ##_args); =
-\
-                 }                                                       =
-\
-             }                                                           =
-\
-             break;                                                      =
-\
-         case Reverse:                                                   =
-\
--            QTAILQ_FOREACH_REVERSE(_listener, list, memory_listeners_as,=
- \
--                                   link_as) {                           =
-\
-+            QTAILQ_FOREACH_REVERSE(_listener, &(_as)->listeners, link_as=
-) { \
-                 if (_listener->_callback) {                             =
-\
-                     _listener->_callback(_listener, _section, ##_args); =
-\
-                 }                                                       =
-\
-@@ -2691,8 +2688,7 @@ void memory_listener_register(MemoryListener *liste=
-ner, AddressSpace *as)
-=20
-     listener->address_space =3D as;
-     if (QTAILQ_EMPTY(&memory_listeners)
--        || listener->priority >=3D QTAILQ_LAST(&memory_listeners,
--                                             memory_listeners)->priority=
-) {
-+        || listener->priority >=3D QTAILQ_LAST(&memory_listeners)->prior=
-ity) {
-         QTAILQ_INSERT_TAIL(&memory_listeners, listener, link);
-     } else {
-         QTAILQ_FOREACH(other, &memory_listeners, link) {
-@@ -2704,8 +2700,7 @@ void memory_listener_register(MemoryListener *liste=
-ner, AddressSpace *as)
-     }
-=20
-     if (QTAILQ_EMPTY(&as->listeners)
--        || listener->priority >=3D QTAILQ_LAST(&as->listeners,
--                                             memory_listeners)->priority=
-) {
-+        || listener->priority >=3D QTAILQ_LAST(&as->listeners)->priority=
-) {
-         QTAILQ_INSERT_TAIL(&as->listeners, listener, link_as);
-     } else {
-         QTAILQ_FOREACH(other, &as->listeners, link_as) {
-diff --git a/memory_mapping.c b/memory_mapping.c
-index 724dd0b417..e3ec70624f 100644
---- a/memory_mapping.c
-+++ b/memory_mapping.c
-@@ -223,7 +223,7 @@ static void guest_phys_blocks_region_add(MemoryListen=
-er *listener,
-     if (!QTAILQ_EMPTY(&g->list->head)) {
-         hwaddr predecessor_size;
-=20
--        predecessor =3D QTAILQ_LAST(&g->list->head, GuestPhysBlockHead);
-+        predecessor =3D QTAILQ_LAST(&g->list->head);
-         predecessor_size =3D predecessor->target_end - predecessor->targ=
-et_start;
-=20
-         /* the memory API guarantees monotonically increasing traversal =
-*/
-diff --git a/net/filter.c b/net/filter.c
-index c9f9e5fa08..28d1930db7 100644
---- a/net/filter.c
-+++ b/net/filter.c
-@@ -55,7 +55,7 @@ static NetFilterState *netfilter_next(NetFilterState *n=
-f,
-         next =3D QTAILQ_NEXT(nf, next);
-     } else {
-         /* reverse order */
--        next =3D QTAILQ_PREV(nf, NetFilterHead, next);
-+        next =3D QTAILQ_PREV(nf, next);
-     }
-=20
-     return next;
-diff --git a/net/net.c b/net/net.c
-index 1f7d626197..3acbdccd61 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -563,7 +563,7 @@ static ssize_t filter_receive_iov(NetClientState *nc,
+@@ -1056,8 +1056,8 @@ static void uhci_process_frame(UHCIState *s)
+                 link =3D qh.link;
+             } else {
+                 /* QH with elements */
+-            	curr_qh =3D link;
+-            	link =3D qh.el_link;
++                curr_qh =3D link;
++                link =3D qh.el_link;
              }
+             continue;
          }
-     } else {
--        QTAILQ_FOREACH_REVERSE(nf, &nc->filters, NetFilterHead, next) {
-+        QTAILQ_FOREACH_REVERSE(nf, &nc->filters, next) {
-             ret =3D qemu_netfilter_receive(nf, direction, sender, flags,=
- iov,
-                                          iovcnt, sent_cb);
-             if (ret) {
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index 1877976522..18a4724bc9 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -1291,7 +1291,7 @@ int64_t qmp_guest_fsfreeze_freeze_list(bool has_mou=
-ntpoints,
-     /* cannot risk guest agent blocking itself on a write in this state =
-*/
-     ga_set_frozen(ga_state);
+diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+index 81cecaf27e..3b6398cb39 100644
+--- a/include/hw/elf_ops.h
++++ b/include/hw/elf_ops.h
+@@ -343,7 +343,7 @@ static int glue(load_elf, SZ)(const char *name, int f=
+d,
+     }
 =20
--    QTAILQ_FOREACH_REVERSE(mount, &mounts, FsMountList, next) {
-+    QTAILQ_FOREACH_REVERSE(mount, &mounts, next) {
-         /* To issue fsfreeze in the reverse order of mounts, check if th=
-e
-          * mount is listed in the list here */
-         if (has_mountpoints) {
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index e85133ef05..2e090937a9 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -2269,7 +2269,7 @@ static void liveness_pass_1(TCGContext *s)
+     if (pentry)
+-   	*pentry =3D (uint64_t)(elf_sword)ehdr.e_entry;
++	*pentry =3D (uint64_t)(elf_sword)ehdr.e_entry;
 =20
-     tcg_la_func_end(s);
+     glue(load_symbols, SZ)(&ehdr, fd, must_swab, clear_lsb, sym_cb);
 =20
--    QTAILQ_FOREACH_REVERSE_SAFE(op, &s->ops, TCGOpHead, link, op_prev) {
-+    QTAILQ_FOREACH_REVERSE_SAFE(op, &s->ops, link, op_prev) {
-         int i, nb_iargs, nb_oargs;
-         TCGOpcode opc_new, opc_new2;
-         bool have_opc_new2;
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 1de74f982b..973a7579aa 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -713,7 +713,7 @@ struct TCGContext {
-     TCGTempSet free_temps[TCG_TYPE_COUNT * 2];
-     TCGTemp temps[TCG_MAX_TEMPS]; /* globals first, temps after */
+diff --git a/linux-user/linuxload.c b/linux-user/linuxload.c
+index 6f0d6054ce..6717c9c6f0 100644
+--- a/linux-user/linuxload.c
++++ b/linux-user/linuxload.c
+@@ -54,7 +54,7 @@ static int prepare_binprm(struct linux_binprm *bprm)
 =20
--    QTAILQ_HEAD(TCGOpHead, TCGOp) ops, free_ops;
-+    QTAILQ_HEAD(, TCGOp) ops, free_ops;
+     /* Set-uid? */
+     if(mode & S_ISUID) {
+-    	bprm->e_uid =3D st.st_uid;
++	bprm->e_uid =3D st.st_uid;
+     }
 =20
-     /* Tells which temporary holds a given register.
-        It does not take into account fixed registers */
-@@ -841,7 +841,7 @@ static inline void tcg_set_insn_start_param(TCGOp *op=
-, int arg, target_ulong v)
- /* The last op that was emitted.  */
- static inline TCGOp *tcg_last_op(void)
- {
--    return QTAILQ_LAST(&tcg_ctx->ops, TCGOpHead);
-+    return QTAILQ_LAST(&tcg_ctx->ops);
+     /* Set-gid? */
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 280137da8c..5c53e84b7a 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -902,7 +902,7 @@ abi_long do_brk(abi_ulong new_brk)
+         }
+ 	target_brk =3D new_brk;
+         DEBUGF_BRK(TARGET_ABI_FMT_lx " (new_brk <=3D brk_page)\n", targe=
+t_brk);
+-    	return target_brk;
++	return target_brk;
+     }
+=20
+     /* We need to allocate more memory after the brk... Note that
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 99bbce083c..12c8407144 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -1807,7 +1807,7 @@ struct target_stat {
+ 	abi_ulong	st_rdev;
+ 	abi_long	st_size;
+ 	abi_long	st_blksize;
+-    	abi_long	st_blocks;	/* Number 512-byte blocks allocated. */
++	abi_long	st_blocks;	/* Number 512-byte blocks allocated. */
+=20
+ 	abi_ulong	target_st_atime;
+ 	abi_ulong 	target_st_atime_nsec;=20
+@@ -1816,7 +1816,7 @@ struct target_stat {
+ 	abi_ulong	target_st_ctime;
+ 	abi_ulong       target_st_ctime_nsec;
+=20
+-  	abi_long	__unused[3];
++	abi_long	__unused[3];
+ };
+ #elif defined(TARGET_S390X)
+ struct target_stat {
+diff --git a/linux-user/x86_64/target_syscall.h b/linux-user/x86_64/targe=
+t_syscall.h
+index 983fb23d9b..5e221e1d9d 100644
+--- a/linux-user/x86_64/target_syscall.h
++++ b/linux-user/x86_64/target_syscall.h
+@@ -12,7 +12,7 @@ struct target_pt_regs {
+ 	abi_ulong rbp;
+ 	abi_ulong rbx;
+ /* arguments: non interrupts/non tracing syscalls only save up to here *=
+/
+- 	abi_ulong r11;
++	abi_ulong r11;
+ 	abi_ulong r10;
+ 	abi_ulong r9;
+ 	abi_ulong r8;
+diff --git a/slirp/ip_input.c b/slirp/ip_input.c
+index 348e1dca5a..094a807d41 100644
+--- a/slirp/ip_input.c
++++ b/slirp/ip_input.c
+@@ -193,7 +193,7 @@ ip_input(struct mbuf *m)
+ 			m =3D dtom(slirp, ip);
+ 		} else
+ 			if (fp)
+-		   	   ip_freef(slirp, fp);
++			   ip_freef(slirp, fp);
+=20
+ 	} else
+ 		ip->ip_len -=3D hlen;
+@@ -537,7 +537,7 @@ typedef uint32_t n_time;
+ 			if (opt =3D=3D IPOPT_SSRR) {
+ #define	INA	struct in_ifaddr *
+ #define	SA	struct sockaddr *
+- 			    if ((ia =3D (INA)ifa_ifwithdstaddr((SA)&ipaddr)) =3D=3D 0)
++			    if ((ia =3D (INA)ifa_ifwithdstaddr((SA)&ipaddr)) =3D=3D 0)
+ 				ia =3D (INA)ifa_ifwithnet((SA)&ipaddr);
+ 			} else
+ 				ia =3D ip_rtaddr(ipaddr.sin_addr);
+diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
+index d073ef9525..09bdf9b482 100644
+--- a/slirp/tcp_input.c
++++ b/slirp/tcp_input.c
+@@ -74,7 +74,7 @@
+                if (so->so_emu) { \
+ 		       if (tcp_emu((so),(m))) sbappend((so), (m)); \
+ 	       } else \
+-	       	       sbappend((so), (m)); \
++		       sbappend((so), (m)); \
+ 	} else {\
+                (flags) =3D tcp_reass((tp), (ti), (m)); \
+                tp->t_flags |=3D TF_ACKNOW; \
+@@ -1175,7 +1175,7 @@ trimthenstep6:
+ 			}
+ 			break;
+=20
+-	 	/*
++		/*
+ 		 * In CLOSING STATE in addition to the processing for
+ 		 * the ESTABLISHED state if the ACK acknowledges our FIN
+ 		 * then enter the TIME-WAIT state, otherwise ignore
+@@ -1325,7 +1325,7 @@ dodata:
+ 		}
+ 		switch (tp->t_state) {
+=20
+-	 	/*
++		/*
+ 		 * In SYN_RECEIVED and ESTABLISHED STATES
+ 		 * enter the CLOSE_WAIT state.
+ 		 */
+@@ -1337,7 +1337,7 @@ dodata:
+ 		    tp->t_state =3D TCPS_CLOSE_WAIT;
+ 		  break;
+=20
+-	 	/*
++		/*
+ 		 * If still in FIN_WAIT_1 STATE FIN has not been acked so
+ 		 * enter the CLOSING state.
+ 		 */
+@@ -1345,7 +1345,7 @@ dodata:
+ 			tp->t_state =3D TCPS_CLOSING;
+ 			break;
+=20
+-	 	/*
++		/*
+ 		 * In FIN_WAIT_2 state enter the TIME_WAIT state,
+ 		 * starting the time-wait timer, turning off the other
+ 		 * standard timers.
+diff --git a/slirp/tcp_output.c b/slirp/tcp_output.c
+index 90b5c376f7..c835432812 100644
+--- a/slirp/tcp_output.c
++++ b/slirp/tcp_output.c
+@@ -275,9 +275,9 @@ send:
+ 			memcpy((caddr_t)(opt + 2), (caddr_t)&mss, sizeof(mss));
+ 			optlen =3D 4;
+ 		}
+- 	}
++	}
+=20
+- 	hdrlen +=3D optlen;
++	hdrlen +=3D optlen;
+=20
+ 	/*
+ 	 * Adjust data length if insertion of options will
+diff --git a/slirp/tcp_timer.c b/slirp/tcp_timer.c
+index 52ef5f9100..dc8288b511 100644
+--- a/slirp/tcp_timer.c
++++ b/slirp/tcp_timer.c
+@@ -263,7 +263,7 @@ tcp_timers(register struct tcpcb *tp, int timer)
+ 			goto dropit;
+=20
+ 		if ((SO_OPTIONS) && tp->t_state <=3D TCPS_CLOSE_WAIT) {
+-		    	if (tp->t_idle >=3D TCPTV_KEEP_IDLE + TCP_MAXIDLE)
++			if (tp->t_idle >=3D TCPTV_KEEP_IDLE + TCP_MAXIDLE)
+ 				goto dropit;
+ 			/*
+ 			 * Send a packet designed to force a response
+diff --git a/slirp/udp.c b/slirp/udp.c
+index c47870a61b..5bb196c907 100644
+--- a/slirp/udp.c
++++ b/slirp/udp.c
+@@ -310,7 +310,7 @@ udp_tos(struct socket *so)
+ 	while(udptos[i].tos) {
+ 		if ((udptos[i].fport && ntohs(so->so_fport) =3D=3D udptos[i].fport) ||
+ 		    (udptos[i].lport && ntohs(so->so_lport) =3D=3D udptos[i].lport)) {
+-		    	so->so_emu =3D udptos[i].emu;
++			so->so_emu =3D udptos[i].emu;
+ 			return udptos[i].tos;
+ 		}
+ 		i++;
+diff --git a/tests/tcg/arm/hello-arm.c b/tests/tcg/arm/hello-arm.c
+index e0daa7ad98..6e5a93bccf 100644
+--- a/tests/tcg/arm/hello-arm.c
++++ b/tests/tcg/arm/hello-arm.c
+@@ -78,9 +78,9 @@ type name(type1 arg1, type2 arg2, type3 arg3, type4 arg=
+4) {				\
+   "mov\tr3,%4\n\t"									\
+   __syscall(name)									\
+   "mov\t%0,r0"										\
+-  	: "=3Dr" (__res)									\
+-  	: "r" ((long)(arg1)),"r" ((long)(arg2)),"r" ((long)(arg3)),"r" ((long=
+)(arg4))	\
+-  	: "r0","r1","r2","r3","lr");							\
++	: "=3Dr" (__res)									\
++	: "r" ((long)(arg1)),"r" ((long)(arg2)),"r" ((long)(arg3)),"r" ((long)(=
+arg4))	\
++	: "r0","r1","r2","r3","lr");							\
+   __syscall_return(type,__res);								\
  }
 =20
- /* Test for whether to terminate the TB for using too many opcodes.  */
-diff --git a/tests/libqos/malloc.c b/tests/libqos/malloc.c
-index ac05874b0a..f7bae47a08 100644
---- a/tests/libqos/malloc.c
-+++ b/tests/libqos/malloc.c
-@@ -104,7 +104,7 @@ static void mlist_coalesce(MemList *head, MemBlock *n=
-ode)
-=20
-     do {
-         merge =3D 0;
--        left =3D QTAILQ_PREV(node, MemList, MLIST_ENTNAME);
-+        left =3D QTAILQ_PREV(node, MLIST_ENTNAME);
-         right =3D QTAILQ_NEXT(node, MLIST_ENTNAME);
-=20
-         /* clowns to the left of me */
-diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
-index 37a7a93784..0ab29a8216 100644
---- a/tests/test-vmstate.c
-+++ b/tests/test-vmstate.c
-@@ -630,7 +630,7 @@ struct TestQtailqElement {
-=20
- typedef struct TestQtailq {
-     int16_t  i16;
--    QTAILQ_HEAD(TestQtailqHead, TestQtailqElement) q;
-+    QTAILQ_HEAD(, TestQtailqElement) q;
-     int32_t  i32;
- } TestQtailq;
-=20
-@@ -735,9 +735,9 @@ static void test_load_q(void)
-     g_assert_cmpint(eof, =3D=3D, QEMU_VM_EOF);
-=20
-     TestQtailqElement *qele_from =3D QTAILQ_FIRST(&obj_q.q);
--    TestQtailqElement *qlast_from =3D QTAILQ_LAST(&obj_q.q, TestQtailqHe=
-ad);
-+    TestQtailqElement *qlast_from =3D QTAILQ_LAST(&obj_q.q);
-     TestQtailqElement *qele_to =3D QTAILQ_FIRST(&tgt.q);
--    TestQtailqElement *qlast_to =3D QTAILQ_LAST(&tgt.q, TestQtailqHead);
-+    TestQtailqElement *qlast_to =3D QTAILQ_LAST(&tgt.q);
-=20
-     while (1) {
-         g_assert_cmpint(qele_to->b, =3D=3D, qele_from->b);
-@@ -755,7 +755,7 @@ static void test_load_q(void)
-     /* clean up */
-     TestQtailqElement *qele;
-     while (!QTAILQ_EMPTY(&tgt.q)) {
--        qele =3D QTAILQ_LAST(&tgt.q, TestQtailqHead);
-+        qele =3D QTAILQ_LAST(&tgt.q);
-         QTAILQ_REMOVE(&tgt.q, qele, next);
-         free(qele);
-         qele =3D NULL;
-diff --git a/ui/console.c b/ui/console.c
-index 3a285bae00..5a904e67d0 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -182,7 +182,7 @@ struct DisplayState {
-=20
- static DisplayState *display_state;
- static QemuConsole *active_console;
--static QTAILQ_HEAD(consoles_head, QemuConsole) consoles =3D
-+static QTAILQ_HEAD(, QemuConsole) consoles =3D
-     QTAILQ_HEAD_INITIALIZER(consoles);
- static bool cursor_visible_phase;
- static QEMUTimer *cursor_timer;
-@@ -1303,7 +1303,7 @@ static QemuConsole *new_console(DisplayState *ds, c=
-onsole_type_t console_type,
-         s->index =3D 0;
-         QTAILQ_INSERT_TAIL(&consoles, s, next);
-     } else if (console_type !=3D GRAPHIC_CONSOLE || qdev_hotplug) {
--        QemuConsole *last =3D QTAILQ_LAST(&consoles, consoles_head);
-+        QemuConsole *last =3D QTAILQ_LAST(&consoles);
-         s->index =3D last->index + 1;
-         QTAILQ_INSERT_TAIL(&consoles, s, next);
-     } else {
-diff --git a/util/qemu-option.c b/util/qemu-option.c
-index de42e2a406..ef60af70fc 100644
---- a/util/qemu-option.c
-+++ b/util/qemu-option.c
-@@ -280,7 +280,7 @@ QemuOpt *qemu_opt_find(QemuOpts *opts, const char *na=
-me)
- {
-     QemuOpt *opt;
-=20
--    QTAILQ_FOREACH_REVERSE(opt, &opts->head, QemuOptHead, next) {
-+    QTAILQ_FOREACH_REVERSE(opt, &opts->head, next) {
-         if (strcmp(opt->name, name) !=3D 0)
-             continue;
-         return opt;
-@@ -379,7 +379,7 @@ bool qemu_opt_has_help_opt(QemuOpts *opts)
- {
-     QemuOpt *opt;
-=20
--    QTAILQ_FOREACH_REVERSE(opt, &opts->head, QemuOptHead, next) {
-+    QTAILQ_FOREACH_REVERSE(opt, &opts->head, next) {
-         if (is_help_option(opt->name)) {
-             return true;
-         }
+@@ -96,8 +96,8 @@ type name(type1 arg1, type2 arg2, type3 arg3, type4 arg=
+4, type5 arg5) {			\
+   "mov\tr4,%5\n\t"									\
+   __syscall(name)									\
+   "mov\t%0,r0"										\
+-  	: "=3Dr" (__res)									\
+-  	: "r" ((long)(arg1)),"r" ((long)(arg2)),"r" ((long)(arg3)),"r" ((long=
+)(arg4)),	\
++	: "=3Dr" (__res)									\
++	: "r" ((long)(arg1)),"r" ((long)(arg2)),"r" ((long)(arg3)),"r" ((long)(=
+arg4)),	\
+ 	  "r" ((long)(arg5))								\
+ 	: "r0","r1","r2","r3","r4","lr");						\
+   __syscall_return(type,__res);								\
 --=20
 2.20.1
