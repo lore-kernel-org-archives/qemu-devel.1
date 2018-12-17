@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1gYtdT-0004A2-PM
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 09:12:44 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gYtrG-0001mx-Au
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 09:26:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1gYtdO-0004qY-Mk
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 09:12:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43374)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1gYtdO-0004mK-Cc
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 09:12:38 -0500
-References: <20181217035816.21777-1-richard.henderson@linaro.org>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <24582c74-a00d-4949-0e91-8dec793d02bc@redhat.com>
-Date: Mon, 17 Dec 2018 12:12:30 -0200
-MIME-Version: 1.0
-In-Reply-To: <20181217035816.21777-1-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gYtrC-0006Qf-AZ
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 09:26:58 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 17 Dec 2018 14:26:50 +0000
+Message-ID: <0780ebaa-3e11-c197-85f9-9133dc227d65@virtuozzo.com>
+References: <20181214231512.5295-1-jsnow@redhat.com>
+	<20181214231512.5295-7-jsnow@redhat.com>
+In-Reply-To: <20181214231512.5295-7-jsnow@redhat.com>
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] tests: Exit boot-serial-test loop if child
- dies
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <9F0BDA0EF6C1F540A56F852BD39EF20C@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 6/7] iotests: allow pretty-print for
+ qmp_log
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,181 +26,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-
-On 12/17/2018 01:58 AM, Richard Henderson wrote:
-> There's no point in waiting 5 full minutes when there will be
-> no more output.  Compute timeout based on elapsed wall clock
-> time instead of N * delays, as the delay is a minimum sleep time.
->
-> Cc: Thomas Huth <thuth@redhat.com>
-> Cc: Laurent Vivier <lvivier@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->   tests/libqtest.h         |  8 +++++
->   tests/boot-serial-test.c | 16 +++++++--
->   tests/libqtest.c         | 70 +++++++++++++++++++++++++---------------
->   3 files changed, 65 insertions(+), 29 deletions(-)
-
-Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-
->
-> diff --git a/tests/libqtest.h b/tests/libqtest.h
-> index 96a6c01352..9758c51be6 100644
-> --- a/tests/libqtest.h
-> +++ b/tests/libqtest.h
-> @@ -1011,4 +1011,12 @@ bool qmp_rsp_is_err(QDict *rsp);
->    */
->   void qmp_assert_error_class(QDict *rsp, const char *class);
->   
-> +/**
-> + * qtest_probe_child:
-> + * @s: QTestState instance to operate on.
-> + *
-> + * Returns: true if the child is still alive.
-> + */
-> +bool qtest_probe_child(QTestState *s);
-> +
->   #endif
-> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-> index 8ec6aed35d..54b9347325 100644
-> --- a/tests/boot-serial-test.c
-> +++ b/tests/boot-serial-test.c
-> @@ -130,11 +130,12 @@ static testdef_t tests[] = {
->   
->   static bool check_guest_output(const testdef_t *test, int fd)
->   {
-> -    int i, nbr = 0, pos = 0, ccnt;
-> +    int nbr = 0, pos = 0, ccnt;
-> +    time_t now, start = time(NULL);
->       char ch;
->   
-> -    /* Poll serial output... Wait at most 360 seconds */
-> -    for (i = 0; i < 36000; ++i) {
-> +    /* Poll serial output... */
-> +    while (1) {
->           ccnt = 0;
->           while (ccnt++ < 512 && (nbr = read(fd, &ch, 1)) == 1) {
->               if (ch == test->expect[pos]) {
-> @@ -148,6 +149,15 @@ static bool check_guest_output(const testdef_t *test, int fd)
->               }
->           }
->           g_assert(nbr >= 0);
-> +        /* Wait only if the child is still alive.  */
-> +        if (!qtest_probe_child(global_qtest)) {
-> +            break;
-> +        }
-> +        /* Wait at most 360 seconds.  */
-> +        now = time(NULL);
-> +        if (now - start >= 360) {
-> +            break;
-> +        }
->           g_usleep(10000);
->       }
->   
-> diff --git a/tests/libqtest.c b/tests/libqtest.c
-> index 43be078518..1d75d3c936 100644
-> --- a/tests/libqtest.c
-> +++ b/tests/libqtest.c
-> @@ -39,10 +39,11 @@ struct QTestState
->   {
->       int fd;
->       int qmp_fd;
-> +    pid_t qemu_pid;  /* our child QEMU process */
-> +    int wstatus;
-> +    bool big_endian;
->       bool irq_level[MAX_IRQ];
->       GString *rx;
-> -    pid_t qemu_pid;  /* our child QEMU process */
-> -    bool big_endian;
->   };
->   
->   static GHookList abrt_hooks;
-> @@ -96,36 +97,52 @@ static int socket_accept(int sock)
->       return ret;
->   }
->   
-> +bool qtest_probe_child(QTestState *s)
-> +{
-> +    pid_t pid = s->qemu_pid;
-> +
-> +    if (pid != -1) {
-> +        pid = waitpid(pid, &s->wstatus, WNOHANG);
-> +        if (pid == 0) {
-> +            return true;
-> +        }
-> +        s->qemu_pid = -1;
-> +    }
-> +    return false;
-> +}
-> +
->   static void kill_qemu(QTestState *s)
->   {
-> -    if (s->qemu_pid != -1) {
-> -        int wstatus = 0;
-> -        pid_t pid;
-> -
-> -        kill(s->qemu_pid, SIGTERM);
-> -        TFR(pid = waitpid(s->qemu_pid, &wstatus, 0));
-> +    pid_t pid = s->qemu_pid;
-> +    int wstatus;
->   
-> +    /* Skip wait if qtest_probe_child already reaped.  */
-> +    if (pid != -1) {
-> +        kill(pid, SIGTERM);
-> +        TFR(pid = waitpid(s->qemu_pid, &s->wstatus, 0));
->           assert(pid == s->qemu_pid);
-> -        /*
-> -         * We expect qemu to exit with status 0; anything else is
-> -         * fishy and should be logged with as much detail as possible.
-> -         */
-> -        if (wstatus) {
-> -            if (WIFEXITED(wstatus)) {
-> -                fprintf(stderr, "%s:%d: kill_qemu() tried to terminate QEMU "
-> -                        "process but encountered exit status %d\n",
-> -                        __FILE__, __LINE__, WEXITSTATUS(wstatus));
-> -            } else if (WIFSIGNALED(wstatus)) {
-> -                int sig = WTERMSIG(wstatus);
-> -                const char *signame = strsignal(sig) ?: "unknown ???";
-> -                const char *dump = WCOREDUMP(wstatus) ? " (core dumped)" : "";
-> +    }
->   
-> -                fprintf(stderr, "%s:%d: kill_qemu() detected QEMU death "
-> -                        "from signal %d (%s)%s\n",
-> -                        __FILE__, __LINE__, sig, signame, dump);
-> -            }
-> -            abort();
-> +    /*
-> +     * We expect qemu to exit with status 0; anything else is
-> +     * fishy and should be logged with as much detail as possible.
-> +     */
-> +    wstatus = s->wstatus;
-> +    if (wstatus) {
-> +        if (WIFEXITED(wstatus)) {
-> +            fprintf(stderr, "%s:%d: kill_qemu() tried to terminate QEMU "
-> +                    "process but encountered exit status %d\n",
-> +                    __FILE__, __LINE__, WEXITSTATUS(wstatus));
-> +        } else if (WIFSIGNALED(wstatus)) {
-> +            int sig = WTERMSIG(wstatus);
-> +            const char *signame = strsignal(sig) ?: "unknown ???";
-> +            const char *dump = WCOREDUMP(wstatus) ? " (core dumped)" : "";
-> +
-> +            fprintf(stderr, "%s:%d: kill_qemu() detected QEMU death "
-> +                    "from signal %d (%s)%s\n",
-> +                    __FILE__, __LINE__, sig, signame, dump);
->           }
-> +        abort();
->       }
->   }
->   
-> @@ -228,6 +245,7 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
->   
->       g_test_message("starting QEMU: %s", command);
->   
-> +    s->wstatus = 0;
->       s->qemu_pid = fork();
->       if (s->qemu_pid == 0) {
->           setenv("QEMU_AUDIO_DRV", "none", true);
+MTUuMTIuMjAxOCAyOjE1LCBKb2huIFNub3cgd3JvdGU6DQo+IElmIGlvdGVzdHMgaGF2ZSBsaW5l
+cyBleGNlZWRpbmcgPjk5OCBjaGFyYWN0ZXJzIGxvbmcsIGdpdCBkb2Vzbid0DQo+IHdhbnQgdG8g
+c2VuZCBpdCBwbGFpbnRleHQgdG8gdGhlIGxpc3QuIFdlIGNhbiBzb2x2ZSB0aGlzIGJ5IGFsbG93
+aW5nDQo+IHRoZSBpb3Rlc3RzIHRvIHVzZSBwcmV0dHkgcHJpbnRlZCBRTVAgb3V0cHV0IHRoYXQg
+d2UgY2FuIG1hdGNoIGFnYWluc3QNCj4gaW5zdGVhZC4NCj4gDQo+IEFzIGEgYm9udXMsIGl0J3Mg
+bXVjaCBuaWNlciBmb3IgaHVtYW4gZXllcywgdG9vLg0KPiANCj4gTm90ZSB0aGF0IHRoaXMgY2hh
+bmdlcyB0aGUgc29ydCBvcmRlciBmb3IgImNvbW1hbmQiIGFuZCAiYXJndW1lbnRzIiwNCj4gc28g
+SSByZXN0cmljdCB0aGlzIHJlb3JkZXJpbmcgdG8gb2NjdXIgb25seSB3aGVuIHRoZSBpbmRlbnQg
+aXMgc3BlY2lmaWVkLg0KPiAtLS0NCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weSB8
+IDE3ICsrKysrKysrKysrKystLS0tDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDEzIGluc2VydGlvbnMo
+KyksIDQgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3Rz
+L2lvdGVzdHMucHkgYi90ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weQ0KPiBpbmRleCA5NTk1
+NDI5ZmVhLi5hYjU4MjNjMDExIDEwMDY0NA0KPiAtLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMvaW90
+ZXN0cy5weQ0KPiArKysgYi90ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weQ0KPiBAQCAtNDQ3
+LDEyICs0NDcsMjEgQEAgY2xhc3MgVk0ocXRlc3QuUUVNVVF0ZXN0TWFjaGluZSk6DQo+ICAgICAg
+ICAgICAgICAgcmVzdWx0LmFwcGVuZChmaWx0ZXJfcW1wX2V2ZW50KGV2KSkNCj4gICAgICAgICAg
+IHJldHVybiByZXN1bHQNCj4gICANCj4gLSAgICBkZWYgcW1wX2xvZyhzZWxmLCBjbWQsIGZpbHRl
+cnM9W2ZpbHRlcl90ZXN0ZmlsZXNdLCAqKmt3YXJncyk6DQo+IC0gICAgICAgIGxvZ21zZyA9ICd7
+ImV4ZWN1dGUiOiAiJXMiLCAiYXJndW1lbnRzIjogJXN9JyAlIFwNCj4gLSAgICAgICAgICAgIChj
+bWQsIGpzb24uZHVtcHMoa3dhcmdzLCBzb3J0X2tleXM9VHJ1ZSkpDQo+ICsgICAgZGVmIHFtcF9s
+b2coc2VsZiwgY21kLCBpbmRlbnQ9Tm9uZSwgZmlsdGVycz1bZmlsdGVyX3Rlc3RmaWxlc10sICoq
+a3dhcmdzKToNCj4gKyAgICAgICAgIyBQeXRob24gPCAzLjQgbmVlZHMgdG8ga25vdyBub3QgdG8g
+YWRkIHdoaXRlc3BhY2Ugd2hlbiBwcmV0dHktcHJpbnRpbmc6DQo+ICsgICAgICAgIHNlcGFyYXRv
+cnMgPSAoJywnLCAnOiAnKSBpZiBpbmRlbnQgaXMgbm90IE5vbmUgZWxzZSAoJywnLCAnOiAnKQ0K
+PiArICAgICAgICBpZiBpbmRlbnQgaXMgbm90IE5vbmU6DQo+ICsgICAgICAgICAgICBmdWxsY21k
+ID0geyAiZXhlY3V0ZSI6IGNtZCwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICJhcmd1bWVu
+dHMiOiBrd2FyZ3MgfQ0KPiArICAgICAgICAgICAgbG9nbXNnID0ganNvbi5kdW1wcyhmdWxsY21k
+LCBpbmRlbnQ9aW5kZW50LCBzZXBhcmF0b3JzPXNlcGFyYXRvcnMsDQo+ICsgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIHNvcnRfa2V5cz1UcnVlKQ0KPiArICAgICAgICBlbHNlOg0KPiAr
+ICAgICAgICAgICAgbG9nbXNnID0gJ3siZXhlY3V0ZSI6ICIlcyIsICJhcmd1bWVudHMiOiAlc30n
+ICUgXA0KPiArICAgICAgICAgICAgICAgIChjbWQsIGpzb24uZHVtcHMoa3dhcmdzLCBzb3J0X2tl
+eXM9VHJ1ZSkpDQoNCmRlZmluaXRlbHkgb3ZlcmxvZ2ljIG9uIE5vbmUvaXMgbm90IE5vbmUsIGJ1
+dCBhbnl3YXksICcsJyBzZXBhcmF0b3IgbGVhZHMgdG8gbGVzcw0KYmVhdXRpZnVsIG91dHB1dC4g
+U28sIEkgdGhpbmsgaXQgaXMgYmV0dGVyIHRvIGRvIGp1c3QgInJlLnN1YihyJ1xzK1xuJywgJ1xu
+JywgbG9uZ21zZykiDQpvbiBmaW5hbCBtZXNzYWdlLCBoZXJlIG9yIGluIGxvZygpLCBvciBpbiBi
+b3RoLg0KDQo+ICAgICAgICAgICBsb2cobG9nbXNnLCBmaWx0ZXJzKQ0KPiAgICAgICAgICAgcmVz
+dWx0ID0gc2VsZi5xbXAoY21kLCAqKmt3YXJncykNCj4gLSAgICAgICAgbG9nKGpzb24uZHVtcHMo
+cmVzdWx0LCBzb3J0X2tleXM9VHJ1ZSksIGZpbHRlcnMpDQo+ICsgICAgICAgIGxvZyhqc29uLmR1
+bXBzKHJlc3VsdCwgaW5kZW50PWluZGVudCwgc2VwYXJhdG9ycz1zZXBhcmF0b3JzLA0KPiArICAg
+ICAgICAgICAgICAgICAgICAgICBzb3J0X2tleXM9VHJ1ZSksIGZpbHRlcnMpDQo+ICAgICAgICAg
+ICByZXR1cm4gcmVzdWx0DQo+ICAgDQo+ICAgICAgIGRlZiBydW5fam9iKHNlbGYsIGpvYiwgYXV0
+b19maW5hbGl6ZT1UcnVlLCBhdXRvX2Rpc21pc3M9RmFsc2UpOg0KPiANCg0KDQotLSANCkJlc3Qg
+cmVnYXJkcywNClZsYWRpbWlyDQo=
