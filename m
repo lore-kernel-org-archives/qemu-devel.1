@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1gZDb7-0002XB-Rj
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 06:31:38 -0500
+	(envelope-from <philmd@redhat.com>) id 1gZDgq-0007JY-OY
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 06:37:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1gZDb2-0004TQ-1c
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 06:31:37 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <mailman.30045.1545053429.1282.qemu-devel@nongnu.org>
-Date: Tue, 18 Dec 2018 06:31:28 -0500
+	(envelope-from <philmd@redhat.com>) id 1gZDgj-0003Ng-KQ
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 06:37:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47568)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gZDgj-0003NI-7r
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 06:37:25 -0500
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Tue, 18 Dec 2018 12:37:17 +0100
+Message-Id: <20181218113717.29130-1-philmd@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <CB38AD4F-062E-4E35-82E7-4C53063B1F9E@gmail.com>
-References: <mailman.30045.1545053429.1282.qemu-devel@nongnu.org>
-Subject: Re: [Qemu-devel] [PATCH 2/3] mac_newworld: enable access to EDID
- data for the VGA device
+Subject: [Qemu-devel] [PATCH] tests: Move qdict-test-data.txt to
+ tests/data/qobject/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,63 +25,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-ppc <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
+Move qdict-test-data.txt to the tests/data/qobject/ subdirectory,
+and remove the unnecessary symlinking.
+(See 4b2ff65a1f3 for similar test-data cleanup).
 
-> On 12/12/2018 13:38, Gerd Hoffmann wrote:
->=20
->> On Wed, Dec 12, 2018 at 08:54:37AM +0000, Mark Cave-Ayland wrote:
->>> On 12/12/2018 08:32, Gerd Hoffmann wrote:
->>>=20
->>>> On Fri, Dec 07, 2018 at 04:08:05PM +0000, Mark Cave-Ayland wrote:
->>>>> This is in preparation for some upcoming QEMU NDRV driver changes =
-that pass
->>>>> display information from the host to the guest.
->>>>=20
->>>>> -    pci_vga_init(pci_bus);
->>>>> +    dev =3D qdev_create(BUS(pci_bus), "VGA");
->>>>> +    qdev_prop_set_int32(dev, "addr", -1);
->>>>> +    qdev_prop_set_bit(dev, "edid", true);
->>>>> +    qdev_init_nofail(dev);
->>>>=20
->>>> Hmm.  IMO you should not overwrite the device defaults here.
->>>>=20
->>>> edid is off by default only because it is new and I'm conservative.
->>>> I want a release (or two) with it being available for user testing.
->>>> If no issues pop up flip it to default on.
->>>=20
->>> Oh, okay. I already have some unreleased guest code that makes use =
-of this, so my
->>> questions would be: how can EDID be enabled from the command line =
-for in-built VGA
->>> devices,
->>=20
->> "-global VGA.edid=3Don" should do.
->>=20
->>> and how do I detect whether EDID support is present from the guest?
->>=20
->> Check whenever the header is present.  The edid blob has a fixed 8 =
-byte
->> header (00 FF FF FF FF FF FF 00).  The linux kernel driver is lazy =
-and
->> checks the first two bytes only.
->>=20
->>> Otherwise a guest driver that assumes it is always present and tries
->>> to read from that area of memory will crash.
->>=20
->> Oh, reading should work no matter what.  You just don't find valid =
-edid
->> data there if it is turned off.
->=20
-> Thanks for the info. My current use case for this is passing a set of =
-possible guest
-> display resolutions from the host to the guest driver, rather than =
-using an internal
-> hard-coded list. I guess that over time QEMU could become "smarter" =
-about building
-> the list of supported resolutions depending upon the capabilities of =
-the host?
+Suggested-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ MAINTAINERS                                         | 1 +
+ configure                                           | 2 +-
+ tests/check-qdict.c                                 | 2 +-
+ qdict-test-data.txt =3D> tests/data/qobject/qdict.txt | 0
+ 4 files changed, 3 insertions(+), 2 deletions(-)
+ rename qdict-test-data.txt =3D> tests/data/qobject/qdict.txt (100%)
 
-Would could have both a hard-coded list and resolutions supported by the =
-host.=20
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 83c127f0d6..269427c3f3 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1891,6 +1891,7 @@ F: tests/check-qnum.c
+ F: tests/check-qjson.c
+ F: tests/check-qlist.c
+ F: tests/check-qstring.c
++F: tests/data/qobject/qdict.txt
+ T: git https://repo.or.cz/qemu/armbru.git qapi-next
+=20
+ QEMU Guest Agent
+diff --git a/configure b/configure
+index 224d3071ac..8022f4b999 100755
+--- a/configure
++++ b/configure
+@@ -7534,7 +7534,7 @@ DIRS=3D"$DIRS tests/fp"
+ DIRS=3D"$DIRS docs docs/interop fsdev scsi"
+ DIRS=3D"$DIRS pc-bios/optionrom pc-bios/spapr-rtas pc-bios/s390-ccw"
+ DIRS=3D"$DIRS roms/seabios roms/vgabios"
+-LINKS=3D"Makefile tests/tcg/Makefile qdict-test-data.txt"
++LINKS=3D"Makefile tests/tcg/Makefile"
+ LINKS=3D"$LINKS tests/tcg/cris/Makefile tests/tcg/cris/.gdbinit"
+ LINKS=3D"$LINKS tests/tcg/lm32/Makefile tests/tcg/xtensa/Makefile po/Mak=
+efile"
+ LINKS=3D"$LINKS tests/fp/Makefile"
+diff --git a/tests/check-qdict.c b/tests/check-qdict.c
+index a1e8305066..b5efa859b0 100644
+--- a/tests/check-qdict.c
++++ b/tests/check-qdict.c
+@@ -291,7 +291,7 @@ static void qdict_stress_test(void)
+     FILE *test_file;
+     QDict *qdict;
+     QString *value;
+-    const char *test_file_path =3D "qdict-test-data.txt";
++    const char *test_file_path =3D "tests/data/qobject/qdict.txt";
+=20
+     test_file =3D fopen(test_file_path, "r");
+     g_assert(test_file !=3D NULL);
+diff --git a/qdict-test-data.txt b/tests/data/qobject/qdict.txt
+similarity index 100%
+rename from qdict-test-data.txt
+rename to tests/data/qobject/qdict.txt
+--=20
+2.17.2
