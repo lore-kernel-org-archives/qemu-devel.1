@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZOTk-0002l4-Bo
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:08:45 -0500
+	(envelope-from <mst@redhat.com>) id 1gZOUn-0003ZM-2V
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:09:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZOTj-0006nw-9e
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:08:44 -0500
-Date: Tue, 18 Dec 2018 18:08:18 -0500
+	(envelope-from <mst@redhat.com>) id 1gZOUm-0007er-0j
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:09:48 -0500
+Date: Tue, 18 Dec 2018 18:09:28 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181218180813-mutt-send-email-mst@kernel.org>
+Message-ID: <20181218180846-mutt-send-email-mst@kernel.org>
 References: <20181218175122.3229-1-philmd@redhat.com>
+	<20181218175122.3229-3-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20181218175122.3229-1-philmd@redhat.com>
+In-Reply-To: <20181218175122.3229-3-philmd@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 0/5] Fix strncpy() warnings for GCC8 new
- -Wstringop-truncation
+Subject: Re: [Qemu-devel] [PATCH v3 2/5] block/sheepdog: Use QEMU_NONSTRING
+ for non NUL-terminated arrays
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +28,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, qemu-block@nongnu.org, 1803872@bugs.launchpad.net, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Howard Spoelstra <hsp.cat7@gmail.com>, Jeff Cody <jcody@redhat.com>, David Hildenbrand <david@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Weil <sw@weilnetz.de>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Ben Pye <ben@curlybracket.co.uk>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Thomas Huth <thuth@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Liu Yuan <namei.unix@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Max Reitz <mreitz@redhat.com>
 
-On Tue, Dec 18, 2018 at 06:51:17PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> GCC 8 new warning prevents builds to success since quite some time.
-> First report on the mailing list is in July 2018:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg03723.html
+On Tue, Dec 18, 2018 at 06:51:19PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> GCC 8 added a -Wstringop-truncation warning:
 >=20
-> Various intents has been sent to fix this:
-> - Incorrectly using g_strlcpy()
->   https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg03705.html
->   https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg03706.html
-> - Using assert() and strpadcpy()
->   https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg03938.html
-> - Use #pragma GCC diagnostic ignored "-Wstringop-truncation"
->   https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04261.html
-> - adding an inline wrapper with said pragma in there
->   https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04261.html
-> - -Wno-stringop-truncation is the makefile
->   https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04261.html
-> - Use the 'nonstring' attribute
->   https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04493.html
+>   The -Wstringop-truncation warning added in GCC 8.0 via r254630 for
+>   bug 81117 is specifically intended to highlight likely unintended
+>   uses of the strncpy function that truncate the terminating NUL
+>   character from the source string.
 >=20
-> This series add the QEMU_NONSTRING definition and use it.
+> This new warning leads to compilation failures:
 >=20
-> Regards,
+>     CC      block/sheepdog.o
+>   qemu/block/sheepdog.c: In function 'find_vdi_name':
+>   qemu/block/sheepdog.c:1239:5: error: 'strncpy' specified bound 256 eq=
+uals destination size [-Werror=3Dstringop-truncation]
+>        strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
+>        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   make: *** [qemu/rules.mak:69: block/sheepdog.o] Error 1
 >=20
-> Phil.
+> As described previous to the strncpy() calls, the use of strncpy() is
+> correct here:
+>=20
+>     /* This pair of strncpy calls ensures that the buffer is zero-fille=
+d,
+>      * which is desirable since we'll soon be sending those bytes, and
+>      * don't want the send_req to read uninitialized data.
+>      */
+>     strncpy(buf, filename, SD_MAX_VDI_LEN);
+>     strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
+>=20
+> Use the QEMU_NONSTRING attribute, since this array is intended to store
+> character arrays that do not necessarily contain a terminating NUL.
+>=20
+> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> ---
+>  block/sheepdog.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/block/sheepdog.c b/block/sheepdog.c
+> index 0125df9d49..d4ad6b119d 100644
+> --- a/block/sheepdog.c
+> +++ b/block/sheepdog.c
+> @@ -1224,7 +1224,7 @@ static int find_vdi_name(BDRVSheepdogState *s, co=
+nst char *filename,
+>      SheepdogVdiReq hdr;
+>      SheepdogVdiRsp *rsp =3D (SheepdogVdiRsp *)&hdr;
+>      unsigned int wlen, rlen =3D 0;
+> -    char buf[SD_MAX_VDI_LEN + SD_MAX_VDI_TAG_LEN];
+> +    QEMU_NONSTRING char buf[SD_MAX_VDI_LEN + SD_MAX_VDI_TAG_LEN];
+
+In case you decide to respin anyway - this would be
+a bit nicer as:
+	char buf[SD_MAX_VDI_LEN + SD_MAX_VDI_TAG_LEN] QEMU_NONSTRING
 
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-> Philippe Mathieu-Daud=E9 (5):
->   qemu/compiler: Define QEMU_NONSTRING
->   block/sheepdog: Use QEMU_NONSTRING for non NUL-terminated arrays
->   hw/acpi: Use QEMU_NONSTRING for non NUL-terminated arrays
->   migration: Use QEMU_NONSTRING for non NUL-terminated arrays
->   migration: Use strnlen() for fixed-size string
->=20
->  block/sheepdog.c            |  2 +-
->  hw/acpi/core.c              |  8 ++++----
->  include/hw/acpi/acpi-defs.h |  8 ++++----
->  include/qemu/compiler.h     | 15 +++++++++++++++
->  migration/global_state.c    |  4 ++--
->  5 files changed, 26 insertions(+), 11 deletions(-)
->=20
+
+>      fd =3D connect_to_sdog(s, errp);
+>      if (fd < 0) {
 > --=20
 > 2.17.2
