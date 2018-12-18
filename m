@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZGD8-0001LU-SZ
+	(envelope-from <imammedo@redhat.com>) id 1gZGD9-0001LX-SD
 	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:19:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZGD5-0005Ob-GU
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:19:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45578)
+	(envelope-from <imammedo@redhat.com>) id 1gZGD7-0005P1-Jg
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:19:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55263)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZGD3-0005NY-C8
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:18:58 -0500
-Date: Tue, 18 Dec 2018 09:18:50 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181218085249-mutt-send-email-mst@kernel.org>
-References: <cover.1545120100.git.yi.z.zhang@linux.intel.com>
-	<5eb87eb9a389242772375dd52bd97c17564a0829.1545120100.git.yi.z.zhang@linux.intel.com>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gZGD7-0005O5-AC
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:19:01 -0500
+Date: Tue, 18 Dec 2018 15:18:48 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181218151853.5f908f20@Igors-MacBook-Pro.local>
+In-Reply-To: <1545062250-7573-1-git-send-email-akrowiak@linux.ibm.com>
+References: <1545062250-7573-1-git-send-email-akrowiak@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5eb87eb9a389242772375dd52bd97c17564a0829.1545120100.git.yi.z.zhang@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH V7 6/6] hostmem-file: add 'sync' option
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] qdev/core: fix qbus_is_full()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,281 +26,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Yi <yi.z.zhang@linux.intel.com>
-Cc: peter.maydell@linaro.org, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, imammedo@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com, crosthwaite.peter@gmail.com, richard.henderson@linaro.org, xiaoguangrong.eric@gmail.com
+To: Tony Krowiak <akrowiak@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, pasic@linux.ibm.com, pmorel@linux.ibm.com
 
-On Tue, Dec 18, 2018 at 04:17:39PM +0800, Zhang Yi wrote:
-> This option controls whether QEMU mmap(2)
+On Mon, 17 Dec 2018 10:57:30 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-will mmap
-
-> the memory backend file with
-> MAP_SYNC flag, which could consistent filesystem metadata
-
-I'm not sure what does "which could consistent" above mean.
-
-
-> for each guest
-> write, if MAP_SYNC flag is supported by the host kernel(Linux kernel 4.15
-
-space before ( here pls.
-
-> and later) and the backend is a file supporting DAX (e.g., file on ext4/xfs
-> file system mounted with '-o dax').
+> The qbus_is_full(BusState *bus) function (qdev_monitor.c) compares the max_index
+> value of the BusState structure with the max_dev value of the BusClass structure
+> to determine whether the maximum number of children has been reached for the
+> bus. The problem is, the max_index field of the BusState structure does not
+> necessarily reflect the number of devices that have been plugged into
+> the bus.
 > 
-> It can take one of following values:
->  - on:  try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
->         'share=off' or 'pmem!=on', QEMU will abort
+> Whenever a child device is plugged into the bus, the bus's max_index value is
+> assigned to the child device and then incremented. If the child is subsequently
+> unplugged, the value of the max_index does not change and no longer reflects the
+> number of children.
+> 
+> When the bus's max_index value reaches the maximum number of devices
+> allowed for the bus (i.e., the max_dev field in the BusClass structure),
+> attempts to plug another device will be rejected claiming that the bus is
+> full -- even if the bus is actually empty.
+> 
+> To resolve the problem, a new 'num_children' field is being added to the
+> BusState structure to keep track of the number of children plugged into the
+> bus. It will be incremented when a child is plugged, and decremented when a
+> child is unplugged.
+> 
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
+> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
 
-Really abort? What if it's added with object_add?
-Should just fail not abort in that case ...
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Also you know whether it's built into qemu at build time -
-how about skipping it in the schema and man page in that case?
-
-
->  - off: never pass MAP_SYNC to mmap(2)
->  - auto (default): if MAP_SYNC is supported and 'share=on' 'pmem=on', work as
->         if 'sync=on'; otherwise, work as if 'sync=off'
-
-So this is a mechanism. And users really do not care about
-the mechanism. What do users want? See discussion in nvdimm.txt
-
-
-> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
 > ---
->  backends/hostmem-file.c | 39 +++++++++++++++++++++++++++++++++++++++
->  docs/nvdimm.txt         | 22 +++++++++++++++++++++-
->  include/exec/memory.h   |  8 ++++++++
->  qemu-options.hx         | 22 +++++++++++++++++++++-
->  4 files changed, 89 insertions(+), 2 deletions(-)
+>  hw/core/qdev.c         | 3 +++
+>  include/hw/qdev-core.h | 1 +
+>  qdev-monitor.c         | 2 +-
+>  3 files changed, 5 insertions(+), 1 deletion(-)
 > 
-> diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-> index 0dd7a90..73cf181 100644
-> --- a/backends/hostmem-file.c
-> +++ b/backends/hostmem-file.c
-> @@ -16,6 +16,7 @@
->  #include "sysemu/hostmem.h"
->  #include "sysemu/sysemu.h"
->  #include "qom/object_interfaces.h"
-> +#include "qapi/qapi-visit.h"
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 6b3cc55b27c2..956923f33520 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -59,6 +59,8 @@ static void bus_remove_child(BusState *bus, DeviceState *child)
+>              snprintf(name, sizeof(name), "child[%d]", kid->index);
+>              QTAILQ_REMOVE(&bus->children, kid, sibling);
 >  
->  /* hostmem-file.c */
->  /**
-> @@ -36,6 +37,7 @@ struct HostMemoryBackendFile {
->      uint64_t align;
->      bool discard_data;
->      bool is_pmem;
-> +    OnOffAuto sync;
+> +            bus->num_children--;
+> +
+>              /* This gives back ownership of kid->child back to us.  */
+>              object_property_del(OBJECT(bus), name, NULL);
+>              object_unref(OBJECT(kid->child));
+> @@ -73,6 +75,7 @@ static void bus_add_child(BusState *bus, DeviceState *child)
+>      char name[32];
+>      BusChild *kid = g_malloc0(sizeof(*kid));
+>  
+> +    bus->num_children++;
+>      kid->index = bus->max_index++;
+>      kid->child = child;
+>      object_ref(OBJECT(kid->child));
+> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> index a24d0dd566e3..521f0a947ead 100644
+> --- a/include/hw/qdev-core.h
+> +++ b/include/hw/qdev-core.h
+> @@ -206,6 +206,7 @@ struct BusState {
+>      HotplugHandler *hotplug_handler;
+>      int max_index;
+>      bool realized;
+> +    int num_children;
+>      QTAILQ_HEAD(ChildrenHead, BusChild) children;
+>      QLIST_ENTRY(BusState) sibling;
 >  };
->  
->  static void
-> @@ -62,6 +64,7 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
->                                   path,
->                                   backend->size, fb->align,
->                                   (backend->share ? RAM_SHARED : 0) |
-> +                                 qemu_ram_sync_flags(fb->sync) |
->                                   (fb->is_pmem ? RAM_PMEM : 0),
->                                   fb->mem_path, errp);
->          g_free(path);
-> @@ -136,6 +139,39 @@ static void file_memory_backend_set_align(Object *o, Visitor *v,
->      error_propagate(errp, local_err);
->  }
->  
-> +static void file_memory_backend_get_sync(
-> +    Object *obj, Visitor *v, const char *name, void *opaque, Error **errp)
-> +{
-> +    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(obj);
-> +    OnOffAuto value = fb->sync;
-> +
-> +    visit_type_OnOffAuto(v, name, &value, errp);
-> +}
-> +
-> +static void file_memory_backend_set_sync(
-> +    Object *obj, Visitor *v, const char *name, void *opaque, Error **errp)
-> +{
-> +    HostMemoryBackend *backend = MEMORY_BACKEND(obj);
-> +    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(obj);
-> +    Error *local_err = NULL;
-> +    OnOffAuto value;
-> +
-> +    if (host_memory_backend_mr_inited(backend)) {
-> +        error_setg(&local_err, "cannot change property '%s' of %s",
-> +                   name, object_get_typename(obj));
-> +        goto out;
-> +    }
-> +
-> +    visit_type_OnOffAuto(v, name, &value, &local_err);
-> +    if (local_err) {
-> +        goto out;
-> +    }
-> +    fb->sync = value;
-> +
-> + out:
-> +    error_propagate(errp, local_err);
-> +}
-> +
->  static bool file_memory_backend_get_pmem(Object *o, Error **errp)
+> diff --git a/qdev-monitor.c b/qdev-monitor.c
+> index 07147c63bf8b..45a8ba49644c 100644
+> --- a/qdev-monitor.c
+> +++ b/qdev-monitor.c
+> @@ -414,7 +414,7 @@ static DeviceState *qbus_find_dev(BusState *bus, char *elem)
+>  static inline bool qbus_is_full(BusState *bus)
 >  {
->      return MEMORY_BACKEND_FILE(o)->is_pmem;
-> @@ -203,6 +239,9 @@ file_backend_class_init(ObjectClass *oc, void *data)
->      object_class_property_add_bool(oc, "pmem",
->          file_memory_backend_get_pmem, file_memory_backend_set_pmem,
->          &error_abort);
-> +    object_class_property_add(oc, "sync", "OnOffAuto",
-> +        file_memory_backend_get_sync, file_memory_backend_set_sync,
-> +        NULL, NULL, &error_abort);
+>      BusClass *bus_class = BUS_GET_CLASS(bus);
+> -    return bus_class->max_dev && bus->max_index >= bus_class->max_dev;
+> +    return bus_class->max_dev && bus->num_children >= bus_class->max_dev;
 >  }
 >  
->  static void file_backend_instance_finalize(Object *o)
-> diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
-> index 5f158a6..d86a270 100644
-> --- a/docs/nvdimm.txt
-> +++ b/docs/nvdimm.txt
-> @@ -142,11 +142,31 @@ backend of vNVDIMM:
->  Guest Data Persistence
->  ----------------------
-
->  
-> +vNVDIMM is designed and implemented to guarantee
-> the guest data
-> +persistence on the backends even on the host crash and power
-> +failures. However, there are still some requirements and limitations
-> +as explained below.
-> +
-
-How about:
-
-nNVDIMM can guarantee guest data persistence in case of a host
-failure such as a crash or power failure, but only if the following
-conditions are satistied.
-
->  Though QEMU supports multiple types of vNVDIMM backends on Linux,
-> -currently the only one that can guarantee the guest write persistence
-> +if MAP_SYNC is not supported by the host kernel and the backends,
-> +the only backend that can guarantee the guest write persistence
->  is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
->  which all guest access do not involve any host-side kernel cache.
-
-BTW I think this user-facing detail belongs in the man page, not the
-source doc.
-
-
->  
-> +mmap(2) flag MAP_SYNC is added since Linux kernel 4.15. On such
-> +systems, QEMU can mmap(2) the backend with MAP_SYNC, which could
-
-Please check all your uses of "could" and "may" and replace
-with stronger wording that matches reality. 
-I am guessing it's copied from
-some other language and I'm trying not to be a language purist
-but it's confusing in English.
-E.g. no one wants an implementation that could guarantee consistence -
-people want one that does guarantee it.
-
-> +consistent filesystem metadata for each guest write. Besides the host
-> +kernel support, enabling MAP_SYNC in QEMU also requires:
-> +
-> + - the backend is a file supporting DAX, e.g., a file on an ext4 or
-> +   xfs file system mounted with '-o dax',
-
-Why list the filesystems here? The list can change with Linux.
-
-> +
-> + - 'sync' option of memory-backend-file is not 'off', and
-> +
-> + - 'share' option of memory-backend-file is 'on'.
-> +
-> + - 'pmem' option of memory-backend-file is 'on'
-> +
-
-Wait isn't this what pmem was supposed to do?
-Doesn't it mean "persistent memory"?
-
-Just goes to show that abbreviation is not good in a user interface IMHO.
-
-I think a higher level name like e.g.  "host-failure-persistent"
-would be better. Have that set whatever flags you need to
-actually be persistent. Thoughts?
-
-
-
->  When using other types of backends, it's suggested to set 'unarmed'
->  option of '-device nvdimm' to 'on', which sets the unarmed flag of the
->  guest NVDIMM region mapping structure.  This unarmed flag indicates
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index c74c467..b398abb 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -26,6 +26,7 @@
->  #include "qom/object.h"
->  #include "qemu/rcu.h"
->  #include "hw/qdev-core.h"
-> +#include "qapi/error.h"
->  
->  #define RAM_ADDR_INVALID (~(ram_addr_t)0)
->  
-> @@ -136,6 +137,13 @@ typedef struct IOMMUNotifier IOMMUNotifier;
->  
->  #define RAM_SYNC (RAM_SYNC_ON_OFF_AUTO_ON | RAM_SYNC_ON_OFF_AUTO_AUTO)
->  
-> +static inline uint64_t qemu_ram_sync_flags(OnOffAuto v)
-> +{
-> +    return v == ON_OFF_AUTO_OFF ? RAM_SYNC_ON_OFF_AUTO_OFF :
-> +           v == ON_OFF_AUTO_ON ? RAM_SYNC_ON_OFF_AUTO_ON :
-> +           RAM_SYNC_ON_OFF_AUTO_AUTO;
-> +}
-> +
-
-That's pretty confusing.
-ON_OFF_AUTO_AUTO is painful enough. I don't think you want
-to duplicate this with all prefixes like RAM_SYNC_ON_OFF_AUTO_ON.
-Pls avoid doing it.
-
-
->  static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
->                                         IOMMUNotifierFlag flags,
->                                         hwaddr start, hwaddr end,
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 08f8516..624f634 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -3928,7 +3928,7 @@ property must be set.  These objects are placed in the
->  
->  @table @option
->  
-> -@item -object memory-backend-file,id=@var{id},size=@var{size},mem-path=@var{dir},share=@var{on|off},discard-data=@var{on|off},merge=@var{on|off},dump=@var{on|off},prealloc=@var{on|off},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave},align=@var{align}
-> +@item -object memory-backend-file,id=@var{id},size=@var{size},mem-path=@var{dir},share=@var{on|off},discard-data=@var{on|off},merge=@var{on|off},dump=@var{on|off},prealloc=@var{on|off},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave},align=@var{align},sync=@var{on|off|auto}
->  
->  Creates a memory file backend object, which can be used to back
->  the guest RAM with huge pages.
-> @@ -4003,6 +4003,26 @@ If @option{pmem} is set to 'on', QEMU will take necessary operations to
->  guarantee the persistence of its own writes to @option{mem-path}
->  (e.g. in vNVDIMM label emulation and live migration).
->  
-> +The @option{sync} option specifies whether QEMU mmap(2) @option{mem-path}
-> +with MAP_SYNC flag, which can guarantee the guest write persistence to
-> +@option{mem-path} even on the host crash and power failures. MAP_SYNC
-> +requires supports from both the host kernel (since Linux kernel 4.15)
-> +and @option{mem-path} (only files supporting DAX). It can take one of
-> +following values:
-> +
-> +@table @option
-> +@item @var{on}
-> +try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
-> +@option{share}=@var{off}, @option{pmem}=@var{off} QEMU will abort
-> +
-> +@item @var{off}
-> +never pass MAP_SYNC to mmap(2)
-> +
-> +@item @var{auto} (default)
-> +if MAP_SYNC is supported and @option{share}=@var{on}, @option{pmem}=@var{on}
-> +work as if @option{sync}=@var{on}; otherwise, work as if @option{sync}=@var{off}
-> +@end table
-> +
->  @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},share=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
->  
->  Creates a memory backend object, which can be used to back the guest RAM.
-> -- 
-> 2.7.4
+>  /*
