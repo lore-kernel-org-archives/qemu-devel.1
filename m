@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gZ92X-0001O9-Se
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:39:39 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gZ92c-0001Tm-8I
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:39:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gZ92U-00029J-Vv
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:39:37 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:44258)
+	(envelope-from <richard.henderson@linaro.org>) id 1gZ92X-0002ES-Tf
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:39:40 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:42365)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gZ92U-0001uj-6k
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:39:34 -0500
-Received: by mail-pg1-x542.google.com with SMTP id t13so7333739pgr.11
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 22:39:19 -0800 (PST)
+	id 1gZ92V-0001y7-Ph
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:39:37 -0500
+Received: by mail-pf1-x442.google.com with SMTP id 64so7641146pfr.9
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 22:39:26 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 17 Dec 2018 22:38:41 -0800
-Message-Id: <20181218063911.2112-5-richard.henderson@linaro.org>
+Date: Mon, 17 Dec 2018 22:38:46 -0800
+Message-Id: <20181218063911.2112-10-richard.henderson@linaro.org>
 In-Reply-To: <20181218063911.2112-1-richard.henderson@linaro.org>
 References: <20181218063911.2112-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 04/34] tcg: Add write_aofs to GVecGen4
+Subject: [Qemu-devel] [PATCH 09/34] target/arm: Use vector minmax expanders
+ for aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,121 +30,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-This allows writing 2 output, 3 input operations.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/tcg-op-gvec.h |  2 ++
- tcg/tcg-op-gvec.c | 27 +++++++++++++++++++--------
- 2 files changed, 21 insertions(+), 8 deletions(-)
+ target/arm/translate-a64.c | 35 ++++++++++++++---------------------
+ 1 file changed, 14 insertions(+), 21 deletions(-)
 
-diff --git a/tcg/tcg-op-gvec.h b/tcg/tcg-op-gvec.h
-index d65b9d9d4c..2cb447112e 100644
---- a/tcg/tcg-op-gvec.h
-+++ b/tcg/tcg-op-gvec.h
-@@ -181,6 +181,8 @@ typedef struct {
-     uint8_t vece;
-     /* Prefer i64 to v64.  */
-     bool prefer_i64;
-+    /* Write aofs as a 2nd dest operand.  */
-+    bool write_aofs;
- } GVecGen4;
- 
- void tcg_gen_gvec_2(uint32_t dofs, uint32_t aofs,
-diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
-index 81689d02f7..c10d3d7b26 100644
---- a/tcg/tcg-op-gvec.c
-+++ b/tcg/tcg-op-gvec.c
-@@ -665,7 +665,7 @@ static void expand_3_i32(uint32_t dofs, uint32_t aofs,
- 
- /* Expand OPSZ bytes worth of three-operand operations using i32 elements.  */
- static void expand_4_i32(uint32_t dofs, uint32_t aofs, uint32_t bofs,
--                         uint32_t cofs, uint32_t oprsz,
-+                         uint32_t cofs, uint32_t oprsz, bool write_aofs,
-                          void (*fni)(TCGv_i32, TCGv_i32, TCGv_i32, TCGv_i32))
- {
-     TCGv_i32 t0 = tcg_temp_new_i32();
-@@ -680,6 +680,9 @@ static void expand_4_i32(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-         tcg_gen_ld_i32(t3, cpu_env, cofs + i);
-         fni(t0, t1, t2, t3);
-         tcg_gen_st_i32(t0, cpu_env, dofs + i);
-+        if (write_aofs) {
-+            tcg_gen_st_i32(t1, cpu_env, aofs + i);
-+        }
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 2d6f8c1b4f..bef21ada71 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -10452,6 +10452,20 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
      }
-     tcg_temp_free_i32(t3);
-     tcg_temp_free_i32(t2);
-@@ -769,7 +772,7 @@ static void expand_3_i64(uint32_t dofs, uint32_t aofs,
  
- /* Expand OPSZ bytes worth of three-operand operations using i64 elements.  */
- static void expand_4_i64(uint32_t dofs, uint32_t aofs, uint32_t bofs,
--                         uint32_t cofs, uint32_t oprsz,
-+                         uint32_t cofs, uint32_t oprsz, bool write_aofs,
-                          void (*fni)(TCGv_i64, TCGv_i64, TCGv_i64, TCGv_i64))
- {
-     TCGv_i64 t0 = tcg_temp_new_i64();
-@@ -784,6 +787,9 @@ static void expand_4_i64(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-         tcg_gen_ld_i64(t3, cpu_env, cofs + i);
-         fni(t0, t1, t2, t3);
-         tcg_gen_st_i64(t0, cpu_env, dofs + i);
-+        if (write_aofs) {
-+            tcg_gen_st_i64(t1, cpu_env, aofs + i);
+     switch (opcode) {
++    case 0x0c: /* SMAX, UMAX */
++        if (u) {
++            gen_gvec_fn3(s, is_q, rd, rn, rm, tcg_gen_gvec_umax, size);
++        } else {
++            gen_gvec_fn3(s, is_q, rd, rn, rm, tcg_gen_gvec_smax, size);
 +        }
-     }
-     tcg_temp_free_i64(t3);
-     tcg_temp_free_i64(t2);
-@@ -880,7 +886,7 @@ static void expand_3_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
- /* Expand OPSZ bytes worth of four-operand operations using host vectors.  */
- static void expand_4_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
-                          uint32_t bofs, uint32_t cofs, uint32_t oprsz,
--                         uint32_t tysz, TCGType type,
-+                         uint32_t tysz, TCGType type, bool write_aofs,
-                          void (*fni)(unsigned, TCGv_vec, TCGv_vec,
-                                      TCGv_vec, TCGv_vec))
- {
-@@ -896,6 +902,9 @@ static void expand_4_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
-         tcg_gen_ld_vec(t3, cpu_env, cofs + i);
-         fni(vece, t0, t1, t2, t3);
-         tcg_gen_st_vec(t0, cpu_env, dofs + i);
-+        if (write_aofs) {
-+            tcg_gen_st_vec(t1, cpu_env, aofs + i);
++        return;
++    case 0x0d: /* SMIN, UMIN */
++        if (u) {
++            gen_gvec_fn3(s, is_q, rd, rn, rm, tcg_gen_gvec_umin, size);
++        } else {
++            gen_gvec_fn3(s, is_q, rd, rn, rm, tcg_gen_gvec_smin, size);
 +        }
-     }
-     tcg_temp_free_vec(t3);
-     tcg_temp_free_vec(t2);
-@@ -1187,7 +1196,7 @@ void tcg_gen_gvec_4(uint32_t dofs, uint32_t aofs, uint32_t bofs, uint32_t cofs,
-          */
-         some = QEMU_ALIGN_DOWN(oprsz, 32);
-         expand_4_vec(g->vece, dofs, aofs, bofs, cofs, some,
--                     32, TCG_TYPE_V256, g->fniv);
-+                     32, TCG_TYPE_V256, g->write_aofs, g->fniv);
-         if (some == oprsz) {
-             break;
-         }
-@@ -1200,18 +1209,20 @@ void tcg_gen_gvec_4(uint32_t dofs, uint32_t aofs, uint32_t bofs, uint32_t cofs,
-         /* fallthru */
-     case TCG_TYPE_V128:
-         expand_4_vec(g->vece, dofs, aofs, bofs, cofs, oprsz,
--                     16, TCG_TYPE_V128, g->fniv);
-+                     16, TCG_TYPE_V128, g->write_aofs, g->fniv);
-         break;
-     case TCG_TYPE_V64:
-         expand_4_vec(g->vece, dofs, aofs, bofs, cofs, oprsz,
--                     8, TCG_TYPE_V64, g->fniv);
-+                     8, TCG_TYPE_V64, g->write_aofs, g->fniv);
-         break;
- 
-     case 0:
-         if (g->fni8 && check_size_impl(oprsz, 8)) {
--            expand_4_i64(dofs, aofs, bofs, cofs, oprsz, g->fni8);
-+            expand_4_i64(dofs, aofs, bofs, cofs, oprsz,
-+                         g->write_aofs, g->fni8);
-         } else if (g->fni4 && check_size_impl(oprsz, 4)) {
--            expand_4_i32(dofs, aofs, bofs, cofs, oprsz, g->fni4);
-+            expand_4_i32(dofs, aofs, bofs, cofs, oprsz,
-+                         g->write_aofs, g->fni4);
-         } else {
-             assert(g->fno != NULL);
-             tcg_gen_gvec_4_ool(dofs, aofs, bofs, cofs,
++        return;
+     case 0x10: /* ADD, SUB */
+         if (u) {
+             gen_gvec_fn3(s, is_q, rd, rn, rm, tcg_gen_gvec_sub, size);
+@@ -10613,27 +10627,6 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
+                 genenvfn = fns[size][u];
+                 break;
+             }
+-            case 0xc: /* SMAX, UMAX */
+-            {
+-                static NeonGenTwoOpFn * const fns[3][2] = {
+-                    { gen_helper_neon_max_s8, gen_helper_neon_max_u8 },
+-                    { gen_helper_neon_max_s16, gen_helper_neon_max_u16 },
+-                    { tcg_gen_smax_i32, tcg_gen_umax_i32 },
+-                };
+-                genfn = fns[size][u];
+-                break;
+-            }
+-
+-            case 0xd: /* SMIN, UMIN */
+-            {
+-                static NeonGenTwoOpFn * const fns[3][2] = {
+-                    { gen_helper_neon_min_s8, gen_helper_neon_min_u8 },
+-                    { gen_helper_neon_min_s16, gen_helper_neon_min_u16 },
+-                    { tcg_gen_smin_i32, tcg_gen_umin_i32 },
+-                };
+-                genfn = fns[size][u];
+-                break;
+-            }
+             case 0xe: /* SABD, UABD */
+             case 0xf: /* SABA, UABA */
+             {
 -- 
 2.17.2
