@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZ530-0004iO-0T
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 21:23:51 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gZ531-0004j8-S3
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 21:23:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZ52y-0005AM-JY
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 21:23:49 -0500
-Date: Tue, 18 Dec 2018 13:13:43 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gZ52y-0005AS-K6
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 21:23:51 -0500
+Date: Tue, 18 Dec 2018 13:09:24 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181218021343.GC23604@umbus.fritz.box>
-References: <20181217223445.28594-1-clg@kaod.org>
-	<20181217223445.28594-2-clg@kaod.org>
+Message-ID: <20181218020924.GB23604@umbus.fritz.box>
+References: <20181214015520.20467-1-aik@ozlabs.ru>
+	<20181217062133.GK5597@umbus.fritz.box>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="69pVuxX8awAiJ7fD"
+	protocol="application/pgp-signature"; boundary="i9LlY+UWpKt15+FH"
 Content-Disposition: inline
-In-Reply-To: <20181217223445.28594-2-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v9 1/7] target/ppc: fix the PPC_BIT
- definitions
+In-Reply-To: <20181217062133.GK5597@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [PATCH qemu v3] ppc/spapr: Receive and store
+ device tree blob from SLOF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,47 +25,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, gkurz@linux.ibm.com
 
 
---69pVuxX8awAiJ7fD
-Content-Type: text/plain; charset=iso-8859-1
+--i9LlY+UWpKt15+FH
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 17, 2018 at 11:34:39PM +0100, C=E9dric Le Goater wrote:
-> Change the PPC_BIT macro to use ULL instead of UL and the PPC_BIT32
-> and PPC_BIT8 not to use any suffix.
+On Mon, Dec 17, 2018 at 05:21:33PM +1100, David Gibson wrote:
+> On Fri, Dec 14, 2018 at 12:55:20PM +1100, Alexey Kardashevskiy wrote:
+> > SLOF receives a device tree and updates it with various properties
+> > before switching to the guest kernel and QEMU is not aware of any chang=
+es
+> > made by SLOF. Since there is no real RTAS (QEMU implements it), it makes
+> > sense to pass the SLOF final device tree to QEMU to let it implement
+> > RTAS related tasks better, such as PCI host bus adapter hotplug.
+> >=20
+> > Specifially, now QEMU can find out the actual XICS phandle (for PHB
+> > hotplug) and the RTAS linux,rtas-entry/base properties (for firmware
+> > assisted NMI - FWNMI).
+> >=20
+> > This stores the initial DT blob in the sPAPR machine and replaces it
+> > in the KVMPPC_H_UPDATE_DT (new private hypercall) handler.
+> >=20
+> > This adds an @update_dt_enabled machine property to allow backward
+> > migration.
+> >=20
+> > SLOF already has a hypercall since
+> > https://github.com/aik/SLOF/commit/e6fc84652c9c0073f9183
+> >=20
+> > This makes use of the new fdt_check_full() helper. In order to allow
+> > the configure script to pick the correct DTC version, this adjusts
+> > the DTC presense test.
+> >=20
+> > Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 >=20
-> This fixes a compile breakage on windows.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> Applied, thanks.
 
-Applied (before the rest of the XIVE patches), thanks.
+And now, unapplied.
 
-> ---
->  target/ppc/cpu.h | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->=20
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index ab68abe8a23c..527181c0f09f 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -70,9 +70,9 @@
->  #define PPC_ELF_MACHINE     EM_PPC
->  #endif
-> =20
-> -#define PPC_BIT(bit)            (0x8000000000000000UL >> (bit))
-> -#define PPC_BIT32(bit)          (0x80000000UL >> (bit))
-> -#define PPC_BIT8(bit)           (0x80UL >> (bit))
-> +#define PPC_BIT(bit)            (0x8000000000000000ULL >> (bit))
-> +#define PPC_BIT32(bit)          (0x80000000 >> (bit))
-> +#define PPC_BIT8(bit)           (0x80 >> (bit))
->  #define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_BIT(b=
-s))
->  #define PPC_BITMASK32(bs, be)   ((PPC_BIT32(bs) - PPC_BIT32(be)) | \
->                                   PPC_BIT32(bs))
+I don't know quite how, but somehow this patch is causing aarch64
+tests to SEGV.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -73,24 +75,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---69pVuxX8awAiJ7fD
+--i9LlY+UWpKt15+FH
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwYV9cACgkQbDjKyiDZ
-s5LxdhAAhxZb8qad8++PRmjA7IFsfHTbgzv5IeCSyZ847SYLpJMVP3+PSqsOX6zF
-lK5lxCOCWDE6pUtKDVTM9MP3A650Oyz/SMUA+c572G+DfbR4LFDZM+fuQBhidHvA
-IpyClT3AULrKCXhI5cu9qfm8OpQ8P0BcRvxZ284fw/+huqXgM8Y0PQb3aWUaDhzB
-ifTKC1+mku21bX+NEKKUrZuBlK/zE5l2U1/3TkFneGKZHCnuKh8XCC/wHkRImUq+
-kXDHXaz+jxYFqKSwSz6SHaECO9eJifRUHVjV2BMaN9PftnVfscW0qX+5Fz+AvojP
-zVGR6MM+k8XRVS7VGxbflqYxjLu5S0sDwQvKun3kHMh32ivwwj/uvbVetXdG3OLm
-OPpUOGRk4FJmgCz175CzM8m6cUxZ44Iqq/vOsi+LBBqQ9ivCSFsrdbaG+GFf+pL4
-yX+9pzYNVJx2BWE14UalU/kjzmlfDVP3RMj7YI4YgUiNsEMJeDkCc81UEupej48H
-MsTqFmh3HPFMAVKT36hkLB7xlBbL+t/Muhi/ZxuAKfArWEfp9Li5mnKWkcHfVFxi
-Mzd/CEIVzCDxncZy3A0BkHRIHJb0rpRwJzxdop1TFH3lEpLbfRX0GQrj9oiRencZ
-3UFRAyjH+wuADxiwSkfbh5c5fGIYv8v2bRTsMnM4C7k1g3u8tNw=
-=hi1Y
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwYVtEACgkQbDjKyiDZ
+s5LHKw/8CQc1etSQ6Y7xonJxIiLe5tKUPKhSMnFO5eEuVjsm2Zhx+GDtU0m/ol1o
+jpzYduBJg15HMSfKxbq2u+LoUoZtad6zMrTn+7X25t+r4lRgprpL3qznUhT4U53d
+Lt/pfq70Fqyai/Wx7ruAvy01VYhH9ESOrmMvpUAU6VEDjyyc4qi7+/bvwp1BVdId
+LwYTRzzhDlFeowkaYtuY4UGC6rvUTu3Wd3GdenZybM62uvCI1OPL//lnTKCQr6We
+iuo6svrCZe6ttuG/4SjvHVltYi94mUR2OOXPYkworwZCvi3yRYW97hc0+gHTJ8D/
+jrWJnAV/w9lrKUWzhAG1WNBl+oVm7GsrPKJ2/bimtHZJcjrp3BBmtFae48npHsx3
+lgokH613w+7pwpWtlSBVIm4pYmbLZjZABCmuVRXruPu0otQRwTg0IvJYwwKMLQ6r
+RdRlRN+F61nsq+x0bHWVH2/WdMFNjQ/kgkFfjm9mX9Kfy3tSxbhUhZKvssznezaN
+FM1rSDzgTPUvqwCBizyFBuZuenb5xMFj/LdTnAFy4xla0bpJWrwcLkJHhQTIt5TM
+jvx6SHtr9VfAgY8OPWEhwicLWLRV+wZ6HF4afXSEGsOYcHXjHF3MMOIbg1IFAXme
+F04ZsEz+/qjnzdmVm37V6jZgJrjk5yXQgzVpKx1GUJWI7tiyqdE=
+=XNZe
 -----END PGP SIGNATURE-----
 
---69pVuxX8awAiJ7fD--
+--i9LlY+UWpKt15+FH--
