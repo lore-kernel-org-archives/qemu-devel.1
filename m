@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gZ92z-0001kN-Rc
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:40:15 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gZ92y-0001jE-V7
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:40:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gZ92t-0002ug-J8
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:40:05 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:35047)
+	(envelope-from <richard.henderson@linaro.org>) id 1gZ92s-0002ty-Sx
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:40:04 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:35929)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gZ92s-0002nX-SC
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:39:59 -0500
-Received: by mail-pg1-x544.google.com with SMTP id s198so7352692pgs.2
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 22:39:55 -0800 (PST)
+	id 1gZ92s-0002IO-Ic
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:39:58 -0500
+Received: by mail-pg1-x543.google.com with SMTP id n2so7350364pgm.3
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 22:39:39 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 17 Dec 2018 22:39:07 -0800
-Message-Id: <20181218063911.2112-31-richard.henderson@linaro.org>
+Date: Mon, 17 Dec 2018 22:38:55 -0800
+Message-Id: <20181218063911.2112-19-richard.henderson@linaro.org>
 In-Reply-To: <20181218063911.2112-1-richard.henderson@linaro.org>
 References: <20181218063911.2112-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 30/34] target/ppc: Use mtvscr/mfvscr for vmstate
+Subject: [Qemu-devel] [PATCH 18/34] target/ppc: convert vaddu[b, h, w,
+ d] and vsubu[b, h, w, d] over to use vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,95 +30,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-This is required before changing the representation of the register.
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20181217122405.18732-10-mark.cave-ayland@ilande.co.uk>
 ---
- target/ppc/machine.c | 44 +++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 41 insertions(+), 3 deletions(-)
+ target/ppc/helper.h                 |  8 --------
+ target/ppc/int_helper.c             |  7 -------
+ target/ppc/translate/vmx-impl.inc.c | 16 ++++++++--------
+ 3 files changed, 8 insertions(+), 23 deletions(-)
 
-diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-index 451cf376b4..3c27a89166 100644
---- a/target/ppc/machine.c
-+++ b/target/ppc/machine.c
-@@ -10,6 +10,7 @@
- #include "migration/cpu.h"
- #include "qapi/error.h"
- #include "kvm_ppc.h"
-+#include "exec/helper-proto.h"
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index c7de04e068..553ff500c8 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -108,14 +108,6 @@ DEF_HELPER_FLAGS_1(ftsqrt, TCG_CALL_NO_RWG_SE, i32, i64)
+ #define dh_ctype_avr ppc_avr_t *
+ #define dh_is_signed_avr dh_is_signed_ptr
  
- static int cpu_load_old(QEMUFile *f, void *opaque, int version_id)
- {
-@@ -17,7 +18,7 @@ static int cpu_load_old(QEMUFile *f, void *opaque, int version_id)
-     CPUPPCState *env = &cpu->env;
-     unsigned int i, j;
-     target_ulong sdr1;
--    uint32_t fpscr;
-+    uint32_t fpscr, vscr;
- #if defined(TARGET_PPC64)
-     int32_t slb_nr;
- #endif
-@@ -84,7 +85,8 @@ static int cpu_load_old(QEMUFile *f, void *opaque, int version_id)
-     if (!cpu->vhyp) {
-         ppc_store_sdr1(env, sdr1);
+-DEF_HELPER_3(vaddubm, void, avr, avr, avr)
+-DEF_HELPER_3(vadduhm, void, avr, avr, avr)
+-DEF_HELPER_3(vadduwm, void, avr, avr, avr)
+-DEF_HELPER_3(vaddudm, void, avr, avr, avr)
+-DEF_HELPER_3(vsububm, void, avr, avr, avr)
+-DEF_HELPER_3(vsubuhm, void, avr, avr, avr)
+-DEF_HELPER_3(vsubuwm, void, avr, avr, avr)
+-DEF_HELPER_3(vsubudm, void, avr, avr, avr)
+ DEF_HELPER_3(vavgub, void, avr, avr, avr)
+ DEF_HELPER_3(vavguh, void, avr, avr, avr)
+ DEF_HELPER_3(vavguw, void, avr, avr, avr)
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index 9d715be25c..4547453ef1 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -531,13 +531,6 @@ void helper_vprtybq(ppc_avr_t *r, ppc_avr_t *b)
+             r->element[i] = a->element[i] op b->element[i];             \
+         }                                                               \
      }
--    qemu_get_be32s(f, &env->vscr);
-+    qemu_get_be32s(f, &vscr);
-+    helper_mtvscr(env, vscr);
-     qemu_get_be64s(f, &env->spe_acc);
-     qemu_get_be32s(f, &env->spe_fscr);
-     qemu_get_betls(f, &env->msr_mask);
-@@ -429,6 +431,28 @@ static bool altivec_needed(void *opaque)
-     return (cpu->env.insns_flags & PPC_ALTIVEC);
+-#define VARITH(suffix, element)                 \
+-    VARITH_DO(add##suffix, +, element)          \
+-    VARITH_DO(sub##suffix, -, element)
+-VARITH(ubm, u8)
+-VARITH(uhm, u16)
+-VARITH(uwm, u32)
+-VARITH(udm, u64)
+ VARITH_DO(muluwm, *, u32)
+ #undef VARITH_DO
+ #undef VARITH
+diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
+index c13828a09d..e353d3f174 100644
+--- a/target/ppc/translate/vmx-impl.inc.c
++++ b/target/ppc/translate/vmx-impl.inc.c
+@@ -411,18 +411,18 @@ static void glue(gen_, name)(DisasContext *ctx)                         \
+     tcg_temp_free_ptr(rb);                                              \
  }
  
-+static int get_vscr(QEMUFile *f, void *opaque, size_t size,
-+                    const VMStateField *field)
-+{
-+    PowerPCCPU *cpu = opaque;
-+    helper_mtvscr(&cpu->env, qemu_get_be32(f));
-+    return 0;
-+}
-+
-+static int put_vscr(QEMUFile *f, void *opaque, size_t size,
-+                    const VMStateField *field, QJSON *vmdesc)
-+{
-+    PowerPCCPU *cpu = opaque;
-+    qemu_put_be32(f, helper_mfvscr(&cpu->env));
-+    return 0;
-+}
-+
-+static const VMStateInfo vmstate_vscr = {
-+    .name = "cpu/altivec/vscr",
-+    .get = get_vscr,
-+    .put = put_vscr,
-+};
-+
- static const VMStateDescription vmstate_altivec = {
-     .name = "cpu/altivec",
-     .version_id = 1,
-@@ -436,7 +460,21 @@ static const VMStateDescription vmstate_altivec = {
-     .needed = altivec_needed,
-     .fields = (VMStateField[]) {
-         VMSTATE_AVR_ARRAY(env.vsr, PowerPCCPU, 32),
--        VMSTATE_UINT32(env.vscr, PowerPCCPU),
-+        /*
-+         * Save the architecture value of the vscr, not the internally
-+         * expanded version.  Since this architecture value does not
-+         * exist in memory to be stored, this requires a but of hoop
-+         * jumping.  We want OFFSET=0 so that we effectively pass CPU
-+         * to the helper functions.
-+         */
-+        {
-+            .name = "vscr",
-+            .version_id = 0,
-+            .size = sizeof(uint32_t),
-+            .info = &vmstate_vscr,
-+            .flags = VMS_SINGLE,
-+            .offset = 0
-+        },
-         VMSTATE_END_OF_LIST()
-     },
- };
+-GEN_VXFORM(vaddubm, 0, 0);
++GEN_VXFORM_V(vaddubm, MO_8, tcg_gen_gvec_add, 0, 0);
+ GEN_VXFORM_DUAL_EXT(vaddubm, PPC_ALTIVEC, PPC_NONE, 0,       \
+                     vmul10cuq, PPC_NONE, PPC2_ISA300, 0x0000F800)
+-GEN_VXFORM(vadduhm, 0, 1);
++GEN_VXFORM_V(vadduhm, MO_16, tcg_gen_gvec_add, 0, 1);
+ GEN_VXFORM_DUAL(vadduhm, PPC_ALTIVEC, PPC_NONE,  \
+                 vmul10ecuq, PPC_NONE, PPC2_ISA300)
+-GEN_VXFORM(vadduwm, 0, 2);
+-GEN_VXFORM(vaddudm, 0, 3);
+-GEN_VXFORM(vsububm, 0, 16);
+-GEN_VXFORM(vsubuhm, 0, 17);
+-GEN_VXFORM(vsubuwm, 0, 18);
+-GEN_VXFORM(vsubudm, 0, 19);
++GEN_VXFORM_V(vadduwm, MO_32, tcg_gen_gvec_add, 0, 2);
++GEN_VXFORM_V(vaddudm, MO_64, tcg_gen_gvec_add, 0, 3);
++GEN_VXFORM_V(vsububm, MO_8, tcg_gen_gvec_sub, 0, 16);
++GEN_VXFORM_V(vsubuhm, MO_16, tcg_gen_gvec_sub, 0, 17);
++GEN_VXFORM_V(vsubuwm, MO_32, tcg_gen_gvec_sub, 0, 18);
++GEN_VXFORM_V(vsubudm, MO_64, tcg_gen_gvec_sub, 0, 19);
+ GEN_VXFORM(vmaxub, 1, 0);
+ GEN_VXFORM(vmaxuh, 1, 1);
+ GEN_VXFORM(vmaxuw, 1, 2);
 -- 
 2.17.2
