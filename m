@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOQB-0007wK-Iu
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:05:05 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOQB-0007wL-Ji
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:05:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOQ5-000447-SA
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOQ6-00044X-2r
 	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:05:00 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:57322)
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:57312)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gZOQ3-000406-Nh
+	id 1gZOQ5-0003zl-LH
 	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:04:57 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Wed, 19 Dec 2018 00:03:39 +0100
-Message-Id: <20181218230442.27887-2-samuel.thibault@ens-lyon.org>
+Date: Wed, 19 Dec 2018 00:03:43 +0100
+Message-Id: <20181218230442.27887-6-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20181218230442.27887-1-samuel.thibault@ens-lyon.org>
 References: <20181218230442.27887-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 01/64] slirp: associate slirp_output callback
- with the Slirp context
+Subject: [Qemu-devel] [PULL 05/64] slirp: remove unused EMU_RSH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,157 +32,73 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Let's make the slirp interface a bit more library-like.
-Associate the slirp_output() with a Slirp context.
+EMU_RSH handling was dropped in commit
+0d62c4cfe21752df4c1d6e2c2398f15d5eaa794a.
+
+The assignment, and subsequent free() of ex_ptr->ex_exec to so->extra
+looks unsafe (double free is likely to occur).
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- net/slirp.c      |  5 +++--
- slirp/libslirp.h |  9 +++++----
- slirp/ncsi.c     |  2 +-
- slirp/slirp.c    | 11 +++++++----
- slirp/slirp.h    |  1 +
- 5 files changed, 17 insertions(+), 11 deletions(-)
+ slirp/misc.h     | 1 -
+ slirp/slirp.c    | 2 --
+ slirp/socket.c   | 4 ----
+ slirp/tcp_subr.c | 1 -
+ 4 files changed, 8 deletions(-)
 
-diff --git a/net/slirp.c b/net/slirp.c
-index f6dc03963a..1dbd34a9da 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -99,7 +99,7 @@ static void slirp_smb_cleanup(SlirpState *s);
- static inline void slirp_smb_cleanup(SlirpState *s) { }
- #endif
+diff --git a/slirp/misc.h b/slirp/misc.h
+index 64ca88c3b7..94829722cd 100644
+--- a/slirp/misc.h
++++ b/slirp/misc.h
+@@ -26,7 +26,6 @@ struct ex_list {
+ #define EMU_REALAUDIO 0x5
+ #define EMU_RLOGIN 0x6
+ #define EMU_IDENT 0x7
+-#define EMU_RSH 0x8
 =20
--void slirp_output(void *opaque, const uint8_t *pkt, int pkt_len)
-+static void net_slirp_output(void *opaque, const uint8_t *pkt, int pkt_l=
-en)
- {
-     SlirpState *s =3D opaque;
+ #define EMU_NOCONNECT 0x10	/* Don't connect */
 =20
-@@ -378,7 +378,8 @@ static int net_slirp_init(NetClientState *peer, const=
- char *model,
-                           ipv6, ip6_prefix, vprefix6_len, ip6_host,
-                           vhostname, tftp_server_name,
-                           tftp_export, bootfile, dhcp,
--                          dns, ip6_dns, dnssearch, vdomainname, s);
-+                          dns, ip6_dns, dnssearch, vdomainname,
-+                          net_slirp_output, s);
-     QTAILQ_INSERT_TAIL(&slirp_stacks, s, entry);
-=20
-     for (config =3D slirp_configs; config; config =3D config->next) {
-diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index 42e42e9a2a..52dbb9feb5 100644
---- a/slirp/libslirp.h
-+++ b/slirp/libslirp.h
-@@ -5,6 +5,8 @@
-=20
- typedef struct Slirp Slirp;
-=20
-+typedef void (*slirp_output)(void *opaque, const uint8_t *pkt, int pkt_l=
-en);
-+
- int get_dns_addr(struct in_addr *pdns_addr);
- int get_dns6_addr(struct in6_addr *pdns6_addr, uint32_t *scope_id);
-=20
-@@ -17,7 +19,9 @@ Slirp *slirp_init(int restricted, bool in_enabled, stru=
-ct in_addr vnetwork,
-                   const char *tftp_path, const char *bootfile,
-                   struct in_addr vdhcp_start, struct in_addr vnameserver=
-,
-                   struct in6_addr vnameserver6, const char **vdnssearch,
--                  const char *vdomainname, void *opaque);
-+                  const char *vdomainname,
-+                  slirp_output output,
-+                  void *opaque);
- void slirp_cleanup(Slirp *slirp);
-=20
- void slirp_pollfds_fill(GArray *pollfds, uint32_t *timeout);
-@@ -26,9 +30,6 @@ void slirp_pollfds_poll(GArray *pollfds, int select_err=
-or);
-=20
- void slirp_input(Slirp *slirp, const uint8_t *pkt, int pkt_len);
-=20
--/* you must provide the following functions: */
--void slirp_output(void *opaque, const uint8_t *pkt, int pkt_len);
--
- int slirp_add_hostfwd(Slirp *slirp, int is_udp,
-                       struct in_addr host_addr, int host_port,
-                       struct in_addr guest_addr, int guest_port);
-diff --git a/slirp/ncsi.c b/slirp/ncsi.c
-index 7116034afc..d7701f7785 100644
---- a/slirp/ncsi.c
-+++ b/slirp/ncsi.c
-@@ -163,5 +163,5 @@ void ncsi_input(Slirp *slirp, const uint8_t *pkt, int=
- pkt_len)
-     *pchecksum =3D htonl(checksum);
-     ncsi_rsp_len +=3D 4;
-=20
--    slirp_output(slirp->opaque, ncsi_reply, ETH_HLEN + ncsi_rsp_len);
-+    slirp->output(slirp->opaque, ncsi_reply, ETH_HLEN + ncsi_rsp_len);
- }
 diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 322edf51eb..b0380c5eaa 100644
+index 06b5c76939..e5968d9aea 100644
 --- a/slirp/slirp.c
 +++ b/slirp/slirp.c
-@@ -287,12 +287,15 @@ Slirp *slirp_init(int restricted, bool in_enabled, =
-struct in_addr vnetwork,
-                   const char *tftp_path, const char *bootfile,
-                   struct in_addr vdhcp_start, struct in_addr vnameserver=
-,
-                   struct in6_addr vnameserver6, const char **vdnssearch,
--                  const char *vdomainname, void *opaque)
-+                  const char *vdomainname,
-+                  slirp_output output,
-+                  void *opaque)
- {
-     Slirp *slirp =3D g_malloc0(sizeof(Slirp));
-=20
-     slirp_init_once();
-=20
-+    slirp->output =3D output;
-     slirp->grand =3D g_rand_new();
-     slirp->restricted =3D restricted;
-=20
-@@ -832,7 +835,7 @@ static void arp_input(Slirp *slirp, const uint8_t *pk=
-t, int pkt_len)
-             rah->ar_sip =3D ah->ar_tip;
-             memcpy(rah->ar_tha, ah->ar_sha, ETH_ALEN);
-             rah->ar_tip =3D ah->ar_sip;
--            slirp_output(slirp->opaque, arp_reply, sizeof(arp_reply));
-+            slirp->output(slirp->opaque, arp_reply, sizeof(arp_reply));
+@@ -1499,8 +1499,6 @@ static int slirp_state_load(QEMUFile *f, void *opaq=
+ue, int version_id)
          }
-         break;
-     case ARPOP_REPLY:
-@@ -932,7 +935,7 @@ static int if_encap4(Slirp *slirp, struct mbuf *ifm, =
-struct ethhdr *eh,
-             /* target IP */
-             rah->ar_tip =3D iph->ip_dst.s_addr;
-             slirp->client_ipaddr =3D iph->ip_dst;
--            slirp_output(slirp->opaque, arp_req, sizeof(arp_req));
-+            slirp->output(slirp->opaque, arp_req, sizeof(arp_req));
-             ifm->resolution_requested =3D true;
+         if (!ex_ptr)
+             return -EINVAL;
+-
+-        so->extra =3D (void *)ex_ptr->ex_exec;
+     }
 =20
-             /* Expire request and drop outgoing packet after 1 second */
-@@ -1018,7 +1021,7 @@ int if_encap(Slirp *slirp, struct mbuf *ifm)
-                 eh->h_dest[0], eh->h_dest[1], eh->h_dest[2],
-                 eh->h_dest[3], eh->h_dest[4], eh->h_dest[5]));
-     memcpy(buf + sizeof(struct ethhdr), ifm->m_data, ifm->m_len);
--    slirp_output(slirp->opaque, buf, ifm->m_len + ETH_HLEN);
-+    slirp->output(slirp->opaque, buf, ifm->m_len + ETH_HLEN);
-     return 1;
- }
+     return vmstate_load_state(f, &vmstate_slirp, slirp, version_id);
+diff --git a/slirp/socket.c b/slirp/socket.c
+index c01d8696af..041ec5061a 100644
+--- a/slirp/socket.c
++++ b/slirp/socket.c
+@@ -89,10 +89,6 @@ sofree(struct socket *so)
+   soqfree(so, &slirp->if_fastq);
+   soqfree(so, &slirp->if_batchq);
 =20
-diff --git a/slirp/slirp.h b/slirp/slirp.h
-index b80725a0d6..e3d65d68ec 100644
---- a/slirp/slirp.h
-+++ b/slirp/slirp.h
-@@ -220,6 +220,7 @@ struct Slirp {
-     GRand *grand;
-     QEMUTimer *ra_timer;
-=20
-+    slirp_output output;
-     void *opaque;
- };
-=20
+-  if (so->so_emu=3D=3DEMU_RSH && so->extra) {
+-	sofree(so->extra);
+-	so->extra=3DNULL;
+-  }
+   if (so =3D=3D slirp->tcp_last_so) {
+       slirp->tcp_last_so =3D &slirp->tcb;
+   } else if (so =3D=3D slirp->udp_last_so) {
+diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+index e7b2baa087..fd7521854e 100644
+--- a/slirp/tcp_subr.c
++++ b/slirp/tcp_subr.c
+@@ -541,7 +541,6 @@ static const struct tos_t tcptos[] =3D {
+ 	  {0, 23, IPTOS_LOWDELAY, 0},	/* telnet */
+ 	  {0, 80, IPTOS_THROUGHPUT, 0},	/* WWW */
+ 	  {0, 513, IPTOS_LOWDELAY, EMU_RLOGIN|EMU_NOCONNECT},	/* rlogin */
+-	  {0, 514, IPTOS_LOWDELAY, EMU_RSH|EMU_NOCONNECT},	/* shell */
+ 	  {0, 544, IPTOS_LOWDELAY, EMU_KSH},		/* kshell */
+ 	  {0, 543, IPTOS_LOWDELAY, 0},	/* klogin */
+ 	  {0, 6667, IPTOS_THROUGHPUT, EMU_IRC},	/* IRC */
 --=20
 2.19.2
