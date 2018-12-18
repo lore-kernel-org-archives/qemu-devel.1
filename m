@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZHyI-00056I-9W
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 11:11:57 -0500
+	(envelope-from <mst@redhat.com>) id 1gZHya-0005S2-DC
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 11:12:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZHyA-0001mX-Nl
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 11:11:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33946)
+	(envelope-from <mst@redhat.com>) id 1gZHyW-00028h-IW
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 11:12:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37916)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZHyA-0001ly-Bz
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 11:11:42 -0500
-Date: Tue, 18 Dec 2018 11:11:36 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZHyW-00028F-AE
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 11:12:04 -0500
+Date: Tue, 18 Dec 2018 11:11:47 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181218161008.3882-8-mst@redhat.com>
+Message-ID: <20181218161008.3882-11-mst@redhat.com>
 References: <20181218161008.3882-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <20181218161008.3882-1-mst@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 07/30] hw/smbios: Remove "smbios_ipmi.h"
+Subject: [Qemu-devel] [PULL v2 10/30] pcie: Create enums for link speed and
+ width
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,108 +29,100 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Corey Minyard <cminyard@mvista.com>, Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Corey Minyard <minyard@acm.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Geoffrey McRae <geoff@hostfission.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Eric Auger <eric.auger@redhat.com>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+From: Alex Williamson <alex.williamson@redhat.com>
 
-This header only declare a single function: smbios_build_type_38_table().
-We already have a header that declares such functions: "smbios_build.h".
-Move the declaration and remove the header.
+In preparation for reporting higher virtual link speeds and widths,
+create enums and macros to help us manage them.
 
-Reviewed-by: Corey Minyard <cminyard@mvista.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Tested-by: Geoffrey McRae <geoff@hostfission.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/smbios/smbios_build.h        |  4 ++++
- hw/smbios/smbios_ipmi.h         | 15 ---------------
- hw/smbios/smbios.c              |  1 -
- hw/smbios/smbios_type_38-stub.c |  2 +-
- hw/smbios/smbios_type_38.c      |  1 -
- 5 files changed, 5 insertions(+), 18 deletions(-)
- delete mode 100644 hw/smbios/smbios_ipmi.h
+ include/hw/pci/pcie_regs.h | 23 +++++++++++++++++++++--
+ hw/pci/pcie.c              |  7 ++++---
+ hw/vfio/pci.c              |  3 ++-
+ 3 files changed, 27 insertions(+), 6 deletions(-)
 
-diff --git a/hw/smbios/smbios_build.h b/hw/smbios/smbios_build.h
-index 93b360d520..56b5a1e3f3 100644
---- a/hw/smbios/smbios_build.h
-+++ b/hw/smbios/smbios_build.h
-@@ -3,6 +3,7 @@
-  *
-  * Copyright (C) 2009 Hewlett-Packard Development Company, L.P.
-  * Copyright (C) 2013 Red Hat, Inc.
-+ * Copyright (c) 2015,2016 Corey Minyard, MontaVista Software, LLC
-  *
-  * Authors:
-  *  Alex Williamson <alex.williamson@hp.com>
-@@ -96,4 +97,7 @@ extern unsigned smbios_table_cnt;
-         smbios_table_cnt++;                                             =
-  \
-     } while (0)
+diff --git a/include/hw/pci/pcie_regs.h b/include/hw/pci/pcie_regs.h
+index a95522a13b..ad4e7808b8 100644
+--- a/include/hw/pci/pcie_regs.h
++++ b/include/hw/pci/pcie_regs.h
+@@ -34,10 +34,29 @@
 =20
-+/* IPMI SMBIOS firmware handling */
-+void smbios_build_type_38_table(void);
+ /* PCI_EXP_LINK{CAP, STA} */
+ /* link speed */
+-#define PCI_EXP_LNK_LS_25               1
++typedef enum PCIExpLinkSpeed {
++    QEMU_PCI_EXP_LNK_2_5GT =3D 1,
++    QEMU_PCI_EXP_LNK_5GT,
++    QEMU_PCI_EXP_LNK_8GT,
++    QEMU_PCI_EXP_LNK_16GT,
++} PCIExpLinkSpeed;
 +
- #endif /* QEMU_SMBIOS_BUILD_H */
-diff --git a/hw/smbios/smbios_ipmi.h b/hw/smbios/smbios_ipmi.h
-deleted file mode 100644
-index 1c9aae38f2..0000000000
---- a/hw/smbios/smbios_ipmi.h
-+++ /dev/null
-@@ -1,15 +0,0 @@
--/*
-- * IPMI SMBIOS firmware handling
-- *
-- * Copyright (c) 2015,2016 Corey Minyard, MontaVista Software, LLC
-- *
-- * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-- * See the COPYING file in the top-level directory.
-- */
--
--#ifndef QEMU_SMBIOS_IPMI_H
--#define QEMU_SMBIOS_IPMI_H
--
--void smbios_build_type_38_table(void);
--
--#endif /* QEMU_SMBIOS_IPMI_H */
-diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
-index 6fe5be3586..4bff9b5ea4 100644
---- a/hw/smbios/smbios.c
-+++ b/hw/smbios/smbios.c
-@@ -28,7 +28,6 @@
- #include "hw/loader.h"
- #include "exec/cpu-common.h"
- #include "smbios_build.h"
--#include "smbios_ipmi.h"
++#define QEMU_PCI_EXP_LNKCAP_MLS(speed)  (speed)
++#define QEMU_PCI_EXP_LNKSTA_CLS         QEMU_PCI_EXP_LNKCAP_MLS
++
++typedef enum PCIExpLinkWidth {
++    QEMU_PCI_EXP_LNK_X1 =3D 1,
++    QEMU_PCI_EXP_LNK_X2 =3D 2,
++    QEMU_PCI_EXP_LNK_X4 =3D 4,
++    QEMU_PCI_EXP_LNK_X8 =3D 8,
++    QEMU_PCI_EXP_LNK_X12 =3D 12,
++    QEMU_PCI_EXP_LNK_X16 =3D 16,
++    QEMU_PCI_EXP_LNK_X32 =3D 32,
++} PCIExpLinkWidth;
 =20
- /* legacy structures and constants for <=3D 2.0 machines */
- struct smbios_header {
-diff --git a/hw/smbios/smbios_type_38-stub.c b/hw/smbios/smbios_type_38-s=
-tub.c
-index fc4516bc8a..14b53d004b 100644
---- a/hw/smbios/smbios_type_38-stub.c
-+++ b/hw/smbios/smbios_type_38-stub.c
-@@ -8,7 +8,7 @@
-  */
+ #define PCI_EXP_LNK_MLW_SHIFT           ctz32(PCI_EXP_LNKCAP_MLW)
+-#define PCI_EXP_LNK_MLW_1               (1 << PCI_EXP_LNK_MLW_SHIFT)
++#define QEMU_PCI_EXP_LNKCAP_MLW(width)  (width << PCI_EXP_LNK_MLW_SHIFT)
++#define QEMU_PCI_EXP_LNKSTA_NLW         QEMU_PCI_EXP_LNKCAP_MLW
 =20
- #include "qemu/osdep.h"
--#include "smbios_ipmi.h"
-+#include "smbios_build.h"
+ /* PCI_EXP_LINKCAP */
+ #define PCI_EXP_LNKCAP_ASPMS_SHIFT      ctz32(PCI_EXP_LNKCAP_ASPMS)
+diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+index 66b73b87c8..aef84c665b 100644
+--- a/hw/pci/pcie.c
++++ b/hw/pci/pcie.c
+@@ -68,11 +68,12 @@ pcie_cap_v1_fill(PCIDevice *dev, uint8_t port, uint8_=
+t type, uint8_t version)
+     pci_set_long(exp_cap + PCI_EXP_LNKCAP,
+                  (port << PCI_EXP_LNKCAP_PN_SHIFT) |
+                  PCI_EXP_LNKCAP_ASPMS_0S |
+-                 PCI_EXP_LNK_MLW_1 |
+-                 PCI_EXP_LNK_LS_25);
++                 QEMU_PCI_EXP_LNKCAP_MLW(QEMU_PCI_EXP_LNK_X1) |
++                 QEMU_PCI_EXP_LNKCAP_MLS(QEMU_PCI_EXP_LNK_2_5GT));
 =20
- void smbios_build_type_38_table(void)
- {
-diff --git a/hw/smbios/smbios_type_38.c b/hw/smbios/smbios_type_38.c
-index d84e87d608..a1ad28d059 100644
---- a/hw/smbios/smbios_type_38.c
-+++ b/hw/smbios/smbios_type_38.c
-@@ -12,7 +12,6 @@
- #include "hw/smbios/smbios.h"
- #include "qemu/error-report.h"
- #include "smbios_build.h"
--#include "smbios_ipmi.h"
+     pci_set_word(exp_cap + PCI_EXP_LNKSTA,
+-                 PCI_EXP_LNK_MLW_1 | PCI_EXP_LNK_LS_25);
++                 QEMU_PCI_EXP_LNKSTA_NLW(QEMU_PCI_EXP_LNK_X1) |
++                 QEMU_PCI_EXP_LNKSTA_CLS(QEMU_PCI_EXP_LNK_2_5GT));
 =20
- /* SMBIOS type 38 - IPMI */
- struct smbios_type_38 {
+     if (dev->cap_present & QEMU_PCIE_LNKSTA_DLLLA) {
+         pci_word_test_and_set_mask(exp_cap + PCI_EXP_LNKSTA,
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 5c7bd96984..74f9a46b4b 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -1897,7 +1897,8 @@ static int vfio_setup_pcie_cap(VFIOPCIDevice *vdev,=
+ int pos, uint8_t size,
+                                    PCI_EXP_TYPE_ENDPOINT << 4,
+                                    PCI_EXP_FLAGS_TYPE);
+             vfio_add_emulated_long(vdev, pos + PCI_EXP_LNKCAP,
+-                                   PCI_EXP_LNK_MLW_1 | PCI_EXP_LNK_LS_25=
+, ~0);
++                           QEMU_PCI_EXP_LNKCAP_MLW(QEMU_PCI_EXP_LNK_X1) =
+|
++                           QEMU_PCI_EXP_LNKCAP_MLS(QEMU_PCI_EXP_LNK_2_5G=
+T), ~0);
+             vfio_add_emulated_word(vdev, pos + PCI_EXP_LNKCTL, 0, ~0);
+         }
+=20
 --=20
 MST
