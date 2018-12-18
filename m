@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gZGB3-0007e0-II
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:16:55 -0500
+	(envelope-from <mst@redhat.com>) id 1gZGD8-0001LU-SZ
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:19:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gZGB0-0004zM-Kd
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:16:53 -0500
-Received: from mail-yw1-xc41.google.com ([2607:f8b0:4864:20::c41]:37899)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gZGAx-0004yd-KV
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:16:48 -0500
-Received: by mail-yw1-xc41.google.com with SMTP id d16so4186430ywa.5
-	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 06:16:45 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1gZGD5-0005Ob-GU
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:19:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45578)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZGD3-0005NY-C8
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:18:58 -0500
+Date: Tue, 18 Dec 2018 09:18:50 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181218085249-mutt-send-email-mst@kernel.org>
+References: <cover.1545120100.git.yi.z.zhang@linux.intel.com>
+	<5eb87eb9a389242772375dd52bd97c17564a0829.1545120100.git.yi.z.zhang@linux.intel.com>
 MIME-Version: 1.0
-References: <20181218100002.11219-1-xieyongji@baidu.com>
-	<20181218100002.11219-7-xieyongji@baidu.com>
-	<649661545136221@sas1-bf4ab558af9f.qloud-c.yandex.net>
-In-Reply-To: <649661545136221@sas1-bf4ab558af9f.qloud-c.yandex.net>
-From: Yongji Xie <elohimes@gmail.com>
-Date: Tue, 18 Dec 2018 22:16:31 +0800
-Message-ID: <CAONzpcaUjNMd=EWZG51-91mwpRyKy0siQW6LKi82NQrDZ-FUXg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 for-4.0 6/7] vhost-user-blk: Add support
- to reconnect backend
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5eb87eb9a389242772375dd52bd97c17564a0829.1545120100.git.yi.z.zhang@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH V7 6/6] hostmem-file: add 'sync' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,317 +27,281 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yury Kotov <yury-kotov@yandex-team.ru>
-Cc: "mst@redhat.com" <mst@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "zhangyu31@baidu.com" <zhangyu31@baidu.com>, "chaiwen@baidu.com" <chaiwen@baidu.com>, "nixun@baidu.com" <nixun@baidu.com>, "lilin24@baidu.com" <lilin24@baidu.com>, Xie Yongji <xieyongji@baidu.com>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>
+To: Zhang Yi <yi.z.zhang@linux.intel.com>
+Cc: peter.maydell@linaro.org, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, imammedo@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com, crosthwaite.peter@gmail.com, richard.henderson@linaro.org, xiaoguangrong.eric@gmail.com
 
-On Tue, 18 Dec 2018 at 20:30, Yury Kotov <yury-kotov@yandex-team.ru> wrote:
->
-> + wrfsh@
->
-> Hi,
->
-> 18.12.2018, 13:01, "elohimes@gmail.com" <elohimes@gmail.com>:
-> > From: Xie Yongji <xieyongji@baidu.com>
-> >
-> > Since we now support the message VHOST_USER_GET_SHM_SIZE
-> > and VHOST_USER_SET_SHM_FD. The backend is able to restart
-> > safely because it can record inflight I/O in shared memory.
-> > This patch allows qemu to reconnect the backend after
-> > connection closed.
-> >
-> > Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-> > Signed-off-by: Ni Xun <nixun@baidu.com>
-> > Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
-> > ---
-> >  hw/block/vhost-user-blk.c | 183 ++++++++++++++++++++++++-----
-> >  include/hw/virtio/vhost-user-blk.h | 4 +
-> >  2 files changed, 160 insertions(+), 27 deletions(-)
-> >
-> > diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-> > index 27028cf996..80f2e2d765 100644
-> > --- a/hw/block/vhost-user-blk.c
-> > +++ b/hw/block/vhost-user-blk.c
-> > @@ -101,7 +101,7 @@ const VhostDevConfigOps blk_ops = {
-> >      .vhost_dev_config_notifier = vhost_user_blk_handle_config_change,
-> >  };
-> >
-> > -static void vhost_user_blk_start(VirtIODevice *vdev)
-> > +static int vhost_user_blk_start(VirtIODevice *vdev)
-> >  {
-> >      VHostUserBlk *s = VHOST_USER_BLK(vdev);
-> >      BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
-> > @@ -110,13 +110,13 @@ static void vhost_user_blk_start(VirtIODevice *vdev)
-> >
-> >      if (!k->set_guest_notifiers) {
-> >          error_report("binding does not support guest notifiers");
-> > - return;
-> > + return -ENOSYS;
-> >      }
-> >
-> >      ret = vhost_dev_enable_notifiers(&s->dev, vdev);
-> >      if (ret < 0) {
-> >          error_report("Error enabling host notifiers: %d", -ret);
-> > - return;
-> > + return ret;
-> >      }
-> >
-> >      ret = k->set_guest_notifiers(qbus->parent, s->dev.nvqs, true);
-> > @@ -147,12 +147,13 @@ static void vhost_user_blk_start(VirtIODevice *vdev)
-> >          vhost_virtqueue_mask(&s->dev, vdev, i, false);
-> >      }
-> >
-> > - return;
-> > + return ret;
-> >
-> >  err_guest_notifiers:
-> >      k->set_guest_notifiers(qbus->parent, s->dev.nvqs, false);
-> >  err_host_notifiers:
-> >      vhost_dev_disable_notifiers(&s->dev, vdev);
-> > + return ret;
-> >  }
-> >
-> >  static void vhost_user_blk_stop(VirtIODevice *vdev)
-> > @@ -171,7 +172,6 @@ static void vhost_user_blk_stop(VirtIODevice *vdev)
-> >      ret = k->set_guest_notifiers(qbus->parent, s->dev.nvqs, false);
-> >      if (ret < 0) {
-> >          error_report("vhost guest notifier cleanup failed: %d", ret);
-> > - return;
-> >      }
-> >
-> >      vhost_dev_disable_notifiers(&s->dev, vdev);
-> > @@ -181,21 +181,43 @@ static void vhost_user_blk_set_status(VirtIODevice *vdev, uint8_t status)
-> >  {
-> >      VHostUserBlk *s = VHOST_USER_BLK(vdev);
-> >      bool should_start = status & VIRTIO_CONFIG_S_DRIVER_OK;
-> > + int ret;
-> >
-> >      if (!vdev->vm_running) {
-> >          should_start = false;
-> >      }
-> >
-> > - if (s->dev.started == should_start) {
-> > + if (s->should_start == should_start) {
-> > + return;
-> > + }
-> > +
-> > + if (!s->connected || s->dev.started == should_start) {
-> > + s->should_start = should_start;
-> >          return;
-> >      }
-> >
-> >      if (should_start) {
-> > - vhost_user_blk_start(vdev);
-> > + s->should_start = true;
-> > + /*
-> > + * make sure vhost_user_blk_handle_output() ignores fake
-> > + * guest kick by vhost_dev_enable_notifiers()
-> > + */
-> > + barrier();
-> > + ret = vhost_user_blk_start(vdev);
-> > + if (ret < 0) {
-> > + error_report("vhost-user-blk: vhost start failed: %s",
-> > + strerror(-ret));
-> > + qemu_chr_fe_disconnect(&s->chardev);
-> > + }
-> >      } else {
-> >          vhost_user_blk_stop(vdev);
-> > + /*
-> > + * make sure vhost_user_blk_handle_output() ignore fake
-> > + * guest kick by vhost_dev_disable_notifiers()
-> > + */
-> > + barrier();
-> > + s->should_start = false;
-> >      }
-> > -
-> >  }
-> >
-> >  static uint64_t vhost_user_blk_get_features(VirtIODevice *vdev,
-> > @@ -225,13 +247,22 @@ static uint64_t vhost_user_blk_get_features(VirtIODevice *vdev,
-> >  static void vhost_user_blk_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-> >  {
-> >      VHostUserBlk *s = VHOST_USER_BLK(vdev);
-> > - int i;
-> > + int i, ret;
-> >
-> >      if (!(virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1) &&
-> >          !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1))) {
-> >          return;
-> >      }
-> >
-> > + if (s->should_start) {
-> > + return;
-> > + }
-> > + s->should_start = true;
-> > +
-> > + if (!s->connected) {
-> > + return;
-> > + }
-> > +
-> >      if (s->dev.started) {
-> >          return;
-> >      }
-> > @@ -239,7 +270,13 @@ static void vhost_user_blk_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-> >      /* Some guests kick before setting VIRTIO_CONFIG_S_DRIVER_OK so start
-> >       * vhost here instead of waiting for .set_status().
-> >       */
-> > - vhost_user_blk_start(vdev);
-> > + ret = vhost_user_blk_start(vdev);
-> > + if (ret < 0) {
-> > + error_report("vhost-user-blk: vhost start failed: %s",
-> > + strerror(-ret));
-> > + qemu_chr_fe_disconnect(&s->chardev);
-> > + return;
-> > + }
-> >
-> >      /* Kick right away to begin processing requests already in vring */
-> >      for (i = 0; i < s->dev.nvqs; i++) {
-> > @@ -259,12 +296,105 @@ static void vhost_user_blk_reset(VirtIODevice *vdev)
-> >      vhost_dev_reset_shm(s->shm);
-> >  }
-> >
-> > +static int vhost_user_blk_connect(DeviceState *dev)
-> > +{
-> > + VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-> > + VHostUserBlk *s = VHOST_USER_BLK(vdev);
-> > + int ret = 0;
-> > +
-> > + if (s->connected) {
-> > + return 0;
-> > + }
-> > + s->connected = true;
-> > +
-> > + s->dev.nvqs = s->num_queues;
-> > + s->dev.vqs = s->vqs;
-> > + s->dev.vq_index = 0;
-> > + s->dev.backend_features = 0;
-> > +
-> > + vhost_dev_set_config_notifier(&s->dev, &blk_ops);
-> > +
-> > + ret = vhost_dev_init(&s->dev, s->vhost_user, VHOST_BACKEND_TYPE_USER, 0);
-> > + if (ret < 0) {
-> > + error_report("vhost-user-blk: vhost initialization failed: %s",
-> > + strerror(-ret));
-> > + return ret;
-> > + }
-> > +
-> > + /* restore vhost state */
-> > + if (s->should_start) {
-> > + ret = vhost_user_blk_start(vdev);
-> > + if (ret < 0) {
-> > + error_report("vhost-user-blk: vhost start failed: %s",
-> > + strerror(-ret));
-> > + return ret;
-> > + }
-> > + }
-> > +
-> > + return 0;
-> > +}
-> > +
-> > +static void vhost_user_blk_disconnect(DeviceState *dev)
-> > +{
-> > + VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-> > + VHostUserBlk *s = VHOST_USER_BLK(vdev);
-> > +
-> > + if (!s->connected) {
-> > + return;
-> > + }
-> > + s->connected = false;
-> > +
-> > + if (s->dev.started) {
-> > + vhost_user_blk_stop(vdev);
-> > + }
-> > +
-> > + vhost_dev_cleanup(&s->dev);
-> > +}
-> > +
-> > +static gboolean vhost_user_blk_watch(GIOChannel *chan, GIOCondition cond,
-> > + void *opaque)
-> > +{
-> > + DeviceState *dev = opaque;
-> > + VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-> > + VHostUserBlk *s = VHOST_USER_BLK(vdev);
-> > +
-> > + qemu_chr_fe_disconnect(&s->chardev);
-> > +
-> > + return true;
-> > +}
-> > +
-> > +static void vhost_user_blk_event(void *opaque, int event)
-> > +{
-> > + DeviceState *dev = opaque;
-> > + VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-> > + VHostUserBlk *s = VHOST_USER_BLK(vdev);
-> > +
-> > + switch (event) {
-> > + case CHR_EVENT_OPENED:
-> > + if (vhost_user_blk_connect(dev) < 0) {
-> > + qemu_chr_fe_disconnect(&s->chardev);
-> > + return;
-> > + }
-> > + s->watch = qemu_chr_fe_add_watch(&s->chardev, G_IO_HUP,
-> > + vhost_user_blk_watch, dev);
-> > + break;
-> > + case CHR_EVENT_CLOSED:
-> > + vhost_user_blk_disconnect(dev);
-> > + if (s->watch) {
-> > + g_source_remove(s->watch);
-> > + s->watch = 0;
-> > + }
-> > + break;
-> > + }
-> > +}
-> > +
-> >  static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
-> >  {
-> >      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-> >      VHostUserBlk *s = VHOST_USER_BLK(vdev);
-> >      VhostUserState *user;
-> >      int i, ret;
-> > + Error *err = NULL;
-> >
-> >      if (!s->chardev.chr) {
-> >          error_setg(errp, "vhost-user-blk: chardev is mandatory");
-> > @@ -299,23 +429,21 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
-> >      }
-> >
-> >      s->shm = g_new0(struct vhost_shm, 1);
-> > -
-> > - s->dev.nvqs = s->num_queues;
-> > - s->dev.vqs = g_new(struct vhost_virtqueue, s->dev.nvqs);
-> > - s->dev.vq_index = 0;
-> > - s->dev.backend_features = 0;
-> > -
-> > - vhost_dev_set_config_notifier(&s->dev, &blk_ops);
-> > -
-> > - ret = vhost_dev_init(&s->dev, s->vhost_user, VHOST_BACKEND_TYPE_USER, 0);
-> > - if (ret < 0) {
-> > - error_setg(errp, "vhost-user-blk: vhost initialization failed: %s",
-> > - strerror(-ret));
-> > - goto virtio_err;
-> > + s->vqs = g_new(struct vhost_virtqueue, s->num_queues);
-> > + s->watch = 0;
-> > + s->should_start = false;
-> > + s->connected = false;
-> > +
-> > + while (qemu_chr_fe_wait_connected(&s->chardev, &err) < 0) {
-> > + error_report_err(err);
-> > + err = NULL;
-> > + sleep(1);
-> >      }
->
-> After the reconnect loop we have some function calls to vhost backend:
-> * qemu_chr_fe_set_handlers implicit calls vhost_dev_init
-> * vhost_dev_get_config
-> * vhost_dev_init_shm
->
-> If vhost backend will restart during their execution the initialzation will be
-> failed. What do you think? May be we can call these functions inside of
-> the reconnect loop to fix it?
->
+On Tue, Dec 18, 2018 at 04:17:39PM +0800, Zhang Yi wrote:
+> This option controls whether QEMU mmap(2)
 
-qemu_chr_fe_wait_connected() should be called only when we are in
-disconnected state. Otherwise, it will be conflicted with reconnect
-thread.
+will mmap
 
-Thanks,
-Yongji
+> the memory backend file with
+> MAP_SYNC flag, which could consistent filesystem metadata
+
+I'm not sure what does "which could consistent" above mean.
+
+
+> for each guest
+> write, if MAP_SYNC flag is supported by the host kernel(Linux kernel 4.15
+
+space before ( here pls.
+
+> and later) and the backend is a file supporting DAX (e.g., file on ext4/xfs
+> file system mounted with '-o dax').
+> 
+> It can take one of following values:
+>  - on:  try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
+>         'share=off' or 'pmem!=on', QEMU will abort
+
+Really abort? What if it's added with object_add?
+Should just fail not abort in that case ...
+
+Also you know whether it's built into qemu at build time -
+how about skipping it in the schema and man page in that case?
+
+
+>  - off: never pass MAP_SYNC to mmap(2)
+>  - auto (default): if MAP_SYNC is supported and 'share=on' 'pmem=on', work as
+>         if 'sync=on'; otherwise, work as if 'sync=off'
+
+So this is a mechanism. And users really do not care about
+the mechanism. What do users want? See discussion in nvdimm.txt
+
+
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
+> ---
+>  backends/hostmem-file.c | 39 +++++++++++++++++++++++++++++++++++++++
+>  docs/nvdimm.txt         | 22 +++++++++++++++++++++-
+>  include/exec/memory.h   |  8 ++++++++
+>  qemu-options.hx         | 22 +++++++++++++++++++++-
+>  4 files changed, 89 insertions(+), 2 deletions(-)
+> 
+> diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+> index 0dd7a90..73cf181 100644
+> --- a/backends/hostmem-file.c
+> +++ b/backends/hostmem-file.c
+> @@ -16,6 +16,7 @@
+>  #include "sysemu/hostmem.h"
+>  #include "sysemu/sysemu.h"
+>  #include "qom/object_interfaces.h"
+> +#include "qapi/qapi-visit.h"
+>  
+>  /* hostmem-file.c */
+>  /**
+> @@ -36,6 +37,7 @@ struct HostMemoryBackendFile {
+>      uint64_t align;
+>      bool discard_data;
+>      bool is_pmem;
+> +    OnOffAuto sync;
+>  };
+>  
+>  static void
+> @@ -62,6 +64,7 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+>                                   path,
+>                                   backend->size, fb->align,
+>                                   (backend->share ? RAM_SHARED : 0) |
+> +                                 qemu_ram_sync_flags(fb->sync) |
+>                                   (fb->is_pmem ? RAM_PMEM : 0),
+>                                   fb->mem_path, errp);
+>          g_free(path);
+> @@ -136,6 +139,39 @@ static void file_memory_backend_set_align(Object *o, Visitor *v,
+>      error_propagate(errp, local_err);
+>  }
+>  
+> +static void file_memory_backend_get_sync(
+> +    Object *obj, Visitor *v, const char *name, void *opaque, Error **errp)
+> +{
+> +    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(obj);
+> +    OnOffAuto value = fb->sync;
+> +
+> +    visit_type_OnOffAuto(v, name, &value, errp);
+> +}
+> +
+> +static void file_memory_backend_set_sync(
+> +    Object *obj, Visitor *v, const char *name, void *opaque, Error **errp)
+> +{
+> +    HostMemoryBackend *backend = MEMORY_BACKEND(obj);
+> +    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(obj);
+> +    Error *local_err = NULL;
+> +    OnOffAuto value;
+> +
+> +    if (host_memory_backend_mr_inited(backend)) {
+> +        error_setg(&local_err, "cannot change property '%s' of %s",
+> +                   name, object_get_typename(obj));
+> +        goto out;
+> +    }
+> +
+> +    visit_type_OnOffAuto(v, name, &value, &local_err);
+> +    if (local_err) {
+> +        goto out;
+> +    }
+> +    fb->sync = value;
+> +
+> + out:
+> +    error_propagate(errp, local_err);
+> +}
+> +
+>  static bool file_memory_backend_get_pmem(Object *o, Error **errp)
+>  {
+>      return MEMORY_BACKEND_FILE(o)->is_pmem;
+> @@ -203,6 +239,9 @@ file_backend_class_init(ObjectClass *oc, void *data)
+>      object_class_property_add_bool(oc, "pmem",
+>          file_memory_backend_get_pmem, file_memory_backend_set_pmem,
+>          &error_abort);
+> +    object_class_property_add(oc, "sync", "OnOffAuto",
+> +        file_memory_backend_get_sync, file_memory_backend_set_sync,
+> +        NULL, NULL, &error_abort);
+>  }
+>  
+>  static void file_backend_instance_finalize(Object *o)
+> diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
+> index 5f158a6..d86a270 100644
+> --- a/docs/nvdimm.txt
+> +++ b/docs/nvdimm.txt
+> @@ -142,11 +142,31 @@ backend of vNVDIMM:
+>  Guest Data Persistence
+>  ----------------------
+
+>  
+> +vNVDIMM is designed and implemented to guarantee
+> the guest data
+> +persistence on the backends even on the host crash and power
+> +failures. However, there are still some requirements and limitations
+> +as explained below.
+> +
+
+How about:
+
+nNVDIMM can guarantee guest data persistence in case of a host
+failure such as a crash or power failure, but only if the following
+conditions are satistied.
+
+>  Though QEMU supports multiple types of vNVDIMM backends on Linux,
+> -currently the only one that can guarantee the guest write persistence
+> +if MAP_SYNC is not supported by the host kernel and the backends,
+> +the only backend that can guarantee the guest write persistence
+>  is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
+>  which all guest access do not involve any host-side kernel cache.
+
+BTW I think this user-facing detail belongs in the man page, not the
+source doc.
+
+
+>  
+> +mmap(2) flag MAP_SYNC is added since Linux kernel 4.15. On such
+> +systems, QEMU can mmap(2) the backend with MAP_SYNC, which could
+
+Please check all your uses of "could" and "may" and replace
+with stronger wording that matches reality. 
+I am guessing it's copied from
+some other language and I'm trying not to be a language purist
+but it's confusing in English.
+E.g. no one wants an implementation that could guarantee consistence -
+people want one that does guarantee it.
+
+> +consistent filesystem metadata for each guest write. Besides the host
+> +kernel support, enabling MAP_SYNC in QEMU also requires:
+> +
+> + - the backend is a file supporting DAX, e.g., a file on an ext4 or
+> +   xfs file system mounted with '-o dax',
+
+Why list the filesystems here? The list can change with Linux.
+
+> +
+> + - 'sync' option of memory-backend-file is not 'off', and
+> +
+> + - 'share' option of memory-backend-file is 'on'.
+> +
+> + - 'pmem' option of memory-backend-file is 'on'
+> +
+
+Wait isn't this what pmem was supposed to do?
+Doesn't it mean "persistent memory"?
+
+Just goes to show that abbreviation is not good in a user interface IMHO.
+
+I think a higher level name like e.g.  "host-failure-persistent"
+would be better. Have that set whatever flags you need to
+actually be persistent. Thoughts?
+
+
+
+>  When using other types of backends, it's suggested to set 'unarmed'
+>  option of '-device nvdimm' to 'on', which sets the unarmed flag of the
+>  guest NVDIMM region mapping structure.  This unarmed flag indicates
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index c74c467..b398abb 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -26,6 +26,7 @@
+>  #include "qom/object.h"
+>  #include "qemu/rcu.h"
+>  #include "hw/qdev-core.h"
+> +#include "qapi/error.h"
+>  
+>  #define RAM_ADDR_INVALID (~(ram_addr_t)0)
+>  
+> @@ -136,6 +137,13 @@ typedef struct IOMMUNotifier IOMMUNotifier;
+>  
+>  #define RAM_SYNC (RAM_SYNC_ON_OFF_AUTO_ON | RAM_SYNC_ON_OFF_AUTO_AUTO)
+>  
+> +static inline uint64_t qemu_ram_sync_flags(OnOffAuto v)
+> +{
+> +    return v == ON_OFF_AUTO_OFF ? RAM_SYNC_ON_OFF_AUTO_OFF :
+> +           v == ON_OFF_AUTO_ON ? RAM_SYNC_ON_OFF_AUTO_ON :
+> +           RAM_SYNC_ON_OFF_AUTO_AUTO;
+> +}
+> +
+
+That's pretty confusing.
+ON_OFF_AUTO_AUTO is painful enough. I don't think you want
+to duplicate this with all prefixes like RAM_SYNC_ON_OFF_AUTO_ON.
+Pls avoid doing it.
+
+
+>  static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
+>                                         IOMMUNotifierFlag flags,
+>                                         hwaddr start, hwaddr end,
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 08f8516..624f634 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -3928,7 +3928,7 @@ property must be set.  These objects are placed in the
+>  
+>  @table @option
+>  
+> -@item -object memory-backend-file,id=@var{id},size=@var{size},mem-path=@var{dir},share=@var{on|off},discard-data=@var{on|off},merge=@var{on|off},dump=@var{on|off},prealloc=@var{on|off},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave},align=@var{align}
+> +@item -object memory-backend-file,id=@var{id},size=@var{size},mem-path=@var{dir},share=@var{on|off},discard-data=@var{on|off},merge=@var{on|off},dump=@var{on|off},prealloc=@var{on|off},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave},align=@var{align},sync=@var{on|off|auto}
+>  
+>  Creates a memory file backend object, which can be used to back
+>  the guest RAM with huge pages.
+> @@ -4003,6 +4003,26 @@ If @option{pmem} is set to 'on', QEMU will take necessary operations to
+>  guarantee the persistence of its own writes to @option{mem-path}
+>  (e.g. in vNVDIMM label emulation and live migration).
+>  
+> +The @option{sync} option specifies whether QEMU mmap(2) @option{mem-path}
+> +with MAP_SYNC flag, which can guarantee the guest write persistence to
+> +@option{mem-path} even on the host crash and power failures. MAP_SYNC
+> +requires supports from both the host kernel (since Linux kernel 4.15)
+> +and @option{mem-path} (only files supporting DAX). It can take one of
+> +following values:
+> +
+> +@table @option
+> +@item @var{on}
+> +try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
+> +@option{share}=@var{off}, @option{pmem}=@var{off} QEMU will abort
+> +
+> +@item @var{off}
+> +never pass MAP_SYNC to mmap(2)
+> +
+> +@item @var{auto} (default)
+> +if MAP_SYNC is supported and @option{share}=@var{on}, @option{pmem}=@var{on}
+> +work as if @option{sync}=@var{on}; otherwise, work as if @option{sync}=@var{off}
+> +@end table
+> +
+>  @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},share=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
+>  
+>  Creates a memory backend object, which can be used to back the guest RAM.
+> -- 
+> 2.7.4
