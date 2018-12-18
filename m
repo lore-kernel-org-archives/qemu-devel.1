@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gZG0U-000708-58
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:06:00 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gZG0l-00079W-4t
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:06:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gZG0Q-0001ei-RW
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:05:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:45744)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gZG0Q-0001eS-Jo
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:05:54 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gZEpc-0008A0-Gc
-	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 12:50:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7C9BA2E80C7
-	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 12:50:40 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gZG0d-0001h4-Ey
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:06:15 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 18 Dec 2018 13:46:24 +0000
+Message-ID: <1ab7fd0f-fc28-6ff0-286e-27b966f85404@virtuozzo.com>
+References: <20181215135324.152629-1-eblake@redhat.com>
+	<20181215135324.152629-4-eblake@redhat.com>
+In-Reply-To: <20181215135324.152629-4-eblake@redhat.com>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 18 Dec 2018 12:42:55 -0000
-From: elmarco <marcandre.lureau@gmail.com>
-Reply-To: Bug 1803872 <1803872@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154254872666.7803.12367996737502527787.malonedeb@wampee.canonical.com>
-Message-Id: <CAJ+F1C+iQ0MDdPx8YJkxG0RR-3QXKmpLGSEr+npf0qHRc8kGKA@mail.gmail.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1803872] Re: [PATCH v2 3/3] migration: Replace
- strncpy() by strpadcpy(pad='\0')
+Content-ID: <0E2DCA795F278F4EAD25F50C5049C4AC@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 03/22] maint: Allow for EXAMPLES in
+ texi2pod
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,106 +26,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-On Tue, Dec 18, 2018 at 3:09 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> GCC 8 added a -Wstringop-truncation warning:
->
->   The -Wstringop-truncation warning added in GCC 8.0 via r254630 for
->   bug 81117 is specifically intended to highlight likely unintended
->   uses of the strncpy function that truncate the terminating NUL
->   character from the source string.
->
-> This new warning leads to compilation failures:
->
->     CC      migration/global_state.o
->   qemu/migration/global_state.c: In function 'global_state_store_running':
->   qemu/migration/global_state.c:45:5: error: 'strncpy' specified bound 10=
-0 equals destination size [-Werror=3Dstringop-truncation]
->        strncpy((char *)global_state.runstate, state, sizeof(global_state.=
-runstate));
->        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~~~
->   make: *** [qemu/rules.mak:69: migration/global_state.o] Error 1
->
-> The runstate name doesn't require the strings to be NUL-terminated,
-> therefore strncpy is the right function to use here.
->
-> We could add a #pragma GCC diagnostic ignored "-Wstringop-truncation"
-> around, disable the warning globally using -Wno-stringop-truncation,
-> but since QEMU provides the strpadcpy() which does the same purpose,
-> simply use it to avoid the annoying warning.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-> ---
->  migration/global_state.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/migration/global_state.c b/migration/global_state.c
-> index 8e8ab5c51e..c7e7618118 100644
-> --- a/migration/global_state.c
-> +++ b/migration/global_state.c
-> @@ -42,8 +42,8 @@ int global_state_store(void)
->  void global_state_store_running(void)
->  {
->      const char *state =3D RunState_str(RUN_STATE_RUNNING);
-> -    strncpy((char *)global_state.runstate,
-> -           state, sizeof(global_state.runstate));
-> +    strpadcpy((char *)global_state.runstate,
-> +              sizeof(global_state.runstate), state, '\0');
->  }
->
->  bool global_state_received(void)
-> --
-> 2.17.2
->
->
-
-
--- =
-
-Marc-Andr=C3=A9 Lureau
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1803872
-
-Title:
-  gcc 8.2 reports stringop-truncation when building qemu
-
-Status in QEMU:
-  New
-
-Bug description:
-  QEMU 3.0
-
-  block/sheepdog.c: In function 'find_vdi_name':
-  block/sheepdog.c:1239:5: error: 'strncpy' specified bound 256 equals dest=
-ination size [-Werror=3Dstringop-truncation]
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_V=
-DI_TAG_LEN);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~~~~
-
-  If this is the intended behavior, please suppress the warning. For
-  example:
-
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wstringop-truncation"
-  =C2=A0=C2=A0=C2=A0=C2=A0strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG=
-_LEN);
-  #pragma GCC diagnostic pop
-
-  This also happens on other sources, for example hw/acpi/core.c, so
-  another option is to suppress it globally on CFLAGS (-Wno-stringop-
-  truncation)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1803872/+subscriptions
+MTUuMTIuMjAxOCAxNjo1MywgRXJpYyBCbGFrZSB3cm90ZToNCj4gVGhlIG5leHQgY29tbWl0IHdp
+bGwgYWRkIGFuIEVYQU1QTEVTIHNlY3Rpb24gdG8gcWVtdS1uYmQuODsNCj4gZm9yIHRoYXQgdG8g
+d29yaywgd2UgbmVlZCB0byByZWNvZ25pemUgRVhBTVBMRVMgaW4gdGV4aTJwb2QsDQo+IGFuZCB3
+ZSBuZWVkIHRvIG1ha2UgYWxsIG1hbiBwYWdlcyBiZSByZWdlbmVyYXRlZCBzaW5jZSB0aGUNCj4g
+b3V0cHV0IG9mIHRleGkycG9kIGNhbiBiZSBkaWZmZXJlbnQuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5
+OiBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0LmNvbT4NCj4gDQo+IC0tLQ0KPiB2MjogbmV3IHBh
+dGNoDQo+IC0tLQ0KPiAgIE1ha2VmaWxlICAgICAgICAgICAgfCAxOCArKysrKysrKysrLS0tLS0t
+LS0NCj4gICBzY3JpcHRzL3RleGkycG9kLnBsIHwgIDIgKy0NCj4gICAyIGZpbGVzIGNoYW5nZWQs
+IDExIGluc2VydGlvbnMoKyksIDkgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvTWFr
+ZWZpbGUgYi9NYWtlZmlsZQ0KPiBpbmRleCBjOGI5ZWZkYWQ0Yi4uMGJkMjA0ZWZmOGEgMTAwNjQ0
+DQo+IC0tLSBhL01ha2VmaWxlDQo+ICsrKyBiL01ha2VmaWxlDQo+IEBAIC04MjQsMTQgKzgyNCwx
+NiBAQCBkb2NzL2ludGVyb3AvcWVtdS1xbXAtcWFwaS50ZXhpOiBxYXBpL3FhcGktZG9jLnRleGkN
+Cj4gICBkb2NzL2ludGVyb3AvcWVtdS1nYS1xYXBpLnRleGk6IHFnYS9xYXBpLWdlbmVyYXRlZC9x
+Z2EtcWFwaS1kb2MudGV4aQ0KPiAgIAlAY3AgLXAgJDwgJEANCj4gDQo+IC1xZW11LjE6IHFlbXUt
+ZG9jLnRleGkgcWVtdS1vcHRpb25zLnRleGkgcWVtdS1tb25pdG9yLnRleGkgcWVtdS1tb25pdG9y
+LWluZm8udGV4aQ0KPiAtcWVtdS4xOiBxZW11LW9wdGlvbi10cmFjZS50ZXhpDQo+IC1xZW11LWlt
+Zy4xOiBxZW11LWltZy50ZXhpIHFlbXUtb3B0aW9uLXRyYWNlLnRleGkgcWVtdS1pbWctY21kcy50
+ZXhpDQo+IC1mc2Rldi92aXJ0ZnMtcHJveHktaGVscGVyLjE6IGZzZGV2L3ZpcnRmcy1wcm94eS1o
+ZWxwZXIudGV4aQ0KPiAtcWVtdS1uYmQuODogcWVtdS1uYmQudGV4aSBxZW11LW9wdGlvbi10cmFj
+ZS50ZXhpDQo+IC1xZW11LWdhLjg6IHFlbXUtZ2EudGV4aQ0KPiAtZG9jcy9xZW11LWJsb2NrLWRy
+aXZlcnMuNzogZG9jcy9xZW11LWJsb2NrLWRyaXZlcnMudGV4aQ0KPiAtZG9jcy9xZW11LWNwdS1t
+b2RlbHMuNzogZG9jcy9xZW11LWNwdS1tb2RlbHMudGV4aQ0KPiArcWVtdS4xOiBxZW11LWRvYy50
+ZXhpIHFlbXUtb3B0aW9ucy50ZXhpIHFlbXUtbW9uaXRvci50ZXhpIFwNCj4gKwlxZW11LW1vbml0
+b3ItaW5mby50ZXhpIHNjcmlwdHMvdGV4aTJwb2QucGwNCj4gK3FlbXUuMTogcWVtdS1vcHRpb24t
+dHJhY2UudGV4aSBzY3JpcHRzL3RleGkycG9kLnBsDQoNCkkgdGhpbmssIG5vIG5lZWRzIHRvIGFk
+ZCBzY3JpcHRzL3RleGkycG9kLnBsIHRvIGJvdGggcWVtdS4xOiBsaW5lcywgYXMgdGhleSBzaG91
+bGQgYmUNCm1lcmdlZCBhbnl3YXkuIEFuZCBpZiB5b3Ugd2FudCB0byBhZGQgbGluZSBicmVha2lu
+ZyBhbnl3YXksIGl0IGxvb2tzIGJldHRlciB0byB1c2Ugb25lIHFlbXUuMToNCmRlcGVuZGVuY3kg
+bGluZS4NCg0KT24gdGhlIG90aGVyIGhhbmQsIGl0IG1heSBiZSBiZXR0ZXIgdG8gYWRkIE1BTlMg
+dmFyaWFibGUgYXMgc3Vic2V0IG9mIERPQ1MgdG8gY29tYmluZSBhbGwgbWFuIHBhZ2UgdGFyZ2V0
+cywNCmFuZCB0aGFuIGRvIGxpa2UgJChNQU5TKTogc2NyaXB0cy90ZXhpMnBvZC5wbC4uIChhbmQg
+cmVjb21iaW5lIERPQ1MsIHVzaW5nIE1BTlMgb2Zjb3Vyc2UpDQpIbSwgYW5kIEkgZG9uJ3Qgc2Vl
+IGhlcmUgZG9jcy9pbnRlcm9wL3FlbXUtZ2EtcmVmLjcgYW5kIGRvY3MvaW50ZXJvcC9xZW11LXFt
+cC1yZWYuNywNCndoaWNoIGV4aXN0IGluIERPQ1MuDQoNCk9uIHRoZSB0aGlyZCBoYW5kLCBJJ20g
+dW5zdXJlIGFib3V0IGhvdyBhbGwgdGhpcyB3b3JrLCB3aGVyZSBhcmUgcnVsZXMgZm9yIHRoZXNl
+IHRhcmdldHMsDQphbmQgc2hvdWxkIG5vdCB3ZSBhZGQgdGhpcyBkZXBlbmRlbmN5IGZvciBhbGwg
+RE9DUyB0YXJnZXRzIDopDQoNCg0KPiArcWVtdS1pbWcuMTogcWVtdS1pbWcudGV4aSBxZW11LW9w
+dGlvbi10cmFjZS50ZXhpIHFlbXUtaW1nLWNtZHMudGV4aSBcDQo+ICsJIHNjcmlwdHMvdGV4aTJw
+b2QucGwNCj4gK2ZzZGV2L3ZpcnRmcy1wcm94eS1oZWxwZXIuMTogZnNkZXYvdmlydGZzLXByb3h5
+LWhlbHBlci50ZXhpIHNjcmlwdHMvdGV4aTJwb2QucGwNCj4gK3FlbXUtbmJkLjg6IHFlbXUtbmJk
+LnRleGkgcWVtdS1vcHRpb24tdHJhY2UudGV4aSBzY3JpcHRzL3RleGkycG9kLnBsDQo+ICtxZW11
+LWdhLjg6IHFlbXUtZ2EudGV4aSBzY3JpcHRzL3RleGkycG9kLnBsDQo+ICtkb2NzL3FlbXUtYmxv
+Y2stZHJpdmVycy43OiBkb2NzL3FlbXUtYmxvY2stZHJpdmVycy50ZXhpIHNjcmlwdHMvdGV4aTJw
+b2QucGwNCj4gK2RvY3MvcWVtdS1jcHUtbW9kZWxzLjc6IGRvY3MvcWVtdS1jcHUtbW9kZWxzLnRl
+eGkgc2NyaXB0cy90ZXhpMnBvZC5wbA0KPiANCj4gICBodG1sOiBxZW11LWRvYy5odG1sIGRvY3Mv
+aW50ZXJvcC9xZW11LXFtcC1yZWYuaHRtbCBkb2NzL2ludGVyb3AvcWVtdS1nYS1yZWYuaHRtbA0K
+PiAgIGluZm86IHFlbXUtZG9jLmluZm8gZG9jcy9pbnRlcm9wL3FlbXUtcW1wLXJlZi5pbmZvIGRv
+Y3MvaW50ZXJvcC9xZW11LWdhLXJlZi5pbmZvDQo+IGRpZmYgLS1naXQgYS9zY3JpcHRzL3RleGky
+cG9kLnBsIGIvc2NyaXB0cy90ZXhpMnBvZC5wbA0KPiBpbmRleCAzOWNlNTg0YTMyMi4uODM5Yjc5
+MTdjZjcgMTAwNzU1DQo+IC0tLSBhL3NjcmlwdHMvdGV4aTJwb2QucGwNCj4gKysrIGIvc2NyaXB0
+cy90ZXhpMnBvZC5wbA0KPiBAQCAtMzk4LDcgKzM5OCw3IEBAICRzZWN0c3tOQU1FfSA9ICIkZm4g
+XC0gJHRsXG4iOw0KPiAgICRzZWN0c3tGT09UTk9URVN9IC49ICI9YmFja1xuIiBpZiBleGlzdHMg
+JHNlY3Rze0ZPT1ROT1RFU307DQo+IA0KPiAgIGZvciAkc2VjdCAocXcoTkFNRSBTWU5PUFNJUyBE
+RVNDUklQVElPTiBPUFRJT05TIEVOVklST05NRU5UIEZJTEVTDQo+IC0JICAgICAgQlVHUyBOT1RF
+UyBGT09UTk9URVMgU0VFQUxTTyBBVVRIT1IgQ09QWVJJR0hUKSkgew0KPiArCSAgICAgIEJVR1Mg
+Tk9URVMgRk9PVE5PVEVTIEVYQU1QTEVTIFNFRUFMU08gQVVUSE9SIENPUFlSSUdIVCkpIHsNCj4g
+ICAgICAgaWYoZXhpc3RzICRzZWN0c3skc2VjdH0pIHsNCj4gICAJJGhlYWQgPSAkc2VjdDsNCj4g
+ICAJJGhlYWQgPX4gcy9TRUVBTFNPL1NFRSBBTFNPLzsNCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2Fy
+ZHMsDQpWbGFkaW1pcg0K
