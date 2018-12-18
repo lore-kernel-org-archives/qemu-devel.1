@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gZK13-0003bo-4V
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 13:22:50 -0500
+	(envelope-from <armbru@redhat.com>) id 1gZK13-0003bp-4R
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 13:22:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gZK0z-0002VB-4g
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 13:22:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:26314)
+	(envelope-from <armbru@redhat.com>) id 1gZK0x-0002OR-3T
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 13:22:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52480)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gZK0x-0002Fw-0O
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 13:22:43 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gZK0v-0002Db-82
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 13:22:41 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A980CBDC1
+	by mx1.redhat.com (Postfix) with ESMTPS id 30039637E5
 	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 18:22:40 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 18 Dec 2018 19:22:19 +0100
-Message-Id: <20181218182234.28876-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH v2 00/15] qapi: add #if pre-processor
- conditions to generated code (part 3)
+Date: Tue, 18 Dec 2018 19:22:22 +0100
+Message-Id: <20181218182234.28876-4-armbru@redhat.com>
+In-Reply-To: <20181218182234.28876-1-armbru@redhat.com>
+References: <20181218182234.28876-1-armbru@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH v2 03/15] qapi: Generate QAPIEvent stuff
+ into separate files WIP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,93 +33,174 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com
 
-Marc-Andr=C3=A9 posted v1 that relies on a QAPI schema language extension
-'top-unit' to permit splitting the generated code.  Here is his cover
-letter:
+Having to include qapi-events.h just for QAPIEvent is suboptimal, but
+quite tolerable.  It'll become problematic when we have events
+conditional on the target, because then qapi-events.h won't be usable
+from target-independent code anymore.  Avoid that by generating it
+into separate files.
 
-    The thrid and last part (of "[PATCH v2 00/54] qapi: add #if
-    pre-processor conditions to generated code") is about adding schema
-    conditions based on the target.
+This is work-in-progress because I conjure up a module to generate
+separate files.  Not nice, since that module's name can clash with a
+user module's name.  Pick module name 'FIXME' to make abundantly clear
+this is a bad idea.
 
-    For now, the qapi code is compiled in common objects (common to all
-    targets). This makes it impossible to add #if TARGET_ARM for example.
+TODO Update docs/devel/qapi-code-gen.txt.
 
-    The patch "RFC: qapi: learn to split the schema by 'top-unit'"
-    proposes to split the schema by "top-unit", so that generated code ca=
-n
-    be built either in common objects or per-target. That patch is a bit
-    rough, I would like to get some feedback about the approach before
-    trying to improve it. The following patches demonstrate usage of
-    target-based #if conditions, and getting rid of the
-    qmp_unregister_command() hack.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ Makefile               |  1 +
+ Makefile.objs          |  1 +
+ monitor.c              |  2 +-
+ scripts/qapi/events.py | 33 ++++++++++++++++++++++-----------
+ stubs/monitor.c        |  2 +-
+ tests/test-qmp-event.c |  1 +
+ ui/vnc.c               |  3 ++-
+ 7 files changed, 29 insertions(+), 14 deletions(-)
 
-We already have a way to split generated code: QAPI modules.  I took
-the liberty to rework Marc-Andr=C3=A9's series to use a target module
-instead.  Less code, no change to the QAPI language.
-
-One of the patches (marked WIP) is a total hack.  Fixable, but I want
-to get this out for discussion first.
-
-Marc-Andr=C3=A9 Lureau (9):
-  build-sys: move qmp-introspect per target
-  qapi: make rtc-reset-reinjection and SEV depend on TARGET_I386
-  qapi: make s390 commands depend on TARGET_S390X
-  target.json: add a note about query-cpu* not being s390x-specific
-  qapi: make query-gic-capabilities depend on TARGET_ARM
-  qapi: make query-cpu-model-expansion depend on s390 or x86
-  qapi: make query-cpu-definitions depend on specific targets
-  qapi: remove qmp_unregister_command()
-  qapi: move RTC_CHANGE to the target schema
-
-Markus Armbruster (6):
-  qapi: Belatedly update docs for commit 9c2f56e9f9d
-  qapi: Eliminate indirection through qmp_event_get_func_emit()
-  qapi: Generate QAPIEvent stuff into separate files WIP
-  qapi: New module target.json
-  Revert "qapi-events: add 'if' condition to implicit event enum"
-  qmp: Deprecate query-events in favor of query-qmp-schema
-
- Makefile                                |   1 +
- Makefile.objs                           |  22 +-
- Makefile.target                         |  12 +
- docs/devel/qapi-code-gen.txt            |  12 +-
- hw/ppc/spapr_rtc.c                      |   2 +-
- hw/s390x/s390-skeys.c                   |   2 +-
- hw/timer/mc146818rtc.c                  |   4 +-
- include/qapi/qmp-event.h                |   6 -
- include/qapi/qmp/dispatch.h             |   1 -
- include/sysemu/arch_init.h              |  11 -
- monitor.c                               |  92 +----
- qapi/misc.json                          | 485 +---------------------
- qapi/qapi-schema.json                   |   1 +
- qapi/qmp-event.c                        |  12 -
- qapi/qmp-registry.c                     |   8 -
- qapi/target.json                        | 514 ++++++++++++++++++++++++
- qemu-deprecated.texi                    |   5 +
- qmp.c                                   |  26 --
- scripts/qapi/events.py                  |  51 ++-
- stubs/Makefile.objs                     |   4 -
- stubs/arch-query-cpu-def.c              |  11 -
- stubs/arch-query-cpu-model-baseline.c   |  13 -
- stubs/arch-query-cpu-model-comparison.c |  13 -
- stubs/arch-query-cpu-model-expansion.c  |  13 -
- stubs/monitor.c                         |   5 +
- target/arm/helper.c                     |   3 +-
- target/arm/monitor.c                    |   2 +-
- target/i386/cpu.c                       |   7 +-
- target/i386/sev_i386.h                  |   2 +-
- target/ppc/translate_init.inc.c         |   3 +-
- target/s390x/cpu_models.c               |   9 +-
- tests/Makefile.include                  |   4 +-
- tests/test-qmp-event.c                  |   7 +-
- tests/test-qobject-input-visitor.c      |   1 -
- ui/vnc.c                                |   3 +-
- 35 files changed, 623 insertions(+), 744 deletions(-)
- create mode 100644 qapi/target.json
- delete mode 100644 stubs/arch-query-cpu-def.c
- delete mode 100644 stubs/arch-query-cpu-model-baseline.c
- delete mode 100644 stubs/arch-query-cpu-model-comparison.c
- delete mode 100644 stubs/arch-query-cpu-model-expansion.c
-
---=20
+diff --git a/Makefile b/Makefile
+index c8b9efdad4..1ab285c928 100644
+--- a/Makefile
++++ b/Makefile
+@@ -101,6 +101,7 @@ GENERATED_QAPI_FILES += $(QAPI_MODULES:%=qapi/qapi-visit-%.c)
+ GENERATED_QAPI_FILES += qapi/qapi-commands.h qapi/qapi-commands.c
+ GENERATED_QAPI_FILES += $(QAPI_MODULES:%=qapi/qapi-commands-%.h)
+ GENERATED_QAPI_FILES += $(QAPI_MODULES:%=qapi/qapi-commands-%.c)
++GENERATED_QAPI_FILES += qapi/qapi-events-FIXME.h qapi/qapi-events-FIXME.c
+ GENERATED_QAPI_FILES += qapi/qapi-events.h qapi/qapi-events.c
+ GENERATED_QAPI_FILES += $(QAPI_MODULES:%=qapi/qapi-events-%.h)
+ GENERATED_QAPI_FILES += $(QAPI_MODULES:%=qapi/qapi-events-%.c)
+diff --git a/Makefile.objs b/Makefile.objs
+index 56af0347d3..126d0cd9b2 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -11,6 +11,7 @@ util-obj-y += $(QAPI_MODULES:%=qapi/qapi-types-%.o)
+ util-obj-y += qapi/qapi-builtin-visit.o
+ util-obj-y += qapi/qapi-visit.o
+ util-obj-y += $(QAPI_MODULES:%=qapi/qapi-visit-%.o)
++util-obj-y += qapi/qapi-events-FIXME.o
+ util-obj-y += qapi/qapi-events.o
+ util-obj-y += $(QAPI_MODULES:%=qapi/qapi-events-%.o)
+ util-obj-y += qapi/qapi-introspect.o
+diff --git a/monitor.c b/monitor.c
+index d7ca587bb0..41540655b7 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -75,7 +75,7 @@
+ #include "qemu/thread.h"
+ #include "block/qapi.h"
+ #include "qapi/qapi-commands.h"
+-#include "qapi/qapi-events.h"
++#include "qapi/qapi-events-FIXME.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp-event.h"
+ #include "qapi/qapi-introspect.h"
+diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
+index d86a2d2b3e..e988e43941 100644
+--- a/scripts/qapi/events.py
++++ b/scripts/qapi/events.py
+@@ -143,12 +143,14 @@ class QAPISchemaGenEventVisitor(QAPISchemaModularCVisitor):
+         self._event_emit_name = c_name(prefix + 'qapi_event_emit')
+ 
+     def _begin_module(self, name):
++        events = self._module_basename('qapi-events', name)
+         types = self._module_basename('qapi-types', name)
+         visit = self._module_basename('qapi-visit', name)
+         self._genc.add(mcgen('''
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+-#include "%(prefix)sqapi-events.h"
++#include "%(prefix)sqapi-events-FIXME.h"
++#include "%(events)s.h"
+ #include "%(visit)s.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp/qdict.h"
+@@ -156,7 +158,8 @@ class QAPISchemaGenEventVisitor(QAPISchemaModularCVisitor):
+ #include "qapi/qmp-event.h"
+ 
+ ''',
+-                             visit=visit, prefix=self._prefix))
++                             events=events, visit=visit,
++                             prefix=self._prefix))
+         self._genh.add(mcgen('''
+ #include "qapi/util.h"
+ #include "%(types)s.h"
+@@ -165,17 +168,25 @@ class QAPISchemaGenEventVisitor(QAPISchemaModularCVisitor):
+                              types=types))
+ 
+     def visit_end(self):
+-        (genc, genh) = self._module[self._main_module]
+-        genh.add(gen_enum(self._event_enum_name,
+-                          self._event_enum_members))
+-        genc.add(gen_enum_lookup(self._event_enum_name,
+-                                 self._event_enum_members))
+-        genh.add(mcgen('''
++        self._add_module('FIXME', ' * QAPI Events FIXME')
++        self._genc.preamble_add(mcgen('''
++#include "qemu/osdep.h"
++#include "%(prefix)sqapi-events-FIXME.h"
++''',
++                                      prefix=self._prefix))
++        self._genh.preamble_add(mcgen('''
++#include "qapi/util.h"
++'''))
++        self._genh.add(gen_enum(self._event_enum_name,
++                                self._event_enum_members))
++        self._genc.add(gen_enum_lookup(self._event_enum_name,
++                                       self._event_enum_members))
++        self._genh.add(mcgen('''
+ 
+ void %(event_emit)s(%(event_enum)s event, QDict *qdict);
+ ''',
+-                       event_emit=self._event_emit_name,
+-                       event_enum=self._event_enum_name))
++                             event_emit=self._event_emit_name,
++                             event_enum=self._event_enum_name))
+ 
+     def visit_event(self, name, info, ifcond, arg_type, boxed):
+         with ifcontext(ifcond, self._genh, self._genc):
+@@ -189,4 +200,4 @@ void %(event_emit)s(%(event_enum)s event, QDict *qdict);
+ def gen_events(schema, output_dir, prefix):
+     vis = QAPISchemaGenEventVisitor(prefix)
+     schema.visit(vis)
+-    vis.write(output_dir)
++    vis.write(output_dir, True)
+diff --git a/stubs/monitor.c b/stubs/monitor.c
+index 32bd7012c3..713c8be042 100644
+--- a/stubs/monitor.c
++++ b/stubs/monitor.c
+@@ -1,6 +1,6 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qapi/qapi-events.h"
++#include "qapi/qapi-events-FIXME.h"
+ #include "qemu-common.h"
+ #include "monitor/monitor.h"
+ 
+diff --git a/tests/test-qmp-event.c b/tests/test-qmp-event.c
+index bf900f14f4..85942419d6 100644
+--- a/tests/test-qmp-event.c
++++ b/tests/test-qmp-event.c
+@@ -21,6 +21,7 @@
+ #include "qapi/qmp/qstring.h"
+ #include "qapi/qmp-event.h"
+ #include "test-qapi-events.h"
++#include "test-qapi-events-FIXME.h"
+ 
+ typedef struct TestEventData {
+     QDict *expect;
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 0c1b477425..8a9000cf09 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -35,7 +35,8 @@
+ #include "qemu/timer.h"
+ #include "qemu/acl.h"
+ #include "qemu/config-file.h"
+-#include "qapi/qapi-events.h"
++#include "qapi/qapi-events-FIXME.h"
++#include "qapi/qapi-events-ui.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-commands-ui.h"
+ #include "ui/input.h"
+-- 
 2.17.2
