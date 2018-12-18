@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gZDEj-00015C-P0
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 06:08:32 -0500
+	(envelope-from <berrange@redhat.com>) id 1gZDFE-0001RH-M7
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 06:09:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gZDB6-0000FI-4z
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 06:04:45 -0500
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Tue, 18 Dec 2018 12:03:31 +0100
-Message-Id: <20181218110333.22558-2-philmd@redhat.com>
-In-Reply-To: <20181218110333.22558-1-philmd@redhat.com>
-References: <20181218110333.22558-1-philmd@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1gZD5L-0004S3-DL
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:58:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58978)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gZD5L-0004Rd-3u
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:58:47 -0500
+Date: Tue, 18 Dec 2018 10:58:39 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181218105839.GD22638@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <alpine.BSF.2.21.1803202324320.13789@zero.eik.bme.hu>
+	<20180321140654.7h3nkkdlztu6mtrq@sirius.home.kraxel.org>
+	<alpine.BSF.2.21.1803211803590.78606@zero.eik.bme.hu>
+	<alpine.BSF.2.21.9999.1812171549220.8888@zero.eik.bme.hu>
+	<20181217150028.GL30264@redhat.com>
+	<alpine.BSF.2.21.9999.1812172255250.25213@zero.eik.bme.hu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <alpine.BSF.2.21.9999.1812172255250.25213@zero.eik.bme.hu>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 1/3] hw/acpi: Replace strncpy() by
- strpadcpy(pad='\0')
+Subject: Re: [Qemu-devel] Monitor and serial output window broken with SDL2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,131 +33,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Ben Pye <ben@curlybracket.co.uk>, Stefan Weil <sw@weilnetz.de>, Howard Spoelstra <hsp.cat7@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <jcody@redhat.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Thomas Huth <thuth@redhat.com>, Liu Yuan <namei.unix@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, 1803872@bugs.launchpad.net, Juan Quintela <quintela@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On Mon, Dec 17, 2018 at 10:57:14PM +0100, BALATON Zoltan wrote:
+> On Mon, 17 Dec 2018, Daniel P. Berrang=C3=A9 wrote:
+> > On Mon, Dec 17, 2018 at 03:56:49PM +0100, BALATON Zoltan wrote:
+> > > On Wed, 21 Mar 2018, BALATON Zoltan wrote:
+> > > > On Wed, 21 Mar 2018, Gerd Hoffmann wrote:
+> > > > > > while the serial output seems to be behind the monitor output=
+ in the window
+> > > > > > opening with Ctrl+Alt+2 and flashes when I type in this windo=
+w. (This
+> > > > > > doesn't seem to happen with qemu-system-x86_64, maybe that's =
+why
+> > > > > > it was not catched.)
+> > > > >=20
+> > > > > Doesn't reproduce too.  It's also not clear why x86_64 should b=
+ehave
+> > > > > different that ppc.  There is no arch-specific code ui/, so the=
+re should
+> > > > > be no difference, exept for hardware like paralle ports which a=
+re not
+> > > > > supported by all machine types.
+> > > > >=20
+> > > > > Any chance you have tested an old ppc binary?
+> > > >=20
+> > > > Not likely because I did make distclean and a clean build before =
+testing
+> > > > to avoid any possible mismatch. It still does not work for me tho=
+ugh.
+> > > > While
+> > >=20
+> > > I still have this problem after updating everything on my machine, =
+latest
+> > > QEMU and SDL 2.0.9 so it's not likely to be a bug in some external
+> > > component. If I just start qemu-system-ppc (compiled with --disable=
+-gtk) and
+> > > try to open monitor console with Ctrl-Alt-2 I see QEMU monitor but =
+when I
+> > > type in this window the serial output window contents flash in this=
+ window.
+> > > At the same time the window that opens for Ctrl-Alt-3 which should =
+have the
+> > > serial output is empty. It looks like an index may be off somewhere=
+ or
+> > > window contents are not associated with the right window but I have=
+ no idea
+> > > where to look for it. Can you reproduce it now and do you have any =
+idea what
+> > > could cause this?
+> >=20
+> > Could you share an example command line which can be used to reproduc=
+e
+> > the problem.
+>=20
+> As I wrote above ust "qemu-system-ppc" without any options reproduces t=
+he
+> problem here.
 
-GCC 8 added a -Wstringop-truncation warning:
+I don't have any luck reproducing the behaviour you describe.
 
-  The -Wstringop-truncation warning added in GCC 8.0 via r254630 for
-  bug 81117 is specifically intended to highlight likely unintended
-  uses of the strncpy function that truncate the terminating NUL
-  character from the source string.
-
-This new warning leads to compilation failures:
-
-    CC      hw/acpi/core.o
-  In function 'acpi_table_install', inlined from 'acpi_table_add' at qemu=
-/hw/acpi/core.c:296:5:
-  qemu/hw/acpi/core.c:184:9: error: 'strncpy' specified bound 4 equals de=
-stination size [-Werror=3Dstringop-truncation]
-           strncpy(ext_hdr->sig, hdrs->sig, sizeof ext_hdr->sig);
-           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  make: *** [qemu/rules.mak:69: hw/acpi/core.o] Error 1
-
-The ACPI tables don't require the strings to be NUL-terminated,
-therefore strncpy is the right function to use here.
-
-We could add a #pragma GCC diagnostic ignored "-Wstringop-truncation"
-around, disable the warning globally using -Wno-stringop-truncation,
-but since QEMU provides the strpadcpy() which does the same purpose,
-simply use it to avoid the annoying warning.
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-[PMD: reword commit subject and description]
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/acpi/aml-build.c |  6 ++++--
- hw/acpi/core.c      | 13 +++++++------
- 2 files changed, 11 insertions(+), 8 deletions(-)
-
-diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-index 1e43cd736d..397833462a 100644
---- a/hw/acpi/aml-build.c
-+++ b/hw/acpi/aml-build.c
-@@ -24,6 +24,7 @@
- #include "hw/acpi/aml-build.h"
- #include "qemu/bswap.h"
- #include "qemu/bitops.h"
-+#include "qemu/cutils.h"
- #include "sysemu/numa.h"
+Built todays git master with
 =20
- static GArray *build_alloc_array(void)
-@@ -1532,13 +1533,14 @@ build_header(BIOSLinker *linker, GArray *table_da=
-ta,
-     h->revision =3D rev;
-=20
-     if (oem_id) {
--        strncpy((char *)h->oem_id, oem_id, sizeof h->oem_id);
-+        strpadcpy((char *)h->oem_id, sizeof h->oem_id, oem_id, '\0');
-     } else {
-         memcpy(h->oem_id, ACPI_BUILD_APPNAME6, 6);
-     }
-=20
-     if (oem_table_id) {
--        strncpy((char *)h->oem_table_id, oem_table_id, sizeof(h->oem_tab=
-le_id));
-+        strpadcpy((char *)h->oem_table_id, sizeof(h->oem_table_id),
-+                  oem_table_id, '\0');
-     } else {
-         memcpy(h->oem_table_id, ACPI_BUILD_APPNAME4, 4);
-         memcpy(h->oem_table_id + 4, sig, 4);
-diff --git a/hw/acpi/core.c b/hw/acpi/core.c
-index aafdc61648..6e8f4e5713 100644
---- a/hw/acpi/core.c
-+++ b/hw/acpi/core.c
-@@ -31,6 +31,7 @@
- #include "qapi/qapi-visit-misc.h"
- #include "qemu/error-report.h"
- #include "qemu/option.h"
-+#include "qemu/cutils.h"
-=20
- struct acpi_table_header {
-     uint16_t _length;         /* our length, not actual part of the hdr =
-*/
-@@ -181,7 +182,7 @@ static void acpi_table_install(const char unsigned *b=
-lob, size_t bloblen,
-     ext_hdr->_length =3D cpu_to_le16(acpi_payload_size);
-=20
-     if (hdrs->has_sig) {
--        strncpy(ext_hdr->sig, hdrs->sig, sizeof ext_hdr->sig);
-+        strpadcpy(ext_hdr->sig, sizeof ext_hdr->sig, hdrs->sig, '\0');
-         ++changed_fields;
-     }
-=20
-@@ -200,12 +201,12 @@ static void acpi_table_install(const char unsigned =
-*blob, size_t bloblen,
-     ext_hdr->checksum =3D 0;
-=20
-     if (hdrs->has_oem_id) {
--        strncpy(ext_hdr->oem_id, hdrs->oem_id, sizeof ext_hdr->oem_id);
-+        strpadcpy(ext_hdr->oem_id, sizeof ext_hdr->oem_id, hdrs->oem_id,=
- '\0');
-         ++changed_fields;
-     }
-     if (hdrs->has_oem_table_id) {
--        strncpy(ext_hdr->oem_table_id, hdrs->oem_table_id,
--                sizeof ext_hdr->oem_table_id);
-+        strpadcpy(ext_hdr->oem_table_id, sizeof ext_hdr->oem_table_id,
-+                  hdrs->oem_table_id, '\0');
-         ++changed_fields;
-     }
-     if (hdrs->has_oem_rev) {
-@@ -213,8 +214,8 @@ static void acpi_table_install(const char unsigned *b=
-lob, size_t bloblen,
-         ++changed_fields;
-     }
-     if (hdrs->has_asl_compiler_id) {
--        strncpy(ext_hdr->asl_compiler_id, hdrs->asl_compiler_id,
--                sizeof ext_hdr->asl_compiler_id);
-+        strpadcpy(ext_hdr->asl_compiler_id, sizeof ext_hdr->asl_compiler=
-_id,
-+                  hdrs->asl_compiler_id, '\0');
-         ++changed_fields;
-     }
-     if (hdrs->has_asl_compiler_rev) {
+  ./configure --target-list=3Dx86_64-softmmu,ppc-softmmu --disable-gtk
+
+then ./ppc-softmmu/qemu-system-ppc -sdl
+
+
+pops up the main SDL window with primary VGA showing firmware output.
+
+I can then Ctrl-Alt-2 to popup monitor console, and Ctrl-Alt-3/4 to
+popup serial & parallel console.  The serial console has  some input
+in it, and the monitor console responds normally without affecting
+any other windows.
+
+Can you provide further information about your host architecture, and
+your host OS distro, and whether you gave any other special options
+to configure or qemu-system-ppc
+
+The only annoyance is that the serial & parallel console windows get
+placed directly on top of the monitor console window instead of letting
+the window manager place them in a sensible place.
+
+
+Regards,
+Daniel
 --=20
-2.17.2
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
