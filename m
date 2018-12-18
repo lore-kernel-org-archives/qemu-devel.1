@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZIzw-0005Gt-DD
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 12:17:37 -0500
+	(envelope-from <bounces@canonical.com>) id 1gZ9zz-0001ca-N4
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:41:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZIzu-0007dL-8d
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 12:17:36 -0500
-Date: Tue, 18 Dec 2018 12:17:09 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181218121457-mutt-send-email-mst@kernel.org>
-References: <20181218110333.22558-1-philmd@redhat.com>
-	<20181218092648-mutt-send-email-mst@kernel.org>
-	<028f1498-d0bc-e920-1c7c-9a1f0bdded58@redhat.com>
-	<20181218095334-mutt-send-email-mst@kernel.org>
-	<bdc695a3-674e-b0de-690d-160146beefb8@redhat.com>
-	<00f8cbcd-eccc-2e76-93be-2855d2c80a37@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1gZ9zu-0007cI-4b
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:41:03 -0500
+Received: from indium.canonical.com ([91.189.90.7]:55012)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gZ9zt-0007b4-SI
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:40:58 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gZ9zr-0007zs-RL
+	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 07:40:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C29052E80C7
+	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 07:40:55 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <00f8cbcd-eccc-2e76-93be-2855d2c80a37@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] Fix strncpy() warnings for GCC8 new
- -Wstringop-truncation
+Date: Tue, 18 Dec 2018 07:23:08 -0000
+From: Johansen <johansense@gmail.com>
+Reply-To: Bug 1511887 <1511887@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20151031002349.21474.82964.malonedeb@soybean.canonical.com>
+Message-Id: <154511778843.9097.9401394073794230251.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1511887] Re: USB device 1.1 not correctly
+ passedthru from Linux host to Windows guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +37,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Ben Pye <ben@curlybracket.co.uk>, Stefan Weil <sw@weilnetz.de>, Howard Spoelstra <hsp.cat7@gmail.com>, Jeff Cody <jcody@redhat.com>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Thomas Huth <thuth@redhat.com>, Liu Yuan <namei.unix@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, 1803872@bugs.launchpad.net, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Tue, Dec 18, 2018 at 06:12:05PM +0100, Paolo Bonzini wrote:
-> On 18/12/18 17:55, Philippe Mathieu-Daud=E9 wrote:
-> >> strpadcpy will instead just silence the warning.
-> > migration/global_state.c:109:15: error: 'strlen' argument 1 declared
-> > attribute 'nonstring' [-Werror=3Dstringop-overflow=3D]
-> >      s->size =3D strlen((char *)s->runstate) + 1;
-> >                ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >=20
-> > GCC won... It is true this strlen() is buggy, indeed s->runstate migh=
-t
-> > be not NUL-terminated.
->=20
-> No, runstate is declared as an array of 100 bytes, which are more than
-> enough.  It's ugly code but not buggy.
->=20
-> Paolo
+** Also affects: wine1.6 (Ubuntu)
+   Importance: Undecided
+       Status: New
 
-Yes ... but it is loaded using
-        VMSTATE_BUFFER(runstate, GlobalState),
-and parsed using qapi_enum_parse which does not get
-the buffer length.
+-- =
 
-So unless we are lucky there's a buffer overrun
-on a remote/file input here.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1511887
 
-Seems buggy to me - what am I missing?
+Title:
+  USB device 1.1 not correctly passedthru from Linux host to Windows
+  guest
 
---=20
-MST
+Status in QEMU:
+  Triaged
+Status in wine1.6 package in Ubuntu:
+  New
+
+Bug description:
+  I have USB Digital Oscilloscope which works great on pure Windows
+  machine but not work on virtualized one. I tried passthru the device
+  from my Debian Jessie (64bit) host machine to Windows 7 (32bit) guest
+  machine but unfortunately it does not work very well. It looks that
+  device is passed thru so Windows machine knows about new device and
+  loads HID device driver for it but the device driver failed to start
+  the device and details of an error provided by device manager is "This
+  device cannot start" Code 10.
+
+  Installed Qemu version: 2.1+dfsg-12+deb8u4 0
+
+  USB device spec: Dynon Instruments ELAB-080, USB 1.1
+
+  On linux host computer
+  ---------------------------
+  lsusb identify it as:
+  Bus 003 Device 009: ID 13a3:0001 =
+
+
+  lsusb -t identify it as:
+  /: Bus 03.Port 1: Dev 1, Class=3Droot_hub, Driver=3Duhci_hcd/2p, 12M
+      |__ Port 1: Dev 9, If 0, Class=3DHuman Interface Device, Driver=3Dusb=
+hid, 12M
+
+  This is how I started my Windows guest machine
+  ------------------------------------------------------
+  kvm -cpu host \
+      -m 2048MiB \
+      -hda test.vdi \
+      -ctrl-grab \
+      -parallel /dev/parport0 \
+      -usbdevice host:13a3:0001
+
+  ...also instead of last line I tried this one:
+      -device usb-host,vendorid=3D0x13a3,productid=3D0x0001
+
+  none of them help to properly handle my device inside guest machine.
+
+  Only one time the Windows guest machine properly start the device so
+  software for that oscilloscope can identify the Oscilloscope and
+  measure for a while but unfortunately after I guess 5 seconds of
+  measurement the device was disconnected from Windows and never start
+  working again even after couple of restarts of guest machine even
+  after plug and unplug it's USB cable and power cable.
+
+  I searched for a solution or some clues to get it work but none of my
+  searching over the internet was successful. Because device works on
+  pure Windows but not work on virtualized one, I think there is a
+  problem with handling not standard USB devices (like sticks,
+  keyboards, mouses etc.)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1511887/+subscriptions
