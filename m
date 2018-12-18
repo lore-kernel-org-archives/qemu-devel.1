@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gZG8b-0005XJ-Nr
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:14:24 -0500
+	(envelope-from <mst@redhat.com>) id 1gZG9f-0006Vc-6F
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:15:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gZG8X-0004Ee-5o
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:14:20 -0500
-Date: Tue, 18 Dec 2018 14:14:01 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20181218141401.GF18767@stefanha-x1.localdomain>
-References: <20181217164847.24411-1-remy.noel@blade-group.com>
+	(envelope-from <mst@redhat.com>) id 1gZG9X-0004aT-DH
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:15:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42302)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZG9W-0004Yu-Nx
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:15:19 -0500
+Date: Tue, 18 Dec 2018 08:35:35 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181218082305-mutt-send-email-mst@kernel.org>
+References: <cover.1545120100.git.yi.z.zhang@linux.intel.com>
+	<62a8796330b86f9f6571e48755d718db11855a6b.1545120100.git.yi.z.zhang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="JSkcQAAxhB1h8DcT"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181217164847.24411-1-remy.noel@blade-group.com>
-Subject: Re: [Qemu-devel] [QEMU-devel][PATCH v3] aio-posix: Fix concurrent
- aio_poll/set_fd_handler.
+In-Reply-To: <62a8796330b86f9f6571e48755d718db11855a6b.1545120100.git.yi.z.zhang@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH V7 2/6] util/mmap-alloc: switch
+ qemu_ram_mmap() to 'flags' parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,70 +28,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: remy.noel@blade-group.com
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Weil <sw@weilnetz.de>, "open list:Block I/O path" <qemu-block@nongnu.org>
+To: Zhang Yi <yi.z.zhang@linux.intel.com>
+Cc: peter.maydell@linaro.org, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, imammedo@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com, crosthwaite.peter@gmail.com, richard.henderson@linaro.org, xiaoguangrong.eric@gmail.com
 
+On Tue, Dec 18, 2018 at 04:17:04PM +0800, Zhang Yi wrote:
+> As more flag parameters besides the existing 'shared' are going to be
+> added to qemu_ram_mmap(), let's switch 'shared' to a 'flags' parameter
+> in advance, so as to ease the further additions.
+> 
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
 
---JSkcQAAxhB1h8DcT
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+And that's the trouble with patch 1: no type safety.
+See below
 
-On Mon, Dec 17, 2018 at 05:48:47PM +0100, remy.noel@blade-group.com wrote:
-> From: Remy Noel <remy.noel@blade-group.com>
->=20
-> It is possible for an io_poll callback to be concurrently executed along
-> with an aio_set_fd_handlers. This can cause all sorts of problems, like
-> a NULL callback or a bad opaque pointer.
->=20
-> This changes set_fd_handlers so that it no longer modify existing handlers
-> entries and instead, always insert those after having proper initialisati=
-on.
->=20
-> Also, we do not call aio_epoll_update for deleted handlers as this has
-> no impact whatsoever.
->=20
-> Signed-off-by: Remy Noel <remy.noel@blade-group.com>
 > ---
+>  exec.c                    |  7 ++++---
+>  include/qemu/mmap-alloc.h | 19 ++++++++++++++++++-
+>  util/mmap-alloc.c         |  8 +++++---
+>  util/oslib-posix.c        |  8 +++++++-
+>  4 files changed, 34 insertions(+), 8 deletions(-)
+> 
+> diff --git a/exec.c b/exec.c
+> index bb6170d..e92a7da 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1810,6 +1810,7 @@ static void *file_ram_alloc(RAMBlock *block,
+>                              ram_addr_t memory,
+>                              int fd,
+>                              bool truncate,
+> +                            uint32_t flags,
+>                              Error **errp)
+>  {
+>      void *area;
+> @@ -1859,8 +1860,7 @@ static void *file_ram_alloc(RAMBlock *block,
+>          perror("ftruncate");
+>      }
+>  
+> -    area = qemu_ram_mmap(fd, memory, block->mr->align,
+> -                         block->flags & RAM_SHARED);
+> +    area = qemu_ram_mmap(fd, memory, block->mr->align, flags);
+>      if (area == MAP_FAILED) {
+>          error_setg_errno(errp, errno,
+>                           "unable to map backing store for guest RAM");
+> @@ -2279,7 +2279,8 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+>      new_block->used_length = size;
+>      new_block->max_length = size;
+>      new_block->flags = ram_flags;
+> -    new_block->host = file_ram_alloc(new_block, size, fd, !file_size, errp);
+> +    new_block->host = file_ram_alloc(new_block, size, fd, !file_size,
+> +            ram_flags, errp);
+>      if (!new_block->host) {
+>          g_free(new_block);
+>          return NULL;
+> diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
+> index 50385e3..6fe6ed4 100644
+> --- a/include/qemu/mmap-alloc.h
+> +++ b/include/qemu/mmap-alloc.h
+> @@ -7,7 +7,24 @@ size_t qemu_fd_getpagesize(int fd);
+>  
+>  size_t qemu_mempath_getpagesize(const char *mem_path);
+>  
+> -void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared);
+> +/**
+> + * qemu_ram_mmap: mmap the specified file or device.
+> + *
+> + * Parameters:
+> + *  @fd: the file or the device to mmap
+> + *  @size: the number of bytes to be mmaped
+> + *  @align: if not zero, specify the alignment of the starting mapping address;
+> + *          otherwise, the alignment in use will be determined by QEMU.
+> + *  @flags: specifies additional properties of the mapping, which can be one or
+> + *          bit-or of following values
+> + *          - RAM_SHARED: mmap with MAP_SHARED flag
+> + *          Other bits are ignored.
+> + *
 
-Please include a changelog in future patches.  For example:
+So set it to RAM_SHARED to require a shared mapping ...
 
-v3:
- * Don't drop revents when a handler is modified [Stefan]
+> + * Return:
+> + *  On success, return a pointer to the mapped area.
+> + *  On failure, return MAP_FAILED.
+> + */
+> +void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags);
+>  
+>  void qemu_ram_munmap(void *ptr, size_t size);
+>  
+> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+> index fd329ec..8f0a740 100644
+> --- a/util/mmap-alloc.c
+> +++ b/util/mmap-alloc.c
+> @@ -13,6 +13,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qemu/mmap-alloc.h"
+>  #include "qemu/host-utils.h"
+> +#include "exec/memory.h"
+>  
+>  #define HUGETLBFS_MAGIC       0x958458f6
+>  
+> @@ -75,7 +76,7 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
+>      return getpagesize();
+>  }
+>  
+> -void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
+> +void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags)
+>  {
+>      /*
+>       * Note: this always allocates at least one extra page of virtual address
+> @@ -92,11 +93,12 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
+>       * anonymous memory is OK.
+>       */
+>      int anonfd = fd == -1 || qemu_fd_getpagesize(fd) == getpagesize() ? -1 : fd;
+> -    int flags = anonfd == -1 ? MAP_ANONYMOUS : MAP_NORESERVE;
+> -    void *ptr = mmap(0, total, PROT_NONE, flags | MAP_PRIVATE, anonfd, 0);
+> +    int mmap_flags = anonfd == -1 ? MAP_ANONYMOUS : MAP_NORESERVE;
+> +    void *ptr = mmap(0, total, PROT_NONE, mmap_flags | MAP_PRIVATE, anonfd, 0);
+>  #else
+>      void *ptr = mmap(0, total, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+>  #endif
+> +    bool shared = flags & RAM_SHARED;
+>      size_t offset;
+>      void *ptr1;
+>  
+> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+> index fbd0dc8..121c31f 100644
+> --- a/util/oslib-posix.c
+> +++ b/util/oslib-posix.c
+> @@ -203,7 +203,13 @@ void *qemu_memalign(size_t alignment, size_t size)
+>  void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment, bool shared)
+>  {
+>      size_t align = QEMU_VMALLOC_ALIGN;
+> -    void *ptr = qemu_ram_mmap(-1, size, align, shared);
+> +    uint32_t flags = 0;
+> +    void *ptr;
+> +
+> +    if (shared) {
+> +        flags = MAP_SHARED;
+> +    }
 
-That way reviewers know what to look for and which issues you have
-addressed.
+And here we set it to MAP_SHARED instead.
+Not good - was this even tested?
 
->  util/aio-posix.c | 86 ++++++++++++++++++++++++++++--------------------
->  util/aio-win32.c | 67 ++++++++++++++++---------------------
->  2 files changed, 79 insertions(+), 74 deletions(-)
->=20
-> diff --git a/util/aio-posix.c b/util/aio-posix.c
-> index 51c41ed3c9..d658cf3007 100644
-> --- a/util/aio-posix.c
-> +++ b/util/aio-posix.c
+> +    ptr = qemu_ram_mmap(-1, size, align, flags);
+>  
+>      if (ptr == MAP_FAILED) {
+>          return NULL;
+> -- 
+> 2.7.4
 
-Thanks!  The worst case I can now imagine is if an fd is handled twice
-due to a concurrent aio_set_fd_handler() call, but spurious
-->io_read()/->io_write() should not cause problems.
 
-I will wait for Paolo to review this because he is most familiar with
-the lockcnt abstraction.
+Suggestion:
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+#ifdef __CHECKER__
+#define QEMU_BITWISE __attribute__((bitwise))
+#define QEMU_FORCE   __attribute__((force))
+#else
+#define QEMU_BITWISE
+#define QEMU_FORCE
+#endif
 
---JSkcQAAxhB1h8DcT
-Content-Type: application/pgp-signature; name="signature.asc"
+typedef unsigned QEMU_BITWISE QemuMmapFlags;
 
------BEGIN PGP SIGNATURE-----
+#define RAM_SHARED ((QEMU_FORCE QemuMmapFlags) (1 << 1))
 
-iQEcBAEBAgAGBQJcGQCpAAoJEJykq7OBq3PI+7YH/jUSBe/1TNSnd2FXWCY3n/Rz
-qzMR2Vn28hH/lMTh8HmQBd9/ufgbZxECGDRZAw+WV3zPlLkQaB28MHpqbNIbyIZw
-MTI3CF+a/2L0L+9fhq/+x/JrOaagLIoEmUnjbKmbCotdP4v8MOhR7z+o1G8inFCC
-hVZNQV6IkE9yqFMYhjqGj/YICnBfsCVoJFNugVQmKH/nYA5MUqr4MAZY1w3dMWkt
-uTaX0/WjaAqJh+Ymw6JqojM+muR3gMuPrUqTUYlQQTSR/g6myAZqW8R2XjQ9XvJd
-kS4VIyYX91oavgz/espRYo9JOu0hrlKKyiHuO45xUSzbbcyo2HBeXC6cY0+uXQk=
-=5/VM
------END PGP SIGNATURE-----
+And then run checker to detect misuse.
 
---JSkcQAAxhB1h8DcT--
+-- 
+MST
