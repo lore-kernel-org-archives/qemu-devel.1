@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1gZB81-0007Gq-0W
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:53:26 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gZBVy-0003Rj-QS
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 04:18:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1gZB7w-0005ZJ-Ti
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:53:24 -0500
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Date: Tue, 18 Dec 2018 08:53:15 +0000
-Message-ID: <2ee882bf-00cc-addf-d866-c5c916a00774@virtuozzo.com>
-References: <20181205122326.26625-1-dplotnikov@virtuozzo.com>
-	<20181207122647.GE5119@linux.fritz.box>
-	<bb51b8f9-a3a4-90e6-2f69-57e90ccd623a@virtuozzo.com>
-	<20181212122457.GB5415@linux.fritz.box>
-	<d0d2cab4-2157-1f9f-3bc9-a70f28a211b0@virtuozzo.com>
-	<20181213122039.GC5427@linux.fritz.box>
-	<f2fcbcc2-5e0f-053d-f4c7-fe0f5f6092f0@virtuozzo.com>
-In-Reply-To: <f2fcbcc2-5e0f-053d-f4c7-fe0f5f6092f0@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <EDB571640064F4449A91768166FE3EF7@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <stefanha@redhat.com>) id 1gZBVv-000629-CM
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 04:18:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53178)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gZBVv-0005wq-13
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 04:18:07 -0500
+Date: Tue, 18 Dec 2018 09:18:02 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20181218091802.GA18767@stefanha-x1.localdomain>
+References: <cover.1545120100.git.yi.z.zhang@linux.intel.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] blk: postpone request execution on a
- context protected with "drained section"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="qMm9M+Fa2AknHoGS"
+Content-Disposition: inline
+In-Reply-To: <cover.1545120100.git.yi.z.zhang@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH V7 0/6] nvdimm: support MAP_SYNC for
+ memory-backend-file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,95 +28,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "keith.busch@intel.com" <keith.busch@intel.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>, "famz@redhat.com" <famz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Zhang Yi <yi.z.zhang@linux.intel.com>
+Cc: mst@redhat.com, peter.maydell@linaro.org, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, imammedo@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, crosthwaite.peter@gmail.com, richard.henderson@linaro.org, xiaoguangrong.eric@gmail.com
 
-cGluZyBwaW5nDQoNCk9uIDE0LjEyLjIwMTggMTQ6NTQsIERlbmlzIFBsb3RuaWtvdiB3cm90ZToN
-Cj4gDQo+IA0KPiBPbiAxMy4xMi4yMDE4IDE1OjIwLCBLZXZpbiBXb2xmIHdyb3RlOg0KPj4gQW0g
-MTMuMTIuMjAxOCB1bSAxMjowNyBoYXQgRGVuaXMgUGxvdG5pa292IGdlc2NocmllYmVuOg0KPj4+
-IE9uIDEyLjEyLjIwMTggMTU6MjQsIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4+IEFtIDExLjEyLjIw
-MTggdW0gMTc6NTUgaGF0IERlbmlzIFBsb3RuaWtvdiBnZXNjaHJpZWJlbjoNCj4+Pj4+PiBXaHkg
-aW52b2x2ZSB0aGUgQWlvQ29udGV4dCBhdCBhbGw/IFRoaXMgY291bGQgYWxsIGJlIGtlcHQgYXQg
-dGhlDQo+Pj4+Pj4gQmxvY2tCYWNrZW5kIGxldmVsIHdpdGhvdXQgZXh0ZW5kaW5nIHRoZSBsYXll
-cmluZyB2aW9sYXRpb24gdGhhdA0KPj4+Pj4+IGFpb19kaXNhYmxlX2V4dGVybmFsKCkgaXMuDQo+
-Pj4+Pj4NCj4+Pj4+PiBCbG9ja0JhY2tlbmRzIGdldCBub3RpZmllZCB3aGVuIHRoZWlyIHJvb3Qg
-bm9kZSBpcyBkcmFpbmVkLCBzbyANCj4+Pj4+PiBob29raW5nDQo+Pj4+Pj4gdGhpbmdzIHVwIHRo
-ZXJlIHNob3VsZCBiZSBhcyBlYXN5LCBpZiBub3QgZXZlbiBlYXNpZXIgdGhhbiBpbg0KPj4+Pj4+
-IEFpb0NvbnRleHQuDQo+Pj4+Pg0KPj4+Pj4gSnVzdCB3YW50IHRvIG1ha2Ugc3VyZSB0aGF0IEkg
-dW5kZXJzdG9vZCBjb3JyZWN0bHkgd2hhdCB5b3UgbWVhbnQgYnkNCj4+Pj4+ICJCbG9ja0JhY2tl
-bmRzIGdldCBub3RpZmllZCIuIERpZCB5b3UgbWVhbiB0aGF0IGJkcnZfZHJhaW5fZW5kIGNhbGxz
-DQo+Pj4+PiBjaGlsZCdzIHJvbGUgY2FsbGJhY2sgYmxrX3Jvb3RfZHJhaW5lZF9lbmQgYnkgY2Fs
-bGluZw0KPj4+Pj4gYmRydl9wYXJlbnRfZHJhaW5lZF9lbmQ/DQo+Pj4+DQo+Pj4+IFllcywgYmxr
-X3Jvb3RfZHJhaW5lZF9iZWdpbi9lbmQgY2FsbHMgYXJlIGFsbCB5b3UgbmVlZC4gU3BlY2lmaWNh
-bGx5LA0KPj4+PiB0aGVpciBhZGp1c3RtZW50cyB0byBibGstPnF1aWVzY2VfY291bnRlciB0aGF0
-IGFyZSBhbHJlYWR5IHRoZXJlLCANCj4+Pj4gYW5kIGluDQo+Pj4+IHRoZSAnaWYgKC0tYmxrLT5x
-dWllc2NlX2NvdW50ZXIgPT0gMCknIGJsb2NrIG9mIGJsa19yb290X2RyYWluZWRfZW5kKCkNCj4+
-Pj4gd2UgY2FuIHJlc3VtZSB0aGUgcXVldWVkIHJlcXVlc3RzLg0KPj4+IFNvdW5kcyBpdCBzaG91
-bGQgYmUgc28sIGJ1dCBpdCBkb2Vzbid0IHdvcmsgdGhhdCB3YXkgYW5kIHRoYXQncyB3aHk6DQo+
-Pj4gd2hlbiBkb2luZyBtaXJyb3Igd2UgbWF5IHJlc3VtZSBwb3N0cG9uZWQgY29yb3V0aW5lcyB0
-b28gZWFybHkgd2hlbiB0aGUNCj4+PiB1bmRlcmx5aW5nIGJzIGlzIHByb3RlY3RlZCBmcm9tIHdy
-aXRpbmcgYXQgYW5kIHRodXMgd2UgZW5jb3VudGVyIHRoZQ0KPj4+IGFzc2VydCBvbiBhIHdyaXRl
-IHJlcXVlc3QgZXhlY3V0aW9uIGF0IGJkcnZfY29fd3JpdGVfcmVxX3ByZXBhcmUgd2hlbg0KPj4+
-IHJlc3VtaW5nIHRoZSBwb3N0cG9uZWQgY29yb3V0aW5lcy4NCj4+Pg0KPj4+IFRoZSB0aGluZyBp
-cyB0aGF0IHRoZSBicyBpcyBwcm90ZWN0ZWQgZm9yIHdyaXRpbmcgYmVmb3JlIGV4ZWN1dGlvbiBv
-Zg0KPj4+IGJkcnZfcmVwbGFjZV9ub2RlIGF0IG1pcnJvcl9leGl0X2NvbW1vbiBhbmQgYmRydl9y
-ZXBsYWNlX25vZGUgY2FsbHMNCj4+PiBiZHJ2X3JlcGxhY2VfY2hpbGRfbm9wZXJtIHdoaWNoLCBp
-biB0dXJuLCBjYWxscyBjaGlsZC0+cm9sZS0+ZHJhaW5lZF9lbmQNCj4+PiB3aGVyZSBvbmUgb2Yg
-dGhlIGNhbGxiYWNrcyBpcyBibGtfcm9vdF9kcmFpbmVkX2VuZCB3aGljaCBjaGVjaw0KPj4+IGlm
-KC0tYmxrLT5xdWllc2NlX2NvdW50ZXIgPT0gMCkgYW5kIHJ1bnMgdGhlIHBvc3Rwb25lZCByZXF1
-ZXN0cw0KPj4+IChjb3JvdXRpbmVzKSBpZiB0aGUgY291bmRpdGlvbiBpcyB0cnVlLg0KPj4NCj4+
-IEhtLCBzbyBzb21ldGhpbmcgaXMgbWVzc2VkIHVwIHdpdGggdGhlIGRyYWluIHNlY3Rpb25zIGlu
-IHRoZSBtaXJyb3INCj4+IGRyaXZlci4gV2UgaGF2ZToNCj4+DQo+PiDCoMKgwqDCoCBiZHJ2X2Ry
-YWluZWRfYmVnaW4odGFyZ2V0X2JzKTsNCj4+IMKgwqDCoMKgIGJkcnZfcmVwbGFjZV9ub2RlKHRv
-X3JlcGxhY2UsIHRhcmdldF9icywgJmxvY2FsX2Vycik7DQo+PiDCoMKgwqDCoCBiZHJ2X2RyYWlu
-ZWRfZW5kKHRhcmdldF9icyk7DQo+Pg0KPj4gT2J2aW91c2x5LCB0aGUgaW50ZW50aW9uIHdhcyB0
-byBrZWVwIHRoZSBCbG9ja0JhY2tlbmQgZHJhaW5lZCBkdXJpbmcNCj4+IGJkcnZfcmVwbGFjZV9u
-b2RlKCkuIFNvIGhvdyBjb3VsZCBibGstPnF1aWVzY2VfY291bnRlciBldmVyIGdldCB0byAwDQo+
-PiBpbnNpZGUgYmRydl9yZXBsYWNlX25vZGUoKSB3aGVuIHRhcmdldF9icyBpcyBkcmFpbmVkPw0K
-Pj4NCj4+IExvb2tpbmcgYXQgYmRydl9yZXBsYWNlX2NoaWxkX25vcGVybSgpLCBpdCBzZWVtcyB0
-aGF0IHRoZSBmdW5jdGlvbiBoYXMNCj4+IGEgYnVnOiBFdmVuIGlmIG9sZF9icyBhbmQgbmV3X2Jz
-IGFyZSBib3RoIGRyYWluZWQsIHRoZSBxdWllc2NlX2NvdW50ZXINCj4+IGZvciB0aGUgcGFyZW50
-IHJlYWNoZXMgMCBmb3IgYSBtb21lbnQgYmVjYXVzZSB3ZSBjYWxsIC5kcmFpbmVkX2VuZCBmb3IN
-Cj4+IHRoZSBvbGQgY2hpbGQgZmlyc3QgYW5kIC5kcmFpbmVkX2JlZ2luIGZvciB0aGUgbmV3IG9u
-ZSBsYXRlci4NCj4+DQo+PiBTbyBpdCBzZWVtcyB0aGUgZml4IHdvdWxkIGJlIHRvIHJldmVyc2Ug
-dGhlIG9yZGVyIGFuZCBmaXJzdCBjYWxsDQo+PiAuZHJhaW5lZF9iZWdpbiBmb3IgdGhlIG5ldyBj
-aGlsZCBhbmQgdGhlbiAuZHJhaW5lZF9lbmQgZm9yIHRoZSBvbGQNCj4+IGNoaWxkLiBTb3VuZHMg
-bGlrZSBhIGdvb2QgbmV3IHRlc3RjYXNlIGZvciB0ZXN0cy90ZXN0LWJkcnYtZHJhaW4uYywgdG9v
-Lg0KPiBZZXMsIGl0J3MgdHJ1ZSwgYnV0IGl0J3Mgbm90IGVub3VnaC4uLg0KPiBJbiBtaXJyb3Jf
-ZXhpdF9jb21tb24oKSB3ZSBhY3RpdmVseSBtYW5pcHVsYXRlIHdpdGggYmxvY2sgZHJpdmVyIHN0
-YXRlcy4NCj4gV2hlbiB3ZSByZXBsYWNlZCBhIG5vZGUgaW4gdGhlIHNuaXBwZXQgeW91IHNob3dl
-ZCB3ZSBjYW4ndCBhbGxvdyB0aGUgDQo+IHBvc3Rwb25lZCBjb3JvdXRpbmVzIHRvIHJ1biBiZWNh
-dXNlIHRoZSBibG9jayB0cmVlIGlzbid0IHJlYWR5IHRvIA0KPiByZWNlaXZlIHRoZSByZXF1ZXN0
-cyB5ZXQuDQo+IFRvIGJlIHJlYWR5LCB3ZSBuZWVkIHRvIGluc2VydCBhIHByb3BlciBibG9jayBk
-cml2ZXIgc3RhdGUgdG8gdGhlIGJsb2NrIA0KPiBiYWNrZW5kIHdoaWNoIGlzIGRvbmUgaGVyZQ0K
-PiANCj4gIMKgwqDCoCBibGtfcmVtb3ZlX2JzKGJqb2ItPmJsayk7DQo+ICDCoMKgwqAgYmxrX3Nl
-dF9wZXJtKGJqb2ItPmJsaywgMCwgQkxLX1BFUk1fQUxMLCAmZXJyb3JfYWJvcnQpOw0KPiAgwqDC
-oMKgIGJsa19pbnNlcnRfYnMoYmpvYi0+YmxrLCBtaXJyb3JfdG9wX2JzLCAmZXJyb3JfYWJvcnQp
-OyA8PCA8PCA8PCA8PA0KPiANCj4gIMKgwqDCoCBic19vcGFxdWUtPmpvYiA9IE5VTEw7DQo+IA0K
-PiAgwqDCoMKgIGJkcnZfZHJhaW5lZF9lbmQoc3JjKTsNCj4gDQo+IElmIHRoZSB0cmVlIGlzbid0
-IHJlYWR5IGFuZCB3ZSByZXN1bWUgdGhlIGNvcm91dGluZXMsIHdlJ2xsIGVuZCB1cCB3aXRoIA0K
-PiB0aGUgcmVxdWVzdCBsYW5kZWQgaW4gYSB3cm9uZyBibG9jayBkcml2ZXIgc3RhdGUuDQo+IA0K
-PiBTbywgd2UgZXhwbGljaXRseSBzaG91bGQgc3RvcCBhbGwgYWN0aXZpdGllcyBvbiBhbGwgdGhl
-IGRyaXZlciBzdGF0ZXMNCj4gYW5kIGl0cyBwYXJlbnRzIGFuZCBhbGxvdyB0aGUgYWN0aXZpdGll
-cyB3aGVuIGV2ZXJ5dGhpbmcgaXMgcmVhZHkgdG8gZ28uDQo+IA0KPiBXaHkgZXhwbGljaXRseSwg
-YmVjYXVzZSB0aGUgYmxvY2sgZHJpdmVyIHN0YXRlcyBtYXkgYmVsb25nIHRvIGRpZmZlcmVudCAN
-Cj4gYmxvY2sgYmFja2VuZHMgYXQgdGhlIG1vbWVudCBvZiB0aGUgbWFuaXB1bGF0aW9uIGJlZ2lu
-bmluZy4NCj4gDQo+IFNvLCBpdCBzZWVtcyB3ZSBuZWVkIHRvIGRpc2FibGUgYWxsIHRoZWlyIGNv
-bnRleHRzIHVudGlsIHRoZSANCj4gbWFuaXB1bGF0aW9uIGVuZHMuDQo+IA0KPiBQbGVhc2UsIGNv
-cnJlY3QgbWUgaWYgSSdtIHdyb25nLg0KPiANCj4+DQo+Pj4gSW4gc2VlbXMgdGhhdCBpZiB0aGUg
-ZXh0ZXJuYWwgcmVxdWVzdHMgZGlzYWJsZWQgb24gdGhlIGNvbnRleHQgd2UgY2FuJ3QNCj4+PiBy
-ZWx5IG9uIGFueXRoaW5nIG9yIHNob3VsZCBjaGVjayB3aGVyZSB0aGUgdW5kZXJseWluZyBicyBh
-bmQgaXRzDQo+Pj4gdW5kZXJseWluZyBub2RlcyBhcmUgcmVhZHkgdG8gcmVjZWl2ZSByZXF1ZXN0
-cyB3aGljaCBzb3VuZHMgcXVpdGUNCj4+PiBjb21wbGljYXRlZC4NCj4+PiBQbGVhc2UgY29ycmVj
-dCBtZSBpZiBzdGlsbCBkb24ndCB1bmRlcnN0YW5kIHNvbWV0aGluZyBpbiB0aGF0IHJvdXRpbmUu
-DQo+Pg0KPj4gSSB0aGluayB0aGUgcmVhc29uIHdoeSByZXlsaW5nIG9uIGFpb19kaXNhYmxlX2V4
-dGVybmFsKCkgd29ya3MgaXMgc2ltcGx5DQo+PiBiZWNhdXNlIHNyYyBpcyBhbHNvIGRyYWluZWQs
-IHdoaWNoIGtlZXBzIGV4dGVybmFsIGV2ZW50cyBpbiB0aGUNCj4+IEFpb0NvbnRleHQgZGlzYWJs
-ZWQgZGVzcGl0ZSB0aGUgYnVnIGluIGRyYWluaW5nIHRoZSB0YXJnZXQgbm9kZS4NCj4+DQo+PiBU
-aGUgYnVnIHdvdWxkIGJlY29tZSBhcHBhcmVudCBldmVuIHdpdGggYWlvX2Rpc2FibGVfZXh0ZXJu
-YWwoKSBpZiB3ZQ0KPj4gZGlkbid0IGRyYWluIHNyYywgb3IgZXZlbiBpZiB3ZSBqdXN0IHN1cHBv
-cnRlZCBzcmMgYW5kIHRhcmdldCBiZWluZyBpbg0KPj4gZGlmZmVyZW50IEFpb0NvbnRleHRzLg0K
-PiANCj4gV2h5IGRvbid0IHdlIGRpc2FibGUgYWxsIHRob3NlIGNvbnRleHRzIGludm9sdmVkIHVu
-dGlsIHRoZSBlbmQgb2YgdGhlIA0KPiBibG9jayBkZXZpY2UgdHJlZSByZWNvbnN0cnVjdGlvbj8N
-Cj4gDQo+IFRoYW5rcyENCj4gDQo+IERlbmlzDQo+Pg0KPj4gS2V2aW4NCj4+DQo+IA0KDQotLSAN
-CkJlc3QsDQpEZW5pcw0K
+
+--qMm9M+Fa2AknHoGS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Dec 18, 2018 at 04:16:44PM +0800, Zhang Yi wrote:
+> Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
+> guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
+> files on ext4/xfs file system mounted with '-o dax').
+>=20
+> A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
+>     https://patchwork.kernel.org/patch/10028151/
+>=20
+> In order to make sure that the file metadata is in sync after a fault=20
+> while we are writing a shared DAX supporting backend files, this
+> patch-set enables QEMU to use MAP_SYNC flag for memory-backend-dax-file.
+>=20
+> As the DAX vs DMA truncated issue was solved, we refined the code and
+> send out this feature for the v5 version.
+>=20
+> A new auto on/off option 'sync' is added to memory-backend-file:
+>  - on:  try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
+>         'share=3Doff' or 'pmem=3Doff', QEMU will abort
+>  - off: never pass MAP_SYNC to mmap(2)
+>  - auto (default): if MAP_SYNC is supported and 'share=3Don' 'pmem=3Don',=
+ work as if
+>         'sync=3Don'; otherwise, work as if 'sync=3Doff'
+
+I took a quick look and didn't see human-readable errors when pmem=3Doff.
+Is it possible to report it instead of aborting?
+
+Thanks,
+Stefan
+
+--qMm9M+Fa2AknHoGS
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcGLtKAAoJEJykq7OBq3PI088IAK+ILwTazc64At/psAhMPZcW
+O8iTp9q1UPg/pDNaO6cvi1y5mgu7ZzPCH6SkRSb8D56dg/K1t9xtuPW9VE/lpxyF
+5pLeZKLlTqDon3CLCUV4MwXLN93TVjs9CX6aUZAA8vYGfzNc7h+yOJEsKbQL/bYs
+DslpYszDDSqx6H/SiIgMh1yyxG+6X0ju4f6mvagBzrf3rzqWMfmfolnHaH50t8yr
+oMOzwUSKEXpGIezseH66EhN1H8HJ2bOS/Mf0DxR0XO4SZKSiqYPVA2mUVlEEDizw
+VAVe9396DzQg3cQOTSqUw5s2NRCSmtbiwjZKlFoqB5ADM2qTBuMhO/rl7CD/kqk=
+=pmYM
+-----END PGP SIGNATURE-----
+
+--qMm9M+Fa2AknHoGS--
