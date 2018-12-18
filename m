@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZ6p1-0004sG-31
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:17:31 -0500
+	(envelope-from <mst@redhat.com>) id 1gZ6pI-00057C-7k
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:17:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZ6oz-0006p7-4o
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:17:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57366)
+	(envelope-from <mst@redhat.com>) id 1gZ6pG-000756-80
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:17:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57940)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZ6ox-0006ma-6F
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:17:27 -0500
-Date: Mon, 17 Dec 2018 23:17:14 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZ6pE-00071r-RE
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:17:45 -0500
+Date: Mon, 17 Dec 2018 23:17:34 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181218041625.24969-11-mst@redhat.com>
+Message-ID: <20181218041625.24969-14-mst@redhat.com>
 References: <20181218041625.24969-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20181218041625.24969-1-mst@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 10/31] pcie: Create enums for link speed and
- width
+Subject: [Qemu-devel] [PULL 13/31] pcie: Add link speed and width fields to
+ PCIESlot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,100 +28,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Geoffrey McRae <geoff@hostfission.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Eric Auger <eric.auger@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Geoffrey McRae <geoff@hostfission.com>, Eric Auger <eric.auger@redhat.com>
 
 From: Alex Williamson <alex.williamson@redhat.com>
 
-In preparation for reporting higher virtual link speeds and widths,
-create enums and macros to help us manage them.
+Add fields allowing the PCIe link speed and width of a PCIESlot to
+be configured, with an instance_post_init callback on the root port
+parent class to set defaults.  This allows child classes to set these
+via properties or via their own instance_init callback, without
+requiring all implementions to support arbitrary user selected values.
 
 Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Tested-by: Geoffrey McRae <geoff@hostfission.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/pci/pcie_regs.h | 23 +++++++++++++++++++++--
- hw/pci/pcie.c              |  7 ++++---
- hw/vfio/pci.c              |  3 ++-
- 3 files changed, 27 insertions(+), 6 deletions(-)
+ include/hw/pci/pcie_port.h     |  4 ++++
+ hw/pci-bridge/pcie_root_port.c | 14 ++++++++++++++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/include/hw/pci/pcie_regs.h b/include/hw/pci/pcie_regs.h
-index a95522a13b..ad4e7808b8 100644
---- a/include/hw/pci/pcie_regs.h
-+++ b/include/hw/pci/pcie_regs.h
-@@ -34,10 +34,29 @@
-=20
- /* PCI_EXP_LINK{CAP, STA} */
- /* link speed */
--#define PCI_EXP_LNK_LS_25               1
-+typedef enum PCIExpLinkSpeed {
-+    QEMU_PCI_EXP_LNK_2_5GT =3D 1,
-+    QEMU_PCI_EXP_LNK_5GT,
-+    QEMU_PCI_EXP_LNK_8GT,
-+    QEMU_PCI_EXP_LNK_16GT,
-+} PCIExpLinkSpeed;
+diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
+index 0736014bfd..df242a0caf 100644
+--- a/include/hw/pci/pcie_port.h
++++ b/include/hw/pci/pcie_port.h
+@@ -49,6 +49,10 @@ struct PCIESlot {
+     /* pci express switch port with slot */
+     uint8_t     chassis;
+     uint16_t    slot;
 +
-+#define QEMU_PCI_EXP_LNKCAP_MLS(speed)  (speed)
-+#define QEMU_PCI_EXP_LNKSTA_CLS         QEMU_PCI_EXP_LNKCAP_MLS
++    PCIExpLinkSpeed speed;
++    PCIExpLinkWidth width;
 +
-+typedef enum PCIExpLinkWidth {
-+    QEMU_PCI_EXP_LNK_X1 =3D 1,
-+    QEMU_PCI_EXP_LNK_X2 =3D 2,
-+    QEMU_PCI_EXP_LNK_X4 =3D 4,
-+    QEMU_PCI_EXP_LNK_X8 =3D 8,
-+    QEMU_PCI_EXP_LNK_X12 =3D 12,
-+    QEMU_PCI_EXP_LNK_X16 =3D 16,
-+    QEMU_PCI_EXP_LNK_X32 =3D 32,
-+} PCIExpLinkWidth;
-=20
- #define PCI_EXP_LNK_MLW_SHIFT           ctz32(PCI_EXP_LNKCAP_MLW)
--#define PCI_EXP_LNK_MLW_1               (1 << PCI_EXP_LNK_MLW_SHIFT)
-+#define QEMU_PCI_EXP_LNKCAP_MLW(width)  (width << PCI_EXP_LNK_MLW_SHIFT)
-+#define QEMU_PCI_EXP_LNKSTA_NLW         QEMU_PCI_EXP_LNKCAP_MLW
-=20
- /* PCI_EXP_LINKCAP */
- #define PCI_EXP_LNKCAP_ASPMS_SHIFT      ctz32(PCI_EXP_LNKCAP_ASPMS)
-diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-index 66b73b87c8..aef84c665b 100644
---- a/hw/pci/pcie.c
-+++ b/hw/pci/pcie.c
-@@ -68,11 +68,12 @@ pcie_cap_v1_fill(PCIDevice *dev, uint8_t port, uint8_=
-t type, uint8_t version)
-     pci_set_long(exp_cap + PCI_EXP_LNKCAP,
-                  (port << PCI_EXP_LNKCAP_PN_SHIFT) |
-                  PCI_EXP_LNKCAP_ASPMS_0S |
--                 PCI_EXP_LNK_MLW_1 |
--                 PCI_EXP_LNK_LS_25);
-+                 QEMU_PCI_EXP_LNKCAP_MLW(QEMU_PCI_EXP_LNK_X1) |
-+                 QEMU_PCI_EXP_LNKCAP_MLS(QEMU_PCI_EXP_LNK_2_5GT));
-=20
-     pci_set_word(exp_cap + PCI_EXP_LNKSTA,
--                 PCI_EXP_LNK_MLW_1 | PCI_EXP_LNK_LS_25);
-+                 QEMU_PCI_EXP_LNKSTA_NLW(QEMU_PCI_EXP_LNK_X1) |
-+                 QEMU_PCI_EXP_LNKSTA_CLS(QEMU_PCI_EXP_LNK_2_5GT));
-=20
-     if (dev->cap_present & QEMU_PCIE_LNKSTA_DLLLA) {
-         pci_word_test_and_set_mask(exp_cap + PCI_EXP_LNKSTA,
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 5c7bd96984..74f9a46b4b 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -1897,7 +1897,8 @@ static int vfio_setup_pcie_cap(VFIOPCIDevice *vdev,=
- int pos, uint8_t size,
-                                    PCI_EXP_TYPE_ENDPOINT << 4,
-                                    PCI_EXP_FLAGS_TYPE);
-             vfio_add_emulated_long(vdev, pos + PCI_EXP_LNKCAP,
--                                   PCI_EXP_LNK_MLW_1 | PCI_EXP_LNK_LS_25=
-, ~0);
-+                           QEMU_PCI_EXP_LNKCAP_MLW(QEMU_PCI_EXP_LNK_X1) =
-|
-+                           QEMU_PCI_EXP_LNKCAP_MLS(QEMU_PCI_EXP_LNK_2_5G=
-T), ~0);
-             vfio_add_emulated_word(vdev, pos + PCI_EXP_LNKCTL, 0, ~0);
-         }
-=20
---=20
+     QLIST_ENTRY(PCIESlot) next;
+ };
+ 
+diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+index 45f9e8cd4a..34ad76743c 100644
+--- a/hw/pci-bridge/pcie_root_port.c
++++ b/hw/pci-bridge/pcie_root_port.c
+@@ -140,6 +140,19 @@ static Property rp_props[] = {
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
++static void rp_instance_post_init(Object *obj)
++{
++    PCIESlot *s = PCIE_SLOT(obj);
++
++    if (!s->speed) {
++        s->speed = QEMU_PCI_EXP_LNK_2_5GT;
++    }
++
++    if (!s->width) {
++        s->width = QEMU_PCI_EXP_LNK_X1;
++    }
++}
++
+ static void rp_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -157,6 +170,7 @@ static void rp_class_init(ObjectClass *klass, void *data)
+ static const TypeInfo rp_info = {
+     .name          = TYPE_PCIE_ROOT_PORT,
+     .parent        = TYPE_PCIE_SLOT,
++    .instance_post_init = rp_instance_post_init,
+     .class_init    = rp_class_init,
+     .abstract      = true,
+     .class_size = sizeof(PCIERootPortClass),
+-- 
 MST
