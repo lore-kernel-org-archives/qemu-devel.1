@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60225)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1gZGDO-0001WY-Av
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:19:20 -0500
+	(envelope-from <mst@redhat.com>) id 1gZGEW-0002QM-Pb
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:20:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1gZGDL-0005Rt-5s
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:19:18 -0500
-Received: from forwardcorp1o.cmail.yandex.net ([37.9.109.47]:49094)
+	(envelope-from <mst@redhat.com>) id 1gZGEQ-0005qx-Ey
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:20:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33343)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
-	id 1gZGDK-0005RD-L9
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:19:15 -0500
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-In-Reply-To: <20181218100002.11219-7-xieyongji@baidu.com>
-References: <20181218100002.11219-1-xieyongji@baidu.com>
-	<20181218100002.11219-7-xieyongji@baidu.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZGEQ-0005qZ-60
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:20:22 -0500
+Date: Tue, 18 Dec 2018 09:20:16 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181218091942-mutt-send-email-mst@kernel.org>
+References: <20181212222648.595-1-marcandre.lureau@redhat.com>
+	<20181217203706-mutt-send-email-mst@kernel.org>
+	<CAJ+F1CK-Ko1H+VCAs_Epf+0vy2r=J7FjpHBXA7e=Ycrwm6xFJQ@mail.gmail.com>
 MIME-Version: 1.0
-Date: Tue, 18 Dec 2018 15:30:21 +0300
-Message-Id: <649661545136221@sas1-bf4ab558af9f.qloud-c.yandex.net>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CK-Ko1H+VCAs_Epf+0vy2r=J7FjpHBXA7e=Ycrwm6xFJQ@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 for-4.0 6/7] vhost-user-blk: Add support
- to reconnect backend
+Subject: Re: [Qemu-devel] [PATCH v13 0/6] Add support for TPM Physical
+ Presence interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,401 +30,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "elohimes@gmail.com" <elohimes@gmail.com>, "mst@redhat.com" <mst@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "zhangyu31@baidu.com" <zhangyu31@baidu.com>, "chaiwen@baidu.com" <chaiwen@baidu.com>, "nixun@baidu.com" <nixun@baidu.com>, "lilin24@baidu.com" <lilin24@baidu.com>, Xie Yongji <xieyongji@baidu.com>, =?utf-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, QEMU <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Berger <stefanb@linux.ibm.com>
 
-+ wrfsh@
+On Tue, Dec 18, 2018 at 01:28:53PM +0400, Marc-Andr=E9 Lureau wrote:
+> Hi Michael,
+>=20
+> On Tue, Dec 18, 2018 at 5:42 AM Michael S. Tsirkin <mst@redhat.com> wro=
+te:
+> >
+> > On Thu, Dec 13, 2018 at 02:26:42AM +0400, Marc-Andr=E9 Lureau wrote:
+> > > Hi,
+> > >
+> > > The following patches implement the TPM Physical Presence Interface
+> > > that allows a user to set a command via ACPI (sysfs entry in Linux)
+> > > that, upon the next reboot, the firmware looks for and acts upon by
+> > > sending sequences of commands to the TPM.
+> > >
+> > > A dedicated memory region is added to the TPM CRB & TIS devices, at
+> > > address/size 0xFED45000/0x400. A new "etc/tpm/config" fw_cfg entry
+> > > holds the location for that PPI region and some version details, to
+> > > allow for future flexibility.
+> > >
+> > > With the associated edk2/ovmf firmware, the Windows HLK "PPI 1.3" t=
+est
+> > > now runs successfully.
+> > >
+> > > It is based on previous work from Stefan Berger ("[PATCH v2 0/4]
+> > > Implement Physical Presence interface for TPM 1.2 and 2")
+> > >
+> > > The edk2 support is merged upstream.
+> >
+> >
+> > Breaks build with tpm disabled:
+> >
+> > /usr/bin/ld: hw/i386/acpi-build.o: in function `build_dsdt':
+> > /scm/qemu/hw/i386/acpi-build.c:2158: undefined reference to `tpm_buil=
+d_ppi_acpi'
+> > /usr/bin/ld: /scm/qemu/hw/i386/acpi-build.c:2179: undefined reference=
+ to `tpm_build_ppi_acpi'
+> > collect2: error: ld returned 1 exit status
+>=20
+> Thanks for noticing, this is probably a regression from v13, since the
+> tpm_build_ppi_acpi was moved to a separate unit that is not always
+> built.
+>=20
+> There is a lot of TPM code that we always build in acpi-build. Either
+> the code should have #ifdef TPM, or we use stubs.
+>=20
+> Fwiw, the preliminary #ifdef patch would look like that, is that
+> desirable, or should we just add some stub:
 
-Hi,
+Seems way too messy. I'd prefer stubs.
 
-18.12.2018, 13:01, "elohimes@gmail.com" <elohimes@gmail.com>:
-> From: Xie Yongji <xieyongji@baidu.com>
->
-> Since we now support the message VHOST_USER_GET_SHM_SIZE
-> and VHOST_USER_SET_SHM_FD. The backend is able to restart
-> safely because it can record inflight I/O in shared memory.
-> This patch allows qemu to reconnect the backend after
-> connection closed.
->
-> Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-> Signed-off-by: Ni Xun <nixun@baidu.com>
-> Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
-> ---
-> =C2=A0hw/block/vhost-user-blk.c | 183 ++++++++++++++++++++++++-----
-> =C2=A0include/hw/virtio/vhost-user-blk.h | 4 +
-> =C2=A02 files changed, 160 insertions(+), 27 deletions(-)
->
-> diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-> index 27028cf996..80f2e2d765 100644
-> --- a/hw/block/vhost-user-blk.c
-> +++ b/hw/block/vhost-user-blk.c
-> @@ -101,7 +101,7 @@ const VhostDevConfigOps blk_ops =3D {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.vhost_dev_config_notifier =3D vhost_user=
-_blk_handle_config_change,
-> =C2=A0};
->
-> -static void vhost_user_blk_start(VirtIODevice *vdev)
-> +static int vhost_user_blk_start(VirtIODevice *vdev)
-> =C2=A0{
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0BusState *qbus =3D BUS(qdev_get_parent_bu=
-s(DEVICE(vdev)));
-> @@ -110,13 +110,13 @@ static void vhost_user_blk_start(VirtIODevice *vd=
-ev)
->
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!k->set_guest_notifiers) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0error_report("bin=
-ding does not support guest notifiers");
-> - return;
-> + return -ENOSYS;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
->
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ret =3D vhost_dev_enable_notifiers(&s->de=
-v, vdev);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (ret < 0) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0error_report("Err=
-or enabling host notifiers: %d", -ret);
-> - return;
-> + return ret;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
->
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ret =3D k->set_guest_notifiers(qbus->pare=
-nt, s->dev.nvqs, true);
-> @@ -147,12 +147,13 @@ static void vhost_user_blk_start(VirtIODevice *vd=
-ev)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_virtqueue_m=
-ask(&s->dev, vdev, i, false);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
->
-> - return;
-> + return ret;
->
-> =C2=A0err_guest_notifiers:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0k->set_guest_notifiers(qbus->parent, s->d=
-ev.nvqs, false);
-> =C2=A0err_host_notifiers:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_disable_notifiers(&s->dev, vdev=
-);
-> + return ret;
-> =C2=A0}
->
-> =C2=A0static void vhost_user_blk_stop(VirtIODevice *vdev)
-> @@ -171,7 +172,6 @@ static void vhost_user_blk_stop(VirtIODevice *vdev)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ret =3D k->set_guest_notifiers(qbus->pare=
-nt, s->dev.nvqs, false);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (ret < 0) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0error_report("vho=
-st guest notifier cleanup failed: %d", ret);
-> - return;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
->
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_disable_notifiers(&s->dev, vdev=
-);
-> @@ -181,21 +181,43 @@ static void vhost_user_blk_set_status(VirtIODevic=
-e *vdev, uint8_t status)
-> =C2=A0{
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool should_start =3D status & VIRTIO_CON=
-FIG_S_DRIVER_OK;
-> + int ret;
->
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!vdev->vm_running) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0should_start =3D =
-false;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
->
-> - if (s->dev.started =3D=3D should_start) {
-> + if (s->should_start =3D=3D should_start) {
-> + return;
-> + }
-> +
-> + if (!s->connected || s->dev.started =3D=3D should_start) {
-> + s->should_start =3D should_start;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
->
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (should_start) {
-> - vhost_user_blk_start(vdev);
-> + s->should_start =3D true;
-> + /*
-> + * make sure vhost_user_blk_handle_output() ignores fake
-> + * guest kick by vhost_dev_enable_notifiers()
-> + */
-> + barrier();
-> + ret =3D vhost_user_blk_start(vdev);
-> + if (ret < 0) {
-> + error_report("vhost-user-blk: vhost start failed: %s",
-> + strerror(-ret));
-> + qemu_chr_fe_disconnect(&s->chardev);
-> + }
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_user_blk_st=
-op(vdev);
-> + /*
-> + * make sure vhost_user_blk_handle_output() ignore fake
-> + * guest kick by vhost_dev_disable_notifiers()
-> + */
-> + barrier();
-> + s->should_start =3D false;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 236a20eaa8..e6ca350067 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -41,14 +41,16 @@
+>  #include "hw/isa/isa.h"
+>  #include "hw/block/fdc.h"
+>  #include "hw/acpi/memory_hotplug.h"
+> +#ifdef CONFIG_TPM
+>  #include "sysemu/tpm.h"
+>  #include "hw/acpi/tpm.h"
+> -#include "hw/acpi/vmgenid.h"
+>  #include "sysemu/tpm_backend.h"
+> +#endif
+> +#include "hw/acpi/vmgenid.h"
+>  #include "hw/timer/mc146818rtc_regs.h"
+>  #include "hw/mem/memory-device.h"
+>  #include "sysemu/numa.h"
 > -
-> =C2=A0}
->
-> =C2=A0static uint64_t vhost_user_blk_get_features(VirtIODevice *vdev,
-> @@ -225,13 +247,22 @@ static uint64_t vhost_user_blk_get_features(VirtI=
-ODevice *vdev,
-> =C2=A0static void vhost_user_blk_handle_output(VirtIODevice *vdev, Virt=
-Queue *vq)
-> =C2=A0{
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
-> - int i;
-> + int i, ret;
->
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!(virtio_host_has_feature(vdev, VIRTI=
-O_F_VERSION_1) &&
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0!virtio_vdev_has_=
-feature(vdev, VIRTIO_F_VERSION_1))) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
->
-> + if (s->should_start) {
-> + return;
-> + }
-> + s->should_start =3D true;
-> +
-> + if (!s->connected) {
-> + return;
-> + }
-> +
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (s->dev.started) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> @@ -239,7 +270,13 @@ static void vhost_user_blk_handle_output(VirtIODev=
-ice *vdev, VirtQueue *vq)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Some guests kick before setting VIRTIO=
-_CONFIG_S_DRIVER_OK so start
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* vhost here instead of waiting for=
- .set_status().
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0*/
-> - vhost_user_blk_start(vdev);
-> + ret =3D vhost_user_blk_start(vdev);
-> + if (ret < 0) {
-> + error_report("vhost-user-blk: vhost start failed: %s",
-> + strerror(-ret));
-> + qemu_chr_fe_disconnect(&s->chardev);
-> + return;
-> + }
->
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Kick right away to begin processing re=
-quests already in vring */
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0for (i =3D 0; i < s->dev.nvqs; i++) {
-> @@ -259,12 +296,105 @@ static void vhost_user_blk_reset(VirtIODevice *v=
-dev)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_reset_shm(s->shm);
-> =C2=A0}
->
-> +static int vhost_user_blk_connect(DeviceState *dev)
-> +{
-> + VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
-> + VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
-> + int ret =3D 0;
-> +
-> + if (s->connected) {
-> + return 0;
-> + }
-> + s->connected =3D true;
-> +
-> + s->dev.nvqs =3D s->num_queues;
-> + s->dev.vqs =3D s->vqs;
-> + s->dev.vq_index =3D 0;
-> + s->dev.backend_features =3D 0;
-> +
-> + vhost_dev_set_config_notifier(&s->dev, &blk_ops);
-> +
-> + ret =3D vhost_dev_init(&s->dev, s->vhost_user, VHOST_BACKEND_TYPE_USE=
-R, 0);
-> + if (ret < 0) {
-> + error_report("vhost-user-blk: vhost initialization failed: %s",
-> + strerror(-ret));
-> + return ret;
-> + }
-> +
-> + /* restore vhost state */
-> + if (s->should_start) {
-> + ret =3D vhost_user_blk_start(vdev);
-> + if (ret < 0) {
-> + error_report("vhost-user-blk: vhost start failed: %s",
-> + strerror(-ret));
-> + return ret;
-> + }
-> + }
-> +
-> + return 0;
-> +}
-> +
-> +static void vhost_user_blk_disconnect(DeviceState *dev)
-> +{
-> + VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
-> + VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
-> +
-> + if (!s->connected) {
-> + return;
-> + }
-> + s->connected =3D false;
-> +
-> + if (s->dev.started) {
-> + vhost_user_blk_stop(vdev);
-> + }
-> +
-> + vhost_dev_cleanup(&s->dev);
-> +}
-> +
-> +static gboolean vhost_user_blk_watch(GIOChannel *chan, GIOCondition co=
-nd,
-> + void *opaque)
-> +{
-> + DeviceState *dev =3D opaque;
-> + VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
-> + VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
-> +
-> + qemu_chr_fe_disconnect(&s->chardev);
-> +
-> + return true;
-> +}
-> +
-> +static void vhost_user_blk_event(void *opaque, int event)
-> +{
-> + DeviceState *dev =3D opaque;
-> + VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
-> + VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
-> +
-> + switch (event) {
-> + case CHR_EVENT_OPENED:
-> + if (vhost_user_blk_connect(dev) < 0) {
-> + qemu_chr_fe_disconnect(&s->chardev);
-> + return;
-> + }
-> + s->watch =3D qemu_chr_fe_add_watch(&s->chardev, G_IO_HUP,
-> + vhost_user_blk_watch, dev);
-> + break;
-> + case CHR_EVENT_CLOSED:
-> + vhost_user_blk_disconnect(dev);
-> + if (s->watch) {
-> + g_source_remove(s->watch);
-> + s->watch =3D 0;
-> + }
-> + break;
-> + }
-> +}
-> +
-> =C2=A0static void vhost_user_blk_device_realize(DeviceState *dev, Error=
- **errp)
-> =C2=A0{
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0VirtIODevice *vdev =3D VIRTIO_DEVICE(dev)=
+> +#include "qemu/units.h"
+>  /* Supported chipsets: */
+>  #include "hw/acpi/piix4.h"
+>  #include "hw/acpi/pcihp.h"
+> @@ -105,7 +107,9 @@ typedef struct AcpiPmInfo {
+>  typedef struct AcpiMiscInfo {
+>      bool is_piix4;
+>      bool has_hpet;
+> +#ifdef CONFIG_TPM
+>      TPMVersion tpm_version;
+> +#endif
+>      const unsigned char *dsdt_code;
+>      unsigned dsdt_size;
+>      uint16_t pvpanic_port;
+> @@ -234,7 +238,9 @@ static void acpi_get_misc_info(AcpiMiscInfo *info)
+>      }
+>=20
+>      info->has_hpet =3D hpet_find();
+> +#ifdef CONFIG_TPM
+>      info->tpm_version =3D tpm_get_version(tpm_find());
+> +#endif
+>      info->pvpanic_port =3D pvpanic_port();
+>      info->applesmc_io_base =3D applesmc_port();
+>  }
+> @@ -1962,10 +1968,12 @@ build_dsdt(GArray *table_data, BIOSLinker *link=
+er,
+>          }
+>      }
+>=20
+> +#ifdef CONFIG_TPM
+>      if (TPM_IS_TIS(tpm_find())) {
+>          aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
+>                     TPM_TIS_ADDR_SIZE, AML_READ_WRITE));
+>      }
+> +#endif
+>      aml_append(scope, aml_name_decl("_CRS", crs));
+>=20
+>      /* reserve GPE0 block resources */
+> @@ -2133,6 +2141,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker=
+,
+>              /* Scan all PCI buses. Generate tables to support hotplug.=
+ */
+>              build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_=
+en);
+>=20
+> +#ifdef CONFIG_TPM
+>              if (TPM_IS_TIS(tpm_find())) {
+>                  dev =3D aml_device("ISA.TPM");
+>                  aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0=
+C31")));
+> @@ -2149,11 +2158,12 @@ build_dsdt(GArray *table_data, BIOSLinker *link=
+er,
+>                  aml_append(dev, aml_name_decl("_CRS", crs));
+>                  aml_append(scope, dev);
+>              }
+> -
+> +#endif
+>              aml_append(sb_scope, scope);
+>          }
+>      }
+>=20
+> +#ifdef CONFIG_TPM
+>      if (TPM_IS_CRB(tpm_find())) {
+>          dev =3D aml_device("TPM");
+>          aml_append(dev, aml_name_decl("_HID", aml_string("MSFT0101")))=
 ;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0VhostUserState *user;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int i, ret;
-> + Error *err =3D NULL;
->
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!s->chardev.chr) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0error_setg(errp, =
-"vhost-user-blk: chardev is mandatory");
-> @@ -299,23 +429,21 @@ static void vhost_user_blk_device_realize(DeviceS=
-tate *dev, Error **errp)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
->
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0s->shm =3D g_new0(struct vhost_shm, 1);
+> @@ -2168,7 +2178,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker=
+,
+>=20
+>          aml_append(sb_scope, dev);
+>      }
 > -
-> - s->dev.nvqs =3D s->num_queues;
-> - s->dev.vqs =3D g_new(struct vhost_virtqueue, s->dev.nvqs);
-> - s->dev.vq_index =3D 0;
-> - s->dev.backend_features =3D 0;
+> +#endif
+>      aml_append(dsdt, sb_scope);
+>=20
+>      /* copy AML table into ACPI tables blob and patch header there */
+> @@ -2194,6 +2204,7 @@ build_hpet(GArray *table_data, BIOSLinker *linker=
+)
+>                   (void *)hpet, "HPET", sizeof(*hpet), 1, NULL, NULL);
+>  }
+>=20
+> +#ifdef CONFIG_TPM
+>  static void
+>  build_tpm_tcpa(GArray *table_data, BIOSLinker *linker, GArray *tcpalog=
+)
+>  {
+> @@ -2247,6 +2258,7 @@ build_tpm2(GArray *table_data, BIOSLinker
+> *linker, GArray *tcpalog)
+>      build_header(linker, table_data,
+>                   (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL,=
+ NULL);
+>  }
+> +#endif
+>=20
+>  #define HOLE_640K_START  (640 * KiB)
+>  #define HOLE_640K_END   (1 * MiB)
+> @@ -2679,6 +2691,7 @@ void acpi_build(AcpiBuildTables *tables,
+> MachineState *machine)
+>          acpi_add_table(table_offsets, tables_blob);
+>          build_hpet(tables_blob, tables->linker);
+>      }
+> +#ifdef CONFIG_TPM
+>      if (misc.tpm_version !=3D TPM_VERSION_UNSPEC) {
+>          acpi_add_table(table_offsets, tables_blob);
+>          build_tpm_tcpa(tables_blob, tables->linker, tables->tcpalog);
+> @@ -2688,6 +2701,7 @@ void acpi_build(AcpiBuildTables *tables,
+> MachineState *machine)
+>              build_tpm2(tables_blob, tables->linker, tables->tcpalog);
+>          }
+>      }
+> +#endif
+>      if (pcms->numa_nodes) {
+>          acpi_add_table(table_offsets, tables_blob);
+>          build_srat(tables_blob, tables->linker, machine);
+> @@ -2886,9 +2900,10 @@ void acpi_setup(void)
+>          acpi_add_rom_blob(build_state, tables.linker->cmd_blob,
+>                            "etc/table-loader", 0);
+>=20
+> +#ifdef CONFIG_TPM
+>      fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
+>                      tables.tcpalog->data, acpi_data_len(tables.tcpalog=
+));
 > -
-> - vhost_dev_set_config_notifier(&s->dev, &blk_ops);
-> -
-> - ret =3D vhost_dev_init(&s->dev, s->vhost_user, VHOST_BACKEND_TYPE_USE=
-R, 0);
-> - if (ret < 0) {
-> - error_setg(errp, "vhost-user-blk: vhost initialization failed: %s",
-> - strerror(-ret));
-> - goto virtio_err;
-> + s->vqs =3D g_new(struct vhost_virtqueue, s->num_queues);
-> + s->watch =3D 0;
-> + s->should_start =3D false;
-> + s->connected =3D false;
-> +
-> + while (qemu_chr_fe_wait_connected(&s->chardev, &err) < 0) {
-> + error_report_err(err);
-> + err =3D NULL;
-> + sleep(1);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-
-After the reconnect loop we have some function calls to vhost backend:
-* qemu_chr_fe_set_handlers implicit calls vhost_dev_init
-* vhost_dev_get_config
-* vhost_dev_init_shm
-
-If vhost backend will restart during their execution the initialzation wi=
-ll be
-failed. What do you think? May be we can call these functions inside of
-the reconnect loop to fix it?
-
-> + qemu_chr_fe_set_handlers(&s->chardev, NULL, NULL, vhost_user_blk_even=
-t,
-> + NULL, (void *)dev, NULL, true);
->
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ret =3D vhost_dev_get_config(&s->dev, (ui=
-nt8_t *)&s->blkcfg,
-> - sizeof(struct virtio_blk_config));
-> + sizeof(struct virtio_blk_config));
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (ret < 0) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0error_setg(errp, =
-"vhost-user-blk: get block config failed");
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto vhost_err;
-> @@ -335,8 +463,7 @@ static void vhost_user_blk_device_realize(DeviceSta=
-te *dev, Error **errp)
->
-> =C2=A0vhost_err:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cleanup(&s->dev);
-> -virtio_err:
-> - g_free(s->dev.vqs);
-> + g_free(s->vqs);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0g_free(s->shm);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_cleanup(vdev);
->
-> @@ -351,9 +478,11 @@ static void vhost_user_blk_device_unrealize(Device=
-State *dev, Error **errp)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0VHostUserBlk *s =3D VHOST_USER_BLK(dev);
->
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_user_blk_set_status(vdev, 0);
-> + qemu_chr_fe_set_handlers(&s->chardev, NULL, NULL, NULL,
-> + NULL, NULL, NULL, false);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cleanup(&s->dev);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_free_shm(s->shm);
-> - g_free(s->dev.vqs);
-> + g_free(s->vqs);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0g_free(s->shm);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_cleanup(vdev);
->
-> diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vho=
-st-user-blk.h
-> index bb706d70b3..c17d47402b 100644
-> --- a/include/hw/virtio/vhost-user-blk.h
-> +++ b/include/hw/virtio/vhost-user-blk.h
-> @@ -38,6 +38,10 @@ typedef struct VHostUserBlk {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct vhost_dev dev;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct vhost_shm *shm;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0VhostUserState *vhost_user;
-> + struct vhost_virtqueue *vqs;
-> + guint watch;
-> + bool should_start;
-> + bool connected;
-> =C2=A0} VHostUserBlk;
->
-> =C2=A0#endif
-> --
-> 2.17.1
-
-Regards,
-Yury
+> +#endif
+>      vmgenid_dev =3D find_vmgenid_dev();
+>      if (vmgenid_dev) {
+>          vmgenid_add_fw_cfg(VMGENID(vmgenid_dev), pcms->fw_cfg,
+>=20
+>=20
+> >
+> > > v13:
+> > > - removed needless error handling in tpm_ppi_init()
+> > > - splitted "add ACPI memory clear interface"
+> > > - moved acpi build function in dedicated hw/acpi/tpm.c
+> > > - added some function documentation in headers
+> > > - various code cleanups suggested by Philippe
+> > > - rebased
+> > >
+> > > Marc-Andr=E9 Lureau (3):
+> > >   tpm: add a "ppi" boolean property
+> > >   acpi: add ACPI memory clear interface
+> > >   tpm: clear RAM when "memory overwrite" requested
+> > >
+> > > Stefan Berger (3):
+> > >   tpm: allocate/map buffer for TPM Physical Presence interface
+> > >   acpi: expose TPM/PPI configuration parameters to firmware via fw_=
+cfg
+> > >   acpi: build TPM Physical Presence interface
+> > >
+> > >  hw/tpm/tpm_ppi.h      |  47 +++++
+> > >  include/hw/acpi/tpm.h |  23 +++
+> > >  include/hw/compat.h   |  11 +-
+> > >  hw/acpi/tpm.c         | 447 ++++++++++++++++++++++++++++++++++++++=
+++++
+> > >  hw/i386/acpi-build.c  |  29 ++-
+> > >  hw/tpm/tpm_crb.c      |  11 ++
+> > >  hw/tpm/tpm_ppi.c      |  53 +++++
+> > >  hw/tpm/tpm_tis.c      |  11 ++
+> > >  docs/specs/tpm.txt    | 104 ++++++++++
+> > >  hw/acpi/Makefile.objs |   1 +
+> > >  hw/tpm/Makefile.objs  |   1 +
+> > >  hw/tpm/trace-events   |   3 +
+> > >  12 files changed, 738 insertions(+), 3 deletions(-)
+> > >  create mode 100644 hw/tpm/tpm_ppi.h
+> > >  create mode 100644 hw/acpi/tpm.c
+> > >  create mode 100644 hw/tpm/tpm_ppi.c
+> > >
+> > > --
+> > > 2.20.0
+> >
+>=20
+>=20
+> --=20
+> Marc-Andr=E9 Lureau
