@@ -1,20 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47442)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gZKBr-0006Wp-5Z
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 13:34:04 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gZKDC-0007Ul-W8
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 13:35:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gZKBm-0003Ot-DB
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 13:33:58 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1545149484-4929-1-git-send-email-thuth@redhat.com>
-Date: Tue, 18 Dec 2018 19:33:30 +0100
-In-Reply-To: <1545149484-4929-1-git-send-email-thuth@redhat.com> (Thomas
-	Huth's message of "Tue, 18 Dec 2018 17:11:24 +0100")
-Message-ID: <878t0mbs79.fsf@dusky.pond.sub.org>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gZKDB-0001JI-Hv
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 13:35:22 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38223)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gZKDA-00017N-2s
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 13:35:20 -0500
+Received: by mail-wr1-x441.google.com with SMTP id v13so16947886wrw.5
+	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 10:35:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [QEMU PATCH] block: Remove blk_attach_dev_legacy()
- / legacy_dev code
+References: <20181126124250.29985-1-marcandre.lureau@redhat.com>
+	<20181126124250.29985-2-marcandre.lureau@redhat.com>
+	<20181210142956.wucn33osm7fxa27d@sirius.home.kraxel.org>
+	<CAMxuvawUrZ=y-txTS86Tz3b-BYY05k4n-jBiY8+vO5e7AOkPKA@mail.gmail.com>
+	<20181210183313-mutt-send-email-mst@kernel.org>
+	<20181211074241.ovuharwewaw22ygq@sirius.home.kraxel.org>
+	<20181211092944.GA921@redhat.com>
+	<20181211135230-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20181211135230-mutt-send-email-mst@kernel.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 18 Dec 2018 22:35:05 +0400
+Message-ID: <CAJ+F1CKuoWWxLqZKQRU-g_144jX2bwsQJUzeW0W-QicNrbPfQw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 01/11] vhost-user: define
+ conventions for vhost-user backends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,200 +37,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, "Hoffmann, Gerd" <kraxel@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-Thomas Huth <thuth@redhat.com> writes:
+Hi
 
-> The last user of blk_attach_dev_legacy() is the code in xen_disk.c.
-> It passes a pointer to a XenBlkDev as second parameter. XenBlkDev
-> is derived from XenDevice which in turn is derived from DeviceState
-> since commit 3a6c9172ac5951e ("xen: create qdev for each backend device").
-> Thus the code can also simply use blk_attach_dev() with a pointer
-> to the DeviceState instead.
-> So we can finally remove all code related to the "legacy_dev" flag, too,
-> and turn the related "void *" in block-backend.c into "DeviceState *"
-> to fix some of the remaining TODOs there.
+On Tue, Dec 11, 2018 at 10:56 PM Michael S. Tsirkin <mst@redhat.com> wrote:
 >
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  Note: I haven't tested the Xen code since I don't have a working Xen
->  installation at hand. I'd appreciate if someone could check it...
-
-Same here.  All I can do is review.
-
->  block/block-backend.c          | 54 +++++++-----------------------------------
->  hw/block/xen_disk.c            |  6 +++--
->  include/sysemu/block-backend.h |  5 ++--
->  3 files changed, 15 insertions(+), 50 deletions(-)
+> On Tue, Dec 11, 2018 at 09:29:44AM +0000, Daniel P. Berrang=C3=A9 wrote:
+> > On Tue, Dec 11, 2018 at 08:42:41AM +0100, Hoffmann, Gerd wrote:
+> > >   Hi,
+> > >
+> > > > Right. The main issue is that we need to make sure only
+> > > > in-tree devices are supported.
+> > >
+> > > Well, that is under debate right now, see:
+> > > https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg04912.html
+> >
+> > I've previously been against the idea of external plugins for QEMU,
+> > however, that was when the plugin was something that would be dlopen'd
+> > by QEMU. That would cause our internal ABI to be exposed to 3rd parties
+> > which is highly undesirable, even if they were open source to comply
+> > with the license needs.
+> >
+> > When the plugin is a completely isolated process communicating with a
+> > well defined protocol, it is not placing a significant burden on the
+> > QEMU developers' ongoing maintainence, nor has problems with license
+> > compliance. The main problem would come from debugging the combined
+> > system as the external process is essentially a black box from QEMU's
+> > POV. Downstream OS vendors are free to place restrictions on which
+> > backend processes they'd be willing to support with QEMU, and upstream
+> > is under no obligation to debug stuff beyond the QEMU boundary.
+> >
+> > We have already accepted that tradeoff with networking by supporting
+> > vhost-user and have externals impls like DPDK, so I don't see a
+> > compelling reason to try to restrict it for other vhost-user backends.
 >
-> diff --git a/block/block-backend.c b/block/block-backend.c
-> index 60d37a0..3c3118f 100644
-> --- a/block/block-backend.c
-> +++ b/block/block-backend.c
-> @@ -47,9 +47,7 @@ struct BlockBackend {
->      QTAILQ_ENTRY(BlockBackend) monitor_link; /* for monitor_block_backends */
->      BlockBackendPublic public;
->  
-> -    void *dev;                  /* attached device model, if any */
-> -    bool legacy_dev;            /* true if dev is not a DeviceState */
-> -    /* TODO change to DeviceState when all users are qdevified */
-> +    DeviceState *dev;           /* attached device model, if any */
->      const BlockDevOps *dev_ops;
->      void *dev_opaque;
->  
-> @@ -836,7 +834,11 @@ void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm)
->      *shared_perm = blk->shared_perm;
->  }
->  
-> -static int blk_do_attach_dev(BlockBackend *blk, void *dev)
-> +/*
-> + * Attach device model @dev to @blk.
-> + * Return 0 on success, -EBUSY when a device model is attached already.
-> + */
-> +int blk_attach_dev(BlockBackend *blk, DeviceState *dev)
->  {
->      if (blk->dev) {
->          return -EBUSY;
-> @@ -851,40 +853,16 @@ static int blk_do_attach_dev(BlockBackend *blk, void *dev)
->  
->      blk_ref(blk);
->      blk->dev = dev;
-> -    blk->legacy_dev = false;
->      blk_iostatus_reset(blk);
->  
->      return 0;
->  }
->  
->  /*
-> - * Attach device model @dev to @blk.
-> - * Return 0 on success, -EBUSY when a device model is attached already.
-> - */
-> -int blk_attach_dev(BlockBackend *blk, DeviceState *dev)
-> -{
-> -    return blk_do_attach_dev(blk, dev);
-> -}
-> -
-> -/*
-> - * Attach device model @dev to @blk.
-> - * @blk must not have a device model attached already.
-> - * TODO qdevified devices don't use this, remove when devices are qdevified
-> - */
-> -void blk_attach_dev_legacy(BlockBackend *blk, void *dev)
-> -{
-> -    if (blk_do_attach_dev(blk, dev) < 0) {
-> -        abort();
-> -    }
-> -    blk->legacy_dev = true;
-> -}
-> -
-> -/*
->   * Detach device model @dev from @blk.
->   * @dev must be currently attached to @blk.
->   */
-> -void blk_detach_dev(BlockBackend *blk, void *dev)
-> -/* TODO change to DeviceState *dev when all users are qdevified */
-> +void blk_detach_dev(BlockBackend *blk, DeviceState *dev)
->  {
->      assert(blk->dev == dev);
->      blk->dev = NULL;
-> @@ -898,8 +876,7 @@ void blk_detach_dev(BlockBackend *blk, void *dev)
->  /*
->   * Return the device model attached to @blk if any, else null.
->   */
-> -void *blk_get_attached_dev(BlockBackend *blk)
-> -/* TODO change to return DeviceState * when all users are qdevified */
-> +DeviceState *blk_get_attached_dev(BlockBackend *blk)
->  {
->      return blk->dev;
->  }
-> @@ -908,10 +885,7 @@ void *blk_get_attached_dev(BlockBackend *blk)
->   * device attached to the BlockBackend. */
->  char *blk_get_attached_dev_id(BlockBackend *blk)
->  {
-> -    DeviceState *dev;
-> -
-> -    assert(!blk->legacy_dev);
-> -    dev = blk->dev;
-> +    DeviceState *dev = blk->dev;
->  
->      if (!dev) {
->          return g_strdup("");
-> @@ -949,11 +923,6 @@ BlockBackend *blk_by_dev(void *dev)
->  void blk_set_dev_ops(BlockBackend *blk, const BlockDevOps *ops,
->                       void *opaque)
->  {
-> -    /* All drivers that use blk_set_dev_ops() are qdevified and we want to keep
-> -     * it that way, so we can assume blk->dev, if present, is a DeviceState if
-> -     * blk->dev_ops is set. Non-device users may use dev_ops without device. */
-> -    assert(!blk->legacy_dev);
-> -
->      blk->dev_ops = ops;
->      blk->dev_opaque = opaque;
->  
-> @@ -979,8 +948,6 @@ void blk_dev_change_media_cb(BlockBackend *blk, bool load, Error **errp)
->          bool tray_was_open, tray_is_open;
->          Error *local_err = NULL;
->  
-> -        assert(!blk->legacy_dev);
-> -
->          tray_was_open = blk_dev_is_tray_open(blk);
->          blk->dev_ops->change_media_cb(blk->dev_opaque, load, &local_err);
->          if (local_err) {
-> @@ -1779,9 +1746,6 @@ void blk_eject(BlockBackend *blk, bool eject_flag)
->      BlockDriverState *bs = blk_bs(blk);
->      char *id;
->  
-> -    /* blk_eject is only called by qdevified devices */
-> -    assert(!blk->legacy_dev);
-> -
->      if (bs) {
->          bdrv_eject(bs, eject_flag);
->      }
-> diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
-> index 36eff94..9605caf 100644
-> --- a/hw/block/xen_disk.c
-> +++ b/hw/block/xen_disk.c
-> @@ -801,7 +801,9 @@ static int blk_connect(struct XenDevice *xendev)
->           * so we can blk_unref() unconditionally */
->          blk_ref(blkdev->blk);
->      }
-> -    blk_attach_dev_legacy(blkdev->blk, blkdev);
-> +    if (blk_attach_dev(blkdev->blk, DEVICE(blkdev)) < 0) {
-> +        return -1;
-> +    }
+> OK seems to be more or less a rough concensus then.
+>
+> I wonder what's the approach wrt migration though.
 
-Other error returns in this function call xen_pv_printf() first.  Should
-this one, too?
+The series doesn't take care of migration.
 
->      blkdev->file_size = blk_getlength(blkdev->blk);
->      if (blkdev->file_size < 0) {
->          BlockDriverState *bs = blk_bs(blkdev->blk);
-> @@ -951,7 +953,7 @@ static void blk_disconnect(struct XenDevice *xendev)
->  
->      if (blkdev->blk) {
->          blk_set_aio_context(blkdev->blk, qemu_get_aio_context());
-> -        blk_detach_dev(blkdev->blk, blkdev);
-> +        blk_detach_dev(blkdev->blk, DEVICE(blkdev));
->          blk_unref(blkdev->blk);
->          blkdev->blk = NULL;
->      }
-> diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-> index c96bcde..39507d6 100644
-> --- a/include/sysemu/block-backend.h
-> +++ b/include/sysemu/block-backend.h
-> @@ -110,9 +110,8 @@ void blk_iostatus_disable(BlockBackend *blk);
->  void blk_iostatus_reset(BlockBackend *blk);
->  void blk_iostatus_set_err(BlockBackend *blk, int error);
->  int blk_attach_dev(BlockBackend *blk, DeviceState *dev);
-> -void blk_attach_dev_legacy(BlockBackend *blk, void *dev);
-> -void blk_detach_dev(BlockBackend *blk, void *dev);
-> -void *blk_get_attached_dev(BlockBackend *blk);
-> +void blk_detach_dev(BlockBackend *blk, DeviceState *dev);
-> +DeviceState *blk_get_attached_dev(BlockBackend *blk);
->  char *blk_get_attached_dev_id(BlockBackend *blk);
->  BlockBackend *blk_by_dev(void *dev);
->  BlockBackend *blk_by_qdev_id(const char *id, Error **errp);
+>
+> Even the compatibility story about vhost-user isn't
+> great, I would like to see something solid before
+> we allow that.
 
-I didn't verify your claim that DEVICE(blkdev) is okay.  Apart from
-that, looks good to me.
+To allow migration? vhost-user has partial support for migration
+(dirty memory tracking), and there is also "[PATCH v2 for-4.0 0/7]
+vhost-user-blk: Add support for backend reconnecting" - allowing the
+backend to store some state, if I understand correctly, which could be
+leveraged I guess...
+
+But I don't think we should block this series because migration isn't
+tackled here.
+
+thanks
+
+
+.
+
+>
+> Are we happy to just block live migration?
+> For sure that's already the case with VFIO.
+>
+>
+> > > > vhost-user by design
+> > > > is for out of tree users. It needn't be hard,
+> > > > maybe it's enough to just make qemu launch these processes
+> > > > as opposed to connecting to them on command line.
+> > >
+> > > Not sure this is a good idea, with security being one of the motivati=
+ng
+> > > factors to move device emulation to other processes.  When libvirt
+> > > launches the processes it can place them in separate sandboxes ...
+> >
+> > Yep, libvirt already turns on seccomp policies which forbid QEMU from
+> > forking/execing anything, and we have no desire to go backwards here.
+> > Any external processes have to be launched by libvirt ahead of time.
+> >
+> >
+> > Regards,
+> > Daniel
+> > --
+> > |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> > |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> > |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
