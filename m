@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gZ9Q1-0005W3-UB
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:03:54 -0500
+	(envelope-from <armbru@redhat.com>) id 1gZ9WG-0001bn-Mq
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:10:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gZ9Pv-00045J-CA
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:03:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36902)
+	(envelope-from <armbru@redhat.com>) id 1gZ9WA-0007b4-AU
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:10:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37474)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gZ9Pn-0003xl-Eg
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:03:41 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gZ9WA-0007Yc-0i
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:10:14 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <20181213184340.24037-1-armbru@redhat.com>
-	<20181213184340.24037-33-armbru@redhat.com>
-	<fde45953-c713-daf7-f3ce-47d63b050f7a@redhat.com>
-	<CAJ+F1CLEDbur0x1H59U52F2kyKUhn55qJHPOBhcdeTvJdaSJLw@mail.gmail.com>
-Date: Tue, 18 Dec 2018 08:03:30 +0100
-In-Reply-To: <CAJ+F1CLEDbur0x1H59U52F2kyKUhn55qJHPOBhcdeTvJdaSJLw@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 17 Dec 2018
-	22:38:14 +0400")
-Message-ID: <877eg7jozh.fsf@dusky.pond.sub.org>
+References: <1543467132-2873-1-git-send-email-liq3ea@gmail.com>
+	<1543467132-2873-3-git-send-email-liq3ea@gmail.com>
+	<644186db-32d3-7c83-8b37-02e8427ef217@redhat.com>
+	<87o99kj7tm.fsf@dusky.pond.sub.org>
+	<b3e3a763-7865-285b-4fa7-b3146f19d354@redhat.com>
+Date: Tue, 18 Dec 2018 08:09:59 +0100
+In-Reply-To: <b3e3a763-7865-285b-4fa7-b3146f19d354@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon,
+	17 Dec 2018 20:37:56 +0100")
+Message-ID: <8736qvjooo.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 32/32] qapi: add conditions to REPLICATION
- type/commands on the schema
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] hw: vmmouse: Use link instead of
+ pointer property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,69 +33,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU <qemu-devel@nongnu.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, ehabkost@redhat.com, mst@redhat.com, Li Qiang <liq3ea@gmail.com>, qemu-devel@nongnu.org, darren.kenny@oracle.com, pbonzini@redhat.com, rth@twiddle.net
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> Hi
+> On 12/17/18 8:01 PM, Markus Armbruster wrote:
+>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>>=20
+>>> Hi Li,
+>>>
+>>> On 11/29/18 5:52 AM, Li Qiang wrote:
+>>>> According to qdev-properties.h, properties of pointer type should
+>>>> be avoided. Turn "ps2_mouse" into a link.
+>>>>
+>>>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>>>> Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+>>>> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+>>>> ---
+>> [...]
+>>>> diff --git a/hw/i386/vmmouse.c b/hw/i386/vmmouse.c
+>>>> index 4412eaf604..f63aac6673 100644
+>>>> --- a/hw/i386/vmmouse.c
+>>>> +++ b/hw/i386/vmmouse.c
+>> [...]
+>>>> @@ -283,8 +289,6 @@ static void vmmouse_class_initfn(ObjectClass *klas=
+s, void *data)
+>>>>      dc->realize =3D vmmouse_realizefn;
+>>>>      dc->reset =3D vmmouse_reset;
+>>>>      dc->vmsd =3D &vmstate_vmmouse;
+>>>> -    dc->props =3D vmmouse_properties;
+>>>> -    /* Reason: pointer property "ps2_mouse" */
+>>>>      dc->user_creatable =3D false;
+>>>
+>>> "user_creatable =3D false" must have an justification comment.
+>>=20
+>> Correct.
+
+Aside: more ->user_creatable =3D false without a comment have crept in
+since I last swept them out.
+
+>>> Can you keep 'Reason: link property "ps2_mouse"'?
+>>=20
+>> Is this a valid reason?
+>>=20
+>> A pointer property is one, because it can only be set by code.
 >
-> On Mon, Dec 17, 2018 at 8:01 PM Thomas Huth <thuth@redhat.com> wrote:
->>
->> On 2018-12-13 19:43, Markus Armbruster wrote:
->> > From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> >
->> > Add #if defined(CONFIG_REPLICATION) in generated code, and adjust the
->> > code accordingly.
->> >
->> > Made conditional:
->> >
->> > * xen-set-replication, query-xen-replication-status,
->> >   xen-colo-do-checkpoint
->> >
->> >   Before the patch, we first register the commands unconditionally in
->> >   generated code (requires a stub), then conditionally unregister in
->> >   qmp_unregister_commands_hack().
->> >
->> >   Afterwards, we register only when CONFIG_REPLICATION.  The command
->> >   fails exactly the same, with CommandNotFound.
->> >
->> >   Improvement, because now query-qmp-schema is accurate, and we're one
->> >   step closer to killing qmp_unregister_commands_hack().
->> >
->> > * enum BlockdevDriver value "replication" in command blockdev-add
->> >
->> > * BlockdevOptions variant @replication
->> >
->> > and related structures.
->> >
->> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> > Reviewed-by: Markus Armbruster <armbru@redhat.com>
->> > Message-Id: <20181213123724.4866-23-marcandre.lureau@redhat.com>
->> > Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> > ---
->> >  migration/colo.c     | 16 ++++------------
->> >  monitor.c            |  5 -----
->> >  qapi/block-core.json | 13 +++++++++----
->> >  qapi/migration.json  | 12 ++++++++----
->> >  4 files changed, 21 insertions(+), 25 deletions(-)
->>
->> I think this might have broken compilation with --disable-replication:
->>
->>  https://gitlab.com/huth/qemu/-/jobs/135648240
->>
->> Any ideas how to fix it?
+> I prefer the original comment :)
 >
-> We introduced a regression by dropping osdep.h include from headers.
->
-> To me, it's best to include osdep.h in headers, since the ifdef exist
-> there. But I have been told we include it in .c instead. I'll upstream
-> the qapi/scripts to include it.
+> /* Reason: pointer property "ps2_mouse" */
 
-This can't be the cause: qapi/qapi-visit-block-core.c includes osdep.h
-first, like all our .c files.
+A pointer property can't be set by -device because there's no sane way
+to pick a value.  Not true for a link property: it's value is a QOM
+path.  But I'm not sure such setting of link properties has been
+implemented.  If it isn't, then /* Reason: link property "ps2_mouse */
+is perfect.  If it isn, then it's wrong, possibly along with with
+dc->user_creatable =3D false.
 
-> thanks for the report, sorry for the regression
-
-You've since posted a fix to add the missing ifdeffery.  I'm testing it
-while I write :)
+>>> Eventually the maintainer taking this patch can fix this for you.
+>>>
+>>> With the comment:
+>>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>>
+>>>>  }
+>> [...]
+>>=20
