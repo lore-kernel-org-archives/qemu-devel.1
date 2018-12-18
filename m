@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gZMpQ-0000GU-On
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 16:23:01 -0500
+	(envelope-from <eblake@redhat.com>) id 1gZMqM-0000jc-3N
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 16:23:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gZMpN-0002hu-JN
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 16:23:00 -0500
-References: <20181218115615.1499-1-philmd@redhat.com>
-	<20181218115615.1499-11-philmd@redhat.com>
-	<20f62f62-f677-6d0f-09dc-3759cc813d8f@redhat.com>
-	<20181218152239.GB19442@habkost.net>
-	<94e8bd71-302e-bced-665d-78538ea3aba3@redhat.com>
-	<2ae5b6cd-7227-fab5-1bd1-4d3ebb88feee@redhat.com>
-	<20181218155731.GC19442@habkost.net>
-	<e5f62788-4b59-223c-c85e-562daf3a27d9@redhat.com>
-	<20181218191343.GE19442@habkost.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <99b7b806-b18a-8c59-b4f5-ff04ffe3da6e@redhat.com>
-Date: Tue, 18 Dec 2018 22:22:39 +0100
+	(envelope-from <eblake@redhat.com>) id 1gZMqK-0003ZY-V7
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 16:23:57 -0500
+References: <20181102151152.288399-1-vsementsov@virtuozzo.com>
+	<20181102151152.288399-4-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <48002129-16ef-f0ad-2701-893fc88ecdd0@redhat.com>
+Date: Tue, 18 Dec 2018 15:23:48 -0600
 MIME-Version: 1.0
-In-Reply-To: <20181218191343.GE19442@habkost.net>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20181102151152.288399-4-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 10/12] MAINTAINERS: Orphanize the 'CPU
- (QOM)' subsystem
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] block/nbd-client: use traces instead
+ of noisy error_report_err
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,82 +25,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>, Helge Deller <deller@gmx.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Luc Michel <luc.michel@greensocs.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>Daniel Berrange <berrange@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On 18/12/18 20:13, Eduardo Habkost wrote:
-> On Tue, Dec 18, 2018 at 06:15:06PM +0100, Paolo Bonzini wrote:
->> On 18/12/18 16:57, Eduardo Habkost wrote:
->>> On Tue, Dec 18, 2018 at 04:44:25PM +0100, Thomas Huth wrote:
->>>> On 2018-12-18 16:31, Philippe Mathieu-Daud=C3=A9 wrote:
->>>>> Hi Paolo, Eduardo,
->>>>>
->>>>> On 12/18/18 4:22 PM, Eduardo Habkost wrote:
->>>>>> On Tue, Dec 18, 2018 at 01:34:52PM +0100, Paolo Bonzini wrote:
->>>>>>> On 18/12/18 12:56, Philippe Mathieu-Daud=C3=A9 wrote:
->>>>>>>> Nobody is looking at those files, downgrade this subsystem as or=
-phan.
->>>>>>>>
->>>>>>>> Remove the qemu-devel@nongnu.org entry because the list is alway=
-s
->>>>>>>> selected by the 'All patches CC here' section.
->>>>>>>>
->>>>>>>> Suggested-by: Markus Armbruster <armbru@redhat.com>
->>>>>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>>>>>>> ---
->>>>>>>>  MAINTAINERS | 3 +--
->>>>>>>>  1 file changed, 1 insertion(+), 2 deletions(-)
->>>>>>>>
->>>>>>>> diff --git a/MAINTAINERS b/MAINTAINERS
->>>>>>>> index e50f8c6b97..e6a73820f1 100644
->>>>>>>> --- a/MAINTAINERS
->>>>>>>> +++ b/MAINTAINERS
->>>>>>>> @@ -1745,8 +1745,7 @@ S: Supported
->>>>>>>>  F: scripts/coverity-model.c
->>>>>>>> =20
->>>>>>>>  CPU
->>>>>>>> -L: qemu-devel@nongnu.org
->>>>>>>> -S: Supported
->>>>>>>> +S: Orphan
->>>>>>>>  F: qom/cpu.c
->>>>>>>>  F: include/qom/cpu.h
->>>>>>>> =20
->>>>>>>>
->>>>>>>
->>>>>>> I don't think that's accurate.  Simply there's not much going on.=
-  If
->>>>>>> patches are sent, get-maintainers's git fallback will do somethin=
-g
->>>>>>> (probably sending the patch to Eduardo, Igor or me).
->>>>>
->>>>> I followed Markus suggestion from
->>>>> https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05414.html=
-:
->>>>>
->>>>>   If we take the definition of S: in MAINTAINERS seriously,
->>>>>   we need to appoint a maintainer (a person, not a mailing list),
->>>>>   or downgrade to S: Orphan.
->>>>
->>>> I agree with Markus and Philippe. Having "S: Supported" but no names
->>>> available is just confusing. So either put a maintainer name in here=
-, or
->>>> downgrade to "Orphan".
->>>
->>> I volunteer to maintain it, but I don't want to be the only
->>> maintainer.  Any other volunteer?
->>
->> I can volunteer since I'd take the patches anyway.  We can also mark i=
-t
->> as Odd Fixes, and also make it a single thing with all of qom/ and
->> include/qom/.
->=20
-> Actually, I consider qom/cpu.c distinct from QOM core, and I was
-> planning to move it to hw/cpu, and add hw/cpu/core.c to the same
-> section.
->=20
-> Anyway, I guess this means you're also volunteering to be listed
-> as QOM maintainer?
+On 11/2/18 10:11 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Reduce extra noise of nbd-client, change 083 correspondingly.
 
-Igor and Daniel, would you co-maintain or review it?
+This says what, but not why. The details from the cover letter are 
+important to include here, namely:
 
-Paolo
+> It was discussed, that error messages, produced by error_reprt_err's,
+> added in f140e300 are
+> 1. not really needed
+> 2. subject to race conditions
+> 
+> And it was decided to drop them (switch to trace-points), look thread
+> https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg00833.html
+> 
+> So, I've also dropped error_report_err, added earlier in be41c100c0d
+> and later in 78a33ab5878.
+
+
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   block/nbd-client.c         | 27 +++++++++++++++++++++++----
+>   block/trace-events         |  4 ++++
+>   tests/qemu-iotests/083.out | 28 ----------------------------
+>   3 files changed, 27 insertions(+), 32 deletions(-)
+> 
+> diff --git a/block/nbd-client.c b/block/nbd-client.c
+> index 9686ecbd5e..9b1dab6e5d 100644
+> --- a/block/nbd-client.c
+> +++ b/block/nbd-client.c
+> @@ -28,6 +28,8 @@
+>    */
+>   
+>   #include "qemu/osdep.h"
+> +
+> +#include "trace.h"
+
+There are probably other things worth tracing, but this is a decent 
+start.  In particular, note the comment in nbd_parse_error_payload():
+
+     /* TODO: Add a trace point to mention the server complaint */
+
+> @@ -79,7 +81,9 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
+>           assert(s->reply.handle == 0);
+>           ret = nbd_receive_reply(s->ioc, &s->reply, &local_err);
+>           if (local_err) {
+> -            error_report_err(local_err);
+> +            trace_nbd_read_reply_entry_fail(ret, error_get_pretty(local_err),
+> +                                            error_get_hint(local_err) ?: "");
+
+I'm not sold on the error hint being useful in the trace message.  For 
+that matter, even error_get_pretty() seems like it might be rather verbose.
+
+I do see why you are trying it, though: in nbd/client.c, 
+nbd_handle_reply_err(), we have:
+
+
+     case NBD_REP_ERR_BLOCK_SIZE_REQD:
+         error_setg(errp, "Server requires INFO_BLOCK_SIZE for option %" 
+PRIu32
+                    " (%s)", reply->option, nbd_opt_lookup(reply->option));
+         break;
+
+     default:
+         error_setg(errp, "Unknown error code when asking for option %" 
+PRIu32
+                    " (%s)", reply->option, nbd_opt_lookup(reply->option));
+         break;
+     }
+
+     if (msg) {
+         error_append_hint(errp, "server reported: %s\n", msg);
+
+That is, we are reporting our own error no matter what (because we don't 
+trust the server to always give us something useful, especially since 
+many non-qemu servers still don't take advantage of the free-form error 
+message slot in the protocol), and append the server's message if 
+present as a hint (as most times a server that uses it actually manages 
+to report something that the end user may benefit from seeing).
+
+But instead of trying to make all the tracepoints in block/nbd-client.c 
+extract this information, we could just improve nbd/client.c to have a 
+tracepoint for any server-received error message at the same point where 
+it calls error_append_hint().
+
+The end result will be the same: if you enable all nbd_* traces, you'll 
+still get the server's error message.  At the same time, doing it as two 
+separate traces in the two separate files means that you can have 
+finer-grained selection of which traces to view, and that the code in 
+nbd-client.c doesn't have to extract the hint, which means patch 1/3 
+isn't important after all.
+
+I'll post a counter-proposal patch along those lines.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
