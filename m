@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOQI-00081z-TG
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOQI-00082D-Uu
 	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:05:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOQD-0004D1-S1
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOQF-0004GJ-Kr
 	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:05:10 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:41398)
+Received: from hera.aquilenet.fr ([185.233.100.1]:41506)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gZOQC-00044I-41
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:05:05 -0500
+	id 1gZOQD-0004A2-9P
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:05:07 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Wed, 19 Dec 2018 00:03:44 +0100
-Message-Id: <20181218230442.27887-7-samuel.thibault@ens-lyon.org>
+Date: Wed, 19 Dec 2018 00:03:56 +0100
+Message-Id: <20181218230442.27887-19-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20181218230442.27887-1-samuel.thibault@ens-lyon.org>
 References: <20181218230442.27887-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 06/64] slirp: rename /extra/chardev
+Subject: [Qemu-devel] [PULL 18/64] slirp: remove the disabled
+ readv()/writev() code path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,60 +33,95 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Now it's only used for the chardev pointer.
+The soread() function may be used on datagram sockets, and would
+provide different behaviour if HAVE_READV was set, on empty datagrams.
+This looks like a minor optimization, that never has been a strong
+goal for slirp.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/slirp.c    | 4 ++--
- slirp/socket.h   | 2 +-
- slirp/tcp_subr.c | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ slirp/slirp_config.h |  3 ---
+ slirp/socket.c       | 15 ---------------
+ 2 files changed, 18 deletions(-)
 
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index e5968d9aea..4c9ba9d428 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -1088,10 +1088,10 @@ int slirp_add_exec(Slirp *slirp, void *chardev, c=
-onst char *cmdline,
+diff --git a/slirp/slirp_config.h b/slirp/slirp_config.h
+index f0cc1c781b..3ce64e088e 100644
+--- a/slirp/slirp_config.h
++++ b/slirp/slirp_config.h
+@@ -29,9 +29,6 @@
+ /* Define if the machine is big endian */
+ //#undef HOST_WORDS_BIGENDIAN
 =20
- ssize_t slirp_send(struct socket *so, const void *buf, size_t len, int f=
-lags)
- {
--    if (so->s =3D=3D -1 && so->extra) {
-+    if (so->s =3D=3D -1 && so->chardev) {
-         /* XXX this blocks entire thread. Rewrite to use
-          * qemu_chr_fe_write and background I/O callbacks */
--        qemu_chr_fe_write_all(so->extra, buf, len);
-+        qemu_chr_fe_write_all(so->chardev, buf, len);
-         return len;
-     }
+-/* Define if you have readv */
+-#undef HAVE_READV
+-
+ /* Define if iovec needs to be declared */
+ #undef DECLARE_IOVEC
+ #ifdef _WIN32
+diff --git a/slirp/socket.c b/slirp/socket.c
+index 041ec5061a..7012c7c07d 100644
+--- a/slirp/socket.c
++++ b/slirp/socket.c
+@@ -187,12 +187,7 @@ soread(struct socket *so)
+ 	 */
+ 	sopreprbuf(so, iov, &n);
 =20
-diff --git a/slirp/socket.h b/slirp/socket.h
-index 2f224bc34f..930ed95972 100644
---- a/slirp/socket.h
-+++ b/slirp/socket.h
-@@ -67,7 +67,7 @@ struct socket {
+-#ifdef HAVE_READV
+-	nn =3D readv(so->s, (struct iovec *)iov, n);
+-	DEBUG_MISC((dfd, " ... read nn =3D %d bytes\n", nn));
+-#else
+ 	nn =3D qemu_recv(so->s, iov[0].iov_base, iov[0].iov_len,0);
+-#endif
+ 	if (nn <=3D 0) {
+ 		if (nn < 0 && (errno =3D=3D EINTR || errno =3D=3D EAGAIN))
+ 			return 0;
+@@ -226,7 +221,6 @@ soread(struct socket *so)
+ 		}
+ 	}
 =20
-   struct sbuf so_rcv;		/* Receive buffer */
-   struct sbuf so_snd;		/* Send buffer */
--  void * extra;			/* Extra pointer */
-+  void * chardev;
- };
+-#ifndef HAVE_READV
+ 	/*
+ 	 * If there was no error, try and read the second time round
+ 	 * We read again if n =3D 2 (ie, there's another part of the buffer)
+@@ -244,7 +238,6 @@ soread(struct socket *so)
+         }
 =20
+ 	DEBUG_MISC((dfd, " ... read nn =3D %d bytes\n", nn));
+-#endif
 =20
-diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index fd7521854e..4b40850c7a 100644
---- a/slirp/tcp_subr.c
-+++ b/slirp/tcp_subr.c
-@@ -961,7 +961,7 @@ int tcp_ctl(struct socket *so)
-                 so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr) {
-                 if (ex_ptr->ex_chardev) {
-                     so->s =3D -1;
--                    so->extra =3D ex_ptr->ex_chardev;
-+                    so->chardev =3D ex_ptr->ex_chardev;
-                     return 1;
-                 }
-                 DEBUG_MISC((dfd, " executing %s\n", ex_ptr->ex_exec));
+ 	/* Update fields */
+ 	sb->sb_cc +=3D nn;
+@@ -452,13 +445,7 @@ sowrite(struct socket *so)
+ 	}
+ 	/* Check if there's urgent data to send, and if so, send it */
+=20
+-#ifdef HAVE_READV
+-	nn =3D writev(so->s, (const struct iovec *)iov, n);
+-
+-	DEBUG_MISC((dfd, "  ... wrote nn =3D %d bytes\n", nn));
+-#else
+ 	nn =3D slirp_send(so, iov[0].iov_base, iov[0].iov_len,0);
+-#endif
+ 	/* This should never happen, but people tell me it does *shrug* */
+ 	if (nn < 0 && (errno =3D=3D EAGAIN || errno =3D=3D EINTR))
+ 		return 0;
+@@ -467,7 +454,6 @@ sowrite(struct socket *so)
+ 		goto err_disconnected;
+ 	}
+=20
+-#ifndef HAVE_READV
+ 	if (n =3D=3D 2 && nn =3D=3D iov[0].iov_len) {
+             int ret;
+             ret =3D slirp_send(so, iov[1].iov_base, iov[1].iov_len,0);
+@@ -475,7 +461,6 @@ sowrite(struct socket *so)
+                 nn +=3D ret;
+         }
+         DEBUG_MISC((dfd, "  ... wrote nn =3D %d bytes\n", nn));
+-#endif
+=20
+ 	/* Update sbuf */
+ 	sb->sb_cc -=3D nn;
 --=20
 2.19.2
