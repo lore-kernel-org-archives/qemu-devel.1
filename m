@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gZ936-0001wc-B0
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:40:21 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gZ935-0001tY-1l
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:40:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gZ92v-0002yS-LJ
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:40:12 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:39756)
+	(envelope-from <richard.henderson@linaro.org>) id 1gZ92t-0002us-Ly
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:40:10 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:37224)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gZ92v-0002S1-6H
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:40:01 -0500
-Received: by mail-pf1-x443.google.com with SMTP id r136so592943pfc.6
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 22:39:41 -0800 (PST)
+	id 1gZ92s-0002AW-Q1
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:39:59 -0500
+Received: by mail-pg1-x541.google.com with SMTP id c25so5843286pgb.4
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 22:39:36 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 17 Dec 2018 22:38:57 -0800
-Message-Id: <20181218063911.2112-21-richard.henderson@linaro.org>
+Date: Mon, 17 Dec 2018 22:38:53 -0800
+Message-Id: <20181218063911.2112-17-richard.henderson@linaro.org>
 In-Reply-To: <20181218063911.2112-1-richard.henderson@linaro.org>
 References: <20181218063911.2112-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 20/34] target/ppc: convert vsplt[bhw] to use
- vector operations
+Subject: [Qemu-devel] [PATCH 16/34] target/ppc: move FP and VMX registers
+ into aligned vsr register array
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,126 +30,575 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/ppc/helper.h                 |  3 --
- target/ppc/int_helper.c             | 24 ---------------
- target/ppc/translate/vmx-impl.inc.c | 45 +++++++++++++++++------------
- 3 files changed, 26 insertions(+), 46 deletions(-)
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 2aa60e5d36..069daa9883 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -246,9 +246,6 @@ DEF_HELPER_3(vrld, void, avr, avr, avr)
- DEF_HELPER_3(vsl, void, avr, avr, avr)
- DEF_HELPER_3(vsr, void, avr, avr, avr)
- DEF_HELPER_4(vsldoi, void, avr, avr, avr, i32)
--DEF_HELPER_3(vspltb, void, avr, avr, i32)
--DEF_HELPER_3(vsplth, void, avr, avr, i32)
--DEF_HELPER_3(vspltw, void, avr, avr, i32)
- DEF_HELPER_3(vextractub, void, avr, avr, i32)
- DEF_HELPER_3(vextractuh, void, avr, avr, i32)
- DEF_HELPER_3(vextractuw, void, avr, avr, i32)
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index e44c0d90ee..3bf0fdb6c5 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -1918,30 +1918,6 @@ void helper_vslo(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
+The VSX register array is a block of 64 128-bit registers where the first 32
+registers consist of the existing 64-bit FP registers extended to 128-bit
+using new VSR registers, and the last 32 registers are the VMX 128-bit
+registers as show below:
+
+            64-bit               64-bit
+    +--------------------+--------------------+
+    |        FP0         |                    |  VSR0
+    +--------------------+--------------------+
+    |        FP1         |                    |  VSR1
+    +--------------------+--------------------+
+    |        ...         |        ...         |  ...
+    +--------------------+--------------------+
+    |        FP30        |                    |  VSR30
+    +--------------------+--------------------+
+    |        FP31        |                    |  VSR31
+    +--------------------+--------------------+
+    |                  VMX0                   |  VSR32
+    +-----------------------------------------+
+    |                  VMX1                   |  VSR33
+    +-----------------------------------------+
+    |                  ...                    |  ...
+    +-----------------------------------------+
+    |                  VMX30                  |  VSR62
+    +-----------------------------------------+
+    |                  VMX31                  |  VSR63
+    +-----------------------------------------+
+
+In order to allow for future conversion of VSX instructions to use TCG vector
+operations, recreate the same layout using an aligned version of the existing
+vsr register array.
+
+Since the old fpr and avr register arrays are removed, the existing callers
+must also be updated to use the correct offset in the vsr register array. This
+also includes switching the relevant VMState fields over to using subarrays
+to make sure that migration is preserved.
+
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-Id: <20181217122405.18732-8-mark.cave-ayland@ilande.co.uk>
+---
+ target/ppc/cpu.h                    |  9 ++--
+ target/ppc/internal.h               | 18 ++------
+ linux-user/ppc/signal.c             | 24 +++++-----
+ target/ppc/arch_dump.c              | 12 ++---
+ target/ppc/gdbstub.c                |  8 ++--
+ target/ppc/machine.c                | 72 +++++++++++++++++++++++++++--
+ target/ppc/monitor.c                |  4 +-
+ target/ppc/translate.c              | 14 +++---
+ target/ppc/translate/dfp-impl.inc.c |  2 +-
+ target/ppc/translate/vmx-impl.inc.c |  7 ++-
+ target/ppc/translate/vsx-impl.inc.c |  4 +-
+ target/ppc/translate_init.inc.c     | 24 +++++-----
+ 12 files changed, 126 insertions(+), 72 deletions(-)
+
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 5445d4c3c1..c8f449081d 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1016,8 +1016,6 @@ struct CPUPPCState {
+ 
+     /* Floating point execution context */
+     float_status fp_status;
+-    /* floating point registers */
+-    float64 fpr[32];
+     /* floating point status and control register */
+     target_ulong fpscr;
+ 
+@@ -1067,11 +1065,10 @@ struct CPUPPCState {
+     /* Special purpose registers */
+     target_ulong spr[1024];
+     ppc_spr_t spr_cb[1024];
+-    /* Altivec registers */
+-    ppc_avr_t avr[32];
++    /* Vector status and control register */
+     uint32_t vscr;
+-    /* VSX registers */
+-    uint64_t vsr[32];
++    /* VSX registers (including FP and AVR) */
++    ppc_vsr_t vsr[64] QEMU_ALIGNED(16);
+     /* SPE registers */
+     uint64_t spe_acc;
+     uint32_t spe_fscr;
+diff --git a/target/ppc/internal.h b/target/ppc/internal.h
+index b4b1f7b3db..b77d564a65 100644
+--- a/target/ppc/internal.h
++++ b/target/ppc/internal.h
+@@ -218,24 +218,14 @@ EXTRACT_HELPER_SPLIT_3(DCMX_XV, 5, 16, 0, 1, 2, 5, 1, 6, 6);
+ 
+ static inline void getVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
+ {
+-    if (n < 32) {
+-        vsr->VsrD(0) = env->fpr[n];
+-        vsr->VsrD(1) = env->vsr[n];
+-    } else {
+-        vsr->u64[0] = env->avr[n - 32].u64[0];
+-        vsr->u64[1] = env->avr[n - 32].u64[1];
+-    }
++    vsr->VsrD(0) = env->vsr[n].u64[0];
++    vsr->VsrD(1) = env->vsr[n].u64[1];
+ }
+ 
+ static inline void putVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
+ {
+-    if (n < 32) {
+-        env->fpr[n] = vsr->VsrD(0);
+-        env->vsr[n] = vsr->VsrD(1);
+-    } else {
+-        env->avr[n - 32].u64[0] = vsr->u64[0];
+-        env->avr[n - 32].u64[1] = vsr->u64[1];
+-    }
++    env->vsr[n].u64[0] = vsr->VsrD(0);
++    env->vsr[n].u64[1] = vsr->VsrD(1);
+ }
+ 
+ void helper_compute_fprf_float16(CPUPPCState *env, float16 arg);
+diff --git a/linux-user/ppc/signal.c b/linux-user/ppc/signal.c
+index 2ae120a2bc..a053dd5b84 100644
+--- a/linux-user/ppc/signal.c
++++ b/linux-user/ppc/signal.c
+@@ -258,8 +258,8 @@ static void save_user_regs(CPUPPCState *env, struct target_mcontext *frame)
+     /* Save Altivec registers if necessary.  */
+     if (env->insns_flags & PPC_ALTIVEC) {
+         uint32_t *vrsave;
+-        for (i = 0; i < ARRAY_SIZE(env->avr); i++) {
+-            ppc_avr_t *avr = &env->avr[i];
++        for (i = 0; i < 32; i++) {
++            ppc_avr_t *avr = &env->vsr[32 + i];
+             ppc_avr_t *vreg = (ppc_avr_t *)&frame->mc_vregs.altivec[i];
+ 
+             __put_user(avr->u64[PPC_VEC_HI], &vreg->u64[0]);
+@@ -281,15 +281,15 @@ static void save_user_regs(CPUPPCState *env, struct target_mcontext *frame)
+     /* Save VSX second halves */
+     if (env->insns_flags2 & PPC2_VSX) {
+         uint64_t *vsregs = (uint64_t *)&frame->mc_vregs.altivec[34];
+-        for (i = 0; i < ARRAY_SIZE(env->vsr); i++) {
+-            __put_user(env->vsr[i], &vsregs[i]);
++        for (i = 0; i < 32; i++) {
++            __put_user(env->vsr[i].u64[1], &vsregs[i]);
+         }
+     }
+ 
+     /* Save floating point registers.  */
+     if (env->insns_flags & PPC_FLOAT) {
+-        for (i = 0; i < ARRAY_SIZE(env->fpr); i++) {
+-            __put_user(env->fpr[i], &frame->mc_fregs[i]);
++        for (i = 0; i < 32; i++) {
++            __put_user(env->vsr[i].u64[0], &frame->mc_fregs[i]);
+         }
+         __put_user((uint64_t) env->fpscr, &frame->mc_fregs[32]);
+     }
+@@ -373,8 +373,8 @@ static void restore_user_regs(CPUPPCState *env,
+ #else
+         v_regs = (ppc_avr_t *)frame->mc_vregs.altivec;
+ #endif
+-        for (i = 0; i < ARRAY_SIZE(env->avr); i++) {
+-            ppc_avr_t *avr = &env->avr[i];
++        for (i = 0; i < 32; i++) {
++            ppc_avr_t *avr = &env->vsr[32 + i];
+             ppc_avr_t *vreg = &v_regs[i];
+ 
+             __get_user(avr->u64[PPC_VEC_HI], &vreg->u64[0]);
+@@ -393,16 +393,16 @@ static void restore_user_regs(CPUPPCState *env,
+     /* Restore VSX second halves */
+     if (env->insns_flags2 & PPC2_VSX) {
+         uint64_t *vsregs = (uint64_t *)&frame->mc_vregs.altivec[34];
+-        for (i = 0; i < ARRAY_SIZE(env->vsr); i++) {
+-            __get_user(env->vsr[i], &vsregs[i]);
++        for (i = 0; i < 32; i++) {
++            __get_user(env->vsr[i].u64[1], &vsregs[i]);
+         }
+     }
+ 
+     /* Restore floating point registers.  */
+     if (env->insns_flags & PPC_FLOAT) {
+         uint64_t fpscr;
+-        for (i = 0; i < ARRAY_SIZE(env->fpr); i++) {
+-            __get_user(env->fpr[i], &frame->mc_fregs[i]);
++        for (i = 0; i < 32; i++) {
++            __get_user(env->vsr[i].u64[0], &frame->mc_fregs[i]);
+         }
+         __get_user(fpscr, &frame->mc_fregs[32]);
+         env->fpscr = (uint32_t) fpscr;
+diff --git a/target/ppc/arch_dump.c b/target/ppc/arch_dump.c
+index cc1460e4e3..c272d0d3d4 100644
+--- a/target/ppc/arch_dump.c
++++ b/target/ppc/arch_dump.c
+@@ -140,7 +140,7 @@ static void ppc_write_elf_fpregset(NoteFuncArg *arg, PowerPCCPU *cpu)
+     memset(fpregset, 0, sizeof(*fpregset));
+ 
+     for (i = 0; i < 32; i++) {
+-        fpregset->fpr[i] = cpu_to_dump64(s, cpu->env.fpr[i]);
++        fpregset->fpr[i] = cpu_to_dump64(s, cpu->env.vsr[i].u64[0]);
+     }
+     fpregset->fpscr = cpu_to_dump_reg(s, cpu->env.fpscr);
+ }
+@@ -166,11 +166,11 @@ static void ppc_write_elf_vmxregset(NoteFuncArg *arg, PowerPCCPU *cpu)
+ #endif
+ 
+         if (needs_byteswap) {
+-            vmxregset->avr[i].u64[0] = bswap64(cpu->env.avr[i].u64[1]);
+-            vmxregset->avr[i].u64[1] = bswap64(cpu->env.avr[i].u64[0]);
++            vmxregset->avr[i].u64[0] = bswap64(cpu->env.vsr[32 + i].u64[1]);
++            vmxregset->avr[i].u64[1] = bswap64(cpu->env.vsr[32 + i].u64[0]);
+         } else {
+-            vmxregset->avr[i].u64[0] = cpu->env.avr[i].u64[0];
+-            vmxregset->avr[i].u64[1] = cpu->env.avr[i].u64[1];
++            vmxregset->avr[i].u64[0] = cpu->env.vsr[32 + i].u64[0];
++            vmxregset->avr[i].u64[1] = cpu->env.vsr[32 + i].u64[1];
+         }
+     }
+     vmxregset->vscr.u32[3] = cpu_to_dump32(s, cpu->env.vscr);
+@@ -188,7 +188,7 @@ static void ppc_write_elf_vsxregset(NoteFuncArg *arg, PowerPCCPU *cpu)
+     memset(vsxregset, 0, sizeof(*vsxregset));
+ 
+     for (i = 0; i < 32; i++) {
+-        vsxregset->vsr[i] = cpu_to_dump64(s, cpu->env.vsr[i]);
++        vsxregset->vsr[i] = cpu_to_dump64(s, cpu->env.vsr[i].u64[1]);
+     }
+ }
+ 
+diff --git a/target/ppc/gdbstub.c b/target/ppc/gdbstub.c
+index b6f6693583..8c9dc284c4 100644
+--- a/target/ppc/gdbstub.c
++++ b/target/ppc/gdbstub.c
+@@ -126,7 +126,7 @@ int ppc_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
+         gdb_get_regl(mem_buf, env->gpr[n]);
+     } else if (n < 64) {
+         /* fprs */
+-        stfq_p(mem_buf, env->fpr[n-32]);
++        stfq_p(mem_buf, env->vsr[n - 32].u64[0]);
+     } else {
+         switch (n) {
+         case 64:
+@@ -178,7 +178,7 @@ int ppc_cpu_gdb_read_register_apple(CPUState *cs, uint8_t *mem_buf, int n)
+         gdb_get_reg64(mem_buf, env->gpr[n]);
+     } else if (n < 64) {
+         /* fprs */
+-        stfq_p(mem_buf, env->fpr[n-32]);
++        stfq_p(mem_buf, env->vsr[n - 32].u64[0]);
+     } else if (n < 96) {
+         /* Altivec */
+         stq_p(mem_buf, n - 64);
+@@ -234,7 +234,7 @@ int ppc_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+         env->gpr[n] = ldtul_p(mem_buf);
+     } else if (n < 64) {
+         /* fprs */
+-        env->fpr[n-32] = ldfq_p(mem_buf);
++        env->vsr[n - 32].u64[0] = ldfq_p(mem_buf);
+     } else {
+         switch (n) {
+         case 64:
+@@ -284,7 +284,7 @@ int ppc_cpu_gdb_write_register_apple(CPUState *cs, uint8_t *mem_buf, int n)
+         env->gpr[n] = ldq_p(mem_buf);
+     } else if (n < 64) {
+         /* fprs */
+-        env->fpr[n-32] = ldfq_p(mem_buf);
++        env->vsr[n - 32].u64[0] = ldfq_p(mem_buf);
+     } else {
+         switch (n) {
+         case 64 + 32:
+diff --git a/target/ppc/machine.c b/target/ppc/machine.c
+index e7b3725273..451cf376b4 100644
+--- a/target/ppc/machine.c
++++ b/target/ppc/machine.c
+@@ -45,7 +45,7 @@ static int cpu_load_old(QEMUFile *f, void *opaque, int version_id)
+             uint64_t l;
+         } u;
+         u.l = qemu_get_be64(f);
+-        env->fpr[i] = u.d;
++        env->vsr[i].u64[0] = u.d;
+     }
+     qemu_get_be32s(f, &fpscr);
+     env->fpscr = fpscr;
+@@ -138,11 +138,73 @@ static const VMStateInfo vmstate_info_avr = {
+ };
+ 
+ #define VMSTATE_AVR_ARRAY_V(_f, _s, _n, _v)                       \
+-    VMSTATE_ARRAY(_f, _s, _n, _v, vmstate_info_avr, ppc_avr_t)
++    VMSTATE_SUB_ARRAY(_f, _s, 32, _n, _v, vmstate_info_avr, ppc_avr_t)
+ 
+ #define VMSTATE_AVR_ARRAY(_f, _s, _n)                             \
+     VMSTATE_AVR_ARRAY_V(_f, _s, _n, 0)
+ 
++static int get_fpr(QEMUFile *f, void *pv, size_t size,
++                   const VMStateField *field)
++{
++    ppc_vsr_t *v = pv;
++
++    v->u64[0] = qemu_get_be64(f);
++
++    return 0;
++}
++
++static int put_fpr(QEMUFile *f, void *pv, size_t size,
++                   const VMStateField *field, QJSON *vmdesc)
++{
++    ppc_vsr_t *v = pv;
++
++    qemu_put_be64(f, v->u64[0]);
++    return 0;
++}
++
++static const VMStateInfo vmstate_info_fpr = {
++    .name = "fpr",
++    .get  = get_fpr,
++    .put  = put_fpr,
++};
++
++#define VMSTATE_FPR_ARRAY_V(_f, _s, _n, _v)                       \
++    VMSTATE_SUB_ARRAY(_f, _s, 0, _n, _v, vmstate_info_fpr, ppc_vsr_t)
++
++#define VMSTATE_FPR_ARRAY(_f, _s, _n)                             \
++    VMSTATE_FPR_ARRAY_V(_f, _s, _n, 0)
++
++static int get_vsr(QEMUFile *f, void *pv, size_t size,
++                   const VMStateField *field)
++{
++    ppc_vsr_t *v = pv;
++
++    v->u64[1] = qemu_get_be64(f);
++
++    return 0;
++}
++
++static int put_vsr(QEMUFile *f, void *pv, size_t size,
++                   const VMStateField *field, QJSON *vmdesc)
++{
++    ppc_vsr_t *v = pv;
++
++    qemu_put_be64(f, v->u64[1]);
++    return 0;
++}
++
++static const VMStateInfo vmstate_info_vsr = {
++    .name = "vsr",
++    .get  = get_vsr,
++    .put  = put_vsr,
++};
++
++#define VMSTATE_VSR_ARRAY_V(_f, _s, _n, _v)                       \
++    VMSTATE_SUB_ARRAY(_f, _s, 0, _n, _v, vmstate_info_vsr, ppc_vsr_t)
++
++#define VMSTATE_VSR_ARRAY(_f, _s, _n)                             \
++    VMSTATE_VSR_ARRAY_V(_f, _s, _n, 0)
++
+ static bool cpu_pre_2_8_migration(void *opaque, int version_id)
+ {
+     PowerPCCPU *cpu = opaque;
+@@ -354,7 +416,7 @@ static const VMStateDescription vmstate_fpu = {
+     .minimum_version_id = 1,
+     .needed = fpu_needed,
+     .fields = (VMStateField[]) {
+-        VMSTATE_FLOAT64_ARRAY(env.fpr, PowerPCCPU, 32),
++        VMSTATE_FPR_ARRAY(env.vsr, PowerPCCPU, 32),
+         VMSTATE_UINTTL(env.fpscr, PowerPCCPU),
+         VMSTATE_END_OF_LIST()
+     },
+@@ -373,7 +435,7 @@ static const VMStateDescription vmstate_altivec = {
+     .minimum_version_id = 1,
+     .needed = altivec_needed,
+     .fields = (VMStateField[]) {
+-        VMSTATE_AVR_ARRAY(env.avr, PowerPCCPU, 32),
++        VMSTATE_AVR_ARRAY(env.vsr, PowerPCCPU, 32),
+         VMSTATE_UINT32(env.vscr, PowerPCCPU),
+         VMSTATE_END_OF_LIST()
+     },
+@@ -392,7 +454,7 @@ static const VMStateDescription vmstate_vsx = {
+     .minimum_version_id = 1,
+     .needed = vsx_needed,
+     .fields = (VMStateField[]) {
+-        VMSTATE_UINT64_ARRAY(env.vsr, PowerPCCPU, 32),
++        VMSTATE_VSR_ARRAY(env.vsr, PowerPCCPU, 32),
+         VMSTATE_END_OF_LIST()
+     },
+ };
+diff --git a/target/ppc/monitor.c b/target/ppc/monitor.c
+index 14915119fc..1db9396b2e 100644
+--- a/target/ppc/monitor.c
++++ b/target/ppc/monitor.c
+@@ -123,8 +123,8 @@ int target_get_monitor_def(CPUState *cs, const char *name, uint64_t *pval)
+ 
+     /* Floating point registers */
+     if ((qemu_tolower(name[0]) == 'f') &&
+-        ppc_cpu_get_reg_num(name + 1, ARRAY_SIZE(env->fpr), &regnum)) {
+-        *pval = env->fpr[regnum];
++        ppc_cpu_get_reg_num(name + 1, 32, &regnum)) {
++        *pval = env->vsr[regnum].u64[0];
+         return 0;
+     }
+ 
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 5923c688cd..8e89aec14d 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -6657,22 +6657,22 @@ GEN_TM_PRIV_NOOP(trechkpt);
+ 
+ static inline void get_fpr(TCGv_i64 dst, int regno)
+ {
+-    tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUPPCState, fpr[regno]));
++    tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUPPCState, vsr[regno].u64[0]));
+ }
+ 
+ static inline void set_fpr(int regno, TCGv_i64 src)
+ {
+-    tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState, fpr[regno]));
++    tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState, vsr[regno].u64[0]));
+ }
+ 
+ static inline void get_avr64(TCGv_i64 dst, int regno, bool high)
+ {
+ #ifdef HOST_WORDS_BIGENDIAN
+     tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUPPCState,
+-                                          avr[regno].u64[(high ? 0 : 1)]));
++                                          vsr[32 + regno].u64[(high ? 0 : 1)]));
+ #else
+     tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUPPCState,
+-                                          avr[regno].u64[(high ? 1 : 0)]));
++                                          vsr[32 + regno].u64[(high ? 1 : 0)]));
  #endif
  }
  
--/* Experimental testing shows that hardware masks the immediate.  */
--#define _SPLAT_MASKED(element) (splat & (ARRAY_SIZE(r->element) - 1))
--#if defined(HOST_WORDS_BIGENDIAN)
--#define SPLAT_ELEMENT(element) _SPLAT_MASKED(element)
--#else
--#define SPLAT_ELEMENT(element)                                  \
--    (ARRAY_SIZE(r->element) - 1 - _SPLAT_MASKED(element))
--#endif
--#define VSPLT(suffix, element)                                          \
--    void helper_vsplt##suffix(ppc_avr_t *r, ppc_avr_t *b, uint32_t splat) \
--    {                                                                   \
--        uint32_t s = b->element[SPLAT_ELEMENT(element)];                \
--        int i;                                                          \
--                                                                        \
--        for (i = 0; i < ARRAY_SIZE(r->element); i++) {                  \
--            r->element[i] = s;                                          \
--        }                                                               \
--    }
--VSPLT(b, u8)
--VSPLT(h, u16)
--VSPLT(w, u32)
--#undef VSPLT
--#undef SPLAT_ELEMENT
--#undef _SPLAT_MASKED
- #if defined(HOST_WORDS_BIGENDIAN)
- #define VINSERT(suffix, element)                                            \
-     void helper_vinsert##suffix(ppc_avr_t *r, ppc_avr_t *b, uint32_t index) \
+@@ -6680,10 +6680,10 @@ static inline void set_avr64(int regno, TCGv_i64 src, bool high)
+ {
+ #ifdef HOST_WORDS_BIGENDIAN
+     tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState,
+-                                          avr[regno].u64[(high ? 0 : 1)]));
++                                          vsr[32 + regno].u64[(high ? 0 : 1)]));
+ #else
+     tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState,
+-                                          avr[regno].u64[(high ? 1 : 0)]));
++                                          vsr[32 + regno].u64[(high ? 1 : 0)]));
+ #endif
+ }
+ 
+@@ -7434,7 +7434,7 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
+             if ((i & (RFPL - 1)) == 0) {
+                 cpu_fprintf(f, "FPR%02d", i);
+             }
+-            cpu_fprintf(f, " %016" PRIx64, *((uint64_t *)&env->fpr[i]));
++            cpu_fprintf(f, " %016" PRIx64, *((uint64_t *)&env->vsr[i].u64[0]));
+             if ((i & (RFPL - 1)) == (RFPL - 1)) {
+                 cpu_fprintf(f, "\n");
+             }
+diff --git a/target/ppc/translate/dfp-impl.inc.c b/target/ppc/translate/dfp-impl.inc.c
+index 634ef73b8a..6c556dc2e1 100644
+--- a/target/ppc/translate/dfp-impl.inc.c
++++ b/target/ppc/translate/dfp-impl.inc.c
+@@ -3,7 +3,7 @@
+ static inline TCGv_ptr gen_fprp_ptr(int reg)
+ {
+     TCGv_ptr r = tcg_temp_new_ptr();
+-    tcg_gen_addi_ptr(r, cpu_env, offsetof(CPUPPCState, fpr[reg]));
++    tcg_gen_addi_ptr(r, cpu_env, offsetof(CPUPPCState, vsr[reg].u64[0]));
+     return r;
+ }
+ 
 diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index be638cdb1a..529ae0e5f5 100644
+index 30046c6e31..75d2b2280f 100644
 --- a/target/ppc/translate/vmx-impl.inc.c
 +++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -814,24 +814,31 @@ GEN_VXFORM_NOA(vprtybw, 1, 24);
- GEN_VXFORM_NOA(vprtybd, 1, 24);
- GEN_VXFORM_NOA(vprtybq, 1, 24);
+@@ -10,10 +10,15 @@
+ static inline TCGv_ptr gen_avr_ptr(int reg)
+ {
+     TCGv_ptr r = tcg_temp_new_ptr();
+-    tcg_gen_addi_ptr(r, cpu_env, offsetof(CPUPPCState, avr[reg]));
++    tcg_gen_addi_ptr(r, cpu_env, offsetof(CPUPPCState, vsr[32 + reg].u64[0]));
+     return r;
+ }
  
--#define GEN_VXFORM_UIMM(name, opc2, opc3)                               \
--static void glue(gen_, name)(DisasContext *ctx)                                 \
--    {                                                                   \
--        TCGv_ptr rb, rd;                                                \
--        TCGv_i32 uimm;                                                  \
--        if (unlikely(!ctx->altivec_enabled)) {                          \
--            gen_exception(ctx, POWERPC_EXCP_VPU);                       \
--            return;                                                     \
--        }                                                               \
--        uimm = tcg_const_i32(UIMM5(ctx->opcode));                       \
--        rb = gen_avr_ptr(rB(ctx->opcode));                              \
--        rd = gen_avr_ptr(rD(ctx->opcode));                              \
--        gen_helper_##name (rd, rb, uimm);                               \
--        tcg_temp_free_i32(uimm);                                        \
--        tcg_temp_free_ptr(rb);                                          \
--        tcg_temp_free_ptr(rd);                                          \
-+static void gen_vsplt(DisasContext *ctx, int vece)
++static inline long avr64_offset(int reg, bool high)
 +{
-+    int uimm, dofs, bofs;
-+
-+    if (unlikely(!ctx->altivec_enabled)) {
-+        gen_exception(ctx, POWERPC_EXCP_VPU);
-+        return;
-     }
- 
-+    uimm = UIMM5(ctx->opcode);
-+    bofs = avr64_offset(rB(ctx->opcode), true);
-+    dofs = avr64_offset(rD(ctx->opcode), true);
-+
-+    /* Experimental testing shows that hardware masks the immediate.  */
-+    bofs += (uimm << vece) & 15;
-+#ifndef HOST_WORDS_BIGENDIAN
-+    bofs ^= 15;
-+#endif
-+
-+    tcg_gen_gvec_dup_mem(vece, dofs, bofs, 16, 16);
++    return offsetof(CPUPPCState, vsr[32 + reg].u64[(high ? 0 : 1)]);
 +}
 +
-+#define GEN_VXFORM_VSPLT(name, vece, opc2, opc3) \
-+static void glue(gen_, name)(DisasContext *ctx) { gen_vsplt(ctx, vece); }
-+
- #define GEN_VXFORM_UIMM_ENV(name, opc2, opc3)                           \
- static void glue(gen_, name)(DisasContext *ctx)                         \
-     {                                                                   \
-@@ -873,9 +880,9 @@ static void glue(gen_, name)(DisasContext *ctx)                         \
-         tcg_temp_free_ptr(rd);                                          \
-     }
+ #define GEN_VR_LDX(name, opc2, opc3)                                          \
+ static void glue(gen_, name)(DisasContext *ctx)                                       \
+ {                                                                             \
+diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
+index 20e1fd9324..1608ad48b1 100644
+--- a/target/ppc/translate/vsx-impl.inc.c
++++ b/target/ppc/translate/vsx-impl.inc.c
+@@ -2,12 +2,12 @@
  
--GEN_VXFORM_UIMM(vspltb, 6, 8);
--GEN_VXFORM_UIMM(vsplth, 6, 9);
--GEN_VXFORM_UIMM(vspltw, 6, 10);
-+GEN_VXFORM_VSPLT(vspltb, MO_8, 6, 8);
-+GEN_VXFORM_VSPLT(vsplth, MO_16, 6, 9);
-+GEN_VXFORM_VSPLT(vspltw, MO_32, 6, 10);
- GEN_VXFORM_UIMM_SPLAT(vextractub, 6, 8, 15);
- GEN_VXFORM_UIMM_SPLAT(vextractuh, 6, 9, 14);
- GEN_VXFORM_UIMM_SPLAT(vextractuw, 6, 10, 12);
+ static inline void get_vsr(TCGv_i64 dst, int n)
+ {
+-    tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUPPCState, vsr[n]));
++    tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUPPCState, vsr[n].u64[1]));
+ }
+ 
+ static inline void set_vsr(int n, TCGv_i64 src)
+ {
+-    tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState, vsr[n]));
++    tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState, vsr[n].u64[1]));
+ }
+ 
+ static inline void get_cpu_vsrh(TCGv_i64 dst, int n)
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+index 168d0cec28..b83097141c 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -9486,7 +9486,7 @@ static bool avr_need_swap(CPUPPCState *env)
+ static int gdb_get_float_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+ {
+     if (n < 32) {
+-        stfq_p(mem_buf, env->fpr[n]);
++        stfq_p(mem_buf, env->vsr[n].u64[0]);
+         ppc_maybe_bswap_register(env, mem_buf, 8);
+         return 8;
+     }
+@@ -9502,7 +9502,7 @@ static int gdb_set_float_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+ {
+     if (n < 32) {
+         ppc_maybe_bswap_register(env, mem_buf, 8);
+-        env->fpr[n] = ldfq_p(mem_buf);
++        env->vsr[n].u64[0] = ldfq_p(mem_buf);
+         return 8;
+     }
+     if (n == 32) {
+@@ -9517,11 +9517,11 @@ static int gdb_get_avr_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+ {
+     if (n < 32) {
+         if (!avr_need_swap(env)) {
+-            stq_p(mem_buf, env->avr[n].u64[0]);
+-            stq_p(mem_buf+8, env->avr[n].u64[1]);
++            stq_p(mem_buf, env->vsr[32 + n].u64[0]);
++            stq_p(mem_buf + 8, env->vsr[32 + n].u64[1]);
+         } else {
+-            stq_p(mem_buf, env->avr[n].u64[1]);
+-            stq_p(mem_buf+8, env->avr[n].u64[0]);
++            stq_p(mem_buf, env->vsr[32 + n].u64[1]);
++            stq_p(mem_buf + 8, env->vsr[32 + n].u64[0]);
+         }
+         ppc_maybe_bswap_register(env, mem_buf, 8);
+         ppc_maybe_bswap_register(env, mem_buf + 8, 8);
+@@ -9546,11 +9546,11 @@ static int gdb_set_avr_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+         ppc_maybe_bswap_register(env, mem_buf, 8);
+         ppc_maybe_bswap_register(env, mem_buf + 8, 8);
+         if (!avr_need_swap(env)) {
+-            env->avr[n].u64[0] = ldq_p(mem_buf);
+-            env->avr[n].u64[1] = ldq_p(mem_buf+8);
++            env->vsr[32 + n].u64[0] = ldq_p(mem_buf);
++            env->vsr[32 + n].u64[1] = ldq_p(mem_buf + 8);
+         } else {
+-            env->avr[n].u64[1] = ldq_p(mem_buf);
+-            env->avr[n].u64[0] = ldq_p(mem_buf+8);
++            env->vsr[32 + n].u64[1] = ldq_p(mem_buf);
++            env->vsr[32 + n].u64[0] = ldq_p(mem_buf + 8);
+         }
+         return 16;
+     }
+@@ -9623,7 +9623,7 @@ static int gdb_set_spe_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+ static int gdb_get_vsx_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+ {
+     if (n < 32) {
+-        stq_p(mem_buf, env->vsr[n]);
++        stq_p(mem_buf, env->vsr[n].u64[1]);
+         ppc_maybe_bswap_register(env, mem_buf, 8);
+         return 8;
+     }
+@@ -9634,7 +9634,7 @@ static int gdb_set_vsx_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+ {
+     if (n < 32) {
+         ppc_maybe_bswap_register(env, mem_buf, 8);
+-        env->vsr[n] = ldq_p(mem_buf);
++        env->vsr[n].u64[1] = ldq_p(mem_buf);
+         return 8;
+     }
+     return 0;
 -- 
 2.17.2
