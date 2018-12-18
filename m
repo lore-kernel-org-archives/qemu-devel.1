@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZHyL-00058e-RZ
+	(envelope-from <mst@redhat.com>) id 1gZHyI-00056I-9W
 	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 11:11:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZHyG-0001tx-4m
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 11:11:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37460)
+	(envelope-from <mst@redhat.com>) id 1gZHyA-0001mX-Nl
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 11:11:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33946)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZHyF-0001sS-V7
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 11:11:48 -0500
-Date: Tue, 18 Dec 2018 11:11:46 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZHyA-0001ly-Bz
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 11:11:42 -0500
+Date: Tue, 18 Dec 2018 11:11:36 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181218161008.3882-10-mst@redhat.com>
+Message-ID: <20181218161008.3882-8-mst@redhat.com>
 References: <20181218161008.3882-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <20181218161008.3882-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v2 09/30] hw/pci-bridge: Fix invalid free()
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 07/30] hw/smbios: Remove "smbios_ipmi.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +28,108 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Matthias Weckbecker <matthias@weckbecker.name>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Corey Minyard <cminyard@mvista.com>, Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Corey Minyard <minyard@acm.org>
 
-From: Matthias Weckbecker <matthias@weckbecker.name>
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-When loadvm'ing a *running* snapshot qemu crashes due to an invalid
-free. It's fortunately caught early by glibc heap memory corruption
-protection and qemu gets killed with SIGABRT.
+This header only declare a single function: smbios_build_type_38_table().
+We already have a header that declares such functions: "smbios_build.h".
+Move the declaration and remove the header.
 
-Steps to reproduce:
-
-1) Create VM (e.g w/ virsh define)
-2) Start the VM and take a snapshot while it's running and having a
-   PCI bridge attached
-3) Destroy the VM and revert the running snapshot.
-
-This commit fixes the issue.
-
-Signed-off-by: Matthias Weckbecker <matthias@weckbecker.name>
+Reviewed-by: Corey Minyard <cminyard@mvista.com>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/pci/pci_bridge.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/smbios/smbios_build.h        |  4 ++++
+ hw/smbios/smbios_ipmi.h         | 15 ---------------
+ hw/smbios/smbios.c              |  1 -
+ hw/smbios/smbios_type_38-stub.c |  2 +-
+ hw/smbios/smbios_type_38.c      |  1 -
+ 5 files changed, 5 insertions(+), 18 deletions(-)
+ delete mode 100644 hw/smbios/smbios_ipmi.h
 
-diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
-index ee9dff2d3a..b9143ac88b 100644
---- a/hw/pci/pci_bridge.c
-+++ b/hw/pci/pci_bridge.c
-@@ -241,9 +241,9 @@ void pci_bridge_update_mappings(PCIBridge *br)
-      * while another accesses an unaffected region. */
-     memory_region_transaction_begin();
-     pci_bridge_region_del(br, br->windows);
-+    pci_bridge_region_cleanup(br, w);
-     br->windows = pci_bridge_region_init(br);
-     memory_region_transaction_commit();
--    pci_bridge_region_cleanup(br, w);
- }
- 
- /* default write_config function for PCI-to-PCI bridge */
--- 
+diff --git a/hw/smbios/smbios_build.h b/hw/smbios/smbios_build.h
+index 93b360d520..56b5a1e3f3 100644
+--- a/hw/smbios/smbios_build.h
++++ b/hw/smbios/smbios_build.h
+@@ -3,6 +3,7 @@
+  *
+  * Copyright (C) 2009 Hewlett-Packard Development Company, L.P.
+  * Copyright (C) 2013 Red Hat, Inc.
++ * Copyright (c) 2015,2016 Corey Minyard, MontaVista Software, LLC
+  *
+  * Authors:
+  *  Alex Williamson <alex.williamson@hp.com>
+@@ -96,4 +97,7 @@ extern unsigned smbios_table_cnt;
+         smbios_table_cnt++;                                             =
+  \
+     } while (0)
+=20
++/* IPMI SMBIOS firmware handling */
++void smbios_build_type_38_table(void);
++
+ #endif /* QEMU_SMBIOS_BUILD_H */
+diff --git a/hw/smbios/smbios_ipmi.h b/hw/smbios/smbios_ipmi.h
+deleted file mode 100644
+index 1c9aae38f2..0000000000
+--- a/hw/smbios/smbios_ipmi.h
++++ /dev/null
+@@ -1,15 +0,0 @@
+-/*
+- * IPMI SMBIOS firmware handling
+- *
+- * Copyright (c) 2015,2016 Corey Minyard, MontaVista Software, LLC
+- *
+- * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+- * See the COPYING file in the top-level directory.
+- */
+-
+-#ifndef QEMU_SMBIOS_IPMI_H
+-#define QEMU_SMBIOS_IPMI_H
+-
+-void smbios_build_type_38_table(void);
+-
+-#endif /* QEMU_SMBIOS_IPMI_H */
+diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
+index 6fe5be3586..4bff9b5ea4 100644
+--- a/hw/smbios/smbios.c
++++ b/hw/smbios/smbios.c
+@@ -28,7 +28,6 @@
+ #include "hw/loader.h"
+ #include "exec/cpu-common.h"
+ #include "smbios_build.h"
+-#include "smbios_ipmi.h"
+=20
+ /* legacy structures and constants for <=3D 2.0 machines */
+ struct smbios_header {
+diff --git a/hw/smbios/smbios_type_38-stub.c b/hw/smbios/smbios_type_38-s=
+tub.c
+index fc4516bc8a..14b53d004b 100644
+--- a/hw/smbios/smbios_type_38-stub.c
++++ b/hw/smbios/smbios_type_38-stub.c
+@@ -8,7 +8,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
+-#include "smbios_ipmi.h"
++#include "smbios_build.h"
+=20
+ void smbios_build_type_38_table(void)
+ {
+diff --git a/hw/smbios/smbios_type_38.c b/hw/smbios/smbios_type_38.c
+index d84e87d608..a1ad28d059 100644
+--- a/hw/smbios/smbios_type_38.c
++++ b/hw/smbios/smbios_type_38.c
+@@ -12,7 +12,6 @@
+ #include "hw/smbios/smbios.h"
+ #include "qemu/error-report.h"
+ #include "smbios_build.h"
+-#include "smbios_ipmi.h"
+=20
+ /* SMBIOS type 38 - IPMI */
+ struct smbios_type_38 {
+--=20
 MST
