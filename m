@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gZAZb-00020e-Ne
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:17:53 -0500
+	(envelope-from <thuth@redhat.com>) id 1gZAjQ-00080p-VP
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:28:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gZAZX-0001vL-UQ
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:17:51 -0500
-Received: from mga07.intel.com ([134.134.136.100]:24329)
+	(envelope-from <thuth@redhat.com>) id 1gZAjL-000204-3k
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:28:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47240)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1gZAZW-0001tW-5k
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:17:47 -0500
-From: Zhang Yi <yi.z.zhang@linux.intel.com>
-Date: Tue, 18 Dec 2018 16:17:39 +0800
-Message-Id: <5eb87eb9a389242772375dd52bd97c17564a0829.1545120100.git.yi.z.zhang@linux.intel.com>
-In-Reply-To: <cover.1545120100.git.yi.z.zhang@linux.intel.com>
-References: <cover.1545120100.git.yi.z.zhang@linux.intel.com>
-Subject: [Qemu-devel]  [PATCH V7 6/6] hostmem-file: add 'sync' option
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gZAjJ-0001yg-3K
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:27:54 -0500
+References: <20181213184340.24037-1-armbru@redhat.com>
+	<20181213184340.24037-33-armbru@redhat.com>
+	<fde45953-c713-daf7-f3ce-47d63b050f7a@redhat.com>
+	<87k1k8j71u.fsf@dusky.pond.sub.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <dabc589c-0206-708c-0f70-b524f23500a9@redhat.com>
+Date: Tue, 18 Dec 2018 09:27:41 +0100
+MIME-Version: 1.0
+In-Reply-To: <87k1k8j71u.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] Regression test with --disable options (was: qapi: add
+ conditions to REPLICATION type/commands on the schema)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,211 +31,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, peter.maydell@linaro.org, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, imammedo@redhat.com
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com, crosthwaite.peter@gmail.com, richard.henderson@linaro.org, xiaoguangrong.eric@gmail.com, Zhang Yi <yi.z.zhang@linux.intel.com>
+To: Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <fam@euphon.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-This option controls whether QEMU mmap(2) the memory backend file with
-MAP_SYNC flag, which could consistent filesystem metadata for each guest
-write, if MAP_SYNC flag is supported by the host kernel(Linux kernel 4.15
-and later) and the backend is a file supporting DAX (e.g., file on ext4/xfs
-file system mounted with '-o dax').
+On 2018-12-17 20:18, Markus Armbruster wrote:
+> Thomas Huth <thuth@redhat.com> writes:
+>=20
+>> On 2018-12-13 19:43, Markus Armbruster wrote:
+>>> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>>
+>>> Add #if defined(CONFIG_REPLICATION) in generated code, and adjust the
+>>> code accordingly.
+>>>
+>>> Made conditional:
+>>>
+>>> * xen-set-replication, query-xen-replication-status,
+>>>   xen-colo-do-checkpoint
+>>>
+>>>   Before the patch, we first register the commands unconditionally in
+>>>   generated code (requires a stub), then conditionally unregister in
+>>>   qmp_unregister_commands_hack().
+>>>
+>>>   Afterwards, we register only when CONFIG_REPLICATION.  The command
+>>>   fails exactly the same, with CommandNotFound.
+>>>
+>>>   Improvement, because now query-qmp-schema is accurate, and we're on=
+e
+>>>   step closer to killing qmp_unregister_commands_hack().
+>>>
+>>> * enum BlockdevDriver value "replication" in command blockdev-add
+>>>
+>>> * BlockdevOptions variant @replication
+>>>
+>>> and related structures.
+>>>
+>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>>> Message-Id: <20181213123724.4866-23-marcandre.lureau@redhat.com>
+>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>> ---
+>>>  migration/colo.c     | 16 ++++------------
+>>>  monitor.c            |  5 -----
+>>>  qapi/block-core.json | 13 +++++++++----
+>>>  qapi/migration.json  | 12 ++++++++----
+>>>  4 files changed, 21 insertions(+), 25 deletions(-)
+>>
+>> I think this might have broken compilation with --disable-replication:
+>>
+>>  https://gitlab.com/huth/qemu/-/jobs/135648240
+>=20
+> Reproduced.
+>=20
+>> Any ideas how to fix it?
+>=20
+> The problem is fairly obvious, repair less so.  Sorry this escaped
+> review.
 
-It can take one of following values:
- - on:  try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
-        'share=off' or 'pmem!=on', QEMU will abort
- - off: never pass MAP_SYNC to mmap(2)
- - auto (default): if MAP_SYNC is supported and 'share=on' 'pmem=on', work as
-        if 'sync=on'; otherwise, work as if 'sync=off'
+This is the second time in 2 months that compilation with
+--disable-replication broke. So instead of relying on reviews here, I
+think we should catch this with Patchew / some docker based compilation
+test instead that configures the build process with everything disabled,
+e.g.:
 
-Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
----
- backends/hostmem-file.c | 39 +++++++++++++++++++++++++++++++++++++++
- docs/nvdimm.txt         | 22 +++++++++++++++++++++-
- include/exec/memory.h   |  8 ++++++++
- qemu-options.hx         | 22 +++++++++++++++++++++-
- 4 files changed, 89 insertions(+), 2 deletions(-)
+ ./configure --enable-werror --disable-rdma --disable-slirp \
+   --disable-curl --disable-capstone --disable-live-block-migration \
+   --disable-glusterfs --disable-replication --disable-coroutine-pool \
+   --disable-smartcard --disable-guest-agent --disable-curses \
+   --disable-libxml2 --disable-tpm --disable-qom-cast-debug \
+   --disable-spice --disable-vhost-vsock  --disable-vhost-net \
+   --disable-vhost-crypto --disable-vhost-user ...
 
-diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-index 0dd7a90..73cf181 100644
---- a/backends/hostmem-file.c
-+++ b/backends/hostmem-file.c
-@@ -16,6 +16,7 @@
- #include "sysemu/hostmem.h"
- #include "sysemu/sysemu.h"
- #include "qom/object_interfaces.h"
-+#include "qapi/qapi-visit.h"
- 
- /* hostmem-file.c */
- /**
-@@ -36,6 +37,7 @@ struct HostMemoryBackendFile {
-     uint64_t align;
-     bool discard_data;
-     bool is_pmem;
-+    OnOffAuto sync;
- };
- 
- static void
-@@ -62,6 +64,7 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
-                                  path,
-                                  backend->size, fb->align,
-                                  (backend->share ? RAM_SHARED : 0) |
-+                                 qemu_ram_sync_flags(fb->sync) |
-                                  (fb->is_pmem ? RAM_PMEM : 0),
-                                  fb->mem_path, errp);
-         g_free(path);
-@@ -136,6 +139,39 @@ static void file_memory_backend_set_align(Object *o, Visitor *v,
-     error_propagate(errp, local_err);
- }
- 
-+static void file_memory_backend_get_sync(
-+    Object *obj, Visitor *v, const char *name, void *opaque, Error **errp)
-+{
-+    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(obj);
-+    OnOffAuto value = fb->sync;
-+
-+    visit_type_OnOffAuto(v, name, &value, errp);
-+}
-+
-+static void file_memory_backend_set_sync(
-+    Object *obj, Visitor *v, const char *name, void *opaque, Error **errp)
-+{
-+    HostMemoryBackend *backend = MEMORY_BACKEND(obj);
-+    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(obj);
-+    Error *local_err = NULL;
-+    OnOffAuto value;
-+
-+    if (host_memory_backend_mr_inited(backend)) {
-+        error_setg(&local_err, "cannot change property '%s' of %s",
-+                   name, object_get_typename(obj));
-+        goto out;
-+    }
-+
-+    visit_type_OnOffAuto(v, name, &value, &local_err);
-+    if (local_err) {
-+        goto out;
-+    }
-+    fb->sync = value;
-+
-+ out:
-+    error_propagate(errp, local_err);
-+}
-+
- static bool file_memory_backend_get_pmem(Object *o, Error **errp)
- {
-     return MEMORY_BACKEND_FILE(o)->is_pmem;
-@@ -203,6 +239,9 @@ file_backend_class_init(ObjectClass *oc, void *data)
-     object_class_property_add_bool(oc, "pmem",
-         file_memory_backend_get_pmem, file_memory_backend_set_pmem,
-         &error_abort);
-+    object_class_property_add(oc, "sync", "OnOffAuto",
-+        file_memory_backend_get_sync, file_memory_backend_set_sync,
-+        NULL, NULL, &error_abort);
- }
- 
- static void file_backend_instance_finalize(Object *o)
-diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
-index 5f158a6..d86a270 100644
---- a/docs/nvdimm.txt
-+++ b/docs/nvdimm.txt
-@@ -142,11 +142,31 @@ backend of vNVDIMM:
- Guest Data Persistence
- ----------------------
- 
-+vNVDIMM is designed and implemented to guarantee the guest data
-+persistence on the backends even on the host crash and power
-+failures. However, there are still some requirements and limitations
-+as explained below.
-+
- Though QEMU supports multiple types of vNVDIMM backends on Linux,
--currently the only one that can guarantee the guest write persistence
-+if MAP_SYNC is not supported by the host kernel and the backends,
-+the only backend that can guarantee the guest write persistence
- is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
- which all guest access do not involve any host-side kernel cache.
- 
-+mmap(2) flag MAP_SYNC is added since Linux kernel 4.15. On such
-+systems, QEMU can mmap(2) the backend with MAP_SYNC, which could
-+consistent filesystem metadata for each guest write. Besides the host
-+kernel support, enabling MAP_SYNC in QEMU also requires:
-+
-+ - the backend is a file supporting DAX, e.g., a file on an ext4 or
-+   xfs file system mounted with '-o dax',
-+
-+ - 'sync' option of memory-backend-file is not 'off', and
-+
-+ - 'share' option of memory-backend-file is 'on'.
-+
-+ - 'pmem' option of memory-backend-file is 'on'
-+
- When using other types of backends, it's suggested to set 'unarmed'
- option of '-device nvdimm' to 'on', which sets the unarmed flag of the
- guest NVDIMM region mapping structure.  This unarmed flag indicates
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index c74c467..b398abb 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -26,6 +26,7 @@
- #include "qom/object.h"
- #include "qemu/rcu.h"
- #include "hw/qdev-core.h"
-+#include "qapi/error.h"
- 
- #define RAM_ADDR_INVALID (~(ram_addr_t)0)
- 
-@@ -136,6 +137,13 @@ typedef struct IOMMUNotifier IOMMUNotifier;
- 
- #define RAM_SYNC (RAM_SYNC_ON_OFF_AUTO_ON | RAM_SYNC_ON_OFF_AUTO_AUTO)
- 
-+static inline uint64_t qemu_ram_sync_flags(OnOffAuto v)
-+{
-+    return v == ON_OFF_AUTO_OFF ? RAM_SYNC_ON_OFF_AUTO_OFF :
-+           v == ON_OFF_AUTO_ON ? RAM_SYNC_ON_OFF_AUTO_ON :
-+           RAM_SYNC_ON_OFF_AUTO_AUTO;
-+}
-+
- static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
-                                        IOMMUNotifierFlag flags,
-                                        hwaddr start, hwaddr end,
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 08f8516..624f634 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3928,7 +3928,7 @@ property must be set.  These objects are placed in the
- 
- @table @option
- 
--@item -object memory-backend-file,id=@var{id},size=@var{size},mem-path=@var{dir},share=@var{on|off},discard-data=@var{on|off},merge=@var{on|off},dump=@var{on|off},prealloc=@var{on|off},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave},align=@var{align}
-+@item -object memory-backend-file,id=@var{id},size=@var{size},mem-path=@var{dir},share=@var{on|off},discard-data=@var{on|off},merge=@var{on|off},dump=@var{on|off},prealloc=@var{on|off},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave},align=@var{align},sync=@var{on|off|auto}
- 
- Creates a memory file backend object, which can be used to back
- the guest RAM with huge pages.
-@@ -4003,6 +4003,26 @@ If @option{pmem} is set to 'on', QEMU will take necessary operations to
- guarantee the persistence of its own writes to @option{mem-path}
- (e.g. in vNVDIMM label emulation and live migration).
- 
-+The @option{sync} option specifies whether QEMU mmap(2) @option{mem-path}
-+with MAP_SYNC flag, which can guarantee the guest write persistence to
-+@option{mem-path} even on the host crash and power failures. MAP_SYNC
-+requires supports from both the host kernel (since Linux kernel 4.15)
-+and @option{mem-path} (only files supporting DAX). It can take one of
-+following values:
-+
-+@table @option
-+@item @var{on}
-+try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
-+@option{share}=@var{off}, @option{pmem}=@var{off} QEMU will abort
-+
-+@item @var{off}
-+never pass MAP_SYNC to mmap(2)
-+
-+@item @var{auto} (default)
-+if MAP_SYNC is supported and @option{share}=@var{on}, @option{pmem}=@var{on}
-+work as if @option{sync}=@var{on}; otherwise, work as if @option{sync}=@var{off}
-+@end table
-+
- @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},share=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
- 
- Creates a memory backend object, which can be used to back the guest RAM.
--- 
-2.7.4
+(I'm still one of those docker agnostics ... so if someone wants to come
+up with a patch, I'd be very glad ... otherwise it'll take some time
+'til I figured it out how to add a docker based test for this...)
+
+ Thanks,
+  Thomas
