@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36438)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <smarkovic@wavecomp.com>) id 1gZGOK-0001y2-1y
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:30:42 -0500
+	(envelope-from <mst@redhat.com>) id 1gZGPZ-0002vb-GZ
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:31:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <smarkovic@wavecomp.com>) id 1gZGOE-0001gY-Mz
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:30:35 -0500
-Received: from mail-eopbgr740134.outbound.protection.outlook.com
-	([40.107.74.134]:31684
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <smarkovic@wavecomp.com>)
-	id 1gZGOE-0001dh-5j
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:30:30 -0500
-From: Stefan Markovic <smarkovic@wavecomp.com>
-Date: Tue, 18 Dec 2018 14:30:26 +0000
-Message-ID: <f673861b-dd65-080a-1105-d6afbcb4e6cc@wavecomp.com>
-References: <20181217200444.14812-1-aleksandar.markovic@rt-rk.com>
-	<20181217200444.14812-4-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <20181217200444.14812-4-aleksandar.markovic@rt-rk.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CE534A2AFB68B043877224DBB56EF4FD@namprd22.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <mst@redhat.com>) id 1gZGPV-0002Xi-Iy
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:31:53 -0500
+Date: Tue, 18 Dec 2018 09:31:00 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181218092648-mutt-send-email-mst@kernel.org>
+References: <20181218110333.22558-1-philmd@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 3/6] target/mips: MXU: Improve textual
- description
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181218110333.22558-1-philmd@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] Fix strncpy() warnings for GCC8 new
+ -Wstringop-truncation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,104 +24,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jancraig@amazon.com" <jancraig@amazon.com>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Ben Pye <ben@curlybracket.co.uk>, Stefan Weil <sw@weilnetz.de>, Howard Spoelstra <hsp.cat7@gmail.com>, Jeff Cody <jcody@redhat.com>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Thomas Huth <thuth@redhat.com>, Liu Yuan <namei.unix@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, 1803872@bugs.launchpad.net, Juan Quintela <quintela@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-DQpPbiAxNy4xMi4xOC4gMjE6MDQsIEFsZWtzYW5kYXIgTWFya292aWMgd3JvdGU6DQo+IEZyb206
-IEFsZWtzYW5kYXIgTWFya292aWMgPGFtYXJrb3ZpY0B3YXZlY29tcC5jb20+DQo+DQo+IEltcHJv
-dmUgdGV4dHVhbCBkZXNjcmlwdGlvbiBvZiBNWFUgZXh0ZW5zaW9uLiBUaGVzZSBhcmUgbW9zdGx5
-DQo+IGNvbW1lbnQgZm9ybWF0dGluZyBjaGFuZ2VzLg0KPg0KPiBTaWduZWQtb2ZmLWJ5OiBBbGVr
-c2FuZGFyIE1hcmtvdmljIDxhbWFya292aWNAd2F2ZWNvbXAuY29tPg0KPiAtLS0NCj4gICB0YXJn
-ZXQvbWlwcy90cmFuc2xhdGUuYyB8IDc0ICsrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0t
-LS0tLS0tLS0tDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDQ0IGluc2VydGlvbnMoKyksIDMwIGRlbGV0
-aW9ucygtKQ0KDQoNClJldmlld2VkLWJ5OiBTdGVmYW4gTWFya292aWMgPHNtYXJrb3ZpY0B3YXZl
-Y29tcC5jb20+DQoNCg0KPiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L21pcHMvdHJhbnNsYXRlLmMgYi90
-YXJnZXQvbWlwcy90cmFuc2xhdGUuYw0KPiBpbmRleCA3NGQxNmNlNTJlLi5lM2E1YTczZTU5IDEw
-MDY0NA0KPiAtLS0gYS90YXJnZXQvbWlwcy90cmFuc2xhdGUuYw0KPiArKysgYi90YXJnZXQvbWlw
-cy90cmFuc2xhdGUuYw0KPiBAQCAtMTM5OSwxMCArMTM5OSwxMiBAQCBlbnVtIHsNCj4gICANCj4g
-ICANCj4gICAvKg0KPiAtICogICAgQU4gT1ZFUlZJRVcgT0YgTVhVIEVYVEVOU0lPTiBJTlNUUlVD
-VElPTiBTRVQNCj4gLSAqICAgID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09DQo+ICAgICoNCj4gLSAqIE1YVSAoZnVsbCBuYW1lOiBNSVBTIGVYdGVuc2lvbi9lbmhh
-bmNlZCBVbml0KSBpcyBhbiBTSU1EIGV4dGVuc2lvbiBvZiBNSVBTMzINCj4gKyAqICAgICAgIEFO
-IE9WRVJWSUVXIE9GIE1YVSBFWFRFTlNJT04gSU5TVFJVQ1RJT04gU0VUDQo+ICsgKiAgICAgICA9
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KPiArICoNCj4gKyAq
-DQo+ICsgKiBNWFUgKGZ1bGwgbmFtZTogTUlQUyBlWHRlbnNpb24vZW5oYW5jZWQgVW5pdCkgaXMg
-YSBTSU1EIGV4dGVuc2lvbiBvZiBNSVBTMzINCj4gICAgKiBpbnN0cnVjdGlvbnMgc2V0LiBJdCBp
-cyBkZXNpZ25lZCB0byBmaXQgdGhlIG5lZWRzIG9mIHNpZ25hbCwgZ3JhcGhpY2FsIGFuZA0KPiAg
-ICAqIHZpZGVvIHByb2Nlc3NpbmcgYXBwbGljYXRpb25zLiBNWFUgaW5zdHJ1Y3Rpb24gc2V0IGlz
-IHVzZWQgaW4gWGJ1cnN0IGZhbWlseQ0KPiAgICAqIG9mIG1pY3JvcHJvY2Vzc29ycyBieSBJbmdl
-bmljLg0KPiBAQCAtMTQxMCwzOSArMTQxMiwzMSBAQCBlbnVtIHsNCj4gICAgKiBNWFUgdW5pdCBj
-b250YWlucyAxNyByZWdpc3RlcnMgY2FsbGVkIFgwLVgxNi4gWDAgaXMgYWx3YXlzIHplcm8sIGFu
-ZCBYMTYgaXMNCj4gICAgKiB0aGUgY29udHJvbCByZWdpc3Rlci4NCj4gICAgKg0KPiAtICogVGhl
-IG5vdGF0aW9uIHVzZWQgaW4gTVhVIGFzc2VtYmxlciBtbmVtb25pY3MNCj4gLSAqIC0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+ICAgICoNCj4gLSAqICBSZWdp
-c3RlcnM6DQo+ICsgKiAgICAgVGhlIG5vdGF0aW9uIHVzZWQgaW4gTVhVIGFzc2VtYmxlciBtbmVt
-b25pY3MNCj4gKyAqICAgICB+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fg0KPiArICoNCj4gKyAqICBSZWdpc3RlciBvcGVyYW5kczoNCj4gICAgKg0KPiAgICAqICAg
-WFJhLCBYUmIsIFhSYywgWFJkIC0gTVhVIHJlZ2lzdGVycw0KPiAgICAqICAgUmIsIFJjLCBSZCwg
-UnMsIFJ0IC0gZ2VuZXJhbCBwdXJwb3NlIE1JUFMgcmVnaXN0ZXJzDQo+ICAgICoNCj4gLSAqICBT
-dWJmaWVsZHM6DQo+ICsgKiAgTm9uLXJlZ2lzdGVyIG9wZXJhbmRzOg0KPiAgICAqDQo+IC0gKiAg
-IGFwdG4xICAgICAgICAgICAgICAtIDEtYml0IGFjY3VtdWxhdGUgYWRkL3N1YnRyYWN0IHBhdHRl
-cm4NCj4gLSAqICAgYXB0bjIgICAgICAgICAgICAgIC0gMi1iaXQgYWNjdW11bGF0ZSBhZGQvc3Vi
-dHJhY3QgcGF0dGVybg0KPiAtICogICBlcHRuMiAgICAgICAgICAgICAgLSAyLWJpdCBleGVjdXRl
-IGFkZC9zdWJ0cmFjdCBwYXR0ZXJuDQo+IC0gKiAgIG9wdG4yICAgICAgICAgICAgICAtIDItYml0
-IG9wZXJhbmQgcGF0dGVybg0KPiAtICogICBvcHRuMyAgICAgICAgICAgICAgLSAzLWJpdCBvcGVy
-YW5kIHBhdHRlcm4NCj4gLSAqICAgc2Z0NCAgICAgICAgICAgICAgIC0gNC1iaXQgc2hpZnQgYW1v
-dW50DQo+IC0gKiAgIHN0cmQyICAgICAgICAgICAgICAtIDItYml0IHN0cmlkZSBhbW91bnQNCj4g
-KyAqICAgYXB0bjEgLSAxLWJpdCBhY2N1bXVsYXRlIGFkZC9zdWJ0cmFjdCBwYXR0ZXJuDQo+ICsg
-KiAgIGFwdG4yIC0gMi1iaXQgYWNjdW11bGF0ZSBhZGQvc3VidHJhY3QgcGF0dGVybg0KPiArICog
-ICBlcHRuMiAtIDItYml0IGV4ZWN1dGUgYWRkL3N1YnRyYWN0IHBhdHRlcm4NCj4gKyAqICAgb3B0
-bjIgLSAyLWJpdCBvcGVyYW5kIHBhdHRlcm4NCj4gKyAqICAgb3B0bjMgLSAzLWJpdCBvcGVyYW5k
-IHBhdHRlcm4NCj4gKyAqICAgc2Z0NCAgLSA0LWJpdCBzaGlmdCBhbW91bnQNCj4gKyAqICAgc3Ry
-ZDIgLSAyLWJpdCBzdHJpZGUgYW1vdW50DQo+ICAgICoNCj4gICAgKiAgUHJlZml4ZXM6DQo+ICAg
-ICoNCj4gLSAqICAgPE9wZXJhdGlvbiBwYXJhbGxlbCBsZXZlbD48T3BlcmFuZCBzaXplPg0KPiAt
-ICogICAgIFMgICAgICAgICAgICAgICAgICAgICAgICAgMzINCj4gLSAqICAgICBEICAgICAgICAg
-ICAgICAgICAgICAgICAgIDE2DQo+IC0gKiAgICAgUSAgICAgICAgICAgICAgICAgICAgICAgICAg
-OA0KPiAtICoNCj4gLSAqICBTdWZmaXhlczoNCj4gLSAqDQo+IC0gKiAgIEUgLSBFeHBhbmQgcmVz
-dWx0cw0KPiAtICogICBGIC0gRml4ZWQgcG9pbnQgbXVsdGlwbGljYXRpb24NCj4gLSAqICAgTCAt
-IExvdyBwYXJ0IHJlc3VsdA0KPiAtICogICBSIC0gRG9pbmcgcm91bmRpbmcNCj4gLSAqICAgViAt
-IFZhcmlhYmxlIGluc3RlYWQgb2YgaW1tZWRpYXRlDQo+IC0gKiAgIFcgLSBDb21iaW5lIGFib3Zl
-IEwgYW5kIFYNCj4gKyAqICAgTGV2ZWwgb2YgcGFyYWxsZWxpc206ICAgICAgICAgICAgICAgIE9w
-ZXJhbmQgc2l6ZToNCj4gKyAqICAgIFMgLSBzaW5nbGUgb3BlcmF0aW9uIGF0IGEgdGltZSAgICAg
-ICAzMiAtIHdvcmQNCj4gKyAqICAgIEQgLSB0d28gb3BlcmF0aW9ucyBpbiBwYXJhbGxlbCAgICAg
-ICAxNiAtIGhhbGYgd29yZA0KPiArICogICAgUSAtIGZvdXIgb3BlcmF0aW9ucyBpbiBwYXJhbGxl
-bCAgICAgICA4IC0gYnl0ZQ0KPiAgICAqDQo+ICAgICogIE9wZXJhdGlvbnM6DQo+ICAgICoNCj4g
-QEAgLTE0ODYsNiArMTQ4MCwxOSBAQCBlbnVtIHsNCj4gICAgKiAgIFNDT1AgIC0gQ2FsY3VsYXRl
-IHjigJlzIHNjb3BlICgtMSwgbWVhbnMgeDwwOyAwLCBtZWFucyB4PT0wOyAxLCBtZWFucyB4PjAp
-DQo+ICAgICogICBYT1IgICAtIExvZ2ljYWwgYml0d2lzZSAnZXhjbHVzaXZlIG9yJyBvcGVyYXRp
-b24NCj4gICAgKg0KPiArICogIFN1ZmZpeGVzOg0KPiArICoNCj4gKyAqICAgRSAtIEV4cGFuZCBy
-ZXN1bHRzDQo+ICsgKiAgIEYgLSBGaXhlZCBwb2ludCBtdWx0aXBsaWNhdGlvbg0KPiArICogICBM
-IC0gTG93IHBhcnQgcmVzdWx0DQo+ICsgKiAgIFIgLSBEb2luZyByb3VuZGluZw0KPiArICogICBW
-IC0gVmFyaWFibGUgaW5zdGVhZCBvZiBpbW1lZGlhdGUNCj4gKyAqICAgVyAtIENvbWJpbmUgYWJv
-dmUgTCBhbmQgVg0KPiArICoNCj4gKyAqDQo+ICsgKiAgICAgVGhlIGxpc3Qgb2YgTVhVIGluc3Ry
-dWN0aW9ucyBncm91cGVkIGJ5IGZ1bmN0aW9uYWxpdHkNCj4gKyAqICAgICB+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fg0KPiArICoNCj4gICAgKiBM
-b2FkL1N0b3JlIGluc3RydWN0aW9ucyAgICAgICAgICAgTXVsdGlwbGljYXRpb24gaW5zdHJ1Y3Rp
-b25zDQo+ICAgICogLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0gICAgICAgICAgIC0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLQ0KPiAgICAqDQo+IEBAIC0xNTYzLDYgKzE1NzAsMTMgQEAgZW51bSB7
-DQo+ICAgICogIFExNlNBVCBYUmEsIFhSYiwgWFJjICAgICAgICAgICAgICBTMzJJMk0gWFJhLCBS
-Yg0KPiAgICAqDQo+ICAgICoNCj4gKyAqICAgICBUaGUgb3Bjb2RlIG9yZ2FuaXphdGlvbiBvZiBN
-WFUgaW5zdHJ1Y3Rpb25zDQo+ICsgKiAgICAgfn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fg0KPiArICoNCj4gKyAqIFRoZSBiaXRzIDMxLi4yNiBvZiBhbGwgTVhVIGlu
-c3RydWN0aW9ucyBhcmUgZXF1YWwgdG8gMHgxQyAoYWxzbyByZWZlcnJlZA0KPiArICogYXMgb3Bj
-b2RlIFNQRUNJQUwyIGluIHRoZSBiYXNlIE1JUFMgSVNBKS4gVGhlIG9yZ2FuaXphdGlvbiBhbmQg
-bWVhbmluZyBvZg0KPiArICogb3RoZXIgYml0cyB1cCB0byB0aGUgaW5zdHJ1Y3Rpb24gbGV2ZWwg
-aXMgYXMgZm9sbG93czoNCj4gKyAqDQo+ICAgICogICAgICAgICAgICAgIGJpdHMNCj4gICAgKiAg
-ICAgICAgICAgICAwNS4uMDANCj4gICAgKg0KPiBAQCAtMTcwMCw3ICsxNzE0LDcgQEAgZW51bSB7
-DQo+ICAgICogICAgICAgICAg4pSCICAgICAgICAgICAgICAgICAgICAgICAgICAgIOKUnOKUgCAw
-MTAg4pSAIE9QQ19NWFVfRDE2TU9WWg0KPiAgICAqICAgICAgICAgIOKUgiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICDilJzilIAgMDExIOKUgCBPUENfTVhVX0QxNk1PVk4NCj4gICAgKiAgICAg
-ICAgICDilIIgICAgICAgICAgICAgICAgICAgICAgICAgICAg4pSc4pSAIDEwMCDilIAgT1BDX01Y
-VV9TMzJNT1ZaDQo+IC0gKiAgICAgICAgICDilIIgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-4pSU4pSAIDEwMSDilIAgT1BDX01YVV9TMzJNT1YNCj4gKyAqICAgICAgICAgIOKUgiAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICDilJTilIAgMTAxIOKUgCBPUENfTVhVX1MzMk1PVk4NCj4gICAg
-KiAgICAgICAgICDilIINCj4gICAgKiAgICAgICAgICDilIIgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgMjMuLjIyDQo+ICAgICogICAgICAgICAg4pSc4pSAIDExMTAxMCDilIAgT1BDX01Y
-VV9fUE9PTDIxIOKUgOKUrOKUgCAwMCDilIAgT1BDX01YVV9ROE1BQw0KPiBAQCAtMTcxMiwxMCAr
-MTcyNiwxMCBAQCBlbnVtIHsNCj4gICAgKiAgICAgICAgICDilJTilIAgMTExMTExIOKUgCA8bm90
-IGFzc2lnbmVkPiAgIChvdmVybGFwcyB3aXRoIFNEQkJQKQ0KPiAgICAqDQo+ICAgICoNCj4gLSAq
-ICAgQ29tcGlsZWQgYWZ0ZXI6DQo+ICsgKiBDb21waWxlZCBhZnRlcjoNCj4gICAgKg0KPiAgICAq
-ICAgIlhCdXJzdMKuIEluc3RydWN0aW9uIFNldCBBcmNoaXRlY3R1cmUgTUlQUyBlWHRlbnNpb24v
-ZW5oYW5jZWQgVW5pdA0KPiAtICogICBQcm9ncmFtbWluZyBNYW51YWwiLCBJbmdlbmljIFNlbWlj
-b25kdWN0b3IgQ28sIEx0ZC4sIDIwMTcNCj4gKyAqICAgUHJvZ3JhbW1pbmcgTWFudWFsIiwgSW5n
-ZW5pYyBTZW1pY29uZHVjdG9yIENvLCBMdGQuLCByZXZpc2lvbiBKdW5lIDIsIDIwMTcNCj4gICAg
-Ki8NCj4gICANCj4gICBlbnVtIHsNCg==
+On Tue, Dec 18, 2018 at 12:03:30PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> GCC 8 new warning prevents builds to success since quite some time.
+> First report on the mailing list is in July 2018:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg03723.html
+>=20
+> Various intents has been sent to fix this:
+> - Incorrectly using g_strlcpy()
+>   https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg03705.html
+>   https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg03706.html
+> - Using assert() and strpadcpy()
+>   https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg03938.html
+> - Use #pragma GCC diagnostic ignored "-Wstringop-truncation"
+>   https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04261.html
+> - adding an inline wrapper with said pragma in there
+>   https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04261.html
+> - -Wno-stringop-truncation is the makefile
+>   https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04261.html
+>=20
+> This series replace the strncpy() calls by strpadcpy() which seemed
+> to me the saniest option.
+>=20
+> Regards,
+>=20
+> Phil.
+
+Do you happen to know why does it build fine with
+Gcc 8.2.1?
+
+Reading the GCC manual it seems that
+there is a "nostring" attribute that means
+"might not be 0 terminated".
+I think we should switch to that which fixes the warning
+but also warns if someone tries to misuse these
+as C-strings.
+
+Seems to be a better option, does it not?
+
+
+> Marc-Andr=E9 Lureau (1):
+>   hw/acpi: Replace strncpy() by strpadcpy(pad=3D'\0')
+>=20
+> Philippe Mathieu-Daud=E9 (2):
+>   block/sheepdog: Replace strncpy() by strpadcpy(pad=3D'\0')
+>   migration: Replace strncpy() by strpadcpy(pad=3D'\0')
+>=20
+>  block/sheepdog.c         |  6 +++---
+>  hw/acpi/aml-build.c      |  6 ++++--
+>  hw/acpi/core.c           | 13 +++++++------
+>  migration/global_state.c |  4 ++--
+>  4 files changed, 16 insertions(+), 13 deletions(-)
+>=20
+> --=20
+> 2.17.2
