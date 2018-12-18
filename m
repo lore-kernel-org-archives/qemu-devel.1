@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gZBb9-0005If-25
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 04:23:32 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gZBga-0006qM-LY
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 04:29:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gZBb6-0005j4-CY
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 04:23:31 -0500
-Received: from 4.mo69.mail-out.ovh.net ([46.105.42.102]:37120)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gZBb6-0005fY-5I
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 04:23:28 -0500
-Received: from player756.ha.ovh.net (unknown [10.109.146.163])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 95F943707A
-	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 10:23:21 +0100 (CET)
-Date: Tue, 18 Dec 2018 10:23:11 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20181218102311.68400aa5@bahia.lan>
-In-Reply-To: <8cf7e664-27e6-d4f4-ea71-29a61a3122e6@redhat.com>
-References: <20181217140055.8545-1-lvivier@redhat.com>
-	<20181218042938.GI23604@umbus.fritz.box>
-	<8cf7e664-27e6-d4f4-ea71-29a61a3122e6@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gZBgY-0001RQ-TF
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 04:29:08 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35443)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gZBgY-0001Qp-Is
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 04:29:06 -0500
+Received: by mail-wr1-x441.google.com with SMTP id 96so15133429wrb.2
+	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 01:29:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] spapr: Add H-Call
- H_HOME_NODE_ASSOCIATIVITY
+References: <20181212222648.595-1-marcandre.lureau@redhat.com>
+	<20181217203706-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20181217203706-mutt-send-email-mst@kernel.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 18 Dec 2018 13:28:53 +0400
+Message-ID: <CAJ+F1CK-Ko1H+VCAs_Epf+0vy2r=J7FjpHBXA7e=Ycrwm6xFJQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v13 0/6] Add support for TPM Physical
+ Presence interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,149 +31,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Berger <stefanb@linux.ibm.com>
 
-On Tue, 18 Dec 2018 08:50:00 +0100
-Laurent Vivier <lvivier@redhat.com> wrote:
+Hi Michael,
 
-> On 18/12/2018 05:29, David Gibson wrote:
-> > On Mon, Dec 17, 2018 at 03:00:55PM +0100, Laurent Vivier wrote:  
-> >> H_HOME_NODE_ASSOCIATIVITY H-Call returns the associativity domain
-> >> designation associated with the identifier input parameter.
-> >>
-> >> Remove the warning message from the kernel:
-> >>   VPHN is not supported. Disabling polling..
-> >>
-> >> Signed-off-by: Laurent Vivier <lvivier@redhat.com>  
-> > 
-> > From the looks of PAPR, I suspect this call isn't of much use outside
-> > PowerVM guests, though it probably wouldn't do any harm.  
-> 
-> This call is used by the kernel to get the node id of a CPU on hotplug
-> and fixes a crash when we hotplug a CPU in a memory-less/CPU-less node
-> where this information is missing (not initialized from the device-tree).
-> 
+On Tue, Dec 18, 2018 at 5:42 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Thu, Dec 13, 2018 at 02:26:42AM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi,
+> >
+> > The following patches implement the TPM Physical Presence Interface
+> > that allows a user to set a command via ACPI (sysfs entry in Linux)
+> > that, upon the next reboot, the firmware looks for and acts upon by
+> > sending sequences of commands to the TPM.
+> >
+> > A dedicated memory region is added to the TPM CRB & TIS devices, at
+> > address/size 0xFED45000/0x400. A new "etc/tpm/config" fw_cfg entry
+> > holds the location for that PPI region and some version details, to
+> > allow for future flexibility.
+> >
+> > With the associated edk2/ovmf firmware, the Windows HLK "PPI 1.3" test
+> > now runs successfully.
+> >
+> > It is based on previous work from Stefan Berger ("[PATCH v2 0/4]
+> > Implement Physical Presence interface for TPM 1.2 and 2")
+> >
+> > The edk2 support is merged upstream.
+>
+>
+> Breaks build with tpm disabled:
+>
+> /usr/bin/ld: hw/i386/acpi-build.o: in function `build_dsdt':
+> /scm/qemu/hw/i386/acpi-build.c:2158: undefined reference to `tpm_build_pp=
+i_acpi'
+> /usr/bin/ld: /scm/qemu/hw/i386/acpi-build.c:2179: undefined reference to =
+`tpm_build_ppi_acpi'
+> collect2: error: ld returned 1 exit status
 
-So this patch isn't just about removing the warning message from the kernel
-but about fixing an actual crash ?
+Thanks for noticing, this is probably a regression from v13, since the
+tpm_build_ppi_acpi was moved to a separate unit that is not always
+built.
 
-I ask because if it's only about the warning, why does the kernel call
-H_HOME_NODE_ASSOCIATIVITY when hcall-vphn isn't advertised ? Especially,
-the polling for topology changes is only started if hcall-vphn is present:
+There is a lot of TPM code that we always build in acpi-build. Either
+the code should have #ifdef TPM, or we use stubs.
 
-	if (firmware_has_feature(FW_FEATURE_VPHN) &&
-		   lppaca_shared_proc(get_lppaca())) {
-		if (!vphn_enabled) {
-			vphn_enabled = 1;
-			setup_cpu_associativity_change_counters();
-			timer_setup(&topology_timer, topology_timer_fn,
-				    TIMER_DEFERRABLE);
-			reset_topology_timer();
-		}
-	}
+Fwiw, the preliminary #ifdef patch would look like that, is that
+desirable, or should we just add some stub:
 
-It thus seems wrong to emit the "Disable polling.." warning for something
-that was never enabled in the first place, doesn't it ?
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 236a20eaa8..e6ca350067 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -41,14 +41,16 @@
+ #include "hw/isa/isa.h"
+ #include "hw/block/fdc.h"
+ #include "hw/acpi/memory_hotplug.h"
++#ifdef CONFIG_TPM
+ #include "sysemu/tpm.h"
+ #include "hw/acpi/tpm.h"
+-#include "hw/acpi/vmgenid.h"
+ #include "sysemu/tpm_backend.h"
++#endif
++#include "hw/acpi/vmgenid.h"
+ #include "hw/timer/mc146818rtc_regs.h"
+ #include "hw/mem/memory-device.h"
+ #include "sysemu/numa.h"
+-
++#include "qemu/units.h"
+ /* Supported chipsets: */
+ #include "hw/acpi/piix4.h"
+ #include "hw/acpi/pcihp.h"
+@@ -105,7 +107,9 @@ typedef struct AcpiPmInfo {
+ typedef struct AcpiMiscInfo {
+     bool is_piix4;
+     bool has_hpet;
++#ifdef CONFIG_TPM
+     TPMVersion tpm_version;
++#endif
+     const unsigned char *dsdt_code;
+     unsigned dsdt_size;
+     uint16_t pvpanic_port;
+@@ -234,7 +238,9 @@ static void acpi_get_misc_info(AcpiMiscInfo *info)
+     }
 
-On the other hand, if this really needed to avoid a crash, I guess you
-should provide some more details.
+     info->has_hpet =3D hpet_find();
++#ifdef CONFIG_TPM
+     info->tpm_version =3D tpm_get_version(tpm_find());
++#endif
+     info->pvpanic_port =3D pvpanic_port();
+     info->applesmc_io_base =3D applesmc_port();
+ }
+@@ -1962,10 +1968,12 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+         }
+     }
 
-> > BenH, Paulus, any thoughts?
-> > 
-> > One nit in implementation: if you implement this hcall, it's supposed
-> > to be advertised by adding hcall-vphn to ibm,hypertas-functions.  
-> ok  in v2.
-> 
-> Thanks,
-> Laurent
-> 
-> >> ---
-> >> Based-on: <20181213040126.6768-1-david@gibson.dropbear.id.au>
-> >>           "[PULL 00/27] ppc-for-4.0 queue 20181213"
-> >>
-> >>  hw/ppc/spapr_hcall.c   | 39 +++++++++++++++++++++++++++++++++++++++
-> >>  include/hw/ppc/spapr.h |  1 +
-> >>  2 files changed, 40 insertions(+)
-> >>
-> >> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> >> index 78fecc8fe9..454ec594fd 100644
-> >> --- a/hw/ppc/spapr_hcall.c
-> >> +++ b/hw/ppc/spapr_hcall.c
-> >> @@ -1663,6 +1663,41 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-> >>      return H_SUCCESS;
-> >>  }
-> >>  
-> >> +static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
-> >> +                                              sPAPRMachineState *spapr,
-> >> +                                              target_ulong opcode,
-> >> +                                              target_ulong *args)
-> >> +{
-> >> +    target_ulong flags = args[0];
-> >> +    target_ulong procno = args[1];
-> >> +    PowerPCCPU *tcpu;
-> >> +    int idx;
-> >> +
-> >> +    /* only support procno from H_REGISTER_VPA */
-> >> +    if ((flags & 0x1) == 0) {
-> >> +        return H_PARAMETER;
-> >> +    }
++#ifdef CONFIG_TPM
+     if (TPM_IS_TIS(tpm_find())) {
+         aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
+                    TPM_TIS_ADDR_SIZE, AML_READ_WRITE));
+     }
++#endif
+     aml_append(scope, aml_name_decl("_CRS", crs));
 
-LoPAPR says that the guest can pass exactly 0x1 or 0x2 in flags. The
-above check should then rather be flags == 0x1.
+     /* reserve GPE0 block resources */
+@@ -2133,6 +2141,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+             /* Scan all PCI buses. Generate tables to support hotplug. */
+             build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
 
-Also, even if linux only seems to call this with 0x1, this is a
-limitation from a LoPAPR standpoint. Not sure H_PARAMETER is the
-appropriate return value if flags is 0x2 since the guest did
-nothing wrong... I'd rather return H_FUNCTION in this case.
++#ifdef CONFIG_TPM
+             if (TPM_IS_TIS(tpm_find())) {
+                 dev =3D aml_device("ISA.TPM");
+                 aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0C31"=
+)));
+@@ -2149,11 +2158,12 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+                 aml_append(dev, aml_name_decl("_CRS", crs));
+                 aml_append(scope, dev);
+             }
+-
++#endif
+             aml_append(sb_scope, scope);
+         }
+     }
 
-> >> +
-> >> +    tcpu = spapr_find_cpu(procno);
-> >> +    if (tcpu == NULL) {
-> >> +        return H_P2;
-> >> +    }
-> >> +
-> >> +    /* sequence is the same as in the "ibm,associativity" property */
-> >> +
-> >> +    idx = 0;
-> >> +#define ASSOCIATIVITY(a, b) (((uint64_t)a << 32) | ((uint64_t)b & 0xffffffff))
-> >> +    args[idx++] = ASSOCIATIVITY(0, 0);
-> >> +    args[idx++] = ASSOCIATIVITY(0, tcpu->node_id);
-> >> +    args[idx++] = ASSOCIATIVITY(procno, -1);
-> >> +    for ( ; idx < 6; idx++) {
-> >> +        args[idx] = -1;
-> >> +    }
-> >> +#undef ASSOCIATIVITY
-> >> +
-> >> +    return H_SUCCESS;
-> >> +}
-> >> +
-> >>  static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
-> >>                                                sPAPRMachineState *spapr,
-> >>                                                target_ulong opcode,
-> >> @@ -1864,6 +1899,10 @@ static void hypercall_register_types(void)
-> >>      spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_support);
-> >>  
-> >>      spapr_register_hypercall(KVMPPC_H_UPDATE_DT, h_update_dt);
-> >> +
-> >> +    /* Virtual Processor Home Node */
-> >> +    spapr_register_hypercall(H_HOME_NODE_ASSOCIATIVITY,
-> >> +                             h_home_node_associativity);
-> >>  }
-> >>  
-> >>  type_init(hypercall_register_types)
-> >> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> >> index b1a2515107..eb13e2b614 100644
-> >> --- a/include/hw/ppc/spapr.h
-> >> +++ b/include/hw/ppc/spapr.h
-> >> @@ -447,6 +447,7 @@ struct sPAPRMachineState {
-> >>  #define H_GET_EM_PARMS          0x2B8
-> >>  #define H_SET_MPP               0x2D0
-> >>  #define H_GET_MPP               0x2D4
-> >> +#define H_HOME_NODE_ASSOCIATIVITY 0x2EC
-> >>  #define H_XIRR_X                0x2FC
-> >>  #define H_RANDOM                0x300
-> >>  #define H_SET_MODE              0x31C  
-> >   
-> 
-> 
++#ifdef CONFIG_TPM
+     if (TPM_IS_CRB(tpm_find())) {
+         dev =3D aml_device("TPM");
+         aml_append(dev, aml_name_decl("_HID", aml_string("MSFT0101")));
+@@ -2168,7 +2178,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+
+         aml_append(sb_scope, dev);
+     }
+-
++#endif
+     aml_append(dsdt, sb_scope);
+
+     /* copy AML table into ACPI tables blob and patch header there */
+@@ -2194,6 +2204,7 @@ build_hpet(GArray *table_data, BIOSLinker *linker)
+                  (void *)hpet, "HPET", sizeof(*hpet), 1, NULL, NULL);
+ }
+
++#ifdef CONFIG_TPM
+ static void
+ build_tpm_tcpa(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+ {
+@@ -2247,6 +2258,7 @@ build_tpm2(GArray *table_data, BIOSLinker
+*linker, GArray *tcpalog)
+     build_header(linker, table_data,
+                  (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NUL=
+L);
+ }
++#endif
+
+ #define HOLE_640K_START  (640 * KiB)
+ #define HOLE_640K_END   (1 * MiB)
+@@ -2679,6 +2691,7 @@ void acpi_build(AcpiBuildTables *tables,
+MachineState *machine)
+         acpi_add_table(table_offsets, tables_blob);
+         build_hpet(tables_blob, tables->linker);
+     }
++#ifdef CONFIG_TPM
+     if (misc.tpm_version !=3D TPM_VERSION_UNSPEC) {
+         acpi_add_table(table_offsets, tables_blob);
+         build_tpm_tcpa(tables_blob, tables->linker, tables->tcpalog);
+@@ -2688,6 +2701,7 @@ void acpi_build(AcpiBuildTables *tables,
+MachineState *machine)
+             build_tpm2(tables_blob, tables->linker, tables->tcpalog);
+         }
+     }
++#endif
+     if (pcms->numa_nodes) {
+         acpi_add_table(table_offsets, tables_blob);
+         build_srat(tables_blob, tables->linker, machine);
+@@ -2886,9 +2900,10 @@ void acpi_setup(void)
+         acpi_add_rom_blob(build_state, tables.linker->cmd_blob,
+                           "etc/table-loader", 0);
+
++#ifdef CONFIG_TPM
+     fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
+                     tables.tcpalog->data, acpi_data_len(tables.tcpalog));
+-
++#endif
+     vmgenid_dev =3D find_vmgenid_dev();
+     if (vmgenid_dev) {
+         vmgenid_add_fw_cfg(VMGENID(vmgenid_dev), pcms->fw_cfg,
+
+
+>
+> > v13:
+> > - removed needless error handling in tpm_ppi_init()
+> > - splitted "add ACPI memory clear interface"
+> > - moved acpi build function in dedicated hw/acpi/tpm.c
+> > - added some function documentation in headers
+> > - various code cleanups suggested by Philippe
+> > - rebased
+> >
+> > Marc-Andr=C3=A9 Lureau (3):
+> >   tpm: add a "ppi" boolean property
+> >   acpi: add ACPI memory clear interface
+> >   tpm: clear RAM when "memory overwrite" requested
+> >
+> > Stefan Berger (3):
+> >   tpm: allocate/map buffer for TPM Physical Presence interface
+> >   acpi: expose TPM/PPI configuration parameters to firmware via fw_cfg
+> >   acpi: build TPM Physical Presence interface
+> >
+> >  hw/tpm/tpm_ppi.h      |  47 +++++
+> >  include/hw/acpi/tpm.h |  23 +++
+> >  include/hw/compat.h   |  11 +-
+> >  hw/acpi/tpm.c         | 447 ++++++++++++++++++++++++++++++++++++++++++
+> >  hw/i386/acpi-build.c  |  29 ++-
+> >  hw/tpm/tpm_crb.c      |  11 ++
+> >  hw/tpm/tpm_ppi.c      |  53 +++++
+> >  hw/tpm/tpm_tis.c      |  11 ++
+> >  docs/specs/tpm.txt    | 104 ++++++++++
+> >  hw/acpi/Makefile.objs |   1 +
+> >  hw/tpm/Makefile.objs  |   1 +
+> >  hw/tpm/trace-events   |   3 +
+> >  12 files changed, 738 insertions(+), 3 deletions(-)
+> >  create mode 100644 hw/tpm/tpm_ppi.h
+> >  create mode 100644 hw/acpi/tpm.c
+> >  create mode 100644 hw/tpm/tpm_ppi.c
+> >
+> > --
+> > 2.20.0
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
