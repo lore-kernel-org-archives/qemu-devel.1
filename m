@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gZC18-000453-UV
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 04:50:24 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gZC6G-0006A6-Rn
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 04:55:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gZC13-0001Ww-Oe
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 04:50:22 -0500
-Received: from mga12.intel.com ([192.55.52.136]:56764)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yu.c.zhang@linux.intel.com>)
-	id 1gZC13-0001WE-Dz
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 04:50:17 -0500
-Date: Tue, 18 Dec 2018 17:47:14 +0800
-From: Yu Zhang <yu.c.zhang@linux.intel.com>
-Message-ID: <20181218094713.gzb4i4zizlu2tj4a@linux.intel.com>
-References: <1544619939-18102-1-git-send-email-yu.c.zhang@linux.intel.com>
-	<1544619939-18102-3-git-send-email-yu.c.zhang@linux.intel.com>
-	<20181217142902.1ee007c1@Igors-MacBook-Pro.local>
+	(envelope-from <cohuck@redhat.com>) id 1gZC6D-0005l5-CC
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 04:55:40 -0500
+Date: Tue, 18 Dec 2018 10:55:18 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181218105518.2574fa64.cohuck@redhat.com>
+In-Reply-To: <1544806422-21418-2-git-send-email-pmorel@linux.ibm.com>
+References: <1544806422-21418-1-git-send-email-pmorel@linux.ibm.com>
+	<1544806422-21418-2-git-send-email-pmorel@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181217142902.1ee007c1@Igors-MacBook-Pro.local>
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] intel-iommu: extend VTD emulation
- to allow 57-bit IOVA address width.
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] s390x/pci: add common function
+ measurement block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,223 +24,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Pierre Morel <pmorel@linux.ibm.com>
+Cc: walling@linux.ibm.com, borntraeger@de.ibm.com, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, pasic@linux.ibm.com, thuth@redhat.com
 
-On Mon, Dec 17, 2018 at 02:29:02PM +0100, Igor Mammedov wrote:
-> On Wed, 12 Dec 2018 21:05:39 +0800
-> Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
+On Fri, 14 Dec 2018 17:53:42 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
+
+> From: Yi Min Zhao <zyimin@linux.ibm.com>
 > 
-> > A 5-level paging capable VM may choose to use 57-bit IOVA address width.
-> > E.g. guest applications may prefer to use its VA as IOVA when performing
-> > VFIO map/unmap operations, to avoid the burden of managing the IOVA space.
-> > 
-> > This patch extends the current vIOMMU logic to cover the extended address
-> > width. When creating a VM with 5-level paging feature, one can choose to
-> > create a virtual VTD with 5-level paging capability, with configurations
-> > like "-device intel-iommu,x-aw-bits=57".
-> > 
-> > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > Reviewed-by: Peter Xu <peterx@redhat.com>
-> > ---
-> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Richard Henderson <rth@twiddle.net>
-> > Cc: Eduardo Habkost <ehabkost@redhat.com>
-> > Cc: Peter Xu <peterx@redhat.com>
-> > ---
-> >  hw/i386/intel_iommu.c          | 53 ++++++++++++++++++++++++++++++++----------
-> >  hw/i386/intel_iommu_internal.h | 10 ++++++--
-> >  include/hw/i386/intel_iommu.h  |  1 +
-> >  3 files changed, 50 insertions(+), 14 deletions(-)
-> > 
-> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > index 0e88c63..871110c 100644
-> > --- a/hw/i386/intel_iommu.c
-> > +++ b/hw/i386/intel_iommu.c
-> > @@ -664,16 +664,16 @@ static inline bool vtd_iova_range_check(uint64_t iova, VTDContextEntry *ce,
-> >  
-> >  /*
-> >   * Rsvd field masks for spte:
-> > - *     Index [1] to [4] 4k pages
-> > - *     Index [5] to [8] large pages
-> > + *     Index [1] to [5] 4k pages
-> > + *     Index [6] to [10] large pages
-> >   */
-> > -static uint64_t vtd_paging_entry_rsvd_field[9];
-> > +static uint64_t vtd_paging_entry_rsvd_field[11];
-> >  
-> >  static bool vtd_slpte_nonzero_rsvd(uint64_t slpte, uint32_t level)
-> >  {
-> >      if (slpte & VTD_SL_PT_PAGE_SIZE_MASK) {
-> >          /* Maybe large page */
-> > -        return slpte & vtd_paging_entry_rsvd_field[level + 4];
-> > +        return slpte & vtd_paging_entry_rsvd_field[level + 5];
-> >      } else {
-> >          return slpte & vtd_paging_entry_rsvd_field[level];
-> >      }
-> > @@ -3127,6 +3127,8 @@ static void vtd_init(IntelIOMMUState *s)
-> >               VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(s->aw_bits);
-> >      if (s->aw_bits == VTD_AW_48BIT) {
-> >          s->cap |= VTD_CAP_SAGAW_48bit;
-> > +    } else if (s->aw_bits == VTD_AW_57BIT) {
-> > +        s->cap |= VTD_CAP_SAGAW_57bit | VTD_CAP_SAGAW_48bit;
-> >      }
-> >      s->ecap = VTD_ECAP_QI | VTD_ECAP_IRO;
-> >      s->haw_bits = cpu->phys_bits;
-> > @@ -3139,10 +3141,12 @@ static void vtd_init(IntelIOMMUState *s)
-> >      vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->haw_bits);
-> >      vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->haw_bits);
-> >      vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->haw_bits);
-> > -    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->haw_bits);
-> > -    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->haw_bits);
-> > -    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->haw_bits);
-> > -    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->haw_bits);
-> > +    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_PAGE_L5_RSVD_MASK(s->haw_bits);
-> > +    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->haw_bits);
-> > +    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->haw_bits);
-> > +    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->haw_bits);
-> > +    vtd_paging_entry_rsvd_field[9] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->haw_bits);
-> > +    vtd_paging_entry_rsvd_field[10] = VTD_SPTE_LPAGE_L5_RSVD_MASK(s->haw_bits);
-> >  
-> >      if (x86_iommu->intr_supported) {
-> >          s->ecap |= VTD_ECAP_IR | VTD_ECAP_MHMV;
-> > @@ -3241,6 +3245,23 @@ static AddressSpace *vtd_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
-> >      return &vtd_as->as;
-> >  }
-> >  
-> > +static bool host_has_la57(void)
-> > +{
-> > +    uint32_t ecx, unused;
-> > +
-> > +    host_cpuid(7, 0, &unused, &unused, &ecx, &unused);
-> > +    return ecx & CPUID_7_0_ECX_LA57;
-> > +}
-> > +
-> > +static bool guest_has_la57(void)
-> > +{
-> > +    CPUState *cs = first_cpu;
-> > +    X86CPU *cpu = X86_CPU(cs);
-> > +    CPUX86State *env = &cpu->env;
-> > +
-> > +    return env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_LA57;
-> > +}
-> another direct access to CPU fields,
-> I'd suggest to set this value when iommu is created
-> i.e. add 'la57' property and set from iommu owner.
+> Common function measurement block is used to report zPCI internal
+> counters of successful pcilg/stg/stb and rpcit instructions to
+> a memory location provided by the program.
+> 
+> This patch introduces a new ZpciFmb structure and schedules a timer
+> callback to copy the zPCI measures to the FMB in the guest memory
+> at an interval time set to 4s by default.
+
+Hm, is there any way to change the interval? If not, just drop the "by
+default"?
+
+> 
+> An error while attemping to update the FMB, would generated an error
+
+s/generated/generate/
+
+> event to the guest.
+> 
+> The pcilg/stg/stb and rpcit interception handlers issue, increase
+> the related counter on success.
+
+"When the ... handlers are called, ..." ?
+
+> The guest shall pass a null FMBA (FMB address) in the FIB (Function
+> Information Block) when it issues a Modify PCI Function Control
+> instrcuction to switch off FMB and stop the corresponding timer.
+> 
+> Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  hw/s390x/s390-pci-bus.c  |   4 +-
+>  hw/s390x/s390-pci-bus.h  |  29 ++++++++++
+>  hw/s390x/s390-pci-inst.c | 141 ++++++++++++++++++++++++++++++++++++++++++++++-
+>  hw/s390x/s390-pci-inst.h |   1 +
+>  4 files changed, 171 insertions(+), 4 deletions(-)
 > 
 
-Sorry, do you mean "-device intel-iommu,la57"? I think we do not need
-that, because a 5-level capable vIOMMU can be created with properties
-like "-device intel-iommu,x-aw-bits=57". 
+> +static int fmb_do_update64(S390PCIBusDevice *pbdev, int offset, int cnt)
+> +{
+> +    MemTxResult ret = MEMTX_OK;
+> +    uint64_t dst = pbdev->fmb_addr + offset;
+> +    uint64_t *src = (uint64_t *) ((unsigned long)(&pbdev->fmb) + offset);
+> +    int i;
+> +
+> +    for (i = 0; i < cnt; i++, dst += 8, src++) {
+> +        address_space_stq_be(&address_space_memory, dst, *src,
+> +                             MEMTXATTRS_UNSPECIFIED, &ret);
+> +        if (ret != MEMTX_OK) {
+> +            s390_pci_generate_error_event(ERR_EVENT_FMBA, pbdev->fh, pbdev->fid,
+> +                                          pbdev->fmb_addr, 0);
+> +            fmb_timer_free(pbdev);
+> +            return ret;
+> +        }
+> +    }
+> +    return ret;
+> +}
+> +
+> +static int fmb_do_update(S390PCIBusDevice *pbdev, int offset, int val, int len)
+> +{
+> +    MemTxResult ret;
+> +    uint64_t dst = pbdev->fmb_addr + offset;
+> +
+> +    switch (len) {
+> +    case 4:
+> +        address_space_stl_be(&address_space_memory, dst, val,
+> +                             MEMTXATTRS_UNSPECIFIED,
+> +                             &ret);
+> +        break;
+> +    case 2:
+> +        address_space_stw_be(&address_space_memory, dst, val,
+> +                             MEMTXATTRS_UNSPECIFIED,
+> +                             &ret);
+> +        break;
+> +    case 1:
+> +        address_space_stb(&address_space_memory, dst, val,
+> +                          MEMTXATTRS_UNSPECIFIED,
+> +                          &ret);
+> +        break;
+> +    default:
+> +        ret = MEMTX_ERROR;
+> +        break;
+> +    }
+> +    if (ret != MEMTX_OK) {
+> +        s390_pci_generate_error_event(ERR_EVENT_FMBA, pbdev->fh, pbdev->fid,
+> +                                      pbdev->fmb_addr, 0);
+> +        fmb_timer_free(pbdev);
+> +    }
+> +
+> +    return ret;
+> +}
+> +
+> +static void fmb_update(void *opaque)
+> +{
+> +    S390PCIBusDevice *pbdev = opaque;
+> +    int64_t t = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
+> +    uint8_t offset;
+> +
+> +    /* Update U bit */
+> +    pbdev->fmb.last_update |= UPDATE_U_BIT;
+> +    offset = offsetof(ZpciFmb, last_update);
+> +    if (fmb_do_update64(pbdev, offset, 1)) {
+> +        return;
+> +    }
+> +
+> +    /* Update FMB sample count */
+> +    offset = offsetof(ZpciFmb, sample);
+> +    if (fmb_do_update(pbdev, offset, pbdev->fmb.sample++,
+> +                      sizeof(pbdev->fmb.sample))) {
 
-The guest CPU fields are checked to make sure the VM has LA57 CPU feature,
-because I believe there shall be no 5-level IOMMU on platforms without LA57
-CPUs. 
+This is the only caller of fmb_do_update(), right? Any chance that a
+new format of the block would introduce new callers?
 
-> >  static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
-> >  {
-> >      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
-> > @@ -3267,11 +3288,19 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
-> >          }
-> >      }
-> >  
-> > -    /* Currently only address widths supported are 39 and 48 bits */
-> > +    /* Currently address widths supported are 39, 48, and 57 bits */
-> >      if ((s->aw_bits != VTD_AW_39BIT) &&
-> > -        (s->aw_bits != VTD_AW_48BIT)) {
-> > -        error_setg(errp, "Supported values for x-aw-bits are: %d, %d",
-> > -                   VTD_AW_39BIT, VTD_AW_48BIT);
-> > +        (s->aw_bits != VTD_AW_48BIT) &&
-> > +        (s->aw_bits != VTD_AW_57BIT)) {
-> > +        error_setg(errp, "Supported values for x-aw-bits are: %d, %d, %d",
-> > +                   VTD_AW_39BIT, VTD_AW_48BIT, VTD_AW_57BIT);
-> > +        return false;
-> > +    }
-> > +
-> > +    if ((s->aw_bits == VTD_AW_57BIT) &&
-> > +        !(host_has_la57() && guest_has_la57())) {
-> Does iommu supposed to work in TCG mode?
-> If yes then why it should care about host_has_la57()?
-> 
+> +        return;
+> +    }
+> +    /* Update FMB counters */
+> +    offset = offsetof(ZpciFmb, counter);
+> +    if (fmb_do_update64(pbdev, offset, ZPCI_FMB_CNT_MAX)) {
+> +        return;
+> +    }
+> +
+> +    /* Clear U bit and update the time */
+> +    pbdev->fmb.last_update = time2tod(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
+> +    pbdev->fmb.last_update <<= 1;
+> +    offset = offsetof(ZpciFmb, last_update);
+> +    if (fmb_do_update64(pbdev, offset, 1)) {
+> +        return;
+> +    }
 
-Hmm... I did not take TCG mode into consideration. And host_has_la57() is
-used to guarantee the host have la57 feature so that iommu shadowing works
-for device assignment.
+Hm, one thing that I don't quite like about the update code is the odd
+split between fmb_do_update() (which always updates one value) and
+fmb_do_update64() (which may update multiple values).
 
-I guess iommu shall work in TCG mode(though I am not quite sure about this).
-But I do not have any usage case of a 5-level vIOMMU in TCG in mind. So maybe
-we can:
-1> check the 'ms->accel' in vtd_decide_config() and do not care about host
-capability if it is TCG.
-2> Or, we can choose to keep as it is, and add the check when 5-level paging
-vIOMMU does have usage in TCG?
+What does the code look like if you:
+- have a fmb_do_update() that can also handle 64bit values,
+- have the update of the counters loop and break out if you get an
+  error?
 
-But as to the check of guest capability, I still believe it is necessary. As
-said, a VM without LA57 feature shall not see a VT-d with 5-level IOMMU.
+Of course, you may have already tried that ;) If it looks ugly, I don't
+have a real issue with this code, either.
 
-> > +        error_setg(errp, "Do not support 57-bit DMA address, unless both "
-> > +                         "host and guest are capable of 5-level paging");
-> >          return false;
-> >      }
-> >  
-> > diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-> > index d084099..2b29b6f 100644
-> > --- a/hw/i386/intel_iommu_internal.h
-> > +++ b/hw/i386/intel_iommu_internal.h
-> > @@ -114,8 +114,8 @@
-> >                                       VTD_INTERRUPT_ADDR_FIRST + 1)
-> >  
-> >  /* The shift of source_id in the key of IOTLB hash table */
-> > -#define VTD_IOTLB_SID_SHIFT         36
-> > -#define VTD_IOTLB_LVL_SHIFT         52
-> > +#define VTD_IOTLB_SID_SHIFT         45
-> > +#define VTD_IOTLB_LVL_SHIFT         61
-> >  #define VTD_IOTLB_MAX_SIZE          1024    /* Max size of the hash table */
-> >  
-> >  /* IOTLB_REG */
-> > @@ -212,6 +212,8 @@
-> >  #define VTD_CAP_SAGAW_39bit         (0x2ULL << VTD_CAP_SAGAW_SHIFT)
-> >   /* 48-bit AGAW, 4-level page-table */
-> >  #define VTD_CAP_SAGAW_48bit         (0x4ULL << VTD_CAP_SAGAW_SHIFT)
-> > + /* 57-bit AGAW, 5-level page-table */
-> > +#define VTD_CAP_SAGAW_57bit         (0x8ULL << VTD_CAP_SAGAW_SHIFT)
-> >  
-> >  /* IQT_REG */
-> >  #define VTD_IQT_QT(val)             (((val) >> 4) & 0x7fffULL)
-> > @@ -379,6 +381,8 @@ typedef union VTDInvDesc VTDInvDesc;
-> >          (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
-> >  #define VTD_SPTE_PAGE_L4_RSVD_MASK(aw) \
-> >          (0x880ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
-> > +#define VTD_SPTE_PAGE_L5_RSVD_MASK(aw) \
-> > +        (0x880ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
-> >  #define VTD_SPTE_LPAGE_L1_RSVD_MASK(aw) \
-> >          (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
-> >  #define VTD_SPTE_LPAGE_L2_RSVD_MASK(aw) \
-> > @@ -387,6 +391,8 @@ typedef union VTDInvDesc VTDInvDesc;
-> >          (0x3ffff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
-> >  #define VTD_SPTE_LPAGE_L4_RSVD_MASK(aw) \
-> >          (0x880ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
-> > +#define VTD_SPTE_LPAGE_L5_RSVD_MASK(aw) \
-> > +        (0x880ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
-> >  
-> >  /* Information about page-selective IOTLB invalidate */
-> >  struct VTDIOTLBPageInvInfo {
-> > diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-> > index 820451c..7474c4f 100644
-> > --- a/include/hw/i386/intel_iommu.h
-> > +++ b/include/hw/i386/intel_iommu.h
-> > @@ -49,6 +49,7 @@
-> >  #define DMAR_REG_SIZE               0x230
-> >  #define VTD_AW_39BIT                39
-> >  #define VTD_AW_48BIT                48
-> > +#define VTD_AW_57BIT                57
-> >  #define VTD_ADDRESS_WIDTH           VTD_AW_39BIT
-> >  #define VTD_HAW_MASK(aw)            ((1ULL << (aw)) - 1)
-> >  
-> 
-> 
-
-B.R.
-Yu
+> +
+> +    timer_mod(pbdev->fmb_timer, t + DEFAULT_MUI);
+> +}
+> +
+>  int mpcifc_service_call(S390CPU *cpu, uint8_t r1, uint64_t fiba, uint8_t ar,
+>                          uintptr_t ra)
+>  {
