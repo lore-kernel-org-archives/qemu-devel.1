@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gZCiv-0002VP-IF
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:35:38 -0500
+	(envelope-from <smarkovic@wavecomp.com>) id 1gZCqb-0004kM-AL
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:43:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gZCis-0002XG-Dm
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:35:37 -0500
-Date: Tue, 18 Dec 2018 10:35:11 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181218103511.GC22638@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181217224807-mutt-send-email-mst@kernel.org>
-	<20181217231145-mutt-send-email-mst@kernel.org>
+	(envelope-from <smarkovic@wavecomp.com>) id 1gZCqX-0001VE-3j
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:43:33 -0500
+Received: from mail-eopbgr680102.outbound.protection.outlook.com
+	([40.107.68.102]:59307
+	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <smarkovic@wavecomp.com>)
+	id 1gZCqW-0001A5-Qf
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:43:29 -0500
+From: Stefan Markovic <smarkovic@wavecomp.com>
+Date: Tue, 18 Dec 2018 10:43:20 +0000
+Message-ID: <394a48e3-d865-b80a-0163-fad2010d12f9@wavecomp.com>
+References: <20181217171007.5007-1-aleksandar.markovic@rt-rk.com>
+	<20181217171007.5007-2-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <20181217171007.5007-2-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <1B388941DE76EB48986C5661AB8BA7B0@namprd22.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181217231145-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] sheepdog build warning
+Subject: Re: [Qemu-devel] [PATCH v2 1/5] disas: nanoMIPS: Fix preamble text
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,114 +32,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, peter.maydell@linaro.org, qemu-block@nongnu.org, meyering@redhat.com, Jeff Cody <jcody@redhat.com>, Liu Yuan <namei.unix@gmail.com>, MORITA Kazutaka <morita.kazutaka@lab.ntt.co.jp>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-On Mon, Dec 17, 2018 at 11:16:05PM -0500, Michael S. Tsirkin wrote:
-> On Mon, Dec 17, 2018 at 11:03:11PM -0500, Michael S. Tsirkin wrote:
-> > mingw32 build on fedora fails with this warning:
-> > 
-> > /scm/qemu/block/sheepdog.c: In function 'find_vdi_name':
-> > /scm/qemu/block/sheepdog.c:1239:5: error: 'strncpy' specified bound 256 equals destination size [-Werror=stringop-truncation]
-> >      strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
-> >      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > cc1: all warnings being treated as errors
-> > make: *** [/scm/qemu/rules.mak:69: block/sheepdog.o] Error 1
-> > make: *** Waiting for unfinished jobs....
-> > 
-> > 
-> > Reading the code one sees it's working as intended:
-> > 
-> > 
-> > static int find_vdi_name(BDRVSheepdogState *s, const char *filename,
-> >                          uint32_t snapid, const char *tag, uint32_t *vid,
-> >                          bool lock, Error **errp)
-> > {
-> >     int ret, fd;
-> >     SheepdogVdiReq hdr;
-> >     SheepdogVdiRsp *rsp = (SheepdogVdiRsp *)&hdr;
-> >     unsigned int wlen, rlen = 0;
-> >     char buf[SD_MAX_VDI_LEN + SD_MAX_VDI_TAG_LEN];
-> > 
-> >     fd = connect_to_sdog(s, errp);
-> >     if (fd < 0) {
-> >         return fd;
-> >     }
-> > 
-> >     /* This pair of strncpy calls ensures that the buffer is zero-filled,
-> >      * which is desirable since we'll soon be sending those bytes, and
-> >      * don't want the send_req to read uninitialized data.
-> >      */
-> >     strncpy(buf, filename, SD_MAX_VDI_LEN);
-> >     strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
-> > 
-> > 
-> > .....
-> > 
-> > }
-> > 
-> > 
-> > 
-> > so this seems to be the case of GCC developers deciding that
-> > strncpy is simply a bad API and a correct use of it should be
-> > warned against.
-> > 
-> > I propose either
-> > 
-> > 1. simply adding
-> > 
-> > #pragma GCC diagnostic ignored "-Wstringop-truncation"
-> > 
-> > in osdep.
-> > 
-> > 2. adding an inline wrapper with said pragma in there.
-> > 
-> > 3. -Wno-stringop-truncation is the makefile
-> > 
-> > Thoughts?
-> > 
-> > -- 
-> 
-> 
-> So here's approach 2. However I note that a newer gcc 8.2.1
-> does not give this warning. Maybe detect at configure time
-> and suppress (option 3)?
-
-I'm not 
-
-> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> index 3bf48bcdec..64d8258529 100644
-> --- a/include/qemu/osdep.h
-> +++ b/include/qemu/osdep.h
-> @@ -134,6 +134,22 @@ extern int daemon(int, int);
->  #define assert(x)  g_assert(x)
->  #endif
->  
-> +/*
-> + * GCC 8.0 declared war on strncpy. Admittedly it's a tricky interface
-> + * with unintuitive semantics, but we use it widely.
-> + */
-> +#if defined(__GNUC__) && __GNUC__ >= 8
-> +static inline void qemu_strncpy(char *to, const char *from, int n)
-> +{
-> +#pragma GCC diagnostic push
-> +#pragma GCC diagnostic ignored "-Wstringop-truncation"
-> +    strncpy(to, from, n);
-> +#pragma GCC diagnostic pop
-> +}
-> +
-> +#define strncpy qemu_strncpy
-> +#endif
-
-I don't think we should disable the warning for all uses of strncpy
-as that defeats the protection this warning offers for bad usage.
-
-IMHO, just push/pop the warning pragma inline in the sheepdog code
-which triggers it.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+DQpPbiAxNy4xMi4xOC4gMTg6MTAsIEFsZWtzYW5kYXIgTWFya292aWMgd3JvdGU6DQo+IEZyb206
+IEFsZWtzYW5kYXIgTWFya292aWMgPGFtYXJrb3ZpY0B3YXZlY29tcC5jb20+DQo+DQo+IEZpeCBz
+ZXZlcmFsIG1pc3Rha2VzIGluIHByZWFtYmxlcyBvZiBuYW5vbWlwcyBkaXNhc3NlbWJsZXIgc291
+cmNlDQo+IGZpbGVzLg0KPg0KPiBTaWduZWQtb2ZmLWJ5OiBBbGVrc2FuZGFyIE1hcmtvdmljIDxh
+bWFya292aWNAd2F2ZWNvbXAuY29tPg0KPiAtLS0NCj4gICBkaXNhcy9uYW5vbWlwcy5jcHAgfCA3
+ICsrKystLS0NCj4gICBkaXNhcy9uYW5vbWlwcy5oICAgfCA3ICsrKystLS0NCj4gICAyIGZpbGVz
+IGNoYW5nZWQsIDggaW5zZXJ0aW9ucygrKSwgNiBkZWxldGlvbnMoLSkNCg0KDQpSZXZpZXdlZC1i
+eTogU3RlZmFuIE1hcmtvdmljIDxzbWFya292aWNAd2F2ZWNvbXAuY29tPg0KDQoNCj4gZGlmZiAt
+LWdpdCBhL2Rpc2FzL25hbm9taXBzLmNwcCBiL2Rpc2FzL25hbm9taXBzLmNwcA0KPiBpbmRleCAx
+MjM4YzJmZjMzLi5mOWVmMGEyNWY0IDEwMDY0NA0KPiAtLS0gYS9kaXNhcy9uYW5vbWlwcy5jcHAN
+Cj4gKysrIGIvZGlzYXMvbmFub21pcHMuY3BwDQo+IEBAIC0xLDEzICsxLDEzIEBADQo+ICAgLyoN
+Cj4gICAgKiAgU291cmNlIGZpbGUgZm9yIG5hbm9NSVBTIGRpc2Fzc2VtYmxlciBjb21wb25lbnQg
+b2YgUUVNVQ0KPiAgICAqDQo+IC0gKiAgQ29weXJpZ2h0IChDKSAyMDE4ICBXYXZlIENvbXB1dGlu
+Zw0KPiArICogIENvcHlyaWdodCAoQykgMjAxOCAgV2F2ZSBDb21wdXRpbmcsIEluYy4NCj4gICAg
+KiAgQ29weXJpZ2h0IChDKSAyMDE4ICBNYXR0aGV3IEZvcnR1bmUgPG1hdHRoZXcuZm9ydHVuZUBt
+aXBzLmNvbT4NCj4gLSAqICBDb3B5cmlnaHQgKEMpIDIwMTggIEFsZWtzYW5kYXIgTWFya292aWMg
+PGFsZWtzYW5kYXIubWFya292aWNAd2F2ZWNvbXAuY29tPg0KPiArICogIENvcHlyaWdodCAoQykg
+MjAxOCAgQWxla3NhbmRhciBNYXJrb3ZpYyA8YW1hcmtvdmljQHdhdmVjb21wLmNvbT4NCj4gICAg
+Kg0KPiAgICAqICBUaGlzIHByb2dyYW0gaXMgZnJlZSBzb2Z0d2FyZTogeW91IGNhbiByZWRpc3Ry
+aWJ1dGUgaXQgYW5kL29yIG1vZGlmeQ0KPiAgICAqICBpdCB1bmRlciB0aGUgdGVybXMgb2YgdGhl
+IEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIGFzIHB1Ymxpc2hlZCBieQ0KPiAtICogIHRoZSBG
+cmVlIFNvZnR3YXJlIEZvdW5kYXRpb24sIGVpdGhlciB2ZXJzaW9uIDMgb2YgdGhlIExpY2Vuc2Us
+IG9yDQo+ICsgKiAgdGhlIEZyZWUgU29mdHdhcmUgRm91bmRhdGlvbiwgZWl0aGVyIHZlcnNpb24g
+MiBvZiB0aGUgTGljZW5zZSwgb3INCj4gICAgKiAgKGF0IHlvdXIgb3B0aW9uKSBhbnkgbGF0ZXIg
+dmVyc2lvbi4NCj4gICAgKg0KPiAgICAqICBUaGlzIHByb2dyYW0gaXMgZGlzdHJpYnV0ZWQgaW4g
+dGhlIGhvcGUgdGhhdCBpdCB3aWxsIGJlIHVzZWZ1bCwNCj4gQEAgLTE3LDYgKzE3LDcgQEANCj4g
+ICAgKg0KPiAgICAqICBZb3Ugc2hvdWxkIGhhdmUgcmVjZWl2ZWQgYSBjb3B5IG9mIHRoZSBHTlUg
+R2VuZXJhbCBQdWJsaWMgTGljZW5zZQ0KPiAgICAqICBhbG9uZyB3aXRoIHRoaXMgcHJvZ3JhbS4g
+IElmIG5vdCwgc2VlIDxodHRwczovL3d3dy5nbnUub3JnL2xpY2Vuc2VzLz4uDQo+ICsgKg0KPiAg
+ICAqLw0KPiAgIA0KPiAgIGV4dGVybiAiQyIgew0KPiBkaWZmIC0tZ2l0IGEvZGlzYXMvbmFub21p
+cHMuaCBiL2Rpc2FzL25hbm9taXBzLmgNCj4gaW5kZXggODRjYzlhNmRmYy4uM2RmMTM4ZDYzZiAx
+MDA2NDQNCj4gLS0tIGEvZGlzYXMvbmFub21pcHMuaA0KPiArKysgYi9kaXNhcy9uYW5vbWlwcy5o
+DQo+IEBAIC0xLDEzICsxLDEzIEBADQo+ICAgLyoNCj4gICAgKiAgSGVhZGVyIGZpbGUgZm9yIG5h
+bm9NSVBTIGRpc2Fzc2VtYmxlciBjb21wb25lbnQgb2YgUUVNVQ0KPiAgICAqDQo+IC0gKiAgQ29w
+eXJpZ2h0IChDKSAyMDE4ICBXYXZlIENvbXB1dGluZw0KPiArICogIENvcHlyaWdodCAoQykgMjAx
+OCAgV2F2ZSBDb21wdXRpbmcsIEluYy4NCj4gICAgKiAgQ29weXJpZ2h0IChDKSAyMDE4ICBNYXR0
+aGV3IEZvcnR1bmUgPG1hdHRoZXcuZm9ydHVuZUBtaXBzLmNvbT4NCj4gLSAqICBDb3B5cmlnaHQg
+KEMpIDIwMTggIEFsZWtzYW5kYXIgTWFya292aWMgPGFsZWtzYW5kYXIubWFya292aWNAd2F2ZWNv
+bXAuY29tPg0KPiArICogIENvcHlyaWdodCAoQykgMjAxOCAgQWxla3NhbmRhciBNYXJrb3ZpYyA8
+YW1hcmtvdmljQHdhdmVjb21wLmNvbT4NCj4gICAgKg0KPiAgICAqICBUaGlzIHByb2dyYW0gaXMg
+ZnJlZSBzb2Z0d2FyZTogeW91IGNhbiByZWRpc3RyaWJ1dGUgaXQgYW5kL29yIG1vZGlmeQ0KPiAg
+ICAqICBpdCB1bmRlciB0aGUgdGVybXMgb2YgdGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNl
+IGFzIHB1Ymxpc2hlZCBieQ0KPiAtICogIHRoZSBGcmVlIFNvZnR3YXJlIEZvdW5kYXRpb24sIGVp
+dGhlciB2ZXJzaW9uIDMgb2YgdGhlIExpY2Vuc2UsIG9yDQo+ICsgKiAgdGhlIEZyZWUgU29mdHdh
+cmUgRm91bmRhdGlvbiwgZWl0aGVyIHZlcnNpb24gMiBvZiB0aGUgTGljZW5zZSwgb3INCj4gICAg
+KiAgKGF0IHlvdXIgb3B0aW9uKSBhbnkgbGF0ZXIgdmVyc2lvbi4NCj4gICAgKg0KPiAgICAqICBU
+aGlzIHByb2dyYW0gaXMgZGlzdHJpYnV0ZWQgaW4gdGhlIGhvcGUgdGhhdCBpdCB3aWxsIGJlIHVz
+ZWZ1bCwNCj4gQEAgLTE3LDYgKzE3LDcgQEANCj4gICAgKg0KPiAgICAqICBZb3Ugc2hvdWxkIGhh
+dmUgcmVjZWl2ZWQgYSBjb3B5IG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZQ0KPiAg
+ICAqICBhbG9uZyB3aXRoIHRoaXMgcHJvZ3JhbS4gIElmIG5vdCwgc2VlIDxodHRwczovL3d3dy5n
+bnUub3JnL2xpY2Vuc2VzLz4uDQo+ICsgKg0KPiAgICAqLw0KPiAgIA0KPiAgICNpZm5kZWYgTkFO
+T01JUFNfRElTQVNTRU1CTEVSX0gNCg==
