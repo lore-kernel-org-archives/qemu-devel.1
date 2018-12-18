@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gZNdg-0004g2-Cw
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 17:14:57 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gZNwQ-0000Nz-GP
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 17:34:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gZNdf-00057m-4r
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 17:14:56 -0500
-References: <20181102151152.288399-1-vsementsov@virtuozzo.com>
-	<20181102151152.288399-4-vsementsov@virtuozzo.com>
-	<48002129-16ef-f0ad-2701-893fc88ecdd0@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1f4b1812-48c0-2ad6-cddc-0f3c09cb1fb2@redhat.com>
-Date: Tue, 18 Dec 2018 16:14:45 -0600
+	(envelope-from <balaton@eik.bme.hu>) id 1gZNwL-0002If-W7
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 17:34:18 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:30944)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gZNwL-0002GF-I9
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 17:34:13 -0500
+Date: Tue, 18 Dec 2018 23:34:10 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <83206F6D-0BA5-4781-8635-84D48DD33A2A@foghorn.io>
+Message-ID: <alpine.BSF.2.21.9999.1812182314450.71625@zero.eik.bme.hu>
+References: <83206F6D-0BA5-4781-8635-84D48DD33A2A@foghorn.io>
 MIME-Version: 1.0
-In-Reply-To: <48002129-16ef-f0ad-2701-893fc88ecdd0@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-ID: <alpine.BSF.2.21.9999.1812182326570.71625@zero.eik.bme.hu>
+Content-Type: text/plain; CHARSET=ISO-8859-15; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] block/nbd-client: use traces instead
- of noisy error_report_err
+Subject: Re: [Qemu-devel] Booting Raspbian on RPi emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,74 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, mdroth@linux.vnet.ibm.com, mreitz@redhat.com, den@openvz.org, pbonzini@redhat.com
+To: Ben Hekster <ben.hekster@foghorn.io>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-On 12/18/18 3:23 PM, Eric Blake wrote:
-> On 11/2/18 10:11 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Reduce extra noise of nbd-client, change 083 correspondingly.
->=20
-> This says what, but not why. The details from the cover letter are=20
-> important to include here, namely:
->=20
->> It was discussed, that error messages, produced by error_reprt_err's,
->> added in f140e300 are
->> 1. not really needed
->> 2. subject to race conditions
->>
->> And it was decided to drop them (switch to trace-points), look thread
->> https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg00833.html
->>
->> So, I've also dropped error_report_err, added earlier in be41c100c0d
->> and later in 78a33ab5878.
->=20
+On Tue, 18 Dec 2018, Ben Hekster via Qemu-devel wrote:
+> I had the exact same issue; for me it was just the addition of G=FCnthe=
+r's "rootwait" option that resolved it, so:
+>
+> $ qemu-system-arm \
+> 	-m 256m \
+> 	-M raspi2 \
+> 	-cpu cortex-a7 \
+> 	-append "console=3DttyAMA0,115200 root=3D/dev/mmcblk0p2 rootwait rw" \
+> 	-dtb bcm2709-rpi-2-b.dtb \
+> 	-drive file=3D2018-11-13-raspbian-stretch-lite.img,if=3Dsd,format=3Dra=
+w \
+> 	-kernel kernel7.img \
+> 	-nographic
+>
+> Did it for me using stock QEMU 3.1.0.  (I need "-nographic" because the=
+ OS X port crashes without it)
 
->> @@ -79,7 +81,9 @@ static coroutine_fn void nbd_read_reply_entry(void=20
->> *opaque)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(s->reply=
-.handle =3D=3D 0);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D nbd_rec=
-eive_reply(s->ioc, &s->reply, &local_err);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (local_err) =
-{
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 er=
-ror_report_err(local_err);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tr=
-ace_nbd_read_reply_entry_fail(ret,=20
->> error_get_pretty(local_err),
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_get_hint(local_err)=20
->> ?: "");
->=20
-> I'm not sold on the error hint being useful in the trace message.=C2=A0=
- For=20
-> that matter, even error_get_pretty() seems like it might be rather verb=
-ose.
->=20
-> I do see why you are trying it, though: in nbd/client.c,=20
-> nbd_handle_reply_err(), we have:
+Indeed. Thanks. It also boots with the raspbian kernel7.img after adding=20
+this option, so likely the cause of this was that mmc wasn't detected fas=
+t=20
+enough and without rootwait it tried to mount it without waiting before=20
+it was available.
 
-Actually, on looking further, the ONLY use of error_append_hint() in=20
-nbd/client.c is when handling NBD_OPT_ which is synchronous when first=20
-establishing the connection; but all of the additions of trace_nbd_*=20
-calls in this file occur during transmission phase, where we don't have=20
-any hints appended.  I could NOT trigger any error path where a hint=20
-would be present in the first place (although I will admit that I may=20
-have missed a spot in my tracing).
+It does not crash on OS X for me even without -nographic but I'm not yet=20
+on Mojave. I've read there may be problems on latest macOS and seen=20
+patches to fix that. Here's the discussion:
 
-> But instead of trying to make all the tracepoints in block/nbd-client.c=
+https://bugs.launchpad.net/qemu/+bug/1802684
+
+Launchpad seems to have eaten the RFC patch URL in the last comment but I=
 =20
-> extract this information, we could just improve nbd/client.c to have a=20
-> tracepoint for any server-received error message at the same point wher=
+think it's this one:
+
+http://patchew.org/QEMU/20181201123056.432-1-peter.maydell@linaro.org/
+
+Maybe you can test and report back if this fixes your problem so it can b=
 e=20
-> it calls error_append_hint().
->=20
+merged if it helps.
 
-This part is still true, even if it is no longer relevant to this patch.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Thank you,
+BALATON Zoltan
