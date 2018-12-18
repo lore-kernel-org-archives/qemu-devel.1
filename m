@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37032)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gZGQE-0003TR-Vv
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:32:37 -0500
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1gZGSv-0005g2-6L
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:35:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gZGQ8-0002pi-8O
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:32:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42006)
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1gZGSt-0004Je-5k
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:35:21 -0500
+Received: from forwardcorp1o.cmail.yandex.net ([2a02:6b8:0:1a72::290]:52337)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gZGQ7-0002oz-Ry
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:32:28 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 18 Dec 2018 15:32:19 +0100
-Message-Id: <1545143539-26253-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [QEMU PATCH] hw/misc/ivshmem: Remove deprecated
- "ivshmem" legacy device
+	(Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
+	id 1gZGSs-0004Hl-BE
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:35:19 -0500
+From: Yury Kotov <yury-kotov@yandex-team.ru>
+In-Reply-To: <CAONzpcaUjNMd=EWZG51-91mwpRyKy0siQW6LKi82NQrDZ-FUXg@mail.gmail.com>
+References: <20181218100002.11219-1-xieyongji@baidu.com>
+	<20181218100002.11219-7-xieyongji@baidu.com>
+	<649661545136221@sas1-bf4ab558af9f.qloud-c.yandex.net>
+	<CAONzpcaUjNMd=EWZG51-91mwpRyKy0siQW6LKi82NQrDZ-FUXg@mail.gmail.com>
+MIME-Version: 1.0
+Date: Tue, 18 Dec 2018 17:35:14 +0300
+Message-Id: <698131545143714@sas1-bf4ab558af9f.qloud-c.yandex.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 for-4.0 6/7] vhost-user-blk: Add support
+ to reconnect backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,492 +31,349 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com
+To: Yongji Xie <elohimes@gmail.com>
+Cc: "mst@redhat.com" <mst@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "zhangyu31@baidu.com" <zhangyu31@baidu.com>, "chaiwen@baidu.com" <chaiwen@baidu.com>, "nixun@baidu.com" <nixun@baidu.com>, "lilin24@baidu.com" <lilin24@baidu.com>, Xie Yongji <xieyongji@baidu.com>, =?utf-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>
 
-It's been marked as deprecated in QEMU v2.6.0 already, so really nobody
-should use the legacy "ivshmem" device anymore (but use ivshmem-plain or
-ivshmem-doorbell instead). Time to remove the deprecated device now.
+18.12.2018, 17:16, "Yongji Xie" <elohimes@gmail.com>:
+> On Tue, 18 Dec 2018 at 20:30, Yury Kotov <yury-kotov@yandex-team.ru> wr=
+ote:
+>> =C2=A0+ wrfsh@
+>>
+>> =C2=A0Hi,
+>>
+>> =C2=A018.12.2018, 13:01, "elohimes@gmail.com" <elohimes@gmail.com>:
+>> =C2=A0> From: Xie Yongji <xieyongji@baidu.com>
+>> =C2=A0>
+>> =C2=A0> Since we now support the message VHOST_USER_GET_SHM_SIZE
+>> =C2=A0> and VHOST_USER_SET_SHM_FD. The backend is able to restart
+>> =C2=A0> safely because it can record inflight I/O in shared memory.
+>> =C2=A0> This patch allows qemu to reconnect the backend after
+>> =C2=A0> connection closed.
+>> =C2=A0>
+>> =C2=A0> Signed-off-by: Xie Yongji <xieyongji@baidu.com>
+>> =C2=A0> Signed-off-by: Ni Xun <nixun@baidu.com>
+>> =C2=A0> Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
+>> =C2=A0> ---
+>> =C2=A0> hw/block/vhost-user-blk.c | 183 ++++++++++++++++++++++++-----
+>> =C2=A0> include/hw/virtio/vhost-user-blk.h | 4 +
+>> =C2=A0> 2 files changed, 160 insertions(+), 27 deletions(-)
+>> =C2=A0>
+>> =C2=A0> diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-b=
+lk.c
+>> =C2=A0> index 27028cf996..80f2e2d765 100644
+>> =C2=A0> --- a/hw/block/vhost-user-blk.c
+>> =C2=A0> +++ b/hw/block/vhost-user-blk.c
+>> =C2=A0> @@ -101,7 +101,7 @@ const VhostDevConfigOps blk_ops =3D {
+>> =C2=A0> .vhost_dev_config_notifier =3D vhost_user_blk_handle_config_ch=
+ange,
+>> =C2=A0> };
+>> =C2=A0>
+>> =C2=A0> -static void vhost_user_blk_start(VirtIODevice *vdev)
+>> =C2=A0> +static int vhost_user_blk_start(VirtIODevice *vdev)
+>> =C2=A0> {
+>> =C2=A0> VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
+>> =C2=A0> BusState *qbus =3D BUS(qdev_get_parent_bus(DEVICE(vdev)));
+>> =C2=A0> @@ -110,13 +110,13 @@ static void vhost_user_blk_start(VirtIOD=
+evice *vdev)
+>> =C2=A0>
+>> =C2=A0> if (!k->set_guest_notifiers) {
+>> =C2=A0> error_report("binding does not support guest notifiers");
+>> =C2=A0> - return;
+>> =C2=A0> + return -ENOSYS;
+>> =C2=A0> }
+>> =C2=A0>
+>> =C2=A0> ret =3D vhost_dev_enable_notifiers(&s->dev, vdev);
+>> =C2=A0> if (ret < 0) {
+>> =C2=A0> error_report("Error enabling host notifiers: %d", -ret);
+>> =C2=A0> - return;
+>> =C2=A0> + return ret;
+>> =C2=A0> }
+>> =C2=A0>
+>> =C2=A0> ret =3D k->set_guest_notifiers(qbus->parent, s->dev.nvqs, true=
+);
+>> =C2=A0> @@ -147,12 +147,13 @@ static void vhost_user_blk_start(VirtIOD=
+evice *vdev)
+>> =C2=A0> vhost_virtqueue_mask(&s->dev, vdev, i, false);
+>> =C2=A0> }
+>> =C2=A0>
+>> =C2=A0> - return;
+>> =C2=A0> + return ret;
+>> =C2=A0>
+>> =C2=A0> err_guest_notifiers:
+>> =C2=A0> k->set_guest_notifiers(qbus->parent, s->dev.nvqs, false);
+>> =C2=A0> err_host_notifiers:
+>> =C2=A0> vhost_dev_disable_notifiers(&s->dev, vdev);
+>> =C2=A0> + return ret;
+>> =C2=A0> }
+>> =C2=A0>
+>> =C2=A0> static void vhost_user_blk_stop(VirtIODevice *vdev)
+>> =C2=A0> @@ -171,7 +172,6 @@ static void vhost_user_blk_stop(VirtIODevi=
+ce *vdev)
+>> =C2=A0> ret =3D k->set_guest_notifiers(qbus->parent, s->dev.nvqs, fals=
+e);
+>> =C2=A0> if (ret < 0) {
+>> =C2=A0> error_report("vhost guest notifier cleanup failed: %d", ret);
+>> =C2=A0> - return;
+>> =C2=A0> }
+>> =C2=A0>
+>> =C2=A0> vhost_dev_disable_notifiers(&s->dev, vdev);
+>> =C2=A0> @@ -181,21 +181,43 @@ static void vhost_user_blk_set_status(Vi=
+rtIODevice *vdev, uint8_t status)
+>> =C2=A0> {
+>> =C2=A0> VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
+>> =C2=A0> bool should_start =3D status & VIRTIO_CONFIG_S_DRIVER_OK;
+>> =C2=A0> + int ret;
+>> =C2=A0>
+>> =C2=A0> if (!vdev->vm_running) {
+>> =C2=A0> should_start =3D false;
+>> =C2=A0> }
+>> =C2=A0>
+>> =C2=A0> - if (s->dev.started =3D=3D should_start) {
+>> =C2=A0> + if (s->should_start =3D=3D should_start) {
+>> =C2=A0> + return;
+>> =C2=A0> + }
+>> =C2=A0> +
+>> =C2=A0> + if (!s->connected || s->dev.started =3D=3D should_start) {
+>> =C2=A0> + s->should_start =3D should_start;
+>> =C2=A0> return;
+>> =C2=A0> }
+>> =C2=A0>
+>> =C2=A0> if (should_start) {
+>> =C2=A0> - vhost_user_blk_start(vdev);
+>> =C2=A0> + s->should_start =3D true;
+>> =C2=A0> + /*
+>> =C2=A0> + * make sure vhost_user_blk_handle_output() ignores fake
+>> =C2=A0> + * guest kick by vhost_dev_enable_notifiers()
+>> =C2=A0> + */
+>> =C2=A0> + barrier();
+>> =C2=A0> + ret =3D vhost_user_blk_start(vdev);
+>> =C2=A0> + if (ret < 0) {
+>> =C2=A0> + error_report("vhost-user-blk: vhost start failed: %s",
+>> =C2=A0> + strerror(-ret));
+>> =C2=A0> + qemu_chr_fe_disconnect(&s->chardev);
+>> =C2=A0> + }
+>> =C2=A0> } else {
+>> =C2=A0> vhost_user_blk_stop(vdev);
+>> =C2=A0> + /*
+>> =C2=A0> + * make sure vhost_user_blk_handle_output() ignore fake
+>> =C2=A0> + * guest kick by vhost_dev_disable_notifiers()
+>> =C2=A0> + */
+>> =C2=A0> + barrier();
+>> =C2=A0> + s->should_start =3D false;
+>> =C2=A0> }
+>> =C2=A0> -
+>> =C2=A0> }
+>> =C2=A0>
+>> =C2=A0> static uint64_t vhost_user_blk_get_features(VirtIODevice *vdev=
+,
+>> =C2=A0> @@ -225,13 +247,22 @@ static uint64_t vhost_user_blk_get_featu=
+res(VirtIODevice *vdev,
+>> =C2=A0> static void vhost_user_blk_handle_output(VirtIODevice *vdev, V=
+irtQueue *vq)
+>> =C2=A0> {
+>> =C2=A0> VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
+>> =C2=A0> - int i;
+>> =C2=A0> + int i, ret;
+>> =C2=A0>
+>> =C2=A0> if (!(virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1) &&
+>> =C2=A0> !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1))) {
+>> =C2=A0> return;
+>> =C2=A0> }
+>> =C2=A0>
+>> =C2=A0> + if (s->should_start) {
+>> =C2=A0> + return;
+>> =C2=A0> + }
+>> =C2=A0> + s->should_start =3D true;
+>> =C2=A0> +
+>> =C2=A0> + if (!s->connected) {
+>> =C2=A0> + return;
+>> =C2=A0> + }
+>> =C2=A0> +
+>> =C2=A0> if (s->dev.started) {
+>> =C2=A0> return;
+>> =C2=A0> }
+>> =C2=A0> @@ -239,7 +270,13 @@ static void vhost_user_blk_handle_output(=
+VirtIODevice *vdev, VirtQueue *vq)
+>> =C2=A0> /* Some guests kick before setting VIRTIO_CONFIG_S_DRIVER_OK s=
+o start
+>> =C2=A0> * vhost here instead of waiting for .set_status().
+>> =C2=A0> */
+>> =C2=A0> - vhost_user_blk_start(vdev);
+>> =C2=A0> + ret =3D vhost_user_blk_start(vdev);
+>> =C2=A0> + if (ret < 0) {
+>> =C2=A0> + error_report("vhost-user-blk: vhost start failed: %s",
+>> =C2=A0> + strerror(-ret));
+>> =C2=A0> + qemu_chr_fe_disconnect(&s->chardev);
+>> =C2=A0> + return;
+>> =C2=A0> + }
+>> =C2=A0>
+>> =C2=A0> /* Kick right away to begin processing requests already in vri=
+ng */
+>> =C2=A0> for (i =3D 0; i < s->dev.nvqs; i++) {
+>> =C2=A0> @@ -259,12 +296,105 @@ static void vhost_user_blk_reset(VirtIO=
+Device *vdev)
+>> =C2=A0> vhost_dev_reset_shm(s->shm);
+>> =C2=A0> }
+>> =C2=A0>
+>> =C2=A0> +static int vhost_user_blk_connect(DeviceState *dev)
+>> =C2=A0> +{
+>> =C2=A0> + VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
+>> =C2=A0> + VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
+>> =C2=A0> + int ret =3D 0;
+>> =C2=A0> +
+>> =C2=A0> + if (s->connected) {
+>> =C2=A0> + return 0;
+>> =C2=A0> + }
+>> =C2=A0> + s->connected =3D true;
+>> =C2=A0> +
+>> =C2=A0> + s->dev.nvqs =3D s->num_queues;
+>> =C2=A0> + s->dev.vqs =3D s->vqs;
+>> =C2=A0> + s->dev.vq_index =3D 0;
+>> =C2=A0> + s->dev.backend_features =3D 0;
+>> =C2=A0> +
+>> =C2=A0> + vhost_dev_set_config_notifier(&s->dev, &blk_ops);
+>> =C2=A0> +
+>> =C2=A0> + ret =3D vhost_dev_init(&s->dev, s->vhost_user, VHOST_BACKEND=
+_TYPE_USER, 0);
+>> =C2=A0> + if (ret < 0) {
+>> =C2=A0> + error_report("vhost-user-blk: vhost initialization failed: %=
+s",
+>> =C2=A0> + strerror(-ret));
+>> =C2=A0> + return ret;
+>> =C2=A0> + }
+>> =C2=A0> +
+>> =C2=A0> + /* restore vhost state */
+>> =C2=A0> + if (s->should_start) {
+>> =C2=A0> + ret =3D vhost_user_blk_start(vdev);
+>> =C2=A0> + if (ret < 0) {
+>> =C2=A0> + error_report("vhost-user-blk: vhost start failed: %s",
+>> =C2=A0> + strerror(-ret));
+>> =C2=A0> + return ret;
+>> =C2=A0> + }
+>> =C2=A0> + }
+>> =C2=A0> +
+>> =C2=A0> + return 0;
+>> =C2=A0> +}
+>> =C2=A0> +
+>> =C2=A0> +static void vhost_user_blk_disconnect(DeviceState *dev)
+>> =C2=A0> +{
+>> =C2=A0> + VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
+>> =C2=A0> + VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
+>> =C2=A0> +
+>> =C2=A0> + if (!s->connected) {
+>> =C2=A0> + return;
+>> =C2=A0> + }
+>> =C2=A0> + s->connected =3D false;
+>> =C2=A0> +
+>> =C2=A0> + if (s->dev.started) {
+>> =C2=A0> + vhost_user_blk_stop(vdev);
+>> =C2=A0> + }
+>> =C2=A0> +
+>> =C2=A0> + vhost_dev_cleanup(&s->dev);
+>> =C2=A0> +}
+>> =C2=A0> +
+>> =C2=A0> +static gboolean vhost_user_blk_watch(GIOChannel *chan, GIOCon=
+dition cond,
+>> =C2=A0> + void *opaque)
+>> =C2=A0> +{
+>> =C2=A0> + DeviceState *dev =3D opaque;
+>> =C2=A0> + VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
+>> =C2=A0> + VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
+>> =C2=A0> +
+>> =C2=A0> + qemu_chr_fe_disconnect(&s->chardev);
+>> =C2=A0> +
+>> =C2=A0> + return true;
+>> =C2=A0> +}
+>> =C2=A0> +
+>> =C2=A0> +static void vhost_user_blk_event(void *opaque, int event)
+>> =C2=A0> +{
+>> =C2=A0> + DeviceState *dev =3D opaque;
+>> =C2=A0> + VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
+>> =C2=A0> + VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
+>> =C2=A0> +
+>> =C2=A0> + switch (event) {
+>> =C2=A0> + case CHR_EVENT_OPENED:
+>> =C2=A0> + if (vhost_user_blk_connect(dev) < 0) {
+>> =C2=A0> + qemu_chr_fe_disconnect(&s->chardev);
+>> =C2=A0> + return;
+>> =C2=A0> + }
+>> =C2=A0> + s->watch =3D qemu_chr_fe_add_watch(&s->chardev, G_IO_HUP,
+>> =C2=A0> + vhost_user_blk_watch, dev);
+>> =C2=A0> + break;
+>> =C2=A0> + case CHR_EVENT_CLOSED:
+>> =C2=A0> + vhost_user_blk_disconnect(dev);
+>> =C2=A0> + if (s->watch) {
+>> =C2=A0> + g_source_remove(s->watch);
+>> =C2=A0> + s->watch =3D 0;
+>> =C2=A0> + }
+>> =C2=A0> + break;
+>> =C2=A0> + }
+>> =C2=A0> +}
+>> =C2=A0> +
+>> =C2=A0> static void vhost_user_blk_device_realize(DeviceState *dev, Er=
+ror **errp)
+>> =C2=A0> {
+>> =C2=A0> VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
+>> =C2=A0> VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
+>> =C2=A0> VhostUserState *user;
+>> =C2=A0> int i, ret;
+>> =C2=A0> + Error *err =3D NULL;
+>> =C2=A0>
+>> =C2=A0> if (!s->chardev.chr) {
+>> =C2=A0> error_setg(errp, "vhost-user-blk: chardev is mandatory");
+>> =C2=A0> @@ -299,23 +429,21 @@ static void vhost_user_blk_device_realiz=
+e(DeviceState *dev, Error **errp)
+>> =C2=A0> }
+>> =C2=A0>
+>> =C2=A0> s->shm =3D g_new0(struct vhost_shm, 1);
+>> =C2=A0> -
+>> =C2=A0> - s->dev.nvqs =3D s->num_queues;
+>> =C2=A0> - s->dev.vqs =3D g_new(struct vhost_virtqueue, s->dev.nvqs);
+>> =C2=A0> - s->dev.vq_index =3D 0;
+>> =C2=A0> - s->dev.backend_features =3D 0;
+>> =C2=A0> -
+>> =C2=A0> - vhost_dev_set_config_notifier(&s->dev, &blk_ops);
+>> =C2=A0> -
+>> =C2=A0> - ret =3D vhost_dev_init(&s->dev, s->vhost_user, VHOST_BACKEND=
+_TYPE_USER, 0);
+>> =C2=A0> - if (ret < 0) {
+>> =C2=A0> - error_setg(errp, "vhost-user-blk: vhost initialization faile=
+d: %s",
+>> =C2=A0> - strerror(-ret));
+>> =C2=A0> - goto virtio_err;
+>> =C2=A0> + s->vqs =3D g_new(struct vhost_virtqueue, s->num_queues);
+>> =C2=A0> + s->watch =3D 0;
+>> =C2=A0> + s->should_start =3D false;
+>> =C2=A0> + s->connected =3D false;
+>> =C2=A0> +
+>> =C2=A0> + while (qemu_chr_fe_wait_connected(&s->chardev, &err) < 0) {
+>> =C2=A0> + error_report_err(err);
+>> =C2=A0> + err =3D NULL;
+>> =C2=A0> + sleep(1);
+>> =C2=A0> }
+>>
+>> =C2=A0After the reconnect loop we have some function calls to vhost ba=
+ckend:
+>> =C2=A0* qemu_chr_fe_set_handlers implicit calls vhost_dev_init
+>> =C2=A0* vhost_dev_get_config
+>> =C2=A0* vhost_dev_init_shm
+>>
+>> =C2=A0If vhost backend will restart during their execution the initial=
+zation will be
+>> =C2=A0failed. What do you think? May be we can call these functions in=
+side of
+>> =C2=A0the reconnect loop to fix it?
+>
+> qemu_chr_fe_wait_connected() should be called only when we are in
+> disconnected state. Otherwise, it will be conflicted with reconnect
+> thread.
+>
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- docs/specs/ivshmem-spec.txt |   8 +-
- hw/i386/pc_piix.c           |   4 -
- hw/misc/ivshmem.c           | 206 +-------------------------------------------
- qemu-deprecated.texi        |   5 --
- scripts/device-crash-test   |   1 -
- tests/ivshmem-test.c        |  65 +++++---------
- 6 files changed, 29 insertions(+), 260 deletions(-)
+Reconnect thread is started by reconnet timer callback from the main loop=
+ but
+vhost_user_blk_device_realize is also runs in the main loop, so we don't =
+a race
+in this case I think.
 
-diff --git a/docs/specs/ivshmem-spec.txt b/docs/specs/ivshmem-spec.txt
-index a1f5499..042f7ea 100644
---- a/docs/specs/ivshmem-spec.txt
-+++ b/docs/specs/ivshmem-spec.txt
-@@ -17,12 +17,16 @@ get interrupted by its peers.
- 
- There are two basic configurations:
- 
--- Just shared memory: -device ivshmem-plain,memdev=HMB,...
-+- Just shared memory:
-+
-+      -device ivshmem-plain,memdev=HMB,...
- 
-   This uses host memory backend HMB.  It should have option "share"
-   set.
- 
--- Shared memory plus interrupts: -device ivshmem,chardev=CHR,vectors=N,...
-+- Shared memory plus interrupts:
-+
-+      -device ivshmem-doorbell,chardev=CHR,vectors=N,...
- 
-   An ivshmem server must already be running on the host.  The device
-   connects to the server's UNIX domain socket via character device
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 7653fbb..5cbe976 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -725,10 +725,6 @@ DEFINE_I440FX_MACHINE(v1_3, "pc-1.3", pc_compat_1_3,
-             .property = "msix",\
-             .value    = "off",\
-         },{\
--            .driver   = "ivshmem",\
--            .property = "use64",\
--            .value    = "0",\
--        },{\
-             .driver   = "qxl",\
-             .property = "revision",\
-             .value    = stringify(3),\
-diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index 8213659..2ab741f 100644
---- a/hw/misc/ivshmem.c
-+++ b/hw/misc/ivshmem.c
-@@ -112,13 +112,6 @@ typedef struct IVShmemState {
-     /* migration stuff */
-     OnOffAuto master;
-     Error *migration_blocker;
--
--    /* legacy cruft */
--    char *role;
--    char *shmobj;
--    char *sizearg;
--    size_t legacy_size;
--    uint32_t not_legacy_32bit;
- } IVShmemState;
- 
- /* registers for the Inter-VM shared memory device */
-@@ -529,17 +522,6 @@ static void process_msg_shmem(IVShmemState *s, int fd, Error **errp)
- 
-     size = buf.st_size;
- 
--    /* Legacy cruft */
--    if (s->legacy_size != SIZE_MAX) {
--        if (size < s->legacy_size) {
--            error_setg(errp, "server sent only %zd bytes of shared memory",
--                       (size_t)buf.st_size);
--            close(fd);
--            return;
--        }
--        size = s->legacy_size;
--    }
--
-     /* mmap the region and map into the BAR2 */
-     memory_region_init_ram_from_fd(&s->server_bar2, OBJECT(s),
-                                    "ivshmem.bar2", size, true, fd, &local_err);
-@@ -882,8 +864,8 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
-     IVShmemState *s = IVSHMEM_COMMON(dev);
-     Error *err = NULL;
-     uint8_t *pci_conf;
--    uint8_t attr = PCI_BASE_ADDRESS_SPACE_MEMORY |
--        PCI_BASE_ADDRESS_MEM_PREFETCH;
-+    const uint8_t attr = PCI_BASE_ADDRESS_SPACE_MEMORY |
-+        PCI_BASE_ADDRESS_MEM_PREFETCH | PCI_BASE_ADDRESS_MEM_TYPE_64;
-     Error *local_err = NULL;
- 
-     /* IRQFD requires MSI */
-@@ -903,10 +885,6 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
-     pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY,
-                      &s->ivshmem_mmio);
- 
--    if (s->not_legacy_32bit) {
--        attr |= PCI_BASE_ADDRESS_MEM_TYPE_64;
--    }
--
-     if (s->hostmem != NULL) {
-         IVSHMEM_DPRINTF("using hostmem\n");
- 
-@@ -1084,13 +1062,6 @@ static Property ivshmem_plain_properties[] = {
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
--static void ivshmem_plain_init(Object *obj)
--{
--    IVShmemState *s = IVSHMEM_PLAIN(obj);
--
--    s->not_legacy_32bit = 1;
--}
--
- static void ivshmem_plain_realize(PCIDevice *dev, Error **errp)
- {
-     IVShmemState *s = IVSHMEM_COMMON(dev);
-@@ -1122,7 +1093,6 @@ static const TypeInfo ivshmem_plain_info = {
-     .name          = TYPE_IVSHMEM_PLAIN,
-     .parent        = TYPE_IVSHMEM_COMMON,
-     .instance_size = sizeof(IVShmemState),
--    .instance_init = ivshmem_plain_init,
-     .class_init    = ivshmem_plain_class_init,
- };
- 
-@@ -1155,8 +1125,6 @@ static void ivshmem_doorbell_init(Object *obj)
-     IVShmemState *s = IVSHMEM_DOORBELL(obj);
- 
-     s->features |= (1 << IVSHMEM_MSI);
--    s->legacy_size = SIZE_MAX;  /* whatever the server sends */
--    s->not_legacy_32bit = 1;
- }
- 
- static void ivshmem_doorbell_realize(PCIDevice *dev, Error **errp)
-@@ -1189,181 +1157,11 @@ static const TypeInfo ivshmem_doorbell_info = {
-     .class_init    = ivshmem_doorbell_class_init,
- };
- 
--static int ivshmem_load_old(QEMUFile *f, void *opaque, int version_id)
--{
--    IVShmemState *s = opaque;
--    PCIDevice *pdev = PCI_DEVICE(s);
--    int ret;
--
--    IVSHMEM_DPRINTF("ivshmem_load_old\n");
--
--    if (version_id != 0) {
--        return -EINVAL;
--    }
--
--    ret = ivshmem_pre_load(s);
--    if (ret) {
--        return ret;
--    }
--
--    ret = pci_device_load(pdev, f);
--    if (ret) {
--        return ret;
--    }
--
--    if (ivshmem_has_feature(s, IVSHMEM_MSI)) {
--        msix_load(pdev, f);
--        ivshmem_msix_vector_use(s);
--    } else {
--        s->intrstatus = qemu_get_be32(f);
--        s->intrmask = qemu_get_be32(f);
--    }
--
--    return 0;
--}
--
--static bool test_msix(void *opaque, int version_id)
--{
--    IVShmemState *s = opaque;
--
--    return ivshmem_has_feature(s, IVSHMEM_MSI);
--}
--
--static bool test_no_msix(void *opaque, int version_id)
--{
--    return !test_msix(opaque, version_id);
--}
--
--static const VMStateDescription ivshmem_vmsd = {
--    .name = "ivshmem",
--    .version_id = 1,
--    .minimum_version_id = 1,
--    .pre_load = ivshmem_pre_load,
--    .post_load = ivshmem_post_load,
--    .fields = (VMStateField[]) {
--        VMSTATE_PCI_DEVICE(parent_obj, IVShmemState),
--
--        VMSTATE_MSIX_TEST(parent_obj, IVShmemState, test_msix),
--        VMSTATE_UINT32_TEST(intrstatus, IVShmemState, test_no_msix),
--        VMSTATE_UINT32_TEST(intrmask, IVShmemState, test_no_msix),
--
--        VMSTATE_END_OF_LIST()
--    },
--    .load_state_old = ivshmem_load_old,
--    .minimum_version_id_old = 0
--};
--
--static Property ivshmem_properties[] = {
--    DEFINE_PROP_CHR("chardev", IVShmemState, server_chr),
--    DEFINE_PROP_STRING("size", IVShmemState, sizearg),
--    DEFINE_PROP_UINT32("vectors", IVShmemState, vectors, 1),
--    DEFINE_PROP_BIT("ioeventfd", IVShmemState, features, IVSHMEM_IOEVENTFD,
--                    false),
--    DEFINE_PROP_BIT("msi", IVShmemState, features, IVSHMEM_MSI, true),
--    DEFINE_PROP_STRING("shm", IVShmemState, shmobj),
--    DEFINE_PROP_STRING("role", IVShmemState, role),
--    DEFINE_PROP_UINT32("use64", IVShmemState, not_legacy_32bit, 1),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
--static void desugar_shm(IVShmemState *s)
--{
--    Object *obj;
--    char *path;
--
--    obj = object_new("memory-backend-file");
--    path = g_strdup_printf("/dev/shm/%s", s->shmobj);
--    object_property_set_str(obj, path, "mem-path", &error_abort);
--    g_free(path);
--    object_property_set_int(obj, s->legacy_size, "size", &error_abort);
--    object_property_set_bool(obj, true, "share", &error_abort);
--    object_property_add_child(OBJECT(s), "internal-shm-backend", obj,
--                              &error_abort);
--    object_unref(obj);
--    user_creatable_complete(USER_CREATABLE(obj), &error_abort);
--    s->hostmem = MEMORY_BACKEND(obj);
--}
--
--static void ivshmem_realize(PCIDevice *dev, Error **errp)
--{
--    IVShmemState *s = IVSHMEM_COMMON(dev);
--
--    if (!qtest_enabled()) {
--        warn_report("ivshmem is deprecated, please use ivshmem-plain"
--                    " or ivshmem-doorbell instead");
--    }
--
--    if (qemu_chr_fe_backend_connected(&s->server_chr) + !!s->shmobj != 1) {
--        error_setg(errp, "You must specify either 'shm' or 'chardev'");
--        return;
--    }
--
--    if (s->sizearg == NULL) {
--        s->legacy_size = 4 * MiB; /* 4 MB default */
--    } else {
--        int ret;
--        uint64_t size;
--
--        ret = qemu_strtosz_MiB(s->sizearg, NULL, &size);
--        if (ret < 0 || (size_t)size != size || !is_power_of_2(size)) {
--            error_setg(errp, "Invalid size %s", s->sizearg);
--            return;
--        }
--        s->legacy_size = size;
--    }
--
--    /* check that role is reasonable */
--    if (s->role) {
--        if (strncmp(s->role, "peer", 5) == 0) {
--            s->master = ON_OFF_AUTO_OFF;
--        } else if (strncmp(s->role, "master", 7) == 0) {
--            s->master = ON_OFF_AUTO_ON;
--        } else {
--            error_setg(errp, "'role' must be 'peer' or 'master'");
--            return;
--        }
--    } else {
--        s->master = ON_OFF_AUTO_AUTO;
--    }
--
--    if (s->shmobj) {
--        desugar_shm(s);
--    }
--
--    /*
--     * Note: we don't use INTx with IVSHMEM_MSI at all, so this is a
--     * bald-faced lie then.  But it's a backwards compatible lie.
--     */
--    pci_config_set_interrupt_pin(dev->config, 1);
--
--    ivshmem_common_realize(dev, errp);
--}
--
--static void ivshmem_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc = DEVICE_CLASS(klass);
--    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
--
--    k->realize = ivshmem_realize;
--    k->revision = 0;
--    dc->desc = "Inter-VM shared memory (legacy)";
--    dc->props = ivshmem_properties;
--    dc->vmsd = &ivshmem_vmsd;
--}
--
--static const TypeInfo ivshmem_info = {
--    .name          = TYPE_IVSHMEM,
--    .parent        = TYPE_IVSHMEM_COMMON,
--    .instance_size = sizeof(IVShmemState),
--    .class_init    = ivshmem_class_init,
--};
--
- static void ivshmem_register_types(void)
- {
-     type_register_static(&ivshmem_common_info);
-     type_register_static(&ivshmem_plain_info);
-     type_register_static(&ivshmem_doorbell_info);
--    type_register_static(&ivshmem_info);
- }
- 
- type_init(ivshmem_register_types)
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 190250f..038df3d 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -110,11 +110,6 @@ documentation of ``query-hotpluggable-cpus'' for additional details.
- 
- @section System emulator devices
- 
--@subsection ivshmem (since 2.6.0)
--
--The ``ivshmem'' device type is replaced by either the ``ivshmem-plain''
--or ``ivshmem-doorbell`` device types.
--
- @subsection bluetooth (since 3.1)
- 
- The bluetooth subsystem is unmaintained since many years and likely bitrotten
-diff --git a/scripts/device-crash-test b/scripts/device-crash-test
-index e93a7c0..a835772 100755
---- a/scripts/device-crash-test
-+++ b/scripts/device-crash-test
-@@ -83,7 +83,6 @@ ERROR_WHITELIST = [
-     {'device':'isa-ipmi-bt', 'expected':True},             # IPMI device requires a bmc attribute to be set
-     {'device':'isa-ipmi-kcs', 'expected':True},            # IPMI device requires a bmc attribute to be set
-     {'device':'isa-parallel', 'expected':True},            # Can't create serial device, empty char device
--    {'device':'ivshmem', 'expected':True},                 # You must specify either 'shm' or 'chardev'
-     {'device':'ivshmem-doorbell', 'expected':True},        # You must specify a 'chardev'
-     {'device':'ivshmem-plain', 'expected':True},           # You must specify a 'memdev'
-     {'device':'loader', 'expected':True},                  # please include valid arguments
-diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
-index c37b196..9811d66 100644
---- a/tests/ivshmem-test.c
-+++ b/tests/ivshmem-test.c
-@@ -305,20 +305,18 @@ static void *server_thread(void *data)
-     return NULL;
- }
- 
--static void setup_vm_with_server(IVState *s, int nvectors, bool msi)
-+static void setup_vm_with_server(IVState *s, int nvectors)
- {
--    char *cmd = g_strdup_printf("-chardev socket,id=chr0,path=%s,nowait "
--                                "-device ivshmem%s,chardev=chr0,vectors=%d",
--                                tmpserver,
--                                msi ? "-doorbell" : ",size=1M,msi=off",
--                                nvectors);
-+    char *cmd = g_strdup_printf("-chardev socket,id=chr0,path=%s,nowait -device"
-+                                " ivshmem-doorbell,chardev=chr0,vectors=%d",
-+                                tmpserver, nvectors);
- 
--    setup_vm_cmd(s, cmd, msi);
-+    setup_vm_cmd(s, cmd, true);
- 
-     g_free(cmd);
- }
- 
--static void test_ivshmem_server(bool msi)
-+static void test_ivshmem_server(void)
- {
-     IVState state1, state2, *s1, *s2;
-     ServerThread thread;
-@@ -341,9 +339,9 @@ static void test_ivshmem_server(bool msi)
-     thread.thread = g_thread_new("ivshmem-server", server_thread, &thread);
-     g_assert(thread.thread != NULL);
- 
--    setup_vm_with_server(&state1, nvectors, msi);
-+    setup_vm_with_server(&state1, nvectors);
-     s1 = &state1;
--    setup_vm_with_server(&state2, nvectors, msi);
-+    setup_vm_with_server(&state2, nvectors);
-     s2 = &state2;
- 
-     /* check got different VM ids */
-@@ -355,39 +353,29 @@ static void test_ivshmem_server(bool msi)
- 
-     /* check number of MSI-X vectors */
-     global_qtest = s1->qs->qts;
--    if (msi) {
--        ret = qpci_msix_table_size(s1->dev);
--        g_assert_cmpuint(ret, ==, nvectors);
--    }
-+    ret = qpci_msix_table_size(s1->dev);
-+    g_assert_cmpuint(ret, ==, nvectors);
- 
-     /* TODO test behavior before MSI-X is enabled */
- 
-     /* ping vm2 -> vm1 on vector 0 */
--    if (msi) {
--        ret = qpci_msix_pending(s1->dev, 0);
--        g_assert_cmpuint(ret, ==, 0);
--    } else {
--        g_assert_cmpuint(in_reg(s1, INTRSTATUS), ==, 0);
--    }
-+    ret = qpci_msix_pending(s1->dev, 0);
-+    g_assert_cmpuint(ret, ==, 0);
-     out_reg(s2, DOORBELL, vm1 << 16);
-     do {
-         g_usleep(10000);
--        ret = msi ? qpci_msix_pending(s1->dev, 0) : in_reg(s1, INTRSTATUS);
-+        ret = qpci_msix_pending(s1->dev, 0);
-     } while (ret == 0 && g_get_monotonic_time() < end_time);
-     g_assert_cmpuint(ret, !=, 0);
- 
-     /* ping vm1 -> vm2 on vector 1 */
-     global_qtest = s2->qs->qts;
--    if (msi) {
--        ret = qpci_msix_pending(s2->dev, 1);
--        g_assert_cmpuint(ret, ==, 0);
--    } else {
--        g_assert_cmpuint(in_reg(s2, INTRSTATUS), ==, 0);
--    }
-+    ret = qpci_msix_pending(s2->dev, 1);
-+    g_assert_cmpuint(ret, ==, 0);
-     out_reg(s1, DOORBELL, vm2 << 16 | 1);
-     do {
-         g_usleep(10000);
--        ret = msi ? qpci_msix_pending(s2->dev, 1) : in_reg(s2, INTRSTATUS);
-+        ret = qpci_msix_pending(s2->dev, 1);
-     } while (ret == 0 && g_get_monotonic_time() < end_time);
-     g_assert_cmpuint(ret, !=, 0);
- 
-@@ -405,27 +393,17 @@ static void test_ivshmem_server(bool msi)
-     close(thread.pipe[0]);
- }
- 
--static void test_ivshmem_server_msi(void)
--{
--    test_ivshmem_server(true);
--}
--
--static void test_ivshmem_server_irq(void)
--{
--    test_ivshmem_server(false);
--}
--
- #define PCI_SLOT_HP             0x06
- 
- static void test_ivshmem_hotplug(void)
- {
-     const char *arch = qtest_get_arch();
- 
--    qtest_start("");
-+    qtest_start("-object memory-backend-ram,size=1M,id=mb1");
- 
--    qtest_qmp_device_add("ivshmem",
--                         "iv1", "{'addr': %s, 'shm': %s, 'size': '1M'}",
--                         stringify(PCI_SLOT_HP), tmpshm);
-+    qtest_qmp_device_add("ivshmem-plain", "iv1",
-+                         "{'addr': %s, 'memdev': 'mb1'}",
-+                         stringify(PCI_SLOT_HP));
-     if (strcmp(arch, "ppc64") != 0) {
-         qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
-     }
-@@ -525,8 +503,7 @@ int main(int argc, char **argv)
-     if (g_test_slow()) {
-         qtest_add_func("/ivshmem/pair", test_ivshmem_pair);
-         if (strcmp(arch, "ppc64") != 0) {
--            qtest_add_func("/ivshmem/server-msi", test_ivshmem_server_msi);
--            qtest_add_func("/ivshmem/server-irq", test_ivshmem_server_irq);
-+            qtest_add_func("/ivshmem/server", test_ivshmem_server);
-         }
-     }
- 
--- 
-1.8.3.1
+Regards,
+Yury
