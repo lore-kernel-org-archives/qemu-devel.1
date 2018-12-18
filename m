@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gZCJx-00060S-I0
+	(envelope-from <armbru@redhat.com>) id 1gZCJx-00060T-ID
 	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:09:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gZCJu-00086R-QF
+	(envelope-from <armbru@redhat.com>) id 1gZCJu-00086Z-Sp
 	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:09:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59784)
+Received: from mx1.redhat.com ([209.132.183.28]:59780)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gZCJu-0007yJ-F9
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gZCJu-0007yE-IC
 	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:09:46 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C1B787FD44
+	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 10:09:43 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-56.ams2.redhat.com
+	[10.36.116.56])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8E5175C229
+	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 10:09:43 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 18 Dec 2018 11:09:35 +0100
-Message-Id: <20181218100941.25267-2-armbru@redhat.com>
-In-Reply-To: <20181218100941.25267-1-armbru@redhat.com>
-References: <20181218100941.25267-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 1/7] qapi: Turn ShutdownCause into QAPI enum
+Date: Tue, 18 Dec 2018 11:09:34 +0100
+Message-Id: <20181218100941.25267-1-armbru@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/7] QAPI patches for 2018-12-18
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,97 +35,83 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Dominik Csapak <d.csapak@proxmox.com>
 
-From: Dominik Csapak <d.csapak@proxmox.com>
+The following changes since commit f163448536e5f7ae8905b14547eab37a41a75f=
+6c:
 
-Needed so the patch after next can add ShutdownCause to QMP events
-SHUTDOWN and RESET.
+  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20181216' into =
+staging (2018-12-17 13:04:25 +0000)
 
-Signed-off-by: Dominik Csapak <d.csapak@proxmox.com>
-Message-Id: <20181205110131.23049-2-d.csapak@proxmox.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- include/sysemu/sysemu.h | 20 --------------------
- qapi/run-state.json     | 34 ++++++++++++++++++++++++++++++++++
- 2 files changed, 34 insertions(+), 20 deletions(-)
+are available in the Git repository at:
 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 8d6095d98b..f83522c7e7 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -31,26 +31,6 @@ VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandler *cb,
- void qemu_del_vm_change_state_handler(VMChangeStateEntry *e);
- void vm_state_notify(int running, RunState state);
- 
--/* Enumeration of various causes for shutdown. */
--typedef enum ShutdownCause {
--    SHUTDOWN_CAUSE_NONE,          /* No shutdown request pending */
--    SHUTDOWN_CAUSE_HOST_ERROR,    /* An error prevents further use of guest */
--    SHUTDOWN_CAUSE_HOST_QMP,      /* Reaction to a QMP command, like 'quit' */
--    SHUTDOWN_CAUSE_HOST_SIGNAL,   /* Reaction to a signal, such as SIGINT */
--    SHUTDOWN_CAUSE_HOST_UI,       /* Reaction to UI event, like window close */
--    SHUTDOWN_CAUSE_GUEST_SHUTDOWN,/* Guest shutdown/suspend request, via
--                                     ACPI or other hardware-specific means */
--    SHUTDOWN_CAUSE_GUEST_RESET,   /* Guest reset request, and command line
--                                     turns that into a shutdown */
--    SHUTDOWN_CAUSE_GUEST_PANIC,   /* Guest panicked, and command line turns
--                                     that into a shutdown */
--    SHUTDOWN_CAUSE_SUBSYSTEM_RESET,/* Partial guest reset that does not trigger
--                                      QMP events and ignores --no-reboot. This
--                                      is useful for sanitize hypercalls on s390
--                                      that are used during kexec/kdump/boot */
--    SHUTDOWN_CAUSE__MAX,
--} ShutdownCause;
--
- static inline bool shutdown_caused_by_guest(ShutdownCause cause)
- {
-     return cause >= SHUTDOWN_CAUSE_GUEST_SHUTDOWN;
-diff --git a/qapi/run-state.json b/qapi/run-state.json
-index 332e44897b..de7725bf09 100644
---- a/qapi/run-state.json
-+++ b/qapi/run-state.json
-@@ -59,6 +59,40 @@
-             'running', 'save-vm', 'shutdown', 'suspended', 'watchdog',
-             'guest-panicked', 'colo', 'preconfig' ] }
- 
-+##
-+# @ShutdownCause:
-+#
-+# An enumeration of reasons for a Shutdown.
-+#
-+# @none: No shutdown request pending
-+#
-+# @host-error: An error prevents further use of guest
-+#
-+# @host-qmp: Reaction to a QMP command, like 'quit'
-+#
-+# @host-signal: Reaction to a signal, such as SIGINT
-+#
-+# @host-ui: Reaction to a UI event, like window close
-+#
-+# @guest-shutdown: Guest shutdown/suspend request, via ACPI or other
-+#                  hardware-specific means
-+#
-+# @guest-reset: Guest reset request, and command line turns that into
-+#               a shutdown
-+#
-+# @guest-panic: Guest panicked, and command line turns that into a shutdown
-+#
-+# @subsystem-reset: Partial guest reset that does not trigger QMP events and
-+#                  ignores --no-reboot. This is useful for sanitizing
-+#                  hypercalls on s390 that are used during kexec/kdump/boot
-+#
-+##
-+{ 'enum': 'ShutdownCause',
-+  # Beware, shutdown_caused_by_guest() depends on enumeration order
-+  'data': [ 'none', 'host-error', 'host-qmp', 'host-signal', 'host-ui',
-+            'guest-shutdown', 'guest-reset', 'guest-panic',
-+            'subsystem-reset'] }
-+
- ##
- # @StatusInfo:
- #
--- 
+  git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2018-12-18
+
+for you to fetch changes up to ce1a1aec47877a281d69dbc2e65f86bfe8fea231:
+
+  qapi: fix flat union on uncovered branches conditionals (2018-12-18 07:=
+57:36 +0100)
+
+----------------------------------------------------------------
+QAPI patches for 2018-12-18
+
+* QMP events SHUTDOWN and RESET now carry a reason
+* New QMP command query-current-machine
+* QMP/HMP command system_wakeup now fails when the guest isn't
+  suspended, or doesn't even support suspend.
+* Fix build for --disable-replication
+
+----------------------------------------------------------------
+Daniel Henrique Barboza (3):
+      qmp: query-current-machine with wakeup-suspend-support
+      qga: update guest-suspend-ram and guest-suspend-hybrid descriptions
+      qmp hmp: Make system_wakeup check wake-up support and run state
+
+Dominik Csapak (3):
+      qapi: Turn ShutdownCause into QAPI enum
+      qmp: Add reason to SHUTDOWN and RESET events
+      qmp: Split ShutdownCause host-qmp into quit and system-reset
+
+Marc-Andr=C3=A9 Lureau (1):
+      qapi: fix flat union on uncovered branches conditionals
+
+ hmp.c                      |  5 ++++-
+ hw/acpi/core.c             |  9 ++++++++-
+ hw/char/serial.c           |  2 +-
+ hw/i386/xen/xen-hvm.c      |  5 +++++
+ hw/input/ps2.c             |  6 +++---
+ hw/timer/mc146818rtc.c     |  2 +-
+ include/sysemu/sysemu.h    | 24 +++---------------------
+ migration/migration.c      |  4 ++--
+ qapi/misc.json             | 32 +++++++++++++++++++++++++++++++-
+ qapi/run-state.json        | 44 ++++++++++++++++++++++++++++++++++++++++=
+++--
+ qga/qapi-schema.json       | 16 ++++++++++------
+ qmp.c                      | 12 +++++++++---
+ scripts/qapi/common.py     |  3 ++-
+ tests/qemu-iotests/060.out |  4 ++--
+ tests/qemu-iotests/071.out |  4 ++--
+ tests/qemu-iotests/081.out | 14 +++++++-------
+ tests/qemu-iotests/087.out | 12 ++++++------
+ tests/qemu-iotests/094.out |  2 +-
+ tests/qemu-iotests/109.out | 44 ++++++++++++++++++++++------------------=
+----
+ tests/qemu-iotests/117.out |  2 +-
+ tests/qemu-iotests/119.out |  2 +-
+ tests/qemu-iotests/120.out |  2 +-
+ tests/qemu-iotests/127.out |  2 +-
+ tests/qemu-iotests/140.out |  2 +-
+ tests/qemu-iotests/143.out |  2 +-
+ tests/qemu-iotests/156.out |  2 +-
+ tests/qemu-iotests/176.out | 16 ++++++++--------
+ tests/qemu-iotests/183.out |  4 ++--
+ tests/qemu-iotests/184.out | 12 ++++++++----
+ tests/qemu-iotests/185.out | 10 +++++-----
+ tests/qemu-iotests/191.out |  6 ++++--
+ tests/qemu-iotests/195.out |  6 ++++--
+ tests/qemu-iotests/223.out |  2 +-
+ tests/qemu-iotests/227.out | 12 ++++++++----
+ vl.c                       | 27 ++++++++++++++++++++++++---
+ 35 files changed, 232 insertions(+), 121 deletions(-)
+
+--=20
 2.17.2
