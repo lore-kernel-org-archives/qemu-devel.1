@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOQJ-00084I-UU
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:05:12 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOQK-00085P-4L
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:05:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOQI-0004Nw-Uu
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOQI-0004Nq-Ua
 	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:05:11 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:41556)
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:57560)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gZOQG-0004DX-5C
+	id 1gZOQI-0004Cn-An
 	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:05:10 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Wed, 19 Dec 2018 00:04:07 +0100
-Message-Id: <20181218230442.27887-30-samuel.thibault@ens-lyon.org>
+Date: Wed, 19 Dec 2018 00:04:01 +0100
+Message-Id: <20181218230442.27887-24-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20181218230442.27887-1-samuel.thibault@ens-lyon.org>
 References: <20181218230442.27887-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 29/64] slirp: remove unused HAVE_INET_ATON
+Subject: [Qemu-devel] [PULL 23/64] slirp: remove unused HAVE_ARPA_INET_H
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,18 +40,21 @@ Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
  1 file changed, 6 deletions(-)
 
 diff --git a/slirp/slirp_config.h b/slirp/slirp_config.h
-index 833f25a965..5126711849 100644
+index 47811e36dc..e95284071a 100644
 --- a/slirp/slirp_config.h
 +++ b/slirp/slirp_config.h
-@@ -16,9 +16,3 @@
+@@ -41,12 +41,6 @@
+ #define HAVE_SYS_SELECT_H
+ #endif
 =20
+-/* Define if you have arpa/inet.h */
+-#undef HAVE_ARPA_INET_H
+-#ifndef _WIN32
+-#define HAVE_ARPA_INET_H
+-#endif
+-
  /* Define to sizeof(char *) */
  #define SIZEOF_CHAR_P (HOST_LONG_BITS / 8)
--
--/* Define if you have inet_aton */
--#undef HAVE_INET_ATON
--#ifndef _WIN32
--#define HAVE_INET_ATON
--#endif
+=20
 --=20
 2.19.2
