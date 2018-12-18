@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZ6q7-00065Y-UA
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:18:44 -0500
+	(envelope-from <mst@redhat.com>) id 1gZ6qD-0006B6-43
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:18:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZ6q6-0007v3-W2
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:18:39 -0500
-Date: Mon, 17 Dec 2018 23:18:33 -0500
+	(envelope-from <mst@redhat.com>) id 1gZ6qA-0007y4-1O
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:18:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57470)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZ6q9-0007x1-Lp
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:18:41 -0500
+Date: Mon, 17 Dec 2018 23:18:39 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181218041625.24969-28-mst@redhat.com>
+Message-ID: <20181218041625.24969-31-mst@redhat.com>
 References: <20181218041625.24969-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20181218041625.24969-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 27/31] hw: arm: Convert the RSDP build to the
- buid_append_foo() API
+Subject: [Qemu-devel] [PULL 30/31] hw: acpi: Remove AcpiRsdpDescriptor and
+ fix tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,16 +28,13 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Samuel Ortiz <sameo@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, Andrew Jones <drjones@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Samuel Ortiz <sameo@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, Andrew Jones <drjones@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Ben Warren <ben@skyportsystems.com>
 
 From: Samuel Ortiz <sameo@linux.intel.com>
 
-Instead of filling a mapped and packed C structure field in random order
-and being careful about endianness and sizes, build_rsdp() now uses
-build_append_int_noprefix() to compose RSDP table.
-
-This makes reviewing and maintaining code easier as this is almost
-matching 1:1 the ACPI spec itself.
+The only remaining AcpiRsdpDescriptor users are the ACPI utils for the
+BIOS table tests.
+We remove that dependency and can thus remove the structure itself.
 
 Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
@@ -41,71 +42,183 @@ Reviewed-by: Andrew Jones <drjones@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/arm/virt-acpi-build.c | 42 ++++++++++++++++++++++------------------
- 1 file changed, 23 insertions(+), 19 deletions(-)
+ include/hw/acpi/acpi-defs.h | 13 -----------
+ tests/acpi-utils.h          |  4 +++-
+ tests/acpi-utils.c          | 46 ++++++++++++++++++++++++++++++-------
+ tests/bios-tables-test.c    | 22 ++++++++++++++----
+ tests/vmgenid-test.c        |  8 ++++---
+ 5 files changed, 63 insertions(+), 30 deletions(-)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index ce8bfa5a37..4a6b53fbfc 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -368,35 +368,39 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+index 8425ecb8c6..5021cb9e79 100644
+--- a/include/hw/acpi/acpi-defs.h
++++ b/include/hw/acpi/acpi-defs.h
+@@ -40,19 +40,6 @@ enum {
+     ACPI_FADT_F_LOW_POWER_S0_IDLE_CAPABLE,
+ };
  
- /* RSDP */
- static void
--build_rsdp(GArray *rsdp_table, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
-+build_rsdp(GArray *tbl, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
- {
--    AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
--    unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
--    unsigned xsdt_pa_offset =
--        (char *)&rsdp->xsdt_physical_address - rsdp_table->data;
-+    int tbl_off = tbl->len; /* Table offset in the RSDP file */
+-struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
+-    uint64_t signature;              /* ACPI signature, contains "RSD PTR " */
+-    uint8_t  checksum;               /* To make sum of struct == 0 */
+-    uint8_t  oem_id [6];             /* OEM identification */
+-    uint8_t  revision;               /* Must be 0 for 1.0, 2 for 2.0 */
+-    uint32_t rsdt_physical_address;  /* 32-bit physical address of RSDT */
+-    uint32_t length;                 /* XSDT Length in bytes including hdr */
+-    uint64_t xsdt_physical_address;  /* 64-bit physical address of XSDT */
+-    uint8_t  extended_checksum;      /* Checksum of entire table */
+-    uint8_t  reserved [3];           /* Reserved field must be 0 */
+-} QEMU_PACKED;
+-typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
+-
+ typedef struct AcpiRsdpData {
+     uint8_t oem_id[6]; /* OEM identification */
+     uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
+diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+index ac52abd0dd..4f4899deb5 100644
+--- a/tests/acpi-utils.h
++++ b/tests/acpi-utils.h
+@@ -82,6 +82,8 @@ typedef struct {
  
--    bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, rsdp_table, 16,
-+    bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, tbl, 16,
-                              true /* fseg memory */);
+ uint8_t acpi_calc_checksum(const uint8_t *data, int len);
+ uint32_t acpi_find_rsdp_address(void);
+-void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table);
++uint32_t acpi_get_rsdt_address(uint8_t *rsdp_table);
++uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table);
++void acpi_parse_rsdp_table(uint32_t addr, uint8_t *rsdp_table);
  
--    memcpy(&rsdp->signature, "RSD PTR ", sizeof(rsdp->signature));
--    memcpy(rsdp->oem_id, rsdp_data->oem_id, sizeof(rsdp->oem_id));
--    rsdp->length = cpu_to_le32(sizeof(*rsdp));
--    rsdp->revision = rsdp_data->revision;
-+    g_array_append_vals(tbl, "RSD PTR ", 8); /* Signature */
-+    build_append_int_noprefix(tbl, 0, 1); /* Checksum */
-+    g_array_append_vals(tbl, rsdp_data->oem_id, 6); /* OEMID */
-+    build_append_int_noprefix(tbl, rsdp_data->revision, 1); /* Revision */
-+    build_append_int_noprefix(tbl, 0, 4); /* RsdtAddress */
-+    build_append_int_noprefix(tbl, 36, 4); /* Length */
- 
--    /* Address to be filled by Guest linker */
--    bios_linker_loader_add_pointer(linker,
--        ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
--        ACPI_BUILD_TABLE_FILE, *rsdp_data->xsdt_tbl_offset);
-+    /* XSDT address to be filled by guest linker */
-+    build_append_int_noprefix(tbl, 0, 8); /* XsdtAddress */
-+    bios_linker_loader_add_pointer(linker, ACPI_BUILD_RSDP_FILE,
-+                                   tbl_off + 24, 8,
-+                                   ACPI_BUILD_TABLE_FILE,
-+                                   *rsdp_data->xsdt_tbl_offset);
- 
--    /* Checksum to be filled by Guest linker */
-+    build_append_int_noprefix(tbl, 0, 1); /* Extended Checksum */
-+    build_append_int_noprefix(tbl, 0, 3); /* Reserved */
-+
-+    /* Checksum to be filled by guest linker */
-     bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
--        (char *)rsdp - rsdp_table->data, 20 /* ACPI rev 1.0 RSDP size */,
--        (char *)&rsdp->checksum - rsdp_table->data);
-+                                    tbl_off, 20, /* ACPI rev 1.0 RSDP size */
-+                                    8);
- 
-     /* Extended checksum to be filled by Guest linker */
-     bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
--        (char *)rsdp - rsdp_table->data, 36 /* ACPI rev 2.0 RSDP size */,
--        (char *)&rsdp->extended_checksum - rsdp_table->data);
-+                                    tbl_off, 36, /* ACPI rev 2.0 RSDP size */
-+                                    32);
+ #endif  /* TEST_ACPI_UTILS_H */
+diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
+index 297af55d39..6374f10ac3 100644
+--- a/tests/acpi-utils.c
++++ b/tests/acpi-utils.c
+@@ -51,14 +51,44 @@ uint32_t acpi_find_rsdp_address(void)
+     return off;
  }
  
- static void
+-void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table)
++uint32_t acpi_get_rsdt_address(uint8_t *rsdp_table)
+ {
+-    ACPI_READ_FIELD(rsdp_table->signature, addr);
+-    ACPI_ASSERT_CMP64(rsdp_table->signature, "RSD PTR ");
++    uint32_t rsdt_physical_address;
+ 
+-    ACPI_READ_FIELD(rsdp_table->checksum, addr);
+-    ACPI_READ_ARRAY(rsdp_table->oem_id, addr);
+-    ACPI_READ_FIELD(rsdp_table->revision, addr);
+-    ACPI_READ_FIELD(rsdp_table->rsdt_physical_address, addr);
+-    ACPI_READ_FIELD(rsdp_table->length, addr);
++    memcpy(&rsdt_physical_address, &rsdp_table[16 /* RsdtAddress offset */], 4);
++    return le32_to_cpu(rsdt_physical_address);
++}
++
++uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table)
++{
++    uint64_t xsdt_physical_address;
++    uint8_t revision = rsdp_table[15 /* Revision offset */];
++
++    /* We must have revision 2 if we're looking for an XSDT pointer */
++    g_assert(revision == 2);
++
++    memcpy(&xsdt_physical_address, &rsdp_table[24 /* XsdtAddress offset */], 8);
++    return le64_to_cpu(xsdt_physical_address);
++}
++
++void acpi_parse_rsdp_table(uint32_t addr, uint8_t *rsdp_table)
++{
++    uint8_t revision;
++
++    /* Read mandatory revision 0 table data (20 bytes) first */
++    memread(addr, rsdp_table, 20);
++    revision = rsdp_table[15 /* Revision offset */];
++
++    switch (revision) {
++    case 0: /* ACPI 1.0 RSDP */
++        break;
++    case 2: /* ACPI 2.0+ RSDP */
++        /* Read the rest of the RSDP table */
++        memread(addr + 20, rsdp_table + 20, 16);
++        break;
++    default:
++        g_assert_not_reached();
++    }
++
++    ACPI_ASSERT_CMP64(*((uint64_t *)(rsdp_table)), "RSD PTR ");
+ }
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index dfa74a5bec..f531241018 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -27,7 +27,7 @@ typedef struct {
+     const char *machine;
+     const char *variant;
+     uint32_t rsdp_addr;
+-    AcpiRsdpDescriptor rsdp_table;
++    uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
+     AcpiRsdtDescriptorRev1 rsdt_table;
+     uint32_t dsdt_addr;
+     uint32_t facs_addr;
+@@ -85,19 +85,31 @@ static void test_acpi_rsdp_address(test_data *data)
+ 
+ static void test_acpi_rsdp_table(test_data *data)
+ {
+-    AcpiRsdpDescriptor *rsdp_table = &data->rsdp_table;
++    uint8_t *rsdp_table = data->rsdp_table, revision;
+     uint32_t addr = data->rsdp_addr;
+ 
+     acpi_parse_rsdp_table(addr, rsdp_table);
++    revision = rsdp_table[15 /* Revision offset */];
+ 
+-    /* rsdp checksum is not for the whole table, but for the first 20 bytes */
+-    g_assert(!acpi_calc_checksum((uint8_t *)rsdp_table, 20));
++    switch (revision) {
++    case 0: /* ACPI 1.0 RSDP */
++        /* With rev 1, checksum is only for the first 20 bytes */
++        g_assert(!acpi_calc_checksum(rsdp_table,  20));
++        break;
++    case 2: /* ACPI 2.0+ RSDP */
++        /* With revision 2, we have 2 checksums */
++        g_assert(!acpi_calc_checksum(rsdp_table, 20));
++        g_assert(!acpi_calc_checksum(rsdp_table, 36));
++        break;
++    default:
++        g_assert_not_reached();
++    }
+ }
+ 
+ static void test_acpi_rsdt_table(test_data *data)
+ {
+     AcpiRsdtDescriptorRev1 *rsdt_table = &data->rsdt_table;
+-    uint32_t addr = le32_to_cpu(data->rsdp_table.rsdt_physical_address);
++    uint32_t addr = acpi_get_rsdt_address(data->rsdp_table);
+     uint32_t *tables;
+     int tables_nr;
+     uint8_t checksum;
+diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+index 0a6fb55f2e..97219ae86c 100644
+--- a/tests/vmgenid-test.c
++++ b/tests/vmgenid-test.c
+@@ -35,7 +35,7 @@ static uint32_t acpi_find_vgia(void)
+ {
+     uint32_t rsdp_offset;
+     uint32_t guid_offset = 0;
+-    AcpiRsdpDescriptor rsdp_table;
++    uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
+     uint32_t rsdt, rsdt_table_length;
+     AcpiRsdtDescriptorRev1 rsdt_table;
+     size_t tables_nr;
+@@ -52,9 +52,11 @@ static uint32_t acpi_find_vgia(void)
+ 
+     g_assert_cmphex(rsdp_offset, <, RSDP_ADDR_INVALID);
+ 
+-    acpi_parse_rsdp_table(rsdp_offset, &rsdp_table);
++    acpi_parse_rsdp_table(rsdp_offset, rsdp_table);
++
++    rsdt = acpi_get_rsdt_address(rsdp_table);
++    g_assert(rsdt);
+ 
+-    rsdt = le32_to_cpu(rsdp_table.rsdt_physical_address);
+     /* read the header */
+     ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
+     ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
 -- 
 MST
