@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZHxr-0004fV-V4
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 11:11:30 -0500
+	(envelope-from <mst@redhat.com>) id 1gZHxx-0004jq-DY
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 11:11:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZHxl-0001Po-1U
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 11:11:24 -0500
-Date: Tue, 18 Dec 2018 11:11:11 -0500
+	(envelope-from <mst@redhat.com>) id 1gZHxv-0001Xf-4y
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 11:11:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42988)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZHxu-0001VE-Op
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 11:11:27 -0500
+Date: Tue, 18 Dec 2018 11:11:24 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181218161008.3882-3-mst@redhat.com>
+Message-ID: <20181218161008.3882-5-mst@redhat.com>
 References: <20181218161008.3882-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20181218161008.3882-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v2 02/30] pc:piix4: Update smbus I/O space after
- a migration
+Subject: [Qemu-devel] [PULL v2 04/30] virtio: Provide version-specific
+ variants of virtio PCI devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +28,506 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <cminyard@mvista.com>, Igor Mammedov <imammedo@redhat.com>, qemu-stable@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
-From: Corey Minyard <cminyard@mvista.com>
+From: Eduardo Habkost <ehabkost@redhat.com>
 
-Otherwise it won't be set up correctly and won't work after
-miigration.
+Many of the current virtio-*-pci device types actually represent
+3 different types of devices:
+* virtio 1.0 non-transitional devices
+* virtio 1.0 transitional devices
+* virtio 0.9 ("legacy device" in virtio 1.0 terminology)
 
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-stable@nongnu.org
+That would be just an annoyance if it didn't break our device/bus
+compatibility QMP interfaces.  With these multi-purpose device
+types, there's no way to tell management software that
+transitional devices and legacy devices require a Conventional
+PCI bus.
+
+The multi-purpose device types would also prevent us from telling
+management software what's the PCI vendor/device ID for them,
+because their PCI IDs change at runtime depending on the bus
+where they were plugged.
+
+This patch adds separate device types for each of those virtio
+device flavors:
+
+- virtio-*-pci: the existing multi-purpose device types
+  - Configurable using `disable-legacy` and `disable-modern`
+    properties
+  - Legacy driver support is automatically enabled/disabled
+    depending on the bus where it is plugged
+  - Supports Conventional PCI and PCI Express buses
+    (but Conventional PCI is incompatible with
+    disable-legacy=off)
+  - Changes PCI vendor/device IDs at runtime
+- virtio-*-pci-transitional: virtio-1.0 device supporting legacy drivers
+  - Supports Conventional PCI buses only, because
+    it has a PIO BAR
+- virtio-*-pci-non-transitional: modern-only
+  - Supports both Conventional PCI and PCI Express buses
+
+The existing TYPE_* macros for these types will point to an
+abstract base type, so existing casts in the code will keep
+working for all variants.
+
+A simple test script (tests/acceptance/virtio_version.py) is
+included, to check if the new device types are equivalent to
+using the `disable-legacy` and `disable-modern` options.
+
+Acked-by: Andrea Bolognani <abologna@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/acpi/piix4.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/virtio/virtio-pci.h             |  24 ++--
+ hw/virtio/virtio-pci.c             |  60 ++++++++--
+ tests/acceptance/virtio_version.py | 176 +++++++++++++++++++++++++++++
+ 3 files changed, 236 insertions(+), 24 deletions(-)
+ create mode 100644 tests/acceptance/virtio_version.py
 
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index e330f24c71..2f4dd03b83 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -173,6 +173,7 @@ static int vmstate_acpi_post_load(void *opaque, int version_id)
-     PIIX4PMState *s = opaque;
+diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+index 8cd546608e..29b4216107 100644
+--- a/hw/virtio/virtio-pci.h
++++ b/hw/virtio/virtio-pci.h
+@@ -216,7 +216,7 @@ static inline void virtio_pci_disable_modern(VirtIOPCIProxy *proxy)
+ /*
+  * virtio-scsi-pci: This extends VirtioPCIProxy.
+  */
+-#define TYPE_VIRTIO_SCSI_PCI "virtio-scsi-pci"
++#define TYPE_VIRTIO_SCSI_PCI "virtio-scsi-pci-base"
+ #define VIRTIO_SCSI_PCI(obj) \
+         OBJECT_CHECK(VirtIOSCSIPCI, (obj), TYPE_VIRTIO_SCSI_PCI)
  
-     pm_io_space_update(s);
-+    smbus_io_space_update(s);
-     return 0;
+@@ -229,7 +229,7 @@ struct VirtIOSCSIPCI {
+ /*
+  * vhost-scsi-pci: This extends VirtioPCIProxy.
+  */
+-#define TYPE_VHOST_SCSI_PCI "vhost-scsi-pci"
++#define TYPE_VHOST_SCSI_PCI "vhost-scsi-pci-base"
+ #define VHOST_SCSI_PCI(obj) \
+         OBJECT_CHECK(VHostSCSIPCI, (obj), TYPE_VHOST_SCSI_PCI)
+ 
+@@ -239,7 +239,7 @@ struct VHostSCSIPCI {
+ };
+ #endif
+ 
+-#define TYPE_VHOST_USER_SCSI_PCI "vhost-user-scsi-pci"
++#define TYPE_VHOST_USER_SCSI_PCI "vhost-user-scsi-pci-base"
+ #define VHOST_USER_SCSI_PCI(obj) \
+         OBJECT_CHECK(VHostUserSCSIPCI, (obj), TYPE_VHOST_USER_SCSI_PCI)
+ 
+@@ -252,7 +252,7 @@ struct VHostUserSCSIPCI {
+ /*
+  * vhost-user-blk-pci: This extends VirtioPCIProxy.
+  */
+-#define TYPE_VHOST_USER_BLK_PCI "vhost-user-blk-pci"
++#define TYPE_VHOST_USER_BLK_PCI "vhost-user-blk-pci-base"
+ #define VHOST_USER_BLK_PCI(obj) \
+         OBJECT_CHECK(VHostUserBlkPCI, (obj), TYPE_VHOST_USER_BLK_PCI)
+ 
+@@ -265,7 +265,7 @@ struct VHostUserBlkPCI {
+ /*
+  * virtio-blk-pci: This extends VirtioPCIProxy.
+  */
+-#define TYPE_VIRTIO_BLK_PCI "virtio-blk-pci"
++#define TYPE_VIRTIO_BLK_PCI "virtio-blk-pci-base"
+ #define VIRTIO_BLK_PCI(obj) \
+         OBJECT_CHECK(VirtIOBlkPCI, (obj), TYPE_VIRTIO_BLK_PCI)
+ 
+@@ -277,7 +277,7 @@ struct VirtIOBlkPCI {
+ /*
+  * virtio-balloon-pci: This extends VirtioPCIProxy.
+  */
+-#define TYPE_VIRTIO_BALLOON_PCI "virtio-balloon-pci"
++#define TYPE_VIRTIO_BALLOON_PCI "virtio-balloon-pci-base"
+ #define VIRTIO_BALLOON_PCI(obj) \
+         OBJECT_CHECK(VirtIOBalloonPCI, (obj), TYPE_VIRTIO_BALLOON_PCI)
+ 
+@@ -289,7 +289,7 @@ struct VirtIOBalloonPCI {
+ /*
+  * virtio-serial-pci: This extends VirtioPCIProxy.
+  */
+-#define TYPE_VIRTIO_SERIAL_PCI "virtio-serial-pci"
++#define TYPE_VIRTIO_SERIAL_PCI "virtio-serial-pci-base"
+ #define VIRTIO_SERIAL_PCI(obj) \
+         OBJECT_CHECK(VirtIOSerialPCI, (obj), TYPE_VIRTIO_SERIAL_PCI)
+ 
+@@ -301,7 +301,7 @@ struct VirtIOSerialPCI {
+ /*
+  * virtio-net-pci: This extends VirtioPCIProxy.
+  */
+-#define TYPE_VIRTIO_NET_PCI "virtio-net-pci"
++#define TYPE_VIRTIO_NET_PCI "virtio-net-pci-base"
+ #define VIRTIO_NET_PCI(obj) \
+         OBJECT_CHECK(VirtIONetPCI, (obj), TYPE_VIRTIO_NET_PCI)
+ 
+@@ -316,7 +316,7 @@ struct VirtIONetPCI {
+ 
+ #ifdef CONFIG_VIRTFS
+ 
+-#define TYPE_VIRTIO_9P_PCI "virtio-9p-pci"
++#define TYPE_VIRTIO_9P_PCI "virtio-9p-pci-base"
+ #define VIRTIO_9P_PCI(obj) \
+         OBJECT_CHECK(V9fsPCIState, (obj), TYPE_VIRTIO_9P_PCI)
+ 
+@@ -330,7 +330,7 @@ typedef struct V9fsPCIState {
+ /*
+  * virtio-rng-pci: This extends VirtioPCIProxy.
+  */
+-#define TYPE_VIRTIO_RNG_PCI "virtio-rng-pci"
++#define TYPE_VIRTIO_RNG_PCI "virtio-rng-pci-base"
+ #define VIRTIO_RNG_PCI(obj) \
+         OBJECT_CHECK(VirtIORngPCI, (obj), TYPE_VIRTIO_RNG_PCI)
+ 
+@@ -365,7 +365,7 @@ struct VirtIOInputHIDPCI {
+ 
+ #ifdef CONFIG_LINUX
+ 
+-#define TYPE_VIRTIO_INPUT_HOST_PCI "virtio-input-host-pci"
++#define TYPE_VIRTIO_INPUT_HOST_PCI "virtio-input-host-pci-base"
+ #define VIRTIO_INPUT_HOST_PCI(obj) \
+         OBJECT_CHECK(VirtIOInputHostPCI, (obj), TYPE_VIRTIO_INPUT_HOST_PCI)
+ 
+@@ -392,7 +392,7 @@ struct VirtIOGPUPCI {
+ /*
+  * vhost-vsock-pci: This extends VirtioPCIProxy.
+  */
+-#define TYPE_VHOST_VSOCK_PCI "vhost-vsock-pci"
++#define TYPE_VHOST_VSOCK_PCI "vhost-vsock-pci-base"
+ #define VHOST_VSOCK_PCI(obj) \
+         OBJECT_CHECK(VHostVSockPCI, (obj), TYPE_VHOST_VSOCK_PCI)
+ 
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index f07ec55c38..d05066deb8 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -1120,7 +1120,10 @@ static void virtio_9p_pci_instance_init(Object *obj)
  }
  
+ static const VirtioPCIDeviceTypeInfo virtio_9p_pci_info = {
+-    .generic_name   = TYPE_VIRTIO_9P_PCI,
++    .base_name              = TYPE_VIRTIO_9P_PCI,
++    .generic_name           = "virtio-9p-pci",
++    .transitional_name      = "virtio-9p-pci-transitional",
++    .non_transitional_name  = "virtio-9p-pci-non-transitional",
+     .instance_size = sizeof(V9fsPCIState),
+     .instance_init = virtio_9p_pci_instance_init,
+     .class_init    = virtio_9p_pci_class_init,
+@@ -2102,7 +2105,10 @@ static void virtio_blk_pci_instance_init(Object *obj)
+ }
+ 
+ static const VirtioPCIDeviceTypeInfo virtio_blk_pci_info = {
+-    .generic_name   = TYPE_VIRTIO_BLK_PCI,
++    .base_name              = TYPE_VIRTIO_BLK_PCI,
++    .generic_name           = "virtio-blk-pci",
++    .transitional_name      = "virtio-blk-pci-transitional",
++    .non_transitional_name  = "virtio-blk-pci-non-transitional",
+     .instance_size = sizeof(VirtIOBlkPCI),
+     .instance_init = virtio_blk_pci_instance_init,
+     .class_init    = virtio_blk_pci_class_init,
+@@ -2157,7 +2163,10 @@ static void vhost_user_blk_pci_instance_init(Object *obj)
+ }
+ 
+ static const VirtioPCIDeviceTypeInfo vhost_user_blk_pci_info = {
+-    .generic_name    = TYPE_VHOST_USER_BLK_PCI,
++    .base_name               = TYPE_VHOST_USER_BLK_PCI,
++    .generic_name            = "vhost-user-blk-pci",
++    .transitional_name       = "vhost-user-blk-pci-transitional",
++    .non_transitional_name   = "vhost-user-blk-pci-non-transitional",
+     .instance_size  = sizeof(VHostUserBlkPCI),
+     .instance_init  = vhost_user_blk_pci_instance_init,
+     .class_init     = vhost_user_blk_pci_class_init,
+@@ -2224,7 +2233,10 @@ static void virtio_scsi_pci_instance_init(Object *obj)
+ }
+ 
+ static const VirtioPCIDeviceTypeInfo virtio_scsi_pci_info = {
+-    .generic_name   = TYPE_VIRTIO_SCSI_PCI,
++    .base_name              = TYPE_VIRTIO_SCSI_PCI,
++    .generic_name           = "virtio-scsi-pci",
++    .transitional_name      = "virtio-scsi-pci-transitional",
++    .non_transitional_name  = "virtio-scsi-pci-non-transitional",
+     .instance_size = sizeof(VirtIOSCSIPCI),
+     .instance_init = virtio_scsi_pci_instance_init,
+     .class_init    = virtio_scsi_pci_class_init,
+@@ -2278,7 +2290,10 @@ static void vhost_scsi_pci_instance_init(Object *obj)
+ }
+ 
+ static const VirtioPCIDeviceTypeInfo vhost_scsi_pci_info = {
+-    .generic_name  = TYPE_VHOST_SCSI_PCI,
++    .base_name             = TYPE_VHOST_SCSI_PCI,
++    .generic_name          = "vhost-scsi-pci",
++    .transitional_name     = "vhost-scsi-pci-transitional",
++    .non_transitional_name = "vhost-scsi-pci-non-transitional",
+     .instance_size = sizeof(VHostSCSIPCI),
+     .instance_init = vhost_scsi_pci_instance_init,
+     .class_init    = vhost_scsi_pci_class_init,
+@@ -2332,7 +2347,10 @@ static void vhost_user_scsi_pci_instance_init(Object *obj)
+ }
+ 
+ static const VirtioPCIDeviceTypeInfo vhost_user_scsi_pci_info = {
+-    .generic_name  = TYPE_VHOST_USER_SCSI_PCI,
++    .base_name             = TYPE_VHOST_USER_SCSI_PCI,
++    .generic_name          = "vhost-user-scsi-pci",
++    .transitional_name     = "vhost-user-scsi-pci-transitional",
++    .non_transitional_name = "vhost-user-scsi-pci-non-transitional",
+     .instance_size = sizeof(VHostUserSCSIPCI),
+     .instance_init = vhost_user_scsi_pci_instance_init,
+     .class_init    = vhost_user_scsi_pci_class_init,
+@@ -2379,7 +2397,10 @@ static void vhost_vsock_pci_instance_init(Object *obj)
+ }
+ 
+ static const VirtioPCIDeviceTypeInfo vhost_vsock_pci_info = {
+-    .generic_name  = TYPE_VHOST_VSOCK_PCI,
++    .base_name             = TYPE_VHOST_VSOCK_PCI,
++    .generic_name          = "vhost-vsock-pci",
++    .transitional_name     = "vhost-vsock-pci-transitional",
++    .non_transitional_name = "vhost-vsock-pci-non-transitional",
+     .instance_size = sizeof(VHostVSockPCI),
+     .instance_init = vhost_vsock_pci_instance_init,
+     .class_init    = vhost_vsock_pci_class_init,
+@@ -2435,7 +2456,10 @@ static void virtio_balloon_pci_instance_init(Object *obj)
+ }
+ 
+ static const VirtioPCIDeviceTypeInfo virtio_balloon_pci_info = {
+-    .generic_name  = TYPE_VIRTIO_BALLOON_PCI,
++    .base_name             = TYPE_VIRTIO_BALLOON_PCI,
++    .generic_name          = "virtio-balloon-pci",
++    .transitional_name     = "virtio-balloon-pci-transitional",
++    .non_transitional_name = "virtio-balloon-pci-non-transitional",
+     .instance_size = sizeof(VirtIOBalloonPCI),
+     .instance_init = virtio_balloon_pci_instance_init,
+     .class_init    = virtio_balloon_pci_class_init,
+@@ -2507,7 +2531,10 @@ static void virtio_serial_pci_instance_init(Object *obj)
+ }
+ 
+ static const VirtioPCIDeviceTypeInfo virtio_serial_pci_info = {
+-    .generic_name  = TYPE_VIRTIO_SERIAL_PCI,
++    .base_name             = TYPE_VIRTIO_SERIAL_PCI,
++    .generic_name          = "virtio-serial-pci",
++    .transitional_name     = "virtio-serial-pci-transitional",
++    .non_transitional_name = "virtio-serial-pci-non-transitional",
+     .instance_size = sizeof(VirtIOSerialPCI),
+     .instance_init = virtio_serial_pci_instance_init,
+     .class_init    = virtio_serial_pci_class_init,
+@@ -2561,7 +2588,10 @@ static void virtio_net_pci_instance_init(Object *obj)
+ }
+ 
+ static const VirtioPCIDeviceTypeInfo virtio_net_pci_info = {
+-    .generic_name  = TYPE_VIRTIO_NET_PCI,
++    .base_name             = TYPE_VIRTIO_NET_PCI,
++    .generic_name          = "virtio-net-pci",
++    .transitional_name     = "virtio-net-pci-transitional",
++    .non_transitional_name = "virtio-net-pci-non-transitional",
+     .instance_size = sizeof(VirtIONetPCI),
+     .instance_init = virtio_net_pci_instance_init,
+     .class_init    = virtio_net_pci_class_init,
+@@ -2611,7 +2641,10 @@ static void virtio_rng_initfn(Object *obj)
+ }
+ 
+ static const VirtioPCIDeviceTypeInfo virtio_rng_pci_info = {
+-    .generic_name  = TYPE_VIRTIO_RNG_PCI,
++    .base_name             = TYPE_VIRTIO_RNG_PCI,
++    .generic_name          = "virtio-rng-pci",
++    .transitional_name     = "virtio-rng-pci-transitional",
++    .non_transitional_name = "virtio-rng-pci-non-transitional",
+     .instance_size = sizeof(VirtIORngPCI),
+     .instance_init = virtio_rng_initfn,
+     .class_init    = virtio_rng_pci_class_init,
+@@ -2734,7 +2767,10 @@ static void virtio_host_initfn(Object *obj)
+ }
+ 
+ static const VirtioPCIDeviceTypeInfo virtio_host_pci_info = {
+-    .generic_name  = TYPE_VIRTIO_INPUT_HOST_PCI,
++    .base_name             = TYPE_VIRTIO_INPUT_HOST_PCI,
++    .generic_name          = "virtio-input-host-pci",
++    .transitional_name     = "virtio-input-host-pci-transitional",
++    .non_transitional_name = "virtio-input-host-pci-non-transitional",
+     .parent        = TYPE_VIRTIO_INPUT_PCI,
+     .instance_size = sizeof(VirtIOInputHostPCI),
+     .instance_init = virtio_host_initfn,
+diff --git a/tests/acceptance/virtio_version.py b/tests/acceptance/virtio_version.py
+new file mode 100644
+index 0000000000..ce990250d8
+--- /dev/null
++++ b/tests/acceptance/virtio_version.py
+@@ -0,0 +1,176 @@
++"""
++Check compatibility of virtio device types
++"""
++# Copyright (c) 2018 Red Hat, Inc.
++#
++# Author:
++#  Eduardo Habkost <ehabkost@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2 or
++# later.  See the COPYING file in the top-level directory.
++import sys
++import os
++
++sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "scripts"))
++from qemu import QEMUMachine
++from avocado_qemu import Test
++
++# Virtio Device IDs:
++VIRTIO_NET = 1
++VIRTIO_BLOCK = 2
++VIRTIO_CONSOLE = 3
++VIRTIO_RNG = 4
++VIRTIO_BALLOON = 5
++VIRTIO_RPMSG = 7
++VIRTIO_SCSI = 8
++VIRTIO_9P = 9
++VIRTIO_RPROC_SERIAL = 11
++VIRTIO_CAIF = 12
++VIRTIO_GPU = 16
++VIRTIO_INPUT = 18
++VIRTIO_VSOCK = 19
++VIRTIO_CRYPTO = 20
++
++PCI_VENDOR_ID_REDHAT_QUMRANET = 0x1af4
++
++# Device IDs for legacy/transitional devices:
++PCI_LEGACY_DEVICE_IDS = {
++    VIRTIO_NET:     0x1000,
++    VIRTIO_BLOCK:   0x1001,
++    VIRTIO_BALLOON: 0x1002,
++    VIRTIO_CONSOLE: 0x1003,
++    VIRTIO_SCSI:    0x1004,
++    VIRTIO_RNG:     0x1005,
++    VIRTIO_9P:      0x1009,
++    VIRTIO_VSOCK:   0x1012,
++}
++
++def pci_modern_device_id(virtio_devid):
++    return virtio_devid + 0x1040
++
++def devtype_implements(vm, devtype, implements):
++    return devtype in [d['name'] for d in vm.command('qom-list-types', implements=implements)]
++
++def get_pci_interfaces(vm, devtype):
++    interfaces = ('pci-express-device', 'conventional-pci-device')
++    return [i for i in interfaces if devtype_implements(vm, devtype, i)]
++
++class VirtioVersionCheck(Test):
++    """
++    Check if virtio-version-specific device types result in the
++    same device tree created by `disable-modern` and
++    `disable-legacy`.
++
++    :avocado: enable
++    :avocado: tags=x86_64
++    """
++
++    # just in case there are failures, show larger diff:
++    maxDiff = 4096
++
++    def run_device(self, devtype, opts=None, machine='pc'):
++        """
++        Run QEMU with `-device DEVTYPE`, return device info from `query-pci`
++        """
++        with QEMUMachine(self.qemu_bin) as vm:
++            vm.set_machine(machine)
++            if opts:
++                devtype += ',' + opts
++            vm.add_args('-device', '%s,id=devfortest' % (devtype))
++            vm.add_args('-S')
++            vm.launch()
++
++            pcibuses = vm.command('query-pci')
++            alldevs = [dev for bus in pcibuses for dev in bus['devices']]
++            devfortest = [dev for dev in alldevs
++                          if dev['qdev_id'] == 'devfortest']
++            return devfortest[0], get_pci_interfaces(vm, devtype)
++
++
++    def assert_devids(self, dev, devid, non_transitional=False):
++        self.assertEqual(dev['id']['vendor'], PCI_VENDOR_ID_REDHAT_QUMRANET)
++        self.assertEqual(dev['id']['device'], devid)
++        if non_transitional:
++            self.assertTrue(0x1040 <= dev['id']['device'] <= 0x107f)
++            self.assertGreaterEqual(dev['id']['subsystem'], 0x40)
++
++    def check_all_variants(self, qemu_devtype, virtio_devid):
++        """Check if a virtio device type and its variants behave as expected"""
++        # Force modern mode:
++        dev_modern, _ = self.run_device(qemu_devtype,
++                                       'disable-modern=off,disable-legacy=on')
++        self.assert_devids(dev_modern, pci_modern_device_id(virtio_devid),
++                           non_transitional=True)
++
++        # <prefix>-non-transitional device types should be 100% equivalent to
++        # <prefix>,disable-modern=off,disable-legacy=on
++        dev_1_0, nt_ifaces = self.run_device('%s-non-transitional' % (qemu_devtype))
++        self.assertEqual(dev_modern, dev_1_0)
++
++        # Force transitional mode:
++        dev_trans, _ = self.run_device(qemu_devtype,
++                                      'disable-modern=off,disable-legacy=off')
++        self.assert_devids(dev_trans, PCI_LEGACY_DEVICE_IDS[virtio_devid])
++
++        # Force legacy mode:
++        dev_legacy, _ = self.run_device(qemu_devtype,
++                                       'disable-modern=on,disable-legacy=off')
++        self.assert_devids(dev_legacy, PCI_LEGACY_DEVICE_IDS[virtio_devid])
++
++        # No options: default to transitional on PC machine-type:
++        no_opts_pc, generic_ifaces = self.run_device(qemu_devtype)
++        self.assertEqual(dev_trans, no_opts_pc)
++
++        #TODO: check if plugging on a PCI Express bus will make the
++        #      device non-transitional
++        #no_opts_q35 = self.run_device(qemu_devtype, machine='q35')
++        #self.assertEqual(dev_modern, no_opts_q35)
++
++        # <prefix>-transitional device types should be 100% equivalent to
++        # <prefix>,disable-modern=off,disable-legacy=off
++        dev_trans, trans_ifaces = self.run_device('%s-transitional' % (qemu_devtype))
++        self.assertEqual(dev_trans, dev_trans)
++
++        # ensure the interface information is correct:
++        self.assertIn('conventional-pci-device', generic_ifaces)
++        self.assertIn('pci-express-device', generic_ifaces)
++
++        self.assertIn('conventional-pci-device', nt_ifaces)
++        self.assertIn('pci-express-device', nt_ifaces)
++
++        self.assertIn('conventional-pci-device', trans_ifaces)
++        self.assertNotIn('pci-express-device', trans_ifaces)
++
++
++    def test_conventional_devs(self):
++        self.check_all_variants('virtio-net-pci', VIRTIO_NET)
++        # virtio-blk requires 'driver' parameter
++        #self.check_all_variants('virtio-blk-pci', VIRTIO_BLOCK)
++        self.check_all_variants('virtio-serial-pci', VIRTIO_CONSOLE)
++        self.check_all_variants('virtio-rng-pci', VIRTIO_RNG)
++        self.check_all_variants('virtio-balloon-pci', VIRTIO_BALLOON)
++        self.check_all_variants('virtio-scsi-pci', VIRTIO_SCSI)
++        # virtio-9p requires 'fsdev' parameter
++        #self.check_all_variants('virtio-9p-pci', VIRTIO_9P)
++
++    def check_modern_only(self, qemu_devtype, virtio_devid):
++        """Check if a modern-only virtio device type behaves as expected"""
++        # Force modern mode:
++        dev_modern, _ = self.run_device(qemu_devtype,
++                                       'disable-modern=off,disable-legacy=on')
++        self.assert_devids(dev_modern, pci_modern_device_id(virtio_devid),
++                           non_transitional=True)
++
++        # No options: should be modern anyway
++        dev_no_opts, ifaces = self.run_device(qemu_devtype)
++        self.assertEqual(dev_modern, dev_no_opts)
++
++        self.assertIn('conventional-pci-device', ifaces)
++        self.assertIn('pci-express-device', ifaces)
++
++    def test_modern_only_devs(self):
++        self.check_modern_only('virtio-vga', VIRTIO_GPU)
++        self.check_modern_only('virtio-gpu-pci', VIRTIO_GPU)
++        self.check_modern_only('virtio-mouse-pci', VIRTIO_INPUT)
++        self.check_modern_only('virtio-tablet-pci', VIRTIO_INPUT)
++        self.check_modern_only('virtio-keyboard-pci', VIRTIO_INPUT)
 -- 
 MST
