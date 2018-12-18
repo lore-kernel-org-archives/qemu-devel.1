@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOQG-0007x7-1n
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:05:09 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOQD-0007wS-13
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:05:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOQD-0004Bk-3Z
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:05:06 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:57416)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOQ9-00046Y-96
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:05:04 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:57302)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gZOQB-00044F-PT
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:05:04 -0500
+	id 1gZOQ5-0003zA-O3
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:04:58 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Wed, 19 Dec 2018 00:03:47 +0100
-Message-Id: <20181218230442.27887-10-samuel.thibault@ens-lyon.org>
+Date: Wed, 19 Dec 2018 00:03:42 +0100
+Message-Id: <20181218230442.27887-5-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20181218230442.27887-1-samuel.thibault@ens-lyon.org>
 References: <20181218230442.27887-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 09/64] slirp: fix slirp_add_exec() leaks
+Subject: [Qemu-devel] [PULL 04/64] slirp: use a dedicated field for chardev
+ pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +33,167 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Free the list elements allocated in add_exec().
+Let's not mix command line and chardev pointers.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/misc.h  | 2 +-
- slirp/slirp.c | 8 ++++++++
- 2 files changed, 9 insertions(+), 1 deletion(-)
+ net/slirp.c      |  8 ++++----
+ slirp/libslirp.h |  2 +-
+ slirp/misc.c     | 11 +++++++----
+ slirp/misc.h     |  4 ++--
+ slirp/slirp.c    |  5 +++--
+ slirp/tcp_subr.c |  2 +-
+ 6 files changed, 18 insertions(+), 14 deletions(-)
 
+diff --git a/net/slirp.c b/net/slirp.c
+index 1dbd34a9da..0bb12567fe 100644
+--- a/net/slirp.c
++++ b/net/slirp.c
+@@ -709,8 +709,8 @@ static int slirp_smb(SlirpState* s, const char *expor=
+ted_dir,
+              CONFIG_SMBD_COMMAND, s->smb_dir, smb_conf);
+     g_free(smb_conf);
+=20
+-    if (slirp_add_exec(s->slirp, 0, smb_cmdline, &vserver_addr, 139) < 0=
+ ||
+-        slirp_add_exec(s->slirp, 0, smb_cmdline, &vserver_addr, 445) < 0=
+) {
++    if (slirp_add_exec(s->slirp, NULL, smb_cmdline, &vserver_addr, 139) =
+< 0 ||
++        slirp_add_exec(s->slirp, NULL, smb_cmdline, &vserver_addr, 445) =
+< 0) {
+         slirp_smb_cleanup(s);
+         g_free(smb_cmdline);
+         error_setg(errp, "Conflicting/invalid smbserver address");
+@@ -774,7 +774,7 @@ static int slirp_guestfwd(SlirpState *s, const char *=
+config_str, Error **errp)
+     snprintf(buf, sizeof(buf), "guestfwd.tcp.%d", port);
+=20
+     if ((strlen(p) > 4) && !strncmp(p, "cmd:", 4)) {
+-        if (slirp_add_exec(s->slirp, 0, &p[4], &server, port) < 0) {
++        if (slirp_add_exec(s->slirp, NULL, &p[4], &server, port) < 0) {
+             error_setg(errp, "Conflicting/invalid host:port in guest "
+                        "forwarding rule '%s'", config_str);
+             return -1;
+@@ -801,7 +801,7 @@ static int slirp_guestfwd(SlirpState *s, const char *=
+config_str, Error **errp)
+             return -1;
+         }
+=20
+-        if (slirp_add_exec(s->slirp, 3, &fwd->hd, &server, port) < 0) {
++        if (slirp_add_exec(s->slirp, &fwd->hd, NULL, &server, port) < 0)=
+ {
+             error_setg(errp, "Conflicting/invalid host:port in guest "
+                        "forwarding rule '%s'", config_str);
+             g_free(fwd);
+diff --git a/slirp/libslirp.h b/slirp/libslirp.h
+index 52dbb9feb5..3e88dbaa01 100644
+--- a/slirp/libslirp.h
++++ b/slirp/libslirp.h
+@@ -35,7 +35,7 @@ int slirp_add_hostfwd(Slirp *slirp, int is_udp,
+                       struct in_addr guest_addr, int guest_port);
+ int slirp_remove_hostfwd(Slirp *slirp, int is_udp,
+                          struct in_addr host_addr, int host_port);
+-int slirp_add_exec(Slirp *slirp, int do_pty, const void *args,
++int slirp_add_exec(Slirp *slirp, void *chardev, const char *cmdline,
+                    struct in_addr *guest_addr, int guest_port);
+=20
+ void slirp_connection_info(Slirp *slirp, Monitor *mon);
+diff --git a/slirp/misc.c b/slirp/misc.c
+index 8f0b6004bd..2784fc420f 100644
+--- a/slirp/misc.c
++++ b/slirp/misc.c
+@@ -37,7 +37,7 @@ remque(void *a)
+   element->qh_rlink =3D NULL;
+ }
+=20
+-int add_exec(struct ex_list **ex_ptr, int do_pty, char *exec,
++int add_exec(struct ex_list **ex_ptr, void *chardev, const char *cmdline=
+,
+              struct in_addr addr, int port)
+ {
+ 	struct ex_list *tmp_ptr;
+@@ -50,11 +50,14 @@ int add_exec(struct ex_list **ex_ptr, int do_pty, cha=
+r *exec,
+ 	}
+=20
+ 	tmp_ptr =3D *ex_ptr;
+-	*ex_ptr =3D g_new(struct ex_list, 1);
++	*ex_ptr =3D g_new0(struct ex_list, 1);
+ 	(*ex_ptr)->ex_fport =3D port;
+ 	(*ex_ptr)->ex_addr =3D addr;
+-	(*ex_ptr)->ex_chardev =3D do_pty =3D=3D 3;
+-	(*ex_ptr)->ex_exec =3D (do_pty =3D=3D 3) ? exec : g_strdup(exec);
++	if (chardev) {
++		(*ex_ptr)->ex_chardev =3D chardev;
++	} else {
++		(*ex_ptr)->ex_exec =3D g_strdup(cmdline);
++	}
+ 	(*ex_ptr)->ex_next =3D tmp_ptr;
+ 	return 0;
+ }
 diff --git a/slirp/misc.h b/slirp/misc.h
-index 94829722cd..0bc5e74bc5 100644
+index 1f8d11def6..64ca88c3b7 100644
 --- a/slirp/misc.h
 +++ b/slirp/misc.h
-@@ -12,7 +12,7 @@ struct ex_list {
- 	void *ex_chardev;
+@@ -9,7 +9,7 @@
+ #define MISC_H
+=20
+ struct ex_list {
+-	int ex_chardev;
++	void *ex_chardev;
  	struct in_addr ex_addr;		/* Server address */
  	int ex_fport;                   /* Port to telnet to */
--	const char *ex_exec;            /* Command line of what to exec */
-+	char *ex_exec;                  /* Command line of what to exec */
- 	struct ex_list *ex_next;
- };
+ 	const char *ex_exec;            /* Command line of what to exec */
+@@ -52,7 +52,7 @@ struct slirp_quehead {
 =20
+ void slirp_insque(void *, void *);
+ void slirp_remque(void *);
+-int add_exec(struct ex_list **, int, char *, struct in_addr, int);
++int add_exec(struct ex_list **, void *, const char *, struct in_addr, in=
+t);
+ int fork_exec(struct socket *so, const char *ex);
+=20
+ #endif
 diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 4c9ba9d428..0e4ade3e4a 100644
+index fd0b17e0d9..06b5c76939 100644
 --- a/slirp/slirp.c
 +++ b/slirp/slirp.c
-@@ -342,6 +342,14 @@ Slirp *slirp_init(int restricted, bool in_enabled, s=
-truct in_addr vnetwork,
+@@ -1068,7 +1068,7 @@ int slirp_add_hostfwd(Slirp *slirp, int is_udp, str=
+uct in_addr host_addr,
+     return 0;
+ }
 =20
- void slirp_cleanup(Slirp *slirp)
+-int slirp_add_exec(Slirp *slirp, int do_pty, const void *args,
++int slirp_add_exec(Slirp *slirp, void *chardev, const char *cmdline,
+                    struct in_addr *guest_addr, int guest_port)
  {
-+    struct ex_list *e, *next;
+     if (!guest_addr->s_addr) {
+@@ -1081,7 +1081,8 @@ int slirp_add_exec(Slirp *slirp, int do_pty, const =
+void *args,
+         guest_addr->s_addr =3D=3D slirp->vnameserver_addr.s_addr) {
+         return -1;
+     }
+-    return add_exec(&slirp->exec_list, do_pty, (char *)args, *guest_addr=
+,
 +
-+    for (e =3D slirp->exec_list; e; e =3D next) {
-+        next =3D e->ex_next;
-+        g_free(e->ex_exec);
-+        g_free(e);
-+    }
-+
-     QTAILQ_REMOVE(&slirp_instances, slirp, entry);
++    return add_exec(&slirp->exec_list, chardev, cmdline, *guest_addr,
+                     htons(guest_port));
+ }
 =20
-     unregister_savevm(NULL, "slirp", slirp);
+diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+index dc19eea55a..e7b2baa087 100644
+--- a/slirp/tcp_subr.c
++++ b/slirp/tcp_subr.c
+@@ -962,7 +962,7 @@ int tcp_ctl(struct socket *so)
+                 so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr) {
+                 if (ex_ptr->ex_chardev) {
+                     so->s =3D -1;
+-                    so->extra =3D (void *)ex_ptr->ex_exec;
++                    so->extra =3D ex_ptr->ex_chardev;
+                     return 1;
+                 }
+                 DEBUG_MISC((dfd, " executing %s\n", ex_ptr->ex_exec));
 --=20
 2.19.2
