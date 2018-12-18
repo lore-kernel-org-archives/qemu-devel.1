@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gZ9WG-0001bn-Mq
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:10:21 -0500
+	(envelope-from <armbru@redhat.com>) id 1gZ9fc-0005eW-JV
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:20:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gZ9WA-0007b4-AU
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:10:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37474)
+	(envelope-from <armbru@redhat.com>) id 1gZ9fZ-0007Nr-Ct
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:20:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42524)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gZ9WA-0007Yc-0i
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:10:14 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gZ9fZ-0007NP-2f
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:19:57 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <1543467132-2873-1-git-send-email-liq3ea@gmail.com>
-	<1543467132-2873-3-git-send-email-liq3ea@gmail.com>
-	<644186db-32d3-7c83-8b37-02e8427ef217@redhat.com>
-	<87o99kj7tm.fsf@dusky.pond.sub.org>
-	<b3e3a763-7865-285b-4fa7-b3146f19d354@redhat.com>
-Date: Tue, 18 Dec 2018 08:09:59 +0100
-In-Reply-To: <b3e3a763-7865-285b-4fa7-b3146f19d354@redhat.com> ("Philippe
-	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon,
-	17 Dec 2018 20:37:56 +0100")
-Message-ID: <8736qvjooo.fsf@dusky.pond.sub.org>
+References: <20181217204046.14861-1-marcandre.lureau@redhat.com>
+Date: Tue, 18 Dec 2018 08:19:51 +0100
+In-Reply-To: <20181217204046.14861-1-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Tue, 18 Dec 2018 00:40:46 +0400")
+Message-ID: <87woo7i9ns.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] hw: vmmouse: Use link instead of
- pointer property
+Subject: Re: [Qemu-devel] [PATCH] qapi: fix flat union on uncovered branches
+ conditionals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,68 +29,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, ehabkost@redhat.com, mst@redhat.com, Li Qiang <liq3ea@gmail.com>, qemu-devel@nongnu.org, darren.kenny@oracle.com, pbonzini@redhat.com, rth@twiddle.net
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, thuth@redhat.com, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-> On 12/17/18 8:01 PM, Markus Armbruster wrote:
->> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->>=20
->>> Hi Li,
->>>
->>> On 11/29/18 5:52 AM, Li Qiang wrote:
->>>> According to qdev-properties.h, properties of pointer type should
->>>> be avoided. Turn "ps2_mouse" into a link.
->>>>
->>>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->>>> Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
->>>> Signed-off-by: Li Qiang <liq3ea@gmail.com>
->>>> ---
->> [...]
->>>> diff --git a/hw/i386/vmmouse.c b/hw/i386/vmmouse.c
->>>> index 4412eaf604..f63aac6673 100644
->>>> --- a/hw/i386/vmmouse.c
->>>> +++ b/hw/i386/vmmouse.c
->> [...]
->>>> @@ -283,8 +289,6 @@ static void vmmouse_class_initfn(ObjectClass *klas=
-s, void *data)
->>>>      dc->realize =3D vmmouse_realizefn;
->>>>      dc->reset =3D vmmouse_reset;
->>>>      dc->vmsd =3D &vmstate_vmmouse;
->>>> -    dc->props =3D vmmouse_properties;
->>>> -    /* Reason: pointer property "ps2_mouse" */
->>>>      dc->user_creatable =3D false;
->>>
->>> "user_creatable =3D false" must have an justification comment.
->>=20
->> Correct.
-
-Aside: more ->user_creatable =3D false without a comment have crept in
-since I last swept them out.
-
->>> Can you keep 'Reason: link property "ps2_mouse"'?
->>=20
->> Is this a valid reason?
->>=20
->> A pointer property is one, because it can only be set by code.
+> Default branches variant should use the member conditional.
 >
-> I prefer the original comment :)
+> This fixes compilation with --disable-replication.
 >
-> /* Reason: pointer property "ps2_mouse" */
+> Fixes: 335d10cd8e2c3bb6067804b095aaf6371fc1983e
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi/common.py | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+> index 8c2d97369e..d385a08270 100644
+> --- a/scripts/qapi/common.py
+> +++ b/scripts/qapi/common.py
+> @@ -1460,7 +1460,7 @@ class QAPISchemaObjectTypeVariants(object):
+>              cases =3D set([v.name for v in self.variants])
+>              for m in self.tag_member.type.members:
+>                  if m.name not in cases:
+> -                    v =3D QAPISchemaObjectTypeVariant(m.name, 'q_empty')
+> +                    v =3D QAPISchemaObjectTypeVariant(m.name, 'q_empty',=
+ m.ifcond)
+>                      v.set_owner(self.tag_member.owner)
+>                      self.variants.append(v)
+>          for v in self.variants:
 
-A pointer property can't be set by -device because there's no sane way
-to pick a value.  Not true for a link property: it's value is a QOM
-path.  But I'm not sure such setting of link properties has been
-implemented.  If it isn't, then /* Reason: link property "ps2_mouse */
-is perfect.  If it isn, then it's wrong, possibly along with with
-dc->user_creatable =3D false.
+Long line, happy to wrap it when I apply.
 
->>> Eventually the maintainer taking this patch can fix this for you.
->>>
->>> With the comment:
->>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>>
->>>>  }
->> [...]
->>=20
+I append the diff of generated code.
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+
+
+diff -rup qapi-gen-fb06411210/qapi-introspect.c qapi-gen-ce1a1aec47/qapi-in=
+trospect.c
+--- qapi-gen-fb06411210/qapi-introspect.c	2018-12-18 08:15:43.929724950 +01=
+00
++++ qapi-gen-ce1a1aec47/qapi-introspect.c	2018-12-18 08:11:30.927263620 +01=
+00
+@@ -10068,11 +10068,13 @@ const QLitObject qmp_schema_qlit =3D QLIT_
+                 { "type", QLIT_QSTR("0"), },
+                 {}
+             })),
++#if defined(CONFIG_REPLICATION)
+             QLIT_QDICT(((QLitDictEntry[]) {
+                 { "case", QLIT_QSTR("replication"), },
+                 { "type", QLIT_QSTR("0"), },
+                 {}
+             })),
++#endif /* defined(CONFIG_REPLICATION) */
+             QLIT_QDICT(((QLitDictEntry[]) {
+                 { "case", QLIT_QSTR("throttle"), },
+                 { "type", QLIT_QSTR("0"), },
+diff -rup qapi-gen-fb06411210/qapi-visit-block-core.c qapi-gen-ce1a1aec47/q=
+api-visit-block-core.c
+--- qapi-gen-fb06411210/qapi-visit-block-core.c	2018-12-18 08:15:43.8337262=
+92 +0100
++++ qapi-gen-ce1a1aec47/qapi-visit-block-core.c	2018-12-18 08:11:30.8332649=
+35 +0100
+@@ -7175,8 +7175,10 @@ void visit_type_BlockdevCreateOptions_me
+         break;
+     case BLOCKDEV_DRIVER_RAW:
+         break;
++#if defined(CONFIG_REPLICATION)
+     case BLOCKDEV_DRIVER_REPLICATION:
+         break;
++#endif /* defined(CONFIG_REPLICATION) */
+     case BLOCKDEV_DRIVER_THROTTLE:
+         break;
+     case BLOCKDEV_DRIVER_VMDK:
