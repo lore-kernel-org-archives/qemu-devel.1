@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gZ92v-0001fa-Ts
+	(envelope-from <richard.henderson@linaro.org>) id 1gZ92v-0001fe-Tk
 	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:40:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gZ92q-0002qK-T9
+	(envelope-from <richard.henderson@linaro.org>) id 1gZ92r-0002rA-FJ
 	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:40:01 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:42367)
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:38630)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gZ92q-0001yb-EX
+	id 1gZ92q-0002Sl-Ow
 	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:39:56 -0500
-Received: by mail-pf1-x444.google.com with SMTP id 64so7641172pfr.9
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 22:39:27 -0800 (PST)
+Received: by mail-pg1-x544.google.com with SMTP id g189so7344221pgc.5
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 22:39:43 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 17 Dec 2018 22:38:47 -0800
-Message-Id: <20181218063911.2112-11-richard.henderson@linaro.org>
+Date: Mon, 17 Dec 2018 22:38:58 -0800
+Message-Id: <20181218063911.2112-22-richard.henderson@linaro.org>
 In-Reply-To: <20181218063911.2112-1-richard.henderson@linaro.org>
 References: <20181218063911.2112-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 10/34] target/arm: Use vector minmax expanders
- for aarch32
+Subject: [Qemu-devel] [PATCH 21/34] target/ppc: nand, nor,
+ eqv are now generic vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,51 +32,50 @@ Cc: mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org, david@gibson.dropbear.id
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 25 +++++++++++++++++++------
- 1 file changed, 19 insertions(+), 6 deletions(-)
+ target/ppc/translate/vmx-impl.inc.c | 26 +++-----------------------
+ 1 file changed, 3 insertions(+), 23 deletions(-)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 33b1860148..f3f172f384 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -6368,6 +6368,25 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-             tcg_gen_gvec_cmp(u ? TCG_COND_GEU : TCG_COND_GE, size,
-                              rd_ofs, rn_ofs, rm_ofs, vec_size, vec_size);
-             return 0;
-+
-+        case NEON_3R_VMAX:
-+            if (u) {
-+                tcg_gen_gvec_umax(size, rd_ofs, rn_ofs, rm_ofs,
-+                                  vec_size, vec_size);
-+            } else {
-+                tcg_gen_gvec_smax(size, rd_ofs, rn_ofs, rm_ofs,
-+                                  vec_size, vec_size);
-+            }
-+            return 0;
-+        case NEON_3R_VMIN:
-+            if (u) {
-+                tcg_gen_gvec_umin(size, rd_ofs, rn_ofs, rm_ofs,
-+                                  vec_size, vec_size);
-+            } else {
-+                tcg_gen_gvec_smin(size, rd_ofs, rn_ofs, rm_ofs,
-+                                  vec_size, vec_size);
-+            }
-+            return 0;
-         }
+diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
+index 529ae0e5f5..329131d30b 100644
+--- a/target/ppc/translate/vmx-impl.inc.c
++++ b/target/ppc/translate/vmx-impl.inc.c
+@@ -277,34 +277,14 @@ static void glue(gen_, name)(DisasContext *ctx)                         \
+            16, 16);                                                     \
+ }
  
-         if (size == 3) {
-@@ -6533,12 +6552,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-         case NEON_3R_VQRSHL:
-             GEN_NEON_INTEGER_OP_ENV(qrshl);
-             break;
--        case NEON_3R_VMAX:
--            GEN_NEON_INTEGER_OP(max);
--            break;
--        case NEON_3R_VMIN:
--            GEN_NEON_INTEGER_OP(min);
--            break;
-         case NEON_3R_VABD:
-             GEN_NEON_INTEGER_OP(abd);
-             break;
+-#define GEN_VXFORM_VN(name, vece, tcg_op, opc2, opc3)                   \
+-static void glue(gen_, name)(DisasContext *ctx)                         \
+-{                                                                       \
+-    if (unlikely(!ctx->altivec_enabled)) {                              \
+-        gen_exception(ctx, POWERPC_EXCP_VPU);                           \
+-        return;                                                         \
+-    }                                                                   \
+-                                                                        \
+-    tcg_op(vece,                                                        \
+-           avr64_offset(rD(ctx->opcode), true),                         \
+-           avr64_offset(rA(ctx->opcode), true),                         \
+-           avr64_offset(rB(ctx->opcode), true),                         \
+-           16, 16);                                                     \
+-                                                                        \
+-    tcg_gen_gvec_not(vece,                                              \
+-                     avr64_offset(rD(ctx->opcode), true),               \
+-                     avr64_offset(rD(ctx->opcode), true),               \
+-                     16, 16);                                           \
+-}
+-
+ /* Logical operations */
+ GEN_VXFORM_V(vand, MO_64, tcg_gen_gvec_and, 2, 16);
+ GEN_VXFORM_V(vandc, MO_64, tcg_gen_gvec_andc, 2, 17);
+ GEN_VXFORM_V(vor, MO_64, tcg_gen_gvec_or, 2, 18);
+ GEN_VXFORM_V(vxor, MO_64, tcg_gen_gvec_xor, 2, 19);
+-GEN_VXFORM_VN(vnor, MO_64, tcg_gen_gvec_or, 2, 20);
+-GEN_VXFORM_VN(veqv, MO_64, tcg_gen_gvec_xor, 2, 26);
+-GEN_VXFORM_VN(vnand, MO_64, tcg_gen_gvec_and, 2, 22);
++GEN_VXFORM_V(vnor, MO_64, tcg_gen_gvec_nor, 2, 20);
++GEN_VXFORM_V(veqv, MO_64, tcg_gen_gvec_eqv, 2, 26);
++GEN_VXFORM_V(vnand, MO_64, tcg_gen_gvec_nand, 2, 22);
+ GEN_VXFORM_V(vorc, MO_64, tcg_gen_gvec_orc, 2, 21);
+ 
+ #define GEN_VXFORM(name, opc2, opc3)                                    \
 -- 
 2.17.2
