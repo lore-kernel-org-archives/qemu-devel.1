@@ -1,17 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gZOJB-0004u2-Mq
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 17:57:52 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOQB-0007wM-LV
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:05:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gZOJ2-0007FS-QG
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 17:57:45 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Tue, 18 Dec 2018 16:57:14 -0600
-Message-Id: <20181218225714.284495-4-eblake@redhat.com>
-In-Reply-To: <20181218225714.284495-1-eblake@redhat.com>
-References: <20181218225714.284495-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] block/nbd-client: use traces instead of
- noisy error_report_err
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOQ5-00043r-OQ
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:05:00 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:57290)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1gZOQ1-0003yX-P2
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:04:55 -0500
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Date: Wed, 19 Dec 2018 00:03:41 +0100
+Message-Id: <20181218230442.27887-4-samuel.thibault@ens-lyon.org>
+In-Reply-To: <20181218230442.27887-1-samuel.thibault@ens-lyon.org>
+References: <20181218230442.27887-1-samuel.thibault@ens-lyon.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 03/64] slirp: replace ex_pty with ex_chardev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,239 +27,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: vsementsov@virtuozzo.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Reduce extra noise of nbd-client, change 083 correspondingly.
+do_pty =3D=3D 3 means to talk to a chardev.
 
-In various commits (be41c100 in 2.10, f140e300 in 2.11, 78a33ab
-in 2.12), we added spots where qemu as an NBD client would report
-problems communicating with the server to stderr, because there
-was no where else to send the error to.  However, this is racy,
-particularly since the most common source of these errors is when
-either the client or the server abruptly hangs up, leaving one
-coroutine to report the error only if it wins (or loses) the
-race as attempting the read from the server before another
-thread completes its cleanup of a protocol error that caused the
-disconnect in the first place.  The race is also apparent in the
-fact that differences in the flush behavior of the server can
-alter the frequency of encountering the race in the client (see
-commit 6d39db96).
-
-Rather than polluting stderr, it's better to just trace these
-situations, for use by developers debugging a flaky connection,
-particularly since the real error that either triggers the abrupt
-disconnection in the first place, or that results from the EIO
-when a request can't receive a reply, DOES make it back to the
-user in the normal Error propagation channels.
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20181102151152.288399-4-vsementsov@virtuozzo.com>
-[eblake: drop depedence on error hint, enhance commit message]
-Signed-off-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- block/nbd-client.c         | 23 +++++++++++++++++++----
- block/trace-events         |  4 ++++
- tests/qemu-iotests/083.out | 28 ----------------------------
- 3 files changed, 23 insertions(+), 32 deletions(-)
+ slirp/misc.c     | 2 +-
+ slirp/misc.h     | 2 +-
+ slirp/slirp.c    | 4 ++--
+ slirp/tcp_subr.c | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index fc5b7eda8ee..ef320759716 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -28,6 +28,8 @@
-  */
-
- #include "qemu/osdep.h"
-+
-+#include "trace.h"
- #include "qapi/error.h"
- #include "nbd-client.h"
-
-@@ -79,7 +81,8 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
-         assert(s->reply.handle == 0);
-         ret = nbd_receive_reply(s->ioc, &s->reply, &local_err);
-         if (local_err) {
--            error_report_err(local_err);
-+            trace_nbd_read_reply_entry_fail(ret, error_get_pretty(local_err));
-+            error_free(local_err);
+diff --git a/slirp/misc.c b/slirp/misc.c
+index e69d5f42c3..8f0b6004bd 100644
+--- a/slirp/misc.c
++++ b/slirp/misc.c
+@@ -53,7 +53,7 @@ int add_exec(struct ex_list **ex_ptr, int do_pty, char =
+*exec,
+ 	*ex_ptr =3D g_new(struct ex_list, 1);
+ 	(*ex_ptr)->ex_fport =3D port;
+ 	(*ex_ptr)->ex_addr =3D addr;
+-	(*ex_ptr)->ex_pty =3D do_pty;
++	(*ex_ptr)->ex_chardev =3D do_pty =3D=3D 3;
+ 	(*ex_ptr)->ex_exec =3D (do_pty =3D=3D 3) ? exec : g_strdup(exec);
+ 	(*ex_ptr)->ex_next =3D tmp_ptr;
+ 	return 0;
+diff --git a/slirp/misc.h b/slirp/misc.h
+index 897650aea1..1f8d11def6 100644
+--- a/slirp/misc.h
++++ b/slirp/misc.h
+@@ -9,7 +9,7 @@
+ #define MISC_H
+=20
+ struct ex_list {
+-	int ex_pty;			/* Do we want a pty? */
++	int ex_chardev;
+ 	struct in_addr ex_addr;		/* Server address */
+ 	int ex_fport;                   /* Port to telnet to */
+ 	const char *ex_exec;            /* Command line of what to exec */
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index b0380c5eaa..fd0b17e0d9 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -1455,7 +1455,7 @@ static void slirp_state_save(QEMUFile *f, void *opa=
+que)
+     struct ex_list *ex_ptr;
+=20
+     for (ex_ptr =3D slirp->exec_list; ex_ptr; ex_ptr =3D ex_ptr->ex_next=
+)
+-        if (ex_ptr->ex_pty =3D=3D 3) {
++        if (ex_ptr->ex_chardev) {
+             struct socket *so;
+             so =3D slirp_find_ctl_socket(slirp, ex_ptr->ex_addr,
+                                        ntohs(ex_ptr->ex_fport));
+@@ -1490,7 +1490,7 @@ static int slirp_state_load(QEMUFile *f, void *opaq=
+ue, int version_id)
+             return -EINVAL;
          }
-         if (ret <= 0) {
-             break;
-@@ -771,7 +774,11 @@ static int nbd_co_request(BlockDriverState *bs, NBDRequest *request,
-
-     ret = nbd_co_receive_return_code(client, request->handle, &local_err);
-     if (local_err) {
--        error_report_err(local_err);
-+        trace_nbd_co_request_fail(request->from, request->len, request->handle,
-+                                  request->flags, request->type,
-+                                  nbd_cmd_lookup(request->type),
-+                                  ret, error_get_pretty(local_err));
-+        error_free(local_err);
-     }
-     return ret;
- }
-@@ -802,7 +809,11 @@ int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
-     ret = nbd_co_receive_cmdread_reply(client, request.handle, offset, qiov,
-                                        &local_err);
-     if (local_err) {
--        error_report_err(local_err);
-+        trace_nbd_co_request_fail(request.from, request.len, request.handle,
-+                                  request.flags, request.type,
-+                                  nbd_cmd_lookup(request.type),
-+                                  ret, error_get_pretty(local_err));
-+        error_free(local_err);
-     }
-     return ret;
- }
-@@ -925,7 +936,11 @@ int coroutine_fn nbd_client_co_block_status(BlockDriverState *bs,
-     ret = nbd_co_receive_blockstatus_reply(client, request.handle, bytes,
-                                            &extent, &local_err);
-     if (local_err) {
--        error_report_err(local_err);
-+        trace_nbd_co_request_fail(request.from, request.len, request.handle,
-+                                  request.flags, request.type,
-+                                  nbd_cmd_lookup(request.type),
-+                                  ret, error_get_pretty(local_err));
-+        error_free(local_err);
-     }
-     if (ret < 0) {
-         return ret;
-diff --git a/block/trace-events b/block/trace-events
-index 3e8c47bb243..693c14c4435 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -156,3 +156,7 @@ nvme_cmd_map_qiov_iov(void *s, int i, void *page, int pages) "s %p iov[%d] %p pa
-
- # block/iscsi.c
- iscsi_xcopy(void *src_lun, uint64_t src_off, void *dst_lun, uint64_t dst_off, uint64_t bytes, int ret) "src_lun %p offset %"PRIu64" dst_lun %p offset %"PRIu64" bytes %"PRIu64" ret %d"
-+
-+# block/nbd-client.c
-+nbd_read_reply_entry_fail(int ret, const char *err) "ret = %d, err: %s"
-+nbd_co_request_fail(uint64_t from, uint32_t len, uint64_t handle, uint16_t flags, uint16_t type, const char *name, int ret, const char *err) "Request failed { .from = %" PRIu64", .len = %" PRIu32 ", .handle = %" PRIu64 ", .flags = 0x%" PRIx16 ", .type = %" PRIu16 " (%s) } ret = %d, err: %s"
-diff --git a/tests/qemu-iotests/083.out b/tests/qemu-iotests/083.out
-index f9af8bb6918..7419722cd7a 100644
---- a/tests/qemu-iotests/083.out
-+++ b/tests/qemu-iotests/083.out
-@@ -41,8 +41,6 @@ can't open device nbd+tcp://127.0.0.1:PORT/foo
-
- === Check disconnect after neg2 ===
-
--Unable to read from socket: Connection reset by peer
--Connection closed
- read failed: Input/output error
-
- === Check disconnect 8 neg2 ===
-@@ -55,40 +53,30 @@ can't open device nbd+tcp://127.0.0.1:PORT/foo
-
- === Check disconnect before request ===
-
--Unable to read from socket: Connection reset by peer
--Connection closed
- read failed: Input/output error
-
- === Check disconnect after request ===
-
--Connection closed
- read failed: Input/output error
-
- === Check disconnect before reply ===
-
--Connection closed
- read failed: Input/output error
-
- === Check disconnect after reply ===
-
--Unexpected end-of-file before all bytes were read
- read failed: Input/output error
-
- === Check disconnect 4 reply ===
-
--Unexpected end-of-file before all bytes were read
--Connection closed
- read failed: Input/output error
-
- === Check disconnect 8 reply ===
-
--Unexpected end-of-file before all bytes were read
--Connection closed
- read failed: Input/output error
-
- === Check disconnect before data ===
-
--Unexpected end-of-file before all bytes were read
- read failed: Input/output error
-
- === Check disconnect after data ===
-@@ -118,8 +106,6 @@ can't open device nbd+tcp://127.0.0.1:PORT/
-
- === Check disconnect after neg-classic ===
-
--Unable to read from socket: Connection reset by peer
--Connection closed
- read failed: Input/output error
-
- === Check disconnect before neg1 ===
-@@ -164,8 +150,6 @@ can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
-
- === Check disconnect after neg2 ===
-
--Unable to read from socket: Connection reset by peer
--Connection closed
- read failed: Input/output error
-
- === Check disconnect 8 neg2 ===
-@@ -178,40 +162,30 @@ can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
-
- === Check disconnect before request ===
-
--Unable to read from socket: Connection reset by peer
--Connection closed
- read failed: Input/output error
-
- === Check disconnect after request ===
-
--Connection closed
- read failed: Input/output error
-
- === Check disconnect before reply ===
-
--Connection closed
- read failed: Input/output error
-
- === Check disconnect after reply ===
-
--Unexpected end-of-file before all bytes were read
- read failed: Input/output error
-
- === Check disconnect 4 reply ===
-
--Unexpected end-of-file before all bytes were read
--Connection closed
- read failed: Input/output error
-
- === Check disconnect 8 reply ===
-
--Unexpected end-of-file before all bytes were read
--Connection closed
- read failed: Input/output error
-
- === Check disconnect before data ===
-
--Unexpected end-of-file before all bytes were read
- read failed: Input/output error
-
- === Check disconnect after data ===
-@@ -241,8 +215,6 @@ can't open device nbd+unix:///?socket=TEST_DIR/nbd.sock
-
- === Check disconnect after neg-classic ===
-
--Unable to read from socket: Connection reset by peer
--Connection closed
- read failed: Input/output error
-
- *** done
--- 
-2.17.2
+         for (ex_ptr =3D slirp->exec_list; ex_ptr; ex_ptr =3D ex_ptr->ex_=
+next) {
+-            if (ex_ptr->ex_pty =3D=3D 3 &&
++            if (ex_ptr->ex_chardev &&
+                 so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr &&
+                 so->so_fport =3D=3D ex_ptr->ex_fport) {
+                 break;
+diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+index 0ccd8e1a96..dc19eea55a 100644
+--- a/slirp/tcp_subr.c
++++ b/slirp/tcp_subr.c
+@@ -960,7 +960,7 @@ int tcp_ctl(struct socket *so)
+         for (ex_ptr =3D slirp->exec_list; ex_ptr; ex_ptr =3D ex_ptr->ex_=
+next) {
+             if (ex_ptr->ex_fport =3D=3D so->so_fport &&
+                 so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr) {
+-                if (ex_ptr->ex_pty =3D=3D 3) {
++                if (ex_ptr->ex_chardev) {
+                     so->s =3D -1;
+                     so->extra =3D (void *)ex_ptr->ex_exec;
+                     return 1;
+--=20
+2.19.2
