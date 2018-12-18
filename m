@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOR8-0000KI-CY
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOR8-0000Kv-QN
 	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:06:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOR5-0004xz-51
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZOR7-0004zW-Hr
 	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:06:02 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:41670)
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:57570)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gZOR4-0004R1-90
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:05:58 -0500
+	id 1gZOR7-0004DS-7Q
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 18:06:01 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Wed, 19 Dec 2018 00:04:21 +0100
-Message-Id: <20181218230442.27887-44-samuel.thibault@ens-lyon.org>
+Date: Wed, 19 Dec 2018 00:04:06 +0100
+Message-Id: <20181218230442.27887-29-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20181218230442.27887-1-samuel.thibault@ens-lyon.org>
 References: <20181218230442.27887-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 43/64] glib-compat: add g_spawn_async_with_fds()
- fallback
+Subject: [Qemu-devel] [PULL 28/64] slirp: remove unused DECLARE_IOVEC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,82 +32,33 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
+It's actually qemu configure CONFIG_IOVEC that is being used.
+
+slirp/ does not use it anyway
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- include/glib-compat.h | 56 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 56 insertions(+)
+ slirp/slirp_config.h | 6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/include/glib-compat.h b/include/glib-compat.h
-index fdf95a255d..8a078c5288 100644
---- a/include/glib-compat.h
-+++ b/include/glib-compat.h
-@@ -83,6 +83,62 @@ static inline gboolean g_strv_contains_qemu(const gcha=
-r *const *strv,
- }
- #define g_strv_contains(a, b) g_strv_contains_qemu(a, b)
+diff --git a/slirp/slirp_config.h b/slirp/slirp_config.h
+index f1ee927c15..833f25a965 100644
+--- a/slirp/slirp_config.h
++++ b/slirp/slirp_config.h
+@@ -14,12 +14,6 @@
+ /* Define if the machine is big endian */
+ //#undef HOST_WORDS_BIGENDIAN
 =20
-+#if !GLIB_CHECK_VERSION(2, 58, 0)
-+typedef struct QemuGSpawnFds {
-+    GSpawnChildSetupFunc child_setup;
-+    gpointer user_data;
-+    gint stdin_fd;
-+    gint stdout_fd;
-+    gint stderr_fd;
-+} QemuGSpawnFds;
-+
-+static inline void
-+qemu_gspawn_fds_setup(gpointer user_data)
-+{
-+    QemuGSpawnFds *q =3D (QemuGSpawnFds *)user_data;
-+
-+    dup2(q->stdin_fd, 0);
-+    dup2(q->stdout_fd, 1);
-+    dup2(q->stderr_fd, 2);
-+    q->child_setup(q->user_data);
-+}
-+#endif
-+
-+static inline gboolean
-+g_spawn_async_with_fds_qemu(const gchar *working_directory,
-+                            gchar **argv,
-+                            gchar **envp,
-+                            GSpawnFlags flags,
-+                            GSpawnChildSetupFunc child_setup,
-+                            gpointer user_data,
-+                            GPid *child_pid,
-+                            gint stdin_fd,
-+                            gint stdout_fd,
-+                            gint stderr_fd,
-+                            GError **error)
-+{
-+#if GLIB_CHECK_VERSION(2, 58, 0)
-+    return g_spawn_async_with_fds(working_directory, argv, envp, flags,
-+                                  child_setup, user_data,
-+                                  child_pid, stdin_fd, stdout_fd, stderr=
-_fd,
-+                                  error);
-+#else
-+    QemuGSpawnFds setup =3D {
-+        .child_setup =3D child_setup,
-+        .user_data =3D user_data,
-+        .stdin_fd =3D stdin_fd,
-+        .stdout_fd =3D stdout_fd,
-+        .stderr_fd =3D stderr_fd,
-+    };
-+
-+    return g_spawn_async(working_directory, argv, envp, flags,
-+                         qemu_gspawn_fds_setup, &setup,
-+                         child_pid, error);
-+#endif
-+}
-+
-+#define g_spawn_async_with_fds(wd, argv, env, f, c, d, p, ifd, ofd, efd,=
- err) \
-+    g_spawn_async_with_fds_qemu(wd, argv, env, f, c, d, p, ifd, ofd, efd=
-, err)
+-/* Define if iovec needs to be declared */
+-#undef DECLARE_IOVEC
+-#ifdef _WIN32
+-#define DECLARE_IOVEC
+-#endif
+-
+ /* Define to sizeof(char *) */
+ #define SIZEOF_CHAR_P (HOST_LONG_BITS / 8)
 =20
- #if defined(_WIN32) && !GLIB_CHECK_VERSION(2, 50, 0)
- /*
 --=20
 2.19.2
