@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZ531-0004iU-0R
+	(envelope-from <dgibson@ozlabs.org>) id 1gZ531-0004j9-Sv
 	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 21:23:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZ52z-0005Aw-9s
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 21:23:50 -0500
-Date: Tue, 18 Dec 2018 11:00:18 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gZ52z-0005Ai-4p
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 21:23:51 -0500
+Date: Tue, 18 Dec 2018 13:23:39 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181218000018.GA23604@umbus.fritz.box>
-References: <20181211223823.13770-1-clg@kaod.org>
-	<20181211223823.13770-10-clg@kaod.org>
-	<4a9ab4ce-c7d7-9744-e5ea-10df38806e9a@kaod.org>
-	<20181217060139.GG5597@umbus.fritz.box>
-	<6f685f79-56b2-7ea4-57b6-e1f21bd34326@kaod.org>
+Message-ID: <20181218022339.GD23604@umbus.fritz.box>
+References: <20181217223445.28594-1-clg@kaod.org>
+	<20181217223445.28594-3-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="sdtB3X0nJg68CQEu"
+	protocol="application/pgp-signature"; boundary="5gxpn/Q6ypwruk0T"
 Content-Disposition: inline
-In-Reply-To: <6f685f79-56b2-7ea4-57b6-e1f21bd34326@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v8 09/12] spapr: set the interrupt
- presenter at reset
+In-Reply-To: <20181217223445.28594-3-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v9 2/7] target/ppc: replace
+ __builtin_ffssl() by the equivalent ctz routines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,167 +26,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---sdtB3X0nJg68CQEu
+--5gxpn/Q6ypwruk0T
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 17, 2018 at 11:41:34PM +0100, C=E9dric Le Goater wrote:
-> On 12/17/18 7:01 AM, David Gibson wrote:
-> > On Thu, Dec 13, 2018 at 01:52:14PM +0100, C=E9dric Le Goater wrote:
-> >> On 12/11/18 11:38 PM, C=E9dric Le Goater wrote:
-> >>> Currently, the interrupt presenter of the vCPU is set at realize
-> >>> time. Setting it at reset will become necessary when the new machine
-> >>> supporting both interrupt modes is introduced. In this machine, the
-> >>> interrupt mode is chosen at CAS time and activated after a reset.
-> >>
-> >> I think we need a second '->intc' pointer specific to XIVE instead.=20
-> >> How about ->intc_xive ?
-> >=20
-> > Ah, interesting.  If we're going to need that, we might as well go
-> > to specific ->icp and ->tctx pointers with the right types.
+On Mon, Dec 17, 2018 at 11:34:40PM +0100, C=E9dric Le Goater wrote:
+> And remove the intermediate MASK_TO_LSH macro which does not add any valu=
+e.
 >=20
-> Hmm, PowerPCCPU is defined under target/ppc and adding the type might=20
-> add some noise. I will check.
+> This fixes a compile breakage on windows.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-It's a pointer, so you can just declare the type without a
-definition.  That should be ok.
+It's an improvement over what's there, but it still leaves macros
+whose primary use would be for guest registers, but are typed
+according to host values, which doesn't make much sense.
 
-> > I don't particularly like having those machine specific pointers
-> > within the cpu structure, but we can look at fixing that later by
-> > reviving my patches to move various machine specific stuff within the
-> > cpu into a separate sub-allocation.
+I think instead we should redefine your BE64 / BE32 variants in terms
+of the existing extract*() and deposit*() primitives, and get rid of
+the GETFIELD / SETFIELD macros.
+
+> ---
+>  target/ppc/cpu.h | 15 +++++++++------
+>  1 file changed, 9 insertions(+), 6 deletions(-)
 >=20
-> ok.
->=20
-> Thanks,
->=20
-> C.=20
->=20
-> >>
-> >> We could just drop this patch and easly get rid of the XiveTCTX object=
-=20
-> >> leak in spapr_unrealize_vcpu().
-> >>
-> >> C.=20
-> >>
-> >>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> >>> ---
-> >>>
-> >>>  Changes since v7:
-> >>>
-> >>>  - introduced spapr_irq_reset_xics().=20
-> >>>
-> >>>  include/hw/ppc/spapr_cpu_core.h |  2 ++
-> >>>  hw/ppc/spapr_cpu_core.c         | 26 ++++++++++++++++++++++++++
-> >>>  hw/ppc/spapr_irq.c              | 13 +++++++++++++
-> >>>  3 files changed, 41 insertions(+)
-> >>>
-> >>> diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_c=
-pu_core.h
-> >>> index 9e2821e4b31f..fc8ea9021656 100644
-> >>> --- a/include/hw/ppc/spapr_cpu_core.h
-> >>> +++ b/include/hw/ppc/spapr_cpu_core.h
-> >>> @@ -53,4 +53,6 @@ static inline sPAPRCPUState *spapr_cpu_state(PowerP=
-CCPU *cpu)
-> >>>      return (sPAPRCPUState *)cpu->machine_data;
-> >>>  }
-> >>> =20
-> >>> +void spapr_cpu_core_set_intc(PowerPCCPU *cpu, const char *intc_type);
-> >>> +
-> >>>  #endif
-> >>> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> >>> index 82666436e9b4..afc5d4f4e739 100644
-> >>> --- a/hw/ppc/spapr_cpu_core.c
-> >>> +++ b/hw/ppc/spapr_cpu_core.c
-> >>> @@ -397,3 +397,29 @@ static const TypeInfo spapr_cpu_core_type_infos[=
-] =3D {
-> >>>  };
-> >>> =20
-> >>>  DEFINE_TYPES(spapr_cpu_core_type_infos)
-> >>> +
-> >>> +typedef struct ForeachFindIntCArgs {
-> >>> +    const char *intc_type;
-> >>> +    Object *intc;
-> >>> +} ForeachFindIntCArgs;
-> >>> +
-> >>> +static int spapr_cpu_core_find_intc(Object *child, void *opaque)
-> >>> +{
-> >>> +    ForeachFindIntCArgs *args =3D opaque;
-> >>> +
-> >>> +    if (object_dynamic_cast(child, args->intc_type)) {
-> >>> +        args->intc =3D child;
-> >>> +    }
-> >>> +
-> >>> +    return args->intc !=3D NULL;
-> >>> +}
-> >>> +
-> >>> +void spapr_cpu_core_set_intc(PowerPCCPU *cpu, const char *intc_type)
-> >>> +{
-> >>> +    ForeachFindIntCArgs args =3D { intc_type, NULL };
-> >>> +
-> >>> +    object_child_foreach(OBJECT(cpu), spapr_cpu_core_find_intc, &arg=
-s);
-> >>> +    g_assert(args.intc);
-> >>> +
-> >>> +    cpu->intc =3D args.intc;
-> >>> +}
-> >>> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> >>> index 0999a2b2d69c..814500f22d34 100644
-> >>> --- a/hw/ppc/spapr_irq.c
-> >>> +++ b/hw/ppc/spapr_irq.c
-> >>> @@ -12,6 +12,7 @@
-> >>>  #include "qemu/error-report.h"
-> >>>  #include "qapi/error.h"
-> >>>  #include "hw/ppc/spapr.h"
-> >>> +#include "hw/ppc/spapr_cpu_core.h"
-> >>>  #include "hw/ppc/spapr_xive.h"
-> >>>  #include "hw/ppc/xics.h"
-> >>>  #include "sysemu/kvm.h"
-> >>> @@ -208,6 +209,15 @@ static int spapr_irq_post_load_xics(sPAPRMachine=
-State *spapr, int version_id)
-> >>>      return 0;
-> >>>  }
-> >>> =20
-> >>> +static void spapr_irq_reset_xics(sPAPRMachineState *spapr, Error **e=
-rrp)
-> >>> +{
-> >>> +   CPUState *cs;
-> >>> +
-> >>> +    CPU_FOREACH(cs) {
-> >>> +        spapr_cpu_core_set_intc(POWERPC_CPU(cs), spapr->icp_type);
-> >>> +    }
-> >>> +}
-> >>> +
-> >>>  #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
-> >>>  #define SPAPR_IRQ_XICS_NR_MSIS     \
-> >>>      (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
-> >>> @@ -225,6 +235,7 @@ sPAPRIrq spapr_irq_xics =3D {
-> >>>      .dt_populate =3D spapr_dt_xics,
-> >>>      .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
-> >>>      .post_load   =3D spapr_irq_post_load_xics,
-> >>> +    .reset       =3D spapr_irq_reset_xics,
-> >>>  };
-> >>> =20
-> >>>  /*
-> >>> @@ -325,6 +336,8 @@ static void spapr_irq_reset_xive(sPAPRMachineStat=
-e *spapr, Error **errp)
-> >>>      CPU_FOREACH(cs) {
-> >>>          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> >>> =20
-> >>> +        spapr_cpu_core_set_intc(cpu, TYPE_XIVE_TCTX);
-> >>> +
-> >>>          /* (TCG) Set the OS CAM line of the thread interrupt context=
-=2E */
-> >>>          spapr_xive_set_tctx_os_cam(XIVE_TCTX(cpu->intc));
-> >>>      }
-> >>>
-> >>
-> >=20
->=20
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 527181c0f09f..f4ef4f214564 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -78,18 +78,21 @@
+>                                   PPC_BIT32(bs))
+>  #define PPC_BITMASK8(bs, be)    ((PPC_BIT8(bs) - PPC_BIT8(be)) | PPC_BIT=
+8(bs))
+> =20
+> +/*
+> + * OPAL PPC bitmask field manipulation, used in XIVE, PHB3 and PHB4
+> + */
+>  #if HOST_LONG_BITS =3D=3D 32
+> -# define MASK_TO_LSH(m)          (__builtin_ffsll(m) - 1)
+> +#  define GETFIELD(m, v)        (((v) & (m)) >> ctz32(m))
+> +#  define SETFIELD(m, v, val)                                   \
+> +    (((v) & ~(m)) | ((((typeof(v))(val)) << ctz32(m)) & (m)))
+>  #elif HOST_LONG_BITS =3D=3D 64
+> -# define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
+> +#  define GETFIELD(m, v)        (((v) & (m)) >> ctz64(m))
+> +#  define SETFIELD(m, v, val)                                   \
+> +    (((v) & ~(m)) | ((((typeof(v))(val)) << ctz64(m)) & (m)))
+>  #else
+>  # error Unknown sizeof long
+>  #endif
+> =20
+> -#define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
+> -#define SETFIELD(m, v, val)                             \
+> -        (((v) & ~(m)) | ((((typeof(v))(val)) << MASK_TO_LSH(m)) & (m)))
+> -
+>  /***********************************************************************=
+******/
+>  /* Exception vectors definitions                                        =
+     */
+>  enum {
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -197,24 +96,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---sdtB3X0nJg68CQEu
+--5gxpn/Q6ypwruk0T
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwYOI8ACgkQbDjKyiDZ
-s5Lo+RAApx+4rWbWBwjpYMq0b5jxtd3eCDaCrdunGnY1GzQI7bzF3lTG2mpwMvh8
-FL0vsJLaglEUiNAKx8c3ku1hqh6r5Q3haAnUcDrZRGR1vjwBGLhzU8pYexBilVx1
-43qGPBVWIdL735Rm7YVZXwKHA4lVLzY/JVO4/frZCABMrLnRRPXb2CtJ74x7zI6Y
-9IUITbmymVxLAkxLYg1s8Fj+IYjnfIe3E51Xyt3mDO0h8pClocyV7Iner0cAHJ6L
-CuaX83DkwDaWdC93Oxv/EXKpSqtV1BiC7vFvhEnT+lcEnBSIls5mABdrWOu9OV/s
-P6k7tvtXuTEd+JLJu+XqUKEZafl527tlkwP0vjxPT24cOU+9B7lGzRcVsCUPTFGO
-sU7reCohtzsEL+MC+drzeIGk3Q91WEaI6K1LP9hf3pZIhOAsV3BTn1n5eG3hzNxY
-ZnYiMXJG0n7V0Y+HHpSc3/eRyH0kEpCqnasK/hJJQ2tqSTVyFoV1oAALgPZLgoTT
-l2C3j3MnfoptkbHp8cK188WVLXTHuM4tcTuWAI3Ezas8XftVB/Jk17aN1DwKOCxr
-ez3DCKNTexJepJEUVI8QHTflEl/ILDwllvwPV+g7+Hgl+ffnxEYH4uKJ2mp39Pnl
-V71o6t8SMsADyoJEfGCrA5vZnjKeUmHGqJyhVwfH5lRC+jN38+E=
-=ntW+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwYWioACgkQbDjKyiDZ
+s5L3LA//bbMjdy6l7i+UDKoRCPa5VIm/I5PfiOcza8n5PYBnwPkexJoJYQcXcBvW
+hHt8BsXsc03p90fcaldtqrH8SuDqDReDY/OjNLnBdhHqPyoUY7BaTxETqARGscQv
+HnoDDy3M2x0TC2kWOSf9qtNNYqZ6Wq6U5q+Dk/KzGVHevZYNtiJmYs0u9mwWn4Ru
+iKJgD8evndmIJEwqHKd6/UdqPYt72PXHeCy31uKkMsygnJELvsxxJpdvydayDBxC
+h7R9uyaT5Y7/15PlByS45wcoswbIxXKGPSwf1V4kHFIPLx6qK+wS1gww+cmDU0RF
+tXT63A7NzjGf9+H34V0chSloNN4FndHmH8fyloNGk03rujPfusVlHygJNigb+gVT
+BdUSe7FpJXwq4ezFisi623VnHM8AQLtK9VM0AZDSGORsMnEv/9XE1SaL5bAjawGh
+3vgtlAikw2F9n0LmxSafmEDq7szTT4F2yvhuDZFd6jHrzfb6hbOzqtW4OCcy/7ys
+BCFjtBqECzjh287dzeFIJZU6iXQjMu0AhVfaiwYzpwAv+W3tv3xILo/t+sez9cD4
+iDpw2o23vKm0HA9iAki/PIKc4XuhnQ2IJK6vmvheRVFQseHmu8lL+8he3wd9A5o8
+w3JvkRVh4Oey+hn4zqckdUwjNoOmHVdNP2eZxI2RS7MxbrfVRVw=
+=IKjK
 -----END PGP SIGNATURE-----
 
---sdtB3X0nJg68CQEu--
+--5gxpn/Q6ypwruk0T--
