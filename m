@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gZ92t-0001fJ-Rp
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:40:06 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gZ92t-0001fH-RS
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:40:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gZ92q-0002ow-58
+	(envelope-from <richard.henderson@linaro.org>) id 1gZ92q-0002py-Pm
 	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:39:59 -0500
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:42869)
+Received: from mail-pf1-x434.google.com ([2607:f8b0:4864:20::434]:36692)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gZ92p-0001vu-PB
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:39:55 -0500
-Received: by mail-pg1-x541.google.com with SMTP id d72so7337986pga.9
-	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 22:39:22 -0800 (PST)
+	id 1gZ92q-0002iw-Cp
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:39:56 -0500
+Received: by mail-pf1-x434.google.com with SMTP id b85so7655504pfc.3
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 22:39:50 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 17 Dec 2018 22:38:43 -0800
-Message-Id: <20181218063911.2112-7-richard.henderson@linaro.org>
+Date: Mon, 17 Dec 2018 22:39:03 -0800
+Message-Id: <20181218063911.2112-27-richard.henderson@linaro.org>
 In-Reply-To: <20181218063911.2112-1-richard.henderson@linaro.org>
 References: <20181218063911.2112-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 06/34] tcg/i386: Implement vector saturating
- arithmetic
+Subject: [Qemu-devel] [PATCH 26/34] target/ppc: Pass integer to helper_mtvscr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,121 +29,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-Only MO_8 and MO_16 are implemented, since that's all the
-instruction set provides.
+We can re-use this helper elsewhere if we're not passing
+in an entire vector register.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/i386/tcg-target.h     |  2 +-
- tcg/i386/tcg-target.inc.c | 42 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 43 insertions(+), 1 deletion(-)
+ target/ppc/helper.h                 |  2 +-
+ target/ppc/int_helper.c             | 10 +++-------
+ target/ppc/translate/vmx-impl.inc.c | 17 +++++++++++++----
+ 3 files changed, 17 insertions(+), 12 deletions(-)
 
-diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index 44381062e6..f50234d97b 100644
---- a/tcg/i386/tcg-target.h
-+++ b/tcg/i386/tcg-target.h
-@@ -185,7 +185,7 @@ extern bool have_avx2;
- #define TCG_TARGET_HAS_shv_vec          0
- #define TCG_TARGET_HAS_cmp_vec          1
- #define TCG_TARGET_HAS_mul_vec          1
--#define TCG_TARGET_HAS_sat_vec          0
-+#define TCG_TARGET_HAS_sat_vec          1
- 
- #define TCG_TARGET_deposit_i32_valid(ofs, len) \
-     (((ofs) == 0 && (len) == 8) || ((ofs) == 8 && (len) == 8) || \
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index c21c3272f2..3571483bae 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -377,6 +377,10 @@ static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
- #define OPC_PADDW       (0xfd | P_EXT | P_DATA16)
- #define OPC_PADDD       (0xfe | P_EXT | P_DATA16)
- #define OPC_PADDQ       (0xd4 | P_EXT | P_DATA16)
-+#define OPC_PADDSB      (0xec | P_EXT | P_DATA16)
-+#define OPC_PADDSW      (0xed | P_EXT | P_DATA16)
-+#define OPC_PADDUB      (0xdc | P_EXT | P_DATA16)
-+#define OPC_PADDUW      (0xdd | P_EXT | P_DATA16)
- #define OPC_PAND        (0xdb | P_EXT | P_DATA16)
- #define OPC_PANDN       (0xdf | P_EXT | P_DATA16)
- #define OPC_PBLENDW     (0x0e | P_EXT3A | P_DATA16)
-@@ -408,6 +412,10 @@ static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
- #define OPC_PSUBW       (0xf9 | P_EXT | P_DATA16)
- #define OPC_PSUBD       (0xfa | P_EXT | P_DATA16)
- #define OPC_PSUBQ       (0xfb | P_EXT | P_DATA16)
-+#define OPC_PSUBSB      (0xe8 | P_EXT | P_DATA16)
-+#define OPC_PSUBSW      (0xe9 | P_EXT | P_DATA16)
-+#define OPC_PSUBUB      (0xd8 | P_EXT | P_DATA16)
-+#define OPC_PSUBUW      (0xd9 | P_EXT | P_DATA16)
- #define OPC_PUNPCKLBW   (0x60 | P_EXT | P_DATA16)
- #define OPC_PUNPCKLWD   (0x61 | P_EXT | P_DATA16)
- #define OPC_PUNPCKLDQ   (0x62 | P_EXT | P_DATA16)
-@@ -2591,9 +2599,21 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
-     static int const add_insn[4] = {
-         OPC_PADDB, OPC_PADDW, OPC_PADDD, OPC_PADDQ
-     };
-+    static int const ssadd_insn[4] = {
-+        OPC_PADDSB, OPC_PADDSW, OPC_UD2, OPC_UD2
-+    };
-+    static int const usadd_insn[4] = {
-+        OPC_PADDSB, OPC_PADDSW, OPC_UD2, OPC_UD2
-+    };
-     static int const sub_insn[4] = {
-         OPC_PSUBB, OPC_PSUBW, OPC_PSUBD, OPC_PSUBQ
-     };
-+    static int const sssub_insn[4] = {
-+        OPC_PSUBSB, OPC_PSUBSW, OPC_UD2, OPC_UD2
-+    };
-+    static int const ussub_insn[4] = {
-+        OPC_PSUBSB, OPC_PSUBSW, OPC_UD2, OPC_UD2
-+    };
-     static int const mul_insn[4] = {
-         OPC_UD2, OPC_PMULLW, OPC_PMULLD, OPC_UD2
-     };
-@@ -2631,9 +2651,21 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
-     case INDEX_op_add_vec:
-         insn = add_insn[vece];
-         goto gen_simd;
-+    case INDEX_op_ssadd_vec:
-+        insn = ssadd_insn[vece];
-+        goto gen_simd;
-+    case INDEX_op_usadd_vec:
-+        insn = usadd_insn[vece];
-+        goto gen_simd;
-     case INDEX_op_sub_vec:
-         insn = sub_insn[vece];
-         goto gen_simd;
-+    case INDEX_op_sssub_vec:
-+        insn = sssub_insn[vece];
-+        goto gen_simd;
-+    case INDEX_op_ussub_vec:
-+        insn = ussub_insn[vece];
-+        goto gen_simd;
-     case INDEX_op_mul_vec:
-         insn = mul_insn[vece];
-         goto gen_simd;
-@@ -3007,6 +3039,10 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     case INDEX_op_or_vec:
-     case INDEX_op_xor_vec:
-     case INDEX_op_andc_vec:
-+    case INDEX_op_ssadd_vec:
-+    case INDEX_op_usadd_vec:
-+    case INDEX_op_sssub_vec:
-+    case INDEX_op_ussub_vec:
-     case INDEX_op_cmp_vec:
-     case INDEX_op_x86_shufps_vec:
-     case INDEX_op_x86_blend_vec:
-@@ -3074,6 +3110,12 @@ int tcg_can_emit_vec_op(TCGOpcode opc, TCGType type, unsigned vece)
-         }
-         return 1;
- 
-+    case INDEX_op_ssadd_vec:
-+    case INDEX_op_usadd_vec:
-+    case INDEX_op_sssub_vec:
-+    case INDEX_op_ussub_vec:
-+        return vece <= MO_16;
-+
-     default:
-         return 0;
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index 069daa9883..b3ffe28103 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -294,7 +294,7 @@ DEF_HELPER_5(vmsumuhs, void, env, avr, avr, avr, avr)
+ DEF_HELPER_5(vmsumshm, void, env, avr, avr, avr, avr)
+ DEF_HELPER_5(vmsumshs, void, env, avr, avr, avr, avr)
+ DEF_HELPER_4(vmladduhm, void, avr, avr, avr, avr)
+-DEF_HELPER_2(mtvscr, void, env, avr)
++DEF_HELPER_FLAGS_2(mtvscr, TCG_CALL_NO_RWG, void, env, i32)
+ DEF_HELPER_3(lvebx, void, env, avr, tl)
+ DEF_HELPER_3(lvehx, void, env, avr, tl)
+ DEF_HELPER_3(lvewx, void, env, avr, tl)
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index 3bf0fdb6c5..0443f33cd2 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -469,14 +469,10 @@ void helper_lvsr(ppc_avr_t *r, target_ulong sh)
      }
+ }
+ 
+-void helper_mtvscr(CPUPPCState *env, ppc_avr_t *r)
++void helper_mtvscr(CPUPPCState *env, uint32_t vscr)
+ {
+-#if defined(HOST_WORDS_BIGENDIAN)
+-    env->vscr = r->u32[3];
+-#else
+-    env->vscr = r->u32[0];
+-#endif
+-    set_flush_to_zero(vscr_nj, &env->vec_status);
++    env->vscr = vscr;
++    set_flush_to_zero((vscr >> VSCR_NJ) & 1, &env->vec_status);
+ }
+ 
+ void helper_vaddcuw(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
+diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
+index 329131d30b..ab6da3aa55 100644
+--- a/target/ppc/translate/vmx-impl.inc.c
++++ b/target/ppc/translate/vmx-impl.inc.c
+@@ -196,14 +196,23 @@ static void gen_mfvscr(DisasContext *ctx)
+ 
+ static void gen_mtvscr(DisasContext *ctx)
+ {
+-    TCGv_ptr p;
++    TCGv_i32 val;
++    int bofs;
++
+     if (unlikely(!ctx->altivec_enabled)) {
+         gen_exception(ctx, POWERPC_EXCP_VPU);
+         return;
+     }
+-    p = gen_avr_ptr(rB(ctx->opcode));
+-    gen_helper_mtvscr(cpu_env, p);
+-    tcg_temp_free_ptr(p);
++
++    val = tcg_temp_new_i32();
++    bofs = avr64_offset(rB(ctx->opcode), true);
++#ifdef HOST_WORDS_BIGENDIAN
++    bofs += 3 * 4;
++#endif
++
++    tcg_gen_ld_i32(val, cpu_env, bofs);
++    gen_helper_mtvscr(cpu_env, val);
++    tcg_temp_free_i32(val);
+ }
+ 
+ #define GEN_VX_VMUL10(name, add_cin, ret_carry)                         \
 -- 
 2.17.2
