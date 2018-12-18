@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gZ8c9-00057a-Cp
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:12:22 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gZ92X-0001O9-Se
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:39:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gZ8c4-0002TJ-DM
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:12:21 -0500
-Date: Tue, 18 Dec 2018 07:12:13 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181218061213.a7x7hdxkczsawt5w@sirius.home.kraxel.org>
-References: <20181207160806.13569-1-mark.cave-ayland@ilande.co.uk>
-	<20181207160806.13569-3-mark.cave-ayland@ilande.co.uk>
-	<20181212083250.56xfzy5j4t4o6ale@sirius.home.kraxel.org>
-	<f7fb9204-bfc1-f27b-d66c-51e650a30cd5@ilande.co.uk>
-	<20181212133809.evtizdym6awwkw7f@sirius.home.kraxel.org>
-	<4d66d1ac-8b4a-748d-543a-1642e153e323@ilande.co.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4d66d1ac-8b4a-748d-543a-1642e153e323@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 2/3] mac_newworld: enable access to EDID
- data for the VGA device
+	(envelope-from <richard.henderson@linaro.org>) id 1gZ92U-00029J-Vv
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:39:37 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:44258)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gZ92U-0001uj-6k
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 01:39:34 -0500
+Received: by mail-pg1-x542.google.com with SMTP id t13so7333739pgr.11
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 22:39:19 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Mon, 17 Dec 2018 22:38:41 -0800
+Message-Id: <20181218063911.2112-5-richard.henderson@linaro.org>
+In-Reply-To: <20181218063911.2112-1-richard.henderson@linaro.org>
+References: <20181218063911.2112-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 04/34] tcg: Add write_aofs to GVecGen4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +26,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
+Cc: mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-  Hi,
+This allows writing 2 output, 3 input operations.
 
-> >> Otherwise a guest driver that assumes it is always present and tries
-> >> to read from that area of memory will crash.
-> > 
-> > Oh, reading should work no matter what.  You just don't find valid edid
-> > data there if it is turned off.
-> 
-> Thanks for the info. My current use case for this is passing a set of possible guest
-> display resolutions from the host to the guest driver, rather than using an internal
-> hard-coded list. I guess that over time QEMU could become "smarter" about building
-> the list of supported resolutions depending upon the capabilities of the host?
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ tcg/tcg-op-gvec.h |  2 ++
+ tcg/tcg-op-gvec.c | 27 +++++++++++++++++++--------
+ 2 files changed, 21 insertions(+), 8 deletions(-)
 
-Yes, that is the plan.  There are xres and yres properties already,
-which will show up as preferred resolution in the edid blob.
-
-The generator also supports to set the maximum display resolution, and
-the display dpi (needed when we add hidpi support some day).
-
-stdvga doesn't support to change the edid dynamically (i.e. on window
-resize) because the hardware doesn't support interrupts, so we can't
-easily signal edid updates to the guest.
-
-cheers,
-  Gerd
+diff --git a/tcg/tcg-op-gvec.h b/tcg/tcg-op-gvec.h
+index d65b9d9d4c..2cb447112e 100644
+--- a/tcg/tcg-op-gvec.h
++++ b/tcg/tcg-op-gvec.h
+@@ -181,6 +181,8 @@ typedef struct {
+     uint8_t vece;
+     /* Prefer i64 to v64.  */
+     bool prefer_i64;
++    /* Write aofs as a 2nd dest operand.  */
++    bool write_aofs;
+ } GVecGen4;
+ 
+ void tcg_gen_gvec_2(uint32_t dofs, uint32_t aofs,
+diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
+index 81689d02f7..c10d3d7b26 100644
+--- a/tcg/tcg-op-gvec.c
++++ b/tcg/tcg-op-gvec.c
+@@ -665,7 +665,7 @@ static void expand_3_i32(uint32_t dofs, uint32_t aofs,
+ 
+ /* Expand OPSZ bytes worth of three-operand operations using i32 elements.  */
+ static void expand_4_i32(uint32_t dofs, uint32_t aofs, uint32_t bofs,
+-                         uint32_t cofs, uint32_t oprsz,
++                         uint32_t cofs, uint32_t oprsz, bool write_aofs,
+                          void (*fni)(TCGv_i32, TCGv_i32, TCGv_i32, TCGv_i32))
+ {
+     TCGv_i32 t0 = tcg_temp_new_i32();
+@@ -680,6 +680,9 @@ static void expand_4_i32(uint32_t dofs, uint32_t aofs, uint32_t bofs,
+         tcg_gen_ld_i32(t3, cpu_env, cofs + i);
+         fni(t0, t1, t2, t3);
+         tcg_gen_st_i32(t0, cpu_env, dofs + i);
++        if (write_aofs) {
++            tcg_gen_st_i32(t1, cpu_env, aofs + i);
++        }
+     }
+     tcg_temp_free_i32(t3);
+     tcg_temp_free_i32(t2);
+@@ -769,7 +772,7 @@ static void expand_3_i64(uint32_t dofs, uint32_t aofs,
+ 
+ /* Expand OPSZ bytes worth of three-operand operations using i64 elements.  */
+ static void expand_4_i64(uint32_t dofs, uint32_t aofs, uint32_t bofs,
+-                         uint32_t cofs, uint32_t oprsz,
++                         uint32_t cofs, uint32_t oprsz, bool write_aofs,
+                          void (*fni)(TCGv_i64, TCGv_i64, TCGv_i64, TCGv_i64))
+ {
+     TCGv_i64 t0 = tcg_temp_new_i64();
+@@ -784,6 +787,9 @@ static void expand_4_i64(uint32_t dofs, uint32_t aofs, uint32_t bofs,
+         tcg_gen_ld_i64(t3, cpu_env, cofs + i);
+         fni(t0, t1, t2, t3);
+         tcg_gen_st_i64(t0, cpu_env, dofs + i);
++        if (write_aofs) {
++            tcg_gen_st_i64(t1, cpu_env, aofs + i);
++        }
+     }
+     tcg_temp_free_i64(t3);
+     tcg_temp_free_i64(t2);
+@@ -880,7 +886,7 @@ static void expand_3_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
+ /* Expand OPSZ bytes worth of four-operand operations using host vectors.  */
+ static void expand_4_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
+                          uint32_t bofs, uint32_t cofs, uint32_t oprsz,
+-                         uint32_t tysz, TCGType type,
++                         uint32_t tysz, TCGType type, bool write_aofs,
+                          void (*fni)(unsigned, TCGv_vec, TCGv_vec,
+                                      TCGv_vec, TCGv_vec))
+ {
+@@ -896,6 +902,9 @@ static void expand_4_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
+         tcg_gen_ld_vec(t3, cpu_env, cofs + i);
+         fni(vece, t0, t1, t2, t3);
+         tcg_gen_st_vec(t0, cpu_env, dofs + i);
++        if (write_aofs) {
++            tcg_gen_st_vec(t1, cpu_env, aofs + i);
++        }
+     }
+     tcg_temp_free_vec(t3);
+     tcg_temp_free_vec(t2);
+@@ -1187,7 +1196,7 @@ void tcg_gen_gvec_4(uint32_t dofs, uint32_t aofs, uint32_t bofs, uint32_t cofs,
+          */
+         some = QEMU_ALIGN_DOWN(oprsz, 32);
+         expand_4_vec(g->vece, dofs, aofs, bofs, cofs, some,
+-                     32, TCG_TYPE_V256, g->fniv);
++                     32, TCG_TYPE_V256, g->write_aofs, g->fniv);
+         if (some == oprsz) {
+             break;
+         }
+@@ -1200,18 +1209,20 @@ void tcg_gen_gvec_4(uint32_t dofs, uint32_t aofs, uint32_t bofs, uint32_t cofs,
+         /* fallthru */
+     case TCG_TYPE_V128:
+         expand_4_vec(g->vece, dofs, aofs, bofs, cofs, oprsz,
+-                     16, TCG_TYPE_V128, g->fniv);
++                     16, TCG_TYPE_V128, g->write_aofs, g->fniv);
+         break;
+     case TCG_TYPE_V64:
+         expand_4_vec(g->vece, dofs, aofs, bofs, cofs, oprsz,
+-                     8, TCG_TYPE_V64, g->fniv);
++                     8, TCG_TYPE_V64, g->write_aofs, g->fniv);
+         break;
+ 
+     case 0:
+         if (g->fni8 && check_size_impl(oprsz, 8)) {
+-            expand_4_i64(dofs, aofs, bofs, cofs, oprsz, g->fni8);
++            expand_4_i64(dofs, aofs, bofs, cofs, oprsz,
++                         g->write_aofs, g->fni8);
+         } else if (g->fni4 && check_size_impl(oprsz, 4)) {
+-            expand_4_i32(dofs, aofs, bofs, cofs, oprsz, g->fni4);
++            expand_4_i32(dofs, aofs, bofs, cofs, oprsz,
++                         g->write_aofs, g->fni4);
+         } else {
+             assert(g->fno != NULL);
+             tcg_gen_gvec_4_ool(dofs, aofs, bofs, cofs,
+-- 
+2.17.2
