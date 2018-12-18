@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gZBga-0006qM-LY
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 04:29:09 -0500
+	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gZBi1-0007ZQ-Tr
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 04:30:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gZBgY-0001RQ-TF
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 04:29:08 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35443)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gZBgY-0001Qp-Is
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 04:29:06 -0500
-Received: by mail-wr1-x441.google.com with SMTP id 96so15133429wrb.2
-	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 01:29:06 -0800 (PST)
+	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gZBhx-0002BM-OG
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 04:30:37 -0500
+Received: from mga18.intel.com ([134.134.136.126]:7588)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yu.c.zhang@linux.intel.com>)
+	id 1gZBhx-00024P-E1
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 04:30:33 -0500
+Date: Tue, 18 Dec 2018 17:27:23 +0800
+From: Yu Zhang <yu.c.zhang@linux.intel.com>
+Message-ID: <20181218092723.yhaerzm4vlzgef65@linux.intel.com>
+References: <1544619939-18102-1-git-send-email-yu.c.zhang@linux.intel.com>
+	<1544619939-18102-2-git-send-email-yu.c.zhang@linux.intel.com>
+	<20181217141740.16ccfaa1@Igors-MacBook-Pro.local>
 MIME-Version: 1.0
-References: <20181212222648.595-1-marcandre.lureau@redhat.com>
-	<20181217203706-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20181217203706-mutt-send-email-mst@kernel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 18 Dec 2018 13:28:53 +0400
-Message-ID: <CAJ+F1CK-Ko1H+VCAs_Epf+0vy2r=J7FjpHBXA7e=Ycrwm6xFJQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v13 0/6] Add support for TPM Physical
- Presence interface
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181217141740.16ccfaa1@Igors-MacBook-Pro.local>
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] intel-iommu: differentiate host
+ address width from IOVA address width.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,232 +30,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Berger <stefanb@linux.ibm.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Hi Michael,
+On Mon, Dec 17, 2018 at 02:17:40PM +0100, Igor Mammedov wrote:
+> On Wed, 12 Dec 2018 21:05:38 +0800
+> Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
+> 
+> > Currently, vIOMMU is using the value of IOVA address width, instead of
+> > the host address width(HAW) to calculate the number of reserved bits in
+> > data structures such as root entries, context entries, and entries of
+> > DMA paging structures etc.
+> > 
+> > However values of IOVA address width and of the HAW may not equal. For
+> > example, a 48-bit IOVA can only be mapped to host addresses no wider than
+> > 46 bits. Using 48, instead of 46 to calculate the reserved bit may result
+> > in an invalid IOVA being accepted.
+> > 
+> > To fix this, a new field - haw_bits is introduced in struct IntelIOMMUState,
+> > whose value is initialized based on the maximum physical address set to
+> > guest CPU.
+> 
+> > Also, definitions such as VTD_HOST_AW_39/48BIT etc. are renamed
+> > to clarify.
+> > 
+> > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> > Reviewed-by: Peter Xu <peterx@redhat.com>
+> > ---
+> [...]
+> 
+> > @@ -3100,6 +3104,8 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
+> >  static void vtd_init(IntelIOMMUState *s)
+> >  {
+> >      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
+> > +    CPUState *cs = first_cpu;
+> > +    X86CPU *cpu = X86_CPU(cs);
+> >  
+> >      memset(s->csr, 0, DMAR_REG_SIZE);
+> >      memset(s->wmask, 0, DMAR_REG_SIZE);
+> > @@ -3119,23 +3125,24 @@ static void vtd_init(IntelIOMMUState *s)
+> >      s->cap = VTD_CAP_FRO | VTD_CAP_NFR | VTD_CAP_ND |
+> >               VTD_CAP_MAMV | VTD_CAP_PSI | VTD_CAP_SLLPS |
+> >               VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(s->aw_bits);
+> > -    if (s->aw_bits == VTD_HOST_AW_48BIT) {
+> > +    if (s->aw_bits == VTD_AW_48BIT) {
+> >          s->cap |= VTD_CAP_SAGAW_48bit;
+> >      }
+> >      s->ecap = VTD_ECAP_QI | VTD_ECAP_IRO;
+> > +    s->haw_bits = cpu->phys_bits;
+> Is it possible to avoid accessing CPU fields directly or cpu altogether
+> and set phys_bits when iommu is created?
 
-On Tue, Dec 18, 2018 at 5:42 AM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Thu, Dec 13, 2018 at 02:26:42AM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi,
-> >
-> > The following patches implement the TPM Physical Presence Interface
-> > that allows a user to set a command via ACPI (sysfs entry in Linux)
-> > that, upon the next reboot, the firmware looks for and acts upon by
-> > sending sequences of commands to the TPM.
-> >
-> > A dedicated memory region is added to the TPM CRB & TIS devices, at
-> > address/size 0xFED45000/0x400. A new "etc/tpm/config" fw_cfg entry
-> > holds the location for that PPI region and some version details, to
-> > allow for future flexibility.
-> >
-> > With the associated edk2/ovmf firmware, the Windows HLK "PPI 1.3" test
-> > now runs successfully.
-> >
-> > It is based on previous work from Stefan Berger ("[PATCH v2 0/4]
-> > Implement Physical Presence interface for TPM 1.2 and 2")
-> >
-> > The edk2 support is merged upstream.
->
->
-> Breaks build with tpm disabled:
->
-> /usr/bin/ld: hw/i386/acpi-build.o: in function `build_dsdt':
-> /scm/qemu/hw/i386/acpi-build.c:2158: undefined reference to `tpm_build_pp=
-i_acpi'
-> /usr/bin/ld: /scm/qemu/hw/i386/acpi-build.c:2179: undefined reference to =
-`tpm_build_ppi_acpi'
-> collect2: error: ld returned 1 exit status
+Thanks for your comments, Igor.
 
-Thanks for noticing, this is probably a regression from v13, since the
-tpm_build_ppi_acpi was moved to a separate unit that is not always
-built.
+Well, I guess you prefer not to query the CPU capabilities while deciding
+the vIOMMU features. But to me, they are not that irrelevant.:)
 
-There is a lot of TPM code that we always build in acpi-build. Either
-the code should have #ifdef TPM, or we use stubs.
+Here the hardware address width in vt-d, and the one in cpuid.MAXPHYSADDR
+are referring to the same concept. In VM, both are the maximum guest physical
+address width. If we do not check the CPU field here, we will still have to
+check the CPU field in other places such as build_dmar_q35(), and reset the
+s->haw_bits again.
 
-Fwiw, the preliminary #ifdef patch would look like that, is that
-desirable, or should we just add some stub:
+Is this explanation convincing enough? :)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 236a20eaa8..e6ca350067 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -41,14 +41,16 @@
- #include "hw/isa/isa.h"
- #include "hw/block/fdc.h"
- #include "hw/acpi/memory_hotplug.h"
-+#ifdef CONFIG_TPM
- #include "sysemu/tpm.h"
- #include "hw/acpi/tpm.h"
--#include "hw/acpi/vmgenid.h"
- #include "sysemu/tpm_backend.h"
-+#endif
-+#include "hw/acpi/vmgenid.h"
- #include "hw/timer/mc146818rtc_regs.h"
- #include "hw/mem/memory-device.h"
- #include "sysemu/numa.h"
--
-+#include "qemu/units.h"
- /* Supported chipsets: */
- #include "hw/acpi/piix4.h"
- #include "hw/acpi/pcihp.h"
-@@ -105,7 +107,9 @@ typedef struct AcpiPmInfo {
- typedef struct AcpiMiscInfo {
-     bool is_piix4;
-     bool has_hpet;
-+#ifdef CONFIG_TPM
-     TPMVersion tpm_version;
-+#endif
-     const unsigned char *dsdt_code;
-     unsigned dsdt_size;
-     uint16_t pvpanic_port;
-@@ -234,7 +238,9 @@ static void acpi_get_misc_info(AcpiMiscInfo *info)
-     }
+> 
+> Perhaps Eduardo
+>  can suggest better approach, since he's more familiar with phys_bits topic
 
-     info->has_hpet =3D hpet_find();
-+#ifdef CONFIG_TPM
-     info->tpm_version =3D tpm_get_version(tpm_find());
-+#endif
-     info->pvpanic_port =3D pvpanic_port();
-     info->applesmc_io_base =3D applesmc_port();
- }
-@@ -1962,10 +1968,12 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         }
-     }
+@Eduardo, any comments? Thanks!
 
-+#ifdef CONFIG_TPM
-     if (TPM_IS_TIS(tpm_find())) {
-         aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
-                    TPM_TIS_ADDR_SIZE, AML_READ_WRITE));
-     }
-+#endif
-     aml_append(scope, aml_name_decl("_CRS", crs));
+> 
+> >      /*
+> >       * Rsvd field masks for spte
+> >       */
+> >      vtd_paging_entry_rsvd_field[0] = ~0ULL;
+> > -    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->aw_bits);
+> > -    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->aw_bits);
+> > -    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->aw_bits);
+> > -    vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->aw_bits);
+> > -    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->aw_bits);
+> > -    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->aw_bits);
+> > -    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->aw_bits);
+> > -    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->aw_bits);
+> > +    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->haw_bits);
+> > +    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->haw_bits);
+> > +    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->haw_bits);
+> > +    vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->haw_bits);
+> > +    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->haw_bits);
+> > +    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->haw_bits);
+> > +    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->haw_bits);
+> > +    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->haw_bits);
+> >  
+> >      if (x86_iommu->intr_supported) {
+> >          s->ecap |= VTD_ECAP_IR | VTD_ECAP_MHMV;
+> > @@ -3261,10 +3268,10 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+> >      }
+> >  
+> >      /* Currently only address widths supported are 39 and 48 bits */
+> > -    if ((s->aw_bits != VTD_HOST_AW_39BIT) &&
+> > -        (s->aw_bits != VTD_HOST_AW_48BIT)) {
+> > +    if ((s->aw_bits != VTD_AW_39BIT) &&
+> > +        (s->aw_bits != VTD_AW_48BIT)) {
+> >          error_setg(errp, "Supported values for x-aw-bits are: %d, %d",
+> > -                   VTD_HOST_AW_39BIT, VTD_HOST_AW_48BIT);
+> > +                   VTD_AW_39BIT, VTD_AW_48BIT);
+> >          return false;
+> >      }
+> >  
+> > diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+> > index ed4e758..820451c 100644
+> > --- a/include/hw/i386/intel_iommu.h
+> > +++ b/include/hw/i386/intel_iommu.h
+> > @@ -47,9 +47,9 @@
+> >  #define VTD_SID_TO_DEVFN(sid)       ((sid) & 0xff)
+> >  
+> >  #define DMAR_REG_SIZE               0x230
+> > -#define VTD_HOST_AW_39BIT           39
+> > -#define VTD_HOST_AW_48BIT           48
+> > -#define VTD_HOST_ADDRESS_WIDTH      VTD_HOST_AW_39BIT
+> > +#define VTD_AW_39BIT                39
+> > +#define VTD_AW_48BIT                48
+> > +#define VTD_ADDRESS_WIDTH           VTD_AW_39BIT
+> >  #define VTD_HAW_MASK(aw)            ((1ULL << (aw)) - 1)
+> >  
+> >  #define DMAR_REPORT_F_INTR          (1)
+> > @@ -244,7 +244,8 @@ struct IntelIOMMUState {
+> >      bool intr_eime;                 /* Extended interrupt mode enabled */
+> >      OnOffAuto intr_eim;             /* Toggle for EIM cabability */
+> >      bool buggy_eim;                 /* Force buggy EIM unless eim=off */
+> > -    uint8_t aw_bits;                /* Host/IOVA address width (in bits) */
+> > +    uint8_t aw_bits;                /* IOVA address width (in bits) */
+> > +    uint8_t haw_bits;               /* Hardware address width (in bits) */
+> >  
+> >      /*
+> >       * Protects IOMMU states in general.  Currently it protects the
+> 
+> 
 
-     /* reserve GPE0 block resources */
-@@ -2133,6 +2141,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-             /* Scan all PCI buses. Generate tables to support hotplug. */
-             build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
-
-+#ifdef CONFIG_TPM
-             if (TPM_IS_TIS(tpm_find())) {
-                 dev =3D aml_device("ISA.TPM");
-                 aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0C31"=
-)));
-@@ -2149,11 +2158,12 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-                 aml_append(dev, aml_name_decl("_CRS", crs));
-                 aml_append(scope, dev);
-             }
--
-+#endif
-             aml_append(sb_scope, scope);
-         }
-     }
-
-+#ifdef CONFIG_TPM
-     if (TPM_IS_CRB(tpm_find())) {
-         dev =3D aml_device("TPM");
-         aml_append(dev, aml_name_decl("_HID", aml_string("MSFT0101")));
-@@ -2168,7 +2178,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-
-         aml_append(sb_scope, dev);
-     }
--
-+#endif
-     aml_append(dsdt, sb_scope);
-
-     /* copy AML table into ACPI tables blob and patch header there */
-@@ -2194,6 +2204,7 @@ build_hpet(GArray *table_data, BIOSLinker *linker)
-                  (void *)hpet, "HPET", sizeof(*hpet), 1, NULL, NULL);
- }
-
-+#ifdef CONFIG_TPM
- static void
- build_tpm_tcpa(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
- {
-@@ -2247,6 +2258,7 @@ build_tpm2(GArray *table_data, BIOSLinker
-*linker, GArray *tcpalog)
-     build_header(linker, table_data,
-                  (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NUL=
-L);
- }
-+#endif
-
- #define HOLE_640K_START  (640 * KiB)
- #define HOLE_640K_END   (1 * MiB)
-@@ -2679,6 +2691,7 @@ void acpi_build(AcpiBuildTables *tables,
-MachineState *machine)
-         acpi_add_table(table_offsets, tables_blob);
-         build_hpet(tables_blob, tables->linker);
-     }
-+#ifdef CONFIG_TPM
-     if (misc.tpm_version !=3D TPM_VERSION_UNSPEC) {
-         acpi_add_table(table_offsets, tables_blob);
-         build_tpm_tcpa(tables_blob, tables->linker, tables->tcpalog);
-@@ -2688,6 +2701,7 @@ void acpi_build(AcpiBuildTables *tables,
-MachineState *machine)
-             build_tpm2(tables_blob, tables->linker, tables->tcpalog);
-         }
-     }
-+#endif
-     if (pcms->numa_nodes) {
-         acpi_add_table(table_offsets, tables_blob);
-         build_srat(tables_blob, tables->linker, machine);
-@@ -2886,9 +2900,10 @@ void acpi_setup(void)
-         acpi_add_rom_blob(build_state, tables.linker->cmd_blob,
-                           "etc/table-loader", 0);
-
-+#ifdef CONFIG_TPM
-     fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
-                     tables.tcpalog->data, acpi_data_len(tables.tcpalog));
--
-+#endif
-     vmgenid_dev =3D find_vmgenid_dev();
-     if (vmgenid_dev) {
-         vmgenid_add_fw_cfg(VMGENID(vmgenid_dev), pcms->fw_cfg,
-
-
->
-> > v13:
-> > - removed needless error handling in tpm_ppi_init()
-> > - splitted "add ACPI memory clear interface"
-> > - moved acpi build function in dedicated hw/acpi/tpm.c
-> > - added some function documentation in headers
-> > - various code cleanups suggested by Philippe
-> > - rebased
-> >
-> > Marc-Andr=C3=A9 Lureau (3):
-> >   tpm: add a "ppi" boolean property
-> >   acpi: add ACPI memory clear interface
-> >   tpm: clear RAM when "memory overwrite" requested
-> >
-> > Stefan Berger (3):
-> >   tpm: allocate/map buffer for TPM Physical Presence interface
-> >   acpi: expose TPM/PPI configuration parameters to firmware via fw_cfg
-> >   acpi: build TPM Physical Presence interface
-> >
-> >  hw/tpm/tpm_ppi.h      |  47 +++++
-> >  include/hw/acpi/tpm.h |  23 +++
-> >  include/hw/compat.h   |  11 +-
-> >  hw/acpi/tpm.c         | 447 ++++++++++++++++++++++++++++++++++++++++++
-> >  hw/i386/acpi-build.c  |  29 ++-
-> >  hw/tpm/tpm_crb.c      |  11 ++
-> >  hw/tpm/tpm_ppi.c      |  53 +++++
-> >  hw/tpm/tpm_tis.c      |  11 ++
-> >  docs/specs/tpm.txt    | 104 ++++++++++
-> >  hw/acpi/Makefile.objs |   1 +
-> >  hw/tpm/Makefile.objs  |   1 +
-> >  hw/tpm/trace-events   |   3 +
-> >  12 files changed, 738 insertions(+), 3 deletions(-)
-> >  create mode 100644 hw/tpm/tpm_ppi.h
-> >  create mode 100644 hw/acpi/tpm.c
-> >  create mode 100644 hw/tpm/tpm_ppi.c
-> >
-> > --
-> > 2.20.0
->
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+B.R.
+Yu
