@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gZDEW-00015D-3t
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 06:08:17 -0500
+	(envelope-from <philmd@redhat.com>) id 1gZDEl-0001Ac-G0
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 06:08:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gZDBf-0000fg-Md
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 06:05:21 -0500
+	(envelope-from <philmd@redhat.com>) id 1gZDAe-0008O2-Ri
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 06:04:17 -0500
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Tue, 18 Dec 2018 12:03:32 +0100
-Message-Id: <20181218110333.22558-3-philmd@redhat.com>
-In-Reply-To: <20181218110333.22558-1-philmd@redhat.com>
-References: <20181218110333.22558-1-philmd@redhat.com>
+Date: Tue, 18 Dec 2018 12:03:30 +0100
+Message-Id: <20181218110333.22558-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 2/3] block/sheepdog: Replace strncpy() by
- strpadcpy(pad='\0')
+Subject: [Qemu-devel] [PATCH v2 0/3] Fix strncpy() warnings for GCC8 new
+ -Wstringop-truncation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +24,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Ben Pye <ben@curlybracket.co.uk>, Stefan Weil <sw@weilnetz.de>, Howard Spoelstra <hsp.cat7@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <jcody@redhat.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Thomas Huth <thuth@redhat.com>, Liu Yuan <namei.unix@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, 1803872@bugs.launchpad.net, Juan Quintela <quintela@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-GCC 8 added a -Wstringop-truncation warning:
+GCC 8 new warning prevents builds to success since quite some time.
+First report on the mailing list is in July 2018:
+https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg03723.html
 
-  The -Wstringop-truncation warning added in GCC 8.0 via r254630 for
-  bug 81117 is specifically intended to highlight likely unintended
-  uses of the strncpy function that truncate the terminating NUL
-  character from the source string.
+Various intents has been sent to fix this:
+- Incorrectly using g_strlcpy()
+  https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg03705.html
+  https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg03706.html
+- Using assert() and strpadcpy()
+  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg03938.html
+- Use #pragma GCC diagnostic ignored "-Wstringop-truncation"
+  https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04261.html
+- adding an inline wrapper with said pragma in there
+  https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04261.html
+- -Wno-stringop-truncation is the makefile
+  https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04261.html
 
-This new warning leads to compilation failures:
+This series replace the strncpy() calls by strpadcpy() which seemed
+to me the saniest option.
 
-    CC      block/sheepdog.o
-  qemu/block/sheepdog.c: In function 'find_vdi_name':
-  qemu/block/sheepdog.c:1239:5: error: 'strncpy' specified bound 256 equa=
-ls destination size [-Werror=3Dstringop-truncation]
-       strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
-       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  make: *** [qemu/rules.mak:69: block/sheepdog.o] Error 1
+Regards,
 
-As described previous to the strncpy() calls, the use of strncpy() is
-correct here:
+Phil.
 
-    /* This pair of strncpy calls ensures that the buffer is zero-filled,
-     * which is desirable since we'll soon be sending those bytes, and
-     * don't want the send_req to read uninitialized data.
-     */
-    strncpy(buf, filename, SD_MAX_VDI_LEN);
-    strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
+Marc-Andr=C3=A9 Lureau (1):
+  hw/acpi: Replace strncpy() by strpadcpy(pad=3D'\0')
 
-We could add a #pragma GCC diagnostic ignored "-Wstringop-truncation"
-around, disable the warning globally using -Wno-stringop-truncation,
-but since QEMU provides the strpadcpy() which does the same purpose,
-simply use it to avoid the annoying warning.
+Philippe Mathieu-Daud=C3=A9 (2):
+  block/sheepdog: Replace strncpy() by strpadcpy(pad=3D'\0')
+  migration: Replace strncpy() by strpadcpy(pad=3D'\0')
 
-Reported-by: Howard Spoelstra <hsp.cat7@gmail.com>
-Buglink: https://bugs.launchpad.net/qemu/+bug/1803872
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- block/sheepdog.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ block/sheepdog.c         |  6 +++---
+ hw/acpi/aml-build.c      |  6 ++++--
+ hw/acpi/core.c           | 13 +++++++------
+ migration/global_state.c |  4 ++--
+ 4 files changed, 16 insertions(+), 13 deletions(-)
 
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 0125df9d49..72e1aef6ea 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -1231,12 +1231,12 @@ static int find_vdi_name(BDRVSheepdogState *s, co=
-nst char *filename,
-         return fd;
-     }
-=20
--    /* This pair of strncpy calls ensures that the buffer is zero-filled=
-,
-+    /* This pair of strpadcpy calls ensures that the buffer is zero-fill=
-ed,
-      * which is desirable since we'll soon be sending those bytes, and
-      * don't want the send_req to read uninitialized data.
-      */
--    strncpy(buf, filename, SD_MAX_VDI_LEN);
--    strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
-+    strpadcpy(buf, SD_MAX_VDI_LEN, filename, '\0');
-+    strpadcpy(buf + SD_MAX_VDI_LEN, SD_MAX_VDI_TAG_LEN, tag, '\0');
-=20
-     memset(&hdr, 0, sizeof(hdr));
-     if (lock) {
 --=20
 2.17.2
