@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gZG1H-0007WU-2c
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:06:49 -0500
+	(envelope-from <mst@redhat.com>) id 1gZG2D-0008DZ-2T
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:07:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gZG1B-0001rC-QK
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:06:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55804)
+	(envelope-from <mst@redhat.com>) id 1gZG27-00020w-NI
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:07:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:11767)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gZG1B-0001qi-DB
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:06:41 -0500
-Date: Tue, 18 Dec 2018 13:27:22 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181218132722.GF22638@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <alpine.BSF.2.21.1803202324320.13789@zero.eik.bme.hu>
-	<20180321140654.7h3nkkdlztu6mtrq@sirius.home.kraxel.org>
-	<alpine.BSF.2.21.1803211803590.78606@zero.eik.bme.hu>
-	<alpine.BSF.2.21.9999.1812171549220.8888@zero.eik.bme.hu>
-	<f3d7a0ed-785d-4176-147d-26a4d58d1a36@ilande.co.uk>
-	<20181218111603.GE22638@redhat.com>
-	<alpine.BSF.2.21.9999.1812181242560.99784@zero.eik.bme.hu>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZG25-0001xi-Ku
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:07:39 -0500
+Date: Tue, 18 Dec 2018 08:52:09 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181218083603-mutt-send-email-mst@kernel.org>
+References: <cover.1545120100.git.yi.z.zhang@linux.intel.com>
+	<2dda518be27a44e26dc8b45d6e2dc7f46c890926.1545120100.git.yi.z.zhang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.9999.1812181242560.99784@zero.eik.bme.hu>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Monitor and serial output window broken with SDL2
+In-Reply-To: <2dda518be27a44e26dc8b45d6e2dc7f46c890926.1545120100.git.yi.z.zhang@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH V7 3/6] util/mmap-alloc: support MAP_SYNC
+ in qemu_ram_mmap()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,96 +28,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Zhang Yi <yi.z.zhang@linux.intel.com>
+Cc: peter.maydell@linaro.org, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, imammedo@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com, crosthwaite.peter@gmail.com, richard.henderson@linaro.org, xiaoguangrong.eric@gmail.com
 
-On Tue, Dec 18, 2018 at 02:11:35PM +0100, BALATON Zoltan wrote:
-> On Tue, 18 Dec 2018, Daniel P. Berrang=C3=A9 wrote:
-> > On Tue, Dec 18, 2018 at 10:54:06AM +0000, Mark Cave-Ayland wrote:
-> > > On 17/12/2018 14:56, BALATON Zoltan wrote:
-> > >=20
-> > > > I still have this problem after updating everything on my machine=
-, latest QEMU and
-> > > > SDL 2.0.9 so it's not likely to be a bug in some external compone=
-nt. If I just start
-> > > > qemu-system-ppc (compiled with --disable-gtk) and try to open mon=
-itor console with
-> > > > Ctrl-Alt-2 I see QEMU monitor but when I type in this window the =
-serial output window
-> > > > contents flash in this window. At the same time the window that o=
-pens for Ctrl-Alt-3
-> > > > which should have the serial output is empty. It looks like an in=
-dex may be off
-> > > > somewhere or window contents are not associated with the right wi=
-ndow but I have no
-> > > > idea where to look for it. Can you reproduce it now and do you ha=
-ve any idea what
-> > > > could cause this?
-> > >=20
-> > > Are you using Fedora Core 29 at all? I know Howard has been experie=
-ncing redraw
-> > > issues since upgrading from FC 28 to FC 29. A couple of other thing=
-s to check:
-> >=20
-> > There is no "Fedora Core" since Fedora Core 6, just Fedora :-P
-> >=20
-> > But seriously, I teted on Fedora 29 and didn't see any problem, so th=
-ere
-> > must be some more specific scenario that is hurting it.
-> >=20
-> > > 1) Does QEMU 3.0 work correctly? If so, a bisection would help.
-> > > 2) Are you using an Nvidia graphics card with the nouveau driver?
-> >=20
-> > This second point is a good idea to consider.
->=20
-> How is graphics card relevant for this? I do use NVidia but not nouveau=
- but
-> vendor drivers (version 390.87) on Mageia 6 (which is a bit like Fedora=
- but
-> may have differences). I have this problem for a while so I don't think=
- it's
-> a recent regression. It only seems to affect qemu-system-ppc,
-> qemu-system-x86_64 does open serial console all right but could be I wa=
-s
-> using different configure options for these.
+On Tue, Dec 18, 2018 at 04:17:12PM +0800, Zhang Yi wrote:
+> When a file supporting DAX is used as vNVDIMM backend, mmap it with
+> MAP_SYNC flag in addition can guarantee the persistence of guest write
+> to the backend file without other QEMU actions (e.g., periodic fsync()
+> by QEMU).
+> 
+> A set of RAM_SYNC flags are added to qemu_ram_mmap():
+> 
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
 
-Well SDL has to render stuff to the screen and that involves the graphics
-card drivers. It is not uncommon to have rendering problems that only
-affect certain vendor drivers. It might be something todo with the PPC
-emulation that is tickling different code paths than x86, and that in
-turn touches some undefined behaviour in SDL and/or the graphics driver.
-
-So it would be relevant to test if you get the same behaviour when using
-the nouveau drivers instead of nvidia vendor drivers.
-
-> Parallel console for Ctrl-Alt-4 seems to work all right but that has no
-> content. I'm not sure if it's relevant to have output in the serial win=
-dow.
-> For qemu-system-ppc OpenBIOS has some serial output. Now that I've trie=
-d it
-> does seem to be relevant: if I press Ctrl-Alt-3 right after QEMU starts=
- when
-> the main screen still says "guest has not initialised" then it works bu=
-t if
-> I wait until OpenBIOS starts with yellow screen (and some output on ser=
-ial)
-> and then press Ctrl-Alt-3 then empty window opens so maybe it's related=
- to
-> have some content on serial when window first opens?
-
-I don't see any difference depending on whether I use Ctrl-Alt-3 before
-or after the yellow screen - both work as expected. The fact that you
-see a difference though does suggest that there's something odd being
-done in the ppc emulation that is in turn doing something bad to SDLs
-rendering with your graphics setup. I don't know what it could be though.
+Should we be reusing RAM_ flags? These are used widely
+already -are you going to allow RAM_SYNC everywhere
+where other RAM flags are legal?
+E.g. memory_region_init_ram_from_file?
 
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> ---
+>  exec.c                    |  2 +-
+>  include/exec/memory.h     |  3 +++
+>  include/exec/ram_addr.h   |  1 +
+>  include/qemu/mmap-alloc.h |  1 +
+>  include/qemu/osdep.h      | 29 +++++++++++++++++++++++++++++
+>  util/mmap-alloc.c         | 14 ++++++++++----
+>  6 files changed, 45 insertions(+), 5 deletions(-)
+> 
+> diff --git a/exec.c b/exec.c
+> index e92a7da..dc4d180 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -2241,7 +2241,7 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+>      int64_t file_size;
+>  
+>      /* Just support these ram flags by now. */
+> -    assert((ram_flags & ~(RAM_SHARED | RAM_PMEM)) == 0);
+> +    assert((ram_flags & ~(RAM_SHARED | RAM_PMEM | RAM_SYNC)) == 0);
+>  
+>      if (xen_enabled()) {
+>          error_setg(errp, "-mem-path not supported with Xen");
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index 667466b..33a4e2c 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -126,6 +126,9 @@ typedef struct IOMMUNotifier IOMMUNotifier;
+>  /* RAM is a persistent kind memory */
+>  #define RAM_PMEM (1 << 5)
+>  
+> +/* RAM can be mmap by a MAP_SYNC flag */
+
+"RAM is mmap-ed with MAP_SYNC"
+
+> +#define RAM_SYNC (1 << 6)
+> +
+>  static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
+>                                         IOMMUNotifierFlag flags,
+>                                         hwaddr start, hwaddr end,
+
+
+
+
+
+> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+> index 9ecd911..d239ce7 100644
+> --- a/include/exec/ram_addr.h
+> +++ b/include/exec/ram_addr.h
+> @@ -87,6 +87,7 @@ long qemu_getrampagesize(void);
+>   *              or bit-or of following values
+>   *              - RAM_SHARED: mmap the backing file or device with MAP_SHARED
+>   *              - RAM_PMEM: the backend @mem_path or @fd is persistent memory
+> + *              - RAM_SYNC:   mmap with MAP_SYNC flag
+>   *              Other bits are ignored.
+>   *  @mem_path or @fd: specify the backing file or device
+>   *  @errp: pointer to Error*, to store an error if it happens
+> diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
+> index 6fe6ed4..1755a8b 100644
+> --- a/include/qemu/mmap-alloc.h
+> +++ b/include/qemu/mmap-alloc.h
+> @@ -18,6 +18,7 @@ size_t qemu_mempath_getpagesize(const char *mem_path);
+>   *  @flags: specifies additional properties of the mapping, which can be one or
+>   *          bit-or of following values
+>   *          - RAM_SHARED: mmap with MAP_SHARED flag
+> + *          - RAM_SYNC:   mmap with MAP_SYNC flag
+>   *          Other bits are ignored.
+>   *
+>   * Return:
+> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+> index 3bf48bc..f94ea68 100644
+> --- a/include/qemu/osdep.h
+> +++ b/include/qemu/osdep.h
+> @@ -410,6 +410,35 @@ void qemu_anon_ram_free(void *ptr, size_t size);
+>  #  define QEMU_VMALLOC_ALIGN getpagesize()
+>  #endif
+>  
+> +/*
+> + * MAP_SHARED_VALIDATE and MAP_SYNC are introduced in Linux kernel
+> + * 4.15, so they may not be defined when compiling on older kernels.
+
+Then you want to import the relevant headers into linux-headers
+using scripts/update-linux-headers.sh. Pls do not duplicate code.
+
+> + */
+> +#ifdef CONFIG_LINUX
+> +
+> +#include <sys/mman.h>
+> +
+> +#ifndef MAP_SHARED_VALIDATE
+> +#define MAP_SHARED_VALIDATE   0x3
+> +#endif
+> +
+> +#ifndef MAP_SYNC
+> +#define MAP_SYNC              0x80000
+> +#endif
+> +
+> +/* MAP_SYNC is only available with MAP_SHARED_VALIDATE. */
+> +#define MAP_SYNC_FLAGS (MAP_SYNC | MAP_SHARED_VALIDATE)
+
+Given mmap flags tend to start with MAP_, adding our own ones
+unconditionally is not a good idea.
+
+
+> +
+> +#else  /* !CONFIG_LINUX */
+> +
+> +#define MAP_SHARED_VALIDATE   0x0
+> +#define MAP_SYNC              0x0
+> +
+> +#define QEMU_HAS_MAP_SYNC     false
+
+Isn't just checking MAP_SYNC enough?
+
+> +#define MAP_SYNC_FLAGS 0
+> +
+> +#endif /* CONFIG_LINUX */
+> +
+>  #ifdef CONFIG_POSIX
+>  struct qemu_signalfd_siginfo {
+>      uint32_t ssi_signo;   /* Signal number */
+> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+> index 8f0a740..89ae862 100644
+> --- a/util/mmap-alloc.c
+> +++ b/util/mmap-alloc.c
+> @@ -99,6 +99,8 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags)
+>      void *ptr = mmap(0, total, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+>  #endif
+>      bool shared = flags & RAM_SHARED;
+> +    bool is_pmem = flags & RAM_PMEM;
+> +    int mmap_xflags = 0;
+>      size_t offset;
+>      void *ptr1;
+>  
+> @@ -109,16 +111,20 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags)
+>      assert(is_power_of_2(align));
+>      /* Always align to host page size */
+>      assert(align >= getpagesize());
+> +    if ((flags & RAM_SYNC) && shared && is_pmem) {
+> +        mmap_xflags |= MAP_SYNC_FLAGS;
+> +    }
+>  
+>      offset = QEMU_ALIGN_UP((uintptr_t)ptr, align) - (uintptr_t)ptr;
+> + retry_mmap_fd:
+>      ptr1 = mmap(ptr + offset, size, PROT_READ | PROT_WRITE,
+>                  MAP_FIXED |
+>                  (fd == -1 ? MAP_ANONYMOUS : 0) |
+> -                (shared ? MAP_SHARED : MAP_PRIVATE),
+> +                (shared ? MAP_SHARED : MAP_PRIVATE) | mmap_xflags,
+>                  fd, 0);
+> -    if (ptr1 == MAP_FAILED) {
+> -        munmap(ptr, total);
+> -        return MAP_FAILED;
+> +    if ((ptr1 == MAP_FAILED) && (mmap_xflags & MAP_SYNC_FLAGS)) {
+> +        mmap_xflags &= ~MAP_SYNC_FLAGS;
+> +        goto retry_mmap_fd;
+>      }
+>  
+>      if (offset > 0) {
+> -- 
+> 2.7.4
