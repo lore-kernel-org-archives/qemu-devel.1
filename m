@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gZCJx-00060T-ID
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:09:50 -0500
+	(envelope-from <armbru@redhat.com>) id 1gZCJx-00060V-IE
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:09:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gZCJu-00086Z-Sp
+	(envelope-from <armbru@redhat.com>) id 1gZCJv-00086h-3x
 	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:09:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59780)
+Received: from mx1.redhat.com ([209.132.183.28]:59804)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gZCJu-0007yE-IC
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gZCJu-00082B-P8
 	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:09:46 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C1B787FD44
-	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 10:09:43 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-56.ams2.redhat.com
-	[10.36.116.56])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8E5175C229
-	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 10:09:43 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 18 Dec 2018 11:09:34 +0100
-Message-Id: <20181218100941.25267-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/7] QAPI patches for 2018-12-18
+Date: Tue, 18 Dec 2018 11:09:40 +0100
+Message-Id: <20181218100941.25267-7-armbru@redhat.com>
+In-Reply-To: <20181218100941.25267-1-armbru@redhat.com>
+References: <20181218100941.25267-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PULL 6/7] qmp hmp: Make system_wakeup check wake-up
+ support and run state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,83 +25,260 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Daniel Henrique Barboza <danielhb413@gmail.com>
 
-The following changes since commit f163448536e5f7ae8905b14547eab37a41a75f=
-6c:
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
 
-  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20181216' into =
-staging (2018-12-17 13:04:25 +0000)
+The qmp/hmp command 'system_wakeup' is simply a direct call to
+'qemu_system_wakeup_request' from vl.c. This function verifies if
+runstate is SUSPENDED and if the wake up reason is valid before
+proceeding. However, no error or warning is thrown if any of those
+pre-requirements isn't met. There is no way for the caller to
+differentiate between a successful wakeup or an error state caused
+when trying to wake up a guest that wasn't suspended.
 
-are available in the Git repository at:
+This means that system_wakeup is silently failing, which can be
+considered a bug. Adding error handling isn't an API break in this
+case - applications that didn't check the result will remain broken,
+the ones that check it will have a chance to deal with it.
 
-  git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2018-12-18
+Adding to that, the commit before previous created a new QMP API called
+query-current-machine, with a new flag called wakeup-suspend-support,
+that indicates if the guest has the capability of waking up from suspended
+state. Although such guest will never reach SUSPENDED state and erroring
+it out in this scenario would suffice, it is more informative for the user
+to differentiate between a failure because the guest isn't suspended versus
+a failure because the guest does not have support for wake up at all.
 
-for you to fetch changes up to ce1a1aec47877a281d69dbc2e65f86bfe8fea231:
+All this considered, this patch changes qmp_system_wakeup to check if
+the guest is capable of waking up from suspend, and if it is suspended.
+After this patch, this is the output of system_wakeup in a guest that
+does not have wake-up from suspend support (ppc64):
 
-  qapi: fix flat union on uncovered branches conditionals (2018-12-18 07:=
-57:36 +0100)
+(qemu) system_wakeup
+wake-up from suspend is not supported by this guest
+(qemu)
 
-----------------------------------------------------------------
-QAPI patches for 2018-12-18
+And this is the output of system_wakeup in a x86 guest that has the
+support but isn't suspended:
 
-* QMP events SHUTDOWN and RESET now carry a reason
-* New QMP command query-current-machine
-* QMP/HMP command system_wakeup now fails when the guest isn't
-  suspended, or doesn't even support suspend.
-* Fix build for --disable-replication
+(qemu) system_wakeup
+Unable to wake up: guest is not in suspended state
+(qemu)
 
-----------------------------------------------------------------
-Daniel Henrique Barboza (3):
-      qmp: query-current-machine with wakeup-suspend-support
-      qga: update guest-suspend-ram and guest-suspend-hybrid descriptions
-      qmp hmp: Make system_wakeup check wake-up support and run state
+Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-Id: <20181205194701.17836-4-danielhb413@gmail.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Acked-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ hmp.c                   | 5 ++++-
+ hw/acpi/core.c          | 3 ++-
+ hw/char/serial.c        | 2 +-
+ hw/input/ps2.c          | 6 +++---
+ hw/timer/mc146818rtc.c  | 2 +-
+ include/sysemu/sysemu.h | 3 ++-
+ migration/migration.c   | 4 ++--
+ qapi/misc.json          | 8 +++++++-
+ qmp.c                   | 8 +++++++-
+ vl.c                    | 6 ++++--
+ 10 files changed, 33 insertions(+), 14 deletions(-)
 
-Dominik Csapak (3):
-      qapi: Turn ShutdownCause into QAPI enum
-      qmp: Add reason to SHUTDOWN and RESET events
-      qmp: Split ShutdownCause host-qmp into quit and system-reset
-
-Marc-Andr=C3=A9 Lureau (1):
-      qapi: fix flat union on uncovered branches conditionals
-
- hmp.c                      |  5 ++++-
- hw/acpi/core.c             |  9 ++++++++-
- hw/char/serial.c           |  2 +-
- hw/i386/xen/xen-hvm.c      |  5 +++++
- hw/input/ps2.c             |  6 +++---
- hw/timer/mc146818rtc.c     |  2 +-
- include/sysemu/sysemu.h    | 24 +++---------------------
- migration/migration.c      |  4 ++--
- qapi/misc.json             | 32 +++++++++++++++++++++++++++++++-
- qapi/run-state.json        | 44 ++++++++++++++++++++++++++++++++++++++++=
-++--
- qga/qapi-schema.json       | 16 ++++++++++------
- qmp.c                      | 12 +++++++++---
- scripts/qapi/common.py     |  3 ++-
- tests/qemu-iotests/060.out |  4 ++--
- tests/qemu-iotests/071.out |  4 ++--
- tests/qemu-iotests/081.out | 14 +++++++-------
- tests/qemu-iotests/087.out | 12 ++++++------
- tests/qemu-iotests/094.out |  2 +-
- tests/qemu-iotests/109.out | 44 ++++++++++++++++++++++------------------=
-----
- tests/qemu-iotests/117.out |  2 +-
- tests/qemu-iotests/119.out |  2 +-
- tests/qemu-iotests/120.out |  2 +-
- tests/qemu-iotests/127.out |  2 +-
- tests/qemu-iotests/140.out |  2 +-
- tests/qemu-iotests/143.out |  2 +-
- tests/qemu-iotests/156.out |  2 +-
- tests/qemu-iotests/176.out | 16 ++++++++--------
- tests/qemu-iotests/183.out |  4 ++--
- tests/qemu-iotests/184.out | 12 ++++++++----
- tests/qemu-iotests/185.out | 10 +++++-----
- tests/qemu-iotests/191.out |  6 ++++--
- tests/qemu-iotests/195.out |  6 ++++--
- tests/qemu-iotests/223.out |  2 +-
- tests/qemu-iotests/227.out | 12 ++++++++----
- vl.c                       | 27 ++++++++++++++++++++++++---
- 35 files changed, 232 insertions(+), 121 deletions(-)
-
---=20
+diff --git a/hmp.c b/hmp.c
+index 43ae9ec61a..80aa5ab504 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1220,7 +1220,10 @@ void hmp_cont(Monitor *mon, const QDict *qdict)
+ 
+ void hmp_system_wakeup(Monitor *mon, const QDict *qdict)
+ {
+-    qmp_system_wakeup(NULL);
++    Error *err = NULL;
++
++    qmp_system_wakeup(&err);
++    hmp_handle_error(mon, &err);
+ }
+ 
+ void hmp_nmi(Monitor *mon, const QDict *qdict)
+diff --git a/hw/acpi/core.c b/hw/acpi/core.c
+index 52e18d7810..d6f0709691 100644
+--- a/hw/acpi/core.c
++++ b/hw/acpi/core.c
+@@ -514,7 +514,8 @@ static uint32_t acpi_pm_tmr_get(ACPIREGS *ar)
+ static void acpi_pm_tmr_timer(void *opaque)
+ {
+     ACPIREGS *ar = opaque;
+-    qemu_system_wakeup_request(QEMU_WAKEUP_REASON_PMTIMER);
++
++    qemu_system_wakeup_request(QEMU_WAKEUP_REASON_PMTIMER, NULL);
+     ar->tmr.update_sci(ar);
+ }
+ 
+diff --git a/hw/char/serial.c b/hw/char/serial.c
+index 02463e3388..7c42a2abfc 100644
+--- a/hw/char/serial.c
++++ b/hw/char/serial.c
+@@ -611,7 +611,7 @@ static void serial_receive1(void *opaque, const uint8_t *buf, int size)
+     SerialState *s = opaque;
+ 
+     if (s->wakeup) {
+-        qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
++        qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER, NULL);
+     }
+     if(s->fcr & UART_FCR_FE) {
+         int i;
+diff --git a/hw/input/ps2.c b/hw/input/ps2.c
+index eb33ee9b6f..d3161f1e7c 100644
+--- a/hw/input/ps2.c
++++ b/hw/input/ps2.c
+@@ -255,7 +255,7 @@ static void ps2_put_keycode(void *opaque, int keycode)
+     PS2KbdState *s = opaque;
+ 
+     trace_ps2_put_keycode(opaque, keycode);
+-    qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
++    qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER, NULL);
+ 
+     if (s->translate) {
+         if (keycode == 0xf0) {
+@@ -285,7 +285,7 @@ static void ps2_keyboard_event(DeviceState *dev, QemuConsole *src,
+         return;
+     }
+ 
+-    qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
++    qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER, NULL);
+     assert(evt->type == INPUT_EVENT_KIND_KEY);
+     qcode = qemu_input_key_value_to_qcode(key->key);
+ 
+@@ -748,7 +748,7 @@ static void ps2_mouse_sync(DeviceState *dev)
+     }
+ 
+     if (s->mouse_buttons) {
+-        qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
++        qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER, NULL);
+     }
+     if (!(s->mouse_status & MOUSE_STATUS_REMOTE)) {
+         /* if not remote, send event. Multiple events are sent if
+diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+index e4e4de8b8a..69483152c3 100644
+--- a/hw/timer/mc146818rtc.c
++++ b/hw/timer/mc146818rtc.c
+@@ -455,7 +455,7 @@ static void rtc_update_timer(void *opaque)
+     if (qemu_clock_get_ns(rtc_clock) >= s->next_alarm_time) {
+         irqs |= REG_C_AF;
+         if (s->cmos_data[RTC_REG_B] & REG_B_AIE) {
+-            qemu_system_wakeup_request(QEMU_WAKEUP_REASON_RTC);
++            qemu_system_wakeup_request(QEMU_WAKEUP_REASON_RTC, NULL);
+         }
+     }
+ 
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index d9cabb34bd..c8efdeb376 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -54,7 +54,8 @@ void qemu_exit_preconfig_request(void);
+ void qemu_system_reset_request(ShutdownCause reason);
+ void qemu_system_suspend_request(void);
+ void qemu_register_suspend_notifier(Notifier *notifier);
+-void qemu_system_wakeup_request(WakeupReason reason);
++bool qemu_wakeup_suspend_enabled(void);
++void qemu_system_wakeup_request(WakeupReason reason, Error **errp);
+ void qemu_system_wakeup_enable(WakeupReason reason, bool enabled);
+ void qemu_register_wakeup_notifier(Notifier *notifier);
+ void qemu_register_wakeup_support(void);
+diff --git a/migration/migration.c b/migration/migration.c
+index 49ffb9997a..ffc4d9e556 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -2408,7 +2408,7 @@ static int postcopy_start(MigrationState *ms)
+     qemu_mutex_lock_iothread();
+     trace_postcopy_start_set_run();
+ 
+-    qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
++    qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER, NULL);
+     global_state_store();
+     ret = vm_stop_force_state(RUN_STATE_FINISH_MIGRATE);
+     if (ret < 0) {
+@@ -2612,7 +2612,7 @@ static void migration_completion(MigrationState *s)
+     if (s->state == MIGRATION_STATUS_ACTIVE) {
+         qemu_mutex_lock_iothread();
+         s->downtime_start = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+-        qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
++        qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER, NULL);
+         s->vm_was_running = runstate_is_running();
+         ret = global_state_store();
+ 
+diff --git a/qapi/misc.json b/qapi/misc.json
+index c4696ef150..24d20a880a 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -1239,12 +1239,18 @@
+ ##
+ # @system_wakeup:
+ #
+-# Wakeup guest from suspend.  Does nothing in case the guest isn't suspended.
++# Wake up guest from suspend. If the guest has wake-up from suspend
++# support enabled (wakeup-suspend-support flag from
++# query-current-machine), wake-up guest from suspend if the guest is
++# in SUSPENDED state. Return an error otherwise.
+ #
+ # Since:  1.1
+ #
+ # Returns:  nothing.
+ #
++# Note: prior to 4.0, this command does nothing in case the guest
++# isn't suspended.
++#
+ # Example:
+ #
+ # -> { "execute": "system_wakeup" }
+diff --git a/qmp.c b/qmp.c
+index 82298f6cb0..4c819dd8cf 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -183,7 +183,13 @@ void qmp_cont(Error **errp)
+ 
+ void qmp_system_wakeup(Error **errp)
+ {
+-    qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
++    if (!qemu_wakeup_suspend_enabled()) {
++        error_setg(errp,
++                   "wake-up from suspend is not supported by this guest");
++        return;
++    }
++
++    qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER, errp);
+ }
+ 
+ ObjectPropertyInfoList *qmp_qom_list(const char *path, Error **errp)
+diff --git a/vl.c b/vl.c
+index 2bd869580f..9dbba36ad3 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1752,11 +1752,13 @@ void qemu_register_suspend_notifier(Notifier *notifier)
+     notifier_list_add(&suspend_notifiers, notifier);
+ }
+ 
+-void qemu_system_wakeup_request(WakeupReason reason)
++void qemu_system_wakeup_request(WakeupReason reason, Error **errp)
+ {
+     trace_system_wakeup_request(reason);
+ 
+     if (!runstate_check(RUN_STATE_SUSPENDED)) {
++        error_setg(errp,
++                   "Unable to wake up: guest is not in suspended state");
+         return;
+     }
+     if (!(wakeup_reason_mask & (1 << reason))) {
+@@ -1786,7 +1788,7 @@ void qemu_register_wakeup_support(void)
+     wakeup_suspend_enabled = true;
+ }
+ 
+-static bool qemu_wakeup_suspend_enabled(void)
++bool qemu_wakeup_suspend_enabled(void)
+ {
+     return wakeup_suspend_enabled;
+ }
+-- 
 2.17.2
