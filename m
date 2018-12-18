@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gZHa2-00075g-1E
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 10:46:51 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gZHkp-0005er-KG
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 10:57:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gZHZv-0002sb-FZ
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 10:46:45 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39900)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gZHZu-0002rc-Nu
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 10:46:39 -0500
-Received: by mail-wr1-x442.google.com with SMTP id t27so16399457wra.6
-	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 07:46:38 -0800 (PST)
-References: <20181214201855.14476-1-richard.henderson@linaro.org>
-	<87k1k8gic7.fsf@linaro.org>
-	<32f6ded3-4dc8-7d3f-b68b-741528433380@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <32f6ded3-4dc8-7d3f-b68b-741528433380@linaro.org>
-Date: Tue, 18 Dec 2018 15:46:35 +0000
-Message-ID: <87r2eeald0.fsf@linaro.org>
+	(envelope-from <ehabkost@redhat.com>) id 1gZHkk-0000U3-Og
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 10:57:55 -0500
+Date: Tue, 18 Dec 2018 13:57:31 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181218155731.GC19442@habkost.net>
+References: <20181218115615.1499-1-philmd@redhat.com>
+	<20181218115615.1499-11-philmd@redhat.com>
+	<20f62f62-f677-6d0f-09dc-3759cc813d8f@redhat.com>
+	<20181218152239.GB19442@habkost.net>
+	<94e8bd71-302e-bced-665d-78538ea3aba3@redhat.com>
+	<2ae5b6cd-7227-fab5-1bd1-4d3ebb88feee@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <2ae5b6cd-7227-fab5-1bd1-4d3ebb88feee@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Convert ARM_TBFLAG_* to FIELDs
+Subject: Re: [Qemu-devel] [PATCH v2 10/12] MAINTAINERS: Orphanize the 'CPU
+ (QOM)' subsystem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +29,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>, Helge Deller <deller@gmx.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Luc Michel <luc.michel@greensocs.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
+On Tue, Dec 18, 2018 at 04:44:25PM +0100, Thomas Huth wrote:
+> On 2018-12-18 16:31, Philippe Mathieu-Daud=E9 wrote:
+> > Hi Paolo, Eduardo,
+> >=20
+> > On 12/18/18 4:22 PM, Eduardo Habkost wrote:
+> >> On Tue, Dec 18, 2018 at 01:34:52PM +0100, Paolo Bonzini wrote:
+> >>> On 18/12/18 12:56, Philippe Mathieu-Daud=E9 wrote:
+> >>>> Nobody is looking at those files, downgrade this subsystem as orph=
+an.
+> >>>>
+> >>>> Remove the qemu-devel@nongnu.org entry because the list is always
+> >>>> selected by the 'All patches CC here' section.
+> >>>>
+> >>>> Suggested-by: Markus Armbruster <armbru@redhat.com>
+> >>>> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> >>>> ---
+> >>>>  MAINTAINERS | 3 +--
+> >>>>  1 file changed, 1 insertion(+), 2 deletions(-)
+> >>>>
+> >>>> diff --git a/MAINTAINERS b/MAINTAINERS
+> >>>> index e50f8c6b97..e6a73820f1 100644
+> >>>> --- a/MAINTAINERS
+> >>>> +++ b/MAINTAINERS
+> >>>> @@ -1745,8 +1745,7 @@ S: Supported
+> >>>>  F: scripts/coverity-model.c
+> >>>> =20
+> >>>>  CPU
+> >>>> -L: qemu-devel@nongnu.org
+> >>>> -S: Supported
+> >>>> +S: Orphan
+> >>>>  F: qom/cpu.c
+> >>>>  F: include/qom/cpu.h
+> >>>> =20
+> >>>>
+> >>>
+> >>> I don't think that's accurate.  Simply there's not much going on.  =
+If
+> >>> patches are sent, get-maintainers's git fallback will do something
+> >>> (probably sending the patch to Eduardo, Igor or me).
+> >=20
+> > I followed Markus suggestion from
+> > https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05414.html:
+> >=20
+> >   If we take the definition of S: in MAINTAINERS seriously,
+> >   we need to appoint a maintainer (a person, not a mailing list),
+> >   or downgrade to S: Orphan.
+>=20
+> I agree with Markus and Philippe. Having "S: Supported" but no names
+> available is just confusing. So either put a maintainer name in here, o=
+r
+> downgrade to "Orphan".
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+I volunteer to maintain it, but I don't want to be the only
+maintainer.  Any other volunteer?
 
-> On 12/17/18 9:43 AM, Alex Benn=C3=A9e wrote:
->>> Use "register" TBFLAG_ANY to indicate shared state between
->>> A32 and A64, and "registers" TBFLAG_A32 & TBFLAG_A64 for
->>> fields that are specific to the given cpu state.
->>>
->>> Move ARM_TBFLAG_BE to shared state, instead of its current
->>> placement within "Bit usage when in AArch32 state".
->>
->> This looks like a worthwhile clean-up but really we need to defer this
->> calculation. It's in the top 2 hot functions on my build load stressor:
->>
->>    5.74%  qemu-system-aarch64      [.] helper_lookup_tb_ptr
->>    5.05%  qemu-system-aarch64      [.] get_phys_addr_lpae
->>    4.39%  qemu-system-aarch64      [.] cpu_get_tb_cpu_state
->>    3.73%  qemu-system-aarch64      [.] tcg_gen_code
->>    3.65%  qemu-system-aarch64      [.] qht_lookup_custom
->
-> Yes, I know.  We need to put on our thinking caps and come up with a sche=
-me
-> that minimizes the chances of missing an update to any (partially) pre-co=
-mputed
-> value.
->
-> That has been Peter's (legitimate) resistance to such a scheme so far.  T=
-here
-> are a *lot* of variables that go into computing tb->flags.
->
-> In the meantime this patch just makes the task of adding bits less
-> ugly.
-
-I'm having all sorts of trouble applying this patch - have you got a
-commit I can reference?
-
---
-Alex Benn=C3=A9e
+--=20
+Eduardo
