@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gZNJ3-0006ZX-Il
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 16:53:42 -0500
+	(envelope-from <ben.hekster@foghorn.io>) id 1gZNJO-0007Ug-IK
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 16:54:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gZN4L-0003UW-LO
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 16:38:29 -0500
-Received: from 10.mo68.mail-out.ovh.net ([46.105.79.203]:54390)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gZN4J-0003Qr-Rj
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 16:38:25 -0500
-Received: from player750.ha.ovh.net (unknown [10.109.159.222])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 1D49C109463
-	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 22:38:17 +0100 (CET)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Tue, 18 Dec 2018 22:38:03 +0100
-Message-Id: <20181218213803.14587-1-clg@kaod.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+	(envelope-from <ben.hekster@foghorn.io>) id 1gZNJL-0007OX-76
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 16:53:58 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:33467)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ben.hekster@foghorn.io>)
+	id 1gZNJK-0007Nv-Qb
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 16:53:55 -0500
+Received: by mail-pf1-x443.google.com with SMTP id c123so8776873pfb.0
+	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 13:53:54 -0800 (PST)
+Received: from [10.10.6.123] ([12.196.120.194])
+	by smtp.gmail.com with ESMTPSA id
+	o189sm24595116pfg.117.2018.12.18.13.53.51 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 18 Dec 2018 13:53:52 -0800 (PST)
+From: Ben Hekster <ben.hekster@foghorn.io>
+Mime-Version: 1.0 (Mac OS X Mail 12.1 \(3445.101.1\))
+Message-Id: <83206F6D-0BA5-4781-8635-84D48DD33A2A@foghorn.io>
+Date: Tue, 18 Dec 2018 13:53:51 -0800
+Content-Type: text/plain;
+	charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] ppc/xive: introduce helpers to access the XIVE
- structures
+Subject: Re: [Qemu-devel] Booting Raspbian on RPi emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,453 +33,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: qemu-devel@nongnu.org
 
-The XIVE internal structures (EAS, END, NVT) are architected to be Big
-Endian. The XIVE models, today, access the different fields of these
-structures using wrappers around the GETFIELD/SETFIELD macros. The
-definitions of these macros depend on the host which seems unnecessary
-for guest only values.
+Hi, Zoltan=E2=80=94
 
-Remove GETFIELD/SETFIELD and replace them with explicit XIVE handlers
-doing the endianess conversion.
+> On Thu, 29 Nov 2018, Guenter Roeck wrote:
+> On 11/29/18 6:42 PM, BALATON Zoltan wrote:
+> On Thu, 29 Nov 2018, Guenter Roeck wrote:
+> On 11/29/18 4:43 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Zoltan,
+>=20
+> On 29/11/18 21:29, BALATON Zoltan wrote:
+> Hello,
+>=20
+> I could not boot Raspbian on QEMU's raspi emulation and I'm not sure =
+why
+> it fails. So question is if this is supposed to work or am I doing
+> something wrong or any clues what may be missing? I'm trying with this
+> command line with v3.1.0-rc3:
+>=20
+> qemu-system-arm -M raspi2 -serial stdio \
+> -kernel rpi-kernel7.img -dtb bcm2709-rpi-2-b.dtb \
+> -append "rw earlyprintk loglevel=3D8 console=3DttyAMA0,115200
+> dwc_otg.lpm_enable=3D0 root=3D/dev/mmcblk0p2" \
+> -drive file=3D2018-10-09-raspbian-stretch-lite.img,format=3Draw,if=3Dsd
+>=20
+> Kernel starts to boot, I see raspberries on the guest screen and log
+> output to serial:
+>=20
+> Booting Linux on physical CPU 0xf00
+> Linux version 4.14.71-v7+ (address@hidden) (gcc version 4.9.3
+> (crosstool-NG crosstool-ng-1.22.0-88-g8460611)) #1145 SMP Fri Sep 21
+> 15:38:35 BST 2018
+> CPU: ARMv7 Processor [410fc075] revision 5 (ARMv7), cr=3D10c5387d
+> [...]
+>=20
+> My version (https://github.com/groeck/qemu =
+<https://github.com/groeck/qemu>) seems to work, using
+> Tried with your v3.1.0-local branch but got same results (does not =
+find mmcblk0 on raspi2, nothing on raspi3) so probably it's not one of =
+the patches in your tree that's missing.
+> multi_v7_defconfig.
+> Then maybe it's your kernel config that's different? Do you have =
+compiled kernels available that I could try?
+> Shouldn't be, but I attached my configuration. This time with v4.14.84 =
+and
+> "make ARCH-arm savedefconfig" after building the image. The output is =
+identical
+> to "make ARCH=3Darm multi_v7_defconfig; make ARCH=3Darm =
+savedefconfig".
+>=20
+> Oh, and here is my qemu configuration.
+>=20
+> --disable-user --disable-gnutls --disable-docs \
+>        --disable-nettle --disable-gcrypt --disable-vnc-png \
+>        --disable-xen --disable-xen-pci-passthrough \
+>        --enable-debug --disable-strip
+>=20
+> That should not make a difference either, but who knows.
+> Just to be sure, I copied a kernel and a root file system
+> to http://server.roeck-us.net/qemu/arm-raspi2/ =
+<http://server.roeck-us.net/qemu/arm-raspi2/>
+> It boots with your kernel (also the raspbian-lite image) so it's =
+likely that the config of the Raspbian kernel is different and that =
+causes the problem. Unfortunately I don't know what config their kernels =
+use. If I'm not mistaken this is the raspbian kernel repo:
+> https://github.com/raspberrypi/linux/ =
+<https://github.com/raspberrypi/linux/>
+>=20
+> My guesses would be bcm2835_defconfig or some other bcm*config? Or =
+something completely different?
+> Regards,
+> BALATON Zoltan
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- include/hw/ppc/xive_regs.h | 28 +++++++++++++---
- target/ppc/cpu.h           | 12 -------
- hw/intc/spapr_xive.c       | 48 +++++++++++++--------------
- hw/intc/xive.c             | 68 +++++++++++++++++++-------------------
- 4 files changed, 82 insertions(+), 74 deletions(-)
+I had the exact same issue; for me it was just the addition of =
+G=C3=BCnther's "rootwait" option that resolved it, so:
 
-diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
-index 85557e730cd8..78875b156980 100644
---- a/include/hw/ppc/xive_regs.h
-+++ b/include/hw/ppc/xive_regs.h
-@@ -126,8 +126,18 @@ typedef struct XiveEAS {
- #define xive_eas_is_valid(eas)   (be64_to_cpu((eas)->w) & EAS_VALID)
- #define xive_eas_is_masked(eas)  (be64_to_cpu((eas)->w) & EAS_MASKED)
-=20
--#define GETFIELD_BE64(m, v)      GETFIELD(m, be64_to_cpu(v))
--#define SETFIELD_BE64(m, v, val) cpu_to_be64(SETFIELD(m, be64_to_cpu(v),=
- val))
-+static inline uint64_t xive_get_field64(uint64_t mask, uint64_t word)
-+{
-+    return (be64_to_cpu(word) & mask) >> ctz64(mask);
-+}
-+
-+static inline uint64_t xive_set_field64(uint64_t mask, uint64_t word,
-+                                        uint64_t value)
-+{
-+    uint64_t tmp =3D
-+        (be64_to_cpu(word) & ~mask) | ((value << ctz64(mask)) & mask);
-+    return cpu_to_be64(tmp);
-+}
-=20
- /* Event Notification Descriptor (END) */
- typedef struct XiveEND {
-@@ -183,8 +193,18 @@ typedef struct XiveEND {
- #define xive_end_is_backlog(end)  (be32_to_cpu((end)->w0) & END_W0_BACKL=
-OG)
- #define xive_end_is_escalate(end) (be32_to_cpu((end)->w0) & END_W0_ESCAL=
-ATE_CTL)
-=20
--#define GETFIELD_BE32(m, v)       GETFIELD(m, be32_to_cpu(v))
--#define SETFIELD_BE32(m, v, val)  cpu_to_be32(SETFIELD(m, be32_to_cpu(v)=
-, val))
-+static inline uint32_t xive_get_field32(uint32_t mask, uint32_t word)
-+{
-+    return (be32_to_cpu(word) & mask) >> ctz32(mask);
-+}
-+
-+static inline uint32_t xive_set_field32(uint32_t mask, uint32_t word,
-+                                        uint32_t value)
-+{
-+    uint32_t tmp =3D
-+        (be32_to_cpu(word) & ~mask) | ((value << ctz32(mask)) & mask);
-+    return cpu_to_be32(tmp);
-+}
-=20
- /* Notification Virtual Target (NVT) */
- typedef struct XiveNVT {
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 527181c0f09f..d5f99f1fc7b9 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -78,18 +78,6 @@
-                                  PPC_BIT32(bs))
- #define PPC_BITMASK8(bs, be)    ((PPC_BIT8(bs) - PPC_BIT8(be)) | PPC_BIT=
-8(bs))
-=20
--#if HOST_LONG_BITS =3D=3D 32
--# define MASK_TO_LSH(m)          (__builtin_ffsll(m) - 1)
--#elif HOST_LONG_BITS =3D=3D 64
--# define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
--#else
--# error Unknown sizeof long
--#endif
--
--#define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
--#define SETFIELD(m, v, val)                             \
--        (((v) & ~(m)) | ((((typeof(v))(val)) << MASK_TO_LSH(m)) & (m)))
--
- /***********************************************************************=
-******/
- /* Exception vectors definitions                                        =
-     */
- enum {
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 3ceabe668b16..87424de26c1c 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -119,12 +119,12 @@ static int spapr_xive_target_to_end(uint32_t target=
-, uint8_t prio,
- static void spapr_xive_end_pic_print_info(sPAPRXive *xive, XiveEND *end,
-                                           Monitor *mon)
- {
--    uint32_t qindex =3D GETFIELD_BE32(END_W1_PAGE_OFF, end->w1);
--    uint32_t qgen =3D GETFIELD_BE32(END_W1_GENERATION, end->w1);
--    uint32_t qsize =3D GETFIELD_BE32(END_W0_QSIZE, end->w0);
-+    uint32_t qindex =3D xive_get_field32(END_W1_PAGE_OFF, end->w1);
-+    uint32_t qgen =3D xive_get_field32(END_W1_GENERATION, end->w1);
-+    uint32_t qsize =3D xive_get_field32(END_W0_QSIZE, end->w0);
-     uint32_t qentries =3D 1 << (qsize + 10);
--    uint32_t nvt =3D GETFIELD_BE32(END_W6_NVT_INDEX, end->w6);
--    uint8_t priority =3D GETFIELD_BE32(END_W7_F0_PRIORITY, end->w7);
-+    uint32_t nvt =3D xive_get_field32(END_W6_NVT_INDEX, end->w6);
-+    uint8_t priority =3D xive_get_field32(END_W7_F0_PRIORITY, end->w7);
-=20
-     monitor_printf(mon, "%3d/%d % 6d/%5d ^%d",
-                    spapr_xive_nvt_to_target(0, nvt),
-@@ -155,10 +155,10 @@ void spapr_xive_pic_print_info(sPAPRXive *xive, Mon=
-itor *mon)
-                        pq & XIVE_ESB_VAL_Q ? 'Q' : '-',
-                        xsrc->status[i] & XIVE_STATUS_ASSERTED ? 'A' : ' =
-',
-                        xive_eas_is_masked(eas) ? "M" : " ",
--                       (int) GETFIELD_BE64(EAS_END_DATA, eas->w));
-+                       (int) xive_get_field64(EAS_END_DATA, eas->w));
-=20
-         if (!xive_eas_is_masked(eas)) {
--            uint32_t end_idx =3D GETFIELD_BE64(EAS_END_INDEX, eas->w);
-+            uint32_t end_idx =3D xive_get_field64(EAS_END_INDEX, eas->w)=
-;
-             XiveEND *end;
-=20
-             assert(end_idx < xive->nr_ends);
-@@ -741,11 +741,11 @@ static target_ulong h_int_set_source_config(PowerPC=
-CPU *cpu,
-         return H_P3;
-     }
-=20
--    new_eas.w =3D SETFIELD_BE64(EAS_END_BLOCK, new_eas.w, end_blk);
--    new_eas.w =3D SETFIELD_BE64(EAS_END_INDEX, new_eas.w, end_idx);
-+    new_eas.w =3D xive_set_field64(EAS_END_BLOCK, new_eas.w, end_blk);
-+    new_eas.w =3D xive_set_field64(EAS_END_INDEX, new_eas.w, end_idx);
-=20
-     if (flags & SPAPR_XIVE_SRC_SET_EISN) {
--        new_eas.w =3D SETFIELD_BE64(EAS_END_DATA, new_eas.w, eisn);
-+        new_eas.w =3D xive_set_field64(EAS_END_DATA, new_eas.w, eisn);
-     }
-=20
- out:
-@@ -810,22 +810,22 @@ static target_ulong h_int_get_source_config(PowerPC=
-CPU *cpu,
-     }
-=20
-     /* EAS_END_BLOCK is unused on sPAPR */
--    end_idx =3D GETFIELD_BE64(EAS_END_INDEX, eas.w);
-+    end_idx =3D xive_get_field64(EAS_END_INDEX, eas.w);
-=20
-     assert(end_idx < xive->nr_ends);
-     end =3D &xive->endt[end_idx];
-=20
--    nvt_blk =3D GETFIELD_BE32(END_W6_NVT_BLOCK, end->w6);
--    nvt_idx =3D GETFIELD_BE32(END_W6_NVT_INDEX, end->w6);
-+    nvt_blk =3D xive_get_field32(END_W6_NVT_BLOCK, end->w6);
-+    nvt_idx =3D xive_get_field32(END_W6_NVT_INDEX, end->w6);
-     args[0] =3D spapr_xive_nvt_to_target(nvt_blk, nvt_idx);
-=20
-     if (xive_eas_is_masked(&eas)) {
-         args[1] =3D 0xff;
-     } else {
--        args[1] =3D GETFIELD_BE32(END_W7_F0_PRIORITY, end->w7);
-+        args[1] =3D xive_get_field32(END_W7_F0_PRIORITY, end->w7);
-     }
-=20
--    args[2] =3D GETFIELD_BE64(EAS_END_DATA, eas.w);
-+    args[2] =3D xive_get_field64(EAS_END_DATA, eas.w);
-=20
-     return H_SUCCESS;
- }
-@@ -894,7 +894,7 @@ static target_ulong h_int_get_queue_info(PowerPCCPU *=
-cpu,
-=20
-     args[0] =3D xive->end_base + (1ull << (end_xsrc->esb_shift + 1)) * e=
-nd_idx;
-     if (xive_end_is_enqueue(end)) {
--        args[1] =3D GETFIELD_BE32(END_W0_QSIZE, end->w0) + 12;
-+        args[1] =3D xive_get_field32(END_W0_QSIZE, end->w0) + 12;
-     } else {
-         args[1] =3D 0;
-     }
-@@ -987,7 +987,7 @@ static target_ulong h_int_set_queue_config(PowerPCCPU=
- *cpu,
-         end.w2 =3D cpu_to_be32((qpage >> 32) & 0x0fffffff);
-         end.w3 =3D cpu_to_be32(qpage & 0xffffffff);
-         end.w0 |=3D cpu_to_be32(END_W0_ENQUEUE);
--        end.w0 =3D SETFIELD_BE32(END_W0_QSIZE, end.w0, qsize - 12);
-+        end.w0 =3D xive_set_field32(END_W0_QSIZE, end.w0, qsize - 12);
-         break;
-     case 0:
-         /* reset queue and disable queueing */
-@@ -1026,9 +1026,9 @@ static target_ulong h_int_set_queue_config(PowerPCC=
-PU *cpu,
-     /* Ensure the priority and target are correctly set (they will not
-      * be right after allocation)
-      */
--    end.w6 =3D SETFIELD_BE32(END_W6_NVT_BLOCK, 0ul, nvt_blk) |
--        SETFIELD_BE32(END_W6_NVT_INDEX, 0ul, nvt_idx);
--    end.w7 =3D SETFIELD_BE32(END_W7_F0_PRIORITY, 0ul, priority);
-+    end.w6 =3D xive_set_field32(END_W6_NVT_BLOCK, 0ul, nvt_blk) |
-+        xive_set_field32(END_W6_NVT_INDEX, 0ul, nvt_idx);
-+    end.w7 =3D xive_set_field32(END_W7_F0_PRIORITY, 0ul, priority);
-=20
-     if (flags & SPAPR_XIVE_END_ALWAYS_NOTIFY) {
-         end.w0 |=3D cpu_to_be32(END_W0_UCOND_NOTIFY);
-@@ -1040,7 +1040,7 @@ static target_ulong h_int_set_queue_config(PowerPCC=
-PU *cpu,
-      * offset counter starts at 0.
-      */
-     end.w1 =3D cpu_to_be32(END_W1_GENERATION) |
--        SETFIELD_BE32(END_W1_PAGE_OFF, 0ul, 0ul);
-+        xive_set_field32(END_W1_PAGE_OFF, 0ul, 0ul);
-     end.w0 |=3D cpu_to_be32(END_W0_VALID);
-=20
-     /* TODO: issue syncs required to ensure all in-flight interrupts
-@@ -1132,7 +1132,7 @@ static target_ulong h_int_get_queue_config(PowerPCC=
-PU *cpu,
-     if (xive_end_is_enqueue(end)) {
-         args[1] =3D (uint64_t) be32_to_cpu(end->w2 & 0x0fffffff) << 32
-             | be32_to_cpu(end->w3);
--        args[2] =3D GETFIELD_BE32(END_W0_QSIZE, end->w0) + 12;
-+        args[2] =3D xive_get_field32(END_W0_QSIZE, end->w0) + 12;
-     } else {
-         args[1] =3D 0;
-         args[2] =3D 0;
-@@ -1141,10 +1141,10 @@ static target_ulong h_int_get_queue_config(PowerP=
-CCPU *cpu,
-     /* TODO: do we need any locking on the END ? */
-     if (flags & SPAPR_XIVE_END_DEBUG) {
-         /* Load the event queue generation number into the return flags =
-*/
--        args[0] |=3D (uint64_t)GETFIELD_BE32(END_W1_GENERATION, end->w1)=
- << 62;
-+        args[0] |=3D (uint64_t)xive_get_field32(END_W1_GENERATION, end->=
-w1) << 62;
-=20
-         /* Load R7 with the event queue offset counter */
--        args[3] =3D GETFIELD_BE32(END_W1_PAGE_OFF, end->w1);
-+        args[3] =3D xive_get_field32(END_W1_PAGE_OFF, end->w1);
-     } else {
-         args[3] =3D 0;
-     }
-diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index 53d2f191e8a3..f8510e426f63 100644
---- a/hw/intc/xive.c
-+++ b/hw/intc/xive.c
-@@ -982,8 +982,8 @@ void xive_end_queue_pic_print_info(XiveEND *end, uint=
-32_t width, Monitor *mon)
- {
-     uint64_t qaddr_base =3D (uint64_t) be32_to_cpu(end->w2 & 0x0fffffff)=
- << 32
-         | be32_to_cpu(end->w3);
--    uint32_t qsize =3D GETFIELD_BE32(END_W0_QSIZE, end->w0);
--    uint32_t qindex =3D GETFIELD_BE32(END_W1_PAGE_OFF, end->w1);
-+    uint32_t qsize =3D xive_get_field32(END_W0_QSIZE, end->w0);
-+    uint32_t qindex =3D xive_get_field32(END_W1_PAGE_OFF, end->w1);
-     uint32_t qentries =3D 1 << (qsize + 10);
-     int i;
-=20
-@@ -1012,13 +1012,13 @@ void xive_end_pic_print_info(XiveEND *end, uint32=
-_t end_idx, Monitor *mon)
- {
-     uint64_t qaddr_base =3D (uint64_t) be32_to_cpu(end->w2 & 0x0fffffff)=
- << 32
-         | be32_to_cpu(end->w3);
--    uint32_t qindex =3D GETFIELD_BE32(END_W1_PAGE_OFF, end->w1);
--    uint32_t qgen =3D GETFIELD_BE32(END_W1_GENERATION, end->w1);
--    uint32_t qsize =3D GETFIELD_BE32(END_W0_QSIZE, end->w0);
-+    uint32_t qindex =3D xive_get_field32(END_W1_PAGE_OFF, end->w1);
-+    uint32_t qgen =3D xive_get_field32(END_W1_GENERATION, end->w1);
-+    uint32_t qsize =3D xive_get_field32(END_W0_QSIZE, end->w0);
-     uint32_t qentries =3D 1 << (qsize + 10);
-=20
--    uint32_t nvt =3D GETFIELD_BE32(END_W6_NVT_INDEX, end->w6);
--    uint8_t priority =3D GETFIELD_BE32(END_W7_F0_PRIORITY, end->w7);
-+    uint32_t nvt =3D xive_get_field32(END_W6_NVT_INDEX, end->w6);
-+    uint8_t priority =3D xive_get_field32(END_W7_F0_PRIORITY, end->w7);
-=20
-     if (!xive_end_is_valid(end)) {
-         return;
-@@ -1041,9 +1041,9 @@ static void xive_end_enqueue(XiveEND *end, uint32_t=
- data)
- {
-     uint64_t qaddr_base =3D (uint64_t) be32_to_cpu(end->w2 & 0x0fffffff)=
- << 32
-         | be32_to_cpu(end->w3);
--    uint32_t qsize =3D GETFIELD_BE32(END_W0_QSIZE, end->w0);
--    uint32_t qindex =3D GETFIELD_BE32(END_W1_PAGE_OFF, end->w1);
--    uint32_t qgen =3D GETFIELD_BE32(END_W1_GENERATION, end->w1);
-+    uint32_t qsize =3D xive_get_field32(END_W0_QSIZE, end->w0);
-+    uint32_t qindex =3D xive_get_field32(END_W1_PAGE_OFF, end->w1);
-+    uint32_t qgen =3D xive_get_field32(END_W1_GENERATION, end->w1);
-=20
-     uint64_t qaddr =3D qaddr_base + (qindex << 2);
-     uint32_t qdata =3D cpu_to_be32((qgen << 31) | (data & 0x7fffffff));
-@@ -1058,9 +1058,9 @@ static void xive_end_enqueue(XiveEND *end, uint32_t=
- data)
-     qindex =3D (qindex + 1) & (qentries - 1);
-     if (qindex =3D=3D 0) {
-         qgen ^=3D 1;
--        end->w1 =3D SETFIELD_BE32(END_W1_GENERATION, end->w1, qgen);
-+        end->w1 =3D xive_set_field32(END_W1_GENERATION, end->w1, qgen);
-     }
--    end->w1 =3D SETFIELD_BE32(END_W1_PAGE_OFF, end->w1, qindex);
-+    end->w1 =3D xive_set_field32(END_W1_PAGE_OFF, end->w1, qindex);
- }
-=20
- /*
-@@ -1139,13 +1139,13 @@ static int xive_presenter_tctx_match(XiveTCTX *tc=
-tx, uint8_t format,
-=20
-         /* HV POOL ring */
-         if ((be32_to_cpu(qw2w2) & TM_QW2W2_VP) &&
--            cam =3D=3D GETFIELD_BE32(TM_QW2W2_POOL_CAM, qw2w2)) {
-+            cam =3D=3D xive_get_field32(TM_QW2W2_POOL_CAM, qw2w2)) {
-             return TM_QW2_HV_POOL;
-         }
-=20
-         /* OS ring */
-         if ((be32_to_cpu(qw1w2) & TM_QW1W2_VO) &&
--            cam =3D=3D GETFIELD_BE32(TM_QW1W2_OS_CAM, qw1w2)) {
-+            cam =3D=3D xive_get_field32(TM_QW1W2_OS_CAM, qw1w2)) {
-             return TM_QW1_OS;
-         }
-     } else {
-@@ -1153,9 +1153,9 @@ static int xive_presenter_tctx_match(XiveTCTX *tctx=
-, uint8_t format,
-=20
-         /* USER ring */
-         if  ((be32_to_cpu(qw1w2) & TM_QW1W2_VO) &&
--             (cam =3D=3D GETFIELD_BE32(TM_QW1W2_OS_CAM, qw1w2)) &&
-+             (cam =3D=3D xive_get_field32(TM_QW1W2_OS_CAM, qw1w2)) &&
-              (be32_to_cpu(qw0w2) & TM_QW0W2_VU) &&
--             (logic_serv =3D=3D GETFIELD_BE32(TM_QW0W2_LOGIC_SERV, qw0w2=
-))) {
-+             (logic_serv =3D=3D xive_get_field32(TM_QW0W2_LOGIC_SERV, qw=
-0w2))) {
-             return TM_QW0_USER;
-         }
-     }
-@@ -1313,8 +1313,8 @@ static void xive_router_end_notify(XiveRouter *xrtr=
-, uint8_t end_blk,
-      *   F=3D1 : User level Event-Based Branch (EBB) notification, no
-      *         priority
-      */
--    format =3D GETFIELD_BE32(END_W6_FORMAT_BIT, end.w6);
--    priority =3D GETFIELD_BE32(END_W7_F0_PRIORITY, end.w7);
-+    format =3D xive_get_field32(END_W6_FORMAT_BIT, end.w6);
-+    priority =3D xive_get_field32(END_W7_F0_PRIORITY, end.w7);
-=20
-     /* The END is masked */
-     if (format =3D=3D 0 && priority =3D=3D 0xff) {
-@@ -1326,11 +1326,11 @@ static void xive_router_end_notify(XiveRouter *xr=
-tr, uint8_t end_blk,
-      * even futher coalescing in the Router
-      */
-     if (!xive_end_is_notify(&end)) {
--        uint8_t pq =3D GETFIELD_BE32(END_W1_ESn, end.w1);
-+        uint8_t pq =3D xive_get_field32(END_W1_ESn, end.w1);
-         bool notify =3D xive_esb_trigger(&pq);
-=20
--        if (pq !=3D GETFIELD_BE32(END_W1_ESn, end.w1)) {
--            end.w1 =3D SETFIELD_BE32(END_W1_ESn, end.w1, pq);
-+        if (pq !=3D xive_get_field32(END_W1_ESn, end.w1)) {
-+            end.w1 =3D xive_set_field32(END_W1_ESn, end.w1, pq);
-             xive_router_write_end(xrtr, end_blk, end_idx, &end, 1);
-         }
-=20
-@@ -1344,11 +1344,11 @@ static void xive_router_end_notify(XiveRouter *xr=
-tr, uint8_t end_blk,
-      * Follows IVPE notification
-      */
-     xive_presenter_notify(xrtr, format,
--                          GETFIELD_BE32(END_W6_NVT_BLOCK, end.w6),
--                          GETFIELD_BE32(END_W6_NVT_INDEX, end.w6),
--                          GETFIELD_BE32(END_W7_F0_IGNORE, end.w7),
-+                          xive_get_field32(END_W6_NVT_BLOCK, end.w6),
-+                          xive_get_field32(END_W6_NVT_INDEX, end.w6),
-+                          xive_get_field32(END_W7_F0_IGNORE, end.w7),
-                           priority,
--                          GETFIELD_BE32(END_W7_F1_LOG_SERVER_ID, end.w7)=
-);
-+                          xive_get_field32(END_W7_F1_LOG_SERVER_ID, end.=
-w7));
-=20
-     /* TODO: Auto EOI. */
- }
-@@ -1385,9 +1385,9 @@ static void xive_router_notify(XiveNotifier *xn, ui=
-nt32_t lisn)
-      * The event trigger becomes an END trigger
-      */
-     xive_router_end_notify(xrtr,
--                           GETFIELD_BE64(EAS_END_BLOCK, eas.w),
--                           GETFIELD_BE64(EAS_END_INDEX, eas.w),
--                           GETFIELD_BE64(EAS_END_DATA,  eas.w));
-+                           xive_get_field64(EAS_END_BLOCK, eas.w),
-+                           xive_get_field64(EAS_END_INDEX, eas.w),
-+                           xive_get_field64(EAS_END_DATA,  eas.w));
- }
-=20
- static void xive_router_class_init(ObjectClass *klass, void *data)
-@@ -1419,9 +1419,9 @@ void xive_eas_pic_print_info(XiveEAS *eas, uint32_t=
- lisn, Monitor *mon)
-=20
-     monitor_printf(mon, "  %08x %s end:%02x/%04x data:%08x\n",
-                    lisn, xive_eas_is_masked(eas) ? "M" : " ",
--                   (uint8_t)  GETFIELD_BE64(EAS_END_BLOCK, eas->w),
--                   (uint32_t) GETFIELD_BE64(EAS_END_INDEX, eas->w),
--                   (uint32_t) GETFIELD_BE64(EAS_END_DATA, eas->w));
-+                   (uint8_t)  xive_get_field64(EAS_END_BLOCK, eas->w),
-+                   (uint32_t) xive_get_field64(EAS_END_INDEX, eas->w),
-+                   (uint32_t) xive_get_field64(EAS_END_DATA, eas->w));
- }
-=20
- /*
-@@ -1454,7 +1454,7 @@ static uint64_t xive_end_source_read(void *opaque, =
-hwaddr addr, unsigned size)
-     }
-=20
-     end_esmask =3D addr_is_even(addr, xsrc->esb_shift) ? END_W1_ESn : EN=
-D_W1_ESe;
--    pq =3D GETFIELD_BE32(end_esmask, end.w1);
-+    pq =3D xive_get_field32(end_esmask, end.w1);
-=20
-     switch (offset) {
-     case XIVE_ESB_LOAD_EOI ... XIVE_ESB_LOAD_EOI + 0x7FF:
-@@ -1479,8 +1479,8 @@ static uint64_t xive_end_source_read(void *opaque, =
-hwaddr addr, unsigned size)
-         return -1;
-     }
-=20
--    if (pq !=3D GETFIELD_BE32(end_esmask, end.w1)) {
--        end.w1 =3D SETFIELD_BE32(end_esmask, end.w1, pq);
-+    if (pq !=3D xive_get_field32(end_esmask, end.w1)) {
-+        end.w1 =3D xive_set_field32(end_esmask, end.w1, pq);
-         xive_router_write_end(xsrc->xrtr, end_blk, end_idx, &end, 1);
-     }
-=20
---=20
-2.17.2
+$ qemu-system-arm \
+	-m 256m \
+	-M raspi2 \
+	-cpu cortex-a7 \
+	-append "console=3DttyAMA0,115200 root=3D/dev/mmcblk0p2 rootwait =
+rw" \
+	-dtb bcm2709-rpi-2-b.dtb \
+	-drive =
+file=3D2018-11-13-raspbian-stretch-lite.img,if=3Dsd,format=3Draw \
+	-kernel kernel7.img \
+	-nographic
+
+Did it for me using stock QEMU 3.1.0.  (I need "-nographic" because the =
+OS X port crashes without it)
+
+Ben
