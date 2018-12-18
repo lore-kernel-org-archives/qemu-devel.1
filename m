@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gZHCw-0004fA-TB
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 10:22:56 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gZHCx-0004Lp-O2
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 10:22:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gZHCt-0003IJ-Fz
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 10:22:54 -0500
-Date: Tue, 18 Dec 2018 13:22:39 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181218152239.GB19442@habkost.net>
-References: <20181218115615.1499-1-philmd@redhat.com>
-	<20181218115615.1499-11-philmd@redhat.com>
-	<20f62f62-f677-6d0f-09dc-3759cc813d8f@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gZH1v-00066a-UJ
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 10:11:37 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 18 Dec 2018 15:11:18 +0000
+Message-ID: <b91e2cff-2d5c-f5dd-e8cc-7a8944c93de4@virtuozzo.com>
+References: <20181215135324.152629-1-eblake@redhat.com>
+	<20181215135324.152629-8-eblake@redhat.com>
+In-Reply-To: <20181215135324.152629-8-eblake@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <1CB7EB09CC043D409E593144DC42674E@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20f62f62-f677-6d0f-09dc-3759cc813d8f@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 10/12] MAINTAINERS: Orphanize the 'CPU
- (QOM)' subsystem
+Subject: Re: [Qemu-devel] [PATCH v2 07/22] qemu-nbd: Avoid strtol open-coding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +25,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>, Helge Deller <deller@gmx.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Luc Michel <luc.michel@greensocs.com>, "Daniel P . Berrange" <berrange@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-On Tue, Dec 18, 2018 at 01:34:52PM +0100, Paolo Bonzini wrote:
-> On 18/12/18 12:56, Philippe Mathieu-Daud=E9 wrote:
-> > Nobody is looking at those files, downgrade this subsystem as orphan.
-> >=20
-> > Remove the qemu-devel@nongnu.org entry because the list is always
-> > selected by the 'All patches CC here' section.
-> >=20
-> > Suggested-by: Markus Armbruster <armbru@redhat.com>
-> > Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> > ---
-> >  MAINTAINERS | 3 +--
-> >  1 file changed, 1 insertion(+), 2 deletions(-)
-> >=20
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index e50f8c6b97..e6a73820f1 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -1745,8 +1745,7 @@ S: Supported
-> >  F: scripts/coverity-model.c
-> > =20
-> >  CPU
-> > -L: qemu-devel@nongnu.org
-> > -S: Supported
-> > +S: Orphan
-> >  F: qom/cpu.c
-> >  F: include/qom/cpu.h
-> > =20
-> >=20
->=20
-> I don't think that's accurate.  Simply there's not much going on.  If
-> patches are sent, get-maintainers's git fallback will do something
-> (probably sending the patch to Eduardo, Igor or me).
-
-Should we add our names to that section, or is it OK to leave it
-as "S: Supported" even if it doesn't have any official
-maintainers?
-
---=20
-Eduardo
+MTUuMTIuMjAxOCAxNjo1MywgRXJpYyBCbGFrZSB3cm90ZToNCj4gT3VyIGNvcHktYW5kLXBhc3Rl
+ZCBvcGVuLWNvZGluZyBvZiBzdHJ0b2wgaGFuZGxpbmcgZm9yZ290IHRvDQo+IGhhbmRsZSBvdmVy
+ZmxvdyBjb25kaXRpb25zLiAgVXNlIHFlbXVfc3RydG8qKCkgaW5zdGVhZC4NCj4gDQo+IEluIHRo
+ZSBjYXNlIG9mIC0tcGFydGl0aW9uLCBzaW5jZSB3ZSBpbnNpc3Qgb24gYSB1c2VyLXN1cHBsaWVk
+DQo+IHBhcnRpdGlvbiB0byBiZSBub24temVybywgd2UgY2FuIHVzZSAwIHJhdGhlciB0aGFuIC0x
+IGZvciBvdXINCj4gaW5pdGlhbCB2YWx1ZSB0byBkaXN0aW5ndWlzaCB3aGVuIGEgcGFydGl0aW9u
+IGlzIG5vdCBiZWluZw0KPiBzZXJ2ZWQsIGZvciBzbGlnaHRseSBtb3JlIG9wdGltYWwgY29kZS4N
+Cj4gDQo+IFRoZSBlcnJvciBtZXNzYWdlcyBmb3Igb3V0LW9mLWJvdW5kcyB2YWx1ZXMgYXJlIGxl
+c3Mgc3BlY2lmaWMsDQo+IGJ1dCBzaG91bGQgbm90IGJlIGEgdGVycmlibGUgbG9zcyBpbiBxdWFs
+aXR5Lg0KPiANCj4gU2lnbmVkLW9mZi1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+
+DQo+IA0KPiAtLS0NCj4gdjI6IFJldGl0bGUsIGNhdGNoIG1vcmUgdXNlcyBvZiBzdHJ0b2wNCj4g
+W0htbSAtIHRoaXMgZGVwZW5kcyBvbiBpbnQ2NF90IGFuZCBvZmZfdCBiZWluZyBjb21wYXRpYmxl
+OyBpZiB0aGV5DQo+IGFyZW4ndCB0aGF0IHdheSBvbiBhbGwgcGxhdGZvcm1zLCBJJ2xsIG5lZWQg
+YSB0ZW1wb3JhcnkgdmFyaWFibGVdDQoNCmhtbSwgYXMgSSB1bmRlcnN0YW5kLCBldmVuIGlmIHRo
+aXMgY29tcGF0aWJpbGl0eSBleGlzdHMsIGl0J3Mgbm90IGEgcGFydA0Kb2Ygc3RhbmRhcmQgYW5k
+IG5vdGhpbmcgYWJvdXQgb2ZmX3Qgc2l6ZSBpbiBQT1NJWC4uDQoNCk1vcmVvdmVyOiB3aGF0IGlz
+IHRoZSByZWFzb24gZm9yIHVzaW5nIG9mZl90IGluIE5CRCBjb2RlPyBXZSBkb24ndCBoYXZlIGl0
+DQppbiBOQkQgcHJvdG9jb2wsIHdlIGRvbid0IGhhdmUgaXQgaW4gZ2VuZXJpYyBibG9jayBsYXll
+ciBpbnRlcmZhY2UuIElzbid0IGl0DQphbHdheXMgY2FzdGVkIHRvIGludDY0X3Qgb3IgbGlrZSB0
+aGlzPw0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
