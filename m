@@ -1,28 +1,34 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:34955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gZLF0-00059q-JQ
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 14:41:19 -0500
+	(envelope-from <bounces@canonical.com>) id 1gZLF9-00059q-LJ
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 14:41:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gZLB6-0001Ye-Tk
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 14:37:17 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40378)
+	(envelope-from <bounces@canonical.com>) id 1gZL9f-000343-WB
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 14:35:52 -0500
+Received: from indium.canonical.com ([91.189.90.7]:49700)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gZLB6-0001UZ-L2
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 14:37:16 -0500
-Received: by mail-wr1-x441.google.com with SMTP id p4so17129971wrt.7
-	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 11:37:16 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gZL9f-0002u8-P1
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 14:35:47 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gZL9e-0003XF-7a
+	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 19:35:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2B63A2E80CC
+	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 19:35:46 +0000 (UTC)
 MIME-Version: 1.0
-References: <20181218182234.28876-1-armbru@redhat.com>
-	<20181218182234.28876-14-armbru@redhat.com>
-In-Reply-To: <20181218182234.28876-14-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 18 Dec 2018 23:37:04 +0400
-Message-ID: <CAJ+F1CLnugfZKFaQTjK3oAPJ3PmsxvBwhDtD8mH-D1FnUqKKgg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 13/15] Revert "qapi-events: add 'if'
- condition to implicit event enum"
+Date: Tue, 18 Dec 2018 19:29:51 -0000
+From: Eric Blake <1803872@bugs.launchpad.net>
+Reply-To: Bug 1803872 <1803872@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154254872666.7803.12367996737502527787.malonedeb@wampee.canonical.com>
+Message-Id: <79a10131-a596-33ff-d58c-1e01bb98beb2@redhat.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1803872] Re: [PATCH v3 4/5] migration: Use
+ QEMU_NONSTRING for non NUL-terminated arrays
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,73 +37,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-Hi
+On 12/18/18 11:51 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> GCC 8 added a -Wstringop-truncation warning:
+> =
 
-On Tue, Dec 18, 2018 at 10:27 PM Markus Armbruster <armbru@redhat.com> wrot=
-e:
->
-> This reverts commit 7bd263490590ee6fcf34ecb6203437e22f6e5a9c.
->
-> The commit applied the events' conditions to the members of enum
-> QAPIEvent.  Awkward, because it renders QAPIEvent unusable in
-> target-independent code as soon as we make an event target-dependent.
-> Reverting this has the following effects:
->
-> * ui/vnc.c can remain target independent.
+>    The -Wstringop-truncation warning added in GCC 8.0 via r254630 for
+>    bug 81117 is specifically intended to highlight likely unintended
+>    uses of the strncpy function that truncate the terminating NUL
+>    character from the source string.
+> =
 
-Was it ever moved? I don't recall
+> This new warning leads to compilation failures:
+> =
 
->
-> * monitor_qapi_event_conf[] doesn't have to muck around with #ifdef.
+>      CC      migration/global_state.o
+>    qemu/migration/global_state.c: In function 'global_state_store_running=
+':
+>    qemu/migration/global_state.c:45:5: error: 'strncpy' specified bound 1=
+00 equals destination size [-Werror=3Dstringop-truncation]
+>         strncpy((char *)global_state.runstate, state, sizeof(global_state=
+.runstate));
+>         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~~~~~~~~~~
+>    make: *** [qemu/rules.mak:69: migration/global_state.o] Error 1
+> =
 
-I suggested a way to get rid of monitor_qapi_event_conf[] in the patch
-message, by having the rate stored in the schema, which could actually
-be useful (for doc, introspection etc).
+> Use the QEMU_NONSTRING attribute, since this array is intended to store
+> character arrays that do not necessarily contain a terminating NUL.
+> =
 
->
-> * query-events again doesn't reflect conditionals.  I'm going to
->   deprecate it in favor of query-qmp-schema.
-
-I guess that's not that important.
-
-I have a slight preference for not declaring enums when the related
-option is disabled.
-
-But people don't like having too much #ifdef code, which is understandable.
-
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->
-> # Conflicts:
-> #       scripts/qapi/events.py
+> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  scripts/qapi/events.py | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
-> index e988e43941..c944ba90b8 100644
-> --- a/scripts/qapi/events.py
-> +++ b/scripts/qapi/events.py
-> @@ -194,7 +194,9 @@ void %(event_emit)s(%(event_enum)s event, QDict *qdic=
-t);
->              self._genc.add(gen_event_send(name, arg_type, boxed,
->                                            self._event_enum_name,
->                                            self._event_emit_name))
-> -        self._event_enum_members.append(QAPISchemaMember(name, ifcond))
-> +        # Note: we generate the enum member regardless of @ifcond, to
-> +        # keep the enumeration usable in target-independent code.
-> +        self._event_enum_members.append(QAPISchemaMember(name))
->
->
->  def gen_events(schema, output_dir, prefix):
-> --
-> 2.17.2
->
->
+>   migration/global_state.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 
+Should this be squashed with 5/5?
 
---=20
-Marc-Andr=C3=A9 Lureau
+-- =
+
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1803872
+
+Title:
+  gcc 8.2 reports stringop-truncation when building qemu
+
+Status in QEMU:
+  New
+
+Bug description:
+  QEMU 3.0
+
+  block/sheepdog.c: In function 'find_vdi_name':
+  block/sheepdog.c:1239:5: error: 'strncpy' specified bound 256 equals dest=
+ination size [-Werror=3Dstringop-truncation]
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_V=
+DI_TAG_LEN);
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~~~~~~~~~~
+
+  If this is the intended behavior, please suppress the warning. For
+  example:
+
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wstringop-truncation"
+  =C2=A0=C2=A0=C2=A0=C2=A0strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG=
+_LEN);
+  #pragma GCC diagnostic pop
+
+  This also happens on other sources, for example hw/acpi/core.c, so
+  another option is to suppress it globally on CFLAGS (-Wno-stringop-
+  truncation)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1803872/+subscriptions
