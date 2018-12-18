@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gZA8o-0003kZ-Cl
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:50:11 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gZADI-0005BW-Bc
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:54:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gZA8j-0005te-BS
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:50:10 -0500
-References: <20181217140055.8545-1-lvivier@redhat.com>
-	<20181218042938.GI23604@umbus.fritz.box>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <8cf7e664-27e6-d4f4-ea71-29a61a3122e6@redhat.com>
-Date: Tue, 18 Dec 2018 08:50:00 +0100
+	(envelope-from <aik@ozlabs.ru>) id 1gZADB-0001GZ-Sf
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:54:48 -0500
+Received: from mail-it1-x142.google.com ([2607:f8b0:4864:20::142]:35864)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gZADB-0001FL-A7
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:54:41 -0500
+Received: by mail-it1-x142.google.com with SMTP id c9so3013568itj.1
+	for <qemu-devel@nongnu.org>; Mon, 17 Dec 2018 23:54:40 -0800 (PST)
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+References: <20181214015520.20467-1-aik@ozlabs.ru>
+	<20181217062133.GK5597@umbus.fritz.box>
+	<20181218020924.GB23604@umbus.fritz.box>
+	<1e2449a7-d89b-3ca5-db66-7da34ff59a35@ozlabs.ru>
+	<20181218034910.GF23604@umbus.fritz.box>
+	<cae378d2-29c8-556b-8833-713fa95db3da@ozlabs.ru>
+Message-ID: <c7e3ab4b-adbf-5a26-f057-c64eedfc6c0b@ozlabs.ru>
+Date: Tue, 18 Dec 2018 18:54:33 +1100
 MIME-Version: 1.0
-In-Reply-To: <20181218042938.GI23604@umbus.fritz.box>
+In-Reply-To: <cae378d2-29c8-556b-8833-713fa95db3da@ozlabs.ru>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] spapr: Add H-Call H_HOME_NODE_ASSOCIATIVITY
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH qemu v3] ppc/spapr: Receive and store
+ device tree blob from SLOF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,110 +35,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, gkurz@linux.ibm.com
 
-On 18/12/2018 05:29, David Gibson wrote:
-> On Mon, Dec 17, 2018 at 03:00:55PM +0100, Laurent Vivier wrote:
->> H_HOME_NODE_ASSOCIATIVITY H-Call returns the associativity domain
->> designation associated with the identifier input parameter.
->>
->> Remove the warning message from the kernel:
->>   VPHN is not supported. Disabling polling..
->>
->> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+
+
+On 18/12/2018 15:30, Alexey Kardashevskiy wrote:
 > 
-> From the looks of PAPR, I suspect this call isn't of much use outside
-> PowerVM guests, though it probably wouldn't do any harm.
-
-This call is used by the kernel to get the node id of a CPU on hotplug
-and fixes a crash when we hotplug a CPU in a memory-less/CPU-less node
-where this information is missing (not initialized from the device-tree).
-
-> BenH, Paulus, any thoughts?
 > 
-> One nit in implementation: if you implement this hcall, it's supposed
-> to be advertised by adding hcall-vphn to ibm,hypertas-functions.
-ok  in v2.
-
-Thanks,
-Laurent
-
->> ---
->> Based-on: <20181213040126.6768-1-david@gibson.dropbear.id.au>
->>           "[PULL 00/27] ppc-for-4.0 queue 20181213"
+> On 18/12/2018 14:49, David Gibson wrote:
+>> On Tue, Dec 18, 2018 at 02:04:54PM +1100, Alexey Kardashevskiy wrote:
+>>>
+>>>
+>>> On 18/12/2018 13:09, David Gibson wrote:
+>>>> On Mon, Dec 17, 2018 at 05:21:33PM +1100, David Gibson wrote:
+>>>>> On Fri, Dec 14, 2018 at 12:55:20PM +1100, Alexey Kardashevskiy wrote:
+>>>>>> SLOF receives a device tree and updates it with various properties
+>>>>>> before switching to the guest kernel and QEMU is not aware of any changes
+>>>>>> made by SLOF. Since there is no real RTAS (QEMU implements it), it makes
+>>>>>> sense to pass the SLOF final device tree to QEMU to let it implement
+>>>>>> RTAS related tasks better, such as PCI host bus adapter hotplug.
+>>>>>>
+>>>>>> Specifially, now QEMU can find out the actual XICS phandle (for PHB
+>>>>>> hotplug) and the RTAS linux,rtas-entry/base properties (for firmware
+>>>>>> assisted NMI - FWNMI).
+>>>>>>
+>>>>>> This stores the initial DT blob in the sPAPR machine and replaces it
+>>>>>> in the KVMPPC_H_UPDATE_DT (new private hypercall) handler.
+>>>>>>
+>>>>>> This adds an @update_dt_enabled machine property to allow backward
+>>>>>> migration.
+>>>>>>
+>>>>>> SLOF already has a hypercall since
+>>>>>> https://github.com/aik/SLOF/commit/e6fc84652c9c0073f9183
+>>>>>>
+>>>>>> This makes use of the new fdt_check_full() helper. In order to allow
+>>>>>> the configure script to pick the correct DTC version, this adjusts
+>>>>>> the DTC presense test.
+>>>>>>
+>>>>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>>>>
+>>>>> Applied, thanks.
+>>>>
+>>>> And now, unapplied.
+>>>>
+>>>> I don't know quite how, but somehow this patch is causing aarch64
+>>>> tests to SEGV.
+>>>
+>>>
+>>> /home/aik/p/qemu/configure --target-list=aarch64-softmmu
+>>> --source-path=/home/aik/p/qemu/ --disable-git-update --with-git=false
+>>>    --enable-trace-backend=log
+>>>
+>>> and
+>>>
+>>> make -C /home/aik/pbuild/qemu-localhost-aarch64-rel/ -j24 check
+>>>
+>>> did not produce segv. I am running this all on a power8 box + ubuntu
+>>> 1804, what is your config?
 >>
->>  hw/ppc/spapr_hcall.c   | 39 +++++++++++++++++++++++++++++++++++++++
->>  include/hw/ppc/spapr.h |  1 +
->>  2 files changed, 40 insertions(+)
->>
->> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
->> index 78fecc8fe9..454ec594fd 100644
->> --- a/hw/ppc/spapr_hcall.c
->> +++ b/hw/ppc/spapr_hcall.c
->> @@ -1663,6 +1663,41 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
->>      return H_SUCCESS;
->>  }
->>  
->> +static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
->> +                                              sPAPRMachineState *spapr,
->> +                                              target_ulong opcode,
->> +                                              target_ulong *args)
->> +{
->> +    target_ulong flags = args[0];
->> +    target_ulong procno = args[1];
->> +    PowerPCCPU *tcpu;
->> +    int idx;
->> +
->> +    /* only support procno from H_REGISTER_VPA */
->> +    if ((flags & 0x1) == 0) {
->> +        return H_PARAMETER;
->> +    }
->> +
->> +    tcpu = spapr_find_cpu(procno);
->> +    if (tcpu == NULL) {
->> +        return H_P2;
->> +    }
->> +
->> +    /* sequence is the same as in the "ibm,associativity" property */
->> +
->> +    idx = 0;
->> +#define ASSOCIATIVITY(a, b) (((uint64_t)a << 32) | ((uint64_t)b & 0xffffffff))
->> +    args[idx++] = ASSOCIATIVITY(0, 0);
->> +    args[idx++] = ASSOCIATIVITY(0, tcpu->node_id);
->> +    args[idx++] = ASSOCIATIVITY(procno, -1);
->> +    for ( ; idx < 6; idx++) {
->> +        args[idx] = -1;
->> +    }
->> +#undef ASSOCIATIVITY
->> +
->> +    return H_SUCCESS;
->> +}
->> +
->>  static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
->>                                                sPAPRMachineState *spapr,
->>                                                target_ulong opcode,
->> @@ -1864,6 +1899,10 @@ static void hypercall_register_types(void)
->>      spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_support);
->>  
->>      spapr_register_hypercall(KVMPPC_H_UPDATE_DT, h_update_dt);
->> +
->> +    /* Virtual Processor Home Node */
->> +    spapr_register_hypercall(H_HOME_NODE_ASSOCIATIVITY,
->> +                             h_home_node_associativity);
->>  }
->>  
->>  type_init(hypercall_register_types)
->> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
->> index b1a2515107..eb13e2b614 100644
->> --- a/include/hw/ppc/spapr.h
->> +++ b/include/hw/ppc/spapr.h
->> @@ -447,6 +447,7 @@ struct sPAPRMachineState {
->>  #define H_GET_EM_PARMS          0x2B8
->>  #define H_SET_MPP               0x2D0
->>  #define H_GET_MPP               0x2D4
->> +#define H_HOME_NODE_ASSOCIATIVITY 0x2EC
->>  #define H_XIRR_X                0x2FC
->>  #define H_RANDOM                0x300
->>  #define H_SET_MODE              0x31C
+>> Hm, curious.  I'm using Fedora 29 on an x86 host.
 > 
+> 
+> Fedora 27 on x86_64 is all right too :-/ Let's upgrade...
+
+Upgraded, bad experience - usb ethernet module did not load, and now it
+does not remember the screen configuration - when the external monitor
+is detached - all windows jump to the laptop screen and never come back
+to the external one when reattached :(
+
+
+Aaaaand the latest QEMU does not compile with gcc 8.2.1 from fc28:
+
+/home/aik/p/qemu-dwg/util/memfd.c:38:12: error: static declaration of
+‘memfd_create’ follows non-static declaration
+ static int memfd_create(const char *name, unsigned int flags)
+            ^~~~~~~~~~~~
+In file included from /usr/include/bits/mman-linux.h:117,
+                 from /usr/include/bits/mman.h:49,
+                 from /usr/include/sys/mman.h:41,
+                 from /home/aik/p/qemu-dwg/include/sysemu/os-posix.h:29,
+                 from /home/aik/p/qemu-dwg/include/qemu/osdep.h:119,
+                 from /home/aik/p/qemu-dwg/util/memfd.c:28:
+/usr/include/bits/mman-shared.h:46:5: note: previous declaration of
+‘memfd_create’ was here
+ int memfd_create (const char *__name, unsigned int __flags) __THROW;
+     ^~~~~~~~~~~~
+
+
+/home/aik/p/qemu-dwg/block/file-posix.c:1585:14: error: static
+declaration of ‘copy_file_range’ follows non-static declaration
+ static off_t copy_file_range(int in_fd, off_t *in_off, int out_fd,
+              ^~~~~~~~~~~~~~~
+In file included from /home/aik/p/qemu-dwg/include/qemu/osdep.h:90,
+                 from /home/aik/p/qemu-dwg/block/file-posix.c:25:
+/usr/include/unistd.h:1107:9: note: previous declaration of
+‘copy_file_range’ was here
+ ssize_t copy_file_range (int __infd, __off64_t *__pinoff,
+         ^~~~~~~~~~~~~~~
+
+
+after fixing these, there is still no segv anyway. Hm :(
+
+
+-- 
+Alexey
