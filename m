@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gZDFK-0001Ac-CS
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 06:09:07 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gZDFU-0001Vk-3G
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 06:09:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gZD49-0002Kr-5r
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:57:36 -0500
-References: <20181217140055.8545-1-lvivier@redhat.com>
-	<20181218042938.GI23604@umbus.fritz.box>
-	<8cf7e664-27e6-d4f4-ea71-29a61a3122e6@redhat.com>
-	<20181218102311.68400aa5@bahia.lan>
-	<639bdcc3-3974-b762-2089-808fd55d9226@redhat.com>
-	<20181218115015.1564d0a2@bahia.lan>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <4e667a79-68b7-4cf1-994c-b72ee738e0a6@redhat.com>
-Date: Tue, 18 Dec 2018 11:57:28 +0100
+	(envelope-from <eric.auger@redhat.com>) id 1gZD1L-0007Bn-QD
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:54:42 -0500
+References: <20181206170733.7469-1-eric.auger@redhat.com>
+	<20181206170733.7469-3-eric.auger@redhat.com>
+	<20181217162701.nzdqhccpnhypj2z7@kamzik.brq.redhat.com>
+	<f253b6f6-2d2c-1e75-75ee-0dd0072924d1@redhat.com>
+	<20181217182546.zym4jhmambkzyigi@kamzik.brq.redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <efbeed1b-2941-dce1-f8e9-14c05733e01e@redhat.com>
+Date: Tue, 18 Dec 2018 11:54:32 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181218115015.1564d0a2@bahia.lan>
+In-Reply-To: <20181217182546.zym4jhmambkzyigi@kamzik.brq.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] spapr: Add H-Call
- H_HOME_NODE_ASSOCIATIVITY
+Subject: Re: [Qemu-devel] [PATCH-for-4.0 v2 2/2] hw/arm/virt-acpi-build:
+ IORT Update for revision D
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +28,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, shameerali.kolothum.thodi@huawei.com, shannon.zhaosl@gmail.com, qemu-arm@nongnu.org, eric.auger.pro@gmail.com
 
-On 18/12/2018 11:50, Greg Kurz wrote:
-> On Tue, 18 Dec 2018 11:00:01 +0100
-> Laurent Vivier <lvivier@redhat.com> wrote:
+Hi Drew,
+
+On 12/17/18 7:25 PM, Andrew Jones wrote:
+> On Mon, Dec 17, 2018 at 05:49:02PM +0100, Auger Eric wrote:
+>> Hi Drew,
+>>
+>> On 12/17/18 5:27 PM, Andrew Jones wrote:
+>>> On Thu, Dec 06, 2018 at 06:07:33PM +0100, Eric Auger wrote:
+>>>> Let's update the structs according to revision D of the IORT
+>>>> specification and set the IORT node revision fields.
+>>>>
+>>>> In IORT smmuv3 node: the new proximity field is not used as
+>>>> the proximity domain valid flag is not set. The new DeviceId
+>>>> mapping index is not used either as all the SMMU control
+>>>> interrupts are GSIV based.
+>>>>
+>>>> In IORT RC node: the new memory address size limit field is
+>>>> set to 64 bits.
+>>>>
+>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>
+>>>> ---
+>>>>
+>>>> v1 -> v2:
+>>>> - separate patches for SMMUv3 DMA coherency issue and struct
+>>>>   update to revision D.
+>>>> - revision fields set
+>>>> ---
+>>>>  hw/arm/virt-acpi-build.c    |  4 ++++
+>>>>  include/hw/acpi/acpi-defs.h | 10 +++++++++-
+>>>>  2 files changed, 13 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+>>>> index aa177ba64d..a34a0958a5 100644
+>>>> --- a/hw/arm/virt-acpi-build.c
+>>>> +++ b/hw/arm/virt-acpi-build.c
+>>>> @@ -423,6 +423,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>>>>       */
+>>>>      iort_node_offset = sizeof(*iort);
+>>>>      iort->node_offset = cpu_to_le32(iort_node_offset);
+>>>> +    iort->revision = 0;
+>>>>  
+>>>>      /* ITS group node */
+>>>>      node_size =  sizeof(*its) + sizeof(uint32_t);
+>>>> @@ -445,6 +446,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>>>>  
+>>>>          smmu->type = ACPI_IORT_NODE_SMMU_V3;
+>>>>          smmu->length = cpu_to_le16(node_size);
+>>>> +        smmu->revision = cpu_to_le32(2);
+>>>>          smmu->mapping_count = cpu_to_le32(1);
+>>>>          smmu->mapping_offset = cpu_to_le32(sizeof(*smmu));
+>>>>          smmu->base_address = cpu_to_le64(vms->memmap[VIRT_SMMU].base);
+>>>> @@ -470,6 +472,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>>>>  
+>>>>      rc->type = ACPI_IORT_NODE_PCI_ROOT_COMPLEX;
+>>>>      rc->length = cpu_to_le16(node_size);
+>>>> +    rc->revision = cpu_to_le32(1);
+>>>>      rc->mapping_count = cpu_to_le32(1);
+>>>>      rc->mapping_offset = cpu_to_le32(sizeof(*rc));
+>>>>  
+>>>> @@ -477,6 +480,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>>>>      rc->memory_properties.cache_coherency = cpu_to_le32(1);
+>>>>      rc->memory_properties.memory_flags = 0x3; /* CCA = CPM = DCAS = 1 */
+>>>>      rc->pci_segment_number = 0; /* MCFG pci_segment */
+>>>> +    rc->memory_address_limit = 64;
+>>>
+>>> Hmmm... IIUC this provides the size of the IOVA space. When it's 64 the
+>>> size of the space is U64_MAX, which gets added to the DMA base (also 64
+>>> bits) when calculating things like the last PFN. It seems strange to use
+>>> a value that will surely overflow those calculations. Is it common to
+>>> put 64 here? Can you elaborate on this?
+>>
+>> I looked at drivers/acpi/arm64/iort.c nc_dma_get_range.
+>> There you can find
+>>
+>>         *size = ncomp->memory_address_limit >= 64 ? U64_MAX :
+>>                         1ULL<<ncomp->memory_address_limit;
+>>
+>> So I was expecting the value "64" to be properly handled by the kernel.
 > 
->> On 18/12/2018 10:23, Greg Kurz wrote:
->>> On Tue, 18 Dec 2018 08:50:00 +0100
-...
->>> Also, even if linux only seems to call this with 0x1, this is a
->>> limitation from a LoPAPR standpoint. Not sure H_PARAMETER is the
->>> appropriate return value if flags is 0x2 since the guest did
->>> nothing wrong... I'd rather return H_FUNCTION in this case.  
->>
->> The doc says:
->>
->>   H_Function:  The function is not supported
->>   H_Parameter: Unsupported flag parameter value
->>
->> in that case function is supported but not the flag, so I think
->> H_PARAMETER is a better choice.
->>
+> I traced the code further and see that the size gets added to the u64
+> dma base without any special checks in both iort_dma_setup() and
+> iommu_dma_init_domain(). Also iommu_dma_init_domain() function has this
+> comment
 > 
-> Well... neither LoPAPR, nor IBM confidential PAPR+ do say anything
-> about partial support for this hcall. If the guest was to use the
-> flags == 0x2 variant, eg, some closed-source OS supporting PAPR,
-> it could be legitimately confused to get an H_PARAMETER error when
-> passing supposedly valid parameters... how to cope with that ?
-> On the other hand, if QEMU cannot honor the flags == 0x2 variant
-> and returns H_FUNCTION then the OS can recover since it is
-> required by the specification.
+>  * @base and @size should be exact multiples of IOMMU page granularity to
+>  * avoid rounding surprises. If necessary, we reserve the page at address 0
+>  * to ensure it is an invalid IOVA. It is safe to reinitialise a domain, but
+>  * any change which could make prior IOVAs invalid will fail.
+> 
+> U64_MAX is not a multiple of any page size. Maybe that U64_MAX assignment
+> is a kernel bug?
+Yes most probably the kernel should check address wraps and alignment.
+Do you want to send a kernel patch yourself or shall I do?
+> 
+> 
+>> If one decides to select something less than the whole range, which
+>> value would you suggest?
+> 
+> I don't know. Isn't it host/guest/device specific? Should we ask KVM what
+> the supported IPA is first? What kind of values are showing up in the
+> IORTs of real hardware?
+Digging into https://lkml.org/lkml/2017/7/31/472, the field is motivated
+for cases where the bus connecting devices to the IOMMU is smaller in
+size than the IOMMU input address bits. Architecturally the SMMU input
+address space is 64 bits. As the vSMMUv3 only implements stage 1, the
+input address is treated as a VA and when bypassed as intermediate
+physical address.
 
-You have certainly access to more information than I have, so I'll
-change H_PARAMETER to H_FUNCTION.
+My understanding is the VAS (VA size) is max 2x52bits=53 bits for
+ARMv8.2. IPA is max 52 bits for 8.2.
 
-Thanks,
-Laurent
+But there are cases where the 64b upper byte is used (when TBI is set)
+in the translation. I still feel difficult to understand SMMU spec 3.4.1
+chapter (Input address size and Virtual Address size).
+
+But anyway I think the kernel should support setting the value to 64bits.
+
+The machines I have access to have Rev 0 IORT table so this field is not
+used :-(
+
+Thanks
+
+Eric
+
+
+
+> 
+>>>
+>>>>  
+>>>>      /* Identity RID mapping covering the whole input RID range */
+>>>>      idmap = &rc->id_mapping_array[0];
+>>>> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+>>>> index 532eaf79bd..b4a5104367 100644
+>>>> --- a/include/hw/acpi/acpi-defs.h
+>>>> +++ b/include/hw/acpi/acpi-defs.h
+>>>> @@ -628,7 +628,11 @@ struct AcpiIortItsGroup {
+>>>>  } QEMU_PACKED;
+>>>>  typedef struct AcpiIortItsGroup AcpiIortItsGroup;
+>>>>  
+>>>> -#define ACPI_IORT_SMMU_V3_COHACC_OVERRIDE 1
+>>>> +enum {
+>>>> +    ACPI_IORT_SMMU_V3_COHACC_OVERRIDE = 1 << 0,
+>>>> +    ACPI_IORT_SMMU_V3_HTTU_OVERRIDE   = 3 << 1,
+>>>> +    ACPI_IORT_SMMU_V3_PXM_VALID       = 1 << 3
+>>>> +};
+>>>
+>>> We don't usually add flag definitions until we need them. Indeed it'll
+>>> just be more code to delete when switching to the aml_append* API.
+>>
+>> The rationale was that those flags becomes usable with this revision so
+>> I decided to expose them. Now I don't have a strong opinion here.
+> 
+> I'd drop the change then.
+> 
+> Thanks,
+> drew
+> 
