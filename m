@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gZJw0-0008Vd-8e
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 13:17:40 -0500
+	(envelope-from <armbru@redhat.com>) id 1gZJwD-0008Q9-Ur
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 13:17:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gZJlV-0006HW-72
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 13:06:48 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:55687)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gZJlU-0006DW-ML
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 13:06:45 -0500
-Received: by mail-wm1-f65.google.com with SMTP id y139so3554017wmc.5
-	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 10:06:44 -0800 (PST)
-References: <20181218164348.7127-1-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <475eccc8-4132-4c16-ac7e-cbec9d67902c@redhat.com>
-Date: Tue, 18 Dec 2018 19:06:40 +0100
+	(envelope-from <armbru@redhat.com>) id 1gZJgX-0006LD-NO
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 13:01:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34314)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gZJgX-0005fl-Cu
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 13:01:37 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BED6C3C2CCC
+	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 18:01:21 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181216140902.23986-1-marcandre.lureau@redhat.com>
+	<20181216140902.23986-12-marcandre.lureau@redhat.com>
+Date: Tue, 18 Dec 2018 19:01:19 +0100
+In-Reply-To: <20181216140902.23986-12-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Sun, 16 Dec 2018
+	18:09:00 +0400")
+Message-ID: <87r2eed89c.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20181218164348.7127-1-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] target/arm: Convert ARM_TBFLAG_* to
- FIELDs
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 11/13] qapi: make query-cpu-definitions
+ depend on specific targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,400 +36,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 12/18/18 5:43 PM, Richard Henderson wrote:
-> Use "register" TBFLAG_ANY to indicate shared state between
-> A32 and A64, and "registers" TBFLAG_A32 & TBFLAG_A64 for
-> fields that are specific to the given cpu state.
-> 
-> Move ARM_TBFLAG_BE to shared state, instead of its current
-> placement within "Bit usage when in AArch32 state".
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
-> 
-> v2: Rebase on master, rather than a random development branch.
-> 
-> ---
->  target/arm/cpu.h           | 102 ++++++++-----------------------------
->  target/arm/helper.c        |  49 +++++++++---------
->  target/arm/translate-a64.c |  22 ++++----
->  target/arm/translate.c     |  40 ++++++++-------
->  4 files changed, 78 insertions(+), 135 deletions(-)
-> 
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index c943f35dd9..2f23953a17 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -2944,102 +2944,40 @@ static inline bool arm_cpu_data_is_big_endian(CPUARMState *env)
->   * We put flags which are shared between 32 and 64 bit mode at the top
->   * of the word, and flags which apply to only one mode at the bottom.
->   */
-> -#define ARM_TBFLAG_AARCH64_STATE_SHIFT 31
-> -#define ARM_TBFLAG_AARCH64_STATE_MASK  (1U << ARM_TBFLAG_AARCH64_STATE_SHIFT)
-> -#define ARM_TBFLAG_MMUIDX_SHIFT 28
-> -#define ARM_TBFLAG_MMUIDX_MASK (0x7 << ARM_TBFLAG_MMUIDX_SHIFT)
-> -#define ARM_TBFLAG_SS_ACTIVE_SHIFT 27
-> -#define ARM_TBFLAG_SS_ACTIVE_MASK (1 << ARM_TBFLAG_SS_ACTIVE_SHIFT)
-> -#define ARM_TBFLAG_PSTATE_SS_SHIFT 26
-> -#define ARM_TBFLAG_PSTATE_SS_MASK (1 << ARM_TBFLAG_PSTATE_SS_SHIFT)
-> +FIELD(TBFLAG_ANY, AARCH64_STATE, 31, 1)
-> +FIELD(TBFLAG_ANY, MMUIDX, 28, 3)
-> +FIELD(TBFLAG_ANY, SS_ACTIVE, 27, 1)
-> +FIELD(TBFLAG_ANY, PSTATE_SS, 26, 1)
->  /* Target EL if we take a floating-point-disabled exception */
-> -#define ARM_TBFLAG_FPEXC_EL_SHIFT 24
-> -#define ARM_TBFLAG_FPEXC_EL_MASK (0x3 << ARM_TBFLAG_FPEXC_EL_SHIFT)
-> +FIELD(TBFLAG_ANY, FPEXC_EL, 24, 2)
-> +FIELD(TBFLAG_ANY, BE, 23, 1)
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-We now share the BigEndian flag, OK, it makes sens.
+> It depends on TARGET_PPC || TARGET_ARM || TARGET_I386 || TARGET_S390X.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> Acked-by: Cornelia Huck <cohuck@redhat.com>
+[...]
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 18579bc5e8..dc0a7413a4 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -36,6 +36,7 @@
+>  #include "qapi/error.h"
+>  #include "qapi/qapi-visit-misc.h"
+>  #include "qapi/qapi-visit-run-state.h"
+> +#include "qapi/target-qapi-commands.h"
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+You already added this one in the previous patch.
 
->  
->  /* Bit usage when in AArch32 state: */
-> -#define ARM_TBFLAG_THUMB_SHIFT      0
-> -#define ARM_TBFLAG_THUMB_MASK       (1 << ARM_TBFLAG_THUMB_SHIFT)
-> -#define ARM_TBFLAG_VECLEN_SHIFT     1
-> -#define ARM_TBFLAG_VECLEN_MASK      (0x7 << ARM_TBFLAG_VECLEN_SHIFT)
-> -#define ARM_TBFLAG_VECSTRIDE_SHIFT  4
-> -#define ARM_TBFLAG_VECSTRIDE_MASK   (0x3 << ARM_TBFLAG_VECSTRIDE_SHIFT)
-> -#define ARM_TBFLAG_VFPEN_SHIFT      7
-> -#define ARM_TBFLAG_VFPEN_MASK       (1 << ARM_TBFLAG_VFPEN_SHIFT)
-> -#define ARM_TBFLAG_CONDEXEC_SHIFT   8
-> -#define ARM_TBFLAG_CONDEXEC_MASK    (0xff << ARM_TBFLAG_CONDEXEC_SHIFT)
-> -#define ARM_TBFLAG_SCTLR_B_SHIFT    16
-> -#define ARM_TBFLAG_SCTLR_B_MASK     (1 << ARM_TBFLAG_SCTLR_B_SHIFT)
-> +FIELD(TBFLAG_A32, THUMB, 0, 1)
-> +FIELD(TBFLAG_A32, VECLEN, 1, 3)
-> +FIELD(TBFLAG_A32, VECSTRIDE, 4, 2)
-> +FIELD(TBFLAG_A32, VFPEN, 7, 1)
-> +FIELD(TBFLAG_A32, CONDEXEC, 8, 8)
-> +FIELD(TBFLAG_A32, SCTLR_B, 16, 1)
->  /* We store the bottom two bits of the CPAR as TB flags and handle
->   * checks on the other bits at runtime
->   */
-> -#define ARM_TBFLAG_XSCALE_CPAR_SHIFT 17
-> -#define ARM_TBFLAG_XSCALE_CPAR_MASK (3 << ARM_TBFLAG_XSCALE_CPAR_SHIFT)
-> +FIELD(TBFLAG_A32, XSCALE_CPAR, 17, 2)
->  /* Indicates whether cp register reads and writes by guest code should access
->   * the secure or nonsecure bank of banked registers; note that this is not
->   * the same thing as the current security state of the processor!
->   */
-> -#define ARM_TBFLAG_NS_SHIFT         19
-> -#define ARM_TBFLAG_NS_MASK          (1 << ARM_TBFLAG_NS_SHIFT)
-> -#define ARM_TBFLAG_BE_DATA_SHIFT    20
-> -#define ARM_TBFLAG_BE_DATA_MASK     (1 << ARM_TBFLAG_BE_DATA_SHIFT)
-> +FIELD(TBFLAG_A32, NS, 19, 1)
->  /* For M profile only, Handler (ie not Thread) mode */
-> -#define ARM_TBFLAG_HANDLER_SHIFT    21
-> -#define ARM_TBFLAG_HANDLER_MASK     (1 << ARM_TBFLAG_HANDLER_SHIFT)
-> +FIELD(TBFLAG_A32, HANDLER, 21, 1)
->  /* For M profile only, whether we should generate stack-limit checks */
-> -#define ARM_TBFLAG_STACKCHECK_SHIFT 22
-> -#define ARM_TBFLAG_STACKCHECK_MASK  (1 << ARM_TBFLAG_STACKCHECK_SHIFT)
-> +FIELD(TBFLAG_A32, STACKCHECK, 22, 1)
->  
->  /* Bit usage when in AArch64 state */
-> -#define ARM_TBFLAG_TBI0_SHIFT 0        /* TBI0 for EL0/1 or TBI for EL2/3 */
-> -#define ARM_TBFLAG_TBI0_MASK (0x1ull << ARM_TBFLAG_TBI0_SHIFT)
-> -#define ARM_TBFLAG_TBI1_SHIFT 1        /* TBI1 for EL0/1  */
-> -#define ARM_TBFLAG_TBI1_MASK (0x1ull << ARM_TBFLAG_TBI1_SHIFT)
-> -#define ARM_TBFLAG_SVEEXC_EL_SHIFT  2
-> -#define ARM_TBFLAG_SVEEXC_EL_MASK   (0x3 << ARM_TBFLAG_SVEEXC_EL_SHIFT)
-> -#define ARM_TBFLAG_ZCR_LEN_SHIFT    4
-> -#define ARM_TBFLAG_ZCR_LEN_MASK     (0xf << ARM_TBFLAG_ZCR_LEN_SHIFT)
-> -
-> -/* some convenience accessor macros */
-> -#define ARM_TBFLAG_AARCH64_STATE(F) \
-> -    (((F) & ARM_TBFLAG_AARCH64_STATE_MASK) >> ARM_TBFLAG_AARCH64_STATE_SHIFT)
-> -#define ARM_TBFLAG_MMUIDX(F) \
-> -    (((F) & ARM_TBFLAG_MMUIDX_MASK) >> ARM_TBFLAG_MMUIDX_SHIFT)
-> -#define ARM_TBFLAG_SS_ACTIVE(F) \
-> -    (((F) & ARM_TBFLAG_SS_ACTIVE_MASK) >> ARM_TBFLAG_SS_ACTIVE_SHIFT)
-> -#define ARM_TBFLAG_PSTATE_SS(F) \
-> -    (((F) & ARM_TBFLAG_PSTATE_SS_MASK) >> ARM_TBFLAG_PSTATE_SS_SHIFT)
-> -#define ARM_TBFLAG_FPEXC_EL(F) \
-> -    (((F) & ARM_TBFLAG_FPEXC_EL_MASK) >> ARM_TBFLAG_FPEXC_EL_SHIFT)
-> -#define ARM_TBFLAG_THUMB(F) \
-> -    (((F) & ARM_TBFLAG_THUMB_MASK) >> ARM_TBFLAG_THUMB_SHIFT)
-> -#define ARM_TBFLAG_VECLEN(F) \
-> -    (((F) & ARM_TBFLAG_VECLEN_MASK) >> ARM_TBFLAG_VECLEN_SHIFT)
-> -#define ARM_TBFLAG_VECSTRIDE(F) \
-> -    (((F) & ARM_TBFLAG_VECSTRIDE_MASK) >> ARM_TBFLAG_VECSTRIDE_SHIFT)
-> -#define ARM_TBFLAG_VFPEN(F) \
-> -    (((F) & ARM_TBFLAG_VFPEN_MASK) >> ARM_TBFLAG_VFPEN_SHIFT)
-> -#define ARM_TBFLAG_CONDEXEC(F) \
-> -    (((F) & ARM_TBFLAG_CONDEXEC_MASK) >> ARM_TBFLAG_CONDEXEC_SHIFT)
-> -#define ARM_TBFLAG_SCTLR_B(F) \
-> -    (((F) & ARM_TBFLAG_SCTLR_B_MASK) >> ARM_TBFLAG_SCTLR_B_SHIFT)
-> -#define ARM_TBFLAG_XSCALE_CPAR(F) \
-> -    (((F) & ARM_TBFLAG_XSCALE_CPAR_MASK) >> ARM_TBFLAG_XSCALE_CPAR_SHIFT)
-> -#define ARM_TBFLAG_NS(F) \
-> -    (((F) & ARM_TBFLAG_NS_MASK) >> ARM_TBFLAG_NS_SHIFT)
-> -#define ARM_TBFLAG_BE_DATA(F) \
-> -    (((F) & ARM_TBFLAG_BE_DATA_MASK) >> ARM_TBFLAG_BE_DATA_SHIFT)
-> -#define ARM_TBFLAG_HANDLER(F) \
-> -    (((F) & ARM_TBFLAG_HANDLER_MASK) >> ARM_TBFLAG_HANDLER_SHIFT)
-> -#define ARM_TBFLAG_STACKCHECK(F) \
-> -    (((F) & ARM_TBFLAG_STACKCHECK_MASK) >> ARM_TBFLAG_STACKCHECK_SHIFT)
-> -#define ARM_TBFLAG_TBI0(F) \
-> -    (((F) & ARM_TBFLAG_TBI0_MASK) >> ARM_TBFLAG_TBI0_SHIFT)
-> -#define ARM_TBFLAG_TBI1(F) \
-> -    (((F) & ARM_TBFLAG_TBI1_MASK) >> ARM_TBFLAG_TBI1_SHIFT)
-> -#define ARM_TBFLAG_SVEEXC_EL(F) \
-> -    (((F) & ARM_TBFLAG_SVEEXC_EL_MASK) >> ARM_TBFLAG_SVEEXC_EL_SHIFT)
-> -#define ARM_TBFLAG_ZCR_LEN(F) \
-> -    (((F) & ARM_TBFLAG_ZCR_LEN_MASK) >> ARM_TBFLAG_ZCR_LEN_SHIFT)
-> +FIELD(TBFLAG_A64, TBI0, 0, 1)
-> +FIELD(TBFLAG_A64, TBI1, 1, 1)
-> +FIELD(TBFLAG_A64, SVEEXC_EL, 2, 2)
-> +FIELD(TBFLAG_A64, ZCR_LEN, 4, 4)
->  
->  static inline bool bswap_code(bool sctlr_b)
->  {
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 644599b29d..cb8bc58eb5 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -12955,16 +12955,18 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
->      ARMMMUIdx mmu_idx = core_to_arm_mmu_idx(env, cpu_mmu_index(env, false));
->      int current_el = arm_current_el(env);
->      int fp_el = fp_exception_el(env, current_el);
-> -    uint32_t flags;
-> +    uint32_t flags = 0;
->  
->      if (is_a64(env)) {
->          ARMCPU *cpu = arm_env_get_cpu(env);
->  
->          *pc = env->pc;
-> -        flags = ARM_TBFLAG_AARCH64_STATE_MASK;
-> +        flags = FIELD_DP32(flags, TBFLAG_ANY, AARCH64_STATE, 1);
->          /* Get control bits for tagged addresses */
-> -        flags |= (arm_regime_tbi0(env, mmu_idx) << ARM_TBFLAG_TBI0_SHIFT);
-> -        flags |= (arm_regime_tbi1(env, mmu_idx) << ARM_TBFLAG_TBI1_SHIFT);
-> +        flags = FIELD_DP32(flags, TBFLAG_A64, TBI0,
-> +                           arm_regime_tbi0(env, mmu_idx));
-> +        flags = FIELD_DP32(flags, TBFLAG_A64, TBI1,
-> +                           arm_regime_tbi1(env, mmu_idx));
->  
->          if (cpu_isar_feature(aa64_sve, cpu)) {
->              int sve_el = sve_exception_el(env, current_el);
-> @@ -12978,28 +12980,25 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
->              } else {
->                  zcr_len = sve_zcr_len_for_el(env, current_el);
->              }
-> -            flags |= sve_el << ARM_TBFLAG_SVEEXC_EL_SHIFT;
-> -            flags |= zcr_len << ARM_TBFLAG_ZCR_LEN_SHIFT;
-> +            flags = FIELD_DP32(flags, TBFLAG_A64, SVEEXC_EL, sve_el);
-> +            flags = FIELD_DP32(flags, TBFLAG_A64, ZCR_LEN, zcr_len);
->          }
->      } else {
->          *pc = env->regs[15];
-> -        flags = (env->thumb << ARM_TBFLAG_THUMB_SHIFT)
-> -            | (env->vfp.vec_len << ARM_TBFLAG_VECLEN_SHIFT)
-> -            | (env->vfp.vec_stride << ARM_TBFLAG_VECSTRIDE_SHIFT)
-> -            | (env->condexec_bits << ARM_TBFLAG_CONDEXEC_SHIFT)
-> -            | (arm_sctlr_b(env) << ARM_TBFLAG_SCTLR_B_SHIFT);
-> -        if (!(access_secure_reg(env))) {
-> -            flags |= ARM_TBFLAG_NS_MASK;
-> -        }
-> +        flags = FIELD_DP32(flags, TBFLAG_A32, THUMB, env->thumb);
-> +        flags = FIELD_DP32(flags, TBFLAG_A32, VECLEN, env->vfp.vec_len);
-> +        flags = FIELD_DP32(flags, TBFLAG_A32, VECSTRIDE, env->vfp.vec_stride);
-> +        flags = FIELD_DP32(flags, TBFLAG_A32, CONDEXEC, env->condexec_bits);
-> +        flags = FIELD_DP32(flags, TBFLAG_A32, SCTLR_B, arm_sctlr_b(env));
-> +        flags = FIELD_DP32(flags, TBFLAG_A32, NS, !access_secure_reg(env));
->          if (env->vfp.xregs[ARM_VFP_FPEXC] & (1 << 30)
->              || arm_el_is_aa64(env, 1)) {
-> -            flags |= ARM_TBFLAG_VFPEN_MASK;
-> +            flags = FIELD_DP32(flags, TBFLAG_A32, VFPEN, 1);
->          }
-> -        flags |= (extract32(env->cp15.c15_cpar, 0, 2)
-> -                  << ARM_TBFLAG_XSCALE_CPAR_SHIFT);
-> +        flags = FIELD_DP32(flags, TBFLAG_A32, XSCALE_CPAR, env->cp15.c15_cpar);
->      }
->  
-> -    flags |= (arm_to_core_mmu_idx(mmu_idx) << ARM_TBFLAG_MMUIDX_SHIFT);
-> +    flags = FIELD_DP32(flags, TBFLAG_ANY, MMUIDX, arm_to_core_mmu_idx(mmu_idx));
->  
->      /* The SS_ACTIVE and PSTATE_SS bits correspond to the state machine
->       * states defined in the ARM ARM for software singlestep:
-> @@ -13009,24 +13008,24 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
->       *     1            1       Active-not-pending
->       */
->      if (arm_singlestep_active(env)) {
-> -        flags |= ARM_TBFLAG_SS_ACTIVE_MASK;
-> +        flags = FIELD_DP32(flags, TBFLAG_ANY, SS_ACTIVE, 1);
->          if (is_a64(env)) {
->              if (env->pstate & PSTATE_SS) {
-> -                flags |= ARM_TBFLAG_PSTATE_SS_MASK;
-> +                flags = FIELD_DP32(flags, TBFLAG_ANY, PSTATE_SS, 1);
->              }
->          } else {
->              if (env->uncached_cpsr & PSTATE_SS) {
-> -                flags |= ARM_TBFLAG_PSTATE_SS_MASK;
-> +                flags = FIELD_DP32(flags, TBFLAG_ANY, PSTATE_SS, 1);
->              }
->          }
->      }
->      if (arm_cpu_data_is_big_endian(env)) {
-> -        flags |= ARM_TBFLAG_BE_DATA_MASK;
-> +        flags = FIELD_DP32(flags, TBFLAG_ANY, BE, 1);
->      }
-> -    flags |= fp_el << ARM_TBFLAG_FPEXC_EL_SHIFT;
-> +    flags = FIELD_DP32(flags, TBFLAG_ANY, FPEXC_EL, fp_el);
->  
->      if (arm_v7m_is_handler_mode(env)) {
-> -        flags |= ARM_TBFLAG_HANDLER_MASK;
-> +        flags = FIELD_DP32(flags, TBFLAG_A32, HANDLER, 1);
->      }
->  
->      /* v8M always applies stack limit checks unless CCR.STKOFHFNMIGN is
-> @@ -13036,7 +13035,7 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
->          arm_feature(env, ARM_FEATURE_M) &&
->          !((mmu_idx  & ARM_MMU_IDX_M_NEGPRI) &&
->            (env->v7m.ccr[env->v7m.secure] & R_V7M_CCR_STKOFHFNMIGN_MASK))) {
-> -        flags |= ARM_TBFLAG_STACKCHECK_MASK;
-> +        flags = FIELD_DP32(flags, TBFLAG_A32, STACKCHECK, 1);
->      }
->  
->      *pflags = flags;
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index e1da1e4d6f..011d64c573 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -13380,7 +13380,8 @@ static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
->      DisasContext *dc = container_of(dcbase, DisasContext, base);
->      CPUARMState *env = cpu->env_ptr;
->      ARMCPU *arm_cpu = arm_env_get_cpu(env);
-> -    int bound;
-> +    uint32_t tb_flags = dc->base.tb->flags;
-> +    int bound, core_mmu_idx;
->  
->      dc->isar = &arm_cpu->isar;
->      dc->pc = dc->base.pc_first;
-> @@ -13394,19 +13395,20 @@ static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
->                                 !arm_el_is_aa64(env, 3);
->      dc->thumb = 0;
->      dc->sctlr_b = 0;
-> -    dc->be_data = ARM_TBFLAG_BE_DATA(dc->base.tb->flags) ? MO_BE : MO_LE;
-> +    dc->be_data = FIELD_EX32(tb_flags, TBFLAG_ANY, BE) ? MO_BE : MO_LE;
->      dc->condexec_mask = 0;
->      dc->condexec_cond = 0;
-> -    dc->mmu_idx = core_to_arm_mmu_idx(env, ARM_TBFLAG_MMUIDX(dc->base.tb->flags));
-> -    dc->tbi0 = ARM_TBFLAG_TBI0(dc->base.tb->flags);
-> -    dc->tbi1 = ARM_TBFLAG_TBI1(dc->base.tb->flags);
-> +    core_mmu_idx = FIELD_EX32(tb_flags, TBFLAG_ANY, MMUIDX);
-> +    dc->mmu_idx = core_to_arm_mmu_idx(env, core_mmu_idx);
-> +    dc->tbi0 = FIELD_EX32(tb_flags, TBFLAG_A64, TBI0);
-> +    dc->tbi1 = FIELD_EX32(tb_flags, TBFLAG_A64, TBI1);
->      dc->current_el = arm_mmu_idx_to_el(dc->mmu_idx);
->  #if !defined(CONFIG_USER_ONLY)
->      dc->user = (dc->current_el == 0);
->  #endif
-> -    dc->fp_excp_el = ARM_TBFLAG_FPEXC_EL(dc->base.tb->flags);
-> -    dc->sve_excp_el = ARM_TBFLAG_SVEEXC_EL(dc->base.tb->flags);
-> -    dc->sve_len = (ARM_TBFLAG_ZCR_LEN(dc->base.tb->flags) + 1) * 16;
-> +    dc->fp_excp_el = FIELD_EX32(tb_flags, TBFLAG_ANY, FPEXC_EL);
-> +    dc->sve_excp_el = FIELD_EX32(tb_flags, TBFLAG_A64, SVEEXC_EL);
-> +    dc->sve_len = (FIELD_EX32(tb_flags, TBFLAG_A64, ZCR_LEN) + 1) * 16;
->      dc->vec_len = 0;
->      dc->vec_stride = 0;
->      dc->cp_regs = arm_cpu->cp_regs;
-> @@ -13427,8 +13429,8 @@ static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
->       *   emit code to generate a software step exception
->       *   end the TB
->       */
-> -    dc->ss_active = ARM_TBFLAG_SS_ACTIVE(dc->base.tb->flags);
-> -    dc->pstate_ss = ARM_TBFLAG_PSTATE_SS(dc->base.tb->flags);
-> +    dc->ss_active = FIELD_EX32(tb_flags, TBFLAG_ANY, SS_ACTIVE);
-> +    dc->pstate_ss = FIELD_EX32(tb_flags, TBFLAG_ANY, PSTATE_SS);
->      dc->is_ldex = false;
->      dc->ss_same_el = (arm_debug_target_el(env) == dc->current_el);
->  
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 7c4675ffd8..5aa567351f 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -13021,6 +13021,8 @@ static void arm_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
->      DisasContext *dc = container_of(dcbase, DisasContext, base);
->      CPUARMState *env = cs->env_ptr;
->      ARMCPU *cpu = arm_env_get_cpu(env);
-> +    uint32_t tb_flags = dc->base.tb->flags;
-> +    uint32_t condexec, core_mmu_idx;
->  
->      dc->isar = &cpu->isar;
->      dc->pc = dc->base.pc_first;
-> @@ -13032,26 +13034,28 @@ static void arm_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
->       */
->      dc->secure_routed_to_el3 = arm_feature(env, ARM_FEATURE_EL3) &&
->                                 !arm_el_is_aa64(env, 3);
-> -    dc->thumb = ARM_TBFLAG_THUMB(dc->base.tb->flags);
-> -    dc->sctlr_b = ARM_TBFLAG_SCTLR_B(dc->base.tb->flags);
-> -    dc->be_data = ARM_TBFLAG_BE_DATA(dc->base.tb->flags) ? MO_BE : MO_LE;
-> -    dc->condexec_mask = (ARM_TBFLAG_CONDEXEC(dc->base.tb->flags) & 0xf) << 1;
-> -    dc->condexec_cond = ARM_TBFLAG_CONDEXEC(dc->base.tb->flags) >> 4;
-> -    dc->mmu_idx = core_to_arm_mmu_idx(env, ARM_TBFLAG_MMUIDX(dc->base.tb->flags));
-> +    dc->thumb = FIELD_EX32(tb_flags, TBFLAG_A32, THUMB);
-> +    dc->sctlr_b = FIELD_EX32(tb_flags, TBFLAG_A32, SCTLR_B);
-> +    dc->be_data = FIELD_EX32(tb_flags, TBFLAG_ANY, BE) ? MO_BE : MO_LE;
-> +    condexec = FIELD_EX32(tb_flags, TBFLAG_A32, CONDEXEC);
-> +    dc->condexec_mask = (condexec & 0xf) << 1;
-> +    dc->condexec_cond = condexec >> 4;
-> +    core_mmu_idx = FIELD_EX32(tb_flags, TBFLAG_ANY, MMUIDX);
-> +    dc->mmu_idx = core_to_arm_mmu_idx(env, core_mmu_idx);
->      dc->current_el = arm_mmu_idx_to_el(dc->mmu_idx);
->  #if !defined(CONFIG_USER_ONLY)
->      dc->user = (dc->current_el == 0);
->  #endif
-> -    dc->ns = ARM_TBFLAG_NS(dc->base.tb->flags);
-> -    dc->fp_excp_el = ARM_TBFLAG_FPEXC_EL(dc->base.tb->flags);
-> -    dc->vfp_enabled = ARM_TBFLAG_VFPEN(dc->base.tb->flags);
-> -    dc->vec_len = ARM_TBFLAG_VECLEN(dc->base.tb->flags);
-> -    dc->vec_stride = ARM_TBFLAG_VECSTRIDE(dc->base.tb->flags);
-> -    dc->c15_cpar = ARM_TBFLAG_XSCALE_CPAR(dc->base.tb->flags);
-> -    dc->v7m_handler_mode = ARM_TBFLAG_HANDLER(dc->base.tb->flags);
-> +    dc->ns = FIELD_EX32(tb_flags, TBFLAG_A32, NS);
-> +    dc->fp_excp_el = FIELD_EX32(tb_flags, TBFLAG_ANY, FPEXC_EL);
-> +    dc->vfp_enabled = FIELD_EX32(tb_flags, TBFLAG_A32, VFPEN);
-> +    dc->vec_len = FIELD_EX32(tb_flags, TBFLAG_A32, VECLEN);
-> +    dc->vec_stride = FIELD_EX32(tb_flags, TBFLAG_A32, VECSTRIDE);
-> +    dc->c15_cpar = FIELD_EX32(tb_flags, TBFLAG_A32, XSCALE_CPAR);
-> +    dc->v7m_handler_mode = FIELD_EX32(tb_flags, TBFLAG_A32, HANDLER);
->      dc->v8m_secure = arm_feature(env, ARM_FEATURE_M_SECURITY) &&
->          regime_is_secure(env, dc->mmu_idx);
-> -    dc->v8m_stackcheck = ARM_TBFLAG_STACKCHECK(dc->base.tb->flags);
-> +    dc->v8m_stackcheck = FIELD_EX32(tb_flags, TBFLAG_A32, STACKCHECK);
->      dc->cp_regs = cpu->cp_regs;
->      dc->features = env->features;
->  
-> @@ -13070,8 +13074,8 @@ static void arm_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
->       *   emit code to generate a software step exception
->       *   end the TB
->       */
-> -    dc->ss_active = ARM_TBFLAG_SS_ACTIVE(dc->base.tb->flags);
-> -    dc->pstate_ss = ARM_TBFLAG_PSTATE_SS(dc->base.tb->flags);
-> +    dc->ss_active = FIELD_EX32(tb_flags, TBFLAG_ANY, SS_ACTIVE);
-> +    dc->pstate_ss = FIELD_EX32(tb_flags, TBFLAG_ANY, PSTATE_SS);
->      dc->is_ldex = false;
->      dc->ss_same_el = false; /* Can't be true since EL_d must be AArch64 */
->  
-> @@ -13516,11 +13520,11 @@ void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
->      DisasContext dc;
->      const TranslatorOps *ops = &arm_translator_ops;
->  
-> -    if (ARM_TBFLAG_THUMB(tb->flags)) {
-> +    if (FIELD_EX32(tb->flags, TBFLAG_A32, THUMB)) {
->          ops = &thumb_translator_ops;
->      }
->  #ifdef TARGET_AARCH64
-> -    if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
-> +    if (FIELD_EX32(tb->flags, TBFLAG_ANY, AARCH64_STATE)) {
->          ops = &aarch64_translator_ops;
->      }
->  #endif
-> 
+>  #include "qapi/qmp/qdict.h"
+>  #include "qapi/qmp/qerror.h"
+>  #include "qapi/visitor.h"
+[...]
