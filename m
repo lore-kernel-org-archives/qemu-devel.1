@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZ6no-0003qQ-OA
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:16:19 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gZ6nm-0003vV-Pw
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:16:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZ6j4-0001hf-BA
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:11:23 -0500
-Date: Tue, 18 Dec 2018 15:11:08 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gZ6j4-0001hm-Bx
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:11:26 -0500
+Date: Tue, 18 Dec 2018 14:49:10 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181218041108.GH23604@umbus.fritz.box>
-References: <20181217223445.28594-1-clg@kaod.org>
+Message-ID: <20181218034910.GF23604@umbus.fritz.box>
+References: <20181214015520.20467-1-aik@ozlabs.ru>
+	<20181217062133.GK5597@umbus.fritz.box>
+	<20181218020924.GB23604@umbus.fritz.box>
+	<1e2449a7-d89b-3ca5-db66-7da34ff59a35@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="uJrvpPjGB3z5kYrA"
+	protocol="application/pgp-signature"; boundary="sDKAb4OeUBrWWL6P"
 Content-Disposition: inline
-In-Reply-To: <20181217223445.28594-1-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v9 0/7] ppc: support for the XIVE interrupt
- controller (POWER9)
+In-Reply-To: <1e2449a7-d89b-3ca5-db66-7da34ff59a35@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu v3] ppc/spapr: Receive and store
+ device tree blob from SLOF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,27 +27,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, gkurz@linux.ibm.com
 
 
---uJrvpPjGB3z5kYrA
-Content-Type: text/plain; charset=iso-8859-1
+--sDKAb4OeUBrWWL6P
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 17, 2018 at 11:34:38PM +0100, C=E9dric Le Goater wrote:
-> Hello,
+On Tue, Dec 18, 2018 at 02:04:54PM +1100, Alexey Kardashevskiy wrote:
 >=20
-> Here is the version 9 of the QEMU models adding support for the XIVE
-> interrupt controller to the sPAPR machine, under TCG only.=20
 >=20
-> The 'dual' machine, supporting both interrupt modes, is nearly complete,
-> only remains the question on the qirq array, which will be addressed
-> in early 2019 with the support for KVM.
+> On 18/12/2018 13:09, David Gibson wrote:
+> > On Mon, Dec 17, 2018 at 05:21:33PM +1100, David Gibson wrote:
+> >> On Fri, Dec 14, 2018 at 12:55:20PM +1100, Alexey Kardashevskiy wrote:
+> >>> SLOF receives a device tree and updates it with various properties
+> >>> before switching to the guest kernel and QEMU is not aware of any cha=
+nges
+> >>> made by SLOF. Since there is no real RTAS (QEMU implements it), it ma=
+kes
+> >>> sense to pass the SLOF final device tree to QEMU to let it implement
+> >>> RTAS related tasks better, such as PCI host bus adapter hotplug.
+> >>>
+> >>> Specifially, now QEMU can find out the actual XICS phandle (for PHB
+> >>> hotplug) and the RTAS linux,rtas-entry/base properties (for firmware
+> >>> assisted NMI - FWNMI).
+> >>>
+> >>> This stores the initial DT blob in the sPAPR machine and replaces it
+> >>> in the KVMPPC_H_UPDATE_DT (new private hypercall) handler.
+> >>>
+> >>> This adds an @update_dt_enabled machine property to allow backward
+> >>> migration.
+> >>>
+> >>> SLOF already has a hypercall since
+> >>> https://github.com/aik/SLOF/commit/e6fc84652c9c0073f9183
+> >>>
+> >>> This makes use of the new fdt_check_full() helper. In order to allow
+> >>> the configure script to pick the correct DTC version, this adjusts
+> >>> the DTC presense test.
+> >>>
+> >>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> >>
+> >> Applied, thanks.
+> >=20
+> > And now, unapplied.
+> >=20
+> > I don't know quite how, but somehow this patch is causing aarch64
+> > tests to SEGV.
+>=20
+>=20
+> /home/aik/p/qemu/configure --target-list=3Daarch64-softmmu
+> --source-path=3D/home/aik/p/qemu/ --disable-git-update --with-git=3Dfalse
+>    --enable-trace-backend=3Dlog
+>=20
+> and
+>=20
+> make -C /home/aik/pbuild/qemu-localhost-aarch64-rel/ -j24 check
+>=20
+> did not produce segv. I am running this all on a power8 box + ubuntu
+> 1804, what is your config?
 
-Ok, I've applied most of this lot.  I think that leaves my next pull
-request just waiting on the GETFIELD stuff.
+Hm, curious.  I'm using Fedora 29 on an x86 host.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -52,24 +96,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---uJrvpPjGB3z5kYrA
+--sDKAb4OeUBrWWL6P
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwYc1wACgkQbDjKyiDZ
-s5KUZhAA0h9a873BRuWGbkSWWt4rkfLC1M/Uy6anVm24IJulN/sRhkn8HRPHX4kB
-gQDkEuRZR7G9aVDSD1Irq9GJqZO6CmgoS6mxuSrdFsPM7vz7Etac7fnzaUNSC4OR
-8hEn9c1EvvQzAGJJKINjxA9392IhF2AE6k/oteMqrZd5mQLoEqe316mq6pCfHl+m
-G9bXJIDnhkBvibfXHSbRypME0MuY8BctVXiLflw3/umuhFB00zmqVTu2iYWpT7RW
-4OWP7ek5khkFpLUhryJqy5cqJZv54gktusgDoZ6HuIXwBVFcEAOl11EgjVTylUWP
-3imIauBF94mZEEoAN4yVSRFoxbU5MVluwKpuL8BGjhLZ2uoHPC0uHfTFLeSApn+4
-PTBzxxs1hzESyaWdN9FaIK/TTTwLqo7SnjxB2dRyrZMDgZkPao0aQ07o4gypAmfZ
-OgXCNaI9jYnv3YxgS1utINeTjnIX9FC2SPLXmaE6SBLMLT/bg22qQWw2ZVNl9TAa
-vXMEKUqDcQEqWLpbHFKIQha2BF9Y0pY6+dGmnZevopjUKI6aEXYpIFZVajqFo4X7
-AmSCxQxLBjorKTomaWxcITebeVfElJKrv8pf56vF/WRD57FjICVzYOjSrJAZW11l
-gI/atMH6F5crrag9fDrNP6J570LfhlHqe+aB6RBkiAlRAnQNUWc=
-=ofIS
+iQIyBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwYbjMACgkQbDjKyiDZ
+s5KrBQ/4qmTEvbiKuBvbd8J9vyksvius+zcbZx6e95ZbwrteTjqEMdFse5T8nu3G
+n50GeoCIlSJ3nVrO5CYRHWr/dnbXlr8oLa4xvYP+KGnTwlpTin8ojY91iDV9C+a+
+ibwUStj44WJBthhvL9A7f48CDe61hnulw1c3rEKzPy1UAbCD9+k1PtSX/nsPmlZZ
+Nwe7ga/UuO5hE6gBXDX0nIBN0XgVBvb32S1dES49uMLuGplXJQPPficcrJmdMbeg
+Bq4H2BrJl6uzpofmQ1kyDgTA7OREdfsEZCmeNkkm9kIuaSCq9rbXtE37Sc7j+mWk
+IDGfqRoBornRM6UT9ljUoZHx+qwYx4t/XT59fm7dyEbqpbpSHVzv+niVJ2acK4LY
+1OxIaGytz7m8HK3x0jtcxw6c8zfof4xeXVbQL+eXlIoFvR9+opj+g8bOLlo+rgZM
+SsNiqvG7mf6I1bR3EZZTACBCl/GYGMSZGFLpVsgE9tVa/3JY7t8kxYcCJtcffavE
+6YCK/gEr+enKzIEtqxRLT89D1ENHWnRbgUzN3vN9aAlxP2kN2dDYAEbqO6zZY4yH
+9AgG5fPksXZD6ix6u6MwXJLrjFjiAnYVx4SsYphIlYqa76N8LSfR6Q5h/GXWS2Sj
+kwn7zb3VX4L7dM6o5u8UN4qwuM8WcO3hhotXRTjzhsuHMYvMyQ==
+=gAd/
 -----END PGP SIGNATURE-----
 
---uJrvpPjGB3z5kYrA--
+--sDKAb4OeUBrWWL6P--
