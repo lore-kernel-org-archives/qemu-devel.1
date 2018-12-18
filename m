@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gZDER-00015C-He
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 06:08:14 -0500
+	(envelope-from <philmd@redhat.com>) id 1gZDEW-00015D-3t
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 06:08:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gZDCM-00014v-Hy
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 06:06:05 -0500
+	(envelope-from <philmd@redhat.com>) id 1gZDBf-0000fg-Md
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 06:05:21 -0500
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Tue, 18 Dec 2018 12:03:33 +0100
-Message-Id: <20181218110333.22558-4-philmd@redhat.com>
+Date: Tue, 18 Dec 2018 12:03:32 +0100
+Message-Id: <20181218110333.22558-3-philmd@redhat.com>
 In-Reply-To: <20181218110333.22558-1-philmd@redhat.com>
 References: <20181218110333.22558-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 3/3] migration: Replace strncpy() by
+Subject: [Qemu-devel] [PATCH v2 2/3] block/sheepdog: Replace strncpy() by
  strpadcpy(pad='\0')
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -35,44 +35,58 @@ GCC 8 added a -Wstringop-truncation warning:
 
 This new warning leads to compilation failures:
 
-    CC      migration/global_state.o
-  qemu/migration/global_state.c: In function 'global_state_store_running'=
-:
-  qemu/migration/global_state.c:45:5: error: 'strncpy' specified bound 10=
-0 equals destination size [-Werror=3Dstringop-truncation]
-       strncpy((char *)global_state.runstate, state, sizeof(global_state.=
-runstate));
-       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~~~
-  make: *** [qemu/rules.mak:69: migration/global_state.o] Error 1
+    CC      block/sheepdog.o
+  qemu/block/sheepdog.c: In function 'find_vdi_name':
+  qemu/block/sheepdog.c:1239:5: error: 'strncpy' specified bound 256 equa=
+ls destination size [-Werror=3Dstringop-truncation]
+       strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
+       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  make: *** [qemu/rules.mak:69: block/sheepdog.o] Error 1
 
-The runstate name doesn't require the strings to be NUL-terminated,
-therefore strncpy is the right function to use here.
+As described previous to the strncpy() calls, the use of strncpy() is
+correct here:
+
+    /* This pair of strncpy calls ensures that the buffer is zero-filled,
+     * which is desirable since we'll soon be sending those bytes, and
+     * don't want the send_req to read uninitialized data.
+     */
+    strncpy(buf, filename, SD_MAX_VDI_LEN);
+    strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
 
 We could add a #pragma GCC diagnostic ignored "-Wstringop-truncation"
 around, disable the warning globally using -Wno-stringop-truncation,
 but since QEMU provides the strpadcpy() which does the same purpose,
 simply use it to avoid the annoying warning.
 
+Reported-by: Howard Spoelstra <hsp.cat7@gmail.com>
+Buglink: https://bugs.launchpad.net/qemu/+bug/1803872
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- migration/global_state.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ block/sheepdog.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/migration/global_state.c b/migration/global_state.c
-index 8e8ab5c51e..c7e7618118 100644
---- a/migration/global_state.c
-+++ b/migration/global_state.c
-@@ -42,8 +42,8 @@ int global_state_store(void)
- void global_state_store_running(void)
- {
-     const char *state =3D RunState_str(RUN_STATE_RUNNING);
--    strncpy((char *)global_state.runstate,
--           state, sizeof(global_state.runstate));
-+    strpadcpy((char *)global_state.runstate,
-+              sizeof(global_state.runstate), state, '\0');
- }
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index 0125df9d49..72e1aef6ea 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -1231,12 +1231,12 @@ static int find_vdi_name(BDRVSheepdogState *s, co=
+nst char *filename,
+         return fd;
+     }
 =20
- bool global_state_received(void)
+-    /* This pair of strncpy calls ensures that the buffer is zero-filled=
+,
++    /* This pair of strpadcpy calls ensures that the buffer is zero-fill=
+ed,
+      * which is desirable since we'll soon be sending those bytes, and
+      * don't want the send_req to read uninitialized data.
+      */
+-    strncpy(buf, filename, SD_MAX_VDI_LEN);
+-    strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
++    strpadcpy(buf, SD_MAX_VDI_LEN, filename, '\0');
++    strpadcpy(buf + SD_MAX_VDI_LEN, SD_MAX_VDI_TAG_LEN, tag, '\0');
+=20
+     memset(&hdr, 0, sizeof(hdr));
+     if (lock) {
 --=20
 2.17.2
