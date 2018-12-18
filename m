@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gZAQI-00073x-7h
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:08:18 -0500
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gZAYj-0001WP-0i
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:16:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gZAQ5-0003xf-8T
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:08:08 -0500
-Received: from 4.mo179.mail-out.ovh.net ([46.105.36.149]:46318)
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gZAYf-0001Ky-QI
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:16:57 -0500
+Received: from mga12.intel.com ([192.55.52.136]:47266)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gZAQ4-0003tU-Vz
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:08:01 -0500
-Received: from player698.ha.ovh.net (unknown [10.109.146.175])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id A8A7E10D8AF
-	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 09:07:52 +0100 (CET)
-References: <20181217223445.28594-1-clg@kaod.org>
-	<20181217223445.28594-3-clg@kaod.org>
-	<20181218022339.GD23604@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <e441c825-ed91-0c36-f319-9e1a473ff2cb@kaod.org>
-Date: Tue, 18 Dec 2018 09:07:47 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181218022339.GD23604@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v9 2/7] target/ppc: replace
- __builtin_ffssl() by the equivalent ctz routines
+	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
+	id 1gZAYf-0001IF-GI
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:16:53 -0500
+From: Zhang Yi <yi.z.zhang@linux.intel.com>
+Date: Tue, 18 Dec 2018 16:16:44 +0800
+Message-Id: <cover.1545120100.git.yi.z.zhang@linux.intel.com>
+Subject: [Qemu-devel] [PATCH V7 0/6] nvdimm: support MAP_SYNC for
+ memory-backend-file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,74 +23,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: mst@redhat.com, peter.maydell@linaro.org, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, imammedo@redhat.com
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com, crosthwaite.peter@gmail.com, richard.henderson@linaro.org, xiaoguangrong.eric@gmail.com, Zhang Yi <yi.z.zhang@linux.intel.com>
 
-On 12/18/18 3:23 AM, David Gibson wrote:
-> On Mon, Dec 17, 2018 at 11:34:40PM +0100, C=E9dric Le Goater wrote:
->> And remove the intermediate MASK_TO_LSH macro which does not add any v=
-alue.
->>
->> This fixes a compile breakage on windows.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->=20
-> It's an improvement over what's there, but it still leaves macros
-> whose primary use would be for guest registers, but are typed
-> according to host values, which doesn't make much sense.
->=20
-> I think instead we should redefine your BE64 / BE32 variants in terms
-> of the existing extract*() and deposit*() primitives, and get rid of
-> the GETFIELD / SETFIELD macros.
+Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
+guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
+files on ext4/xfs file system mounted with '-o dax').
 
-I will get rid of the GETFIELD/SETFIELD macros and rewrite the BE64/BE32=20
-variants but I won't use the extract*() and deposit*(). I prefer to keep
-the same pattern, which is similar to shpc_get/set_status(). I will make=20
-the code clearer with static inlines.=20
+A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
+    https://patchwork.kernel.org/patch/10028151/
 
-I don't really like the names also. what about xive_(get/set)_field(32/64=
-) ? =20
+In order to make sure that the file metadata is in sync after a fault 
+while we are writing a shared DAX supporting backend files, this
+patch-set enables QEMU to use MAP_SYNC flag for memory-backend-dax-file.
 
-C.
-=20
->> ---
->>  target/ppc/cpu.h | 15 +++++++++------
->>  1 file changed, 9 insertions(+), 6 deletions(-)
->>
->> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
->> index 527181c0f09f..f4ef4f214564 100644
->> --- a/target/ppc/cpu.h
->> +++ b/target/ppc/cpu.h
->> @@ -78,18 +78,21 @@
->>                                   PPC_BIT32(bs))
->>  #define PPC_BITMASK8(bs, be)    ((PPC_BIT8(bs) - PPC_BIT8(be)) | PPC_=
-BIT8(bs))
->> =20
->> +/*
->> + * OPAL PPC bitmask field manipulation, used in XIVE, PHB3 and PHB4
->> + */
->>  #if HOST_LONG_BITS =3D=3D 32
->> -# define MASK_TO_LSH(m)          (__builtin_ffsll(m) - 1)
->> +#  define GETFIELD(m, v)        (((v) & (m)) >> ctz32(m))
->> +#  define SETFIELD(m, v, val)                                   \
->> +    (((v) & ~(m)) | ((((typeof(v))(val)) << ctz32(m)) & (m)))
->>  #elif HOST_LONG_BITS =3D=3D 64
->> -# define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
->> +#  define GETFIELD(m, v)        (((v) & (m)) >> ctz64(m))
->> +#  define SETFIELD(m, v, val)                                   \
->> +    (((v) & ~(m)) | ((((typeof(v))(val)) << ctz64(m)) & (m)))
->>  #else
->>  # error Unknown sizeof long
->>  #endif
->> =20
->> -#define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
->> -#define SETFIELD(m, v, val)                             \
->> -        (((v) & ~(m)) | ((((typeof(v))(val)) << MASK_TO_LSH(m)) & (m)=
-))
->> -
->>  /********************************************************************=
-*********/
->>  /* Exception vectors definitions                                     =
-        */
->>  enum {
->=20
+As the DAX vs DMA truncated issue was solved, we refined the code and
+send out this feature for the v5 version.
+
+A new auto on/off option 'sync' is added to memory-backend-file:
+ - on:  try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
+        'share=off' or 'pmem=off', QEMU will abort
+ - off: never pass MAP_SYNC to mmap(2)
+ - auto (default): if MAP_SYNC is supported and 'share=on' 'pmem=on', work as if
+        'sync=on'; otherwise, work as if 'sync=off'
+
+Changes in v7:
+ * Micheal: [3,4,6]/6 limited the "sync" flag only on a nvdimm backend.(pmem=on)
+
+Changes in v6:
+ * Pankaj: 3/7 are squashed with 2/7
+ * Pankaj: 7/7 update comments to "consistent filesystem metadata".
+ * Pankaj, Igor: 1/7 Added Reviewed-by in patch-1/7
+ * Stefan, 4/7 move the include header from "/linux/mman.h" to "osdep.h"
+ * Stefan, 5/7 Add missing "munmap"
+ * Stefan, 2/7 refine the shared/flag.
+
+Changes in v5:
+ * Add patch 1 to fix a memory leak issue.
+ * Refine the patch 4-6
+ * Remove the patch 3 as we already change the parameter from "shared" to
+   "flags"
+
+Changes in v4:
+ * Add patch 1-3 to switch some functions to a single 'flags'
+   parameters. (Michael S. Tsirkin)
+ * v3 patch 1-3 become v4 patch 4-6.
+ * Patch 4: move definitions of MAP_SYNC and MAP_SHARED_VALIDATE to a
+   new header file under include/standard-headers/linux/. (Michael S. Tsirkin)
+ * Patch 6: refine the description of the 'sync' option. (Michael S. Tsirkin)
+
+Changes in v3:
+ * Patch 1: add MAP_SHARED_VALIDATE in both sync=on and sync=auto
+   cases, and add back the retry mechanism. MAP_SYNC will be ignored
+   by Linux kernel 4.15 if MAP_SHARED_VALIDATE is missed.
+ * Patch 1: define MAP_SYNC and MAP_SHARED_VALIDATE as 0 on non-Linux
+   platforms in order to make qemu_ram_mmap() compile on those platforms.
+ * Patch 2&3: include more information in error messages of
+   memory-backend in hope to help user to identify the error.
+   (Dr. David Alan Gilbert)
+ * Patch 3: fix typo in the commit message. (Dr. David Alan Gilbert)
+
+Changes in v2:
+ * Add 'sync' option to control the use of MAP_SYNC. (Eduardo Habkost)
+ * Remove the unnecessary set of MAP_SHARED_VALIDATE in some cases and
+   the retry mechanism in qemu_ram_mmap(). (Michael S. Tsirkin)
+ * Move OS dependent definitions of MAP_SYNC and MAP_SHARED_VALIDATE
+   to osdep.h. (Michael S. Tsirkin)
+
+Zhang Yi (6):
+  numa: Fixed the memory leak of numa error message
+  util/mmap-alloc: switch qemu_ram_mmap() to 'flags' parameter
+  util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
+  util/mmap-alloc: Switch the RAM_SYNC flags to OnOffAuto
+  hostmem: add more information in error messages
+  hostmem-file: add 'sync' option
+
+ backends/hostmem-file.c   | 45 +++++++++++++++++++++++++++++++++++++++++++--
+ backends/hostmem.c        |  8 +++++---
+ docs/nvdimm.txt           | 22 +++++++++++++++++++++-
+ exec.c                    |  9 +++++----
+ include/exec/memory.h     | 18 ++++++++++++++++++
+ include/exec/ram_addr.h   |  1 +
+ include/qemu/mmap-alloc.h | 20 +++++++++++++++++++-
+ include/qemu/osdep.h      | 29 +++++++++++++++++++++++++++++
+ numa.c                    |  1 +
+ qemu-options.hx           | 22 +++++++++++++++++++++-
+ util/mmap-alloc.c         | 27 ++++++++++++++++++++++-----
+ util/oslib-posix.c        |  8 +++++++-
+ 12 files changed, 192 insertions(+), 18 deletions(-)
+
+-- 
+2.7.4
