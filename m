@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gZG31-0000eH-U0
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:08:38 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gZG3h-0001B3-7U
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:09:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gZG30-0002Gr-4v
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:08:35 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 18 Dec 2018 13:03:40 +0000
-Message-ID: <dcb33317-e500-fc17-447f-d0999c20b5f6@virtuozzo.com>
-References: <20181215135324.152629-1-eblake@redhat.com>
-	<20181215135324.152629-3-eblake@redhat.com>
-In-Reply-To: <20181215135324.152629-3-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <29B4B30F28558447931DAF1A4CA66696@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1gZG3b-0002SU-DX
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:09:17 -0500
+Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:44391)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gZG3Z-0002Qp-96
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:09:11 -0500
+Received: by mail-oi1-x22e.google.com with SMTP id m6so1987846oig.11
+	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 06:09:07 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 02/22] nbd: Document timeline of various
- features
+References: <20181217105650.27361-1-alex.bennee@linaro.org>
+In-Reply-To: <20181217105650.27361-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 18 Dec 2018 14:08:55 +0000
+Message-ID: <CAFEAcA_eBvVJvEDUwr4r2rbNiOp-10ysHNDS3RadOiU1tbqkpA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v3 00/15] Hardfloat + softfloat maintainers
+ update and gitdm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,66 +30,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-MTUuMTIuMjAxOCAxNjo1MywgRXJpYyBCbGFrZSB3cm90ZToNCj4gSXQgY2FuIGJlIHVzZWZ1bCB0
-byBmaWd1cmUgb3V0IHdoaWNoIE5CRCBwcm90b2NvbCBmZWF0dXJlcyBhcmUNCj4gZXhwb3NlZCBi
-eSBhIHNlcnZlciwgYXMgd2VsbCBhcyB3aGF0IGZlYXR1cmVzIGEgY2xpZW50IHdpbGwNCj4gdGFr
-ZSBhZHZhbnRhZ2Ugb2YgaWYgYXZhaWxhYmxlLCBmb3IgYSBnaXZlbiBxZW11IHJlbGVhc2UuICBJ
-dCdzDQo+IG5vdCBhbHdheXMgcHJlY2lzZSB0byBiYXNlIGZlYXR1cmVzIG9uIHZlcnNpb24gbnVt
-YmVycyAodGhhbmtzDQo+IHRvIGRvd25zdHJlYW0gYmFja3BvcnRzKSwgYnV0IGFueSBkb2N1bWVu
-dGF0aW9uIGlzIGJldHRlciB0aGFuDQo+IG1ha2luZyB1c2VycyBzZWFyY2ggdGhyb3VnaCBnaXQg
-bG9ncyB0aGVtc2VsdmVzLg0KPiANCj4gVGhpcyBwYXRjaCBvcmlnaW5hbGx5IHN0ZW1tZWQgZnJv
-bSBhIHJlcXVlc3QgdG8gZG9jdW1lbnQgdGhhdA0KPiBwcmlzdGluZSAzLjAgaGFzIGEga25vd24g
-YnVnIHdoZXJlIE5CRF9PUFRfTElTVF9NRVRBX0NPTlRFWFQNCj4gd2l0aCAwIHF1ZXJpZXMgZm9y
-Z290IHRvIGFkdmVydGlzZSBhbiBhdmFpbGFibGUNCj4gInFlbXU6ZGlydHktYml0bWFwIiBjb250
-ZXh0LCBidXQgZG9jdW1lbnRpbmcgYnVncyBsaWtlIHRoaXMgKG9yDQo+IHRoZSBmYWN0IHRoYXQg
-My4wIGFsc28gYm90Y2hlZCBOQkRfQ01EX0NBQ0hFKSBnZXRzIHRvIGJlIHRvbw0KPiBtdWNoIGRl
-dGFpbHMsIGVzcGVjaWFsbHkgc2luY2UgYnVnZ3kgcmVsZWFzZXMgd2lsbCBiZSBsZXNzDQo+IGxp
-a2VseSBjb25uZWN0aW9uIHRhcmdldHMgb3ZlciB0aW1lLiAgSW5zdGVhZCwgSSBjaG9zZSB0byBq
-dXN0DQo+IHJlbWluZCB1c2VycyB0byBjaGVjayBzdGFibGUgcmVsZWFzZSBicmFuY2hlcy4NCj4g
-DQo+IFN1Z2dlc3RlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNv
-dkB2aXJ0dW96em8uY29tPg0KPiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVk
-aGF0LmNvbT4NCj4gDQo+IC0tLQ0KPiB2MjogbmV3IHBhdGNoDQo+IC0tLQ0KPiAgIGRvY3MvaW50
-ZXJvcC9uYmQudHh0IHwgMTkgKysrKysrKysrKysrKysrKysrLQ0KPiAgIDEgZmlsZSBjaGFuZ2Vk
-LCAxOCBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvZG9j
-cy9pbnRlcm9wL25iZC50eHQgYi9kb2NzL2ludGVyb3AvbmJkLnR4dA0KPiBpbmRleCA3N2I1ZjQ1
-OTExMS4uMmIyNWY4NzFlN2MgMTAwNjQ0DQo+IC0tLSBhL2RvY3MvaW50ZXJvcC9uYmQudHh0DQo+
-ICsrKyBiL2RvY3MvaW50ZXJvcC9uYmQudHh0DQo+IEBAIC0xNSw3ICsxNSw2IEBAIFFlbXUgc3Vw
-cG9ydHMgdGhlICJiYXNlOmFsbG9jYXRpb24iIG1ldGFkYXRhIGNvbnRleHQgYXMgZGVmaW5lZCBp
-biB0aGUNCj4gICBOQkQgcHJvdG9jb2wgc3BlY2lmaWNhdGlvbiwgYW5kIGFsc28gZGVmaW5lcyBh
-biBhZGRpdGlvbmFsIG1ldGFkYXRhDQo+ICAgbmFtZXNwYWNlICJxZW11Ii4NCj4gDQo+IC0NCj4g
-ICA9PSAicWVtdSIgbmFtZXNwYWNlID09DQo+IA0KPiAgIFRoZSAicWVtdSIgbmFtZXNwYWNlIGN1
-cnJlbnRseSBjb250YWlucyBvbmx5IG9uZSB0eXBlIG9mIGNvbnRleHQsDQo+IEBAIC0zNiwzICsz
-NSwyMSBAQCBpbiBhZGRpdGlvbiB0byAicWVtdTpkaXJ0eS1iaXRtYXA6PGRpcnR5LWJpdG1hcC1l
-eHBvcnQtbmFtZT4iOg0KPiAgICAgICAgICAgICAgIG5hbWVzcGFjZS4NCj4gICAqICJxZW11OmRp
-cnR5LWJpdG1hcDoiIC0gcmV0dXJucyBsaXN0IG9mIGFsbCBhdmFpbGFibGUgZGlydHktYml0bWFw
-DQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIG1ldGFkYXRhIGNvbnRleHRzLg0KPiArDQo+
-ICs9IEZlYXR1cmVzIGJ5IHZlcnNpb24gPQ0KPiArDQo+ICtUaGUgZm9sbG93aW5nIGxpc3QgZG9j
-dW1lbnRzIHdoaWNoIHFlbXUgdmVyc2lvbiBmaXJzdCBpbXBsZW1lbnRlZA0KPiArdmFyaW91cyBm
-ZWF0dXJlcyAoYm90aCBhcyBhIHNlcnZlciBleHBvc2luZyB0aGUgZmVhdHVyZSwgYW5kIGFzIGEN
-Cj4gK2NsaWVudCB0YWtpbmcgYWR2YW50YWdlIG9mIHRoZSBmZWF0dXJlIHdoZW4gcHJlc2VudCks
-IHRvIG1ha2UgaXQNCj4gK2Vhc2llciB0byBwbGFuIGZvciBjcm9zcy12ZXJzaW9uIGludGVyb3Bl
-cmFiaWxpdHkuICBOb3RlIHRoYXQgaW4NCj4gK3NldmVyYWwgY2FzZXMsIHRoZSBpbml0aWFsIHJl
-bGVhc2UgY29udGFpbmluZyBhIGZlYXR1cmUgbWF5IHJlcXVpcmUNCj4gK2FkZGl0aW9uYWwgcGF0
-Y2hlcyBmcm9tIHRoZSBjb3JyZXNwb25kaW5nIHN0YWJsZSBicmFuY2ggdG8gZml4IGJ1Z3MgaW4N
-Cj4gK3RoZSBvcGVyYXRpb24gb2YgdGhhdCBmZWF0dXJlLg0KPiArDQo+ICsqIDIuNjogTkJEX09Q
-VF9TVEFSVFRMUyB3aXRoIFRMUyBYLjUwOSBDZXJ0aWZpY2F0ZXMNCj4gKyogMi44OiBOQkRfQ01E
-X1dSSVRFX1pFUk9FUw0KPiArKiAyLjEwOiBOQkRfT1BUX0dPLCBOQkRfSU5GT19CTE9DSw0KPiAr
-KiAyLjExOiBOQkRfT1BUX1NUUlVDVFVSRURfUkVBRA0KDQpOQkRfT1BUX1NUUlVDVFVSRURfUkVQ
-TFkgeW91IG1lYW4NCg0KPiArKiAyLjEyOiBOQkRfQ01EX0JMT0NLX1NUQVRVUyBmb3IgImJhc2U6
-YWxsb2NhdGlvbiINCj4gKyogMy4wOiBOQkRfT1BUX1NUQVJUVExTIHdpdGggVExTIFByZS1TaGFy
-ZWQgS2V5cyAoUFNLKSwNCj4gK05CRF9DTURfQkxPQ0tfU1RBVFVTIGZvciAicWVtdTpkaXJ0eS1i
-aXRtYXA6IiwgTkJEX0NNRF9DQUNIRQ0KPiANCg0KSG0sIHRyeWluZyB0byBjaGVjayBieToNCg0K
-ICAgZmVhdHVyZXM9JChlY2hvIE5CRF9PUFRfe1NUQVJUVExTLEdPLFNUUlVDVFVSRURfUkVQTFl9
-IE5CRF9DTURfe1dSSVRFX1pFUk9FUyxCTE9DS19TVEFUVVMsQ0FDSEV9IE5CRF9JTkZPX0JMT0NL
-IFBTSykNCiAgIHZlcnNpb25zPSQoZWNobyB2Mi57NS4uMTJ9LjAgdjMuMC4wKQ0KICAgZm9yIGYg
-aW4gJGZlYXR1cmVzOyBkbyBlY2hvIC0tLS0tLS0tLS0tLS07IGVjaG8gJGY7IGZvciB2IGluICR2
-ZXJzaW9uczsgZG8gZWNobyAkdjo7IGdpdCBncmVwICRmICR2OyBkb25lOyBkb25lIHwgbGVzcw0K
-DQpsb29rcyBjb3JyZWN0Lg0KDQpDaGVja2VkIGJhc2U6YWxsb2NhdGlvbi9xZW11OmRpcnR5LWJp
-dG1hcCBhcHBlYXJhbmNlLg0KDQpEb24ndCB3YW50IHRvIGRpZyBpbiBUTFMgdmVyc2lvbiBjaGVj
-a2luZyB3aGljaCBpcyBJJ20gbm90IGZhbWlsaWFyIHdpdGgsIHNvLCBJJ20gT0sgYW5kIHdpdGgg
-cy9SRUFEL1JFUExZOg0KDQpSZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tp
-eSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxh
-ZGltaXINCg==
+On Mon, 17 Dec 2018 at 10:56, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+> The following changes since commit b019f5e5375224a003f260c89d424fea7767b7=
+fc:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-misc-20181214'=
+ into staging (2018-12-16 16:32:43 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/stsquad/qemu.git tags/pull-hardfloat-and-gitdm-17121=
+8-3
+>
+> for you to fetch changes up to d9fe9db943d4e855a75424978d7ab87fd54edd98:
+>
+>   hardfloat: implement float32/64 comparison (2018-12-17 08:25:25 +0000)
+>
+> ----------------------------------------------------------------
+> Hardfloat + maintainers and gitdm
+>
+
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
+
+-- PMM
