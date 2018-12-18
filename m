@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gZB0D-0004JW-B9
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:45:23 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1gZB5F-0005zD-L3
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:50:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gZB08-00007E-Sk
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:45:21 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 18 Dec 2018 08:45:11 +0000
-Message-ID: <af13669e-d0bd-6c53-fb60-f647a0bc4bfc@virtuozzo.com>
-References: <20181214231512.5295-1-jsnow@redhat.com>
-	<20181214231512.5295-8-jsnow@redhat.com>
-	<3832143d-136d-d282-e487-376f1f38ad44@virtuozzo.com>
-	<f7fa56ed-c000-fad8-bce5-5b57c1a812a0@redhat.com>
-In-Reply-To: <f7fa56ed-c000-fad8-bce5-5b57c1a812a0@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D07B44E2B6541E448AB9408FECE81D34@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <liq3ea@gmail.com>) id 1gZB5E-0003kH-GZ
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:50:33 -0500
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:47083)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gZB5E-0003ic-7B
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:50:32 -0500
+Received: by mail-io1-xd41.google.com with SMTP id v10so12111834ios.13
+	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 00:50:31 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 7/7] iotests: add iotest 236 for testing
- bitmap merge
+References: <1543467132-2873-1-git-send-email-liq3ea@gmail.com>
+	<1543467132-2873-3-git-send-email-liq3ea@gmail.com>
+	<644186db-32d3-7c83-8b37-02e8427ef217@redhat.com>
+	<87o99kj7tm.fsf@dusky.pond.sub.org>
+	<b3e3a763-7865-285b-4fa7-b3146f19d354@redhat.com>
+	<8736qvjooo.fsf@dusky.pond.sub.org>
+In-Reply-To: <8736qvjooo.fsf@dusky.pond.sub.org>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue, 18 Dec 2018 16:49:54 +0800
+Message-ID: <CAKXe6S+EVGMnETHUdZaGu7E8Tv_jmk--uVepRjSW5__6pVc6fw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] hw: vmmouse: Use link instead of
+ pointer property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,95 +34,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Markus Armbruster <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Thomas Huth <thuth@redhat.com>, ehabkost@redhat.com, mst@redhat.com, Qemu Developers <qemu-devel@nongnu.org>, Darren Kenny <darren.kenny@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>, rth@twiddle.net
 
-MTguMTIuMjAxOCAwOjMyLCBKb2huIFNub3cgd3JvdGU6DQo+IA0KPiANCj4gT24gMTIvMTcvMTgg
-MTA6NDggQU0sIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+PiAxNS4xMi4y
-MDE4IDI6MTUsIEpvaG4gU25vdyB3cm90ZToNCj4+PiBOZXcgaW50ZXJmYWNlLCBuZXcgc21va2Ug
-dGVzdC4NCj4+PiAtLS0NCj4+PiAgICB0ZXN0cy9xZW11LWlvdGVzdHMvMjM2ICAgICB8IDEyNCAr
-KysrKysrKysrKysrKysrKysrKysrKw0KPj4+ICAgIHRlc3RzL3FlbXUtaW90ZXN0cy8yMzYub3V0
-IHwgMjAwICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4+PiAgICB0ZXN0
-cy9xZW11LWlvdGVzdHMvZ3JvdXAgICB8ICAgMSArDQo+Pj4gICAgMyBmaWxlcyBjaGFuZ2VkLCAz
-MjUgaW5zZXJ0aW9ucygrKQ0KPj4+ICAgIGNyZWF0ZSBtb2RlIDEwMDc1NSB0ZXN0cy9xZW11LWlv
-dGVzdHMvMjM2DQo+Pj4gICAgY3JlYXRlIG1vZGUgMTAwNjQ0IHRlc3RzL3FlbXUtaW90ZXN0cy8y
-MzYub3V0DQo+Pj4NCj4+PiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzIzNiBiL3Rl
-c3RzL3FlbXUtaW90ZXN0cy8yMzYNCj4+PiBuZXcgZmlsZSBtb2RlIDEwMDc1NQ0KPj4+IGluZGV4
-IDAwMDAwMDAwMDAuLmVkZjE2YzRhYjENCj4+PiAtLS0gL2Rldi9udWxsDQo+Pj4gKysrIGIvdGVz
-dHMvcWVtdS1pb3Rlc3RzLzIzNg0KPj4+IEBAIC0wLDAgKzEsMTI0IEBADQo+Pj4gKyMhL3Vzci9i
-aW4vZW52IHB5dGhvbg0KPj4+ICsjDQo+Pj4gKyMgVGVzdCBiaXRtYXAgbWVyZ2VzLg0KPj4+ICsj
-DQo+Pj4gKyMgQ29weXJpZ2h0IChjKSAyMDE4IEpvaG4gU25vdyBmb3IgUmVkIEhhdCwgSW5jLg0K
-Pj4+ICsjDQo+Pj4gKyMgVGhpcyBwcm9ncmFtIGlzIGZyZWUgc29mdHdhcmU7IHlvdSBjYW4gcmVk
-aXN0cmlidXRlIGl0IGFuZC9vciBtb2RpZnkNCj4+PiArIyBpdCB1bmRlciB0aGUgdGVybXMgb2Yg
-dGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIGFzIHB1Ymxpc2hlZCBieQ0KPj4+ICsjIHRo
-ZSBGcmVlIFNvZnR3YXJlIEZvdW5kYXRpb247IGVpdGhlciB2ZXJzaW9uIDIgb2YgdGhlIExpY2Vu
-c2UsIG9yDQo+Pj4gKyMgKGF0IHlvdXIgb3B0aW9uKSBhbnkgbGF0ZXIgdmVyc2lvbi4NCj4+PiAr
-Iw0KPj4+ICsjIFRoaXMgcHJvZ3JhbSBpcyBkaXN0cmlidXRlZCBpbiB0aGUgaG9wZSB0aGF0IGl0
-IHdpbGwgYmUgdXNlZnVsLA0KPj4+ICsjIGJ1dCBXSVRIT1VUIEFOWSBXQVJSQU5UWTsgd2l0aG91
-dCBldmVuIHRoZSBpbXBsaWVkIHdhcnJhbnR5IG9mDQo+Pj4gKyMgTUVSQ0hBTlRBQklMSVRZIG9y
-IEZJVE5FU1MgRk9SIEEgUEFSVElDVUxBUiBQVVJQT1NFLiAgU2VlIHRoZQ0KPj4+ICsjIEdOVSBH
-ZW5lcmFsIFB1YmxpYyBMaWNlbnNlIGZvciBtb3JlIGRldGFpbHMuDQo+Pj4gKyMNCj4+PiArIyBZ
-b3Ugc2hvdWxkIGhhdmUgcmVjZWl2ZWQgYSBjb3B5IG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMg
-TGljZW5zZQ0KPj4+ICsjIGFsb25nIHdpdGggdGhpcyBwcm9ncmFtLiAgSWYgbm90LCBzZWUgPGh0
-dHA6Ly93d3cuZ251Lm9yZy9saWNlbnNlcy8+Lg0KPj4+ICsjDQo+Pj4gKyMgb3duZXI9anNub3dA
-cmVkaGF0LmNvbQ0KPj4+ICsNCj4+PiAraW1wb3J0IGpzb24NCj4+PiAraW1wb3J0IGlvdGVzdHMN
-Cj4+PiArZnJvbSBpb3Rlc3RzIGltcG9ydCBsb2cNCj4+PiArDQo+Pj4gK2lvdGVzdHMudmVyaWZ5
-X2ltYWdlX2Zvcm1hdChzdXBwb3J0ZWRfZm10cz1bJ3Fjb3cyJ10pDQo+Pj4gKw0KPj4NCj4+IHdl
-IGhhcmRjb2RlIHBhdHRlcm5zLCBzbyBpdCdzIGJldHRlciB0byBoYXJkY29kZSBzaXplIGhlcmUg
-dG9vOg0KPj4NCj4+IHNpemUgPSA2NCAqIDEwMjQgKiAxMDI0DQo+IA0KPiBJZiB5b3UgaW5zaXN0
-Lg0KPiANCj4+DQo+Pj4gK3BhdHRlcm5zID0gWygiMHg1ZCIsICIwIiwgICAgICAgICAiNjRrIiks
-DQo+Pj4gKyAgICAgICAgICAgICgiMHhkNSIsICIxTSIsICAgICAgICAiNjRrIiksDQo+Pj4gKyAg
-ICAgICAgICAgICgiMHhkYyIsICIzMk0iLCAgICAgICAiNjRrIiksDQo+Pj4gKyAgICAgICAgICAg
-ICgiMHhjZCIsICIweDNmZjAwMDAiLCAiNjRrIildICAjIDY0TSAtIDY0Sw0KPj4+ICsNCj4+PiAr
-b3ZlcndyaXRlID0gWygiMHhhYiIsICIwIiwgICAgICAgICAiNjRrIiksICMgRnVsbCBvdmVyd3Jp
-dGUNCj4+PiArICAgICAgICAgICAgICgiMHhhZCIsICIweDAwZjgwMDAiLCAiNjRrIiksICMgUGFy
-dGlhbC1sZWZ0ICgxTS0zMkspDQo+Pj4gKyAgICAgICAgICAgICAoIjB4MWQiLCAiMHgyMDA4MDAw
-IiwgIjY0ayIpLCAjIFBhcnRpYWwtcmlnaHQgKDMyTSszMkspDQo+Pj4gKyAgICAgICAgICAgICAo
-IjB4ZWEiLCAiMHgzZmUwMDAwIiwgIjY0ayIpXSAjIEFkamFjZW50LWxlZnQgKDY0TSAtIDEyOEsp
-DQo+Pj4gKw0KPj4+ICtkZWYgcXVlcnlfYml0bWFwcyh2bSk6DQo+Pj4gKyAgICByZXMgPSB2bS5x
-bXAoInF1ZXJ5LWJsb2NrIikNCj4+PiArICAgIHJldHVybiB7ZGV2aWNlWydkZXZpY2UnXTogZGV2
-aWNlWydkaXJ0eS1iaXRtYXBzJ10gZm9yDQo+Pj4gKyAgICAgICAgICAgIGRldmljZSBpbiByZXNb
-J3JldHVybiddfQ0KPj4+ICsNCj4+PiArd2l0aCBpb3Rlc3RzLkZpbGVQYXRoKCdpbWcnKSBhcyBp
-bWdfcGF0aCwgXA0KPj4+ICsgICAgIGlvdGVzdHMuVk0oKSBhcyB2bToNCj4+PiArDQo+Pj4gKyAg
-ICBsb2coJy0tLSBQcmVwYXJpbmcgaW1hZ2UgJiBWTSAtLS1cbicpDQo+Pj4gKyAgICBpb3Rlc3Rz
-LnFlbXVfaW1nX3BpcGUoJ2NyZWF0ZScsICctZicsIGlvdGVzdHMuaW1nZm10LCBpbWdfcGF0aCwg
-JzY0TScpDQo+Pg0KPj4gbm8gbmVlZHMgZm9yIHFlbXVfaW1nX3BpcGUsIGFzIHlvdSBkb24ndCB1
-c2UgaXRzIG91dHB1dCwgcWVtdV9pbWcoKSBpcyBlbm91Z2ggYW5kIHFlbXVfaW1nX2NyZWF0ZSgp
-IGlzIGJldHRlciwNCj4+IGFuZCB0aGUgYmVzdCBJIHRoaW5rIGlzIGp1c3Q6DQo+Pg0KPiANCj4g
-TW9yZSBjYXJnbyBjdWx0IGNvcHkgYW5kIHBhc3RlLg0KPiANCj4+IHZtLmFkZF9kcml2ZV9yYXco
-J2lkPWRyaXZlMCxkcml2ZXI9bnVsbC1jbyxzaXplPScgKyBzdHIoc2l6ZSkpDQo+Pg0KPj4gYXMg
-cWNvdzIgKGFuZCByZWFsIGRpc2sgaW4gZ2VuZXJhbCkgaXMgYWN0dWFsbHkgdW5yZWxhdGVkIHRv
-IHRoZSB0ZXN0Lg0KPj4NCj4gDQo+IEkgdGhpbmsgSSdsbCBsZWF2ZSB0aGUgaW1hZ2UgY3JlYXRp
-b24gaW4ganVzdCBzbyB0aGF0IGlmIHlvdSBydW4gdGhlDQo+IHRlc3QgdW5kZXIgZGlmZmVyZW50
-IGZvcm1hdHMgaXQnbGwgYWN0dWFsbHkgZG8gc29tZXRoaW5nIHZhZ3VlbHkNCj4gZGlmZmVyZW50
-LCBqdXN0IGluIGNhc2UuDQoNCmhtLCBidXQgeW91IHNhaWQsIHN1cHBvcnRlZF9mbXRzPVsncWNv
-dzInXT8NCg0KSSdtIG9rIHdpdGggbGVhdmluZyBpbWFnZSBjcmVhdGlvbiB0b28sIGFueXdheS4N
-Cg0KPiANCj4gQWN0dWFsbHksIGl0IGRpZCBoaWdobGlnaHQgaG93IHdlaXJkIFZQQyBpcyBhZ2Fp
-biBhbmQgSSBjaGFuZ2VkIHRoZSByZXN0DQo+IGFzIGEgcmVzdWx0IHRvIGFjY29tbW9kYXRlIGlt
-YWdlIGZvcm1hdHMgdGhhdCByb3VuZCB0aGVpciBkaXNrIHNpemVzLg0KPiANCj4+DQo+Pj4gKyAg
-ICB2bS5hZGRfZHJpdmUoaW1nX3BhdGgpDQo+Pj4gKyAgICB2bS5sYXVuY2goKQ0KPj4+ICsNCj4+
-PiArICAgIGxvZygnLS0tIEFkZGluZyBwcmVsaW1pbmFyeSBiaXRtYXBzIEEgJiBCIC0tLVxuJykN
-Cj4+PiArICAgIHZtLnFtcF9sb2coImJsb2NrLWRpcnR5LWJpdG1hcC1hZGQiLCBub2RlPSJkcml2
-ZTAiLCBuYW1lPSJiaXRtYXBBIikNCj4+PiArICAgIHZtLnFtcF9sb2coImJsb2NrLWRpcnR5LWJp
-dG1hcC1hZGQiLCBub2RlPSJkcml2ZTAiLCBuYW1lPSJiaXRtYXBCIikNCj4+PiArDQo+Pj4gKyAg
-ICAjIERpcnRpZXMgNCBjbHVzdGVycy4gY291bnQ9MjYyMTQ0DQo+Pj4gKyAgICBsb2coJycpDQo+
-Pj4gKyAgICBsb2coJy0tLSBFbXVsYXRpbmcgd3JpdGVzIC0tLVxuJykNCj4+PiArICAgIGZvciBw
-IGluIHBhdHRlcm5zOg0KPj4+ICsgICAgICAgIGNtZCA9ICJ3cml0ZSAtUCVzICVzICVzIiAlIHAN
-Cj4+PiArICAgICAgICBsb2coY21kKQ0KPj4+ICsgICAgICAgIGxvZyh2bS5obXBfcWVtdV9pbygi
-ZHJpdmUwIiwgY21kKSkNCj4+PiArDQo+Pj4gKyAgICBsb2coanNvbi5kdW1wcyhxdWVyeV9iaXRt
-YXBzKHZtKSwgaW5kZW50PTIsIHNlcGFyYXRvcnM9KCcsJywgJzogJykpKQ0KPj4NCj4+IGxvZyBj
-YW4gZG8ganNvbi5kdW1wcywgc28gaXQncyBzdHJhbmdlIHRvIGRvIGl0IGhlcmUsIGFuZCBJIGRv
-bid0IGxpa2UgJywnIHNlcGFyYXRvciwgYXMgSSBkZXNjcmliZWQNCj4gDQo+IEJlY2F1c2UgaXQg
-dHJpZXMgdG8gZmlsdGVyIHRoZSByaWNoIG9iamVjdCBiZWZvcmUgaXQgY29udmVydHMsIGFzIHlv
-dSd2ZQ0KPiBub3RpY2VkLiBJIHRoaW5rIEknbGwgdGFrZSBhIHBhZ2UgZnJvbSB5b3VyIGJvb2sg
-YW5kIHRyeSB0byBmaXggbG9nKCkgdG8NCj4gYmUgYmV0dGVyLg0KPiANCj4gQXMgZm9yIG5vdCBs
-aWtpbmcgdGhlICcsJyBzZXBhcmF0b3IsIGl0IHNob3VsZCBiZSBpZGVudGljYWwgdG8geW91cg0K
-PiBhcHByb2FjaCBiZWNhdXNlIGl0IG9ubHkgcmVtb3ZlcyB0aGUgc3BhY2Ugd2hlbiBwcmV0dHkg
-cHJpbnRpbmcgaXMNCj4gZW5hYmxlZC4gQ2FuIHlvdSBzaG93IG1lIHdoYXQgdGhpcyBhcHByb2Fj
-aCBkb2VzIHRoYXQgeW91IGZpbmQgdG8gYmUNCj4gdWdseSBhbmQgaG93IGl0J3MgZGlmZmVyZW50
-IGZyb20geW91ciByZWdleCBhcHByb2FjaD8NCg0KSSB3YXMgd3JvbmcsIHNvcnJ5KQ0KDQpCdXQs
-IG9uIHRoZSBvdGhlciBoYW5kLCByaWdodC1zdHJpcHBpbmcgbGluZXMgaW4gbG9nKCkgaXMgYSBn
-b29kIHRoaW5nIGFueXdheS4gT3IsIG1heSBiZSBldmVuIGJldHRlciAoYXMgd2UNCmRvbid0IGhh
-dmUgc3VjaCB0ZXN0cyB5ZXQpLCBqdXN0IGVycm9yIG91dCBpZiBhbnkgdHJhaWxpbmcgd2hpdGVz
-cGFjZXMgZm91bmQgKGFuZCB1c2UgY29ycmVjdCBzZXBhcmF0b3JzIGZvcg0KanNvbi5kdW1wcykN
-Cg0KPiANCj4gLS1qcw0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+Markus Armbruster <armbru@redhat.com> =E4=BA=8E2018=E5=B9=B412=E6=9C=8818=
+=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=883:10=E5=86=99=E9=81=93=EF=BC=
+=9A
+
+> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>
+> > On 12/17/18 8:01 PM, Markus Armbruster wrote:
+> >> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+> >>
+> >>> Hi Li,
+> >>>
+> >>> On 11/29/18 5:52 AM, Li Qiang wrote:
+> >>>> According to qdev-properties.h, properties of pointer type should
+> >>>> be avoided. Turn "ps2_mouse" into a link.
+> >>>>
+> >>>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> >>>> Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+> >>>> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> >>>> ---
+> >> [...]
+> >>>> diff --git a/hw/i386/vmmouse.c b/hw/i386/vmmouse.c
+> >>>> index 4412eaf604..f63aac6673 100644
+> >>>> --- a/hw/i386/vmmouse.c
+> >>>> +++ b/hw/i386/vmmouse.c
+> >> [...]
+> >>>> @@ -283,8 +289,6 @@ static void vmmouse_class_initfn(ObjectClass
+> *klass, void *data)
+> >>>>      dc->realize =3D vmmouse_realizefn;
+> >>>>      dc->reset =3D vmmouse_reset;
+> >>>>      dc->vmsd =3D &vmstate_vmmouse;
+> >>>> -    dc->props =3D vmmouse_properties;
+> >>>> -    /* Reason: pointer property "ps2_mouse" */
+> >>>>      dc->user_creatable =3D false;
+> >>>
+> >>> "user_creatable =3D false" must have an justification comment.
+> >>
+> >> Correct.
+>
+> Aside: more ->user_creatable =3D false without a comment have crept in
+> since I last swept them out.
+>
+> >>> Can you keep 'Reason: link property "ps2_mouse"'?
+> >>
+> >> Is this a valid reason?
+> >>
+> >> A pointer property is one, because it can only be set by code.
+> >
+> > I prefer the original comment :)
+> >
+> > /* Reason: pointer property "ps2_mouse" */
+>
+> A pointer property can't be set by -device because there's no sane way
+> to pick a value.  Not true for a link property: it's value is a QOM
+> path.  But I'm not sure such setting of link properties has been
+> implemented.  If it isn't, then /* Reason: link property "ps2_mouse */
+> is perfect. If it isn, then it's wrong, possibly along with with
+
+dc->user_creatable =3D false.
+>
+>
+Agree,
+
+AFAIK there is no way to set link property in '-device'.
+Anyway I think the maintainer can just merge or add this minor adjustment
+to the patch.
+
+Thanks,
+Li Qiang
+
+
+
+> >>> Eventually the maintainer taking this patch can fix this for you.
+> >>>
+> >>> With the comment:
+> >>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> >>>
+> >>>>  }
+> >> [...]
+> >>
+>
