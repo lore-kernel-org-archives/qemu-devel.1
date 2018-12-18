@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZGpd-0001tR-1a
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:58:50 -0500
+	(envelope-from <elohimes@gmail.com>) id 1gZGqM-0002TK-KT
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:59:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZGpb-00046b-1n
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:58:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54340)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZGpY-000454-SE
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:58:46 -0500
-Date: Tue, 18 Dec 2018 09:58:35 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181218095745-mutt-send-email-mst@kernel.org>
-References: <1544619939-18102-1-git-send-email-yu.c.zhang@linux.intel.com>
-	<1544619939-18102-2-git-send-email-yu.c.zhang@linux.intel.com>
-	<20181217141740.16ccfaa1@Igors-MacBook-Pro.local>
-	<20181218092723.yhaerzm4vlzgef65@linux.intel.com>
-	<20181218155536.2b35a037@Igors-MacBook-Pro.local>
+	(envelope-from <elohimes@gmail.com>) id 1gZGqK-0004Se-UO
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:59:34 -0500
+Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:34157)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gZGqK-0004RB-N4
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 09:59:32 -0500
+Received: by mail-yw1-xc42.google.com with SMTP id g75so6791797ywb.1
+	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 06:59:32 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181218155536.2b35a037@Igors-MacBook-Pro.local>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] intel-iommu: differentiate host
- address width from IOVA address width.
+References: <20181218100002.11219-1-xieyongji@baidu.com>
+	<20181218100002.11219-7-xieyongji@baidu.com>
+	<649661545136221@sas1-bf4ab558af9f.qloud-c.yandex.net>
+	<CAONzpcaUjNMd=EWZG51-91mwpRyKy0siQW6LKi82NQrDZ-FUXg@mail.gmail.com>
+	<698131545143714@sas1-bf4ab558af9f.qloud-c.yandex.net>
+In-Reply-To: <698131545143714@sas1-bf4ab558af9f.qloud-c.yandex.net>
+From: Yongji Xie <elohimes@gmail.com>
+Date: Tue, 18 Dec 2018 22:59:19 +0800
+Message-ID: <CAONzpcbM+mhpGPqv8nHjx5-cdJ0bP8SCc7nsRZpfhAagFhkmnw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 for-4.0 6/7] vhost-user-blk: Add support
+ to reconnect backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,157 +32,328 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Yu Zhang <yu.c.zhang@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Yury Kotov <yury-kotov@yandex-team.ru>
+Cc: "mst@redhat.com" <mst@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "zhangyu31@baidu.com" <zhangyu31@baidu.com>, "chaiwen@baidu.com" <chaiwen@baidu.com>, "nixun@baidu.com" <nixun@baidu.com>, "lilin24@baidu.com" <lilin24@baidu.com>, Xie Yongji <xieyongji@baidu.com>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>
 
-On Tue, Dec 18, 2018 at 03:55:36PM +0100, Igor Mammedov wrote:
-> On Tue, 18 Dec 2018 17:27:23 +0800
-> Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
-> 
-> > On Mon, Dec 17, 2018 at 02:17:40PM +0100, Igor Mammedov wrote:
-> > > On Wed, 12 Dec 2018 21:05:38 +0800
-> > > Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
-> > > 
-> > > > Currently, vIOMMU is using the value of IOVA address width, instead of
-> > > > the host address width(HAW) to calculate the number of reserved bits in
-> > > > data structures such as root entries, context entries, and entries of
-> > > > DMA paging structures etc.
-> > > > 
-> > > > However values of IOVA address width and of the HAW may not equal. For
-> > > > example, a 48-bit IOVA can only be mapped to host addresses no wider than
-> > > > 46 bits. Using 48, instead of 46 to calculate the reserved bit may result
-> > > > in an invalid IOVA being accepted.
-> > > > 
-> > > > To fix this, a new field - haw_bits is introduced in struct IntelIOMMUState,
-> > > > whose value is initialized based on the maximum physical address set to
-> > > > guest CPU.
-> > > 
-> > > > Also, definitions such as VTD_HOST_AW_39/48BIT etc. are renamed
-> > > > to clarify.
-> > > > 
-> > > > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > > > Reviewed-by: Peter Xu <peterx@redhat.com>
-> > > > ---
-> > > [...]
-> > > 
-> > > > @@ -3100,6 +3104,8 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
-> > > >  static void vtd_init(IntelIOMMUState *s)
-> > > >  {
-> > > >      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
-> > > > +    CPUState *cs = first_cpu;
-> > > > +    X86CPU *cpu = X86_CPU(cs);
-> > > >  
-> > > >      memset(s->csr, 0, DMAR_REG_SIZE);
-> > > >      memset(s->wmask, 0, DMAR_REG_SIZE);
-> > > > @@ -3119,23 +3125,24 @@ static void vtd_init(IntelIOMMUState *s)
-> > > >      s->cap = VTD_CAP_FRO | VTD_CAP_NFR | VTD_CAP_ND |
-> > > >               VTD_CAP_MAMV | VTD_CAP_PSI | VTD_CAP_SLLPS |
-> > > >               VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(s->aw_bits);
-> > > > -    if (s->aw_bits == VTD_HOST_AW_48BIT) {
-> > > > +    if (s->aw_bits == VTD_AW_48BIT) {
-> > > >          s->cap |= VTD_CAP_SAGAW_48bit;
-> > > >      }
-> > > >      s->ecap = VTD_ECAP_QI | VTD_ECAP_IRO;
-> > > > +    s->haw_bits = cpu->phys_bits;
-> > > Is it possible to avoid accessing CPU fields directly or cpu altogether
-> > > and set phys_bits when iommu is created?
-> > 
-> > Thanks for your comments, Igor.
-> > 
-> > Well, I guess you prefer not to query the CPU capabilities while deciding
-> > the vIOMMU features. But to me, they are not that irrelevant.:)
-> > 
-> > Here the hardware address width in vt-d, and the one in cpuid.MAXPHYSADDR
-> > are referring to the same concept. In VM, both are the maximum guest physical
-> > address width. If we do not check the CPU field here, we will still have to
-> > check the CPU field in other places such as build_dmar_q35(), and reset the
-> > s->haw_bits again.
-> > 
-> > Is this explanation convincing enough? :)
-> current build_dmar_q35() doesn't do it, it's all new code in this series that
-> contains not acceptable direct access from one device (iommu) to another (cpu).   
-> Proper way would be for the owner of iommu to fish limits from somewhere and set
-> values during iommu creation.
+On Tue, 18 Dec 2018 at 22:35, Yury Kotov <yury-kotov@yandex-team.ru> wrote:
+>
+> 18.12.2018, 17:16, "Yongji Xie" <elohimes@gmail.com>:
+> > On Tue, 18 Dec 2018 at 20:30, Yury Kotov <yury-kotov@yandex-team.ru> wrote:
+> >>  + wrfsh@
+> >>
+> >>  Hi,
+> >>
+> >>  18.12.2018, 13:01, "elohimes@gmail.com" <elohimes@gmail.com>:
+> >>  > From: Xie Yongji <xieyongji@baidu.com>
+> >>  >
+> >>  > Since we now support the message VHOST_USER_GET_SHM_SIZE
+> >>  > and VHOST_USER_SET_SHM_FD. The backend is able to restart
+> >>  > safely because it can record inflight I/O in shared memory.
+> >>  > This patch allows qemu to reconnect the backend after
+> >>  > connection closed.
+> >>  >
+> >>  > Signed-off-by: Xie Yongji <xieyongji@baidu.com>
+> >>  > Signed-off-by: Ni Xun <nixun@baidu.com>
+> >>  > Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
+> >>  > ---
+> >>  > hw/block/vhost-user-blk.c | 183 ++++++++++++++++++++++++-----
+> >>  > include/hw/virtio/vhost-user-blk.h | 4 +
+> >>  > 2 files changed, 160 insertions(+), 27 deletions(-)
+> >>  >
+> >>  > diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+> >>  > index 27028cf996..80f2e2d765 100644
+> >>  > --- a/hw/block/vhost-user-blk.c
+> >>  > +++ b/hw/block/vhost-user-blk.c
+> >>  > @@ -101,7 +101,7 @@ const VhostDevConfigOps blk_ops = {
+> >>  > .vhost_dev_config_notifier = vhost_user_blk_handle_config_change,
+> >>  > };
+> >>  >
+> >>  > -static void vhost_user_blk_start(VirtIODevice *vdev)
+> >>  > +static int vhost_user_blk_start(VirtIODevice *vdev)
+> >>  > {
+> >>  > VHostUserBlk *s = VHOST_USER_BLK(vdev);
+> >>  > BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
+> >>  > @@ -110,13 +110,13 @@ static void vhost_user_blk_start(VirtIODevice *vdev)
+> >>  >
+> >>  > if (!k->set_guest_notifiers) {
+> >>  > error_report("binding does not support guest notifiers");
+> >>  > - return;
+> >>  > + return -ENOSYS;
+> >>  > }
+> >>  >
+> >>  > ret = vhost_dev_enable_notifiers(&s->dev, vdev);
+> >>  > if (ret < 0) {
+> >>  > error_report("Error enabling host notifiers: %d", -ret);
+> >>  > - return;
+> >>  > + return ret;
+> >>  > }
+> >>  >
+> >>  > ret = k->set_guest_notifiers(qbus->parent, s->dev.nvqs, true);
+> >>  > @@ -147,12 +147,13 @@ static void vhost_user_blk_start(VirtIODevice *vdev)
+> >>  > vhost_virtqueue_mask(&s->dev, vdev, i, false);
+> >>  > }
+> >>  >
+> >>  > - return;
+> >>  > + return ret;
+> >>  >
+> >>  > err_guest_notifiers:
+> >>  > k->set_guest_notifiers(qbus->parent, s->dev.nvqs, false);
+> >>  > err_host_notifiers:
+> >>  > vhost_dev_disable_notifiers(&s->dev, vdev);
+> >>  > + return ret;
+> >>  > }
+> >>  >
+> >>  > static void vhost_user_blk_stop(VirtIODevice *vdev)
+> >>  > @@ -171,7 +172,6 @@ static void vhost_user_blk_stop(VirtIODevice *vdev)
+> >>  > ret = k->set_guest_notifiers(qbus->parent, s->dev.nvqs, false);
+> >>  > if (ret < 0) {
+> >>  > error_report("vhost guest notifier cleanup failed: %d", ret);
+> >>  > - return;
+> >>  > }
+> >>  >
+> >>  > vhost_dev_disable_notifiers(&s->dev, vdev);
+> >>  > @@ -181,21 +181,43 @@ static void vhost_user_blk_set_status(VirtIODevice *vdev, uint8_t status)
+> >>  > {
+> >>  > VHostUserBlk *s = VHOST_USER_BLK(vdev);
+> >>  > bool should_start = status & VIRTIO_CONFIG_S_DRIVER_OK;
+> >>  > + int ret;
+> >>  >
+> >>  > if (!vdev->vm_running) {
+> >>  > should_start = false;
+> >>  > }
+> >>  >
+> >>  > - if (s->dev.started == should_start) {
+> >>  > + if (s->should_start == should_start) {
+> >>  > + return;
+> >>  > + }
+> >>  > +
+> >>  > + if (!s->connected || s->dev.started == should_start) {
+> >>  > + s->should_start = should_start;
+> >>  > return;
+> >>  > }
+> >>  >
+> >>  > if (should_start) {
+> >>  > - vhost_user_blk_start(vdev);
+> >>  > + s->should_start = true;
+> >>  > + /*
+> >>  > + * make sure vhost_user_blk_handle_output() ignores fake
+> >>  > + * guest kick by vhost_dev_enable_notifiers()
+> >>  > + */
+> >>  > + barrier();
+> >>  > + ret = vhost_user_blk_start(vdev);
+> >>  > + if (ret < 0) {
+> >>  > + error_report("vhost-user-blk: vhost start failed: %s",
+> >>  > + strerror(-ret));
+> >>  > + qemu_chr_fe_disconnect(&s->chardev);
+> >>  > + }
+> >>  > } else {
+> >>  > vhost_user_blk_stop(vdev);
+> >>  > + /*
+> >>  > + * make sure vhost_user_blk_handle_output() ignore fake
+> >>  > + * guest kick by vhost_dev_disable_notifiers()
+> >>  > + */
+> >>  > + barrier();
+> >>  > + s->should_start = false;
+> >>  > }
+> >>  > -
+> >>  > }
+> >>  >
+> >>  > static uint64_t vhost_user_blk_get_features(VirtIODevice *vdev,
+> >>  > @@ -225,13 +247,22 @@ static uint64_t vhost_user_blk_get_features(VirtIODevice *vdev,
+> >>  > static void vhost_user_blk_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+> >>  > {
+> >>  > VHostUserBlk *s = VHOST_USER_BLK(vdev);
+> >>  > - int i;
+> >>  > + int i, ret;
+> >>  >
+> >>  > if (!(virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1) &&
+> >>  > !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1))) {
+> >>  > return;
+> >>  > }
+> >>  >
+> >>  > + if (s->should_start) {
+> >>  > + return;
+> >>  > + }
+> >>  > + s->should_start = true;
+> >>  > +
+> >>  > + if (!s->connected) {
+> >>  > + return;
+> >>  > + }
+> >>  > +
+> >>  > if (s->dev.started) {
+> >>  > return;
+> >>  > }
+> >>  > @@ -239,7 +270,13 @@ static void vhost_user_blk_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+> >>  > /* Some guests kick before setting VIRTIO_CONFIG_S_DRIVER_OK so start
+> >>  > * vhost here instead of waiting for .set_status().
+> >>  > */
+> >>  > - vhost_user_blk_start(vdev);
+> >>  > + ret = vhost_user_blk_start(vdev);
+> >>  > + if (ret < 0) {
+> >>  > + error_report("vhost-user-blk: vhost start failed: %s",
+> >>  > + strerror(-ret));
+> >>  > + qemu_chr_fe_disconnect(&s->chardev);
+> >>  > + return;
+> >>  > + }
+> >>  >
+> >>  > /* Kick right away to begin processing requests already in vring */
+> >>  > for (i = 0; i < s->dev.nvqs; i++) {
+> >>  > @@ -259,12 +296,105 @@ static void vhost_user_blk_reset(VirtIODevice *vdev)
+> >>  > vhost_dev_reset_shm(s->shm);
+> >>  > }
+> >>  >
+> >>  > +static int vhost_user_blk_connect(DeviceState *dev)
+> >>  > +{
+> >>  > + VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+> >>  > + VHostUserBlk *s = VHOST_USER_BLK(vdev);
+> >>  > + int ret = 0;
+> >>  > +
+> >>  > + if (s->connected) {
+> >>  > + return 0;
+> >>  > + }
+> >>  > + s->connected = true;
+> >>  > +
+> >>  > + s->dev.nvqs = s->num_queues;
+> >>  > + s->dev.vqs = s->vqs;
+> >>  > + s->dev.vq_index = 0;
+> >>  > + s->dev.backend_features = 0;
+> >>  > +
+> >>  > + vhost_dev_set_config_notifier(&s->dev, &blk_ops);
+> >>  > +
+> >>  > + ret = vhost_dev_init(&s->dev, s->vhost_user, VHOST_BACKEND_TYPE_USER, 0);
+> >>  > + if (ret < 0) {
+> >>  > + error_report("vhost-user-blk: vhost initialization failed: %s",
+> >>  > + strerror(-ret));
+> >>  > + return ret;
+> >>  > + }
+> >>  > +
+> >>  > + /* restore vhost state */
+> >>  > + if (s->should_start) {
+> >>  > + ret = vhost_user_blk_start(vdev);
+> >>  > + if (ret < 0) {
+> >>  > + error_report("vhost-user-blk: vhost start failed: %s",
+> >>  > + strerror(-ret));
+> >>  > + return ret;
+> >>  > + }
+> >>  > + }
+> >>  > +
+> >>  > + return 0;
+> >>  > +}
+> >>  > +
+> >>  > +static void vhost_user_blk_disconnect(DeviceState *dev)
+> >>  > +{
+> >>  > + VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+> >>  > + VHostUserBlk *s = VHOST_USER_BLK(vdev);
+> >>  > +
+> >>  > + if (!s->connected) {
+> >>  > + return;
+> >>  > + }
+> >>  > + s->connected = false;
+> >>  > +
+> >>  > + if (s->dev.started) {
+> >>  > + vhost_user_blk_stop(vdev);
+> >>  > + }
+> >>  > +
+> >>  > + vhost_dev_cleanup(&s->dev);
+> >>  > +}
+> >>  > +
+> >>  > +static gboolean vhost_user_blk_watch(GIOChannel *chan, GIOCondition cond,
+> >>  > + void *opaque)
+> >>  > +{
+> >>  > + DeviceState *dev = opaque;
+> >>  > + VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+> >>  > + VHostUserBlk *s = VHOST_USER_BLK(vdev);
+> >>  > +
+> >>  > + qemu_chr_fe_disconnect(&s->chardev);
+> >>  > +
+> >>  > + return true;
+> >>  > +}
+> >>  > +
+> >>  > +static void vhost_user_blk_event(void *opaque, int event)
+> >>  > +{
+> >>  > + DeviceState *dev = opaque;
+> >>  > + VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+> >>  > + VHostUserBlk *s = VHOST_USER_BLK(vdev);
+> >>  > +
+> >>  > + switch (event) {
+> >>  > + case CHR_EVENT_OPENED:
+> >>  > + if (vhost_user_blk_connect(dev) < 0) {
+> >>  > + qemu_chr_fe_disconnect(&s->chardev);
+> >>  > + return;
+> >>  > + }
+> >>  > + s->watch = qemu_chr_fe_add_watch(&s->chardev, G_IO_HUP,
+> >>  > + vhost_user_blk_watch, dev);
+> >>  > + break;
+> >>  > + case CHR_EVENT_CLOSED:
+> >>  > + vhost_user_blk_disconnect(dev);
+> >>  > + if (s->watch) {
+> >>  > + g_source_remove(s->watch);
+> >>  > + s->watch = 0;
+> >>  > + }
+> >>  > + break;
+> >>  > + }
+> >>  > +}
+> >>  > +
+> >>  > static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
+> >>  > {
+> >>  > VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+> >>  > VHostUserBlk *s = VHOST_USER_BLK(vdev);
+> >>  > VhostUserState *user;
+> >>  > int i, ret;
+> >>  > + Error *err = NULL;
+> >>  >
+> >>  > if (!s->chardev.chr) {
+> >>  > error_setg(errp, "vhost-user-blk: chardev is mandatory");
+> >>  > @@ -299,23 +429,21 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
+> >>  > }
+> >>  >
+> >>  > s->shm = g_new0(struct vhost_shm, 1);
+> >>  > -
+> >>  > - s->dev.nvqs = s->num_queues;
+> >>  > - s->dev.vqs = g_new(struct vhost_virtqueue, s->dev.nvqs);
+> >>  > - s->dev.vq_index = 0;
+> >>  > - s->dev.backend_features = 0;
+> >>  > -
+> >>  > - vhost_dev_set_config_notifier(&s->dev, &blk_ops);
+> >>  > -
+> >>  > - ret = vhost_dev_init(&s->dev, s->vhost_user, VHOST_BACKEND_TYPE_USER, 0);
+> >>  > - if (ret < 0) {
+> >>  > - error_setg(errp, "vhost-user-blk: vhost initialization failed: %s",
+> >>  > - strerror(-ret));
+> >>  > - goto virtio_err;
+> >>  > + s->vqs = g_new(struct vhost_virtqueue, s->num_queues);
+> >>  > + s->watch = 0;
+> >>  > + s->should_start = false;
+> >>  > + s->connected = false;
+> >>  > +
+> >>  > + while (qemu_chr_fe_wait_connected(&s->chardev, &err) < 0) {
+> >>  > + error_report_err(err);
+> >>  > + err = NULL;
+> >>  > + sleep(1);
+> >>  > }
+> >>
+> >>  After the reconnect loop we have some function calls to vhost backend:
+> >>  * qemu_chr_fe_set_handlers implicit calls vhost_dev_init
+> >>  * vhost_dev_get_config
+> >>  * vhost_dev_init_shm
+> >>
+> >>  If vhost backend will restart during their execution the initialzation will be
+> >>  failed. What do you think? May be we can call these functions inside of
+> >>  the reconnect loop to fix it?
+> >
+> > qemu_chr_fe_wait_connected() should be called only when we are in
+> > disconnected state. Otherwise, it will be conflicted with reconnect
+> > thread.
+> >
+>
+> Reconnect thread is started by reconnet timer callback from the main loop but
+> vhost_user_blk_device_realize is also runs in the main loop, so we don't a race
+> in this case I think.
+>
 
-Maybe it's a good idea to add documentation for now.
+The reconnet timer callback have an assert: assert(s->connected == 0).
+And it's odd to call qemu_chr_fe_wait_connected() when reconnect
+thread is running.
 
-It would be nice not to push this stuff up the stack,
-it's unfortunate that our internal APIs make it hard.
-
-
-> > > 
-> > > Perhaps Eduardo
-> > >  can suggest better approach, since he's more familiar with phys_bits topic
-> > 
-> > @Eduardo, any comments? Thanks!
-> > 
-> > > 
-> > > >      /*
-> > > >       * Rsvd field masks for spte
-> > > >       */
-> > > >      vtd_paging_entry_rsvd_field[0] = ~0ULL;
-> > > > -    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->aw_bits);
-> > > > -    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->aw_bits);
-> > > > -    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->aw_bits);
-> > > > -    vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->aw_bits);
-> > > > -    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->aw_bits);
-> > > > -    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->aw_bits);
-> > > > -    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->aw_bits);
-> > > > -    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->aw_bits);
-> > > > +    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->haw_bits);
-> > > > +    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->haw_bits);
-> > > > +    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->haw_bits);
-> > > > +    vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->haw_bits);
-> > > > +    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->haw_bits);
-> > > > +    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->haw_bits);
-> > > > +    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->haw_bits);
-> > > > +    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->haw_bits);
-> > > >  
-> > > >      if (x86_iommu->intr_supported) {
-> > > >          s->ecap |= VTD_ECAP_IR | VTD_ECAP_MHMV;
-> > > > @@ -3261,10 +3268,10 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
-> > > >      }
-> > > >  
-> > > >      /* Currently only address widths supported are 39 and 48 bits */
-> > > > -    if ((s->aw_bits != VTD_HOST_AW_39BIT) &&
-> > > > -        (s->aw_bits != VTD_HOST_AW_48BIT)) {
-> > > > +    if ((s->aw_bits != VTD_AW_39BIT) &&
-> > > > +        (s->aw_bits != VTD_AW_48BIT)) {
-> > > >          error_setg(errp, "Supported values for x-aw-bits are: %d, %d",
-> > > > -                   VTD_HOST_AW_39BIT, VTD_HOST_AW_48BIT);
-> > > > +                   VTD_AW_39BIT, VTD_AW_48BIT);
-> > > >          return false;
-> > > >      }
-> > > >  
-> > > > diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-> > > > index ed4e758..820451c 100644
-> > > > --- a/include/hw/i386/intel_iommu.h
-> > > > +++ b/include/hw/i386/intel_iommu.h
-> > > > @@ -47,9 +47,9 @@
-> > > >  #define VTD_SID_TO_DEVFN(sid)       ((sid) & 0xff)
-> > > >  
-> > > >  #define DMAR_REG_SIZE               0x230
-> > > > -#define VTD_HOST_AW_39BIT           39
-> > > > -#define VTD_HOST_AW_48BIT           48
-> > > > -#define VTD_HOST_ADDRESS_WIDTH      VTD_HOST_AW_39BIT
-> > > > +#define VTD_AW_39BIT                39
-> > > > +#define VTD_AW_48BIT                48
-> > > > +#define VTD_ADDRESS_WIDTH           VTD_AW_39BIT
-> > > >  #define VTD_HAW_MASK(aw)            ((1ULL << (aw)) - 1)
-> > > >  
-> > > >  #define DMAR_REPORT_F_INTR          (1)
-> > > > @@ -244,7 +244,8 @@ struct IntelIOMMUState {
-> > > >      bool intr_eime;                 /* Extended interrupt mode enabled */
-> > > >      OnOffAuto intr_eim;             /* Toggle for EIM cabability */
-> > > >      bool buggy_eim;                 /* Force buggy EIM unless eim=off */
-> > > > -    uint8_t aw_bits;                /* Host/IOVA address width (in bits) */
-> > > > +    uint8_t aw_bits;                /* IOVA address width (in bits) */
-> > > > +    uint8_t haw_bits;               /* Hardware address width (in bits) */
-> > > >  
-> > > >      /*
-> > > >       * Protects IOMMU states in general.  Currently it protects the
-> > > 
-> > > 
-> > 
-> > B.R.
-> > Yu
+Thanks,
+Yongji
