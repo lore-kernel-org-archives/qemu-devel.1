@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gZOIr-0004h6-2Z
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 17:57:32 -0500
+	(envelope-from <eblake@redhat.com>) id 1gZOJ1-0004pq-LA
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 17:57:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gZOIl-00072b-E6
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 17:57:25 -0500
+	(envelope-from <eblake@redhat.com>) id 1gZOIx-0007Cw-R4
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 17:57:37 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 18 Dec 2018 16:57:12 -0600
-Message-Id: <20181218225714.284495-2-eblake@redhat.com>
+Date: Tue, 18 Dec 2018 16:57:13 -0600
+Message-Id: <20181218225714.284495-3-eblake@redhat.com>
 In-Reply-To: <20181218225714.284495-1-eblake@redhat.com>
 References: <20181218225714.284495-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/3] nbd: publish _lookup functions
+Subject: [Qemu-devel] [PATCH v2 2/3] nbd/client: Trace all server option
+ error messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,55 +21,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: vsementsov@virtuozzo.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: vsementsov@virtuozzo.com, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Not all servers send free-form text alongside option error replies, but
+for servers that do (such as qemu), we pass the server's message as a
+hint alongside our own error reporting.  However, it would also be
+useful to trace such server messages, since we can't guarantee how the
+hint may be consumed.
 
-These functions are used for formatting pretty trace points. We are
-going to add some in block/nbd-client, so, let's publish all these
-functions at once. Note, that nbd_reply_type_lookup is already
-published, and constants, "named" by these functions live in
-include/block/nbd.h too.
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20181102151152.288399-3-vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- include/block/nbd.h | 5 +++++
- nbd/nbd-internal.h  | 5 -----
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ nbd/client.c     | 2 ++
+ nbd/trace-events | 1 +
+ 2 files changed, 3 insertions(+)
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 6a5bfe5d559..65402d33964 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -343,5 +343,10 @@ static inline bool nbd_reply_is_structured(NBDReply *reply)
- }
+diff --git a/nbd/client.c b/nbd/client.c
+index b4d457a19ad..0ad7147ed95 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -171,6 +171,8 @@ static int nbd_handle_reply_err(QIOChannel *ioc, NBDOptionReply *reply,
+             goto cleanup;
+         }
+         msg[reply->length] = '\0';
++        trace_nbd_server_error_msg(reply->type,
++                                   nbd_reply_type_lookup(reply->type), msg);
+     }
 
- const char *nbd_reply_type_lookup(uint16_t type);
-+const char *nbd_opt_lookup(uint32_t opt);
-+const char *nbd_rep_lookup(uint32_t rep);
-+const char *nbd_info_lookup(uint16_t info);
-+const char *nbd_cmd_lookup(uint16_t info);
-+const char *nbd_err_lookup(int err);
-
- #endif
-diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
-index eeff78d3c98..f38be9ebaaf 100644
---- a/nbd/nbd-internal.h
-+++ b/nbd/nbd-internal.h
-@@ -100,11 +100,6 @@ struct NBDTLSHandshakeData {
-
- void nbd_tls_handshake(QIOTask *task,
-                        void *opaque);
--const char *nbd_opt_lookup(uint32_t opt);
--const char *nbd_rep_lookup(uint32_t rep);
--const char *nbd_info_lookup(uint16_t info);
--const char *nbd_cmd_lookup(uint16_t info);
--const char *nbd_err_lookup(int err);
-
- int nbd_drop(QIOChannel *ioc, size_t size, Error **errp);
-
+     switch (reply->type) {
+diff --git a/nbd/trace-events b/nbd/trace-events
+index 5e1d4afe8e6..5492042acbf 100644
+--- a/nbd/trace-events
++++ b/nbd/trace-events
+@@ -1,6 +1,7 @@
+ # nbd/client.c
+ nbd_send_option_request(uint32_t opt, const char *name, uint32_t len) "Sending option request %" PRIu32" (%s), len %" PRIu32
+ nbd_receive_option_reply(uint32_t option, const char *optname, uint32_t type, const char *typename, uint32_t length) "Received option reply %" PRIu32" (%s), type %" PRIu32" (%s), len %" PRIu32
++nbd_server_error_msg(uint32_t err, const char *type, const char *msg) "server reported error 0x%" PRIx32 " (%s) with additional message: %s"
+ nbd_reply_err_unsup(uint32_t option, const char *name) "server doesn't understand request %" PRIu32 " (%s), attempting fallback"
+ nbd_opt_go_start(const char *name) "Attempting NBD_OPT_GO for export '%s'"
+ nbd_opt_go_success(void) "Export is good to go"
 -- 
 2.17.2
