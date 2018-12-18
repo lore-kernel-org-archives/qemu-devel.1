@@ -1,25 +1,25 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:41195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZ4O7-0001s8-CU
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 20:41:42 -0500
+	(envelope-from <mst@redhat.com>) id 1gZ4On-0001s8-1H
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 20:42:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZ4K9-0004NN-12
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 20:37:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47730)
+	(envelope-from <mst@redhat.com>) id 1gZ4Cg-0008Bv-5o
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 20:29:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34728)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZ4K6-0004MZ-VL
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 20:37:28 -0500
-Date: Mon, 17 Dec 2018 20:37:22 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZ4Cf-0008Bb-W5
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 20:29:46 -0500
+Date: Mon, 17 Dec 2018 20:29:37 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181217203706-mutt-send-email-mst@kernel.org>
-References: <20181212222648.595-1-marcandre.lureau@redhat.com>
+Message-ID: <20181217202850-mutt-send-email-mst@kernel.org>
+References: <154464279386.9828.10219496338109023342.stgit@gimli.home>
+	<154464358344.9828.234735873419417928.stgit@gimli.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181212222648.595-1-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v13 0/6] Add support for TPM Physical
- Presence interface
+In-Reply-To: <154464358344.9828.234735873419417928.stgit@gimli.home>
+Subject: Re: [Qemu-devel] [PATCH v5 6/8] pcie: Allow generic PCIe root port
+ to specify link speed and width
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, stefanb@linux.vnet.ibm.com, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, f4bug@amsat.org, Stefan Berger <stefanb@linux.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Geoffrey McRae <geoff@hostfission.com>, Eric Auger <eric.auger@redhat.com>
 
-On Thu, Dec 13, 2018 at 02:26:42AM +0400, Marc-Andr=E9 Lureau wrote:
-> Hi,
->=20
-> The following patches implement the TPM Physical Presence Interface
-> that allows a user to set a command via ACPI (sysfs entry in Linux)
-> that, upon the next reboot, the firmware looks for and acts upon by
-> sending sequences of commands to the TPM.
->=20
-> A dedicated memory region is added to the TPM CRB & TIS devices, at
-> address/size 0xFED45000/0x400. A new "etc/tpm/config" fw_cfg entry
-> holds the location for that PPI region and some version details, to
-> allow for future flexibility.
->=20
-> With the associated edk2/ovmf firmware, the Windows HLK "PPI 1.3" test
-> now runs successfully.
->=20
-> It is based on previous work from Stefan Berger ("[PATCH v2 0/4]
-> Implement Physical Presence interface for TPM 1.2 and 2")
->=20
-> The edk2 support is merged upstream.
+On Wed, Dec 12, 2018 at 12:39:43PM -0700, Alex Williamson wrote:
+> Allow users to experimentally specify speed and width values for the
+> generic PCIe root port.  Defaults remain at 2.5GT/s & x1 for
+> compatiblity with the intent to only support changing defaults via
+> machine types for now.
+> 
+> Note for libvirt testing that pcie-root-port controllers are given
+> default names like "pci.7" which don't play well with using the
+> "-set device.$name.$prop=$value" options accessible to us via
+> <qemu:commandline> options.  The solution is to add an <alias> to the
+> pcie-root-port <controller>, for example:
+> 
+>     <controller type='pci' index='7' model='pcie-root-port'>
+>       <model name='pcie-root-port'/>
+>       <target chassis='7' port='0x15'/>
+>       <alias name='ua-gfx0'/>
+>       <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x5'/>
+>     </controller>
+> 
+> The "ua-" here is a mandatory prefix.  We can then use:
+> 
+>   <qemu:commandline>
+>     <qemu:arg value='-set'/>
+>     <qemu:arg value='device.ua-gfx0.x-speed=8'/>
+>     <qemu:arg value='-set'/>
+>     <qemu:arg value='device.ua-gfx0.x-width=16'/>
+>   </qemu:commandline>
+> 
+> or, without an alias, set globals such as:
+> 
+>   <qemu:commandline>
+>     <qemu:arg value='-global'/>
+>     <qemu:arg value='pcie-root-port.x-speed=8'/>
+>     <qemu:arg value='-global'/>
+>     <qemu:arg value='pcie-root-port.x-width=16'/>
+>   </qemu:commandline>
+> 
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Tested-by: Geoffrey McRae <geoff@hostfission.com>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+>  hw/pci-bridge/gen_pcie_root_port.c |    4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
+> index 299de429ec1e..ca5418a89dd2 100644
+> --- a/hw/pci-bridge/gen_pcie_root_port.c
+> +++ b/hw/pci-bridge/gen_pcie_root_port.c
+> @@ -124,6 +124,10 @@ static Property gen_rp_props[] = {
+>                       res_reserve.mem_pref_32, -1),
+>      DEFINE_PROP_SIZE("pref64-reserve", GenPCIERootPort,
+>                       res_reserve.mem_pref_64, -1),
+> +    DEFINE_PROP_PCIE_LINK_SPEED("x-speed", PCIESlot,
+> +                                speed, PCIE_LINK_SPEED_2_5),
+> +    DEFINE_PROP_PCIE_LINK_WIDTH("x-width", PCIESlot,
+> +                                width, PCIE_LINK_WIDTH_1),
+>      DEFINE_PROP_END_OF_LIST()
+>  };
+>  
 
+Doesn't seem to build.
+Just where is DEFINE_PROP_PCIE_LINK_SPEED defined?
 
-Breaks build with tpm disabled:
-
-/usr/bin/ld: hw/i386/acpi-build.o: in function `build_dsdt':
-/scm/qemu/hw/i386/acpi-build.c:2158: undefined reference to `tpm_build_pp=
-i_acpi'
-/usr/bin/ld: /scm/qemu/hw/i386/acpi-build.c:2179: undefined reference to =
-`tpm_build_ppi_acpi'
-collect2: error: ld returned 1 exit status
-
-
-> v13:
-> - removed needless error handling in tpm_ppi_init()
-> - splitted "add ACPI memory clear interface"
-> - moved acpi build function in dedicated hw/acpi/tpm.c
-> - added some function documentation in headers
-> - various code cleanups suggested by Philippe
-> - rebased
->=20
-> Marc-Andr=E9 Lureau (3):
->   tpm: add a "ppi" boolean property
->   acpi: add ACPI memory clear interface
->   tpm: clear RAM when "memory overwrite" requested
->=20
-> Stefan Berger (3):
->   tpm: allocate/map buffer for TPM Physical Presence interface
->   acpi: expose TPM/PPI configuration parameters to firmware via fw_cfg
->   acpi: build TPM Physical Presence interface
->=20
->  hw/tpm/tpm_ppi.h      |  47 +++++
->  include/hw/acpi/tpm.h |  23 +++
->  include/hw/compat.h   |  11 +-
->  hw/acpi/tpm.c         | 447 ++++++++++++++++++++++++++++++++++++++++++
->  hw/i386/acpi-build.c  |  29 ++-
->  hw/tpm/tpm_crb.c      |  11 ++
->  hw/tpm/tpm_ppi.c      |  53 +++++
->  hw/tpm/tpm_tis.c      |  11 ++
->  docs/specs/tpm.txt    | 104 ++++++++++
->  hw/acpi/Makefile.objs |   1 +
->  hw/tpm/Makefile.objs  |   1 +
->  hw/tpm/trace-events   |   3 +
->  12 files changed, 738 insertions(+), 3 deletions(-)
->  create mode 100644 hw/tpm/tpm_ppi.h
->  create mode 100644 hw/acpi/tpm.c
->  create mode 100644 hw/tpm/tpm_ppi.c
->=20
-> --=20
-> 2.20.0
+-- 
+MST
