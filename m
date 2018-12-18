@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gZB5F-0005zD-L3
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:50:34 -0500
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gZB81-0007Gq-0W
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:53:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gZB5E-0003kH-GZ
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:50:33 -0500
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:47083)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gZB5E-0003ic-7B
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:50:32 -0500
-Received: by mail-io1-xd41.google.com with SMTP id v10so12111834ios.13
-	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 00:50:31 -0800 (PST)
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gZB7w-0005ZJ-Ti
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:53:24 -0500
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Date: Tue, 18 Dec 2018 08:53:15 +0000
+Message-ID: <2ee882bf-00cc-addf-d866-c5c916a00774@virtuozzo.com>
+References: <20181205122326.26625-1-dplotnikov@virtuozzo.com>
+	<20181207122647.GE5119@linux.fritz.box>
+	<bb51b8f9-a3a4-90e6-2f69-57e90ccd623a@virtuozzo.com>
+	<20181212122457.GB5415@linux.fritz.box>
+	<d0d2cab4-2157-1f9f-3bc9-a70f28a211b0@virtuozzo.com>
+	<20181213122039.GC5427@linux.fritz.box>
+	<f2fcbcc2-5e0f-053d-f4c7-fe0f5f6092f0@virtuozzo.com>
+In-Reply-To: <f2fcbcc2-5e0f-053d-f4c7-fe0f5f6092f0@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EDB571640064F4449A91768166FE3EF7@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <1543467132-2873-1-git-send-email-liq3ea@gmail.com>
-	<1543467132-2873-3-git-send-email-liq3ea@gmail.com>
-	<644186db-32d3-7c83-8b37-02e8427ef217@redhat.com>
-	<87o99kj7tm.fsf@dusky.pond.sub.org>
-	<b3e3a763-7865-285b-4fa7-b3146f19d354@redhat.com>
-	<8736qvjooo.fsf@dusky.pond.sub.org>
-In-Reply-To: <8736qvjooo.fsf@dusky.pond.sub.org>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 18 Dec 2018 16:49:54 +0800
-Message-ID: <CAKXe6S+EVGMnETHUdZaGu7E8Tv_jmk--uVepRjSW5__6pVc6fw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] hw: vmmouse: Use link instead of
- pointer property
+Subject: Re: [Qemu-devel] [PATCH] blk: postpone request execution on a
+ context protected with "drained section"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,86 +31,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Thomas Huth <thuth@redhat.com>, ehabkost@redhat.com, mst@redhat.com, Qemu Developers <qemu-devel@nongnu.org>, Darren Kenny <darren.kenny@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>, rth@twiddle.net
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "keith.busch@intel.com" <keith.busch@intel.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>, "famz@redhat.com" <famz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Markus Armbruster <armbru@redhat.com> =E4=BA=8E2018=E5=B9=B412=E6=9C=8818=
-=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=883:10=E5=86=99=E9=81=93=EF=BC=
-=9A
-
-> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->
-> > On 12/17/18 8:01 PM, Markus Armbruster wrote:
-> >> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
-> >>
-> >>> Hi Li,
-> >>>
-> >>> On 11/29/18 5:52 AM, Li Qiang wrote:
-> >>>> According to qdev-properties.h, properties of pointer type should
-> >>>> be avoided. Turn "ps2_mouse" into a link.
-> >>>>
-> >>>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> >>>> Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
-> >>>> Signed-off-by: Li Qiang <liq3ea@gmail.com>
-> >>>> ---
-> >> [...]
-> >>>> diff --git a/hw/i386/vmmouse.c b/hw/i386/vmmouse.c
-> >>>> index 4412eaf604..f63aac6673 100644
-> >>>> --- a/hw/i386/vmmouse.c
-> >>>> +++ b/hw/i386/vmmouse.c
-> >> [...]
-> >>>> @@ -283,8 +289,6 @@ static void vmmouse_class_initfn(ObjectClass
-> *klass, void *data)
-> >>>>      dc->realize =3D vmmouse_realizefn;
-> >>>>      dc->reset =3D vmmouse_reset;
-> >>>>      dc->vmsd =3D &vmstate_vmmouse;
-> >>>> -    dc->props =3D vmmouse_properties;
-> >>>> -    /* Reason: pointer property "ps2_mouse" */
-> >>>>      dc->user_creatable =3D false;
-> >>>
-> >>> "user_creatable =3D false" must have an justification comment.
-> >>
-> >> Correct.
->
-> Aside: more ->user_creatable =3D false without a comment have crept in
-> since I last swept them out.
->
-> >>> Can you keep 'Reason: link property "ps2_mouse"'?
-> >>
-> >> Is this a valid reason?
-> >>
-> >> A pointer property is one, because it can only be set by code.
-> >
-> > I prefer the original comment :)
-> >
-> > /* Reason: pointer property "ps2_mouse" */
->
-> A pointer property can't be set by -device because there's no sane way
-> to pick a value.  Not true for a link property: it's value is a QOM
-> path.  But I'm not sure such setting of link properties has been
-> implemented.  If it isn't, then /* Reason: link property "ps2_mouse */
-> is perfect. If it isn, then it's wrong, possibly along with with
-
-dc->user_creatable =3D false.
->
->
-Agree,
-
-AFAIK there is no way to set link property in '-device'.
-Anyway I think the maintainer can just merge or add this minor adjustment
-to the patch.
-
-Thanks,
-Li Qiang
-
-
-
-> >>> Eventually the maintainer taking this patch can fix this for you.
-> >>>
-> >>> With the comment:
-> >>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> >>>
-> >>>>  }
-> >> [...]
-> >>
->
+cGluZyBwaW5nDQoNCk9uIDE0LjEyLjIwMTggMTQ6NTQsIERlbmlzIFBsb3RuaWtvdiB3cm90ZToN
+Cj4gDQo+IA0KPiBPbiAxMy4xMi4yMDE4IDE1OjIwLCBLZXZpbiBXb2xmIHdyb3RlOg0KPj4gQW0g
+MTMuMTIuMjAxOCB1bSAxMjowNyBoYXQgRGVuaXMgUGxvdG5pa292IGdlc2NocmllYmVuOg0KPj4+
+IE9uIDEyLjEyLjIwMTggMTU6MjQsIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4+IEFtIDExLjEyLjIw
+MTggdW0gMTc6NTUgaGF0IERlbmlzIFBsb3RuaWtvdiBnZXNjaHJpZWJlbjoNCj4+Pj4+PiBXaHkg
+aW52b2x2ZSB0aGUgQWlvQ29udGV4dCBhdCBhbGw/IFRoaXMgY291bGQgYWxsIGJlIGtlcHQgYXQg
+dGhlDQo+Pj4+Pj4gQmxvY2tCYWNrZW5kIGxldmVsIHdpdGhvdXQgZXh0ZW5kaW5nIHRoZSBsYXll
+cmluZyB2aW9sYXRpb24gdGhhdA0KPj4+Pj4+IGFpb19kaXNhYmxlX2V4dGVybmFsKCkgaXMuDQo+
+Pj4+Pj4NCj4+Pj4+PiBCbG9ja0JhY2tlbmRzIGdldCBub3RpZmllZCB3aGVuIHRoZWlyIHJvb3Qg
+bm9kZSBpcyBkcmFpbmVkLCBzbyANCj4+Pj4+PiBob29raW5nDQo+Pj4+Pj4gdGhpbmdzIHVwIHRo
+ZXJlIHNob3VsZCBiZSBhcyBlYXN5LCBpZiBub3QgZXZlbiBlYXNpZXIgdGhhbiBpbg0KPj4+Pj4+
+IEFpb0NvbnRleHQuDQo+Pj4+Pg0KPj4+Pj4gSnVzdCB3YW50IHRvIG1ha2Ugc3VyZSB0aGF0IEkg
+dW5kZXJzdG9vZCBjb3JyZWN0bHkgd2hhdCB5b3UgbWVhbnQgYnkNCj4+Pj4+ICJCbG9ja0JhY2tl
+bmRzIGdldCBub3RpZmllZCIuIERpZCB5b3UgbWVhbiB0aGF0IGJkcnZfZHJhaW5fZW5kIGNhbGxz
+DQo+Pj4+PiBjaGlsZCdzIHJvbGUgY2FsbGJhY2sgYmxrX3Jvb3RfZHJhaW5lZF9lbmQgYnkgY2Fs
+bGluZw0KPj4+Pj4gYmRydl9wYXJlbnRfZHJhaW5lZF9lbmQ/DQo+Pj4+DQo+Pj4+IFllcywgYmxr
+X3Jvb3RfZHJhaW5lZF9iZWdpbi9lbmQgY2FsbHMgYXJlIGFsbCB5b3UgbmVlZC4gU3BlY2lmaWNh
+bGx5LA0KPj4+PiB0aGVpciBhZGp1c3RtZW50cyB0byBibGstPnF1aWVzY2VfY291bnRlciB0aGF0
+IGFyZSBhbHJlYWR5IHRoZXJlLCANCj4+Pj4gYW5kIGluDQo+Pj4+IHRoZSAnaWYgKC0tYmxrLT5x
+dWllc2NlX2NvdW50ZXIgPT0gMCknIGJsb2NrIG9mIGJsa19yb290X2RyYWluZWRfZW5kKCkNCj4+
+Pj4gd2UgY2FuIHJlc3VtZSB0aGUgcXVldWVkIHJlcXVlc3RzLg0KPj4+IFNvdW5kcyBpdCBzaG91
+bGQgYmUgc28sIGJ1dCBpdCBkb2Vzbid0IHdvcmsgdGhhdCB3YXkgYW5kIHRoYXQncyB3aHk6DQo+
+Pj4gd2hlbiBkb2luZyBtaXJyb3Igd2UgbWF5IHJlc3VtZSBwb3N0cG9uZWQgY29yb3V0aW5lcyB0
+b28gZWFybHkgd2hlbiB0aGUNCj4+PiB1bmRlcmx5aW5nIGJzIGlzIHByb3RlY3RlZCBmcm9tIHdy
+aXRpbmcgYXQgYW5kIHRodXMgd2UgZW5jb3VudGVyIHRoZQ0KPj4+IGFzc2VydCBvbiBhIHdyaXRl
+IHJlcXVlc3QgZXhlY3V0aW9uIGF0IGJkcnZfY29fd3JpdGVfcmVxX3ByZXBhcmUgd2hlbg0KPj4+
+IHJlc3VtaW5nIHRoZSBwb3N0cG9uZWQgY29yb3V0aW5lcy4NCj4+Pg0KPj4+IFRoZSB0aGluZyBp
+cyB0aGF0IHRoZSBicyBpcyBwcm90ZWN0ZWQgZm9yIHdyaXRpbmcgYmVmb3JlIGV4ZWN1dGlvbiBv
+Zg0KPj4+IGJkcnZfcmVwbGFjZV9ub2RlIGF0IG1pcnJvcl9leGl0X2NvbW1vbiBhbmQgYmRydl9y
+ZXBsYWNlX25vZGUgY2FsbHMNCj4+PiBiZHJ2X3JlcGxhY2VfY2hpbGRfbm9wZXJtIHdoaWNoLCBp
+biB0dXJuLCBjYWxscyBjaGlsZC0+cm9sZS0+ZHJhaW5lZF9lbmQNCj4+PiB3aGVyZSBvbmUgb2Yg
+dGhlIGNhbGxiYWNrcyBpcyBibGtfcm9vdF9kcmFpbmVkX2VuZCB3aGljaCBjaGVjaw0KPj4+IGlm
+KC0tYmxrLT5xdWllc2NlX2NvdW50ZXIgPT0gMCkgYW5kIHJ1bnMgdGhlIHBvc3Rwb25lZCByZXF1
+ZXN0cw0KPj4+IChjb3JvdXRpbmVzKSBpZiB0aGUgY291bmRpdGlvbiBpcyB0cnVlLg0KPj4NCj4+
+IEhtLCBzbyBzb21ldGhpbmcgaXMgbWVzc2VkIHVwIHdpdGggdGhlIGRyYWluIHNlY3Rpb25zIGlu
+IHRoZSBtaXJyb3INCj4+IGRyaXZlci4gV2UgaGF2ZToNCj4+DQo+PiDCoMKgwqDCoCBiZHJ2X2Ry
+YWluZWRfYmVnaW4odGFyZ2V0X2JzKTsNCj4+IMKgwqDCoMKgIGJkcnZfcmVwbGFjZV9ub2RlKHRv
+X3JlcGxhY2UsIHRhcmdldF9icywgJmxvY2FsX2Vycik7DQo+PiDCoMKgwqDCoCBiZHJ2X2RyYWlu
+ZWRfZW5kKHRhcmdldF9icyk7DQo+Pg0KPj4gT2J2aW91c2x5LCB0aGUgaW50ZW50aW9uIHdhcyB0
+byBrZWVwIHRoZSBCbG9ja0JhY2tlbmQgZHJhaW5lZCBkdXJpbmcNCj4+IGJkcnZfcmVwbGFjZV9u
+b2RlKCkuIFNvIGhvdyBjb3VsZCBibGstPnF1aWVzY2VfY291bnRlciBldmVyIGdldCB0byAwDQo+
+PiBpbnNpZGUgYmRydl9yZXBsYWNlX25vZGUoKSB3aGVuIHRhcmdldF9icyBpcyBkcmFpbmVkPw0K
+Pj4NCj4+IExvb2tpbmcgYXQgYmRydl9yZXBsYWNlX2NoaWxkX25vcGVybSgpLCBpdCBzZWVtcyB0
+aGF0IHRoZSBmdW5jdGlvbiBoYXMNCj4+IGEgYnVnOiBFdmVuIGlmIG9sZF9icyBhbmQgbmV3X2Jz
+IGFyZSBib3RoIGRyYWluZWQsIHRoZSBxdWllc2NlX2NvdW50ZXINCj4+IGZvciB0aGUgcGFyZW50
+IHJlYWNoZXMgMCBmb3IgYSBtb21lbnQgYmVjYXVzZSB3ZSBjYWxsIC5kcmFpbmVkX2VuZCBmb3IN
+Cj4+IHRoZSBvbGQgY2hpbGQgZmlyc3QgYW5kIC5kcmFpbmVkX2JlZ2luIGZvciB0aGUgbmV3IG9u
+ZSBsYXRlci4NCj4+DQo+PiBTbyBpdCBzZWVtcyB0aGUgZml4IHdvdWxkIGJlIHRvIHJldmVyc2Ug
+dGhlIG9yZGVyIGFuZCBmaXJzdCBjYWxsDQo+PiAuZHJhaW5lZF9iZWdpbiBmb3IgdGhlIG5ldyBj
+aGlsZCBhbmQgdGhlbiAuZHJhaW5lZF9lbmQgZm9yIHRoZSBvbGQNCj4+IGNoaWxkLiBTb3VuZHMg
+bGlrZSBhIGdvb2QgbmV3IHRlc3RjYXNlIGZvciB0ZXN0cy90ZXN0LWJkcnYtZHJhaW4uYywgdG9v
+Lg0KPiBZZXMsIGl0J3MgdHJ1ZSwgYnV0IGl0J3Mgbm90IGVub3VnaC4uLg0KPiBJbiBtaXJyb3Jf
+ZXhpdF9jb21tb24oKSB3ZSBhY3RpdmVseSBtYW5pcHVsYXRlIHdpdGggYmxvY2sgZHJpdmVyIHN0
+YXRlcy4NCj4gV2hlbiB3ZSByZXBsYWNlZCBhIG5vZGUgaW4gdGhlIHNuaXBwZXQgeW91IHNob3dl
+ZCB3ZSBjYW4ndCBhbGxvdyB0aGUgDQo+IHBvc3Rwb25lZCBjb3JvdXRpbmVzIHRvIHJ1biBiZWNh
+dXNlIHRoZSBibG9jayB0cmVlIGlzbid0IHJlYWR5IHRvIA0KPiByZWNlaXZlIHRoZSByZXF1ZXN0
+cyB5ZXQuDQo+IFRvIGJlIHJlYWR5LCB3ZSBuZWVkIHRvIGluc2VydCBhIHByb3BlciBibG9jayBk
+cml2ZXIgc3RhdGUgdG8gdGhlIGJsb2NrIA0KPiBiYWNrZW5kIHdoaWNoIGlzIGRvbmUgaGVyZQ0K
+PiANCj4gIMKgwqDCoCBibGtfcmVtb3ZlX2JzKGJqb2ItPmJsayk7DQo+ICDCoMKgwqAgYmxrX3Nl
+dF9wZXJtKGJqb2ItPmJsaywgMCwgQkxLX1BFUk1fQUxMLCAmZXJyb3JfYWJvcnQpOw0KPiAgwqDC
+oMKgIGJsa19pbnNlcnRfYnMoYmpvYi0+YmxrLCBtaXJyb3JfdG9wX2JzLCAmZXJyb3JfYWJvcnQp
+OyA8PCA8PCA8PCA8PA0KPiANCj4gIMKgwqDCoCBic19vcGFxdWUtPmpvYiA9IE5VTEw7DQo+IA0K
+PiAgwqDCoMKgIGJkcnZfZHJhaW5lZF9lbmQoc3JjKTsNCj4gDQo+IElmIHRoZSB0cmVlIGlzbid0
+IHJlYWR5IGFuZCB3ZSByZXN1bWUgdGhlIGNvcm91dGluZXMsIHdlJ2xsIGVuZCB1cCB3aXRoIA0K
+PiB0aGUgcmVxdWVzdCBsYW5kZWQgaW4gYSB3cm9uZyBibG9jayBkcml2ZXIgc3RhdGUuDQo+IA0K
+PiBTbywgd2UgZXhwbGljaXRseSBzaG91bGQgc3RvcCBhbGwgYWN0aXZpdGllcyBvbiBhbGwgdGhl
+IGRyaXZlciBzdGF0ZXMNCj4gYW5kIGl0cyBwYXJlbnRzIGFuZCBhbGxvdyB0aGUgYWN0aXZpdGll
+cyB3aGVuIGV2ZXJ5dGhpbmcgaXMgcmVhZHkgdG8gZ28uDQo+IA0KPiBXaHkgZXhwbGljaXRseSwg
+YmVjYXVzZSB0aGUgYmxvY2sgZHJpdmVyIHN0YXRlcyBtYXkgYmVsb25nIHRvIGRpZmZlcmVudCAN
+Cj4gYmxvY2sgYmFja2VuZHMgYXQgdGhlIG1vbWVudCBvZiB0aGUgbWFuaXB1bGF0aW9uIGJlZ2lu
+bmluZy4NCj4gDQo+IFNvLCBpdCBzZWVtcyB3ZSBuZWVkIHRvIGRpc2FibGUgYWxsIHRoZWlyIGNv
+bnRleHRzIHVudGlsIHRoZSANCj4gbWFuaXB1bGF0aW9uIGVuZHMuDQo+IA0KPiBQbGVhc2UsIGNv
+cnJlY3QgbWUgaWYgSSdtIHdyb25nLg0KPiANCj4+DQo+Pj4gSW4gc2VlbXMgdGhhdCBpZiB0aGUg
+ZXh0ZXJuYWwgcmVxdWVzdHMgZGlzYWJsZWQgb24gdGhlIGNvbnRleHQgd2UgY2FuJ3QNCj4+PiBy
+ZWx5IG9uIGFueXRoaW5nIG9yIHNob3VsZCBjaGVjayB3aGVyZSB0aGUgdW5kZXJseWluZyBicyBh
+bmQgaXRzDQo+Pj4gdW5kZXJseWluZyBub2RlcyBhcmUgcmVhZHkgdG8gcmVjZWl2ZSByZXF1ZXN0
+cyB3aGljaCBzb3VuZHMgcXVpdGUNCj4+PiBjb21wbGljYXRlZC4NCj4+PiBQbGVhc2UgY29ycmVj
+dCBtZSBpZiBzdGlsbCBkb24ndCB1bmRlcnN0YW5kIHNvbWV0aGluZyBpbiB0aGF0IHJvdXRpbmUu
+DQo+Pg0KPj4gSSB0aGluayB0aGUgcmVhc29uIHdoeSByZXlsaW5nIG9uIGFpb19kaXNhYmxlX2V4
+dGVybmFsKCkgd29ya3MgaXMgc2ltcGx5DQo+PiBiZWNhdXNlIHNyYyBpcyBhbHNvIGRyYWluZWQs
+IHdoaWNoIGtlZXBzIGV4dGVybmFsIGV2ZW50cyBpbiB0aGUNCj4+IEFpb0NvbnRleHQgZGlzYWJs
+ZWQgZGVzcGl0ZSB0aGUgYnVnIGluIGRyYWluaW5nIHRoZSB0YXJnZXQgbm9kZS4NCj4+DQo+PiBU
+aGUgYnVnIHdvdWxkIGJlY29tZSBhcHBhcmVudCBldmVuIHdpdGggYWlvX2Rpc2FibGVfZXh0ZXJu
+YWwoKSBpZiB3ZQ0KPj4gZGlkbid0IGRyYWluIHNyYywgb3IgZXZlbiBpZiB3ZSBqdXN0IHN1cHBv
+cnRlZCBzcmMgYW5kIHRhcmdldCBiZWluZyBpbg0KPj4gZGlmZmVyZW50IEFpb0NvbnRleHRzLg0K
+PiANCj4gV2h5IGRvbid0IHdlIGRpc2FibGUgYWxsIHRob3NlIGNvbnRleHRzIGludm9sdmVkIHVu
+dGlsIHRoZSBlbmQgb2YgdGhlIA0KPiBibG9jayBkZXZpY2UgdHJlZSByZWNvbnN0cnVjdGlvbj8N
+Cj4gDQo+IFRoYW5rcyENCj4gDQo+IERlbmlzDQo+Pg0KPj4gS2V2aW4NCj4+DQo+IA0KDQotLSAN
+CkJlc3QsDQpEZW5pcw0K
