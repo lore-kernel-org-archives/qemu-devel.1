@@ -1,34 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41758)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gZ9zz-0001ca-N4
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:41:04 -0500
+	(envelope-from <agk@godking.net>) id 1gZB2B-000575-Sm
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:47:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gZ9zu-0007cI-4b
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:41:03 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55012)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gZ9zt-0007b4-SI
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 02:40:58 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gZ9zr-0007zs-RL
-	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 07:40:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C29052E80C7
-	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 07:40:55 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 18 Dec 2018 07:23:08 -0000
-From: Johansen <johansense@gmail.com>
-Reply-To: Bug 1511887 <1511887@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20151031002349.21474.82964.malonedeb@soybean.canonical.com>
-Message-Id: <154511778843.9097.9401394073794230251.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1511887] Re: USB device 1.1 not correctly
- passedthru from Linux host to Windows guest
+	(envelope-from <agk@godking.net>) id 1gZB27-0001CX-QF
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:47:23 -0500
+Received: from s18231873.onlinehome-server.info ([217.160.179.168]:48040
+	helo=godking.net) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <agk@godking.net>) id 1gZB27-00019J-CM
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 03:47:19 -0500
+From: Alexander Kappner <agk@godking.net>
+Date: Tue, 18 Dec 2018 00:46:59 -0800
+Message-Id: <1545122819-29687-1-git-send-email-agk@godking.net>
+Subject: [Qemu-devel] [PATCH] Introduce new "no_guest_reset" parameter for
+ usb-host device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,77 +23,119 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Alexander Kappner <agk@godking.net>
 
-** Also affects: wine1.6 (Ubuntu)
-   Importance: Undecided
-       Status: New
+With certain USB devices passed through via usb-host, a guest attempting to
+reset a usb-host device can trigger a reset loop that renders the USB device
+unusable. In my use case, the device was an iPhone XR that was passed through to
+a Mac OS X Mojave guest. Upon connecting the device, the following happens:
 
--- =
+1) Guest recognizes new device, sends reset to emulated USB host
+2) QEMU's USB host sends reset to host kernel
+3) Host kernel resets device
+4) After reset, host kernel determines that some part of the device descriptor
+has changed ("device firmware changed" in dmesg), so host kernel decides to
+re-enumerate the device.
+5) Re-enumeration causes QEMU to disconnect and reconnect the device in the
+guest.
+6) goto 1)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1511887
+Here's from the host kernel (note the "device firmware changed" lines")
 
-Title:
-  USB device 1.1 not correctly passedthru from Linux host to Windows
-  guest
+[3677704.473050] usb 1-1.3: new high-speed USB device number 53 using ehci-pci
+[3677704.555594] usb 1-1.3: New USB device found, idVendor=05ac, idProduct=12a8, bcdDevice=11.08
+[3677704.555599] usb 1-1.3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[3677704.555602] usb 1-1.3: Product: iPhone
+[3677704.555605] usb 1-1.3: Manufacturer: Apple Inc.
+[3677704.555607] usb 1-1.3: SerialNumber: [[removed]]
+[3677709.401040] usb 1-1.3: reset high-speed USB device number 53 using ehci-pci
+[3677709.479486] usb 1-1.3: device firmware changed
+[3677709.479842] usb 1-1.3: USB disconnect, device number 53
+[3677709.546039] usb 1-1.3: new high-speed USB device number 54 using ehci-pci
+[3677709.627471] usb 1-1.3: New USB device found, idVendor=05ac, idProduct=12a8, bcdDevice=11.08
+[3677709.627476] usb 1-1.3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[3677709.627479] usb 1-1.3: Product: iPhone
+[3677709.627481] usb 1-1.3: Manufacturer: Apple Inc.
+[3677709.627483] usb 1-1.3: SerialNumber: [[removed]]
+[3677762.320044] usb 1-1.3: reset high-speed USB device number 54 using ehci-pci
+[3677762.615630] usb 1-1.3: USB disconnect, device number 54
+[3677762.787043] usb 1-1.3: new high-speed USB device number 55 using ehci-pci
+[3677762.869016] usb 1-1.3: New USB device found, idVendor=05ac, idProduct=12a8, bcdDevice=11.08
+[3677762.869024] usb 1-1.3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[3677762.869028] usb 1-1.3: Product: iPhone
+[3677762.869032] usb 1-1.3: Manufacturer: Apple Inc.
+[3677762.869035] usb 1-1.3: SerialNumber: [[removed]]
+[3677815.662036] usb 1-1.3: reset high-speed USB device number 55 using ehci-pci
 
-Status in QEMU:
-  Triaged
-Status in wine1.6 package in Ubuntu:
-  New
+Here's from QEMU:
 
-Bug description:
-  I have USB Digital Oscilloscope which works great on pure Windows
-  machine but not work on virtualized one. I tried passthru the device
-  from my Debian Jessie (64bit) host machine to Windows 7 (32bit) guest
-  machine but unfortunately it does not work very well. It looks that
-  device is passed thru so Windows machine knows about new device and
-  loads HID device driver for it but the device driver failed to start
-  the device and details of an error provided by device manager is "This
-  device cannot start" Code 10.
+libusb: error [_get_usbfs_fd] libusb couldn't open USB device /dev/bus/usb/005/022: No such file or directory
+libusb: error [udev_hotplug_event] ignoring udev action bind
+libusb: error [udev_hotplug_event] ignoring udev action bind
+libusb: error [_open_sysfs_attr] open /sys/bus/usb/devices/5-1/bConfigurationValue failed ret=-1 errno=2
+libusb: error [_get_usbfs_fd] File doesn't exist, wait 10 ms and try again
 
-  Installed Qemu version: 2.1+dfsg-12+deb8u4 0
+libusb: error [_get_usbfs_fd] libusb couldn't open USB device /dev/bus/usb/005/024: No such file or directory
+libusb: error [udev_hotplug_event] ignoring udev action bind
+libusb: error [udev_hotplug_event] ignoring udev action bind
+libusb: error [_open_sysfs_attr] open /sys/bus/usb/devices/5-1/bConfigurationValue failed ret=-1 errno=2
+libusb: error [_get_usbfs_fd] File doesn't exist, wait 10 ms and try again
 
-  USB device spec: Dynon Instruments ELAB-080, USB 1.1
+libusb: error [_get_usbfs_fd] libusb couldn't open USB device /dev/bus/usb/005/026: No such file or directory
 
-  On linux host computer
-  ---------------------------
-  lsusb identify it as:
-  Bus 003 Device 009: ID 13a3:0001 =
+The result of this is that the device remains permanently unusable in the guest.
+The same problem has been previously reported for an iPad:
+https://stackoverflow.com/questions/52617634/how-do-i-get-qemu-usb-passthrough-to-work-for-ipad-iphone
 
+This problem can be elegantly solved by interrupting step 2) above. Instead of
+passing through the reset, QEMU simply ignores it. To allow this to be
+configured on a per-device level,  a new parameter "no_guest_reset" is
+introduced for the usb-host device. I can confirm that the configuration
+described above (iPhone XS + Mojave guest) works flawlessly with
+no_guest_reset=True specified.
 
-  lsusb -t identify it as:
-  /: Bus 03.Port 1: Dev 1, Class=3Droot_hub, Driver=3Duhci_hcd/2p, 12M
-      |__ Port 1: Dev 9, If 0, Class=3DHuman Interface Device, Driver=3Dusb=
-hid, 12M
+Working command line for my scenario:
+device_add usb-host,vendorid=0x05ac,productid=0x12a8,no_guest_reset=True,id=iphone
 
-  This is how I started my Windows guest machine
-  ------------------------------------------------------
-  kvm -cpu host \
-      -m 2048MiB \
-      -hda test.vdi \
-      -ctrl-grab \
-      -parallel /dev/parport0 \
-      -usbdevice host:13a3:0001
+Best regards
+Alexander
 
-  ...also instead of last line I tried this one:
-      -device usb-host,vendorid=3D0x13a3,productid=3D0x0001
+Signed-off-by: Alexander Kappner <agk@godking.net>
+---
+ hw/usb/host-libusb.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-  none of them help to properly handle my device inside guest machine.
-
-  Only one time the Windows guest machine properly start the device so
-  software for that oscilloscope can identify the Oscilloscope and
-  measure for a while but unfortunately after I guess 5 seconds of
-  measurement the device was disconnected from Windows and never start
-  working again even after couple of restarts of guest machine even
-  after plug and unplug it's USB cable and power cable.
-
-  I searched for a solution or some clues to get it work but none of my
-  searching over the internet was successful. Because device works on
-  pure Windows but not work on virtualized one, I think there is a
-  problem with handling not standard USB devices (like sticks,
-  keyboards, mouses etc.)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1511887/+subscriptions
+diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
+index 833250a..1b5e655 100644
+--- a/hw/usb/host-libusb.c
++++ b/hw/usb/host-libusb.c
+@@ -82,7 +82,7 @@ struct USBHostDevice {
+     uint32_t                         options;
+     uint32_t                         loglevel;
+     bool                             needs_autoscan;
+-
++    bool                             no_guest_reset;
+     /* state */
+     QTAILQ_ENTRY(USBHostDevice)      next;
+     int                              seen, errcount;
+@@ -1456,6 +1456,10 @@ static void usb_host_handle_reset(USBDevice *udev)
+     USBHostDevice *s = USB_HOST_DEVICE(udev);
+     int rc;
+ 
++    if (s->no_guest_reset) {
++        return;
++    }
++
+     trace_usb_host_reset(s->bus_num, s->addr);
+ 
+     rc = libusb_reset_device(s->dh);
+@@ -1573,6 +1577,7 @@ static Property usb_host_dev_properties[] = {
+     DEFINE_PROP_UINT32("productid", USBHostDevice, match.product_id, 0),
+     DEFINE_PROP_UINT32("isobufs",  USBHostDevice, iso_urb_count,    4),
+     DEFINE_PROP_UINT32("isobsize", USBHostDevice, iso_urb_frames,   32),
++    DEFINE_PROP_BOOL("no_guest_reset", USBHostDevice, no_guest_reset,   FALSE),
+     DEFINE_PROP_UINT32("loglevel",  USBHostDevice, loglevel,
+                        LIBUSB_LOG_LEVEL_WARNING),
+     DEFINE_PROP_BIT("pipeline",    USBHostDevice, options,
+-- 
+2.1.4
