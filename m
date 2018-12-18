@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gZ4hs-0000Bp-Cv
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 21:02:01 -0500
+	(envelope-from <mst@redhat.com>) id 1gZ4yN-0003O4-Nk
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 21:19:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gZ4ho-0000t2-B9
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 21:02:00 -0500
-Received: from mga06.intel.com ([134.134.136.31]:39425)
+	(envelope-from <mst@redhat.com>) id 1gZ4yK-0000CM-G6
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 21:19:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60238)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1gZ4ho-0000sU-0X
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 21:01:56 -0500
-Date: Tue, 18 Dec 2018 10:01:46 +0800
-From: Yi Zhang <yi.z.zhang@linux.intel.com>
-Message-ID: <20181218020146.GA72672@tiger-server>
-References: <cover.1544598069.git.yi.z.zhang@linux.intel.com>
-	<20181212100106-mutt-send-email-mst@kernel.org>
-	<20181217055354.GA67329@tiger-server>
-	<20181217102459-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZ4yK-00008R-6D
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 21:19:00 -0500
+Date: Mon, 17 Dec 2018 21:18:58 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181217211833-mutt-send-email-mst@kernel.org>
+References: <20181203070517.22668-1-zhengxiang9@huawei.com>
+	<0847e762-42eb-5e9e-6ba9-4066bf05547d@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181217102459-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH V6 0/6] nvdimm: support MAP_SYNC for
- memory-backend-file
+In-Reply-To: <0847e762-42eb-5e9e-6ba9-4066bf05547d@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] pcie: set link state inactive/active after
+ hot unplug/plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,124 +28,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: xiaoguangrong.eric@gmail.com, dan.j.williams@intel.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, qemu-devel@nongnu.org, imammedo@redhat.com, ehabkost@redhat.com
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Zheng Xiang <zhengxiang9@huawei.com>, qemu-devel@nongnu.org, wanghaibin.wang@huawei.com, Zheng Xiang <xiang.zheng@linaro.org>
 
-On 2018-12-17 at 10:27:50 -0500, Michael S. Tsirkin wrote:
-> On Mon, Dec 17, 2018 at 01:53:54PM +0800, Yi Zhang wrote:
-> > On 2018-12-12 at 10:06:13 -0500, Michael S. Tsirkin wrote:
-> > > On Wed, Dec 12, 2018 at 04:11:44PM +0800, Zhang Yi wrote:
-> > > > Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
-> > > > guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
-> > > > files on ext4/xfs file system mounted with '-o dax').
-> > > > 
-> > > > A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
-> > > >     https://patchwork.kernel.org/patch/10028151/
-> > > > 
-> > > > In order to make sure that the file metadata is in sync after a fault 
-> > > > while we are writing a shared DAX supporting backend files, this
-> > > > patch-set enables QEMU to use MAP_SYNC flag for memory-backend-dax-file.
-> > > > 
-> > > > As the DAX vs DMA truncated issue was solved, we refined the code and
-> > > > send out this feature for the v5 version.
-> > > > 
-> > > > A new auto on/off option 'sync' is added to memory-backend-file:
-> > > >  - on:  try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
-> > > >         'share=off', QEMU will abort
-> > > >  - off: never pass MAP_SYNC to mmap(2)
-> > > >  - auto (default): if MAP_SYNC is supported and 'share=on', work as if
-> > > >         'sync=on'; otherwise, work as if 'sync=off'
-> > > 
-> > > Can this change be limited to a real DAX device?
-> > > Then you won't need to bother with flags at all.
-> > Thanks Micheal's review,
+On Wed, Dec 05, 2018 at 08:23:35AM +0200, Marcel Apfelbaum wrote:
+> 
+> 
+> On 12/3/18 9:05 AM, Zheng Xiang wrote:
+> > When VM boots from the latest version of linux kernel, after
+> > hot-unpluging virtio-blk disks which are hotplugged into
+> > pcie-root-port, the VM's dmesg log shows:
 > > 
-> > For real dax device, we still need to have a option to turn sync off.
-> 
-> Not sure why really. Why use an nvdimm if you don't actually
-> want it to be persistent?
-> 
-> 
-> > > 
-> > > And am I mistaken in thinking that this will affect all
-> > > guest memory with share=on? Or do I misunderstand?
+> > [  151.046242] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0001 from Slot Status
+> > [  151.046365] pciehp 0000:00:05.0:pcie004: Slot(0-3): Attention button pressed
+> > [  151.046369] pciehp 0000:00:05.0:pcie004: Slot(0-3): Powering off due to button press
+> > [  151.046420] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
+> > [  151.046425] pciehp 0000:00:05.0:pcie004: pciehp_green_led_blink: SLOTCTRL a8 write cmd 200
+> > [  151.046464] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
+> > [  151.046468] pciehp 0000:00:05.0:pcie004: pciehp_set_attention_status: SLOTCTRL a8 write cmd c0
+> > [  156.163421] pciehp 0000:00:05.0:pcie004: pciehp_get_power_status: SLOTCTRL a8 value read 2f1
+> > [  156.163427] pciehp 0000:00:05.0:pcie004: pciehp_unconfigure_device: domain:bus:dev = 0000:06:00
+> > [  156.198736] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
+> > [  156.198772] pciehp 0000:00:05.0:pcie004: pciehp_power_off_slot: SLOTCTRL a8 write cmd 400
+> > [  157.224124] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0018 from Slot Status
+> > [  157.224194] pciehp 0000:00:05.0:pcie004: pciehp_green_led_off: SLOTCTRL a8 write cmd 300
+> > [  157.224220] pciehp 0000:00:05.0:pcie004: pciehp_check_link_active: lnk_status = 2011
+> > [  157.224223] pciehp 0000:00:05.0:pcie004: Slot(0-3): Link Up
+> > [  157.224233] pciehp 0000:00:05.0:pcie004: pciehp_get_power_status: SLOTCTRL a8 value read 7f1
+> > [  157.224281] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
+> > [  157.224285] pciehp 0000:00:05.0:pcie004: pciehp_power_on_slot: SLOTCTRL a8 write cmd 0
+> > [  157.224300] pciehp 0000:00:05.0:pcie004: __pciehp_link_set: lnk_ctrl = 0
+> > [  157.224336] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
+> > [  157.224339] pciehp 0000:00:05.0:pcie004: pciehp_green_led_blink: SLOTCTRL a8 write cmd 200
+> > [  159.739294] pci 0000:06:00.0 id reading try 50 times with interval 20 ms to get ffffffff
+> > [  159.739315] pciehp 0000:00:05.0:pcie004: pciehp_check_link_status: lnk_status = 2011
+> > [  159.739318] pciehp 0000:00:05.0:pcie004: Failed to check link status
+> > [  159.739371] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
+> > [  159.739394] pciehp 0000:00:05.0:pcie004: pciehp_power_off_slot: SLOTCTRL a8 write cmd 400
+> > [  160.771426] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
+> > [  160.771452] pciehp 0000:00:05.0:pcie004: pciehp_green_led_off: SLOTCTRL a8 write cmd 300
+> > [  160.771495] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
+> > [  160.771499] pciehp 0000:00:05.0:pcie004: pciehp_set_attention_status: SLOTCTRL a8 write cmd 40
+> > [  160.771535] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
+> > [  160.771539] pciehp 0000:00:05.0:pcie004: pciehp_green_led_off: SLOTCTRL a8 write cmd 300
 > > 
-> > Only file-backend memory with share=on.
+> > After analyzing the log information, it seems that qemu doesn't
+> > change the Link Status from active to inactive after hot-unplug.
+> > This results in the abnormal log after the linux kernel commit
+> > d331710ea78fea merged.
+> > 
+> > Furthermore, If I hotplug the same virtio-blk disk after hot-unplug,
+> > the virtio-blk would turn on and then back off.
+> > 
+> > So this patch set the Link Status inactive after hot-unplug and
+> > active after hot-plug.
+> > 
+> > Signed-off-by: Zheng Xiang <zhengxiang9@huawei.com>
+> > Signed-off-by: Zheng Xiang <xiang.zheng@linaro.org>
+> > Cc: Wang Haibin <wanghaibin.wang@huawei.com>
+> > ---
+> >   hw/pci/pcie.c | 12 ++++++++++++
+> >   1 file changed, 12 insertions(+)
+> > 
+> > diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+> > index 6c91bd4..66b73b8 100644
+> > --- a/hw/pci/pcie.c
+> > +++ b/hw/pci/pcie.c
+> > @@ -345,6 +345,10 @@ void pcie_cap_slot_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >       if (!dev->hotplugged) {
+> >           pci_word_test_and_set_mask(exp_cap + PCI_EXP_SLTSTA,
+> >                                      PCI_EXP_SLTSTA_PDS);
+> > +        if (pci_dev->cap_present & QEMU_PCIE_LNKSTA_DLLLA) {
+> > +            pci_word_test_and_set_mask(exp_cap + PCI_EXP_LNKSTA,
+> > +                                       PCI_EXP_LNKSTA_DLLLA);
+> > +        }
+> >           return;
+> >       }
+> > @@ -355,6 +359,10 @@ void pcie_cap_slot_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >       if (pci_get_function_0(pci_dev)) {
+> >           pci_word_test_and_set_mask(exp_cap + PCI_EXP_SLTSTA,
+> >                                      PCI_EXP_SLTSTA_PDS);
+> > +        if (pci_dev->cap_present & QEMU_PCIE_LNKSTA_DLLLA) {
+> > +            pci_word_test_and_set_mask(exp_cap + PCI_EXP_LNKSTA,
+> > +                                       PCI_EXP_LNKSTA_DLLLA);
+> > +        }
+> >           pcie_cap_slot_event(PCI_DEVICE(hotplug_dev),
+> >                               PCI_EXP_HP_EV_PDC | PCI_EXP_HP_EV_ABP);
+> >       }
+> > @@ -531,6 +539,10 @@ void pcie_cap_slot_write_config(PCIDevice *dev,
+> >           pci_word_test_and_clear_mask(exp_cap + PCI_EXP_SLTSTA,
+> >                                        PCI_EXP_SLTSTA_PDS);
+> > +        if (dev->cap_present & QEMU_PCIE_LNKSTA_DLLLA) {
+> > +            pci_word_test_and_clear_mask(exp_cap + PCI_EXP_LNKSTA,
+> > +                                         PCI_EXP_LNKSTA_DLLLA);
+> > +        }
+> >           pci_word_test_and_set_mask(exp_cap + PCI_EXP_SLTSTA,
+> >                                          PCI_EXP_SLTSTA_PDC);
+> >       }
 > 
-> Yes but that's everyone if e.g. vhost-user needs to be active.
+> Looks good to me,
 > 
-> So frankly I don't think it's a good idea to change the default like this
-> unless it's limited to nvdimm in some way.
+> Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
+> Thanks,
+> Marcel
+> 
+> 
 
-Yes, fine, I will limit this flag only on an nvdimm backend. Thanks,
-Micheal.
+Marcel you need to fix your signature. I can't use it without
+a space before <.
 
-> 
-> > > 
-> > > 
-> > > 
-> > > > Changes in v6:
-> > > >  * Pankaj: 3/7 are squashed with 2/7
-> > > >  * Pankaj: 7/7 update comments to "consistent filesystem metadata".
-> > > >  * Pankaj, Igor: 1/7 Added Reviewed-by in patch-1/7
-> > > >  * Stefan, 4/7 move the include header from "/linux/mman.h" to "osdep.h"
-> > > >  * Stefan, 5/7 Add missing "munmap"
-> > > >  * Stefan, 2/7 refine the shared/flag.
-> > > > 
-> > > > Changes in v5:
-> > > >  * Add patch 1 to fix a memory leak issue.
-> > > >  * Refine the patch 4-6
-> > > >  * Remove the patch 3 as we already change the parameter from "shared" to
-> > > >    "flags"
-> > > > 
-> > > > Changes in v4:
-> > > >  * Add patch 1-3 to switch some functions to a single 'flags'
-> > > >    parameters. (Michael S. Tsirkin)
-> > > >  * v3 patch 1-3 become v4 patch 4-6.
-> > > >  * Patch 4: move definitions of MAP_SYNC and MAP_SHARED_VALIDATE to a
-> > > >    new header file under include/standard-headers/linux/. (Michael S. Tsirkin)
-> > > >  * Patch 6: refine the description of the 'sync' option. (Michael S. Tsirkin)
-> > > > 
-> > > > Changes in v3:
-> > > >  * Patch 1: add MAP_SHARED_VALIDATE in both sync=on and sync=auto
-> > > >    cases, and add back the retry mechanism. MAP_SYNC will be ignored
-> > > >    by Linux kernel 4.15 if MAP_SHARED_VALIDATE is missed.
-> > > >  * Patch 1: define MAP_SYNC and MAP_SHARED_VALIDATE as 0 on non-Linux
-> > > >    platforms in order to make qemu_ram_mmap() compile on those platforms.
-> > > >  * Patch 2&3: include more information in error messages of
-> > > >    memory-backend in hope to help user to identify the error.
-> > > >    (Dr. David Alan Gilbert)
-> > > >  * Patch 3: fix typo in the commit message. (Dr. David Alan Gilbert)
-> > > > 
-> > > > Changes in v2:
-> > > >  * Add 'sync' option to control the use of MAP_SYNC. (Eduardo Habkost)
-> > > >  * Remove the unnecessary set of MAP_SHARED_VALIDATE in some cases and
-> > > >    the retry mechanism in qemu_ram_mmap(). (Michael S. Tsirkin)
-> > > >  * Move OS dependent definitions of MAP_SYNC and MAP_SHARED_VALIDATE
-> > > >    to osdep.h. (Michael S. Tsirkin)
-> > > > 
-> > > > Zhang Yi (6):
-> > > >   numa: Fixed the memory leak of numa error message
-> > > >   util/mmap-alloc: switch qemu_ram_mmap() to 'flags' parameter
-> > > >   util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
-> > > >   util/mmap-alloc: Switch the RAM_SYNC flags to OnOffAuto
-> > > >   hostmem: add more information in error messages
-> > > >   hostmem-file: add 'sync' option
-> > > > 
-> > > >  backends/hostmem-file.c   | 45 +++++++++++++++++++++++++++++++++++++++++++--
-> > > >  backends/hostmem.c        |  8 +++++---
-> > > >  docs/nvdimm.txt           | 20 +++++++++++++++++++-
-> > > >  exec.c                    |  9 +++++----
-> > > >  include/exec/memory.h     | 18 ++++++++++++++++++
-> > > >  include/exec/ram_addr.h   |  1 +
-> > > >  include/qemu/mmap-alloc.h | 20 +++++++++++++++++++-
-> > > >  include/qemu/osdep.h      | 29 +++++++++++++++++++++++++++++
-> > > >  numa.c                    |  1 +
-> > > >  qemu-options.hx           | 22 +++++++++++++++++++++-
-> > > >  util/mmap-alloc.c         | 26 +++++++++++++++++++++-----
-> > > >  util/oslib-posix.c        |  8 +++++++-
-> > > >  12 files changed, 189 insertions(+), 18 deletions(-)
-> > > > 
-> > > > -- 
-> > > > 2.7.4
-> 
+Thanks!
+
+-- 
+MST
