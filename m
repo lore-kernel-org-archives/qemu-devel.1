@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZ4yN-0003O4-Nk
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 21:19:04 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gZ531-0004iU-0R
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 21:23:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZ4yK-0000CM-G6
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 21:19:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60238)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZ4yK-00008R-6D
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 21:19:00 -0500
-Date: Mon, 17 Dec 2018 21:18:58 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181217211833-mutt-send-email-mst@kernel.org>
-References: <20181203070517.22668-1-zhengxiang9@huawei.com>
-	<0847e762-42eb-5e9e-6ba9-4066bf05547d@gmail.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1gZ52z-0005Aw-9s
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 21:23:50 -0500
+Date: Tue, 18 Dec 2018 11:00:18 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20181218000018.GA23604@umbus.fritz.box>
+References: <20181211223823.13770-1-clg@kaod.org>
+	<20181211223823.13770-10-clg@kaod.org>
+	<4a9ab4ce-c7d7-9744-e5ea-10df38806e9a@kaod.org>
+	<20181217060139.GG5597@umbus.fritz.box>
+	<6f685f79-56b2-7ea4-57b6-e1f21bd34326@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="sdtB3X0nJg68CQEu"
 Content-Disposition: inline
-In-Reply-To: <0847e762-42eb-5e9e-6ba9-4066bf05547d@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] pcie: set link state inactive/active after
- hot unplug/plug
+In-Reply-To: <6f685f79-56b2-7ea4-57b6-e1f21bd34326@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v8 09/12] spapr: set the interrupt
+ presenter at reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,116 +28,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Zheng Xiang <zhengxiang9@huawei.com>, qemu-devel@nongnu.org, wanghaibin.wang@huawei.com, Zheng Xiang <xiang.zheng@linaro.org>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On Wed, Dec 05, 2018 at 08:23:35AM +0200, Marcel Apfelbaum wrote:
-> 
-> 
-> On 12/3/18 9:05 AM, Zheng Xiang wrote:
-> > When VM boots from the latest version of linux kernel, after
-> > hot-unpluging virtio-blk disks which are hotplugged into
-> > pcie-root-port, the VM's dmesg log shows:
-> > 
-> > [  151.046242] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0001 from Slot Status
-> > [  151.046365] pciehp 0000:00:05.0:pcie004: Slot(0-3): Attention button pressed
-> > [  151.046369] pciehp 0000:00:05.0:pcie004: Slot(0-3): Powering off due to button press
-> > [  151.046420] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
-> > [  151.046425] pciehp 0000:00:05.0:pcie004: pciehp_green_led_blink: SLOTCTRL a8 write cmd 200
-> > [  151.046464] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
-> > [  151.046468] pciehp 0000:00:05.0:pcie004: pciehp_set_attention_status: SLOTCTRL a8 write cmd c0
-> > [  156.163421] pciehp 0000:00:05.0:pcie004: pciehp_get_power_status: SLOTCTRL a8 value read 2f1
-> > [  156.163427] pciehp 0000:00:05.0:pcie004: pciehp_unconfigure_device: domain:bus:dev = 0000:06:00
-> > [  156.198736] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
-> > [  156.198772] pciehp 0000:00:05.0:pcie004: pciehp_power_off_slot: SLOTCTRL a8 write cmd 400
-> > [  157.224124] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0018 from Slot Status
-> > [  157.224194] pciehp 0000:00:05.0:pcie004: pciehp_green_led_off: SLOTCTRL a8 write cmd 300
-> > [  157.224220] pciehp 0000:00:05.0:pcie004: pciehp_check_link_active: lnk_status = 2011
-> > [  157.224223] pciehp 0000:00:05.0:pcie004: Slot(0-3): Link Up
-> > [  157.224233] pciehp 0000:00:05.0:pcie004: pciehp_get_power_status: SLOTCTRL a8 value read 7f1
-> > [  157.224281] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
-> > [  157.224285] pciehp 0000:00:05.0:pcie004: pciehp_power_on_slot: SLOTCTRL a8 write cmd 0
-> > [  157.224300] pciehp 0000:00:05.0:pcie004: __pciehp_link_set: lnk_ctrl = 0
-> > [  157.224336] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
-> > [  157.224339] pciehp 0000:00:05.0:pcie004: pciehp_green_led_blink: SLOTCTRL a8 write cmd 200
-> > [  159.739294] pci 0000:06:00.0 id reading try 50 times with interval 20 ms to get ffffffff
-> > [  159.739315] pciehp 0000:00:05.0:pcie004: pciehp_check_link_status: lnk_status = 2011
-> > [  159.739318] pciehp 0000:00:05.0:pcie004: Failed to check link status
-> > [  159.739371] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
-> > [  159.739394] pciehp 0000:00:05.0:pcie004: pciehp_power_off_slot: SLOTCTRL a8 write cmd 400
-> > [  160.771426] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
-> > [  160.771452] pciehp 0000:00:05.0:pcie004: pciehp_green_led_off: SLOTCTRL a8 write cmd 300
-> > [  160.771495] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
-> > [  160.771499] pciehp 0000:00:05.0:pcie004: pciehp_set_attention_status: SLOTCTRL a8 write cmd 40
-> > [  160.771535] pciehp 0000:00:05.0:pcie004: pending interrupts 0x0010 from Slot Status
-> > [  160.771539] pciehp 0000:00:05.0:pcie004: pciehp_green_led_off: SLOTCTRL a8 write cmd 300
-> > 
-> > After analyzing the log information, it seems that qemu doesn't
-> > change the Link Status from active to inactive after hot-unplug.
-> > This results in the abnormal log after the linux kernel commit
-> > d331710ea78fea merged.
-> > 
-> > Furthermore, If I hotplug the same virtio-blk disk after hot-unplug,
-> > the virtio-blk would turn on and then back off.
-> > 
-> > So this patch set the Link Status inactive after hot-unplug and
-> > active after hot-plug.
-> > 
-> > Signed-off-by: Zheng Xiang <zhengxiang9@huawei.com>
-> > Signed-off-by: Zheng Xiang <xiang.zheng@linaro.org>
-> > Cc: Wang Haibin <wanghaibin.wang@huawei.com>
-> > ---
-> >   hw/pci/pcie.c | 12 ++++++++++++
-> >   1 file changed, 12 insertions(+)
-> > 
-> > diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-> > index 6c91bd4..66b73b8 100644
-> > --- a/hw/pci/pcie.c
-> > +++ b/hw/pci/pcie.c
-> > @@ -345,6 +345,10 @@ void pcie_cap_slot_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-> >       if (!dev->hotplugged) {
-> >           pci_word_test_and_set_mask(exp_cap + PCI_EXP_SLTSTA,
-> >                                      PCI_EXP_SLTSTA_PDS);
-> > +        if (pci_dev->cap_present & QEMU_PCIE_LNKSTA_DLLLA) {
-> > +            pci_word_test_and_set_mask(exp_cap + PCI_EXP_LNKSTA,
-> > +                                       PCI_EXP_LNKSTA_DLLLA);
-> > +        }
-> >           return;
-> >       }
-> > @@ -355,6 +359,10 @@ void pcie_cap_slot_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-> >       if (pci_get_function_0(pci_dev)) {
-> >           pci_word_test_and_set_mask(exp_cap + PCI_EXP_SLTSTA,
-> >                                      PCI_EXP_SLTSTA_PDS);
-> > +        if (pci_dev->cap_present & QEMU_PCIE_LNKSTA_DLLLA) {
-> > +            pci_word_test_and_set_mask(exp_cap + PCI_EXP_LNKSTA,
-> > +                                       PCI_EXP_LNKSTA_DLLLA);
-> > +        }
-> >           pcie_cap_slot_event(PCI_DEVICE(hotplug_dev),
-> >                               PCI_EXP_HP_EV_PDC | PCI_EXP_HP_EV_ABP);
-> >       }
-> > @@ -531,6 +539,10 @@ void pcie_cap_slot_write_config(PCIDevice *dev,
-> >           pci_word_test_and_clear_mask(exp_cap + PCI_EXP_SLTSTA,
-> >                                        PCI_EXP_SLTSTA_PDS);
-> > +        if (dev->cap_present & QEMU_PCIE_LNKSTA_DLLLA) {
-> > +            pci_word_test_and_clear_mask(exp_cap + PCI_EXP_LNKSTA,
-> > +                                         PCI_EXP_LNKSTA_DLLLA);
-> > +        }
-> >           pci_word_test_and_set_mask(exp_cap + PCI_EXP_SLTSTA,
-> >                                          PCI_EXP_SLTSTA_PDC);
-> >       }
-> 
-> Looks good to me,
-> 
-> Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
+
+--sdtB3X0nJg68CQEu
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Dec 17, 2018 at 11:41:34PM +0100, C=E9dric Le Goater wrote:
+> On 12/17/18 7:01 AM, David Gibson wrote:
+> > On Thu, Dec 13, 2018 at 01:52:14PM +0100, C=E9dric Le Goater wrote:
+> >> On 12/11/18 11:38 PM, C=E9dric Le Goater wrote:
+> >>> Currently, the interrupt presenter of the vCPU is set at realize
+> >>> time. Setting it at reset will become necessary when the new machine
+> >>> supporting both interrupt modes is introduced. In this machine, the
+> >>> interrupt mode is chosen at CAS time and activated after a reset.
+> >>
+> >> I think we need a second '->intc' pointer specific to XIVE instead.=20
+> >> How about ->intc_xive ?
+> >=20
+> > Ah, interesting.  If we're going to need that, we might as well go
+> > to specific ->icp and ->tctx pointers with the right types.
+>=20
+> Hmm, PowerPCCPU is defined under target/ppc and adding the type might=20
+> add some noise. I will check.
+
+It's a pointer, so you can just declare the type without a
+definition.  That should be ok.
+
+> > I don't particularly like having those machine specific pointers
+> > within the cpu structure, but we can look at fixing that later by
+> > reviving my patches to move various machine specific stuff within the
+> > cpu into a separate sub-allocation.
+>=20
+> ok.
+>=20
 > Thanks,
-> Marcel
-> 
-> 
+>=20
+> C.=20
+>=20
+> >>
+> >> We could just drop this patch and easly get rid of the XiveTCTX object=
+=20
+> >> leak in spapr_unrealize_vcpu().
+> >>
+> >> C.=20
+> >>
+> >>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >>> ---
+> >>>
+> >>>  Changes since v7:
+> >>>
+> >>>  - introduced spapr_irq_reset_xics().=20
+> >>>
+> >>>  include/hw/ppc/spapr_cpu_core.h |  2 ++
+> >>>  hw/ppc/spapr_cpu_core.c         | 26 ++++++++++++++++++++++++++
+> >>>  hw/ppc/spapr_irq.c              | 13 +++++++++++++
+> >>>  3 files changed, 41 insertions(+)
+> >>>
+> >>> diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_c=
+pu_core.h
+> >>> index 9e2821e4b31f..fc8ea9021656 100644
+> >>> --- a/include/hw/ppc/spapr_cpu_core.h
+> >>> +++ b/include/hw/ppc/spapr_cpu_core.h
+> >>> @@ -53,4 +53,6 @@ static inline sPAPRCPUState *spapr_cpu_state(PowerP=
+CCPU *cpu)
+> >>>      return (sPAPRCPUState *)cpu->machine_data;
+> >>>  }
+> >>> =20
+> >>> +void spapr_cpu_core_set_intc(PowerPCCPU *cpu, const char *intc_type);
+> >>> +
+> >>>  #endif
+> >>> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> >>> index 82666436e9b4..afc5d4f4e739 100644
+> >>> --- a/hw/ppc/spapr_cpu_core.c
+> >>> +++ b/hw/ppc/spapr_cpu_core.c
+> >>> @@ -397,3 +397,29 @@ static const TypeInfo spapr_cpu_core_type_infos[=
+] =3D {
+> >>>  };
+> >>> =20
+> >>>  DEFINE_TYPES(spapr_cpu_core_type_infos)
+> >>> +
+> >>> +typedef struct ForeachFindIntCArgs {
+> >>> +    const char *intc_type;
+> >>> +    Object *intc;
+> >>> +} ForeachFindIntCArgs;
+> >>> +
+> >>> +static int spapr_cpu_core_find_intc(Object *child, void *opaque)
+> >>> +{
+> >>> +    ForeachFindIntCArgs *args =3D opaque;
+> >>> +
+> >>> +    if (object_dynamic_cast(child, args->intc_type)) {
+> >>> +        args->intc =3D child;
+> >>> +    }
+> >>> +
+> >>> +    return args->intc !=3D NULL;
+> >>> +}
+> >>> +
+> >>> +void spapr_cpu_core_set_intc(PowerPCCPU *cpu, const char *intc_type)
+> >>> +{
+> >>> +    ForeachFindIntCArgs args =3D { intc_type, NULL };
+> >>> +
+> >>> +    object_child_foreach(OBJECT(cpu), spapr_cpu_core_find_intc, &arg=
+s);
+> >>> +    g_assert(args.intc);
+> >>> +
+> >>> +    cpu->intc =3D args.intc;
+> >>> +}
+> >>> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> >>> index 0999a2b2d69c..814500f22d34 100644
+> >>> --- a/hw/ppc/spapr_irq.c
+> >>> +++ b/hw/ppc/spapr_irq.c
+> >>> @@ -12,6 +12,7 @@
+> >>>  #include "qemu/error-report.h"
+> >>>  #include "qapi/error.h"
+> >>>  #include "hw/ppc/spapr.h"
+> >>> +#include "hw/ppc/spapr_cpu_core.h"
+> >>>  #include "hw/ppc/spapr_xive.h"
+> >>>  #include "hw/ppc/xics.h"
+> >>>  #include "sysemu/kvm.h"
+> >>> @@ -208,6 +209,15 @@ static int spapr_irq_post_load_xics(sPAPRMachine=
+State *spapr, int version_id)
+> >>>      return 0;
+> >>>  }
+> >>> =20
+> >>> +static void spapr_irq_reset_xics(sPAPRMachineState *spapr, Error **e=
+rrp)
+> >>> +{
+> >>> +   CPUState *cs;
+> >>> +
+> >>> +    CPU_FOREACH(cs) {
+> >>> +        spapr_cpu_core_set_intc(POWERPC_CPU(cs), spapr->icp_type);
+> >>> +    }
+> >>> +}
+> >>> +
+> >>>  #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
+> >>>  #define SPAPR_IRQ_XICS_NR_MSIS     \
+> >>>      (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
+> >>> @@ -225,6 +235,7 @@ sPAPRIrq spapr_irq_xics =3D {
+> >>>      .dt_populate =3D spapr_dt_xics,
+> >>>      .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
+> >>>      .post_load   =3D spapr_irq_post_load_xics,
+> >>> +    .reset       =3D spapr_irq_reset_xics,
+> >>>  };
+> >>> =20
+> >>>  /*
+> >>> @@ -325,6 +336,8 @@ static void spapr_irq_reset_xive(sPAPRMachineStat=
+e *spapr, Error **errp)
+> >>>      CPU_FOREACH(cs) {
+> >>>          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> >>> =20
+> >>> +        spapr_cpu_core_set_intc(cpu, TYPE_XIVE_TCTX);
+> >>> +
+> >>>          /* (TCG) Set the OS CAM line of the thread interrupt context=
+=2E */
+> >>>          spapr_xive_set_tctx_os_cam(XIVE_TCTX(cpu->intc));
+> >>>      }
+> >>>
+> >>
+> >=20
+>=20
 
-Marcel you need to fix your signature. I can't use it without
-a space before <.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Thanks!
+--sdtB3X0nJg68CQEu
+Content-Type: application/pgp-signature; name="signature.asc"
 
--- 
-MST
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwYOI8ACgkQbDjKyiDZ
+s5Lo+RAApx+4rWbWBwjpYMq0b5jxtd3eCDaCrdunGnY1GzQI7bzF3lTG2mpwMvh8
+FL0vsJLaglEUiNAKx8c3ku1hqh6r5Q3haAnUcDrZRGR1vjwBGLhzU8pYexBilVx1
+43qGPBVWIdL735Rm7YVZXwKHA4lVLzY/JVO4/frZCABMrLnRRPXb2CtJ74x7zI6Y
+9IUITbmymVxLAkxLYg1s8Fj+IYjnfIe3E51Xyt3mDO0h8pClocyV7Iner0cAHJ6L
+CuaX83DkwDaWdC93Oxv/EXKpSqtV1BiC7vFvhEnT+lcEnBSIls5mABdrWOu9OV/s
+P6k7tvtXuTEd+JLJu+XqUKEZafl527tlkwP0vjxPT24cOU+9B7lGzRcVsCUPTFGO
+sU7reCohtzsEL+MC+drzeIGk3Q91WEaI6K1LP9hf3pZIhOAsV3BTn1n5eG3hzNxY
+ZnYiMXJG0n7V0Y+HHpSc3/eRyH0kEpCqnasK/hJJQ2tqSTVyFoV1oAALgPZLgoTT
+l2C3j3MnfoptkbHp8cK188WVLXTHuM4tcTuWAI3Ezas8XftVB/Jk17aN1DwKOCxr
+ez3DCKNTexJepJEUVI8QHTflEl/ILDwllvwPV+g7+Hgl+ffnxEYH4uKJ2mp39Pnl
+V71o6t8SMsADyoJEfGCrA5vZnjKeUmHGqJyhVwfH5lRC+jN38+E=
+=ntW+
+-----END PGP SIGNATURE-----
+
+--sdtB3X0nJg68CQEu--
