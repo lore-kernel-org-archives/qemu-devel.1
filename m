@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gZCBu-0007yV-N3
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:01:36 -0500
+	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gZCEt-0002OG-2i
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:04:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gZCBp-0001xg-4p
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:01:30 -0500
-Received: from mail-pf1-x429.google.com ([2607:f8b0:4864:20::429]:37016)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gZCBj-0001pw-0O
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:01:20 -0500
-Received: by mail-pf1-x429.google.com with SMTP id y126so7904420pfb.4
-	for <qemu-devel@nongnu.org>; Tue, 18 Dec 2018 02:01:07 -0800 (PST)
-From: elohimes@gmail.com
-Date: Tue, 18 Dec 2018 18:00:02 +0800
-Message-Id: <20181218100002.11219-8-xieyongji@baidu.com>
-In-Reply-To: <20181218100002.11219-1-xieyongji@baidu.com>
-References: <20181218100002.11219-1-xieyongji@baidu.com>
-Subject: [Qemu-devel] [PATCH v2 for-4.0 7/7] contrib/vhost-user-blk: enable
- inflight I/O recording
+	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gZCEn-0003h6-Bp
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:04:35 -0500
+Received: from mga05.intel.com ([192.55.52.43]:26445)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yu.c.zhang@linux.intel.com>)
+	id 1gZCEn-0003cS-0r
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 05:04:29 -0500
+Date: Tue, 18 Dec 2018 18:01:16 +0800
+From: Yu Zhang <yu.c.zhang@linux.intel.com>
+Message-ID: <20181218100116.6wqncwwhxni4o66t@linux.intel.com>
+References: <1544619939-18102-1-git-send-email-yu.c.zhang@linux.intel.com>
+	<1544619939-18102-3-git-send-email-yu.c.zhang@linux.intel.com>
+	<20181217142902.1ee007c1@Igors-MacBook-Pro.local>
+	<20181218094713.gzb4i4zizlu2tj4a@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181218094713.gzb4i4zizlu2tj4a@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] intel-iommu: extend VTD emulation
+ to allow 57-bit IOVA address width.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,33 +31,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, marcandre.lureau@redhat.com, jasowang@redhat.com, yury-kotov@yandex-team.ru, maxime.coquelin@redhat.com
-Cc: qemu-devel@nongnu.org, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-From: Xie Yongji <xieyongji@baidu.com>
+On Tue, Dec 18, 2018 at 05:47:14PM +0800, Yu Zhang wrote:
+> On Mon, Dec 17, 2018 at 02:29:02PM +0100, Igor Mammedov wrote:
+> > On Wed, 12 Dec 2018 21:05:39 +0800
+> > Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
+> > 
+> > > A 5-level paging capable VM may choose to use 57-bit IOVA address width.
+> > > E.g. guest applications may prefer to use its VA as IOVA when performing
+> > > VFIO map/unmap operations, to avoid the burden of managing the IOVA space.
+> > > 
+> > > This patch extends the current vIOMMU logic to cover the extended address
+> > > width. When creating a VM with 5-level paging feature, one can choose to
+> > > create a virtual VTD with 5-level paging capability, with configurations
+> > > like "-device intel-iommu,x-aw-bits=57".
+> > > 
+> > > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> > > Reviewed-by: Peter Xu <peterx@redhat.com>
+> > > ---
+> > > Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> > > Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> > > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > > Cc: Richard Henderson <rth@twiddle.net>
+> > > Cc: Eduardo Habkost <ehabkost@redhat.com>
+> > > Cc: Peter Xu <peterx@redhat.com>
+> > > ---
+> > >  hw/i386/intel_iommu.c          | 53 ++++++++++++++++++++++++++++++++----------
+> > >  hw/i386/intel_iommu_internal.h | 10 ++++++--
+> > >  include/hw/i386/intel_iommu.h  |  1 +
+> > >  3 files changed, 50 insertions(+), 14 deletions(-)
+> > > 
+> > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> > > index 0e88c63..871110c 100644
+> > > --- a/hw/i386/intel_iommu.c
+> > > +++ b/hw/i386/intel_iommu.c
+> > > @@ -664,16 +664,16 @@ static inline bool vtd_iova_range_check(uint64_t iova, VTDContextEntry *ce,
+> > >  
+> > >  /*
+> > >   * Rsvd field masks for spte:
+> > > - *     Index [1] to [4] 4k pages
+> > > - *     Index [5] to [8] large pages
+> > > + *     Index [1] to [5] 4k pages
+> > > + *     Index [6] to [10] large pages
+> > >   */
+> > > -static uint64_t vtd_paging_entry_rsvd_field[9];
+> > > +static uint64_t vtd_paging_entry_rsvd_field[11];
+> > >  
+> > >  static bool vtd_slpte_nonzero_rsvd(uint64_t slpte, uint32_t level)
+> > >  {
+> > >      if (slpte & VTD_SL_PT_PAGE_SIZE_MASK) {
+> > >          /* Maybe large page */
+> > > -        return slpte & vtd_paging_entry_rsvd_field[level + 4];
+> > > +        return slpte & vtd_paging_entry_rsvd_field[level + 5];
+> > >      } else {
+> > >          return slpte & vtd_paging_entry_rsvd_field[level];
+> > >      }
+> > > @@ -3127,6 +3127,8 @@ static void vtd_init(IntelIOMMUState *s)
+> > >               VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(s->aw_bits);
+> > >      if (s->aw_bits == VTD_AW_48BIT) {
+> > >          s->cap |= VTD_CAP_SAGAW_48bit;
+> > > +    } else if (s->aw_bits == VTD_AW_57BIT) {
+> > > +        s->cap |= VTD_CAP_SAGAW_57bit | VTD_CAP_SAGAW_48bit;
+> > >      }
+> > >      s->ecap = VTD_ECAP_QI | VTD_ECAP_IRO;
+> > >      s->haw_bits = cpu->phys_bits;
+> > > @@ -3139,10 +3141,12 @@ static void vtd_init(IntelIOMMUState *s)
+> > >      vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->haw_bits);
+> > >      vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->haw_bits);
+> > >      vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->haw_bits);
+> > > -    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->haw_bits);
+> > > -    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->haw_bits);
+> > > -    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->haw_bits);
+> > > -    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->haw_bits);
+> > > +    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_PAGE_L5_RSVD_MASK(s->haw_bits);
+> > > +    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->haw_bits);
+> > > +    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->haw_bits);
+> > > +    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->haw_bits);
+> > > +    vtd_paging_entry_rsvd_field[9] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->haw_bits);
+> > > +    vtd_paging_entry_rsvd_field[10] = VTD_SPTE_LPAGE_L5_RSVD_MASK(s->haw_bits);
+> > >  
+> > >      if (x86_iommu->intr_supported) {
+> > >          s->ecap |= VTD_ECAP_IR | VTD_ECAP_MHMV;
+> > > @@ -3241,6 +3245,23 @@ static AddressSpace *vtd_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
+> > >      return &vtd_as->as;
+> > >  }
+> > >  
+> > > +static bool host_has_la57(void)
+> > > +{
+> > > +    uint32_t ecx, unused;
+> > > +
+> > > +    host_cpuid(7, 0, &unused, &unused, &ecx, &unused);
+> > > +    return ecx & CPUID_7_0_ECX_LA57;
+> > > +}
+> > > +
+> > > +static bool guest_has_la57(void)
+> > > +{
+> > > +    CPUState *cs = first_cpu;
+> > > +    X86CPU *cpu = X86_CPU(cs);
+> > > +    CPUX86State *env = &cpu->env;
+> > > +
+> > > +    return env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_LA57;
+> > > +}
+> > another direct access to CPU fields,
+> > I'd suggest to set this value when iommu is created
+> > i.e. add 'la57' property and set from iommu owner.
+> > 
+> 
+> Sorry, do you mean "-device intel-iommu,la57"? I think we do not need
+> that, because a 5-level capable vIOMMU can be created with properties
+> like "-device intel-iommu,x-aw-bits=57". 
+> 
+> The guest CPU fields are checked to make sure the VM has LA57 CPU feature,
+> because I believe there shall be no 5-level IOMMU on platforms without LA57
+> CPUs. 
+> 
+> > >  static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+> > >  {
+> > >      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
+> > > @@ -3267,11 +3288,19 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+> > >          }
+> > >      }
+> > >  
+> > > -    /* Currently only address widths supported are 39 and 48 bits */
+> > > +    /* Currently address widths supported are 39, 48, and 57 bits */
+> > >      if ((s->aw_bits != VTD_AW_39BIT) &&
+> > > -        (s->aw_bits != VTD_AW_48BIT)) {
+> > > -        error_setg(errp, "Supported values for x-aw-bits are: %d, %d",
+> > > -                   VTD_AW_39BIT, VTD_AW_48BIT);
+> > > +        (s->aw_bits != VTD_AW_48BIT) &&
+> > > +        (s->aw_bits != VTD_AW_57BIT)) {
+> > > +        error_setg(errp, "Supported values for x-aw-bits are: %d, %d, %d",
+> > > +                   VTD_AW_39BIT, VTD_AW_48BIT, VTD_AW_57BIT);
+> > > +        return false;
+> > > +    }
+> > > +
+> > > +    if ((s->aw_bits == VTD_AW_57BIT) &&
+> > > +        !(host_has_la57() && guest_has_la57())) {
+> > Does iommu supposed to work in TCG mode?
+> > If yes then why it should care about host_has_la57()?
+> > 
+> 
+> Hmm... I did not take TCG mode into consideration. And host_has_la57() is
+> used to guarantee the host have la57 feature so that iommu shadowing works
+> for device assignment.
+> 
+> I guess iommu shall work in TCG mode(though I am not quite sure about this).
+> But I do not have any usage case of a 5-level vIOMMU in TCG in mind. So maybe
+> we can:
+> 1> check the 'ms->accel' in vtd_decide_config() and do not care about host
+> capability if it is TCG.
 
-This patch enables inflight I/O recording for
-vhost-user-blk backend so that we could restart it safely.
+For choice 1, kvm_enabled() might be used instead of ms->accel. Thanks Peter
+for the remind. :)
 
-Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
----
- contrib/vhost-user-blk/vhost-user-blk.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user-blk/vhost-user-blk.c
-index 571f114a56..b144490fd6 100644
---- a/contrib/vhost-user-blk/vhost-user-blk.c
-+++ b/contrib/vhost-user-blk/vhost-user-blk.c
-@@ -328,7 +328,8 @@ vub_get_features(VuDev *dev)
- static uint64_t
- vub_get_protocol_features(VuDev *dev)
- {
--    return 1ull << VHOST_USER_PROTOCOL_F_CONFIG;
-+    return 1ull << VHOST_USER_PROTOCOL_F_CONFIG |
-+           1ull << VHOST_USER_PROTOCOL_F_SLAVE_SHMFD;
- }
- 
- static int
--- 
-2.17.1
+> 2> Or, we can choose to keep as it is, and add the check when 5-level paging
+> vIOMMU does have usage in TCG?
+> 
+> But as to the check of guest capability, I still believe it is necessary. As
+> said, a VM without LA57 feature shall not see a VT-d with 5-level IOMMU.
+> 
+> > > +        error_setg(errp, "Do not support 57-bit DMA address, unless both "
+> > > +                         "host and guest are capable of 5-level paging");
+> > >          return false;
+> > >      }
+> > >  
+> > > diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+> > > index d084099..2b29b6f 100644
+> > > --- a/hw/i386/intel_iommu_internal.h
+> > > +++ b/hw/i386/intel_iommu_internal.h
+> > > @@ -114,8 +114,8 @@
+> > >                                       VTD_INTERRUPT_ADDR_FIRST + 1)
+> > >  
+> > >  /* The shift of source_id in the key of IOTLB hash table */
+> > > -#define VTD_IOTLB_SID_SHIFT         36
+> > > -#define VTD_IOTLB_LVL_SHIFT         52
+> > > +#define VTD_IOTLB_SID_SHIFT         45
+> > > +#define VTD_IOTLB_LVL_SHIFT         61
+> > >  #define VTD_IOTLB_MAX_SIZE          1024    /* Max size of the hash table */
+> > >  
+> > >  /* IOTLB_REG */
+> > > @@ -212,6 +212,8 @@
+> > >  #define VTD_CAP_SAGAW_39bit         (0x2ULL << VTD_CAP_SAGAW_SHIFT)
+> > >   /* 48-bit AGAW, 4-level page-table */
+> > >  #define VTD_CAP_SAGAW_48bit         (0x4ULL << VTD_CAP_SAGAW_SHIFT)
+> > > + /* 57-bit AGAW, 5-level page-table */
+> > > +#define VTD_CAP_SAGAW_57bit         (0x8ULL << VTD_CAP_SAGAW_SHIFT)
+> > >  
+> > >  /* IQT_REG */
+> > >  #define VTD_IQT_QT(val)             (((val) >> 4) & 0x7fffULL)
+> > > @@ -379,6 +381,8 @@ typedef union VTDInvDesc VTDInvDesc;
+> > >          (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+> > >  #define VTD_SPTE_PAGE_L4_RSVD_MASK(aw) \
+> > >          (0x880ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+> > > +#define VTD_SPTE_PAGE_L5_RSVD_MASK(aw) \
+> > > +        (0x880ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+> > >  #define VTD_SPTE_LPAGE_L1_RSVD_MASK(aw) \
+> > >          (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+> > >  #define VTD_SPTE_LPAGE_L2_RSVD_MASK(aw) \
+> > > @@ -387,6 +391,8 @@ typedef union VTDInvDesc VTDInvDesc;
+> > >          (0x3ffff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+> > >  #define VTD_SPTE_LPAGE_L4_RSVD_MASK(aw) \
+> > >          (0x880ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+> > > +#define VTD_SPTE_LPAGE_L5_RSVD_MASK(aw) \
+> > > +        (0x880ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+> > >  
+> > >  /* Information about page-selective IOTLB invalidate */
+> > >  struct VTDIOTLBPageInvInfo {
+> > > diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+> > > index 820451c..7474c4f 100644
+> > > --- a/include/hw/i386/intel_iommu.h
+> > > +++ b/include/hw/i386/intel_iommu.h
+> > > @@ -49,6 +49,7 @@
+> > >  #define DMAR_REG_SIZE               0x230
+> > >  #define VTD_AW_39BIT                39
+> > >  #define VTD_AW_48BIT                48
+> > > +#define VTD_AW_57BIT                57
+> > >  #define VTD_ADDRESS_WIDTH           VTD_AW_39BIT
+> > >  #define VTD_HAW_MASK(aw)            ((1ULL << (aw)) - 1)
+> > >  
+> > 
+> > 
+> 
+> B.R.
+> Yu
+> 
