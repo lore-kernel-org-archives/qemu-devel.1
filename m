@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZ6oY-0004Yg-MQ
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:17:03 -0500
+	(envelope-from <mst@redhat.com>) id 1gZ6ok-0004f2-Ip
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:17:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZ6oY-0006Oj-3f
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:17:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54058)
+	(envelope-from <mst@redhat.com>) id 1gZ6of-0006X9-HE
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:17:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58362)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZ6oX-0006O2-RZ
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:17:01 -0500
-Date: Mon, 17 Dec 2018 23:16:56 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZ6of-0006V5-B8
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:17:09 -0500
+Date: Mon, 17 Dec 2018 23:17:01 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181218041625.24969-6-mst@redhat.com>
+Message-ID: <20181218041625.24969-7-mst@redhat.com>
 References: <20181218041625.24969-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <20181218041625.24969-1-mst@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 05/31] tests: Remove unused include
+Subject: [Qemu-devel] [PULL 06/31] hw/smbios: Restrict access to
+ "hw/smbios/ipmi.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +29,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Corey Minyard <minyard@acm.org>
 
 From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-The "hw/smbios/smbios.h" include is not used, remove it.
+All the consumers of "hw/smbios/ipmi.h" are located in hw/smbios/.
+There is no need to have this include publicly exposed,
+reduce the visibility by moving it in hw/smbios/.
 
 Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- tests/acpi-utils.c | 1 -
- 1 file changed, 1 deletion(-)
+ include/hw/smbios/ipmi.h =3D> hw/smbios/smbios_ipmi.h | 0
+ hw/smbios/smbios.c                                  | 2 +-
+ hw/smbios/smbios_type_38-stub.c                     | 2 +-
+ hw/smbios/smbios_type_38.c                          | 2 +-
+ 4 files changed, 3 insertions(+), 3 deletions(-)
+ rename include/hw/smbios/ipmi.h =3D> hw/smbios/smbios_ipmi.h (100%)
 
-diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
-index 41dc1ea9b4..297af55d39 100644
---- a/tests/acpi-utils.c
-+++ b/tests/acpi-utils.c
-@@ -15,7 +15,6 @@
+diff --git a/include/hw/smbios/ipmi.h b/hw/smbios/smbios_ipmi.h
+similarity index 100%
+rename from include/hw/smbios/ipmi.h
+rename to hw/smbios/smbios_ipmi.h
+diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
+index 04811279a0..6fe5be3586 100644
+--- a/hw/smbios/smbios.c
++++ b/hw/smbios/smbios.c
+@@ -28,7 +28,7 @@
+ #include "hw/loader.h"
+ #include "exec/cpu-common.h"
+ #include "smbios_build.h"
+-#include "hw/smbios/ipmi.h"
++#include "smbios_ipmi.h"
+=20
+ /* legacy structures and constants for <=3D 2.0 machines */
+ struct smbios_header {
+diff --git a/hw/smbios/smbios_type_38-stub.c b/hw/smbios/smbios_type_38-s=
+tub.c
+index 5b83c9b1f1..fc4516bc8a 100644
+--- a/hw/smbios/smbios_type_38-stub.c
++++ b/hw/smbios/smbios_type_38-stub.c
+@@ -8,7 +8,7 @@
+  */
+=20
  #include "qemu/osdep.h"
- #include <glib/gstdio.h>
- #include "qemu-common.h"
--#include "hw/smbios/smbios.h"
- #include "qemu/bitmap.h"
- #include "acpi-utils.h"
- #include "boot-sector.h"
+-#include "hw/smbios/ipmi.h"
++#include "smbios_ipmi.h"
+=20
+ void smbios_build_type_38_table(void)
+ {
+diff --git a/hw/smbios/smbios_type_38.c b/hw/smbios/smbios_type_38.c
+index 56e8609c00..d84e87d608 100644
+--- a/hw/smbios/smbios_type_38.c
++++ b/hw/smbios/smbios_type_38.c
+@@ -9,10 +9,10 @@
+=20
+ #include "qemu/osdep.h"
+ #include "hw/ipmi/ipmi.h"
+-#include "hw/smbios/ipmi.h"
+ #include "hw/smbios/smbios.h"
+ #include "qemu/error-report.h"
+ #include "smbios_build.h"
++#include "smbios_ipmi.h"
+=20
+ /* SMBIOS type 38 - IPMI */
+ struct smbios_type_38 {
 --=20
 MST
