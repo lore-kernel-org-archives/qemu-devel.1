@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZ7AQ-0007Lw-Mz
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:39:39 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gZ8Ke-00025B-3Q
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 00:54:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZ7AP-0000ym-GG
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:39:38 -0500
-Date: Tue, 18 Dec 2018 15:29:38 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181218042938.GI23604@umbus.fritz.box>
-References: <20181217140055.8545-1-lvivier@redhat.com>
+	(envelope-from <kraxel@redhat.com>) id 1gZ8Ka-0006Wd-SR
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 00:54:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41906)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gZ8Ka-0006Ux-KZ
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 00:54:12 -0500
+Date: Tue, 18 Dec 2018 06:54:08 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181218055408.6yxxumlhw56vzzus@sirius.home.kraxel.org>
+References: <alpine.BSF.2.21.1803202324320.13789@zero.eik.bme.hu>
+	<20180321140654.7h3nkkdlztu6mtrq@sirius.home.kraxel.org>
+	<alpine.BSF.2.21.1803211803590.78606@zero.eik.bme.hu>
+	<alpine.BSF.2.21.9999.1812171549220.8888@zero.eik.bme.hu>
+	<20181217150028.GL30264@redhat.com>
+	<alpine.BSF.2.21.9999.1812172255250.25213@zero.eik.bme.hu>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="4BlIp4fARb6QCoOq"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181217140055.8545-1-lvivier@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] spapr: Add H-Call H_HOME_NODE_ASSOCIATIVITY
+In-Reply-To: <alpine.BSF.2.21.9999.1812172255250.25213@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] Monitor and serial output window broken with SDL2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,137 +31,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, qemu-devel@nongnu.org
 
+  Hi,
 
---4BlIp4fARb6QCoOq
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> > > > > Doesn't reproduce too.  It's also not clear why x86_64 should behave
+> > > > > different that ppc.  There is no arch-specific code ui/, so there should
+> > > > > be no difference, exept for hardware like paralle ports which are not
+> > > > > supported by all machine types.
+> > > > > 
+> > > > > Any chance you have tested an old ppc binary?
+> > > > 
+> > > > Not likely because I did make distclean and a clean build before testing
+> > > > to avoid any possible mismatch. It still does not work for me though.
+> > > > While
+> > > 
+> > > I still have this problem after updating everything on my machine, latest
+> > > QEMU and SDL 2.0.9 so it's not likely to be a bug in some external
+> > > component. If I just start qemu-system-ppc (compiled with --disable-gtk) and
+> > > try to open monitor console with Ctrl-Alt-2 I see QEMU monitor but when I
+> > > type in this window the serial output window contents flash in this window.
+> > > At the same time the window that opens for Ctrl-Alt-3 which should have the
+> > > serial output is empty. It looks like an index may be off somewhere or
+> > > window contents are not associated with the right window but I have no idea
+> > > where to look for it. Can you reproduce it now and do you have any idea what
+> > > could cause this?
+> > 
+> > Could you share an example command line which can be used to reproduce
+> > the problem.
+> 
+> As I wrote above ust "qemu-system-ppc" without any options reproduces the
+> problem here.
 
-On Mon, Dec 17, 2018 at 03:00:55PM +0100, Laurent Vivier wrote:
-> H_HOME_NODE_ASSOCIATIVITY H-Call returns the associativity domain
-> designation associated with the identifier input parameter.
->=20
-> Remove the warning message from the kernel:
->   VPHN is not supported. Disabling polling..
->=20
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Still doesn't reproduce, using "qemu-system-ppc -display sdl".  x86_64
+is fine too.  Also using SDL 2.0.9.
 
-=46rom the looks of PAPR, I suspect this call isn't of much use outside
-PowerVM guests, though it probably wouldn't do any harm.
+"struct sdl2_console" holds the per-window state, you could try to
+sprinkle some debug printfs (or add trace points) to sdl2_window_create,
+sdl2_redraw, ...
 
-BenH, Paulus, any thoughts?
-
-One nit in implementation: if you implement this hcall, it's supposed
-to be advertised by adding hcall-vphn to ibm,hypertas-functions.
-
-> ---
-> Based-on: <20181213040126.6768-1-david@gibson.dropbear.id.au>
->           "[PULL 00/27] ppc-for-4.0 queue 20181213"
->=20
->  hw/ppc/spapr_hcall.c   | 39 +++++++++++++++++++++++++++++++++++++++
->  include/hw/ppc/spapr.h |  1 +
->  2 files changed, 40 insertions(+)
->=20
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 78fecc8fe9..454ec594fd 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1663,6 +1663,41 @@ static target_ulong h_client_architecture_support(=
-PowerPCCPU *cpu,
->      return H_SUCCESS;
->  }
-> =20
-> +static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
-> +                                              sPAPRMachineState *spapr,
-> +                                              target_ulong opcode,
-> +                                              target_ulong *args)
-> +{
-> +    target_ulong flags =3D args[0];
-> +    target_ulong procno =3D args[1];
-> +    PowerPCCPU *tcpu;
-> +    int idx;
-> +
-> +    /* only support procno from H_REGISTER_VPA */
-> +    if ((flags & 0x1) =3D=3D 0) {
-> +        return H_PARAMETER;
-> +    }
-> +
-> +    tcpu =3D spapr_find_cpu(procno);
-> +    if (tcpu =3D=3D NULL) {
-> +        return H_P2;
-> +    }
-> +
-> +    /* sequence is the same as in the "ibm,associativity" property */
-> +
-> +    idx =3D 0;
-> +#define ASSOCIATIVITY(a, b) (((uint64_t)a << 32) | ((uint64_t)b & 0xffff=
-ffff))
-> +    args[idx++] =3D ASSOCIATIVITY(0, 0);
-> +    args[idx++] =3D ASSOCIATIVITY(0, tcpu->node_id);
-> +    args[idx++] =3D ASSOCIATIVITY(procno, -1);
-> +    for ( ; idx < 6; idx++) {
-> +        args[idx] =3D -1;
-> +    }
-> +#undef ASSOCIATIVITY
-> +
-> +    return H_SUCCESS;
-> +}
-> +
->  static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
->                                                sPAPRMachineState *spapr,
->                                                target_ulong opcode,
-> @@ -1864,6 +1899,10 @@ static void hypercall_register_types(void)
->      spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_support=
-);
-> =20
->      spapr_register_hypercall(KVMPPC_H_UPDATE_DT, h_update_dt);
-> +
-> +    /* Virtual Processor Home Node */
-> +    spapr_register_hypercall(H_HOME_NODE_ASSOCIATIVITY,
-> +                             h_home_node_associativity);
->  }
-> =20
->  type_init(hypercall_register_types)
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index b1a2515107..eb13e2b614 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -447,6 +447,7 @@ struct sPAPRMachineState {
->  #define H_GET_EM_PARMS          0x2B8
->  #define H_SET_MPP               0x2D0
->  #define H_GET_MPP               0x2D4
-> +#define H_HOME_NODE_ASSOCIATIVITY 0x2EC
->  #define H_XIRR_X                0x2FC
->  #define H_RANDOM                0x300
->  #define H_SET_MODE              0x31C
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---4BlIp4fARb6QCoOq
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwYd68ACgkQbDjKyiDZ
-s5ISTg//WUXgehfDSrhvD5iNJb3hnPQ84q+KdI1cRZ1AjDdN0i88Y3Q7dtw1S3cb
-ONx0bT1D7H9Q/pewKQzIUhVOoYsZqg1XXNy5uyjyl4qN0FVII9F/nOnOkvxquuUu
-T1ibeTNY2u06MapH7K4oeFonWtxMlCyck+CWeFKi0AEdO14HI6dp4R50lm4PGoO0
-FaPkRTpYlbiL+cr7gCByY/n9DKlc4vBFJCsdDxyxjX9ASvaQPi5fUno6xZVJIOqk
-MzeBysJ+rGkxtVVferPisIon9kr+Nz4HnXKEjDRrCb0vsF3v8jmy2g4mN54NvRfd
-fqMwwB2NvVo6TvslpLTveJSQFUlPldWjC2F6VpwwB7SErWgRQ/SVwEc31ZsWOFI4
-Iorx+lMvsB0RC0LgI4Ioztdi0/NDLKW+C5tXxuAr0NWeKjLy7VZ3XKZK0mt9UGUc
-FuhUqD93IyABrdDmnIQqMdLzhk0PLmsTDizalDFdrT5EZkqBciyAN7kVUR8r1gUt
-xEA2kFceMe4gLNNdq7ePPWeMa6bHb7c72ahe3Ub8VgTX7Vbu/4bZHUdzSyOHe81V
-+S8QOaSA55Goi6ZM8MX6ANVH9v+Ms0pfG3fu+m4Nv5bQ6FA8H4h407M0AGZstfi4
-v0z0OQkmjrhNZGG8fLnVwhREwgWMdmd164o/E2j8GA+BvSdTZcU=
-=uBuW
------END PGP SIGNATURE-----
-
---4BlIp4fARb6QCoOq--
+HTH,
+  Gerd
