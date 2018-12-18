@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51506)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZ6qD-0006B6-43
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:18:46 -0500
+	(envelope-from <mst@redhat.com>) id 1gZ6qE-0006Cp-PV
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:18:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZ6qA-0007y4-1O
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:18:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57470)
+	(envelope-from <mst@redhat.com>) id 1gZ6qD-00081C-Lj
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:18:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58282)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZ6q9-0007x1-Lp
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:18:41 -0500
-Date: Mon, 17 Dec 2018 23:18:39 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZ6qD-00080L-DI
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:18:45 -0500
+Date: Mon, 17 Dec 2018 23:18:41 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181218041625.24969-31-mst@redhat.com>
+Message-ID: <20181218041625.24969-32-mst@redhat.com>
 References: <20181218041625.24969-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20181218041625.24969-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 30/31] hw: acpi: Remove AcpiRsdpDescriptor and
- fix tests
+Subject: [Qemu-devel] [PULL 31/31] hw/i386: Remove deprecated machines
+ pc-0.10 and pc-0.11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,197 +28,148 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Samuel Ortiz <sameo@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, Andrew Jones <drjones@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Ben Warren <ben@skyportsystems.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, libvir-list@redhat.com, Laurent Vivier <lvivier@redhat.com>
 
-From: Samuel Ortiz <sameo@linux.intel.com>
+From: Thomas Huth <thuth@redhat.com>
 
-The only remaining AcpiRsdpDescriptor users are the ACPI utils for the
-BIOS table tests.
-We remove that dependency and can thus remove the structure itself.
+They've been deprecated for two releases and nobody complained that they
+are still required anymore, so it's time to remove these now.
+And while we're at it, mark the other remaining old 0.x machine types
+as deprecated (since they can not properly be used for live-migration
+anyway).
 
-Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/acpi/acpi-defs.h | 13 -----------
- tests/acpi-utils.h          |  4 +++-
- tests/acpi-utils.c          | 46 ++++++++++++++++++++++++++++++-------
- tests/bios-tables-test.c    | 22 ++++++++++++++----
- tests/vmgenid-test.c        |  8 ++++---
- 5 files changed, 63 insertions(+), 30 deletions(-)
+ hw/i386/pc_piix.c     | 70 ++-----------------------------------------
+ tests/cpu-plug-test.c |  4 +--
+ qemu-deprecated.texi  |  2 +-
+ 3 files changed, 4 insertions(+), 72 deletions(-)
 
-diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-index 8425ecb8c6..5021cb9e79 100644
---- a/include/hw/acpi/acpi-defs.h
-+++ b/include/hw/acpi/acpi-defs.h
-@@ -40,19 +40,6 @@ enum {
-     ACPI_FADT_F_LOW_POWER_S0_IDLE_CAPABLE,
- };
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index e000c7511a..7f1cb527b5 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -368,7 +368,7 @@ static void pc_compat_1_2(MachineState *machine)
+     x86_cpu_change_kvm_default("kvm-pv-eoi", NULL);
+ }
  
--struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
--    uint64_t signature;              /* ACPI signature, contains "RSD PTR " */
--    uint8_t  checksum;               /* To make sum of struct == 0 */
--    uint8_t  oem_id [6];             /* OEM identification */
--    uint8_t  revision;               /* Must be 0 for 1.0, 2 for 2.0 */
--    uint32_t rsdt_physical_address;  /* 32-bit physical address of RSDT */
--    uint32_t length;                 /* XSDT Length in bytes including hdr */
--    uint64_t xsdt_physical_address;  /* 64-bit physical address of XSDT */
--    uint8_t  extended_checksum;      /* Checksum of entire table */
--    uint8_t  reserved [3];           /* Reserved field must be 0 */
--} QEMU_PACKED;
--typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
+-/* PC compat function for pc-0.10 to pc-0.13 */
++/* PC compat function for pc-0.12 and pc-0.13 */
+ static void pc_compat_0_13(MachineState *machine)
+ {
+     pc_compat_1_2(machine);
+@@ -834,6 +834,7 @@ static void pc_i440fx_0_15_machine_options(MachineClass *m)
+ {
+     pc_i440fx_1_0_machine_options(m);
+     m->hw_version = "0.15";
++    m->deprecation_reason = "use a newer machine type instead";
+     SET_MACHINE_COMPAT(m, PC_COMPAT_0_15);
+ }
+ 
+@@ -951,73 +952,6 @@ static void pc_i440fx_0_12_machine_options(MachineClass *m)
+ DEFINE_I440FX_MACHINE(v0_12, "pc-0.12", pc_compat_0_13,
+                       pc_i440fx_0_12_machine_options);
+ 
 -
- typedef struct AcpiRsdpData {
-     uint8_t oem_id[6]; /* OEM identification */
-     uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
-diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
-index ac52abd0dd..4f4899deb5 100644
---- a/tests/acpi-utils.h
-+++ b/tests/acpi-utils.h
-@@ -82,6 +82,8 @@ typedef struct {
+-#define PC_COMPAT_0_11 \
+-        PC_CPU_MODEL_IDS("0.11") \
+-        {\
+-            .driver   = "virtio-blk-pci",\
+-            .property = "vectors",\
+-            .value    = stringify(0),\
+-        },{\
+-            .driver   = TYPE_PCI_DEVICE,\
+-            .property = "rombar",\
+-            .value    = stringify(0),\
+-        },{\
+-            .driver   = "ide-drive",\
+-            .property = "ver",\
+-            .value    = "0.11",\
+-        },{\
+-            .driver   = "scsi-disk",\
+-            .property = "ver",\
+-            .value    = "0.11",\
+-        },
+-
+-static void pc_i440fx_0_11_machine_options(MachineClass *m)
+-{
+-    pc_i440fx_0_12_machine_options(m);
+-    m->hw_version = "0.11";
+-    m->deprecation_reason = "use a newer machine type instead";
+-    SET_MACHINE_COMPAT(m, PC_COMPAT_0_11);
+-}
+-
+-DEFINE_I440FX_MACHINE(v0_11, "pc-0.11", pc_compat_0_13,
+-                      pc_i440fx_0_11_machine_options);
+-
+-
+-#define PC_COMPAT_0_10 \
+-    PC_CPU_MODEL_IDS("0.10") \
+-    {\
+-        .driver   = "virtio-blk-pci",\
+-        .property = "class",\
+-        .value    = stringify(PCI_CLASS_STORAGE_OTHER),\
+-    },{\
+-        .driver   = "virtio-serial-pci",\
+-        .property = "class",\
+-        .value    = stringify(PCI_CLASS_DISPLAY_OTHER),\
+-    },{\
+-        .driver   = "virtio-net-pci",\
+-        .property = "vectors",\
+-        .value    = stringify(0),\
+-    },{\
+-        .driver   = "ide-drive",\
+-        .property = "ver",\
+-        .value    = "0.10",\
+-    },{\
+-        .driver   = "scsi-disk",\
+-        .property = "ver",\
+-        .value    = "0.10",\
+-    },
+-
+-static void pc_i440fx_0_10_machine_options(MachineClass *m)
+-{
+-    pc_i440fx_0_11_machine_options(m);
+-    m->hw_version = "0.10";
+-    SET_MACHINE_COMPAT(m, PC_COMPAT_0_10);
+-}
+-
+-DEFINE_I440FX_MACHINE(v0_10, "pc-0.10", pc_compat_0_13,
+-                      pc_i440fx_0_10_machine_options);
+-
+ typedef struct {
+     uint16_t gpu_device_id;
+     uint16_t pch_device_id;
+diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
+index f4a677d238..668f00144e 100644
+--- a/tests/cpu-plug-test.c
++++ b/tests/cpu-plug-test.c
+@@ -157,9 +157,7 @@ static void add_pc_test_case(const char *mname)
+         (strcmp(mname, "pc-0.15") == 0) ||
+         (strcmp(mname, "pc-0.14") == 0) ||
+         (strcmp(mname, "pc-0.13") == 0) ||
+-        (strcmp(mname, "pc-0.12") == 0) ||
+-        (strcmp(mname, "pc-0.11") == 0) ||
+-        (strcmp(mname, "pc-0.10") == 0)) {
++        (strcmp(mname, "pc-0.12") == 0)) {
+         path = g_strdup_printf("cpu-plug/%s/init/%ux%ux%u&maxcpus=%u",
+                                mname, data->sockets, data->cores,
+                                data->threads, data->maxcpus);
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index e362d37225..c3735b698e 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -134,7 +134,7 @@ their usecases.
  
- uint8_t acpi_calc_checksum(const uint8_t *data, int len);
- uint32_t acpi_find_rsdp_address(void);
--void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table);
-+uint32_t acpi_get_rsdt_address(uint8_t *rsdp_table);
-+uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table);
-+void acpi_parse_rsdp_table(uint32_t addr, uint8_t *rsdp_table);
+ @section System emulator machines
  
- #endif  /* TEST_ACPI_UTILS_H */
-diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
-index 297af55d39..6374f10ac3 100644
---- a/tests/acpi-utils.c
-+++ b/tests/acpi-utils.c
-@@ -51,14 +51,44 @@ uint32_t acpi_find_rsdp_address(void)
-     return off;
- }
+-@subsection pc-0.10 and pc-0.11 (since 3.0)
++@subsection pc-0.12, pc-0.13, pc-0.14 and pc-0.15 (since 4.0)
  
--void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table)
-+uint32_t acpi_get_rsdt_address(uint8_t *rsdp_table)
- {
--    ACPI_READ_FIELD(rsdp_table->signature, addr);
--    ACPI_ASSERT_CMP64(rsdp_table->signature, "RSD PTR ");
-+    uint32_t rsdt_physical_address;
- 
--    ACPI_READ_FIELD(rsdp_table->checksum, addr);
--    ACPI_READ_ARRAY(rsdp_table->oem_id, addr);
--    ACPI_READ_FIELD(rsdp_table->revision, addr);
--    ACPI_READ_FIELD(rsdp_table->rsdt_physical_address, addr);
--    ACPI_READ_FIELD(rsdp_table->length, addr);
-+    memcpy(&rsdt_physical_address, &rsdp_table[16 /* RsdtAddress offset */], 4);
-+    return le32_to_cpu(rsdt_physical_address);
-+}
-+
-+uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table)
-+{
-+    uint64_t xsdt_physical_address;
-+    uint8_t revision = rsdp_table[15 /* Revision offset */];
-+
-+    /* We must have revision 2 if we're looking for an XSDT pointer */
-+    g_assert(revision == 2);
-+
-+    memcpy(&xsdt_physical_address, &rsdp_table[24 /* XsdtAddress offset */], 8);
-+    return le64_to_cpu(xsdt_physical_address);
-+}
-+
-+void acpi_parse_rsdp_table(uint32_t addr, uint8_t *rsdp_table)
-+{
-+    uint8_t revision;
-+
-+    /* Read mandatory revision 0 table data (20 bytes) first */
-+    memread(addr, rsdp_table, 20);
-+    revision = rsdp_table[15 /* Revision offset */];
-+
-+    switch (revision) {
-+    case 0: /* ACPI 1.0 RSDP */
-+        break;
-+    case 2: /* ACPI 2.0+ RSDP */
-+        /* Read the rest of the RSDP table */
-+        memread(addr + 20, rsdp_table + 20, 16);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    ACPI_ASSERT_CMP64(*((uint64_t *)(rsdp_table)), "RSD PTR ");
- }
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index dfa74a5bec..f531241018 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -27,7 +27,7 @@ typedef struct {
-     const char *machine;
-     const char *variant;
-     uint32_t rsdp_addr;
--    AcpiRsdpDescriptor rsdp_table;
-+    uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
-     AcpiRsdtDescriptorRev1 rsdt_table;
-     uint32_t dsdt_addr;
-     uint32_t facs_addr;
-@@ -85,19 +85,31 @@ static void test_acpi_rsdp_address(test_data *data)
- 
- static void test_acpi_rsdp_table(test_data *data)
- {
--    AcpiRsdpDescriptor *rsdp_table = &data->rsdp_table;
-+    uint8_t *rsdp_table = data->rsdp_table, revision;
-     uint32_t addr = data->rsdp_addr;
- 
-     acpi_parse_rsdp_table(addr, rsdp_table);
-+    revision = rsdp_table[15 /* Revision offset */];
- 
--    /* rsdp checksum is not for the whole table, but for the first 20 bytes */
--    g_assert(!acpi_calc_checksum((uint8_t *)rsdp_table, 20));
-+    switch (revision) {
-+    case 0: /* ACPI 1.0 RSDP */
-+        /* With rev 1, checksum is only for the first 20 bytes */
-+        g_assert(!acpi_calc_checksum(rsdp_table,  20));
-+        break;
-+    case 2: /* ACPI 2.0+ RSDP */
-+        /* With revision 2, we have 2 checksums */
-+        g_assert(!acpi_calc_checksum(rsdp_table, 20));
-+        g_assert(!acpi_calc_checksum(rsdp_table, 36));
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
- }
- 
- static void test_acpi_rsdt_table(test_data *data)
- {
-     AcpiRsdtDescriptorRev1 *rsdt_table = &data->rsdt_table;
--    uint32_t addr = le32_to_cpu(data->rsdp_table.rsdt_physical_address);
-+    uint32_t addr = acpi_get_rsdt_address(data->rsdp_table);
-     uint32_t *tables;
-     int tables_nr;
-     uint8_t checksum;
-diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-index 0a6fb55f2e..97219ae86c 100644
---- a/tests/vmgenid-test.c
-+++ b/tests/vmgenid-test.c
-@@ -35,7 +35,7 @@ static uint32_t acpi_find_vgia(void)
- {
-     uint32_t rsdp_offset;
-     uint32_t guid_offset = 0;
--    AcpiRsdpDescriptor rsdp_table;
-+    uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
-     uint32_t rsdt, rsdt_table_length;
-     AcpiRsdtDescriptorRev1 rsdt_table;
-     size_t tables_nr;
-@@ -52,9 +52,11 @@ static uint32_t acpi_find_vgia(void)
- 
-     g_assert_cmphex(rsdp_offset, <, RSDP_ADDR_INVALID);
- 
--    acpi_parse_rsdp_table(rsdp_offset, &rsdp_table);
-+    acpi_parse_rsdp_table(rsdp_offset, rsdp_table);
-+
-+    rsdt = acpi_get_rsdt_address(rsdp_table);
-+    g_assert(rsdt);
- 
--    rsdt = le32_to_cpu(rsdp_table.rsdt_physical_address);
-     /* read the header */
-     ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
-     ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
+ These machine types are very old and likely can not be used for live migration
+ from old QEMU versions anymore. A newer machine type should be used instead.
 -- 
 MST
