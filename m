@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZ6q6-00061S-4i
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:18:39 -0500
+	(envelope-from <mst@redhat.com>) id 1gZ6q5-00060I-3E
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:18:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZ6q5-0007tD-6a
-	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:18:38 -0500
-Date: Mon, 17 Dec 2018 23:18:32 -0500
+	(envelope-from <mst@redhat.com>) id 1gZ6q3-0007ri-Oi
+	for qemu-devel@nongnu.org; Mon, 17 Dec 2018 23:18:37 -0500
+Date: Mon, 17 Dec 2018 23:18:28 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181218041625.24969-27-mst@redhat.com>
+Message-ID: <20181218041625.24969-25-mst@redhat.com>
 References: <20181218041625.24969-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20181218041625.24969-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 26/31] hw: arm: Carry RSDP specific data through
- AcpiRsdpData
+Subject: [Qemu-devel] [PULL 24/31] hw: arm: acpi: Fix incorrect checksums in
+ RSDP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,90 +24,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Samuel Ortiz <sameo@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, Andrew Jones <drjones@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Shannon Zhao <shannon.zhaosl@gmail.com>, Andrew Jones <drjones@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, qemu-arm@nongnu.org
 
-From: Samuel Ortiz <sameo@linux.intel.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-That will allow us to generalize the ARM build_rsdp() routine to support
-both legacy RSDP (The current i386 implementation) and extended RSDP
-(The ARM implementation).
+When RSDP table was introduced (d4bec5d87), we calculated only legacy
+checksum, and that was incorrect as it
+ - specified rev=2 and forgot about extended checksum.
+ - legacy checksum calculated on full table instead of the 1st 20 bytes
 
-Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Fix it by adding extended checksum calculation and using correct
+size for legacy checksum.
+
+While at it use explicit constants to specify sub/full tables
+sizes instead of relying on AcpiRsdpDescriptor size and fields offsets.
+The follow up commits will convert this table to build_append_int_noprefix() API,
+will use constants anyway and remove unused AcpiRsdpDescriptor structure.
+
+Based on "[PATCH v5 05/24] hw: acpi: Implement XSDT support for  RSDP"
+by Samuel Ortiz, who did it right in his impl.
+
+Fixes: d4bec5d87 ("hw/arm/virt-acpi-build: Generate RSDP table")
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+CC: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+CC: Shannon Zhao <shannon.zhaosl@gmail.com>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Samuel Ortiz <sameo@linux.intel.com>
+Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/acpi/acpi-defs.h |  8 ++++++++
- hw/arm/virt-acpi-build.c    | 18 +++++++++++++-----
- 2 files changed, 21 insertions(+), 5 deletions(-)
+ hw/arm/virt-acpi-build.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-index af8e023968..8425ecb8c6 100644
---- a/include/hw/acpi/acpi-defs.h
-+++ b/include/hw/acpi/acpi-defs.h
-@@ -53,6 +53,14 @@ struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
- } QEMU_PACKED;
- typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
- 
-+typedef struct AcpiRsdpData {
-+    uint8_t oem_id[6]; /* OEM identification */
-+    uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
-+
-+    unsigned *rsdt_tbl_offset;
-+    unsigned *xsdt_tbl_offset;
-+} AcpiRsdpData;
-+
- /* Table structure from Linux kernel (the ACPI tables are under the
-    BSD license) */
- 
 diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 0835900052..ce8bfa5a37 100644
+index fcaa350892..0835900052 100644
 --- a/hw/arm/virt-acpi-build.c
 +++ b/hw/arm/virt-acpi-build.c
-@@ -368,7 +368,7 @@ static void acpi_dsdt_add_power_button(Aml *scope)
- 
- /* RSDP */
- static void
--build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
-+build_rsdp(GArray *rsdp_table, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
- {
-     AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
-     unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
-@@ -379,14 +379,14 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
-                              true /* fseg memory */);
- 
-     memcpy(&rsdp->signature, "RSD PTR ", sizeof(rsdp->signature));
--    memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, sizeof(rsdp->oem_id));
-+    memcpy(rsdp->oem_id, rsdp_data->oem_id, sizeof(rsdp->oem_id));
-     rsdp->length = cpu_to_le32(sizeof(*rsdp));
--    rsdp->revision = 0x02;
-+    rsdp->revision = rsdp_data->revision;
- 
-     /* Address to be filled by Guest linker */
-     bios_linker_loader_add_pointer(linker,
-         ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
--        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
-+        ACPI_BUILD_TABLE_FILE, *rsdp_data->xsdt_tbl_offset);
+@@ -390,8 +390,13 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
  
      /* Checksum to be filled by Guest linker */
      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-@@ -857,7 +857,15 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
-     build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
+-        (char *)rsdp - rsdp_table->data, sizeof *rsdp,
++        (char *)rsdp - rsdp_table->data, 20 /* ACPI rev 1.0 RSDP size */,
+         (char *)&rsdp->checksum - rsdp_table->data);
++
++    /* Extended checksum to be filled by Guest linker */
++    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
++        (char *)rsdp - rsdp_table->data, 36 /* ACPI rev 2.0 RSDP size */,
++        (char *)&rsdp->extended_checksum - rsdp_table->data);
+ }
  
-     /* RSDP is in FSEG memory, so allocate it separately */
--    build_rsdp(tables->rsdp, tables->linker, xsdt);
-+    {
-+        AcpiRsdpData rsdp_data = {
-+            .revision = 2,
-+            .oem_id = ACPI_BUILD_APPNAME6,
-+            .xsdt_tbl_offset = &xsdt,
-+            .rsdt_tbl_offset = NULL,
-+        };
-+        build_rsdp(tables->rsdp, tables->linker, &rsdp_data);
-+    }
- 
-     /* Cleanup memory that's no longer used. */
-     g_array_free(table_offsets, true);
+ static void
 -- 
 MST
