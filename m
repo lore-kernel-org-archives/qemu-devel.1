@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gZXOo-0004LA-Ev
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:40:15 -0500
+	(envelope-from <bishara@daynix.com>) id 1gZXPd-0004pi-1Y
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:41:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gZXOh-0004MZ-Jo
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:40:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40066)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gZXOh-0004Ip-AA
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:40:07 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181218182234.28876-1-armbru@redhat.com>
-	<20181218182234.28876-14-armbru@redhat.com>
-	<CAJ+F1CLnugfZKFaQTjK3oAPJ3PmsxvBwhDtD8mH-D1FnUqKKgg@mail.gmail.com>
-Date: Wed, 19 Dec 2018 09:40:03 +0100
-In-Reply-To: <CAJ+F1CLnugfZKFaQTjK3oAPJ3PmsxvBwhDtD8mH-D1FnUqKKgg@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 18 Dec 2018
-	23:37:04 +0400")
-Message-ID: <87r2ednc4c.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 13/15] Revert "qapi-events: add 'if'
- condition to implicit event enum"
+	(envelope-from <bishara@daynix.com>) id 1gZXPZ-0005Pl-1c
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:41:04 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:34157)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bishara@daynix.com>) id 1gZXPY-0005Om-Og
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:41:00 -0500
+Received: by mail-wr1-x442.google.com with SMTP id j2so18604297wrw.1
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 00:41:00 -0800 (PST)
+From: Bishara AbuHattoum <bishara@daynix.com>
+Date: Wed, 19 Dec 2018 10:40:51 +0200
+Message-Id: <1545208851-6906-2-git-send-email-bishara@daynix.com>
+In-Reply-To: <1545208851-6906-1-git-send-email-bishara@daynix.com>
+References: <1545208851-6906-1-git-send-email-bishara@daynix.com>
+Subject: [Qemu-devel] [PATCH] qga-win: Adding support for Windows Server
+ 2019 get-osinfo command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,107 +26,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Yan Vugenfirer <yan@daynix.com>, Samee Jubran <sameeh@daynix.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+Since Windows Server 2016, Microsoft stopped upgrading the major and minor
+versions of their new Windows Server product, so, the current functionality
+of checking major and minor version numbers to determine the Windows Server
+version wont work as expected.
+The implemented solution here is to use the build number in addition to the
+major and minor version numbers of the product to determine the Windows
+Server product version.
+The final build number of Windows Server 2016 is 14939, and
+the final build number of Windows Server 2019 is 17764, so any Windows
+Server product that has the major version of 10 and minor version of 0
+with a build number lower or equal to 14939 will resemble 2016 and if the
+build number is lower or equal to 17763 will resemble 2019.
 
-> Hi
->
-> On Tue, Dec 18, 2018 at 10:27 PM Markus Armbruster <armbru@redhat.com> wr=
-ote:
->>
->> This reverts commit 7bd263490590ee6fcf34ecb6203437e22f6e5a9c.
->>
->> The commit applied the events' conditions to the members of enum
->> QAPIEvent.  Awkward, because it renders QAPIEvent unusable in
->> target-independent code as soon as we make an event target-dependent.
->> Reverting this has the following effects:
->>
->> * ui/vnc.c can remain target independent.
->
-> Was it ever moved? I don't recall
+Reference:
+https://techcommunity.microsoft.com/t5/Windows-Server-Insiders/Windows-Server-2019-version-info/m-p/293112/highlight/true#M859
 
-It's currently target-independent, and we want it to remain that way.
+Signed-off-by: Bishara AbuHattoum <bishara@daynix.com>
+---
+ qga/commands-win32.c | 29 +++++++++++++++++++++++++++--
+ 1 file changed, 27 insertions(+), 2 deletions(-)
 
-You keep it that way by splitting target-dependent target_QAPIEvent off
-QAPIEvent.
-
-I keep it that way by not making any enum members target-dependent.
-
->> * monitor_qapi_event_conf[] doesn't have to muck around with #ifdef.
->
-> I suggested a way to get rid of monitor_qapi_event_conf[] in the patch
-> message, by having the rate stored in the schema, which could actually
-> be useful (for doc, introspection etc).
-
-Introspection and generated documentation improvements might still make
-that worthwhile.  For the former, we'd first want an actual user,
-though.
-
->> * query-events again doesn't reflect conditionals.  I'm going to
->>   deprecate it in favor of query-qmp-schema.
->
-> I guess that's not that important.
-
-query-qmp-schema has reflected conditionals since we introduced them in
-v3.0.  query-events has not.  Your commit fixes it for 4.0.  Fixes are
-good, but when an interface is known to be deficient in some versions,
-while a strictly more powerful buddy is fine in all versions, the
-obvious thing to do is to stay away from the deficient one regardless of
-version.
-
-I think we should deprecate query-events even if we decide to fix it
-now.
-
-I'll work this into the next commit's commit message.
-
-> I have a slight preference for not declaring enums when the related
-> option is disabled.
-
-Me too, but I like keeping things simple even more.
-
-Possibly even simpler: dispense with the enumeration type, add suitable
-#define to each qapi-event-MODULE.h.  We can have #ifdef there.  What do
-you think?
-
-> But people don't like having too much #ifdef code, which is understandabl=
-e.
-
-In this case, it's just one big #if in monitor.c.  Tolerable, I think.
-
-If we replace QAPIEvent by #define, the #if shrinks to just #ifdef
-QAPI_EVENT_RTC_CHANGE.
-
-Note that monitor.c is already target-dependent.  It should really be
-split up, though.  The #if would keep the QMP part target-dependent,
-unless we split it up even more.  Hmm.
-
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>
->> # Conflicts:
->> #       scripts/qapi/events.py
->> ---
->>  scripts/qapi/events.py | 4 +++-
->>  1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
->> index e988e43941..c944ba90b8 100644
->> --- a/scripts/qapi/events.py
->> +++ b/scripts/qapi/events.py
->> @@ -194,7 +194,9 @@ void %(event_emit)s(%(event_enum)s event, QDict *qdi=
-ct);
->>              self._genc.add(gen_event_send(name, arg_type, boxed,
->>                                            self._event_enum_name,
->>                                            self._event_emit_name))
->> -        self._event_enum_members.append(QAPISchemaMember(name, ifcond))
->> +        # Note: we generate the enum member regardless of @ifcond, to
->> +        # keep the enumeration usable in target-independent code.
->> +        self._event_enum_members.append(QAPISchemaMember(name))
->>
->>
->>  def gen_events(schema, output_dir, prefix):
->> --
->> 2.17.2
->>
->>
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index 62e1b51..3985b40 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -2009,12 +2009,24 @@ static ga_matrix_lookup_t const WIN_VERSION_MATRIX[2][8] = {
+         { 6, 1, "Microsoft Windows Server 2008 R2",     "2008r2"},
+         { 6, 2, "Microsoft Windows Server 2012",        "2012"},
+         { 6, 3, "Microsoft Windows Server 2012 R2",     "2012r2"},
+-        {10, 0, "Microsoft Windows Server 2016",        "2016"},
++        { 0, 0, 0},
+         { 0, 0, 0},
+         { 0, 0, 0}
+     }
+ };
+ 
++typedef struct _ga_win_10_0_server_t {
++    int final_build;
++    char const *version;
++    char const *version_id;
++} ga_win_10_0_server_t;
++
++static ga_win_10_0_server_t const WIN_10_0_SERVER_VERSION_MATRIX[3] = {
++    {14393, "Microsoft Windows Server 2016",    "2016"},
++    {17763, "Microsoft Windows Server 2019",    "2019"},
++    {0, 0}
++};
++
+ static void ga_get_win_version(RTL_OSVERSIONINFOEXW *info, Error **errp)
+ {
+     typedef NTSTATUS(WINAPI * rtl_get_version_t)(
+@@ -2039,10 +2051,23 @@ static char *ga_get_win_name(OSVERSIONINFOEXW const *os_version, bool id)
+ {
+     DWORD major = os_version->dwMajorVersion;
+     DWORD minor = os_version->dwMinorVersion;
++    DWORD build = os_version->dwBuildNumber;
+     int tbl_idx = (os_version->wProductType != VER_NT_WORKSTATION);
+     ga_matrix_lookup_t const *table = WIN_VERSION_MATRIX[tbl_idx];
++    ga_win_10_0_server_t const *win_10_0_table = WIN_10_0_SERVER_VERSION_MATRIX;
+     while (table->version != NULL) {
+-        if (major == table->major && minor == table->minor) {
++        if (major == 10 && minor == 0 && tbl_idx) {
++            while (win_10_0_table->version != NULL) {
++                if (build <= win_10_0_table->final_build) {
++                    if (id) {
++                        return g_strdup(win_10_0_table->version_id);
++                    } else {
++                        return g_strdup(win_10_0_table->version);
++                    }
++                }
++                win_10_0_table++;
++            }
++        } else if (major == table->major && minor == table->minor) {
+             if (id) {
+                 return g_strdup(table->version_id);
+             } else {
+-- 
+1.8.3.1
