@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46236)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gZffQ-0005Bj-Mi
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 12:29:57 -0500
+	(envelope-from <bounces@canonical.com>) id 1gZfq9-0000jn-0Q
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 12:41:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gZffP-0000MX-P0
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 12:29:56 -0500
-References: <20181219015230.18652-1-jsnow@redhat.com>
-	<20181219015230.18652-4-jsnow@redhat.com>
-	<0de4bd2b-c78f-f293-4d43-20c8bcd168c6@virtuozzo.com>
-	<71a31ed2-b371-3b8f-d527-bf37b09e5443@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <17495805-6cef-224e-16b0-ae854c96617b@redhat.com>
-Date: Wed, 19 Dec 2018 12:29:49 -0500
+	(envelope-from <bounces@canonical.com>) id 1gZfq5-0002ej-3d
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 12:41:00 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57674)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gZfq3-0002dr-BR
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 12:40:57 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gZfpz-0005W3-Cx
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 17:40:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 610A72E80D2
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 17:40:51 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <71a31ed2-b371-3b8f-d527-bf37b09e5443@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 3/5] iotests: change qmp_log filters to
- expect QMP objects only
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 19 Dec 2018 17:31:26 -0000
+From: Paolo Montesel <1809144@bugs.launchpad.net>
+Reply-To: Bug 1809144 <1809144@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154524068665.20249.14759163527388138129.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1809144] [NEW] SVM instructions fail with SVME
+ bit enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +36,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Markus Armbruster <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
 
+Public bug reported:
 
+I was trying to use QEMU/TCG to emulate some stuff that uses SVM.
+I know SVM is only partially implemented but I gave it a try anyway.
 
-On 12/19/18 6:27 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 19.12.2018 14:07, Vladimir Sementsov-Ogievskiy wrote:
->> 19.12.2018 4:52, John Snow wrote:
->>> log() treats filters as if they can always filter its primary argument.
->>> qmp_log treats filters as if they're always text.
->>>
->>> Change qmp_log to treat filters as if they're always qmp object filters,
->>> then change the logging call to rely on log()'s ability to serialize QMP
->>> objects, so we're not duplicating that effort.
->>
->> As I understand, there still no use for qmp-object based filters (even after the
->> series), do we really need them? I'm afraid it's premature complication.
-> 
-> aha, sorry, missed that you use it in 206.
-> But still not sure that it worth it. Isn't it better to just remove fields from dict,
-> which are unpredictable, instead of substituting them..
-> 
+I found that if SVM is enabled in the same basic block in which there's a c=
+all to VMSAVE/etc,
+the call fails as illegal op because the flags don't get updated correctly.
 
-I'd like to keep the QMP output a prettified version of the plaintext
-output, and not have it omit things. You can make the case for changing
-that behavior in a separate patch.
+The pseudocode for the asm I'm running is:
 
-> The other idea here: if we want
-> automatically logged qmp commands (qmp_log(), actually), it should filter unpredictable
-> things from output automatically, just by command, which is the first argument. Caller
-> should not care about it, as it may be derived from command, how to filter it's output.
-> And then, we just need a kind of dict of functions, which do not do something like generic
-> recursion, but specifically prepares common-test-output for the concrete command...
-> 
+```
+EFER |=3D SVME; set the appropriate bit with wrmsr
+vmsave
+```
 
-Feel free to enhance the test suite later to understand all the types of
-commands and replies and scrub them automatically. For now, specifying
-the filters matches behavior in much of the rest of the test suite and I
-am not motivated to fix it.
+This is an example of the relevant translate.c code:
+
+```
+            if (!(s->flags & HF_SVME_MASK) || !s->pe) {
+                goto illegal_op;
+            }
+            if (s->cpl !=3D 0) {
+                gen_exception(s, EXCP0D_GPF, pc_start - s->cs_base);
+                break;
+            }
+```
+
+s->flags doesn't get updated after the wrmsr instruction and so QEMU
+raises an illegal opcode interrupt.
+
+A quick fix is to make the tb end after `wrmsr` instructions, but it's an h=
+ack afaik.
+I'm not too comfortable with QEMU's code, so I don't know what a proper fix=
+ would be.
+
+Cheers,
+
+thebabush
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1809144
+
+Title:
+  SVM instructions fail with SVME bit enabled
+
+Status in QEMU:
+  New
+
+Bug description:
+  I was trying to use QEMU/TCG to emulate some stuff that uses SVM.
+  I know SVM is only partially implemented but I gave it a try anyway.
+
+  I found that if SVM is enabled in the same basic block in which there's a=
+ call to VMSAVE/etc,
+  the call fails as illegal op because the flags don't get updated correctl=
+y.
+
+  The pseudocode for the asm I'm running is:
+
+  ```
+  EFER |=3D SVME; set the appropriate bit with wrmsr
+  vmsave
+  ```
+
+  This is an example of the relevant translate.c code:
+
+  ```
+              if (!(s->flags & HF_SVME_MASK) || !s->pe) {
+                  goto illegal_op;
+              }
+              if (s->cpl !=3D 0) {
+                  gen_exception(s, EXCP0D_GPF, pc_start - s->cs_base);
+                  break;
+              }
+  ```
+
+  s->flags doesn't get updated after the wrmsr instruction and so QEMU
+  raises an illegal opcode interrupt.
+
+  A quick fix is to make the tb end after `wrmsr` instructions, but it's an=
+ hack afaik.
+  I'm not too comfortable with QEMU's code, so I don't know what a proper f=
+ix would be.
+
+  Cheers,
+
+  thebabush
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1809144/+subscriptions
