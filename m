@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZWbn-0001yp-BH
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:41 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gZWbq-00023E-PA
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZWbk-0005uN-Aq
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:35 -0500
-Date: Wed, 19 Dec 2018 17:35:58 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gZWbg-0005q2-Vp
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:38 -0500
+Date: Wed, 19 Dec 2018 17:17:26 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181219063558.GU30570@umbus.fritz.box>
+Message-ID: <20181219061726.GI30570@umbus.fritz.box>
 References: <20181218063911.2112-1-richard.henderson@linaro.org>
-	<20181218063911.2112-26-richard.henderson@linaro.org>
+	<20181218063911.2112-14-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="kSOhxpxUsM1s2qz/"
+	protocol="application/pgp-signature"; boundary="X+nYw8KZ/oNxZ8JS"
 Content-Disposition: inline
-In-Reply-To: <20181218063911.2112-26-richard.henderson@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 25/34] target/ppc: convert xxsel to vector
- operations
+In-Reply-To: <20181218063911.2112-14-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 13/34] target/ppc: introduce get_cpu_vsr{l,
+ h}() and set_cpu_vsr{l, h}() helpers for VSR register access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,94 +29,1595 @@ To: Richard Henderson <richard.henderson@linaro.org>
 Cc: qemu-devel@nongnu.org, mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org
 
 
---kSOhxpxUsM1s2qz/
+--X+nYw8KZ/oNxZ8JS
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 17, 2018 at 10:39:02PM -0800, Richard Henderson wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On Mon, Dec 17, 2018 at 10:38:50PM -0800, Richard Henderson wrote:
+> From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>=20
+> These helpers allow us to move VSR register values to/from the specified =
+TCGv_i64
+> argument.
+>=20
+> To prevent VSX helpers accessing the cpu_vsr array directly, add extra TCG
+> temporaries as required.
+>=20
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
+> Message-Id: <20181217122405.18732-4-mark.cave-ayland@ilande.co.uk>
 > ---
->  target/ppc/translate/vsx-impl.inc.c | 55 ++++++++++++++---------------
->  1 file changed, 27 insertions(+), 28 deletions(-)
+>  target/ppc/translate/vsx-impl.inc.c | 782 ++++++++++++++++++++--------
+>  1 file changed, 561 insertions(+), 221 deletions(-)
 >=20
 > diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/v=
 sx-impl.inc.c
-> index a040038ed4..dc32471cd7 100644
+> index 85ed135d44..e9a05d66f7 100644
 > --- a/target/ppc/translate/vsx-impl.inc.c
 > +++ b/target/ppc/translate/vsx-impl.inc.c
-> @@ -1280,40 +1280,39 @@ static void glue(gen_, name)(DisasContext * ctx) =
-           \
->  VSX_XXMRG(xxmrghw, 1)
->  VSX_XXMRG(xxmrglw, 0)
+> @@ -1,20 +1,48 @@
+>  /***                           VSX extension                            =
+   ***/
 > =20
-> +static void xxsel_i64(TCGv_i64 t, TCGv_i64 a, TCGv_i64 b, TCGv_i64 c)
+> -static inline TCGv_i64 cpu_vsrh(int n)
+> +static inline void get_vsr(TCGv_i64 dst, int n)
 > +{
-> +    tcg_gen_and_i64(b, b, c);
-> +    tcg_gen_andc_i64(a, a, c);
-> +    tcg_gen_or_i64(t, a, b);
+> +    tcg_gen_mov_i64(dst, cpu_vsr[n]);
 > +}
 > +
-> +static void xxsel_vec(unsigned vece, TCGv_vec t, TCGv_vec a,
-> +                      TCGv_vec b, TCGv_vec c)
+> +static inline void set_vsr(int n, TCGv_i64 src)
 > +{
-> +    tcg_gen_and_vec(vece, b, b, c);
-> +    tcg_gen_andc_vec(vece, a, a, c);
-> +    tcg_gen_or_vec(vece, t, a, b);
+> +    tcg_gen_mov_i64(cpu_vsr[n], src);
 > +}
 > +
->  static void gen_xxsel(DisasContext * ctx)
+> +static inline void get_cpu_vsrh(TCGv_i64 dst, int n)
 >  {
-> -    TCGv_i64 a, b, c, tmp;
-> +    static const GVecGen4 g =3D {
-> +        .fni8 =3D xxsel_i64,
-> +        .fniv =3D xxsel_vec,
-> +        .vece =3D MO_64,
-> +    };
-> +    int rt =3D xT(ctx->opcode);
-> +    int ra =3D xA(ctx->opcode);
-> +    int rb =3D xB(ctx->opcode);
-> +    int rc =3D xC(ctx->opcode);
+>      if (n < 32) {
+> -        return cpu_fpr[n];
+> +        get_fpr(dst, n);
+>      } else {
+> -        return cpu_avrh[n-32];
+> +        get_avr64(dst, n - 32, true);
+>      }
+>  }
+> =20
+> -static inline TCGv_i64 cpu_vsrl(int n)
+> +static inline void get_cpu_vsrl(TCGv_i64 dst, int n)
+>  {
+>      if (n < 32) {
+> -        return cpu_vsr[n];
+> +        get_vsr(dst, n);
+>      } else {
+> -        return cpu_avrl[n-32];
+> +        get_avr64(dst, n - 32, false);
+> +    }
+> +}
+> +
+> +static inline void set_cpu_vsrh(int n, TCGv_i64 src)
+> +{
+> +    if (n < 32) {
+> +        set_fpr(n, src);
+> +    } else {
+> +        set_avr64(n - 32, src, true);
+> +    }
+> +}
+> +
+> +static inline void set_cpu_vsrl(int n, TCGv_i64 src)
+> +{
+> +    if (n < 32) {
+> +        set_vsr(n, src);
+> +    } else {
+> +        set_avr64(n - 32, src, false);
+>      }
+>  }
+> =20
+> @@ -22,16 +50,20 @@ static inline TCGv_i64 cpu_vsrl(int n)
+>  static void gen_##name(DisasContext *ctx)                     \
+>  {                                                             \
+>      TCGv EA;                                                  \
+> +    TCGv_i64 t0;                                              \
+>      if (unlikely(!ctx->vsx_enabled)) {                        \
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);                \
+>          return;                                               \
+>      }                                                         \
+> +    t0 =3D tcg_temp_new_i64();                                  \
+>      gen_set_access_type(ctx, ACCESS_INT);                     \
+>      EA =3D tcg_temp_new();                                      \
+>      gen_addr_reg_index(ctx, EA);                              \
+> -    gen_qemu_##operation(ctx, cpu_vsrh(xT(ctx->opcode)), EA); \
+> +    gen_qemu_##operation(ctx, t0, EA);                        \
+> +    set_cpu_vsrh(xT(ctx->opcode), t0);                        \
+>      /* NOTE: cpu_vsrl is undefined */                         \
+>      tcg_temp_free(EA);                                        \
+> +    tcg_temp_free_i64(t0);                                    \
+>  }
+> =20
+>  VSX_LOAD_SCALAR(lxsdx, ld64_i64)
+> @@ -44,39 +76,54 @@ VSX_LOAD_SCALAR(lxsspx, ld32fs)
+>  static void gen_lxvd2x(DisasContext *ctx)
+>  {
+>      TCGv EA;
+> +    TCGv_i64 t0;
+>      if (unlikely(!ctx->vsx_enabled)) {
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+>          return;
+>      }
+> +    t0 =3D tcg_temp_new_i64();
+>      gen_set_access_type(ctx, ACCESS_INT);
+>      EA =3D tcg_temp_new();
+>      gen_addr_reg_index(ctx, EA);
+> -    gen_qemu_ld64_i64(ctx, cpu_vsrh(xT(ctx->opcode)), EA);
+> +    gen_qemu_ld64_i64(ctx, t0, EA);
+> +    set_cpu_vsrh(xT(ctx->opcode), t0);
+>      tcg_gen_addi_tl(EA, EA, 8);
+> -    gen_qemu_ld64_i64(ctx, cpu_vsrl(xT(ctx->opcode)), EA);
+> +    gen_qemu_ld64_i64(ctx, t0, EA);
+> +    set_cpu_vsrl(xT(ctx->opcode), t0);
+>      tcg_temp_free(EA);
+> +    tcg_temp_free_i64(t0);
+>  }
+> =20
+>  static void gen_lxvdsx(DisasContext *ctx)
+>  {
+>      TCGv EA;
+> +    TCGv_i64 t0;
+> +    TCGv_i64 t1;
+>      if (unlikely(!ctx->vsx_enabled)) {
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+>          return;
+>      }
+> +    t0 =3D tcg_temp_new_i64();
+> +    t1 =3D tcg_temp_new_i64();
+>      gen_set_access_type(ctx, ACCESS_INT);
+>      EA =3D tcg_temp_new();
+>      gen_addr_reg_index(ctx, EA);
+> -    gen_qemu_ld64_i64(ctx, cpu_vsrh(xT(ctx->opcode)), EA);
+> -    tcg_gen_mov_i64(cpu_vsrl(xT(ctx->opcode)), cpu_vsrh(xT(ctx->opcode))=
+);
+> +    gen_qemu_ld64_i64(ctx, t0, EA);
+> +    set_cpu_vsrh(xT(ctx->opcode), t0);
+> +    tcg_gen_mov_i64(t1, t0);
+> +    set_cpu_vsrl(xT(ctx->opcode), t1);
+>      tcg_temp_free(EA);
+> +    tcg_temp_free_i64(t0);
+> +    tcg_temp_free_i64(t1);
+>  }
+> =20
+>  static void gen_lxvw4x(DisasContext *ctx)
+>  {
+>      TCGv EA;
+> -    TCGv_i64 xth =3D cpu_vsrh(xT(ctx->opcode));
+> -    TCGv_i64 xtl =3D cpu_vsrl(xT(ctx->opcode));
+> +    TCGv_i64 xth =3D tcg_temp_new_i64();
+> +    TCGv_i64 xtl =3D tcg_temp_new_i64();
+> +    get_cpu_vsrh(xth, xT(ctx->opcode));
+> +    get_cpu_vsrh(xtl, xT(ctx->opcode));
+>      if (unlikely(!ctx->vsx_enabled)) {
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+>          return;
+> @@ -104,6 +151,8 @@ static void gen_lxvw4x(DisasContext *ctx)
+>          tcg_gen_qemu_ld_i64(xtl, EA, ctx->mem_idx, MO_BEQ);
+>      }
+>      tcg_temp_free(EA);
+> +    tcg_temp_free_i64(xth);
+> +    tcg_temp_free_i64(xtl);
+>  }
+> =20
+>  static void gen_bswap16x8(TCGv_i64 outh, TCGv_i64 outl,
+> @@ -151,8 +200,10 @@ static void gen_bswap32x4(TCGv_i64 outh, TCGv_i64 ou=
+tl,
+>  static void gen_lxvh8x(DisasContext *ctx)
+>  {
+>      TCGv EA;
+> -    TCGv_i64 xth =3D cpu_vsrh(xT(ctx->opcode));
+> -    TCGv_i64 xtl =3D cpu_vsrl(xT(ctx->opcode));
+> +    TCGv_i64 xth =3D tcg_temp_new_i64();
+> +    TCGv_i64 xtl =3D tcg_temp_new_i64();
+> +    get_cpu_vsrh(xth, xT(ctx->opcode));
+> +    get_cpu_vsrh(xtl, xT(ctx->opcode));
+> =20
+>      if (unlikely(!ctx->vsx_enabled)) {
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+> @@ -169,13 +220,17 @@ static void gen_lxvh8x(DisasContext *ctx)
+>          gen_bswap16x8(xth, xtl, xth, xtl);
+>      }
+>      tcg_temp_free(EA);
+> +    tcg_temp_free_i64(xth);
+> +    tcg_temp_free_i64(xtl);
+>  }
+> =20
+>  static void gen_lxvb16x(DisasContext *ctx)
+>  {
+>      TCGv EA;
+> -    TCGv_i64 xth =3D cpu_vsrh(xT(ctx->opcode));
+> -    TCGv_i64 xtl =3D cpu_vsrl(xT(ctx->opcode));
+> +    TCGv_i64 xth =3D tcg_temp_new_i64();
+> +    TCGv_i64 xtl =3D tcg_temp_new_i64();
+> +    get_cpu_vsrh(xth, xT(ctx->opcode));
+> +    get_cpu_vsrh(xtl, xT(ctx->opcode));
+> =20
+>      if (unlikely(!ctx->vsx_enabled)) {
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+> @@ -188,6 +243,8 @@ static void gen_lxvb16x(DisasContext *ctx)
+>      tcg_gen_addi_tl(EA, EA, 8);
+>      tcg_gen_qemu_ld_i64(xtl, EA, ctx->mem_idx, MO_BEQ);
+>      tcg_temp_free(EA);
+> +    tcg_temp_free_i64(xth);
+> +    tcg_temp_free_i64(xtl);
+>  }
+> =20
+>  #define VSX_VECTOR_LOAD_STORE(name, op, indexed)            \
+> @@ -195,15 +252,16 @@ static void gen_##name(DisasContext *ctx)          =
+         \
+>  {                                                           \
+>      int xt;                                                 \
+>      TCGv EA;                                                \
+> -    TCGv_i64 xth, xtl;                                      \
+> +    TCGv_i64 xth =3D tcg_temp_new_i64();                      \
+> +    TCGv_i64 xtl =3D tcg_temp_new_i64();                      \
+>                                                              \
+>      if (indexed) {                                          \
+>          xt =3D xT(ctx->opcode);                               \
+>      } else {                                                \
+>          xt =3D DQxT(ctx->opcode);                             \
+>      }                                                       \
+> -    xth =3D cpu_vsrh(xt);                                     \
+> -    xtl =3D cpu_vsrl(xt);                                     \
+> +    get_cpu_vsrh(xth, xt);                                  \
+> +    get_cpu_vsrl(xtl, xt);                                  \
+>                                                              \
+>      if (xt < 32) {                                          \
+>          if (unlikely(!ctx->vsx_enabled)) {                  \
+> @@ -225,14 +283,20 @@ static void gen_##name(DisasContext *ctx)          =
+         \
+>      }                                                       \
+>      if (ctx->le_mode) {                                     \
+>          tcg_gen_qemu_##op(xtl, EA, ctx->mem_idx, MO_LEQ);   \
+> +        set_cpu_vsrl(xt, xtl);                              \
+>          tcg_gen_addi_tl(EA, EA, 8);                         \
+>          tcg_gen_qemu_##op(xth, EA, ctx->mem_idx, MO_LEQ);   \
+> +        set_cpu_vsrh(xt, xth);                              \
+>      } else {                                                \
+>          tcg_gen_qemu_##op(xth, EA, ctx->mem_idx, MO_BEQ);   \
+> +        set_cpu_vsrh(xt, xth);                              \
+>          tcg_gen_addi_tl(EA, EA, 8);                         \
+>          tcg_gen_qemu_##op(xtl, EA, ctx->mem_idx, MO_BEQ);   \
+> +        set_cpu_vsrl(xt, xtl);                              \
+>      }                                                       \
+>      tcg_temp_free(EA);                                      \
+> +    tcg_temp_free_i64(xth);                                 \
+> +    tcg_temp_free_i64(xtl);                                 \
+>  }
+> =20
+>  VSX_VECTOR_LOAD_STORE(lxv, ld_i64, 0)
+> @@ -276,7 +340,8 @@ VSX_VECTOR_LOAD_STORE_LENGTH(stxvll)
+>  static void gen_##name(DisasContext *ctx)                         \
+>  {                                                                 \
+>      TCGv EA;                                                      \
+> -    TCGv_i64 xth =3D cpu_vsrh(rD(ctx->opcode) + 32);                \
+> +    TCGv_i64 xth =3D tcg_temp_new_i64();                            \
+> +    get_cpu_vsrh(xth, rD(ctx->opcode) + 32);                      \
+>                                                                    \
+>      if (unlikely(!ctx->altivec_enabled)) {                        \
+>          gen_exception(ctx, POWERPC_EXCP_VPU);                     \
+> @@ -286,8 +351,10 @@ static void gen_##name(DisasContext *ctx)           =
+              \
+>      EA =3D tcg_temp_new();                                          \
+>      gen_addr_imm_index(ctx, EA, 0x03);                            \
+>      gen_qemu_##operation(ctx, xth, EA);                           \
+> +    set_cpu_vsrh(rD(ctx->opcode) + 32, xth);                      \
+>      /* NOTE: cpu_vsrl is undefined */                             \
+>      tcg_temp_free(EA);                                            \
+> +    tcg_temp_free_i64(xth);                                       \
+>  }
+> =20
+>  VSX_LOAD_SCALAR_DS(lxsd, ld64_i64)
+> @@ -297,15 +364,19 @@ VSX_LOAD_SCALAR_DS(lxssp, ld32fs)
+>  static void gen_##name(DisasContext *ctx)                     \
+>  {                                                             \
+>      TCGv EA;                                                  \
+> +    TCGv_i64 t0;                                              \
+>      if (unlikely(!ctx->vsx_enabled)) {                        \
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);                \
+>          return;                                               \
+>      }                                                         \
+> +    t0 =3D tcg_temp_new_i64();                                  \
+>      gen_set_access_type(ctx, ACCESS_INT);                     \
+>      EA =3D tcg_temp_new();                                      \
+>      gen_addr_reg_index(ctx, EA);                              \
+> -    gen_qemu_##operation(ctx, cpu_vsrh(xS(ctx->opcode)), EA); \
+> +    gen_qemu_##operation(ctx, t0, EA);                        \
+> +    set_cpu_vsrh(xS(ctx->opcode), t0);                        \
+>      tcg_temp_free(EA);                                        \
+> +    tcg_temp_free_i64(t0);                                    \
+>  }
+> =20
+>  VSX_STORE_SCALAR(stxsdx, st64_i64)
+> @@ -318,6 +389,7 @@ VSX_STORE_SCALAR(stxsspx, st32fs)
+>  static void gen_stxvd2x(DisasContext *ctx)
+>  {
+>      TCGv EA;
+> +    TCGv_i64 t0 =3D tcg_temp_new_i64();
+>      if (unlikely(!ctx->vsx_enabled)) {
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+>          return;
+> @@ -325,17 +397,23 @@ static void gen_stxvd2x(DisasContext *ctx)
+>      gen_set_access_type(ctx, ACCESS_INT);
+>      EA =3D tcg_temp_new();
+>      gen_addr_reg_index(ctx, EA);
+> -    gen_qemu_st64_i64(ctx, cpu_vsrh(xS(ctx->opcode)), EA);
+> +    get_cpu_vsrh(t0, xS(ctx->opcode));
+> +    gen_qemu_st64_i64(ctx, t0, EA);
+>      tcg_gen_addi_tl(EA, EA, 8);
+> -    gen_qemu_st64_i64(ctx, cpu_vsrl(xS(ctx->opcode)), EA);
+> +    get_cpu_vsrl(t0, xS(ctx->opcode));
+> +    gen_qemu_st64_i64(ctx, t0, EA);
+>      tcg_temp_free(EA);
+> +    tcg_temp_free_i64(t0);
+>  }
+> =20
+>  static void gen_stxvw4x(DisasContext *ctx)
+>  {
+> -    TCGv_i64 xsh =3D cpu_vsrh(xS(ctx->opcode));
+> -    TCGv_i64 xsl =3D cpu_vsrl(xS(ctx->opcode));
+>      TCGv EA;
+> +    TCGv_i64 xsh =3D tcg_temp_new_i64();
+> +    TCGv_i64 xsl =3D tcg_temp_new_i64();
+> +    get_cpu_vsrh(xsh, xS(ctx->opcode));
+> +    get_cpu_vsrl(xsl, xS(ctx->opcode));
+> +
+>      if (unlikely(!ctx->vsx_enabled)) {
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+>          return;
+> @@ -362,13 +440,17 @@ static void gen_stxvw4x(DisasContext *ctx)
+>          tcg_gen_qemu_st_i64(xsl, EA, ctx->mem_idx, MO_BEQ);
+>      }
+>      tcg_temp_free(EA);
+> +    tcg_temp_free_i64(xsh);
+> +    tcg_temp_free_i64(xsl);
+>  }
+> =20
+>  static void gen_stxvh8x(DisasContext *ctx)
+>  {
+> -    TCGv_i64 xsh =3D cpu_vsrh(xS(ctx->opcode));
+> -    TCGv_i64 xsl =3D cpu_vsrl(xS(ctx->opcode));
+>      TCGv EA;
+> +    TCGv_i64 xsh =3D tcg_temp_new_i64();
+> +    TCGv_i64 xsl =3D tcg_temp_new_i64();
+> +    get_cpu_vsrh(xsh, xS(ctx->opcode));
+> +    get_cpu_vsrl(xsl, xS(ctx->opcode));
+> =20
+>      if (unlikely(!ctx->vsx_enabled)) {
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+> @@ -393,13 +475,17 @@ static void gen_stxvh8x(DisasContext *ctx)
+>          tcg_gen_qemu_st_i64(xsl, EA, ctx->mem_idx, MO_BEQ);
+>      }
+>      tcg_temp_free(EA);
+> +    tcg_temp_free_i64(xsh);
+> +    tcg_temp_free_i64(xsl);
+>  }
+> =20
+>  static void gen_stxvb16x(DisasContext *ctx)
+>  {
+> -    TCGv_i64 xsh =3D cpu_vsrh(xS(ctx->opcode));
+> -    TCGv_i64 xsl =3D cpu_vsrl(xS(ctx->opcode));
+>      TCGv EA;
+> +    TCGv_i64 xsh =3D tcg_temp_new_i64();
+> +    TCGv_i64 xsl =3D tcg_temp_new_i64();
+> +    get_cpu_vsrh(xsh, xS(ctx->opcode));
+> +    get_cpu_vsrl(xsl, xS(ctx->opcode));
+> =20
+>      if (unlikely(!ctx->vsx_enabled)) {
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+> @@ -412,13 +498,16 @@ static void gen_stxvb16x(DisasContext *ctx)
+>      tcg_gen_addi_tl(EA, EA, 8);
+>      tcg_gen_qemu_st_i64(xsl, EA, ctx->mem_idx, MO_BEQ);
+>      tcg_temp_free(EA);
+> +    tcg_temp_free_i64(xsh);
+> +    tcg_temp_free_i64(xsl);
+>  }
+> =20
+>  #define VSX_STORE_SCALAR_DS(name, operation)                      \
+>  static void gen_##name(DisasContext *ctx)                         \
+>  {                                                                 \
+>      TCGv EA;                                                      \
+> -    TCGv_i64 xth =3D cpu_vsrh(rD(ctx->opcode) + 32);                \
+> +    TCGv_i64 xth =3D tcg_temp_new_i64();                            \
+> +    get_cpu_vsrh(xth, rD(ctx->opcode) + 32);                      \
+>                                                                    \
+>      if (unlikely(!ctx->altivec_enabled)) {                        \
+>          gen_exception(ctx, POWERPC_EXCP_VPU);                     \
+> @@ -430,62 +519,119 @@ static void gen_##name(DisasContext *ctx)         =
+                \
+>      gen_qemu_##operation(ctx, xth, EA);                           \
+>      /* NOTE: cpu_vsrl is undefined */                             \
+>      tcg_temp_free(EA);                                            \
+> +    tcg_temp_free_i64(xth);                                       \
+>  }
+> =20
+>  VSX_LOAD_SCALAR_DS(stxsd, st64_i64)
+>  VSX_LOAD_SCALAR_DS(stxssp, st32fs)
+> =20
+> -#define MV_VSRW(name, tcgop1, tcgop2, target, source)           \
+> -static void gen_##name(DisasContext *ctx)                       \
+> -{                                                               \
+> -    if (xS(ctx->opcode) < 32) {                                 \
+> -        if (unlikely(!ctx->fpu_enabled)) {                      \
+> -            gen_exception(ctx, POWERPC_EXCP_FPU);               \
+> -            return;                                             \
+> -        }                                                       \
+> -    } else {                                                    \
+> -        if (unlikely(!ctx->altivec_enabled)) {                  \
+> -            gen_exception(ctx, POWERPC_EXCP_VPU);               \
+> -            return;                                             \
+> -        }                                                       \
+> -    }                                                           \
+> -    TCGv_i64 tmp =3D tcg_temp_new_i64();                          \
+> -    tcg_gen_##tcgop1(tmp, source);                              \
+> -    tcg_gen_##tcgop2(target, tmp);                              \
+> -    tcg_temp_free_i64(tmp);                                     \
+> +static void gen_mfvsrwz(DisasContext *ctx)
+> +{
+> +    if (xS(ctx->opcode) < 32) {
+> +        if (unlikely(!ctx->fpu_enabled)) {
+> +            gen_exception(ctx, POWERPC_EXCP_FPU);
+> +            return;
+> +        }
+> +    } else {
+> +        if (unlikely(!ctx->altivec_enabled)) {
+> +            gen_exception(ctx, POWERPC_EXCP_VPU);
+> +            return;
+> +        }
+> +    }
+> +    TCGv_i64 tmp =3D tcg_temp_new_i64();
+> +    TCGv_i64 xsh =3D tcg_temp_new_i64();
+> +    get_cpu_vsrh(xsh, xS(ctx->opcode));
+> +    tcg_gen_ext32u_i64(tmp, xsh);
+> +    tcg_gen_trunc_i64_tl(cpu_gpr[rA(ctx->opcode)], tmp);
+> +    tcg_temp_free_i64(tmp);
+>  }
+> =20
+> +static void gen_mtvsrwa(DisasContext *ctx)
+> +{
+> +    if (xS(ctx->opcode) < 32) {
+> +        if (unlikely(!ctx->fpu_enabled)) {
+> +            gen_exception(ctx, POWERPC_EXCP_FPU);
+> +            return;
+> +        }
+> +    } else {
+> +        if (unlikely(!ctx->altivec_enabled)) {
+> +            gen_exception(ctx, POWERPC_EXCP_VPU);
+> +            return;
+> +        }
+> +    }
+> +    TCGv_i64 tmp =3D tcg_temp_new_i64();
+> +    TCGv_i64 xsh =3D tcg_temp_new_i64();
+> +    tcg_gen_extu_tl_i64(tmp, cpu_gpr[rA(ctx->opcode)]);
+> +    tcg_gen_ext32s_i64(xsh, tmp);
+> +    set_cpu_vsrh(xT(ctx->opcode), xsh);
+> +    tcg_temp_free_i64(tmp);
+> +    tcg_temp_free_i64(xsh);
+> +}
+> =20
+> -MV_VSRW(mfvsrwz, ext32u_i64, trunc_i64_tl, cpu_gpr[rA(ctx->opcode)], \
+> -        cpu_vsrh(xS(ctx->opcode)))
+> -MV_VSRW(mtvsrwa, extu_tl_i64, ext32s_i64, cpu_vsrh(xT(ctx->opcode)), \
+> -        cpu_gpr[rA(ctx->opcode)])
+> -MV_VSRW(mtvsrwz, extu_tl_i64, ext32u_i64, cpu_vsrh(xT(ctx->opcode)), \
+> -        cpu_gpr[rA(ctx->opcode)])
+> +static void gen_mtvsrwz(DisasContext *ctx)
+> +{
+> +    if (xS(ctx->opcode) < 32) {
+> +        if (unlikely(!ctx->fpu_enabled)) {
+> +            gen_exception(ctx, POWERPC_EXCP_FPU);
+> +            return;
+> +        }
+> +    } else {
+> +        if (unlikely(!ctx->altivec_enabled)) {
+> +            gen_exception(ctx, POWERPC_EXCP_VPU);
+> +            return;
+> +        }
+> +    }
+> +    TCGv_i64 tmp =3D tcg_temp_new_i64();
+> +    TCGv_i64 xsh =3D tcg_temp_new_i64();
+> +    tcg_gen_extu_tl_i64(tmp, cpu_gpr[rA(ctx->opcode)]);
+> +    tcg_gen_ext32u_i64(xsh, tmp);
+> +    set_cpu_vsrh(xT(ctx->opcode), xsh);
+> +    tcg_temp_free_i64(tmp);
+> +    tcg_temp_free_i64(xsh);
+> +}
+> =20
+>  #if defined(TARGET_PPC64)
+> -#define MV_VSRD(name, target, source)                           \
+> -static void gen_##name(DisasContext *ctx)                       \
+> -{                                                               \
+> -    if (xS(ctx->opcode) < 32) {                                 \
+> -        if (unlikely(!ctx->fpu_enabled)) {                      \
+> -            gen_exception(ctx, POWERPC_EXCP_FPU);               \
+> -            return;                                             \
+> -        }                                                       \
+> -    } else {                                                    \
+> -        if (unlikely(!ctx->altivec_enabled)) {                  \
+> -            gen_exception(ctx, POWERPC_EXCP_VPU);               \
+> -            return;                                             \
+> -        }                                                       \
+> -    }                                                           \
+> -    tcg_gen_mov_i64(target, source);                            \
+> +static void gen_mfvsrd(DisasContext *ctx)
+> +{
+> +    TCGv_i64 t0 =3D tcg_temp_new_i64();
+> +    if (xS(ctx->opcode) < 32) {
+> +        if (unlikely(!ctx->fpu_enabled)) {
+> +            gen_exception(ctx, POWERPC_EXCP_FPU);
+> +            return;
+> +        }
+> +    } else {
+> +        if (unlikely(!ctx->altivec_enabled)) {
+> +            gen_exception(ctx, POWERPC_EXCP_VPU);
+> +            return;
+> +        }
+> +    }
+> +    get_cpu_vsrh(t0, xS(ctx->opcode));
+> +    tcg_gen_mov_i64(cpu_gpr[rA(ctx->opcode)], t0);
+> +    tcg_temp_free_i64(t0);
+>  }
+> =20
+> -MV_VSRD(mfvsrd, cpu_gpr[rA(ctx->opcode)], cpu_vsrh(xS(ctx->opcode)))
+> -MV_VSRD(mtvsrd, cpu_vsrh(xT(ctx->opcode)), cpu_gpr[rA(ctx->opcode)])
+> +static void gen_mtvsrd(DisasContext *ctx)
+> +{
+> +    TCGv_i64 t0 =3D tcg_temp_new_i64();
+> +    if (xS(ctx->opcode) < 32) {
+> +        if (unlikely(!ctx->fpu_enabled)) {
+> +            gen_exception(ctx, POWERPC_EXCP_FPU);
+> +            return;
+> +        }
+> +    } else {
+> +        if (unlikely(!ctx->altivec_enabled)) {
+> +            gen_exception(ctx, POWERPC_EXCP_VPU);
+> +            return;
+> +        }
+> +    }
+> +    tcg_gen_mov_i64(t0, cpu_gpr[rA(ctx->opcode)]);
+> +    set_cpu_vsrh(xT(ctx->opcode), t0);
+> +    tcg_temp_free_i64(t0);
+> +}
+> =20
+>  static void gen_mfvsrld(DisasContext *ctx)
+>  {
+> +    TCGv_i64 t0 =3D tcg_temp_new_i64();
+>      if (xS(ctx->opcode) < 32) {
+>          if (unlikely(!ctx->vsx_enabled)) {
+>              gen_exception(ctx, POWERPC_EXCP_VSXU);
+> @@ -497,12 +643,14 @@ static void gen_mfvsrld(DisasContext *ctx)
+>              return;
+>          }
+>      }
+> -
+> -    tcg_gen_mov_i64(cpu_gpr[rA(ctx->opcode)], cpu_vsrl(xS(ctx->opcode)));
+> +    get_cpu_vsrl(t0, xS(ctx->opcode));
+> +    tcg_gen_mov_i64(cpu_gpr[rA(ctx->opcode)], t0);
+> +    tcg_temp_free_i64(t0);
+>  }
+> =20
+>  static void gen_mtvsrdd(DisasContext *ctx)
+>  {
+> +    TCGv_i64 t0 =3D tcg_temp_new_i64();
+>      if (xT(ctx->opcode) < 32) {
+>          if (unlikely(!ctx->vsx_enabled)) {
+>              gen_exception(ctx, POWERPC_EXCP_VSXU);
+> @@ -516,16 +664,20 @@ static void gen_mtvsrdd(DisasContext *ctx)
+>      }
+> =20
+>      if (!rA(ctx->opcode)) {
+> -        tcg_gen_movi_i64(cpu_vsrh(xT(ctx->opcode)), 0);
+> +        tcg_gen_movi_i64(t0, 0);
+>      } else {
+> -        tcg_gen_mov_i64(cpu_vsrh(xT(ctx->opcode)), cpu_gpr[rA(ctx->opcod=
+e)]);
+> +        tcg_gen_mov_i64(t0, cpu_gpr[rA(ctx->opcode)]);
+>      }
+> +    set_cpu_vsrh(xT(ctx->opcode), t0);
+> =20
+> -    tcg_gen_mov_i64(cpu_vsrl(xT(ctx->opcode)), cpu_gpr[rB(ctx->opcode)]);
+> +    tcg_gen_mov_i64(t0, cpu_gpr[rB(ctx->opcode)]);
+> +    set_cpu_vsrl(xT(ctx->opcode), t0);
+> +    tcg_temp_free_i64(t0);
+>  }
+> =20
+>  static void gen_mtvsrws(DisasContext *ctx)
+>  {
+> +    TCGv_i64 t0 =3D tcg_temp_new_i64();
+>      if (xT(ctx->opcode) < 32) {
+>          if (unlikely(!ctx->vsx_enabled)) {
+>              gen_exception(ctx, POWERPC_EXCP_VSXU);
+> @@ -538,55 +690,60 @@ static void gen_mtvsrws(DisasContext *ctx)
+>          }
+>      }
+> =20
+> -    tcg_gen_deposit_i64(cpu_vsrl(xT(ctx->opcode)), cpu_gpr[rA(ctx->opcod=
+e)],
+> +    tcg_gen_deposit_i64(t0, cpu_gpr[rA(ctx->opcode)],
+>                          cpu_gpr[rA(ctx->opcode)], 32, 32);
+> -    tcg_gen_mov_i64(cpu_vsrh(xT(ctx->opcode)), cpu_vsrl(xT(ctx->opcode))=
+);
+> +    set_cpu_vsrl(xT(ctx->opcode), t0);
+> +    set_cpu_vsrh(xT(ctx->opcode), t0);
+> +    tcg_temp_free_i64(t0);
+>  }
+> =20
+>  #endif
+> =20
+>  static void gen_xxpermdi(DisasContext *ctx)
+>  {
+> +    TCGv_i64 xh, xl;
 > +
 >      if (unlikely(!ctx->vsx_enabled)) {
 >          gen_exception(ctx, POWERPC_EXCP_VSXU);
 >          return;
 >      }
-> -    a =3D tcg_temp_new_i64();
-> -    b =3D tcg_temp_new_i64();
-> -    c =3D tcg_temp_new_i64();
-> -    tmp =3D tcg_temp_new_i64();
+> =20
+> +    xh =3D tcg_temp_new_i64();
+> +    xl =3D tcg_temp_new_i64();
+> +
+>      if (unlikely((xT(ctx->opcode) =3D=3D xA(ctx->opcode)) ||
+>                   (xT(ctx->opcode) =3D=3D xB(ctx->opcode)))) {
+> -        TCGv_i64 xh, xl;
 > -
-> -    get_cpu_vsrh(a, xA(ctx->opcode));
-> -    get_cpu_vsrh(b, xB(ctx->opcode));
-> -    get_cpu_vsrh(c, xC(ctx->opcode));
+> -        xh =3D tcg_temp_new_i64();
+> -        xl =3D tcg_temp_new_i64();
 > -
-> -    tcg_gen_and_i64(b, b, c);
-> -    tcg_gen_andc_i64(a, a, c);
-> -    tcg_gen_or_i64(tmp, a, b);
-> -    set_cpu_vsrh(xT(ctx->opcode), tmp);
+>          if ((DM(ctx->opcode) & 2) =3D=3D 0) {
+> -            tcg_gen_mov_i64(xh, cpu_vsrh(xA(ctx->opcode)));
+> +            get_cpu_vsrh(xh, xA(ctx->opcode));
+>          } else {
+> -            tcg_gen_mov_i64(xh, cpu_vsrl(xA(ctx->opcode)));
+> +            get_cpu_vsrl(xh, xA(ctx->opcode));
+>          }
+>          if ((DM(ctx->opcode) & 1) =3D=3D 0) {
+> -            tcg_gen_mov_i64(xl, cpu_vsrh(xB(ctx->opcode)));
+> +            get_cpu_vsrh(xl, xB(ctx->opcode));
+>          } else {
+> -            tcg_gen_mov_i64(xl, cpu_vsrl(xB(ctx->opcode)));
+> +            get_cpu_vsrl(xl, xB(ctx->opcode));
+>          }
+> =20
+> -        tcg_gen_mov_i64(cpu_vsrh(xT(ctx->opcode)), xh);
+> -        tcg_gen_mov_i64(cpu_vsrl(xT(ctx->opcode)), xl);
 > -
-> -    get_cpu_vsrl(a, xA(ctx->opcode));
-> -    get_cpu_vsrl(b, xB(ctx->opcode));
-> -    get_cpu_vsrl(c, xC(ctx->opcode));
-> -
-> -    tcg_gen_and_i64(b, b, c);
-> -    tcg_gen_andc_i64(a, a, c);
-> -    tcg_gen_or_i64(tmp, a, b);
-> -    set_cpu_vsrl(xT(ctx->opcode), tmp);
-> -
-> -    tcg_temp_free_i64(a);
-> -    tcg_temp_free_i64(b);
-> -    tcg_temp_free_i64(c);
-> -    tcg_temp_free_i64(tmp);
-> +    tcg_gen_gvec_4(vsr_full_offset(rt), vsr_full_offset(ra),
-> +                   vsr_full_offset(rb), vsr_full_offset(rc), 16, 16, &g);
+> -        tcg_temp_free_i64(xh);
+> -        tcg_temp_free_i64(xl);
+> +        set_cpu_vsrh(xT(ctx->opcode), xh);
+> +        set_cpu_vsrl(xT(ctx->opcode), xl);
+>      } else {
+>          if ((DM(ctx->opcode) & 2) =3D=3D 0) {
+> -            tcg_gen_mov_i64(cpu_vsrh(xT(ctx->opcode)), cpu_vsrh(xA(ctx->=
+opcode)));
+> +            get_cpu_vsrh(xh, xA(ctx->opcode));
+> +            set_cpu_vsrh(xT(ctx->opcode), xh);
+>          } else {
+> -            tcg_gen_mov_i64(cpu_vsrh(xT(ctx->opcode)), cpu_vsrl(xA(ctx->=
+opcode)));
+> +            get_cpu_vsrl(xh, xA(ctx->opcode));
+> +            set_cpu_vsrh(xT(ctx->opcode), xh);
+>          }
+>          if ((DM(ctx->opcode) & 1) =3D=3D 0) {
+> -            tcg_gen_mov_i64(cpu_vsrl(xT(ctx->opcode)), cpu_vsrh(xB(ctx->=
+opcode)));
+> +            get_cpu_vsrh(xl, xB(ctx->opcode));
+> +            set_cpu_vsrl(xT(ctx->opcode), xl);
+>          } else {
+> -            tcg_gen_mov_i64(cpu_vsrl(xT(ctx->opcode)), cpu_vsrl(xB(ctx->=
+opcode)));
+> +            get_cpu_vsrl(xl, xB(ctx->opcode));
+> +            set_cpu_vsrl(xT(ctx->opcode), xl);
+>          }
+>      }
+> +    tcg_temp_free_i64(xh);
+> +    tcg_temp_free_i64(xl);
+>  }
+> =20
+>  #define OP_ABS 1
+> @@ -606,7 +763,7 @@ static void glue(gen_, name)(DisasContext * ctx)     =
+             \
+>          }                                                         \
+>          xb =3D tcg_temp_new_i64();                                  \
+>          sgm =3D tcg_temp_new_i64();                                 \
+> -        tcg_gen_mov_i64(xb, cpu_vsrh(xB(ctx->opcode)));           \
+> +        get_cpu_vsrh(xb, xB(ctx->opcode));                        \
+>          tcg_gen_movi_i64(sgm, sgn_mask);                          \
+>          switch (op) {                                             \
+>              case OP_ABS: {                                        \
+> @@ -623,7 +780,7 @@ static void glue(gen_, name)(DisasContext * ctx)     =
+             \
+>              }                                                     \
+>              case OP_CPSGN: {                                      \
+>                  TCGv_i64 xa =3D tcg_temp_new_i64();                 \
+> -                tcg_gen_mov_i64(xa, cpu_vsrh(xA(ctx->opcode)));   \
+> +                get_cpu_vsrh(xa, xA(ctx->opcode));                \
+>                  tcg_gen_and_i64(xa, xa, sgm);                     \
+>                  tcg_gen_andc_i64(xb, xb, sgm);                    \
+>                  tcg_gen_or_i64(xb, xb, xa);                       \
+> @@ -631,7 +788,7 @@ static void glue(gen_, name)(DisasContext * ctx)     =
+             \
+>                  break;                                            \
+>              }                                                     \
+>          }                                                         \
+> -        tcg_gen_mov_i64(cpu_vsrh(xT(ctx->opcode)), xb);           \
+> +        set_cpu_vsrh(xT(ctx->opcode), xb);                        \
+>          tcg_temp_free_i64(xb);                                    \
+>          tcg_temp_free_i64(sgm);                                   \
+>      }
+> @@ -647,7 +804,7 @@ static void glue(gen_, name)(DisasContext *ctx)      =
+             \
+>      int xa;                                                       \
+>      int xt =3D rD(ctx->opcode) + 32;                                \
+>      int xb =3D rB(ctx->opcode) + 32;                                \
+> -    TCGv_i64 xah, xbh, xbl, sgm;                                  \
+> +    TCGv_i64 xah, xbh, xbl, sgm, tmp;                             \
+>                                                                    \
+>      if (unlikely(!ctx->vsx_enabled)) {                            \
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);                    \
+> @@ -656,8 +813,9 @@ static void glue(gen_, name)(DisasContext *ctx)      =
+             \
+>      xbh =3D tcg_temp_new_i64();                                     \
+>      xbl =3D tcg_temp_new_i64();                                     \
+>      sgm =3D tcg_temp_new_i64();                                     \
+> -    tcg_gen_mov_i64(xbh, cpu_vsrh(xb));                           \
+> -    tcg_gen_mov_i64(xbl, cpu_vsrl(xb));                           \
+> +    tmp =3D tcg_temp_new_i64();                                     \
+> +    get_cpu_vsrh(xbh, xb);                                        \
+> +    get_cpu_vsrl(xbl, xb);                                        \
+>      tcg_gen_movi_i64(sgm, sgn_mask);                              \
+>      switch (op) {                                                 \
+>      case OP_ABS:                                                  \
+> @@ -672,17 +830,19 @@ static void glue(gen_, name)(DisasContext *ctx)    =
+               \
+>      case OP_CPSGN:                                                \
+>          xah =3D tcg_temp_new_i64();                                 \
+>          xa =3D rA(ctx->opcode) + 32;                                \
+> -        tcg_gen_and_i64(xah, cpu_vsrh(xa), sgm);                  \
+> +        get_cpu_vsrh(tmp, xa);                                    \
+> +        tcg_gen_and_i64(xah, tmp, sgm);                           \
+>          tcg_gen_andc_i64(xbh, xbh, sgm);                          \
+>          tcg_gen_or_i64(xbh, xbh, xah);                            \
+>          tcg_temp_free_i64(xah);                                   \
+>          break;                                                    \
+>      }                                                             \
+> -    tcg_gen_mov_i64(cpu_vsrh(xt), xbh);                           \
+> -    tcg_gen_mov_i64(cpu_vsrl(xt), xbl);                           \
+> +    set_cpu_vsrh(xt, xbh);                                        \
+> +    set_cpu_vsrl(xt, xbl);                                        \
+>      tcg_temp_free_i64(xbl);                                       \
+>      tcg_temp_free_i64(xbh);                                       \
+>      tcg_temp_free_i64(sgm);                                       \
+> +    tcg_temp_free_i64(tmp);                                       \
+>  }
+> =20
+>  VSX_SCALAR_MOVE_QP(xsabsqp, OP_ABS, SGN_MASK_DP)
+> @@ -701,8 +861,8 @@ static void glue(gen_, name)(DisasContext * ctx)     =
+            \
+>          xbh =3D tcg_temp_new_i64();                                \
+>          xbl =3D tcg_temp_new_i64();                                \
+>          sgm =3D tcg_temp_new_i64();                                \
+> -        tcg_gen_mov_i64(xbh, cpu_vsrh(xB(ctx->opcode)));         \
+> -        tcg_gen_mov_i64(xbl, cpu_vsrl(xB(ctx->opcode)));         \
+> +        set_cpu_vsrh(xB(ctx->opcode), xbh);                      \
+> +        set_cpu_vsrl(xB(ctx->opcode), xbl);                      \
+>          tcg_gen_movi_i64(sgm, sgn_mask);                         \
+>          switch (op) {                                            \
+>              case OP_ABS: {                                       \
+> @@ -723,8 +883,8 @@ static void glue(gen_, name)(DisasContext * ctx)     =
+            \
+>              case OP_CPSGN: {                                     \
+>                  TCGv_i64 xah =3D tcg_temp_new_i64();               \
+>                  TCGv_i64 xal =3D tcg_temp_new_i64();               \
+> -                tcg_gen_mov_i64(xah, cpu_vsrh(xA(ctx->opcode))); \
+> -                tcg_gen_mov_i64(xal, cpu_vsrl(xA(ctx->opcode))); \
+> +                get_cpu_vsrh(xah, xA(ctx->opcode));              \
+> +                get_cpu_vsrl(xal, xA(ctx->opcode));              \
+>                  tcg_gen_and_i64(xah, xah, sgm);                  \
+>                  tcg_gen_and_i64(xal, xal, sgm);                  \
+>                  tcg_gen_andc_i64(xbh, xbh, sgm);                 \
+> @@ -736,8 +896,8 @@ static void glue(gen_, name)(DisasContext * ctx)     =
+            \
+>                  break;                                           \
+>              }                                                    \
+>          }                                                        \
+> -        tcg_gen_mov_i64(cpu_vsrh(xT(ctx->opcode)), xbh);         \
+> -        tcg_gen_mov_i64(cpu_vsrl(xT(ctx->opcode)), xbl);         \
+> +        set_cpu_vsrh(xT(ctx->opcode), xbh);                      \
+> +        set_cpu_vsrl(xT(ctx->opcode), xbl);                      \
+>          tcg_temp_free_i64(xbh);                                  \
+>          tcg_temp_free_i64(xbl);                                  \
+>          tcg_temp_free_i64(sgm);                                  \
+> @@ -768,12 +928,17 @@ static void gen_##name(DisasContext * ctx)         =
+                           \
+>  #define GEN_VSX_HELPER_XT_XB_ENV(name, op1, op2, inval, type) \
+>  static void gen_##name(DisasContext * ctx)                    \
+>  {                                                             \
+> +    TCGv_i64 t0 =3D tcg_temp_new_i64();                         \
+> +    TCGv_i64 t1 =3D tcg_temp_new_i64();                         \
+>      if (unlikely(!ctx->vsx_enabled)) {                        \
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);                \
+>          return;                                               \
+>      }                                                         \
+> -    gen_helper_##name(cpu_vsrh(xT(ctx->opcode)), cpu_env,     \
+> -                      cpu_vsrh(xB(ctx->opcode)));             \
+> +    get_cpu_vsrh(t0, xB(ctx->opcode));                        \
+> +    gen_helper_##name(t1, cpu_env, t0);                       \
+> +    set_cpu_vsrh(xT(ctx->opcode), t1);                        \
+> +    tcg_temp_free_i64(t0);                                    \
+> +    tcg_temp_free_i64(t1);                                    \
+>  }
+> =20
+>  GEN_VSX_HELPER_2(xsadddp, 0x00, 0x04, 0, PPC2_VSX)
+> @@ -949,10 +1114,13 @@ GEN_VSX_HELPER_2(xxpermr, 0x08, 0x07, 0, PPC2_ISA3=
+00)
+> =20
+>  static void gen_xxbrd(DisasContext *ctx)
+>  {
+> -    TCGv_i64 xth =3D cpu_vsrh(xT(ctx->opcode));
+> -    TCGv_i64 xtl =3D cpu_vsrl(xT(ctx->opcode));
+> -    TCGv_i64 xbh =3D cpu_vsrh(xB(ctx->opcode));
+> -    TCGv_i64 xbl =3D cpu_vsrl(xB(ctx->opcode));
+> +    TCGv_i64 xth =3D tcg_temp_new_i64();
+> +    TCGv_i64 xtl =3D tcg_temp_new_i64();
+> +
+> +    TCGv_i64 xbh =3D tcg_temp_new_i64();
+> +    TCGv_i64 xbl =3D tcg_temp_new_i64();
+> +    get_cpu_vsrh(xbh, xB(ctx->opcode));
+> +    get_cpu_vsrl(xbl, xB(ctx->opcode));
+> =20
+>      if (unlikely(!ctx->vsx_enabled)) {
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+> @@ -960,28 +1128,49 @@ static void gen_xxbrd(DisasContext *ctx)
+>      }
+>      tcg_gen_bswap64_i64(xth, xbh);
+>      tcg_gen_bswap64_i64(xtl, xbl);
+> +    set_cpu_vsrh(xT(ctx->opcode), xth);
+> +    set_cpu_vsrl(xT(ctx->opcode), xtl);
+> +
+> +    tcg_temp_free_i64(xth);
+> +    tcg_temp_free_i64(xtl);
+> +    tcg_temp_free_i64(xbh);
+> +    tcg_temp_free_i64(xbl);
+>  }
+> =20
+>  static void gen_xxbrh(DisasContext *ctx)
+>  {
+> -    TCGv_i64 xth =3D cpu_vsrh(xT(ctx->opcode));
+> -    TCGv_i64 xtl =3D cpu_vsrl(xT(ctx->opcode));
+> -    TCGv_i64 xbh =3D cpu_vsrh(xB(ctx->opcode));
+> -    TCGv_i64 xbl =3D cpu_vsrl(xB(ctx->opcode));
+> +    TCGv_i64 xth =3D tcg_temp_new_i64();
+> +    TCGv_i64 xtl =3D tcg_temp_new_i64();
+> +
+> +    TCGv_i64 xbh =3D tcg_temp_new_i64();
+> +    TCGv_i64 xbl =3D tcg_temp_new_i64();
+> +    get_cpu_vsrh(xbh, xB(ctx->opcode));
+> +    get_cpu_vsrl(xbl, xB(ctx->opcode));
+> =20
+>      if (unlikely(!ctx->vsx_enabled)) {
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+>          return;
+>      }
+>      gen_bswap16x8(xth, xtl, xbh, xbl);
+> +    set_cpu_vsrh(xT(ctx->opcode), xth);
+> +    set_cpu_vsrl(xT(ctx->opcode), xtl);
+> +
+> +    tcg_temp_free_i64(xth);
+> +    tcg_temp_free_i64(xtl);
+> +    tcg_temp_free_i64(xbh);
+> +    tcg_temp_free_i64(xbl);
+>  }
+> =20
+>  static void gen_xxbrq(DisasContext *ctx)
+>  {
+> -    TCGv_i64 xth =3D cpu_vsrh(xT(ctx->opcode));
+> -    TCGv_i64 xtl =3D cpu_vsrl(xT(ctx->opcode));
+> -    TCGv_i64 xbh =3D cpu_vsrh(xB(ctx->opcode));
+> -    TCGv_i64 xbl =3D cpu_vsrl(xB(ctx->opcode));
+> +    TCGv_i64 xth =3D tcg_temp_new_i64();
+> +    TCGv_i64 xtl =3D tcg_temp_new_i64();
+> +
+> +    TCGv_i64 xbh =3D tcg_temp_new_i64();
+> +    TCGv_i64 xbl =3D tcg_temp_new_i64();
+> +    get_cpu_vsrh(xbh, xB(ctx->opcode));
+> +    get_cpu_vsrl(xbl, xB(ctx->opcode));
+> +
+>      TCGv_i64 t0 =3D tcg_temp_new_i64();
+> =20
+>      if (unlikely(!ctx->vsx_enabled)) {
+> @@ -990,35 +1179,65 @@ static void gen_xxbrq(DisasContext *ctx)
+>      }
+>      tcg_gen_bswap64_i64(t0, xbl);
+>      tcg_gen_bswap64_i64(xtl, xbh);
+> +    set_cpu_vsrl(xT(ctx->opcode), xtl);
+>      tcg_gen_mov_i64(xth, t0);
+> +    set_cpu_vsrl(xT(ctx->opcode), xth);
+> +
+>      tcg_temp_free_i64(t0);
+> +    tcg_temp_free_i64(xth);
+> +    tcg_temp_free_i64(xtl);
+> +    tcg_temp_free_i64(xbh);
+> +    tcg_temp_free_i64(xbl);
+>  }
+> =20
+>  static void gen_xxbrw(DisasContext *ctx)
+>  {
+> -    TCGv_i64 xth =3D cpu_vsrh(xT(ctx->opcode));
+> -    TCGv_i64 xtl =3D cpu_vsrl(xT(ctx->opcode));
+> -    TCGv_i64 xbh =3D cpu_vsrh(xB(ctx->opcode));
+> -    TCGv_i64 xbl =3D cpu_vsrl(xB(ctx->opcode));
+> +    TCGv_i64 xth =3D tcg_temp_new_i64();
+> +    TCGv_i64 xtl =3D tcg_temp_new_i64();
+> +
+> +    TCGv_i64 xbh =3D tcg_temp_new_i64();
+> +    TCGv_i64 xbl =3D tcg_temp_new_i64();
+> +    get_cpu_vsrh(xbh, xB(ctx->opcode));
+> +    get_cpu_vsrl(xbl, xB(ctx->opcode));
+> =20
+>      if (unlikely(!ctx->vsx_enabled)) {
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+>          return;
+>      }
+>      gen_bswap32x4(xth, xtl, xbh, xbl);
+> +    set_cpu_vsrl(xT(ctx->opcode), xth);
+> +    set_cpu_vsrl(xT(ctx->opcode), xtl);
+> +
+> +    tcg_temp_free_i64(xth);
+> +    tcg_temp_free_i64(xtl);
+> +    tcg_temp_free_i64(xbh);
+> +    tcg_temp_free_i64(xbl);
+>  }
+> =20
+>  #define VSX_LOGICAL(name, tcg_op)                                    \
+>  static void glue(gen_, name)(DisasContext * ctx)                     \
+>      {                                                                \
+> +        TCGv_i64 t0;                                                 \
+> +        TCGv_i64 t1;                                                 \
+> +        TCGv_i64 t2;                                                 \
+>          if (unlikely(!ctx->vsx_enabled)) {                           \
+>              gen_exception(ctx, POWERPC_EXCP_VSXU);                   \
+>              return;                                                  \
+>          }                                                            \
+> -        tcg_op(cpu_vsrh(xT(ctx->opcode)), cpu_vsrh(xA(ctx->opcode)), \
+> -            cpu_vsrh(xB(ctx->opcode)));                              \
+> -        tcg_op(cpu_vsrl(xT(ctx->opcode)), cpu_vsrl(xA(ctx->opcode)), \
+> -            cpu_vsrl(xB(ctx->opcode)));                              \
+> +        t0 =3D tcg_temp_new_i64();                                     \
+> +        t1 =3D tcg_temp_new_i64();                                     \
+> +        t2 =3D tcg_temp_new_i64();                                     \
+> +        get_cpu_vsrh(t0, xA(ctx->opcode));                           \
+> +        get_cpu_vsrh(t1, xB(ctx->opcode));                           \
+> +        tcg_op(t2, t0, t1);                                          \
+> +        set_cpu_vsrh(xT(ctx->opcode), t2);                           \
+> +        get_cpu_vsrl(t0, xA(ctx->opcode));                           \
+> +        get_cpu_vsrl(t1, xB(ctx->opcode));                           \
+> +        tcg_op(t2, t0, t1);                                          \
+> +        set_cpu_vsrl(xT(ctx->opcode), t2);                           \
+> +        tcg_temp_free_i64(t0);                                       \
+> +        tcg_temp_free_i64(t1);                                       \
+> +        tcg_temp_free_i64(t2);                                       \
+>      }
+> =20
+>  VSX_LOGICAL(xxland, tcg_gen_and_i64)
+> @@ -1033,7 +1252,7 @@ VSX_LOGICAL(xxlorc, tcg_gen_orc_i64)
+>  #define VSX_XXMRG(name, high)                               \
+>  static void glue(gen_, name)(DisasContext * ctx)            \
+>      {                                                       \
+> -        TCGv_i64 a0, a1, b0, b1;                            \
+> +        TCGv_i64 a0, a1, b0, b1, tmp;                       \
+>          if (unlikely(!ctx->vsx_enabled)) {                  \
+>              gen_exception(ctx, POWERPC_EXCP_VSXU);          \
+>              return;                                         \
+> @@ -1042,27 +1261,29 @@ static void glue(gen_, name)(DisasContext * ctx) =
+           \
+>          a1 =3D tcg_temp_new_i64();                            \
+>          b0 =3D tcg_temp_new_i64();                            \
+>          b1 =3D tcg_temp_new_i64();                            \
+> +        tmp =3D tcg_temp_new_i64();                           \
+>          if (high) {                                         \
+> -            tcg_gen_mov_i64(a0, cpu_vsrh(xA(ctx->opcode))); \
+> -            tcg_gen_mov_i64(a1, cpu_vsrh(xA(ctx->opcode))); \
+> -            tcg_gen_mov_i64(b0, cpu_vsrh(xB(ctx->opcode))); \
+> -            tcg_gen_mov_i64(b1, cpu_vsrh(xB(ctx->opcode))); \
+> +            get_cpu_vsrh(a0, xA(ctx->opcode));              \
+> +            get_cpu_vsrh(a1, xA(ctx->opcode));              \
+> +            get_cpu_vsrh(b0, xB(ctx->opcode));              \
+> +            get_cpu_vsrh(b1, xB(ctx->opcode));              \
+>          } else {                                            \
+> -            tcg_gen_mov_i64(a0, cpu_vsrl(xA(ctx->opcode))); \
+> -            tcg_gen_mov_i64(a1, cpu_vsrl(xA(ctx->opcode))); \
+> -            tcg_gen_mov_i64(b0, cpu_vsrl(xB(ctx->opcode))); \
+> -            tcg_gen_mov_i64(b1, cpu_vsrl(xB(ctx->opcode))); \
+> +            get_cpu_vsrl(a0, xA(ctx->opcode));              \
+> +            get_cpu_vsrl(a1, xA(ctx->opcode));              \
+> +            get_cpu_vsrl(b0, xB(ctx->opcode));              \
+> +            get_cpu_vsrl(b1, xB(ctx->opcode));              \
+>          }                                                   \
+>          tcg_gen_shri_i64(a0, a0, 32);                       \
+>          tcg_gen_shri_i64(b0, b0, 32);                       \
+> -        tcg_gen_deposit_i64(cpu_vsrh(xT(ctx->opcode)),      \
+> -                            b0, a0, 32, 32);                \
+> -        tcg_gen_deposit_i64(cpu_vsrl(xT(ctx->opcode)),      \
+> -                            b1, a1, 32, 32);                \
+> +        tcg_gen_deposit_i64(tmp, b0, a0, 32, 32);           \
+> +        set_cpu_vsrh(xT(ctx->opcode), tmp);                 \
+> +        tcg_gen_deposit_i64(tmp, b1, a1, 32, 32);           \
+> +        set_cpu_vsrl(xT(ctx->opcode), tmp);                 \
+>          tcg_temp_free_i64(a0);                              \
+>          tcg_temp_free_i64(a1);                              \
+>          tcg_temp_free_i64(b0);                              \
+>          tcg_temp_free_i64(b1);                              \
+> +        tcg_temp_free_i64(tmp);                             \
+>      }
+> =20
+>  VSX_XXMRG(xxmrghw, 1)
+> @@ -1070,7 +1291,7 @@ VSX_XXMRG(xxmrglw, 0)
+> =20
+>  static void gen_xxsel(DisasContext * ctx)
+>  {
+> -    TCGv_i64 a, b, c;
+> +    TCGv_i64 a, b, c, tmp;
+>      if (unlikely(!ctx->vsx_enabled)) {
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+>          return;
+> @@ -1078,34 +1299,43 @@ static void gen_xxsel(DisasContext * ctx)
+>      a =3D tcg_temp_new_i64();
+>      b =3D tcg_temp_new_i64();
+>      c =3D tcg_temp_new_i64();
+> +    tmp =3D tcg_temp_new_i64();
+> =20
+> -    tcg_gen_mov_i64(a, cpu_vsrh(xA(ctx->opcode)));
+> -    tcg_gen_mov_i64(b, cpu_vsrh(xB(ctx->opcode)));
+> -    tcg_gen_mov_i64(c, cpu_vsrh(xC(ctx->opcode)));
+> +    get_cpu_vsrh(a, xA(ctx->opcode));
+> +    get_cpu_vsrh(b, xB(ctx->opcode));
+> +    get_cpu_vsrh(c, xC(ctx->opcode));
+> =20
+>      tcg_gen_and_i64(b, b, c);
+>      tcg_gen_andc_i64(a, a, c);
+> -    tcg_gen_or_i64(cpu_vsrh(xT(ctx->opcode)), a, b);
+> +    tcg_gen_or_i64(tmp, a, b);
+> +    set_cpu_vsrh(xT(ctx->opcode), tmp);
+> =20
+> -    tcg_gen_mov_i64(a, cpu_vsrl(xA(ctx->opcode)));
+> -    tcg_gen_mov_i64(b, cpu_vsrl(xB(ctx->opcode)));
+> -    tcg_gen_mov_i64(c, cpu_vsrl(xC(ctx->opcode)));
+> +    get_cpu_vsrl(a, xA(ctx->opcode));
+> +    get_cpu_vsrl(b, xB(ctx->opcode));
+> +    get_cpu_vsrl(c, xC(ctx->opcode));
+> =20
+>      tcg_gen_and_i64(b, b, c);
+>      tcg_gen_andc_i64(a, a, c);
+> -    tcg_gen_or_i64(cpu_vsrl(xT(ctx->opcode)), a, b);
+> +    tcg_gen_or_i64(tmp, a, b);
+> +    set_cpu_vsrl(xT(ctx->opcode), tmp);
+> =20
+>      tcg_temp_free_i64(a);
+>      tcg_temp_free_i64(b);
+>      tcg_temp_free_i64(c);
+> +    tcg_temp_free_i64(tmp);
 >  }
 > =20
 >  static void gen_xxspltw(DisasContext *ctx)
+>  {
+>      TCGv_i64 b, b2;
+> -    TCGv_i64 vsr =3D (UIM(ctx->opcode) & 2) ?
+> -                   cpu_vsrl(xB(ctx->opcode)) :
+> -                   cpu_vsrh(xB(ctx->opcode));
+> +    TCGv_i64 vsr;
+> +
+> +    vsr =3D tcg_temp_new_i64();
+> +    if (UIM(ctx->opcode) & 2) {
+> +        get_cpu_vsrl(vsr, xB(ctx->opcode));
+> +    } else {
+> +        get_cpu_vsrh(vsr, xB(ctx->opcode));
+> +    }
+> =20
+>      if (unlikely(!ctx->vsx_enabled)) {
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+> @@ -1122,9 +1352,11 @@ static void gen_xxspltw(DisasContext *ctx)
+>      }
+> =20
+>      tcg_gen_shli_i64(b2, b, 32);
+> -    tcg_gen_or_i64(cpu_vsrh(xT(ctx->opcode)), b, b2);
+> -    tcg_gen_mov_i64(cpu_vsrl(xT(ctx->opcode)), cpu_vsrh(xT(ctx->opcode))=
+);
+> +    tcg_gen_or_i64(vsr, b, b2);
+> +    set_cpu_vsrh(xT(ctx->opcode), vsr);
+> +    set_cpu_vsrl(xT(ctx->opcode), vsr);
+> =20
+> +    tcg_temp_free_i64(vsr);
+>      tcg_temp_free_i64(b);
+>      tcg_temp_free_i64(b2);
+>  }
+> @@ -1134,6 +1366,7 @@ static void gen_xxspltw(DisasContext *ctx)
+>  static void gen_xxspltib(DisasContext *ctx)
+>  {
+>      unsigned char uim8 =3D IMM8(ctx->opcode);
+> +    TCGv_i64 vsr =3D tcg_temp_new_i64();
+>      if (xS(ctx->opcode) < 32) {
+>          if (unlikely(!ctx->altivec_enabled)) {
+>              gen_exception(ctx, POWERPC_EXCP_VPU);
+> @@ -1145,8 +1378,10 @@ static void gen_xxspltib(DisasContext *ctx)
+>              return;
+>          }
+>      }
+> -    tcg_gen_movi_i64(cpu_vsrh(xT(ctx->opcode)), pattern(uim8));
+> -    tcg_gen_movi_i64(cpu_vsrl(xT(ctx->opcode)), pattern(uim8));
+> +    tcg_gen_movi_i64(vsr, pattern(uim8));
+> +    set_cpu_vsrh(xT(ctx->opcode), vsr);
+> +    set_cpu_vsrl(xT(ctx->opcode), vsr);
+> +    tcg_temp_free_i64(vsr);
+>  }
+> =20
+>  static void gen_xxsldwi(DisasContext *ctx)
+> @@ -1161,40 +1396,40 @@ static void gen_xxsldwi(DisasContext *ctx)
+> =20
+>      switch (SHW(ctx->opcode)) {
+>          case 0: {
+> -            tcg_gen_mov_i64(xth, cpu_vsrh(xA(ctx->opcode)));
+> -            tcg_gen_mov_i64(xtl, cpu_vsrl(xA(ctx->opcode)));
+> +            get_cpu_vsrh(xth, xA(ctx->opcode));
+> +            get_cpu_vsrl(xtl, xA(ctx->opcode));
+>              break;
+>          }
+>          case 1: {
+>              TCGv_i64 t0 =3D tcg_temp_new_i64();
+> -            tcg_gen_mov_i64(xth, cpu_vsrh(xA(ctx->opcode)));
+> +            get_cpu_vsrh(xth, xA(ctx->opcode));
+>              tcg_gen_shli_i64(xth, xth, 32);
+> -            tcg_gen_mov_i64(t0, cpu_vsrl(xA(ctx->opcode)));
+> +            get_cpu_vsrl(t0, xA(ctx->opcode));
+>              tcg_gen_shri_i64(t0, t0, 32);
+>              tcg_gen_or_i64(xth, xth, t0);
+> -            tcg_gen_mov_i64(xtl, cpu_vsrl(xA(ctx->opcode)));
+> +            get_cpu_vsrl(xtl, xA(ctx->opcode));
+>              tcg_gen_shli_i64(xtl, xtl, 32);
+> -            tcg_gen_mov_i64(t0, cpu_vsrh(xB(ctx->opcode)));
+> +            get_cpu_vsrh(t0, xB(ctx->opcode));
+>              tcg_gen_shri_i64(t0, t0, 32);
+>              tcg_gen_or_i64(xtl, xtl, t0);
+>              tcg_temp_free_i64(t0);
+>              break;
+>          }
+>          case 2: {
+> -            tcg_gen_mov_i64(xth, cpu_vsrl(xA(ctx->opcode)));
+> -            tcg_gen_mov_i64(xtl, cpu_vsrh(xB(ctx->opcode)));
+> +            get_cpu_vsrl(xth, xA(ctx->opcode));
+> +            get_cpu_vsrh(xtl, xB(ctx->opcode));
+>              break;
+>          }
+>          case 3: {
+>              TCGv_i64 t0 =3D tcg_temp_new_i64();
+> -            tcg_gen_mov_i64(xth, cpu_vsrl(xA(ctx->opcode)));
+> +            get_cpu_vsrl(xth, xA(ctx->opcode));
+>              tcg_gen_shli_i64(xth, xth, 32);
+> -            tcg_gen_mov_i64(t0, cpu_vsrh(xB(ctx->opcode)));
+> +            get_cpu_vsrh(t0, xB(ctx->opcode));
+>              tcg_gen_shri_i64(t0, t0, 32);
+>              tcg_gen_or_i64(xth, xth, t0);
+> -            tcg_gen_mov_i64(xtl, cpu_vsrh(xB(ctx->opcode)));
+> +            get_cpu_vsrh(xtl, xB(ctx->opcode));
+>              tcg_gen_shli_i64(xtl, xtl, 32);
+> -            tcg_gen_mov_i64(t0, cpu_vsrl(xB(ctx->opcode)));
+> +            get_cpu_vsrl(t0, xB(ctx->opcode));
+>              tcg_gen_shri_i64(t0, t0, 32);
+>              tcg_gen_or_i64(xtl, xtl, t0);
+>              tcg_temp_free_i64(t0);
+> @@ -1202,8 +1437,8 @@ static void gen_xxsldwi(DisasContext *ctx)
+>          }
+>      }
+> =20
+> -    tcg_gen_mov_i64(cpu_vsrh(xT(ctx->opcode)), xth);
+> -    tcg_gen_mov_i64(cpu_vsrl(xT(ctx->opcode)), xtl);
+> +    set_cpu_vsrh(xT(ctx->opcode), xth);
+> +    set_cpu_vsrl(xT(ctx->opcode), xtl);
+> =20
+>      tcg_temp_free_i64(xth);
+>      tcg_temp_free_i64(xtl);
+> @@ -1214,6 +1449,7 @@ static void gen_##name(DisasContext *ctx)          =
+             \
+>  {                                                               \
+>      TCGv xt, xb;                                                \
+>      TCGv_i32 t0 =3D tcg_temp_new_i32();                           \
+> +    TCGv_i64 t1 =3D tcg_temp_new_i64();                           \
+>      uint8_t uimm =3D UIMM4(ctx->opcode);                          \
+>                                                                  \
+>      if (unlikely(!ctx->vsx_enabled)) {                          \
+> @@ -1226,8 +1462,9 @@ static void gen_##name(DisasContext *ctx)          =
+             \
+>       * uimm > 12 handle as per hardware in helper               \
+>       */                                                         \
+>      if (uimm > 15) {                                            \
+> -        tcg_gen_movi_i64(cpu_vsrh(xT(ctx->opcode)), 0);         \
+> -        tcg_gen_movi_i64(cpu_vsrl(xT(ctx->opcode)), 0);         \
+> +        tcg_gen_movi_i64(t1, 0);                                \
+> +        set_cpu_vsrh(xT(ctx->opcode), t1);                      \
+> +        set_cpu_vsrl(xT(ctx->opcode), t1);                      \
+>          return;                                                 \
+>      }                                                           \
+>      tcg_gen_movi_i32(t0, uimm);                                 \
+> @@ -1235,6 +1472,7 @@ static void gen_##name(DisasContext *ctx)          =
+             \
+>      tcg_temp_free(xb);                                          \
+>      tcg_temp_free(xt);                                          \
+>      tcg_temp_free_i32(t0);                                      \
+> +    tcg_temp_free_i64(t1);                                      \
+>  }
+> =20
+>  VSX_EXTRACT_INSERT(xxextractuw)
+> @@ -1244,30 +1482,41 @@ VSX_EXTRACT_INSERT(xxinsertw)
+>  static void gen_xsxexpdp(DisasContext *ctx)
+>  {
+>      TCGv rt =3D cpu_gpr[rD(ctx->opcode)];
+> +    TCGv_i64 t0 =3D tcg_temp_new_i64();
+>      if (unlikely(!ctx->vsx_enabled)) {
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+>          return;
+>      }
+> -    tcg_gen_extract_i64(rt, cpu_vsrh(xB(ctx->opcode)), 52, 11);
+> +    get_cpu_vsrh(t0, xB(ctx->opcode));
+> +    tcg_gen_extract_i64(rt, t0, 52, 11);
+> +    tcg_temp_free_i64(t0);
+>  }
+> =20
+>  static void gen_xsxexpqp(DisasContext *ctx)
+>  {
+> -    TCGv_i64 xth =3D cpu_vsrh(rD(ctx->opcode) + 32);
+> -    TCGv_i64 xtl =3D cpu_vsrl(rD(ctx->opcode) + 32);
+> -    TCGv_i64 xbh =3D cpu_vsrh(rB(ctx->opcode) + 32);
+> +    TCGv_i64 xth =3D tcg_temp_new_i64();
+> +    TCGv_i64 xtl =3D tcg_temp_new_i64();
+> +
+> +    TCGv_i64 xbh =3D tcg_temp_new_i64();
+> +    get_cpu_vsrh(xbh, rB(ctx->opcode) + 32);
+> =20
+>      if (unlikely(!ctx->vsx_enabled)) {
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+>          return;
+>      }
+>      tcg_gen_extract_i64(xth, xbh, 48, 15);
+> +    set_cpu_vsrh(rD(ctx->opcode) + 32, xth);
+>      tcg_gen_movi_i64(xtl, 0);
+> +    set_cpu_vsrl(rD(ctx->opcode) + 32, xtl);
+> +
+> +    tcg_temp_free_i64(xbh);
+> +    tcg_temp_free_i64(xth);
+> +    tcg_temp_free_i64(xtl);
+>  }
+> =20
+>  static void gen_xsiexpdp(DisasContext *ctx)
+>  {
+> -    TCGv_i64 xth =3D cpu_vsrh(xT(ctx->opcode));
+> +    TCGv_i64 xth;
+>      TCGv ra =3D cpu_gpr[rA(ctx->opcode)];
+>      TCGv rb =3D cpu_gpr[rB(ctx->opcode)];
+>      TCGv_i64 t0;
+> @@ -1277,21 +1526,30 @@ static void gen_xsiexpdp(DisasContext *ctx)
+>          return;
+>      }
+>      t0 =3D tcg_temp_new_i64();
+> +    xth =3D tcg_temp_new_i64();
+>      tcg_gen_andi_i64(xth, ra, 0x800FFFFFFFFFFFFF);
+>      tcg_gen_andi_i64(t0, rb, 0x7FF);
+>      tcg_gen_shli_i64(t0, t0, 52);
+>      tcg_gen_or_i64(xth, xth, t0);
+> +    set_cpu_vsrh(xT(ctx->opcode), xth);
+>      /* dword[1] is undefined */
+>      tcg_temp_free_i64(t0);
+> +    tcg_temp_free_i64(xth);
+>  }
+> =20
+>  static void gen_xsiexpqp(DisasContext *ctx)
+>  {
+> -    TCGv_i64 xth =3D cpu_vsrh(rD(ctx->opcode) + 32);
+> -    TCGv_i64 xtl =3D cpu_vsrl(rD(ctx->opcode) + 32);
+> -    TCGv_i64 xah =3D cpu_vsrh(rA(ctx->opcode) + 32);
+> -    TCGv_i64 xal =3D cpu_vsrl(rA(ctx->opcode) + 32);
+> -    TCGv_i64 xbh =3D cpu_vsrh(rB(ctx->opcode) + 32);
+> +    TCGv_i64 xth =3D tcg_temp_new_i64();
+> +    TCGv_i64 xtl =3D tcg_temp_new_i64();
+> +
+> +    TCGv_i64 xah =3D tcg_temp_new_i64();
+> +    TCGv_i64 xal =3D tcg_temp_new_i64();
+> +    get_cpu_vsrh(xah, rA(ctx->opcode) + 32);
+> +    get_cpu_vsrl(xal, rA(ctx->opcode) + 32);
+> +
+> +    TCGv_i64 xbh =3D tcg_temp_new_i64();
+> +    get_cpu_vsrh(xbh, rB(ctx->opcode) + 32);
+> +
+>      TCGv_i64 t0;
+> =20
+>      if (unlikely(!ctx->vsx_enabled)) {
+> @@ -1303,14 +1561,22 @@ static void gen_xsiexpqp(DisasContext *ctx)
+>      tcg_gen_andi_i64(t0, xbh, 0x7FFF);
+>      tcg_gen_shli_i64(t0, t0, 48);
+>      tcg_gen_or_i64(xth, xth, t0);
+> +    set_cpu_vsrh(rD(ctx->opcode) + 32, xth);
+>      tcg_gen_mov_i64(xtl, xal);
+> +    set_cpu_vsrl(rD(ctx->opcode) + 32, xtl);
+> +
+>      tcg_temp_free_i64(t0);
+> +    tcg_temp_free_i64(xth);
+> +    tcg_temp_free_i64(xtl);
+> +    tcg_temp_free_i64(xah);
+> +    tcg_temp_free_i64(xal);
+> +    tcg_temp_free_i64(xbh);
+>  }
+> =20
+>  static void gen_xsxsigdp(DisasContext *ctx)
+>  {
+>      TCGv rt =3D cpu_gpr[rD(ctx->opcode)];
+> -    TCGv_i64 t0, zr, nan, exp;
+> +    TCGv_i64 t0, t1, zr, nan, exp;
+> =20
+>      if (unlikely(!ctx->vsx_enabled)) {
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+> @@ -1318,17 +1584,21 @@ static void gen_xsxsigdp(DisasContext *ctx)
+>      }
+>      exp =3D tcg_temp_new_i64();
+>      t0 =3D tcg_temp_new_i64();
+> +    t1 =3D tcg_temp_new_i64();
+>      zr =3D tcg_const_i64(0);
+>      nan =3D tcg_const_i64(2047);
+> =20
+> -    tcg_gen_extract_i64(exp, cpu_vsrh(xB(ctx->opcode)), 52, 11);
+> +    get_cpu_vsrh(t1, xB(ctx->opcode));
+> +    tcg_gen_extract_i64(exp, t1, 52, 11);
+>      tcg_gen_movi_i64(t0, 0x0010000000000000);
+>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, zr, zr, t0);
+>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, nan, zr, t0);
+> -    tcg_gen_andi_i64(rt, cpu_vsrh(xB(ctx->opcode)), 0x000FFFFFFFFFFFFF);
+> +    get_cpu_vsrh(t1, xB(ctx->opcode));
+> +    tcg_gen_andi_i64(rt, t1, 0x000FFFFFFFFFFFFF);
+>      tcg_gen_or_i64(rt, rt, t0);
+> =20
+>      tcg_temp_free_i64(t0);
+> +    tcg_temp_free_i64(t1);
+>      tcg_temp_free_i64(exp);
+>      tcg_temp_free_i64(zr);
+>      tcg_temp_free_i64(nan);
+> @@ -1337,8 +1607,13 @@ static void gen_xsxsigdp(DisasContext *ctx)
+>  static void gen_xsxsigqp(DisasContext *ctx)
+>  {
+>      TCGv_i64 t0, zr, nan, exp;
+> -    TCGv_i64 xth =3D cpu_vsrh(rD(ctx->opcode) + 32);
+> -    TCGv_i64 xtl =3D cpu_vsrl(rD(ctx->opcode) + 32);
+> +    TCGv_i64 xth =3D tcg_temp_new_i64();
+> +    TCGv_i64 xtl =3D tcg_temp_new_i64();
+> +
+> +    TCGv_i64 xbh =3D tcg_temp_new_i64();
+> +    TCGv_i64 xbl =3D tcg_temp_new_i64();
+> +    get_cpu_vsrh(xbh, rB(ctx->opcode) + 32);
+> +    get_cpu_vsrl(xbl, rB(ctx->opcode) + 32);
+> =20
+>      if (unlikely(!ctx->vsx_enabled)) {
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+> @@ -1349,29 +1624,41 @@ static void gen_xsxsigqp(DisasContext *ctx)
+>      zr =3D tcg_const_i64(0);
+>      nan =3D tcg_const_i64(32767);
+> =20
+> -    tcg_gen_extract_i64(exp, cpu_vsrh(rB(ctx->opcode) + 32), 48, 15);
+> +    tcg_gen_extract_i64(exp, xbh, 48, 15);
+>      tcg_gen_movi_i64(t0, 0x0001000000000000);
+>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, zr, zr, t0);
+>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, nan, zr, t0);
+> -    tcg_gen_andi_i64(xth, cpu_vsrh(rB(ctx->opcode) + 32), 0x0000FFFFFFFF=
+FFFF);
+> +    tcg_gen_andi_i64(xth, xbh, 0x0000FFFFFFFFFFFF);
+>      tcg_gen_or_i64(xth, xth, t0);
+> -    tcg_gen_mov_i64(xtl, cpu_vsrl(rB(ctx->opcode) + 32));
+> +    set_cpu_vsrh(rD(ctx->opcode) + 32, xth);
+> +    tcg_gen_mov_i64(xtl, xbl);
+> +    set_cpu_vsrl(rD(ctx->opcode) + 32, xtl);
+> =20
+>      tcg_temp_free_i64(t0);
+>      tcg_temp_free_i64(exp);
+>      tcg_temp_free_i64(zr);
+>      tcg_temp_free_i64(nan);
+> +    tcg_temp_free_i64(xth);
+> +    tcg_temp_free_i64(xtl);
+> +    tcg_temp_free_i64(xbh);
+> +    tcg_temp_free_i64(xbl);
+>  }
+>  #endif
+> =20
+>  static void gen_xviexpsp(DisasContext *ctx)
+>  {
+> -    TCGv_i64 xth =3D cpu_vsrh(xT(ctx->opcode));
+> -    TCGv_i64 xtl =3D cpu_vsrl(xT(ctx->opcode));
+> -    TCGv_i64 xah =3D cpu_vsrh(xA(ctx->opcode));
+> -    TCGv_i64 xal =3D cpu_vsrl(xA(ctx->opcode));
+> -    TCGv_i64 xbh =3D cpu_vsrh(xB(ctx->opcode));
+> -    TCGv_i64 xbl =3D cpu_vsrl(xB(ctx->opcode));
+> +    TCGv_i64 xth =3D tcg_temp_new_i64();
+> +    TCGv_i64 xtl =3D tcg_temp_new_i64();
+> +
+> +    TCGv_i64 xah =3D tcg_temp_new_i64();
+> +    TCGv_i64 xal =3D tcg_temp_new_i64();
+> +    TCGv_i64 xbh =3D tcg_temp_new_i64();
+> +    TCGv_i64 xbl =3D tcg_temp_new_i64();
+> +    get_cpu_vsrh(xah, xA(ctx->opcode));
+> +    get_cpu_vsrl(xal, xA(ctx->opcode));
+> +    get_cpu_vsrh(xbh, xB(ctx->opcode));
+> +    get_cpu_vsrl(xbl, xB(ctx->opcode));
+> +
+>      TCGv_i64 t0;
+> =20
+>      if (unlikely(!ctx->vsx_enabled)) {
+> @@ -1383,21 +1670,36 @@ static void gen_xviexpsp(DisasContext *ctx)
+>      tcg_gen_andi_i64(t0, xbh, 0xFF000000FF);
+>      tcg_gen_shli_i64(t0, t0, 23);
+>      tcg_gen_or_i64(xth, xth, t0);
+> +    set_cpu_vsrh(xT(ctx->opcode), xth);
+>      tcg_gen_andi_i64(xtl, xal, 0x807FFFFF807FFFFF);
+>      tcg_gen_andi_i64(t0, xbl, 0xFF000000FF);
+>      tcg_gen_shli_i64(t0, t0, 23);
+>      tcg_gen_or_i64(xtl, xtl, t0);
+> +    set_cpu_vsrl(xT(ctx->opcode), xtl);
+> +
+>      tcg_temp_free_i64(t0);
+> +    tcg_temp_free_i64(xth);
+> +    tcg_temp_free_i64(xtl);
+> +    tcg_temp_free_i64(xah);
+> +    tcg_temp_free_i64(xal);
+> +    tcg_temp_free_i64(xbh);
+> +    tcg_temp_free_i64(xbl);
+>  }
+> =20
+>  static void gen_xviexpdp(DisasContext *ctx)
+>  {
+> -    TCGv_i64 xth =3D cpu_vsrh(xT(ctx->opcode));
+> -    TCGv_i64 xtl =3D cpu_vsrl(xT(ctx->opcode));
+> -    TCGv_i64 xah =3D cpu_vsrh(xA(ctx->opcode));
+> -    TCGv_i64 xal =3D cpu_vsrl(xA(ctx->opcode));
+> -    TCGv_i64 xbh =3D cpu_vsrh(xB(ctx->opcode));
+> -    TCGv_i64 xbl =3D cpu_vsrl(xB(ctx->opcode));
+> +    TCGv_i64 xth =3D tcg_temp_new_i64();
+> +    TCGv_i64 xtl =3D tcg_temp_new_i64();
+> +
+> +    TCGv_i64 xah =3D tcg_temp_new_i64();
+> +    TCGv_i64 xal =3D tcg_temp_new_i64();
+> +    TCGv_i64 xbh =3D tcg_temp_new_i64();
+> +    TCGv_i64 xbl =3D tcg_temp_new_i64();
+> +    get_cpu_vsrh(xah, xA(ctx->opcode));
+> +    get_cpu_vsrl(xal, xA(ctx->opcode));
+> +    get_cpu_vsrh(xbh, xB(ctx->opcode));
+> +    get_cpu_vsrl(xbl, xB(ctx->opcode));
+> +
+>      TCGv_i64 t0;
+> =20
+>      if (unlikely(!ctx->vsx_enabled)) {
+> @@ -1409,19 +1711,31 @@ static void gen_xviexpdp(DisasContext *ctx)
+>      tcg_gen_andi_i64(t0, xbh, 0x7FF);
+>      tcg_gen_shli_i64(t0, t0, 52);
+>      tcg_gen_or_i64(xth, xth, t0);
+> +    set_cpu_vsrh(xT(ctx->opcode), xth);
+>      tcg_gen_andi_i64(xtl, xal, 0x800FFFFFFFFFFFFF);
+>      tcg_gen_andi_i64(t0, xbl, 0x7FF);
+>      tcg_gen_shli_i64(t0, t0, 52);
+>      tcg_gen_or_i64(xtl, xtl, t0);
+> +    set_cpu_vsrl(xT(ctx->opcode), xtl);
+> +
+>      tcg_temp_free_i64(t0);
+> +    tcg_temp_free_i64(xth);
+> +    tcg_temp_free_i64(xtl);
+> +    tcg_temp_free_i64(xah);
+> +    tcg_temp_free_i64(xal);
+> +    tcg_temp_free_i64(xbh);
+> +    tcg_temp_free_i64(xbl);
+>  }
+> =20
+>  static void gen_xvxexpsp(DisasContext *ctx)
+>  {
+> -    TCGv_i64 xth =3D cpu_vsrh(xT(ctx->opcode));
+> -    TCGv_i64 xtl =3D cpu_vsrl(xT(ctx->opcode));
+> -    TCGv_i64 xbh =3D cpu_vsrh(xB(ctx->opcode));
+> -    TCGv_i64 xbl =3D cpu_vsrl(xB(ctx->opcode));
+> +    TCGv_i64 xth =3D tcg_temp_new_i64();
+> +    TCGv_i64 xtl =3D tcg_temp_new_i64();
+> +
+> +    TCGv_i64 xbh =3D tcg_temp_new_i64();
+> +    TCGv_i64 xbl =3D tcg_temp_new_i64();
+> +    get_cpu_vsrh(xbh, xB(ctx->opcode));
+> +    get_cpu_vsrl(xbl, xB(ctx->opcode));
+> =20
+>      if (unlikely(!ctx->vsx_enabled)) {
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+> @@ -1429,33 +1743,53 @@ static void gen_xvxexpsp(DisasContext *ctx)
+>      }
+>      tcg_gen_shri_i64(xth, xbh, 23);
+>      tcg_gen_andi_i64(xth, xth, 0xFF000000FF);
+> +    set_cpu_vsrh(xT(ctx->opcode), xth);
+>      tcg_gen_shri_i64(xtl, xbl, 23);
+>      tcg_gen_andi_i64(xtl, xtl, 0xFF000000FF);
+> +    set_cpu_vsrl(xT(ctx->opcode), xtl);
+> +
+> +    tcg_temp_free_i64(xth);
+> +    tcg_temp_free_i64(xtl);
+> +    tcg_temp_free_i64(xbh);
+> +    tcg_temp_free_i64(xbl);
+>  }
+> =20
+>  static void gen_xvxexpdp(DisasContext *ctx)
+>  {
+> -    TCGv_i64 xth =3D cpu_vsrh(xT(ctx->opcode));
+> -    TCGv_i64 xtl =3D cpu_vsrl(xT(ctx->opcode));
+> -    TCGv_i64 xbh =3D cpu_vsrh(xB(ctx->opcode));
+> -    TCGv_i64 xbl =3D cpu_vsrl(xB(ctx->opcode));
+> +    TCGv_i64 xth =3D tcg_temp_new_i64();
+> +    TCGv_i64 xtl =3D tcg_temp_new_i64();
+> +
+> +    TCGv_i64 xbh =3D tcg_temp_new_i64();
+> +    TCGv_i64 xbl =3D tcg_temp_new_i64();
+> +    get_cpu_vsrh(xbh, xB(ctx->opcode));
+> +    get_cpu_vsrl(xbl, xB(ctx->opcode));
+> =20
+>      if (unlikely(!ctx->vsx_enabled)) {
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+>          return;
+>      }
+>      tcg_gen_extract_i64(xth, xbh, 52, 11);
+> +    set_cpu_vsrh(xT(ctx->opcode), xth);
+>      tcg_gen_extract_i64(xtl, xbl, 52, 11);
+> +    set_cpu_vsrl(xT(ctx->opcode), xtl);
+> +
+> +    tcg_temp_free_i64(xth);
+> +    tcg_temp_free_i64(xtl);
+> +    tcg_temp_free_i64(xbh);
+> +    tcg_temp_free_i64(xbl);
+>  }
+> =20
+>  GEN_VSX_HELPER_2(xvxsigsp, 0x00, 0x04, 0, PPC2_ISA300)
+> =20
+>  static void gen_xvxsigdp(DisasContext *ctx)
+>  {
+> -    TCGv_i64 xth =3D cpu_vsrh(xT(ctx->opcode));
+> -    TCGv_i64 xtl =3D cpu_vsrl(xT(ctx->opcode));
+> -    TCGv_i64 xbh =3D cpu_vsrh(xB(ctx->opcode));
+> -    TCGv_i64 xbl =3D cpu_vsrl(xB(ctx->opcode));
+> +    TCGv_i64 xth =3D tcg_temp_new_i64();
+> +    TCGv_i64 xtl =3D tcg_temp_new_i64();
+> +
+> +    TCGv_i64 xbh =3D tcg_temp_new_i64();
+> +    TCGv_i64 xbl =3D tcg_temp_new_i64();
+> +    get_cpu_vsrh(xbh, xB(ctx->opcode));
+> +    get_cpu_vsrl(xbl, xB(ctx->opcode));
+> =20
+>      TCGv_i64 t0, zr, nan, exp;
+> =20
+> @@ -1474,6 +1808,7 @@ static void gen_xvxsigdp(DisasContext *ctx)
+>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, nan, zr, t0);
+>      tcg_gen_andi_i64(xth, xbh, 0x000FFFFFFFFFFFFF);
+>      tcg_gen_or_i64(xth, xth, t0);
+> +    set_cpu_vsrh(xT(ctx->opcode), xth);
+> =20
+>      tcg_gen_extract_i64(exp, xbl, 52, 11);
+>      tcg_gen_movi_i64(t0, 0x0010000000000000);
+> @@ -1481,11 +1816,16 @@ static void gen_xvxsigdp(DisasContext *ctx)
+>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, nan, zr, t0);
+>      tcg_gen_andi_i64(xtl, xbl, 0x000FFFFFFFFFFFFF);
+>      tcg_gen_or_i64(xtl, xtl, t0);
+> +    set_cpu_vsrl(xT(ctx->opcode), xtl);
+> =20
+>      tcg_temp_free_i64(t0);
+>      tcg_temp_free_i64(exp);
+>      tcg_temp_free_i64(zr);
+>      tcg_temp_free_i64(nan);
+> +    tcg_temp_free_i64(xth);
+> +    tcg_temp_free_i64(xtl);
+> +    tcg_temp_free_i64(xbh);
+> +    tcg_temp_free_i64(xbl);
+>  }
+> =20
+>  #undef GEN_XX2FORM
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -124,24 +1625,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---kSOhxpxUsM1s2qz/
+--X+nYw8KZ/oNxZ8JS
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwZ5s0ACgkQbDjKyiDZ
-s5IbbBAAqRbhNqy6OM6xuGc4ZSS7PmEEPUMd/yNV3o/AzGUiQBXOBBkxAKptadZG
-57tooCdRdanT1c+w7MqiqT3z6WbWXkKfUQyVw2nLfrDMFxnHzYgu+Y+yhCChy2jH
-vE5rJKhofWZcUBQmdhVR/f9paz8gvIsxO0cExpacUEO9tVl/ZNxMrRUTZ2p25VUs
-4yoVwQez3ZXzjJQUF5NKODG7YmV3RKzTlJEjNBcbDwJGkg0puFlWvjZ8elAt3bTa
-n2k4JnMWbVIMm5iNZptqT9h55WWZrEP3vaCZu3vIDO+tEbvSBPaFTCSVEpX1I38H
-XokEpz6bXbjGHdP7xionB5WyXDqin53AYPMEGkAtUi4qGBIGQYtVzKSkeavqEF4x
-kIWnOJHpxrjkIzv2GgZFgDFosBvHoFSqCRfdUKn/ELbVznxSBeynkfrUNlDitOKc
-azv9tXLW7Yc9vynXzf6NY2UGj29ODQUi5wyVWddqNHOZEchc1Wn2zL4FwT23gM/S
-0jI6g0uNAjb3JW0kAQzMyIaf1XF4bExqE+ojkUAb3X861nqTPYgIapDCtg0anpN4
-c/A4cjdacrd4i/poqrNHJ3F9c5VYCxmUHu8EFugOW1YFKhvu9yTq9xOMxg2iQQk+
-UzZ+4k05oj8Kt+MdnYdD9GipA7IQqcri8LQ4IMiMqrhSIiccT4M=
-=+HyR
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwZ4nYACgkQbDjKyiDZ
+s5Jshw/6A4cdyOO/2lZ79OHUvpI5c4UywWJNE6kANPLuTsteJndRIeyj51fzelsS
+wRs3krjbeUOQLX/rc7fKVyGs4NBlhJmgXLrdZgFY0UWYWBMDarSrdPJhE/x95czO
+iRikEejoaUtcdpgJW6oaslfJjQD6Psl0GGt/Nu9H6KU3Pg6KzfkpHSKZiSIK93ES
+ZgmLEJ2lhjQlOR/xgy7hc5hyOLypfSMTPXffYg6a3GiaU6DC7///T0xTjB+Cigv3
+4/50BUeCQx0DTnota+fyEMNS6/s9b38dandU0gnGYu4PoYkHPcXkoAVrojFIP1vv
+Uo3xOX4qpLDxUmoB1Zcvu4vVrHBJgS4kweC+2UDnHeIeeHwRDKQ5STy2DAqoZz/l
+rnzQG5P2Mp0DNRoKpCo3e8NDjyJgyrC5ADX92rQeVAP/zmFttXdLij0tjvuXLbwA
+22r2oRpc32lsK/P1SzPdWYuWxyk2zuA4itRF+oXaA/raDezZjcyvn/mDBjW2cyzM
+JXMswdxZwXCzNoY2CET45t+pRApNmQ4+M8/4o+irzcJIsZRkkzZXahtnEeIf6Rqc
+hjqY74Eki48d/yWqksKEvIGmHV8X+EY1IQrbBsyfDQ5RUe8v5XzyhX1UF0DlQewd
+3ghHrxiZTjqm9MHO3vy4ha7vFrgVS7RD9tQjWObgpn2QOlwKUNc=
+=bgzL
 -----END PGP SIGNATURE-----
 
---kSOhxpxUsM1s2qz/--
+--X+nYw8KZ/oNxZ8JS--
