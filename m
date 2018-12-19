@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZWbj-0001wO-0T
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:32 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gZWbj-0001wN-0N
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZWbg-0005pl-Sq
+	(envelope-from <dgibson@ozlabs.org>) id 1gZWbg-0005pU-Pb
 	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:30 -0500
-Date: Wed, 19 Dec 2018 17:31:13 +1100
+Date: Wed, 19 Dec 2018 17:29:57 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181219063113.GO30570@umbus.fritz.box>
+Message-ID: <20181219062957.GN30570@umbus.fritz.box>
 References: <20181218063911.2112-1-richard.henderson@linaro.org>
-	<20181218063911.2112-20-richard.henderson@linaro.org>
+	<20181218063911.2112-19-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ctUzwJm0i+kwMBIK"
+	protocol="application/pgp-signature"; boundary="U6leaJ20qZQc29iB"
 Content-Disposition: inline
-In-Reply-To: <20181218063911.2112-20-richard.henderson@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 19/34] target/ppc: convert vspltis[bhw] to
- use vector operations
+In-Reply-To: <20181218063911.2112-19-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 18/34] target/ppc: convert vaddu[b, h, w,
+ d] and vsubu[b, h, w, d] over to use vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,140 +29,98 @@ To: Richard Henderson <richard.henderson@linaro.org>
 Cc: qemu-devel@nongnu.org, mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org
 
 
---ctUzwJm0i+kwMBIK
+--U6leaJ20qZQc29iB
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 17, 2018 at 10:38:56PM -0800, Richard Henderson wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On Mon, Dec 17, 2018 at 10:38:55PM -0800, Richard Henderson wrote:
+> From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>=20
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
+> Message-Id: <20181217122405.18732-10-mark.cave-ayland@ilande.co.uk>
 > ---
->  target/ppc/helper.h                 |  3 ---
->  target/ppc/int_helper.c             | 15 ------------
->  target/ppc/translate/vmx-impl.inc.c | 36 +++++++----------------------
->  3 files changed, 8 insertions(+), 46 deletions(-)
+>  target/ppc/helper.h                 |  8 --------
+>  target/ppc/int_helper.c             |  7 -------
+>  target/ppc/translate/vmx-impl.inc.c | 16 ++++++++--------
+>  3 files changed, 8 insertions(+), 23 deletions(-)
 >=20
 > diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-> index 553ff500c8..2aa60e5d36 100644
+> index c7de04e068..553ff500c8 100644
 > --- a/target/ppc/helper.h
 > +++ b/target/ppc/helper.h
-> @@ -246,9 +246,6 @@ DEF_HELPER_3(vrld, void, avr, avr, avr)
->  DEF_HELPER_3(vsl, void, avr, avr, avr)
->  DEF_HELPER_3(vsr, void, avr, avr, avr)
->  DEF_HELPER_4(vsldoi, void, avr, avr, avr, i32)
-> -DEF_HELPER_2(vspltisb, void, avr, i32)
-> -DEF_HELPER_2(vspltish, void, avr, i32)
-> -DEF_HELPER_2(vspltisw, void, avr, i32)
->  DEF_HELPER_3(vspltb, void, avr, avr, i32)
->  DEF_HELPER_3(vsplth, void, avr, avr, i32)
->  DEF_HELPER_3(vspltw, void, avr, avr, i32)
+> @@ -108,14 +108,6 @@ DEF_HELPER_FLAGS_1(ftsqrt, TCG_CALL_NO_RWG_SE, i32, =
+i64)
+>  #define dh_ctype_avr ppc_avr_t *
+>  #define dh_is_signed_avr dh_is_signed_ptr
+> =20
+> -DEF_HELPER_3(vaddubm, void, avr, avr, avr)
+> -DEF_HELPER_3(vadduhm, void, avr, avr, avr)
+> -DEF_HELPER_3(vadduwm, void, avr, avr, avr)
+> -DEF_HELPER_3(vaddudm, void, avr, avr, avr)
+> -DEF_HELPER_3(vsububm, void, avr, avr, avr)
+> -DEF_HELPER_3(vsubuhm, void, avr, avr, avr)
+> -DEF_HELPER_3(vsubuwm, void, avr, avr, avr)
+> -DEF_HELPER_3(vsubudm, void, avr, avr, avr)
+>  DEF_HELPER_3(vavgub, void, avr, avr, avr)
+>  DEF_HELPER_3(vavguh, void, avr, avr, avr)
+>  DEF_HELPER_3(vavguw, void, avr, avr, avr)
 > diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-> index 4547453ef1..e44c0d90ee 100644
+> index 9d715be25c..4547453ef1 100644
 > --- a/target/ppc/int_helper.c
 > +++ b/target/ppc/int_helper.c
-> @@ -2066,21 +2066,6 @@ VNEG(vnegw, s32)
->  VNEG(vnegd, s64)
->  #undef VNEG
-> =20
-> -#define VSPLTI(suffix, element, splat_type)                     \
-> -    void helper_vspltis##suffix(ppc_avr_t *r, uint32_t splat)   \
-> -    {                                                           \
-> -        splat_type x =3D (int8_t)(splat << 3) >> 3;               \
-> -        int i;                                                  \
-> -                                                                \
-> -        for (i =3D 0; i < ARRAY_SIZE(r->element); i++) {          \
-> -            r->element[i] =3D x;                                  \
-> -        }                                                       \
-> -    }
-> -VSPLTI(b, s8, int8_t)
-> -VSPLTI(h, s16, int16_t)
-> -VSPLTI(w, s32, int32_t)
-> -#undef VSPLTI
-> -
->  #define VSR(suffix, element, mask)                                      \
->      void helper_vsr##suffix(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)   \
->      {                                                                   \
+> @@ -531,13 +531,6 @@ void helper_vprtybq(ppc_avr_t *r, ppc_avr_t *b)
+>              r->element[i] =3D a->element[i] op b->element[i];           =
+  \
+>          }                                                               \
+>      }
+> -#define VARITH(suffix, element)                 \
+> -    VARITH_DO(add##suffix, +, element)          \
+> -    VARITH_DO(sub##suffix, -, element)
+> -VARITH(ubm, u8)
+> -VARITH(uhm, u16)
+> -VARITH(uwm, u32)
+> -VARITH(udm, u64)
+>  VARITH_DO(muluwm, *, u32)
+>  #undef VARITH_DO
+>  #undef VARITH
 > diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/v=
 mx-impl.inc.c
-> index e353d3f174..be638cdb1a 100644
+> index c13828a09d..e353d3f174 100644
 > --- a/target/ppc/translate/vmx-impl.inc.c
 > +++ b/target/ppc/translate/vmx-impl.inc.c
-> @@ -720,25 +720,21 @@ GEN_VXRFORM_DUAL(vcmpbfp, PPC_ALTIVEC, PPC_NONE, \
->  GEN_VXRFORM_DUAL(vcmpgtfp, PPC_ALTIVEC, PPC_NONE, \
->                   vcmpgtud, PPC_NONE, PPC2_ALTIVEC_207)
+> @@ -411,18 +411,18 @@ static void glue(gen_, name)(DisasContext *ctx)    =
+                     \
+>      tcg_temp_free_ptr(rb);                                              \
+>  }
 > =20
-> -#define GEN_VXFORM_SIMM(name, opc2, opc3)                               \
-> +#define GEN_VXFORM_DUPI(name, tcg_op, opc2, opc3)                       \
->  static void glue(gen_, name)(DisasContext *ctx)                         \
->      {                                                                   \
-> -        TCGv_ptr rd;                                                    \
-> -        TCGv_i32 simm;                                                  \
-> +        int simm;                                                       \
->          if (unlikely(!ctx->altivec_enabled)) {                          \
->              gen_exception(ctx, POWERPC_EXCP_VPU);                       \
->              return;                                                     \
->          }                                                               \
-> -        simm =3D tcg_const_i32(SIMM5(ctx->opcode));                     =
-  \
-> -        rd =3D gen_avr_ptr(rD(ctx->opcode));                            =
-  \
-> -        gen_helper_##name (rd, simm);                                   \
-> -        tcg_temp_free_i32(simm);                                        \
-> -        tcg_temp_free_ptr(rd);                                          \
-> +        simm =3D SIMM5(ctx->opcode);                                    =
-  \
-> +        tcg_op(avr64_offset(rD(ctx->opcode), true), 16, 16, simm);      \
->      }
-> =20
-> -GEN_VXFORM_SIMM(vspltisb, 6, 12);
-> -GEN_VXFORM_SIMM(vspltish, 6, 13);
-> -GEN_VXFORM_SIMM(vspltisw, 6, 14);
-> +GEN_VXFORM_DUPI(vspltisb, tcg_gen_gvec_dup8i, 6, 12);
-> +GEN_VXFORM_DUPI(vspltish, tcg_gen_gvec_dup16i, 6, 13);
-> +GEN_VXFORM_DUPI(vspltisw, tcg_gen_gvec_dup32i, 6, 14);
-> =20
->  #define GEN_VXFORM_NOA(name, opc2, opc3)                                \
->  static void glue(gen_, name)(DisasContext *ctx)                         =
-        \
-> @@ -818,22 +814,6 @@ GEN_VXFORM_NOA(vprtybw, 1, 24);
->  GEN_VXFORM_NOA(vprtybd, 1, 24);
->  GEN_VXFORM_NOA(vprtybq, 1, 24);
-> =20
-> -#define GEN_VXFORM_SIMM(name, opc2, opc3)                               \
-> -static void glue(gen_, name)(DisasContext *ctx)                         =
-        \
-> -    {                                                                   \
-> -        TCGv_ptr rd;                                                    \
-> -        TCGv_i32 simm;                                                  \
-> -        if (unlikely(!ctx->altivec_enabled)) {                          \
-> -            gen_exception(ctx, POWERPC_EXCP_VPU);                       \
-> -            return;                                                     \
-> -        }                                                               \
-> -        simm =3D tcg_const_i32(SIMM5(ctx->opcode));                     =
-  \
-> -        rd =3D gen_avr_ptr(rD(ctx->opcode));                            =
-  \
-> -        gen_helper_##name (rd, simm);                                   \
-> -        tcg_temp_free_i32(simm);                                        \
-> -        tcg_temp_free_ptr(rd);                                          \
-> -    }
-> -
->  #define GEN_VXFORM_UIMM(name, opc2, opc3)                               \
->  static void glue(gen_, name)(DisasContext *ctx)                         =
-        \
->      {                                                                   \
-> @@ -1255,7 +1235,7 @@ GEN_VXFORM_DUAL(vsldoi, PPC_ALTIVEC, PPC_NONE,
->  #undef GEN_VXRFORM_DUAL
->  #undef GEN_VXRFORM1
->  #undef GEN_VXRFORM
-> -#undef GEN_VXFORM_SIMM
-> +#undef GEN_VXFORM_DUPI
->  #undef GEN_VXFORM_NOA
->  #undef GEN_VXFORM_UIMM
->  #undef GEN_VAFORM_PAIRED
+> -GEN_VXFORM(vaddubm, 0, 0);
+> +GEN_VXFORM_V(vaddubm, MO_8, tcg_gen_gvec_add, 0, 0);
+>  GEN_VXFORM_DUAL_EXT(vaddubm, PPC_ALTIVEC, PPC_NONE, 0,       \
+>                      vmul10cuq, PPC_NONE, PPC2_ISA300, 0x0000F800)
+> -GEN_VXFORM(vadduhm, 0, 1);
+> +GEN_VXFORM_V(vadduhm, MO_16, tcg_gen_gvec_add, 0, 1);
+>  GEN_VXFORM_DUAL(vadduhm, PPC_ALTIVEC, PPC_NONE,  \
+>                  vmul10ecuq, PPC_NONE, PPC2_ISA300)
+> -GEN_VXFORM(vadduwm, 0, 2);
+> -GEN_VXFORM(vaddudm, 0, 3);
+> -GEN_VXFORM(vsububm, 0, 16);
+> -GEN_VXFORM(vsubuhm, 0, 17);
+> -GEN_VXFORM(vsubuwm, 0, 18);
+> -GEN_VXFORM(vsubudm, 0, 19);
+> +GEN_VXFORM_V(vadduwm, MO_32, tcg_gen_gvec_add, 0, 2);
+> +GEN_VXFORM_V(vaddudm, MO_64, tcg_gen_gvec_add, 0, 3);
+> +GEN_VXFORM_V(vsububm, MO_8, tcg_gen_gvec_sub, 0, 16);
+> +GEN_VXFORM_V(vsubuhm, MO_16, tcg_gen_gvec_sub, 0, 17);
+> +GEN_VXFORM_V(vsubuwm, MO_32, tcg_gen_gvec_sub, 0, 18);
+> +GEN_VXFORM_V(vsubudm, MO_64, tcg_gen_gvec_sub, 0, 19);
+>  GEN_VXFORM(vmaxub, 1, 0);
+>  GEN_VXFORM(vmaxuh, 1, 1);
+>  GEN_VXFORM(vmaxuw, 1, 2);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -170,24 +128,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---ctUzwJm0i+kwMBIK
+--U6leaJ20qZQc29iB
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwZ5bEACgkQbDjKyiDZ
-s5Jthw//R45ghhBcryt+bOtBsLjOXClfapjbhzZWT/71t2WuaUCei7Z/F4nUK7eJ
-aPMXvvNCdkhtIsjvXRLFd7OX50Inn1zPEXa7wnQqKAM40ma2FAJRbX1feoeImF8C
-PS31wuwydhbAHQqgow3PfPXZLLWopeizz3NmR8pyIxnWYk9xomWDR5S7MkdmOzfS
-MwfetXV13mf4lIoW+uxPW8Q9teZag1cQ0vYgFaGce9BS2cMb1GRLAuwT8jJI7blo
-XHS8J6xE7De43K6oDdYHoAerQ2P7qOEYWtFKAkqyOPOe0bMHrVp9iIYHvWsYX2pp
-wuCt7WTjAX8kTWQhrfpQb9LH0O6V9oRHc2TfBd7NviwnlQCdFR6Gc1EeIxuqm0H0
-DWQ/Lzq7GIlyPbCDZk4vc1YBs92/oMSX1wy4CZtQ5NVCLsOC/hdzaYsXv4iS5Xvc
-T3lvmLe0FmWSd7Tz32k9z18TIzIZ+ohM+4vGZPOEdCykFjJh95Ra72ugvVX8FMbg
-tVcHbndwi9UNSrZui+IlnTtMjVK5Sxg51NfEmO7HY5y2QoU4s/AXbAUGxt8G7pFZ
-lrT7jZXHUq6hirdzG0wZ119/s1R00bBhfXSRHCYFY7O9p7rrTB7UR5Ni7mXnuYnh
-4N5694gpwPWvEPhYzbCglCd7adBlWbOq2//y43Sk+1qd7uosluI=
-=jZzf
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwZ5WUACgkQbDjKyiDZ
+s5IT7BAAmrO8FKt7xgUxGH+XguCGbOgaL4ARCVDSECCSQHKMD+nbXEtf/8Jl+R/0
+CYukQuKDl+LXbl2DzYO18h1zWnjQvKLjjRZz2NxwJBX58UR48BICuPVRWsRULk7N
+dar05gwNz9tLr+HELfiRZBaGCqnaDVn4I/NTJDq/x1ve0pXyMvvuXCQzfz8vTW/D
+gOeBkvtGs30kWU1bABYQw+saS3AEF8txkEgekQ58OtGQ267N+MP2VeP+IOy9I8Hf
+JWG8v6OUIZZUDp50NFUQ970Lnc5sz85GneOvXF+WnOGmbfKXSJuhkFd257+KpMle
+L9WYPq419A/LAv+a7KXi3QJwGJdLeNga/RwfJFlKLTtUpHooBnCn56T7DrhjHKcB
+4KFTvgvVyd5dsRs5TFbG0hqKghX4+uOA3K1ZrQ1Dgl+ukJZlJ/refrPfrKXERi2+
+rsEDOth3hPLApN29Gt9NAjv8A7bTs+YZxfwLWRdiQJdRUWaPSwIPVgP8J0lPjChG
+esOCSpkgKhoYo0YNShFLFKKO3o8Klfyecq25AUiWM83SHuJ0rm6osKEsWvh9T8To
+vzhdGBT/FMcrv9LO515r3a1Ao/fGBw3T2cudRM3jjDuOb4WA3jBUDcQ900i7IlGy
+jzsy5MUCA0Wpi6jyAuP9SOINNHTKY0ZzznRi0U4utV0KXXXXGck=
+=G/0+
 -----END PGP SIGNATURE-----
 
---ctUzwJm0i+kwMBIK--
+--U6leaJ20qZQc29iB--
