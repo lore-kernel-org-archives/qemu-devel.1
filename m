@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=884a3e257=Alistair.Francis@wdc.com>)
-	id 1gZhN7-0002NL-EV
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:19:10 -0500
+	(envelope-from <eblake@redhat.com>) id 1gZhNI-0002Wl-0R
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:19:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=884a3e257=Alistair.Francis@wdc.com>)
-	id 1gZhN2-0001A5-MC
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:19:09 -0500
-From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Wed, 19 Dec 2018 19:19:00 +0000
-Message-ID: <c356657e627168d89cb5b012b7e21e4efbbe83f3.1545246859.git.alistair.francis@wdc.com>
-References: <cover.1545246859.git.alistair.francis@wdc.com>
-In-Reply-To: <cover.1545246859.git.alistair.francis@wdc.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <eblake@redhat.com>) id 1gZhNG-0001HB-Cu
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:19:19 -0500
+References: <20181219015230.18652-1-jsnow@redhat.com>
+	<20181219015230.18652-2-jsnow@redhat.com>
+	<b92a888e-1223-2966-ae83-b0f014171129@redhat.com>
+	<e7aca710-fb9b-9c32-a37d-8122a4c5d913@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c1742689-f3f0-b464-8b8a-13ad77016e0f@redhat.com>
+Date: Wed, 19 Dec 2018 13:19:04 -0600
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v2 15/23] riscv: tcg-target: Add branch and
- jump instructions
+In-Reply-To: <e7aca710-fb9b-9c32-a37d-8122a4c5d913@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 1/5] iotests: add qmp recursive sorting
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,169 +27,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Michael Clark <mjc@sifive.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/riscv/tcg-target.inc.c | 145 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 145 insertions(+)
+On 12/19/18 12:57 PM, John Snow wrote:
+>=20
+>=20
+> On 12/19/18 1:52 PM, Eric Blake wrote:
+>> On 12/18/18 7:52 PM, John Snow wrote:
+>>> Python before 3.6 does not sort kwargs by default.
+>>> If we want to print out pretty-printed QMP objects while
+>>> preserving the "exec" > "arguments" ordering, we need a custom sort.
+>>
+>> Naive question - why do we need the sorting? Is it so that the output =
+is
+>> deterministic?=C2=A0 Surely it can't be because the ordering otherwise=
+ makes
+>> a difference to execution.
+>>
+>=20
+> Yeah, it's because dicts are unordered and prior to 3.6 they may shuffl=
+e
+> around arbitrarily based on internal hashes.
+>=20
+> kwargs in particular are unordered- the order we send over the wire may
+> or may not reflect the order the test author wrote in their iotest.
 
-diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
-index 5da850b957..ecc76c9ef8 100644
---- a/tcg/riscv/tcg-target.inc.c
-+++ b/tcg/riscv/tcg-target.inc.c
-@@ -750,3 +750,148 @@ static void tcg_out_addsub2(TCGContext *s,
-         tcg_out_opc_reg(s, opc_add, rh, th, TCG_REG_TMP0);
-     }
- }
-+
-+static const struct {
-+    RISCVInsn op;
-+    bool swap;
-+} tcg_brcond_to_riscv[] =3D {
-+    [TCG_COND_EQ] =3D  { OPC_BEQ,  false },
-+    [TCG_COND_NE] =3D  { OPC_BNE,  false },
-+    [TCG_COND_LT] =3D  { OPC_BLT,  false },
-+    [TCG_COND_GE] =3D  { OPC_BGE,  false },
-+    [TCG_COND_LE] =3D  { OPC_BGE,  true  },
-+    [TCG_COND_GT] =3D  { OPC_BLT,  true  },
-+    [TCG_COND_LTU] =3D { OPC_BLTU, false },
-+    [TCG_COND_GEU] =3D { OPC_BGEU, false },
-+    [TCG_COND_LEU] =3D { OPC_BGEU, true  },
-+    [TCG_COND_GTU] =3D { OPC_BLTU, true  }
-+};
-+
-+static void tcg_out_brcond(TCGContext *s, TCGCond cond, TCGReg arg1,
-+                           TCGReg arg2, TCGLabel *l)
-+{
-+    RISCVInsn op =3D tcg_brcond_to_riscv[cond].op;
-+
-+    tcg_debug_assert(op !=3D 0);
-+
-+    if (tcg_brcond_to_riscv[cond].swap) {
-+        TCGReg t =3D arg1;
-+        arg1 =3D arg2;
-+        arg2 =3D t;
-+    }
-+
-+    if (l->has_value) {
-+        intptr_t diff =3D tcg_pcrel_diff(s, l->u.value_ptr);
-+        if (diff =3D=3D sextreg(diff, 0, 12)) {
-+            tcg_out_opc_branch(s, op, arg1, arg2, diff);
-+        } else {
-+            /* Invert the conditional branch.  */
-+            tcg_out_opc_branch(s, op ^ (1 << 12), arg1, arg2, 8);
-+            tcg_out_opc_jump(s, OPC_JAL, TCG_REG_ZERO, diff - 4);
-+        }
-+    } else {
-+        tcg_out_reloc(s, s->code_ptr, R_RISCV_BRANCH, l, 0);
-+        tcg_out_opc_branch(s, op, arg1, arg2, 0);
-+        /* NOP to allow patching later */
-+        tcg_out_opc_imm(s, OPC_ADDI, TCG_REG_ZERO, TCG_REG_ZERO, 0);
-+    }
-+}
-+
-+static void tcg_out_setcond(TCGContext *s, TCGCond cond, TCGReg ret,
-+                            TCGReg arg1, TCGReg arg2)
-+{
-+    switch (cond) {
-+    case TCG_COND_EQ:
-+        tcg_out_opc_reg(s, OPC_SUB, ret, arg1, arg2);
-+        tcg_out_opc_imm(s, OPC_SLTIU, ret, ret, 1);
-+        break;
-+    case TCG_COND_NE:
-+        tcg_out_opc_reg(s, OPC_SUB, ret, arg1, arg2);
-+        tcg_out_opc_reg(s, OPC_SLTU, ret, TCG_REG_ZERO, ret);
-+        break;
-+    case TCG_COND_LT:
-+        tcg_out_opc_reg(s, OPC_SLT, ret, arg1, arg2);
-+        break;
-+    case TCG_COND_GE:
-+        tcg_out_opc_reg(s, OPC_SLT, ret, arg1, arg2);
-+        tcg_out_opc_imm(s, OPC_XORI, ret, ret, 1);
-+        break;
-+    case TCG_COND_LE:
-+        tcg_out_opc_reg(s, OPC_SLT, ret, arg2, arg1);
-+        tcg_out_opc_imm(s, OPC_XORI, ret, ret, 1);
-+        break;
-+    case TCG_COND_GT:
-+        tcg_out_opc_reg(s, OPC_SLT, ret, arg2, arg1);
-+        break;
-+    case TCG_COND_LTU:
-+        tcg_out_opc_reg(s, OPC_SLTU, ret, arg1, arg2);
-+        break;
-+    case TCG_COND_GEU:
-+        tcg_out_opc_reg(s, OPC_SLTU, ret, arg1, arg2);
-+        tcg_out_opc_imm(s, OPC_XORI, ret, ret, 1);
-+        break;
-+    case TCG_COND_LEU:
-+        tcg_out_opc_reg(s, OPC_SLTU, ret, arg2, arg1);
-+        tcg_out_opc_imm(s, OPC_XORI, ret, ret, 1);
-+        break;
-+    case TCG_COND_GTU:
-+        tcg_out_opc_reg(s, OPC_SLTU, ret, arg2, arg1);
-+        break;
-+    default:
-+         g_assert_not_reached();
-+         break;
-+     }
-+}
-+
-+static void tcg_out_brcond2(TCGContext *s, TCGCond cond, TCGReg al, TCGReg=
- ah,
-+                            TCGReg bl, TCGReg bh, TCGLabel *l)
-+{
-+    /* todo */
-+    g_assert_not_reached();
-+}
-+
-+static void tcg_out_setcond2(TCGContext *s, TCGCond cond, TCGReg ret,
-+                             TCGReg al, TCGReg ah, TCGReg bl, TCGReg bh)
-+{
-+    /* todo */
-+    g_assert_not_reached();
-+}
-+
-+static inline void tcg_out_goto(TCGContext *s, tcg_insn_unit *target)
-+{
-+    ptrdiff_t offset =3D tcg_pcrel_diff(s, target);
-+    tcg_debug_assert(offset =3D=3D sextreg(offset, 1, 20) << 1);
-+    tcg_out_opc_jump(s, OPC_JAL, TCG_REG_ZERO, offset);
-+}
-+
-+static void tcg_out_call_int(TCGContext *s, tcg_insn_unit *arg, bool tail)
-+{
-+    TCGReg link =3D tail ? TCG_REG_ZERO : TCG_REG_RA;
-+    ptrdiff_t offset =3D tcg_pcrel_diff(s, arg);
-+    int ret;
-+
-+    if (offset =3D=3D sextreg(offset, 1, 20) << 1) {
-+        /* short jump: -2097150 to 2097152 */
-+        tcg_out_opc_jump(s, OPC_JAL, link, offset);
-+    } else if (TCG_TARGET_REG_BITS =3D=3D 32 ||
-+        offset =3D=3D sextreg(offset, 1, 31) << 1) {
-+        /* long jump: -2147483646 to 2147483648 */
-+        tcg_out_opc_upper(s, OPC_AUIPC, TCG_REG_TMP0, 0);
-+        tcg_out_opc_imm(s, OPC_JALR, link, TCG_REG_TMP0, 0);
-+        ret =3D reloc_call(s->code_ptr - 2, arg);\
-+        tcg_debug_assert(ret =3D=3D true);
-+    } else if (TCG_TARGET_REG_BITS =3D=3D 64) {
-+        /* far jump: 64-bit */
-+        tcg_target_long imm =3D sextreg((tcg_target_long)arg, 0, 12);
-+        tcg_target_long base =3D (tcg_target_long)arg - imm;
-+        tcg_out_movi(s, TCG_TYPE_PTR, TCG_REG_TMP0, base);
-+        tcg_out_opc_imm(s, OPC_JALR, link, TCG_REG_TMP0, imm);
-+    } else {
-+        g_assert_not_reached();
-+    }
-+}
-+
-+static void tcg_out_call(TCGContext *s, tcg_insn_unit *arg)
-+{
-+    tcg_out_call_int(s, arg, false);
-+}
+Which shouldn't matter to what QMP executes, but MIGHT matter in getting=20
+reproducible log output.
+
+>=20
+> Therefore, it's a way to get consistent ordering.
+>=20
+> Now, we CAN just rely on sort_keys=3DTrue to be done with it, however,
+> this puts arguments before execute, and it's less nice to read -- and
+> I'd have to change a LOT of test output.
+
+Okay, I'm finally seeing it; the existing code has:
+
+     def qmp_log(self, cmd, filters=3D[filter_testfiles], **kwargs):
+         logmsg =3D '{"execute": "%s", "arguments": %s}' % \
+             (cmd, json.dumps(kwargs, sort_keys=3DTrue))
+
+where our log is outputting a message that resembles a dict where=20
+"execute": is the first key, and the user's input dict is then sorted=20
+(the top-most output of {} is unsorted, but the nested ones are sorted,=20
+and possibly in a different order than the user typed them, but at least=20
+deterministic). But when you change to the user passing a full QMP=20
+command (rather than just a dict for the arguments of the QMP command),=20
+using sort_keys=3DTrue will sort everything _including_ putting=20
+"arguments" before "execute" (which is deterministic but changes log=20
+output); while using sort_keys=3DFalse will not affect output in newer=20
+python where kwargs remains ordered, but risks nondeterministic output=20
+on older python.
+
+>=20
+> This way keeps the order you expect to see while maintaining a strict
+> order for the arguments. I think that's the nicest compromise until we
+> can stipulate 3.6+ in the year 2034 where kwargs *are* strictly ordered=
+.
+
+But kwargs strict ordering is only at the top-level, not recursive,=20
+right? That is, even if you can rely on:
+
+foo(b=3D1, a=3D2)
+
+providing kwargs where 'b' always outputs before 'a', I don't see how=20
+that would help:
+
+foo(b=3D{'d':3, 'c':4})
+
+not reorder the keys within 'b' without your recursive ordering.
+
 --=20
-2.19.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
