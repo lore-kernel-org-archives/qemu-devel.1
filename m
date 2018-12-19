@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=88499b8e4=Paul.Durrant@citrix.com>)
-	id 1gZbCX-0001VD-50
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:43:51 -0500
+	(envelope-from <armbru@redhat.com>) id 1gZbD4-0001oG-22
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:44:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=88499b8e4=Paul.Durrant@citrix.com>)
-	id 1gZbCU-0007md-EZ
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:43:49 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Wed, 19 Dec 2018 12:43:24 +0000
-Message-ID: <40bdef2962864ca8bc364249196bf9b3@AMSPEX02CL03.citrite.net>
-References: <20181217133011.31433-1-paul.durrant@citrix.com>
-	<20181217133011.31433-17-paul.durrant@citrix.com>
-	<20181219123926.GA1288@perard.uk.xensource.com>
-In-Reply-To: <20181219123926.GA1288@perard.uk.xensource.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <armbru@redhat.com>) id 1gZbCy-00085d-9b
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:44:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55484)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gZbCx-000844-7J
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:44:16 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181218112056.11727.96529.stgit@pasha-VirtualBox>
+	<20181218112154.11727.4557.stgit@pasha-VirtualBox>
+Date: Wed, 19 Dec 2018 13:43:52 +0100
+In-Reply-To: <20181218112154.11727.4557.stgit@pasha-VirtualBox> (Pavel
+	Dovgalyuk's message of "Tue, 18 Dec 2018 14:21:54 +0300")
+Message-ID: <87y38lit4n.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v6 16/18] xen: automatically create
- XenBlockDevice-s
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v8 10/20] replay: introduce info hmp/qmp
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,224 +28,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony Perard <anthony.perard@citrix.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, dovgaluk@ispras.ru, artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
 
-> -----Original Message-----
-> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
-> Sent: 19 December 2018 12:39
-> To: Paul Durrant <Paul.Durrant@citrix.com>
-> Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
-> devel@lists.xenproject.org; Kevin Wolf <kwolf@redhat.com>; Max Reitz
-> <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
-> Subject: Re: [PATCH v6 16/18] xen: automatically create XenBlockDevice-s
->=20
-> On Mon, Dec 17, 2018 at 01:30:09PM +0000, Paul Durrant wrote:
-> > +static char *xen_block_blockdev_add(const char *id, QDict *qdict,
-> > +                                    Error **errp)
-> > +{
-> > +    const char *driver =3D qdict_get_try_str(qdict, "driver");
-> > +    BlockdevOptions *options =3D NULL;
-> > +    Error *local_err =3D NULL;
-> > +    char *str =3D NULL;
-> > +    char *node_name;
-> > +    Visitor *v;
-> > +
-> > +    if (!driver) {
-> > +        error_setg(errp, "no 'driver' parameter");
-> > +        return NULL;
-> > +    }
-> > +
-> > +    node_name =3D g_strdup_printf("%s-%s", id, driver);
-> > +    qdict_put_str(qdict, "node-name", node_name);
-> > +
-> > +    qdict_iter(qdict, add_item, &str);
-> > +
-> > +    trace_xen_block_blockdev_add(str);
-> > +    g_free(str);
-> > +
-> > +    v =3D qobject_input_visitor_new_flat_confused(qdict, errp);
->=20
-> Kevin seems to say that this could be done without the _flat_confused
-> version. The flat_confused version seems to be useful just because
-> the key "cache.direct" is used earlier, and because everything in qdict
-> is a string.
+Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
 
-It could be, but there's a good reason for wanting everything as a string, =
-and that is so that I can do a qdict_iter to generate my trace message. Als=
-o I really don't want to get too elaborate here... this is supposed to be m=
-imicking what would normally come via a json blob, and that would start out=
- as strings.
-
-  Paul
-
->=20
-> I think instead, qobject_input_visitor_new could be used. You would just
-> need to replace
->     qdict_put_str(qdict, "cache.direct", "on");
-> by
->     QDict *cache =3D qdict_new();
->     qdict_put_str(cache, "direct", "on");
->     qdict_put_obj(qdict, "cache", QOBJECT(cache));
->=20
-> And also the property "read-only" which seems to be a bool as well. I've
-> check all property in the qdict, and I think that the only two that
-> needs to be changes. And then, we can use:
->     v =3D qobject_input_visitor_new(qdict); which never fails.
->=20
-> You'll just need "qapi/qobject-input-visitor.h" instead of "block/qdict.h=
-"
->=20
-> > +    if (!v) {
-> > +        goto fail;
-> > +    }
-> > +
-> > +    visit_type_BlockdevOptions(v, NULL, &options, &local_err);
-> > +    visit_free(v);
-> > +
-> > +    if (local_err) {
-> > +        error_propagate(errp, local_err);
-> > +        goto fail;
-> > +    }
-> > +
-> > +    qmp_blockdev_add(options, &local_err);
-> > +
-> > +    if (local_err) {
-> > +        error_propagate(errp, local_err);
-> > +        goto fail;
-> > +    }
-> > +
-> > +    qapi_free_BlockdevOptions(options);
-> > +
-> > +    return node_name;
-> > +
-> > +fail:
-> > +    if (options) {
-> > +        qapi_free_BlockdevOptions(options);
-> > +    }
-> > +    g_free(node_name);
-> > +
-> > +    return NULL;
-> > +}
-> [...]
-> > +static XenBlockDrive *xen_block_drive_create(const char *id,
-> > +                                             const char *device_type,
-> > +                                             QDict *opts, Error **errp=
-)
-> > +{
-> > +    const char *params =3D qdict_get_try_str(opts, "params");
-> > +    const char *mode =3D qdict_get_try_str(opts, "mode");
-> > +    const char *direct_io_safe =3D qdict_get_try_str(opts, "direct-io-
-> safe");
-> > +    const char *discard_enable =3D qdict_get_try_str(opts, "discard-
-> enable");
-> > +    char *driver =3D NULL;
-> > +    char *filename =3D NULL;
-> > +    XenBlockDrive *drive =3D NULL;
-> > +    Error *local_err =3D NULL;
-> > +    QDict *qdict;
-> > +
-> > +    if (params) {
-> > +        char **v =3D g_strsplit(params, ":", 2);
-> > +
-> > +        if (v[1] =3D=3D NULL) {
-> > +            filename =3D g_strdup(v[0]);
-> > +            driver =3D g_strdup("file");
-> > +        } else {
-> > +            if (strcmp(v[0], "aio") =3D=3D 0) {
-> > +                driver =3D g_strdup("file");
-> > +            } else if (strcmp(v[0], "vhd") =3D=3D 0) {
-> > +                driver =3D g_strdup("vpc");
-> > +            } else {
-> > +                driver =3D g_strdup(v[0]);
-> > +            }
-> > +            filename =3D g_strdup(v[1]);
-> > +        }
-> > +
-> > +        g_strfreev(v);
-> > +    }
-> > +
-> > +    if (!filename) {
-> > +        error_setg(errp, "no filename");
-> > +        goto done;
-> > +    }
-> > +    assert(driver);
-> > +
-> > +    drive =3D g_new0(XenBlockDrive, 1);
-> > +    drive->id =3D g_strdup(id);
-> > +
-> > +    qdict =3D qdict_new();
-> > +
-> > +    qdict_put_str(qdict, "driver", "file");
-> > +    qdict_put_str(qdict, "filename", filename);
-> > +
-> > +    if (mode && *mode !=3D 'w') {
-> > +        qdict_put_str(qdict, "read-only", "on");
-> > +    }
-> > +
-> > +    if (direct_io_safe) {
-> > +        unsigned long value;
-> > +
-> > +        if (!qemu_strtoul(direct_io_safe, NULL, 2, &value) && !!value)
-> {
-> > +            qdict_put_str(qdict, "cache.direct", "on");
-> > +            qdict_put_str(qdict, "aio", "native");
-> > +        }
-> > +    }
-> > +
-> > +    if (discard_enable) {
-> > +        unsigned long value;
-> > +
-> > +        if (!qemu_strtoul(discard_enable, NULL, 2, &value) && !!value)
-> {
-> > +            qdict_put_str(qdict, "discard", "unmap");
-> > +        }
-> > +    }
-> > +
-> > +    /*
-> > +     * It is necessary to turn file locking off as an emulated device
-> > +     * may have already opened the same image file.
-> > +     */
-> > +    qdict_put_str(qdict, "locking", "off");
-> > +
-> > +    xen_block_drive_layer_add(drive, qdict, &local_err);
-> > +    qobject_unref(qdict);
-> > +
-> > +    if (local_err) {
-> > +        error_propagate(errp, local_err);
-> > +        goto done;
-> > +    }
-> > +
-> > +    /* If the image is a raw file then we are done */
->=20
-> I don't think that is true, as I have this warning in QEMU:
-> qemu-system-i386: warning: Opening a block device as a file using the
-> 'file' driver is deprecated
->=20
-> We would need a "raw" driver.
->=20
-> > +    if (!strcmp(driver, "file")) {
-> > +        goto done;
-> > +    }
-> > +
-> > +    qdict =3D qdict_new();
-> > +
-> > +    qdict_put_str(qdict, "driver", driver);
-> > +
-> > +    xen_block_drive_layer_add(drive, qdict, &local_err);
-> > +    qobject_unref(qdict);
-> > +
-> > +done:
-> > +    g_free(driver);
-> > +    g_free(filename);
-> > +
-> > +    if (local_err) {
-> > +        xen_block_drive_destroy(drive, NULL);
-> > +        return NULL;
-> > +    }
-> > +
-> > +    return drive;
-> > +}
->=20
+> This patch introduces 'info replay' monitor command and
+> corresponding qmp request.
+> These commands request the current record/replay mode, replay log file name,
+> and the execution step (number or recorded/replayed instructions).
+> User may use step number for replay_seek/replay_break commands and
+> for controlling the execution of replay.
+>
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>
 > --
-> Anthony PERARD
+>
+> v2:
+>  - renamed info_replay qmp into query-replay (suggested by Eric Blake)
+> v7:
+>  - added empty line (suggested by Markus Armbruster)
+> ---
+>  hmp-commands-info.hx      |   14 ++++++++++++++
+>  hmp.h                     |    1 +
+>  qapi/misc.json            |   35 +++++++++++++++++++++++++++++++++++
+>  replay/Makefile.objs      |    3 ++-
+>  replay/replay-debugging.c |   42 ++++++++++++++++++++++++++++++++++++++++++
+>  5 files changed, 94 insertions(+), 1 deletion(-)
+>  create mode 100644 replay/replay-debugging.c
+>
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index cbee8b9..9f2f35e 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -918,6 +918,20 @@ STEXI
+>  Show SEV information.
+>  ETEXI
+>  
+> +    {
+> +        .name       = "replay",
+> +        .args_type  = "",
+> +        .params     = "",
+> +        .help       = "show parameters of the record/replay",
+> +        .cmd        = hmp_info_replay,
+> +    },
+> +
+> +STEXI
+> +@item info replay
+> +@findex info replay
+> +Display the current record/replay mode and the currently executing step.
+> +ETEXI
+> +
+>  STEXI
+>  @end table
+>  ETEXI
+> diff --git a/hmp.h b/hmp.h
+> index 5f1addc..d792149 100644
+> --- a/hmp.h
+> +++ b/hmp.h
+> @@ -148,5 +148,6 @@ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+>  void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+>  void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
+>  void hmp_info_sev(Monitor *mon, const QDict *qdict);
+> +void hmp_info_replay(Monitor *mon, const QDict *qdict);
+>  
+>  #endif
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index 8325e0d..e47aea6 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -3113,6 +3113,41 @@
+>    'data': [ 'none', 'record', 'play' ] }
+>  
+>  ##
+> +# @ReplayInfo:
+> +#
+> +# Status of the record/replay mode.
+> +#
+> +# @mode: current mode.
+> +#
+> +# @filename: name of the record/replay log file.
+> +#
+> +# @step: current step number.
+> +#
+> +# Since: 4.0
+> +#
+> +##
+> +{ 'struct': 'ReplayInfo',
+> +  'data': { 'mode': 'ReplayMode', '*filename': 'str', 'step': 'int' } }
+
+@filename is optional.  For each ReplayMode: is @filename always absent,
+always present, or can it be either?
+
+> +
+> +##
+> +# @query-replay:
+> +#
+> +# Retrieves the status of the execution record/replay.
+> +#
+> +# Returns: structure with the properties of the record/replay.
+
+You've used "parameters of the record/replay" (in HMP help info),
+"status of the record/replay mode" (QMP ReplayInfo doc), "the status of
+the execution record/replay" (QMP query-replay doc), and "structure with
+the properties of the record/replay".  Please pick one.  I think I'd
+pick "record/replay information".
+
+In my (superficial) review of v6, I asked what a client would do with
+@step.  You gave two use cases:
+
+ 1. Control current step to be sure that replay is not stalled due to the bug.
+ 2. Requesting the step for some moment of execution to use it as a parameter
+    of replay_seek/replay_break operations. I.e., for returning to the same
+    point later.
+
+The first one is a bit vague.  The second one sounds plausible enough to
+me at least for stopped VMs (for running VMs, it feels too imprecise to
+be useful, but what do I know).  replay-break is in PATCH 11,
+replay-seek in PATCH 12.  Would it make sense add a suitable reference
+to ReplayInfo's documentation then?
+
+> +#
+> +# Since: 4.0
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "query-replay" }
+> +# <- { "return": { "mode": "play", "filename": "log.rr", "step": 220414 } }
+> +#
+> +##
+> +{ 'command': 'query-replay',
+> +  'returns': 'ReplayInfo' }
+> +
+> +##
+>  # @xen-load-devices-state:
+>  #
+>  # Load the state of all devices from file. The RAM and the block devices
+
+At the end of this series, record/replay takes almost 100 non-blank
+lines in misc.json.  Let's create a separate QAPI schema module
+qapi/replay.json, so we can have MAINTAINERS cover this stuff properly.
+
+> diff --git a/replay/Makefile.objs b/replay/Makefile.objs
+> index cee6539..6694e3e 100644
+> --- a/replay/Makefile.objs
+> +++ b/replay/Makefile.objs
+> @@ -6,4 +6,5 @@ common-obj-y += replay-input.o
+>  common-obj-y += replay-char.o
+>  common-obj-y += replay-snapshot.o
+>  common-obj-y += replay-net.o
+> -common-obj-y += replay-audio.o
+> \ No newline at end of file
+> +common-obj-y += replay-audio.o
+> +common-obj-y += replay-debugging.o
+> diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
+> new file mode 100644
+> index 0000000..1d7e75d
+> --- /dev/null
+> +++ b/replay/replay-debugging.c
+> @@ -0,0 +1,42 @@
+> +/*
+> + * replay-debugging.c
+> + *
+> + * Copyright (c) 2010-2018 Institute for System Programming
+> + *                         of the Russian Academy of Sciences.
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "sysemu/replay.h"
+> +#include "replay-internal.h"
+> +#include "hmp.h"
+> +#include "monitor/monitor.h"
+> +#include "qapi/qapi-commands-misc.h"
+> +
+> +void hmp_info_replay(Monitor *mon, const QDict *qdict)
+> +{
+> +    if (replay_mode == REPLAY_MODE_NONE) {
+> +        monitor_printf(mon, "No record/replay\n");
+> +    } else {
+> +        monitor_printf(mon, "%s execution '%s': current step = %"PRId64"\n",
+> +            replay_mode == REPLAY_MODE_RECORD ? "Recording" : "Replaying",
+> +            replay_get_filename(), replay_get_current_step());
+> +    }
+> +}
+> +
+> +ReplayInfo *qmp_query_replay(Error **errp)
+> +{
+> +    ReplayInfo *retval = g_new0(ReplayInfo, 1);
+> +
+> +    retval->mode = replay_mode;
+> +    if (replay_get_filename()) {
+> +        retval->filename = g_strdup(replay_get_filename());
+> +        retval->has_filename = true;
+> +    }
+> +    retval->step = replay_get_current_step();
+> +    return retval;
+> +}
