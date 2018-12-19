@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1gZc9l-0003wo-Uy
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 08:45:02 -0500
+	(envelope-from <prvs=884673768=anthony.perard@citrix.com>)
+	id 1gZcPq-0001Y9-40
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 09:01:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1gZc9j-0005kX-9f
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 08:45:01 -0500
-Received: from mga06.intel.com ([134.134.136.31]:35093)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
-	id 1gZc9i-0005da-SN
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 08:44:59 -0500
-From: Robert Hoo <robert.hu@linux.intel.com>
-Date: Wed, 19 Dec 2018 21:44:41 +0800
-Message-Id: <1545227081-213696-3-git-send-email-robert.hu@linux.intel.com>
-In-Reply-To: <1545227081-213696-1-git-send-email-robert.hu@linux.intel.com>
-References: <1545227081-213696-1-git-send-email-robert.hu@linux.intel.com>
-Subject: [Qemu-devel] [PATCH 2/2] Revert "i386: Add CPUID bit for PCONFIG"
+	(envelope-from <prvs=884673768=anthony.perard@citrix.com>)
+	id 1gZcPk-0005wy-2p
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 09:01:37 -0500
+Date: Wed, 19 Dec 2018 14:01:18 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20181219140118.GC1288@perard.uk.xensource.com>
+References: <20181217133011.31433-1-paul.durrant@citrix.com>
+	<20181217133011.31433-17-paul.durrant@citrix.com>
+	<20181219123926.GA1288@perard.uk.xensource.com>
+	<40bdef2962864ca8bc364249196bf9b3@AMSPEX02CL03.citrite.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <40bdef2962864ca8bc364249196bf9b3@AMSPEX02CL03.citrite.net>
+Subject: Re: [Qemu-devel] [PATCH v6 16/18] xen: automatically create
+ XenBlockDevice-s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, thomas.lendacky@amd.com
-Cc: qemu-devel@nongnu.org, robert.hu@intel.com, Robert Hoo <robert.hu@linux.intel.com>
+To: Paul Durrant <Paul.Durrant@citrix.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-This reverts commit 5131dc433df54b37e8e918d8fba7fe10344e7a7b.
-For new instruction 'PCONFIG' will not be exposed to guest.
+On Wed, Dec 19, 2018 at 12:43:24PM +0000, Paul Durrant wrote:
+> > Kevin seems to say that this could be done without the _flat_confused
+> > version. The flat_confused version seems to be useful just because
+> > the key "cache.direct" is used earlier, and because everything in qdict
+> > is a string.
+> 
+> It could be, but there's a good reason for wanting everything as a string, and that is so that I can do a qdict_iter to generate my trace message. Also I really don't want to get too elaborate here... this is supposed to be mimicking what would normally come via a json blob, and that would start out as strings.
 
-Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
----
- target/i386/cpu.c | 2 +-
- target/i386/cpu.h | 1 -
- 2 files changed, 1 insertion(+), 2 deletions(-)
+Mimic JSON ? Not really. JSON has types. If the toolstack wanted
+cache.direct or read-only option on a blockdev, it will need to use the
+bool type as string type will be rejected.  The expected types when
+issuing a QMP request can be found in "qapi/block-core.json", for the
+command "blockdev-add".
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index b6113d0..08d4307 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1040,7 +1040,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
--            NULL, NULL, "pconfig", NULL,
-+            NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, "spec-ctrl", "stibp",
-             NULL, "arch-capabilities", NULL, "ssbd",
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index ef41a03..66707d7 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -692,7 +692,6 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
- 
- #define CPUID_7_0_EDX_AVX512_4VNNIW (1U << 2) /* AVX512 Neural Network Instructions */
- #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumulation Single Precision */
--#define CPUID_7_0_EDX_PCONFIG (1U << 18)       /* Platform Configuration */
- #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
- #define CPUID_7_0_EDX_ARCH_CAPABILITIES (1U << 29)  /*Arch Capabilities*/
- #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
+Also, there is a comment on the qobject_input_visitor_new_flat_confused
+function, it reads:
+    The block subsystem uses this function to visit its flat QDict with
+    possibly confused scalar types.  It should not be used for anything
+    else, and it should go away once the block subsystem has been
+    cleaned up.
+
+We might as well avoid using it right now, as it's easy to do so.
+
 -- 
-1.8.3.1
+Anthony PERARD
