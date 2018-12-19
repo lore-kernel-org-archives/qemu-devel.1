@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gZj72-0002ua-8V
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 16:10:40 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gZjKV-0008KL-Mf
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 16:24:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gZj6y-0006Bo-Rr
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 16:10:40 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:50369 helo=mail.rt-rk.com)
+	(envelope-from <ehabkost@redhat.com>) id 1gZjKP-000205-SV
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 16:24:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58814)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gZj6y-000665-IK
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 16:10:36 -0500
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed, 19 Dec 2018 22:10:19 +0100
-Message-Id: <20181219211022.5379-1-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v2 0/3] MAINTAINERS: Clean up main target/mips
- section
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gZjKP-0001zd-Le
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 16:24:29 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 14E50653C2
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 21:24:28 +0000 (UTC)
+Date: Wed, 19 Dec 2018 19:24:18 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181219212418.GJ19442@habkost.net>
+References: <20181219085038.7729-1-peterx@redhat.com>
+	<20181219085038.7729-3-peterx@redhat.com>
+	<c9e56e11-214f-552a-faea-cb5901392164@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c9e56e11-214f-552a-faea-cb5901392164@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] q35: set split kernel irqchip as
+ default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,25 +35,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, smarkovic@wavecomp.com, amarkovic@wavecomp.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Jiri Denemark <jdenemar@redhat.com>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+On Wed, Dec 19, 2018 at 09:12:55PM +0100, Paolo Bonzini wrote:
+> On 19/12/18 09:50, Peter Xu wrote:
+> > Starting from QEMU 4.0, let's specify "split" as the default value for
+> > kernel-irqchip.
+> > 
+> > So for QEMU>=4.0 we'll have: allowed=Y,required=N,split=Y
+> >    for QEMU<=3.1 we'll have: allowed=Y,required=N,split=N
+> >    (omitting all the "kernel_irqchip_" prefix)
+> > 
+> > Note that this "split" is optional - we'll first try to enable split
+> > kernel irqchip, and we'll fall back to complete kernel irqchip if we
+> > found that the kernel capability is missing.
+> 
+> Please just fail completely and require a new kernel for the 4.0 machine
+> type.  There are subtle differences between kernel and QEMU irqchip, I
+> don't think we want to open that can of worms.
 
-Clean up main target/mips section. Add some new files, add email
-filter, and reorder items.
+This would make existing VMs that are runnable with pc-q35-3.1.0
+not runnable by only updating the machine-type.
 
-v1->v2:
-  - fixed typo in a commit message
-  - removed unnecessary "?" in a line for filtering email subjects
+The good news is that we can make this a non-issue by clearly
+documenting that QEMU needs a more recent kernel (just like we'll
+do for RDTSCP[1]).
 
-Aleksandar Markovic (3):
-  MAINTAINERS: target/mips: Add MIPS files under default-configs
-    directory
-  MAINTAINERS: target/mips: Add filter for mips in email subjects
-  MAINTAINERS: target/mips: Reorder items alphabetically
-
- MAINTAINERS | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+[1] https://lore.kernel.org/lkml/20181210181328.GA762@zn.tnic/
 
 -- 
-2.17.1
+Eduardo
