@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gZYMu-00036f-58
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 04:42:20 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gZYSj-0004bl-0l
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 04:48:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gZYMq-0003nZ-Ur
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 04:42:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41070)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gZYMq-0003mo-Nu
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 04:42:16 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4F13C89ACC
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 09:42:15 +0000 (UTC)
-Date: Wed, 19 Dec 2018 10:42:14 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181219094213.lqh244w35unsbejc@sirius.home.kraxel.org>
-References: <20180222070513.8740-1-kraxel@redhat.com>
-	<20180222070513.8740-6-kraxel@redhat.com>
-	<20181218184532.GA18660@redhat.com>
-	<20181219075510.ci3yypwj3f2plcnv@sirius.home.kraxel.org>
+	(envelope-from <cohuck@redhat.com>) id 1gZYSf-0007kC-QF
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 04:48:20 -0500
+Date: Wed, 19 Dec 2018 10:48:07 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181219104807.4c11f39f.cohuck@redhat.com>
+In-Reply-To: <1545154139-8740-2-git-send-email-pmorel@linux.ibm.com>
+References: <1545154139-8740-1-git-send-email-pmorel@linux.ibm.com>
+	<1545154139-8740-2-git-send-email-pmorel@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181219075510.ci3yypwj3f2plcnv@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] keymap: consider modifier state
- when picking a mapping
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4] s390x/pci: add common function
+ measurement block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,30 +24,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Adam Williamson <awilliam@redhat.com>
+To: Pierre Morel <pmorel@linux.ibm.com>
+Cc: walling@linux.ibm.com, borntraeger@de.ibm.com, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, pasic@linux.ibm.com, thuth@redhat.com
 
-  Hi,
- 
-> > This is quite horrible though. I'm more inclined
-> > to revert this patch and find another way to fix the original problem
-> > which won't require the UI frontends to track modifier state.
+On Tue, 18 Dec 2018 18:28:59 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
+
+> From: Yi Min Zhao <zyimin@linux.ibm.com>
 > 
-> The UIs track modifier state anyway.
+> Common function measurement block is used to report zPCI internal
+> counters of successful pcilg/stg/stb and rpcit instructions to
+> a memory location provided by the program.
 > 
-> I fact I have some WIP patches to add a generic keyboard state tracker,
-> so the UIs can use common code instead of having their own state
-> tracking code each.  Also to make UI hotkeys configurable, consistent
-> across all UIs we have.  Guess I should undust them, at least the state
-> tracking part of it.
+> This patch introduces a new ZpciFmb structure and schedules a timer
+> callback to copy the zPCI measures to the FMB in the guest memory
+> at an interval time set to 4s.
 > 
-> With that in place we can easily pass the full keyboard state to the
-> keymap code.
+> An error while attemping to update the FMB, would generate an error
+> event to the guest.
+> 
+> The pcilg/stg/stb and rpcit interception handlers increase the
+> related counter on a successul call.
 
-Tried that:
-  https://git.kraxel.org/cgit/qemu/log/?h=sirius/kbd-state
+s/successul/successful/
 
-Not polished yet.
+> The guest shall pass a null FMBA (FMB address) in the FIB (Function
+> Information Block) when it issues a Modify PCI Function Control
+> instruction to switch off FMB and stop the corresponding timer.
+> 
+> Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  hw/s390x/s390-pci-bus.c  |   4 +-
+>  hw/s390x/s390-pci-bus.h  |  29 +++++++++++
+>  hw/s390x/s390-pci-inst.c | 129 +++++++++++++++++++++++++++++++++++++++++++++--
+>  hw/s390x/s390-pci-inst.h |   1 +
+>  4 files changed, 159 insertions(+), 4 deletions(-)
+> 
 
-cheers,
-  Gerd
+> +static void fmb_update(void *opaque)
+> +{
+> +    S390PCIBusDevice *pbdev = opaque;
+> +    int64_t t = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
+> +    int i;
+> +
+> +    /* Update U bit */
+> +    pbdev->fmb.last_update *= 2;
+> +    pbdev->fmb.last_update |= UPDATE_U_BIT;
+> +    if (fmb_do_update(pbdev, offsetof(ZpciFmb, last_update),
+> +                      pbdev->fmb.last_update, 8)) {
+> +        return;
+> +    }
+> +
+> +    /* Update FMB sample count */
+> +    if (fmb_do_update(pbdev, offsetof(ZpciFmb, sample),
+> +                      pbdev->fmb.sample++, 4)) {
+> +        return;
+> +    }
+> +
+> +    /* Update FMB counters */
+> +    for (i = 0; i < ZPCI_FMB_CNT_MAX; i++) {
+> +        if (fmb_do_update(pbdev, offsetof(ZpciFmb, counter[i]),
+> +                          pbdev->fmb.counter[i], 8)) {
+> +            return;
+> +        }
+> +    }
+> +
+> +    /* Clear U bit and update the time */
+> +    pbdev->fmb.last_update = time2tod(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
+> +    pbdev->fmb.last_update *= 2;
+> +    if (fmb_do_update(pbdev, offsetof(ZpciFmb, last_update),
+> +                      pbdev->fmb.last_update, 8)) {
+> +        return;
+> +    }
+> +    timer_mod(pbdev->fmb_timer, t + DEFAULT_MUI);
+> +}
+> +
+
+Might be better to use sizeof() instead of hard-coded values when
+calling fmb_do_update()?
+
+Otherwise, looks good.
