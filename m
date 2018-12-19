@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <r.bolshakov@yadro.com>) id 1gZfEV-0004Zz-0q
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 12:02:07 -0500
+	(envelope-from <berrange@redhat.com>) id 1gZfLd-0007zm-T1
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 12:09:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <r.bolshakov@yadro.com>) id 1gZfEO-0001fG-Sa
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 12:02:06 -0500
-Received: from mta-01.yadro.com ([89.207.88.251]:47414)
+	(envelope-from <berrange@redhat.com>) id 1gZfLZ-0000Ij-JT
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 12:09:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35218)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <r.bolshakov@yadro.com>)
-	id 1gZfEM-0001ZE-MT
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 12:02:00 -0500
-Date: Wed, 19 Dec 2018 20:01:50 +0300
-From: Roman Bolshakov <r.bolshakov@yadro.com>
-Message-ID: <20181219170150.m2tmhhg3tuyfrnvx@SPB-NB-133.local>
-References: <20181219091248.9641-1-armbru@redhat.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gZfLZ-0000IC-Ax
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 12:09:25 -0500
+Date: Wed, 19 Dec 2018 17:09:09 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181219170909.GO20465@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181218100002.11219-1-xieyongji@baidu.com>
+	<20181218100002.11219-2-xieyongji@baidu.com>
+	<CAMxuvawx1GXar_UX5Pa_JEEW7EFnG092_PZGKiUL73wtd+s7cg@mail.gmail.com>
+	<20181218152520.GB4807@redhat.com>
+	<20181218104351-mutt-send-email-mst@kernel.org>
+	<20181218160919.GD4807@redhat.com>
+	<20181219105418-mutt-send-email-mst@kernel.org>
+	<20181219160102.GL20465@redhat.com>
+	<20181219114920-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20181219091248.9641-1-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] ui/cocoa: Include less of the generated
- modular QAPI headers
+In-Reply-To: <20181219114920-mutt-send-email-mst@kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 for-4.0 1/7] chardev: Add disconnected
+ option for chardev socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +37,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, elohimes@gmail.com, zhangyu31@baidu.com, xieyongji@baidu.com, Jason Wang <jasowang@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, lilin24@baidu.com, Yury Kotov <yury-kotov@yandex-team.ru>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, chaiwen@baidu.com, nixun@baidu.com
 
-On Wed, Dec 19, 2018 at 10:12:48AM +0100, Markus Armbruster wrote:
-> Avoids pointless recompilation.  Missed in commit 112ed241f5d.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
-> Untested; I don't have access to a Mac.
-> 
->  ui/cocoa.m | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/ui/cocoa.m b/ui/cocoa.m
-> index ecf12bfc2e..43e751693c 100644
-> --- a/ui/cocoa.m
-> +++ b/ui/cocoa.m
-> @@ -32,7 +32,8 @@
->  #include "ui/input.h"
->  #include "sysemu/sysemu.h"
->  #include "qapi/error.h"
-> -#include "qapi/qapi-commands.h"
-> +#include "qapi/qapi-commands-block-core.h"
-> +#include "qapi/qapi-commands-misc.h"
->  #include "sysemu/blockdev.h"
->  #include "qemu-version.h"
->  #include <Carbon/Carbon.h>
-> -- 
-> 2.17.2
-> 
-> 
+On Wed, Dec 19, 2018 at 11:50:38AM -0500, Michael S. Tsirkin wrote:
+> On Wed, Dec 19, 2018 at 04:01:02PM +0000, Daniel P. Berrang=C3=A9 wrote=
+:
+> > On Wed, Dec 19, 2018 at 10:55:09AM -0500, Michael S. Tsirkin wrote:
+> > > On Tue, Dec 18, 2018 at 04:09:19PM +0000, Daniel P. Berrang=C3=A9 w=
+rote:
+> > > > On Tue, Dec 18, 2018 at 11:02:46AM -0500, Michael S. Tsirkin wrot=
+e:
+> > > > > On Tue, Dec 18, 2018 at 03:25:20PM +0000, Daniel P. Berrang=C3=A9=
+ wrote:
+> > > > > > On Tue, Dec 18, 2018 at 04:24:26PM +0400, Marc-Andr=C3=A9 Lur=
+eau wrote:
+> > > > > > > Hi
+> > > > > > >=20
+> > > > > > > On Tue, Dec 18, 2018 at 2:01 PM <elohimes@gmail.com> wrote:
+> > > > > > > >
+> > > > > > > > From: Xie Yongji <xieyongji@baidu.com>
+> > > > > > > >
+> > > > > > > > New option "disconnected" is added to init the chardev so=
+cket
+> > > > > > > > in disconnected state. Then we can use qemu_chr_fe_wait_c=
+onnected()
+> > > > > > > > to connect when necessary. Now it would be used for unix =
+domain
+> > > > > > > > socket of vhost-user-blk device to support reconnect.
+> > > > > > >=20
+> > > > > > > What difference does that make if you wait for connection i=
+n
+> > > > > > > qemu_chr_fe_wait_connected(), or during chardev setup?
+> > > > > > >=20
+> > > > > > > "disconnected" is misleading, would it be possible to reuse
+> > > > > > > "wait/nowait" instead?
+> > > > > >=20
+> > > > > > Currently we default to doing a blocking connect in foregroun=
+d,
+> > > > > > except if reconnect is non-zero, in which case we do a connec=
+t
+> > > > > > async in the background. This "disconnected" proposal effecti=
+vely
+> > > > > > does a blocking connect, but delayed to later in startup.
+> > > > > >=20
+> > > > > > IOW, this could already be achieved if "reconnect" were set t=
+o
+> > > > > > non-zero. If the usage doesn't want reconnect though, I tend
+> > > > > > to agree that we should use the exisiting wait/nowait options
+> > > > > > to let it be controlled. I don't see that this "disconnected"
+> > > > > > option gives a compelling benefit over using wait/nowait.
+> > > > >=20
+> > > > > So the tricky thing is that we can not expose the
+> > > > > device to guest until we get a connection and can query
+> > > > > it for the first time. After that is completed,
+> > > > > we can reasonably support disconnected operation at least for n=
+et.
+> > > >=20
+> > > > The device code would still use  qemu_chr_fe_wait_connected() in =
+my proposal,
+> > > > so that its no different to the situation with the proposed "disc=
+onnected"
+> > > > flag.
+> > > >=20
+> > > > Regards,
+> > > > Daniel
+> > >=20
+> > > I guess so, but wouldn't it be confusing to users that one says
+> > > "nowait" and qemu still waits for a connection and does not
+> > > run the VM? That's different from how nowait behaves normally.
+> >=20
+> > Well "nowait" is only referring to the chardev behaviour which is
+> > still an accurate description.
+>=20
+> man page seems to say
+>=20
+>            nowait specifies that QEMU should not block waiting
+>            for a client to connect to a listening socket.
+>=20
+> if we do wait for a client to connect then how is it accurate?
 
-Hi Markus,
+Well the manpage needs to be clarified that this applies to the
+initialization of the chardev.  What a downstream objet/device
+does with the chardev is outside the scope of chardev config
+options.
 
-You should change change qapi/qapi-commands-block-core.h to
-qapi/qapi-commands-block.h to avoid:
-
-ui/cocoa.m:1225:5: warning: implicit declaration of function 'qmp_eject' is invalid in C99 [-Wimplicit-function-declaration]
-    qmp_eject(true, [drive cStringUsingEncoding: NSASCIIStringEncoding],
-    ^
-ui/cocoa.m:1225:5: warning: this function declaration is not a prototype [-Wstrict-prototypes]
-
-Thanks,
-Roman
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
