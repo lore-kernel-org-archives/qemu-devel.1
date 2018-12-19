@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZdzK-0000WQ-Ht
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:42:24 -0500
+	(envelope-from <mst@redhat.com>) id 1gZe9b-000090-8A
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:53:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZdzH-0002Zn-0i
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:42:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36674)
+	(envelope-from <mst@redhat.com>) id 1gZe9W-0006H5-Vv
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:52:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57018)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZdzG-0002Xi-Ir
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:42:18 -0500
-Date: Wed, 19 Dec 2018 10:42:07 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZe9W-0006G4-MR
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:52:54 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DF9B218B320
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 15:52:53 +0000 (UTC)
+Date: Wed, 19 Dec 2018 10:52:46 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181219103112-mutt-send-email-mst@kernel.org>
-References: <20181126124250.29985-2-marcandre.lureau@redhat.com>
-	<20181210142956.wucn33osm7fxa27d@sirius.home.kraxel.org>
-	<CAMxuvawUrZ=y-txTS86Tz3b-BYY05k4n-jBiY8+vO5e7AOkPKA@mail.gmail.com>
-	<20181210183313-mutt-send-email-mst@kernel.org>
-	<20181211074241.ovuharwewaw22ygq@sirius.home.kraxel.org>
-	<20181211092944.GA921@redhat.com>
-	<20181211135230-mutt-send-email-mst@kernel.org>
-	<CAJ+F1CKuoWWxLqZKQRU-g_144jX2bwsQJUzeW0W-QicNrbPfQw@mail.gmail.com>
-	<20181218181803-mutt-send-email-mst@kernel.org>
-	<CAJ+F1CJmT5O3x84upBDhvvCPCK5x51RP0TxBMsodLzVeQgC-vw@mail.gmail.com>
+Message-ID: <20181219105133-mutt-send-email-mst@kernel.org>
+References: <20181219085038.7729-1-peterx@redhat.com>
+	<20181219085038.7729-3-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAJ+F1CJmT5O3x84upBDhvvCPCK5x51RP0TxBMsodLzVeQgC-vw@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 01/11] vhost-user: define
- conventions for vhost-user backends
+In-Reply-To: <20181219085038.7729-3-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] q35: set split kernel irqchip as
+ default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,180 +34,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, "Hoffmann, Gerd" <kraxel@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, maxime.coquelin@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Wed, Dec 19, 2018 at 12:01:59PM +0400, Marc-Andr=E9 Lureau wrote:
-> Hi
->=20
-> On Wed, Dec 19, 2018 at 3:20 AM Michael S. Tsirkin <mst@redhat.com> wro=
-te:
-> >
-> > On Tue, Dec 18, 2018 at 10:35:05PM +0400, Marc-Andr=E9 Lureau wrote:
-> > > Hi
-> > >
-> > > On Tue, Dec 11, 2018 at 10:56 PM Michael S. Tsirkin <mst@redhat.com=
-> wrote:
-> > > >
-> > > > On Tue, Dec 11, 2018 at 09:29:44AM +0000, Daniel P. Berrang=E9 wr=
-ote:
-> > > > > On Tue, Dec 11, 2018 at 08:42:41AM +0100, Hoffmann, Gerd wrote:
-> > > > > >   Hi,
-> > > > > >
-> > > > > > > Right. The main issue is that we need to make sure only
-> > > > > > > in-tree devices are supported.
-> > > > > >
-> > > > > > Well, that is under debate right now, see:
-> > > > > > https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg0491=
-2.html
-> > > > >
-> > > > > I've previously been against the idea of external plugins for Q=
-EMU,
-> > > > > however, that was when the plugin was something that would be d=
-lopen'd
-> > > > > by QEMU. That would cause our internal ABI to be exposed to 3rd=
- parties
-> > > > > which is highly undesirable, even if they were open source to c=
-omply
-> > > > > with the license needs.
-> > > > >
-> > > > > When the plugin is a completely isolated process communicating =
-with a
-> > > > > well defined protocol, it is not placing a significant burden o=
-n the
-> > > > > QEMU developers' ongoing maintainence, nor has problems with li=
-cense
-> > > > > compliance. The main problem would come from debugging the comb=
-ined
-> > > > > system as the external process is essentially a black box from =
-QEMU's
-> > > > > POV. Downstream OS vendors are free to place restrictions on wh=
-ich
-> > > > > backend processes they'd be willing to support with QEMU, and u=
-pstream
-> > > > > is under no obligation to debug stuff beyond the QEMU boundary.
-> > > > >
-> > > > > We have already accepted that tradeoff with networking by suppo=
-rting
-> > > > > vhost-user and have externals impls like DPDK, so I don't see a
-> > > > > compelling reason to try to restrict it for other vhost-user ba=
-ckends.
-> > > >
-> > > > OK seems to be more or less a rough concensus then.
-> > > >
-> > > > I wonder what's the approach wrt migration though.
-> > >
-> > > The series doesn't take care of migration.
-> > >
-> > > >
-> > > > Even the compatibility story about vhost-user isn't
-> > > > great, I would like to see something solid before
-> > > > we allow that.
-> > >
-> > > To allow migration? vhost-user has partial support for migration
-> > > (dirty memory tracking), and there is also "[PATCH v2 for-4.0 0/7]
-> > > vhost-user-blk: Add support for backend reconnecting" - allowing th=
-e
-> > > backend to store some state, if I understand correctly, which could=
- be
-> > > leveraged I guess...
-> > >
-> > > But I don't think we should block this series because migration isn=
-'t
-> > > tackled here.
-> > >
-> > > thanks
-> > >
-> > >
-> > > .
-> >
-> > How about blocking migration for now then?
->=20
-> The device here (vhost-user-input) blocks migration (unmigratable =3D 1=
-)
+On Wed, Dec 19, 2018 at 04:50:36PM +0800, Peter Xu wrote:
+> Starting from QEMU 4.0, let's specify "split" as the default value for
+> kernel-irqchip.
+> 
+> So for QEMU>=4.0 we'll have: allowed=Y,required=N,split=Y
+>    for QEMU<=3.1 we'll have: allowed=Y,required=N,split=N
+>    (omitting all the "kernel_irqchip_" prefix)
+> 
+> Note that this "split" is optional - we'll first try to enable split
+> kernel irqchip, and we'll fall back to complete kernel irqchip if we
+> found that the kernel capability is missing.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Right. But that device is just an excersize, right?
-It bothers me that next device might not remember and
-we will get a mess.
-Could we make it somehow that if there is no vmsd
-then migration is blocked?
+I'm split on this one ;)
+On the one hand why not make pc and q35 are consistent here?
+On the other hand we really should work to leave PC alone
+as much as we can ...
+
+Paolo, what's your opinion?
 
 
-> >
-> > We need someone to work on a solution for cross version/device
-> > compatibility, vhost net/blk without that is bad enough but at least =
-we
-> > have a feature bits, for random devices it would be very very bad.
->=20
-> For now, if migration is somehow supported, it must be handled mostly
-> by the qemu device, and the vhost-user backend must track dirty memory
-> and be "stateless": *able to reconnect & resume where it left off).
->=20
-> A backend shouldn't declare VHOST_USER_PROTOCOL_F_LOG_SHMFD if it can't=
- do that.
->=20
-> When a backend will have a state to migrate, we will have to implement
-> a new feature. I assume that's what you are asking.
-
-No, I am talking about a cross version/backend migration.
-
-And it's such a boutique problem backends do not even
-understand what it's about. A way to handle it
-in the frontend is needed.
-
-We also need a way to make sure incorrect backends do not
-connect to incorrect devices, and we need a mechanism
-that allows cross-version migration compatibility.
-
-There's been a long discussion about cross-version
-migration for vhost-user and I think Maxime had
-a plan there. Maxime could you repost the
-set of issues and what the plan is maybe?
-
-
-> >
-> >
-> > > >
-> > > > Are we happy to just block live migration?
-> > > > For sure that's already the case with VFIO.
-> > > >
-> > > >
-> > > > > > > vhost-user by design
-> > > > > > > is for out of tree users. It needn't be hard,
-> > > > > > > maybe it's enough to just make qemu launch these processes
-> > > > > > > as opposed to connecting to them on command line.
-> > > > > >
-> > > > > > Not sure this is a good idea, with security being one of the =
-motivating
-> > > > > > factors to move device emulation to other processes.  When li=
-bvirt
-> > > > > > launches the processes it can place them in separate sandboxe=
-s ...
-> > > > >
-> > > > > Yep, libvirt already turns on seccomp policies which forbid QEM=
-U from
-> > > > > forking/execing anything, and we have no desire to go backwards=
- here.
-> > > > > Any external processes have to be launched by libvirt ahead of =
-time.
-> > > > >
-> > > > >
-> > > > > Regards,
-> > > > > Daniel
-> > > > > --
-> > > > > |: https://berrange.com      -o-    https://www.flickr.com/phot=
-os/dberrange :|
-> > > > > |: https://libvirt.org         -o-            https://fstop138.=
-berrange.com :|
-> > > > > |: https://entangle-photo.org    -o-    https://www.instagram.c=
-om/dberrange :|
-> > > >
-> > >
-> > >
-> > > --
-> > > Marc-Andr=E9 Lureau
->=20
->=20
->=20
-> --=20
-> Marc-Andr=E9 Lureau
+> ---
+>  hw/core/machine.c   | 2 ++
+>  hw/i386/pc_q35.c    | 2 ++
+>  include/hw/boards.h | 1 +
+>  3 files changed, 5 insertions(+)
+> 
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index c51423b647..4439ea663f 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -653,8 +653,10 @@ static void machine_class_base_init(ObjectClass *oc, void *data)
+>  static void machine_initfn(Object *obj)
+>  {
+>      MachineState *ms = MACHINE(obj);
+> +    MachineClass *mc = MACHINE_GET_CLASS(obj);
+>  
+>      ms->kernel_irqchip_allowed = true;
+> +    ms->kernel_irqchip_split = mc->default_kernel_irqchip_split;
+>      ms->kvm_shadow_mem = -1;
+>      ms->dump_guest_core = true;
+>      ms->mem_merge = true;
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index 58459bdab5..d2fb0fa49f 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -304,6 +304,7 @@ static void pc_q35_machine_options(MachineClass *m)
+>      m->units_per_default_bus = 1;
+>      m->default_machine_opts = "firmware=bios-256k.bin";
+>      m->default_display = "std";
+> +    m->default_kernel_irqchip_split = true;
+>      m->no_floppy = 1;
+>      machine_class_allow_dynamic_sysbus_dev(m, TYPE_AMD_IOMMU_DEVICE);
+>      machine_class_allow_dynamic_sysbus_dev(m, TYPE_INTEL_IOMMU_DEVICE);
+> @@ -323,6 +324,7 @@ DEFINE_Q35_MACHINE(v4_0, "pc-q35-4.0", NULL,
+>  static void pc_q35_3_1_machine_options(MachineClass *m)
+>  {
+>      pc_q35_4_0_machine_options(m);
+> +    m->default_kernel_irqchip_split = false;
+>      m->alias = NULL;
+>      SET_MACHINE_COMPAT(m, PC_COMPAT_3_1);
+>  }
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index f82f28468b..362384815e 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -195,6 +195,7 @@ struct MachineClass {
+>      const char *hw_version;
+>      ram_addr_t default_ram_size;
+>      const char *default_cpu_type;
+> +    bool default_kernel_irqchip_split;
+>      bool option_rom_has_mr;
+>      bool rom_file_has_mr;
+>      int minimum_page_bits;
+> -- 
+> 2.17.1
