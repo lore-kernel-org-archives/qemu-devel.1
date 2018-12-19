@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gZhtb-0000C2-Qz
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:52:44 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gZiDR-0003TB-1v
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 15:13:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gZhta-0007a8-Tq
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:52:43 -0500
-References: <20181219015230.18652-1-jsnow@redhat.com>
-	<20181219015230.18652-4-jsnow@redhat.com>
-	<0de4bd2b-c78f-f293-4d43-20c8bcd168c6@virtuozzo.com>
-	<71a31ed2-b371-3b8f-d527-bf37b09e5443@virtuozzo.com>
-	<b3e9768f-cb40-5112-9174-1f352b2d97ed@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <aae520a3-2728-1269-8e87-99b2f4ef151c@redhat.com>
-Date: Wed, 19 Dec 2018 14:52:23 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gZiDN-0003hA-4a
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 15:13:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57200)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gZiDM-0003gg-HT
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 15:13:09 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 39C8885A04
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 20:13:07 +0000 (UTC)
+References: <20181219085038.7729-1-peterx@redhat.com>
+	<20181219085038.7729-3-peterx@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c9e56e11-214f-552a-faea-cb5901392164@redhat.com>
+Date: Wed, 19 Dec 2018 21:12:55 +0100
 MIME-Version: 1.0
-In-Reply-To: <b3e9768f-cb40-5112-9174-1f352b2d97ed@redhat.com>
+In-Reply-To: <20181219085038.7729-3-peterx@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 3/5] iotests: change qmp_log filters to
- expect QMP objects only
+Subject: Re: [Qemu-devel] [PATCH 2/4] q35: set split kernel irqchip as
+ default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +35,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-
-
-On 12/19/18 2:01 PM, Eric Blake wrote:
-> On 12/19/18 5:27 AM, Vladimir Sementsov-Ogievskiy wrote:
+On 19/12/18 09:50, Peter Xu wrote:
+> Starting from QEMU 4.0, let's specify "split" as the default value for
+> kernel-irqchip.
 > 
->> But still not sure that it worth it. Isn't it better to just remove
->> fields from dict,
->> which are unpredictable, instead of substituting them..
+> So for QEMU>=4.0 we'll have: allowed=Y,required=N,split=Y
+>    for QEMU<=3.1 we'll have: allowed=Y,required=N,split=N
+>    (omitting all the "kernel_irqchip_" prefix)
 > 
-> For getting the test to pass when we have a key:unpredictable value in
-> the dict, you are right that both changing it to key:SUBST or removing
-> key work at producing reproducible output. But when it comes to
-> debugging test failure, having key:SUBST in the logs gives you a hint at
-> what else to look at, whereas omitting key altogether may make the
-> reason for the failure completely disappear from the logs.
-> 
-> Thus, I would argue that even though it is more complex to write a
-> filter that can recursively substitute, the resulting output is easier
-> to debug if a test starts failing - and that if the work in doing the
-> more complex filtering has already been submitted and is not too much of
-> a burden to maintain, then we might as well use it rather than going
-> with the simpler case of just eliding the problematic keys or using just
-> textual filtering.
-> 
-> However, I'm not in a good position to argue whether there is a
-> reasonable maintenance burden with the patches in this series, vs. what
-> it would take to rewrite 206 to do just textual filtering instead of QMP
-> dict substitution filtering.
-> 
+> Note that this "split" is optional - we'll first try to enable split
+> kernel irqchip, and we'll fall back to complete kernel irqchip if we
+> found that the kernel capability is missing.
 
-My reasoning is this:
+Please just fail completely and require a new kernel for the 4.0 machine
+type.  There are subtle differences between kernel and QEMU irqchip, I
+don't think we want to open that can of worms.
 
-(1) It would be good if QMP filters behaved similarly to their plaintext
-companions, as this is the least surprising behavior, and
-
-(2) It would be best to log the keys provided in responses in case we
-wish to test for their presence (and that their values match something
-we were able to predict via a pattern), and
-
-(3) Not arbitrarily changing the nature of the response invisibly in a
-way that obscures it from log files to aid debugging, like you say.
-
-
-
-I offer some ideas for how to add text filtering for QMP objects in
-iotests in some of my replies, but it's not going to happen in 2018,
-IMO. I want pretty-printing of QMP commands more than I want text
-filtering of serialized QMP objects.
+Paolo
