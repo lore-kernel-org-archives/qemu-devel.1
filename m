@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gZd0i-00068Y-Ij
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 09:39:45 -0500
+	(envelope-from <eblake@redhat.com>) id 1gZd8r-0001Kv-JO
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 09:48:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gZd0g-0005Bd-GW
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 09:39:44 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:36207)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1gZd0f-00057e-VM
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 09:39:42 -0500
-Received: by mail-ot1-x343.google.com with SMTP id k98so19305224otk.3
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 06:39:41 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1gZd8q-0001oI-KT
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 09:48:09 -0500
+References: <20181219065020.81256-1-mahaocong_work@163.com>
+	<20181219065020.81256-2-mahaocong_work@163.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ea116c05-43c3-cb11-e492-b32a8f918bec@redhat.com>
+Date: Wed, 19 Dec 2018 08:47:50 -0600
 MIME-Version: 1.0
-In-Reply-To: <20181210152829.29271-5-alex.bennee@linaro.org>
-References: <20181210152829.29271-1-alex.bennee@linaro.org>
-	<20181210152829.29271-5-alex.bennee@linaro.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Wed, 19 Dec 2018 15:39:39 +0100
-Message-ID: <CAL1e-=hfFv1TsG_viYi6-0z0qN8GnTP-70ZLMrDMmLVz9iBWQA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 04/13] tests/tcg/mips: enable
- mips32-dsp/mips32-dspr2/mipsr5900 linux-user (WIP)
+In-Reply-To: <20181219065020.81256-2-mahaocong_work@163.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] migration: add incremental mode on
+ drive-mirror
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,45 +25,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: shorne@gmail.com, amarkovic@wavecomp.com, qemu-devel@nongnu.org, aurelien@aurel32.net, edgar.iglesias@gmail.com, jcmvbkbc@gmail.com, michael@walle.cc, Stefan Markovic <smarkovic@wavecomp.com>
+To: mahaocong <mahaocong_work@163.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, jcody@redhat.com, mahaocong <mahaocong@didichuxing.com>, qemu-devel@nongnu.org, mreitz@redhat.com
 
-On Dec 10, 2018 4:29 PM, "Alex Benn=C3=A9e" <alex.bennee@linaro.org> wrote:
->
-> Convert the existing tests to use our common cross build
-> infrastructure.
->
-> [WIP: mips32r2 disabled to avoid name clash]
-> [WIP: mipsr5900 disabled due to clashing build flags]
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+On 12/19/18 12:50 AM, mahaocong wrote:
+> From: mahaocong <mahaocong@didichuxing.com>
+> 
+> Signed-off-by: mahaocong <mahaocong@didichuxing.com>
+
+The subject line tells "what", but you are missing a commit message body 
+that gives the "why".  Details about the new feature, and how it is 
+useful, go a long way to making the code easier to review.  How much of 
+your cover letter should be here as well?
+
+At a first glance, I'm just going to focus on the interface:
+
 > ---
->  tests/tcg/mips/Makefile.target       |  15 ++-
->  tests/tcg/mips/mips32-dsp/Makefile   | 166 +++++----------------------
->  tests/tcg/mips/mips32-dspr2/Makefile |  83 +++-----------
->  tests/tcg/mips/mipsr5900/Makefile    |  40 +++----
->  4 files changed, 75 insertions(+), 229 deletions(-)
->
+>   block/dirty-bitmap.c         | 14 ++++++++++
+>   block/mirror.c               | 63 +++++++++++++++++++++++++++++++++++---------
+>   blockdev.c                   | 36 +++++++++++++++++++++++--
+>   include/block/block_int.h    |  3 ++-
+>   include/block/dirty-bitmap.h |  3 +++
+>   include/qemu/hbitmap.h       |  2 ++
+>   qapi/block-core.json         |  4 ++-
+>   util/hbitmap.c               | 28 ++++++++++++++++++++
+>   8 files changed, 136 insertions(+), 17 deletions(-)
+> 
 
-Alex,
+> +++ b/qapi/block-core.json
+> @@ -1727,6 +1727,8 @@
+>   #        (all the disk, only the sectors allocated in the topmost image, or
+>   #        only new I/O).
+>   #
+> +# @bitmap-name: the bitmap to be used in incremental mode.
 
-How about reorganizing directories in tests/tcg/mips altogether, and make
-it less confusing, and easier for future developers to approach an work on?
+Missing a '(since 4.0)' tag.  And doesn't really explain what 
+incremental mode in a mirroring operation actually means.
 
-Let's say like this:
+> +#
+>   # @granularity: granularity of the dirty bitmap, default is 64K
+>   #               if the image format doesn't have clusters, 4K if the clusters
+>   #               are smaller than that, else the cluster size.  Must be a
+> @@ -1768,7 +1770,7 @@
+>   { 'struct': 'DriveMirror',
+>     'data': { '*job-id': 'str', 'device': 'str', 'target': 'str',
+>               '*format': 'str', '*node-name': 'str', '*replaces': 'str',
+> -            'sync': 'MirrorSyncMode', '*mode': 'NewImageMode',
+> +            'sync': 'MirrorSyncMode', '*bitmap-name': 'str', '*mode': 'NewImageMode',
 
-tests/tcg/mips
-    user
-        isa
-            r5900
-        ase
-            dsp
-            dsp_r2
-    system
-        isa   =E3=80=8Afor now empty=E3=80=8B
-        ase
-            dsp
-            dsp_r2
+Can this be named just 'bitmap', instead of the longer 'bitmap-name'?
 
-Thanks,
-Aleksandar
+>               '*speed': 'int', '*granularity': 'uint32',
+>               '*buf-size': 'int', '*on-source-error': 'BlockdevOnError',
+>               '*on-target-error': 'BlockdevOnError',
+> diff --git a/util/hbitmap.c b/util/hbitmap.c
+> index 8d402c5..7ae2fc2 100644
+> --- a/util/hbitmap.c
+
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
