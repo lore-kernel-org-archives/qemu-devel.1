@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gZjUC-0003nU-5c
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 16:34:36 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gZjez-00075s-8S
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 16:45:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gZjU7-0006Bt-LI
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 16:34:36 -0500
-Received: from mail-yb1-f194.google.com ([209.85.219.194]:44381)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gZjey-0002wJ-BF
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 16:45:45 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41000)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gZjU7-0006Bh-Gi
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 16:34:31 -0500
-Received: by mail-yb1-f194.google.com with SMTP id d2so8472434ybs.11
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 13:34:31 -0800 (PST)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1gZjey-0002vV-4T
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 16:45:44 -0500
+Received: by mail-wr1-x441.google.com with SMTP id x10so21023085wrs.8
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 13:45:43 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20181219085038.7729-1-peterx@redhat.com>
+	<20181219085038.7729-3-peterx@redhat.com>
+	<c9e56e11-214f-552a-faea-cb5901392164@redhat.com>
+	<20181219212418.GJ19442@habkost.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2b60279a-26bc-1569-3f3c-da507fed2c44@redhat.com>
+Date: Wed, 19 Dec 2018 22:45:40 +0100
 MIME-Version: 1.0
-References: <20170809202712.6951-1-f4bug@amsat.org>
-	<20170809202712.6951-13-f4bug@amsat.org>
-In-Reply-To: <20170809202712.6951-13-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 19 Dec 2018 22:34:19 +0100
-Message-ID: <CAAdtpL7UE2dGie9zYOx3=L98vFr16dyrk2cdLZi1Nu58i+9DOQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.11 v3 12/16] travis/osx: silent
- texinfo warnings
+In-Reply-To: <20181219212418.GJ19442@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/4] q35: set split kernel irqchip as
+ default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,44 +35,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Jiri Denemark <jdenemar@redhat.com>
 
-Hey Alex, Peter, what do you think about this patch?
+On 19/12/18 22:24, Eduardo Habkost wrote:
+> On Wed, Dec 19, 2018 at 09:12:55PM +0100, Paolo Bonzini wrote:
+>> On 19/12/18 09:50, Peter Xu wrote:
+>>> Starting from QEMU 4.0, let's specify "split" as the default value for
+>>> kernel-irqchip.
+>>>
+>>> So for QEMU>=4.0 we'll have: allowed=Y,required=N,split=Y
+>>>    for QEMU<=3.1 we'll have: allowed=Y,required=N,split=N
+>>>    (omitting all the "kernel_irqchip_" prefix)
+>>>
+>>> Note that this "split" is optional - we'll first try to enable split
+>>> kernel irqchip, and we'll fall back to complete kernel irqchip if we
+>>> found that the kernel capability is missing.
+>>
+>> Please just fail completely and require a new kernel for the 4.0 machine
+>> type.  There are subtle differences between kernel and QEMU irqchip, I
+>> don't think we want to open that can of worms.
+> 
+> This would make existing VMs that are runnable with pc-q35-3.1.0
+> not runnable by only updating the machine-type.
+> 
+> The good news is that we can make this a non-issue by clearly
+> documenting that QEMU needs a more recent kernel (just like we'll
+> do for RDTSCP[1]).
 
-On Wed, Aug 9, 2017 at 10:27 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
->
->   $ make info
->     GEN     qemu-doc.html
->   qemu-doc.texi:8: warning: unrecognized encoding name `UTF-8'.
->     GEN     qemu-doc.txt
->   qemu-doc.texi:8: warning: unrecognized encoding name `UTF-8'.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  .travis.yml | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/.travis.yml b/.travis.yml
-> index 4bf69b0116..24f62fb7cf 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -74,9 +74,11 @@ git:
->    # we want to do this ourselves
->    submodules: false
->  before_install:
-> +  # silent texinfo warnings (https://github.com/xiaohanyu/oh-my-emacs/bl=
-ob/c664894e2f1c1cb0f95a9f2da88d41b00f190856/core/ome-basic.org#homebrew)
->    - if [ "$TRAVIS_OS_NAME" =3D=3D "osx" ]; then
->          brew update ;
-> -        brew install libffi gettext glib pixman ;
-> +        brew install libffi gettext glib pixman texinfo ;
-> +        brew link texinfo --force ;
->      fi
->    - wget -O - http://people.linaro.org/~alex.bennee/qemu-submodule-git-s=
-eed.tar.xz | tar -xvJ
->    - travis_retry git submodule update --init --recursive
-> --
-> 2.13.3
->
+Right, RDTSCP is exactly what came to mind.
+
+Paolo
