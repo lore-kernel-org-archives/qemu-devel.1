@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gZfes-0004sD-CI
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 12:29:23 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gZffQ-0005Bj-Mi
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 12:29:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gZfep-00085X-40
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 12:29:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43952)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gZfeo-00084R-Te
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 12:29:19 -0500
-References: <20181211095057.14623-1-fli@suse.com>
-	<20181211095057.14623-7-fli@suse.com>
-	<87y38tc2fb.fsf@dusky.pond.sub.org>
-	<3645fb54-3651-f63b-c416-b22634e1f992@suse.com>
-	<87zht1keso.fsf@dusky.pond.sub.org>
-	<cc510f12-e94c-bd90-ce01-4ad5d143420f@suse.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9be94c80-623d-c1e7-2524-07b07d05446c@redhat.com>
-Date: Wed, 19 Dec 2018 11:29:16 -0600
+	(envelope-from <jsnow@redhat.com>) id 1gZffP-0000MX-P0
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 12:29:56 -0500
+References: <20181219015230.18652-1-jsnow@redhat.com>
+	<20181219015230.18652-4-jsnow@redhat.com>
+	<0de4bd2b-c78f-f293-4d43-20c8bcd168c6@virtuozzo.com>
+	<71a31ed2-b371-3b8f-d527-bf37b09e5443@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <17495805-6cef-224e-16b0-ae854c96617b@redhat.com>
+Date: Wed, 19 Dec 2018 12:29:49 -0500
 MIME-Version: 1.0
-In-Reply-To: <cc510f12-e94c-bd90-ce01-4ad5d143420f@suse.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <71a31ed2-b371-3b8f-d527-bf37b09e5443@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v8 6/7] qemu_thread_create:
- propagate the error to callers to handle
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 3/5] iotests: change qmp_log filters to
+ expect QMP objects only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <fli@suse.com>, Markus Armbruster <armbru@redhat.com>
-Cc: David Gibson <dgibson@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 12/19/18 6:14 AM, Fei Li wrote:
 
->>>>> =C2=A0=C2=A0 28 files changed, 243 insertions(+), 101 deletions(-)
 
->> I recommend to split this patch.=C2=A0 First part adds the Error ** pa=
-rameter
->> to qemu_thread_create(), passing &error_abort everywhere.=C2=A0 No fun=
-ctional
->> change.=C2=A0 Subsequent patches then improve on &error_abort.=C2=A0 T=
-his way,
->> each improvement patch can be cc'ed to just that part's maintainer(s).
->> Parts you don't want to touch you simply leave at &error_abort.=C2=A0 =
-Makes
->> sense?
-> Yes, I think this makes sense, much clearer. :) But I am a little=20
-> worried about
-> whether too many subsequent improvement patches (some of them are quite
-> small changes) are acceptable.
+On 12/19/18 6:27 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 19.12.2018 14:07, Vladimir Sementsov-Ogievskiy wrote:
+>> 19.12.2018 4:52, John Snow wrote:
+>>> log() treats filters as if they can always filter its primary argument.
+>>> qmp_log treats filters as if they're always text.
+>>>
+>>> Change qmp_log to treat filters as if they're always qmp object filters,
+>>> then change the logging call to rely on log()'s ability to serialize QMP
+>>> objects, so we're not duplicating that effort.
+>>
+>> As I understand, there still no use for qmp-object based filters (even after the
+>> series), do we really need them? I'm afraid it's premature complication.
+> 
+> aha, sorry, missed that you use it in 206.
+> But still not sure that it worth it. Isn't it better to just remove fields from dict,
+> which are unpredictable, instead of substituting them..
+> 
 
-A long series of small patches, where each patch is cc'd to an=20
-appropriate maintainer, will likely get cumulative reviews faster than a=20
-single monolithic patch where no one person is the expert on every line=20
-touched.
+I'd like to keep the QMP output a prettified version of the plaintext
+output, and not have it omit things. You can make the case for changing
+that behavior in a separate patch.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> The other idea here: if we want
+> automatically logged qmp commands (qmp_log(), actually), it should filter unpredictable
+> things from output automatically, just by command, which is the first argument. Caller
+> should not care about it, as it may be derived from command, how to filter it's output.
+> And then, we just need a kind of dict of functions, which do not do something like generic
+> recursion, but specifically prepares common-test-output for the concrete command...
+> 
+
+Feel free to enhance the test suite later to understand all the types of
+commands and replies and scrub them automatically. For now, specifying
+the filters matches behavior in much of the rest of the test suite and I
+am not motivated to fix it.
