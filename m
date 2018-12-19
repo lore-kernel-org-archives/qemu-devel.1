@@ -1,35 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gZb43-0006J1-T2
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:35:05 -0500
+	(envelope-from <prvs=884673768=anthony.perard@citrix.com>)
+	id 1gZb8S-0007ub-VH
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:39:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gZb42-00028m-MY
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:35:03 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37076)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gZb42-00028O-GG
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:35:02 -0500
-Received: by mail-wr1-x443.google.com with SMTP id s12so18927345wrt.4
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 04:35:02 -0800 (PST)
+	(envelope-from <prvs=884673768=anthony.perard@citrix.com>)
+	id 1gZb8Q-0004Ur-6l
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:39:36 -0500
+Date: Wed, 19 Dec 2018 12:39:26 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20181219123926.GA1288@perard.uk.xensource.com>
+References: <20181217133011.31433-1-paul.durrant@citrix.com>
+	<20181217133011.31433-17-paul.durrant@citrix.com>
 MIME-Version: 1.0
-References: <20180803173614.12358-1-marcandre.lureau@redhat.com>
-	<20180803173614.12358-11-marcandre.lureau@redhat.com>
-	<20180807101505.GF7335@redhat.com>
-	<CAJ+F1C+=aucconH7EZ8D2g_Wir2wEeq4GMobK+jNPZ8b0LbZKA@mail.gmail.com>
-	<20180807143055.pkx7l2ufb36lyq3b@sirius.home.kraxel.org>
-	<CAJ+F1CJtFJ_vk817tQsGEi3B+xC4bH3eGxA+tRPayyj3F0gnsw@mail.gmail.com>
-	<20181219071325.c7ayirk564s7kuhn@sirius.home.kraxel.org>
-	<CAJ+F1CKzb3DmmuQG5itgsUxvUwM34fh242FsgxKp1Aj-fksrBg@mail.gmail.com>
-	<20181219095442.oayncn5ufysvntet@sirius.home.kraxel.org>
-In-Reply-To: <20181219095442.oayncn5ufysvntet@sirius.home.kraxel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 19 Dec 2018 16:34:50 +0400
-Message-ID: <CAJ+F1CJ-jg9fSoE1Z3g3vQvXO8sz320YrBEs7sa_Dr+o-JQAYg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 10/10] display: add -display app launching
- external application
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20181217133011.31433-17-paul.durrant@citrix.com>
+Subject: Re: [Qemu-devel] [PATCH v6 16/18] xen: automatically create
+ XenBlockDevice-s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,79 +26,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: Paul Durrant <paul.durrant@citrix.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-Hi
+On Mon, Dec 17, 2018 at 01:30:09PM +0000, Paul Durrant wrote:
+> +static char *xen_block_blockdev_add(const char *id, QDict *qdict,
+> +                                    Error **errp)
+> +{
+> +    const char *driver = qdict_get_try_str(qdict, "driver");
+> +    BlockdevOptions *options = NULL;
+> +    Error *local_err = NULL;
+> +    char *str = NULL;
+> +    char *node_name;
+> +    Visitor *v;
+> +
+> +    if (!driver) {
+> +        error_setg(errp, "no 'driver' parameter");
+> +        return NULL;
+> +    }
+> +
+> +    node_name = g_strdup_printf("%s-%s", id, driver);
+> +    qdict_put_str(qdict, "node-name", node_name);
+> +
+> +    qdict_iter(qdict, add_item, &str);
+> +
+> +    trace_xen_block_blockdev_add(str);
+> +    g_free(str);
+> +
+> +    v = qobject_input_visitor_new_flat_confused(qdict, errp);
 
-On Wed, Dec 19, 2018 at 1:54 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> On Wed, Dec 19, 2018 at 11:44:07AM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> > On Wed, Dec 19, 2018 at 11:13 AM Gerd Hoffmann <kraxel@redhat.com> wrot=
-e:
-> > >
-> > >   Hi,
-> > >
-> > > > > Also:  remote-viewer accepts config files.  I'd suggest to write =
-one, so
-> > > > > it is easy to restart remote-viewer.  Also I would not use a temp=
- dir
-> > > >
-> > > > Where should it be written?
-> > >
-> > > /run/user/$uid/qemu/$vmname/remote-viewer.vv ?
-> > >
-> > > > What should be the content of
-> > > > the .vv file?
-> > >
-> > > Everything needed, so launching remote-viewer is
-> > > just "remote-viewer /path/to/config.vv".
-> >
-> > If it's just what is needed to launch the viewer, why not stick to the
-> > url syntax?
->
-> First, the info needed to launch is located on a fixed & well known
-> place on disk then, so it is easy to restart remote-viewer.
+Kevin seems to say that this could be done without the _flat_confused
+version. The flat_confused version seems to be useful just because
+the key "cache.direct" is used earlier, and because everything in qdict
+is a string.
 
-It would also be a fixed URI, if we use the spice+unix:// syntax.
+I think instead, qobject_input_visitor_new could be used. You would just
+need to replace
+    qdict_put_str(qdict, "cache.direct", "on");
+by
+    QDict *cache = qdict_new();
+    qdict_put_str(cache, "direct", "on");
+    qdict_put_obj(qdict, "cache", QOBJECT(cache));
 
-Fwiw, yes it's not registered in IANA/IETF, or with a RFC, but it is
-considered "standard" withing the spice project. So we could formally
-document it, as part of the protocol perhaps?, if it helps.
+And also the property "read-only" which seems to be a bool as well. I've
+check all property in the qdict, and I think that the only two that
+needs to be changes. And then, we can use:
+    v = qobject_input_visitor_new(qdict); which never fails.
 
->
-> Second, with a vv file you can do a bit more, for example setting "ca"
-> in case TLS is configured, or set enable-{smartcard,usbredir} depending
-> on guest configuration.
->
-> > .vv files are quite specific to virt-viewer/remote-viewer.
->
-> The same is true for the URL syntax.  Trying to pass a URL to vncviewer
-> doesn't work ...
+You'll just need "qapi/qobject-input-visitor.h" instead of "block/qdict.h"
 
-For vnc://
-https://tools.ietf.org/html/rfc7869
+> +    if (!v) {
+> +        goto fail;
+> +    }
+> +
+> +    visit_type_BlockdevOptions(v, NULL, &options, &local_err);
+> +    visit_free(v);
+> +
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        goto fail;
+> +    }
+> +
+> +    qmp_blockdev_add(options, &local_err);
+> +
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        goto fail;
+> +    }
+> +
+> +    qapi_free_BlockdevOptions(options);
+> +
+> +    return node_name;
+> +
+> +fail:
+> +    if (options) {
+> +        qapi_free_BlockdevOptions(options);
+> +    }
+> +    g_free(node_name);
+> +
+> +    return NULL;
+> +}
+[...]
+> +static XenBlockDrive *xen_block_drive_create(const char *id,
+> +                                             const char *device_type,
+> +                                             QDict *opts, Error **errp)
+> +{
+> +    const char *params = qdict_get_try_str(opts, "params");
+> +    const char *mode = qdict_get_try_str(opts, "mode");
+> +    const char *direct_io_safe = qdict_get_try_str(opts, "direct-io-safe");
+> +    const char *discard_enable = qdict_get_try_str(opts, "discard-enable");
+> +    char *driver = NULL;
+> +    char *filename = NULL;
+> +    XenBlockDrive *drive = NULL;
+> +    Error *local_err = NULL;
+> +    QDict *qdict;
+> +
+> +    if (params) {
+> +        char **v = g_strsplit(params, ":", 2);
+> +
+> +        if (v[1] == NULL) {
+> +            filename = g_strdup(v[0]);
+> +            driver = g_strdup("file");
+> +        } else {
+> +            if (strcmp(v[0], "aio") == 0) {
+> +                driver = g_strdup("file");
+> +            } else if (strcmp(v[0], "vhd") == 0) {
+> +                driver = g_strdup("vpc");
+> +            } else {
+> +                driver = g_strdup(v[0]);
+> +            }
+> +            filename = g_strdup(v[1]);
+> +        }
+> +
+> +        g_strfreev(v);
+> +    }
+> +
+> +    if (!filename) {
+> +        error_setg(errp, "no filename");
+> +        goto done;
+> +    }
+> +    assert(driver);
+> +
+> +    drive = g_new0(XenBlockDrive, 1);
+> +    drive->id = g_strdup(id);
+> +
+> +    qdict = qdict_new();
+> +
+> +    qdict_put_str(qdict, "driver", "file");
+> +    qdict_put_str(qdict, "filename", filename);
+> +
+> +    if (mode && *mode != 'w') {
+> +        qdict_put_str(qdict, "read-only", "on");
+> +    }
+> +
+> +    if (direct_io_safe) {
+> +        unsigned long value;
+> +
+> +        if (!qemu_strtoul(direct_io_safe, NULL, 2, &value) && !!value) {
+> +            qdict_put_str(qdict, "cache.direct", "on");
+> +            qdict_put_str(qdict, "aio", "native");
+> +        }
+> +    }
+> +
+> +    if (discard_enable) {
+> +        unsigned long value;
+> +
+> +        if (!qemu_strtoul(discard_enable, NULL, 2, &value) && !!value) {
+> +            qdict_put_str(qdict, "discard", "unmap");
+> +        }
+> +    }
+> +
+> +    /*
+> +     * It is necessary to turn file locking off as an emulated device
+> +     * may have already opened the same image file.
+> +     */
+> +    qdict_put_str(qdict, "locking", "off");
+> +
+> +    xen_block_drive_layer_add(drive, qdict, &local_err);
+> +    qobject_unref(qdict);
+> +
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        goto done;
+> +    }
+> +
+> +    /* If the image is a raw file then we are done */
 
-(I recall some docs abourt rdp:// as well)
+I don't think that is true, as I have this warning in QEMU:
+qemu-system-i386: warning: Opening a block device as a file using the 'file' driver is deprecated
 
->
-> > > > Should it use a template to avoid proxying all the
-> > > > options?
-> > >
-> > > Is this needed?  virt-viewer has a user settings file,
-> > > shouldn't user preferences go there instead?
-> >
-> > User settings files are quite limited at this point. Afaik, it's only
-> > used for the "ask-quit" preference, and "monitor-mapping". Other
-> > options are either from command line or .vv files.
->
-> Ok.
->
-> I think it is more useful to extend that instead of passing through
-> options from the qemu command line to virt-viewer.
+We would need a "raw" driver.
 
-Hmm, although it limits what you can easily configure per instance as well.=
-.
+> +    if (!strcmp(driver, "file")) {
+> +        goto done;
+> +    }
+> +
+> +    qdict = qdict_new();
+> +
+> +    qdict_put_str(qdict, "driver", driver);
+> +
+> +    xen_block_drive_layer_add(drive, qdict, &local_err);
+> +    qobject_unref(qdict);
+> +
+> +done:
+> +    g_free(driver);
+> +    g_free(filename);
+> +
+> +    if (local_err) {
+> +        xen_block_drive_destroy(drive, NULL);
+> +        return NULL;
+> +    }
+> +
+> +    return drive;
+> +}
 
---=20
-Marc-Andr=C3=A9 Lureau
+-- 
+Anthony PERARD
