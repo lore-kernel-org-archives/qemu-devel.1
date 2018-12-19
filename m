@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gZVLB-0005GN-W8
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 01:28:23 -0500
+	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gZVO1-0006Mc-Rt
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 01:31:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gZVL7-0004kI-E1
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 01:28:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34216)
+	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gZVNy-0006eN-JS
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 01:31:17 -0500
+Received: from mga05.intel.com ([192.55.52.43]:9327)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gZVL7-0004ig-5i
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 01:28:17 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 39E82356F2
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 06:28:16 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1545143539-26253-1-git-send-email-thuth@redhat.com>
-	<87woo6d8qn.fsf@dusky.pond.sub.org>
-	<056308f4-a0eb-37b8-a9c7-67ce6a0e6cc6@redhat.com>
-Date: Wed, 19 Dec 2018 07:28:09 +0100
-In-Reply-To: <056308f4-a0eb-37b8-a9c7-67ce6a0e6cc6@redhat.com> (Thomas Huth's
-	message of "Wed, 19 Dec 2018 05:57:24 +0100")
-Message-ID: <87pnty6neu.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <yu.c.zhang@linux.intel.com>)
+	id 1gZVNy-0006df-9R
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 01:31:14 -0500
+Date: Wed, 19 Dec 2018 14:28:10 +0800
+From: Yu Zhang <yu.c.zhang@linux.intel.com>
+Message-ID: <20181219062809.jd4rvv2o6jogxaez@linux.intel.com>
+References: <1544619939-18102-1-git-send-email-yu.c.zhang@linux.intel.com>
+	<1544619939-18102-2-git-send-email-yu.c.zhang@linux.intel.com>
+	<20181217141740.16ccfaa1@Igors-MacBook-Pro.local>
+	<20181218092723.yhaerzm4vlzgef65@linux.intel.com>
+	<20181218155536.2b35a037@Igors-MacBook-Pro.local>
+	<20181218095745-mutt-send-email-mst@kernel.org>
+	<20181219030358.drxnsqchuj5i37bp@linux.intel.com>
+	<20181218221031-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [QEMU PATCH] hw/misc/ivshmem: Remove deprecated
- "ivshmem" legacy device
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181218221031-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] intel-iommu: differentiate host
+ address width from IOVA address width.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,134 +35,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Thomas Huth <thuth@redhat.com> writes:
+On Tue, Dec 18, 2018 at 10:12:45PM -0500, Michael S. Tsirkin wrote:
+> On Wed, Dec 19, 2018 at 11:03:58AM +0800, Yu Zhang wrote:
+> > On Tue, Dec 18, 2018 at 09:58:35AM -0500, Michael S. Tsirkin wrote:
+> > > On Tue, Dec 18, 2018 at 03:55:36PM +0100, Igor Mammedov wrote:
+> > > > On Tue, 18 Dec 2018 17:27:23 +0800
+> > > > Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
+> > > > 
+> > > > > On Mon, Dec 17, 2018 at 02:17:40PM +0100, Igor Mammedov wrote:
+> > > > > > On Wed, 12 Dec 2018 21:05:38 +0800
+> > > > > > Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
+> > > > > > 
+> > > > > > > Currently, vIOMMU is using the value of IOVA address width, instead of
+> > > > > > > the host address width(HAW) to calculate the number of reserved bits in
+> > > > > > > data structures such as root entries, context entries, and entries of
+> > > > > > > DMA paging structures etc.
+> > > > > > > 
+> > > > > > > However values of IOVA address width and of the HAW may not equal. For
+> > > > > > > example, a 48-bit IOVA can only be mapped to host addresses no wider than
+> > > > > > > 46 bits. Using 48, instead of 46 to calculate the reserved bit may result
+> > > > > > > in an invalid IOVA being accepted.
+> > > > > > > 
+> > > > > > > To fix this, a new field - haw_bits is introduced in struct IntelIOMMUState,
+> > > > > > > whose value is initialized based on the maximum physical address set to
+> > > > > > > guest CPU.
+> > > > > > 
+> > > > > > > Also, definitions such as VTD_HOST_AW_39/48BIT etc. are renamed
+> > > > > > > to clarify.
+> > > > > > > 
+> > > > > > > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> > > > > > > Reviewed-by: Peter Xu <peterx@redhat.com>
+> > > > > > > ---
+> > > > > > [...]
+> > > > > > 
+> > > > > > > @@ -3100,6 +3104,8 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
+> > > > > > >  static void vtd_init(IntelIOMMUState *s)
+> > > > > > >  {
+> > > > > > >      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
+> > > > > > > +    CPUState *cs = first_cpu;
+> > > > > > > +    X86CPU *cpu = X86_CPU(cs);
+> > > > > > >  
+> > > > > > >      memset(s->csr, 0, DMAR_REG_SIZE);
+> > > > > > >      memset(s->wmask, 0, DMAR_REG_SIZE);
+> > > > > > > @@ -3119,23 +3125,24 @@ static void vtd_init(IntelIOMMUState *s)
+> > > > > > >      s->cap = VTD_CAP_FRO | VTD_CAP_NFR | VTD_CAP_ND |
+> > > > > > >               VTD_CAP_MAMV | VTD_CAP_PSI | VTD_CAP_SLLPS |
+> > > > > > >               VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(s->aw_bits);
+> > > > > > > -    if (s->aw_bits == VTD_HOST_AW_48BIT) {
+> > > > > > > +    if (s->aw_bits == VTD_AW_48BIT) {
+> > > > > > >          s->cap |= VTD_CAP_SAGAW_48bit;
+> > > > > > >      }
+> > > > > > >      s->ecap = VTD_ECAP_QI | VTD_ECAP_IRO;
+> > > > > > > +    s->haw_bits = cpu->phys_bits;
+> > > > > > Is it possible to avoid accessing CPU fields directly or cpu altogether
+> > > > > > and set phys_bits when iommu is created?
+> > > > > 
+> > > > > Thanks for your comments, Igor.
+> > > > > 
+> > > > > Well, I guess you prefer not to query the CPU capabilities while deciding
+> > > > > the vIOMMU features. But to me, they are not that irrelevant.:)
+> > > > > 
+> > > > > Here the hardware address width in vt-d, and the one in cpuid.MAXPHYSADDR
+> > > > > are referring to the same concept. In VM, both are the maximum guest physical
+> > > > > address width. If we do not check the CPU field here, we will still have to
+> > > > > check the CPU field in other places such as build_dmar_q35(), and reset the
+> > > > > s->haw_bits again.
+> > > > > 
+> > > > > Is this explanation convincing enough? :)
+> > > > current build_dmar_q35() doesn't do it, it's all new code in this series that
+> > > > contains not acceptable direct access from one device (iommu) to another (cpu).   
+> > > > Proper way would be for the owner of iommu to fish limits from somewhere and set
+> > > > values during iommu creation.
+> > > 
+> > > Maybe it's a good idea to add documentation for now.
+> > 
+> > Thanks Michael. So what kind of documentation do you refer? 
+> 
+> The idea would be to have two properties, AW for the CPU and
+> the IOMMU. In the documentation explain that they
+> should normally be set to the same value.
+> 
+> > > 
+> > > It would be nice not to push this stuff up the stack,
+> > > it's unfortunate that our internal APIs make it hard.
+> > 
+> > Sorry, I do not quite get it. What do you mean "internal APIs make it hard"? :)
+> 
+> The API doesn't actually guarantee any initialization order.
+> CPU happens to be initialized first but I do not
+> think there's a guarantee that it will keep being the case.
+> This makes it hard to get properties from one device
+> and use in another one.
+> 
 
-> On 2018-12-18 18:50, Markus Armbruster wrote:
->> Thomas Huth <thuth@redhat.com> writes:
->> 
->>> It's been marked as deprecated in QEMU v2.6.0 already, so really nobody
->>> should use the legacy "ivshmem" device anymore (but use ivshmem-plain or
->>> ivshmem-doorbell instead). Time to remove the deprecated device now.
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  docs/specs/ivshmem-spec.txt |   8 +-
->>>  hw/i386/pc_piix.c           |   4 -
->>>  hw/misc/ivshmem.c           | 206 +-------------------------------------------
->>>  qemu-deprecated.texi        |   5 --
->>>  scripts/device-crash-test   |   1 -
->>>  tests/ivshmem-test.c        |  65 +++++---------
->>>  6 files changed, 29 insertions(+), 260 deletions(-)
->>>
->>> diff --git a/docs/specs/ivshmem-spec.txt b/docs/specs/ivshmem-spec.txt
->>> index a1f5499..042f7ea 100644
->>> --- a/docs/specs/ivshmem-spec.txt
->>> +++ b/docs/specs/ivshmem-spec.txt
->>> @@ -17,12 +17,16 @@ get interrupted by its peers.
->>>  
->>>  There are two basic configurations:
->>>  
->>> -- Just shared memory: -device ivshmem-plain,memdev=HMB,...
->>> +- Just shared memory:
->>> +
->>> +      -device ivshmem-plain,memdev=HMB,...
->>>  
->>>    This uses host memory backend HMB.  It should have option "share"
->>>    set.
->>>  
->>> -- Shared memory plus interrupts: -device ivshmem,chardev=CHR,vectors=N,...
->>> +- Shared memory plus interrupts:
->>> +
->>> +      -device ivshmem-doorbell,chardev=CHR,vectors=N,...
->>>  
->>>    An ivshmem server must already be running on the host.  The device
->>>    connects to the server's UNIX domain socket via character device
->> 
->> Just whitespace.  Intentional?
->
-> It's not just whitespace, I had to change "-device ivshmem" into
-> "-device ivshmem-doorbell" here, and that did not fit into one line anymore.
+Oops...
+Then there can be no easy way in the runtime to gurantee this. BTW, could we
+initialize CPU before other components? Is it hard to do, or not reasonable
+to do so?
 
-Oww, that should've been done in commit 5400c02b90b.  Turns out I'm not
-only blind to mistakes in my own texts, I'm also blind to the fixes.
-Suggest to add to the commit message:
+I have plan to draft a doc in qemu on 5-level paging topic(maybe after all the
+enabling is done). But I don't this this is the proper place to put - as you
+can see, this fix is not relevant to 5-level paging. So any suggestion about
+the documentation?
 
-    Belatedly update a mention of the deprecated "ivshmem" in
-    docs/specs/ivshmem-spec.txt to "ivshmem-doorbell".  Missed in commit
-    5400c02b90b.
+> > > 
+> > > 
+> > > > > > 
+> > > > > > Perhaps Eduardo
+> > > > > >  can suggest better approach, since he's more familiar with phys_bits topic
+> > > > > 
+> > > > > @Eduardo, any comments? Thanks!
+> > > > > 
+> > > > > > 
+> > > > > > >      /*
+> > > > > > >       * Rsvd field masks for spte
+> > > > > > >       */
+> > > > > > >      vtd_paging_entry_rsvd_field[0] = ~0ULL;
+> > > > > > > -    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->aw_bits);
+> > > > > > > -    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->aw_bits);
+> > > > > > > -    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->aw_bits);
+> > > > > > > -    vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->aw_bits);
+> > > > > > > -    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->aw_bits);
+> > > > > > > -    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->aw_bits);
+> > > > > > > -    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->aw_bits);
+> > > > > > > -    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->aw_bits);
+> > > > > > > +    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->haw_bits);
+> > > > > > > +    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->haw_bits);
+> > > > > > > +    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->haw_bits);
+> > > > > > > +    vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->haw_bits);
+> > > > > > > +    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->haw_bits);
+> > > > > > > +    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->haw_bits);
+> > > > > > > +    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->haw_bits);
+> > > > > > > +    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->haw_bits);
+> > > > > > >  
+> > > > > > >      if (x86_iommu->intr_supported) {
+> > > > > > >          s->ecap |= VTD_ECAP_IR | VTD_ECAP_MHMV;
+> > > > > > > @@ -3261,10 +3268,10 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+> > > > > > >      }
+> > > > > > >  
+> > > > > > >      /* Currently only address widths supported are 39 and 48 bits */
+> > > > > > > -    if ((s->aw_bits != VTD_HOST_AW_39BIT) &&
+> > > > > > > -        (s->aw_bits != VTD_HOST_AW_48BIT)) {
+> > > > > > > +    if ((s->aw_bits != VTD_AW_39BIT) &&
+> > > > > > > +        (s->aw_bits != VTD_AW_48BIT)) {
+> > > > > > >          error_setg(errp, "Supported values for x-aw-bits are: %d, %d",
+> > > > > > > -                   VTD_HOST_AW_39BIT, VTD_HOST_AW_48BIT);
+> > > > > > > +                   VTD_AW_39BIT, VTD_AW_48BIT);
+> > > > > > >          return false;
+> > > > > > >      }
+> > > > > > >  
+> > > > > > > diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+> > > > > > > index ed4e758..820451c 100644
+> > > > > > > --- a/include/hw/i386/intel_iommu.h
+> > > > > > > +++ b/include/hw/i386/intel_iommu.h
+> > > > > > > @@ -47,9 +47,9 @@
+> > > > > > >  #define VTD_SID_TO_DEVFN(sid)       ((sid) & 0xff)
+> > > > > > >  
+> > > > > > >  #define DMAR_REG_SIZE               0x230
+> > > > > > > -#define VTD_HOST_AW_39BIT           39
+> > > > > > > -#define VTD_HOST_AW_48BIT           48
+> > > > > > > -#define VTD_HOST_ADDRESS_WIDTH      VTD_HOST_AW_39BIT
+> > > > > > > +#define VTD_AW_39BIT                39
+> > > > > > > +#define VTD_AW_48BIT                48
+> > > > > > > +#define VTD_ADDRESS_WIDTH           VTD_AW_39BIT
+> > > > > > >  #define VTD_HAW_MASK(aw)            ((1ULL << (aw)) - 1)
+> > > > > > >  
+> > > > > > >  #define DMAR_REPORT_F_INTR          (1)
+> > > > > > > @@ -244,7 +244,8 @@ struct IntelIOMMUState {
+> > > > > > >      bool intr_eime;                 /* Extended interrupt mode enabled */
+> > > > > > >      OnOffAuto intr_eim;             /* Toggle for EIM cabability */
+> > > > > > >      bool buggy_eim;                 /* Force buggy EIM unless eim=off */
+> > > > > > > -    uint8_t aw_bits;                /* Host/IOVA address width (in bits) */
+> > > > > > > +    uint8_t aw_bits;                /* IOVA address width (in bits) */
+> > > > > > > +    uint8_t haw_bits;               /* Hardware address width (in bits) */
+> > > > > > >  
+> > > > > > >      /*
+> > > > > > >       * Protects IOMMU states in general.  Currently it protects the
+> > > > > > 
+> > > > > > 
+> > > > > 
+> > > > > B.R.
+> > > > > Yu
+> > > 
+> > 
+> > B.R.
+> > Yu
 
->>> @@ -882,8 +864,8 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
->>>      IVShmemState *s = IVSHMEM_COMMON(dev);
->>>      Error *err = NULL;
->>>      uint8_t *pci_conf;
->>> -    uint8_t attr = PCI_BASE_ADDRESS_SPACE_MEMORY |
->>> -        PCI_BASE_ADDRESS_MEM_PREFETCH;
->>> +    const uint8_t attr = PCI_BASE_ADDRESS_SPACE_MEMORY |
->>> +        PCI_BASE_ADDRESS_MEM_PREFETCH | PCI_BASE_ADDRESS_MEM_TYPE_64;
->>>      Error *local_err = NULL;
->>>  
->>>      /* IRQFD requires MSI */
->> 
->> Sure this belongs to this patch?
->
-> Yes. I had to remove the "if (s->not_legacy_32bit)" below, so I moved
-> the PCI_BASE_ADDRESS_MEM_TYPE_64 to the other bits above. I could also
-> leave it below, but I think that would look a little bit lonely there
-> without the if-statement.
-
-I missed that part over the addition of const; I should've read more
-closely.
-
-I don't care for const here, but I don't really mind it either.  But
-let's eliminate the variable instead.  It's used just once, and there's
-considerable distance.
-
->>> @@ -903,10 +885,6 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
->>>      pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY,
->>>                       &s->ivshmem_mmio);
->>>  
->>> -    if (s->not_legacy_32bit) {
->>> -        attr |= PCI_BASE_ADDRESS_MEM_TYPE_64;
->>> -    }
->>> -
->>>      if (s->hostmem != NULL) {
->>>          IVSHMEM_DPRINTF("using hostmem\n");
->>>  
-> [...]
->>> diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
->>> index c37b196..9811d66 100644
->>> --- a/tests/ivshmem-test.c
->>> +++ b/tests/ivshmem-test.c
->>> @@ -305,20 +305,18 @@ static void *server_thread(void *data)
->>>      return NULL;
->>>  }
->>>  
->>> -static void setup_vm_with_server(IVState *s, int nvectors, bool msi)
->>> +static void setup_vm_with_server(IVState *s, int nvectors)
->>>  {
->>> -    char *cmd = g_strdup_printf("-chardev socket,id=chr0,path=%s,nowait "
->>> -                                "-device ivshmem%s,chardev=chr0,vectors=%d",
->>> -                                tmpserver,
->>> -                                msi ? "-doorbell" : ",size=1M,msi=off",
->>> -                                nvectors);
->>> +    char *cmd = g_strdup_printf("-chardev socket,id=chr0,path=%s,nowait -device"
->> 
->> Awkward line break.
->> 
->>> +                                " ivshmem-doorbell,chardev=chr0,vectors=%d",
->>> +                                tmpserver, nvectors);
->> 
->> Suggest
->> 
->>        char *cmd = g_strdup_printf("-chardev socket,id=chr0,path=%s,nowait "
->>                        "-device ivshmem-doorbell,chardev=chr0,vectors=%d",
->>                        tmpserver, nvectors);
->
-> Ok, I can do that in v2.
->
->  Thomas
-
-Thanks!
+B.R.
+Yu
