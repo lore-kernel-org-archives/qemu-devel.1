@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gZXZ7-0008Q3-2P
+	(envelope-from <peterx@redhat.com>) id 1gZXZ6-0008PY-6T
 	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:50:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gZXZ5-0004BQ-Iy
+	(envelope-from <peterx@redhat.com>) id 1gZXZ3-00049j-1R
 	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:50:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34680)
+Received: from mx1.redhat.com ([209.132.183.28]:34654)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gZXZ5-0004Ac-9S
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:50:51 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gZXZ2-00049G-QT
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:50:48 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 56B862D2BF5
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 08:50:50 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 98EDB792B8
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 08:50:47 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Wed, 19 Dec 2018 16:50:35 +0800
-Message-Id: <20181219085038.7729-2-peterx@redhat.com>
-In-Reply-To: <20181219085038.7729-1-peterx@redhat.com>
-References: <20181219085038.7729-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/4] kvm: let split be optional for
- kvm_arch_irqchip_create
+Date: Wed, 19 Dec 2018 16:50:34 +0800
+Message-Id: <20181219085038.7729-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/4] q35: change defaults for kernel irqchip
+ and IR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,60 +31,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, peterx@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
 
-This patch allows the kvm_arch_irqchip_create() to return 0 if the
-split irqchip is specified but not forced by the user.  Also, modify
-kvm_irqchip_create() similiarly.
+This only changes q35.  Nothing else.
 
-This patch should have no functional change for existing code since
-currently if split is specified it must be forced by the user so we'll
-always have machine_kernel_irqchip_required() returns true. However it
-could potentially be used in follow up patches when we want to turn
-split kernel irqchip as default for QEMU 4.0 which could trigger the
-case that kernel_irqchip_required=N while kernel_irqchip_split=Y. When
-with that, we'll first try with split irqchip, and falls back to
-normal kernel irqchip when split capability is not provided by the
-kernel.
+Before this series, we have these default parameters:
 
-This brings us benefit that we can even run a default QEMU 4.0 on old
-kernels that does not support split irqchip (<4.4) but at the same
-time enable split irqchip for new kernels (>=4.4) as default.
+  - machine kernel-irqchip: on
+  - intel-iommu IR: off
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- accel/kvm/kvm-all.c | 3 ++-
- target/i386/kvm.c   | 6 +++---
- 2 files changed, 5 insertions(+), 4 deletions(-)
+This series wants to change these default variables into:
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 4880a05399..b008364041 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -1468,7 +1468,8 @@ static void kvm_irqchip_create(MachineState *machine, KVMState *s)
-      * in-kernel irqchip for us */
-     ret = kvm_arch_irqchip_create(machine, s);
-     if (ret == 0) {
--        if (machine_kernel_irqchip_split(machine)) {
-+        if (machine_kernel_irqchip_required(machine) &&
-+            machine_kernel_irqchip_split(machine)) {
-             perror("Split IRQ chip mode not supported.");
-             exit(1);
-         } else {
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 739cf8c8ea..8f919f8f9f 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -3685,9 +3685,9 @@ int kvm_arch_irqchip_create(MachineState *ms, KVMState *s)
-     if (machine_kernel_irqchip_split(ms)) {
-         ret = kvm_vm_enable_cap(s, KVM_CAP_SPLIT_IRQCHIP, 0, 24);
-         if (ret) {
--            error_report("Could not enable split irqchip mode: %s",
--                         strerror(-ret));
--            exit(1);
-+            assert(ret < 0);
-+            /* If split not required, return 0 instead to retry */
-+            return machine_kernel_irqchip_required(ms) ? ret : 0;
-         } else {
-             DPRINTF("Enabled KVM_CAP_SPLIT_IRQCHIP\n");
-             kvm_split_irqchip = true;
+  - machine kernel-irqchip: split
+  - intel-iommu IR: on
+
+and at the meantime we should keep compatibility with old kernels and
+old versions of QEMU.
+
+For old versions of QEMU: we used machine compat properties.
+
+For old kernels (<4.4): if user didn't specify split kernel irqchip,
+we'll take it only as the first priority if it's supported by the
+kernel; otherwise, we will continue with complete kernel irqchip.
+
+Both of these parameters should be good to have (split irqchip gains
+more security, while IR gets it too but even more, like x2apic).  So
+let's try to make them as default if capable.
+
+Tests ("split" stands for whether kernel split irqchip enabled, "IR"
+stands for whether IR is turned on):
+
+   |--------------------------------------------------------+-------+----|
+   | params                                                 | split | IR |
+   |--------------------------------------------------------+-------+----|
+   | -M q35                                                 |     0 | /  |
+   | -M q35,accel=kvm                                       |     1 | /  |
+   | -M pc-q35-3.1,accel=kvm                                |     0 | /  |
+   | -M q35,accel=kvm,kernel-irqchip=off                    |     0 | /  |
+   | -M q35,accel=kvm,kernel-irqchip=on                     |     0 | /  |
+   | -M q35 -device intel-iommu                             |     0 | 1  |
+   | -M q35,accel=kvm -device intel-iommu                   |     1 | 1  |
+   | -M q35,accel=kvm,kernel-irqchip=on -device intel-iommu |     0 | 0  |
+   |--------------------------------------------------------+-------+----|
+
+I didn't try old kernels, though.
+
+Any comment would be welcomed, thanks.
+
+Peter Xu (4):
+  kvm: let split be optional for kvm_arch_irqchip_create
+  q35: set split kernel irqchip as default
+  x86-iommu: switch intr_supported to OnOffAuto type
+  x86-iommu: turn on IR by default if proper
+
+ accel/kvm/kvm-all.c         |  3 ++-
+ hw/core/machine.c           |  2 ++
+ hw/i386/acpi-build.c        |  6 +++---
+ hw/i386/amd_iommu.c         |  2 +-
+ hw/i386/intel_iommu.c       |  6 +++---
+ hw/i386/pc.c                |  2 +-
+ hw/i386/pc_q35.c            |  2 ++
+ hw/i386/x86-iommu.c         | 18 +++++++++++++++---
+ include/hw/boards.h         |  1 +
+ include/hw/i386/x86-iommu.h |  4 +++-
+ target/i386/kvm.c           |  6 +++---
+ 11 files changed, 36 insertions(+), 16 deletions(-)
+
 -- 
 2.17.1
