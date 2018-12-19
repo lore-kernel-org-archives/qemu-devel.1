@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1gZbTt-0000IO-5J
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 08:01:51 -0500
+	(envelope-from <armbru@redhat.com>) id 1gZbZ8-0001pn-8Q
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 08:07:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1gZbTi-0002Ta-0W
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 08:01:45 -0500
-Date: Wed, 19 Dec 2018 14:00:37 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20181219130037.c5lrlps6ljqxvs5b@kamzik.brq.redhat.com>
-References: <20181218175122.3229-1-philmd@redhat.com>
-	<20181218175122.3229-4-philmd@redhat.com>
-	<20181219101034.2dgs2faryopmflnz@kamzik.brq.redhat.com>
-	<49ed6ada-c821-6afd-11a9-9520901a151c@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1gZbZ1-0006BP-DA
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 08:07:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53246)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gZbZ1-00069Q-3g
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 08:07:03 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181218112056.11727.96529.stgit@pasha-VirtualBox>
+	<20181218112159.11727.39970.stgit@pasha-VirtualBox>
+Date: Wed, 19 Dec 2018 14:06:48 +0100
+In-Reply-To: <20181218112159.11727.39970.stgit@pasha-VirtualBox> (Pavel
+	Dovgalyuk's message of "Tue, 18 Dec 2018 14:21:59 +0300")
+Message-ID: <87imzpis2f.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <49ed6ada-c821-6afd-11a9-9520901a151c@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] hw/acpi: Use QEMU_NONSTRING for non
- NUL-terminated arrays
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v8 11/20] replay: introduce breakpoint at
+ the specified step
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,69 +28,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, 1803872@bugs.launchpad.net, Thomas Huth <thuth@redhat.com>, Ben Pye <ben@curlybracket.co.uk>, qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>, Stefan Weil <sw@weilnetz.de>, Jeff Cody <jcody@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Liu Yuan <namei.unix@gmail.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Max Reitz <mreitz@redhat.com>, Howard Spoelstra <hsp.cat7@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, dovgaluk@ispras.ru, artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
 
-On Wed, Dec 19, 2018 at 01:43:40PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Hi Drew,
->=20
-> On 12/19/18 11:10 AM, Andrew Jones wrote:
-> > On Tue, Dec 18, 2018 at 06:51:20PM +0100, Philippe Mathieu-Daud=E9 wr=
-ote:
-> >> GCC 8 added a -Wstringop-truncation warning:
-> >>
-> >>   The -Wstringop-truncation warning added in GCC 8.0 via r254630 for
-> >>   bug 81117 is specifically intended to highlight likely unintended
-> >>   uses of the strncpy function that truncate the terminating NUL
-> >>   character from the source string.
-> >>
-> >> This new warning leads to compilation failures:
-> >>
-> >>     CC      hw/acpi/core.o
-> >>   In function 'acpi_table_install', inlined from 'acpi_table_add' at=
- qemu/hw/acpi/core.c:296:5:
-> >>   qemu/hw/acpi/core.c:184:9: error: 'strncpy' specified bound 4 equa=
-ls destination size [-Werror=3Dstringop-truncation]
-> >>            strncpy(ext_hdr->sig, hdrs->sig, sizeof ext_hdr->sig);
-> >>            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >>   make: *** [qemu/rules.mak:69: hw/acpi/core.o] Error 1
-> >>
-> >> Use the QEMU_NONSTRING attribute, since ACPI tables don't require th=
-e
-> >> strings to be NUL-terminated.
-> >=20
-> > Aren't we always starting with zero-initialized structures in ACPI co=
-de?
-> > If so, then we should be able to change the strncpy's to memcpy's.
->=20
-> The first call zero-initializes, but then we call realloc():
->=20
->     /* We won't fail from here on. Initialize / extend the globals. */
->     if (acpi_tables =3D=3D NULL) {
->         acpi_tables_len =3D sizeof(uint16_t);
->         acpi_tables =3D g_malloc0(acpi_tables_len);
->     }
->=20
->     acpi_tables =3D g_realloc(acpi_tables, acpi_tables_len +
->                                          ACPI_TABLE_PFX_SIZE +
->                                          sizeof dfl_hdr + body_size);
->=20
->     ext_hdr =3D (struct acpi_table_header *)(acpi_tables +
->                                            acpi_tables_len);
->=20
-> So memcpy() isn't enough.
+Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
 
-Ah, thanks.
-
->=20
-> I can resend the previous patch which uses strpadcpy() if you prefer,
-> Igor already reviewed it:
->=20
-> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04406.html
+> This patch introduces replay_break, replay_delete_break
+> qmp and hmp commands.
+> These commands allow stopping at the specified instruction.
+> It may be useful for debugging when there are some known
+> events that should be investigated.
+> replay_break command has one argument - number of instructions
+> executed since the start of the replay.
+> replay_delete_break removes previously set breakpoint.
 >
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+[...]
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index e47aea6..0bcb547 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -3148,6 +3148,37 @@
+>    'returns': 'ReplayInfo' }
+>  
+>  ##
+> +# @replay-break:
+> +#
+> +# Set breakpoint on the specified step of the replay.
+> +# Execution stops when the specified step is reached.
+> +#
+> +# @step: execution step to stop at
+> +#
+> +# Since: 4.0
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "replay-break", "data": { "step": 220414 } }
+> +#
+> +##
+> +{ 'command': 'replay-break', 'data': { 'step': 'int' } }
+> +
+> +##
+> +# @replay-delete-break:
+> +#
+> +# Removes replay breakpoint.
+> +#
+> +# Since: 4.0
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "replay-delete-break" }
+> +#
+> +##
+> +{ 'command': 'replay-delete-break' }
+> +
+> +##
+>  # @xen-load-devices-state:
+>  #
+>  # Load the state of all devices from file. The RAM and the block devices
 
-I do like strpadcpy() better, but I'm not going to lose sleep about
-this either way it goes.
+This interface can support at most one breakpoint.  That's okay; if you
+want to schedule multiple stops, you queue them further up the stack,
+and use this command to set the next one before you resume execution.
 
-Thanks,
-drew=20
+If we ever decide to queue in QEMU, we'd have to add optional breakpoint
+names to these functions, defaulting to some implied name.  Not exactly
+elegant, but workable.
+
+What does replay-break do when the breakpoint has been set already?
+
+What does it do when @step is in the past?
+
+What does replay-delete-break do when no breakpoint has been set?
+
+The answers to these questions need to be worked into the comamnd
+documentation.
+
+As mentioned in review of PATCH 10, having the documentation point to
+query-replay might make sense.
+
+[...]
