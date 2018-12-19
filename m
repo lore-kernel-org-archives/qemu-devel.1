@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46021)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gZhNI-0002Wl-0R
+	(envelope-from <prvs=884a3e257=Alistair.Francis@wdc.com>)
+	id 1gZhNH-0002WT-QF
 	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:19:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gZhNG-0001HB-Cu
+	(envelope-from <prvs=884a3e257=Alistair.Francis@wdc.com>)
+	id 1gZhND-0001FW-7f
 	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:19:19 -0500
-References: <20181219015230.18652-1-jsnow@redhat.com>
-	<20181219015230.18652-2-jsnow@redhat.com>
-	<b92a888e-1223-2966-ae83-b0f014171129@redhat.com>
-	<e7aca710-fb9b-9c32-a37d-8122a4c5d913@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c1742689-f3f0-b464-8b8a-13ad77016e0f@redhat.com>
-Date: Wed, 19 Dec 2018 13:19:04 -0600
-MIME-Version: 1.0
-In-Reply-To: <e7aca710-fb9b-9c32-a37d-8122a4c5d913@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+From: Alistair Francis <Alistair.Francis@wdc.com>
+Date: Wed, 19 Dec 2018 19:19:11 +0000
+Message-ID: <1a0a7e8f3347764f212c5efa5c07c9be17efdec6.1545246859.git.alistair.francis@wdc.com>
+References: <cover.1545246859.git.alistair.francis@wdc.com>
+In-Reply-To: <cover.1545246859.git.alistair.francis@wdc.com>
 Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 1/5] iotests: add qmp recursive sorting
- function
+MIME-Version: 1.0
+Subject: [Qemu-devel] [PATCH v2 16/23] riscv: tcg-target: Add slowpath load
+ and store instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,79 +26,289 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>
 
-On 12/19/18 12:57 PM, John Snow wrote:
->=20
->=20
-> On 12/19/18 1:52 PM, Eric Blake wrote:
->> On 12/18/18 7:52 PM, John Snow wrote:
->>> Python before 3.6 does not sort kwargs by default.
->>> If we want to print out pretty-printed QMP objects while
->>> preserving the "exec" > "arguments" ordering, we need a custom sort.
->>
->> Naive question - why do we need the sorting? Is it so that the output =
-is
->> deterministic?=C2=A0 Surely it can't be because the ordering otherwise=
- makes
->> a difference to execution.
->>
->=20
-> Yeah, it's because dicts are unordered and prior to 3.6 they may shuffl=
-e
-> around arbitrarily based on internal hashes.
->=20
-> kwargs in particular are unordered- the order we send over the wire may
-> or may not reflect the order the test author wrote in their iotest.
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Michael Clark <mjc@sifive.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ tcg/riscv/tcg-target.inc.c | 256 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 256 insertions(+)
 
-Which shouldn't matter to what QMP executes, but MIGHT matter in getting=20
-reproducible log output.
-
->=20
-> Therefore, it's a way to get consistent ordering.
->=20
-> Now, we CAN just rely on sort_keys=3DTrue to be done with it, however,
-> this puts arguments before execute, and it's less nice to read -- and
-> I'd have to change a LOT of test output.
-
-Okay, I'm finally seeing it; the existing code has:
-
-     def qmp_log(self, cmd, filters=3D[filter_testfiles], **kwargs):
-         logmsg =3D '{"execute": "%s", "arguments": %s}' % \
-             (cmd, json.dumps(kwargs, sort_keys=3DTrue))
-
-where our log is outputting a message that resembles a dict where=20
-"execute": is the first key, and the user's input dict is then sorted=20
-(the top-most output of {} is unsorted, but the nested ones are sorted,=20
-and possibly in a different order than the user typed them, but at least=20
-deterministic). But when you change to the user passing a full QMP=20
-command (rather than just a dict for the arguments of the QMP command),=20
-using sort_keys=3DTrue will sort everything _including_ putting=20
-"arguments" before "execute" (which is deterministic but changes log=20
-output); while using sort_keys=3DFalse will not affect output in newer=20
-python where kwargs remains ordered, but risks nondeterministic output=20
-on older python.
-
->=20
-> This way keeps the order you expect to see while maintaining a strict
-> order for the arguments. I think that's the nicest compromise until we
-> can stipulate 3.6+ in the year 2034 where kwargs *are* strictly ordered=
-.
-
-But kwargs strict ordering is only at the top-level, not recursive,=20
-right? That is, even if you can rely on:
-
-foo(b=3D1, a=3D2)
-
-providing kwargs where 'b' always outputs before 'a', I don't see how=20
-that would help:
-
-foo(b=3D{'d':3, 'c':4})
-
-not reorder the keys within 'b' without your recursive ordering.
-
+diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
+index ecc76c9ef8..7216bad086 100644
+--- a/tcg/riscv/tcg-target.inc.c
++++ b/tcg/riscv/tcg-target.inc.c
+@@ -895,3 +895,259 @@ static void tcg_out_call(TCGContext *s, tcg_insn_unit=
+ *arg)
+ {
+     tcg_out_call_int(s, arg, false);
+ }
++
++static void tcg_out_mb(TCGContext *s, TCGArg a0)
++{
++    tcg_insn_unit insn =3D OPC_FENCE;
++
++    if (a0 & TCG_MO_LD_LD) {
++        insn |=3D 0x02200000;
++    }
++    if (a0 & TCG_MO_ST_LD) {
++        insn |=3D 0x01200000;
++    }
++    if (a0 & TCG_MO_LD_ST) {
++        insn |=3D 0x02100000;
++    }
++    if (a0 & TCG_MO_ST_ST) {
++        insn |=3D 0x02200000;
++    }
++    tcg_out32(s, insn);
++}
++
++/*
++ * Load/store and TLB
++ */
++
++#if defined(CONFIG_SOFTMMU)
++#include "tcg-ldst.inc.c"
++
++/* helper signature: helper_ret_ld_mmu(CPUState *env, target_ulong addr,
++ *                                     TCGMemOpIdx oi, uintptr_t ra)
++ */
++static void * const qemu_ld_helpers[16] =3D {
++    [MO_UB]   =3D helper_ret_ldub_mmu,
++    [MO_SB]   =3D helper_ret_ldsb_mmu,
++    [MO_LEUW] =3D helper_le_lduw_mmu,
++    [MO_LESW] =3D helper_le_ldsw_mmu,
++    [MO_LEUL] =3D helper_le_ldul_mmu,
++#if TCG_TARGET_REG_BITS =3D=3D 64
++    [MO_LESL] =3D helper_le_ldsl_mmu,
++#endif
++    [MO_LEQ]  =3D helper_le_ldq_mmu,
++    [MO_BEUW] =3D helper_be_lduw_mmu,
++    [MO_BESW] =3D helper_be_ldsw_mmu,
++    [MO_BEUL] =3D helper_be_ldul_mmu,
++#if TCG_TARGET_REG_BITS =3D=3D 64
++    [MO_BESL] =3D helper_be_ldsl_mmu,
++#endif
++    [MO_BEQ]  =3D helper_be_ldq_mmu,
++};
++
++/* helper signature: helper_ret_st_mmu(CPUState *env, target_ulong addr,
++ *                                     uintxx_t val, TCGMemOpIdx oi,
++ *                                     uintptr_t ra)
++ */
++static void * const qemu_st_helpers[16] =3D {
++    [MO_UB]   =3D helper_ret_stb_mmu,
++    [MO_LEUW] =3D helper_le_stw_mmu,
++    [MO_LEUL] =3D helper_le_stl_mmu,
++    [MO_LEQ]  =3D helper_le_stq_mmu,
++    [MO_BEUW] =3D helper_be_stw_mmu,
++    [MO_BEUL] =3D helper_be_stl_mmu,
++    [MO_BEQ]  =3D helper_be_stq_mmu,
++};
++
++static void tcg_out_tlb_load(TCGContext *s, TCGReg addrl,
++                             TCGReg addrh, TCGMemOpIdx oi,
++                             tcg_insn_unit **label_ptr, bool is_load)
++{
++    TCGMemOp opc =3D get_memop(oi);
++    unsigned s_bits =3D opc & MO_SIZE;
++    unsigned a_bits =3D get_alignment_bits(opc);
++    target_ulong mask;
++    int mem_index =3D get_mmuidx(oi);
++    int cmp_off
++        =3D (is_load
++           ? offsetof(CPUArchState, tlb_table[mem_index][0].addr_read)
++           : offsetof(CPUArchState, tlb_table[mem_index][0].addr_write));
++    int add_off =3D offsetof(CPUArchState, tlb_table[mem_index][0].addend)=
+;
++    RISCVInsn load_cmp_op =3D (TARGET_LONG_BITS =3D=3D 64 ? OPC_LD :
++                             TCG_TARGET_REG_BITS =3D=3D 64 ? OPC_LWU : OPC=
+_LW);
++    RISCVInsn load_add_op =3D TCG_TARGET_REG_BITS =3D=3D 64 ? OPC_LD : OPC=
+_LW;
++    TCGReg base =3D TCG_AREG0;
++
++    /* We don't support oversize guests */
++    if (TCG_TARGET_REG_BITS < TARGET_LONG_BITS) {
++        g_assert_not_reached();
++    }
++
++    /* We don't support unaligned accesses. */
++    if (a_bits < s_bits) {
++        a_bits =3D s_bits;
++    }
++    mask =3D (target_ulong)TARGET_PAGE_MASK | ((1 << a_bits) - 1);
++
++
++    /* Compensate for very large offsets.  */
++    if (add_off >=3D 0x1000) {
++        int adj;
++        base =3D TCG_REG_TMP2;
++        if (cmp_off <=3D 2 * 0xfff) {
++            adj =3D 0xfff;
++            tcg_out_opc_imm(s, OPC_ADDI, base, TCG_AREG0, adj);
++        } else {
++            adj =3D cmp_off - sextreg(cmp_off, 0, 12);
++            tcg_debug_assert(add_off - adj >=3D -0x1000
++                             && add_off - adj < 0x1000);
++
++            tcg_out_opc_upper(s, OPC_LUI, base, adj);
++            tcg_out_opc_reg(s, OPC_ADD, base, base, TCG_AREG0);
++        }
++        add_off -=3D adj;
++        cmp_off -=3D adj;
++    }
++
++    /* Extract the page index.  */
++    if (CPU_TLB_BITS + CPU_TLB_ENTRY_BITS < 12) {
++        tcg_out_opc_imm(s, OPC_SRLI, TCG_REG_TMP0, addrl,
++                        TARGET_PAGE_BITS - CPU_TLB_ENTRY_BITS);
++        tcg_out_opc_imm(s, OPC_ANDI, TCG_REG_TMP0, TCG_REG_TMP0,
++                        MAKE_64BIT_MASK(CPU_TLB_ENTRY_BITS, CPU_TLB_BITS))=
+;
++    } else if (TARGET_PAGE_BITS >=3D 12) {
++        tcg_out_opc_upper(s, OPC_LUI, TCG_REG_TMP0,
++                          MAKE_64BIT_MASK(TARGET_PAGE_BITS, CPU_TLB_BITS))=
+;
++        tcg_out_opc_reg(s, OPC_AND, TCG_REG_TMP0, TCG_REG_TMP0, addrl);
++        tcg_out_opc_imm(s, OPC_SRLI, TCG_REG_TMP0, TCG_REG_TMP0,
++                        CPU_TLB_BITS - CPU_TLB_ENTRY_BITS);
++    } else {
++        tcg_out_opc_imm(s, OPC_SRLI, TCG_REG_TMP0, addrl, TARGET_PAGE_BITS=
+);
++        tcg_out_opc_imm(s, OPC_ANDI, TCG_REG_TMP0, TCG_REG_TMP0,
++                        MAKE_64BIT_MASK(0, CPU_TLB_BITS));
++        tcg_out_opc_imm(s, OPC_SLLI, TCG_REG_TMP0, TCG_REG_TMP0,
++                        CPU_TLB_ENTRY_BITS);
++    }
++
++    /* Add that to the base address to index the tlb.  */
++    tcg_out_opc_reg(s, OPC_ADD, TCG_REG_TMP2, base, TCG_REG_TMP0);
++    base =3D TCG_REG_TMP2;
++
++    /* Load the tlb comparator and the addend.  */
++    tcg_out_ldst(s, load_cmp_op, TCG_REG_TMP0, base, cmp_off);
++    tcg_out_ldst(s, load_add_op, TCG_REG_TMP2, base, add_off);
++
++    /* Clear the non-page, non-alignment bits from the address.  */
++    if (mask =3D=3D sextreg(mask, 0, 12)) {
++        tcg_out_opc_imm(s, OPC_ANDI, TCG_REG_TMP1, addrl, mask);
++    } else {
++        tcg_out_movi(s, TCG_TYPE_REG, TCG_REG_TMP1, mask);
++        tcg_out_opc_reg(s, OPC_AND, TCG_REG_TMP1, TCG_REG_TMP1, addrl);
++     }
++
++    /* Compare masked address with the TLB entry. */
++    label_ptr[0] =3D s->code_ptr;
++    tcg_out_opc_branch(s, OPC_BNE, TCG_REG_TMP0, TCG_REG_TMP1, 0);
++    /* NOP to allow patching later */
++    tcg_out_opc_imm(s, OPC_ADDI, TCG_REG_ZERO, TCG_REG_ZERO, 0);
++    /* TODO: Move this out of line
++     * see:
++     *   https://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg02234=
+.html
++     */
++
++    /* TLB Hit - translate address using addend.  */
++    if (TCG_TARGET_REG_BITS > TARGET_LONG_BITS) {
++        tcg_out_ext32u(s, TCG_REG_TMP0, addrl);
++        addrl =3D TCG_REG_TMP0;
++    }
++    tcg_out_opc_reg(s, OPC_ADD, TCG_REG_TMP0, TCG_REG_TMP2, addrl);
++}
++
++static void add_qemu_ldst_label(TCGContext *s, int is_ld, TCGMemOpIdx oi,
++                                TCGType ext,
++                                TCGReg datalo, TCGReg datahi,
++                                TCGReg addrlo, TCGReg addrhi,
++                                void *raddr, tcg_insn_unit **label_ptr)
++{
++    TCGLabelQemuLdst *label =3D new_ldst_label(s);
++
++    label->is_ld =3D is_ld;
++    label->oi =3D oi;
++    label->type =3D ext;
++    label->datalo_reg =3D datalo;
++    label->datahi_reg =3D datahi;
++    label->addrlo_reg =3D addrlo;
++    label->addrhi_reg =3D addrhi;
++    label->raddr =3D raddr;
++    label->label_ptr[0] =3D label_ptr[0];
++}
++
++static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
++{
++    TCGMemOpIdx oi =3D l->oi;
++    TCGMemOp opc =3D get_memop(oi);
++    TCGReg a0 =3D tcg_target_call_iarg_regs[0];
++    TCGReg a1 =3D tcg_target_call_iarg_regs[1];
++    TCGReg a2 =3D tcg_target_call_iarg_regs[2];
++    TCGReg a3 =3D tcg_target_call_iarg_regs[3];
++
++    /* We don't support oversize guests */
++    if (TCG_TARGET_REG_BITS < TARGET_LONG_BITS) {
++        g_assert_not_reached();
++    }
++
++    /* resolve label address */
++    patch_reloc(l->label_ptr[0], R_RISCV_BRANCH, (intptr_t) s->code_ptr, 0=
+);
++
++    /* call load helper */
++    tcg_out_mov(s, TCG_TYPE_PTR, a0, TCG_AREG0);
++    tcg_out_mov(s, TCG_TYPE_PTR, a1, l->addrlo_reg);
++    tcg_out_movi(s, TCG_TYPE_PTR, a2, oi);
++    tcg_out_movi(s, TCG_TYPE_PTR, a3, (tcg_target_long)l->raddr);
++
++    tcg_out_call(s, qemu_ld_helpers[opc & (MO_BSWAP | MO_SSIZE)]);
++    tcg_out_mov(s, (opc & MO_SIZE) =3D=3D MO_64, l->datalo_reg, a0);
++
++    tcg_out_goto(s, l->raddr);
++}
++
++static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
++{
++    TCGMemOpIdx oi =3D l->oi;
++    TCGMemOp opc =3D get_memop(oi);
++    TCGMemOp s_bits =3D opc & MO_SIZE;
++    TCGReg a0 =3D tcg_target_call_iarg_regs[0];
++    TCGReg a1 =3D tcg_target_call_iarg_regs[1];
++    TCGReg a2 =3D tcg_target_call_iarg_regs[2];
++    TCGReg a3 =3D tcg_target_call_iarg_regs[3];
++    TCGReg a4 =3D tcg_target_call_iarg_regs[4];
++
++    /* We don't support oversize guests */
++    if (TCG_TARGET_REG_BITS < TARGET_LONG_BITS) {
++        g_assert_not_reached();
++    }
++
++    /* resolve label address */
++    patch_reloc(l->label_ptr[0], R_RISCV_BRANCH, (intptr_t) s->code_ptr, 0=
+);
++
++    /* call store helper */
++    tcg_out_mov(s, TCG_TYPE_PTR, a0, TCG_AREG0);
++    tcg_out_mov(s, TCG_TYPE_PTR, a1, l->addrlo_reg);
++    tcg_out_mov(s, TCG_TYPE_PTR, a2, l->datalo_reg);
++    switch (s_bits) {
++    case MO_8:
++        tcg_out_ext8u(s, a2, a2);
++        break;
++    case MO_16:
++        tcg_out_ext16u(s, a2, a2);
++        break;
++    default:
++        break;
++    }
++    tcg_out_movi(s, TCG_TYPE_PTR, a3, oi);
++    tcg_out_movi(s, TCG_TYPE_PTR, a4, (tcg_target_long)l->raddr);
++
++    tcg_out_call(s, qemu_st_helpers[opc & (MO_BSWAP | MO_SSIZE)]);
++
++    tcg_out_goto(s, l->raddr);
++}
++#endif /* CONFIG_SOFTMMU */
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.19.1
