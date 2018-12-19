@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gZbCV-0001V9-N3
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:43:50 -0500
+	(envelope-from <prvs=88499b8e4=Paul.Durrant@citrix.com>)
+	id 1gZbCX-0001VD-50
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:43:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gZbCS-0007l8-Vp
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:43:47 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:39517)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gZbCS-0007jR-NS
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:43:44 -0500
-Received: by mail-wr1-f66.google.com with SMTP id t27so19382394wra.6
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 04:43:43 -0800 (PST)
-References: <20181218175122.3229-1-philmd@redhat.com>
-	<20181218175122.3229-4-philmd@redhat.com>
-	<20181219101034.2dgs2faryopmflnz@kamzik.brq.redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <49ed6ada-c821-6afd-11a9-9520901a151c@redhat.com>
-Date: Wed, 19 Dec 2018 13:43:40 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181219101034.2dgs2faryopmflnz@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <prvs=88499b8e4=Paul.Durrant@citrix.com>)
+	id 1gZbCU-0007md-EZ
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:43:49 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Wed, 19 Dec 2018 12:43:24 +0000
+Message-ID: <40bdef2962864ca8bc364249196bf9b3@AMSPEX02CL03.citrite.net>
+References: <20181217133011.31433-1-paul.durrant@citrix.com>
+	<20181217133011.31433-17-paul.durrant@citrix.com>
+	<20181219123926.GA1288@perard.uk.xensource.com>
+In-Reply-To: <20181219123926.GA1288@perard.uk.xensource.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] hw/acpi: Use QEMU_NONSTRING for non
- NUL-terminated arrays
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v6 16/18] xen: automatically create
+ XenBlockDevice-s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,116 +28,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <jcody@redhat.com>, Ben Pye <ben@curlybracket.co.uk>, qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>, David Hildenbrand <david@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Liu Yuan <namei.unix@gmail.com>, Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>, Howard Spoelstra <hsp.cat7@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, 1803872@bugs.launchpad.net, Igor Mammedov <imammedo@redhat.com>
+To: Anthony Perard <anthony.perard@citrix.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-Hi Drew,
+> -----Original Message-----
+> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
+> Sent: 19 December 2018 12:39
+> To: Paul Durrant <Paul.Durrant@citrix.com>
+> Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
+> devel@lists.xenproject.org; Kevin Wolf <kwolf@redhat.com>; Max Reitz
+> <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
+> Subject: Re: [PATCH v6 16/18] xen: automatically create XenBlockDevice-s
+>=20
+> On Mon, Dec 17, 2018 at 01:30:09PM +0000, Paul Durrant wrote:
+> > +static char *xen_block_blockdev_add(const char *id, QDict *qdict,
+> > +                                    Error **errp)
+> > +{
+> > +    const char *driver =3D qdict_get_try_str(qdict, "driver");
+> > +    BlockdevOptions *options =3D NULL;
+> > +    Error *local_err =3D NULL;
+> > +    char *str =3D NULL;
+> > +    char *node_name;
+> > +    Visitor *v;
+> > +
+> > +    if (!driver) {
+> > +        error_setg(errp, "no 'driver' parameter");
+> > +        return NULL;
+> > +    }
+> > +
+> > +    node_name =3D g_strdup_printf("%s-%s", id, driver);
+> > +    qdict_put_str(qdict, "node-name", node_name);
+> > +
+> > +    qdict_iter(qdict, add_item, &str);
+> > +
+> > +    trace_xen_block_blockdev_add(str);
+> > +    g_free(str);
+> > +
+> > +    v =3D qobject_input_visitor_new_flat_confused(qdict, errp);
+>=20
+> Kevin seems to say that this could be done without the _flat_confused
+> version. The flat_confused version seems to be useful just because
+> the key "cache.direct" is used earlier, and because everything in qdict
+> is a string.
 
-On 12/19/18 11:10 AM, Andrew Jones wrote:
-> On Tue, Dec 18, 2018 at 06:51:20PM +0100, Philippe Mathieu-Daudé wrote:
->> GCC 8 added a -Wstringop-truncation warning:
->>
->>   The -Wstringop-truncation warning added in GCC 8.0 via r254630 for
->>   bug 81117 is specifically intended to highlight likely unintended
->>   uses of the strncpy function that truncate the terminating NUL
->>   character from the source string.
->>
->> This new warning leads to compilation failures:
->>
->>     CC      hw/acpi/core.o
->>   In function 'acpi_table_install', inlined from 'acpi_table_add' at qemu/hw/acpi/core.c:296:5:
->>   qemu/hw/acpi/core.c:184:9: error: 'strncpy' specified bound 4 equals destination size [-Werror=stringop-truncation]
->>            strncpy(ext_hdr->sig, hdrs->sig, sizeof ext_hdr->sig);
->>            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>   make: *** [qemu/rules.mak:69: hw/acpi/core.o] Error 1
->>
->> Use the QEMU_NONSTRING attribute, since ACPI tables don't require the
->> strings to be NUL-terminated.
-> 
-> Aren't we always starting with zero-initialized structures in ACPI code?
-> If so, then we should be able to change the strncpy's to memcpy's.
+It could be, but there's a good reason for wanting everything as a string, =
+and that is so that I can do a qdict_iter to generate my trace message. Als=
+o I really don't want to get too elaborate here... this is supposed to be m=
+imicking what would normally come via a json blob, and that would start out=
+ as strings.
 
-The first call zero-initializes, but then we call realloc():
+  Paul
 
-    /* We won't fail from here on. Initialize / extend the globals. */
-    if (acpi_tables == NULL) {
-        acpi_tables_len = sizeof(uint16_t);
-        acpi_tables = g_malloc0(acpi_tables_len);
-    }
-
-    acpi_tables = g_realloc(acpi_tables, acpi_tables_len +
-                                         ACPI_TABLE_PFX_SIZE +
-                                         sizeof dfl_hdr + body_size);
-
-    ext_hdr = (struct acpi_table_header *)(acpi_tables +
-                                           acpi_tables_len);
-
-So memcpy() isn't enough.
-
-I can resend the previous patch which uses strpadcpy() if you prefer,
-Igor already reviewed it:
-
-https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04406.html
-
->>
->> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>  hw/acpi/core.c              | 8 ++++----
->>  include/hw/acpi/acpi-defs.h | 8 ++++----
->>  2 files changed, 8 insertions(+), 8 deletions(-)
->>
->> diff --git a/hw/acpi/core.c b/hw/acpi/core.c
->> index aafdc61648..f60f750c3d 100644
->> --- a/hw/acpi/core.c
->> +++ b/hw/acpi/core.c
->> @@ -35,14 +35,14 @@
->>  struct acpi_table_header {
->>      uint16_t _length;         /* our length, not actual part of the hdr */
->>                                /* allows easier parsing for fw_cfg clients */
->> -    char sig[4];              /* ACPI signature (4 ASCII characters) */
->> +    char sig[4] QEMU_NONSTRING; /* ACPI signature (4 ASCII characters) */
->>      uint32_t length;          /* Length of table, in bytes, including header */
->>      uint8_t revision;         /* ACPI Specification minor version # */
->>      uint8_t checksum;         /* To make sum of entire table == 0 */
->> -    char oem_id[6];           /* OEM identification */
->> -    char oem_table_id[8];     /* OEM table identification */
->> +    char oem_id[6] QEMU_NONSTRING; /* OEM identification */
->> +    char oem_table_id[8] QEMU_NONSTRING; /* OEM table identification */
->>      uint32_t oem_revision;    /* OEM revision number */
->> -    char asl_compiler_id[4];  /* ASL compiler vendor ID */
->> +    char asl_compiler_id[4] QEMU_NONSTRING; /* ASL compiler vendor ID */
->>      uint32_t asl_compiler_revision; /* ASL compiler revision number */
->>  } QEMU_PACKED;
->>  
->> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
->> index af8e023968..3bf0bec8ba 100644
->> --- a/include/hw/acpi/acpi-defs.h
->> +++ b/include/hw/acpi/acpi-defs.h
->> @@ -43,7 +43,7 @@ enum {
->>  struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
->>      uint64_t signature;              /* ACPI signature, contains "RSD PTR " */
->>      uint8_t  checksum;               /* To make sum of struct == 0 */
->> -    uint8_t  oem_id [6];             /* OEM identification */
->> +    uint8_t  oem_id [6] QEMU_NONSTRING; /* OEM identification */
->>      uint8_t  revision;               /* Must be 0 for 1.0, 2 for 2.0 */
->>      uint32_t rsdt_physical_address;  /* 32-bit physical address of RSDT */
->>      uint32_t length;                 /* XSDT Length in bytes including hdr */
->> @@ -62,10 +62,10 @@ typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
->>      uint32_t length;                 /* Length of table, in bytes, including header */ \
->>      uint8_t  revision;               /* ACPI Specification minor version # */ \
->>      uint8_t  checksum;               /* To make sum of entire table == 0 */ \
->> -    uint8_t  oem_id [6];             /* OEM identification */ \
->> -    uint8_t  oem_table_id [8];       /* OEM table identification */ \
->> +    uint8_t  oem_id [6] QEMU_NONSTRING; /* OEM identification */ \
->> +    uint8_t  oem_table_id [8] QEMU_NONSTRING; /* OEM table identification */ \
->>      uint32_t oem_revision;           /* OEM revision number */ \
->> -    uint8_t  asl_compiler_id [4];    /* ASL compiler vendor ID */ \
->> +    uint8_t  asl_compiler_id [4] QEMU_NONSTRING; /* ASL compiler vendor ID */ \
->>      uint32_t asl_compiler_revision;  /* ASL compiler revision number */
->>  
->>  
->> -- 
->> 2.17.2
->>
->>
+>=20
+> I think instead, qobject_input_visitor_new could be used. You would just
+> need to replace
+>     qdict_put_str(qdict, "cache.direct", "on");
+> by
+>     QDict *cache =3D qdict_new();
+>     qdict_put_str(cache, "direct", "on");
+>     qdict_put_obj(qdict, "cache", QOBJECT(cache));
+>=20
+> And also the property "read-only" which seems to be a bool as well. I've
+> check all property in the qdict, and I think that the only two that
+> needs to be changes. And then, we can use:
+>     v =3D qobject_input_visitor_new(qdict); which never fails.
+>=20
+> You'll just need "qapi/qobject-input-visitor.h" instead of "block/qdict.h=
+"
+>=20
+> > +    if (!v) {
+> > +        goto fail;
+> > +    }
+> > +
+> > +    visit_type_BlockdevOptions(v, NULL, &options, &local_err);
+> > +    visit_free(v);
+> > +
+> > +    if (local_err) {
+> > +        error_propagate(errp, local_err);
+> > +        goto fail;
+> > +    }
+> > +
+> > +    qmp_blockdev_add(options, &local_err);
+> > +
+> > +    if (local_err) {
+> > +        error_propagate(errp, local_err);
+> > +        goto fail;
+> > +    }
+> > +
+> > +    qapi_free_BlockdevOptions(options);
+> > +
+> > +    return node_name;
+> > +
+> > +fail:
+> > +    if (options) {
+> > +        qapi_free_BlockdevOptions(options);
+> > +    }
+> > +    g_free(node_name);
+> > +
+> > +    return NULL;
+> > +}
+> [...]
+> > +static XenBlockDrive *xen_block_drive_create(const char *id,
+> > +                                             const char *device_type,
+> > +                                             QDict *opts, Error **errp=
+)
+> > +{
+> > +    const char *params =3D qdict_get_try_str(opts, "params");
+> > +    const char *mode =3D qdict_get_try_str(opts, "mode");
+> > +    const char *direct_io_safe =3D qdict_get_try_str(opts, "direct-io-
+> safe");
+> > +    const char *discard_enable =3D qdict_get_try_str(opts, "discard-
+> enable");
+> > +    char *driver =3D NULL;
+> > +    char *filename =3D NULL;
+> > +    XenBlockDrive *drive =3D NULL;
+> > +    Error *local_err =3D NULL;
+> > +    QDict *qdict;
+> > +
+> > +    if (params) {
+> > +        char **v =3D g_strsplit(params, ":", 2);
+> > +
+> > +        if (v[1] =3D=3D NULL) {
+> > +            filename =3D g_strdup(v[0]);
+> > +            driver =3D g_strdup("file");
+> > +        } else {
+> > +            if (strcmp(v[0], "aio") =3D=3D 0) {
+> > +                driver =3D g_strdup("file");
+> > +            } else if (strcmp(v[0], "vhd") =3D=3D 0) {
+> > +                driver =3D g_strdup("vpc");
+> > +            } else {
+> > +                driver =3D g_strdup(v[0]);
+> > +            }
+> > +            filename =3D g_strdup(v[1]);
+> > +        }
+> > +
+> > +        g_strfreev(v);
+> > +    }
+> > +
+> > +    if (!filename) {
+> > +        error_setg(errp, "no filename");
+> > +        goto done;
+> > +    }
+> > +    assert(driver);
+> > +
+> > +    drive =3D g_new0(XenBlockDrive, 1);
+> > +    drive->id =3D g_strdup(id);
+> > +
+> > +    qdict =3D qdict_new();
+> > +
+> > +    qdict_put_str(qdict, "driver", "file");
+> > +    qdict_put_str(qdict, "filename", filename);
+> > +
+> > +    if (mode && *mode !=3D 'w') {
+> > +        qdict_put_str(qdict, "read-only", "on");
+> > +    }
+> > +
+> > +    if (direct_io_safe) {
+> > +        unsigned long value;
+> > +
+> > +        if (!qemu_strtoul(direct_io_safe, NULL, 2, &value) && !!value)
+> {
+> > +            qdict_put_str(qdict, "cache.direct", "on");
+> > +            qdict_put_str(qdict, "aio", "native");
+> > +        }
+> > +    }
+> > +
+> > +    if (discard_enable) {
+> > +        unsigned long value;
+> > +
+> > +        if (!qemu_strtoul(discard_enable, NULL, 2, &value) && !!value)
+> {
+> > +            qdict_put_str(qdict, "discard", "unmap");
+> > +        }
+> > +    }
+> > +
+> > +    /*
+> > +     * It is necessary to turn file locking off as an emulated device
+> > +     * may have already opened the same image file.
+> > +     */
+> > +    qdict_put_str(qdict, "locking", "off");
+> > +
+> > +    xen_block_drive_layer_add(drive, qdict, &local_err);
+> > +    qobject_unref(qdict);
+> > +
+> > +    if (local_err) {
+> > +        error_propagate(errp, local_err);
+> > +        goto done;
+> > +    }
+> > +
+> > +    /* If the image is a raw file then we are done */
+>=20
+> I don't think that is true, as I have this warning in QEMU:
+> qemu-system-i386: warning: Opening a block device as a file using the
+> 'file' driver is deprecated
+>=20
+> We would need a "raw" driver.
+>=20
+> > +    if (!strcmp(driver, "file")) {
+> > +        goto done;
+> > +    }
+> > +
+> > +    qdict =3D qdict_new();
+> > +
+> > +    qdict_put_str(qdict, "driver", driver);
+> > +
+> > +    xen_block_drive_layer_add(drive, qdict, &local_err);
+> > +    qobject_unref(qdict);
+> > +
+> > +done:
+> > +    g_free(driver);
+> > +    g_free(filename);
+> > +
+> > +    if (local_err) {
+> > +        xen_block_drive_destroy(drive, NULL);
+> > +        return NULL;
+> > +    }
+> > +
+> > +    return drive;
+> > +}
+>=20
+> --
+> Anthony PERARD
