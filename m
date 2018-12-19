@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gZeKA-0007jy-Bi
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 11:03:59 -0500
+	(envelope-from <lvivier@redhat.com>) id 1gZeew-0005Cc-UK
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 11:25:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gZeK4-0001JS-90
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 11:03:52 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38720)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gZeK3-0001FN-Dn
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 11:03:47 -0500
-Received: by mail-wm1-x342.google.com with SMTP id m22so7038574wml.3
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 08:03:44 -0800 (PST)
-References: <20181210152829.29271-1-alex.bennee@linaro.org>
-	<20181210152829.29271-5-alex.bennee@linaro.org>
-	<CAL1e-=hfFv1TsG_viYi6-0z0qN8GnTP-70ZLMrDMmLVz9iBWQA@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAL1e-=hfFv1TsG_viYi6-0z0qN8GnTP-70ZLMrDMmLVz9iBWQA@mail.gmail.com>
-Date: Wed, 19 Dec 2018 16:03:42 +0000
-Message-ID: <87imzpa4gx.fsf@linaro.org>
+	(envelope-from <lvivier@redhat.com>) id 1gZeep-0006Ny-5i
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 11:25:19 -0500
+References: <20181218131829.5135-1-lvivier@redhat.com>
+	<20181218171032.308026c5@bahia.lan>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <28b963d3-a42e-1f6c-a8b5-34445f4af698@redhat.com>
+Date: Wed, 19 Dec 2018 17:25:04 +0100
 MIME-Version: 1.0
+In-Reply-To: <20181218171032.308026c5@bahia.lan>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 04/13] tests/tcg/mips: enable
- mips32-dsp/mips32-dspr2/mipsr5900 linux-user (WIP)
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] spapr: Add H-Call
+ H_HOME_NODE_ASSOCIATIVITY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,57 +25,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Cc: shorne@gmail.com, amarkovic@wavecomp.com, qemu-devel@nongnu.org, aurelien@aurel32.net, edgar.iglesias@gmail.com, jcmvbkbc@gmail.com, michael@walle.cc, Stefan Markovic <smarkovic@wavecomp.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-
-Aleksandar Markovic <aleksandar.m.mail@gmail.com> writes:
-
-> On Dec 10, 2018 4:29 PM, "Alex Benn=C3=A9e" <alex.bennee@linaro.org> wrot=
-e:
+On 18/12/2018 17:10, Greg Kurz wrote:
+> On Tue, 18 Dec 2018 14:18:29 +0100
+> Laurent Vivier <lvivier@redhat.com> wrote:
+> 
+>> H_HOME_NODE_ASSOCIATIVITY H-Call returns the associativity domain
+>> designation associated with the identifier input parameter
 >>
->> Convert the existing tests to use our common cross build
->> infrastructure.
+>> This fixes a crash when we try to hotplug a CPU in memory-less and
+>> CPU-less numa node. In this case, the kernel tries to online the
+>> node, but without the information provided by this h-call, the node id,
+>> it cannot and the CPU is started while the node is not onlined.
 >>
->> [WIP: mips32r2 disabled to avoid name clash]
->> [WIP: mipsr5900 disabled due to clashing build flags]
+>> It also removes the warning message from the kernel:
+>>   VPHN is not supported. Disabling polling..
 >>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 >> ---
->>  tests/tcg/mips/Makefile.target       |  15 ++-
->>  tests/tcg/mips/mips32-dsp/Makefile   | 166 +++++----------------------
->>  tests/tcg/mips/mips32-dspr2/Makefile |  83 +++-----------
->>  tests/tcg/mips/mipsr5900/Makefile    |  40 +++----
->>  4 files changed, 75 insertions(+), 229 deletions(-)
 >>
->
-> Alex,
->
-> How about reorganizing directories in tests/tcg/mips altogether, and make
-> it less confusing, and easier for future developers to approach an work o=
-n?
->
-> Let's say like this:
->
-> tests/tcg/mips
->     user
->         isa
->             r5900
->         ase
->             dsp
->             dsp_r2
->     system
->         isa   =E3=80=8Afor now empty=E3=80=8B
->         ase
->             dsp
->             dsp_r2
+>> Notes:
+>>     v2:
+>>       add hcall-vphn to ibm,hypertas-functions
+>>       correctly check flags
+>>       return H_FUNCTION rather than H_PARAMETER
+>>       update description
+>>
+>>  hw/ppc/spapr.c         |  1 +
+>>  hw/ppc/spapr_hcall.c   | 39 +++++++++++++++++++++++++++++++++++++++
+>>  include/hw/ppc/spapr.h |  1 +
+>>  3 files changed, 41 insertions(+)
+>>
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index 7a0ab2da54..d961272c8a 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -1049,6 +1049,7 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, void *fdt)
+>>      add_str(hypertas, "hcall-sprg0");
+>>      add_str(hypertas, "hcall-copy");
+>>      add_str(hypertas, "hcall-debug");
+>> +    add_str(hypertas, "hcall-vphn");
+>>      add_str(qemu_hypertas, "hcall-memop1");
+>>  
+>>      if (!kvm_enabled() || kvmppc_spapr_use_multitce()) {
+>> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+>> index 78fecc8fe9..a48adb3cfb 100644
+>> --- a/hw/ppc/spapr_hcall.c
+>> +++ b/hw/ppc/spapr_hcall.c
+>> @@ -1663,6 +1663,41 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+>>      return H_SUCCESS;
+>>  }
+>>  
+>> +static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
+>> +                                              sPAPRMachineState *spapr,
+>> +                                              target_ulong opcode,
+>> +                                              target_ulong *args)
+>> +{
+>> +    target_ulong flags = args[0];
+>> +    target_ulong procno = args[1];
+>> +    PowerPCCPU *tcpu;
+>> +    int idx;
+>> +
+>> +    /* only support procno from H_REGISTER_VPA */
+>> +    if (flags != 0x1) {
+>> +        return H_FUNCTION;
+>> +    }
+>> +
+>> +    tcpu = spapr_find_cpu(procno);
+>> +    if (tcpu == NULL) {
+>> +        return H_P2;
+>> +    }
+>> +
+>> +    /* sequence is the same as in the "ibm,associativity" property */
+>> +
+>> +    idx = 0;
+>> +#define ASSOCIATIVITY(a, b) (((uint64_t)a << 32) | ((uint64_t)b & 0xffffffff))
+> 
+> It would be safer to have parens around a and b.
 
-Yeah sounds like a plan. I'm going to do the same with cris (bare and libc).
+I agree
 
->
-> Thanks,
-> Aleksandar
+>> +    args[idx++] = ASSOCIATIVITY(0, 0);
+>> +    args[idx++] = ASSOCIATIVITY(0, tcpu->node_id);
+>> +    args[idx++] = ASSOCIATIVITY(procno, -1);
+> 
+> The returned values are supposed to be a stream of mixed 16-bit and 32-bit
+> values, _insanely_ encoded as follows:
+> 
+> The high order bit of each 2 byte field is a length specifier:
+>  1: The associativity domain number is contained in the low order 15 bits of the
+>     field,
+>  0: The associativity domain number is contained in the low order 15 bits of the
+>     current field concatenated with the 16 bits of the next sequential field)
+> 
+> ie, usable values are either 31-bit, either 15-bit.
+> 
+> I don't see such an encoding taking place in the code... this may cause
+> problems if node_id >= 0x80000000: the guest will only get bits 30:16,
+> and consider bits 15:0 to belong to the next field, which may in turn
+> be considered as a 15-bit value or combined with the top 16-bits of
+> procno to form a bogus 31-bit value... :-\
 
+> I guess it is okay to go with the "long" variant for everyone since you
+> only have 5 of them, but you could also use the "short" variant when
+> values are < 0x10000.
+> 
+> And in any case, it seems we have to limit node ids and vcpu ids to be
+> 31 bits if we're to support this interface.
 
---
-Alex Benn=C3=A9e
+>From PowerPCCPU, node_id is an int32_t, vcpu_id is an "int", and node id
+ and cpu id cannot be negative, so the value encoded are already 31bit
+values. Moreover, in NumaNodeOptions (see qapi/misc.json) nodeid and
+cpus are uint16.
+
+So I think we don't have to check the bit 31 of these values.
+
+I don't want to manage the 15bit encoding because the list is hard coded
+and I want to keep it simple.
+
+Thanks,
+Laurent
