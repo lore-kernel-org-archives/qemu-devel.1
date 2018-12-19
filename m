@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZgQz-0007rX-HD
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 13:19:06 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gZggr-0002dj-Dj
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 13:35:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZgQv-0004ke-JF
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 13:19:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59914)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZgQv-0004kH-9w
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 13:19:01 -0500
-Date: Wed, 19 Dec 2018 13:18:51 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181219131256-mutt-send-email-mst@kernel.org>
-References: <20181218100002.11219-1-xieyongji@baidu.com>
-	<20181218100002.11219-2-xieyongji@baidu.com>
-	<CAMxuvawx1GXar_UX5Pa_JEEW7EFnG092_PZGKiUL73wtd+s7cg@mail.gmail.com>
-	<20181218152520.GB4807@redhat.com>
-	<20181218104351-mutt-send-email-mst@kernel.org>
-	<20181218160919.GD4807@redhat.com>
-	<20181219105418-mutt-send-email-mst@kernel.org>
-	<20181219160102.GL20465@redhat.com>
-	<20181219114920-mutt-send-email-mst@kernel.org>
-	<20181219170909.GO20465@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1gZggo-0005Tx-8T
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 13:35:29 -0500
+References: <20181219015230.18652-1-jsnow@redhat.com>
+	<20181219015230.18652-4-jsnow@redhat.com>
+	<0de4bd2b-c78f-f293-4d43-20c8bcd168c6@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <38592dbf-e2e2-1de5-2cc6-62d5541b43dc@redhat.com>
+Date: Wed, 19 Dec 2018 13:35:07 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20181219170909.GO20465@redhat.com>
+In-Reply-To: <0de4bd2b-c78f-f293-4d43-20c8bcd168c6@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 for-4.0 1/7] chardev: Add disconnected
- option for chardev socket
+Subject: Re: [Qemu-devel] [PATCH v4 3/5] iotests: change qmp_log filters to
+ expect QMP objects only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,115 +26,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, elohimes@gmail.com, zhangyu31@baidu.com, xieyongji@baidu.com, Jason Wang <jasowang@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, lilin24@baidu.com, Yury Kotov <yury-kotov@yandex-team.ru>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, chaiwen@baidu.com, nixun@baidu.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Wed, Dec 19, 2018 at 05:09:09PM +0000, Daniel P. Berrang=E9 wrote:
-> On Wed, Dec 19, 2018 at 11:50:38AM -0500, Michael S. Tsirkin wrote:
-> > On Wed, Dec 19, 2018 at 04:01:02PM +0000, Daniel P. Berrang=E9 wrote:
-> > > On Wed, Dec 19, 2018 at 10:55:09AM -0500, Michael S. Tsirkin wrote:
-> > > > On Tue, Dec 18, 2018 at 04:09:19PM +0000, Daniel P. Berrang=E9 wr=
-ote:
-> > > > > On Tue, Dec 18, 2018 at 11:02:46AM -0500, Michael S. Tsirkin wr=
-ote:
-> > > > > > On Tue, Dec 18, 2018 at 03:25:20PM +0000, Daniel P. Berrang=E9=
- wrote:
-> > > > > > > On Tue, Dec 18, 2018 at 04:24:26PM +0400, Marc-Andr=E9 Lure=
-au wrote:
-> > > > > > > > Hi
-> > > > > > > >=20
-> > > > > > > > On Tue, Dec 18, 2018 at 2:01 PM <elohimes@gmail.com> wrot=
-e:
-> > > > > > > > >
-> > > > > > > > > From: Xie Yongji <xieyongji@baidu.com>
-> > > > > > > > >
-> > > > > > > > > New option "disconnected" is added to init the chardev =
-socket
-> > > > > > > > > in disconnected state. Then we can use qemu_chr_fe_wait=
-_connected()
-> > > > > > > > > to connect when necessary. Now it would be used for uni=
-x domain
-> > > > > > > > > socket of vhost-user-blk device to support reconnect.
-> > > > > > > >=20
-> > > > > > > > What difference does that make if you wait for connection=
- in
-> > > > > > > > qemu_chr_fe_wait_connected(), or during chardev setup?
-> > > > > > > >=20
-> > > > > > > > "disconnected" is misleading, would it be possible to reu=
-se
-> > > > > > > > "wait/nowait" instead?
-> > > > > > >=20
-> > > > > > > Currently we default to doing a blocking connect in foregro=
-und,
-> > > > > > > except if reconnect is non-zero, in which case we do a conn=
-ect
-> > > > > > > async in the background. This "disconnected" proposal effec=
-tively
-> > > > > > > does a blocking connect, but delayed to later in startup.
-> > > > > > >=20
-> > > > > > > IOW, this could already be achieved if "reconnect" were set=
- to
-> > > > > > > non-zero. If the usage doesn't want reconnect though, I ten=
-d
-> > > > > > > to agree that we should use the exisiting wait/nowait optio=
-ns
-> > > > > > > to let it be controlled. I don't see that this "disconnecte=
-d"
-> > > > > > > option gives a compelling benefit over using wait/nowait.
-> > > > > >=20
-> > > > > > So the tricky thing is that we can not expose the
-> > > > > > device to guest until we get a connection and can query
-> > > > > > it for the first time. After that is completed,
-> > > > > > we can reasonably support disconnected operation at least for=
- net.
-> > > > >=20
-> > > > > The device code would still use  qemu_chr_fe_wait_connected() i=
-n my proposal,
-> > > > > so that its no different to the situation with the proposed "di=
-sconnected"
-> > > > > flag.
-> > > > >=20
-> > > > > Regards,
-> > > > > Daniel
-> > > >=20
-> > > > I guess so, but wouldn't it be confusing to users that one says
-> > > > "nowait" and qemu still waits for a connection and does not
-> > > > run the VM? That's different from how nowait behaves normally.
-> > >=20
-> > > Well "nowait" is only referring to the chardev behaviour which is
-> > > still an accurate description.
-> >=20
-> > man page seems to say
-> >=20
-> >            nowait specifies that QEMU should not block waiting
-> >            for a client to connect to a listening socket.
-> >=20
-> > if we do wait for a client to connect then how is it accurate?
+
+
+On 12/19/18 6:07 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 19.12.2018 4:52, John Snow wrote:
+>> log() treats filters as if they can always filter its primary argument=
+.
+>> qmp_log treats filters as if they're always text.
+>>
+>> Change qmp_log to treat filters as if they're always qmp object filter=
+s,
+>> then change the logging call to rely on log()'s ability to serialize Q=
+MP
+>> objects, so we're not duplicating that effort.
 >=20
-> Well the manpage needs to be clarified that this applies to the
-> initialization of the chardev.  What a downstream objet/device
-> does with the chardev is outside the scope of chardev config
-> options.
+> As I understand, there still no use for qmp-object based filters (even =
+after the
+> series), do we really need them? I'm afraid it's premature complication=
+.
 >=20
-> Regards,
-> Daniel
 
-Practically qemu blocks. I suspect the distinction which object
-within qemu does it will be lost on users.
+There are callers of log() that use qmp filters. Those callers can now
+migrate over to qmp_log to get both the call and response.
 
-And it's not exactly about waiting anyway.
-It's about whether we should stop the VM on disconnect
-which I feel is different.
+There ARE users of QMP filters.
 
-So I think we need a new flag along the lines of
-	disconnect=3Dignore/exit/stop
+Look at `git grep 'log(vm'` for callers that are passing rich QMP
+objects. The ones that pass filters are usually passing filter_qmp_event.
 
-with proper documentation.
+Now, if we choose, we can move them over to using qmp_log and amend the
+logging output to get both the outgoing and returning message.
 
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
+-- hmm, maybe, if you want, and I am NOT suggesting I will do this
+before the holiday break (and therefore not in this series) -- what we
+can do is this:
+
+log(txt, filters=3D[]) -- Takes text and text filters only.
+
+log_qmp(obj, tfilters=3D[], qfilters=3D[]) -- Logs a QMP object, takes QM=
+P
+filters for pre-filtering and tfilters for post-filtering. Contains the
+json.dumps call. Simply passes tfilters down to log().
+
+vm.qmp(log=3D1, tfilters=3D[], qfilters=3D[], ...) -- Perform the actual =
+QMP
+call and response, logging the outgoing and incoming objects via log_qmp.
+
+I can use this patchset as a starting point to do that. It will involve
+amending a lot of existing tests and test outputs, so I won't do this
+unless there appears to be some support for that API in advance.
+
+> Why not to keep all filters text based? If we need to filter some concr=
+ete fields,
+> not the whole thing, I doubt that recursion and defining functions insi=
+de
+> functions is a true way for it. Instead in concrete case, like in you t=
+est, it's
+> better to select fields that should be in output, and output only them.
+>=20
+>>
+>> Because kwargs have been sorted already, the order is preserved.
+>>
+>> Edit the only caller who uses filters on qmp_log to use a qmp version,
+>> also added in this patch.
+>> ---
+>>   tests/qemu-iotests/206        |  4 ++--
+>>   tests/qemu-iotests/iotests.py | 24 +++++++++++++++++++++---
+>>   2 files changed, 23 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/tests/qemu-iotests/206 b/tests/qemu-iotests/206
+>> index e92550fa59..5bb738bf23 100755
+>> --- a/tests/qemu-iotests/206
+>> +++ b/tests/qemu-iotests/206
+>> @@ -27,7 +27,7 @@ iotests.verify_image_format(supported_fmts=3D['qcow2=
+'])
+>>  =20
+>>   def blockdev_create(vm, options):
+>>       result =3D vm.qmp_log('blockdev-create',
+>> -                        filters=3D[iotests.filter_testfiles],
+>> +                        filters=3D[iotests.filter_qmp_testfiles],
+>>                           job_id=3D'job0', options=3Doptions)
+>>  =20
+>>       if 'return' in result:
+>> @@ -55,7 +55,7 @@ with iotests.FilePath('t.qcow2') as disk_path, \
+>>                             'size': 0 })
+>>  =20
+>>       vm.qmp_log('blockdev-add',
+>> -               filters=3D[iotests.filter_testfiles],
+>> +               filters=3D[iotests.filter_qmp_testfiles],
+>>                  driver=3D'file', filename=3Ddisk_path,
+>>                  node_name=3D'imgfile')
+>>  =20
+>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotest=
+s.py
+>> index 55fb60e039..812302538d 100644
+>> --- a/tests/qemu-iotests/iotests.py
+>> +++ b/tests/qemu-iotests/iotests.py
+>> @@ -246,10 +246,29 @@ def filter_qmp_event(event):
+>>           event['timestamp']['microseconds'] =3D 'USECS'
+>>       return event
+>>  =20
+>> +def filter_qmp(qmsg, filter_fn):
+>> +    '''Given a string filter, filter a QMP object's values.
+>> +    filter_fn takes a (key, value) pair.'''
+>> +    for key in qmsg:
+>> +        if isinstance(qmsg[key], list):
+>> +            qmsg[key] =3D [filter_qmp(atom, filter_fn) for atom in qm=
+sg[key]]
+>> +        elif isinstance(qmsg[key], dict):
+>> +            qmsg[key] =3D filter_qmp(qmsg[key], filter_fn)
+>> +        else:
+>> +            qmsg[key] =3D filter_fn(key, qmsg[key])
+>> +    return qmsg
+>> +
+>>   def filter_testfiles(msg):
+>>       prefix =3D os.path.join(test_dir, "%s-" % (os.getpid()))
+>>       return msg.replace(prefix, 'TEST_DIR/PID-')
+>>  =20
+>> +def filter_qmp_testfiles(qmsg):
+>> +    def _filter(key, value):
+>> +        if key =3D=3D 'filename' or key =3D=3D 'backing-file':
+>> +            return filter_testfiles(value)
+>> +        return value
+>> +    return filter_qmp(qmsg, _filter)
+>> +
+>>   def filter_generated_node_ids(msg):
+>>       return re.sub("#block[0-9]+", "NODE_NAME", msg)
+>>  =20
+>> @@ -462,10 +481,9 @@ class VM(qtest.QEMUQtestMachine):
+>>       def qmp_log(self, cmd, filters=3D[], **kwargs):
+>>           full_cmd =3D OrderedDict({"execute": cmd,
+>>                                   "arguments": ordered_kwargs(kwargs)}=
+)
+>> -        logmsg =3D json.dumps(full_cmd)
+>> -        log(logmsg, filters)
+>> +        log(full_cmd, filters)
+>>           result =3D self.qmp(cmd, **kwargs)
+>> -        log(json.dumps(result, sort_keys=3DTrue), filters)
+>> +        log(result, filters)
+>>           return result
+>>  =20
+>>       def run_job(self, job, auto_finalize=3DTrue, auto_dismiss=3DFals=
+e):
+>>
+>=20
+>=20
+
+--=20
+=E2=80=94js
