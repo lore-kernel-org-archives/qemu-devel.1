@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gZYxO-0007za-Qj
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 05:20:08 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gZYyj-0000HK-QW
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 05:21:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gZYxN-0003ud-LO
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 05:20:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52030)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gZYxN-0003tY-D2
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 05:20:01 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 50CB43DE04
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 10:19:59 +0000 (UTC)
-Date: Wed, 19 Dec 2018 11:19:57 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181219101957.yonihjoa2a5crpr6@sirius.home.kraxel.org>
-References: <20181218142629.15943-1-berrange@redhat.com>
-	<20181218142629.15943-2-berrange@redhat.com>
-	<20181219072023.2hbaoqrfp6r2ihog@sirius.home.kraxel.org>
-	<20181219100325.GC20465@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gZYyh-0004wb-Qw
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 05:21:25 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 19 Dec 2018 10:20:29 +0000
+Message-ID: <fe80addc-0e37-a453-b9e1-5e78b559a093@virtuozzo.com>
+References: <20181219015230.18652-1-jsnow@redhat.com>
+	<20181219015230.18652-2-jsnow@redhat.com>
+In-Reply-To: <20181219015230.18652-2-jsnow@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D4AC2FD7834E6A4081C35EB8FD0C29DB@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181219100325.GC20465@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] ui: install logo icons to
- $prefix/share/icons
+Subject: Re: [Qemu-devel] [PATCH v4 1/5] iotests: add qmp recursive sorting
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,37 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-  Hi,
-
-> > How did you create the png files?
-> > Can you drop a script or Makefile for that into the ui/icons directory?
-> 
-> I used GIMP so that it created high quality antialiased pngs.
-
-Ok, so that'll be hardly scriptable.
-A short README will do then I guess.
-
-> > Should we commit them to git, or generate at build time?
-> > Is the tool used something we can expect to be installed?
-> 
-> I tried using ImageMagick to convert SVG to PNG but the results
-> were really poor compared to GIMP - very fuzzy. Running with
-> -verbose I can see it is invoking inkscape to atually do the
-> conversion, and it tells inkscape to export a small image which
-> it then resizes, hence the quality loss.
-
-Tried to call inkscape directly?
-Having something scriptable would be nice.
-But I'm fine with a README saying gimp gives good results too.
-
-> The icons are small enough that we shouldn't really worry about
-> having pre-rendered icons in GIT IMHO. They're not ever going to
-> change unless we replace our logo again.
-
-And inkscape as package build dependency wouldn't be nice either.
-
-cheers,
-  Gerd
+MTkuMTIuMjAxOCA0OjUyLCBKb2huIFNub3cgd3JvdGU6DQo+IFB5dGhvbiBiZWZvcmUgMy42IGRv
+ZXMgbm90IHNvcnQga3dhcmdzIGJ5IGRlZmF1bHQuDQo+IElmIHdlIHdhbnQgdG8gcHJpbnQgb3V0
+IHByZXR0eS1wcmludGVkIFFNUCBvYmplY3RzIHdoaWxlDQo+IHByZXNlcnZpbmcgdGhlICJleGVj
+IiA+ICJhcmd1bWVudHMiIG9yZGVyaW5nLCB3ZSBuZWVkIGEgY3VzdG9tIHNvcnQuDQo+IA0KPiBX
+ZSBjYW4gYWNjb21wbGlzaCB0aGlzIGJ5IHNvcnRpbmcgKiprd2FyZ3MgaW50byBhbiBPcmRlcmVk
+RGljdCwNCj4gd2hpY2ggZG9lcyBwcmVzZXJ2ZSBhZGRpdGlvbiBvcmRlci4NCj4gLS0tDQo+ICAg
+dGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHkgfCAyMSArKysrKysrKysrKysrKysrKy0tLS0N
+Cj4gICAxIGZpbGUgY2hhbmdlZCwgMTcgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkNCj4g
+DQo+IGRpZmYgLS1naXQgYS90ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weSBiL3Rlc3RzL3Fl
+bXUtaW90ZXN0cy9pb3Rlc3RzLnB5DQo+IGluZGV4IDk1OTU0MjlmZWEuLjlhZWMwM2M3YTMgMTAw
+NjQ0DQo+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5DQo+ICsrKyBiL3Rlc3Rz
+L3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5DQo+IEBAIC0zMCw2ICszMCw3IEBAIGltcG9ydCBzaWdu
+YWwNCj4gICBpbXBvcnQgbG9nZ2luZw0KPiAgIGltcG9ydCBhdGV4aXQNCj4gICBpbXBvcnQgaW8N
+Cj4gK2Zyb20gY29sbGVjdGlvbnMgaW1wb3J0IE9yZGVyZWREaWN0DQo+ICAgDQo+ICAgc3lzLnBh
+dGguYXBwZW5kKG9zLnBhdGguam9pbihvcy5wYXRoLmRpcm5hbWUoX19maWxlX18pLCAnLi4nLCAn
+Li4nLCAnc2NyaXB0cycpKQ0KPiAgIGltcG9ydCBxdGVzdA0KPiBAQCAtNzUsNiArNzYsMTYgQEAg
+ZGVmIHFlbXVfaW1nKCphcmdzKToNCj4gICAgICAgICAgIHN5cy5zdGRlcnIud3JpdGUoJ3FlbXUt
+aW1nIHJlY2VpdmVkIHNpZ25hbCAlaTogJXNcbicgJSAoLWV4aXRjb2RlLCAnICcuam9pbihxZW11
+X2ltZ19hcmdzICsgbGlzdChhcmdzKSkpKQ0KPiAgICAgICByZXR1cm4gZXhpdGNvZGUNCj4gICAN
+Cj4gK2RlZiBvcmRlcmVkX2t3YXJncyhrd2FyZ3MpOg0KPiArICAgICMga3dhcmdzIHByaW9yIHRv
+IDMuNiBhcmUgbm90IG9yZGVyZWQsIHNvOg0KPiArICAgIG9kID0gT3JkZXJlZERpY3QoKQ0KPiAr
+ICAgIGZvciBrIGluIHNvcnRlZChrd2FyZ3Mua2V5cygpKToNCg0KeW91IGNhbiB1c2UgZm9yIGss
+IHYgaW4gc29ydGVkKGt3YXJncy5pdGVtcygpKToNCmFuZCB1c2UgdGhlbiB2IGluc3RlYWQgb2Yg
+a3dhcmdzW2tdDQoNCj4gKyAgICAgICAgaWYgaXNpbnN0YW5jZShrd2FyZ3Nba10sIGRpY3QpOg0K
+PiArICAgICAgICAgICAgb2Rba10gPSBvcmRlcmVkX2t3YXJncyhrd2FyZ3Nba10pDQo+ICsgICAg
+ICAgIGVsc2U6DQo+ICsgICAgICAgICAgICBvZFtrXSA9IGt3YXJnc1trXQ0KPiArICAgIHJldHVy
+biBvZA0KPiArDQo+ICAgZGVmIHFlbXVfaW1nX2NyZWF0ZSgqYXJncyk6DQo+ICAgICAgIGFyZ3Mg
+PSBsaXN0KGFyZ3MpDQo+ICAgDQo+IEBAIC0yNTcsOCArMjY4LDkgQEAgZGVmIGZpbHRlcl9pbWdf
+aW5mbyhvdXRwdXQsIGZpbGVuYW1lKToNCj4gICBkZWYgbG9nKG1zZywgZmlsdGVycz1bXSk6DQo+
+ICAgICAgIGZvciBmbHQgaW4gZmlsdGVyczoNCj4gICAgICAgICAgIG1zZyA9IGZsdChtc2cpDQoN
+CkkgdGhpbmsgdGhhdCB0cnlpbmcgdG8gYXBwbHkgdGV4dCBmaWx0ZXJzIHRvIG9iamVjdCBzaG91
+bGQgYmUgZml4ZWQgZmlyc3QuDQoNCj4gLSAgICBpZiB0eXBlKG1zZykgaXMgZGljdCBvciB0eXBl
+KG1zZykgaXMgbGlzdDoNCj4gLSAgICAgICAgcHJpbnQoanNvbi5kdW1wcyhtc2csIHNvcnRfa2V5
+cz1UcnVlKSkNCj4gKyAgICBpZiBpc2luc3RhbmNlKG1zZywgZGljdCkgb3IgaXNpbnN0YW5jZSht
+c2csIGxpc3QpOg0KPiArICAgICAgICBzb3J0X2tleXMgPSBub3QgaXNpbnN0YW5jZShtc2csIE9y
+ZGVyZWREaWN0KQ0KPiArICAgICAgICBwcmludChqc29uLmR1bXBzKG1zZywgc29ydF9rZXlzPXNv
+cnRfa2V5cykpDQo+ICAgICAgIGVsc2U6DQo+ICAgICAgICAgICBwcmludChtc2cpDQo+ICAgDQo+
+IEBAIC00NDgsOCArNDYwLDkgQEAgY2xhc3MgVk0ocXRlc3QuUUVNVVF0ZXN0TWFjaGluZSk6DQo+
+ICAgICAgICAgICByZXR1cm4gcmVzdWx0DQo+ICAgDQo+ICAgICAgIGRlZiBxbXBfbG9nKHNlbGYs
+IGNtZCwgZmlsdGVycz1bZmlsdGVyX3Rlc3RmaWxlc10sICoqa3dhcmdzKToNCj4gLSAgICAgICAg
+bG9nbXNnID0gJ3siZXhlY3V0ZSI6ICIlcyIsICJhcmd1bWVudHMiOiAlc30nICUgXA0KPiAtICAg
+ICAgICAgICAgKGNtZCwganNvbi5kdW1wcyhrd2FyZ3MsIHNvcnRfa2V5cz1UcnVlKSkNCj4gKyAg
+ICAgICAgZnVsbF9jbWQgPSBPcmRlcmVkRGljdCh7ImV4ZWN1dGUiOiBjbWQsDQo+ICsgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICJhcmd1bWVudHMiOiBvcmRlcmVkX2t3YXJncyhrd2Fy
+Z3MpfSkNCg0Kbm8sIHlvdSBjYW4ndCB1c2UgZGljdCBhcyBhIHBhcmFtZXRlciB0byBjb25zdHJ1
+Y3RvciwgYXMgZGljdCBpcyBub3Qgb3JkZXJlZCwNCnVzZSB0dXBsZSBvZiB0dXBsZXMsIGxpa2Ug
+T3JkZXJlZERpY3QoKCgnZXhlY3V0ZSc6IGNtZCksICgnZXhlY3V0ZSc6IC4uLikpKQ0KDQoNCg0K
+PiArICAgICAgICBsb2dtc2cgPSBqc29uLmR1bXBzKGZ1bGxfY21kKQ0KPiAgICAgICAgICAgbG9n
+KGxvZ21zZywgZmlsdGVycykNCg0KYW5kIEkgcHJlZmVyZSBmaXhpbmcgdGhlIHRoaW5nLCB0aGF0
+IHdlIGRvIGpzb24uZHVtcHMgYm90aCBpbiBsb2coKSBhbmQgcW1wX2xvZygpIGJlZm9yZQ0KdGhp
+cyBwYXRjaC4NCg0KQWxzbzogc28sIHdlIG1vdmUgYWxsIHFtcF9sb2cgY2FsbGVycyB0byBuZXcg
+bG9naWMgKHRocm91Z2ggc29ydGluZyBieSBoYW5kIHdpdGggb3JkZXJlZF9rd2FyZ3MpLA0KYW5k
+IGl0IHdvcmtzPyBUaGVuLCBtYXliZSwgbW92ZSBhbGwgbG9nIGNhbGxlcnMgdG8gbmV3IGxvZ2lj
+LCBhbmQgZ2V0IHJpZCBvZiBqc29uLmR1bXBzIGF0IGFsbCwNCnRvIGhhdmUgb25lIHBhdGggaW5z
+dGVhZCBvZiB0d28/DQoNCj4gICAgICAgICAgIHJlc3VsdCA9IHNlbGYucW1wKGNtZCwgKiprd2Fy
+Z3MpDQo+ICAgICAgICAgICBsb2coanNvbi5kdW1wcyhyZXN1bHQsIHNvcnRfa2V5cz1UcnVlKSwg
+ZmlsdGVycykNCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
