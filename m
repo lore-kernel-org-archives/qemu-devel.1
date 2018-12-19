@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZWbn-0001yn-76
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:41 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gZWbv-00026M-7b
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZWbj-0005tM-Rk
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:35 -0500
-Date: Wed, 19 Dec 2018 17:32:01 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gZWbn-0005zT-S0
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:40 -0500
+Date: Wed, 19 Dec 2018 17:39:40 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181219063201.GP30570@umbus.fritz.box>
+Message-ID: <20181219063940.GY30570@umbus.fritz.box>
 References: <20181218063911.2112-1-richard.henderson@linaro.org>
-	<20181218063911.2112-21-richard.henderson@linaro.org>
+	<20181218063911.2112-30-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="b5sSX5qSQrSInIHt"
+	protocol="application/pgp-signature"; boundary="npbjE3dh3wBH6WIP"
 Content-Disposition: inline
-In-Reply-To: <20181218063911.2112-21-richard.henderson@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 20/34] target/ppc: convert vsplt[bhw] to
- use vector operations
+In-Reply-To: <20181218063911.2112-30-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 29/34] target/ppc: Add helper_mfvscr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,149 +28,106 @@ To: Richard Henderson <richard.henderson@linaro.org>
 Cc: qemu-devel@nongnu.org, mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org
 
 
---b5sSX5qSQrSInIHt
+--npbjE3dh3wBH6WIP
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 17, 2018 at 10:38:57PM -0800, Richard Henderson wrote:
+On Mon, Dec 17, 2018 at 10:39:06PM -0800, Richard Henderson wrote:
+> This is required before changing the representation of the register.
+>=20
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  target/ppc/helper.h                 |  3 --
->  target/ppc/int_helper.c             | 24 ---------------
->  target/ppc/translate/vmx-impl.inc.c | 45 +++++++++++++++++------------
->  3 files changed, 26 insertions(+), 46 deletions(-)
+>  target/ppc/helper.h                 | 1 +
+>  target/ppc/arch_dump.c              | 3 ++-
+>  target/ppc/int_helper.c             | 5 +++++
+>  target/ppc/translate/vmx-impl.inc.c | 2 +-
+>  target/ppc/translate_init.inc.c     | 2 +-
+>  5 files changed, 10 insertions(+), 3 deletions(-)
 >=20
 > diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-> index 2aa60e5d36..069daa9883 100644
+> index b3ffe28103..7dbb08b9dd 100644
 > --- a/target/ppc/helper.h
 > +++ b/target/ppc/helper.h
-> @@ -246,9 +246,6 @@ DEF_HELPER_3(vrld, void, avr, avr, avr)
->  DEF_HELPER_3(vsl, void, avr, avr, avr)
->  DEF_HELPER_3(vsr, void, avr, avr, avr)
->  DEF_HELPER_4(vsldoi, void, avr, avr, avr, i32)
-> -DEF_HELPER_3(vspltb, void, avr, avr, i32)
-> -DEF_HELPER_3(vsplth, void, avr, avr, i32)
-> -DEF_HELPER_3(vspltw, void, avr, avr, i32)
->  DEF_HELPER_3(vextractub, void, avr, avr, i32)
->  DEF_HELPER_3(vextractuh, void, avr, avr, i32)
->  DEF_HELPER_3(vextractuw, void, avr, avr, i32)
-> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-> index e44c0d90ee..3bf0fdb6c5 100644
-> --- a/target/ppc/int_helper.c
-> +++ b/target/ppc/int_helper.c
-> @@ -1918,30 +1918,6 @@ void helper_vslo(ppc_avr_t *r, ppc_avr_t *a, ppc_a=
-vr_t *b)
->  #endif
+> @@ -295,6 +295,7 @@ DEF_HELPER_5(vmsumshm, void, env, avr, avr, avr, avr)
+>  DEF_HELPER_5(vmsumshs, void, env, avr, avr, avr, avr)
+>  DEF_HELPER_4(vmladduhm, void, avr, avr, avr, avr)
+>  DEF_HELPER_FLAGS_2(mtvscr, TCG_CALL_NO_RWG, void, env, i32)
+> +DEF_HELPER_FLAGS_1(mfvscr, TCG_CALL_NO_RWG, i32, env)
+>  DEF_HELPER_3(lvebx, void, env, avr, tl)
+>  DEF_HELPER_3(lvehx, void, env, avr, tl)
+>  DEF_HELPER_3(lvewx, void, env, avr, tl)
+> diff --git a/target/ppc/arch_dump.c b/target/ppc/arch_dump.c
+> index c272d0d3d4..f753798789 100644
+> --- a/target/ppc/arch_dump.c
+> +++ b/target/ppc/arch_dump.c
+> @@ -17,6 +17,7 @@
+>  #include "elf.h"
+>  #include "sysemu/dump.h"
+>  #include "sysemu/kvm.h"
+> +#include "exec/helper-proto.h"
+> =20
+>  #ifdef TARGET_PPC64
+>  #define ELFCLASS ELFCLASS64
+> @@ -173,7 +174,7 @@ static void ppc_write_elf_vmxregset(NoteFuncArg *arg,=
+ PowerPCCPU *cpu)
+>              vmxregset->avr[i].u64[1] =3D cpu->env.vsr[32 + i].u64[1];
+>          }
+>      }
+> -    vmxregset->vscr.u32[3] =3D cpu_to_dump32(s, cpu->env.vscr);
+> +    vmxregset->vscr.u32[3] =3D cpu_to_dump32(s, helper_mfvscr(&cpu->env)=
+);
 >  }
 > =20
-> -/* Experimental testing shows that hardware masks the immediate.  */
-> -#define _SPLAT_MASKED(element) (splat & (ARRAY_SIZE(r->element) - 1))
-> -#if defined(HOST_WORDS_BIGENDIAN)
-> -#define SPLAT_ELEMENT(element) _SPLAT_MASKED(element)
-> -#else
-> -#define SPLAT_ELEMENT(element)                                  \
-> -    (ARRAY_SIZE(r->element) - 1 - _SPLAT_MASKED(element))
-> -#endif
-> -#define VSPLT(suffix, element)                                          \
-> -    void helper_vsplt##suffix(ppc_avr_t *r, ppc_avr_t *b, uint32_t splat=
-) \
-> -    {                                                                   \
-> -        uint32_t s =3D b->element[SPLAT_ELEMENT(element)];              =
-  \
-> -        int i;                                                          \
-> -                                                                        \
-> -        for (i =3D 0; i < ARRAY_SIZE(r->element); i++) {                =
-  \
-> -            r->element[i] =3D s;                                        =
-  \
-> -        }                                                               \
-> -    }
-> -VSPLT(b, u8)
-> -VSPLT(h, u16)
-> -VSPLT(w, u32)
-> -#undef VSPLT
-> -#undef SPLAT_ELEMENT
-> -#undef _SPLAT_MASKED
->  #if defined(HOST_WORDS_BIGENDIAN)
->  #define VINSERT(suffix, element)                                        =
-    \
->      void helper_vinsert##suffix(ppc_avr_t *r, ppc_avr_t *b, uint32_t ind=
-ex) \
-> diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/v=
-mx-impl.inc.c
-> index be638cdb1a..529ae0e5f5 100644
-> --- a/target/ppc/translate/vmx-impl.inc.c
-> +++ b/target/ppc/translate/vmx-impl.inc.c
-> @@ -814,24 +814,31 @@ GEN_VXFORM_NOA(vprtybw, 1, 24);
->  GEN_VXFORM_NOA(vprtybd, 1, 24);
->  GEN_VXFORM_NOA(vprtybq, 1, 24);
+>  static void ppc_write_elf_vsxregset(NoteFuncArg *arg, PowerPCCPU *cpu)
+> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+> index 0443f33cd2..75201bbba6 100644
+> --- a/target/ppc/int_helper.c
+> +++ b/target/ppc/int_helper.c
+> @@ -475,6 +475,11 @@ void helper_mtvscr(CPUPPCState *env, uint32_t vscr)
+>      set_flush_to_zero((vscr >> VSCR_NJ) & 1, &env->vec_status);
+>  }
 > =20
-> -#define GEN_VXFORM_UIMM(name, opc2, opc3)                               \
-> -static void glue(gen_, name)(DisasContext *ctx)                         =
-        \
-> -    {                                                                   \
-> -        TCGv_ptr rb, rd;                                                \
-> -        TCGv_i32 uimm;                                                  \
-> -        if (unlikely(!ctx->altivec_enabled)) {                          \
-> -            gen_exception(ctx, POWERPC_EXCP_VPU);                       \
-> -            return;                                                     \
-> -        }                                                               \
-> -        uimm =3D tcg_const_i32(UIMM5(ctx->opcode));                     =
-  \
-> -        rb =3D gen_avr_ptr(rB(ctx->opcode));                            =
-  \
-> -        rd =3D gen_avr_ptr(rD(ctx->opcode));                            =
-  \
-> -        gen_helper_##name (rd, rb, uimm);                               \
-> -        tcg_temp_free_i32(uimm);                                        \
-> -        tcg_temp_free_ptr(rb);                                          \
-> -        tcg_temp_free_ptr(rd);                                          \
-> +static void gen_vsplt(DisasContext *ctx, int vece)
+> +uint32_t helper_mfvscr(CPUPPCState *env)
 > +{
-> +    int uimm, dofs, bofs;
-> +
-> +    if (unlikely(!ctx->altivec_enabled)) {
-> +        gen_exception(ctx, POWERPC_EXCP_VPU);
-> +        return;
->      }
-> =20
-> +    uimm =3D UIMM5(ctx->opcode);
-> +    bofs =3D avr64_offset(rB(ctx->opcode), true);
-> +    dofs =3D avr64_offset(rD(ctx->opcode), true);
-> +
-> +    /* Experimental testing shows that hardware masks the immediate.  */
-> +    bofs +=3D (uimm << vece) & 15;
-> +#ifndef HOST_WORDS_BIGENDIAN
-> +    bofs ^=3D 15;
-> +#endif
-> +
-> +    tcg_gen_gvec_dup_mem(vece, dofs, bofs, 16, 16);
+> +    return env->vscr;
 > +}
 > +
-> +#define GEN_VXFORM_VSPLT(name, vece, opc2, opc3) \
-> +static void glue(gen_, name)(DisasContext *ctx) { gen_vsplt(ctx, vece); }
-> +
->  #define GEN_VXFORM_UIMM_ENV(name, opc2, opc3)                           \
->  static void glue(gen_, name)(DisasContext *ctx)                         \
->      {                                                                   \
-> @@ -873,9 +880,9 @@ static void glue(gen_, name)(DisasContext *ctx)      =
-                   \
->          tcg_temp_free_ptr(rd);                                          \
+>  void helper_vaddcuw(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
+>  {
+>      int i;
+> diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/v=
+mx-impl.inc.c
+> index ab6da3aa55..1c0c461241 100644
+> --- a/target/ppc/translate/vmx-impl.inc.c
+> +++ b/target/ppc/translate/vmx-impl.inc.c
+> @@ -187,7 +187,7 @@ static void gen_mfvscr(DisasContext *ctx)
+>      tcg_gen_movi_i64(avr, 0);
+>      set_avr64(rD(ctx->opcode), avr, true);
+>      t =3D tcg_temp_new_i32();
+> -    tcg_gen_ld_i32(t, cpu_env, offsetof(CPUPPCState, vscr));
+> +    gen_helper_mfvscr(t, cpu_env);
+>      tcg_gen_extu_i32_i64(avr, t);
+>      set_avr64(rD(ctx->opcode), avr, false);
+>      tcg_temp_free_i32(t);
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+> index 292b1df700..353285c6bd 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -9527,7 +9527,7 @@ static int gdb_get_avr_reg(CPUPPCState *env, uint8_=
+t *mem_buf, int n)
+>          return 16;
 >      }
-> =20
-> -GEN_VXFORM_UIMM(vspltb, 6, 8);
-> -GEN_VXFORM_UIMM(vsplth, 6, 9);
-> -GEN_VXFORM_UIMM(vspltw, 6, 10);
-> +GEN_VXFORM_VSPLT(vspltb, MO_8, 6, 8);
-> +GEN_VXFORM_VSPLT(vsplth, MO_16, 6, 9);
-> +GEN_VXFORM_VSPLT(vspltw, MO_32, 6, 10);
->  GEN_VXFORM_UIMM_SPLAT(vextractub, 6, 8, 15);
->  GEN_VXFORM_UIMM_SPLAT(vextractuh, 6, 9, 14);
->  GEN_VXFORM_UIMM_SPLAT(vextractuw, 6, 10, 12);
+>      if (n =3D=3D 32) {
+> -        stl_p(mem_buf, env->vscr);
+> +        stl_p(mem_buf, helper_mfvscr(env));
+>          ppc_maybe_bswap_register(env, mem_buf, 4);
+>          return 4;
+>      }
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -179,24 +135,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---b5sSX5qSQrSInIHt
+--npbjE3dh3wBH6WIP
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwZ5eEACgkQbDjKyiDZ
-s5LHzBAA5OCjvi/UuAi4cu9harvWEQZgb7vQQ4oF699QhQ3HRFBZ/bkSChz0FNZ0
-ItLdciZ87QuydhTYjO2X8S4TtJfNEaa0Bccu9QMlnzuWvxAU674O/n6oyAOHR+7x
-IFiKY6gPgJwZ92aTzlM8NIhZEr602xnXQJwoSu1igZJuVUMILczzZnQY8A5zP6X8
-StOoJcS6p9yGsKLGQNH7572XYuOOFzte5skKeeDUZG45ObINQ8YYOHYgkg7Xx2V8
-GZGqcb5yhlYf4nfKIpEOMoZ/v84ClVv3XM+Qz8lmueN3t998k8xuA2VS2WIXUhnJ
-erHAQ5BFSPOhTiI8gXrVu53bQlgguWWUiqTy+FlCSAlGPVuEIwy+75c1RDI9Effp
-Ne+RQIEI60vYKQG8E16giy4eOcxrK1l0kucFklpCL8BPOoeSTsG6ENpM2RDW7ezN
-xY9aNCpURBUEFP/HTsmRoPdiA6s9NNxKlVG9cAWv92Lc8w3QctoKTISaZB7FPZPT
-EcYofbRqnZQuPks9HCiqcVix6ihLdv4uZFplBNgfJjfChf4zFTo3SeF9033nRgMn
-3mY+3kEWXma8F6yMD/FEASfjCm7zaVDACQn+5SIVIjdRfQBwOobHvxWjqzzgYv1C
-ZhwjnuNPBdCCdkKW4zHzrdtkJ1P3FJ0Lwz4kApwm9dNLlXgHxwo=
-=9ZN7
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwZ56sACgkQbDjKyiDZ
+s5LpyBAAhkWTJVbRjllywZRa8WxKWRAtaBhSiOw4RqNQ48ycFXLggQgbogist6k4
+sFfI6YNe4z347WJLApAdYGliwB530QkgVsNZ3qFnp7QwQ+L6qbpGhoDIs/D/xbfV
+yxmY0lwQ1NwjQdiNTpxLTAPQV0F/Te8rX500+cTuU5qwOXrbcL1vCirKZ7StDBMs
+OHP/Ckfym28VDIqKDWnk7u+/QA8addQOsE5ETcJJYTojzRnyWhAfmS/o2ccLSA+E
+538sGJb1Ms+rLixq4sdN92LmJ8EHBHfnPNBgmhLTiNUBELNP5zR1eZhfALEc0Yu4
+491YyVRsPHoCEUtgpaw8N1ocOL+rEFQZPfrj7cDoB99Vm8flZPjrkqmL3rVt2lh8
+KvLJWus2AfBmviA0FZlkQjVqXXpAJLOcMumvxKZ3JIXj5eAs7LZxPz2LMeIeq/4r
+F7auMBNG0ER/z4Db0sNMFJL65a2xyZvh67LfVlXn0I2YZsxlbrWzV3UZQAL2rQGz
+fALW8vaOHJVll92OG1bgRoVf7EsUkA5sMGb7nYSmrmP6QZXslzGapCDQUhxLAGrh
+dW45Fq484rrMKVb38onbrGOD5jspPKLysS5nSSrxpzLv9bOp+3Ml0l2H00qx1VMf
+ocK8apqnbFz4lMhY7vwjHMMRe8ZVv5Ge/vKxl9hRbIJibvnXtpw=
+=N6om
 -----END PGP SIGNATURE-----
 
---b5sSX5qSQrSInIHt--
+--npbjE3dh3wBH6WIP--
