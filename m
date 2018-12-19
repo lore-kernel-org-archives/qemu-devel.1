@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gZhke-0004vR-8O
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:43:29 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gZhos-00079E-4c
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:47:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gZhkc-0003EA-VE
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:43:28 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:37873)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gZhkc-0003DS-Nv
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:43:26 -0500
-Received: by mail-oi1-x243.google.com with SMTP id y23so2597643oia.4
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 11:43:26 -0800 (PST)
+	(envelope-from <jsnow@redhat.com>) id 1gZhor-0006jg-23
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:47:50 -0500
+References: <20181219015230.18652-1-jsnow@redhat.com>
+	<20181219015230.18652-2-jsnow@redhat.com>
+	<b92a888e-1223-2966-ae83-b0f014171129@redhat.com>
+	<e7aca710-fb9b-9c32-a37d-8122a4c5d913@redhat.com>
+	<c1742689-f3f0-b464-8b8a-13ad77016e0f@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <4f58832c-ef2b-9fca-656d-65ca9c2a49bc@redhat.com>
+Date: Wed, 19 Dec 2018 14:47:40 -0500
 MIME-Version: 1.0
-References: <20181218230442.27887-1-samuel.thibault@ens-lyon.org>
-In-Reply-To: <20181218230442.27887-1-samuel.thibault@ens-lyon.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 19 Dec 2018 19:43:14 +0000
-Message-ID: <CAFEAcA89ZxboWWDn3iDh_8u-ejMKjhWmmA_ckLMH7si+yU_icw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/64] slirp updates
+In-Reply-To: <c1742689-f3f0-b464-8b8a-13ad77016e0f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 1/5] iotests: add qmp recursive sorting
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,109 +28,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Tue, 18 Dec 2018 at 23:04, Samuel Thibault
-<samuel.thibault@ens-lyon.org> wrote:
->
-> The following changes since commit e85c577158a2e8e252414959da9ef15c12eec63d:
->
->   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2018-12-17' into staging (2018-12-18 14:31:06 +0000)
->
-> are available in the Git repository at:
->
->   https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
->
-> for you to fetch changes up to 4c2b5ca1b5dd42bb96e954db7a46ebe39fd24620:
->
->   slirp: Mark debugging calls as unlikely (2018-12-18 23:44:35 +0100)
->
-> ----------------------------------------------------------------
-> Abstract away slirp toward a libslirp
 
-This fails to compile (all platforms):
 
-For the windows builds, a compile failure in slirp.c:
-/home/petmay01/qemu-for-merges/net/slirp.c: In function 'net_slirp_init':
-/home/petmay01/qemu-for-merges/net/slirp.c:302:10: error: implicit
-declaration of function 'inet_pton'
-[-Werror=implicit-function-declaration]
-     if (!inet_pton(AF_INET6, vprefix6, &ip6_prefix)) {
-          ^
-/home/petmay01/qemu-for-merges/net/slirp.c:302:5: error: nested extern
-declaration of 'inet_pton' [-Werror=nested-externs]
-     if (!inet_pton(AF_INET6, vprefix6, &ip6_prefix)) {
-     ^
+On 12/19/18 2:19 PM, Eric Blake wrote:
+> On 12/19/18 12:57 PM, John Snow wrote:
+>>
+>>
+>> On 12/19/18 1:52 PM, Eric Blake wrote:
+>>> On 12/18/18 7:52 PM, John Snow wrote:
+>>>> Python before 3.6 does not sort kwargs by default.
+>>>> If we want to print out pretty-printed QMP objects while
+>>>> preserving the "exec" > "arguments" ordering, we need a custom sort.
+>>>
+>>> Naive question - why do we need the sorting? Is it so that the output=
+ is
+>>> deterministic?=C2=A0 Surely it can't be because the ordering otherwis=
+e makes
+>>> a difference to execution.
+>>>
+>>
+>> Yeah, it's because dicts are unordered and prior to 3.6 they may shuff=
+le
+>> around arbitrarily based on internal hashes.
+>>
+>> kwargs in particular are unordered- the order we send over the wire ma=
+y
+>> or may not reflect the order the test author wrote in their iotest.
+>=20
+> Which shouldn't matter to what QMP executes, but MIGHT matter in gettin=
+g
+> reproducible log output.
+>=20
+>>
+>> Therefore, it's a way to get consistent ordering.
+>>
+>> Now, we CAN just rely on sort_keys=3DTrue to be done with it, however,
+>> this puts arguments before execute, and it's less nice to read -- and
+>> I'd have to change a LOT of test output.
+>=20
+> Okay, I'm finally seeing it; the existing code has:
+>=20
+> =C2=A0=C2=A0=C2=A0 def qmp_log(self, cmd, filters=3D[filter_testfiles],=
+ **kwargs):
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 logmsg =3D '{"execute": "%s"=
+, "arguments": %s}' % \
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (cmd=
+, json.dumps(kwargs, sort_keys=3DTrue))
+>=20
+> where our log is outputting a message that resembles a dict where
+> "execute": is the first key, and the user's input dict is then sorted
+> (the top-most output of {} is unsorted, but the nested ones are sorted,
+> and possibly in a different order than the user typed them, but at leas=
+t
+> deterministic). But when you change to the user passing a full QMP
+> command (rather than just a dict for the arguments of the QMP command),
+> using sort_keys=3DTrue will sort everything _including_ putting
+> "arguments" before "execute" (which is deterministic but changes log
+> output); while using sort_keys=3DFalse will not affect output in newer
+> python where kwargs remains ordered, but risks nondeterministic output
+> on older python.
+>=20
 
-On Linux (x86-64 and other host archs) a link failure:
+Yes, and pretty-printing requires the full object, otherwise it's too
+hard to manually re-indent the buffered subdict, and you have to indent
+the outer dict, and...
 
-  LINK    arm-softmmu/qemu-system-arm
-../slirp/ncsi.o: In function `ncsi_input':
-/home/petmay01/linaro/qemu-for-merges/slirp/ncsi.c:166: undefined
-reference to `slirp_output'
-../slirp/slirp.o: In function `arp_input':
-/home/petmay01/linaro/qemu-for-merges/slirp/slirp.c:835: undefined
-reference to `slirp_output'
-../slirp/slirp.o: In function `if_encap4':
-/home/petmay01/linaro/qemu-for-merges/slirp/slirp.c:935: undefined
-reference to `slirp_output'
-../slirp/slirp.o: In function `if_encap':
-/home/petmay01/linaro/qemu-for-merges/slirp/slirp.c:1021: undefined
-reference to `slirp_output'
-collect2: error: ld returned 1 exit status
-Makefile:199: recipe for target 'qemu-system-arm' failed
+...
 
-It also manages to provoke an internal linker error on freebsd:
+It's easier to just build the full dictionary and then pretty-print it.
 
-/usr/bin/ld: error in ../slirp/socket.o(.eh_frame); no .eh_frame_hdr
-table will be created.
-/usr/bin/ld: ../slirp/socket.o: invalid string offset 1416 >= 978 for
-section `.strtab'
-/usr/bin/ld: ../slirp/socket.o: invalid relocation type 38
-/usr/bin/ld: BFD 2.17.50 [FreeBSD] 2007-07-03 assertion fail
-/usr/src/gnu/usr.bin/binutils/libbfd/../../../../contrib/binutils/bfd/elf64-x86-
-64.c:276
-/usr/bin/ld: ../slirp/socket.o: invalid relocation type 51
-/usr/bin/ld: BFD 2.17.50 [FreeBSD] 2007-07-03 assertion fail
-/usr/src/gnu/usr.bin/binutils/libbfd/../../../../contrib/binutils/bfd/elf64-x86-64.c:276
-/usr/bin/ld: ../slirp/socket.o: invalid relocation type 57
-[enormous long list of similar messages]
-/usr/bin/ld: ../slirp/socket.o: invalid relocation type 8248
-/usr/bin/ld: BFD 2.17.50 [FreeBSD] 2007-07-03 assertion fail
-/usr/src/gnu/usr.bin/binutils/libbfd/../../../../contrib/binutils/bfd/elf64-x86-
-64.c:276
-/usr/bin/ld: BFD 2.17.50 [FreeBSD] 2007-07-03 internal error, aborting
-at /usr/src/gnu/usr.bin/binutils/libbfd/../../../../contrib/binutils/b
-fd/reloc.c line 5288 in bfd_byte
-*bfd_generic_get_relocated_section_contents(bfd *, struct
-bfd_link_info *, struct bfd_link_order *, bfd_byte
- *, bfd_boolean, asymbol **)
+The motivation here is that pretty-printing a call to qmp_log should
+indent both outgoing and incoming because that's semantically the most
+obvious and right thing to do. Principle of least surprise.
 
-/usr/bin/ld: Please report this bug.
+>>
+>> This way keeps the order you expect to see while maintaining a strict
+>> order for the arguments. I think that's the nicest compromise until we
+>> can stipulate 3.6+ in the year 2034 where kwargs *are* strictly ordere=
+d.
+>=20
+> But kwargs strict ordering is only at the top-level, not recursive,
+> right? That is, even if you can rely on:
+>=20
+> foo(b=3D1, a=3D2)
+>=20
+> providing kwargs where 'b' always outputs before 'a', I don't see how
+> that would help:
+>=20
+> foo(b=3D{'d':3, 'c':4})
+>=20
+> not reorder the keys within 'b' without your recursive ordering.
+>=20
 
-c++: error: linker command failed with exit code 1 (use -v to see invocation)
+Well, kwargs *are* dictionaries, and both become sorted in 3.6. You can
+rely on the ordering at any level, but only in 3.6 and after.
 
-On NetBSD, a different slirp.c compiler error building the bsd-user
-target:
-In file included from ../slirp/slirp.c:31:0:
-/var/tmp/qemu-test.nLOQbq/include/hw/hw.h:6:2: error: #error Cannot
-include hw/hw.h from user emulation
- #error Cannot include hw/hw.h from user emulation
-  ^
+We cannot rely on that behavior, though, so in our current reality:
 
-On OpenBSD, a rather uninformative linker error:
-/usr/bin/ld: final link failed: Nonrepresentable section on output
-collect2: error: ld returned 1 exit status
+(1) kwargs can be arbitrarily reordered
+(2) subdictionaries in kwargs can also be arbitrarily reordered
 
-On OSX, the clang version of the same issue as Linux:
-Undefined symbols for architecture x86_64:
-  "_slirp_output", referenced from:
-      _ncsi_input in ncsi.o
-      _slirp_input in slirp.o
-      _if_encap in slirp.o
-ld: symbol(s) not found for architecture x86_64
-clang: error: linker command failed with exit code 1 (use -v to see invocation)
+And so my ordered_kwargs() function recursively orders any dictionaries
+it finds, assuming a typical JSON structure -- which will suffice for
+QMP objects.
 
-thanks
--- PMM
+In practice, it appears to correctly re-implement the behavior of
+json.dumps(..., sort_keys=3DTrue).
+
+--js
