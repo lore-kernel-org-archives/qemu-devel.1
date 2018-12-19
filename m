@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gZbd7-0003iJ-N3
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 08:11:22 -0500
+	(envelope-from <thuth@redhat.com>) id 1gZbfT-0004dg-Se
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 08:13:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gZbd0-0000XD-Rx
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 08:11:15 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 19 Dec 2018 13:11:00 +0000
-Message-ID: <f75b9dc8-c3c7-ff3e-2c20-551f764dd6a3@virtuozzo.com>
-References: <20181215135324.152629-1-eblake@redhat.com>
-	<20181215135324.152629-10-eblake@redhat.com>
-In-Reply-To: <20181215135324.152629-10-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2EA3A33F107907408B75ABFA98243300@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 09/22] nbd/client: Refactor
- nbd_receive_list()
+	(envelope-from <thuth@redhat.com>) id 1gZbfN-0002JC-4t
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 08:13:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46498)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gZbfM-0002Iv-Pz
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 08:13:37 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed, 19 Dec 2018 14:13:25 +0100
+Message-Id: <1545225205-7227-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] hw/misc/ivshmem: Remove deprecated
+ "ivshmem" legacy device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,184 +22,514 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-MTUuMTIuMjAxOCAxNjo1MywgRXJpYyBCbGFrZSB3cm90ZToNCj4gUmlnaHQgbm93LCBuYmRfcmVj
-ZWl2ZV9saXN0KCkgaXMgb25seSBjYWxsZWQgYnkNCj4gbmJkX3JlY2VpdmVfcXVlcnlfZXhwb3J0
-cygpLCB3aGljaCBpbiB0dXJuIGlzIG9ubHkgY2FsbGVkIGlmIHRoZQ0KPiBzZXJ2ZXIgbGFja3Mg
-TkJEX09QVF9HTyBidXQgaGFzIHdvcmtpbmcgb3B0aW9uIG5lZ290aWF0aW9uLCBhbmQgaXMNCj4g
-bWVyZWx5IHVzZWQgYXMgYSBxdWFsaXR5LW9mLWltcGxlbWVudGF0aW9uIHRyaWNrIHNpbmNlIHNl
-cnZlcnMNCj4gY2FuJ3QgZ2l2ZSBkZWNlbnQgZXJyb3JzIGZvciBOQkRfT1BUX0VYUE9SVF9OQU1F
-LiAgSG93ZXZlciwgc2VydmVycw0KPiB0aGF0IGxhY2sgTkJEX09QVF9HTyBhcmUgYmVjb21pbmcg
-aW5jcmVhc2luZ2x5IHJhcmUgKG5iZGtpdCB3YXMgYQ0KPiBsYXRlY29tZXIsIGluIEF1ZyAyMDE4
-LCBidXQgcWVtdSBoYXMgYmVlbiBzdWNoIGEgc2VydmVyIHNpbmNlIGNvbW1pdA0KPiBmMzc3MDhm
-NiBpbiBKdWx5IDIwMTcgYW5kIHJlbGVhc2VkIGluIDIuMTApLCBzbyBpdCBubyBsb25nZXIgbWFr
-ZXMNCj4gc2Vuc2UgdG8gbWljcm8tb3B0aW1pemUgdGhhdCBmdW5jdGlvbiBmb3IgcGVyZm9ybWFu
-Y2UuDQo+IA0KPiBGdXJ0aGVybW9yZSwgd2hlbiBkZWJ1Z2dpbmcgYSBzZXJ2ZXIncyBpbXBsZW1l
-bnRhdGlvbiwgdHJhY2luZyB0aGUNCj4gZnVsbCByZXBseSAoYm90aCBuYW1lcyBhbmQgZGVzY3Jp
-cHRpb25zKSBpcyB1c2VmdWwsIG5vdCB0byBtZW50aW9uDQo+IHRoYXQgdXBjb21pbmcgcGF0Y2hl
-cyBhZGRpbmcgJ3FlbXUtbmJkIC0tbGlzdCcgd2lsbCB3YW50IHRvIGNvbGxlY3QNCj4gdGhhdCBk
-YXRhLiAgQW5kIHdoZW4geW91IGNvbnNpZGVyIHRoYXQgYSBzZXJ2ZXIgY2FuIHNlbmQgYW4gZXhw
-b3J0DQo+IG5hbWUgdXAgdG8gdGhlIE5CRCBwcm90b2NvbCBsZW5ndGggbGltaXQgb2YgNGs7IGJ1
-dCBvdXIgY3VycmVudA0KPiBOQkRfTUFYX05BTUVfU0laRSBpcyBvbmx5IDI1Niwgd2UgY2FuJ3Qg
-dHJhY2UgYWxsIHZhbGlkIHNlcnZlcg0KPiBuYW1lcyB3aXRob3V0IG1vcmUgc3RvcmFnZSwgYnV0
-IDRrIGlzIGxhcmdlIGVub3VnaCB0aGF0IHRoZSBoZWFwDQo+IGlzIGJldHRlciB0aGFuIHRoZSBz
-dGFjayBmb3IgbG9uZyBuYW1lcy4NCj4gDQo+IFRodXMsIEknbSBjaGFuZ2luZyB0aGUgZGl2aXNp
-b24gb2YgbGFib3IsIHdpdGggbmJkX3JlY2VpdmVfbGlzdCgpDQo+IG5vdyBhbHdheXMgbWFsbG9j
-J2luZyBhIHJlc3VsdCBvbiBzdWNjZXNzICh0aGUgbWFsbG9jIGlzIGJvdW5kZWQNCj4gYnkgdGhl
-IGZhY3QgdGhhdCB3ZSByZWplY3Qgc2VydmVycyB3aXRoIGEgcmVwbHkgbGVuZ3RoIGxhcmdlcg0K
-PiB0aGFuIDMyTSksIGFuZCBtb3ZpbmcgdGhlIGNvbXBhcmlzb24gdG8gJ3dhbnRuYW1lJyB0byB0
-aGUgY2FsbGVyLg0KPiANCj4gVGhlcmUgaXMgYSBtaW5vciBjaGFuZ2UgaW4gYmVoYXZpb3Igd2hl
-cmUgYSBzZXJ2ZXIgd2l0aCAwIGV4cG9ydHMNCj4gKGFuIGltbWVkaWF0ZSBOQkRfUkVQX0FDSyBy
-ZXBseSkgaXMgbm93IG5vIGxvbmdlciBkaXN0aW5ndWlzaGVkDQo+IGZyb20gYSBzZXJ2ZXIgd2l0
-aG91dCBMSVNUIHN1cHBvcnQgKE5CRF9SRVBfRVJSX1VOU1VQKTsgdGhpcw0KPiBpbmZvcm1hdGlv
-biBjb3VsZCBiZSBwcmVzZXJ2ZWQgd2l0aCBhIGNvbXBsaWNhdGlvbiB0byB0aGUgY2FsbGluZw0K
-PiBjb250cmFjdCB0byBwcm92aWRlIGEgYml0IG1vcmUgaW5mb3JtYXRpb24sIGJ1dCBJIGRpZG4n
-dCBzZWUgdGhlDQo+IHBvaW50LiAgQWZ0ZXIgYWxsLCB0aGUgd29yc3QgdGhhdCBjYW4gaGFwcGVu
-IGlmIG91ciBndWVzcyBhdCBhDQo+IG1hdGNoIGlzIHdyb25nIGlzIHRoYXQgdGhlIGNhbGxlciB3
-aWxsIGdldCBhIGNyeXB0aWMgZGlzY29ubmVjdA0KPiB3aGVuIE5CRF9PUFRfRVhQT1JUX05BTUUg
-ZmFpbHMgKHdoaWNoIGlzIG5vIGRpZmZlcmVudCBmcm9tIHdoYXQNCj4gd291bGQgaGFwcGVuIGlm
-IHdlIGhhZCBub3QgdHJpZWQgTElTVCksIHdoaWxlIHRyZWF0aW5nIGFuIGVtcHR5DQo+IGxpc3Qg
-YXMgaW1tZWRpYXRlIGZhaWx1cmUgd291bGQgcHJldmVudCBjb25uZWN0aW5nIHRvIHJlYWxseSBv
-bGQNCj4gc2VydmVycyB0aGF0IHJlYWxseSBkaWQgbGFjayBMSVNULiAgQmVzaWRlcywgTkJEIHNl
-cnZlcnMgd2l0aCAwDQo+IGV4cG9ydHMgYXJlIHJhcmUgKHFlbXUgY2FuIGRvIGl0IHdoZW4gdXNp
-bmcgUU1QIG5iZC1zZXJ2ZXItc3RhcnQNCj4gd2l0aG91dCBuYmQtc2VydmVyLWFkZCAtIGJ1dCBx
-ZW11IHVuZGVyc3RhbmRzIE5CRF9PUFRfR08gYW5kDQo+IHRodXMgd29uJ3QgdGlja2xlIHRoaXMg
-Y2hhbmdlIGluIGJlaGF2aW9yKS4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEVyaWMgQmxha2UgPGVi
-bGFrZUByZWRoYXQuY29tPg0KPiANCj4gLS0tDQo+IHYyOiBSZXdyaXRlIGluIGEgZGlmZmVyZW50
-IG1hbm5lciAobW92ZSB0aGUgY29tcGFyaXNvbiB0byB0aGUNCj4gY2FsbGVyKQ0KPiBGaXggZnJl
-ZSB0byBnX2ZyZWUgW1ZsYWRpbWlyXQ0KPiAtLS0NCj4gICBuYmQvY2xpZW50LmMgICAgIHwgODkg
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tDQo+ICAgbmJk
-L3RyYWNlLWV2ZW50cyB8ICAxICsNCj4gICAyIGZpbGVzIGNoYW5nZWQsIDU4IGluc2VydGlvbnMo
-KyksIDMyIGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL25iZC9jbGllbnQuYyBiL25i
-ZC9jbGllbnQuYw0KPiBpbmRleCAxYTNhNjIwZmI2ZC4uMjhmNWEyODZjYmEgMTAwNjQ0DQo+IC0t
-LSBhL25iZC9jbGllbnQuYw0KPiArKysgYi9uYmQvY2xpZW50LmMNCj4gQEAgLTIzMiwxOCArMjMy
-LDI0IEBAIHN0YXRpYyBpbnQgbmJkX2hhbmRsZV9yZXBseV9lcnIoUUlPQ2hhbm5lbCAqaW9jLCBO
-QkRPcHRpb25SZXBseSAqcmVwbHksDQo+ICAgICAgIHJldHVybiByZXN1bHQ7DQo+ICAgfQ0KPiAN
-Cj4gLS8qIFByb2Nlc3MgYW5vdGhlciBwb3J0aW9uIG9mIHRoZSBOQkRfT1BUX0xJU1QgcmVwbHku
-ICBTZXQgKkBtYXRjaCBpZg0KPiAtICogdGhlIGN1cnJlbnQgcmVwbHkgbWF0Y2hlcyBAd2FudCBv
-ciBpZiB0aGUgc2VydmVyIGRvZXMgbm90IHN1cHBvcnQNCj4gLSAqIE5CRF9PUFRfTElTVCwgb3Ro
-ZXJ3aXNlIGxlYXZlIEBtYXRjaCBhbG9uZS4gIFJldHVybiAwIGlmIGl0ZXJhdGlvbg0KPiAtICog
-aXMgY29tcGxldGUsIHBvc2l0aXZlIGlmIG1vcmUgcmVwbGllcyBhcmUgZXhwZWN0ZWQsIG9yIG5l
-Z2F0aXZlDQo+IC0gKiB3aXRoIEBlcnJwIHNldCBpZiBhbiB1bnJlY292ZXJhYmxlIGVycm9yIG9j
-Y3VycmVkLiAqLw0KPiAtc3RhdGljIGludCBuYmRfcmVjZWl2ZV9saXN0KFFJT0NoYW5uZWwgKmlv
-YywgY29uc3QgY2hhciAqd2FudCwgYm9vbCAqbWF0Y2gsDQo+ICsvKiBuYmRfcmVjZWl2ZV9saXN0
-Og0KPiArICogUHJvY2VzcyBhbm90aGVyIHBvcnRpb24gb2YgdGhlIE5CRF9PUFRfTElTVCByZXBs
-eSwgcG9wdWxhdGluZyBhbnkNCj4gKyAqIG5hbWUgcmVjZWl2ZWQgaW50byAqQG5hbWUuIElmIEBk
-ZXNjcmlwdGlvbiBpcyBub24tTlVMTCwgYW5kIHRoZQ0KPiArICogc2VydmVyIHByb3ZpZGVkIGEg
-ZGVzY3JpcHRpb24sIHRoYXQgaXMgYWxzbyBwb3B1bGF0ZWQuIFRoZSBjYWxsZXINCj4gKyAqIG11
-c3QgZXZlbnR1YWxseSBjYWxsIGdfZnJlZSgpIG9uIHN1Y2Nlc3MuDQo+ICsgKiBSZXR1cm5zIDEg
-aWYgYSBuYW1lIHdhcyByZWNlaXZlZCBhbmQgaXRlcmF0aW9uIG11c3QgY29udGludWUsDQo+ICsg
-KiAgICAgICAgIDAgaWYgaXRlcmF0aW9uIGlzIGNvbXBsZXRlLA0KDQptYXliZSwgc29tZXRoaW5n
-IGxpa2U6IGlmIGl0ZXJhdGlvbiBpcyBjb21wbGV0ZSwgb3IgTkJEX09QVF9MSVNUIGlzIHVuc3Vw
-cG9ydGVkLiBAbmFtZSBhbmQNCiAgQGRlc2NyaXB0aW9uIGFyZSBub3Qgc2V0Lg0KDQooaXQncyBu
-b3Qgb2J2aW91cyB0aGluZywgdGhhdCBpdGVyYXRpb24gY29tcGxldGUgYXNzdW1lcyBubyBuZXcg
-bmFtZSByZWNlaXZlZCwgYW5kIHRoYXQgMA0Kc2VydmVzIHVuc3VwcG9ydGVkIHRvbykNCg0KPiAr
-ICogICAgICAgICAtMSB3aXRoIEBlcnJwIHNldCBpZiBhbiB1bnJlY292ZXJhYmxlIGVycm9yIG9j
-Y3VycmVkLg0KPiArICovDQo+ICtzdGF0aWMgaW50IG5iZF9yZWNlaXZlX2xpc3QoUUlPQ2hhbm5l
-bCAqaW9jLCBjaGFyICoqbmFtZSwgY2hhciAqKmRlc2NyaXB0aW9uLA0KPiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBFcnJvciAqKmVycnApDQo+ICAgew0KPiArICAgIGludCByZXQgPSAt
-MTsNCj4gICAgICAgTkJET3B0aW9uUmVwbHkgcmVwbHk7DQo+ICAgICAgIHVpbnQzMl90IGxlbjsN
-Cj4gICAgICAgdWludDMyX3QgbmFtZWxlbjsNCj4gLSAgICBjaGFyIG5hbWVbTkJEX01BWF9OQU1F
-X1NJWkUgKyAxXTsNCj4gKyAgICBjaGFyICpsb2NhbF9uYW1lID0gTlVMTDsNCj4gKyAgICBjaGFy
-ICpsb2NhbF9kZXNjID0gTlVMTDsNCj4gICAgICAgaW50IGVycm9yOw0KPiANCj4gICAgICAgaWYg
-KG5iZF9yZWNlaXZlX29wdGlvbl9yZXBseShpb2MsIE5CRF9PUFRfTElTVCwgJnJlcGx5LCBlcnJw
-KSA8IDApIHsNCj4gQEAgLTI1MSw5ICsyNTcsNiBAQCBzdGF0aWMgaW50IG5iZF9yZWNlaXZlX2xp
-c3QoUUlPQ2hhbm5lbCAqaW9jLCBjb25zdCBjaGFyICp3YW50LCBib29sICptYXRjaCwNCj4gICAg
-ICAgfQ0KPiAgICAgICBlcnJvciA9IG5iZF9oYW5kbGVfcmVwbHlfZXJyKGlvYywgJnJlcGx5LCBl
-cnJwKTsNCj4gICAgICAgaWYgKGVycm9yIDw9IDApIHsNCj4gLSAgICAgICAgLyogVGhlIHNlcnZl
-ciBkaWQgbm90IHN1cHBvcnQgTkJEX09QVF9MSVNULCBzbyBzZXQgKm1hdGNoIG9uDQo+IC0gICAg
-ICAgICAqIHRoZSBhc3N1bXB0aW9uIHRoYXQgYW55IG5hbWUgd2lsbCBiZSBhY2NlcHRlZC4gICov
-DQo+IC0gICAgICAgICptYXRjaCA9IHRydWU7DQoNCmhtLCBhY3R1YWxseSwgbWF0Y2ggd2FzIHdy
-b25nbHkgc2V0IHRvIHRydWUgb24gbmVnYXRpdmUgZXJyb3IsIGJ1dCBpdCBkb2Vzbid0IG1hdHRl
-ci4NCg0KPiAgICAgICAgICAgcmV0dXJuIGVycm9yOw0KPiAgICAgICB9DQo+ICAgICAgIGxlbiA9
-IHJlcGx5Lmxlbmd0aDsNCj4gQEAgLTI5MCwzMyArMjkzLDM4IEBAIHN0YXRpYyBpbnQgbmJkX3Jl
-Y2VpdmVfbGlzdChRSU9DaGFubmVsICppb2MsIGNvbnN0IGNoYXIgKndhbnQsIGJvb2wgKm1hdGNo
-LA0KPiAgICAgICAgICAgbmJkX3NlbmRfb3B0X2Fib3J0KGlvYyk7DQo+ICAgICAgICAgICByZXR1
-cm4gLTE7DQo+ICAgICAgIH0NCj4gLSAgICBpZiAobmFtZWxlbiAhPSBzdHJsZW4od2FudCkpIHsN
-Cj4gLSAgICAgICAgaWYgKG5iZF9kcm9wKGlvYywgbGVuLCBlcnJwKSA8IDApIHsNCj4gLSAgICAg
-ICAgICAgIGVycm9yX3ByZXBlbmQoZXJycCwNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAg
-ImZhaWxlZCB0byBza2lwIGV4cG9ydCBuYW1lIHdpdGggd3JvbmcgbGVuZ3RoOiAiKTsNCj4gLSAg
-ICAgICAgICAgIG5iZF9zZW5kX29wdF9hYm9ydChpb2MpOw0KPiAtICAgICAgICAgICAgcmV0dXJu
-IC0xOw0KPiAtICAgICAgICB9DQo+IC0gICAgICAgIHJldHVybiAxOw0KPiAtICAgIH0NCj4gDQo+
-IC0gICAgYXNzZXJ0KG5hbWVsZW4gPCBzaXplb2YobmFtZSkpOw0KPiAtICAgIGlmIChuYmRfcmVh
-ZChpb2MsIG5hbWUsIG5hbWVsZW4sIGVycnApIDwgMCkgew0KPiArICAgIGxvY2FsX25hbWUgPSBn
-X21hbGxvYyhuYW1lbGVuICsgMSk7DQo+ICsgICAgaWYgKG5iZF9yZWFkKGlvYywgbG9jYWxfbmFt
-ZSwgbmFtZWxlbiwgZXJycCkgPCAwKSB7DQo+ICAgICAgICAgICBlcnJvcl9wcmVwZW5kKGVycnAs
-ICJmYWlsZWQgdG8gcmVhZCBleHBvcnQgbmFtZTogIik7DQo+ICAgICAgICAgICBuYmRfc2VuZF9v
-cHRfYWJvcnQoaW9jKTsNCj4gLSAgICAgICAgcmV0dXJuIC0xOw0KPiArICAgICAgICBnb3RvIG91
-dDsNCj4gICAgICAgfQ0KPiAtICAgIG5hbWVbbmFtZWxlbl0gPSAnXDAnOw0KPiArICAgIGxvY2Fs
-X25hbWVbbmFtZWxlbl0gPSAnXDAnOw0KPiAgICAgICBsZW4gLT0gbmFtZWxlbjsNCj4gLSAgICBp
-ZiAobmJkX2Ryb3AoaW9jLCBsZW4sIGVycnApIDwgMCkgew0KPiAtICAgICAgICBlcnJvcl9wcmVw
-ZW5kKGVycnAsICJmYWlsZWQgdG8gcmVhZCBleHBvcnQgZGVzY3JpcHRpb246ICIpOw0KPiAtICAg
-ICAgICBuYmRfc2VuZF9vcHRfYWJvcnQoaW9jKTsNCj4gLSAgICAgICAgcmV0dXJuIC0xOw0KPiAr
-ICAgIGlmIChsZW4pIHsNCj4gKyAgICAgICAgbG9jYWxfZGVzYyA9IGdfbWFsbG9jKGxlbiArIDEp
-Ow0KPiArICAgICAgICBpZiAobmJkX3JlYWQoaW9jLCBsb2NhbF9kZXNjLCBsZW4sIGVycnApIDwg
-MCkgew0KPiArICAgICAgICAgICAgZXJyb3JfcHJlcGVuZChlcnJwLCAiZmFpbGVkIHRvIHJlYWQg
-ZXhwb3J0IGRlc2NyaXB0aW9uOiAiKTsNCj4gKyAgICAgICAgICAgIG5iZF9zZW5kX29wdF9hYm9y
-dChpb2MpOw0KPiArICAgICAgICAgICAgZ290byBvdXQ7DQo+ICsgICAgICAgIH0NCj4gKyAgICAg
-ICAgbG9jYWxfZGVzY1tsZW5dID0gJ1wwJzsNCj4gICAgICAgfQ0KPiAtICAgIGlmICghc3RyY21w
-KG5hbWUsIHdhbnQpKSB7DQo+IC0gICAgICAgICptYXRjaCA9IHRydWU7DQo+ICsNCj4gKyAgICB0
-cmFjZV9uYmRfcmVjZWl2ZV9saXN0KGxvY2FsX25hbWUsIGxvY2FsX2Rlc2MgPzogIiIpOw0KPiAr
-ICAgICpuYW1lID0gbG9jYWxfbmFtZTsNCj4gKyAgICBsb2NhbF9uYW1lID0gTlVMTDsNCj4gKyAg
-ICBpZiAoZGVzY3JpcHRpb24pIHsNCj4gKyAgICAgICAgKmRlc2NyaXB0aW9uID0gbG9jYWxfZGVz
-YzsNCj4gKyAgICAgICAgbG9jYWxfZGVzYyA9IE5VTEw7DQo+ICAgICAgIH0NCj4gLSAgICByZXR1
-cm4gMTsNCj4gKyAgICByZXQgPSAxOw0KPiArDQo+ICsgb3V0Og0KPiArICAgIGdfZnJlZShsb2Nh
-bF9uYW1lKTsNCj4gKyAgICBnX2ZyZWUobG9jYWxfZGVzYyk7DQo+ICsgICAgcmV0dXJuIHJldDsN
-Cj4gICB9DQo+IA0KPiANCj4gQEAgLTQ5MSw2ICs0OTksNyBAQCBzdGF0aWMgaW50IG5iZF9yZWNl
-aXZlX3F1ZXJ5X2V4cG9ydHMoUUlPQ2hhbm5lbCAqaW9jLA0KPiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBjb25zdCBjaGFyICp3YW50bmFtZSwNCj4gICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgRXJyb3IgKiplcnJwKQ0KPiAgIHsNCj4gKyAgICBi
-b29sIGxpc3RFbXB0eSA9IHRydWU7DQo+ICAgICAgIGJvb2wgZm91bmRFeHBvcnQgPSBmYWxzZTsN
-Cg0KYmVpbmcgaGVyZSwgYmV0dGVyIGlzIHRvIGZpeCBuYW1pbmcgdG8gUWVtdSBjb2Rpbmcgc3R5
-bGUsIGxpc3RfZW1wdHkgYW5kIGZvdW5kX2V4cG9ydA0KDQo+IA0KPiAgICAgICB0cmFjZV9uYmRf
-cmVjZWl2ZV9xdWVyeV9leHBvcnRzX3N0YXJ0KHdhbnRuYW1lKTsNCj4gQEAgLTQ5OSwxNCArNTA4
-LDI1IEBAIHN0YXRpYyBpbnQgbmJkX3JlY2VpdmVfcXVlcnlfZXhwb3J0cyhRSU9DaGFubmVsICpp
-b2MsDQo+ICAgICAgIH0NCj4gDQo+ICAgICAgIHdoaWxlICgxKSB7DQo+IC0gICAgICAgIGludCBy
-ZXQgPSBuYmRfcmVjZWl2ZV9saXN0KGlvYywgd2FudG5hbWUsICZmb3VuZEV4cG9ydCwgZXJycCk7
-DQo+ICsgICAgICAgIGNoYXIgKm5hbWU7DQo+ICsgICAgICAgIGludCByZXQgPSBuYmRfcmVjZWl2
-ZV9saXN0KGlvYywgJm5hbWUsIE5VTEwsIGVycnApOw0KPiANCj4gICAgICAgICAgIGlmIChyZXQg
-PCAwKSB7DQo+ICAgICAgICAgICAgICAgLyogU2VydmVyIGdhdmUgdW5leHBlY3RlZCByZXBseSAq
-Lw0KPiAgICAgICAgICAgICAgIHJldHVybiAtMTsNCj4gICAgICAgICAgIH0gZWxzZSBpZiAocmV0
-ID09IDApIHsNCj4gICAgICAgICAgICAgICAvKiBEb25lIGl0ZXJhdGluZy4gKi8NCj4gLSAgICAg
-ICAgICAgIGlmICghZm91bmRFeHBvcnQpIHsNCj4gKyAgICAgICAgICAgIGlmIChsaXN0RW1wdHkp
-IHsNCj4gKyAgICAgICAgICAgICAgICAvKg0KPiArICAgICAgICAgICAgICAgICAqIFdlIGRvbid0
-IGhhdmUgZW5vdWdoIGNvbnRleHQgdG8gdGVsbCBhIHNlcnZlciB0aGF0DQo+ICsgICAgICAgICAg
-ICAgICAgICogc2VudCBhbiBlbXB0eSBsaXN0IGFwYXJ0IGZyb20gYSBzZXJ2ZXIgdGhhdCBkb2Vz
-DQo+ICsgICAgICAgICAgICAgICAgICogbm90IHN1cHBvcnQgdGhlIGxpc3QgY29tbWFuZDsgYnV0
-IGFzIHRoaXMgZnVuY3Rpb24NCj4gKyAgICAgICAgICAgICAgICAgKiBpcyBqdXN0IHVzZWQgdG8g
-dHJpZ2dlciBhIG5pY2VyIGVycm9yIG1lc3NhZ2UNCj4gKyAgICAgICAgICAgICAgICAgKiBiZWZv
-cmUgdHJ5aW5nIE5CRF9PUFRfRVhQT1JUX05BTUUsIGFzc3VtZSB0aGUNCj4gKyAgICAgICAgICAg
-ICAgICAgKiBleHBvcnQgaXMgYXZhaWxhYmxlLg0KPiArICAgICAgICAgICAgICAgICAqLw0KPiAr
-ICAgICAgICAgICAgICAgIHJldHVybiAwOw0KPiArICAgICAgICAgICAgfSBlbHNlIGlmICghZm91
-bmRFeHBvcnQpIHsNCj4gICAgICAgICAgICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiTm8gZXhw
-b3J0IHdpdGggbmFtZSAnJXMnIGF2YWlsYWJsZSIsDQo+ICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgd2FudG5hbWUpOw0KPiAgICAgICAgICAgICAgICAgICBuYmRfc2VuZF9vcHRfYWJvcnQo
-aW9jKTsNCj4gQEAgLTUxNSw2ICs1MzUsMTEgQEAgc3RhdGljIGludCBuYmRfcmVjZWl2ZV9xdWVy
-eV9leHBvcnRzKFFJT0NoYW5uZWwgKmlvYywNCj4gICAgICAgICAgICAgICB0cmFjZV9uYmRfcmVj
-ZWl2ZV9xdWVyeV9leHBvcnRzX3N1Y2Nlc3Mod2FudG5hbWUpOw0KPiAgICAgICAgICAgICAgIHJl
-dHVybiAwOw0KPiAgICAgICAgICAgfQ0KPiArICAgICAgICBsaXN0RW1wdHkgPSBmYWxzZTsNCj4g
-KyAgICAgICAgaWYgKCFzdHJjbXAobmFtZSwgd2FudG5hbWUpKSB7DQo+ICsgICAgICAgICAgICBm
-b3VuZEV4cG9ydCA9IHRydWU7DQo+ICsgICAgICAgIH0NCj4gKyAgICAgICAgZ19mcmVlKG5hbWUp
-Ow0KPiAgICAgICB9DQo+ICAgfQ0KPiANCj4gZGlmZiAtLWdpdCBhL25iZC90cmFjZS1ldmVudHMg
-Yi9uYmQvdHJhY2UtZXZlbnRzDQo+IGluZGV4IDVlMWQ0YWZlOGU2Li44ZTlmYzAyNGMyOCAxMDA2
-NDQNCj4gLS0tIGEvbmJkL3RyYWNlLWV2ZW50cw0KPiArKysgYi9uYmQvdHJhY2UtZXZlbnRzDQo+
-IEBAIC0yLDYgKzIsNyBAQA0KPiAgIG5iZF9zZW5kX29wdGlvbl9yZXF1ZXN0KHVpbnQzMl90IG9w
-dCwgY29uc3QgY2hhciAqbmFtZSwgdWludDMyX3QgbGVuKSAiU2VuZGluZyBvcHRpb24gcmVxdWVz
-dCAlIiBQUkl1MzIiICglcyksIGxlbiAlIiBQUkl1MzINCj4gICBuYmRfcmVjZWl2ZV9vcHRpb25f
-cmVwbHkodWludDMyX3Qgb3B0aW9uLCBjb25zdCBjaGFyICpvcHRuYW1lLCB1aW50MzJfdCB0eXBl
-LCBjb25zdCBjaGFyICp0eXBlbmFtZSwgdWludDMyX3QgbGVuZ3RoKSAiUmVjZWl2ZWQgb3B0aW9u
-IHJlcGx5ICUiIFBSSXUzMiIgKCVzKSwgdHlwZSAlIiBQUkl1MzIiICglcyksIGxlbiAlIiBQUkl1
-MzINCj4gICBuYmRfcmVwbHlfZXJyX3Vuc3VwKHVpbnQzMl90IG9wdGlvbiwgY29uc3QgY2hhciAq
-bmFtZSkgInNlcnZlciBkb2Vzbid0IHVuZGVyc3RhbmQgcmVxdWVzdCAlIiBQUkl1MzIgIiAoJXMp
-LCBhdHRlbXB0aW5nIGZhbGxiYWNrIg0KPiArbmJkX3JlY2VpdmVfbGlzdChjb25zdCBjaGFyICpu
-YW1lLCBjb25zdCBjaGFyICpkZXNjKSAiZXhwb3J0IGxpc3QgaW5jbHVkZXMgJyVzJywgZGVzY3Jp
-cHRpb24gJyVzJyINCj4gICBuYmRfb3B0X2dvX3N0YXJ0KGNvbnN0IGNoYXIgKm5hbWUpICJBdHRl
-bXB0aW5nIE5CRF9PUFRfR08gZm9yIGV4cG9ydCAnJXMnIg0KPiAgIG5iZF9vcHRfZ29fc3VjY2Vz
-cyh2b2lkKSAiRXhwb3J0IGlzIGdvb2QgdG8gZ28iDQo+ICAgbmJkX29wdF9nb19pbmZvX3Vua25v
-d24oaW50IGluZm8sIGNvbnN0IGNoYXIgKm5hbWUpICJJZ25vcmluZyB1bmtub3duIGluZm8gJWQg
-KCVzKSINCj4gDQoNCg0KTmV3IHNlbWFudGljcyBvZiBuYmRfcmVjZWl2ZV9saXN0IGlzIG11Y2gg
-bW9yZSBzaW1wbGUsIHRoYW5rIHlvdSEgV2l0aCBvciB3aXRob3V0IG15IHRpbnkgc3VnZ2VzdGlv
-bnM6DQpSZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNv
-dkB2aXJ0dW96em8uY29tPg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+It's been marked as deprecated in QEMU v2.6.0 already, so really nobody
+should use the legacy "ivshmem" device anymore (but use ivshmem-plain or
+ivshmem-doorbell instead). Time to remove the deprecated device now.
+
+Belatedly also update a mention of the deprecated "ivshmem" in the file
+docs/specs/ivshmem-spec.txt to "ivshmem-doorbell". Missed in commit
+5400c02b90b ("ivshmem: Split ivshmem-plain, ivshmem-doorbell off ivshmem").
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ v2:
+ - Rebased to master (solved a conflict with the now-removed global_qtest)
+ - Mention ivshmem-spec.txt in the commit message
+ - Get rid of "attr" variable in ivshmem.c
+ - Re-indent printf code in setup_vm_with_server(()
+
+ docs/specs/ivshmem-spec.txt |   8 +-
+ hw/i386/pc_piix.c           |   4 -
+ hw/misc/ivshmem.c           | 210 ++------------------------------------------
+ qemu-deprecated.texi        |   5 --
+ scripts/device-crash-test   |   1 -
+ tests/ivshmem-test.c        |  67 +++++---------
+ 6 files changed, 34 insertions(+), 261 deletions(-)
+
+diff --git a/docs/specs/ivshmem-spec.txt b/docs/specs/ivshmem-spec.txt
+index a1f5499..042f7ea 100644
+--- a/docs/specs/ivshmem-spec.txt
++++ b/docs/specs/ivshmem-spec.txt
+@@ -17,12 +17,16 @@ get interrupted by its peers.
+ 
+ There are two basic configurations:
+ 
+-- Just shared memory: -device ivshmem-plain,memdev=HMB,...
++- Just shared memory:
++
++      -device ivshmem-plain,memdev=HMB,...
+ 
+   This uses host memory backend HMB.  It should have option "share"
+   set.
+ 
+-- Shared memory plus interrupts: -device ivshmem,chardev=CHR,vectors=N,...
++- Shared memory plus interrupts:
++
++      -device ivshmem-doorbell,chardev=CHR,vectors=N,...
+ 
+   An ivshmem server must already be running on the host.  The device
+   connects to the server's UNIX domain socket via character device
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 7653fbb..5cbe976 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -725,10 +725,6 @@ DEFINE_I440FX_MACHINE(v1_3, "pc-1.3", pc_compat_1_3,
+             .property = "msix",\
+             .value    = "off",\
+         },{\
+-            .driver   = "ivshmem",\
+-            .property = "use64",\
+-            .value    = "0",\
+-        },{\
+             .driver   = "qxl",\
+             .property = "revision",\
+             .value    = stringify(3),\
+diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+index 8213659..c7b6bbc 100644
+--- a/hw/misc/ivshmem.c
++++ b/hw/misc/ivshmem.c
+@@ -112,13 +112,6 @@ typedef struct IVShmemState {
+     /* migration stuff */
+     OnOffAuto master;
+     Error *migration_blocker;
+-
+-    /* legacy cruft */
+-    char *role;
+-    char *shmobj;
+-    char *sizearg;
+-    size_t legacy_size;
+-    uint32_t not_legacy_32bit;
+ } IVShmemState;
+ 
+ /* registers for the Inter-VM shared memory device */
+@@ -529,17 +522,6 @@ static void process_msg_shmem(IVShmemState *s, int fd, Error **errp)
+ 
+     size = buf.st_size;
+ 
+-    /* Legacy cruft */
+-    if (s->legacy_size != SIZE_MAX) {
+-        if (size < s->legacy_size) {
+-            error_setg(errp, "server sent only %zd bytes of shared memory",
+-                       (size_t)buf.st_size);
+-            close(fd);
+-            return;
+-        }
+-        size = s->legacy_size;
+-    }
+-
+     /* mmap the region and map into the BAR2 */
+     memory_region_init_ram_from_fd(&s->server_bar2, OBJECT(s),
+                                    "ivshmem.bar2", size, true, fd, &local_err);
+@@ -882,8 +864,6 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
+     IVShmemState *s = IVSHMEM_COMMON(dev);
+     Error *err = NULL;
+     uint8_t *pci_conf;
+-    uint8_t attr = PCI_BASE_ADDRESS_SPACE_MEMORY |
+-        PCI_BASE_ADDRESS_MEM_PREFETCH;
+     Error *local_err = NULL;
+ 
+     /* IRQFD requires MSI */
+@@ -903,10 +883,6 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
+     pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY,
+                      &s->ivshmem_mmio);
+ 
+-    if (s->not_legacy_32bit) {
+-        attr |= PCI_BASE_ADDRESS_MEM_TYPE_64;
+-    }
+-
+     if (s->hostmem != NULL) {
+         IVSHMEM_DPRINTF("using hostmem\n");
+ 
+@@ -964,7 +940,11 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
+     }
+ 
+     vmstate_register_ram(s->ivshmem_bar2, DEVICE(s));
+-    pci_register_bar(PCI_DEVICE(s), 2, attr, s->ivshmem_bar2);
++    pci_register_bar(PCI_DEVICE(s), 2,
++                     PCI_BASE_ADDRESS_SPACE_MEMORY |
++                     PCI_BASE_ADDRESS_MEM_PREFETCH |
++                     PCI_BASE_ADDRESS_MEM_TYPE_64,
++                     s->ivshmem_bar2);
+ }
+ 
+ static void ivshmem_exit(PCIDevice *dev)
+@@ -1084,13 +1064,6 @@ static Property ivshmem_plain_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+-static void ivshmem_plain_init(Object *obj)
+-{
+-    IVShmemState *s = IVSHMEM_PLAIN(obj);
+-
+-    s->not_legacy_32bit = 1;
+-}
+-
+ static void ivshmem_plain_realize(PCIDevice *dev, Error **errp)
+ {
+     IVShmemState *s = IVSHMEM_COMMON(dev);
+@@ -1122,7 +1095,6 @@ static const TypeInfo ivshmem_plain_info = {
+     .name          = TYPE_IVSHMEM_PLAIN,
+     .parent        = TYPE_IVSHMEM_COMMON,
+     .instance_size = sizeof(IVShmemState),
+-    .instance_init = ivshmem_plain_init,
+     .class_init    = ivshmem_plain_class_init,
+ };
+ 
+@@ -1155,8 +1127,6 @@ static void ivshmem_doorbell_init(Object *obj)
+     IVShmemState *s = IVSHMEM_DOORBELL(obj);
+ 
+     s->features |= (1 << IVSHMEM_MSI);
+-    s->legacy_size = SIZE_MAX;  /* whatever the server sends */
+-    s->not_legacy_32bit = 1;
+ }
+ 
+ static void ivshmem_doorbell_realize(PCIDevice *dev, Error **errp)
+@@ -1189,181 +1159,11 @@ static const TypeInfo ivshmem_doorbell_info = {
+     .class_init    = ivshmem_doorbell_class_init,
+ };
+ 
+-static int ivshmem_load_old(QEMUFile *f, void *opaque, int version_id)
+-{
+-    IVShmemState *s = opaque;
+-    PCIDevice *pdev = PCI_DEVICE(s);
+-    int ret;
+-
+-    IVSHMEM_DPRINTF("ivshmem_load_old\n");
+-
+-    if (version_id != 0) {
+-        return -EINVAL;
+-    }
+-
+-    ret = ivshmem_pre_load(s);
+-    if (ret) {
+-        return ret;
+-    }
+-
+-    ret = pci_device_load(pdev, f);
+-    if (ret) {
+-        return ret;
+-    }
+-
+-    if (ivshmem_has_feature(s, IVSHMEM_MSI)) {
+-        msix_load(pdev, f);
+-        ivshmem_msix_vector_use(s);
+-    } else {
+-        s->intrstatus = qemu_get_be32(f);
+-        s->intrmask = qemu_get_be32(f);
+-    }
+-
+-    return 0;
+-}
+-
+-static bool test_msix(void *opaque, int version_id)
+-{
+-    IVShmemState *s = opaque;
+-
+-    return ivshmem_has_feature(s, IVSHMEM_MSI);
+-}
+-
+-static bool test_no_msix(void *opaque, int version_id)
+-{
+-    return !test_msix(opaque, version_id);
+-}
+-
+-static const VMStateDescription ivshmem_vmsd = {
+-    .name = "ivshmem",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
+-    .pre_load = ivshmem_pre_load,
+-    .post_load = ivshmem_post_load,
+-    .fields = (VMStateField[]) {
+-        VMSTATE_PCI_DEVICE(parent_obj, IVShmemState),
+-
+-        VMSTATE_MSIX_TEST(parent_obj, IVShmemState, test_msix),
+-        VMSTATE_UINT32_TEST(intrstatus, IVShmemState, test_no_msix),
+-        VMSTATE_UINT32_TEST(intrmask, IVShmemState, test_no_msix),
+-
+-        VMSTATE_END_OF_LIST()
+-    },
+-    .load_state_old = ivshmem_load_old,
+-    .minimum_version_id_old = 0
+-};
+-
+-static Property ivshmem_properties[] = {
+-    DEFINE_PROP_CHR("chardev", IVShmemState, server_chr),
+-    DEFINE_PROP_STRING("size", IVShmemState, sizearg),
+-    DEFINE_PROP_UINT32("vectors", IVShmemState, vectors, 1),
+-    DEFINE_PROP_BIT("ioeventfd", IVShmemState, features, IVSHMEM_IOEVENTFD,
+-                    false),
+-    DEFINE_PROP_BIT("msi", IVShmemState, features, IVSHMEM_MSI, true),
+-    DEFINE_PROP_STRING("shm", IVShmemState, shmobj),
+-    DEFINE_PROP_STRING("role", IVShmemState, role),
+-    DEFINE_PROP_UINT32("use64", IVShmemState, not_legacy_32bit, 1),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+-static void desugar_shm(IVShmemState *s)
+-{
+-    Object *obj;
+-    char *path;
+-
+-    obj = object_new("memory-backend-file");
+-    path = g_strdup_printf("/dev/shm/%s", s->shmobj);
+-    object_property_set_str(obj, path, "mem-path", &error_abort);
+-    g_free(path);
+-    object_property_set_int(obj, s->legacy_size, "size", &error_abort);
+-    object_property_set_bool(obj, true, "share", &error_abort);
+-    object_property_add_child(OBJECT(s), "internal-shm-backend", obj,
+-                              &error_abort);
+-    object_unref(obj);
+-    user_creatable_complete(USER_CREATABLE(obj), &error_abort);
+-    s->hostmem = MEMORY_BACKEND(obj);
+-}
+-
+-static void ivshmem_realize(PCIDevice *dev, Error **errp)
+-{
+-    IVShmemState *s = IVSHMEM_COMMON(dev);
+-
+-    if (!qtest_enabled()) {
+-        warn_report("ivshmem is deprecated, please use ivshmem-plain"
+-                    " or ivshmem-doorbell instead");
+-    }
+-
+-    if (qemu_chr_fe_backend_connected(&s->server_chr) + !!s->shmobj != 1) {
+-        error_setg(errp, "You must specify either 'shm' or 'chardev'");
+-        return;
+-    }
+-
+-    if (s->sizearg == NULL) {
+-        s->legacy_size = 4 * MiB; /* 4 MB default */
+-    } else {
+-        int ret;
+-        uint64_t size;
+-
+-        ret = qemu_strtosz_MiB(s->sizearg, NULL, &size);
+-        if (ret < 0 || (size_t)size != size || !is_power_of_2(size)) {
+-            error_setg(errp, "Invalid size %s", s->sizearg);
+-            return;
+-        }
+-        s->legacy_size = size;
+-    }
+-
+-    /* check that role is reasonable */
+-    if (s->role) {
+-        if (strncmp(s->role, "peer", 5) == 0) {
+-            s->master = ON_OFF_AUTO_OFF;
+-        } else if (strncmp(s->role, "master", 7) == 0) {
+-            s->master = ON_OFF_AUTO_ON;
+-        } else {
+-            error_setg(errp, "'role' must be 'peer' or 'master'");
+-            return;
+-        }
+-    } else {
+-        s->master = ON_OFF_AUTO_AUTO;
+-    }
+-
+-    if (s->shmobj) {
+-        desugar_shm(s);
+-    }
+-
+-    /*
+-     * Note: we don't use INTx with IVSHMEM_MSI at all, so this is a
+-     * bald-faced lie then.  But it's a backwards compatible lie.
+-     */
+-    pci_config_set_interrupt_pin(dev->config, 1);
+-
+-    ivshmem_common_realize(dev, errp);
+-}
+-
+-static void ivshmem_class_init(ObjectClass *klass, void *data)
+-{
+-    DeviceClass *dc = DEVICE_CLASS(klass);
+-    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+-
+-    k->realize = ivshmem_realize;
+-    k->revision = 0;
+-    dc->desc = "Inter-VM shared memory (legacy)";
+-    dc->props = ivshmem_properties;
+-    dc->vmsd = &ivshmem_vmsd;
+-}
+-
+-static const TypeInfo ivshmem_info = {
+-    .name          = TYPE_IVSHMEM,
+-    .parent        = TYPE_IVSHMEM_COMMON,
+-    .instance_size = sizeof(IVShmemState),
+-    .class_init    = ivshmem_class_init,
+-};
+-
+ static void ivshmem_register_types(void)
+ {
+     type_register_static(&ivshmem_common_info);
+     type_register_static(&ivshmem_plain_info);
+     type_register_static(&ivshmem_doorbell_info);
+-    type_register_static(&ivshmem_info);
+ }
+ 
+ type_init(ivshmem_register_types)
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 190250f..038df3d 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -110,11 +110,6 @@ documentation of ``query-hotpluggable-cpus'' for additional details.
+ 
+ @section System emulator devices
+ 
+-@subsection ivshmem (since 2.6.0)
+-
+-The ``ivshmem'' device type is replaced by either the ``ivshmem-plain''
+-or ``ivshmem-doorbell`` device types.
+-
+ @subsection bluetooth (since 3.1)
+ 
+ The bluetooth subsystem is unmaintained since many years and likely bitrotten
+diff --git a/scripts/device-crash-test b/scripts/device-crash-test
+index e93a7c0..a835772 100755
+--- a/scripts/device-crash-test
++++ b/scripts/device-crash-test
+@@ -83,7 +83,6 @@ ERROR_WHITELIST = [
+     {'device':'isa-ipmi-bt', 'expected':True},             # IPMI device requires a bmc attribute to be set
+     {'device':'isa-ipmi-kcs', 'expected':True},            # IPMI device requires a bmc attribute to be set
+     {'device':'isa-parallel', 'expected':True},            # Can't create serial device, empty char device
+-    {'device':'ivshmem', 'expected':True},                 # You must specify either 'shm' or 'chardev'
+     {'device':'ivshmem-doorbell', 'expected':True},        # You must specify a 'chardev'
+     {'device':'ivshmem-plain', 'expected':True},           # You must specify a 'memdev'
+     {'device':'loader', 'expected':True},                  # please include valid arguments
+diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
+index 089e268..0c85532 100644
+--- a/tests/ivshmem-test.c
++++ b/tests/ivshmem-test.c
+@@ -291,20 +291,20 @@ static void *server_thread(void *data)
+     return NULL;
+ }
+ 
+-static void setup_vm_with_server(IVState *s, int nvectors, bool msi)
++static void setup_vm_with_server(IVState *s, int nvectors)
+ {
+-    char *cmd = g_strdup_printf("-chardev socket,id=chr0,path=%s,nowait "
+-                                "-device ivshmem%s,chardev=chr0,vectors=%d",
+-                                tmpserver,
+-                                msi ? "-doorbell" : ",size=1M,msi=off",
+-                                nvectors);
++    char *cmd;
+ 
+-    setup_vm_cmd(s, cmd, msi);
++    cmd = g_strdup_printf("-chardev socket,id=chr0,path=%s,nowait "
++                          "-device ivshmem-doorbell,chardev=chr0,vectors=%d",
++                          tmpserver, nvectors);
++
++    setup_vm_cmd(s, cmd, true);
+ 
+     g_free(cmd);
+ }
+ 
+-static void test_ivshmem_server(bool msi)
++static void test_ivshmem_server(void)
+ {
+     IVState state1, state2, *s1, *s2;
+     ServerThread thread;
+@@ -327,9 +327,9 @@ static void test_ivshmem_server(bool msi)
+     thread.thread = g_thread_new("ivshmem-server", server_thread, &thread);
+     g_assert(thread.thread != NULL);
+ 
+-    setup_vm_with_server(&state1, nvectors, msi);
++    setup_vm_with_server(&state1, nvectors);
+     s1 = &state1;
+-    setup_vm_with_server(&state2, nvectors, msi);
++    setup_vm_with_server(&state2, nvectors);
+     s2 = &state2;
+ 
+     /* check got different VM ids */
+@@ -340,38 +340,28 @@ static void test_ivshmem_server(bool msi)
+     g_assert_cmpint(vm1, !=, vm2);
+ 
+     /* check number of MSI-X vectors */
+-    if (msi) {
+-        ret = qpci_msix_table_size(s1->dev);
+-        g_assert_cmpuint(ret, ==, nvectors);
+-    }
++    ret = qpci_msix_table_size(s1->dev);
++    g_assert_cmpuint(ret, ==, nvectors);
+ 
+     /* TODO test behavior before MSI-X is enabled */
+ 
+     /* ping vm2 -> vm1 on vector 0 */
+-    if (msi) {
+-        ret = qpci_msix_pending(s1->dev, 0);
+-        g_assert_cmpuint(ret, ==, 0);
+-    } else {
+-        g_assert_cmpuint(in_reg(s1, INTRSTATUS), ==, 0);
+-    }
++    ret = qpci_msix_pending(s1->dev, 0);
++    g_assert_cmpuint(ret, ==, 0);
+     out_reg(s2, DOORBELL, vm1 << 16);
+     do {
+         g_usleep(10000);
+-        ret = msi ? qpci_msix_pending(s1->dev, 0) : in_reg(s1, INTRSTATUS);
++        ret = qpci_msix_pending(s1->dev, 0);
+     } while (ret == 0 && g_get_monotonic_time() < end_time);
+     g_assert_cmpuint(ret, !=, 0);
+ 
+     /* ping vm1 -> vm2 on vector 1 */
+-    if (msi) {
+-        ret = qpci_msix_pending(s2->dev, 1);
+-        g_assert_cmpuint(ret, ==, 0);
+-    } else {
+-        g_assert_cmpuint(in_reg(s2, INTRSTATUS), ==, 0);
+-    }
++    ret = qpci_msix_pending(s2->dev, 1);
++    g_assert_cmpuint(ret, ==, 0);
+     out_reg(s1, DOORBELL, vm2 << 16 | 1);
+     do {
+         g_usleep(10000);
+-        ret = msi ? qpci_msix_pending(s2->dev, 1) : in_reg(s2, INTRSTATUS);
++        ret = qpci_msix_pending(s2->dev, 1);
+     } while (ret == 0 && g_get_monotonic_time() < end_time);
+     g_assert_cmpuint(ret, !=, 0);
+ 
+@@ -389,27 +379,17 @@ static void test_ivshmem_server(bool msi)
+     close(thread.pipe[0]);
+ }
+ 
+-static void test_ivshmem_server_msi(void)
+-{
+-    test_ivshmem_server(true);
+-}
+-
+-static void test_ivshmem_server_irq(void)
+-{
+-    test_ivshmem_server(false);
+-}
+-
+ #define PCI_SLOT_HP             0x06
+ 
+ static void test_ivshmem_hotplug(void)
+ {
+     const char *arch = qtest_get_arch();
+ 
+-    qtest_start("");
++    qtest_start("-object memory-backend-ram,size=1M,id=mb1");
+ 
+-    qtest_qmp_device_add("ivshmem",
+-                         "iv1", "{'addr': %s, 'shm': %s, 'size': '1M'}",
+-                         stringify(PCI_SLOT_HP), tmpshm);
++    qtest_qmp_device_add("ivshmem-plain", "iv1",
++                         "{'addr': %s, 'memdev': 'mb1'}",
++                         stringify(PCI_SLOT_HP));
+     if (strcmp(arch, "ppc64") != 0) {
+         qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
+     }
+@@ -509,8 +489,7 @@ int main(int argc, char **argv)
+     if (g_test_slow()) {
+         qtest_add_func("/ivshmem/pair", test_ivshmem_pair);
+         if (strcmp(arch, "ppc64") != 0) {
+-            qtest_add_func("/ivshmem/server-msi", test_ivshmem_server_msi);
+-            qtest_add_func("/ivshmem/server-irq", test_ivshmem_server_irq);
++            qtest_add_func("/ivshmem/server", test_ivshmem_server);
+         }
+     }
+ 
+-- 
+1.8.3.1
