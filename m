@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gZbHM-00047l-SG
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:48:49 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gZbNt-0005hg-5F
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:55:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gZbHJ-00021a-NV
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:48:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43965)
+	(envelope-from <kraxel@redhat.com>) id 1gZbNp-0006H4-LB
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:55:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55900)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gZbHJ-000215-EH
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:48:45 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181218112056.11727.96529.stgit@pasha-VirtualBox>
-	<20181218112142.11727.24919.stgit@pasha-VirtualBox>
-Date: Wed, 19 Dec 2018 13:48:07 +0100
-In-Reply-To: <20181218112142.11727.24919.stgit@pasha-VirtualBox> (Pavel
-	Dovgalyuk's message of "Tue, 18 Dec 2018 14:21:42 +0300")
-Message-ID: <87tvj9isxk.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gZbNp-0006GO-F7
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:55:29 -0500
+Date: Wed, 19 Dec 2018 13:55:27 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181219125527.6vvjnmegmihso5ix@sirius.home.kraxel.org>
+References: <20180803173614.12358-1-marcandre.lureau@redhat.com>
+	<20180803173614.12358-11-marcandre.lureau@redhat.com>
+	<20180807101505.GF7335@redhat.com>
+	<CAJ+F1C+=aucconH7EZ8D2g_Wir2wEeq4GMobK+jNPZ8b0LbZKA@mail.gmail.com>
+	<20180807143055.pkx7l2ufb36lyq3b@sirius.home.kraxel.org>
+	<CAJ+F1CJtFJ_vk817tQsGEi3B+xC4bH3eGxA+tRPayyj3F0gnsw@mail.gmail.com>
+	<20181219071325.c7ayirk564s7kuhn@sirius.home.kraxel.org>
+	<CAJ+F1CKzb3DmmuQG5itgsUxvUwM34fh242FsgxKp1Aj-fksrBg@mail.gmail.com>
+	<20181219095442.oayncn5ufysvntet@sirius.home.kraxel.org>
+	<CAJ+F1CJ-jg9fSoE1Z3g3vQvXO8sz320YrBEs7sa_Dr+o-JQAYg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v8 08/20] migration: introduce icount field
- for snapshots
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CJ-jg9fSoE1Z3g3vQvXO8sz320YrBEs7sa_Dr+o-JQAYg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 10/10] display: add -display app launching
+ external application
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +36,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, dovgaluk@ispras.ru, artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
+> > > > Everything needed, so launching remote-viewer is
+> > > > just "remote-viewer /path/to/config.vv".
+> > >
+> > > If it's just what is needed to launch the viewer, why not stick to the
+> > > url syntax?
+> >
+> > First, the info needed to launch is located on a fixed & well known
+> > place on disk then, so it is easy to restart remote-viewer.
+> 
+> It would also be a fixed URI, if we use the spice+unix:// syntax.
 
-> Saving icount as a parameters of the snapshot allows navigation between
-> them in the execution replay scenario.
-> This information can be used for finding a specific snapshot for rewinding
-> the recorded execution to the specific moment of the time.
-> E.g., 'reverse step' action needs to load the nearest snapshot which is
-> prior to the current moment of time .
->
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-[...]
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 9e45fb4..a031e5b 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -2509,6 +2509,11 @@ int save_snapshot(const char *name, Error **errp)
->      sn->date_sec = tv.tv_sec;
->      sn->date_nsec = tv.tv_usec * 1000;
->      sn->vm_clock_nsec = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-> +    if (replay_mode != REPLAY_MODE_NONE) {
-> +        sn->icount = replay_get_current_step();
-> +    } else {
-> +        sn->icount = -1ULL;
-> +    }
->  
->      if (name) {
->          ret = bdrv_snapshot_find(bs, old_sn, name);
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 762000f..7bb1727 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -26,13 +26,18 @@
->  #
->  # @vm-clock-nsec: fractional part in nano seconds to be used with vm-clock-sec
->  #
-> +# @icount: Current instruction count. Appears when execution record/replay
-> +#          is enabled. Used for "time-traveling" to match the moment
-> +#          in the recorded execution with the snapshots (since 4.0)
-> +#
->  # Since: 1.3
->  #
->  ##
->  { 'struct': 'SnapshotInfo',
->    'data': { 'id': 'str', 'name': 'str', 'vm-state-size': 'int',
->              'date-sec': 'int', 'date-nsec': 'int',
-> -            'vm-clock-sec': 'int', 'vm-clock-nsec': 'int' } }
-> +            'vm-clock-sec': 'int', 'vm-clock-nsec': 'int',
-> +            '*icount': 'int' } }
->  
->  ##
->  # @ImageInfoSpecificQCow2EncryptionBase:
+Ah, good.  Fine with me then.
 
-As far as I can tell, @icount is the same as ReplayInfo's @step.  But I
-had to look at the code to tell.  Please name the two consistently.
-Also consider having the documentation refer to ReplayInfo.
+> > I think it is more useful to extend that instead of passing through
+> > options from the qemu command line to virt-viewer.
+> 
+> Hmm, although it limits what you can easily configure per instance as well..
 
-> diff --git a/qapi/block.json b/qapi/block.json
-> index 11f01f2..a6396a9 100644
-> --- a/qapi/block.json
-> +++ b/qapi/block.json
-> @@ -176,7 +176,8 @@
->  #                    "date-sec": 1000012,
->  #                    "date-nsec": 10,
->  #                    "vm-clock-sec": 100,
-> -#                    "vm-clock-nsec": 20
-> +#                    "vm-clock-nsec": 20,
-> +#                    "icount": 220414
->  #      }
->  #    }
->  #
+We might decide on a case-by-vase basis, which make sense as
+per-instance and which not.  For example: Hotkeys is more a user
+preference and I don't think we need them be configurable per-vm.
+For fullscreen it is probably more useful to have that as vm-specific
+option.
+
+cheers,
+  Gerd
