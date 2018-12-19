@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gZdQI-0001HC-P7
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:06:13 -0500
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gZdad-0004df-Qx
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:16:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gZdQC-0004rH-RT
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:06:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43240)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gZdQC-0004ou-EF
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:06:04 -0500
-References: <20181217231700.24482-1-pbonzini@redhat.com>
-	<CAFEAcA-=jLUHhcUeBMQtOU-tA6nKaNoBkf2eYqC6CA2TkG+6ZA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0c4f4079-40df-4d40-0c77-bc18eedaf538@redhat.com>
-Date: Wed, 19 Dec 2018 16:05:58 +0100
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gZdac-0007Wk-Ot
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:16:51 -0500
+Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:34167)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1gZdac-0007WE-IW
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:16:50 -0500
+Received: by mail-ot1-x331.google.com with SMTP id t5so19467074otk.1
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 07:16:50 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-=jLUHhcUeBMQtOU-tA6nKaNoBkf2eYqC6CA2TkG+6ZA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20181122141741.11108-1-marcandre.lureau@redhat.com>
+References: <20181122141741.11108-1-marcandre.lureau@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Wed, 19 Dec 2018 16:16:48 +0100
+Message-ID: <CAL1e-=h_YXP8Y-narAHaoB5GU9s3U8ehEO+mqQUAbuqFjGp6Kw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/35] Misc patches for 2018-12-18
+Subject: Re: [Qemu-devel] [PATCH] docs: apply some qemu.org-like CSS style
+ to HTML
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,19 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Cc: pbonzini@redhat.com, sw@weilnetz.de, qemu-devel@nongnu.org
 
-On 19/12/18 15:33, Peter Maydell wrote:
-> PS: can the colorization be disabled? Grepping logfiles for
-> ERROR, FAIL, etc doesn't work in the presence of colour
-> escape sequences...
+On Nov 22, 2018 3:18 PM, "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.=
+com>
+wrote:
+>
+> Style a bit the HTML documents, to make them look like qemu.org pages.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  Makefile                     |   2 +
+>  docs/texinfo-extra-head.html |   7 ++
+>  docs/texinfo.css             | 226 +++++++++++++++++++++++++++++++++++
+>  3 files changed, 235 insertions(+)
+>  create mode 100644 docs/texinfo-extra-head.html
+>  create mode 100644 docs/texinfo.css
+>
 
-Oh interesting that it didn't grep fine for you, it seemed to be okay her=
-e.
+Marc-Andr=C3=A9,
 
-I added it because "make -O" uses a pipe rather than tty, and causes
-colors not to be applied.  I'm thinking of adding a --enable-color=3DFOO
-instead, for now I'll disable it and send v2.
+I salute these effort, and also my eyes say thank you to you.
 
-Paolo
+I just have a suggestion that command line examples, like this one:
+
+qemu-system-i386 [options] [disk_image]
+
+have a little larger letters. (maybe it is just my system, I see them as if
+their size is almost twice smaller than regular text size)
+
+Thanks again!
+Aleksandar
