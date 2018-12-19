@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gZk5D-0005At-RS
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 17:12:52 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gZkYK-0002ie-Iq
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 17:42:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gZk5A-0003jZ-AV
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 17:12:51 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:45393)
+	(envelope-from <peter.maydell@linaro.org>) id 1gZkYJ-0004vJ-LV
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 17:42:56 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:33725)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gZk5A-0003gu-2w
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 17:12:48 -0500
-Received: by mail-wr1-f65.google.com with SMTP id t6so20902138wrr.12
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 14:12:48 -0800 (PST)
-References: <20181219091248.9641-1-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b8b2c9fa-5524-7a43-c6ac-ee2d246a0b00@redhat.com>
-Date: Wed, 19 Dec 2018 23:12:45 +0100
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gZkYJ-0004v3-Gd
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 17:42:55 -0500
+Received: by mail-oi1-x243.google.com with SMTP id c206so3010700oib.0
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 14:42:55 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20181219091248.9641-1-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] ui/cocoa: Include less of the generated
- modular QAPI headers
+References: <20170809202712.6951-1-f4bug@amsat.org>
+	<20170809202712.6951-13-f4bug@amsat.org>
+	<CAAdtpL7UE2dGie9zYOx3=L98vFr16dyrk2cdLZi1Nu58i+9DOQ@mail.gmail.com>
+In-Reply-To: <CAAdtpL7UE2dGie9zYOx3=L98vFr16dyrk2cdLZi1Nu58i+9DOQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 19 Dec 2018 22:42:43 +0000
+Message-ID: <CAFEAcA98P9ZagjLTMvAMDdKiktUp3hQPjO0rq9qBXBc7SHO3jg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.11 v3 12/16] travis/osx: silent
+ texinfo warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +32,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 12/19/18 10:12 AM, Markus Armbruster wrote:
-> Avoids pointless recompilation.  Missed in commit 112ed241f5d.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
-> Untested; I don't have access to a Mac.
+On Wed, 19 Dec 2018 at 21:34, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
+>
+> Hey Alex, Peter, what do you think about this patch?
+>
+> On Wed, Aug 9, 2017 at 10:27 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.=
+org> wrote:
+> >
+> >   $ make info
+> >     GEN     qemu-doc.html
+> >   qemu-doc.texi:8: warning: unrecognized encoding name `UTF-8'.
+> >     GEN     qemu-doc.txt
+> >   qemu-doc.texi:8: warning: unrecognized encoding name `UTF-8'.
+> >
+> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > ---
+> >  .travis.yml | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/.travis.yml b/.travis.yml
+> > index 4bf69b0116..24f62fb7cf 100644
+> > --- a/.travis.yml
+> > +++ b/.travis.yml
+> > @@ -74,9 +74,11 @@ git:
+> >    # we want to do this ourselves
+> >    submodules: false
+> >  before_install:
+> > +  # silent texinfo warnings (https://github.com/xiaohanyu/oh-my-emacs/=
+blob/c664894e2f1c1cb0f95a9f2da88d41b00f190856/core/ome-basic.org#homebrew)
+> >    - if [ "$TRAVIS_OS_NAME" =3D=3D "osx" ]; then
+> >          brew update ;
+> > -        brew install libffi gettext glib pixman ;
+> > +        brew install libffi gettext glib pixman texinfo ;
+> > +        brew link texinfo --force ;
+> >      fi
 
-You kinda do, open a GitHub account and enable Travis-CI (free for
-public projects), then pushing a branch to your GitHub will trigger a
-Travis build:
+The commit message is a bit lacking in detail about how it's
+fixing things. IIRC this message is caused because the stock
+OSX texinfo is too old, so installing a newer version via
+brew makes sense. But what does the "brew link" command do?
 
-https://travis-ci.org/philmd/qemu/jobs/470146270#L3047
-
-> 
->  ui/cocoa.m | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/ui/cocoa.m b/ui/cocoa.m
-> index ecf12bfc2e..43e751693c 100644
-> --- a/ui/cocoa.m
-> +++ b/ui/cocoa.m
-> @@ -32,7 +32,8 @@
->  #include "ui/input.h"
->  #include "sysemu/sysemu.h"
->  #include "qapi/error.h"
-> -#include "qapi/qapi-commands.h"
-> +#include "qapi/qapi-commands-block-core.h"
-> +#include "qapi/qapi-commands-misc.h"
->  #include "sysemu/blockdev.h"
->  #include "qemu-version.h"
->  #include <Carbon/Carbon.h>
-> 
+thanks
+-- PMM
