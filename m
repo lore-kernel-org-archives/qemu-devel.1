@@ -1,32 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gZVO1-0006Mc-Rt
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 01:31:19 -0500
+	(envelope-from <bounces@canonical.com>) id 1gZVXH-0001An-Dv
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 01:40:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gZVNy-0006eN-JS
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 01:31:17 -0500
-Received: from mga05.intel.com ([192.55.52.43]:9327)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yu.c.zhang@linux.intel.com>)
-	id 1gZVNy-0006df-9R
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 01:31:14 -0500
-Date: Wed, 19 Dec 2018 14:28:10 +0800
-From: Yu Zhang <yu.c.zhang@linux.intel.com>
-Message-ID: <20181219062809.jd4rvv2o6jogxaez@linux.intel.com>
-References: <1544619939-18102-1-git-send-email-yu.c.zhang@linux.intel.com>
-	<1544619939-18102-2-git-send-email-yu.c.zhang@linux.intel.com>
-	<20181217141740.16ccfaa1@Igors-MacBook-Pro.local>
-	<20181218092723.yhaerzm4vlzgef65@linux.intel.com>
-	<20181218155536.2b35a037@Igors-MacBook-Pro.local>
-	<20181218095745-mutt-send-email-mst@kernel.org>
-	<20181219030358.drxnsqchuj5i37bp@linux.intel.com>
-	<20181218221031-mutt-send-email-mst@kernel.org>
+	(envelope-from <bounces@canonical.com>) id 1gZVXD-0002kG-Mm
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 01:40:50 -0500
+Received: from indium.canonical.com ([91.189.90.7]:38304)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gZVXD-0002jW-Fs
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 01:40:47 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gZVXC-0002IU-8p
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 06:40:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 264912E80C9
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 06:40:46 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181218221031-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] intel-iommu: differentiate host
- address width from IOVA address width.
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 19 Dec 2018 06:27:20 -0000
+From: Gao <1809075@bugs.launchpad.net>
+Reply-To: Bug 1809075 <1809075@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154520012723.21082.14347694074023377449.malonedeb@wampee.canonical.com>
+Message-Id: <154520084073.24508.10632165852718669942.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1809075] Re: Concurrency bug on keyboard events:
+ capslock LED messing up keycode streams causes character misses at guest
+ kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,194 +38,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-On Tue, Dec 18, 2018 at 10:12:45PM -0500, Michael S. Tsirkin wrote:
-> On Wed, Dec 19, 2018 at 11:03:58AM +0800, Yu Zhang wrote:
-> > On Tue, Dec 18, 2018 at 09:58:35AM -0500, Michael S. Tsirkin wrote:
-> > > On Tue, Dec 18, 2018 at 03:55:36PM +0100, Igor Mammedov wrote:
-> > > > On Tue, 18 Dec 2018 17:27:23 +0800
-> > > > Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
-> > > > 
-> > > > > On Mon, Dec 17, 2018 at 02:17:40PM +0100, Igor Mammedov wrote:
-> > > > > > On Wed, 12 Dec 2018 21:05:38 +0800
-> > > > > > Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
-> > > > > > 
-> > > > > > > Currently, vIOMMU is using the value of IOVA address width, instead of
-> > > > > > > the host address width(HAW) to calculate the number of reserved bits in
-> > > > > > > data structures such as root entries, context entries, and entries of
-> > > > > > > DMA paging structures etc.
-> > > > > > > 
-> > > > > > > However values of IOVA address width and of the HAW may not equal. For
-> > > > > > > example, a 48-bit IOVA can only be mapped to host addresses no wider than
-> > > > > > > 46 bits. Using 48, instead of 46 to calculate the reserved bit may result
-> > > > > > > in an invalid IOVA being accepted.
-> > > > > > > 
-> > > > > > > To fix this, a new field - haw_bits is introduced in struct IntelIOMMUState,
-> > > > > > > whose value is initialized based on the maximum physical address set to
-> > > > > > > guest CPU.
-> > > > > > 
-> > > > > > > Also, definitions such as VTD_HOST_AW_39/48BIT etc. are renamed
-> > > > > > > to clarify.
-> > > > > > > 
-> > > > > > > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > > > > > > Reviewed-by: Peter Xu <peterx@redhat.com>
-> > > > > > > ---
-> > > > > > [...]
-> > > > > > 
-> > > > > > > @@ -3100,6 +3104,8 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
-> > > > > > >  static void vtd_init(IntelIOMMUState *s)
-> > > > > > >  {
-> > > > > > >      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
-> > > > > > > +    CPUState *cs = first_cpu;
-> > > > > > > +    X86CPU *cpu = X86_CPU(cs);
-> > > > > > >  
-> > > > > > >      memset(s->csr, 0, DMAR_REG_SIZE);
-> > > > > > >      memset(s->wmask, 0, DMAR_REG_SIZE);
-> > > > > > > @@ -3119,23 +3125,24 @@ static void vtd_init(IntelIOMMUState *s)
-> > > > > > >      s->cap = VTD_CAP_FRO | VTD_CAP_NFR | VTD_CAP_ND |
-> > > > > > >               VTD_CAP_MAMV | VTD_CAP_PSI | VTD_CAP_SLLPS |
-> > > > > > >               VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(s->aw_bits);
-> > > > > > > -    if (s->aw_bits == VTD_HOST_AW_48BIT) {
-> > > > > > > +    if (s->aw_bits == VTD_AW_48BIT) {
-> > > > > > >          s->cap |= VTD_CAP_SAGAW_48bit;
-> > > > > > >      }
-> > > > > > >      s->ecap = VTD_ECAP_QI | VTD_ECAP_IRO;
-> > > > > > > +    s->haw_bits = cpu->phys_bits;
-> > > > > > Is it possible to avoid accessing CPU fields directly or cpu altogether
-> > > > > > and set phys_bits when iommu is created?
-> > > > > 
-> > > > > Thanks for your comments, Igor.
-> > > > > 
-> > > > > Well, I guess you prefer not to query the CPU capabilities while deciding
-> > > > > the vIOMMU features. But to me, they are not that irrelevant.:)
-> > > > > 
-> > > > > Here the hardware address width in vt-d, and the one in cpuid.MAXPHYSADDR
-> > > > > are referring to the same concept. In VM, both are the maximum guest physical
-> > > > > address width. If we do not check the CPU field here, we will still have to
-> > > > > check the CPU field in other places such as build_dmar_q35(), and reset the
-> > > > > s->haw_bits again.
-> > > > > 
-> > > > > Is this explanation convincing enough? :)
-> > > > current build_dmar_q35() doesn't do it, it's all new code in this series that
-> > > > contains not acceptable direct access from one device (iommu) to another (cpu).   
-> > > > Proper way would be for the owner of iommu to fish limits from somewhere and set
-> > > > values during iommu creation.
-> > > 
-> > > Maybe it's a good idea to add documentation for now.
-> > 
-> > Thanks Michael. So what kind of documentation do you refer? 
-> 
-> The idea would be to have two properties, AW for the CPU and
-> the IOMMU. In the documentation explain that they
-> should normally be set to the same value.
-> 
-> > > 
-> > > It would be nice not to push this stuff up the stack,
-> > > it's unfortunate that our internal APIs make it hard.
-> > 
-> > Sorry, I do not quite get it. What do you mean "internal APIs make it hard"? :)
-> 
-> The API doesn't actually guarantee any initialization order.
-> CPU happens to be initialized first but I do not
-> think there's a guarantee that it will keep being the case.
-> This makes it hard to get properties from one device
-> and use in another one.
-> 
+### Reproduce steps
 
-Oops...
-Then there can be no easy way in the runtime to gurantee this. BTW, could we
-initialize CPU before other components? Is it hard to do, or not reasonable
-to do so?
+Add `fprintf(stderr, "ps2_queue 0x%x\n", b);` to `hw/input/ps2.c` and
+re-build qemu.
 
-I have plan to draft a doc in qemu on 5-level paging topic(maybe after all the
-enabling is done). But I don't this this is the proper place to put - as you
-can see, this fix is not relevant to 5-level paging. So any suggestion about
-the documentation?
+- qemu-system-x86_64 -hda <your img> --enable-kvm -m <> -display vnc=3D:1
+- vncviewer -Shared :5901
 
-> > > 
-> > > 
-> > > > > > 
-> > > > > > Perhaps Eduardo
-> > > > > >  can suggest better approach, since he's more familiar with phys_bits topic
-> > > > > 
-> > > > > @Eduardo, any comments? Thanks!
-> > > > > 
-> > > > > > 
-> > > > > > >      /*
-> > > > > > >       * Rsvd field masks for spte
-> > > > > > >       */
-> > > > > > >      vtd_paging_entry_rsvd_field[0] = ~0ULL;
-> > > > > > > -    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->aw_bits);
-> > > > > > > -    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->aw_bits);
-> > > > > > > -    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->aw_bits);
-> > > > > > > -    vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->aw_bits);
-> > > > > > > -    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->aw_bits);
-> > > > > > > -    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->aw_bits);
-> > > > > > > -    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->aw_bits);
-> > > > > > > -    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->aw_bits);
-> > > > > > > +    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->haw_bits);
-> > > > > > > +    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->haw_bits);
-> > > > > > > +    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->haw_bits);
-> > > > > > > +    vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->haw_bits);
-> > > > > > > +    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->haw_bits);
-> > > > > > > +    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->haw_bits);
-> > > > > > > +    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->haw_bits);
-> > > > > > > +    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->haw_bits);
-> > > > > > >  
-> > > > > > >      if (x86_iommu->intr_supported) {
-> > > > > > >          s->ecap |= VTD_ECAP_IR | VTD_ECAP_MHMV;
-> > > > > > > @@ -3261,10 +3268,10 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
-> > > > > > >      }
-> > > > > > >  
-> > > > > > >      /* Currently only address widths supported are 39 and 48 bits */
-> > > > > > > -    if ((s->aw_bits != VTD_HOST_AW_39BIT) &&
-> > > > > > > -        (s->aw_bits != VTD_HOST_AW_48BIT)) {
-> > > > > > > +    if ((s->aw_bits != VTD_AW_39BIT) &&
-> > > > > > > +        (s->aw_bits != VTD_AW_48BIT)) {
-> > > > > > >          error_setg(errp, "Supported values for x-aw-bits are: %d, %d",
-> > > > > > > -                   VTD_HOST_AW_39BIT, VTD_HOST_AW_48BIT);
-> > > > > > > +                   VTD_AW_39BIT, VTD_AW_48BIT);
-> > > > > > >          return false;
-> > > > > > >      }
-> > > > > > >  
-> > > > > > > diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-> > > > > > > index ed4e758..820451c 100644
-> > > > > > > --- a/include/hw/i386/intel_iommu.h
-> > > > > > > +++ b/include/hw/i386/intel_iommu.h
-> > > > > > > @@ -47,9 +47,9 @@
-> > > > > > >  #define VTD_SID_TO_DEVFN(sid)       ((sid) & 0xff)
-> > > > > > >  
-> > > > > > >  #define DMAR_REG_SIZE               0x230
-> > > > > > > -#define VTD_HOST_AW_39BIT           39
-> > > > > > > -#define VTD_HOST_AW_48BIT           48
-> > > > > > > -#define VTD_HOST_ADDRESS_WIDTH      VTD_HOST_AW_39BIT
-> > > > > > > +#define VTD_AW_39BIT                39
-> > > > > > > +#define VTD_AW_48BIT                48
-> > > > > > > +#define VTD_ADDRESS_WIDTH           VTD_AW_39BIT
-> > > > > > >  #define VTD_HAW_MASK(aw)            ((1ULL << (aw)) - 1)
-> > > > > > >  
-> > > > > > >  #define DMAR_REPORT_F_INTR          (1)
-> > > > > > > @@ -244,7 +244,8 @@ struct IntelIOMMUState {
-> > > > > > >      bool intr_eime;                 /* Extended interrupt mode enabled */
-> > > > > > >      OnOffAuto intr_eim;             /* Toggle for EIM cabability */
-> > > > > > >      bool buggy_eim;                 /* Force buggy EIM unless eim=off */
-> > > > > > > -    uint8_t aw_bits;                /* Host/IOVA address width (in bits) */
-> > > > > > > +    uint8_t aw_bits;                /* IOVA address width (in bits) */
-> > > > > > > +    uint8_t haw_bits;               /* Hardware address width (in bits) */
-> > > > > > >  
-> > > > > > >      /*
-> > > > > > >       * Protects IOMMU states in general.  Currently it protects the
-> > > > > > 
-> > > > > > 
-> > > > > 
-> > > > > B.R.
-> > > > > Yu
-> > > 
-> > 
-> > B.R.
-> > Yu
+In guest os, find the keyboard device(very likely to be /dev/input/event0)
+```
+sudo evtest /dev/input/event0
+```
 
-B.R.
-Yu
+On host OS
+- vncdotool -s 127.0.0.1::5901 type AaBb =
+
+Finally, =
+
+- record what evtest has received and compared with expected key streams. =
+
+
+Around once out of five times, we can find keycode lost due to capslock
+LED.
+
+Please do not rely on graphics mode output as there are also key loss
+bugs when wayland internals deal with kernel keyboard events.
+
+A simply note on some conversion between keycode and keys. Hopefully it wou=
+ld come in handy in debugging:
+a 0x1e 0x9e
+b 0x30 0xb0
+c 0x2e 0xae
+d 0x20 0xa0
+capslock 0x3a 0xba
+capslock LED 0xfa 0xfa
+ret   0x1c 0x9c =
+
+leftshift 0x2a 0xaa
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1809075
+
+Title:
+  Concurrency bug on keyboard events: capslock LED messing up keycode
+  streams causes character misses at guest kernel
+
+Status in QEMU:
+  New
+
+Bug description:
+  Whenever capslock is pressed on host, both capslock keycode(0x3a 0xba)
+  and capslock LED keycode(0xfa 0xfa) would be sent to the ps2 keycode
+  stream.
+
+  However, capslock LED is handled by another thread, confirmed by
+  tracing `ps2_write_keyboard` with gdb. The keycode of casplock LED
+  might divide
+
+  For example, I sent AaBb but got ABa. I was using vncdotool, so it
+  equals sending `capslock a capslock a capslock b capslock b`. In
+  ps2_queue, I was expecting `3a fa fa ba 1e 9e 3a fa fa ba 1e 9e 3a fa
+  fa ba 30 b0 3a fa fa ba 30 b0`. But actually once in a while, it might
+  not receive such streams. In one case I got `3a fa fa ba 1e 9e 3a ba
+  1e fa fa 9e 3a ba 30 b0 3a ba 30 b0 fa fa`
+
+  In this specific example, `a` was lost because LED keycode 'jumps in' its=
+ keycode. Kernel event device receives below streams
+  ```
+  # /dev/input/event receives    what is sent from ps2_queue
+  # I use cap_1 to show capslock key down
+  cap_1   led     caps_0,        # 0x3a 0xfa 0xfa 0xba
+  a_1     a_0                    # 0x1e 0x9e
+  caps_1  caps_0                 # 0x3a 0xba
+  led                            # 0x1e 0xfa 0xfa 0x1e (we lost `a` here)
+  caps_1  caps_0                 # 0x3a 0xba
+  b_1     led     b_0            # 0x30 0xfa 0xfa 0xb0 =
+
+  caps_1  caps_0                 # 0x3a 0xba
+  led     b_1     b_0            # 0xfa 0xfa 0x30 0xb0
+  ```
+
+  I made sure kernel receives the correct key stream as the qemu
+  ps2_queue sends using /proc, ftrace and dynamic_debug. I explained the
+  details in this [post](https://medium.com/@alapha23/quick-peek-into-
+  kernel-land-keyboard-events-handling-with-ftrace-and-dynamic-debug-
+  24a790056d5a)
+
+  So it seems to be a concurrency issue.
+
+  A hacky path on my mind is to skip all `0xfa` in ps2_queue. But I'm
+  not sure if capslock LED is the only stink bug to our ps2 keycode
+  queue as I've seen other keycodes handled by `ps2_write_keyboard` sent
+  to ps2 queue.
+
+  Another solution might be a memory barrier or a lock. Making key down
+  and key up atomic will prevent another thread modifying the ps2 queue
+  unwantedly.
+
+  What do you think?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1809075/+subscriptions
