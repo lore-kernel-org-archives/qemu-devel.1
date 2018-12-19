@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gZXZ9-0008Qk-Oq
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:50:57 -0500
+	(envelope-from <peterx@redhat.com>) id 1gZXZD-0008TV-4q
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:51:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gZXZ8-0004D8-Bn
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:50:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49080)
+	(envelope-from <peterx@redhat.com>) id 1gZXZB-0004Ee-3t
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:50:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40930)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gZXZ8-0004CY-3b
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:50:54 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gZXZA-0004E0-Oc
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:50:57 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0C47DCD191
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 08:50:53 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BB04187629
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 08:50:55 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Wed, 19 Dec 2018 16:50:36 +0800
-Message-Id: <20181219085038.7729-3-peterx@redhat.com>
+Date: Wed, 19 Dec 2018 16:50:37 +0800
+Message-Id: <20181219085038.7729-4-peterx@redhat.com>
 In-Reply-To: <20181219085038.7729-1-peterx@redhat.com>
 References: <20181219085038.7729-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/4] q35: set split kernel irqchip as default
+Subject: [Qemu-devel] [PATCH 3/4] x86-iommu: switch intr_supported to
+ OnOffAuto type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,70 +33,171 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, peterx@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
 
-Starting from QEMU 4.0, let's specify "split" as the default value for
-kernel-irqchip.
+Switch the intr_supported variable from a boolean to OnOffAuto type so
+that we can know whether the user specified it or not.  With that
+we'll have a chance to help the user to choose more wisely where
+possible.  Introduce x86_iommu_ir_supported() to mask these changes.
 
-So for QEMU>=4.0 we'll have: allowed=Y,required=N,split=Y
-   for QEMU<=3.1 we'll have: allowed=Y,required=N,split=N
-   (omitting all the "kernel_irqchip_" prefix)
-
-Note that this "split" is optional - we'll first try to enable split
-kernel irqchip, and we'll fall back to complete kernel irqchip if we
-found that the kernel capability is missing.
+No functional change at all.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- hw/core/machine.c   | 2 ++
- hw/i386/pc_q35.c    | 2 ++
- include/hw/boards.h | 1 +
- 3 files changed, 5 insertions(+)
+ hw/i386/acpi-build.c        |  6 +++---
+ hw/i386/amd_iommu.c         |  2 +-
+ hw/i386/intel_iommu.c       |  6 +++---
+ hw/i386/pc.c                |  2 +-
+ hw/i386/x86-iommu.c         | 15 +++++++++++++--
+ include/hw/i386/x86-iommu.h |  4 +++-
+ 6 files changed, 24 insertions(+), 11 deletions(-)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index c51423b647..4439ea663f 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -653,8 +653,10 @@ static void machine_class_base_init(ObjectClass *oc, void *data)
- static void machine_initfn(Object *obj)
- {
-     MachineState *ms = MACHINE(obj);
-+    MachineClass *mc = MACHINE_GET_CLASS(obj);
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 236a20eaa8..7012f97cac 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2426,7 +2426,7 @@ build_dmar_q35(GArray *table_data, BIOSLinker *linker)
+     IntelIOMMUState *intel_iommu = INTEL_IOMMU_DEVICE(iommu);
  
-     ms->kernel_irqchip_allowed = true;
-+    ms->kernel_irqchip_split = mc->default_kernel_irqchip_split;
-     ms->kvm_shadow_mem = -1;
-     ms->dump_guest_core = true;
-     ms->mem_merge = true;
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 58459bdab5..d2fb0fa49f 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -304,6 +304,7 @@ static void pc_q35_machine_options(MachineClass *m)
-     m->units_per_default_bus = 1;
-     m->default_machine_opts = "firmware=bios-256k.bin";
-     m->default_display = "std";
-+    m->default_kernel_irqchip_split = true;
-     m->no_floppy = 1;
-     machine_class_allow_dynamic_sysbus_dev(m, TYPE_AMD_IOMMU_DEVICE);
-     machine_class_allow_dynamic_sysbus_dev(m, TYPE_INTEL_IOMMU_DEVICE);
-@@ -323,6 +324,7 @@ DEFINE_Q35_MACHINE(v4_0, "pc-q35-4.0", NULL,
- static void pc_q35_3_1_machine_options(MachineClass *m)
+     assert(iommu);
+-    if (iommu->intr_supported) {
++    if (x86_iommu_ir_supported(iommu)) {
+         dmar_flags |= 0x1;      /* Flags: 0x1: INT_REMAP */
+     }
+ 
+@@ -2499,7 +2499,7 @@ build_amd_iommu(GArray *table_data, BIOSLinker *linker)
+      * When interrupt remapping is supported, we add a special IVHD device
+      * for type IO-APIC.
+      */
+-    if (x86_iommu_get_default()->intr_supported) {
++    if (x86_iommu_ir_supported(x86_iommu_get_default())) {
+         ivhd_table_len += 8;
+     }
+     /* IVHD length */
+@@ -2535,7 +2535,7 @@ build_amd_iommu(GArray *table_data, BIOSLinker *linker)
+      * Linux IOMMU driver checks for the special IVHD device (type IO-APIC).
+      * See Linux kernel commit 'c2ff5cf5294bcbd7fa50f7d860e90a66db7e5059'
+      */
+-    if (x86_iommu_get_default()->intr_supported) {
++    if (x86_iommu_ir_supported(x86_iommu_get_default())) {
+         build_append_int_noprefix(table_data,
+                                  (0x1ull << 56) |           /* type IOAPIC */
+                                  (IOAPIC_SB_DEVID << 40) |  /* IOAPIC devid */
+diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+index 353a810e6b..8ad707aba0 100644
+--- a/hw/i386/amd_iommu.c
++++ b/hw/i386/amd_iommu.c
+@@ -1233,7 +1233,7 @@ static int amdvi_int_remap_msi(AMDVIState *iommu,
+     }
+ 
+     /* validate that we are configure with intremap=on */
+-    if (!X86_IOMMU_DEVICE(iommu)->intr_supported) {
++    if (!x86_iommu_ir_supported(X86_IOMMU_DEVICE(iommu))) {
+         trace_amdvi_err("Interrupt remapping is enabled in the guest but "
+                         "not in the host. Use intremap=on to enable interrupt "
+                         "remapping in amd-iommu.");
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index d97bcbc2f7..3df4b0a550 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -3137,7 +3137,7 @@ static void vtd_init(IntelIOMMUState *s)
+     vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->aw_bits);
+     vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->aw_bits);
+ 
+-    if (x86_iommu->intr_supported) {
++    if (x86_iommu_ir_supported(x86_iommu)) {
+         s->ecap |= VTD_ECAP_IR | VTD_ECAP_MHMV;
+         if (s->intr_eim == ON_OFF_AUTO_ON) {
+             s->ecap |= VTD_ECAP_EIM;
+@@ -3238,14 +3238,14 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
  {
-     pc_q35_4_0_machine_options(m);
-+    m->default_kernel_irqchip_split = false;
-     m->alias = NULL;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_3_1);
+     X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
+ 
+-    if (s->intr_eim == ON_OFF_AUTO_ON && !x86_iommu->intr_supported) {
++    if (s->intr_eim == ON_OFF_AUTO_ON && !x86_iommu_ir_supported(x86_iommu)) {
+         error_setg(errp, "eim=on cannot be selected without intremap=on");
+         return false;
+     }
+ 
+     if (s->intr_eim == ON_OFF_AUTO_AUTO) {
+         s->intr_eim = (kvm_irqchip_in_kernel() || s->buggy_eim)
+-                      && x86_iommu->intr_supported ?
++                      && x86_iommu_ir_supported(x86_iommu) ?
+                                               ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
+     }
+     if (s->intr_eim == ON_OFF_AUTO_ON && !s->buggy_eim) {
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 115bc2825c..d95a0e3ad1 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1244,7 +1244,7 @@ void pc_machine_done(Notifier *notifier, void *data)
+     if (pcms->apic_id_limit > 255 && !xen_enabled()) {
+         IntelIOMMUState *iommu = INTEL_IOMMU_DEVICE(x86_iommu_get_default());
+ 
+-        if (!iommu || !iommu->x86_iommu.intr_supported ||
++        if (!iommu || !x86_iommu_ir_supported(X86_IOMMU_DEVICE(iommu)) ||
+             iommu->intr_eim != ON_OFF_AUTO_ON) {
+             error_report("current -smp configuration requires "
+                          "Extended Interrupt Mode enabled. "
+diff --git a/hw/i386/x86-iommu.c b/hw/i386/x86-iommu.c
+index abc3c03158..61ee0f1eaa 100644
+--- a/hw/i386/x86-iommu.c
++++ b/hw/i386/x86-iommu.c
+@@ -119,8 +119,13 @@ static void x86_iommu_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
++    /* If the user didn't specify IR, choose a default value for it */
++    if (x86_iommu->intr_supported == ON_OFF_AUTO_AUTO) {
++        x86_iommu->intr_supported = ON_OFF_AUTO_OFF;
++    }
++
+     /* Both Intel and AMD IOMMU IR only support "kernel-irqchip={off|split}" */
+-    if (x86_iommu->intr_supported && kvm_irqchip_in_kernel() &&
++    if (x86_iommu_ir_supported(x86_iommu) && kvm_irqchip_in_kernel() &&
+         !kvm_irqchip_is_split()) {
+         error_setg(errp, "Interrupt Remapping cannot work with "
+                          "kernel-irqchip=on, please use 'split|off'.");
+@@ -135,7 +140,8 @@ static void x86_iommu_realize(DeviceState *dev, Error **errp)
  }
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index f82f28468b..362384815e 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -195,6 +195,7 @@ struct MachineClass {
-     const char *hw_version;
-     ram_addr_t default_ram_size;
-     const char *default_cpu_type;
-+    bool default_kernel_irqchip_split;
-     bool option_rom_has_mr;
-     bool rom_file_has_mr;
-     int minimum_page_bits;
+ 
+ static Property x86_iommu_properties[] = {
+-    DEFINE_PROP_BOOL("intremap", X86IOMMUState, intr_supported, false),
++    DEFINE_PROP_ON_OFF_AUTO("intremap", X86IOMMUState,
++                            intr_supported, ON_OFF_AUTO_AUTO),
+     DEFINE_PROP_BOOL("device-iotlb", X86IOMMUState, dt_supported, false),
+     DEFINE_PROP_BOOL("pt", X86IOMMUState, pt_supported, true),
+     DEFINE_PROP_END_OF_LIST(),
+@@ -148,6 +154,11 @@ static void x86_iommu_class_init(ObjectClass *klass, void *data)
+     dc->props = x86_iommu_properties;
+ }
+ 
++bool x86_iommu_ir_supported(X86IOMMUState *s)
++{
++    return s->intr_supported == ON_OFF_AUTO_ON;
++}
++
+ static const TypeInfo x86_iommu_info = {
+     .name          = TYPE_X86_IOMMU_DEVICE,
+     .parent        = TYPE_SYS_BUS_DEVICE,
+diff --git a/include/hw/i386/x86-iommu.h b/include/hw/i386/x86-iommu.h
+index 2b22a579a3..dcd9719a2c 100644
+--- a/include/hw/i386/x86-iommu.h
++++ b/include/hw/i386/x86-iommu.h
+@@ -74,13 +74,15 @@ typedef struct IEC_Notifier IEC_Notifier;
+ 
+ struct X86IOMMUState {
+     SysBusDevice busdev;
+-    bool intr_supported;        /* Whether vIOMMU supports IR */
++    OnOffAuto intr_supported;   /* Whether vIOMMU supports IR */
+     bool dt_supported;          /* Whether vIOMMU supports DT */
+     bool pt_supported;          /* Whether vIOMMU supports pass-through */
+     IommuType type;             /* IOMMU type - AMD/Intel     */
+     QLIST_HEAD(, IEC_Notifier) iec_notifiers; /* IEC notify list */
+ };
+ 
++bool x86_iommu_ir_supported(X86IOMMUState *s);
++
+ /* Generic IRQ entry information when interrupt remapping is enabled */
+ struct X86IOMMUIrq {
+     /* Used by both IOAPIC/MSI interrupt remapping */
 -- 
 2.17.1
