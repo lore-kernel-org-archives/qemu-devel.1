@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gZXZG-0008Uc-Bi
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:51:03 -0500
+	(envelope-from <armbru@redhat.com>) id 1gZXfq-0003zs-6a
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:57:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gZXZD-0004GL-N5
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:51:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34750)
+	(envelope-from <armbru@redhat.com>) id 1gZXfn-0001F9-1I
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:57:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51026)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gZXZD-0004Fi-Eo
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:50:59 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 766245F722
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 08:50:58 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Wed, 19 Dec 2018 16:50:38 +0800
-Message-Id: <20181219085038.7729-5-peterx@redhat.com>
-In-Reply-To: <20181219085038.7729-1-peterx@redhat.com>
-References: <20181219085038.7729-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/4] x86-iommu: turn on IR by default if proper
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gZXfm-0001Eh-PR
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:57:46 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181218182234.28876-1-armbru@redhat.com>
+	<CAJ+F1CLo4YRnGWHsyoUWDrPU1X2z-5+eDmdGsw-zp7ihTpD_+Q@mail.gmail.com>
+Date: Wed, 19 Dec 2018 09:57:44 +0100
+In-Reply-To: <CAJ+F1CLo4YRnGWHsyoUWDrPU1X2z-5+eDmdGsw-zp7ihTpD_+Q@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 19 Dec 2018
+	00:35:07 +0400")
+Message-ID: <87d0pxnbav.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v2 00/15] qapi: add #if pre-processor
+ conditions to generated code (part 3)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +30,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, peterx@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
-When the user didn't specify "intremap" for the IOMMU device, we turn
-it on by default if it is supported.  This will turn IR on for the
-default Q35 platform as long as the IOMMU device is specified on new
-kernels.
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- hw/i386/x86-iommu.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+> Hi
+>
+> On Tue, Dec 18, 2018 at 10:26 PM Markus Armbruster <armbru@redhat.com> wr=
+ote:
+>>
+>> Marc-Andr=C3=A9 posted v1 that relies on a QAPI schema language extension
+>> 'top-unit' to permit splitting the generated code.  Here is his cover
+>> letter:
+>>
+>>     The thrid and last part (of "[PATCH v2 00/54] qapi: add #if
+>>     pre-processor conditions to generated code") is about adding schema
+>>     conditions based on the target.
+>>
+>>     For now, the qapi code is compiled in common objects (common to all
+>>     targets). This makes it impossible to add #if TARGET_ARM for example.
+>>
+>>     The patch "RFC: qapi: learn to split the schema by 'top-unit'"
+>>     proposes to split the schema by "top-unit", so that generated code c=
+an
+>>     be built either in common objects or per-target. That patch is a bit
+>>     rough, I would like to get some feedback about the approach before
+>>     trying to improve it. The following patches demonstrate usage of
+>>     target-based #if conditions, and getting rid of the
+>>     qmp_unregister_command() hack.
+>>
+>> We already have a way to split generated code: QAPI modules.  I took
+>> the liberty to rework Marc-Andr=C3=A9's series to use a target module
+>> instead.  Less code, no change to the QAPI language.
+>>
+>> One of the patches (marked WIP) is a total hack.  Fixable, but I want
+>> to get this out for discussion first.
+>
+> The approach you propose includes -target.h header in the top headers,
+> effectively making all the qapi code target-dependent, no?
 
-diff --git a/hw/i386/x86-iommu.c b/hw/i386/x86-iommu.c
-index 61ee0f1eaa..d1534c1ae0 100644
---- a/hw/i386/x86-iommu.c
-+++ b/hw/i386/x86-iommu.c
-@@ -112,6 +112,7 @@ static void x86_iommu_realize(DeviceState *dev, Error **errp)
-     PCMachineState *pcms =
-         PC_MACHINE(object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE));
-     QLIST_INIT(&x86_iommu->iec_notifiers);
-+    bool irq_all_kernel = kvm_irqchip_in_kernel() && !kvm_irqchip_is_split();
- 
-     if (!pcms || !pcms->bus) {
-         error_setg(errp, "Machine-type '%s' not supported by IOMMU",
-@@ -121,12 +122,12 @@ static void x86_iommu_realize(DeviceState *dev, Error **errp)
- 
-     /* If the user didn't specify IR, choose a default value for it */
-     if (x86_iommu->intr_supported == ON_OFF_AUTO_AUTO) {
--        x86_iommu->intr_supported = ON_OFF_AUTO_OFF;
-+        x86_iommu->intr_supported = irq_all_kernel ?
-+            ON_OFF_AUTO_OFF : ON_OFF_AUTO_ON;
-     }
- 
-     /* Both Intel and AMD IOMMU IR only support "kernel-irqchip={off|split}" */
--    if (x86_iommu_ir_supported(x86_iommu) && kvm_irqchip_in_kernel() &&
--        !kvm_irqchip_is_split()) {
-+    if (x86_iommu_ir_supported(x86_iommu) && irq_all_kernel) {
-         error_setg(errp, "Interrupt Remapping cannot work with "
-                          "kernel-irqchip=on, please use 'split|off'.");
-         return;
--- 
-2.17.1
+Yes, but...
+
+> I am actually a bit surprised there are no poisoined define errors.
+> Possibly because the top-level header is rarely included.
+
+... next to nothing includes the top-level header:
+
+    $ git-grep -E 'include.*"(qapi/)?qapi-[^-]*.h'
+    monitor.c:#include "qapi/qapi-commands.h"
+
+Here we actually need all commands, complete with their
+target-dependence.
+
+    monitor.c:#include "qapi/qapi-introspect.h"
+    tests/test-qobject-input-visitor.c:#include "qapi/qapi-introspect.h"
+
+qapi-introspect.[ch] are monolithic.
+
+    ui/cocoa.m:#include "qapi/qapi-commands.h"
+
+This is just lazy; we should include just the qapi-commands-FOO we
+actually need.  I'll ask the maintainer for help with cleaning this up.
+
+Including top-level headers has been a bad idea ever since we generate
+modular headers (commit 252dc3105fc), because it leads to "touch the
+QAPI schema, have some coffee while the world is recompiled".
+
+Adding target-dependent conditionals makes this bad idea impractical in
+target-independent code.  Feature!
+
+> By contrast, my approach has the advantage of a clean split between
+> target and non-target dependent code, which I would feel more
+> confident about.
+>
+> That's the reason why I promptly discarded the QAPI modules approach
+> without having second thoughts at least. Now you force me to
+> reconsider it though.
+
+Please do :)
