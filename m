@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44809)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gZafC-0003Jv-Cx
+	(envelope-from <kraxel@redhat.com>) id 1gZafE-0003LS-6g
 	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:09:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gZaf9-0000CH-Aj
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:09:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40732)
+	(envelope-from <kraxel@redhat.com>) id 1gZaf6-0000BD-9F
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:09:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48422)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gZaf6-0000Ai-7l
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:09:16 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gZaf2-00009k-KA
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:09:14 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3B03289AED
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 12:09:14 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D2D053DBE3
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 12:09:10 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 19 Dec 2018 13:09:02 +0100
-Message-Id: <20181219120904.17643-6-kraxel@redhat.com>
+Date: Wed, 19 Dec 2018 13:09:03 +0100
+Message-Id: <20181219120904.17643-7-kraxel@redhat.com>
 In-Reply-To: <20181219120904.17643-1-kraxel@redhat.com>
 References: <20181219120904.17643-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH v2 5/7] kbd-state: use state tracker for vnc
+Subject: [Qemu-devel] [RFC PATCH v2 6/7] keymap: pass full keyboard state to
+ keysym2scancode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,269 +33,104 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: berrange@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
 
-Use the new keyboard state tracked for vnc.  Allows to drop the
-vnc-specific modifier state tracking code.
+Pass the keyboard state tracker handle down to keysym2scancode(),
+so the code can fully inspect the keyboard state as needed.  No
+functional change.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- ui/vnc.h |   5 ++-
- ui/vnc.c | 120 ++++++++++++++++++---------------------------------------------
- 2 files changed, 35 insertions(+), 90 deletions(-)
+ ui/keymaps.h | 3 ++-
+ ui/curses.c  | 2 +-
+ ui/keymaps.c | 8 ++++----
+ ui/vnc.c     | 5 +----
+ 4 files changed, 8 insertions(+), 10 deletions(-)
 
-diff --git a/ui/vnc.h b/ui/vnc.h
-index a86e0610e8..56111908ce 100644
---- a/ui/vnc.h
-+++ b/ui/vnc.h
-@@ -44,6 +44,7 @@
- #include "keymaps.h"
- #include "vnc-palette.h"
- #include "vnc-enc-zrle.h"
+diff --git a/ui/keymaps.h b/ui/keymaps.h
+index 98213a4191..6a2365196a 100644
+--- a/ui/keymaps.h
++++ b/ui/keymaps.h
+@@ -26,6 +26,7 @@
+ #define QEMU_KEYMAPS_H
+ 
+ #include "qemu-common.h"
 +#include "ui/kbd-state.h"
  
- // #define _VNC_DEBUG 1
+ typedef struct {
+ 	const char* name;
+@@ -55,7 +56,7 @@ typedef struct kbd_layout_t kbd_layout_t;
+ kbd_layout_t *init_keyboard_layout(const name2keysym_t *table,
+                                    const char *language, Error **errp);
+ int keysym2scancode(kbd_layout_t *k, int keysym,
+-                    bool shift, bool altgr, bool ctrl);
++                    KbdState *kbd);
+ int keycode_is_keypad(kbd_layout_t *k, int keycode);
+ int keysym_is_numlock(kbd_layout_t *k, int keysym);
  
-@@ -155,7 +156,7 @@ struct VncDisplay
-     int lock_key_sync;
-     QEMUPutLEDEntry *led;
-     int ledstate;
--    int key_delay_ms;
-+    KbdState *kbd;
-     QemuMutex mutex;
+diff --git a/ui/curses.c b/ui/curses.c
+index f4e7a12f74..54687589d4 100644
+--- a/ui/curses.c
++++ b/ui/curses.c
+@@ -273,7 +273,7 @@ static void curses_refresh(DisplayChangeListener *dcl)
+             }
  
-     QEMUCursor *cursor;
-@@ -326,8 +327,6 @@ struct VncState
+             keycode = keysym2scancode(kbd_layout, keysym & KEYSYM_MASK,
+-                                      false, false, false);
++                                      NULL);
+             if (keycode == 0)
+                 continue;
  
-     VncReadEvent *read_handler;
-     size_t read_handler_expect;
--    /* input */
--    uint8_t modifiers_state[256];
+diff --git a/ui/keymaps.c b/ui/keymaps.c
+index 085889b555..6be87cc201 100644
+--- a/ui/keymaps.c
++++ b/ui/keymaps.c
+@@ -189,7 +189,7 @@ kbd_layout_t *init_keyboard_layout(const name2keysym_t *table,
  
-     bool abort;
-     QemuMutex output_mutex;
+ 
+ int keysym2scancode(kbd_layout_t *k, int keysym,
+-                    bool shift, bool altgr, bool ctrl)
++                    KbdState *kbd)
+ {
+     static const uint32_t mask =
+         SCANCODE_SHIFT | SCANCODE_ALTGR | SCANCODE_CTRL;
+@@ -221,13 +221,13 @@ int keysym2scancode(kbd_layout_t *k, int keysym,
+      * If so, prefer that one.
+      */
+     mods = 0;
+-    if (shift) {
++    if (kbd && kbd_state_modifier_get(kbd, KBD_MOD_SHIFT)) {
+         mods |= SCANCODE_SHIFT;
+     }
+-    if (altgr) {
++    if (kbd && kbd_state_modifier_get(kbd, KBD_MOD_ALTGR)) {
+         mods |= SCANCODE_ALTGR;
+     }
+-    if (ctrl) {
++    if (kbd && kbd_state_modifier_get(kbd, KBD_MOD_CTRL)) {
+         mods |= SCANCODE_CTRL;
+     }
+ 
 diff --git a/ui/vnc.c b/ui/vnc.c
-index 0c1b477425..b56431ce3b 100644
+index b56431ce3b..704a138667 100644
 --- a/ui/vnc.c
 +++ b/ui/vnc.c
-@@ -59,7 +59,6 @@ static QTAILQ_HEAD(, VncDisplay) vnc_displays =
-     QTAILQ_HEAD_INITIALIZER(vnc_displays);
- 
- static int vnc_cursor_define(VncState *vs);
--static void vnc_release_modifiers(VncState *vs);
- static void vnc_update_throttle_offset(VncState *vs);
- 
- static void vnc_set_share_mode(VncState *vs, VncShareMode mode)
-@@ -1248,7 +1247,7 @@ void vnc_disconnect_finish(VncState *vs)
-     vnc_sasl_client_cleanup(vs);
- #endif /* CONFIG_VNC_SASL */
-     audio_del(vs);
--    vnc_release_modifiers(vs);
-+    kbd_state_lift_all_keys(vs->vd->kbd);
- 
-     if (vs->mouse_mode_notifier.notify != NULL) {
-         qemu_remove_mouse_mode_change_notifier(&vs->mouse_mode_notifier);
-@@ -1737,26 +1736,10 @@ static void pointer_event(VncState *vs, int button_mask, int x, int y)
-     qemu_input_event_sync();
- }
- 
--static void reset_keys(VncState *vs)
-+static void press_key(VncState *vs, QKeyCode qcode)
- {
--    int i;
--    for(i = 0; i < 256; i++) {
--        if (vs->modifiers_state[i]) {
--            qemu_input_event_send_key_number(vs->vd->dcl.con, i, false);
--            qemu_input_event_send_key_delay(vs->vd->key_delay_ms);
--            vs->modifiers_state[i] = 0;
--        }
--    }
--}
--
--static void press_key(VncState *vs, int keysym)
--{
--    int keycode = keysym2scancode(vs->vd->kbd_layout, keysym,
--                                  false, false, false) & SCANCODE_KEYMASK;
--    qemu_input_event_send_key_number(vs->vd->dcl.con, keycode, true);
--    qemu_input_event_send_key_delay(vs->vd->key_delay_ms);
--    qemu_input_event_send_key_number(vs->vd->dcl.con, keycode, false);
--    qemu_input_event_send_key_delay(vs->vd->key_delay_ms);
-+    kbd_state_key_event(vs->vd->kbd, qcode, true);
-+    kbd_state_key_event(vs->vd->kbd, qcode, false);
- }
- 
- static void vnc_led_state_change(VncState *vs)
-@@ -1797,32 +1780,20 @@ static void kbd_leds(void *opaque, int ledstate)
- 
- static void do_key_event(VncState *vs, int down, int keycode, int sym)
- {
-+    QKeyCode qcode = qemu_input_key_number_to_qcode(keycode);
-+
-     /* QEMU console switch */
--    switch(keycode) {
--    case 0x2a:                          /* Left Shift */
--    case 0x36:                          /* Right Shift */
--    case 0x1d:                          /* Left CTRL */
--    case 0x9d:                          /* Right CTRL */
--    case 0x38:                          /* Left ALT */
--    case 0xb8:                          /* Right ALT */
--        if (down)
--            vs->modifiers_state[keycode] = 1;
--        else
--            vs->modifiers_state[keycode] = 0;
--        break;
--    case 0x02 ... 0x0a: /* '1' to '9' keys */
--        if (vs->vd->dcl.con == NULL &&
--            down && vs->modifiers_state[0x1d] && vs->modifiers_state[0x38]) {
-+    switch (qcode) {
-+    case Q_KEY_CODE_1 ... Q_KEY_CODE_9: /* '1' to '9' keys */
-+        if (vs->vd->dcl.con == NULL && down &&
-+            kbd_state_modifier_get(vs->vd->kbd, KBD_MOD_CTRL) &&
-+            kbd_state_modifier_get(vs->vd->kbd, KBD_MOD_ALT)) {
-             /* Reset the modifiers sent to the current console */
--            reset_keys(vs);
--            console_select(keycode - 0x02);
-+            kbd_state_lift_all_keys(vs->vd->kbd);
-+            console_select(qcode - Q_KEY_CODE_1);
-             return;
-         }
--        break;
--    case 0x3a:                        /* CapsLock */
--    case 0x45:                        /* NumLock */
--        if (down)
--            vs->modifiers_state[keycode] ^= 1;
-+    default:
-         break;
-     }
- 
-@@ -1837,16 +1808,14 @@ static void do_key_event(VncState *vs, int down, int keycode, int sym)
-            toggles numlock away from the VNC window.
-         */
-         if (keysym_is_numlock(vs->vd->kbd_layout, sym & 0xFFFF)) {
--            if (!vs->modifiers_state[0x45]) {
-+            if (!kbd_state_modifier_get(vs->vd->kbd, KBD_MOD_NUMLOCK)) {
-                 trace_vnc_key_sync_numlock(true);
--                vs->modifiers_state[0x45] = 1;
--                press_key(vs, 0xff7f);
-+                press_key(vs, Q_KEY_CODE_NUM_LOCK);
-             }
-         } else {
--            if (vs->modifiers_state[0x45]) {
-+            if (kbd_state_modifier_get(vs->vd->kbd, KBD_MOD_NUMLOCK)) {
-                 trace_vnc_key_sync_numlock(false);
--                vs->modifiers_state[0x45] = 0;
--                press_key(vs, 0xff7f);
-+                press_key(vs, Q_KEY_CODE_NUM_LOCK);
-             }
-         }
-     }
-@@ -1859,30 +1828,25 @@ static void do_key_event(VncState *vs, int down, int keycode, int sym)
-            toggles capslock away from the VNC window.
-         */
-         int uppercase = !!(sym >= 'A' && sym <= 'Z');
--        int shift = !!(vs->modifiers_state[0x2a] | vs->modifiers_state[0x36]);
--        int capslock = !!(vs->modifiers_state[0x3a]);
-+        bool shift = kbd_state_modifier_get(vs->vd->kbd, KBD_MOD_SHIFT);
-+        bool capslock = kbd_state_modifier_get(vs->vd->kbd, KBD_MOD_CAPSLOCK);
-         if (capslock) {
-             if (uppercase == shift) {
-                 trace_vnc_key_sync_capslock(false);
--                vs->modifiers_state[0x3a] = 0;
--                press_key(vs, 0xffe5);
-+                press_key(vs, Q_KEY_CODE_CAPS_LOCK);
-             }
-         } else {
-             if (uppercase != shift) {
-                 trace_vnc_key_sync_capslock(true);
--                vs->modifiers_state[0x3a] = 1;
--                press_key(vs, 0xffe5);
-+                press_key(vs, Q_KEY_CODE_CAPS_LOCK);
-             }
-         }
-     }
- 
--    if (qemu_console_is_graphic(NULL)) {
--        qemu_input_event_send_key_number(vs->vd->dcl.con, keycode, down);
--        qemu_input_event_send_key_delay(vs->vd->key_delay_ms);
--    } else {
--        bool numlock = vs->modifiers_state[0x45];
--        bool control = (vs->modifiers_state[0x1d] ||
--                        vs->modifiers_state[0x9d]);
-+    kbd_state_key_event(vs->vd->kbd, qcode, down);
-+    if (!qemu_console_is_graphic(NULL)) {
-+        bool numlock = kbd_state_modifier_get(vs->vd->kbd, KBD_MOD_NUMLOCK);
-+        bool control = kbd_state_modifier_get(vs->vd->kbd, KBD_MOD_CTRL);
-         /* QEMU console emulation */
-         if (down) {
-             switch (keycode) {
-@@ -1983,27 +1947,6 @@ static void do_key_event(VncState *vs, int down, int keycode, int sym)
-     }
- }
- 
--static void vnc_release_modifiers(VncState *vs)
--{
--    static const int keycodes[] = {
--        /* shift, control, alt keys, both left & right */
--        0x2a, 0x36, 0x1d, 0x9d, 0x38, 0xb8,
--    };
--    int i, keycode;
--
--    if (!qemu_console_is_graphic(NULL)) {
--        return;
--    }
--    for (i = 0; i < ARRAY_SIZE(keycodes); i++) {
--        keycode = keycodes[i];
--        if (!vs->modifiers_state[keycode]) {
--            continue;
--        }
--        qemu_input_event_send_key_number(vs->vd->dcl.con, keycode, false);
--        qemu_input_event_send_key_delay(vs->vd->key_delay_ms);
--    }
--}
--
- static const char *code2name(int keycode)
- {
-     return QKeyCode_str(qemu_input_key_number_to_qcode(keycode));
-@@ -2011,9 +1954,9 @@ static const char *code2name(int keycode)
+@@ -1954,9 +1954,6 @@ static const char *code2name(int keycode)
  
  static void key_event(VncState *vs, int down, uint32_t sym)
  {
--    bool shift = vs->modifiers_state[0x2a] || vs->modifiers_state[0x36];
--    bool altgr = vs->modifiers_state[0xb8];
--    bool ctrl  = vs->modifiers_state[0x1d] || vs->modifiers_state[0x9d];
-+    bool shift = kbd_state_modifier_get(vs->vd->kbd, KBD_MOD_SHIFT);
-+    bool altgr = kbd_state_modifier_get(vs->vd->kbd, KBD_MOD_ALTGR);
-+    bool ctrl  = kbd_state_modifier_get(vs->vd->kbd, KBD_MOD_CTRL);
+-    bool shift = kbd_state_modifier_get(vs->vd->kbd, KBD_MOD_SHIFT);
+-    bool altgr = kbd_state_modifier_get(vs->vd->kbd, KBD_MOD_ALTGR);
+-    bool ctrl  = kbd_state_modifier_get(vs->vd->kbd, KBD_MOD_CTRL);
      int keycode;
      int lsym = sym;
  
-@@ -3240,6 +3183,7 @@ void vnc_display_init(const char *id, Error **errp)
+@@ -1965,7 +1962,7 @@ static void key_event(VncState *vs, int down, uint32_t sym)
+     }
  
-     vd->dcl.ops = &dcl_ops;
-     register_displaychangelistener(&vd->dcl);
-+    vd->kbd = kbd_state_init(vd->dcl.con);
+     keycode = keysym2scancode(vs->vd->kbd_layout, lsym & 0xFFFF,
+-                              shift, altgr, ctrl) & SCANCODE_KEYMASK;
++                              vs->vd->kbd) & SCANCODE_KEYMASK;
+     trace_vnc_key_event_map(down, sym, keycode, code2name(keycode));
+     do_key_event(vs, down, keycode, sym);
  }
- 
- 
-@@ -3976,7 +3920,6 @@ void vnc_display_open(const char *id, Error **errp)
-         vd->led = qemu_add_led_event_handler(kbd_leds, vd);
-     }
-     vd->ledstate = 0;
--    vd->key_delay_ms = key_delay_ms;
- 
-     device_id = qemu_opt_get(opts, "display");
-     if (device_id) {
-@@ -3993,10 +3936,13 @@ void vnc_display_open(const char *id, Error **errp)
-     }
- 
-     if (con != vd->dcl.con) {
-+        kbd_state_free(vd->kbd);
-         unregister_displaychangelistener(&vd->dcl);
-         vd->dcl.con = con;
-         register_displaychangelistener(&vd->dcl);
-+        vd->kbd = kbd_state_init(vd->dcl.con);
-     }
-+    kbd_state_set_delay(vd->kbd, key_delay_ms);
- 
-     if (saddr == NULL) {
-         goto cleanup;
 -- 
 2.9.3
