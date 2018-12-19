@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45353)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=884a3e257=Alistair.Francis@wdc.com>)
-	id 1gZhL0-0000rn-QY
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:16:59 -0500
+	id 1gZhLT-000161-HL
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:17:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=884a3e257=Alistair.Francis@wdc.com>)
-	id 1gZhKv-0008Cu-QL
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:16:58 -0500
+	id 1gZhLP-0008Vg-5v
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:17:27 -0500
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Wed, 19 Dec 2018 19:16:22 +0000
-Message-ID: <02fc0b3a733f5f08eb396bee5afd3d327941f0c9.1545246859.git.alistair.francis@wdc.com>
+Date: Wed, 19 Dec 2018 19:17:20 +0000
+Message-ID: <6e43abaa64361d57b9bc9439820d0e7701f2d47e.1545246859.git.alistair.francis@wdc.com>
 References: <cover.1545246859.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1545246859.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v2 01/23] elf.h: Add the RISCV ELF magic numbers
+Subject: [Qemu-devel] [PATCH v2 06/23] riscv: Add the tcg target registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,74 +32,143 @@ Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/elf.h | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 55 insertions(+)
+ tcg/riscv/tcg-target.inc.c | 118 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 118 insertions(+)
+ create mode 100644 tcg/riscv/tcg-target.inc.c
 
-diff --git a/include/elf.h b/include/elf.h
-index c151164b63..0ac7911b7b 100644
---- a/include/elf.h
-+++ b/include/elf.h
-@@ -1338,6 +1338,61 @@ typedef struct {
- #define R_IA64_DTPREL64LSB	0xb7	/* @dtprel(sym + add), data8 LSB */
- #define R_IA64_LTOFF_DTPREL22	0xba	/* @ltoff(@dtprel(s+a)), imm22 */
-=20
-+/* RISC-V relocations.  */
-+#define R_RISCV_NONE          0
-+#define R_RISCV_32            1
-+#define R_RISCV_64            2
-+#define R_RISCV_RELATIVE      3
-+#define R_RISCV_COPY          4
-+#define R_RISCV_JUMP_SLOT     5
-+#define R_RISCV_TLS_DTPMOD32  6
-+#define R_RISCV_TLS_DTPMOD64  7
-+#define R_RISCV_TLS_DTPREL32  8
-+#define R_RISCV_TLS_DTPREL64  9
-+#define R_RISCV_TLS_TPREL32   10
-+#define R_RISCV_TLS_TPREL64   11
-+#define R_RISCV_BRANCH        16
-+#define R_RISCV_JAL           17
-+#define R_RISCV_CALL          18
-+#define R_RISCV_CALL_PLT      19
-+#define R_RISCV_GOT_HI20      20
-+#define R_RISCV_TLS_GOT_HI20  21
-+#define R_RISCV_TLS_GD_HI20   22
-+#define R_RISCV_PCREL_HI20    23
-+#define R_RISCV_PCREL_LO12_I  24
-+#define R_RISCV_PCREL_LO12_S  25
-+#define R_RISCV_HI20          26
-+#define R_RISCV_LO12_I        27
-+#define R_RISCV_LO12_S        28
-+#define R_RISCV_TPREL_HI20    29
-+#define R_RISCV_TPREL_LO12_I  30
-+#define R_RISCV_TPREL_LO12_S  31
-+#define R_RISCV_TPREL_ADD     32
-+#define R_RISCV_ADD8          33
-+#define R_RISCV_ADD16         34
-+#define R_RISCV_ADD32         35
-+#define R_RISCV_ADD64         36
-+#define R_RISCV_SUB8          37
-+#define R_RISCV_SUB16         38
-+#define R_RISCV_SUB32         39
-+#define R_RISCV_SUB64         40
-+#define R_RISCV_GNU_VTINHERIT 41
-+#define R_RISCV_GNU_VTENTRY   42
-+#define R_RISCV_ALIGN         43
-+#define R_RISCV_RVC_BRANCH    44
-+#define R_RISCV_RVC_JUMP      45
-+#define R_RISCV_RVC_LUI       46
-+#define R_RISCV_GPREL_I       47
-+#define R_RISCV_GPREL_S       48
-+#define R_RISCV_TPREL_I       49
-+#define R_RISCV_TPREL_S       50
-+#define R_RISCV_RELAX         51
-+#define R_RISCV_SUB6          52
-+#define R_RISCV_SET6          53
-+#define R_RISCV_SET8          54
-+#define R_RISCV_SET16         55
-+#define R_RISCV_SET32         56
+diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
+new file mode 100644
+index 0000000000..6c969e3973
+--- /dev/null
++++ b/tcg/riscv/tcg-target.inc.c
+@@ -0,0 +1,118 @@
++/*
++ * Tiny Code Generator for QEMU
++ *
++ * Copyright (c) 2018 SiFive, Inc
++ * Copyright (c) 2008-2009 Arnaud Patard <arnaud.patard@rtp-net.org>
++ * Copyright (c) 2009 Aurelien Jarno <aurelien@aurel32.net>
++ * Copyright (c) 2008 Fabrice Bellard
++ *
++ * Based on i386/tcg-target.c and mips/tcg-target.c
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a=
+ copy
++ * of this software and associated documentation files (the "Software"), t=
+o deal
++ * in the Software without restriction, including without limitation the r=
+ights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or se=
+ll
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included=
+ in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS=
+ OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY=
+,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OT=
+HER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING=
+ FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS =
+IN
++ * THE SOFTWARE.
++ */
 +
- typedef struct elf32_rel {
-   Elf32_Addr	r_offset;
-   Elf32_Word	r_info;
++#include "tcg-pool.inc.c"
++
++#ifdef CONFIG_DEBUG_TCG
++static const char * const tcg_target_reg_names[TCG_TARGET_NB_REGS] =3D {
++    "zero",
++    "ra",
++    "sp",
++    "gp",
++    "tp",
++    "t0",
++    "t1",
++    "t2",
++    "s0",
++    "s1",
++    "a0",
++    "a1",
++    "a2",
++    "a3",
++    "a4",
++    "a5",
++    "a6",
++    "a7",
++    "s2",
++    "s3",
++    "s4",
++    "s5",
++    "s6",
++    "s7",
++    "s8",
++    "s9",
++    "s10",
++    "s11",
++    "t3",
++    "t4",
++    "t5",
++    "t6"
++};
++#endif
++
++static const int tcg_target_reg_alloc_order[] =3D {
++    /* Call saved registers */
++    /* TCG_REG_S0 reservered for TCG_AREG0 */
++    TCG_REG_S1,
++    TCG_REG_S2,
++    TCG_REG_S3,
++    TCG_REG_S4,
++    TCG_REG_S5,
++    TCG_REG_S6,
++    TCG_REG_S7,
++    TCG_REG_S8,
++    TCG_REG_S9,
++    TCG_REG_S10,
++    TCG_REG_S11,
++
++    /* Call clobbered registers */
++    TCG_REG_T0,
++    TCG_REG_T1,
++    TCG_REG_T2,
++    TCG_REG_T3,
++    TCG_REG_T4,
++    TCG_REG_T5,
++    TCG_REG_T6,
++
++    /* Argument registers */
++    TCG_REG_A0,
++    TCG_REG_A1,
++    TCG_REG_A2,
++    TCG_REG_A3,
++    TCG_REG_A4,
++    TCG_REG_A5,
++    TCG_REG_A6,
++    TCG_REG_A7,
++};
++
++static const int tcg_target_call_iarg_regs[] =3D {
++    TCG_REG_A0,
++    TCG_REG_A1,
++    TCG_REG_A2,
++    TCG_REG_A3,
++    TCG_REG_A4,
++    TCG_REG_A5,
++    TCG_REG_A6,
++    TCG_REG_A7,
++};
++
++static const int tcg_target_call_oarg_regs[] =3D {
++    TCG_REG_A0,
++    TCG_REG_A1,
++};
 --=20
 2.19.1
