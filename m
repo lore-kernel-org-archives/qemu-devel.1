@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZWbp-0001zP-6V
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:39 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gZWbq-00020s-6V
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZWbm-0005xv-EX
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:37 -0500
-Date: Wed, 19 Dec 2018 17:38:38 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gZWbn-0005yc-09
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:38 -0500
+Date: Wed, 19 Dec 2018 17:40:34 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181219063838.GX30570@umbus.fritz.box>
+Message-ID: <20181219064034.GA30570@umbus.fritz.box>
 References: <20181218063911.2112-1-richard.henderson@linaro.org>
-	<20181218063911.2112-29-richard.henderson@linaro.org>
+	<20181218063911.2112-32-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="8MA55IEjTDEadc2f"
+	protocol="application/pgp-signature"; boundary="q5wOvoHkaccQRDme"
 Content-Disposition: inline
-In-Reply-To: <20181218063911.2112-29-richard.henderson@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 28/34] target/ppc: Remove vscr_nj and
- vscr_sat
+In-Reply-To: <20181218063911.2112-32-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 31/34] target/ppc: Add set_vscr_sat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +28,162 @@ To: Richard Henderson <richard.henderson@linaro.org>
 Cc: qemu-devel@nongnu.org, mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org
 
 
---8MA55IEjTDEadc2f
+--q5wOvoHkaccQRDme
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 17, 2018 at 10:39:05PM -0800, Richard Henderson wrote:
-> These macros are no longer used.
+On Mon, Dec 17, 2018 at 10:39:08PM -0800, Richard Henderson wrote:
+> This is required before changing the representation of the register.
 >=20
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  target/ppc/cpu.h | 2 --
->  1 file changed, 2 deletions(-)
+>  target/ppc/int_helper.c | 29 +++++++++++++++++------------
+>  1 file changed, 17 insertions(+), 12 deletions(-)
 >=20
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index c8f449081d..a2fe6058b1 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -700,8 +700,6 @@ enum {
->  /* Vector status and control register */
->  #define VSCR_NJ		16 /* Vector non-java */
->  #define VSCR_SAT	0 /* Vector saturation */
-> -#define vscr_nj		(((env->vscr) >> VSCR_NJ)	& 0x1)
-> -#define vscr_sat	(((env->vscr) >> VSCR_SAT)	& 0x1)
+> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+> index 75201bbba6..38aa3e85a6 100644
+> --- a/target/ppc/int_helper.c
+> +++ b/target/ppc/int_helper.c
+> @@ -480,6 +480,11 @@ uint32_t helper_mfvscr(CPUPPCState *env)
+>      return env->vscr;
+>  }
 > =20
->  /***********************************************************************=
-******/
->  /* BookE e500 MMU registers */
+> +static inline void set_vscr_sat(CPUPPCState *env)
+> +{
+> +    env->vscr |=3D 1 << VSCR_SAT;
+> +}
+> +
+>  void helper_vaddcuw(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
+>  {
+>      int i;
+> @@ -593,7 +598,7 @@ VARITHFPFMA(nmsubfp, float_muladd_negate_result | flo=
+at_muladd_negate_c);
+>              }                                                           \
+>          }                                                               \
+>          if (sat) {                                                      \
+> -            env->vscr |=3D (1 << VSCR_SAT);                             =
+  \
+> +            set_vscr_sat(env);                                          \
+>          }                                                               \
+>      }
+>  #define VARITHSAT_SIGNED(suffix, element, optype, cvt)          \
+> @@ -865,7 +870,7 @@ void helper_vcmpbfp_dot(CPUPPCState *env, ppc_avr_t *=
+r, ppc_avr_t *a,
+>              }                                                           \
+>          }                                                               \
+>          if (sat) {                                                      \
+> -            env->vscr |=3D (1 << VSCR_SAT);                             =
+  \
+> +            set_vscr_sat(env);                                          \
+>          }                                                               \
+>      }
+>  VCT(uxs, cvtsduw, u32)
+> @@ -916,7 +921,7 @@ void helper_vmhaddshs(CPUPPCState *env, ppc_avr_t *r,=
+ ppc_avr_t *a,
+>      }
+> =20
+>      if (sat) {
+> -        env->vscr |=3D (1 << VSCR_SAT);
+> +        set_vscr_sat(env);
+>      }
+>  }
+> =20
+> @@ -933,7 +938,7 @@ void helper_vmhraddshs(CPUPPCState *env, ppc_avr_t *r=
+, ppc_avr_t *a,
+>      }
+> =20
+>      if (sat) {
+> -        env->vscr |=3D (1 << VSCR_SAT);
+> +        set_vscr_sat(env);
+>      }
+>  }
+> =20
+> @@ -1061,7 +1066,7 @@ void helper_vmsumshs(CPUPPCState *env, ppc_avr_t *r=
+, ppc_avr_t *a,
+>      }
+> =20
+>      if (sat) {
+> -        env->vscr |=3D (1 << VSCR_SAT);
+> +        set_vscr_sat(env);
+>      }
+>  }
+> =20
+> @@ -1114,7 +1119,7 @@ void helper_vmsumuhs(CPUPPCState *env, ppc_avr_t *r=
+, ppc_avr_t *a,
+>      }
+> =20
+>      if (sat) {
+> -        env->vscr |=3D (1 << VSCR_SAT);
+> +        set_vscr_sat(env);
+>      }
+>  }
+> =20
+> @@ -1633,7 +1638,7 @@ void helper_vpkpx(ppc_avr_t *r, ppc_avr_t *a, ppc_a=
+vr_t *b)
+>          }                                                               \
+>          *r =3D result;                                                  =
+  \
+>          if (dosat && sat) {                                             \
+> -            env->vscr |=3D (1 << VSCR_SAT);                             =
+  \
+> +            set_vscr_sat(env);                                          \
+>          }                                                               \
+>      }
+>  #define I(x, y) (x)
+> @@ -2106,7 +2111,7 @@ void helper_vsumsws(CPUPPCState *env, ppc_avr_t *r,=
+ ppc_avr_t *a, ppc_avr_t *b)
+>      *r =3D result;
+> =20
+>      if (sat) {
+> -        env->vscr |=3D (1 << VSCR_SAT);
+> +        set_vscr_sat(env);
+>      }
+>  }
+> =20
+> @@ -2133,7 +2138,7 @@ void helper_vsum2sws(CPUPPCState *env, ppc_avr_t *r=
+, ppc_avr_t *a, ppc_avr_t *b)
+> =20
+>      *r =3D result;
+>      if (sat) {
+> -        env->vscr |=3D (1 << VSCR_SAT);
+> +        set_vscr_sat(env);
+>      }
+>  }
+> =20
+> @@ -2152,7 +2157,7 @@ void helper_vsum4sbs(CPUPPCState *env, ppc_avr_t *r=
+, ppc_avr_t *a, ppc_avr_t *b)
+>      }
+> =20
+>      if (sat) {
+> -        env->vscr |=3D (1 << VSCR_SAT);
+> +        set_vscr_sat(env);
+>      }
+>  }
+> =20
+> @@ -2169,7 +2174,7 @@ void helper_vsum4shs(CPUPPCState *env, ppc_avr_t *r=
+, ppc_avr_t *a, ppc_avr_t *b)
+>      }
+> =20
+>      if (sat) {
+> -        env->vscr |=3D (1 << VSCR_SAT);
+> +        set_vscr_sat(env);
+>      }
+>  }
+> =20
+> @@ -2188,7 +2193,7 @@ void helper_vsum4ubs(CPUPPCState *env, ppc_avr_t *r=
+, ppc_avr_t *a, ppc_avr_t *b)
+>      }
+> =20
+>      if (sat) {
+> -        env->vscr |=3D (1 << VSCR_SAT);
+> +        set_vscr_sat(env);
+>      }
+>  }
+> =20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -66,24 +191,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---8MA55IEjTDEadc2f
+--q5wOvoHkaccQRDme
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwZ524ACgkQbDjKyiDZ
-s5KmPhAAgcku9sZe33tDr1qO2no4c06T+CYCkbBZvH48LrKF+JIE0CGd8kKndDNQ
-LmaOm9cieyPdwbVLINHeAU55ocnEGQhaEj+1wGQtZwi3mpXWo+Qq8wBmRfBjJWJ4
-bPCSWj+e1sFF6UekQNTjODe3RDdnVaJ/awLV9tnqwcuf3w6PGofJCXtM7riadg1M
-p9ePrXJnn0w0TEFka6Xbyhi5L/dtKg9xoVLGRqXGBbCyhDxQMJ8HGXk0JETtm65I
-gTU20gm3zm+DwCVEa05rCFZEpOJZ885Bvq2lMlSTYPxrez9wVjEtd2cUpCbzGMbJ
-t5FtPsjYLJUgzNKmITEcryjiirJWysUepu1pG83X/jaIa5W+AKpZW1O277BNAx0D
-eaprc2cWHV6UURtFfMnxJU9SDygedAYfVqyUvENEDsTxWcwMdS1NcWzUeAhDUBbM
-p6sXJ9OX0ZqsdKgScnc+UboWqY+2hWhKIydcnUPMlV7tehDnyks87bE5Ixq7V/or
-TIUmpqAVy1ZkH1RZNAirc0SJXbFZ2qdEtgBIBQ+P96Ub9HklC20G/XgfwswXCT+1
-2nebyrYmGQr1rXR+m9VxGz+pnb5JkAGCnCtF189XcykV/XZ1sZ9yTHB8+2Ijc6KD
-f8x4VjHXoiwwSrvAqhD4+KVWcp3p+b9t36e24sBG41J8iEfgYJw=
-=6pUK
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwZ5+EACgkQbDjKyiDZ
+s5I8gxAAl/+KTR2UHCJWqLkoKUWfW75TD2uhT+byGnTnEfcyyP2Qe8oSj4a3YNZQ
+jDYnzBwjmRcTeH3ndyzT/ruHws+uZb/Conw0GDiOtfpDfpoVHOZ/p/UHMso6nedO
+aMwSgpkYxQCGf3gJl8laGpeqcjP3sEbHyVUHCumpQw4tf6STEwqdnCw8iCWFvT2o
+Abshyli7BUclu92ZQAUUfJQn8wKHSfZkv0GWwlCMfL/cXIk3hMJcipfkU34vjBL1
+wR7h7OB6VfCvPulQIgWF0fa5Pw9NUOv4RoxzSmy2JLiSlx16Ksys05wKOW1wlwVW
+1gOGRUitAByscNcWHDgo/HO6ANAHxzNU0cR9ZVBPvhOtMFHgmfwDxpa7takEAI0n
+iN59ySpf+c3hqCRhrCNdbwUNjGm+4vMxXxpKd8OiROPLddoWRyi9jzLpgaZQXHkw
+txxR1GTHGCE+G6d01dCMMG3/bERmc+CV9TaOScAOf32kGNKQut7uSzcJQx1f6ft+
+KSOSWLNm6y5ecACalDXpDyTYcZH77qcjp7uMjBZpe1hFJ1P9bmYdeJavHNIFqR1g
+YqmFKJ4UmzEFKIQ5D91RRyUhV1eVyIB28F1fXwveRZ1EHw8WKwuDxMpBjJtYg8Bd
+kwZFxX5AYMxbjIJb9lxTF43CZ1stNR9d900AdFoGm+cOa0fDSWU=
+=p49+
 -----END PGP SIGNATURE-----
 
---8MA55IEjTDEadc2f--
+--q5wOvoHkaccQRDme--
