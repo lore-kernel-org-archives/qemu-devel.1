@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46400)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=884a3e257=Alistair.Francis@wdc.com>)
-	id 1gZhO3-000398-9W
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:20:11 -0500
+	id 1gZhOM-0003OV-1C
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:20:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=884a3e257=Alistair.Francis@wdc.com>)
-	id 1gZhNy-0002Ch-VB
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:20:07 -0500
+	id 1gZhOD-0002SR-T5
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:20:23 -0500
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Wed, 19 Dec 2018 19:19:59 +0000
-Message-ID: <c445175310fa836b61fd862a55628907f0093194.1545246859.git.alistair.francis@wdc.com>
+Date: Wed, 19 Dec 2018 19:20:09 +0000
+Message-ID: <caa478c8987d6042434bb9582017cdf0ea192208.1545246859.git.alistair.francis@wdc.com>
 References: <cover.1545246859.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1545246859.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v2 21/23] tcg: Add RISC-V cpu signal handler
+Subject: [Qemu-devel] [PATCH v2 22/23] dias: Add RISC-V support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,95 +30,31 @@ Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistai
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/tcg/user-exec.c | 75 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 75 insertions(+)
+ disas.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
-index cd75829cf2..941295ea49 100644
---- a/accel/tcg/user-exec.c
-+++ b/accel/tcg/user-exec.c
-@@ -571,6 +571,81 @@ int cpu_signal_handler(int host_signum, void *pinfo,
-     return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
- }
-=20
-+#elif defined(__riscv)
-+
-+int cpu_signal_handler(int host_signum, void *pinfo,
-+                       void *puc)
-+{
-+    siginfo_t *info =3D pinfo;
-+    ucontext_t *uc =3D puc;
-+    greg_t pc =3D uc->uc_mcontext.__gregs[REG_PC];
-+    uint32_t insn =3D *(uint32_t *)pc;
-+    int is_write =3D 0;
-+
-+    /* Detect store by reading the instruction at the program
-+       counter. Note: we currently only generate 32-bit
-+       instructions so we thus only detect 32-bit stores */
-+    switch (((insn >> 0) & 0b11)) {
-+    case 3:
-+        switch (((insn >> 2) & 0b11111)) {
-+        case 8:
-+            switch (((insn >> 12) & 0b111)) {
-+            case 0: /* sb */
-+            case 1: /* sh */
-+            case 2: /* sw */
-+            case 3: /* sd */
-+            case 4: /* sq */
-+                is_write =3D 1;
-+                break;
-+            default:
-+                break;
-+            }
-+            break;
-+        case 9:
-+            switch (((insn >> 12) & 0b111)) {
-+            case 2: /* fsw */
-+            case 3: /* fsd */
-+            case 4: /* fsq */
-+                is_write =3D 1;
-+                break;
-+            default:
-+                break;
-+            }
-+            break;
-+        default:
-+            break;
-+        }
-+    }
-+
-+    /* Check for compressed instructions */
-+    switch (((insn >> 13) & 0b111)) {
-+    case 7:
-+        switch (insn & 0b11) {
-+        case 0: /*c.sd */
-+        case 2: /* c.sdsp */
-+            is_write =3D 1;
-+            break;
-+        default:
-+            break;
-+        }
-+        break;
-+    case 6:
-+        switch (insn & 0b11) {
-+        case 0: /* c.sw */
-+        case 3: /* c.swsp */
-+            is_write =3D 1;
-+            break;
-+        default:
-+            break;
-+        }
-+        break;
-+    default:
-+        break;
-+    }
-+
-+    return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
-+}
-+
- #else
-=20
- #error host CPU specific signal handler needed
+diff --git a/disas.c b/disas.c
+index f9c517b358..d9aa713a40 100644
+--- a/disas.c
++++ b/disas.c
+@@ -522,8 +522,14 @@ void disas(FILE *out, void *code, unsigned long size)
+ # ifdef _ARCH_PPC64
+     s.info.cap_mode =3D CS_MODE_64;
+ # endif
+-#elif defined(__riscv__)
+-    print_insn =3D print_insn_riscv;
++#elif defined(__riscv) && defined(CONFIG_RISCV_DIS)
++#if defined(_ILP32) || (__riscv_xlen =3D=3D 32)
++    print_insn =3D print_insn_riscv32;
++#elif defined(_LP64)
++    print_insn =3D print_insn_riscv64;
++#else
++#error unsupported RISC-V ABI
++#endif
+ #elif defined(__aarch64__) && defined(CONFIG_ARM_A64_DIS)
+     print_insn =3D print_insn_arm_a64;
+     s.info.cap_arch =3D CS_ARCH_ARM64;
 --=20
 2.19.1
