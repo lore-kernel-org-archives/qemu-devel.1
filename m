@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZWbq-00020s-6V
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:41 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gZWbp-0001zQ-6j
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZWbn-0005yc-09
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:38 -0500
-Date: Wed, 19 Dec 2018 17:40:34 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gZWbg-0005pv-Tw
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:37 -0500
+Date: Wed, 19 Dec 2018 17:27:48 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181219064034.GA30570@umbus.fritz.box>
+Message-ID: <20181219062748.GL30570@umbus.fritz.box>
 References: <20181218063911.2112-1-richard.henderson@linaro.org>
-	<20181218063911.2112-32-richard.henderson@linaro.org>
+	<20181218063911.2112-17-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="q5wOvoHkaccQRDme"
+	protocol="application/pgp-signature"; boundary="tv2SIFopg1r47n4a"
 Content-Disposition: inline
-In-Reply-To: <20181218063911.2112-32-richard.henderson@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 31/34] target/ppc: Add set_vscr_sat
+In-Reply-To: <20181218063911.2112-17-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 16/34] target/ppc: move FP and VMX
+ registers into aligned vsr register array
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,162 +29,631 @@ To: Richard Henderson <richard.henderson@linaro.org>
 Cc: qemu-devel@nongnu.org, mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org
 
 
---q5wOvoHkaccQRDme
+--tv2SIFopg1r47n4a
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 17, 2018 at 10:39:08PM -0800, Richard Henderson wrote:
-> This is required before changing the representation of the register.
+On Mon, Dec 17, 2018 at 10:38:53PM -0800, Richard Henderson wrote:
+> From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 >=20
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> The VSX register array is a block of 64 128-bit registers where the first=
+ 32
+> registers consist of the existing 64-bit FP registers extended to 128-bit
+> using new VSR registers, and the last 32 registers are the VMX 128-bit
+> registers as show below:
+>=20
+>             64-bit               64-bit
+>     +--------------------+--------------------+
+>     |        FP0         |                    |  VSR0
+>     +--------------------+--------------------+
+>     |        FP1         |                    |  VSR1
+>     +--------------------+--------------------+
+>     |        ...         |        ...         |  ...
+>     +--------------------+--------------------+
+>     |        FP30        |                    |  VSR30
+>     +--------------------+--------------------+
+>     |        FP31        |                    |  VSR31
+>     +--------------------+--------------------+
+>     |                  VMX0                   |  VSR32
+>     +-----------------------------------------+
+>     |                  VMX1                   |  VSR33
+>     +-----------------------------------------+
+>     |                  ...                    |  ...
+>     +-----------------------------------------+
+>     |                  VMX30                  |  VSR62
+>     +-----------------------------------------+
+>     |                  VMX31                  |  VSR63
+>     +-----------------------------------------+
+>=20
+> In order to allow for future conversion of VSX instructions to use TCG ve=
+ctor
+> operations, recreate the same layout using an aligned version of the exis=
+ting
+> vsr register array.
+>=20
+> Since the old fpr and avr register arrays are removed, the existing calle=
+rs
+> must also be updated to use the correct offset in the vsr register array.=
+ This
+> also includes switching the relevant VMState fields over to using subarra=
+ys
+> to make sure that migration is preserved.
+>=20
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
+> Message-Id: <20181217122405.18732-8-mark.cave-ayland@ilande.co.uk>
 > ---
->  target/ppc/int_helper.c | 29 +++++++++++++++++------------
->  1 file changed, 17 insertions(+), 12 deletions(-)
+>  target/ppc/cpu.h                    |  9 ++--
+>  target/ppc/internal.h               | 18 ++------
+>  linux-user/ppc/signal.c             | 24 +++++-----
+>  target/ppc/arch_dump.c              | 12 ++---
+>  target/ppc/gdbstub.c                |  8 ++--
+>  target/ppc/machine.c                | 72 +++++++++++++++++++++++++++--
+>  target/ppc/monitor.c                |  4 +-
+>  target/ppc/translate.c              | 14 +++---
+>  target/ppc/translate/dfp-impl.inc.c |  2 +-
+>  target/ppc/translate/vmx-impl.inc.c |  7 ++-
+>  target/ppc/translate/vsx-impl.inc.c |  4 +-
+>  target/ppc/translate_init.inc.c     | 24 +++++-----
+>  12 files changed, 126 insertions(+), 72 deletions(-)
 >=20
-> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-> index 75201bbba6..38aa3e85a6 100644
-> --- a/target/ppc/int_helper.c
-> +++ b/target/ppc/int_helper.c
-> @@ -480,6 +480,11 @@ uint32_t helper_mfvscr(CPUPPCState *env)
->      return env->vscr;
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 5445d4c3c1..c8f449081d 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1016,8 +1016,6 @@ struct CPUPPCState {
+> =20
+>      /* Floating point execution context */
+>      float_status fp_status;
+> -    /* floating point registers */
+> -    float64 fpr[32];
+>      /* floating point status and control register */
+>      target_ulong fpscr;
+> =20
+> @@ -1067,11 +1065,10 @@ struct CPUPPCState {
+>      /* Special purpose registers */
+>      target_ulong spr[1024];
+>      ppc_spr_t spr_cb[1024];
+> -    /* Altivec registers */
+> -    ppc_avr_t avr[32];
+> +    /* Vector status and control register */
+>      uint32_t vscr;
+> -    /* VSX registers */
+> -    uint64_t vsr[32];
+> +    /* VSX registers (including FP and AVR) */
+> +    ppc_vsr_t vsr[64] QEMU_ALIGNED(16);
+>      /* SPE registers */
+>      uint64_t spe_acc;
+>      uint32_t spe_fscr;
+> diff --git a/target/ppc/internal.h b/target/ppc/internal.h
+> index b4b1f7b3db..b77d564a65 100644
+> --- a/target/ppc/internal.h
+> +++ b/target/ppc/internal.h
+> @@ -218,24 +218,14 @@ EXTRACT_HELPER_SPLIT_3(DCMX_XV, 5, 16, 0, 1, 2, 5, =
+1, 6, 6);
+> =20
+>  static inline void getVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
+>  {
+> -    if (n < 32) {
+> -        vsr->VsrD(0) =3D env->fpr[n];
+> -        vsr->VsrD(1) =3D env->vsr[n];
+> -    } else {
+> -        vsr->u64[0] =3D env->avr[n - 32].u64[0];
+> -        vsr->u64[1] =3D env->avr[n - 32].u64[1];
+> -    }
+> +    vsr->VsrD(0) =3D env->vsr[n].u64[0];
+> +    vsr->VsrD(1) =3D env->vsr[n].u64[1];
 >  }
 > =20
-> +static inline void set_vscr_sat(CPUPPCState *env)
+>  static inline void putVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
+>  {
+> -    if (n < 32) {
+> -        env->fpr[n] =3D vsr->VsrD(0);
+> -        env->vsr[n] =3D vsr->VsrD(1);
+> -    } else {
+> -        env->avr[n - 32].u64[0] =3D vsr->u64[0];
+> -        env->avr[n - 32].u64[1] =3D vsr->u64[1];
+> -    }
+> +    env->vsr[n].u64[0] =3D vsr->VsrD(0);
+> +    env->vsr[n].u64[1] =3D vsr->VsrD(1);
+>  }
+> =20
+>  void helper_compute_fprf_float16(CPUPPCState *env, float16 arg);
+> diff --git a/linux-user/ppc/signal.c b/linux-user/ppc/signal.c
+> index 2ae120a2bc..a053dd5b84 100644
+> --- a/linux-user/ppc/signal.c
+> +++ b/linux-user/ppc/signal.c
+> @@ -258,8 +258,8 @@ static void save_user_regs(CPUPPCState *env, struct t=
+arget_mcontext *frame)
+>      /* Save Altivec registers if necessary.  */
+>      if (env->insns_flags & PPC_ALTIVEC) {
+>          uint32_t *vrsave;
+> -        for (i =3D 0; i < ARRAY_SIZE(env->avr); i++) {
+> -            ppc_avr_t *avr =3D &env->avr[i];
+> +        for (i =3D 0; i < 32; i++) {
+> +            ppc_avr_t *avr =3D &env->vsr[32 + i];
+>              ppc_avr_t *vreg =3D (ppc_avr_t *)&frame->mc_vregs.altivec[i];
+> =20
+>              __put_user(avr->u64[PPC_VEC_HI], &vreg->u64[0]);
+> @@ -281,15 +281,15 @@ static void save_user_regs(CPUPPCState *env, struct=
+ target_mcontext *frame)
+>      /* Save VSX second halves */
+>      if (env->insns_flags2 & PPC2_VSX) {
+>          uint64_t *vsregs =3D (uint64_t *)&frame->mc_vregs.altivec[34];
+> -        for (i =3D 0; i < ARRAY_SIZE(env->vsr); i++) {
+> -            __put_user(env->vsr[i], &vsregs[i]);
+> +        for (i =3D 0; i < 32; i++) {
+> +            __put_user(env->vsr[i].u64[1], &vsregs[i]);
+>          }
+>      }
+> =20
+>      /* Save floating point registers.  */
+>      if (env->insns_flags & PPC_FLOAT) {
+> -        for (i =3D 0; i < ARRAY_SIZE(env->fpr); i++) {
+> -            __put_user(env->fpr[i], &frame->mc_fregs[i]);
+> +        for (i =3D 0; i < 32; i++) {
+> +            __put_user(env->vsr[i].u64[0], &frame->mc_fregs[i]);
+>          }
+>          __put_user((uint64_t) env->fpscr, &frame->mc_fregs[32]);
+>      }
+> @@ -373,8 +373,8 @@ static void restore_user_regs(CPUPPCState *env,
+>  #else
+>          v_regs =3D (ppc_avr_t *)frame->mc_vregs.altivec;
+>  #endif
+> -        for (i =3D 0; i < ARRAY_SIZE(env->avr); i++) {
+> -            ppc_avr_t *avr =3D &env->avr[i];
+> +        for (i =3D 0; i < 32; i++) {
+> +            ppc_avr_t *avr =3D &env->vsr[32 + i];
+>              ppc_avr_t *vreg =3D &v_regs[i];
+> =20
+>              __get_user(avr->u64[PPC_VEC_HI], &vreg->u64[0]);
+> @@ -393,16 +393,16 @@ static void restore_user_regs(CPUPPCState *env,
+>      /* Restore VSX second halves */
+>      if (env->insns_flags2 & PPC2_VSX) {
+>          uint64_t *vsregs =3D (uint64_t *)&frame->mc_vregs.altivec[34];
+> -        for (i =3D 0; i < ARRAY_SIZE(env->vsr); i++) {
+> -            __get_user(env->vsr[i], &vsregs[i]);
+> +        for (i =3D 0; i < 32; i++) {
+> +            __get_user(env->vsr[i].u64[1], &vsregs[i]);
+>          }
+>      }
+> =20
+>      /* Restore floating point registers.  */
+>      if (env->insns_flags & PPC_FLOAT) {
+>          uint64_t fpscr;
+> -        for (i =3D 0; i < ARRAY_SIZE(env->fpr); i++) {
+> -            __get_user(env->fpr[i], &frame->mc_fregs[i]);
+> +        for (i =3D 0; i < 32; i++) {
+> +            __get_user(env->vsr[i].u64[0], &frame->mc_fregs[i]);
+>          }
+>          __get_user(fpscr, &frame->mc_fregs[32]);
+>          env->fpscr =3D (uint32_t) fpscr;
+> diff --git a/target/ppc/arch_dump.c b/target/ppc/arch_dump.c
+> index cc1460e4e3..c272d0d3d4 100644
+> --- a/target/ppc/arch_dump.c
+> +++ b/target/ppc/arch_dump.c
+> @@ -140,7 +140,7 @@ static void ppc_write_elf_fpregset(NoteFuncArg *arg, =
+PowerPCCPU *cpu)
+>      memset(fpregset, 0, sizeof(*fpregset));
+> =20
+>      for (i =3D 0; i < 32; i++) {
+> -        fpregset->fpr[i] =3D cpu_to_dump64(s, cpu->env.fpr[i]);
+> +        fpregset->fpr[i] =3D cpu_to_dump64(s, cpu->env.vsr[i].u64[0]);
+>      }
+>      fpregset->fpscr =3D cpu_to_dump_reg(s, cpu->env.fpscr);
+>  }
+> @@ -166,11 +166,11 @@ static void ppc_write_elf_vmxregset(NoteFuncArg *ar=
+g, PowerPCCPU *cpu)
+>  #endif
+> =20
+>          if (needs_byteswap) {
+> -            vmxregset->avr[i].u64[0] =3D bswap64(cpu->env.avr[i].u64[1]);
+> -            vmxregset->avr[i].u64[1] =3D bswap64(cpu->env.avr[i].u64[0]);
+> +            vmxregset->avr[i].u64[0] =3D bswap64(cpu->env.vsr[32 + i].u6=
+4[1]);
+> +            vmxregset->avr[i].u64[1] =3D bswap64(cpu->env.vsr[32 + i].u6=
+4[0]);
+>          } else {
+> -            vmxregset->avr[i].u64[0] =3D cpu->env.avr[i].u64[0];
+> -            vmxregset->avr[i].u64[1] =3D cpu->env.avr[i].u64[1];
+> +            vmxregset->avr[i].u64[0] =3D cpu->env.vsr[32 + i].u64[0];
+> +            vmxregset->avr[i].u64[1] =3D cpu->env.vsr[32 + i].u64[1];
+>          }
+>      }
+>      vmxregset->vscr.u32[3] =3D cpu_to_dump32(s, cpu->env.vscr);
+> @@ -188,7 +188,7 @@ static void ppc_write_elf_vsxregset(NoteFuncArg *arg,=
+ PowerPCCPU *cpu)
+>      memset(vsxregset, 0, sizeof(*vsxregset));
+> =20
+>      for (i =3D 0; i < 32; i++) {
+> -        vsxregset->vsr[i] =3D cpu_to_dump64(s, cpu->env.vsr[i]);
+> +        vsxregset->vsr[i] =3D cpu_to_dump64(s, cpu->env.vsr[i].u64[1]);
+>      }
+>  }
+> =20
+> diff --git a/target/ppc/gdbstub.c b/target/ppc/gdbstub.c
+> index b6f6693583..8c9dc284c4 100644
+> --- a/target/ppc/gdbstub.c
+> +++ b/target/ppc/gdbstub.c
+> @@ -126,7 +126,7 @@ int ppc_cpu_gdb_read_register(CPUState *cs, uint8_t *=
+mem_buf, int n)
+>          gdb_get_regl(mem_buf, env->gpr[n]);
+>      } else if (n < 64) {
+>          /* fprs */
+> -        stfq_p(mem_buf, env->fpr[n-32]);
+> +        stfq_p(mem_buf, env->vsr[n - 32].u64[0]);
+>      } else {
+>          switch (n) {
+>          case 64:
+> @@ -178,7 +178,7 @@ int ppc_cpu_gdb_read_register_apple(CPUState *cs, uin=
+t8_t *mem_buf, int n)
+>          gdb_get_reg64(mem_buf, env->gpr[n]);
+>      } else if (n < 64) {
+>          /* fprs */
+> -        stfq_p(mem_buf, env->fpr[n-32]);
+> +        stfq_p(mem_buf, env->vsr[n - 32].u64[0]);
+>      } else if (n < 96) {
+>          /* Altivec */
+>          stq_p(mem_buf, n - 64);
+> @@ -234,7 +234,7 @@ int ppc_cpu_gdb_write_register(CPUState *cs, uint8_t =
+*mem_buf, int n)
+>          env->gpr[n] =3D ldtul_p(mem_buf);
+>      } else if (n < 64) {
+>          /* fprs */
+> -        env->fpr[n-32] =3D ldfq_p(mem_buf);
+> +        env->vsr[n - 32].u64[0] =3D ldfq_p(mem_buf);
+>      } else {
+>          switch (n) {
+>          case 64:
+> @@ -284,7 +284,7 @@ int ppc_cpu_gdb_write_register_apple(CPUState *cs, ui=
+nt8_t *mem_buf, int n)
+>          env->gpr[n] =3D ldq_p(mem_buf);
+>      } else if (n < 64) {
+>          /* fprs */
+> -        env->fpr[n-32] =3D ldfq_p(mem_buf);
+> +        env->vsr[n - 32].u64[0] =3D ldfq_p(mem_buf);
+>      } else {
+>          switch (n) {
+>          case 64 + 32:
+> diff --git a/target/ppc/machine.c b/target/ppc/machine.c
+> index e7b3725273..451cf376b4 100644
+> --- a/target/ppc/machine.c
+> +++ b/target/ppc/machine.c
+> @@ -45,7 +45,7 @@ static int cpu_load_old(QEMUFile *f, void *opaque, int =
+version_id)
+>              uint64_t l;
+>          } u;
+>          u.l =3D qemu_get_be64(f);
+> -        env->fpr[i] =3D u.d;
+> +        env->vsr[i].u64[0] =3D u.d;
+>      }
+>      qemu_get_be32s(f, &fpscr);
+>      env->fpscr =3D fpscr;
+> @@ -138,11 +138,73 @@ static const VMStateInfo vmstate_info_avr =3D {
+>  };
+> =20
+>  #define VMSTATE_AVR_ARRAY_V(_f, _s, _n, _v)                       \
+> -    VMSTATE_ARRAY(_f, _s, _n, _v, vmstate_info_avr, ppc_avr_t)
+> +    VMSTATE_SUB_ARRAY(_f, _s, 32, _n, _v, vmstate_info_avr, ppc_avr_t)
+> =20
+>  #define VMSTATE_AVR_ARRAY(_f, _s, _n)                             \
+>      VMSTATE_AVR_ARRAY_V(_f, _s, _n, 0)
+> =20
+> +static int get_fpr(QEMUFile *f, void *pv, size_t size,
+> +                   const VMStateField *field)
 > +{
-> +    env->vscr |=3D 1 << VSCR_SAT;
+> +    ppc_vsr_t *v =3D pv;
+> +
+> +    v->u64[0] =3D qemu_get_be64(f);
+> +
+> +    return 0;
 > +}
 > +
->  void helper_vaddcuw(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
+> +static int put_fpr(QEMUFile *f, void *pv, size_t size,
+> +                   const VMStateField *field, QJSON *vmdesc)
+> +{
+> +    ppc_vsr_t *v =3D pv;
+> +
+> +    qemu_put_be64(f, v->u64[0]);
+> +    return 0;
+> +}
+> +
+> +static const VMStateInfo vmstate_info_fpr =3D {
+> +    .name =3D "fpr",
+> +    .get  =3D get_fpr,
+> +    .put  =3D put_fpr,
+> +};
+> +
+> +#define VMSTATE_FPR_ARRAY_V(_f, _s, _n, _v)                       \
+> +    VMSTATE_SUB_ARRAY(_f, _s, 0, _n, _v, vmstate_info_fpr, ppc_vsr_t)
+> +
+> +#define VMSTATE_FPR_ARRAY(_f, _s, _n)                             \
+> +    VMSTATE_FPR_ARRAY_V(_f, _s, _n, 0)
+> +
+> +static int get_vsr(QEMUFile *f, void *pv, size_t size,
+> +                   const VMStateField *field)
+> +{
+> +    ppc_vsr_t *v =3D pv;
+> +
+> +    v->u64[1] =3D qemu_get_be64(f);
+> +
+> +    return 0;
+> +}
+> +
+> +static int put_vsr(QEMUFile *f, void *pv, size_t size,
+> +                   const VMStateField *field, QJSON *vmdesc)
+> +{
+> +    ppc_vsr_t *v =3D pv;
+> +
+> +    qemu_put_be64(f, v->u64[1]);
+> +    return 0;
+> +}
+> +
+> +static const VMStateInfo vmstate_info_vsr =3D {
+> +    .name =3D "vsr",
+> +    .get  =3D get_vsr,
+> +    .put  =3D put_vsr,
+> +};
+> +
+> +#define VMSTATE_VSR_ARRAY_V(_f, _s, _n, _v)                       \
+> +    VMSTATE_SUB_ARRAY(_f, _s, 0, _n, _v, vmstate_info_vsr, ppc_vsr_t)
+> +
+> +#define VMSTATE_VSR_ARRAY(_f, _s, _n)                             \
+> +    VMSTATE_VSR_ARRAY_V(_f, _s, _n, 0)
+> +
+>  static bool cpu_pre_2_8_migration(void *opaque, int version_id)
 >  {
->      int i;
-> @@ -593,7 +598,7 @@ VARITHFPFMA(nmsubfp, float_muladd_negate_result | flo=
-at_muladd_negate_c);
->              }                                                           \
->          }                                                               \
->          if (sat) {                                                      \
-> -            env->vscr |=3D (1 << VSCR_SAT);                             =
-  \
-> +            set_vscr_sat(env);                                          \
->          }                                                               \
->      }
->  #define VARITHSAT_SIGNED(suffix, element, optype, cvt)          \
-> @@ -865,7 +870,7 @@ void helper_vcmpbfp_dot(CPUPPCState *env, ppc_avr_t *=
-r, ppc_avr_t *a,
->              }                                                           \
->          }                                                               \
->          if (sat) {                                                      \
-> -            env->vscr |=3D (1 << VSCR_SAT);                             =
-  \
-> +            set_vscr_sat(env);                                          \
->          }                                                               \
->      }
->  VCT(uxs, cvtsduw, u32)
-> @@ -916,7 +921,7 @@ void helper_vmhaddshs(CPUPPCState *env, ppc_avr_t *r,=
- ppc_avr_t *a,
+>      PowerPCCPU *cpu =3D opaque;
+> @@ -354,7 +416,7 @@ static const VMStateDescription vmstate_fpu =3D {
+>      .minimum_version_id =3D 1,
+>      .needed =3D fpu_needed,
+>      .fields =3D (VMStateField[]) {
+> -        VMSTATE_FLOAT64_ARRAY(env.fpr, PowerPCCPU, 32),
+> +        VMSTATE_FPR_ARRAY(env.vsr, PowerPCCPU, 32),
+>          VMSTATE_UINTTL(env.fpscr, PowerPCCPU),
+>          VMSTATE_END_OF_LIST()
+>      },
+> @@ -373,7 +435,7 @@ static const VMStateDescription vmstate_altivec =3D {
+>      .minimum_version_id =3D 1,
+>      .needed =3D altivec_needed,
+>      .fields =3D (VMStateField[]) {
+> -        VMSTATE_AVR_ARRAY(env.avr, PowerPCCPU, 32),
+> +        VMSTATE_AVR_ARRAY(env.vsr, PowerPCCPU, 32),
+>          VMSTATE_UINT32(env.vscr, PowerPCCPU),
+>          VMSTATE_END_OF_LIST()
+>      },
+> @@ -392,7 +454,7 @@ static const VMStateDescription vmstate_vsx =3D {
+>      .minimum_version_id =3D 1,
+>      .needed =3D vsx_needed,
+>      .fields =3D (VMStateField[]) {
+> -        VMSTATE_UINT64_ARRAY(env.vsr, PowerPCCPU, 32),
+> +        VMSTATE_VSR_ARRAY(env.vsr, PowerPCCPU, 32),
+>          VMSTATE_END_OF_LIST()
+>      },
+>  };
+> diff --git a/target/ppc/monitor.c b/target/ppc/monitor.c
+> index 14915119fc..1db9396b2e 100644
+> --- a/target/ppc/monitor.c
+> +++ b/target/ppc/monitor.c
+> @@ -123,8 +123,8 @@ int target_get_monitor_def(CPUState *cs, const char *=
+name, uint64_t *pval)
+> =20
+>      /* Floating point registers */
+>      if ((qemu_tolower(name[0]) =3D=3D 'f') &&
+> -        ppc_cpu_get_reg_num(name + 1, ARRAY_SIZE(env->fpr), &regnum)) {
+> -        *pval =3D env->fpr[regnum];
+> +        ppc_cpu_get_reg_num(name + 1, 32, &regnum)) {
+> +        *pval =3D env->vsr[regnum].u64[0];
+>          return 0;
 >      }
 > =20
->      if (sat) {
-> -        env->vscr |=3D (1 << VSCR_SAT);
-> +        set_vscr_sat(env);
->      }
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index 5923c688cd..8e89aec14d 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -6657,22 +6657,22 @@ GEN_TM_PRIV_NOOP(trechkpt);
+> =20
+>  static inline void get_fpr(TCGv_i64 dst, int regno)
+>  {
+> -    tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUPPCState, fpr[regno]));
+> +    tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUPPCState, vsr[regno].u64[0]=
+));
 >  }
 > =20
-> @@ -933,7 +938,7 @@ void helper_vmhraddshs(CPUPPCState *env, ppc_avr_t *r=
-, ppc_avr_t *a,
->      }
-> =20
->      if (sat) {
-> -        env->vscr |=3D (1 << VSCR_SAT);
-> +        set_vscr_sat(env);
->      }
+>  static inline void set_fpr(int regno, TCGv_i64 src)
+>  {
+> -    tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState, fpr[regno]));
+> +    tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState, vsr[regno].u64[0]=
+));
 >  }
 > =20
-> @@ -1061,7 +1066,7 @@ void helper_vmsumshs(CPUPPCState *env, ppc_avr_t *r=
-, ppc_avr_t *a,
->      }
-> =20
->      if (sat) {
-> -        env->vscr |=3D (1 << VSCR_SAT);
-> +        set_vscr_sat(env);
->      }
+>  static inline void get_avr64(TCGv_i64 dst, int regno, bool high)
+>  {
+>  #ifdef HOST_WORDS_BIGENDIAN
+>      tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUPPCState,
+> -                                          avr[regno].u64[(high ? 0 : 1)]=
+));
+> +                                          vsr[32 + regno].u64[(high ? 0 =
+: 1)]));
+>  #else
+>      tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUPPCState,
+> -                                          avr[regno].u64[(high ? 1 : 0)]=
+));
+> +                                          vsr[32 + regno].u64[(high ? 1 =
+: 0)]));
+>  #endif
 >  }
 > =20
-> @@ -1114,7 +1119,7 @@ void helper_vmsumuhs(CPUPPCState *env, ppc_avr_t *r=
-, ppc_avr_t *a,
->      }
-> =20
->      if (sat) {
-> -        env->vscr |=3D (1 << VSCR_SAT);
-> +        set_vscr_sat(env);
->      }
+> @@ -6680,10 +6680,10 @@ static inline void set_avr64(int regno, TCGv_i64 =
+src, bool high)
+>  {
+>  #ifdef HOST_WORDS_BIGENDIAN
+>      tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState,
+> -                                          avr[regno].u64[(high ? 0 : 1)]=
+));
+> +                                          vsr[32 + regno].u64[(high ? 0 =
+: 1)]));
+>  #else
+>      tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState,
+> -                                          avr[regno].u64[(high ? 1 : 0)]=
+));
+> +                                          vsr[32 + regno].u64[(high ? 1 =
+: 0)]));
+>  #endif
 >  }
 > =20
-> @@ -1633,7 +1638,7 @@ void helper_vpkpx(ppc_avr_t *r, ppc_avr_t *a, ppc_a=
-vr_t *b)
->          }                                                               \
->          *r =3D result;                                                  =
-  \
->          if (dosat && sat) {                                             \
-> -            env->vscr |=3D (1 << VSCR_SAT);                             =
-  \
-> +            set_vscr_sat(env);                                          \
->          }                                                               \
->      }
->  #define I(x, y) (x)
-> @@ -2106,7 +2111,7 @@ void helper_vsumsws(CPUPPCState *env, ppc_avr_t *r,=
- ppc_avr_t *a, ppc_avr_t *b)
->      *r =3D result;
-> =20
->      if (sat) {
-> -        env->vscr |=3D (1 << VSCR_SAT);
-> +        set_vscr_sat(env);
->      }
+> @@ -7434,7 +7434,7 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f, fpri=
+ntf_function cpu_fprintf,
+>              if ((i & (RFPL - 1)) =3D=3D 0) {
+>                  cpu_fprintf(f, "FPR%02d", i);
+>              }
+> -            cpu_fprintf(f, " %016" PRIx64, *((uint64_t *)&env->fpr[i]));
+> +            cpu_fprintf(f, " %016" PRIx64, *((uint64_t *)&env->vsr[i].u6=
+4[0]));
+>              if ((i & (RFPL - 1)) =3D=3D (RFPL - 1)) {
+>                  cpu_fprintf(f, "\n");
+>              }
+> diff --git a/target/ppc/translate/dfp-impl.inc.c b/target/ppc/translate/d=
+fp-impl.inc.c
+> index 634ef73b8a..6c556dc2e1 100644
+> --- a/target/ppc/translate/dfp-impl.inc.c
+> +++ b/target/ppc/translate/dfp-impl.inc.c
+> @@ -3,7 +3,7 @@
+>  static inline TCGv_ptr gen_fprp_ptr(int reg)
+>  {
+>      TCGv_ptr r =3D tcg_temp_new_ptr();
+> -    tcg_gen_addi_ptr(r, cpu_env, offsetof(CPUPPCState, fpr[reg]));
+> +    tcg_gen_addi_ptr(r, cpu_env, offsetof(CPUPPCState, vsr[reg].u64[0]));
+>      return r;
 >  }
 > =20
-> @@ -2133,7 +2138,7 @@ void helper_vsum2sws(CPUPPCState *env, ppc_avr_t *r=
-, ppc_avr_t *a, ppc_avr_t *b)
-> =20
->      *r =3D result;
->      if (sat) {
-> -        env->vscr |=3D (1 << VSCR_SAT);
-> +        set_vscr_sat(env);
->      }
+> diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/v=
+mx-impl.inc.c
+> index 30046c6e31..75d2b2280f 100644
+> --- a/target/ppc/translate/vmx-impl.inc.c
+> +++ b/target/ppc/translate/vmx-impl.inc.c
+> @@ -10,10 +10,15 @@
+>  static inline TCGv_ptr gen_avr_ptr(int reg)
+>  {
+>      TCGv_ptr r =3D tcg_temp_new_ptr();
+> -    tcg_gen_addi_ptr(r, cpu_env, offsetof(CPUPPCState, avr[reg]));
+> +    tcg_gen_addi_ptr(r, cpu_env, offsetof(CPUPPCState, vsr[32 + reg].u64=
+[0]));
+>      return r;
 >  }
 > =20
-> @@ -2152,7 +2157,7 @@ void helper_vsum4sbs(CPUPPCState *env, ppc_avr_t *r=
-, ppc_avr_t *a, ppc_avr_t *b)
->      }
+> +static inline long avr64_offset(int reg, bool high)
+> +{
+> +    return offsetof(CPUPPCState, vsr[32 + reg].u64[(high ? 0 : 1)]);
+> +}
+> +
+>  #define GEN_VR_LDX(name, opc2, opc3)                                    =
+      \
+>  static void glue(gen_, name)(DisasContext *ctx)                         =
+              \
+>  {                                                                       =
+      \
+> diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/v=
+sx-impl.inc.c
+> index 20e1fd9324..1608ad48b1 100644
+> --- a/target/ppc/translate/vsx-impl.inc.c
+> +++ b/target/ppc/translate/vsx-impl.inc.c
+> @@ -2,12 +2,12 @@
 > =20
->      if (sat) {
-> -        env->vscr |=3D (1 << VSCR_SAT);
-> +        set_vscr_sat(env);
->      }
+>  static inline void get_vsr(TCGv_i64 dst, int n)
+>  {
+> -    tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUPPCState, vsr[n]));
+> +    tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUPPCState, vsr[n].u64[1]));
 >  }
 > =20
-> @@ -2169,7 +2174,7 @@ void helper_vsum4shs(CPUPPCState *env, ppc_avr_t *r=
-, ppc_avr_t *a, ppc_avr_t *b)
->      }
-> =20
->      if (sat) {
-> -        env->vscr |=3D (1 << VSCR_SAT);
-> +        set_vscr_sat(env);
->      }
+>  static inline void set_vsr(int n, TCGv_i64 src)
+>  {
+> -    tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState, vsr[n]));
+> +    tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState, vsr[n].u64[1]));
 >  }
 > =20
-> @@ -2188,7 +2193,7 @@ void helper_vsum4ubs(CPUPPCState *env, ppc_avr_t *r=
-, ppc_avr_t *a, ppc_avr_t *b)
+>  static inline void get_cpu_vsrh(TCGv_i64 dst, int n)
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+> index 168d0cec28..b83097141c 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -9486,7 +9486,7 @@ static bool avr_need_swap(CPUPPCState *env)
+>  static int gdb_get_float_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+>  {
+>      if (n < 32) {
+> -        stfq_p(mem_buf, env->fpr[n]);
+> +        stfq_p(mem_buf, env->vsr[n].u64[0]);
+>          ppc_maybe_bswap_register(env, mem_buf, 8);
+>          return 8;
 >      }
-> =20
->      if (sat) {
-> -        env->vscr |=3D (1 << VSCR_SAT);
-> +        set_vscr_sat(env);
+> @@ -9502,7 +9502,7 @@ static int gdb_set_float_reg(CPUPPCState *env, uint=
+8_t *mem_buf, int n)
+>  {
+>      if (n < 32) {
+>          ppc_maybe_bswap_register(env, mem_buf, 8);
+> -        env->fpr[n] =3D ldfq_p(mem_buf);
+> +        env->vsr[n].u64[0] =3D ldfq_p(mem_buf);
+>          return 8;
 >      }
->  }
-> =20
+>      if (n =3D=3D 32) {
+> @@ -9517,11 +9517,11 @@ static int gdb_get_avr_reg(CPUPPCState *env, uint=
+8_t *mem_buf, int n)
+>  {
+>      if (n < 32) {
+>          if (!avr_need_swap(env)) {
+> -            stq_p(mem_buf, env->avr[n].u64[0]);
+> -            stq_p(mem_buf+8, env->avr[n].u64[1]);
+> +            stq_p(mem_buf, env->vsr[32 + n].u64[0]);
+> +            stq_p(mem_buf + 8, env->vsr[32 + n].u64[1]);
+>          } else {
+> -            stq_p(mem_buf, env->avr[n].u64[1]);
+> -            stq_p(mem_buf+8, env->avr[n].u64[0]);
+> +            stq_p(mem_buf, env->vsr[32 + n].u64[1]);
+> +            stq_p(mem_buf + 8, env->vsr[32 + n].u64[0]);
+>          }
+>          ppc_maybe_bswap_register(env, mem_buf, 8);
+>          ppc_maybe_bswap_register(env, mem_buf + 8, 8);
+> @@ -9546,11 +9546,11 @@ static int gdb_set_avr_reg(CPUPPCState *env, uint=
+8_t *mem_buf, int n)
+>          ppc_maybe_bswap_register(env, mem_buf, 8);
+>          ppc_maybe_bswap_register(env, mem_buf + 8, 8);
+>          if (!avr_need_swap(env)) {
+> -            env->avr[n].u64[0] =3D ldq_p(mem_buf);
+> -            env->avr[n].u64[1] =3D ldq_p(mem_buf+8);
+> +            env->vsr[32 + n].u64[0] =3D ldq_p(mem_buf);
+> +            env->vsr[32 + n].u64[1] =3D ldq_p(mem_buf + 8);
+>          } else {
+> -            env->avr[n].u64[1] =3D ldq_p(mem_buf);
+> -            env->avr[n].u64[0] =3D ldq_p(mem_buf+8);
+> +            env->vsr[32 + n].u64[1] =3D ldq_p(mem_buf);
+> +            env->vsr[32 + n].u64[0] =3D ldq_p(mem_buf + 8);
+>          }
+>          return 16;
+>      }
+> @@ -9623,7 +9623,7 @@ static int gdb_set_spe_reg(CPUPPCState *env, uint8_=
+t *mem_buf, int n)
+>  static int gdb_get_vsx_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+>  {
+>      if (n < 32) {
+> -        stq_p(mem_buf, env->vsr[n]);
+> +        stq_p(mem_buf, env->vsr[n].u64[1]);
+>          ppc_maybe_bswap_register(env, mem_buf, 8);
+>          return 8;
+>      }
+> @@ -9634,7 +9634,7 @@ static int gdb_set_vsx_reg(CPUPPCState *env, uint8_=
+t *mem_buf, int n)
+>  {
+>      if (n < 32) {
+>          ppc_maybe_bswap_register(env, mem_buf, 8);
+> -        env->vsr[n] =3D ldq_p(mem_buf);
+> +        env->vsr[n].u64[1] =3D ldq_p(mem_buf);
+>          return 8;
+>      }
+>      return 0;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -191,24 +661,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---q5wOvoHkaccQRDme
+--tv2SIFopg1r47n4a
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwZ5+EACgkQbDjKyiDZ
-s5I8gxAAl/+KTR2UHCJWqLkoKUWfW75TD2uhT+byGnTnEfcyyP2Qe8oSj4a3YNZQ
-jDYnzBwjmRcTeH3ndyzT/ruHws+uZb/Conw0GDiOtfpDfpoVHOZ/p/UHMso6nedO
-aMwSgpkYxQCGf3gJl8laGpeqcjP3sEbHyVUHCumpQw4tf6STEwqdnCw8iCWFvT2o
-Abshyli7BUclu92ZQAUUfJQn8wKHSfZkv0GWwlCMfL/cXIk3hMJcipfkU34vjBL1
-wR7h7OB6VfCvPulQIgWF0fa5Pw9NUOv4RoxzSmy2JLiSlx16Ksys05wKOW1wlwVW
-1gOGRUitAByscNcWHDgo/HO6ANAHxzNU0cR9ZVBPvhOtMFHgmfwDxpa7takEAI0n
-iN59ySpf+c3hqCRhrCNdbwUNjGm+4vMxXxpKd8OiROPLddoWRyi9jzLpgaZQXHkw
-txxR1GTHGCE+G6d01dCMMG3/bERmc+CV9TaOScAOf32kGNKQut7uSzcJQx1f6ft+
-KSOSWLNm6y5ecACalDXpDyTYcZH77qcjp7uMjBZpe1hFJ1P9bmYdeJavHNIFqR1g
-YqmFKJ4UmzEFKIQ5D91RRyUhV1eVyIB28F1fXwveRZ1EHw8WKwuDxMpBjJtYg8Bd
-kwZFxX5AYMxbjIJb9lxTF43CZ1stNR9d900AdFoGm+cOa0fDSWU=
-=p49+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwZ5OQACgkQbDjKyiDZ
+s5Lc7RAArrrjxKq5q1U8w2VgOhT2sJ616V1xacTEj+Ye3+20zsBHkUvX3JyrwS64
+GnrzOl0O1PG6P0phgJHhvTSa7kojRnSHO6iUa65jKjdktk70xhKtIt2VszKbE8dW
+lQ93FIJVSwWCu6aIBaVxlbz3tC1Dbaw3QLin8jJqz5uUBgw2XZwc12PqK4p8Bxpg
+nk9jqrb/mKrQH6+iPuf+xQNXDw5ys/JRwZKnTd8d3uTQg5pkqKbWBkSikJCWTgBh
+ZpU4VH60Vhfe2BcSwEI5+FMx2OCZdS7E4ySVIeJTeM6oxsQGrOnRNhZN5vYm0nmQ
+5EIGEBsN7at7hgpw0cxcZunik+Fx7TR9Cjomiti8QgUr3dye/pJ+TdVA4fWrSHgs
+1O42V7XnFZ4sDLb3R/S+f5bWPiEaf6dC2DSESyyu9QXyxs/JuvX07qgBNrGkkwxI
+iUy91rAPG/ob/LPL0+KaxxhmFbKinjAUZkXB9vNjpXUn2Cbwghh0IDQw6v/vdVEQ
+gfq1YwIeJgGZsWmjTVyvB0z0zAMuD5ROob2AXaTOOh3/RFLWbQuAOaD5rroLfvxN
+gd1x6rbT7AT8UslE25+dAlSdw6PAtTfvCHyMTWSQnnnZKNQhQCXz8KdDkfxypI5y
+c8hZj+qVGoGlRIaDhG4eOd71z7tkjoo9nCRFJXgzYHO3zacMG54=
+=D7aj
 -----END PGP SIGNATURE-----
 
---q5wOvoHkaccQRDme--
+--tv2SIFopg1r47n4a--
