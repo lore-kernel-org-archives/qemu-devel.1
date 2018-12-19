@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gZeHm-00067u-K5
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 11:01:27 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gZeKA-0007jy-Bi
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 11:03:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gZeHi-0006zq-36
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 11:01:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37444)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gZeHh-0006xO-Of
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 11:01:21 -0500
-Date: Wed, 19 Dec 2018 16:01:02 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181219160102.GL20465@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181218100002.11219-1-xieyongji@baidu.com>
-	<20181218100002.11219-2-xieyongji@baidu.com>
-	<CAMxuvawx1GXar_UX5Pa_JEEW7EFnG092_PZGKiUL73wtd+s7cg@mail.gmail.com>
-	<20181218152520.GB4807@redhat.com>
-	<20181218104351-mutt-send-email-mst@kernel.org>
-	<20181218160919.GD4807@redhat.com>
-	<20181219105418-mutt-send-email-mst@kernel.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1gZeK4-0001JS-90
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 11:03:52 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38720)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gZeK3-0001FN-Dn
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 11:03:47 -0500
+Received: by mail-wm1-x342.google.com with SMTP id m22so7038574wml.3
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 08:03:44 -0800 (PST)
+References: <20181210152829.29271-1-alex.bennee@linaro.org>
+	<20181210152829.29271-5-alex.bennee@linaro.org>
+	<CAL1e-=hfFv1TsG_viYi6-0z0qN8GnTP-70ZLMrDMmLVz9iBWQA@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAL1e-=hfFv1TsG_viYi6-0z0qN8GnTP-70ZLMrDMmLVz9iBWQA@mail.gmail.com>
+Date: Wed, 19 Dec 2018 16:03:42 +0000
+Message-ID: <87imzpa4gx.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181219105418-mutt-send-email-mst@kernel.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 for-4.0 1/7] chardev: Add disconnected
- option for chardev socket
+Subject: Re: [Qemu-devel] [RFC PATCH 04/13] tests/tcg/mips: enable
+ mips32-dsp/mips32-dspr2/mipsr5900 linux-user (WIP)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,78 +32,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, elohimes@gmail.com, zhangyu31@baidu.com, xieyongji@baidu.com, Jason Wang <jasowang@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, lilin24@baidu.com, Yury Kotov <yury-kotov@yandex-team.ru>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, chaiwen@baidu.com, nixun@baidu.com
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: shorne@gmail.com, amarkovic@wavecomp.com, qemu-devel@nongnu.org, aurelien@aurel32.net, edgar.iglesias@gmail.com, jcmvbkbc@gmail.com, michael@walle.cc, Stefan Markovic <smarkovic@wavecomp.com>
 
-On Wed, Dec 19, 2018 at 10:55:09AM -0500, Michael S. Tsirkin wrote:
-> On Tue, Dec 18, 2018 at 04:09:19PM +0000, Daniel P. Berrang=C3=A9 wrote=
-:
-> > On Tue, Dec 18, 2018 at 11:02:46AM -0500, Michael S. Tsirkin wrote:
-> > > On Tue, Dec 18, 2018 at 03:25:20PM +0000, Daniel P. Berrang=C3=A9 w=
-rote:
-> > > > On Tue, Dec 18, 2018 at 04:24:26PM +0400, Marc-Andr=C3=A9 Lureau =
-wrote:
-> > > > > Hi
-> > > > >=20
-> > > > > On Tue, Dec 18, 2018 at 2:01 PM <elohimes@gmail.com> wrote:
-> > > > > >
-> > > > > > From: Xie Yongji <xieyongji@baidu.com>
-> > > > > >
-> > > > > > New option "disconnected" is added to init the chardev socket
-> > > > > > in disconnected state. Then we can use qemu_chr_fe_wait_conne=
-cted()
-> > > > > > to connect when necessary. Now it would be used for unix doma=
-in
-> > > > > > socket of vhost-user-blk device to support reconnect.
-> > > > >=20
-> > > > > What difference does that make if you wait for connection in
-> > > > > qemu_chr_fe_wait_connected(), or during chardev setup?
-> > > > >=20
-> > > > > "disconnected" is misleading, would it be possible to reuse
-> > > > > "wait/nowait" instead?
-> > > >=20
-> > > > Currently we default to doing a blocking connect in foreground,
-> > > > except if reconnect is non-zero, in which case we do a connect
-> > > > async in the background. This "disconnected" proposal effectively
-> > > > does a blocking connect, but delayed to later in startup.
-> > > >=20
-> > > > IOW, this could already be achieved if "reconnect" were set to
-> > > > non-zero. If the usage doesn't want reconnect though, I tend
-> > > > to agree that we should use the exisiting wait/nowait options
-> > > > to let it be controlled. I don't see that this "disconnected"
-> > > > option gives a compelling benefit over using wait/nowait.
-> > >=20
-> > > So the tricky thing is that we can not expose the
-> > > device to guest until we get a connection and can query
-> > > it for the first time. After that is completed,
-> > > we can reasonably support disconnected operation at least for net.
-> >=20
-> > The device code would still use  qemu_chr_fe_wait_connected() in my p=
-roposal,
-> > so that its no different to the situation with the proposed "disconne=
-cted"
-> > flag.
-> >=20
-> > Regards,
-> > Daniel
->=20
-> I guess so, but wouldn't it be confusing to users that one says
-> "nowait" and qemu still waits for a connection and does not
-> run the VM? That's different from how nowait behaves normally.
 
-Well "nowait" is only referring to the chardev behaviour which is
-still an accurate description.
+Aleksandar Markovic <aleksandar.m.mail@gmail.com> writes:
 
-The fact that the network then waits during startup is a seperate
-matter. We don't define chardev semantics in terms of possible
-users as there are many distinct users of chardevs in QEMU.
+> On Dec 10, 2018 4:29 PM, "Alex Benn=C3=A9e" <alex.bennee@linaro.org> wrot=
+e:
+>>
+>> Convert the existing tests to use our common cross build
+>> infrastructure.
+>>
+>> [WIP: mips32r2 disabled to avoid name clash]
+>> [WIP: mipsr5900 disabled due to clashing build flags]
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> ---
+>>  tests/tcg/mips/Makefile.target       |  15 ++-
+>>  tests/tcg/mips/mips32-dsp/Makefile   | 166 +++++----------------------
+>>  tests/tcg/mips/mips32-dspr2/Makefile |  83 +++-----------
+>>  tests/tcg/mips/mipsr5900/Makefile    |  40 +++----
+>>  4 files changed, 75 insertions(+), 229 deletions(-)
+>>
+>
+> Alex,
+>
+> How about reorganizing directories in tests/tcg/mips altogether, and make
+> it less confusing, and easier for future developers to approach an work o=
+n?
+>
+> Let's say like this:
+>
+> tests/tcg/mips
+>     user
+>         isa
+>             r5900
+>         ase
+>             dsp
+>             dsp_r2
+>     system
+>         isa   =E3=80=8Afor now empty=E3=80=8B
+>         ase
+>             dsp
+>             dsp_r2
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Yeah sounds like a plan. I'm going to do the same with cris (bare and libc).
+
+>
+> Thanks,
+> Aleksandar
+
+
+--
+Alex Benn=C3=A9e
