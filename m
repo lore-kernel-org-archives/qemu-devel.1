@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gZdeM-0006ls-9k
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:20:45 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gZdeQ-0006qc-Pv
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:20:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gZdeJ-0004od-8P
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:20:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45952)
+	(envelope-from <pbonzini@redhat.com>) id 1gZdeN-0004rU-PJ
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:20:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35652)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gZdeI-0004oC-To
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:20:39 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gZdeN-0004qt-Ev
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:20:43 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3E2A32CD7EF
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 15:20:38 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B0BC8A7FF5
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 15:20:42 +0000 (UTC)
+Received: from donizetti.redhat.com (ovpn-112-76.ams2.redhat.com
+	[10.36.112.76])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id BEA3568888
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 15:20:41 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 19 Dec 2018 16:19:05 +0100
-Message-Id: <20181219151917.3874-24-pbonzini@redhat.com>
+Date: Wed, 19 Dec 2018 16:19:08 +0100
+Message-Id: <20181219151917.3874-27-pbonzini@redhat.com>
 In-Reply-To: <20181219151917.3874-1-pbonzini@redhat.com>
 References: <20181219151917.3874-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 23/35] test: replace gtester with a TAP driver
+Subject: [Qemu-devel] [PULL 26/35] qemu/queue.h: leave head structs
+ anonymous unless necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,777 +38,710 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-gtester is deprecated by upstream glib (see for example the announcement
-at https://blog.gtk.org/2018/07/11/news-from-glib-2-58/) and it does
-not support tests that call g_test_skip in some glib stable releases.
+Most list head structs need not be given a name.  In most cases the
+name is given just in case one is going to use QTAILQ_LAST, QTAILQ_PREV
+or reverse iteration, but this does not apply to lists of other kinds,
+and even for QTAILQ in practice this is only rarely needed.  In addition,
+we will soon reimplement those macros completely so that they do not
+need a name for the head struct.  So clean up everything, not giving a
+name except in the rare case where it is necessary.
 
-glib suggests instead using Automake's TAP support, which gtest itself
-supports since version 2.38 (QEMU's minimum requirement is 2.40).
-We do not support Automake, but we can use Automake's code to beautify
-the TAP output.  I chose to use the Perl copy rather than the shell/awk
-one, with some changes so that it can accept TAP through stdin, in order
-to reuse Perl's TAP parsing package.  This also avoids duplicating the
-parser between tap-driver.pl and tap-merge.pl.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <1543513531-1151-3-git-send-email-pbonzini@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- scripts/gtester-cat                          |  26 --
- scripts/tap-driver.pl                        | 378 +++++++++++++++++++
- scripts/tap-merge.pl                         | 110 ++++++
- tests/Makefile.include                       |  54 +--
- tests/docker/dockerfiles/centos7.docker      |   1 +
- tests/docker/dockerfiles/debian-amd64.docker |   1 +
- tests/docker/dockerfiles/debian-ports.docker |   1 +
- tests/docker/dockerfiles/debian-sid.docker   |   1 +
- tests/docker/dockerfiles/debian8.docker      |   1 +
- tests/docker/dockerfiles/debian9.docker      |   1 +
- tests/docker/dockerfiles/fedora.docker       |   1 +
- tests/docker/dockerfiles/ubuntu.docker       |   1 +
- 12 files changed, 529 insertions(+), 47 deletions(-)
- delete mode 100755 scripts/gtester-cat
- create mode 100755 scripts/tap-driver.pl
- create mode 100755 scripts/tap-merge.pl
+ accel/kvm/kvm-all.c                     | 4 ++--
+ block/gluster.c                         | 2 +-
+ block/mirror.c                          | 2 +-
+ block/qcow2-bitmap.c                    | 4 +---
+ block/qcow2.h                           | 5 ++++-
+ block/sheepdog.c                        | 6 +++---
+ block/vhdx.h                            | 2 +-
+ blockdev.c                              | 2 +-
+ contrib/ivshmem-client/ivshmem-client.h | 4 +---
+ contrib/ivshmem-server/ivshmem-server.h | 5 +----
+ exec.c                                  | 2 +-
+ fsdev/qemu-fsdev.c                      | 2 +-
+ hw/block/nvme.h                         | 8 ++++----
+ hw/block/xen_disk.c                     | 6 +++---
+ hw/core/reset.c                         | 2 +-
+ hw/i386/xen/xen-mapcache.c              | 2 +-
+ hw/ppc/spapr_iommu.c                    | 2 +-
+ hw/usb/ccid-card-emulated.c             | 4 ++--
+ hw/usb/dev-network.c                    | 2 +-
+ hw/usb/xen-usb.c                        | 6 +++---
+ hw/watchdog/watchdog.c                  | 2 +-
+ hw/xen/xen_pvdev.c                      | 4 ++--
+ include/exec/memory.h                   | 4 ++--
+ include/hw/vfio/vfio-platform.h         | 2 +-
+ include/qom/cpu.h                       | 4 ++--
+ include/sysemu/kvm.h                    | 2 --
+ include/sysemu/rng.h                    | 2 +-
+ linux-user/elfload.c                    | 2 +-
+ memory.c                                | 2 +-
+ migration/block-dirty-bitmap.c          | 2 +-
+ migration/block.c                       | 4 ++--
+ migration/ram.c                         | 2 +-
+ monitor.c                               | 4 ++--
+ net/queue.c                             | 2 +-
+ net/slirp.c                             | 2 +-
+ slirp/slirp.c                           | 2 +-
+ target/arm/kvm.c                        | 2 +-
+ target/i386/hax-mem.c                   | 2 +-
+ tcg/tcg.h                               | 2 +-
+ tests/test-rcu-list.c                   | 2 +-
+ vl.c                                    | 2 +-
+ 41 files changed, 59 insertions(+), 65 deletions(-)
 
-diff --git a/scripts/gtester-cat b/scripts/gtester-cat
-deleted file mode 100755
-index 061a952cad..0000000000
---- a/scripts/gtester-cat
-+++ /dev/null
-@@ -1,26 +0,0 @@
--#!/bin/sh
--#
--# Copyright IBM, Corp. 2012
--#
--# Authors:
--#  Anthony Liguori <aliguori@us.ibm.com>
--#
--# This work is licensed under the terms of the GNU GPLv2 or later.
--# See the COPYING file in the top-level directory.
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 4880a05399..4e1de942ce 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -86,7 +86,7 @@ struct KVMState
+     int robust_singlestep;
+     int debugregs;
+ #ifdef KVM_CAP_SET_GUEST_DEBUG
+-    struct kvm_sw_breakpoint_head kvm_sw_breakpoints;
++    QTAILQ_HEAD(, kvm_sw_breakpoint) kvm_sw_breakpoints;
+ #endif
+     int many_ioeventfds;
+     int intx_set_mask;
+@@ -102,7 +102,7 @@ struct KVMState
+     int nr_allocated_irq_routes;
+     unsigned long *used_gsi_bitmap;
+     unsigned int gsi_count;
+-    QTAILQ_HEAD(msi_hashtab, KVMMSIRoute) msi_hashtab[KVM_MSI_HASHTAB_SI=
+ZE];
++    QTAILQ_HEAD(, KVMMSIRoute) msi_hashtab[KVM_MSI_HASHTAB_SIZE];
+ #endif
+     KVMMemoryListener memory_listener;
+     QLIST_HEAD(, KVMParkedVcpu) kvm_parked_vcpus;
+diff --git a/block/gluster.c b/block/gluster.c
+index 5e300c96c8..72891060e3 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -72,7 +72,7 @@ typedef struct ListElement {
+     GlfsPreopened saved;
+ } ListElement;
+=20
+-static QLIST_HEAD(glfs_list, ListElement) glfs_list;
++static QLIST_HEAD(, ListElement) glfs_list;
+=20
+ static QemuOptsList qemu_gluster_create_opts =3D {
+     .name =3D "qemu-gluster-create-opts",
+diff --git a/block/mirror.c b/block/mirror.c
+index ab59ad77e8..f0b211a9c8 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -72,7 +72,7 @@ typedef struct MirrorBlockJob {
+     unsigned long *in_flight_bitmap;
+     int in_flight;
+     int64_t bytes_in_flight;
+-    QTAILQ_HEAD(MirrorOpList, MirrorOp) ops_in_flight;
++    QTAILQ_HEAD(, MirrorOp) ops_in_flight;
+     int ret;
+     bool unmap;
+     int target_cluster_size;
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index accebef4cf..b946301429 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -77,8 +77,6 @@ typedef struct Qcow2BitmapTable {
+     uint32_t size; /* number of 64bit entries */
+     QSIMPLEQ_ENTRY(Qcow2BitmapTable) entry;
+ } Qcow2BitmapTable;
+-typedef QSIMPLEQ_HEAD(Qcow2BitmapTableList, Qcow2BitmapTable)
+-    Qcow2BitmapTableList;
+=20
+ typedef struct Qcow2Bitmap {
+     Qcow2BitmapTable table;
+@@ -1316,7 +1314,7 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriv=
+erState *bs, Error **errp)
+     int ret;
+     Qcow2BitmapList *bm_list;
+     Qcow2Bitmap *bm;
+-    Qcow2BitmapTableList drop_tables;
++    QSIMPLEQ_HEAD(, Qcow2BitmapTable) drop_tables;
+     Qcow2BitmapTable *tb, *tb_next;
+=20
+     if (!bdrv_has_changed_persistent_bitmaps(bs)) {
+diff --git a/block/qcow2.h b/block/qcow2.h
+index a98d24500b..438a1dee9e 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -278,7 +278,10 @@ typedef struct BDRVQcow2State {
+     QEMUTimer *cache_clean_timer;
+     unsigned cache_clean_interval;
+=20
+-    QLIST_HEAD(QCowClusterAlloc, QCowL2Meta) cluster_allocs;
++    uint8_t *cluster_cache;
++    uint8_t *cluster_data;
++    uint64_t cluster_cache_offset;
++    QLIST_HEAD(, QCowL2Meta) cluster_allocs;
+=20
+     uint64_t *refcount_table;
+     uint64_t refcount_table_offset;
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index 0125df9d49..90ab43baa4 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -391,12 +391,12 @@ struct BDRVSheepdogState {
+     uint32_t aioreq_seq_num;
+=20
+     /* Every aio request must be linked to either of these queues. */
+-    QLIST_HEAD(inflight_aio_head, AIOReq) inflight_aio_head;
+-    QLIST_HEAD(failed_aio_head, AIOReq) failed_aio_head;
++    QLIST_HEAD(, AIOReq) inflight_aio_head;
++    QLIST_HEAD(, AIOReq) failed_aio_head;
+=20
+     CoMutex queue_lock;
+     CoQueue overlapping_queue;
+-    QLIST_HEAD(inflight_aiocb_head, SheepdogAIOCB) inflight_aiocb_head;
++    QLIST_HEAD(, SheepdogAIOCB) inflight_aiocb_head;
+ };
+=20
+ typedef struct BDRVSheepdogReopenState {
+diff --git a/block/vhdx.h b/block/vhdx.h
+index 3a5f5293ad..1bfb4e4f73 100644
+--- a/block/vhdx.h
++++ b/block/vhdx.h
+@@ -398,7 +398,7 @@ typedef struct BDRVVHDXState {
+=20
+     bool log_replayed_on_open;
+=20
+-    QLIST_HEAD(VHDXRegionHead, VHDXRegionEntry) regions;
++    QLIST_HEAD(, VHDXRegionEntry) regions;
+ } BDRVVHDXState;
+=20
+ void vhdx_guid_generate(MSGUID *guid);
+diff --git a/blockdev.c b/blockdev.c
+index 20a5aa56b2..34b2a29158 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -2268,7 +2268,7 @@ void qmp_transaction(TransactionActionList *dev_lis=
+t,
+     BlkActionState *state, *next;
+     Error *local_err =3D NULL;
+=20
+-    QSIMPLEQ_HEAD(snap_bdrv_states, BlkActionState) snap_bdrv_states;
++    QSIMPLEQ_HEAD(, BlkActionState) snap_bdrv_states;
+     QSIMPLEQ_INIT(&snap_bdrv_states);
+=20
+     /* Does this transaction get canceled as a group on failure?
+diff --git a/contrib/ivshmem-client/ivshmem-client.h b/contrib/ivshmem-cl=
+ient/ivshmem-client.h
+index 5ee942262b..fe3cc4a03d 100644
+--- a/contrib/ivshmem-client/ivshmem-client.h
++++ b/contrib/ivshmem-client/ivshmem-client.h
+@@ -46,9 +46,7 @@ typedef struct IvshmemClientPeer {
+     int vectors[IVSHMEM_CLIENT_MAX_VECTORS]; /**< one fd per vector */
+     unsigned vectors_count;                  /**< number of vectors */
+ } IvshmemClientPeer;
+-QTAILQ_HEAD(IvshmemClientPeerList, IvshmemClientPeer);
+=20
+-typedef struct IvshmemClientPeerList IvshmemClientPeerList;
+ typedef struct IvshmemClient IvshmemClient;
+=20
+ /**
+@@ -73,7 +71,7 @@ struct IvshmemClient {
+     int sock_fd;                        /**< unix sock filedesc */
+     int shm_fd;                         /**< shm file descriptor */
+=20
+-    IvshmemClientPeerList peer_list;    /**< list of peers */
++    QTAILQ_HEAD(, IvshmemClientPeer) peer_list;    /**< list of peers */
+     IvshmemClientPeer local;            /**< our own infos */
+=20
+     IvshmemClientNotifCb notif_cb;      /**< notification callback */
+diff --git a/contrib/ivshmem-server/ivshmem-server.h b/contrib/ivshmem-se=
+rver/ivshmem-server.h
+index 4af08e1bb7..d870adb6a0 100644
+--- a/contrib/ivshmem-server/ivshmem-server.h
++++ b/contrib/ivshmem-server/ivshmem-server.h
+@@ -52,9 +52,6 @@ typedef struct IvshmemServerPeer {
+     EventNotifier vectors[IVSHMEM_SERVER_MAX_VECTORS]; /**< one per vect=
+or */
+     unsigned vectors_count;                  /**< number of vectors */
+ } IvshmemServerPeer;
+-QTAILQ_HEAD(IvshmemServerPeerList, IvshmemServerPeer);
 -
--cat <<EOF
--<?xml version=3D"1.0"?>
--<gtester>
-- <info>
--  <package>qemu</package>
--  <version>0.0</version>
--  <revision>rev</revision>
-- </info>
--EOF
+-typedef struct IvshmemServerPeerList IvshmemServerPeerList;
+=20
+ /**
+  * Structure describing an ivshmem server
+@@ -72,7 +69,7 @@ typedef struct IvshmemServer {
+     unsigned n_vectors;              /**< number of vectors */
+     uint16_t cur_id;                 /**< id to be given to next client =
+*/
+     bool verbose;                    /**< true in verbose mode */
+-    IvshmemServerPeerList peer_list; /**< list of peers */
++    QTAILQ_HEAD(, IvshmemServerPeer) peer_list; /**< list of peers */
+ } IvshmemServer;
+=20
+ /**
+diff --git a/exec.c b/exec.c
+index 6e875f0640..af0cbbab9c 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3471,7 +3471,7 @@ typedef struct MapClient {
+ } MapClient;
+=20
+ QemuMutex map_client_list_lock;
+-static QLIST_HEAD(map_client_list, MapClient) map_client_list
++static QLIST_HEAD(, MapClient) map_client_list
+     =3D QLIST_HEAD_INITIALIZER(map_client_list);
+=20
+ static void cpu_unregister_map_client_do(MapClient *client)
+diff --git a/fsdev/qemu-fsdev.c b/fsdev/qemu-fsdev.c
+index 4536fd977d..54cb36a212 100644
+--- a/fsdev/qemu-fsdev.c
++++ b/fsdev/qemu-fsdev.c
+@@ -18,7 +18,7 @@
+ #include "qemu/error-report.h"
+ #include "qemu/option.h"
+=20
+-static QTAILQ_HEAD(FsDriverEntry_head, FsDriverListEntry) fsdriver_entri=
+es =3D
++static QTAILQ_HEAD(, FsDriverListEntry) fsdriver_entries =3D
+     QTAILQ_HEAD_INITIALIZER(fsdriver_entries);
+=20
+ static FsDriverTable FsDrivers[] =3D {
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index cabcf20c32..56c9d4b4b1 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -29,8 +29,8 @@ typedef struct NvmeSQueue {
+     uint64_t    dma_addr;
+     QEMUTimer   *timer;
+     NvmeRequest *io_req;
+-    QTAILQ_HEAD(sq_req_list, NvmeRequest) req_list;
+-    QTAILQ_HEAD(out_req_list, NvmeRequest) out_req_list;
++    QTAILQ_HEAD(, NvmeRequest) req_list;
++    QTAILQ_HEAD(, NvmeRequest) out_req_list;
+     QTAILQ_ENTRY(NvmeSQueue) entry;
+ } NvmeSQueue;
+=20
+@@ -45,8 +45,8 @@ typedef struct NvmeCQueue {
+     uint32_t    size;
+     uint64_t    dma_addr;
+     QEMUTimer   *timer;
+-    QTAILQ_HEAD(sq_list, NvmeSQueue) sq_list;
+-    QTAILQ_HEAD(cq_req_list, NvmeRequest) req_list;
++    QTAILQ_HEAD(, NvmeSQueue) sq_list;
++    QTAILQ_HEAD(, NvmeRequest) req_list;
+ } NvmeCQueue;
+=20
+ typedef struct NvmeNamespace {
+diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
+index 36eff94f84..2a254b99d0 100644
+--- a/hw/block/xen_disk.c
++++ b/hw/block/xen_disk.c
+@@ -82,9 +82,9 @@ struct XenBlkDev {
+     int                 more_work;
+=20
+     /* request lists */
+-    QLIST_HEAD(inflight_head, ioreq) inflight;
+-    QLIST_HEAD(finished_head, ioreq) finished;
+-    QLIST_HEAD(freelist_head, ioreq) freelist;
++    QLIST_HEAD(, ioreq) inflight;
++    QLIST_HEAD(, ioreq) finished;
++    QLIST_HEAD(, ioreq) freelist;
+     int                 requests_total;
+     int                 requests_inflight;
+     int                 requests_finished;
+diff --git a/hw/core/reset.c b/hw/core/reset.c
+index 84c8869371..9c477f2bf5 100644
+--- a/hw/core/reset.c
++++ b/hw/core/reset.c
+@@ -35,7 +35,7 @@ typedef struct QEMUResetEntry {
+     void *opaque;
+ } QEMUResetEntry;
+=20
+-static QTAILQ_HEAD(reset_handlers, QEMUResetEntry) reset_handlers =3D
++static QTAILQ_HEAD(, QEMUResetEntry) reset_handlers =3D
+     QTAILQ_HEAD_INITIALIZER(reset_handlers);
+=20
+ void qemu_register_reset(QEMUResetHandler *func, void *opaque)
+diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
+index 4e4f069a24..02e823c5a2 100644
+--- a/hw/i386/xen/xen-mapcache.c
++++ b/hw/i386/xen/xen-mapcache.c
+@@ -71,7 +71,7 @@ typedef struct MapCacheRev {
+ typedef struct MapCache {
+     MapCacheEntry *entry;
+     unsigned long nr_buckets;
+-    QTAILQ_HEAD(map_cache_head, MapCacheRev) locked_entries;
++    QTAILQ_HEAD(, MapCacheRev) locked_entries;
+=20
+     /* For most cases (>99.9%), the page address is the same. */
+     MapCacheEntry *last_entry;
+diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+index 1b0880ac9e..68dacf6356 100644
+--- a/hw/ppc/spapr_iommu.c
++++ b/hw/ppc/spapr_iommu.c
+@@ -42,7 +42,7 @@ enum sPAPRTCEAccess {
+ #define IOMMU_PAGE_SIZE(shift)      (1ULL << (shift))
+ #define IOMMU_PAGE_MASK(shift)      (~(IOMMU_PAGE_SIZE(shift) - 1))
+=20
+-static QLIST_HEAD(spapr_tce_tables, sPAPRTCETable) spapr_tce_tables;
++static QLIST_HEAD(, sPAPRTCETable) spapr_tce_tables;
+=20
+ sPAPRTCETable *spapr_tce_find_by_liobn(target_ulong liobn)
+ {
+diff --git a/hw/usb/ccid-card-emulated.c b/hw/usb/ccid-card-emulated.c
+index 25976ed84f..de880a8c30 100644
+--- a/hw/usb/ccid-card-emulated.c
++++ b/hw/usb/ccid-card-emulated.c
+@@ -119,11 +119,11 @@ struct EmulatedState {
+     char    *db;
+     uint8_t  atr[MAX_ATR_SIZE];
+     uint8_t  atr_length;
+-    QSIMPLEQ_HEAD(event_list, EmulEvent) event_list;
++    QSIMPLEQ_HEAD(, EmulEvent) event_list;
+     QemuMutex event_list_mutex;
+     QemuThread event_thread_id;
+     VReader *reader;
+-    QSIMPLEQ_HEAD(guest_apdu_list, EmulEvent) guest_apdu_list;
++    QSIMPLEQ_HEAD(, EmulEvent) guest_apdu_list;
+     QemuMutex vreader_mutex; /* and guest_apdu_list mutex */
+     QemuMutex handle_apdu_mutex;
+     QemuCond handle_apdu_cond;
+diff --git a/hw/usb/dev-network.c b/hw/usb/dev-network.c
+index 385e090336..ffab3fabee 100644
+--- a/hw/usb/dev-network.c
++++ b/hw/usb/dev-network.c
+@@ -648,7 +648,7 @@ typedef struct USBNetState {
+     char usbstring_mac[13];
+     NICState *nic;
+     NICConf conf;
+-    QTAILQ_HEAD(rndis_resp_head, rndis_response) rndis_resp;
++    QTAILQ_HEAD(, rndis_response) rndis_resp;
+ } USBNetState;
+=20
+ #define TYPE_USB_NET "usb-net"
+diff --git a/hw/usb/xen-usb.c b/hw/usb/xen-usb.c
+index f5d5c91094..5758a105a2 100644
+--- a/hw/usb/xen-usb.c
++++ b/hw/usb/xen-usb.c
+@@ -72,7 +72,7 @@ struct usbback_stub {
+     USBPort       port;
+     unsigned int  speed;
+     bool          attached;
+-    QTAILQ_HEAD(submit_q_head, usbback_req) submit_q;
++    QTAILQ_HEAD(, usbback_req) submit_q;
+ };
+=20
+ struct usbback_req {
+@@ -108,8 +108,8 @@ struct usbback_info {
+     int                      num_ports;
+     int                      usb_ver;
+     bool                     ring_error;
+-    QTAILQ_HEAD(req_free_q_head, usbback_req) req_free_q;
+-    QSIMPLEQ_HEAD(hotplug_q_head, usbback_hotplug) hotplug_q;
++    QTAILQ_HEAD(, usbback_req) req_free_q;
++    QSIMPLEQ_HEAD(, usbback_hotplug) hotplug_q;
+     struct usbback_stub      ports[USBBACK_MAXPORTS];
+     struct usbback_stub      *addr_table[USB_DEV_ADDR_SIZE];
+     QEMUBH                   *bh;
+diff --git a/hw/watchdog/watchdog.c b/hw/watchdog/watchdog.c
+index 33e6c20184..dce7c1db14 100644
+--- a/hw/watchdog/watchdog.c
++++ b/hw/watchdog/watchdog.c
+@@ -32,7 +32,7 @@
+ #include "qemu/help_option.h"
+=20
+ static WatchdogAction watchdog_action =3D WATCHDOG_ACTION_RESET;
+-static QLIST_HEAD(watchdog_list, WatchdogTimerModel) watchdog_list;
++static QLIST_HEAD(, WatchdogTimerModel) watchdog_list;
+=20
+ void watchdog_add_model(WatchdogTimerModel *model)
+ {
+diff --git a/hw/xen/xen_pvdev.c b/hw/xen/xen_pvdev.c
+index aed783e844..f026556f62 100644
+--- a/hw/xen/xen_pvdev.c
++++ b/hw/xen/xen_pvdev.c
+@@ -31,10 +31,10 @@ struct xs_dirs {
+     QTAILQ_ENTRY(xs_dirs) list;
+ };
+=20
+-static QTAILQ_HEAD(xs_dirs_head, xs_dirs) xs_cleanup =3D
++static QTAILQ_HEAD(, xs_dirs) xs_cleanup =3D
+     QTAILQ_HEAD_INITIALIZER(xs_cleanup);
+=20
+-static QTAILQ_HEAD(XenDeviceHead, XenDevice) xendevs =3D
++static QTAILQ_HEAD(, XenDevice) xendevs =3D
+     QTAILQ_HEAD_INITIALIZER(xendevs);
+=20
+ /* ------------------------------------------------------------- */
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index ffd23ed8d8..56820474b1 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -379,9 +379,9 @@ struct MemoryRegion {
+     MemoryRegion *alias;
+     hwaddr alias_offset;
+     int32_t priority;
+-    QTAILQ_HEAD(subregions, MemoryRegion) subregions;
++    QTAILQ_HEAD(, MemoryRegion) subregions;
+     QTAILQ_ENTRY(MemoryRegion) subregions_link;
+-    QTAILQ_HEAD(coalesced_ranges, CoalescedMemoryRange) coalesced;
++    QTAILQ_HEAD(, CoalescedMemoryRange) coalesced;
+     const char *name;
+     unsigned ioeventfd_nb;
+     MemoryRegionIoeventfd *ioeventfds;
+diff --git a/include/hw/vfio/vfio-platform.h b/include/hw/vfio/vfio-platf=
+orm.h
+index 0ee10b1d71..30d3c28d3b 100644
+--- a/include/hw/vfio/vfio-platform.h
++++ b/include/hw/vfio/vfio-platform.h
+@@ -53,7 +53,7 @@ typedef struct VFIOPlatformDevice {
+     VFIORegion **regions;
+     QLIST_HEAD(, VFIOINTp) intp_list; /* list of IRQs */
+     /* queue of pending IRQs */
+-    QSIMPLEQ_HEAD(pending_intp_queue, VFIOINTp) pending_intp_queue;
++    QSIMPLEQ_HEAD(, VFIOINTp) pending_intp_queue;
+     char *compat; /* DT compatible values, separated by NUL */
+     unsigned int num_compat; /* number of compatible values */
+     uint32_t mmap_timeout; /* delay to re-enable mmaps after interrupt *=
+/
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 1396f53e5b..62aef77b87 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -375,9 +375,9 @@ struct CPUState {
+     QTAILQ_ENTRY(CPUState) node;
+=20
+     /* ice debug support */
+-    QTAILQ_HEAD(breakpoints_head, CPUBreakpoint) breakpoints;
++    QTAILQ_HEAD(, CPUBreakpoint) breakpoints;
+=20
+-    QTAILQ_HEAD(watchpoints_head, CPUWatchpoint) watchpoints;
++    QTAILQ_HEAD(, CPUWatchpoint) watchpoints;
+     CPUWatchpoint *watchpoint_hit;
+=20
+     void *opaque;
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 97d8d9d0d5..a6d1cd190f 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -412,8 +412,6 @@ struct kvm_sw_breakpoint {
+     QTAILQ_ENTRY(kvm_sw_breakpoint) entry;
+ };
+=20
+-QTAILQ_HEAD(kvm_sw_breakpoint_head, kvm_sw_breakpoint);
 -
--sed \
--  -e '/<?xml/d' \
--  -e '/^<gtester>$/d' \
--  -e '/<info>/,/<\/info>/d' \
--  -e '$b' \
--  -e '/^<\/gtester>$/d' "$@"
-diff --git a/scripts/tap-driver.pl b/scripts/tap-driver.pl
-new file mode 100755
-index 0000000000..5e59b5db49
---- /dev/null
-+++ b/scripts/tap-driver.pl
-@@ -0,0 +1,378 @@
-+#! /usr/bin/env perl
-+# Copyright (C) 2011-2013 Free Software Foundation, Inc.
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2, or (at your option)
-+# any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+
-+# As a special exception to the GNU General Public License, if you
-+# distribute this file as part of a program that contains a
-+# configuration script generated by Autoconf, you may include it under
-+# the same distribution terms that you use for the rest of that program.
-+
-+# ---------------------------------- #
-+#  Imports, static data, and setup.  #
-+# ---------------------------------- #
-+
-+use warnings FATAL =3D> 'all';
-+use strict;
-+use Getopt::Long ();
-+use TAP::Parser;
-+use Term::ANSIColor qw(:constants);
-+
-+my $ME =3D "tap-driver.pl";
-+my $VERSION =3D "2018-11-30";
-+
-+my $USAGE =3D <<'END';
-+Usage:
-+  tap-driver [--test-name=3DTEST] [--color=3D{always|never|auto}]
-+             [--verbose] [--show-failures-only]
-+END
-+
-+my $HELP =3D "$ME: TAP-aware test driver for QEMU testsuite harness." .
-+           "\n" . $USAGE;
-+
-+# It's important that NO_PLAN evaluates "false" as a boolean.
-+use constant NO_PLAN =3D> 0;
-+use constant EARLY_PLAN =3D> 1;
-+use constant LATE_PLAN =3D> 2;
-+
-+use constant DIAG_STRING =3D> "#";
-+
-+# ------------------- #
-+#  Global variables.  #
-+# ------------------- #
-+
-+my $testno =3D 0;     # Number of test results seen so far.
-+my $bailed_out =3D 0; # Whether a "Bail out!" directive has been seen.
-+my $failed =3D 0;     # Final exit code
-+
-+# Whether the TAP plan has been seen or not, and if yes, which kind
-+# it is ("early" is seen before any test result, "late" otherwise).
-+my $plan_seen =3D NO_PLAN;
-+
-+# ----------------- #
-+#  Option parsing.  #
-+# ----------------- #
-+
-+my %cfg =3D (
-+  "color" =3D> 0,
-+  "verbose" =3D> 0,
-+  "show-failures-only" =3D> 0,
-+);
-+
-+my $color =3D "auto";
-+my $test_name =3D undef;
-+
-+# Perl's Getopt::Long allows options to take optional arguments after a =
-space.
-+# Prevent --color by itself from consuming other arguments
-+foreach (@ARGV) {
-+  if ($_ eq "--color" || $_ eq "-color") {
-+    $_ =3D "--color=3D$color";
-+  }
-+}
-+
-+Getopt::Long::GetOptions
-+  (
-+    'help' =3D> sub { print $HELP; exit 0; },
-+    'version' =3D> sub { print "$ME $VERSION\n"; exit 0; },
-+    'test-name=3Ds' =3D> \$test_name,
-+    'color=3Ds'  =3D> \$color,
-+    'show-failures-only' =3D> sub { $cfg{"show-failures-only"} =3D 1; },
-+    'verbose' =3D> sub { $cfg{"verbose"} =3D 1; },
-+  ) or exit 1;
-+
-+if ($color =3D~ /^always$/i) {
-+  $cfg{'color'} =3D 1;
-+} elsif ($color =3D~ /^never$/i) {
-+  $cfg{'color'} =3D 0;
-+} elsif ($color =3D~ /^auto$/i) {
-+  $cfg{'color'} =3D (-t STDOUT);
-+} else {
-+  die "Invalid color mode: $color\n";
-+}
-+
-+# ------------- #
-+#  Prototypes.  #
-+# ------------- #
-+
-+sub colored ($$);
-+sub decorate_result ($);
-+sub extract_tap_comment ($);
-+sub handle_tap_bailout ($);
-+sub handle_tap_plan ($);
-+sub handle_tap_result ($);
-+sub is_null_string ($);
-+sub main ();
-+sub report ($;$);
-+sub stringify_result_obj ($);
-+sub testsuite_error ($);
-+
-+# -------------- #
-+#  Subroutines.  #
-+# -------------- #
-+
-+# If the given string is undefined or empty, return true, otherwise
-+# return false.  This function is useful to avoid pitfalls like:
-+#   if ($message) { print "$message\n"; }
-+# which wouldn't print anything if $message is the literal "0".
-+sub is_null_string ($)
-+{
-+  my $str =3D shift;
-+  return ! (defined $str and length $str);
-+}
-+
-+sub stringify_result_obj ($)
-+{
-+  my $result_obj =3D shift;
-+  if ($result_obj->is_unplanned || $result_obj->number !=3D $testno)
-+    {
-+      return "ERROR";
-+    }
-+  elsif ($plan_seen =3D=3D LATE_PLAN)
-+    {
-+      return "ERROR";
-+    }
-+  elsif (!$result_obj->directive)
-+    {
-+      return $result_obj->is_ok ? "PASS" : "FAIL";
-+    }
-+  elsif ($result_obj->has_todo)
-+    {
-+      return $result_obj->is_actual_ok ? "XPASS" : "XFAIL";
-+    }
-+  elsif ($result_obj->has_skip)
-+    {
-+      return $result_obj->is_ok ? "SKIP" : "FAIL";
-+    }
-+  die "$ME: INTERNAL ERROR"; # NOTREACHED
-+}
-+
-+sub colored ($$)
-+{
-+  my ($color_string, $text) =3D @_;
-+  return $color_string . $text . RESET;
-+}
-+
-+sub decorate_result ($)
-+{
-+  my $result =3D shift;
-+  return $result unless $cfg{"color"};
-+  my %color_for_result =3D
-+    (
-+      "ERROR" =3D> BOLD.MAGENTA,
-+      "PASS"  =3D> GREEN,
-+      "XPASS" =3D> BOLD.YELLOW,
-+      "FAIL"  =3D> BOLD.RED,
-+      "XFAIL" =3D> YELLOW,
-+      "SKIP"  =3D> BLUE,
-+    );
-+  if (my $color =3D $color_for_result{$result})
-+    {
-+      return colored ($color, $result);
-+    }
-+  else
-+    {
-+      return $result; # Don't colorize unknown stuff.
-+    }
-+}
-+
-+sub report ($;$)
-+{
-+  my ($msg, $result, $explanation) =3D (undef, @_);
-+  if ($result =3D~ /^(?:X?(?:PASS|FAIL)|SKIP|ERROR)/)
-+    {
-+      # Output on console might be colorized.
-+      $msg =3D decorate_result($result);
-+      if ($result =3D~ /^(?:PASS|XFAIL|SKIP)/)
-+        {
-+          return if $cfg{"show-failures-only"};
-+        }
-+      else
-+        {
-+          $failed =3D 1;
-+        }
-+    }
-+  elsif ($result eq "#")
-+    {
-+      $msg =3D "  ";
-+    }
-+  else
-+    {
-+      die "$ME: INTERNAL ERROR"; # NOTREACHED
-+    }
-+  $msg .=3D " $explanation" if defined $explanation;
-+  print $msg . "\n";
-+}
-+
-+sub testsuite_error ($)
-+{
-+  report "ERROR", "- $_[0]";
-+}
-+
-+sub handle_tap_result ($)
-+{
-+  $testno++;
-+  my $result_obj =3D shift;
-+
-+  my $test_result =3D stringify_result_obj $result_obj;
-+  my $string =3D $result_obj->number;
-+
-+  my $description =3D $result_obj->description;
-+  $string .=3D " $test_name" unless is_null_string $test_name;
-+  $string .=3D " $description" unless is_null_string $description;
-+
-+  if ($plan_seen =3D=3D LATE_PLAN)
-+    {
-+      $string .=3D " # AFTER LATE PLAN";
-+    }
-+  elsif ($result_obj->is_unplanned)
-+    {
-+      $string .=3D " # UNPLANNED";
-+    }
-+  elsif ($result_obj->number !=3D $testno)
-+    {
-+      $string .=3D " # OUT-OF-ORDER (expecting $testno)";
-+    }
-+  elsif (my $directive =3D $result_obj->directive)
-+    {
-+      $string .=3D " # $directive";
-+      my $explanation =3D $result_obj->explanation;
-+      $string .=3D " $explanation"
-+        unless is_null_string $explanation;
-+    }
-+
-+  report $test_result, $string;
-+}
-+
-+sub handle_tap_plan ($)
-+{
-+  my $plan =3D shift;
-+  if ($plan_seen)
-+    {
-+      # Error, only one plan per stream is acceptable.
-+      testsuite_error "multiple test plans";
-+      return;
-+    }
-+  # The TAP plan can come before or after *all* the TAP results; we spea=
-k
-+  # respectively of an "early" or a "late" plan.  If we see the plan lin=
-e
-+  # after at least one TAP result has been seen, assume we have a late
-+  # plan; in this case, any further test result seen after the plan will
-+  # be flagged as an error.
-+  $plan_seen =3D ($testno >=3D 1 ? LATE_PLAN : EARLY_PLAN);
-+  # If $testno > 0, we have an error ("too many tests run") that will be
-+  # automatically dealt with later, so don't worry about it here.  If
-+  # $plan_seen is true, we have an error due to a repeated plan, and tha=
-t
-+  # has already been dealt with above.  Otherwise, we have a valid "plan
-+  # with SKIP" specification, and should report it as a particular kind
-+  # of SKIP result.
-+  if ($plan->directive && $testno =3D=3D 0)
-+    {
-+      my $explanation =3D is_null_string ($plan->explanation) ?
-+                        undef : "- " . $plan->explanation;
-+      report "SKIP", $explanation;
-+    }
-+}
-+
-+sub handle_tap_bailout ($)
-+{
-+  my ($bailout, $msg) =3D ($_[0], "Bail out!");
-+  $bailed_out =3D 1;
-+  $msg .=3D " " . $bailout->explanation
-+    unless is_null_string $bailout->explanation;
-+  testsuite_error $msg;
-+}
-+
-+sub extract_tap_comment ($)
-+{
-+  my $line =3D shift;
-+  if (index ($line, DIAG_STRING) =3D=3D 0)
-+    {
-+      # Strip leading `DIAG_STRING' from `$line'.
-+      $line =3D substr ($line, length (DIAG_STRING));
-+      # And strip any leading and trailing whitespace left.
-+      $line =3D~ s/(?:^\s*|\s*$)//g;
-+      # Return what is left (if any).
-+      return $line;
-+    }
-+  return "";
-+}
-+
-+sub main ()
-+{
-+  my $iterator =3D TAP::Parser::Iterator::Stream->new(\*STDIN);
-+  my $parser =3D TAP::Parser->new ({iterator =3D> $iterator });
-+
-+  while (defined (my $cur =3D $parser->next))
-+    {
-+      # Parsing of TAP input should stop after a "Bail out!" directive.
-+      next if $bailed_out;
-+
-+      if ($cur->is_plan)
-+        {
-+          handle_tap_plan ($cur);
-+        }
-+      elsif ($cur->is_test)
-+        {
-+          handle_tap_result ($cur);
-+        }
-+      elsif ($cur->is_bailout)
-+        {
-+          handle_tap_bailout ($cur);
-+        }
-+      elsif ($cfg{"verbose"})
-+        {
-+          my $comment =3D extract_tap_comment ($cur->raw);
-+          report "#", "$comment" if length $comment;
-+       }
-+    }
-+  # A "Bail out!" directive should cause us to ignore any following TAP
-+  # error.
-+  if (!$bailed_out)
-+    {
-+      if (!$plan_seen)
-+        {
-+          testsuite_error "missing test plan";
-+        }
-+      elsif ($parser->tests_planned !=3D $parser->tests_run)
-+        {
-+          my ($planned, $run) =3D ($parser->tests_planned, $parser->test=
-s_run);
-+          my $bad_amount =3D $run > $planned ? "many" : "few";
-+          testsuite_error (sprintf "too %s tests run (expected %d, got %=
-d)",
-+                                   $bad_amount, $planned, $run);
-+        }
-+    }
-+}
-+
-+# ----------- #
-+#  Main code. #
-+# ----------- #
-+
-+main;
-+exit($failed);
-+
-+# Local Variables:
-+# perl-indent-level: 2
-+# perl-continued-statement-offset: 2
-+# perl-continued-brace-offset: 0
-+# perl-brace-offset: 0
-+# perl-brace-imaginary-offset: 0
-+# perl-label-offset: -2
-+# cperl-indent-level: 2
-+# cperl-brace-offset: 0
-+# cperl-continued-brace-offset: 0
-+# cperl-label-offset: -2
-+# cperl-extra-newline-before-brace: t
-+# cperl-merge-trailing-else: nil
-+# cperl-continued-statement-offset: 2
-+# End:
-diff --git a/scripts/tap-merge.pl b/scripts/tap-merge.pl
-new file mode 100755
-index 0000000000..59e3fa5007
---- /dev/null
-+++ b/scripts/tap-merge.pl
-@@ -0,0 +1,110 @@
-+#! /usr/bin/env perl
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# Author: Paolo Bonzini <pbonzini@redhat.com>
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2, or (at your option)
-+# any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+
-+# ---------------------------------- #
-+#  Imports, static data, and setup.  #
-+# ---------------------------------- #
-+
-+use warnings FATAL =3D> 'all';
-+use strict;
-+use Getopt::Long ();
-+use TAP::Parser;
-+
-+my $ME =3D "tap-merge.pl";
-+my $VERSION =3D "2018-11-30";
-+
-+my $HELP =3D "$ME: merge multiple TAP inputs from stdin.";
-+
-+use constant DIAG_STRING =3D> "#";
-+
-+# ----------------- #
-+#  Option parsing.  #
-+# ----------------- #
-+
-+Getopt::Long::GetOptions
-+  (
-+    'help' =3D> sub { print $HELP; exit 0; },
-+    'version' =3D> sub { print "$ME $VERSION\n"; exit 0; },
-+  );
-+
-+# -------------- #
-+#  Subroutines.  #
-+# -------------- #
-+
-+sub main ()
-+{
-+  my $iterator =3D TAP::Parser::Iterator::Stream->new(\*STDIN);
-+  my $parser =3D TAP::Parser->new ({iterator =3D> $iterator });
-+  my $testno =3D 0;     # Number of test results seen so far.
-+  my $bailed_out =3D 0; # Whether a "Bail out!" directive has been seen.
-+
-+  while (defined (my $cur =3D $parser->next))
-+    {
-+      if ($cur->is_bailout)
-+        {
-+          $bailed_out =3D 1;
-+          print DIAG_STRING . " " . $cur->as_string . "\n";
-+          next;
-+        }
-+      elsif ($cur->is_plan)
-+        {
-+          $bailed_out =3D 0;
-+          next;
-+        }
-+      elsif ($cur->is_test)
-+        {
-+          $bailed_out =3D 0 if $cur->number =3D=3D 1;
-+          $testno++;
-+          $cur =3D TAP::Parser::Result::Test->new({
-+                          ok =3D> $cur->ok,
-+                          test_num =3D> $testno,
-+                          directive =3D> $cur->directive,
-+                          explanation =3D> $cur->explanation,
-+                          description =3D> $cur->description
-+                  });
-+        }
-+      elsif ($cur->is_version)
-+        {
-+          next if $testno > 0;
-+        }
-+      print $cur->as_string . "\n" unless $bailed_out;
-+    }
-+  print "1..$testno\n";
-+}
-+
-+# ----------- #
-+#  Main code. #
-+# ----------- #
-+
-+main;
-+
-+# Local Variables:
-+# perl-indent-level: 2
-+# perl-continued-statement-offset: 2
-+# perl-continued-brace-offset: 0
-+# perl-brace-offset: 0
-+# perl-brace-imaginary-offset: 0
-+# perl-label-offset: -2
-+# cperl-indent-level: 2
-+# cperl-brace-offset: 0
-+# cperl-continued-brace-offset: 0
-+# cperl-label-offset: -2
-+# cperl-extra-newline-before-brace: t
-+# cperl-merge-trailing-else: nil
-+# cperl-continued-statement-offset: 2
-+# End:
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 3f5a1d0c30..080c7637e2 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -808,41 +808,53 @@ tests/test-qga$(EXESUF): qemu-ga$(EXESUF)
- tests/test-qga$(EXESUF): tests/test-qga.o $(qtest-obj-y)
+ struct kvm_sw_breakpoint *kvm_find_sw_breakpoint(CPUState *cpu,
+                                                  target_ulong pc);
 =20
- SPEED =3D quick
--GTESTER_OPTIONS =3D -k $(if $(V),--verbose,-q)
--GCOV_OPTIONS =3D -n $(if $(V),-f,)
+diff --git a/include/sysemu/rng.h b/include/sysemu/rng.h
+index 45629c4c53..27b37da05d 100644
+--- a/include/sysemu/rng.h
++++ b/include/sysemu/rng.h
+@@ -57,7 +57,7 @@ struct RngBackend
 =20
- # gtester tests, possibly with verbose output
-+# do_test_tap runs all tests, even if some of them fail, while do_test_h=
-uman
-+# stops at the first failure unless -k is given on the command line
-+
-+do_test_human =3D \
-+	$(call quiet-command, rc=3D0; \
-+	  { $(foreach COMMAND, $1, \
-+	    MALLOC_PERTURB_=3D$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1)=
-)} \
-+	      $2 $(COMMAND) -m=3D$(SPEED) -k --tap \
-+	      | ./scripts/tap-driver.pl --test-name=3D"$(notdir $(COMMAND))" $(=
-if $(V),, --show-failures-only) \
-+	      || $(if $(findstring k, $(MAKEFLAGS)), rc=3D$$?, exit $$?); ) }; =
-exit $$rc, \
-+	  "TEST", "$@")
-+
-+do_test_tap =3D \
-+	$(call quiet-command, \
-+	  { $(foreach COMMAND, $1, \
-+	    MALLOC_PERTURB_=3D$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1)=
-)} \
-+	      $2 $(COMMAND) -m=3D$(SPEED) -k --tap | sed "s/^[a-z][a-z]* [0-9]*=
- /&$(notdir $(COMMAND)) /" || true; ) } \
-+	      | ./scripts/tap-merge.pl | tee "$@" \
-+	      | ./scripts/tap-driver.pl $(if $(V),, --show-failures-only), \
-+	  "TAP","$@")
+     /*< protected >*/
+     bool opened;
+-    QSIMPLEQ_HEAD(requests, RngRequest) requests;
++    QSIMPLEQ_HEAD(, RngRequest) requests;
+ };
 =20
- .PHONY: $(patsubst %, check-qtest-%, $(QTEST_TARGETS))
- $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: subdir-%-=
-softmmu $(check-qtest-y)
--	$(call quiet-command,QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
--		QTEST_QEMU_IMG=3Dqemu-img$(EXESUF) \
--		MALLOC_PERTURB_=3D$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} =
-\
--		gtester $(GTESTER_OPTIONS) -m=3D$(SPEED) $(check-qtest-$*-y) $(check-q=
-test-generic-y),"GTESTER","$@")
-+	$(call do_test_human,$(check-qtest-$*-y) $(check-qtest-generic-y), \
-+	  QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
-+	  QTEST_QEMU_IMG=3Dqemu-img$(EXESUF))
 =20
- .PHONY: $(patsubst %, check-%, $(check-unit-y) $(check-speed-y))
- $(patsubst %, check-%, $(check-unit-y) $(check-speed-y)): check-%: %
--	$(call quiet-command, \
--		MALLOC_PERTURB_=3D$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} =
-\
--		gtester $(GTESTER_OPTIONS) -m=3D$(SPEED) $*,"GTESTER","$*")
-+	$(call do_test_human, $*)
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 5bccd2e243..4cff9e1a31 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -2844,7 +2844,7 @@ struct elf_note_info {
+     struct target_elf_prstatus *prstatus;  /* NT_PRSTATUS */
+     struct target_elf_prpsinfo *psinfo;    /* NT_PRPSINFO */
 =20
--# gtester tests with XML output
-+# gtester tests with TAP output
+-    QTAILQ_HEAD(thread_list_head, elf_thread_status) thread_list;
++    QTAILQ_HEAD(, elf_thread_status) thread_list;
+ #if 0
+     /*
+      * Current version of ELF coredump doesn't support
+diff --git a/memory.c b/memory.c
+index 5759f74034..195c5cf639 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2795,7 +2795,7 @@ struct MemoryRegionList {
+     QTAILQ_ENTRY(MemoryRegionList) mrqueue;
+ };
 =20
--$(patsubst %, check-report-qtest-%.xml, $(QTEST_TARGETS)): check-report-=
-qtest-%.xml: $(check-qtest-y)
--	$(call quiet-command,QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
--		QTEST_QEMU_IMG=3Dqemu-img$(EXESUF) \
--	  gtester -q $(GTESTER_OPTIONS) -o $@ -m=3D$(SPEED) $(check-qtest-$*-y)=
- $(check-qtest-generic-y),"GTESTER","$@")
-+$(patsubst %, check-report-qtest-%.tap, $(QTEST_TARGETS)): check-report-=
-qtest-%.tap: $(check-qtest-y)
-+	$(call do_test_tap, $(check-qtest-$*-y) $(check-qtest-generic-y), \
-+	  QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
-+	  QTEST_QEMU_IMG=3Dqemu-img$(EXESUF))
+-typedef QTAILQ_HEAD(mrqueue, MemoryRegionList) MemoryRegionListHead;
++typedef QTAILQ_HEAD(, MemoryRegionList) MemoryRegionListHead;
 =20
--check-report-unit.xml: $(check-unit-y)
--	$(call quiet-command,gtester -q $(GTESTER_OPTIONS) -o $@ -m=3D$(SPEED) =
-$^,"GTESTER","$@")
-+check-report-unit.tap: $(check-unit-y)
-+	$(call do_test_tap,$^)
+ #define MR_SIZE(size) (int128_nz(size) ? (hwaddr)int128_get64( \
+                            int128_sub((size), int128_one())) : 0)
+diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitma=
+p.c
+index 5e90f44c2f..6426151e4f 100644
+--- a/migration/block-dirty-bitmap.c
++++ b/migration/block-dirty-bitmap.c
+@@ -116,7 +116,7 @@ typedef struct DirtyBitmapMigBitmapState {
+ } DirtyBitmapMigBitmapState;
 =20
- # Reports and overall runs
+ typedef struct DirtyBitmapMigState {
+-    QSIMPLEQ_HEAD(dbms_list, DirtyBitmapMigBitmapState) dbms_list;
++    QSIMPLEQ_HEAD(, DirtyBitmapMigBitmapState) dbms_list;
 =20
--check-report.xml: $(patsubst %,check-report-qtest-%.xml, $(QTEST_TARGETS=
-)) check-report-unit.xml
--	$(call quiet-command,$(SRC_PATH)/scripts/gtester-cat $^ > $@,"GEN","$@"=
-)
--
--check-report.html: check-report.xml
--	$(call quiet-command,gtester-report $< > $@,"GEN","$@")
-+check-report.tap: $(patsubst %,check-report-qtest-%.tap, $(QTEST_TARGETS=
-)) check-report-unit.tap
-+	$(call quiet-command,./scripts/tap-merge.py $^ > $@,"GEN","$@")
+     bool bulk_completed;
+     bool no_bitmaps;
+diff --git a/migration/block.c b/migration/block.c
+index 4c04d937b1..0e24e18d13 100644
+--- a/migration/block.c
++++ b/migration/block.c
+@@ -93,12 +93,12 @@ typedef struct BlkMigBlock {
+ } BlkMigBlock;
 =20
- # Per guest TCG tests
+ typedef struct BlkMigState {
+-    QSIMPLEQ_HEAD(bmds_list, BlkMigDevState) bmds_list;
++    QSIMPLEQ_HEAD(, BlkMigDevState) bmds_list;
+     int64_t total_sector_sum;
+     bool zero_blocks;
 =20
-diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/docke=
-rfiles/centos7.docker
-index 0a04bfbed8..e0f18f5a41 100644
---- a/tests/docker/dockerfiles/centos7.docker
-+++ b/tests/docker/dockerfiles/centos7.docker
-@@ -22,6 +22,7 @@ ENV PACKAGES \
-     mesa-libEGL-devel \
-     mesa-libgbm-devel \
-     nettle-devel \
-+    perl-Test-Harness \
-     pixman-devel \
-     SDL-devel \
-     spice-glib-devel \
-diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/=
-dockerfiles/debian-amd64.docker
-index 24b113b76f..c66e341e5f 100644
---- a/tests/docker/dockerfiles/debian-amd64.docker
-+++ b/tests/docker/dockerfiles/debian-amd64.docker
-@@ -16,6 +16,7 @@ RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
-         liblzo2-dev \
-         librdmacm-dev \
-         libsnappy-dev \
-+        libtest-harness-perl \
-         libvte-dev
+     /* Protected by lock.  */
+-    QSIMPLEQ_HEAD(blk_list, BlkMigBlock) blk_list;
++    QSIMPLEQ_HEAD(, BlkMigBlock) blk_list;
+     int submitted;
+     int read_done;
 =20
- # virgl
-diff --git a/tests/docker/dockerfiles/debian-ports.docker b/tests/docker/=
-dockerfiles/debian-ports.docker
-index e05a9a9802..514ab53b80 100644
---- a/tests/docker/dockerfiles/debian-ports.docker
-+++ b/tests/docker/dockerfiles/debian-ports.docker
-@@ -29,6 +29,7 @@ RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
-         flex \
-         gettext \
-         git \
-+        libtest-harness-perl \
-         pkg-config \
-         psmisc \
-         python \
-diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/do=
-ckerfiles/debian-sid.docker
-index 9a3d168705..b30cbe7fc0 100644
---- a/tests/docker/dockerfiles/debian-sid.docker
-+++ b/tests/docker/dockerfiles/debian-sid.docker
-@@ -26,6 +26,7 @@ RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
-         ca-certificates \
-         flex \
-         git \
-+        libtest-harness-perl \
-         pkg-config \
-         psmisc \
-         python \
-diff --git a/tests/docker/dockerfiles/debian8.docker b/tests/docker/docke=
-rfiles/debian8.docker
-index 52945631cd..cdc3f11e06 100644
---- a/tests/docker/dockerfiles/debian8.docker
-+++ b/tests/docker/dockerfiles/debian8.docker
-@@ -29,6 +29,7 @@ RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
-         gettext \
-         git \
-         gnupg \
-+        libtest-harness-perl \
-         pkg-config \
-         python-minimal
+diff --git a/migration/ram.c b/migration/ram.c
+index 7e7deec4d8..1849979fed 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -322,7 +322,7 @@ struct RAMState {
+     RAMBlock *last_req_rb;
+     /* Queue of outstanding page requests from the destination */
+     QemuMutex src_page_req_mutex;
+-    QSIMPLEQ_HEAD(src_page_requests, RAMSrcPageRequest) src_page_request=
+s;
++    QSIMPLEQ_HEAD(, RAMSrcPageRequest) src_page_requests;
+ };
+ typedef struct RAMState RAMState;
 =20
-diff --git a/tests/docker/dockerfiles/debian9.docker b/tests/docker/docke=
-rfiles/debian9.docker
-index 154ae2a455..9561d4f225 100644
---- a/tests/docker/dockerfiles/debian9.docker
-+++ b/tests/docker/dockerfiles/debian9.docker
-@@ -24,6 +24,7 @@ RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
-         flex \
-         gettext \
-         git \
-+        libtest-harness-perl \
-         pkg-config \
-         psmisc \
-         python \
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/docker=
-files/fedora.docker
-index 0c4eb9e49c..1d0e3dc4ec 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -70,6 +70,7 @@ ENV PACKAGES \
-     nss-devel \
-     numactl-devel \
-     perl \
-+    perl-Test-Harness \
-     pixman-devel \
-     python3 \
-     PyYAML \
-diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/docker=
-files/ubuntu.docker
-index 36e2b17de5..229add533c 100644
---- a/tests/docker/dockerfiles/ubuntu.docker
-+++ b/tests/docker/dockerfiles/ubuntu.docker
-@@ -45,6 +45,7 @@ ENV PACKAGES flex bison \
-     libspice-protocol-dev \
-     libspice-server-dev \
-     libssh2-1-dev \
-+    libtest-harness-perl \
-     libusb-1.0-0-dev \
-     libusbredirhost-dev \
-     libvdeplug-dev \
+diff --git a/monitor.c b/monitor.c
+index 0ad54d8b11..eb39fb015b 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -266,12 +266,12 @@ typedef struct QMPRequest QMPRequest;
+ /* Protects mon_list, monitor_qapi_event_state, monitor_destroyed.  */
+ static QemuMutex monitor_lock;
+ static GHashTable *monitor_qapi_event_state;
+-static QTAILQ_HEAD(mon_list, Monitor) mon_list;
++static QTAILQ_HEAD(, Monitor) mon_list;
+ static bool monitor_destroyed;
+=20
+ /* Protects mon_fdsets */
+ static QemuMutex mon_fdsets_lock;
+-static QLIST_HEAD(mon_fdsets, MonFdset) mon_fdsets;
++static QLIST_HEAD(, MonFdset) mon_fdsets;
+=20
+ static int mon_refcount;
+=20
+diff --git a/net/queue.c b/net/queue.c
+index 9c32abdb8f..61276ca4be 100644
+--- a/net/queue.c
++++ b/net/queue.c
+@@ -55,7 +55,7 @@ struct NetQueue {
+     uint32_t nq_count;
+     NetQueueDeliverFunc *deliver;
+=20
+-    QTAILQ_HEAD(packets, NetPacket) packets;
++    QTAILQ_HEAD(, NetPacket) packets;
+=20
+     unsigned delivering : 1;
+ };
+diff --git a/net/slirp.c b/net/slirp.c
+index f6dc03963a..38ae65e4a9 100644
+--- a/net/slirp.c
++++ b/net/slirp.c
+@@ -85,7 +85,7 @@ typedef struct SlirpState {
+ } SlirpState;
+=20
+ static struct slirp_config_str *slirp_configs;
+-static QTAILQ_HEAD(slirp_stacks, SlirpState) slirp_stacks =3D
++static QTAILQ_HEAD(, SlirpState) slirp_stacks =3D
+     QTAILQ_HEAD_INITIALIZER(slirp_stacks);
+=20
+ static int slirp_hostfwd(SlirpState *s, const char *redir_str, Error **e=
+rrp);
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index 322edf51eb..ab2fc4eb8b 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -47,7 +47,7 @@ static const uint8_t special_ethaddr[ETH_ALEN] =3D {
+=20
+ u_int curtime;
+=20
+-static QTAILQ_HEAD(slirp_instances, Slirp) slirp_instances =3D
++static QTAILQ_HEAD(, Slirp) slirp_instances =3D
+     QTAILQ_HEAD_INITIALIZER(slirp_instances);
+=20
+ static struct in_addr dns_addr;
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index 44dd0ce6ce..e00ccf9c98 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -206,7 +206,7 @@ typedef struct KVMDevice {
+     int dev_fd;
+ } KVMDevice;
+=20
+-static QSLIST_HEAD(kvm_devices_head, KVMDevice) kvm_devices_head;
++static QSLIST_HEAD(, KVMDevice) kvm_devices_head;
+=20
+ static void kvm_arm_devlistener_add(MemoryListener *listener,
+                                     MemoryRegionSection *section)
+diff --git a/target/i386/hax-mem.c b/target/i386/hax-mem.c
+index 5c37e94caa..6bb5a24917 100644
+--- a/target/i386/hax-mem.c
++++ b/target/i386/hax-mem.c
+@@ -56,7 +56,7 @@ typedef struct HAXMapping {
+  * send to the kernel only the removal of the pages from the MMIO hole a=
+fter
+  * having computed locally the result of the deletion and additions.
+  */
+-static QTAILQ_HEAD(HAXMappingListHead, HAXMapping) mappings =3D
++static QTAILQ_HEAD(, HAXMapping) mappings =3D
+     QTAILQ_HEAD_INITIALIZER(mappings);
+=20
+ /**
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index ade692fdf5..06f23bbf66 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -702,7 +702,7 @@ struct TCGContext {
+=20
+     /* These structures are private to tcg-target.inc.c.  */
+ #ifdef TCG_TARGET_NEED_LDST_LABELS
+-    QSIMPLEQ_HEAD(ldst_labels, TCGLabelQemuLdst) ldst_labels;
++    QSIMPLEQ_HEAD(, TCGLabelQemuLdst) ldst_labels;
+ #endif
+ #ifdef TCG_TARGET_NEED_POOL_LABELS
+     struct TCGLabelPoolData *pool_labels;
+diff --git a/tests/test-rcu-list.c b/tests/test-rcu-list.c
+index 2e6f70bd59..6f076473e0 100644
+--- a/tests/test-rcu-list.c
++++ b/tests/test-rcu-list.c
+@@ -108,7 +108,7 @@ static void reclaim_list_el(struct rcu_head *prcu)
+ }
+=20
+ #if TEST_LIST_TYPE =3D=3D 1
+-static QLIST_HEAD(q_list_head, list_element) Q_list_head;
++static QLIST_HEAD(, list_element) Q_list_head;
+=20
+ #define TEST_NAME "qlist"
+ #define TEST_LIST_REMOVE_RCU        QLIST_REMOVE_RCU
+diff --git a/vl.c b/vl.c
+index 5f6ff43b1b..0903166812 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1529,7 +1529,7 @@ struct vm_change_state_entry {
+     QLIST_ENTRY (vm_change_state_entry) entries;
+ };
+=20
+-static QLIST_HEAD(vm_change_state_head, vm_change_state_entry) vm_change=
+_state_head;
++static QLIST_HEAD(, vm_change_state_entry) vm_change_state_head;
+=20
+ VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandle=
+r *cb,
+                                                      void *opaque)
 --=20
 2.20.1
