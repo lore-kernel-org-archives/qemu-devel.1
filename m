@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1gZREl-0005Ws-WC
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 21:05:28 -0500
+	(envelope-from <yan.y.zhao@intel.com>) id 1gZRPz-0007jw-0H
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 21:17:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1gZREi-0006Ao-Qt
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 21:05:27 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2747 helo=huawei.com)
+	(envelope-from <yan.y.zhao@intel.com>) id 1gZRPu-0006uI-Ly
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 21:17:02 -0500
+Received: from mga02.intel.com ([134.134.136.20]:6548)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
-	id 1gZREi-00067C-Dy
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 21:05:24 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Wed, 19 Dec 2018 02:05:11 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DB1D65E6@dggeml531-mbs.china.huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+	id 1gZRPu-0006lS-0u
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 21:16:58 -0500
+Date: Tue, 18 Dec 2018 21:12:18 -0500
+From: Zhao Yan <yan.y.zhao@intel.com>
+Message-ID: <20181219021218.GA8139@joy-OptiPlex-7040>
+References: <1542746383-18288-1-git-send-email-kwankhede@nvidia.com>
+	<1542746383-18288-4-git-send-email-kwankhede@nvidia.com>
+	<33183CC9F5247A488A2544077AF19020DB1D1315@dggeml531-mbs.china.huawei.com>
 MIME-Version: 1.0
-Subject: [Qemu-devel] About live migration rollback
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DB1D1315@dggeml531-mbs.china.huawei.com>
+Subject: Re: [Qemu-devel] [PATCH 3/5] Add migration functions for VFIO
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,66 +30,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "dgilbert@redhat.com" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, "peterx@redhat.com" <peterx@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Liujinsong (Paul)" <liu.jinsong@huawei.com>
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc: Kirti Wankhede <kwankhede@nvidia.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "cjia@nvidia.com" <cjia@nvidia.com>, "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "yi.l.liu@intel.com" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>, "ziye.yang@intel.com" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "cohuck@redhat.com" <cohuck@redhat.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "zhi.a.wang@intel.com" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>, "eauger@redhat.com" <eauger@redhat.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "changpeng.liu@intel.com" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Hu, Robert" <robert.hu@intel.com>, Huangzhichao <huangzhichao@huawei.com>, "Liujinsong (Paul)" <liu.jinsong@huawei.com>
 
-Hi Dave,
+right, a capabilities field in struct vfio_device_migration_info can avoid
+populating iteration APIs and migration states into every vendor drivers
+who actually may not requires those APIs and simply do nothing or return
+value 0 in response to those APIs.
 
-We discussed some live migration fallback scenarios in this year's KVM foru=
-m,=20
-and now I can provide another scenario, perhaps the upstream should conside=
-r rolling
-back for this situation.
+struct vfio_device_migration_info {
+        __u32 device_state;         /* VFIO device state */
++     __u32 capabilities;    /* VFIO device capabilities */
+        struct {
+            __u64 precopy_only;
+            __u64 compatible;
+            __u64 postcopy_only;
+            __u64 threshold_size;
+        } pending;	
+     ...
+};
+ 
+So, only for devices who need iteration APIs, like GPU with standalone
+video memory, can set flag VFIO_MIGRATION_HAS_ITERTATION to this
+capabilities field. Then callbacks like save_live_iterate(),
+is_active_iterate(), save_live_pending() will check the flag
+VFIO_MIGRATION_HAS_ITERTATION in capabilities field and send requests
+into vendor driver.
 
-Environments information:
+But, for simple devices who only use system memory, like IGD and NIC,
+will not set the flag VFIO_MIGRATION_HAS_ITERTATION, and as a result, no
+need to handle requests like "Get buffer", "Set buffer", "Get pending
+bytes" triggered by QEMU iteration callbacks. And therefore, detailed
+migration states are not cared for vendor drivers for these devices.
 
-host A: cpu E5620(model WestmereEP without flag xsave)
-host B: cpu E5-2643(model SandyBridgeEP with flag xsave)
+Thanks to Gonglei for providing this idea and details.
+Free free to give your comments to the above description.
 
-The reproduce steps is :
-1. Start a windows 2008 vm with -cpu host(which means host-passthrough).
-2. Migrate the vm to host B when cr4.OSXSAVE=3D0.
-3. Vm runs on host B for a while so that cr4.OSXSAVE changes to 1.
-4. Then migrate the vm to host A successfully, but vm was paused, and qemu =
-printed log as followed:
 
-KVM: entry failed, hardware error 0x80000021
-
-If you're running a guest on an Intel machine without unrestricted mode
-support, the failure can be most likely due to the guest entering an invali=
-d
-state for Intel VT. For example, the guest maybe running in big real mode
-which is not supported on less recent Intel processors.
-
-EAX=3D019b3bb0 EBX=3D01a3ae80 ECX=3D01a61ce8 EDX=3D00000000
-ESI=3D01a62000 EDI=3D00000000 EBP=3D00000000 ESP=3D01718b20
-EIP=3D0185d982 EFL=3D00000286 [--S--P-] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HLT=
-=3D0
-ES =3D0000 00000000 0000ffff 00009300
-CS =3Df000 ffff0000 0000ffff 00009b00
-SS =3D0000 00000000 0000ffff 00009300
-DS =3D0000 00000000 0000ffff 00009300
-FS =3D0000 00000000 0000ffff 00009300
-GS =3D0000 00000000 0000ffff 00009300
-LDT=3D0000 00000000 0000ffff 00008200
-TR =3D0000 00000000 0000ffff 00008b00
-GDT=3D     00000000 0000ffff
-IDT=3D     00000000 0000ffff
-CR0=3D60000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=3D=
-0000000000000000
-DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-EFER=3D0000000000000000
-Code=3D00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 <00> 00 =
-00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 =
-00 00 00
-
-Problem happened when kvm_put_sregs returns err -22(called by kvm_arch_put_=
-registers(qemu)).
-
-Because kvm_arch_vcpu_ioctl_set_sregs(kvm module) checked that=20
-guest_cpuid_has no X86_FEATURE_XSAVE but cr4.OSXSAVE=3D1.
-We should cancel migration if kvm_arch_put_registers returns error.
-
-Thanks,
--Gonglei
+On Mon, Dec 17, 2018 at 11:19:49AM +0000, Gonglei (Arei) wrote:
+> Hi,
+> 
+> It's great to see this patch series, which is a very important step, although 
+> currently only consider GPU mdev devices to support hot migration. 
+> 
+> However, this is based on the VFIO framework after all, so we expect 
+> that we can make this live migration framework more general.
+> 
+> For example, the vfio_save_pending() callback is used to obtain device
+> memory (such as GPU memory), but if the device (such as network card) 
+> has no special proprietary memory, but only system memory? 
+> It is too much to perform a null operation for this kind of device by writing
+> memory to the vendor driver of kernel space. 
+> 
+> I think we can acquire the capability from the vendor driver before using this. 
+> If there is device memory that needs iterative copying, the vendor driver return
+> ture, otherwise return false. Then QEMU implement the specific logic, 
+> otherwise return directly. Just like getting the capability list of KVM
+> module, can we?
+> 
+> 
+> Regards,
+> -Gonglei
+> 
+> 
+> > -----Original Message-----
+> > From: Qemu-devel
+> > [mailto:qemu-devel-bounces+arei.gonglei=huawei.com@nongnu.org] On
+> > Behalf Of Kirti Wankhede
+> > Sent: Wednesday, November 21, 2018 4:40 AM
+> > To: alex.williamson@redhat.com; cjia@nvidia.com
+> > Cc: Zhengxiao.zx@Alibaba-inc.com; kevin.tian@intel.com; yi.l.liu@intel.com;
+> > eskultet@redhat.com; ziye.yang@intel.com; qemu-devel@nongnu.org;
+> > cohuck@redhat.com; shuangtai.tst@alibaba-inc.com; dgilbert@redhat.com;
+> > zhi.a.wang@intel.com; mlevitsk@redhat.com; pasic@linux.ibm.com;
+> > aik@ozlabs.ru; Kirti Wankhede <kwankhede@nvidia.com>;
+> > eauger@redhat.com; felipe@nutanix.com; jonathan.davies@nutanix.com;
+> > changpeng.liu@intel.com; Ken.Xue@amd.com
+> > Subject: [Qemu-devel] [PATCH 3/5] Add migration functions for VFIO devices
+> > 
+> > - Migration function are implemented for VFIO_DEVICE_TYPE_PCI device.
+> > - Added SaveVMHandlers and implemented all basic functions required for live
+> >   migration.
+> > - Added VM state change handler to know running or stopped state of VM.
+> > - Added migration state change notifier to get notification on migration state
+> >   change. This state is translated to VFIO device state and conveyed to vendor
+> >   driver.
+> > - VFIO device supportd migration or not is decided based of migration region
+> >   query. If migration region query is successful then migration is supported
+> >   else migration is blocked.
+> > - Structure vfio_device_migration_info is mapped at 0th offset of migration
+> >   region and should always trapped by VFIO device's driver. Added both type of
+> >   access support, trapped or mmapped, for data section of the region.
+> > - To save device state, read data offset and size using structure
+> >   vfio_device_migration_info.data, accordingly copy data from the region.
+> > - To restore device state, write data offset and size in the structure and write
+> >   data in the region.
+> > - To get dirty page bitmap, write start address and pfn count then read count of
+> >   pfns copied and accordingly read those from the rest of the region or
+> > mmaped
+> >   part of the region. This copy is iterated till page bitmap for all requested
+> >   pfns are copied.
+> > 
+> > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> > Reviewed-by: Neo Jia <cjia@nvidia.com>
+> > ---
+> >  hw/vfio/Makefile.objs         |   2 +-
+> >  hw/vfio/migration.c           | 729
+> > ++++++++++++++++++++++++++++++++++++++++++
+> >  include/hw/vfio/vfio-common.h |  23 ++
+> >  3 files changed, 753 insertions(+), 1 deletion(-)
+> >  create mode 100644 hw/vfio/migration.c
+> > 
+> [skip]
+> 
+> > +
+> > +static SaveVMHandlers savevm_vfio_handlers = {
+> > +    .save_setup = vfio_save_setup,
+> > +    .save_live_iterate = vfio_save_iterate,
+> > +    .save_live_complete_precopy = vfio_save_complete_precopy,
+> > +    .save_live_pending = vfio_save_pending,
+> > +    .save_cleanup = vfio_save_cleanup,
+> > +    .load_state = vfio_load_state,
+> > +    .load_setup = vfio_load_setup,
+> > +    .load_cleanup = vfio_load_cleanup,
+> > +    .is_active_iterate = vfio_is_active_iterate,
+> > +};
+> > +
+> 
+>  
