@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZeBz-0001zP-28
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:55:28 -0500
+	(envelope-from <mst@redhat.com>) id 1gZeFy-0004kN-QN
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:59:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZeBv-0000sr-GQ
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:55:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44878)
+	(envelope-from <mst@redhat.com>) id 1gZeFk-0004q8-EF
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:59:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38184)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZeBv-0000bX-43
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:55:23 -0500
-Date: Wed, 19 Dec 2018 10:55:09 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZeFh-0004mI-Os
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:59:19 -0500
+Date: Wed, 19 Dec 2018 10:59:10 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181219105418-mutt-send-email-mst@kernel.org>
-References: <20181218100002.11219-1-xieyongji@baidu.com>
-	<20181218100002.11219-2-xieyongji@baidu.com>
-	<CAMxuvawx1GXar_UX5Pa_JEEW7EFnG092_PZGKiUL73wtd+s7cg@mail.gmail.com>
-	<20181218152520.GB4807@redhat.com>
-	<20181218104351-mutt-send-email-mst@kernel.org>
-	<20181218160919.GD4807@redhat.com>
+Message-ID: <20181219105555-mutt-send-email-mst@kernel.org>
+References: <cover.1545120100.git.yi.z.zhang@linux.intel.com>
+	<5eb87eb9a389242772375dd52bd97c17564a0829.1545120100.git.yi.z.zhang@linux.intel.com>
+	<20181218085249-mutt-send-email-mst@kernel.org>
+	<20181219091017.GA35378@tiger-server>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181218160919.GD4807@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 for-4.0 1/7] chardev: Add disconnected
- option for chardev socket
+In-Reply-To: <20181219091017.GA35378@tiger-server>
+Subject: Re: [Qemu-devel] [PATCH V7 6/6] hostmem-file: add 'sync' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,65 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, elohimes@gmail.com, zhangyu31@baidu.com, xieyongji@baidu.com, Jason Wang <jasowang@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, lilin24@baidu.com, Yury Kotov <yury-kotov@yandex-team.ru>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, chaiwen@baidu.com, nixun@baidu.com
+To: peter.maydell@linaro.org, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, imammedo@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com, crosthwaite.peter@gmail.com, richard.henderson@linaro.org, xiaoguangrong.eric@gmail.com
 
-On Tue, Dec 18, 2018 at 04:09:19PM +0000, Daniel P. Berrang=E9 wrote:
-> On Tue, Dec 18, 2018 at 11:02:46AM -0500, Michael S. Tsirkin wrote:
-> > On Tue, Dec 18, 2018 at 03:25:20PM +0000, Daniel P. Berrang=E9 wrote:
-> > > On Tue, Dec 18, 2018 at 04:24:26PM +0400, Marc-Andr=E9 Lureau wrote=
-:
-> > > > Hi
-> > > >=20
-> > > > On Tue, Dec 18, 2018 at 2:01 PM <elohimes@gmail.com> wrote:
-> > > > >
-> > > > > From: Xie Yongji <xieyongji@baidu.com>
-> > > > >
-> > > > > New option "disconnected" is added to init the chardev socket
-> > > > > in disconnected state. Then we can use qemu_chr_fe_wait_connect=
-ed()
-> > > > > to connect when necessary. Now it would be used for unix domain
-> > > > > socket of vhost-user-blk device to support reconnect.
-> > > >=20
-> > > > What difference does that make if you wait for connection in
-> > > > qemu_chr_fe_wait_connected(), or during chardev setup?
-> > > >=20
-> > > > "disconnected" is misleading, would it be possible to reuse
-> > > > "wait/nowait" instead?
-> > >=20
-> > > Currently we default to doing a blocking connect in foreground,
-> > > except if reconnect is non-zero, in which case we do a connect
-> > > async in the background. This "disconnected" proposal effectively
-> > > does a blocking connect, but delayed to later in startup.
-> > >=20
-> > > IOW, this could already be achieved if "reconnect" were set to
-> > > non-zero. If the usage doesn't want reconnect though, I tend
-> > > to agree that we should use the exisiting wait/nowait options
-> > > to let it be controlled. I don't see that this "disconnected"
-> > > option gives a compelling benefit over using wait/nowait.
-> >=20
-> > So the tricky thing is that we can not expose the
-> > device to guest until we get a connection and can query
-> > it for the first time. After that is completed,
-> > we can reasonably support disconnected operation at least for net.
->=20
-> The device code would still use  qemu_chr_fe_wait_connected() in my pro=
-posal,
-> so that its no different to the situation with the proposed "disconnect=
-ed"
-> flag.
->=20
-> Regards,
-> Daniel
+On Wed, Dec 19, 2018 at 05:10:18PM +0800, Yi Zhang wrote:
+> > > +
+> > > + - 'sync' option of memory-backend-file is not 'off', and
+> > > +
+> > > + - 'share' option of memory-backend-file is 'on'.
+> > > +
+> > > + - 'pmem' option of memory-backend-file is 'on'
+> > > +
+> > 
+> > Wait isn't this what pmem was supposed to do?
+> > Doesn't it mean "persistent memory"?
+> pmem is a option for memory-backend-file, user should know the backend
+> is in host persistent memory, with this flags on, while there is a host crash
+> or a power failures.
+> 
+> [1] Qemu will take necessary operations to guarantee the persistence.
+> https://patchwork.ozlabs.org/cover/944749/ 
+> 
+> [2] Host kernel also take opretions to consistent filesystem metadata.
+> Add MAP_SYNC flags.
 
-I guess so, but wouldn't it be confusing to users that one says
-"nowait" and qemu still waits for a connection and does not
-run the VM? That's different from how nowait behaves normally.
+OK so I'm a user. Can you educate me please?  When should MAP_SYNC not
+be set? Are there any disadvantages (e.g.  performance?)?
 
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
+-- 
+MST
