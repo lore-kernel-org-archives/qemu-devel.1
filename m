@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZf0N-00060E-Bs
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 11:47:36 -0500
+	(envelope-from <groug@kaod.org>) id 1gZf3j-0007gZ-8p
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 11:51:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZf0K-0007J9-GJ
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 11:47:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42932)
+	(envelope-from <groug@kaod.org>) id 1gZf3e-0002Ie-0y
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 11:50:59 -0500
+Received: from 8.mo177.mail-out.ovh.net ([46.105.61.98]:58990)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZf0K-0007I9-66
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 11:47:28 -0500
-Date: Wed, 19 Dec 2018 11:47:23 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181219114438-mutt-send-email-mst@kernel.org>
-References: <1544619939-18102-1-git-send-email-yu.c.zhang@linux.intel.com>
-	<1544619939-18102-2-git-send-email-yu.c.zhang@linux.intel.com>
-	<20181217141740.16ccfaa1@Igors-MacBook-Pro.local>
-	<20181218092723.yhaerzm4vlzgef65@linux.intel.com>
-	<20181218155536.2b35a037@Igors-MacBook-Pro.local>
-	<20181219025717.6m72hq73p2haexkv@linux.intel.com>
-	<20181219114037.5550a562@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gZf3X-00021K-MM
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 11:50:50 -0500
+Received: from player786.ha.ovh.net (unknown [10.109.159.140])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 77A71D5467
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 17:50:36 +0100 (CET)
+Date: Wed, 19 Dec 2018 17:50:31 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20181219175031.44e1a9f5@bahia.lan>
+In-Reply-To: <28b963d3-a42e-1f6c-a8b5-34445f4af698@redhat.com>
+References: <20181218131829.5135-1-lvivier@redhat.com>
+	<20181218171032.308026c5@bahia.lan>
+	<28b963d3-a42e-1f6c-a8b5-34445f4af698@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181219114037.5550a562@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] intel-iommu: differentiate host
- address width from IOVA address width.
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] spapr: Add H-Call
+ H_HOME_NODE_ASSOCIATIVITY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,207 +32,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Yu Zhang <yu.c.zhang@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Wed, Dec 19, 2018 at 11:40:37AM +0100, Igor Mammedov wrote:
-> On Wed, 19 Dec 2018 10:57:17 +0800
-> Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
+On Wed, 19 Dec 2018 17:25:04 +0100
+Laurent Vivier <lvivier@redhat.com> wrote:
+
+> On 18/12/2018 17:10, Greg Kurz wrote:
+> > On Tue, 18 Dec 2018 14:18:29 +0100
+> > Laurent Vivier <lvivier@redhat.com> wrote:
+> >   
+> >> H_HOME_NODE_ASSOCIATIVITY H-Call returns the associativity domain
+> >> designation associated with the identifier input parameter
+> >>
+> >> This fixes a crash when we try to hotplug a CPU in memory-less and
+> >> CPU-less numa node. In this case, the kernel tries to online the
+> >> node, but without the information provided by this h-call, the node id,
+> >> it cannot and the CPU is started while the node is not onlined.
+> >>
+> >> It also removes the warning message from the kernel:
+> >>   VPHN is not supported. Disabling polling..
+> >>
+> >> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> >> ---
+> >>
+> >> Notes:
+> >>     v2:
+> >>       add hcall-vphn to ibm,hypertas-functions
+> >>       correctly check flags
+> >>       return H_FUNCTION rather than H_PARAMETER
+> >>       update description
+> >>
+> >>  hw/ppc/spapr.c         |  1 +
+> >>  hw/ppc/spapr_hcall.c   | 39 +++++++++++++++++++++++++++++++++++++++
+> >>  include/hw/ppc/spapr.h |  1 +
+> >>  3 files changed, 41 insertions(+)
+> >>
+> >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> >> index 7a0ab2da54..d961272c8a 100644
+> >> --- a/hw/ppc/spapr.c
+> >> +++ b/hw/ppc/spapr.c
+> >> @@ -1049,6 +1049,7 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, void *fdt)
+> >>      add_str(hypertas, "hcall-sprg0");
+> >>      add_str(hypertas, "hcall-copy");
+> >>      add_str(hypertas, "hcall-debug");
+> >> +    add_str(hypertas, "hcall-vphn");
+> >>      add_str(qemu_hypertas, "hcall-memop1");
+> >>  
+> >>      if (!kvm_enabled() || kvmppc_spapr_use_multitce()) {
+> >> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> >> index 78fecc8fe9..a48adb3cfb 100644
+> >> --- a/hw/ppc/spapr_hcall.c
+> >> +++ b/hw/ppc/spapr_hcall.c
+> >> @@ -1663,6 +1663,41 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+> >>      return H_SUCCESS;
+> >>  }
+> >>  
+> >> +static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
+> >> +                                              sPAPRMachineState *spapr,
+> >> +                                              target_ulong opcode,
+> >> +                                              target_ulong *args)
+> >> +{
+> >> +    target_ulong flags = args[0];
+> >> +    target_ulong procno = args[1];
+> >> +    PowerPCCPU *tcpu;
+> >> +    int idx;
+> >> +
+> >> +    /* only support procno from H_REGISTER_VPA */
+> >> +    if (flags != 0x1) {
+> >> +        return H_FUNCTION;
+> >> +    }
+> >> +
+> >> +    tcpu = spapr_find_cpu(procno);
+> >> +    if (tcpu == NULL) {
+> >> +        return H_P2;
+> >> +    }
+> >> +
+> >> +    /* sequence is the same as in the "ibm,associativity" property */
+> >> +
+> >> +    idx = 0;
+> >> +#define ASSOCIATIVITY(a, b) (((uint64_t)a << 32) | ((uint64_t)b & 0xffffffff))  
+> > 
+> > It would be safer to have parens around a and b.  
 > 
-> > On Tue, Dec 18, 2018 at 03:55:36PM +0100, Igor Mammedov wrote:
-> > > On Tue, 18 Dec 2018 17:27:23 +0800
-> > > Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
-> > >   
-> > > > On Mon, Dec 17, 2018 at 02:17:40PM +0100, Igor Mammedov wrote:  
-> > > > > On Wed, 12 Dec 2018 21:05:38 +0800
-> > > > > Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
-> > > > >   
-> > > > > > Currently, vIOMMU is using the value of IOVA address width, instead of
-> > > > > > the host address width(HAW) to calculate the number of reserved bits in
-> > > > > > data structures such as root entries, context entries, and entries of
-> > > > > > DMA paging structures etc.
-> > > > > > 
-> > > > > > However values of IOVA address width and of the HAW may not equal. For
-> > > > > > example, a 48-bit IOVA can only be mapped to host addresses no wider than
-> > > > > > 46 bits. Using 48, instead of 46 to calculate the reserved bit may result
-> > > > > > in an invalid IOVA being accepted.
-> > > > > > 
-> > > > > > To fix this, a new field - haw_bits is introduced in struct IntelIOMMUState,
-> > > > > > whose value is initialized based on the maximum physical address set to
-> > > > > > guest CPU.  
-> > > > >   
-> > > > > > Also, definitions such as VTD_HOST_AW_39/48BIT etc. are renamed
-> > > > > > to clarify.
-> > > > > > 
-> > > > > > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > > > > > Reviewed-by: Peter Xu <peterx@redhat.com>
-> > > > > > ---  
-> > > > > [...]
-> > > > >   
-> > > > > > @@ -3100,6 +3104,8 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
-> > > > > >  static void vtd_init(IntelIOMMUState *s)
-> > > > > >  {
-> > > > > >      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
-> > > > > > +    CPUState *cs = first_cpu;
-> > > > > > +    X86CPU *cpu = X86_CPU(cs);
-> > > > > >  
-> > > > > >      memset(s->csr, 0, DMAR_REG_SIZE);
-> > > > > >      memset(s->wmask, 0, DMAR_REG_SIZE);
-> > > > > > @@ -3119,23 +3125,24 @@ static void vtd_init(IntelIOMMUState *s)
-> > > > > >      s->cap = VTD_CAP_FRO | VTD_CAP_NFR | VTD_CAP_ND |
-> > > > > >               VTD_CAP_MAMV | VTD_CAP_PSI | VTD_CAP_SLLPS |
-> > > > > >               VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(s->aw_bits);
-> > > > > > -    if (s->aw_bits == VTD_HOST_AW_48BIT) {
-> > > > > > +    if (s->aw_bits == VTD_AW_48BIT) {
-> > > > > >          s->cap |= VTD_CAP_SAGAW_48bit;
-> > > > > >      }
-> > > > > >      s->ecap = VTD_ECAP_QI | VTD_ECAP_IRO;
-> > > > > > +    s->haw_bits = cpu->phys_bits;  
-> > > > > Is it possible to avoid accessing CPU fields directly or cpu altogether
-> > > > > and set phys_bits when iommu is created?  
-> > > > 
-> > > > Thanks for your comments, Igor.
-> > > > 
-> > > > Well, I guess you prefer not to query the CPU capabilities while deciding
-> > > > the vIOMMU features. But to me, they are not that irrelevant.:)
-> > > > 
-> > > > Here the hardware address width in vt-d, and the one in cpuid.MAXPHYSADDR
-> > > > are referring to the same concept. In VM, both are the maximum guest physical
-> > > > address width. If we do not check the CPU field here, we will still have to
-> > > > check the CPU field in other places such as build_dmar_q35(), and reset the
-> > > > s->haw_bits again.
-> > > > 
-> > > > Is this explanation convincing enough? :)  
-> > > current build_dmar_q35() doesn't do it, it's all new code in this series that
-> > > contains not acceptable direct access from one device (iommu) to another (cpu).   
-> > > Proper way would be for the owner of iommu to fish limits from somewhere and set
-> > > values during iommu creation.  
-> > 
-> > Well, current build_dmar_q35() doesn't do it, because it is using the incorrect value. :)
-> > According to the spec, the host address width is the maximum physical address width,
-> > yet current implementation is using the DMA address width. For me, this is not only
-> > wrong, but also unsecure. For this point, I think we all agree this need to be fixed.
-> > 
-> > As to how to fix it - should we query the cpu fields, I still do not understand why
-> > this is not acceptable. :)
-> > 
-> > I had thought of other approaches before, yet I did not choose:
-> > 
-> > 1> Introduce a new parameter, say, "x-haw-bits" which is used for iommu to limit its  
-> > physical address width(similar to the "x-aw-bits" for IOVA). But what should we check
-> > this parameter or not? What if this parameter is set to sth. different than the "phys-bits"
-> > or not?
-> > 
-> > 2> Another choice I had thought of is, to query the physical iommu. I abandoned this  
-> > idea because my understanding is that vIOMMU is not a passthrued device, it is emulated.
+> I agree
 > 
-> > So Igor, may I ask why you think checking against the cpu fields so not acceptable? :)
-> Because accessing private fields of device from another random device is not robust
-> and a subject to breaking in unpredictable manner when field meaning or initialization
-> order changes. (analogy to baremetal: one does not solder wire to a CPU die to let
-> access some piece of data from random device).
-> 
-> I've looked at intel-iommu code and how it's created so here is a way to do the thing
-> you need using proper interfaces:
-> 
-> 1. add x-haw_bits property
-> 2. include in your series patch
->     '[Qemu-devel] [PATCH] qdev: let machine hotplug handler to override  bus hotplug handler'
-> 3. add your iommu to pc_get_hotpug_handler() to redirect plug flow to
->    machine and let _pre_plug handler to check and set x-haw_bits for machine level
-> 4. you probably can use phys-bits/host-phys-bits properties to get data that you need
->    also see how ms->possible_cpus, that's how you can get access to CPU from machine
->    layer.
-
-
-But given it's all actually a hack trying to guess host CPU capabilities,
-I would rather say 
-1. add a host kernel interface to get it from VFIO
-2. on a host where it's not there, and assuming we want to support old kernels,
-   write a function returning these (do we? why? is the 5 level hardware already
-   so widespread?), and call it at any time. No need to poke at the VCPU.
-
-
-
-> > >   
-> > > > > 
-> > > > > Perhaps Eduardo
-> > > > >  can suggest better approach, since he's more familiar with phys_bits topic  
-> > > > 
-> > > > @Eduardo, any comments? Thanks!
-> > > >   
-> > > > >   
-> > > > > >      /*
-> > > > > >       * Rsvd field masks for spte
-> > > > > >       */
-> > > > > >      vtd_paging_entry_rsvd_field[0] = ~0ULL;
-> > > > > > -    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->aw_bits);
-> > > > > > -    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->aw_bits);
-> > > > > > -    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->aw_bits);
-> > > > > > -    vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->aw_bits);
-> > > > > > -    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->aw_bits);
-> > > > > > -    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->aw_bits);
-> > > > > > -    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->aw_bits);
-> > > > > > -    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->aw_bits);
-> > > > > > +    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->haw_bits);
-> > > > > > +    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->haw_bits);
-> > > > > > +    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->haw_bits);
-> > > > > > +    vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->haw_bits);
-> > > > > > +    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->haw_bits);
-> > > > > > +    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->haw_bits);
-> > > > > > +    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->haw_bits);
-> > > > > > +    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->haw_bits);
-> > > > > >  
-> > > > > >      if (x86_iommu->intr_supported) {
-> > > > > >          s->ecap |= VTD_ECAP_IR | VTD_ECAP_MHMV;
-> > > > > > @@ -3261,10 +3268,10 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
-> > > > > >      }
-> > > > > >  
-> > > > > >      /* Currently only address widths supported are 39 and 48 bits */
-> > > > > > -    if ((s->aw_bits != VTD_HOST_AW_39BIT) &&
-> > > > > > -        (s->aw_bits != VTD_HOST_AW_48BIT)) {
-> > > > > > +    if ((s->aw_bits != VTD_AW_39BIT) &&
-> > > > > > +        (s->aw_bits != VTD_AW_48BIT)) {
-> > > > > >          error_setg(errp, "Supported values for x-aw-bits are: %d, %d",
-> > > > > > -                   VTD_HOST_AW_39BIT, VTD_HOST_AW_48BIT);
-> > > > > > +                   VTD_AW_39BIT, VTD_AW_48BIT);
-> > > > > >          return false;
-> > > > > >      }
-> > > > > >  
-> > > > > > diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-> > > > > > index ed4e758..820451c 100644
-> > > > > > --- a/include/hw/i386/intel_iommu.h
-> > > > > > +++ b/include/hw/i386/intel_iommu.h
-> > > > > > @@ -47,9 +47,9 @@
-> > > > > >  #define VTD_SID_TO_DEVFN(sid)       ((sid) & 0xff)
-> > > > > >  
-> > > > > >  #define DMAR_REG_SIZE               0x230
-> > > > > > -#define VTD_HOST_AW_39BIT           39
-> > > > > > -#define VTD_HOST_AW_48BIT           48
-> > > > > > -#define VTD_HOST_ADDRESS_WIDTH      VTD_HOST_AW_39BIT
-> > > > > > +#define VTD_AW_39BIT                39
-> > > > > > +#define VTD_AW_48BIT                48
-> > > > > > +#define VTD_ADDRESS_WIDTH           VTD_AW_39BIT
-> > > > > >  #define VTD_HAW_MASK(aw)            ((1ULL << (aw)) - 1)
-> > > > > >  
-> > > > > >  #define DMAR_REPORT_F_INTR          (1)
-> > > > > > @@ -244,7 +244,8 @@ struct IntelIOMMUState {
-> > > > > >      bool intr_eime;                 /* Extended interrupt mode enabled */
-> > > > > >      OnOffAuto intr_eim;             /* Toggle for EIM cabability */
-> > > > > >      bool buggy_eim;                 /* Force buggy EIM unless eim=off */
-> > > > > > -    uint8_t aw_bits;                /* Host/IOVA address width (in bits) */
-> > > > > > +    uint8_t aw_bits;                /* IOVA address width (in bits) */
-> > > > > > +    uint8_t haw_bits;               /* Hardware address width (in bits) */
-> > > > > >  
-> > > > > >      /*
-> > > > > >       * Protects IOMMU states in general.  Currently it protects the  
-> > > > > 
-> > > > >   
-> > > > 
-> > > > B.R.
-> > > > Yu  
-> > > 
-> > >   
+> >> +    args[idx++] = ASSOCIATIVITY(0, 0);
+> >> +    args[idx++] = ASSOCIATIVITY(0, tcpu->node_id);
+> >> +    args[idx++] = ASSOCIATIVITY(procno, -1);  
 > > 
-> > B.R.
-> > Yu
+> > The returned values are supposed to be a stream of mixed 16-bit and 32-bit
+> > values, _insanely_ encoded as follows:
+> > 
+> > The high order bit of each 2 byte field is a length specifier:
+> >  1: The associativity domain number is contained in the low order 15 bits of the
+> >     field,
+> >  0: The associativity domain number is contained in the low order 15 bits of the
+> >     current field concatenated with the 16 bits of the next sequential field)
+> > 
+> > ie, usable values are either 31-bit, either 15-bit.
+> > 
+> > I don't see such an encoding taking place in the code... this may cause
+> > problems if node_id >= 0x80000000: the guest will only get bits 30:16,
+> > and consider bits 15:0 to belong to the next field, which may in turn
+> > be considered as a 15-bit value or combined with the top 16-bits of
+> > procno to form a bogus 31-bit value... :-\  
+> 
+> > I guess it is okay to go with the "long" variant for everyone since you
+> > only have 5 of them, but you could also use the "short" variant when
+> > values are < 0x10000.
+> > 
+> > And in any case, it seems we have to limit node ids and vcpu ids to be
+> > 31 bits if we're to support this interface.  
+> 
+> From PowerPCCPU, node_id is an int32_t, vcpu_id is an "int", and node id
+>  and cpu id cannot be negative, so the value encoded are already 31bit
+> values. Moreover, in NumaNodeOptions (see qapi/misc.json) nodeid and
+> cpus are uint16.
+> 
+> So I think we don't have to check the bit 31 of these values.
+> 
+
+Indeed, it seems you're right.
+
+> I don't want to manage the 15bit encoding because the list is hard coded
+> and I want to keep it simple.
+> 
+
+Fair enough.
+
+
+> Thanks,
+> Laurent
