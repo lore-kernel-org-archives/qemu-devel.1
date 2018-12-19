@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <weijiang.yang@intel.com>) id 1gZTm5-0000Wy-OW
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 23:48:06 -0500
+	(envelope-from <weijiang.yang@intel.com>) id 1gZURn-0004LC-H9
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 00:31:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <weijiang.yang@intel.com>) id 1gZTl7-00019V-UX
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 23:47:06 -0500
-Received: from mga05.intel.com ([192.55.52.43]:64703)
+	(envelope-from <weijiang.yang@intel.com>) id 1gZURk-0005ye-CO
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 00:31:07 -0500
+Received: from mga04.intel.com ([192.55.52.120]:9470)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <weijiang.yang@intel.com>)
-	id 1gZTl7-000165-K9
-	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 23:47:01 -0500
-From: weijiang.yang@intel.com
-Date: Wed, 19 Dec 2018 12:50:21 +0800
-Message-Id: <20181219045021.18479-1-weijiang.yang@intel.com>
-Subject: [Qemu-devel] [PATCH v1] This patch enhances bitmap op function
- input check and ambiguous return.
+	id 1gZURk-0005tJ-2B
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 00:31:04 -0500
+From: Yang Weijiang <weijiang.yang@intel.com>
+Date: Wed, 19 Dec 2018 13:34:24 +0800
+Message-Id: <20181219053424.18881-1-weijiang.yang@intel.com>
+Subject: [Qemu-devel] [PATCH v1][RESEND] bitmap: fix the "n=0" corner case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,21 +25,23 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com, peterx@redhat.com, wei.w.wang@intel.com
 Cc: Yang Weijiang <weijiang.yang@intel.com>
 
-From: Yang Weijiang <weijiang.yang@intel.com>
+This patch enhances bitmap op function input check and ambiguous return.
+BITMAP_LAST_WORD_MASK(nbits) returns 0xffffffff when "nbits=0", this leads
+to error returns in some functions. This patch also checks bits input in
+some slow bitmap op functions, if bits = 0, do early return to keep the
+dst data unchanged.
 
-    BITMAP_LAST_WORD_MASK(nbits) returns 0xffffffff when "nbits=0",
-    this leads to error returns in some functions. This patch also
-    checks bits input in some slow bitmap op functions, if bits = 0,
-    do early return to keep the dst data unchanged.
-
-    this patch is a follow-up patch of :
-    https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg03510.html
+This patch is a follow-up patch of :
+https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg03510.html
 
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 ---
  include/qemu/bitmap.h | 24 ++++++++++++++++++++++++
  util/bitmap.c         | 24 ++++++++++++++++++++++++
  2 files changed, 48 insertions(+)
+
+RESEND ChangeLog:
+- git commit log format change.
 
 diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
 index 509eeddece..b6ce0ed551 100644
