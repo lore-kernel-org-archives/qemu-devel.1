@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53872)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gZYYv-0006Pt-9d
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 04:54:46 -0500
+	(envelope-from <berrange@redhat.com>) id 1gZYab-0007KE-6u
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 04:56:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gZYYu-0003hv-Eu
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 04:54:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55774)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gZYYu-0003gz-7e
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 04:54:44 -0500
-Date: Wed, 19 Dec 2018 10:54:42 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181219095442.oayncn5ufysvntet@sirius.home.kraxel.org>
-References: <20180803173614.12358-1-marcandre.lureau@redhat.com>
-	<20180803173614.12358-11-marcandre.lureau@redhat.com>
-	<20180807101505.GF7335@redhat.com>
-	<CAJ+F1C+=aucconH7EZ8D2g_Wir2wEeq4GMobK+jNPZ8b0LbZKA@mail.gmail.com>
-	<20180807143055.pkx7l2ufb36lyq3b@sirius.home.kraxel.org>
-	<CAJ+F1CJtFJ_vk817tQsGEi3B+xC4bH3eGxA+tRPayyj3F0gnsw@mail.gmail.com>
-	<20181219071325.c7ayirk564s7kuhn@sirius.home.kraxel.org>
-	<CAJ+F1CKzb3DmmuQG5itgsUxvUwM34fh242FsgxKp1Aj-fksrBg@mail.gmail.com>
+	(envelope-from <berrange@redhat.com>) id 1gZYaX-0005Ik-NV
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 04:56:29 -0500
+Date: Wed, 19 Dec 2018 09:56:10 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181219095610.GB20465@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181218115615.1499-1-philmd@redhat.com>
+	<20181218115615.1499-11-philmd@redhat.com>
+	<20f62f62-f677-6d0f-09dc-3759cc813d8f@redhat.com>
+	<20181218152239.GB19442@habkost.net>
+	<94e8bd71-302e-bced-665d-78538ea3aba3@redhat.com>
+	<2ae5b6cd-7227-fab5-1bd1-4d3ebb88feee@redhat.com>
+	<20181218155731.GC19442@habkost.net>
+	<e5f62788-4b59-223c-c85e-562daf3a27d9@redhat.com>
+	<20181218191343.GE19442@habkost.net>
+	<99b7b806-b18a-8c59-b4f5-ff04ffe3da6e@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAJ+F1CKzb3DmmuQG5itgsUxvUwM34fh242FsgxKp1Aj-fksrBg@mail.gmail.com>
+In-Reply-To: <99b7b806-b18a-8c59-b4f5-ff04ffe3da6e@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 10/10] display: add -display app launching
- external application
+Subject: Re: [Qemu-devel] [PATCH v2 10/12] MAINTAINERS: Orphanize the 'CPU
+ (QOM)' subsystem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,59 +34,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <thuth@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>, Helge Deller <deller@gmx.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Luc Michel <luc.michel@greensocs.com>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On Wed, Dec 19, 2018 at 11:44:07AM +0400, Marc-Andr=E9 Lureau wrote:
-> On Wed, Dec 19, 2018 at 11:13 AM Gerd Hoffmann <kraxel@redhat.com> wrot=
-e:
-> >
-> >   Hi,
-> >
-> > > > Also:  remote-viewer accepts config files.  I'd suggest to write =
-one, so
-> > > > it is easy to restart remote-viewer.  Also I would not use a temp=
- dir
-> > >
-> > > Where should it be written?
-> >
-> > /run/user/$uid/qemu/$vmname/remote-viewer.vv ?
-> >
-> > > What should be the content of
-> > > the .vv file?
-> >
-> > Everything needed, so launching remote-viewer is
-> > just "remote-viewer /path/to/config.vv".
+On Tue, Dec 18, 2018 at 10:22:39PM +0100, Paolo Bonzini wrote:
+> On 18/12/18 20:13, Eduardo Habkost wrote:
+> > On Tue, Dec 18, 2018 at 06:15:06PM +0100, Paolo Bonzini wrote:
+> >> On 18/12/18 16:57, Eduardo Habkost wrote:
+> >>> On Tue, Dec 18, 2018 at 04:44:25PM +0100, Thomas Huth wrote:
+> >>>> On 2018-12-18 16:31, Philippe Mathieu-Daud=C3=A9 wrote:
+> >>>>> Hi Paolo, Eduardo,
+> >>>>>
+> >>>>> On 12/18/18 4:22 PM, Eduardo Habkost wrote:
+> >>>>>> On Tue, Dec 18, 2018 at 01:34:52PM +0100, Paolo Bonzini wrote:
+> >>>>>>> On 18/12/18 12:56, Philippe Mathieu-Daud=C3=A9 wrote:
+> >>>>>>>> Nobody is looking at those files, downgrade this subsystem as =
+orphan.
+> >>>>>>>>
+> >>>>>>>> Remove the qemu-devel@nongnu.org entry because the list is alw=
+ays
+> >>>>>>>> selected by the 'All patches CC here' section.
+> >>>>>>>>
+> >>>>>>>> Suggested-by: Markus Armbruster <armbru@redhat.com>
+> >>>>>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> >>>>>>>> ---
+> >>>>>>>>  MAINTAINERS | 3 +--
+> >>>>>>>>  1 file changed, 1 insertion(+), 2 deletions(-)
+> >>>>>>>>
+> >>>>>>>> diff --git a/MAINTAINERS b/MAINTAINERS
+> >>>>>>>> index e50f8c6b97..e6a73820f1 100644
+> >>>>>>>> --- a/MAINTAINERS
+> >>>>>>>> +++ b/MAINTAINERS
+> >>>>>>>> @@ -1745,8 +1745,7 @@ S: Supported
+> >>>>>>>>  F: scripts/coverity-model.c
+> >>>>>>>> =20
+> >>>>>>>>  CPU
+> >>>>>>>> -L: qemu-devel@nongnu.org
+> >>>>>>>> -S: Supported
+> >>>>>>>> +S: Orphan
+> >>>>>>>>  F: qom/cpu.c
+> >>>>>>>>  F: include/qom/cpu.h
+> >>>>>>>> =20
+> >>>>>>>>
+> >>>>>>>
+> >>>>>>> I don't think that's accurate.  Simply there's not much going o=
+n.  If
+> >>>>>>> patches are sent, get-maintainers's git fallback will do someth=
+ing
+> >>>>>>> (probably sending the patch to Eduardo, Igor or me).
+> >>>>>
+> >>>>> I followed Markus suggestion from
+> >>>>> https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05414.ht=
+ml:
+> >>>>>
+> >>>>>   If we take the definition of S: in MAINTAINERS seriously,
+> >>>>>   we need to appoint a maintainer (a person, not a mailing list),
+> >>>>>   or downgrade to S: Orphan.
+> >>>>
+> >>>> I agree with Markus and Philippe. Having "S: Supported" but no nam=
+es
+> >>>> available is just confusing. So either put a maintainer name in he=
+re, or
+> >>>> downgrade to "Orphan".
+> >>>
+> >>> I volunteer to maintain it, but I don't want to be the only
+> >>> maintainer.  Any other volunteer?
+> >>
+> >> I can volunteer since I'd take the patches anyway.  We can also mark=
+ it
+> >> as Odd Fixes, and also make it a single thing with all of qom/ and
+> >> include/qom/.
+> >=20
+> > Actually, I consider qom/cpu.c distinct from QOM core, and I was
+> > planning to move it to hw/cpu, and add hw/cpu/core.c to the same
+> > section.
+> >=20
+> > Anyway, I guess this means you're also volunteering to be listed
+> > as QOM maintainer?
 >=20
-> If it's just what is needed to launch the viewer, why not stick to the
-> url syntax?
+> Igor and Daniel, would you co-maintain or review it?
 
-First, the info needed to launch is located on a fixed & well known
-place on disk then, so it is easy to restart remote-viewer.
+I'm fine being listed as a manitainer for qom/, agree with moving
+qom/cpu.c to hw/cpu, as I was going to suggest that myself :-)
 
-Second, with a vv file you can do a bit more, for example setting "ca"
-in case TLS is configured, or set enable-{smartcard,usbredir} depending
-on guest configuration.
 
-> .vv files are quite specific to virt-viewer/remote-viewer.
-
-The same is true for the URL syntax.  Trying to pass a URL to vncviewer
-doesn't work ...
-
-> > > Should it use a template to avoid proxying all the
-> > > options?
-> >
-> > Is this needed?  virt-viewer has a user settings file,
-> > shouldn't user preferences go there instead?
->=20
-> User settings files are quite limited at this point. Afaik, it's only
-> used for the "ask-quit" preference, and "monitor-mapping". Other
-> options are either from command line or .vv files.
-
-Ok.
-
-I think it is more useful to extend that instead of passing through
-options from the qemu command line to virt-viewer.
-
-cheers,
-  Gerd
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
