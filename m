@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gZafA-0003Ih-5F
+	(envelope-from <kraxel@redhat.com>) id 1gZafA-0003Id-3U
 	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:09:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gZaf6-0000B9-8s
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:09:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48414)
+	(envelope-from <kraxel@redhat.com>) id 1gZaf4-0000Ae-7h
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:09:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47338)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gZaf2-00009S-Gl
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:09:14 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gZaf2-00009M-Ev
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:09:12 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 46EA43D96D
+	by mx1.redhat.com (Postfix) with ESMTPS id 1C00183F4C
 	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 12:09:10 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 19 Dec 2018 13:08:59 +0100
-Message-Id: <20181219120904.17643-3-kraxel@redhat.com>
+Date: Wed, 19 Dec 2018 13:09:01 +0100
+Message-Id: <20181219120904.17643-5-kraxel@redhat.com>
 In-Reply-To: <20181219120904.17643-1-kraxel@redhat.com>
 References: <20181219120904.17643-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH v2 2/7] kbd-state: use state tracker for
- sdl2
+Subject: [Qemu-devel] [RFC PATCH v2 4/7] kbd-state: use state tracker for gtk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,144 +32,130 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: berrange@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
 
-Use the new keyboard state tracked for sdl2.  We can drop the modifier
-state tracking from sdl2.  Also keyup code is simpler, the state tracker
-will take care to not send suspious keyup events to the guest.
+Use the new keyboard state tracked for gtk.  Allows to drop the
+gtk-specific modifier state tracking code.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/ui/sdl2.h |  2 ++
- ui/sdl2-input.c   | 40 +++-------------------------------------
- ui/sdl2.c         | 12 +++---------
- 3 files changed, 8 insertions(+), 46 deletions(-)
+ include/ui/gtk.h |  2 ++
+ ui/gtk.c         | 38 ++++++--------------------------------
+ 2 files changed, 8 insertions(+), 32 deletions(-)
 
-diff --git a/include/ui/sdl2.h b/include/ui/sdl2.h
-index f43eecdbd6..393f4b0fd5 100644
---- a/include/ui/sdl2.h
-+++ b/include/ui/sdl2.h
-@@ -7,6 +7,7 @@
- #include <SDL.h>
- #include <SDL_syswm.h>
+diff --git a/include/ui/gtk.h b/include/ui/gtk.h
+index 99edd3c085..9cf0c9e55c 100644
+--- a/include/ui/gtk.h
++++ b/include/ui/gtk.h
+@@ -22,6 +22,7 @@
+ #include <gdk/gdkwayland.h>
+ #endif
  
 +#include "ui/kbd-state.h"
- #ifdef CONFIG_OPENGL
- # include "ui/egl-helpers.h"
- #endif
-@@ -27,6 +28,7 @@ struct sdl2_console {
-     int idle_counter;
-     int ignore_hotkeys;
-     SDL_GLContext winctx;
+ #if defined(CONFIG_OPENGL)
+ #include "ui/egl-helpers.h"
+ #include "ui/egl-context.h"
+@@ -32,6 +33,7 @@ typedef struct GtkDisplayState GtkDisplayState;
+ typedef struct VirtualGfxConsole {
+     GtkWidget *drawing_area;
+     DisplayChangeListener dcl;
 +    KbdState *kbd;
- #ifdef CONFIG_OPENGL
-     QemuGLShader *gls;
-     egl_fb guest_fb;
-diff --git a/ui/sdl2-input.c b/ui/sdl2-input.c
-index 1378b63dd9..ae52d548f6 100644
---- a/ui/sdl2-input.c
-+++ b/ui/sdl2-input.c
-@@ -30,22 +30,9 @@
- #include "ui/sdl2.h"
- #include "sysemu/sysemu.h"
+     DisplaySurface *ds;
+     pixman_image_t *convert;
+     cairo_surface_t *surface;
+diff --git a/ui/gtk.c b/ui/gtk.c
+index 579990b865..85d095e624 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -122,17 +122,6 @@
  
--static uint8_t modifiers_state[SDL_NUM_SCANCODES];
+ #define HOTKEY_MODIFIERS        (GDK_CONTROL_MASK | GDK_MOD1_MASK)
+ 
+-static const int modifier_keycode[] = {
+-    Q_KEY_CODE_SHIFT,
+-    Q_KEY_CODE_SHIFT_R,
+-    Q_KEY_CODE_CTRL,
+-    Q_KEY_CODE_CTRL_R,
+-    Q_KEY_CODE_ALT,
+-    Q_KEY_CODE_ALT_R,
+-    Q_KEY_CODE_META_L,
+-    Q_KEY_CODE_META_R,
+-};
 -
- void sdl2_reset_keys(struct sdl2_console *scon)
+ static const guint16 *keycode_map;
+ static size_t keycode_maplen;
+ 
+@@ -187,7 +176,6 @@ struct GtkDisplayState {
+ 
+     bool external_pause_update;
+ 
+-    bool modifier_pressed[ARRAY_SIZE(modifier_keycode)];
+     bool ignore_keys;
+ 
+     DisplayOptions *opts;
+@@ -426,20 +414,12 @@ static void gd_update_full_redraw(VirtualConsole *vc)
+ static void gtk_release_modifiers(GtkDisplayState *s)
  {
--    QemuConsole *con = scon ? scon->dcl.con : NULL;
--    int i;
--
--    for (i = 0 ;
--         i < SDL_NUM_SCANCODES && i < qemu_input_map_usb_to_qcode_len ;
--         i++) {
--        if (modifiers_state[i]) {
--            int qcode = qemu_input_map_usb_to_qcode[i];
--            qemu_input_event_send_key_qcode(con, qcode, false);
--            modifiers_state[i] = 0;
+     VirtualConsole *vc = gd_vc_find_current(s);
+-    int i, qcode;
+ 
+     if (vc->type != GD_VC_GFX ||
+         !qemu_console_is_graphic(vc->gfx.dcl.con)) {
+         return;
+     }
+-    for (i = 0; i < ARRAY_SIZE(modifier_keycode); i++) {
+-        qcode = modifier_keycode[i];
+-        if (!s->modifier_pressed[i]) {
+-            continue;
 -        }
+-        qemu_input_event_send_key_qcode(vc->gfx.dcl.con, qcode, false);
+-        s->modifier_pressed[i] = false;
 -    }
-+    kbd_state_lift_all_keys(scon->kbd);
++    kbd_state_lift_all_keys(vc->gfx.kbd);
  }
  
- void sdl2_process_key(struct sdl2_console *scon,
-@@ -59,31 +46,10 @@ void sdl2_process_key(struct sdl2_console *scon,
+ static void gd_widget_reparent(GtkWidget *from, GtkWidget *to,
+@@ -1113,7 +1093,6 @@ static gboolean gd_key_event(GtkWidget *widget, GdkEventKey *key, void *opaque)
+     VirtualConsole *vc = opaque;
+     GtkDisplayState *s = vc->s;
+     int qcode;
+-    int i;
+ 
+     if (s->ignore_keys) {
+         s->ignore_keys = (key->type == GDK_KEY_PRESS);
+@@ -1134,8 +1113,8 @@ static gboolean gd_key_event(GtkWidget *widget, GdkEventKey *key, void *opaque)
+         || key->hardware_keycode == VK_PAUSE
+ #endif
+         ) {
+-        qemu_input_event_send_key_qcode(vc->gfx.dcl.con, Q_KEY_CODE_PAUSE,
+-                                        key->type == GDK_KEY_PRESS);
++        kbd_state_key_event(vc->gfx.kbd, Q_KEY_CODE_PAUSE,
++                            key->type == GDK_KEY_PRESS);
+         return TRUE;
      }
  
-     qcode = qemu_input_map_usb_to_qcode[ev->keysym.scancode];
--
--    /* modifier state tracking */
--    switch (ev->keysym.scancode) {
--    case SDL_SCANCODE_LCTRL:
--    case SDL_SCANCODE_LSHIFT:
--    case SDL_SCANCODE_LALT:
--    case SDL_SCANCODE_LGUI:
--    case SDL_SCANCODE_RCTRL:
--    case SDL_SCANCODE_RSHIFT:
--    case SDL_SCANCODE_RALT:
--    case SDL_SCANCODE_RGUI:
--        if (ev->type == SDL_KEYUP) {
--            modifiers_state[ev->keysym.scancode] = 0;
--        } else {
--            modifiers_state[ev->keysym.scancode] = 1;
+@@ -1144,14 +1123,8 @@ static gboolean gd_key_event(GtkWidget *widget, GdkEventKey *key, void *opaque)
+     trace_gd_key_event(vc->label, key->hardware_keycode, qcode,
+                        (key->type == GDK_KEY_PRESS) ? "down" : "up");
+ 
+-    for (i = 0; i < ARRAY_SIZE(modifier_keycode); i++) {
+-        if (qcode == modifier_keycode[i]) {
+-            s->modifier_pressed[i] = (key->type == GDK_KEY_PRESS);
 -        }
--        break;
--    default:
--        /* nothing */
--        break;
 -    }
-+    kbd_state_key_event(scon->kbd, qcode, ev->type == SDL_KEYDOWN);
- 
-     if (!qemu_console_is_graphic(con)) {
--        bool ctrl = (modifiers_state[SDL_SCANCODE_LCTRL] ||
--                     modifiers_state[SDL_SCANCODE_RCTRL]);
-+        bool ctrl = kbd_state_modifier_get(scon->kbd, KBD_MOD_CTRL);
-         if (ev->type == SDL_KEYDOWN) {
-             switch (ev->keysym.scancode) {
-             case SDL_SCANCODE_RETURN:
-diff --git a/ui/sdl2.c b/ui/sdl2.c
-index a10b6e3a08..ee1a2445d6 100644
---- a/ui/sdl2.c
-+++ b/ui/sdl2.c
-@@ -38,7 +38,6 @@ static int gui_grab; /* if true, all keyboard/mouse events are grabbed */
- 
- static int gui_saved_grab;
- static int gui_fullscreen;
--static int gui_keysym;
- static int gui_grab_code = KMOD_LALT | KMOD_LCTRL;
- static SDL_Cursor *sdl_cursor_normal;
- static SDL_Cursor *sdl_cursor_hidden;
-@@ -330,6 +329,7 @@ static void handle_keydown(SDL_Event *ev)
-     int win;
-     struct sdl2_console *scon = get_scon_from_window(ev->key.windowID);
-     int gui_key_modifier_pressed = get_mod_state();
-+    int gui_keysym = 0;
- 
-     if (!scon->ignore_hotkeys && gui_key_modifier_pressed && !ev->key.repeat) {
-         switch (ev->key.keysym.scancode) {
-@@ -410,16 +410,9 @@ static void handle_keydown(SDL_Event *ev)
- static void handle_keyup(SDL_Event *ev)
- {
-     struct sdl2_console *scon = get_scon_from_window(ev->key.windowID);
--    int gui_key_modifier_pressed = get_mod_state();
- 
-     scon->ignore_hotkeys = false;
 -
--    if (!gui_key_modifier_pressed) {
--        gui_keysym = 0;
--    }
--    if (!gui_keysym) {
--        sdl2_process_key(scon, &ev->key);
--    }
-+    sdl2_process_key(scon, &ev->key);
+-    qemu_input_event_send_key_qcode(vc->gfx.dcl.con, qcode,
+-                                    key->type == GDK_KEY_PRESS);
++    kbd_state_key_event(vc->gfx.kbd, qcode,
++                        key->type == GDK_KEY_PRESS);
+ 
+     return TRUE;
  }
+@@ -2052,6 +2025,7 @@ static GSList *gd_vc_gfx_init(GtkDisplayState *s, VirtualConsole *vc,
+     gtk_notebook_append_page(GTK_NOTEBOOK(s->notebook),
+                              vc->tab_item, gtk_label_new(vc->label));
  
- static void handle_textinput(SDL_Event *ev)
-@@ -823,6 +816,7 @@ static void sdl2_display_init(DisplayState *ds, DisplayOptions *o)
-         sdl2_console[i].dcl.ops = &dcl_2d_ops;
- #endif
-         sdl2_console[i].dcl.con = con;
-+        sdl2_console[i].kbd = kbd_state_init(con);
-         register_displaychangelistener(&sdl2_console[i].dcl);
++    vc->gfx.kbd = kbd_state_init(con);
+     vc->gfx.dcl.con = con;
+     register_displaychangelistener(&vc->gfx.dcl);
  
- #if defined(SDL_VIDEO_DRIVER_WINDOWS) || defined(SDL_VIDEO_DRIVER_X11)
 -- 
 2.9.3
