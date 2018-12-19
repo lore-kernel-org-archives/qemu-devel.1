@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55658)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gZVmw-000779-Is
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 01:57:03 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gZW2w-00024q-QB
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:13:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gZVmt-0002Pt-EB
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 01:57:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40596)
+	(envelope-from <kraxel@redhat.com>) id 1gZW2r-0007po-QY
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:13:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57696)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gZVmt-0002PZ-7w
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 01:56:59 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4AE787BDB8
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 06:56:58 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181218182234.28876-1-armbru@redhat.com>
-	<20181218182234.28876-3-armbru@redhat.com>
-	<64220b68-3a4d-a285-968d-96d38026b8e3@redhat.com>
-Date: Wed, 19 Dec 2018 07:56:52 +0100
-In-Reply-To: <64220b68-3a4d-a285-968d-96d38026b8e3@redhat.com> (Eric Blake's
-	message of "Tue, 18 Dec 2018 13:56:23 -0600")
-Message-ID: <871s6engwb.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gZW2r-0007pb-KS
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:13:29 -0500
+Date: Wed, 19 Dec 2018 08:13:25 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181219071325.c7ayirk564s7kuhn@sirius.home.kraxel.org>
+References: <20180803173614.12358-1-marcandre.lureau@redhat.com>
+	<20180803173614.12358-11-marcandre.lureau@redhat.com>
+	<20180807101505.GF7335@redhat.com>
+	<CAJ+F1C+=aucconH7EZ8D2g_Wir2wEeq4GMobK+jNPZ8b0LbZKA@mail.gmail.com>
+	<20180807143055.pkx7l2ufb36lyq3b@sirius.home.kraxel.org>
+	<CAJ+F1CJtFJ_vk817tQsGEi3B+xC4bH3eGxA+tRPayyj3F0gnsw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC PATCH v2 02/15] qapi: Eliminate indirection
- through qmp_event_get_func_emit()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CJtFJ_vk817tQsGEi3B+xC4bH3eGxA+tRPayyj3F0gnsw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 10/10] display: add -display app launching
+ external application
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,69 +32,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-Eric Blake <eblake@redhat.com> writes:
+  Hi,
 
-> On 12/18/18 12:22 PM, Markus Armbruster wrote:
->> The qapi_event_send_FOO() functions emit events like this:
->>
->>      QMPEventFuncEmit emit;
->>
->>      emit = qmp_event_get_func_emit();
->>      if (!emit) {
->>          return;
->>      }
->>
->
->>      emit(QAPI_EVENT_FOO, qmp);
->>
->
->> More seriously: how does this work even now?  qemu-system-FOO wants
->> QAPIEvent, and passes a function taking that to
->> qmp_event_set_func_emit().  test-qmp-event wants test_QAPIEvent, and
->> passes a function taking that to qmp_event_set_func_emit().
->>
->> I works by type trickery, of course:
->
-> s/I/It/
+> > Also:  remote-viewer accepts config files.  I'd suggest to write one, so
+> > it is easy to restart remote-viewer.  Also I would not use a temp dir
+> 
+> Where should it be written?
 
-Of course.
+/run/user/$uid/qemu/$vmname/remote-viewer.vv ?
 
->>
->>      typedef void (*QMPEventFuncEmit)(unsigned event, QDict *dict);
->>
->>      void qmp_event_set_func_emit(QMPEventFuncEmit emit);
->>
->>      QMPEventFuncEmit qmp_event_get_func_emit(void);
->>
->> We use unsigned instead of the enumeration type.  Relies on both
->> enumerations boiling down to unsigned, which happens to be true for
->> the compilers we use.
->>
->> Clean this up as follows:
->>
->> * Generate qapi_event_send_FOO() that call PREFIX_qapi_event_emit()
->>    instead of the value of qmp_event_set_func_emit().
->>
->> * Generate a prototype for PREFIX_qapi_event_emit() into
->>    qapi-events.h.
->>
->> * PREFIX_ is empty for qapi/qapi-schema.json, and test_ for
->>    tests/qapi-schema/qapi-schema-test.json.  It's qga_ for
->>    qga/qapi-schema.json, and doc-good- for
->>    tests/qapi-schema/doc-good-qapi-doc.texi, but those don't define any
->>    events.
->
-> Wait - PREFIX is qga_ or doc_good_...
+> What should be the content of
+> the .vv file?
 
-Yes.
+Everything needed, so launching remote-viewer is
+just "remote-viewer /path/to/config.vv".
 
->> * Add a qapi_event_emit() that does nothing to stubs/monitor.c.  This
->>    takes care of all other programs that link code emitting QMP events.
->
-> ...but the stub function is defined without a prefix?
+We might consider writing such a config file
+unconditionally, even without -display app.
 
-It's defined with a prefix, except in the commit message ;)  Will fix,
-thanks!
+> Should it use a template to avoid proxying all the
+> options?
+
+Is this needed?  virt-viewer has a user settings file,
+shouldn't user preferences go there instead?
+
+> > for the files and sockets, but some fixed location.
+> > /run/user/$uid/qemu/$vmname for example (where $vmname is whatever you
+> > passed to qemu using -name).
+> 
+> That's easy enough, although if no -name is given, I suppose a
+> temporary location is still better than a fixed location.
+
+Yes, just replace $vmname with `mktemp --directory` then.
+
+cheers,
+  Gerd
