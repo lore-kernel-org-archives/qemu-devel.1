@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45462)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=884a3e257=Alistair.Francis@wdc.com>)
-	id 1gZhLT-00015p-54
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:17:28 -0500
+	id 1gZhLj-0001GV-2G
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:17:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=884a3e257=Alistair.Francis@wdc.com>)
-	id 1gZhLO-0008UY-1Z
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:17:26 -0500
+	id 1gZhLe-0000Db-2X
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:17:42 -0500
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Wed, 19 Dec 2018 19:17:07 +0000
-Message-ID: <a135ee1a88cd7bd08993a519d4d654da27785254.1545246859.git.alistair.francis@wdc.com>
+Date: Wed, 19 Dec 2018 19:17:32 +0000
+Message-ID: <dba7315e4e20e879933f72d47ccf98f1cc612b8a.1545246859.git.alistair.francis@wdc.com>
 References: <cover.1545246859.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1545246859.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v2 05/23] riscv: Add the tcg-target header file
+Subject: [Qemu-devel] [PATCH v2 07/23] riscv: tcg-target: Add support for
+ the constraints
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,233 +31,189 @@ Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistai
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- MAINTAINERS            |  10 ++-
- tcg/riscv/tcg-target.h | 177 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 186 insertions(+), 1 deletion(-)
- create mode 100644 tcg/riscv/tcg-target.h
+ tcg/riscv/tcg-target.inc.c | 168 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 168 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b923f4c1b3..107bca486b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -268,7 +268,6 @@ F: hw/riscv/
- F: include/hw/riscv/
- F: linux-user/host/riscv32/
- F: linux-user/host/riscv64/
--F: disas/riscv.c
-=20
- S390
- M: Richard Henderson <rth@twiddle.net>
-@@ -2166,6 +2165,15 @@ S: Odd Fixes
- F: tcg/ppc/
- F: disas/ppc.c
-=20
-+RISC-V
-+M: Michael Clark <mjc@sifive.com>
-+M: Palmer Dabbelt <palmer@sifive.com>
-+M: Alistair Francis <Alistair.Francis@wdc.com>
-+L: qemu-riscv@nongnu.org
-+S: Maintained
-+F: tcg/riscv/
-+F: disas/riscv.c
+diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
+index 6c969e3973..f853d01803 100644
+--- a/tcg/riscv/tcg-target.inc.c
++++ b/tcg/riscv/tcg-target.inc.c
+@@ -116,3 +116,171 @@ static const int tcg_target_call_oarg_regs[] =3D {
+     TCG_REG_A0,
+     TCG_REG_A1,
+ };
 +
- S390 target
- M: Richard Henderson <rth@twiddle.net>
- S: Maintained
-diff --git a/tcg/riscv/tcg-target.h b/tcg/riscv/tcg-target.h
-new file mode 100644
-index 0000000000..60918cacb4
---- /dev/null
-+++ b/tcg/riscv/tcg-target.h
-@@ -0,0 +1,177 @@
-+/*
-+ * Tiny Code Generator for QEMU
-+ *
-+ * Copyright (c) 2018 SiFive, Inc
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a=
- copy
-+ * of this software and associated documentation files (the "Software"), t=
-o deal
-+ * in the Software without restriction, including without limitation the r=
-ights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or se=
-ll
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included=
- in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS=
- OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY=
-,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OT=
-HER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING=
- FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS =
-IN
-+ * THE SOFTWARE.
-+ */
++#define TCG_CT_CONST_ZERO  0x100
++#define TCG_CT_CONST_S12   0x200
++#define TCG_CT_CONST_N12   0x400
++#define TCG_CT_CONST_M12   0x800
 +
-+#ifndef RISCV_TCG_TARGET_H
-+#define RISCV_TCG_TARGET_H
-+
-+#if __riscv_xlen =3D=3D 32
-+# define TCG_TARGET_REG_BITS 32
-+#elif __riscv_xlen =3D=3D 64
-+# define TCG_TARGET_REG_BITS 64
-+#endif
-+
-+#define TCG_TARGET_INSN_UNIT_SIZE 4
-+#define TCG_TARGET_TLB_DISPLACEMENT_BITS 20
-+#define TCG_TARGET_NB_REGS 32
-+
-+typedef enum {
-+    TCG_REG_ZERO,
-+    TCG_REG_RA,
-+    TCG_REG_SP,
-+    TCG_REG_GP,
-+    TCG_REG_TP,
-+    TCG_REG_T0,
-+    TCG_REG_T1,
-+    TCG_REG_T2,
-+    TCG_REG_S0,
-+    TCG_REG_S1,
-+    TCG_REG_A0,
-+    TCG_REG_A1,
-+    TCG_REG_A2,
-+    TCG_REG_A3,
-+    TCG_REG_A4,
-+    TCG_REG_A5,
-+    TCG_REG_A6,
-+    TCG_REG_A7,
-+    TCG_REG_S2,
-+    TCG_REG_S3,
-+    TCG_REG_S4,
-+    TCG_REG_S5,
-+    TCG_REG_S6,
-+    TCG_REG_S7,
-+    TCG_REG_S8,
-+    TCG_REG_S9,
-+    TCG_REG_S10,
-+    TCG_REG_S11,
-+    TCG_REG_T3,
-+    TCG_REG_T4,
-+    TCG_REG_T5,
-+    TCG_REG_T6,
-+
-+    /* aliases */
-+    TCG_AREG0          =3D TCG_REG_S0,
-+    TCG_GUEST_BASE_REG =3D TCG_REG_S1,
-+    TCG_REG_TMP0       =3D TCG_REG_T6,
-+    TCG_REG_TMP1       =3D TCG_REG_T5,
-+    TCG_REG_TMP2       =3D TCG_REG_T4,
-+} TCGReg;
-+
-+/* used for function call generation */
-+#define TCG_REG_CALL_STACK              TCG_REG_SP
-+#define TCG_TARGET_STACK_ALIGN          16
-+#define TCG_TARGET_CALL_ALIGN_ARGS      1
-+#define TCG_TARGET_CALL_STACK_OFFSET    0
-+
-+/* optional instructions */
-+#define TCG_TARGET_HAS_goto_ptr         1
-+#define TCG_TARGET_HAS_movcond_i32      0
-+#define TCG_TARGET_HAS_div_i32          1
-+#define TCG_TARGET_HAS_rem_i32          1
-+#define TCG_TARGET_HAS_div2_i32         0
-+#define TCG_TARGET_HAS_rot_i32          0
-+#define TCG_TARGET_HAS_deposit_i32      0
-+#define TCG_TARGET_HAS_extract_i32      0
-+#define TCG_TARGET_HAS_sextract_i32     0
-+#define TCG_TARGET_HAS_add2_i32         1
-+#define TCG_TARGET_HAS_sub2_i32         1
-+#define TCG_TARGET_HAS_mulu2_i32        0
-+#define TCG_TARGET_HAS_muls2_i32        0
-+#define TCG_TARGET_HAS_muluh_i32        (TCG_TARGET_REG_BITS =3D=3D 32)
-+#define TCG_TARGET_HAS_mulsh_i32        (TCG_TARGET_REG_BITS =3D=3D 32)
-+#define TCG_TARGET_HAS_ext8s_i32        1
-+#define TCG_TARGET_HAS_ext16s_i32       1
-+#define TCG_TARGET_HAS_ext8u_i32        1
-+#define TCG_TARGET_HAS_ext16u_i32       1
-+#define TCG_TARGET_HAS_bswap16_i32      0
-+#define TCG_TARGET_HAS_bswap32_i32      0
-+#define TCG_TARGET_HAS_not_i32          1
-+#define TCG_TARGET_HAS_neg_i32          1
-+#define TCG_TARGET_HAS_andc_i32         0
-+#define TCG_TARGET_HAS_orc_i32          0
-+#define TCG_TARGET_HAS_eqv_i32          0
-+#define TCG_TARGET_HAS_nand_i32         0
-+#define TCG_TARGET_HAS_nor_i32          0
-+#define TCG_TARGET_HAS_clz_i32          0
-+#define TCG_TARGET_HAS_ctz_i32          0
-+#define TCG_TARGET_HAS_ctpop_i32        0
-+#define TCG_TARGET_HAS_direct_jump      0
-+#define TCG_TARGET_HAS_brcond2          1
-+#define TCG_TARGET_HAS_setcond2         1
-+
-+#if TCG_TARGET_REG_BITS =3D=3D 64
-+#define TCG_TARGET_HAS_movcond_i64      0
-+#define TCG_TARGET_HAS_div_i64          1
-+#define TCG_TARGET_HAS_rem_i64          1
-+#define TCG_TARGET_HAS_div2_i64         0
-+#define TCG_TARGET_HAS_rot_i64          0
-+#define TCG_TARGET_HAS_deposit_i64      0
-+#define TCG_TARGET_HAS_extract_i64      0
-+#define TCG_TARGET_HAS_sextract_i64     0
-+#define TCG_TARGET_HAS_extrl_i64_i32    1
-+#define TCG_TARGET_HAS_extrh_i64_i32    1
-+#define TCG_TARGET_HAS_ext8s_i64        1
-+#define TCG_TARGET_HAS_ext16s_i64       1
-+#define TCG_TARGET_HAS_ext32s_i64       1
-+#define TCG_TARGET_HAS_ext8u_i64        1
-+#define TCG_TARGET_HAS_ext16u_i64       1
-+#define TCG_TARGET_HAS_ext32u_i64       1
-+#define TCG_TARGET_HAS_bswap16_i64      0
-+#define TCG_TARGET_HAS_bswap32_i64      0
-+#define TCG_TARGET_HAS_bswap64_i64      0
-+#define TCG_TARGET_HAS_not_i64          1
-+#define TCG_TARGET_HAS_neg_i64          1
-+#define TCG_TARGET_HAS_andc_i64         0
-+#define TCG_TARGET_HAS_orc_i64          0
-+#define TCG_TARGET_HAS_eqv_i64          0
-+#define TCG_TARGET_HAS_nand_i64         0
-+#define TCG_TARGET_HAS_nor_i64          0
-+#define TCG_TARGET_HAS_clz_i64          0
-+#define TCG_TARGET_HAS_ctz_i64          0
-+#define TCG_TARGET_HAS_ctpop_i64        0
-+#define TCG_TARGET_HAS_add2_i64         1
-+#define TCG_TARGET_HAS_sub2_i64         1
-+#define TCG_TARGET_HAS_mulu2_i64        0
-+#define TCG_TARGET_HAS_muls2_i64        0
-+#define TCG_TARGET_HAS_muluh_i64        1
-+#define TCG_TARGET_HAS_mulsh_i64        1
-+#endif
-+
-+static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
++static inline tcg_target_long sextreg(tcg_target_long val, int pos, int le=
+n)
 +{
-+    __builtin___clear_cache((char *)start, (char *)stop);
++    if (TCG_TARGET_REG_BITS =3D=3D 32) {
++        return sextract32(val, pos, len);
++    } else {
++        return sextract64(val, pos, len);
++    }
 +}
 +
-+/* not defined -- call should be eliminated at compile time */
-+void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t);
-+
-+#define TCG_TARGET_DEFAULT_MO (0)
-+
-+#ifdef CONFIG_SOFTMMU
-+#define TCG_TARGET_NEED_LDST_LABELS
++/* parse target specific constraints */
++static const char *target_parse_constraint(TCGArgConstraint *ct,
++                                           const char *ct_str, TCGType typ=
+e)
++{
++    switch (*ct_str++) {
++    case 'r':
++        ct->ct |=3D TCG_CT_REG;
++        ct->u.regs =3D 0xffffffff;
++        break;
++    case 'L':
++        /* qemu_ld/qemu_st constraint */
++        ct->ct |=3D TCG_CT_REG;
++        ct->u.regs =3D 0xffffffff;
++        /* qemu_ld/qemu_st uses TCG_REG_TMP0 */
++#if defined(CONFIG_SOFTMMU)
++        tcg_regset_reset_reg(ct->u.regs, tcg_target_call_iarg_regs[0]);
++        tcg_regset_reset_reg(ct->u.regs, tcg_target_call_iarg_regs[1]);
++        tcg_regset_reset_reg(ct->u.regs, tcg_target_call_iarg_regs[2]);
++        tcg_regset_reset_reg(ct->u.regs, tcg_target_call_iarg_regs[3]);
++        tcg_regset_reset_reg(ct->u.regs, tcg_target_call_iarg_regs[4]);
 +#endif
-+#define TCG_TARGET_NEED_POOL_LABELS
++        break;
++    case 'I':
++        ct->ct |=3D TCG_CT_CONST_S12;
++        break;
++    case 'N':
++        ct->ct |=3D TCG_CT_CONST_N12;
++        break;
++    case 'M':
++        ct->ct |=3D TCG_CT_CONST_M12;
++        break;
++    case 'Z':
++        /* we can use a zero immediate as a zero register argument. */
++        ct->ct |=3D TCG_CT_CONST_ZERO;
++        break;
++    default:
++        return NULL;
++    }
++    return ct_str;
++}
 +
-+#define TCG_TARGET_HAS_MEMORY_BSWAP 0
++/* test if a constant matches the constraint */
++static int tcg_target_const_match(tcg_target_long val, TCGType type,
++                                  const TCGArgConstraint *arg_ct)
++{
++    int ct =3D arg_ct->ct;
++    if (ct & TCG_CT_CONST) {
++        return 1;
++    }
++    if ((ct & TCG_CT_CONST_ZERO) && val =3D=3D 0) {
++        return 1;
++    }
++    if ((ct & TCG_CT_CONST_S12) && val =3D=3D sextreg(val, 0, 12)) {
++        return 1;
++    }
++    if ((ct & TCG_CT_CONST_N12) && -val =3D=3D sextreg(-val, 0, 12)) {
++        return 1;
++    }
++    if ((ct & TCG_CT_CONST_M12) && val >=3D -0xfff && val <=3D 0xfff) {
++        return 1;
++    }
++    return 0;
++}
 +
++/*
++ * RISC-V Base ISA opcodes (IM)
++ */
++
++typedef enum {
++    OPC_ADD =3D 0x33,
++    OPC_ADDI =3D 0x13,
++    OPC_AND =3D 0x7033,
++    OPC_ANDI =3D 0x7013,
++    OPC_AUIPC =3D 0x17,
++    OPC_BEQ =3D 0x63,
++    OPC_BGE =3D 0x5063,
++    OPC_BGEU =3D 0x7063,
++    OPC_BLT =3D 0x4063,
++    OPC_BLTU =3D 0x6063,
++    OPC_BNE =3D 0x1063,
++    OPC_DIV =3D 0x2004033,
++    OPC_DIVU =3D 0x2005033,
++    OPC_JAL =3D 0x6f,
++    OPC_JALR =3D 0x67,
++    OPC_LB =3D 0x3,
++    OPC_LBU =3D 0x4003,
++    OPC_LD =3D 0x3003,
++    OPC_LH =3D 0x1003,
++    OPC_LHU =3D 0x5003,
++    OPC_LUI =3D 0x37,
++    OPC_LW =3D 0x2003,
++    OPC_LWU =3D 0x6003,
++    OPC_MUL =3D 0x2000033,
++    OPC_MULH =3D 0x2001033,
++    OPC_MULHSU =3D 0x2002033,
++    OPC_MULHU =3D 0x2003033,
++    OPC_OR =3D 0x6033,
++    OPC_ORI =3D 0x6013,
++    OPC_REM =3D 0x2006033,
++    OPC_REMU =3D 0x2007033,
++    OPC_SB =3D 0x23,
++    OPC_SD =3D 0x3023,
++    OPC_SH =3D 0x1023,
++    OPC_SLL =3D 0x1033,
++    OPC_SLLI =3D 0x1013,
++    OPC_SLT =3D 0x2033,
++    OPC_SLTI =3D 0x2013,
++    OPC_SLTIU =3D 0x3013,
++    OPC_SLTU =3D 0x3033,
++    OPC_SRA =3D 0x40005033,
++    OPC_SRAI =3D 0x40005013,
++    OPC_SRL =3D 0x5033,
++    OPC_SRLI =3D 0x5013,
++    OPC_SUB =3D 0x40000033,
++    OPC_SW =3D 0x2023,
++    OPC_XOR =3D 0x4033,
++    OPC_XORI =3D 0x4013,
++
++#if TCG_TARGET_REG_BITS =3D=3D 64
++    OPC_ADDIW =3D 0x1b,
++    OPC_ADDW =3D 0x3b,
++    OPC_DIVUW =3D 0x200503b,
++    OPC_DIVW =3D 0x200403b,
++    OPC_MULW =3D 0x200003b,
++    OPC_REMUW =3D 0x200703b,
++    OPC_REMW =3D 0x200603b,
++    OPC_SLLIW =3D 0x101b,
++    OPC_SLLW =3D 0x103b,
++    OPC_SRAIW =3D 0x4000501b,
++    OPC_SRAW =3D 0x4000503b,
++    OPC_SRLIW =3D 0x501b,
++    OPC_SRLW =3D 0x503b,
++    OPC_SUBW =3D 0x4000003b,
++#else
++    /* Simplify code throughout by defining aliases for RV32.  */
++    OPC_ADDIW =3D OPC_ADDI,
++    OPC_ADDW =3D OPC_ADD,
++    OPC_DIVUW =3D OPC_DIVU,
++    OPC_DIVW =3D OPC_DIV,
++    OPC_MULW =3D OPC_MUL,
++    OPC_REMUW =3D OPC_REMU,
++    OPC_REMW =3D OPC_REM,
++    OPC_SLLIW =3D OPC_SLLI,
++    OPC_SLLW =3D OPC_SLL,
++    OPC_SRAIW =3D OPC_SRAI,
++    OPC_SRAW =3D OPC_SRA,
++    OPC_SRLIW =3D OPC_SRLI,
++    OPC_SRLW =3D OPC_SRL,
++    OPC_SUBW =3D OPC_SUB,
 +#endif
++
++    OPC_FENCE =3D 0x0000000f,
++} RISCVInsn;
 --=20
 2.19.1
