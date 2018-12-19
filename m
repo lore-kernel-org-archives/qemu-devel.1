@@ -1,32 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gZWhQ-00071w-Ls
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:55:25 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gZWoG-0004ZA-JK
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:02:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gZWhK-0002X3-7J
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:55:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59408)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gZWhF-0002Qq-9P
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:55:15 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 320A9C0740ED
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 07:55:12 +0000 (UTC)
-Date: Wed, 19 Dec 2018 08:55:10 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181219075510.ci3yypwj3f2plcnv@sirius.home.kraxel.org>
-References: <20180222070513.8740-1-kraxel@redhat.com>
-	<20180222070513.8740-6-kraxel@redhat.com>
-	<20181218184532.GA18660@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gZWoA-0000x4-J9
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:02:28 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46253)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gZWo1-0000o8-QB
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 03:02:15 -0500
+Received: by mail-wr1-x443.google.com with SMTP id l9so18413585wrt.13
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 00:02:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181218184532.GA18660@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] keymap: consider modifier state
- when picking a mapping
+References: <20181126124250.29985-1-marcandre.lureau@redhat.com>
+	<20181126124250.29985-2-marcandre.lureau@redhat.com>
+	<20181210142956.wucn33osm7fxa27d@sirius.home.kraxel.org>
+	<CAMxuvawUrZ=y-txTS86Tz3b-BYY05k4n-jBiY8+vO5e7AOkPKA@mail.gmail.com>
+	<20181210183313-mutt-send-email-mst@kernel.org>
+	<20181211074241.ovuharwewaw22ygq@sirius.home.kraxel.org>
+	<20181211092944.GA921@redhat.com>
+	<20181211135230-mutt-send-email-mst@kernel.org>
+	<CAJ+F1CKuoWWxLqZKQRU-g_144jX2bwsQJUzeW0W-QicNrbPfQw@mail.gmail.com>
+	<20181218181803-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20181218181803-mutt-send-email-mst@kernel.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 19 Dec 2018 12:01:59 +0400
+Message-ID: <CAJ+F1CJmT5O3x84upBDhvvCPCK5x51RP0TxBMsodLzVeQgC-vw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 01/11] vhost-user: define
+ conventions for vhost-user backends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,57 +39,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Adam Williamson <awilliam@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, "Hoffmann, Gerd" <kraxel@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-  Hi,
+Hi
 
-> After this patch the two sequences now show:
-> 
->   19237@1545158356.679095:vnc_key_event_map down 1, sym 0xffe1 -> keycode 0x2a [shift]
->   19237@1545158356.896528:vnc_key_event_map down 1, sym 0x3c -> keycode 0x33 [comma]
->   19237@1545158356.993672:vnc_key_event_map down 0, sym 0x3c -> keycode 0x33 [comma]
->   19237@1545158357.233437:vnc_key_event_map down 0, sym 0xffe1 -> keycode 0x2a [shift]
-> 
->   19237@1545158358.726002:vnc_key_event_map down 1, sym 0xffe1 -> keycode 0x2a [shift]
->   19237@1545158358.999542:vnc_key_event_map down 1, sym 0x3c -> keycode 0x33 [comma]
->   19237@1545158359.201503:vnc_key_event_map down 0, sym 0xffe1 -> keycode 0x2a [shift]
->   19237@1545158359.435021:vnc_key_event_map down 0, sym 0x3c -> keycode 0x56 [less]
-> 
-> Notice how we sent a "down(comma)" and paired it with an "up(less)". This
-> causes the guest to consider the key stuck down, so next time you type
-> a "<" it will get lost.
+On Wed, Dec 19, 2018 at 3:20 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Tue, Dec 18, 2018 at 10:35:05PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi
+> >
+> > On Tue, Dec 11, 2018 at 10:56 PM Michael S. Tsirkin <mst@redhat.com> wr=
+ote:
+> > >
+> > > On Tue, Dec 11, 2018 at 09:29:44AM +0000, Daniel P. Berrang=C3=A9 wro=
+te:
+> > > > On Tue, Dec 11, 2018 at 08:42:41AM +0100, Hoffmann, Gerd wrote:
+> > > > >   Hi,
+> > > > >
+> > > > > > Right. The main issue is that we need to make sure only
+> > > > > > in-tree devices are supported.
+> > > > >
+> > > > > Well, that is under debate right now, see:
+> > > > > https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg04912.ht=
+ml
+> > > >
+> > > > I've previously been against the idea of external plugins for QEMU,
+> > > > however, that was when the plugin was something that would be dlope=
+n'd
+> > > > by QEMU. That would cause our internal ABI to be exposed to 3rd par=
+ties
+> > > > which is highly undesirable, even if they were open source to compl=
+y
+> > > > with the license needs.
+> > > >
+> > > > When the plugin is a completely isolated process communicating with=
+ a
+> > > > well defined protocol, it is not placing a significant burden on th=
+e
+> > > > QEMU developers' ongoing maintainence, nor has problems with licens=
+e
+> > > > compliance. The main problem would come from debugging the combined
+> > > > system as the external process is essentially a black box from QEMU=
+'s
+> > > > POV. Downstream OS vendors are free to place restrictions on which
+> > > > backend processes they'd be willing to support with QEMU, and upstr=
+eam
+> > > > is under no obligation to debug stuff beyond the QEMU boundary.
+> > > >
+> > > > We have already accepted that tradeoff with networking by supportin=
+g
+> > > > vhost-user and have externals impls like DPDK, so I don't see a
+> > > > compelling reason to try to restrict it for other vhost-user backen=
+ds.
+> > >
+> > > OK seems to be more or less a rough concensus then.
+> > >
+> > > I wonder what's the approach wrt migration though.
+> >
+> > The series doesn't take care of migration.
+> >
+> > >
+> > > Even the compatibility story about vhost-user isn't
+> > > great, I would like to see something solid before
+> > > we allow that.
+> >
+> > To allow migration? vhost-user has partial support for migration
+> > (dirty memory tracking), and there is also "[PATCH v2 for-4.0 0/7]
+> > vhost-user-blk: Add support for backend reconnecting" - allowing the
+> > backend to store some state, if I understand correctly, which could be
+> > leveraged I guess...
+> >
+> > But I don't think we should block this series because migration isn't
+> > tackled here.
+> >
+> > thanks
+> >
+> >
+> > .
+>
+> How about blocking migration for now then?
 
-Ouch.
+The device here (vhost-user-input) blocks migration (unmigratable =3D 1)
 
-> This is easily reproduced with gtk-vnc and the following QEMU command
-> line:
-> 
->   ./x86_64-softmmu/qemu-system-x86_64 -vnc :1 -d trace:vnc* 
-> 
-> 
-> I don't see any nice way to fix the problem without having to keep a
-> memory of modifier state with every "down" event, so you can use the
-> same modifier state with the later "up" event to ensure you get a
-> matching key up.
+>
+> We need someone to work on a solution for cross version/device
+> compatibility, vhost net/blk without that is bad enough but at least we
+> have a feature bits, for random devices it would be very very bad.
 
-Well, for key-up you can prefer keys in "down" state instead of looking
-at the modifiers.
+For now, if migration is somehow supported, it must be handled mostly
+by the qemu device, and the vhost-user backend must track dirty memory
+and be "stateless": *able to reconnect & resume where it left off).
 
-> This is quite horrible though. I'm more inclined
-> to revert this patch and find another way to fix the original problem
-> which won't require the UI frontends to track modifier state.
+A backend shouldn't declare VHOST_USER_PROTOCOL_F_LOG_SHMFD if it can't do =
+that.
 
-The UIs track modifier state anyway.
+When a backend will have a state to migrate, we will have to implement
+a new feature. I assume that's what you are asking.
 
-I fact I have some WIP patches to add a generic keyboard state tracker,
-so the UIs can use common code instead of having their own state
-tracking code each.  Also to make UI hotkeys configurable, consistent
-across all UIs we have.  Guess I should undust them, at least the state
-tracking part of it.
+>
+>
+> > >
+> > > Are we happy to just block live migration?
+> > > For sure that's already the case with VFIO.
+> > >
+> > >
+> > > > > > vhost-user by design
+> > > > > > is for out of tree users. It needn't be hard,
+> > > > > > maybe it's enough to just make qemu launch these processes
+> > > > > > as opposed to connecting to them on command line.
+> > > > >
+> > > > > Not sure this is a good idea, with security being one of the moti=
+vating
+> > > > > factors to move device emulation to other processes.  When libvir=
+t
+> > > > > launches the processes it can place them in separate sandboxes ..=
+.
+> > > >
+> > > > Yep, libvirt already turns on seccomp policies which forbid QEMU fr=
+om
+> > > > forking/execing anything, and we have no desire to go backwards her=
+e.
+> > > > Any external processes have to be launched by libvirt ahead of time=
+.
+> > > >
+> > > >
+> > > > Regards,
+> > > > Daniel
+> > > > --
+> > > > |: https://berrange.com      -o-    https://www.flickr.com/photos/d=
+berrange :|
+> > > > |: https://libvirt.org         -o-            https://fstop138.berr=
+ange.com :|
+> > > > |: https://entangle-photo.org    -o-    https://www.instagram.com/d=
+berrange :|
+> > >
+> >
+> >
+> > --
+> > Marc-Andr=C3=A9 Lureau
 
-With that in place we can easily pass the full keyboard state to the
-keymap code.
 
-cheers,
-  Gerd
+
+--=20
+Marc-Andr=C3=A9 Lureau
