@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gZjez-00075s-8S
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 16:45:45 -0500
+	(envelope-from <philmd@redhat.com>) id 1gZk5D-0005At-RS
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 17:12:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gZjey-0002wJ-BF
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 16:45:45 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41000)
+	(envelope-from <philmd@redhat.com>) id 1gZk5A-0003jZ-AV
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 17:12:51 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:45393)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gZjey-0002vV-4T
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 16:45:44 -0500
-Received: by mail-wr1-x441.google.com with SMTP id x10so21023085wrs.8
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 13:45:43 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20181219085038.7729-1-peterx@redhat.com>
-	<20181219085038.7729-3-peterx@redhat.com>
-	<c9e56e11-214f-552a-faea-cb5901392164@redhat.com>
-	<20181219212418.GJ19442@habkost.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2b60279a-26bc-1569-3f3c-da507fed2c44@redhat.com>
-Date: Wed, 19 Dec 2018 22:45:40 +0100
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gZk5A-0003gu-2w
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 17:12:48 -0500
+Received: by mail-wr1-f65.google.com with SMTP id t6so20902138wrr.12
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 14:12:48 -0800 (PST)
+References: <20181219091248.9641-1-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <b8b2c9fa-5524-7a43-c6ac-ee2d246a0b00@redhat.com>
+Date: Wed, 19 Dec 2018 23:12:45 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181219212418.GJ19442@habkost.net>
+In-Reply-To: <20181219091248.9641-1-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/4] q35: set split kernel irqchip as
- default
+Subject: Re: [Qemu-devel] [PATCH] ui/cocoa: Include less of the generated
+ modular QAPI headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,34 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Jiri Denemark <jdenemar@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On 19/12/18 22:24, Eduardo Habkost wrote:
-> On Wed, Dec 19, 2018 at 09:12:55PM +0100, Paolo Bonzini wrote:
->> On 19/12/18 09:50, Peter Xu wrote:
->>> Starting from QEMU 4.0, let's specify "split" as the default value for
->>> kernel-irqchip.
->>>
->>> So for QEMU>=4.0 we'll have: allowed=Y,required=N,split=Y
->>>    for QEMU<=3.1 we'll have: allowed=Y,required=N,split=N
->>>    (omitting all the "kernel_irqchip_" prefix)
->>>
->>> Note that this "split" is optional - we'll first try to enable split
->>> kernel irqchip, and we'll fall back to complete kernel irqchip if we
->>> found that the kernel capability is missing.
->>
->> Please just fail completely and require a new kernel for the 4.0 machine
->> type.  There are subtle differences between kernel and QEMU irqchip, I
->> don't think we want to open that can of worms.
+On 12/19/18 10:12 AM, Markus Armbruster wrote:
+> Avoids pointless recompilation.  Missed in commit 112ed241f5d.
 > 
-> This would make existing VMs that are runnable with pc-q35-3.1.0
-> not runnable by only updating the machine-type.
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+> Untested; I don't have access to a Mac.
+
+You kinda do, open a GitHub account and enable Travis-CI (free for
+public projects), then pushing a branch to your GitHub will trigger a
+Travis build:
+
+https://travis-ci.org/philmd/qemu/jobs/470146270#L3047
+
 > 
-> The good news is that we can make this a non-issue by clearly
-> documenting that QEMU needs a more recent kernel (just like we'll
-> do for RDTSCP[1]).
-
-Right, RDTSCP is exactly what came to mind.
-
-Paolo
+>  ui/cocoa.m | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/ui/cocoa.m b/ui/cocoa.m
+> index ecf12bfc2e..43e751693c 100644
+> --- a/ui/cocoa.m
+> +++ b/ui/cocoa.m
+> @@ -32,7 +32,8 @@
+>  #include "ui/input.h"
+>  #include "sysemu/sysemu.h"
+>  #include "qapi/error.h"
+> -#include "qapi/qapi-commands.h"
+> +#include "qapi/qapi-commands-block-core.h"
+> +#include "qapi/qapi-commands-misc.h"
+>  #include "sysemu/blockdev.h"
+>  #include "qemu-version.h"
+>  #include <Carbon/Carbon.h>
+> 
