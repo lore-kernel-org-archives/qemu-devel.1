@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZWbm-0001yL-1c
+	(envelope-from <dgibson@ozlabs.org>) id 1gZWbm-0001yW-7W
 	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZWbk-0005tc-3C
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:33 -0500
-Date: Wed, 19 Dec 2018 17:38:09 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gZWbj-0005t4-LY
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:34 -0500
+Date: Wed, 19 Dec 2018 17:33:39 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181219063809.GW30570@umbus.fritz.box>
+Message-ID: <20181219063338.GR30570@umbus.fritz.box>
 References: <20181218063911.2112-1-richard.henderson@linaro.org>
-	<20181218063911.2112-28-richard.henderson@linaro.org>
+	<20181218063911.2112-23-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="hSsVBZHIO2Q9XETc"
+	protocol="application/pgp-signature"; boundary="0Qexx6XJGNEACt6j"
 Content-Disposition: inline
-In-Reply-To: <20181218063911.2112-28-richard.henderson@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 27/34] target/ppc: Use helper_mtvscr for
- reset and gdb
+In-Reply-To: <20181218063911.2112-23-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 22/34] target/ppc: convert VSX logical
+ operations to vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +29,90 @@ To: Richard Henderson <richard.henderson@linaro.org>
 Cc: qemu-devel@nongnu.org, mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org
 
 
---hSsVBZHIO2Q9XETc
+--0Qexx6XJGNEACt6j
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 17, 2018 at 10:39:04PM -0800, Richard Henderson wrote:
-> Not setting flush_to_zero from gdb_set_avr_reg was a bug.
->=20
+On Mon, Dec 17, 2018 at 10:38:59PM -0800, Richard Henderson wrote:
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  target/ppc/translate_init.inc.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
+>  target/ppc/translate/vsx-impl.inc.c | 43 ++++++++++++-----------------
+>  1 file changed, 17 insertions(+), 26 deletions(-)
 >=20
-> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-> index b83097141c..292b1df700 100644
-> --- a/target/ppc/translate_init.inc.c
-> +++ b/target/ppc/translate_init.inc.c
-> @@ -601,10 +601,9 @@ static void spr_write_excp_vector(DisasContext *ctx,=
- int sprn, int gprn)
-> =20
->  static inline void vscr_init(CPUPPCState *env, uint32_t val)
->  {
-> -    env->vscr =3D val;
->      /* Altivec always uses round-to-nearest */
->      set_float_rounding_mode(float_round_nearest_even, &env->vec_status);
-> -    set_flush_to_zero(vscr_nj, &env->vec_status);
-> +    helper_mtvscr(env, val);
+> diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/v=
+sx-impl.inc.c
+> index 1608ad48b1..8ab1290026 100644
+> --- a/target/ppc/translate/vsx-impl.inc.c
+> +++ b/target/ppc/translate/vsx-impl.inc.c
+> @@ -10,6 +10,11 @@ static inline void set_vsr(int n, TCGv_i64 src)
+>      tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState, vsr[n].u64[1]));
 >  }
 > =20
->  #ifdef CONFIG_USER_ONLY
-> @@ -9556,7 +9555,7 @@ static int gdb_set_avr_reg(CPUPPCState *env, uint8_=
-t *mem_buf, int n)
+> +static inline int vsr_full_offset(int n)
+> +{
+> +    return offsetof(CPUPPCState, vsr[n].u64[0]);
+> +}
+> +
+>  static inline void get_cpu_vsrh(TCGv_i64 dst, int n)
+>  {
+>      if (n < 32) {
+> @@ -1214,40 +1219,26 @@ static void gen_xxbrw(DisasContext *ctx)
+>      tcg_temp_free_i64(xbl);
+>  }
+> =20
+> -#define VSX_LOGICAL(name, tcg_op)                                    \
+> +#define VSX_LOGICAL(name, vece, tcg_op)                              \
+>  static void glue(gen_, name)(DisasContext * ctx)                     \
+>      {                                                                \
+> -        TCGv_i64 t0;                                                 \
+> -        TCGv_i64 t1;                                                 \
+> -        TCGv_i64 t2;                                                 \
+>          if (unlikely(!ctx->vsx_enabled)) {                           \
+>              gen_exception(ctx, POWERPC_EXCP_VSXU);                   \
+>              return;                                                  \
+>          }                                                            \
+> -        t0 =3D tcg_temp_new_i64();                                     \
+> -        t1 =3D tcg_temp_new_i64();                                     \
+> -        t2 =3D tcg_temp_new_i64();                                     \
+> -        get_cpu_vsrh(t0, xA(ctx->opcode));                           \
+> -        get_cpu_vsrh(t1, xB(ctx->opcode));                           \
+> -        tcg_op(t2, t0, t1);                                          \
+> -        set_cpu_vsrh(xT(ctx->opcode), t2);                           \
+> -        get_cpu_vsrl(t0, xA(ctx->opcode));                           \
+> -        get_cpu_vsrl(t1, xB(ctx->opcode));                           \
+> -        tcg_op(t2, t0, t1);                                          \
+> -        set_cpu_vsrl(xT(ctx->opcode), t2);                           \
+> -        tcg_temp_free_i64(t0);                                       \
+> -        tcg_temp_free_i64(t1);                                       \
+> -        tcg_temp_free_i64(t2);                                       \
+> +        tcg_op(vece, vsr_full_offset(xT(ctx->opcode)),               \
+> +               vsr_full_offset(xA(ctx->opcode)),                     \
+> +               vsr_full_offset(xB(ctx->opcode)), 16, 16);            \
 >      }
->      if (n =3D=3D 32) {
->          ppc_maybe_bswap_register(env, mem_buf, 4);
-> -        env->vscr =3D ldl_p(mem_buf);
-> +        helper_mtvscr(env, ldl_p(mem_buf));
->          return 4;
->      }
->      if (n =3D=3D 33) {
+> =20
+> -VSX_LOGICAL(xxland, tcg_gen_and_i64)
+> -VSX_LOGICAL(xxlandc, tcg_gen_andc_i64)
+> -VSX_LOGICAL(xxlor, tcg_gen_or_i64)
+> -VSX_LOGICAL(xxlxor, tcg_gen_xor_i64)
+> -VSX_LOGICAL(xxlnor, tcg_gen_nor_i64)
+> -VSX_LOGICAL(xxleqv, tcg_gen_eqv_i64)
+> -VSX_LOGICAL(xxlnand, tcg_gen_nand_i64)
+> -VSX_LOGICAL(xxlorc, tcg_gen_orc_i64)
+> +VSX_LOGICAL(xxland, MO_64, tcg_gen_gvec_and)
+> +VSX_LOGICAL(xxlandc, MO_64, tcg_gen_gvec_andc)
+> +VSX_LOGICAL(xxlor, MO_64, tcg_gen_gvec_or)
+> +VSX_LOGICAL(xxlxor, MO_64, tcg_gen_gvec_xor)
+> +VSX_LOGICAL(xxlnor, MO_64, tcg_gen_gvec_nor)
+> +VSX_LOGICAL(xxleqv, MO_64, tcg_gen_gvec_eqv)
+> +VSX_LOGICAL(xxlnand, MO_64, tcg_gen_gvec_nand)
+> +VSX_LOGICAL(xxlorc, MO_64, tcg_gen_gvec_orc)
+> =20
+>  #define VSX_XXMRG(name, high)                               \
+>  static void glue(gen_, name)(DisasContext * ctx)            \
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -80,24 +120,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---hSsVBZHIO2Q9XETc
+--0Qexx6XJGNEACt6j
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwZ51EACgkQbDjKyiDZ
-s5LmuRAAsxcdh491aKW+hB92Qg0Jj50/DgiieVWn/AEpEgVombQ282NlvLTOepvT
-VhbZYt3MMpTkiW/Wb+UXz2Mxn+h7ZWxuZle4CZuGFuM1jRVHh7QF1u/Qc7IckgGw
-mx44lcSdaSKlMy3NlOLfu2ElARAEnsXb03UE7tghijeTeVpQN8/qzBsaSuRUZ8U0
-sGayHMZQgwCmYfIWNODK4Xe0zMCinYe1nesXLOQIsaMaIqVuPlCcPBcqP4wozvd5
-EmbJ9/o4kt+uT/7QBCFrD/9qJcn6XA3oA5Zgof7Sx4196OQpL3deuwSY1jQP/ZUy
-QJEwHaBEf6sD7SgUNfrkg3l/HC+OTNNxi/RLsuHMhZlBLlXHDFbCvpC0Zt5zz0r5
-c65S+li4lCPlDFTuE28iO1noWowi6RW7HdvcF7xHeakyfZP0c0WWMe7ONY4+AjDp
-9i5KLVUejbgQLWFBNaaUi/h90nip5GVz4ulgxaacW3fSBhUtAYJjFnygpAnR8thO
-yHgYFeCtz/qEZYvUkrIlK3JvVZ/Dh7uwXl0ENLANbtV91dKOW2zeKvo68jAhfaFA
-EH3rWMVIZpiVNitG8qpmmDez143XJfOJ7hUqvxp0hX9F19Kvv2fGM4btOA8g4ec9
-JMGqa7V3Q8gI3tzAHlJSE442aKpXfsHDL2tNxjH1I5pJC5nhfCc=
-=1HMf
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwZ5kIACgkQbDjKyiDZ
+s5JCuA/+O3sQwGJAvNK4hqP++9aSbpM67aJg3KhrtVETWSC1hQu8S7HWBjlCnCqL
+PNSpSlSBkLxr5BvN5UfvzD8I7keyorFVlA+Hyg20VIlaY4aXMuqoVcnqkngnFz3z
+2u2aKHs3FSFIrJqk6EVtCpxJe8drVGbmqwiUek3k4ilYvLPTef6mXk1kf81F8Rqv
+6A7Er6Ch6pO6t3/f/+2yBE8jeeRn21B9GWyDPC+a/m4p1D4+UvxgbzAqX2VPiUsb
+kP60PuEBF7uL2CFLUFb56LRsraTEt8mHfSKSAAh9Bh06/78WqZtzsnBekjzooSK6
+G6gVsdI7HxWUN0VsszmNN/mkZvtCfgf0rmicVV2de6ppy/jI2hhxUVq7p1OJegZZ
+a/So6lX7PFVrl8STU9UADa5N6VGhUQd/2VSKx1UdGCJQDYlJ2IHuLODQz02VX+t4
+F0spVgxX//ERmzZw/BNDzOm1oSGoU2L6Ox3Yh7NleeMBARXiS3vse9FnugRcNF+w
+RnBTxnw6Zv0+78bZ7Ax+Ahdb+ZUA5Nrt+33rvzBZXgvxPcZ7QQefXhH2nb5Jp5PG
+MVzGx9ySHgIUAtA1nk2bQLa34Qd3I7tHcpvYcDlnHjW4eyzPReWw3C68O8dcKHWP
+LpnPzkOyoQAvf8TTYQSeC1QPCwa54/mqw71YGyHlWaKOVvrsuJA=
+=6y0L
 -----END PGP SIGNATURE-----
 
---hSsVBZHIO2Q9XETc--
+--0Qexx6XJGNEACt6j--
