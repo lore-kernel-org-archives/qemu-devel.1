@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gZaRE-0006ad-Hj
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 06:54:57 -0500
+	(envelope-from <thuth@redhat.com>) id 1gZaWY-0008Tf-5f
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:00:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gZaR9-0007nX-AG
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 06:54:56 -0500
-Date: Wed, 19 Dec 2018 12:54:42 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181219125442.08eb053d.cohuck@redhat.com>
-In-Reply-To: <20181207175423.6c45621f@oc2783563651>
-References: <20181122165432.4437-1-cohuck@redhat.com>
-	<20181204133810.66e8cfe5@oc2783563651>
-	<20181204141130.06496b9b.cohuck@redhat.com>
-	<20181204160236.54de2784@oc2783563651>
-	<20181205135402.33c2b22d.cohuck@redhat.com>
-	<20181206194714.31e9f43a@oc2783563651>
-	<20181207110529.3b293124.cohuck@redhat.com>
-	<20181207175423.6c45621f@oc2783563651>
+	(envelope-from <thuth@redhat.com>) id 1gZaWU-0003vy-40
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:00:26 -0500
+References: <1545149484-4929-1-git-send-email-thuth@redhat.com>
+	<878t0mbs79.fsf@dusky.pond.sub.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <a1001443-d2ef-732c-fa26-cfa7b88b8e1a@redhat.com>
+Date: Wed, 19 Dec 2018 13:00:09 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <878t0mbs79.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/3] vfio-ccw: support hsch/csch (kernel
- part)
+Subject: Re: [Qemu-devel] [QEMU PATCH] block: Remove blk_attach_dev_legacy()
+ / legacy_dev code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,164 +25,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: "Jason J . Herne" <jjherne@linux.ibm.com>, linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>, kvm@vger.kernel.org, Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org, Farhan Ali <alifm@linux.ibm.com>, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
 
-On Fri, 7 Dec 2018 17:54:23 +0100
-Halil Pasic <pasic@linux.ibm.com> wrote:
-
-> On Fri, 7 Dec 2018 11:05:29 +0100
-> Cornelia Huck <cohuck@redhat.com> wrote:
+On 2018-12-18 19:33, Markus Armbruster wrote:
+> Thomas Huth <thuth@redhat.com> writes:
 > 
-> > > > I think most of the sorting-out-the-operations stuff should be done by
-> > > > the hardware itself, and we should not really try to enforce anything
-> > > > special in our vfio code.
-> > > >       
-> > > 
-> > > Sounds very reasonable to me. Does this mean you are against Pierre's
-> > > '[PATCH v3 6/6] vfio: ccw: serialize the write system calls' as it does
-> > > not let HW sort out stuff, but enforces sequencing?    
-> > 
-> > I have not yet had time to look at that, sorry.
-> >   
-> > > 
-> > >     
-> > > > For your example, it might be best if a hsch is always accepted and
-> > > > send on towards the hardware.      
-> > > 
-> > > Nod.
-> > >     
-> > > > Probably best to reflect back -EAGAIN if
-> > > > we're currently processing another instruction from another vcpu, so
-> > > > that the user space caller can retry.      
-> > > 
-> > > Hm, not sure how this works together with your previous sentence.    
-> > 
-> > The software layering. We have the kernel layer
-> > (drivers/s390/cio/vfio_ccw_*) that interacts with the hardware more or
-> > less directly, and the QEMU layer, which does some writes on regions.
-> > In the end, the goal is to act on behalf of the guest issuing a
-> > ssch/hsch/csch, which is from the guest's view a single instruction. We
-> > should not have the individual "instructions" compete with each other
-> > so that they run essentially in parallel (kernel layer), but we should
-> > also not try to impose an artificial ordering as to when instructions
-> > executed by different vcpus are executed (QEMU layer). Therefore, don't
-> > try to run an instruction in the kernel when another one is in progress
-> > for the same subchannel (exclusivity in the kernel), but retry in QEMU
-> > if needed (no ordering between vcpus imposed).
-> > 
-> > In short, don't create strange concurrency issues in the "instruction"
-> > handling, but make it possible to execute instructions in a
-> > non-predictable order if the guest does not care about enforcing
-> > ordering on its side.
-> >   
+>> The last user of blk_attach_dev_legacy() is the code in xen_disk.c.
+>> It passes a pointer to a XenBlkDev as second parameter. XenBlkDev
+>> is derived from XenDevice which in turn is derived from DeviceState
+>> since commit 3a6c9172ac5951e ("xen: create qdev for each backend device").
+>> Thus the code can also simply use blk_attach_dev() with a pointer
+>> to the DeviceState instead.
+>> So we can finally remove all code related to the "legacy_dev" flag, too,
+>> and turn the related "void *" in block-backend.c into "DeviceState *"
+>> to fix some of the remaining TODOs there.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  Note: I haven't tested the Xen code since I don't have a working Xen
+>>  installation at hand. I'd appreciate if someone could check it...
+[...]
+>> diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
+>> index 36eff94..9605caf 100644
+>> --- a/hw/block/xen_disk.c
+>> +++ b/hw/block/xen_disk.c
+>> @@ -801,7 +801,9 @@ static int blk_connect(struct XenDevice *xendev)
+>>           * so we can blk_unref() unconditionally */
+>>          blk_ref(blkdev->blk);
+>>      }
+>> -    blk_attach_dev_legacy(blkdev->blk, blkdev);
+>> +    if (blk_attach_dev(blkdev->blk, DEVICE(blkdev)) < 0) {
+>> +        return -1;
+>> +    }
 > 
-> I'm neither sold on this, nor am I violently opposing it. Will try to
-> meditate on it some more if any spare cycles arise. Currently I don't
-> see the benefit of the non-predictable order over plain FCFS. For
-> example, let's assume we have a ssch "instruction" that 1 second to
-> complete. Since normally ssch instruction  does not have to process the
-> channel program, and is thus kind of a constant time operation (now we
-> do the translation and the pinning as a part of the "instruction), our
-> strange guest gets jumpy and does a csch after T+0.2s. And on T+0.8 in
-> desperation follows the whole up with a hsch. If I understand your
-> proposal correctly, both userspace handlers would spin on -EAGAIN until
-> T+1. When ssch is done the csch and the hsch would race for who can
-> be the next. I don't quite get the value of that.
+> Other error returns in this function call xen_pv_printf() first.  Should
+> this one, too?
 
-What would happen on real hardware for such a guest? I would expect
-that the csch and the hsch would be executed in a random order as well.
+Only some of them do a xen_pv_printf() first, there are also many that
+don't. blk_attach_dev() currently only returns an error if a device has
+already been attach - which should simply never happen here, so a printf
+currently does not seem to be justified to me. Alternatively, we could
+also abort() here instead, I think. I'll leave that decision up to the
+Xen maintainers...
 
-My point is that it is up to the guest to impose an order on the
-execution of instructions, if wanted. We should not try to guess
-anything; I think that would make the implementation needlessly complex.
-
-> 
-> > >     
-> > > > Same for ssch, if another ssch is
-> > > > already being processed. We *could* reflect cc 2 if the fctl
-> > > > bit is already set, but that won't do for csch, so it is
-> > > > probably best to have the hardware figure that out in any case.
-> > > >       
-> > > 
-> > > We just need to be careful about avoiding races if we let hw sort
-> > > out things. If an ssch is issued with the start function pending
-> > > the correct response is cc 2.     
-> > 
-> > But sending it on to the hardware will give us that cc 2, no?
-> >   
-> > >     
-> > > > If I read the code correctly, we currently reflect -EBUSY and
-> > > > not -EAGAIN if we get a ssch request while already processing
-> > > > another one. QEMU hands that back to the guest as a cc 2, which
-> > > > is not 100% correct. In practice, we don't see this with Linux
-> > > > guests due to locking. 
-> > > 
-> > > Nod, does not happen because of BQL. We currently do the
-> > > user-space counterpart of vfio_ccw_mdev_write() in BQL context or
-> > > (i.e. we hold BQL until translation is done and our host ssch()
-> > > comes back)?    
-> > 
-> > The Linux kernel uses the subchannel lock to enforce exclusivity for
-> > subchannel instructions, so we won't see Linux guests issue
-> > instructions on different vcpus in parallel, that's what I meant.
-> >  
-> 
-> That is cool. Yet I think the situation with the BQL is relevant.
-> Because while BQL is held, not only IO instructions on a single
-> vfio-ccw device are mutually exclusive. AFAIU no other instruction
-> QEMU instruction handler can engage. And a store subchannel for
-> device A having to wait until the translation for the start
-> subchannel on device B is done is not the most scary thing I can
-> imagine. 
-
-Yes. But we still need to be able to cope with a userspace that does
-not give us those guarantees.
-
-> > > 
-> > > I think -EBUSY is the correct response for ssch while start
-> > > pending set. I think we set start pending in QEMU before we issue
-> > > 'start command/io request' to the kernel. I don't think -EAGAIN
-> > > is a good idea. AFAIU we would expect user-space to loop on
-> > > -EAGAIN e.g. at least until the processing of a 'start command'
-> > > is done and the (fist) ssch by the host is issued. And then
-> > > what?  Translate the second channel program issue the second ssch
-> > > in the host and probably get a non-zero cc? Or return -EBUSY? Or
-> > > keep returning -EAGAIN?    
-> > 
-> > My idea was:
-> > - return -EAGAIN if we're already processing a channel instruction
-> > - continue returning -EBUSY etc. if the instruction gets the
-> > respective return code from the hardware
-> > 
-> > So, the second ssch would first get a -EAGAIN and then a -EBUSY if
-> > the first ssch is done, but the subchannel is still doing the start
-> > function. Just as you would expect when you do a ssch while your
-> > last request has not finished yet.
-> >   
-> 
-> But before you can issue the second ssch you have to do the
-> translation for it. And we must assume the IO corresponding to the
-> first ssch is not done yet -- so we still need the translated channel
-> program of the first ssch. 
-
-Yes, we need to be able to juggle different translated channel programs
-if we don't consider this part of the "instruction execution". But if
-we return -EAGAIN if the code is currently doing that translation, we
-should be fine, no?
-
-> That is if we insist on doing the -EBUSY
-> based on a return code from the hardware. I'm not sure we end up with
-> a big simplification from making the "instructions" mutex on vfio-ccw
-> device level in kernel as proposed above. 
-
-I'm not sure we're not talking past each other here... the "translate
-and issue instruction" part should be mutually exclusive; I just don't
-want to return -EBUSY, but -EAGAIN, so that userspace knows it should
-try again.
-
-> But I'm not against it. If
-> you have the time to write the patches I will find time to review
-> them.
-
-Probably only on the new year...
+ Thomas
