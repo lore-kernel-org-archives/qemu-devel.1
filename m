@@ -1,34 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56537)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gZa49-0008Ey-1L
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 06:31:06 -0500
+	(envelope-from <a175818323@gmail.com>) id 1gZa7P-0000zn-AI
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 06:34:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gZa45-0003Mv-OO
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 06:31:04 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34176)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gZa45-0003MB-Gu
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 06:31:01 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gZa43-0001Jl-Fo
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 11:30:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D4C842E80D7
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 11:30:56 +0000 (UTC)
+	(envelope-from <a175818323@gmail.com>) id 1gZa7M-0005uq-CH
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 06:34:27 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 19 Dec 2018 11:20:27 -0000
-From: Daniel Berrange <1738283@bugs.launchpad.net>
-Reply-To: Bug 1738283 <1738283@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151328724563.26325.11755910452939969450.malonedeb@wampee.canonical.com>
-Message-Id: <154521842739.24618.4576597447996141648.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1738283] Re: 'Less than' (<), 'more than' (>),
- and 'pipe' (|) can't be typed via VNC
+From: Bob Chen <a175818323@gmail.com>
+Date: Wed, 19 Dec 2018 19:34:09 +0800
+Message-ID: <CAMxP3BRZ1hZ0_DZBG3Wpn4=n101qCF-vF+4nzC5ERg9aGZHR=A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] QEMU crashed when reconnecting over iscsi protocol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +19,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: QEMU Developers <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
-Discussing the problem & likely solution here:
+I looked into the source code, and found some reconnect method from
+libiscsi. Are they able to work?
 
-  https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04631.html
+QEMU: 2.12.1
+libiscsi: 1.18.0  (https://github.com/sahlberg/libiscsi)
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1738283
-
-Title:
-  'Less than' (<), 'more than' (>), and 'pipe' (|) can't be typed via
-  VNC
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  If I start QEMU 2.11 (from
-  https://build.opensuse.org/package/show/Virtualization/qemu) VM with
-  VNC, I am unable to type following three characters: 'less than' (<),
-  'more than' (>), and 'pipe' (|) on en_US QWERTY keyboard. Other
-  characters work fine. QEMu version 2.10.1 worked fine.
-
-  /usr/bin/qemu-kvm -m 2048 -cpu kvm64 -drive
-  media=3Dcdrom,if=3Dnone,id=3Dcd0,format=3Draw,file=3DOI-hipster-
-  minimal-20171031.iso -device ide-cd,drive=3Dcd0 -boot once=3Dd,menu=3Don
-  ,splash-time=3D5000 -device usb-ehci -device usb-tablet -smp 1 -enable-
-  kvm -vnc :91,share=3Dforce-shared
-
-  The ISO can be downloaded here: https://www.openindiana.org/download/
-
-  Also tried Fedora-Server-dvd-x86_64-25-1.3.iso and it's the same
-  situation.
-
-  If I run the same command without '-vnc :91,share=3Dforce-shared',
-  everything works just fine.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1738283/+subscriptions
+(gdb) f
+#0  0x00007fcd956933bd in iscsi_reconnect (iscsi=0x7fcd97f206d0) at
+connect.c:461
+461 memcpy(tmp_iscsi->old_iscsi, iscsi, sizeof(struct iscsi_context));
+(gdb) bt
+#0  0x00007fcd956933bd in iscsi_reconnect (iscsi=0x7fcd97f206d0) at
+connect.c:461
+#1  0x00007fcd956a4ccd in iscsi_service_reconnect_if_loggedin
+(iscsi=0x7fcd97f206d0) at socket.c:879
+#2  0x00007fcd956a50d2 in iscsi_tcp_service (iscsi=0x7fcd97f206d0,
+revents=<value optimized out>) at socket.c:989
+#3  0x00007fcd9674b737 in iscsi_process_read (arg=0x7fcd97f1e680) at
+block/iscsi.c:371
+#4  0x00007fcd967e5b47 in aio_dispatch_handlers (ctx=0x7fcd97ee48d0) at
+util/aio-posix.c:406
+#5  0x00007fcd967e5ce9 in aio_dispatch (ctx=0x7fcd97ee48d0) at
+util/aio-posix.c:437
+#6  0x00007fcd967e038c in aio_ctx_dispatch (source=0x7fcd97ee48d0,
+callback=0, user_data=0x0) at util/async.c:261
+#7  0x00007fcd93b1135e in g_main_context_dispatch () from
+/usr/lib64/libglib-2.0.so.0
+#8  0x00007fcd967e424e in glib_pollfds_poll () at util/main-loop.c:215
+#9  0x00007fcd967e4368 in os_host_main_loop_wait (timeout=987000000) at
+util/main-loop.c:263
+#10 0x00007fcd967e4438 in main_loop_wait (nonblocking=0) at
+util/main-loop.c:522
+#11 0x00007fcd963c4b29 in main_loop () at vl.c:1943
+#12 0x00007fcd963cca8d in main (argc=62, argv=0x7ffff89f4208,
+envp=0x7ffff89f4400) at vl.c:4734
