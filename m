@@ -1,16 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1gZa7P-0000zn-AI
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 06:34:28 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gZaEm-000389-Dl
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 06:42:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1gZa7M-0005uq-CH
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 06:34:27 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gZaEk-000447-Iy
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 06:42:04 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 19 Dec 2018 11:41:55 +0000
+Message-ID: <0a55acd4-8c0c-69ab-f20f-9d00ca65fcc1@virtuozzo.com>
+References: <20181218225714.284495-1-eblake@redhat.com>
+	<20181218225714.284495-3-eblake@redhat.com>
+In-Reply-To: <20181218225714.284495-3-eblake@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A2190B0D54D0624CBD99C2B1D0BDCD36@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-From: Bob Chen <a175818323@gmail.com>
-Date: Wed, 19 Dec 2018 19:34:09 +0800
-Message-ID: <CAMxP3BRZ1hZ0_DZBG3Wpn4=n101qCF-vF+4nzC5ERg9aGZHR=A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] QEMU crashed when reconnecting over iscsi protocol
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] nbd/client: Trace all server option
+ error messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,41 +26,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-I looked into the source code, and found some reconnect method from
-libiscsi. Are they able to work?
-
-QEMU: 2.12.1
-libiscsi: 1.18.0  (https://github.com/sahlberg/libiscsi)
-
-
-(gdb) f
-#0  0x00007fcd956933bd in iscsi_reconnect (iscsi=0x7fcd97f206d0) at
-connect.c:461
-461 memcpy(tmp_iscsi->old_iscsi, iscsi, sizeof(struct iscsi_context));
-(gdb) bt
-#0  0x00007fcd956933bd in iscsi_reconnect (iscsi=0x7fcd97f206d0) at
-connect.c:461
-#1  0x00007fcd956a4ccd in iscsi_service_reconnect_if_loggedin
-(iscsi=0x7fcd97f206d0) at socket.c:879
-#2  0x00007fcd956a50d2 in iscsi_tcp_service (iscsi=0x7fcd97f206d0,
-revents=<value optimized out>) at socket.c:989
-#3  0x00007fcd9674b737 in iscsi_process_read (arg=0x7fcd97f1e680) at
-block/iscsi.c:371
-#4  0x00007fcd967e5b47 in aio_dispatch_handlers (ctx=0x7fcd97ee48d0) at
-util/aio-posix.c:406
-#5  0x00007fcd967e5ce9 in aio_dispatch (ctx=0x7fcd97ee48d0) at
-util/aio-posix.c:437
-#6  0x00007fcd967e038c in aio_ctx_dispatch (source=0x7fcd97ee48d0,
-callback=0, user_data=0x0) at util/async.c:261
-#7  0x00007fcd93b1135e in g_main_context_dispatch () from
-/usr/lib64/libglib-2.0.so.0
-#8  0x00007fcd967e424e in glib_pollfds_poll () at util/main-loop.c:215
-#9  0x00007fcd967e4368 in os_host_main_loop_wait (timeout=987000000) at
-util/main-loop.c:263
-#10 0x00007fcd967e4438 in main_loop_wait (nonblocking=0) at
-util/main-loop.c:522
-#11 0x00007fcd963c4b29 in main_loop () at vl.c:1943
-#12 0x00007fcd963cca8d in main (argc=62, argv=0x7ffff89f4208,
-envp=0x7ffff89f4400) at vl.c:4734
+MTkuMTIuMjAxOCAxOjU3LCBFcmljIEJsYWtlIHdyb3RlOg0KPiBOb3QgYWxsIHNlcnZlcnMgc2Vu
+ZCBmcmVlLWZvcm0gdGV4dCBhbG9uZ3NpZGUgb3B0aW9uIGVycm9yIHJlcGxpZXMsIGJ1dA0KPiBm
+b3Igc2VydmVycyB0aGF0IGRvIChzdWNoIGFzIHFlbXUpLCB3ZSBwYXNzIHRoZSBzZXJ2ZXIncyBt
+ZXNzYWdlIGFzIGENCj4gaGludCBhbG9uZ3NpZGUgb3VyIG93biBlcnJvciByZXBvcnRpbmcuICBI
+b3dldmVyLCBpdCB3b3VsZCBhbHNvIGJlDQo+IHVzZWZ1bCB0byB0cmFjZSBzdWNoIHNlcnZlciBt
+ZXNzYWdlcywgc2luY2Ugd2UgY2FuJ3QgZ3VhcmFudGVlIGhvdyB0aGUNCj4gaGludCBtYXkgYmUg
+Y29uc3VtZWQuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0
+LmNvbT4NCg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1l
+bnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KPiAtLS0NCj4gICBuYmQvY2xpZW50LmMgICAgIHwgMiAr
+Kw0KPiAgIG5iZC90cmFjZS1ldmVudHMgfCAxICsNCj4gICAyIGZpbGVzIGNoYW5nZWQsIDMgaW5z
+ZXJ0aW9ucygrKQ0KPiANCj4gZGlmZiAtLWdpdCBhL25iZC9jbGllbnQuYyBiL25iZC9jbGllbnQu
+Yw0KPiBpbmRleCBiNGQ0NTdhMTlhZC4uMGFkNzE0N2VkOTUgMTAwNjQ0DQo+IC0tLSBhL25iZC9j
+bGllbnQuYw0KPiArKysgYi9uYmQvY2xpZW50LmMNCj4gQEAgLTE3MSw2ICsxNzEsOCBAQCBzdGF0
+aWMgaW50IG5iZF9oYW5kbGVfcmVwbHlfZXJyKFFJT0NoYW5uZWwgKmlvYywgTkJET3B0aW9uUmVw
+bHkgKnJlcGx5LA0KPiAgICAgICAgICAgICAgIGdvdG8gY2xlYW51cDsNCj4gICAgICAgICAgIH0N
+Cj4gICAgICAgICAgIG1zZ1tyZXBseS0+bGVuZ3RoXSA9ICdcMCc7DQo+ICsgICAgICAgIHRyYWNl
+X25iZF9zZXJ2ZXJfZXJyb3JfbXNnKHJlcGx5LT50eXBlLA0KPiArICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBuYmRfcmVwbHlfdHlwZV9sb29rdXAocmVwbHktPnR5cGUpLCBtc2cp
+Ow0KPiAgICAgICB9DQo+IA0KPiAgICAgICBzd2l0Y2ggKHJlcGx5LT50eXBlKSB7DQo+IGRpZmYg
+LS1naXQgYS9uYmQvdHJhY2UtZXZlbnRzIGIvbmJkL3RyYWNlLWV2ZW50cw0KPiBpbmRleCA1ZTFk
+NGFmZThlNi4uNTQ5MjA0MmFjYmYgMTAwNjQ0DQo+IC0tLSBhL25iZC90cmFjZS1ldmVudHMNCj4g
+KysrIGIvbmJkL3RyYWNlLWV2ZW50cw0KPiBAQCAtMSw2ICsxLDcgQEANCj4gICAjIG5iZC9jbGll
+bnQuYw0KPiAgIG5iZF9zZW5kX29wdGlvbl9yZXF1ZXN0KHVpbnQzMl90IG9wdCwgY29uc3QgY2hh
+ciAqbmFtZSwgdWludDMyX3QgbGVuKSAiU2VuZGluZyBvcHRpb24gcmVxdWVzdCAlIiBQUkl1MzIi
+ICglcyksIGxlbiAlIiBQUkl1MzINCj4gICBuYmRfcmVjZWl2ZV9vcHRpb25fcmVwbHkodWludDMy
+X3Qgb3B0aW9uLCBjb25zdCBjaGFyICpvcHRuYW1lLCB1aW50MzJfdCB0eXBlLCBjb25zdCBjaGFy
+ICp0eXBlbmFtZSwgdWludDMyX3QgbGVuZ3RoKSAiUmVjZWl2ZWQgb3B0aW9uIHJlcGx5ICUiIFBS
+SXUzMiIgKCVzKSwgdHlwZSAlIiBQUkl1MzIiICglcyksIGxlbiAlIiBQUkl1MzINCj4gK25iZF9z
+ZXJ2ZXJfZXJyb3JfbXNnKHVpbnQzMl90IGVyciwgY29uc3QgY2hhciAqdHlwZSwgY29uc3QgY2hh
+ciAqbXNnKSAic2VydmVyIHJlcG9ydGVkIGVycm9yIDB4JSIgUFJJeDMyICIgKCVzKSB3aXRoIGFk
+ZGl0aW9uYWwgbWVzc2FnZTogJXMiDQo+ICAgbmJkX3JlcGx5X2Vycl91bnN1cCh1aW50MzJfdCBv
+cHRpb24sIGNvbnN0IGNoYXIgKm5hbWUpICJzZXJ2ZXIgZG9lc24ndCB1bmRlcnN0YW5kIHJlcXVl
+c3QgJSIgUFJJdTMyICIgKCVzKSwgYXR0ZW1wdGluZyBmYWxsYmFjayINCj4gICBuYmRfb3B0X2dv
+X3N0YXJ0KGNvbnN0IGNoYXIgKm5hbWUpICJBdHRlbXB0aW5nIE5CRF9PUFRfR08gZm9yIGV4cG9y
+dCAnJXMnIg0KPiAgIG5iZF9vcHRfZ29fc3VjY2Vzcyh2b2lkKSAiRXhwb3J0IGlzIGdvb2QgdG8g
+Z28iDQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
