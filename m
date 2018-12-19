@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gZddb-00061T-5E
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:19:57 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gZddY-00060L-AZ
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:19:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gZddZ-0004A2-4u
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:19:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48936)
+	(envelope-from <pbonzini@redhat.com>) id 1gZddW-00048W-Hl
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:19:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44392)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gZddY-000490-Or
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:19:53 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gZddW-000489-Bm
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 10:19:50 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A63F96CE
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 15:19:49 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 19 Dec 2018 16:18:56 +0100
-Message-Id: <20181219151917.3874-15-pbonzini@redhat.com>
+Date: Wed, 19 Dec 2018 16:18:55 +0100
+Message-Id: <20181219151917.3874-14-pbonzini@redhat.com>
 In-Reply-To: <20181219151917.3874-1-pbonzini@redhat.com>
 References: <20181219151917.3874-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 14/35] block/iscsi: fix ioctl cancel
- use-after-free
+Subject: [Qemu-devel] [PULL 13/35] block/iscsi: take iscsilun->mutex in
+ iscsi_timed_check_events()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,102 +33,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Felipe Franciosi <felipe@nutanix.com>, Sreejith Mohanan <sreejit.mohanan@nutanix.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 
 From: Stefan Hajnoczi <stefanha@redhat.com>
 
-iscsi_aio_cancel() does not increment the request's reference count,
-causing a use-after-free when ABORT TASK finishes after the request has
-already completed.
+Commit d045c466d9e62b4321fadf586d024d54ddfd8bd4 ("iscsi: do not use
+aio_context_acquire/release") introduced iscsilun->mutex but appears to
+have overlooked iscsi_timed_check_events() when introducing the mutex.
 
-There are some additional issues with iscsi_aio_cancel():
-1. Several ABORT TASKs may be sent for the same task if
-   iscsi_aio_cancel() is invoked multiple times.  It's better to avoid
-   this just in case the command identifier is reused.
-2. The iscsilun->mutex protection is missing in iscsi_aio_cancel().
+iscsi_service() and iscsi_set_events() must be called with
+iscsilun->mutex held.
 
-Reported-by: Felipe Franciosi <felipe@nutanix.com>
+iscsi_timed_check_events() is invoked from the AioContext and does not
+take the mutex.
+
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20180203061621.7033-4-stefanha@redhat.com>
-Reviewed-by: Felipe Franciosi <felipe@nutanix.com>
-Tested-by: Sreejith Mohanan <sreejit.mohanan@nutanix.com>
+Message-Id: <20180203061621.7033-3-stefanha@redhat.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/iscsi.c | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
+ block/iscsi.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/block/iscsi.c b/block/iscsi.c
-index 1924a2b58e..abb872d3d9 100644
+index a4e3730a82..1924a2b58e 100644
 --- a/block/iscsi.c
 +++ b/block/iscsi.c
-@@ -124,6 +124,7 @@ typedef struct IscsiAIOCB {
- #ifdef __linux__
-     sg_io_hdr_t *ioh;
- #endif
-+    bool cancelled;
- } IscsiAIOCB;
+@@ -344,6 +344,8 @@ static void iscsi_timed_check_events(void *opaque)
+ {
+     IscsiLun *iscsilun =3D opaque;
 =20
- /* libiscsi uses time_t so its enough to process events every second */
-@@ -287,6 +288,7 @@ static void iscsi_co_init_iscsitask(IscsiLun *iscsilu=
-n, struct IscsiTask *iTask)
-     };
- }
-=20
-+/* Called (via iscsi_service) with QemuMutex held. */
- static void
- iscsi_abort_task_cb(struct iscsi_context *iscsi, int status, void *comma=
-nd_data,
-                     void *private_data)
-@@ -295,6 +297,7 @@ iscsi_abort_task_cb(struct iscsi_context *iscsi, int =
-status, void *command_data,
-=20
-     acb->status =3D -ECANCELED;
-     iscsi_schedule_bh(acb);
-+    qemu_aio_unref(acb); /* acquired in iscsi_aio_cancel() */
- }
-=20
- static void
-@@ -303,14 +306,25 @@ iscsi_aio_cancel(BlockAIOCB *blockacb)
-     IscsiAIOCB *acb =3D (IscsiAIOCB *)blockacb;
-     IscsiLun *iscsilun =3D acb->iscsilun;
-=20
--    if (acb->status !=3D -EINPROGRESS) {
 +    qemu_mutex_lock(&iscsilun->mutex);
 +
-+    /* If it was cancelled or completed already, our work is done here *=
-/
-+    if (acb->cancelled || acb->status !=3D -EINPROGRESS) {
-+        qemu_mutex_unlock(&iscsilun->mutex);
-         return;
-     }
+     /* check for timed out requests */
+     iscsi_service(iscsilun->iscsi, 0);
 =20
-+    acb->cancelled =3D true;
-+
-+    qemu_aio_ref(acb); /* released in iscsi_abort_task_cb() */
-+
-     /* send a task mgmt call to the target to cancel the task on the tar=
-get */
--    iscsi_task_mgmt_abort_task_async(iscsilun->iscsi, acb->task,
--                                     iscsi_abort_task_cb, acb);
-+    if (iscsi_task_mgmt_abort_task_async(iscsilun->iscsi, acb->task,
-+                                         iscsi_abort_task_cb, acb) < 0) =
-{
-+        qemu_aio_unref(acb); /* since iscsi_abort_task_cb() won't be cal=
-led */
-+    }
+@@ -356,6 +358,8 @@ static void iscsi_timed_check_events(void *opaque)
+      * to return to service once this situation changes. */
+     iscsi_set_events(iscsilun);
 =20
 +    qemu_mutex_unlock(&iscsilun->mutex);
++
+     timer_mod(iscsilun->event_timer,
+               qemu_clock_get_ms(QEMU_CLOCK_REALTIME) + EVENT_INTERVAL);
  }
-=20
- static const AIOCBInfo iscsi_aiocb_info =3D {
-@@ -1008,6 +1022,7 @@ static BlockAIOCB *iscsi_aio_ioctl(BlockDriverState=
- *bs,
-     acb->bh          =3D NULL;
-     acb->status      =3D -EINPROGRESS;
-     acb->ioh         =3D buf;
-+    acb->cancelled   =3D false;
-=20
-     if (req !=3D SG_IO) {
-         iscsi_ioctl_handle_emulated(acb, req, buf);
 --=20
 2.20.1
