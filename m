@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gZd8r-0001Kv-JO
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 09:48:13 -0500
+	(envelope-from <weijiang.yang@intel.com>) id 1gZTm5-0000Wy-OW
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 23:48:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gZd8q-0001oI-KT
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 09:48:09 -0500
-References: <20181219065020.81256-1-mahaocong_work@163.com>
-	<20181219065020.81256-2-mahaocong_work@163.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ea116c05-43c3-cb11-e492-b32a8f918bec@redhat.com>
-Date: Wed, 19 Dec 2018 08:47:50 -0600
-MIME-Version: 1.0
-In-Reply-To: <20181219065020.81256-2-mahaocong_work@163.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] migration: add incremental mode on
- drive-mirror
+	(envelope-from <weijiang.yang@intel.com>) id 1gZTl7-00019V-UX
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 23:47:06 -0500
+Received: from mga05.intel.com ([192.55.52.43]:64703)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <weijiang.yang@intel.com>)
+	id 1gZTl7-000165-K9
+	for qemu-devel@nongnu.org; Tue, 18 Dec 2018 23:47:01 -0500
+From: weijiang.yang@intel.com
+Date: Wed, 19 Dec 2018 12:50:21 +0800
+Message-Id: <20181219045021.18479-1-weijiang.yang@intel.com>
+Subject: [Qemu-devel] [PATCH v1] This patch enhances bitmap op function
+ input check and ambiguous return.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,65 +23,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mahaocong <mahaocong_work@163.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, jcody@redhat.com, mahaocong <mahaocong@didichuxing.com>, qemu-devel@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com, peterx@redhat.com, wei.w.wang@intel.com
+Cc: Yang Weijiang <weijiang.yang@intel.com>
 
-On 12/19/18 12:50 AM, mahaocong wrote:
-> From: mahaocong <mahaocong@didichuxing.com>
-> 
-> Signed-off-by: mahaocong <mahaocong@didichuxing.com>
+From: Yang Weijiang <weijiang.yang@intel.com>
 
-The subject line tells "what", but you are missing a commit message body 
-that gives the "why".  Details about the new feature, and how it is 
-useful, go a long way to making the code easier to review.  How much of 
-your cover letter should be here as well?
+    BITMAP_LAST_WORD_MASK(nbits) returns 0xffffffff when "nbits=0",
+    this leads to error returns in some functions. This patch also
+    checks bits input in some slow bitmap op functions, if bits = 0,
+    do early return to keep the dst data unchanged.
 
-At a first glance, I'm just going to focus on the interface:
+    this patch is a follow-up patch of :
+    https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg03510.html
 
-> ---
->   block/dirty-bitmap.c         | 14 ++++++++++
->   block/mirror.c               | 63 +++++++++++++++++++++++++++++++++++---------
->   blockdev.c                   | 36 +++++++++++++++++++++++--
->   include/block/block_int.h    |  3 ++-
->   include/block/dirty-bitmap.h |  3 +++
->   include/qemu/hbitmap.h       |  2 ++
->   qapi/block-core.json         |  4 ++-
->   util/hbitmap.c               | 28 ++++++++++++++++++++
->   8 files changed, 136 insertions(+), 17 deletions(-)
-> 
+Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+---
+ include/qemu/bitmap.h | 24 ++++++++++++++++++++++++
+ util/bitmap.c         | 24 ++++++++++++++++++++++++
+ 2 files changed, 48 insertions(+)
 
-> +++ b/qapi/block-core.json
-> @@ -1727,6 +1727,8 @@
->   #        (all the disk, only the sectors allocated in the topmost image, or
->   #        only new I/O).
->   #
-> +# @bitmap-name: the bitmap to be used in incremental mode.
-
-Missing a '(since 4.0)' tag.  And doesn't really explain what 
-incremental mode in a mirroring operation actually means.
-
-> +#
->   # @granularity: granularity of the dirty bitmap, default is 64K
->   #               if the image format doesn't have clusters, 4K if the clusters
->   #               are smaller than that, else the cluster size.  Must be a
-> @@ -1768,7 +1770,7 @@
->   { 'struct': 'DriveMirror',
->     'data': { '*job-id': 'str', 'device': 'str', 'target': 'str',
->               '*format': 'str', '*node-name': 'str', '*replaces': 'str',
-> -            'sync': 'MirrorSyncMode', '*mode': 'NewImageMode',
-> +            'sync': 'MirrorSyncMode', '*bitmap-name': 'str', '*mode': 'NewImageMode',
-
-Can this be named just 'bitmap', instead of the longer 'bitmap-name'?
-
->               '*speed': 'int', '*granularity': 'uint32',
->               '*buf-size': 'int', '*on-source-error': 'BlockdevOnError',
->               '*on-target-error': 'BlockdevOnError',
-> diff --git a/util/hbitmap.c b/util/hbitmap.c
-> index 8d402c5..7ae2fc2 100644
-> --- a/util/hbitmap.c
-
-
+diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
+index 509eeddece..b6ce0ed551 100644
+--- a/include/qemu/bitmap.h
++++ b/include/qemu/bitmap.h
+@@ -113,6 +113,10 @@ static inline void bitmap_zero(unsigned long *dst, long nbits)
+ 
+ static inline void bitmap_fill(unsigned long *dst, long nbits)
+ {
++    if (unlikely(!nbits)) {
++        return;
++    }
++
+     size_t nlongs = BITS_TO_LONGS(nbits);
+     if (!small_nbits(nbits)) {
+         long len = (nlongs - 1) * sizeof(unsigned long);
+@@ -174,6 +178,10 @@ static inline void bitmap_complement(unsigned long *dst,
+                                      const unsigned long *src,
+                                      long nbits)
+ {
++    if (unlikely(!nbits)) {
++        return;
++    }
++
+     if (small_nbits(nbits)) {
+         *dst = ~(*src) & BITMAP_LAST_WORD_MASK(nbits);
+     } else {
+@@ -184,6 +192,10 @@ static inline void bitmap_complement(unsigned long *dst,
+ static inline int bitmap_equal(const unsigned long *src1,
+                                const unsigned long *src2, long nbits)
+ {
++    if (unlikely(!nbits)) {
++        return 0;
++    }
++
+     if (small_nbits(nbits)) {
+         return ! ((*src1 ^ *src2) & BITMAP_LAST_WORD_MASK(nbits));
+     } else {
+@@ -193,6 +205,10 @@ static inline int bitmap_equal(const unsigned long *src1,
+ 
+ static inline int bitmap_empty(const unsigned long *src, long nbits)
+ {
++    if (unlikely(!nbits)) {
++        return 0;
++    }
++
+     if (small_nbits(nbits)) {
+         return ! (*src & BITMAP_LAST_WORD_MASK(nbits));
+     } else {
+@@ -202,6 +218,10 @@ static inline int bitmap_empty(const unsigned long *src, long nbits)
+ 
+ static inline int bitmap_full(const unsigned long *src, long nbits)
+ {
++    if (unlikely(!nbits)) {
++        return 0;
++    }
++
+     if (small_nbits(nbits)) {
+         return ! (~(*src) & BITMAP_LAST_WORD_MASK(nbits));
+     } else {
+@@ -212,6 +232,10 @@ static inline int bitmap_full(const unsigned long *src, long nbits)
+ static inline int bitmap_intersects(const unsigned long *src1,
+                                     const unsigned long *src2, long nbits)
+ {
++    if (unlikely(!nbits)) {
++        return 0;
++    }
++
+     if (small_nbits(nbits)) {
+         return ((*src1 & *src2) & BITMAP_LAST_WORD_MASK(nbits)) != 0;
+     } else {
+diff --git a/util/bitmap.c b/util/bitmap.c
+index cb618c65a5..64bb16a46a 100644
+--- a/util/bitmap.c
++++ b/util/bitmap.c
+@@ -42,6 +42,10 @@ int slow_bitmap_empty(const unsigned long *bitmap, long bits)
+ {
+     long k, lim = bits/BITS_PER_LONG;
+ 
++    if (unlikely(!bits)) {
++        return 0;
++    }
++
+     for (k = 0; k < lim; ++k) {
+         if (bitmap[k]) {
+             return 0;
+@@ -60,6 +64,10 @@ int slow_bitmap_full(const unsigned long *bitmap, long bits)
+ {
+     long k, lim = bits/BITS_PER_LONG;
+ 
++    if (unlikely(!bits)) {
++        return 0;
++    }
++
+     for (k = 0; k < lim; ++k) {
+         if (~bitmap[k]) {
+             return 0;
+@@ -80,6 +88,10 @@ int slow_bitmap_equal(const unsigned long *bitmap1,
+ {
+     long k, lim = bits/BITS_PER_LONG;
+ 
++    if (unlikely(!bits)) {
++        return 0;
++    }
++
+     for (k = 0; k < lim; ++k) {
+         if (bitmap1[k] != bitmap2[k]) {
+             return 0;
+@@ -116,6 +128,10 @@ int slow_bitmap_and(unsigned long *dst, const unsigned long *bitmap1,
+     long nr = BITS_TO_LONGS(bits);
+     unsigned long result = 0;
+ 
++    if (unlikely(!bits)) {
++        return 0;
++    }
++
+     for (k = 0; k < nr; k++) {
+         result |= (dst[k] = bitmap1[k] & bitmap2[k]);
+     }
+@@ -342,6 +358,10 @@ int slow_bitmap_intersects(const unsigned long *bitmap1,
+ {
+     long k, lim = bits/BITS_PER_LONG;
+ 
++    if (unlikely(!bits)) {
++        return 0;
++    }
++
+     for (k = 0; k < lim; ++k) {
+         if (bitmap1[k] & bitmap2[k]) {
+             return 1;
+@@ -360,6 +380,10 @@ long slow_bitmap_count_one(const unsigned long *bitmap, long nbits)
+ {
+     long k, lim = nbits / BITS_PER_LONG, result = 0;
+ 
++    if (unlikely(!nbits)) {
++        return 0;
++    }
++
+     for (k = 0; k < lim; k++) {
+         result += ctpopl(bitmap[k]);
+     }
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.17.1
