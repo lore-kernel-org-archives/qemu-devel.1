@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZWbw-000281-FH
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:46 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gZWbx-00028z-67
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gZWbn-0005zi-To
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:40 -0500
-Date: Wed, 19 Dec 2018 17:40:13 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gZWbn-0005zv-VL
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 02:49:42 -0500
+Date: Wed, 19 Dec 2018 17:42:37 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181219064012.GZ30570@umbus.fritz.box>
+Message-ID: <20181219064236.GC30570@umbus.fritz.box>
 References: <20181218063911.2112-1-richard.henderson@linaro.org>
-	<20181218063911.2112-31-richard.henderson@linaro.org>
+	<20181218063911.2112-34-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="qrotSzihSRAsrOtf"
+	protocol="application/pgp-signature"; boundary="fo/b2PYVqg2cQvBK"
 Content-Disposition: inline
-In-Reply-To: <20181218063911.2112-31-richard.henderson@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 30/34] target/ppc: Use mtvscr/mfvscr for
- vmstate
+In-Reply-To: <20181218063911.2112-34-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 33/34] target/ppc: convert vadd*s and
+ vsub*s to vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,107 +29,189 @@ To: Richard Henderson <richard.henderson@linaro.org>
 Cc: qemu-devel@nongnu.org, mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org
 
 
---qrotSzihSRAsrOtf
+--fo/b2PYVqg2cQvBK
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 17, 2018 at 10:39:07PM -0800, Richard Henderson wrote:
-> This is required before changing the representation of the register.
->=20
+On Mon, Dec 17, 2018 at 10:39:10PM -0800, Richard Henderson wrote:
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  target/ppc/machine.c | 44 +++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 41 insertions(+), 3 deletions(-)
+>  target/ppc/helper.h                 | 24 ++++++------
+>  target/ppc/int_helper.c             | 18 ++-------
+>  target/ppc/translate/vmx-impl.inc.c | 57 +++++++++++++++++++++++------
+>  3 files changed, 61 insertions(+), 38 deletions(-)
 >=20
-> diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-> index 451cf376b4..3c27a89166 100644
-> --- a/target/ppc/machine.c
-> +++ b/target/ppc/machine.c
-> @@ -10,6 +10,7 @@
->  #include "migration/cpu.h"
->  #include "qapi/error.h"
->  #include "kvm_ppc.h"
-> +#include "exec/helper-proto.h"
-> =20
->  static int cpu_load_old(QEMUFile *f, void *opaque, int version_id)
->  {
-> @@ -17,7 +18,7 @@ static int cpu_load_old(QEMUFile *f, void *opaque, int =
-version_id)
->      CPUPPCState *env =3D &cpu->env;
->      unsigned int i, j;
->      target_ulong sdr1;
-> -    uint32_t fpscr;
-> +    uint32_t fpscr, vscr;
->  #if defined(TARGET_PPC64)
->      int32_t slb_nr;
->  #endif
-> @@ -84,7 +85,8 @@ static int cpu_load_old(QEMUFile *f, void *opaque, int =
-version_id)
->      if (!cpu->vhyp) {
->          ppc_store_sdr1(env, sdr1);
+> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+> index 7dbb08b9dd..3daf6bf863 100644
+> --- a/target/ppc/helper.h
+> +++ b/target/ppc/helper.h
+> @@ -219,18 +219,18 @@ DEF_HELPER_2(vprtybq, void, avr, avr)
+>  DEF_HELPER_3(vsubcuw, void, avr, avr, avr)
+>  DEF_HELPER_2(lvsl, void, avr, tl)
+>  DEF_HELPER_2(lvsr, void, avr, tl)
+> -DEF_HELPER_4(vaddsbs, void, env, avr, avr, avr)
+> -DEF_HELPER_4(vaddshs, void, env, avr, avr, avr)
+> -DEF_HELPER_4(vaddsws, void, env, avr, avr, avr)
+> -DEF_HELPER_4(vsubsbs, void, env, avr, avr, avr)
+> -DEF_HELPER_4(vsubshs, void, env, avr, avr, avr)
+> -DEF_HELPER_4(vsubsws, void, env, avr, avr, avr)
+> -DEF_HELPER_4(vaddubs, void, env, avr, avr, avr)
+> -DEF_HELPER_4(vadduhs, void, env, avr, avr, avr)
+> -DEF_HELPER_4(vadduws, void, env, avr, avr, avr)
+> -DEF_HELPER_4(vsububs, void, env, avr, avr, avr)
+> -DEF_HELPER_4(vsubuhs, void, env, avr, avr, avr)
+> -DEF_HELPER_4(vsubuws, void, env, avr, avr, avr)
+> +DEF_HELPER_FLAGS_5(vaddsbs, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
+32)
+> +DEF_HELPER_FLAGS_5(vaddshs, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
+32)
+> +DEF_HELPER_FLAGS_5(vaddsws, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
+32)
+> +DEF_HELPER_FLAGS_5(vsubsbs, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
+32)
+> +DEF_HELPER_FLAGS_5(vsubshs, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
+32)
+> +DEF_HELPER_FLAGS_5(vsubsws, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
+32)
+> +DEF_HELPER_FLAGS_5(vaddubs, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
+32)
+> +DEF_HELPER_FLAGS_5(vadduhs, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
+32)
+> +DEF_HELPER_FLAGS_5(vadduws, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
+32)
+> +DEF_HELPER_FLAGS_5(vsububs, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
+32)
+> +DEF_HELPER_FLAGS_5(vsubuhs, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
+32)
+> +DEF_HELPER_FLAGS_5(vsubuws, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
+32)
+>  DEF_HELPER_3(vadduqm, void, avr, avr, avr)
+>  DEF_HELPER_4(vaddecuq, void, avr, avr, avr, avr)
+>  DEF_HELPER_4(vaddeuqm, void, avr, avr, avr, avr)
+> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+> index 9dbcbcd87a..22671c71e5 100644
+> --- a/target/ppc/int_helper.c
+> +++ b/target/ppc/int_helper.c
+> @@ -583,27 +583,17 @@ VARITHFPFMA(nmsubfp, float_muladd_negate_result | f=
+loat_muladd_negate_c);
 >      }
-> -    qemu_get_be32s(f, &env->vscr);
-> +    qemu_get_be32s(f, &vscr);
-> +    helper_mtvscr(env, vscr);
->      qemu_get_be64s(f, &env->spe_acc);
->      qemu_get_be32s(f, &env->spe_fscr);
->      qemu_get_betls(f, &env->msr_mask);
-> @@ -429,6 +431,28 @@ static bool altivec_needed(void *opaque)
->      return (cpu->env.insns_flags & PPC_ALTIVEC);
->  }
 > =20
-> +static int get_vscr(QEMUFile *f, void *opaque, size_t size,
-> +                    const VMStateField *field)
-> +{
-> +    PowerPCCPU *cpu =3D opaque;
-> +    helper_mtvscr(&cpu->env, qemu_get_be32(f));
-> +    return 0;
+>  #define VARITHSAT_DO(name, op, optype, cvt, element)                    \
+> -    void helper_v##name(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,   \
+> -                        ppc_avr_t *b)                                   \
+> +    void helper_v##name(ppc_avr_t *r, ppc_avr_t *vscr_sat,              \
+> +                        ppc_avr_t *a, ppc_avr_t *b, uint32_t desc)      \
+>      {                                                                   \
+>          int sat =3D 0;                                                  =
+  \
+>          int i;                                                          \
+>                                                                          \
+>          for (i =3D 0; i < ARRAY_SIZE(r->element); i++) {                =
+  \
+> -            switch (sizeof(r->element[0])) {                            \
+> -            case 1:                                                     \
+> -                VARITHSAT_CASE(optype, op, cvt, element);               \
+> -                break;                                                  \
+> -            case 2:                                                     \
+> -                VARITHSAT_CASE(optype, op, cvt, element);               \
+> -                break;                                                  \
+> -            case 4:                                                     \
+> -                VARITHSAT_CASE(optype, op, cvt, element);               \
+> -                break;                                                  \
+> -            }                                                           \
+> +            VARITHSAT_CASE(optype, op, cvt, element);                   \
+>          }                                                               \
+>          if (sat) {                                                      \
+> -            set_vscr_sat(env);                                          \
+> +            vscr_sat->u32[0] =3D 1;                                     =
+  \
+>          }                                                               \
+>      }
+>  #define VARITHSAT_SIGNED(suffix, element, optype, cvt)          \
+> diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/v=
+mx-impl.inc.c
+> index 1c0c461241..c6a53a9f63 100644
+> --- a/target/ppc/translate/vmx-impl.inc.c
+> +++ b/target/ppc/translate/vmx-impl.inc.c
+> @@ -548,22 +548,55 @@ GEN_VXFORM(vslo, 6, 16);
+>  GEN_VXFORM(vsro, 6, 17);
+>  GEN_VXFORM(vaddcuw, 0, 6);
+>  GEN_VXFORM(vsubcuw, 0, 22);
+> -GEN_VXFORM_ENV(vaddubs, 0, 8);
+> +
+> +#define GEN_VXFORM_SAT(NAME, VECE, NORM, SAT, OPC2, OPC3)               \
+> +static void glue(glue(gen_, NAME), _vec)(unsigned vece, TCGv_vec t,     \
+> +                                         TCGv_vec sat, TCGv_vec a,      \
+> +                                         TCGv_vec b)                    \
+> +{                                                                       \
+> +    TCGv_vec x =3D tcg_temp_new_vec_matching(t);                        =
+  \
+> +    glue(glue(tcg_gen_, NORM), _vec)(VECE, x, a, b);                    \
+> +    glue(glue(tcg_gen_, SAT), _vec)(VECE, t, a, b);                     \
+> +    tcg_gen_cmp_vec(TCG_COND_NE, VECE, x, x, t);                        \
+> +    tcg_gen_or_vec(VECE, sat, sat, x);                                  \
+> +    tcg_temp_free_vec(x);                                               \
+> +}                                                                       \
+> +static void glue(gen_, NAME)(DisasContext *ctx)                         \
+> +{                                                                       \
+> +    static const GVecGen4 g =3D {                                       =
+  \
+> +        .fniv =3D glue(glue(gen_, NAME), _vec),                         =
+  \
+> +        .fno =3D glue(gen_helper_, NAME),                               =
+  \
+> +        .opc =3D glue(glue(INDEX_op_, NORM), _vec),                     =
+  \
+> +        .write_aofs =3D true,                                           =
+  \
+> +        .vece =3D VECE,                                                 =
+  \
+> +    };                                                                  \
+> +    if (unlikely(!ctx->altivec_enabled)) {                              \
+> +        gen_exception(ctx, POWERPC_EXCP_VPU);                           \
+> +        return;                                                         \
+> +    }                                                                   \
+> +    tcg_gen_gvec_4(avr64_offset(rD(ctx->opcode), true),                 \
+> +                   offsetof(CPUPPCState, vscr_sat),                     \
+> +                   avr64_offset(rA(ctx->opcode), true),                 \
+> +                   avr64_offset(rB(ctx->opcode), true),                 \
+> +                   16, 16, &g);                                         \
 > +}
 > +
-> +static int put_vscr(QEMUFile *f, void *opaque, size_t size,
-> +                    const VMStateField *field, QJSON *vmdesc)
-> +{
-> +    PowerPCCPU *cpu =3D opaque;
-> +    qemu_put_be32(f, helper_mfvscr(&cpu->env));
-> +    return 0;
-> +}
-> +
-> +static const VMStateInfo vmstate_vscr =3D {
-> +    .name =3D "cpu/altivec/vscr",
-> +    .get =3D get_vscr,
-> +    .put =3D put_vscr,
-> +};
-> +
->  static const VMStateDescription vmstate_altivec =3D {
->      .name =3D "cpu/altivec",
->      .version_id =3D 1,
-> @@ -436,7 +460,21 @@ static const VMStateDescription vmstate_altivec =3D {
->      .needed =3D altivec_needed,
->      .fields =3D (VMStateField[]) {
->          VMSTATE_AVR_ARRAY(env.vsr, PowerPCCPU, 32),
-> -        VMSTATE_UINT32(env.vscr, PowerPCCPU),
-> +        /*
-> +         * Save the architecture value of the vscr, not the internally
-> +         * expanded version.  Since this architecture value does not
-> +         * exist in memory to be stored, this requires a but of hoop
-> +         * jumping.  We want OFFSET=3D0 so that we effectively pass CPU
-> +         * to the helper functions.
-> +         */
-> +        {
-> +            .name =3D "vscr",
-> +            .version_id =3D 0,
-> +            .size =3D sizeof(uint32_t),
-> +            .info =3D &vmstate_vscr,
-> +            .flags =3D VMS_SINGLE,
-> +            .offset =3D 0
-> +        },
->          VMSTATE_END_OF_LIST()
->      },
->  };
+> +GEN_VXFORM_SAT(vaddubs, MO_8, add, usadd, 0, 8);
+>  GEN_VXFORM_DUAL_EXT(vaddubs, PPC_ALTIVEC, PPC_NONE, 0,       \
+>                      vmul10uq, PPC_NONE, PPC2_ISA300, 0x0000F800)
+> -GEN_VXFORM_ENV(vadduhs, 0, 9);
+> +GEN_VXFORM_SAT(vadduhs, MO_16, add, usadd, 0, 9);
+>  GEN_VXFORM_DUAL(vadduhs, PPC_ALTIVEC, PPC_NONE, \
+>                  vmul10euq, PPC_NONE, PPC2_ISA300)
+> -GEN_VXFORM_ENV(vadduws, 0, 10);
+> -GEN_VXFORM_ENV(vaddsbs, 0, 12);
+> -GEN_VXFORM_ENV(vaddshs, 0, 13);
+> -GEN_VXFORM_ENV(vaddsws, 0, 14);
+> -GEN_VXFORM_ENV(vsububs, 0, 24);
+> -GEN_VXFORM_ENV(vsubuhs, 0, 25);
+> -GEN_VXFORM_ENV(vsubuws, 0, 26);
+> -GEN_VXFORM_ENV(vsubsbs, 0, 28);
+> -GEN_VXFORM_ENV(vsubshs, 0, 29);
+> -GEN_VXFORM_ENV(vsubsws, 0, 30);
+> +GEN_VXFORM_SAT(vadduws, MO_32, add, usadd, 0, 10);
+> +GEN_VXFORM_SAT(vaddsbs, MO_8, add, ssadd, 0, 12);
+> +GEN_VXFORM_SAT(vaddshs, MO_16, add, ssadd, 0, 13);
+> +GEN_VXFORM_SAT(vaddsws, MO_32, add, ssadd, 0, 14);
+> +GEN_VXFORM_SAT(vsububs, MO_8, sub, ussub, 0, 24);
+> +GEN_VXFORM_SAT(vsubuhs, MO_16, sub, ussub, 0, 25);
+> +GEN_VXFORM_SAT(vsubuws, MO_32, sub, ussub, 0, 26);
+> +GEN_VXFORM_SAT(vsubsbs, MO_8, sub, sssub, 0, 28);
+> +GEN_VXFORM_SAT(vsubshs, MO_16, sub, sssub, 0, 29);
+> +GEN_VXFORM_SAT(vsubsws, MO_32, sub, sssub, 0, 30);
+>  GEN_VXFORM(vadduqm, 0, 4);
+>  GEN_VXFORM(vaddcuq, 0, 5);
+>  GEN_VXFORM3(vaddeuqm, 30, 0);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -137,24 +219,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---qrotSzihSRAsrOtf
+--fo/b2PYVqg2cQvBK
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwZ58wACgkQbDjKyiDZ
-s5IHfxAAp8MsvmgtJgp0DKG2EyJr21KqLKyWldd7ZYeYFQd5wZ6DfJTRSsW6pk/l
-8RTVyXVtK5idSZhtRyQzdQEgLir7oN5hYyNyPimD20kQ/S945F34FFS0SSq1McI9
-dRukqCvnnlhabehhGdd4An2b1NBiLAwf5B3G6NPIbv+cf12Cma/e4DEjFar68u5L
-ss5/421Ov6xNzAZ2RD03RIsM18i+tzNg9ukAXtcN/R3+PnCpuFBgEpIxiO7Vkixw
-QbWSHI20lITe/a7Adj9HAOcx698TlJ0JCIUQ8gQDHXYBaeMG+Dj9rsOy9UQqYmcn
-tUBytUinOe7Z/zFgON2bnBpjcsJxzVJycflSOF5csSziQ+d6qza1snopSMytawUV
-iPx3x/xAkFtzI436fmDy7TFNvJWs8VEKdPpA9kgfiAzooRP5U+hyXFXb0z+wRBJS
-WdUQPmxgbQRi6F/9c9b+J2HEEhX32jvPtZ+0WIm/P+7yIXIOxuRwoLKakMEcMnJV
-9eyKCrxbI2AhcCtl6ZOBE3Aysjm0vIfCI5FJTXPEsOcBSOllyAFE6rnfMWl1aXX0
-V18ZiWsdJ5s8eiYBI3kW8+n3K9r+59/4kBpzZaG/Y++3zeD7/1ZIZEZD19vr86L/
-GU1leCDbUFlXSKV3ubxWRSLqgM4vAA4jvx2iD6Fc4VjJuzypNtY=
-=auHh
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwZ6FwACgkQbDjKyiDZ
+s5LtBxAAykg39gK93WHx+PQhJnOyF7WnOAs9JrtxuuQVxSQz6kqFuyHSA4eiI0N+
+mK/AX+0qc0LhUoiNEJPRE382C8sX50IcDVtcS2vbYwhBFZhV9JOT3K1ok7B9WIhE
+YzYMAcdOmYB9jV7MAF9d7Kr7SH6u29HXJBY5oVd+r1IobXmpTdzlw+d6yjVDK1QZ
+7vVLnhHuXCmej8hkMsAJo+K9qvTKZQtBpwXvV1WlcI+129LfE/jRxFSKuzXquWyz
+zo/6r4+0mGP34Rgti/6UkLIUywKa+WKmpUzpbDrK5Iqk/d3vORXe8LwxskHaRNX8
+LSKd/i24q5QqBECP6re6yho1DWZPbgPRlzhB5EgPLMP/HdlLTf9kMM+XdJoYcMno
+oRur9SdCX+1dKoh9aMnq6b+kuIs0xyvvhonI9bmJMCT3H0/bqvVZyMmfjx1ihjcz
+eNogshd/btWjGL1SJ9B4RUkgCg6+c+NS/fB+OpR0AfHfsybaKVfrGyqykt23rSf7
+07ognbi5JjF+JflG80ZZMdoU6T5WCNN/Ht5MhyBUGXA8l0a24S/1LpEliOrMhG7D
+/KdoL2l4+qaDJjYPKJ1lYBVveQSnjwrr1UUsuVeXizjx2FaS+4pefzRJCn0AaSUs
+IYqSYOpUxkCS+iEM0ty2FxrIXaokCwsZbaNmfvbWA8euyDSRRUU=
+=4lWW
 -----END PGP SIGNATURE-----
 
---qrotSzihSRAsrOtf--
+--fo/b2PYVqg2cQvBK--
