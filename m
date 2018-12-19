@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben.hekster@foghorn.io>) id 1gZheS-00008x-EQ
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:37:07 -0500
+	(envelope-from <ben.hekster@foghorn.io>) id 1gZhjp-0004JS-Tr
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:42:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben.hekster@foghorn.io>) id 1gZheP-0003vh-5J
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:37:04 -0500
-Received: from mail-pf1-x42a.google.com ([2607:f8b0:4864:20::42a]:45873)
+	(envelope-from <ben.hekster@foghorn.io>) id 1gZhjm-0002Ix-9b
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:42:37 -0500
+Received: from mail-pf1-x42f.google.com ([2607:f8b0:4864:20::42f]:45889)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <ben.hekster@foghorn.io>)
-	id 1gZheL-0003rC-7e
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:36:58 -0500
-Received: by mail-pf1-x42a.google.com with SMTP id g62so10265038pfd.12
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 11:36:56 -0800 (PST)
+	id 1gZhjl-0002GR-T2
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:42:34 -0500
+Received: by mail-pf1-x42f.google.com with SMTP id g62so10271550pfd.12
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 11:42:33 -0800 (PST)
 From: Ben Hekster <ben.hekster@foghorn.io>
-Message-Id: <EC65CD28-C2F9-49D7-BDE1-9C3B5F68665E@foghorn.io>
+Message-Id: <47126B68-3AF7-48AB-B904-4D8EAC854BC7@foghorn.io>
 Mime-Version: 1.0 (Mac OS X Mail 12.1 \(3445.101.1\))
-Date: Wed, 19 Dec 2018 11:36:51 -0800
-In-Reply-To: <CAFEAcA9M73BdXs345vdqkuQE3sxT+GnS4PWZ2OPO8DWwNtRQ-A@mail.gmail.com>
+Date: Wed, 19 Dec 2018 11:42:30 -0800
+In-Reply-To: <EC65CD28-C2F9-49D7-BDE1-9C3B5F68665E@foghorn.io>
 References: <83206F6D-0BA5-4781-8635-84D48DD33A2A@foghorn.io>
 	<CAFEAcA-PJadBG0sE43N9wEx9Qm3Nxu2am_0Zy2Zqtz66C9SJ-w@mail.gmail.com>
 	<ECFBC025-CD7F-444B-BF7F-62E20954A85A@foghorn.io>
 	<CAFEAcA9M73BdXs345vdqkuQE3sxT+GnS4PWZ2OPO8DWwNtRQ-A@mail.gmail.com>
+	<EC65CD28-C2F9-49D7-BDE1-9C3B5F68665E@foghorn.io>
 Content-Type: text/plain;
 	charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
@@ -36,27 +37,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Checked out tag patchew/20181201123056.432-1-peter.maydell@linaro.org =
-from https://github.com/patchew-project/qemu and verified the crash no =
-longer occurs.  It does indeed appear that the crash previously happened =
-right around the time where I can now see the window being resized.
+Should have tested a little more:
 
-I've attached a screenshot here for you; not sure if this will make it =
-through to the mailing list...
+	While the crashing has stopped, the window isn't responsive to =
+keystrokes.  This includes the frame buffer emulation itself (so I can't =
+actually log in) as well as the QEMU Monitor; nothing I type has any =
+effect in either.
 
 Ben
 
-> On Dec 19, 2018, at 10:43, Peter Maydell <peter.maydell@linaro.org> =
-wrote:
+> On Dec 19, 2018, at 11:36, Ben Hekster <ben.hekster@foghorn.io> wrote:
 >=20
-> On Wed, 19 Dec 2018 at 17:46, Ben Hekster <ben.hekster@foghorn.io> =
-wrote:
->> probably a manifestation of =
-https://bugs.launchpad.net/qemu/+bug/1802684
+> Checked out tag patchew/20181201123056.432-1-peter.maydell@linaro.org =
+<mailto:patchew/20181201123056.432-1-peter.maydell@linaro.org> from =
+https://github.com/patchew-project/qemu =
+<https://github.com/patchew-project/qemu> and verified the crash no =
+longer occurs.  It does indeed appear that the crash previously happened =
+right around the time where I can now see the window being resized.
 >=20
-> Yep. If you could test the patchset at
-> http://patchew.org/QEMU/20181201123056.432-1-peter.maydell@linaro.org/
-> and confirm that it fixes the problem that would be great.
+> I've attached a screenshot here for you; not sure if this will make it =
+through to the mailing list...
 >=20
-> thanks
-> -- PMM
+> Ben
+>=20
+>> On Dec 19, 2018, at 10:43, Peter Maydell <peter.maydell@linaro.org =
+<mailto:peter.maydell@linaro.org>> wrote:
+>>=20
+>> On Wed, 19 Dec 2018 at 17:46, Ben Hekster <ben.hekster@foghorn.io =
+<mailto:ben.hekster@foghorn.io>> wrote:
+>>> probably a manifestation of =
+https://bugs.launchpad.net/qemu/+bug/1802684 =
+<https://bugs.launchpad.net/qemu/+bug/1802684>
+>> Yep. If you could test the patchset at
+>> =
+http://patchew.org/QEMU/20181201123056.432-1-peter.maydell@linaro.org/ =
+<http://patchew.org/QEMU/20181201123056.432-1-peter.maydell@linaro.org/>
+>> and confirm that it fixes the problem that would be great.
+>>=20
+>> thanks
+>> -- PMM
+>=20
+> <Screen Shot 2018-12-19 at 11.31.52.png>
