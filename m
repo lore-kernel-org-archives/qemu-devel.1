@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gZhKL-0000SR-Qw
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:16:20 -0500
+	(envelope-from <prvs=884a3e257=Alistair.Francis@wdc.com>)
+	id 1gZhKS-0000WY-LB
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:16:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gZhKH-0007kq-Ug
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:16:17 -0500
-Received: from 4.mo177.mail-out.ovh.net ([46.105.37.72]:59054)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gZhKF-0007Yj-VQ
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:16:12 -0500
-Received: from player699.ha.ovh.net (unknown [10.109.159.90])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id D5CC9D7ABC
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 20:16:02 +0100 (CET)
-References: <20181211223823.13770-1-clg@kaod.org>
-	<20181211223823.13770-12-clg@kaod.org>
-	<20181217060717.GI5597@umbus.fritz.box>
-	<dcfacfb6-8fec-04b0-4f2a-c20097511559@kaod.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <602c3aab-5eca-7011-966e-3a84df5ce4b3@kaod.org>
-Date: Wed, 19 Dec 2018 20:15:36 +0100
-MIME-Version: 1.0
-In-Reply-To: <dcfacfb6-8fec-04b0-4f2a-c20097511559@kaod.org>
-Content-Type: text/plain; charset=windows-1252
+	(envelope-from <prvs=884a3e257=Alistair.Francis@wdc.com>)
+	id 1gZhKP-0007uM-Ds
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:16:24 -0500
+From: Alistair Francis <Alistair.Francis@wdc.com>
+Date: Wed, 19 Dec 2018 19:16:13 +0000
+Message-ID: <cover.1545246859.git.alistair.francis@wdc.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 11/12] spapr: introduce a new sPAPR IRQ
- backend supporting XIVE and XICS
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: [Qemu-devel] [PATCH v2 00/23]  Add RISC-V TCG backend support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,39 +23,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>
 
-[ ... ]
+This patch set adds RISC-V backend support to QEMU. This is based on
+Michael Clark's original work with extra work on top.
 
->>> +static qemu_irq spapr_qirq_dual(sPAPRMachineState *spapr, int irq)
->>> +{
->>> +    return spapr_irq_current(spapr)->qirq(spapr, irq);
->>> +}
->>
->> This still makes me really nervous - I'd really prefer to have qirqs
->> independent of the backend, rather than relying on *every* irq using
->> device never looking up qirqs in advance.
-> 
-> I will take a look. This is a large rework I won't have time to address 
-> this year. I have removed the dual machine from v9.
-> 
-> You would move the qirq array at the machine level ?  
+This has been somewhat tested and can run other architecture softmmu
+code. It seems that any complex OS will eventually hang, but we can
+run the BIOS and OS startup code for a number of different operating
+systems.
 
-I took a look today and did a few changes : 
+I haven't tested linux user support at all yet. I think Michael had that
+working reliably though and hopefully my changes haven't broken it.
 
- - move the qirq array at the machine level
- - introduced a 'set_irq' method to sPAPR IRQ
- - adapted the 'qirq' method of sPAPR IRQ. We still need to perform some
-   checks and to handle the IRQ number offset.
+There are still some todos in the code (there are missing instructions
+and byte swapping) but these should assert instead of generating invalid
+code.
 
-It falls well in place, a part for the ICS source of the PnvPSI model 
-which does not have any qirq anymore. For PSI, I am thinking of moving 
-the qirq array under PnvPSI model, like I did for the machine. 
+This branch can be found here:
+https://github.com/alistair23/qemu/tree/mainline/alistair/tcg-backend-upstr=
+eam.next
 
-Would that be ok ?
+v2:
+ - define TCG_TARGET_HAS_MEMORY_BSWAP
+ - Fix new TCG MAINTAINERS entry
+ - Rebase ontop of Richard's patch_reloc() changes
+v1:
+ - Fix long jump with slowpath load/stores
+RFC v3:
+ - Update the MAINTAINERS file
+ - Enusre that RISC-V 32-bit works
+ - More changes based on Richard's feedback and contributions
+RFC v2:
+ - A large number of changes based on Richard's feedback
 
-I think there are a couple more possible cleanups on the different ICS 
-models to do if these changes are acceptable. 
+Alistair Francis (23):
+  elf.h: Add the RISCV ELF magic numbers
+  linux-user: Add host dependency for RISC-V 32-bit
+  linux-user: Add host dependency for RISC-V 64-bit
+  exec: Add RISC-V GCC poison macro
+  riscv: Add the tcg-target header file
+  riscv: Add the tcg target registers
+  riscv: tcg-target: Add support for the constraints
+  riscv: tcg-target: Add the immediate encoders
+  riscv: tcg-target: Add the instruction emitters
+  riscv: tcg-target: Add the relocation functions
+  riscv: tcg-target: Add the mov and movi instruction
+  riscv: tcg-target: Add the extract instructions
+  riscv: tcg-target: Add the out load and store instructions
+  riscv: tcg-target: Add the add2 and sub2 instructions
+  riscv: tcg-target: Add branch and jump instructions
+  riscv: tcg-target: Add slowpath load and store instructions
+  riscv: tcg-target: Add direct load and store instructions
+  riscv: tcg-target: Add the out op decoder
+  riscv: tcg-target: Add the prologue generation and register the JIT
+  riscv: tcg-target: Add the target init code
+  tcg: Add RISC-V cpu signal handler
+  dias: Add RISC-V support
+  configure: Add support for building RISC-V host
 
-C. 
+ MAINTAINERS                       |   12 +-
+ accel/tcg/user-exec.c             |   75 ++
+ configure                         |   12 +-
+ disas.c                           |   10 +-
+ include/elf.h                     |   55 +
+ include/exec/poison.h             |    1 +
+ linux-user/host/riscv32/hostdep.h |   11 +
+ linux-user/host/riscv64/hostdep.h |   11 +
+ tcg/riscv/tcg-target.h            |  177 +++
+ tcg/riscv/tcg-target.inc.c        | 1946 +++++++++++++++++++++++++++++
+ 10 files changed, 2305 insertions(+), 5 deletions(-)
+ create mode 100644 linux-user/host/riscv32/hostdep.h
+ create mode 100644 linux-user/host/riscv64/hostdep.h
+ create mode 100644 tcg/riscv/tcg-target.h
+ create mode 100644 tcg/riscv/tcg-target.inc.c
+
+--=20
+2.19.1
