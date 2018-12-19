@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZf9L-0001qh-7a
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 11:56:48 -0500
+	(envelope-from <r.bolshakov@yadro.com>) id 1gZfEV-0004Zz-0q
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 12:02:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZf9G-0006ly-96
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 11:56:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:3379)
+	(envelope-from <r.bolshakov@yadro.com>) id 1gZfEO-0001fG-Sa
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 12:02:06 -0500
+Received: from mta-01.yadro.com ([89.207.88.251]:47414)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZf9G-0006lT-3F
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 11:56:42 -0500
-Date: Wed, 19 Dec 2018 11:56:39 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181219115341-mutt-send-email-mst@kernel.org>
-References: <1544465415-207855-1-git-send-email-imammedo@redhat.com>
-	<20181219113611-mutt-send-email-mst@kernel.org>
-	<20181219164517.GN20465@redhat.com>
+	(Exim 4.71) (envelope-from <r.bolshakov@yadro.com>)
+	id 1gZfEM-0001ZE-MT
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 12:02:00 -0500
+Date: Wed, 19 Dec 2018 20:01:50 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+Message-ID: <20181219170150.m2tmhhg3tuyfrnvx@SPB-NB-133.local>
+References: <20181219091248.9641-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20181219164517.GN20465@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/9] tests: apci: consolidate and cleanup
- ACPI test code
+In-Reply-To: <20181219091248.9641-1-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] ui/cocoa: Include less of the generated
+ modular QAPI headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Samuel Ortiz <sameo@linux.intel.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-On Wed, Dec 19, 2018 at 04:45:17PM +0000, Daniel P. Berrang=E9 wrote:
-> On Wed, Dec 19, 2018 at 11:38:36AM -0500, Michael S. Tsirkin wrote:
-> > On Mon, Dec 10, 2018 at 07:10:06PM +0100, Igor Mammedov wrote:
-> > > While working on adding tests for virt/arm board (uefi/XSDT/64-bit =
-table pointers),
-> > > I found it's rather difficult to deal with mixed ACPI testing code =
-that we've
-> > > collected so far. So instead of just adding a pile of XSDT hacks on=
- top, here
-> > > goes small refactoring series:
-> > >    * that removes dead code
-> > >    * replaces reading tables with a fetch per table everywhere inst=
-ead of
-> > >      mix of field by field and whole table
-> > >    * consolidates the way tables are read (reduces code duplication=
-)
-> > >    * test no longer depends on ACPI structures from QEMU (i.e. does=
-n't affected
-> > >      by mistakes there)=20
-> > >    * fixiex FACS not beint compared against reference tables
-> > > Overall test is reduced on ~170LOC and hopefully it makes easier to=
- add more
-> > > stuff on top.
-> >=20
-> > So this was posted outside the merge window - do you still want
-> > it merged? If yes pls repost.
->=20
-> Huh, QEMU development does not have merge windows. Subsystem maintainer=
-s
-> should review patch series at any time & queue it if it is acceptable.
-> The freeze process only applies to maintainers sending pull requests fo=
-r
-> merge to git mater.  Contributors shouldn't be expected to resubmit
-> patches in this case.
->=20
-> Regards,
-> Daniel
+On Wed, Dec 19, 2018 at 10:12:48AM +0100, Markus Armbruster wrote:
+> Avoids pointless recompilation.  Missed in commit 112ed241f5d.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+> Untested; I don't have access to a Mac.
+> 
+>  ui/cocoa.m | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/ui/cocoa.m b/ui/cocoa.m
+> index ecf12bfc2e..43e751693c 100644
+> --- a/ui/cocoa.m
+> +++ b/ui/cocoa.m
+> @@ -32,7 +32,8 @@
+>  #include "ui/input.h"
+>  #include "sysemu/sysemu.h"
+>  #include "qapi/error.h"
+> -#include "qapi/qapi-commands.h"
+> +#include "qapi/qapi-commands-block-core.h"
+> +#include "qapi/qapi-commands-misc.h"
+>  #include "sysemu/blockdev.h"
+>  #include "qemu-version.h"
+>  #include <Carbon/Carbon.h>
+> -- 
+> 2.17.2
+> 
+> 
 
-Yea, I try to help drive-by contributors by tracking their patches even
-during the freeze. Merged some of these in the 1st pull req.  But Igor
-is a co-maintainer of the ACPI subsystem. Shouldn't be a problem.
+Hi Markus,
 
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
+You should change change qapi/qapi-commands-block-core.h to
+qapi/qapi-commands-block.h to avoid:
+
+ui/cocoa.m:1225:5: warning: implicit declaration of function 'qmp_eject' is invalid in C99 [-Wimplicit-function-declaration]
+    qmp_eject(true, [drive cStringUsingEncoding: NSASCIIStringEncoding],
+    ^
+ui/cocoa.m:1225:5: warning: this function declaration is not a prototype [-Wstrict-prototypes]
+
+Thanks,
+Roman
