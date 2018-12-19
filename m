@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gZcuy-00044w-TT
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 09:33:49 -0500
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gZd0i-00068Y-Ij
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 09:39:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gZcux-0007Az-54
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 09:33:48 -0500
-Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:43742)
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gZd0g-0005Bd-GW
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 09:39:44 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:36207)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gZcuw-0007AV-Ub
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 09:33:47 -0500
-Received: by mail-ot1-x335.google.com with SMTP id a11so19222576otr.10
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 06:33:46 -0800 (PST)
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1gZd0f-00057e-VM
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 09:39:42 -0500
+Received: by mail-ot1-x343.google.com with SMTP id k98so19305224otk.3
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 06:39:41 -0800 (PST)
 MIME-Version: 1.0
-References: <20181217231700.24482-1-pbonzini@redhat.com>
-In-Reply-To: <20181217231700.24482-1-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 19 Dec 2018 14:33:34 +0000
-Message-ID: <CAFEAcA-=jLUHhcUeBMQtOU-tA6nKaNoBkf2eYqC6CA2TkG+6ZA@mail.gmail.com>
+In-Reply-To: <20181210152829.29271-5-alex.bennee@linaro.org>
+References: <20181210152829.29271-1-alex.bennee@linaro.org>
+	<20181210152829.29271-5-alex.bennee@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Wed, 19 Dec 2018 15:39:39 +0100
+Message-ID: <CAL1e-=hfFv1TsG_viYi6-0z0qN8GnTP-70ZLMrDMmLVz9iBWQA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/35] Misc patches for 2018-12-18
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 04/13] tests/tcg/mips: enable
+ mips32-dsp/mips32-dspr2/mipsr5900 linux-user (WIP)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +31,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: shorne@gmail.com, amarkovic@wavecomp.com, qemu-devel@nongnu.org, aurelien@aurel32.net, edgar.iglesias@gmail.com, jcmvbkbc@gmail.com, michael@walle.cc, Stefan Markovic <smarkovic@wavecomp.com>
 
-On Mon, 17 Dec 2018 at 23:23, Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Dec 10, 2018 4:29 PM, "Alex Benn=C3=A9e" <alex.bennee@linaro.org> wrote:
 >
-> The following changes since commit 0f98c9945899c5dfacd5a410ff04178eda605a16:
+> Convert the existing tests to use our common cross build
+> infrastructure.
 >
->   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2018-12-12' into staging (2018-12-14 10:19:47 +0000)
+> [WIP: mips32r2 disabled to avoid name clash]
+> [WIP: mipsr5900 disabled due to clashing build flags]
 >
-> are available in the Git repository at:
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to cf7d97201d31cf14c7285e76ffb58bd518280184:
->
->   avoid TABs in files that only contain a few (2018-12-18 00:13:10 +0100)
->
-> I removed the vhost-user patches, which need a small linux-headers update
-> in order to fix the BSDs, and added TAB fixes and the script to convert
-> multiline comments into 4-line format.
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  tests/tcg/mips/Makefile.target       |  15 ++-
+>  tests/tcg/mips/mips32-dsp/Makefile   | 166 +++++----------------------
+>  tests/tcg/mips/mips32-dspr2/Makefile |  83 +++-----------
+>  tests/tcg/mips/mipsr5900/Makefile    |  40 +++----
+>  4 files changed, 75 insertions(+), 229 deletions(-)
 >
 
-Something seems to be wrong with the new test harness, eg
-for aarch32 builds I get:
+Alex,
 
-PASS 50 test-hmp /arm/hmp/vexpress-a15
-PASS 5 display-vga-test /x86_64/display/pci/virtio-gpu
-PASS 1 intel-hda-test /x86_64/intel-hda/ich6
-PASS 2 intel-hda-test /x86_64/intel-hda/ich9
-shm_open: Permission denied
-ERROR - missing test plan
-/home/peter.maydell/qemu/tests/Makefile.include:836: recipe for target
-'check-qtest-x86_64' failed
+How about reorganizing directories in tests/tcg/mips altogether, and make
+it less confusing, and easier for future developers to approach an work on?
 
-and OSX host prints
-  TEST    check-tests/test-io-channel-buffer
-  TEST    check-tests/test-base64
-  TEST    check-tests/test-crypto-pbkdf
-ERROR - missing test plan
+Let's say like this:
 
-PS: can the colorization be disabled? Grepping logfiles for
-ERROR, FAIL, etc doesn't work in the presence of colour
-escape sequences...
+tests/tcg/mips
+    user
+        isa
+            r5900
+        ase
+            dsp
+            dsp_r2
+    system
+        isa   =E3=80=8Afor now empty=E3=80=8B
+        ase
+            dsp
+            dsp_r2
 
-thanks
--- PMM
+Thanks,
+Aleksandar
