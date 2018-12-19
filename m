@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gZbNt-0005hg-5F
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:55:33 -0500
+	(envelope-from <pmorel@linux.ibm.com>) id 1gZbPZ-0006VE-CY
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:57:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gZbNp-0006H4-LB
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:55:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55900)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gZbNp-0006GO-F7
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:55:29 -0500
-Date: Wed, 19 Dec 2018 13:55:27 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181219125527.6vvjnmegmihso5ix@sirius.home.kraxel.org>
-References: <20180803173614.12358-1-marcandre.lureau@redhat.com>
-	<20180803173614.12358-11-marcandre.lureau@redhat.com>
-	<20180807101505.GF7335@redhat.com>
-	<CAJ+F1C+=aucconH7EZ8D2g_Wir2wEeq4GMobK+jNPZ8b0LbZKA@mail.gmail.com>
-	<20180807143055.pkx7l2ufb36lyq3b@sirius.home.kraxel.org>
-	<CAJ+F1CJtFJ_vk817tQsGEi3B+xC4bH3eGxA+tRPayyj3F0gnsw@mail.gmail.com>
-	<20181219071325.c7ayirk564s7kuhn@sirius.home.kraxel.org>
-	<CAJ+F1CKzb3DmmuQG5itgsUxvUwM34fh242FsgxKp1Aj-fksrBg@mail.gmail.com>
-	<20181219095442.oayncn5ufysvntet@sirius.home.kraxel.org>
-	<CAJ+F1CJ-jg9fSoE1Z3g3vQvXO8sz320YrBEs7sa_Dr+o-JQAYg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CJ-jg9fSoE1Z3g3vQvXO8sz320YrBEs7sa_Dr+o-JQAYg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 10/10] display: add -display app launching
- external application
+	(envelope-from <pmorel@linux.ibm.com>) id 1gZbPW-0007gW-4F
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:57:17 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50292
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+	id 1gZbPU-0007e7-55
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 07:57:12 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wBJCnYfn070763
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 07:57:10 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2pfmnkdgxf-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 07:57:10 -0500
+Received: from localhost
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+	Wed, 19 Dec 2018 12:57:09 -0000
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Wed, 19 Dec 2018 13:57:04 +0100
+Message-Id: <1545224225-24267-1-git-send-email-pmorel@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v5] s390x/pci: add common fmb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,32 +36,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: walling@linux.ibm.com
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, pasic@linux.ibm.com, thuth@redhat.com
 
-> > > > Everything needed, so launching remote-viewer is
-> > > > just "remote-viewer /path/to/config.vv".
-> > >
-> > > If it's just what is needed to launch the viewer, why not stick to the
-> > > url syntax?
-> >
-> > First, the info needed to launch is located on a fixed & well known
-> > place on disk then, so it is easy to restart remote-viewer.
-> 
-> It would also be a fixed URI, if we use the spice+unix:// syntax.
+After the last review round I corrected the commit message
+and use the sizeof of the target entries in the fmb_di_update()
+function.
 
-Ah, good.  Fine with me then.
+Regards,
+Pierre
 
-> > I think it is more useful to extend that instead of passing through
-> > options from the qemu command line to virt-viewer.
-> 
-> Hmm, although it limits what you can easily configure per instance as well..
+Yi Min Zhao (1):
+  s390x/pci: add common function measurement block
 
-We might decide on a case-by-vase basis, which make sense as
-per-instance and which not.  For example: Hotkeys is more a user
-preference and I don't think we need them be configurable per-vm.
-For fullscreen it is probably more useful to have that as vm-specific
-option.
+ hw/s390x/s390-pci-bus.c  |   4 +-
+ hw/s390x/s390-pci-bus.h  |  29 +++++++++++
+ hw/s390x/s390-pci-inst.c | 129 +++++++++++++++++++++++++++++++++++++++++++++--
+ hw/s390x/s390-pci-inst.h |   1 +
+ 4 files changed, 159 insertions(+), 4 deletions(-)
 
-cheers,
-  Gerd
+-- 
+2.7.4
+
+Changelog:
+
+from v4:
+- commit message
+- use sizeof target of the fmb_do_update
+
+from v3:
+- changed commit message according to Conny's comments
+
+In s390-pci-inst.c
+- simplify the fmb_do_update() to handle
+  all cases from byte to quad. (Conny)
+
+from v2:
+In s390-pci-bus:
+- Initialize the FMB Format.
+
+In s390-pci-bus.h
+- re-organization of the internal counters, having a table for the
+  internal counters.
+
+In s390-pci-inst.c
+- Internal counters update (LD/ST/STB/RPCIT) is done always.
+  even if the FMB if fmb_addr is NULL.
+  AFAIU this respect the documentation which only states that FMB
+  update is stopped.
+- in mpcifc_service_call(), moved the setting of fmb_addr after
+  the timer has been stopped.
+- fmb_update((), use address_space_stq_be() to handle endianness
+  when storing the FMB.
+- define the format with 32 bits instead of one char and reserved
+  chars, this is easier to handle the FMB copy.
+- No update of the DMA fields inside the FMB, as stipulated by the
+  documentation when format32 is 0.
