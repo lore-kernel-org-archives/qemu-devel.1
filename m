@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gZYab-0007KE-6u
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 04:56:30 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gZYba-0007ph-Lq
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 04:57:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gZYaX-0005Ik-NV
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 04:56:29 -0500
-Date: Wed, 19 Dec 2018 09:56:10 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181219095610.GB20465@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181218115615.1499-1-philmd@redhat.com>
-	<20181218115615.1499-11-philmd@redhat.com>
-	<20f62f62-f677-6d0f-09dc-3759cc813d8f@redhat.com>
-	<20181218152239.GB19442@habkost.net>
-	<94e8bd71-302e-bced-665d-78538ea3aba3@redhat.com>
-	<2ae5b6cd-7227-fab5-1bd1-4d3ebb88feee@redhat.com>
-	<20181218155731.GC19442@habkost.net>
-	<e5f62788-4b59-223c-c85e-562daf3a27d9@redhat.com>
-	<20181218191343.GE19442@habkost.net>
-	<99b7b806-b18a-8c59-b4f5-ff04ffe3da6e@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1gZYbZ-0006Ja-1w
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 04:57:30 -0500
+Date: Wed, 19 Dec 2018 10:57:00 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181219105700.35390f09@redhat.com>
+In-Reply-To: <CAP+75-XEQYC1XNcCy7-vaF3DOB=3HTUWmLz_XL+DZybxUDi1Mw@mail.gmail.com>
+References: <20181218175122.3229-1-philmd@redhat.com>
+	<20181218175122.3229-4-philmd@redhat.com>
+	<20181219101552.17b942bb@redhat.com>
+	<CAP+75-XEQYC1XNcCy7-vaF3DOB=3HTUWmLz_XL+DZybxUDi1Mw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <99b7b806-b18a-8c59-b4f5-ff04ffe3da6e@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 10/12] MAINTAINERS: Orphanize the 'CPU
- (QOM)' subsystem
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] hw/acpi: Use QEMU_NONSTRING for non
+ NUL-terminated arrays
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,96 +26,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <thuth@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>, Helge Deller <deller@gmx.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Luc Michel <luc.michel@greensocs.com>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, 1803872@bugs.launchpad.net, Thomas Huth <thuth@redhat.com>, Ben Pye <ben@curlybracket.co.uk>, qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>, Stefan Weil <sw@weilnetz.de>, Jeff Cody <jcody@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, Liu Yuan <namei.unix@gmail.com>, =?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau <marcandre.lureau@redhat.com>, Max Reitz <mreitz@redhat.com>, Howard Spoelstra <hsp.cat7@gmail.com>, "Dr. David Alan
+	Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On Tue, Dec 18, 2018 at 10:22:39PM +0100, Paolo Bonzini wrote:
-> On 18/12/18 20:13, Eduardo Habkost wrote:
-> > On Tue, Dec 18, 2018 at 06:15:06PM +0100, Paolo Bonzini wrote:
-> >> On 18/12/18 16:57, Eduardo Habkost wrote:
-> >>> On Tue, Dec 18, 2018 at 04:44:25PM +0100, Thomas Huth wrote:
-> >>>> On 2018-12-18 16:31, Philippe Mathieu-Daud=C3=A9 wrote:
-> >>>>> Hi Paolo, Eduardo,
-> >>>>>
-> >>>>> On 12/18/18 4:22 PM, Eduardo Habkost wrote:
-> >>>>>> On Tue, Dec 18, 2018 at 01:34:52PM +0100, Paolo Bonzini wrote:
-> >>>>>>> On 18/12/18 12:56, Philippe Mathieu-Daud=C3=A9 wrote:
-> >>>>>>>> Nobody is looking at those files, downgrade this subsystem as =
-orphan.
-> >>>>>>>>
-> >>>>>>>> Remove the qemu-devel@nongnu.org entry because the list is alw=
-ays
-> >>>>>>>> selected by the 'All patches CC here' section.
-> >>>>>>>>
-> >>>>>>>> Suggested-by: Markus Armbruster <armbru@redhat.com>
-> >>>>>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> >>>>>>>> ---
-> >>>>>>>>  MAINTAINERS | 3 +--
-> >>>>>>>>  1 file changed, 1 insertion(+), 2 deletions(-)
-> >>>>>>>>
-> >>>>>>>> diff --git a/MAINTAINERS b/MAINTAINERS
-> >>>>>>>> index e50f8c6b97..e6a73820f1 100644
-> >>>>>>>> --- a/MAINTAINERS
-> >>>>>>>> +++ b/MAINTAINERS
-> >>>>>>>> @@ -1745,8 +1745,7 @@ S: Supported
-> >>>>>>>>  F: scripts/coverity-model.c
-> >>>>>>>> =20
-> >>>>>>>>  CPU
-> >>>>>>>> -L: qemu-devel@nongnu.org
-> >>>>>>>> -S: Supported
-> >>>>>>>> +S: Orphan
-> >>>>>>>>  F: qom/cpu.c
-> >>>>>>>>  F: include/qom/cpu.h
-> >>>>>>>> =20
-> >>>>>>>>
-> >>>>>>>
-> >>>>>>> I don't think that's accurate.  Simply there's not much going o=
-n.  If
-> >>>>>>> patches are sent, get-maintainers's git fallback will do someth=
-ing
-> >>>>>>> (probably sending the patch to Eduardo, Igor or me).
-> >>>>>
-> >>>>> I followed Markus suggestion from
-> >>>>> https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05414.ht=
-ml:
-> >>>>>
-> >>>>>   If we take the definition of S: in MAINTAINERS seriously,
-> >>>>>   we need to appoint a maintainer (a person, not a mailing list),
-> >>>>>   or downgrade to S: Orphan.
-> >>>>
-> >>>> I agree with Markus and Philippe. Having "S: Supported" but no nam=
-es
-> >>>> available is just confusing. So either put a maintainer name in he=
-re, or
-> >>>> downgrade to "Orphan".
-> >>>
-> >>> I volunteer to maintain it, but I don't want to be the only
-> >>> maintainer.  Any other volunteer?
-> >>
-> >> I can volunteer since I'd take the patches anyway.  We can also mark=
- it
-> >> as Odd Fixes, and also make it a single thing with all of qom/ and
-> >> include/qom/.
-> >=20
-> > Actually, I consider qom/cpu.c distinct from QOM core, and I was
-> > planning to move it to hw/cpu, and add hw/cpu/core.c to the same
-> > section.
-> >=20
-> > Anyway, I guess this means you're also volunteering to be listed
-> > as QOM maintainer?
+On Wed, 19 Dec 2018 10:20:36 +0100
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+
+> Le mer. 19 d=C3=A9c. 2018 10:16, Igor Mammedov <imammedo@redhat.com> a =
+=C3=A9crit :
 >=20
-> Igor and Daniel, would you co-maintain or review it?
+> > On Tue, 18 Dec 2018 18:51:20 +0100
+> > Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+> > =20
+> > > GCC 8 added a -Wstringop-truncation warning:
+> > >
+> > >   The -Wstringop-truncation warning added in GCC 8.0 via r254630 for
+> > >   bug 81117 is specifically intended to highlight likely unintended
+> > >   uses of the strncpy function that truncate the terminating NUL
+> > >   character from the source string.
+> > >
+> > > This new warning leads to compilation failures:
+> > >
+> > >     CC      hw/acpi/core.o
+> > >   In function 'acpi_table_install', inlined from 'acpi_table_add' at =
+=20
+> > qemu/hw/acpi/core.c:296:5: =20
+> > >   qemu/hw/acpi/core.c:184:9: error: 'strncpy' specified bound 4 equal=
+s =20
+> > destination size [-Werror=3Dstringop-truncation] =20
+> > >            strncpy(ext_hdr->sig, hdrs->sig, sizeof ext_hdr->sig);
+> > >            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > >   make: *** [qemu/rules.mak:69: hw/acpi/core.o] Error 1
+> > >
+> > > Use the QEMU_NONSTRING attribute, since ACPI tables don't require the
+> > > strings to be NUL-terminated.
+> > >
+> > > Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+> > > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > > ---
+> > >  hw/acpi/core.c              | 8 ++++----
+> > >  include/hw/acpi/acpi-defs.h | 8 ++++----
+> > >  2 files changed, 8 insertions(+), 8 deletions(-)
+> > >
+> > > diff --git a/hw/acpi/core.c b/hw/acpi/core.c
+> > > index aafdc61648..f60f750c3d 100644
+> > > --- a/hw/acpi/core.c
+> > > +++ b/hw/acpi/core.c
+> > > @@ -35,14 +35,14 @@
+> > >  struct acpi_table_header {
+> > >      uint16_t _length;         /* our length, not actual part of the =
+hdr =20
+> > */ =20
+> > >                                /* allows easier parsing for fw_cfg =20
+> > clients */ =20
+> > > -    char sig[4];              /* ACPI signature (4 ASCII characters)=
+ */
+> > > +    char sig[4] QEMU_NONSTRING; /* ACPI signature (4 ASCII character=
+s) =20
+> > */ =20
+> > >      uint32_t length;          /* Length of table, in bytes, includin=
+g =20
+> > header */ =20
+> > >      uint8_t revision;         /* ACPI Specification minor version # =
+*/
+> > >      uint8_t checksum;         /* To make sum of entire table =3D=3D =
+0 */
+> > > -    char oem_id[6];           /* OEM identification */
+> > > -    char oem_table_id[8];     /* OEM table identification */
+> > > +    char oem_id[6] QEMU_NONSTRING; /* OEM identification */
+> > > +    char oem_table_id[8] QEMU_NONSTRING; /* OEM table identification=
+ */
+> > >      uint32_t oem_revision;    /* OEM revision number */
+> > > -    char asl_compiler_id[4];  /* ASL compiler vendor ID */
+> > > +    char asl_compiler_id[4] QEMU_NONSTRING; /* ASL compiler vendor I=
+D */
+> > >      uint32_t asl_compiler_revision; /* ASL compiler revision number =
+*/
+> > >  } QEMU_PACKED;
+> > >
+> > > diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> > > index af8e023968..3bf0bec8ba 100644
+> > > --- a/include/hw/acpi/acpi-defs.h
+> > > +++ b/include/hw/acpi/acpi-defs.h
+> > > @@ -43,7 +43,7 @@ enum {
+> > >  struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer=
+ */
+> > >      uint64_t signature;              /* ACPI signature, contains "RS=
+D =20
+> > PTR " */ =20
+> > >      uint8_t  checksum;               /* To make sum of struct =3D=3D=
+ 0 */
+> > > -    uint8_t  oem_id [6];             /* OEM identification */
+> > > +    uint8_t  oem_id [6] QEMU_NONSTRING; /* OEM identification */
+> > >      uint8_t  revision;               /* Must be 0 for 1.0, 2 for 2.0=
+ */
+> > >      uint32_t rsdt_physical_address;  /* 32-bit physical address of R=
+SDT =20
+> > */ =20
+> > >      uint32_t length;                 /* XSDT Length in bytes includi=
+ng =20
+> > hdr */
+> >
+> > you'll need to rebase this on top the latest Michael's pull request.
+> > [PULL v2 25/30] hw: arm: Carry RSDP specific data through  AcpiRsdpData
+> > [PULL v2 29/30] hw: acpi: Remove AcpiRsdpDescriptor and fix tests
+> > =20
+>=20
+> OK. Can I add your Ack-by then?
+pls note that new AcpiRsdpData has oem_id field that needs the same treatme=
+nt
 
-I'm fine being listed as a manitainer for qom/, agree with moving
-qom/cpu.c to hw/cpu, as I was going to suggest that myself :-)
+with rebase
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+>=20
+> > @@ -62,10 +62,10 @@ typedef struct AcpiRsdpDescriptor AcpiRsdpDescripto=
+r; =20
+> > >      uint32_t length;                 /* Length of table, in bytes, =
+=20
+> > including header */ \ =20
+> > >      uint8_t  revision;               /* ACPI Specification minor =20
+> > version # */ \ =20
+> > >      uint8_t  checksum;               /* To make sum of entire table =
+=3D=3D =20
+> > 0 */ \ =20
+> > > -    uint8_t  oem_id [6];             /* OEM identification */ \
+> > > -    uint8_t  oem_table_id [8];       /* OEM table identification */ \
+> > > +    uint8_t  oem_id [6] QEMU_NONSTRING; /* OEM identification */ \
+> > > +    uint8_t  oem_table_id [8] QEMU_NONSTRING; /* OEM table =20
+> > identification */ \ =20
+> > >      uint32_t oem_revision;           /* OEM revision number */ \
+> > > -    uint8_t  asl_compiler_id [4];    /* ASL compiler vendor ID */ \
+> > > +    uint8_t  asl_compiler_id [4] QEMU_NONSTRING; /* ASL compiler ven=
+dor =20
+> > ID */ \ =20
+> > >      uint32_t asl_compiler_revision;  /* ASL compiler revision number=
+ */
+> > >
+> > > =20
+> >
+> > =20
