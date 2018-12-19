@@ -1,35 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gZa0X-0005im-DZ
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 06:27:25 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gZa1D-0006cQ-3i
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 06:28:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gZZqu-0000fo-MQ
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 06:17:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35360)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gZZqs-0000a1-M0
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 06:17:23 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 856BE81DED
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 11:17:19 +0000 (UTC)
-Date: Wed, 19 Dec 2018 11:17:12 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181219111712.GI20465@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180222070513.8740-1-kraxel@redhat.com>
-	<20180222070513.8740-6-kraxel@redhat.com>
-	<20181218184532.GA18660@redhat.com>
-	<20181219075510.ci3yypwj3f2plcnv@sirius.home.kraxel.org>
-	<20181219094213.lqh244w35unsbejc@sirius.home.kraxel.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gZa19-0000SS-1H
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 06:28:03 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 19 Dec 2018 11:27:10 +0000
+Message-ID: <71a31ed2-b371-3b8f-d527-bf37b09e5443@virtuozzo.com>
+References: <20181219015230.18652-1-jsnow@redhat.com>
+	<20181219015230.18652-4-jsnow@redhat.com>
+	<0de4bd2b-c78f-f293-4d43-20c8bcd168c6@virtuozzo.com>
+In-Reply-To: <0de4bd2b-c78f-f293-4d43-20c8bcd168c6@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A7C5BE8BE3E9C543BF4379AC1FE77E76@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181219094213.lqh244w35unsbejc@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] keymap: consider modifier state
- when picking a mapping
+Subject: Re: [Qemu-devel] [PATCH v4 3/5] iotests: change qmp_log filters to
+ expect QMP objects only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,37 +27,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Adam Williamson <awilliam@redhat.com>
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Wed, Dec 19, 2018 at 10:42:14AM +0100, Gerd Hoffmann wrote:
->   Hi,
->  
-> > > This is quite horrible though. I'm more inclined
-> > > to revert this patch and find another way to fix the original problem
-> > > which won't require the UI frontends to track modifier state.
-> > 
-> > The UIs track modifier state anyway.
-> > 
-> > I fact I have some WIP patches to add a generic keyboard state tracker,
-> > so the UIs can use common code instead of having their own state
-> > tracking code each.  Also to make UI hotkeys configurable, consistent
-> > across all UIs we have.  Guess I should undust them, at least the state
-> > tracking part of it.
-> > 
-> > With that in place we can easily pass the full keyboard state to the
-> > keymap code.
-> 
-> Tried that:
->   https://git.kraxel.org/cgit/qemu/log/?h=sirius/kbd-state
-
-I've had a look & think that code makes sense & ought to be able to
-solve this problem.
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+MTkuMTIuMjAxOCAxNDowNywgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
+MTkuMTIuMjAxOCA0OjUyLCBKb2huIFNub3cgd3JvdGU6DQo+PiBsb2coKSB0cmVhdHMgZmlsdGVy
+cyBhcyBpZiB0aGV5IGNhbiBhbHdheXMgZmlsdGVyIGl0cyBwcmltYXJ5IGFyZ3VtZW50Lg0KPj4g
+cW1wX2xvZyB0cmVhdHMgZmlsdGVycyBhcyBpZiB0aGV5J3JlIGFsd2F5cyB0ZXh0Lg0KPj4NCj4+
+IENoYW5nZSBxbXBfbG9nIHRvIHRyZWF0IGZpbHRlcnMgYXMgaWYgdGhleSdyZSBhbHdheXMgcW1w
+IG9iamVjdCBmaWx0ZXJzLA0KPj4gdGhlbiBjaGFuZ2UgdGhlIGxvZ2dpbmcgY2FsbCB0byByZWx5
+IG9uIGxvZygpJ3MgYWJpbGl0eSB0byBzZXJpYWxpemUgUU1QDQo+PiBvYmplY3RzLCBzbyB3ZSdy
+ZSBub3QgZHVwbGljYXRpbmcgdGhhdCBlZmZvcnQuDQo+IA0KPiBBcyBJIHVuZGVyc3RhbmQsIHRo
+ZXJlIHN0aWxsIG5vIHVzZSBmb3IgcW1wLW9iamVjdCBiYXNlZCBmaWx0ZXJzIChldmVuIGFmdGVy
+IHRoZQ0KPiBzZXJpZXMpLCBkbyB3ZSByZWFsbHkgbmVlZCB0aGVtPyBJJ20gYWZyYWlkIGl0J3Mg
+cHJlbWF0dXJlIGNvbXBsaWNhdGlvbi4NCg0KYWhhLCBzb3JyeSwgbWlzc2VkIHRoYXQgeW91IHVz
+ZSBpdCBpbiAyMDYuDQpCdXQgc3RpbGwgbm90IHN1cmUgdGhhdCBpdCB3b3J0aCBpdC4gSXNuJ3Qg
+aXQgYmV0dGVyIHRvIGp1c3QgcmVtb3ZlIGZpZWxkcyBmcm9tIGRpY3QsDQp3aGljaCBhcmUgdW5w
+cmVkaWN0YWJsZSwgaW5zdGVhZCBvZiBzdWJzdGl0dXRpbmcgdGhlbS4uDQoNClRoZSBvdGhlciBp
+ZGVhIGhlcmU6IGlmIHdlIHdhbnQNCmF1dG9tYXRpY2FsbHkgbG9nZ2VkIHFtcCBjb21tYW5kcyAo
+cW1wX2xvZygpLCBhY3R1YWxseSksIGl0IHNob3VsZCBmaWx0ZXIgdW5wcmVkaWN0YWJsZQ0KdGhp
+bmdzIGZyb20gb3V0cHV0IGF1dG9tYXRpY2FsbHksIGp1c3QgYnkgY29tbWFuZCwgd2hpY2ggaXMg
+dGhlIGZpcnN0IGFyZ3VtZW50LiBDYWxsZXINCnNob3VsZCBub3QgY2FyZSBhYm91dCBpdCwgYXMg
+aXQgbWF5IGJlIGRlcml2ZWQgZnJvbSBjb21tYW5kLCBob3cgdG8gZmlsdGVyIGl0J3Mgb3V0cHV0
+Lg0KQW5kIHRoZW4sIHdlIGp1c3QgbmVlZCBhIGtpbmQgb2YgZGljdCBvZiBmdW5jdGlvbnMsIHdo
+aWNoIGRvIG5vdCBkbyBzb21ldGhpbmcgbGlrZSBnZW5lcmljDQpyZWN1cnNpb24sIGJ1dCBzcGVj
+aWZpY2FsbHkgcHJlcGFyZXMgY29tbW9uLXRlc3Qtb3V0cHV0IGZvciB0aGUgY29uY3JldGUgY29t
+bWFuZC4uLg0KDQo+IA0KPiBXaHkgbm90IHRvIGtlZXAgYWxsIGZpbHRlcnMgdGV4dCBiYXNlZD8g
+SWYgd2UgbmVlZCB0byBmaWx0ZXIgc29tZSBjb25jcmV0ZSBmaWVsZHMsDQo+IG5vdCB0aGUgd2hv
+bGUgdGhpbmcsIEkgZG91YnQgdGhhdCByZWN1cnNpb24gYW5kIGRlZmluaW5nIGZ1bmN0aW9ucyBp
+bnNpZGUNCj4gZnVuY3Rpb25zIGlzIGEgdHJ1ZSB3YXkgZm9yIGl0LiBJbnN0ZWFkIGluIGNvbmNy
+ZXRlIGNhc2UsIGxpa2UgaW4geW91IHRlc3QsIGl0J3MNCj4gYmV0dGVyIHRvIHNlbGVjdCBmaWVs
+ZHMgdGhhdCBzaG91bGQgYmUgaW4gb3V0cHV0LCBhbmQgb3V0cHV0IG9ubHkgdGhlbS4NCj4gDQo+
+Pg0KPj4gQmVjYXVzZSBrd2FyZ3MgaGF2ZSBiZWVuIHNvcnRlZCBhbHJlYWR5LCB0aGUgb3JkZXIg
+aXMgcHJlc2VydmVkLg0KPj4NCj4+IEVkaXQgdGhlIG9ubHkgY2FsbGVyIHdobyB1c2VzIGZpbHRl
+cnMgb24gcW1wX2xvZyB0byB1c2UgYSBxbXAgdmVyc2lvbiwNCj4+IGFsc28gYWRkZWQgaW4gdGhp
+cyBwYXRjaC4NCj4+IC0tLQ0KPj4gwqAgdGVzdHMvcWVtdS1pb3Rlc3RzLzIwNsKgwqDCoMKgwqDC
+oMKgIHzCoCA0ICsrLS0NCj4+IMKgIHRlc3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5IHwgMjQg
+KysrKysrKysrKysrKysrKysrKysrLS0tDQo+PiDCoCAyIGZpbGVzIGNoYW5nZWQsIDIzIGluc2Vy
+dGlvbnMoKyksIDUgZGVsZXRpb25zKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL3Rlc3RzL3FlbXUt
+aW90ZXN0cy8yMDYgYi90ZXN0cy9xZW11LWlvdGVzdHMvMjA2DQo+PiBpbmRleCBlOTI1NTBmYTU5
+Li41YmI3MzhiZjIzIDEwMDc1NQ0KPj4gLS0tIGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzIwNg0KPj4g
+KysrIGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzIwNg0KPj4gQEAgLTI3LDcgKzI3LDcgQEAgaW90ZXN0
+cy52ZXJpZnlfaW1hZ2VfZm9ybWF0KHN1cHBvcnRlZF9mbXRzPVsncWNvdzInXSkNCj4+IMKgIGRl
+ZiBibG9ja2Rldl9jcmVhdGUodm0sIG9wdGlvbnMpOg0KPj4gwqDCoMKgwqDCoCByZXN1bHQgPSB2
+bS5xbXBfbG9nKCdibG9ja2Rldi1jcmVhdGUnLA0KPj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZmlsdGVycz1baW90ZXN0cy5maWx0ZXJfdGVzdGZpbGVz
+XSwNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGZp
+bHRlcnM9W2lvdGVzdHMuZmlsdGVyX3FtcF90ZXN0ZmlsZXNdLA0KPj4gwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgam9iX2lkPSdqb2IwJywgb3B0aW9u
+cz1vcHRpb25zKQ0KPj4gwqDCoMKgwqDCoCBpZiAncmV0dXJuJyBpbiByZXN1bHQ6DQo+PiBAQCAt
+NTUsNyArNTUsNyBAQCB3aXRoIGlvdGVzdHMuRmlsZVBhdGgoJ3QucWNvdzInKSBhcyBkaXNrX3Bh
+dGgsIFwNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCAnc2l6ZSc6IDAgfSkNCj4+IMKgwqDCoMKgwqAgdm0ucW1wX2xvZygnYmxvY2tkZXYt
+YWRkJywNCj4+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGZpbHRlcnM9W2lvdGVzdHMu
+ZmlsdGVyX3Rlc3RmaWxlc10sDQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBmaWx0
+ZXJzPVtpb3Rlc3RzLmZpbHRlcl9xbXBfdGVzdGZpbGVzXSwNCj4+IMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgIGRyaXZlcj0nZmlsZScsIGZpbGVuYW1lPWRpc2tfcGF0aCwNCj4+IMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIG5vZGVfbmFtZT0naW1nZmlsZScpDQo+PiBk
+aWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHkgYi90ZXN0cy9xZW11LWlv
+dGVzdHMvaW90ZXN0cy5weQ0KPj4gaW5kZXggNTVmYjYwZTAzOS4uODEyMzAyNTM4ZCAxMDA2NDQN
+Cj4+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5DQo+PiArKysgYi90ZXN0cy9x
+ZW11LWlvdGVzdHMvaW90ZXN0cy5weQ0KPj4gQEAgLTI0NiwxMCArMjQ2LDI5IEBAIGRlZiBmaWx0
+ZXJfcW1wX2V2ZW50KGV2ZW50KToNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCBldmVudFsndGltZXN0
+YW1wJ11bJ21pY3Jvc2Vjb25kcyddID0gJ1VTRUNTJw0KPj4gwqDCoMKgwqDCoCByZXR1cm4gZXZl
+bnQNCj4+ICtkZWYgZmlsdGVyX3FtcChxbXNnLCBmaWx0ZXJfZm4pOg0KPj4gK8KgwqDCoCAnJydH
+aXZlbiBhIHN0cmluZyBmaWx0ZXIsIGZpbHRlciBhIFFNUCBvYmplY3QncyB2YWx1ZXMuDQo+PiAr
+wqDCoMKgIGZpbHRlcl9mbiB0YWtlcyBhIChrZXksIHZhbHVlKSBwYWlyLicnJw0KPj4gK8KgwqDC
+oCBmb3Iga2V5IGluIHFtc2c6DQo+PiArwqDCoMKgwqDCoMKgwqAgaWYgaXNpbnN0YW5jZShxbXNn
+W2tleV0sIGxpc3QpOg0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcW1zZ1trZXldID0gW2Zp
+bHRlcl9xbXAoYXRvbSwgZmlsdGVyX2ZuKSBmb3IgYXRvbSBpbiBxbXNnW2tleV1dDQo+PiArwqDC
+oMKgwqDCoMKgwqAgZWxpZiBpc2luc3RhbmNlKHFtc2dba2V5XSwgZGljdCk6DQo+PiArwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCBxbXNnW2tleV0gPSBmaWx0ZXJfcW1wKHFtc2dba2V5XSwgZmlsdGVy
+X2ZuKQ0KPj4gK8KgwqDCoMKgwqDCoMKgIGVsc2U6DQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCBxbXNnW2tleV0gPSBmaWx0ZXJfZm4oa2V5LCBxbXNnW2tleV0pDQo+PiArwqDCoMKgIHJldHVy
+biBxbXNnDQo+PiArDQo+PiDCoCBkZWYgZmlsdGVyX3Rlc3RmaWxlcyhtc2cpOg0KPj4gwqDCoMKg
+wqDCoCBwcmVmaXggPSBvcy5wYXRoLmpvaW4odGVzdF9kaXIsICIlcy0iICUgKG9zLmdldHBpZCgp
+KSkNCj4+IMKgwqDCoMKgwqAgcmV0dXJuIG1zZy5yZXBsYWNlKHByZWZpeCwgJ1RFU1RfRElSL1BJ
+RC0nKQ0KPj4gK2RlZiBmaWx0ZXJfcW1wX3Rlc3RmaWxlcyhxbXNnKToNCj4+ICvCoMKgwqAgZGVm
+IF9maWx0ZXIoa2V5LCB2YWx1ZSk6DQo+PiArwqDCoMKgwqDCoMKgwqAgaWYga2V5ID09ICdmaWxl
+bmFtZScgb3Iga2V5ID09ICdiYWNraW5nLWZpbGUnOg0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKg
+wqAgcmV0dXJuIGZpbHRlcl90ZXN0ZmlsZXModmFsdWUpDQo+PiArwqDCoMKgwqDCoMKgwqAgcmV0
+dXJuIHZhbHVlDQo+PiArwqDCoMKgIHJldHVybiBmaWx0ZXJfcW1wKHFtc2csIF9maWx0ZXIpDQo+
+PiArDQo+PiDCoCBkZWYgZmlsdGVyX2dlbmVyYXRlZF9ub2RlX2lkcyhtc2cpOg0KPj4gwqDCoMKg
+wqDCoCByZXR1cm4gcmUuc3ViKCIjYmxvY2tbMC05XSsiLCAiTk9ERV9OQU1FIiwgbXNnKQ0KPj4g
+QEAgLTQ2MiwxMCArNDgxLDkgQEAgY2xhc3MgVk0ocXRlc3QuUUVNVVF0ZXN0TWFjaGluZSk6DQo+
+PiDCoMKgwqDCoMKgIGRlZiBxbXBfbG9nKHNlbGYsIGNtZCwgZmlsdGVycz1bXSwgKiprd2FyZ3Mp
+Og0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgIGZ1bGxfY21kID0gT3JkZXJlZERpY3QoeyJleGVjdXRl
+IjogY21kLA0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgICJhcmd1bWVudHMiOiBvcmRlcmVkX2t3YXJncyhrd2FyZ3Mp
+fSkNCj4+IC3CoMKgwqDCoMKgwqDCoCBsb2dtc2cgPSBqc29uLmR1bXBzKGZ1bGxfY21kKQ0KPj4g
+LcKgwqDCoMKgwqDCoMKgIGxvZyhsb2dtc2csIGZpbHRlcnMpDQo+PiArwqDCoMKgwqDCoMKgwqAg
+bG9nKGZ1bGxfY21kLCBmaWx0ZXJzKQ0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgIHJlc3VsdCA9IHNl
+bGYucW1wKGNtZCwgKiprd2FyZ3MpDQo+PiAtwqDCoMKgwqDCoMKgwqAgbG9nKGpzb24uZHVtcHMo
+cmVzdWx0LCBzb3J0X2tleXM9VHJ1ZSksIGZpbHRlcnMpDQo+PiArwqDCoMKgwqDCoMKgwqAgbG9n
+KHJlc3VsdCwgZmlsdGVycykNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gcmVzdWx0DQo+
+PiDCoMKgwqDCoMKgIGRlZiBydW5fam9iKHNlbGYsIGpvYiwgYXV0b19maW5hbGl6ZT1UcnVlLCBh
+dXRvX2Rpc21pc3M9RmFsc2UpOg0KPj4NCj4gDQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0K
+VmxhZGltaXINCg==
