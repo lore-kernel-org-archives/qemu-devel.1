@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gZguJ-0008Pn-9y
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 13:49:24 -0500
+	(envelope-from <eblake@redhat.com>) id 1gZgvR-0000cS-Uc
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 13:50:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gZguI-0004Z8-DQ
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 13:49:23 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:34234)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gZguI-0004XU-4w
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 13:49:22 -0500
-Received: by mail-ot1-x343.google.com with SMTP id t5so20127880otk.1
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 10:49:19 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1gZgvQ-0005ZW-M5
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 13:50:33 -0500
+References: <20181219015230.18652-1-jsnow@redhat.com>
+	<20181219015230.18652-2-jsnow@redhat.com>
+	<fe80addc-0e37-a453-b9e1-5e78b559a093@virtuozzo.com>
+	<a1b2fca0-2bd1-01f6-6ff0-dfde78d4dfec@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <dd3979c0-2fd6-83a2-8b6f-7e3a2b828583@redhat.com>
+Date: Wed, 19 Dec 2018 12:50:14 -0600
 MIME-Version: 1.0
-References: <20181218142851.9477-1-laurent@vivier.eu>
-In-Reply-To: <20181218142851.9477-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 19 Dec 2018 18:49:07 +0000
-Message-ID: <CAFEAcA8tO=9xbauigHPy2Tv2JMHntHv+fF+vn+KXJN-HPaeTng@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/4] Trivial patches patches
+In-Reply-To: <a1b2fca0-2bd1-01f6-6ff0-dfde78d4dfec@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/5] iotests: add qmp recursive sorting
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +27,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Collin Walling <walling@linux.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, Qemu-block <qemu-block@nongnu.org>, David Hildenbrand <david@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Michael Roth <mdroth@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Tue, 18 Dec 2018 at 14:53, Laurent Vivier <laurent@vivier.eu> wrote:
->
-> The following changes since commit f163448536e5f7ae8905b14547eab37a41a75f6c:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20181216' into staging (2018-12-17 13:04:25 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/vivier/qemu.git tags/trivial-patches-pull-request
->
-> for you to fetch changes up to b2322003b6389c7c98104c8626ffa342928ba83c:
->
->   error: Remove NULL checks on error_propagate() calls (2018-12-18 14:57:48 +0100)
->
-> ----------------------------------------------------------------
-> Trivial patches (2018-12-18)
->
-> ----------------------------------------------------------------
+On 12/19/18 11:55 AM, John Snow wrote:
 
-Applied, thanks.
+>>> +def ordered_kwargs(kwargs):
+>>> +    # kwargs prior to 3.6 are not ordered, so:
+>>> +    od = OrderedDict()
+>>> +    for k in sorted(kwargs.keys()):
+>>
+>> you can use for k, v in sorted(kwargs.items()):
+>> and use then v instead of kwargs[k]
+>>
+> 
+> I don't need to sort the tuples, though, Only the keys -- which are not
+> duplicated. Is it really worth changing? ...
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+If I'm reading this correctly:
+https://www.pythoncentral.io/how-to-sort-python-dictionaries-by-key-or-value/
 
--- PMM
+sorting tuples with unique keys is the same as sorting by the keys, but 
+gives you the value (as part of the tuple) for free.  So the benefit is 
+that:
+
+> 
+>>> +        if isinstance(kwargs[k], dict):
+>>> +            od[k] = ordered_kwargs(kwargs[k])
+
+here, you'd write:
+
+if isinstance(v, dict):
+   od[k] = ordered_kwargs(v)
+
+instead of having to repeat the value lookup.
+
+> 
+> The motivation is that log() will log whatever you give it and apply
+> filters that work on that kind of object. Some callers need to filter
+> rich QMP objects and some callers need to filter text -- this is the way
+> log() behaves right now and I simply didn't change it.
+> 
+> What qmp_log currently does is convert both the outgoing and incoming
+> QMP objects to text, and then filters them as text. However, only
+> precisely one test (206) uses this functionality.
+> 
+> So... I need some way for test 206 to do what it does. One way is to
+> make a rich QMP filter, which is what I do later in this series under
+> the pretense that other tests will likely want to filter QMP output, too.
+> 
+> The other approach involves teaching qmp_log to accept two kinds of
+> filters (qmp and text) and then passing both along to log(), which will
+> then filter the object before pretty-printing and then apply the text
+> filters after pretty-printing, and then logging the result.
+> 
+> As it stands now, though, log() just applies all filters to the first
+> argument without the caller needing to disambiguate. If I teach log() to
+> use two types of filters, I need to go back through all of the iotests
+> and teach all callers to specify e.g. qfilters= or tfilters=.
+> 
+> I opted for an approach that let me just edit test 206 instead -- and
+> one that added a recursive QMP filter that might be useful in the future
+> for other purposes.
+
+The reasoning here makes sense to me.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
