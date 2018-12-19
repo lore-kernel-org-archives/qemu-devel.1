@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gZh2B-0003in-4U
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 13:57:31 -0500
+	(envelope-from <eblake@redhat.com>) id 1gZh6O-0004xR-0Z
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:01:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gZh2A-0002KG-5n
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 13:57:31 -0500
+	(envelope-from <eblake@redhat.com>) id 1gZh6N-0005kt-7z
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:01:51 -0500
 References: <20181219015230.18652-1-jsnow@redhat.com>
-	<20181219015230.18652-2-jsnow@redhat.com>
-	<b92a888e-1223-2966-ae83-b0f014171129@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <e7aca710-fb9b-9c32-a37d-8122a4c5d913@redhat.com>
-Date: Wed, 19 Dec 2018 13:57:20 -0500
+	<20181219015230.18652-4-jsnow@redhat.com>
+	<0de4bd2b-c78f-f293-4d43-20c8bcd168c6@virtuozzo.com>
+	<71a31ed2-b371-3b8f-d527-bf37b09e5443@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b3e9768f-cb40-5112-9174-1f352b2d97ed@redhat.com>
+Date: Wed, 19 Dec 2018 13:01:41 -0600
 MIME-Version: 1.0
-In-Reply-To: <b92a888e-1223-2966-ae83-b0f014171129@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <71a31ed2-b371-3b8f-d527-bf37b09e5443@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 1/5] iotests: add qmp recursive sorting
- function
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 3/5] iotests: change qmp_log filters to
+ expect QMP objects only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,72 +27,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
+On 12/19/18 5:27 AM, Vladimir Sementsov-Ogievskiy wrote:
 
+> But still not sure that it worth it. Isn't it better to just remove fields from dict,
+> which are unpredictable, instead of substituting them..
 
-On 12/19/18 1:52 PM, Eric Blake wrote:
-> On 12/18/18 7:52 PM, John Snow wrote:
->> Python before 3.6 does not sort kwargs by default.
->> If we want to print out pretty-printed QMP objects while
->> preserving the "exec" > "arguments" ordering, we need a custom sort.
->=20
-> Naive question - why do we need the sorting? Is it so that the output i=
-s
-> deterministic?=C2=A0 Surely it can't be because the ordering otherwise =
-makes
-> a difference to execution.
->=20
+For getting the test to pass when we have a key:unpredictable value in 
+the dict, you are right that both changing it to key:SUBST or removing 
+key work at producing reproducible output. But when it comes to 
+debugging test failure, having key:SUBST in the logs gives you a hint at 
+what else to look at, whereas omitting key altogether may make the 
+reason for the failure completely disappear from the logs.
 
-Yeah, it's because dicts are unordered and prior to 3.6 they may shuffle
-around arbitrarily based on internal hashes.
+Thus, I would argue that even though it is more complex to write a 
+filter that can recursively substitute, the resulting output is easier 
+to debug if a test starts failing - and that if the work in doing the 
+more complex filtering has already been submitted and is not too much of 
+a burden to maintain, then we might as well use it rather than going 
+with the simpler case of just eliding the problematic keys or using just 
+textual filtering.
 
-kwargs in particular are unordered- the order we send over the wire may
-or may not reflect the order the test author wrote in their iotest.
+However, I'm not in a good position to argue whether there is a 
+reasonable maintenance burden with the patches in this series, vs. what 
+it would take to rewrite 206 to do just textual filtering instead of QMP 
+dict substitution filtering.
 
-Therefore, it's a way to get consistent ordering.
-
-Now, we CAN just rely on sort_keys=3DTrue to be done with it, however,
-this puts arguments before execute, and it's less nice to read -- and
-I'd have to change a LOT of test output.
-
-This way keeps the order you expect to see while maintaining a strict
-order for the arguments. I think that's the nicest compromise until we
-can stipulate 3.6+ in the year 2034 where kwargs *are* strictly ordered.
-
-> Here's my review from a non-Python export viewpoint:
->=20
->>
->> We can accomplish this by sorting **kwargs into an OrderedDict,
->> which does preserve addition order.
->> ---
->> =C2=A0 tests/qemu-iotests/iotests.py | 21 +++++++++++++++++----
->> =C2=A0 1 file changed, 17 insertions(+), 4 deletions(-)
->>
->=20
->> @@ -448,8 +460,9 @@ class VM(qtest.QEMUQtestMachine):
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return result
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 def qmp_log(self, cmd, filters=3D=
-[filter_testfiles], **kwargs):
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 logmsg =3D '{"execute": "%=
-s", "arguments": %s}' % \
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (c=
-md, json.dumps(kwargs, sort_keys=3DTrue))
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 full_cmd =3D OrderedDict({=
-"execute": cmd,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "arguments": ordered_kwargs(kw=
-args)})
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 logmsg =3D json.dumps(full=
-_cmd)
->=20
-> Vladimir knows Python better than me, but once you fix this OrderedDict
-> construction up to actually work, the patch looks reasonable to me.
->=20
-
-Yeah, it only worked by accident of implementation details :(
-I've patched it up locally.
-
---js
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
