@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44891)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gZhJm-0000DX-RG
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:15:44 -0500
+	(envelope-from <clg@kaod.org>) id 1gZhKL-0000SR-Qw
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:16:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gZhJk-0007GY-KE
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:15:42 -0500
-Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:44088)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gZhJk-0007D8-28
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:15:40 -0500
-Received: by mail-ot1-x335.google.com with SMTP id f18so20093622otl.11
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 11:15:38 -0800 (PST)
+	(envelope-from <clg@kaod.org>) id 1gZhKH-0007kq-Ug
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:16:17 -0500
+Received: from 4.mo177.mail-out.ovh.net ([46.105.37.72]:59054)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gZhKF-0007Yj-VQ
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 14:16:12 -0500
+Received: from player699.ha.ovh.net (unknown [10.109.159.90])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id D5CC9D7ABC
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 20:16:02 +0100 (CET)
+References: <20181211223823.13770-1-clg@kaod.org>
+	<20181211223823.13770-12-clg@kaod.org>
+	<20181217060717.GI5597@umbus.fritz.box>
+	<dcfacfb6-8fec-04b0-4f2a-c20097511559@kaod.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <602c3aab-5eca-7011-966e-3a84df5ce4b3@kaod.org>
+Date: Wed, 19 Dec 2018 20:15:36 +0100
 MIME-Version: 1.0
-References: <20181218161008.3882-1-mst@redhat.com>
-In-Reply-To: <20181218161008.3882-1-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 19 Dec 2018 19:15:26 +0000
-Message-ID: <CAFEAcA-mzqQ+tt+43LVnruBj9Mgf2q7MaCgV5o2BPz3GJT+i+A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/30] pci, pc, virtio: fixes, features
+In-Reply-To: <dcfacfb6-8fec-04b0-4f2a-c20097511559@kaod.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 11/12] spapr: introduce a new sPAPR IRQ
+ backend supporting XIVE and XICS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +34,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On Tue, 18 Dec 2018 at 16:11, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> Changes from v1:
->     Drop
->         intel_iommu: turn on IR by default
->
-> The following changes since commit f163448536e5f7ae8905b14547eab37a41a75f6c:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20181216' into staging (2018-12-17 13:04:25 +0000)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->
-> for you to fetch changes up to d4ea2be7e8718ad6c1e5810bee6bdf5a0b8f31b8:
->
->   hw/i386: Remove deprecated machines pc-0.10 and pc-0.11 (2018-12-18 11:09:02 -0500)
->
-> ----------------------------------------------------------------
-> pci, pc, virtio: fixes, features
->
-> VTD fixes
-> ACPI refactoring
-> new names for virtio devices
-> multiple pcie link width/speeds
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+[ ... ]
 
-Hi; I'm afraid I get conflicts in some files which look
-too complicated for me to want to try to resolve at this end:
-Auto-merging tests/vmgenid-test.c
-CONFLICT (content): Merge conflict in tests/vmgenid-test.c
-Auto-merging tests/bios-tables-test.c
-CONFLICT (content): Merge conflict in tests/bios-tables-test.c
-Auto-merging tests/acpi-utils.h
-CONFLICT (content): Merge conflict in tests/acpi-utils.h
-Auto-merging tests/acpi-utils.c
-CONFLICT (content): Merge conflict in tests/acpi-utils.c
-Removing include/hw/smbios/ipmi.h
+>>> +static qemu_irq spapr_qirq_dual(sPAPRMachineState *spapr, int irq)
+>>> +{
+>>> +    return spapr_irq_current(spapr)->qirq(spapr, irq);
+>>> +}
+>>
+>> This still makes me really nervous - I'd really prefer to have qirqs
+>> independent of the backend, rather than relying on *every* irq using
+>> device never looking up qirqs in advance.
+> 
+> I will take a look. This is a large rework I won't have time to address 
+> this year. I have removed the dual machine from v9.
+> 
+> You would move the qirq array at the machine level ?  
 
-Please can you rebase and resend?
+I took a look today and did a few changes : 
 
-thanks
--- PMM
+ - move the qirq array at the machine level
+ - introduced a 'set_irq' method to sPAPR IRQ
+ - adapted the 'qirq' method of sPAPR IRQ. We still need to perform some
+   checks and to handle the IRQ number offset.
+
+It falls well in place, a part for the ICS source of the PnvPSI model 
+which does not have any qirq anymore. For PSI, I am thinking of moving 
+the qirq array under PnvPSI model, like I did for the machine. 
+
+Would that be ok ?
+
+I think there are a couple more possible cleanups on the different ICS 
+models to do if these changes are acceptable. 
+
+C. 
