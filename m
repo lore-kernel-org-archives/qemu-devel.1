@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ga0OM-0004qf-KW
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 10:37:43 -0500
+	(envelope-from <imammedo@redhat.com>) id 1ga0RZ-0006A3-0C
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 10:41:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ga0OI-0002Dm-0F
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 10:37:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45812)
+	(envelope-from <imammedo@redhat.com>) id 1ga0RS-0005j7-9G
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 10:41:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:3674)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ga0OF-00020v-RV
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 10:37:36 -0500
-Date: Thu, 20 Dec 2018 15:37:22 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181220153722.GV12930@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181122141741.11108-1-marcandre.lureau@redhat.com>
-	<CAL1e-=h_YXP8Y-narAHaoB5GU9s3U8ehEO+mqQUAbuqFjGp6Kw@mail.gmail.com>
-	<CAMxuvazCTcnV1bkmk3HCe1ufD9HSAQh_0=hkFAwXTkQqdcK6TQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ga0RR-0005hk-PW
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 10:40:54 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0515B138224
+	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 15:40:53 +0000 (UTC)
+Date: Thu, 20 Dec 2018 16:40:44 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181220164044.749ecf9d@Igors-MacBook-Pro.local>
+In-Reply-To: <20181212214850.29953-29-marcandre.lureau@redhat.com>
+References: <20181212214850.29953-1-marcandre.lureau@redhat.com>
+	<20181212214850.29953-29-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAMxuvazCTcnV1bkmk3HCe1ufD9HSAQh_0=hkFAwXTkQqdcK6TQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] docs: apply some qemu.org-like CSS style
- to HTML
+Subject: Re: [Qemu-devel] [PATCH v6 28/28] hostmem: use object id for memory
+ region name with >= 4.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,67 +34,264 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: aleksandar.m.mail@gmail.com, "Bonzini, Paolo" <pbonzini@redhat.com>, Stefan Weil <sw@weilnetz.de>, qemu-devel <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com
 
-On Thu, Dec 20, 2018 at 07:24:56PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Wed, Dec 19, 2018 at 7:17 PM Aleksandar Markovic
-> <aleksandar.m.mail@gmail.com> wrote:
-> >
-> >
-> > On Nov 22, 2018 3:18 PM, "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@r=
-edhat.com> wrote:
-> > >
-> > > Style a bit the HTML documents, to make them look like qemu.org pag=
-es.
-> > >
-> > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > > ---
-> > >  Makefile                     |   2 +
-> > >  docs/texinfo-extra-head.html |   7 ++
-> > >  docs/texinfo.css             | 226 +++++++++++++++++++++++++++++++=
-++++
-> > >  3 files changed, 235 insertions(+)
-> > >  create mode 100644 docs/texinfo-extra-head.html
-> > >  create mode 100644 docs/texinfo.css
-> > >
-> >
-> > Marc-Andr=C3=A9,
-> >
-> > I salute these effort, and also my eyes say thank you to you.
-> >
-> > I just have a suggestion that command line examples, like this one:
-> >
-> > qemu-system-i386 [options] [disk_image]
-> >
-> > have a little larger letters. (maybe it is just my system, I see them=
- as if their size is almost twice smaller than regular text size)
->=20
-> Easy, change
-> pre.verbatim {
-> font-size: smaller
-> }
->=20
-> to larger.
->=20
-> >
-> > Thanks again!
->=20
-> Note that there is an alternative proposal that looks more interesting
-> in "[qemu-web PATCH] Import historical documentation"
-> I don't know what's the status about it.
+On Thu, 13 Dec 2018 01:48:50 +0400
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
-Essentiall it is waiting for me to propose a v2 based on feedback
+> hostmem-file and hostmem-memfd use the whole object path for the
+> memory region name, and hostname-ram uses only the path component (the
+> object id, or canonical path basename):
+>=20
+> qemu -m 1024 -object memory-backend-file,id=3Dmem,size=3D1G,mem-path=3D/t=
+mp/foo -numa node,memdev=3Dmem -monitor stdio
+> (qemu) info ramblock
+>               Block Name    PSize              Offset               Used =
+             Total
+>             /objects/mem    4 KiB  0x0000000000000000 0x0000000040000000 =
+0x0000000040000000
+>=20
+> qemu -m 1024 -object memory-backend-memfd,id=3Dmem,size=3D1G -numa node,m=
+emdev=3Dmem -monitor stdio
+> (qemu) info ramblock
+>               Block Name    PSize              Offset               Used =
+             Total
+>             /objects/mem    4 KiB  0x0000000000000000 0x0000000040000000 =
+0x0000000040000000
+>=20
+> qemu -m 1024 -object memory-backend-ram,id=3Dmem,size=3D1G -numa node,mem=
+dev=3Dmem -monitor stdio
+> (qemu) info ramblock
+>               Block Name    PSize              Offset               Used =
+             Total
+>                      mem    4 KiB  0x0000000000000000 0x0000000040000000 =
+0x0000000040000000
+>=20
+> For consistency, change to use object id for -file and -memfd as well
+> with >=3D 4.0.
+>=20
+> Having a consistent naming allows to migrate to different hostmem
+> backends.
+
+With neat below fixed:
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  include/sysemu/hostmem.h |  3 ++-
+>  backends/hostmem-file.c  |  8 ++++----
+>  backends/hostmem-memfd.c |  2 +-
+>  backends/hostmem-ram.c   |  9 ++++-----
+>  backends/hostmem.c       | 36 ++++++++++++++++++++++++++++++++++++
+>  hw/core/machine.c        | 12 +++++++++++-
+>  6 files changed, 58 insertions(+), 12 deletions(-)
+>=20
+> diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
+> index 6e6bd2c1cb..a023b372a4 100644
+> --- a/include/sysemu/hostmem.h
+> +++ b/include/sysemu/hostmem.h
+> @@ -53,7 +53,7 @@ struct HostMemoryBackend {
+> =20
+>      /* protected */
+>      uint64_t size;
+> -    bool merge, dump;
+> +    bool merge, dump, use_canonical_path;
+>      bool prealloc, force_prealloc, is_mapped, share;
+>      DECLARE_BITMAP(host_nodes, MAX_NODES + 1);
+>      HostMemPolicy policy;
+> @@ -67,5 +67,6 @@ MemoryRegion *host_memory_backend_get_memory(HostMemory=
+Backend *backend);
+>  void host_memory_backend_set_mapped(HostMemoryBackend *backend, bool map=
+ped);
+>  bool host_memory_backend_is_mapped(HostMemoryBackend *backend);
+>  size_t host_memory_backend_pagesize(HostMemoryBackend *memdev);
+> +char *host_memory_backend_get_name(HostMemoryBackend *backend);
+> =20
+>  #endif
+> diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+> index 78f058dee2..7a34e25c43 100644
+> --- a/backends/hostmem-file.c
+> +++ b/backends/hostmem-file.c
+> @@ -43,7 +43,7 @@ file_backend_memory_alloc(HostMemoryBackend *backend, E=
+rror **errp)
+>  {
+>      HostMemoryBackendFile *fb =3D MEMORY_BACKEND_FILE(backend);
+>  #ifdef CONFIG_POSIX
+> -    gchar *path;
+> +    gchar *name;
+>  #endif
+> =20
+>      if (!backend->size) {
+> @@ -58,14 +58,14 @@ file_backend_memory_alloc(HostMemoryBackend *backend,=
+ Error **errp)
+>      error_setg(errp, "-mem-path not supported on this host");
+>  #else
+>      backend->force_prealloc =3D mem_prealloc;
+> -    path =3D object_get_canonical_path(OBJECT(backend));
+> +    name =3D host_memory_backend_get_name(backend);
+>      memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
+> -                                     path,
+> +                                     name,
+>                                       backend->size, fb->align,
+>                                       (backend->share ? RAM_SHARED : 0) |
+>                                       (fb->is_pmem ? RAM_PMEM : 0),
+>                                       fb->mem_path, errp);
+> -    g_free(path);
+> +    g_free(name);
+>  #endif
+>  }
+> =20
+> diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
+> index 2eb9c827a5..98c9bf3240 100644
+> --- a/backends/hostmem-memfd.c
+> +++ b/backends/hostmem-memfd.c
+> @@ -53,7 +53,7 @@ memfd_backend_memory_alloc(HostMemoryBackend *backend, =
+Error **errp)
+>          return;
+>      }
+> =20
+> -    name =3D object_get_canonical_path(OBJECT(backend));
+> +    name =3D host_memory_backend_get_name(backend);
+>      memory_region_init_ram_from_fd(&backend->mr, OBJECT(backend),
+>                                     name, backend->size,
+>                                     backend->share, fd, errp);
+> diff --git a/backends/hostmem-ram.c b/backends/hostmem-ram.c
+> index 7ddd08d370..24b65d9ae3 100644
+> --- a/backends/hostmem-ram.c
+> +++ b/backends/hostmem-ram.c
+> @@ -16,21 +16,20 @@
+> =20
+>  #define TYPE_MEMORY_BACKEND_RAM "memory-backend-ram"
+> =20
+> -
+>  static void
+>  ram_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+>  {
+> -    char *path;
+> +    char *name;
+> =20
+>      if (!backend->size) {
+>          error_setg(errp, "can't create backend with size 0");
+>          return;
+>      }
+> =20
+> -    path =3D object_get_canonical_path_component(OBJECT(backend));
+> -    memory_region_init_ram_shared_nomigrate(&backend->mr, OBJECT(backend=
+), path,
+> +    name =3D host_memory_backend_get_name(backend);
+> +    memory_region_init_ram_shared_nomigrate(&backend->mr, OBJECT(backend=
+), name,
+>                             backend->size, backend->share, errp);
+> -    g_free(path);
+> +    g_free(name);
+>  }
+> =20
+>  static void
+> diff --git a/backends/hostmem.c b/backends/hostmem.c
+> index af800284e0..ff67e39c83 100644
+> --- a/backends/hostmem.c
+> +++ b/backends/hostmem.c
+> @@ -28,6 +28,16 @@ QEMU_BUILD_BUG_ON(HOST_MEM_POLICY_BIND !=3D MPOL_BIND);
+>  QEMU_BUILD_BUG_ON(HOST_MEM_POLICY_INTERLEAVE !=3D MPOL_INTERLEAVE);
+>  #endif
+> =20
+> +char *
+> +host_memory_backend_get_name(HostMemoryBackend *self)
+
+for consistency s/self/backend/
 
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> +{
+> +    if (!self->use_canonical_path) {
+> +        return object_get_canonical_path_component(OBJECT(self));
+> +    }
+> +
+> +    return object_get_canonical_path(OBJECT(self));
+> +}
+> +
+>  static void
+>  host_memory_backend_get_size(Object *obj, Visitor *v, const char *name,
+>                               void *opaque, Error **errp)
+> @@ -247,6 +257,11 @@ static void host_memory_backend_init(Object *obj)
+>      backend->prealloc =3D mem_prealloc;
+>  }
+> =20
+> +static void host_memory_backend_post_init(Object *obj)
+> +{
+> +    object_apply_compat_props(obj);
+> +}
+> +
+>  bool host_memory_backend_mr_inited(HostMemoryBackend *backend)
+>  {
+>      /*
+> @@ -395,6 +410,23 @@ static void host_memory_backend_set_share(Object *o,=
+ bool value, Error **errp)
+>      backend->share =3D value;
+>  }
+> =20
+> +static bool
+> +host_memory_backend_get_use_canonical_path(Object *obj, Error **errp)
+> +{
+> +    HostMemoryBackend *self =3D MEMORY_BACKEND(obj);
+> +
+> +    return self->use_canonical_path;
+> +}
+> +
+> +static void
+> +host_memory_backend_set_use_canonical_path(Object *obj, bool value,
+> +                                           Error **errp)
+> +{
+> +    HostMemoryBackend *self =3D MEMORY_BACKEND(obj);
+> +
+> +    self->use_canonical_path =3D value;
+> +}
+> +
+>  static void
+>  host_memory_backend_class_init(ObjectClass *oc, void *data)
+>  {
+> @@ -441,6 +473,9 @@ host_memory_backend_class_init(ObjectClass *oc, void =
+*data)
+>          &error_abort);
+>      object_class_property_set_description(oc, "share",
+>          "Mark the memory as private to QEMU or shared", &error_abort);
+> +    object_class_property_add_bool(oc, "x-use-canonical-path-for-rambloc=
+k-id",
+> +        host_memory_backend_get_use_canonical_path,
+> +        host_memory_backend_set_use_canonical_path, &error_abort);
+>  }
+> =20
+>  static const TypeInfo host_memory_backend_info =3D {
+> @@ -451,6 +486,7 @@ static const TypeInfo host_memory_backend_info =3D {
+>      .class_init =3D host_memory_backend_class_init,
+>      .instance_size =3D sizeof(HostMemoryBackend),
+>      .instance_init =3D host_memory_backend_init,
+> +    .instance_post_init =3D host_memory_backend_post_init,
+>      .interfaces =3D (InterfaceInfo[]) {
+>          { TYPE_USER_CREATABLE },
+>          { }
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 7570408caa..cba79ef7ff 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -23,7 +23,17 @@
+>  #include "sysemu/qtest.h"
+>  #include "hw/pci/pci.h"
+> =20
+> -GlobalProperty hw_compat_3_1[] =3D {};
+> +GlobalProperty hw_compat_3_1[] =3D {
+> +    {
+> +        .driver   =3D "memory-backend-file",
+> +        .property =3D "x-use-canonical-path-for-ramblock-id",
+> +        .value    =3D "true",
+> +    },{
+> +        .driver   =3D "memory-backend-memfd",
+> +        .property =3D "x-use-canonical-path-for-ramblock-id",
+> +        .value    =3D "true",
+> +    },
+> +};
+>  const size_t hw_compat_3_1_len =3D G_N_ELEMENTS(hw_compat_3_1);
+> =20
+>  GlobalProperty hw_compat_3_0[] =3D {};
