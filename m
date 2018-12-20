@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ga4cX-00014d-NE
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 15:08:38 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ga4it-0003ku-Bp
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 15:15:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ga4cS-00041v-PN
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 15:08:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40226)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ga4cS-0003zW-DU
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 15:08:32 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EAAD7C06C9E4
-	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 20:08:29 +0000 (UTC)
-Date: Thu, 20 Dec 2018 18:08:25 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181220200825.GO19442@habkost.net>
-References: <20181212214850.29953-1-marcandre.lureau@redhat.com>
-	<20181212214850.29953-8-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20181212214850.29953-8-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 07/28] compat: replace PC_COMPAT_3_0 &
- HW_COMPAT_3_0 macros
+	(envelope-from <richard.henderson@linaro.org>) id 1ga4io-0001XE-DN
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 15:15:11 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:38443)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1ga4io-0001Tv-61
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 15:15:06 -0500
+Received: by mail-pl1-x644.google.com with SMTP id e5so1378306plb.5
+	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 12:15:05 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Thu, 20 Dec 2018 12:15:02 -0800
+Message-Id: <20181220201502.12285-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH] linux-user: Add safe_syscall for riscv64 host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,17 +24,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Alistair.Francis@wdc.com, laurent@vivier.eu, palmer@sifive.com
 
-On Thu, Dec 13, 2018 at 01:48:29AM +0400, Marc-Andr=E9 Lureau wrote:
-> Use static arrays instead.
->=20
-> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
 
-In case you need to respin the series: I suggest squashing
-patches 07-19 together.
+At some point we should make this routine be non-optional for
+porting to a new host.
 
---=20
-Eduardo
+
+r~
+
+---
+ linux-user/host/riscv64/hostdep.h          | 23 +++++++
+ linux-user/host/riscv64/safe-syscall.inc.S | 77 ++++++++++++++++++++++
+ 2 files changed, 100 insertions(+)
+ create mode 100644 linux-user/host/riscv64/safe-syscall.inc.S
+
+diff --git a/linux-user/host/riscv64/hostdep.h b/linux-user/host/riscv64/hostdep.h
+index 28467ba00b..865f0fb9ff 100644
+--- a/linux-user/host/riscv64/hostdep.h
++++ b/linux-user/host/riscv64/hostdep.h
+@@ -8,4 +8,27 @@
+ #ifndef RISCV64_HOSTDEP_H
+ #define RISCV64_HOSTDEP_H
+ 
++/* We have a safe-syscall.inc.S */
++#define HAVE_SAFE_SYSCALL
++
++#ifndef __ASSEMBLER__
++
++/* These are defined by the safe-syscall.inc.S file */
++extern char safe_syscall_start[];
++extern char safe_syscall_end[];
++
++/* Adjust the signal context to rewind out of safe-syscall if we're in it */
++static inline void rewind_if_in_safe_syscall(void *puc)
++{
++    ucontext_t *uc = puc;
++    unsigned long *pcreg = &uc->uc_mcontext.__gregs[REG_PC];
++
++    if (*pcreg > (uintptr_t)safe_syscall_start
++        && *pcreg < (uintptr_t)safe_syscall_end) {
++        *pcreg = (uintptr_t)safe_syscall_start;
++    }
++}
++
++#endif /* __ASSEMBLER__ */
++
+ #endif
+diff --git a/linux-user/host/riscv64/safe-syscall.inc.S b/linux-user/host/riscv64/safe-syscall.inc.S
+new file mode 100644
+index 0000000000..9ca3fbfd1e
+--- /dev/null
++++ b/linux-user/host/riscv64/safe-syscall.inc.S
+@@ -0,0 +1,77 @@
++/*
++ * safe-syscall.inc.S : host-specific assembly fragment
++ * to handle signals occurring at the same time as system calls.
++ * This is intended to be included by linux-user/safe-syscall.S
++ *
++ * Written by Richard Henderson <rth@twiddle.net>
++ * Copyright (C) 2018 Linaro, Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++	.global safe_syscall_base
++	.global safe_syscall_start
++	.global safe_syscall_end
++	.type	safe_syscall_base, @function
++	.type	safe_syscall_start, @function
++	.type	safe_syscall_end, @function
++
++	/*
++	 * This is the entry point for making a system call. The calling
++	 * convention here is that of a C varargs function with the
++	 * first argument an 'int *' to the signal_pending flag, the
++	 * second one the system call number (as a 'long'), and all further
++	 * arguments being syscall arguments (also 'long').
++	 * We return a long which is the syscall's return value, which
++	 * may be negative-errno on failure. Conversion to the
++	 * -1-and-errno-set convention is done by the calling wrapper.
++	 */
++safe_syscall_base:
++	.cfi_startproc
++	/*
++	 * The syscall calling convention is nearly the same as C:
++	 * we enter with a0 == *signal_pending
++	 *               a1 == syscall number
++	 *               a2 ... a7 == syscall arguments
++	 *               and return the result in a0
++	 * and the syscall instruction needs
++	 *               a7 == syscall number
++	 *               a0 ... a5 == syscall arguments
++	 *               and returns the result in a0
++	 * Shuffle everything around appropriately.
++	 */
++	mv	t0, a0		/* signal_pending pointer */
++	mv	t1, a1		/* syscall number */
++	mv	a0, a2		/* syscall arguments */
++	mv	a1, a3
++	mv	a2, a4
++	mv	a3, a5
++	mv	a4, a6
++	mv	a5, a7
++	mv	a7, t1
++
++	/*
++	 * This next sequence of code works in conjunction with the
++	 * rewind_if_safe_syscall_function(). If a signal is taken
++	 * and the interrupted PC is anywhere between 'safe_syscall_start'
++	 * and 'safe_syscall_end' then we rewind it to 'safe_syscall_start'.
++	 * The code sequence must therefore be able to cope with this, and
++	 * the syscall instruction must be the final one in the sequence.
++	 */
++safe_syscall_start:
++	/* If signal_pending is non-zero, don't do the call */
++	lw	t1, 0(t0)
++	bnez	t1, 0f
++	scall
++safe_syscall_end:
++	/* code path for having successfully executed the syscall */
++	ret
++
++0:
++	/* code path when we didn't execute the syscall */
++	li	a0, -TARGET_ERESTARTSYS
++	ret
++	.cfi_endproc
++
++	.size	safe_syscall_base, .-safe_syscall_base
+-- 
+2.17.2
