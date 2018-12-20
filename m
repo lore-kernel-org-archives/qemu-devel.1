@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gZzKr-0007CF-Fp
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:30:03 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gZzKv-000770-2j
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:30:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gZz87-0000rX-Gp
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:16:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43934)
+	(envelope-from <pbonzini@redhat.com>) id 1gZzGH-0008O3-Dz
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:25:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51712)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gZz87-0000r0-79
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:16:51 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gZzGG-0008MS-UP
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:25:17 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 834B0C0495B0
-	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 14:16:50 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 20 Dec 2018 18:15:48 +0400
-Message-Id: <20181220141553.24098-8-marcandre.lureau@redhat.com>
-In-Reply-To: <20181220141553.24098-1-marcandre.lureau@redhat.com>
-References: <20181220141553.24098-1-marcandre.lureau@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id A9C2789AE3
+	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 14:25:15 +0000 (UTC)
+References: <20181220121100.21554-1-pbonzini@redhat.com>
+	<490cbc41-0076-659a-9745-29881b9c95cc@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9685dcbe-7236-c03d-47e9-9b1eb30d9a3c@redhat.com>
+Date: Thu, 20 Dec 2018 15:25:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <490cbc41-0076-659a-9745-29881b9c95cc@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 07/12] char: move SpiceChardev and
- open_spice_port() to spice.h header
+Subject: Re: [Qemu-devel] [PATCH] target/i386: Disable MPX support on named
+ CPU models
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,104 +35,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, kraxel@redhat.com
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com
 
-This will allow easier subclassing of SpiceChardev, in upcoming
-"display: add -display app launching external application" patch.
+On 20/12/18 15:18, Wainer dos Santos Moschetta wrote:
+>=20
+> On 12/20/2018 10:11 AM, Paolo Bonzini wrote:
+>> MPX support is being phased out by Intel; GCC has dropped it, Linux
+>> is also going to do that.=C2=A0 Even though KVM will have special code
+>> to support MPX after the kernel proper stops enabling it in XCR0,
+>> we probably also want to deprecate that in a few years.=C2=A0 As a sta=
+rt,
+>> do not enable it by default for any named CPU model starting with
+>> the 4.0 machine types; this include Skylake, Icelake and Cascadelake.
+>>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>> =C2=A0 include/hw/i386/pc.h | 29 +++++++++++++++++++++++++++++
+>> =C2=A0 target/i386/cpu.c=C2=A0=C2=A0=C2=A0 | 14 +++++++-------
+>> =C2=A0 2 files changed, 36 insertions(+), 7 deletions(-)
+>=20
+> Side question: I didn't find on QEMU's user manual any reference to
+> deprecated features for CPU models. Does that information exists
+> somewhere? If not, should it be documented for the users?
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- include/chardev/spice.h | 27 +++++++++++++++++++++++++++
- chardev/spice.c         | 28 +++++-----------------------
- 2 files changed, 32 insertions(+), 23 deletions(-)
- create mode 100644 include/chardev/spice.h
+It's not deprecated yet, as it won't be removed until pc-*-3.1 is
+deprecated.  It may be deprecated together with pc-*-3.1, or maybe not
+since TCG does implement MPX.
 
-diff --git a/include/chardev/spice.h b/include/chardev/spice.h
-new file mode 100644
-index 0000000000..6431da3205
---- /dev/null
-+++ b/include/chardev/spice.h
-@@ -0,0 +1,27 @@
-+#ifndef CHARDEV_SPICE_H_
-+#define CHARDEV_SPICE_H_
-+
-+#include <spice.h>
-+#include "chardev/char-fe.h"
-+
-+typedef struct SpiceChardev {
-+    Chardev               parent;
-+
-+    SpiceCharDeviceInstance sin;
-+    bool                  active;
-+    bool                  blocked;
-+    const uint8_t         *datapos;
-+    int                   datalen;
-+    QLIST_ENTRY(SpiceChardev) next;
-+} SpiceChardev;
-+
-+#define TYPE_CHARDEV_SPICE "chardev-spice"
-+#define TYPE_CHARDEV_SPICEVMC "chardev-spicevmc"
-+#define TYPE_CHARDEV_SPICEPORT "chardev-spiceport"
-+
-+#define SPICE_CHARDEV(obj) OBJECT_CHECK(SpiceChardev, (obj), TYPE_CHARDE=
-V_SPICE)
-+
-+void qemu_chr_open_spice_port(Chardev *chr, ChardevBackend *backend,
-+                              bool *be_opened, Error **errp);
-+
-+#endif
-diff --git a/chardev/spice.c b/chardev/spice.c
-index c68e60115b..2202d50eee 100644
---- a/chardev/spice.c
-+++ b/chardev/spice.c
-@@ -2,30 +2,12 @@
- #include "trace.h"
- #include "ui/qemu-spice.h"
- #include "chardev/char.h"
-+#include "chardev/spice.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "qemu/option.h"
--#include <spice.h>
- #include <spice/protocol.h>
-=20
--
--typedef struct SpiceChardev {
--    Chardev               parent;
--
--    SpiceCharDeviceInstance sin;
--    bool                  active;
--    bool                  blocked;
--    const uint8_t         *datapos;
--    int                   datalen;
--    QLIST_ENTRY(SpiceChardev) next;
--} SpiceChardev;
--
--#define TYPE_CHARDEV_SPICE "chardev-spice"
--#define TYPE_CHARDEV_SPICEVMC "chardev-spicevmc"
--#define TYPE_CHARDEV_SPICEPORT "chardev-spiceport"
--
--#define SPICE_CHARDEV(obj) OBJECT_CHECK(SpiceChardev, (obj), TYPE_CHARDE=
-V_SPICE)
--
- typedef struct SpiceCharSource {
-     GSource               source;
-     SpiceChardev       *scd;
-@@ -315,10 +297,10 @@ static void qemu_chr_open_spice_vmc(Chardev *chr,
-     chr_open(chr, type);
- }
-=20
--static void qemu_chr_open_spice_port(Chardev *chr,
--                                     ChardevBackend *backend,
--                                     bool *be_opened,
--                                     Error **errp)
-+void qemu_chr_open_spice_port(Chardev *chr,
-+                              ChardevBackend *backend,
-+                              bool *be_opened,
-+                              Error **errp)
- {
-     ChardevSpicePort *spiceport =3D backend->u.spiceport.data;
-     const char *name =3D spiceport->fqdn;
---=20
-2.20.1.2.gb21ebb671b
+Paolo
