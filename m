@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gZxCB-00006A-58
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:12:55 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gZxCa-0000cS-6l
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:13:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gZxCA-0007ud-3Q
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:12:55 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 20 Dec 2018 12:12:42 +0000
-Message-ID: <36691b89-1f25-2c82-3009-e86fff587f6c@virtuozzo.com>
-References: <20181220022952.20493-1-jsnow@redhat.com>
-	<20181220022952.20493-12-jsnow@redhat.com>
-In-Reply-To: <20181220022952.20493-12-jsnow@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <95875724FF9DC749BC974E0D51149E71@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <ehabkost@redhat.com>) id 1gZxCX-0008P1-3C
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:13:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32966)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gZxCW-0008OW-Sb
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:13:17 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 30CD4DA337
+	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 12:13:16 +0000 (UTC)
+Date: Thu, 20 Dec 2018 10:13:08 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181220121308.GN19442@habkost.net>
+References: <20181220054037.24320-1-peterx@redhat.com>
+	<20181220054037.24320-2-peterx@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 11/11] iotests: add iotest 236 for
- testing bitmap merge
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181220054037.24320-2-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] q35: set split kernel irqchip as
+ default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,59 +34,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, Markus Armbruster <armbru@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-MjAuMTIuMjAxOCA1OjI5LCBKb2huIFNub3cgd3JvdGU6DQo+IE5ldyBpbnRlcmZhY2UsIG5ldyBz
-bW9rZSB0ZXN0Lg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSm9obiBTbm93IDxqc25vd0ByZWRoYXQu
-Y29tPg0KPiAtLS0NCg0KWy4uLl0NCg0KPiArICAgICMgQTogNyBjbHVzdGVycw0KPiArICAgICMg
-QjogNCBjbHVzdGVycw0KPiArICAgICMgQzogNiBjbHVzdGVycw0KPiArICAgIGxvZyhxdWVyeV9i
-aXRtYXBzKHZtKSwgaW5kZW50PTIpDQo+ICsNCj4gKyAgICBsb2coJ1xuLS0tIFN1Ym1pdHRpbmcg
-QmFkIE1lcmdlIC0tLVxuJykNCg0KYWhhLCBzcGVudCBzb21lIHRpbWUsIHRyeWluZyB0byB1bmRl
-cnN0YW5kLCB3aGF0IGlzIGJhZCB3aXRoIG1lcmdlLCB1bnRpbCB1bmRlcnN0YW5kIHRoYXQNCnRo
-YXQgaXMgYWJvcnQuIEkgZGlkbid0IHNsZWVwIGVub3VnaCBsYXN0IG5pZ2h0LCBidXQgYW55d2F5
-LCAnQWJvcnRpbmcgTWVyZ2UgVHJhbnNhY3Rpb24nDQppcyBhIGJpdCBjbGVhcmVyLCBJIHRoaW5r
-Lg0KDQo+ICsgICAgdm0ucW1wX2xvZygidHJhbnNhY3Rpb24iLCBpbmRlbnQ9MiwgYWN0aW9ucz1b
-DQo+ICsgICAgICAgIHsgInR5cGUiOiAiYmxvY2stZGlydHktYml0bWFwLWFkZCIsDQo+ICsgICAg
-ICAgICAgImRhdGEiOiB7ICJub2RlIjogImRyaXZlMCIsICJuYW1lIjogImJpdG1hcEQiLA0KPiAr
-ICAgICAgICAgICAgICAgICAgICAiZGlzYWJsZWQiOiBUcnVlLCAiZ3JhbnVsYXJpdHkiOiBncmFu
-dWxhcml0eSB9fSwNCj4gKyAgICAgICAgeyAidHlwZSI6ICJibG9jay1kaXJ0eS1iaXRtYXAtbWVy
-Z2UiLA0KPiArICAgICAgICAgICJkYXRhIjogeyAibm9kZSI6ICJkcml2ZTAiLCAidGFyZ2V0Ijog
-ImJpdG1hcEQiLA0KPiArICAgICAgICAgICAgICAgICAgICAiYml0bWFwcyI6IFsiYml0bWFwQiIs
-ICJiaXRtYXBDIl0gfX0sDQo+ICsgICAgICAgIHsgInR5cGUiOiAiYWJvcnQiLCAiZGF0YSI6IHt9
-fQ0KPiArICAgIF0pDQo+ICsgICAgbG9nKHF1ZXJ5X2JpdG1hcHModm0pLCBpbmRlbnQ9MikNCj4g
-Kw0KPiArICAgIGxvZygnXG4tLS0gQ3JlYXRpbmcgRCBhcyBhIG1lcmdlIG9mIEIgJiBDIC0tLVxu
-JykNCj4gKyAgICAjIEdvb2QgaHlnaWVuZTogY3JlYXRlIGEgZGlzYWJsZWQgYml0bWFwIGFzIGEg
-bWVyZ2UgdGFyZ2V0Lg0KPiArICAgIHZtLnFtcF9sb2coInRyYW5zYWN0aW9uIiwgaW5kZW50PTIs
-IGFjdGlvbnM9Ww0KPiArICAgICAgICB7ICJ0eXBlIjogImJsb2NrLWRpcnR5LWJpdG1hcC1hZGQi
-LA0KPiArICAgICAgICAgICJkYXRhIjogeyAibm9kZSI6ICJkcml2ZTAiLCAibmFtZSI6ICJiaXRt
-YXBEIiwNCj4gKyAgICAgICAgICAgICAgICAgICAgImRpc2FibGVkIjogVHJ1ZSwgImdyYW51bGFy
-aXR5IjogZ3JhbnVsYXJpdHkgfX0sDQo+ICsgICAgICAgIHsgInR5cGUiOiAiYmxvY2stZGlydHkt
-Yml0bWFwLW1lcmdlIiwNCj4gKyAgICAgICAgICAiZGF0YSI6IHsgIm5vZGUiOiAiZHJpdmUwIiwg
-InRhcmdldCI6ICJiaXRtYXBEIiwNCj4gKyAgICAgICAgICAgICAgICAgICAgImJpdG1hcHMiOiBb
-ImJpdG1hcEIiLCAiYml0bWFwQyJdIH19DQo+ICsgICAgXSkNCj4gKw0KPiArICAgICMgQSBhbmQg
-RCBzaG91bGQgbm93IGJvdGggaGF2ZSA3IGNsdXN0ZXJzIGFwaWVjZS4NCj4gKyAgICAjIEIgYW5k
-IEMgcmVtYWluIHVuY2hhbmdlZCB3aXRoIDQgYW5kIDYgcmVzcGVjdGl2ZWx5Lg0KPiArICAgIGxv
-ZyhxdWVyeV9iaXRtYXBzKHZtKSwgaW5kZW50PTIpDQo+ICsNCj4gKyAgICAjIEEgYW5kIEQgc2hv
-dWxkIGJlIGVxdWl2YWxlbnQuDQo+ICsgICAgIyBTb21lIGZvcm1hdHMgcm91bmQgdGhlIHNpemUg
-b2YgdGhlIGRpc2ssIHNvIGRvbid0IHByaW50IHRoZSBjaGVja3N1bXMuDQoNCkp1c3QgaW50ZXJl
-c3RlZDogcm91bmQgNjRNPyB0byB3aGF0Pw0KDQo+ICsgICAgY2hlY2tfYSA9IHZtLnFtcCgneC1k
-ZWJ1Zy1ibG9jay1kaXJ0eS1iaXRtYXAtc2hhMjU2JywNCj4gKyAgICAgICAgICAgICAgICAgICAg
-IG5vZGU9ImRyaXZlMCIsIG5hbWU9ImJpdG1hcEEiKVsncmV0dXJuJ11bJ3NoYTI1NiddDQo+ICsg
-ICAgY2hlY2tfYiA9IHZtLnFtcCgneC1kZWJ1Zy1ibG9jay1kaXJ0eS1iaXRtYXAtc2hhMjU2JywN
-Cj4gKyAgICAgICAgICAgICAgICAgICAgIG5vZGU9ImRyaXZlMCIsIG5hbWU9ImJpdG1hcEQiKVsn
-cmV0dXJuJ11bJ3NoYTI1NiddDQo+ICsgICAgYXNzZXJ0KGNoZWNrX2EgPT0gY2hlY2tfYikNCg0K
-aG1tLCBhIGZ1bm55IHN1Z2dlc3Rpb246IHMvY2hlY2tfYi9jaGVja19kLw0KDQo+ICsNCj4gKyAg
-ICBsb2coJ1xuLS0tIFJlbW92aW5nIGJpdG1hcHMgQSwgQiwgQywgYW5kIEQgLS0tXG4nKQ0KDQp3
-aGF0IGFib3V0IGZhaWxlZCB0cmFuc2FjdGlvbiB3aXRoIHJlbW92ZSBjb21tYW5kLCBmb3IgYSBm
-dWxsIGtpdD8NCg0KPiArICAgIHZtLnFtcF9sb2coImJsb2NrLWRpcnR5LWJpdG1hcC1yZW1vdmUi
-LCBub2RlPSJkcml2ZTAiLCBuYW1lPSJiaXRtYXBBIikNCj4gKyAgICB2bS5xbXBfbG9nKCJibG9j
-ay1kaXJ0eS1iaXRtYXAtcmVtb3ZlIiwgbm9kZT0iZHJpdmUwIiwgbmFtZT0iYml0bWFwQiIpDQo+
-ICsgICAgdm0ucW1wX2xvZygiYmxvY2stZGlydHktYml0bWFwLXJlbW92ZSIsIG5vZGU9ImRyaXZl
-MCIsIG5hbWU9ImJpdG1hcEMiKQ0KPiArICAgIHZtLnFtcF9sb2coImJsb2NrLWRpcnR5LWJpdG1h
-cC1yZW1vdmUiLCBub2RlPSJkcml2ZTAiLCBuYW1lPSJiaXRtYXBEIikNCj4gKw0KPiArICAgIGxv
-ZygnXG4tLS0gRmluYWwgUXVlcnkgLS0tXG4nKQ0KPiArICAgIGxvZyhxdWVyeV9iaXRtYXBzKHZt
-KSwgaW5kZW50PTIpDQo+ICsNCj4gKyAgICBsb2coJ1xuLS0tIERvbmUgLS0tXG4nKQ0KPiArICAg
-IHZtLnNodXRkb3duKCkNCg0KDQp3aXRoIG9yIHdpdGhvdXQgYW55IG9mIG15IHN1Z2dlc3Rpb25z
-Og0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZA
-dmlydHVvenpvLmNvbT4NCg0KDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On Thu, Dec 20, 2018 at 01:40:35PM +0800, Peter Xu wrote:
+> Starting from QEMU 4.0, let's specify "split" as the default value for
+> kernel-irqchip.
+> 
+> So for QEMU>=4.0 we'll have: allowed=Y,required=N,split=Y
+>    for QEMU<=3.1 we'll have: allowed=Y,required=N,split=N
+>    (omitting all the "kernel_irqchip_" prefix)
+> 
+> Note that this will let the default q35 machine type to depend on
+> Linux version 4.4 or newer because that's where split irqchip is
+> introduced in kernel.  But it's fine since we're boosting supported
+> Linux version for QEMU 4.0 to around Linux 4.5.  For more information
+> please refer to the discussion on AMD's RDTSCP:
+> 
+>   https://lore.kernel.org/lkml/20181210181328.GA762@zn.tnic/
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+
+-- 
+Eduardo
