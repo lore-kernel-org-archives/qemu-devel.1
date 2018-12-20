@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gZrUN-000309-1K
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 01:07:19 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gZtm0-0004W0-8V
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 03:33:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gZrUF-00008N-TD
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 01:07:17 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:44177)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gZrUF-00007z-53
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 01:07:11 -0500
-Received: by mail-pf1-x442.google.com with SMTP id u6so378939pfh.11
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 22:07:11 -0800 (PST)
-References: <cover.1545246859.git.alistair.francis@wdc.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <19f7305e-ae63-3a5b-87dd-e0cfd835462f@linaro.org>
-Date: Wed, 19 Dec 2018 22:07:07 -0800
-MIME-Version: 1.0
-In-Reply-To: <cover.1545246859.git.alistair.francis@wdc.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gZtlz-0001oS-E4
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 03:33:40 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 20 Dec 2018 08:33:30 +0000
+Message-ID: <9ac2eaa1-2556-7547-e09c-b3dafb5efb85@virtuozzo.com>
+References: <20181220022952.20493-1-jsnow@redhat.com>
+	<20181220022952.20493-3-jsnow@redhat.com>
+In-Reply-To: <20181220022952.20493-3-jsnow@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/23] Add RISC-V TCG backend support
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F334AF7CBC68F84390F17F509E93701A@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v5 02/11] block/dirty-bitmap: remove
+ assertion from restore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +26,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
-Cc: "alistair23@gmail.com" <alistair23@gmail.com>
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, Markus Armbruster <armbru@redhat.com>
 
-On 12/19/18 11:16 AM, Alistair Francis wrote:
-> This patch set adds RISC-V backend support to QEMU. This is based on
-> Michael Clark's original work with extra work on top.
-> 
-> This has been somewhat tested and can run other architecture softmmu
-> code. It seems that any complex OS will eventually hang, but we can
-> run the BIOS and OS startup code for a number of different operating
-> systems.
-> 
-> I haven't tested linux user support at all yet. I think Michael had that
-> working reliably though and hopefully my changes haven't broken it.
-> 
-> There are still some todos in the code (there are missing instructions
-> and byte swapping) but these should assert instead of generating invalid
-> code.
-
-Queued to tcg-next, with the extrh fix.
-
-Some of those todos are no longer todos, since e.g. bswap is now optional.
-Those asserts should never fire (as a good assert should do, I suppose).
-
-The missing instructions are only for riscv32, which afaik is just now making
-its way to glibc.  So a chroot complete enough to build qemu is a ways away.
-I'm ok with leaving that incomplete for now.
-
-
-r~
+MjAuMTIuMjAxOCA1OjI5LCBKb2huIFNub3cgd3JvdGU6DQo+IFdoZW4gbWFraW5nIGEgYmFja3Vw
+IG9mIGEgZGlydHkgYml0bWFwIChmb3IgdHJhbnNhY3Rpb25zKSwgd2Ugd2FudCB0bw0KPiByZXN0
+b3JlIHRoYXQgYmFja3VwIHdoZXRoZXIgb3Igbm90IHRoZSBiaXRtYXAgaXMgZW5hYmxlZCBvciBu
+b3QuDQo+IA0KPiBJdCBpcyBwZXJmZWN0bHkgdmFsaWQgdG8gd3JpdGUgaW50byBiaXRtYXBzIHRo
+YXQgYXJlIGRpc2FibGVkLiBJdCBpcw0KPiBvbmx5IGlsbGVnaXRpbWF0ZSBmb3IgdGhlIGd1ZXN0
+IHRvIGhhdmUgZG9uZSBzby4NCj4gDQo+IFJlbW92ZSB0aGlzIGFzc2VydGlvbi4NCj4gDQo+IFNp
+Z25lZC1vZmYtYnk6IEpvaG4gU25vdyA8anNub3dAcmVkaGF0LmNvbT4NCg0KUmV2aWV3ZWQtYnk6
+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4N
+Cg0KPiAtLS0NCj4gICBibG9jay9kaXJ0eS1iaXRtYXAuYyB8IDEgLQ0KPiAgIDEgZmlsZSBjaGFu
+Z2VkLCAxIGRlbGV0aW9uKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvYmxvY2svZGlydHktYml0bWFw
+LmMgYi9ibG9jay9kaXJ0eS1iaXRtYXAuYw0KPiBpbmRleCA4OWZkMWQ3ZjhiLi42YjY4ODM5NGU0
+IDEwMDY0NA0KPiAtLS0gYS9ibG9jay9kaXJ0eS1iaXRtYXAuYw0KPiArKysgYi9ibG9jay9kaXJ0
+eS1iaXRtYXAuYw0KPiBAQCAtNjI1LDcgKzYyNSw2IEBAIHZvaWQgYmRydl9jbGVhcl9kaXJ0eV9i
+aXRtYXAoQmRydkRpcnR5Qml0bWFwICpiaXRtYXAsIEhCaXRtYXAgKipvdXQpDQo+ICAgdm9pZCBi
+ZHJ2X3Jlc3RvcmVfZGlydHlfYml0bWFwKEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwLCBIQml0bWFw
+ICpiYWNrdXApDQo+ICAgew0KPiAgICAgICBIQml0bWFwICp0bXAgPSBiaXRtYXAtPmJpdG1hcDsN
+Cj4gLSAgICBhc3NlcnQoYmRydl9kaXJ0eV9iaXRtYXBfZW5hYmxlZChiaXRtYXApKTsNCj4gICAg
+ICAgYXNzZXJ0KCFiZHJ2X2RpcnR5X2JpdG1hcF9yZWFkb25seShiaXRtYXApKTsNCj4gICAgICAg
+Yml0bWFwLT5iaXRtYXAgPSBiYWNrdXA7DQo+ICAgICAgIGhiaXRtYXBfZnJlZSh0bXApOw0KPiAN
+Cg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
