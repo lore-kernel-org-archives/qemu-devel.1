@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gZz5j-0004R3-8k
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:14:25 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gZzKj-000779-T8
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:29:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gZz5g-0006ko-3i
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:14:23 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 20 Dec 2018 14:13:54 +0000
-Message-ID: <c722731a-fad4-c5c8-a588-19dd2dde1e89@virtuozzo.com>
-References: <20181215135324.152629-1-eblake@redhat.com>
-	<20181215135324.152629-13-eblake@redhat.com>
-	<20181215151929.GY27120@redhat.com>
-	<39d9eca0-239c-d145-9bb5-fda68ac40bdc@redhat.com>
-In-Reply-To: <39d9eca0-239c-d145-9bb5-fda68ac40bdc@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A03EE0409CF21847B53432EC487E5BE4@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <sgarzare@redhat.com>) id 1gZzIr-0002LX-BH
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:28:02 -0500
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:43360)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gZzIr-0002Ko-6F
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:27:57 -0500
+Received: by mail-ot1-f65.google.com with SMTP id a11so2047115otr.10
+	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 06:27:56 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 12/22] nbd/client: Improve error
- handling in nbd_negotiate_simple_meta_context()
+References: <20181213210057.3676-1-quintela@redhat.com>
+	<20181213210057.3676-6-quintela@redhat.com>
+In-Reply-To: <20181213210057.3676-6-quintela@redhat.com>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Thu, 20 Dec 2018 15:27:44 +0100
+Message-ID: <CAGxU2F7KA=sW21_vqp0WY0cJMVSGX7FsrQ8v_k2iP=pmV3gPsg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 05/16] virtio: split virtio balloon bits
+ from virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +29,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-MTcuMTIuMjAxOCAxODozMCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMTIvMTUvMTggOToxOSBB
-TSwgUmljaGFyZCBXLk0uIEpvbmVzIHdyb3RlOg0KPj4gT24gU2F0LCBEZWMgMTUsIDIwMTggYXQg
-MDc6NTM6MTRBTSAtMDYwMCwgRXJpYyBCbGFrZSB3cm90ZToNCj4+PiBBbHdheXMgYWxsb2NhdGUg
-c3BhY2UgZm9yIHRoZSByZXBseSByZXR1cm5lZCBieSB0aGUgc2VydmVyIGFuZA0KPj4+IGhvaXN0
-IHRoZSB0cmFjZSBlYXJsaWVyLCBhcyBpdCBpcyBtb3JlIGludGVyZXN0aW5nIHRvIHRyYWNlIHRo
-ZQ0KPj4+IHNlcnZlcidzIHJlcGx5IChldmVuIGlmIGl0IGlzIHVuZXhwZWN0ZWQpIHRoYW4gcGFy
-cm90aW5nIG91cg0KPj4+IHJlcXVlc3Qgb25seSBvbiBzdWNjZXNzLsKgIEFmdGVyIGFsbCwgc2tp
-cHBpbmcgdGhlIGFsbG9jYXRpb24NCj4+PiBmb3IgYSB3cm9uZyBzaXplIHdhcyBtZXJlbHkgYSBt
-aWNyby1vcHRpbWl6YXRpb24gdGhhdCBvbmx5DQo+Pj4gYmVuZWZpdHRlZCBhIGJyb2tlbiBzZXJ2
-ZXIsIHJhdGhlciB0aGFuIHRoZSBjb21tb24gY2FzZSBvZiBhDQo+Pj4gY29tcGxpYW50IHNlcnZl
-ciB0aGF0IG1lZXRzIG91ciBleHBlY3RhdGlvbnMuDQo+Pj4NCj4+PiBUaGVuIHR1cm4gdGhlIHJl
-cGx5IGhhbmRsaW5nIGludG8gYSBsb29wIChldmVuIHRob3VnaCB3ZSBzdGlsbA0KPj4+IG5ldmVy
-IGl0ZXJhdGUgbW9yZSB0aGFuIG9uY2UpLCB0byBtYWtlIHRoaXMgY29kZSBlYXNpZXIgdG8gdXNl
-DQo+Pj4gd2hlbiBsYXRlciBwYXRjaGVzIGRvIHN1cHBvcnQgbXVsdGlwbGUgc2VydmVyIHJlcGxp
-ZXMuwqAgVGhpcw0KPj4+IGNoYW5nZXMgdGhlIGVycm9yIG1lc3NhZ2UgZm9yIGEgc2VydmVyIHdp
-dGggdHdvIHJlcGxpZXMgKGENCj4+PiBjb3JuZXIgY2FzZSB3ZSBhcmUgdW5saWtlbHkgdG8gaGl0
-IGluIHByYWN0aWNlKSBmcm9tOg0KPj4+DQo+Pj4gVW5leHBlY3RlZCByZXBseSB0eXBlIDQgKG1l
-dGEgY29udGV4dCksIGV4cGVjdGVkIDAgKGFjaykNCj4+Pg0KPj4+IHRvOg0KPj4+DQo+Pj4gU2Vy
-dmVyIHJlcGxpZWQgd2l0aCBtb3JlIHRoYW4gb25lIGNvbnRleHQNCj4+Pg0KPj4+IFNpZ25lZC1v
-ZmYtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPg0KPj4+DQo+Pj4gLS0tDQo+Pj4g
-djI6IHNwbGl0IHBhdGNoIGludG8gZWFzaWVyLXRvLXJldmlldyBwaWVjZXMgW1JpY2gsIFZsYWRp
-bWlyXQ0KPj4+IC0tLQ0KPj4+IMKgIG5iZC9jbGllbnQuYyB8IDE2ICsrKysrKysrKysrKy0tLS0N
-Cj4+PiDCoCAxIGZpbGUgY2hhbmdlZCwgMTIgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkN
-Cj4+Pg0KPj4+IGRpZmYgLS1naXQgYS9uYmQvY2xpZW50LmMgYi9uYmQvY2xpZW50LmMNCj4+PiBp
-bmRleCBiY2NjZDVmNTU1ZS4uYjZhODVmYzNlZjggMTAwNjQ0DQo+Pj4gLS0tIGEvbmJkL2NsaWVu
-dC5jDQo+Pj4gKysrIGIvbmJkL2NsaWVudC5jDQo+Pj4gQEAgLTY4NCwxMCArNjg0LDExIEBAIHN0
-YXRpYyBpbnQgbmJkX25lZ290aWF0ZV9zaW1wbGVfbWV0YV9jb250ZXh0KFFJT0NoYW5uZWwgKmlv
-YywNCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuIHJldDsNCj4+PiDCoMKgwqDCoMKgIH0N
-Cj4+Pg0KPj4+IC3CoMKgwqAgaWYgKHJlcGx5LnR5cGUgPT0gTkJEX1JFUF9NRVRBX0NPTlRFWFQp
-IHsNCj4+PiArwqDCoMKgIHdoaWxlIChyZXBseS50eXBlID09IE5CRF9SRVBfTUVUQV9DT05URVhU
-KSB7DQo+Pg0KPj4gSSdtIG5vdCBzdXJlIEkgdW5kZXJzdGFuZCB3aHkgdGhpcyBjaGFuZ2UgaXMg
-c2FmZS4NCj4+DQo+PiBBcyBmYXIgYXMgSSBjYW4gc2VlIHJlcGx5LnR5cGUgaXMgb25seSB1cGRh
-dGVkIGluIHRoZSBsb29wIGJ5DQo+PiBuYmRfcmVjZWl2ZV9vcHRpb25fcmVwbHksIGFuZCB0aGF0
-IHJlYWRzIGZyb20gdGhlIHNlcnZlciwgYW5kIHNvIHRoZQ0KPj4gc2VydmVyIG1pZ2h0IGtlZXAg
-c2VuZGluZyBOQkRfUkVQX01FVEFfQ09OVEVYVCBwYWNrZXRzIChpbnN0ZWFkIG9mIHRoZQ0KPj4g
-ZXhwZWN0ZWQgTkJEX1JFUF9BQ0spLCBzbyBpdCBjb3VsZCBub3cgbG9vcCBmb3JldmVyIGFnYWlu
-c3QgYQ0KPj4gbWFsaWNpb3VzIHNlcnZlcj/CoCAoVGhpcyBpcyBub3QgdGFraW5nIGludG8gYWNj
-b3VudCBhbnkgbGF0ZXIgcGF0Y2hlcykNCj4gDQo+IEhtbSAtIG5vdyB0aGF0IEkndmUgYWxyZWFk
-eSByZXNwb25kZWQgdG8gd2h5IHRoZSBjb252ZXJzaW9uIHRvIGEgbG9vcCBkb2VzIG5vdCBjaGFu
-Z2UgdGhpcyBjb2RlLCBJJ20gbm93IHdvbmRlcmluZyBpZiBJIGV2ZW4gbmVlZCB0aGlzIHBhdGNo
-LiBJbiB2MSBvZiB0aGUgc2VyaWVzLCBib3RoIFNFVCBhbmQgTElTVCBzaGFyZWQgYSBjb21tb24g
-ZnVuY3Rpb24sIGFuZCBzaW5jZSBMSVNUIG5lZWRzIHRoZSBsb29wLCBjb252ZXJ0aW5nIFNFVCB0
-byB1c2UgYSBsb29wIHRoYXQgZXhpdHMgZWFybHkgaWYgaXQgZXhlY3V0ZXMgbW9yZSB0aGFuIG9u
-Y2Ugd2FzIG5lZWRlZCB0byBtYWtlIHRoZSB0d28gYWN0aW9ucyBzaGFyZSBhIGNvbW1vbiBlbnRy
-eSBwb2ludC7CoCBCdXQgc2luY2UgdjIgdXNlcyBkaWZmZXJlbnQgZW50cnkgcG9pbnRzIChiZWNh
-dXNlIGl0IHNlcGFyYXRlZCB0aGUgY29tbW9uIGNvZGUgaW50byBzZXBhcmF0ZSBoZWxwZXIgZnVu
-Y3Rpb25zLCBsZWF2aW5nIHRoZSBTRVQgZW50cnkgcG9pbnQgdW5jaGFuZ2VkIGFuZCBhZGRpbmcg
-YSBuZXcgTElTVCBlbnRyeSBwb2ludCksIHdoZXJlIG9ubHkgdGhlIExJU1QgZW50cnkgcG9pbnQg
-YWN0dWFsbHkgaGFzIHRvIGxvb3AsIEkgbWlnaHQgYmUgYWJsZSB0byBqdXN0IGRyb3AgdGhpcyBw
-YXRjaCBlbnRpcmVseSBhbmQgc3RpbGwgYWNoaWV2ZSB0aGUgc2FtZSBlZmZlY3QuDQo+IA0KDQpB
-cmUgeW91IGdvaW5nIHRvIHJlc2VuZCBzZXJpZXMgd2l0aG91dCB0aGlzIHBhdGNoPyBJbiB0aGlz
-IGNhc2UgSSdkIHByZWZlciB0byBjb250aW51ZSByZXZpZXcgb24gYWxyZWFkeSByZWJhc2VkIHBh
-dGNoZXMuIE9yIGl0IGRvZXNuJ3QgbWFrZSBtdWNoIGRpZmZlcmVuY2U/DQoNCi0tIA0KQmVzdCBy
-ZWdhcmRzLA0KVmxhZGltaXINCg==
+On Thu, Dec 13, 2018 at 10:07 PM Juan Quintela <quintela@redhat.com> wrote:
+>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  hw/virtio/Makefile.objs        |  1 +
+>  hw/virtio/virtio-balloon-pci.c | 94 ++++++++++++++++++++++++++++++++++
+>  hw/virtio/virtio-pci.c         | 58 ---------------------
+>  hw/virtio/virtio-pci.h         | 14 -----
+>  tests/Makefile.include         |  2 +-
+>  5 files changed, 96 insertions(+), 73 deletions(-)
+>  create mode 100644 hw/virtio/virtio-balloon-pci.c
+
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
