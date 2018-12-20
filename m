@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ga0Sp-0006yq-Jw
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 10:42:20 -0500
+	(envelope-from <pmathieu@redhat.com>) id 1ga1CV-0006vg-9K
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 11:29:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ga0Sn-0007H0-Ja
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 10:42:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43588)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ga0Sl-00076W-D0
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 10:42:17 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3D0731F8EA
-	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 15:42:08 +0000 (UTC)
-Date: Thu, 20 Dec 2018 16:42:00 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181220164200.79e7713d@Igors-MacBook-Pro.local>
-In-Reply-To: <20181212214850.29953-1-marcandre.lureau@redhat.com>
-References: <20181212214850.29953-1-marcandre.lureau@redhat.com>
+	(envelope-from <pmathieu@redhat.com>) id 1ga1CR-0005gk-6X
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 11:29:31 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:43030)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1ga1CQ-0005XE-SA
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 11:29:27 -0500
+Received: by mail-wr1-f67.google.com with SMTP id r10so2388569wrs.10
+	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 08:29:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20181218175122.3229-1-philmd@redhat.com>
+	<20181218175122.3229-4-philmd@redhat.com>
+	<20181219101034.2dgs2faryopmflnz@kamzik.brq.redhat.com>
+	<49ed6ada-c821-6afd-11a9-9520901a151c@redhat.com>
+	<20181219130037.c5lrlps6ljqxvs5b@kamzik.brq.redhat.com>
+	<20181220161828.7387f3f5@Igors-MacBook-Pro.local>
+In-Reply-To: <20181220161828.7387f3f5@Igors-MacBook-Pro.local>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Thu, 20 Dec 2018 17:29:06 +0100
+Message-ID: <CAP+75-Uep=GV1_Y1f3Owh39FRkxrKkcdyX5MDat2iZh1X_8s8A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 00/28] Generalize machine compatibility
- properties
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] hw/acpi: Use QEMU_NONSTRING for non
+ NUL-terminated arrays
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,150 +34,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Andrew Jones <drjones@redhat.com>, Kevin Wolf <kwolf@redhat.com>, 1803872@bugs.launchpad.net, Thomas Huth <thuth@redhat.com>, Ben Pye <ben@curlybracket.co.uk>, Qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, Stefan Weil <sw@weilnetz.de>, Jeff Cody <jcody@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Liu Yuan <namei.unix@gmail.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Max Reitz <mreitz@redhat.com>, Howard Spoelstra <hsp.cat7@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On Thu, 13 Dec 2018 01:48:22 +0400
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+On Thu, Dec 20, 2018 at 4:18 PM Igor Mammedov <imammedo@redhat.com> wrote:
+>
+> On Wed, 19 Dec 2018 14:00:37 +0100
+> Andrew Jones <drjones@redhat.com> wrote:
+>
+> > On Wed, Dec 19, 2018 at 01:43:40PM +0100, Philippe Mathieu-Daud=C3=A9 w=
+rote:
+> > > Hi Drew,
+> > >
+> > > On 12/19/18 11:10 AM, Andrew Jones wrote:
+> > > > On Tue, Dec 18, 2018 at 06:51:20PM +0100, Philippe Mathieu-Daud=C3=
+=A9 wrote:
+> > > >> GCC 8 added a -Wstringop-truncation warning:
+> > > >>
+> > > >>   The -Wstringop-truncation warning added in GCC 8.0 via r254630 f=
+or
+> > > >>   bug 81117 is specifically intended to highlight likely unintende=
+d
+> > > >>   uses of the strncpy function that truncate the terminating NUL
+> > > >>   character from the source string.
+> > > >>
+> > > >> This new warning leads to compilation failures:
+> > > >>
+> > > >>     CC      hw/acpi/core.o
+> > > >>   In function 'acpi_table_install', inlined from 'acpi_table_add' =
+at qemu/hw/acpi/core.c:296:5:
+> > > >>   qemu/hw/acpi/core.c:184:9: error: 'strncpy' specified bound 4 eq=
+uals destination size [-Werror=3Dstringop-truncation]
+> > > >>            strncpy(ext_hdr->sig, hdrs->sig, sizeof ext_hdr->sig);
+> > > >>            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > > >>   make: *** [qemu/rules.mak:69: hw/acpi/core.o] Error 1
+> > > >>
+> > > >> Use the QEMU_NONSTRING attribute, since ACPI tables don't require =
+the
+> > > >> strings to be NUL-terminated.
+> > > >
+> > > > Aren't we always starting with zero-initialized structures in ACPI =
+code?
+> > > > If so, then we should be able to change the strncpy's to memcpy's.
+> > >
+> > > The first call zero-initializes, but then we call realloc():
+> > >
+> > >     /* We won't fail from here on. Initialize / extend the globals. *=
+/
+> > >     if (acpi_tables =3D=3D NULL) {
+> > >         acpi_tables_len =3D sizeof(uint16_t);
+> > >         acpi_tables =3D g_malloc0(acpi_tables_len);
+> > >     }
+> > >
+> > >     acpi_tables =3D g_realloc(acpi_tables, acpi_tables_len +
+> > >                                          ACPI_TABLE_PFX_SIZE +
+> > >                                          sizeof dfl_hdr + body_size);
+> > >
+> > >     ext_hdr =3D (struct acpi_table_header *)(acpi_tables +
+> > >                                            acpi_tables_len);
+> > >
+> > > So memcpy() isn't enough.
+> >
+> > Ah, thanks.
+> >
+> > >
+> > > I can resend the previous patch which uses strpadcpy() if you prefer,
+> > > Igor already reviewed it:
+> > >
+> > > https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04406.html
+> > >
+> >
+> > I do like strpadcpy() better, but I'm not going to lose sleep about
+> > this either way it goes.
+> I'm ok with both ways, but v2 consensus was to use QEMU_NONSTRING if I go=
+t it right
 
-> Hi,
->=20
-> During "[PATCH v2 05/10] qom/globals: generalize
-> object_property_set_globals()" review, Eduardo suggested to rework the
-> GlobalProperty handling, so that -global is limited to QDev only and
-> we avoid mixing the machine compats and the user-provided -global
-> properties (instead of generalizing -global to various object kinds,
-> like I proposed in v2).
->=20
-> "qdev: do not mix compat props with global props" patch decouples a
-> bit user-provided -global from machine compat properties. This allows
-> to get rid of "user_provided" and "errp" fields in following patches.
->=20
-> A new compat property "x-use-canonical-path-for-ramblock-id" is added
-> to hostmem for legacy canonical path names, set to true for -file and
-> -memfd with qemu < 4.0.
->=20
-> (this series was initially titled "[PATCH v2 00/10] hostmem: use
-> object "id" for memory region name with >=3D 3.1", but its focus is more
-> in refactoring the global and compatilibity properties handling now)
-
-Series no longer applies to master, could you rebase it pls?
-
->=20
-> v6:
-> - split "hw: apply machine compat properties without touching globals"
-> - replace PC_COMPAT_* and HW_COMPAT_* defines with static arrays
-> - add ARMCPUInfo *info in ARMCPUClass for "arm: replace
->   instance_post_init()" patch
-> - rebased, commit message updates, add some r-b tags
->=20
-> v5:
-> - replace the SET_COMPAT macros, use normal function instead
->   (suggested by Eduardo)
-> - replace the TYPE_COMPAT_PROPS interface approach for explicit
->   object_apply_compat_props(), solving post-init ordering issues.
-> - get back to coupling compat properties with machine, in qdev
->   (although there is still some discussion how to improve this, it
->    can be changed later)
-> - mark the "arm: replace instance_post_init()" as RFC, since it is not
->   longer required for this series
-> - change machines version from 3.2 to 4.0
-> - add some r-b tags
->=20
-> v4:
-> - fix accel/machine compat props apply order inversion
-> - split "qdev: do not mix compat props with global props": replace
->   using current_machine by new compat_props global, introduce
->   SET_COMPAT() macro, use GPtrArray.
-> - add a comment about "qdev-props: call object_apply_global_props()"
->   error reporting
-> - add "arm: replace instance_post_init()", to solve the post-init
->   ordering issue
-> - add "hw/arm/virt: add virt-3.2 machine type" for completeness
-> - commit message improvements
-> - rebased, add r-b tags
->=20
-> v3:
-> - GlobalProperties improvements/cleanups
-> - drop generalizing the -global idea
-> - "replace" the set_globals flag with a TYPE_COMPAT_PROPS interface
-> - update hw/i386 machine version to 3.2
-> - add "qom: make interface types abstract" interface cleanup
->=20
-> v2:
-> - replace "qom/user-creatable: add a few helper macros" patch for a
->   more optimized "qom: make user_creatable_complete() specific to
->   UserCreatable"
-> - rename register_global_list() to register_global_properties()
-> - call object_property_set_globals() after post-init
-> - add and use a ObjectClass.set_globals flag, instead of dynamically
->   check object class in object_property_set_globals()
-> - use object "id" in >=3D 3.1 instead of canonical path, add compat
->   property "x-use-canonical-path-for-ramblock-id" in base hostmem
->   class.
->=20
-> Marc-Andr=C3=A9 Lureau (28):
->   hw: apply accel compat properties without touching globals
->   machines: replace COMPAT define with a static array
->   hw: apply machine compat properties without touching globals
->   machine: move compat properties out of globals
->   hw: remove SET_MACHINE_COMPAT
->   compat: replace PC_COMPAT_3_1 & HW_COMPAT_3_1 macros
->   compat: replace PC_COMPAT_3_0 & HW_COMPAT_3_0 macros
->   compat: replace PC_COMPAT_2_12 & HW_COMPAT_2_12 macros
->   compat: replace PC_COMPAT_2_11 & HW_COMPAT_2_11 macros
->   compat: replace PC_COMPAT_2_10 & HW_COMPAT_2_10 macros
->   compat: replace PC_COMPAT_2_9 & HW_COMPAT_2_9 macros
->   compat: replace PC_COMPAT_2_8 & HW_COMPAT_2_8 macros
->   compat: replace PC_COMPAT_2_7 & HW_COMPAT_2_7 macros
->   compat: replace PC_COMPAT_2_6 & HW_COMPAT_2_6 macros
->   compat: replace PC_COMPAT_2_5 & HW_COMPAT_2_5 macros
->   compat: replace PC_COMPAT_2_4 & HW_COMPAT_2_4 macros
->   compat: replace PC_COMPAT_2_3 & HW_COMPAT_2_3 macros
->   compat: replace PC_COMPAT_2_2 & HW_COMPAT_2_2 macros
->   compat: replace PC_COMPAT_2_1 & HW_COMPAT_2_1 macros
->   include: remove compat.h
->   compat: remove remaining PC_COMPAT macros
->   qdev: make a separate helper function to apply compat properties
->   qdev: all globals are now user-provided
->   qdev-props: convert global_props to GPtrArray
->   qdev-props: remove errp from GlobalProperty
->   qdev-props: call object_apply_global_props()
->   arm: replace instance_post_init()
->   hostmem: use object id for memory region name with >=3D 4.0
->=20
->  include/hw/boards.h            |  59 ++-
->  include/hw/compat.h            | 291 --------------
->  include/hw/i386/pc.h           | 684 +++------------------------------
->  include/hw/qdev-core.h         |  21 +-
->  include/qom/object.h           |   3 +
->  include/sysemu/accel.h         |   4 +-
->  include/sysemu/hostmem.h       |   3 +-
->  target/arm/cpu-qom.h           |   3 +
->  target/arm/cpu.h               |   2 +
->  accel/accel.c                  |  12 -
->  backends/hostmem-file.c        |   8 +-
->  backends/hostmem-memfd.c       |   2 +-
->  backends/hostmem-ram.c         |   9 +-
->  backends/hostmem.c             |  36 ++
->  hw/arm/virt.c                  |  46 +--
->  hw/core/machine.c              | 339 +++++++++++++++-
->  hw/core/qdev-properties.c      |  49 +--
->  hw/core/qdev.c                 |  15 +
->  hw/i386/pc.c                   | 668 ++++++++++++++++++++++++++++++++
->  hw/i386/pc_piix.c              | 603 +++++++++++++++--------------
->  hw/i386/pc_q35.c               |  36 +-
->  hw/ppc/spapr.c                 | 207 +++++-----
->  hw/s390x/s390-virtio-ccw.c     | 191 +++++----
->  hw/xen/xen-common.c            |  41 +-
->  qom/cpu.c                      |   1 -
->  qom/object.c                   |  35 ++
->  target/arm/cpu.c               |  30 +-
->  target/arm/cpu64.c             |  24 +-
->  target/i386/cpu.c              |   1 -
->  target/sparc/cpu.c             |   1 -
->  tests/test-qdev-global-props.c |  57 +--
->  vl.c                           |   4 -
->  32 files changed, 1817 insertions(+), 1668 deletions(-)
->  delete mode 100644 include/hw/compat.h
->=20
+Yes, MST recommended it because this attribute is clever than strpadcpy().
