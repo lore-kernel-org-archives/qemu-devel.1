@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ga3Et-0005PD-MU
+	(envelope-from <mst@redhat.com>) id 1ga3Es-0005Or-6w
 	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:40:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ga3Et-0001UV-0x
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:40:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33870)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ga3Es-0001SX-Oo
+	(envelope-from <mst@redhat.com>) id 1ga3Er-0001Ri-DO
 	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:40:06 -0500
-Date: Thu, 20 Dec 2018 13:40:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53322)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ga3Er-0001PT-0C
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:40:05 -0500
+Date: Thu, 20 Dec 2018 13:40:02 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181220183059.20726-38-mst@redhat.com>
+Message-ID: <20181220183059.20726-37-mst@redhat.com>
 References: <20181220183059.20726-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20181220183059.20726-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v3 37/44] pci/pcie: perform unplug via the
+Subject: [Qemu-devel] [PULL v3 36/44] pci/pcihp: perform unplug via the
  hotplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,7 +28,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
 From: David Hildenbrand <david@redhat.com>
 
@@ -41,66 +41,90 @@ cleanly, we also have to make sure to go via the hotplug handler chain when
 actually unplugging a device after an unplug request. Lookup the hotplug
 handler and call "unplug".
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/pci/pcie.h |  2 ++
- hw/pci/pcie.c         | 10 +++++++++-
- hw/pci/pcie_port.c    |  1 +
- 3 files changed, 12 insertions(+), 1 deletion(-)
+ include/hw/acpi/pcihp.h |  3 +++
+ hw/acpi/pcihp.c         | 11 ++++++++++-
+ hw/acpi/piix4.c         |  7 +++++--
+ 3 files changed, 18 insertions(+), 3 deletions(-)
 
-diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
-index d51ca23f07..cd318646a2 100644
---- a/include/hw/pci/pcie.h
-+++ b/include/hw/pci/pcie.h
-@@ -134,6 +134,8 @@ void pcie_ats_init(PCIDevice *dev, uint16_t offset);
+diff --git a/include/hw/acpi/pcihp.h b/include/hw/acpi/pcihp.h
+index ce31625850..8bc4a4c01d 100644
+--- a/include/hw/acpi/pcihp.h
++++ b/include/hw/acpi/pcihp.h
+@@ -62,6 +62,9 @@ void acpi_pcihp_device_plug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
+                                DeviceState *dev, Error **errp);
+ void acpi_pcihp_device_unplug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
+                                  DeviceState *dev, Error **errp);
++void acpi_pcihp_device_unplug_request_cb(HotplugHandler *hotplug_dev,
++                                         AcpiPciHpState *s, DeviceState *dev,
++                                         Error **errp);
  
- void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-                            Error **errp);
-+void pcie_cap_slot_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                             Error **errp);
- void pcie_cap_slot_unplug_request_cb(HotplugHandler *hotplug_dev,
-                                      DeviceState *dev, Error **errp);
- #endif /* QEMU_PCIE_H */
-diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-index ec3b1145f3..2d3d8a047b 100644
---- a/hw/pci/pcie.c
-+++ b/hw/pci/pcie.c
-@@ -442,11 +442,19 @@ void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-     }
- }
+ /* Called on reset */
+ void acpi_pcihp_reset(AcpiPciHpState *s);
+diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
+index 05e3f8d11e..7bc7a72340 100644
+--- a/hw/acpi/pcihp.c
++++ b/hw/acpi/pcihp.c
+@@ -154,6 +154,7 @@ static bool acpi_pcihp_pc_no_hotplug(AcpiPciHpState *s, PCIDevice *dev)
  
--static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque)
-+void pcie_cap_slot_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                             Error **errp)
+ static void acpi_pcihp_eject_slot(AcpiPciHpState *s, unsigned bsel, unsigned slots)
  {
-     object_unparent(OBJECT(dev));
- }
++    HotplugHandler *hotplug_ctrl;
+     BusChild *kid, *next;
+     int slot = ctz32(slots);
+     PCIBus *bus = acpi_pcihp_find_hotplug_bus(s, bsel);
+@@ -171,7 +172,8 @@ static void acpi_pcihp_eject_slot(AcpiPciHpState *s, unsigned bsel, unsigned slo
+         PCIDevice *dev = PCI_DEVICE(qdev);
+         if (PCI_SLOT(dev->devfn) == slot) {
+             if (!acpi_pcihp_pc_no_hotplug(s, dev)) {
+-                object_unparent(OBJECT(qdev));
++                hotplug_ctrl = qdev_get_hotplug_handler(qdev);
++                hotplug_handler_unplug(hotplug_ctrl, qdev, &error_abort);
+             }
+         }
+     }
+@@ -266,6 +268,13 @@ void acpi_pcihp_device_plug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
  
-+static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque)
+ void acpi_pcihp_device_unplug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
+                                  DeviceState *dev, Error **errp)
 +{
-+    HotplugHandler *hotplug_ctrl = qdev_get_hotplug_handler(DEVICE(dev));
-+
-+    hotplug_handler_unplug(hotplug_ctrl, DEVICE(dev), &error_abort);
++    object_unparent(OBJECT(dev));
 +}
 +
- void pcie_cap_slot_unplug_request_cb(HotplugHandler *hotplug_dev,
-                                      DeviceState *dev, Error **errp)
++void acpi_pcihp_device_unplug_request_cb(HotplugHandler *hotplug_dev,
++                                         AcpiPciHpState *s, DeviceState *dev,
++                                         Error **errp)
  {
-diff --git a/hw/pci/pcie_port.c b/hw/pci/pcie_port.c
-index 73e81e5847..bc07abc31b 100644
---- a/hw/pci/pcie_port.c
-+++ b/hw/pci/pcie_port.c
-@@ -155,6 +155,7 @@ static void pcie_slot_class_init(ObjectClass *oc, void *data)
- 
-     dc->props = pcie_slot_props;
-     hc->plug = pcie_cap_slot_plug_cb;
-+    hc->unplug = pcie_cap_slot_unplug_cb;
-     hc->unplug_request = pcie_cap_slot_unplug_request_cb;
- }
- 
+     PCIDevice *pdev = PCI_DEVICE(dev);
+     int slot = PCI_SLOT(pdev->devfn);
+diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+index 07dfeb0e3d..88f9a9ec09 100644
+--- a/hw/acpi/piix4.c
++++ b/hw/acpi/piix4.c
+@@ -419,8 +419,8 @@ static void piix4_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+         acpi_memory_unplug_request_cb(hotplug_dev, &s->acpi_memory_hotplug,
+                                       dev, errp);
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+-        acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
+-                                    errp);
++        acpi_pcihp_device_unplug_request_cb(hotplug_dev, &s->acpi_pci_hotplug,
++                                            dev, errp);
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
+                !s->cpu_hotplug_legacy) {
+         acpi_cpu_unplug_request_cb(hotplug_dev, &s->cpuhp_state, dev, errp);
+@@ -438,6 +438,9 @@ static void piix4_device_unplug_cb(HotplugHandler *hotplug_dev,
+     if (s->acpi_memory_hotplug.is_enabled &&
+         object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+         acpi_memory_unplug_cb(&s->acpi_memory_hotplug, dev, errp);
++    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
++        acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
++                                    errp);
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
+                !s->cpu_hotplug_legacy) {
+         acpi_cpu_unplug_cb(&s->cpuhp_state, dev, errp);
 -- 
 MST
