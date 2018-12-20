@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ga3Eq-0005ME-8b
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:40:05 -0500
+	(envelope-from <mst@redhat.com>) id 1ga3Et-0005PD-MU
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:40:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ga3En-0001Ji-Kt
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:40:04 -0500
-Date: Thu, 20 Dec 2018 13:39:42 -0500
+	(envelope-from <mst@redhat.com>) id 1ga3Et-0001UV-0x
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:40:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33870)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ga3Es-0001SX-Oo
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:40:06 -0500
+Date: Thu, 20 Dec 2018 13:40:04 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181220183059.20726-27-mst@redhat.com>
+Message-ID: <20181220183059.20726-38-mst@redhat.com>
 References: <20181220183059.20726-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20181220183059.20726-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v3 26/44] hw: arm: Convert the RSDP build to the
- buid_append_foo() API
+Subject: [Qemu-devel] [PULL v3 37/44] pci/pcie: perform unplug via the
+ hotplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,88 +28,79 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Samuel Ortiz <sameo@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, Andrew Jones <drjones@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-From: Samuel Ortiz <sameo@linux.intel.com>
+From: David Hildenbrand <david@redhat.com>
 
-Instead of filling a mapped and packed C structure field in random order
-and being careful about endianness and sizes, build_rsdp() now uses
-build_append_int_noprefix() to compose RSDP table.
+Introduce and use the "unplug" callback.
 
-This makes reviewing and maintaining code easier as this is almost
-matching 1:1 the ACPI spec itself.
+This is a preparation for multi-stage hotplug handlers, whereby the bus
+hotplug handler is overwritten by the machine hotplug handler. This handler
+will then pass control to the bus hotplug handler. So to get this running
+cleanly, we also have to make sure to go via the hotplug handler chain when
+actually unplugging a device after an unplug request. Lookup the hotplug
+handler and call "unplug".
 
-Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/arm/virt-acpi-build.c | 42 ++++++++++++++++++++++------------------
- 1 file changed, 23 insertions(+), 19 deletions(-)
+ include/hw/pci/pcie.h |  2 ++
+ hw/pci/pcie.c         | 10 +++++++++-
+ hw/pci/pcie_port.c    |  1 +
+ 3 files changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index ce8bfa5a37..4a6b53fbfc 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -368,35 +368,39 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+index d51ca23f07..cd318646a2 100644
+--- a/include/hw/pci/pcie.h
++++ b/include/hw/pci/pcie.h
+@@ -134,6 +134,8 @@ void pcie_ats_init(PCIDevice *dev, uint16_t offset);
  
- /* RSDP */
- static void
--build_rsdp(GArray *rsdp_table, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
-+build_rsdp(GArray *tbl, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
- {
--    AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
--    unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
--    unsigned xsdt_pa_offset =
--        (char *)&rsdp->xsdt_physical_address - rsdp_table->data;
-+    int tbl_off = tbl->len; /* Table offset in the RSDP file */
- 
--    bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, rsdp_table, 16,
-+    bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, tbl, 16,
-                              true /* fseg memory */);
- 
--    memcpy(&rsdp->signature, "RSD PTR ", sizeof(rsdp->signature));
--    memcpy(rsdp->oem_id, rsdp_data->oem_id, sizeof(rsdp->oem_id));
--    rsdp->length = cpu_to_le32(sizeof(*rsdp));
--    rsdp->revision = rsdp_data->revision;
-+    g_array_append_vals(tbl, "RSD PTR ", 8); /* Signature */
-+    build_append_int_noprefix(tbl, 0, 1); /* Checksum */
-+    g_array_append_vals(tbl, rsdp_data->oem_id, 6); /* OEMID */
-+    build_append_int_noprefix(tbl, rsdp_data->revision, 1); /* Revision */
-+    build_append_int_noprefix(tbl, 0, 4); /* RsdtAddress */
-+    build_append_int_noprefix(tbl, 36, 4); /* Length */
- 
--    /* Address to be filled by Guest linker */
--    bios_linker_loader_add_pointer(linker,
--        ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
--        ACPI_BUILD_TABLE_FILE, *rsdp_data->xsdt_tbl_offset);
-+    /* XSDT address to be filled by guest linker */
-+    build_append_int_noprefix(tbl, 0, 8); /* XsdtAddress */
-+    bios_linker_loader_add_pointer(linker, ACPI_BUILD_RSDP_FILE,
-+                                   tbl_off + 24, 8,
-+                                   ACPI_BUILD_TABLE_FILE,
-+                                   *rsdp_data->xsdt_tbl_offset);
- 
--    /* Checksum to be filled by Guest linker */
-+    build_append_int_noprefix(tbl, 0, 1); /* Extended Checksum */
-+    build_append_int_noprefix(tbl, 0, 3); /* Reserved */
-+
-+    /* Checksum to be filled by guest linker */
-     bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
--        (char *)rsdp - rsdp_table->data, 20 /* ACPI rev 1.0 RSDP size */,
--        (char *)&rsdp->checksum - rsdp_table->data);
-+                                    tbl_off, 20, /* ACPI rev 1.0 RSDP size */
-+                                    8);
- 
-     /* Extended checksum to be filled by Guest linker */
-     bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
--        (char *)rsdp - rsdp_table->data, 36 /* ACPI rev 2.0 RSDP size */,
--        (char *)&rsdp->extended_checksum - rsdp_table->data);
-+                                    tbl_off, 36, /* ACPI rev 2.0 RSDP size */
-+                                    32);
+ void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+                            Error **errp);
++void pcie_cap_slot_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
++                             Error **errp);
+ void pcie_cap_slot_unplug_request_cb(HotplugHandler *hotplug_dev,
+                                      DeviceState *dev, Error **errp);
+ #endif /* QEMU_PCIE_H */
+diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+index ec3b1145f3..2d3d8a047b 100644
+--- a/hw/pci/pcie.c
++++ b/hw/pci/pcie.c
+@@ -442,11 +442,19 @@ void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+     }
  }
  
- static void
+-static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque)
++void pcie_cap_slot_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
++                             Error **errp)
+ {
+     object_unparent(OBJECT(dev));
+ }
+ 
++static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque)
++{
++    HotplugHandler *hotplug_ctrl = qdev_get_hotplug_handler(DEVICE(dev));
++
++    hotplug_handler_unplug(hotplug_ctrl, DEVICE(dev), &error_abort);
++}
++
+ void pcie_cap_slot_unplug_request_cb(HotplugHandler *hotplug_dev,
+                                      DeviceState *dev, Error **errp)
+ {
+diff --git a/hw/pci/pcie_port.c b/hw/pci/pcie_port.c
+index 73e81e5847..bc07abc31b 100644
+--- a/hw/pci/pcie_port.c
++++ b/hw/pci/pcie_port.c
+@@ -155,6 +155,7 @@ static void pcie_slot_class_init(ObjectClass *oc, void *data)
+ 
+     dc->props = pcie_slot_props;
+     hc->plug = pcie_cap_slot_plug_cb;
++    hc->unplug = pcie_cap_slot_unplug_cb;
+     hc->unplug_request = pcie_cap_slot_unplug_request_cb;
+ }
+ 
 -- 
 MST
