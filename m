@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ga3Eu-0005PT-E6
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:40:10 -0500
+	(envelope-from <mst@redhat.com>) id 1ga3F0-0005aa-Cu
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:40:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ga3Eo-0001LY-FX
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:40:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58200)
+	(envelope-from <mst@redhat.com>) id 1ga3Ex-0001h8-K2
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:40:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54432)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ga3Eo-0001Je-5h
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:40:02 -0500
-Date: Thu, 20 Dec 2018 13:40:00 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ga3Ex-0001dv-8k
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:40:11 -0500
+Date: Thu, 20 Dec 2018 13:40:08 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181220183059.20726-35-mst@redhat.com>
+Message-ID: <20181220183059.20726-40-mst@redhat.com>
 References: <20181220183059.20726-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20181220183059.20726-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v3 34/44] pci/pcihp: perform check for bus
- capability in pre_plug handler
+Subject: [Qemu-devel] [PULL v3 39/44] pci/shpc: perform unplug via the
+ hotplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,122 +28,132 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
 From: David Hildenbrand <david@redhat.com>
 
-Perform the check in the pre_plug handler. In addition, we need the
-capability only if the device is actually hotplugged (and not created
-during machine initialization). This is a preparation for coldplugging
-pci devices via that hotplug handler.
+Introduce and use the "unplug" callback.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+This is a preparation for multi-stage hotplug handlers, whereby the bus
+hotplug handler is overwritten by the machine hotplug handler. This handler
+will then pass control to the bus hotplug handler. So to get this running
+cleanly, we also have to make sure to go via the hotplug handler chain when
+actually unplugging a device after an unplug request. Lookup the hotplug
+handler and call "unplug".
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/acpi/pcihp.h |  2 ++
- hw/acpi/pcihp.c         | 21 +++++++++++++++------
- hw/acpi/piix4.c         | 16 ++++++++++++++--
- 3 files changed, 31 insertions(+), 8 deletions(-)
+ include/hw/pci/pci_bridge.h     |  2 ++
+ include/hw/pci/shpc.h           |  2 ++
+ hw/pci-bridge/pci_bridge_dev.c  | 10 ++++++++++
+ hw/pci-bridge/pcie_pci_bridge.c |  1 +
+ hw/pci/shpc.c                   | 11 ++++++++++-
+ 5 files changed, 25 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/acpi/pcihp.h b/include/hw/acpi/pcihp.h
-index 8a65f99fc8..ce31625850 100644
---- a/include/hw/acpi/pcihp.h
-+++ b/include/hw/acpi/pcihp.h
-@@ -56,6 +56,8 @@ typedef struct AcpiPciHpState {
- void acpi_pcihp_init(Object *owner, AcpiPciHpState *, PCIBus *root,
-                      MemoryRegion *address_space_io, bool bridges_enabled);
+diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
+index 6e37c7551a..ba488818d2 100644
+--- a/include/hw/pci/pci_bridge.h
++++ b/include/hw/pci/pci_bridge.h
+@@ -101,6 +101,8 @@ void pci_bridge_exitfn(PCIDevice *pci_dev);
  
-+void acpi_pcihp_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-+                                   DeviceState *dev, Error **errp);
- void acpi_pcihp_device_plug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
-                                DeviceState *dev, Error **errp);
- void acpi_pcihp_device_unplug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
-diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-index 80d42e12ff..5e7cef173c 100644
---- a/hw/acpi/pcihp.c
-+++ b/hw/acpi/pcihp.c
-@@ -217,17 +217,24 @@ void acpi_pcihp_reset(AcpiPciHpState *s)
-     acpi_pcihp_update(s);
+ void pci_bridge_dev_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+                             Error **errp);
++void pci_bridge_dev_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
++                              Error **errp);
+ void pci_bridge_dev_unplug_request_cb(HotplugHandler *hotplug_dev,
+                                       DeviceState *dev, Error **errp);
+ 
+diff --git a/include/hw/pci/shpc.h b/include/hw/pci/shpc.h
+index 71293aca58..18f6ec1cd5 100644
+--- a/include/hw/pci/shpc.h
++++ b/include/hw/pci/shpc.h
+@@ -47,6 +47,8 @@ void shpc_cap_write_config(PCIDevice *d, uint32_t addr, uint32_t val, int len);
+ 
+ void shpc_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+                          Error **errp);
++void shpc_device_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
++                           Error **errp);
+ void shpc_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+                                    DeviceState *dev, Error **errp);
+ 
+diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
+index fa0be13ac4..ff6b8323da 100644
+--- a/hw/pci-bridge/pci_bridge_dev.c
++++ b/hw/pci-bridge/pci_bridge_dev.c
+@@ -219,6 +219,15 @@ void pci_bridge_dev_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+     shpc_device_plug_cb(hotplug_dev, dev, errp);
  }
  
-+void acpi_pcihp_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-+                                   DeviceState *dev, Error **errp)
++void pci_bridge_dev_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
++                              Error **errp)
 +{
-+    /* Only hotplugged devices need the hotplug capability. */
-+    if (dev->hotplugged &&
-+        acpi_pcihp_get_bsel(pci_get_bus(PCI_DEVICE(dev))) < 0) {
-+        error_setg(errp, "Unsupported bus. Bus doesn't have property '"
-+                   ACPI_PCIHP_PROP_BSEL "' set");
-+        return;
-+    }
++    PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
++
++    g_assert(shpc_present(pci_hotplug_dev));
++    shpc_device_unplug_cb(hotplug_dev, dev, errp);
 +}
 +
- void acpi_pcihp_device_plug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
-                                DeviceState *dev, Error **errp)
+ void pci_bridge_dev_unplug_request_cb(HotplugHandler *hotplug_dev,
+                                       DeviceState *dev, Error **errp)
  {
-     PCIDevice *pdev = PCI_DEVICE(dev);
-     int slot = PCI_SLOT(pdev->devfn);
--    int bsel = acpi_pcihp_get_bsel(pci_get_bus(pdev));
--    if (bsel < 0) {
--        error_setg(errp, "Unsupported bus. Bus doesn't have property '"
--                   ACPI_PCIHP_PROP_BSEL "' set");
--        return;
--    }
-+    int bsel;
- 
-     /* Don't send event when device is enabled during qemu machine creation:
-      * it is present on boot, no hotplug event is necessary. We do send an
-@@ -236,6 +243,8 @@ void acpi_pcihp_device_plug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
-         return;
-     }
- 
-+    bsel = acpi_pcihp_get_bsel(pci_get_bus(pdev));
-+    g_assert(bsel >= 0);
-     s->acpi_pcihp_pci_status[bsel].up |= (1U << slot);
-     acpi_send_event(DEVICE(hotplug_dev), ACPI_PCI_HOTPLUG_STATUS);
- }
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index 2f4dd03b83..f68e62d36c 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -371,6 +371,18 @@ static void piix4_pm_powerdown_req(Notifier *n, void *opaque)
-     acpi_pm1_evt_power_down(&s->ar);
+@@ -251,6 +260,7 @@ static void pci_bridge_dev_class_init(ObjectClass *klass, void *data)
+     dc->vmsd = &pci_bridge_dev_vmstate;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+     hc->plug = pci_bridge_dev_plug_cb;
++    hc->unplug = pci_bridge_dev_unplug_cb;
+     hc->unplug_request = pci_bridge_dev_unplug_request_cb;
  }
  
-+static void piix4_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-+                                    DeviceState *dev, Error **errp)
-+{
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-+        acpi_pcihp_device_pre_plug_cb(hotplug_dev, dev, errp);
-+    } else if (!object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
-+               !object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-+        error_setg(errp, "acpi: device pre plug request for not supported"
-+                   " device type: %s", object_get_typename(OBJECT(dev)));
-+    }
-+}
-+
- static void piix4_device_plug_cb(HotplugHandler *hotplug_dev,
-                                  DeviceState *dev, Error **errp)
+diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
+index 0ffea680d5..d491b40d04 100644
+--- a/hw/pci-bridge/pcie_pci_bridge.c
++++ b/hw/pci-bridge/pcie_pci_bridge.c
+@@ -154,6 +154,7 @@ static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
+     dc->reset = &pcie_pci_bridge_reset;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+     hc->plug = pci_bridge_dev_plug_cb;
++    hc->unplug = pci_bridge_dev_unplug_cb;
+     hc->unplug_request = pci_bridge_dev_unplug_request_cb;
+ }
+ 
+diff --git a/hw/pci/shpc.c b/hw/pci/shpc.c
+index 7851bfa8ad..45053b39b9 100644
+--- a/hw/pci/shpc.c
++++ b/hw/pci/shpc.c
+@@ -238,6 +238,7 @@ static void shpc_invalid_command(SHPCDevice *shpc)
+ 
+ static void shpc_free_devices_in_slot(SHPCDevice *shpc, int slot)
  {
-@@ -393,8 +405,7 @@ static void piix4_device_plug_cb(HotplugHandler *hotplug_dev,
-             acpi_cpu_plug_cb(hotplug_dev, &s->cpuhp_state, dev, errp);
++    HotplugHandler *hotplug_ctrl;
+     int devfn;
+     int pci_slot = SHPC_IDX_TO_PCI(slot);
+     for (devfn = PCI_DEVFN(pci_slot, 0);
+@@ -245,7 +246,9 @@ static void shpc_free_devices_in_slot(SHPCDevice *shpc, int slot)
+          ++devfn) {
+         PCIDevice *affected_dev = shpc->sec_bus->devices[devfn];
+         if (affected_dev) {
+-            object_unparent(OBJECT(affected_dev));
++            hotplug_ctrl = qdev_get_hotplug_handler(DEVICE(affected_dev));
++            hotplug_handler_unplug(hotplug_ctrl, DEVICE(affected_dev),
++                                   &error_abort);
          }
-     } else {
--        error_setg(errp, "acpi: device plug request for not supported device"
--                   " type: %s", object_get_typename(OBJECT(dev)));
-+        g_assert_not_reached();
      }
  }
+@@ -540,6 +543,12 @@ void shpc_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+     shpc_interrupt_update(pci_hotplug_dev);
+ }
  
-@@ -703,6 +714,7 @@ static void piix4_pm_class_init(ObjectClass *klass, void *data)
-      */
-     dc->user_creatable = false;
-     dc->hotpluggable = false;
-+    hc->pre_plug = piix4_device_pre_plug_cb;
-     hc->plug = piix4_device_plug_cb;
-     hc->unplug_request = piix4_device_unplug_request_cb;
-     hc->unplug = piix4_device_unplug_cb;
++void shpc_device_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
++                           Error **errp)
++{
++    object_unparent(OBJECT(dev));
++}
++
+ void shpc_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+                                    DeviceState *dev, Error **errp)
+ {
 -- 
 MST
