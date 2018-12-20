@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ga1H1-000146-Eq
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 11:34:13 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ga1KX-0003eM-Qi
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 11:37:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ga1Gt-0002er-36
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 11:34:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46058)
+	(envelope-from <stefanha@redhat.com>) id 1ga1KU-00060J-L7
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 11:37:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42894)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ga1Gs-0002dy-OW
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 11:34:02 -0500
-Date: Thu, 20 Dec 2018 11:33:54 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181220113338-mutt-send-email-mst@kernel.org>
-References: <CAMxuvawUrZ=y-txTS86Tz3b-BYY05k4n-jBiY8+vO5e7AOkPKA@mail.gmail.com>
-	<20181210183313-mutt-send-email-mst@kernel.org>
-	<20181211074241.ovuharwewaw22ygq@sirius.home.kraxel.org>
-	<20181211092944.GA921@redhat.com>
-	<20181211135230-mutt-send-email-mst@kernel.org>
-	<CAJ+F1CKuoWWxLqZKQRU-g_144jX2bwsQJUzeW0W-QicNrbPfQw@mail.gmail.com>
-	<20181218181803-mutt-send-email-mst@kernel.org>
-	<CAJ+F1CJmT5O3x84upBDhvvCPCK5x51RP0TxBMsodLzVeQgC-vw@mail.gmail.com>
-	<20181219103112-mutt-send-email-mst@kernel.org>
-	<CAJ+F1CLKftEt8g5WyW8NPOPNsKPXhNnS3BkdVqjrny4cjb+kWw@mail.gmail.com>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ga1KU-0005zO-EX
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 11:37:46 -0500
+Date: Thu, 20 Dec 2018 16:37:38 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20181220163738.GA5662@stefanha-x1.localdomain>
+References: <20181220152030.28035-1-remy.noel@blade-group.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="1yeeQ81UyVL57Vl7"
 Content-Disposition: inline
-In-Reply-To: <CAJ+F1CLKftEt8g5WyW8NPOPNsKPXhNnS3BkdVqjrny4cjb+kWw@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 01/11] vhost-user: define
- conventions for vhost-user backends
+In-Reply-To: <20181220152030.28035-1-remy.noel@blade-group.com>
+Subject: Re: [Qemu-devel] [QEMU-devel][PATCH v4 0/2] Fix concurrent
+ aio_poll/set_fd_handler.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,129 +28,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, "Hoffmann, Gerd" <kraxel@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Maxime Coquelin <maxime.coquelin@redhat.com>
+To: remy.noel@blade-group.com
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Weil <sw@weilnetz.de>
 
-On Thu, Dec 20, 2018 at 04:40:55PM +0400, Marc-Andr=E9 Lureau wrote:
-> Hi
->=20
-> On Wed, Dec 19, 2018 at 7:42 PM Michael S. Tsirkin <mst@redhat.com> wro=
-te:
-> >
-> > On Wed, Dec 19, 2018 at 12:01:59PM +0400, Marc-Andr=E9 Lureau wrote:
-> > > Hi
-> > >
-> > > On Wed, Dec 19, 2018 at 3:20 AM Michael S. Tsirkin <mst@redhat.com>=
- wrote:
-> > > >
-> > > > On Tue, Dec 18, 2018 at 10:35:05PM +0400, Marc-Andr=E9 Lureau wro=
-te:
-> > > > > Hi
-> > > > >
-> > > > > On Tue, Dec 11, 2018 at 10:56 PM Michael S. Tsirkin <mst@redhat=
-.com> wrote:
-> > > > > >
-> > > > > > On Tue, Dec 11, 2018 at 09:29:44AM +0000, Daniel P. Berrang=E9=
- wrote:
-> > > > > > > On Tue, Dec 11, 2018 at 08:42:41AM +0100, Hoffmann, Gerd wr=
-ote:
-> > > > > > > >   Hi,
-> > > > > > > >
-> > > > > > > > > Right. The main issue is that we need to make sure only
-> > > > > > > > > in-tree devices are supported.
-> > > > > > > >
-> > > > > > > > Well, that is under debate right now, see:
-> > > > > > > > https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg=
-04912.html
-> > > > > > >
-> > > > > > > I've previously been against the idea of external plugins f=
-or QEMU,
-> > > > > > > however, that was when the plugin was something that would =
-be dlopen'd
-> > > > > > > by QEMU. That would cause our internal ABI to be exposed to=
- 3rd parties
-> > > > > > > which is highly undesirable, even if they were open source =
-to comply
-> > > > > > > with the license needs.
-> > > > > > >
-> > > > > > > When the plugin is a completely isolated process communicat=
-ing with a
-> > > > > > > well defined protocol, it is not placing a significant burd=
-en on the
-> > > > > > > QEMU developers' ongoing maintainence, nor has problems wit=
-h license
-> > > > > > > compliance. The main problem would come from debugging the =
-combined
-> > > > > > > system as the external process is essentially a black box f=
-rom QEMU's
-> > > > > > > POV. Downstream OS vendors are free to place restrictions o=
-n which
-> > > > > > > backend processes they'd be willing to support with QEMU, a=
-nd upstream
-> > > > > > > is under no obligation to debug stuff beyond the QEMU bound=
-ary.
-> > > > > > >
-> > > > > > > We have already accepted that tradeoff with networking by s=
-upporting
-> > > > > > > vhost-user and have externals impls like DPDK, so I don't s=
-ee a
-> > > > > > > compelling reason to try to restrict it for other vhost-use=
-r backends.
-> > > > > >
-> > > > > > OK seems to be more or less a rough concensus then.
-> > > > > >
-> > > > > > I wonder what's the approach wrt migration though.
-> > > > >
-> > > > > The series doesn't take care of migration.
-> > > > >
-> > > > > >
-> > > > > > Even the compatibility story about vhost-user isn't
-> > > > > > great, I would like to see something solid before
-> > > > > > we allow that.
-> > > > >
-> > > > > To allow migration? vhost-user has partial support for migratio=
-n
-> > > > > (dirty memory tracking), and there is also "[PATCH v2 for-4.0 0=
-/7]
-> > > > > vhost-user-blk: Add support for backend reconnecting" - allowin=
-g the
-> > > > > backend to store some state, if I understand correctly, which c=
-ould be
-> > > > > leveraged I guess...
-> > > > >
-> > > > > But I don't think we should block this series because migration=
- isn't
-> > > > > tackled here.
-> > > > >
-> > > > > thanks
-> > > > >
-> > > > >
-> > > > > .
-> > > >
-> > > > How about blocking migration for now then?
-> > >
-> > > The device here (vhost-user-input) blocks migration (unmigratable =3D=
- 1)
-> >
-> > Right. But that device is just an excersize, right?
->=20
-> Mostly
->=20
-> > It bothers me that next device might not remember and
-> > we will get a mess.
->=20
-> The next device (the one I care most about) is vhost-user-gpu.
->=20
-> > Could we make it somehow that if there is no vmsd
-> > then migration is blocked?
->=20
-> Where would you do that? in DeviceClass? That might break other
-> devices, needs code review. In VirtIODevice? that would be probably
-> simpler.
 
-In vhost user core somehow?
+--1yeeQ81UyVL57Vl7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Dec 20, 2018 at 04:20:28PM +0100, remy.noel@blade-group.com wrote:
+> From: Remy Noel <remy.noel@blade-group.com>
 >=20
+> It is possible for an io_poll/read/write callback to be concurrently exec=
+uted along
+> with an aio_set_fd_handlers. This can cause all sorts of problems, like
+> a NULL callback or a bad opaque pointer.
+>=20
+> V2:
+>     * Do not use RCU anymore as it inccurs a performance loss
+> V3:
+>     * Don't drop revents when a handler is modified [Stefan]
+> V4:
+>     * Unregister fd from ctx epoll when removing fd_handler [Paolo]
+>=20
+> Remy Noel (2):
+>   aio-posix: Unregister fd from ctx epoll when removing fd_handler.
+>   aio-posix: Fix concurrent aio_poll/set_fd_handler.
+>=20
+>  util/aio-posix.c | 90 +++++++++++++++++++++++++++++-------------------
+>  util/aio-win32.c | 67 ++++++++++++++++-------------------
+>  2 files changed, 84 insertions(+), 73 deletions(-)
 >=20
 > --=20
-> Marc-Andr=E9 Lureau
+> 2.19.2
+>=20
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--1yeeQ81UyVL57Vl7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcG8VSAAoJEJykq7OBq3PI4u0H/RL5BCS1wt3ZKf8ckP9yA1Ff
+wh26M5CDjOVcdJ0SDL5LtG+mqQAuajwBhCv8PHkjIErZ7myflKf1+xArFUVExAOT
+eDk7Wf+JRmqFSx052XBMsDN+LEJplTQtCcl4BMTHXuSJHzY2jnyeDwRO7KSISsJY
+FPl+2/HlHY5Jf45SmnE5jmqVX1r4c1yqpydysWSzFZcdDowTM7+iP4khiyxFCnMZ
+kHtFiwT72pRslUCcbNB7cy1j24qHRdBrlrX9RT105+AcuEIpDY819c1s898syOXx
+lmPMztfCGQVrVpKYH+3bEG3WdPWlg/7seCcBWYJ3hE/+JgoGkI407ctsTg1HVdQ=
+=/W/D
+-----END PGP SIGNATURE-----
+
+--1yeeQ81UyVL57Vl7--
