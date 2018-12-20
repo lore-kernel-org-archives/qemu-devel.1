@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gZx9q-0006yd-QU
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:10:31 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gZxAQ-0007Lg-Lk
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:11:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gZx9n-0005Hd-GF
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:10:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57658)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gZx9n-0005H0-8e
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:10:27 -0500
-Date: Thu, 20 Dec 2018 10:10:18 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181220121018.GM19442@habkost.net>
-References: <20181210190600.GK4669@habkost.net> <20181210194258.GD5482@zn.tnic>
-	<20181210200843.GN4669@habkost.net>
-	<20181211103839.GC921@redhat.com>
-	<20181211115546.GQ4669@habkost.net>
-	<e4d9a943-2de2-34a7-3f52-ee3d64ea889a@redhat.com>
-	<20181211153017.GN921@redhat.com> <20181211161440.GG27375@zn.tnic>
-	<20181212195235.GX7141@habkost.net> <20181212200803.GG6653@zn.tnic>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gZxAN-0005n8-Hf
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:11:06 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51591)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1gZxAN-0005mX-AV
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:11:03 -0500
+Received: by mail-wm1-x344.google.com with SMTP id b11so1771707wmj.1
+	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 04:11:03 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 20 Dec 2018 13:11:00 +0100
+Message-Id: <20181220121100.21554-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181212200803.GG6653@zn.tnic>
-Subject: Re: [Qemu-devel] [PATCH -v2] target-i386: Reenable RDTSCP support
- on Opteron_G[345] CPU models CPU models
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] target/i386: Disable MPX support on named CPU
+ models
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,38 +28,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?iso-8859-1?Q?J=F6rg_R=F6del?= <joro@8bytes.org>, Andre Przywara <andre.przywara@arm.com>, kvm ML <kvm@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com
 
-On Wed, Dec 12, 2018 at 09:08:03PM +0100, Borislav Petkov wrote:
-> On Wed, Dec 12, 2018 at 05:52:35PM -0200, Eduardo Habkost wrote:
-> > Why did you remove this entry from PC_COMPAT_2_4?
-> > 
-> > We must keep compatibility with old behavior of Opteron_G2 on
-> > pc-2.4, even if the old behavior was incorrect.
-> 
-> Ok, hunk reverted. v2 below.
-> 
-> Thx.
-> 
-> ---
-> From: Borislav Petkov <bp@suse.de>
-> 
-> The missing functionality was added ~3 years ago with the Linux commit
-> 
->   46896c73c1a4 ("KVM: svm: add support for RDTSCP")
-> 
-> so reenable RDTSCP support on those CPU models.
-> 
-> Opteron_G2 - being family 15, model 6, doesn't have RDTSCP support
-> (the real hardware doesn't have it. K8 got RDTSCP support with the NPT
-> models, i.e., models >= 0x40).
-> 
-> Document the host's minimum required kernel version, while at it.
-> 
-> Signed-off-by: Borislav Petkov <bp@suse.de>
+MPX support is being phased out by Intel; GCC has dropped it, Linux
+is also going to do that.  Even though KVM will have special code
+to support MPX after the kernel proper stops enabling it in XCR0,
+we probably also want to deprecate that in a few years.  As a start,
+do not enable it by default for any named CPU model starting with
+the 4.0 machine types; this include Skylake, Icelake and Cascadelake.
 
-Queued, thanks.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ include/hw/i386/pc.h | 29 +++++++++++++++++++++++++++++
+ target/i386/cpu.c    | 14 +++++++-------
+ 2 files changed, 36 insertions(+), 7 deletions(-)
 
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 9d29c4b1df..39619e9c01 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -296,6 +296,35 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+ 
+ #define PC_COMPAT_3_1 \
+     HW_COMPAT_3_1 \
++    {\
++        .driver   = "Skylake-Client" "-" TYPE_X86_CPU,\
++        .property = "mpx",\
++        .value    = "on",\
++    },{\
++        .driver   = "Skylake-Client-IBRS" "-" TYPE_X86_CPU,\
++        .property = "mpx",\
++        .value    = "on",\
++    },{\
++        .driver   = "Skylake-Server" "-" TYPE_X86_CPU,\
++        .property = "mpx",\
++        .value    = "on",\
++    },{\
++        .driver   = "Skylake-Server-IBRS" "-" TYPE_X86_CPU,\
++        .property = "mpx",\
++        .value    = "on",\
++    },{\
++        .driver   = "Cascadelake-Server" "-" TYPE_X86_CPU,\
++        .property = "mpx",\
++        .value    = "on",\
++    },{\
++        .driver   = "Icelake-Client" "-" TYPE_X86_CPU,\
++        .property = "mpx",\
++        .value    = "on",\
++    },{\
++        .driver   = "Icelake-Server" "-" TYPE_X86_CPU,\
++        .property = "mpx",\
++        .value    = "on",\
++    },
+ 
+ #define PC_COMPAT_3_0 \
+     HW_COMPAT_3_0 \
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 677a3bd5fb..1dc1f569da 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -2296,7 +2296,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+             CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
+             CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
+             CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
+-            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX,
++            CPUID_7_0_EBX_SMAP,
+         /* Missing: XSAVES (not supported by some Linux versions,
+          * including v4.1 to v4.12).
+          * KVM doesn't yet expose any XSAVES state save component,
+@@ -2343,7 +2343,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+             CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
+             CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
+             CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
+-            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX,
++            CPUID_7_0_EBX_SMAP,
+         /* Missing: XSAVES (not supported by some Linux versions,
+          * including v4.1 to v4.12).
+          * KVM doesn't yet expose any XSAVES state save component,
+@@ -2388,7 +2388,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+             CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
+             CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
+             CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
+-            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_CLWB |
++            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLWB |
+             CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
+             CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
+             CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
+@@ -2440,7 +2440,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+             CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
+             CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
+             CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
+-            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_CLWB |
++            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLWB |
+             CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
+             CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
+             CPUID_7_0_EBX_AVX512VL,
+@@ -2490,7 +2490,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+             CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
+             CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
+             CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
+-            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_CLWB |
++            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLWB |
+             CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
+             CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
+             CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT |
+@@ -2546,7 +2546,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+             CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
+             CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
+             CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
+-            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_INTEL_PT,
++            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_INTEL_PT,
+         .features[FEAT_7_0_ECX] =
+             CPUID_7_0_ECX_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
+             CPUID_7_0_ECX_OSPKE | CPUID_7_0_ECX_VBMI2 | CPUID_7_0_ECX_GFNI |
+@@ -2601,7 +2601,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+             CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
+             CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
+             CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
+-            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_CLWB |
++            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLWB |
+             CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
+             CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
+             CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT |
 -- 
-Eduardo
+2.20.1
