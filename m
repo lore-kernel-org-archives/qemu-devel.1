@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gZocW-0002qX-7C
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 22:03:33 -0500
+	(envelope-from <fli@suse.com>) id 1gZot4-0006W8-GJ
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 22:20:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gZocS-0005fm-75
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 22:03:32 -0500
-Received: from mga18.intel.com ([134.134.136.126]:45248)
+	(envelope-from <fli@suse.com>) id 1gZot0-0008B8-6w
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 22:20:37 -0500
+Received: from mx2.suse.de ([195.135.220.15]:52070 helo=mx1.suse.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1gZocM-0005bZ-9c
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 22:03:26 -0500
-Date: Thu, 20 Dec 2018 11:03:12 +0800
-From: Yi Zhang <yi.z.zhang@linux.intel.com>
-Message-ID: <20181220030312.GA70591@tiger-server>
-References: <cover.1545120100.git.yi.z.zhang@linux.intel.com>
-	<5eb87eb9a389242772375dd52bd97c17564a0829.1545120100.git.yi.z.zhang@linux.intel.com>
-	<20181218085249-mutt-send-email-mst@kernel.org>
-	<20181219091017.GA35378@tiger-server>
-	<20181219105555-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gZosy-00086j-G5
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 22:20:34 -0500
+References: <20181211095057.14623-1-fli@suse.com>
+	<20181211095057.14623-7-fli@suse.com>
+	<87y38tc2fb.fsf@dusky.pond.sub.org>
+	<3645fb54-3651-f63b-c416-b22634e1f992@suse.com>
+	<87zht1keso.fsf@dusky.pond.sub.org>
+	<cc510f12-e94c-bd90-ce01-4ad5d143420f@suse.com>
+	<9be94c80-623d-c1e7-2524-07b07d05446c@redhat.com>
+From: Fei Li <fli@suse.com>
+Message-ID: <d4768f41-b010-3b97-5275-58bd151d8562@suse.com>
+Date: Thu, 20 Dec 2018 11:20:22 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181219105555-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH V7 6/6] hostmem-file: add 'sync' option
+In-Reply-To: <9be94c80-623d-c1e7-2524-07b07d05446c@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v8 6/7] qemu_thread_create:
+ propagate the error to callers to handle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +34,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: peter.maydell@linaro.org, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, imammedo@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com, crosthwaite.peter@gmail.com, richard.henderson@linaro.org, xiaoguangrong.eric@gmail.com
+To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: David Gibson <dgibson@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 2018-12-19 at 10:59:10 -0500, Michael S. Tsirkin wrote:
-> On Wed, Dec 19, 2018 at 05:10:18PM +0800, Yi Zhang wrote:
-> > > > +
-> > > > + - 'sync' option of memory-backend-file is not 'off', and
-> > > > +
-> > > > + - 'share' option of memory-backend-file is 'on'.
-> > > > +
-> > > > + - 'pmem' option of memory-backend-file is 'on'
-> > > > +
-> > > 
-> > > Wait isn't this what pmem was supposed to do?
-> > > Doesn't it mean "persistent memory"?
-> > pmem is a option for memory-backend-file, user should know the backend
-> > is in host persistent memory, with this flags on, while there is a host crash
-> > or a power failures.
-> > 
-> > [1] Qemu will take necessary operations to guarantee the persistence.
-> > https://patchwork.ozlabs.org/cover/944749/ 
-> > 
-> > [2] Host kernel also take opretions to consistent filesystem metadata.
-> > Add MAP_SYNC flags.
-> 
-> OK so I'm a user. Can you educate me please?  
-We suppose an administrator should know it, what is the back-end region coming from,
-is it persistent? what is the font-end device is? a volatile dimm or an
-nonvolatile dimm? then they can choice put the pmem=on[off] and sync=on[off].
-If he didn't, we encourage that don't set these 2 flags.
 
-> When should MAP_SYNC not
-> be set? Are there any disadvantages (e.g.  performance?)?
-Not only the performance, sometimes like the front-end device is an
-volatile ram, we don't wanna set such option although the backend is a
-novolatile memory, if power lose, all of thing should lose in this ram.
 
-> 
-> -- 
-> MST
-> 
+On 12/20/2018 01:29 AM, Eric Blake wrote:
+> On 12/19/18 6:14 AM, Fei Li wrote:
+>
+>>>>>> =C2=A0=C2=A0 28 files changed, 243 insertions(+), 101 deletions(-)
+>
+>>> I recommend to split this patch.=C2=A0 First part adds the Error **=20
+>>> parameter
+>>> to qemu_thread_create(), passing &error_abort everywhere. No function=
+al
+>>> change.=C2=A0 Subsequent patches then improve on &error_abort. This w=
+ay,
+>>> each improvement patch can be cc'ed to just that part's maintainer(s)=
+.
+>>> Parts you don't want to touch you simply leave at &error_abort.=C2=A0=
+ Makes
+>>> sense?
+>> Yes, I think this makes sense, much clearer. :) But I am a little=20
+>> worried about
+>> whether too many subsequent improvement patches (some of them are quit=
+e
+>> small changes) are acceptable.
+>
+> A long series of small patches, where each patch is cc'd to an=20
+> appropriate maintainer, will likely get cumulative reviews faster than=20
+> a single monolithic patch where no one person is the expert on every=20
+> line touched.
+>
+Ok, thanks for the advice!
+
+Have a nice day
+Fei
