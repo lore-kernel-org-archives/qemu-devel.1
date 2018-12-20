@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gZo6M-0004AS-Pw
+	(envelope-from <jsnow@redhat.com>) id 1gZo6K-00048p-Vn
 	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 21:30:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gZo6G-0007YW-Mi
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 21:30:16 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gZo6A-0007O0-VC
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 21:30:12 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Wed, 19 Dec 2018 21:29:42 -0500
-Message-Id: <20181220022952.20493-2-jsnow@redhat.com>
+Date: Wed, 19 Dec 2018 21:29:43 -0500
+Message-Id: <20181220022952.20493-3-jsnow@redhat.com>
 In-Reply-To: <20181220022952.20493-1-jsnow@redhat.com>
 References: <20181220022952.20493-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 01/11] blockdev: abort transactions in
- reverse order
+Subject: [Qemu-devel] [PATCH v5 02/11] block/dirty-bitmap: remove assertion
+ from restore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,78 +23,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, vsementsov@virtuozzo.com, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, Markus Armbruster <armbru@redhat.com>
 
-Presently, we abort transactions in the same order they were processed in.
-Bitmap commands, though, attempt to restore backup data structures on abort.
+When making a backup of a dirty bitmap (for transactions), we want to
+restore that backup whether or not the bitmap is enabled or not.
 
-That's not valid, they need to be aborted in reverse chronological order.
+It is perfectly valid to write into bitmaps that are disabled. It is
+only illegitimate for the guest to have done so.
 
-Replace the QSIMPLEQ data structure with a QTAILQ one, so we can iterate
-in reverse for the abort phase of the transaction.
+Remove this assertion.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- blockdev.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ block/dirty-bitmap.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index a6f71f9d83..43e4c22da5 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1339,7 +1339,7 @@ struct BlkActionState {
-     const BlkActionOps *ops;
-     JobTxn *block_job_txn;
-     TransactionProperties *txn_props;
--    QSIMPLEQ_ENTRY(BlkActionState) entry;
-+    QTAILQ_ENTRY(BlkActionState) entry;
- };
- 
- /* internal snapshot private data */
-@@ -2266,8 +2266,8 @@ void qmp_transaction(TransactionActionList *dev_list,
-     BlkActionState *state, *next;
-     Error *local_err = NULL;
- 
--    QSIMPLEQ_HEAD(snap_bdrv_states, BlkActionState) snap_bdrv_states;
--    QSIMPLEQ_INIT(&snap_bdrv_states);
-+    QTAILQ_HEAD(snap_bdrv_states, BlkActionState) snap_bdrv_states;
-+    QTAILQ_INIT(&snap_bdrv_states);
- 
-     /* Does this transaction get canceled as a group on failure?
-      * If not, we don't really need to make a JobTxn.
-@@ -2298,7 +2298,7 @@ void qmp_transaction(TransactionActionList *dev_list,
-         state->action = dev_info;
-         state->block_job_txn = block_job_txn;
-         state->txn_props = props;
--        QSIMPLEQ_INSERT_TAIL(&snap_bdrv_states, state, entry);
-+        QTAILQ_INSERT_TAIL(&snap_bdrv_states, state, entry);
- 
-         state->ops->prepare(state, &local_err);
-         if (local_err) {
-@@ -2307,7 +2307,7 @@ void qmp_transaction(TransactionActionList *dev_list,
-         }
-     }
- 
--    QSIMPLEQ_FOREACH(state, &snap_bdrv_states, entry) {
-+    QTAILQ_FOREACH(state, &snap_bdrv_states, entry) {
-         if (state->ops->commit) {
-             state->ops->commit(state);
-         }
-@@ -2318,13 +2318,13 @@ void qmp_transaction(TransactionActionList *dev_list,
- 
- delete_and_fail:
-     /* failure, and it is all-or-none; roll back all operations */
--    QSIMPLEQ_FOREACH(state, &snap_bdrv_states, entry) {
-+    QTAILQ_FOREACH_REVERSE(state, &snap_bdrv_states, snap_bdrv_states, entry) {
-         if (state->ops->abort) {
-             state->ops->abort(state);
-         }
-     }
- exit:
--    QSIMPLEQ_FOREACH_SAFE(state, &snap_bdrv_states, entry, next) {
-+    QTAILQ_FOREACH_SAFE(state, &snap_bdrv_states, entry, next) {
-         if (state->ops->clean) {
-             state->ops->clean(state);
-         }
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 89fd1d7f8b..6b688394e4 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -625,7 +625,6 @@ void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
+ void bdrv_restore_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap *backup)
+ {
+     HBitmap *tmp = bitmap->bitmap;
+-    assert(bdrv_dirty_bitmap_enabled(bitmap));
+     assert(!bdrv_dirty_bitmap_readonly(bitmap));
+     bitmap->bitmap = backup;
+     hbitmap_free(tmp);
 -- 
 2.17.2
