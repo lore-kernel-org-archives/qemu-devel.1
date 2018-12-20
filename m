@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ga3DO-0004B8-O1
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:38:36 -0500
+	(envelope-from <mst@redhat.com>) id 1ga3E8-0004jJ-Vk
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:39:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ga3DK-0007it-7M
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:38:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56932)
+	(envelope-from <mst@redhat.com>) id 1ga3Dv-0008Nr-7b
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:39:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55716)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ga3DJ-0007gg-Ml
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:38:30 -0500
-Date: Thu, 20 Dec 2018 13:38:15 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ga3Do-00083I-Gk
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:39:06 -0500
+Date: Thu, 20 Dec 2018 13:38:43 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181220183059.20726-11-mst@redhat.com>
+Message-ID: <20181220183059.20726-13-mst@redhat.com>
 References: <20181220183059.20726-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20181220183059.20726-1-mst@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v3 10/44] pcie: Create enums for link speed and
- width
+Subject: [Qemu-devel] [PULL v3 12/44] qapi: Define PCIe link speed and width
+ properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,100 +28,289 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Geoffrey McRae <geoff@hostfission.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Eric Auger <eric.auger@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>, Eric Blake <eblake@redhat.com>, Geoffrey McRae <geoff@hostfission.com>, Markus Armbruster <armbru@redhat.com>
 
 From: Alex Williamson <alex.williamson@redhat.com>
 
-In preparation for reporting higher virtual link speeds and widths,
-create enums and macros to help us manage them.
+Create properties to be able to define speeds and widths for PCIe
+links.  The only tricky bit here is that our get and set callbacks
+translate from the fixed QAPI automagic enums to those we define
+in PCI code to represent the actual register segment value.
 
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Eric Blake <eblake@redhat.com>
 Tested-by: Geoffrey McRae <geoff@hostfission.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/pci/pcie_regs.h | 23 +++++++++++++++++++++--
- hw/pci/pcie.c              |  7 ++++---
- hw/vfio/pci.c              |  3 ++-
- 3 files changed, 27 insertions(+), 6 deletions(-)
+ qapi/common.json             |  42 +++++++++
+ include/hw/qdev-properties.h |   8 ++
+ hw/core/qdev-properties.c    | 176 +++++++++++++++++++++++++++++++++++
+ 3 files changed, 226 insertions(+)
 
-diff --git a/include/hw/pci/pcie_regs.h b/include/hw/pci/pcie_regs.h
-index a95522a13b..ad4e7808b8 100644
---- a/include/hw/pci/pcie_regs.h
-+++ b/include/hw/pci/pcie_regs.h
-@@ -34,10 +34,29 @@
-=20
- /* PCI_EXP_LINK{CAP, STA} */
- /* link speed */
--#define PCI_EXP_LNK_LS_25               1
-+typedef enum PCIExpLinkSpeed {
-+    QEMU_PCI_EXP_LNK_2_5GT =3D 1,
-+    QEMU_PCI_EXP_LNK_5GT,
-+    QEMU_PCI_EXP_LNK_8GT,
-+    QEMU_PCI_EXP_LNK_16GT,
-+} PCIExpLinkSpeed;
+diff --git a/qapi/common.json b/qapi/common.json
+index 021174f04e..99d313ef3b 100644
+--- a/qapi/common.json
++++ b/qapi/common.json
+@@ -127,6 +127,48 @@
+ { 'enum': 'OffAutoPCIBAR',
+   'data': [ 'off', 'auto', 'bar0', 'bar1', 'bar2', 'bar3', 'bar4', 'bar5' ] }
+ 
++##
++# @PCIELinkSpeed:
++#
++# An enumeration of PCIe link speeds in units of GT/s
++#
++# @2_5: 2.5GT/s
++#
++# @5: 5.0GT/s
++#
++# @8: 8.0GT/s
++#
++# @16: 16.0GT/s
++#
++# Since: 4.0
++##
++{ 'enum': 'PCIELinkSpeed',
++  'data': [ '2_5', '5', '8', '16' ] }
 +
-+#define QEMU_PCI_EXP_LNKCAP_MLS(speed)  (speed)
-+#define QEMU_PCI_EXP_LNKSTA_CLS         QEMU_PCI_EXP_LNKCAP_MLS
++##
++# @PCIELinkWidth:
++#
++# An enumeration of PCIe link width
++#
++# @1: x1
++#
++# @2: x2
++#
++# @4: x4
++#
++# @8: x8
++#
++# @12: x12
++#
++# @16: x16
++#
++# @32: x32
++#
++# Since: 4.0
++##
++{ 'enum': 'PCIELinkWidth',
++  'data': [ '1', '2', '4', '8', '12', '16', '32' ] }
 +
-+typedef enum PCIExpLinkWidth {
-+    QEMU_PCI_EXP_LNK_X1 =3D 1,
-+    QEMU_PCI_EXP_LNK_X2 =3D 2,
-+    QEMU_PCI_EXP_LNK_X4 =3D 4,
-+    QEMU_PCI_EXP_LNK_X8 =3D 8,
-+    QEMU_PCI_EXP_LNK_X12 =3D 12,
-+    QEMU_PCI_EXP_LNK_X16 =3D 16,
-+    QEMU_PCI_EXP_LNK_X32 =3D 32,
-+} PCIExpLinkWidth;
-=20
- #define PCI_EXP_LNK_MLW_SHIFT           ctz32(PCI_EXP_LNKCAP_MLW)
--#define PCI_EXP_LNK_MLW_1               (1 << PCI_EXP_LNK_MLW_SHIFT)
-+#define QEMU_PCI_EXP_LNKCAP_MLW(width)  (width << PCI_EXP_LNK_MLW_SHIFT)
-+#define QEMU_PCI_EXP_LNKSTA_NLW         QEMU_PCI_EXP_LNKCAP_MLW
-=20
- /* PCI_EXP_LINKCAP */
- #define PCI_EXP_LNKCAP_ASPMS_SHIFT      ctz32(PCI_EXP_LNKCAP_ASPMS)
-diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-index 66b73b87c8..aef84c665b 100644
---- a/hw/pci/pcie.c
-+++ b/hw/pci/pcie.c
-@@ -68,11 +68,12 @@ pcie_cap_v1_fill(PCIDevice *dev, uint8_t port, uint8_=
-t type, uint8_t version)
-     pci_set_long(exp_cap + PCI_EXP_LNKCAP,
-                  (port << PCI_EXP_LNKCAP_PN_SHIFT) |
-                  PCI_EXP_LNKCAP_ASPMS_0S |
--                 PCI_EXP_LNK_MLW_1 |
--                 PCI_EXP_LNK_LS_25);
-+                 QEMU_PCI_EXP_LNKCAP_MLW(QEMU_PCI_EXP_LNK_X1) |
-+                 QEMU_PCI_EXP_LNKCAP_MLS(QEMU_PCI_EXP_LNK_2_5GT));
-=20
-     pci_set_word(exp_cap + PCI_EXP_LNKSTA,
--                 PCI_EXP_LNK_MLW_1 | PCI_EXP_LNK_LS_25);
-+                 QEMU_PCI_EXP_LNKSTA_NLW(QEMU_PCI_EXP_LNK_X1) |
-+                 QEMU_PCI_EXP_LNKSTA_CLS(QEMU_PCI_EXP_LNK_2_5GT));
-=20
-     if (dev->cap_present & QEMU_PCIE_LNKSTA_DLLLA) {
-         pci_word_test_and_set_mask(exp_cap + PCI_EXP_LNKSTA,
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 5c7bd96984..74f9a46b4b 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -1897,7 +1897,8 @@ static int vfio_setup_pcie_cap(VFIOPCIDevice *vdev,=
- int pos, uint8_t size,
-                                    PCI_EXP_TYPE_ENDPOINT << 4,
-                                    PCI_EXP_FLAGS_TYPE);
-             vfio_add_emulated_long(vdev, pos + PCI_EXP_LNKCAP,
--                                   PCI_EXP_LNK_MLW_1 | PCI_EXP_LNK_LS_25=
-, ~0);
-+                           QEMU_PCI_EXP_LNKCAP_MLW(QEMU_PCI_EXP_LNK_X1) =
-|
-+                           QEMU_PCI_EXP_LNKCAP_MLS(QEMU_PCI_EXP_LNK_2_5G=
-T), ~0);
-             vfio_add_emulated_word(vdev, pos + PCI_EXP_LNKCTL, 0, ~0);
-         }
-=20
---=20
+ ##
+ # @SysEmuTarget:
+ #
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index 3ab9cd2eb6..b6758c852e 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -36,6 +36,8 @@ extern const PropertyInfo qdev_prop_uuid;
+ extern const PropertyInfo qdev_prop_arraylen;
+ extern const PropertyInfo qdev_prop_link;
+ extern const PropertyInfo qdev_prop_off_auto_pcibar;
++extern const PropertyInfo qdev_prop_pcie_link_speed;
++extern const PropertyInfo qdev_prop_pcie_link_width;
+ 
+ #define DEFINE_PROP(_name, _state, _field, _prop, _type) { \
+         .name      = (_name),                                    \
+@@ -217,6 +219,12 @@ extern const PropertyInfo qdev_prop_off_auto_pcibar;
+ #define DEFINE_PROP_OFF_AUTO_PCIBAR(_n, _s, _f, _d) \
+     DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_off_auto_pcibar, \
+                         OffAutoPCIBAR)
++#define DEFINE_PROP_PCIE_LINK_SPEED(_n, _s, _f, _d) \
++    DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_pcie_link_speed, \
++                        PCIExpLinkSpeed)
++#define DEFINE_PROP_PCIE_LINK_WIDTH(_n, _s, _f, _d) \
++    DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_pcie_link_width, \
++                        PCIExpLinkWidth)
+ 
+ #define DEFINE_PROP_UUID(_name, _state, _field) {                  \
+         .name      = (_name),                                      \
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index bd84c4ea4c..943dc2654b 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -1297,3 +1297,179 @@ const PropertyInfo qdev_prop_off_auto_pcibar = {
+     .set = set_enum,
+     .set_default_value = set_default_value_enum,
+ };
++
++/* --- PCIELinkSpeed 2_5/5/8/16 -- */
++
++static void get_prop_pcielinkspeed(Object *obj, Visitor *v, const char *name,
++                                   void *opaque, Error **errp)
++{
++    DeviceState *dev = DEVICE(obj);
++    Property *prop = opaque;
++    PCIExpLinkSpeed *p = qdev_get_prop_ptr(dev, prop);
++    int speed;
++
++    switch (*p) {
++    case QEMU_PCI_EXP_LNK_2_5GT:
++        speed = PCIE_LINK_SPEED_2_5;
++        break;
++    case QEMU_PCI_EXP_LNK_5GT:
++        speed = PCIE_LINK_SPEED_5;
++        break;
++    case QEMU_PCI_EXP_LNK_8GT:
++        speed = PCIE_LINK_SPEED_8;
++        break;
++    case QEMU_PCI_EXP_LNK_16GT:
++        speed = PCIE_LINK_SPEED_16;
++        break;
++    default:
++        /* Unreachable */
++        abort();
++    }
++
++    visit_type_enum(v, prop->name, &speed, prop->info->enum_table, errp);
++}
++
++static void set_prop_pcielinkspeed(Object *obj, Visitor *v, const char *name,
++                                   void *opaque, Error **errp)
++{
++    DeviceState *dev = DEVICE(obj);
++    Property *prop = opaque;
++    PCIExpLinkSpeed *p = qdev_get_prop_ptr(dev, prop);
++    int speed;
++    Error *local_err = NULL;
++
++    if (dev->realized) {
++        qdev_prop_set_after_realize(dev, name, errp);
++        return;
++    }
++
++    visit_type_enum(v, prop->name, &speed, prop->info->enum_table, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    switch (speed) {
++    case PCIE_LINK_SPEED_2_5:
++        *p = QEMU_PCI_EXP_LNK_2_5GT;
++        break;
++    case PCIE_LINK_SPEED_5:
++        *p = QEMU_PCI_EXP_LNK_5GT;
++        break;
++    case PCIE_LINK_SPEED_8:
++        *p = QEMU_PCI_EXP_LNK_8GT;
++        break;
++    case PCIE_LINK_SPEED_16:
++        *p = QEMU_PCI_EXP_LNK_16GT;
++        break;
++    default:
++        /* Unreachable */
++        abort();
++    }
++}
++
++const PropertyInfo qdev_prop_pcie_link_speed = {
++    .name = "PCIELinkSpeed",
++    .description = "2_5/5/8/16",
++    .enum_table = &PCIELinkSpeed_lookup,
++    .get = get_prop_pcielinkspeed,
++    .set = set_prop_pcielinkspeed,
++    .set_default_value = set_default_value_enum,
++};
++
++/* --- PCIELinkWidth 1/2/4/8/12/16/32 -- */
++
++static void get_prop_pcielinkwidth(Object *obj, Visitor *v, const char *name,
++                                   void *opaque, Error **errp)
++{
++    DeviceState *dev = DEVICE(obj);
++    Property *prop = opaque;
++    PCIExpLinkWidth *p = qdev_get_prop_ptr(dev, prop);
++    int width;
++
++    switch (*p) {
++    case QEMU_PCI_EXP_LNK_X1:
++        width = PCIE_LINK_WIDTH_1;
++        break;
++    case QEMU_PCI_EXP_LNK_X2:
++        width = PCIE_LINK_WIDTH_2;
++        break;
++    case QEMU_PCI_EXP_LNK_X4:
++        width = PCIE_LINK_WIDTH_4;
++        break;
++    case QEMU_PCI_EXP_LNK_X8:
++        width = PCIE_LINK_WIDTH_8;
++        break;
++    case QEMU_PCI_EXP_LNK_X12:
++        width = PCIE_LINK_WIDTH_12;
++        break;
++    case QEMU_PCI_EXP_LNK_X16:
++        width = PCIE_LINK_WIDTH_16;
++        break;
++    case QEMU_PCI_EXP_LNK_X32:
++        width = PCIE_LINK_WIDTH_32;
++        break;
++    default:
++        /* Unreachable */
++        abort();
++    }
++
++    visit_type_enum(v, prop->name, &width, prop->info->enum_table, errp);
++}
++
++static void set_prop_pcielinkwidth(Object *obj, Visitor *v, const char *name,
++                                   void *opaque, Error **errp)
++{
++    DeviceState *dev = DEVICE(obj);
++    Property *prop = opaque;
++    PCIExpLinkWidth *p = qdev_get_prop_ptr(dev, prop);
++    int width;
++    Error *local_err = NULL;
++
++    if (dev->realized) {
++        qdev_prop_set_after_realize(dev, name, errp);
++        return;
++    }
++
++    visit_type_enum(v, prop->name, &width, prop->info->enum_table, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    switch (width) {
++    case PCIE_LINK_WIDTH_1:
++        *p = QEMU_PCI_EXP_LNK_X1;
++        break;
++    case PCIE_LINK_WIDTH_2:
++        *p = QEMU_PCI_EXP_LNK_X2;
++        break;
++    case PCIE_LINK_WIDTH_4:
++        *p = QEMU_PCI_EXP_LNK_X4;
++        break;
++    case PCIE_LINK_WIDTH_8:
++        *p = QEMU_PCI_EXP_LNK_X8;
++        break;
++    case PCIE_LINK_WIDTH_12:
++        *p = QEMU_PCI_EXP_LNK_X12;
++        break;
++    case PCIE_LINK_WIDTH_16:
++        *p = QEMU_PCI_EXP_LNK_X16;
++        break;
++    case PCIE_LINK_WIDTH_32:
++        *p = QEMU_PCI_EXP_LNK_X32;
++        break;
++    default:
++        /* Unreachable */
++        abort();
++    }
++}
++
++const PropertyInfo qdev_prop_pcie_link_width = {
++    .name = "PCIELinkWidth",
++    .description = "1/2/4/8/12/16/32",
++    .enum_table = &PCIELinkWidth_lookup,
++    .get = get_prop_pcielinkwidth,
++    .set = set_prop_pcielinkwidth,
++    .set_default_value = set_default_value_enum,
++};
+-- 
 MST
