@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1ga3KC-0001dP-4T
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:45:37 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ga3UA-0001y6-K8
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:55:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1ga3KB-0001u4-A8
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:45:36 -0500
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:33803)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1ga3KB-0001sa-3C
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:45:35 -0500
-Received: by mail-qt1-x842.google.com with SMTP id r14so2980467qtp.1
-	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 10:45:34 -0800 (PST)
-Date: Thu, 20 Dec 2018 10:45:32 -0800 (PST)
-In-Reply-To: <CAKmqyKNY4FCzXcpBMWawVA9RWGBZ7vctRLaQGhsODH6HCXkK9A@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-9f966fb7-686c-4427-a39c-850368f88f0e@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/23] Add RISC-V TCG backend support
+	(envelope-from <pbonzini@redhat.com>) id 1ga3U8-0006oc-F0
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:55:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33608)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ga3U6-0006lp-PP
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:55:51 -0500
+References: <20181220123655.30475-1-pbonzini@redhat.com>
+	<CAFEAcA_=kHDpwcwnEaVEAfD8fQ_UkjKcs_+k_DpQpo9KvF_nhg@mail.gmail.com>
+	<CAFEAcA-AKFxFOdd8PMKC0aMb_NPvhu0KMVcgOP+wUNfy5Qh84g@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2b32a63f-b628-89aa-1860-5f304a1fd7ba@redhat.com>
+Date: Thu, 20 Dec 2018 19:55:45 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-AKFxFOdd8PMKC0aMb_NPvhu0KMVcgOP+wUNfy5Qh84g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v3 00/35] Misc patches for 2018-12-18
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alistair23@gmail.com
-Cc: richard.henderson@linaro.org, qemu-riscv@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, 20 Dec 2018 09:20:05 PST (-0800), alistair23@gmail.com wrote:
-> On Wed, Dec 19, 2018 at 10:07 PM Richard Henderson
-> <richard.henderson@linaro.org> wrote:
+On 20/12/18 18:41, Peter Maydell wrote:
+>> This seemed to work on most of my test hosts but something
+>> weird happened here: hyperlong repetitive command line and
+>> looks like make got an "fwrite(): Resource temporarily unavailable"
+>> halfway through writing it out??
 >>
->> On 12/19/18 11:16 AM, Alistair Francis wrote:
->> > This patch set adds RISC-V backend support to QEMU. This is based on
->> > Michael Clark's original work with extra work on top.
->> >
->> > This has been somewhat tested and can run other architecture softmmu
->> > code. It seems that any complex OS will eventually hang, but we can
->> > run the BIOS and OS startup code for a number of different operating
->> > systems.
->> >
->> > I haven't tested linux user support at all yet. I think Michael had that
->> > working reliably though and hopefully my changes haven't broken it.
->> >
->> > There are still some todos in the code (there are missing instructions
->> > and byte swapping) but these should assert instead of generating invalid
->> > code.
->>
->> Queued to tcg-next, with the extrh fix.
->
-> Thanks Richard!
+>> This was on my x86-64 Linux Ubuntu system, clang build
+>> which I configure with '--cc=3Dclang' '--cxx=3Dclang++' '--enable-gtk'
+>> '--extra-cflags=3D-fsanitize=3Dundefined  -fno-sanitize=3Dshift-base -=
+Werror';
+>> the error is during the 'make -C build/clang check V=3D1' phase.
+>=20
+> Checking my logfiles I think that the previous pull request
+> apply attempt also failed this way, but I didn't notice
+> because of the other failures on other hosts. It may be
+> the combination of the huge command line and the way my
+> test setup uses GNU parallel and ssh to capture the make
+> output into a logfile.
 
-Sounds good to me.  I'm still attempting to collect the RISC-V patches to get a 
-PR out, a few things came up but I should have time now.  This was the biggest 
-patch set, so it should be a lot easier now.
+Ok, I got it even better than the old harness.  Now each test is printed
+individually and the V=3D1 command lines are very easily cut-and-pasted:
 
-Thanks for picking this up!
+  TEST    check-qtest-x86_64: tests/endianness-test
+  TEST    check-qtest-x86_64: tests/fdc-test
+  TEST    check-qtest-x86_64: tests/ide-test
+  TEST    check-qtest-x86_64: tests/ahci-test
 
->> Some of those todos are no longer todos, since e.g. bswap is now optional.
->> Those asserts should never fire (as a good assert should do, I suppose).
->>
->> The missing instructions are only for riscv32, which afaik is just now making
->> its way to glibc.  So a chroot complete enough to build qemu is a ways away.
->> I'm ok with leaving that incomplete for now.
+With V=3D1:
 
-We've decided to delay the rv32i glibc port until after the next glibc release, 
-which is targeted for the beginning of February.  glibc should freeze at the 
-end of the year, at which point we're going to do a rv32i glibc prerelease and 
-try to build a proper userspace with the theory being that we'll shake out ABI 
-bugs that way.
+export MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
+ QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64
+QTEST_QEMU_IMG=3Dqemu-img; tests/endianness-test -m=3Dquick -k --tap |
+./scripts/tap-driver.pl --test-name=3D"endianness-test"
+PASS 1 endianness-test /x86_64/endianness/pc
+PASS 2 endianness-test /x86_64/endianness/split/pc
+PASS 3 endianness-test /x86_64/endianness/combine/pc
+export MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
+ QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64
+QTEST_QEMU_IMG=3Dqemu-img; tests/fdc-test -m=3Dquick -k --tap |
+./scripts/tap-driver.pl --test-name=3D"fdc-test"
+PASS 1 fdc-test /x86_64/fdc/cmos
+PASS 2 fdc-test /x86_64/fdc/no_media_on_start
+PASS 3 fdc-test /x86_64/fdc/read_without_media
+
+...
+
+(as long as you don't use -k).  Thanks for the test.
+
+Paolo
