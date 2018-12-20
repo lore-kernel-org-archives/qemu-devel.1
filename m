@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gZoQ3-0007Df-K9
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 21:50:40 -0500
+	(envelope-from <eblake@redhat.com>) id 1gZoTE-00087T-Mg
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 21:54:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gZoQ2-0004W5-S0
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 21:50:39 -0500
+	(envelope-from <eblake@redhat.com>) id 1gZoTC-0007jb-Mu
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 21:53:56 -0500
 References: <20181220022952.20493-1-jsnow@redhat.com>
-	<20181220022952.20493-9-jsnow@redhat.com>
+	<20181220022952.20493-10-jsnow@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <5c52379d-68f0-34ef-c755-76592a90e828@redhat.com>
-Date: Wed, 19 Dec 2018 20:50:31 -0600
+Message-ID: <577432c1-bfeb-5b56-fea3-24bd50e23825@redhat.com>
+Date: Wed, 19 Dec 2018 20:53:35 -0600
 MIME-Version: 1.0
-In-Reply-To: <20181220022952.20493-9-jsnow@redhat.com>
+In-Reply-To: <20181220022952.20493-10-jsnow@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 08/11] iotests: remove default filters
- from qmp_log
+Subject: Re: [Qemu-devel] [PATCH v5 09/11] iotests: change qmp_log filters
+ to expect QMP objects only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,6 +29,9 @@ To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: vsementsov@virtuozzo.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, Markus Armbruster <armbru@redhat.com>
 
 On 12/19/18 8:29 PM, John Snow wrote:
+> As laid out in the previous commit's message:
+> 
+> ```
 > Several places in iotests deal with serializing objects into JSON
 > strings, but to add pretty-printing it seems desireable to localize
 
@@ -43,23 +46,26 @@ s/desireable/desirable/
 > qmp_log currently operates by dumping outgoing and incoming QMP
 > objects into strings and filtering them assuming that filters=[]
 > are string filters.
+> ```
 > 
-> To have qmp_log use log's serialization, qmp_log will need to
-> accept only qmp filters, not text filters.
+> Therefore:
 > 
-> However, only a single caller of qmp_log actually requires any
-> filters at all. I remove the default filter and add it explicitly
-> to the caller in preparation for refactoring qmp_log to use rich
-> filters instead.
+> Change qmp_log to treat filters as if they're always qmp object filters,
+> then change the logging call to rely on log()'s ability to serialize QMP
+> objects, so we're not duplicating that effort.
 > 
-> test 206 is amended to name the filter explicitly and the default
-> is removed.
+> Add a qmp version of filter_testfiles and adjust the only caller using
+> it for qmp_log to use the qmp version.
 > 
+> Signed-off-by: John Snow  <jsnow@redhat.com>
 > Signed-off-by: John Snow <jsnow@redhat.com>
+
+Odd double S-o-B differing only by space.
+
 > ---
->   tests/qemu-iotests/206        | 8 ++++++--
->   tests/qemu-iotests/iotests.py | 2 +-
->   2 files changed, 7 insertions(+), 3 deletions(-)
+>   tests/qemu-iotests/206        |  4 ++--
+>   tests/qemu-iotests/iotests.py | 24 +++++++++++++++++++++---
+>   2 files changed, 23 insertions(+), 5 deletions(-)
 > 
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
