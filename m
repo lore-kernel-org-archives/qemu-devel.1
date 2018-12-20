@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZzrI-0001Np-75
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 10:03:36 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gZzxn-0003QQ-Oq
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 10:10:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZzrD-0008H5-7K
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 10:03:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:30477)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZzrB-0008Fe-UZ
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 10:03:26 -0500
-Date: Thu, 20 Dec 2018 10:03:23 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181220095621-mutt-send-email-mst@kernel.org>
-References: <20181218161008.3882-1-mst@redhat.com>
-	<CAFEAcA-mzqQ+tt+43LVnruBj9Mgf2q7MaCgV5o2BPz3GJT+i+A@mail.gmail.com>
-	<20181220154959.4a598d84@Igors-MacBook-Pro.local>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gZzxj-0006JO-L2
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 10:10:15 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 20 Dec 2018 15:09:51 +0000
+Message-ID: <22f5652f-1881-1576-18c1-140b57bce1db@virtuozzo.com>
+References: <20181218075707.12006-1-anton.nefedov@virtuozzo.com>
+	<20181218075707.12006-5-anton.nefedov@virtuozzo.com>
+In-Reply-To: <20181218075707.12006-5-anton.nefedov@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <B21E80E95C74CF4C9EFD06988661A4B7@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181220154959.4a598d84@Igors-MacBook-Pro.local>
-Subject: Re: [Qemu-devel] [PULL v2 00/30] pci, pc, virtio: fixes, features
+Subject: Re: [Qemu-devel] [PATCH v11 04/10] block: introduce
+ BDRV_REQ_ALLOCATE flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,65 +26,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
 
-On Thu, Dec 20, 2018 at 03:49:59PM +0100, Igor Mammedov wrote:
-> On Wed, 19 Dec 2018 19:15:26 +0000
-> Peter Maydell <peter.maydell@linaro.org> wrote:
-> 
-> > On Tue, 18 Dec 2018 at 16:11, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > >
-> > > Changes from v1:
-> > >     Drop
-> > >         intel_iommu: turn on IR by default
-> > >
-> > > The following changes since commit f163448536e5f7ae8905b14547eab37a41a75f6c:
-> > >
-> > >   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20181216' into staging (2018-12-17 13:04:25 +0000)
-> > >
-> > > are available in the Git repository at:
-> > >
-> > >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-> > >
-> > > for you to fetch changes up to d4ea2be7e8718ad6c1e5810bee6bdf5a0b8f31b8:
-> > >
-> > >   hw/i386: Remove deprecated machines pc-0.10 and pc-0.11 (2018-12-18 11:09:02 -0500)
-> > >
-> > > ----------------------------------------------------------------
-> > > pci, pc, virtio: fixes, features
-> > >
-> > > VTD fixes
-> > > ACPI refactoring
-> > > new names for virtio devices
-> > > multiple pcie link width/speeds
-> > >
-> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > 
-> > Hi; I'm afraid I get conflicts in some files which look
-> > too complicated for me to want to try to resolve at this end:
-> > Auto-merging tests/vmgenid-test.c
-> > CONFLICT (content): Merge conflict in tests/vmgenid-test.c
-> > Auto-merging tests/bios-tables-test.c
-> > CONFLICT (content): Merge conflict in tests/bios-tables-test.c
-> > Auto-merging tests/acpi-utils.h
-> > CONFLICT (content): Merge conflict in tests/acpi-utils.h
-> > Auto-merging tests/acpi-utils.c
-> > CONFLICT (content): Merge conflict in tests/acpi-utils.c
-> > Removing include/hw/smbios/ipmi.h
-> 
-> I'm working on fixing conflicts due to 29/30 and will include conflicting patch in my acpi tests cleanup on respin
-> 
-> Meanwhile could you drop 29/30 and apply the rest of pull request (which applies just fine)?
-
-I rebased it all. Preparing a pull request. Can you look at my tree
-for_upstream branch and confirm?
-
-Thanks!
-
-> > 
-> > Please can you rebase and resend?
-> > 
-> > thanks
-> > -- PMM
-> > 
+MTguMTIuMjAxOCAxMDo1NywgQW50b24gTmVmZWRvdiB3cm90ZToNCj4gVGhlIGZsYWcgaXMgc3Vw
+cG9zZWQgdG8gaW5kaWNhdGUgdGhhdCB0aGUgcmVnaW9uIG9mIHRoZSBkaXNrIGltYWdlIGhhcw0K
+PiB0byBiZSBzdWZmaWNpZW50bHkgYWxsb2NhdGVkIHNvIGl0IHJlYWRzIGFzIHplcm9lcy4NCj4g
+DQo+IFRoZSBjYWxsIHdpdGggdGhlIGZsYWcgc2V0IG11c3QgcmV0dXJuIC1FTk9UU1VQIGlmIGFs
+bG9jYXRpb24gY2Fubm90DQo+IGJlIGRvbmUgZWZmaWNpZW50bHkuDQo+IFRoaXMgaGFzIHRvIGJl
+IG1hZGUgc3VyZSBvZiBieSBib3RoDQo+ICAgIC0gdGhlIGRyaXZlcnMgdGhhdCBzdXBwb3J0IHRo
+ZSBmbGFnDQo+ICAgIC0gYW5kIHRoZSBjb21tb24gYmxvY2sgbGF5ZXIgKHNvIGl0IHdpbGwgbm90
+IGZhbGwgYmFjayB0byBhbnkgc2xvd3BhdGgNCj4gICAgICAobGlrZSB3cml0aW5nIHplcm8gYnVm
+ZmVycykgaW4gY2FzZSB0aGUgZHJpdmVyIGRvZXMgbm90IHN1cHBvcnQNCj4gICAgICB0aGUgZmxh
+ZykuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBBbnRvbiBOZWZlZG92IDxhbnRvbi5uZWZlZG92QHZp
+cnR1b3p6by5jb20+DQo+IC0tLQ0KPiAgIGluY2x1ZGUvYmxvY2svYmxvY2suaCAgICAgfCAxMCAr
+KysrKysrKystDQo+ICAgaW5jbHVkZS9ibG9jay9ibG9ja19pbnQuaCB8ICAzICsrLQ0KPiAgIGJs
+b2NrL2lvLmMgICAgICAgICAgICAgICAgfCAxNCArKysrKysrKysrKysrLQ0KPiAgIDMgZmlsZXMg
+Y2hhbmdlZCwgMjQgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1n
+aXQgYS9pbmNsdWRlL2Jsb2NrL2Jsb2NrLmggYi9pbmNsdWRlL2Jsb2NrL2Jsb2NrLmgNCj4gaW5k
+ZXggZjcwYTg0M2I3Mi4uNjQzZDMyZjRiOCAxMDA2NDQNCj4gLS0tIGEvaW5jbHVkZS9ibG9jay9i
+bG9jay5oDQo+ICsrKyBiL2luY2x1ZGUvYmxvY2svYmxvY2suaA0KPiBAQCAtODMsOCArODMsMTYg
+QEAgdHlwZWRlZiBlbnVtIHsNCj4gICAgICAgICovDQo+ICAgICAgIEJEUlZfUkVRX1NFUklBTElT
+SU5HICAgICAgICA9IDB4ODAsDQo+ICAgDQo+ICsgICAgLyoNCj4gKyAgICAgKiBUaGUgQkRSVl9S
+RVFfQUxMT0NBVEUgZmxhZyBpcyB1c2VkIHRvIGluZGljYXRlIHRoYXQgdGhlIGRyaXZlciBoYXMg
+dG8NCj4gKyAgICAgKiBlZmZpY2llbnRseSBhbGxvY2F0ZSB0aGUgc3BhY2Ugc28gaXQgcmVhZHMg
+YXMgemVyb2VzLCBvciByZXR1cm4gYW4gZXJyb3IuDQo+ICsgICAgICogSWYgdGhpcyBmbGFnIGlz
+IHNldCB0aGVuIEJEUlZfUkVRX1pFUk9fV1JJVEUgbXVzdCBhbHNvIGJlIHNldC4NCj4gKyAgICAg
+KiBUaGlzIGZsYWcgY2Fubm90IGJlIHNldCB0b2dldGhlciB3aXRoIEJEUlZfUkVRX01BWV9VTk1B
+UC4NCj4gKyAgICAgKi8NCj4gKyAgICBCRFJWX1JFUV9BTExPQ0FURSAgICAgICAgICAgPSAweDEw
+MCwNCj4gKw0KPiAgICAgICAvKiBNYXNrIG9mIHZhbGlkIGZsYWdzICovDQo+IC0gICAgQkRSVl9S
+RVFfTUFTSyAgICAgICAgICAgICAgID0gMHhmZiwNCj4gKyAgICBCRFJWX1JFUV9NQVNLICAgICAg
+ICAgICAgICAgPSAweDFmZiwNCj4gICB9IEJkcnZSZXF1ZXN0RmxhZ3M7DQo+ICAgDQo+ICAgdHlw
+ZWRlZiBzdHJ1Y3QgQmxvY2tTaXplcyB7DQo+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2Jsb2NrL2Js
+b2NrX2ludC5oIGIvaW5jbHVkZS9ibG9jay9ibG9ja19pbnQuaA0KPiBpbmRleCBmNjA1NjIyMjE2
+Li44MzMxMjlkOTEyIDEwMDY0NA0KPiAtLS0gYS9pbmNsdWRlL2Jsb2NrL2Jsb2NrX2ludC5oDQo+
+ICsrKyBiL2luY2x1ZGUvYmxvY2svYmxvY2tfaW50LmgNCj4gQEAgLTcyNCw3ICs3MjQsOCBAQCBz
+dHJ1Y3QgQmxvY2tEcml2ZXJTdGF0ZSB7DQo+ICAgICAgICAqIHRoZWlyIGNoaWxkcmVuLiAqLw0K
+PiAgICAgICB1bnNpZ25lZCBpbnQgc3VwcG9ydGVkX3dyaXRlX2ZsYWdzOw0KPiAgICAgICAvKiBG
+bGFncyBob25vcmVkIGR1cmluZyBwd3JpdGVfemVyb2VzIChzbyBmYXI6IEJEUlZfUkVRX0ZVQSwN
+Cj4gLSAgICAgKiBCRFJWX1JFUV9NQVlfVU5NQVAsIEJEUlZfUkVRX1dSSVRFX1VOQ0hBTkdFRCkg
+Ki8NCj4gKyAgICAgKiBCRFJWX1JFUV9NQVlfVU5NQVAsIEJEUlZfUkVRX1dSSVRFX1VOQ0hBTkdF
+RCwgQkRSVl9SRVFfQUxMT0NBVEUpDQo+ICsgICAgICovDQo+ICAgICAgIHVuc2lnbmVkIGludCBz
+dXBwb3J0ZWRfemVyb19mbGFnczsNCj4gICANCj4gICAgICAgLyogdGhlIGZvbGxvd2luZyBtZW1i
+ZXIgZ2l2ZXMgYSBuYW1lIHRvIGV2ZXJ5IG5vZGUgb24gdGhlIGJzIGdyYXBoLiAqLw0KPiBkaWZm
+IC0tZ2l0IGEvYmxvY2svaW8uYyBiL2Jsb2NrL2lvLmMNCj4gaW5kZXggYmQ5ZDY4OGY4Yi4uNjYw
+MDZhMDg5ZCAxMDA2NDQNCj4gLS0tIGEvYmxvY2svaW8uYw0KPiArKysgYi9ibG9jay9pby5jDQo+
+IEBAIC0xNTM0LDcgKzE1MzQsNyBAQCBzdGF0aWMgaW50IGNvcm91dGluZV9mbiBiZHJ2X2NvX2Rv
+X3B3cml0ZV96ZXJvZXMoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+ICAgICAgICAgICAgICAgYXNz
+ZXJ0KCFicy0+c3VwcG9ydGVkX3plcm9fZmxhZ3MpOw0KPiAgICAgICAgICAgfQ0KPiAgIA0KPiAt
+ICAgICAgICBpZiAocmV0ID09IC1FTk9UU1VQKSB7DQo+ICsgICAgICAgIGlmIChyZXQgPT0gLUVO
+T1RTVVAgJiYgIShmbGFncyAmIEJEUlZfUkVRX0FMTE9DQVRFKSkgew0KPiAgICAgICAgICAgICAg
+IC8qIEZhbGwgYmFjayB0byBib3VuY2UgYnVmZmVyIGlmIHdyaXRlIHplcm9lcyBpcyB1bnN1cHBv
+cnRlZCAqLw0KPiAgICAgICAgICAgICAgIEJkcnZSZXF1ZXN0RmxhZ3Mgd3JpdGVfZmxhZ3MgPSBm
+bGFncyAmIH5CRFJWX1JFUV9aRVJPX1dSSVRFOw0KPiAgIA0KPiBAQCAtMTc3Myw2ICsxNzczLDkg
+QEAgc3RhdGljIGludCBjb3JvdXRpbmVfZm4gYmRydl9jb19kb196ZXJvX3B3cml0ZXYoQmRydkNo
+aWxkICpjaGlsZCwNCj4gICANCj4gICAgICAgYXNzZXJ0KGZsYWdzICYgQkRSVl9SRVFfWkVST19X
+UklURSk7DQo+ICAgICAgIGlmIChoZWFkX3BhZGRpbmdfYnl0ZXMgfHwgdGFpbF9wYWRkaW5nX2J5
+dGVzKSB7DQo+ICsgICAgICAgIGlmIChmbGFncyAmIEJEUlZfUkVRX0FMTE9DQVRFKSB7DQo+ICsg
+ICAgICAgICAgICByZXR1cm4gLUVOT1RTVVA7DQo+ICsgICAgICAgIH0NCj4gICAgICAgICAgIGJ1
+ZiA9IHFlbXVfYmxvY2thbGlnbihicywgYWxpZ24pOw0KPiAgICAgICAgICAgaW92ID0gKHN0cnVj
+dCBpb3ZlYykgew0KPiAgICAgICAgICAgICAgIC5pb3ZfYmFzZSAgID0gYnVmLA0KPiBAQCAtMTg1
+OCw2ICsxODYxLDkgQEAgaW50IGNvcm91dGluZV9mbiBiZHJ2X2NvX3B3cml0ZXYoQmRydkNoaWxk
+ICpjaGlsZCwNCj4gICAgICAgYm9vbCB1c2VfbG9jYWxfcWlvdiA9IGZhbHNlOw0KPiAgICAgICBp
+bnQgcmV0Ow0KPiAgIA0KPiArICAgIGFzc2VydCghKChmbGFncyAmIEJEUlZfUkVRX0FMTE9DQVRF
+KSAmJiAoZmxhZ3MgJiBCRFJWX1JFUV9NQVlfVU5NQVApKSk7DQo+ICsgICAgYXNzZXJ0KCEoKGZs
+YWdzICYgQkRSVl9SRVFfQUxMT0NBVEUpICYmICEoZmxhZ3MgJiBCRFJWX1JFUV9aRVJPX1dSSVRF
+KSkpOw0KPiArDQo+ICAgICAgIHRyYWNlX2JkcnZfY29fcHdyaXRldihjaGlsZC0+YnMsIG9mZnNl
+dCwgYnl0ZXMsIGZsYWdzKTsNCj4gICANCj4gICAgICAgaWYgKCFicy0+ZHJ2KSB7DQo+IEBAIC0x
+OTgwLDYgKzE5ODYsMTIgQEAgaW50IGNvcm91dGluZV9mbiBiZHJ2X2NvX3B3cml0ZV96ZXJvZXMo
+QmRydkNoaWxkICpjaGlsZCwgaW50NjRfdCBvZmZzZXQsDQo+ICAgew0KPiAgICAgICB0cmFjZV9i
+ZHJ2X2NvX3B3cml0ZV96ZXJvZXMoY2hpbGQtPmJzLCBvZmZzZXQsIGJ5dGVzLCBmbGFncyk7DQo+
+ICAgDQo+ICsgICAgaWYgKChmbGFncyAmIEJEUlZfUkVRX0FMTE9DQVRFKSAmJg0KPiArICAgICAg
+ICAhKGNoaWxkLT5icy0+c3VwcG9ydGVkX3plcm9fZmxhZ3MgJiBCRFJWX1JFUV9BTExPQ0FURSkp
+DQo+ICsgICAgew0KPiArICAgICAgICByZXR1cm4gLUVOT1RTVVA7DQo+ICsgICAgfQ0KDQpXaHkg
+ZG9uJ3Qgd2UgaGF2ZSB0aGlzIGNoZWNrIGluIGJkcnZfY29fcHdyaXRldj8NCkhvd2V2ZXIsIHNp
+bWlsYXIgY2hlY2sgYWJvdXQgVU5NQVAgaXMgaGVyZSB0b28sIHNvOg0KUmV2aWV3ZWQtYnk6IFZs
+YWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0K
+PiArDQo+ICAgICAgIGlmICghKGNoaWxkLT5icy0+b3Blbl9mbGFncyAmIEJEUlZfT19VTk1BUCkp
+IHsNCj4gICAgICAgICAgIGZsYWdzICY9IH5CRFJWX1JFUV9NQVlfVU5NQVA7DQo+ICAgICAgIH0N
+Cj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
