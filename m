@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gZzLb-0007jJ-Od
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:30:52 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gZzLf-0007mK-8s
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:30:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gZz8n-0001Hg-Or
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:17:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39104)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gZz7S-0000GU-D2
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:16:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44596)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gZz8m-0001ES-Bg
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:17:33 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	id 1gZz7S-0000Fn-3u
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:16:10 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 859681E339
-	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 14:17:29 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7742F8E587
+	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 14:16:09 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 20 Dec 2018 18:15:53 +0400
-Message-Id: <20181220141553.24098-13-marcandre.lureau@redhat.com>
+Date: Thu, 20 Dec 2018 18:15:42 +0400
+Message-Id: <20181220141553.24098-2-marcandre.lureau@redhat.com>
 In-Reply-To: <20181220141553.24098-1-marcandre.lureau@redhat.com>
 References: <20181220141553.24098-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 12/12] display: add -display spice-app
- launching a Spice client
+Subject: [Qemu-devel] [PATCH v2 01/12] configure: bump spice-server required
+ version to 0.12.5
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,319 +37,205 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: berrange@redhat.com, kraxel@redhat.com
 
-Add a new display backend that will configure Spice to allow a remote
-client to control QEMU in a similar fashion as other QEMU display
-backend/UI like GTK.
+Looking at chardev/spice.c code, I realize compilation was broken for
+a while with spice-server < 0.12.3. Let's bump required version
+to 0.12.5, released May 19 2014, instead of adding more #ifdef.
 
-For this to work, it will set up Spice server with a unix socket, and
-register a VC chardev that will be exposed as Spice ports. A QMP
-monitor is also exposed as a Spice port, this allows the remote client
-fuller qemu control and state handling.
+(this patch combines changes from an early version and some of
+Frediano "[PATCH 2/2] spice: Bump required spice-server version to
+0.12.6")
 
-- doesn't handle VC set_echo() - this doesn't seem a strong
-  requirement, very few front-end use it
-- spice options can be tweaked with other -spice arguments
-- Windows support shouldn't be hard to do, but will probably use a TCP
-  port instead
-- we may want to watch the child process to quit automatically if it
-  crashed
+According to repology, all the distros that are build target platforms
+for QEMU include it:
+
+      RHEL-7: 0.14.0
+      Debian (Stretch): 0.12.8
+      Debian (Jessie): 0.12.5
+      FreeBSD (ports): 0.14.0
+      OpenSUSE Leap 15: 0.14.0
+      Ubuntu (Xenial): 0.12.6
+
+Note that a previous version of this patch was bumping version to
+0.12.6. Unfortunately, Debian Jessie (oldstable) is stuck with spice
+server 0.12.5, and QEMU should keep building until after 2y of current
+stable (Stretch), which will be around June 17th 2019. Qemu 4.1
+should thus be free of bumping to spice-server 0.12.6 during 4.1
+development cycle.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- qapi/ui.json     |   7 +-
- ui/spice-app.c   | 200 +++++++++++++++++++++++++++++++++++++++++++++++
- qemu-options.hx  |   5 ++
- ui/Makefile.objs |   5 ++
- 4 files changed, 216 insertions(+), 1 deletion(-)
- create mode 100644 ui/spice-app.c
+ include/ui/qemu-spice.h |  6 ------
+ chardev/spice.c         | 10 ----------
+ hw/display/qxl.c        |  2 --
+ ui/spice-core.c         |  8 --------
+ configure               |  4 ++--
+ 5 files changed, 2 insertions(+), 28 deletions(-)
 
-diff --git a/qapi/ui.json b/qapi/ui.json
-index 3f2f662dca..56092706dd 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -1099,12 +1099,17 @@
- #
- # @cocoa: The Cocoa user interface.
- #
-+# @spice-app: Set up a Spice server and run the default associated
-+#             application to connect to it. The server will redirect
-+#             the serial console and QEMU monitors. (Since 4.0)
-+#
- # Since: 2.12
- #
- ##
- { 'enum'    : 'DisplayType',
-   'data'    : [ 'default', 'none', 'gtk', 'sdl',
--                'egl-headless', 'curses', 'cocoa' ] }
-+                'egl-headless', 'curses', 'cocoa',
-+                'spice-app'] }
+diff --git a/include/ui/qemu-spice.h b/include/ui/qemu-spice.h
+index c6d50eb87a..8c23dfe717 100644
+--- a/include/ui/qemu-spice.h
++++ b/include/ui/qemu-spice.h
+@@ -46,13 +46,7 @@ int qemu_spice_migrate_info(const char *hostname, int =
+port, int tls_port,
+ #else
+ #define SPICE_NEEDS_SET_MM_TIME 0
+ #endif
+-
+-#if SPICE_SERVER_VERSION >=3D 0x000c02
+ void qemu_spice_register_ports(void);
+-#else
+-static inline Chardev *qemu_chr_open_spice_port(const char *name)
+-{ return NULL; }
+-#endif
 =20
- ##
- # @DisplayOptions:
-diff --git a/ui/spice-app.c b/ui/spice-app.c
-new file mode 100644
-index 0000000000..1d283d7ba3
---- /dev/null
-+++ b/ui/spice-app.c
-@@ -0,0 +1,200 @@
-+/*
-+ * QEMU external Spice client display driver
-+ *
-+ * Copyright (c) 2018 Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.co=
-m>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
-+ * of this software and associated documentation files (the "Software"),=
- to deal
-+ * in the Software without restriction, including without limitation the=
- rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
-sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be includ=
-ed in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
-SS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
-TY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
-OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
-NG FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-+ * THE SOFTWARE.
-+ */
-+#include "qemu/osdep.h"
-+
-+#include <gio/gio.h>
-+
-+#include "qemu-common.h"
-+#include "ui/console.h"
-+#include "qemu/config-file.h"
-+#include "qemu/option.h"
-+#include "qemu/cutils.h"
-+#include "qapi/error.h"
-+#include "io/channel-command.h"
-+#include "chardev/spice.h"
-+#include "sysemu/sysemu.h"
-+
-+static const char *tmp_dir;
-+static char *app_dir;
-+static char *sock_path;
-+
-+typedef struct VCChardev {
-+    SpiceChardev parent;
-+} VCChardev;
-+
-+#define TYPE_CHARDEV_VC "chardev-vc"
-+#define VC_CHARDEV(obj) OBJECT_CHECK(VCChardev, (obj), TYPE_CHARDEV_VC)
-+
-+static ChardevBackend *
-+chr_spice_backend_new(void)
-+{
-+    ChardevBackend *be =3D g_new0(ChardevBackend, 1);
-+
-+    be->type =3D CHARDEV_BACKEND_KIND_SPICEPORT;
-+    be->u.spiceport.data =3D g_new0(ChardevSpicePort, 1);
-+
-+    return be;
-+}
-+
-+static void vc_chr_open(Chardev *chr,
-+                        ChardevBackend *backend,
-+                        bool *be_opened,
-+                        Error **errp)
-+{
-+    ChardevBackend *be;
-+    const char *fqdn =3D NULL;
-+
-+    if (strstart(chr->label, "serial", NULL)) {
-+        fqdn =3D "org.qemu.console.serial.0";
-+    } else if (strstart(chr->label, "parallel", NULL)) {
-+        fqdn =3D "org.qemu.console.parallel.0";
-+    } else if (strstart(chr->label, "compat_monitor", NULL)) {
-+        fqdn =3D "org.qemu.monitor.hmp.0";
-+    }
-+
-+    be =3D chr_spice_backend_new();
-+    be->u.spiceport.data->fqdn =3D fqdn ?
-+        g_strdup(fqdn) : g_strdup_printf("org.qemu.console.%s", chr->lab=
-el);
-+    qemu_chr_open_spice_port(chr, be, be_opened, errp);
-+    qapi_free_ChardevBackend(be);
-+}
-+
-+static void vc_chr_set_echo(Chardev *chr, bool echo)
-+{
-+    /* TODO: set echo for frontends QMP and qtest */
-+}
-+
-+static void char_vc_class_init(ObjectClass *oc, void *data)
-+{
-+    ChardevClass *cc =3D CHARDEV_CLASS(oc);
-+
-+    cc->parse =3D qemu_chr_parse_vc;
-+    cc->open =3D vc_chr_open;
-+    cc->chr_set_echo =3D vc_chr_set_echo;
-+}
-+
-+static const TypeInfo char_vc_type_info =3D {
-+    .name =3D TYPE_CHARDEV_VC,
-+    .parent =3D TYPE_CHARDEV_SPICEPORT,
-+    .instance_size =3D sizeof(VCChardev),
-+    .class_init =3D char_vc_class_init,
-+};
-+
-+static void spice_app_atexit(void)
-+{
-+    if (sock_path) {
-+        unlink(sock_path);
-+    }
-+    if (tmp_dir) {
-+        rmdir(tmp_dir);
-+    }
-+    g_free(sock_path);
-+    g_free(app_dir);
-+}
-+
-+static void spice_app_display_early_init(DisplayOptions *opts)
-+{
-+    QemuOpts *qopts;
-+    ChardevBackend *be =3D chr_spice_backend_new();
-+    GError *err =3D NULL;
-+
-+    if (opts->has_full_screen) {
-+        error_report("spice-app full-screen isn't supported yet.");
-+        exit(1);
-+    }
-+    if (opts->has_window_close) {
-+        error_report("spice-app window-close isn't supported yet.");
-+        exit(1);
-+    }
-+
-+    atexit(spice_app_atexit);
-+
-+    if (qemu_name) {
-+        app_dir =3D g_build_filename(g_get_user_runtime_dir(),
-+                                   "qemu", qemu_name, NULL);
-+        if (g_mkdir_with_parents(app_dir, S_IRWXU) < -1) {
-+            error_report("Failed to create directory %s: %s",
-+                         app_dir, strerror(errno));
-+            exit(1);
-+        }
-+    } else {
-+        app_dir =3D g_dir_make_tmp(NULL, &err);
-+        tmp_dir =3D app_dir;
-+        if (err) {
-+            error_report("Failed to create temporary directory: %s",
-+                         err->message);
-+            exit(1);
-+        }
-+    }
-+
-+    type_register(&char_vc_type_info);
-+
-+    sock_path =3D g_strjoin("", app_dir, "/", "spice.sock", NULL);
-+    qopts =3D qemu_opts_create(qemu_find_opts("spice"), NULL, 0, &error_=
-abort);
-+    qemu_opt_set(qopts, "disable-ticketing", "on", &error_abort);
-+    qemu_opt_set(qopts, "unix", "on", &error_abort);
-+    qemu_opt_set(qopts, "addr", sock_path, &error_abort);
-+    qemu_opt_set(qopts, "image-compression", "off", &error_abort);
-+    qemu_opt_set(qopts, "streaming-video", "off", &error_abort);
-+    qemu_opt_set(qopts, "gl", opts->has_gl ? "on" : "off", &error_abort)=
-;
-+    display_opengl =3D opts->has_gl;
-+
-+    be->u.spiceport.data->fqdn =3D g_strdup("org.qemu.monitor.qmp.0");
-+    qemu_chardev_new("org.qemu.monitor.qmp", TYPE_CHARDEV_SPICEPORT,
-+                     be, &error_abort);
-+    qopts =3D qemu_opts_create(qemu_find_opts("mon"),
-+                             NULL, 0, &error_fatal);
-+    qemu_opt_set(qopts, "chardev", "org.qemu.monitor.qmp", &error_abort)=
-;
-+    qemu_opt_set(qopts, "mode", "control", &error_abort);
-+
-+    qapi_free_ChardevBackend(be);
-+}
-+
-+static void spice_app_display_init(DisplayState *ds, DisplayOptions *opt=
-s)
-+{
-+    GError *err =3D NULL;
-+    gchar *uri;
-+
-+    uri =3D g_strjoin("", "spice+unix://", app_dir, "/", "spice.sock", N=
-ULL);
-+    info_report("Launching display with URI: %s", uri);
-+    g_app_info_launch_default_for_uri(uri, NULL, &err);
-+    if (err) {
-+        error_report("Failed to launch %s URI: %s", uri, err->message);
-+        exit(1);
-+    }
-+    g_free(uri);
-+}
-+
-+static QemuDisplay qemu_display_spice_app =3D {
-+    .type       =3D DISPLAY_TYPE_SPICE_APP,
-+    .early_init =3D spice_app_display_early_init,
-+    .init       =3D spice_app_display_init,
-+};
-+
-+static void register_spice_app(void)
-+{
-+    qemu_display_register(&qemu_display_spice_app);
-+}
-+
-+type_init(register_spice_app);
-diff --git a/qemu-options.hx b/qemu-options.hx
-index df42116ecc..e13425fbc2 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1211,6 +1211,7 @@ STEXI
- ETEXI
+ #else  /* CONFIG_SPICE */
 =20
- DEF("display", HAS_ARG, QEMU_OPTION_display,
-+    "-display spice-app[,gl=3Don|off]\n"
-     "-display sdl[,frame=3Don|off][,alt_grab=3Don|off][,ctrl_grab=3Don|o=
-ff]\n"
-     "            [,window_close=3Don|off][,gl=3Don|core|es|off]\n"
-     "-display gtk[,grab_on_hover=3Don|off][,gl=3Don|off]|\n"
-@@ -1262,6 +1263,10 @@ Start a VNC server on display <arg>
- @item egl-headless
- Offload all OpenGL operations to a local DRI device. For any graphical d=
-isplay,
- this display needs to be paired with either VNC or SPICE displays.
-+@item spice-app
-+Start QEMU as a Spice server and launch the default Spice client
-+application. The Spice server will redirect the serial consoles and
-+QEMU monitors. (Since 4.0)
- @end table
- ETEXI
+diff --git a/chardev/spice.c b/chardev/spice.c
+index e66e3ad568..173c257949 100644
+--- a/chardev/spice.c
++++ b/chardev/spice.c
+@@ -77,7 +77,6 @@ static int vmc_read(SpiceCharDeviceInstance *sin, uint8=
+_t *buf, int len)
+     return bytes;
+ }
 =20
-diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index 00f6976c30..5b155d2292 100644
---- a/ui/Makefile.objs
-+++ b/ui/Makefile.objs
-@@ -54,6 +54,11 @@ curses.mo-objs :=3D curses.o
- curses.mo-cflags :=3D $(CURSES_CFLAGS)
- curses.mo-libs :=3D $(CURSES_LIBS)
+-#if SPICE_SERVER_VERSION >=3D 0x000c02
+ static void vmc_event(SpiceCharDeviceInstance *sin, uint8_t event)
+ {
+     SpiceChardev *scd =3D container_of(sin, SpiceChardev, sin);
+@@ -95,7 +94,6 @@ static void vmc_event(SpiceCharDeviceInstance *sin, uin=
+t8_t event)
+     trace_spice_vmc_event(chr_event);
+     qemu_chr_be_event(chr, chr_event);
+ }
+-#endif
 =20
-+common-obj-$(call land,$(CONFIG_SPICE),$(CONFIG_GIO)) +=3D spice-app.mo
-+spice-app.mo-objs :=3D spice-app.o
-+spice-app.mo-cflags :=3D $(GIO_CFLAGS)
-+spice-app.mo-libs :=3D $(GIO_LIBS)
-+
- common-obj-$(CONFIG_OPENGL) +=3D shader.o
- common-obj-$(CONFIG_OPENGL) +=3D console-gl.o
- common-obj-$(CONFIG_OPENGL) +=3D egl-helpers.o
+ static void vmc_state(SpiceCharDeviceInstance *sin, int connected)
+ {
+@@ -119,9 +117,7 @@ static SpiceCharDeviceInterface vmc_interface =3D {
+     .state              =3D vmc_state,
+     .write              =3D vmc_write,
+     .read               =3D vmc_read,
+-#if SPICE_SERVER_VERSION >=3D 0x000c02
+     .event              =3D vmc_event,
+-#endif
+ #if SPICE_SERVER_VERSION >=3D 0x000c06
+     .flags              =3D SPICE_CHAR_DEVICE_NOTIFY_WRITABLE,
+ #endif
+@@ -223,9 +219,7 @@ static void char_spice_finalize(Object *obj)
+     }
+=20
+     g_free((char *)s->sin.subtype);
+-#if SPICE_SERVER_VERSION >=3D 0x000c02
+     g_free((char *)s->sin.portname);
+-#endif
+ }
+=20
+ static void spice_vmc_set_fe_open(struct Chardev *chr, int fe_open)
+@@ -240,7 +234,6 @@ static void spice_vmc_set_fe_open(struct Chardev *chr=
+, int fe_open)
+=20
+ static void spice_port_set_fe_open(struct Chardev *chr, int fe_open)
+ {
+-#if SPICE_SERVER_VERSION >=3D 0x000c02
+     SpiceChardev *s =3D SPICE_CHARDEV(chr);
+=20
+     if (fe_open) {
+@@ -248,7 +241,6 @@ static void spice_port_set_fe_open(struct Chardev *ch=
+r, int fe_open)
+     } else {
+         spice_server_port_event(&s->sin, SPICE_PORT_EVENT_CLOSED);
+     }
+-#endif
+ }
+=20
+ static void spice_chr_accept_input(struct Chardev *chr)
+@@ -298,7 +290,6 @@ static void qemu_chr_open_spice_vmc(Chardev *chr,
+     chr_open(chr, type);
+ }
+=20
+-#if SPICE_SERVER_VERSION >=3D 0x000c02
+ static void qemu_chr_open_spice_port(Chardev *chr,
+                                      ChardevBackend *backend,
+                                      bool *be_opened,
+@@ -331,7 +322,6 @@ void qemu_spice_register_ports(void)
+         vmc_register_interface(s);
+     }
+ }
+-#endif
+=20
+ static void qemu_chr_parse_spice_vmc(QemuOpts *opts, ChardevBackend *bac=
+kend,
+                                      Error **errp)
+diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+index 9087db5dee..8e9a65e75b 100644
+--- a/hw/display/qxl.c
++++ b/hw/display/qxl.c
+@@ -1189,9 +1189,7 @@ static void qxl_enter_vga_mode(PCIQXLDevice *d)
+         return;
+     }
+     trace_qxl_enter_vga_mode(d->id);
+-#if SPICE_SERVER_VERSION >=3D 0x000c03 /* release 0.12.3 */
+     spice_qxl_driver_unload(&d->ssd.qxl);
+-#endif
+     graphic_console_set_hwops(d->ssd.dcl.con, d->vga.hw_ops, &d->vga);
+     update_displaychangelistener(&d->ssd.dcl, GUI_REFRESH_INTERVAL_DEFAU=
+LT);
+     qemu_spice_create_host_primary(&d->ssd);
+diff --git a/ui/spice-core.c b/ui/spice-core.c
+index ebaae24643..fc850b3f50 100644
+--- a/ui/spice-core.c
++++ b/ui/spice-core.c
+@@ -745,13 +745,7 @@ void qemu_spice_init(void)
+     }
+=20
+     if (qemu_opt_get_bool(opts, "disable-agent-file-xfer", 0)) {
+-#if SPICE_SERVER_VERSION >=3D 0x000c04
+         spice_server_set_agent_file_xfer(spice_server, false);
+-#else
+-        error_report("this qemu build does not support the "
+-                     "\"disable-agent-file-xfer\" option");
+-        exit(1);
+-#endif
+     }
+=20
+     compression =3D SPICE_IMAGE_COMPRESS_AUTO_GLZ;
+@@ -817,9 +811,7 @@ void qemu_spice_init(void)
+     g_free(x509_cert_file);
+     g_free(x509_cacert_file);
+=20
+-#if SPICE_SERVER_VERSION >=3D 0x000c02
+     qemu_spice_register_ports();
+-#endif
+=20
+ #ifdef HAVE_SPICE_GL
+     if (qemu_opt_get_bool(opts, "gl", 0)) {
+diff --git a/configure b/configure
+index 224d3071ac..b0927b882a 100755
+--- a/configure
++++ b/configure
+@@ -4599,7 +4599,7 @@ int main(void) { spice_server_new(); return 0; }
+ EOF
+   spice_cflags=3D$($pkg_config --cflags spice-protocol spice-server 2>/d=
+ev/null)
+   spice_libs=3D$($pkg_config --libs spice-protocol spice-server 2>/dev/n=
+ull)
+-  if $pkg_config --atleast-version=3D0.12.0 spice-server && \
++  if $pkg_config --atleast-version=3D0.12.5 spice-server && \
+      $pkg_config --atleast-version=3D0.12.3 spice-protocol && \
+      compile_prog "$spice_cflags" "$spice_libs" ; then
+     spice=3D"yes"
+@@ -4610,7 +4610,7 @@ EOF
+   else
+     if test "$spice" =3D "yes" ; then
+       feature_not_found "spice" \
+-          "Install spice-server(>=3D0.12.0) and spice-protocol(>=3D0.12.=
+3) devel"
++          "Install spice-server(>=3D0.12.5) and spice-protocol(>=3D0.12.=
+3) devel"
+     fi
+     spice=3D"no"
+   fi
 --=20
 2.20.1.2.gb21ebb671b
