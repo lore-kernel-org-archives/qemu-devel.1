@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ga3Ee-00058h-2S
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:39:55 -0500
+	(envelope-from <mst@redhat.com>) id 1ga3Ej-0005Du-FM
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:39:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ga3ER-0000lQ-Qv
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:39:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52970)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ga3EP-0000fz-La
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:39:39 -0500
-Date: Thu, 20 Dec 2018 13:39:33 -0500
+	(envelope-from <mst@redhat.com>) id 1ga3Ei-00017K-3X
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:39:57 -0500
+Date: Thu, 20 Dec 2018 13:39:35 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181220183059.20726-22-mst@redhat.com>
+Message-ID: <20181220183059.20726-23-mst@redhat.com>
 References: <20181220183059.20726-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <20181220183059.20726-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v3 21/44] intel_iommu: remove "x-" prefix for
- "aw-bits"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v3 22/44] hw: acpi: The RSDP build API can
+ return void
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +25,76 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Samuel Ortiz <sameo@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Thomas Huth <thuth@redhat.com>, Andrew Jones <drjones@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, qemu-arm@nongnu.org
 
-From: Peter Xu <peterx@redhat.com>
+From: Samuel Ortiz <sameo@linux.intel.com>
 
-We're going to have 57bits aw-bits support sooner.  It's possibly time
-to remove the "x-" prefix.
+For both x86 and ARM architectures, the internal RSDP build API can
+return void as the current return value is unused.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/intel_iommu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/arm/virt-acpi-build.c | 4 +---
+ hw/i386/acpi-build.c     | 4 +---
+ 2 files changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 26cc731c7b..96ef31eb7e 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -2656,7 +2656,7 @@ static Property vtd_properties[] = {
-     DEFINE_PROP_ON_OFF_AUTO("eim", IntelIOMMUState, intr_eim,
-                             ON_OFF_AUTO_AUTO),
-     DEFINE_PROP_BOOL("x-buggy-eim", IntelIOMMUState, buggy_eim, false),
--    DEFINE_PROP_UINT8("x-aw-bits", IntelIOMMUState, aw_bits,
-+    DEFINE_PROP_UINT8("aw-bits", IntelIOMMUState, aw_bits,
-                       VTD_HOST_ADDRESS_WIDTH),
-     DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALSE),
-     DEFINE_PROP_BOOL("dma-drain", IntelIOMMUState, dma_drain, true),
--- 
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 5785fb697c..fcaa350892 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -367,7 +367,7 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+ }
+=20
+ /* RSDP */
+-static GArray *
++static void
+ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_off=
+set)
+ {
+     AcpiRsdpDescriptor *rsdp =3D acpi_data_push(rsdp_table, sizeof *rsdp=
+);
+@@ -392,8 +392,6 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, un=
+signed xsdt_tbl_offset)
+     bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+         (char *)rsdp - rsdp_table->data, sizeof *rsdp,
+         (char *)&rsdp->checksum - rsdp_table->data);
+-
+-    return rsdp_table;
+ }
+=20
+ static void
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 236a20eaa8..35f17d0d91 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2547,7 +2547,7 @@ build_amd_iommu(GArray *table_data, BIOSLinker *lin=
+ker)
+                  "IVRS", table_data->len - iommu_start, 1, NULL, NULL);
+ }
+=20
+-static GArray *
++static void
+ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_off=
+set)
+ {
+     AcpiRsdpDescriptor *rsdp =3D acpi_data_push(rsdp_table, sizeof *rsdp=
+);
+@@ -2569,8 +2569,6 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, =
+unsigned rsdt_tbl_offset)
+     bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+         (char *)rsdp - rsdp_table->data, sizeof *rsdp,
+         (char *)&rsdp->checksum - rsdp_table->data);
+-
+-    return rsdp_table;
+ }
+=20
+ typedef
+--=20
 MST
