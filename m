@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gZobU-0002Hr-7U
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 22:02:28 -0500
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gZocW-0002qX-7C
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 22:03:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gZobT-0005Bk-9k
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 22:02:28 -0500
-References: <20181220022952.20493-1-jsnow@redhat.com>
-	<20181220022952.20493-12-jsnow@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ca1a1d6f-495a-ebc6-353e-77769a52fe29@redhat.com>
-Date: Wed, 19 Dec 2018 21:02:14 -0600
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gZocS-0005fm-75
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 22:03:32 -0500
+Received: from mga18.intel.com ([134.134.136.126]:45248)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
+	id 1gZocM-0005bZ-9c
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 22:03:26 -0500
+Date: Thu, 20 Dec 2018 11:03:12 +0800
+From: Yi Zhang <yi.z.zhang@linux.intel.com>
+Message-ID: <20181220030312.GA70591@tiger-server>
+References: <cover.1545120100.git.yi.z.zhang@linux.intel.com>
+	<5eb87eb9a389242772375dd52bd97c17564a0829.1545120100.git.yi.z.zhang@linux.intel.com>
+	<20181218085249-mutt-send-email-mst@kernel.org>
+	<20181219091017.GA35378@tiger-server>
+	<20181219105555-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20181220022952.20493-12-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 11/11] iotests: add iotest 236 for
- testing bitmap merge
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181219105555-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH V7 6/6] hostmem-file: add 'sync' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,27 +31,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: vsementsov@virtuozzo.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, Markus Armbruster <armbru@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: peter.maydell@linaro.org, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, imammedo@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com, crosthwaite.peter@gmail.com, richard.henderson@linaro.org, xiaoguangrong.eric@gmail.com
 
-On 12/19/18 8:29 PM, John Snow wrote:
-> New interface, new smoke test.
+On 2018-12-19 at 10:59:10 -0500, Michael S. Tsirkin wrote:
+> On Wed, Dec 19, 2018 at 05:10:18PM +0800, Yi Zhang wrote:
+> > > > +
+> > > > + - 'sync' option of memory-backend-file is not 'off', and
+> > > > +
+> > > > + - 'share' option of memory-backend-file is 'on'.
+> > > > +
+> > > > + - 'pmem' option of memory-backend-file is 'on'
+> > > > +
+> > > 
+> > > Wait isn't this what pmem was supposed to do?
+> > > Doesn't it mean "persistent memory"?
+> > pmem is a option for memory-backend-file, user should know the backend
+> > is in host persistent memory, with this flags on, while there is a host crash
+> > or a power failures.
+> > 
+> > [1] Qemu will take necessary operations to guarantee the persistence.
+> > https://patchwork.ozlabs.org/cover/944749/ 
+> > 
+> > [2] Host kernel also take opretions to consistent filesystem metadata.
+> > Add MAP_SYNC flags.
 > 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->   tests/qemu-iotests/236     | 161 +++++++++++++++++
->   tests/qemu-iotests/236.out | 351 +++++++++++++++++++++++++++++++++++++
->   tests/qemu-iotests/group   |   1 +
->   3 files changed, 513 insertions(+)
->   create mode 100755 tests/qemu-iotests/236
->   create mode 100644 tests/qemu-iotests/236.out
+> OK so I'm a user. Can you educate me please?  
+We suppose an administrator should know it, what is the back-end region coming from,
+is it persistent? what is the font-end device is? a volatile dimm or an
+nonvolatile dimm? then they can choice put the pmem=on[off] and sync=on[off].
+If he didn't, we encourage that don't set these 2 flags.
+
+> When should MAP_SYNC not
+> be set? Are there any disadvantages (e.g.  performance?)?
+Not only the performance, sometimes like the front-end device is an
+volatile ram, we don't wanna set such option although the backend is a
+novolatile memory, if power lose, all of thing should lose in this ram.
+
 > 
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-(and glad that my insistence on beefing up the test has caught bugs)
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> -- 
+> MST
+> 
