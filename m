@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gZtnX-0005PP-Bf
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 03:35:16 -0500
+	(envelope-from <mahaocong_work@163.com>) id 1gZtrE-0006cR-9J
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 03:39:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gZtnU-0002eS-TA
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 03:35:14 -0500
-Received: from mail-it1-x134.google.com ([2607:f8b0:4864:20::134]:53046)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gZtnS-0002WK-Sw
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 03:35:11 -0500
-Received: by mail-it1-x134.google.com with SMTP id g76so1796862itg.2
-	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 00:35:02 -0800 (PST)
-MIME-Version: 1.0
-References: <CAKXe6SK+Pm8hGh=BXQ8FosVd=s4S+oc4moxJOjOq5HNeoG5Jcw@mail.gmail.com>
-	<CAKXe6SK8SXVKZ23c+QNJLEGYOkY57ovFHKNwT3byTTZai3bdaw@mail.gmail.com>
-	<c3b72adf-86c0-6a45-026c-838e4b7187da@redhat.com>
-	<5C1ACD2D.094894.04703@m12-14.163.com>
-	<B2B5C030-9D7C-47BD-B3BE-F79782C79C01@euphon.net>
-In-Reply-To: <B2B5C030-9D7C-47BD-B3BE-F79782C79C01@euphon.net>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Thu, 20 Dec 2018 16:34:25 +0800
-Message-ID: <CAKXe6SJo1uRf6YXfTsKuQdnmFM_iAijSGpdAwG0TRTxbceMd5Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Question about aio_poll and glib aio_ctx_dispatch
+	(envelope-from <mahaocong_work@163.com>) id 1gZtrD-0004m6-Ji
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 03:39:04 -0500
+From: mahaocong <mahaocong_work@163.com>
+Date: Thu, 20 Dec 2018 16:38:38 +0800
+Message-Id: <20181220083839.85523-1-mahaocong_work@163.com>
+Subject: [Qemu-devel] [PATCH v1 0/1] migration: add incremental mode on
+ drive-mirror
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,130 +18,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <fam@euphon.net>
-Cc: Li Qiang <liq3ea@163.com>, Paolo Bonzini <pbonzini@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
+To: qemu-block@nongnu.org
+Cc: jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org, mahaocong <mahaocong@didichuxing.com>
 
-Fam Zheng <fam@euphon.net> =E4=BA=8E2018=E5=B9=B412=E6=9C=8820=E6=97=A5=E5=
-=91=A8=E5=9B=9B =E4=B8=8A=E5=8D=889:26=E5=86=99=E9=81=93=EF=BC=9A
+From: mahaocong <mahaocong@didichuxing.com>
 
->
->
-> > On Dec 20, 2018, at 06:58, Li Qiang <liq3ea@163.com> wrote:
-> >
-> > Hello Paolo
-> >
-> > Thanks for your kind reply.
-> >
-> > Yes, aio_poll and aio_ctx_dispatch mostly run in different threads,
-> though
-> > Sometimes they can run in a thread nested from Fam=E2=80=99s slides:
-> > =E2=86=92
-> http://events17.linuxfoundation.org/sites/events/files/slides/Improving%2=
-0the%20QEMU%20Event%20Loop%20-%203.pdf
-> >
-> > So you mean we can poll the same fd in two threads? If so , the =E2=80=
-=98fd=E2=80=99 in
-> =E2=80=98qemu_aio_context=E2=80=99 will be run twice, I think there=E2=80=
-=99s
-> > something I understand wrong.
-> >
-> > Let=E2=80=99s take an example. In the =E2=80=98v9fs_reset=E2=80=99.
-> >
-> > void v9fs_reset(V9fsState *s)
-> > {
-> >    VirtfsCoResetData data =3D { .pdu =3D { .s =3D s }, .done =3D false =
-};
-> >    Coroutine *co;
-> >
-> >    while (!QLIST_EMPTY(&s->active_list)) {
-> >        aio_poll(qemu_get_aio_context(), true);
-> >    }
-> >
-> >    co =3D qemu_coroutine_create(virtfs_co_reset, &data);
-> >    qemu_coroutine_enter(co);
-> >
-> >    while (!data.done) {
-> >        aio_poll(qemu_get_aio_context(), true);
-> >    }
-> > }
-> >
-> > Here we use aio_poll to wait the pending action to complete.
-> > Here aio_poll will poll the fds in =E2=80=98qemu_aio_context=E2=80=99 i=
-n vcpu thread,
-> > However, the main loop is also poll the fds in =E2=80=98qemu_aio_contex=
-t=E2=80=99.
-> > If some =E2=80=98fd=E2=80=99 in =E2=80=98qemu_aio_context=E2=80=99 has =
-events, the two thread will be
-> wakeup?
-> > You say both will call aio_dispatch_handlers and
-> timerlistgroup_run_timers.
-> > But the are the same fd, how can this happen?
->
->
->
-Thanks Fam,
+This patch adds possibility to start mirroring with user-created-bitmap.
+The use-case is, for live migration with ceph rbd image. I think the new
+function may be used to reduce the initial dirty block number on drive-mirror
+by using user-created-bitmap instead of created from block-backing-chain,
+comparing with full mode and top mode, and thus accelerate the live-migration speed.
 
+This function should be used with backup. My test steps is as follows:
+1.create rbd image in ceph cluster, and map nbd device with rbd image.
+2.create a new bitmap attached to drive.
+3.create a full backup on nbd device and sync it to the rbd image.
+4.create new image in destination host and set it's backingfile as rbd image.
+5.start incremental mirroring to destination with dirty-bitmap from step 2.
+6.live migrate VM to destination, bitmap should be migrated too.
+7.unmap nbd in source host and map in destination.
 
-> I think in this case BQL is used to synchronize them so when v9fs_reset
-> runs, the main loop doesn't.
->
+Then I can use incremental backup to sync data and renew bitmap. If live migrate
+VM again, repeat step 4 to step 7. The first live-migration depend on full backup,
+but in the next live-migration, we can reuse backup data and bitmap to reduce the
+initial dirty block number on mirror.
+User-created-bitmap should be migrated, which record dirty block starting
+in backup and in live-migration.
 
-I think you're right. The main loop will not hold BQL when polling. But it
-will acquire the BQL before it can
-do the dispatch. So even if an 'fd' events occurs in this case, only the
-aio_poll's dispatch can run.
+mahaocong (1):
+  mirror: add incremental mode support. when use incremental in drive-mirror
+          by qmp-command, drive-mirror create unnamed-bitmap with the same
+          granularity of user-bitmap setting on qmp-command. Next, copy It's
+          hbitmap to unnamed-bitmap. Then, start mirror with this unnamed-bitmap.
+  dirty-bitmap: add new API to copy dirty-bitmap.
+  hbitmap: add new function to copy hbitmap.
 
-Thanks,
-Li Qiang
+ block/dirty-bitmap.c         | 14 ++++++++++
+ block/mirror.c               | 63 +++++++++++++++++++++++++++++++++++---------
+ blockdev.c                   | 36 +++++++++++++++++++++++--
+ include/block/block_int.h    |  3 ++-
+ include/block/dirty-bitmap.h |  3 +++
+ include/qemu/hbitmap.h       |  2 ++
+ qapi/block-core.json         |  9 ++++++-
+ util/hbitmap.c               | 28 ++++++++++++++++++++
+ 8 files changed, 141 insertions(+), 17 deletions(-)
 
-
-
->
-> Thanks,
-> Fam
->
-> >
-> > Thanks,
-> > Li Qiang
-> >
-> >
-> > =E5=8F=91=E4=BB=B6=E4=BA=BA: Paolo Bonzini
-> > =E5=8F=91=E9=80=81=E6=97=B6=E9=97=B4: 2018=E5=B9=B412=E6=9C=8820=E6=97=
-=A5 4:42
-> > =E6=94=B6=E4=BB=B6=E4=BA=BA: Li Qiang; stefanha@redhat.com; fam@euphon.=
-net; Qemu Developers; =E6=9D=8E=E5=BC=BA
-> > =E4=B8=BB=E9=A2=98: Re: Question about aio_poll and glib aio_ctx_dispat=
-ch
-> >
-> > On 19/12/18 11:05, Li Qiang wrote:
-> >> Sent it to qemu-devel.
-> >>
-> >> Li Qiang <liq3ea@gmail.com <mailto:liq3ea@gmail.com>> =E4=BA=8E2018=E5=
-=B9=B412=E6=9C=8819=E6=97=A5=E5=91=A8
-> >> =E4=B8=89 =E4=B8=8B=E5=8D=886:04=E5=86=99=E9=81=93=EF=BC=9A
-> >>
-> >>    Hello Paolo, Stefan, Fam and all,
-> >>
-> >>    Here I have a question about 'aio_poll'.
-> >>    IIUC the 'aio_poll' is (mostly) used for synchronous IO
-> >>    as I see a lot of code like this:
-> >>    while(condition)
-> >>     aio_poll();
-> >>
-> >>    However it seems the 'aio_poll' and 'aio_ctx_dispatch' both poll th=
-e
-> fd.
-> >>    So what happened when the 'fd' has events, which function will be
-> >>    wakeup?
-> >
-> > Roughly speaking, aio_poll is used for synchronous IO and within I/O
-> > threads; aio_ctx_dispatch is used within the main thread.
-> >
-> > Both end up calling aio_dispatch_handlers and timerlistgroup_run_timers=
-.
-> >
-> > Paolo
-> >
->
->
->
+-- 
+2.14.1
