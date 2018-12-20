@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZxaE-00020f-Vo
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:37:47 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gZxbB-0002iQ-KO
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:38:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gZxaB-0001rm-0l
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:37:46 -0500
-Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:57794)
+	(envelope-from <pbonzini@redhat.com>) id 1gZxb6-0002II-13
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:38:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47202)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gZxaA-0001qr-M8
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:37:42 -0500
-Date: Thu, 20 Dec 2018 13:37:40 +0100
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20181220123739.s3t5trh3pymhrxzl@function>
-References: <20181218230442.27887-1-samuel.thibault@ens-lyon.org>
-	<CAFEAcA89ZxboWWDn3iDh_8u-ejMKjhWmmA_ckLMH7si+yU_icw@mail.gmail.com>
-	<CAJ+F1CKhFNo9UGuuvcV0ErFoQmHSCxO6jUfo6et3vT9wD4e21A@mail.gmail.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gZxb5-0002Ha-OK
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:38:39 -0500
+References: <1545227081-213696-1-git-send-email-robert.hu@linux.intel.com>
+	<1545227081-213696-2-git-send-email-robert.hu@linux.intel.com>
+	<20181219140136.GJ20465@redhat.com>
+	<1545265096.44118.3.camel@linux.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e1b012da-7aac-1063-35ae-0ab3c4c5eb4b@redhat.com>
+Date: Thu, 20 Dec 2018 13:38:31 +0100
 MIME-Version: 1.0
+In-Reply-To: <1545265096.44118.3.camel@linux.intel.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJ+F1CKhFNo9UGuuvcV0ErFoQmHSCxO6jUfo6et3vT9wD4e21A@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 00/64] slirp updates
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/2] i386: remove the new CPUID 'PCONFIG'
+ from Icelake-Server CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Robert Hoo <robert.hu@linux.intel.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc: robert.hu@intel.com, rth@twiddle.net, ehabkost@redhat.com, thomas.lendacky@amd.com, qemu-devel@nongnu.org
 
-Marc-André Lureau, le jeu. 20 déc. 2018 16:01:44 +0400, a ecrit:
-> > declaration of 'inet_pton' [-Werror=nested-externs]
-> >      if (!inet_pton(AF_INET6, vprefix6, &ip6_prefix)) {
-> >      ^
-> >
-> 
-> This one is easy, it needs "build-sys: require Vista API by default
-> globally" series that Paolo has been sending in his last pullreqs.
+On 20/12/18 01:18, Robert Hoo wrote:
+> On Wed, 2018-12-19 at 14:01 +0000, Daniel P. Berrang=C3=A9 wrote:
+>> On Wed, Dec 19, 2018 at 09:44:40PM +0800, Robert Hoo wrote:
+>>> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+>>> ---
+>>> =C2=A0target/i386/cpu.c | 3 +--
+>>> =C2=A01 file changed, 1 insertion(+), 2 deletions(-)
+>>>
+>>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>>> index 677a3bd..b6113d0 100644
+>>> --- a/target/i386/cpu.c
+>>> +++ b/target/i386/cpu.c
+>>> @@ -2613,8 +2613,7 @@ static X86CPUDefinition builtin_x86_defs[] =3D
+>>> {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0CPUID_7_0_ECX_AVX512VNNI | CPUID_7_0_ECX_AVX512BITALG
+>>> |
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0CPUID_7_0_ECX_AVX512_VPOPCNTDQ | CPUID_7_0_ECX_LA57,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.features[FEAT_=
+7_0_EDX] =3D
+>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0CPUID_7_0_EDX_PCONFIG | CPUID_7_0_EDX_SPEC_CTRL |
+>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0CPUID_7_0_EDX_SPEC_CTRL_SSBD,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0CPUID_7_0_EDX_SPEC_CTRL |
+>>> CPUID_7_0_EDX_SPEC_CTRL_SSBD,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Missing: XSA=
+VES (not supported by some Linux versions,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* including v4.1 to v4.12).
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* KVM doesn't yet expose any XSAVES stat=
+e save
+>>> component,
+>>
+>> This was shipped in QEMU 3.1.0, so I don't think we can
+>> unconditionally
+>> remove it like this without breaking CPU model migration compat.=C2=A0
+>>
+> I think the sooner, the better. Take the time window that Icelake CPU
+> model has just shipped with QEMU 3.1.0 and is not publicly/widely used
+> yet.
 
-Ok, let's wait for it for that part then.
+We should still leave it in the 3.1 machine types.  I've just sent a
+patch to do the same with MPX.
 
-> there is an obvious
-> mistake in "build-sys: use a seperate slirp-obj-y && slirp.mo" (Sam,
-> you should squash that fix)
-
-Ok, squashed in my tree.
-
-Samuel
+Paolo
