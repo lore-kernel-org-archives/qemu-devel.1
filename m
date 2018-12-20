@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ga55z-0000gm-NY
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 15:39:04 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ga580-0001ka-AD
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 15:41:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ga55y-00044m-Ne
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 15:39:03 -0500
-Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:32822)
+	(envelope-from <peter.maydell@linaro.org>) id 1ga57y-0007sO-Ew
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 15:41:08 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:46798)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ga55y-000446-GV
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 15:39:02 -0500
-Received: by mail-ot1-x335.google.com with SMTP id i20so3190255otl.0
-	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 12:39:02 -0800 (PST)
+	id 1ga57y-0007rI-7x
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 15:41:06 -0500
+Received: by mail-oi1-x241.google.com with SMTP id x202so2993719oif.13
+	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 12:41:05 -0800 (PST)
 MIME-Version: 1.0
-References: <20181220094514.3904-1-armbru@redhat.com>
-In-Reply-To: <20181220094514.3904-1-armbru@redhat.com>
+References: <20181220201502.12285-1-richard.henderson@linaro.org>
+In-Reply-To: <20181220201502.12285-1-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 20 Dec 2018 20:38:49 +0000
-Message-ID: <CAFEAcA9HgTJssfc1NHe+uNkAymzADuVbRh9Z=ymUW9Fa+Y4jRA@mail.gmail.com>
+Date: Thu, 20 Dec 2018 20:40:53 +0000
+Message-ID: <CAFEAcA8G8Yi=j1G70vspSFm57AsLbNsm07yxPmwaJgWPJFtu4w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] Miscellaneous patches for 2018-12-20
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Add safe_syscall for riscv64
+ host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +29,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, Laurent Vivier <laurent@vivier.eu>
 
-On Thu, 20 Dec 2018 at 09:47, Markus Armbruster <armbru@redhat.com> wrote:
+On Thu, 20 Dec 2018 at 20:16, Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> The following changes since commit b72566a4ffaddbc0c0c1f6f5ee91b42ab13ff429:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
 >
->   Merge remote-tracking branch 'remotes/vivier2/tags/trivial-patches-pull-request' into staging (2018-12-19 15:31:02 +0000)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-misc-2018-12-20
->
-> for you to fetch changes up to 3a6b016d6487f3492bc1b80b2c3bc25c67aab8e2:
->
->   build: Remake config-host.mak when VERSION changes (2018-12-20 10:31:08 +0100)
->
-> ----------------------------------------------------------------
-> Miscellaneous patches for 2018-12-20
->
-> ----------------------------------------------------------------
-> Markus Armbruster (2):
->       Clean up includes
->       build: Remake config-host.mak when VERSION changes
+> At some point we should make this routine be non-optional for
+> porting to a new host.
 
-Applied, thanks.
+Yes, I agree -- how many hosts do we still have which are
+missing support for it?
+
+thanks
 -- PMM
