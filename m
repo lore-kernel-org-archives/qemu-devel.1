@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ga3El-0005Hk-UH
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:40:00 -0500
+	(envelope-from <mst@redhat.com>) id 1ga3Em-0005Hm-5Y
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:40:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ga3Ek-0001DT-FD
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:39:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55858)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ga3Ej-0001Ag-Up
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:39:58 -0500
-Date: Thu, 20 Dec 2018 13:39:54 -0500
+	(envelope-from <mst@redhat.com>) id 1ga3Ek-0001Cu-8w
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:40:00 -0500
+Date: Thu, 20 Dec 2018 13:39:45 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181220183059.20726-32-mst@redhat.com>
+Message-ID: <20181220183059.20726-29-mst@redhat.com>
 References: <20181220183059.20726-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20181220183059.20726-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v3 31/44] pci/pcie: rename hotplug handler
- callbacks
+Subject: [Qemu-devel] [PULL v3 28/44] hw: acpi: Export and share the ARM
+ RSDP build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,109 +24,260 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Samuel Ortiz <sameo@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, Andrew Jones <drjones@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, qemu-arm@nongnu.org
 
-From: David Hildenbrand <david@redhat.com>
+From: Samuel Ortiz <sameo@linux.intel.com>
 
-The callbacks are also called for cold plugged devices. Drop the "hot"
-to better match the actual callback names.
+Now that build_rsdp() supports building both legacy and current RSDP
+tables, we can move it to a generic folder (hw/acpi) and have the i386
+ACPI code reuse it in order to reduce code duplication.
 
-While at it, also rename  pcie_cap_slot_hotplug_common() to
-pcie_cap_slot_plug_common().
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- include/hw/pci/pcie.h |  8 ++++----
- hw/pci/pcie.c         | 17 ++++++++---------
- hw/pci/pcie_port.c    |  4 ++--
- 3 files changed, 14 insertions(+), 15 deletions(-)
+ include/hw/acpi/aml-build.h |  2 ++
+ hw/acpi/aml-build.c         | 68 +++++++++++++++++++++++++++++++++++++
+ hw/arm/virt-acpi-build.c    | 65 -----------------------------------
+ hw/i386/acpi-build.c        | 49 +++++++++++---------------
+ 4 files changed, 89 insertions(+), 95 deletions(-)
 
-diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
-index 1976909ab4..d51ca23f07 100644
---- a/include/hw/pci/pcie.h
-+++ b/include/hw/pci/pcie.h
-@@ -132,8 +132,8 @@ void pcie_ari_init(PCIDevice *dev, uint16_t offset, uint16_t nextfn);
- void pcie_dev_ser_num_init(PCIDevice *dev, uint16_t offset, uint64_t ser_num);
- void pcie_ats_init(PCIDevice *dev, uint16_t offset);
- 
--void pcie_cap_slot_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
--                              Error **errp);
--void pcie_cap_slot_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
--                                         DeviceState *dev, Error **errp);
-+void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                           Error **errp);
-+void pcie_cap_slot_unplug_request_cb(HotplugHandler *hotplug_dev,
-+                                     DeviceState *dev, Error **errp);
- #endif /* QEMU_PCIE_H */
-diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-index d91a615193..ec3b1145f3 100644
---- a/hw/pci/pcie.c
-+++ b/hw/pci/pcie.c
-@@ -390,9 +390,8 @@ static void pcie_cap_slot_event(PCIDevice *dev, PCIExpressHotPlugEvent event)
-     hotplug_event_notify(dev);
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index 6c36903c0a..1a563ad756 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -388,6 +388,8 @@ void acpi_add_table(GArray *table_offsets, GArray *table_data);
+ void acpi_build_tables_init(AcpiBuildTables *tables);
+ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre);
+ void
++build_rsdp(GArray *tbl, BIOSLinker *linker, AcpiRsdpData *rsdp_data);
++void
+ build_rsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
+            const char *oem_id, const char *oem_table_id);
+ void
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 1e43cd736d..555c24f21d 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -1589,6 +1589,74 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre)
+     g_array_free(tables->vmgenid, mfre);
  }
  
--static void pcie_cap_slot_hotplug_common(PCIDevice *hotplug_dev,
--                                         DeviceState *dev,
--                                         uint8_t **exp_cap, Error **errp)
-+static void pcie_cap_slot_plug_common(PCIDevice *hotplug_dev, DeviceState *dev,
-+                                      uint8_t **exp_cap, Error **errp)
++/*
++ * ACPI spec 5.2.5.3 Root System Description Pointer (RSDP).
++ * (Revision 1.0 or later)
++ */
++void
++build_rsdp(GArray *tbl, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
++{
++    int tbl_off = tbl->len; /* Table offset in the RSDP file */
++
++    switch (rsdp_data->revision) {
++    case 0:
++        /* With ACPI 1.0, we must have an RSDT pointer */
++        g_assert(rsdp_data->rsdt_tbl_offset);
++        break;
++    case 2:
++        /* With ACPI 2.0+, we must have an XSDT pointer */
++        g_assert(rsdp_data->xsdt_tbl_offset);
++        break;
++    default:
++        /* Only revisions 0 (ACPI 1.0) and 2 (ACPI 2.0+) are valid for RSDP */
++        g_assert_not_reached();
++    }
++
++    bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, tbl, 16,
++                             true /* fseg memory */);
++
++    g_array_append_vals(tbl, "RSD PTR ", 8); /* Signature */
++    build_append_int_noprefix(tbl, 0, 1); /* Checksum */
++    g_array_append_vals(tbl, rsdp_data->oem_id, 6); /* OEMID */
++    build_append_int_noprefix(tbl, rsdp_data->revision, 1); /* Revision */
++    build_append_int_noprefix(tbl, 0, 4); /* RsdtAddress */
++    if (rsdp_data->rsdt_tbl_offset) {
++        /* RSDT address to be filled by guest linker */
++        bios_linker_loader_add_pointer(linker, ACPI_BUILD_RSDP_FILE,
++                                       tbl_off + 16, 4,
++                                       ACPI_BUILD_TABLE_FILE,
++                                       *rsdp_data->rsdt_tbl_offset);
++    }
++
++    /* Checksum to be filled by guest linker */
++    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
++                                    tbl_off, 20, /* ACPI rev 1.0 RSDP size */
++                                    8);
++
++    if (rsdp_data->revision == 0) {
++        /* ACPI 1.0 RSDP, we're done */
++        return;
++    }
++
++    build_append_int_noprefix(tbl, 36, 4); /* Length */
++
++    /* XSDT address to be filled by guest linker */
++    build_append_int_noprefix(tbl, 0, 8); /* XsdtAddress */
++    /* We already validated our xsdt pointer */
++    bios_linker_loader_add_pointer(linker, ACPI_BUILD_RSDP_FILE,
++                                   tbl_off + 24, 8,
++                                   ACPI_BUILD_TABLE_FILE,
++                                   *rsdp_data->xsdt_tbl_offset);
++
++    build_append_int_noprefix(tbl, 0, 1); /* Extended Checksum */
++    build_append_int_noprefix(tbl, 0, 3); /* Reserved */
++
++    /* Extended checksum to be filled by Guest linker */
++    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
++                                    tbl_off, 36, /* ACPI rev 2.0 RSDP size */
++                                    32);
++}
++
+ /* Build rsdt table */
+ void
+ build_rsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 05f6654371..95fad6f0ce 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -366,71 +366,6 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+     aml_append(scope, dev);
+ }
+ 
+-/* RSDP */
+-static void
+-build_rsdp(GArray *tbl, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
+-{
+-    int tbl_off = tbl->len; /* Table offset in the RSDP file */
+-
+-    switch (rsdp_data->revision) {
+-    case 0:
+-        /* With ACPI 1.0, we must have an RSDT pointer */
+-        g_assert(rsdp_data->rsdt_tbl_offset);
+-        break;
+-    case 2:
+-        /* With ACPI 2.0+, we must have an XSDT pointer */
+-        g_assert(rsdp_data->xsdt_tbl_offset);
+-        break;
+-    default:
+-        /* Only revisions 0 (ACPI 1.0) and 2 (ACPI 2.0+) are valid for RSDP */
+-        g_assert_not_reached();
+-    }
+-
+-    bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, tbl, 16,
+-                             true /* fseg memory */);
+-
+-    g_array_append_vals(tbl, "RSD PTR ", 8); /* Signature */
+-    build_append_int_noprefix(tbl, 0, 1); /* Checksum */
+-    g_array_append_vals(tbl, rsdp_data->oem_id, 6); /* OEMID */
+-    build_append_int_noprefix(tbl, rsdp_data->revision, 1); /* Revision */
+-    build_append_int_noprefix(tbl, 0, 4); /* RsdtAddress */
+-    if (rsdp_data->rsdt_tbl_offset) {
+-        /* RSDT address to be filled by guest linker */
+-        bios_linker_loader_add_pointer(linker, ACPI_BUILD_RSDP_FILE,
+-                                       tbl_off + 16, 4,
+-                                       ACPI_BUILD_TABLE_FILE,
+-                                       *rsdp_data->rsdt_tbl_offset);
+-    }
+-
+-    /* Checksum to be filled by guest linker */
+-    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+-                                    tbl_off, 20, /* ACPI rev 1.0 RSDP size */
+-                                    8);
+-
+-    if (rsdp_data->revision == 0) {
+-        /* ACPI 1.0 RSDP, we're done */
+-        return;
+-    }
+-
+-    build_append_int_noprefix(tbl, 36, 4); /* Length */
+-
+-    /* XSDT address to be filled by guest linker */
+-    build_append_int_noprefix(tbl, 0, 8); /* XsdtAddress */
+-    /* We already validated our xsdt pointer */
+-    bios_linker_loader_add_pointer(linker, ACPI_BUILD_RSDP_FILE,
+-                                   tbl_off + 24, 8,
+-                                   ACPI_BUILD_TABLE_FILE,
+-                                   *rsdp_data->xsdt_tbl_offset);
+-
+-    build_append_int_noprefix(tbl, 0, 1); /* Extended Checksum */
+-    build_append_int_noprefix(tbl, 0, 3); /* Reserved */
+-
+-    /* Extended checksum to be filled by Guest linker */
+-    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+-                                    tbl_off, 36, /* ACPI rev 2.0 RSDP size */
+-                                    32);
+-}
+-
+ static void
+ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
  {
-     *exp_cap = hotplug_dev->config + hotplug_dev->exp.exp_cap;
-     uint16_t sltsta = pci_get_word(*exp_cap + PCI_EXP_SLTSTA);
-@@ -406,13 +405,13 @@ static void pcie_cap_slot_hotplug_common(PCIDevice *hotplug_dev,
-     }
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index fb877648ac..9891b6913b 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2547,35 +2547,6 @@ build_amd_iommu(GArray *table_data, BIOSLinker *linker)
+                  "IVRS", table_data->len - iommu_start, 1, NULL, NULL);
  }
  
--void pcie_cap_slot_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
--                              Error **errp)
-+void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                           Error **errp)
- {
-     uint8_t *exp_cap;
-     PCIDevice *pci_dev = PCI_DEVICE(dev);
+-static void
+-build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
+-{
+-    /* AcpiRsdpDescriptor describes revision 2 RSDP table and as result we
+-     * allocate extra 16 bytes for pc/q35 RSDP rev1 as well. Keep extra 16 bytes
+-     * wasted to make sure we won't breake migration for machine types older
+-     * than 2.3 due to size mismatch.
+-     */
+-    AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
+-    unsigned rsdt_pa_size = sizeof(rsdp->rsdt_physical_address);
+-    unsigned rsdt_pa_offset =
+-        (char *)&rsdp->rsdt_physical_address - rsdp_table->data;
+-
+-    bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, rsdp_table, 16,
+-                             true /* fseg memory */);
+-
+-    memcpy(&rsdp->signature, "RSD PTR ", 8);
+-    memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, 6);
+-    /* Address to be filled by Guest linker */
+-    bios_linker_loader_add_pointer(linker,
+-        ACPI_BUILD_RSDP_FILE, rsdt_pa_offset, rsdt_pa_size,
+-        ACPI_BUILD_TABLE_FILE, rsdt_tbl_offset);
+-
+-    /* Checksum to be filled by Guest linker */
+-    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+-        (char *)rsdp - rsdp_table->data, 20 /* ACPI rev 1.0 RSDP size */,
+-        (char *)&rsdp->checksum - rsdp_table->data);
+-}
+-
+ typedef
+ struct AcpiBuildState {
+     /* Copy of table in RAM (for patching). */
+@@ -2732,7 +2703,25 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+                slic_oem.id, slic_oem.table_id);
  
--    pcie_cap_slot_hotplug_common(PCI_DEVICE(hotplug_dev), dev, &exp_cap, errp);
-+    pcie_cap_slot_plug_common(PCI_DEVICE(hotplug_dev), dev, &exp_cap, errp);
+     /* RSDP is in FSEG memory, so allocate it separately */
+-    build_rsdp(tables->rsdp, tables->linker, rsdt);
++    {
++        AcpiRsdpData rsdp_data = {
++            .revision = 0,
++            .oem_id = ACPI_BUILD_APPNAME6,
++            .xsdt_tbl_offset = NULL,
++            .rsdt_tbl_offset = &rsdt,
++        };
++        build_rsdp(tables->rsdp, tables->linker, &rsdp_data);
++        if (!pcmc->rsdp_in_ram) {
++            /* We used to allocate some extra space for RSDP revision 2 but
++             * only used the RSDP revision 0 space. The extra bytes were
++             * zeroed out and not used.
++             * Here we continue wasting those extra 16 bytes to make sure we
++             * don't break migration for machine types 2.2 and older due to
++             * RSDP blob size mismatch.
++             */
++            build_append_int_noprefix(tables->rsdp, 0, 16);
++        }
++    }
  
-     /* Don't send event when device is enabled during qemu machine creation:
-      * it is present on boot, no hotplug event is necessary. We do send an
-@@ -448,14 +447,14 @@ static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque)
-     object_unparent(OBJECT(dev));
- }
- 
--void pcie_cap_slot_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
--                                         DeviceState *dev, Error **errp)
-+void pcie_cap_slot_unplug_request_cb(HotplugHandler *hotplug_dev,
-+                                     DeviceState *dev, Error **errp)
- {
-     uint8_t *exp_cap;
-     PCIDevice *pci_dev = PCI_DEVICE(dev);
-     PCIBus *bus = pci_get_bus(pci_dev);
- 
--    pcie_cap_slot_hotplug_common(PCI_DEVICE(hotplug_dev), dev, &exp_cap, errp);
-+    pcie_cap_slot_plug_common(PCI_DEVICE(hotplug_dev), dev, &exp_cap, errp);
- 
-     /* In case user cancel the operation of multi-function hot-add,
-      * remove the function that is unexposed to guest individually,
-diff --git a/hw/pci/pcie_port.c b/hw/pci/pcie_port.c
-index 6432b9ac1f..73e81e5847 100644
---- a/hw/pci/pcie_port.c
-+++ b/hw/pci/pcie_port.c
-@@ -154,8 +154,8 @@ static void pcie_slot_class_init(ObjectClass *oc, void *data)
-     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
- 
-     dc->props = pcie_slot_props;
--    hc->plug = pcie_cap_slot_hotplug_cb;
--    hc->unplug_request = pcie_cap_slot_hot_unplug_request_cb;
-+    hc->plug = pcie_cap_slot_plug_cb;
-+    hc->unplug_request = pcie_cap_slot_unplug_request_cb;
- }
- 
- static const TypeInfo pcie_slot_type_info = {
+     /* We'll expose it all to Guest so we want to reduce
+      * chance of size changes.
 -- 
 MST
