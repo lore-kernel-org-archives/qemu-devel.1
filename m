@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gZwWm-00067J-Fj
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 06:30:09 -0500
+	(envelope-from <philmd@redhat.com>) id 1gZwjb-0000UT-6a
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 06:43:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gZwWl-00027X-RV
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 06:30:08 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 20 Dec 2018 11:29:55 +0000
-Message-ID: <0e9bbc69-3a2a-7e1f-c1e2-090ab8923f1c@virtuozzo.com>
-References: <20181220022952.20493-1-jsnow@redhat.com>
-	<20181220022952.20493-11-jsnow@redhat.com>
-In-Reply-To: <20181220022952.20493-11-jsnow@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D4153DD44DA29F498C19BC31AB251E09@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <philmd@redhat.com>) id 1gZwjX-0004TE-66
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 06:43:23 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:53289)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gZwjW-0004SF-Uc
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 06:43:19 -0500
+Received: by mail-wm1-f65.google.com with SMTP id d15so1656564wmb.3
+	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 03:43:18 -0800 (PST)
+References: <20181219151917.3874-1-pbonzini@redhat.com>
+	<CAFEAcA_0jPh6TVOqzfp_O5eFitNocabR1GdLkwwZcv6QcW=iUQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d5bc276c-b149-acc6-03b8-6f5c5a309e4a@redhat.com>
+Date: Thu, 20 Dec 2018 12:43:15 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 10/11] iotests: implement pretty-print
- for log and qmp_log
+In-Reply-To: <CAFEAcA_0jPh6TVOqzfp_O5eFitNocabR1GdLkwwZcv6QcW=iUQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL v2 00/35] Misc patches for 2018-12-18
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,15 +30,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-MjAuMTIuMjAxOCA1OjI5LCBKb2huIFNub3cgd3JvdGU6DQo+IElmIGlvdGVzdHMgaGF2ZSBsaW5l
-cyBleGNlZWRpbmcgPjk5OCBjaGFyYWN0ZXJzIGxvbmcsIGdpdCBkb2Vzbid0DQo+IHdhbnQgdG8g
-c2VuZCBpdCBwbGFpbnRleHQgdG8gdGhlIGxpc3QuIFdlIGNhbiBzb2x2ZSB0aGlzIGJ5IGFsbG93
-aW5nDQo+IHRoZSBpb3Rlc3RzIHRvIHVzZSBwcmV0dHkgcHJpbnRlZCBRTVAgb3V0cHV0IHRoYXQg
-d2UgY2FuIG1hdGNoIGFnYWluc3QNCj4gaW5zdGVhZC4NCj4gDQo+IEFzIGEgYm9udXMsIGl0J3Mg
-bXVjaCBuaWNlciBmb3IgaHVtYW4gZXllcyB0b28uDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBKb2hu
-IFNub3c8anNub3dAcmVkaGF0LmNvbT4NCg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNv
-di1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KLS0gDQpCZXN0IHJlZ2Fy
-ZHMsDQpWbGFkaW1pcg0K
+On 12/20/18 12:10 AM, Peter Maydell wrote:
+> On Wed, 19 Dec 2018 at 15:21, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> The following changes since commit e85c577158a2e8e252414959da9ef15c12eec63d:
+>>
+>>   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2018-12-17' into staging (2018-12-18 14:31:06 +0000)
+>>
+>> are available in the Git repository at:
+>>
+>>   git://github.com/bonzini/qemu.git tags/for-upstream
+>>
+>> for you to fetch changes up to b4e8bbb9ae50045160957e7ab66c4f1cae535ea4:
+>>
+>>   avoid TABs in files that only contain a few (2018-12-19 16:03:22 +0100)
+>>
+>> ----------------------------------------------------------------
+>> * HAX support for Linux hosts (Alejandro)
+>> * esp bugfixes (Guenter)
+>> * Windows build cleanup (Marc-André)
+>> * checkpatch logic improvements (Paolo)
+>> * coalesced range bugfix (Paolo)
+>> * switch testsuite to TAP (Paolo)
+>> * QTAILQ rewrite (Paolo)
+>> * block/iscsi.c cancellation fixes (Stefan)
+>> * improve selection of the default accelerator (Thomas)
+>>
+>> ----------------------------------------------------------------
+[...]
+> I also get this splat trying to do 'make check-tcg':
+> 
+> make: Entering directory
+> '/home/petmay01/linaro/qemu-for-merges/build/all-linux-static'
+>   BUILD   debian9
+> The command '/bin/sh -c DEBIAN_FRONTEND=noninteractive eatmydata
+> apt install -y --no-install-recommends         bison
+> build-essential         ca-certificates         clang         flex
+>     gettext         git         libtest-harness-perl
+> pkg-config         psmisc         python         texinfo
+> $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\
+> -f2)' returned a non-zero code: 100
+> Traceback (most recent call last):
+>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+> line 563, in <module>
+>     sys.exit(main())
+>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+> line 560, in main
+>     return args.cmdobj.run(args, argv)
+>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+> line 376, in run
+>     extra_files_cksum=cksum)
+>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+> line 254, in build_image
+>     quiet=quiet)
+>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+> line 181, in _do_check
+>     return subprocess.check_call(self._command + cmd, **kwargs)
+>   File "/usr/lib/python2.7/subprocess.py", line 541, in check_call
+>     raise CalledProcessError(retcode, cmd)
+> subprocess.CalledProcessError: Command '['docker', 'build', '-t',
+> 'qemu:debian9', '-f', '/tmp/docker_buildsvtS6R/tmp74LVkj.docker',
+> '/tmp/docker_buildsvtS6R']' returned non-zero exit status 100
+> /home/petmay01/linaro/qemu-for-merges/tests/docker/Makefile.include:53:
+> recipe for target 'docker-image-debian9' failed
+> make: *** [docker-image-debian9] Error 1
+
+This looks an unrelated error. The Debian mirror you are using might be
+out of sync (or syncing), or the filesystem where you store your Docker
+image is full?
