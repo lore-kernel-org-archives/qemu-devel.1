@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gZv97-00046M-LX
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 05:01:43 -0500
+	(envelope-from <peterx@redhat.com>) id 1gZvOC-0007BB-GY
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 05:17:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gZv92-0006Pd-52
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 05:01:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43340)
+	(envelope-from <peterx@redhat.com>) id 1gZvO8-0005uT-BC
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 05:17:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56404)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gZv91-0006N8-SO
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 05:01:32 -0500
-References: <20181219151917.3874-1-pbonzini@redhat.com>
-	<CAFEAcA_0jPh6TVOqzfp_O5eFitNocabR1GdLkwwZcv6QcW=iUQ@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4aabde25-52dd-10c1-1e50-582f22e4041c@redhat.com>
-Date: Thu, 20 Dec 2018 11:01:24 +0100
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gZvO8-0005tX-5a
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 05:17:08 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 20D3E8E583
+	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 10:17:07 +0000 (UTC)
+Date: Thu, 20 Dec 2018 18:16:58 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20181220101658.GA24875@xz-x1>
+References: <20181220054037.24320-1-peterx@redhat.com>
+	<be579ef2-4722-f986-cc2f-1acab8a92335@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_0jPh6TVOqzfp_O5eFitNocabR1GdLkwwZcv6QcW=iUQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL v2 00/35] Misc patches for 2018-12-18
+Content-Disposition: inline
+In-Reply-To: <be579ef2-4722-f986-cc2f-1acab8a92335@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] q35: change defaults for kernel
+ irqchip and IR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,72 +34,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On 20/12/18 00:10, Peter Maydell wrote:
-> I get a compile failure on my OSX system:
+On Thu, Dec 20, 2018 at 11:00:21AM +0100, Paolo Bonzini wrote:
+> On 20/12/18 06:40, Peter Xu wrote:
+> > For old versions of QEMU: we used machine compat properties.
+> > 
+> > For old kernels (<4.4): if user didn't specify split kernel irqchip,
+> > we'll take it only as the first priority if it's supported by the
+> > kernel; otherwise, we will continue with complete kernel irqchip.
+> > 
+> > Both of these parameters should be good to have (split irqchip gains
+> > more security, while IR gets it too but even more, like x2apic).  So
+> > let's try to make them as default if capable.
 > 
->   CC      tests/test-crypto-pbkdf.o
-> /Users/pm215/src/qemu-for-merges/tests/test-crypto-pbkdf.c:444:17:
-> error: too few arguments to function call, single argument 'msg' was
-> not specified
->     g_test_skip();
->     ~~~~~~~~~~~ ^
-> /usr/local/Cellar/glib/2.58.1/include/glib-2.0/glib/gtestutils.h:209:1:
-> note: 'g_test_skip' declared here
-> GLIB_AVAILABLE_IN_2_38
-> ^
-> /usr/local/Cellar/glib/2.58.1/include/glib-2.0/glib/gversionmacros.h:394:49:
-> note: expanded from macro 'GLIB_AVAILABLE_IN_2_38'
-> # define GLIB_AVAILABLE_IN_2_38                 _GLIB_EXTERN
->                                                 ^
-> /usr/local/Cellar/glib/2.58.1/include/glib-2.0/glib/gmacros.h:456:22:
-> note: expanded from macro '_GLIB_EXTERN'
-> #define _GLIB_EXTERN extern
->                      ^
-> 1 error generated.
+> This is not correct anymore, but the commit message in patch 1 is
+> correct, so
 
-Sorry, I forgot to commit the fix.
+Indeed; I should remove the old cover letter to avoid confusion.
 
 > 
-> I also get this splat trying to do 'make check-tcg':
-> 
-> make: Entering directory
-> '/home/petmay01/linaro/qemu-for-merges/build/all-linux-static'
->   BUILD   debian9
-> The command '/bin/sh -c DEBIAN_FRONTEND=noninteractive eatmydata
-> apt install -y --no-install-recommends         bison
-> build-essential         ca-certificates         clang         flex
->     gettext         git         libtest-harness-perl
-> pkg-config         psmisc         python         texinfo
-> $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\
-> -f2)' returned a non-zero code: 100
-> Traceback (most recent call last):
->   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
-> line 563, in <module>
->     sys.exit(main())
->   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
-> line 560, in main
->     return args.cmdobj.run(args, argv)
->   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
-> line 376, in run
->     extra_files_cksum=cksum)
->   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
-> line 254, in build_image
->     quiet=quiet)
->   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
-> line 181, in _do_check
->     return subprocess.check_call(self._command + cmd, **kwargs)
->   File "/usr/lib/python2.7/subprocess.py", line 541, in check_call
->     raise CalledProcessError(retcode, cmd)
-> subprocess.CalledProcessError: Command '['docker', 'build', '-t',
-> 'qemu:debian9', '-f', '/tmp/docker_buildsvtS6R/tmp74LVkj.docker',
-> '/tmp/docker_buildsvtS6R']' returned non-zero exit status 100
-> /home/petmay01/linaro/qemu-for-merges/tests/docker/Makefile.include:53:
-> recipe for target 'docker-image-debian9' failed
-> make: *** [docker-image-debian9] Error 1
+> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-I'll try it too.
+Thanks!
 
-Paolo
+-- 
+Peter Xu
