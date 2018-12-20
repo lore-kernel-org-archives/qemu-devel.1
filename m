@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gZq1Z-0001yL-72
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 23:33:29 -0500
+	(envelope-from <bounces@canonical.com>) id 1gZqN7-000519-Dy
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 23:55:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gZq1R-00078m-S7
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 23:33:27 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:37536)
+	(envelope-from <bounces@canonical.com>) id 1gZqN4-0005zh-8X
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 23:55:45 -0500
+Received: from indium.canonical.com ([91.189.90.7]:44604)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gZq1P-00073f-SJ
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 23:33:21 -0500
-Received: by mail-pg1-x543.google.com with SMTP id c25so265034pgb.4
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 20:33:19 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 19 Dec 2018 20:33:15 -0800
-Message-Id: <20181220043315.8848-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH] disas/microblaze: Remove unused REG_SP macro
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gZqN4-0005z5-2K
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 23:55:42 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gZqN2-0005AT-7F
+	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 04:55:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 14E6E2E80CB
+	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 04:55:40 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 20 Dec 2018 04:46:47 -0000
+From: William Razgunas <bjraz@abstractions.me>
+Reply-To: Bug 1808824 <1808824@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154505934144.23344.12423865582266502170.malonedeb@soybean.canonical.com>
+Message-Id: <154528120746.2249.12879166818086890264.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1808824] Re: Mouse leaves VM window when Grab on
+ Hover isn't selected Windows 10 and Intel HAX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,35 +38,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: edgar.iglesias@gmail.com
 
-This causes a build error with debian sid, riscv64 host:
+https://youtu.be/Vpi59ptOiyc
+Here is a video demonstrating the main issue. This does not show any lag bu=
+t, it does show how VM doesn't capture the mouse correctly.
 
-disas/microblaze.c:179: error: "REG_SP" redefined [-Werror]
- #define REG_SP  1 /* stack pointer */
+After capture if you move the mouse far enough off the VM window the mouse =
+goes out of the window in odd places that isn't representative of the locat=
+ion of where the mouse is.
+The mouse will leave the VM from the middle of the of VM window at times.
 
-In file included from /usr/include/signal.h:306,
-                 from include/qemu/osdep.h:101,
-                 from disas/microblaze.c:36:
-/usr/include/riscv64-linux-gnu/sys/ucontext.h:36: note: this is the location of the previous definition
- # define REG_SP 2
+-- =
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- disas/microblaze.c | 1 -
- 1 file changed, 1 deletion(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1808824
 
-diff --git a/disas/microblaze.c b/disas/microblaze.c
-index 598ecbc89d..c23605043a 100644
---- a/disas/microblaze.c
-+++ b/disas/microblaze.c
-@@ -176,7 +176,6 @@ enum microblaze_instr_type {
- #define REG_TLBSX 36869 /* MMU: TLB Search Index reg */
- 
- /* alternate names for gen purpose regs */
--#define REG_SP  1 /* stack pointer */
- #define REG_ROSDP 2 /* read-only small data pointer */
- #define REG_RWSDP 13 /* read-write small data pointer */
- 
--- 
-2.17.2
+Title:
+  Mouse leaves VM window when Grab on Hover isn't selected Windows 10
+  and Intel HAX
+
+Status in QEMU:
+  New
+
+Bug description:
+  On Windows 10.0.17134 I have been having the problem that the mouse
+  will leave the VM window after a short time when grab on hover isn't
+  selected.  The VM will then try to grab on Hover and the mouse will
+  grab in weird places and it will become very unwieldy to control the
+  mouse in the VM window.
+
+  This is exasperated by super slow response making it nearly unusable
+  if the Intel=C2=AE Hardware Accelerated Execution Manager (Intel=C2=AE HA=
+XM) is
+  not currently installed on my machine.
+
+  I know they are different things but they compounded on each other
+  when you have a mouse that is not staying in the VM window and the
+  VM's visualized cpu is acting VERY slow the system is unusable.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1808824/+subscriptions
