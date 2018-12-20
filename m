@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1ga3iL-0005Xc-8T
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 14:10:34 -0500
+	(envelope-from <bounces@canonical.com>) id 1ga4LC-0005Pw-L7
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 14:50:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1ga3iK-0001IO-8X
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 14:10:33 -0500
-Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:41922)
+	(envelope-from <bounces@canonical.com>) id 1ga4L9-0006IC-G2
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 14:50:42 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35088)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1ga3iK-00018O-46
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 14:10:32 -0500
-Received: by mail-qt1-x841.google.com with SMTP id l12so3029862qtf.8
-	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 11:10:25 -0800 (PST)
-Date: Thu, 20 Dec 2018 11:10:24 -0800 (PST)
-In-Reply-To: <CAKmqyKPXri6faCRjXnp7WCyRYcuBhiEU=W_VrW4LYUe1O_c4Pw@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-2a2d74bc-32ef-4a14-adb7-c1556269a686@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/23] Add RISC-V TCG backend support
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ga4L7-0006EF-Na
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 14:50:39 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ga4L4-0003bg-RJ
+	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 19:50:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C17882E80C9
+	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 19:50:34 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 20 Dec 2018 19:44:24 -0000
+From: Julio Faracco <jcfaracco@gmail.com>
+Reply-To: Bug 1809304 <1809304@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154533506483.19401.8849680441407310900.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1809304] [NEW] qemu-img convert is freezing for
+ some DMG files.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +36,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alistair23@gmail.com
-Cc: richard.henderson@linaro.org, qemu-riscv@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Thu, 20 Dec 2018 11:04:41 PST (-0800), alistair23@gmail.com wrote:
-> On Thu, Dec 20, 2018 at 10:45 AM Palmer Dabbelt <palmer@sifive.com> wrote:
->>
->> On Thu, 20 Dec 2018 09:20:05 PST (-0800), alistair23@gmail.com wrote:
->> > On Wed, Dec 19, 2018 at 10:07 PM Richard Henderson
->> > <richard.henderson@linaro.org> wrote:
->> >>
->> >> On 12/19/18 11:16 AM, Alistair Francis wrote:
->> >> > This patch set adds RISC-V backend support to QEMU. This is based on
->> >> > Michael Clark's original work with extra work on top.
->> >> >
->> >> > This has been somewhat tested and can run other architecture softmmu
->> >> > code. It seems that any complex OS will eventually hang, but we can
->> >> > run the BIOS and OS startup code for a number of different operating
->> >> > systems.
->> >> >
->> >> > I haven't tested linux user support at all yet. I think Michael had that
->> >> > working reliably though and hopefully my changes haven't broken it.
->> >> >
->> >> > There are still some todos in the code (there are missing instructions
->> >> > and byte swapping) but these should assert instead of generating invalid
->> >> > code.
->> >>
->> >> Queued to tcg-next, with the extrh fix.
->> >
->> > Thanks Richard!
->>
->> Sounds good to me.  I'm still attempting to collect the RISC-V patches to get a
->> PR out, a few things came up but I should have time now.  This was the biggest
->> patch set, so it should be a lot easier now.
->>
->> Thanks for picking this up!
->>
->> >> Some of those todos are no longer todos, since e.g. bswap is now optional.
->> >> Those asserts should never fire (as a good assert should do, I suppose).
->> >>
->> >> The missing instructions are only for riscv32, which afaik is just now making
->> >> its way to glibc.  So a chroot complete enough to build qemu is a ways away.
->> >> I'm ok with leaving that incomplete for now.
->>
->> We've decided to delay the rv32i glibc port until after the next glibc release,
->> which is targeted for the beginning of February.  glibc should freeze at the
->> end of the year, at which point we're going to do a rv32i glibc prerelease and
->> try to build a proper userspace with the theory being that we'll shake out ABI
->> bugs that way.
->
-> Yocto/OE has full support for building 32-bit userspaces with the
-> latest 32-bit glibc patchset so that is probably a good place to start
-> testing. It even runs QEMU!
+Public bug reported:
 
-That's my plan.  The issue is less on the distro side and more on the "go 
-through the whole rv32i glibc ABI to make sure it's sane" side.
+Recently, I created a file using hdiutil from MacOS (using Zlib
+compression):
+
+$ hdiutil create -volname MyVolName -srcfolder /path/to/my/vol/ -ov
+-format UDZO myvolname.dmg
+
+But, when I try to convert this volume using qemu-img convert, this
+command is freezing.
+
+I'm using the upstream version to test it.
+
+It is freezing inside the binary search method to retrieve the chunk.
+
+But, I still don't know why.
+
+I'm attaching the file as an example.
+
+It can be mounted using MacOS or other Linux apps like hfsleuth and
+darling-dmg.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: dmg qemu-img
+
+** Attachment added: "Firefox-Zlib.dmg"
+   https://bugs.launchpad.net/bugs/1809304/+attachment/5223852/+files/Firef=
+ox-Zlib.dmg
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1809304
+
+Title:
+  qemu-img convert is freezing for some DMG files.
+
+Status in QEMU:
+  New
+
+Bug description:
+  Recently, I created a file using hdiutil from MacOS (using Zlib
+  compression):
+
+  $ hdiutil create -volname MyVolName -srcfolder /path/to/my/vol/ -ov
+  -format UDZO myvolname.dmg
+
+  But, when I try to convert this volume using qemu-img convert, this
+  command is freezing.
+
+  I'm using the upstream version to test it.
+
+  It is freezing inside the binary search method to retrieve the chunk.
+
+  But, I still don't know why.
+
+  I'm attaching the file as an example.
+
+  It can be mounted using MacOS or other Linux apps like hfsleuth and
+  darling-dmg.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1809304/+subscriptions
