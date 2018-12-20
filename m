@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ga3Eq-0005MD-7w
+	(envelope-from <mst@redhat.com>) id 1ga3Eq-0005ME-8b
 	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:40:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ga3En-0001IV-0w
+	(envelope-from <mst@redhat.com>) id 1ga3En-0001Ji-Kt
 	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:40:04 -0500
-Date: Thu, 20 Dec 2018 13:39:58 -0500
+Date: Thu, 20 Dec 2018 13:39:42 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181220183059.20726-34-mst@redhat.com>
+Message-ID: <20181220183059.20726-27-mst@redhat.com>
 References: <20181220183059.20726-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20181220183059.20726-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v3 33/44] s390x/pci: rename hotplug handler
- callbacks
+Subject: [Qemu-devel] [PULL v3 26/44] hw: arm: Convert the RSDP build to the
+ buid_append_foo() API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,60 +24,88 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Samuel Ortiz <sameo@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, Andrew Jones <drjones@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org
 
-From: David Hildenbrand <david@redhat.com>
+From: Samuel Ortiz <sameo@linux.intel.com>
 
-The callbacks are also called for cold plugged devices. Drop the "hot"
-to better match the actual callback names.
+Instead of filling a mapped and packed C structure field in random order
+and being careful about endianness and sizes, build_rsdp() now uses
+build_append_int_noprefix() to compose RSDP table.
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+This makes reviewing and maintaining code easier as this is almost
+matching 1:1 the ACPI spec itself.
+
+Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/s390x/s390-pci-bus.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ hw/arm/virt-acpi-build.c | 42 ++++++++++++++++++++++------------------
+ 1 file changed, 23 insertions(+), 19 deletions(-)
 
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index f7458445c0..15759b6514 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -823,8 +823,8 @@ static bool s390_pci_alloc_idx(S390pciState *s, S390PCIBusDevice *pbdev)
-     return true;
- }
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index ce8bfa5a37..4a6b53fbfc 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -368,35 +368,39 @@ static void acpi_dsdt_add_power_button(Aml *scope)
  
--static void s390_pcihost_hot_plug(HotplugHandler *hotplug_dev,
--                                  DeviceState *dev, Error **errp)
-+static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                              Error **errp)
+ /* RSDP */
+ static void
+-build_rsdp(GArray *rsdp_table, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
++build_rsdp(GArray *tbl, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
  {
-     PCIDevice *pdev = NULL;
-     S390PCIBusDevice *pbdev = NULL;
-@@ -932,8 +932,8 @@ static void s390_pcihost_timer_cb(void *opaque)
-     qdev_unplug(DEVICE(pbdev), NULL);
+-    AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
+-    unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
+-    unsigned xsdt_pa_offset =
+-        (char *)&rsdp->xsdt_physical_address - rsdp_table->data;
++    int tbl_off = tbl->len; /* Table offset in the RSDP file */
+ 
+-    bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, rsdp_table, 16,
++    bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, tbl, 16,
+                              true /* fseg memory */);
+ 
+-    memcpy(&rsdp->signature, "RSD PTR ", sizeof(rsdp->signature));
+-    memcpy(rsdp->oem_id, rsdp_data->oem_id, sizeof(rsdp->oem_id));
+-    rsdp->length = cpu_to_le32(sizeof(*rsdp));
+-    rsdp->revision = rsdp_data->revision;
++    g_array_append_vals(tbl, "RSD PTR ", 8); /* Signature */
++    build_append_int_noprefix(tbl, 0, 1); /* Checksum */
++    g_array_append_vals(tbl, rsdp_data->oem_id, 6); /* OEMID */
++    build_append_int_noprefix(tbl, rsdp_data->revision, 1); /* Revision */
++    build_append_int_noprefix(tbl, 0, 4); /* RsdtAddress */
++    build_append_int_noprefix(tbl, 36, 4); /* Length */
+ 
+-    /* Address to be filled by Guest linker */
+-    bios_linker_loader_add_pointer(linker,
+-        ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
+-        ACPI_BUILD_TABLE_FILE, *rsdp_data->xsdt_tbl_offset);
++    /* XSDT address to be filled by guest linker */
++    build_append_int_noprefix(tbl, 0, 8); /* XsdtAddress */
++    bios_linker_loader_add_pointer(linker, ACPI_BUILD_RSDP_FILE,
++                                   tbl_off + 24, 8,
++                                   ACPI_BUILD_TABLE_FILE,
++                                   *rsdp_data->xsdt_tbl_offset);
+ 
+-    /* Checksum to be filled by Guest linker */
++    build_append_int_noprefix(tbl, 0, 1); /* Extended Checksum */
++    build_append_int_noprefix(tbl, 0, 3); /* Reserved */
++
++    /* Checksum to be filled by guest linker */
+     bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+-        (char *)rsdp - rsdp_table->data, 20 /* ACPI rev 1.0 RSDP size */,
+-        (char *)&rsdp->checksum - rsdp_table->data);
++                                    tbl_off, 20, /* ACPI rev 1.0 RSDP size */
++                                    8);
+ 
+     /* Extended checksum to be filled by Guest linker */
+     bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+-        (char *)rsdp - rsdp_table->data, 36 /* ACPI rev 2.0 RSDP size */,
+-        (char *)&rsdp->extended_checksum - rsdp_table->data);
++                                    tbl_off, 36, /* ACPI rev 2.0 RSDP size */
++                                    32);
  }
  
--static void s390_pcihost_hot_unplug(HotplugHandler *hotplug_dev,
--                                    DeviceState *dev, Error **errp)
-+static void s390_pcihost_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                                Error **errp)
- {
-     PCIDevice *pci_dev = NULL;
-     PCIBus *bus;
-@@ -1041,8 +1041,8 @@ static void s390_pcihost_class_init(ObjectClass *klass, void *data)
- 
-     dc->reset = s390_pcihost_reset;
-     dc->realize = s390_pcihost_realize;
--    hc->plug = s390_pcihost_hot_plug;
--    hc->unplug = s390_pcihost_hot_unplug;
-+    hc->plug = s390_pcihost_plug;
-+    hc->unplug = s390_pcihost_unplug;
-     msi_nonbroken = true;
- }
- 
+ static void
 -- 
 MST
