@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ga1Eg-0007pl-Ki
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 11:31:52 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ga1Ef-0007pb-I8
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 11:31:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ga1Ef-0000nY-Ss
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 11:31:46 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ga1Ec-0000iZ-6Y
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 11:31:45 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Thu, 20 Dec 2018 16:31:20 +0000
-Message-Id: <20181220163123.9233-7-mark.cave-ayland@ilande.co.uk>
+Date: Thu, 20 Dec 2018 16:31:16 +0000
+Message-Id: <20181220163123.9233-3-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20181220163123.9233-1-mark.cave-ayland@ilande.co.uk>
 References: <20181220163123.9233-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH v3 6/9] target/ppc: switch FPR,
- VMX and VSX helpers to access data directly from cpu_env
+Subject: [Qemu-devel] [PATCH v3 2/9] target/ppc: switch EXTRACT_HELPER
+ macros over to use sextract32/extract32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,135 +22,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, richard.henderson@linaro.org, david@gibson.dropbear.id.au
 
-Instead of accessing the FPR, VMX and VSX registers through static arrays of
-TCGv_i64 globals, remove them and change the helpers to load/store data directly
-within cpu_env.
+These ensure that we consistently handle signed and unsigned extensions correctly
+when decoding immediates from instruction opcodes.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate.c              | 59 ++++++++++---------------------------
- target/ppc/translate/vsx-impl.inc.c |  4 +--
- 2 files changed, 18 insertions(+), 45 deletions(-)
+ target/ppc/internal.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index fa3e8dc114..5923c688cd 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -55,15 +55,9 @@
- /* global register indexes */
- static char cpu_reg_names[10*3 + 22*4 /* GPR */
-     + 10*4 + 22*5 /* SPE GPRh */
--    + 10*4 + 22*5 /* FPR */
--    + 2*(10*6 + 22*7) /* AVRh, AVRl */
--    + 10*5 + 22*6 /* VSR */
-     + 8*5 /* CRF */];
- static TCGv cpu_gpr[32];
- static TCGv cpu_gprh[32];
--static TCGv_i64 cpu_fpr[32];
--static TCGv_i64 cpu_avrh[32], cpu_avrl[32];
--static TCGv_i64 cpu_vsr[32];
- static TCGv_i32 cpu_crf[8];
- static TCGv cpu_nip;
- static TCGv cpu_msr;
-@@ -108,39 +102,6 @@ void ppc_translate_init(void)
-                                          offsetof(CPUPPCState, gprh[i]), p);
-         p += (i < 10) ? 4 : 5;
-         cpu_reg_names_size -= (i < 10) ? 4 : 5;
--
--        snprintf(p, cpu_reg_names_size, "fp%d", i);
--        cpu_fpr[i] = tcg_global_mem_new_i64(cpu_env,
--                                            offsetof(CPUPPCState, fpr[i]), p);
--        p += (i < 10) ? 4 : 5;
--        cpu_reg_names_size -= (i < 10) ? 4 : 5;
--
--        snprintf(p, cpu_reg_names_size, "avr%dH", i);
--#ifdef HOST_WORDS_BIGENDIAN
--        cpu_avrh[i] = tcg_global_mem_new_i64(cpu_env,
--                                             offsetof(CPUPPCState, avr[i].u64[0]), p);
--#else
--        cpu_avrh[i] = tcg_global_mem_new_i64(cpu_env,
--                                             offsetof(CPUPPCState, avr[i].u64[1]), p);
--#endif
--        p += (i < 10) ? 6 : 7;
--        cpu_reg_names_size -= (i < 10) ? 6 : 7;
--
--        snprintf(p, cpu_reg_names_size, "avr%dL", i);
--#ifdef HOST_WORDS_BIGENDIAN
--        cpu_avrl[i] = tcg_global_mem_new_i64(cpu_env,
--                                             offsetof(CPUPPCState, avr[i].u64[1]), p);
--#else
--        cpu_avrl[i] = tcg_global_mem_new_i64(cpu_env,
--                                             offsetof(CPUPPCState, avr[i].u64[0]), p);
--#endif
--        p += (i < 10) ? 6 : 7;
--        cpu_reg_names_size -= (i < 10) ? 6 : 7;
--        snprintf(p, cpu_reg_names_size, "vsr%d", i);
--        cpu_vsr[i] = tcg_global_mem_new_i64(cpu_env,
--                                            offsetof(CPUPPCState, vsr[i]), p);
--        p += (i < 10) ? 5 : 6;
--        cpu_reg_names_size -= (i < 10) ? 5 : 6;
-     }
- 
-     cpu_nip = tcg_global_mem_new(cpu_env,
-@@ -6696,22 +6657,34 @@ GEN_TM_PRIV_NOOP(trechkpt);
- 
- static inline void get_fpr(TCGv_i64 dst, int regno)
- {
--    tcg_gen_mov_i64(dst, cpu_fpr[regno]);
-+    tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUPPCState, fpr[regno]));
+diff --git a/target/ppc/internal.h b/target/ppc/internal.h
+index 8b35863549..5d460247e2 100644
+--- a/target/ppc/internal.h
++++ b/target/ppc/internal.h
+@@ -52,20 +52,20 @@ FUNC_MASK(mask_u64, uint64_t, 64, UINT64_MAX);
+ #define EXTRACT_HELPER(name, shift, nb)                                       \
+ static inline uint32_t name(uint32_t opcode)                                  \
+ {                                                                             \
+-    return (opcode >> (shift)) & ((1 << (nb)) - 1);                           \
++    return extract32(opcode, shift, nb);                                      \
  }
  
- static inline void set_fpr(int regno, TCGv_i64 src)
- {
--    tcg_gen_mov_i64(cpu_fpr[regno], src);
-+    tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState, fpr[regno]));
+ #define EXTRACT_SHELPER(name, shift, nb)                                      \
+ static inline int32_t name(uint32_t opcode)                                   \
+ {                                                                             \
+-    return (int16_t)((opcode >> (shift)) & ((1 << (nb)) - 1));                \
++    return sextract32(opcode, shift, nb);                                     \
  }
  
- static inline void get_avr64(TCGv_i64 dst, int regno, bool high)
- {
--    tcg_gen_mov_i64(dst, (high ? cpu_avrh : cpu_avrl)[regno]);
-+#ifdef HOST_WORDS_BIGENDIAN
-+    tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUPPCState,
-+                                          avr[regno].u64[(high ? 0 : 1)]));
-+#else
-+    tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUPPCState,
-+                                          avr[regno].u64[(high ? 1 : 0)]));
-+#endif
+ #define EXTRACT_HELPER_SPLIT(name, shift1, nb1, shift2, nb2)                  \
+ static inline uint32_t name(uint32_t opcode)                                  \
+ {                                                                             \
+-    return (((opcode >> (shift1)) & ((1 << (nb1)) - 1)) << nb2) |             \
+-            ((opcode >> (shift2)) & ((1 << (nb2)) - 1));                      \
++    return extract32(opcode, shift1, nb1) << nb2 |                            \
++               extract32(opcode, shift2, nb2);                                \
  }
  
- static inline void set_avr64(int regno, TCGv_i64 src, bool high)
- {
--    tcg_gen_mov_i64((high ? cpu_avrh : cpu_avrl)[regno], src);
-+#ifdef HOST_WORDS_BIGENDIAN
-+    tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState,
-+                                          avr[regno].u64[(high ? 0 : 1)]));
-+#else
-+    tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState,
-+                                          avr[regno].u64[(high ? 1 : 0)]));
-+#endif
- }
- 
- #include "translate/fp-impl.inc.c"
-diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-index f0665df1a5..7eaa36b4d5 100644
---- a/target/ppc/translate/vsx-impl.inc.c
-+++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -2,12 +2,12 @@
- 
- static inline void get_vsr(TCGv_i64 dst, int n)
- {
--    tcg_gen_mov_i64(dst, cpu_vsr[n]);
-+    tcg_gen_ld_i64(dst, cpu_env, offsetof(CPUPPCState, vsr[n]));
- }
- 
- static inline void set_vsr(int n, TCGv_i64 src)
- {
--    tcg_gen_mov_i64(cpu_vsr[n], src);
-+    tcg_gen_st_i64(src, cpu_env, offsetof(CPUPPCState, vsr[n]));
- }
- 
- static inline void get_cpu_vsrh(TCGv_i64 dst, int n)
+ #define EXTRACT_HELPER_SPLIT_3(name,                                          \
 -- 
 2.11.0
