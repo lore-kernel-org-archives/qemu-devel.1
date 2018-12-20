@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gZrQM-0001Zz-P7
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 01:03:11 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gZrUN-000309-1K
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 01:07:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gZrQH-0002Ep-NR
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 01:03:10 -0500
-Received: from mga01.intel.com ([192.55.52.88]:44512)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yu.c.zhang@linux.intel.com>)
-	id 1gZrQH-0002Ar-CM
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 01:03:05 -0500
-Date: Thu, 20 Dec 2018 13:59:58 +0800
-From: Yu Zhang <yu.c.zhang@linux.intel.com>
-Message-ID: <20181220055958.7kp3idlj5bqcem3m@linux.intel.com>
-References: <1544619939-18102-1-git-send-email-yu.c.zhang@linux.intel.com>
-	<1544619939-18102-2-git-send-email-yu.c.zhang@linux.intel.com>
-	<20181217141740.16ccfaa1@Igors-MacBook-Pro.local>
-	<20181218092723.yhaerzm4vlzgef65@linux.intel.com>
-	<20181218155536.2b35a037@Igors-MacBook-Pro.local>
-	<20181219025717.6m72hq73p2haexkv@linux.intel.com>
-	<20181219114037.5550a562@redhat.com>
-	<20181219114438-mutt-send-email-mst@kernel.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1gZrUF-00008N-TD
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 01:07:17 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:44177)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gZrUF-00007z-53
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 01:07:11 -0500
+Received: by mail-pf1-x442.google.com with SMTP id u6so378939pfh.11
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 22:07:11 -0800 (PST)
+References: <cover.1545246859.git.alistair.francis@wdc.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <19f7305e-ae63-3a5b-87dd-e0cfd835462f@linaro.org>
+Date: Wed, 19 Dec 2018 22:07:07 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181219114438-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] intel-iommu: differentiate host
- address width from IOVA address width.
+In-Reply-To: <cover.1545246859.git.alistair.francis@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 00/23] Add RISC-V TCG backend support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,223 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>
 
-On Wed, Dec 19, 2018 at 11:47:23AM -0500, Michael S. Tsirkin wrote:
-> On Wed, Dec 19, 2018 at 11:40:37AM +0100, Igor Mammedov wrote:
-> > On Wed, 19 Dec 2018 10:57:17 +0800
-> > Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
-> > 
-> > > On Tue, Dec 18, 2018 at 03:55:36PM +0100, Igor Mammedov wrote:
-> > > > On Tue, 18 Dec 2018 17:27:23 +0800
-> > > > Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
-> > > >   
-> > > > > On Mon, Dec 17, 2018 at 02:17:40PM +0100, Igor Mammedov wrote:  
-> > > > > > On Wed, 12 Dec 2018 21:05:38 +0800
-> > > > > > Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
-> > > > > >   
-> > > > > > > Currently, vIOMMU is using the value of IOVA address width, instead of
-> > > > > > > the host address width(HAW) to calculate the number of reserved bits in
-> > > > > > > data structures such as root entries, context entries, and entries of
-> > > > > > > DMA paging structures etc.
-> > > > > > > 
-> > > > > > > However values of IOVA address width and of the HAW may not equal. For
-> > > > > > > example, a 48-bit IOVA can only be mapped to host addresses no wider than
-> > > > > > > 46 bits. Using 48, instead of 46 to calculate the reserved bit may result
-> > > > > > > in an invalid IOVA being accepted.
-> > > > > > > 
-> > > > > > > To fix this, a new field - haw_bits is introduced in struct IntelIOMMUState,
-> > > > > > > whose value is initialized based on the maximum physical address set to
-> > > > > > > guest CPU.  
-> > > > > >   
-> > > > > > > Also, definitions such as VTD_HOST_AW_39/48BIT etc. are renamed
-> > > > > > > to clarify.
-> > > > > > > 
-> > > > > > > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > > > > > > Reviewed-by: Peter Xu <peterx@redhat.com>
-> > > > > > > ---  
-> > > > > > [...]
-> > > > > >   
-> > > > > > > @@ -3100,6 +3104,8 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
-> > > > > > >  static void vtd_init(IntelIOMMUState *s)
-> > > > > > >  {
-> > > > > > >      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
-> > > > > > > +    CPUState *cs = first_cpu;
-> > > > > > > +    X86CPU *cpu = X86_CPU(cs);
-> > > > > > >  
-> > > > > > >      memset(s->csr, 0, DMAR_REG_SIZE);
-> > > > > > >      memset(s->wmask, 0, DMAR_REG_SIZE);
-> > > > > > > @@ -3119,23 +3125,24 @@ static void vtd_init(IntelIOMMUState *s)
-> > > > > > >      s->cap = VTD_CAP_FRO | VTD_CAP_NFR | VTD_CAP_ND |
-> > > > > > >               VTD_CAP_MAMV | VTD_CAP_PSI | VTD_CAP_SLLPS |
-> > > > > > >               VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(s->aw_bits);
-> > > > > > > -    if (s->aw_bits == VTD_HOST_AW_48BIT) {
-> > > > > > > +    if (s->aw_bits == VTD_AW_48BIT) {
-> > > > > > >          s->cap |= VTD_CAP_SAGAW_48bit;
-> > > > > > >      }
-> > > > > > >      s->ecap = VTD_ECAP_QI | VTD_ECAP_IRO;
-> > > > > > > +    s->haw_bits = cpu->phys_bits;  
-> > > > > > Is it possible to avoid accessing CPU fields directly or cpu altogether
-> > > > > > and set phys_bits when iommu is created?  
-> > > > > 
-> > > > > Thanks for your comments, Igor.
-> > > > > 
-> > > > > Well, I guess you prefer not to query the CPU capabilities while deciding
-> > > > > the vIOMMU features. But to me, they are not that irrelevant.:)
-> > > > > 
-> > > > > Here the hardware address width in vt-d, and the one in cpuid.MAXPHYSADDR
-> > > > > are referring to the same concept. In VM, both are the maximum guest physical
-> > > > > address width. If we do not check the CPU field here, we will still have to
-> > > > > check the CPU field in other places such as build_dmar_q35(), and reset the
-> > > > > s->haw_bits again.
-> > > > > 
-> > > > > Is this explanation convincing enough? :)  
-> > > > current build_dmar_q35() doesn't do it, it's all new code in this series that
-> > > > contains not acceptable direct access from one device (iommu) to another (cpu).   
-> > > > Proper way would be for the owner of iommu to fish limits from somewhere and set
-> > > > values during iommu creation.  
-> > > 
-> > > Well, current build_dmar_q35() doesn't do it, because it is using the incorrect value. :)
-> > > According to the spec, the host address width is the maximum physical address width,
-> > > yet current implementation is using the DMA address width. For me, this is not only
-> > > wrong, but also unsecure. For this point, I think we all agree this need to be fixed.
-> > > 
-> > > As to how to fix it - should we query the cpu fields, I still do not understand why
-> > > this is not acceptable. :)
-> > > 
-> > > I had thought of other approaches before, yet I did not choose:
-> > > 
-> > > 1> Introduce a new parameter, say, "x-haw-bits" which is used for iommu to limit its  
-> > > physical address width(similar to the "x-aw-bits" for IOVA). But what should we check
-> > > this parameter or not? What if this parameter is set to sth. different than the "phys-bits"
-> > > or not?
-> > > 
-> > > 2> Another choice I had thought of is, to query the physical iommu. I abandoned this  
-> > > idea because my understanding is that vIOMMU is not a passthrued device, it is emulated.
-> > 
-> > > So Igor, may I ask why you think checking against the cpu fields so not acceptable? :)
-> > Because accessing private fields of device from another random device is not robust
-> > and a subject to breaking in unpredictable manner when field meaning or initialization
-> > order changes. (analogy to baremetal: one does not solder wire to a CPU die to let
-> > access some piece of data from random device).
-> > 
-> > I've looked at intel-iommu code and how it's created so here is a way to do the thing
-> > you need using proper interfaces:
-> > 
-> > 1. add x-haw_bits property
-> > 2. include in your series patch
-> >     '[Qemu-devel] [PATCH] qdev: let machine hotplug handler to override  bus hotplug handler'
-> > 3. add your iommu to pc_get_hotpug_handler() to redirect plug flow to
-> >    machine and let _pre_plug handler to check and set x-haw_bits for machine level
-> > 4. you probably can use phys-bits/host-phys-bits properties to get data that you need
-> >    also see how ms->possible_cpus, that's how you can get access to CPU from machine
-> >    layer.
+On 12/19/18 11:16 AM, Alistair Francis wrote:
+> This patch set adds RISC-V backend support to QEMU. This is based on
+> Michael Clark's original work with extra work on top.
 > 
+> This has been somewhat tested and can run other architecture softmmu
+> code. It seems that any complex OS will eventually hang, but we can
+> run the BIOS and OS startup code for a number of different operating
+> systems.
 > 
-> But given it's all actually a hack trying to guess host CPU capabilities,
-
-Well, not exactly. :)
-
-Unlike the 2nd patch in this series, which I used host cpu capability as a reference(though
-not the final solution), what this patch cares about is the guest physical address width,
-which can possibly be different than the physical one. E.g. we can create a VM with 39 bit
-physical address on hosts whose address width is 46 bits, and in such case, 39 shall be the
-address limitation in guest DMAR, instead of 46.
-
-So I think Igor's proposal can meet all my requirement(I'll study the hotplug handler interface
-to figure out).
-
-> I would rather say 
-> 1. add a host kernel interface to get it from VFIO
-> 2. on a host where it's not there, and assuming we want to support old kernels,
->    write a function returning these (do we? why? is the 5 level hardware already
->    so widespread?), and call it at any time. No need to poke at the VCPU.
+> I haven't tested linux user support at all yet. I think Michael had that
+> working reliably though and hopefully my changes haven't broken it.
 > 
-> 
-> 
-> > > >   
-> > > > > > 
-> > > > > > Perhaps Eduardo
-> > > > > >  can suggest better approach, since he's more familiar with phys_bits topic  
-> > > > > 
-> > > > > @Eduardo, any comments? Thanks!
-> > > > >   
-> > > > > >   
-> > > > > > >      /*
-> > > > > > >       * Rsvd field masks for spte
-> > > > > > >       */
-> > > > > > >      vtd_paging_entry_rsvd_field[0] = ~0ULL;
-> > > > > > > -    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->aw_bits);
-> > > > > > > -    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->aw_bits);
-> > > > > > > -    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->aw_bits);
-> > > > > > > -    vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->aw_bits);
-> > > > > > > -    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->aw_bits);
-> > > > > > > -    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->aw_bits);
-> > > > > > > -    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->aw_bits);
-> > > > > > > -    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->aw_bits);
-> > > > > > > +    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->haw_bits);
-> > > > > > > +    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->haw_bits);
-> > > > > > > +    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->haw_bits);
-> > > > > > > +    vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->haw_bits);
-> > > > > > > +    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->haw_bits);
-> > > > > > > +    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->haw_bits);
-> > > > > > > +    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->haw_bits);
-> > > > > > > +    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->haw_bits);
-> > > > > > >  
-> > > > > > >      if (x86_iommu->intr_supported) {
-> > > > > > >          s->ecap |= VTD_ECAP_IR | VTD_ECAP_MHMV;
-> > > > > > > @@ -3261,10 +3268,10 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
-> > > > > > >      }
-> > > > > > >  
-> > > > > > >      /* Currently only address widths supported are 39 and 48 bits */
-> > > > > > > -    if ((s->aw_bits != VTD_HOST_AW_39BIT) &&
-> > > > > > > -        (s->aw_bits != VTD_HOST_AW_48BIT)) {
-> > > > > > > +    if ((s->aw_bits != VTD_AW_39BIT) &&
-> > > > > > > +        (s->aw_bits != VTD_AW_48BIT)) {
-> > > > > > >          error_setg(errp, "Supported values for x-aw-bits are: %d, %d",
-> > > > > > > -                   VTD_HOST_AW_39BIT, VTD_HOST_AW_48BIT);
-> > > > > > > +                   VTD_AW_39BIT, VTD_AW_48BIT);
-> > > > > > >          return false;
-> > > > > > >      }
-> > > > > > >  
-> > > > > > > diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-> > > > > > > index ed4e758..820451c 100644
-> > > > > > > --- a/include/hw/i386/intel_iommu.h
-> > > > > > > +++ b/include/hw/i386/intel_iommu.h
-> > > > > > > @@ -47,9 +47,9 @@
-> > > > > > >  #define VTD_SID_TO_DEVFN(sid)       ((sid) & 0xff)
-> > > > > > >  
-> > > > > > >  #define DMAR_REG_SIZE               0x230
-> > > > > > > -#define VTD_HOST_AW_39BIT           39
-> > > > > > > -#define VTD_HOST_AW_48BIT           48
-> > > > > > > -#define VTD_HOST_ADDRESS_WIDTH      VTD_HOST_AW_39BIT
-> > > > > > > +#define VTD_AW_39BIT                39
-> > > > > > > +#define VTD_AW_48BIT                48
-> > > > > > > +#define VTD_ADDRESS_WIDTH           VTD_AW_39BIT
-> > > > > > >  #define VTD_HAW_MASK(aw)            ((1ULL << (aw)) - 1)
-> > > > > > >  
-> > > > > > >  #define DMAR_REPORT_F_INTR          (1)
-> > > > > > > @@ -244,7 +244,8 @@ struct IntelIOMMUState {
-> > > > > > >      bool intr_eime;                 /* Extended interrupt mode enabled */
-> > > > > > >      OnOffAuto intr_eim;             /* Toggle for EIM cabability */
-> > > > > > >      bool buggy_eim;                 /* Force buggy EIM unless eim=off */
-> > > > > > > -    uint8_t aw_bits;                /* Host/IOVA address width (in bits) */
-> > > > > > > +    uint8_t aw_bits;                /* IOVA address width (in bits) */
-> > > > > > > +    uint8_t haw_bits;               /* Hardware address width (in bits) */
-> > > > > > >  
-> > > > > > >      /*
-> > > > > > >       * Protects IOMMU states in general.  Currently it protects the  
-> > > > > > 
-> > > > > >   
-> > > > > 
-> > > > > B.R.
-> > > > > Yu  
-> > > > 
-> > > >   
-> > > 
-> > > B.R.
-> > > Yu
+> There are still some todos in the code (there are missing instructions
+> and byte swapping) but these should assert instead of generating invalid
+> code.
 
-B.R.
-Yu
+Queued to tcg-next, with the extrh fix.
+
+Some of those todos are no longer todos, since e.g. bswap is now optional.
+Those asserts should never fire (as a good assert should do, I suppose).
+
+The missing instructions are only for riscv32, which afaik is just now making
+its way to glibc.  So a chroot complete enough to build qemu is a ways away.
+I'm ok with leaving that incomplete for now.
+
+
+r~
