@@ -1,29 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ga2fO-0003Yz-K3
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:03:27 -0500
+	(envelope-from <bounces@canonical.com>) id 1ga2mZ-0005Ug-8d
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:10:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ga2fM-00036x-ER
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:03:26 -0500
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:34644)
+	(envelope-from <bounces@canonical.com>) id 1ga2mU-0004r4-81
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:10:51 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57066)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ga2fG-0002u8-Iq
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:03:18 -0500
-Received: by mail-pl1-x642.google.com with SMTP id w4so1238425plz.1
-	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 10:03:10 -0800 (PST)
-References: <20181220163123.9233-1-mark.cave-ayland@ilande.co.uk>
-	<20181220163123.9233-10-mark.cave-ayland@ilande.co.uk>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <068c98c7-7279-46cf-771b-a6addf3f4145@linaro.org>
-Date: Thu, 20 Dec 2018 10:03:07 -0800
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ga2mU-0004pY-1p
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 13:10:46 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ga2mS-0008Q8-ID
+	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 18:10:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 80B9D2E8024
+	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 18:10:44 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20181220163123.9233-10-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 9/9] target/ppc: replace AVR* macros
- with Vsr* macros
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 20 Dec 2018 17:59:01 -0000
+From: "k.c. Wang" <1809291@bugs.launchpad.net>
+Reply-To: Bug 1809291 <1809291@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154532874183.18487.10011391612831676105.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1809291] [NEW] ARM PL181 (mmc for Security
+ Digital Card) not working in Ubuntu 18.10 (CMD 2,
+ 3 timeout). The SDC driver worked fine in Ubuntu 18.04 and earlier versions
+ but not in Ubuntu 18.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +38,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
 
-On 12/20/18 8:31 AM, Mark Cave-Ayland wrote:
-> Now that the VMX and VSR register sets have been combined, the same macros can
-> be used to access both AVR and VSR field members.
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->  target/ppc/int_helper.c | 38 +++++++++++++-------------------------
->  target/ppc/internal.h   |  4 ++++
->  2 files changed, 17 insertions(+), 25 deletions(-)
+Public bug reported:
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+ARM PL181 MMC card no longer working in qemu-system-arm in Ubuntu 18.10
+The MMC driver code worked fine in Ubuntu 15.10 to 18.04.
+The command to run qemu-system-arm is
 
+    qemu-system-arm -M versatilepb -m 256M -sd sdimage -kernel t.bin
+-serial mon:stdio
 
->  #if defined(HOST_WORDS_BIGENDIAN)
-> +#define HI_IDX 0
-> +#define LO_IDX 1
->  #define VsrB(i) u8[i]
->  #define VsrH(i) u16[i]
->  #define VsrW(i) u32[i]
->  #define VsrD(i) u64[i]
+During SDC initialization, SDC commands 2, 3, 9, 13, 7, 16 all timeout, =
 
-Since this is in internal.h, we can use it elsewhere than just helpers.  E.g.
-if you sort some patches earlier, you could use it in get_avr64 instead of ifdefs.
+which cause subsequent read/write commands 17/24 to fail also.
 
+Tried both ARM versatilepb and realview-pb-a8, realview-pbx-a9 boards:
+all the same.
 
-r~
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1809291
+
+Title:
+  ARM PL181 (mmc for Security Digital Card) not working in Ubuntu 18.10
+  (CMD 2,3 timeout).  The SDC driver worked fine in Ubuntu 18.04 and
+  earlier versions but not in Ubuntu 18.10
+
+Status in QEMU:
+  New
+
+Bug description:
+  ARM PL181 MMC card no longer working in qemu-system-arm in Ubuntu 18.10
+  The MMC driver code worked fine in Ubuntu 15.10 to 18.04.
+  The command to run qemu-system-arm is
+
+      qemu-system-arm -M versatilepb -m 256M -sd sdimage -kernel t.bin
+  -serial mon:stdio
+
+  During SDC initialization, SDC commands 2, 3, 9, 13, 7, 16 all timeout, =
+
+  which cause subsequent read/write commands 17/24 to fail also.
+
+  Tried both ARM versatilepb and realview-pb-a8, realview-pbx-a9 boards:
+  all the same.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1809291/+subscriptions
