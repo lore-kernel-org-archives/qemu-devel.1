@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ga7BI-0005RI-Ue
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 17:52:41 -0500
+	(envelope-from <13824125580@163.com>) id 1ga8H9-0007aG-OO
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 19:02:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ga7BH-0003tp-Vc
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 17:52:40 -0500
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:39395)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1ga7BH-0003sR-Nr
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 17:52:39 -0500
-Received: by mail-lj1-x241.google.com with SMTP id t9-v6so3036513ljh.6
-	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 14:52:39 -0800 (PST)
+	(envelope-from <13824125580@163.com>) id 1ga8H6-0006Bd-HU
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 19:02:47 -0500
+Received: from m13-81.163.com ([220.181.13.81]:50698)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <13824125580@163.com>) id 1ga8H5-00069N-Ms
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 19:02:44 -0500
+Date: Fri, 21 Dec 2018 07:47:13 +0800 (CST)
+From: tugouxp  <13824125580@163.com>
+In-Reply-To: <87d0pw9y7m.fsf@linaro.org>
+References: <76d14474.f850.167cb46b4d9.Coremail.13824125580@163.com>
+	<87d0pw9y7m.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20181220201502.12285-1-richard.henderson@linaro.org>
-In-Reply-To: <20181220201502.12285-1-richard.henderson@linaro.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 20 Dec 2018 14:52:11 -0800
-Message-ID: <CAKmqyKMgkCy-1-LvE2V2TdJPofWHsH-vbEMjbjrS_eOppXQJJg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Add safe_syscall for riscv64
- host
+Message-ID: <19e6128e.27e9.167ce041690.Coremail.13824125580@163.com>
+Content-Type: text/plain; charset=GBK
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] did the qemu can emulate the whole system with the
+ processor that without support the "virtulization and kvm"?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,148 +28,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, Laurent Vivier <laurent@vivier.eu>
+To: =?GBK?Q?Alex_Benn=A8=A6e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-On Thu, Dec 20, 2018 at 12:15 PM Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-
-Alistair
-
-> ---
->
-> At some point we should make this routine be non-optional for
-> porting to a new host.
->
->
-> r~
->
-> ---
->  linux-user/host/riscv64/hostdep.h          | 23 +++++++
->  linux-user/host/riscv64/safe-syscall.inc.S | 77 ++++++++++++++++++++++
->  2 files changed, 100 insertions(+)
->  create mode 100644 linux-user/host/riscv64/safe-syscall.inc.S
->
-> diff --git a/linux-user/host/riscv64/hostdep.h b/linux-user/host/riscv64/hostdep.h
-> index 28467ba00b..865f0fb9ff 100644
-> --- a/linux-user/host/riscv64/hostdep.h
-> +++ b/linux-user/host/riscv64/hostdep.h
-> @@ -8,4 +8,27 @@
->  #ifndef RISCV64_HOSTDEP_H
->  #define RISCV64_HOSTDEP_H
->
-> +/* We have a safe-syscall.inc.S */
-> +#define HAVE_SAFE_SYSCALL
-> +
-> +#ifndef __ASSEMBLER__
-> +
-> +/* These are defined by the safe-syscall.inc.S file */
-> +extern char safe_syscall_start[];
-> +extern char safe_syscall_end[];
-> +
-> +/* Adjust the signal context to rewind out of safe-syscall if we're in it */
-> +static inline void rewind_if_in_safe_syscall(void *puc)
-> +{
-> +    ucontext_t *uc = puc;
-> +    unsigned long *pcreg = &uc->uc_mcontext.__gregs[REG_PC];
-> +
-> +    if (*pcreg > (uintptr_t)safe_syscall_start
-> +        && *pcreg < (uintptr_t)safe_syscall_end) {
-> +        *pcreg = (uintptr_t)safe_syscall_start;
-> +    }
-> +}
-> +
-> +#endif /* __ASSEMBLER__ */
-> +
->  #endif
-> diff --git a/linux-user/host/riscv64/safe-syscall.inc.S b/linux-user/host/riscv64/safe-syscall.inc.S
-> new file mode 100644
-> index 0000000000..9ca3fbfd1e
-> --- /dev/null
-> +++ b/linux-user/host/riscv64/safe-syscall.inc.S
-> @@ -0,0 +1,77 @@
-> +/*
-> + * safe-syscall.inc.S : host-specific assembly fragment
-> + * to handle signals occurring at the same time as system calls.
-> + * This is intended to be included by linux-user/safe-syscall.S
-> + *
-> + * Written by Richard Henderson <rth@twiddle.net>
-> + * Copyright (C) 2018 Linaro, Inc.
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +       .global safe_syscall_base
-> +       .global safe_syscall_start
-> +       .global safe_syscall_end
-> +       .type   safe_syscall_base, @function
-> +       .type   safe_syscall_start, @function
-> +       .type   safe_syscall_end, @function
-> +
-> +       /*
-> +        * This is the entry point for making a system call. The calling
-> +        * convention here is that of a C varargs function with the
-> +        * first argument an 'int *' to the signal_pending flag, the
-> +        * second one the system call number (as a 'long'), and all further
-> +        * arguments being syscall arguments (also 'long').
-> +        * We return a long which is the syscall's return value, which
-> +        * may be negative-errno on failure. Conversion to the
-> +        * -1-and-errno-set convention is done by the calling wrapper.
-> +        */
-> +safe_syscall_base:
-> +       .cfi_startproc
-> +       /*
-> +        * The syscall calling convention is nearly the same as C:
-> +        * we enter with a0 == *signal_pending
-> +        *               a1 == syscall number
-> +        *               a2 ... a7 == syscall arguments
-> +        *               and return the result in a0
-> +        * and the syscall instruction needs
-> +        *               a7 == syscall number
-> +        *               a0 ... a5 == syscall arguments
-> +        *               and returns the result in a0
-> +        * Shuffle everything around appropriately.
-> +        */
-> +       mv      t0, a0          /* signal_pending pointer */
-> +       mv      t1, a1          /* syscall number */
-> +       mv      a0, a2          /* syscall arguments */
-> +       mv      a1, a3
-> +       mv      a2, a4
-> +       mv      a3, a5
-> +       mv      a4, a6
-> +       mv      a5, a7
-> +       mv      a7, t1
-> +
-> +       /*
-> +        * This next sequence of code works in conjunction with the
-> +        * rewind_if_safe_syscall_function(). If a signal is taken
-> +        * and the interrupted PC is anywhere between 'safe_syscall_start'
-> +        * and 'safe_syscall_end' then we rewind it to 'safe_syscall_start'.
-> +        * The code sequence must therefore be able to cope with this, and
-> +        * the syscall instruction must be the final one in the sequence.
-> +        */
-> +safe_syscall_start:
-> +       /* If signal_pending is non-zero, don't do the call */
-> +       lw      t1, 0(t0)
-> +       bnez    t1, 0f
-> +       scall
-> +safe_syscall_end:
-> +       /* code path for having successfully executed the syscall */
-> +       ret
-> +
-> +0:
-> +       /* code path when we didn't execute the syscall */
-> +       li      a0, -TARGET_ERESTARTSYS
-> +       ret
-> +       .cfi_endproc
-> +
-> +       .size   safe_syscall_base, .-safe_syscall_base
-> --
-> 2.17.2
->
->
+SGkgYWxleDoKICAgIG5vdyBteSBob3N0IG1hY2hpbmUgZGlkIG5vdCBoYXZlIHRoZSAiL2Rldi9r
+dm0iIG5vZGVzIGFuZCBubyBjaGFuY2UgdG8gbWFrZSBpdCBleGlzdHMuIApzbyBpIHdhbnQgdG8g
+a25vdyB3aGV0aGVyIHRoZSAiL2Rldi9rdm0iIGlzICBtYW5kYXRvcnkgIGZvciBxZW11IHRvIGVt
+dWxhdGUgdGhlIHdob2xlIHN5c3RlbS4gCnNvIGkgY2FuIG1ha2UgdGhlIGVtdWxhdGlvbiB3aXRo
+b3V0IHRoZSBzdXBwb3J0IG9mIGt2bSBtZWNoYW5pc20uCgoKdGhhbmtzIGZvciB5b3VyIHN1cHBv
+cnQuIQoKCgoKCgoKCgpBdCAyMDE4LTEyLTIwIDIwOjMxOjA5LCAiQWxleCBCZW5uqKZlIiA8YWxl
+eC5iZW5uZWVAbGluYXJvLm9yZz4gd3JvdGU6Cj4KPnR1Z291eHAgPDEzODI0MTI1NTgwQDE2My5j
+b20+IHdyaXRlczoKPgo+PiBoaSBmb2xrczoKPj4gICAgICBkaWQgdGhlIHFlbXUgY2FuIGVtdWxh
+dGUgdGhlIHdob2xlIHN5c3RlbShzdWNoIGFzIHVidW50dSkgd2l0aAo+PiAgICAgIHRoZSBwcm9j
+ZXNzb3IgdGhhdCB3aXRob3V0IHN1cHBvcnQgdGhlICJ2aXJ0dWxpemF0aW9uIGFuZCBrdm0iPwo+
+Cj5JIGRvbid0IHF1aXRlIGZvbGxvdyB5b3VyIHF1ZXN0aW9uLiBIb3dldmVyIGlmIHlvdSBhcmUg
+YXNraW5nIGFib3V0IHRoZQo+Y3Jvc3MtYXJjaGl0ZWN0dXJlIGVtdWxhdGlvbiAodXN1YWxseSBj
+YWxsZWQgVENHKSB0aGUgZmVhdHVyZXMgb2YgdGhlCj5wcm9jZXNzb3IgZGVwZW5kIG9uIGhvdyBj
+b21wbGV0ZSB0aGUgZnJvbnQtZW5kIGlzLgo+Cj5TbyB5b3UgY2FuIGZvciBleGFtcGxlIGJvb3Qg
+YW4gYWFyY2g2NCBzeXN0ZW0gdW5kZXIgZW11bGF0aW9uIHRoYXQgY2FuCj5pdHNlbGYgcnVuIEtW
+TSBndWVzdHMgKGJlY2F1c2Ugd2UgaW1wbGVtZW50IEVMMC8xLzIvMykuIEhvd2V2ZXIgeW91Cj50
+aGUgc3lzdGVtIGNhbid0IGN1cnJlbnRseSB1c2UgVkhFIGV4dGVuc2lvbnMgYmVjYXVzZSB0aGUg
+c3VwcG9ydCBmb3IKPnRoYXQgaGFzIHlldCB0byBiZSBhZGRlZC4KPgo+V2hhdCBpcyB5b3VyIHVz
+ZS1jYXNlPwo+Cj4tLQo+QWxleCBCZW5uqKZlCg==
