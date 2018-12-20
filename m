@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gZuhv-00020a-BI
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 04:33:31 -0500
+	(envelope-from <remy.noel@blade-group.com>) id 1gZujy-0003Kf-Fc
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 04:35:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gZuhu-0005Dp-JR
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 04:33:31 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 20 Dec 2018 09:33:04 +0000
-Message-ID: <001b68c9-bfdc-e709-27cc-f3d11a069820@virtuozzo.com>
-References: <20181219015230.18652-1-jsnow@redhat.com>
-	<20181219015230.18652-4-jsnow@redhat.com>
-	<0de4bd2b-c78f-f293-4d43-20c8bcd168c6@virtuozzo.com>
-	<71a31ed2-b371-3b8f-d527-bf37b09e5443@virtuozzo.com>
-	<b3e9768f-cb40-5112-9174-1f352b2d97ed@redhat.com>
-	<aae520a3-2728-1269-8e87-99b2f4ef151c@redhat.com>
-In-Reply-To: <aae520a3-2728-1269-8e87-99b2f4ef151c@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F88B45DD575547419EB638D1FF3E7117@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <remy.noel@blade-group.com>) id 1gZujv-0007qc-9I
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 04:35:38 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45150)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <remy.noel@blade-group.com>)
+	id 1gZuju-0007pp-Ri
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 04:35:35 -0500
+Received: by mail-wr1-x444.google.com with SMTP id t6so957642wrr.12
+	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 01:35:34 -0800 (PST)
+References: <20181217164847.24411-1-remy.noel@blade-group.com>
+	<eca584ae-042b-39f7-ca23-c23573676675@redhat.com>
+	<5e90fbad-578a-5f0a-7c6d-e06dae7ba8a3@blade-group.com>
+	<a8813976-fe90-a77a-d75b-0201300ae6ab@redhat.com>
+From: Remy NOEL <remy.noel@blade-group.com>
+Message-ID: <00c49d20-8c19-e543-2630-a215da8b01fb@blade-group.com>
+Date: Thu, 20 Dec 2018 10:35:53 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 3/5] iotests: change qmp_log filters to
- expect QMP objects only
+In-Reply-To: <a8813976-fe90-a77a-d75b-0201300ae6ab@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US-large
+Subject: Re: [Qemu-devel] [QEMU-devel][PATCH v3] aio-posix: Fix concurrent
+ aio_poll/set_fd_handler.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +34,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Weil <sw@weilnetz.de>, "open list:Block I/O path" <qemu-block@nongnu.org>
 
-MTkuMTIuMjAxOCAyMjo1MiwgSm9obiBTbm93IHdyb3RlOg0KPiANCj4gDQo+IE9uIDEyLzE5LzE4
-IDI6MDEgUE0sIEVyaWMgQmxha2Ugd3JvdGU6DQo+PiBPbiAxMi8xOS8xOCA1OjI3IEFNLCBWbGFk
-aW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4NCj4+PiBCdXQgc3RpbGwgbm90IHN1
-cmUgdGhhdCBpdCB3b3J0aCBpdC4gSXNuJ3QgaXQgYmV0dGVyIHRvIGp1c3QgcmVtb3ZlDQo+Pj4g
-ZmllbGRzIGZyb20gZGljdCwNCj4+PiB3aGljaCBhcmUgdW5wcmVkaWN0YWJsZSwgaW5zdGVhZCBv
-ZiBzdWJzdGl0dXRpbmcgdGhlbS4uDQo+Pg0KPj4gRm9yIGdldHRpbmcgdGhlIHRlc3QgdG8gcGFz
-cyB3aGVuIHdlIGhhdmUgYSBrZXk6dW5wcmVkaWN0YWJsZSB2YWx1ZSBpbg0KPj4gdGhlIGRpY3Qs
-IHlvdSBhcmUgcmlnaHQgdGhhdCBib3RoIGNoYW5naW5nIGl0IHRvIGtleTpTVUJTVCBvciByZW1v
-dmluZw0KPj4ga2V5IHdvcmsgYXQgcHJvZHVjaW5nIHJlcHJvZHVjaWJsZSBvdXRwdXQuIEJ1dCB3
-aGVuIGl0IGNvbWVzIHRvDQo+PiBkZWJ1Z2dpbmcgdGVzdCBmYWlsdXJlLCBoYXZpbmcga2V5OlNV
-QlNUIGluIHRoZSBsb2dzIGdpdmVzIHlvdSBhIGhpbnQgYXQNCj4+IHdoYXQgZWxzZSB0byBsb29r
-IGF0LCB3aGVyZWFzIG9taXR0aW5nIGtleSBhbHRvZ2V0aGVyIG1heSBtYWtlIHRoZQ0KPj4gcmVh
-c29uIGZvciB0aGUgZmFpbHVyZSBjb21wbGV0ZWx5IGRpc2FwcGVhciBmcm9tIHRoZSBsb2dzLg0K
-Pj4NCj4+IFRodXMsIEkgd291bGQgYXJndWUgdGhhdCBldmVuIHRob3VnaCBpdCBpcyBtb3JlIGNv
-bXBsZXggdG8gd3JpdGUgYQ0KPj4gZmlsdGVyIHRoYXQgY2FuIHJlY3Vyc2l2ZWx5IHN1YnN0aXR1
-dGUsIHRoZSByZXN1bHRpbmcgb3V0cHV0IGlzIGVhc2llcg0KPj4gdG8gZGVidWcgaWYgYSB0ZXN0
-IHN0YXJ0cyBmYWlsaW5nIC0gYW5kIHRoYXQgaWYgdGhlIHdvcmsgaW4gZG9pbmcgdGhlDQo+PiBt
-b3JlIGNvbXBsZXggZmlsdGVyaW5nIGhhcyBhbHJlYWR5IGJlZW4gc3VibWl0dGVkIGFuZCBpcyBu
-b3QgdG9vIG11Y2ggb2YNCj4+IGEgYnVyZGVuIHRvIG1haW50YWluLCB0aGVuIHdlIG1pZ2h0IGFz
-IHdlbGwgdXNlIGl0IHJhdGhlciB0aGFuIGdvaW5nDQo+PiB3aXRoIHRoZSBzaW1wbGVyIGNhc2Ug
-b2YganVzdCBlbGlkaW5nIHRoZSBwcm9ibGVtYXRpYyBrZXlzIG9yIHVzaW5nIGp1c3QNCj4+IHRl
-eHR1YWwgZmlsdGVyaW5nLg0KPj4NCj4+IEhvd2V2ZXIsIEknbSBub3QgaW4gYSBnb29kIHBvc2l0
-aW9uIHRvIGFyZ3VlIHdoZXRoZXIgdGhlcmUgaXMgYQ0KPj4gcmVhc29uYWJsZSBtYWludGVuYW5j
-ZSBidXJkZW4gd2l0aCB0aGUgcGF0Y2hlcyBpbiB0aGlzIHNlcmllcywgdnMuIHdoYXQNCj4+IGl0
-IHdvdWxkIHRha2UgdG8gcmV3cml0ZSAyMDYgdG8gZG8ganVzdCB0ZXh0dWFsIGZpbHRlcmluZyBp
-bnN0ZWFkIG9mIFFNUA0KPj4gZGljdCBzdWJzdGl0dXRpb24gZmlsdGVyaW5nLg0KPj4NCj4gDQo+
-IE15IHJlYXNvbmluZyBpcyB0aGlzOg0KPiANCj4gKDEpIEl0IHdvdWxkIGJlIGdvb2QgaWYgUU1Q
-IGZpbHRlcnMgYmVoYXZlZCBzaW1pbGFybHkgdG8gdGhlaXIgcGxhaW50ZXh0DQo+IGNvbXBhbmlv
-bnMsIGFzIHRoaXMgaXMgdGhlIGxlYXN0IHN1cnByaXNpbmcgYmVoYXZpb3IsIGFuZA0KPiANCj4g
-KDIpIEl0IHdvdWxkIGJlIGJlc3QgdG8gbG9nIHRoZSBrZXlzIHByb3ZpZGVkIGluIHJlc3BvbnNl
-cyBpbiBjYXNlIHdlDQo+IHdpc2ggdG8gdGVzdCBmb3IgdGhlaXIgcHJlc2VuY2UgKGFuZCB0aGF0
-IHRoZWlyIHZhbHVlcyBtYXRjaCBzb21ldGhpbmcNCj4gd2Ugd2VyZSBhYmxlIHRvIHByZWRpY3Qg
-dmlhIGEgcGF0dGVybiksIGFuZA0KPiANCj4gKDMpIE5vdCBhcmJpdHJhcmlseSBjaGFuZ2luZyB0
-aGUgbmF0dXJlIG9mIHRoZSByZXNwb25zZSBpbnZpc2libHkgaW4gYQ0KPiB3YXkgdGhhdCBvYnNj
-dXJlcyBpdCBmcm9tIGxvZyBmaWxlcyB0byBhaWQgZGVidWdnaW5nLCBsaWtlIHlvdSBzYXkuDQoN
-ClllcywgYXQgbGVhc3QgKDItMykgbWFrZXMgc2Vuc2UgZm9yIG1lLg0KDQo+IA0KPiANCj4gDQo+
-IEkgb2ZmZXIgc29tZSBpZGVhcyBmb3IgaG93IHRvIGFkZCB0ZXh0IGZpbHRlcmluZyBmb3IgUU1Q
-IG9iamVjdHMgaW4NCj4gaW90ZXN0cyBpbiBzb21lIG9mIG15IHJlcGxpZXMsIGJ1dCBpdCdzIG5v
-dCBnb2luZyB0byBoYXBwZW4gaW4gMjAxOCwNCj4gSU1PLiBJIHdhbnQgcHJldHR5LXByaW50aW5n
-IG9mIFFNUCBjb21tYW5kcyBtb3JlIHRoYW4gSSB3YW50IHRleHQNCj4gZmlsdGVyaW5nIG9mIHNl
-cmlhbGl6ZWQgUU1QIG9iamVjdHMuDQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGlt
-aXINCg==
+On 12/19/18 8:32 PM, Paolo Bonzini wrote:
+
+> You found another bug then. :)
+K. Will fix.
