@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZyyR-0002O0-Mq
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:06:52 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gZz5j-0004R3-8k
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:14:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gZyyO-0001K0-J7
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:06:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51118)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gZyyO-0001JC-Aj
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:06:48 -0500
-Date: Thu, 20 Dec 2018 09:06:41 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181220090435-mutt-send-email-mst@kernel.org>
-References: <cover.1545120100.git.yi.z.zhang@linux.intel.com>
-	<5eb87eb9a389242772375dd52bd97c17564a0829.1545120100.git.yi.z.zhang@linux.intel.com>
-	<20181218085249-mutt-send-email-mst@kernel.org>
-	<20181219091017.GA35378@tiger-server>
-	<20181219105555-mutt-send-email-mst@kernel.org>
-	<20181220030312.GA70591@tiger-server>
-	<20181219223700-mutt-send-email-mst@kernel.org>
-	<20181220053739.GB70591@tiger-server>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gZz5g-0006ko-3i
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 09:14:23 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 20 Dec 2018 14:13:54 +0000
+Message-ID: <c722731a-fad4-c5c8-a588-19dd2dde1e89@virtuozzo.com>
+References: <20181215135324.152629-1-eblake@redhat.com>
+	<20181215135324.152629-13-eblake@redhat.com>
+	<20181215151929.GY27120@redhat.com>
+	<39d9eca0-239c-d145-9bb5-fda68ac40bdc@redhat.com>
+In-Reply-To: <39d9eca0-239c-d145-9bb5-fda68ac40bdc@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A03EE0409CF21847B53432EC487E5BE4@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181220053739.GB70591@tiger-server>
-Subject: Re: [Qemu-devel] [PATCH V7 6/6] hostmem-file: add 'sync' option
+Subject: Re: [Qemu-devel] [PATCH v2 12/22] nbd/client: Improve error
+ handling in nbd_negotiate_simple_meta_context()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,63 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, imammedo@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com, crosthwaite.peter@gmail.com, richard.henderson@linaro.org, xiaoguangrong.eric@gmail.com
+To: Eric Blake <eblake@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "nsoffer@redhat.com" <nsoffer@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-On Thu, Dec 20, 2018 at 01:37:40PM +0800, Yi Zhang wrote:
-> On 2018-12-19 at 22:42:07 -0500, Michael S. Tsirkin wrote:
-> > On Thu, Dec 20, 2018 at 11:03:12AM +0800, Yi Zhang wrote:
-> > > On 2018-12-19 at 10:59:10 -0500, Michael S. Tsirkin wrote:
-> > > > On Wed, Dec 19, 2018 at 05:10:18PM +0800, Yi Zhang wrote:
-> > > > > > > +
-> > > > > > > + - 'sync' option of memory-backend-file is not 'off', and
-> > > > > > > +
-> > > > > > > + - 'share' option of memory-backend-file is 'on'.
-> > > > > > > +
-> > > > > > > + - 'pmem' option of memory-backend-file is 'on'
-> > > > > > > +
-> > > > > > 
-> > > > > > Wait isn't this what pmem was supposed to do?
-> > > > > > Doesn't it mean "persistent memory"?
-> > > > > pmem is a option for memory-backend-file, user should know the backend
-> > > > > is in host persistent memory, with this flags on, while there is a host crash
-> > > > > or a power failures.
-> > > > > 
-> > > > > [1] Qemu will take necessary operations to guarantee the persistence.
-> > > > > https://patchwork.ozlabs.org/cover/944749/ 
-> > > > > 
-> > > > > [2] Host kernel also take opretions to consistent filesystem metadata.
-> > > > > Add MAP_SYNC flags.
-> > > > 
-> > > > OK so I'm a user. Can you educate me please?  
-> > > We suppose an administrator should know it, what is the back-end region coming from,
-> > > is it persistent? what is the font-end device is? a volatile dimm or an
-> > > nonvolatile dimm? then they can choice put the pmem=on[off] and sync=on[off].
-> > > If he didn't, we encourage that don't set these 2 flags.
-> > > 
-> > > > When should MAP_SYNC not
-> > > > be set? Are there any disadvantages (e.g.  performance?)?
-> > > Not only the performance, sometimes like the front-end device is an
-> > > volatile ram, we don't wanna set such option although the backend is a
-> > > novolatile memory, if power lose, all of thing should lose in this ram.
-> > 
-> > 
-> > 
-> > I am not sure how does above answer the questions. If I don't know,
-> > neither will the hypothetical administrator. Looks like a better
-> > interface is needed to make the choice on behalf of the user.
-> > 
-> By default, we have already ignore the 2 flags, unless the administrator
-> know how to make that use. By-now, seems we don't have a better way to detect what
-> memory-backend-file is, a persistent memory or not.
-
-In that case how about an interface where user tells QEMU "this backend
-is in persistent memory"?
-
-
-
-> > 
-> > > > 
-> > > > -- 
-> > > > MST
-> > > > 
-> > 
+MTcuMTIuMjAxOCAxODozMCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMTIvMTUvMTggOToxOSBB
+TSwgUmljaGFyZCBXLk0uIEpvbmVzIHdyb3RlOg0KPj4gT24gU2F0LCBEZWMgMTUsIDIwMTggYXQg
+MDc6NTM6MTRBTSAtMDYwMCwgRXJpYyBCbGFrZSB3cm90ZToNCj4+PiBBbHdheXMgYWxsb2NhdGUg
+c3BhY2UgZm9yIHRoZSByZXBseSByZXR1cm5lZCBieSB0aGUgc2VydmVyIGFuZA0KPj4+IGhvaXN0
+IHRoZSB0cmFjZSBlYXJsaWVyLCBhcyBpdCBpcyBtb3JlIGludGVyZXN0aW5nIHRvIHRyYWNlIHRo
+ZQ0KPj4+IHNlcnZlcidzIHJlcGx5IChldmVuIGlmIGl0IGlzIHVuZXhwZWN0ZWQpIHRoYW4gcGFy
+cm90aW5nIG91cg0KPj4+IHJlcXVlc3Qgb25seSBvbiBzdWNjZXNzLsKgIEFmdGVyIGFsbCwgc2tp
+cHBpbmcgdGhlIGFsbG9jYXRpb24NCj4+PiBmb3IgYSB3cm9uZyBzaXplIHdhcyBtZXJlbHkgYSBt
+aWNyby1vcHRpbWl6YXRpb24gdGhhdCBvbmx5DQo+Pj4gYmVuZWZpdHRlZCBhIGJyb2tlbiBzZXJ2
+ZXIsIHJhdGhlciB0aGFuIHRoZSBjb21tb24gY2FzZSBvZiBhDQo+Pj4gY29tcGxpYW50IHNlcnZl
+ciB0aGF0IG1lZXRzIG91ciBleHBlY3RhdGlvbnMuDQo+Pj4NCj4+PiBUaGVuIHR1cm4gdGhlIHJl
+cGx5IGhhbmRsaW5nIGludG8gYSBsb29wIChldmVuIHRob3VnaCB3ZSBzdGlsbA0KPj4+IG5ldmVy
+IGl0ZXJhdGUgbW9yZSB0aGFuIG9uY2UpLCB0byBtYWtlIHRoaXMgY29kZSBlYXNpZXIgdG8gdXNl
+DQo+Pj4gd2hlbiBsYXRlciBwYXRjaGVzIGRvIHN1cHBvcnQgbXVsdGlwbGUgc2VydmVyIHJlcGxp
+ZXMuwqAgVGhpcw0KPj4+IGNoYW5nZXMgdGhlIGVycm9yIG1lc3NhZ2UgZm9yIGEgc2VydmVyIHdp
+dGggdHdvIHJlcGxpZXMgKGENCj4+PiBjb3JuZXIgY2FzZSB3ZSBhcmUgdW5saWtlbHkgdG8gaGl0
+IGluIHByYWN0aWNlKSBmcm9tOg0KPj4+DQo+Pj4gVW5leHBlY3RlZCByZXBseSB0eXBlIDQgKG1l
+dGEgY29udGV4dCksIGV4cGVjdGVkIDAgKGFjaykNCj4+Pg0KPj4+IHRvOg0KPj4+DQo+Pj4gU2Vy
+dmVyIHJlcGxpZWQgd2l0aCBtb3JlIHRoYW4gb25lIGNvbnRleHQNCj4+Pg0KPj4+IFNpZ25lZC1v
+ZmYtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPg0KPj4+DQo+Pj4gLS0tDQo+Pj4g
+djI6IHNwbGl0IHBhdGNoIGludG8gZWFzaWVyLXRvLXJldmlldyBwaWVjZXMgW1JpY2gsIFZsYWRp
+bWlyXQ0KPj4+IC0tLQ0KPj4+IMKgIG5iZC9jbGllbnQuYyB8IDE2ICsrKysrKysrKysrKy0tLS0N
+Cj4+PiDCoCAxIGZpbGUgY2hhbmdlZCwgMTIgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkN
+Cj4+Pg0KPj4+IGRpZmYgLS1naXQgYS9uYmQvY2xpZW50LmMgYi9uYmQvY2xpZW50LmMNCj4+PiBp
+bmRleCBiY2NjZDVmNTU1ZS4uYjZhODVmYzNlZjggMTAwNjQ0DQo+Pj4gLS0tIGEvbmJkL2NsaWVu
+dC5jDQo+Pj4gKysrIGIvbmJkL2NsaWVudC5jDQo+Pj4gQEAgLTY4NCwxMCArNjg0LDExIEBAIHN0
+YXRpYyBpbnQgbmJkX25lZ290aWF0ZV9zaW1wbGVfbWV0YV9jb250ZXh0KFFJT0NoYW5uZWwgKmlv
+YywNCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuIHJldDsNCj4+PiDCoMKgwqDCoMKgIH0N
+Cj4+Pg0KPj4+IC3CoMKgwqAgaWYgKHJlcGx5LnR5cGUgPT0gTkJEX1JFUF9NRVRBX0NPTlRFWFQp
+IHsNCj4+PiArwqDCoMKgIHdoaWxlIChyZXBseS50eXBlID09IE5CRF9SRVBfTUVUQV9DT05URVhU
+KSB7DQo+Pg0KPj4gSSdtIG5vdCBzdXJlIEkgdW5kZXJzdGFuZCB3aHkgdGhpcyBjaGFuZ2UgaXMg
+c2FmZS4NCj4+DQo+PiBBcyBmYXIgYXMgSSBjYW4gc2VlIHJlcGx5LnR5cGUgaXMgb25seSB1cGRh
+dGVkIGluIHRoZSBsb29wIGJ5DQo+PiBuYmRfcmVjZWl2ZV9vcHRpb25fcmVwbHksIGFuZCB0aGF0
+IHJlYWRzIGZyb20gdGhlIHNlcnZlciwgYW5kIHNvIHRoZQ0KPj4gc2VydmVyIG1pZ2h0IGtlZXAg
+c2VuZGluZyBOQkRfUkVQX01FVEFfQ09OVEVYVCBwYWNrZXRzIChpbnN0ZWFkIG9mIHRoZQ0KPj4g
+ZXhwZWN0ZWQgTkJEX1JFUF9BQ0spLCBzbyBpdCBjb3VsZCBub3cgbG9vcCBmb3JldmVyIGFnYWlu
+c3QgYQ0KPj4gbWFsaWNpb3VzIHNlcnZlcj/CoCAoVGhpcyBpcyBub3QgdGFraW5nIGludG8gYWNj
+b3VudCBhbnkgbGF0ZXIgcGF0Y2hlcykNCj4gDQo+IEhtbSAtIG5vdyB0aGF0IEkndmUgYWxyZWFk
+eSByZXNwb25kZWQgdG8gd2h5IHRoZSBjb252ZXJzaW9uIHRvIGEgbG9vcCBkb2VzIG5vdCBjaGFu
+Z2UgdGhpcyBjb2RlLCBJJ20gbm93IHdvbmRlcmluZyBpZiBJIGV2ZW4gbmVlZCB0aGlzIHBhdGNo
+LiBJbiB2MSBvZiB0aGUgc2VyaWVzLCBib3RoIFNFVCBhbmQgTElTVCBzaGFyZWQgYSBjb21tb24g
+ZnVuY3Rpb24sIGFuZCBzaW5jZSBMSVNUIG5lZWRzIHRoZSBsb29wLCBjb252ZXJ0aW5nIFNFVCB0
+byB1c2UgYSBsb29wIHRoYXQgZXhpdHMgZWFybHkgaWYgaXQgZXhlY3V0ZXMgbW9yZSB0aGFuIG9u
+Y2Ugd2FzIG5lZWRlZCB0byBtYWtlIHRoZSB0d28gYWN0aW9ucyBzaGFyZSBhIGNvbW1vbiBlbnRy
+eSBwb2ludC7CoCBCdXQgc2luY2UgdjIgdXNlcyBkaWZmZXJlbnQgZW50cnkgcG9pbnRzIChiZWNh
+dXNlIGl0IHNlcGFyYXRlZCB0aGUgY29tbW9uIGNvZGUgaW50byBzZXBhcmF0ZSBoZWxwZXIgZnVu
+Y3Rpb25zLCBsZWF2aW5nIHRoZSBTRVQgZW50cnkgcG9pbnQgdW5jaGFuZ2VkIGFuZCBhZGRpbmcg
+YSBuZXcgTElTVCBlbnRyeSBwb2ludCksIHdoZXJlIG9ubHkgdGhlIExJU1QgZW50cnkgcG9pbnQg
+YWN0dWFsbHkgaGFzIHRvIGxvb3AsIEkgbWlnaHQgYmUgYWJsZSB0byBqdXN0IGRyb3AgdGhpcyBw
+YXRjaCBlbnRpcmVseSBhbmQgc3RpbGwgYWNoaWV2ZSB0aGUgc2FtZSBlZmZlY3QuDQo+IA0KDQpB
+cmUgeW91IGdvaW5nIHRvIHJlc2VuZCBzZXJpZXMgd2l0aG91dCB0aGlzIHBhdGNoPyBJbiB0aGlz
+IGNhc2UgSSdkIHByZWZlciB0byBjb250aW51ZSByZXZpZXcgb24gYWxyZWFkeSByZWJhc2VkIHBh
+dGNoZXMuIE9yIGl0IGRvZXNuJ3QgbWFrZSBtdWNoIGRpZmZlcmVuY2U/DQoNCi0tIA0KQmVzdCBy
+ZWdhcmRzLA0KVmxhZGltaXINCg==
