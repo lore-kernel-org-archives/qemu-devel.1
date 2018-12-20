@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gZlB0-0002VT-96
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 18:22:54 -0500
+	(envelope-from <robert.hu@linux.intel.com>) id 1gZm2o-0001wa-Vk
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 19:18:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gZlAz-0006Pp-Bc
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 18:22:54 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:36331)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gZlAw-0006NN-CN
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 18:22:50 -0500
-Received: by mail-oi1-x241.google.com with SMTP id x23so3084256oix.3
-	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 15:22:49 -0800 (PST)
-MIME-Version: 1.0
-References: <20170809202712.6951-1-f4bug@amsat.org>
-	<20170809202712.6951-13-f4bug@amsat.org>
-	<CAAdtpL7UE2dGie9zYOx3=L98vFr16dyrk2cdLZi1Nu58i+9DOQ@mail.gmail.com>
-	<CAFEAcA98P9ZagjLTMvAMDdKiktUp3hQPjO0rq9qBXBc7SHO3jg@mail.gmail.com>
-	<CAAdtpL5FtLunqQcru3+ZBL1HGL=8ZYtjZs0MPkAikqB_tBGu1A@mail.gmail.com>
-In-Reply-To: <CAAdtpL5FtLunqQcru3+ZBL1HGL=8ZYtjZs0MPkAikqB_tBGu1A@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 19 Dec 2018 23:22:36 +0000
-Message-ID: <CAFEAcA8c564V_Ogq67v7gUjHQ5ykASiPy3z+oiq8+ypyHYM7zg@mail.gmail.com>
+	(envelope-from <robert.hu@linux.intel.com>) id 1gZm2i-0001Xi-Ib
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 19:18:27 -0500
+Received: from mga11.intel.com ([192.55.52.93]:28348)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
+	id 1gZm2h-00016Z-HP
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 19:18:24 -0500
+Message-ID: <1545265096.44118.3.camel@linux.intel.com>
+From: Robert Hoo <robert.hu@linux.intel.com>
+Date: Thu, 20 Dec 2018 08:18:16 +0800
+In-Reply-To: <20181219140136.GJ20465@redhat.com>
+References: <1545227081-213696-1-git-send-email-robert.hu@linux.intel.com>
+	<1545227081-213696-2-git-send-email-robert.hu@linux.intel.com>
+	<20181219140136.GJ20465@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.11 v3 12/16] travis/osx: silent
- texinfo warnings
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] i386: remove the new CPUID 'PCONFIG'
+ from Icelake-Server CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,23 +30,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Daniel P. =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>
+Cc: robert.hu@intel.com, robert.hu@linux.intel.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, thomas.lendacky@amd.com, qemu-devel@nongnu.org
 
-On Wed, 19 Dec 2018 at 23:13, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
- wrote:
-> I'm trying to reduce OSX warnings, as of current QEMU master I count
-> 80 warnings using Xcode 10, which result in me not looking at them (or
-> worst, at new ones...).
-
-A lot of them are the address-of-packed-member warnings, which
-I've been gradually looking at -- I think we're now down to
-just the slirp ones, which I've been leaving until the big
-refactor that's pending has landed.
-Other than that there are a bunch of deprecated-declaration
-warnings about SASL, which I never figured out an approach
-for and so just suppress in my "grep logs for warnings"
-script. I don't think there's too many other than that?
-
-thanks
--- PMM
+On Wed, 2018-12-19 at 14:01 +0000, Daniel P. Berrangé wrote:
+> On Wed, Dec 19, 2018 at 09:44:40PM +0800, Robert Hoo wrote:
+> > Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+> > ---
+> >  target/i386/cpu.c | 3 +--
+> >  1 file changed, 1 insertion(+), 2 deletions(-)
+> > 
+> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > index 677a3bd..b6113d0 100644
+> > --- a/target/i386/cpu.c
+> > +++ b/target/i386/cpu.c
+> > @@ -2613,8 +2613,7 @@ static X86CPUDefinition builtin_x86_defs[] =
+> > {
+> >              CPUID_7_0_ECX_AVX512VNNI | CPUID_7_0_ECX_AVX512BITALG
+> > |
+> >              CPUID_7_0_ECX_AVX512_VPOPCNTDQ | CPUID_7_0_ECX_LA57,
+> >          .features[FEAT_7_0_EDX] =
+> > -            CPUID_7_0_EDX_PCONFIG | CPUID_7_0_EDX_SPEC_CTRL |
+> > -            CPUID_7_0_EDX_SPEC_CTRL_SSBD,
+> > +            CPUID_7_0_EDX_SPEC_CTRL |
+> > CPUID_7_0_EDX_SPEC_CTRL_SSBD,
+> >          /* Missing: XSAVES (not supported by some Linux versions,
+> >                  * including v4.1 to v4.12).
+> >                  * KVM doesn't yet expose any XSAVES state save
+> > component,
+> 
+> This was shipped in QEMU 3.1.0, so I don't think we can
+> unconditionally
+> remove it like this without breaking CPU model migration compat. 
+> 
+I think the sooner, the better. Take the time window that Icelake CPU
+model has just shipped with QEMU 3.1.0 and is not publicly/widely used
+yet.
+> 
+> Regards,
+> Daniel
