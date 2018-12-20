@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46414)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gZn4x-0005Pe-GR
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 20:24:48 -0500
+	(envelope-from <viktor.prutyanov@phystech.edu>) id 1gZn5S-0005le-1G
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 20:25:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gZn4w-0002RT-Mi
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 20:24:47 -0500
-From: John Snow <jsnow@redhat.com>
-References: <20181214231512.5295-1-jsnow@redhat.com>
-	<45156be0-6524-2fb0-105d-a47d27703c35@redhat.com>
-Message-ID: <6eea9e43-710d-8328-fd5b-a71699077290@redhat.com>
-Date: Wed, 19 Dec 2018 20:24:38 -0500
-MIME-Version: 1.0
-In-Reply-To: <45156be0-6524-2fb0-105d-a47d27703c35@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/7] bitmaps: remove x- prefix from QMP
- api
+	(envelope-from <viktor.prutyanov@phystech.edu>) id 1gZn5O-0002rU-IL
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 20:25:16 -0500
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:36928)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <viktor.prutyanov@phystech.edu>)
+	id 1gZn5M-0002nK-JV
+	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 20:25:14 -0500
+Received: by mail-lf1-x141.google.com with SMTP id y11so65832lfj.4
+	for <qemu-devel@nongnu.org>; Wed, 19 Dec 2018 17:25:12 -0800 (PST)
+From: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
+Date: Thu, 20 Dec 2018 04:24:41 +0300
+Message-Id: <20181220012441.13694-7-viktor.prutyanov@phystech.edu>
+In-Reply-To: <20181220012441.13694-1-viktor.prutyanov@phystech.edu>
+References: <20181220012441.13694-1-viktor.prutyanov@phystech.edu>
+Subject: [Qemu-devel] [PATCH v2 6/6] configure: enable elf2dmp build for
+ Windows hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +27,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: pbonzini@redhat.com, rkagan@virtuozzo.com
+Cc: eblake@redhat.com, qemu-devel@nongnu.org, Viktor Prutyanov <viktor.prutyanov@phystech.edu>
 
+After this patch contrib/elf2dmp can be built for Windows x86 and x86_64
+hosts by mingw.
 
+Signed-off-by: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
+---
+ Makefile  | 4 ++--
+ configure | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-On 12/17/18 4:14 PM, John Snow wrote:
-> 
-> 
-> On 12/14/18 6:15 PM, John Snow wrote:
->> Touch up a few last things and remove the x- prefix.
->>
->> V3:
->>  - Reworked qmp_log to pretty-print the outgoing command, too [Vladimir]
->>  - Modified test to log only bitmap information [Vladimir]
->>  - Test disable/enable transaction toggle [Eric]
->>
->> Note that the filter I added is now unused, but I think we will want it
->> and it's small enough, so I'm going to check it in anyway. If you disagree,
->> I'll just drop the patch instead.
->>
->> --js
->>
->> John Snow (7):
->>   blockdev: abort transactions in reverse order
->>   blockdev: n-ary bitmap merge
->>   block: remove 'x' prefix from experimental bitmap APIs
->>   iotests.py: don't abort if IMGKEYSECRET is undefined
->>   iotests: add filter_generated_node_ids
->>   iotests: allow pretty-print for qmp_log
->>   iotests: add iotest 236 for testing bitmap merge
->>
->>  blockdev.c                    |  96 +++++++++-------
->>  qapi/block-core.json          |  56 +++++-----
->>  qapi/transaction.json         |  12 +-
->>  tests/qemu-iotests/223        |   4 +-
->>  tests/qemu-iotests/236        | 124 +++++++++++++++++++++
->>  tests/qemu-iotests/236.out    | 200 ++++++++++++++++++++++++++++++++++
->>  tests/qemu-iotests/group      |   1 +
->>  tests/qemu-iotests/iotests.py |  22 +++-
->>  8 files changed, 436 insertions(+), 79 deletions(-)
->>  create mode 100755 tests/qemu-iotests/236
->>  create mode 100644 tests/qemu-iotests/236.out
->>
-> 
-> Thanks, I'm staging patches 1-5 and I'll send the PR once we get to the
-> bottom of patches 6 and 7, just to keep volume on the list down.
-> 
-
-NACK.
-
-Patch 2 is incomplete an additional bugfix is needed.
-
---js
+diff --git a/Makefile b/Makefile
+index c8b9efdad4..25acb94aa6 100644
+--- a/Makefile
++++ b/Makefile
+@@ -565,8 +565,8 @@ ifneq ($(EXESUF),)
+ qemu-ga: qemu-ga$(EXESUF) $(QGA_VSS_PROVIDER) $(QEMU_GA_MSI)
+ endif
+ 
+-elf2dmp: LIBS = $(CURL_LIBS)
+-elf2dmp: $(elf2dmp-obj-y)
++elf2dmp$(EXESUF): LIBS += $(CURL_LIBS)
++elf2dmp$(EXESUF): $(elf2dmp-obj-y)
+ 	$(call LINK, $^)
+ 
+ ifdef CONFIG_IVSHMEM
+diff --git a/configure b/configure
+index 224d3071ac..686ae2e093 100755
+--- a/configure
++++ b/configure
+@@ -5753,8 +5753,8 @@ if test "$want_tools" = "yes" ; then
+   if [ "$ivshmem" = "yes" ]; then
+     tools="ivshmem-client\$(EXESUF) ivshmem-server\$(EXESUF) $tools"
+   fi
+-  if [ "$posix" = "yes" ] && [ "$curl" = "yes" ]; then
+-    tools="elf2dmp $tools"
++  if [ "$curl" = "yes" ]; then
++      tools="elf2dmp\$(EXESUF) $tools"
+   fi
+ fi
+ if test "$softmmu" = yes ; then
+-- 
+2.17.2
