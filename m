@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gZxHO-0004Fx-Fy
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:18:19 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gZxJv-0005oQ-1J
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:20:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gZxHL-0006hk-Ce
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:18:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34264)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gZxHL-0006hI-3d
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:18:15 -0500
-References: <20181219151917.3874-1-pbonzini@redhat.com>
-	<CAFEAcA_0jPh6TVOqzfp_O5eFitNocabR1GdLkwwZcv6QcW=iUQ@mail.gmail.com>
-	<d5bc276c-b149-acc6-03b8-6f5c5a309e4a@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d96927aa-282e-f24a-324f-b674afc81aa6@redhat.com>
-Date: Thu, 20 Dec 2018 13:18:04 +0100
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gZxJs-0000Fr-E9
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:20:54 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53670)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gZxJs-0000F7-7E
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 07:20:52 -0500
+Received: by mail-wm1-x341.google.com with SMTP id d15so1794202wmb.3
+	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 04:20:52 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <d5bc276c-b149-acc6-03b8-6f5c5a309e4a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+References: <20181218230442.27887-1-samuel.thibault@ens-lyon.org>
+	<CAFEAcA89ZxboWWDn3iDh_8u-ejMKjhWmmA_ckLMH7si+yU_icw@mail.gmail.com>
+	<CAJ+F1CKhFNo9UGuuvcV0ErFoQmHSCxO6jUfo6et3vT9wD4e21A@mail.gmail.com>
+In-Reply-To: <CAJ+F1CKhFNo9UGuuvcV0ErFoQmHSCxO6jUfo6et3vT9wD4e21A@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 20 Dec 2018 16:20:39 +0400
+Message-ID: <CAJ+F1CKo+Cd-MHAYR9us762yKckhPa4md0PwvB10OKv8exv0oQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v2 00/35] Misc patches for 2018-12-18
+Subject: Re: [Qemu-devel] [PULL 00/64] slirp updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,25 +31,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 20/12/18 12:43, Philippe Mathieu-Daud=C3=A9 wrote:
->> subprocess.CalledProcessError: Command '['docker', 'build', '-t',
->> 'qemu:debian9', '-f', '/tmp/docker_buildsvtS6R/tmp74LVkj.docker',
->> '/tmp/docker_buildsvtS6R']' returned non-zero exit status 100
->> /home/petmay01/linaro/qemu-for-merges/tests/docker/Makefile.include:53=
-:
->> recipe for target 'docker-image-debian9' failed
->> make: *** [docker-image-debian9] Error 1
->=20
-> This looks an unrelated error. The Debian mirror you are using might be
-> out of sync (or syncing), or the filesystem where you store your Docker
-> image is full?
+Hi
+
+On Thu, Dec 20, 2018 at 4:01 PM Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@gmail.com> wrote:
+>
+> Hi
+>
+> On Wed, Dec 19, 2018 at 11:45 PM Peter Maydell <peter.maydell@linaro.org>=
+ wrote:
+> >
+> > On Tue, 18 Dec 2018 at 23:04, Samuel Thibault
+> > <samuel.thibault@ens-lyon.org> wrote:
+> > >
+> > > The following changes since commit e85c577158a2e8e252414959da9ef15c12=
+eec63d:
+> > >
+> > >   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request=
+-2018-12-17' into staging (2018-12-18 14:31:06 +0000)
+> > >
+> > > are available in the Git repository at:
+> > >
+> > >   https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
+> > >
+> > > for you to fetch changes up to 4c2b5ca1b5dd42bb96e954db7a46ebe39fd246=
+20:
+> > >
+> > >   slirp: Mark debugging calls as unlikely (2018-12-18 23:44:35 +0100)
+> > >
+> > > ----------------------------------------------------------------
+> > > Abstract away slirp toward a libslirp
+> >
+> > This fails to compile (all platforms):
+> >
+> > For the windows builds, a compile failure in slirp.c:
+> > /home/petmay01/qemu-for-merges/net/slirp.c: In function 'net_slirp_init=
+':
+> > /home/petmay01/qemu-for-merges/net/slirp.c:302:10: error: implicit
+> > declaration of function 'inet_pton'
+> > [-Werror=3Dimplicit-function-declaration]
+> >      if (!inet_pton(AF_INET6, vprefix6, &ip6_prefix)) {
+> >           ^
+> > /home/petmay01/qemu-for-merges/net/slirp.c:302:5: error: nested extern
+> > declaration of 'inet_pton' [-Werror=3Dnested-externs]
+> >      if (!inet_pton(AF_INET6, vprefix6, &ip6_prefix)) {
+> >      ^
+> >
+>
+> This one is easy, it needs "build-sys: require Vista API by default
+> globally" series that Paolo has been sending in his last pullreqs.
+>
+> > On Linux (x86-64 and other host archs) a link failure:
+> >
+> >   LINK    arm-softmmu/qemu-system-arm
+> > ../slirp/ncsi.o: In function `ncsi_input':
+> > /home/petmay01/linaro/qemu-for-merges/slirp/ncsi.c:166: undefined
+> > reference to `slirp_output'
+> > ../slirp/slirp.o: In function `arp_input':
+> > /home/petmay01/linaro/qemu-for-merges/slirp/slirp.c:835: undefined
+> > reference to `slirp_output'
+> > ../slirp/slirp.o: In function `if_encap4':
+> > /home/petmay01/linaro/qemu-for-merges/slirp/slirp.c:935: undefined
+> > reference to `slirp_output'
+> > ../slirp/slirp.o: In function `if_encap':
+> > /home/petmay01/linaro/qemu-for-merges/slirp/slirp.c:1021: undefined
+> > reference to `slirp_output'
+> > collect2: error: ld returned 1 exit status
+> > Makefile:199: recipe for target 'qemu-system-arm' failed
+> >
+>
+> Hmm, weird linker error. Could you give some details on your build enviro=
+nment?
+>
+> > It also manages to provoke an internal linker error on freebsd:
+> >
+> > /usr/bin/ld: error in ../slirp/socket.o(.eh_frame); no .eh_frame_hdr
+> > table will be created.
+> > /usr/bin/ld: ../slirp/socket.o: invalid string offset 1416 >=3D 978 for
+> > section `.strtab'
+> > /usr/bin/ld: ../slirp/socket.o: invalid relocation type 38
+> > /usr/bin/ld: BFD 2.17.50 [FreeBSD] 2007-07-03 assertion fail
+> > /usr/src/gnu/usr.bin/binutils/libbfd/../../../../contrib/binutils/bfd/e=
+lf64-x86-
+> > 64.c:276
+> > /usr/bin/ld: ../slirp/socket.o: invalid relocation type 51
+> > /usr/bin/ld: BFD 2.17.50 [FreeBSD] 2007-07-03 assertion fail
+> > /usr/src/gnu/usr.bin/binutils/libbfd/../../../../contrib/binutils/bfd/e=
+lf64-x86-64.c:276
+> > /usr/bin/ld: ../slirp/socket.o: invalid relocation type 57
+> > [enormous long list of similar messages]
+> > /usr/bin/ld: ../slirp/socket.o: invalid relocation type 8248
+> > /usr/bin/ld: BFD 2.17.50 [FreeBSD] 2007-07-03 assertion fail
+> > /usr/src/gnu/usr.bin/binutils/libbfd/../../../../contrib/binutils/bfd/e=
+lf64-x86-
+> > 64.c:276
+> > /usr/bin/ld: BFD 2.17.50 [FreeBSD] 2007-07-03 internal error, aborting
+> > at /usr/src/gnu/usr.bin/binutils/libbfd/../../../../contrib/binutils/b
+> > fd/reloc.c line 5288 in bfd_byte
+> > *bfd_generic_get_relocated_section_contents(bfd *, struct
+> > bfd_link_info *, struct bfd_link_order *, bfd_byte
+> >  *, bfd_boolean, asymbol **)
+> >
+> > /usr/bin/ld: Please report this bug.
+>
+> make vm-build-freebsd passes here... weirder
+>
+> >
+> > c++: error: linker command failed with exit code 1 (use -v to see invoc=
+ation)
+> >
+> > On NetBSD, a different slirp.c compiler error building the bsd-user
+> > target:
+> > In file included from ../slirp/slirp.c:31:0:
+> > /var/tmp/qemu-test.nLOQbq/include/hw/hw.h:6:2: error: #error Cannot
+> > include hw/hw.h from user emulation
+> >  #error Cannot include hw/hw.h from user emulation
+> >   ^
+> >
+>
+> make vm-build-netbsd passes here too...
+>
+> > On OpenBSD, a rather uninformative linker error:
+> > /usr/bin/ld: final link failed: Nonrepresentable section on output
+> > collect2: error: ld returned 1 exit status
+>
+> make vm-build-openbsd fails here however with the:
+> "Cannot include hw/hw.h from user emulation" (interesting, no? ;)
+>
+> Eh, git blame:
+> 062e552 Anthony Liguori        2009-01-08 19:27 +0000   31=E2=94=82 #incl=
+ude "hw/hw.h"
+>
+> -#include "hw/hw.h"
+> +#include "migration/vmstate.h"
+> +#include "migration/qemu-file-types.h"
+>
+> Seems to solve it. I will send a seperate patch.
+
+Ok I figure that the error only happen when build for -user, however
+with the build fix below, it only builds for -softmmu. So that fix is
+not required.
+
+All in all, I think we should give it another try once the "build-sys:
+require Vista API" series is merged, and with the build-sys fix below
+squahed in "build-sys: use a seperate slirp-obj-y && slirp.mo".
+
+>
+> > On OSX, the clang version of the same issue as Linux:
+> > Undefined symbols for architecture x86_64:
+> >   "_slirp_output", referenced from:
+> >       _ncsi_input in ncsi.o
+> >       _slirp_input in slirp.o
+> >       _if_encap in slirp.o
+> > ld: symbol(s) not found for architecture x86_64
+> > clang: error: linker command failed with exit code 1 (use -v to see inv=
+ocation)
+> >
+>
+> I don't have a mac, but all those linker errors look related.
+>
+> I don't get why it sometime succeeds to link, but there is an obvious
+> mistake in "build-sys: use a seperate slirp-obj-y && slirp.mo" (Sam,
+> you should squash that fix)
+>
+> diff --git a/Makefile.target b/Makefile.target
+> index 37e2fc449b..39f72e81be 100644
+> --- a/Makefile.target
+> +++ b/Makefile.target
+> @@ -182,13 +182,13 @@ dummy :=3D $(call unnest-vars,.., \
+>                 slirp-obj-y)
+>  target-obj-y :=3D $(target-obj-y-save)
+>  all-obj-y +=3D $(common-obj-y)
+> -all-obj-y +=3D $(slirp-obj-y)
+>  all-obj-y +=3D $(target-obj-y)
+>  all-obj-y +=3D $(qom-obj-y)
+>  all-obj-$(CONFIG_SOFTMMU) +=3D $(block-obj-y) $(chardev-obj-y)
+>  all-obj-$(CONFIG_USER_ONLY) +=3D $(crypto-aes-obj-y)
+>  all-obj-$(CONFIG_SOFTMMU) +=3D $(crypto-obj-y)
+>  all-obj-$(CONFIG_SOFTMMU) +=3D $(io-obj-y)
+> +all-obj-$(CONFIG_SOFTMMU) +=3D $(slirp-obj-y)
+>
+> --
+> Marc-Andr=C3=A9 Lureau
 
 
-Indeed I cannot reproduce it.  I'll send the pull request with
-g_test_skip fixed (well, removed -- the harness notes 0 tests run and
-declares it a SKIP anyway).
 
-Paolo
+--=20
+Marc-Andr=C3=A9 Lureau
