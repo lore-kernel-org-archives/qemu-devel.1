@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gZqN7-000519-Dy
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 23:55:46 -0500
+	(envelope-from <peterx@redhat.com>) id 1gZqvq-0001Lw-Bj
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 00:31:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gZqN4-0005zh-8X
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 23:55:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:44604)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gZqN4-0005z5-2K
-	for qemu-devel@nongnu.org; Wed, 19 Dec 2018 23:55:42 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gZqN2-0005AT-7F
-	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 04:55:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 14E6E2E80CB
-	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 04:55:40 +0000 (UTC)
+	(envelope-from <peterx@redhat.com>) id 1gZqvm-0000HD-C0
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 00:31:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56784)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gZqvm-0000Fd-6E
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 00:31:34 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8B00DC058CBD
+	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 05:31:32 +0000 (UTC)
+Date: Thu, 20 Dec 2018 13:31:20 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20181220053120.GE16723@xz-x1>
+References: <20181219085038.7729-1-peterx@redhat.com>
+	<20181219085038.7729-3-peterx@redhat.com>
+	<c9e56e11-214f-552a-faea-cb5901392164@redhat.com>
+	<20181219212418.GJ19442@habkost.net>
+	<2b60279a-26bc-1569-3f3c-da507fed2c44@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 20 Dec 2018 04:46:47 -0000
-From: William Razgunas <bjraz@abstractions.me>
-Reply-To: Bug 1808824 <1808824@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154505934144.23344.12423865582266502170.malonedeb@soybean.canonical.com>
-Message-Id: <154528120746.2249.12879166818086890264.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1808824] Re: Mouse leaves VM window when Grab on
- Hover isn't selected Windows 10 and Intel HAX
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2b60279a-26bc-1569-3f3c-da507fed2c44@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] q35: set split kernel irqchip as
+ default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +37,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Jiri Denemark <jdenemar@redhat.com>
 
-https://youtu.be/Vpi59ptOiyc
-Here is a video demonstrating the main issue. This does not show any lag bu=
-t, it does show how VM doesn't capture the mouse correctly.
+On Wed, Dec 19, 2018 at 10:45:40PM +0100, Paolo Bonzini wrote:
+> On 19/12/18 22:24, Eduardo Habkost wrote:
+> > On Wed, Dec 19, 2018 at 09:12:55PM +0100, Paolo Bonzini wrote:
+> >> On 19/12/18 09:50, Peter Xu wrote:
+> >>> Starting from QEMU 4.0, let's specify "split" as the default value for
+> >>> kernel-irqchip.
+> >>>
+> >>> So for QEMU>=4.0 we'll have: allowed=Y,required=N,split=Y
+> >>>    for QEMU<=3.1 we'll have: allowed=Y,required=N,split=N
+> >>>    (omitting all the "kernel_irqchip_" prefix)
+> >>>
+> >>> Note that this "split" is optional - we'll first try to enable split
+> >>> kernel irqchip, and we'll fall back to complete kernel irqchip if we
+> >>> found that the kernel capability is missing.
+> >>
+> >> Please just fail completely and require a new kernel for the 4.0 machine
+> >> type.  There are subtle differences between kernel and QEMU irqchip, I
+> >> don't think we want to open that can of worms.
+> > 
+> > This would make existing VMs that are runnable with pc-q35-3.1.0
+> > not runnable by only updating the machine-type.
+> > 
+> > The good news is that we can make this a non-issue by clearly
+> > documenting that QEMU needs a more recent kernel (just like we'll
+> > do for RDTSCP[1]).
+> 
+> Right, RDTSCP is exactly what came to mind.
 
-After capture if you move the mouse far enough off the VM window the mouse =
-goes out of the window in odd places that isn't representative of the locat=
-ion of where the mouse is.
-The mouse will leave the VM from the middle of the of VM window at times.
+Ok so I think I'll just make it even simpler by dropping patch 1.
+Also I noticed that the documentation on linux kernel version
+requirement has not yet reached master but I'll assume it'll be there
+some day very soon so I'll ignore that part.
 
--- =
+Thanks everyone!  I'll repost soon.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1808824
-
-Title:
-  Mouse leaves VM window when Grab on Hover isn't selected Windows 10
-  and Intel HAX
-
-Status in QEMU:
-  New
-
-Bug description:
-  On Windows 10.0.17134 I have been having the problem that the mouse
-  will leave the VM window after a short time when grab on hover isn't
-  selected.  The VM will then try to grab on Hover and the mouse will
-  grab in weird places and it will become very unwieldy to control the
-  mouse in the VM window.
-
-  This is exasperated by super slow response making it nearly unusable
-  if the Intel=C2=AE Hardware Accelerated Execution Manager (Intel=C2=AE HA=
-XM) is
-  not currently installed on my machine.
-
-  I know they are different things but they compounded on each other
-  when you have a mouse that is not staying in the VM window and the
-  VM's visualized cpu is acting VERY slow the system is unusable.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1808824/+subscriptions
+-- 
+Peter Xu
