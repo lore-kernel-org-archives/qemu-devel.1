@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gZqvq-0001Lw-Bj
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 00:31:39 -0500
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gZr1q-0002Xr-7S
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 00:37:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gZqvm-0000HD-C0
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 00:31:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56784)
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gZr1m-0003Dv-TS
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 00:37:50 -0500
+Received: from mga05.intel.com ([192.55.52.43]:8397)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gZqvm-0000Fd-6E
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 00:31:34 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8B00DC058CBD
-	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 05:31:32 +0000 (UTC)
-Date: Thu, 20 Dec 2018 13:31:20 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20181220053120.GE16723@xz-x1>
-References: <20181219085038.7729-1-peterx@redhat.com>
-	<20181219085038.7729-3-peterx@redhat.com>
-	<c9e56e11-214f-552a-faea-cb5901392164@redhat.com>
-	<20181219212418.GJ19442@habkost.net>
-	<2b60279a-26bc-1569-3f3c-da507fed2c44@redhat.com>
+	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
+	id 1gZr1m-0003CC-4N
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 00:37:46 -0500
+Date: Thu, 20 Dec 2018 13:37:40 +0800
+From: Yi Zhang <yi.z.zhang@linux.intel.com>
+Message-ID: <20181220053739.GB70591@tiger-server>
+References: <cover.1545120100.git.yi.z.zhang@linux.intel.com>
+	<5eb87eb9a389242772375dd52bd97c17564a0829.1545120100.git.yi.z.zhang@linux.intel.com>
+	<20181218085249-mutt-send-email-mst@kernel.org>
+	<20181219091017.GA35378@tiger-server>
+	<20181219105555-mutt-send-email-mst@kernel.org>
+	<20181220030312.GA70591@tiger-server>
+	<20181219223700-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <2b60279a-26bc-1569-3f3c-da507fed2c44@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/4] q35: set split kernel irqchip as
- default
+In-Reply-To: <20181219223700-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH V7 6/6] hostmem-file: add 'sync' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,43 +33,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Jiri Denemark <jdenemar@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: peter.maydell@linaro.org, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, imammedo@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com, crosthwaite.peter@gmail.com, richard.henderson@linaro.org, xiaoguangrong.eric@gmail.com
 
-On Wed, Dec 19, 2018 at 10:45:40PM +0100, Paolo Bonzini wrote:
-> On 19/12/18 22:24, Eduardo Habkost wrote:
-> > On Wed, Dec 19, 2018 at 09:12:55PM +0100, Paolo Bonzini wrote:
-> >> On 19/12/18 09:50, Peter Xu wrote:
-> >>> Starting from QEMU 4.0, let's specify "split" as the default value for
-> >>> kernel-irqchip.
-> >>>
-> >>> So for QEMU>=4.0 we'll have: allowed=Y,required=N,split=Y
-> >>>    for QEMU<=3.1 we'll have: allowed=Y,required=N,split=N
-> >>>    (omitting all the "kernel_irqchip_" prefix)
-> >>>
-> >>> Note that this "split" is optional - we'll first try to enable split
-> >>> kernel irqchip, and we'll fall back to complete kernel irqchip if we
-> >>> found that the kernel capability is missing.
-> >>
-> >> Please just fail completely and require a new kernel for the 4.0 machine
-> >> type.  There are subtle differences between kernel and QEMU irqchip, I
-> >> don't think we want to open that can of worms.
+On 2018-12-19 at 22:42:07 -0500, Michael S. Tsirkin wrote:
+> On Thu, Dec 20, 2018 at 11:03:12AM +0800, Yi Zhang wrote:
+> > On 2018-12-19 at 10:59:10 -0500, Michael S. Tsirkin wrote:
+> > > On Wed, Dec 19, 2018 at 05:10:18PM +0800, Yi Zhang wrote:
+> > > > > > +
+> > > > > > + - 'sync' option of memory-backend-file is not 'off', and
+> > > > > > +
+> > > > > > + - 'share' option of memory-backend-file is 'on'.
+> > > > > > +
+> > > > > > + - 'pmem' option of memory-backend-file is 'on'
+> > > > > > +
+> > > > > 
+> > > > > Wait isn't this what pmem was supposed to do?
+> > > > > Doesn't it mean "persistent memory"?
+> > > > pmem is a option for memory-backend-file, user should know the backend
+> > > > is in host persistent memory, with this flags on, while there is a host crash
+> > > > or a power failures.
+> > > > 
+> > > > [1] Qemu will take necessary operations to guarantee the persistence.
+> > > > https://patchwork.ozlabs.org/cover/944749/ 
+> > > > 
+> > > > [2] Host kernel also take opretions to consistent filesystem metadata.
+> > > > Add MAP_SYNC flags.
+> > > 
+> > > OK so I'm a user. Can you educate me please?  
+> > We suppose an administrator should know it, what is the back-end region coming from,
+> > is it persistent? what is the font-end device is? a volatile dimm or an
+> > nonvolatile dimm? then they can choice put the pmem=on[off] and sync=on[off].
+> > If he didn't, we encourage that don't set these 2 flags.
 > > 
-> > This would make existing VMs that are runnable with pc-q35-3.1.0
-> > not runnable by only updating the machine-type.
-> > 
-> > The good news is that we can make this a non-issue by clearly
-> > documenting that QEMU needs a more recent kernel (just like we'll
-> > do for RDTSCP[1]).
+> > > When should MAP_SYNC not
+> > > be set? Are there any disadvantages (e.g.  performance?)?
+> > Not only the performance, sometimes like the front-end device is an
+> > volatile ram, we don't wanna set such option although the backend is a
+> > novolatile memory, if power lose, all of thing should lose in this ram.
 > 
-> Right, RDTSCP is exactly what came to mind.
-
-Ok so I think I'll just make it even simpler by dropping patch 1.
-Also I noticed that the documentation on linux kernel version
-requirement has not yet reached master but I'll assume it'll be there
-some day very soon so I'll ignore that part.
-
-Thanks everyone!  I'll repost soon.
-
--- 
-Peter Xu
+> 
+> 
+> I am not sure how does above answer the questions. If I don't know,
+> neither will the hypothetical administrator. Looks like a better
+> interface is needed to make the choice on behalf of the user.
+> 
+By default, we have already ignore the 2 flags, unless the administrator
+know how to make that use. By-now, seems we don't have a better way to detect what
+memory-backend-file is, a persistent memory or not.
+> 
+> > > 
+> > > -- 
+> > > MST
+> > > 
+> 
