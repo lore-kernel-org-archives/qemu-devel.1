@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gaLP0-0002YA-LJ
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:03:47 -0500
+	(envelope-from <robert.hu@linux.intel.com>) id 1gaLPv-00031w-C6
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:04:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gaLOx-0007ug-Uj
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:03:46 -0500
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:29196
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gaLOx-0007sw-Hj
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:03:43 -0500
-References: <76d14474.f850.167cb46b4d9.Coremail.13824125580@163.com>
-	<87d0pw9y7m.fsf@linaro.org>
-	<19e6128e.27e9.167ce041690.Coremail.13824125580@163.com>
-	<874lb79ru9.fsf@linaro.org>
-	<744a1829.ff89.167d091062b.Coremail.13824125580@163.com>
-From: Li Zhijian <lizhijian@cn.fujitsu.com>
-Message-ID: <7f94976c-f081-492e-8c68-c6766a88a115@cn.fujitsu.com>
-Date: Fri, 21 Dec 2018 22:03:31 +0800
-MIME-Version: 1.0
-In-Reply-To: <744a1829.ff89.167d091062b.Coremail.13824125580@163.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="gbk"; format=flowed
+	(envelope-from <robert.hu@linux.intel.com>) id 1gaLPs-0008KH-Mn
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:04:43 -0500
+Received: from mga11.intel.com ([192.55.52.93]:34912)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
+	id 1gaLPs-0008G2-8u
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:04:40 -0500
+Message-ID: <1545401072.44118.7.camel@linux.intel.com>
+From: Robert Hoo <robert.hu@linux.intel.com>
+Date: Fri, 21 Dec 2018 22:04:32 +0800
+In-Reply-To: <5ee7dd18-e70c-e654-25ee-e700a8174ee9@redhat.com>
+References: <1545227081-213696-1-git-send-email-robert.hu@linux.intel.com>
+	<1545227081-213696-2-git-send-email-robert.hu@linux.intel.com>
+	<20181219140136.GJ20465@redhat.com>
+	<1545265096.44118.3.camel@linux.intel.com>
+	<e1b012da-7aac-1063-35ae-0ab3c4c5eb4b@redhat.com>
+	<1545310252.44118.5.camel@linux.intel.com>
+	<5ee7dd18-e70c-e654-25ee-e700a8174ee9@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] did the qemu can emulate the whole system with the
- processor that without support the "virtulization and kvm"?
+Subject: Re: [Qemu-devel] [PATCH 1/2] i386: remove the new CPUID 'PCONFIG'
+ from Icelake-Server CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,55 +34,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: tugouxp <13824125580@163.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>, kai.huang@intel.com, luwei.kang@intel.com
+Cc: robert.hu@intel.com, robert.hu@linux.intel.com, thomas.lendacky@amd.com, ehabkost@redhat.com, qemu-devel@nongnu.org, rth@twiddle.net
 
+On Fri, 2018-12-21 at 07:27 +0100, Paolo Bonzini wrote:
+> On 20/12/18 13:50, Robert Hoo wrote:
+> > On Thu, 2018-12-20 at 13:38 +0100, Paolo Bonzini wrote:
+> > > On 20/12/18 01:18, Robert Hoo wrote:
+> > > > I think the sooner, the better. Take the time window that
+> > > > Icelake
+> > > > CPU
+> > > > model has just shipped with QEMU 3.1.0 and is not
+> > > > publicly/widely
+> > > > used
+> > > > yet.
+> > > 
+> > > We should still leave it in the 3.1 machine types.Â Â I've just
+> > > sent a
+> > > patch to do the same with MPX.
+> > > 
+> > 
+> > I took a look your patch of "Disable MPX support on named CPU
+> > models".
+> > Seems you do the same as I do to PCONFIG. So you agree with my
+> > above
+> > patch?:-)
+> > 
+> > I won't object that keep it in 3.1 machine type as you do to MPX.
+> 
+> Sorry Robert, I changed my mind.Â Â If no hypervisor exists that
+> enables
+> PCONFIG for guests (using the PCONFIG_ENABLE processor control),
+> effectively no one can ever have used it.Â Â We should disable it in
+> all
+> machine types and Cc qemu-stable.
 
-On 12/21/18 19:40, tugouxp wrote:
-> thank you.
->   
-> i just want to confirm one thing,  that is whether the qemu can emulate a whole operation system just by analysis instructions by instructions manually  without the support of KVM.
+Thanks Paolo.
+> 
+> In fact, the same is true for INTEL_PT, which is not supported by any
+> released kernel version and, even is going to be available only with
+> a
+> module parameter when it will be.
 
-IIUC£¬
-"operation system" often means a software but QEMU usually emulates hardwares, including cpus, memory, NIC, etc.
-Please know that QEMU born earlier than KVM, so QEMU can work well without KVM.
+Add Luwei in judging this.
+> 
+> This is not the same as MPX, which did work even though nobody was
+> probably using it.
+> 
+> So this series is correct and I will follow up with one for INTEL_PT;
+> however, this begs the question of how the patches are being tested.
+> 
+My apologies for carelessness.
 
-Thanks
+I've seen you patch for INTEL_PT. So am I going to resend these 2
+patches and Cc qemu-stable? or simply reply these 2 patches adding
+qemu-stable in Cc list?
 
-
-> so from the answer you give to me, it is feasible, right?
->
->
->
-> thanks very much!
->
->
->
->
->
->
->
->
->
-> At 2018-12-21 17:01:02, "Alex Benn¨¦e" <alex.bennee@linaro.org> wrote:
->> tugouxp <13824125580@163.com> writes:
->>
->>> Hi alex:
->>>      now my host machine did not have the "/dev/kvm" nodes and no chance to make it exists.
->>> so i want to know whether the "/dev/kvm" is  mandatory  for qemu to emulate the whole system.
->>> so i can make the emulation without the support of kvm mechanism.
->> QEMU runs in two modes - full system emulation with TCG doesn't require
->> KVM although it is relatively slow. On systems where there guest
->> architecture is the same as the host architecture you can run with KMV
->> (or HAX/WHPX/HVF) accelerators at near native speeds.
->>
->> The reasons for not having a /dev/kvm can vary but you haven't said what
->> your host architecture is and what OS you are running so it's hard to
->> offer advice here.
->>
->> --
->> Alex Benn¨¦e
->
--- 
-Best regards.
-Li Zhijian (8528)
+> Paolo
