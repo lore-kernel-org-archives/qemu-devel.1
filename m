@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gaNjs-00084y-65
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:33:29 -0500
+	(envelope-from <mst@redhat.com>) id 1gaNms-0002Gm-IE
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:36:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gaNjq-0002gy-5o
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:33:28 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 21 Dec 2018 16:33:14 +0000
-Message-ID: <da464c42-3ff6-38c7-bf5a-43631b89dadb@virtuozzo.com>
-References: <20181012131509.16370-1-vsementsov@virtuozzo.com>
-	<790c1efd-1188-8ff3-f71b-b9dd49dd2bc0@virtuozzo.com>
-In-Reply-To: <790c1efd-1188-8ff3-f71b-b9dd49dd2bc0@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <BC6F89A70DE8804595B8AE8527997679@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <mst@redhat.com>) id 1gaNmn-0004vJ-Da
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:36:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53328)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gaNmn-0004pF-4g
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:36:29 -0500
+Date: Fri, 21 Dec 2018 11:36:07 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181221112902-mutt-send-email-mst@kernel.org>
+References: <cover.1545120100.git.yi.z.zhang@linux.intel.com>
+	<5eb87eb9a389242772375dd52bd97c17564a0829.1545120100.git.yi.z.zhang@linux.intel.com>
+	<20181218085249-mutt-send-email-mst@kernel.org>
+	<20181219091017.GA35378@tiger-server>
+	<20181219105555-mutt-send-email-mst@kernel.org>
+	<20181220030312.GA70591@tiger-server>
+	<20181219223700-mutt-send-email-mst@kernel.org>
+	<20181220053739.GB70591@tiger-server>
+	<20181220090435-mutt-send-email-mst@kernel.org>
+	<20181221031817.GA77135@tiger-server>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] improve block-latency-histogram-set
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181221031817.GA77135@tiger-server>
+Subject: Re: [Qemu-devel] [PATCH V7 6/6] hostmem-file: add 'sync' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,23 +35,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "eblake@redhat.com" <eblake@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, Denis Lunev <den@virtuozzo.com>, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
+To: peter.maydell@linaro.org, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, imammedo@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com, crosthwaite.peter@gmail.com, richard.henderson@linaro.org, xiaoguangrong.eric@gmail.com
 
-MjEuMTIuMjAxOCAxOTozMSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
-cGluZw0KDQpvb3BzLCBzaG91bGQgcy8zLjEvNC4wDQoNCj4gDQo+IDEyLjEwLjIwMTggMTY6MTUs
-IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+PiBTdXBwb3J0IFFPTSBwYXRo
-IGZvciBibG9jay1sYXRlbmN5LWhpc3RvZ3JhbS1zZXQgYW5kIGRyb3AgeC0gcHJlZml4Lg0KPj4N
-Cj4+IExpYnZpcnQgZGlzY3Vzc2lvbiAobm90IHlldCB1cGRhdGVkIGZvciB1c2luZyBpZCBpbnN0
-ZWFkIG9mIGRldmljZSk6DQo+PiBodHRwczovL3d3dy5yZWRoYXQuY29tL2FyY2hpdmVzL2xpYnZp
-ci1saXN0LzIwMTgtU2VwdGVtYmVyL21zZzAwMDExLmh0bWwNCj4+DQo+PiB2MjogaWQsZGV2aWNl
-IC0+IGlkICh3aXRoIGZhbGwgYmFjayB0byBkZXZpY2UgbmFtZSkNCj4+IMKgwqDCoMKgIGZpeCB2
-ZXJzaW9ucyBhbmQgYWxsIHJlbWFpbmluZyB4XyBwcmVmaXhlcw0KPj4NCj4+IFZsYWRpbWlyIFNl
-bWVudHNvdi1PZ2lldnNraXkgKDIpOg0KPj4gwqDCoCBxYXBpOiBtb3ZlIHRvIFFPTSBwYXRoIGZv
-ciB4LWJsb2NrLWxhdGVuY3ktaGlzdG9ncmFtLXNldA0KPj4gwqDCoCBxYXBpOiBkcm9wIHgtIGZy
-b20geC1ibG9jay1sYXRlbmN5LWhpc3RvZ3JhbS1zZXQNCj4+DQo+PiDCoCBxYXBpL2Jsb2NrLWNv
-cmUuanNvbiB8IDI0ICsrKysrKysrKysrKy0tLS0tLS0tLS0tLQ0KPj4gwqAgYmxvY2svcWFwaS5j
-wqDCoMKgwqDCoMKgwqDCoCB8IDEyICsrKysrKy0tLS0tLQ0KPj4gwqAgYmxvY2tkZXYuY8KgwqDC
-oMKgwqDCoMKgwqDCoMKgIHwgMTggKysrKysrKysrKysrKy0tLS0tDQo+PiDCoCAzIGZpbGVzIGNo
-YW5nZWQsIDMxIGluc2VydGlvbnMoKyksIDIzIGRlbGV0aW9ucygtKQ0KPj4NCj4gDQo+IA0KDQoN
-Ci0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+On Fri, Dec 21, 2018 at 11:18:18AM +0800, Yi Zhang wrote:
+> On 2018-12-20 at 09:06:41 -0500, Michael S. Tsirkin wrote:
+> > On Thu, Dec 20, 2018 at 01:37:40PM +0800, Yi Zhang wrote:
+> > > On 2018-12-19 at 22:42:07 -0500, Michael S. Tsirkin wrote:
+> > > > On Thu, Dec 20, 2018 at 11:03:12AM +0800, Yi Zhang wrote:
+> > > > > On 2018-12-19 at 10:59:10 -0500, Michael S. Tsirkin wrote:
+> > > > > > On Wed, Dec 19, 2018 at 05:10:18PM +0800, Yi Zhang wrote:
+> > > > > > > > > +
+> > > > > > > > > + - 'sync' option of memory-backend-file is not 'off', and
+> > > > > > > > > +
+> > > > > > > > > + - 'share' option of memory-backend-file is 'on'.
+> > > > > > > > > +
+> > > > > > > > > + - 'pmem' option of memory-backend-file is 'on'
+> > > > > > > > > +
+> > > > > > > > 
+> > > > > > > > Wait isn't this what pmem was supposed to do?
+> > > > > > > > Doesn't it mean "persistent memory"?
+> > > > > > > pmem is a option for memory-backend-file, user should know the backend
+> > > > > > > is in host persistent memory, with this flags on, while there is a host crash
+> > > > > > > or a power failures.
+> > > > > > > 
+> > > > > > > [1] Qemu will take necessary operations to guarantee the persistence.
+> > > > > > > https://patchwork.ozlabs.org/cover/944749/ 
+> > > > > > > 
+> > > > > > > [2] Host kernel also take opretions to consistent filesystem metadata.
+> > > > > > > Add MAP_SYNC flags.
+> > > > > > 
+> > > > > > OK so I'm a user. Can you educate me please?  
+> > > > > We suppose an administrator should know it, what is the back-end region coming from,
+> > > > > is it persistent? what is the font-end device is? a volatile dimm or an
+> > > > > nonvolatile dimm? then they can choice put the pmem=on[off] and sync=on[off].
+> > > > > If he didn't, we encourage that don't set these 2 flags.
+> > > > > 
+> > > > > > When should MAP_SYNC not
+> > > > > > be set? Are there any disadvantages (e.g.  performance?)?
+> > > > > Not only the performance, sometimes like the front-end device is an
+> > > > > volatile ram, we don't wanna set such option although the backend is a
+> > > > > novolatile memory, if power lose, all of thing should lose in this ram.
+> > > > 
+> > > > 
+> > > > 
+> > > > I am not sure how does above answer the questions. If I don't know,
+> > > > neither will the hypothetical administrator. Looks like a better
+> > > > interface is needed to make the choice on behalf of the user.
+> > > > 
+> > > By default, we have already ignore the 2 flags, unless the administrator
+> > > know how to make that use. By-now, seems we don't have a better way to detect what
+> > > memory-backend-file is, a persistent memory or not.
+> > 
+> > In that case how about an interface where user tells QEMU "this backend
+> > is in persistent memory"?
+> 
+> Actually, [pmem=on] already did this, we can get the backend memory type from:
+> 
+> file_memory_backend_get_pmem(),
+> 
+> That is already being used in the memory_region_init_ram_from_file. that
+> is why I reuse the RAM_PMEM to identify the region coming from a
+> persitent memory? correct me if something I misunderstood? 
+
+Right and thus my question: why not set SYNC unconditionally with pmem=on?
+
+> 
+> > 
+> > 
+> > 
+> > > > 
+> > > > > > 
+> > > > > > -- 
+> > > > > > MST
+> > > > > > 
+> > > > 
+> > 
