@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35353)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gaMLP-0001QM-Hy
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 10:04:08 -0500
+	(envelope-from <philmd@redhat.com>) id 1gaMaE-0004m9-Mb
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 10:19:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gaMLM-0005Fc-D9
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 10:04:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49388)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gaMLM-0005F6-4p
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 10:04:04 -0500
-References: <1545227081-213696-1-git-send-email-robert.hu@linux.intel.com>
-	<1545227081-213696-2-git-send-email-robert.hu@linux.intel.com>
-	<20181219140136.GJ20465@redhat.com>
-	<1545265096.44118.3.camel@linux.intel.com>
-	<e1b012da-7aac-1063-35ae-0ab3c4c5eb4b@redhat.com>
-	<1545310252.44118.5.camel@linux.intel.com>
-	<5ee7dd18-e70c-e654-25ee-e700a8174ee9@redhat.com>
-	<1545401072.44118.7.camel@linux.intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bd0addb6-9d5f-b4dc-8cd9-f2d096ccd16c@redhat.com>
-Date: Fri, 21 Dec 2018 16:03:55 +0100
+	(envelope-from <philmd@redhat.com>) id 1gaMaB-00073k-PI
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 10:19:26 -0500
+Received: from mail-wr1-f41.google.com ([209.85.221.41]:35868)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gaMa9-0006xd-OP
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 10:19:22 -0500
+Received: by mail-wr1-f41.google.com with SMTP id u4so5631040wrp.3
+	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 07:19:18 -0800 (PST)
+References: <20181221134115.27973-1-berrange@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <009f5d95-c968-6f3f-93c2-32300ee7e5e1@redhat.com>
+Date: Fri, 21 Dec 2018 16:19:15 +0100
 MIME-Version: 1.0
-In-Reply-To: <1545401072.44118.7.camel@linux.intel.com>
+In-Reply-To: <20181221134115.27973-1-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] i386: remove the new CPUID 'PCONFIG'
- from Icelake-Server CPU model
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] hw/usb: fix mistaken de-initialization of
+ CCID state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,27 +30,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Robert Hoo <robert.hu@linux.intel.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, kai.huang@intel.com, luwei.kang@intel.com
-Cc: robert.hu@intel.com, thomas.lendacky@amd.com, ehabkost@redhat.com, qemu-devel@nongnu.org, rth@twiddle.net
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, qemu-stable@nongnu.org
 
-On 21/12/18 15:04, Robert Hoo wrote:
->> So this series is correct and I will follow up with one for INTEL_PT;
->> however, this begs the question of how the patches are being tested.
->
-> My apologies for carelessness.
+On 12/21/18 2:41 PM, Daniel P. Berrangé wrote:
+> In previous commit:
+> 
+>   commit 7dea29e4af17fc1d27478de9f8ea38144deac54a
+>   Author: Li Qiang <liq3ea@gmail.com>
+>   Date:   Fri Oct 19 03:50:36 2018 -0700
+> 
+>     hw: ccid-card-emulated: cleanup resource when realize in error path
+> 
+> The emulated_realize method was changed so that it jumps to a cleanup
+> label to de-initialize state upon error. This change failed to ensure
+> the success path exited the method before this point though. So the
+> mutexes are always destroyed even in normal operation. The result is
+> as crashtastic as expected:
+> 
+> $ qemu-system-x86_64 -usb -device usb-ccid,id=ccid0 -device ccid-card-emulated,backend=nss-emulated,id=smartcard0,bus=ccid0.0
+> qemu-system-x86_64: util/qemu-thread-posix.c:64: qemu_mutex_lock_impl: Assertion `mutex->initialized' failed.
+> Aborted (core dumped)
+> 
+> Reported-by: Michael Tokarev <mjt@tls.msk.ru>
 
-No problem.  In the future please check that "-cpu Icelake-Client"
-doesn't have warnings such as
+Fixes: 7dea29e4af1
 
-qemu-system-x86_64: warning: host doesn't support requested feature:
-CPUID.07H:EBX.intel-pt [bit 25]
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-when run on an Icelake-Client host.
-
-> I've seen you patch for INTEL_PT. So am I going to resend these 2
-> patches and Cc qemu-stable? or simply reply these 2 patches adding
-> qemu-stable in Cc list?
-
-I can take care of that, thanks.
-
-Paolo
+> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+> ---
+>  hw/usb/ccid-card-emulated.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/hw/usb/ccid-card-emulated.c b/hw/usb/ccid-card-emulated.c
+> index 25976ed84f..e0457d305b 100644
+> --- a/hw/usb/ccid-card-emulated.c
+> +++ b/hw/usb/ccid-card-emulated.c
+> @@ -549,6 +549,8 @@ static void emulated_realize(CCIDCardState *base, Error **errp)
+>      qemu_thread_create(&card->apdu_thread_id, "ccid/apdu", handle_apdu_thread,
+>                         card, QEMU_THREAD_JOINABLE);
+>  
+> +    return;
+> +
+>  out2:
+>      clean_event_notifier(card);
+>  out1:
+> 
