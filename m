@@ -1,32 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gaEHe-0004zc-Sl
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 01:27:43 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gaEK7-0005uT-9v
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 01:30:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gaEHa-0006Uo-VG
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 01:27:42 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:33161)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gaEHa-0006Ti-Ok
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 01:27:38 -0500
-Received: by mail-wr1-f68.google.com with SMTP id c14so4022633wrr.0
-	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 22:27:38 -0800 (PST)
-References: <1545227081-213696-1-git-send-email-robert.hu@linux.intel.com>
-	<1545227081-213696-2-git-send-email-robert.hu@linux.intel.com>
-	<20181219140136.GJ20465@redhat.com>
-	<1545265096.44118.3.camel@linux.intel.com>
-	<e1b012da-7aac-1063-35ae-0ab3c4c5eb4b@redhat.com>
-	<1545310252.44118.5.camel@linux.intel.com>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gaEK3-0008Ns-AY
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 01:30:15 -0500
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5ee7dd18-e70c-e654-25ee-e700a8174ee9@redhat.com>
-Date: Fri, 21 Dec 2018 07:27:36 +0100
+Date: Fri, 21 Dec 2018 07:30:02 +0100
+Message-Id: <20181221063002.7570-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1545310252.44118.5.camel@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] i386: remove the new CPUID 'PCONFIG'
- from Icelake-Server CPU model
+Subject: [Qemu-devel] [PATCH] i386: remove the 'INTEL_PT' CPUID bit from
+ named CPU models
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,40 +21,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Robert Hoo <robert.hu@linux.intel.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: thomas.lendacky@amd.com, ehabkost@redhat.com, qemu-devel@nongnu.org, robert.hu@intel.com, rth@twiddle.net
+To: qemu-devel@nongnu.org
+Cc: robert.hu@intel.com, Robert Hoo <robert.hu@linux.intel.com>, qemu-stable@nongnu.org
 
-On 20/12/18 13:50, Robert Hoo wrote:
-> On Thu, 2018-12-20 at 13:38 +0100, Paolo Bonzini wrote:
->> On 20/12/18 01:18, Robert Hoo wrote:
->>> I think the sooner, the better. Take the time window that Icelake
->>> CPU
->>> model has just shipped with QEMU 3.1.0 and is not publicly/widely
->>> used
->>> yet.
->>
->> We should still leave it in the 3.1 machine types.  I've just sent a
->> patch to do the same with MPX.
->>
-> I took a look your patch of "Disable MPX support on named CPU models".
-> Seems you do the same as I do to PCONFIG. So you agree with my above
-> patch?:-)
-> 
-> I won't object that keep it in 3.1 machine type as you do to MPX.
+From: Robert Hoo <robert.hu@linux.intel.com>
 
-Sorry Robert, I changed my mind.  If no hypervisor exists that enables
-PCONFIG for guests (using the PCONFIG_ENABLE processor control),
-effectively no one can ever have used it.  We should disable it in all
-machine types and Cc qemu-stable.
+Processor tracing is not yet implemented for KVM and it will be an
+opt in feature requiring a special module parameter.
+Disable it, because it is wrong to enable it by default and
+it is impossible that no one has ever used it.
 
-In fact, the same is true for INTEL_PT, which is not supported by any
-released kernel version and, even is going to be available only with a
-module parameter when it will be.
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ target/i386/cpu.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-This is not the same as MPX, which did work even though nobody was
-probably using it.
-
-So this series is correct and I will follow up with one for INTEL_PT;
-however, this begs the question of how the patches are being tested.
-
-Paolo
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index dae46f0319..9c54c41e7a 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -2493,8 +2493,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+             CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLWB |
+             CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
+             CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
+-            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT |
+-            CPUID_7_0_EBX_INTEL_PT,
++            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
+         .features[FEAT_7_0_ECX] =
+             CPUID_7_0_ECX_PKU | CPUID_7_0_ECX_OSPKE |
+             CPUID_7_0_ECX_AVX512VNNI,
+@@ -2546,7 +2545,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+             CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
+             CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
+             CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
+-            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_INTEL_PT,
++            CPUID_7_0_EBX_SMAP,
+         .features[FEAT_7_0_ECX] =
+             CPUID_7_0_ECX_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
+             CPUID_7_0_ECX_OSPKE | CPUID_7_0_ECX_VBMI2 | CPUID_7_0_ECX_GFNI |
+@@ -2604,8 +2603,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+             CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLWB |
+             CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
+             CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
+-            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT |
+-            CPUID_7_0_EBX_INTEL_PT,
++            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
+         .features[FEAT_7_0_ECX] =
+             CPUID_7_0_ECX_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
+             CPUID_7_0_ECX_OSPKE | CPUID_7_0_ECX_VBMI2 | CPUID_7_0_ECX_GFNI |
+-- 
+2.20.1
