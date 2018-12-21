@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yaroslav.isakov@gmail.com>) id 1gaSWG-0000ak-TE
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 16:39:45 -0500
+	(envelope-from <yaroslav.isakov@gmail.com>) id 1gaSX1-00010r-0J
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 16:40:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yaroslav.isakov@gmail.com>) id 1gaSWG-000824-AF
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 16:39:44 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44371)
+	(envelope-from <yaroslav.isakov@gmail.com>) id 1gaSWw-0008OX-Px
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 16:40:30 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40202)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <yaroslav.isakov@gmail.com>)
-	id 1gaSWG-00081m-53
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 16:39:44 -0500
-Received: by mail-wr1-x443.google.com with SMTP id z5so6628846wrt.11
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 13:39:44 -0800 (PST)
-MIME-Version: 1.0
-References: <cover.1545425136.git.yaroslav.isakov@gmail.com>
-	<af2fca9a040c19198c5aff8752f152a525fd96b7.1545425136.git.yaroslav.isakov@gmail.com>
-In-Reply-To: <af2fca9a040c19198c5aff8752f152a525fd96b7.1545425136.git.yaroslav.isakov@gmail.com>
+	id 1gaSWv-0008MW-FF
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 16:40:26 -0500
+Received: by mail-wr1-x443.google.com with SMTP id p4so6653785wrt.7
+	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 13:40:23 -0800 (PST)
+Received: from localhost ([91.201.22.4]) by smtp.gmail.com with ESMTPSA id
+	g67sm14292624wmd.38.2018.12.21.13.40.21 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Fri, 21 Dec 2018 13:40:22 -0800 (PST)
+Message-Id: <cover.1545426882.git.yaroslav.isakov@gmail.com>
 From: Yaroslav Isakov <yaroslav.isakov@gmail.com>
-Date: Fri, 21 Dec 2018 22:39:31 +0100
-Message-ID: <CADS+iDXua37iz+e92RMzMTbQzWXgiSSrQ8_NeqnAao_frQghWQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] Pass raw DB values from hda-codec.c to
- audio driver
+Date: Fri, 21 Dec 2018 22:14:42 +0100
+Subject: [Qemu-devel] [PATCH 0/3] Allow hw/audio drivers to pass raw DB
+ values to audio/ drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,53 +31,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Sorry, lost cover letter and first patch, resending them
+This patch series introduces the ability for virtual audio drivers to pass
+information about guest-chosen DB values to backend audio drivers.
 
-=D0=BF=D1=82, 21 =D0=B4=D0=B5=D0=BA. 2018 =D0=B3. =D0=B2 21:57, Yaroslav Is=
-akov <yaroslav.isakov@gmail.com>:
->
-> Signed-off-by: Yaroslav Isakov <yaroslav.isakov@gmail.com>
-> ---
->  hw/audio/hda-codec.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/audio/hda-codec.c b/hw/audio/hda-codec.c
-> index 09f9da344b..d160e86d2a 100644
-> --- a/hw/audio/hda-codec.c
-> +++ b/hw/audio/hda-codec.c
-> @@ -437,6 +437,7 @@ static void hda_audio_set_amp(HDAAudioStream *st)
->  {
->      bool muted;
->      uint32_t left, right;
-> +    double left_db, right_db;
->
->      if (st->node =3D=3D NULL) {
->          return;
-> @@ -446,6 +447,9 @@ static void hda_audio_set_amp(HDAAudioStream *st)
->      left  =3D st->mute_left  ? 0 : st->gain_left;
->      right =3D st->mute_right ? 0 : st->gain_right;
->
-> +    left_db =3D ((int64_t)left - QEMU_HDA_AMP_STEPS) * QEMU_HDA_AMP_DB_O=
-F_STEP;
-> +    right_db =3D ((int64_t)right - QEMU_HDA_AMP_STEPS) * QEMU_HDA_AMP_DB=
-_OF_STEP;
-> +
->      left =3D left * 255 / QEMU_HDA_AMP_STEPS;
->      right =3D right * 255 / QEMU_HDA_AMP_STEPS;
->
-> @@ -454,10 +458,10 @@ static void hda_audio_set_amp(HDAAudioStream *st)
->      }
->      if (st->output) {
->          AUD_set_volume_out(st->voice.out, muted, left, right,
-> -                           false, 0, 0);
-> +                           true, left_db, right_db);
->      } else {
->          AUD_set_volume_in(st->voice.in, muted, left, right,
-> -                          false, 0, 0);
-> +                          true, left_db, right_db);
->      }
->  }
->
-> --
-> 2.18.1
->
+For now, supported virtual driver is hda-codec, and backend is pulseaudio, as
+they both support DB values.
+
+Without these patches, emulated Windows has a very short range of hearable
+sound, as range in the guest is much smaller than in Pulseaudio.
+
+Yaroslav Isakov (3):
+  Allow audio driver to pass DB value to underlying drivers
+  Pass raw DB values from hda-codec.c to audio driver
+  If raw DB values are known, use them in paaudio
+
+ audio/audio.c               | 15 +++++++++++++--
+ audio/audio.h               |  6 ++++--
+ audio/mixeng.h              |  6 ++++--
+ audio/paaudio.c             |  9 +++++++--
+ hw/audio/ac97.c             |  4 ++--
+ hw/audio/hda-codec-common.h |  2 +-
+ hw/audio/hda-codec.c        | 12 ++++++++++--
+ hw/audio/lm4549.c           |  2 +-
+ hw/audio/wm8750.c           | 18 ++++++++++++------
+ hw/display/xlnx_dp.c        |  3 ++-
+ hw/usb/dev-audio.c          |  6 ++++--
+ 11 files changed, 60 insertions(+), 23 deletions(-)
+
+-- 
+2.18.1
