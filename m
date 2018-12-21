@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gaNTJ-00057V-NV
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:16:22 -0500
+	(envelope-from <mst@redhat.com>) id 1gaNWS-0007sk-95
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:19:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gaNTI-0004QC-RM
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:16:21 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 21 Dec 2018 16:16:06 +0000
-Message-ID: <057e2117-d03a-8733-9926-83b99901d478@virtuozzo.com>
-References: <20181218075707.12006-1-anton.nefedov@virtuozzo.com>
-	<20181218075707.12006-10-anton.nefedov@virtuozzo.com>
-In-Reply-To: <20181218075707.12006-10-anton.nefedov@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <9ECDD52F3B83EB448339297526204A12@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <mst@redhat.com>) id 1gaNWN-00079q-Kc
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:19:36 -0500
+Date: Fri, 21 Dec 2018 11:19:18 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181221111904-mutt-send-email-mst@kernel.org>
+References: <154535246529.862554.6113740443866753456.stgit@bahia.lan>
+	<154535253055.862554.10471167343589360987.stgit@bahia.lan>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v11 09/10] qcow2: skip writing zero buffers
- to empty COW areas
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <154535253055.862554.10471167343589360987.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH 03/15] pci: allow cleanup/unregistration of
+ PCI root buses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,125 +24,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>
 
-MTguMTIuMjAxOCAxMDo1NywgQW50b24gTmVmZWRvdiB3cm90ZToNCj4gSWYgQ09XIGFyZWFzIG9m
-IHRoZSBuZXdseSBhbGxvY2F0ZWQgY2x1c3RlcnMgYXJlIHplcm9lcyBvbiB0aGUgYmFja2luZyBp
-bWFnZSwNCj4gZWZmaWNpZW50IGJkcnZfd3JpdGVfemVyb2VzKGZsYWdzPUJEUlZfUkVRX0FMTE9D
-QVRFKSBjYW4gYmUgdXNlZCBvbiB0aGUgd2hvbGUNCj4gY2x1c3RlciBpbnN0ZWFkIG9mIHdyaXRp
-bmcgZXhwbGljaXQgemVybyBidWZmZXJzIGxhdGVyIGluIHBlcmZvcm1fY293KCkuDQo+IA0KPiBp
-b3Rlc3QgMDYwOg0KPiB3cml0ZSB0byB0aGUgZGlzY2FyZGVkIGNsdXN0ZXIgZG9lcyBub3QgdHJp
-Z2dlciBDT1cgYW55bW9yZS4NCj4gVXNlIGEgYmFja2luZyBpbWFnZSBpbnN0ZWFkLg0KPiANCj4g
-U2lnbmVkLW9mZi1ieTogQW50b24gTmVmZWRvdiA8YW50b24ubmVmZWRvdkB2aXJ0dW96em8uY29t
-Pg0KPiAtLS0NCj4gICBxYXBpL2Jsb2NrLWNvcmUuanNvbiAgICAgICB8ICA0ICstDQo+ICAgYmxv
-Y2svcWNvdzIuaCAgICAgICAgICAgICAgfCAgNiArKysNCj4gICBibG9jay9xY293Mi1jbHVzdGVy
-LmMgICAgICB8ICAyICstDQo+ICAgYmxvY2svcWNvdzIuYyAgICAgICAgICAgICAgfCA4OSArKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLQ0KPiAgIGJsb2NrL3RyYWNlLWV2ZW50
-cyAgICAgICAgIHwgIDEgKw0KPiAgIHRlc3RzL3FlbXUtaW90ZXN0cy8wNjAgICAgIHwgIDcgKyst
-DQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzA2MC5vdXQgfCAgNSArKy0NCj4gICA3IGZpbGVzIGNo
-YW5nZWQsIDEwOCBpbnNlcnRpb25zKCspLCA2IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdp
-dCBhL3FhcGkvYmxvY2stY29yZS5qc29uIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4gaW5kZXgg
-NzYyMDAwZjMxZi4uMjA0NTI4YjNmNiAxMDA2NDQNCj4gLS0tIGEvcWFwaS9ibG9jay1jb3JlLmpz
-b24NCj4gKysrIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4gQEAgLTMwMDksNiArMzAwOSw4IEBA
-DQo+ICAgIw0KPiAgICMgQGNvcl93cml0ZTogYSB3cml0ZSBkdWUgdG8gY29weS1vbi1yZWFkIChz
-aW5jZSAyLjExKQ0KPiAgICMNCj4gKyMgQGNsdXN0ZXJfYWxsb2Nfc3BhY2U6IGFuIGFsbG9jYXRp
-b24gb2YgZmlsZSBzcGFjZSBmb3IgYSBjbHVzdGVyIChzaW5jZSA0LjApDQo+ICsjDQo+ICAgIyBT
-aW5jZTogMi45DQo+ICAgIyMNCj4gICB7ICdlbnVtJzogJ0Jsa2RlYnVnRXZlbnQnLCAncHJlZml4
-JzogJ0JMS0RCRycsDQo+IEBAIC0zMDI3LDcgKzMwMjksNyBAQA0KPiAgICAgICAgICAgICAgICdw
-d3JpdGV2X3Jtd190YWlsJywgJ3B3cml0ZXZfcm13X2FmdGVyX3RhaWwnLCAncHdyaXRldicsDQo+
-ICAgICAgICAgICAgICAgJ3B3cml0ZXZfemVybycsICdwd3JpdGV2X2RvbmUnLCAnZW1wdHlfaW1h
-Z2VfcHJlcGFyZScsDQo+ICAgICAgICAgICAgICAgJ2wxX3Nocmlua193cml0ZV90YWJsZScsICds
-MV9zaHJpbmtfZnJlZV9sMl9jbHVzdGVycycsDQo+IC0gICAgICAgICAgICAnY29yX3dyaXRlJ10g
-fQ0KPiArICAgICAgICAgICAgJ2Nvcl93cml0ZScsICdjbHVzdGVyX2FsbG9jX3NwYWNlJ10gfQ0K
-PiAgIA0KPiAgICMjDQo+ICAgIyBAQmxrZGVidWdJbmplY3RFcnJvck9wdGlvbnM6DQo+IGRpZmYg
-LS1naXQgYS9ibG9jay9xY293Mi5oIGIvYmxvY2svcWNvdzIuaA0KPiBpbmRleCBhOThkMjQ1MDBi
-Li4zMmQyYzA0YmZhIDEwMDY0NA0KPiAtLS0gYS9ibG9jay9xY293Mi5oDQo+ICsrKyBiL2Jsb2Nr
-L3Fjb3cyLmgNCj4gQEAgLTM4Niw2ICszODYsMTIgQEAgdHlwZWRlZiBzdHJ1Y3QgUUNvd0wyTWV0
-YQ0KPiAgICAgICAgKi8NCj4gICAgICAgUWNvdzJDT1dSZWdpb24gY293X2VuZDsNCj4gICANCj4g
-KyAgICAvKg0KPiArICAgICAqIEluZGljYXRlcyB0aGF0IENPVyByZWdpb25zIGFyZSBhbHJlYWR5
-IGhhbmRsZWQgYW5kIGRvIG5vdCByZXF1aXJlDQo+ICsgICAgICogYW55IG1vcmUgcHJvY2Vzc2lu
-Zy4NCj4gKyAgICAgKi8NCj4gKyAgICBib29sIHNraXBfY293Ow0KPiArDQo+ICAgICAgIC8qKg0K
-DQpobW0sIGFyb3VuZCBpdCwgYWxsIGNvbW1lbnRzIHN0YXJ0cyBmcm9tICcvKionLCBzbywgSSB0
-aGluaywgeW91cnMgc2hvdWxkIHRvby4NCih0aGlzIG5vdGUgZG9lc24ndCB0b3VjaCB5b3VyIG90
-aGVyIGNvbW1lbnRzKQ0KDQo+ICAgICAgICAqIFRoZSBJL08gdmVjdG9yIHdpdGggdGhlIGRhdGEg
-ZnJvbSB0aGUgYWN0dWFsIGd1ZXN0IHdyaXRlIHJlcXVlc3QuDQo+ICAgICAgICAqIElmIG5vbi1O
-VUxMLCB0aGlzIGlzIG1lYW50IHRvIGJlIG1lcmdlZCB0b2dldGhlciB3aXRoIHRoZSBkYXRhDQo+
-IGRpZmYgLS1naXQgYS9ibG9jay9xY293Mi1jbHVzdGVyLmMgYi9ibG9jay9xY293Mi1jbHVzdGVy
-LmMNCj4gaW5kZXggZTI3Mzc0MjlmNS4uMjNlMDcwMjAyNyAxMDA2NDQNCj4gLS0tIGEvYmxvY2sv
-cWNvdzItY2x1c3Rlci5jDQo+ICsrKyBiL2Jsb2NrL3Fjb3cyLWNsdXN0ZXIuYw0KPiBAQCAtODA2
-LDcgKzgwNiw3IEBAIHN0YXRpYyBpbnQgcGVyZm9ybV9jb3coQmxvY2tEcml2ZXJTdGF0ZSAqYnMs
-IFFDb3dMMk1ldGEgKm0pDQo+ICAgICAgIGFzc2VydChzdGFydC0+b2Zmc2V0ICsgc3RhcnQtPm5i
-X2J5dGVzIDw9IGVuZC0+b2Zmc2V0KTsNCj4gICAgICAgYXNzZXJ0KCFtLT5kYXRhX3Fpb3YgfHwg
-bS0+ZGF0YV9xaW92LT5zaXplID09IGRhdGFfYnl0ZXMpOw0KPiAgIA0KPiAtICAgIGlmIChzdGFy
-dC0+bmJfYnl0ZXMgPT0gMCAmJiBlbmQtPm5iX2J5dGVzID09IDApIHsNCj4gKyAgICBpZiAoKHN0
-YXJ0LT5uYl9ieXRlcyA9PSAwICYmIGVuZC0+bmJfYnl0ZXMgPT0gMCkgfHwgbS0+c2tpcF9jb3cp
-IHsNCj4gICAgICAgICAgIHJldHVybiAwOw0KPiAgICAgICB9DQo+ICAgDQo+IGRpZmYgLS1naXQg
-YS9ibG9jay9xY293Mi5jIGIvYmxvY2svcWNvdzIuYw0KPiBpbmRleCA0ODk3YWJhZTVlLi4xNjFi
-OTM1OTYyIDEwMDY0NA0KPiAtLS0gYS9ibG9jay9xY293Mi5jDQo+ICsrKyBiL2Jsb2NrL3Fjb3cy
-LmMNCj4gQEAgLTIwMjEsNiArMjAyMSwxMSBAQCBzdGF0aWMgYm9vbCBtZXJnZV9jb3codWludDY0
-X3Qgb2Zmc2V0LCB1bnNpZ25lZCBieXRlcywNCj4gICAgICAgICAgICAgICBjb250aW51ZTsNCj4g
-ICAgICAgICAgIH0NCj4gICANCj4gKyAgICAgICAgLyogSWYgQ09XIHJlZ2lvbnMgYXJlIGhhbmRs
-ZWQgYWxyZWFkeSwgc2tpcCB0aGlzIHRvbyAqLw0KPiArICAgICAgICBpZiAobS0+c2tpcF9jb3cp
-IHsNCj4gKyAgICAgICAgICAgIGNvbnRpbnVlOw0KPiArICAgICAgICB9DQo+ICsNCj4gICAgICAg
-ICAgIC8qIFRoZSBkYXRhIChtaWRkbGUpIHJlZ2lvbiBtdXN0IGJlIGltbWVkaWF0ZWx5IGFmdGVy
-IHRoZQ0KPiAgICAgICAgICAgICogc3RhcnQgcmVnaW9uICovDQo+ICAgICAgICAgICBpZiAobDJt
-ZXRhX2Nvd19zdGFydChtKSArIG0tPmNvd19zdGFydC5uYl9ieXRlcyAhPSBvZmZzZXQpIHsNCj4g
-QEAgLTIwNDYsNiArMjA1MSw3NyBAQCBzdGF0aWMgYm9vbCBtZXJnZV9jb3codWludDY0X3Qgb2Zm
-c2V0LCB1bnNpZ25lZCBieXRlcywNCj4gICAgICAgcmV0dXJuIGZhbHNlOw0KPiAgIH0NCj4gICAN
-Cj4gK3N0YXRpYyBib29sIGlzX3VuYWxsb2NhdGVkKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBpbnQ2
-NF90IG9mZnNldCwgaW50NjRfdCBieXRlcykNCj4gK3sNCj4gKyAgICBpbnQ2NF90IG5yOw0KPiAr
-ICAgIHJldHVybiAhYnl0ZXMgfHwNCj4gKyAgICAgICAgKCFiZHJ2X2lzX2FsbG9jYXRlZF9hYm92
-ZShicywgTlVMTCwgb2Zmc2V0LCBieXRlcywgJm5yKSAmJiBuciA9PSBieXRlcyk7DQo+ICt9DQo+
-ICsNCj4gK3N0YXRpYyBib29sIGlzX3plcm9fY293KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBRQ293
-TDJNZXRhICptKQ0KPiArew0KPiArICAgIC8qDQo+ICsgICAgICogVGhpcyBjaGVjayBpcyBkZXNp
-Z25lZCBmb3Igb3B0aW1pemF0aW9uIHNob3J0Y3V0IHNvIGl0IG11c3QgYmUNCj4gKyAgICAgKiBl
-ZmZpY2llbnQuDQo+ICsgICAgICogSW5zdGVhZCBvZiBpc196ZXJvKCksIHVzZSBpc191bmFsbG9j
-YXRlZCgpIGFzIGl0IGlzIGZhc3RlciAoYnV0IG5vdA0KPiArICAgICAqIGFzIGFjY3VyYXRlIGFu
-ZCBjYW4gcmVzdWx0IGluIGZhbHNlIG5lZ2F0aXZlcykuDQo+ICsgICAgICovDQo+ICsgICAgcmV0
-dXJuIGlzX3VuYWxsb2NhdGVkKGJzLCBtLT5vZmZzZXQgKyBtLT5jb3dfc3RhcnQub2Zmc2V0LA0K
-DQpoZXJlIHlvdSBhZGQgbS0+Y293X3N0YXJ0Lm9mZnNldCAuLi5bMV0NCg0KPiArICAgICAgICAg
-ICAgICAgICAgICAgICAgICBtLT5jb3dfc3RhcnQubmJfYnl0ZXMpICYmDQo+ICsgICAgICAgICAg
-IGlzX3VuYWxsb2NhdGVkKGJzLCBtLT5vZmZzZXQgKyBtLT5jb3dfZW5kLm9mZnNldCwNCj4gKyAg
-ICAgICAgICAgICAgICAgICAgICAgICAgbS0+Y293X2VuZC5uYl9ieXRlcyk7DQo+ICt9DQo+ICsN
-Cj4gK3N0YXRpYyBpbnQgaGFuZGxlX2FsbG9jX3NwYWNlKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBR
-Q293TDJNZXRhICpsMm1ldGEpDQo+ICt7DQo+ICsgICAgQkRSVlFjb3cyU3RhdGUgKnMgPSBicy0+
-b3BhcXVlOw0KPiArICAgIFFDb3dMMk1ldGEgKm07DQo+ICsNCj4gKyAgICBpZiAoIShicy0+Zmls
-ZS0+YnMtPnN1cHBvcnRlZF96ZXJvX2ZsYWdzICYgQkRSVl9SRVFfQUxMT0NBVEUpKSB7DQo+ICsg
-ICAgICAgIHJldHVybiAwOw0KPiArICAgIH0NCj4gKw0KPiArICAgIGlmIChicy0+ZW5jcnlwdGVk
-KSB7DQo+ICsgICAgICAgIHJldHVybiAwOw0KPiArICAgIH0NCj4gKw0KPiArICAgIGZvciAobSA9
-IGwybWV0YTsgbSAhPSBOVUxMOyBtID0gbS0+bmV4dCkgew0KPiArICAgICAgICBpbnQgcmV0Ow0K
-PiArDQo+ICsgICAgICAgIGlmICghbS0+Y293X3N0YXJ0Lm5iX2J5dGVzICYmICFtLT5jb3dfZW5k
-Lm5iX2J5dGVzKSB7DQo+ICsgICAgICAgICAgICBjb250aW51ZTsNCj4gKyAgICAgICAgfQ0KPiAr
-DQo+ICsgICAgICAgIGlmICghaXNfemVyb19jb3coYnMsIG0pKSB7DQo+ICsgICAgICAgICAgICBj
-b250aW51ZTsNCj4gKyAgICAgICAgfQ0KPiArDQo+ICsgICAgICAgIC8qDQo+ICsgICAgICAgICAq
-IENvbnZlbnRpb25hbCBwbGFjZSBmb3IgcWNvdzJfcHJlX3dyaXRlX292ZXJsYXBfY2hlY2soKSBi
-dXQgaW4gdGhpcw0KPiArICAgICAgICAgKiBjYXNlIGl0IGlzIGFscmVhZHkgZG9uZSBmb3IgdGhl
-c2UgY2x1c3RlcnMNCj4gKyAgICAgICAgICovDQoNCnRvIGJlIGhvbmVzdCwgY2hlY2sgaXMgZG9u
-ZSBmb3Igb3JpZ2luYWwgcmVxdWVzdCBub3QsIG5vdCBmb3IgY293X3JlZ2lvbnMsIGFuZCwNCm9u
-IHRoZSBvdGhlciBoYW5kLA0KZG9fcGVyZm9ybV9jb3dfd3JpdGUgX2RvZXNfIHRoZSBjaGVjay4N
-Cg0KU28sIEkgc2VlIHR3byBjb25zaXN0ZW50IHdheXM6DQoxLiB5b3UganVzdCBhZGQgY2hlY2sg
-aGVyZSwgbGlrZSBpbiBkb19wZXJmb3JtX2Nvd193cml0ZQ0KMi4gaW1wcm92ZSBjaGVjayBpbiBx
-Y293Ml9jb19wd3JpdGV2IHRvIGNvdmVyIHRoZSB3aG9sZSBhcmVhLCBhbmQgZHJvcCBjaGVja3Mg
-ZnJvbQ0KICAgIHBlcmZvcm1fY293Lg0KDQpJIHByZWZlciAxLCBhcyBpdCBtb3JlIGhlbHBmdWwg
-aW4gY2FzZSBvZiBidWdzIGluIHRoZSBjb2RlIChqdXN0IGNoZWNrIGV4YWN0bHkgd2hhdA0KeW91
-IGFyZSBnb2luZyB0byB3cml0ZSBpbiB0aGUgbmV4dCB3cml0ZSkuDQoNCj4gKw0KPiArICAgICAg
-ICBCTEtEQkdfRVZFTlQoYnMtPmZpbGUsIEJMS0RCR19DTFVTVEVSX0FMTE9DX1NQQUNFKTsNCj4g
-KyAgICAgICAgLyoNCj4gKyAgICAgICAgICogaW5zdGVhZCBvZiB3cml0aW5nIHplcm8gQ09XIGJ1
-ZmZlcnMsDQo+ICsgICAgICAgICAqIGVmZmljaWVudGx5IHplcm8gb3V0IHRoZSB3aG9sZSBjbHVz
-dGVycw0KPiArICAgICAgICAgKi8NCj4gKyAgICAgICAgcmV0ID0gYmRydl9jb19wd3JpdGVfemVy
-b2VzKGJzLT5maWxlLCBtLT5hbGxvY19vZmZzZXQsDQoNClsxXS4uLiBhbmQgaGVyZSAtIG5vdC4N
-CkFuZCBwZXJmb3JtX2NvdyB1c2VzIHN0YXJ0IHRvby4NCmhtbS4uDQoNCk9uIHRoZSBvdGhlciBo
-YW5kLCBoZXJlIHdlIGp1c3Qgd2FudCB0byB6ZXJvIGFsbCBhbGxvY2F0ZWQgY2x1c3RlcnMsIGl0
-IGlzIG5vdCByZWxhdGVkDQp0byBjb3cgcmVnaW9ucy4gU28sIG9rLg0KDQo+ICsgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBtLT5uYl9jbHVzdGVycyAqIHMtPmNsdXN0ZXJfc2l6
-ZSwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEJEUlZfUkVRX0FMTE9D
-QVRFKTsNCj4gKyAgICAgICAgaWYgKHJldCA8IDApIHsNCj4gKyAgICAgICAgICAgIGlmIChyZXQg
-IT0gLUVOT1RTVVAgJiYgcmV0ICE9IC1FQUdBSU4pIHsNCj4gKyAgICAgICAgICAgICAgICByZXR1
-cm4gcmV0Ow0KPiArICAgICAgICAgICAgfQ0KPiArICAgICAgICAgICAgY29udGludWU7DQo+ICsg
-ICAgICAgIH0NCj4gKw0KPiArICAgICAgICB0cmFjZV9xY293Ml9za2lwX2NvdyhxZW11X2Nvcm91
-dGluZV9zZWxmKCksIG0tPm9mZnNldCwgbS0+bmJfY2x1c3RlcnMpOw0KPiArICAgICAgICBtLT5z
-a2lwX2NvdyA9IHRydWU7DQo+ICsgICAgfQ0KPiArICAgIHJldHVybiAwOw0KPiArfQ0KPiArDQoN
-ClsuLi5dDQoNCg0Kd2l0aCBwcmUtd3JpdGUtY2hlY2sgYWRkZWQ6DQpSZXZpZXdlZC1ieTogVmxh
-ZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KDQoN
-Cg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On Fri, Dec 21, 2018 at 01:35:30AM +0100, Greg Kurz wrote:
+> From: Michael Roth <mdroth@linux.vnet.ibm.com>
+> 
+> This adds cleanup counterparts to pci_register_root_bus(),
+> pci_root_bus_new(), and pci_bus_irqs().
+> 
+> These cleanup routines are needed in the case of hotpluggable
+> PCIHostBridge implementations. Currently we can rely on the
+> object_unparent()'ing of the PCIHostState recursively unparenting
+> and cleaning up it's child buses, but we need explicit calls
+> to also:
+> 
+>   1) remove the PCIHostState from pci_host_bridges global list.
+>      otherwise, we risk accessing freed memory when we access
+>      the list later
+>   2) clean up memory allocated in pci_bus_irqs()
+> 
+> Both are handled outside the context of any particular bus or
+> host bridge's init/realize functions, making it difficult to
+> avoid the need for explicit cleanup functions without remodeling
+> how PCIHostBridges are created. So keep it simple and just add
+> them for now.
+> 
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+
+> ---
+>  hw/pci/pci.c         |   33 +++++++++++++++++++++++++++++++++
+>  include/hw/pci/pci.h |    3 +++
+>  2 files changed, 36 insertions(+)
+> 
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index efb5ce196ffb..16354f91206c 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -333,6 +333,13 @@ static void pci_host_bus_register(DeviceState *host)
+>      QLIST_INSERT_HEAD(&pci_host_bridges, host_bridge, next);
+>  }
+>  
+> +static void pci_host_bus_unregister(DeviceState *host)
+> +{
+> +    PCIHostState *host_bridge = PCI_HOST_BRIDGE(host);
+> +
+> +    QLIST_REMOVE(host_bridge, next);
+> +}
+> +
+>  PCIBus *pci_device_root_bus(const PCIDevice *d)
+>  {
+>      PCIBus *bus = pci_get_bus(d);
+> @@ -379,6 +386,11 @@ static void pci_root_bus_init(PCIBus *bus, DeviceState *parent,
+>      pci_host_bus_register(parent);
+>  }
+>  
+> +static void pci_bus_uninit(PCIBus *bus)
+> +{
+> +    pci_host_bus_unregister(BUS(bus)->parent);
+> +}
+> +
+>  bool pci_bus_is_express(PCIBus *bus)
+>  {
+>      return object_dynamic_cast(OBJECT(bus), TYPE_PCIE_BUS);
+> @@ -413,6 +425,12 @@ PCIBus *pci_root_bus_new(DeviceState *parent, const char *name,
+>      return bus;
+>  }
+>  
+> +void pci_root_bus_cleanup(PCIBus *bus)
+> +{
+> +    pci_bus_uninit(bus);
+> +    object_unparent(OBJECT(bus));
+> +}
+> +
+>  void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
+>                    void *irq_opaque, int nirq)
+>  {
+> @@ -423,6 +441,15 @@ void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
+>      bus->irq_count = g_malloc0(nirq * sizeof(bus->irq_count[0]));
+>  }
+>  
+> +void pci_bus_irqs_cleanup(PCIBus *bus)
+> +{
+> +    bus->set_irq = NULL;
+> +    bus->map_irq = NULL;
+> +    bus->irq_opaque = NULL;
+> +    bus->nirq = 0;
+> +    g_free(bus->irq_count);
+> +}
+> +
+>  PCIBus *pci_register_root_bus(DeviceState *parent, const char *name,
+>                                pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
+>                                void *irq_opaque,
+> @@ -439,6 +466,12 @@ PCIBus *pci_register_root_bus(DeviceState *parent, const char *name,
+>      return bus;
+>  }
+>  
+> +void pci_unregister_root_bus(PCIBus *bus)
+> +{
+> +    pci_bus_irqs_cleanup(bus);
+> +    pci_root_bus_cleanup(bus);
+> +}
+> +
+>  int pci_bus_num(PCIBus *s)
+>  {
+>      return PCI_BUS_GET_CLASS(s)->bus_num(s);
+> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> index e6514bba23aa..8998e3be3390 100644
+> --- a/include/hw/pci/pci.h
+> +++ b/include/hw/pci/pci.h
+> @@ -405,8 +405,10 @@ PCIBus *pci_root_bus_new(DeviceState *parent, const char *name,
+>                           MemoryRegion *address_space_mem,
+>                           MemoryRegion *address_space_io,
+>                           uint8_t devfn_min, const char *typename);
+> +void pci_root_bus_cleanup(PCIBus *bus);
+>  void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
+>                    void *irq_opaque, int nirq);
+> +void pci_bus_irqs_cleanup(PCIBus *bus);
+>  int pci_bus_get_irq_level(PCIBus *bus, int irq_num);
+>  /* 0 <= pin <= 3 0 = INTA, 1 = INTB, 2 = INTC, 3 = INTD */
+>  int pci_swizzle_map_irq_fn(PCIDevice *pci_dev, int pin);
+> @@ -417,6 +419,7 @@ PCIBus *pci_register_root_bus(DeviceState *parent, const char *name,
+>                                MemoryRegion *address_space_io,
+>                                uint8_t devfn_min, int nirq,
+>                                const char *typename);
+> +void pci_unregister_root_bus(PCIBus *bus);
+>  void pci_bus_set_route_irq_fn(PCIBus *, pci_route_irq_fn);
+>  PCIINTxRoute pci_device_route_intx_to_irq(PCIDevice *dev, int pin);
+>  bool pci_intx_route_changed(PCIINTxRoute *old, PCIINTxRoute *new);
