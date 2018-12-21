@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gaHDi-0008Mo-9y
+	(envelope-from <jsnow@redhat.com>) id 1gaHDi-0008NR-P5
 	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 04:35:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gaHDh-00074N-Gb
+	(envelope-from <jsnow@redhat.com>) id 1gaHDh-00074w-Q5
 	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 04:35:50 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 21 Dec 2018 04:35:20 -0500
-Message-Id: <20181221093529.23855-3-jsnow@redhat.com>
+Date: Fri, 21 Dec 2018 04:35:25 -0500
+Message-Id: <20181221093529.23855-8-jsnow@redhat.com>
 In-Reply-To: <20181221093529.23855-1-jsnow@redhat.com>
 References: <20181221093529.23855-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 02/11] block/dirty-bitmap: remove assertion
- from restore
+Subject: [Qemu-devel] [PATCH v6 07/11] iotests: add qmp recursive sorting
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,32 +23,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: eblake@redhat.com, Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, vsementsov@virtuozzo.com, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-When making a backup of a dirty bitmap (for transactions), we want to
-restore that backup whether or not the bitmap is enabled.
+Python before 3.6 does not sort dictionaries (including kwargs).
+Therefore, printing QMP objects involves sorting the keys to have
+a predictable ordering in the iotests output. This means that
+iotests output will sometimes show arguments in an order not
+specified by the test author.
 
-It is perfectly valid to write into bitmaps that are disabled. It is
-only illegitimate for the guest to have done so.
+Presently, we accomplish this by using json.dumps' sort_keys argument,
+where we only serialize the arguments dictionary, but not the command.
 
-Remove this assertion.
+However, if we want to pretty-print QMP objects being sent to the
+QEMU process, we need to build the entire command before logging it.
+Ordinarily, this would then involve "arguments" being sorted above
+"execute", which would necessitate a rather ugly and harder-to-read
+change to many iotests outputs.
 
+To facilitate pretty-printing AND maintaining predictable output AND
+having "arguments" sort after "execute", add a custom sort function
+that takes a dictionary and recursively builds an OrderedDict that
+maintains the specific key order we wish to see in iotests output.
+
+The qmp_log function uses this to build a QMP object that keeps
+"execute" above "arguments", but sorts all keys and keys in any
+subdicts in "arguments" lexicographically to maintain consistent
+iotests output, with no incompatible changes to any current test.
+
+Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/dirty-bitmap.c | 1 -
- 1 file changed, 1 deletion(-)
+ tests/qemu-iotests/iotests.py | 24 ++++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 89fd1d7f8b..6b688394e4 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -625,7 +625,6 @@ void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
- void bdrv_restore_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap *backup)
- {
-     HBitmap *tmp = bitmap->bitmap;
--    assert(bdrv_dirty_bitmap_enabled(bitmap));
-     assert(!bdrv_dirty_bitmap_readonly(bitmap));
-     bitmap->bitmap = backup;
-     hbitmap_free(tmp);
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 9595429fea..565eebb1ab 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -30,6 +30,7 @@ import signal
+ import logging
+ import atexit
+ import io
++from collections import OrderedDict
+ 
+ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'scripts'))
+ import qtest
+@@ -75,6 +76,16 @@ def qemu_img(*args):
+         sys.stderr.write('qemu-img received signal %i: %s\n' % (-exitcode, ' '.join(qemu_img_args + list(args))))
+     return exitcode
+ 
++def ordered_kwargs(kwargs):
++    # kwargs prior to 3.6 are not ordered, so:
++    od = OrderedDict()
++    for k, v in sorted(kwargs.items()):
++        if isinstance(v, dict):
++            od[k] = ordered_kwargs(v)
++        else:
++            od[k] = v
++    return od
++
+ def qemu_img_create(*args):
+     args = list(args)
+ 
+@@ -257,8 +268,10 @@ def filter_img_info(output, filename):
+ def log(msg, filters=[]):
+     for flt in filters:
+         msg = flt(msg)
+-    if type(msg) is dict or type(msg) is list:
+-        print(json.dumps(msg, sort_keys=True))
++    if isinstance(msg, dict) or isinstance(msg, list):
++        # Don't sort if it's already sorted
++        do_sort = not isinstance(msg, OrderedDict)
++        print(json.dumps(msg, sort_keys=do_sort))
+     else:
+         print(msg)
+ 
+@@ -448,8 +461,11 @@ class VM(qtest.QEMUQtestMachine):
+         return result
+ 
+     def qmp_log(self, cmd, filters=[filter_testfiles], **kwargs):
+-        logmsg = '{"execute": "%s", "arguments": %s}' % \
+-            (cmd, json.dumps(kwargs, sort_keys=True))
++        full_cmd = OrderedDict((
++            ("execute", cmd),
++            ("arguments", ordered_kwargs(kwargs))
++        ))
++        logmsg = json.dumps(full_cmd)
+         log(logmsg, filters)
+         result = self.qmp(cmd, **kwargs)
+         log(json.dumps(result, sort_keys=True), filters)
 -- 
 2.17.2
