@@ -1,18 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gaEK7-0005uT-9v
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 01:30:15 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gaEN3-0006jh-1N
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 01:33:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gaEK3-0008Ns-AY
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 01:30:15 -0500
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1gaEMx-0002Er-Bj
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 01:33:16 -0500
+Received: from mail-wr1-f53.google.com ([209.85.221.53]:35110)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gaEMx-0002EO-4N
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 01:33:11 -0500
+Received: by mail-wr1-f53.google.com with SMTP id 96so4034528wrb.2
+	for <qemu-devel@nongnu.org>; Thu, 20 Dec 2018 22:33:11 -0800 (PST)
+References: <130d7419.4ba1.167ce7b9ed6.Coremail.13824125580@163.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 21 Dec 2018 07:30:02 +0100
-Message-Id: <20181221063002.7570-1-pbonzini@redhat.com>
+Message-ID: <38696e96-5047-b076-40ab-e650bb8e1f02@redhat.com>
+Date: Fri, 21 Dec 2018 07:33:08 +0100
 MIME-Version: 1.0
+In-Reply-To: <130d7419.4ba1.167ce7b9ed6.Coremail.13824125580@163.com>
+Content-Type: text/plain; charset=gbk
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] i386: remove the 'INTEL_PT' CPUID bit from
- named CPU models
+Subject: Re: [Qemu-devel] is the "tcg translation" necessary when the "kvm
+ acceleration" emulation mode enabled?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,54 +30,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: robert.hu@intel.com, Robert Hoo <robert.hu@linux.intel.com>, qemu-stable@nongnu.org
+To: tugouxp <13824125580@163.com>, qemu-devel@nongnu.org
 
-From: Robert Hoo <robert.hu@linux.intel.com>
+> scenario 1:  did the tcg translation need to be done in this case now
+> that the host and target arch is the same?  or  let the kvm emulation
+> the system wit the original instructions with out the TCG
+> translation
 
-Processor tracing is not yet implemented for KVM and it will be an
-opt in feature requiring a special module parameter.
-Disable it, because it is wrong to enable it by default and
-it is impossible that no one has ever used it.
+TCG is turned off when KVM is enabled.  The code for TCG does not run at
+all.
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- target/i386/cpu.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+> scenario 2:   the pre condition is same with scenario 1 except the kvm
+> is disable£¿ so ,in this scenario, the TCG must be used in order to
+> the pure software emulation without acceleration?
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index dae46f0319..9c54c41e7a 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2493,8 +2493,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLWB |
-             CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
-             CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
--            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT |
--            CPUID_7_0_EBX_INTEL_PT,
-+            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
-         .features[FEAT_7_0_ECX] =
-             CPUID_7_0_ECX_PKU | CPUID_7_0_ECX_OSPKE |
-             CPUID_7_0_ECX_AVX512VNNI,
-@@ -2546,7 +2545,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
-             CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
-             CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
--            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_INTEL_PT,
-+            CPUID_7_0_EBX_SMAP,
-         .features[FEAT_7_0_ECX] =
-             CPUID_7_0_ECX_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
-             CPUID_7_0_ECX_OSPKE | CPUID_7_0_ECX_VBMI2 | CPUID_7_0_ECX_GFNI |
-@@ -2604,8 +2603,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLWB |
-             CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
-             CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
--            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT |
--            CPUID_7_0_EBX_INTEL_PT,
-+            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
-         .features[FEAT_7_0_ECX] =
-             CPUID_7_0_ECX_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
-             CPUID_7_0_ECX_OSPKE | CPUID_7_0_ECX_VBMI2 | CPUID_7_0_ECX_GFNI |
--- 
-2.20.1
+Correct.  In this case KVM is turned off.  The capabilities of the
+emulated CPU will _not_ be what you have in your host processor, but
+rather what QEMU implements.  For example, you will get no AVX.
+
+> scenario 3:  in this scenario, the host and target arch is not the
+> same, so how to use the "kvm mechainsim" in this case?  so the
+> instructions feed to the kvm module to run must be translated By TCG
+> module? right?
+
+KVM cannot be used in this case; KVM is only enabled when the host and
+the target are the same.
+
+Paolo
+
+On 21/12/18 02:57, tugouxp wrote:
+> hi folks:
+>     i am very puzzled about the relationship between "target cpu instruction"  translated to host instructions through TCG module and the "kvm" acceleration" mode.
+> 
+> 
+> think about three scenario of emulation:
+> scenario 1, 2 and 3 as follows:
+> 
+> 1. target cpu: x86_64,
+>     host cpu:   x84_64,
+>     emulation OS:   ubuntu_desktop_amd64.iso
+>     kvm:  enabled.
+> 
+> 
+> 2. target cpu: x86_64,
+> 
+>     host cpu:   x84_64,
+> 
+>     emulation OS:   ubuntu_desktop_amd64.iso
+>     kvm:  disabled.
+> 
+> 
+> 3. target cpu  x86_64,
+>     host cpu:  armv8
+>     emulationOS: ubuntu_desktop_amd64.iso
+>     kvm:  enabled
