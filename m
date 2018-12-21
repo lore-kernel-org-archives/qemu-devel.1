@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gaLZy-0007Rk-OR
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:15:07 -0500
+	(envelope-from <vkuznets@redhat.com>) id 1gaLb4-0008Lk-IJ
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:16:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gaLZu-0007jH-Ii
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:15:06 -0500
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:35800)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gaLZu-0007g8-6u
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:15:02 -0500
-Received: by mail-wm1-x329.google.com with SMTP id c126so5857344wmh.0
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 06:15:01 -0800 (PST)
-References: <76d14474.f850.167cb46b4d9.Coremail.13824125580@163.com>
-	<87d0pw9y7m.fsf@linaro.org>
-	<19e6128e.27e9.167ce041690.Coremail.13824125580@163.com>
-	<874lb79ru9.fsf@linaro.org>
-	<744a1829.ff89.167d091062b.Coremail.13824125580@163.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <744a1829.ff89.167d091062b.Coremail.13824125580@163.com>
-Date: Fri, 21 Dec 2018 14:14:58 +0000
-Message-ID: <8736qr9db1.fsf@linaro.org>
+	(envelope-from <vkuznets@redhat.com>) id 1gaLb0-00007N-Bx
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:16:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60714)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1gaLb0-00006y-0D
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:16:10 -0500
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+Date: Fri, 21 Dec 2018 15:16:04 +0100
+Message-Id: <20181221141604.16935-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] did the qemu can emulate the whole system with the
- processor that without support the "virtulization and kvm"?
+Subject: [Qemu-devel] [PATCH] i386/kvm: add a comment explaining why
+ .feat_names are commented out for Hyper-V feature bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,66 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: tugouxp <13824125580@163.com>
-Cc: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcelo Tosatti <mtosatti@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>
 
+Hyper-V .feat_names are, unlike hardware features, commented out and it i=
+s
+not obvious why we do that. Document the current status quo.
 
-tugouxp <13824125580@163.com> writes:
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ target/i386/cpu.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-> thank you.
->
-> i just want to confirm one thing,  that is whether the qemu can emulate a=
- whole operation system just by analysis instructions by instructions manua=
-lly  without the support of KVM.
-> so from the answer you give to me, it is feasible, right?
-
-Yes - if you run qemu-system-$(ARCH) you are emulating a full machine
-with hardware attached. It can either use TCG or a HW based acceleration
-like KVM. HW based acceleration is only available on the same machine
-type.
-
-There is a third type - qemu-$(ARCH) which is often called linux-user
-mode. Here the translation engine only translates instruction from guest
-to the host and then maps system calls to the host system. This is isn't
-emulating a whole system but allows you to run binaries from one
-architecture on another.
-
->
->
->
-> thanks very much!
->
->
->
->
->
->
->
->
->
-> At 2018-12-21 17:01:02, "Alex Benn=C3=A9e" <alex.bennee@linaro.org> wrote:
->>
->>tugouxp <13824125580@163.com> writes:
->>
->>> Hi alex:
->>>     now my host machine did not have the "/dev/kvm" nodes and no chance=
- to make it exists.
->>> so i want to know whether the "/dev/kvm" is  mandatory  for qemu to emu=
-late the whole system.
->>> so i can make the emulation without the support of kvm mechanism.
->>
->>QEMU runs in two modes - full system emulation with TCG doesn't require
->>KVM although it is relatively slow. On systems where there guest
->>architecture is the same as the host architecture you can run with KMV
->>(or HAX/WHPX/HVF) accelerators at near native speeds.
->>
->>The reasons for not having a /dev/kvm can vary but you haven't said what
->>your host architecture is and what OS you are running so it's hard to
->>offer advice here.
->>
->>--
->>Alex Benn=C3=A9e
-
-
---
-Alex Benn=C3=A9e
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 677a3bd5fb..18a486c5a0 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -929,6 +929,13 @@ static FeatureWordInfo feature_word_info[FEATURE_WOR=
+DS] =3D {
+          */
+         .no_autoenable_flags =3D ~0U,
+     },
++    /*
++     * .feat_names are commented out for Hyper-V enlightenments because =
+we
++     * don't want to have two different ways for enabling them on QEMU c=
+ommand
++     * line. Some features (e.g. "hyperv_time", "hyperv_vapic", ...) req=
+uire
++     * enabling several feature bits simultaneously, exposing these bits
++     * individually may just confuse guests.
++     */
+     [FEAT_HYPERV_EAX] =3D {
+         .type =3D CPUID_FEATURE_WORD,
+         .feat_names =3D {
+--=20
+2.19.2
