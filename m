@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37355)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gaGg8-0001jv-44
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 04:01:08 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gaGjM-0002q7-K4
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 04:04:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gaGg4-0005pT-Up
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 04:01:08 -0500
-Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:51573)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gaGg4-0005oB-Dw
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 04:01:04 -0500
-Received: by mail-wm1-x32a.google.com with SMTP id b11so4547209wmj.1
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 01:01:04 -0800 (PST)
-References: <76d14474.f850.167cb46b4d9.Coremail.13824125580@163.com>
-	<87d0pw9y7m.fsf@linaro.org>
-	<19e6128e.27e9.167ce041690.Coremail.13824125580@163.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <19e6128e.27e9.167ce041690.Coremail.13824125580@163.com>
-Date: Fri, 21 Dec 2018 09:01:02 +0000
-Message-ID: <874lb79ru9.fsf@linaro.org>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gaGjG-0000PO-8K
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 04:04:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34358)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1gaGjA-0000LY-RQ
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 04:04:18 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A2474C05D274
+	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 09:04:14 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri, 21 Dec 2018 13:03:42 +0400
+Message-Id: <20181221090410.27250-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] did the qemu can emulate the whole system with the
- processor that without support the "virtulization and kvm"?
+Subject: [Qemu-devel] [PATCH v7 00/28] Generalize machine compatibility
+ properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,27 +32,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: tugouxp <13824125580@163.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: imammedo@redhat.com, ehabkost@redhat.com
 
+Hi,
 
-tugouxp <13824125580@163.com> writes:
+During "[PATCH v2 05/10] qom/globals: generalize
+object_property_set_globals()" review, Eduardo suggested to rework the
+GlobalProperty handling, so that -global is limited to QDev only and
+we avoid mixing the machine compats and the user-provided -global
+properties (instead of generalizing -global to various object kinds,
+like I proposed in v2).
 
-> Hi alex:
->     now my host machine did not have the "/dev/kvm" nodes and no chance t=
-o make it exists.
-> so i want to know whether the "/dev/kvm" is  mandatory  for qemu to emula=
-te the whole system.
-> so i can make the emulation without the support of kvm mechanism.
+"qdev: do not mix compat props with global props" patch decouples a
+bit user-provided -global from machine compat properties. This allows
+to get rid of "user_provided" and "errp" fields in following patches.
 
-QEMU runs in two modes - full system emulation with TCG doesn't require
-KVM although it is relatively slow. On systems where there guest
-architecture is the same as the host architecture you can run with KMV
-(or HAX/WHPX/HVF) accelerators at near native speeds.
+A new compat property "x-use-canonical-path-for-ramblock-id" is added
+to hostmem for legacy canonical path names, set to true for -file and
+-memfd with qemu < 4.0.
 
-The reasons for not having a /dev/kvm can vary but you haven't said what
-your host architecture is and what OS you are running so it's hard to
-offer advice here.
+(this series was initially titled "[PATCH v2 00/10] hostmem: use
+object "id" for memory region name with >=3D 3.1", but its focus is more
+in refactoring the global and compatilibity properties handling now)
 
---
-Alex Benn=C3=A9e
+v7:
+- rebased (s390 conflicts)
+- rename self/backend in last patch
+- add some r-b tags
+
+v6:
+- split "hw: apply machine compat properties without touching globals"
+- replace PC_COMPAT_* and HW_COMPAT_* defines with static arrays
+- add ARMCPUInfo *info in ARMCPUClass for "arm: replace
+  instance_post_init()" patch
+- rebased, commit message updates, add some r-b tags
+
+v5:
+- replace the SET_COMPAT macros, use normal function instead
+  (suggested by Eduardo)
+- replace the TYPE_COMPAT_PROPS interface approach for explicit
+  object_apply_compat_props(), solving post-init ordering issues.
+- get back to coupling compat properties with machine, in qdev
+  (although there is still some discussion how to improve this, it
+   can be changed later)
+- mark the "arm: replace instance_post_init()" as RFC, since it is not
+  longer required for this series
+- change machines version from 3.2 to 4.0
+- add some r-b tags
+
+v4:
+- fix accel/machine compat props apply order inversion
+- split "qdev: do not mix compat props with global props": replace
+  using current_machine by new compat_props global, introduce
+  SET_COMPAT() macro, use GPtrArray.
+- add a comment about "qdev-props: call object_apply_global_props()"
+  error reporting
+- add "arm: replace instance_post_init()", to solve the post-init
+  ordering issue
+- add "hw/arm/virt: add virt-3.2 machine type" for completeness
+- commit message improvements
+- rebased, add r-b tags
+
+v3:
+- GlobalProperties improvements/cleanups
+- drop generalizing the -global idea
+- "replace" the set_globals flag with a TYPE_COMPAT_PROPS interface
+- update hw/i386 machine version to 3.2
+- add "qom: make interface types abstract" interface cleanup
+
+v2:
+- replace "qom/user-creatable: add a few helper macros" patch for a
+  more optimized "qom: make user_creatable_complete() specific to
+  UserCreatable"
+- rename register_global_list() to register_global_properties()
+- call object_property_set_globals() after post-init
+- add and use a ObjectClass.set_globals flag, instead of dynamically
+  check object class in object_property_set_globals()
+- use object "id" in >=3D 3.1 instead of canonical path, add compat
+  property "x-use-canonical-path-for-ramblock-id" in base hostmem
+  class.
+
+Marc-Andr=C3=A9 Lureau (28):
+  hw: apply accel compat properties without touching globals
+  machines: replace COMPAT define with a static array
+  hw: apply machine compat properties without touching globals
+  machine: move compat properties out of globals
+  hw: remove SET_MACHINE_COMPAT
+  compat: replace PC_COMPAT_3_1 & HW_COMPAT_3_1 macros
+  compat: replace PC_COMPAT_3_0 & HW_COMPAT_3_0 macros
+  compat: replace PC_COMPAT_2_12 & HW_COMPAT_2_12 macros
+  compat: replace PC_COMPAT_2_11 & HW_COMPAT_2_11 macros
+  compat: replace PC_COMPAT_2_10 & HW_COMPAT_2_10 macros
+  compat: replace PC_COMPAT_2_9 & HW_COMPAT_2_9 macros
+  compat: replace PC_COMPAT_2_8 & HW_COMPAT_2_8 macros
+  compat: replace PC_COMPAT_2_7 & HW_COMPAT_2_7 macros
+  compat: replace PC_COMPAT_2_6 & HW_COMPAT_2_6 macros
+  compat: replace PC_COMPAT_2_5 & HW_COMPAT_2_5 macros
+  compat: replace PC_COMPAT_2_4 & HW_COMPAT_2_4 macros
+  compat: replace PC_COMPAT_2_3 & HW_COMPAT_2_3 macros
+  compat: replace PC_COMPAT_2_2 & HW_COMPAT_2_2 macros
+  compat: replace PC_COMPAT_2_1 & HW_COMPAT_2_1 macros
+  include: remove compat.h
+  compat: remove remaining PC_COMPAT macros
+  qdev: make a separate helper function to apply compat properties
+  qdev: all globals are now user-provided
+  qdev-props: convert global_props to GPtrArray
+  qdev-props: remove errp from GlobalProperty
+  qdev-props: call object_apply_global_props()
+  arm: replace instance_post_init()
+  hostmem: use object id for memory region name with >=3D 4.0
+
+ include/hw/boards.h            |  59 ++-
+ include/hw/compat.h            | 291 --------------
+ include/hw/i386/pc.h           | 684 +++------------------------------
+ include/hw/qdev-core.h         |  21 +-
+ include/qom/object.h           |   3 +
+ include/sysemu/accel.h         |   4 +-
+ include/sysemu/hostmem.h       |   3 +-
+ target/arm/cpu-qom.h           |   3 +
+ target/arm/cpu.h               |   2 +
+ accel/accel.c                  |  12 -
+ backends/hostmem-file.c        |   8 +-
+ backends/hostmem-memfd.c       |   2 +-
+ backends/hostmem-ram.c         |   9 +-
+ backends/hostmem.c             |  36 ++
+ hw/arm/virt.c                  |  46 +--
+ hw/core/machine.c              | 339 +++++++++++++++-
+ hw/core/qdev-properties.c      |  49 +--
+ hw/core/qdev.c                 |  15 +
+ hw/i386/pc.c                   | 668 ++++++++++++++++++++++++++++++++
+ hw/i386/pc_piix.c              | 603 +++++++++++++++--------------
+ hw/i386/pc_q35.c               |  36 +-
+ hw/ppc/spapr.c                 | 207 +++++-----
+ hw/s390x/s390-virtio-ccw.c     | 196 +++++-----
+ hw/xen/xen-common.c            |  41 +-
+ qom/cpu.c                      |   1 -
+ qom/object.c                   |  35 ++
+ target/arm/cpu.c               |  30 +-
+ target/arm/cpu64.c             |  24 +-
+ target/i386/cpu.c              |   1 -
+ target/sparc/cpu.c             |   1 -
+ tests/test-qdev-global-props.c |  57 +--
+ vl.c                           |   4 -
+ 32 files changed, 1818 insertions(+), 1672 deletions(-)
+ delete mode 100644 include/hw/compat.h
+
+--=20
+2.20.1.2.gb21ebb671b
