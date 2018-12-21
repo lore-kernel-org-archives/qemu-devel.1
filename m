@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gaIhT-000736-22
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 06:10:39 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gaIj1-0007mR-2Q
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 06:12:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gaIhP-00089O-1r
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 06:10:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34640)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gaIhO-00088n-Qk
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 06:10:34 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0FD6FC0495B7
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 11:10:34 +0000 (UTC)
-Date: Fri, 21 Dec 2018 11:10:26 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181221111026.GH7439@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181219120904.17643-1-kraxel@redhat.com>
-	<20181219120904.17643-5-kraxel@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1gaIiw-00018Y-9h
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 06:12:15 -0500
+Date: Fri, 21 Dec 2018 12:12:02 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181221121202.2fefa757.cohuck@redhat.com>
+In-Reply-To: <20181219092800.654fcc21@x1.home>
+References: <20181122165432.4437-1-cohuck@redhat.com>
+	<20181122165432.4437-2-cohuck@redhat.com>
+	<d3442c5d-06e9-d87a-3bc3-903f40b0cedf@linux.ibm.com>
+	<20181218182400.6305b061.cohuck@redhat.com>
+	<20181219092800.654fcc21@x1.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181219120904.17643-5-kraxel@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 4/7] kbd-state: use state tracker
- for gtk
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] vfio-ccw: add capabilities chain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,28 +26,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Eric Farman <farman@linux.ibm.com>, linux-s390@vger.kernel.org, Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org, Farhan Ali <alifm@linux.ibm.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org
 
-On Wed, Dec 19, 2018 at 01:09:01PM +0100, Gerd Hoffmann wrote:
-> Use the new keyboard state tracked for gtk.  Allows to drop the
-> gtk-specific modifier state tracking code.
->=20
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  include/ui/gtk.h |  2 ++
->  ui/gtk.c         | 38 ++++++--------------------------------
->  2 files changed, 8 insertions(+), 32 deletions(-)
+On Wed, 19 Dec 2018 09:28:00 -0700
+Alex Williamson <alex.williamson@redhat.com> wrote:
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> On Tue, 18 Dec 2018 18:24:00 +0100
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+> > On Mon, 17 Dec 2018 16:53:34 -0500
+> > Eric Farman <farman@linux.ibm.com> wrote:
+> >   
+> > > On 11/22/2018 11:54 AM, Cornelia Huck wrote:
+> > > 
+> > > ...snip...
+> > >     
+> > > > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > > > index 813102810f53..565669f95534 100644
+> > > > --- a/include/uapi/linux/vfio.h
+> > > > +++ b/include/uapi/linux/vfio.h
+> > > > @@ -297,6 +297,7 @@ struct vfio_region_info_cap_type {
+> > > >   
+> > > >   #define VFIO_REGION_TYPE_PCI_VENDOR_TYPE	(1 << 31)
+> > > >   #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
+> > > > +#define VFIO_REGION_TYPE_CCW			(1 << 30)      
+> > > 
+> > > Oof.  So the existing VFIO_REGION_TYPE_PCI_VENDOR_TYPE gets OR'd with 
+> > > another value (e.g., 8086).  But in 4.20, there was a 
+> > > VFIO_REGION_TYPE_GFX is added as simply "1" ... Which direction are 
+> > > these definitions being added from?  I guess asked another way, is 
+> > > _TYPE_CCW going to be OR'd with anything else that necessitates its 
+> > > presence as an identifier with some Other Thing, or should this follow 
+> > > the TYPE_GFX enumeration?  Perhaps the type field needs to be tidied up 
+> > > to help this sit more cleanly now?  (Sorry!)    
+> > 
+> > The semantics of that type stuff are really a bit unclear to me :(
+> > 
+> > I don't think we'll ever do any fancy mask handling for ccw. It is
+> > probably enough to have any kind of uniqueness within the different
+> > types, so maybe counting up would be indeed enough...  
+> 
+> Just to confirm, this is the intended usage, simply reserve a new type
+> following the GFX region example.  We can define VFIO_REGION_TYPE_CCW
+> as 2 and then there's a whole address space of sub-types to fill in
+> within that.  I might have over-engineered PCI a bit with the address
+> space split, but it seemed like a good idea at the time to pre-define a
+> type address space for each vendor, such that they only need to define
+> the sub-types and we can avoid namespace collisions.  Unfortunately
+> this implicit definition for each PCI vendor also contributes to the
+> confusion here.  Sorry.  Thanks,
+> 
+> Alex
 
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Thanks for the explanation. I'm simply switching VFIO_REGION_TYPE_CCW
+to 2 in the next version.
