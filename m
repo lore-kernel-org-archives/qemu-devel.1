@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <huan.xiong@hxt-semitech.com>) id 1gaMgD-0007HF-Co
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 10:25:38 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gaMhW-0008As-Eo
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 10:26:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <huan.xiong@hxt-semitech.com>) id 1gaMg9-0008Gw-D2
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 10:25:37 -0500
-Received: from mx01.hxt-semitech.com ([223.203.96.7]:59342
-	helo=barracuda.hxt-semitech.com)
+	(envelope-from <cohuck@redhat.com>) id 1gaMhS-0000qn-Gd
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 10:26:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42150)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <huan.xiong@hxt-semitech.com>)
-	id 1gaMg8-0008DH-JJ
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 10:25:33 -0500
-From: "Xiong, Huan" <huan.xiong@hxt-semitech.com>
-Date: Fri, 21 Dec 2018 15:24:20 +0000
-Message-ID: <332894457e224012a03051197f1757b7@HXTBJIDCEMVIW02.hxtcorp.net>
-References: <1544002886-11333-1-git-send-email-huan.xiong@hxt-semitech.com>
-	<20181214160903-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20181214160903-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gaMhS-0000qY-A2
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 10:26:54 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A96C358E2C
+	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 15:26:53 +0000 (UTC)
+Date: Fri, 21 Dec 2018 16:26:45 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181221162645.776f69fc.cohuck@redhat.com>
+In-Reply-To: <20181221090410.27250-24-marcandre.lureau@redhat.com>
+References: <20181221090410.27250-1-marcandre.lureau@redhat.com>
+	<20181221090410.27250-24-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] hw/pci-bridge: check invalid slot number
- for root and downstream port
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 23/28] qdev: all globals are now
+ user-provided
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,118 +34,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com, ehabkost@redhat.com
 
-T24gRnJpLCAxNCBEZWMgMjAxOCAyMToxMjozNCArMDAwMCAoVVRDKSwgTWljaGFlbCBTLiBUc2ly
-a2luIHdyb3RlOg0KPiBGcm9tOiBNaWNoYWVsIFMuIFRzaXJraW4gW21haWx0bzptc3RAcmVkaGF0
-LmNvbV0NCj4gU2VudDogMjAxOMTqMTLUwjE1yNUgNToxMw0KPiBUbzogWGlvbmcsIEh1YW4gPGh1
-YW4ueGlvbmdAaHh0LXNlbWl0ZWNoLmNvbT4NCj4gQ2M6IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsg
-bWFyY2VsLmFwZmVsYmF1bUBnbWFpbC5jb20NCj4gU3ViamVjdDogUmU6IFtQQVRDSF0gaHcvcGNp
-LWJyaWRnZTogY2hlY2sgaW52YWxpZCBzbG90IG51bWJlciBmb3Igcm9vdCBhbmQNCj4gZG93bnN0
-cmVhbSBwb3J0DQo+IA0KPiBPbiBXZWQsIERlYyAwNSwgMjAxOCBhdCAwNTo0MToyNlBNICswODAw
-LCBIdWFuIFhpb25nIHdyb3RlOg0KPiA+IFNpbmNlIHJvb3QgYW5kIGRvd25zdHJlYW0gcG9ydCBo
-YXZlIG9ubHkgb25lIHNsb3QsIGRldmljZSBzaG91bGQgYmUNCj4gPiBjb25uZWN0ZWQgdG8gdGhl
-bSB1c2luZyBzbG90IDAuIFFFTVUgZG9lc24ndCBoYXZlIGEgY2hlY2sgZm9yIHRoYXQgYW5kDQo+
-ID4gc3RhcnRzIHVwIHdoZW4gYSBub24temVybyBzbG90IGlzIHNwZWNpZmllZCwgdGhvdWdoIHRo
-ZSBkZXZpY2UgaXMgbm90DQo+ID4gc2VlbiBpbiBndWVzdCBPUy4NCj4gPg0KPiA+IFRoZSBjaGFu
-Z2UgZml4ZXMgdGhhdCBieSBhZGRpbmcgYSBjaGVjayBpbiBQQ0kgZGV2aWNlICJhdHRyIiBwcm9w
-ZXJ0eQ0KPiA+IHNldHRlciBmdW5jdGlvbi4gVGhlIGNoZWNrIGlzIHBlcmZvcm1lZCBvbmx5IGlm
-IGEgUENJIGRldmljZSBoYXMgYmVlbg0KPiA+IGNvbm5lY3RlZCB0byBhIGJ1cywgb3RoZXJ3aXNl
-IGl0IGRvZXMgbm90aGluZy4gVGhlIGxhdHRlciBvY2N1cnMNCj4gPiBiZWNhdXNlIHNldHRlciBm
-dW5jdGlvbiBpcyBhbHNvIGNhbGxlZCBpbiBvYmplY3QgaW5zdGFudGlhdGlvbiBwaGFzZQ0KPiA+
-IHRvIHNldCBwcm9wZXJ0eSBkZWZhdWx0IHZhbHVlLg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTog
-SHVhbiBYaW9uZyA8aHVhbi54aW9uZ0BoeHQtc2VtaXRlY2guY29tPg0KPiANCj4gSSB0aG91Z2h0
-IHRoYXQgYSBub24gMCBzbG90IGlzIHVzZWZ1bCBmb3IgQVJJLiBObz8NCg0KTWljaGFlbCwNCg0K
-U29ycnkgZm9yIHRoZSBjb25mdXNpb24uIEkgZGlkbid0IGtub3cgYWJvdXQgQVJJIGFuZCBtaXN1
-bmRlcnN0b29kIHRoZSANCmlzc3VlLiBQbGVhc2UgaWdub3JlIHRoZSBwYXRjaC4NCg0KVGhlIGlz
-c3VlIEkgdHJpZWQgdG8gZml4IHdhcyBsaWtlIHRoZSBmb2xsb3dpbmcgKG5vdGUgcWVtdS14aGNp
-J3Mgc2xvdCANCndhcyBub24tMCkuIFdpdGggdGhpcyBzZXR1cCwgcWVtdSBzdGFydGVkIHVwIGJ1
-dCB0aGUgeGhjaSBjb250cm9sbGVyIHdhc24ndA0Kc2VlbiBpbiBndWVzdC4NCg0KICAtZGV2aWNl
-IHBjaWUtcm9vdC1wb3J0LGNoYXNzaXM9MixpZD1ycC4yLGJ1cz1wY2llLjAsYWRkcj0weDIgXA0K
-ICAtZGV2aWNlIHFlbXUteGhjaSxpZD11c2IsYnVzPXJwLjIsYWRkcj0weDEgXA0KDQpJdCBub3cg
-c2VlbXMgdG8gbWUgdGhhdCB0aGVyZSBhcmUgdHdvIGZhY3RvcnMgdGhhdCBsZWFkIHRvIHRoZSBp
-c3N1ZToNCg0KMSkgUUVNVSBkb2Vzbid0IHNldCBBUkkgY2FwYWJpbGl0eSBmb3IgZW11bGF0ZWQg
-UENJZSBkZXZpY2UgKHBjaWVfYXJpX2luaXQoKSANCmlzbid0IGNhbGxlZCBhbnl3aGVyZSkuDQog
-ICANCjIpIEV2ZW50IGlmIEFSSSBjYXBhYmlsaXR5IHdhcyBzZXQsIHRoZSBjb21tYW5kIGxpbmUg
-cGVyaGFwcyBzdGlsbCB3b3VsZG4ndCANCndvcmsgYmVjYXVzZSBhZGRyPTB4MSB3b3VsZCBiZSBm
-dW5jdGlvbiA4IG9mIHNsb3QgMCwgd2hpY2ggbWVhbnMgZnVuY3Rpb24gMCANCm9mIHNsb3QgMCBp
-cyB1bmRlZmluZWQuDQogICANClRoYW5rcywNClJheQ0KDQo+IA0KPiANCj4gPiAtLS0NCj4gPiAg
-aHcvY29yZS9xZGV2LXByb3BlcnRpZXMuYyAgICAgICAgICB8ICA1ICsrKystDQo+ID4gIGh3L3Bj
-aS1icmlkZ2UvcGNpZV9yb290X3BvcnQuYyAgICAgfCAgMiArLQ0KPiA+ICBody9wY2ktYnJpZGdl
-L3hpbzMxMzBfZG93bnN0cmVhbS5jIHwgIDIgKy0NCj4gPiAgaHcvcGNpL3BjaS5jICAgICAgICAg
-ICAgICAgICAgICAgICB8IDEzICsrKysrKysrKysrKysNCj4gPiAgaW5jbHVkZS9ody9wY2kvcGNp
-LmggICAgICAgICAgICAgICB8ICAxICsNCj4gPiAgNSBmaWxlcyBjaGFuZ2VkLCAyMCBpbnNlcnRp
-b25zKCspLCAzIGRlbGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2h3L2NvcmUvcWRl
-di1wcm9wZXJ0aWVzLmMgYi9ody9jb3JlL3FkZXYtcHJvcGVydGllcy5jDQo+ID4gaW5kZXggMzUw
-NzJkZS4uNmU3OTIxOSAxMDA2NDQNCj4gPiAtLS0gYS9ody9jb3JlL3FkZXYtcHJvcGVydGllcy5j
-DQo+ID4gKysrIGIvaHcvY29yZS9xZGV2LXByb3BlcnRpZXMuYw0KPiA+IEBAIC02NTQsNiArNjU0
-LDggQEAgc3RhdGljIHZvaWQgc2V0X3BjaV9kZXZmbihPYmplY3QgKm9iaiwgVmlzaXRvciAqdiwN
-Cj4gY29uc3QgY2hhciAqbmFtZSwNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICB2b2lk
-ICpvcGFxdWUsIEVycm9yICoqZXJycCkgIHsNCj4gPiAgICAgIERldmljZVN0YXRlICpkZXYgPSBE
-RVZJQ0Uob2JqKTsNCj4gPiArICAgIEJ1c1N0YXRlICpidXMgPSBxZGV2X2dldF9wYXJlbnRfYnVz
-KGRldik7DQo+ID4gKyAgICBCdXNDbGFzcyAqYnVzX2NsYXNzID0gYnVzID8gQlVTX0dFVF9DTEFT
-UyhidXMpIDogTlVMTDsNCj4gPiAgICAgIFByb3BlcnR5ICpwcm9wID0gb3BhcXVlOw0KPiA+ICAg
-ICAgaW50MzJfdCB2YWx1ZSwgKnB0ciA9IHFkZXZfZ2V0X3Byb3BfcHRyKGRldiwgcHJvcCk7DQo+
-ID4gICAgICB1bnNpZ25lZCBpbnQgc2xvdCwgZm4sIG47DQo+ID4gQEAgLTY4Nyw3ICs2ODksOCBA
-QCBzdGF0aWMgdm9pZCBzZXRfcGNpX2RldmZuKE9iamVjdCAqb2JqLCBWaXNpdG9yICp2LA0KPiBj
-b25zdCBjaGFyICpuYW1lLA0KPiA+ICAgICAgICAgICAgICBnb3RvIGludmFsaWQ7DQo+ID4gICAg
-ICAgICAgfQ0KPiA+ICAgICAgfQ0KPiA+IC0gICAgaWYgKHN0cltuXSAhPSAnXDAnIHx8IGZuID4g
-NyB8fCBzbG90ID4gMzEpIHsNCj4gPiArICAgIGlmIChzdHJbbl0gIT0gJ1wwJyB8fCBmbiA+IDcg
-fHwgc2xvdCA+IDMxIHx8IChidXNfY2xhc3MgJiYNCj4gPiArICAgICAgICBidXNfY2xhc3MtPm1h
-eF9kZXYgIT0gMCAmJiBzbG90ID49IGJ1c19jbGFzcy0+bWF4X2RldikpIHsNCj4gPiAgICAgICAg
-ICBnb3RvIGludmFsaWQ7DQo+ID4gICAgICB9DQo+IA0KPiBUaGlzIGxvb2tzIGtpbmQgb2YgY29t
-cGxpY2F0ZWQuIElzbid0IHRoZXJlIGFuIGVhc2llciB3YXk/DQo+IA0KPiA+ICAgICAgKnB0ciA9
-IHNsb3QgPDwgMyB8IGZuOw0KPiA+IGRpZmYgLS1naXQgYS9ody9wY2ktYnJpZGdlL3BjaWVfcm9v
-dF9wb3J0LmMNCj4gPiBiL2h3L3BjaS1icmlkZ2UvcGNpZV9yb290X3BvcnQuYyBpbmRleCA0NWY5
-ZThjLi5lZTQyNDExIDEwMDY0NA0KPiA+IC0tLSBhL2h3L3BjaS1icmlkZ2UvcGNpZV9yb290X3Bv
-cnQuYw0KPiA+ICsrKyBiL2h3L3BjaS1icmlkZ2UvcGNpZV9yb290X3BvcnQuYw0KPiA+IEBAIC02
-MSw3ICs2MSw3IEBAIHN0YXRpYyB2b2lkIHJwX3JlYWxpemUoUENJRGV2aWNlICpkLCBFcnJvciAq
-KmVycnApDQo+ID4gICAgICBpbnQgcmM7DQo+ID4NCj4gPiAgICAgIHBjaV9jb25maWdfc2V0X2lu
-dGVycnVwdF9waW4oZC0+Y29uZmlnLCAxKTsNCj4gPiAtICAgIHBjaV9icmlkZ2VfaW5pdGZuKGQs
-IFRZUEVfUENJRV9CVVMpOw0KPiA+ICsgICAgcGNpX2JyaWRnZV9pbml0Zm4oZCwgVFlQRV9QQ0lF
-X0RPV05TVFJFQU1fQlVTKTsNCj4gPiAgICAgIHBjaWVfcG9ydF9pbml0X3JlZyhkKTsNCj4gPg0K
-PiA+ICAgICAgcmMgPSBwY2lfYnJpZGdlX3NzdmlkX2luaXQoZCwgcnBjLT5zc3ZpZF9vZmZzZXQs
-IGRjLT52ZW5kb3JfaWQsDQo+ID4gZGlmZiAtLWdpdCBhL2h3L3BjaS1icmlkZ2UveGlvMzEzMF9k
-b3duc3RyZWFtLmMNCj4gPiBiL2h3L3BjaS1icmlkZ2UveGlvMzEzMF9kb3duc3RyZWFtLmMNCj4g
-PiBpbmRleCA0NjdiYmFiLi45NjBhOTBjIDEwMDY0NA0KPiA+IC0tLSBhL2h3L3BjaS1icmlkZ2Uv
-eGlvMzEzMF9kb3duc3RyZWFtLmMNCj4gPiArKysgYi9ody9wY2ktYnJpZGdlL3hpbzMxMzBfZG93
-bnN0cmVhbS5jDQo+ID4gQEAgLTYyLDcgKzYyLDcgQEAgc3RhdGljIHZvaWQgeGlvMzEzMF9kb3du
-c3RyZWFtX3JlYWxpemUoUENJRGV2aWNlICpkLA0KPiBFcnJvciAqKmVycnApDQo+ID4gICAgICBQ
-Q0lFU2xvdCAqcyA9IFBDSUVfU0xPVChkKTsNCj4gPiAgICAgIGludCByYzsNCj4gPg0KPiA+IC0g
-ICAgcGNpX2JyaWRnZV9pbml0Zm4oZCwgVFlQRV9QQ0lFX0JVUyk7DQo+ID4gKyAgICBwY2lfYnJp
-ZGdlX2luaXRmbihkLCBUWVBFX1BDSUVfRE9XTlNUUkVBTV9CVVMpOw0KPiA+ICAgICAgcGNpZV9w
-b3J0X2luaXRfcmVnKGQpOw0KPiA+DQo+ID4gICAgICByYyA9IG1zaV9pbml0KGQsIFhJTzMxMzBf
-TVNJX09GRlNFVCwgWElPMzEzMF9NU0lfTlJfVkVDVE9SLCBkaWZmDQo+ID4gLS1naXQgYS9ody9w
-Y2kvcGNpLmMgYi9ody9wY2kvcGNpLmMgaW5kZXggNTZiMTNiMy4uNDU3NzM2ZCAxMDA2NDQNCj4g
-PiAtLS0gYS9ody9wY2kvcGNpLmMNCj4gPiArKysgYi9ody9wY2kvcGNpLmMNCj4gPiBAQCAtMTg3
-LDYgKzE4NywxOCBAQCBzdGF0aWMgY29uc3QgVHlwZUluZm8gcGNpZV9idXNfaW5mbyA9IHsNCj4g
-PiAgICAgIC5wYXJlbnQgPSBUWVBFX1BDSV9CVVMsDQo+ID4gIH07DQo+ID4NCj4gPiArc3RhdGlj
-IHZvaWQgcGNpZV9kb3duc3RyZWFtX2J1c19jbGFzc19pbml0KE9iamVjdENsYXNzICprbGFzcywg
-dm9pZA0KPiA+ICsqZGF0YSkgew0KPiA+ICsgICAgQnVzQ2xhc3MgKmsgPSBCVVNfQ0xBU1Moa2xh
-c3MpOw0KPiA+ICsgICAgay0+bWF4X2RldiA9IDE7DQo+ID4gK30NCj4gPiArDQo+ID4gK3N0YXRp
-YyBjb25zdCBUeXBlSW5mbyBwY2llX2Rvd25zdHJlYW1fYnVzX2luZm8gPSB7DQo+ID4gKyAgICAu
-bmFtZSA9IFRZUEVfUENJRV9ET1dOU1RSRUFNX0JVUywNCj4gPiArICAgIC5wYXJlbnQgPSBUWVBF
-X1BDSUVfQlVTLA0KPiA+ICsgICAgLmNsYXNzX2luaXQgPSBwY2llX2Rvd25zdHJlYW1fYnVzX2Ns
-YXNzX2luaXQsIH07DQo+ID4gKw0KPiA+ICBzdGF0aWMgUENJQnVzICpwY2lfZmluZF9idXNfbnIo
-UENJQnVzICpidXMsIGludCBidXNfbnVtKTsgIHN0YXRpYw0KPiA+IHZvaWQgcGNpX3VwZGF0ZV9t
-YXBwaW5ncyhQQ0lEZXZpY2UgKmQpOyAgc3RhdGljIHZvaWQNCj4gPiBwY2lfaXJxX2hhbmRsZXIo
-dm9pZCAqb3BhcXVlLCBpbnQgaXJxX251bSwgaW50IGxldmVsKTsgQEAgLTI2ODEsNg0KPiA+ICsy
-NjkzLDcgQEAgc3RhdGljIHZvaWQgcGNpX3JlZ2lzdGVyX3R5cGVzKHZvaWQpICB7DQo+ID4gICAg
-ICB0eXBlX3JlZ2lzdGVyX3N0YXRpYygmcGNpX2J1c19pbmZvKTsNCj4gPiAgICAgIHR5cGVfcmVn
-aXN0ZXJfc3RhdGljKCZwY2llX2J1c19pbmZvKTsNCj4gPiArICAgIHR5cGVfcmVnaXN0ZXJfc3Rh
-dGljKCZwY2llX2Rvd25zdHJlYW1fYnVzX2luZm8pOw0KPiA+ICAgICAgdHlwZV9yZWdpc3Rlcl9z
-dGF0aWMoJmNvbnZlbnRpb25hbF9wY2lfaW50ZXJmYWNlX2luZm8pOw0KPiA+ICAgICAgdHlwZV9y
-ZWdpc3Rlcl9zdGF0aWMoJnBjaWVfaW50ZXJmYWNlX2luZm8pOw0KPiA+ICAgICAgdHlwZV9yZWdp
-c3Rlcl9zdGF0aWMoJnBjaV9kZXZpY2VfdHlwZV9pbmZvKTsNCj4gPiBkaWZmIC0tZ2l0IGEvaW5j
-bHVkZS9ody9wY2kvcGNpLmggYi9pbmNsdWRlL2h3L3BjaS9wY2kuaCBpbmRleA0KPiA+IGU2NTE0
-YmIuLjIyNTM3NTcgMTAwNjQ0DQo+ID4gLS0tIGEvaW5jbHVkZS9ody9wY2kvcGNpLmgNCj4gPiAr
-KysgYi9pbmNsdWRlL2h3L3BjaS9wY2kuaA0KPiA+IEBAIC0zOTMsNiArMzkzLDcgQEAgdHlwZWRl
-ZiBQQ0lJTlR4Um91dGUgKCpwY2lfcm91dGVfaXJxX2ZuKSh2b2lkDQo+ID4gKm9wYXF1ZSwgaW50
-IHBpbik7ICAjZGVmaW5lIFBDSV9CVVNfQ0xBU1Moa2xhc3MpDQo+ID4gT0JKRUNUX0NMQVNTX0NI
-RUNLKFBDSUJ1c0NsYXNzLCAoa2xhc3MpLCBUWVBFX1BDSV9CVVMpICAjZGVmaW5lDQo+ID4gUENJ
-X0JVU19HRVRfQ0xBU1Mob2JqKSBPQkpFQ1RfR0VUX0NMQVNTKFBDSUJ1c0NsYXNzLCAob2JqKSwg
-VFlQRV9QQ0lfQlVTKQ0KPiAjZGVmaW5lIFRZUEVfUENJRV9CVVMgIlBDSUUiDQo+ID4gKyNkZWZp
-bmUgVFlQRV9QQ0lFX0RPV05TVFJFQU1fQlVTICJQQ0lFLWRvd25zdHJlYW0iDQo+ID4NCj4gPiAg
-Ym9vbCBwY2lfYnVzX2lzX2V4cHJlc3MoUENJQnVzICpidXMpOyAgYm9vbCBwY2lfYnVzX2lzX3Jv
-b3QoUENJQnVzDQo+ID4gKmJ1cyk7DQo+ID4gLS0NCj4gPiAyLjcuNA0K
+On Fri, 21 Dec 2018 13:04:05 +0400
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+
+> All globals are now either provided via -global or through -cpu
+> features (CPU features are implemented by registering globals).
+>=20
+> If the global isn't being used, it should warn in either case.
+>=20
+> We can thus consider that all global_props are "user-provided"
+> globals. No need to track this per-globals anymore.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  include/hw/qdev-core.h         |  3 --
+>  hw/core/qdev-properties.c      |  4 ---
+>  tests/test-qdev-global-props.c | 57 ++++------------------------------
+>  vl.c                           |  1 -
+>  4 files changed, 6 insertions(+), 59 deletions(-)
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
