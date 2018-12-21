@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaDdx-0000jM-Pq
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:42 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gaDdp-0000by-Or
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaDdn-0007JF-Um
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:39 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gaDdo-0007K7-FS
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:33 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 21 Dec 2018 16:45:44 +1100
-Message-Id: <20181221054606.22007-19-david@gibson.dropbear.id.au>
+Date: Fri, 21 Dec 2018 16:45:42 +1100
+Message-Id: <20181221054606.22007-17-david@gibson.dropbear.id.au>
 In-Reply-To: <20181221054606.22007-1-david@gibson.dropbear.id.au>
 References: <20181221054606.22007-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 18/40] ppc/xive: introduce the XiveRouter model
+Subject: [Qemu-devel] [PULL 16/40] ppc/xive: add support for the LSI
+ interrupt sources
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,248 +28,194 @@ Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, gkurz@redhat.com, lvivier@redhat
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-The XiveRouter models the second sub-engine of the XIVE architecture :
-the Interrupt Virtualization Routing Engine (IVRE).
-
-The IVRE handles event notifications of the IVSE and performs the
-interrupt routing process. For this purpose, it uses a set of tables
-stored in system memory, the first of which being the Event Assignment
-Structure (EAS) table.
-
-The EAT associates an interrupt source number with an Event Notification
-Descriptor (END) which will be used in a second phase of the routing
-process to identify a Notification Virtual Target.
-
-The XiveRouter is an abstract class which needs to be inherited from
-to define a storage for the EAT, and other upcoming tables.
+The 'sent' status of the LSI interrupt source is modeled with the 'P'
+bit of the ESB and the assertion status of the source is maintained
+with an extra bit under the main XiveSource object. The type of the
+source is stored in the same array for practical reasons.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-[dwg: Folded in parts of a later fix by C=C3=A9dric fixing field access]
-[dwg: Fix style nits]
+[dwg: Fix style nit]
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xive.c             | 77 ++++++++++++++++++++++++++++++++++++++
- include/hw/ppc/xive.h      | 31 +++++++++++++++
- include/hw/ppc/xive_regs.h | 62 ++++++++++++++++++++++++++++++
- 3 files changed, 170 insertions(+)
- create mode 100644 include/hw/ppc/xive_regs.h
+ hw/intc/xive.c        | 67 +++++++++++++++++++++++++++++++++++++++----
+ include/hw/ppc/xive.h | 19 +++++++++++-
+ 2 files changed, 79 insertions(+), 7 deletions(-)
 
 diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index 8d5434d6bd..8878abc317 100644
+index 6389bd8323..4998f128e7 100644
 --- a/hw/intc/xive.c
 +++ b/hw/intc/xive.c
-@@ -444,6 +444,82 @@ static const TypeInfo xive_source_info =3D {
-     .class_init    =3D xive_source_class_init,
- };
-=20
-+/*
-+ * XIVE Router (aka. Virtualization Controller or IVRE)
-+ */
-+
-+int xive_router_get_eas(XiveRouter *xrtr, uint8_t eas_blk, uint32_t eas_=
-idx,
-+                        XiveEAS *eas)
-+{
-+    XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
-+
-+    return xrc->get_eas(xrtr, eas_blk, eas_idx, eas);
-+}
-+
-+static void xive_router_notify(XiveNotifier *xn, uint32_t lisn)
-+{
-+    XiveRouter *xrtr =3D XIVE_ROUTER(xn);
-+    uint8_t eas_blk =3D XIVE_SRCNO_BLOCK(lisn);
-+    uint32_t eas_idx =3D XIVE_SRCNO_INDEX(lisn);
-+    XiveEAS eas;
-+
-+    /* EAS cache lookup */
-+    if (xive_router_get_eas(xrtr, eas_blk, eas_idx, &eas)) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: Unknown LISN %x\n", lisn);
-+        return;
-+    }
-+
-+    /*
-+     * The IVRE checks the State Bit Cache at this point. We skip the
-+     * SBC lookup because the state bits of the sources are modeled
-+     * internally in QEMU.
-+     */
-+
-+    if (!xive_eas_is_valid(&eas)) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid LISN %x\n", lisn);
-+        return;
-+    }
-+
-+    if (xive_eas_is_masked(&eas)) {
-+        /* Notification completed */
-+        return;
-+    }
-+}
-+
-+static void xive_router_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    XiveNotifierClass *xnc =3D XIVE_NOTIFIER_CLASS(klass);
-+
-+    dc->desc    =3D "XIVE Router Engine";
-+    xnc->notify =3D xive_router_notify;
-+}
-+
-+static const TypeInfo xive_router_info =3D {
-+    .name          =3D TYPE_XIVE_ROUTER,
-+    .parent        =3D TYPE_SYS_BUS_DEVICE,
-+    .abstract      =3D true,
-+    .class_size    =3D sizeof(XiveRouterClass),
-+    .class_init    =3D xive_router_class_init,
-+    .interfaces    =3D (InterfaceInfo[]) {
-+        { TYPE_XIVE_NOTIFIER },
-+        { }
-+    }
-+};
-+
-+void xive_eas_pic_print_info(XiveEAS *eas, uint32_t lisn, Monitor *mon)
-+{
-+    if (!xive_eas_is_valid(eas)) {
-+        return;
-+    }
-+
-+    monitor_printf(mon, "  %08x %s end:%02x/%04x data:%08x\n",
-+                   lisn, xive_eas_is_masked(eas) ? "M" : " ",
-+                   (uint8_t)  xive_get_field64(EAS_END_BLOCK, eas->w),
-+                   (uint32_t) xive_get_field64(EAS_END_INDEX, eas->w),
-+                   (uint32_t) xive_get_field64(EAS_END_DATA, eas->w));
-+}
-+
- /*
-  * XIVE Fabric
-  */
-@@ -457,6 +533,7 @@ static void xive_register_types(void)
- {
-     type_register_static(&xive_source_info);
-     type_register_static(&xive_fabric_info);
-+    type_register_static(&xive_router_info);
+@@ -89,14 +89,42 @@ uint8_t xive_source_esb_set(XiveSource *xsrc, uint32_=
+t srcno, uint8_t pq)
+     return xive_esb_set(&xsrc->status[srcno], pq);
  }
 =20
- type_init(xive_register_types)
-diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-index 436f1bf756..527aa73366 100644
---- a/include/hw/ppc/xive.h
-+++ b/include/hw/ppc/xive.h
-@@ -141,6 +141,8 @@
- #define PPC_XIVE_H
++/*
++ * Returns whether the event notification should be forwarded.
++ */
++static bool xive_source_lsi_trigger(XiveSource *xsrc, uint32_t srcno)
++{
++    uint8_t old_pq =3D xive_source_esb_get(xsrc, srcno);
++
++    xsrc->status[srcno] |=3D XIVE_STATUS_ASSERTED;
++
++    switch (old_pq) {
++    case XIVE_ESB_RESET:
++        xive_source_esb_set(xsrc, srcno, XIVE_ESB_PENDING);
++        return true;
++    default:
++        return false;
++    }
++}
++
+ /*
+  * Returns whether the event notification should be forwarded.
+  */
+ static bool xive_source_esb_trigger(XiveSource *xsrc, uint32_t srcno)
+ {
++    bool ret;
++
+     assert(srcno < xsrc->nr_irqs);
 =20
- #include "hw/qdev-core.h"
-+#include "hw/sysbus.h"
-+#include "hw/ppc/xive_regs.h"
+-    return xive_esb_trigger(&xsrc->status[srcno]);
++    ret =3D xive_esb_trigger(&xsrc->status[srcno]);
++
++    if (xive_source_irq_is_lsi(xsrc, srcno) &&
++        xive_source_esb_get(xsrc, srcno) =3D=3D XIVE_ESB_QUEUED) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "XIVE: queued an event on LSI IRQ %d\n", srcno);
++    }
++
++    return ret;
+ }
 =20
  /*
-  * XIVE Fabric (Interface between Source and Router)
-@@ -297,4 +299,33 @@ static inline void xive_source_irq_set(XiveSource *x=
-src, uint32_t srcno,
+@@ -104,9 +132,23 @@ static bool xive_source_esb_trigger(XiveSource *xsrc=
+, uint32_t srcno)
+  */
+ static bool xive_source_esb_eoi(XiveSource *xsrc, uint32_t srcno)
+ {
++    bool ret;
++
+     assert(srcno < xsrc->nr_irqs);
+=20
+-    return xive_esb_eoi(&xsrc->status[srcno]);
++    ret =3D xive_esb_eoi(&xsrc->status[srcno]);
++
++    /*
++     * LSI sources do not set the Q bit but they can still be
++     * asserted, in which case we should forward a new event
++     * notification
++     */
++    if (xive_source_irq_is_lsi(xsrc, srcno) &&
++        xsrc->status[srcno] & XIVE_STATUS_ASSERTED) {
++        ret =3D xive_source_lsi_trigger(xsrc, srcno);
++    }
++
++    return ret;
+ }
+=20
+ /*
+@@ -271,8 +313,16 @@ static void xive_source_set_irq(void *opaque, int sr=
+cno, int val)
+     XiveSource *xsrc =3D XIVE_SOURCE(opaque);
+     bool notify =3D false;
+=20
+-    if (val) {
+-        notify =3D xive_source_esb_trigger(xsrc, srcno);
++    if (xive_source_irq_is_lsi(xsrc, srcno)) {
++        if (val) {
++            notify =3D xive_source_lsi_trigger(xsrc, srcno);
++        } else {
++            xsrc->status[srcno] &=3D ~XIVE_STATUS_ASSERTED;
++        }
++    } else {
++        if (val) {
++            notify =3D xive_source_esb_trigger(xsrc, srcno);
++        }
+     }
+=20
+     /* Forward the source event notification for routing */
+@@ -292,9 +342,11 @@ void xive_source_pic_print_info(XiveSource *xsrc, ui=
+nt32_t offset, Monitor *mon)
+             continue;
+         }
+=20
+-        monitor_printf(mon, "  %08x %c%c\n", i + offset,
++        monitor_printf(mon, "  %08x %s %c%c%c\n", i + offset,
++                       xive_source_irq_is_lsi(xsrc, i) ? "LSI" : "MSI",
+                        pq & XIVE_ESB_VAL_P ? 'P' : '-',
+-                       pq & XIVE_ESB_VAL_Q ? 'Q' : '-');
++                       pq & XIVE_ESB_VAL_Q ? 'Q' : '-',
++                       xsrc->status[i] & XIVE_STATUS_ASSERTED ? 'A' : ' =
+');
      }
  }
 =20
-+/*
-+ * XIVE Router
-+ */
+@@ -302,6 +354,8 @@ static void xive_source_reset(void *dev)
+ {
+     XiveSource *xsrc =3D XIVE_SOURCE(dev);
+=20
++    /* Do not clear the LSI bitmap */
 +
-+typedef struct XiveRouter {
-+    SysBusDevice    parent;
-+} XiveRouter;
+     /* PQs are initialized to 0b01 (Q=3D1) which corresponds to "ints of=
+f" */
+     memset(xsrc->status, XIVE_ESB_OFF, xsrc->nr_irqs);
+ }
+@@ -324,6 +378,7 @@ static void xive_source_realize(DeviceState *dev, Err=
+or **errp)
+     }
+=20
+     xsrc->status =3D g_malloc0(xsrc->nr_irqs);
++    xsrc->lsi_map =3D bitmap_new(xsrc->nr_irqs);
+=20
+     memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
+                           &xive_source_esb_ops, xsrc, "xive.esb",
+diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+index 7aa2e38012..7cebc32eba 100644
+--- a/include/hw/ppc/xive.h
++++ b/include/hw/ppc/xive.h
+@@ -162,8 +162,9 @@ typedef struct XiveSource {
+     /* IRQs */
+     uint32_t        nr_irqs;
+     qemu_irq        *qirqs;
++    unsigned long   *lsi_map;
+=20
+-    /* PQ bits */
++    /* PQ bits and LSI assertion bit */
+     uint8_t         *status;
+=20
+     /* ESB memory region */
+@@ -219,6 +220,7 @@ static inline hwaddr xive_source_esb_mgmt(XiveSource =
+*xsrc, int srcno)
+  * When doing an EOI, the Q bit will indicate if the interrupt
+  * needs to be re-triggered.
+  */
++#define XIVE_STATUS_ASSERTED  0x4  /* Extra bit for LSI */
+ #define XIVE_ESB_VAL_P        0x2
+ #define XIVE_ESB_VAL_Q        0x1
+=20
+@@ -257,4 +259,19 @@ static inline qemu_irq xive_source_qirq(XiveSource *=
+xsrc, uint32_t srcno)
+     return xsrc->qirqs[srcno];
+ }
+=20
++static inline bool xive_source_irq_is_lsi(XiveSource *xsrc, uint32_t src=
+no)
++{
++    assert(srcno < xsrc->nr_irqs);
++    return test_bit(srcno, xsrc->lsi_map);
++}
 +
-+#define TYPE_XIVE_ROUTER "xive-router"
-+#define XIVE_ROUTER(obj)                                \
-+    OBJECT_CHECK(XiveRouter, (obj), TYPE_XIVE_ROUTER)
-+#define XIVE_ROUTER_CLASS(klass)                                        =
-\
-+    OBJECT_CLASS_CHECK(XiveRouterClass, (klass), TYPE_XIVE_ROUTER)
-+#define XIVE_ROUTER_GET_CLASS(obj)                              \
-+    OBJECT_GET_CLASS(XiveRouterClass, (obj), TYPE_XIVE_ROUTER)
-+
-+typedef struct XiveRouterClass {
-+    SysBusDeviceClass parent;
-+
-+    /* XIVE table accessors */
-+    int (*get_eas)(XiveRouter *xrtr, uint8_t eas_blk, uint32_t eas_idx,
-+                   XiveEAS *eas);
-+} XiveRouterClass;
-+
-+void xive_eas_pic_print_info(XiveEAS *eas, uint32_t lisn, Monitor *mon);
-+
-+int xive_router_get_eas(XiveRouter *xrtr, uint8_t eas_blk, uint32_t eas_=
-idx,
-+                        XiveEAS *eas);
++static inline void xive_source_irq_set(XiveSource *xsrc, uint32_t srcno,
++                                       bool lsi)
++{
++    assert(srcno < xsrc->nr_irqs);
++    if (lsi) {
++        bitmap_set(xsrc->lsi_map, srcno, 1);
++    }
++}
 +
  #endif /* PPC_XIVE_H */
-diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
-new file mode 100644
-index 0000000000..e1193fb3e4
---- /dev/null
-+++ b/include/hw/ppc/xive_regs.h
-@@ -0,0 +1,62 @@
-+/*
-+ * QEMU PowerPC XIVE internal structure definitions
-+ *
-+ *
-+ * The XIVE structures are accessed by the HW and their format is
-+ * architected to be big-endian. Some macros are provided to ease
-+ * access to the different fields.
-+ *
-+ *
-+ * Copyright (c) 2016-2018, IBM Corporation.
-+ *
-+ * This code is licensed under the GPL version 2 or later. See the
-+ * COPYING file in the top-level directory.
-+ */
-+
-+#ifndef PPC_XIVE_REGS_H
-+#define PPC_XIVE_REGS_H
-+
-+/*
-+ * Interrupt source number encoding on PowerBUS
-+ */
-+#define XIVE_SRCNO_BLOCK(srcno) (((srcno) >> 28) & 0xf)
-+#define XIVE_SRCNO_INDEX(srcno) ((srcno) & 0x0fffffff)
-+#define XIVE_SRCNO(blk, idx)    ((uint32_t)(blk) << 28 | (idx))
-+
-+/*
-+ * EAS (Event Assignment Structure)
-+ *
-+ * One per interrupt source. Targets an interrupt to a given Event
-+ * Notification Descriptor (END) and provides the corresponding
-+ * logical interrupt number (END data)
-+ */
-+typedef struct XiveEAS {
-+        /*
-+         * Use a single 64-bit definition to make it easier to perform
-+         * atomic updates
-+         */
-+        uint64_t        w;
-+#define EAS_VALID       PPC_BIT(0)
-+#define EAS_END_BLOCK   PPC_BITMASK(4, 7)        /* Destination END bloc=
-k# */
-+#define EAS_END_INDEX   PPC_BITMASK(8, 31)       /* Destination END inde=
-x */
-+#define EAS_MASKED      PPC_BIT(32)              /* Masked */
-+#define EAS_END_DATA    PPC_BITMASK(33, 63)      /* Data written to the =
-END */
-+} XiveEAS;
-+
-+#define xive_eas_is_valid(eas)   (be64_to_cpu((eas)->w) & EAS_VALID)
-+#define xive_eas_is_masked(eas)  (be64_to_cpu((eas)->w) & EAS_MASKED)
-+
-+static inline uint64_t xive_get_field64(uint64_t mask, uint64_t word)
-+{
-+    return (be64_to_cpu(word) & mask) >> ctz64(mask);
-+}
-+
-+static inline uint64_t xive_set_field64(uint64_t mask, uint64_t word,
-+                                        uint64_t value)
-+{
-+    uint64_t tmp =3D
-+        (be64_to_cpu(word) & ~mask) | ((value << ctz64(mask)) & mask);
-+    return cpu_to_be64(tmp);
-+}
-+
-+#endif /* PPC_XIVE_REGS_H */
 --=20
 2.19.2
