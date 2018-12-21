@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nicholas.a.hudson@gmail.com>) id 1gaNQU-0002BZ-AC
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:13:28 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gaNTJ-00057V-NV
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:16:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nicholas.a.hudson@gmail.com>) id 1gaNQT-00029I-En
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:13:26 -0500
-References: <975b9131-9937-cfea-3b5d-ef36d0c2b761@gmail.com>
-From: Nick Hudson <nicholas.a.hudson@gmail.com>
-Message-ID: <963b728a-2ed3-bcc9-0ed3-df2d47f70621@gmail.com>
-Date: Fri, 21 Dec 2018 16:13:17 +0000
-MIME-Version: 1.0
-In-Reply-To: <975b9131-9937-cfea-3b5d-ef36d0c2b761@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gaNTI-0004QC-RM
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:16:21 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 21 Dec 2018 16:16:06 +0000
+Message-ID: <057e2117-d03a-8733-9926-83b99901d478@virtuozzo.com>
+References: <20181218075707.12006-1-anton.nefedov@virtuozzo.com>
+	<20181218075707.12006-10-anton.nefedov@virtuozzo.com>
+In-Reply-To: <20181218075707.12006-10-anton.nefedov@virtuozzo.com>
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v3] Support u-boot noload images for arm as
- used by, NetBSD/evbarm GENERIC kernel.
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <9ECDD52F3B83EB448339297526204A12@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v11 09/10] qcow2: skip writing zero buffers
+ to empty COW areas
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,214 +26,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
 
-ping
-
-On 11/12/2018 12:27, Nick Hudson wrote:
->
-> noload kernels are loaded with the u-boot image header and as a result
-> the header size needs adding to the entry point.  Fake up a hdr so the
-> kernel image is loaded at the right address and the entry point is
-> adjusted appropriately.
->
-> The bootloader fits in the space that the uboot header would have 
-> occupied.
->
-> Clarify the load_uimage API to state the passing of a load address 
-> when an
-> image doesn't specify one, or when loading a ramdisk is expected.
->
-> Adjust callers of load_uimage, etc.
->
-> Signed-off-by: Nick Hudson<skrll@netbsd.org>
->
-> ---
->  hw/arm/boot.c          |  8 +++++---
->  hw/core/loader.c       | 19 ++++++++++++++++---
->  hw/core/uboot_image.h  |  1 +
->  hw/microblaze/boot.c   |  2 +-
->  hw/nios2/boot.c        |  2 +-
->  hw/ppc/e500.c          |  1 +
->  hw/ppc/ppc440_bamboo.c |  2 +-
->  hw/ppc/sam460ex.c      |  2 +-
->  include/hw/loader.h    |  7 ++++++-
->  9 files changed, 33 insertions(+), 11 deletions(-)
->
-> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-> index 586baa9b64..450267566a 100644
-> --- a/hw/arm/boot.c
-> +++ b/hw/arm/boot.c
-> @@ -30,8 +30,9 @@
->   * Documentation/arm/Booting and Documentation/arm64/booting.txt
->   * They have different preferred image load offsets from system RAM 
-> base.
->   */
-> -#define KERNEL_ARGS_ADDR 0x100
-> -#define KERNEL_LOAD_ADDR 0x00010000
-> +#define KERNEL_ARGS_ADDR   0x100
-> +#define KERNEL_NOLOAD_ADDR 0x00000000
-> +#define KERNEL_LOAD_ADDR   0x00010000
->  #define KERNEL64_LOAD_ADDR 0x00080000
->
->  #define ARM64_TEXT_OFFSET_OFFSET    8
-> @@ -1078,7 +1079,8 @@ void arm_load_kernel(ARMCPU *cpu, struct 
-> arm_boot_info *info)
->      }
->      entry = elf_entry;
->      if (kernel_size < 0) {
-> -        kernel_size = load_uimage_as(info->kernel_filename, &entry, 
-> NULL,
-> +        uint64_t loadaddr = info->loader_start + KERNEL_NOLOAD_ADDR;
-> +        kernel_size = load_uimage_as(info->kernel_filename, &entry, 
-> &loadaddr,
->                                       &is_linux, NULL, NULL, as);
->      }
->      if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64) && kernel_size < 
-> 0) {
-> diff --git a/hw/core/loader.c b/hw/core/loader.c
-> index aa0b3fc867..7362197162 100644
-> --- a/hw/core/loader.c
-> +++ b/hw/core/loader.c
-> @@ -638,13 +638,26 @@ static int load_uboot_image(const char 
-> *filename, hwaddr *ep, hwaddr *loadaddr,
->          goto out;
->
->      if (hdr->ih_type != image_type) {
-> -        fprintf(stderr, "Wrong image type %d, expected %d\n", 
-> hdr->ih_type,
-> -                image_type);
-> -        goto out;
-> +        if (image_type != IH_TYPE_KERNEL &&
-> +            hdr->ih_type != IH_TYPE_KERNEL_NOLOAD) {
-> +            fprintf(stderr, "Wrong image type %d, expected %d\n", 
-> hdr->ih_type,
-> +                    image_type);
-> +            goto out;
-> +        }
->      }
->
->      /* TODO: Implement other image types.  */
->      switch (hdr->ih_type) {
-> +    case IH_TYPE_KERNEL_NOLOAD:
-> +        if (!loadaddr || *loadaddr == LOAD_UIMAGE_LOADADDR_INVALID) {
-> +            fprintf(stderr, "this image format (kernel_noload) cannot 
-> be "
-> +                    "loaded on this machine type");
-> +            goto out;
-> +        }
-> +
-> +        hdr->ih_load = *loadaddr + sizeof(*hdr);
-> +        hdr->ih_ep += hdr->ih_load;
-> +        /* fall through */
->      case IH_TYPE_KERNEL:
->          address = hdr->ih_load;
->          if (translate_fn) {
-> diff --git a/hw/core/uboot_image.h b/hw/core/uboot_image.h
-> index 34c11a70a6..608022de6e 100644
-> --- a/hw/core/uboot_image.h
-> +++ b/hw/core/uboot_image.h
-> @@ -124,6 +124,7 @@
->  #define IH_TYPE_SCRIPT        6    /* Script file     */
->  #define IH_TYPE_FILESYSTEM    7    /* Filesystem Image (any type)    */
->  #define IH_TYPE_FLATDT        8    /* Binary Flat Device Tree Blob    */
-> +#define IH_TYPE_KERNEL_NOLOAD  14    /* OS Kernel Image (noload)    */
->
->  /*
->   * Compression Types
-> diff --git a/hw/microblaze/boot.c b/hw/microblaze/boot.c
-> index 35bfeda7aa..489ab839b7 100644
-> --- a/hw/microblaze/boot.c
-> +++ b/hw/microblaze/boot.c
-> @@ -156,7 +156,7 @@ void microblaze_load_kernel(MicroBlazeCPU *cpu, 
-> hwaddr ddr_base,
->
->          /* If it wasn't an ELF image, try an u-boot image.  */
->          if (kernel_size < 0) {
-> -            hwaddr uentry, loadaddr;
-> +            hwaddr uentry, loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
->
->              kernel_size = load_uimage(kernel_filename, &uentry, 
-> &loadaddr, 0,
->                                        NULL, NULL);
-> diff --git a/hw/nios2/boot.c b/hw/nios2/boot.c
-> index 4bb5b601d3..ed5cb28e94 100644
-> --- a/hw/nios2/boot.c
-> +++ b/hw/nios2/boot.c
-> @@ -161,7 +161,7 @@ void nios2_load_kernel(Nios2CPU *cpu, hwaddr 
-> ddr_base,
->
->          /* If it wasn't an ELF image, try an u-boot image. */
->          if (kernel_size < 0) {
-> -            hwaddr uentry, loadaddr;
-> +            hwaddr uentry, loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
->
->              kernel_size = load_uimage(kernel_filename, &uentry, 
-> &loadaddr, 0,
->                                        NULL, NULL);
-> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-> index e6747fce28..e275178951 100644
-> --- a/hw/ppc/e500.c
-> +++ b/hw/ppc/e500.c
-> @@ -997,6 +997,7 @@ void ppce500_init(MachineState *machine)
->           * Hrm. No ELF image? Try a uImage, maybe someone is giving 
-> us an
->           * ePAPR compliant kernel
->           */
-> +        loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
->          payload_size = load_uimage(filename, &bios_entry, &loadaddr, 
-> NULL,
->                                     NULL, NULL);
->          if (payload_size < 0) {
-> diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
-> index f5720f979e..70428b1865 100644
-> --- a/hw/ppc/ppc440_bamboo.c
-> +++ b/hw/ppc/ppc440_bamboo.c
-> @@ -180,7 +180,7 @@ static void bamboo_init(MachineState *machine)
->      CPUPPCState *env;
->      uint64_t elf_entry;
->      uint64_t elf_lowaddr;
-> -    hwaddr loadaddr = 0;
-> +    hwaddr loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
->      target_long initrd_size = 0;
->      DeviceState *dev;
->      int success;
-> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-> index 5aac58f36e..2d6d5c4402 100644
-> --- a/hw/ppc/sam460ex.c
-> +++ b/hw/ppc/sam460ex.c
-> @@ -402,7 +402,7 @@ static void sam460ex_init(MachineState *machine)
->      CPUPPCState *env;
->      PPC4xxI2CState *i2c[2];
->      hwaddr entry = UBOOT_ENTRY;
-> -    hwaddr loadaddr = 0;
-> +    hwaddr loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
->      target_long initrd_size = 0;
->      DeviceState *dev;
->      SysBusDevice *sbdev;
-> diff --git a/include/hw/loader.h b/include/hw/loader.h
-> index 67a0af84ac..a7254bc5c4 100644
-> --- a/include/hw/loader.h
-> +++ b/include/hw/loader.h
-> @@ -160,10 +160,15 @@ void load_elf_hdr(const char *filename, void 
-> *hdr, bool *is64, Error **errp);
->  int load_aout(const char *filename, hwaddr addr, int max_sz,
->                int bswap_needed, hwaddr target_page_size);
->
-> +#define LOAD_UIMAGE_LOADADDR_INVALID (-1)
-> +
->  /** load_uimage_as:
->   * @filename: Path of uimage file
->   * @ep: Populated with program entry point. Ignored if NULL.
-> - * @loadaddr: Populated with the load address. Ignored if NULL.
-> + * @loadaddr: load address if none specified in the image or when 
-> loading a ramdisk.
-> + *            Populated with the the load address. Ignored if NULL or
-> + *            LOAD_UIMAGE_LOADADDR_INVALID (images which do not 
-> specify a load address
-> + *            will not be loadable).
->   * @is_linux: Is set to true if the image loaded is Linux. Ignored if 
-> NULL.
->   * @translate_fn: optional function to translate load addresses
->   * @translate_opaque: opaque data passed to @translate_fn
+MTguMTIuMjAxOCAxMDo1NywgQW50b24gTmVmZWRvdiB3cm90ZToNCj4gSWYgQ09XIGFyZWFzIG9m
+IHRoZSBuZXdseSBhbGxvY2F0ZWQgY2x1c3RlcnMgYXJlIHplcm9lcyBvbiB0aGUgYmFja2luZyBp
+bWFnZSwNCj4gZWZmaWNpZW50IGJkcnZfd3JpdGVfemVyb2VzKGZsYWdzPUJEUlZfUkVRX0FMTE9D
+QVRFKSBjYW4gYmUgdXNlZCBvbiB0aGUgd2hvbGUNCj4gY2x1c3RlciBpbnN0ZWFkIG9mIHdyaXRp
+bmcgZXhwbGljaXQgemVybyBidWZmZXJzIGxhdGVyIGluIHBlcmZvcm1fY293KCkuDQo+IA0KPiBp
+b3Rlc3QgMDYwOg0KPiB3cml0ZSB0byB0aGUgZGlzY2FyZGVkIGNsdXN0ZXIgZG9lcyBub3QgdHJp
+Z2dlciBDT1cgYW55bW9yZS4NCj4gVXNlIGEgYmFja2luZyBpbWFnZSBpbnN0ZWFkLg0KPiANCj4g
+U2lnbmVkLW9mZi1ieTogQW50b24gTmVmZWRvdiA8YW50b24ubmVmZWRvdkB2aXJ0dW96em8uY29t
+Pg0KPiAtLS0NCj4gICBxYXBpL2Jsb2NrLWNvcmUuanNvbiAgICAgICB8ICA0ICstDQo+ICAgYmxv
+Y2svcWNvdzIuaCAgICAgICAgICAgICAgfCAgNiArKysNCj4gICBibG9jay9xY293Mi1jbHVzdGVy
+LmMgICAgICB8ICAyICstDQo+ICAgYmxvY2svcWNvdzIuYyAgICAgICAgICAgICAgfCA4OSArKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLQ0KPiAgIGJsb2NrL3RyYWNlLWV2ZW50
+cyAgICAgICAgIHwgIDEgKw0KPiAgIHRlc3RzL3FlbXUtaW90ZXN0cy8wNjAgICAgIHwgIDcgKyst
+DQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzA2MC5vdXQgfCAgNSArKy0NCj4gICA3IGZpbGVzIGNo
+YW5nZWQsIDEwOCBpbnNlcnRpb25zKCspLCA2IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdp
+dCBhL3FhcGkvYmxvY2stY29yZS5qc29uIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4gaW5kZXgg
+NzYyMDAwZjMxZi4uMjA0NTI4YjNmNiAxMDA2NDQNCj4gLS0tIGEvcWFwaS9ibG9jay1jb3JlLmpz
+b24NCj4gKysrIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4gQEAgLTMwMDksNiArMzAwOSw4IEBA
+DQo+ICAgIw0KPiAgICMgQGNvcl93cml0ZTogYSB3cml0ZSBkdWUgdG8gY29weS1vbi1yZWFkIChz
+aW5jZSAyLjExKQ0KPiAgICMNCj4gKyMgQGNsdXN0ZXJfYWxsb2Nfc3BhY2U6IGFuIGFsbG9jYXRp
+b24gb2YgZmlsZSBzcGFjZSBmb3IgYSBjbHVzdGVyIChzaW5jZSA0LjApDQo+ICsjDQo+ICAgIyBT
+aW5jZTogMi45DQo+ICAgIyMNCj4gICB7ICdlbnVtJzogJ0Jsa2RlYnVnRXZlbnQnLCAncHJlZml4
+JzogJ0JMS0RCRycsDQo+IEBAIC0zMDI3LDcgKzMwMjksNyBAQA0KPiAgICAgICAgICAgICAgICdw
+d3JpdGV2X3Jtd190YWlsJywgJ3B3cml0ZXZfcm13X2FmdGVyX3RhaWwnLCAncHdyaXRldicsDQo+
+ICAgICAgICAgICAgICAgJ3B3cml0ZXZfemVybycsICdwd3JpdGV2X2RvbmUnLCAnZW1wdHlfaW1h
+Z2VfcHJlcGFyZScsDQo+ICAgICAgICAgICAgICAgJ2wxX3Nocmlua193cml0ZV90YWJsZScsICds
+MV9zaHJpbmtfZnJlZV9sMl9jbHVzdGVycycsDQo+IC0gICAgICAgICAgICAnY29yX3dyaXRlJ10g
+fQ0KPiArICAgICAgICAgICAgJ2Nvcl93cml0ZScsICdjbHVzdGVyX2FsbG9jX3NwYWNlJ10gfQ0K
+PiAgIA0KPiAgICMjDQo+ICAgIyBAQmxrZGVidWdJbmplY3RFcnJvck9wdGlvbnM6DQo+IGRpZmYg
+LS1naXQgYS9ibG9jay9xY293Mi5oIGIvYmxvY2svcWNvdzIuaA0KPiBpbmRleCBhOThkMjQ1MDBi
+Li4zMmQyYzA0YmZhIDEwMDY0NA0KPiAtLS0gYS9ibG9jay9xY293Mi5oDQo+ICsrKyBiL2Jsb2Nr
+L3Fjb3cyLmgNCj4gQEAgLTM4Niw2ICszODYsMTIgQEAgdHlwZWRlZiBzdHJ1Y3QgUUNvd0wyTWV0
+YQ0KPiAgICAgICAgKi8NCj4gICAgICAgUWNvdzJDT1dSZWdpb24gY293X2VuZDsNCj4gICANCj4g
+KyAgICAvKg0KPiArICAgICAqIEluZGljYXRlcyB0aGF0IENPVyByZWdpb25zIGFyZSBhbHJlYWR5
+IGhhbmRsZWQgYW5kIGRvIG5vdCByZXF1aXJlDQo+ICsgICAgICogYW55IG1vcmUgcHJvY2Vzc2lu
+Zy4NCj4gKyAgICAgKi8NCj4gKyAgICBib29sIHNraXBfY293Ow0KPiArDQo+ICAgICAgIC8qKg0K
+DQpobW0sIGFyb3VuZCBpdCwgYWxsIGNvbW1lbnRzIHN0YXJ0cyBmcm9tICcvKionLCBzbywgSSB0
+aGluaywgeW91cnMgc2hvdWxkIHRvby4NCih0aGlzIG5vdGUgZG9lc24ndCB0b3VjaCB5b3VyIG90
+aGVyIGNvbW1lbnRzKQ0KDQo+ICAgICAgICAqIFRoZSBJL08gdmVjdG9yIHdpdGggdGhlIGRhdGEg
+ZnJvbSB0aGUgYWN0dWFsIGd1ZXN0IHdyaXRlIHJlcXVlc3QuDQo+ICAgICAgICAqIElmIG5vbi1O
+VUxMLCB0aGlzIGlzIG1lYW50IHRvIGJlIG1lcmdlZCB0b2dldGhlciB3aXRoIHRoZSBkYXRhDQo+
+IGRpZmYgLS1naXQgYS9ibG9jay9xY293Mi1jbHVzdGVyLmMgYi9ibG9jay9xY293Mi1jbHVzdGVy
+LmMNCj4gaW5kZXggZTI3Mzc0MjlmNS4uMjNlMDcwMjAyNyAxMDA2NDQNCj4gLS0tIGEvYmxvY2sv
+cWNvdzItY2x1c3Rlci5jDQo+ICsrKyBiL2Jsb2NrL3Fjb3cyLWNsdXN0ZXIuYw0KPiBAQCAtODA2
+LDcgKzgwNiw3IEBAIHN0YXRpYyBpbnQgcGVyZm9ybV9jb3coQmxvY2tEcml2ZXJTdGF0ZSAqYnMs
+IFFDb3dMMk1ldGEgKm0pDQo+ICAgICAgIGFzc2VydChzdGFydC0+b2Zmc2V0ICsgc3RhcnQtPm5i
+X2J5dGVzIDw9IGVuZC0+b2Zmc2V0KTsNCj4gICAgICAgYXNzZXJ0KCFtLT5kYXRhX3Fpb3YgfHwg
+bS0+ZGF0YV9xaW92LT5zaXplID09IGRhdGFfYnl0ZXMpOw0KPiAgIA0KPiAtICAgIGlmIChzdGFy
+dC0+bmJfYnl0ZXMgPT0gMCAmJiBlbmQtPm5iX2J5dGVzID09IDApIHsNCj4gKyAgICBpZiAoKHN0
+YXJ0LT5uYl9ieXRlcyA9PSAwICYmIGVuZC0+bmJfYnl0ZXMgPT0gMCkgfHwgbS0+c2tpcF9jb3cp
+IHsNCj4gICAgICAgICAgIHJldHVybiAwOw0KPiAgICAgICB9DQo+ICAgDQo+IGRpZmYgLS1naXQg
+YS9ibG9jay9xY293Mi5jIGIvYmxvY2svcWNvdzIuYw0KPiBpbmRleCA0ODk3YWJhZTVlLi4xNjFi
+OTM1OTYyIDEwMDY0NA0KPiAtLS0gYS9ibG9jay9xY293Mi5jDQo+ICsrKyBiL2Jsb2NrL3Fjb3cy
+LmMNCj4gQEAgLTIwMjEsNiArMjAyMSwxMSBAQCBzdGF0aWMgYm9vbCBtZXJnZV9jb3codWludDY0
+X3Qgb2Zmc2V0LCB1bnNpZ25lZCBieXRlcywNCj4gICAgICAgICAgICAgICBjb250aW51ZTsNCj4g
+ICAgICAgICAgIH0NCj4gICANCj4gKyAgICAgICAgLyogSWYgQ09XIHJlZ2lvbnMgYXJlIGhhbmRs
+ZWQgYWxyZWFkeSwgc2tpcCB0aGlzIHRvbyAqLw0KPiArICAgICAgICBpZiAobS0+c2tpcF9jb3cp
+IHsNCj4gKyAgICAgICAgICAgIGNvbnRpbnVlOw0KPiArICAgICAgICB9DQo+ICsNCj4gICAgICAg
+ICAgIC8qIFRoZSBkYXRhIChtaWRkbGUpIHJlZ2lvbiBtdXN0IGJlIGltbWVkaWF0ZWx5IGFmdGVy
+IHRoZQ0KPiAgICAgICAgICAgICogc3RhcnQgcmVnaW9uICovDQo+ICAgICAgICAgICBpZiAobDJt
+ZXRhX2Nvd19zdGFydChtKSArIG0tPmNvd19zdGFydC5uYl9ieXRlcyAhPSBvZmZzZXQpIHsNCj4g
+QEAgLTIwNDYsNiArMjA1MSw3NyBAQCBzdGF0aWMgYm9vbCBtZXJnZV9jb3codWludDY0X3Qgb2Zm
+c2V0LCB1bnNpZ25lZCBieXRlcywNCj4gICAgICAgcmV0dXJuIGZhbHNlOw0KPiAgIH0NCj4gICAN
+Cj4gK3N0YXRpYyBib29sIGlzX3VuYWxsb2NhdGVkKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBpbnQ2
+NF90IG9mZnNldCwgaW50NjRfdCBieXRlcykNCj4gK3sNCj4gKyAgICBpbnQ2NF90IG5yOw0KPiAr
+ICAgIHJldHVybiAhYnl0ZXMgfHwNCj4gKyAgICAgICAgKCFiZHJ2X2lzX2FsbG9jYXRlZF9hYm92
+ZShicywgTlVMTCwgb2Zmc2V0LCBieXRlcywgJm5yKSAmJiBuciA9PSBieXRlcyk7DQo+ICt9DQo+
+ICsNCj4gK3N0YXRpYyBib29sIGlzX3plcm9fY293KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBRQ293
+TDJNZXRhICptKQ0KPiArew0KPiArICAgIC8qDQo+ICsgICAgICogVGhpcyBjaGVjayBpcyBkZXNp
+Z25lZCBmb3Igb3B0aW1pemF0aW9uIHNob3J0Y3V0IHNvIGl0IG11c3QgYmUNCj4gKyAgICAgKiBl
+ZmZpY2llbnQuDQo+ICsgICAgICogSW5zdGVhZCBvZiBpc196ZXJvKCksIHVzZSBpc191bmFsbG9j
+YXRlZCgpIGFzIGl0IGlzIGZhc3RlciAoYnV0IG5vdA0KPiArICAgICAqIGFzIGFjY3VyYXRlIGFu
+ZCBjYW4gcmVzdWx0IGluIGZhbHNlIG5lZ2F0aXZlcykuDQo+ICsgICAgICovDQo+ICsgICAgcmV0
+dXJuIGlzX3VuYWxsb2NhdGVkKGJzLCBtLT5vZmZzZXQgKyBtLT5jb3dfc3RhcnQub2Zmc2V0LA0K
+DQpoZXJlIHlvdSBhZGQgbS0+Y293X3N0YXJ0Lm9mZnNldCAuLi5bMV0NCg0KPiArICAgICAgICAg
+ICAgICAgICAgICAgICAgICBtLT5jb3dfc3RhcnQubmJfYnl0ZXMpICYmDQo+ICsgICAgICAgICAg
+IGlzX3VuYWxsb2NhdGVkKGJzLCBtLT5vZmZzZXQgKyBtLT5jb3dfZW5kLm9mZnNldCwNCj4gKyAg
+ICAgICAgICAgICAgICAgICAgICAgICAgbS0+Y293X2VuZC5uYl9ieXRlcyk7DQo+ICt9DQo+ICsN
+Cj4gK3N0YXRpYyBpbnQgaGFuZGxlX2FsbG9jX3NwYWNlKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBR
+Q293TDJNZXRhICpsMm1ldGEpDQo+ICt7DQo+ICsgICAgQkRSVlFjb3cyU3RhdGUgKnMgPSBicy0+
+b3BhcXVlOw0KPiArICAgIFFDb3dMMk1ldGEgKm07DQo+ICsNCj4gKyAgICBpZiAoIShicy0+Zmls
+ZS0+YnMtPnN1cHBvcnRlZF96ZXJvX2ZsYWdzICYgQkRSVl9SRVFfQUxMT0NBVEUpKSB7DQo+ICsg
+ICAgICAgIHJldHVybiAwOw0KPiArICAgIH0NCj4gKw0KPiArICAgIGlmIChicy0+ZW5jcnlwdGVk
+KSB7DQo+ICsgICAgICAgIHJldHVybiAwOw0KPiArICAgIH0NCj4gKw0KPiArICAgIGZvciAobSA9
+IGwybWV0YTsgbSAhPSBOVUxMOyBtID0gbS0+bmV4dCkgew0KPiArICAgICAgICBpbnQgcmV0Ow0K
+PiArDQo+ICsgICAgICAgIGlmICghbS0+Y293X3N0YXJ0Lm5iX2J5dGVzICYmICFtLT5jb3dfZW5k
+Lm5iX2J5dGVzKSB7DQo+ICsgICAgICAgICAgICBjb250aW51ZTsNCj4gKyAgICAgICAgfQ0KPiAr
+DQo+ICsgICAgICAgIGlmICghaXNfemVyb19jb3coYnMsIG0pKSB7DQo+ICsgICAgICAgICAgICBj
+b250aW51ZTsNCj4gKyAgICAgICAgfQ0KPiArDQo+ICsgICAgICAgIC8qDQo+ICsgICAgICAgICAq
+IENvbnZlbnRpb25hbCBwbGFjZSBmb3IgcWNvdzJfcHJlX3dyaXRlX292ZXJsYXBfY2hlY2soKSBi
+dXQgaW4gdGhpcw0KPiArICAgICAgICAgKiBjYXNlIGl0IGlzIGFscmVhZHkgZG9uZSBmb3IgdGhl
+c2UgY2x1c3RlcnMNCj4gKyAgICAgICAgICovDQoNCnRvIGJlIGhvbmVzdCwgY2hlY2sgaXMgZG9u
+ZSBmb3Igb3JpZ2luYWwgcmVxdWVzdCBub3QsIG5vdCBmb3IgY293X3JlZ2lvbnMsIGFuZCwNCm9u
+IHRoZSBvdGhlciBoYW5kLA0KZG9fcGVyZm9ybV9jb3dfd3JpdGUgX2RvZXNfIHRoZSBjaGVjay4N
+Cg0KU28sIEkgc2VlIHR3byBjb25zaXN0ZW50IHdheXM6DQoxLiB5b3UganVzdCBhZGQgY2hlY2sg
+aGVyZSwgbGlrZSBpbiBkb19wZXJmb3JtX2Nvd193cml0ZQ0KMi4gaW1wcm92ZSBjaGVjayBpbiBx
+Y293Ml9jb19wd3JpdGV2IHRvIGNvdmVyIHRoZSB3aG9sZSBhcmVhLCBhbmQgZHJvcCBjaGVja3Mg
+ZnJvbQ0KICAgIHBlcmZvcm1fY293Lg0KDQpJIHByZWZlciAxLCBhcyBpdCBtb3JlIGhlbHBmdWwg
+aW4gY2FzZSBvZiBidWdzIGluIHRoZSBjb2RlIChqdXN0IGNoZWNrIGV4YWN0bHkgd2hhdA0KeW91
+IGFyZSBnb2luZyB0byB3cml0ZSBpbiB0aGUgbmV4dCB3cml0ZSkuDQoNCj4gKw0KPiArICAgICAg
+ICBCTEtEQkdfRVZFTlQoYnMtPmZpbGUsIEJMS0RCR19DTFVTVEVSX0FMTE9DX1NQQUNFKTsNCj4g
+KyAgICAgICAgLyoNCj4gKyAgICAgICAgICogaW5zdGVhZCBvZiB3cml0aW5nIHplcm8gQ09XIGJ1
+ZmZlcnMsDQo+ICsgICAgICAgICAqIGVmZmljaWVudGx5IHplcm8gb3V0IHRoZSB3aG9sZSBjbHVz
+dGVycw0KPiArICAgICAgICAgKi8NCj4gKyAgICAgICAgcmV0ID0gYmRydl9jb19wd3JpdGVfemVy
+b2VzKGJzLT5maWxlLCBtLT5hbGxvY19vZmZzZXQsDQoNClsxXS4uLiBhbmQgaGVyZSAtIG5vdC4N
+CkFuZCBwZXJmb3JtX2NvdyB1c2VzIHN0YXJ0IHRvby4NCmhtbS4uDQoNCk9uIHRoZSBvdGhlciBo
+YW5kLCBoZXJlIHdlIGp1c3Qgd2FudCB0byB6ZXJvIGFsbCBhbGxvY2F0ZWQgY2x1c3RlcnMsIGl0
+IGlzIG5vdCByZWxhdGVkDQp0byBjb3cgcmVnaW9ucy4gU28sIG9rLg0KDQo+ICsgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBtLT5uYl9jbHVzdGVycyAqIHMtPmNsdXN0ZXJfc2l6
+ZSwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEJEUlZfUkVRX0FMTE9D
+QVRFKTsNCj4gKyAgICAgICAgaWYgKHJldCA8IDApIHsNCj4gKyAgICAgICAgICAgIGlmIChyZXQg
+IT0gLUVOT1RTVVAgJiYgcmV0ICE9IC1FQUdBSU4pIHsNCj4gKyAgICAgICAgICAgICAgICByZXR1
+cm4gcmV0Ow0KPiArICAgICAgICAgICAgfQ0KPiArICAgICAgICAgICAgY29udGludWU7DQo+ICsg
+ICAgICAgIH0NCj4gKw0KPiArICAgICAgICB0cmFjZV9xY293Ml9za2lwX2NvdyhxZW11X2Nvcm91
+dGluZV9zZWxmKCksIG0tPm9mZnNldCwgbS0+bmJfY2x1c3RlcnMpOw0KPiArICAgICAgICBtLT5z
+a2lwX2NvdyA9IHRydWU7DQo+ICsgICAgfQ0KPiArICAgIHJldHVybiAwOw0KPiArfQ0KPiArDQoN
+ClsuLi5dDQoNCg0Kd2l0aCBwcmUtd3JpdGUtY2hlY2sgYWRkZWQ6DQpSZXZpZXdlZC1ieTogVmxh
+ZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KDQoN
+Cg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
