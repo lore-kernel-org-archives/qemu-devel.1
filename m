@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yaroslav.isakov@gmail.com>) id 1gaSXC-00018E-Jb
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 16:40:43 -0500
+	(envelope-from <yaroslav.isakov@gmail.com>) id 1gaSXI-0001De-I5
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 16:40:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yaroslav.isakov@gmail.com>) id 1gaSX7-0008Us-UP
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 16:40:42 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:50332)
+	(envelope-from <yaroslav.isakov@gmail.com>) id 1gaSXG-00008f-Ay
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 16:40:48 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44375)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <yaroslav.isakov@gmail.com>)
-	id 1gaSX6-0008Tl-P1
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 16:40:36 -0500
-Received: by mail-wm1-x341.google.com with SMTP id n190so6557111wmd.0
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 13:40:36 -0800 (PST)
+	id 1gaSXE-00006A-Ci
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 16:40:46 -0500
+Received: by mail-wr1-x443.google.com with SMTP id z5so6630573wrt.11
+	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 13:40:43 -0800 (PST)
 Received: from localhost ([91.201.22.4]) by smtp.gmail.com with ESMTPSA id
-	f14sm14898492wrv.56.2018.12.21.13.40.34 for <qemu-devel@nongnu.org>
+	s16sm11006452wrt.77.2018.12.21.13.40.41 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 21 Dec 2018 13:40:34 -0800 (PST)
-Message-Id: <af2fca9a040c19198c5aff8752f152a525fd96b7.1545426882.git.yaroslav.isakov@gmail.com>
+	Fri, 21 Dec 2018 13:40:41 -0800 (PST)
+Message-Id: <fca88dd3e21b29a12d6f00e65eebdd146024302f.1545426882.git.yaroslav.isakov@gmail.com>
 In-Reply-To: <cover.1545426882.git.yaroslav.isakov@gmail.com>
 References: <cover.1545426882.git.yaroslav.isakov@gmail.com>
 From: Yaroslav Isakov <yaroslav.isakov@gmail.com>
-Date: Fri, 21 Dec 2018 21:31:03 +0100
-Subject: [Qemu-devel] [PATCH 2/3] Pass raw DB values from hda-codec.c to
- audio driver
+Date: Fri, 21 Dec 2018 01:25:14 +0100
+Subject: [Qemu-devel] [PATCH 3/3] If raw DB values are known,
+ use them in paaudio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,43 +35,28 @@ To: qemu-devel@nongnu.org
 
 Signed-off-by: Yaroslav Isakov <yaroslav.isakov@gmail.com>
 ---
- hw/audio/hda-codec.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ audio/paaudio.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/hw/audio/hda-codec.c b/hw/audio/hda-codec.c
-index 09f9da344b..d160e86d2a 100644
---- a/hw/audio/hda-codec.c
-+++ b/hw/audio/hda-codec.c
-@@ -437,6 +437,7 @@ static void hda_audio_set_amp(HDAAudioStream *st)
- {
-     bool muted;
-     uint32_t left, right;
-+    double left_db, right_db;
+diff --git a/audio/paaudio.c b/audio/paaudio.c
+index 4c100bc318..d25df102ab 100644
+--- a/audio/paaudio.c
++++ b/audio/paaudio.c
+@@ -724,8 +724,13 @@ static int qpa_ctl_out (HWVoiceOut *hw, int cmd, ...)
+             va_end (ap);
  
-     if (st->node == NULL) {
-         return;
-@@ -446,6 +447,9 @@ static void hda_audio_set_amp(HDAAudioStream *st)
-     left  = st->mute_left  ? 0 : st->gain_left;
-     right = st->mute_right ? 0 : st->gain_right;
+             v.channels = 2;
+-            v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vol.l) / UINT32_MAX;
+-            v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vol.r) / UINT32_MAX;
++            if (sw->vol.db_known) {
++                v.values[0] = pa_sw_volume_from_dB(sw->vol.l_db);
++                v.values[1] = pa_sw_volume_from_dB(sw->vol.r_db);
++            } else {
++                v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vol.l) / UINT32_MAX;
++                v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vol.r) / UINT32_MAX;
++            }
  
-+    left_db = ((int64_t)left - QEMU_HDA_AMP_STEPS) * QEMU_HDA_AMP_DB_OF_STEP;
-+    right_db = ((int64_t)right - QEMU_HDA_AMP_STEPS) * QEMU_HDA_AMP_DB_OF_STEP;
-+
-     left = left * 255 / QEMU_HDA_AMP_STEPS;
-     right = right * 255 / QEMU_HDA_AMP_STEPS;
- 
-@@ -454,10 +458,10 @@ static void hda_audio_set_amp(HDAAudioStream *st)
-     }
-     if (st->output) {
-         AUD_set_volume_out(st->voice.out, muted, left, right,
--                           false, 0, 0);
-+                           true, left_db, right_db);
-     } else {
-         AUD_set_volume_in(st->voice.in, muted, left, right,
--                          false, 0, 0);
-+                          true, left_db, right_db);
-     }
- }
+             pa_threaded_mainloop_lock (g->mainloop);
  
 -- 
 2.18.1
