@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gaR4s-0002jG-Kv
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:07:28 -0500
+	(envelope-from <cota@braap.org>) id 1gaR5G-0002wn-GL
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:07:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gaR4p-0006Pt-Ce
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:07:22 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:49782)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
-	id 1gaR4n-00057w-KL
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:07:19 -0500
-From: Liam Merwick <liam.merwick@oracle.com>
-Date: Fri, 21 Dec 2018 20:03:51 +0000
-Message-Id: <1545422632-24444-4-git-send-email-liam.merwick@oracle.com>
-In-Reply-To: <1545422632-24444-1-git-send-email-liam.merwick@oracle.com>
-References: <1545422632-24444-1-git-send-email-liam.merwick@oracle.com>
-Subject: [Qemu-devel] [RFC v2 3/4] pvh: Add x86/HVM direct boot ABI header
- file
+	(envelope-from <cota@braap.org>) id 1gaR5A-0006ie-Gr
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:07:46 -0500
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:53711)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gaR5A-0006g3-7Q
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:07:40 -0500
+Date: Fri, 21 Dec 2018 14:30:37 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181221193037.GB11197@flamenco>
+References: <20181220111008.24954-1-alex.bennee@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20181220111008.24954-1-alex.bennee@linaro.org>
+Subject: Re: [Qemu-devel] [RFC PATCH] fpu: add compile time check for old
+ glibc/libm and fma
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,180 +28,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, ehabkost@redhat.com, rth@twiddle.net, xen-devel@lists.xenproject.org, sgarzare@redhat.com, mst@redhat.com, stefanha@redhat.com, maran.wilson@oracle.com, george.kennedy@oracle.com, boris.ostrovsky@oracle.com, liam.merwick@oracle.com
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, laurent.desnogues@gmail.com, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>
 
-From: Liam Merwick <Liam.Merwick@oracle.com>
+On Thu, Dec 20, 2018 at 11:10:08 +0000, Alex Bennée wrote:
+(snip)
+> +#if defined(__GLIBC__) && (__GLIBC__ == 2 && __GLIBC_MINOR__ <= 12)
+> +#define QEMU_HARDFLOAT_USE_FMA 0
+> +#else
+> +#define QEMU_HARDFLOAT_USE_FMA 1
+> +#endif
+> +#else
+> +#define QEMU_HARDFLOAT_USE_FMA 1
+> +#endif
+> +
+>  /*
+>   * QEMU_HARDFLOAT_USE_ISINF chooses whether to use isinf() over
+>   * float{32,64}_is_infinity when !USE_FP.
+> @@ -1551,6 +1570,9 @@ float32_muladd(float32 xa, float32 xb, float32 xc, int flags, float_status *s)
+>      ub.s = xb;
+>      uc.s = xc;
+>  
+> +    if (!QEMU_HARDFLOAT_USE_FMA) {
+> +        goto soft;
+> +    }
 
-The x86/HVM direct boot ABI permits Qemu to be able to boot directly
-into the uncompressed Linux kernel binary with minimal firmware involvement.
+I don't think this should be a compile-time check; if the QEMU binary
+is run on a system with a newer, fixed glibc (or any other libc), then
+we'll have disabled fma hardfloat unnecessarily.
 
-	https://xenbits.xen.org/docs/unstable/misc/pvh.html
+What do you think about the following?
 
-This commit adds the header file that defines the start_info struct
-that needs to be populated in order to use this ABI.
+Laurent: if you want to test the below, you can pull it from
+   https://github.com/cota/qemu/tree/fma-fix
 
-The canonical version of start_info.h is in the Xen codebase.
-(like QEMU, the Linux kernel uses a copy as well).
+Thanks,
 
-Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
-Reviewed-by: Konrad Rzeszutek Wilk <Konrad.Wilk@oracle.com>
+		Emilio
 ---
- include/hw/xen/start_info.h | 146 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 146 insertions(+)
- create mode 100644 include/hw/xen/start_info.h
+commit ddeec29a2c33550c5d018aeea05d45a23579ae1b
+Author: Emilio G. Cota <cota@braap.org>
+Date:   Fri Dec 21 14:08:57 2018 -0500
 
-diff --git a/include/hw/xen/start_info.h b/include/hw/xen/start_info.h
-new file mode 100644
-index 000000000000..348779eb10cd
---- /dev/null
-+++ b/include/hw/xen/start_info.h
-@@ -0,0 +1,146 @@
-+/*
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to
-+ * deal in the Software without restriction, including without limitation the
-+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-+ * sell copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-+ * DEALINGS IN THE SOFTWARE.
-+ *
-+ * Copyright (c) 2016, Citrix Systems, Inc.
-+ */
+    softfloat: enforce softfloat if the host's FMA is broken
+    
+    The added branch is marked as unlikely and therefore its impact
+    on performance (measured with fp-bench) is within the noise range
+    when measured on an Intel(R) Xeon(R) Gold 6142 CPU @ 2.60GHz.
+    
+    Laurent Desnogues <laurent.desnogues@gmail.com>
+    Signed-off-by: Emilio G. Cota <cota@braap.org>
+
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 59eac97d10..8b3670ca9d 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -1542,6 +1542,8 @@ soft_f64_muladd(float64 a, float64 b, float64 c, int flags,
+     return float64_round_pack_canonical(pr, status);
+ }
+ 
++static bool host_fma_is_broken;
 +
-+#ifndef __XEN_PUBLIC_ARCH_X86_HVM_START_INFO_H__
-+#define __XEN_PUBLIC_ARCH_X86_HVM_START_INFO_H__
+ float32 QEMU_FLATTEN
+ float32_muladd(float32 xa, float32 xb, float32 xc, int flags, float_status *s)
+ {
+@@ -1562,6 +1564,11 @@ float32_muladd(float32 xa, float32 xb, float32 xc, int flags, float_status *s)
+     if (unlikely(!f32_is_zon3(ua, ub, uc))) {
+         goto soft;
+     }
 +
-+/*
-+ * Start of day structure passed to PVH guests and to HVM guests in %ebx.
-+ *
-+ * NOTE: nothing will be loaded at physical address 0, so a 0 value in any
-+ * of the address fields should be treated as not present.
-+ *
-+ *  0 +----------------+
-+ *    | magic          | Contains the magic value XEN_HVM_START_MAGIC_VALUE
-+ *    |                | ("xEn3" with the 0x80 bit of the "E" set).
-+ *  4 +----------------+
-+ *    | version        | Version of this structure. Current version is 1. New
-+ *    |                | versions are guaranteed to be backwards-compatible.
-+ *  8 +----------------+
-+ *    | flags          | SIF_xxx flags.
-+ * 12 +----------------+
-+ *    | nr_modules     | Number of modules passed to the kernel.
-+ * 16 +----------------+
-+ *    | modlist_paddr  | Physical address of an array of modules
-+ *    |                | (layout of the structure below).
-+ * 24 +----------------+
-+ *    | cmdline_paddr  | Physical address of the command line,
-+ *    |                | a zero-terminated ASCII string.
-+ * 32 +----------------+
-+ *    | rsdp_paddr     | Physical address of the RSDP ACPI data structure.
-+ * 40 +----------------+
-+ *    | memmap_paddr   | Physical address of the (optional) memory map. Only
-+ *    |                | present in version 1 and newer of the structure.
-+ * 48 +----------------+
-+ *    | memmap_entries | Number of entries in the memory map table. Only
-+ *    |                | present in version 1 and newer of the structure.
-+ *    |                | Zero if there is no memory map being provided.
-+ * 52 +----------------+
-+ *    | reserved       | Version 1 and newer only.
-+ * 56 +----------------+
-+ *
-+ * The layout of each entry in the module structure is the following:
-+ *
-+ *  0 +----------------+
-+ *    | paddr          | Physical address of the module.
-+ *  8 +----------------+
-+ *    | size           | Size of the module in bytes.
-+ * 16 +----------------+
-+ *    | cmdline_paddr  | Physical address of the command line,
-+ *    |                | a zero-terminated ASCII string.
-+ * 24 +----------------+
-+ *    | reserved       |
-+ * 32 +----------------+
-+ *
-+ * The layout of each entry in the memory map table is as follows:
-+ *
-+ *  0 +----------------+
-+ *    | addr           | Base address
-+ *  8 +----------------+
-+ *    | size           | Size of mapping in bytes
-+ * 16 +----------------+
-+ *    | type           | Type of mapping as defined between the hypervisor
-+ *    |                | and guest it's starting. E820_TYPE_xxx, for example.
-+ * 20 +----------------|
-+ *    | reserved       |
-+ * 24 +----------------+
-+ *
-+ * The address and sizes are always a 64bit little endian unsigned integer.
-+ *
-+ * NB: Xen on x86 will always try to place all the data below the 4GiB
-+ * boundary.
-+ *
-+ * Version numbers of the hvm_start_info structure have evolved like this:
-+ *
-+ * Version 0:
-+ *
-+ * Version 1:   Added the memmap_paddr/memmap_entries fields (plus 4 bytes of
-+ *              padding) to the end of the hvm_start_info struct. These new
-+ *              fields can be used to pass a memory map to the guest. The
-+ *              memory map is optional and so guests that understand version 1
-+ *              of the structure must check that memmap_entries is non-zero
-+ *              before trying to read the memory map.
-+ */
-+#define XEN_HVM_START_MAGIC_VALUE 0x336ec578
++    if (unlikely(host_fma_is_broken)) {
++        goto soft;
++    }
 +
-+/*
-+ * C representation of the x86/HVM start info layout.
-+ *
-+ * The canonical definition of this layout is above, this is just a way to
-+ * represent the layout described there using C types.
-+ */
-+struct hvm_start_info {
-+    uint32_t magic;             /* Contains the magic value 0x336ec578       */
-+                                /* ("xEn3" with the 0x80 bit of the "E" set).*/
-+    uint32_t version;           /* Version of this structure.                */
-+    uint32_t flags;             /* SIF_xxx flags.                            */
-+    uint32_t nr_modules;        /* Number of modules passed to the kernel.   */
-+    uint64_t modlist_paddr;     /* Physical address of an array of           */
-+                                /* hvm_modlist_entry.                        */
-+    uint64_t cmdline_paddr;     /* Physical address of the command line.     */
-+    uint64_t rsdp_paddr;        /* Physical address of the RSDP ACPI data    */
-+                                /* structure.                                */
-+    uint64_t memmap_paddr;      /* Physical address of an array of           */
-+                                /* hvm_memmap_table_entry. Only present in   */
-+                                /* version 1 and newer of the structure      */
-+    uint32_t memmap_entries;    /* Number of entries in the memmap table.    */
-+                                /* Only present in version 1 and newer of    */
-+                                /* the structure. Value will be zero if      */
-+                                /* there is no memory map being provided.    */
-+    uint32_t reserved;
-+};
+     /*
+      * When (a || b) == 0, there's no need to check for under/over flow,
+      * since we know the addend is (normal || 0) and the product is 0.
+@@ -1623,6 +1630,11 @@ float64_muladd(float64 xa, float64 xb, float64 xc, int flags, float_status *s)
+     if (unlikely(!f64_is_zon3(ua, ub, uc))) {
+         goto soft;
+     }
 +
-+struct hvm_modlist_entry {
-+    uint64_t paddr;             /* Physical address of the module.           */
-+    uint64_t size;              /* Size of the module in bytes.              */
-+    uint64_t cmdline_paddr;     /* Physical address of the command line.     */
-+    uint64_t reserved;
-+};
++    if (unlikely(host_fma_is_broken)) {
++        goto soft;
++    }
 +
-+struct hvm_memmap_table_entry {
-+    uint64_t addr;              /* Base address of the memory region         */
-+    uint64_t size;              /* Size of the memory region in bytes        */
-+    uint32_t type;              /* Mapping type                              */
-+    uint32_t reserved;
-+};
+     /*
+      * When (a || b) == 0, there's no need to check for under/over flow,
+      * since we know the addend is (normal || 0) and the product is 0.
+@@ -7974,3 +7986,25 @@ float128 float128_scalbn(float128 a, int n, float_status *status)
+                                          , status);
+ 
+ }
 +
-+#endif /* __XEN_PUBLIC_ARCH_X86_HVM_START_INFO_H__ */
--- 
-1.8.3.1
++static void __attribute__((constructor)) softfloat_init(void)
++{
++    union_float64 ua, ub, uc, ur;
++
++    if (QEMU_NO_HARDFLOAT) {
++        return;
++    }
++
++    /*
++     * Test that the host's FMA is not obviously broken. For example,
++     * glibc < 2.23 can perform an incorrect FMA on certain hosts; see
++     *   https://sourceware.org/bugzilla/show_bug.cgi?id=13304
++     */
++    ua.s = 0x0020000000000001;
++    ub.s = 0x3ca0000000000000;
++    uc.s = 0x0020000000000000;
++    ur.h = fma(ua.h, ub.h, uc.h);
++    if (ur.s != 0x0020000000000001) {
++        host_fma_is_broken = true;
++    }
++}
