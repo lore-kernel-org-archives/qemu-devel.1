@@ -1,26 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gaPX0-0002mg-8W
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 13:28:19 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gaPkv-0007Kx-Kl
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 13:42:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gaPWx-0000oG-04
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 13:28:18 -0500
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:40371)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gaPWw-0000mt-Oj
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 13:28:14 -0500
-Date: Fri, 21 Dec 2018 13:28:10 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181221182810.GA11197@flamenco>
-References: <beec7ae9-f9ce-52f0-7e55-cb25d70c51f4@ozlabs.ru>
-	<d5247b86-4c9c-0eff-7900-66443041f63e@redhat.com>
-	<20181221093623.738b71e9@bahia.lan>
-	<20181221112634.4abd9d02@bahia.lan>
+	(envelope-from <mreitz@redhat.com>) id 1gaPks-0002Zy-Km
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 13:42:41 -0500
+From: Max Reitz <mreitz@redhat.com>
+Date: Fri, 21 Dec 2018 19:42:26 +0100
+Message-Id: <20181221184226.28881-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181221112634.4abd9d02@bahia.lan>
-Subject: Re: [Qemu-devel] travis failures
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] iotests: Make 234 stable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +19,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Thomas Huth <thuth@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On Fri, Dec 21, 2018 at 11:26:34 +0100, Greg Kurz wrote:
-> On Fri, 21 Dec 2018 09:36:23 +0100
-> Greg Kurz <groug@kaod.org> wrote:
-> 
-> > On Fri, 21 Dec 2018 07:47:07 +0100
-> > Thomas Huth <thuth@redhat.com> wrote:
-> > 
-> > > On 2018-12-21 04:06, Alexey Kardashevskiy wrote:  
-> > > > Hi
-> > > > 
-> > > > I am trying https://travis-ci.org/aik/qemu/ and that thing fails every
-> > > > time I am not so sure why.
-> > > > 
-> > > > One example:
-> > > > https://travis-ci.org/aik/qemu/jobs/470796318
-> > > > 
-> > > > The errors are like this:
-> > > > 
-> > > >   GTESTER check-qtest-unicore32
-> > > >   GTESTER check-qtest-x86_64
-> > > > Could not access KVM kernel module: No such file or directory
-> > > > qemu-system-x86_64: failed to initialize KVM: No such file or directory
-> > > > qemu-system-x86_64: Back to tcg accelerator
-> > > > 
-> > > > 
-> > > > Does anyone else see those? How do we fix them? Thanks.    
-> > > 
-> > > Some test are explicitly requesting "-M accel=kvm:tcg" and this is
-> > > causing this message if KVM is not available. We could maybe silence
-> > > them if qtest_enabled() ?
-> > > 
-> > >  Thomas
-> > > 
-> > >   
-> > 
-> > I've also experienced a bunch of similar failures with travis, like:
-> > 
-> > https://travis-ci.org/gkurz/qemu/jobs/466994463
-> > 
-> 
-> Today with tests/test-qht-par again:
-> 
-> https://travis-ci.org/gkurz/qemu/jobs/470871251#L4455
-> 
-> Cc'ing Emilio for suggestions on how to go forward with this.
+This test waits for a MIGRATION event with status=3Dcompleted on the
+source VM before querying the migration status on both source and
+destination.  However, just because the source says migration has
+completed does not mean the destination thinks the same.  Therefore, in
+some cases, the destination VM may still report "active" instead of
+"completed" when asked for its migration status.
 
-Yes, this was being discussed in this thread:
+Fix this by enabling migration events on both VMs and waiting until both
+source and destination emit a status=3Dcompleted MIGRATION event.
 
-  https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg01638.html
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ tests/qemu-iotests/234     | 56 ++++++++++++++++++++------------------
+ tests/qemu-iotests/234.out | 10 +++++--
+ 2 files changed, 38 insertions(+), 28 deletions(-)
 
-I haven't heard from Eduardo in a while, I guess he's off for the
-holidays.
-
-My latest suggestion was to try a branch where test-qht-par is
-standalone, instead of using system(3) to call qht-bench--see
-this message:
-  https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg02056.html
-
-Can anyone please try that? Or at least let me know how to run
-a test Travis build so that I can debug this faster.
-
-Thanks,
-
-		Emilio
+diff --git a/tests/qemu-iotests/234 b/tests/qemu-iotests/234
+index a8185b4360..c4c26bc21e 100755
+--- a/tests/qemu-iotests/234
++++ b/tests/qemu-iotests/234
+@@ -26,6 +26,22 @@ import os
+ iotests.verify_image_format(supported_fmts=3D['qcow2'])
+ iotests.verify_platform(['linux'])
+=20
++def enable_migration_events(vm, name):
++    iotests.log('Enabling migration QMP events on %s...' % name)
++    iotests.log(vm.qmp('migrate-set-capabilities', capabilities=3D[
++        {
++            'capability': 'events',
++            'state': True
++        }
++    ]))
++
++def wait_migration(vm):
++    while True:
++        event =3D vm.event_wait('MIGRATION')
++        iotests.log(event, filters=3D[iotests.filter_qmp_event])
++        if event['data']['status'] =3D=3D 'completed':
++            break
++
+ with iotests.FilePath('img') as img_path, \
+      iotests.FilePath('backing') as backing_path, \
+      iotests.FilePath('mig_fifo_a') as fifo_a, \
+@@ -46,6 +62,8 @@ with iotests.FilePath('img') as img_path, \
+          .add_blockdev('%s,file=3Ddrive0-backing-file,node-name=3Ddrive0=
+-backing' % (iotests.imgfmt))
+          .launch())
+=20
++    enable_migration_events(vm_a, 'A')
++
+     iotests.log('Launching destination VM...')
+     (vm_b.add_blockdev('file,filename=3D%s,node-name=3Ddrive0-file' % (i=
+mg_path))
+          .add_blockdev('%s,file=3Ddrive0-file,node-name=3Ddrive0' % (iot=
+ests.imgfmt))
+@@ -54,6 +72,8 @@ with iotests.FilePath('img') as img_path, \
+          .add_incoming("exec: cat '%s'" % (fifo_a))
+          .launch())
+=20
++    enable_migration_events(vm_b, 'B')
++
+     # Add a child node that was created after the parent node. The rever=
+se case
+     # is covered by the -blockdev options above.
+     iotests.log(vm_a.qmp('blockdev-snapshot', node=3D'drive0-backing',
+@@ -61,22 +81,13 @@ with iotests.FilePath('img') as img_path, \
+     iotests.log(vm_b.qmp('blockdev-snapshot', node=3D'drive0-backing',
+                          overlay=3D'drive0'))
+=20
+-    iotests.log('Enabling migration QMP events on A...')
+-    iotests.log(vm_a.qmp('migrate-set-capabilities', capabilities=3D[
+-        {
+-            'capability': 'events',
+-            'state': True
+-        }
+-    ]))
+-
+     iotests.log('Starting migration to B...')
+     iotests.log(vm_a.qmp('migrate', uri=3D'exec:cat >%s' % (fifo_a)))
+     with iotests.Timeout(3, 'Migration does not complete'):
+-        while True:
+-            event =3D vm_a.event_wait('MIGRATION')
+-            iotests.log(event, filters=3D[iotests.filter_qmp_event])
+-            if event['data']['status'] =3D=3D 'completed':
+-                break
++        # Wait for the source first (which includes setup=3Dsetup)
++        wait_migration(vm_a)
++        # Wait for the destination second (which does not)
++        wait_migration(vm_b)
+=20
+     iotests.log(vm_a.qmp('query-migrate')['return']['status'])
+     iotests.log(vm_b.qmp('query-migrate')['return']['status'])
+@@ -94,25 +105,18 @@ with iotests.FilePath('img') as img_path, \
+          .add_incoming("exec: cat '%s'" % (fifo_b))
+          .launch())
+=20
++    enable_migration_events(vm_a, 'A')
++
+     iotests.log(vm_a.qmp('blockdev-snapshot', node=3D'drive0-backing',
+                          overlay=3D'drive0'))
+=20
+-    iotests.log('Enabling migration QMP events on B...')
+-    iotests.log(vm_b.qmp('migrate-set-capabilities', capabilities=3D[
+-        {
+-            'capability': 'events',
+-            'state': True
+-        }
+-    ]))
+-
+     iotests.log('Starting migration back to A...')
+     iotests.log(vm_b.qmp('migrate', uri=3D'exec:cat >%s' % (fifo_b)))
+     with iotests.Timeout(3, 'Migration does not complete'):
+-        while True:
+-            event =3D vm_b.event_wait('MIGRATION')
+-            iotests.log(event, filters=3D[iotests.filter_qmp_event])
+-            if event['data']['status'] =3D=3D 'completed':
+-                break
++        # Wait for the source first (which includes setup=3Dsetup)
++        wait_migration(vm_b)
++        # Wait for the destination second (which does not)
++        wait_migration(vm_a)
+=20
+     iotests.log(vm_a.qmp('query-migrate')['return']['status'])
+     iotests.log(vm_b.qmp('query-migrate')['return']['status'])
+diff --git a/tests/qemu-iotests/234.out b/tests/qemu-iotests/234.out
+index b9ed910b1a..692976d1c6 100644
+--- a/tests/qemu-iotests/234.out
++++ b/tests/qemu-iotests/234.out
+@@ -1,14 +1,18 @@
+ Launching source VM...
++Enabling migration QMP events on A...
++{"return": {}}
+ Launching destination VM...
++Enabling migration QMP events on B...
+ {"return": {}}
+ {"return": {}}
+-Enabling migration QMP events on A...
+ {"return": {}}
+ Starting migration to B...
+ {"return": {}}
+ {"data": {"status": "setup"}, "event": "MIGRATION", "timestamp": {"micro=
+seconds": "USECS", "seconds": "SECS"}}
+ {"data": {"status": "active"}, "event": "MIGRATION", "timestamp": {"micr=
+oseconds": "USECS", "seconds": "SECS"}}
+ {"data": {"status": "completed"}, "event": "MIGRATION", "timestamp": {"m=
+icroseconds": "USECS", "seconds": "SECS"}}
++{"data": {"status": "active"}, "event": "MIGRATION", "timestamp": {"micr=
+oseconds": "USECS", "seconds": "SECS"}}
++{"data": {"status": "completed"}, "event": "MIGRATION", "timestamp": {"m=
+icroseconds": "USECS", "seconds": "SECS"}}
+ completed
+ completed
+ {"return": {"running": false, "singlestep": false, "status": "postmigrat=
+e"}}
+@@ -16,14 +20,16 @@ completed
+ Add a second parent to drive0-file...
+ {"return": {}}
+ Restart A with -incoming and second parent...
++Enabling migration QMP events on A...
+ {"return": {}}
+-Enabling migration QMP events on B...
+ {"return": {}}
+ Starting migration back to A...
+ {"return": {}}
+ {"data": {"status": "setup"}, "event": "MIGRATION", "timestamp": {"micro=
+seconds": "USECS", "seconds": "SECS"}}
+ {"data": {"status": "active"}, "event": "MIGRATION", "timestamp": {"micr=
+oseconds": "USECS", "seconds": "SECS"}}
+ {"data": {"status": "completed"}, "event": "MIGRATION", "timestamp": {"m=
+icroseconds": "USECS", "seconds": "SECS"}}
++{"data": {"status": "active"}, "event": "MIGRATION", "timestamp": {"micr=
+oseconds": "USECS", "seconds": "SECS"}}
++{"data": {"status": "completed"}, "event": "MIGRATION", "timestamp": {"m=
+icroseconds": "USECS", "seconds": "SECS"}}
+ completed
+ completed
+ {"return": {"running": true, "singlestep": false, "status": "running"}}
+--=20
+2.19.2
