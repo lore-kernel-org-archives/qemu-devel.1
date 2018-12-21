@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaDdn-0000ZN-Q5
+	(envelope-from <dgibson@ozlabs.org>) id 1gaDdm-0000ZJ-1T
 	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaDdl-0007F9-H6
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:31 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gaDdl-0007D5-0t
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:29 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 21 Dec 2018 16:45:34 +1100
-Message-Id: <20181221054606.22007-9-david@gibson.dropbear.id.au>
+Date: Fri, 21 Dec 2018 16:45:38 +1100
+Message-Id: <20181221054606.22007-13-david@gibson.dropbear.id.au>
 In-Reply-To: <20181221054606.22007-1-david@gibson.dropbear.id.au>
 References: <20181221054606.22007-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 08/40] ppc405_boards: use g_new(T,
+Subject: [Qemu-devel] [PULL 12/40] virtex_ml507: use g_new(T,
  n) instead of g_malloc(sizeof(T) * n)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,32 +31,28 @@ From: Greg Kurz <groug@kaod.org>
 Because it is a recommended coding practice (see HACKING).
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/ppc405_boards.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/ppc/virtex_ml507.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
-index 1b0a0a8ba3..f47b15f10e 100644
---- a/hw/ppc/ppc405_boards.c
-+++ b/hw/ppc/ppc405_boards.c
-@@ -149,7 +149,7 @@ static void ref405ep_init(MachineState *machine)
-     MemoryRegion *bios;
-     MemoryRegion *sram =3D g_new(MemoryRegion, 1);
-     ram_addr_t bdloc;
--    MemoryRegion *ram_memories =3D g_malloc(2 * sizeof(*ram_memories));
-+    MemoryRegion *ram_memories =3D g_new(MemoryRegion, 2);
-     hwaddr ram_bases[2], ram_sizes[2];
-     target_ulong sram_size;
-     long bios_size;
-@@ -448,7 +448,7 @@ static void taihu_405ep_init(MachineState *machine)
-     qemu_irq *pic;
-     MemoryRegion *sysmem =3D get_system_memory();
-     MemoryRegion *bios;
--    MemoryRegion *ram_memories =3D g_malloc(2 * sizeof(*ram_memories));
-+    MemoryRegion *ram_memories =3D g_new(MemoryRegion, 2);
-     MemoryRegion *ram =3D g_malloc0(sizeof(*ram));
-     hwaddr ram_bases[2], ram_sizes[2];
-     long bios_size;
+diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+index ee9b4b4490..5177120574 100644
+--- a/hw/ppc/virtex_ml507.c
++++ b/hw/ppc/virtex_ml507.c
+@@ -105,7 +105,7 @@ static PowerPCCPU *ppc440_init_xilinx(ram_addr_t *ram=
+_size,
+     ppc_dcr_init(env, NULL, NULL);
+=20
+     /* interrupt controller */
+-    irqs =3D g_malloc0(sizeof(qemu_irq) * PPCUIC_OUTPUT_NB);
++    irqs =3D g_new0(qemu_irq, PPCUIC_OUTPUT_NB);
+     irqs[PPCUIC_OUTPUT_INT] =3D ((qemu_irq *)env->irq_inputs)[PPC40x_INP=
+UT_INT];
+     irqs[PPCUIC_OUTPUT_CINT] =3D ((qemu_irq *)env->irq_inputs)[PPC40x_IN=
+PUT_CINT];
+     ppcuic_init(env, irqs, 0x0C0, 0, 1);
 --=20
 2.19.2
