@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gaJ4O-0005f0-Fh
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 06:34:21 -0500
+	(envelope-from <13824125580@163.com>) id 1gaJAT-00071L-1C
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 06:40:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gaJ4K-0002Xb-Eb
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 06:34:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44486)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gaJ4I-0002TU-EK
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 06:34:16 -0500
-References: <20181220152030.28035-1-remy.noel@blade-group.com>
-	<20181220163738.GA5662@stefanha-x1.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <44649c49-6d9f-a839-32f1-1cce9766da17@redhat.com>
-Date: Fri, 21 Dec 2018 12:34:03 +0100
+	(envelope-from <13824125580@163.com>) id 1gaJAP-0007q8-GB
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 06:40:36 -0500
+Received: from m13-128.163.com ([220.181.13.128]:21336)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <13824125580@163.com>) id 1gaJAO-0007lE-Nm
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 06:40:33 -0500
+Date: Fri, 21 Dec 2018 19:40:24 +0800 (CST)
+From: tugouxp  <13824125580@163.com>
+In-Reply-To: <874lb79ru9.fsf@linaro.org>
+References: <76d14474.f850.167cb46b4d9.Coremail.13824125580@163.com>
+	<87d0pw9y7m.fsf@linaro.org>
+	<19e6128e.27e9.167ce041690.Coremail.13824125580@163.com>
+	<874lb79ru9.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20181220163738.GA5662@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="0cvTm023tFifx4AMvnSpFfH5qwfqaAURh"
-Subject: Re: [Qemu-devel] [QEMU-devel][PATCH v4 0/2] Fix concurrent
- aio_poll/set_fd_handler.
+Message-ID: <744a1829.ff89.167d091062b.Coremail.13824125580@163.com>
+Content-Type: text/plain; charset=GBK
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] did the qemu can emulate the whole system with the
+ processor that without support the "virtulization and kvm"?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,83 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, remy.noel@blade-group.com
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Stefan Weil <sw@weilnetz.de>
+To: =?GBK?Q?Alex_Benn=A8=A6e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0cvTm023tFifx4AMvnSpFfH5qwfqaAURh
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, remy.noel@blade-group.com
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>,
- Stefan Weil <sw@weilnetz.de>
-Message-ID: <44649c49-6d9f-a839-32f1-1cce9766da17@redhat.com>
-Subject: Re: [QEMU-devel][PATCH v4 0/2] Fix concurrent
- aio_poll/set_fd_handler.
-References: <20181220152030.28035-1-remy.noel@blade-group.com>
- <20181220163738.GA5662@stefanha-x1.localdomain>
-In-Reply-To: <20181220163738.GA5662@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-
-On 20/12/18 17:37, Stefan Hajnoczi wrote:
-> On Thu, Dec 20, 2018 at 04:20:28PM +0100, remy.noel@blade-group.com wro=
-te:
->> From: Remy Noel <remy.noel@blade-group.com>
->>
->> It is possible for an io_poll/read/write callback to be concurrently e=
-xecuted along
->> with an aio_set_fd_handlers. This can cause all sorts of problems, lik=
-e
->> a NULL callback or a bad opaque pointer.
->>
->> V2:
->>     * Do not use RCU anymore as it inccurs a performance loss
->> V3:
->>     * Don't drop revents when a handler is modified [Stefan]
->> V4:
->>     * Unregister fd from ctx epoll when removing fd_handler [Paolo]
->>
->> Remy Noel (2):
->>   aio-posix: Unregister fd from ctx epoll when removing fd_handler.
->>   aio-posix: Fix concurrent aio_poll/set_fd_handler.
->>
->>  util/aio-posix.c | 90 +++++++++++++++++++++++++++++------------------=
--
->>  util/aio-win32.c | 67 ++++++++++++++++-------------------
->>  2 files changed, 84 insertions(+), 73 deletions(-)
->>
->> --=20
->> 2.19.2
->>
->=20
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-
-FWIW, I had missed the early version that used RCU, but lockcnt is
-already very RCU-like, so not using RCU is the right thing to do.  The
-difference between lockcnt and RCU is that cleanup is done by the reader
-instead of a separate thread.  Because we know that reader/writer
-concurrency is very rare for AioContext handlers, the tradeoffs favor
-lockcnt over RCU.
-
-Paolo
-
-
---0cvTm023tFifx4AMvnSpFfH5qwfqaAURh
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlwcz6sACgkQv/vSX3jH
-roP+/ggAqizsNhLP6ApRp4F14jv28xpbDSgsv5RbCwcQPlrRx4cfwHDfUVtzXY/1
-nd9hIGuTv/4RZWCfo0jGxq26rYwci6gFmyzf2AmtOH9VmoNovVAjCNRcuY+ILwNv
-JlZDEi1+tjneLTF3BVt8w7HIJv2d302Y1npYZSiP/wWL160sYYvlGRseEI9MpyWC
-q1hhrqvX6RB/LJelvXGwLiPBEO5uIJecvJfjKbDhtrI8ytVHOkqrUoft2XBoArfd
-dySsnk4fdiTt9+DBGrvfb+SydF/QBeExdSHWjdkq3AxlSHkA5Gw5/1AL46RiIVB6
-D5GUWCL4TtTo5lCP4IzP0DidNGaHJA==
-=Oct8
------END PGP SIGNATURE-----
-
---0cvTm023tFifx4AMvnSpFfH5qwfqaAURh--
+dGhhbmsgeW91LgogCmkganVzdCB3YW50IHRvIGNvbmZpcm0gb25lIHRoaW5nLCAgdGhhdCBpcyB3
+aGV0aGVyIHRoZSBxZW11IGNhbiBlbXVsYXRlIGEgd2hvbGUgb3BlcmF0aW9uIHN5c3RlbSBqdXN0
+IGJ5IGFuYWx5c2lzIGluc3RydWN0aW9ucyBieSBpbnN0cnVjdGlvbnMgbWFudWFsbHkgIHdpdGhv
+dXQgdGhlIHN1cHBvcnQgb2YgS1ZNLgpzbyBmcm9tIHRoZSBhbnN3ZXIgeW91IGdpdmUgdG8gbWUs
+IGl0IGlzIGZlYXNpYmxlLCByaWdodD8KCgoKdGhhbmtzIHZlcnkgbXVjaCEKCgoKCgoKCgoKQXQg
+MjAxOC0xMi0yMSAxNzowMTowMiwgIkFsZXggQmVubqimZSIgPGFsZXguYmVubmVlQGxpbmFyby5v
+cmc+IHdyb3RlOgo+Cj50dWdvdXhwIDwxMzgyNDEyNTU4MEAxNjMuY29tPiB3cml0ZXM6Cj4KPj4g
+SGkgYWxleDoKPj4gICAgIG5vdyBteSBob3N0IG1hY2hpbmUgZGlkIG5vdCBoYXZlIHRoZSAiL2Rl
+di9rdm0iIG5vZGVzIGFuZCBubyBjaGFuY2UgdG8gbWFrZSBpdCBleGlzdHMuCj4+IHNvIGkgd2Fu
+dCB0byBrbm93IHdoZXRoZXIgdGhlICIvZGV2L2t2bSIgaXMgIG1hbmRhdG9yeSAgZm9yIHFlbXUg
+dG8gZW11bGF0ZSB0aGUgd2hvbGUgc3lzdGVtLgo+PiBzbyBpIGNhbiBtYWtlIHRoZSBlbXVsYXRp
+b24gd2l0aG91dCB0aGUgc3VwcG9ydCBvZiBrdm0gbWVjaGFuaXNtLgo+Cj5RRU1VIHJ1bnMgaW4g
+dHdvIG1vZGVzIC0gZnVsbCBzeXN0ZW0gZW11bGF0aW9uIHdpdGggVENHIGRvZXNuJ3QgcmVxdWly
+ZQo+S1ZNIGFsdGhvdWdoIGl0IGlzIHJlbGF0aXZlbHkgc2xvdy4gT24gc3lzdGVtcyB3aGVyZSB0
+aGVyZSBndWVzdAo+YXJjaGl0ZWN0dXJlIGlzIHRoZSBzYW1lIGFzIHRoZSBob3N0IGFyY2hpdGVj
+dHVyZSB5b3UgY2FuIHJ1biB3aXRoIEtNVgo+KG9yIEhBWC9XSFBYL0hWRikgYWNjZWxlcmF0b3Jz
+IGF0IG5lYXIgbmF0aXZlIHNwZWVkcy4KPgo+VGhlIHJlYXNvbnMgZm9yIG5vdCBoYXZpbmcgYSAv
+ZGV2L2t2bSBjYW4gdmFyeSBidXQgeW91IGhhdmVuJ3Qgc2FpZCB3aGF0Cj55b3VyIGhvc3QgYXJj
+aGl0ZWN0dXJlIGlzIGFuZCB3aGF0IE9TIHlvdSBhcmUgcnVubmluZyBzbyBpdCdzIGhhcmQgdG8K
+Pm9mZmVyIGFkdmljZSBoZXJlLgo+Cj4tLQo+QWxleCBCZW5uqKZlCg==
