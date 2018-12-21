@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gaQ4F-0002PM-Ek
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 14:02:40 -0500
+	(envelope-from <cota@braap.org>) id 1gaQvd-00040X-7w
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 14:57:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gaQ4A-0006rQ-D4
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 14:02:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47158)
+	(envelope-from <cota@braap.org>) id 1gaQva-0002Kx-17
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 14:57:49 -0500
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:38697)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gaQ4A-0006nc-68
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 14:02:34 -0500
-Date: Fri, 21 Dec 2018 14:02:28 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181221140016-mutt-send-email-mst@kernel.org>
-References: <20181217141740.16ccfaa1@Igors-MacBook-Pro.local>
-	<20181218092723.yhaerzm4vlzgef65@linux.intel.com>
-	<20181218155536.2b35a037@Igors-MacBook-Pro.local>
-	<20181219025717.6m72hq73p2haexkv@linux.intel.com>
-	<20181219114037.5550a562@redhat.com>
-	<20181220211801.GR19442@habkost.net>
-	<20181221151325.39b64733@redhat.com>
-	<20181221160944.65c5skjhkel3of7y@linux.intel.com>
-	<20181221120320-mutt-send-email-mst@kernel.org>
-	<20181221173758.4ohku43as4dkb355@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181221173758.4ohku43as4dkb355@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] intel-iommu: differentiate host
- address width from IOVA address width.
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gaQvZ-0002JD-Pc
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 14:57:45 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Fri, 21 Dec 2018 14:51:59 -0500
+Message-Id: <20181221195200.6544-2-cota@braap.org>
+In-Reply-To: <20181221195200.6544-1-cota@braap.org>
+References: <20181221195200.6544-1-cota@braap.org>
+Subject: [Qemu-devel] [PATCH 1/2] fp-bench: fix update_random_ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,33 +23,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On Sat, Dec 22, 2018 at 01:37:58AM +0800, Yu Zhang wrote:
-> On Fri, Dec 21, 2018 at 12:04:49PM -0500, Michael S. Tsirkin wrote:
-> > On Sat, Dec 22, 2018 at 12:09:44AM +0800, Yu Zhang wrote:
-> > > Well, my understanding of the vt-d spec is that the address limitation in
-> > > DMAR are referring to the same concept of CPUID.MAXPHYSADDR. I do not think
-> > > there's any different in the native scenario. :)
-> > 
-> > I think native machines exist on which the two values are different.
-> > Is that true?
-> 
-> I think the answer is not. My understanding is that HAW(host address wdith) is
-> the maximum physical address width a CPU can detects(by cpuid.0x80000008).
-> 
-> I agree there are some addresses the CPU does not touch, but they are still in
-> the physical address space, and there's only one physical address space...
-> 
-> B.R.
-> Yu
+The second test in the branches is wrong; fix while converting
+to a switch statement, which is easier to get right.
 
-Ouch I thought we are talking about the virtual address size.
-I think I did have a box where VTD's virtual address size was
-smaller than CPU's.
-For physical one - we just need to make it as big as max supported
-memory right?
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+---
+ tests/fp/fp-bench.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
+diff --git a/tests/fp/fp-bench.c b/tests/fp/fp-bench.c
+index f5bc5edebf..546bac9c9c 100644
+--- a/tests/fp/fp-bench.c
++++ b/tests/fp/fp-bench.c
+@@ -143,15 +143,20 @@ static void update_random_ops(int n_ops, enum precision prec)
+     for (i = 0; i < n_ops; i++) {
+         uint64_t r = random_ops[i];
+ 
+-        if (prec == PREC_SINGLE || PREC_FLOAT32) {
++        switch (prec) {
++        case PREC_SINGLE:
++        case PREC_FLOAT32:
+             do {
+                 r = xorshift64star(r);
+             } while (!float32_is_normal(r));
+-        } else if (prec == PREC_DOUBLE || PREC_FLOAT64) {
++            break;
++        case PREC_DOUBLE:
++        case PREC_FLOAT64:
+             do {
+                 r = xorshift64star(r);
+             } while (!float64_is_normal(r));
+-        } else {
++            break;
++        default:
+             g_assert_not_reached();
+         }
+         random_ops[i] = r;
 -- 
-MST
+2.17.1
