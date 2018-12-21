@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gaK2f-0002kB-3m
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gaK2f-0002k8-27
 	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 07:36:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gaK2b-0003X1-3L
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gaK2Z-0003VK-5i
 	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 07:36:35 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36602)
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:42333)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gaK2Z-0003Qk-6q
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 07:36:32 -0500
-Received: by mail-wr1-x441.google.com with SMTP id u4so5101055wrp.3
+	id 1gaK2X-0003R9-7U
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 07:36:30 -0500
+Received: by mail-wr1-x42b.google.com with SMTP id q18so5096182wrx.9
 	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 04:36:27 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	k7sm11217839wrl.51.2018.12.21.04.36.24 for <qemu-devel@nongnu.org>
+	k7sm11217839wrl.51.2018.12.21.04.36.25 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
 	Fri, 21 Dec 2018 04:36:25 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 21 Dec 2018 13:36:21 +0100
-Message-Id: <1545395783-39040-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v4 00/35] Misc patches for 2018-12-21
+Date: Fri, 21 Dec 2018 13:36:22 +0100
+Message-Id: <1545395783-39040-2-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1545395783-39040-1-git-send-email-pbonzini@redhat.com>
+References: <1545395783-39040-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 22/35] test: execute g_test_run when tests are
+ skipped
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,302 +34,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The following changes since commit e85c577158a2e8e252414959da9ef15c12eec63d:
+Sometimes a test's main() function recognizes that the environment
+does not support the test, and therefore exits.  In this case, we
+still should run g_test_run() so that a TAP harness will print the
+test plan ("1..0") and the test will be marked as skipped.
 
-  Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2018-12-17' into staging (2018-12-18 14:31:06 +0000)
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <1543513531-1151-2-git-send-email-pbonzini@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ tests/cdrom-test.c        | 2 +-
+ tests/ivshmem-test.c      | 5 ++---
+ tests/migration-test.c    | 8 ++++----
+ tests/test-crypto-pbkdf.c | 3 ++-
+ 4 files changed, 9 insertions(+), 9 deletions(-)
 
-are available in the git repository at:
-
-
-  git://github.com/bonzini/qemu.git tags/for-upstream
-
-for you to fetch changes up to 2cbc4ea2a9f9b81d5f4bfee8c412849755b842b0:
-
-  avoid TABs in files that only contain a few (2018-12-21 12:58:28 +0100)
-
-v3->v4: avoid extra long command lines and ease cut-and-paste from make check logs
-----------------------------------------------------------------
-* HAX support for Linux hosts (Alejandro)
-* esp bugfixes (Guenter)
-* Windows build cleanup (Marc-André)
-* checkpatch logic improvements (Paolo)
-* coalesced range bugfix (Paolo)
-* switch testsuite to TAP (Paolo)
-* QTAILQ rewrite (Paolo)
-* block/iscsi.c cancellation fixes (Stefan)
-* improve selection of the default accelerator (Thomas)
-
-----------------------------------------------------------------
-Alexandro Sanchez Bach (1):
-      hax: Support for Linux hosts
-
-Guenter Roeck (2):
-      esp-pci: Fix status register write erase control
-      scsi: esp: Defer command completion until previous interrupts have been handled
-
-Marc-André Lureau (5):
-      vhost-user-bridge: fix "unknown type name" compilation error
-      build-sys: don't include windows.h, osdep.h does it
-      build-sys: move windows defines in osdep.h header
-      build-sys: build with Vista API by default
-      qga: drop < Vista compatibility
-
-Paolo Bonzini (21):
-      checkpatch: fix premature exit when no input or --mailback
-      checkpatch: check Signed-off-by in --mailback mode
-      checkpatch: improve handling of multiple patches or files
-      checkpatch: colorize output to terminal
-      pam: wrap MemoryRegion initialization in a transaction
-      memory: extract flat_range_coalesced_io_{del,add}
-      memory: avoid unnecessary coalesced_io_del operations
-      memory: update coalesced_range on transaction_commit
-      test: execute g_test_run when tests are skipped
-      test: replace gtester with a TAP driver
-      qemu/queue.h: do not access tqe_prev directly
-      vfio: make vfio_address_spaces static
-      qemu/queue.h: leave head structs anonymous unless necessary
-      qemu/queue.h: typedef QTAILQ heads
-      qemu/queue.h: remove Q_TAILQ_{HEAD,ENTRY}
-      qemu/queue.h: reimplement QTAILQ without pointer-to-pointers
-      qemu/queue.h: simplify reverse access to QTAILQ
-      checkpatch: warn about qemu/queue.h head structs that are not typedef-ed
-      scripts: add script to convert multiline comments into 4-line format
-      remove space-tab sequences
-      avoid TABs in files that only contain a few
-
-Peng Hao (1):
-      hw/watchdog/wdt_i6300esb: remove a unnecessary comment
-
-Stefan Hajnoczi (4):
-      block/iscsi: drop unused IscsiAIOCB->buf field
-      block/iscsi: take iscsilun->mutex in iscsi_timed_check_events()
-      block/iscsi: fix ioctl cancel use-after-free
-      block/iscsi: cancel libiscsi task when ABORT TASK TMF completes
-
-Thomas Huth (1):
-      accel: Improve selection of the default accelerator
-
- accel/accel.c                                |  18 +-
- accel/kvm/kvm-all.c                          |   4 +-
- accel/tcg/translate-all.c                    |   4 -
- block/bochs.c                                |  22 +-
- block/file-posix.c                           |   2 +-
- block/file-win32.c                           |   8 +-
- block/gluster.c                              |   2 +-
- block/iscsi.c                                |  47 +++-
- block/linux-aio.c                            |   4 +-
- block/mirror.c                               |   2 +-
- block/qcow2-bitmap.c                         |   4 +-
- block/qcow2-cluster.c                        |   2 +-
- block/qcow2.h                                |   5 +-
- block/sheepdog.c                             |   6 +-
- block/vhdx.h                                 |   2 +-
- block/vpc.c                                  |   2 +-
- blockdev.c                                   |   4 +-
- bsd-user/elfload.c                           |   2 +-
- bsd-user/x86_64/target_syscall.h             |   2 +-
- configure                                    |   3 -
- contrib/elf2dmp/main.c                       |   2 +-
- contrib/ivshmem-client/ivshmem-client.h      |   4 +-
- contrib/ivshmem-server/ivshmem-server.h      |   5 +-
- cpus-common.c                                |   2 +-
- crypto/aes.c                                 |  28 +-
- disas/alpha.c                                |   8 +-
- disas/arm.c                                  |   2 +-
- disas/i386.c                                 |   4 +-
- disas/m68k.c                                 |   4 +-
- dump.c                                       |   2 +-
- exec.c                                       |   5 +-
- fsdev/qemu-fsdev.c                           |   2 +-
- hw/alpha/typhoon.c                           |  12 +-
- hw/arm/stellaris.c                           |   2 +-
- hw/block/nvme.h                              |   8 +-
- hw/block/xen_disk.c                          |   6 +-
- hw/char/sh_serial.c                          |  18 +-
- hw/char/virtio-serial-bus.c                  |   2 +-
- hw/char/xen_console.c                        |  58 ++--
- hw/core/loader.c                             |  28 +-
- hw/core/qdev.c                               |   4 +-
- hw/core/reset.c                              |   2 +-
- hw/display/tc6393xb.c                        |   6 +-
- hw/display/vga.c                             |   8 +-
- hw/display/virtio-gpu-3d.c                   |   6 +-
- hw/dma/pxa2xx_dma.c                          |   4 +-
- hw/dma/soc_dma.c                             |   2 +-
- hw/gpio/max7310.c                            |   2 +-
- hw/i386/xen/xen-hvm.c                        |   4 +-
- hw/i386/xen/xen-mapcache.c                   |   2 +-
- hw/ide/core.c                                |  94 +++----
- hw/input/lm832x.c                            |   2 +-
- hw/input/pckbd.c                             |   2 +-
- hw/input/tsc210x.c                           |   2 +-
- hw/intc/apic.c                               |   2 +-
- hw/mips/gt64xxx_pci.c                        |   6 +-
- hw/mips/mips_r4k.c                           |   4 +-
- hw/misc/max111x.c                            |   6 +-
- hw/misc/omap_l4.c                            |   4 +-
- hw/net/mipsnet.c                             |  16 +-
- hw/net/ne2000.c                              |  44 ++--
- hw/net/rocker/rocker.c                       |   2 +-
- hw/net/virtio-net.c                          |   4 +-
- hw/net/vmxnet3.c                             |   6 +-
- hw/pci-host/pam.c                            |   2 +
- hw/pci/msix.c                                |   2 +-
- hw/pci/pci.c                                 |  44 ++--
- hw/pci/pci_bridge.c                          |   2 +-
- hw/ppc/ppc405_uc.c                           |   2 +-
- hw/ppc/prep.c                                |   4 +-
- hw/ppc/spapr_iommu.c                         |   2 +-
- hw/scsi/esp-pci.c                            |  10 +-
- hw/scsi/esp.c                                |  33 ++-
- hw/scsi/lsi53c895a.c                         |   6 +-
- hw/scsi/scsi-bus.c                           |   2 +-
- hw/scsi/trace-events                         |   1 +
- hw/sh4/r2d.c                                 |  16 +-
- hw/usb/ccid-card-emulated.c                  |   4 +-
- hw/usb/combined-packet.c                     |   2 +-
- hw/usb/dev-bluetooth.c                       |   2 +-
- hw/usb/dev-hid.c                             |   6 +-
- hw/usb/dev-hub.c                             |  14 +-
- hw/usb/dev-mtp.c                             |   4 +-
- hw/usb/dev-network.c                         |   2 +-
- hw/usb/hcd-ehci.c                            |   2 +-
- hw/usb/hcd-ehci.h                            |   2 +-
- hw/usb/hcd-uhci.c                            |   8 +-
- hw/usb/xen-usb.c                             |   6 +-
- hw/vfio/common.c                             |   4 +-
- hw/watchdog/watchdog.c                       |   2 +-
- hw/watchdog/wdt_i6300esb.c                   |   1 -
- hw/xen/xen_devconfig.c                       |   2 +-
- hw/xen/xen_pvdev.c                           |   4 +-
- hw/xenpv/xen_domainbuild.c                   |   8 +-
- include/elf.h                                |  10 +-
- include/exec/memory.h                        |   6 +-
- include/hw/acpi/acpi.h                       |  14 +-
- include/hw/elf_ops.h                         |   2 +-
- include/hw/ide/internal.h                    |   2 +-
- include/hw/qdev-core.h                       |   2 +-
- include/hw/scsi/esp.h                        |   2 +
- include/hw/sh4/sh_intc.h                     |  20 +-
- include/hw/usb.h                             |   2 +-
- include/hw/vfio/vfio-common.h                |   4 +-
- include/hw/vfio/vfio-platform.h              |   2 +-
- include/hw/xen/io/ring.h                     |   4 +-
- include/net/net.h                            |   2 +-
- include/qemu/acl.h                           |  14 +-
- include/qemu/iov.h                           |   2 +-
- include/qemu/option_int.h                    |   2 +-
- include/qemu/osdep.h                         |  17 ++
- include/qemu/queue.h                         | 153 +++++------
- include/qemu/rcu_queue.h                     |  45 ++--
- include/qom/cpu.h                            |   9 +-
- include/scsi/constants.h                     |   2 +-
- include/sysemu/accel.h                       |   2 +-
- include/sysemu/balloon.h                     |   2 +-
- include/sysemu/kvm.h                         |   2 -
- include/sysemu/memory_mapping.h              |   2 +-
- include/sysemu/rng.h                         |   2 +-
- linux-user/elfload.c                         |   2 +-
- linux-user/linuxload.c                       |  14 +-
- linux-user/main.c                            |   4 +-
- linux-user/mmap.c                            |  10 +-
- linux-user/qemu.h                            |   4 +-
- linux-user/signal.c                          |  16 +-
- linux-user/strace.c                          |   4 +-
- linux-user/syscall.c                         |   2 +-
- linux-user/syscall_defs.h                    |   4 +-
- linux-user/uaccess.c                         |   2 +-
- linux-user/vm86.c                            |   2 +-
- linux-user/x86_64/target_syscall.h           |   2 +-
- memory.c                                     |  97 ++++---
- memory_mapping.c                             |   2 +-
- migration/block-dirty-bitmap.c               |   2 +-
- migration/block.c                            |   4 +-
- migration/ram.c                              |   2 +-
- monitor.c                                    |   4 +-
- nbd/client.c                                 |   2 +-
- net/checksum.c                               |   2 +-
- net/filter.c                                 |   2 +-
- net/net.c                                    |   2 +-
- net/queue.c                                  |   2 +-
- net/slirp.c                                  |   2 +-
- qga/commands-posix.c                         |   2 +-
- qga/commands-win32.c                         |  70 +----
- qtest.c                                      |   4 +-
- rules.mak                                    |   4 +-
- scripts/checkpatch.pl                        |  95 +++++--
- scripts/cocci-macro-file.h                   |  24 +-
- scripts/fix-multiline-comments.sh            |  62 +++++
- scripts/gtester-cat                          |  26 --
- scripts/tap-driver.pl                        | 378 +++++++++++++++++++++++++++
- scripts/tap-merge.pl                         | 110 ++++++++
- slirp/ip_input.c                             |   4 +-
- slirp/slirp.c                                |   2 +-
- slirp/tcp_input.c                            |  10 +-
- slirp/tcp_output.c                           |   4 +-
- slirp/tcp_timer.c                            |   2 +-
- slirp/udp.c                                  |   2 +-
- target/alpha/translate.c                     |   2 +-
- target/arm/kvm.c                             |   2 +-
- target/cris/helper.c                         |   2 +-
- target/cris/mmu.h                            |  10 +-
- target/cris/translate_v10.inc.c              |   2 +-
- target/i386/Makefile.objs                    |   6 +-
- target/i386/hax-i386.h                       |   6 +-
- target/i386/hax-mem.c                        |   2 +-
- target/i386/{hax-darwin.c => hax-posix.c}    |   0
- target/i386/{hax-darwin.h => hax-posix.h}    |   0
- target/i386/translate.c                      |  12 +-
- target/mips/translate.c                      |   2 +-
- target/tilegx/translate.c                    |   2 +-
- tcg/i386/tcg-target.inc.c                    |   4 +-
- tcg/tcg.c                                    |   2 +-
- tcg/tcg.h                                    |   6 +-
- tests/Makefile.include                       |  74 ++++--
- tests/cdrom-test.c                           |   2 +-
- tests/docker/dockerfiles/centos7.docker      |   1 +
- tests/docker/dockerfiles/debian-amd64.docker |   1 +
- tests/docker/dockerfiles/debian-ports.docker |   1 +
- tests/docker/dockerfiles/debian-sid.docker   |   1 +
- tests/docker/dockerfiles/debian8.docker      |   1 +
- tests/docker/dockerfiles/debian9.docker      |   1 +
- tests/docker/dockerfiles/fedora.docker       |   1 +
- tests/docker/dockerfiles/ubuntu.docker       |   1 +
- tests/ivshmem-test.c                         |   5 +-
- tests/libqos/malloc.c                        |   2 +-
- tests/migration-test.c                       |   8 +-
- tests/tcg/alpha/test-cond.c                  |   4 +-
- tests/tcg/arm/hello-arm.c                    |  20 +-
- tests/tcg/cris/check_glibc_kernelversion.c   |   8 +-
- tests/tcg/cris/check_mmap3.c                 |   2 +-
- tests/tcg/cris/check_openpf1.c               |   2 +-
- tests/tcg/cris/check_settls1.c               |   2 +-
- tests/tcg/i386/hello-i386.c                  |  14 +-
- tests/tcg/mips/hello-mips.c                  |  10 +-
- tests/tcg/multiarch/sha1.c                   |  12 +-
- tests/test-crypto-pbkdf.c                    |   3 +-
- tests/test-rcu-list.c                        |   2 +-
- tests/test-vmstate.c                         |   8 +-
- tests/vhost-user-bridge.c                    |   3 +-
- tests/vhost-user-test.c                      |   4 +-
- ui/console.c                                 |   4 +-
- ui/input.c                                   |  14 +-
- ui/keymaps.h                                 |   4 +-
- ui/qemu-pixman.c                             |   2 +-
- ui/vnc-enc-zywrle-template.c                 |   4 +-
- ui/vnc.c                                     |   4 +-
- util/bitops.c                                |   4 +-
- util/osdep.c                                 |   4 +-
- util/qemu-option.c                           |   4 +-
- util/qemu-sockets.c                          |   4 +-
- util/qemu-thread-win32.c                     |   4 -
- vl.c                                         |   4 +-
- 215 files changed, 1505 insertions(+), 898 deletions(-)
- create mode 100755 scripts/fix-multiline-comments.sh
- delete mode 100755 scripts/gtester-cat
- create mode 100755 scripts/tap-driver.pl
- create mode 100755 scripts/tap-merge.pl
- rename target/i386/{hax-darwin.c => hax-posix.c} (100%)
- rename target/i386/{hax-darwin.h => hax-posix.h} (100%)
+diff --git a/tests/cdrom-test.c b/tests/cdrom-test.c
+index 9b43dc9..14bd981 100644
+--- a/tests/cdrom-test.c
++++ b/tests/cdrom-test.c
+@@ -169,7 +169,7 @@ int main(int argc, char **argv)
+ 
+     if (exec_genisoimg(genisocheck)) {
+         /* genisoimage not available - so can't run tests */
+-        return 0;
++        return g_test_run();
+     }
+ 
+     ret = prepare_image(arch, isoimage);
+diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
+index 089e268..fe5eb30 100644
+--- a/tests/ivshmem-test.c
++++ b/tests/ivshmem-test.c
+@@ -492,7 +492,7 @@ int main(int argc, char **argv)
+     /* shm */
+     tmpshm = mktempshm(TMPSHMSIZE, &fd);
+     if (!tmpshm) {
+-        return 0;
++        goto out;
+     }
+     tmpshmem = mmap(0, TMPSHMSIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+     g_assert(tmpshmem != MAP_FAILED);
+@@ -514,9 +514,8 @@ int main(int argc, char **argv)
+         }
+     }
+ 
++out:
+     ret = g_test_run();
+-
+     cleanup();
+-
+     return ret;
+ }
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 06ca506..8352612 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -789,7 +789,7 @@ int main(int argc, char **argv)
+     g_test_init(&argc, &argv, NULL);
+ 
+     if (!ufd_version_check()) {
+-        return 0;
++        return g_test_run();
+     }
+ 
+     /*
+@@ -800,7 +800,7 @@ int main(int argc, char **argv)
+     if (g_str_equal(qtest_get_arch(), "ppc64") &&
+         access("/sys/module/kvm_hv", F_OK)) {
+         g_test_message("Skipping test: kvm_hv not available");
+-        return 0;
++        return g_test_run();
+     }
+ 
+     /*
+@@ -811,11 +811,11 @@ int main(int argc, char **argv)
+ #if defined(HOST_S390X)
+         if (access("/dev/kvm", R_OK | W_OK)) {
+             g_test_message("Skipping test: kvm not available");
+-            return 0;
++            return g_test_run();
+         }
+ #else
+         g_test_message("Skipping test: Need s390x host to work properly");
+-        return 0;
++        return g_test_run();
+ #endif
+     }
+ 
+diff --git a/tests/test-crypto-pbkdf.c b/tests/test-crypto-pbkdf.c
+index d937aff..85ed1f9 100644
+--- a/tests/test-crypto-pbkdf.c
++++ b/tests/test-crypto-pbkdf.c
+@@ -440,6 +440,7 @@ int main(int argc, char **argv)
+ #else
+ int main(int argc, char **argv)
+ {
+-    return 0;
++    g_test_init(&argc, &argv, NULL);
++    return g_test_run();
+ }
+ #endif
 -- 
 1.8.3.1
