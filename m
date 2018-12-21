@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gaMow-000311-3I
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 10:34:38 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gaMqX-0003jP-58
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 10:36:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gaMos-0007o0-3i
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 10:34:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58256)
+	(envelope-from <cohuck@redhat.com>) id 1gaMqT-0000PH-6K
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 10:36:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39368)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gaMor-0007nq-UI
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 10:34:34 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gaMqR-0000Nw-8I
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 10:36:11 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3A9167AEB2
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 15:34:33 +0000 (UTC)
-Date: Fri, 21 Dec 2018 16:34:26 +0100
+	by mx1.redhat.com (Postfix) with ESMTPS id DE64DC07EFD5
+	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 15:36:09 +0000 (UTC)
+Date: Fri, 21 Dec 2018 16:35:57 +0100
 From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181221163426.1e0bbb35.cohuck@redhat.com>
-In-Reply-To: <20181221090410.27250-26-marcandre.lureau@redhat.com>
+Message-ID: <20181221163557.4b45716d.cohuck@redhat.com>
+In-Reply-To: <20181221090410.27250-27-marcandre.lureau@redhat.com>
 References: <20181221090410.27250-1-marcandre.lureau@redhat.com>
-	<20181221090410.27250-26-marcandre.lureau@redhat.com>
+	<20181221090410.27250-27-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 25/28] qdev-props: remove errp from
- GlobalProperty
+Subject: Re: [Qemu-devel] [PATCH v7 26/28] qdev-props: call
+ object_apply_global_props()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,43 +37,18 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
 Cc: qemu-devel@nongnu.org, imammedo@redhat.com, ehabkost@redhat.com
 
-On Fri, 21 Dec 2018 13:04:07 +0400
+On Fri, 21 Dec 2018 13:04:08 +0400
 Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
-> All qdev_prop_register_global() set &error_fatal for errp, except
-> '-rtc driftfix=3Dslew', which arguably should also use &error_fatal, as
-> otherwise failing to apply the property would only report a warning.
+> It's now possible to use the common function.
+>=20
+> Teach object_apply_global_props() to warn if Error argument is NULL.
 >=20
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 > ---
->  include/hw/qdev-core.h    | 6 ------
->  hw/core/qdev-properties.c | 4 ++--
->  qom/cpu.c                 | 1 -
->  target/i386/cpu.c         | 1 -
->  target/sparc/cpu.c        | 1 -
->  vl.c                      | 1 -
->  6 files changed, 2 insertions(+), 12 deletions(-)
->=20
-
-> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> index 3467e0485c..a2d25d3d37 100644
-> --- a/hw/core/qdev-properties.c
-> +++ b/hw/core/qdev-properties.c
-> @@ -1238,8 +1238,8 @@ void qdev_prop_set_globals(DeviceState *dev)
->          if (err !=3D NULL) {
->              error_prepend(&err, "can't apply global %s.%s=3D%s: ",
->                            prop->driver, prop->property, prop->value);
-> -            if (!dev->hotplugged && prop->errp) {
-> -                error_propagate(prop->errp, err);
-> +            if (!dev->hotplugged) {
-> +                error_propagate(&error_fatal, err);
-
-Might want to add a comment to this function that any error is fatal
-for non-hotplugged devices.
-
->              } else {
->                  warn_report_err(err);
->              }
+>  hw/core/qdev-properties.c | 24 ++----------------------
+>  qom/object.c              | 12 +++++++++++-
+>  2 files changed, 13 insertions(+), 23 deletions(-)
 
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
