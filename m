@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ga8mq-0004k9-Pd
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 19:35:33 -0500
+	(envelope-from <groug@kaod.org>) id 1ga8nA-0004xy-Fr
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 19:35:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ga8mn-0004gp-H6
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 19:35:32 -0500
-Received: from 4.mo5.mail-out.ovh.net ([178.33.111.247]:50017)
+	(envelope-from <groug@kaod.org>) id 1ga8n6-0005CF-Vl
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 19:35:52 -0500
+Received: from 9.mo6.mail-out.ovh.net ([87.98.171.146]:50397)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ga8ml-0004XS-Gb
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 19:35:29 -0500
-Received: from player795.ha.ovh.net (unknown [10.109.159.222])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id C406D20BC57
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 01:35:25 +0100 (CET)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ga8n6-00059p-PM
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 19:35:48 -0500
+Received: from player695.ha.ovh.net (unknown [10.109.160.54])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 580D519FF27
+	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 01:35:47 +0100 (CET)
 From: Greg Kurz <groug@kaod.org>
-Date: Fri, 21 Dec 2018 01:35:09 +0100
-Message-ID: <154535250941.862554.15763512831843902652.stgit@bahia.lan>
+Date: Fri, 21 Dec 2018 01:35:30 +0100
+Message-ID: <154535253055.862554.10471167343589360987.stgit@bahia.lan>
 In-Reply-To: <154535246529.862554.6113740443866753456.stgit@bahia.lan>
 References: <154535246529.862554.6113740443866753456.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 02/15] spapr: move spapr_create_phb() to core
- machine code
+Subject: [Qemu-devel] [PATCH 03/15] pci: allow cleanup/unregistration of PCI
+ root buses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,81 +33,130 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>
 
-This function is only used when creating the default PHB. Let's rename
-it and move it to the core machine code for clarity.
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+This adds cleanup counterparts to pci_register_root_bus(),
+pci_root_bus_new(), and pci_bus_irqs().
+
+These cleanup routines are needed in the case of hotpluggable
+PCIHostBridge implementations. Currently we can rely on the
+object_unparent()'ing of the PCIHostState recursively unparenting
+and cleaning up it's child buses, but we need explicit calls
+to also:
+
+  1) remove the PCIHostState from pci_host_bridges global list.
+     otherwise, we risk accessing freed memory when we access
+     the list later
+  2) clean up memory allocated in pci_bus_irqs()
+
+Both are handled outside the context of any particular bus or
+host bridge's init/realize functions, making it difficult to
+avoid the need for explicit cleanup functions without remodeling
+how PCIHostBridges are created. So keep it simple and just add
+them for now.
+
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c              |   13 ++++++++++++-
- hw/ppc/spapr_pci.c          |   11 -----------
- include/hw/pci-host/spapr.h |    2 --
- 3 files changed, 12 insertions(+), 14 deletions(-)
+ hw/pci/pci.c         |   33 +++++++++++++++++++++++++++++++++
+ include/hw/pci/pci.h |    3 +++
+ 2 files changed, 36 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 8ea680fcde1e..1f17b5d01f4f 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2551,6 +2551,17 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
-     }
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index efb5ce196ffb..16354f91206c 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -333,6 +333,13 @@ static void pci_host_bus_register(DeviceState *host)
+     QLIST_INSERT_HEAD(&pci_host_bridges, host_bridge, next);
  }
  
-+static PCIHostState *spapr_create_default_phb(void)
++static void pci_host_bus_unregister(DeviceState *host)
 +{
-+    DeviceState *dev;
++    PCIHostState *host_bridge = PCI_HOST_BRIDGE(host);
 +
-+    dev = qdev_create(NULL, TYPE_SPAPR_PCI_HOST_BRIDGE);
-+    qdev_prop_set_uint32(dev, "index", 0);
-+    qdev_init_nofail(dev);
-+
-+    return PCI_HOST_BRIDGE(dev);
++    QLIST_REMOVE(host_bridge, next);
 +}
 +
- /* pSeries LPAR / sPAPR hardware init */
- static void spapr_machine_init(MachineState *machine)
+ PCIBus *pci_device_root_bus(const PCIDevice *d)
  {
-@@ -2782,7 +2793,7 @@ static void spapr_machine_init(MachineState *machine)
-     /* Set up PCI */
-     spapr_pci_rtas_init();
- 
--    phb = spapr_create_phb(spapr, 0);
-+    phb = spapr_create_default_phb();
- 
-     for (i = 0; i < nb_nics; i++) {
-         NICInfo *nd = &nd_table[i];
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 2374d55fc112..e59adbe706bb 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1979,17 +1979,6 @@ static const TypeInfo spapr_phb_info = {
-     }
- };
- 
--PCIHostState *spapr_create_phb(sPAPRMachineState *spapr, int index)
--{
--    DeviceState *dev;
--
--    dev = qdev_create(NULL, TYPE_SPAPR_PCI_HOST_BRIDGE);
--    qdev_prop_set_uint32(dev, "index", index);
--    qdev_init_nofail(dev);
--
--    return PCI_HOST_BRIDGE(dev);
--}
--
- typedef struct sPAPRFDT {
-     void *fdt;
-     int node_off;
-diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
-index 7c66c3872f96..a65cfef16945 100644
---- a/include/hw/pci-host/spapr.h
-+++ b/include/hw/pci-host/spapr.h
-@@ -111,8 +111,6 @@ static inline qemu_irq spapr_phb_lsi_qirq(struct sPAPRPHBState *phb, int pin)
-     return spapr_qirq(spapr, phb->lsi_table[pin].irq);
+     PCIBus *bus = pci_get_bus(d);
+@@ -379,6 +386,11 @@ static void pci_root_bus_init(PCIBus *bus, DeviceState *parent,
+     pci_host_bus_register(parent);
  }
  
--PCIHostState *spapr_create_phb(sPAPRMachineState *spapr, int index);
--
- int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t xics_phandle, void *fdt,
-                           uint32_t nr_msis);
++static void pci_bus_uninit(PCIBus *bus)
++{
++    pci_host_bus_unregister(BUS(bus)->parent);
++}
++
+ bool pci_bus_is_express(PCIBus *bus)
+ {
+     return object_dynamic_cast(OBJECT(bus), TYPE_PCIE_BUS);
+@@ -413,6 +425,12 @@ PCIBus *pci_root_bus_new(DeviceState *parent, const char *name,
+     return bus;
+ }
  
++void pci_root_bus_cleanup(PCIBus *bus)
++{
++    pci_bus_uninit(bus);
++    object_unparent(OBJECT(bus));
++}
++
+ void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
+                   void *irq_opaque, int nirq)
+ {
+@@ -423,6 +441,15 @@ void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
+     bus->irq_count = g_malloc0(nirq * sizeof(bus->irq_count[0]));
+ }
+ 
++void pci_bus_irqs_cleanup(PCIBus *bus)
++{
++    bus->set_irq = NULL;
++    bus->map_irq = NULL;
++    bus->irq_opaque = NULL;
++    bus->nirq = 0;
++    g_free(bus->irq_count);
++}
++
+ PCIBus *pci_register_root_bus(DeviceState *parent, const char *name,
+                               pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
+                               void *irq_opaque,
+@@ -439,6 +466,12 @@ PCIBus *pci_register_root_bus(DeviceState *parent, const char *name,
+     return bus;
+ }
+ 
++void pci_unregister_root_bus(PCIBus *bus)
++{
++    pci_bus_irqs_cleanup(bus);
++    pci_root_bus_cleanup(bus);
++}
++
+ int pci_bus_num(PCIBus *s)
+ {
+     return PCI_BUS_GET_CLASS(s)->bus_num(s);
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index e6514bba23aa..8998e3be3390 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -405,8 +405,10 @@ PCIBus *pci_root_bus_new(DeviceState *parent, const char *name,
+                          MemoryRegion *address_space_mem,
+                          MemoryRegion *address_space_io,
+                          uint8_t devfn_min, const char *typename);
++void pci_root_bus_cleanup(PCIBus *bus);
+ void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
+                   void *irq_opaque, int nirq);
++void pci_bus_irqs_cleanup(PCIBus *bus);
+ int pci_bus_get_irq_level(PCIBus *bus, int irq_num);
+ /* 0 <= pin <= 3 0 = INTA, 1 = INTB, 2 = INTC, 3 = INTD */
+ int pci_swizzle_map_irq_fn(PCIDevice *pci_dev, int pin);
+@@ -417,6 +419,7 @@ PCIBus *pci_register_root_bus(DeviceState *parent, const char *name,
+                               MemoryRegion *address_space_io,
+                               uint8_t devfn_min, int nirq,
+                               const char *typename);
++void pci_unregister_root_bus(PCIBus *bus);
+ void pci_bus_set_route_irq_fn(PCIBus *, pci_route_irq_fn);
+ PCIINTxRoute pci_device_route_intx_to_irq(PCIDevice *dev, int pin);
+ bool pci_intx_route_changed(PCIINTxRoute *old, PCIINTxRoute *new);
