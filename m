@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gaGIW-0005DM-9M
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 03:36:45 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gaGg8-0001jv-44
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 04:01:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gaGIR-0007Z4-76
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 03:36:44 -0500
-Received: from 20.mo4.mail-out.ovh.net ([46.105.33.73]:51063)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gaGIQ-0007Sw-Sq
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 03:36:39 -0500
-Received: from player758.ha.ovh.net (unknown [10.109.146.211])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id C05551C7800
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 09:36:27 +0100 (CET)
-Date: Fri, 21 Dec 2018 09:36:23 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20181221093623.738b71e9@bahia.lan>
-In-Reply-To: <d5247b86-4c9c-0eff-7900-66443041f63e@redhat.com>
-References: <beec7ae9-f9ce-52f0-7e55-cb25d70c51f4@ozlabs.ru>
-	<d5247b86-4c9c-0eff-7900-66443041f63e@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1gaGg4-0005pT-Up
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 04:01:08 -0500
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:51573)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gaGg4-0005oB-Dw
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 04:01:04 -0500
+Received: by mail-wm1-x32a.google.com with SMTP id b11so4547209wmj.1
+	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 01:01:04 -0800 (PST)
+References: <76d14474.f850.167cb46b4d9.Coremail.13824125580@163.com>
+	<87d0pw9y7m.fsf@linaro.org>
+	<19e6128e.27e9.167ce041690.Coremail.13824125580@163.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <19e6128e.27e9.167ce041690.Coremail.13824125580@163.com>
+Date: Fri, 21 Dec 2018 09:01:02 +0000
+Message-ID: <874lb79ru9.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] travis failures
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] did the qemu can emulate the whole system with the
+ processor that without support the "virtulization and kvm"?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: tugouxp <13824125580@163.com>
+Cc: qemu-devel@nongnu.org
 
-On Fri, 21 Dec 2018 07:47:07 +0100
-Thomas Huth <thuth@redhat.com> wrote:
 
-> On 2018-12-21 04:06, Alexey Kardashevskiy wrote:
-> > Hi
-> > 
-> > I am trying https://travis-ci.org/aik/qemu/ and that thing fails every
-> > time I am not so sure why.
-> > 
-> > One example:
-> > https://travis-ci.org/aik/qemu/jobs/470796318
-> > 
-> > The errors are like this:
-> > 
-> >   GTESTER check-qtest-unicore32
-> >   GTESTER check-qtest-x86_64
-> > Could not access KVM kernel module: No such file or directory
-> > qemu-system-x86_64: failed to initialize KVM: No such file or directory
-> > qemu-system-x86_64: Back to tcg accelerator
-> > 
-> > 
-> > Does anyone else see those? How do we fix them? Thanks.  
-> 
-> Some test are explicitly requesting "-M accel=kvm:tcg" and this is
-> causing this message if KVM is not available. We could maybe silence
-> them if qtest_enabled() ?
-> 
->  Thomas
-> 
-> 
+tugouxp <13824125580@163.com> writes:
 
-I've also experienced a bunch of similar failures with travis, like:
+> Hi alex:
+>     now my host machine did not have the "/dev/kvm" nodes and no chance t=
+o make it exists.
+> so i want to know whether the "/dev/kvm" is  mandatory  for qemu to emula=
+te the whole system.
+> so i can make the emulation without the support of kvm mechanism.
 
-https://travis-ci.org/gkurz/qemu/jobs/466994463
+QEMU runs in two modes - full system emulation with TCG doesn't require
+KVM although it is relatively slow. On systems where there guest
+architecture is the same as the host architecture you can run with KMV
+(or HAX/WHPX/HVF) accelerators at near native speeds.
 
-The KVM error messages aren't directly related to the failure IMHO.
+The reasons for not having a /dev/kvm can vary but you haven't said what
+your host architecture is and what OS you are running so it's hard to
+offer advice here.
 
-In both cases, the cause of the failure seems to be:
-
-No output has been received in the last XXm0s, this potentially indicates a
-stalled build or something wrong with the build itself.
-Check the details on how to adjust your build configuration on:
-https://docs.travis-ci.com/user/common-build-problems/#Build-times-out-because-no-output-was-received
-The build has been terminated
-
-and the last GTESTER line is for tests/test-qht-par:
-
-https://travis-ci.org/aik/qemu/jobs/470796318#L8219
-
-https://travis-ci.org/gkurz/qemu/jobs/466994463#L4454
-
-This has been recently discussed on qemu-devel:
-
-https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg01638.html
-
-But I haven't seen anything come out that yet.
+--
+Alex Benn=C3=A9e
