@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaDdp-0000bW-Gw
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:34 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gaDdi-0000Wd-MP
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaDdo-0007Jp-Bv
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:33 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gaDdg-000719-Iz
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:26 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 21 Dec 2018 16:45:43 +1100
-Message-Id: <20181221054606.22007-18-david@gibson.dropbear.id.au>
+Date: Fri, 21 Dec 2018 16:45:32 +1100
+Message-Id: <20181221054606.22007-7-david@gibson.dropbear.id.au>
 In-Reply-To: <20181221054606.22007-1-david@gibson.dropbear.id.au>
 References: <20181221054606.22007-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 17/40] ppc/xive: introduce the XiveNotifier
- interface
+Subject: [Qemu-devel] [PULL 06/40] target/ppc: use g_new(T,
+ n) instead of g_malloc(sizeof(T) * n)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,119 +24,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, gkurz@redhat.com, lvivier@redhat.com, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, gkurz@redhat.com, lvivier@redhat.com, clg@kaod.org, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+From: Greg Kurz <groug@kaod.org>
 
-The XiveNotifier offers a simple interface, between the XiveSource
-object and the main interrupt controller of the machine. It will
-forward event notifications to the XIVE Interrupt Virtualization
-Routing Engine (IVRE).
+Because it is a recommended coding practice (see HACKING).
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-[dwg: Adjust type name string for XiveNotifier]
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xive.c        | 25 +++++++++++++++++++++++++
- include/hw/ppc/xive.h | 23 +++++++++++++++++++++++
- 2 files changed, 48 insertions(+)
+ target/ppc/translate_init.inc.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index 4998f128e7..8d5434d6bd 100644
---- a/hw/intc/xive.c
-+++ b/hw/intc/xive.c
-@@ -156,7 +156,11 @@ static bool xive_source_esb_eoi(XiveSource *xsrc, ui=
-nt32_t srcno)
-  */
- static void xive_source_notify(XiveSource *xsrc, int srcno)
- {
-+    XiveNotifierClass *xnc =3D XIVE_NOTIFIER_GET_CLASS(xsrc->xive);
-=20
-+    if (xnc->notify) {
-+        xnc->notify(xsrc->xive, srcno);
-+    }
- }
-=20
- /*
-@@ -363,6 +367,17 @@ static void xive_source_reset(void *dev)
- static void xive_source_realize(DeviceState *dev, Error **errp)
- {
-     XiveSource *xsrc =3D XIVE_SOURCE(dev);
-+    Object *obj;
-+    Error *local_err =3D NULL;
-+
-+    obj =3D object_property_get_link(OBJECT(dev), "xive", &local_err);
-+    if (!obj) {
-+        error_propagate(errp, local_err);
-+        error_prepend(errp, "required link 'xive' not found: ");
-+        return;
-+    }
-+
-+    xsrc->xive =3D XIVE_NOTIFIER(obj);
-=20
-     if (!xsrc->nr_irqs) {
-         error_setg(errp, "Number of interrupt needs to be greater than 0=
-");
-@@ -429,9 +444,19 @@ static const TypeInfo xive_source_info =3D {
-     .class_init    =3D xive_source_class_init,
- };
-=20
-+/*
-+ * XIVE Fabric
-+ */
-+static const TypeInfo xive_fabric_info =3D {
-+    .name =3D TYPE_XIVE_NOTIFIER,
-+    .parent =3D TYPE_INTERFACE,
-+    .class_size =3D sizeof(XiveNotifierClass),
-+};
-+
- static void xive_register_types(void)
- {
-     type_register_static(&xive_source_info);
-+    type_register_static(&xive_fabric_info);
- }
-=20
- type_init(xive_register_types)
-diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-index 7cebc32eba..436f1bf756 100644
---- a/include/hw/ppc/xive.h
-+++ b/include/hw/ppc/xive.h
-@@ -142,6 +142,27 @@
-=20
- #include "hw/qdev-core.h"
-=20
-+/*
-+ * XIVE Fabric (Interface between Source and Router)
-+ */
-+
-+typedef struct XiveNotifier {
-+    Object parent;
-+} XiveNotifier;
-+
-+#define TYPE_XIVE_NOTIFIER "xive-notifier"
-+#define XIVE_NOTIFIER(obj)                                     \
-+    OBJECT_CHECK(XiveNotifier, (obj), TYPE_XIVE_NOTIFIER)
-+#define XIVE_NOTIFIER_CLASS(klass)                                     \
-+    OBJECT_CLASS_CHECK(XiveNotifierClass, (klass), TYPE_XIVE_NOTIFIER)
-+#define XIVE_NOTIFIER_GET_CLASS(obj)                                   \
-+    OBJECT_GET_CLASS(XiveNotifierClass, (obj), TYPE_XIVE_NOTIFIER)
-+
-+typedef struct XiveNotifierClass {
-+    InterfaceClass parent;
-+    void (*notify)(XiveNotifier *xn, uint32_t lisn);
-+} XiveNotifierClass;
-+
- /*
-  * XIVE Interrupt Source
-  */
-@@ -171,6 +192,8 @@ typedef struct XiveSource {
-     uint64_t        esb_flags;
-     uint32_t        esb_shift;
-     MemoryRegion    esb_mmio;
-+
-+    XiveNotifier    *xive;
- } XiveSource;
-=20
- /*
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+index 168d0cec28..03f1d34a97 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -9081,13 +9081,13 @@ static void init_ppc_proc(PowerPCCPU *cpu)
+             nb_tlb *=3D 2;
+         switch (env->tlb_type) {
+         case TLB_6XX:
+-            env->tlb.tlb6 =3D g_malloc0(nb_tlb * sizeof(ppc6xx_tlb_t));
++            env->tlb.tlb6 =3D g_new0(ppc6xx_tlb_t, nb_tlb);
+             break;
+         case TLB_EMB:
+-            env->tlb.tlbe =3D g_malloc0(nb_tlb * sizeof(ppcemb_tlb_t));
++            env->tlb.tlbe =3D g_new0(ppcemb_tlb_t, nb_tlb);
+             break;
+         case TLB_MAS:
+-            env->tlb.tlbm =3D g_malloc0(nb_tlb * sizeof(ppcmas_tlb_t));
++            env->tlb.tlbm =3D g_new0(ppcmas_tlb_t, nb_tlb);
+             break;
+         }
+         /* Pre-compute some useful values */
 --=20
 2.19.2
