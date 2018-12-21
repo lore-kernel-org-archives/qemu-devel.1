@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1gaLOn-0002SC-7Q
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:03:33 -0500
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gaLP0-0002YA-LJ
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:03:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1gaLOj-0007ma-7Y
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:03:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42216)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1gaLOj-0007l3-1G
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:03:29 -0500
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-Date: Fri, 21 Dec 2018 15:03:21 +0100
-Message-Id: <20181221140321.7750-1-vkuznets@redhat.com>
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gaLOx-0007ug-Uj
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:03:46 -0500
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:29196
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gaLOx-0007sw-Hj
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:03:43 -0500
+References: <76d14474.f850.167cb46b4d9.Coremail.13824125580@163.com>
+	<87d0pw9y7m.fsf@linaro.org>
+	<19e6128e.27e9.167ce041690.Coremail.13824125580@163.com>
+	<874lb79ru9.fsf@linaro.org>
+	<744a1829.ff89.167d091062b.Coremail.13824125580@163.com>
+From: Li Zhijian <lizhijian@cn.fujitsu.com>
+Message-ID: <7f94976c-f081-492e-8c68-c6766a88a115@cn.fujitsu.com>
+Date: Fri, 21 Dec 2018 22:03:31 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH RFC] i386: Enable NPT and NRIPSAVE for Epyc CPUs
+In-Reply-To: <744a1829.ff89.167d091062b.Coremail.13824125580@163.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] did the qemu can emulate the whole system with the
+ processor that without support the "virtulization and kvm"?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +32,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+To: tugouxp <13824125580@163.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-Epyc CPUs support NPT and NRIPSAVE features and KVM exposes these when
-present. Add them to EPYC and EPYC-IBPB cpu models.
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
-- RFC part: I'm not sure when these features first appeared, we may want =
-to
-  modify some Opteron_* models too.
----
- target/i386/cpu.c | 4 ++++
- 1 file changed, 4 insertions(+)
+On 12/21/18 19:40, tugouxp wrote:
+> thank you.
+>   
+> i just want to confirm one thing,  that is whether the qemu can emulate a whole operation system just by analysis instructions by instructions manually  without the support of KVM.
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 677a3bd5fb..0a10fbeccc 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2843,6 +2843,8 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
-             CPUID_XSAVE_XGETBV1,
-         .features[FEAT_6_EAX] =3D
-             CPUID_6_EAX_ARAT,
-+        .features[FEAT_SVM] =3D
-+            CPUID_SVM_NPT | CPUID_SVM_NRIPSAVE,
-         .xlevel =3D 0x8000001E,
-         .model_id =3D "AMD EPYC Processor",
-         .cache_info =3D &epyc_cache_info,
-@@ -2891,6 +2893,8 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
-             CPUID_XSAVE_XGETBV1,
-         .features[FEAT_6_EAX] =3D
-             CPUID_6_EAX_ARAT,
-+        .features[FEAT_SVM] =3D
-+            CPUID_SVM_NPT | CPUID_SVM_NRIPSAVE,
-         .xlevel =3D 0x8000001E,
-         .model_id =3D "AMD EPYC Processor (with IBPB)",
-         .cache_info =3D &epyc_cache_info,
---=20
-2.19.2
+IIUC£¬
+"operation system" often means a software but QEMU usually emulates hardwares, including cpus, memory, NIC, etc.
+Please know that QEMU born earlier than KVM, so QEMU can work well without KVM.
+
+Thanks
+
+
+> so from the answer you give to me, it is feasible, right?
+>
+>
+>
+> thanks very much!
+>
+>
+>
+>
+>
+>
+>
+>
+>
+> At 2018-12-21 17:01:02, "Alex Benn¨¦e" <alex.bennee@linaro.org> wrote:
+>> tugouxp <13824125580@163.com> writes:
+>>
+>>> Hi alex:
+>>>      now my host machine did not have the "/dev/kvm" nodes and no chance to make it exists.
+>>> so i want to know whether the "/dev/kvm" is  mandatory  for qemu to emulate the whole system.
+>>> so i can make the emulation without the support of kvm mechanism.
+>> QEMU runs in two modes - full system emulation with TCG doesn't require
+>> KVM although it is relatively slow. On systems where there guest
+>> architecture is the same as the host architecture you can run with KMV
+>> (or HAX/WHPX/HVF) accelerators at near native speeds.
+>>
+>> The reasons for not having a /dev/kvm can vary but you haven't said what
+>> your host architecture is and what OS you are running so it's hard to
+>> offer advice here.
+>>
+>> --
+>> Alex Benn¨¦e
+>
+-- 
+Best regards.
+Li Zhijian (8528)
