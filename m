@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaDdp-0000bn-Lz
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:34 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gaDdm-0000ZL-T6
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaDdo-0007Ko-KT
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:33 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gaDdl-0007Fm-S5
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:30 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 21 Dec 2018 16:45:48 +1100
-Message-Id: <20181221054606.22007-23-david@gibson.dropbear.id.au>
+Date: Fri, 21 Dec 2018 16:45:40 +1100
+Message-Id: <20181221054606.22007-15-david@gibson.dropbear.id.au>
 In-Reply-To: <20181221054606.22007-1-david@gibson.dropbear.id.au>
 References: <20181221054606.22007-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 22/40] spapr: export and rename the
- xics_max_server_number() routine
+Subject: [Qemu-devel] [PULL 14/40] e500: simplify IRQ wiring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +22,114 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, gkurz@redhat.com, lvivier@redhat.com, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, gkurz@redhat.com, lvivier@redhat.com, clg@kaod.org, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+From: Greg Kurz <groug@kaod.org>
 
-The XIVE sPAPR IRQ backend will use it to define the number of ENDs of
-the IC controller.
+The OpenPIC have 5 outputs per connected CPU. The machine init code hence
+needs a bi-dimensional array (smp_cpu lines, 5 columns) to wire up the ir=
+qs
+between the PIC and the CPUs.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+The current code first allocates an array of smp_cpus pointers to qemu_ir=
+q
+type, then it allocates another array of smp_cpus * 5 qemu_irq and fills =
+the
+first array with pointers to each line of the second array. This is rathe=
+r
+convoluted.
+
+Simplify the logic by introducing a structured type that describes all th=
+e
+OpenPIC outputs for a single CPU, ie, fixed size of 5 qemu_irq, and only
+allocate a smp_cpu sized array of those.
+
+This also allows to use g_new(T, n) instead of g_malloc(sizeof(T) * n)
+as recommended in HACKING.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c         | 8 ++++----
- include/hw/ppc/spapr.h | 1 +
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ hw/ppc/e500.c | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index c1c0e75fcd..fc47a058dd 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -150,7 +150,7 @@ static void pre_2_10_vmstate_unregister_dummy_icp(int=
- i)
-                        (void *)(uintptr_t) i);
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index e6747fce28..b20fea0dfc 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -685,7 +685,7 @@ static void ppce500_cpu_reset(void *opaque)
  }
 =20
--static int xics_max_server_number(sPAPRMachineState *spapr)
-+int spapr_max_server_number(sPAPRMachineState *spapr)
+ static DeviceState *ppce500_init_mpic_qemu(PPCE500MachineState *pms,
+-                                           qemu_irq **irqs)
++                                           IrqLines  *irqs)
  {
-     assert(spapr->vsmt);
-     return DIV_ROUND_UP(max_cpus * spapr->vsmt, smp_threads);
-@@ -1268,7 +1268,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spa=
-pr,
-     _FDT(fdt_setprop_cell(fdt, 0, "#size-cells", 2));
+     DeviceState *dev;
+     SysBusDevice *s;
+@@ -705,7 +705,7 @@ static DeviceState *ppce500_init_mpic_qemu(PPCE500Mac=
+hineState *pms,
+     k =3D 0;
+     for (i =3D 0; i < smp_cpus; i++) {
+         for (j =3D 0; j < OPENPIC_OUTPUT_NB; j++) {
+-            sysbus_connect_irq(s, k++, irqs[i][j]);
++            sysbus_connect_irq(s, k++, irqs[i].irq[j]);
+         }
+     }
 =20
-     /* /interrupt controller */
--    spapr_dt_xics(xics_max_server_number(spapr), fdt, PHANDLE_XICP);
-+    spapr_dt_xics(spapr_max_server_number(spapr), fdt, PHANDLE_XICP);
+@@ -713,7 +713,7 @@ static DeviceState *ppce500_init_mpic_qemu(PPCE500Mac=
+hineState *pms,
+ }
 =20
-     ret =3D spapr_populate_memory(spapr, fdt);
-     if (ret < 0) {
-@@ -2467,7 +2467,7 @@ static void spapr_init_cpus(sPAPRMachineState *spap=
-r)
-     if (smc->pre_2_10_has_unused_icps) {
-         int i;
+ static DeviceState *ppce500_init_mpic_kvm(const PPCE500MachineClass *pmc=
+,
+-                                          qemu_irq **irqs, Error **errp)
++                                          IrqLines *irqs, Error **errp)
+ {
+     Error *err =3D NULL;
+     DeviceState *dev;
+@@ -742,7 +742,7 @@ static DeviceState *ppce500_init_mpic_kvm(const PPCE5=
+00MachineClass *pmc,
 =20
--        for (i =3D 0; i < xics_max_server_number(spapr); i++) {
-+        for (i =3D 0; i < spapr_max_server_number(spapr); i++) {
-             /* Dummy entries get deregistered when real ICPState objects
-              * are registered during CPU core hotplug.
-              */
-@@ -2588,7 +2588,7 @@ static void spapr_machine_init(MachineState *machin=
-e)
+ static DeviceState *ppce500_init_mpic(PPCE500MachineState *pms,
+                                       MemoryRegion *ccsr,
+-                                      qemu_irq **irqs)
++                                      IrqLines *irqs)
+ {
+     MachineState *machine =3D MACHINE(pms);
+     const PPCE500MachineClass *pmc =3D PPCE500_MACHINE_GET_CLASS(pms);
+@@ -806,15 +806,14 @@ void ppce500_init(MachineState *machine)
+     /* irq num for pin INTA, INTB, INTC and INTD is 1, 2, 3 and
+      * 4 respectively */
+     unsigned int pci_irq_nrs[PCI_NUM_PINS] =3D {1, 2, 3, 4};
+-    qemu_irq **irqs;
++    IrqLines *irqs;
+     DeviceState *dev, *mpicdev;
+     CPUPPCState *firstenv =3D NULL;
+     MemoryRegion *ccsr_addr_space;
+     SysBusDevice *s;
+     PPCE500CCSRState *ccsr;
 =20
-     /*
-      * VSMT must be set in order to be able to compute VCPU ids, ie to
--     * call xics_max_server_number() or spapr_vcpu_id().
-+     * call spapr_max_server_number() or spapr_vcpu_id().
-      */
-     spapr_set_vsmt_mode(spapr, &error_fatal);
+-    irqs =3D g_malloc0(smp_cpus * sizeof(qemu_irq *));
+-    irqs[0] =3D g_malloc0(smp_cpus * sizeof(qemu_irq) * OPENPIC_OUTPUT_N=
+B);
++    irqs =3D g_new0(IrqLines, smp_cpus);
+     for (i =3D 0; i < smp_cpus; i++) {
+         PowerPCCPU *cpu;
+         CPUState *cs;
+@@ -834,10 +833,9 @@ void ppce500_init(MachineState *machine)
+             firstenv =3D env;
+         }
 =20
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 6279711fe8..198764066d 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -737,6 +737,7 @@ int spapr_hpt_shift_for_ramsize(uint64_t ramsize);
- void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
-                           Error **errp);
- void spapr_clear_pending_events(sPAPRMachineState *spapr);
-+int spapr_max_server_number(sPAPRMachineState *spapr);
+-        irqs[i] =3D irqs[0] + (i * OPENPIC_OUTPUT_NB);
+         input =3D (qemu_irq *)env->irq_inputs;
+-        irqs[i][OPENPIC_OUTPUT_INT] =3D input[PPCE500_INPUT_INT];
+-        irqs[i][OPENPIC_OUTPUT_CINT] =3D input[PPCE500_INPUT_CINT];
++        irqs[i].irq[OPENPIC_OUTPUT_INT] =3D input[PPCE500_INPUT_INT];
++        irqs[i].irq[OPENPIC_OUTPUT_CINT] =3D input[PPCE500_INPUT_CINT];
+         env->spr_cb[SPR_BOOKE_PIR].default_value =3D cs->cpu_index =3D i=
+;
+         env->mpic_iack =3D pmc->ccsrbar_base + MPC8544_MPIC_REGS_OFFSET =
++ 0xa0;
 =20
- /* CPU and LMB DRC release callbacks. */
- void spapr_core_release(DeviceState *dev);
 --=20
 2.19.2
