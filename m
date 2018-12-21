@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gaNWS-0007sk-95
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:19:37 -0500
+	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gaNZI-0001ak-CC
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:22:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gaNWN-00079q-Kc
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:19:36 -0500
-Date: Fri, 21 Dec 2018 11:19:18 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181221111904-mutt-send-email-mst@kernel.org>
-References: <154535246529.862554.6113740443866753456.stgit@bahia.lan>
-	<154535253055.862554.10471167343589360987.stgit@bahia.lan>
+	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gaNZF-0001iO-6f
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:22:32 -0500
+Received: from mga05.intel.com ([192.55.52.43]:1762)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yu.c.zhang@linux.intel.com>)
+	id 1gaNZE-0001hY-PL
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:22:29 -0500
+Date: Sat, 22 Dec 2018 00:19:20 +0800
+From: Yu Zhang <yu.c.zhang@linux.intel.com>
+Message-ID: <20181221161920.45fnlmcp7aqu6ibi@linux.intel.com>
+References: <20181218100116.6wqncwwhxni4o66t@linux.intel.com>
+	<20181218074104-mutt-send-email-mst@kernel.org>
+	<20181218134540.2q43v6fpvzbsam6h@linux.intel.com>
+	<20181218094527-mutt-send-email-mst@kernel.org>
+	<20181219034006.d4drqoz5b6r6h3mn@linux.intel.com>
+	<20181218233451-mutt-send-email-mst@kernel.org>
+	<20181219055743.okeszdqlqkg7tagk@linux.intel.com>
+	<20181219100355-mutt-send-email-mst@kernel.org>
+	<20181220054921.sk5wnmlo2vvjgcs6@linux.intel.com>
+	<20181220132644-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <154535253055.862554.10471167343589360987.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 03/15] pci: allow cleanup/unregistration of
- PCI root buses
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20181220132644-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] intel-iommu: extend VTD emulation
+ to allow 57-bit IOVA address width.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,137 +38,270 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Fri, Dec 21, 2018 at 01:35:30AM +0100, Greg Kurz wrote:
-> From: Michael Roth <mdroth@linux.vnet.ibm.com>
+On Thu, Dec 20, 2018 at 01:28:21PM -0500, Michael S. Tsirkin wrote:
+> On Thu, Dec 20, 2018 at 01:49:21PM +0800, Yu Zhang wrote:
+> > On Wed, Dec 19, 2018 at 10:23:44AM -0500, Michael S. Tsirkin wrote:
+> > > On Wed, Dec 19, 2018 at 01:57:43PM +0800, Yu Zhang wrote:
+> > > > On Tue, Dec 18, 2018 at 11:35:34PM -0500, Michael S. Tsirkin wrote:
+> > > > > On Wed, Dec 19, 2018 at 11:40:06AM +0800, Yu Zhang wrote:
+> > > > > > On Tue, Dec 18, 2018 at 09:49:02AM -0500, Michael S. Tsirkin wrote:
+> > > > > > > On Tue, Dec 18, 2018 at 09:45:41PM +0800, Yu Zhang wrote:
+> > > > > > > > On Tue, Dec 18, 2018 at 07:43:28AM -0500, Michael S. Tsirkin wrote:
+> > > > > > > > > On Tue, Dec 18, 2018 at 06:01:16PM +0800, Yu Zhang wrote:
+> > > > > > > > > > On Tue, Dec 18, 2018 at 05:47:14PM +0800, Yu Zhang wrote:
+> > > > > > > > > > > On Mon, Dec 17, 2018 at 02:29:02PM +0100, Igor Mammedov wrote:
+> > > > > > > > > > > > On Wed, 12 Dec 2018 21:05:39 +0800
+> > > > > > > > > > > > Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
+> > > > > > > > > > > > 
+> > > > > > > > > > > > > A 5-level paging capable VM may choose to use 57-bit IOVA address width.
+> > > > > > > > > > > > > E.g. guest applications may prefer to use its VA as IOVA when performing
+> > > > > > > > > > > > > VFIO map/unmap operations, to avoid the burden of managing the IOVA space.
+> > > > > > > > > > > > > 
+> > > > > > > > > > > > > This patch extends the current vIOMMU logic to cover the extended address
+> > > > > > > > > > > > > width. When creating a VM with 5-level paging feature, one can choose to
+> > > > > > > > > > > > > create a virtual VTD with 5-level paging capability, with configurations
+> > > > > > > > > > > > > like "-device intel-iommu,x-aw-bits=57".
+> > > > > > > > > > > > > 
+> > > > > > > > > > > > > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> > > > > > > > > > > > > Reviewed-by: Peter Xu <peterx@redhat.com>
+> > > > > > > > > > > > > ---
+> > > > > > > > > > > > > Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> > > > > > > > > > > > > Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> > > > > > > > > > > > > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > > > > > > > > > > > > Cc: Richard Henderson <rth@twiddle.net>
+> > > > > > > > > > > > > Cc: Eduardo Habkost <ehabkost@redhat.com>
+> > > > > > > > > > > > > Cc: Peter Xu <peterx@redhat.com>
+> > > > > > > > > > > > > ---
+> > > > > > > > > > > > >  hw/i386/intel_iommu.c          | 53 ++++++++++++++++++++++++++++++++----------
+> > > > > > > > > > > > >  hw/i386/intel_iommu_internal.h | 10 ++++++--
+> > > > > > > > > > > > >  include/hw/i386/intel_iommu.h  |  1 +
+> > > > > > > > > > > > >  3 files changed, 50 insertions(+), 14 deletions(-)
+> > > > > > > > > > > > > 
+> > > > > > > > > > > > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> > > > > > > > > > > > > index 0e88c63..871110c 100644
+> > > > > > > > > > > > > --- a/hw/i386/intel_iommu.c
+> > > > > > > > > > > > > +++ b/hw/i386/intel_iommu.c
+> > > > > > > > > > > > > @@ -664,16 +664,16 @@ static inline bool vtd_iova_range_check(uint64_t iova, VTDContextEntry *ce,
+> > > > > > > > > > > > >  
+> > > > > > > > > > > > >  /*
+> > > > > > > > > > > > >   * Rsvd field masks for spte:
+> > > > > > > > > > > > > - *     Index [1] to [4] 4k pages
+> > > > > > > > > > > > > - *     Index [5] to [8] large pages
+> > > > > > > > > > > > > + *     Index [1] to [5] 4k pages
+> > > > > > > > > > > > > + *     Index [6] to [10] large pages
+> > > > > > > > > > > > >   */
+> > > > > > > > > > > > > -static uint64_t vtd_paging_entry_rsvd_field[9];
+> > > > > > > > > > > > > +static uint64_t vtd_paging_entry_rsvd_field[11];
+> > > > > > > > > > > > >  
+> > > > > > > > > > > > >  static bool vtd_slpte_nonzero_rsvd(uint64_t slpte, uint32_t level)
+> > > > > > > > > > > > >  {
+> > > > > > > > > > > > >      if (slpte & VTD_SL_PT_PAGE_SIZE_MASK) {
+> > > > > > > > > > > > >          /* Maybe large page */
+> > > > > > > > > > > > > -        return slpte & vtd_paging_entry_rsvd_field[level + 4];
+> > > > > > > > > > > > > +        return slpte & vtd_paging_entry_rsvd_field[level + 5];
+> > > > > > > > > > > > >      } else {
+> > > > > > > > > > > > >          return slpte & vtd_paging_entry_rsvd_field[level];
+> > > > > > > > > > > > >      }
+> > > > > > > > > > > > > @@ -3127,6 +3127,8 @@ static void vtd_init(IntelIOMMUState *s)
+> > > > > > > > > > > > >               VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(s->aw_bits);
+> > > > > > > > > > > > >      if (s->aw_bits == VTD_AW_48BIT) {
+> > > > > > > > > > > > >          s->cap |= VTD_CAP_SAGAW_48bit;
+> > > > > > > > > > > > > +    } else if (s->aw_bits == VTD_AW_57BIT) {
+> > > > > > > > > > > > > +        s->cap |= VTD_CAP_SAGAW_57bit | VTD_CAP_SAGAW_48bit;
+> > > > > > > > > > > > >      }
+> > > > > > > > > > > > >      s->ecap = VTD_ECAP_QI | VTD_ECAP_IRO;
+> > > > > > > > > > > > >      s->haw_bits = cpu->phys_bits;
+> > > > > > > > > > > > > @@ -3139,10 +3141,12 @@ static void vtd_init(IntelIOMMUState *s)
+> > > > > > > > > > > > >      vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->haw_bits);
+> > > > > > > > > > > > >      vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->haw_bits);
+> > > > > > > > > > > > >      vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->haw_bits);
+> > > > > > > > > > > > > -    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->haw_bits);
+> > > > > > > > > > > > > -    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->haw_bits);
+> > > > > > > > > > > > > -    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->haw_bits);
+> > > > > > > > > > > > > -    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->haw_bits);
+> > > > > > > > > > > > > +    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_PAGE_L5_RSVD_MASK(s->haw_bits);
+> > > > > > > > > > > > > +    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->haw_bits);
+> > > > > > > > > > > > > +    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->haw_bits);
+> > > > > > > > > > > > > +    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->haw_bits);
+> > > > > > > > > > > > > +    vtd_paging_entry_rsvd_field[9] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->haw_bits);
+> > > > > > > > > > > > > +    vtd_paging_entry_rsvd_field[10] = VTD_SPTE_LPAGE_L5_RSVD_MASK(s->haw_bits);
+> > > > > > > > > > > > >  
+> > > > > > > > > > > > >      if (x86_iommu->intr_supported) {
+> > > > > > > > > > > > >          s->ecap |= VTD_ECAP_IR | VTD_ECAP_MHMV;
+> > > > > > > > > > > > > @@ -3241,6 +3245,23 @@ static AddressSpace *vtd_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
+> > > > > > > > > > > > >      return &vtd_as->as;
+> > > > > > > > > > > > >  }
+> > > > > > > > > > > > >  
+> > > > > > > > > > > > > +static bool host_has_la57(void)
+> > > > > > > > > > > > > +{
+> > > > > > > > > > > > > +    uint32_t ecx, unused;
+> > > > > > > > > > > > > +
+> > > > > > > > > > > > > +    host_cpuid(7, 0, &unused, &unused, &ecx, &unused);
+> > > > > > > > > > > > > +    return ecx & CPUID_7_0_ECX_LA57;
+> > > > > > > > > > > > > +}
+> > > > > > > > > > > > > +
+> > > > > > > > > > > > > +static bool guest_has_la57(void)
+> > > > > > > > > > > > > +{
+> > > > > > > > > > > > > +    CPUState *cs = first_cpu;
+> > > > > > > > > > > > > +    X86CPU *cpu = X86_CPU(cs);
+> > > > > > > > > > > > > +    CPUX86State *env = &cpu->env;
+> > > > > > > > > > > > > +
+> > > > > > > > > > > > > +    return env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_LA57;
+> > > > > > > > > > > > > +}
+> > > > > > > > > > > > another direct access to CPU fields,
+> > > > > > > > > > > > I'd suggest to set this value when iommu is created
+> > > > > > > > > > > > i.e. add 'la57' property and set from iommu owner.
+> > > > > > > > > > > > 
+> > > > > > > > > > > 
+> > > > > > > > > > > Sorry, do you mean "-device intel-iommu,la57"? I think we do not need
+> > > > > > > > > > > that, because a 5-level capable vIOMMU can be created with properties
+> > > > > > > > > > > like "-device intel-iommu,x-aw-bits=57". 
+> > > > > > > > > > > 
+> > > > > > > > > > > The guest CPU fields are checked to make sure the VM has LA57 CPU feature,
+> > > > > > > > > > > because I believe there shall be no 5-level IOMMU on platforms without LA57
+> > > > > > > > > > > CPUs. 
+> > > > > > > > > 
+> > > > > > > > > I don't necessarily see why these need to be connected.
+> > > > > > > > > If yes pls add code to explain.
+> > > > > > > > 
+> > > > > > > > Sorry, do you mean the VM shall be able to see a 5-level IOMMU even it does not
+> > > > > > > > have LA57 feature? I do not see any direct connection when asked to enable a 5-level
+> > > > > > > > vIOMMU at first, but I was told(and checked) that DPDK in the VM may choose a VA
+> > > > > > > > value as an IOVA.
+> > > > > > > 
+> > > > > > > Right but then that doesn't work on all hosts either.
+> > > > > > 
+> > > > > > Oh, the host already has 5-level IOMMU now. So I think DPDK in native shall work with that.
+> > > > > > 
+> > > > > > > 
+> > > > > > > > And if guest has LA57, we should create a 5-level vIOMMU to the VM.
+> > > > > > > > But if the VM even does not have LA57, any specific reason we should give it a 5-level
+> > > > > > > > vIOMMU?
+> > > > > > > 
+> > > > > > > So the example you give is VTD address width < CPU aw. That is known
+> > > > > > > to be problematic for dpdk but not for other software and maybe dpdk
+> > > > > > > will learns how to cope. Given such hosts exist it might be
+> > > > > > > useful to support this at least for debugging.
+> > > > > > > 
+> > > > > > > Are there reasons to worry about VTD > CPU?
+> > > > > > 
+> > > > > > Well, I am not that worried(no usage case is one concern). I am OK to drop the guest check. :)
+> > > > > > 
+> > > > > > > 
+> > > > > > > 
+> > > > > > > > > 
+> > > > > > > > > 
+> > > > > > > > > > > > >  static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+> > > > > > > > > > > > >  {
+> > > > > > > > > > > > >      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
+> > > > > > > > > > > > > @@ -3267,11 +3288,19 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+> > > > > > > > > > > > >          }
+> > > > > > > > > > > > >      }
+> > > > > > > > > > > > >  
+> > > > > > > > > > > > > -    /* Currently only address widths supported are 39 and 48 bits */
+> > > > > > > > > > > > > +    /* Currently address widths supported are 39, 48, and 57 bits */
+> > > > > > > > > > > > >      if ((s->aw_bits != VTD_AW_39BIT) &&
+> > > > > > > > > > > > > -        (s->aw_bits != VTD_AW_48BIT)) {
+> > > > > > > > > > > > > -        error_setg(errp, "Supported values for x-aw-bits are: %d, %d",
+> > > > > > > > > > > > > -                   VTD_AW_39BIT, VTD_AW_48BIT);
+> > > > > > > > > > > > > +        (s->aw_bits != VTD_AW_48BIT) &&
+> > > > > > > > > > > > > +        (s->aw_bits != VTD_AW_57BIT)) {
+> > > > > > > > > > > > > +        error_setg(errp, "Supported values for x-aw-bits are: %d, %d, %d",
+> > > > > > > > > > > > > +                   VTD_AW_39BIT, VTD_AW_48BIT, VTD_AW_57BIT);
+> > > > > > > > > > > > > +        return false;
+> > > > > > > > > > > > > +    }
+> > > > > > > > > > > > > +
+> > > > > > > > > > > > > +    if ((s->aw_bits == VTD_AW_57BIT) &&
+> > > > > > > > > > > > > +        !(host_has_la57() && guest_has_la57())) {
+> > > > > > > > > > > > Does iommu supposed to work in TCG mode?
+> > > > > > > > > > > > If yes then why it should care about host_has_la57()?
+> > > > > > > > > > > > 
+> > > > > > > > > > > 
+> > > > > > > > > > > Hmm... I did not take TCG mode into consideration. And host_has_la57() is
+> > > > > > > > > > > used to guarantee the host have la57 feature so that iommu shadowing works
+> > > > > > > > > > > for device assignment.
+> > > > > > > > > > > 
+> > > > > > > > > > > I guess iommu shall work in TCG mode(though I am not quite sure about this).
+> > > > > > > > > > > But I do not have any usage case of a 5-level vIOMMU in TCG in mind. So maybe
+> > > > > > > > > > > we can:
+> > > > > > > > > > > 1> check the 'ms->accel' in vtd_decide_config() and do not care about host
+> > > > > > > > > > > capability if it is TCG.
+> > > > > > > > > > 
+> > > > > > > > > > For choice 1, kvm_enabled() might be used instead of ms->accel. Thanks Peter
+> > > > > > > > > > for the remind. :)
+> > > > > > > > > 
+> > > > > > > > > 
+> > > > > > > > > This needs a big comment with an explanation though.
+> > > > > > > > > And probably a TODO to make it work under TCG ...
+> > > > > > > > > 
+> > > > > > > > 
+> > > > > > > > Thanks, Michael. For choice 1, I believe it should work for TCG(will need test
+> > > > > > > > though), and the condition would be sth. like:
+> > > > > > > > 
+> > > > > > > >     if ((s->aw_bits == VTD_AW_57BIT) &&
+> > > > > > > >         kvm_enabled() &&
+> > > > > > > >         !host_has_la57())  {
+> > > > > > > > 
+> > > > > > > > As you can see, though I remove the check of guest_has_la57(), I still kept the
+> > > > > > > > check against host when KVM is enabled. I'm still ready to be convinced for any
+> > > > > > > > requirement why we do not need the guest check. :) 
+> > > > > > > 
+> > > > > > > 
+> > > > > > > okay but then (repeating myself, sorry) pls add a comment that explains
+> > > > > > > what happens if you do not add this limitation.
+> > > > > > 
+> > > > > > How about below comments?
+> > > > > >     /*
+> > > > > >      * For KVM guests, the host capability of LA57 shall be available,
+> > > > > 
+> > > > > So why is host CPU LA57 necessary for shadowing? Could you explain pls?
+> > > > 
+> > > > Oh, let me try to explain the background here. :)
+> > > > 
+> > > > Currently, vIOMMU in qemu does not have logic to check against the hardware
+> > > > IOMMU capability. E.g. when we create an IOMMU with 48 bit DMA address width,
+> > > > qemu does not check if any physical IOMMU has such support. And the shadow
+> > > > IOMMU logic will have problem if host IOMMU only supports 39 bit IOVA. And
+> > > > we will have the same problem when it comes to 57 bit IOVA.
+> > > > 
+> > > > My previous discussion with Peter Xu reached an agreement that for now, we
+> > > > just use the host cpu capability as a reference when trying to create a 5-level
+> > > > vIOMMU, because 57 bit IOMMU hardware will not come until ICX platform(which
+> > > > includes LA57). 
+> > > > 
+> > > > And the final correct solution should be to enumerate the capabilities of
+> > > > hardware IOMMUs used by the assigned device, and reject if any dismatch is
+> > > > found.
+> > > 
+> > > Right. And it's a hack because
+> > > 1. CPU AW doesn't always match VTD AW
+> > > 2. The limitation only applies to hardware devices, software ones are fine
+> > > So we need a patch for the host sysfs to expose the actual IOMMU AW to userspace.
+> > > QEMU could then look at the actual hardware features.
+> > > I'd like to see the actual patch doing that, even if we
+> > > add a hack based on CPU AW for existing systems.
+> > > 
+> > 
+> > Sure, I have plan to do so. And I am wondering, if this is a must for current
+> > patchset to be accepted? I mean, after all, we already have the same problem
+> > on existing platform. :)
 > 
-> This adds cleanup counterparts to pci_register_root_bus(),
-> pci_root_bus_new(), and pci_bus_irqs().
-> 
-> These cleanup routines are needed in the case of hotpluggable
-> PCIHostBridge implementations. Currently we can rely on the
-> object_unparent()'ing of the PCIHostState recursively unparenting
-> and cleaning up it's child buses, but we need explicit calls
-> to also:
-> 
->   1) remove the PCIHostState from pci_host_bridges global list.
->      otherwise, we risk accessing freed memory when we access
->      the list later
->   2) clean up memory allocated in pci_bus_irqs()
-> 
-> Both are handled outside the context of any particular bus or
-> host bridge's init/realize functions, making it difficult to
-> avoid the need for explicit cleanup functions without remodeling
-> how PCIHostBridges are created. So keep it simple and just add
-> them for now.
-> 
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> I'd like to avoid poking at the CPU from VTD code. That's all.
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+OK. So for the short term，how about I remove the check of host cpu, and add a TODO
+in the comments in vtd_decide_config()? 
 
-> ---
->  hw/pci/pci.c         |   33 +++++++++++++++++++++++++++++++++
->  include/hw/pci/pci.h |    3 +++
->  2 files changed, 36 insertions(+)
-> 
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index efb5ce196ffb..16354f91206c 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -333,6 +333,13 @@ static void pci_host_bus_register(DeviceState *host)
->      QLIST_INSERT_HEAD(&pci_host_bridges, host_bridge, next);
->  }
->  
-> +static void pci_host_bus_unregister(DeviceState *host)
-> +{
-> +    PCIHostState *host_bridge = PCI_HOST_BRIDGE(host);
-> +
-> +    QLIST_REMOVE(host_bridge, next);
-> +}
-> +
->  PCIBus *pci_device_root_bus(const PCIDevice *d)
->  {
->      PCIBus *bus = pci_get_bus(d);
-> @@ -379,6 +386,11 @@ static void pci_root_bus_init(PCIBus *bus, DeviceState *parent,
->      pci_host_bus_register(parent);
->  }
->  
-> +static void pci_bus_uninit(PCIBus *bus)
-> +{
-> +    pci_host_bus_unregister(BUS(bus)->parent);
-> +}
-> +
->  bool pci_bus_is_express(PCIBus *bus)
->  {
->      return object_dynamic_cast(OBJECT(bus), TYPE_PCIE_BUS);
-> @@ -413,6 +425,12 @@ PCIBus *pci_root_bus_new(DeviceState *parent, const char *name,
->      return bus;
->  }
->  
-> +void pci_root_bus_cleanup(PCIBus *bus)
-> +{
-> +    pci_bus_uninit(bus);
-> +    object_unparent(OBJECT(bus));
-> +}
-> +
->  void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
->                    void *irq_opaque, int nirq)
->  {
-> @@ -423,6 +441,15 @@ void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
->      bus->irq_count = g_malloc0(nirq * sizeof(bus->irq_count[0]));
->  }
->  
-> +void pci_bus_irqs_cleanup(PCIBus *bus)
-> +{
-> +    bus->set_irq = NULL;
-> +    bus->map_irq = NULL;
-> +    bus->irq_opaque = NULL;
-> +    bus->nirq = 0;
-> +    g_free(bus->irq_count);
-> +}
-> +
->  PCIBus *pci_register_root_bus(DeviceState *parent, const char *name,
->                                pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
->                                void *irq_opaque,
-> @@ -439,6 +466,12 @@ PCIBus *pci_register_root_bus(DeviceState *parent, const char *name,
->      return bus;
->  }
->  
-> +void pci_unregister_root_bus(PCIBus *bus)
-> +{
-> +    pci_bus_irqs_cleanup(bus);
-> +    pci_root_bus_cleanup(bus);
-> +}
-> +
->  int pci_bus_num(PCIBus *s)
->  {
->      return PCI_BUS_GET_CLASS(s)->bus_num(s);
-> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> index e6514bba23aa..8998e3be3390 100644
-> --- a/include/hw/pci/pci.h
-> +++ b/include/hw/pci/pci.h
-> @@ -405,8 +405,10 @@ PCIBus *pci_root_bus_new(DeviceState *parent, const char *name,
->                           MemoryRegion *address_space_mem,
->                           MemoryRegion *address_space_io,
->                           uint8_t devfn_min, const char *typename);
-> +void pci_root_bus_cleanup(PCIBus *bus);
->  void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
->                    void *irq_opaque, int nirq);
-> +void pci_bus_irqs_cleanup(PCIBus *bus);
->  int pci_bus_get_irq_level(PCIBus *bus, int irq_num);
->  /* 0 <= pin <= 3 0 = INTA, 1 = INTB, 2 = INTC, 3 = INTD */
->  int pci_swizzle_map_irq_fn(PCIDevice *pci_dev, int pin);
-> @@ -417,6 +419,7 @@ PCIBus *pci_register_root_bus(DeviceState *parent, const char *name,
->                                MemoryRegion *address_space_io,
->                                uint8_t devfn_min, int nirq,
->                                const char *typename);
-> +void pci_unregister_root_bus(PCIBus *bus);
->  void pci_bus_set_route_irq_fn(PCIBus *, pci_route_irq_fn);
->  PCIINTxRoute pci_device_route_intx_to_irq(PCIDevice *dev, int pin);
->  bool pci_intx_route_changed(PCIINTxRoute *old, PCIINTxRoute *new);
+As to the check against hardware IOMMU, Peter once had a proposal in
+http://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg02281.html
+
+Do you have any comment or suggestion on Peter's proposal? I still do not quite know
+how to do it for now...
+
+[...]
+
+
+B.R.
+Yu
