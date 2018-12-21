@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gaNHO-0001fY-Vq
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:04:09 -0500
+	(envelope-from <mst@redhat.com>) id 1gaNHo-0001zl-0j
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:04:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gaNHO-0004Fc-2B
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:04:02 -0500
-Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:44348)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gaNHN-0004BA-LV
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:04:01 -0500
-Received: by mail-qt1-x841.google.com with SMTP id n32so6162105qte.11
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 08:03:55 -0800 (PST)
-Date: Fri, 21 Dec 2018 08:03:05 -0800
-Message-Id: <20181221160307.14819-13-palmer@sifive.com>
-In-Reply-To: <20181221160307.14819-1-palmer@sifive.com>
-References: <20181221160307.14819-1-palmer@sifive.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Subject: [Qemu-devel] [PULL 12/14] target/riscv/pmp.c: Fix pmp_decode_napot()
+	(envelope-from <mst@redhat.com>) id 1gaNHk-0004QP-Qi
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:04:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36936)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gaNHd-0004Ki-2R
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:04:18 -0500
+Date: Fri, 21 Dec 2018 11:04:05 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181221110400-mutt-send-email-mst@kernel.org>
+References: <1544063533-10139-1-git-send-email-lizhijian@cn.fujitsu.com>
+	<1544063533-10139-4-git-send-email-lizhijian@cn.fujitsu.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1544063533-10139-4-git-send-email-lizhijian@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v4 3/4] i386: import & use
+ bootparam.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,45 +28,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-riscv@nongnu.org
-Cc: qemu-devel@nongnu.org, Anup Patel <anup@brainfault.org>, Anup Patel <anup.patel@wdc.com>, Alistair Francis <alistair.francis@wdc.com>, Palmer Dabbelt <palmer@sifive.com>
+To: Li Zhijian <lizhijian@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, philip.li@intel.com, zhijianx.li@intel.com, philmd@redhat.com
 
-From: Anup Patel <anup@brainfault.org>
+On Thu, Dec 06, 2018 at 10:32:12AM +0800, Li Zhijian wrote:
+> it's from v4.20-rc5.
+> 
+> CC: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 
-Currently, start and end address of a PMP region are not decoded
-correctly by pmp_decode_napot().
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-Let's say we have a 128KB PMP region with base address as 0x80000000.
-Now, the PMPADDRx CSR value for this region will be 0x20003fff.
-
-The current pmp_decode_napot() implementation will decode PMPADDRx
-CSR as t1=14, base=0x100000000, and range=0x1ffff whereas it should
-have decoded PMPADDRx CSR as t1=14, base=0x80000000, and range=0x1fff.
-
-This patch fixes the base value decoding in pmp_decode_napot() when
-PMPADDRx CSR is not -1 (i.e. 0xffffffffffffffff).
-
-Signed-off-by: Anup Patel <anup@brainfault.org>
-Signed-off-by: Anup Patel <anup.patel@wdc.com>
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
-Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
----
- target/riscv/pmp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
-index 03abd8fe5eb7..15a5366616bd 100644
---- a/target/riscv/pmp.c
-+++ b/target/riscv/pmp.c
-@@ -138,7 +138,7 @@ static void pmp_decode_napot(target_ulong a, target_ulong *sa, target_ulong *ea)
-         return;
-     } else {
-         target_ulong t1 = ctz64(~a);
--        target_ulong base = (a & ~(((target_ulong)1 << t1) - 1)) << 3;
-+        target_ulong base = (a & ~(((target_ulong)1 << t1) - 1)) << 2;
-         target_ulong range = ((target_ulong)1 << (t1 + 3)) - 1;
-         *sa = base;
-         *ea = base + range;
--- 
-2.18.1
+> ---
+> V4: use scirpt to import bootparam.h (Michael S. Tsirkin)
+> V3: new patch
+> 
+> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> ---
+>  hw/i386/pc.c                                 |  8 +------
+>  include/standard-headers/asm-x86/bootparam.h | 34 ++++++++++++++++++++++++++++
+>  scripts/update-linux-headers.sh              |  4 ++++
+>  3 files changed, 39 insertions(+), 7 deletions(-)
+>  create mode 100644 include/standard-headers/asm-x86/bootparam.h
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 067d23a..3b10726 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -74,6 +74,7 @@
+>  #include "hw/nmi.h"
+>  #include "hw/i386/intel_iommu.h"
+>  #include "hw/net/ne2000-isa.h"
+> +#include "standard-headers/asm-x86/bootparam.h"
+>  
+>  /* debug PC/ISA interrupts */
+>  //#define DEBUG_IRQ
+> @@ -820,13 +821,6 @@ static long get_file_size(FILE *f)
+>      return size;
+>  }
+>  
+> -/* setup_data types */
+> -#define SETUP_NONE     0
+> -#define SETUP_E820_EXT 1
+> -#define SETUP_DTB      2
+> -#define SETUP_PCI      3
+> -#define SETUP_EFI      4
+> -
+>  struct setup_data {
+>      uint64_t next;
+>      uint32_t type;
+> diff --git a/include/standard-headers/asm-x86/bootparam.h b/include/standard-headers/asm-x86/bootparam.h
+> new file mode 100644
+> index 0000000..67d4f01
+> --- /dev/null
+> +++ b/include/standard-headers/asm-x86/bootparam.h
+> @@ -0,0 +1,34 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +#ifndef _ASM_X86_BOOTPARAM_H
+> +#define _ASM_X86_BOOTPARAM_H
+> +
+> +/* setup_data types */
+> +#define SETUP_NONE			0
+> +#define SETUP_E820_EXT			1
+> +#define SETUP_DTB			2
+> +#define SETUP_PCI			3
+> +#define SETUP_EFI			4
+> +#define SETUP_APPLE_PROPERTIES		5
+> +#define SETUP_JAILHOUSE			6
+> +
+> +/* ram_size flags */
+> +#define RAMDISK_IMAGE_START_MASK	0x07FF
+> +#define RAMDISK_PROMPT_FLAG		0x8000
+> +#define RAMDISK_LOAD_FLAG		0x4000
+> +
+> +/* loadflags */
+> +#define LOADED_HIGH	(1<<0)
+> +#define KASLR_FLAG	(1<<1)
+> +#define QUIET_FLAG	(1<<5)
+> +#define KEEP_SEGMENTS	(1<<6)
+> +#define CAN_USE_HEAP	(1<<7)
+> +
+> +/* xloadflags */
+> +#define XLF_KERNEL_64			(1<<0)
+> +#define XLF_CAN_BE_LOADED_ABOVE_4G	(1<<1)
+> +#define XLF_EFI_HANDOVER_32		(1<<2)
+> +#define XLF_EFI_HANDOVER_64		(1<<3)
+> +#define XLF_EFI_KEXEC			(1<<4)
+> +
+> +
+> +#endif /* _ASM_X86_BOOTPARAM_H */
+> diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+> index 0a964fe..77ec108 100755
+> --- a/scripts/update-linux-headers.sh
+> +++ b/scripts/update-linux-headers.sh
+> @@ -120,6 +120,10 @@ for arch in $ARCHLIST; do
+>          cp "$tmpdir/include/asm/unistd_x32.h" "$output/linux-headers/asm-x86/"
+>          cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-x86/"
+>          cp_portable "$tmpdir/include/asm/kvm_para.h" "$output/include/standard-headers/asm-$arch"
+> +        # Remove everything except the macros from bootparam.h avoiding the
+> +        # unnecessary import of several video/ist/etc headers
+> +        sed -e '/__ASSEMBLY__/,/__ASSEMBLY__/d' $tmpdir/include/asm/bootparam.h > $tmpdir/bootparam.h
+> +        cp_portable $tmpdir/bootparam.h "$output/include/standard-headers/asm-$arch"
+>      fi
+>  done
+>  
+> -- 
+> 2.7.4
