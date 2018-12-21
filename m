@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gaK4S-00049x-Rm
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 07:38:29 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gaK7q-0006lM-9C
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 07:42:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gaK4O-000653-B5
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 07:38:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44176)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gaK4O-00063t-3U
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 07:38:24 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5014BC050069
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 12:38:23 +0000 (UTC)
-Date: Fri, 21 Dec 2018 13:38:18 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181221133818.030092bf.cohuck@redhat.com>
-In-Reply-To: <20181221090410.27250-4-marcandre.lureau@redhat.com>
-References: <20181221090410.27250-1-marcandre.lureau@redhat.com>
-	<20181221090410.27250-4-marcandre.lureau@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gaK7m-0002cu-G1
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 07:41:56 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 21 Dec 2018 12:41:20 +0000
+Message-ID: <785c6911-3871-2fc0-d7ea-b09246fb9f1d@virtuozzo.com>
+References: <20181221093529.23855-1-jsnow@redhat.com>
+	<20181221093529.23855-10-jsnow@redhat.com>
+In-Reply-To: <20181221093529.23855-10-jsnow@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <5025A2A1699C284989F7125E420FACB4@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 03/28] hw: apply machine compat
- properties without touching globals
+Subject: Re: [Qemu-devel] [PATCH v6 09/11] iotests: change qmp_log filters
+ to expect QMP objects only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,27 +26,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, ehabkost@redhat.com
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "eblake@redhat.com" <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Fri, 21 Dec 2018 13:03:45 +0400
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
-
-> Similarly to accel properties, move compat properties out of globals
-> registration, and apply the machine compat properties during
-> device_post_init().
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  include/hw/boards.h        |  3 +-
->  hw/arm/virt.c              | 27 ++++++++----
->  hw/core/machine.c          | 19 +--------
->  hw/core/qdev.c             |  2 +
->  hw/i386/pc_piix.c          | 87 +++++++++++++++++++++++++-------------
->  hw/i386/pc_q35.c           | 33 ++++++++++-----
->  hw/ppc/spapr.c             | 42 ++++++++++++------
->  hw/s390x/s390-virtio-ccw.c | 33 ++++++++++-----
->  vl.c                       |  1 -
->  9 files changed, 152 insertions(+), 95 deletions(-)
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+MjEuMTIuMjAxOCAxMjozNSwgSm9obiBTbm93IHdyb3RlOg0KPiBBcyBsYWlkIG91dCBpbiB0aGUg
+cHJldmlvdXMgY29tbWl0J3MgbWVzc2FnZToNCj4gDQo+IGBgYA0KPiBTZXZlcmFsIHBsYWNlcyBp
+biBpb3Rlc3RzIGRlYWwgd2l0aCBzZXJpYWxpemluZyBvYmplY3RzIGludG8gSlNPTg0KPiBzdHJp
+bmdzLCBidXQgdG8gYWRkIHByZXR0eS1wcmludGluZyBpdCBzZWVtcyBkZXNpcmFibGUgdG8gbG9j
+YWxpemUNCj4gYWxsIG9mIHRob3NlIGNhc2VzLg0KPiANCj4gbG9nKCkgc2VlbXMgbGlrZSBhIGdv
+b2QgY2FuZGlkYXRlIGZvciB0aGF0IGNlbnRyYWxpemVkIGJlaGF2aW9yLg0KPiBsb2coKSBjYW4g
+YWxyZWFkeSBzZXJpYWxpemUganNvbiBvYmplY3RzLCBidXQgd2hlbiBpdCBkb2VzIHNvLA0KPiBp
+dCBhc3N1bWVzIGZpbHRlcnM9W10gb3BlcmF0ZXMgb24gUU1QIG9iamVjdHMsIG5vdCBzdHJpbmdz
+Lg0KPiANCj4gcW1wX2xvZyBjdXJyZW50bHkgb3BlcmF0ZXMgYnkgZHVtcGluZyBvdXRnb2luZyBh
+bmQgaW5jb21pbmcgUU1QDQo+IG9iamVjdHMgaW50byBzdHJpbmdzIGFuZCBmaWx0ZXJpbmcgdGhl
+bSBhc3N1bWluZyB0aGF0IGZpbHRlcnM9W10NCj4gYXJlIHN0cmluZyBmaWx0ZXJzLg0KPiBgYGAN
+Cj4gDQo+IFRoZXJlZm9yZToNCj4gDQo+IENoYW5nZSBxbXBfbG9nIHRvIHRyZWF0IGZpbHRlcnMg
+YXMgaWYgdGhleSdyZSBhbHdheXMgcW1wIG9iamVjdCBmaWx0ZXJzLA0KPiB0aGVuIGNoYW5nZSB0
+aGUgbG9nZ2luZyBjYWxsIHRvIHJlbHkgb24gbG9nKCkncyBhYmlsaXR5IHRvIHNlcmlhbGl6ZSBR
+TVANCj4gb2JqZWN0cywgc28gd2UncmUgbm90IGR1cGxpY2F0aW5nIHRoYXQgZWZmb3J0Lg0KPiAN
+Cj4gQWRkIGEgcW1wIHZlcnNpb24gb2YgZmlsdGVyX3Rlc3RmaWxlcyBhbmQgYWRqdXN0IHRoZSBv
+bmx5IGNhbGxlciB1c2luZw0KPiBpdCBmb3IgcW1wX2xvZyB0byB1c2UgdGhlIHFtcCB2ZXJzaW9u
+Lg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSm9obiBTbm93IDxqc25vd0ByZWRoYXQuY29tPg0KPiAt
+LS0NCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvMjA2ICAgICAgICB8ICA0ICsrLS0NCj4gICB0ZXN0
+cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weSB8IDI4ICsrKysrKysrKysrKysrKysrKysrKysrKyst
+LS0NCj4gICAyIGZpbGVzIGNoYW5nZWQsIDI3IGluc2VydGlvbnMoKyksIDUgZGVsZXRpb25zKC0p
+DQo+IA0KPiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzIwNiBiL3Rlc3RzL3FlbXUt
+aW90ZXN0cy8yMDYNCj4gaW5kZXggZTkyNTUwZmE1OS4uNWJiNzM4YmYyMyAxMDA3NTUNCj4gLS0t
+IGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzIwNg0KPiArKysgYi90ZXN0cy9xZW11LWlvdGVzdHMvMjA2
+DQo+IEBAIC0yNyw3ICsyNyw3IEBAIGlvdGVzdHMudmVyaWZ5X2ltYWdlX2Zvcm1hdChzdXBwb3J0
+ZWRfZm10cz1bJ3Fjb3cyJ10pDQo+ICAgDQo+ICAgZGVmIGJsb2NrZGV2X2NyZWF0ZSh2bSwgb3B0
+aW9ucyk6DQo+ICAgICAgIHJlc3VsdCA9IHZtLnFtcF9sb2coJ2Jsb2NrZGV2LWNyZWF0ZScsDQo+
+IC0gICAgICAgICAgICAgICAgICAgICAgICBmaWx0ZXJzPVtpb3Rlc3RzLmZpbHRlcl90ZXN0Zmls
+ZXNdLA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgZmlsdGVycz1baW90ZXN0cy5maWx0ZXJf
+cW1wX3Rlc3RmaWxlc10sDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgam9iX2lkPSdqb2Iw
+Jywgb3B0aW9ucz1vcHRpb25zKQ0KPiAgIA0KPiAgICAgICBpZiAncmV0dXJuJyBpbiByZXN1bHQ6
+DQo+IEBAIC01NSw3ICs1NSw3IEBAIHdpdGggaW90ZXN0cy5GaWxlUGF0aCgndC5xY293MicpIGFz
+IGRpc2tfcGF0aCwgXA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJ3NpemUnOiAwIH0p
+DQo+ICAgDQo+ICAgICAgIHZtLnFtcF9sb2coJ2Jsb2NrZGV2LWFkZCcsDQo+IC0gICAgICAgICAg
+ICAgICBmaWx0ZXJzPVtpb3Rlc3RzLmZpbHRlcl90ZXN0ZmlsZXNdLA0KPiArICAgICAgICAgICAg
+ICAgZmlsdGVycz1baW90ZXN0cy5maWx0ZXJfcW1wX3Rlc3RmaWxlc10sDQo+ICAgICAgICAgICAg
+ICAgICAgZHJpdmVyPSdmaWxlJywgZmlsZW5hbWU9ZGlza19wYXRoLA0KPiAgICAgICAgICAgICAg
+ICAgIG5vZGVfbmFtZT0naW1nZmlsZScpDQo+ICAgDQo+IGRpZmYgLS1naXQgYS90ZXN0cy9xZW11
+LWlvdGVzdHMvaW90ZXN0cy5weSBiL3Rlc3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5DQo+IGlu
+ZGV4IDU3ZmUyMGRiNDUuLmE5NmE3MDEwZDQgMTAwNjQ0DQo+IC0tLSBhL3Rlc3RzL3FlbXUtaW90
+ZXN0cy9pb3Rlc3RzLnB5DQo+ICsrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5DQo+
+IEBAIC0yNDYsMTAgKzI0NiwzMyBAQCBkZWYgZmlsdGVyX3FtcF9ldmVudChldmVudCk6DQo+ICAg
+ICAgICAgICBldmVudFsndGltZXN0YW1wJ11bJ21pY3Jvc2Vjb25kcyddID0gJ1VTRUNTJw0KPiAg
+ICAgICByZXR1cm4gZXZlbnQNCj4gICANCj4gK2RlZiBmaWx0ZXJfcW1wKHFtc2csIGZpbHRlcl9m
+bik6DQo+ICsgICAgJycnR2l2ZW4gYSBzdHJpbmcgZmlsdGVyLCBmaWx0ZXIgYSBRTVAgb2JqZWN0
+J3MgdmFsdWVzLg0KPiArICAgIGZpbHRlcl9mbiB0YWtlcyBhIChrZXksIHZhbHVlKSBwYWlyLicn
+Jw0KPiArICAgICMgSXRlcmF0ZSB0aHJvdWdoIGVpdGhlciBsaXN0cyBvciBkaWN0czsNCj4gKyAg
+ICBpZiBpc2luc3RhbmNlKHFtc2csIGxpc3QpOg0KPiArICAgICAgICBpdGVtcyA9IGVudW1lcmF0
+ZShxbXNnKQ0KPiArICAgIGVsc2U6DQo+ICsgICAgICAgIGl0ZW1zID0gcW1zZy5pdGVtcygpDQo+
+ICsNCj4gKyAgICBmb3IgaywgdiBpbiBpdGVtczoNCj4gKyAgICAgICAgaWYgaXNpbnN0YW5jZSh2
+LCBsaXN0KSBvciBpc2luc3RhbmNlKHYsIGRpY3QpOg0KPiArICAgICAgICAgICAgcW1zZ1trXSA9
+IGZpbHRlcl9xbXAodiwgZmlsdGVyX2ZuKQ0KPiArICAgICAgICBlbHNlOg0KPiArICAgICAgICAg
+ICAgcW1zZ1trXSA9IGZpbHRlcl9mbihrLCB2KQ0KPiArICAgIHJldHVybiBxbXNnDQoNCkhtbS4g
+VGhpcyBtYWRlIG1lIGNoZWNrLCBpcyBlbnVtZXJhdGUgYXBwbGljYWJsZSB0byBkaWN0cywNCmFu
+ZCwgeWVzIGl0IGlzLg0KDQpzbywgaXQgbWF5IGJlIGFzIGVhc3kgYXMNCg0KICAgICBmb3Igaywg
+diBpbiBlbnVtZXJhdGUocW1zZyk6DQogICAgICAgICBpZiBpc2luc3RhbmNlKHYsIGxpc3QpIG9y
+IGlzaW5zdGFuY2UodiwgZGljdCk6DQogICAgICAgICAgICAgcW1zZ1trXSA9IGZpbHRlcl9xbXAo
+diwgZmlsdGVyX2ZuKQ0KICAgICAgICAgZWxzZToNCiAgICAgICAgICAgICBxbXNnW2tdID0gZmls
+dGVyX2ZuKGssIHYpDQoNCndpdGggdGhpczoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRz
+b3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCg0KQnV0IGRvZXMgaXQg
+d2hhdCB5b3Ugd2FudD8NClNvLCBmb3IgbGlzdHMgb2Ygc3RyaW5ncywgZmlsdGVyX2ZuIHdpbGwg
+Z2V0IHBhaXIgb2YgaW5kZXggaW4gYXJyYXkNCmFuZCB2YWx1ZT8NCk9uIHRoZSBvdGhlciBoYW5k
+LCB3ZSBjYW4gYWRqdXN0IHRoZSBiZWhhdmlvciBhcyB3ZSB3YW50IHdoZW4gd2UgaW50cm9kdWNl
+DQpzdWNoIGZpbHRlcnMuDQoNCj4gKw0KPiAgIGRlZiBmaWx0ZXJfdGVzdGZpbGVzKG1zZyk6DQo+
+ICAgICAgIHByZWZpeCA9IG9zLnBhdGguam9pbih0ZXN0X2RpciwgIiVzLSIgJSAob3MuZ2V0cGlk
+KCkpKQ0KPiAgICAgICByZXR1cm4gbXNnLnJlcGxhY2UocHJlZml4LCAnVEVTVF9ESVIvUElELScp
+DQo+ICAgDQo+ICtkZWYgZmlsdGVyX3FtcF90ZXN0ZmlsZXMocW1zZyk6DQo+ICsgICAgZGVmIF9m
+aWx0ZXIoa2V5LCB2YWx1ZSk6DQo+ICsgICAgICAgIGlmIGtleSA9PSAnZmlsZW5hbWUnIG9yIGtl
+eSA9PSAnYmFja2luZy1maWxlJzoNCj4gKyAgICAgICAgICAgIHJldHVybiBmaWx0ZXJfdGVzdGZp
+bGVzKHZhbHVlKQ0KPiArICAgICAgICByZXR1cm4gdmFsdWUNCj4gKyAgICByZXR1cm4gZmlsdGVy
+X3FtcChxbXNnLCBfZmlsdGVyKQ0KPiArDQo+ICAgZGVmIGZpbHRlcl9nZW5lcmF0ZWRfbm9kZV9p
+ZHMobXNnKToNCj4gICAgICAgcmV0dXJuIHJlLnN1YigiI2Jsb2NrWzAtOV0rIiwgIk5PREVfTkFN
+RSIsIG1zZykNCj4gICANCj4gQEAgLTQ2NSwxMCArNDg4LDkgQEAgY2xhc3MgVk0ocXRlc3QuUUVN
+VVF0ZXN0TWFjaGluZSk6DQo+ICAgICAgICAgICAgICAgKCJleGVjdXRlIiwgY21kKSwNCj4gICAg
+ICAgICAgICAgICAoImFyZ3VtZW50cyIsIG9yZGVyZWRfa3dhcmdzKGt3YXJncykpDQo+ICAgICAg
+ICAgICApKQ0KPiAtICAgICAgICBsb2dtc2cgPSBqc29uLmR1bXBzKGZ1bGxfY21kKQ0KPiAtICAg
+ICAgICBsb2cobG9nbXNnLCBmaWx0ZXJzKQ0KPiArICAgICAgICBsb2coZnVsbF9jbWQsIGZpbHRl
+cnMpDQo+ICAgICAgICAgICByZXN1bHQgPSBzZWxmLnFtcChjbWQsICoqa3dhcmdzKQ0KPiAtICAg
+ICAgICBsb2coanNvbi5kdW1wcyhyZXN1bHQsIHNvcnRfa2V5cz1UcnVlKSwgZmlsdGVycykNCj4g
+KyAgICAgICAgbG9nKHJlc3VsdCwgZmlsdGVycykNCj4gICAgICAgICAgIHJldHVybiByZXN1bHQN
+Cj4gICANCj4gICAgICAgZGVmIHJ1bl9qb2Ioc2VsZiwgam9iLCBhdXRvX2ZpbmFsaXplPVRydWUs
+IGF1dG9fZGlzbWlzcz1GYWxzZSk6DQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGlt
+aXINCg==
