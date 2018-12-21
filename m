@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gaNHO-0001ey-GO
+	(envelope-from <palmer@sifive.com>) id 1gaNHO-0001fT-Si
 	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:04:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gaNHN-0004E9-2m
+	(envelope-from <palmer@sifive.com>) id 1gaNHN-0004Ew-J8
 	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:04:02 -0500
-Received: from mail-qt1-x82e.google.com ([2607:f8b0:4864:20::82e]:44404)
+Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:41917)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gaNHM-00049W-Of
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:04:00 -0500
-Received: by mail-qt1-x82e.google.com with SMTP id n32so6161846qte.11
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 08:03:51 -0800 (PST)
-Date: Fri, 21 Dec 2018 08:03:03 -0800
-Message-Id: <20181221160307.14819-11-palmer@sifive.com>
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gaNHN-00046f-6M
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:04:01 -0500
+Received: by mail-qt1-x842.google.com with SMTP id l12so6163727qtf.8
+	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 08:03:44 -0800 (PST)
+Date: Fri, 21 Dec 2018 08:02:59 -0800
+Message-Id: <20181221160307.14819-7-palmer@sifive.com>
 In-Reply-To: <20181221160307.14819-1-palmer@sifive.com>
 References: <20181221160307.14819-1-palmer@sifive.com>
 From: Palmer Dabbelt <palmer@sifive.com>
-Subject: [Qemu-devel] [PULL 10/14] RISC-V: Enable second UART on sifive_e
- and sifive_u
+Subject: [Qemu-devel] [PULL 06/14] sifive_u: Set 'clock-frequency' DT
+ property for SiFive UART
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,59 +27,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-riscv@nongnu.org
-Cc: qemu-devel@nongnu.org, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Alistair Francis <Alistair.Francis@wdc.com>, Alistair Francis <alistair.francis@wdc.com>
+Cc: qemu-devel@nongnu.org, Anup Patel <anup@brainfault.org>, Anup Patel <anup.patel@wdc.com>, Alistair Francis <alistair.francis@wdc.com>, Palmer Dabbelt <palmer@sifive.com>
 
-From: Michael Clark <mjc@sifive.com>
+From: Anup Patel <anup@brainfault.org>
 
-Previously the second UARTs on the sifive_e and sifive_u machines
-where disabled due to check-qtest-riscv32 and check-qtest-riscv64
-failures. Recent changes in the QEMU core serial code have
-resolved these failures so the second UARTs can be instantiated.
+The 'clock-frequency' DT property is required by U-Boot to compute
+the divider value. This patch sets the 'clock-frequency' DT property
+of the SiFive UART device tree node (similar to virt machine).
 
-Cc: Palmer Dabbelt <palmer@sifive.com>
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>
-Signed-off-by: Michael Clark <mjc@sifive.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Anup Patel <anup@brainfault.org>
+Signed-off-by: Anup Patel <anup.patel@wdc.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- hw/riscv/sifive_e.c | 5 ++---
- hw/riscv/sifive_u.c | 5 ++---
- 2 files changed, 4 insertions(+), 6 deletions(-)
+ hw/riscv/sifive_u.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index cb513cc3bb50..5d9d65ff29ab 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -192,9 +192,8 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
-         memmap[SIFIVE_E_QSPI0].base, memmap[SIFIVE_E_QSPI0].size);
-     sifive_mmio_emulate(sys_mem, "riscv.sifive.e.pwm0",
-         memmap[SIFIVE_E_PWM0].base, memmap[SIFIVE_E_PWM0].size);
--    /* sifive_uart_create(sys_mem, memmap[SIFIVE_E_UART1].base,
--        serial_hd(1), qdev_get_gpio_in(DEVICE(s->plic),
--                                       SIFIVE_E_UART1_IRQ)); */
-+    sifive_uart_create(sys_mem, memmap[SIFIVE_E_UART1].base,
-+        serial_hd(1), qdev_get_gpio_in(DEVICE(s->plic), SIFIVE_E_UART1_IRQ));
-     sifive_mmio_emulate(sys_mem, "riscv.sifive.e.qspi1",
-         memmap[SIFIVE_E_QSPI1].base, memmap[SIFIVE_E_QSPI1].size);
-     sifive_mmio_emulate(sys_mem, "riscv.sifive.e.pwm1",
 diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 849fa2e6311a..3bd3b67507f8 100644
+index 5c41ee5017e4..849fa2e6311a 100644
 --- a/hw/riscv/sifive_u.c
 +++ b/hw/riscv/sifive_u.c
-@@ -368,9 +368,8 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
-         memmap[SIFIVE_U_PLIC].size);
-     sifive_uart_create(system_memory, memmap[SIFIVE_U_UART0].base,
-         serial_hd(0), qdev_get_gpio_in(DEVICE(s->plic), SIFIVE_U_UART0_IRQ));
--    /* sifive_uart_create(system_memory, memmap[SIFIVE_U_UART1].base,
--        serial_hd(1), qdev_get_gpio_in(DEVICE(s->plic),
--                                       SIFIVE_U_UART1_IRQ)); */
-+    sifive_uart_create(system_memory, memmap[SIFIVE_U_UART1].base,
-+        serial_hd(1), qdev_get_gpio_in(DEVICE(s->plic), SIFIVE_U_UART1_IRQ));
-     sifive_clint_create(memmap[SIFIVE_U_CLINT].base,
-         memmap[SIFIVE_U_CLINT].size, smp_cpus,
-         SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
+@@ -241,6 +241,8 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+     qemu_fdt_setprop_cells(fdt, nodename, "reg",
+         0x0, memmap[SIFIVE_U_UART0].base,
+         0x0, memmap[SIFIVE_U_UART0].size);
++    qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
++                          SIFIVE_U_CLOCK_FREQ / 2);
+     qemu_fdt_setprop_cells(fdt, nodename, "interrupt-parent", plic_phandle);
+     qemu_fdt_setprop_cells(fdt, nodename, "interrupts", 1);
+ 
 -- 
 2.18.1
