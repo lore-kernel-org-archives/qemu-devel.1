@@ -1,31 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gaGln-0004wb-E5
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 04:07:00 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gaHDi-0008Mq-BQ
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 04:35:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gaGll-0002dc-5W
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 04:06:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46946)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gaGlk-0002YV-QU
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 04:06:57 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 633A0A3403
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 09:06:49 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri, 21 Dec 2018 13:04:10 +0400
-Message-Id: <20181221090410.27250-29-marcandre.lureau@redhat.com>
-In-Reply-To: <20181221090410.27250-1-marcandre.lureau@redhat.com>
-References: <20181221090410.27250-1-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 28/28] hostmem: use object id for memory
- region name with >= 4.0
+	(envelope-from <jsnow@redhat.com>) id 1gaHDh-00074G-Ex
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 04:35:50 -0500
+From: John Snow <jsnow@redhat.com>
+Date: Fri, 21 Dec 2018 04:35:19 -0500
+Message-Id: <20181221093529.23855-2-jsnow@redhat.com>
+In-Reply-To: <20181221093529.23855-1-jsnow@redhat.com>
+References: <20181221093529.23855-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 01/11] blockdev: abort transactions in
+ reverse order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,256 +20,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, ehabkost@redhat.com
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: eblake@redhat.com, Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, vsementsov@virtuozzo.com, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-hostmem-file and hostmem-memfd use the whole object path for the
-memory region name, and hostname-ram uses only the path component (the
-object id, or canonical path basename):
+Presently, we abort transactions in the same order they were processed in.
+Bitmap commands, though, attempt to restore backup data structures on abort.
 
-qemu -m 1024 -object memory-backend-file,id=3Dmem,size=3D1G,mem-path=3D/t=
-mp/foo -numa node,memdev=3Dmem -monitor stdio
-(qemu) info ramblock
-              Block Name    PSize              Offset               Used =
-             Total
-            /objects/mem    4 KiB  0x0000000000000000 0x0000000040000000 =
-0x0000000040000000
+That's not valid, they need to be aborted in reverse chronological order.
 
-qemu -m 1024 -object memory-backend-memfd,id=3Dmem,size=3D1G -numa node,m=
-emdev=3Dmem -monitor stdio
-(qemu) info ramblock
-              Block Name    PSize              Offset               Used =
-             Total
-            /objects/mem    4 KiB  0x0000000000000000 0x0000000040000000 =
-0x0000000040000000
+Replace the QSIMPLEQ data structure with a QTAILQ one, so we can iterate
+in reverse for the abort phase of the transaction.
 
-qemu -m 1024 -object memory-backend-ram,id=3Dmem,size=3D1G -numa node,mem=
-dev=3Dmem -monitor stdio
-(qemu) info ramblock
-              Block Name    PSize              Offset               Used =
-             Total
-                     mem    4 KiB  0x0000000000000000 0x0000000040000000 =
-0x0000000040000000
-
-For consistency, change to use object id for -file and -memfd as well
-with >=3D 4.0.
-
-Having a consistent naming allows to migrate to different hostmem
-backends.
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- include/sysemu/hostmem.h |  3 ++-
- backends/hostmem-file.c  |  8 ++++----
- backends/hostmem-memfd.c |  2 +-
- backends/hostmem-ram.c   |  9 ++++-----
- backends/hostmem.c       | 36 ++++++++++++++++++++++++++++++++++++
- hw/core/machine.c        | 12 +++++++++++-
- 6 files changed, 58 insertions(+), 12 deletions(-)
+ blockdev.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
-index 6e6bd2c1cb..a023b372a4 100644
---- a/include/sysemu/hostmem.h
-+++ b/include/sysemu/hostmem.h
-@@ -53,7 +53,7 @@ struct HostMemoryBackend {
-=20
-     /* protected */
-     uint64_t size;
--    bool merge, dump;
-+    bool merge, dump, use_canonical_path;
-     bool prealloc, force_prealloc, is_mapped, share;
-     DECLARE_BITMAP(host_nodes, MAX_NODES + 1);
-     HostMemPolicy policy;
-@@ -67,5 +67,6 @@ MemoryRegion *host_memory_backend_get_memory(HostMemory=
-Backend *backend);
- void host_memory_backend_set_mapped(HostMemoryBackend *backend, bool map=
-ped);
- bool host_memory_backend_is_mapped(HostMemoryBackend *backend);
- size_t host_memory_backend_pagesize(HostMemoryBackend *memdev);
-+char *host_memory_backend_get_name(HostMemoryBackend *backend);
-=20
- #endif
-diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-index 78f058dee2..7a34e25c43 100644
---- a/backends/hostmem-file.c
-+++ b/backends/hostmem-file.c
-@@ -43,7 +43,7 @@ file_backend_memory_alloc(HostMemoryBackend *backend, E=
-rror **errp)
- {
-     HostMemoryBackendFile *fb =3D MEMORY_BACKEND_FILE(backend);
- #ifdef CONFIG_POSIX
--    gchar *path;
-+    gchar *name;
- #endif
-=20
-     if (!backend->size) {
-@@ -58,14 +58,14 @@ file_backend_memory_alloc(HostMemoryBackend *backend,=
- Error **errp)
-     error_setg(errp, "-mem-path not supported on this host");
- #else
-     backend->force_prealloc =3D mem_prealloc;
--    path =3D object_get_canonical_path(OBJECT(backend));
-+    name =3D host_memory_backend_get_name(backend);
-     memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
--                                     path,
-+                                     name,
-                                      backend->size, fb->align,
-                                      (backend->share ? RAM_SHARED : 0) |
-                                      (fb->is_pmem ? RAM_PMEM : 0),
-                                      fb->mem_path, errp);
--    g_free(path);
-+    g_free(name);
- #endif
- }
-=20
-diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
-index 2eb9c827a5..98c9bf3240 100644
---- a/backends/hostmem-memfd.c
-+++ b/backends/hostmem-memfd.c
-@@ -53,7 +53,7 @@ memfd_backend_memory_alloc(HostMemoryBackend *backend, =
-Error **errp)
-         return;
+diff --git a/blockdev.c b/blockdev.c
+index a6f71f9d83..43e4c22da5 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1339,7 +1339,7 @@ struct BlkActionState {
+     const BlkActionOps *ops;
+     JobTxn *block_job_txn;
+     TransactionProperties *txn_props;
+-    QSIMPLEQ_ENTRY(BlkActionState) entry;
++    QTAILQ_ENTRY(BlkActionState) entry;
+ };
+ 
+ /* internal snapshot private data */
+@@ -2266,8 +2266,8 @@ void qmp_transaction(TransactionActionList *dev_list,
+     BlkActionState *state, *next;
+     Error *local_err = NULL;
+ 
+-    QSIMPLEQ_HEAD(snap_bdrv_states, BlkActionState) snap_bdrv_states;
+-    QSIMPLEQ_INIT(&snap_bdrv_states);
++    QTAILQ_HEAD(snap_bdrv_states, BlkActionState) snap_bdrv_states;
++    QTAILQ_INIT(&snap_bdrv_states);
+ 
+     /* Does this transaction get canceled as a group on failure?
+      * If not, we don't really need to make a JobTxn.
+@@ -2298,7 +2298,7 @@ void qmp_transaction(TransactionActionList *dev_list,
+         state->action = dev_info;
+         state->block_job_txn = block_job_txn;
+         state->txn_props = props;
+-        QSIMPLEQ_INSERT_TAIL(&snap_bdrv_states, state, entry);
++        QTAILQ_INSERT_TAIL(&snap_bdrv_states, state, entry);
+ 
+         state->ops->prepare(state, &local_err);
+         if (local_err) {
+@@ -2307,7 +2307,7 @@ void qmp_transaction(TransactionActionList *dev_list,
+         }
      }
-=20
--    name =3D object_get_canonical_path(OBJECT(backend));
-+    name =3D host_memory_backend_get_name(backend);
-     memory_region_init_ram_from_fd(&backend->mr, OBJECT(backend),
-                                    name, backend->size,
-                                    backend->share, fd, errp);
-diff --git a/backends/hostmem-ram.c b/backends/hostmem-ram.c
-index 7ddd08d370..24b65d9ae3 100644
---- a/backends/hostmem-ram.c
-+++ b/backends/hostmem-ram.c
-@@ -16,21 +16,20 @@
-=20
- #define TYPE_MEMORY_BACKEND_RAM "memory-backend-ram"
-=20
--
- static void
- ram_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
- {
--    char *path;
-+    char *name;
-=20
-     if (!backend->size) {
-         error_setg(errp, "can't create backend with size 0");
-         return;
+ 
+-    QSIMPLEQ_FOREACH(state, &snap_bdrv_states, entry) {
++    QTAILQ_FOREACH(state, &snap_bdrv_states, entry) {
+         if (state->ops->commit) {
+             state->ops->commit(state);
+         }
+@@ -2318,13 +2318,13 @@ void qmp_transaction(TransactionActionList *dev_list,
+ 
+ delete_and_fail:
+     /* failure, and it is all-or-none; roll back all operations */
+-    QSIMPLEQ_FOREACH(state, &snap_bdrv_states, entry) {
++    QTAILQ_FOREACH_REVERSE(state, &snap_bdrv_states, snap_bdrv_states, entry) {
+         if (state->ops->abort) {
+             state->ops->abort(state);
+         }
      }
-=20
--    path =3D object_get_canonical_path_component(OBJECT(backend));
--    memory_region_init_ram_shared_nomigrate(&backend->mr, OBJECT(backend=
-), path,
-+    name =3D host_memory_backend_get_name(backend);
-+    memory_region_init_ram_shared_nomigrate(&backend->mr, OBJECT(backend=
-), name,
-                            backend->size, backend->share, errp);
--    g_free(path);
-+    g_free(name);
- }
-=20
- static void
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index af800284e0..0c8ef17653 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -28,6 +28,16 @@ QEMU_BUILD_BUG_ON(HOST_MEM_POLICY_BIND !=3D MPOL_BIND)=
-;
- QEMU_BUILD_BUG_ON(HOST_MEM_POLICY_INTERLEAVE !=3D MPOL_INTERLEAVE);
- #endif
-=20
-+char *
-+host_memory_backend_get_name(HostMemoryBackend *backend)
-+{
-+    if (!backend->use_canonical_path) {
-+        return object_get_canonical_path_component(OBJECT(backend));
-+    }
-+
-+    return object_get_canonical_path(OBJECT(backend));
-+}
-+
- static void
- host_memory_backend_get_size(Object *obj, Visitor *v, const char *name,
-                              void *opaque, Error **errp)
-@@ -247,6 +257,11 @@ static void host_memory_backend_init(Object *obj)
-     backend->prealloc =3D mem_prealloc;
- }
-=20
-+static void host_memory_backend_post_init(Object *obj)
-+{
-+    object_apply_compat_props(obj);
-+}
-+
- bool host_memory_backend_mr_inited(HostMemoryBackend *backend)
- {
-     /*
-@@ -395,6 +410,23 @@ static void host_memory_backend_set_share(Object *o,=
- bool value, Error **errp)
-     backend->share =3D value;
- }
-=20
-+static bool
-+host_memory_backend_get_use_canonical_path(Object *obj, Error **errp)
-+{
-+    HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
-+
-+    return backend->use_canonical_path;
-+}
-+
-+static void
-+host_memory_backend_set_use_canonical_path(Object *obj, bool value,
-+                                           Error **errp)
-+{
-+    HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
-+
-+    backend->use_canonical_path =3D value;
-+}
-+
- static void
- host_memory_backend_class_init(ObjectClass *oc, void *data)
- {
-@@ -441,6 +473,9 @@ host_memory_backend_class_init(ObjectClass *oc, void =
-*data)
-         &error_abort);
-     object_class_property_set_description(oc, "share",
-         "Mark the memory as private to QEMU or shared", &error_abort);
-+    object_class_property_add_bool(oc, "x-use-canonical-path-for-rambloc=
-k-id",
-+        host_memory_backend_get_use_canonical_path,
-+        host_memory_backend_set_use_canonical_path, &error_abort);
- }
-=20
- static const TypeInfo host_memory_backend_info =3D {
-@@ -451,6 +486,7 @@ static const TypeInfo host_memory_backend_info =3D {
-     .class_init =3D host_memory_backend_class_init,
-     .instance_size =3D sizeof(HostMemoryBackend),
-     .instance_init =3D host_memory_backend_init,
-+    .instance_post_init =3D host_memory_backend_post_init,
-     .interfaces =3D (InterfaceInfo[]) {
-         { TYPE_USER_CREATABLE },
-         { }
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 7570408caa..cba79ef7ff 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -23,7 +23,17 @@
- #include "sysemu/qtest.h"
- #include "hw/pci/pci.h"
-=20
--GlobalProperty hw_compat_3_1[] =3D {};
-+GlobalProperty hw_compat_3_1[] =3D {
-+    {
-+        .driver   =3D "memory-backend-file",
-+        .property =3D "x-use-canonical-path-for-ramblock-id",
-+        .value    =3D "true",
-+    },{
-+        .driver   =3D "memory-backend-memfd",
-+        .property =3D "x-use-canonical-path-for-ramblock-id",
-+        .value    =3D "true",
-+    },
-+};
- const size_t hw_compat_3_1_len =3D G_N_ELEMENTS(hw_compat_3_1);
-=20
- GlobalProperty hw_compat_3_0[] =3D {};
---=20
-2.20.1.2.gb21ebb671b
+ exit:
+-    QSIMPLEQ_FOREACH_SAFE(state, &snap_bdrv_states, entry, next) {
++    QTAILQ_FOREACH_SAFE(state, &snap_bdrv_states, entry, next) {
+         if (state->ops->clean) {
+             state->ops->clean(state);
+         }
+-- 
+2.17.2
