@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaDeF-00012u-9T
+	(envelope-from <dgibson@ozlabs.org>) id 1gaDeE-00012P-Qe
 	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:47:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaDeE-0008V3-Ej
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:59 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gaDeC-0008SK-Ku
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:58 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 21 Dec 2018 16:46:00 +1100
-Message-Id: <20181221054606.22007-35-david@gibson.dropbear.id.au>
+Date: Fri, 21 Dec 2018 16:45:52 +1100
+Message-Id: <20181221054606.22007-27-david@gibson.dropbear.id.au>
 In-Reply-To: <20181221054606.22007-1-david@gibson.dropbear.id.au>
 References: <20181221054606.22007-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 34/40] spapr: allocate the interrupt thread
- context under the CPU core
+Subject: [Qemu-devel] [PULL 26/40] ppc/xive: introduce a simplified XIVE
+ presenter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,169 +28,336 @@ Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, gkurz@redhat.com, lvivier@redhat
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Each interrupt mode has its own specific interrupt presenter object,
-that we store under the CPU object, one for XICS and one for XIVE.
+The last sub-engine of the XIVE architecture is the Interrupt
+Virtualization Presentation Engine (IVPE). On HW, the IVRE and the
+IVPE share elements, the Power Bus interface (CQ), the routing table
+descriptors, and they can be combined in the same HW logic. We do the
+same in QEMU and combine both engines in the XiveRouter for
+simplicity.
 
-Extend the sPAPR IRQ backend with a new handler to support them both.
+When the IVRE has completed its job of matching an event source with a
+Notification Virtual Target (NVT) to notify, it forwards the event
+notification to the IVPE sub-engine. The IVPE scans the thread
+interrupt contexts of the Notification Virtual Targets (NVT)
+dispatched on the HW processor threads and if a match is found, it
+signals the thread. If not, the IVPE escalates the notification to
+some other targets and records the notification in a backlog queue.
+
+The IVPE maintains the thread interrupt context state for each of its
+NVTs not dispatched on HW processor threads in the Notification
+Virtual Target table (NVTT).
+
+The model currently only supports single NVT notifications.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+[dwg: Folded in fix for field accessors]
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xive.c             | 22 ++++++++++++++++++++++
- hw/ppc/spapr_cpu_core.c    |  5 ++---
- hw/ppc/spapr_irq.c         | 15 +++++++++++++++
- include/hw/ppc/spapr_irq.h |  2 ++
- include/hw/ppc/xive.h      |  1 +
- 5 files changed, 42 insertions(+), 3 deletions(-)
+ hw/intc/xive.c             | 190 +++++++++++++++++++++++++++++++++++++
+ include/hw/ppc/xive.h      |  14 +++
+ include/hw/ppc/xive_regs.h |  24 +++++
+ 3 files changed, 228 insertions(+)
 
 diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index 607e74acd2..ea33494338 100644
+index 06a835c454..1d737346c3 100644
 --- a/hw/intc/xive.c
 +++ b/hw/intc/xive.c
-@@ -528,6 +528,28 @@ static const TypeInfo xive_tctx_info =3D {
-     .class_init    =3D xive_tctx_class_init,
- };
+@@ -984,6 +984,188 @@ int xive_router_write_end(XiveRouter *xrtr, uint8_t=
+ end_blk, uint32_t end_idx,
+    return xrc->write_end(xrtr, end_blk, end_idx, end, word_number);
+ }
 =20
-+Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp)
++int xive_router_get_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_=
+idx,
++                        XiveNVT *nvt)
 +{
-+    Error *local_err =3D NULL;
-+    Object *obj;
++   XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
 +
-+    obj =3D object_new(TYPE_XIVE_TCTX);
-+    object_property_add_child(cpu, TYPE_XIVE_TCTX, obj, &error_abort);
-+    object_unref(obj);
-+    object_property_add_const_link(obj, "cpu", cpu, &error_abort);
-+    object_property_set_bool(obj, true, "realized", &local_err);
-+    if (local_err) {
-+        goto error;
++   return xrc->get_nvt(xrtr, nvt_blk, nvt_idx, nvt);
++}
++
++int xive_router_write_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nv=
+t_idx,
++                        XiveNVT *nvt, uint8_t word_number)
++{
++   XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
++
++   return xrc->write_nvt(xrtr, nvt_blk, nvt_idx, nvt, word_number);
++}
++
++/*
++ * The thread context register words are in big-endian format.
++ */
++static int xive_presenter_tctx_match(XiveTCTX *tctx, uint8_t format,
++                                     uint8_t nvt_blk, uint32_t nvt_idx,
++                                     bool cam_ignore, uint32_t logic_ser=
+v)
++{
++    uint32_t cam =3D xive_nvt_cam_line(nvt_blk, nvt_idx);
++    uint32_t qw2w2 =3D xive_tctx_word2(&tctx->regs[TM_QW2_HV_POOL]);
++    uint32_t qw1w2 =3D xive_tctx_word2(&tctx->regs[TM_QW1_OS]);
++    uint32_t qw0w2 =3D xive_tctx_word2(&tctx->regs[TM_QW0_USER]);
++
++    /*
++     * TODO (PowerNV): ignore mode. The low order bits of the NVT
++     * identifier are ignored in the "CAM" match.
++     */
++
++    if (format =3D=3D 0) {
++        if (cam_ignore =3D=3D true) {
++            /*
++             * F=3D0 & i=3D1: Logical server notification (bits ignored =
+at
++             * the end of the NVT identifier)
++             */
++            qemu_log_mask(LOG_UNIMP, "XIVE: no support for LS NVT %x/%x\=
+n",
++                          nvt_blk, nvt_idx);
++             return -1;
++        }
++
++        /* F=3D0 & i=3D0: Specific NVT notification */
++
++        /* TODO (PowerNV) : PHYS ring */
++
++        /* HV POOL ring */
++        if ((be32_to_cpu(qw2w2) & TM_QW2W2_VP) &&
++            cam =3D=3D xive_get_field32(TM_QW2W2_POOL_CAM, qw2w2)) {
++            return TM_QW2_HV_POOL;
++        }
++
++        /* OS ring */
++        if ((be32_to_cpu(qw1w2) & TM_QW1W2_VO) &&
++            cam =3D=3D xive_get_field32(TM_QW1W2_OS_CAM, qw1w2)) {
++            return TM_QW1_OS;
++        }
++    } else {
++        /* F=3D1 : User level Event-Based Branch (EBB) notification */
++
++        /* USER ring */
++        if  ((be32_to_cpu(qw1w2) & TM_QW1W2_VO) &&
++             (cam =3D=3D xive_get_field32(TM_QW1W2_OS_CAM, qw1w2)) &&
++             (be32_to_cpu(qw0w2) & TM_QW0W2_VU) &&
++             (logic_serv =3D=3D xive_get_field32(TM_QW0W2_LOGIC_SERV, qw=
+0w2))) {
++            return TM_QW0_USER;
++        }
++    }
++    return -1;
++}
++
++typedef struct XiveTCTXMatch {
++    XiveTCTX *tctx;
++    uint8_t ring;
++} XiveTCTXMatch;
++
++static bool xive_presenter_match(XiveRouter *xrtr, uint8_t format,
++                                 uint8_t nvt_blk, uint32_t nvt_idx,
++                                 bool cam_ignore, uint8_t priority,
++                                 uint32_t logic_serv, XiveTCTXMatch *mat=
+ch)
++{
++    CPUState *cs;
++
++    /*
++     * TODO (PowerNV): handle chip_id overwrite of block field for
++     * hardwired CAM compares
++     */
++
++    CPU_FOREACH(cs) {
++        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
++        XiveTCTX *tctx =3D XIVE_TCTX(cpu->intc);
++        int ring;
++
++        /*
++         * HW checks that the CPU is enabled in the Physical Thread
++         * Enable Register (PTER).
++         */
++
++        /*
++         * Check the thread context CAM lines and record matches. We
++         * will handle CPU exception delivery later
++         */
++        ring =3D xive_presenter_tctx_match(tctx, format, nvt_blk, nvt_id=
+x,
++                                         cam_ignore, logic_serv);
++        /*
++         * Save the context and follow on to catch duplicates, that we
++         * don't support yet.
++         */
++        if (ring !=3D -1) {
++            if (match->tctx) {
++                qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found a th=
+read "
++                              "context NVT %x/%x\n", nvt_blk, nvt_idx);
++                return false;
++            }
++
++            match->ring =3D ring;
++            match->tctx =3D tctx;
++        }
 +    }
 +
-+    return obj;
++    if (!match->tctx) {
++        qemu_log_mask(LOG_UNIMP, "XIVE: NVT %x/%x is not dispatched\n",
++                      nvt_blk, nvt_idx);
++        return false;
++    }
 +
-+error:
-+    object_unparent(obj);
-+    error_propagate(errp, local_err);
-+    return NULL;
++    return true;
++}
++
++/*
++ * This is our simple Xive Presenter Engine model. It is merged in the
++ * Router as it does not require an extra object.
++ *
++ * It receives notification requests sent by the IVRE to find one
++ * matching NVT (or more) dispatched on the processor threads. In case
++ * of a single NVT notification, the process is abreviated and the
++ * thread is signaled if a match is found. In case of a logical server
++ * notification (bits ignored at the end of the NVT identifier), the
++ * IVPE and IVRE select a winning thread using different filters. This
++ * involves 2 or 3 exchanges on the PowerBus that the model does not
++ * support.
++ *
++ * The parameters represent what is sent on the PowerBus
++ */
++static void xive_presenter_notify(XiveRouter *xrtr, uint8_t format,
++                                  uint8_t nvt_blk, uint32_t nvt_idx,
++                                  bool cam_ignore, uint8_t priority,
++                                  uint32_t logic_serv)
++{
++    XiveNVT nvt;
++    XiveTCTXMatch match =3D { .tctx =3D NULL, .ring =3D 0 };
++    bool found;
++
++    /* NVT cache lookup */
++    if (xive_router_get_nvt(xrtr, nvt_blk, nvt_idx, &nvt)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: no NVT %x/%x\n",
++                      nvt_blk, nvt_idx);
++        return;
++    }
++
++    if (!xive_nvt_is_valid(&nvt)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: NVT %x/%x is invalid\n",
++                      nvt_blk, nvt_idx);
++        return;
++    }
++
++    found =3D xive_presenter_match(xrtr, format, nvt_blk, nvt_idx, cam_i=
+gnore,
++                                 priority, logic_serv, &match);
++    if (found) {
++        return;
++    }
++
++    /*
++     * If no matching NVT is dispatched on a HW thread :
++     * - update the NVT structure if backlog is activated
++     * - escalate (ESe PQ bits and EAS in w4-5) if escalation is
++     *   activated
++     */
 +}
 +
  /*
-  * XIVE ESB helpers
-  */
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 2398ce62c0..1811cd48db 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -11,7 +11,6 @@
- #include "hw/ppc/spapr_cpu_core.h"
- #include "target/ppc/cpu.h"
- #include "hw/ppc/spapr.h"
--#include "hw/ppc/xics.h" /* for icp_create() - to be removed */
- #include "hw/boards.h"
- #include "qapi/error.h"
- #include "sysemu/cpus.h"
-@@ -215,6 +214,7 @@ static void spapr_cpu_core_unrealize(DeviceState *dev=
-, Error **errp)
- static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPRMachineState *spapr=
-,
-                                sPAPRCPUCore *sc, Error **errp)
- {
-+    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-     CPUPPCState *env =3D &cpu->env;
-     CPUState *cs =3D CPU(cpu);
-     Error *local_err =3D NULL;
-@@ -233,8 +233,7 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPR=
-MachineState *spapr,
-     qemu_register_reset(spapr_cpu_reset, cpu);
-     spapr_cpu_reset(cpu);
-=20
--    cpu->intc =3D icp_create(OBJECT(cpu), spapr->icp_type, XICS_FABRIC(s=
-papr),
--                           &local_err);
-+    cpu->intc =3D smc->irq->cpu_intc_create(spapr, OBJECT(cpu), &local_e=
-rr);
-     if (local_err) {
-         goto error_unregister;
-     }
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 975954dc27..fdcc7795e4 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -191,6 +191,12 @@ static void spapr_irq_print_info_xics(sPAPRMachineSt=
-ate *spapr, Monitor *mon)
-     ics_pic_print_info(spapr->ics, mon);
+  * An END trigger can come from an event trigger (IPI or HW) or from
+  * another chip. We don't model the PowerBus but the END trigger
+@@ -1053,6 +1235,14 @@ static void xive_router_end_notify(XiveRouter *xrt=
+r, uint8_t end_blk,
+     /*
+      * Follows IVPE notification
+      */
++    xive_presenter_notify(xrtr, format,
++                          xive_get_field32(END_W6_NVT_BLOCK, end.w6),
++                          xive_get_field32(END_W6_NVT_INDEX, end.w6),
++                          xive_get_field32(END_W7_F0_IGNORE, end.w7),
++                          priority,
++                          xive_get_field32(END_W7_F1_LOG_SERVER_ID, end.=
+w7));
++
++    /* TODO: Auto EOI. */
  }
 =20
-+static Object *spapr_irq_cpu_intc_create_xics(sPAPRMachineState *spapr,
-+                                              Object *cpu, Error **errp)
-+{
-+    return icp_create(cpu, spapr->icp_type, XICS_FABRIC(spapr), errp);
-+}
-+
- #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
- #define SPAPR_IRQ_XICS_NR_MSIS     \
-     (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
-@@ -205,6 +211,7 @@ sPAPRIrq spapr_irq_xics =3D {
-     .qirq        =3D spapr_qirq_xics,
-     .print_info  =3D spapr_irq_print_info_xics,
-     .dt_populate =3D spapr_dt_xics,
-+    .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
- };
-=20
- /*
-@@ -282,6 +289,12 @@ static void spapr_irq_print_info_xive(sPAPRMachineSt=
-ate *spapr,
-     spapr_xive_pic_print_info(spapr->xive, mon);
- }
-=20
-+static Object *spapr_irq_cpu_intc_create_xive(sPAPRMachineState *spapr,
-+                                              Object *cpu, Error **errp)
-+{
-+    return xive_tctx_create(cpu, XIVE_ROUTER(spapr->xive), errp);
-+}
-+
- /*
-  * XIVE uses the full IRQ number space. Set it to 8K to be compatible
-  * with XICS.
-@@ -300,6 +313,7 @@ sPAPRIrq spapr_irq_xive =3D {
-     .qirq        =3D spapr_qirq_xive,
-     .print_info  =3D spapr_irq_print_info_xive,
-     .dt_populate =3D spapr_dt_xive,
-+    .cpu_intc_create =3D spapr_irq_cpu_intc_create_xive,
- };
-=20
- /*
-@@ -405,4 +419,5 @@ sPAPRIrq spapr_irq_xics_legacy =3D {
-     .qirq        =3D spapr_qirq_xics,
-     .print_info  =3D spapr_irq_print_info_xics,
-     .dt_populate =3D spapr_dt_xics,
-+    .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
- };
-diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-index e51e9f052f..13db0428ab 100644
---- a/include/hw/ppc/spapr_irq.h
-+++ b/include/hw/ppc/spapr_irq.h
-@@ -41,6 +41,8 @@ typedef struct sPAPRIrq {
-     void (*print_info)(sPAPRMachineState *spapr, Monitor *mon);
-     void (*dt_populate)(sPAPRMachineState *spapr, uint32_t nr_servers,
-                         void *fdt, uint32_t phandle);
-+    Object *(*cpu_intc_create)(sPAPRMachineState *spapr, Object *cpu,
-+                               Error **errp);
- } sPAPRIrq;
-=20
- extern sPAPRIrq spapr_irq_xics;
+ static void xive_router_notify(XiveNotifier *xn, uint32_t lisn)
 diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-index 19309d1d65..18cd114eb2 100644
+index 1e823a4c64..19309d1d65 100644
 --- a/include/hw/ppc/xive.h
 +++ b/include/hw/ppc/xive.h
-@@ -419,6 +419,7 @@ typedef struct XiveTCTX {
- extern const MemoryRegionOps xive_tm_ops;
+@@ -325,6 +325,10 @@ typedef struct XiveRouterClass {
+                    XiveEND *end);
+     int (*write_end)(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_idx=
+,
+                      XiveEND *end, uint8_t word_number);
++    int (*get_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_idx,
++                   XiveNVT *nvt);
++    int (*write_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_idx=
+,
++                     XiveNVT *nvt, uint8_t word_number);
+ } XiveRouterClass;
+=20
+ void xive_eas_pic_print_info(XiveEAS *eas, uint32_t lisn, Monitor *mon);
+@@ -335,6 +339,11 @@ int xive_router_get_end(XiveRouter *xrtr, uint8_t en=
+d_blk, uint32_t end_idx,
+                         XiveEND *end);
+ int xive_router_write_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t en=
+d_idx,
+                           XiveEND *end, uint8_t word_number);
++int xive_router_get_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_=
+idx,
++                        XiveNVT *nvt);
++int xive_router_write_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nv=
+t_idx,
++                          XiveNVT *nvt, uint8_t word_number);
++
+=20
+ /*
+  * XIVE END ESBs
+@@ -411,4 +420,9 @@ extern const MemoryRegionOps xive_tm_ops;
 =20
  void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
-+Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp);
 =20
- static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nvt_i=
++static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nvt_i=
 dx)
- {
++{
++    return (nvt_blk << 19) | nvt_idx;
++}
++
+ #endif /* PPC_XIVE_H */
+diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
+index 8b3cc6c9b9..bf36678a24 100644
+--- a/include/hw/ppc/xive_regs.h
++++ b/include/hw/ppc/xive_regs.h
+@@ -208,4 +208,28 @@ typedef struct XiveEND {
+ #define xive_end_is_backlog(end)  (be32_to_cpu((end)->w0) & END_W0_BACKL=
+OG)
+ #define xive_end_is_escalate(end) (be32_to_cpu((end)->w0) & END_W0_ESCAL=
+ATE_CTL)
+=20
++/* Notification Virtual Target (NVT) */
++typedef struct XiveNVT {
++        uint32_t        w0;
++#define NVT_W0_VALID             PPC_BIT32(0)
++        uint32_t        w1;
++        uint32_t        w2;
++        uint32_t        w3;
++        uint32_t        w4;
++        uint32_t        w5;
++        uint32_t        w6;
++        uint32_t        w7;
++        uint32_t        w8;
++#define NVT_W8_GRP_VALID         PPC_BIT32(0)
++        uint32_t        w9;
++        uint32_t        wa;
++        uint32_t        wb;
++        uint32_t        wc;
++        uint32_t        wd;
++        uint32_t        we;
++        uint32_t        wf;
++} XiveNVT;
++
++#define xive_nvt_is_valid(nvt)    (be32_to_cpu((nvt)->w0) & NVT_W0_VALID=
+)
++
+ #endif /* PPC_XIVE_REGS_H */
 --=20
 2.19.2
