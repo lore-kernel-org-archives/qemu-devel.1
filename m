@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gaNQG-0001xn-95
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:13:13 -0500
+	(envelope-from <nicholas.a.hudson@gmail.com>) id 1gaNQU-0002BZ-AC
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:13:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gaNQA-0001qm-H5
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:13:12 -0500
-Received: from mga12.intel.com ([192.55.52.136]:28812)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yu.c.zhang@linux.intel.com>)
-	id 1gaNQ8-0001md-F3
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:13:06 -0500
-Date: Sat, 22 Dec 2018 00:09:44 +0800
-From: Yu Zhang <yu.c.zhang@linux.intel.com>
-Message-ID: <20181221160944.65c5skjhkel3of7y@linux.intel.com>
-References: <1544619939-18102-1-git-send-email-yu.c.zhang@linux.intel.com>
-	<1544619939-18102-2-git-send-email-yu.c.zhang@linux.intel.com>
-	<20181217141740.16ccfaa1@Igors-MacBook-Pro.local>
-	<20181218092723.yhaerzm4vlzgef65@linux.intel.com>
-	<20181218155536.2b35a037@Igors-MacBook-Pro.local>
-	<20181219025717.6m72hq73p2haexkv@linux.intel.com>
-	<20181219114037.5550a562@redhat.com>
-	<20181220211801.GR19442@habkost.net>
-	<20181221151325.39b64733@redhat.com>
+	(envelope-from <nicholas.a.hudson@gmail.com>) id 1gaNQT-00029I-En
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:13:26 -0500
+References: <975b9131-9937-cfea-3b5d-ef36d0c2b761@gmail.com>
+From: Nick Hudson <nicholas.a.hudson@gmail.com>
+Message-ID: <963b728a-2ed3-bcc9-0ed3-df2d47f70621@gmail.com>
+Date: Fri, 21 Dec 2018 16:13:17 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181221151325.39b64733@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] intel-iommu: differentiate host
- address width from IOVA address width.
+In-Reply-To: <975b9131-9937-cfea-3b5d-ef36d0c2b761@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v3] Support u-boot noload images for arm as
+ used by, NetBSD/evbarm GENERIC kernel.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,190 +24,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Fri, Dec 21, 2018 at 03:13:25PM +0100, Igor Mammedov wrote:
-> On Thu, 20 Dec 2018 19:18:01 -0200
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
-> 
-> > On Wed, Dec 19, 2018 at 11:40:37AM +0100, Igor Mammedov wrote:
-> > > On Wed, 19 Dec 2018 10:57:17 +0800
-> > > Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
-> > >   
-> > > > On Tue, Dec 18, 2018 at 03:55:36PM +0100, Igor Mammedov wrote:  
-> > > > > On Tue, 18 Dec 2018 17:27:23 +0800
-> > > > > Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
-> > > > >     
-> > > > > > On Mon, Dec 17, 2018 at 02:17:40PM +0100, Igor Mammedov wrote:    
-> > > > > > > On Wed, 12 Dec 2018 21:05:38 +0800
-> > > > > > > Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
-> > > > > > >     
-> > > > > > > > Currently, vIOMMU is using the value of IOVA address width, instead of
-> > > > > > > > the host address width(HAW) to calculate the number of reserved bits in
-> > > > > > > > data structures such as root entries, context entries, and entries of
-> > > > > > > > DMA paging structures etc.
-> > > > > > > > 
-> > > > > > > > However values of IOVA address width and of the HAW may not equal. For
-> > > > > > > > example, a 48-bit IOVA can only be mapped to host addresses no wider than
-> > > > > > > > 46 bits. Using 48, instead of 46 to calculate the reserved bit may result
-> > > > > > > > in an invalid IOVA being accepted.
-> > > > > > > > 
-> > > > > > > > To fix this, a new field - haw_bits is introduced in struct IntelIOMMUState,
-> > > > > > > > whose value is initialized based on the maximum physical address set to
-> > > > > > > > guest CPU.    
-> > > > > > >     
-> > > > > > > > Also, definitions such as VTD_HOST_AW_39/48BIT etc. are renamed
-> > > > > > > > to clarify.
-> > > > > > > > 
-> > > > > > > > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > > > > > > > Reviewed-by: Peter Xu <peterx@redhat.com>
-> > > > > > > > ---    
-> > > > > > > [...]
-> > > > > > >     
-> > > > > > > > @@ -3100,6 +3104,8 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
-> > > > > > > >  static void vtd_init(IntelIOMMUState *s)
-> > > > > > > >  {
-> > > > > > > >      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
-> > > > > > > > +    CPUState *cs = first_cpu;
-> > > > > > > > +    X86CPU *cpu = X86_CPU(cs);
-> > > > > > > >  
-> > > > > > > >      memset(s->csr, 0, DMAR_REG_SIZE);
-> > > > > > > >      memset(s->wmask, 0, DMAR_REG_SIZE);
-> > > > > > > > @@ -3119,23 +3125,24 @@ static void vtd_init(IntelIOMMUState *s)
-> > > > > > > >      s->cap = VTD_CAP_FRO | VTD_CAP_NFR | VTD_CAP_ND |
-> > > > > > > >               VTD_CAP_MAMV | VTD_CAP_PSI | VTD_CAP_SLLPS |
-> > > > > > > >               VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(s->aw_bits);
-> > > > > > > > -    if (s->aw_bits == VTD_HOST_AW_48BIT) {
-> > > > > > > > +    if (s->aw_bits == VTD_AW_48BIT) {
-> > > > > > > >          s->cap |= VTD_CAP_SAGAW_48bit;
-> > > > > > > >      }
-> > > > > > > >      s->ecap = VTD_ECAP_QI | VTD_ECAP_IRO;
-> > > > > > > > +    s->haw_bits = cpu->phys_bits;    
-> > > > > > > Is it possible to avoid accessing CPU fields directly or cpu altogether
-> > > > > > > and set phys_bits when iommu is created?    
-> > > > > > 
-> > > > > > Thanks for your comments, Igor.
-> > > > > > 
-> > > > > > Well, I guess you prefer not to query the CPU capabilities while deciding
-> > > > > > the vIOMMU features. But to me, they are not that irrelevant.:)
-> > > > > > 
-> > > > > > Here the hardware address width in vt-d, and the one in cpuid.MAXPHYSADDR
-> > > > > > are referring to the same concept. In VM, both are the maximum guest physical
-> > > > > > address width. If we do not check the CPU field here, we will still have to
-> > > > > > check the CPU field in other places such as build_dmar_q35(), and reset the
-> > > > > > s->haw_bits again.
-> > > > > > 
-> > > > > > Is this explanation convincing enough? :)    
-> > > > > current build_dmar_q35() doesn't do it, it's all new code in this series that
-> > > > > contains not acceptable direct access from one device (iommu) to another (cpu).   
-> > > > > Proper way would be for the owner of iommu to fish limits from somewhere and set
-> > > > > values during iommu creation.    
-> > > > 
-> > > > Well, current build_dmar_q35() doesn't do it, because it is using the incorrect value. :)
-> > > > According to the spec, the host address width is the maximum physical address width,
-> > > > yet current implementation is using the DMA address width. For me, this is not only
-> > > > wrong, but also unsecure. For this point, I think we all agree this need to be fixed.
-> > > > 
-> > > > As to how to fix it - should we query the cpu fields, I still do not understand why
-> > > > this is not acceptable. :)
-> > > > 
-> > > > I had thought of other approaches before, yet I did not choose:
-> > > >   
-> > > > 1> Introduce a new parameter, say, "x-haw-bits" which is used for iommu to limit its    
-> > > > physical address width(similar to the "x-aw-bits" for IOVA). But what should we check
-> > > > this parameter or not? What if this parameter is set to sth. different than the "phys-bits"
-> > > > or not?
-> > > >   
-> > > > 2> Another choice I had thought of is, to query the physical iommu. I abandoned this    
-> > > > idea because my understanding is that vIOMMU is not a passthrued device, it is emulated.  
-> > >   
-> > > > So Igor, may I ask why you think checking against the cpu fields so not acceptable? :)  
-> > > Because accessing private fields of device from another random device is not robust
-> > > and a subject to breaking in unpredictable manner when field meaning or initialization
-> > > order changes. (analogy to baremetal: one does not solder wire to a CPU die to let
-> > > access some piece of data from random device).
-> > >   
-> > 
-> > With either the solution below or the one I proposed, we still
-> > have a ordering problem: if we want "-cpu ...,phys-bits=..." to
-> As Michael said, it's questionable if iommu should rely on guest's
-> phys-bits at all, but that aside we should use proper interfaces
-> and hierarchy to initialize devices, see below why I dislike
-> simplistic pc_max_phys_bits().
+ping
 
-Well, my understanding of the vt-d spec is that the address limitation in
-DMAR are referring to the same concept of CPUID.MAXPHYSADDR. I do not think
-there's any different in the native scenario. :)
-
-> 
-> > affect the IOMMU device, we will need the CPU objects to be
-> > created before IOMMU realize.
-> > 
-> > At least both proposals make the initialization ordering
-> > explicitly a responsibility of the machine code.  In either case,
-> > I don't think we will start creating all CPU objects after device
-> > realize any time soon.
-> > 
-> > 
-> > > I've looked at intel-iommu code and how it's created so here is a way to do the thing
-> > > you need using proper interfaces:
-> > > 
-> > > 1. add x-haw_bits property
-> > > 2. include in your series patch
-> > >     '[Qemu-devel] [PATCH] qdev: let machine hotplug handler to override  bus hotplug handler'
-> > > 3. add your iommu to pc_get_hotpug_handler() to redirect plug flow to
-> > >    machine and let _pre_plug handler to check and set x-haw_bits for machine level  
-> > 
-> > Wow, that's a very complex way to pass a single integer from
-> > machine code to device code.  If this is the only way to do that,
-> > we really need to take a step back and rethink our API design.
-> > 
-> > What's wrong with having a simple
-> >   uint32_t pc_max_phys_bits(PCMachineState*)
-> > function?
-> As suggested, it would be only aesthetic change for accessing first_cpu from
-> random device at random time. IOMMU would still access cpu instance directly
-> no matter how much wrappers one would use so it's still the same hack.
-> If phys_bits were changing during VM lifecycle and iommu needed to use
-> updated value then using pc_max_phys_bits() might be justified as
-> we don't have interfaces to handle that but that's not the case here.
-> 
-> I suggested a typical way (albeit a bit complex) to handle device
-> initialization in cases where bus plug handler is not sufficient.
-> It follows proper hierarchy without any layer violations and can fail
-> gracefully even if we start creating CPUs later using only '-device cpufoo'
-> without need to fix iommu code to handle that (it would fail creating
-> iommu with clear error that CPU isn't available and all user have to
-> do is to fix CLI to make sure that CPU is created before iommu).
-> 
-> So I'd prefer if we used exiting pattern for device initialization
-> instead of hacks whenever it is possible.
-
-Thanks, Igor. I kind of understand your concern here. And I am wondering,
-the phys-bits shall be a configuration used by the VM, not just vCPU. So,
-instead of trying to deduce this value from the 1st created vCPU, or to
-guarantee the order of vCPU & vIOMMU creation, is there any possibility
-we move a max-phys-bits in the MachineState, and derive the 'phys-bits'
-in vCPU and 'haw-bits' in vIOMMU from MachineState later in their creation
-process respectively?
-
-> 
-> > 
-> > > 4. you probably can use phys-bits/host-phys-bits properties to get data that you need
-> > >    also see how ms->possible_cpus, that's how you can get access to CPU from machine
-> > >    layer.
-> > >   
-> > [...]
-> > 
-> PS:
-> Another thing I'd like to draw your attention to (since you recently looked at
-> phys-bits) is about host/guest phys_bits and if it's safe from migration pov
-> between hosts with different limits.
-> 
-
-Good point, and thanks for the remind. Edurado, Paolo, and I discussed this
-before. And indeed, it is a bit tricky... :)
-
-B.R.
-Yu
+On 11/12/2018 12:27, Nick Hudson wrote:
+>
+> noload kernels are loaded with the u-boot image header and as a result
+> the header size needs adding to the entry point.  Fake up a hdr so the
+> kernel image is loaded at the right address and the entry point is
+> adjusted appropriately.
+>
+> The bootloader fits in the space that the uboot header would have 
+> occupied.
+>
+> Clarify the load_uimage API to state the passing of a load address 
+> when an
+> image doesn't specify one, or when loading a ramdisk is expected.
+>
+> Adjust callers of load_uimage, etc.
+>
+> Signed-off-by: Nick Hudson<skrll@netbsd.org>
+>
+> ---
+>  hw/arm/boot.c          |  8 +++++---
+>  hw/core/loader.c       | 19 ++++++++++++++++---
+>  hw/core/uboot_image.h  |  1 +
+>  hw/microblaze/boot.c   |  2 +-
+>  hw/nios2/boot.c        |  2 +-
+>  hw/ppc/e500.c          |  1 +
+>  hw/ppc/ppc440_bamboo.c |  2 +-
+>  hw/ppc/sam460ex.c      |  2 +-
+>  include/hw/loader.h    |  7 ++++++-
+>  9 files changed, 33 insertions(+), 11 deletions(-)
+>
+> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+> index 586baa9b64..450267566a 100644
+> --- a/hw/arm/boot.c
+> +++ b/hw/arm/boot.c
+> @@ -30,8 +30,9 @@
+>   * Documentation/arm/Booting and Documentation/arm64/booting.txt
+>   * They have different preferred image load offsets from system RAM 
+> base.
+>   */
+> -#define KERNEL_ARGS_ADDR 0x100
+> -#define KERNEL_LOAD_ADDR 0x00010000
+> +#define KERNEL_ARGS_ADDR   0x100
+> +#define KERNEL_NOLOAD_ADDR 0x00000000
+> +#define KERNEL_LOAD_ADDR   0x00010000
+>  #define KERNEL64_LOAD_ADDR 0x00080000
+>
+>  #define ARM64_TEXT_OFFSET_OFFSET    8
+> @@ -1078,7 +1079,8 @@ void arm_load_kernel(ARMCPU *cpu, struct 
+> arm_boot_info *info)
+>      }
+>      entry = elf_entry;
+>      if (kernel_size < 0) {
+> -        kernel_size = load_uimage_as(info->kernel_filename, &entry, 
+> NULL,
+> +        uint64_t loadaddr = info->loader_start + KERNEL_NOLOAD_ADDR;
+> +        kernel_size = load_uimage_as(info->kernel_filename, &entry, 
+> &loadaddr,
+>                                       &is_linux, NULL, NULL, as);
+>      }
+>      if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64) && kernel_size < 
+> 0) {
+> diff --git a/hw/core/loader.c b/hw/core/loader.c
+> index aa0b3fc867..7362197162 100644
+> --- a/hw/core/loader.c
+> +++ b/hw/core/loader.c
+> @@ -638,13 +638,26 @@ static int load_uboot_image(const char 
+> *filename, hwaddr *ep, hwaddr *loadaddr,
+>          goto out;
+>
+>      if (hdr->ih_type != image_type) {
+> -        fprintf(stderr, "Wrong image type %d, expected %d\n", 
+> hdr->ih_type,
+> -                image_type);
+> -        goto out;
+> +        if (image_type != IH_TYPE_KERNEL &&
+> +            hdr->ih_type != IH_TYPE_KERNEL_NOLOAD) {
+> +            fprintf(stderr, "Wrong image type %d, expected %d\n", 
+> hdr->ih_type,
+> +                    image_type);
+> +            goto out;
+> +        }
+>      }
+>
+>      /* TODO: Implement other image types.  */
+>      switch (hdr->ih_type) {
+> +    case IH_TYPE_KERNEL_NOLOAD:
+> +        if (!loadaddr || *loadaddr == LOAD_UIMAGE_LOADADDR_INVALID) {
+> +            fprintf(stderr, "this image format (kernel_noload) cannot 
+> be "
+> +                    "loaded on this machine type");
+> +            goto out;
+> +        }
+> +
+> +        hdr->ih_load = *loadaddr + sizeof(*hdr);
+> +        hdr->ih_ep += hdr->ih_load;
+> +        /* fall through */
+>      case IH_TYPE_KERNEL:
+>          address = hdr->ih_load;
+>          if (translate_fn) {
+> diff --git a/hw/core/uboot_image.h b/hw/core/uboot_image.h
+> index 34c11a70a6..608022de6e 100644
+> --- a/hw/core/uboot_image.h
+> +++ b/hw/core/uboot_image.h
+> @@ -124,6 +124,7 @@
+>  #define IH_TYPE_SCRIPT        6    /* Script file     */
+>  #define IH_TYPE_FILESYSTEM    7    /* Filesystem Image (any type)    */
+>  #define IH_TYPE_FLATDT        8    /* Binary Flat Device Tree Blob    */
+> +#define IH_TYPE_KERNEL_NOLOAD  14    /* OS Kernel Image (noload)    */
+>
+>  /*
+>   * Compression Types
+> diff --git a/hw/microblaze/boot.c b/hw/microblaze/boot.c
+> index 35bfeda7aa..489ab839b7 100644
+> --- a/hw/microblaze/boot.c
+> +++ b/hw/microblaze/boot.c
+> @@ -156,7 +156,7 @@ void microblaze_load_kernel(MicroBlazeCPU *cpu, 
+> hwaddr ddr_base,
+>
+>          /* If it wasn't an ELF image, try an u-boot image.  */
+>          if (kernel_size < 0) {
+> -            hwaddr uentry, loadaddr;
+> +            hwaddr uentry, loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
+>
+>              kernel_size = load_uimage(kernel_filename, &uentry, 
+> &loadaddr, 0,
+>                                        NULL, NULL);
+> diff --git a/hw/nios2/boot.c b/hw/nios2/boot.c
+> index 4bb5b601d3..ed5cb28e94 100644
+> --- a/hw/nios2/boot.c
+> +++ b/hw/nios2/boot.c
+> @@ -161,7 +161,7 @@ void nios2_load_kernel(Nios2CPU *cpu, hwaddr 
+> ddr_base,
+>
+>          /* If it wasn't an ELF image, try an u-boot image. */
+>          if (kernel_size < 0) {
+> -            hwaddr uentry, loadaddr;
+> +            hwaddr uentry, loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
+>
+>              kernel_size = load_uimage(kernel_filename, &uentry, 
+> &loadaddr, 0,
+>                                        NULL, NULL);
+> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+> index e6747fce28..e275178951 100644
+> --- a/hw/ppc/e500.c
+> +++ b/hw/ppc/e500.c
+> @@ -997,6 +997,7 @@ void ppce500_init(MachineState *machine)
+>           * Hrm. No ELF image? Try a uImage, maybe someone is giving 
+> us an
+>           * ePAPR compliant kernel
+>           */
+> +        loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
+>          payload_size = load_uimage(filename, &bios_entry, &loadaddr, 
+> NULL,
+>                                     NULL, NULL);
+>          if (payload_size < 0) {
+> diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+> index f5720f979e..70428b1865 100644
+> --- a/hw/ppc/ppc440_bamboo.c
+> +++ b/hw/ppc/ppc440_bamboo.c
+> @@ -180,7 +180,7 @@ static void bamboo_init(MachineState *machine)
+>      CPUPPCState *env;
+>      uint64_t elf_entry;
+>      uint64_t elf_lowaddr;
+> -    hwaddr loadaddr = 0;
+> +    hwaddr loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
+>      target_long initrd_size = 0;
+>      DeviceState *dev;
+>      int success;
+> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+> index 5aac58f36e..2d6d5c4402 100644
+> --- a/hw/ppc/sam460ex.c
+> +++ b/hw/ppc/sam460ex.c
+> @@ -402,7 +402,7 @@ static void sam460ex_init(MachineState *machine)
+>      CPUPPCState *env;
+>      PPC4xxI2CState *i2c[2];
+>      hwaddr entry = UBOOT_ENTRY;
+> -    hwaddr loadaddr = 0;
+> +    hwaddr loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
+>      target_long initrd_size = 0;
+>      DeviceState *dev;
+>      SysBusDevice *sbdev;
+> diff --git a/include/hw/loader.h b/include/hw/loader.h
+> index 67a0af84ac..a7254bc5c4 100644
+> --- a/include/hw/loader.h
+> +++ b/include/hw/loader.h
+> @@ -160,10 +160,15 @@ void load_elf_hdr(const char *filename, void 
+> *hdr, bool *is64, Error **errp);
+>  int load_aout(const char *filename, hwaddr addr, int max_sz,
+>                int bswap_needed, hwaddr target_page_size);
+>
+> +#define LOAD_UIMAGE_LOADADDR_INVALID (-1)
+> +
+>  /** load_uimage_as:
+>   * @filename: Path of uimage file
+>   * @ep: Populated with program entry point. Ignored if NULL.
+> - * @loadaddr: Populated with the load address. Ignored if NULL.
+> + * @loadaddr: load address if none specified in the image or when 
+> loading a ramdisk.
+> + *            Populated with the the load address. Ignored if NULL or
+> + *            LOAD_UIMAGE_LOADADDR_INVALID (images which do not 
+> specify a load address
+> + *            will not be loadable).
+>   * @is_linux: Is set to true if the image loaded is Linux. Ignored if 
+> NULL.
+>   * @translate_fn: optional function to translate load addresses
+>   * @translate_opaque: opaque data passed to @translate_fn
