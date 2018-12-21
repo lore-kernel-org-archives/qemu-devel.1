@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gaNHP-0001gK-E6
+	(envelope-from <palmer@sifive.com>) id 1gaNHP-0001gc-Kh
 	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:04:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gaNHO-0004Fi-13
+	(envelope-from <palmer@sifive.com>) id 1gaNHO-0004GL-Ct
 	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:04:03 -0500
-Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:45896)
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:34492)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gaNHN-00048c-KP
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:04:01 -0500
-Received: by mail-qt1-x843.google.com with SMTP id e5so6154818qtr.12
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 08:03:49 -0800 (PST)
-Date: Fri, 21 Dec 2018 08:03:02 -0800
-Message-Id: <20181221160307.14819-10-palmer@sifive.com>
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gaNHN-000488-Sv
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:04:02 -0500
+Received: by mail-qk1-x741.google.com with SMTP id q8so3364138qke.1
+	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 08:03:48 -0800 (PST)
+Date: Fri, 21 Dec 2018 08:03:01 -0800
+Message-Id: <20181221160307.14819-9-palmer@sifive.com>
 In-Reply-To: <20181221160307.14819-1-palmer@sifive.com>
 References: <20181221160307.14819-1-palmer@sifive.com>
 From: Palmer Dabbelt <palmer@sifive.com>
-Subject: [Qemu-devel] [PULL 09/14] RISC-V: Fix PLIC pending bitfield reads
+Subject: [Qemu-devel] [PULL 08/14] RISC-V: Fix CLINT timecmp low 32-bit
+ writes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +31,53 @@ Cc: qemu-devel@nongnu.org, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palme
 
 From: Michael Clark <mjc@sifive.com>
 
-The address calculation for the pending bitfield had
-a copy paste bug. This bug went unnoticed because the Linux
-PLIC driver does not read the pending bitfield, rather it
-reads pending interrupt numbers from the claim register
-and writes acknowledgements back to the claim register.
+A missing shift made updates to the low order bits
+of timecmp erroneously copy the old low order bits
+into the high order bits of the 64-bit timecmp
+register. Add the missing shift and rename timecmp
+local variables to timecmp_hi and timecmp_lo.
+
+This bug didn't show up as the low order bits are
+usually written first followed by the high order
+bits meaning the high order bits contained an invalid
+value between the timecmp_lo and timecmp_hi update.
 
 Cc: Palmer Dabbelt <palmer@sifive.com>
 Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Cc: Alistair Francis <Alistair.Francis@wdc.com>
-Reported-by: Vincent Siles <vincent.siles@ens-lyon.org>
+Co-Authored-by: Johannes Haring <johannes.haring@gmx.net>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- hw/riscv/sifive_plic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/riscv/sifive_clint.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
-index 9cf9a1f98644..d12ec3fc9a54 100644
---- a/hw/riscv/sifive_plic.c
-+++ b/hw/riscv/sifive_plic.c
-@@ -214,7 +214,7 @@ static uint64_t sifive_plic_read(void *opaque, hwaddr addr, unsigned size)
-     } else if (addr >= plic->pending_base && /* 1 bit per source */
-                addr < plic->pending_base + (plic->num_sources >> 3))
-     {
--        uint32_t word = (addr - plic->priority_base) >> 2;
-+        uint32_t word = (addr - plic->pending_base) >> 2;
-         if (RISCV_DEBUG_PLIC) {
-             qemu_log("plic: read pending: word=%d value=%d\n",
-                 word, plic->pending[word]);
+diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
+index 0d2fd52487e6..d4c159e93736 100644
+--- a/hw/riscv/sifive_clint.c
++++ b/hw/riscv/sifive_clint.c
+@@ -146,15 +146,15 @@ static void sifive_clint_write(void *opaque, hwaddr addr, uint64_t value,
+             error_report("clint: invalid timecmp hartid: %zu", hartid);
+         } else if ((addr & 0x7) == 0) {
+             /* timecmp_lo */
+-            uint64_t timecmp = env->timecmp;
++            uint64_t timecmp_hi = env->timecmp >> 32;
+             sifive_clint_write_timecmp(RISCV_CPU(cpu),
+-                timecmp << 32 | (value & 0xFFFFFFFF));
++                timecmp_hi << 32 | (value & 0xFFFFFFFF));
+             return;
+         } else if ((addr & 0x7) == 4) {
+             /* timecmp_hi */
+-            uint64_t timecmp = env->timecmp;
++            uint64_t timecmp_lo = env->timecmp;
+             sifive_clint_write_timecmp(RISCV_CPU(cpu),
+-                value << 32 | (timecmp & 0xFFFFFFFF));
++                value << 32 | (timecmp_lo & 0xFFFFFFFF));
+         } else {
+             error_report("clint: invalid timecmp write: %08x", (uint32_t)addr);
+         }
 -- 
 2.18.1
