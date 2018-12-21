@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaDdd-0000UO-Q7
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:22 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gaDde-0000UT-IO
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaDdc-0006tK-FV
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:21 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gaDdd-0006xv-O3
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:22 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 21 Dec 2018 16:45:28 +1100
-Message-Id: <20181221054606.22007-3-david@gibson.dropbear.id.au>
+Date: Fri, 21 Dec 2018 16:45:29 +1100
+Message-Id: <20181221054606.22007-4-david@gibson.dropbear.id.au>
 In-Reply-To: <20181221054606.22007-1-david@gibson.dropbear.id.au>
 References: <20181221054606.22007-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 02/40] target/ppc: Remove silly
- GETFIELD/SETFIELD/MASK_TO_LSH macros
+Subject: [Qemu-devel] [PULL 03/40] spapr: Fix ibm,
+ max-associativity-domains property number of nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,45 +23,123 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, gkurz@redhat.com, lvivier@redhat.com, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, gkurz@redhat.com, lvivier@redhat.com, clg@kaod.org, Serhii Popovych <spopovyc@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-The (only) obvious use for these macros is constructing and parsing guest
-visible register fields.  But the way they're constructed, they're only
-valid when used on a *host* long, whose size shouldn't be visible to the
-guest at all.
+From: Serhii Popovych <spopovyc@redhat.com>
 
-They also have no current users, so just get rid of them.
+Laurent Vivier reported off by one with maximum number of NUMA nodes
+provided by qemu-kvm being less by one than required according to
+description of "ibm,max-associativity-domains" property in LoPAPR.
+
+It appears that I incorrectly treated LoPAPR description of this
+property assuming it provides last valid domain (NUMA node here)
+instead of maximum number of domains.
+
+  ### Before hot-add
+
+  (qemu) info numa
+  3 nodes
+  node 0 cpus: 0
+  node 0 size: 0 MB
+  node 0 plugged: 0 MB
+  node 1 cpus:
+  node 1 size: 1024 MB
+  node 1 plugged: 0 MB
+  node 2 cpus:
+  node 2 size: 0 MB
+  node 2 plugged: 0 MB
+
+  $ numactl -H
+  available: 2 nodes (0-1)
+  node 0 cpus: 0
+  node 0 size: 0 MB
+  node 0 free: 0 MB
+  node 1 cpus:
+  node 1 size: 999 MB
+  node 1 free: 658 MB
+  node distances:
+  node   0   1
+    0:  10  40
+    1:  40  10
+
+  ### Hot-add
+
+  (qemu) object_add memory-backend-ram,id=3Dmem0,size=3D1G
+  (qemu) device_add pc-dimm,id=3Ddimm1,memdev=3Dmem0,node=3D2
+  (qemu) [   87.704898] pseries-hotplug-mem: Attempting to hot-add 4 ...
+  <there is no "Initmem setup node 2 [mem 0xHEX-0xHEX]">
+  [   87.705128] lpar: Attempting to resize HPT to shift 21
+  ... <HPT resize messages>
+
+  ### After hot-add
+
+  (qemu) info numa
+  3 nodes
+  node 0 cpus: 0
+  node 0 size: 0 MB
+  node 0 plugged: 0 MB
+  node 1 cpus:
+  node 1 size: 1024 MB
+  node 1 plugged: 0 MB
+  node 2 cpus:
+  node 2 size: 1024 MB
+  node 2 plugged: 1024 MB
+
+  $ numactl -H
+  available: 2 nodes (0-1)
+  ^^^^^^^^^^^^^^^^^^^^^^^^
+             Still only two nodes (and memory hot-added to node 0 below)
+  node 0 cpus: 0
+  node 0 size: 1024 MB
+  node 0 free: 1021 MB
+  node 1 cpus:
+  node 1 size: 999 MB
+  node 1 free: 658 MB
+  node distances:
+  node   0   1
+    0:  10  40
+    1:  40  10
+
+After fix applied numactl(8) reports 3 nodes available and memory
+plugged into node 2 as expected.
+
+>From David Gibson:
+------------------
+  Qemu makes a distinction between "non NUMA" (nb_numa_nodes =3D=3D 0) an=
+d
+  "NUMA with one node" (nb_numa_nodes =3D=3D 1).  But from a PAPR guests'=
+s
+  point of view these are equivalent.  I don't want to present two
+  different cases to the guest when we don't need to, so even though the
+  guest can handle it, I'd prefer we put a '1' here for both the
+  nb_numa_nodes =3D=3D 0 and nb_numa_nodes =3D=3D 1 case.
+
+This consolidates everything discussed previously on mailing list.
+
+Fixes: da9f80fbad21 ("spapr: Add ibm,max-associativity-domains property")
+Reported-by: Laurent Vivier <lvivier@redhat.com>
+Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 ---
- target/ppc/cpu.h | 12 ------------
- 1 file changed, 12 deletions(-)
+ hw/ppc/spapr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 527181c0f0..d5f99f1fc7 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -78,18 +78,6 @@
-                                  PPC_BIT32(bs))
- #define PPC_BITMASK8(bs, be)    ((PPC_BIT8(bs) - PPC_BIT8(be)) | PPC_BIT=
-8(bs))
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 55be0f56cb..b423db311e 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1033,7 +1033,7 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr,=
+ void *fdt)
+         cpu_to_be32(0),
+         cpu_to_be32(0),
+         cpu_to_be32(0),
+-        cpu_to_be32(nb_numa_nodes ? nb_numa_nodes - 1 : 0),
++        cpu_to_be32(nb_numa_nodes ? nb_numa_nodes : 1),
+     };
 =20
--#if HOST_LONG_BITS =3D=3D 32
--# define MASK_TO_LSH(m)          (__builtin_ffsll(m) - 1)
--#elif HOST_LONG_BITS =3D=3D 64
--# define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
--#else
--# error Unknown sizeof long
--#endif
--
--#define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
--#define SETFIELD(m, v, val)                             \
--        (((v) & ~(m)) | ((((typeof(v))(val)) << MASK_TO_LSH(m)) & (m)))
--
- /***********************************************************************=
-******/
- /* Exception vectors definitions                                        =
-     */
- enum {
+     _FDT(rtas =3D fdt_add_subnode(fdt, 0, "rtas"));
 --=20
 2.19.2
