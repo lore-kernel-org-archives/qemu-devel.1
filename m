@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1gaLZA-0006rb-PF
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:14:17 -0500
+	(envelope-from <vkuznets@redhat.com>) id 1gaLZs-0007MK-PT
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:15:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1gaLZA-0007JF-5a
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:14:16 -0500
-Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:45761)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
-	id 1gaLZ9-0007Id-UE
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:14:16 -0500
-Received: by mail-qt1-x841.google.com with SMTP id e5so5747288qtr.12
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 06:14:15 -0800 (PST)
+	(envelope-from <vkuznets@redhat.com>) id 1gaLZr-0007fn-85
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:15:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45847)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1gaLZr-0007ew-0J
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:14:59 -0500
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+In-Reply-To: <20181220120544.GL19442@habkost.net>
+References: <20181126135958.20956-1-vkuznets@redhat.com>
+	<c30c335e-ca21-1179-670b-d4506ce14571@redhat.com>
+	<878t1chzj8.fsf@vitty.brq.redhat.com>
+	<20181130183608.GQ18284@habkost.net>
+	<871s6yy9st.fsf@vitty.brq.redhat.com>
+	<20181204180808.GC18284@habkost.net>
+	<875zvpl98t.fsf@vitty.brq.redhat.com>
+	<20181220120544.GL19442@habkost.net>
+Date: Fri, 21 Dec 2018 15:14:55 +0100
+Message-ID: <87y38j3r1c.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-References: <20181220111008.24954-1-alex.bennee@linaro.org>
-In-Reply-To: <20181220111008.24954-1-alex.bennee@linaro.org>
-From: Laurent Desnogues <laurent.desnogues@gmail.com>
-Date: Fri, 21 Dec 2018 15:14:14 +0100
-Message-ID: <CABoDooNLKh7y0vqNM+zJkpDVS8H1PChxbXFCuA=7TjV7rG147g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] fpu: add compile time check for old
- glibc/libm and fma
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] i386/kvm: expose
+ HV_CPUID_ENLIGHTMENT_INFO.EAX and HV_CPUID_NESTED_FEATURES.EAX as feature
+ words
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,88 +34,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-Hi,
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-On Thu, Dec 20, 2018 at 12:10 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> =
-wrote:
+> On Wed, Dec 19, 2018 at 06:25:06PM +0100, Vitaly Kuznetsov wrote:
+>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>> 
+>> > On Mon, Dec 03, 2018 at 03:17:06PM +0100, Vitaly Kuznetsov wrote:
+>> >> Eduardo Habkost <ehabkost@redhat.com> writes:
+>> > [...]
+>> >> > But note that we might still be able to move the existing
+>> >> > "hyperv_*" features to feature_word_info[].feat_names.  We just
+>> >> > need to keep the same semantics (e.g. enable
+>> >> > HV_HYPERCALL_AVAILABLE automatically when some features are set).
+>> >> >
+>> >> > Maybe we can make some of the feature properties read-only.  This
+>> >> > way we can give them meaningful names for debugging and error
+>> >> > messages, even if we don't want to make them configurable
+>> >> > directly.
+>> >> 
+>> >> I'd suggest (if there are no objections of course) we do this separately
+>> >> from this patch. [...]
+>> >
+>> > Agreed.
+>> >
+>> 
+>> Paolo, Eduardo,
+>> 
+>> in case there are no concerns here, could you please pick this patch up?
+>> Thanks!
 >
-> Some versions of glibc have been reported to have problems with
-> fused-multiply-accumulate operations. If the underlying fma
-> implementation does a two step operation it will instroduce subtle
-> rounding errors. Newer versions of the library seem to deal with this
-> better and modern hardware has fused operations which the library can
-> use.
+> Queued, thanks!
+>
+> Can you please send the comment you wrote about feat_names as a
+> follow-up patch?
 
-Thanks for taking care of this issue.  The fix was tested on our
-machines and it works as expected.
+Oops, sorry, I just realized I promissed to send out v2 with it and
+aparently never did. Will send out a follow-up patch shortly. Thanks!
 
-So:
-
-Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-
-> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Cc: Emilio G. Cota <cota@braap.org>
-> ---
->  fpu/softfloat.c | 25 +++++++++++++++++++++++++
->  1 file changed, 25 insertions(+)
->
-> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-> index 59eac97d10..9c2dbd04b5 100644
-> --- a/fpu/softfloat.c
-> +++ b/fpu/softfloat.c
-> @@ -203,6 +203,25 @@ GEN_INPUT_FLUSH3(float64_input_flush3, float64)
->  # define QEMU_HARDFLOAT_3F64_USE_FP 0
->  #endif
->
-> +/*
-> + * Choose whether to accelerate fused multiply-accumulate operations
-> + * with hard float functions. Some versions of glibc's maths library
-> + * have been reported to be broken on x86 without FMA instructions.
-> + */
-> +#if defined(__x86_64__)
-> +/* this was actually reported as glibc-2.12-1.149.el6_6.5.x86_64 was
-> + * broken but glibc 2.12-1.209 works but out of caution lets disable
-> + * for all older glibcs.
-> + */
-> +#if defined(__GLIBC__) && (__GLIBC__ =3D=3D 2 && __GLIBC_MINOR__ <=3D 12=
-)
-> +#define QEMU_HARDFLOAT_USE_FMA 0
-> +#else
-> +#define QEMU_HARDFLOAT_USE_FMA 1
-> +#endif
-> +#else
-> +#define QEMU_HARDFLOAT_USE_FMA 1
-> +#endif
-> +
->  /*
->   * QEMU_HARDFLOAT_USE_ISINF chooses whether to use isinf() over
->   * float{32,64}_is_infinity when !USE_FP.
-> @@ -1551,6 +1570,9 @@ float32_muladd(float32 xa, float32 xb, float32 xc, =
-int flags, float_status *s)
->      ub.s =3D xb;
->      uc.s =3D xc;
->
-> +    if (!QEMU_HARDFLOAT_USE_FMA) {
-> +        goto soft;
-> +    }
->      if (unlikely(!can_use_fpu(s))) {
->          goto soft;
->      }
-> @@ -1612,6 +1634,9 @@ float64_muladd(float64 xa, float64 xb, float64 xc, =
-int flags, float_status *s)
->      ub.s =3D xb;
->      uc.s =3D xc;
->
-> +    if (!QEMU_HARDFLOAT_USE_FMA) {
-> +        goto soft;
-> +    }
->      if (unlikely(!can_use_fpu(s))) {
->          goto soft;
->      }
-> --
-> 2.17.1
->
+-- 
+Vitaly
