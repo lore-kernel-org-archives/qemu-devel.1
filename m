@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaDeh-0001Q9-Ks
+	(envelope-from <dgibson@ozlabs.org>) id 1gaDeh-0001Q7-Km
 	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:47:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaDed-0000bl-5E
+	(envelope-from <dgibson@ozlabs.org>) id 1gaDed-0000bv-8X
 	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:47:27 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 21 Dec 2018 16:46:04 +1100
-Message-Id: <20181221054606.22007-39-david@gibson.dropbear.id.au>
+Date: Fri, 21 Dec 2018 16:46:05 +1100
+Message-Id: <20181221054606.22007-40-david@gibson.dropbear.id.au>
 In-Reply-To: <20181221054606.22007-1-david@gibson.dropbear.id.au>
 References: <20181221054606.22007-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 38/40] spapr: introduce an 'ic-mode' machine
- option
+Subject: [Qemu-devel] [PULL 39/40] spapr: change default CPU type to POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,277 +27,34 @@ Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, gkurz@redhat.com, lvivier@redhat
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-This option is used to select the interrupt controller mode (XICS or
-XIVE) with which the machine will operate. XICS being the default
-mode for now.
-
-When running a machine with the XIVE interrupt mode backend, the guest
-OS is required to have support for the XIVE exploitation mode. In the
-case of legacy OS, the mode selected by CAS should be XICS and the OS
-should fail to boot. However, QEMU could possibly detect it, terminate
-the boot process and reset to stop in the SLOF firmware. This is not
-yet handled.
-
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c          | 50 +++++++++++++++++++++++++++++++++++------
- hw/ppc/spapr_cpu_core.c |  3 +--
- hw/ppc/spapr_irq.c      | 34 +++++++++-------------------
- include/hw/ppc/spapr.h  |  1 +
- 4 files changed, 55 insertions(+), 33 deletions(-)
+ hw/ppc/spapr.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 2f87c8ba19..65c6065602 100644
+index 65c6065602..19a07c5c9d 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -1104,10 +1104,9 @@ static void spapr_dt_ov5_platform_support(sPAPRMac=
-hineState *spapr, void *fdt,
-                                           int chosen)
+@@ -3931,7 +3931,7 @@ static void spapr_machine_class_init(ObjectClass *o=
+c, void *data)
+     hc->unplug =3D spapr_machine_device_unplug;
+=20
+     smc->dr_lmb_enabled =3D true;
+-    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
++    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power9_v2.0");
+     mc->has_hotpluggable_cpus =3D true;
+     smc->resize_hpt_default =3D SPAPR_RESIZE_HPT_ENABLED;
+     fwc->get_dev_path =3D spapr_get_fw_dev_path;
+@@ -4028,6 +4028,7 @@ static void spapr_machine_3_1_class_options(Machine=
+Class *mc)
  {
-     PowerPCCPU *first_ppc_cpu =3D POWERPC_CPU(first_cpu);
--    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-=20
-     char val[2 * 4] =3D {
--        23, smc->irq->ov5, /* Xive mode. */
-+        23, spapr->irq->ov5, /* Xive mode. */
-         24, 0x00, /* Hash/Radix, filled in below. */
-         25, 0x00, /* Hash options: Segment Tables =3D=3D no, GTSE =3D=3D=
- no. */
-         26, 0x40, /* Radix options: GTSE =3D=3D yes. */
-@@ -1276,7 +1275,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spa=
-pr,
-     _FDT(fdt_setprop_cell(fdt, 0, "#size-cells", 2));
-=20
-     /* /interrupt controller */
--    smc->irq->dt_populate(spapr, spapr_max_server_number(spapr), fdt,
-+    spapr->irq->dt_populate(spapr, spapr_max_server_number(spapr), fdt,
-                           PHANDLE_XICP);
-=20
-     ret =3D spapr_populate_memory(spapr, fdt);
-@@ -1297,7 +1296,8 @@ static void *spapr_build_fdt(sPAPRMachineState *spa=
-pr,
-     }
-=20
-     QLIST_FOREACH(phb, &spapr->phbs, list) {
--        ret =3D spapr_populate_pci_dt(phb, PHANDLE_XICP, fdt, smc->irq->=
-nr_msis);
-+        ret =3D spapr_populate_pci_dt(phb, PHANDLE_XICP, fdt,
-+                                    spapr->irq->nr_msis);
-         if (ret < 0) {
-             error_report("couldn't setup PCI devices in fdt");
-             exit(1);
-@@ -2633,7 +2633,7 @@ static void spapr_machine_init(MachineState *machin=
-e)
-     spapr_ovec_set(spapr->ov5, OV5_DRMEM_V2);
-=20
-     /* advertise XIVE on POWER9 machines */
--    if (smc->irq->ov5 & SPAPR_OV5_XIVE_EXPLOIT) {
-+    if (spapr->irq->ov5 & SPAPR_OV5_XIVE_EXPLOIT) {
-         if (ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGICAL=
-_3_00,
-                                   0, spapr->max_compat_pvr)) {
-             spapr_ovec_set(spapr->ov5, OV5_XIVE_EXPLOIT);
-@@ -3053,9 +3053,38 @@ static void spapr_set_vsmt(Object *obj, Visitor *v=
-, const char *name,
-     visit_type_uint32(v, name, (uint32_t *)opaque, errp);
+     spapr_machine_4_0_class_options(mc);
+     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_3_1);
++    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
  }
 =20
-+static char *spapr_get_ic_mode(Object *obj, Error **errp)
-+{
-+    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-+
-+    if (spapr->irq =3D=3D &spapr_irq_xics_legacy) {
-+        return g_strdup("legacy");
-+    } else if (spapr->irq =3D=3D &spapr_irq_xics) {
-+        return g_strdup("xics");
-+    } else if (spapr->irq =3D=3D &spapr_irq_xive) {
-+        return g_strdup("xive");
-+    }
-+    g_assert_not_reached();
-+}
-+
-+static void spapr_set_ic_mode(Object *obj, const char *value, Error **er=
-rp)
-+{
-+    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-+
-+    /* The legacy IRQ backend can not be set */
-+    if (strcmp(value, "xics") =3D=3D 0) {
-+        spapr->irq =3D &spapr_irq_xics;
-+    } else if (strcmp(value, "xive") =3D=3D 0) {
-+        spapr->irq =3D &spapr_irq_xive;
-+    } else {
-+        error_setg(errp, "Bad value for \"ic-mode\" property");
-+    }
-+}
-+
- static void spapr_instance_init(Object *obj)
- {
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-+    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-=20
-     spapr->htab_fd =3D -1;
-     spapr->use_hotplug_event_source =3D true;
-@@ -3089,6 +3118,14 @@ static void spapr_instance_init(Object *obj)
-                                     " the host's SMT mode", &error_abort=
-);
-     object_property_add_bool(obj, "vfio-no-msix-emulation",
-                              spapr_get_msix_emulation, NULL, NULL);
-+
-+    /* The machine class defines the default interrupt controller mode *=
-/
-+    spapr->irq =3D smc->irq;
-+    object_property_add_str(obj, "ic-mode", spapr_get_ic_mode,
-+                            spapr_set_ic_mode, NULL);
-+    object_property_set_description(obj, "ic-mode",
-+                 "Specifies the interrupt controller mode (xics, xive)",
-+                 NULL);
- }
-=20
- static void spapr_machine_finalizefn(Object *obj)
-@@ -3811,9 +3848,8 @@ static void spapr_pic_print_info(InterruptStatsProv=
-ider *obj,
-                                  Monitor *mon)
- {
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
--    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-=20
--    smc->irq->print_info(spapr, mon);
-+    spapr->irq->print_info(spapr, mon);
- }
-=20
- int spapr_get_vcpu_id(PowerPCCPU *cpu)
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 1811cd48db..82666436e9 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -214,7 +214,6 @@ static void spapr_cpu_core_unrealize(DeviceState *dev=
-, Error **errp)
- static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPRMachineState *spapr=
-,
-                                sPAPRCPUCore *sc, Error **errp)
- {
--    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-     CPUPPCState *env =3D &cpu->env;
-     CPUState *cs =3D CPU(cpu);
-     Error *local_err =3D NULL;
-@@ -233,7 +232,7 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPR=
-MachineState *spapr,
-     qemu_register_reset(spapr_cpu_reset, cpu);
-     spapr_cpu_reset(cpu);
-=20
--    cpu->intc =3D smc->irq->cpu_intc_create(spapr, OBJECT(cpu), &local_e=
-rr);
-+    cpu->intc =3D spapr->irq->cpu_intc_create(spapr, OBJECT(cpu), &local=
-_err);
-     if (local_err) {
-         goto error_unregister;
-     }
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 9e3aa85b6d..7b3b5afec2 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -94,8 +94,7 @@ error:
- static void spapr_irq_init_xics(sPAPRMachineState *spapr, Error **errp)
- {
-     MachineState *machine =3D MACHINE(spapr);
--    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
--    int nr_irqs =3D smc->irq->nr_irqs;
-+    int nr_irqs =3D spapr->irq->nr_irqs;
-     Error *local_err =3D NULL;
-=20
-     if (kvm_enabled()) {
-@@ -234,7 +233,6 @@ sPAPRIrq spapr_irq_xics =3D {
- static void spapr_irq_init_xive(sPAPRMachineState *spapr, Error **errp)
- {
-     MachineState *machine =3D MACHINE(spapr);
--    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-     uint32_t nr_servers =3D spapr_max_server_number(spapr);
-     DeviceState *dev;
-     int i;
-@@ -248,7 +246,7 @@ static void spapr_irq_init_xive(sPAPRMachineState *sp=
-apr, Error **errp)
-     }
-=20
-     dev =3D qdev_create(NULL, TYPE_SPAPR_XIVE);
--    qdev_prop_set_uint32(dev, "nr-irqs", smc->irq->nr_irqs);
-+    qdev_prop_set_uint32(dev, "nr-irqs", spapr->irq->nr_irqs);
-     /*
-      * 8 XIVE END structures per CPU. One for each available priority
-      */
-@@ -362,50 +360,38 @@ sPAPRIrq spapr_irq_xive =3D {
-  */
- void spapr_irq_init(sPAPRMachineState *spapr, Error **errp)
- {
--    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
--
-     /* Initialize the MSI IRQ allocator. */
-     if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
--        spapr_irq_msi_init(spapr, smc->irq->nr_msis);
-+        spapr_irq_msi_init(spapr, spapr->irq->nr_msis);
-     }
-=20
--    smc->irq->init(spapr, errp);
-+    spapr->irq->init(spapr, errp);
- }
-=20
- int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
-*errp)
- {
--    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
--
--    return smc->irq->claim(spapr, irq, lsi, errp);
-+    return spapr->irq->claim(spapr, irq, lsi, errp);
- }
-=20
- void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num)
- {
--    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
--
--    smc->irq->free(spapr, irq, num);
-+    spapr->irq->free(spapr, irq, num);
- }
-=20
- qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq)
- {
--    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
--
--    return smc->irq->qirq(spapr, irq);
-+    return spapr->irq->qirq(spapr, irq);
- }
-=20
- int spapr_irq_post_load(sPAPRMachineState *spapr, int version_id)
- {
--    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
--
--    return smc->irq->post_load(spapr, version_id);
-+    return spapr->irq->post_load(spapr, version_id);
- }
-=20
- void spapr_irq_reset(sPAPRMachineState *spapr, Error **errp)
- {
--    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
--
--    if (smc->irq->reset) {
--        smc->irq->reset(spapr, errp);
-+    if (spapr->irq->reset) {
-+        spapr->irq->reset(spapr, errp);
-     }
- }
-=20
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 06765b4e9d..2c77a8ba88 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -177,6 +177,7 @@ struct sPAPRMachineState {
-     int32_t irq_map_nr;
-     unsigned long *irq_map;
-     sPAPRXive  *xive;
-+    sPAPRIrq *irq;
-=20
-     bool cmd_line_caps[SPAPR_CAP_NUM];
-     sPAPRCapabilities def, eff, mig;
+ DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
 --=20
 2.19.2
