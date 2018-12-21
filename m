@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yaroslav.isakov@gmail.com>) id 1gaSNM-0005I3-VY
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 16:30:33 -0500
+	(envelope-from <yaroslav.isakov@gmail.com>) id 1gaSNn-0005a1-RB
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 16:31:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yaroslav.isakov@gmail.com>) id 1gaSNI-0005WL-2V
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 16:30:32 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55621)
+	(envelope-from <yaroslav.isakov@gmail.com>) id 1gaSNn-0005rp-7g
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 16:30:59 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43096)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <yaroslav.isakov@gmail.com>)
-	id 1gaSNH-0005VW-TC
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 16:30:28 -0500
-Received: by mail-wm1-x343.google.com with SMTP id y139so6477864wmc.5
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 13:30:27 -0800 (PST)
+	id 1gaSNn-0005qy-02
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 16:30:59 -0500
+Received: by mail-wr1-x442.google.com with SMTP id r10so6616684wrs.10
+	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 13:30:58 -0800 (PST)
 Received: from localhost ([91.201.22.4]) by smtp.gmail.com with ESMTPSA id
-	t70sm16312724wmd.36.2018.12.21.12.59.06 for <qemu-devel@nongnu.org>
+	t70sm16304930wmd.36.2018.12.21.12.57.12 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 21 Dec 2018 12:59:06 -0800 (PST)
-Message-Id: <cover.1545425136.git.yaroslav.isakov@gmail.com>
+	Fri, 21 Dec 2018 12:57:12 -0800 (PST)
+Message-Id: <fca88dd3e21b29a12d6f00e65eebdd146024302f.1545425136.git.yaroslav.isakov@gmail.com>
+In-Reply-To: <cover.1545425136.git.yaroslav.isakov@gmail.com>
+References: <cover.1545425136.git.yaroslav.isakov@gmail.com>
 From: Yaroslav Isakov <yaroslav.isakov@gmail.com>
-Date: Fri, 21 Dec 2018 21:45:36 +0100
-Subject: [Qemu-devel] [PATCH 0/3] Allow hw/audio drivers to pass raw DB
- values to audio/ drivers
+Date: Fri, 21 Dec 2018 01:25:14 +0100
+Subject: [Qemu-devel] [PATCH 3/3] If raw DB values are known,
+ use them in paaudio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +33,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This patch series introduces the ability for virtual audio drivers to pass
-information about guest-chosen DB values to backend audio drivers.
+Signed-off-by: Yaroslav Isakov <yaroslav.isakov@gmail.com>
+---
+ audio/paaudio.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-For now, supported virtual driver is hda-codec, and backend is pulseaudio, as
-they both support DB values.
-
-Without these patches, emulated Windows has a very short range of hearable
-sound, as range in the guest is much smaller than in Pulseaudio.
-
-Yaroslav Isakov (3):
-  Allow audio driver to pass DB value to underlying drivers
-  Pass raw DB values from hda-codec.c to audio driver
-  If raw DB values are known, use them in paaudio
-
- audio/audio.c               | 15 +++++++++++++--
- audio/audio.h               |  6 ++++--
- audio/mixeng.h              |  6 ++++--
- audio/paaudio.c             |  9 +++++++--
- hw/audio/ac97.c             |  4 ++--
- hw/audio/hda-codec-common.h |  2 +-
- hw/audio/hda-codec.c        | 12 ++++++++++--
- hw/audio/lm4549.c           |  2 +-
- hw/audio/wm8750.c           | 18 ++++++++++++------
- hw/display/xlnx_dp.c        |  3 ++-
- hw/usb/dev-audio.c          |  6 ++++--
- 11 files changed, 60 insertions(+), 23 deletions(-)
-
+diff --git a/audio/paaudio.c b/audio/paaudio.c
+index 4c100bc318..d25df102ab 100644
+--- a/audio/paaudio.c
++++ b/audio/paaudio.c
+@@ -724,8 +724,13 @@ static int qpa_ctl_out (HWVoiceOut *hw, int cmd, ...)
+             va_end (ap);
+ 
+             v.channels = 2;
+-            v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vol.l) / UINT32_MAX;
+-            v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vol.r) / UINT32_MAX;
++            if (sw->vol.db_known) {
++                v.values[0] = pa_sw_volume_from_dB(sw->vol.l_db);
++                v.values[1] = pa_sw_volume_from_dB(sw->vol.r_db);
++            } else {
++                v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vol.l) / UINT32_MAX;
++                v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vol.r) / UINT32_MAX;
++            }
+ 
+             pa_threaded_mainloop_lock (g->mainloop);
+ 
 -- 
 2.18.1
