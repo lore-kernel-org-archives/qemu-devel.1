@@ -1,18 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gaUWN-0005AM-Pg
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 18:48:01 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gaUWN-00059N-4q
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 18:47:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gaUWN-0004qE-37
+	(envelope-from <mreitz@redhat.com>) id 1gaUWM-0004pk-IS
 	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 18:47:59 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Sat, 22 Dec 2018 00:47:49 +0100
-Message-Id: <20181221234750.23577-3-mreitz@redhat.com>
-In-Reply-To: <20181221234750.23577-1-mreitz@redhat.com>
-References: <20181221234750.23577-1-mreitz@redhat.com>
+Date: Sat, 22 Dec 2018 00:47:47 +0100
+Message-Id: <20181221234750.23577-1-mreitz@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 2/3] iotests: Bind qemu-nbd to localhost in 147
+Subject: [Qemu-devel] [PATCH 0/3] iotests: Allow 147 to be run concurrently
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +22,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-By default, qemu-nbd binds to 0.0.0.0.  However, we then proceed to
-connect to "localhost".  Usually, this works out fine; but if this test
-is run concurrently, some other test function may have bound a different
-server to ::1 (on the same port -- you can bind different serves to the
-same port, as long as one is on IPv4 and the other on IPv6).
+147 currently cannot be run concurrently for two reasons:
 
-So running qemu-nbd works, it can bind to 0.0.0.0:NBD_PORT.  But
-potentially a concurrent test has successfully taken [::1]:NBD_PORT.  In
-this case, trying to connect to "localhost" will lead us to the IPv6
-instance, where we do not want to end up.
+(1) It creates TCP/IP NBD servers on a fixed port.
 
-Fix this by just binding to "localhost".  This will make qemu-nbd error
-out immediately and not give us cryptic errors later.
+(2) It uses a mix of "0.0.0.0", "localhost", and "::1" as host addresses
+    to bind to.  As explained in the commit messages of patches 2 and 3,
+    this results in it potentially actually being able to set up two
+    servers on the same port at the same time -- but connecting to one
+    will always lead to the IPv6 server (regardless of whether you use
+    "localhost" or "::1").  Therefore, even if you get two servers
+    running concurrently, one of the tests will still break because it
+    connects to the wrong one.
 
-(Also, it will allow us to just try a different port as of a future
-patch.)
+This series fixes these issues.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/147 | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
-index 05b374b7d3..3e10a9969e 100755
---- a/tests/qemu-iotests/147
-+++ b/tests/qemu-iotests/147
-@@ -92,7 +92,7 @@ class QemuNBD(NBDBlockdevAddBase):
-         self.assertEqual(qemu_nbd('-f', imgfmt, test_img, *args), 0)
-=20
-     def test_inet(self):
--        self._server_up('-p', str(NBD_PORT))
-+        self._server_up('-b', 'localhost', '-p', str(NBD_PORT))
-         address =3D { 'type': 'inet',
-                     'data': {
-                         'host': 'localhost',
+Note that even if you do not care about concurrency, it still is a good
+idea to make 147 not use a fixed port to create NBD servers on, as it
+may always be already in use by a totally different application.
+
+
+Max Reitz (3):
+  iotests.py: Add qemu_nbd_pipe()
+  iotests: Bind qemu-nbd to localhost in 147
+  iotests: Allow 147 to be run concurrently
+
+ tests/qemu-iotests/147        | 98 ++++++++++++++++++++++++-----------
+ tests/qemu-iotests/iotests.py | 14 +++++
+ 2 files changed, 82 insertions(+), 30 deletions(-)
+
 --=20
 2.19.2
