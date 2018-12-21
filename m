@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gaLzF-0000Lt-04
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:41:16 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gaLzK-0000QE-NH
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:41:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gaLzB-0000Gh-QZ
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:41:12 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:34076)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gaLzG-0000N2-Uy
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:41:18 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:48030)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gaLzA-0000Fn-TT
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:41:09 -0500
+	id 1gaLzG-0000Lg-Hr
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 09:41:14 -0500
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Fri, 21 Dec 2018 16:40:21 +0200
-Message-Id: <20181221144037.10290-8-yuval.shaia@oracle.com>
+Date: Fri, 21 Dec 2018 16:40:23 +0200
+Message-Id: <20181221144037.10290-10-yuval.shaia@oracle.com>
 In-Reply-To: <20181221144037.10290-1-yuval.shaia@oracle.com>
 References: <20181221144037.10290-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v9 07/23] hw/pvrdma: Make default pkey 0xFFFF
+Subject: [Qemu-devel] [PATCH v9 09/23] hw/pvrdma: Set the correct opcode for
+ send completion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,30 +27,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
 
-Commit 6e7dba23af ("hw/pvrdma: Make default pkey 0xFFFF") exports
-default pkey as external definition but omit the change from 0x7FFF to
-0xFFFF.
-
-Fixes: 6e7dba23af ("hw/pvrdma: Make default pkey 0xFFFF")
+opcode for WC should be set by the device and not taken from work
+element.
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/vmw/pvrdma.h | 2 +-
+ hw/rdma/vmw/pvrdma_qp_ops.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
-index e3742d893a..15c3f28b86 100644
---- a/hw/rdma/vmw/pvrdma.h
-+++ b/hw/rdma/vmw/pvrdma.h
-@@ -52,7 +52,7 @@
- #define PVRDMA_FW_VERSION    14
+diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
+index 7b0f440fda..3388be1926 100644
+--- a/hw/rdma/vmw/pvrdma_qp_ops.c
++++ b/hw/rdma/vmw/pvrdma_qp_ops.c
+@@ -154,7 +154,7 @@ int pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle)
+         comp_ctx->cq_handle = qp->send_cq_handle;
+         comp_ctx->cqe.wr_id = wqe->hdr.wr_id;
+         comp_ctx->cqe.qp = qp_handle;
+-        comp_ctx->cqe.opcode = wqe->hdr.opcode;
++        comp_ctx->cqe.opcode = IBV_WC_SEND;
  
- /* Some defaults */
--#define PVRDMA_PKEY          0x7FFF
-+#define PVRDMA_PKEY          0xFFFF
- 
- typedef struct DSRInfo {
-     dma_addr_t dma;
+         rdma_backend_post_send(&dev->backend_dev, &qp->backend_qp, qp->qp_type,
+                                (struct ibv_sge *)&wqe->sge[0], wqe->hdr.num_sge,
 -- 
 2.17.2
