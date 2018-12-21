@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gaNHO-0001fK-QJ
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:04:03 -0500
+	(envelope-from <palmer@sifive.com>) id 1gaNHP-0001gK-E6
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:04:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gaNHN-0004EJ-40
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:04:02 -0500
-Received: from mail-qt1-x834.google.com ([2607:f8b0:4864:20::834]:39173)
+	(envelope-from <palmer@sifive.com>) id 1gaNHO-0004Fi-13
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:04:03 -0500
+Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:45896)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gaNHM-0004AP-TG
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:04:00 -0500
-Received: by mail-qt1-x834.google.com with SMTP id u47so1598011qtj.6
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 08:03:53 -0800 (PST)
-Date: Fri, 21 Dec 2018 08:03:04 -0800
-Message-Id: <20181221160307.14819-12-palmer@sifive.com>
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gaNHN-00048c-KP
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 11:04:01 -0500
+Received: by mail-qt1-x843.google.com with SMTP id e5so6154818qtr.12
+	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 08:03:49 -0800 (PST)
+Date: Fri, 21 Dec 2018 08:03:02 -0800
+Message-Id: <20181221160307.14819-10-palmer@sifive.com>
 In-Reply-To: <20181221160307.14819-1-palmer@sifive.com>
 References: <20181221160307.14819-1-palmer@sifive.com>
 From: Palmer Dabbelt <palmer@sifive.com>
-Subject: [Qemu-devel] [PULL 11/14] sifive_uart: Implement interrupt pending
- register
+Subject: [Qemu-devel] [PULL 09/14] RISC-V: Fix PLIC pending bitfield reads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,84 +26,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-riscv@nongnu.org
-Cc: qemu-devel@nongnu.org, Nathaniel Graff <nathaniel.graff@sifive.com>, Alistair Francis <alistair.francis@wdc.com>, Palmer Dabbelt <palmer@sifive.com>
+Cc: qemu-devel@nongnu.org, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Alistair Francis <Alistair.Francis@wdc.com>, Alistair Francis <alistair.francis@wdc.com>
 
-From: Nathaniel Graff <nathaniel.graff@sifive.com>
+From: Michael Clark <mjc@sifive.com>
 
-The watermark bits are set in the interrupt pending register according
-to the configuration of txcnt and rxcnt in the txctrl and rxctrl
-registers.
+The address calculation for the pending bitfield had
+a copy paste bug. This bug went unnoticed because the Linux
+PLIC driver does not read the pending bitfield, rather it
+reads pending interrupt numbers from the claim register
+and writes acknowledgements back to the claim register.
 
-Since the UART TX does not implement a FIFO, the txwm bit is set as long
-as the TX watermark level is greater than zero.
-
-Signed-off-by: Nathaniel Graff <nathaniel.graff@sifive.com>
-Reviewed-by: Michael Clark <mjc@sifive.com>
+Cc: Palmer Dabbelt <palmer@sifive.com>
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>
+Reported-by: Vincent Siles <vincent.siles@ens-lyon.org>
+Signed-off-by: Michael Clark <mjc@sifive.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- hw/riscv/sifive_uart.c         | 24 +++++++++++++++++++-----
- include/hw/riscv/sifive_uart.h |  3 +++
- 2 files changed, 22 insertions(+), 5 deletions(-)
+ hw/riscv/sifive_plic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/riscv/sifive_uart.c b/hw/riscv/sifive_uart.c
-index b0c3798cf274..456a3d3697c2 100644
---- a/hw/riscv/sifive_uart.c
-+++ b/hw/riscv/sifive_uart.c
-@@ -28,12 +28,26 @@
-  * Not yet implemented:
-  *
-  * Transmit FIFO using "qemu/fifo8.h"
-- * SIFIVE_UART_IE_TXWM interrupts
-- * SIFIVE_UART_IE_RXWM interrupts must honor fifo watermark
-- * Rx FIFO watermark interrupt trigger threshold
-- * Tx FIFO watermark interrupt trigger threshold.
-  */
- 
-+/* Returns the state of the IP (interrupt pending) register */
-+static uint64_t uart_ip(SiFiveUARTState *s)
-+{
-+    uint64_t ret = 0;
-+
-+    uint64_t txcnt = SIFIVE_UART_GET_TXCNT(s->txctrl);
-+    uint64_t rxcnt = SIFIVE_UART_GET_RXCNT(s->rxctrl);
-+
-+    if (txcnt != 0) {
-+        ret |= SIFIVE_UART_IP_TXWM;
-+    }
-+    if (s->rx_fifo_len > rxcnt) {
-+        ret |= SIFIVE_UART_IP_RXWM;
-+    }
-+
-+    return ret;
-+}
-+
- static void update_irq(SiFiveUARTState *s)
- {
-     int cond = 0;
-@@ -69,7 +83,7 @@ uart_read(void *opaque, hwaddr addr, unsigned int size)
-     case SIFIVE_UART_IE:
-         return s->ie;
-     case SIFIVE_UART_IP:
--        return s->rx_fifo_len ? SIFIVE_UART_IP_RXWM : 0;
-+        return uart_ip(s);
-     case SIFIVE_UART_TXCTRL:
-         return s->txctrl;
-     case SIFIVE_UART_RXCTRL:
-diff --git a/include/hw/riscv/sifive_uart.h b/include/hw/riscv/sifive_uart.h
-index 504f18a60f1b..c8dc1c57fd0b 100644
---- a/include/hw/riscv/sifive_uart.h
-+++ b/include/hw/riscv/sifive_uart.h
-@@ -43,6 +43,9 @@ enum {
-     SIFIVE_UART_IP_RXWM       = 2  /* Receive watermark interrupt pending */
- };
- 
-+#define SIFIVE_UART_GET_TXCNT(txctrl)   ((txctrl >> 16) & 0x7)
-+#define SIFIVE_UART_GET_RXCNT(rxctrl)   ((rxctrl >> 16) & 0x7)
-+
- #define TYPE_SIFIVE_UART "riscv.sifive.uart"
- 
- #define SIFIVE_UART(obj) \
+diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
+index 9cf9a1f98644..d12ec3fc9a54 100644
+--- a/hw/riscv/sifive_plic.c
++++ b/hw/riscv/sifive_plic.c
+@@ -214,7 +214,7 @@ static uint64_t sifive_plic_read(void *opaque, hwaddr addr, unsigned size)
+     } else if (addr >= plic->pending_base && /* 1 bit per source */
+                addr < plic->pending_base + (plic->num_sources >> 3))
+     {
+-        uint32_t word = (addr - plic->priority_base) >> 2;
++        uint32_t word = (addr - plic->pending_base) >> 2;
+         if (RISCV_DEBUG_PLIC) {
+             qemu_log("plic: read pending: word=%d value=%d\n",
+                 word, plic->pending[word]);
 -- 
 2.18.1
