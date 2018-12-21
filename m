@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhi.a.wang@intel.com>) id 1gaFNa-0000b1-9T
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 02:37:56 -0500
+	(envelope-from <clg@kaod.org>) id 1gaFnE-0004a1-9Y
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 03:04:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhi.a.wang@intel.com>) id 1gaFNW-0006Uz-JB
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 02:37:54 -0500
-Received: from mga17.intel.com ([192.55.52.151]:64382)
+	(envelope-from <clg@kaod.org>) id 1gaFnA-0000fU-94
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 03:04:24 -0500
+Received: from 7.mo6.mail-out.ovh.net ([46.105.59.196]:41129)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zhi.a.wang@intel.com>)
-	id 1gaFNW-0006Ij-8Q
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 02:37:50 -0500
-References: <1542746383-18288-1-git-send-email-kwankhede@nvidia.com>
-	<1542746383-18288-4-git-send-email-kwankhede@nvidia.com>
-	<33183CC9F5247A488A2544077AF19020DB1D1315@dggeml531-mbs.china.huawei.com>
-	<20181219021218.GA8139@joy-OptiPlex-7040>
-From: Zhi Wang <zhi.a.wang@intel.com>
-Message-ID: <1dd14bcc-11d6-3d68-62d9-3d7292b93bd7@intel.com>
-Date: Fri, 21 Dec 2018 02:36:35 -0500
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gaFn9-0000VA-CZ
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 03:04:19 -0500
+Received: from player687.ha.ovh.net (unknown [10.109.143.225])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 3861A19D281
+	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 09:04:10 +0100 (CET)
+References: <154535246529.862554.6113740443866753456.stgit@bahia.lan>
+	<154535261366.862554.2330587135163596442.stgit@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <cd3bad6c-ff0d-41ea-6619-bff313e585e9@kaod.org>
+Date: Fri, 21 Dec 2018 09:03:49 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181219021218.GA8139@joy-OptiPlex-7040>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <154535261366.862554.2330587135163596442.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/5] Add migration functions for VFIO
- devices
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 07/15] spapr_pci: Define SPAPR_MAX_PHBS in
+ hw/pci-host/spapr.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,149 +32,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhao Yan <yan.y.zhao@intel.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc: Kirti Wankhede <kwankhede@nvidia.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "cjia@nvidia.com" <cjia@nvidia.com>, "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "yi.l.liu@intel.com" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>, "ziye.yang@intel.com" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "cohuck@redhat.com" <cohuck@redhat.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>, "eauger@redhat.com" <eauger@redhat.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "changpeng.liu@intel.com" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Hu, Robert" <robert.hu@intel.com>, Huangzhichao <huangzhichao@huawei.com>, "Liujinsong (Paul)" <liu.jinsong@huawei.com>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>
 
-It's nice to see cloud vendors are also quite interested in VFIO 
-migration interfaces and functions. From what Yan said and Huawei's 
-requirements, there should be more devices which don't have private 
-memory, maybe GPU is almost the only one which has the private memory.
+On 12/21/18 1:36 AM, Greg Kurz wrote:
+> PHB hotplug will bring more users for it. Let's define it along with
+> the PHB defines from which it is derived for simplicity.
+>=20
+> While here fix a misleading comment about manual placement, which was
+> abandoned with 30b3bc5aa9f4.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-As VFIO is a generic user-space device controlling interfaces nowadays 
-in the kernel and perhaps becomes into an standard in future, I guess we 
-also need to think more about a generic framework and how to let the 
-non-GPU devices to step into VFIO easily.
 
- From perspective of the vendors of the devices and the cloud vendors 
-who want to build their migration support on top of VFIO, it would be 
-nice to have a simple and friendly path for them.
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Thanks,
-Zhi.
+> ---
+>  hw/ppc/spapr.c              |    2 --
+>  include/hw/pci-host/spapr.h |    6 ++++--
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 621006eaa862..fe3f9829ae6c 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3838,8 +3838,6 @@ static void spapr_phb_placement(sPAPRMachineState=
+ *spapr, uint32_t index,
+>       * 1TiB 64-bit MMIO windows for each PHB.
+>       */
+>      const uint64_t base_buid =3D 0x800000020000000ULL;
+> -#define SPAPR_MAX_PHBS ((SPAPR_PCI_LIMIT - SPAPR_PCI_BASE) / \
+> -                        SPAPR_PCI_MEM64_WIN_SIZE - 1)
+>      int i;
+> =20
+>      /* Sanity check natural alignments */
+> diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
+> index 9d2ec1a410e8..83d5075a6ef3 100644
+> --- a/include/hw/pci-host/spapr.h
+> +++ b/include/hw/pci-host/spapr.h
+> @@ -94,11 +94,13 @@ struct sPAPRPHBState {
+>      ((1ULL << 32) - SPAPR_PCI_MEM_WIN_BUS_OFFSET)
+>  #define SPAPR_PCI_MEM64_WIN_SIZE     0x10000000000ULL /* 1 TiB */
+> =20
+> -/* Without manual configuration, all PCI outbound windows will be
+> - * within this range */
+> +/* All PCI outbound windows will be within this range */
+>  #define SPAPR_PCI_BASE               (1ULL << 45) /* 32 TiB */
+>  #define SPAPR_PCI_LIMIT              (1ULL << 46) /* 64 TiB */
+> =20
+> +#define SPAPR_MAX_PHBS ((SPAPR_PCI_LIMIT - SPAPR_PCI_BASE) / \
+> +                        SPAPR_PCI_MEM64_WIN_SIZE - 1)
+> +
 
-On 12/18/18 9:12 PM, Zhao Yan wrote:
-> right, a capabilities field in struct vfio_device_migration_info can avoid
-> populating iteration APIs and migration states into every vendor drivers
-> who actually may not requires those APIs and simply do nothing or return
-> value 0 in response to those APIs.
-> 
-> struct vfio_device_migration_info {
->          __u32 device_state;         /* VFIO device state */
-> +     __u32 capabilities;    /* VFIO device capabilities */
->          struct {
->              __u64 precopy_only;
->              __u64 compatible;
->              __u64 postcopy_only;
->              __u64 threshold_size;
->          } pending;	
->       ...
-> };
->   
-> So, only for devices who need iteration APIs, like GPU with standalone
-> video memory, can set flag VFIO_MIGRATION_HAS_ITERTATION to this
-> capabilities field. Then callbacks like save_live_iterate(),
-> is_active_iterate(), save_live_pending() will check the flag
-> VFIO_MIGRATION_HAS_ITERTATION in capabilities field and send requests
-> into vendor driver.
-> 
-> But, for simple devices who only use system memory, like IGD and NIC,
-> will not set the flag VFIO_MIGRATION_HAS_ITERTATION, and as a result, no
-> need to handle requests like "Get buffer", "Set buffer", "Get pending
-> bytes" triggered by QEMU iteration callbacks. And therefore, detailed
-> migration states are not cared for vendor drivers for these devices.
-> 
-> Thanks to Gonglei for providing this idea and details.
-> Free free to give your comments to the above description.
-> 
-> 
-> On Mon, Dec 17, 2018 at 11:19:49AM +0000, Gonglei (Arei) wrote:
->> Hi,
->>
->> It's great to see this patch series, which is a very important step, although
->> currently only consider GPU mdev devices to support hot migration.
->>
->> However, this is based on the VFIO framework after all, so we expect
->> that we can make this live migration framework more general.
->>
->> For example, the vfio_save_pending() callback is used to obtain device
->> memory (such as GPU memory), but if the device (such as network card)
->> has no special proprietary memory, but only system memory?
->> It is too much to perform a null operation for this kind of device by writing
->> memory to the vendor driver of kernel space.
->>
->> I think we can acquire the capability from the vendor driver before using this.
->> If there is device memory that needs iterative copying, the vendor driver return
->> ture, otherwise return false. Then QEMU implement the specific logic,
->> otherwise return directly. Just like getting the capability list of KVM
->> module, can we?
->>
->>
->> Regards,
->> -Gonglei
->>
->>
->>> -----Original Message-----
->>> From: Qemu-devel
->>> [mailto:qemu-devel-bounces+arei.gonglei=huawei.com@nongnu.org] On
->>> Behalf Of Kirti Wankhede
->>> Sent: Wednesday, November 21, 2018 4:40 AM
->>> To: alex.williamson@redhat.com; cjia@nvidia.com
->>> Cc: Zhengxiao.zx@Alibaba-inc.com; kevin.tian@intel.com; yi.l.liu@intel.com;
->>> eskultet@redhat.com; ziye.yang@intel.com; qemu-devel@nongnu.org;
->>> cohuck@redhat.com; shuangtai.tst@alibaba-inc.com; dgilbert@redhat.com;
->>> zhi.a.wang@intel.com; mlevitsk@redhat.com; pasic@linux.ibm.com;
->>> aik@ozlabs.ru; Kirti Wankhede <kwankhede@nvidia.com>;
->>> eauger@redhat.com; felipe@nutanix.com; jonathan.davies@nutanix.com;
->>> changpeng.liu@intel.com; Ken.Xue@amd.com
->>> Subject: [Qemu-devel] [PATCH 3/5] Add migration functions for VFIO devices
->>>
->>> - Migration function are implemented for VFIO_DEVICE_TYPE_PCI device.
->>> - Added SaveVMHandlers and implemented all basic functions required for live
->>>    migration.
->>> - Added VM state change handler to know running or stopped state of VM.
->>> - Added migration state change notifier to get notification on migration state
->>>    change. This state is translated to VFIO device state and conveyed to vendor
->>>    driver.
->>> - VFIO device supportd migration or not is decided based of migration region
->>>    query. If migration region query is successful then migration is supported
->>>    else migration is blocked.
->>> - Structure vfio_device_migration_info is mapped at 0th offset of migration
->>>    region and should always trapped by VFIO device's driver. Added both type of
->>>    access support, trapped or mmapped, for data section of the region.
->>> - To save device state, read data offset and size using structure
->>>    vfio_device_migration_info.data, accordingly copy data from the region.
->>> - To restore device state, write data offset and size in the structure and write
->>>    data in the region.
->>> - To get dirty page bitmap, write start address and pfn count then read count of
->>>    pfns copied and accordingly read those from the rest of the region or
->>> mmaped
->>>    part of the region. This copy is iterated till page bitmap for all requested
->>>    pfns are copied.
->>>
->>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->>> Reviewed-by: Neo Jia <cjia@nvidia.com>
->>> ---
->>>   hw/vfio/Makefile.objs         |   2 +-
->>>   hw/vfio/migration.c           | 729
->>> ++++++++++++++++++++++++++++++++++++++++++
->>>   include/hw/vfio/vfio-common.h |  23 ++
->>>   3 files changed, 753 insertions(+), 1 deletion(-)
->>>   create mode 100644 hw/vfio/migration.c
->>>
->> [skip]
->>
->>> +
->>> +static SaveVMHandlers savevm_vfio_handlers = {
->>> +    .save_setup = vfio_save_setup,
->>> +    .save_live_iterate = vfio_save_iterate,
->>> +    .save_live_complete_precopy = vfio_save_complete_precopy,
->>> +    .save_live_pending = vfio_save_pending,
->>> +    .save_cleanup = vfio_save_cleanup,
->>> +    .load_state = vfio_load_state,
->>> +    .load_setup = vfio_load_setup,
->>> +    .load_cleanup = vfio_load_cleanup,
->>> +    .is_active_iterate = vfio_is_active_iterate,
->>> +};
->>> +
->>
->>   
+Which is 32. Good, this is in sync with the IRQ number ranges.
+
+C.
+
+>  #define SPAPR_PCI_2_7_MMIO_WIN_SIZE  0xf80000000
+>  #define SPAPR_PCI_IO_WIN_SIZE        0x10000
+> =20
+>=20
