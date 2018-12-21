@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gaG7u-0002xl-97
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 03:25:46 -0500
+	(envelope-from <groug@kaod.org>) id 1gaGIW-0005DM-9M
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 03:36:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gaG7p-0001Hp-9j
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 03:25:44 -0500
-Received: from indium.canonical.com ([91.189.90.7]:56380)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gaG7o-0001Fy-UN
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 03:25:41 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gaG7l-0000hi-8t
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 08:25:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 280BC2E8053
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 08:25:37 +0000 (UTC)
+	(envelope-from <groug@kaod.org>) id 1gaGIR-0007Z4-76
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 03:36:44 -0500
+Received: from 20.mo4.mail-out.ovh.net ([46.105.33.73]:51063)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gaGIQ-0007Sw-Sq
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 03:36:39 -0500
+Received: from player758.ha.ovh.net (unknown [10.109.146.211])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id C05551C7800
+	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 09:36:27 +0100 (CET)
+Date: Fri, 21 Dec 2018 09:36:23 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20181221093623.738b71e9@bahia.lan>
+In-Reply-To: <d5247b86-4c9c-0eff-7900-66443041f63e@redhat.com>
+References: <beec7ae9-f9ce-52f0-7e55-cb25d70c51f4@ozlabs.ru>
+	<d5247b86-4c9c-0eff-7900-66443041f63e@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 21 Dec 2018 08:12:47 -0000
-From: =?utf-8?q?Tomasz_Bara=C5=84ski?= <1809252@bugs.launchpad.net>
-Reply-To: Bug 1809252 <1809252@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154531078494.20640.11118060956049517137.malonedeb@wampee.canonical.com>
-Message-Id: <154537996750.24485.3791215180966276526.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1809252] Re: Password authentication in
- FIPS-compliant mode
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] travis failures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,33 +30,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-I understand. Thank you, guys!
+On Fri, 21 Dec 2018 07:47:07 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
--- =
+> On 2018-12-21 04:06, Alexey Kardashevskiy wrote:
+> > Hi
+> > 
+> > I am trying https://travis-ci.org/aik/qemu/ and that thing fails every
+> > time I am not so sure why.
+> > 
+> > One example:
+> > https://travis-ci.org/aik/qemu/jobs/470796318
+> > 
+> > The errors are like this:
+> > 
+> >   GTESTER check-qtest-unicore32
+> >   GTESTER check-qtest-x86_64
+> > Could not access KVM kernel module: No such file or directory
+> > qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> > qemu-system-x86_64: Back to tcg accelerator
+> > 
+> > 
+> > Does anyone else see those? How do we fix them? Thanks.  
+> 
+> Some test are explicitly requesting "-M accel=kvm:tcg" and this is
+> causing this message if KVM is not available. We could maybe silence
+> them if qtest_enabled() ?
+> 
+>  Thomas
+> 
+> 
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1809252
+I've also experienced a bunch of similar failures with travis, like:
 
-Title:
-  Password authentication in FIPS-compliant mode
+https://travis-ci.org/gkurz/qemu/jobs/466994463
 
-Status in QEMU:
-  Invalid
+The KVM error messages aren't directly related to the failure IMHO.
 
-Bug description:
-  The documentation states, that:
+In both cases, the cause of the failure seems to be:
 
-  "The VNC protocol has limited support for password based
-  authentication. (...) Password authentication is not supported when
-  operating in FIPS 140-2 compliance mode as it requires the use of the
-  DES cipher."
+No output has been received in the last XXm0s, this potentially indicates a
+stalled build or something wrong with the build itself.
+Check the details on how to adjust your build configuration on:
+https://docs.travis-ci.com/user/common-build-problems/#Build-times-out-because-no-output-was-received
+The build has been terminated
 
-  Would it be possible for qemu to use a different cipher and re-enable
-  password as an option in VNC console? Is there a technical reason for
-  not using a stronger cipher?
+and the last GTESTER line is for tests/test-qht-par:
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1809252/+subscriptions
+https://travis-ci.org/aik/qemu/jobs/470796318#L8219
+
+https://travis-ci.org/gkurz/qemu/jobs/466994463#L4454
+
+This has been recently discussed on qemu-devel:
+
+https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg01638.html
+
+But I haven't seen anything come out that yet.
