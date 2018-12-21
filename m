@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gaQzA-0006lV-Pa
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:01:31 -0500
+	(envelope-from <bounces@canonical.com>) id 1gaR4w-0002k8-Jz
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:07:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gaQz3-0003w6-4z
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:01:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51146)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gaQz0-0003m5-JJ
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:01:18 -0500
-Date: Fri, 21 Dec 2018 18:01:02 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181221200102.GT19442@habkost.net>
-References: <20181218092723.yhaerzm4vlzgef65@linux.intel.com>
-	<20181218155536.2b35a037@Igors-MacBook-Pro.local>
-	<20181219025717.6m72hq73p2haexkv@linux.intel.com>
-	<20181219114037.5550a562@redhat.com>
-	<20181220211801.GR19442@habkost.net>
-	<20181221151325.39b64733@redhat.com>
-	<20181221160944.65c5skjhkel3of7y@linux.intel.com>
-	<20181221120320-mutt-send-email-mst@kernel.org>
-	<20181221173758.4ohku43as4dkb355@linux.intel.com>
-	<20181221140016-mutt-send-email-mst@kernel.org>
+	(envelope-from <bounces@canonical.com>) id 1gaR4r-0006R7-Mb
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:07:26 -0500
+Received: from indium.canonical.com ([91.189.90.7]:36652)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gaR4r-0005sh-D4
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:07:21 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gaR3a-000618-IE
+	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 20:06:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 382D32E80CC
+	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 20:06:01 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181221140016-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] intel-iommu: differentiate host
- address width from IOVA address width.
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 21 Dec 2018 19:57:47 -0000
+From: Julio Faracco <jcfaracco@gmail.com>
+Reply-To: Bug 1809304 <1809304@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154533506483.19401.8849680441407310900.malonedeb@soybean.canonical.com>
+Message-Id: <154542226730.4953.11889637505036035406.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1809304] Re: qemu-img convert is freezing for
+ some DMG files.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,36 +37,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Yu Zhang <yu.c.zhang@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-On Fri, Dec 21, 2018 at 02:02:28PM -0500, Michael S. Tsirkin wrote:
-> On Sat, Dec 22, 2018 at 01:37:58AM +0800, Yu Zhang wrote:
-> > On Fri, Dec 21, 2018 at 12:04:49PM -0500, Michael S. Tsirkin wrote:
-> > > On Sat, Dec 22, 2018 at 12:09:44AM +0800, Yu Zhang wrote:
-> > > > Well, my understanding of the vt-d spec is that the address limitation in
-> > > > DMAR are referring to the same concept of CPUID.MAXPHYSADDR. I do not think
-> > > > there's any different in the native scenario. :)
-> > > 
-> > > I think native machines exist on which the two values are different.
-> > > Is that true?
-> > 
-> > I think the answer is not. My understanding is that HAW(host address wdith) is
-> > the maximum physical address width a CPU can detects(by cpuid.0x80000008).
-> > 
-> > I agree there are some addresses the CPU does not touch, but they are still in
-> > the physical address space, and there's only one physical address space...
-> > 
-> > B.R.
-> > Yu
-> 
-> Ouch I thought we are talking about the virtual address size.
-> I think I did have a box where VTD's virtual address size was
-> smaller than CPU's.
-> For physical one - we just need to make it as big as max supported
-> memory right?
+I'm almost sure that we need other improvements beyond fixing binary
+search deadlock.
 
-What exactly do you mean by "max supported memory"?
+It is returning read errors when you apply your patch.
 
--- 
-Eduardo
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1809304
+
+Title:
+  qemu-img convert is freezing for some DMG files.
+
+Status in QEMU:
+  New
+
+Bug description:
+  Recently, I created a file using hdiutil from MacOS (using Zlib
+  compression):
+
+  $ hdiutil create -volname MyVolName -srcfolder /path/to/my/vol/ -ov
+  -format UDZO myvolname.dmg
+
+  But, when I try to convert this volume using qemu-img convert, this
+  command is freezing.
+
+  I'm using the upstream version to test it.
+
+  It is freezing inside the binary search method to retrieve the chunk.
+
+  But, I still don't know why.
+
+  I'm attaching the file as an example.
+
+  It can be mounted using MacOS or other Linux apps like hfsleuth and
+  darling-dmg.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1809304/+subscriptions
