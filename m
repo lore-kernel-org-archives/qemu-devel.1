@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gaI0z-00054n-QU
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 05:26:46 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1gaID5-0007VW-9e
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 05:39:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gaI0v-0003GT-Pt
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 05:26:45 -0500
-Received: from 18.mo3.mail-out.ovh.net ([87.98.172.162]:52437)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gaI0v-0003FA-I1
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 05:26:41 -0500
-Received: from player762.ha.ovh.net (unknown [10.109.160.232])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 15A1F1EF072
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 11:26:39 +0100 (CET)
-Date: Fri, 21 Dec 2018 11:26:34 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20181221112634.4abd9d02@bahia.lan>
-In-Reply-To: <20181221093623.738b71e9@bahia.lan>
-References: <beec7ae9-f9ce-52f0-7e55-cb25d70c51f4@ozlabs.ru>
-	<d5247b86-4c9c-0eff-7900-66443041f63e@redhat.com>
-	<20181221093623.738b71e9@bahia.lan>
+	(envelope-from <dovgaluk@ispras.ru>) id 1gaID1-0002my-4x
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 05:39:15 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:41938)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1gaICz-0002gd-Cy
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 05:39:11 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20181218112056.11727.96529.stgit@pasha-VirtualBox>	<20181218112142.11727.24919.stgit@pasha-VirtualBox>
+	<87tvj9isxk.fsf@dusky.pond.sub.org>
+In-Reply-To: <87tvj9isxk.fsf@dusky.pond.sub.org>
+Date: Fri, 21 Dec 2018 13:39:11 +0300
+Message-ID: <003301d49919$6966bd80$3c343880$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain;
+	charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] travis failures
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v8 08/20] migration: introduce icount field
+ for snapshots
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,74 +30,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>
+To: 'Markus Armbruster' <armbru@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
 
-On Fri, 21 Dec 2018 09:36:23 +0100
-Greg Kurz <groug@kaod.org> wrote:
+> From: Markus Armbruster [mailto:armbru@redhat.com]
+> Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
+> 
+> > Saving icount as a parameters of the snapshot allows navigation between
+> > them in the execution replay scenario.
+> > This information can be used for finding a specific snapshot for rewinding
+> > the recorded execution to the specific moment of the time.
+> > E.g., 'reverse step' action needs to load the nearest snapshot which is
+> > prior to the current moment of time .
+> >
+> > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> [...]
+> > diff --git a/migration/savevm.c b/migration/savevm.c
+> > index 9e45fb4..a031e5b 100644
+> > --- a/migration/savevm.c
+> > +++ b/migration/savevm.c
+> > @@ -2509,6 +2509,11 @@ int save_snapshot(const char *name, Error **errp)
+> >      sn->date_sec = tv.tv_sec;
+> >      sn->date_nsec = tv.tv_usec * 1000;
+> >      sn->vm_clock_nsec = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> > +    if (replay_mode != REPLAY_MODE_NONE) {
+> > +        sn->icount = replay_get_current_step();
+> > +    } else {
+> > +        sn->icount = -1ULL;
+> > +    }
+> >
+> >      if (name) {
+> >          ret = bdrv_snapshot_find(bs, old_sn, name);
+> > diff --git a/qapi/block-core.json b/qapi/block-core.json
+> > index 762000f..7bb1727 100644
+> > --- a/qapi/block-core.json
+> > +++ b/qapi/block-core.json
+> > @@ -26,13 +26,18 @@
+> >  #
+> >  # @vm-clock-nsec: fractional part in nano seconds to be used with vm-clock-sec
+> >  #
+> > +# @icount: Current instruction count. Appears when execution record/replay
+> > +#          is enabled. Used for "time-traveling" to match the moment
+> > +#          in the recorded execution with the snapshots (since 4.0)
+> > +#
+> >  # Since: 1.3
+> >  #
+> >  ##
+> >  { 'struct': 'SnapshotInfo',
+> >    'data': { 'id': 'str', 'name': 'str', 'vm-state-size': 'int',
+> >              'date-sec': 'int', 'date-nsec': 'int',
+> > -            'vm-clock-sec': 'int', 'vm-clock-nsec': 'int' } }
+> > +            'vm-clock-sec': 'int', 'vm-clock-nsec': 'int',
+> > +            '*icount': 'int' } }
+> >
+> >  ##
+> >  # @ImageInfoSpecificQCow2EncryptionBase:
+> 
+> As far as I can tell, @icount is the same as ReplayInfo's @step.  But I
+> had to look at the code to tell.  Please name the two consistently.
+> Also consider having the documentation refer to ReplayInfo.
 
-> On Fri, 21 Dec 2018 07:47:07 +0100
-> Thomas Huth <thuth@redhat.com> wrote:
-> 
-> > On 2018-12-21 04:06, Alexey Kardashevskiy wrote:  
-> > > Hi
-> > > 
-> > > I am trying https://travis-ci.org/aik/qemu/ and that thing fails every
-> > > time I am not so sure why.
-> > > 
-> > > One example:
-> > > https://travis-ci.org/aik/qemu/jobs/470796318
-> > > 
-> > > The errors are like this:
-> > > 
-> > >   GTESTER check-qtest-unicore32
-> > >   GTESTER check-qtest-x86_64
-> > > Could not access KVM kernel module: No such file or directory
-> > > qemu-system-x86_64: failed to initialize KVM: No such file or directory
-> > > qemu-system-x86_64: Back to tcg accelerator
-> > > 
-> > > 
-> > > Does anyone else see those? How do we fix them? Thanks.    
-> > 
-> > Some test are explicitly requesting "-M accel=kvm:tcg" and this is
-> > causing this message if KVM is not available. We could maybe silence
-> > them if qtest_enabled() ?
-> > 
-> >  Thomas
-> > 
-> >   
-> 
-> I've also experienced a bunch of similar failures with travis, like:
-> 
-> https://travis-ci.org/gkurz/qemu/jobs/466994463
-> 
+Thanks for noticing, renamed everything to 'icount' to match with command line option.
 
-Today with tests/test-qht-par again:
-
-https://travis-ci.org/gkurz/qemu/jobs/470871251#L4455
-
-Cc'ing Emilio for suggestions on how to go forward with this.
-
-> The KVM error messages aren't directly related to the failure IMHO.
-> 
-> In both cases, the cause of the failure seems to be:
-> 
-> No output has been received in the last XXm0s, this potentially indicates a
-> stalled build or something wrong with the build itself.
-> Check the details on how to adjust your build configuration on:
-> https://docs.travis-ci.com/user/common-build-problems/#Build-times-out-because-no-output-was-received
-> The build has been terminated
-> 
-> and the last GTESTER line is for tests/test-qht-par:
-> 
-> https://travis-ci.org/aik/qemu/jobs/470796318#L8219
-> 
-> https://travis-ci.org/gkurz/qemu/jobs/466994463#L4454
-> 
-> This has been recently discussed on qemu-devel:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg01638.html
-> 
-> But I haven't seen anything come out that yet.
-> 
-> 
+Pavel Dovgalyuk
