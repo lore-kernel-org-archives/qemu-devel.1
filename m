@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gaFvO-00088X-0z
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 03:12:50 -0500
+	(envelope-from <13824125580@163.com>) id 1gaFyi-0000lY-N6
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 03:16:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gaFvJ-0000lh-3T
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 03:12:50 -0500
-Received: from 1.mo179.mail-out.ovh.net ([178.33.111.220]:39593)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gaFvI-0000hz-R4
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 03:12:44 -0500
-Received: from player798.ha.ovh.net (unknown [10.109.160.226])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id E77C910CB72
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 09:12:42 +0100 (CET)
-References: <154535246529.862554.6113740443866753456.stgit@bahia.lan>
-	<154537411408.891668.13796612948399384908.stgit@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <285a22ed-c71b-b9de-e01a-f0ada3ca6ae4@kaod.org>
-Date: Fri, 21 Dec 2018 09:12:24 +0100
+	(envelope-from <13824125580@163.com>) id 1gaFyZ-000891-5G
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 03:16:13 -0500
+Received: from m13-112.163.com ([220.181.13.112]:23214)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <13824125580@163.com>) id 1gaFyY-00080v-Ch
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 03:16:07 -0500
+Date: Fri, 21 Dec 2018 16:00:49 +0800 (CST)
+From: tugouxp  <13824125580@163.com>
+In-Reply-To: <38696e96-5047-b076-40ab-e650bb8e1f02@redhat.com>
+References: <130d7419.4ba1.167ce7b9ed6.Coremail.13824125580@163.com>
+	<38696e96-5047-b076-40ab-e650bb8e1f02@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <154537411408.891668.13796612948399384908.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 14/15] spapr: Expose the name of the
- interrupt controller node
+Message-ID: <31f6df3f.c713.167cfc7fc00.Coremail.13824125580@163.com>
+Content-Type: text/plain; charset=GBK
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] is the "tcg translation" necessary when the "kvm
+ acceleration" emulation mode enabled?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,158 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 12/21/18 7:35 AM, Greg Kurz wrote:
-> This will be needed by PHB hotplug in order to access the phandle prope=
-rty.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-
-I would have used the prefix 'spapr_dt_', but it's minor.
-
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
-Thanks,
-
-C.
-
-> ---
->  hw/intc/spapr_xive.c        |    9 +++++++--
->  hw/intc/xics_spapr.c        |    9 ++++++++-
->  hw/ppc/spapr_irq.c          |    3 +++
->  include/hw/ppc/spapr_irq.h  |    1 +
->  include/hw/ppc/spapr_xive.h |    1 +
->  include/hw/ppc/xics.h       |    1 +
->  6 files changed, 21 insertions(+), 3 deletions(-)
->=20
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index 87424de26c1c..0540aac88d2a 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -1410,6 +1410,12 @@ void spapr_xive_hcall_init(sPAPRMachineState *sp=
-apr)
->      spapr_register_hypercall(H_INT_RESET, h_int_reset);
->  }
-> =20
-> +gchar *spapr_xive_get_nodename(sPAPRMachineState *spapr)
-> +{
-> +    return g_strdup_printf("interrupt-controller@%" PRIx64,
-> +                    spapr->xive->tm_base + XIVE_TM_USER_PAGE * (1 << T=
-M_SHIFT));
-> +}
-> +
->  void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void=
- *fdt,
->                     uint32_t phandle)
->  {
-> @@ -1444,8 +1450,7 @@ void spapr_dt_xive(sPAPRMachineState *spapr, uint=
-32_t nr_servers, void *fdt,
->                             XIVE_TM_OS_PAGE * (1ull << TM_SHIFT));
->      timas[3] =3D cpu_to_be64(1ull << TM_SHIFT);
-> =20
-> -    nodename =3D g_strdup_printf("interrupt-controller@%" PRIx64,
-> -                           xive->tm_base + XIVE_TM_USER_PAGE * (1 << T=
-M_SHIFT));
-> +    nodename =3D spapr_xive_get_nodename(spapr);
->      _FDT(node =3D fdt_add_subnode(fdt, 0, nodename));
->      g_free(nodename);
-> =20
-> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-> index f67d3c80bf3a..75d40daf518d 100644
-> --- a/hw/intc/xics_spapr.c
-> +++ b/hw/intc/xics_spapr.c
-> @@ -244,6 +244,13 @@ void xics_spapr_init(sPAPRMachineState *spapr)
->      spapr_register_hypercall(H_IPOLL, h_ipoll);
->  }
-> =20
-> +#define NODENAME "interrupt-controller"
-> +
-> +gchar *spapr_xics_get_nodename(sPAPRMachineState *spapr)
-> +{
-> +    return g_strdup(NODENAME);
-> +}
-> +
->  void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, void=
- *fdt,
->                     uint32_t phandle)
->  {
-> @@ -252,7 +259,7 @@ void spapr_dt_xics(sPAPRMachineState *spapr, uint32=
-_t nr_servers, void *fdt,
->      };
->      int node;
-> =20
-> -    _FDT(node =3D fdt_add_subnode(fdt, 0, "interrupt-controller"));
-> +    _FDT(node =3D fdt_add_subnode(fdt, 0, NODENAME));
-> =20
->      _FDT(fdt_setprop_string(fdt, node, "device_type",
->                              "PowerPC-External-Interrupt-Presentation")=
-);
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 0999a2b2d69c..703c3a3c20d5 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -223,6 +223,7 @@ sPAPRIrq spapr_irq_xics =3D {
->      .qirq        =3D spapr_qirq_xics,
->      .print_info  =3D spapr_irq_print_info_xics,
->      .dt_populate =3D spapr_dt_xics,
-> +    .get_nodename =3D spapr_xics_get_nodename,
->      .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
->      .post_load   =3D spapr_irq_post_load_xics,
->  };
-> @@ -349,6 +350,7 @@ sPAPRIrq spapr_irq_xive =3D {
->      .qirq        =3D spapr_qirq_xive,
->      .print_info  =3D spapr_irq_print_info_xive,
->      .dt_populate =3D spapr_dt_xive,
-> +    .get_nodename =3D spapr_xive_get_nodename,
->      .cpu_intc_create =3D spapr_irq_cpu_intc_create_xive,
->      .post_load   =3D spapr_irq_post_load_xive,
->      .reset       =3D spapr_irq_reset_xive,
-> @@ -462,6 +464,7 @@ sPAPRIrq spapr_irq_xics_legacy =3D {
->      .qirq        =3D spapr_qirq_xics,
->      .print_info  =3D spapr_irq_print_info_xics,
->      .dt_populate =3D spapr_dt_xics,
-> +    .get_nodename =3D spapr_xics_get_nodename,
->      .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
->      .post_load   =3D spapr_irq_post_load_xics,
->  };
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index b34d5a00381b..59a1cf8bbc1d 100644
-> --- a/include/hw/ppc/spapr_irq.h
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -42,6 +42,7 @@ typedef struct sPAPRIrq {
->      void (*print_info)(sPAPRMachineState *spapr, Monitor *mon);
->      void (*dt_populate)(sPAPRMachineState *spapr, uint32_t nr_servers,
->                          void *fdt, uint32_t phandle);
-> +    gchar *(*get_nodename)(sPAPRMachineState *spapr);
->      Object *(*cpu_intc_create)(sPAPRMachineState *spapr, Object *cpu,
->                                 Error **errp);
->      int (*post_load)(sPAPRMachineState *spapr, int version_id);
-> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> index 728735dbcfbe..d280310ed587 100644
-> --- a/include/hw/ppc/spapr_xive.h
-> +++ b/include/hw/ppc/spapr_xive.h
-> @@ -47,6 +47,7 @@ typedef struct sPAPRMachineState sPAPRMachineState;
->  void spapr_xive_hcall_init(sPAPRMachineState *spapr);
->  void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void=
- *fdt,
->                     uint32_t phandle);
-> +gchar *spapr_xive_get_nodename(sPAPRMachineState *spapr);
->  void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx);
-> =20
->  #endif /* PPC_SPAPR_XIVE_H */
-> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index 14afda198cdb..eafb6428787f 100644
-> --- a/include/hw/ppc/xics.h
-> +++ b/include/hw/ppc/xics.h
-> @@ -204,6 +204,7 @@ typedef struct sPAPRMachineState sPAPRMachineState;
-> =20
->  void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, void=
- *fdt,
->                     uint32_t phandle);
-> +gchar *spapr_xics_get_nodename(sPAPRMachineState *spapr);
->  int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
->  void xics_spapr_init(sPAPRMachineState *spapr);
-> =20
->=20
+bXVjaCBhcHByZWNpYXRlIQoKOikKCgoKCgoKCgpBdCAyMDE4LTEyLTIxIDE0OjMzOjA4LCAiUGFv
+bG8gQm9uemluaSIgPHBib256aW5pQHJlZGhhdC5jb20+IHdyb3RlOgo+PiBzY2VuYXJpbyAxOiAg
+ZGlkIHRoZSB0Y2cgdHJhbnNsYXRpb24gbmVlZCB0byBiZSBkb25lIGluIHRoaXMgY2FzZSBub3cK
+Pj4gdGhhdCB0aGUgaG9zdCBhbmQgdGFyZ2V0IGFyY2ggaXMgdGhlIHNhbWU/ICBvciAgbGV0IHRo
+ZSBrdm0gZW11bGF0aW9uCj4+IHRoZSBzeXN0ZW0gd2l0IHRoZSBvcmlnaW5hbCBpbnN0cnVjdGlv
+bnMgd2l0aCBvdXQgdGhlIFRDRwo+PiB0cmFuc2xhdGlvbgo+Cj5UQ0cgaXMgdHVybmVkIG9mZiB3
+aGVuIEtWTSBpcyBlbmFibGVkLiAgVGhlIGNvZGUgZm9yIFRDRyBkb2VzIG5vdCBydW4gYXQKPmFs
+bC4KPgo+PiBzY2VuYXJpbyAyOiAgIHRoZSBwcmUgY29uZGl0aW9uIGlzIHNhbWUgd2l0aCBzY2Vu
+YXJpbyAxIGV4Y2VwdCB0aGUga3ZtCj4+IGlzIGRpc2FibGWjvyBzbyAsaW4gdGhpcyBzY2VuYXJp
+bywgdGhlIFRDRyBtdXN0IGJlIHVzZWQgaW4gb3JkZXIgdG8KPj4gdGhlIHB1cmUgc29mdHdhcmUg
+ZW11bGF0aW9uIHdpdGhvdXQgYWNjZWxlcmF0aW9uPwo+Cj5Db3JyZWN0LiAgSW4gdGhpcyBjYXNl
+IEtWTSBpcyB0dXJuZWQgb2ZmLiAgVGhlIGNhcGFiaWxpdGllcyBvZiB0aGUKPmVtdWxhdGVkIENQ
+VSB3aWxsIF9ub3RfIGJlIHdoYXQgeW91IGhhdmUgaW4geW91ciBob3N0IHByb2Nlc3NvciwgYnV0
+Cj5yYXRoZXIgd2hhdCBRRU1VIGltcGxlbWVudHMuICBGb3IgZXhhbXBsZSwgeW91IHdpbGwgZ2V0
+IG5vIEFWWC4KPgo+PiBzY2VuYXJpbyAzOiAgaW4gdGhpcyBzY2VuYXJpbywgdGhlIGhvc3QgYW5k
+IHRhcmdldCBhcmNoIGlzIG5vdCB0aGUKPj4gc2FtZSwgc28gaG93IHRvIHVzZSB0aGUgImt2bSBt
+ZWNoYWluc2ltIiBpbiB0aGlzIGNhc2U/ICBzbyB0aGUKPj4gaW5zdHJ1Y3Rpb25zIGZlZWQgdG8g
+dGhlIGt2bSBtb2R1bGUgdG8gcnVuIG11c3QgYmUgdHJhbnNsYXRlZCBCeSBUQ0cKPj4gbW9kdWxl
+PyByaWdodD8KPgo+S1ZNIGNhbm5vdCBiZSB1c2VkIGluIHRoaXMgY2FzZTsgS1ZNIGlzIG9ubHkg
+ZW5hYmxlZCB3aGVuIHRoZSBob3N0IGFuZAo+dGhlIHRhcmdldCBhcmUgdGhlIHNhbWUuCj4KPlBh
+b2xvCj4KPk9uIDIxLzEyLzE4IDAyOjU3LCB0dWdvdXhwIHdyb3RlOgo+PiBoaSBmb2xrczoKPj4g
+ICAgIGkgYW0gdmVyeSBwdXp6bGVkIGFib3V0IHRoZSByZWxhdGlvbnNoaXAgYmV0d2VlbiAidGFy
+Z2V0IGNwdSBpbnN0cnVjdGlvbiIgIHRyYW5zbGF0ZWQgdG8gaG9zdCBpbnN0cnVjdGlvbnMgdGhy
+b3VnaCBUQ0cgbW9kdWxlIGFuZCB0aGUgImt2bSIgYWNjZWxlcmF0aW9uIiBtb2RlLgo+PiAKPj4g
+Cj4+IHRoaW5rIGFib3V0IHRocmVlIHNjZW5hcmlvIG9mIGVtdWxhdGlvbjoKPj4gc2NlbmFyaW8g
+MSwgMiBhbmQgMyBhcyBmb2xsb3dzOgo+PiAKPj4gMS4gdGFyZ2V0IGNwdTogeDg2XzY0LAo+PiAg
+ICAgaG9zdCBjcHU6ICAgeDg0XzY0LAo+PiAgICAgZW11bGF0aW9uIE9TOiAgIHVidW50dV9kZXNr
+dG9wX2FtZDY0Lmlzbwo+PiAgICAga3ZtOiAgZW5hYmxlZC4KPj4gCj4+IAo+PiAyLiB0YXJnZXQg
+Y3B1OiB4ODZfNjQsCj4+IAo+PiAgICAgaG9zdCBjcHU6ICAgeDg0XzY0LAo+PiAKPj4gICAgIGVt
+dWxhdGlvbiBPUzogICB1YnVudHVfZGVza3RvcF9hbWQ2NC5pc28KPj4gICAgIGt2bTogIGRpc2Fi
+bGVkLgo+PiAKPj4gCj4+IDMuIHRhcmdldCBjcHUgIHg4Nl82NCwKPj4gICAgIGhvc3QgY3B1OiAg
+YXJtdjgKPj4gICAgIGVtdWxhdGlvbk9TOiB1YnVudHVfZGVza3RvcF9hbWQ2NC5pc28KPj4gICAg
+IGt2bTogIGVuYWJsZWQK
