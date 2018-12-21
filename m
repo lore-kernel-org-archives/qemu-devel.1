@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gaEaZ-0001zr-R8
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 01:47:16 -0500
+	(envelope-from <zhi.a.wang@intel.com>) id 1gaFNa-0000b1-9T
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 02:37:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gaEaW-0006SW-M6
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 01:47:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44924)
+	(envelope-from <zhi.a.wang@intel.com>) id 1gaFNW-0006Uz-JB
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 02:37:54 -0500
+Received: from mga17.intel.com ([192.55.52.151]:64382)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gaEaW-0006RZ-Cq
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 01:47:12 -0500
-References: <beec7ae9-f9ce-52f0-7e55-cb25d70c51f4@ozlabs.ru>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d5247b86-4c9c-0eff-7900-66443041f63e@redhat.com>
-Date: Fri, 21 Dec 2018 07:47:07 +0100
+	(Exim 4.71) (envelope-from <zhi.a.wang@intel.com>)
+	id 1gaFNW-0006Ij-8Q
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 02:37:50 -0500
+References: <1542746383-18288-1-git-send-email-kwankhede@nvidia.com>
+	<1542746383-18288-4-git-send-email-kwankhede@nvidia.com>
+	<33183CC9F5247A488A2544077AF19020DB1D1315@dggeml531-mbs.china.huawei.com>
+	<20181219021218.GA8139@joy-OptiPlex-7040>
+From: Zhi Wang <zhi.a.wang@intel.com>
+Message-ID: <1dd14bcc-11d6-3d68-62d9-3d7292b93bd7@intel.com>
+Date: Fri, 21 Dec 2018 02:36:35 -0500
 MIME-Version: 1.0
-In-Reply-To: <beec7ae9-f9ce-52f0-7e55-cb25d70c51f4@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20181219021218.GA8139@joy-OptiPlex-7040>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] travis failures
+Subject: Re: [Qemu-devel] [PATCH 3/5] Add migration functions for VFIO
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,30 +32,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Zhao Yan <yan.y.zhao@intel.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc: Kirti Wankhede <kwankhede@nvidia.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "cjia@nvidia.com" <cjia@nvidia.com>, "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "yi.l.liu@intel.com" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>, "ziye.yang@intel.com" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "cohuck@redhat.com" <cohuck@redhat.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>, "eauger@redhat.com" <eauger@redhat.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "changpeng.liu@intel.com" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Hu, Robert" <robert.hu@intel.com>, Huangzhichao <huangzhichao@huawei.com>, "Liujinsong (Paul)" <liu.jinsong@huawei.com>
 
-On 2018-12-21 04:06, Alexey Kardashevskiy wrote:
-> Hi
-> 
-> I am trying https://travis-ci.org/aik/qemu/ and that thing fails every
-> time I am not so sure why.
-> 
-> One example:
-> https://travis-ci.org/aik/qemu/jobs/470796318
-> 
-> The errors are like this:
-> 
->   GTESTER check-qtest-unicore32
->   GTESTER check-qtest-x86_64
-> Could not access KVM kernel module: No such file or directory
-> qemu-system-x86_64: failed to initialize KVM: No such file or directory
-> qemu-system-x86_64: Back to tcg accelerator
-> 
-> 
-> Does anyone else see those? How do we fix them? Thanks.
+It's nice to see cloud vendors are also quite interested in VFIO 
+migration interfaces and functions. From what Yan said and Huawei's 
+requirements, there should be more devices which don't have private 
+memory, maybe GPU is almost the only one which has the private memory.
 
-Some test are explicitly requesting "-M accel=kvm:tcg" and this is
-causing this message if KVM is not available. We could maybe silence
-them if qtest_enabled() ?
+As VFIO is a generic user-space device controlling interfaces nowadays 
+in the kernel and perhaps becomes into an standard in future, I guess we 
+also need to think more about a generic framework and how to let the 
+non-GPU devices to step into VFIO easily.
 
- Thomas
+ From perspective of the vendors of the devices and the cloud vendors 
+who want to build their migration support on top of VFIO, it would be 
+nice to have a simple and friendly path for them.
+
+Thanks,
+Zhi.
+
+On 12/18/18 9:12 PM, Zhao Yan wrote:
+> right, a capabilities field in struct vfio_device_migration_info can avoid
+> populating iteration APIs and migration states into every vendor drivers
+> who actually may not requires those APIs and simply do nothing or return
+> value 0 in response to those APIs.
+> 
+> struct vfio_device_migration_info {
+>          __u32 device_state;         /* VFIO device state */
+> +     __u32 capabilities;    /* VFIO device capabilities */
+>          struct {
+>              __u64 precopy_only;
+>              __u64 compatible;
+>              __u64 postcopy_only;
+>              __u64 threshold_size;
+>          } pending;	
+>       ...
+> };
+>   
+> So, only for devices who need iteration APIs, like GPU with standalone
+> video memory, can set flag VFIO_MIGRATION_HAS_ITERTATION to this
+> capabilities field. Then callbacks like save_live_iterate(),
+> is_active_iterate(), save_live_pending() will check the flag
+> VFIO_MIGRATION_HAS_ITERTATION in capabilities field and send requests
+> into vendor driver.
+> 
+> But, for simple devices who only use system memory, like IGD and NIC,
+> will not set the flag VFIO_MIGRATION_HAS_ITERTATION, and as a result, no
+> need to handle requests like "Get buffer", "Set buffer", "Get pending
+> bytes" triggered by QEMU iteration callbacks. And therefore, detailed
+> migration states are not cared for vendor drivers for these devices.
+> 
+> Thanks to Gonglei for providing this idea and details.
+> Free free to give your comments to the above description.
+> 
+> 
+> On Mon, Dec 17, 2018 at 11:19:49AM +0000, Gonglei (Arei) wrote:
+>> Hi,
+>>
+>> It's great to see this patch series, which is a very important step, although
+>> currently only consider GPU mdev devices to support hot migration.
+>>
+>> However, this is based on the VFIO framework after all, so we expect
+>> that we can make this live migration framework more general.
+>>
+>> For example, the vfio_save_pending() callback is used to obtain device
+>> memory (such as GPU memory), but if the device (such as network card)
+>> has no special proprietary memory, but only system memory?
+>> It is too much to perform a null operation for this kind of device by writing
+>> memory to the vendor driver of kernel space.
+>>
+>> I think we can acquire the capability from the vendor driver before using this.
+>> If there is device memory that needs iterative copying, the vendor driver return
+>> ture, otherwise return false. Then QEMU implement the specific logic,
+>> otherwise return directly. Just like getting the capability list of KVM
+>> module, can we?
+>>
+>>
+>> Regards,
+>> -Gonglei
+>>
+>>
+>>> -----Original Message-----
+>>> From: Qemu-devel
+>>> [mailto:qemu-devel-bounces+arei.gonglei=huawei.com@nongnu.org] On
+>>> Behalf Of Kirti Wankhede
+>>> Sent: Wednesday, November 21, 2018 4:40 AM
+>>> To: alex.williamson@redhat.com; cjia@nvidia.com
+>>> Cc: Zhengxiao.zx@Alibaba-inc.com; kevin.tian@intel.com; yi.l.liu@intel.com;
+>>> eskultet@redhat.com; ziye.yang@intel.com; qemu-devel@nongnu.org;
+>>> cohuck@redhat.com; shuangtai.tst@alibaba-inc.com; dgilbert@redhat.com;
+>>> zhi.a.wang@intel.com; mlevitsk@redhat.com; pasic@linux.ibm.com;
+>>> aik@ozlabs.ru; Kirti Wankhede <kwankhede@nvidia.com>;
+>>> eauger@redhat.com; felipe@nutanix.com; jonathan.davies@nutanix.com;
+>>> changpeng.liu@intel.com; Ken.Xue@amd.com
+>>> Subject: [Qemu-devel] [PATCH 3/5] Add migration functions for VFIO devices
+>>>
+>>> - Migration function are implemented for VFIO_DEVICE_TYPE_PCI device.
+>>> - Added SaveVMHandlers and implemented all basic functions required for live
+>>>    migration.
+>>> - Added VM state change handler to know running or stopped state of VM.
+>>> - Added migration state change notifier to get notification on migration state
+>>>    change. This state is translated to VFIO device state and conveyed to vendor
+>>>    driver.
+>>> - VFIO device supportd migration or not is decided based of migration region
+>>>    query. If migration region query is successful then migration is supported
+>>>    else migration is blocked.
+>>> - Structure vfio_device_migration_info is mapped at 0th offset of migration
+>>>    region and should always trapped by VFIO device's driver. Added both type of
+>>>    access support, trapped or mmapped, for data section of the region.
+>>> - To save device state, read data offset and size using structure
+>>>    vfio_device_migration_info.data, accordingly copy data from the region.
+>>> - To restore device state, write data offset and size in the structure and write
+>>>    data in the region.
+>>> - To get dirty page bitmap, write start address and pfn count then read count of
+>>>    pfns copied and accordingly read those from the rest of the region or
+>>> mmaped
+>>>    part of the region. This copy is iterated till page bitmap for all requested
+>>>    pfns are copied.
+>>>
+>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+>>> ---
+>>>   hw/vfio/Makefile.objs         |   2 +-
+>>>   hw/vfio/migration.c           | 729
+>>> ++++++++++++++++++++++++++++++++++++++++++
+>>>   include/hw/vfio/vfio-common.h |  23 ++
+>>>   3 files changed, 753 insertions(+), 1 deletion(-)
+>>>   create mode 100644 hw/vfio/migration.c
+>>>
+>> [skip]
+>>
+>>> +
+>>> +static SaveVMHandlers savevm_vfio_handlers = {
+>>> +    .save_setup = vfio_save_setup,
+>>> +    .save_live_iterate = vfio_save_iterate,
+>>> +    .save_live_complete_precopy = vfio_save_complete_precopy,
+>>> +    .save_live_pending = vfio_save_pending,
+>>> +    .save_cleanup = vfio_save_cleanup,
+>>> +    .load_state = vfio_load_state,
+>>> +    .load_setup = vfio_load_setup,
+>>> +    .load_cleanup = vfio_load_cleanup,
+>>> +    .is_active_iterate = vfio_is_active_iterate,
+>>> +};
+>>> +
+>>
+>>   
