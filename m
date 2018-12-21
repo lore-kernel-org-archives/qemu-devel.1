@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gaRVI-0006vj-0F
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:34:40 -0500
+	(envelope-from <liam.merwick@oracle.com>) id 1gaRXb-0007gO-7c
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:37:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gaRVC-0005cH-QD
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:34:39 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:54736)
+	(envelope-from <liam.merwick@oracle.com>) id 1gaRXV-0006sj-GU
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:37:03 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:34648)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
-	id 1gaR4I-00055A-Qq
+	id 1gaR4I-00058Y-Hl
 	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:06:47 -0500
 From: Liam Merwick <liam.merwick@oracle.com>
-Date: Fri, 21 Dec 2018 20:03:48 +0000
-Message-Id: <1545422632-24444-1-git-send-email-liam.merwick@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC v2 0/4] QEMU changes to do PVH boot
+Date: Fri, 21 Dec 2018 20:03:52 +0000
+Message-Id: <1545422632-24444-5-git-send-email-liam.merwick@oracle.com>
+In-Reply-To: <1545422632-24444-1-git-send-email-liam.merwick@oracle.com>
+References: <1545422632-24444-1-git-send-email-liam.merwick@oracle.com>
+Subject: [Qemu-devel] [RFC v2 4/4] pvh: Boot uncompressed kernel using
+ direct boot ABI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,134 +28,222 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, ehabkost@redhat.com, rth@twiddle.net, xen-devel@lists.xenproject.org, sgarzare@redhat.com, mst@redhat.com, stefanha@redhat.com, maran.wilson@oracle.com, george.kennedy@oracle.com, boris.ostrovsky@oracle.com, liam.merwick@oracle.com
 
-For certain applications it is desirable to rapidly boot a KVM virtual
-machine. In cases where legacy hardware and software support within the
-guest is not needed, QEMU should be able to boot directly into the
-uncompressed Linux kernel binary with minimal firmware involvement.
+These changes (along with corresponding Linux kernel and qboot changes)
+enable a guest to be booted using the x86/HVM direct boot ABI.
 
-There already exists an ABI to allow this for Xen PVH guests and the ABI
-is supported by Linux and FreeBSD:
+This commit adds a load_elfboot() routine to pass the size and
+location of the kernel entry point to qboot (which will fill in
+the start_info struct information needed to to boot the guest).
+Having loaded the ELF binary, load_linux() will run qboot
+which continues the boot.
 
-   https://xenbits.xen.org/docs/unstable/misc/pvh.html
+The address for the kernel entry point is read from an ELF Note
+in the uncompressed kernel binary by a helper routine passed
+to load_elf().
 
-Details on the Linux changes (v9 staged for 4.21): https://lkml.org/lkml/=
-2018/12/14/1330
-qboot pull request: https://github.com/bonzini/qboot/pull/17=20
+Co-developed-by: George Kennedy <George.Kennedy@oracle.com>
+Signed-off-by: George Kennedy <George.Kennedy@oracle.com>
+Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
+---
+ hw/i386/pc.c  | 136 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ include/elf.h |  10 +++++
+ 2 files changed, 145 insertions(+), 1 deletion(-)
 
-This patch series provides QEMU support to read the ELF header of an
-uncompressed kernel binary and get the 32-bit PVH kernel entry point
-from an ELF Note.  In load_linux() a call is made to load_elfboot()
-so see if the header matches that of an uncompressed kernel binary (ELF)
-and if so, loads the binary and determines the kernel entry address
-from an ELF Note in the binary.  Then qboot does futher initialisation
-of the guest (e820, etc.) and jumps to the kernel entry address and
-boots the guest.
-
-changes v1 -> v2
-- Based on feedback from Stefan Hajnoczi
-- The reading of the PVH entry point is now done in a single pass during
-  elf_load() which results in Patch2 in v1 being split into Patches 1&2 i=
-n v2
-  and considerably reworked.
-- Patch1 adds a new optional function pointer to parse the ELF note type
-  (the type is passed in via the existing translate_opaque arg - the
-  function already had 11 args so I didn't want to add more than one new =
-arg).
-- Patch2 adds a function to elf_ops.h to find an ELF note
-  matching a specific type=20
-- Patch3 just has a line added to the commit message to state that the Xe=
-n
-  repo is the canonical location
-- Patch4 (that does the PVH boot) is mainly equivalent to Patch3 in v1
-  just minor load_elfboot() changes and the addition of a
-  read_pvh_start_addr() helper function for load_elf()
-
-
-Us=D1=96ng the method/scripts documented by the NEMU team at
-
-   https://github.com/intel/nemu/wiki/Measuring-Boot-Latency
-   https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg00200.html
-
-below are some timings measured (vmlinux and bzImage from the same build)
-Time to get to kernel start is almost halved (95=E1=B9=81s -> 48ms)
-
-QEMU + qboot + vmlinux (PVH + 4.20-rc4)
- qemu_init_end: 41.550521
- fw_start: 41.667139 (+0.116618)
- fw_do_boot: 47.448495 (+5.781356)
- linux_startup_64: 47.720785 (+0.27229)
- linux_start_kernel: 48.399541 (+0.678756)
- linux_start_user: 296.952056 (+248.552515)
-
-QEMU + qboot + bzImage:
- qemu_init_end: 29.209276
- fw_start: 29.317342 (+0.108066)
- linux_start_boot: 36.679362 (+7.36202)
- linux_startup_64: 94.531349 (+57.851987)
- linux_start_kernel: 94.900913 (+0.369564)
- linux_start_user: 401.060971 (+306.160058)
-
-QEMU + bzImage:
- qemu_init_end: 30.424430
- linux_startup_64: 893.770334 (+863.345904)
- linux_start_kernel: 894.17049 (+0.400156)
- linux_start_user: 1208.679768 (+314.509278)
-
-
-Liam Merwick (4):
-  elf: Add optional function ptr to load_elf() to parse ELF notes
-  elf-ops.h: Add get_elf_note_type()
-  pvh: Add x86/HVM direct boot ABI header file
-  pvh: Boot uncompressed kernel using direct boot ABI
-
- hw/alpha/dp264.c               |   4 +-
- hw/arm/armv7m.c                |   3 +-
- hw/arm/boot.c                  |   2 +-
- hw/core/generic-loader.c       |   2 +-
- hw/core/loader.c               |  24 ++++---
- hw/cris/boot.c                 |   3 +-
- hw/hppa/machine.c              |   6 +-
- hw/i386/multiboot.c            |   2 +-
- hw/i386/pc.c                   | 131 +++++++++++++++++++++++++++++++++++=
--
- hw/lm32/lm32_boards.c          |   6 +-
- hw/lm32/milkymist.c            |   3 +-
- hw/m68k/an5206.c               |   2 +-
- hw/m68k/mcf5208.c              |   2 +-
- hw/microblaze/boot.c           |   7 +-
- hw/mips/mips_fulong2e.c        |   5 +-
- hw/mips/mips_malta.c           |   5 +-
- hw/mips/mips_mipssim.c         |   5 +-
- hw/mips/mips_r4k.c             |   5 +-
- hw/moxie/moxiesim.c            |   2 +-
- hw/nios2/boot.c                |   7 +-
- hw/openrisc/openrisc_sim.c     |   2 +-
- hw/pci-host/prep.c             |   2 +-
- hw/ppc/e500.c                  |   3 +-
- hw/ppc/mac_newworld.c          |   5 +-
- hw/ppc/mac_oldworld.c          |   5 +-
- hw/ppc/ppc440_bamboo.c         |   2 +-
- hw/ppc/sam460ex.c              |   3 +-
- hw/ppc/spapr.c                 |   7 +-
- hw/ppc/virtex_ml507.c          |   2 +-
- hw/riscv/sifive_e.c            |   2 +-
- hw/riscv/sifive_u.c            |   2 +-
- hw/riscv/spike.c               |   2 +-
- hw/riscv/virt.c                |   2 +-
- hw/s390x/ipl.c                 |   9 ++-
- hw/sparc/leon3.c               |   3 +-
- hw/sparc/sun4m.c               |   6 +-
- hw/sparc64/sun4u.c             |   4 +-
- hw/tricore/tricore_testboard.c |   2 +-
- hw/xtensa/sim.c                |  12 ++--
- hw/xtensa/xtfpga.c             |   2 +-
- include/elf.h                  |  10 +++
- include/hw/elf_ops.h           |  72 ++++++++++++++++++++
- include/hw/loader.h            |   9 ++-
- include/hw/xen/start_info.h    | 146 +++++++++++++++++++++++++++++++++++=
-++++++
- 44 files changed, 469 insertions(+), 71 deletions(-)
- create mode 100644 include/hw/xen/start_info.h
-
---=20
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 115bc2825ce4..6d44a14da44d 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -54,6 +54,7 @@
+ #include "sysemu/qtest.h"
+ #include "kvm_i386.h"
+ #include "hw/xen/xen.h"
++#include "hw/xen/start_info.h"
+ #include "ui/qemu-spice.h"
+ #include "exec/memory.h"
+ #include "exec/address-spaces.h"
+@@ -109,6 +110,9 @@ static struct e820_entry *e820_table;
+ static unsigned e820_entries;
+ struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
+ 
++/* Physical Address of PVH entry point read from kernel ELF NOTE */
++static size_t pvh_start_addr;
++
+ void gsi_handler(void *opaque, int n, int level)
+ {
+     GSIState *s = opaque;
+@@ -834,6 +838,109 @@ struct setup_data {
+     uint8_t data[0];
+ } __attribute__((packed));
+ 
++
++/*
++ * The entry point into the kernel for PVH boot is different from
++ * the native entry point.  The PVH entry is defined by the x86/HVM
++ * direct boot ABI and is available in an ELFNOTE in the kernel binary.
++ *
++ * This function is passed to load_elf() when it is called from
++ * load_elfboot() which then additionally checks for an ELF Note of
++ * type XEN_ELFNOTE_PHYS32_ENTRY and passes it to this function to
++ * parse the PVH entry address from the ELF Note.
++ *
++ * Due to trickery in elf_opts.h, load_elf() is actually available as
++ * load_elf32() or load_elf64() and this routine needs to be able
++ * to deal with being called as 32 or 64 bit.
++ *
++ * The address of the PVH entry point is saved to the 'pvh_start_addr'
++ * global variable.  (although the entry point is 32-bit, the kernel
++ * binary can be either 32-bit or 64-bit).
++ */
++static uint64_t read_pvh_start_addr(void *arg1, void *arg2, bool is64)
++{
++    size_t *elf_note_data_addr;
++
++    /* Check if ELF Note header passed in is valid */
++    if (arg1 == NULL) {
++        return 0;
++    }
++
++    if (is64) {
++        struct elf64_note *nhdr64 = (struct elf64_note *)arg1;
++        uint64_t nhdr_size64 = sizeof(struct elf64_note);
++        uint64_t phdr_align = *(uint64_t *)arg2;
++        uint64_t nhdr_namesz = nhdr64->n_namesz;
++
++        elf_note_data_addr =
++            ((void *)nhdr64) + nhdr_size64 +
++            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
++    } else {
++        struct elf32_note *nhdr32 = (struct elf32_note *)arg1;
++        uint32_t nhdr_size32 = sizeof(struct elf32_note);
++        uint32_t phdr_align = *(uint32_t *)arg2;
++        uint32_t nhdr_namesz = nhdr32->n_namesz;
++
++        elf_note_data_addr =
++            ((void *)nhdr32) + nhdr_size32 +
++            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
++    }
++
++    pvh_start_addr = *elf_note_data_addr;
++
++    return pvh_start_addr;
++}
++
++static bool load_elfboot(const char *kernel_filename,
++                   int kernel_file_size,
++                   uint8_t *header,
++                   size_t pvh_xen_start_addr,
++                   FWCfgState *fw_cfg)
++{
++    uint32_t flags = 0;
++    uint32_t mh_load_addr = 0;
++    uint32_t elf_kernel_size = 0;
++    uint64_t elf_entry;
++    uint64_t elf_low, elf_high;
++    int kernel_size;
++
++    if (ldl_p(header) != 0x464c457f) {
++        return false; /* no elfboot */
++    }
++
++    bool elf_is64 = header[EI_CLASS] == ELFCLASS64;
++    flags = elf_is64 ?
++        ((Elf64_Ehdr *)header)->e_flags : ((Elf32_Ehdr *)header)->e_flags;
++
++    if (flags & 0x00010004) { /* LOAD_ELF_HEADER_HAS_ADDR */
++        error_report("elfboot unsupported flags = %x", flags);
++        exit(1);
++    }
++
++    uint64_t elf_note_type = XEN_ELFNOTE_PHYS32_ENTRY;
++    kernel_size = load_elf(kernel_filename, read_pvh_start_addr,
++                           NULL, &elf_note_type, &elf_entry,
++                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
++                           0, 0);
++
++    if (kernel_size < 0) {
++        error_report("Error while loading elf kernel");
++        exit(1);
++    }
++    mh_load_addr = elf_low;
++    elf_kernel_size = elf_high - elf_low;
++
++    if (pvh_start_addr == 0) {
++        error_report("Error loading uncompressed kernel without PVH ELF Note");
++        exit(1);
++    }
++    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_start_addr);
++    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
++    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
++
++    return true;
++}
++
+ static void load_linux(PCMachineState *pcms,
+                        FWCfgState *fw_cfg)
+ {
+@@ -873,6 +980,33 @@ static void load_linux(PCMachineState *pcms,
+     if (ldl_p(header+0x202) == 0x53726448) {
+         protocol = lduw_p(header+0x206);
+     } else {
++        /*
++         * If the kernel address for using the x86/HVM direct boot ABI has
++         * been saved then proceed with booting the uncompressed kernel
++         */
++        if (load_elfboot(kernel_filename, kernel_size,
++                         header, pvh_start_addr, fw_cfg)) {
++            struct hvm_modlist_entry ramdisk_mod = { 0 };
++
++            fclose(f);
++
++            fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
++                strlen(kernel_cmdline) + 1);
++            fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA, kernel_cmdline);
++
++            assert(machine->device_memory != NULL);
++            ramdisk_mod.paddr = machine->device_memory->base;
++            ramdisk_mod.size =
++                memory_region_size(&machine->device_memory->mr);
++
++            fw_cfg_add_bytes(fw_cfg, FW_CFG_KERNEL_DATA, &ramdisk_mod,
++                             sizeof(ramdisk_mod));
++            fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_SIZE, sizeof(header));
++            fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA,
++                             header, sizeof(header));
++
++            return;
++        }
+         /* This looks like a multiboot kernel. If it is, let's stop
+            treating it like a Linux kernel. */
+         if (load_multiboot(fw_cfg, f, kernel_filename, initrd_filename,
+@@ -1336,7 +1470,7 @@ void pc_memory_init(PCMachineState *pcms,
+     int linux_boot, i;
+     MemoryRegion *ram, *option_rom_mr;
+     MemoryRegion *ram_below_4g, *ram_above_4g;
+-    FWCfgState *fw_cfg;
++    FWCfgState *fw_cfg = NULL;
+     MachineState *machine = MACHINE(pcms);
+     PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+ 
+diff --git a/include/elf.h b/include/elf.h
+index c151164b63da..1f82c7a7124b 100644
+--- a/include/elf.h
++++ b/include/elf.h
+@@ -1585,6 +1585,16 @@ typedef struct elf64_shdr {
+ #define NT_ARM_HW_WATCH 0x403           /* ARM hardware watchpoint registers */
+ #define NT_ARM_SYSTEM_CALL      0x404   /* ARM system call number */
+ 
++/*
++ * Physical entry point into the kernel.
++ *
++ * 32bit entry point into the kernel. When requested to launch the
++ * guest kernel, use this entry point to launch the guest in 32-bit
++ * protected mode with paging disabled.
++ *
++ * [ Corresponding definition in Linux kernel: include/xen/interface/elfnote.h ]
++ */
++#define XEN_ELFNOTE_PHYS32_ENTRY    18  /* 0x12 */
+ 
+ /* Note header in a PT_NOTE section */
+ typedef struct elf32_note {
+-- 
 1.8.3.1
