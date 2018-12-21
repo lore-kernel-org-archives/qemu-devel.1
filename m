@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gaR5G-0002wn-GL
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:07:48 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gaRAw-0007Dq-Pc
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:13:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gaR5A-0006ie-Gr
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:07:46 -0500
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:53711)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gaR5A-0006g3-7Q
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:07:40 -0500
-Date: Fri, 21 Dec 2018 14:30:37 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181221193037.GB11197@flamenco>
-References: <20181220111008.24954-1-alex.bennee@linaro.org>
+	(envelope-from <jsnow@redhat.com>) id 1gaRAv-0002ob-03
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 15:13:38 -0500
+References: <20181221093529.23855-1-jsnow@redhat.com>
+	<20181221093529.23855-10-jsnow@redhat.com>
+	<785c6911-3871-2fc0-d7ea-b09246fb9f1d@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <45e11a42-da20-9998-574c-e88fc802918a@redhat.com>
+Date: Fri, 21 Dec 2018 15:13:28 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20181220111008.24954-1-alex.bennee@linaro.org>
-Subject: Re: [Qemu-devel] [RFC PATCH] fpu: add compile time check for old
- glibc/libm and fma
+In-Reply-To: <785c6911-3871-2fc0-d7ea-b09246fb9f1d@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 09/11] iotests: change qmp_log filters
+ to expect QMP objects only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,117 +26,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, laurent.desnogues@gmail.com, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "eblake@redhat.com" <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Thu, Dec 20, 2018 at 11:10:08 +0000, Alex Bennée wrote:
-(snip)
-> +#if defined(__GLIBC__) && (__GLIBC__ == 2 && __GLIBC_MINOR__ <= 12)
-> +#define QEMU_HARDFLOAT_USE_FMA 0
-> +#else
-> +#define QEMU_HARDFLOAT_USE_FMA 1
-> +#endif
-> +#else
-> +#define QEMU_HARDFLOAT_USE_FMA 1
-> +#endif
-> +
->  /*
->   * QEMU_HARDFLOAT_USE_ISINF chooses whether to use isinf() over
->   * float{32,64}_is_infinity when !USE_FP.
-> @@ -1551,6 +1570,9 @@ float32_muladd(float32 xa, float32 xb, float32 xc, int flags, float_status *s)
->      ub.s = xb;
->      uc.s = xc;
->  
-> +    if (!QEMU_HARDFLOAT_USE_FMA) {
-> +        goto soft;
-> +    }
 
-I don't think this should be a compile-time check; if the QEMU binary
-is run on a system with a newer, fixed glibc (or any other libc), then
-we'll have disabled fma hardfloat unnecessarily.
 
-What do you think about the following?
+On 12/21/18 7:41 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Hmm. This made me check, is enumerate applicable to dicts,
+> and, yes it is.
+> 
 
-Laurent: if you want to test the below, you can pull it from
-   https://github.com/cota/qemu/tree/fma-fix
+enumerate on dicts gives you a numerical index paired with the key,
+so... k is the numerical index and v is the key.
 
-Thanks,
+> so, it may be as easy as
+> 
+>      for k, v in enumerate(qmsg):
+>          if isinstance(v, list) or isinstance(v, dict):
+>              qmsg[k] = filter_qmp(v, filter_fn)
 
-		Emilio
----
-commit ddeec29a2c33550c5d018aeea05d45a23579ae1b
-Author: Emilio G. Cota <cota@braap.org>
-Date:   Fri Dec 21 14:08:57 2018 -0500
+                    ^ this will break if qmsg was a dict.
 
-    softfloat: enforce softfloat if the host's FMA is broken
-    
-    The added branch is marked as unlikely and therefore its impact
-    on performance (measured with fp-bench) is within the noise range
-    when measured on an Intel(R) Xeon(R) Gold 6142 CPU @ 2.60GHz.
-    
-    Laurent Desnogues <laurent.desnogues@gmail.com>
-    Signed-off-by: Emilio G. Cota <cota@braap.org>
+>          else:
+>              qmsg[k] = filter_fn(k, v)
+> 
+> with this:
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> 
+> 
+> But does it what you want?
+> So, for lists of strings, filter_fn will get pair of index in array
+> and value?
+> On the other hand, we can adjust the behavior as we want when we introduce
+> such filters.
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 59eac97d10..8b3670ca9d 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -1542,6 +1542,8 @@ soft_f64_muladd(float64 a, float64 b, float64 c, int flags,
-     return float64_round_pack_canonical(pr, status);
- }
- 
-+static bool host_fma_is_broken;
-+
- float32 QEMU_FLATTEN
- float32_muladd(float32 xa, float32 xb, float32 xc, int flags, float_status *s)
- {
-@@ -1562,6 +1564,11 @@ float32_muladd(float32 xa, float32 xb, float32 xc, int flags, float_status *s)
-     if (unlikely(!f32_is_zon3(ua, ub, uc))) {
-         goto soft;
-     }
-+
-+    if (unlikely(host_fma_is_broken)) {
-+        goto soft;
-+    }
-+
-     /*
-      * When (a || b) == 0, there's no need to check for under/over flow,
-      * since we know the addend is (normal || 0) and the product is 0.
-@@ -1623,6 +1630,11 @@ float64_muladd(float64 xa, float64 xb, float64 xc, int flags, float_status *s)
-     if (unlikely(!f64_is_zon3(ua, ub, uc))) {
-         goto soft;
-     }
-+
-+    if (unlikely(host_fma_is_broken)) {
-+        goto soft;
-+    }
-+
-     /*
-      * When (a || b) == 0, there's no need to check for under/over flow,
-      * since we know the addend is (normal || 0) and the product is 0.
-@@ -7974,3 +7986,25 @@ float128 float128_scalbn(float128 a, int n, float_status *status)
-                                          , status);
- 
- }
-+
-+static void __attribute__((constructor)) softfloat_init(void)
-+{
-+    union_float64 ua, ub, uc, ur;
-+
-+    if (QEMU_NO_HARDFLOAT) {
-+        return;
-+    }
-+
-+    /*
-+     * Test that the host's FMA is not obviously broken. For example,
-+     * glibc < 2.23 can perform an incorrect FMA on certain hosts; see
-+     *   https://sourceware.org/bugzilla/show_bug.cgi?id=13304
-+     */
-+    ua.s = 0x0020000000000001;
-+    ub.s = 0x3ca0000000000000;
-+    uc.s = 0x0020000000000000;
-+    ur.h = fma(ua.h, ub.h, uc.h);
-+    if (ur.s != 0x0020000000000001) {
-+        host_fma_is_broken = true;
-+    }
-+}
+I'm not sure what I want...
+
+Named index is the best, but isn't always available because like you
+say, the object we are passed is not always a dictionary. We could
+theoretically have a list of lists somewhere. What key would I pass
+then? It's meaningless.
+
+I could change qmp_filter to pass the k,v to the filter when it finds
+the "last dictionary," i.e. if it recursively finds no more dictionaries
+underneath, it passes the value along regardless of whatever it finds.
+This is a bit more complex because I think I'd need a co-mutual
+recursive function to "travel" each value and report if there are
+further dictionaries down below.
+
+Or, I could just leave the filter as-is where it only ever gets one,
+non-dict/non-list item and receives a key. Sometimes the key will now be
+a numerical index which is likely not useful...
+
+I might stage this as-is for now. Let's revisit it before 4.0 rc0.
+
+--js
