@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gaKZn-0004tL-BP
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 08:10:52 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gaKZv-0004yS-TU
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 08:11:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gaKZe-00010O-RN
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 08:10:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49124)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gaKZe-0000zc-AU
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 08:10:42 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gaKZc-0003Bo-UR
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 13:10:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E16162E8019
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 13:10:40 +0000 (UTC)
+	(envelope-from <cohuck@redhat.com>) id 1gaKZp-0001DI-Hv
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 08:10:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33982)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gaKZo-00018g-Ip
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 08:10:53 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9B2CB2DC37B
+	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 13:10:50 +0000 (UTC)
+Date: Fri, 21 Dec 2018 14:10:44 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181221141044.72263fec.cohuck@redhat.com>
+In-Reply-To: <20181221090410.27250-21-marcandre.lureau@redhat.com>
+References: <20181221090410.27250-1-marcandre.lureau@redhat.com>
+	<20181221090410.27250-21-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 21 Dec 2018 13:02:45 -0000
-From: zhaoby <1809453@bugs.launchpad.net>
-Reply-To: Bug 1809453 <1809453@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154539736525.20217.16347056739487632712.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1809453] [NEW] Windows qemu download Big file bug
- in net user mode
+Subject: Re: [Qemu-devel] [PATCH v7 20/28] include: remove compat.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,42 +33,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com, ehabkost@redhat.com
 
-Public bug reported:
+On Fri, 21 Dec 2018 13:04:02 +0400
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
-hi
+> The header is now empty.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  include/hw/compat.h        | 4 ----
+>  include/hw/i386/pc.h       | 1 -
+>  hw/arm/virt.c              | 1 -
+>  hw/ppc/spapr.c             | 1 -
+>  hw/s390x/s390-virtio-ccw.c | 1 -
+>  5 files changed, 8 deletions(-)
+>  delete mode 100644 include/hw/compat.h
 
-Windows qemu with -net user downloading big files has a bug, -net tap is
-good!
-
-I suspect that the Slirp protocol has a bug on the Windows pc, which is
-normal on ubuntu.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1809453
-
-Title:
-  Windows  qemu download Big file bug in net user mode
-
-Status in QEMU:
-  New
-
-Bug description:
-  hi
-
-  Windows qemu with -net user downloading big files has a bug, -net tap
-  is good!
-
-  I suspect that the Slirp protocol has a bug on the Windows pc, which
-  is normal on ubuntu.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1809453/+subscriptions
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
