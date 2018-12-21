@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ga8mH-0004O3-2W
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 19:35:00 -0500
+	(envelope-from <groug@kaod.org>) id 1ga8mU-0004QU-Pa
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 19:35:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ga8mD-0003Qp-Se
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 19:34:57 -0500
-Received: from 5.mo2.mail-out.ovh.net ([87.98.181.248]:33196)
+	(envelope-from <groug@kaod.org>) id 1ga8mQ-0003wf-KJ
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 19:35:09 -0500
+Received: from 4.mo3.mail-out.ovh.net ([178.33.46.10]:52273)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ga8mD-0003El-M7
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 19:34:53 -0500
-Received: from player796.ha.ovh.net (unknown [10.109.146.168])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id A1B66177010
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 01:34:43 +0100 (CET)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ga8mQ-0003rP-B4
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 19:35:06 -0500
+Received: from player697.ha.ovh.net (unknown [10.109.146.32])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 936241EE989
+	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 01:35:04 +0100 (CET)
 From: Greg Kurz <groug@kaod.org>
-Date: Fri, 21 Dec 2018 01:34:25 +0100
-Message-ID: <154535246529.862554.6113740443866753456.stgit@bahia.lan>
+Date: Fri, 21 Dec 2018 01:34:48 +0100
+Message-ID: <154535248827.862554.14664931152289972599.stgit@bahia.lan>
+In-Reply-To: <154535246529.862554.6113740443866753456.stgit@bahia.lan>
+References: <154535246529.862554.6113740443866753456.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 00/15] spapr: Add support for PHB hotplug
+Subject: [Qemu-devel] [PATCH 01/15] ppc/spapr: Receive and store device tree
+ blob from SLOF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,91 +33,244 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>
 
-Previous work on PHB hotplug was last posted more than one year ago:
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg07906.html
+SLOF receives a device tree and updates it with various properties
+before switching to the guest kernel and QEMU is not aware of any changes
+made by SLOF. Since there is no real RTAS (QEMU implements it), it makes
+sense to pass the SLOF final device tree to QEMU to let it implement
+RTAS related tasks better, such as PCI host bus adapter hotplug.
 
-Quite a few significant changes happened since then:
-- fixed PHB indexes
-- fixed IRQ numbers for LSIs
-- SLOF capable of updating the FDT in QEMU
-- XIVE
+Specifially, now QEMU can find out the actual XICS phandle (for PHB
+hotplug) and the RTAS linux,rtas-entry/base properties (for firmware
+assisted NMI - FWNMI).
 
-First step in this new series is to teach QEMU how to get the FDT from
-SLOF thanks to the recent patch from Alexey, rebased against David's
-ppc-for-4.0 branch (SHA1: 11ce774130e7).
+This stores the initial DT blob in the sPAPR machine and replaces it
+in the KVMPPC_H_UPDATE_DT (new private hypercall) handler.
 
-Most of the other patches come from the previous version with minor
-modifications, but I guess even the ones with Reviewed-by tags deserve
-to be reviewed again in case I've missed something.
+This adds an @update_dt_enabled machine property to allow backward
+migration.
 
-Finally, the XIVE and XICS backends are changed to expose the name of
-the interrupt controller node in the device tree. The machine code can
-then exploit this to reach out to its phandle property, in case it got
-changed by SLOF. This is needed to wire up interrupts during hotplug.
+SLOF already has a hypercall since
+https://github.com/aik/SLOF/commit/e6fc84652c9c0073f9183
 
-This was only lightly tested at the moment. I'll post about that later.
+This makes use of the new fdt_check_full() helper. In order to allow
+the configure script to pick the correct DTC version, this adjusts
+the DTC presense test.
 
-Please comment.
-
-Cheers,
-
---
-Greg
-
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
+ configure              |    2 +-
+ hw/ppc/spapr.c         |   43 ++++++++++++++++++++++++++++++++++++++++++-
+ hw/ppc/spapr_hcall.c   |   42 ++++++++++++++++++++++++++++++++++++++++++
+ hw/ppc/trace-events    |    3 +++
+ include/hw/ppc/spapr.h |    7 ++++++-
+ 5 files changed, 94 insertions(+), 3 deletions(-)
 
-Alexey Kardashevskiy (1):
-      ppc/spapr: Receive and store device tree blob from SLOF
-
-Greg Kurz (4):
-      spapr: move spapr_create_phb() to core machine code
-      spapr_pci: add proper rollback on PHB realize error path
-      spapr_pci: Define SPAPR_MAX_PHBS in hw/pci-host/spapr.h
-      spapr: Expose the name of the interrupt controller node
-
-Michael Roth (9):
-      pci: allow cleanup/unregistration of PCI buses
-      spapr_pci: add PHB unrealize
-      spapr: enable PHB hotplug for default pseries machine type
-      spapr: create DR connectors for PHBs
-      spapr_events: add support for phb hotplug events
-      qdev: pass an Object * to qbus_set_hotplug_handler()
-      spapr_pci: provide node start offset via spapr_populate_pci_dt()
-      spapr_pci: add ibm, my-drc-index property for PHB hotplug
-      spapr: add hotplug hooks for PHB hotplug
-
-Nathan Fontenot (1):
-      spapr: populate PHB DRC entries for root DT node
-
-
- configure                     |    2 
- hw/acpi/piix4.c               |    2 
- hw/char/virtio-serial-bus.c   |    2 
- hw/core/bus.c                 |   11 --
- hw/intc/spapr_xive.c          |    9 +-
- hw/intc/xics_spapr.c          |    9 +-
- hw/pci/pci.c                  |   33 ++++++
- hw/pci/pcie.c                 |    2 
- hw/pci/shpc.c                 |    2 
- hw/ppc/spapr.c                |  230 ++++++++++++++++++++++++++++++++++++++++-
- hw/ppc/spapr_drc.c            |   18 +++
- hw/ppc/spapr_events.c         |    3 +
- hw/ppc/spapr_hcall.c          |   42 +++++++
- hw/ppc/spapr_irq.c            |    3 +
- hw/ppc/spapr_pci.c            |  139 +++++++++++++++++++------
- hw/ppc/trace-events           |    3 +
- hw/s390x/css-bridge.c         |    2 
- hw/s390x/s390-pci-bus.c       |    6 +
- hw/scsi/virtio-scsi.c         |    2 
- hw/scsi/vmw_pvscsi.c          |    2 
- hw/usb/dev-smartcard-reader.c |    2 
- include/hw/pci-host/spapr.h   |   14 ++
- include/hw/pci/pci.h          |    3 +
- include/hw/ppc/spapr.h        |    9 +-
- include/hw/ppc/spapr_drc.h    |    8 +
- include/hw/ppc/spapr_irq.h    |    1 
- include/hw/ppc/spapr_xive.h   |    1 
- include/hw/ppc/xics.h         |    1 
- include/hw/qdev-core.h        |    3 -
- 29 files changed, 491 insertions(+), 73 deletions(-)
+diff --git a/configure b/configure
+index 224d3071ac61..baeeabc29f56 100755
+--- a/configure
++++ b/configure
+@@ -3916,7 +3916,7 @@ if test "$fdt" != "no" ; then
+   cat > $TMPC << EOF
+ #include <libfdt.h>
+ #include <libfdt_env.h>
+-int main(void) { fdt_first_subnode(0, 0); return 0; }
++int main(void) { fdt_check_full(NULL, 0); return 0; }
+ EOF
+   if compile_prog "" "$fdt_libs" ; then
+     # system DTC is good - use it
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 17ad84396b31..8ea680fcde1e 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1668,7 +1668,10 @@ static void spapr_machine_reset(void)
+     /* Load the fdt */
+     qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
+     cpu_physical_memory_write(fdt_addr, fdt, fdt_totalsize(fdt));
+-    g_free(fdt);
++    g_free(spapr->fdt_blob);
++    spapr->fdt_size = fdt_totalsize(fdt);
++    spapr->fdt_initial_size = spapr->fdt_size;
++    spapr->fdt_blob = fdt;
+ 
+     /* Set up the entry state */
+     spapr_cpu_set_entry_state(first_ppc_cpu, SPAPR_ENTRY_POINT, fdt_addr);
+@@ -1919,6 +1922,39 @@ static const VMStateDescription vmstate_spapr_irq_map = {
+     },
+ };
+ 
++static bool spapr_dtb_needed(void *opaque)
++{
++    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(opaque);
++
++    return smc->update_dt_enabled;
++}
++
++static int spapr_dtb_pre_load(void *opaque)
++{
++    sPAPRMachineState *spapr = (sPAPRMachineState *)opaque;
++
++    g_free(spapr->fdt_blob);
++    spapr->fdt_blob = NULL;
++    spapr->fdt_size = 0;
++
++    return 0;
++}
++
++static const VMStateDescription vmstate_spapr_dtb = {
++    .name = "spapr_dtb",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = spapr_dtb_needed,
++    .pre_load = spapr_dtb_pre_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(fdt_initial_size, sPAPRMachineState),
++        VMSTATE_UINT32(fdt_size, sPAPRMachineState),
++        VMSTATE_VBUFFER_ALLOC_UINT32(fdt_blob, sPAPRMachineState, 0, NULL,
++                                     fdt_size),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
+ static const VMStateDescription vmstate_spapr = {
+     .name = "spapr",
+     .version_id = 3,
+@@ -1948,6 +1984,7 @@ static const VMStateDescription vmstate_spapr = {
+         &vmstate_spapr_cap_ibs,
+         &vmstate_spapr_irq_map,
+         &vmstate_spapr_cap_nested_kvm_hv,
++        &vmstate_spapr_dtb,
+         NULL
+     }
+ };
+@@ -3929,6 +3966,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+     hc->unplug = spapr_machine_device_unplug;
+ 
+     smc->dr_lmb_enabled = true;
++    smc->update_dt_enabled = true;
+     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power9_v2.0");
+     mc->has_hotpluggable_cpus = true;
+     smc->resize_hpt_default = SPAPR_RESIZE_HPT_ENABLED;
+@@ -4024,9 +4062,12 @@ DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
+ 
+ static void spapr_machine_3_1_class_options(MachineClass *mc)
+ {
++    sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
++
+     spapr_machine_4_0_class_options(mc);
+     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_3_1);
+     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power8_v2.0");
++    smc->update_dt_enabled = false;
+ }
+ 
+ DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index ae913d070f50..78fecc8fe906 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1717,6 +1717,46 @@ static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
+ 
+     args[0] = characteristics;
+     args[1] = behaviour;
++    return H_SUCCESS;
++}
++
++static target_ulong h_update_dt(PowerPCCPU *cpu, sPAPRMachineState *spapr,
++                                target_ulong opcode, target_ulong *args)
++{
++    target_ulong dt = ppc64_phys_to_real(args[0]);
++    struct fdt_header hdr = { 0 };
++    unsigned cb;
++    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
++    void *fdt;
++
++    cpu_physical_memory_read(dt, &hdr, sizeof(hdr));
++    cb = fdt32_to_cpu(hdr.totalsize);
++
++    if (!smc->update_dt_enabled) {
++        return H_SUCCESS;
++    }
++
++    /* Check that the fdt did not grow out of proportion */
++    if (cb > spapr->fdt_initial_size * 2) {
++        trace_spapr_update_dt_failed_size(spapr->fdt_initial_size, cb,
++                                          fdt32_to_cpu(hdr.magic));
++        return H_PARAMETER;
++    }
++
++    fdt = g_malloc0(cb);
++    cpu_physical_memory_read(dt, fdt, cb);
++
++    /* Check the fdt consistency */
++    if (fdt_check_full(fdt, cb)) {
++        trace_spapr_update_dt_failed_check(spapr->fdt_initial_size, cb,
++                                           fdt32_to_cpu(hdr.magic));
++        return H_PARAMETER;
++    }
++
++    g_free(spapr->fdt_blob);
++    spapr->fdt_size = cb;
++    spapr->fdt_blob = fdt;
++    trace_spapr_update_dt(cb);
+ 
+     return H_SUCCESS;
+ }
+@@ -1822,6 +1862,8 @@ static void hypercall_register_types(void)
+ 
+     /* ibm,client-architecture-support support */
+     spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_support);
++
++    spapr_register_hypercall(KVMPPC_H_UPDATE_DT, h_update_dt);
+ }
+ 
+ type_init(hypercall_register_types)
+diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
+index dc5e65aee96d..0af155ed323d 100644
+--- a/hw/ppc/trace-events
++++ b/hw/ppc/trace-events
+@@ -22,6 +22,9 @@ spapr_cas_pvr_try(uint32_t pvr) "0x%x"
+ spapr_cas_pvr(uint32_t cur_pvr, bool explicit_match, uint32_t new_pvr) "current=0x%x, explicit_match=%u, new=0x%x"
+ spapr_h_resize_hpt_prepare(uint64_t flags, uint64_t shift) "flags=0x%"PRIx64", shift=%"PRIu64
+ spapr_h_resize_hpt_commit(uint64_t flags, uint64_t shift) "flags=0x%"PRIx64", shift=%"PRIu64
++spapr_update_dt(unsigned cb) "New blob %u bytes"
++spapr_update_dt_failed_size(unsigned cbold, unsigned cbnew, unsigned magic) "Old blob %u bytes, new blob %u bytes, magic 0x%x"
++spapr_update_dt_failed_check(unsigned cbold, unsigned cbnew, unsigned magic) "Old blob %u bytes, new blob %u bytes, magic 0x%x"
+ 
+ # hw/ppc/spapr_iommu.c
+ spapr_iommu_put(uint64_t liobn, uint64_t ioba, uint64_t tce, uint64_t ret) "liobn=0x%"PRIx64" ioba=0x%"PRIx64" tce=0x%"PRIx64" ret=%"PRId64
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 2c77a8ba8810..36033b89d31a 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -103,6 +103,7 @@ struct sPAPRMachineClass {
+ 
+     /*< public >*/
+     bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMBs */
++    bool update_dt_enabled;    /* enable KVMPPC_H_UPDATE_DT */
+     bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
+     bool pre_2_10_has_unused_icps;
+     bool legacy_irq_allocation;
+@@ -139,6 +140,9 @@ struct sPAPRMachineState {
+     int vrma_adjust;
+     ssize_t rtas_size;
+     void *rtas_blob;
++    uint32_t fdt_size;
++    uint32_t fdt_initial_size;
++    void *fdt_blob;
+     long kernel_size;
+     bool kernel_le;
+     uint32_t initrd_base;
+@@ -480,7 +484,8 @@ struct sPAPRMachineState {
+ #define KVMPPC_H_LOGICAL_MEMOP  (KVMPPC_HCALL_BASE + 0x1)
+ /* Client Architecture support */
+ #define KVMPPC_H_CAS            (KVMPPC_HCALL_BASE + 0x2)
+-#define KVMPPC_HCALL_MAX        KVMPPC_H_CAS
++#define KVMPPC_H_UPDATE_DT      (KVMPPC_HCALL_BASE + 0x3)
++#define KVMPPC_HCALL_MAX        KVMPPC_H_UPDATE_DT
+ 
+ typedef struct sPAPRDeviceTreeUpdateHeader {
+     uint32_t version_id;
