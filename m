@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaDdp-0000by-Or
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:34 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gaDdu-0000gg-17
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaDdo-0007K7-FS
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:33 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gaDdr-0007PQ-Iu
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:37 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 21 Dec 2018 16:45:42 +1100
-Message-Id: <20181221054606.22007-17-david@gibson.dropbear.id.au>
+Date: Fri, 21 Dec 2018 16:45:50 +1100
+Message-Id: <20181221054606.22007-25-david@gibson.dropbear.id.au>
 In-Reply-To: <20181221054606.22007-1-david@gibson.dropbear.id.au>
 References: <20181221054606.22007-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 16/40] ppc/xive: add support for the LSI
- interrupt sources
+Subject: [Qemu-devel] [PULL 24/40] ppc/xive: add support for the END Event
+ State Buffers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,194 +28,256 @@ Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, gkurz@redhat.com, lvivier@redhat
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-The 'sent' status of the LSI interrupt source is modeled with the 'P'
-bit of the ESB and the assertion status of the source is maintained
-with an extra bit under the main XiveSource object. The type of the
-source is stored in the same array for practical reasons.
+The Event Notification Descriptor (END) XIVE structure also contains
+two Event State Buffers providing further coalescing of interrupts,
+one for the notification event (ESn) and one for the escalation events
+(ESe). A MMIO page is assigned for each to control the EOI through
+loads only. Stores are not allowed.
+
+The END ESBs are modeled through an object resembling the 'XiveSource'
+It is stateless as the END state bits are backed into the XiveEND
+structure under the XiveRouter and the MMIO accesses follow the same
+rules as for the XiveSource ESBs.
+
+END ESBs are not supported by the Linux drivers neither on OPAL nor on
+sPAPR. Nevetherless, it provides a mean to study the question in the
+future and validates a bit more the XIVE model.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-[dwg: Fix style nit]
+[dwg: Fold in a later fix for field access]
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xive.c        | 67 +++++++++++++++++++++++++++++++++++++++----
- include/hw/ppc/xive.h | 19 +++++++++++-
- 2 files changed, 79 insertions(+), 7 deletions(-)
+ hw/intc/xive.c        | 160 +++++++++++++++++++++++++++++++++++++++++-
+ include/hw/ppc/xive.h |  21 ++++++
+ 2 files changed, 179 insertions(+), 2 deletions(-)
 
 diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index 6389bd8323..4998f128e7 100644
+index 9ec841f741..7b2ef7480d 100644
 --- a/hw/intc/xive.c
 +++ b/hw/intc/xive.c
-@@ -89,14 +89,42 @@ uint8_t xive_source_esb_set(XiveSource *xsrc, uint32_=
-t srcno, uint8_t pq)
-     return xive_esb_set(&xsrc->status[srcno], pq);
+@@ -613,8 +613,18 @@ static void xive_router_end_notify(XiveRouter *xrtr,=
+ uint8_t end_blk,
+      * even futher coalescing in the Router
+      */
+     if (!xive_end_is_notify(&end)) {
+-        qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implemented\n"=
+);
+-        return;
++        uint8_t pq =3D xive_get_field32(END_W1_ESn, end.w1);
++        bool notify =3D xive_esb_trigger(&pq);
++
++        if (pq !=3D xive_get_field32(END_W1_ESn, end.w1)) {
++            end.w1 =3D xive_set_field32(END_W1_ESn, end.w1, pq);
++            xive_router_write_end(xrtr, end_blk, end_idx, &end, 1);
++        }
++
++        /* ESn[Q]=3D1 : end of notification */
++        if (!notify) {
++            return;
++        }
+     }
+=20
+     /*
+@@ -694,6 +704,151 @@ void xive_eas_pic_print_info(XiveEAS *eas, uint32_t=
+ lisn, Monitor *mon)
+                    (uint32_t) xive_get_field64(EAS_END_DATA, eas->w));
  }
 =20
 +/*
-+ * Returns whether the event notification should be forwarded.
++ * END ESB MMIO loads
 + */
-+static bool xive_source_lsi_trigger(XiveSource *xsrc, uint32_t srcno)
++static uint64_t xive_end_source_read(void *opaque, hwaddr addr, unsigned=
+ size)
 +{
-+    uint8_t old_pq =3D xive_source_esb_get(xsrc, srcno);
++    XiveENDSource *xsrc =3D XIVE_END_SOURCE(opaque);
++    uint32_t offset =3D addr & 0xFFF;
++    uint8_t end_blk;
++    uint32_t end_idx;
++    XiveEND end;
++    uint32_t end_esmask;
++    uint8_t pq;
++    uint64_t ret =3D -1;
 +
-+    xsrc->status[srcno] |=3D XIVE_STATUS_ASSERTED;
++    end_blk =3D xsrc->block_id;
++    end_idx =3D addr >> (xsrc->esb_shift + 1);
 +
-+    switch (old_pq) {
-+    case XIVE_ESB_RESET:
-+        xive_source_esb_set(xsrc, srcno, XIVE_ESB_PENDING);
-+        return true;
-+    default:
-+        return false;
++    if (xive_router_get_end(xsrc->xrtr, end_blk, end_idx, &end)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: No END %x/%x\n", end_blk,
++                      end_idx);
++        return -1;
 +    }
-+}
 +
- /*
-  * Returns whether the event notification should be forwarded.
-  */
- static bool xive_source_esb_trigger(XiveSource *xsrc, uint32_t srcno)
- {
-+    bool ret;
++    if (!xive_end_is_valid(&end)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: END %x/%x is invalid\n",
++                      end_blk, end_idx);
++        return -1;
++    }
 +
-     assert(srcno < xsrc->nr_irqs);
-=20
--    return xive_esb_trigger(&xsrc->status[srcno]);
-+    ret =3D xive_esb_trigger(&xsrc->status[srcno]);
++    end_esmask =3D addr_is_even(addr, xsrc->esb_shift) ? END_W1_ESn : EN=
+D_W1_ESe;
++    pq =3D xive_get_field32(end_esmask, end.w1);
 +
-+    if (xive_source_irq_is_lsi(xsrc, srcno) &&
-+        xive_source_esb_get(xsrc, srcno) =3D=3D XIVE_ESB_QUEUED) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "XIVE: queued an event on LSI IRQ %d\n", srcno);
++    switch (offset) {
++    case XIVE_ESB_LOAD_EOI ... XIVE_ESB_LOAD_EOI + 0x7FF:
++        ret =3D xive_esb_eoi(&pq);
++
++        /* Forward the source event notification for routing ?? */
++        break;
++
++    case XIVE_ESB_GET ... XIVE_ESB_GET + 0x3FF:
++        ret =3D pq;
++        break;
++
++    case XIVE_ESB_SET_PQ_00 ... XIVE_ESB_SET_PQ_00 + 0x0FF:
++    case XIVE_ESB_SET_PQ_01 ... XIVE_ESB_SET_PQ_01 + 0x0FF:
++    case XIVE_ESB_SET_PQ_10 ... XIVE_ESB_SET_PQ_10 + 0x0FF:
++    case XIVE_ESB_SET_PQ_11 ... XIVE_ESB_SET_PQ_11 + 0x0FF:
++        ret =3D xive_esb_set(&pq, (offset >> 8) & 0x3);
++        break;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid END ESB load addr =
+%d\n",
++                      offset);
++        return -1;
++    }
++
++    if (pq !=3D xive_get_field32(end_esmask, end.w1)) {
++        end.w1 =3D xive_set_field32(end_esmask, end.w1, pq);
++        xive_router_write_end(xsrc->xrtr, end_blk, end_idx, &end, 1);
 +    }
 +
 +    return ret;
- }
-=20
- /*
-@@ -104,9 +132,23 @@ static bool xive_source_esb_trigger(XiveSource *xsrc=
-, uint32_t srcno)
-  */
- static bool xive_source_esb_eoi(XiveSource *xsrc, uint32_t srcno)
- {
-+    bool ret;
++}
 +
-     assert(srcno < xsrc->nr_irqs);
-=20
--    return xive_esb_eoi(&xsrc->status[srcno]);
-+    ret =3D xive_esb_eoi(&xsrc->status[srcno]);
++/*
++ * END ESB MMIO stores are invalid
++ */
++static void xive_end_source_write(void *opaque, hwaddr addr,
++                                  uint64_t value, unsigned size)
++{
++    qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid ESB write addr 0x%"
++                  HWADDR_PRIx"\n", addr);
++}
++
++static const MemoryRegionOps xive_end_source_ops =3D {
++    .read =3D xive_end_source_read,
++    .write =3D xive_end_source_write,
++    .endianness =3D DEVICE_BIG_ENDIAN,
++    .valid =3D {
++        .min_access_size =3D 8,
++        .max_access_size =3D 8,
++    },
++    .impl =3D {
++        .min_access_size =3D 8,
++        .max_access_size =3D 8,
++    },
++};
++
++static void xive_end_source_realize(DeviceState *dev, Error **errp)
++{
++    XiveENDSource *xsrc =3D XIVE_END_SOURCE(dev);
++    Object *obj;
++    Error *local_err =3D NULL;
++
++    obj =3D object_property_get_link(OBJECT(dev), "xive", &local_err);
++    if (!obj) {
++        error_propagate(errp, local_err);
++        error_prepend(errp, "required link 'xive' not found: ");
++        return;
++    }
++
++    xsrc->xrtr =3D XIVE_ROUTER(obj);
++
++    if (!xsrc->nr_ends) {
++        error_setg(errp, "Number of interrupt needs to be greater than 0=
+");
++        return;
++    }
++
++    if (xsrc->esb_shift !=3D XIVE_ESB_4K &&
++        xsrc->esb_shift !=3D XIVE_ESB_64K) {
++        error_setg(errp, "Invalid ESB shift setting");
++        return;
++    }
 +
 +    /*
-+     * LSI sources do not set the Q bit but they can still be
-+     * asserted, in which case we should forward a new event
-+     * notification
++     * Each END is assigned an even/odd pair of MMIO pages, the even pag=
+e
++     * manages the ESn field while the odd page manages the ESe field.
 +     */
-+    if (xive_source_irq_is_lsi(xsrc, srcno) &&
-+        xsrc->status[srcno] & XIVE_STATUS_ASSERTED) {
-+        ret =3D xive_source_lsi_trigger(xsrc, srcno);
-+    }
++    memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
++                          &xive_end_source_ops, xsrc, "xive.end",
++                          (1ull << (xsrc->esb_shift + 1)) * xsrc->nr_end=
+s);
++}
 +
-+    return ret;
- }
-=20
++static Property xive_end_source_properties[] =3D {
++    DEFINE_PROP_UINT8("block-id", XiveENDSource, block_id, 0),
++    DEFINE_PROP_UINT32("nr-ends", XiveENDSource, nr_ends, 0),
++    DEFINE_PROP_UINT32("shift", XiveENDSource, esb_shift, XIVE_ESB_64K),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void xive_end_source_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->desc    =3D "XIVE END Source";
++    dc->props   =3D xive_end_source_properties;
++    dc->realize =3D xive_end_source_realize;
++}
++
++static const TypeInfo xive_end_source_info =3D {
++    .name          =3D TYPE_XIVE_END_SOURCE,
++    .parent        =3D TYPE_DEVICE,
++    .instance_size =3D sizeof(XiveENDSource),
++    .class_init    =3D xive_end_source_class_init,
++};
++
  /*
-@@ -271,8 +313,16 @@ static void xive_source_set_irq(void *opaque, int sr=
-cno, int val)
-     XiveSource *xsrc =3D XIVE_SOURCE(opaque);
-     bool notify =3D false;
-=20
--    if (val) {
--        notify =3D xive_source_esb_trigger(xsrc, srcno);
-+    if (xive_source_irq_is_lsi(xsrc, srcno)) {
-+        if (val) {
-+            notify =3D xive_source_lsi_trigger(xsrc, srcno);
-+        } else {
-+            xsrc->status[srcno] &=3D ~XIVE_STATUS_ASSERTED;
-+        }
-+    } else {
-+        if (val) {
-+            notify =3D xive_source_esb_trigger(xsrc, srcno);
-+        }
-     }
-=20
-     /* Forward the source event notification for routing */
-@@ -292,9 +342,11 @@ void xive_source_pic_print_info(XiveSource *xsrc, ui=
-nt32_t offset, Monitor *mon)
-             continue;
-         }
-=20
--        monitor_printf(mon, "  %08x %c%c\n", i + offset,
-+        monitor_printf(mon, "  %08x %s %c%c%c\n", i + offset,
-+                       xive_source_irq_is_lsi(xsrc, i) ? "LSI" : "MSI",
-                        pq & XIVE_ESB_VAL_P ? 'P' : '-',
--                       pq & XIVE_ESB_VAL_Q ? 'Q' : '-');
-+                       pq & XIVE_ESB_VAL_Q ? 'Q' : '-',
-+                       xsrc->status[i] & XIVE_STATUS_ASSERTED ? 'A' : ' =
-');
-     }
+  * XIVE Fabric
+  */
+@@ -708,6 +863,7 @@ static void xive_register_types(void)
+     type_register_static(&xive_source_info);
+     type_register_static(&xive_fabric_info);
+     type_register_static(&xive_router_info);
++    type_register_static(&xive_end_source_info);
  }
 =20
-@@ -302,6 +354,8 @@ static void xive_source_reset(void *dev)
- {
-     XiveSource *xsrc =3D XIVE_SOURCE(dev);
-=20
-+    /* Do not clear the LSI bitmap */
-+
-     /* PQs are initialized to 0b01 (Q=3D1) which corresponds to "ints of=
-f" */
-     memset(xsrc->status, XIVE_ESB_OFF, xsrc->nr_irqs);
- }
-@@ -324,6 +378,7 @@ static void xive_source_realize(DeviceState *dev, Err=
-or **errp)
-     }
-=20
-     xsrc->status =3D g_malloc0(xsrc->nr_irqs);
-+    xsrc->lsi_map =3D bitmap_new(xsrc->nr_irqs);
-=20
-     memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
-                           &xive_source_esb_ops, xsrc, "xive.esb",
+ type_init(xive_register_types)
 diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-index 7aa2e38012..7cebc32eba 100644
+index 4851d3b3a4..014f64aa98 100644
 --- a/include/hw/ppc/xive.h
 +++ b/include/hw/ppc/xive.h
-@@ -162,8 +162,9 @@ typedef struct XiveSource {
-     /* IRQs */
-     uint32_t        nr_irqs;
-     qemu_irq        *qirqs;
-+    unsigned long   *lsi_map;
+@@ -336,6 +336,27 @@ int xive_router_get_end(XiveRouter *xrtr, uint8_t en=
+d_blk, uint32_t end_idx,
+ int xive_router_write_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t en=
+d_idx,
+                           XiveEND *end, uint8_t word_number);
 =20
--    /* PQ bits */
-+    /* PQ bits and LSI assertion bit */
-     uint8_t         *status;
-=20
-     /* ESB memory region */
-@@ -219,6 +220,7 @@ static inline hwaddr xive_source_esb_mgmt(XiveSource =
-*xsrc, int srcno)
-  * When doing an EOI, the Q bit will indicate if the interrupt
-  * needs to be re-triggered.
-  */
-+#define XIVE_STATUS_ASSERTED  0x4  /* Extra bit for LSI */
- #define XIVE_ESB_VAL_P        0x2
- #define XIVE_ESB_VAL_Q        0x1
-=20
-@@ -257,4 +259,19 @@ static inline qemu_irq xive_source_qirq(XiveSource *=
-xsrc, uint32_t srcno)
-     return xsrc->qirqs[srcno];
- }
-=20
-+static inline bool xive_source_irq_is_lsi(XiveSource *xsrc, uint32_t src=
-no)
-+{
-+    assert(srcno < xsrc->nr_irqs);
-+    return test_bit(srcno, xsrc->lsi_map);
-+}
++/*
++ * XIVE END ESBs
++ */
 +
-+static inline void xive_source_irq_set(XiveSource *xsrc, uint32_t srcno,
-+                                       bool lsi)
-+{
-+    assert(srcno < xsrc->nr_irqs);
-+    if (lsi) {
-+        bitmap_set(xsrc->lsi_map, srcno, 1);
-+    }
-+}
++#define TYPE_XIVE_END_SOURCE "xive-end-source"
++#define XIVE_END_SOURCE(obj) \
++    OBJECT_CHECK(XiveENDSource, (obj), TYPE_XIVE_END_SOURCE)
 +
- #endif /* PPC_XIVE_H */
++typedef struct XiveENDSource {
++    DeviceState parent;
++
++    uint32_t        nr_ends;
++    uint8_t         block_id;
++
++    /* ESB memory region */
++    uint32_t        esb_shift;
++    MemoryRegion    esb_mmio;
++
++    XiveRouter      *xrtr;
++} XiveENDSource;
++
+ /*
+  * For legacy compatibility, the exceptions define up to 256 different
+  * priorities. P9 implements only 9 levels : 8 active levels [0 - 7]
 --=20
 2.19.2
