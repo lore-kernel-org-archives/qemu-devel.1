@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaDeJ-00017T-QF
+	(envelope-from <dgibson@ozlabs.org>) id 1gaDeI-00016r-Pu
 	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:47:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaDeI-0000G2-QF
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:47:03 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gaDeE-0008V9-Fb
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:59 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 21 Dec 2018 16:45:55 +1100
-Message-Id: <20181221054606.22007-30-david@gibson.dropbear.id.au>
+Date: Fri, 21 Dec 2018 16:45:53 +1100
+Message-Id: <20181221054606.22007-28-david@gibson.dropbear.id.au>
 In-Reply-To: <20181221054606.22007-1-david@gibson.dropbear.id.au>
 References: <20181221054606.22007-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 29/40] spapr/xive: use the VCPU id as a NVT
- identifier
+Subject: [Qemu-devel] [PULL 27/40] ppc/xive: notify the CPU when the
+ interrupt priority is more privileged
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,122 +28,189 @@ Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, gkurz@redhat.com, lvivier@redhat
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-The IVPE scans the O/S CAM line of the XIVE thread interrupt contexts
-to find a matching Notification Virtual Target (NVT) among the NVTs
-dispatched on the HW processor threads.
+After the event data was enqueued in the O/S Event Queue, the IVPE
+raises the bit corresponding to the priority of the pending interrupt
+in the register IBP (Interrupt Pending Buffer) to indicate there is an
+event pending in one of the 8 priority queues. The Pending Interrupt
+Priority Register (PIPR) is also updated using the IPB. This register
+represent the priority of the most favored pending notification.
 
-On a real system, the thread interrupt contexts are updated by the
-hypervisor when a Virtual Processor is scheduled to run on a HW
-thread. Under QEMU, the model will emulate the same behavior by
-hardwiring the NVT identifier in the thread context registers at
-reset.
+The PIPR is then compared to the the Current Processor Priority
+Register (CPPR). If it is more favored (numerically less than), the
+CPU interrupt line is raised and the EO bit of the Notification Source
+Register (NSR) is updated to notify the presence of an exception for
+the O/S. The check needs to be done whenever the PIPR or the CPPR are
+changed.
 
-The NVT identifier used by the sPAPRXive model is the VCPU id. The END
-identifier is also derived from the VCPU id. A set of helpers doing
-the conversion between identifiers are provided for the hcalls
-configuring the sources and the ENDs.
-
-The model does not need a NVT table but the XiveRouter NVT operations
-are provided to perform some extra checks in the routing algorithm.
+The O/S acknowledges the interrupt with a special load in the Thread
+Interrupt Management Area. If the EO bit of the NSR is set, the CPPR
+takes the value of PIPR. The bit number in the IBP corresponding to
+the priority of the pending interrupt is reseted and so is the EO bit
+of the NSR.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+[dwg: Fix style nits]
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/spapr_xive.c | 56 +++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 55 insertions(+), 1 deletion(-)
+ hw/intc/xive.c | 96 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 95 insertions(+), 1 deletion(-)
 
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 5f03adca56..d6291c6470 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -26,6 +26,26 @@
- #define SPAPR_XIVE_VC_BASE   0x0006010000000000ull
- #define SPAPR_XIVE_TM_BASE   0x0006030203180000ull
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 1d737346c3..607e74acd2 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -22,9 +22,75 @@
+  * XIVE Thread Interrupt Management context
+  */
 =20
 +/*
-+ * The allocation of VP blocks is a complex operation in OPAL and the
-+ * VP identifiers have a relation with the number of HW chips, the
-+ * size of the VP blocks, VP grouping, etc. The QEMU sPAPR XIVE
-+ * controller model does not have the same constraints and can use a
-+ * simple mapping scheme of the CPU vcpu_id
-+ *
-+ * These identifiers are never returned to the OS.
++ * Convert a priority number to an Interrupt Pending Buffer (IPB)
++ * register, which indicates a pending interrupt at the priority
++ * corresponding to the bit number
 + */
-+
-+#define SPAPR_XIVE_NVT_BASE 0x400
++static uint8_t priority_to_ipb(uint8_t priority)
++{
++    return priority > XIVE_PRIORITY_MAX ?
++        0 : 1 << (XIVE_PRIORITY_MAX - priority);
++}
 +
 +/*
-+ * sPAPR NVT and END indexing helpers
++ * Convert an Interrupt Pending Buffer (IPB) register to a Pending
++ * Interrupt Priority Register (PIPR), which contains the priority of
++ * the most favored pending notification.
 + */
-+static uint32_t spapr_xive_nvt_to_target(uint8_t nvt_blk, uint32_t nvt_i=
-dx)
++static uint8_t ipb_to_pipr(uint8_t ibp)
 +{
-+    return nvt_idx - SPAPR_XIVE_NVT_BASE;
++    return ibp ? clz32((uint32_t)ibp << 24) : 0xff;
++}
++
++static void ipb_update(uint8_t *regs, uint8_t priority)
++{
++    regs[TM_IPB] |=3D priority_to_ipb(priority);
++    regs[TM_PIPR] =3D ipb_to_pipr(regs[TM_IPB]);
++}
++
++static uint8_t exception_mask(uint8_t ring)
++{
++    switch (ring) {
++    case TM_QW1_OS:
++        return TM_QW1_NSR_EO;
++    default:
++        g_assert_not_reached();
++    }
++}
++
+ static uint64_t xive_tctx_accept(XiveTCTX *tctx, uint8_t ring)
+ {
+-    return 0;
++    uint8_t *regs =3D &tctx->regs[ring];
++    uint8_t nsr =3D regs[TM_NSR];
++    uint8_t mask =3D exception_mask(ring);
++
++    qemu_irq_lower(tctx->output);
++
++    if (regs[TM_NSR] & mask) {
++        uint8_t cppr =3D regs[TM_PIPR];
++
++        regs[TM_CPPR] =3D cppr;
++
++        /* Reset the pending buffer bit */
++        regs[TM_IPB] &=3D ~priority_to_ipb(cppr);
++        regs[TM_PIPR] =3D ipb_to_pipr(regs[TM_IPB]);
++
++        /* Drop Exception bit */
++        regs[TM_NSR] &=3D ~mask;
++    }
++
++    return (nsr << 8) | regs[TM_CPPR];
++}
++
++static void xive_tctx_notify(XiveTCTX *tctx, uint8_t ring)
++{
++    uint8_t *regs =3D &tctx->regs[ring];
++
++    if (regs[TM_PIPR] < regs[TM_CPPR]) {
++        regs[TM_NSR] |=3D exception_mask(ring);
++        qemu_irq_raise(tctx->output);
++    }
+ }
+=20
+ static void xive_tctx_set_cppr(XiveTCTX *tctx, uint8_t ring, uint8_t cpp=
+r)
+@@ -34,6 +100,9 @@ static void xive_tctx_set_cppr(XiveTCTX *tctx, uint8_t=
+ ring, uint8_t cppr)
+     }
+=20
+     tctx->regs[ring + TM_CPPR] =3D cppr;
++
++    /* CPPR has changed, check if we need to raise a pending exception *=
+/
++    xive_tctx_notify(tctx, ring);
+ }
+=20
+ /*
+@@ -189,6 +258,17 @@ static void xive_tm_set_os_cppr(XiveTCTX *tctx, hwad=
+dr offset,
+     xive_tctx_set_cppr(tctx, TM_QW1_OS, value & 0xff);
+ }
+=20
++/*
++ * Adjust the IPB to allow a CPU to process event queues of other
++ * priorities during one physical interrupt cycle.
++ */
++static void xive_tm_set_os_pending(XiveTCTX *tctx, hwaddr offset,
++                                   uint64_t value, unsigned size)
++{
++    ipb_update(&tctx->regs[TM_QW1_OS], value & 0xff);
++    xive_tctx_notify(tctx, TM_QW1_OS);
 +}
 +
  /*
-  * On sPAPR machines, use a simplified output for the XIVE END
-  * structure dumping only the information related to the OS EQ.
-@@ -40,7 +60,8 @@ static void spapr_xive_end_pic_print_info(sPAPRXive *xi=
-ve, XiveEND *end,
-     uint32_t nvt =3D xive_get_field32(END_W6_NVT_INDEX, end->w6);
-     uint8_t priority =3D xive_get_field32(END_W7_F0_PRIORITY, end->w7);
+  * Define a mapping of "special" operations depending on the TIMA page
+  * offset and the size of the operation.
+@@ -211,6 +291,7 @@ static const XiveTmOp xive_tm_operations[] =3D {
 =20
--    monitor_printf(mon, "%3d/%d % 6d/%5d ^%d", nvt,
-+    monitor_printf(mon, "%3d/%d % 6d/%5d ^%d",
-+                   spapr_xive_nvt_to_target(0, nvt),
-                    priority, qindex, qentries, qgen);
+     /* MMIOs above 2K : special operations with side effects */
+     { XIVE_TM_OS_PAGE, TM_SPC_ACK_OS_REG,     2, NULL, xive_tm_ack_os_re=
+g },
++    { XIVE_TM_OS_PAGE, TM_SPC_SET_OS_PENDING, 1, xive_tm_set_os_pending,=
+ NULL },
+ };
 =20
-     xive_end_queue_pic_print_info(end, 6, mon);
-@@ -246,6 +267,37 @@ static int spapr_xive_write_end(XiveRouter *xrtr, ui=
-nt8_t end_blk,
-     return 0;
- }
-=20
-+static int spapr_xive_get_nvt(XiveRouter *xrtr,
-+                              uint8_t nvt_blk, uint32_t nvt_idx, XiveNVT=
- *nvt)
-+{
-+    uint32_t vcpu_id =3D spapr_xive_nvt_to_target(nvt_blk, nvt_idx);
-+    PowerPCCPU *cpu =3D spapr_find_cpu(vcpu_id);
-+
-+    if (!cpu) {
-+        /* TODO: should we assert() if we can find a NVT ? */
-+        return -1;
-+    }
+ static const XiveTmOp *xive_tm_find_op(hwaddr offset, unsigned size, boo=
+l write)
+@@ -373,6 +454,13 @@ static void xive_tctx_reset(void *dev)
+     tctx->regs[TM_QW1_OS + TM_LSMFB] =3D 0xFF;
+     tctx->regs[TM_QW1_OS + TM_ACK_CNT] =3D 0xFF;
+     tctx->regs[TM_QW1_OS + TM_AGE] =3D 0xFF;
 +
 +    /*
-+     * sPAPR does not maintain a NVT table. Return that the NVT is
-+     * valid if we have found a matching CPU
++     * Initialize PIPR to 0xFF to avoid phantom interrupts when the
++     * CPPR is first set.
 +     */
-+    nvt->w0 =3D cpu_to_be32(NVT_W0_VALID);
-+    return 0;
-+}
-+
-+static int spapr_xive_write_nvt(XiveRouter *xrtr, uint8_t nvt_blk,
-+                                uint32_t nvt_idx, XiveNVT *nvt,
-+                                uint8_t word_number)
-+{
-+    /*
-+     * We don't need to write back to the NVTs because the sPAPR
-+     * machine should never hit a non-scheduled NVT. It should never
-+     * get called.
-+     */
-+    g_assert_not_reached();
-+}
-+
- static const VMStateDescription vmstate_spapr_xive_end =3D {
-     .name =3D TYPE_SPAPR_XIVE "/end",
-     .version_id =3D 1,
-@@ -308,6 +360,8 @@ static void spapr_xive_class_init(ObjectClass *klass,=
- void *data)
-     xrc->get_eas =3D spapr_xive_get_eas;
-     xrc->get_end =3D spapr_xive_get_end;
-     xrc->write_end =3D spapr_xive_write_end;
-+    xrc->get_nvt =3D spapr_xive_get_nvt;
-+    xrc->write_nvt =3D spapr_xive_write_nvt;
++    tctx->regs[TM_QW1_OS + TM_PIPR] =3D
++        ipb_to_pipr(tctx->regs[TM_QW1_OS + TM_IPB]);
  }
 =20
- static const TypeInfo spapr_xive_info =3D {
+ static void xive_tctx_realize(DeviceState *dev, Error **errp)
+@@ -1155,9 +1243,15 @@ static void xive_presenter_notify(XiveRouter *xrtr=
+, uint8_t format,
+     found =3D xive_presenter_match(xrtr, format, nvt_blk, nvt_idx, cam_i=
+gnore,
+                                  priority, logic_serv, &match);
+     if (found) {
++        ipb_update(&match.tctx->regs[match.ring], priority);
++        xive_tctx_notify(match.tctx, match.ring);
+         return;
+     }
+=20
++    /* Record the IPB in the associated NVT structure */
++    ipb_update((uint8_t *) &nvt.w4, priority);
++    xive_router_write_nvt(xrtr, nvt_blk, nvt_idx, &nvt, 4);
++
+     /*
+      * If no matching NVT is dispatched on a HW thread :
+      * - update the NVT structure if backlog is activated
 --=20
 2.19.2
