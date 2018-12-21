@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaDde-0000UT-IO
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:23 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gaDdg-0000Ud-Aj
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaDdd-0006xv-O3
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:22 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gaDdb-0006qq-Rx
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 00:46:23 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 21 Dec 2018 16:45:29 +1100
-Message-Id: <20181221054606.22007-4-david@gibson.dropbear.id.au>
+Date: Fri, 21 Dec 2018 16:45:27 +1100
+Message-Id: <20181221054606.22007-2-david@gibson.dropbear.id.au>
 In-Reply-To: <20181221054606.22007-1-david@gibson.dropbear.id.au>
 References: <20181221054606.22007-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 03/40] spapr: Fix ibm,
- max-associativity-domains property number of nodes
+Subject: [Qemu-devel] [PULL 01/40] target/ppc: fix the PPC_BIT definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,123 +23,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, gkurz@redhat.com, lvivier@redhat.com, clg@kaod.org, Serhii Popovych <spopovyc@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, gkurz@redhat.com, lvivier@redhat.com, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Serhii Popovych <spopovyc@redhat.com>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Laurent Vivier reported off by one with maximum number of NUMA nodes
-provided by qemu-kvm being less by one than required according to
-description of "ibm,max-associativity-domains" property in LoPAPR.
+Change the PPC_BIT macro to use ULL instead of UL and the PPC_BIT32
+and PPC_BIT8 not to use any suffix.
 
-It appears that I incorrectly treated LoPAPR description of this
-property assuming it provides last valid domain (NUMA node here)
-instead of maximum number of domains.
+This fixes a compile breakage on windows.
 
-  ### Before hot-add
-
-  (qemu) info numa
-  3 nodes
-  node 0 cpus: 0
-  node 0 size: 0 MB
-  node 0 plugged: 0 MB
-  node 1 cpus:
-  node 1 size: 1024 MB
-  node 1 plugged: 0 MB
-  node 2 cpus:
-  node 2 size: 0 MB
-  node 2 plugged: 0 MB
-
-  $ numactl -H
-  available: 2 nodes (0-1)
-  node 0 cpus: 0
-  node 0 size: 0 MB
-  node 0 free: 0 MB
-  node 1 cpus:
-  node 1 size: 999 MB
-  node 1 free: 658 MB
-  node distances:
-  node   0   1
-    0:  10  40
-    1:  40  10
-
-  ### Hot-add
-
-  (qemu) object_add memory-backend-ram,id=3Dmem0,size=3D1G
-  (qemu) device_add pc-dimm,id=3Ddimm1,memdev=3Dmem0,node=3D2
-  (qemu) [   87.704898] pseries-hotplug-mem: Attempting to hot-add 4 ...
-  <there is no "Initmem setup node 2 [mem 0xHEX-0xHEX]">
-  [   87.705128] lpar: Attempting to resize HPT to shift 21
-  ... <HPT resize messages>
-
-  ### After hot-add
-
-  (qemu) info numa
-  3 nodes
-  node 0 cpus: 0
-  node 0 size: 0 MB
-  node 0 plugged: 0 MB
-  node 1 cpus:
-  node 1 size: 1024 MB
-  node 1 plugged: 0 MB
-  node 2 cpus:
-  node 2 size: 1024 MB
-  node 2 plugged: 1024 MB
-
-  $ numactl -H
-  available: 2 nodes (0-1)
-  ^^^^^^^^^^^^^^^^^^^^^^^^
-             Still only two nodes (and memory hot-added to node 0 below)
-  node 0 cpus: 0
-  node 0 size: 1024 MB
-  node 0 free: 1021 MB
-  node 1 cpus:
-  node 1 size: 999 MB
-  node 1 free: 658 MB
-  node distances:
-  node   0   1
-    0:  10  40
-    1:  40  10
-
-After fix applied numactl(8) reports 3 nodes available and memory
-plugged into node 2 as expected.
-
->From David Gibson:
-------------------
-  Qemu makes a distinction between "non NUMA" (nb_numa_nodes =3D=3D 0) an=
-d
-  "NUMA with one node" (nb_numa_nodes =3D=3D 1).  But from a PAPR guests'=
-s
-  point of view these are equivalent.  I don't want to present two
-  different cases to the guest when we don't need to, so even though the
-  guest can handle it, I'd prefer we put a '1' here for both the
-  nb_numa_nodes =3D=3D 0 and nb_numa_nodes =3D=3D 1 case.
-
-This consolidates everything discussed previously on mailing list.
-
-Fixes: da9f80fbad21 ("spapr: Add ibm,max-associativity-domains property")
-Reported-by: Laurent Vivier <lvivier@redhat.com>
-Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
-
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 ---
- hw/ppc/spapr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/ppc/cpu.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 55be0f56cb..b423db311e 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1033,7 +1033,7 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr,=
- void *fdt)
-         cpu_to_be32(0),
-         cpu_to_be32(0),
-         cpu_to_be32(0),
--        cpu_to_be32(nb_numa_nodes ? nb_numa_nodes - 1 : 0),
-+        cpu_to_be32(nb_numa_nodes ? nb_numa_nodes : 1),
-     };
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index ab68abe8a2..527181c0f0 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -70,9 +70,9 @@
+ #define PPC_ELF_MACHINE     EM_PPC
+ #endif
 =20
-     _FDT(rtas =3D fdt_add_subnode(fdt, 0, "rtas"));
+-#define PPC_BIT(bit)            (0x8000000000000000UL >> (bit))
+-#define PPC_BIT32(bit)          (0x80000000UL >> (bit))
+-#define PPC_BIT8(bit)           (0x80UL >> (bit))
++#define PPC_BIT(bit)            (0x8000000000000000ULL >> (bit))
++#define PPC_BIT32(bit)          (0x80000000 >> (bit))
++#define PPC_BIT8(bit)           (0x80 >> (bit))
+ #define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_BIT(b=
+s))
+ #define PPC_BITMASK32(bs, be)   ((PPC_BIT32(bs) - PPC_BIT32(be)) | \
+                                  PPC_BIT32(bs))
 --=20
 2.19.2
