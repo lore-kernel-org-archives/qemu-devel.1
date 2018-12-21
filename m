@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gaLDL-0006dL-UV
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 08:51:44 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gaLF5-0007lM-6e
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 08:53:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gaLDK-0000fw-Mt
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 08:51:43 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 21 Dec 2018 13:51:33 +0000
-Message-ID: <a718b5ae-7a81-ac6a-7ca9-1aa17542514f@virtuozzo.com>
-References: <20181218075707.12006-1-anton.nefedov@virtuozzo.com>
-	<20181218075707.12006-7-anton.nefedov@virtuozzo.com>
-In-Reply-To: <20181218075707.12006-7-anton.nefedov@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <53056A25497C0040A0010FDFC74EB223@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gaLF1-0001gc-MH
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 08:53:30 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50854)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1gaLF1-0001dz-Bg
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 08:53:27 -0500
+Received: by mail-wm1-x342.google.com with SMTP id n190so5404289wmd.0
+	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 05:53:22 -0800 (PST)
+References: <20181217184540.4571-1-yuval.shaia@oracle.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <9265e109-6adc-0380-582c-f1038b7d3683@gmail.com>
+Date: Fri, 21 Dec 2018 15:53:21 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v11 06/10] file-posix: reset
- fallocate-related flags without CONFIG_FALLOCATE*
+In-Reply-To: <20181217184540.4571-1-yuval.shaia@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v8 00/23] Add support for RDMA MAD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,40 +30,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
+To: Yuval Shaia <yuval.shaia@oracle.com>, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
 
-MTguMTIuMjAxOCAxMDo1NywgQW50b24gTmVmZWRvdiB3cm90ZToNCj4gdGhlc2UgZmxhZ3MgY3Vy
-cmVudGx5IGFmZmVjdCBub3RoaW5nIHdpdGhvdXQgQ09ORklHX0ZBTExPQ0FURSosIHNvIGl0J3MN
-Cj4gbm90IGEgYnVnLiBGaXhpbmcgaXQgbWFrZXMgcG9zc2libGUgdG8gYWRqdXN0IHN1cHBvcnRl
-ZCB6ZXJvIGZsYWcNCj4gQkRSVl9SRVFfQUxMT0NBVEUgcmVnYXJkbGVzcyBvZiBjb25maWd1cmF0
-aW9uIChpbiB0aGUgZm9sbG93aW5nIHBhdGNoKS4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEFudG9u
-IE5lZmVkb3YgPGFudG9uLm5lZmVkb3ZAdmlydHVvenpvLmNvbT4NCg0KSSdkIHByZWZlcmUgdG8g
-cmVmYWN0b3IgdGhpbmdzIHNvIHRoYXQgdGhlc2UgdmFyaWFibGVzIGFyZSBmYWxzZSBmcm9tIHRo
-ZSBiZWdpbm5pbmcgaW4NCnRoZXNlIGNhc2VzLCBidXQgaXQncyBtb3JlIGRpZmZpY3VsdCBhbmQg
-bWF5IGJlIGRvbmUgc2VwYXJhdGVseS4NCg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNv
-di1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KPiAtLS0NCj4gICBibG9j
-ay9maWxlLXBvc2l4LmMgfCA4ICsrKysrKy0tDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDYgaW5zZXJ0
-aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9ibG9jay9maWxlLXBv
-c2l4LmMgYi9ibG9jay9maWxlLXBvc2l4LmMNCj4gaW5kZXggZDhmMGI5Mzc1Mi4uYTY1ZTQ2NGNi
-YyAxMDA2NDQNCj4gLS0tIGEvYmxvY2svZmlsZS1wb3NpeC5jDQo+ICsrKyBiL2Jsb2NrL2ZpbGUt
-cG9zaXguYw0KPiBAQCAtMTQ4OCw5ICsxNDg4LDcgQEAgc3RhdGljIHNzaXplX3QgaGFuZGxlX2Fp
-b2NiX3dyaXRlX3plcm9lc19ibG9jayhSYXdQb3NpeEFJT0RhdGEgKmFpb2NiKQ0KPiAgIHN0YXRp
-YyBpbnQgaGFuZGxlX2Fpb2NiX3dyaXRlX3plcm9lcyh2b2lkICpvcGFxdWUpDQo+ICAgew0KPiAg
-ICAgICBSYXdQb3NpeEFJT0RhdGEgKmFpb2NiID0gb3BhcXVlOw0KPiAtI2lmIGRlZmluZWQoQ09O
-RklHX0ZBTExPQ0FURSkgfHwgZGVmaW5lZChDT05GSUdfWEZTKQ0KPiAgICAgICBCRFJWUmF3U3Rh
-dGUgKnMgPSBhaW9jYi0+YnMtPm9wYXF1ZTsNCj4gLSNlbmRpZg0KPiAgICNpZmRlZiBDT05GSUdf
-RkFMTE9DQVRFDQo+ICAgICAgIGludDY0X3QgbGVuOw0KPiAgICNlbmRpZg0KPiBAQCAtMTUxNCw2
-ICsxNTEyLDggQEAgc3RhdGljIGludCBoYW5kbGVfYWlvY2Jfd3JpdGVfemVyb2VzKHZvaWQgKm9w
-YXF1ZSkNCj4gICAgICAgICAgIH0NCj4gICAgICAgICAgIHMtPmhhc193cml0ZV96ZXJvZXMgPSBm
-YWxzZTsNCj4gICAgICAgfQ0KPiArI2Vsc2UNCj4gKyAgICBzLT5oYXNfd3JpdGVfemVyb2VzID0g
-ZmFsc2U7DQo+ICAgI2VuZGlmDQo+ICAgDQo+ICAgI2lmZGVmIENPTkZJR19GQUxMT0NBVEVfUFVO
-Q0hfSE9MRQ0KPiBAQCAtMTUzMyw2ICsxNTMzLDggQEAgc3RhdGljIGludCBoYW5kbGVfYWlvY2Jf
-d3JpdGVfemVyb2VzKHZvaWQgKm9wYXF1ZSkNCj4gICAgICAgICAgICAgICBzLT5oYXNfZGlzY2Fy
-ZCA9IGZhbHNlOw0KPiAgICAgICAgICAgfQ0KPiAgICAgICB9DQo+ICsjZWxzZQ0KPiArICAgIHMt
-Pmhhc19kaXNjYXJkID0gZmFsc2U7DQo+ICAgI2VuZGlmDQo+ICAgDQo+ICAgI2lmZGVmIENPTkZJ
-R19GQUxMT0NBVEUNCj4gQEAgLTE1NDYsNiArMTU0OCw4IEBAIHN0YXRpYyBpbnQgaGFuZGxlX2Fp
-b2NiX3dyaXRlX3plcm9lcyh2b2lkICpvcGFxdWUpDQo+ICAgICAgICAgICB9DQo+ICAgICAgICAg
-ICBzLT5oYXNfZmFsbG9jYXRlID0gZmFsc2U7DQo+ICAgICAgIH0NCj4gKyNlbHNlDQo+ICsgICAg
-cy0+aGFzX2ZhbGxvY2F0ZSA9IGZhbHNlOw0KPiAgICNlbmRpZg0KPiAgIA0KPiAgICAgICByZXR1
-cm4gLUVOT1RTVVA7DQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+
+
+On 12/17/18 8:45 PM, Yuval Shaia wrote:
+> Hi all.
+
+Hi Yuval,
+The series does not apply on master anymore,
+can you please rebase it and send ii again?
+
+Thanks,
+Marcel
+
+> This is a major enhancement to the pvrdma device to allow it to work with
+> state of the art applications such as MPI.
+>
+> As described in patch #5, MAD packets are management packets that are used
+> for many purposes including but not limited to communication layer above IB
+> verbs API.
+>
+> Patch 1 exposes new external executable (under contrib) that aims to
+> address a specific limitation in the RDMA usrespace MAD stack.
+>
+> This patch-set mainly present MAD enhancement but during the work on it i
+> came across some bugs and enhancement needed to be implemented before doing
+> any MAD coding. This is the role of patches 2 to 4, 7 to 9 and 15 to 17.
+>
+> Patches 6 and 18 are cosmetic changes while not relevant to this patchset
+> still introduce with it since (at least for 6) hard to decouple.
+>
+> Patches 12 to 15 couple pvrdma device with vmxnet3 device as this is the
+> configuration enforced by pvrdma driver in guest - a vmxnet3 device in
+> function 0 and pvrdma device in function 1 in the same PCI slot. Patch 12
+> moves needed code from vmxnet3 device to a new header file that can be used
+> by pvrdma code while Patches 13 to 15 use of it.
+>
+> Along with this patch-set there is a parallel patch posted to libvirt to
+> apply the change needed there as part of the process implemented in patches
+> 10 and 11. This change is needed so that guest would be able to configure
+> any IP to the Ethernet function of the pvrdma device.
+> https://www.redhat.com/archives/libvir-list/2018-November/msg00135.html
+>
+> Since we maintain external resources such as GIDs on host GID table we need
+> to do some cleanup before going down. This is the job of patches 19 and 20.
+>
+> Patches 21 to 22 contain a fixes for bugs detected during the work on
+> processing VM shutdown notification.
+>
+> Patch 23 fixes documentation.
+>
+> Optional second review is welcome for:
+> [10] qapi: Define new QMP message for pvrdma
+> [17] hw/pvrdma: Fill error code in command's response
+>
+> v1 -> v2:
+>      * Fix compilation issue detected when compiling for mingw.
+>      * Address comment from Eric Blake re version of QEMU in json
+>        message.
+>      * Fix example from QMP message in json file.
+>      * Fix case where a VM tries to remove an invalid GID from GID table.
+>      * rdmacm-mux: Cleanup entries in socket-gids table when socket is
+>        closed.
+>      * Cleanup resources (GIDs, QPs etc) when VM goes down.
+>
+> v2 -> v3:
+>      * Address comment from Cornelia Huck for patch #19.
+>      * Add some R-Bs from Marcel Apfelbaum and Dmitry Fleytman.
+>      * Update docs/pvrdma.txt with the changes made by this patchset.
+>      * Address comments from Shamir Rabinovitch for UMAD multiplexer.
+>
+> v3 -> v4:
+>      * Address some comments from Marcel.
+>      * Add some R-Bs from Cornelia Huck and Shamir Rabinovitch.
+>
+> v4 -> v5:
+>      * Add one more patch that deletes code that performs unneeded (and
+>        buggy) cleanup of resources during VM shutdown.
+>      * Fix race condition that might happen when MAD response arrive before
+>        ack for the send is received.
+>      * Based qapi patch on Eric Blake's patch "qapi: Reduce Makefile
+>        boilerplate" per Markus Armbruster's suggestion.
+>        Please note that this will cause build error until Eric's patch will
+>        be applied.
+>      * Add some debug log messages to rdmacm-mux.
+>
+> v5 -> v6
+>      * Add some R-Bs from Marcel.
+>      * Set hop_limit to 0xFF in mad_send.
+>      * Accept comment from Marcel re clearing response in execute_command.
+>      * Change version for QMP message per Eric Blake comment.
+>      * Add some notes to docs/pvrdma.txt as suggested by Marcel.
+>      * in rdmacm-mux, do not default to rxe0.
+>
+> v6 -> v7:
+>      * Fix formating (checkpatch) in patch #17.
+>      * Undo wrong setting done in patch #17 (found after testing with
+>        Prasad's patchset).
+>      * Add Marcel's r-b for patches #11 and #17.
+>
+> v7 -> v8:
+>      * Accept Eric's comments for patch 10 and 11
+>
+> Thanks,
+> Yuval
+>
+> Yuval Shaia (23):
+>    contrib/rdmacm-mux: Add implementation of RDMA User MAD multiplexer
+>    hw/rdma: Add ability to force notification without re-arm
+>    hw/rdma: Return qpn 1 if ibqp is NULL
+>    hw/rdma: Abort send-op if fail to create addr handler
+>    hw/rdma: Add support for MAD packets
+>    hw/pvrdma: Make function reset_device return void
+>    hw/pvrdma: Make default pkey 0xFFFF
+>    hw/pvrdma: Set the correct opcode for recv completion
+>    hw/pvrdma: Set the correct opcode for send completion
+>    qapi: Define new QMP message for pvrdma
+>    hw/pvrdma: Add support to allow guest to configure GID table
+>    vmxnet3: Move some definitions to header file
+>    hw/pvrdma: Make sure PCI function 0 is vmxnet3
+>    hw/rdma: Initialize node_guid from vmxnet3 mac address
+>    hw/pvrdma: Make device state depend on Ethernet function state
+>    hw/pvrdma: Fill all CQE fields
+>    hw/pvrdma: Fill error code in command's response
+>    hw/rdma: Remove unneeded code that handles more that one port
+>    vl: Introduce shutdown_notifiers
+>    hw/pvrdma: Clean device's resource when system is shutdown
+>    hw/rdma: Do not use bitmap_zero_extend to free bitmap
+>    hw/rdma: Do not call rdma_backend_del_gid on an empty gid
+>    docs: Update pvrdma device documentation
+>
+>   MAINTAINERS                      |   2 +
+>   Makefile                         |   3 +
+>   Makefile.objs                    |   4 +-
+>   contrib/rdmacm-mux/Makefile.objs |   4 +
+>   contrib/rdmacm-mux/main.c        | 798 +++++++++++++++++++++++++++++++
+>   contrib/rdmacm-mux/rdmacm-mux.h  |  61 +++
+>   docs/pvrdma.txt                  | 126 ++++-
+>   hw/net/vmxnet3.c                 | 116 +----
+>   hw/net/vmxnet3_defs.h            | 133 ++++++
+>   hw/rdma/rdma_backend.c           | 515 +++++++++++++++++---
+>   hw/rdma/rdma_backend.h           |  28 +-
+>   hw/rdma/rdma_backend_defs.h      |  19 +-
+>   hw/rdma/rdma_rm.c                | 120 ++++-
+>   hw/rdma/rdma_rm.h                |  17 +-
+>   hw/rdma/rdma_rm_defs.h           |  21 +-
+>   hw/rdma/rdma_utils.h             |  25 +
+>   hw/rdma/vmw/pvrdma.h             |  10 +-
+>   hw/rdma/vmw/pvrdma_cmd.c         | 225 ++++-----
+>   hw/rdma/vmw/pvrdma_main.c        |  61 ++-
+>   hw/rdma/vmw/pvrdma_qp_ops.c      |  62 ++-
+>   include/sysemu/sysemu.h          |   1 +
+>   qapi/qapi-schema.json            |   1 +
+>   qapi/rdma.json                   |  38 ++
+>   vl.c                             |  15 +-
+>   24 files changed, 2022 insertions(+), 383 deletions(-)
+>   create mode 100644 contrib/rdmacm-mux/Makefile.objs
+>   create mode 100644 contrib/rdmacm-mux/main.c
+>   create mode 100644 contrib/rdmacm-mux/rdmacm-mux.h
+>   create mode 100644 hw/net/vmxnet3_defs.h
+>   create mode 100644 qapi/rdma.json
+>
