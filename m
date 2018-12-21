@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaBDW-0000kp-4E
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 22:11:14 -0500
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gaBKd-0001mJ-0e
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 22:18:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gaBDU-0003HF-Rq
-	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 22:11:14 -0500
-Date: Fri, 21 Dec 2018 12:50:48 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181221015048.GA20009@umbus.fritz.box>
-References: <20181211223823.13770-1-clg@kaod.org>
-	<20181211223823.13770-12-clg@kaod.org>
-	<20181217060717.GI5597@umbus.fritz.box>
-	<dcfacfb6-8fec-04b0-4f2a-c20097511559@kaod.org>
-	<602c3aab-5eca-7011-966e-3a84df5ce4b3@kaod.org>
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gaBKZ-0000nh-T5
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 22:18:35 -0500
+Received: from mga09.intel.com ([134.134.136.24]:41002)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
+	id 1gaBKY-0000d5-Ki
+	for qemu-devel@nongnu.org; Thu, 20 Dec 2018 22:18:31 -0500
+Date: Fri, 21 Dec 2018 11:18:18 +0800
+From: Yi Zhang <yi.z.zhang@linux.intel.com>
+Message-ID: <20181221031817.GA77135@tiger-server>
+References: <cover.1545120100.git.yi.z.zhang@linux.intel.com>
+	<5eb87eb9a389242772375dd52bd97c17564a0829.1545120100.git.yi.z.zhang@linux.intel.com>
+	<20181218085249-mutt-send-email-mst@kernel.org>
+	<20181219091017.GA35378@tiger-server>
+	<20181219105555-mutt-send-email-mst@kernel.org>
+	<20181220030312.GA70591@tiger-server>
+	<20181219223700-mutt-send-email-mst@kernel.org>
+	<20181220053739.GB70591@tiger-server>
+	<20181220090435-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="x+6KMIRAuhnl3hBn"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <602c3aab-5eca-7011-966e-3a84df5ce4b3@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v8 11/12] spapr: introduce a new sPAPR IRQ
- backend supporting XIVE and XICS
+In-Reply-To: <20181220090435-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH V7 6/6] hostmem-file: add 'sync' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,80 +35,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: peter.maydell@linaro.org, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, imammedo@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com, crosthwaite.peter@gmail.com, richard.henderson@linaro.org, xiaoguangrong.eric@gmail.com
+
+On 2018-12-20 at 09:06:41 -0500, Michael S. Tsirkin wrote:
+> On Thu, Dec 20, 2018 at 01:37:40PM +0800, Yi Zhang wrote:
+> > On 2018-12-19 at 22:42:07 -0500, Michael S. Tsirkin wrote:
+> > > On Thu, Dec 20, 2018 at 11:03:12AM +0800, Yi Zhang wrote:
+> > > > On 2018-12-19 at 10:59:10 -0500, Michael S. Tsirkin wrote:
+> > > > > On Wed, Dec 19, 2018 at 05:10:18PM +0800, Yi Zhang wrote:
+> > > > > > > > +
+> > > > > > > > + - 'sync' option of memory-backend-file is not 'off', and
+> > > > > > > > +
+> > > > > > > > + - 'share' option of memory-backend-file is 'on'.
+> > > > > > > > +
+> > > > > > > > + - 'pmem' option of memory-backend-file is 'on'
+> > > > > > > > +
+> > > > > > > 
+> > > > > > > Wait isn't this what pmem was supposed to do?
+> > > > > > > Doesn't it mean "persistent memory"?
+> > > > > > pmem is a option for memory-backend-file, user should know the backend
+> > > > > > is in host persistent memory, with this flags on, while there is a host crash
+> > > > > > or a power failures.
+> > > > > > 
+> > > > > > [1] Qemu will take necessary operations to guarantee the persistence.
+> > > > > > https://patchwork.ozlabs.org/cover/944749/ 
+> > > > > > 
+> > > > > > [2] Host kernel also take opretions to consistent filesystem metadata.
+> > > > > > Add MAP_SYNC flags.
+> > > > > 
+> > > > > OK so I'm a user. Can you educate me please?  
+> > > > We suppose an administrator should know it, what is the back-end region coming from,
+> > > > is it persistent? what is the font-end device is? a volatile dimm or an
+> > > > nonvolatile dimm? then they can choice put the pmem=on[off] and sync=on[off].
+> > > > If he didn't, we encourage that don't set these 2 flags.
+> > > > 
+> > > > > When should MAP_SYNC not
+> > > > > be set? Are there any disadvantages (e.g.  performance?)?
+> > > > Not only the performance, sometimes like the front-end device is an
+> > > > volatile ram, we don't wanna set such option although the backend is a
+> > > > novolatile memory, if power lose, all of thing should lose in this ram.
+> > > 
+> > > 
+> > > 
+> > > I am not sure how does above answer the questions. If I don't know,
+> > > neither will the hypothetical administrator. Looks like a better
+> > > interface is needed to make the choice on behalf of the user.
+> > > 
+> > By default, we have already ignore the 2 flags, unless the administrator
+> > know how to make that use. By-now, seems we don't have a better way to detect what
+> > memory-backend-file is, a persistent memory or not.
+> 
+> In that case how about an interface where user tells QEMU "this backend
+> is in persistent memory"?
+
+Actually, [pmem=on] already did this, we can get the backend memory type from:
+
+file_memory_backend_get_pmem(),
+
+That is already being used in the memory_region_init_ram_from_file. that
+is why I reuse the RAM_PMEM to identify the region coming from a
+persitent memory? correct me if something I misunderstood? 
 
 
---x+6KMIRAuhnl3hBn
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Dec 19, 2018 at 08:15:36PM +0100, C=E9dric Le Goater wrote:
-> [ ... ]
->=20
-> >>> +static qemu_irq spapr_qirq_dual(sPAPRMachineState *spapr, int irq)
-> >>> +{
-> >>> +    return spapr_irq_current(spapr)->qirq(spapr, irq);
-> >>> +}
-> >>
-> >> This still makes me really nervous - I'd really prefer to have qirqs
-> >> independent of the backend, rather than relying on *every* irq using
-> >> device never looking up qirqs in advance.
-> >=20
-> > I will take a look. This is a large rework I won't have time to address=
-=20
-> > this year. I have removed the dual machine from v9.
-> >=20
-> > You would move the qirq array at the machine level ? =20
->=20
-> I took a look today and did a few changes :=20
->=20
->  - move the qirq array at the machine level
->  - introduced a 'set_irq' method to sPAPR IRQ
->  - adapted the 'qirq' method of sPAPR IRQ. We still need to perform some
->    checks and to handle the IRQ number offset.
->=20
-> It falls well in place, a part for the ICS source of the PnvPSI model=20
-> which does not have any qirq anymore. For PSI, I am thinking of moving=20
-> the qirq array under PnvPSI model, like I did for the machine.=20
->=20
-> Would that be ok ?
-
-That sounds reasonable.  I'd been thinking of having a qirq array at
-the machine level which dispatched to other qirq arrays at the ICS or
-XiveSource levels, but if you don't need that, that's ok too.
->=20
-> I think there are a couple more possible cleanups on the different ICS=20
-> models to do if these changes are acceptable.=20
->=20
-> C.=20
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---x+6KMIRAuhnl3hBn
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwcRvYACgkQbDjKyiDZ
-s5KuFBAA3NVPyGSV3OLDyDEZNXYBzCt/kbwGGzaAV2gCUHu1DPUOw9R3mwUYEveF
-NkYPRsCyIfEIhQfJCG+kRtpvfvmNm4826VM0ShixQnwNlHQ+5xvxEnvjRw+hBmZg
-bg/3bdK7IolyBfXflja1PWy10kVdCCn+8f6xR/BTaxCZ8Gd1QwuD/fAmBZjB5Nkx
-gHgzbNPjsSx+3DJOvB9ETJxOT+vYC1x4sseR/Et94s4ZbSpeO/LWi+mXoO+9K0qb
-+gdk+MTf5QpOkpBhN7GnNpQ1ISUQKuPTQmx4cTSEjPMdAW1aYHw4fsg2igA4abbl
-Zf2mQ4EqFm7n+laLrOEPLAyxXlCd1oGgoMEPv7Y0ur9XX+3M6cccjc2er4XjuzrM
-qGTohaPYHYkLqTuUwUuADUbZRndZptWl9f2Zqj2xA5XXR7ChXgUpUIKnC9sbDNOB
-NCZIfJ2hxUcza1GU8krRsCoAURkIynWCoNfJ37qnG4KeU00ayO5pSAiKe5iW/I+t
-B/IzWTf9nODcMoPlf5g9EQlLzfnmMv3KVs7ejZxIq+PRv1h6wx5oR3cxqbwKY8F6
-/tyDT2ymkbYWEWoX8cObskDlACeBmCWODEOwSsEDmtsmTpFfBVk9SIFHLcVXKxpY
-iVtpwlsOD5wAiSbyKn0tOjdzpRt+3TLO571Ew+FkFaS9EViTri8=
-=LcLM
------END PGP SIGNATURE-----
-
---x+6KMIRAuhnl3hBn--
+> 
+> 
+> 
+> > > 
+> > > > > 
+> > > > > -- 
+> > > > > MST
+> > > > > 
+> > > 
+> 
