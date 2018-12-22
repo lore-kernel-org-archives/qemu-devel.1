@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1galih-00045s-Jo
-	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 13:09:52 -0500
+	(envelope-from <bounces@canonical.com>) id 1gamCm-0000qP-5c
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 13:40:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1galif-00015l-MB
-	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 13:09:51 -0500
-References: <20181220163123.9233-1-mark.cave-ayland@ilande.co.uk>
-	<20181220163123.9233-9-mark.cave-ayland@ilande.co.uk>
-	<06d2cdee-30f6-2ad7-ba56-3a0ca161fb72@linaro.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <3f013e89-1f99-49b9-9db9-d39ee086aafb@ilande.co.uk>
-Date: Sat, 22 Dec 2018 18:09:21 +0000
+	(envelope-from <bounces@canonical.com>) id 1gamCi-000562-Kh
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 13:40:56 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45078)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gamCi-00054S-As
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 13:40:52 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gamCg-0001BA-Uu
+	for <qemu-devel@nongnu.org>; Sat, 22 Dec 2018 18:40:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id DB29C2E80CD
+	for <qemu-devel@nongnu.org>; Sat, 22 Dec 2018 18:40:50 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <06d2cdee-30f6-2ad7-ba56-3a0ca161fb72@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 8/9] target/ppc: move FP and VMX
- registers into aligned vsr register array
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 22 Dec 2018 18:33:30 -0000
+From: Neil Darlow <1793275@bugs.launchpad.net>
+Reply-To: Bug 1793275 <1793275@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153734706849.11874.4653304097344263662.malonedeb@gac.canonical.com>
+Message-Id: <154550361046.24863.10282987990156013652.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1793275] Re: Hosts fail to start after update to
+ QEMU 3.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,123 +37,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
 
-On 20/12/2018 17:57, Richard Henderson wrote:
+This bug is not present in QEMU-3.1.0.
 
-> On 12/20/18 8:31 AM, Mark Cave-Ayland wrote:
->> The VSX register array is a block of 64 128-bit registers where the first 32
->> registers consist of the existing 64-bit FP registers extended to 128-bit
->> using new VSR registers, and the last 32 registers are the VMX 128-bit
->> registers as show below:
->>
->>             64-bit               64-bit
->>     +--------------------+--------------------+
->>     |        FP0         |                    |  VSR0
->>     +--------------------+--------------------+
->>     |        FP1         |                    |  VSR1
->>     +--------------------+--------------------+
->>     |        ...         |        ...         |  ...
->>     +--------------------+--------------------+
->>     |        FP30        |                    |  VSR30
->>     +--------------------+--------------------+
->>     |        FP31        |                    |  VSR31
->>     +--------------------+--------------------+
->>     |                  VMX0                   |  VSR32
->>     +-----------------------------------------+
->>     |                  VMX1                   |  VSR33
->>     +-----------------------------------------+
->>     |                  ...                    |  ...
->>     +-----------------------------------------+
->>     |                  VMX30                  |  VSR62
->>     +-----------------------------------------+
->>     |                  VMX31                  |  VSR63
->>     +-----------------------------------------+
->>
->> In order to allow for future conversion of VSX instructions to use TCG vector
->> operations, recreate the same layout using an aligned version of the existing
->> vsr register array.
->>
->> Since the old fpr and avr register arrays are removed, the existing callers
->> must also be updated to use the correct offset in the vsr register array. This
->> also includes switching the relevant VMState fields over to using subarrays
->> to make sure that migration is preserved.
->>
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->> Acked-by: David Gibson <david@gibson.dropbear.id.au>
->> ---
->>  linux-user/ppc/signal.c             | 24 ++++++-------
->>  target/ppc/arch_dump.c              | 12 +++----
->>  target/ppc/cpu.h                    |  9 ++---
->>  target/ppc/gdbstub.c                |  8 ++---
->>  target/ppc/internal.h               | 18 +++-------
->>  target/ppc/machine.c                | 72 ++++++++++++++++++++++++++++++++++---
->>  target/ppc/monitor.c                |  4 +--
->>  target/ppc/translate.c              | 14 ++++----
->>  target/ppc/translate/dfp-impl.inc.c |  2 +-
->>  target/ppc/translate/vmx-impl.inc.c |  7 +++-
->>  target/ppc/translate/vsx-impl.inc.c |  4 +--
->>  target/ppc/translate_init.inc.c     | 24 ++++++-------
->>  12 files changed, 126 insertions(+), 72 deletions(-)
->>
->> diff --git a/linux-user/ppc/signal.c b/linux-user/ppc/signal.c
->> index 2ae120a2bc..a053dd5b84 100644
->> --- a/linux-user/ppc/signal.c
->> +++ b/linux-user/ppc/signal.c
->> @@ -258,8 +258,8 @@ static void save_user_regs(CPUPPCState *env, struct target_mcontext *frame)
->>      /* Save Altivec registers if necessary.  */
->>      if (env->insns_flags & PPC_ALTIVEC) {
->>          uint32_t *vrsave;
->> -        for (i = 0; i < ARRAY_SIZE(env->avr); i++) {
->> -            ppc_avr_t *avr = &env->avr[i];
->> +        for (i = 0; i < 32; i++) {
->> +            ppc_avr_t *avr = &env->vsr[32 + i];
-> 
-> Because of our subsequent discussion re endianness within these vectors, I
-> think it would be helpful add some helpers here.
-> 
-> static inline ppc_avr_t *cpu_avr_ptr(CPUPPCState *env, int i)
-> {
->     return &env->vsr[32 + i];
-> }
-> 
->>      /* Save VSX second halves */
->>      if (env->insns_flags2 & PPC2_VSX) {
->>          uint64_t *vsregs = (uint64_t *)&frame->mc_vregs.altivec[34];
->> -        for (i = 0; i < ARRAY_SIZE(env->vsr); i++) {
->> -            __put_user(env->vsr[i], &vsregs[i]);
->> +        for (i = 0; i < 32; i++) {
->> +            __put_user(env->vsr[i].u64[1], &vsregs[i]);
-> 
-> static inline uint64_t *cpu_vsrl_ptr(CPUPPCState *env, int i)
-> {
->     return &env->vsr[i].u64[1];
-> }
-> 
->>      /* Save floating point registers.  */
->>      if (env->insns_flags & PPC_FLOAT) {
->> -        for (i = 0; i < ARRAY_SIZE(env->fpr); i++) {
->> -            __put_user(env->fpr[i], &frame->mc_fregs[i]);
->> +        for (i = 0; i < 32; i++) {
->> +            __put_user(env->vsr[i].u64[0], &frame->mc_fregs[i]);
-> 
-> static inline uint64_t *cpu_fpr_ptr(CPUPPCState *env, int i)
-> {
->     return &env->vsr[i].u64[0];
-> }
-> 
-> 
-> Eventually, we will want to make these last two functions be dependent on host
-> endianness, so that we can remove getVSR and putVSR.  At which point VSR and
-> AVX registers will have the same representation.  Because at present they
-> don't, which IMO is, if not a bug, at least a severe mis-feature.
+-- =
 
-Okay I can do that. Do you want these helpers used just within
-linux-user/ppc/signal.c or also within the other files touched by this patch e.g.
-arch_dump.c, gdbstub.c etc.?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1793275
 
+Title:
+  Hosts fail to start after update to QEMU 3.0
 
-ATB,
+Status in QEMU:
+  New
 
-Mark.
+Bug description:
+  Host OS: Archlinux
+  Host Architecture: AMD64
+  Guest OS: FreeBSD-11.2 (x2) and Archlinux (x1)
+  Guest Architecture: AMD64
+
+  I have been using QEMU 2.x without issue for a number of years but
+  since updating to QEMU 3.0 my guests do not complete startup.
+
+  FreeBSD 11.2 guest failure symptom:
+  The two FreeBSD-11.2 guests output repeated messages of "unexpected cache=
+ type 4". This appears to be an internal error message and I've not found a=
+ny instances of it through Google search.
+
+  Archlinux guest failure symptom:
+  The single Archlinux guest gets no further than the message "uncompressin=
+g initial ramdisk".
+
+  The guests are started by a qemu-kvm invokation. No virtual machine
+  managers are used. The command lines used (from ps awx) to launch the
+  VMs are:
+
+  [neil@optimus ~]$ ps awx |grep qemu
+   1492 ?        Sl     3:19 /usr/bin/qemu-system-x86_64 -daemonize -pidfil=
+e /run/qemu_vps1.pid -enable-kvm -cpu host -smp 2 -k en-gb -boot order=3Dc =
+-drive file=3D/dev/system/vps1,cache=3Dnone,format=3Draw,if=3Dvirtio,index=
+=3D0,media=3Ddisk -m 1024 -name FreeBSD_1 -net nic,macaddr=3D52:54:AD:86:64=
+:00,model=3Dvirtio -net vde,sock=3D/run/vde_switch-tap0.sock -monitor telne=
+t:127.0.0.2:23,server,nowait -vnc 192.168.0.1:0
+   1510 ?        Sl     0:54 /usr/bin/qemu-system-x86_64 -daemonize -pidfil=
+e /run/qemu_vps2.pid -enable-kvm -cpu host -smp 2 -k en-gb -boot order=3Dc =
+-drive file=3D/dev/system/vps2,cache=3Dnone,format=3Draw,if=3Dvirtio,index=
+=3D0,media=3Ddisk -m 1024 -name Archlinux -net nic,macaddr=3D52:54:AD:86:64=
+:01,model=3Dvirtio -net vde,sock=3D/run/vde_switch-tap0.sock -monitor telne=
+t:127.0.0.3:23,server,nowait -vnc 192.168.0.1:1
+   1529 ?        Sl     3:07 /usr/bin/qemu-system-x86_64 -daemonize -pidfil=
+e /run/qemu_vps3.pid -enable-kvm -cpu host -smp 2 -k en-gb -boot order=3Dc =
+-drive file=3D/dev/system/vps3,cache=3Dnone,format=3Draw,if=3Dvirtio,index=
+=3D0,media=3Ddisk -m 1024 -name FreeBSD_2 -net nic,macaddr=3D52:54:AD:86:64=
+:02,model=3Dvirtio -net vde,sock=3D/run/vde_switch-tap0.sock -monitor telne=
+t:127.0.0.4:23,server,nowait -vnc 192.168.0.1:2
+
+  The VMs were installed to LVM volumes on the host machine (hence the
+  /dev/system/vpsN device names). Networking is over a Linux tap
+  interface connected to a VDE2 virtual network switch.
+
+  Currently working version of QEMU: qemu-headless 2.12.1-1
+  Failing version of QEMU: qemu-headless-3.0.0-1
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1793275/+subscriptions
