@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gaaxO-0004bS-Ed
-	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 01:40:19 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gacqc-0001tH-RH
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 03:41:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gaaxM-0000FF-Iv
-	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 01:40:18 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:33953)
+	(envelope-from <pbonzini@redhat.com>) id 1gacqZ-0004Ut-Mz
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 03:41:26 -0500
+Received: from mail-wm1-f52.google.com ([209.85.128.52]:50963)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1gaaxM-0000EU-EW
-	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 01:40:16 -0500
-Received: by mail-oi1-x242.google.com with SMTP id r62so6611688oie.1
-	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 22:40:14 -0800 (PST)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gacqZ-0004UD-Gj
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 03:41:23 -0500
+Received: by mail-wm1-f52.google.com with SMTP id n190so7302590wmd.0
+	for <qemu-devel@nongnu.org>; Sat, 22 Dec 2018 00:41:22 -0800 (PST)
+References: <1545395783-39040-1-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA9FwFg9zsg3xLhOs9C=XJHjAo+ACd1=g22YtPaax6N0YQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <42d8a1b8-6c33-8e22-b5d9-35f42f6b928e@redhat.com>
+Date: Sat, 22 Dec 2018 09:41:19 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181220111008.24954-1-alex.bennee@linaro.org>
-References: <20181220111008.24954-1-alex.bennee@linaro.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Sat, 22 Dec 2018 07:40:12 +0100
-Message-ID: <CAL1e-=iAoPLnMxstz2nDxXnHxWbV5Q+zpRFEv4vHMixZyT0LMQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] fpu: add compile time check for old
- glibc/libm and fma
+In-Reply-To: <CAFEAcA9FwFg9zsg3xLhOs9C=XJHjAo+ACd1=g22YtPaax6N0YQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL v4 00/35] Misc patches for 2018-12-21
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +30,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, "Emilio G . Cota" <cota@braap.org>, laurent.desnogues@gmail.com, Aurelien Jarno <aurelien@aurel32.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Dec 20, 2018 12:11 PM, "Alex Benn=C3=A9e" <alex.bennee@linaro.org> wrote=
-:
->
-> Some versions of glibc have been reported to have problems with
-> fused-multiply-accumulate operations. If the underlying fma
-> implementation does a two step operation it will instroduce subtle
-> rounding errors. Newer versions of the library seem to deal with this
-> better and modern hardware has fused operations which the library can
-> use.
->
-> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Cc: Emilio G. Cota <cota@braap.org>
-> ---
->  fpu/softfloat.c | 25 +++++++++++++++++++++++++
->  1 file changed, 25 insertions(+)
->
+On 21/12/18 22:09, Peter Maydell wrote:
+> I don't really understand what's going on here, or why
+> it only happens with this one system (my main x86-64
+> Linux Ubuntu 16.04.5 box) and not the various others I'm
+> running test builds on. But it does seem to be 100%
+> reliable with any of these pullreqs with the new test
+> driver in them :-(
 
-What about using gnu_get_libc_version() at runtime?
+I'm afraid something in your setup is causing make's stdout to have
+O_NONBLOCK set.  Make doesn't use O_NONBLOCK at all, so it must be
+something above it.  I also checked Perl with strace and, at least here,
+it doesn't set O_NONBLOCK.
 
-http://man7.org/linux/man-pages/man3/gnu_get_libc_version.3.html
+So here are some ideas... First, can you try applying something like
+this to reproduce?
 
-> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-> index 59eac97d10..9c2dbd04b5 100644
-> --- a/fpu/softfloat.c
-> +++ b/fpu/softfloat.c
-> @@ -203,6 +203,25 @@ GEN_INPUT_FLUSH3(float64_input_flush3, float64)
->  # define QEMU_HARDFLOAT_3F64_USE_FP 0
->  #endif
->
-> +/*
-> + * Choose whether to accelerate fused multiply-accumulate operations
-> + * with hard float functions. Some versions of glibc's maths library
-> + * have been reported to be broken on x86 without FMA instructions.
-> + */
-> +#if defined(__x86_64__)
-> +/* this was actually reported as glibc-2.12-1.149.el6_6.5.x86_64 was
-> + * broken but glibc 2.12-1.209 works but out of caution lets disable
-> + * for all older glibcs.
-> + */
-> +#if defined(__GLIBC__) && (__GLIBC__ =3D=3D 2 && __GLIBC_MINOR__ <=3D 12=
-)
-> +#define QEMU_HARDFLOAT_USE_FMA 0
-> +#else
-> +#define QEMU_HARDFLOAT_USE_FMA 1
-> +#endif
-> +#else
-> +#define QEMU_HARDFLOAT_USE_FMA 1
-> +#endif
-> +
->  /*
->   * QEMU_HARDFLOAT_USE_ISINF chooses whether to use isinf() over
->   * float{32,64}_is_infinity when !USE_FP.
-> @@ -1551,6 +1570,9 @@ float32_muladd(float32 xa, float32 xb, float32 xc,
-int flags, float_status *s)
->      ub.s =3D xb;
->      uc.s =3D xc;
->
-> +    if (!QEMU_HARDFLOAT_USE_FMA) {
-> +        goto soft;
-> +    }
->      if (unlikely(!can_use_fpu(s))) {
->          goto soft;
->      }
-> @@ -1612,6 +1634,9 @@ float64_muladd(float64 xa, float64 xb, float64 xc,
-int flags, float_status *s)
->      ub.s =3D xb;
->      uc.s =3D xc;
->
-> +    if (!QEMU_HARDFLOAT_USE_FMA) {
-> +        goto soft;
-> +    }
->      if (unlikely(!can_use_fpu(s))) {
->          goto soft;
->      }
-> --
-> 2.17.1
->
->
+--- a/Makefile
++++ b/Makefile
+@@ -17,9 +17,13 @@ print-%:
+ # All following code might depend on configuration variables
+ ifneq ($(wildcard config-host.mak),)
+ # Put the all: rule here so that config-host.mak can contain dependencies.
+-all:
++all: lotsofoutput
+ include config-host.mak
+
++.PHONY: lotsofoutput
++lotsofoutput:
++	yes 1234567890 | head -n 10000
++
+ git-submodule-update:
+
+ .PHONY: git-submodule-update
+
+
+And please try applying this, which is a bit of a shot in the dark but
+1) it is a good idea anyway; 2) it may help, if not alone, together with
+the workarounds below:
+
+diff --git a/scripts/tap-driver.pl b/scripts/tap-driver.pl
+index 5e59b5db49..6621a5cd67 100755
+--- a/scripts/tap-driver.pl
++++ b/scripts/tap-driver.pl
+@@ -313,6 +313,7 @@ sub main ()
+   my $iterator = TAP::Parser::Iterator::Stream->new(\*STDIN);
+   my $parser = TAP::Parser->new ({iterator => $iterator });
+
++  STDOUT->autoflush(1);
+   while (defined (my $cur = $parser->next))
+     {
+       # Parsing of TAP input should stop after a "Bail out!" directive.
+diff --git a/scripts/tap-merge.pl b/scripts/tap-merge.pl
+index 59e3fa5007..10ccf57bb2 100755
+--- a/scripts/tap-merge.pl
++++ b/scripts/tap-merge.pl
+@@ -53,6 +53,7 @@ sub main ()
+   my $testno = 0;     # Number of test results seen so far.
+   my $bailed_out = 0; # Whether a "Bail out!" directive has been seen.
+
++  STDOUT->autoflush(1);
+   while (defined (my $cur = $parser->next))
+     {
+       if ($cur->is_bailout)
+
+Possible workarounds include:
+
+- using "make -Oline" or "make -Onone" (for -Oline, it may require the
+above autoflush patch).
+
+- running this Python script before invoking make
+
+    import os
+    from fcntl import *
+    fcntl(1, F_SETFL, fcntl(1, F_GETFL) & ~os.O_NONBLOCK)
+
+Paolo
