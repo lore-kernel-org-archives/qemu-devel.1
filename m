@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gadwN-0006Zg-N8
-	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 04:51:28 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gadwO-0006a3-45
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 04:51:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gadwM-0006kq-Qb
-	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 04:51:27 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35006)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gadwN-0006lE-3x
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 04:51:28 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55946)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1gadwM-0006do-KE
-	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 04:51:26 -0500
-Received: by mail-wr1-x441.google.com with SMTP id 96so7530874wrb.2
-	for <qemu-devel@nongnu.org>; Sat, 22 Dec 2018 01:51:17 -0800 (PST)
+	id 1gadwM-0006ij-Tf
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 04:51:27 -0500
+Received: by mail-wm1-x343.google.com with SMTP id y139so7337109wmc.5
+	for <qemu-devel@nongnu.org>; Sat, 22 Dec 2018 01:51:24 -0800 (PST)
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Sat, 22 Dec 2018 11:50:31 +0200
-Message-Id: <20181222095036.29743-27-marcel.apfelbaum@gmail.com>
+Date: Sat, 22 Dec 2018 11:50:36 +0200
+Message-Id: <20181222095036.29743-32-marcel.apfelbaum@gmail.com>
 In-Reply-To: <20181222095036.29743-1-marcel.apfelbaum@gmail.com>
 References: <20181222095036.29743-1-marcel.apfelbaum@gmail.com>
-Subject: [Qemu-devel] [PATCH PULL 26/31] rdma: check num_sge does not exceed
- MAX_SGE
+Subject: [Qemu-devel] [PATCH PULL 31/31] pvrdma: check return value from
+ pvrdma_idx_ring_has_ routines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,48 +32,77 @@ Cc: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, pjp@fedoraproject.org
 
 From: Prasad J Pandit <pjp@fedoraproject.org>
 
-rdma back-end has scatter/gather array ibv_sge[MAX_SGE=4] set
-to have 4 elements. A guest could send a 'PvrdmaSqWqe' ring element
-with 'num_sge' set to > MAX_SGE, which may lead to OOB access issue.
-Add check to avoid it.
+pvrdma_idx_ring_has_[data/space] routines also return invalid
+index PVRDMA_INVALID_IDX[=-1], if ring has no data/space. Check
+return value from these routines to avoid plausible infinite loops.
 
-Reported-by: Saar Amar <saaramar5@gmail.com>
+Reported-by: Li Qiang <liq3ea@163.com>
 Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
 Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/rdma_backend.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ hw/rdma/vmw/pvrdma_dev_ring.c | 29 +++++++++++------------------
+ 1 file changed, 11 insertions(+), 18 deletions(-)
 
-diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-index ae1e4dcb29..bd4710d16f 100644
---- a/hw/rdma/rdma_backend.c
-+++ b/hw/rdma/rdma_backend.c
-@@ -476,9 +476,9 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+diff --git a/hw/rdma/vmw/pvrdma_dev_ring.c b/hw/rdma/vmw/pvrdma_dev_ring.c
+index 01247fc041..e8e5b502f6 100644
+--- a/hw/rdma/vmw/pvrdma_dev_ring.c
++++ b/hw/rdma/vmw/pvrdma_dev_ring.c
+@@ -73,23 +73,16 @@ out:
+ 
+ void *pvrdma_ring_next_elem_read(PvrdmaRing *ring)
+ {
++    int e;
+     unsigned int idx = 0, offset;
+ 
+-    /*
+-    pr_dbg("%s: t=%d, h=%d\n", ring->name, ring->ring_state->prod_tail,
+-           ring->ring_state->cons_head);
+-    */
+-
+-    if (!pvrdma_idx_ring_has_data(ring->ring_state, ring->max_elems, &idx)) {
++    e = pvrdma_idx_ring_has_data(ring->ring_state, ring->max_elems, &idx);
++    if (e <= 0) {
+         pr_dbg("No more data in ring\n");
+         return NULL;
      }
  
-     pr_dbg("num_sge=%d\n", num_sge);
--    if (!num_sge) {
--        pr_dbg("num_sge=0\n");
--        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NO_SGE, ctx);
-+    if (!num_sge || num_sge > MAX_SGE) {
-+        pr_dbg("invalid num_sge=%d\n", num_sge);
-+        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_INV_NUM_SGE, ctx);
-         return;
+     offset = idx * ring->elem_sz;
+-    /*
+-    pr_dbg("idx=%d\n", idx);
+-    pr_dbg("offset=%d\n", offset);
+-    */
+     return ring->pages[offset / TARGET_PAGE_SIZE] + (offset % TARGET_PAGE_SIZE);
+ }
+ 
+@@ -105,20 +98,20 @@ void pvrdma_ring_read_inc(PvrdmaRing *ring)
+ 
+ void *pvrdma_ring_next_elem_write(PvrdmaRing *ring)
+ {
+-    unsigned int idx, offset, tail;
++    int idx;
++    unsigned int offset, tail;
+ 
+-    /*
+-    pr_dbg("%s: t=%d, h=%d\n", ring->name, ring->ring_state->prod_tail,
+-           ring->ring_state->cons_head);
+-    */
+-
+-    if (!pvrdma_idx_ring_has_space(ring->ring_state, ring->max_elems, &tail)) {
++    idx = pvrdma_idx_ring_has_space(ring->ring_state, ring->max_elems, &tail);
++    if (idx <= 0) {
+         pr_dbg("CQ is full\n");
+         return NULL;
      }
  
-@@ -603,9 +603,9 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
-     }
+     idx = pvrdma_idx(&ring->ring_state->prod_tail, ring->max_elems);
+-    /* TODO: tail == idx */
++    if (idx < 0 || tail != idx) {
++        pr_dbg("invalid idx\n");
++        return NULL;
++    }
  
-     pr_dbg("num_sge=%d\n", num_sge);
--    if (!num_sge) {
--        pr_dbg("num_sge=0\n");
--        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NO_SGE, ctx);
-+    if (!num_sge || num_sge > MAX_SGE) {
-+        pr_dbg("invalid num_sge=%d\n", num_sge);
-+        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_INV_NUM_SGE, ctx);
-         return;
-     }
- 
+     offset = idx * ring->elem_sz;
+     return ring->pages[offset / TARGET_PAGE_SIZE] + (offset % TARGET_PAGE_SIZE);
 -- 
 2.17.1
