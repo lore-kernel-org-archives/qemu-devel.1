@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37108)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gaVso-0001kw-Bq
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 20:15:19 -0500
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gaaxO-0004bS-Ed
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 01:40:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gaVsQ-0000Al-VK
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 20:15:02 -0500
-Received: from mga01.intel.com ([192.55.52.88]:20824)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yu.c.zhang@linux.intel.com>)
-	id 1gaVsQ-0008J2-Gi
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 20:14:50 -0500
-Date: Sat, 22 Dec 2018 09:11:26 +0800
-From: Yu Zhang <yu.c.zhang@linux.intel.com>
-Message-ID: <20181222011126.fdse6h4pl2n7yacl@linux.intel.com>
-References: <20181218092723.yhaerzm4vlzgef65@linux.intel.com>
-	<20181218155536.2b35a037@Igors-MacBook-Pro.local>
-	<20181219025717.6m72hq73p2haexkv@linux.intel.com>
-	<20181219114037.5550a562@redhat.com>
-	<20181220211801.GR19442@habkost.net>
-	<20181221151325.39b64733@redhat.com>
-	<20181221160944.65c5skjhkel3of7y@linux.intel.com>
-	<20181221120320-mutt-send-email-mst@kernel.org>
-	<20181221173758.4ohku43as4dkb355@linux.intel.com>
-	<20181221140016-mutt-send-email-mst@kernel.org>
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gaaxM-0000FF-Iv
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 01:40:18 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:33953)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1gaaxM-0000EU-EW
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 01:40:16 -0500
+Received: by mail-oi1-x242.google.com with SMTP id r62so6611688oie.1
+	for <qemu-devel@nongnu.org>; Fri, 21 Dec 2018 22:40:14 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181221140016-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] intel-iommu: differentiate host
- address width from IOVA address width.
+In-Reply-To: <20181220111008.24954-1-alex.bennee@linaro.org>
+References: <20181220111008.24954-1-alex.bennee@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Sat, 22 Dec 2018 07:40:12 +0100
+Message-ID: <CAL1e-=iAoPLnMxstz2nDxXnHxWbV5Q+zpRFEv4vHMixZyT0LMQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] fpu: add compile time check for old
+ glibc/libm and fma
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,50 +30,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, "Emilio G . Cota" <cota@braap.org>, laurent.desnogues@gmail.com, Aurelien Jarno <aurelien@aurel32.net>
 
-On Fri, Dec 21, 2018 at 02:02:28PM -0500, Michael S. Tsirkin wrote:
-> On Sat, Dec 22, 2018 at 01:37:58AM +0800, Yu Zhang wrote:
-> > On Fri, Dec 21, 2018 at 12:04:49PM -0500, Michael S. Tsirkin wrote:
-> > > On Sat, Dec 22, 2018 at 12:09:44AM +0800, Yu Zhang wrote:
-> > > > Well, my understanding of the vt-d spec is that the address limitation in
-> > > > DMAR are referring to the same concept of CPUID.MAXPHYSADDR. I do not think
-> > > > there's any different in the native scenario. :)
-> > > 
-> > > I think native machines exist on which the two values are different.
-> > > Is that true?
-> > 
-> > I think the answer is not. My understanding is that HAW(host address wdith) is
-> > the maximum physical address width a CPU can detects(by cpuid.0x80000008).
-> > 
-> > I agree there are some addresses the CPU does not touch, but they are still in
-> > the physical address space, and there's only one physical address space...
-> > 
-> > B.R.
-> > Yu
-> 
-> Ouch I thought we are talking about the virtual address size.
-> I think I did have a box where VTD's virtual address size was
-> smaller than CPU's.
-> For physical one - we just need to make it as big as max supported
-> memory right?
+On Dec 20, 2018 12:11 PM, "Alex Benn=C3=A9e" <alex.bennee@linaro.org> wrote=
+:
+>
+> Some versions of glibc have been reported to have problems with
+> fused-multiply-accumulate operations. If the underlying fma
+> implementation does a two step operation it will instroduce subtle
+> rounding errors. Newer versions of the library seem to deal with this
+> better and modern hardware has fused operations which the library can
+> use.
+>
+> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Cc: Emilio G. Cota <cota@braap.org>
+> ---
+>  fpu/softfloat.c | 25 +++++++++++++++++++++++++
+>  1 file changed, 25 insertions(+)
+>
 
-Well, my understanding of the physical one is the maximum physical address
-width. Sorry, this explain seems nonsense... I mean, it's not just about
-the max supported memory, but also covers MMIO. It shall be detectable
-from cpuid, or ACPI's DMAR table, instead of calculated by the max memory
-size. One common usage of this value is to tell the paging structure entries(
-CPU's or IOMMU's) which bits shall be reserved. There are also some registers
-e.g. apic base reg etc, whose contents are physical addresses, therefore also
-need to follow the similar requirement for the reserved bits.
+What about using gnu_get_libc_version() at runtime?
 
-So I think the correct direction might be to define this property in the
-machine status level, instead of the CPU level. Is this reasonable to you?
+http://man7.org/linux/man-pages/man3/gnu_get_libc_version.3.html
 
-> 
-> -- 
-> MST
-
-B.R.
-Yu
+> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+> index 59eac97d10..9c2dbd04b5 100644
+> --- a/fpu/softfloat.c
+> +++ b/fpu/softfloat.c
+> @@ -203,6 +203,25 @@ GEN_INPUT_FLUSH3(float64_input_flush3, float64)
+>  # define QEMU_HARDFLOAT_3F64_USE_FP 0
+>  #endif
+>
+> +/*
+> + * Choose whether to accelerate fused multiply-accumulate operations
+> + * with hard float functions. Some versions of glibc's maths library
+> + * have been reported to be broken on x86 without FMA instructions.
+> + */
+> +#if defined(__x86_64__)
+> +/* this was actually reported as glibc-2.12-1.149.el6_6.5.x86_64 was
+> + * broken but glibc 2.12-1.209 works but out of caution lets disable
+> + * for all older glibcs.
+> + */
+> +#if defined(__GLIBC__) && (__GLIBC__ =3D=3D 2 && __GLIBC_MINOR__ <=3D 12=
+)
+> +#define QEMU_HARDFLOAT_USE_FMA 0
+> +#else
+> +#define QEMU_HARDFLOAT_USE_FMA 1
+> +#endif
+> +#else
+> +#define QEMU_HARDFLOAT_USE_FMA 1
+> +#endif
+> +
+>  /*
+>   * QEMU_HARDFLOAT_USE_ISINF chooses whether to use isinf() over
+>   * float{32,64}_is_infinity when !USE_FP.
+> @@ -1551,6 +1570,9 @@ float32_muladd(float32 xa, float32 xb, float32 xc,
+int flags, float_status *s)
+>      ub.s =3D xb;
+>      uc.s =3D xc;
+>
+> +    if (!QEMU_HARDFLOAT_USE_FMA) {
+> +        goto soft;
+> +    }
+>      if (unlikely(!can_use_fpu(s))) {
+>          goto soft;
+>      }
+> @@ -1612,6 +1634,9 @@ float64_muladd(float64 xa, float64 xb, float64 xc,
+int flags, float_status *s)
+>      ub.s =3D xb;
+>      uc.s =3D xc;
+>
+> +    if (!QEMU_HARDFLOAT_USE_FMA) {
+> +        goto soft;
+> +    }
+>      if (unlikely(!can_use_fpu(s))) {
+>          goto soft;
+>      }
+> --
+> 2.17.1
+>
+>
