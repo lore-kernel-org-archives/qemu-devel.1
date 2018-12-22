@@ -1,16 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wangjian161@huawei.com>) id 1gaeVg-0003ZP-TC
-	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 05:27:57 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gafQB-0006hH-4z
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 06:26:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wangjian161@huawei.com>) id 1gaeVg-0003Zc-1g
-	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 05:27:56 -0500
-From: w00426999 <wangjian161@huawei.com>
-Date: Sat, 22 Dec 2018 18:27:28 +0800
-Message-ID: <1545474448-24488-1-git-send-email-wangjian161@huawei.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gafQA-0004ED-HT
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 06:26:19 -0500
+Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:32975)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gafQA-0004Dy-DA
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 06:26:18 -0500
+Received: by mail-oi1-x231.google.com with SMTP id c206so6907331oib.0
+	for <qemu-devel@nongnu.org>; Sat, 22 Dec 2018 03:26:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2] qemu: avoid memory leak while remove disk
+References: <1545395783-39040-1-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA9FwFg9zsg3xLhOs9C=XJHjAo+ACd1=g22YtPaax6N0YQ@mail.gmail.com>
+	<42d8a1b8-6c33-8e22-b5d9-35f42f6b928e@redhat.com>
+In-Reply-To: <42d8a1b8-6c33-8e22-b5d9-35f42f6b928e@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 22 Dec 2018 11:26:05 +0000
+Message-ID: <CAFEAcA85Gi1u_x3fdXLtDgQpHcoik9KggidK2+AJL4xtP6U=aA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v4 00/35] Misc patches for 2018-12-21
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,106 +30,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, famz@redhat.com, stefanha@gmail.com
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, eric.fangyi@huawei.com, wangjian161@huawei.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Memset vhost_dev to zero in the vhost_dev_cleanup function.
-This causes dev.vqs to be NULL, so that
-vqs does not free up space when calling the g_free function.
-This will result in a memory leak. But you can't release vqs
-directly in the vhost_dev_cleanup function, because vhost_net
-will also call this function, and vhost_net's vqs is assigned by array.
-In order to solve this problem, we first save the pointer of vqs,
-and release the space of vqs after vhost_dev_cleanup is called.
+On Sat, 22 Dec 2018 at 08:41, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 21/12/18 22:09, Peter Maydell wrote:
+> > I don't really understand what's going on here, or why
+> > it only happens with this one system (my main x86-64
+> > Linux Ubuntu 16.04.5 box) and not the various others I'm
+> > running test builds on. But it does seem to be 100%
+> > reliable with any of these pullreqs with the new test
+> > driver in them :-(
+>
+> I'm afraid something in your setup is causing make's stdout to have
+> O_NONBLOCK set.  Make doesn't use O_NONBLOCK at all, so it must be
+> something above it.  I also checked Perl with strace and, at least here,
+> it doesn't set O_NONBLOCK.
+>
+> So here are some ideas... First, can you try applying something like
+> this to reproduce?
 
-Signed-off-by: Jian Wang <wangjian161@huawei.com>
----
- hw/block/vhost-user-blk.c | 7 +++++--
- hw/scsi/vhost-scsi.c      | 3 ++-
- hw/scsi/vhost-user-scsi.c | 3 ++-
- 3 files changed, 9 insertions(+), 4 deletions(-)
+OK, I'll give these a go, but it'll have to be in January now.
 
-diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-index 1451940..c3af28f 100644
---- a/hw/block/vhost-user-blk.c
-+++ b/hw/block/vhost-user-blk.c
-@@ -250,6 +250,7 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VHostUserBlk *s = VHOST_USER_BLK(vdev);
-     VhostUserState *user;
-+    struct vhost_virtqueue *vqs = NULL;
-     int i, ret;
- 
-     if (!s->chardev.chr) {
-@@ -288,6 +289,7 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
-     s->dev.vqs = g_new(struct vhost_virtqueue, s->dev.nvqs);
-     s->dev.vq_index = 0;
-     s->dev.backend_features = 0;
-+    vqs = s->dev.vqs;
- 
-     vhost_dev_set_config_notifier(&s->dev, &blk_ops);
- 
-@@ -314,7 +316,7 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
- vhost_err:
-     vhost_dev_cleanup(&s->dev);
- virtio_err:
--    g_free(s->dev.vqs);
-+    g_free(vqs);
-     virtio_cleanup(vdev);
- 
-     vhost_user_cleanup(user);
-@@ -326,10 +328,11 @@ static void vhost_user_blk_device_unrealize(DeviceState *dev, Error **errp)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VHostUserBlk *s = VHOST_USER_BLK(dev);
-+    struct vhost_virtqueue *vqs = s->dev.vqs;
- 
-     vhost_user_blk_set_status(vdev, 0);
-     vhost_dev_cleanup(&s->dev);
--    g_free(s->dev.vqs);
-+    g_free(vqs);
-     virtio_cleanup(vdev);
- 
-     if (s->vhost_user) {
-diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-index 7f21b4f..61e2e57 100644
---- a/hw/scsi/vhost-scsi.c
-+++ b/hw/scsi/vhost-scsi.c
-@@ -215,6 +215,7 @@ static void vhost_scsi_unrealize(DeviceState *dev, Error **errp)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VHostSCSICommon *vsc = VHOST_SCSI_COMMON(dev);
-+    struct vhost_virtqueue *vqs = vsc->dev.vqs;
- 
-     migrate_del_blocker(vsc->migration_blocker);
-     error_free(vsc->migration_blocker);
-@@ -223,7 +224,7 @@ static void vhost_scsi_unrealize(DeviceState *dev, Error **errp)
-     vhost_scsi_set_status(vdev, 0);
- 
-     vhost_dev_cleanup(&vsc->dev);
--    g_free(vsc->dev.vqs);
-+    g_free(vqs);
- 
-     virtio_scsi_common_unrealize(dev, errp);
- }
-diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
-index 2e1ba4a..6728878 100644
---- a/hw/scsi/vhost-user-scsi.c
-+++ b/hw/scsi/vhost-user-scsi.c
-@@ -121,12 +121,13 @@ static void vhost_user_scsi_unrealize(DeviceState *dev, Error **errp)
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VHostUserSCSI *s = VHOST_USER_SCSI(dev);
-     VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
-+    struct vhost_virtqueue *vqs = vsc->dev.vqs;
- 
-     /* This will stop the vhost backend. */
-     vhost_user_scsi_set_status(vdev, 0);
- 
-     vhost_dev_cleanup(&vsc->dev);
--    g_free(vsc->dev.vqs);
-+    g_free(vqs);
- 
-     virtio_scsi_common_unrealize(dev, errp);
- 
--- 
-1.8.3.1
+thanks
+-- PMM
