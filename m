@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gaj0D-0001Mz-OY
-	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 10:15:46 -0500
+	(envelope-from <yaroslav.isakov@gmail.com>) id 1gakQE-00008l-38
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 11:46:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gaj05-0003SN-Cf
-	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 10:15:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33606)
+	(envelope-from <yaroslav.isakov@gmail.com>) id 1gakQD-0006Tg-Db
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 11:46:42 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41608)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gaj05-0003Ol-6b
-	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 10:15:37 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gaj04-0006t3-21
-	for <qemu-devel@nongnu.org>; Sat, 22 Dec 2018 15:15:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0C4E22E80C7
-	for <qemu-devel@nongnu.org>; Sat, 22 Dec 2018 15:15:36 +0000 (UTC)
+	(Exim 4.71) (envelope-from <yaroslav.isakov@gmail.com>)
+	id 1gakQD-0006ST-71
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 11:46:41 -0500
+Received: by mail-wr1-x443.google.com with SMTP id x10so8105620wrs.8
+	for <qemu-devel@nongnu.org>; Sat, 22 Dec 2018 08:46:41 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <cover.1545426882.git.yaroslav.isakov@gmail.com>
+In-Reply-To: <cover.1545426882.git.yaroslav.isakov@gmail.com>
+From: Yaroslav Isakov <yaroslav.isakov@gmail.com>
+Date: Sat, 22 Dec 2018 17:46:28 +0100
+Message-ID: <CADS+iDVkG9JVONLqZZ-vHy8ek0sp+D_ctJ+mbnrTAzLfX8jPOA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 22 Dec 2018 15:08:51 -0000
-From: Daniels Umanovskis <1809546@bugs.launchpad.net>
-Reply-To: Bug 1809546 <1809546@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154549130563.19742.15114184471142076379.malonedeb@soybean.canonical.com>
-Message-Id: <154549133148.25430.6897027174241901313.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1809546] Re: Writing a byte to a pl011 SFR
- overwrites the whole SFR
+Subject: Re: [Qemu-devel] [PATCH 0/3] Allow hw/audio drivers to pass raw DB
+ values to audio/ drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,87 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 
-Adding the link script.
+Sorry for a mess, forgot to add maintainer. Gerd, please, take a look
+at these patches.
 
-** Attachment added: "linkscript.ld"
-   https://bugs.launchpad.net/qemu/+bug/1809546/+attachment/5224337/+files/=
-linkscript.ld
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1809546
-
-Title:
-  Writing a byte to a pl011 SFR overwrites the whole SFR
-
-Status in QEMU:
-  New
-
-Bug description:
-  The bug is present in QEMU 2.8.1 and, if my analysis is correct, also
-  on master.
-
-  I first noticed that a PL011 UART driver, which is fine on real
-  hardware, fails to enable the RX interrupt in the IMSC register when
-  running in QEMU. However, the problem only comes up if the code is
-  compiled without optimizations. I think I've narrowed it down to a
-  minimal example that will exhibit the problem if run as a bare-metal
-  application.
-
-  Given:
-
-  pl011_addr: .word 0x10009000
-
-  The following snippet will be problematic:
-
-       ldr r3, pl011_addr
-       ldrb r2, [r3, #0x38]        // IMSC
-       mov r2, #0
-       orr r2, r2, #0x10           // R2 =3D=3D 0x10
-       strb r2, [r3, #0x38]        // Whole word reads correctly after this
-       ldrb r2, [r3, #0x39]
-       mov r2, #0
-       strb r2, [r3, #0x39]        // Problem here! Overwrites offset 0x38 =
-as well
-
-  After the first strb instruction, which writes to 0x10009038,
-  everything is fine. It can be seen in the QEMU monitor:
-
-  (qemu) xp 0x10009038
-  0000000010009038: 0x00000010
-
-  After the second strb instruction, the write to 0x10009039 clears the
-  entire word:
-
-  (qemu) xp 0x10009038
-  0000000010009038: 0x00000000
-
-  QEMU command-line, using the vexpress-a9 which has the PL011 at
-  0x10009000:
-
-  qemu-system-arm -S -M vexpress-a9 -m 32M -no-reboot -nographic
-  -monitor telnet:127.0.0.1:1234,server,nowait -kernel pl011-sfr.bin
-  -gdb tcp::2159 -serial mon:stdio
-
-  Compiling the original C code with optimizations makes the driver
-  work. It compiles down to assembly that only does a single write:
-
-      ldr r3, pl011_addr
-      mov r2, #0x10
-      str r2, [r3, #0x38]
-
-  Attached is the an assembly file, and linkscript, that shows the
-  problem, and also includes the working code.
-
-  I haven't debugged inside of QEMU itself but it seems to me that the
-  problem is in pl011_write in pl011.c - the functions looks at which
-  offset is being written, and then writes the entire SFR that offset
-  falls under, which means that changing a single byte will change the
-  whole SFR.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1809546/+subscriptions
+=D0=BF=D1=82, 21 =D0=B4=D0=B5=D0=BA. 2018 =D0=B3. =D0=B2 22:40, Yaroslav Is=
+akov <yaroslav.isakov@gmail.com>:
+>
+> This patch series introduces the ability for virtual audio drivers to pas=
+s
+> information about guest-chosen DB values to backend audio drivers.
+>
+> For now, supported virtual driver is hda-codec, and backend is pulseaudio=
+, as
+> they both support DB values.
+>
+> Without these patches, emulated Windows has a very short range of hearabl=
+e
+> sound, as range in the guest is much smaller than in Pulseaudio.
+>
+> Yaroslav Isakov (3):
+>   Allow audio driver to pass DB value to underlying drivers
+>   Pass raw DB values from hda-codec.c to audio driver
+>   If raw DB values are known, use them in paaudio
+>
+>  audio/audio.c               | 15 +++++++++++++--
+>  audio/audio.h               |  6 ++++--
+>  audio/mixeng.h              |  6 ++++--
+>  audio/paaudio.c             |  9 +++++++--
+>  hw/audio/ac97.c             |  4 ++--
+>  hw/audio/hda-codec-common.h |  2 +-
+>  hw/audio/hda-codec.c        | 12 ++++++++++--
+>  hw/audio/lm4549.c           |  2 +-
+>  hw/audio/wm8750.c           | 18 ++++++++++++------
+>  hw/display/xlnx_dp.c        |  3 ++-
+>  hw/usb/dev-audio.c          |  6 ++++--
+>  11 files changed, 60 insertions(+), 23 deletions(-)
+>
+> --
+> 2.18.1
+>
