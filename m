@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gadw9-0006Rj-2o
-	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 04:51:17 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gadw6-0006PQ-QX
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 04:51:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gadw8-0006Z5-05
-	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 04:51:13 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54152)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gadw6-0006Xb-1a
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 04:51:10 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36111)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1gadw7-0006Xx-97
-	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 04:51:11 -0500
-Received: by mail-wm1-x341.google.com with SMTP id d15so7372055wmb.3
-	for <qemu-devel@nongnu.org>; Sat, 22 Dec 2018 01:51:11 -0800 (PST)
+	id 1gadw5-0006X9-RX
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 04:51:09 -0500
+Received: by mail-wm1-x342.google.com with SMTP id p6so7871999wmc.1
+	for <qemu-devel@nongnu.org>; Sat, 22 Dec 2018 01:51:09 -0800 (PST)
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Sat, 22 Dec 2018 11:50:26 +0200
-Message-Id: <20181222095036.29743-22-marcel.apfelbaum@gmail.com>
+Date: Sat, 22 Dec 2018 11:50:25 +0200
+Message-Id: <20181222095036.29743-21-marcel.apfelbaum@gmail.com>
 In-Reply-To: <20181222095036.29743-1-marcel.apfelbaum@gmail.com>
 References: <20181222095036.29743-1-marcel.apfelbaum@gmail.com>
-Subject: [Qemu-devel] [PATCH PULL 21/31] hw/pvrdma: Clean device's resource
- when system is shutdown
+Subject: [Qemu-devel]  [PATCH PULL 20/31] vl: Introduce shutdown_notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,83 +31,76 @@ Cc: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, pjp@fedoraproject.org
 
 From: Yuval Shaia <yuval.shaia@oracle.com>
 
-In order to clean some external resources such as GIDs, QPs etc,
-register to receive notification when VM is shutdown.
+Notifier will be used for signaling shutdown event to inform system is
+shutdown. This will allow devices and other component to run some
+cleanup code needed before VM is shutdown.
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/vmw/pvrdma.h      |  2 ++
- hw/rdma/vmw/pvrdma_main.c | 15 +++++++++++++++
- 2 files changed, 17 insertions(+)
+ include/sysemu/sysemu.h |  1 +
+ vl.c                    | 15 ++++++++++++++-
+ 2 files changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
-index 10a3c4fb7c..ffae36986e 100644
---- a/hw/rdma/vmw/pvrdma.h
-+++ b/hw/rdma/vmw/pvrdma.h
-@@ -17,6 +17,7 @@
- #define PVRDMA_PVRDMA_H
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index c8efdeb376..e0d15da937 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -62,6 +62,7 @@ void qemu_register_wakeup_support(void);
+ void qemu_system_shutdown_request(ShutdownCause reason);
+ void qemu_system_powerdown_request(void);
+ void qemu_register_powerdown_notifier(Notifier *notifier);
++void qemu_register_shutdown_notifier(Notifier *notifier);
+ void qemu_system_debug_request(void);
+ void qemu_system_vmstop_request(RunState reason);
+ void qemu_system_vmstop_request_prepare(void);
+diff --git a/vl.c b/vl.c
+index 46ebf813b3..8353d3c718 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1577,6 +1577,8 @@ static NotifierList suspend_notifiers =
+     NOTIFIER_LIST_INITIALIZER(suspend_notifiers);
+ static NotifierList wakeup_notifiers =
+     NOTIFIER_LIST_INITIALIZER(wakeup_notifiers);
++static NotifierList shutdown_notifiers =
++    NOTIFIER_LIST_INITIALIZER(shutdown_notifiers);
+ static uint32_t wakeup_reason_mask = ~(1 << QEMU_WAKEUP_REASON_NONE);
  
- #include "qemu/units.h"
-+#include "qemu/notify.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/msix.h"
- #include "chardev/char-fe.h"
-@@ -87,6 +88,7 @@ typedef struct PVRDMADev {
-     RdmaDeviceResources rdma_dev_res;
-     CharBackend mad_chr;
-     VMXNET3State *func0;
-+    Notifier shutdown_notifier;
- } PVRDMADev;
- #define PVRDMA_DEV(dev) OBJECT_CHECK(PVRDMADev, (dev), PVRDMA_HW_NAME)
- 
-diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-index 150404dfa6..23dc9926e3 100644
---- a/hw/rdma/vmw/pvrdma_main.c
-+++ b/hw/rdma/vmw/pvrdma_main.c
-@@ -24,6 +24,7 @@
- #include "hw/qdev-properties.h"
- #include "cpu.h"
- #include "trace.h"
-+#include "sysemu/sysemu.h"
- 
- #include "../rdma_rm.h"
- #include "../rdma_backend.h"
-@@ -334,6 +335,9 @@ static void pvrdma_fini(PCIDevice *pdev)
-     if (msix_enabled(pdev)) {
-         uninit_msix(pdev, RDMA_MAX_INTRS);
-     }
-+
-+    pr_dbg("Device %s %x.%x is down\n", pdev->name, PCI_SLOT(pdev->devfn),
-+           PCI_FUNC(pdev->devfn));
+ ShutdownCause qemu_shutdown_requested_get(void)
+@@ -1828,6 +1830,12 @@ static void qemu_system_powerdown(void)
+     notifier_list_notify(&powerdown_notifiers, NULL);
  }
  
- static void pvrdma_stop(PVRDMADev *dev)
-@@ -559,6 +563,14 @@ static int pvrdma_check_ram_shared(Object *obj, void *opaque)
-     return 0;
- }
- 
-+static void pvrdma_shutdown_notifier(Notifier *n, void *opaque)
++static void qemu_system_shutdown(ShutdownCause cause)
 +{
-+    PVRDMADev *dev = container_of(n, PVRDMADev, shutdown_notifier);
-+    PCIDevice *pci_dev = PCI_DEVICE(dev);
-+
-+    pvrdma_fini(pci_dev);
++    qapi_event_send_shutdown(shutdown_caused_by_guest(cause), cause);
++    notifier_list_notify(&shutdown_notifiers, &cause);
 +}
 +
- static void pvrdma_realize(PCIDevice *pdev, Error **errp)
+ void qemu_system_powerdown_request(void)
  {
-     int rc;
-@@ -632,6 +644,9 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
-         goto out;
-     }
+     trace_qemu_system_powerdown_request();
+@@ -1840,6 +1848,11 @@ void qemu_register_powerdown_notifier(Notifier *notifier)
+     notifier_list_add(&powerdown_notifiers, notifier);
+ }
  
-+    dev->shutdown_notifier.notify = pvrdma_shutdown_notifier;
-+    qemu_register_shutdown_notifier(&dev->shutdown_notifier);
++void qemu_register_shutdown_notifier(Notifier *notifier)
++{
++    notifier_list_add(&shutdown_notifiers, notifier);
++}
 +
- out:
-     if (rc) {
-         error_append_hint(errp, "Device fail to load\n");
+ void qemu_system_debug_request(void)
+ {
+     debug_requested = 1;
+@@ -1867,7 +1880,7 @@ static bool main_loop_should_exit(void)
+     request = qemu_shutdown_requested();
+     if (request) {
+         qemu_kill_report();
+-        qapi_event_send_shutdown(shutdown_caused_by_guest(request), request);
++        qemu_system_shutdown(request);
+         if (no_shutdown) {
+             vm_stop(RUN_STATE_SHUTDOWN);
+         } else {
 -- 
 2.17.1
