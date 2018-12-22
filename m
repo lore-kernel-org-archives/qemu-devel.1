@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1gaVev-0005w8-FV
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 20:00:56 -0500
+	(envelope-from <robert.hu@linux.intel.com>) id 1gaVi8-0006k6-2Q
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 20:04:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1gaVel-0003Ud-BC
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 20:00:48 -0500
-Received: from mga05.intel.com ([192.55.52.43]:45757)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
-	id 1gaVeZ-0007Pl-OS
-	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 20:00:34 -0500
-Message-ID: <1545440328.44118.8.camel@linux.intel.com>
+	(envelope-from <robert.hu@linux.intel.com>) id 1gaVhq-0000nA-3R
+	for qemu-devel@nongnu.org; Fri, 21 Dec 2018 20:04:00 -0500
+Message-ID: <1545440514.44118.11.camel@linux.intel.com>
 From: Robert Hoo <robert.hu@linux.intel.com>
-Date: Sat, 22 Dec 2018 08:58:48 +0800
-In-Reply-To: <bd0addb6-9d5f-b4dc-8cd9-f2d096ccd16c@redhat.com>
-References: <1545227081-213696-1-git-send-email-robert.hu@linux.intel.com>
-	<1545227081-213696-2-git-send-email-robert.hu@linux.intel.com>
-	<20181219140136.GJ20465@redhat.com>
-	<1545265096.44118.3.camel@linux.intel.com>
-	<e1b012da-7aac-1063-35ae-0ab3c4c5eb4b@redhat.com>
-	<1545310252.44118.5.camel@linux.intel.com>
-	<5ee7dd18-e70c-e654-25ee-e700a8174ee9@redhat.com>
-	<1545401072.44118.7.camel@linux.intel.com>
-	<bd0addb6-9d5f-b4dc-8cd9-f2d096ccd16c@redhat.com>
+Date: Sat, 22 Dec 2018 09:01:54 +0800
+In-Reply-To: <faa89439-18ae-931b-54c7-212b7dea0e48@redhat.com>
+References: <20181221063002.7570-1-pbonzini@redhat.com>
+	<cb7a9fc9-cded-7ca5-dbb9-8ffde9670fa7@redhat.com>
+	<faa89439-18ae-931b-54c7-212b7dea0e48@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] i386: remove the new CPUID 'PCONFIG'
- from Icelake-Server CPU model
+Subject: Re: [Qemu-devel] [PATCH] i386: remove the 'INTEL_PT' CPUID bit from
+ named CPU models
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,34 +25,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>, kai.huang@intel.com, luwei.kang@intel.com
-Cc: robert.hu@intel.com, robert.hu@linux.intel.com, thomas.lendacky@amd.com, ehabkost@redhat.com, qemu-devel@nongnu.org, rth@twiddle.net
+To: Paolo Bonzini <pbonzini@redhat.com>, Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, qemu-devel@nongnu.org, luwei.kang@intel.com
+Cc: robert.hu@intel.com, robert.hu@linux.intel.com, qemu-stable@nongnu.org
 
-On Fri, 2018-12-21 at 16:03 +0100, Paolo Bonzini wrote:
-> On 21/12/18 15:04, Robert Hoo wrote:
-> > > So this series is correct and I will follow up with one for
-> > > INTEL_PT;
-> > > however, this begs the question of how the patches are being
-> > > tested.
+On Fri, 2018-12-21 at 16:27 +0100, Paolo Bonzini wrote:
+> On 21/12/18 16:22, Philippe Mathieu-Daudé wrote:
+> > Hi Paolo,
 > > 
-> > My apologies for carelessness.
-> 
-> No problem.  In the future please check that "-cpu Icelake-Client"
-> doesn't have warnings such as
-> 
-> qemu-system-x86_64: warning: host doesn't support requested feature:
-> CPUID.07H:EBX.intel-pt [bit 25]
-> 
-> when run on an Icelake-Client host.
+> > On 12/21/18 7:30 AM, Paolo Bonzini wrote:
+> > > From: Robert Hoo <robert.hu@linux.intel.com>
+> > > 
+> > > Processor tracing is not yet implemented for KVM and it will be
+> > > an
+> > > opt in feature requiring a special module parameter.
+> > > Disable it, because it is wrong to enable it by default and
+> > > it is impossible that no one has ever used it.
+> > > 
+> > > Cc: qemu-stable@nongnu.org
+> > 
+> > Does this patch misses Robert S-o-b?
+> > Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
 
-Sure. I'm going to ask our validation team to add these in test
-criteria.
+Paolo's right. It didn't come from me.
 > 
-> > I've seen you patch for INTEL_PT. So am I going to resend these 2
-> > patches and Cc qemu-stable? or simply reply these 2 patches adding
-> > qemu-stable in Cc list?
-> 
-> I can take care of that, thanks.
+> No, the author is wrong, it should be me.  "git commit -c" apparently
+> copies the author from the original commit.
 > 
 > Paolo
+
+Hi Paolo, would you hold on INTEL_PT removal for a moment? I think I
+need Luwei's double confirm.
+(Added him in receiver list.)
+> 
+> > > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > > ---
+> > >  target/i386/cpu.c | 8 +++-----
+> > >  1 file changed, 3 insertions(+), 5 deletions(-)
+> > > 
+> > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > > index dae46f0319..9c54c41e7a 100644
+> > > --- a/target/i386/cpu.c
+> > > +++ b/target/i386/cpu.c
+> > > @@ -2493,8 +2493,7 @@ static X86CPUDefinition builtin_x86_defs[]
+> > > = {
+> > >              CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLWB |
+> > >              CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
+> > >              CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
+> > > -            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT |
+> > > -            CPUID_7_0_EBX_INTEL_PT,
+> > > +            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
+> > >          .features[FEAT_7_0_ECX] =
+> > >              CPUID_7_0_ECX_PKU | CPUID_7_0_ECX_OSPKE |
+> > >              CPUID_7_0_ECX_AVX512VNNI,
+> > > @@ -2546,7 +2545,7 @@ static X86CPUDefinition builtin_x86_defs[]
+> > > = {
+> > >              CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 |
+> > > CPUID_7_0_EBX_SMEP |
+> > >              CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS |
+> > > CPUID_7_0_EBX_INVPCID |
+> > >              CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED |
+> > > CPUID_7_0_EBX_ADX |
+> > > -            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_INTEL_PT,
+> > > +            CPUID_7_0_EBX_SMAP,
+> > >          .features[FEAT_7_0_ECX] =
+> > >              CPUID_7_0_ECX_VBMI | CPUID_7_0_ECX_UMIP |
+> > > CPUID_7_0_ECX_PKU |
+> > >              CPUID_7_0_ECX_OSPKE | CPUID_7_0_ECX_VBMI2 |
+> > > CPUID_7_0_ECX_GFNI |
+> > > @@ -2604,8 +2603,7 @@ static X86CPUDefinition builtin_x86_defs[]
+> > > = {
+> > >              CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLWB |
+> > >              CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
+> > >              CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
+> > > -            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT |
+> > > -            CPUID_7_0_EBX_INTEL_PT,
+> > > +            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
+> > >          .features[FEAT_7_0_ECX] =
+> > >              CPUID_7_0_ECX_VBMI | CPUID_7_0_ECX_UMIP |
+> > > CPUID_7_0_ECX_PKU |
+> > >              CPUID_7_0_ECX_OSPKE | CPUID_7_0_ECX_VBMI2 |
+> > > CPUID_7_0_ECX_GFNI |
+> > > 
+> 
 > 
