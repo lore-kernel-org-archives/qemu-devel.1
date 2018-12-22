@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gadw5-0006OA-Ml
-	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 04:51:10 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gadw9-0006Rj-2o
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 04:51:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gadw4-0006Wt-N4
-	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 04:51:09 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44479)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gadw8-0006Z5-05
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 04:51:13 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54152)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1gadw4-0006WJ-HG
-	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 04:51:08 -0500
-Received: by mail-wr1-x441.google.com with SMTP id z5so7497292wrt.11
-	for <qemu-devel@nongnu.org>; Sat, 22 Dec 2018 01:51:08 -0800 (PST)
+	id 1gadw7-0006Xx-97
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 04:51:11 -0500
+Received: by mail-wm1-x341.google.com with SMTP id d15so7372055wmb.3
+	for <qemu-devel@nongnu.org>; Sat, 22 Dec 2018 01:51:11 -0800 (PST)
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Sat, 22 Dec 2018 11:50:24 +0200
-Message-Id: <20181222095036.29743-20-marcel.apfelbaum@gmail.com>
+Date: Sat, 22 Dec 2018 11:50:26 +0200
+Message-Id: <20181222095036.29743-22-marcel.apfelbaum@gmail.com>
 In-Reply-To: <20181222095036.29743-1-marcel.apfelbaum@gmail.com>
 References: <20181222095036.29743-1-marcel.apfelbaum@gmail.com>
-Subject: [Qemu-devel] [PATCH PULL 19/31] hw/rdma: Remove unneeded code that
- handles more that one port
+Subject: [Qemu-devel] [PATCH PULL 21/31] hw/pvrdma: Clean device's resource
+ when system is shutdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,137 +32,83 @@ Cc: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, pjp@fedoraproject.org
 
 From: Yuval Shaia <yuval.shaia@oracle.com>
 
-Device supports only one port, let's remove a dead code that handles
-more than one port.
+In order to clean some external resources such as GIDs, QPs etc,
+register to receive notification when VM is shutdown.
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/rdma_rm.c      | 34 ++++++++++++++++------------------
- hw/rdma/rdma_rm.h      |  2 +-
- hw/rdma/rdma_rm_defs.h |  4 ++--
- 3 files changed, 19 insertions(+), 21 deletions(-)
+ hw/rdma/vmw/pvrdma.h      |  2 ++
+ hw/rdma/vmw/pvrdma_main.c | 15 +++++++++++++++
+ 2 files changed, 17 insertions(+)
 
-diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-index 250254561c..b7d4ebe972 100644
---- a/hw/rdma/rdma_rm.c
-+++ b/hw/rdma/rdma_rm.c
-@@ -545,7 +545,7 @@ int rdma_rm_add_gid(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
-         return -EINVAL;
+diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
+index 10a3c4fb7c..ffae36986e 100644
+--- a/hw/rdma/vmw/pvrdma.h
++++ b/hw/rdma/vmw/pvrdma.h
+@@ -17,6 +17,7 @@
+ #define PVRDMA_PVRDMA_H
+ 
+ #include "qemu/units.h"
++#include "qemu/notify.h"
+ #include "hw/pci/pci.h"
+ #include "hw/pci/msix.h"
+ #include "chardev/char-fe.h"
+@@ -87,6 +88,7 @@ typedef struct PVRDMADev {
+     RdmaDeviceResources rdma_dev_res;
+     CharBackend mad_chr;
+     VMXNET3State *func0;
++    Notifier shutdown_notifier;
+ } PVRDMADev;
+ #define PVRDMA_DEV(dev) OBJECT_CHECK(PVRDMADev, (dev), PVRDMA_HW_NAME)
+ 
+diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+index 150404dfa6..23dc9926e3 100644
+--- a/hw/rdma/vmw/pvrdma_main.c
++++ b/hw/rdma/vmw/pvrdma_main.c
+@@ -24,6 +24,7 @@
+ #include "hw/qdev-properties.h"
+ #include "cpu.h"
+ #include "trace.h"
++#include "sysemu/sysemu.h"
+ 
+ #include "../rdma_rm.h"
+ #include "../rdma_backend.h"
+@@ -334,6 +335,9 @@ static void pvrdma_fini(PCIDevice *pdev)
+     if (msix_enabled(pdev)) {
+         uninit_msix(pdev, RDMA_MAX_INTRS);
      }
++
++    pr_dbg("Device %s %x.%x is down\n", pdev->name, PCI_SLOT(pdev->devfn),
++           PCI_FUNC(pdev->devfn));
+ }
  
--    memcpy(&dev_res->ports[0].gid_tbl[gid_idx].gid, gid, sizeof(*gid));
-+    memcpy(&dev_res->port.gid_tbl[gid_idx].gid, gid, sizeof(*gid));
- 
+ static void pvrdma_stop(PVRDMADev *dev)
+@@ -559,6 +563,14 @@ static int pvrdma_check_ram_shared(Object *obj, void *opaque)
      return 0;
  }
-@@ -556,15 +556,15 @@ int rdma_rm_del_gid(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
+ 
++static void pvrdma_shutdown_notifier(Notifier *n, void *opaque)
++{
++    PVRDMADev *dev = container_of(n, PVRDMADev, shutdown_notifier);
++    PCIDevice *pci_dev = PCI_DEVICE(dev);
++
++    pvrdma_fini(pci_dev);
++}
++
+ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
+ {
      int rc;
+@@ -632,6 +644,9 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
+         goto out;
+     }
  
-     rc = rdma_backend_del_gid(backend_dev, ifname,
--                              &dev_res->ports[0].gid_tbl[gid_idx].gid);
-+                              &dev_res->port.gid_tbl[gid_idx].gid);
++    dev->shutdown_notifier.notify = pvrdma_shutdown_notifier;
++    qemu_register_shutdown_notifier(&dev->shutdown_notifier);
++
+ out:
      if (rc) {
-         pr_dbg("Fail to delete gid\n");
-         return -EINVAL;
-     }
- 
--    memset(dev_res->ports[0].gid_tbl[gid_idx].gid.raw, 0,
--           sizeof(dev_res->ports[0].gid_tbl[gid_idx].gid));
--    dev_res->ports[0].gid_tbl[gid_idx].backend_gid_index = -1;
-+    memset(dev_res->port.gid_tbl[gid_idx].gid.raw, 0,
-+           sizeof(dev_res->port.gid_tbl[gid_idx].gid));
-+    dev_res->port.gid_tbl[gid_idx].backend_gid_index = -1;
- 
-     return 0;
- }
-@@ -577,16 +577,16 @@ int rdma_rm_get_backend_gid_index(RdmaDeviceResources *dev_res,
-         return -EINVAL;
-     }
- 
--    if (unlikely(dev_res->ports[0].gid_tbl[sgid_idx].backend_gid_index == -1)) {
--        dev_res->ports[0].gid_tbl[sgid_idx].backend_gid_index =
-+    if (unlikely(dev_res->port.gid_tbl[sgid_idx].backend_gid_index == -1)) {
-+        dev_res->port.gid_tbl[sgid_idx].backend_gid_index =
-         rdma_backend_get_gid_index(backend_dev,
--                                   &dev_res->ports[0].gid_tbl[sgid_idx].gid);
-+                                   &dev_res->port.gid_tbl[sgid_idx].gid);
-     }
- 
-     pr_dbg("backend_gid_index=%d\n",
--           dev_res->ports[0].gid_tbl[sgid_idx].backend_gid_index);
-+           dev_res->port.gid_tbl[sgid_idx].backend_gid_index);
- 
--    return dev_res->ports[0].gid_tbl[sgid_idx].backend_gid_index;
-+    return dev_res->port.gid_tbl[sgid_idx].backend_gid_index;
- }
- 
- static void destroy_qp_hash_key(gpointer data)
-@@ -596,15 +596,13 @@ static void destroy_qp_hash_key(gpointer data)
- 
- static void init_ports(RdmaDeviceResources *dev_res)
- {
--    int i, j;
-+    int i;
- 
--    memset(dev_res->ports, 0, sizeof(dev_res->ports));
-+    memset(&dev_res->port, 0, sizeof(dev_res->port));
- 
--    for (i = 0; i < MAX_PORTS; i++) {
--        dev_res->ports[i].state = IBV_PORT_DOWN;
--        for (j = 0; j < MAX_PORT_GIDS; j++) {
--            dev_res->ports[i].gid_tbl[j].backend_gid_index = -1;
--        }
-+    dev_res->port.state = IBV_PORT_DOWN;
-+    for (i = 0; i < MAX_PORT_GIDS; i++) {
-+        dev_res->port.gid_tbl[i].backend_gid_index = -1;
-     }
- }
- 
-@@ -613,7 +611,7 @@ static void fini_ports(RdmaDeviceResources *dev_res,
- {
-     int i;
- 
--    dev_res->ports[0].state = IBV_PORT_DOWN;
-+    dev_res->port.state = IBV_PORT_DOWN;
-     for (i = 0; i < MAX_PORT_GIDS; i++) {
-         rdma_rm_del_gid(dev_res, backend_dev, ifname, i);
-     }
-diff --git a/hw/rdma/rdma_rm.h b/hw/rdma/rdma_rm.h
-index a7169b4e89..3c602c04c0 100644
---- a/hw/rdma/rdma_rm.h
-+++ b/hw/rdma/rdma_rm.h
-@@ -79,7 +79,7 @@ int rdma_rm_get_backend_gid_index(RdmaDeviceResources *dev_res,
- static inline union ibv_gid *rdma_rm_get_gid(RdmaDeviceResources *dev_res,
-                                              int sgid_idx)
- {
--    return &dev_res->ports[0].gid_tbl[sgid_idx].gid;
-+    return &dev_res->port.gid_tbl[sgid_idx].gid;
- }
- 
- #endif
-diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
-index 7b3435f991..0ba61d1838 100644
---- a/hw/rdma/rdma_rm_defs.h
-+++ b/hw/rdma/rdma_rm_defs.h
-@@ -18,7 +18,7 @@
- 
- #include "rdma_backend_defs.h"
- 
--#define MAX_PORTS             1
-+#define MAX_PORTS             1 /* Do not change - we support only one port */
- #define MAX_PORT_GIDS         255
- #define MAX_GIDS              MAX_PORT_GIDS
- #define MAX_PORT_PKEYS        1
-@@ -97,7 +97,7 @@ typedef struct RdmaRmPort {
- } RdmaRmPort;
- 
- typedef struct RdmaDeviceResources {
--    RdmaRmPort ports[MAX_PORTS];
-+    RdmaRmPort port;
-     RdmaRmResTbl pd_tbl;
-     RdmaRmResTbl mr_tbl;
-     RdmaRmResTbl uc_tbl;
+         error_append_hint(errp, "Device fail to load\n");
 -- 
 2.17.1
