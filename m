@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gaiwD-0008Bc-Co
-	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 10:11:38 -0500
+	(envelope-from <bounces@canonical.com>) id 1gaj09-0001LW-8Z
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 10:15:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gaiwC-00006V-No
-	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 10:11:37 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20181217224348.14922-2-mreitz@redhat.com>
-References: <20181217224348.14922-1-mreitz@redhat.com>
-	<20181217224348.14922-2-mreitz@redhat.com>
-Date: Sat, 22 Dec 2018 16:10:48 +0100
-Message-ID: <w51a7kxfvgn.fsf@maestria.local.igalia.com>
+	(envelope-from <bounces@canonical.com>) id 1gaj05-0003Rm-7C
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 10:15:41 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33588)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gaj05-0003Nh-0g
+	for qemu-devel@nongnu.org; Sat, 22 Dec 2018 10:15:37 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gaj03-0006rq-DI
+	for <qemu-devel@nongnu.org>; Sat, 22 Dec 2018 15:15:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 613792E805B
+	for <qemu-devel@nongnu.org>; Sat, 22 Dec 2018 15:15:35 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v12 01/31] block: Use
- bdrv_refresh_filename() to pull
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 22 Dec 2018 15:08:25 -0000
+From: Daniels Umanovskis <1809546@bugs.launchpad.net>
+Reply-To: Bug 1809546 <1809546@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154549130563.19742.15114184471142076379.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1809546] [NEW] Writing a byte to a pl011 SFR
+ overwrites the whole SFR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,24 +36,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Mon 17 Dec 2018 11:43:18 PM CET, Max Reitz <mreitz@redhat.com> wrote:
-> @@ -3327,6 +3333,7 @@ static int img_rebase(int argc, char **argv)
->                  qdict_put_bool(options, BDRV_OPT_FORCE_SHARE, true);
->              }
->  
-> +            bdrv_refresh_filename(bs);
->              overlay_filename = bs->exact_filename[0] ? bs->exact_filename
->                                                       : bs->filename;
->              out_real_path = g_malloc(PATH_MAX);
-> -- 
-> 2.19.2
+Public bug reported:
 
-I also doubt that these new hunks are necessary, but it doesn't hurt to
-be consistent :)
+The bug is present in QEMU 2.8.1 and, if my analysis is correct, also on
+master.
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+I first noticed that a PL011 UART driver, which is fine on real
+hardware, fails to enable the RX interrupt in the IMSC register when
+running in QEMU. However, the problem only comes up if the code is
+compiled without optimizations. I think I've narrowed it down to a
+minimal example that will exhibit the problem if run as a bare-metal
+application.
 
-Berto
+Given:
+
+pl011_addr: .word 0x10009000
+
+The following snippet will be problematic:
+
+     ldr r3, pl011_addr
+     ldrb r2, [r3, #0x38]        // IMSC
+     mov r2, #0
+     orr r2, r2, #0x10           // R2 =3D=3D 0x10
+     strb r2, [r3, #0x38]        // Whole word reads correctly after this
+     ldrb r2, [r3, #0x39]
+     mov r2, #0
+     strb r2, [r3, #0x39]        // Problem here! Overwrites offset 0x38 as=
+ well
+
+After the first strb instruction, which writes to 0x10009038, everything
+is fine. It can be seen in the QEMU monitor:
+
+(qemu) xp 0x10009038
+0000000010009038: 0x00000010
+
+After the second strb instruction, the write to 0x10009039 clears the
+entire word:
+
+(qemu) xp 0x10009038
+0000000010009038: 0x00000000
+
+QEMU command-line, using the vexpress-a9 which has the PL011 at
+0x10009000:
+
+qemu-system-arm -S -M vexpress-a9 -m 32M -no-reboot -nographic -monitor
+telnet:127.0.0.1:1234,server,nowait -kernel pl011-sfr.bin -gdb tcp::2159
+-serial mon:stdio
+
+Compiling the original C code with optimizations makes the driver work.
+It compiles down to assembly that only does a single write:
+
+    ldr r3, pl011_addr
+    mov r2, #0x10
+    str r2, [r3, #0x38]
+
+Attached is the an assembly file, and linkscript, that shows the
+problem, and also includes the working code.
+
+I haven't debugged inside of QEMU itself but it seems to me that the
+problem is in pl011_write in pl011.c - the functions looks at which
+offset is being written, and then writes the entire SFR that offset
+falls under, which means that changing a single byte will change the
+whole SFR.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Attachment added: "startup.s"
+   https://bugs.launchpad.net/bugs/1809546/+attachment/5224336/+files/start=
+up.s
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1809546
+
+Title:
+  Writing a byte to a pl011 SFR overwrites the whole SFR
+
+Status in QEMU:
+  New
+
+Bug description:
+  The bug is present in QEMU 2.8.1 and, if my analysis is correct, also
+  on master.
+
+  I first noticed that a PL011 UART driver, which is fine on real
+  hardware, fails to enable the RX interrupt in the IMSC register when
+  running in QEMU. However, the problem only comes up if the code is
+  compiled without optimizations. I think I've narrowed it down to a
+  minimal example that will exhibit the problem if run as a bare-metal
+  application.
+
+  Given:
+
+  pl011_addr: .word 0x10009000
+
+  The following snippet will be problematic:
+
+       ldr r3, pl011_addr
+       ldrb r2, [r3, #0x38]        // IMSC
+       mov r2, #0
+       orr r2, r2, #0x10           // R2 =3D=3D 0x10
+       strb r2, [r3, #0x38]        // Whole word reads correctly after this
+       ldrb r2, [r3, #0x39]
+       mov r2, #0
+       strb r2, [r3, #0x39]        // Problem here! Overwrites offset 0x38 =
+as well
+
+  After the first strb instruction, which writes to 0x10009038,
+  everything is fine. It can be seen in the QEMU monitor:
+
+  (qemu) xp 0x10009038
+  0000000010009038: 0x00000010
+
+  After the second strb instruction, the write to 0x10009039 clears the
+  entire word:
+
+  (qemu) xp 0x10009038
+  0000000010009038: 0x00000000
+
+  QEMU command-line, using the vexpress-a9 which has the PL011 at
+  0x10009000:
+
+  qemu-system-arm -S -M vexpress-a9 -m 32M -no-reboot -nographic
+  -monitor telnet:127.0.0.1:1234,server,nowait -kernel pl011-sfr.bin
+  -gdb tcp::2159 -serial mon:stdio
+
+  Compiling the original C code with optimizations makes the driver
+  work. It compiles down to assembly that only does a single write:
+
+      ldr r3, pl011_addr
+      mov r2, #0x10
+      str r2, [r3, #0x38]
+
+  Attached is the an assembly file, and linkscript, that shows the
+  problem, and also includes the working code.
+
+  I haven't debugged inside of QEMU itself but it seems to me that the
+  problem is in pl011_write in pl011.c - the functions looks at which
+  offset is being written, and then writes the entire SFR that offset
+  falls under, which means that changing a single byte will change the
+  whole SFR.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1809546/+subscriptions
