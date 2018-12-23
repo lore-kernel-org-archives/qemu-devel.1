@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52043)
+Received: from eggs.gnu.org ([208.118.235.92]:52074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAjk-0007MS-EI
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:37 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAjm-0007R5-Mc
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAji-0001Z4-V9
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:36 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42851)
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAjk-0001ho-Ti
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:38 -0500
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:39295)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gbAji-0001Vb-MT
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:34 -0500
-Received: by mail-wr1-x443.google.com with SMTP id q18so10089842wrx.9
-	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:52:34 -0800 (PST)
+	id 1gbAjk-0001dR-Ju
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:36 -0500
+Received: by mail-wr1-x42e.google.com with SMTP id t27so10103792wra.6
+	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:52:36 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Sun, 23 Dec 2018 21:51:39 +0100
-Message-Id: <b35ceed43600ab8572d8d7881adc14f3937ef91f.1545598229.git.DirtY.iCE.hu@gmail.com>
+Date: Sun, 23 Dec 2018 21:51:41 +0100
+Message-Id: <f9a3268815b96aad8c699f4a8e4b2565e4d9ff75.1545598229.git.DirtY.iCE.hu@gmail.com>
 In-Reply-To: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 03/52] qapi: qapi for audio backends
+Subject: [Qemu-devel] [PATCH v2 05/52] audio: -audiodev command line option:
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,319 +32,260 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-This patch adds structures into qapi to replace the existing
-configuration structures used by audio backends currently. This qapi
-will be the base of the -audiodev command line parameter (that replaces
-the old environment variables based config).
+This patch adds documentation of an -audiodev command line option, that
+deprecates the old QEMU_* environment variables for audio backend
+configuration.  It's syntax is similar to existing options (-netdev,
+-device, etc):
 
-This is not a 1:1 translation of the old options, I've tried to make
-them much more consistent (e.g. almost every backend had an option to
-specify buffer size, but the name was different for every backend, and
-some backends required usecs, while some other required frames, samples
-or bytes). Also tried to reduce the number of abbreviations used by the
-config keys.
+  -audiodev driver_name,property=value,...
 
-Some of the more important changes:
-* use `in` and `out` instead of `ADC` and `DAC`, as the former is more
-  user friendly imho
-* moved buffer settings into the global setting area (so it's the same
-  for all backends that support it. Backends that can't change buffer
-  size will simply ignore them). Also using usecs, as it's probably more
-  user friendly than samples or bytes.
-* try-poll is now an alsa backend specific option (as all other backends
-  currently ignore it)
+Although now it's possible to specify multiple -audiodev options on
+command line, multiple audio backends are not supported yet.
 
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- Makefile.objs         |   6 +-
- qapi/audio.json       | 253 ++++++++++++++++++++++++++++++++++++++++++
- qapi/qapi-schema.json |   1 +
- 3 files changed, 257 insertions(+), 3 deletions(-)
- create mode 100644 qapi/audio.json
+ qemu-options.hx | 222 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 219 insertions(+), 3 deletions(-)
 
-diff --git a/Makefile.objs b/Makefile.objs
-index bc5b8a8442..3f833a70c0 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -1,6 +1,6 @@
--QAPI_MODULES = block-core block char common crypto introspect job migration
--QAPI_MODULES += misc net rdma rocker run-state sockets tpm trace transaction
--QAPI_MODULES += ui
-+QAPI_MODULES = audio block-core block char common crypto introspect job
-+QAPI_MODULES += migration misc net rdma rocker run-state sockets tpm trace
-+QAPI_MODULES += transaction ui
+diff --git a/qemu-options.hx b/qemu-options.hx
+index df42116ecc..3ede6a591d 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -416,14 +416,230 @@ The default is @code{en-us}.
+ ETEXI
  
- #######################################################################
- # Common libraries for tools and emulators
-diff --git a/qapi/audio.json b/qapi/audio.json
-new file mode 100644
-index 0000000000..56d8ce439f
---- /dev/null
-+++ b/qapi/audio.json
-@@ -0,0 +1,253 @@
-+# -*- mode: python -*-
-+#
-+# Copyright (C) 2015 Zoltán Kővágó <DirtY.iCE.hu@gmail.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or later.
-+# See the COPYING file in the top-level directory.
+ 
++HXCOMM Deprecated by -audiodev
+ DEF("audio-help", 0, QEMU_OPTION_audio_help,
+-    "-audio-help     print list of audio drivers and their options\n",
++    "-audio-help     show -audiodev equivalent of the currently specified audio settings\n",
+     QEMU_ARCH_ALL)
+ STEXI
+ @item -audio-help
+ @findex -audio-help
+-Will show the audio subsystem help: list of drivers, tunable
+-parameters.
++Will show the -audiodev equivalent of the currently specified
++(deprecated) environment variables.
++ETEXI
 +
-+##
-+# @AudiodevNoOptions:
-+#
-+# The none, coreaudio, sdl and spice audio backend have no options.
-+#
-+# Since: 3.2
-+##
-+{ 'struct': 'AudiodevNoOptions',
-+  'data': { } }
++DEF("audiodev", HAS_ARG, QEMU_OPTION_audiodev,
++    "-audiodev [driver=]driver,id=id[,prop[=value][,...]]\n"
++    "                specifies the audio backend to use\n"
++    "                id= identifier of the backend\n"
++    "                timer-period= timer period in microseconds\n"
++    "                in|out.fixed-settings= use fixed settings for host audio\n"
++    "                in|out.frequency= frequency to use with fixed settings\n"
++    "                in|out.channels= number of channels to use with fixed settings\n"
++    "                in|out.format= sample format to use with fixed settings\n"
++    "                valid values: s8, s16, s32, u8, u16, u32\n"
++    "                in|out.voices= number of voices to use\n"
++    "                in|out.buffer-len= size of buffer in microseconds\n"
++    "                in|out.buffer-count= number of buffers\n"
++    "-audiodev none,id=id,[,prop[=value][,...]]\n"
++    "                dummy driver that discards all output\n"
++#ifdef CONFIG_ALSA
++    "-audiodev alsa,id=id[,prop[=value][,...]]\n"
++    "                alsa-in|alsa-out.dev= name of the audio device to use\n"
++    "                alsa-in|alsa-out.try-poll= attempt to use poll mode\n"
++    "                threshold= threshold (in microseconds) when playback starts\n"
++#endif
++#ifdef CONFIG_COREAUDIO
++    "-audiodev coreaudio,id=id[,prop[=value][,...]]\n"
++#endif
++#ifdef CONFIG_DSOUND
++    "-audiodev dsound,id=id[,prop[=value][,...]]\n"
++    "                latency= add extra latency to playback in microseconds\n"
++#endif
++#ifdef CONFIG_OSS
++    "-audiodev oss,id=id[,prop[=value][,...]]\n"
++    "                oss-in|oss-out.dev= path of the audio device to use\n"
++    "                oss-in|oss-out.try-poll= attempt to use poll mode\n"
++    "                try-mmap= try using memory mapped access\n"
++    "                exclusive= open device in exclusive mode\n"
++    "                dsp-policy= set timing policy (0..10), -1 to use fragment mode\n"
++#endif
++#ifdef CONFIG_PA
++    "-audiodev pa,id=id[,prop[=value][,...]]\n"
++    "                server= PulseAudio server address\n"
++    "                sink|source.name= sink/source device name\n"
++#endif
++#ifdef CONFIG_SDL
++    "-audiodev sdl,id=id[,prop[=value][,...]]\n"
++#endif
++#ifdef CONFIG_SPICE
++    "-audiodev spice,id=id[,prop[=value][,...]]\n"
++#endif
++    "-audiodev wav,id=id[,prop[=value][,...]]\n"
++    "                path= path of wav file to record\n",
++    QEMU_ARCH_ALL)
++STEXI
++@item -audiodev [driver=]@var{driver},id=@var{id}[,@var{prop}[=@var{value}][,...]]
++@findex -audiodev
++Adds a new audio backend @var{driver} identified by @var{id}.  There are
++global and driver specific properties.  Some values can be set
++differently for input and output, they're marked with @code{in|out.}.
++You can set the input's property with @code{in.@var{prop}} and the
++output's property with @code{out.@var{prop}}. For example:
++@example
++-audiodev alsa,id=example,in.frequency=44110,out.frequency=8000
++-audiodev alsa,id=example,out.channels=1 # leaves in.channels unspecified
++@end example
 +
-+##
-+# @AudiodevAlsaPerDirectionOptions:
-+#
-+# Options of the alsa backend that are used for both playback and recording.
-+#
-+# @dev: #optional the name of the alsa device to use (default 'default')
-+#
-+# @try-poll: #optional attempt to use poll mode, falling back to non polling
-+#            access on failure (default on)
-+#
-+# Since: 3.2
-+##
-+{ 'struct': 'AudiodevAlsaPerDirectionOptions',
-+  'data': {
-+    '*dev':      'str',
-+    '*try-poll': 'bool' } }
++Valid global options are:
 +
-+##
-+# @AudiodevAlsaOptions:
-+#
-+# Options of the alsa audio backend.
-+#
-+# @alsa-in: options of the capture stream
-+#
-+# @alsa-out: options of the playback stream
-+#
-+# @threshold: #optional set the threshold (in microseconds) when playback starts
-+#
-+# Since: 3.2
-+##
-+{ 'struct': 'AudiodevAlsaOptions',
-+  'data': {
-+    'alsa-in':    'AudiodevAlsaPerDirectionOptions',
-+    'alsa-out':   'AudiodevAlsaPerDirectionOptions',
-+    '*threshold': 'int' } }
++@table @option
++@item id=@var{identifier}
++Identifies the audio backend.
 +
-+##
-+# @AudiodevDsoundOptions:
-+#
-+# Options of the dsound audio backend.
-+#
-+# @latency: #optional add extra latency to playback in microseconds (default
-+#           10000)
-+#
-+# Since: 3.2
-+##
-+{ 'struct': 'AudiodevDsoundOptions',
-+  'data': {
-+    '*latency': 'int' } }
++@item timer-period=@var{period}
++Sets the timer @var{period} used by the audio subsystem in microseconds.
++Default is 10000 (10 ms).
 +
-+##
-+# @AudiodevOssPerDirectionOptions:
-+#
-+# Options of the oss backend that are used for both playback and recording.
-+#
-+# @dev: #optional file name of the oss device (default '/dev/dsp')
-+#
-+# @try-poll: #optional attempt to use poll mode, falling back to non polling
-+#            access on failure (default on)
-+#
-+# Since: 3.2
-+##
-+{ 'struct': 'AudiodevOssPerDirectionOptions',
-+  'data': {
-+    '*dev':      'str',
-+    '*try-poll': 'bool' } }
++@item in|out.fixed-settings=on|off
++Use fixed settings for host audio.  When off, it will change based on
++how the guest opens the sound card.  In this case you must not specify
++@var{frequency}, @var{channels} or @var{format}.  Default is on.
 +
-+##
-+# @AudiodevOssOptions:
-+#
-+# Options of the oss audio backend.
-+#
-+# @oss-in: options of the capture stream
-+#
-+# @oss-out: options of the playback stream
-+#
-+# @try-mmap: #optional try using memory mapped access, falling back to non
-+#            memory mapped access on failure (default off)
-+#
-+# @exclusive: #optional open device in exclusive mode (vmix won't work)
-+#             (default off)
-+#
-+# @dsp-policy: #optional set the timing policy of the device (between 0 and 10,
-+#              where smaller number means smaller latency but higher CPU usage)
-+#              or -1 to use fragment mode (option ignored on some platforms)
-+#              (default 5)
-+#
-+# Since: 3.2
-+##
-+{ 'struct': 'AudiodevOssOptions',
-+  'data': {
-+    'oss-in':      'AudiodevOssPerDirectionOptions',
-+    'oss-out':     'AudiodevOssPerDirectionOptions',
-+    '*try-mmap':   'bool',
-+    '*exclusive':  'bool',
-+    '*dsp-policy': 'int' } }
++@item in|out.frequency=@var{frequency}
++Specify the @var{frequency} to use when using @var{fixed-settings}.
++Default is 44100Hz.
 +
-+##
-+# @AudiodevPaPerDirectionOptions:
-+#
-+# Options of the pa backend that are used for both playback and recording.
-+#
-+# @name: #optional name of the sink/source to use
-+#
-+# Since: 3.2
-+##
-+{ 'struct': 'AudiodevPaPerDirectionOptions',
-+  'data': {
-+    '*name': 'str' } }
++@item in|out.channels=@var{channels}
++Specify the number of @var{channels} to use when using
++@var{fixed-settings}. Default is 2 (stereo).
 +
-+##
-+# @AudiodevPaOptions:
-+#
-+# Options of the pa (PulseAudio) audio backend.
-+#
-+# @server: #optional PulseAudio server address (default: let PulseAudio choose)
-+#
-+# @sink: sink specific options
-+#
-+# @source: source specific options
-+#
-+# Since: 3.2
-+##
-+{ 'struct': 'AudiodevPaOptions',
-+  'data': {
-+    '*server': 'str',
-+    'sink':    'AudiodevPaPerDirectionOptions',
-+    'source':  'AudiodevPaPerDirectionOptions' } }
++@item in|out.format=@var{format}
++Specify the sample @var{format} to use when using @var{fixed-settings}.
++Valid values are: @code{s8}, @code{s16}, @code{s32}, @code{u8},
++@code{u16}, @code{u32}. Default is @code{s16}.
 +
-+##
-+# @AudiodevWavOptions:
-+#
-+# Options of the wav audio backend.
-+#
-+# @path: #optional name of the wav file to record (default 'qemu.wav')
-+#
-+# Since: 3.2
-+##
-+{ 'struct': 'AudiodevWavOptions',
-+  'data': {
-+    '*path': 'str' } }
++@item in|out.voices=@var{voices}
++Specify the number of @var{voices} to use.  Default is 1.
 +
++@item in|out.buffer=@var{usecs}
++Sets the size of the buffer in microseconds.
 +
-+##
-+# @AudioFormat:
-+#
-+# An enumeration of possible audio formats.
-+#
-+# Since: 3.2
-+##
-+{ 'enum': 'AudioFormat',
-+  'data': [ 'u8', 's8', 'u16', 's16', 'u32', 's32' ] }
++@item in|out.buffer-count=@var{count}
++Sets the @var{count} of the buffers.
 +
-+##
-+# @AudiodevDriver:
-+#
-+# An enumeration of possible audio backend drivers.
-+#
-+# Since: 3.2
-+##
-+{ 'enum': 'AudiodevDriver',
-+  'data': [ 'none', 'alsa', 'coreaudio', 'dsound', 'oss', 'pa', 'sdl', 'spice',
-+            'wav' ] }
++@end table
 +
-+##
-+# @AudiodevPerDirectionOptions:
-+#
-+# General audio backend options that are used for both playback and recording.
-+#
-+# @fixed-settings: #optional use fixed settings for host input/output.  When
-+#                  off, frequency, channels and format must not be specified
-+#                  (default on)
-+#
-+# @frequency: #optional frequency to use when using fixed settings
-+#             (default 44100)
-+#
-+# @channels: #optional number of channels when using fixed settings
-+#            (default 2)
-+#
-+# @voices: #optional number of voices to use (default 1)
-+#
-+# @format: #optional sample format to use when using fixed settings
-+#          (default s16)
-+#
-+# @buffer-len: #optional the buffer size in microseconds
-+#
-+# @buffer-count: #optional number of buffers
-+#
-+# Since: 3.2
-+##
-+{ 'struct': 'AudiodevPerDirectionOptions',
-+  'data': {
-+    '*fixed-settings': 'bool',
-+    '*frequency':      'int',
-+    '*channels':       'int',
-+    '*voices':         'int',
-+    '*format':         'AudioFormat',
-+    '*buffer-len':     'int',
-+    '*buffer-count':   'int' } }
++@item -audiodev none,id=@var{id}[,@var{prop}[=@var{value}][,...]]
++Creates a dummy backend that discards all outputs.  This backend has no
++backend specific properties.
 +
-+##
-+# @Audiodev:
-+#
-+# Options of an audio backend.
-+#
-+# @id: identifier of the backend
-+#
-+# @driver: the backend driver to use
-+#
-+# @in: options of the capture stream
-+#
-+# @out: options of the playback stream
-+#
-+# @timer-period: #optional timer period (in microseconds, 0: use lowest
-+#                possible)
-+#
-+# Since: 3.2
-+##
-+{ 'union': 'Audiodev',
-+  'base': {
-+    'id':            'str',
-+    'driver':        'AudiodevDriver',
-+    'in':            'AudiodevPerDirectionOptions',
-+    'out':           'AudiodevPerDirectionOptions',
-+    '*timer-period': 'int' },
-+  'discriminator': 'driver',
-+  'data': {
-+    'none':      'AudiodevNoOptions',
-+    'alsa':      'AudiodevAlsaOptions',
-+    'coreaudio': 'AudiodevNoOptions',
-+    'dsound':    'AudiodevDsoundOptions',
-+    'oss':       'AudiodevOssOptions',
-+    'pa':        'AudiodevPaOptions',
-+    'sdl':       'AudiodevNoOptions',
-+    'spice':     'AudiodevNoOptions',
-+    'wav':       'AudiodevWavOptions' } }
-diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-index 3bbdfcee84..d5f9856be7 100644
---- a/qapi/qapi-schema.json
-+++ b/qapi/qapi-schema.json
-@@ -95,3 +95,4 @@
- { 'include': 'trace.json' }
- { 'include': 'introspect.json' }
- { 'include': 'misc.json' }
-+{ 'include': 'audio.json' }
++@item -audiodev alsa,id=@var{id}[,@var{prop}[=@var{value}][,...]]
++Creates backend using the ALSA.  This backend is only available on
++Linux.
++
++ALSA specific options are:
++
++@table @option
++@item alsa-in|alsa-out.dev=@var{device}
++Specify the ALSA @var{device} to use for input and/or output.  Default
++is @code{default}.
++
++@item alsa-in|alsa-out.try-poll=on|off
++Attempt to use poll mode with the device.  Default is on.
++
++@item threshold=@var{threshold}
++Threshold (in microseconds) when playback starts.  Default is 0.
++
++@end table
++
++@item -audiodev coreaudio,id=@var{id}[,@var{prop}[=@var{value}][,...]]
++Creates a backend using Apple's Core Audio.  This backend is only
++available on Mac OS and only supports playback.  This backend has no
++backend specific properties.
++
++@item -audiodev dsound,id=@var{id}[,@var{prop}[=@var{value}][,...]]
++Creates a backend using Microsoft's DirectSound.  This backend is only
++available on Windows and only supports playback.
++
++Backend specific options are:
++
++@table @option
++
++@item latency=@var{usecs}
++Add extra @var{usecs} microseconds latency to playback.  Default is
++10000 (10 ms).
++
++@end table
++
++@item -audiodev oss,id=@var{id}[,@var{prop}[=@var{value}][,...]]
++Creates a backend using OSS.  This backend is available on most
++Unix-like systems.
++
++OSS specific options are:
++
++@table @option
++
++@item oss-in|oss-out.dev=@var{device}
++Specify the file name of the OSS @var{device} to use.  Default is
++@code{/dev/dsp}.
++
++@item oss-in|oss-out.try-poll=on|of
++Attempt to use poll mode with the device.  Default is on.
++
++@item try-mmap=on|off
++Try using memory mapped device access.  Default is off.
++
++@item exclusive=on|off
++Open the device in exclusive mode (vmix won't work in this case).
++Default is off.
++
++@item dsp-policy=@var{policy}
++Sets the timing policy (between 0 and 10, where smaller number means
++smaller latency but higher CPU usage).  Use -1 to use buffer sizes
++specified by @code{buffer} and @code{buffer-count}.  This option is
++ignored if you do not have OSS 4. Default is 5.
++
++@end table
++
++@item -audiodev pa,id=@var{id}[,@var{prop}[=@var{value}][,...]]
++Creates a backend using PulseAudio.  This backend is available on most
++systems.
++
++PulseAudio specific options are:
++
++@table @option
++
++@item server=@var{server}
++Sets the PulseAudio @var{server} to connect to.
++
++@item sink|source.name=@var{sink}
++Use the specified sink/source for playback/recording.
++
++@end table
++
++@item -audiodev sdl,id=@var{id}[,@var{prop}[=@var{value}][,...]]
++Creates a backend using SDL.  This backend is available on most systems,
++but you should use your platform's native backend if possible.  This
++backend has no backend specific properties.
++
++@item -audiodev spice,id=@var{id}[,@var{prop}[=@var{value}][,...]]
++Creates a backend that sends audio through SPICE.  This backend requires
++@code{-spice} and automatically selected in that case, so usually you
++can ignore this option.  This backend has no backend specific
++properties.
++
++@item -audiodev wav,id=@var{id}[,@var{prop}[=@var{value}][,...]]
++Creates a backend that writes audio to a WAV file.
++
++Backend specific options are:
++
++@table @option
++
++@item path=@var{path}
++Write recorded audio into the specified file.  Default is
++@code{qemu.wav}.
++
++@end table
+ ETEXI
+ 
+ DEF("soundhw", HAS_ARG, QEMU_OPTION_soundhw,
 -- 
 2.20.1
