@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52423)
+Received: from eggs.gnu.org ([208.118.235.92]:52444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAk4-00083O-Oo
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAk6-00086s-2C
 	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAk2-0002p4-UB
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:56 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36147)
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAk2-0002oF-Ne
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:57 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51806)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gbAk2-0002l4-Kp
+	id 1gbAk2-0002k9-D3
 	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:54 -0500
-Received: by mail-wm1-x342.google.com with SMTP id p6so10418101wmc.1
+Received: by mail-wm1-x343.google.com with SMTP id b11so9877281wmj.1
 	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:52:54 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Sun, 23 Dec 2018 21:52:04 +0100
-Message-Id: <59bee9fad02c04c6600eba20dafb0c4cd1b31007.1545598229.git.DirtY.iCE.hu@gmail.com>
+Date: Sun, 23 Dec 2018 21:52:03 +0100
+Message-Id: <5f0cba98be3d59c4f1d6118b0554429f9e7b3ceb.1545598229.git.DirtY.iCE.hu@gmail.com>
 In-Reply-To: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 28/52] audio: api for mixeng code free
- backends
+Subject: [Qemu-devel] [PATCH v2 27/52] audio: use size_t where makes sense
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,362 +31,834 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>
 
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/audio.c          | 211 ++++++++++++++++++++++++++++++++++++++++-
- audio/audio_int.h      |  45 +++++++--
- audio/audio_template.h |   1 +
- 3 files changed, 247 insertions(+), 10 deletions(-)
+ audio/alsaaudio.c       |   8 +-
+ audio/audio.c           | 162 ++++++++++++++++++++--------------------
+ audio/audio.h           |   4 +-
+ audio/audio_int.h       |  22 +++---
+ audio/audio_template.h  |   6 +-
+ audio/mixeng.h          |  11 ++-
+ audio/ossaudio.c        |  18 ++---
+ audio/paaudio.c         |   8 +-
+ audio/rate_template.h   |   2 +-
+ audio/sdlaudio.c        |   3 +-
+ audio/wavaudio.c        |   4 +-
+ include/sysemu/replay.h |   4 +-
+ replay/replay-audio.c   |  16 ++--
+ 13 files changed, 133 insertions(+), 135 deletions(-)
 
+diff --git a/audio/alsaaudio.c b/audio/alsaaudio.c
+index 19de7d01cb..69e7a3868c 100644
+--- a/audio/alsaaudio.c
++++ b/audio/alsaaudio.c
+@@ -747,8 +747,8 @@ static int alsa_init_out(HWVoiceOut *hw, struct audsettings *as,
+ 
+     alsa->pcm_buf = audio_calloc(__func__, obt.samples, 1 << hw->info.shift);
+     if (!alsa->pcm_buf) {
+-        dolog ("Could not allocate DAC buffer (%d samples, each %d bytes)\n",
+-               hw->samples, 1 << hw->info.shift);
++        dolog("Could not allocate DAC buffer (%zu samples, each %d bytes)\n",
++              hw->samples, 1 << hw->info.shift);
+         alsa_anal_close1 (&handle);
+         return -1;
+     }
+@@ -849,8 +849,8 @@ static int alsa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
+ 
+     alsa->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
+     if (!alsa->pcm_buf) {
+-        dolog ("Could not allocate ADC buffer (%d samples, each %d bytes)\n",
+-               hw->samples, 1 << hw->info.shift);
++        dolog("Could not allocate ADC buffer (%zu samples, each %d bytes)\n",
++              hw->samples, 1 << hw->info.shift);
+         alsa_anal_close1 (&handle);
+         return -1;
+     }
 diff --git a/audio/audio.c b/audio/audio.c
-index 27a8a31a64..1897e22444 100644
+index 1ea80ba6a7..27a8a31a64 100644
 --- a/audio/audio.c
 +++ b/audio/audio.c
-@@ -575,6 +575,25 @@ size_t audio_pcm_hw_clip_out(HWVoiceOut *hw, void *pcm_buf,
-     return clipped;
+@@ -530,10 +530,10 @@ static int audio_attach_capture (HWVoiceOut *hw)
+ /*
+  * Hard voice (capture)
+  */
+-static int audio_pcm_hw_find_min_in (HWVoiceIn *hw)
++static size_t audio_pcm_hw_find_min_in (HWVoiceIn *hw)
+ {
+     SWVoiceIn *sw;
+-    int m = hw->total_samples_captured;
++    size_t m = hw->total_samples_captured;
+ 
+     for (sw = hw->sw_head.lh_first; sw; sw = sw->entries.le_next) {
+         if (sw->active) {
+@@ -543,28 +543,28 @@ static int audio_pcm_hw_find_min_in (HWVoiceIn *hw)
+     return m;
  }
  
-+static void audio_pcm_hw_clip_out2(HWVoiceOut *hw, void *pcm_buf, size_t len)
-+{
+-int audio_pcm_hw_get_live_in (HWVoiceIn *hw)
++size_t audio_pcm_hw_get_live_in(HWVoiceIn *hw)
+ {
+-    int live = hw->total_samples_captured - audio_pcm_hw_find_min_in (hw);
+-    if (audio_bug(__func__, live < 0 || live > hw->samples)) {
+-        dolog ("live=%d hw->samples=%d\n", live, hw->samples);
++    size_t live = hw->total_samples_captured - audio_pcm_hw_find_min_in (hw);
++    if (audio_bug(__func__, live > hw->samples)) {
++        dolog("live=%zu hw->samples=%zu\n", live, hw->samples);
+         return 0;
+     }
+     return live;
+ }
+ 
+-int audio_pcm_hw_clip_out (HWVoiceOut *hw, void *pcm_buf,
+-                           int live, int pending)
++size_t audio_pcm_hw_clip_out(HWVoiceOut *hw, void *pcm_buf,
++                             size_t live, size_t pending)
+ {
+-    int left = hw->samples - pending;
+-    int len = MIN (left, live);
+-    int clipped = 0;
++    size_t left = hw->samples - pending;
++    size_t len = MIN (left, live);
 +    size_t clipped = 0;
-+    size_t pos = hw->rpos;
-+
-+    while (len) {
-+        st_sample *src = hw->mix_buf + pos;
-+        uint8_t *dst = advance (pcm_buf, clipped << hw->info.shift);
-+        size_t samples_till_end_of_buf = hw->samples - pos;
-+        size_t samples_to_clip = MIN(len, samples_till_end_of_buf);
-+
-+        hw->clip (dst, src, samples_to_clip);
-+
-+        pos = (pos + samples_to_clip) % hw->samples;
-+        len -= samples_to_clip;
-+        clipped += samples_to_clip;
-+    }
-+}
-+
+ 
+     while (len) {
+         struct st_sample *src = hw->mix_buf + hw->rpos;
+         uint8_t *dst = advance (pcm_buf, hw->rpos << hw->info.shift);
+-        int samples_till_end_of_buf = hw->samples - hw->rpos;
+-        int samples_to_clip = MIN (len, samples_till_end_of_buf);
++        size_t samples_till_end_of_buf = hw->samples - hw->rpos;
++        size_t samples_to_clip = MIN (len, samples_till_end_of_buf);
+ 
+         hw->clip (dst, src, samples_to_clip);
+ 
+@@ -578,14 +578,14 @@ int audio_pcm_hw_clip_out (HWVoiceOut *hw, void *pcm_buf,
  /*
   * Soft voice (capture)
   */
-@@ -1052,6 +1071,31 @@ static void audio_capture_mix_and_clear(HWVoiceOut *hw, size_t rpos,
-     mixeng_clear(hw->mix_buf, samples - n);
- }
- 
-+static size_t audio_pcm_hw_run_out(HWVoiceOut *hw, size_t live)
-+{
-+    size_t clipped = 0;
-+
-+    while (live) {
-+        size_t size, decr, proc;
-+        void *buf = hw->pcm_ops->get_buffer_out(hw, &size);
-+
-+        decr = MIN(size >> hw->info.shift, live);
-+        audio_pcm_hw_clip_out2(hw, buf, decr);
-+        proc = hw->pcm_ops->put_buffer_out(hw, buf, decr << hw->info.shift) >>
-+            hw->info.shift;
-+
-+        live -= proc;
-+        clipped += proc;
-+        hw->rpos = (hw->rpos + proc) % hw->samples;
-+
-+        if (proc == 0 || proc < decr) {
-+            break;
-+        }
-+    }
-+
-+    return clipped;
-+}
-+
- static void audio_run_out (AudioState *s)
+-static int audio_pcm_sw_get_rpos_in (SWVoiceIn *sw)
++static size_t audio_pcm_sw_get_rpos_in(SWVoiceIn *sw)
  {
-     HWVoiceOut *hw = NULL;
-@@ -1099,7 +1143,11 @@ static void audio_run_out (AudioState *s)
-         }
+     HWVoiceIn *hw = sw->hw;
+-    int live = hw->total_samples_captured - sw->total_hw_samples_acquired;
+-    int rpos;
++    ssize_t live = hw->total_samples_captured - sw->total_hw_samples_acquired;
++    ssize_t rpos;
  
-         prev_rpos = hw->rpos;
--        played = hw->pcm_ops->run_out (hw, live);
-+        if (hw->pcm_ops->run_out) {
-+            played = hw->pcm_ops->run_out(hw, live);
-+        } else {
-+            played = audio_pcm_hw_run_out(hw, live);
-+        }
-         replay_audio_out(&played);
-         if (audio_bug(__func__, hw->rpos >= hw->samples)) {
-             dolog("hw->rpos=%zu hw->samples=%zu played=%zu\n",
-@@ -1158,6 +1206,35 @@ static void audio_run_out (AudioState *s)
+     if (audio_bug(__func__, live < 0 || live > hw->samples)) {
+-        dolog ("live=%d hw->samples=%d\n", live, hw->samples);
++        dolog("live=%zu hw->samples=%zu\n", live, hw->samples);
+         return 0;
+     }
+ 
+@@ -598,17 +598,17 @@ static int audio_pcm_sw_get_rpos_in (SWVoiceIn *sw)
      }
  }
  
-+static size_t audio_pcm_hw_run_in(HWVoiceIn *hw, size_t samples)
-+{
-+    size_t conv = 0;
-+
-+    while (samples) {
-+        size_t proc;
-+        size_t size = samples << hw->info.shift;
-+        void *buf = hw->pcm_ops->get_buffer_in(hw, &size);
-+
-+        assert((size & hw->info.align) == 0);
-+        if (size == 0) {
-+            hw->pcm_ops->put_buffer_in(hw, buf, size);
-+            break;
-+        }
-+
-+        proc = MIN(size >> hw->info.shift,
-+                   hw->samples - hw->wpos);
-+
-+        hw->conv(hw->conv_buf + hw->wpos, buf, proc);
-+        hw->wpos = (hw->wpos + proc) % hw->samples;
-+
-+        samples -= proc;
-+        conv += proc;
-+        hw->pcm_ops->put_buffer_in(hw, buf, proc << hw->info.shift);
-+    }
-+
-+    return conv;
-+}
-+
- static void audio_run_in (AudioState *s)
+-static int audio_pcm_sw_read(SWVoiceIn *sw, void *buf, int size)
++static size_t audio_pcm_sw_read(SWVoiceIn *sw, void *buf, size_t size)
  {
-     HWVoiceIn *hw = NULL;
-@@ -1167,7 +1244,12 @@ static void audio_run_in (AudioState *s)
-         size_t captured = 0, min;
+     HWVoiceIn *hw = sw->hw;
+-    int samples, live, ret = 0, swlim, isamp, osamp, rpos, total = 0;
++    size_t samples, live, ret = 0, swlim, isamp, osamp, rpos, total = 0;
+     struct st_sample *src, *dst = sw->buf;
  
-         if (replay_mode != REPLAY_MODE_PLAY) {
--            captured = hw->pcm_ops->run_in(hw);
-+            if (hw->pcm_ops->run_in) {
-+                captured = hw->pcm_ops->run_in(hw);
-+            } else {
-+                captured = audio_pcm_hw_run_in(
-+                    hw, hw->samples - audio_pcm_hw_get_live_in(hw));
-+            }
+     rpos = audio_pcm_sw_get_rpos_in (sw) % hw->samples;
+ 
+     live = hw->total_samples_captured - sw->total_hw_samples_acquired;
+-    if (audio_bug(__func__, live < 0 || live > hw->samples)) {
+-        dolog ("live_in=%d hw->samples=%d\n", live, hw->samples);
++    if (audio_bug(__func__, live > hw->samples)) {
++        dolog("live_in=%zu hw->samples=%zu\n", live, hw->samples);
+         return 0;
+     }
+ 
+@@ -622,9 +622,9 @@ static int audio_pcm_sw_read(SWVoiceIn *sw, void *buf, int size)
+ 
+     while (swlim) {
+         src = hw->conv_buf + rpos;
+-        isamp = hw->wpos - rpos;
+-        /* XXX: <= ? */
+-        if (isamp <= 0) {
++        if (hw->wpos > rpos) {
++            isamp = hw->wpos - rpos;
++        } else {
+             isamp = hw->samples - rpos;
          }
-         replay_audio_in(&captured, hw->conv_buf, &hw->wpos, hw->samples);
  
-@@ -1261,12 +1343,137 @@ void audio_run(AudioState *s, const char *msg)
- #endif
+@@ -633,11 +633,6 @@ static int audio_pcm_sw_read(SWVoiceIn *sw, void *buf, int size)
+         }
+         osamp = swlim;
+ 
+-        if (audio_bug(__func__, osamp < 0)) {
+-            dolog ("osamp=%d\n", osamp);
+-            return 0;
+-        }
+-
+         st_rate_flow (sw->rate, src, dst, &isamp, &osamp);
+         swlim -= osamp;
+         rpos = (rpos + isamp) % hw->samples;
+@@ -658,10 +653,10 @@ static int audio_pcm_sw_read(SWVoiceIn *sw, void *buf, int size)
+ /*
+  * Hard voice (playback)
+  */
+-static int audio_pcm_hw_find_min_out (HWVoiceOut *hw, int *nb_livep)
++static size_t audio_pcm_hw_find_min_out (HWVoiceOut *hw, int *nb_livep)
+ {
+     SWVoiceOut *sw;
+-    int m = INT_MAX;
++    size_t m = SIZE_MAX;
+     int nb_live = 0;
+ 
+     for (sw = hw->sw_head.lh_first; sw; sw = sw->entries.le_next) {
+@@ -675,9 +670,9 @@ static int audio_pcm_hw_find_min_out (HWVoiceOut *hw, int *nb_livep)
+     return m;
  }
  
-+void *audio_generic_get_buffer_in(HWVoiceIn *hw, size_t *size)
-+{
-+    ssize_t start;
-+
-+    if (unlikely(!hw->buf_emul)) {
-+        size_t calc_size = hw->samples << hw->info.shift;
-+        hw->buf_emul = g_malloc(calc_size);
-+        hw->size_emul = calc_size;
-+        hw->pos_emul = hw->pending_emul = 0;
-+    }
-+
-+    while (hw->pending_emul < hw->size_emul) {
-+        size_t read_len = MIN(hw->size_emul - hw->pos_emul,
-+                              hw->size_emul - hw->pending_emul);
-+        size_t read = hw->pcm_ops->read(hw, hw->buf_emul + hw->pos_emul,
-+                                        read_len);
-+        hw->pending_emul += read;
-+        if (read < read_len) {
-+            break;
-+        }
-+    }
-+
-+    start = ((ssize_t) hw->pos_emul) - hw->pending_emul;
-+    if (start < 0) {
-+        start += hw->size_emul;
-+    }
-+    assert(start >= 0 && start < hw->size_emul);
-+
-+    *size = MIN(hw->pending_emul, hw->size_emul - start);
-+    return hw->buf_emul + start;
-+}
-+
-+void audio_generic_put_buffer_in(HWVoiceIn *hw, void *buf, size_t size)
-+{
-+    assert(size <= hw->pending_emul);
-+    hw->pending_emul -= size;
-+}
-+
-+void *audio_generic_get_buffer_out(HWVoiceOut *hw, size_t *size)
-+{
-+    if (unlikely(!hw->buf_emul)) {
-+        size_t calc_size = hw->samples << hw->info.shift;
-+
-+        hw->buf_emul = g_malloc(calc_size);
-+        hw->size_emul = calc_size;
-+        hw->pos_emul = hw->pending_emul = 0;
-+    }
-+
-+    *size = MIN(hw->size_emul - hw->pending_emul,
-+                hw->size_emul - hw->pos_emul);
-+    return hw->buf_emul + hw->pos_emul;
-+}
-+
-+size_t audio_generic_put_buffer_out_nowrite(HWVoiceOut *hw, void *buf,
-+                                            size_t size)
-+{
-+    assert(buf == hw->buf_emul + hw->pos_emul &&
-+           size + hw->pending_emul <= hw->size_emul);
-+
-+    hw->pending_emul += size;
-+    hw->pos_emul = (hw->pos_emul + size) % hw->size_emul;
-+
-+    return size;
-+}
-+
-+size_t audio_generic_put_buffer_out(HWVoiceOut *hw, void *buf, size_t size)
-+{
-+    audio_generic_put_buffer_out_nowrite(hw, buf, size);
-+
-+    while (hw->pending_emul) {
-+        size_t write_len, written;
-+        ssize_t start = ((ssize_t) hw->pos_emul) - hw->pending_emul;
-+        if (start < 0) {
-+            start += hw->size_emul;
-+        }
-+        assert(start >= 0 && start < hw->size_emul);
-+
-+        write_len = MIN(hw->pending_emul, hw->size_emul - start);
-+
-+        written = hw->pcm_ops->write(hw, hw->buf_emul + start, write_len);
-+        hw->pending_emul -= written;
-+
-+        if (written < write_len) {
-+            break;
-+        }
-+    }
-+
-+    /*
-+     * fake we have written everything. non-written data remain in pending_emul,
-+     * so we do not have to clip them multiple times
-+     */
-+    return size;
-+}
-+
-+size_t audio_generic_write(HWVoiceOut *hw, void *buf, size_t size)
-+{
-+    size_t dst_size, copy_size;
-+    void *dst = hw->pcm_ops->get_buffer_out(hw, &dst_size);
-+    copy_size = MIN(size, dst_size);
-+
-+    memcpy(dst, buf, copy_size);
-+    return hw->pcm_ops->put_buffer_out(hw, buf, copy_size);
-+}
-+
-+size_t audio_generic_read(HWVoiceIn *hw, void *buf, size_t size)
-+{
-+    size_t dst_size, copy_size;
-+    void *dst = hw->pcm_ops->get_buffer_in(hw, &dst_size);
-+    copy_size = MIN(size, dst_size);
-+
-+    memcpy(dst, buf, copy_size);
-+    hw->pcm_ops->put_buffer_in(hw, buf, copy_size);
-+    return copy_size;
-+}
-+
-+
- static int audio_driver_init(AudioState *s, struct audio_driver *drv,
-                              Audiodev *dev)
+-static int audio_pcm_hw_get_live_out (HWVoiceOut *hw, int *nb_live)
++static size_t audio_pcm_hw_get_live_out (HWVoiceOut *hw, int *nb_live)
  {
-     s->drv_opaque = drv->init(dev);
+-    int smin;
++    size_t smin;
+     int nb_live1;
  
-     if (s->drv_opaque) {
-+        if (!drv->pcm_ops->get_buffer_in) {
-+            drv->pcm_ops->get_buffer_in = audio_generic_get_buffer_in;
-+            drv->pcm_ops->put_buffer_in = audio_generic_put_buffer_in;
-+        }
-+        if (!drv->pcm_ops->get_buffer_out) {
-+            drv->pcm_ops->get_buffer_out = audio_generic_get_buffer_out;
-+            drv->pcm_ops->put_buffer_out = audio_generic_put_buffer_out;
-+        }
-+
-         audio_init_nb_voices_out(s, drv);
-         audio_init_nb_voices_in(s, drv);
-         s->drv = drv;
+     smin = audio_pcm_hw_find_min_out (hw, &nb_live1);
+@@ -686,10 +681,10 @@ static int audio_pcm_hw_get_live_out (HWVoiceOut *hw, int *nb_live)
+     }
+ 
+     if (nb_live1) {
+-        int live = smin;
++        size_t live = smin;
+ 
+-        if (audio_bug(__func__, live < 0 || live > hw->samples)) {
+-            dolog ("live=%d hw->samples=%d\n", live, hw->samples);
++        if (audio_bug(__func__, live > hw->samples)) {
++            dolog("live=%zu hw->samples=%zu\n", live, hw->samples);
+             return 0;
+         }
+         return live;
+@@ -700,10 +695,10 @@ static int audio_pcm_hw_get_live_out (HWVoiceOut *hw, int *nb_live)
+ /*
+  * Soft voice (playback)
+  */
+-static int audio_pcm_sw_write (SWVoiceOut *sw, void *buf, int size)
++static size_t audio_pcm_sw_write(SWVoiceOut *sw, void *buf, size_t size)
+ {
+-    int hwsamples, samples, isamp, osamp, wpos, live, dead, left, swlim, blck;
+-    int ret = 0, pos = 0, total = 0;
++    size_t hwsamples, samples, isamp, osamp, wpos, live, dead, left, swlim, blck;
++    size_t ret = 0, pos = 0, total = 0;
+ 
+     if (!sw) {
+         return size;
+@@ -712,8 +707,8 @@ static int audio_pcm_sw_write (SWVoiceOut *sw, void *buf, int size)
+     hwsamples = sw->hw->samples;
+ 
+     live = sw->total_hw_samples_mixed;
+-    if (audio_bug(__func__, live < 0 || live > hwsamples)) {
+-        dolog ("live=%d hw->samples=%d\n", live, hwsamples);
++    if (audio_bug(__func__, live > hwsamples)) {
++        dolog("live=%zu hw->samples=%zu\n", live, hwsamples);
+         return 0;
+     }
+ 
+@@ -767,7 +762,7 @@ static int audio_pcm_sw_write (SWVoiceOut *sw, void *buf, int size)
+ 
+ #ifdef DEBUG_OUT
+     dolog (
+-        "%s: write size %d ret %d total sw %d\n",
++        "%s: write size %zu ret %zu total sw %zu\n",
+         SW_NAME (sw),
+         size >> sw->info.shift,
+         ret,
+@@ -846,7 +841,7 @@ static void audio_timer (void *opaque)
+ /*
+  * Public API
+  */
+-int AUD_write (SWVoiceOut *sw, void *buf, int size)
++size_t AUD_write(SWVoiceOut *sw, void *buf, size_t size)
+ {
+     if (!sw) {
+         /* XXX: Consider options */
+@@ -861,7 +856,7 @@ int AUD_write (SWVoiceOut *sw, void *buf, int size)
+     return audio_pcm_sw_write(sw, buf, size);
+ }
+ 
+-int AUD_read (SWVoiceIn *sw, void *buf, int size)
++size_t AUD_read(SWVoiceIn *sw, void *buf, size_t size)
+ {
+     if (!sw) {
+         /* XXX: Consider options */
+@@ -970,17 +965,17 @@ void AUD_set_active_in (SWVoiceIn *sw, int on)
+     }
+ }
+ 
+-static int audio_get_avail (SWVoiceIn *sw)
++static size_t audio_get_avail (SWVoiceIn *sw)
+ {
+-    int live;
++    size_t live;
+ 
+     if (!sw) {
+         return 0;
+     }
+ 
+     live = sw->hw->total_samples_captured - sw->total_hw_samples_acquired;
+-    if (audio_bug(__func__, live < 0 || live > sw->hw->samples)) {
+-        dolog ("live=%d sw->hw->samples=%d\n", live, sw->hw->samples);
++    if (audio_bug(__func__, live > sw->hw->samples)) {
++        dolog("live=%zu sw->hw->samples=%zu\n", live, sw->hw->samples);
+         return 0;
+     }
+ 
+@@ -993,9 +988,9 @@ static int audio_get_avail (SWVoiceIn *sw)
+     return (((int64_t) live << 32) / sw->ratio) << sw->info.shift;
+ }
+ 
+-static int audio_get_free (SWVoiceOut *sw)
++static size_t audio_get_free(SWVoiceOut *sw)
+ {
+-    int live, dead;
++    size_t live, dead;
+ 
+     if (!sw) {
+         return 0;
+@@ -1003,8 +998,8 @@ static int audio_get_free (SWVoiceOut *sw)
+ 
+     live = sw->total_hw_samples_mixed;
+ 
+-    if (audio_bug(__func__, live < 0 || live > sw->hw->samples)) {
+-        dolog ("live=%d sw->hw->samples=%d\n", live, sw->hw->samples);
++    if (audio_bug(__func__, live > sw->hw->samples)) {
++        dolog("live=%zu sw->hw->samples=%zu\n", live, sw->hw->samples);
+         return 0;
+     }
+ 
+@@ -1019,9 +1014,10 @@ static int audio_get_free (SWVoiceOut *sw)
+     return (((int64_t) dead << 32) / sw->ratio) << sw->info.shift;
+ }
+ 
+-static void audio_capture_mix_and_clear (HWVoiceOut *hw, int rpos, int samples)
++static void audio_capture_mix_and_clear(HWVoiceOut *hw, size_t rpos,
++                                        size_t samples)
+ {
+-    int n;
++    size_t n;
+ 
+     if (hw->enabled) {
+         SWVoiceCap *sc;
+@@ -1032,17 +1028,17 @@ static void audio_capture_mix_and_clear (HWVoiceOut *hw, int rpos, int samples)
+ 
+             n = samples;
+             while (n) {
+-                int till_end_of_hw = hw->samples - rpos2;
+-                int to_write = MIN (till_end_of_hw, n);
+-                int bytes = to_write << hw->info.shift;
+-                int written;
++                size_t till_end_of_hw = hw->samples - rpos2;
++                size_t to_write = MIN(till_end_of_hw, n);
++                size_t bytes = to_write << hw->info.shift;
++                size_t written;
+ 
+                 sw->buf = hw->mix_buf + rpos2;
+                 written = audio_pcm_sw_write (sw, NULL, bytes);
+                 if (written - bytes) {
+-                    dolog ("Could not mix %d bytes into a capture "
+-                           "buffer, mixed %d\n",
+-                           bytes, written);
++                    dolog("Could not mix %zu bytes into a capture "
++                          "buffer, mixed %zu\n",
++                          bytes, written);
+                     break;
+                 }
+                 n -= to_write;
+@@ -1051,9 +1047,9 @@ static void audio_capture_mix_and_clear (HWVoiceOut *hw, int rpos, int samples)
+         }
+     }
+ 
+-    n = MIN (samples, hw->samples - rpos);
+-    mixeng_clear (hw->mix_buf + rpos, n);
+-    mixeng_clear (hw->mix_buf, samples - n);
++    n = MIN(samples, hw->samples - rpos);
++    mixeng_clear(hw->mix_buf + rpos, n);
++    mixeng_clear(hw->mix_buf, samples - n);
+ }
+ 
+ static void audio_run_out (AudioState *s)
+@@ -1062,16 +1058,16 @@ static void audio_run_out (AudioState *s)
+     SWVoiceOut *sw;
+ 
+     while ((hw = audio_pcm_hw_find_any_enabled_out(s, hw))) {
+-        int played;
+-        int live, free, nb_live, cleanup_required, prev_rpos;
++        size_t played, live, prev_rpos, free;
++        int nb_live, cleanup_required;
+ 
+         live = audio_pcm_hw_get_live_out (hw, &nb_live);
+         if (!nb_live) {
+             live = 0;
+         }
+ 
+-        if (audio_bug(__func__, live < 0 || live > hw->samples)) {
+-            dolog ("live=%d hw->samples=%d\n", live, hw->samples);
++        if (audio_bug(__func__, live > hw->samples)) {
++            dolog ("live=%zu hw->samples=%zu\n", live, hw->samples);
+             continue;
+         }
+ 
+@@ -1106,13 +1102,13 @@ static void audio_run_out (AudioState *s)
+         played = hw->pcm_ops->run_out (hw, live);
+         replay_audio_out(&played);
+         if (audio_bug(__func__, hw->rpos >= hw->samples)) {
+-            dolog ("hw->rpos=%d hw->samples=%d played=%d\n",
+-                   hw->rpos, hw->samples, played);
++            dolog("hw->rpos=%zu hw->samples=%zu played=%zu\n",
++                  hw->rpos, hw->samples, played);
+             hw->rpos = 0;
+         }
+ 
+ #ifdef DEBUG_OUT
+-        dolog ("played=%d\n", played);
++        dolog("played=%zu\n", played);
+ #endif
+ 
+         if (played) {
+@@ -1127,8 +1123,8 @@ static void audio_run_out (AudioState *s)
+             }
+ 
+             if (audio_bug(__func__, played > sw->total_hw_samples_mixed)) {
+-                dolog ("played=%d sw->total_hw_samples_mixed=%d\n",
+-                       played, sw->total_hw_samples_mixed);
++                dolog("played=%zu sw->total_hw_samples_mixed=%zu\n",
++                      played, sw->total_hw_samples_mixed);
+                 played = sw->total_hw_samples_mixed;
+             }
+ 
+@@ -1168,7 +1164,7 @@ static void audio_run_in (AudioState *s)
+ 
+     while ((hw = audio_pcm_hw_find_any_enabled_in(s, hw))) {
+         SWVoiceIn *sw;
+-        int captured = 0, min;
++        size_t captured = 0, min;
+ 
+         if (replay_mode != REPLAY_MODE_PLAY) {
+             captured = hw->pcm_ops->run_in(hw);
+@@ -1183,7 +1179,7 @@ static void audio_run_in (AudioState *s)
+             sw->total_hw_samples_acquired -= min;
+ 
+             if (sw->active) {
+-                int avail;
++                size_t avail;
+ 
+                 avail = audio_get_avail (sw);
+                 if (avail > 0) {
+@@ -1199,15 +1195,15 @@ static void audio_run_capture (AudioState *s)
+     CaptureVoiceOut *cap;
+ 
+     for (cap = s->cap_head.lh_first; cap; cap = cap->entries.le_next) {
+-        int live, rpos, captured;
++        size_t live, rpos, captured;
+         HWVoiceOut *hw = &cap->hw;
+         SWVoiceOut *sw;
+ 
+         captured = live = audio_pcm_hw_get_live_out (hw, NULL);
+         rpos = hw->rpos;
+         while (live) {
+-            int left = hw->samples - rpos;
+-            int to_capture = MIN (live, left);
++            size_t left = hw->samples - rpos;
++            size_t to_capture = MIN(live, left);
+             struct st_sample *src;
+             struct capture_callback *cb;
+ 
+@@ -1230,8 +1226,8 @@ static void audio_run_capture (AudioState *s)
+             }
+ 
+             if (audio_bug(__func__, captured > sw->total_hw_samples_mixed)) {
+-                dolog ("captured=%d sw->total_hw_samples_mixed=%d\n",
+-                       captured, sw->total_hw_samples_mixed);
++                dolog("captured=%zu sw->total_hw_samples_mixed=%zu\n",
++                      captured, sw->total_hw_samples_mixed);
+                 captured = sw->total_hw_samples_mixed;
+             }
+ 
+@@ -1570,8 +1566,8 @@ CaptureVoiceOut *AUD_add_capture(
+         hw->mix_buf = audio_calloc(__func__, hw->samples,
+                                    sizeof(struct st_sample));
+         if (!hw->mix_buf) {
+-            dolog ("Could not allocate capture mix buffer (%d samples)\n",
+-                   hw->samples);
++            dolog("Could not allocate capture mix buffer (%zu samples)\n",
++                  hw->samples);
+             goto err2;
+         }
+ 
+@@ -1580,7 +1576,7 @@ CaptureVoiceOut *AUD_add_capture(
+         cap->buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
+         if (!cap->buf) {
+             dolog ("Could not allocate capture buffer "
+-                   "(%d samples, each %d bytes)\n",
++                   "(%zu samples, each %d bytes)\n",
+                    hw->samples, 1 << hw->info.shift);
+             goto err3;
+         }
+diff --git a/audio/audio.h b/audio/audio.h
+index bcbe56d639..bfb12e7531 100644
+--- a/audio/audio.h
++++ b/audio/audio.h
+@@ -114,7 +114,7 @@ SWVoiceOut *AUD_open_out (
+     );
+ 
+ void AUD_close_out (QEMUSoundCard *card, SWVoiceOut *sw);
+-int  AUD_write (SWVoiceOut *sw, void *pcm_buf, int size);
++size_t AUD_write (SWVoiceOut *sw, void *pcm_buf, size_t size);
+ int  AUD_get_buffer_size_out (SWVoiceOut *sw);
+ void AUD_set_active_out (SWVoiceOut *sw, int on);
+ int  AUD_is_active_out (SWVoiceOut *sw);
+@@ -135,7 +135,7 @@ SWVoiceIn *AUD_open_in (
+     );
+ 
+ void AUD_close_in (QEMUSoundCard *card, SWVoiceIn *sw);
+-int  AUD_read (SWVoiceIn *sw, void *pcm_buf, int size);
++size_t AUD_read (SWVoiceIn *sw, void *pcm_buf, size_t size);
+ void AUD_set_active_in (SWVoiceIn *sw, int on);
+ int  AUD_is_active_in (SWVoiceIn *sw);
+ 
 diff --git a/audio/audio_int.h b/audio/audio_int.h
-index 330c465d0b..5c361d9451 100644
+index d269c38465..330c465d0b 100644
 --- a/audio/audio_int.h
 +++ b/audio/audio_int.h
-@@ -64,6 +64,8 @@ typedef struct HWVoiceOut {
+@@ -60,12 +60,12 @@ typedef struct HWVoiceOut {
+ 
+     f_sample *clip;
+ 
+-    int rpos;
++    size_t rpos;
      uint64_t ts_helper;
  
      struct st_sample *mix_buf;
-+    void *buf_emul;
-+    size_t pos_emul, pending_emul, size_emul;
  
-     size_t samples;
+-    int samples;
++    size_t samples;
      QLIST_HEAD (sw_out_listhead, SWVoiceOut) sw_head;
-@@ -86,6 +88,8 @@ typedef struct HWVoiceIn {
+     QLIST_HEAD (sw_cap_listhead, SWVoiceCap) cap_head;
+     int ctl_caps;
+@@ -81,13 +81,13 @@ typedef struct HWVoiceIn {
+ 
+     t_sample *conv;
+ 
+-    int wpos;
+-    int total_samples_captured;
++    size_t wpos;
++    size_t total_samples_captured;
      uint64_t ts_helper;
  
      struct st_sample *conv_buf;
-+    void *buf_emul;
-+    size_t pos_emul, pending_emul, size_emul;
  
-     size_t samples;
+-    int samples;
++    size_t samples;
      QLIST_HEAD (sw_in_listhead, SWVoiceIn) sw_head;
-@@ -146,17 +150,42 @@ struct audio_driver {
- };
+     int ctl_caps;
+     struct audio_pcm_ops *pcm_ops;
+@@ -102,7 +102,7 @@ struct SWVoiceOut {
+     int64_t ratio;
+     struct st_sample *buf;
+     void *rate;
+-    int total_hw_samples_mixed;
++    size_t total_hw_samples_mixed;
+     int active;
+     int empty;
+     HWVoiceOut *hw;
+@@ -119,7 +119,7 @@ struct SWVoiceIn {
+     struct audio_pcm_info info;
+     int64_t ratio;
+     void *rate;
+-    int total_hw_samples_acquired;
++    size_t total_hw_samples_acquired;
+     struct st_sample *buf;
+     f_sample *clip;
+     HWVoiceIn *hw;
+@@ -207,10 +207,10 @@ audio_driver *audio_driver_lookup(const char *name);
+ void audio_pcm_init_info (struct audio_pcm_info *info, struct audsettings *as);
+ void audio_pcm_info_clear_buf (struct audio_pcm_info *info, void *buf, int len);
  
- struct audio_pcm_ops {
--    int  (*init_out)(HWVoiceOut *hw, struct audsettings *as, void *drv_opaque);
--    void (*fini_out)(HWVoiceOut *hw);
--    int  (*run_out) (HWVoiceOut *hw, int live);
--    int  (*ctl_out) (HWVoiceOut *hw, int cmd, ...);
-+    int    (*init_out)(HWVoiceOut *hw, audsettings *as, void *drv_opaque);
-+    void   (*fini_out)(HWVoiceOut *hw);
-+    int    (*run_out) (HWVoiceOut *hw, int live);
-+    size_t (*write)   (HWVoiceOut *hw, void *buf, size_t size);
-+    /*
-+     * get a buffer that after later can be passed to put_buffer_out; optional
-+     * returns the buffer, and writes it's size to size (in bytes)
-+     * this is unrelated to the above buffer_size_out function
-+     */
-+    void  *(*get_buffer_out)(HWVoiceOut *hw, size_t *size);
-+    /*
-+     * put back the buffer returned by get_buffer_out; optional
-+     * buf must be equal the pointer returned by get_buffer_out,
-+     * size may be smaller
-+     */
-+    size_t (*put_buffer_out)(HWVoiceOut *hw, void *buf, size_t size);
-+    int    (*ctl_out) (HWVoiceOut *hw, int cmd, ...);
+-int  audio_pcm_hw_get_live_in (HWVoiceIn *hw);
++size_t audio_pcm_hw_get_live_in(HWVoiceIn *hw);
  
--    int  (*init_in) (HWVoiceIn *hw, struct audsettings *as, void *drv_opaque);
--    void (*fini_in) (HWVoiceIn *hw);
--    int  (*run_in)  (HWVoiceIn *hw);
--    int  (*ctl_in)  (HWVoiceIn *hw, int cmd, ...);
-+    int    (*init_in) (HWVoiceIn *hw, audsettings *as, void *drv_opaque);
-+    void   (*fini_in) (HWVoiceIn *hw);
-+    int    (*run_in)  (HWVoiceIn *hw);
-+    size_t (*read)    (HWVoiceIn *hw, void *buf, size_t size);
-+    void  *(*get_buffer_in)(HWVoiceIn *hw, size_t *size);
-+    void   (*put_buffer_in)(HWVoiceIn *hw, void *buf, size_t size);
-+    int    (*ctl_in)  (HWVoiceIn *hw, int cmd, ...);
- };
+-int audio_pcm_hw_clip_out (HWVoiceOut *hw, void *pcm_buf,
+-                           int live, int pending);
++size_t audio_pcm_hw_clip_out(HWVoiceOut *hw, void *pcm_buf,
++                             size_t live, size_t pending);
  
-+void *audio_generic_get_buffer_in(HWVoiceIn *hw, size_t *size);
-+void audio_generic_put_buffer_in(HWVoiceIn *hw, void *buf, size_t size);
-+void *audio_generic_get_buffer_out(HWVoiceOut *hw, size_t *size);
-+size_t audio_generic_put_buffer_out(HWVoiceOut *hw, void *buf, size_t size);
-+size_t audio_generic_put_buffer_out_nowrite(HWVoiceOut *hw, void *buf,
-+                                            size_t size);
-+size_t audio_generic_write(HWVoiceOut *hw, void *buf, size_t size);
-+size_t audio_generic_read(HWVoiceIn *hw, void *buf, size_t size);
-+
- struct capture_callback {
-     struct audio_capture_ops ops;
-     void *opaque;
+ int audio_bug (const char *funcname, int cond);
+ void *audio_calloc (const char *funcname, int nmemb, size_t size);
+@@ -223,7 +223,7 @@ void audio_run(AudioState *s, const char *msg);
+ 
+ #define VOICE_VOLUME_CAP (1 << VOICE_VOLUME)
+ 
+-static inline int audio_ring_dist (int dst, int src, int len)
++static inline size_t audio_ring_dist(size_t dst, size_t src, size_t len)
+ {
+     return (dst >= src) ? (dst - src) : (len - src + dst);
+ }
 diff --git a/audio/audio_template.h b/audio/audio_template.h
-index fecbf1a046..33cdb66d7f 100644
+index ce1e5d6559..fecbf1a046 100644
 --- a/audio/audio_template.h
 +++ b/audio/audio_template.h
-@@ -71,6 +71,7 @@ static void glue(audio_init_nb_voices_, TYPE)(AudioState *s,
- 
- static void glue (audio_pcm_hw_free_resources_, TYPE) (HW *hw)
+@@ -79,8 +79,8 @@ static int glue (audio_pcm_hw_alloc_resources_, TYPE) (HW *hw)
  {
-+    g_free(hw->buf_emul);
-     g_free (HWBUF);
-     HWBUF = NULL;
+     HWBUF = audio_calloc(__func__, hw->samples, sizeof(struct st_sample));
+     if (!HWBUF) {
+-        dolog ("Could not allocate " NAME " buffer (%d samples)\n",
+-               hw->samples);
++        dolog("Could not allocate " NAME " buffer (%zu samples)\n",
++              hw->samples);
+         return -1;
+     }
+ 
+@@ -265,7 +265,7 @@ static HW *glue(audio_pcm_hw_add_new_, TYPE)(AudioState *s,
+     }
+ 
+     if (audio_bug(__func__, hw->samples <= 0)) {
+-        dolog ("hw->samples=%d\n", hw->samples);
++        dolog("hw->samples=%zd\n", hw->samples);
+         goto err1;
+     }
+ 
+diff --git a/audio/mixeng.h b/audio/mixeng.h
+index b53a5ef99a..2c09ed41e7 100644
+--- a/audio/mixeng.h
++++ b/audio/mixeng.h
+@@ -25,6 +25,8 @@
+ #ifndef QEMU_MIXENG_H
+ #define QEMU_MIXENG_H
+ 
++#include <stddef.h>
++
+ #ifdef FLOAT_MIXENG
+ typedef float mixeng_real;
+ struct mixeng_volume { int mute; mixeng_real r; mixeng_real l; };
+@@ -33,6 +35,7 @@ struct st_sample { mixeng_real l; mixeng_real r; };
+ struct mixeng_volume { int mute; int64_t r; int64_t l; };
+ struct st_sample { int64_t l; int64_t r; };
+ #endif
++typedef struct st_sample st_sample;
+ 
+ typedef void (t_sample) (struct st_sample *dst, const void *src, int samples);
+ typedef void (f_sample) (void *dst, const struct st_sample *src, int samples);
+@@ -41,10 +44,10 @@ extern t_sample *mixeng_conv[2][2][2][3];
+ extern f_sample *mixeng_clip[2][2][2][3];
+ 
+ void *st_rate_start (int inrate, int outrate);
+-void st_rate_flow (void *opaque, struct st_sample *ibuf, struct st_sample *obuf,
+-                   int *isamp, int *osamp);
+-void st_rate_flow_mix (void *opaque, struct st_sample *ibuf, struct st_sample *obuf,
+-                       int *isamp, int *osamp);
++void st_rate_flow(void *opaque, st_sample *ibuf, st_sample *obuf,
++                  size_t *isamp, size_t *osamp);
++void st_rate_flow_mix(void *opaque, st_sample *ibuf, st_sample *obuf,
++                      size_t *isamp, size_t *osamp);
+ void st_rate_stop (void *opaque);
+ void mixeng_clear (struct st_sample *buf, int len);
+ void mixeng_volume (struct st_sample *buf, int len, struct mixeng_volume *vol);
+diff --git a/audio/ossaudio.c b/audio/ossaudio.c
+index 70909e5696..05c7d6f85c 100644
+--- a/audio/ossaudio.c
++++ b/audio/ossaudio.c
+@@ -476,8 +476,8 @@ static void oss_fini_out (HWVoiceOut *hw)
+         if (oss->mmapped) {
+             err = munmap (oss->pcm_buf, hw->samples << hw->info.shift);
+             if (err) {
+-                oss_logerr (errno, "Failed to unmap buffer %p, size %d\n",
+-                            oss->pcm_buf, hw->samples << hw->info.shift);
++                oss_logerr(errno, "Failed to unmap buffer %p, size %zu\n",
++                           oss->pcm_buf, hw->samples << hw->info.shift);
+             }
+         }
+         else {
+@@ -543,8 +543,8 @@ static int oss_init_out(HWVoiceOut *hw, struct audsettings *as,
+             0
+             );
+         if (oss->pcm_buf == MAP_FAILED) {
+-            oss_logerr (errno, "Failed to map %d bytes of DAC\n",
+-                        hw->samples << hw->info.shift);
++            oss_logerr(errno, "Failed to map %zu bytes of DAC\n",
++                       hw->samples << hw->info.shift);
+         }
+         else {
+             int err;
+@@ -568,8 +568,8 @@ static int oss_init_out(HWVoiceOut *hw, struct audsettings *as,
+             if (!oss->mmapped) {
+                 err = munmap (oss->pcm_buf, hw->samples << hw->info.shift);
+                 if (err) {
+-                    oss_logerr (errno, "Failed to unmap buffer %p size %d\n",
+-                                oss->pcm_buf, hw->samples << hw->info.shift);
++                    oss_logerr(errno, "Failed to unmap buffer %p size %zu\n",
++                               oss->pcm_buf, hw->samples << hw->info.shift);
+                 }
+             }
+         }
+@@ -581,7 +581,7 @@ static int oss_init_out(HWVoiceOut *hw, struct audsettings *as,
+                                     1 << hw->info.shift);
+         if (!oss->pcm_buf) {
+             dolog (
+-                "Could not allocate DAC buffer (%d samples, each %d bytes)\n",
++                "Could not allocate DAC buffer (%zu samples, each %d bytes)\n",
+                 hw->samples,
+                 1 << hw->info.shift
+                 );
+@@ -693,8 +693,8 @@ static int oss_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
+     hw->samples = (obt.nfrags * obt.fragsize) >> hw->info.shift;
+     oss->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
+     if (!oss->pcm_buf) {
+-        dolog ("Could not allocate ADC buffer (%d samples, each %d bytes)\n",
+-               hw->samples, 1 << hw->info.shift);
++        dolog("Could not allocate ADC buffer (%zu samples, each %d bytes)\n",
++              hw->samples, 1 << hw->info.shift);
+         oss_anal_close (&fd);
+         return -1;
+     }
+diff --git a/audio/paaudio.c b/audio/paaudio.c
+index 6a1919e93b..251b087a74 100644
+--- a/audio/paaudio.c
++++ b/audio/paaudio.c
+@@ -584,8 +584,8 @@ static int qpa_init_out(HWVoiceOut *hw, struct audsettings *as,
+     pa->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
+     pa->rpos = hw->rpos;
+     if (!pa->pcm_buf) {
+-        dolog ("Could not allocate buffer (%d bytes)\n",
+-               hw->samples << hw->info.shift);
++        dolog("Could not allocate buffer (%zu bytes)\n",
++              hw->samples << hw->info.shift);
+         goto fail2;
+     }
+ 
+@@ -645,8 +645,8 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
+     pa->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
+     pa->wpos = hw->wpos;
+     if (!pa->pcm_buf) {
+-        dolog ("Could not allocate buffer (%d bytes)\n",
+-               hw->samples << hw->info.shift);
++        dolog("Could not allocate buffer (%zu bytes)\n",
++              hw->samples << hw->info.shift);
+         goto fail2;
+     }
+ 
+diff --git a/audio/rate_template.h b/audio/rate_template.h
+index 6e93588877..f94c940c61 100644
+--- a/audio/rate_template.h
++++ b/audio/rate_template.h
+@@ -28,7 +28,7 @@
+  * Return number of samples processed.
+  */
+ void NAME (void *opaque, struct st_sample *ibuf, struct st_sample *obuf,
+-           int *isamp, int *osamp)
++           size_t *isamp, size_t *osamp)
+ {
+     struct rate *rate = opaque;
+     struct st_sample *istart, *iend;
+diff --git a/audio/sdlaudio.c b/audio/sdlaudio.c
+index ab9166d054..92da4804c6 100644
+--- a/audio/sdlaudio.c
++++ b/audio/sdlaudio.c
+@@ -273,8 +273,7 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
+         }
+ 
+         if (audio_bug(__func__, sdl->live < 0 || sdl->live > hw->samples)) {
+-            dolog ("sdl->live=%d hw->samples=%d\n",
+-                   sdl->live, hw->samples);
++            dolog("sdl->live=%d hw->samples=%zu\n", sdl->live, hw->samples);
+             return;
+         }
+ 
+diff --git a/audio/wavaudio.c b/audio/wavaudio.c
+index dda6993fb9..58300663ff 100644
+--- a/audio/wavaudio.c
++++ b/audio/wavaudio.c
+@@ -137,8 +137,8 @@ static int wav_init_out(HWVoiceOut *hw, struct audsettings *as,
+     hw->samples = 1024;
+     wav->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
+     if (!wav->pcm_buf) {
+-        dolog ("Could not allocate buffer (%d bytes)\n",
+-               hw->samples << hw->info.shift);
++        dolog("Could not allocate buffer (%zu bytes)\n",
++              hw->samples << hw->info.shift);
+         return -1;
+     }
+ 
+diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+index 3a7c58e423..5c0a91e44f 100644
+--- a/include/sysemu/replay.h
++++ b/include/sysemu/replay.h
+@@ -179,9 +179,9 @@ void replay_net_packet_event(ReplayNetState *rns, unsigned flags,
+ /* Audio */
+ 
+ /*! Saves/restores number of played samples of audio out operation. */
+-void replay_audio_out(int *played);
++void replay_audio_out(size_t *played);
+ /*! Saves/restores recorded samples of audio in operation. */
+-void replay_audio_in(int *recorded, void *samples, int *wpos, int size);
++void replay_audio_in(size_t *recorded, void *samples, size_t *wpos, size_t size);
+ 
+ /* VM state operations */
+ 
+diff --git a/replay/replay-audio.c b/replay/replay-audio.c
+index b113836de4..efe1628727 100644
+--- a/replay/replay-audio.c
++++ b/replay/replay-audio.c
+@@ -16,18 +16,18 @@
+ #include "sysemu/sysemu.h"
+ #include "audio/audio.h"
+ 
+-void replay_audio_out(int *played)
++void replay_audio_out(size_t *played)
+ {
+     if (replay_mode == REPLAY_MODE_RECORD) {
+         g_assert(replay_mutex_locked());
+         replay_save_instructions();
+         replay_put_event(EVENT_AUDIO_OUT);
+-        replay_put_dword(*played);
++        replay_put_qword(*played);
+     } else if (replay_mode == REPLAY_MODE_PLAY) {
+         g_assert(replay_mutex_locked());
+         replay_account_executed_instructions();
+         if (replay_next_event_is(EVENT_AUDIO_OUT)) {
+-            *played = replay_get_dword();
++            *played = replay_get_qword();
+             replay_finish_event();
+         } else {
+             error_report("Missing audio out event in the replay log");
+@@ -36,7 +36,7 @@ void replay_audio_out(int *played)
+     }
  }
+ 
+-void replay_audio_in(int *recorded, void *samples, int *wpos, int size)
++void replay_audio_in(size_t *recorded, void *samples, size_t *wpos, size_t size)
+ {
+     int pos;
+     uint64_t left, right;
+@@ -44,8 +44,8 @@ void replay_audio_in(int *recorded, void *samples, int *wpos, int size)
+         g_assert(replay_mutex_locked());
+         replay_save_instructions();
+         replay_put_event(EVENT_AUDIO_IN);
+-        replay_put_dword(*recorded);
+-        replay_put_dword(*wpos);
++        replay_put_qword(*recorded);
++        replay_put_qword(*wpos);
+         for (pos = (*wpos - *recorded + size) % size ; pos != *wpos
+              ; pos = (pos + 1) % size) {
+             audio_sample_to_uint64(samples, pos, &left, &right);
+@@ -56,8 +56,8 @@ void replay_audio_in(int *recorded, void *samples, int *wpos, int size)
+         g_assert(replay_mutex_locked());
+         replay_account_executed_instructions();
+         if (replay_next_event_is(EVENT_AUDIO_IN)) {
+-            *recorded = replay_get_dword();
+-            *wpos = replay_get_dword();
++            *recorded = replay_get_qword();
++            *wpos = replay_get_qword();
+             for (pos = (*wpos - *recorded + size) % size ; pos != *wpos
+                  ; pos = (pos + 1) % size) {
+                 left = replay_get_qword();
 -- 
 2.20.1
