@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gb1k2-00073V-RY
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:16:19 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gb1oz-0002mN-Jq
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:21:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gb1jz-0006Go-Kg
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:16:18 -0500
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sun, 23 Dec 2018 11:15:25 +0000
-Message-Id: <20181223111525.581-10-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20181223111525.581-1-mark.cave-ayland@ilande.co.uk>
-References: <20181223111525.581-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH v4 9/9] target/ppc: replace AVR* macros with
- Vsr* macros
+	(envelope-from <no-reply@patchew.org>) id 1gb1ow-0002RC-Ez
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:21:25 -0500
+Resent-Message-Id: <E1gb1ow-0002RC-Ez@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21724)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gb1ow-0002PM-4U
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:21:22 -0500
+In-Reply-To: <20181214165657.749-1-rkagan@virtuozzo.com>
+Message-ID: <154556313749.18047.12433695608940809202@02a1dbf831e2>
+Reply-To: <qemu-devel@nongnu.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 23 Dec 2018 03:05:39 -0800 (PST)
+Subject: Re: [Qemu-devel] [RFC PATCH 0/5] expose negotiated virtio features
+ in r/o properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,91 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, richard.henderson@linaro.org, david@gibson.dropbear.id.au
+To: rkagan@virtuozzo.com
+Cc: fam@euphon.net, qemu-devel@nongnu.orgfam@euphon.net, mst@redhat.com, amit@kernel.org, armbru@redhat.com, pbonzini@redhat.com, afaerber@suse.de
 
-Now that the VMX and VSR register sets have been combined, the same macros can
-be used to access both AVR and VSR field members.
-
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/ppc/int_helper.c | 30 +++++++++++++-----------------
- 1 file changed, 13 insertions(+), 17 deletions(-)
-
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 9d715be25c..598731d47a 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -391,13 +391,9 @@ target_ulong helper_602_mfrom(target_ulong arg)
- #if defined(HOST_WORDS_BIGENDIAN)
- #define HI_IDX 0
- #define LO_IDX 1
--#define AVRB(i) u8[i]
--#define AVRW(i) u32[i]
- #else
- #define HI_IDX 1
- #define LO_IDX 0
--#define AVRB(i) u8[15-(i)]
--#define AVRW(i) u32[3-(i)]
- #endif
- 
- #if defined(HOST_WORDS_BIGENDIAN)
-@@ -3277,11 +3273,11 @@ void helper_vcipher(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
-     int i;
- 
-     VECTOR_FOR_INORDER_I(i, u32) {
--        result.AVRW(i) = b->AVRW(i) ^
--            (AES_Te0[a->AVRB(AES_shifts[4*i + 0])] ^
--             AES_Te1[a->AVRB(AES_shifts[4*i + 1])] ^
--             AES_Te2[a->AVRB(AES_shifts[4*i + 2])] ^
--             AES_Te3[a->AVRB(AES_shifts[4*i + 3])]);
-+        result.VsrW(i) = b->VsrW(i) ^
-+            (AES_Te0[a->VsrB(AES_shifts[4 * i + 0])] ^
-+             AES_Te1[a->VsrB(AES_shifts[4 * i + 1])] ^
-+             AES_Te2[a->VsrB(AES_shifts[4 * i + 2])] ^
-+             AES_Te3[a->VsrB(AES_shifts[4 * i + 3])]);
-     }
-     *r = result;
- }
-@@ -3292,7 +3288,7 @@ void helper_vcipherlast(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
-     int i;
- 
-     VECTOR_FOR_INORDER_I(i, u8) {
--        result.AVRB(i) = b->AVRB(i) ^ (AES_sbox[a->AVRB(AES_shifts[i])]);
-+        result.VsrB(i) = b->VsrB(i) ^ (AES_sbox[a->VsrB(AES_shifts[i])]);
-     }
-     *r = result;
- }
-@@ -3305,15 +3301,15 @@ void helper_vncipher(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
-     ppc_avr_t tmp;
- 
-     VECTOR_FOR_INORDER_I(i, u8) {
--        tmp.AVRB(i) = b->AVRB(i) ^ AES_isbox[a->AVRB(AES_ishifts[i])];
-+        tmp.VsrB(i) = b->VsrB(i) ^ AES_isbox[a->VsrB(AES_ishifts[i])];
-     }
- 
-     VECTOR_FOR_INORDER_I(i, u32) {
--        r->AVRW(i) =
--            AES_imc[tmp.AVRB(4*i + 0)][0] ^
--            AES_imc[tmp.AVRB(4*i + 1)][1] ^
--            AES_imc[tmp.AVRB(4*i + 2)][2] ^
--            AES_imc[tmp.AVRB(4*i + 3)][3];
-+        r->VsrW(i) =
-+            AES_imc[tmp.VsrB(4 * i + 0)][0] ^
-+            AES_imc[tmp.VsrB(4 * i + 1)][1] ^
-+            AES_imc[tmp.VsrB(4 * i + 2)][2] ^
-+            AES_imc[tmp.VsrB(4 * i + 3)][3];
-     }
- }
- 
-@@ -3323,7 +3319,7 @@ void helper_vncipherlast(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
-     int i;
- 
-     VECTOR_FOR_INORDER_I(i, u8) {
--        result.AVRB(i) = b->AVRB(i) ^ (AES_isbox[a->AVRB(AES_ishifts[i])]);
-+        result.VsrB(i) = b->VsrB(i) ^ (AES_isbox[a->VsrB(AES_ishifts[i])]);
-     }
-     *r = result;
- }
--- 
-2.11.0
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIxNDE2NTY1Ny43NDkt
+MS1ya2FnYW5AdmlydHVvenpvLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
+IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
+Zm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxODEyMTQxNjU2NTcuNzQ5LTEtcmthZ2FuQHZpcnR1
+b3p6by5jb20KVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUkZDIFBBVENIIDAv
+NV0gZXhwb3NlIG5lZ290aWF0ZWQgdmlydGlvIGZlYXR1cmVzIGluIHIvbyBwcm9wZXJ0aWVzCgo9
+PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFs
+PSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
+bWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29t
+bWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4g
+JGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxv
+ZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9
+ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAg
+ICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQg
+JGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3
+ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
+CmE3ODZiN2IgdmlydGlvOiBleHBvc2UgbmVnb3RpYXRlZCBmZWF0dXJlcyBpbiByL28gcHJvcGVy
+dGllcwowYzZiZjM4IHZpcnRpbzogZHJvcCBERUZJTkVfVklSVElPX0NPTU1PTl9GRUFUVVJFUwoz
+MmU4MzJkIHFkZXYtcHJvcGVydGllczogYWRkIHIvbyA2NGJpdCBiaXRmaWVsZCBwcm9wZXJ0eQo4
+NjQ3NWNmIHFtcDogZnVydGhlciBjb25zb2xpZGF0ZSBsaXN0aW5nIG9mIGRldmljZSBhbmQgb2Jq
+ZWN0IHByb3BlcnRpZXMKMDlmMTE2OSBxb206IHByZXNlcnZlIGdldC9zZXQgcHJlc2VuY2UgaW4g
+YWxpYXNlZCBwcm9wZXJ0aWVzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAx
+LzU6IHFvbTogcHJlc2VydmUgZ2V0L3NldCBwcmVzZW5jZSBpbiBhbGlhc2VkIHByb3BlcnRpZXMu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMi81OiBxbXA6IGZ1cnRoZXIgY29uc29saWRhdGUgbGlzdGluZyBv
+ZiBkZXZpY2UgYW5kIG9iamVjdCBwcm9wZXJ0aWVzLi4uCkNoZWNraW5nIFBBVENIIDMvNTogcWRl
+di1wcm9wZXJ0aWVzOiBhZGQgci9vIDY0Yml0IGJpdGZpZWxkIHByb3BlcnR5Li4uCkNoZWNraW5n
+IFBBVENIIDQvNTogdmlydGlvOiBkcm9wIERFRklORV9WSVJUSU9fQ09NTU9OX0ZFQVRVUkVTLi4u
+CkNoZWNraW5nIFBBVENIIDUvNTogdmlydGlvOiBleHBvc2UgbmVnb3RpYXRlZCBmZWF0dXJlcyBp
+biByL28gcHJvcGVydGllcy4uLgpFUlJPUjogTWFjcm9zIHdpdGggY29tcGxleCB2YWx1ZXMgc2hv
+dWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiMyMTg6IEZJTEU6IGluY2x1ZGUvaHcvdmly
+dGlvL3ZpcnRpby5oOjI2MToKKyNkZWZpbmUgREVGSU5FX1ZJUlRJT19GRUFUVVJFX0JJVChfbmFt
+ZSwgX3N0YXRlLCBfZmllbGQsIF9iaXQsIF9kZWZ2YWwpIFwKKyAgICBERUZJTkVfUFJPUF9CSVQ2
+NChfbmFtZSwgX3N0YXRlLCBfZmllbGQsIF9iaXQsIF9kZWZ2YWwpLCAgICAgICAgICAgIFwKKyAg
+ICBERUZJTkVfVklSVElPX0ZFQVRVUkVfQklUX05FR09USUFURUQoX25hbWUsIF9iaXQpCgp0b3Rh
+bDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDE2NSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhh
+cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
+YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
+RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
+ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRw
+Oi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE4MTIxNDE2NTY1Ny43NDktMS1ya2FnYW5AdmlydHVvenpv
+LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRl
+ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
+c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
