@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:41213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gb4nv-0005bx-1V
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 09:32:47 -0500
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gb7HB-0005IE-53
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 12:10:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gb4lw-0004mB-5t
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 09:31:12 -0500
-Resent-Message-Id: <E1gb4lw-0004mB-5t@eggs.gnu.org>
-In-Reply-To: <20181214231512.5295-1-jsnow@redhat.com>
-Message-ID: <154557529251.18047.4398293307933286743@02a1dbf831e2>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gb7HA-0003DI-9Q
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 12:10:53 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:40291)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1gb7HA-0003Cw-55
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 12:10:52 -0500
+Received: by mail-ot1-x341.google.com with SMTP id s5so9343341oth.7
+	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 09:10:51 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 23 Dec 2018 06:28:14 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 0/7] bitmaps: remove x- prefix from QMP
- api
+References: <20181127121724.19755-1-sw@weilnetz.de>
+	<20181127121724.19755-3-sw@weilnetz.de>
+In-Reply-To: <20181127121724.19755-3-sw@weilnetz.de>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Sun, 23 Dec 2018 18:10:38 +0100
+Message-ID: <CAL1e-=g9u5PONfeord2BUWsu-EKm7h2rx-_-9QarE=50JoZdfg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-3.1 2/2] disas/nanomips: Fix format
+ strings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +30,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jsnow@redhat.com
-Cc: fam@euphon.net, qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, vsementsov@virtuozzo.com, armbru@redhat.com, mreitz@redhat.com
+To: Stefan Weil <sw@weilnetz.de>
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIxNDIzMTUxMi41Mjk1
-LTEtanNub3dAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
-bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
-bWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxODEyMTQyMzE1MTIuNTI5NS0xLWpzbm93QHJlZGhhdC5j
-b20KVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC83XSBiaXRt
-YXBzOiByZW1vdmUgeC0gcHJlZml4IGZyb20gUU1QIGFwaQoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
-ID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5l
-ICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZv
-cm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNo
-byAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAk
-YykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2No
-ZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBl
-Y2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NS
-SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
-MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoyNDMzNGM5IGlvdGVzdHM6IGFk
-ZCBpb3Rlc3QgMjM2IGZvciB0ZXN0aW5nIGJpdG1hcCBtZXJnZQo0YTZhNTFmIGlvdGVzdHM6IGFs
-bG93IHByZXR0eS1wcmludCBmb3IgcW1wX2xvZwoxOTZjOTIyIGlvdGVzdHM6IGFkZCBmaWx0ZXJf
-Z2VuZXJhdGVkX25vZGVfaWRzCmVhZTI5NTMgaW90ZXN0cy5weTogZG9uJ3QgYWJvcnQgaWYgSU1H
-S0VZU0VDUkVUIGlzIHVuZGVmaW5lZAo2YWFhYWZhIGJsb2NrOiByZW1vdmUgJ3gnIHByZWZpeCBm
-cm9tIGV4cGVyaW1lbnRhbCBiaXRtYXAgQVBJcwoxNGMzZWUxIGJsb2NrZGV2OiBuLWFyeSBiaXRt
-YXAgbWVyZ2UKMjRkNTUyOCBibG9ja2RldjogYWJvcnQgdHJhbnNhY3Rpb25zIGluIHJldmVyc2Ug
-b3JkZXIKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNzogYmxvY2tkZXY6
-IGFib3J0IHRyYW5zYWN0aW9ucyBpbiByZXZlcnNlIG9yZGVyLi4uCkNoZWNraW5nIFBBVENIIDIv
-NzogYmxvY2tkZXY6IG4tYXJ5IGJpdG1hcCBtZXJnZS4uLgpFUlJPUjogZXh0ZXJucyBzaG91bGQg
-YmUgYXZvaWRlZCBpbiAuYyBmaWxlcwojMjg6IEZJTEU6IGJsb2NrZGV2LmM6MjEyNToKK3ZvaWQg
-ZG9fYmxvY2tfZGlydHlfYml0bWFwX21lcmdlKGNvbnN0IGNoYXIgKm5vZGUsIGNvbnN0IGNoYXIg
-KnRhcmdldCwKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTQ3IGxpbmVzIGNoZWNrZWQK
-CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDMv
-NzogYmxvY2s6IHJlbW92ZSAneCcgcHJlZml4IGZyb20gZXhwZXJpbWVudGFsIGJpdG1hcCBBUElz
-Li4uCkNoZWNraW5nIFBBVENIIDQvNzogaW90ZXN0cy5weTogZG9uJ3QgYWJvcnQgaWYgSU1HS0VZ
-U0VDUkVUIGlzIHVuZGVmaW5lZC4uLgpDaGVja2luZyBQQVRDSCA1Lzc6IGlvdGVzdHM6IGFkZCBm
-aWx0ZXJfZ2VuZXJhdGVkX25vZGVfaWRzLi4uCkNoZWNraW5nIFBBVENIIDYvNzogaW90ZXN0czog
-YWxsb3cgcHJldHR5LXByaW50IGZvciBxbXBfbG9nLi4uCkNoZWNraW5nIFBBVENIIDcvNzogaW90
-ZXN0czogYWRkIGlvdGVzdCAyMzYgZm9yIHRlc3RpbmcgYml0bWFwIG1lcmdlLi4uCj09PSBPVVRQ
-VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBs
-b2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTgxMjE0MjMxNTEy
-LjUyOTUtMS1qc25vd0ByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdl
-LgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3Bh
-dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
-ZWRoYXQuY29t
+On Tue, Nov 27, 2018 at 1:19 PM Stefan Weil <sw@weilnetz.de> wrote:
+>
+> Signed-off-by: Stefan Weil <sw@weilnetz.de>
+> ---
+>  disas/nanomips.cpp | 18 +++++++++++-------
+>  1 file changed, 11 insertions(+), 7 deletions(-)
+>
+
+Hi, Stefan,
+
+My plan is to accept this patch plus (in the same patch) following
+changes in nanomips.h:
+
+This code:
+
+typedef unsigned short uint16;
+typedef unsigned int uint32;
+typedef long long int64;
+typedef unsigned long long uint64;
+
+namespace img
+{
+    typedef unsigned long long address;
+}
+
+should become:
+
+typedef uint16_t uint16;
+typedef uint32_t uint32;
+typedef int64_t int64;
+typedef uint64_t uint64;
+
+namespace img
+{
+    typedef uint64_t address;
+}
+
+The reason is that I would like to keep custom types. The custom types
+names "uint32", "int64", etc. are admittedly too generic, but that
+will change in further development, and it looks do not bother any
+compiler so far. This means that patch 1/1 will not be applied.
+
+There is no need for respin, I will do the corrections while
+integrating pull request.
+
+Please let me know if you object over this.
+
+Thanks again for bringing all these issues!
+
+Aleksandar
+
+
+
+
+> diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
+> index 4c3cfceaba..a3f69348b3 100644
+> --- a/disas/nanomips.cpp
+> +++ b/disas/nanomips.cpp
+> @@ -284,7 +284,8 @@ uint64_t NMD::renumber_registers(uint64_t index, uint64_t *register_list,
+>      }
+>
+>      throw std::runtime_error(img::format(
+> -                   "Invalid register mapping index %d, size of list = %d",
+> +                   "Invalid register mapping index %" PRIu64
+> +                   ", size of list = %zu",
+>                     index, register_list_size));
+>  }
+>
+> @@ -501,7 +502,8 @@ std::string NMD::GPR(uint64_t reg)
+>          return gpr_reg[reg];
+>      }
+>
+> -    throw std::runtime_error(img::format("Invalid GPR register index %d", reg));
+> +    throw std::runtime_error(img::format("Invalid GPR register index %" PRIu64,
+> +                                         reg));
+>  }
+>
+>
+> @@ -518,7 +520,8 @@ std::string NMD::FPR(uint64_t reg)
+>          return fpr_reg[reg];
+>      }
+>
+> -    throw std::runtime_error(img::format("Invalid FPR register index %d", reg));
+> +    throw std::runtime_error(img::format("Invalid FPR register index %" PRIu64,
+> +                                         reg));
+>  }
+>
+>
+> @@ -532,26 +535,27 @@ std::string NMD::AC(uint64_t reg)
+>          return ac_reg[reg];
+>      }
+>
+> -    throw std::runtime_error(img::format("Invalid AC register index %d", reg));
+> +    throw std::runtime_error(img::format("Invalid AC register index %" PRIu64,
+> +                                         reg));
+>  }
+>
+>
+>  std::string NMD::IMMEDIATE(uint64_t value)
+>  {
+> -    return img::format("0x%x", value);
+> +    return img::format("0x%" PRIx64, value);
+>  }
+>
+>
+>  std::string NMD::IMMEDIATE(int64_t value)
+>  {
+> -    return img::format("%d", value);
+> +    return img::format("%" PRId64, value);
+>  }
+>
+>
+>  std::string NMD::CPR(uint64_t reg)
+>  {
+>      /* needs more work */
+> -    return img::format("CP%d", reg);
+> +    return img::format("CP%" PRIu64, reg);
+>  }
+>
+>
+> --
+> 2.11.0
+>
+>
