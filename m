@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52356)
+Received: from eggs.gnu.org ([208.118.235.92]:52291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAk0-0007tJ-Ma
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:55 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAjx-0007lQ-RE
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAjy-0002Vb-2E
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:52 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45126)
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAjv-0002Lr-Iq
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:49 -0500
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:35604)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gbAjx-0002Nt-Lw
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:49 -0500
-Received: by mail-wr1-x441.google.com with SMTP id t6so10090838wrr.12
-	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:52:48 -0800 (PST)
+	id 1gbAjv-0002IU-72
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:47 -0500
+Received: by mail-wm1-x32e.google.com with SMTP id c126so10408927wmh.0
+	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:52:47 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Sun, 23 Dec 2018 21:51:56 +0100
-Message-Id: <5262d91b3c72117da7cdc3c45c8685ae8b19c211.1545598229.git.DirtY.iCE.hu@gmail.com>
+Date: Sun, 23 Dec 2018 21:51:54 +0100
+Message-Id: <899034ec66d2d4b9a2302d874482b727d7eb92e4.1545598229.git.DirtY.iCE.hu@gmail.com>
 In-Reply-To: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 20/52] audio: audiodev= parameters no longer
- optional when -audiodev present
+Subject: [Qemu-devel] [PATCH v2 18/52] audio: basic support for multi
+ backend audio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,659 +32,468 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-This means you should probably stop using -soundhw (as it doesn't allow
-you to specify any options) and add the device manually with -device.
-The exception is pcspk, it's currently not possible to manually add it.
-To use it with audiodev, use something like this:
+Audio functions no longer access glob_audio_state, instead they get an
+AudioState as a parameter.  This is required in order to support
+multiple backends.
 
-    -audiodev id=foo,... -global isa-pcspk.audiodev=foo -soundhw pcspk
+glob_audio_state is also gone, and replaced with a tailq so we can store
+more than one states.
 
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/audio.c   |  24 ++--
- audio/paaudio.c | 303 +++++++++++++++++++++++++++---------------------
- 2 files changed, 189 insertions(+), 138 deletions(-)
+ audio/audio.c          | 105 +++++++++++++++++++++++++++++++----------
+ audio/audio.h          |  12 +++--
+ audio/audio_int.h      |   2 +
+ audio/audio_template.h |   2 +-
+ audio/wavcapture.c     |   6 +--
+ hmp-commands.hx        |  11 +++--
+ monitor.c              |  12 ++++-
+ qemu-options.hx        |   5 ++
+ ui/vnc.c               |  15 +++++-
+ ui/vnc.h               |   2 +
+ 10 files changed, 133 insertions(+), 39 deletions(-)
 
 diff --git a/audio/audio.c b/audio/audio.c
-index 92fa170b46..a7f79f3929 100644
+index 461aea7a01..92fa170b46 100644
 --- a/audio/audio.c
 +++ b/audio/audio.c
-@@ -100,6 +100,8 @@ const struct mixeng_volume nominal_volume = {
- #endif
+@@ -86,7 +86,8 @@ audio_driver *audio_driver_lookup(const char *name)
+     return NULL;
+ }
+ 
+-static AudioState glob_audio_state;
++static QTAILQ_HEAD(AudioStateHead, AudioState) audio_states =
++    QTAILQ_HEAD_INITIALIZER(audio_states);
+ 
+ const struct mixeng_volume nominal_volume = {
+     .mute = 0,
+@@ -1240,11 +1241,14 @@ static void audio_run_capture (AudioState *s)
+ 
+ void audio_run (const char *msg)
+ {
+-    AudioState *s = &glob_audio_state;
++    AudioState *s;
++
++    QTAILQ_FOREACH(s, &audio_states, list) {
++        audio_run_out (s);
++        audio_run_in (s);
++        audio_run_capture (s);
++    }
+ 
+-    audio_run_out (s);
+-    audio_run_in (s);
+-    audio_run_capture (s);
+ #ifdef DEBUG_POLL
+     {
+         static double prevtime;
+@@ -1306,13 +1310,11 @@ bool audio_is_cleaning_up(void)
+     return is_cleaning_up;
+ }
+ 
+-void audio_cleanup(void)
++static void free_audio_state(AudioState *s)
+ {
+-    AudioState *s = &glob_audio_state;
+     HWVoiceOut *hwo, *hwon;
+     HWVoiceIn *hwi, *hwin;
+ 
+-    is_cleaning_up = true;
+     QLIST_FOREACH_SAFE(hwo, &s->hw_head_out, entries, hwon) {
+         SWVoiceCap *sc;
+ 
+@@ -1349,6 +1351,17 @@ void audio_cleanup(void)
+         qapi_free_Audiodev(s->dev);
+         s->dev = NULL;
+     }
++    g_free(s);
++}
++
++void audio_cleanup(void)
++{
++    is_cleaning_up = true;
++    while (!QTAILQ_EMPTY(&audio_states)) {
++        AudioState *s = QTAILQ_FIRST(&audio_states);
++        QTAILQ_REMOVE(&audio_states, s, list);
++        free_audio_state(s);
++    }
+ }
+ 
+ static const VMStateDescription vmstate_audio = {
+@@ -1361,28 +1374,34 @@ static const VMStateDescription vmstate_audio = {
  };
  
-+static bool legacy_config = true;
+ static Audiodev *parse_option(QemuOpts *opts, Error **errp);
+-static int audio_init(Audiodev *dev)
 +
- #ifdef AUDIO_IS_FLAWLESS_AND_NO_CHECKS_ARE_REQURIED
- #error No its not
- #else
-@@ -1381,7 +1383,7 @@ static Audiodev *parse_option(QemuOpts *opts, Error **errp);
-  * if dev == NULL => legacy implicit initialization, return the already created
-  *   state or create a new one
-  */
--static AudioState *audio_init(Audiodev *dev)
-+static AudioState *audio_init(Audiodev *dev, const char *name)
++/*
++ * if we have dev, this function was called because of an -audiodev argument =>
++ *   initialize a new state with it
++ * if dev == NULL => legacy implicit initialization, return the already created
++ *   state or create a new one
++ */
++static AudioState *audio_init(Audiodev *dev)
  {
-     static bool atexit_registered;
++    static bool atexit_registered;
      size_t i;
-@@ -1395,12 +1397,13 @@ static AudioState *audio_init(Audiodev *dev)
+     int done = 0;
+     const char *drvname = NULL;
+     VMChangeStateEntry *e;
+-    AudioState *s = &glob_audio_state;
++    AudioState *s;
+     struct audio_driver *driver;
+     /* silence gcc warning about uninitialized variable */
+     QemuOptsList *list = NULL;
  
+-    if (s->drv) {
+-        if (dev) {
+-            dolog("Cannot create more than one audio backend, sorry\n");
+-            qapi_free_Audiodev(dev);
+-        }
+-        return -1;
+-    }
+-
      if (dev) {
          /* -audiodev option */
-+        legacy_config = false;
          drvname = AudiodevDriver_str(dev->driver);
-     } else if (!QTAILQ_EMPTY(&audio_states)) {
--        /*
--         * todo: check for -audiodev once we have normal audiodev selection
--         * support
--         */
-+        if (!legacy_config) {
-+            dolog("You must specify an audiodev= for the device %s\n", name);
-+            exit(1);
-+        }
-         return QTAILQ_FIRST(&audio_states);
++    } else if (!QTAILQ_EMPTY(&audio_states)) {
++        /*
++         * todo: check for -audiodev once we have normal audiodev selection
++         * support
++         */
++        return QTAILQ_FIRST(&audio_states);
      } else {
          /* legacy implicit initialization */
-@@ -1497,7 +1500,7 @@ static AudioState *audio_init(Audiodev *dev)
+         audio_handle_legacy_opts();
+@@ -1392,12 +1411,18 @@ static int audio_init(Audiodev *dev)
+             exit(1);
+         }
+     }
++
++    s = g_malloc0(sizeof(AudioState));
+     s->dev = dev;
+ 
+     QLIST_INIT (&s->hw_head_out);
+     QLIST_INIT (&s->hw_head_in);
+     QLIST_INIT (&s->cap_head);
+-    atexit(audio_cleanup);
++    if (!atexit_registered) {
++        atexit(audio_cleanup);
++        atexit_registered = true;
++    }
++    QTAILQ_INSERT_TAIL(&audio_states, s, list);
+ 
+     s->ts = timer_new_ns(QEMU_CLOCK_VIRTUAL, audio_timer, s);
+ 
+@@ -1466,15 +1491,18 @@ static int audio_init(Audiodev *dev)
+ 
+     QLIST_INIT (&s->card_head);
+     vmstate_register (NULL, 0, &vmstate_audio, s);
+-    return 0;
++    return s;
+ }
+ 
  void AUD_register_card (const char *name, QEMUSoundCard *card)
  {
-     if (!card->state) {
--        card->state = audio_init(NULL);
-+        card->state = audio_init(NULL, name);
-     }
- 
+-    audio_init(NULL);
++    if (!card->state) {
++        card->state = audio_init(NULL);
++    }
++
      card->name = g_strdup (name);
-@@ -1523,8 +1526,11 @@ CaptureVoiceOut *AUD_add_capture(
+     memset (&card->entries, 0, sizeof (card->entries));
+-    QLIST_INSERT_HEAD (&glob_audio_state.card_head, card, entries);
++    QLIST_INSERT_HEAD (&card->state->card_head, card, entries);
+ }
+ 
+ void AUD_remove_card (QEMUSoundCard *card)
+@@ -1484,16 +1512,21 @@ void AUD_remove_card (QEMUSoundCard *card)
+ }
+ 
+ 
+-CaptureVoiceOut *AUD_add_capture (
++CaptureVoiceOut *AUD_add_capture(
++    AudioState *s,
+     struct audsettings *as,
+     struct audio_capture_ops *ops,
+     void *cb_opaque
+     )
+ {
+-    AudioState *s = &glob_audio_state;
+     CaptureVoiceOut *cap;
      struct capture_callback *cb;
  
-     if (!s) {
--        /* todo: remove when we have normal audiodev selection support */
--        s = audio_init(NULL);
-+        if (!legacy_config) {
-+            dolog("You must specify audiodev when trying to capture\n");
-+            goto err0;
-+        }
-+        s = audio_init(NULL, NULL);
-     }
- 
++    if (!s) {
++        /* todo: remove when we have normal audiodev selection support */
++        s = audio_init(NULL);
++    }
++
      if (audio_validate_settings (as)) {
-@@ -1763,7 +1769,7 @@ static int each_option(void *opaque, QemuOpts *opts, Error **errp)
+         dolog ("Invalid settings were passed when trying to add capture\n");
+         audio_print_settings (as);
+@@ -1730,7 +1763,7 @@ static int each_option(void *opaque, QemuOpts *opts, Error **errp)
      if (!dev) {
          return -1;
      }
--    return audio_init(dev) ? 0 : -1;
-+    return audio_init(dev, NULL) ? 0 : -1;
+-    return audio_init(dev);
++    return audio_init(dev) ? 0 : -1;
  }
  
  void audio_set_options(void)
-diff --git a/audio/paaudio.c b/audio/paaudio.c
-index 6de6ed97fc..24b75ca503 100644
---- a/audio/paaudio.c
-+++ b/audio/paaudio.c
-@@ -10,10 +10,21 @@
- #include "audio_int.h"
- #include "audio_pt_int.h"
- 
--typedef struct {
--    Audiodev *dev;
-+typedef struct PAConnection {
-+    char *server;
-+    int refcount;
-+    QTAILQ_ENTRY(PAConnection) list;
+@@ -1798,3 +1831,25 @@ int audio_buffer_bytes(AudiodevPerDirectionOptions *pdo,
+     return audio_buffer_samples(pdo, as, def_usecs) *
+         audioformat_bytes_per_sample(as->fmt);
+ }
 +
-     pa_threaded_mainloop *mainloop;
-     pa_context *context;
-+} PAConnection;
-+
-+static QTAILQ_HEAD(PAConnectionHead, PAConnection) pa_conns =
-+    QTAILQ_HEAD_INITIALIZER(pa_conns);
-+
-+typedef struct {
-+    Audiodev *dev;
-+    PAConnection *conn;
- } paaudio;
- 
- typedef struct {
-@@ -44,7 +55,7 @@ typedef struct {
-     int samples;
- } PAVoiceIn;
- 
--static void qpa_audio_fini(void *opaque);
-+static void qpa_conn_fini(PAConnection *c);
- 
- static void GCC_FMT_ATTR (2, 3) qpa_logerr (int err, const char *fmt, ...)
- {
-@@ -107,11 +118,11 @@ static inline int PA_STREAM_IS_GOOD(pa_stream_state_t x)
- 
- static int qpa_simple_read (PAVoiceIn *p, void *data, size_t length, int *rerror)
- {
--    paaudio *g = p->g;
-+    PAConnection *c = p->g->conn;
- 
--    pa_threaded_mainloop_lock (g->mainloop);
-+    pa_threaded_mainloop_lock(c->mainloop);
- 
--    CHECK_DEAD_GOTO (g, p->stream, rerror, unlock_and_fail);
-+    CHECK_DEAD_GOTO(c, p->stream, rerror, unlock_and_fail);
- 
-     while (length > 0) {
-         size_t l;
-@@ -120,11 +131,11 @@ static int qpa_simple_read (PAVoiceIn *p, void *data, size_t length, int *rerror
-             int r;
- 
-             r = pa_stream_peek (p->stream, &p->read_data, &p->read_length);
--            CHECK_SUCCESS_GOTO (g, rerror, r == 0, unlock_and_fail);
-+            CHECK_SUCCESS_GOTO(c, rerror, r == 0, unlock_and_fail);
- 
-             if (!p->read_data) {
--                pa_threaded_mainloop_wait (g->mainloop);
--                CHECK_DEAD_GOTO (g, p->stream, rerror, unlock_and_fail);
-+                pa_threaded_mainloop_wait(c->mainloop);
-+                CHECK_DEAD_GOTO(c, p->stream, rerror, unlock_and_fail);
-             } else {
-                 p->read_index = 0;
-             }
-@@ -147,53 +158,53 @@ static int qpa_simple_read (PAVoiceIn *p, void *data, size_t length, int *rerror
-             p->read_length = 0;
-             p->read_index = 0;
- 
--            CHECK_SUCCESS_GOTO (g, rerror, r == 0, unlock_and_fail);
-+            CHECK_SUCCESS_GOTO(c, rerror, r == 0, unlock_and_fail);
-         }
-     }
- 
--    pa_threaded_mainloop_unlock (g->mainloop);
-+    pa_threaded_mainloop_unlock(c->mainloop);
-     return 0;
- 
- unlock_and_fail:
--    pa_threaded_mainloop_unlock (g->mainloop);
-+    pa_threaded_mainloop_unlock(c->mainloop);
-     return -1;
- }
- 
- static int qpa_simple_write (PAVoiceOut *p, const void *data, size_t length, int *rerror)
- {
--    paaudio *g = p->g;
-+    PAConnection *c = p->g->conn;
- 
--    pa_threaded_mainloop_lock (g->mainloop);
-+    pa_threaded_mainloop_lock(c->mainloop);
- 
--    CHECK_DEAD_GOTO (g, p->stream, rerror, unlock_and_fail);
-+    CHECK_DEAD_GOTO(c, p->stream, rerror, unlock_and_fail);
- 
-     while (length > 0) {
-         size_t l;
-         int r;
- 
-         while (!(l = pa_stream_writable_size (p->stream))) {
--            pa_threaded_mainloop_wait (g->mainloop);
--            CHECK_DEAD_GOTO (g, p->stream, rerror, unlock_and_fail);
-+            pa_threaded_mainloop_wait(c->mainloop);
-+            CHECK_DEAD_GOTO(c, p->stream, rerror, unlock_and_fail);
-         }
- 
--        CHECK_SUCCESS_GOTO (g, rerror, l != (size_t) -1, unlock_and_fail);
-+        CHECK_SUCCESS_GOTO(c, rerror, l != (size_t) -1, unlock_and_fail);
- 
-         if (l > length) {
-             l = length;
-         }
- 
-         r = pa_stream_write (p->stream, data, l, NULL, 0LL, PA_SEEK_RELATIVE);
--        CHECK_SUCCESS_GOTO (g, rerror, r >= 0, unlock_and_fail);
-+        CHECK_SUCCESS_GOTO(c, rerror, r >= 0, unlock_and_fail);
- 
-         data = (const uint8_t *) data + l;
-         length -= l;
-     }
- 
--    pa_threaded_mainloop_unlock (g->mainloop);
-+    pa_threaded_mainloop_unlock(c->mainloop);
-     return 0;
- 
- unlock_and_fail:
--    pa_threaded_mainloop_unlock (g->mainloop);
-+    pa_threaded_mainloop_unlock(c->mainloop);
-     return -1;
- }
- 
-@@ -431,13 +442,13 @@ static AudioFormat pa_to_audfmt (pa_sample_format_t fmt, int *endianness)
- 
- static void context_state_cb (pa_context *c, void *userdata)
- {
--    paaudio *g = userdata;
-+    PAConnection *conn = userdata;
- 
-     switch (pa_context_get_state(c)) {
-     case PA_CONTEXT_READY:
-     case PA_CONTEXT_TERMINATED:
-     case PA_CONTEXT_FAILED:
--        pa_threaded_mainloop_signal (g->mainloop, 0);
-+        pa_threaded_mainloop_signal(conn->mainloop, 0);
-         break;
- 
-     case PA_CONTEXT_UNCONNECTED:
-@@ -450,14 +461,14 @@ static void context_state_cb (pa_context *c, void *userdata)
- 
- static void stream_state_cb (pa_stream *s, void * userdata)
- {
--    paaudio *g = userdata;
-+    PAConnection *c = userdata;
- 
-     switch (pa_stream_get_state (s)) {
- 
-     case PA_STREAM_READY:
-     case PA_STREAM_FAILED:
-     case PA_STREAM_TERMINATED:
--        pa_threaded_mainloop_signal (g->mainloop, 0);
-+        pa_threaded_mainloop_signal(c->mainloop, 0);
-         break;
- 
-     case PA_STREAM_UNCONNECTED:
-@@ -468,13 +479,13 @@ static void stream_state_cb (pa_stream *s, void * userdata)
- 
- static void stream_request_cb (pa_stream *s, size_t length, void *userdata)
- {
--    paaudio *g = userdata;
-+    PAConnection *c = userdata;
- 
--    pa_threaded_mainloop_signal (g->mainloop, 0);
-+    pa_threaded_mainloop_signal(c->mainloop, 0);
- }
- 
- static pa_stream *qpa_simple_new (
--        paaudio *g,
-+        PAConnection *c,
-         const char *name,
-         pa_stream_direction_t dir,
-         const char *dev,
-@@ -485,50 +496,48 @@ static pa_stream *qpa_simple_new (
- {
-     int r;
-     pa_stream *stream;
-+    pa_stream_flags_t flags;
- 
--    pa_threaded_mainloop_lock (g->mainloop);
-+    pa_threaded_mainloop_lock(c->mainloop);
- 
--    stream = pa_stream_new (g->context, name, ss, map);
-+    stream = pa_stream_new(c->context, name, ss, map);
-     if (!stream) {
-         goto fail;
-     }
- 
--    pa_stream_set_state_callback (stream, stream_state_cb, g);
--    pa_stream_set_read_callback (stream, stream_request_cb, g);
--    pa_stream_set_write_callback (stream, stream_request_cb, g);
-+    pa_stream_set_state_callback (stream, stream_state_cb, c);
-+    pa_stream_set_read_callback (stream, stream_request_cb, c);
-+    pa_stream_set_write_callback (stream, stream_request_cb, c);
-+
-+    flags =
-+        PA_STREAM_INTERPOLATE_TIMING
-+#ifdef PA_STREAM_ADJUST_LATENCY
-+        |PA_STREAM_ADJUST_LATENCY
-+#endif
-+        |PA_STREAM_AUTO_TIMING_UPDATE;
- 
-     if (dir == PA_STREAM_PLAYBACK) {
--        r = pa_stream_connect_playback (stream, dev, attr,
--                                        PA_STREAM_INTERPOLATE_TIMING
--#ifdef PA_STREAM_ADJUST_LATENCY
--                                        |PA_STREAM_ADJUST_LATENCY
--#endif
--                                        |PA_STREAM_AUTO_TIMING_UPDATE, NULL, NULL);
-+        r = pa_stream_connect_playback(stream, dev, attr, flags, NULL, NULL);
-     } else {
--        r = pa_stream_connect_record (stream, dev, attr,
--                                      PA_STREAM_INTERPOLATE_TIMING
--#ifdef PA_STREAM_ADJUST_LATENCY
--                                      |PA_STREAM_ADJUST_LATENCY
--#endif
--                                      |PA_STREAM_AUTO_TIMING_UPDATE);
-+        r = pa_stream_connect_record(stream, dev, attr, flags);
-     }
- 
-     if (r < 0) {
-       goto fail;
-     }
- 
--    pa_threaded_mainloop_unlock (g->mainloop);
-+    pa_threaded_mainloop_unlock(c->mainloop);
- 
-     return stream;
- 
- fail:
--    pa_threaded_mainloop_unlock (g->mainloop);
-+    pa_threaded_mainloop_unlock(c->mainloop);
- 
-     if (stream) {
-         pa_stream_unref (stream);
-     }
- 
--    *rerror = pa_context_errno (g->context);
-+    *rerror = pa_context_errno(c->context);
- 
-     return NULL;
- }
-@@ -544,6 +553,7 @@ static int qpa_init_out(HWVoiceOut *hw, struct audsettings *as,
-     paaudio *g = pa->g = drv_opaque;
-     AudiodevPaOptions *popts = &g->dev->u.pa;
-     AudiodevPaPerDirectionOptions *ppdo = popts->sink;
-+    PAConnection *c = g->conn;
- 
-     ss.format = audfmt_to_pa (as->fmt, as->endianness);
-     ss.channels = as->nchannels;
-@@ -561,7 +571,7 @@ static int qpa_init_out(HWVoiceOut *hw, struct audsettings *as,
-     obt_as.fmt = pa_to_audfmt (ss.format, &obt_as.endianness);
- 
-     pa->stream = qpa_simple_new (
--        g,
-+        c,
-         "qemu",
-         PA_STREAM_PLAYBACK,
-         ppdo->has_name ? ppdo->name : NULL,
-@@ -613,6 +623,7 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-     paaudio *g = pa->g = drv_opaque;
-     AudiodevPaOptions *popts = &g->dev->u.pa;
-     AudiodevPaPerDirectionOptions *ppdo = popts->source;
-+    PAConnection *c = g->conn;
- 
-     ss.format = audfmt_to_pa (as->fmt, as->endianness);
-     ss.channels = as->nchannels;
-@@ -621,7 +632,7 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-     obt_as.fmt = pa_to_audfmt (ss.format, &obt_as.endianness);
- 
-     pa->stream = qpa_simple_new (
--        g,
-+        c,
-         "qemu",
-         PA_STREAM_RECORD,
-         ppdo->has_name ? ppdo->name : NULL,
-@@ -709,7 +720,7 @@ static int qpa_ctl_out (HWVoiceOut *hw, int cmd, ...)
-     PAVoiceOut *pa = (PAVoiceOut *) hw;
-     pa_operation *op;
-     pa_cvolume v;
--    paaudio *g = pa->g;
-+    PAConnection *c = pa->g->conn;
- 
- #ifdef PA_CHECK_VERSION    /* macro is present in 0.9.16+ */
-     pa_cvolume_init (&v);  /* function is present in 0.9.13+ */
-@@ -729,28 +740,28 @@ static int qpa_ctl_out (HWVoiceOut *hw, int cmd, ...)
-             v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vol.l) / UINT32_MAX;
-             v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vol.r) / UINT32_MAX;
- 
--            pa_threaded_mainloop_lock (g->mainloop);
-+            pa_threaded_mainloop_lock(c->mainloop);
- 
--            op = pa_context_set_sink_input_volume (g->context,
-+            op = pa_context_set_sink_input_volume(c->context,
-                 pa_stream_get_index (pa->stream),
-                 &v, NULL, NULL);
-             if (!op)
--                qpa_logerr (pa_context_errno (g->context),
-+                qpa_logerr (pa_context_errno(c->context),
-                             "set_sink_input_volume() failed\n");
-             else
-                 pa_operation_unref (op);
- 
--            op = pa_context_set_sink_input_mute (g->context,
-+            op = pa_context_set_sink_input_mute(c->context,
-                 pa_stream_get_index (pa->stream),
-                sw->vol.mute, NULL, NULL);
-             if (!op) {
--                qpa_logerr (pa_context_errno (g->context),
-+                qpa_logerr (pa_context_errno(c->context),
-                             "set_sink_input_mute() failed\n");
-             } else {
-                 pa_operation_unref (op);
-             }
- 
--            pa_threaded_mainloop_unlock (g->mainloop);
-+            pa_threaded_mainloop_unlock(c->mainloop);
-         }
-     }
-     return 0;
-@@ -761,7 +772,7 @@ static int qpa_ctl_in (HWVoiceIn *hw, int cmd, ...)
-     PAVoiceIn *pa = (PAVoiceIn *) hw;
-     pa_operation *op;
-     pa_cvolume v;
--    paaudio *g = pa->g;
-+    PAConnection *c = pa->g->conn;
- 
- #ifdef PA_CHECK_VERSION
-     pa_cvolume_init (&v);
-@@ -781,122 +792,156 @@ static int qpa_ctl_in (HWVoiceIn *hw, int cmd, ...)
-             v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vol.l) / UINT32_MAX;
-             v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vol.r) / UINT32_MAX;
- 
--            pa_threaded_mainloop_lock (g->mainloop);
-+            pa_threaded_mainloop_lock(c->mainloop);
- 
--            op = pa_context_set_source_output_volume (g->context,
--                pa_stream_get_index (pa->stream),
-+            op = pa_context_set_source_output_volume(c->context,
-+                pa_stream_get_index(pa->stream),
-                 &v, NULL, NULL);
-             if (!op) {
--                qpa_logerr (pa_context_errno (g->context),
--                            "set_source_output_volume() failed\n");
-+                qpa_logerr(pa_context_errno(c->context),
-+                           "set_source_output_volume() failed\n");
-             } else {
-                 pa_operation_unref(op);
-             }
- 
--            op = pa_context_set_source_output_mute (g->context,
-+            op = pa_context_set_source_output_mute(c->context,
-                 pa_stream_get_index (pa->stream),
-                 sw->vol.mute, NULL, NULL);
-             if (!op) {
--                qpa_logerr (pa_context_errno (g->context),
--                            "set_source_output_mute() failed\n");
-+                qpa_logerr(pa_context_errno(c->context),
-+                           "set_source_output_mute() failed\n");
-             } else {
-                 pa_operation_unref (op);
-             }
- 
--            pa_threaded_mainloop_unlock (g->mainloop);
-+            pa_threaded_mainloop_unlock(c->mainloop);
-         }
-     }
-     return 0;
- }
- 
- /* common */
-+static void *qpa_conn_init(const char *server)
++AudioState *audio_state_by_name(const char *name)
 +{
-+    PAConnection *c = g_malloc0(sizeof(PAConnection));
-+    QTAILQ_INSERT_TAIL(&pa_conns, c, list);
-+
-+    c->mainloop = pa_threaded_mainloop_new();
-+    if (!c->mainloop) {
-+        goto fail;
-+    }
-+
-+    c->context = pa_context_new(pa_threaded_mainloop_get_api(c->mainloop),
-+                                server);
-+    if (!c->context) {
-+        goto fail;
-+    }
-+
-+    pa_context_set_state_callback(c->context, context_state_cb, c);
-+
-+    if (pa_context_connect(c->context, server, 0, NULL) < 0) {
-+        qpa_logerr(pa_context_errno(c->context),
-+                   "pa_context_connect() failed\n");
-+        goto fail;
-+    }
-+
-+    pa_threaded_mainloop_lock(c->mainloop);
-+
-+    if (pa_threaded_mainloop_start(c->mainloop) < 0) {
-+        goto unlock_and_fail;
-+    }
-+
-+    for (;;) {
-+        pa_context_state_t state;
-+
-+        state = pa_context_get_state(c->context);
-+
-+        if (state == PA_CONTEXT_READY) {
-+            break;
++    AudioState *s;
++    QTAILQ_FOREACH(s, &audio_states, list) {
++        assert(s->dev);
++        if (strcmp(name, s->dev->id) == 0) {
++            return s;
 +        }
-+
-+        if (!PA_CONTEXT_IS_GOOD (state)) {
-+            qpa_logerr(pa_context_errno(c->context),
-+                       "Wrong context state\n");
-+            goto unlock_and_fail;
-+        }
-+
-+        /* Wait until the context is ready */
-+        pa_threaded_mainloop_wait(c->mainloop);
 +    }
-+
-+    pa_threaded_mainloop_unlock(c->mainloop);
-+    return c;
-+
-+unlock_and_fail:
-+    pa_threaded_mainloop_unlock(c->mainloop);
-+fail:
-+    AUD_log (AUDIO_CAP, "Failed to initialize PA context");
-+    qpa_conn_fini(c);
 +    return NULL;
 +}
 +
- static void *qpa_audio_init(Audiodev *dev)
- {
-     paaudio *g;
-     AudiodevPaOptions *popts;
-     const char *server;
-+    PAConnection *c;
- 
-     assert(dev->driver == AUDIODEV_DRIVER_PA);
- 
--    g = g_malloc(sizeof(paaudio));
-+    g = g_malloc0(sizeof(paaudio));
-     popts = &dev->u.pa;
-     server = popts->has_server ? popts->server : NULL;
- 
-     g->dev = dev;
--    g->mainloop = NULL;
--    g->context = NULL;
- 
--    g->mainloop = pa_threaded_mainloop_new ();
--    if (!g->mainloop) {
--        goto fail;
--    }
--
--    g->context = pa_context_new (pa_threaded_mainloop_get_api (g->mainloop),
--                                 server);
--    if (!g->context) {
--        goto fail;
--    }
--
--    pa_context_set_state_callback (g->context, context_state_cb, g);
--
--    if (pa_context_connect (g->context, server, 0, NULL) < 0) {
--        qpa_logerr (pa_context_errno (g->context),
--                    "pa_context_connect() failed\n");
--        goto fail;
--    }
--
--    pa_threaded_mainloop_lock (g->mainloop);
--
--    if (pa_threaded_mainloop_start (g->mainloop) < 0) {
--        goto unlock_and_fail;
--    }
--
--    for (;;) {
--        pa_context_state_t state;
--
--        state = pa_context_get_state (g->context);
--
--        if (state == PA_CONTEXT_READY) {
-+    QTAILQ_FOREACH(c, &pa_conns, list) {
-+        if (server == NULL || c->server == NULL ?
-+            server == c->server :
-+            strcmp(server, c->server) == 0) {
-+            g->conn = c;
-             break;
-         }
--
--        if (!PA_CONTEXT_IS_GOOD (state)) {
--            qpa_logerr (pa_context_errno (g->context),
--                        "Wrong context state\n");
--            goto unlock_and_fail;
--        }
--
--        /* Wait until the context is ready */
--        pa_threaded_mainloop_wait (g->mainloop);
-+    }
-+    if (!g->conn) {
-+        g->conn = qpa_conn_init(server);
-+    }
-+    if (!g->conn) {
-+        g_free(g);
-+        return NULL;
-     }
- 
--    pa_threaded_mainloop_unlock (g->mainloop);
--
-+    ++g->conn->refcount;
-     return g;
-+}
- 
--unlock_and_fail:
--    pa_threaded_mainloop_unlock (g->mainloop);
--fail:
--    AUD_log (AUDIO_CAP, "Failed to initialize PA context");
--    qpa_audio_fini(g);
--    return NULL;
-+static void qpa_conn_fini(PAConnection *c)
++const char *audio_get_id(QEMUSoundCard *card)
 +{
-+    if (c->mainloop) {
-+        pa_threaded_mainloop_stop(c->mainloop);
++    if (card->state) {
++        assert(card->state->dev);
++        return card->state->dev->id;
++    } else {
++        return "";
 +    }
-+
-+    if (c->context) {
-+        pa_context_disconnect(c->context);
-+        pa_context_unref(c->context);
-+    }
-+
-+    if (c->mainloop) {
-+        pa_threaded_mainloop_free(c->mainloop);
-+    }
-+
-+    QTAILQ_REMOVE(&pa_conns, c, list);
-+    g_free(c);
- }
++}
+diff --git a/audio/audio.h b/audio/audio.h
+index 7df1b8b249..5e0dcdb93e 100644
+--- a/audio/audio.h
++++ b/audio/audio.h
+@@ -78,8 +78,10 @@ typedef struct SWVoiceOut SWVoiceOut;
+ typedef struct CaptureVoiceOut CaptureVoiceOut;
+ typedef struct SWVoiceIn SWVoiceIn;
  
- static void qpa_audio_fini (void *opaque)
++typedef struct AudioState AudioState;
+ typedef struct QEMUSoundCard {
+     char *name;
++    AudioState *state;
+     QLIST_ENTRY (QEMUSoundCard) entries;
+ } QEMUSoundCard;
+ 
+@@ -94,7 +96,8 @@ void AUD_log (const char *cap, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
+ 
+ void AUD_register_card (const char *name, QEMUSoundCard *card);
+ void AUD_remove_card (QEMUSoundCard *card);
+-CaptureVoiceOut *AUD_add_capture (
++CaptureVoiceOut *AUD_add_capture(
++    AudioState *s,
+     struct audsettings *as,
+     struct audio_capture_ops *ops,
+     void *opaque
+@@ -162,8 +165,8 @@ static inline void *advance (void *p, int incr)
+ #define audio_MAX(a, b) ((a)<(b)?(b):(a))
+ #endif
+ 
+-int wav_start_capture (CaptureState *s, const char *path, int freq,
+-                       int bits, int nchannels);
++int wav_start_capture(AudioState *state, CaptureState *s, const char *path,
++                      int freq, int bits, int nchannels);
+ 
+ bool audio_is_cleaning_up(void);
+ void audio_cleanup(void);
+@@ -177,4 +180,7 @@ void audio_set_options(void);
+ void audio_handle_legacy_opts(void);
+ void audio_legacy_help(void);
+ 
++AudioState *audio_state_by_name(const char *name);
++const char *audio_get_id(QEMUSoundCard *card);
++
+ #endif /* QEMU_AUDIO_H */
+diff --git a/audio/audio_int.h b/audio/audio_int.h
+index 792ec3152a..9d9db8c270 100644
+--- a/audio/audio_int.h
++++ b/audio/audio_int.h
+@@ -195,6 +195,8 @@ struct AudioState {
+ 
+     bool timer_running;
+     uint64_t timer_last;
++
++    QTAILQ_ENTRY(AudioState) list;
+ };
+ 
+ extern const struct mixeng_volume nominal_volume;
+diff --git a/audio/audio_template.h b/audio/audio_template.h
+index ccf6d810f7..ce1e5d6559 100644
+--- a/audio/audio_template.h
++++ b/audio/audio_template.h
+@@ -399,7 +399,7 @@ SW *glue (AUD_open_, TYPE) (
+     struct audsettings *as
+     )
  {
-     paaudio *g = opaque;
-+    PAConnection *c = g->conn;
+-    AudioState *s = &glob_audio_state;
++    AudioState *s = card->state;
+     AudiodevPerDirectionOptions *pdo = s->dev->TYPE;
  
--    if (g->mainloop) {
--        pa_threaded_mainloop_stop (g->mainloop);
--    }
--
--    if (g->context) {
--        pa_context_disconnect (g->context);
--        pa_context_unref (g->context);
--    }
--
--    if (g->mainloop) {
--        pa_threaded_mainloop_free (g->mainloop);
-+    if (--c->refcount == 0) {
-+        qpa_conn_fini(c);
+     if (audio_bug(__func__, !card || !name || !callback_fn || !as)) {
+diff --git a/audio/wavcapture.c b/audio/wavcapture.c
+index e943565210..88d3141be5 100644
+--- a/audio/wavcapture.c
++++ b/audio/wavcapture.c
+@@ -107,8 +107,8 @@ static struct capture_ops wav_capture_ops = {
+     .info = wav_capture_info
+ };
+ 
+-int wav_start_capture (CaptureState *s, const char *path, int freq,
+-                       int bits, int nchannels)
++int wav_start_capture(AudioState *state, CaptureState *s, const char *path,
++                      int freq, int bits, int nchannels)
+ {
+     Monitor *mon = cur_mon;
+     WAVState *wav;
+@@ -175,7 +175,7 @@ int wav_start_capture (CaptureState *s, const char *path, int freq,
+         goto error_free;
      }
  
-     g_free(g);
+-    cap = AUD_add_capture (&as, &ops, wav);
++    cap = AUD_add_capture(state, &as, &ops, wav);
+     if (!cap) {
+         monitor_printf (mon, "Failed to add audio capture\n");
+         goto error_free;
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index ba71558c25..dc339a5484 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -796,16 +796,17 @@ ETEXI
+ 
+     {
+         .name       = "wavcapture",
+-        .args_type  = "path:F,freq:i?,bits:i?,nchannels:i?",
+-        .params     = "path [frequency [bits [channels]]]",
++        .args_type  = "path:F,freq:i?,bits:i?,nchannels:i?,audiodev:s?",
++        .params     = "path [frequency [bits [channels [audiodev]]]]",
+         .help       = "capture audio to a wave file (default frequency=44100 bits=16 channels=2)",
+         .cmd        = hmp_wavcapture,
+     },
+ STEXI
+-@item wavcapture @var{filename} [@var{frequency} [@var{bits} [@var{channels}]]]
++@item wavcapture @var{filename} [@var{frequency} [@var{bits} [@var{channels} [@var{audiodev}]]]]
+ @findex wavcapture
+-Capture audio into @var{filename}. Using sample rate @var{frequency}
+-bits per sample @var{bits} and number of channels @var{channels}.
++Capture audio into @var{filename} from @var{audiodev}. Using sample rate
++@var{frequency} bits per sample @var{bits} and number of channels
++@var{channels}.
+ 
+ Defaults:
+ @itemize @minus
+diff --git a/monitor.c b/monitor.c
+index 0ad54d8b11..14e130308f 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -2038,7 +2038,17 @@ static void hmp_wavcapture(Monitor *mon, const QDict *qdict)
+     int bits = qdict_get_try_int(qdict, "bits", -1);
+     int has_channels = qdict_haskey(qdict, "nchannels");
+     int nchannels = qdict_get_try_int(qdict, "nchannels", -1);
++    const char *audiodev = qdict_get_try_str(qdict, "audiodev");
+     CaptureState *s;
++    AudioState *as = NULL;
++
++    if (audiodev) {
++        as = audio_state_by_name(audiodev);
++        if (!as) {
++            monitor_printf(mon, "Invalid audiodev specified\n");
++            return;
++        }
++    }
+ 
+     s = g_malloc0 (sizeof (*s));
+ 
+@@ -2046,7 +2056,7 @@ static void hmp_wavcapture(Monitor *mon, const QDict *qdict)
+     bits = has_bits ? bits : 16;
+     nchannels = has_channels ? nchannels : 2;
+ 
+-    if (wav_start_capture (s, path, freq, bits, nchannels)) {
++    if (wav_start_capture(as, s, path, freq, bits, nchannels)) {
+         monitor_printf(mon, "Failed to add wave capture\n");
+         g_free (s);
+         return;
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 3ede6a591d..687dd23bf2 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -1911,6 +1911,11 @@ can help the device and guest to keep up and not lose events in case
+ events are arriving in bulk.  Possible causes for the latter are flaky
+ network connections, or scripts for automated testing.
+ 
++@item audiodev=@var{audiodev}
++
++Use the specified @var{audiodev} when the VNC client requests audio
++transmission.
++
+ @end table
+ ETEXI
+ 
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 0e9e9fb63a..c64ca10de9 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -1195,7 +1195,7 @@ static void audio_add(VncState *vs)
+     ops.destroy = audio_capture_destroy;
+     ops.capture = audio_capture;
+ 
+-    vs->audio_cap = AUD_add_capture(&vs->as, &ops, vs);
++    vs->audio_cap = AUD_add_capture(vs->vd->audio_state, &vs->as, &ops, vs);
+     if (!vs->audio_cap) {
+         error_report("Failed to add audio capture");
+     }
+@@ -3390,6 +3390,9 @@ static QemuOptsList qemu_vnc_opts = {
+         },{
+             .name = "non-adaptive",
+             .type = QEMU_OPT_BOOL,
++        },{
++            .name = "audiodev",
++            .type = QEMU_OPT_STRING,
+         },
+         { /* end of list */ }
+     },
+@@ -3825,6 +3828,7 @@ void vnc_display_open(const char *id, Error **errp)
+     int acl = 0;
+     int lock_key_sync = 1;
+     int key_delay_ms;
++    const char *audiodev;
+ 
+     if (!vd) {
+         error_setg(errp, "VNC display not active");
+@@ -3978,6 +3982,15 @@ void vnc_display_open(const char *id, Error **errp)
+     vd->ledstate = 0;
+     vd->key_delay_ms = key_delay_ms;
+ 
++    audiodev = qemu_opt_get(opts, "audiodev");
++    if (audiodev) {
++        vd->audio_state = audio_state_by_name(audiodev);
++        if (!vd->audio_state) {
++            error_setg(errp, "Audiodev '%s' not found", audiodev);
++            goto fail;
++        }
++    }
++
+     device_id = qemu_opt_get(opts, "display");
+     if (device_id) {
+         int head = qemu_opt_get_number(opts, "head", 0);
+diff --git a/ui/vnc.h b/ui/vnc.h
+index a86e0610e8..0c9a2d82e0 100644
+--- a/ui/vnc.h
++++ b/ui/vnc.h
+@@ -181,6 +181,8 @@ struct VncDisplay
+ #ifdef CONFIG_VNC_SASL
+     VncDisplaySASL sasl;
+ #endif
++
++    AudioState *audio_state;
+ };
+ 
+ typedef struct VncTight {
 -- 
 2.20.1
