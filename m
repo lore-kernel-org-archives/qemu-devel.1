@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52359)
+Received: from eggs.gnu.org ([208.118.235.92]:52342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAk0-0007tg-QP
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:53 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAk0-0007sI-84
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAjz-0002bb-Oy
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAjy-0002WC-5w
 	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:52 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45127)
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36945)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gbAjz-0002Ya-Gy
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:51 -0500
-Received: by mail-wr1-x442.google.com with SMTP id t6so10090887wrr.12
-	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:52:51 -0800 (PST)
+	id 1gbAjx-0002KM-Qp
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:50 -0500
+Received: by mail-wm1-x342.google.com with SMTP id g67so10420765wmd.2
+	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:52:48 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Sun, 23 Dec 2018 21:52:00 +0100
-Message-Id: <a785e3cb6e5bb38503f15d11c2df0c2dcb3a6b2a.1545598229.git.DirtY.iCE.hu@gmail.com>
+Date: Sun, 23 Dec 2018 21:51:55 +0100
+Message-Id: <10517b96e87d45063ef7d6a2d0bce66fd06620ae.1545598229.git.DirtY.iCE.hu@gmail.com>
 In-Reply-To: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 24/52] audio: do not run each backend in
- audio_run
+Subject: [Qemu-devel] [PATCH v2 19/52] audio: add audiodev properties to
+ frontends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,145 +32,326 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Michael Walle <michael@walle.cc>
 
-audio_run is called manually by alsa and oss backends when polling.
-In this case only the requesting backend should be run, not all of them.
+Finally add audiodev= options to audio frontends so users can specify
+which backend to use when multiple backends exist.  Not specifying an
+audiodev= option currently causes the first audiodev to be used, this is
+fixed in the next commit.
+
+Example usage: -audiodev pa,id=foo -device AC97,audiodev=foo
 
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/alsaaudio.c |  7 +++++--
- audio/audio.c     | 14 +++++---------
- audio/audio_int.h |  2 +-
- audio/ossaudio.c  | 12 ++++++------
- 4 files changed, 17 insertions(+), 18 deletions(-)
+ audio/audio.h                    |  3 ++
+ hw/audio/ac97.c                  |  1 +
+ hw/audio/adlib.c                 |  1 +
+ hw/audio/cs4231a.c               |  1 +
+ hw/audio/es1370.c                |  7 +++-
+ hw/audio/gus.c                   |  1 +
+ hw/audio/hda-codec.c             |  1 +
+ hw/audio/milkymist-ac97.c        |  6 ++++
+ hw/audio/pcspk.c                 |  1 +
+ hw/audio/pl041.c                 |  1 +
+ hw/audio/sb16.c                  |  1 +
+ hw/audio/wm8750.c                |  6 ++++
+ hw/core/qdev-properties-system.c | 57 ++++++++++++++++++++++++++++++++
+ hw/usb/dev-audio.c               |  1 +
+ include/hw/qdev-properties.h     |  3 ++
+ 15 files changed, 90 insertions(+), 1 deletion(-)
 
-diff --git a/audio/alsaaudio.c b/audio/alsaaudio.c
-index d4bb540cb9..ffc6220d7a 100644
---- a/audio/alsaaudio.c
-+++ b/audio/alsaaudio.c
-@@ -39,6 +39,7 @@ struct pollhlp {
-     struct pollfd *pfds;
-     int count;
-     int mask;
-+    AudioState *s;
+diff --git a/audio/audio.h b/audio/audio.h
+index 5e0dcdb93e..ccfef9e10a 100644
+--- a/audio/audio.h
++++ b/audio/audio.h
+@@ -183,4 +183,7 @@ void audio_legacy_help(void);
+ AudioState *audio_state_by_name(const char *name);
+ const char *audio_get_id(QEMUSoundCard *card);
+ 
++#define DEFINE_AUDIO_PROPERTIES(_s, _f)         \
++    DEFINE_PROP_AUDIODEV("audiodev", _s, _f)
++
+ #endif /* QEMU_AUDIO_H */
+diff --git a/hw/audio/ac97.c b/hw/audio/ac97.c
+index 2265622d44..03e3da4f31 100644
+--- a/hw/audio/ac97.c
++++ b/hw/audio/ac97.c
+@@ -1408,6 +1408,7 @@ static int ac97_init (PCIBus *bus)
+ }
+ 
+ static Property ac97_properties[] = {
++    DEFINE_AUDIO_PROPERTIES(AC97LinkState, card),
+     DEFINE_PROP_UINT32 ("use_broken_id", AC97LinkState, use_broken_id, 0),
+     DEFINE_PROP_END_OF_LIST (),
+ };
+diff --git a/hw/audio/adlib.c b/hw/audio/adlib.c
+index 0957780a3d..0d01cd07c5 100644
+--- a/hw/audio/adlib.c
++++ b/hw/audio/adlib.c
+@@ -298,6 +298,7 @@ static void adlib_realizefn (DeviceState *dev, Error **errp)
+ }
+ 
+ static Property adlib_properties[] = {
++    DEFINE_AUDIO_PROPERTIES(AdlibState, card),
+     DEFINE_PROP_UINT32 ("iobase",  AdlibState, port, 0x220),
+     DEFINE_PROP_UINT32 ("freq",    AdlibState, freq,  44100),
+     DEFINE_PROP_END_OF_LIST (),
+diff --git a/hw/audio/cs4231a.c b/hw/audio/cs4231a.c
+index 62da75eefe..d25a120b0f 100644
+--- a/hw/audio/cs4231a.c
++++ b/hw/audio/cs4231a.c
+@@ -687,6 +687,7 @@ static int cs4231a_init (ISABus *bus)
+ }
+ 
+ static Property cs4231a_properties[] = {
++    DEFINE_AUDIO_PROPERTIES(CSState, card),
+     DEFINE_PROP_UINT32 ("iobase",  CSState, port, 0x534),
+     DEFINE_PROP_UINT32 ("irq",     CSState, irq,  9),
+     DEFINE_PROP_UINT32 ("dma",     CSState, dma,  3),
+diff --git a/hw/audio/es1370.c b/hw/audio/es1370.c
+index a5314d66fd..8c63912a82 100644
+--- a/hw/audio/es1370.c
++++ b/hw/audio/es1370.c
+@@ -886,6 +886,11 @@ static int es1370_init (PCIBus *bus)
+     return 0;
+ }
+ 
++static Property es1370_properties[] = {
++    DEFINE_AUDIO_PROPERTIES(ES1370State, card),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void es1370_class_init (ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS (klass);
+@@ -902,6 +907,7 @@ static void es1370_class_init (ObjectClass *klass, void *data)
+     dc->desc = "ENSONIQ AudioPCI ES1370";
+     dc->vmsd = &vmstate_es1370;
+     dc->reset = es1370_on_reset;
++    dc->props = es1370_properties;
+ }
+ 
+ static const TypeInfo es1370_info = {
+@@ -922,4 +928,3 @@ static void es1370_register_types (void)
+ }
+ 
+ type_init (es1370_register_types)
+-
+diff --git a/hw/audio/gus.c b/hw/audio/gus.c
+index b3e2a7fdd5..dfb74cf0d3 100644
+--- a/hw/audio/gus.c
++++ b/hw/audio/gus.c
+@@ -295,6 +295,7 @@ static int GUS_init (ISABus *bus)
+ }
+ 
+ static Property gus_properties[] = {
++    DEFINE_AUDIO_PROPERTIES(GUSState, card),
+     DEFINE_PROP_UINT32 ("freq",    GUSState, freq,        44100),
+     DEFINE_PROP_UINT32 ("iobase",  GUSState, port,        0x240),
+     DEFINE_PROP_UINT32 ("irq",     GUSState, emu.gusirq,  7),
+diff --git a/hw/audio/hda-codec.c b/hw/audio/hda-codec.c
+index c25bfa38b1..e66103aedf 100644
+--- a/hw/audio/hda-codec.c
++++ b/hw/audio/hda-codec.c
+@@ -839,6 +839,7 @@ static const VMStateDescription vmstate_hda_audio = {
  };
  
- typedef struct ALSAVoiceOut {
-@@ -199,11 +200,11 @@ static void alsa_poll_handler (void *opaque)
-         break;
- 
-     case SND_PCM_STATE_PREPARED:
--        audio_run ("alsa run (prepared)");
-+        audio_run(hlp->s, "alsa run (prepared)");
-         break;
- 
-     case SND_PCM_STATE_RUNNING:
--        audio_run ("alsa run (running)");
-+        audio_run (hlp->s, "alsa run (running)");
-         break;
- 
-     default:
-@@ -757,6 +758,7 @@ static int alsa_init_out(HWVoiceOut *hw, struct audsettings *as,
-         return -1;
+ static Property hda_audio_properties[] = {
++    DEFINE_AUDIO_PROPERTIES(HDAAudioState, card),
+     DEFINE_PROP_UINT32("debug", HDAAudioState, debug,   0),
+     DEFINE_PROP_BOOL("mixer", HDAAudioState, mixer,  true),
+     DEFINE_PROP_BOOL("use-timer", HDAAudioState, use_timer,  true),
+diff --git a/hw/audio/milkymist-ac97.c b/hw/audio/milkymist-ac97.c
+index 90cce1e6ed..8739cb376a 100644
+--- a/hw/audio/milkymist-ac97.c
++++ b/hw/audio/milkymist-ac97.c
+@@ -328,6 +328,11 @@ static const VMStateDescription vmstate_milkymist_ac97 = {
      }
+ };
  
-+    alsa->pollhlp.s = hw->s;
-     alsa->handle = handle;
-     alsa->dev = dev;
-     return 0;
-@@ -858,6 +860,7 @@ static int alsa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-         return -1;
-     }
- 
-+    alsa->pollhlp.s = hw->s;
-     alsa->handle = handle;
-     alsa->dev = dev;
-     return 0;
-diff --git a/audio/audio.c b/audio/audio.c
-index a32b86a813..4779061859 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -839,7 +839,7 @@ static void audio_timer (void *opaque)
-     }
-     s->timer_last = now;
- 
--    audio_run("timer");
-+    audio_run(s, "timer");
-     audio_reset_timer(s);
- }
- 
-@@ -1241,15 +1241,11 @@ static void audio_run_capture (AudioState *s)
-     }
- }
- 
--void audio_run (const char *msg)
-+void audio_run(AudioState *s, const char *msg)
++static Property milkymist_ac97_properties[] = {
++    DEFINE_AUDIO_PROPERTIES(MilkymistAC97State, card),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void milkymist_ac97_class_init(ObjectClass *klass, void *data)
  {
--    AudioState *s;
--
--    QTAILQ_FOREACH(s, &audio_states, list) {
--        audio_run_out (s);
--        audio_run_in (s);
--        audio_run_capture (s);
--    }
-+    audio_run_out(s);
-+    audio_run_in(s);
-+    audio_run_capture(s);
- 
- #ifdef DEBUG_POLL
-     {
-diff --git a/audio/audio_int.h b/audio/audio_int.h
-index 9d9db8c270..9950cea869 100644
---- a/audio/audio_int.h
-+++ b/audio/audio_int.h
-@@ -220,7 +220,7 @@ int audio_pcm_hw_clip_out (HWVoiceOut *hw, void *pcm_buf,
- int audio_bug (const char *funcname, int cond);
- void *audio_calloc (const char *funcname, int nmemb, size_t size);
- 
--void audio_run (const char *msg);
-+void audio_run(AudioState *s, const char *msg);
- 
- #define VOICE_ENABLE 1
- #define VOICE_DISABLE 2
-diff --git a/audio/ossaudio.c b/audio/ossaudio.c
-index ae06e58d13..fde62c8ce2 100644
---- a/audio/ossaudio.c
-+++ b/audio/ossaudio.c
-@@ -110,28 +110,28 @@ static void oss_anal_close (int *fdp)
- 
- static void oss_helper_poll_out (void *opaque)
- {
--    (void) opaque;
--    audio_run ("oss_poll_out");
-+    AudioState *s = opaque;
-+    audio_run(s, "oss_poll_out");
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -335,6 +340,7 @@ static void milkymist_ac97_class_init(ObjectClass *klass, void *data)
+     dc->realize = milkymist_ac97_realize;
+     dc->reset = milkymist_ac97_reset;
+     dc->vmsd = &vmstate_milkymist_ac97;
++    dc->props = milkymist_ac97_properties;
  }
  
- static void oss_helper_poll_in (void *opaque)
- {
--    (void) opaque;
--    audio_run ("oss_poll_in");
-+    AudioState *s = opaque;
-+    audio_run(s, "oss_poll_in");
+ static const TypeInfo milkymist_ac97_info = {
+diff --git a/hw/audio/pcspk.c b/hw/audio/pcspk.c
+index 4a7386a689..1457cd1ac6 100644
+--- a/hw/audio/pcspk.c
++++ b/hw/audio/pcspk.c
+@@ -208,6 +208,7 @@ static const VMStateDescription vmstate_spk = {
+ };
+ 
+ static Property pcspk_properties[] = {
++    DEFINE_AUDIO_PROPERTIES(PCSpkState, card),
+     DEFINE_PROP_UINT32("iobase", PCSpkState, iobase,  -1),
+     DEFINE_PROP_BOOL("migrate", PCSpkState, migrate,  true),
+     DEFINE_PROP_END_OF_LIST(),
+diff --git a/hw/audio/pl041.c b/hw/audio/pl041.c
+index c8cc503236..fca1dc8a54 100644
+--- a/hw/audio/pl041.c
++++ b/hw/audio/pl041.c
+@@ -621,6 +621,7 @@ static const VMStateDescription vmstate_pl041 = {
+ };
+ 
+ static Property pl041_device_properties[] = {
++    DEFINE_AUDIO_PROPERTIES(PL041State, codec.card),
+     /* Non-compact FIFO depth property */
+     DEFINE_PROP_UINT32("nc_fifo_depth", PL041State, fifo_depth,
+                        DEFAULT_FIFO_DEPTH),
+diff --git a/hw/audio/sb16.c b/hw/audio/sb16.c
+index 65ea0cd938..5a6a880f2e 100644
+--- a/hw/audio/sb16.c
++++ b/hw/audio/sb16.c
+@@ -1419,6 +1419,7 @@ static int SB16_init (ISABus *bus)
  }
  
- static void oss_poll_out (HWVoiceOut *hw)
- {
-     OSSVoiceOut *oss = (OSSVoiceOut *) hw;
- 
--    qemu_set_fd_handler (oss->fd, NULL, oss_helper_poll_out, NULL);
-+    qemu_set_fd_handler(oss->fd, NULL, oss_helper_poll_out, hw->s);
+ static Property sb16_properties[] = {
++    DEFINE_AUDIO_PROPERTIES(SB16State, card),
+     DEFINE_PROP_UINT32 ("version", SB16State, ver,  0x0405), /* 4.5 */
+     DEFINE_PROP_UINT32 ("iobase",  SB16State, port, 0x220),
+     DEFINE_PROP_UINT32 ("irq",     SB16State, irq,  5),
+diff --git a/hw/audio/wm8750.c b/hw/audio/wm8750.c
+index 5d614c0d8b..c86fd91f98 100644
+--- a/hw/audio/wm8750.c
++++ b/hw/audio/wm8750.c
+@@ -700,6 +700,11 @@ void wm8750_set_bclk_in(void *opaque, int new_hz)
+     wm8750_clk_update(s, 1);
  }
  
- static void oss_poll_in (HWVoiceIn *hw)
++static Property wm8750_properties[] = {
++    DEFINE_AUDIO_PROPERTIES(WM8750State, card),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void wm8750_class_init(ObjectClass *klass, void *data)
  {
-     OSSVoiceIn *oss = (OSSVoiceIn *) hw;
- 
--    qemu_set_fd_handler (oss->fd, oss_helper_poll_in, NULL, NULL);
-+    qemu_set_fd_handler(oss->fd, oss_helper_poll_in, NULL, hw->s);
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -710,6 +715,7 @@ static void wm8750_class_init(ObjectClass *klass, void *data)
+     sc->recv = wm8750_rx;
+     sc->send = wm8750_tx;
+     dc->vmsd = &vmstate_wm8750;
++    dc->props = wm8750_properties;
  }
  
- static int oss_write (SWVoiceOut *sw, void *buf, int len)
+ static const TypeInfo wm8750_info = {
+diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
+index b45a7ef54b..4659b6986f 100644
+--- a/hw/core/qdev-properties-system.c
++++ b/hw/core/qdev-properties-system.c
+@@ -11,6 +11,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "audio/audio.h"
+ #include "net/net.h"
+ #include "hw/qdev.h"
+ #include "qapi/error.h"
+@@ -318,6 +319,62 @@ const PropertyInfo qdev_prop_netdev = {
+ };
+ 
+ 
++/* --- audiodev --- */
++static void get_audiodev(Object *obj, Visitor *v, const char* name,
++                         void *opaque, Error **errp)
++{
++    DeviceState *dev = DEVICE(obj);
++    Property *prop = opaque;
++    QEMUSoundCard *card = qdev_get_prop_ptr(dev, prop);
++    char *p = g_strdup(audio_get_id(card));
++
++    visit_type_str(v, name, &p, errp);
++    g_free(p);
++}
++
++static void set_audiodev(Object *obj, Visitor *v, const char* name,
++                         void *opaque, Error **errp)
++{
++    DeviceState *dev = DEVICE(obj);
++    Property *prop = opaque;
++    QEMUSoundCard *card = qdev_get_prop_ptr(dev, prop);
++    AudioState *state;
++    Error *local_err = NULL;
++    int err = 0;
++    char *str;
++
++    if (dev->realized) {
++        qdev_prop_set_after_realize(dev, name, errp);
++        return;
++    }
++
++    visit_type_str(v, name, &str, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    state = audio_state_by_name(str);
++
++    if (!state) {
++        err = -ENOENT;
++        goto out;
++    }
++    card->state = state;
++
++out:
++    error_set_from_qdev_prop_error(errp, err, dev, prop, str);
++    g_free(str);
++}
++
++const PropertyInfo qdev_prop_audiodev = {
++    .name = "str",
++    .description = "ID of an audiodev to use as a backend",
++    /* release done on shutdown */
++    .get = get_audiodev,
++    .set = set_audiodev,
++};
++
+ void qdev_prop_set_drive(DeviceState *dev, const char *name,
+                          BlockBackend *value, Error **errp)
+ {
+diff --git a/hw/usb/dev-audio.c b/hw/usb/dev-audio.c
+index b1b9736a19..589977d96c 100644
+--- a/hw/usb/dev-audio.c
++++ b/hw/usb/dev-audio.c
+@@ -663,6 +663,7 @@ static const VMStateDescription vmstate_usb_audio = {
+ };
+ 
+ static Property usb_audio_properties[] = {
++    DEFINE_AUDIO_PROPERTIES(USBAudioState, card),
+     DEFINE_PROP_UINT32("debug", USBAudioState, debug, 0),
+     DEFINE_PROP_UINT32("buffer", USBAudioState, buffer,
+                        32 * USBAUDIO_PACKET_SIZE),
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index b6758c852e..6156409062 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -34,6 +34,7 @@ extern const PropertyInfo qdev_prop_blocksize;
+ extern const PropertyInfo qdev_prop_pci_host_devaddr;
+ extern const PropertyInfo qdev_prop_uuid;
+ extern const PropertyInfo qdev_prop_arraylen;
++extern const PropertyInfo qdev_prop_audiodev;
+ extern const PropertyInfo qdev_prop_link;
+ extern const PropertyInfo qdev_prop_off_auto_pcibar;
+ extern const PropertyInfo qdev_prop_pcie_link_speed;
+@@ -233,6 +234,8 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
+             + type_check(QemuUUID, typeof_field(_state, _field)),  \
+         .set_default = true,                                       \
+         }
++#define DEFINE_PROP_AUDIODEV(_n, _s, _f) \
++    DEFINE_PROP(_n, _s, _f, qdev_prop_audiodev, QEMUSoundCard)
+ 
+ #define DEFINE_PROP_END_OF_LIST()               \
+     {}
 -- 
 2.20.1
