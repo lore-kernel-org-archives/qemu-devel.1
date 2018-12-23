@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52012)
+Received: from eggs.gnu.org ([208.118.235.92]:52014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAjh-0007Jd-E9
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAjh-0007Jg-Hm
 	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAjg-0001Mg-7G
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAjg-0001PV-Nb
 	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:33 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35865)
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:33256)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gbAjg-0001F7-07
+	id 1gbAjg-0001Jv-Hn
 	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:32 -0500
-Received: by mail-wr1-x441.google.com with SMTP id u4so10091513wrp.3
-	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:52:31 -0800 (PST)
+Received: by mail-wm1-x341.google.com with SMTP id r24so18059286wmh.0
+	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:52:32 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Sun, 23 Dec 2018 21:51:36 +0100
-Message-Id: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
+Date: Sun, 23 Dec 2018 21:51:37 +0100
+Message-Id: <5ffd8b7b6fefbc3c2c4fb074f3083ffbdc946d20.1545598229.git.DirtY.iCE.hu@gmail.com>
+In-Reply-To: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
+References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 00/52] Audio 5.1 patches
+Subject: [Qemu-devel] [PATCH v2 01/52] qapi: support alternates in
+ OptsVisitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,138 +32,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Hi,
+They are required for flat unions (you still have to allocate the
+structs).
 
-I've updated my audio patchset to the current git master. Other than that not
-much happened since my last update [1], fixed a few small problems that I
-noticed while rebasing my patches.
+Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
+---
+ include/qapi/opts-visitor.h |  7 +++----
+ qapi/opts-visitor.c         | 16 ++++++++++++++++
+ 2 files changed, 19 insertions(+), 4 deletions(-)
 
-Please review.
-
-[1]: https://lists.gnu.org/archive/html/qemu-devel/2016-01/msg02451.html
-
-Kővágó, Zoltán (52):
-  qapi: support alternates in OptsVisitor
-  qapi: support nested structs in OptsVisitor
-  qapi: qapi for audio backends
-  audio: use qapi AudioFormat instead of audfmt_e
-  audio: -audiodev command line option: documentation
-  audio: -audiodev command line option basic implementation
-  alsaaudio: port to -audiodev config
-  coreaudio: port to -audiodev config
-  dsoundaudio: port to -audiodev config
-  noaudio: port to -audiodev config
-  ossaudio: port to -audiodev config
-  paaudio: port to -audiodev config
-  sdlaudio: port to -audiodev config
-  spiceaudio: port to -audiodev config
-  wavaudio: port to -audiodev config
-  audio: -audiodev command line option: cleanup
-  audio: reduce glob_audio_state usage
-  audio: basic support for multi backend audio
-  audio: add audiodev properties to frontends
-  audio: audiodev= parameters no longer optional when -audiodev present
-  paaudio: do not move stream when sink/source name is specified
-  paaudio: properly disconnect streams in fini_*
-  audio: remove audio_MIN, audio_MAX
-  audio: do not run each backend in audio_run
-  paaudio: fix playback glitches
-  audio: remove read and write pcm_ops
-  audio: use size_t where makes sense
-  audio: api for mixeng code free backends
-  alsaaudio: port to the new audio backend api
-  coreaudio: port to the new audio backend api
-  dsoundaudio: port to the new audio backend api
-  noaudio: port to the new audio backend api
-  ossaudio: port to the new audio backend api
-  paaudio: port to the new audio backend api
-  sdlaudio: port to the new audio backend api
-  spiceaudio: port to the new audio backend api
-  wavaudio: port to the new audio backend api
-  audio: remove remains of the old backend api
-  audio: unify input and output mixeng buffer management
-  audio: remove hw->samples, buffer_size_in/out pcm_ops
-  audio: common rate control code for timer based outputs
-  audio: split ctl_* functions into enable_* and volume_*
-  audio: add mixeng option (documentation)
-  audio: make mixeng optional
-  paaudio: get/put_buffer functions
-  audio: support more than two channels in volume setting
-  audio: replace shift in audio_pcm_info with bytes_per_frame
-  audio: basic support for multichannel audio
-  paaudio: channel-map option
-  usb-audio: do not count on avail bytes actually available
-  usb-audio: support more than two channels of audio
-  usbaudio: change playback counters to 64 bit
-
- Makefile.objs                           |    6 +-
- audio/Makefile.objs                     |    3 +-
- audio/alsaaudio.c                       |  755 ++++-------
- audio/audio.c                           | 1561 ++++++++++++-----------
- audio/audio.h                           |   78 +-
- audio/audio_int.h                       |  131 +-
- audio/audio_legacy.c                    |  342 +++++
- audio/audio_pt_int.c                    |  174 ---
- audio/audio_pt_int.h                    |   22 -
- audio/audio_template.h                  |  112 +-
- audio/audio_win_int.c                   |   18 +-
- audio/coreaudio.c                       |  198 ++-
- audio/dsound_template.h                 |   63 +-
- audio/dsoundaudio.c                     |  449 ++-----
- audio/mixeng.h                          |   11 +-
- audio/noaudio.c                         |   98 +-
- audio/ossaudio.c                        |  594 ++++-----
- audio/paaudio.c                         |  881 ++++++-------
- audio/rate_template.h                   |    2 +-
- audio/sdlaudio.c                        |  218 ++--
- audio/spiceaudio.c                      |  286 ++---
- audio/wavaudio.c                        |  158 +--
- audio/wavcapture.c                      |    8 +-
- configure                               |    5 -
- hmp-commands.hx                         |   11 +-
- hw/acpi/core.c                          |    2 +-
- hw/arm/omap2.c                          |    2 +-
- hw/audio/ac97.c                         |   13 +-
- hw/audio/adlib.c                        |    7 +-
- hw/audio/cs4231a.c                      |   11 +-
- hw/audio/es1370.c                       |   17 +-
- hw/audio/gus.c                          |    9 +-
- hw/audio/hda-codec.c                    |   35 +-
- hw/audio/lm4549.c                       |    6 +-
- hw/audio/milkymist-ac97.c               |   16 +-
- hw/audio/pcspk.c                        |    5 +-
- hw/audio/pl041.c                        |    1 +
- hw/audio/sb16.c                         |   17 +-
- hw/audio/wm8750.c                       |   14 +-
- hw/core/qdev-properties-system.c        |   57 +
- hw/display/xlnx_dp.c                    |    2 +-
- hw/input/tsc210x.c                      |    2 +-
- hw/usb/dev-audio.c                      |  460 ++++++-
- include/hw/qdev-properties.h            |    3 +
- include/qapi/opts-visitor.h             |    9 +-
- include/sysemu/replay.h                 |    4 +-
- monitor.c                               |   12 +-
- net/net.c                               |    2 +-
- numa.c                                  |    2 +-
- qapi/audio.json                         |  261 ++++
- qapi/opts-visitor.c                     |  145 ++-
- qapi/qapi-schema.json                   |    1 +
- qemu-options.hx                         |  242 +++-
- qom/object_interfaces.c                 |    2 +-
- replay/replay-audio.c                   |   16 +-
- tests/qapi-schema/qapi-schema-test.json |    9 +-
- tests/qapi-schema/qapi-schema-test.out  |    4 +
- tests/test-opts-visitor.c               |   43 +-
- ui/vnc.c                                |   41 +-
- ui/vnc.h                                |    2 +
- vl.c                                    |   11 +-
- 61 files changed, 3921 insertions(+), 3748 deletions(-)
- create mode 100644 audio/audio_legacy.c
- delete mode 100644 audio/audio_pt_int.c
- delete mode 100644 audio/audio_pt_int.h
- create mode 100644 qapi/audio.json
-
+diff --git a/include/qapi/opts-visitor.h b/include/qapi/opts-visitor.h
+index 9b989e7e08..ca044e3b33 100644
+--- a/include/qapi/opts-visitor.h
++++ b/include/qapi/opts-visitor.h
+@@ -29,10 +29,9 @@ typedef struct OptsVisitor OptsVisitor;
+  * - values below INT64_MIN or LLONG_MIN are rejected,
+  * - values above INT64_MAX or LLONG_MAX are rejected.
+  *
+- * The Opts input visitor does not implement support for visiting QAPI
+- * alternates, numbers (other than integers), null, or arbitrary
+- * QTypes.  It also requires a non-null list argument to
+- * visit_start_list().
++ * The Opts input visitor does not implement support for visiting numbers
++ * (other than integers), null, or arbitrary QTypes. It also requires a
++ * non-null list argument to visit_start_list().
+  */
+ Visitor *opts_visitor_new(const QemuOpts *opts);
+ 
+diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
+index 324b197495..4af6043b75 100644
+--- a/qapi/opts-visitor.c
++++ b/qapi/opts-visitor.c
+@@ -156,6 +156,13 @@ opts_start_struct(Visitor *v, const char *name, void **obj,
+     }
+ }
+ 
++static void
++opts_start_alternate(Visitor *v, const char *name, GenericAlternate **obj,
++                     size_t size, Error **errp)
++{
++    opts_start_struct(v, name, (void **)obj, size, errp);
++}
++
+ 
+ static void
+ opts_check_struct(Visitor *v, Error **errp)
+@@ -198,6 +205,12 @@ opts_end_struct(Visitor *v, void **obj)
+     ov->fake_id_opt = NULL;
+ }
+ 
++static void
++opts_end_alternate(Visitor *v, void **obj)
++{
++    opts_end_struct(v, obj);
++}
++
+ 
+ static GQueue *
+ lookup_distinct(const OptsVisitor *ov, const char *name, Error **errp)
+@@ -547,6 +560,9 @@ opts_visitor_new(const QemuOpts *opts)
+     ov->visitor.check_struct = &opts_check_struct;
+     ov->visitor.end_struct   = &opts_end_struct;
+ 
++    ov->visitor.start_alternate = &opts_start_alternate;
++    ov->visitor.end_alternate = &opts_end_alternate;
++
+     ov->visitor.start_list = &opts_start_list;
+     ov->visitor.next_list  = &opts_next_list;
+     ov->visitor.check_list = &opts_check_list;
 -- 
 2.20.1
