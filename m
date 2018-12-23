@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52521)
+Received: from eggs.gnu.org ([208.118.235.92]:52482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkA-0008Ai-1E
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:03 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAk7-00087R-T3
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAk8-0003DG-O3
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:01 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55633)
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAk5-00031m-Tl
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:58 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39694)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gbAk8-0003Ai-Ho
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:00 -0500
-Received: by mail-wm1-x343.google.com with SMTP id y139so9809625wmc.5
-	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:53:00 -0800 (PST)
+	id 1gbAk5-0002xp-N4
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:57 -0500
+Received: by mail-wm1-x341.google.com with SMTP id f81so10393873wmd.4
+	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:52:57 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Sun, 23 Dec 2018 21:52:12 +0100
-Message-Id: <645cc4345f9dd8f133fed0c40a91fbfb75944dfb.1545598229.git.DirtY.iCE.hu@gmail.com>
+Date: Sun, 23 Dec 2018 21:52:08 +0100
+Message-Id: <3cdadfc819548ae32d9c90877de7382c391d0371.1545598229.git.DirtY.iCE.hu@gmail.com>
 In-Reply-To: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 36/52] spiceaudio: port to the new audio
+Subject: [Qemu-devel] [PATCH v2 32/52] noaudio: port to the new audio
  backend api
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -36,183 +36,90 @@ Cc: Gerd Hoffmann <kraxel@redhat.com>
 
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/spiceaudio.c | 112 +++++++++++++++------------------------------
- 1 file changed, 38 insertions(+), 74 deletions(-)
+ audio/noaudio.c | 39 +++++++++++++++------------------------
+ 1 file changed, 15 insertions(+), 24 deletions(-)
 
-diff --git a/audio/spiceaudio.c b/audio/spiceaudio.c
-index f963853ed8..d1605d3939 100644
---- a/audio/spiceaudio.c
-+++ b/audio/spiceaudio.c
-@@ -51,7 +51,7 @@ typedef struct SpiceVoiceOut {
-     SpiceRateCtl          rate;
-     int                   active;
-     uint32_t              *frame;
--    uint32_t              *fpos;
-+    uint32_t              fpos;
-     uint32_t              fsize;
- } SpiceVoiceOut;
+diff --git a/audio/noaudio.c b/audio/noaudio.c
+index c49f2df4b3..6a3a1c418b 100644
+--- a/audio/noaudio.c
++++ b/audio/noaudio.c
+@@ -40,10 +40,9 @@ typedef struct NoVoiceIn {
+     int64_t old_ticks;
+ } NoVoiceIn;
  
-@@ -60,7 +60,6 @@ typedef struct SpiceVoiceIn {
-     SpiceRecordInstance   sin;
-     SpiceRateCtl          rate;
-     int                   active;
--    uint32_t              samples[LINE_IN_SAMPLES];
- } SpiceVoiceIn;
- 
- static const SpicePlaybackInterface playback_sif = {
-@@ -152,44 +151,36 @@ static void line_out_fini (HWVoiceOut *hw)
-     spice_server_remove_interface (&out->sin.base);
- }
- 
--static int line_out_run (HWVoiceOut *hw, int live)
-+static void *line_out_get_buffer(HWVoiceOut *hw, size_t *size)
+-static int no_run_out (HWVoiceOut *hw, int live)
++static size_t no_write(HWVoiceOut *hw, void *buf, size_t len)
  {
--    SpiceVoiceOut *out = container_of (hw, SpiceVoiceOut, hw);
--    int rpos, decr;
--    int samples;
-+    SpiceVoiceOut *out = container_of(hw, SpiceVoiceOut, hw);
-+    size_t decr;
+     NoVoiceOut *no = (NoVoiceOut *) hw;
+-    int decr, samples;
+     int64_t now;
+     int64_t ticks;
+     int64_t bytes;
+@@ -51,13 +50,9 @@ static int no_run_out (HWVoiceOut *hw, int live)
+     now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+     ticks = now - no->old_ticks;
+     bytes = muldiv64(ticks, hw->info.bytes_per_second, NANOSECONDS_PER_SECOND);
+-    bytes = MIN(bytes, INT_MAX);
+-    samples = bytes >> hw->info.shift;
  
--    if (!live) {
--        return 0;
-+    if (!out->frame) {
-+        spice_server_playback_get_buffer(&out->sin, &out->frame, &out->fsize);
-+        out->fpos = 0;
-     }
- 
--    decr = rate_get_samples (&hw->info, &out->rate);
--    decr = MIN (live, decr);
-+    decr = rate_get_samples(&hw->info, &out->rate);
-+    decr = MIN(out->fsize - out->fpos, decr);
- 
--    samples = decr;
--    rpos = hw->rpos;
--    while (samples) {
--        int left_till_end_samples = hw->samples - rpos;
--        int len = MIN (samples, left_till_end_samples);
-+    *size = decr << hw->info.shift;
-+    return out->frame + out->fpos;
-+}
- 
--        if (!out->frame) {
--            spice_server_playback_get_buffer (&out->sin, &out->frame, &out->fsize);
--            out->fpos = out->frame;
--        }
--        if (out->frame) {
--            len = MIN (len, out->fsize);
--            hw->clip (out->fpos, hw->mix_buf + rpos, len);
--            out->fsize -= len;
--            out->fpos  += len;
--            if (out->fsize == 0) {
--                spice_server_playback_put_samples (&out->sin, out->frame);
--                out->frame = out->fpos = NULL;
--            }
--        }
--        rpos = (rpos + len) % hw->samples;
--        samples -= len;
-+static size_t line_out_put_buffer(HWVoiceOut *hw, void *buf, size_t size)
-+{
-+    SpiceVoiceOut *out = container_of(hw, SpiceVoiceOut, hw);
-+
-+    out->fpos += size >> 2;
-+    assert(buf == out->frame + out->fpos && out->fpos <= out->fsize);
-+
-+    if (out->fpos == out->fsize) { /* buffer full */
-+        spice_server_playback_put_samples(&out->sin, out->frame);
-+        out->frame = NULL;
-     }
--    hw->rpos = rpos;
+     no->old_ticks = now;
+-    decr = MIN (live, samples);
+-    hw->rpos = (hw->rpos + decr) % hw->samples;
 -    return decr;
-+
-+    return size;
++    return MIN(len, bytes);
  }
  
- static int line_out_ctl (HWVoiceOut *hw, int cmd, ...)
-@@ -211,9 +202,9 @@ static int line_out_ctl (HWVoiceOut *hw, int cmd, ...)
-         }
-         out->active = 0;
-         if (out->frame) {
--            memset (out->fpos, 0, out->fsize << 2);
-+            memset(out->frame + out->fpos, 0, (out->fsize - out->fpos) << 2);
-             spice_server_playback_put_samples (&out->sin, out->frame);
--            out->frame = out->fpos = NULL;
-+            out->frame = NULL;
-         }
-         spice_server_playback_stop (&out->sin);
-         break;
-@@ -275,49 +266,20 @@ static void line_in_fini (HWVoiceIn *hw)
-     spice_server_remove_interface (&in->sin.base);
+ static int no_init_out(HWVoiceOut *hw, struct audsettings *as, void *drv_opaque)
+@@ -91,25 +86,21 @@ static void no_fini_in (HWVoiceIn *hw)
+     (void) hw;
  }
  
--static int line_in_run (HWVoiceIn *hw)
-+static size_t line_in_read(HWVoiceIn *hw, void *buf, size_t len)
+-static int no_run_in (HWVoiceIn *hw)
++static size_t no_read(HWVoiceIn *hw, void *buf, size_t size)
  {
-     SpiceVoiceIn *in = container_of (hw, SpiceVoiceIn, hw);
--    int num_samples;
--    int ready;
--    int len[2];
--    uint64_t delta_samp;
--    const uint32_t *samples;
-+    uint64_t delta_samp = rate_get_samples(&hw->info, &in->rate);
-+    uint64_t to_read = MIN(len >> 2, delta_samp);
-+    size_t ready = spice_server_record_get_samples(&in->sin, buf, to_read);
++    size_t to_clear;
+     NoVoiceIn *no = (NoVoiceIn *) hw;
+-    int live = audio_pcm_hw_get_live_in (hw);
+-    int dead = hw->samples - live;
+-    int samples = 0;
  
--    if (!(num_samples = hw->samples - audio_pcm_hw_get_live_in (hw))) {
--        return 0;
--    }
--
--    delta_samp = rate_get_samples (&hw->info, &in->rate);
--    num_samples = MIN (num_samples, delta_samp);
--
--    ready = spice_server_record_get_samples (&in->sin, in->samples, num_samples);
--    samples = in->samples;
-+    /* XXX: do we need this? */
-     if (ready == 0) {
--        static const uint32_t silence[LINE_IN_SAMPLES];
--        samples = silence;
--        ready = LINE_IN_SAMPLES;
-+        memset(buf, 0, to_read << 2);
-+        ready = to_read;
-     }
+-    if (dead) {
+-        int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+-        int64_t ticks = now - no->old_ticks;
+-        int64_t bytes =
+-            muldiv64(ticks, hw->info.bytes_per_second, NANOSECONDS_PER_SECOND);
++    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    int64_t ticks = now - no->old_ticks;
++    int64_t bytes =
++        muldiv64 (ticks, hw->info.bytes_per_second, NANOSECONDS_PER_SECOND);
  
--    num_samples = MIN (ready, num_samples);
--
--    if (hw->wpos + num_samples > hw->samples) {
--        len[0] = hw->samples - hw->wpos;
--        len[1] = num_samples - len[0];
--    } else {
--        len[0] = num_samples;
--        len[1] = 0;
+-        no->old_ticks = now;
+-        bytes = MIN (bytes, INT_MAX);
+-        samples = bytes >> hw->info.shift;
+-        samples = MIN (samples, dead);
 -    }
--
--    hw->conv (hw->conv_buf + hw->wpos, samples, len[0]);
--
--    if (len[1]) {
--        hw->conv (hw->conv_buf, samples + len[0], len[1]);
--    }
--
--    hw->wpos = (hw->wpos + num_samples) % hw->samples;
--
--    return num_samples;
-+    return ready << 2;
+-    return samples;
++    no->old_ticks = now;
++    to_clear = MIN(bytes, size);
++
++    audio_pcm_info_clear_buf(&hw->info, buf, to_clear >> hw->info.shift);
++    return to_clear;
  }
  
- static int line_in_ctl (HWVoiceIn *hw, int cmd, ...)
-@@ -366,12 +328,14 @@ static int line_in_ctl (HWVoiceIn *hw, int cmd, ...)
- static struct audio_pcm_ops audio_callbacks = {
-     .init_out = line_out_init,
-     .fini_out = line_out_fini,
--    .run_out  = line_out_run,
-+    .write    = audio_generic_write,
-+    .get_buffer_out = line_out_get_buffer,
-+    .put_buffer_out = line_out_put_buffer,
-     .ctl_out  = line_out_ctl,
+ static int no_ctl_in (HWVoiceIn *hw, int cmd, ...)
+@@ -132,12 +123,12 @@ static void no_audio_fini (void *opaque)
+ static struct audio_pcm_ops no_pcm_ops = {
+     .init_out = no_init_out,
+     .fini_out = no_fini_out,
+-    .run_out  = no_run_out,
++    .write    = no_write,
+     .ctl_out  = no_ctl_out,
  
-     .init_in  = line_in_init,
-     .fini_in  = line_in_fini,
--    .run_in   = line_in_run,
-+    .read     = line_in_read,
-     .ctl_in   = line_in_ctl,
+     .init_in  = no_init_in,
+     .fini_in  = no_fini_in,
+-    .run_in   = no_run_in,
++    .read     = no_read,
+     .ctl_in   = no_ctl_in
  };
  
 -- 
