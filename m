@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52553)
+Received: from eggs.gnu.org ([208.118.235.92]:52659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkB-0008Da-Ae
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:05 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkI-0008P3-1W
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAk8-0003E0-UE
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:03 -0500
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:55510)
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkE-0003Wc-5d
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:09 -0500
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:33806)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gbAk8-00035c-Jh
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:00 -0500
-Received: by mail-wm1-x32d.google.com with SMTP id y139so9809607wmc.5
-	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:52:59 -0800 (PST)
+	id 1gbAkD-0003Sz-Os
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:06 -0500
+Received: by mail-wm1-x336.google.com with SMTP id y185so18070866wmd.1
+	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:53:05 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Sun, 23 Dec 2018 21:52:10 +0100
-Message-Id: <b0c156cefaa661414349dde7aa490eec84ef8b12.1545598229.git.DirtY.iCE.hu@gmail.com>
+Date: Sun, 23 Dec 2018 21:52:18 +0100
+Message-Id: <43c41cadb8334e39ab419fe1c8447c794481ef5d.1545598229.git.DirtY.iCE.hu@gmail.com>
 In-Reply-To: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 34/52] paaudio: port to the new audio
- backend api
+Subject: [Qemu-devel] [PATCH v2 42/52] audio: split ctl_* functions into
+ enable_* and volume_*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,788 +34,1156 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
+This way we no longer need vararg functions, improving compile time
+error detection.  Also now it's possible to check actually what commands
+are supported, without needing to manually update ctl_caps.
+
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/Makefile.objs  |   1 -
- audio/audio_pt_int.c | 174 --------------------
- audio/audio_pt_int.h |  22 ---
- audio/paaudio.c      | 372 ++++++-------------------------------------
- configure            |   5 -
- 5 files changed, 45 insertions(+), 529 deletions(-)
- delete mode 100644 audio/audio_pt_int.c
- delete mode 100644 audio/audio_pt_int.h
+ audio/alsaaudio.c      |  56 +++++++-----------
+ audio/audio.c          |  45 +++++++++------
+ audio/audio_int.h      |  15 ++---
+ audio/audio_template.h |   1 -
+ audio/coreaudio.c      |  13 ++---
+ audio/dsoundaudio.c    |  50 +++++++---------
+ audio/noaudio.c        |  14 ++---
+ audio/ossaudio.c       |  78 ++++++++++---------------
+ audio/paaudio.c        | 126 ++++++++++++++++-------------------------
+ audio/sdlaudio.c       |  17 +-----
+ audio/spiceaudio.c     | 101 ++++++++++++++-------------------
+ audio/wavaudio.c       |   7 +--
+ 12 files changed, 213 insertions(+), 310 deletions(-)
 
-diff --git a/audio/Makefile.objs b/audio/Makefile.objs
-index dca87f6347..d7490a379f 100644
---- a/audio/Makefile.objs
-+++ b/audio/Makefile.objs
-@@ -2,7 +2,6 @@ common-obj-y = audio.o audio_legacy.o noaudio.o wavaudio.o mixeng.o
- common-obj-$(CONFIG_SPICE) += spiceaudio.o
- common-obj-$(CONFIG_AUDIO_COREAUDIO) += coreaudio.o
- common-obj-$(CONFIG_AUDIO_DSOUND) += dsoundaudio.o
--common-obj-$(CONFIG_AUDIO_PT_INT) += audio_pt_int.o
- common-obj-$(CONFIG_AUDIO_WIN_INT) += audio_win_int.o
- common-obj-y += wavcapture.o
+diff --git a/audio/alsaaudio.c b/audio/alsaaudio.c
+index 672803e5c2..bc097b1f31 100644
+--- a/audio/alsaaudio.c
++++ b/audio/alsaaudio.c
+@@ -745,34 +745,28 @@ static int alsa_voice_ctl (snd_pcm_t *handle, const char *typ, int ctl)
+     return 0;
+ }
  
-diff --git a/audio/audio_pt_int.c b/audio/audio_pt_int.c
-deleted file mode 100644
-index 3fe56d8514..0000000000
---- a/audio/audio_pt_int.c
-+++ /dev/null
-@@ -1,174 +0,0 @@
--#include "qemu/osdep.h"
--#include "qemu-common.h"
--#include "audio.h"
+-static int alsa_ctl_out (HWVoiceOut *hw, int cmd, ...)
++static void alsa_enable_out(HWVoiceOut *hw, bool enable)
+ {
+     ALSAVoiceOut *alsa = (ALSAVoiceOut *) hw;
+     AudiodevAlsaPerDirectionOptions *apdo = alsa->dev->u.alsa.alsa_out;
+ 
+-    switch (cmd) {
+-    case VOICE_ENABLE:
+-        {
+-            bool poll_mode = !apdo->has_try_poll || apdo->try_poll;
++    if (enable) {
++        bool poll_mode = !apdo->has_try_poll || apdo->try_poll;
+ 
+-            ldebug ("enabling voice\n");
+-            if (poll_mode && alsa_poll_out (hw)) {
+-                poll_mode = 0;
+-            }
+-            hw->poll_mode = poll_mode;
+-            return alsa_voice_ctl (alsa->handle, "playback", VOICE_CTL_PREPARE);
++        ldebug ("enabling voice\n");
++        if (poll_mode && alsa_poll_out (hw)) {
++            poll_mode = 0;
+         }
 -
--#define AUDIO_CAP "audio-pt"
+-    case VOICE_DISABLE:
++        hw->poll_mode = poll_mode;
++        alsa_voice_ctl(alsa->handle, "playback", VOICE_CTL_PREPARE);
++    } else {
+         ldebug ("disabling voice\n");
+         if (hw->poll_mode) {
+             hw->poll_mode = 0;
+             alsa_fini_poll (&alsa->pollhlp);
+         }
+-        return alsa_voice_ctl (alsa->handle, "playback", VOICE_CTL_PAUSE);
++        alsa_voice_ctl(alsa->handle, "playback", VOICE_CTL_PAUSE);
+     }
 -
--#include "audio_int.h"
--#include "audio_pt_int.h"
--
--static void GCC_FMT_ATTR(3, 4) logerr (struct audio_pt *pt, int err,
--                                       const char *fmt, ...)
--{
--    va_list ap;
--
--    va_start (ap, fmt);
--    AUD_vlog (pt->drv, fmt, ap);
--    va_end (ap);
--
--    AUD_log (NULL, "\n");
--    AUD_log (pt->drv, "Reason: %s\n", strerror (err));
--}
--
--int audio_pt_init (struct audio_pt *p, void *(*func) (void *),
--                   void *opaque, const char *drv, const char *cap)
--{
--    int err, err2;
--    const char *efunc;
--    sigset_t set, old_set;
--
--    p->drv = drv;
--
--    err = sigfillset (&set);
--    if (err) {
--        logerr(p, errno, "%s(%s): sigfillset failed", cap, __func__);
--        return -1;
--    }
--
--    err = pthread_mutex_init (&p->mutex, NULL);
--    if (err) {
--        efunc = "pthread_mutex_init";
--        goto err0;
--    }
--
--    err = pthread_cond_init (&p->cond, NULL);
--    if (err) {
--        efunc = "pthread_cond_init";
--        goto err1;
--    }
--
--    err = pthread_sigmask (SIG_BLOCK, &set, &old_set);
--    if (err) {
--        efunc = "pthread_sigmask";
--        goto err2;
--    }
--
--    err = pthread_create (&p->thread, NULL, func, opaque);
--
--    err2 = pthread_sigmask (SIG_SETMASK, &old_set, NULL);
--    if (err2) {
--        logerr(p, err2, "%s(%s): pthread_sigmask (restore) failed",
--               cap, __func__);
--        /* We have failed to restore original signal mask, all bets are off,
--           so terminate the process */
--        exit (EXIT_FAILURE);
--    }
--
--    if (err) {
--        efunc = "pthread_create";
--        goto err2;
--    }
--
--    return 0;
--
-- err2:
--    err2 = pthread_cond_destroy (&p->cond);
--    if (err2) {
--        logerr(p, err2, "%s(%s): pthread_cond_destroy failed", cap, __func__);
--    }
--
-- err1:
--    err2 = pthread_mutex_destroy (&p->mutex);
--    if (err2) {
--        logerr(p, err2, "%s(%s): pthread_mutex_destroy failed", cap, __func__);
--    }
--
-- err0:
--    logerr(p, err, "%s(%s): %s failed", cap, __func__, efunc);
 -    return -1;
--}
+ }
+ 
+ static int alsa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
+@@ -861,35 +855,29 @@ static size_t alsa_read(HWVoiceIn *hw, void *buf, size_t len)
+     return pos;
+ }
+ 
+-static int alsa_ctl_in (HWVoiceIn *hw, int cmd, ...)
++static void alsa_enable_in(HWVoiceIn *hw, bool enable)
+ {
+     ALSAVoiceIn *alsa = (ALSAVoiceIn *) hw;
+     AudiodevAlsaPerDirectionOptions *apdo = alsa->dev->u.alsa.alsa_in;
+ 
+-    switch (cmd) {
+-    case VOICE_ENABLE:
+-        {
+-            bool poll_mode = !apdo->has_try_poll || apdo->try_poll;
++    if (enable) {
++        bool poll_mode = !apdo->has_try_poll || apdo->try_poll;
+ 
+-            ldebug ("enabling voice\n");
+-            if (poll_mode && alsa_poll_in (hw)) {
+-                poll_mode = 0;
+-            }
+-            hw->poll_mode = poll_mode;
 -
--int audio_pt_fini (struct audio_pt *p, const char *cap)
--{
--    int err, ret = 0;
+-            return alsa_voice_ctl (alsa->handle, "capture", VOICE_CTL_START);
++        ldebug ("enabling voice\n");
++        if (poll_mode && alsa_poll_in (hw)) {
++            poll_mode = 0;
+         }
++        hw->poll_mode = poll_mode;
+ 
+-    case VOICE_DISABLE:
++        alsa_voice_ctl(alsa->handle, "capture", VOICE_CTL_START);
++    } else {
+         ldebug ("disabling voice\n");
+         if (hw->poll_mode) {
+             hw->poll_mode = 0;
+             alsa_fini_poll (&alsa->pollhlp);
+         }
+-        return alsa_voice_ctl (alsa->handle, "capture", VOICE_CTL_PAUSE);
++        alsa_voice_ctl(alsa->handle, "capture", VOICE_CTL_PAUSE);
+     }
 -
--    err = pthread_cond_destroy (&p->cond);
--    if (err) {
--        logerr(p, err, "%s(%s): pthread_cond_destroy failed", cap, __func__);
--        ret = -1;
--    }
+-    return -1;
+ }
+ 
+ static void *alsa_audio_init(Audiodev *dev)
+@@ -931,13 +919,13 @@ static struct audio_pcm_ops alsa_pcm_ops = {
+     .fini_out = alsa_fini_out,
+     .buffer_size_out = alsa_buffer_size_out,
+     .write    = alsa_write,
+-    .ctl_out  = alsa_ctl_out,
++    .enable_out = alsa_enable_out,
+ 
+     .init_in  = alsa_init_in,
+     .fini_in  = alsa_fini_in,
+     .buffer_size_in = alsa_buffer_size_in,
+     .read     = alsa_read,
+-    .ctl_in   = alsa_ctl_in,
++    .enable_in = alsa_enable_in,
+ };
+ 
+ static struct audio_driver alsa_audio_driver = {
+diff --git a/audio/audio.c b/audio/audio.c
+index f89bce3a34..7ba939560a 100644
+--- a/audio/audio.c
++++ b/audio/audio.c
+@@ -638,7 +638,7 @@ static size_t audio_pcm_sw_read(SWVoiceIn *sw, void *buf, size_t size)
+         total += isamp;
+     }
+ 
+-    if (!(hw->ctl_caps & VOICE_VOLUME_CAP)) {
++    if (!hw->pcm_ops->volume_in) {
+         mixeng_volume (sw->buf, ret, &sw->vol);
+     }
+ 
+@@ -725,7 +725,7 @@ static size_t audio_pcm_sw_write(SWVoiceOut *sw, void *buf, size_t size)
+     if (swlim) {
+         sw->conv (sw->buf, buf, swlim);
+ 
+-        if (!(sw->hw->ctl_caps & VOICE_VOLUME_CAP)) {
++        if (!sw->hw->pcm_ops->volume_out) {
+             mixeng_volume (sw->buf, swlim, &sw->vol);
+         }
+     }
+@@ -892,7 +892,9 @@ void AUD_set_active_out (SWVoiceOut *sw, int on)
+             if (!hw->enabled) {
+                 hw->enabled = 1;
+                 if (s->vm_running) {
+-                    hw->pcm_ops->ctl_out(hw, VOICE_ENABLE);
++                    if (hw->pcm_ops->enable_out) {
++                        hw->pcm_ops->enable_out(hw, true);
++                    }
+                     audio_reset_timer (s);
+                 }
+             }
+@@ -937,7 +939,9 @@ void AUD_set_active_in (SWVoiceIn *sw, int on)
+             if (!hw->enabled) {
+                 hw->enabled = 1;
+                 if (s->vm_running) {
+-                    hw->pcm_ops->ctl_in(hw, VOICE_ENABLE);
++                    if (hw->pcm_ops->enable_in) {
++                        hw->pcm_ops->enable_in(hw, true);
++                    }
+                     audio_reset_timer (s);
+                 }
+             }
+@@ -954,7 +958,9 @@ void AUD_set_active_in (SWVoiceIn *sw, int on)
+ 
+                 if (nb_active == 1) {
+                     hw->enabled = 0;
+-                    hw->pcm_ops->ctl_in (hw, VOICE_DISABLE);
++                    if (hw->pcm_ops->enable_in) {
++                        hw->pcm_ops->enable_in(hw, false);
++                    }
+                 }
+             }
+         }
+@@ -1102,7 +1108,9 @@ static void audio_run_out (AudioState *s)
+ #endif
+             hw->enabled = 0;
+             hw->pending_disable = 0;
+-            hw->pcm_ops->ctl_out (hw, VOICE_DISABLE);
++            if (hw->pcm_ops->enable_out) {
++                hw->pcm_ops->enable_out(hw, false);
++            }
+             for (sc = hw->cap_head.lh_first; sc; sc = sc->entries.le_next) {
+                 sc->sw.active = 0;
+                 audio_recalc_and_notify_capture (sc->cap);
+@@ -1465,15 +1473,18 @@ static void audio_vm_change_state_handler (void *opaque, int running,
+     AudioState *s = opaque;
+     HWVoiceOut *hwo = NULL;
+     HWVoiceIn *hwi = NULL;
+-    int op = running ? VOICE_ENABLE : VOICE_DISABLE;
+ 
+     s->vm_running = running;
+     while ((hwo = audio_pcm_hw_find_any_enabled_out(s, hwo))) {
+-        hwo->pcm_ops->ctl_out(hwo, op);
++        if (hwo->pcm_ops->enable_out) {
++            hwo->pcm_ops->enable_out(hwo, running);
++        }
+     }
+ 
+     while ((hwi = audio_pcm_hw_find_any_enabled_in(s, hwi))) {
+-        hwi->pcm_ops->ctl_in(hwi, op);
++        if (hwi->pcm_ops->enable_in) {
++            hwi->pcm_ops->enable_in(hwi, running);
++        }
+     }
+     audio_reset_timer (s);
+ }
+@@ -1493,8 +1504,8 @@ static void free_audio_state(AudioState *s)
+     QLIST_FOREACH_SAFE(hwo, &s->hw_head_out, entries, hwon) {
+         SWVoiceCap *sc;
+ 
+-        if (hwo->enabled) {
+-            hwo->pcm_ops->ctl_out (hwo, VOICE_DISABLE);
++        if (hwo->enabled && hwo->pcm_ops->enable_out) {
++            hwo->pcm_ops->enable_out(hwo, false);
+         }
+         hwo->pcm_ops->fini_out (hwo);
+ 
+@@ -1510,8 +1521,8 @@ static void free_audio_state(AudioState *s)
+     }
+ 
+     QLIST_FOREACH_SAFE(hwi, &s->hw_head_in, entries, hwin) {
+-        if (hwi->enabled) {
+-            hwi->pcm_ops->ctl_in (hwi, VOICE_DISABLE);
++        if (hwi->enabled && hwi->pcm_ops->enable_in) {
++            hwi->pcm_ops->enable_in(hwi, false);
+         }
+         hwi->pcm_ops->fini_in (hwi);
+         QLIST_REMOVE(hwi, entries);
+@@ -1827,8 +1838,8 @@ void AUD_set_volume_out (SWVoiceOut *sw, int mute, uint8_t lvol, uint8_t rvol)
+         sw->vol.l = nominal_volume.l * lvol / 255;
+         sw->vol.r = nominal_volume.r * rvol / 255;
+ 
+-        if (hw->pcm_ops->ctl_out) {
+-            hw->pcm_ops->ctl_out (hw, VOICE_VOLUME, sw);
++        if (hw->pcm_ops->volume_out) {
++            hw->pcm_ops->volume_out(hw, &sw->vol);
+         }
+     }
+ }
+@@ -1842,8 +1853,8 @@ void AUD_set_volume_in (SWVoiceIn *sw, int mute, uint8_t lvol, uint8_t rvol)
+         sw->vol.l = nominal_volume.l * lvol / 255;
+         sw->vol.r = nominal_volume.r * rvol / 255;
+ 
+-        if (hw->pcm_ops->ctl_in) {
+-            hw->pcm_ops->ctl_in (hw, VOICE_VOLUME, sw);
++        if (hw->pcm_ops->volume_in) {
++            hw->pcm_ops->volume_in(hw, &sw->vol);
+         }
+     }
+ }
+diff --git a/audio/audio_int.h b/audio/audio_int.h
+index 0f0ea3e040..a5ead07998 100644
+--- a/audio/audio_int.h
++++ b/audio/audio_int.h
+@@ -72,7 +72,6 @@ typedef struct HWVoiceOut {
+ 
+     QLIST_HEAD (sw_out_listhead, SWVoiceOut) sw_head;
+     QLIST_HEAD (sw_cap_listhead, SWVoiceCap) cap_head;
+-    int ctl_caps;
+     struct audio_pcm_ops *pcm_ops;
+     QLIST_ENTRY (HWVoiceOut) entries;
+ } HWVoiceOut;
+@@ -93,7 +92,6 @@ typedef struct HWVoiceIn {
+     size_t pos_emul, pending_emul, size_emul;
+ 
+     QLIST_HEAD (sw_in_listhead, SWVoiceIn) sw_head;
+-    int ctl_caps;
+     struct audio_pcm_ops *pcm_ops;
+     QLIST_ENTRY (HWVoiceIn) entries;
+ } HWVoiceIn;
+@@ -145,7 +143,6 @@ struct audio_driver {
+     int max_voices_in;
+     int voice_size_out;
+     int voice_size_in;
+-    int ctl_caps;
+     QLIST_ENTRY(audio_driver) next;
+ };
+ 
+@@ -167,7 +164,8 @@ struct audio_pcm_ops {
+      * size may be smaller
+      */
+     size_t (*put_buffer_out)(HWVoiceOut *hw, void *buf, size_t size);
+-    int    (*ctl_out) (HWVoiceOut *hw, int cmd, ...);
++    void   (*enable_out)(HWVoiceOut *hw, bool enable);
++    void   (*volume_out)(HWVoiceOut *hw, struct mixeng_volume *vol);
+ 
+     int    (*init_in) (HWVoiceIn *hw, audsettings *as, void *drv_opaque);
+     void   (*fini_in) (HWVoiceIn *hw);
+@@ -175,7 +173,8 @@ struct audio_pcm_ops {
+     size_t (*buffer_size_in)(HWVoiceIn *hw);
+     void  *(*get_buffer_in)(HWVoiceIn *hw, size_t *size);
+     void   (*put_buffer_in)(HWVoiceIn *hw, void *buf, size_t size);
+-    int    (*ctl_in)  (HWVoiceIn *hw, int cmd, ...);
++    void   (*enable_in)(HWVoiceIn *hw, bool enable);
++    void   (*volume_in)(HWVoiceIn *hw, struct mixeng_volume *vol);
+ };
+ 
+ void *audio_generic_get_buffer_in(HWVoiceIn *hw, size_t *size);
+@@ -251,12 +250,6 @@ void audio_rate_start(RateCtl *rate);
+ size_t audio_rate_get_bytes(struct audio_pcm_info *info, RateCtl *rate,
+                             size_t bytes_avail);
+ 
+-#define VOICE_ENABLE 1
+-#define VOICE_DISABLE 2
+-#define VOICE_VOLUME 3
 -
--    err = pthread_mutex_destroy (&p->mutex);
--    if (err) {
--        logerr(p, err, "%s(%s): pthread_mutex_destroy failed", cap, __func__);
--        ret = -1;
--    }
--    return ret;
--}
+-#define VOICE_VOLUME_CAP (1 << VOICE_VOLUME)
 -
--int audio_pt_lock (struct audio_pt *p, const char *cap)
--{
--    int err;
+ static inline size_t audio_ring_dist(size_t dst, size_t src, size_t len)
+ {
+     return (dst >= src) ? (dst - src) : (len - src + dst);
+diff --git a/audio/audio_template.h b/audio/audio_template.h
+index 07ce9ce51f..9ec565fc48 100644
+--- a/audio/audio_template.h
++++ b/audio/audio_template.h
+@@ -267,7 +267,6 @@ static HW *glue(audio_pcm_hw_add_new_, TYPE)(AudioState *s,
+ 
+     hw->s = s;
+     hw->pcm_ops = drv->pcm_ops;
+-    hw->ctl_caps = drv->ctl_caps;
+ 
+     QLIST_INIT (&hw->sw_head);
+ #ifdef DAC
+diff --git a/audio/coreaudio.c b/audio/coreaudio.c
+index f4210d5784..a3cdbd87ce 100644
+--- a/audio/coreaudio.c
++++ b/audio/coreaudio.c
+@@ -655,13 +655,12 @@ static void coreaudio_fini_out (HWVoiceOut *hw)
+     }
+ }
+ 
+-static int coreaudio_ctl_out (HWVoiceOut *hw, int cmd, ...)
++static void coreaudio_enable_out (HWVoiceOut *hw, bool enable)
+ {
+     OSStatus status;
+     coreaudioVoiceOut *core = (coreaudioVoiceOut *) hw;
+ 
+-    switch (cmd) {
+-    case VOICE_ENABLE:
++    if (enable) {
+         /* start playback */
+         if (!isPlaying(core->outputDeviceID)) {
+             status = AudioDeviceStart(core->outputDeviceID, core->ioprocid);
+@@ -669,9 +668,7 @@ static int coreaudio_ctl_out (HWVoiceOut *hw, int cmd, ...)
+                 coreaudio_logerr (status, "Could not resume playback\n");
+             }
+         }
+-        break;
 -
--    err = pthread_mutex_lock (&p->mutex);
--    if (err) {
--        logerr(p, err, "%s(%s): pthread_mutex_lock failed", cap, __func__);
--        return -1;
--    }
+-    case VOICE_DISABLE:
++    } else {
+         /* stop playback */
+         if (!audio_is_cleaning_up()) {
+             if (isPlaying(core->outputDeviceID)) {
+@@ -682,9 +679,7 @@ static int coreaudio_ctl_out (HWVoiceOut *hw, int cmd, ...)
+                 }
+             }
+         }
+-        break;
+     }
 -    return 0;
--}
+ }
+ 
+ static void *coreaudio_audio_init(Audiodev *dev)
+@@ -703,7 +698,7 @@ static struct audio_pcm_ops coreaudio_pcm_ops = {
+     .buffer_size_out = coreaudio_buffer_size_out,
+     .get_buffer_out = coreaudio_get_buffer_out,
+     .put_buffer_out = coreaudio_put_buffer_out_nowrite,
+-    .ctl_out  = coreaudio_ctl_out
++    .enable_out = coreaudio_enable_out
+ };
+ 
+ static struct audio_driver coreaudio_audio_driver = {
+diff --git a/audio/dsoundaudio.c b/audio/dsoundaudio.c
+index be6b8d8889..6c10d271fe 100644
+--- a/audio/dsoundaudio.c
++++ b/audio/dsoundaudio.c
+@@ -363,7 +363,7 @@ static int dsound_open (dsound *s)
+     return 0;
+ }
+ 
+-static int dsound_ctl_out (HWVoiceOut *hw, int cmd, ...)
++static void dsound_enable_out(HWVoiceOut *hw, bool enable)
+ {
+     HRESULT hr;
+     DWORD status;
+@@ -373,18 +373,17 @@ static int dsound_ctl_out (HWVoiceOut *hw, int cmd, ...)
+ 
+     if (!dsb) {
+         dolog ("Attempt to control voice without a buffer\n");
+-        return 0;
++        return;
+     }
+ 
+-    switch (cmd) {
+-    case VOICE_ENABLE:
++    if (enable) {
+         if (dsound_get_status_out (dsb, &status, s)) {
+-            return -1;
++            return;
+         }
+ 
+         if (status & DSBSTATUS_PLAYING) {
+             dolog ("warning: Voice is already playing\n");
+-            return 0;
++            return;
+         }
+ 
+         dsound_clear_sample (hw, dsb, s);
+@@ -392,28 +391,24 @@ static int dsound_ctl_out (HWVoiceOut *hw, int cmd, ...)
+         hr = IDirectSoundBuffer_Play (dsb, 0, 0, DSBPLAY_LOOPING);
+         if (FAILED (hr)) {
+             dsound_logerr (hr, "Could not start playing buffer\n");
+-            return -1;
++            return;
+         }
+-        break;
 -
--int audio_pt_unlock (struct audio_pt *p, const char *cap)
--{
--    int err;
--
--    err = pthread_mutex_unlock (&p->mutex);
--    if (err) {
--        logerr(p, err, "%s(%s): pthread_mutex_unlock failed", cap, __func__);
--        return -1;
--    }
+-    case VOICE_DISABLE:
++    } else {
+         if (dsound_get_status_out (dsb, &status, s)) {
+-            return -1;
++            return;
+         }
+ 
+         if (status & DSBSTATUS_PLAYING) {
+             hr = IDirectSoundBuffer_Stop (dsb);
+             if (FAILED (hr)) {
+                 dsound_logerr (hr, "Could not stop playing buffer\n");
+-                return -1;
++                return;
+             }
+         }
+         else {
+             dolog ("warning: Voice is not playing\n");
+         }
+-        break;
+     }
 -    return 0;
--}
--
--int audio_pt_wait (struct audio_pt *p, const char *cap)
--{
--    int err;
--
--    err = pthread_cond_wait (&p->cond, &p->mutex);
--    if (err) {
--        logerr(p, err, "%s(%s): pthread_cond_wait failed", cap, __func__);
+ }
+ 
+ static void *dsound_get_buffer_out(HWVoiceOut *hw, size_t *size)
+@@ -463,7 +458,7 @@ static size_t dsound_put_buffer_out(HWVoiceOut *hw, void *buf, size_t len)
+     return len;
+ }
+ 
+-static int dsound_ctl_in (HWVoiceIn *hw, int cmd, ...)
++static void dsound_enable_in(HWVoiceIn *hw, bool enable)
+ {
+     HRESULT hr;
+     DWORD status;
+@@ -472,18 +467,17 @@ static int dsound_ctl_in (HWVoiceIn *hw, int cmd, ...)
+ 
+     if (!dscb) {
+         dolog ("Attempt to control capture voice without a buffer\n");
 -        return -1;
--    }
++        return;
+     }
+ 
+-    switch (cmd) {
+-    case VOICE_ENABLE:
++    if (enable) {
+         if (dsound_get_status_in (dscb, &status)) {
+-            return -1;
++            return;
+         }
+ 
+         if (status & DSCBSTATUS_CAPTURING) {
+             dolog ("warning: Voice is already capturing\n");
+-            return 0;
++            return;
+         }
+ 
+         /* clear ?? */
+@@ -491,28 +485,24 @@ static int dsound_ctl_in (HWVoiceIn *hw, int cmd, ...)
+         hr = IDirectSoundCaptureBuffer_Start (dscb, DSCBSTART_LOOPING);
+         if (FAILED (hr)) {
+             dsound_logerr (hr, "Could not start capturing\n");
+-            return -1;
++            return;
+         }
+-        break;
+-
+-    case VOICE_DISABLE:
++    } else {
+         if (dsound_get_status_in (dscb, &status)) {
+-            return -1;
++            return;
+         }
+ 
+         if (status & DSCBSTATUS_CAPTURING) {
+             hr = IDirectSoundCaptureBuffer_Stop (dscb);
+             if (FAILED (hr)) {
+                 dsound_logerr (hr, "Could not stop capturing\n");
+-                return -1;
++                return;
+             }
+         }
+         else {
+             dolog ("warning: Voice is not capturing\n");
+         }
+-        break;
+     }
 -    return 0;
--}
--
--int audio_pt_unlock_and_signal (struct audio_pt *p, const char *cap)
--{
--    int err;
--
--    err = pthread_mutex_unlock (&p->mutex);
--    if (err) {
--        logerr(p, err, "%s(%s): pthread_mutex_unlock failed", cap, __func__);
--        return -1;
--    }
--    err = pthread_cond_signal (&p->cond);
--    if (err) {
--        logerr(p, err, "%s(%s): pthread_cond_signal failed", cap, __func__);
--        return -1;
--    }
+ }
+ 
+ static void *dsound_get_buffer_in(HWVoiceIn *hw, size_t *size)
+@@ -677,7 +667,7 @@ static struct audio_pcm_ops dsound_pcm_ops = {
+     .buffer_size_out = dsound_buffer_size_out,
+     .get_buffer_out = dsound_get_buffer_out,
+     .put_buffer_out = dsound_put_buffer_out,
+-    .ctl_out  = dsound_ctl_out,
++    .enable_out = dsound_enable_out,
+ 
+     .init_in  = dsound_init_in,
+     .fini_in  = dsound_fini_in,
+@@ -685,7 +675,7 @@ static struct audio_pcm_ops dsound_pcm_ops = {
+     .buffer_size_in = dsound_buffer_size_in,
+     .get_buffer_in = dsound_get_buffer_in,
+     .put_buffer_in = dsound_put_buffer_in,
+-    .ctl_in   = dsound_ctl_in
++    .enable_in = dsound_enable_in,
+ };
+ 
+ static struct audio_driver dsound_audio_driver = {
+diff --git a/audio/noaudio.c b/audio/noaudio.c
+index 85241612cf..f2938aff66 100644
+--- a/audio/noaudio.c
++++ b/audio/noaudio.c
+@@ -60,14 +60,13 @@ static void no_fini_out (HWVoiceOut *hw)
+     (void) hw;
+ }
+ 
+-static int no_ctl_out (HWVoiceOut *hw, int cmd, ...)
++static void no_enable_out(HWVoiceOut *hw, bool enable)
+ {
+     NoVoiceOut *no = (NoVoiceOut *) hw;
+ 
+-    if (cmd == VOICE_ENABLE) {
++    if (enable) {
+         audio_rate_start(&no->rate);
+     }
 -    return 0;
--}
--
--int audio_pt_join (struct audio_pt *p, void **arg, const char *cap)
--{
--    int err;
--    void *ret;
--
--    err = pthread_join (p->thread, &ret);
--    if (err) {
--        logerr(p, err, "%s(%s): pthread_join failed", cap, __func__);
--        return -1;
--    }
--    *arg = ret;
+ }
+ 
+ static int no_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
+@@ -93,14 +92,13 @@ static size_t no_read(HWVoiceIn *hw, void *buf, size_t size)
+     return bytes;
+ }
+ 
+-static int no_ctl_in (HWVoiceIn *hw, int cmd, ...)
++static void no_enable_in(HWVoiceIn *hw, bool enable)
+ {
+     NoVoiceIn *no = (NoVoiceIn *) hw;
+ 
+-    if (cmd == VOICE_ENABLE) {
++    if (enable) {
+         audio_rate_start(&no->rate);
+     }
 -    return 0;
--}
-diff --git a/audio/audio_pt_int.h b/audio/audio_pt_int.h
-deleted file mode 100644
-index 4c0c15b9af..0000000000
---- a/audio/audio_pt_int.h
-+++ /dev/null
-@@ -1,22 +0,0 @@
--#ifndef QEMU_AUDIO_PT_INT_H
--#define QEMU_AUDIO_PT_INT_H
+ }
+ 
+ static void *no_audio_init (Audiodev *dev)
+@@ -117,12 +115,12 @@ static struct audio_pcm_ops no_pcm_ops = {
+     .init_out = no_init_out,
+     .fini_out = no_fini_out,
+     .write    = no_write,
+-    .ctl_out  = no_ctl_out,
++    .enable_out = no_enable_out,
+ 
+     .init_in  = no_init_in,
+     .fini_in  = no_fini_in,
+     .read     = no_read,
+-    .ctl_in   = no_ctl_in
++    .enable_in = no_enable_in
+ };
+ 
+ static struct audio_driver no_audio_driver = {
+diff --git a/audio/ossaudio.c b/audio/ossaudio.c
+index bc34e12de4..cefc90fe58 100644
+--- a/audio/ossaudio.c
++++ b/audio/ossaudio.c
+@@ -571,59 +571,50 @@ static size_t oss_buffer_size_out(HWVoiceOut *hw)
+     return oss->samples;
+ }
+ 
+-static int oss_ctl_out (HWVoiceOut *hw, int cmd, ...)
++static void oss_enable_out(HWVoiceOut *hw, bool enable)
+ {
+     int trig;
+     OSSVoiceOut *oss = (OSSVoiceOut *) hw;
+     AudiodevOssPerDirectionOptions *opdo = oss->dev->u.oss.oss_out;
+ 
+-    switch (cmd) {
+-    case VOICE_ENABLE:
+-        {
+-            bool poll_mode = !opdo->has_try_poll || opdo->try_poll;
++    if (enable) {
++        bool poll_mode = !opdo->has_try_poll || opdo->try_poll;
+ 
+-            ldebug ("enabling voice\n");
+-            if (poll_mode) {
+-                oss_poll_out (hw);
+-                poll_mode = 0;
+-            }
+-            hw->poll_mode = poll_mode;
 -
--#include <pthread.h>
+-            if (!oss->mmapped) {
+-                return 0;
+-            }
++        ldebug ("enabling voice\n");
++        if (poll_mode) {
++            oss_poll_out (hw);
++            poll_mode = 0;
++        }
++        hw->poll_mode = poll_mode;
+ 
+-            audio_pcm_info_clear_buf(&hw->info, hw->buf_emul, hw->mix_buf->size);
+-            trig = PCM_ENABLE_OUTPUT;
+-            if (ioctl (oss->fd, SNDCTL_DSP_SETTRIGGER, &trig) < 0) {
+-                oss_logerr (
+-                    errno,
+-                    "SNDCTL_DSP_SETTRIGGER PCM_ENABLE_OUTPUT failed\n"
+-                    );
+-                return -1;
+-            }
++        if (!oss->mmapped) {
++            return;
+         }
+-        break;
+ 
+-    case VOICE_DISABLE:
++        audio_pcm_info_clear_buf(&hw->info, hw->buf_emul, hw->mix_buf->size);
++        trig = PCM_ENABLE_OUTPUT;
++        if (ioctl (oss->fd, SNDCTL_DSP_SETTRIGGER, &trig) < 0) {
++            oss_logerr(errno,
++                       "SNDCTL_DSP_SETTRIGGER PCM_ENABLE_OUTPUT failed\n");
++            return;
++        }
++    } else {
+         if (hw->poll_mode) {
+             qemu_set_fd_handler (oss->fd, NULL, NULL, NULL);
+             hw->poll_mode = 0;
+         }
+ 
+         if (!oss->mmapped) {
+-            return 0;
++            return;
+         }
+ 
+         ldebug ("disabling voice\n");
+         trig = 0;
+         if (ioctl (oss->fd, SNDCTL_DSP_SETTRIGGER, &trig) < 0) {
+             oss_logerr (errno, "SNDCTL_DSP_SETTRIGGER 0 failed\n");
+-            return -1;
++            return;
+         }
+-        break;
+     }
+-    return 0;
+ }
+ 
+ static int oss_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
+@@ -716,32 +707,25 @@ static size_t oss_read(HWVoiceIn *hw, void *buf, size_t len)
+     return pos;
+ }
+ 
+-static int oss_ctl_in (HWVoiceIn *hw, int cmd, ...)
++static void oss_enable_in(HWVoiceIn *hw, bool enable)
+ {
+     OSSVoiceIn *oss = (OSSVoiceIn *) hw;
+     AudiodevOssPerDirectionOptions *opdo = oss->dev->u.oss.oss_out;
+ 
+-    switch (cmd) {
+-    case VOICE_ENABLE:
+-        {
+-            bool poll_mode = !opdo->has_try_poll || opdo->try_poll;
++    if (enable) {
++        bool poll_mode = !opdo->has_try_poll || opdo->try_poll;
+ 
+-            if (poll_mode) {
+-                oss_poll_in (hw);
+-                poll_mode = 0;
+-            }
+-            hw->poll_mode = poll_mode;
++        if (poll_mode) {
++            oss_poll_in (hw);
++            poll_mode = 0;
+         }
+-        break;
 -
--struct audio_pt {
--    const char *drv;
--    pthread_t thread;
--    pthread_cond_t cond;
--    pthread_mutex_t mutex;
--};
--
--int audio_pt_init (struct audio_pt *, void *(*) (void *), void *,
--                   const char *, const char *);
--int audio_pt_fini (struct audio_pt *, const char *);
--int audio_pt_lock (struct audio_pt *, const char *);
--int audio_pt_unlock (struct audio_pt *, const char *);
--int audio_pt_wait (struct audio_pt *, const char *);
--int audio_pt_unlock_and_signal (struct audio_pt *, const char *);
--int audio_pt_join (struct audio_pt *, void **, const char *);
--
--#endif /* QEMU_AUDIO_PT_INT_H */
+-    case VOICE_DISABLE:
++        hw->poll_mode = poll_mode;
++    } else {
+         if (hw->poll_mode) {
+             hw->poll_mode = 0;
+             qemu_set_fd_handler (oss->fd, NULL, NULL, NULL);
+         }
+-        break;
+     }
+-    return 0;
+ }
+ 
+ static void *oss_audio_init(Audiodev *dev)
+@@ -770,13 +754,13 @@ static struct audio_pcm_ops oss_pcm_ops = {
+     .buffer_size_out = oss_buffer_size_out,
+     .get_buffer_out = oss_get_buffer_out,
+     .put_buffer_out = oss_put_buffer_out,
+-    .ctl_out  = oss_ctl_out,
++    .enable_out = oss_enable_out,
+ 
+     .init_in  = oss_init_in,
+     .fini_in  = oss_fini_in,
+     .read     = oss_read,
+     .buffer_size_in = oss_buffer_size_in,
+-    .ctl_in   = oss_ctl_in
++    .enable_in = oss_enable_in
+ };
+ 
+ static struct audio_driver oss_audio_driver = {
 diff --git a/audio/paaudio.c b/audio/paaudio.c
-index 251b087a74..392225c875 100644
+index 7cab3cff97..6565048ac7 100644
 --- a/audio/paaudio.c
 +++ b/audio/paaudio.c
-@@ -8,7 +8,6 @@
- 
- #define AUDIO_CAP "pulseaudio"
- #include "audio_int.h"
--#include "audio_pt_int.h"
- 
- typedef struct PAConnection {
-     char *server;
-@@ -29,28 +28,16 @@ typedef struct {
- 
- typedef struct {
-     HWVoiceOut hw;
--    int done;
--    int live;
--    int decr;
--    int rpos;
-     pa_stream *stream;
--    void *pcm_buf;
--    struct audio_pt pt;
-     paaudio *g;
-     int samples;
- } PAVoiceOut;
- 
- typedef struct {
-     HWVoiceIn hw;
--    int done;
--    int dead;
--    int incr;
--    int wpos;
-     pa_stream *stream;
--    void *pcm_buf;
--    struct audio_pt pt;
-     const void *read_data;
--    size_t read_index, read_length;
-+    size_t read_length;
-     paaudio *g;
-     int samples;
- } PAVoiceIn;
-@@ -88,298 +75,96 @@ static inline int PA_STREAM_IS_GOOD(pa_stream_state_t x)
+@@ -458,7 +458,7 @@ static void qpa_fini_in (HWVoiceIn *hw)
+     }
  }
+ 
+-static int qpa_ctl_out (HWVoiceOut *hw, int cmd, ...)
++static void qpa_volume_out(HWVoiceOut *hw, struct mixeng_volume *vol)
+ {
+     PAVoiceOut *pa = (PAVoiceOut *) hw;
+     pa_operation *op;
+@@ -469,48 +469,36 @@ static int qpa_ctl_out (HWVoiceOut *hw, int cmd, ...)
+     pa_cvolume_init (&v);  /* function is present in 0.9.13+ */
  #endif
  
--#define CHECK_SUCCESS_GOTO(c, rerror, expression, label)        \
-+#define CHECK_SUCCESS_GOTO(c, expression, label, msg)           \
-     do {                                                        \
-         if (!(expression)) {                                    \
--            if (rerror) {                                       \
--                *(rerror) = pa_context_errno ((c)->context);    \
--            }                                                   \
-+            qpa_logerr(pa_context_errno((c)->context), msg);    \
-             goto label;                                         \
-         }                                                       \
-     } while (0)
+-    switch (cmd) {
+-    case VOICE_VOLUME:
+-        {
+-            SWVoiceOut *sw;
+-            va_list ap;
++    v.channels = 2;
++    v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->l) / UINT32_MAX;
++    v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->r) / UINT32_MAX;
  
--#define CHECK_DEAD_GOTO(c, stream, rerror, label)                       \
-+#define CHECK_DEAD_GOTO(c, stream, label, msg)                          \
-     do {                                                                \
-         if (!(c)->context || !PA_CONTEXT_IS_GOOD (pa_context_get_state((c)->context)) || \
-             !(stream) || !PA_STREAM_IS_GOOD (pa_stream_get_state ((stream)))) { \
-             if (((c)->context && pa_context_get_state ((c)->context) == PA_CONTEXT_FAILED) || \
-                 ((stream) && pa_stream_get_state ((stream)) == PA_STREAM_FAILED)) { \
--                if (rerror) {                                           \
--                    *(rerror) = pa_context_errno ((c)->context);        \
--                }                                                       \
-+                qpa_logerr(pa_context_errno((c)->context), msg);        \
-             } else {                                                    \
--                if (rerror) {                                           \
--                    *(rerror) = PA_ERR_BADSTATE;                        \
--                }                                                       \
-+                qpa_logerr(PA_ERR_BADSTATE, msg);                       \
-             }                                                           \
-             goto label;                                                 \
-         }                                                               \
-     } while (0)
+-            va_start (ap, cmd);
+-            sw = va_arg (ap, SWVoiceOut *);
+-            va_end (ap);
++    pa_threaded_mainloop_lock(c->mainloop);
  
--static int qpa_simple_read (PAVoiceIn *p, void *data, size_t length, int *rerror)
-+static size_t qpa_read(HWVoiceIn *hw, void *data, size_t length)
- {
-+    PAVoiceIn *p = (PAVoiceIn *) hw;
-     PAConnection *c = p->g->conn;
-+    size_t l;
-+    int r;
- 
-     pa_threaded_mainloop_lock(c->mainloop);
- 
--    CHECK_DEAD_GOTO(c, p->stream, rerror, unlock_and_fail);
-+    CHECK_DEAD_GOTO(c, p->stream, unlock_and_fail,
-+                    "pa_threaded_mainloop_lock failed\n");
- 
--    while (length > 0) {
--        size_t l;
+-            v.channels = 2;
+-            v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vol.l) / UINT32_MAX;
+-            v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vol.r) / UINT32_MAX;
 -
--        while (!p->read_data) {
--            int r;
+-            pa_threaded_mainloop_lock(c->mainloop);
 -
--            r = pa_stream_peek (p->stream, &p->read_data, &p->read_length);
--            CHECK_SUCCESS_GOTO(c, rerror, r == 0, unlock_and_fail);
+-            op = pa_context_set_sink_input_volume(c->context,
+-                pa_stream_get_index (pa->stream),
+-                &v, NULL, NULL);
+-            if (!op)
+-                qpa_logerr (pa_context_errno(c->context),
+-                            "set_sink_input_volume() failed\n");
+-            else
+-                pa_operation_unref (op);
 -
--            if (!p->read_data) {
--                pa_threaded_mainloop_wait(c->mainloop);
--                CHECK_DEAD_GOTO(c, p->stream, rerror, unlock_and_fail);
+-            op = pa_context_set_sink_input_mute(c->context,
+-                pa_stream_get_index (pa->stream),
+-               sw->vol.mute, NULL, NULL);
+-            if (!op) {
+-                qpa_logerr (pa_context_errno(c->context),
+-                            "set_sink_input_mute() failed\n");
 -            } else {
--                p->read_index = 0;
+-                pa_operation_unref (op);
 -            }
--        }
--
--        l = p->read_length < length ? p->read_length : length;
--        memcpy (data, (const uint8_t *) p->read_data+p->read_index, l);
--
--        data = (uint8_t *) data + l;
--        length -= l;
--
--        p->read_index += l;
--        p->read_length -= l;
-+    if (!p->read_length) {
-+        r = pa_stream_peek (p->stream, &p->read_data, &p->read_length);
-+        CHECK_SUCCESS_GOTO(c, r == 0, unlock_and_fail,
-+                           "pa_stream_peek failed\n");
++    op = pa_context_set_sink_input_volume(c->context,
++                                          pa_stream_get_index(pa->stream),
++                                          &v, NULL, NULL);
++    if (!op) {
++        qpa_logerr(pa_context_errno(c->context),
++                   "set_sink_input_volume() failed\n");
++    } else {
++        pa_operation_unref (op);
 +    }
  
--        if (!p->read_length) {
--            int r;
-+    l = MIN(p->read_length, length);
-+    memcpy(data, p->read_data, l);
- 
--            r = pa_stream_drop (p->stream);
--            p->read_data = NULL;
--            p->read_length = 0;
--            p->read_index = 0;
-+    p->read_data += l;
-+    p->read_length -= l;
- 
--            CHECK_SUCCESS_GOTO(c, rerror, r == 0, unlock_and_fail);
+-            pa_threaded_mainloop_unlock(c->mainloop);
 -        }
-+    if (!p->read_length) {
-+        r = pa_stream_drop(p->stream);
-+        CHECK_SUCCESS_GOTO(c, r == 0, unlock_and_fail,
-+                           "pa_stream_drop failed\n");
++    op = pa_context_set_sink_input_mute(c->context,
++                                        pa_stream_get_index(pa->stream),
++                                        vol->mute, NULL, NULL);
++    if (!op) {
++        qpa_logerr(pa_context_errno(c->context),
++                   "set_sink_input_mute() failed\n");
++    } else {
++        pa_operation_unref(op);
      }
- 
-     pa_threaded_mainloop_unlock(c->mainloop);
 -    return 0;
-+    return l;
- 
- unlock_and_fail:
-     pa_threaded_mainloop_unlock(c->mainloop);
--    return -1;
-+    return 0;
- }
- 
--static int qpa_simple_write (PAVoiceOut *p, const void *data, size_t length, int *rerror)
-+static size_t qpa_write(HWVoiceOut *hw, void *data, size_t length)
- {
-+    PAVoiceOut *p = (PAVoiceOut *) hw;
-     PAConnection *c = p->g->conn;
-+    size_t l;
-+    int r;
- 
-     pa_threaded_mainloop_lock(c->mainloop);
- 
--    CHECK_DEAD_GOTO(c, p->stream, rerror, unlock_and_fail);
-+    CHECK_DEAD_GOTO(c, p->stream, unlock_and_fail,
-+                    "pa_threaded_mainloop_lock failed\n");
- 
--    while (length > 0) {
--        size_t l;
--        int r;
-+    l = pa_stream_writable_size(p->stream);
- 
--        while (!(l = pa_stream_writable_size (p->stream))) {
--            pa_threaded_mainloop_wait(c->mainloop);
--            CHECK_DEAD_GOTO(c, p->stream, rerror, unlock_and_fail);
--        }
-+    CHECK_SUCCESS_GOTO(c, l != (size_t) -1, unlock_and_fail,
-+                       "pa_stream_writable_size failed\n");
- 
--        CHECK_SUCCESS_GOTO(c, rerror, l != (size_t) -1, unlock_and_fail);
--
--        if (l > length) {
--            l = length;
--        }
--
--        r = pa_stream_write (p->stream, data, l, NULL, 0LL, PA_SEEK_RELATIVE);
--        CHECK_SUCCESS_GOTO(c, rerror, r >= 0, unlock_and_fail);
--
--        data = (const uint8_t *) data + l;
--        length -= l;
-+    if (l > length) {
-+        l = length;
-     }
- 
-+    r = pa_stream_write(p->stream, data, l, NULL, 0LL, PA_SEEK_RELATIVE);
-+    CHECK_SUCCESS_GOTO(c, r >= 0, unlock_and_fail, "pa_stream_write failed\n");
 +
-     pa_threaded_mainloop_unlock(c->mainloop);
--    return 0;
-+    return l;
- 
- unlock_and_fail:
-     pa_threaded_mainloop_unlock(c->mainloop);
--    return -1;
--}
--
--static void *qpa_thread_out (void *arg)
--{
--    PAVoiceOut *pa = arg;
--    HWVoiceOut *hw = &pa->hw;
--
--    if (audio_pt_lock(&pa->pt, __func__)) {
--        return NULL;
--    }
--
--    for (;;) {
--        int decr, to_mix, rpos;
--
--        for (;;) {
--            if (pa->done) {
--                goto exit;
--            }
--
--            if (pa->live > 0) {
--                break;
--            }
--
--            if (audio_pt_wait(&pa->pt, __func__)) {
--                goto exit;
--            }
--        }
--
--        decr = to_mix = MIN(pa->live, pa->samples >> 5);
--        rpos = pa->rpos;
--
--        if (audio_pt_unlock(&pa->pt, __func__)) {
--            return NULL;
--        }
--
--        while (to_mix) {
--            int error;
--            int chunk = MIN (to_mix, hw->samples - rpos);
--            struct st_sample *src = hw->mix_buf + rpos;
--
--            hw->clip (pa->pcm_buf, src, chunk);
--
--            if (qpa_simple_write (pa, pa->pcm_buf,
--                                  chunk << hw->info.shift, &error) < 0) {
--                qpa_logerr (error, "pa_simple_write failed\n");
--                return NULL;
--            }
--
--            rpos = (rpos + chunk) % hw->samples;
--            to_mix -= chunk;
--        }
--
--        if (audio_pt_lock(&pa->pt, __func__)) {
--            return NULL;
--        }
--
--        pa->rpos = rpos;
--        pa->live -= decr;
--        pa->decr += decr;
--    }
--
-- exit:
--    audio_pt_unlock(&pa->pt, __func__);
--    return NULL;
--}
--
--static int qpa_run_out (HWVoiceOut *hw, int live)
--{
--    int decr;
--    PAVoiceOut *pa = (PAVoiceOut *) hw;
--
--    if (audio_pt_lock(&pa->pt, __func__)) {
--        return 0;
--    }
--
--    decr = MIN (live, pa->decr);
--    pa->decr -= decr;
--    pa->live = live - decr;
--    hw->rpos = pa->rpos;
--    if (pa->live > 0) {
--        audio_pt_unlock_and_signal(&pa->pt, __func__);
--    }
--    else {
--        audio_pt_unlock(&pa->pt, __func__);
--    }
--    return decr;
--}
--
--/* capture */
--static void *qpa_thread_in (void *arg)
--{
--    PAVoiceIn *pa = arg;
--    HWVoiceIn *hw = &pa->hw;
--
--    if (audio_pt_lock(&pa->pt, __func__)) {
--        return NULL;
--    }
--
--    for (;;) {
--        int incr, to_grab, wpos;
--
--        for (;;) {
--            if (pa->done) {
--                goto exit;
--            }
--
--            if (pa->dead > 0) {
--                break;
--            }
--
--            if (audio_pt_wait(&pa->pt, __func__)) {
--                goto exit;
--            }
--        }
--
--        incr = to_grab = MIN(pa->dead, pa->samples >> 5);
--        wpos = pa->wpos;
--
--        if (audio_pt_unlock(&pa->pt, __func__)) {
--            return NULL;
--        }
--
--        while (to_grab) {
--            int error;
--            int chunk = MIN (to_grab, hw->samples - wpos);
--            void *buf = advance (pa->pcm_buf, wpos);
--
--            if (qpa_simple_read (pa, buf,
--                                 chunk << hw->info.shift, &error) < 0) {
--                qpa_logerr (error, "pa_simple_read failed\n");
--                return NULL;
--            }
--
--            hw->conv (hw->conv_buf + wpos, buf, chunk);
--            wpos = (wpos + chunk) % hw->samples;
--            to_grab -= chunk;
--        }
--
--        if (audio_pt_lock(&pa->pt, __func__)) {
--            return NULL;
--        }
--
--        pa->wpos = wpos;
--        pa->dead -= incr;
--        pa->incr += incr;
--    }
--
-- exit:
--    audio_pt_unlock(&pa->pt, __func__);
--    return NULL;
--}
--
--static int qpa_run_in (HWVoiceIn *hw)
--{
--    int live, incr, dead;
--    PAVoiceIn *pa = (PAVoiceIn *) hw;
--
--    if (audio_pt_lock(&pa->pt, __func__)) {
--        return 0;
--    }
--
--    live = audio_pcm_hw_get_live_in (hw);
--    dead = hw->samples - live;
--    incr = MIN (dead, pa->incr);
--    pa->incr -= incr;
--    pa->dead = dead - incr;
--    hw->wpos = pa->wpos;
--    if (pa->dead > 0) {
--        audio_pt_unlock_and_signal(&pa->pt, __func__);
--    }
--    else {
--        audio_pt_unlock(&pa->pt, __func__);
--    }
--    return incr;
-+    return 0;
++    pa_threaded_mainloop_unlock(c->mainloop);
  }
  
- static pa_sample_format_t audfmt_to_pa (AudioFormat afmt, int endianness)
-@@ -467,13 +252,6 @@ static void stream_state_cb (pa_stream *s, void * userdata)
-     }
- }
- 
--static void stream_request_cb (pa_stream *s, size_t length, void *userdata)
--{
--    PAConnection *c = userdata;
--
--    pa_threaded_mainloop_signal(c->mainloop, 0);
--}
--
- static pa_stream *qpa_simple_new (
-         PAConnection *c,
-         const char *name,
-@@ -496,8 +274,6 @@ static pa_stream *qpa_simple_new (
-     }
- 
-     pa_stream_set_state_callback (stream, stream_state_cb, c);
--    pa_stream_set_read_callback (stream, stream_request_cb, c);
--    pa_stream_set_write_callback (stream, stream_request_cb, c);
- 
-     flags =
-         PA_STREAM_INTERPOLATE_TIMING
-@@ -581,28 +357,9 @@ static int qpa_init_out(HWVoiceOut *hw, struct audsettings *as,
-     audio_pcm_init_info (&hw->info, &obt_as);
-     hw->samples = pa->samples = audio_buffer_samples(g->dev->out, &obt_as,
-                                                      46440);
--    pa->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
--    pa->rpos = hw->rpos;
--    if (!pa->pcm_buf) {
--        dolog("Could not allocate buffer (%zu bytes)\n",
--              hw->samples << hw->info.shift);
--        goto fail2;
--    }
--
--    if (audio_pt_init(&pa->pt, qpa_thread_out, hw, AUDIO_CAP, __func__)) {
--        goto fail3;
--    }
- 
-     return 0;
- 
-- fail3:
--    g_free (pa->pcm_buf);
--    pa->pcm_buf = NULL;
-- fail2:
--    if (pa->stream) {
--        pa_stream_unref (pa->stream);
--        pa->stream = NULL;
--    }
-  fail1:
-     return -1;
- }
-@@ -642,28 +399,9 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-     audio_pcm_init_info (&hw->info, &obt_as);
-     hw->samples = pa->samples = audio_buffer_samples(g->dev->in, &obt_as,
-                                                      46440);
--    pa->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
--    pa->wpos = hw->wpos;
--    if (!pa->pcm_buf) {
--        dolog("Could not allocate buffer (%zu bytes)\n",
--              hw->samples << hw->info.shift);
--        goto fail2;
--    }
--
--    if (audio_pt_init(&pa->pt, qpa_thread_in, hw, AUDIO_CAP, __func__)) {
--        goto fail3;
--    }
- 
-     return 0;
- 
-- fail3:
--    g_free (pa->pcm_buf);
--    pa->pcm_buf = NULL;
-- fail2:
--    if (pa->stream) {
--        pa_stream_unref (pa->stream);
--        pa->stream = NULL;
--    }
-  fail1:
-     return -1;
- }
-@@ -691,42 +429,22 @@ static void qpa_simple_disconnect(PAConnection *c, pa_stream *stream)
- 
- static void qpa_fini_out (HWVoiceOut *hw)
+-static int qpa_ctl_in (HWVoiceIn *hw, int cmd, ...)
++static void qpa_volume_in(HWVoiceIn *hw, struct mixeng_volume *vol)
  {
--    void *ret;
-     PAVoiceOut *pa = (PAVoiceOut *) hw;
- 
--    audio_pt_lock(&pa->pt, __func__);
--    pa->done = 1;
--    audio_pt_unlock_and_signal(&pa->pt, __func__);
--    audio_pt_join(&pa->pt, &ret, __func__);
--
-     if (pa->stream) {
-         qpa_simple_disconnect(pa->g->conn, pa->stream);
-         pa->stream = NULL;
-     }
--
--    audio_pt_fini(&pa->pt, __func__);
--    g_free (pa->pcm_buf);
--    pa->pcm_buf = NULL;
- }
- 
- static void qpa_fini_in (HWVoiceIn *hw)
- {
--    void *ret;
      PAVoiceIn *pa = (PAVoiceIn *) hw;
+     pa_operation *op;
+@@ -521,46 +509,33 @@ static int qpa_ctl_in (HWVoiceIn *hw, int cmd, ...)
+     pa_cvolume_init (&v);
+ #endif
  
--    audio_pt_lock(&pa->pt, __func__);
--    pa->done = 1;
--    audio_pt_unlock_and_signal(&pa->pt, __func__);
--    audio_pt_join(&pa->pt, &ret, __func__);
+-    switch (cmd) {
+-    case VOICE_VOLUME:
+-        {
+-            SWVoiceIn *sw;
+-            va_list ap;
++    v.channels = 2;
++    v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->l) / UINT32_MAX;
++    v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->r) / UINT32_MAX;
+ 
+-            va_start (ap, cmd);
+-            sw = va_arg (ap, SWVoiceIn *);
+-            va_end (ap);
++    pa_threaded_mainloop_lock(c->mainloop);
+ 
+-            v.channels = 2;
+-            v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vol.l) / UINT32_MAX;
+-            v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vol.r) / UINT32_MAX;
 -
-     if (pa->stream) {
-         qpa_simple_disconnect(pa->g->conn, pa->stream);
-         pa->stream = NULL;
+-            pa_threaded_mainloop_lock(c->mainloop);
+-
+-            op = pa_context_set_source_output_volume(c->context,
+-                pa_stream_get_index(pa->stream),
+-                &v, NULL, NULL);
+-            if (!op) {
+-                qpa_logerr(pa_context_errno(c->context),
+-                           "set_source_output_volume() failed\n");
+-            } else {
+-                pa_operation_unref(op);
+-            }
+-
+-            op = pa_context_set_source_output_mute(c->context,
+-                pa_stream_get_index (pa->stream),
+-                sw->vol.mute, NULL, NULL);
+-            if (!op) {
+-                qpa_logerr(pa_context_errno(c->context),
+-                           "set_source_output_mute() failed\n");
+-            } else {
+-                pa_operation_unref (op);
+-            }
++    op = pa_context_set_source_output_volume(c->context,
++        pa_stream_get_index(pa->stream),
++        &v, NULL, NULL);
++    if (!op) {
++        qpa_logerr(pa_context_errno(c->context),
++                   "set_source_output_volume() failed\n");
++    } else {
++        pa_operation_unref(op);
++    }
+ 
+-            pa_threaded_mainloop_unlock(c->mainloop);
+-        }
++    op = pa_context_set_source_output_mute(c->context,
++        pa_stream_get_index(pa->stream),
++        vol->mute, NULL, NULL);
++    if (!op) {
++        qpa_logerr(pa_context_errno(c->context),
++                   "set_source_output_mute() failed\n");
++    } else {
++        pa_operation_unref (op);
      }
--
--    audio_pt_fini(&pa->pt, __func__);
--    g_free (pa->pcm_buf);
--    pa->pcm_buf = NULL;
+-    return 0;
++
++    pa_threaded_mainloop_unlock(c->mainloop);
  }
  
- static int qpa_ctl_out (HWVoiceOut *hw, int cmd, ...)
-@@ -964,12 +682,12 @@ static void qpa_audio_fini (void *opaque)
- static struct audio_pcm_ops qpa_pcm_ops = {
-     .init_out = qpa_init_out,
+ /* common */
+@@ -695,13 +670,13 @@ static struct audio_pcm_ops qpa_pcm_ops = {
      .fini_out = qpa_fini_out,
--    .run_out  = qpa_run_out,
-+    .write    = qpa_write,
-     .ctl_out  = qpa_ctl_out,
+     .write    = qpa_write,
+     .buffer_size_out = qpa_buffer_size_out,
+-    .ctl_out  = qpa_ctl_out,
++    .volume_out = qpa_volume_out,
  
      .init_in  = qpa_init_in,
      .fini_in  = qpa_fini_in,
--    .run_in   = qpa_run_in,
-+    .read     = qpa_read,
-     .ctl_in   = qpa_ctl_in
+     .read     = qpa_read,
+     .buffer_size_in = qpa_buffer_size_in,
+-    .ctl_in   = qpa_ctl_in
++    .volume_in = qpa_volume_in
  };
  
-diff --git a/configure b/configure
-index 224d3071ac..872a5efb3b 100755
---- a/configure
-+++ b/configure
-@@ -286,7 +286,6 @@ block_drv_ro_whitelist=""
- host_cc="cc"
- libs_softmmu=""
- libs_tools=""
--audio_pt_int=""
- audio_win_int=""
- libs_qga=""
- debug_info="yes"
-@@ -3339,7 +3338,6 @@ for drv in $audio_drv_list; do
-     audio_drv_probe $drv pulse/pulseaudio.h "-lpulse" \
-         "pa_context_set_source_output_volume(NULL, 0, NULL, NULL, NULL); return 0;"
-     pulse_libs="-lpulse"
--    audio_pt_int="yes"
-     ;;
+ static struct audio_driver pa_audio_driver = {
+@@ -715,7 +690,6 @@ static struct audio_driver pa_audio_driver = {
+     .max_voices_in  = INT_MAX,
+     .voice_size_out = sizeof (PAVoiceOut),
+     .voice_size_in  = sizeof (PAVoiceIn),
+-    .ctl_caps       = VOICE_VOLUME_CAP
+ };
  
-     sdl)
-@@ -6304,9 +6302,6 @@ echo "PULSE_LIBS=$pulse_libs" >> $config_host_mak
- echo "COREAUDIO_LIBS=$coreaudio_libs" >> $config_host_mak
- echo "DSOUND_LIBS=$dsound_libs" >> $config_host_mak
- echo "OSS_LIBS=$oss_libs" >> $config_host_mak
--if test "$audio_pt_int" = "yes" ; then
--  echo "CONFIG_AUDIO_PT_INT=y" >> $config_host_mak
--fi
- if test "$audio_win_int" = "yes" ; then
-   echo "CONFIG_AUDIO_WIN_INT=y" >> $config_host_mak
- fi
+ static void register_audio_pa(void)
+diff --git a/audio/sdlaudio.c b/audio/sdlaudio.c
+index 4df35ce31a..93554df119 100644
+--- a/audio/sdlaudio.c
++++ b/audio/sdlaudio.c
+@@ -378,20 +378,9 @@ static size_t sdl_buffer_size_out(HWVoiceOut *hw)
+     return sdl->samples;
+ }
+ 
+-static int sdl_ctl_out (HWVoiceOut *hw, int cmd, ...)
++static void sdl_enable_out(HWVoiceOut *hw, bool enable)
+ {
+-    (void) hw;
+-
+-    switch (cmd) {
+-    case VOICE_ENABLE:
+-        SDL_PauseAudio (0);
+-        break;
+-
+-    case VOICE_DISABLE:
+-        SDL_PauseAudio (1);
+-        break;
+-    }
+-    return 0;
++    SDL_PauseAudio(!enable);
+ }
+ 
+ static void *sdl_audio_init(Audiodev *dev)
+@@ -449,7 +438,7 @@ static struct audio_pcm_ops sdl_pcm_ops = {
+     .buffer_size_out = sdl_buffer_size_out,
+     .get_buffer_out = sdl_get_buffer_out,
+     .put_buffer_out = sdl_put_buffer_out_nowrite,
+-    .ctl_out  = sdl_ctl_out,
++    .enable_out = sdl_enable_out,
+ };
+ 
+ static struct audio_driver sdl_audio_driver = {
+diff --git a/audio/spiceaudio.c b/audio/spiceaudio.c
+index 2495866c82..771ecacf27 100644
+--- a/audio/spiceaudio.c
++++ b/audio/spiceaudio.c
+@@ -153,22 +153,20 @@ static size_t line_out_put_buffer(HWVoiceOut *hw, void *buf, size_t size)
+     return size;
+ }
+ 
+-static int line_out_ctl (HWVoiceOut *hw, int cmd, ...)
++static void line_out_enable(HWVoiceOut *hw, bool enable)
+ {
+     SpiceVoiceOut *out = container_of (hw, SpiceVoiceOut, hw);
+ 
+-    switch (cmd) {
+-    case VOICE_ENABLE:
++    if (enable) {
+         if (out->active) {
+-            break;
++            return;
+         }
+         out->active = 1;
+         audio_rate_start(&out->rate);
+         spice_server_playback_start (&out->sin);
+-        break;
+-    case VOICE_DISABLE:
++    } else {
+         if (!out->active) {
+-            break;
++            return;
+         }
+         out->active = 0;
+         if (out->frame) {
+@@ -177,29 +175,21 @@ static int line_out_ctl (HWVoiceOut *hw, int cmd, ...)
+             out->frame = NULL;
+         }
+         spice_server_playback_stop (&out->sin);
+-        break;
+-    case VOICE_VOLUME:
+-        {
++    }
++}
++
+ #if ((SPICE_INTERFACE_PLAYBACK_MAJOR >= 1) && (SPICE_INTERFACE_PLAYBACK_MINOR >= 2))
+-            SWVoiceOut *sw;
+-            va_list ap;
+-            uint16_t vol[2];
++static void line_out_volume(HWVoiceOut *hw, struct mixeng_volume *vol)
++{
++    SpiceVoiceOut *out = container_of(hw, SpiceVoiceOut, hw);
++    uint16_t svol[2];
+ 
+-            va_start (ap, cmd);
+-            sw = va_arg (ap, SWVoiceOut *);
+-            va_end (ap);
+-
+-            vol[0] = sw->vol.l / ((1ULL << 16) + 1);
+-            vol[1] = sw->vol.r / ((1ULL << 16) + 1);
+-            spice_server_playback_set_volume (&out->sin, 2, vol);
+-            spice_server_playback_set_mute (&out->sin, sw->vol.mute);
++    svol[0] = vol->l / ((1ULL << 16) + 1);
++    svol[1] = vol->r / ((1ULL << 16) + 1);
++    spice_server_playback_set_volume(&out->sin, 2, svol);
++    spice_server_playback_set_mute(&out->sin, vol->mute);
++}
+ #endif
+-            break;
+-        }
+-    }
+-
+-    return 0;
+-}
+ 
+ /* record */
+ 
+@@ -255,48 +245,38 @@ static size_t line_in_read(HWVoiceIn *hw, void *buf, size_t len)
+     return ready << 2;
+ }
+ 
+-static int line_in_ctl (HWVoiceIn *hw, int cmd, ...)
++static void line_in_enable(HWVoiceIn *hw, bool enable)
+ {
+     SpiceVoiceIn *in = container_of (hw, SpiceVoiceIn, hw);
+ 
+-    switch (cmd) {
+-    case VOICE_ENABLE:
++    if (enable) {
+         if (in->active) {
+-            break;
++            return;
+         }
+         in->active = 1;
+         audio_rate_start(&in->rate);
+         spice_server_record_start (&in->sin);
+-        break;
+-    case VOICE_DISABLE:
++    } else {
+         if (!in->active) {
+-            break;
++            return;
+         }
+         in->active = 0;
+         spice_server_record_stop (&in->sin);
+-        break;
+-    case VOICE_VOLUME:
+-        {
++    }
++}
++
+ #if ((SPICE_INTERFACE_RECORD_MAJOR >= 2) && (SPICE_INTERFACE_RECORD_MINOR >= 2))
+-            SWVoiceIn *sw;
+-            va_list ap;
+-            uint16_t vol[2];
++static void line_in_volume(HWVoiceIn *hw, struct mixeng_volume *vol)
++{
++    SpiceVoiceIn *in = container_of (hw, SpiceVoiceIn, hw);
++    uint16_t svol[2];
+ 
+-            va_start (ap, cmd);
+-            sw = va_arg (ap, SWVoiceIn *);
+-            va_end (ap);
+-
+-            vol[0] = sw->vol.l / ((1ULL << 16) + 1);
+-            vol[1] = sw->vol.r / ((1ULL << 16) + 1);
+-            spice_server_record_set_volume (&in->sin, 2, vol);
+-            spice_server_record_set_mute (&in->sin, sw->vol.mute);
++    svol[0] = vol->l / ((1ULL << 16) + 1);
++    svol[1] = vol->r / ((1ULL << 16) + 1);
++    spice_server_record_set_volume(&in->sin, 2, svol);
++    spice_server_record_set_mute(&in->sin, vol->mute);
++}
+ #endif
+-            break;
+-        }
+-    }
+-
+-    return 0;
+-}
+ 
+ static struct audio_pcm_ops audio_callbacks = {
+     .init_out = line_out_init,
+@@ -305,13 +285,19 @@ static struct audio_pcm_ops audio_callbacks = {
+     .buffer_size_out = line_out_buffer_size,
+     .get_buffer_out = line_out_get_buffer,
+     .put_buffer_out = line_out_put_buffer,
+-    .ctl_out  = line_out_ctl,
++    .enable_out = line_out_enable,
++#if ((SPICE_INTERFACE_PLAYBACK_MAJOR >= 1) && (SPICE_INTERFACE_PLAYBACK_MINOR >= 2))
++    .volume_out = line_out_volume,
++#endif
+ 
+     .init_in  = line_in_init,
+     .fini_in  = line_in_fini,
+     .read     = line_in_read,
+     .buffer_size_in = line_in_buffer_size,
+-    .ctl_in   = line_in_ctl,
++    .enable_in = line_in_enable,
++#if ((SPICE_INTERFACE_RECORD_MAJOR >= 2) && (SPICE_INTERFACE_RECORD_MINOR >= 2))
++    .volume_in = line_in_volume,
++#endif
+ };
+ 
+ static struct audio_driver spice_audio_driver = {
+@@ -324,9 +310,6 @@ static struct audio_driver spice_audio_driver = {
+     .max_voices_in  = 1,
+     .voice_size_out = sizeof (SpiceVoiceOut),
+     .voice_size_in  = sizeof (SpiceVoiceIn),
+-#if ((SPICE_INTERFACE_PLAYBACK_MAJOR >= 1) && (SPICE_INTERFACE_PLAYBACK_MINOR >= 2))
+-    .ctl_caps       = VOICE_VOLUME_CAP
+-#endif
+ };
+ 
+ void qemu_spice_audio_init (void)
+diff --git a/audio/wavaudio.c b/audio/wavaudio.c
+index f977d96b9c..672d5fc337 100644
+--- a/audio/wavaudio.c
++++ b/audio/wavaudio.c
+@@ -170,14 +170,13 @@ static void wav_fini_out (HWVoiceOut *hw)
+     wav->f = NULL;
+ }
+ 
+-static int wav_ctl_out (HWVoiceOut *hw, int cmd, ...)
++static void wav_enable_out(HWVoiceOut *hw, bool enable)
+ {
+     WAVVoiceOut *wav = (WAVVoiceOut *) hw;
+ 
+-    if (cmd == VOICE_ENABLE) {
++    if (enable) {
+         audio_rate_start(&wav->rate);
+     }
+-    return 0;
+ }
+ 
+ static void *wav_audio_init(Audiodev *dev)
+@@ -195,7 +194,7 @@ static struct audio_pcm_ops wav_pcm_ops = {
+     .init_out = wav_init_out,
+     .fini_out = wav_fini_out,
+     .write    = wav_write_out,
+-    .ctl_out  = wav_ctl_out,
++    .enable_out = wav_enable_out,
+ };
+ 
+ static struct audio_driver wav_audio_driver = {
 -- 
 2.20.1
