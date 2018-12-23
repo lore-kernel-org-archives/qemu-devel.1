@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gb26V-0000qk-Ly
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gb26Q-0000mR-0T
 	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:39:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gb26T-0000GN-S4
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:39:31 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gb26O-0000B8-14
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:39:25 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sun, 23 Dec 2018 11:38:59 +0000
-Message-Id: <20181223113859.3675-7-mark.cave-ayland@ilande.co.uk>
+Date: Sun, 23 Dec 2018 11:38:58 +0000
+Message-Id: <20181223113859.3675-6-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20181223113859.3675-1-mark.cave-ayland@ilande.co.uk>
 References: <20181223113859.3675-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 6/6] target/ppc: remove various
- HOST_WORDS_BIGENDIAN hacks in int_helper.c
+Subject: [Qemu-devel] [PATCH 5/6] target/ppc: eliminate use of EL_IDX macros
+ from int_helper.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,413 +22,132 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, richard.henderson@linaro.org, david@gibson.dropbear.id.au
 
-Following on from the previous work, there are numerous endian-related hacks
-in int_helper.c that can now be replaced with Vsr* macros.
+These macros can be eliminated by instead using the relavant Vsr* macros in
+the few locations where they appear.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- target/ppc/int_helper.c | 205 +++++++++++++++++-------------------------------
- 1 file changed, 70 insertions(+), 135 deletions(-)
+ target/ppc/int_helper.c | 66 ++++++++++++++++++++-----------------------------
+ 1 file changed, 27 insertions(+), 39 deletions(-)
 
 diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 4cc7fdfd25..0d97eb9383 100644
+index addbe54c21..4cc7fdfd25 100644
 --- a/target/ppc/int_helper.c
 +++ b/target/ppc/int_helper.c
-@@ -443,8 +443,8 @@ void helper_lvsl(ppc_avr_t *r, target_ulong sh)
- {
-     int i, j = (sh & 0xf);
- 
--    VECTOR_FOR_INORDER_I(i, u8) {
--        r->u8[i] = j++;
-+    for (i = 0; i < ARRAY_SIZE(r->u8); i++) {
-+        r->VsrB(i) = j++;
-     }
- }
- 
-@@ -452,18 +452,14 @@ void helper_lvsr(ppc_avr_t *r, target_ulong sh)
- {
-     int i, j = 0x10 - (sh & 0xf);
- 
--    VECTOR_FOR_INORDER_I(i, u8) {
--        r->u8[i] = j++;
-+    for (i = 0; i < ARRAY_SIZE(r->u8); i++) {
-+        r->VsrB(i) = j++;
-     }
- }
- 
- void helper_mtvscr(CPUPPCState *env, ppc_avr_t *r)
- {
--#if defined(HOST_WORDS_BIGENDIAN)
--    env->vscr = r->u32[3];
--#else
--    env->vscr = r->u32[0];
--#endif
-+    env->vscr = r->VsrW(3);
-     set_flush_to_zero(vscr_nj, &env->vec_status);
- }
- 
-@@ -870,8 +866,8 @@ target_ulong helper_vclzlsbb(ppc_avr_t *r)
- {
-     target_ulong count = 0;
-     int i;
--    VECTOR_FOR_INORDER_I(i, u8) {
--        if (r->u8[i] & 0x01) {
-+    for (i = 0; i < ARRAY_SIZE(r->u8); i++) {
-+        if (r->VsrB(i) & 0x01) {
-             break;
-         }
-         count++;
-@@ -883,12 +879,8 @@ target_ulong helper_vctzlsbb(ppc_avr_t *r)
- {
-     target_ulong count = 0;
-     int i;
--#if defined(HOST_WORDS_BIGENDIAN)
-     for (i = ARRAY_SIZE(r->u8) - 1; i >= 0; i--) {
--#else
--    for (i = 0; i < ARRAY_SIZE(r->u8); i++) {
--#endif
--        if (r->u8[i] & 0x01) {
-+        if (r->VsrB(i) & 0x01) {
-             break;
-         }
-         count++;
-@@ -1151,18 +1143,14 @@ void helper_vperm(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b,
-     ppc_avr_t result;
-     int i;
- 
--    VECTOR_FOR_INORDER_I(i, u8) {
--        int s = c->u8[i] & 0x1f;
--#if defined(HOST_WORDS_BIGENDIAN)
-+    for (i = 0; i < ARRAY_SIZE(r->u8); i++) {
-+        int s = c->VsrB(i) & 0x1f;
-         int index = s & 0xf;
--#else
--        int index = 15 - (s & 0xf);
--#endif
- 
-         if (s & 0x10) {
--            result.u8[i] = b->u8[index];
-+            result.VsrB(i) = b->VsrB(index);
-         } else {
--            result.u8[i] = a->u8[index];
-+            result.VsrB(i) = a->VsrB(index);
-         }
-     }
-     *r = result;
-@@ -1174,18 +1162,14 @@ void helper_vpermr(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b,
-     ppc_avr_t result;
-     int i;
- 
--    VECTOR_FOR_INORDER_I(i, u8) {
--        int s = c->u8[i] & 0x1f;
--#if defined(HOST_WORDS_BIGENDIAN)
-+    for (i = 0; i < ARRAY_SIZE(r->u8); i++) {
-+        int s = c->VsrB(i) & 0x1f;
-         int index = 15 - (s & 0xf);
--#else
--        int index = s & 0xf;
--#endif
- 
-         if (s & 0x10) {
--            result.u8[i] = a->u8[index];
-+            result.VsrB(i) = a->VsrB(index);
-         } else {
--            result.u8[i] = b->u8[index];
-+            result.VsrB(i) = b->VsrB(index);
-         }
-     }
-     *r = result;
-@@ -1882,25 +1866,14 @@ void helper_vsldoi(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t shift)
-     int i;
-     ppc_avr_t result;
- 
--#if defined(HOST_WORDS_BIGENDIAN)
-     for (i = 0; i < ARRAY_SIZE(r->u8); i++) {
-         int index = sh + i;
-         if (index > 0xf) {
--            result.u8[i] = b->u8[index - 0x10];
--        } else {
--            result.u8[i] = a->u8[index];
--        }
--    }
--#else
--    for (i = 0; i < ARRAY_SIZE(r->u8); i++) {
--        int index = (16 - sh) + i;
--        if (index > 0xf) {
--            result.u8[i] = a->u8[index - 0x10];
-+            result.VsrB(i) = b->VsrB(index - 0x10);
-         } else {
--            result.u8[i] = b->u8[index];
-+            result.VsrB(i) = a->VsrB(index);
-         }
-     }
--#endif
+@@ -3320,12 +3320,7 @@ void helper_vncipherlast(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
      *r = result;
  }
  
-@@ -1919,25 +1892,20 @@ void helper_vslo(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
- 
- /* Experimental testing shows that hardware masks the immediate.  */
- #define _SPLAT_MASKED(element) (splat & (ARRAY_SIZE(r->element) - 1))
+-#define ROTRu32(v, n) (((v) >> (n)) | ((v) << (32-n)))
 -#if defined(HOST_WORDS_BIGENDIAN)
- #define SPLAT_ELEMENT(element) _SPLAT_MASKED(element)
+-#define EL_IDX(i) (i)
 -#else
--#define SPLAT_ELEMENT(element)                                  \
--    (ARRAY_SIZE(r->element) - 1 - _SPLAT_MASKED(element))
+-#define EL_IDX(i) (3 - (i))
 -#endif
--#define VSPLT(suffix, element)                                          \
-+#define VSPLT(suffix, element, access)                                  \
-     void helper_vsplt##suffix(ppc_avr_t *r, ppc_avr_t *b, uint32_t splat) \
-     {                                                                   \
--        uint32_t s = b->element[SPLAT_ELEMENT(element)];                \
-+        uint32_t s = b->access(SPLAT_ELEMENT(element));                 \
-         int i;                                                          \
-                                                                         \
-         for (i = 0; i < ARRAY_SIZE(r->element); i++) {                  \
--            r->element[i] = s;                                          \
-+            r->access(i) = s;                                           \
-         }                                                               \
-     }
--VSPLT(b, u8)
--VSPLT(h, u16)
--VSPLT(w, u32)
-+VSPLT(b, u8, VsrB)
-+VSPLT(h, u16, VsrH)
-+VSPLT(w, u32, VsrW)
- #undef VSPLT
- #undef SPLAT_ELEMENT
- #undef _SPLAT_MASKED
-@@ -1998,17 +1966,10 @@ void helper_xxextractuw(CPUPPCState *env, target_ulong xtn,
-     getVSR(xbn, &xb, env);
-     memset(&xt, 0, sizeof(xt));
++#define ROTRu32(v, n) (((v) >> (n)) | ((v) << (32 - n)))
  
--#if defined(HOST_WORDS_BIGENDIAN)
-     ext_index = index;
-     for (i = 0; i < es; i++, ext_index++) {
--        xt.u8[8 - es + i] = xb.u8[ext_index % 16];
--    }
--#else
--    ext_index = 15 - index;
--    for (i = es - 1; i >= 0; i--, ext_index--) {
--        xt.u8[8 + i] = xb.u8[ext_index % 16];
-+        xt.VsrB(8 - es + i) = xb.VsrB(ext_index % 16);
-     }
--#endif
- 
-     putVSR(xtn, &xt, env);
- }
-@@ -2023,46 +1984,39 @@ void helper_xxinsertw(CPUPPCState *env, target_ulong xtn,
-     getVSR(xbn, &xb, env);
-     getVSR(xtn, &xt, env);
- 
--#if defined(HOST_WORDS_BIGENDIAN)
-     ins_index = index;
-     for (i = 0; i < es && ins_index < 16; i++, ins_index++) {
--        xt.u8[ins_index] = xb.u8[8 - es + i];
--    }
--#else
--    ins_index = 15 - index;
--    for (i = es - 1; i >= 0 && ins_index >= 0; i--, ins_index--) {
--        xt.u8[ins_index] = xb.u8[8 + i];
-+        xt.VsrB(ins_index) = xb.VsrB(8 - es + i);
-     }
--#endif
- 
-     putVSR(xtn, &xt, env);
- }
- 
--#define VEXT_SIGNED(name, element, mask, cast, recast)              \
-+#define VEXT_SIGNED(name, element, access, mask, cast, recast)      \
- void helper_##name(ppc_avr_t *r, ppc_avr_t *b)                      \
- {                                                                   \
-     int i;                                                          \
--    VECTOR_FOR_INORDER_I(i, element) {                              \
--        r->element[i] = (recast)((cast)(b->element[i] & mask));     \
-+    for (i = 0; i < ARRAY_SIZE(r->element); i++) {                  \
-+        r->access(i) = (recast)((cast)(b->access(i) & mask));       \
-     }                                                               \
- }
--VEXT_SIGNED(vextsb2w, s32, UINT8_MAX, int8_t, int32_t)
--VEXT_SIGNED(vextsb2d, s64, UINT8_MAX, int8_t, int64_t)
--VEXT_SIGNED(vextsh2w, s32, UINT16_MAX, int16_t, int32_t)
--VEXT_SIGNED(vextsh2d, s64, UINT16_MAX, int16_t, int64_t)
--VEXT_SIGNED(vextsw2d, s64, UINT32_MAX, int32_t, int64_t)
-+VEXT_SIGNED(vextsb2w, s32, VsrSW, UINT8_MAX, int8_t, int32_t)
-+VEXT_SIGNED(vextsb2d, s64, VsrSD, UINT8_MAX, int8_t, int64_t)
-+VEXT_SIGNED(vextsh2w, s32, VsrSW, UINT16_MAX, int16_t, int32_t)
-+VEXT_SIGNED(vextsh2d, s64, VsrSD, UINT16_MAX, int16_t, int64_t)
-+VEXT_SIGNED(vextsw2d, s64, VsrSD, UINT32_MAX, int32_t, int64_t)
- #undef VEXT_SIGNED
- 
--#define VNEG(name, element)                                         \
-+#define VNEG(name, element, access)                                 \
- void helper_##name(ppc_avr_t *r, ppc_avr_t *b)                      \
- {                                                                   \
-     int i;                                                          \
--    VECTOR_FOR_INORDER_I(i, element) {                              \
--        r->element[i] = -b->element[i];                             \
-+    for (i = 0; i < ARRAY_SIZE(r->element); i++) {                  \
-+        r->access(i) = -b->access(i);                               \
-     }                                                               \
- }
--VNEG(vnegw, s32)
--VNEG(vnegd, s64)
-+VNEG(vnegw, s32, VsrSW)
-+VNEG(vnegd, s64, VsrSD)
- #undef VNEG
- 
- #define VSPLTI(suffix, element, splat_type)                     \
-@@ -2129,17 +2083,13 @@ void helper_vsumsws(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
-     ppc_avr_t result;
-     int sat = 0;
- 
--#if defined(HOST_WORDS_BIGENDIAN)
--    upper = ARRAY_SIZE(r->s32)-1;
--#else
--    upper = 0;
--#endif
--    t = (int64_t)b->s32[upper];
-+    upper = ARRAY_SIZE(r->s32) - 1;
-+    t = (int64_t)b->VsrSW(upper);
-     for (i = 0; i < ARRAY_SIZE(r->s32); i++) {
--        t += a->s32[i];
--        result.s32[i] = 0;
-+        t += a->VsrSW(i);
-+        result.VsrSW(i) = 0;
-     }
--    result.s32[upper] = cvtsdsw(t, &sat);
-+    result.VsrSW(upper) = cvtsdsw(t, &sat);
-     *r = result;
- 
-     if (sat) {
-@@ -2153,19 +2103,15 @@ void helper_vsum2sws(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
-     ppc_avr_t result;
-     int sat = 0;
- 
--#if defined(HOST_WORDS_BIGENDIAN)
-     upper = 1;
--#else
--    upper = 0;
--#endif
-     for (i = 0; i < ARRAY_SIZE(r->u64); i++) {
--        int64_t t = (int64_t)b->s32[upper + i * 2];
-+        int64_t t = (int64_t)b->VsrSW(upper + i * 2);
- 
--        result.u64[i] = 0;
-+        result.VsrW(i) = 0;
-         for (j = 0; j < ARRAY_SIZE(r->u64); j++) {
--            t += a->s32[2 * i + j];
-+            t += a->VsrSW(2 * i + j);
-         }
--        result.s32[upper + i * 2] = cvtsdsw(t, &sat);
-+        result.VsrSW(upper + i * 2) = cvtsdsw(t, &sat);
-     }
- 
-     *r = result;
-@@ -2285,13 +2231,13 @@ VUPK(lsw, s64, s32, UPKLO)
- #undef UPKHI
- #undef UPKLO
- 
--#define VGENERIC_DO(name, element)                                      \
-+#define VGENERIC_DO(name, element, access)                              \
-     void helper_v##name(ppc_avr_t *r, ppc_avr_t *b)                     \
-     {                                                                   \
-         int i;                                                          \
-                                                                         \
--        VECTOR_FOR_INORDER_I(i, element) {                              \
--            r->element[i] = name(b->element[i]);                        \
-+        for (i = 0; i < ARRAY_SIZE(r->element); i++) {                  \
-+            r->access(i) = name(b->access(i));                          \
-         }                                                               \
-     }
- 
-@@ -2300,10 +2246,10 @@ VUPK(lsw, s64, s32, UPKLO)
- #define clzw(v) clz32((v))
- #define clzd(v) clz64((v))
- 
--VGENERIC_DO(clzb, u8)
--VGENERIC_DO(clzh, u16)
--VGENERIC_DO(clzw, u32)
--VGENERIC_DO(clzd, u64)
-+VGENERIC_DO(clzb, u8, VsrB)
-+VGENERIC_DO(clzh, u16, VsrH)
-+VGENERIC_DO(clzw, u32, VsrW)
-+VGENERIC_DO(clzd, u64, VsrD)
- 
- #undef clzb
- #undef clzh
-@@ -2315,10 +2261,10 @@ VGENERIC_DO(clzd, u64)
- #define ctzw(v) ctz32((v))
- #define ctzd(v) ctz64((v))
- 
--VGENERIC_DO(ctzb, u8)
--VGENERIC_DO(ctzh, u16)
--VGENERIC_DO(ctzw, u32)
--VGENERIC_DO(ctzd, u64)
-+VGENERIC_DO(ctzb, u8, VsrB)
-+VGENERIC_DO(ctzh, u16, VsrH)
-+VGENERIC_DO(ctzw, u32, VsrW)
-+VGENERIC_DO(ctzd, u64, VsrD)
- 
- #undef ctzb
- #undef ctzh
-@@ -2330,10 +2276,10 @@ VGENERIC_DO(ctzd, u64)
- #define popcntw(v) ctpop32(v)
- #define popcntd(v) ctpop64(v)
- 
--VGENERIC_DO(popcntb, u8)
--VGENERIC_DO(popcnth, u16)
--VGENERIC_DO(popcntw, u32)
--VGENERIC_DO(popcntd, u64)
-+VGENERIC_DO(popcntb, u8, VsrB)
-+VGENERIC_DO(popcnth, u16, VsrH)
-+VGENERIC_DO(popcntw, u32, VsrW)
-+VGENERIC_DO(popcntd, u64, VsrD)
- 
- #undef popcntb
- #undef popcnth
-@@ -2630,20 +2576,12 @@ static int bcd_cmp_zero(ppc_avr_t *bcd)
- 
- static uint16_t get_national_digit(ppc_avr_t *reg, int n)
+ void helper_vshasigmaw(ppc_avr_t *r,  ppc_avr_t *a, uint32_t st_six)
  {
--#if defined(HOST_WORDS_BIGENDIAN)
--    return reg->u16[7 - n];
--#else
--    return reg->u16[n];
--#endif
-+    return reg->VsrH(7 - n);
- }
- 
- static void set_national_digit(ppc_avr_t *reg, uint8_t val, int n)
- {
--#if defined(HOST_WORDS_BIGENDIAN)
--    reg->u16[7 - n] = val;
--#else
--    reg->u16[n] = val;
--#endif
-+    reg->VsrH(7 - n) = val;
- }
- 
- static int bcd_cmp_mag(ppc_avr_t *a, ppc_avr_t *b)
-@@ -3395,14 +3333,11 @@ void helper_vpermxor(ppc_avr_t *r,  ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
-     ppc_avr_t result;
+@@ -3333,40 +3328,34 @@ void helper_vshasigmaw(ppc_avr_t *r,  ppc_avr_t *a, uint32_t st_six)
+     int six = st_six & 0xF;
      int i;
  
--    VECTOR_FOR_INORDER_I(i, u8) {
--        int indexA = c->u8[i] >> 4;
--        int indexB = c->u8[i] & 0xF;
--#if defined(HOST_WORDS_BIGENDIAN)
--        result.u8[i] = a->u8[indexA] ^ b->u8[indexB];
--#else
--        result.u8[i] = a->u8[15-indexA] ^ b->u8[15-indexB];
--#endif
-+    for (i = 0; i < ARRAY_SIZE(r->u8); i++) {
-+        int indexA = c->VsrB(i) >> 4;
-+        int indexB = c->VsrB(i) & 0xF;
-+
-+        result.VsrB(i) = a->VsrB(indexA) ^ b->VsrB(indexB);
+-    VECTOR_FOR_INORDER_I(i, u32) {
++    for (i = 0; i < ARRAY_SIZE(r->u32); i++) {
+         if (st == 0) {
+             if ((six & (0x8 >> i)) == 0) {
+-                r->u32[EL_IDX(i)] = ROTRu32(a->u32[EL_IDX(i)], 7) ^
+-                                    ROTRu32(a->u32[EL_IDX(i)], 18) ^
+-                                    (a->u32[EL_IDX(i)] >> 3);
++                r->VsrW(i) = ROTRu32(a->VsrW(i), 7) ^
++                             ROTRu32(a->VsrW(i), 18) ^
++                             (a->VsrW(i) >> 3);
+             } else { /* six.bit[i] == 1 */
+-                r->u32[EL_IDX(i)] = ROTRu32(a->u32[EL_IDX(i)], 17) ^
+-                                    ROTRu32(a->u32[EL_IDX(i)], 19) ^
+-                                    (a->u32[EL_IDX(i)] >> 10);
++                r->VsrW(i) = ROTRu32(a->VsrW(i), 17) ^
++                             ROTRu32(a->VsrW(i), 19) ^
++                             (a->VsrW(i) >> 10);
+             }
+         } else { /* st == 1 */
+             if ((six & (0x8 >> i)) == 0) {
+-                r->u32[EL_IDX(i)] = ROTRu32(a->u32[EL_IDX(i)], 2) ^
+-                                    ROTRu32(a->u32[EL_IDX(i)], 13) ^
+-                                    ROTRu32(a->u32[EL_IDX(i)], 22);
++                r->VsrW(i) = ROTRu32(a->VsrW(i), 2) ^
++                             ROTRu32(a->VsrW(i), 13) ^
++                             ROTRu32(a->VsrW(i), 22);
+             } else { /* six.bit[i] == 1 */
+-                r->u32[EL_IDX(i)] = ROTRu32(a->u32[EL_IDX(i)], 6) ^
+-                                    ROTRu32(a->u32[EL_IDX(i)], 11) ^
+-                                    ROTRu32(a->u32[EL_IDX(i)], 25);
++                r->VsrW(i) = ROTRu32(a->VsrW(i), 6) ^
++                             ROTRu32(a->VsrW(i), 11) ^
++                             ROTRu32(a->VsrW(i), 25);
+             }
+         }
      }
-     *r = result;
  }
+ 
+ #undef ROTRu32
+-#undef EL_IDX
+ 
+ #define ROTRu64(v, n) (((v) >> (n)) | ((v) << (64-n)))
+-#if defined(HOST_WORDS_BIGENDIAN)
+-#define EL_IDX(i) (i)
+-#else
+-#define EL_IDX(i) (1 - (i))
+-#endif
+ 
+ void helper_vshasigmad(ppc_avr_t *r,  ppc_avr_t *a, uint32_t st_six)
+ {
+@@ -3374,33 +3363,32 @@ void helper_vshasigmad(ppc_avr_t *r,  ppc_avr_t *a, uint32_t st_six)
+     int six = st_six & 0xF;
+     int i;
+ 
+-    VECTOR_FOR_INORDER_I(i, u64) {
++    for (i = 0; i < ARRAY_SIZE(r->u64); i++) {
+         if (st == 0) {
+             if ((six & (0x8 >> (2*i))) == 0) {
+-                r->u64[EL_IDX(i)] = ROTRu64(a->u64[EL_IDX(i)], 1) ^
+-                                    ROTRu64(a->u64[EL_IDX(i)], 8) ^
+-                                    (a->u64[EL_IDX(i)] >> 7);
++                r->VsrD(i) = ROTRu64(a->VsrD(i), 1) ^
++                             ROTRu64(a->VsrD(i), 8) ^
++                             (a->VsrD(i) >> 7);
+             } else { /* six.bit[2*i] == 1 */
+-                r->u64[EL_IDX(i)] = ROTRu64(a->u64[EL_IDX(i)], 19) ^
+-                                    ROTRu64(a->u64[EL_IDX(i)], 61) ^
+-                                    (a->u64[EL_IDX(i)] >> 6);
++                r->VsrD(i) = ROTRu64(a->VsrD(i), 19) ^
++                             ROTRu64(a->VsrD(i), 61) ^
++                             (a->VsrD(i) >> 6);
+             }
+         } else { /* st == 1 */
+             if ((six & (0x8 >> (2*i))) == 0) {
+-                r->u64[EL_IDX(i)] = ROTRu64(a->u64[EL_IDX(i)], 28) ^
+-                                    ROTRu64(a->u64[EL_IDX(i)], 34) ^
+-                                    ROTRu64(a->u64[EL_IDX(i)], 39);
++                r->VsrD(i) = ROTRu64(a->VsrD(i), 28) ^
++                             ROTRu64(a->VsrD(i), 34) ^
++                             ROTRu64(a->VsrD(i), 39);
+             } else { /* six.bit[2*i] == 1 */
+-                r->u64[EL_IDX(i)] = ROTRu64(a->u64[EL_IDX(i)], 14) ^
+-                                    ROTRu64(a->u64[EL_IDX(i)], 18) ^
+-                                    ROTRu64(a->u64[EL_IDX(i)], 41);
++                r->VsrD(i) = ROTRu64(a->VsrD(i), 14) ^
++                             ROTRu64(a->VsrD(i), 18) ^
++                             ROTRu64(a->VsrD(i), 41);
+             }
+         }
+     }
+ }
+ 
+ #undef ROTRu64
+-#undef EL_IDX
+ 
+ void helper_vpermxor(ppc_avr_t *r,  ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
+ {
 -- 
 2.11.0
