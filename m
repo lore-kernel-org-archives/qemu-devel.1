@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52536)
+Received: from eggs.gnu.org ([208.118.235.92]:52523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkA-0008CS-QB
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:03 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkA-0008B0-8K
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAk9-0003G0-H4
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAk9-0003Ei-3M
 	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:02 -0500
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:50633)
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54758)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gbAk9-0003DS-A4
+	id 1gbAk8-000376-Sz
 	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:01 -0500
-Received: by mail-wm1-x336.google.com with SMTP id n190so9881731wmd.0
-	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:53:01 -0800 (PST)
+Received: by mail-wm1-x342.google.com with SMTP id a62so9861848wmh.4
+	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:52:59 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Sun, 23 Dec 2018 21:52:13 +0100
-Message-Id: <4a336338eda1c3f6b8d27003d840373ada76a099.1545598229.git.DirtY.iCE.hu@gmail.com>
+Date: Sun, 23 Dec 2018 21:52:11 +0100
+Message-Id: <8b28b74150934d42fef0b2e4b9d19b60700a686e.1545598229.git.DirtY.iCE.hu@gmail.com>
 In-Reply-To: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 37/52] wavaudio: port to the new audio
+Subject: [Qemu-devel] [PATCH v2 35/52] sdlaudio: port to the new audio
  backend api
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -34,116 +34,200 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
+SDL2 is still a big mess, but it's probably not worse than the current
+version.
+
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/wavaudio.c | 54 ++++++++----------------------------------------
- 1 file changed, 9 insertions(+), 45 deletions(-)
+ audio/sdlaudio.c | 136 +++++++++++++++++------------------------------
+ 1 file changed, 50 insertions(+), 86 deletions(-)
 
-diff --git a/audio/wavaudio.c b/audio/wavaudio.c
-index 58300663ff..31db03aadb 100644
---- a/audio/wavaudio.c
-+++ b/audio/wavaudio.c
-@@ -34,52 +34,28 @@ typedef struct WAVVoiceOut {
+diff --git a/audio/sdlaudio.c b/audio/sdlaudio.c
+index 92da4804c6..685cbc83b8 100644
+--- a/audio/sdlaudio.c
++++ b/audio/sdlaudio.c
+@@ -42,11 +42,6 @@
+ 
+ typedef struct SDLVoiceOut {
      HWVoiceOut hw;
-     FILE *f;
-     int64_t old_ticks;
--    void *pcm_buf;
-     int total_samples;
- } WAVVoiceOut;
+-    int live;
+-#if USE_SEMAPHORE
+-    int rpos;
+-#endif
+-    int decr;
+ } SDLVoiceOut;
  
--static int wav_run_out (HWVoiceOut *hw, int live)
-+static size_t wav_write_out(HWVoiceOut *hw, void *buf, size_t len)
- {
-     WAVVoiceOut *wav = (WAVVoiceOut *) hw;
--    int rpos, decr, samples;
--    uint8_t *dst;
--    struct st_sample *src;
-     int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-     int64_t ticks = now - wav->old_ticks;
-     int64_t bytes =
-         muldiv64(ticks, hw->info.bytes_per_second, NANOSECONDS_PER_SECOND);
+ static struct SDLAudioState {
+@@ -252,17 +247,13 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
+     SDLVoiceOut *sdl = opaque;
+     SDLAudioState *s = &glob_sdl;
+     HWVoiceOut *hw = &sdl->hw;
+-    int samples = len >> hw->info.shift;
  
--    if (bytes > INT_MAX) {
--        samples = INT_MAX >> hw->info.shift;
--    }
--    else {
--        samples = bytes >> hw->info.shift;
--    }
--
-+    bytes = MIN(bytes, len);
-+    bytes = bytes >> hw->info.shift << hw->info.shift;
-     wav->old_ticks = now;
--    decr = MIN (live, samples);
--    samples = decr;
--    rpos = hw->rpos;
+     if (s->exit) {
+         return;
+     }
+ 
 -    while (samples) {
--        int left_till_end_samples = hw->samples - rpos;
--        int convert_samples = MIN (samples, left_till_end_samples);
- 
--        src = hw->mix_buf + rpos;
--        dst = advance (wav->pcm_buf, rpos << hw->info.shift);
+-        int to_mix, decr;
 -
--        hw->clip (dst, src, convert_samples);
--        if (fwrite (dst, convert_samples << hw->info.shift, 1, wav->f) != 1) {
--            dolog ("wav_run_out: fwrite of %d bytes failed\nReaons: %s\n",
--                   convert_samples << hw->info.shift, strerror (errno));
+-        /* dolog ("in callback samples=%d\n", samples); */
+ #if USE_SEMAPHORE
++    while (len) {
+         sdl_wait (s, "sdl_callback");
+         if (s->exit) {
+             return;
+@@ -271,95 +262,66 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
+         if (sdl_lock (s, "sdl_callback")) {
+             return;
+         }
+-
+-        if (audio_bug(__func__, sdl->live < 0 || sdl->live > hw->samples)) {
+-            dolog("sdl->live=%d hw->samples=%zu\n", sdl->live, hw->samples);
+-            return;
 -        }
 -
--        rpos = (rpos + convert_samples) % hw->samples;
--        samples -= convert_samples;
--        wav->total_samples += convert_samples;
-+    if (bytes && fwrite(buf, bytes, 1, wav->f) != 1) {
-+        dolog("wav_write_out: fwrite of %zu bytes failed\nReaons: %s\n",
-+              bytes, strerror(errno));
+-        if (!sdl->live) {
+-            goto again;
+-        }
+-#else
+-        if (s->exit || !sdl->live) {
+-            break;
+-        }
+ #endif
+ 
+-        /* dolog ("in callback live=%d\n", live); */
+-        to_mix = MIN (samples, sdl->live);
+-        decr = to_mix;
+-        while (to_mix) {
+-            int chunk = MIN (to_mix, hw->samples - hw->rpos);
+-            struct st_sample *src = hw->mix_buf + hw->rpos;
++        while (hw->pending_emul && len) {
++            size_t write_len;
++            ssize_t start = ((ssize_t) hw->pos_emul) - hw->pending_emul;
++            if (start < 0) {
++                start += hw->size_emul;
++            }
++            assert(start >= 0 && start < hw->size_emul);
+ 
+-            /* dolog ("in callback to_mix %d, chunk %d\n", to_mix, chunk); */
+-            hw->clip (buf, src, chunk);
+-#if USE_SEMAPHORE
+-            sdl->rpos = (sdl->rpos + chunk) % hw->samples;
+-#else
+-            hw->rpos = (hw->rpos + chunk) % hw->samples;
+-#endif
+-            to_mix -= chunk;
+-            buf += chunk << hw->info.shift;
++            write_len = MIN(MIN(hw->pending_emul, len),
++                            hw->size_emul - start);
++
++            memcpy(buf, hw->buf_emul + start, write_len);
++            hw->pending_emul -= write_len;
++            len -= write_len;
++            buf += write_len;
+         }
+-        samples -= decr;
+-        sdl->live -= decr;
+-        sdl->decr += decr;
+ 
+ #if USE_SEMAPHORE
+-    again:
+         if (sdl_unlock (s, "sdl_callback")) {
+             return;
+         }
+-#endif
      }
- 
--    hw->rpos = rpos;
--    return decr;
-+    wav->total_samples += bytes >> hw->info.shift;
-+    return bytes;
- }
- 
- /* VICE code: Store number as little endian. */
-@@ -135,13 +111,6 @@ static int wav_init_out(HWVoiceOut *hw, struct audsettings *as,
-     audio_pcm_init_info (&hw->info, &wav_as);
- 
-     hw->samples = 1024;
--    wav->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
--    if (!wav->pcm_buf) {
--        dolog("Could not allocate buffer (%zu bytes)\n",
--              hw->samples << hw->info.shift);
--        return -1;
+-    /* dolog ("done len=%d\n", len); */
+-
+-#if (SDL_MAJOR_VERSION >= 2)
+-    /* SDL2 does not clear the remaining buffer for us, so do it on our own */
+-    if (samples) {
+-        memset(buf, 0, samples << hw->info.shift);
+-    }
+-#endif
+-}
+-
+-static int sdl_run_out (HWVoiceOut *hw, int live)
+-{
+-    int decr;
+-    SDLVoiceOut *sdl = (SDLVoiceOut *) hw;
+-    SDLAudioState *s = &glob_sdl;
+-
+-    if (sdl_lock (s, "sdl_run_out")) {
+-        return 0;
 -    }
 -
-     le_store (hdr + 22, hw->info.nchannels, 2);
-     le_store (hdr + 24, hw->info.freq, 4);
-     le_store (hdr + 28, hw->info.freq << (bits16 + stereo), 4);
-@@ -151,8 +120,6 @@ static int wav_init_out(HWVoiceOut *hw, struct audsettings *as,
-     if (!wav->f) {
-         dolog ("Failed to open wave file `%s'\nReason: %s\n",
-                wav_path, strerror(errno));
--        g_free (wav->pcm_buf);
--        wav->pcm_buf = NULL;
-         return -1;
-     }
- 
-@@ -206,9 +173,6 @@ static void wav_fini_out (HWVoiceOut *hw)
-                wav->f, strerror (errno));
-     }
-     wav->f = NULL;
+-    if (sdl->decr > live) {
+-        ldebug ("sdl->decr %d live %d sdl->live %d\n",
+-                sdl->decr,
+-                live,
+-                sdl->live);
+-    }
 -
--    g_free (wav->pcm_buf);
--    wav->pcm_buf = NULL;
+-    decr = MIN (sdl->decr, live);
+-    sdl->decr -= decr;
+-
+-#if USE_SEMAPHORE
+-    sdl->live = live - decr;
+-    hw->rpos = sdl->rpos;
+ #else
+-    sdl->live = live;
++    /* clear remaining buffer that we couldn't fill with data */
++    if (len) {
++        memset(buf, 0, len);
++    }
+ #endif
+-
+-    if (sdl->live > 0) {
+-        sdl_unlock_and_post (s, "sdl_run_out");
+-    }
+-    else {
+-        sdl_unlock (s, "sdl_run_out");
+-    }
+-    return decr;
  }
  
- static int wav_ctl_out (HWVoiceOut *hw, int cmd, ...)
-@@ -232,7 +196,7 @@ static void wav_audio_fini (void *opaque)
- static struct audio_pcm_ops wav_pcm_ops = {
-     .init_out = wav_init_out,
-     .fini_out = wav_fini_out,
--    .run_out  = wav_run_out,
-+    .write    = wav_write_out,
-     .ctl_out  = wav_ctl_out,
++#define SDL_WRAPPER_FUNC(name, ret_type, args_decl, args, fail, unlock) \
++    static ret_type glue(sdl_, name)args_decl                           \
++    {                                                                   \
++        SDLAudioState *s = &glob_sdl;                                   \
++        ret_type ret;                                                   \
++                                                                        \
++        if (sdl_lock(s, "sdl_" #name)) {                                \
++            fail;                                                       \
++            return 0; /* implicitly casts to NULL */                    \
++        }                                                               \
++                                                                        \
++        ret = glue(audio_generic_, name)args;                           \
++                                                                        \
++        unlock(s, "sdl_" #name);                                        \
++        return ret;                                                     \
++    }
++
++SDL_WRAPPER_FUNC(get_buffer_out, void *, (HWVoiceOut *hw, size_t *size),
++                 (hw, size), *size = 0, sdl_unlock)
++SDL_WRAPPER_FUNC(put_buffer_out_nowrite, size_t,
++                 (HWVoiceOut *hw, void *buf, size_t size), (hw, buf, size),
++                 /*nothing*/, sdl_unlock_and_post)
++SDL_WRAPPER_FUNC(write, size_t,
++                 (HWVoiceOut *hw, void *buf, size_t size), (hw, buf, size),
++                 /* nothing */, sdl_unlock_and_post)
++
++#undef SDL_WRAPPER_FUNC
++
+ static void sdl_fini_out (HWVoiceOut *hw)
+ {
+     (void) hw;
+@@ -476,7 +438,9 @@ static void sdl_audio_fini (void *opaque)
+ static struct audio_pcm_ops sdl_pcm_ops = {
+     .init_out = sdl_init_out,
+     .fini_out = sdl_fini_out,
+-    .run_out  = sdl_run_out,
++    .write    = sdl_write,
++    .get_buffer_out = sdl_get_buffer_out,
++    .put_buffer_out = sdl_put_buffer_out_nowrite,
+     .ctl_out  = sdl_ctl_out,
  };
  
 -- 
