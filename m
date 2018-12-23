@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gb1jl-0006pA-K8
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:16:03 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gb1ju-0006yC-CN
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:16:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gb1jh-00065A-OR
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:16:01 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gb1jr-0006D5-7F
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:16:10 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sun, 23 Dec 2018 11:15:20 +0000
-Message-Id: <20181223111525.581-5-mark.cave-ayland@ilande.co.uk>
+Date: Sun, 23 Dec 2018 11:15:23 +0000
+Message-Id: <20181223111525.581-8-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20181223111525.581-1-mark.cave-ayland@ilande.co.uk>
 References: <20181223111525.581-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH v4 4/9] target/ppc: introduce get_avr64() and
- set_avr64() helpers for VMX register access
+Subject: [Qemu-devel] [PATCH v4 7/9] target/ppc: merge ppc_vsr_t and
+ ppc_avr_t union types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,329 +22,235 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, richard.henderson@linaro.org, david@gibson.dropbear.id.au
 
-These helpers allow us to move AVR register values to/from the specified TCGv_i64
-argument.
+Since the VSX registers are actually a superset of the VMX registers then they
+can be represented by the same type. Merge ppc_avr_t into ppc_vsr_t and change
+ppc_avr_t to be a simple typedef alias.
 
-To prevent VMX helpers accessing the cpu_avr{l,h} arrays directly, add extra TCG
-temporaries as required.
+Note that due to a difference in the naming of the float32 member between
+ppc_avr_t and ppc_vsr_t, references to the ppc_avr_t f member must be replaced
+with f32 instead.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate.c              |  10 +++
- target/ppc/translate/vmx-impl.inc.c | 147 ++++++++++++++++++++++++++++--------
- 2 files changed, 124 insertions(+), 33 deletions(-)
+ target/ppc/cpu.h        | 17 ++++++++-------
+ target/ppc/int_helper.c | 56 +++++++++++++++++++++++++------------------------
+ target/ppc/internal.h   | 11 ----------
+ 3 files changed, 39 insertions(+), 45 deletions(-)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 9cecab42f3..3bb24e7310 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -6709,6 +6709,16 @@ static inline void set_fpr(int regno, TCGv_i64 src)
-     tcg_gen_mov_i64(cpu_fpr[regno], src);
- }
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index d5f99f1fc7..578641ac20 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -218,7 +218,6 @@ typedef struct opc_handler_t opc_handler_t;
+ /* Types used to describe some PowerPC registers etc. */
+ typedef struct DisasContext DisasContext;
+ typedef struct ppc_spr_t ppc_spr_t;
+-typedef union ppc_avr_t ppc_avr_t;
+ typedef union ppc_tlb_t ppc_tlb_t;
+ typedef struct ppc_hash_pte64 ppc_hash_pte64_t;
  
-+static inline void get_avr64(TCGv_i64 dst, int regno, bool high)
-+{
-+    tcg_gen_mov_i64(dst, (high ? cpu_avrh : cpu_avrl)[regno]);
-+}
-+
-+static inline void set_avr64(int regno, TCGv_i64 src, bool high)
-+{
-+    tcg_gen_mov_i64((high ? cpu_avrh : cpu_avrl)[regno], src);
-+}
-+
- #include "translate/fp-impl.inc.c"
+@@ -242,22 +241,26 @@ struct ppc_spr_t {
+ #endif
+ };
  
- #include "translate/vmx-impl.inc.c"
-diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index 3cb6fc2926..5e8327e9a3 100644
---- a/target/ppc/translate/vmx-impl.inc.c
-+++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -18,52 +18,66 @@ static inline TCGv_ptr gen_avr_ptr(int reg)
- static void glue(gen_, name)(DisasContext *ctx)                                       \
- {                                                                             \
-     TCGv EA;                                                                  \
-+    TCGv_i64 avr;                                                             \
-     if (unlikely(!ctx->altivec_enabled)) {                                    \
-         gen_exception(ctx, POWERPC_EXCP_VPU);                                 \
-         return;                                                               \
-     }                                                                         \
-     gen_set_access_type(ctx, ACCESS_INT);                                     \
-+    avr = tcg_temp_new_i64();                                                 \
-     EA = tcg_temp_new();                                                      \
-     gen_addr_reg_index(ctx, EA);                                              \
-     tcg_gen_andi_tl(EA, EA, ~0xf);                                            \
-     /* We only need to swap high and low halves. gen_qemu_ld64_i64 does       \
-        necessary 64-bit byteswap already. */                                  \
-     if (ctx->le_mode) {                                                       \
--        gen_qemu_ld64_i64(ctx, cpu_avrl[rD(ctx->opcode)], EA);                \
-+        gen_qemu_ld64_i64(ctx, avr, EA);                                      \
-+        set_avr64(rD(ctx->opcode), avr, false);                               \
-         tcg_gen_addi_tl(EA, EA, 8);                                           \
--        gen_qemu_ld64_i64(ctx, cpu_avrh[rD(ctx->opcode)], EA);                \
-+        gen_qemu_ld64_i64(ctx, avr, EA);                                      \
-+        set_avr64(rD(ctx->opcode), avr, true);                                \
-     } else {                                                                  \
--        gen_qemu_ld64_i64(ctx, cpu_avrh[rD(ctx->opcode)], EA);                \
-+        gen_qemu_ld64_i64(ctx, avr, EA);                                      \
-+        set_avr64(rD(ctx->opcode), avr, true);                                \
-         tcg_gen_addi_tl(EA, EA, 8);                                           \
--        gen_qemu_ld64_i64(ctx, cpu_avrl[rD(ctx->opcode)], EA);                \
-+        gen_qemu_ld64_i64(ctx, avr, EA);                                      \
-+        set_avr64(rD(ctx->opcode), avr, false);                               \
-     }                                                                         \
-     tcg_temp_free(EA);                                                        \
-+    tcg_temp_free_i64(avr);                                                   \
- }
- 
- #define GEN_VR_STX(name, opc2, opc3)                                          \
- static void gen_st##name(DisasContext *ctx)                                   \
- {                                                                             \
-     TCGv EA;                                                                  \
-+    TCGv_i64 avr;                                                             \
-     if (unlikely(!ctx->altivec_enabled)) {                                    \
-         gen_exception(ctx, POWERPC_EXCP_VPU);                                 \
-         return;                                                               \
-     }                                                                         \
-     gen_set_access_type(ctx, ACCESS_INT);                                     \
-+    avr = tcg_temp_new_i64();                                                 \
-     EA = tcg_temp_new();                                                      \
-     gen_addr_reg_index(ctx, EA);                                              \
-     tcg_gen_andi_tl(EA, EA, ~0xf);                                            \
-     /* We only need to swap high and low halves. gen_qemu_st64_i64 does       \
-        necessary 64-bit byteswap already. */                                  \
-     if (ctx->le_mode) {                                                       \
--        gen_qemu_st64_i64(ctx, cpu_avrl[rD(ctx->opcode)], EA);                \
-+        get_avr64(avr, rD(ctx->opcode), false);                               \
-+        gen_qemu_st64_i64(ctx, avr, EA);                                      \
-         tcg_gen_addi_tl(EA, EA, 8);                                           \
--        gen_qemu_st64_i64(ctx, cpu_avrh[rD(ctx->opcode)], EA);                \
-+        get_avr64(avr, rD(ctx->opcode), true);                                \
-+        gen_qemu_st64_i64(ctx, avr, EA);                                      \
-     } else {                                                                  \
--        gen_qemu_st64_i64(ctx, cpu_avrh[rD(ctx->opcode)], EA);                \
-+        get_avr64(avr, rD(ctx->opcode), true);                                \
-+        gen_qemu_st64_i64(ctx, avr, EA);                                      \
-         tcg_gen_addi_tl(EA, EA, 8);                                           \
--        gen_qemu_st64_i64(ctx, cpu_avrl[rD(ctx->opcode)], EA);                \
-+        get_avr64(avr, rD(ctx->opcode), false);                               \
-+        gen_qemu_st64_i64(ctx, avr, EA);                                      \
-     }                                                                         \
-     tcg_temp_free(EA);                                                        \
-+    tcg_temp_free_i64(avr);                                                   \
- }
- 
- #define GEN_VR_LVE(name, opc2, opc3, size)                              \
-@@ -159,15 +173,20 @@ static void gen_lvsr(DisasContext *ctx)
- static void gen_mfvscr(DisasContext *ctx)
- {
-     TCGv_i32 t;
-+    TCGv_i64 avr;
-     if (unlikely(!ctx->altivec_enabled)) {
-         gen_exception(ctx, POWERPC_EXCP_VPU);
-         return;
-     }
--    tcg_gen_movi_i64(cpu_avrh[rD(ctx->opcode)], 0);
-+    avr = tcg_temp_new_i64();
-+    tcg_gen_movi_i64(avr, 0);
-+    set_avr64(rD(ctx->opcode), avr, true);
-     t = tcg_temp_new_i32();
-     tcg_gen_ld_i32(t, cpu_env, offsetof(CPUPPCState, vscr));
--    tcg_gen_extu_i32_i64(cpu_avrl[rD(ctx->opcode)], t);
-+    tcg_gen_extu_i32_i64(avr, t);
-+    set_avr64(rD(ctx->opcode), avr, false);
-     tcg_temp_free_i32(t);
-+    tcg_temp_free_i64(avr);
- }
- 
- static void gen_mtvscr(DisasContext *ctx)
-@@ -185,9 +204,10 @@ static void gen_mtvscr(DisasContext *ctx)
- #define GEN_VX_VMUL10(name, add_cin, ret_carry)                         \
- static void glue(gen_, name)(DisasContext *ctx)                         \
- {                                                                       \
--    TCGv_i64 t0 = tcg_temp_new_i64();                                   \
--    TCGv_i64 t1 = tcg_temp_new_i64();                                   \
--    TCGv_i64 t2 = tcg_temp_new_i64();                                   \
-+    TCGv_i64 t0;                                                        \
-+    TCGv_i64 t1;                                                        \
-+    TCGv_i64 t2;                                                        \
-+    TCGv_i64 avr;                                                       \
-     TCGv_i64 ten, z;                                                    \
-                                                                         \
-     if (unlikely(!ctx->altivec_enabled)) {                              \
-@@ -195,30 +215,43 @@ static void glue(gen_, name)(DisasContext *ctx)                         \
-         return;                                                         \
-     }                                                                   \
-                                                                         \
-+    t0 = tcg_temp_new_i64();                                            \
-+    t1 = tcg_temp_new_i64();                                            \
-+    t2 = tcg_temp_new_i64();                                            \
-+    avr = tcg_temp_new_i64();                                           \
-     ten = tcg_const_i64(10);                                            \
-     z = tcg_const_i64(0);                                               \
-                                                                         \
-     if (add_cin) {                                                      \
--        tcg_gen_mulu2_i64(t0, t1, cpu_avrl[rA(ctx->opcode)], ten);      \
--        tcg_gen_andi_i64(t2, cpu_avrl[rB(ctx->opcode)], 0xF);           \
--        tcg_gen_add2_i64(cpu_avrl[rD(ctx->opcode)], t2, t0, t1, t2, z); \
-+        get_avr64(avr, rA(ctx->opcode), false);                         \
-+        tcg_gen_mulu2_i64(t0, t1, avr, ten);                            \
-+        get_avr64(avr, rB(ctx->opcode), false);                         \
-+        tcg_gen_andi_i64(t2, avr, 0xF);                                 \
-+        tcg_gen_add2_i64(avr, t2, t0, t1, t2, z);                       \
-+        set_avr64(rD(ctx->opcode), avr, false);                         \
-     } else {                                                            \
--        tcg_gen_mulu2_i64(cpu_avrl[rD(ctx->opcode)], t2,                \
--                          cpu_avrl[rA(ctx->opcode)], ten);              \
-+        get_avr64(avr, rA(ctx->opcode), false);                         \
-+        tcg_gen_mulu2_i64(avr, t2, avr, ten);                           \
-+        set_avr64(rD(ctx->opcode), avr, false);                         \
-     }                                                                   \
-                                                                         \
-     if (ret_carry) {                                                    \
--        tcg_gen_mulu2_i64(t0, t1, cpu_avrh[rA(ctx->opcode)], ten);      \
--        tcg_gen_add2_i64(t0, cpu_avrl[rD(ctx->opcode)], t0, t1, t2, z); \
--        tcg_gen_movi_i64(cpu_avrh[rD(ctx->opcode)], 0);                 \
-+        get_avr64(avr, rA(ctx->opcode), true);                          \
-+        tcg_gen_mulu2_i64(t0, t1, avr, ten);                            \
-+        tcg_gen_add2_i64(t0, avr, t0, t1, t2, z);                       \
-+        set_avr64(rD(ctx->opcode), avr, false);                         \
-+        set_avr64(rD(ctx->opcode), z, true);                            \
-     } else {                                                            \
--        tcg_gen_mul_i64(t0, cpu_avrh[rA(ctx->opcode)], ten);            \
--        tcg_gen_add_i64(cpu_avrh[rD(ctx->opcode)], t0, t2);             \
-+        get_avr64(avr, rA(ctx->opcode), true);                          \
-+        tcg_gen_mul_i64(t0, avr, ten);                                  \
-+        tcg_gen_add_i64(avr, t0, t2);                                   \
-+        set_avr64(rD(ctx->opcode), avr, true);                          \
-     }                                                                   \
-                                                                         \
-     tcg_temp_free_i64(t0);                                              \
-     tcg_temp_free_i64(t1);                                              \
-     tcg_temp_free_i64(t2);                                              \
-+    tcg_temp_free_i64(avr);                                             \
-     tcg_temp_free_i64(ten);                                             \
-     tcg_temp_free_i64(z);                                               \
- }                                                                       \
-@@ -232,12 +265,31 @@ GEN_VX_VMUL10(vmul10ecuq, 1, 1);
- #define GEN_VX_LOGICAL(name, tcg_op, opc2, opc3)                        \
- static void glue(gen_, name)(DisasContext *ctx)                                 \
- {                                                                       \
-+    TCGv_i64 t0;                                                        \
-+    TCGv_i64 t1;                                                        \
-+    TCGv_i64 avr;                                                       \
-+                                                                        \
-     if (unlikely(!ctx->altivec_enabled)) {                              \
-         gen_exception(ctx, POWERPC_EXCP_VPU);                           \
-         return;                                                         \
-     }                                                                   \
--    tcg_op(cpu_avrh[rD(ctx->opcode)], cpu_avrh[rA(ctx->opcode)], cpu_avrh[rB(ctx->opcode)]); \
--    tcg_op(cpu_avrl[rD(ctx->opcode)], cpu_avrl[rA(ctx->opcode)], cpu_avrl[rB(ctx->opcode)]); \
-+    t0 = tcg_temp_new_i64();                                            \
-+    t1 = tcg_temp_new_i64();                                            \
-+    avr = tcg_temp_new_i64();                                           \
-+                                                                        \
-+    get_avr64(t0, rA(ctx->opcode), true);                               \
-+    get_avr64(t1, rB(ctx->opcode), true);                               \
-+    tcg_op(avr, t0, t1);                                                \
-+    set_avr64(rD(ctx->opcode), avr, true);                              \
-+                                                                        \
-+    get_avr64(t0, rA(ctx->opcode), false);                              \
-+    get_avr64(t1, rB(ctx->opcode), false);                              \
-+    tcg_op(avr, t0, t1);                                                \
-+    set_avr64(rD(ctx->opcode), avr, false);                             \
-+                                                                        \
-+    tcg_temp_free_i64(t0);                                              \
-+    tcg_temp_free_i64(t1);                                              \
-+    tcg_temp_free_i64(avr);                                             \
- }
- 
- GEN_VX_LOGICAL(vand, tcg_gen_and_i64, 2, 16);
-@@ -406,6 +458,7 @@ GEN_VXFORM(vmrglw, 6, 6);
- static void gen_vmrgew(DisasContext *ctx)
- {
-     TCGv_i64 tmp;
-+    TCGv_i64 avr;
-     int VT, VA, VB;
-     if (unlikely(!ctx->altivec_enabled)) {
-         gen_exception(ctx, POWERPC_EXCP_VPU);
-@@ -415,15 +468,28 @@ static void gen_vmrgew(DisasContext *ctx)
-     VA = rA(ctx->opcode);
-     VB = rB(ctx->opcode);
-     tmp = tcg_temp_new_i64();
--    tcg_gen_shri_i64(tmp, cpu_avrh[VB], 32);
--    tcg_gen_deposit_i64(cpu_avrh[VT], cpu_avrh[VA], tmp, 0, 32);
--    tcg_gen_shri_i64(tmp, cpu_avrl[VB], 32);
--    tcg_gen_deposit_i64(cpu_avrl[VT], cpu_avrl[VA], tmp, 0, 32);
-+    avr = tcg_temp_new_i64();
+-/* Altivec registers (128 bits) */
+-union ppc_avr_t {
+-    float32 f[4];
++/* VSX/Altivec registers (128 bits) */
++typedef union _ppc_vsr_t {
+     uint8_t u8[16];
+     uint16_t u16[8];
+     uint32_t u32[4];
++    uint64_t u64[2];
+     int8_t s8[16];
+     int16_t s16[8];
+     int32_t s32[4];
+-    uint64_t u64[2];
+     int64_t s64[2];
++    float32 f32[4];
++    float64 f64[2];
++    float128 f128;
+ #ifdef CONFIG_INT128
+     __uint128_t u128;
+ #endif
+-    Int128 s128;
+-};
++    Int128  s128;
++} ppc_vsr_t;
 +
-+    get_avr64(avr, VB, true);
-+    tcg_gen_shri_i64(tmp, avr, 32);
-+    get_avr64(avr, VA, true);
-+    tcg_gen_deposit_i64(avr, avr, tmp, 0, 32);
-+    set_avr64(VT, avr, true);
-+
-+    get_avr64(avr, VB, false);
-+    tcg_gen_shri_i64(tmp, avr, 32);
-+    get_avr64(avr, VA, false);
-+    tcg_gen_deposit_i64(avr, avr, tmp, 0, 32);
-+    set_avr64(VT, avr, false);
-+
-     tcg_temp_free_i64(tmp);
-+    tcg_temp_free_i64(avr);
- }
++typedef ppc_vsr_t ppc_avr_t;
  
- static void gen_vmrgow(DisasContext *ctx)
- {
-+    TCGv_i64 t0, t1;
-+    TCGv_i64 avr;
-     int VT, VA, VB;
-     if (unlikely(!ctx->altivec_enabled)) {
-         gen_exception(ctx, POWERPC_EXCP_VPU);
-@@ -432,9 +498,23 @@ static void gen_vmrgow(DisasContext *ctx)
-     VT = rD(ctx->opcode);
-     VA = rA(ctx->opcode);
-     VB = rB(ctx->opcode);
--
--    tcg_gen_deposit_i64(cpu_avrh[VT], cpu_avrh[VB], cpu_avrh[VA], 32, 32);
--    tcg_gen_deposit_i64(cpu_avrl[VT], cpu_avrl[VB], cpu_avrl[VA], 32, 32);
-+    t0 = tcg_temp_new_i64();
-+    t1 = tcg_temp_new_i64();
-+    avr = tcg_temp_new_i64();
-+
-+    get_avr64(t0, VB, true);
-+    get_avr64(t1, VA, true);
-+    tcg_gen_deposit_i64(avr, t0, t1, 32, 32);
-+    set_avr64(VT, avr, true);
-+
-+    get_avr64(t0, VB, false);
-+    get_avr64(t1, VA, false);
-+    tcg_gen_deposit_i64(avr, t0, t1, 32, 32);
-+    set_avr64(VT, avr, false);
-+
-+    tcg_temp_free_i64(t0);
-+    tcg_temp_free_i64(t1);
-+    tcg_temp_free_i64(avr);
- }
- 
- GEN_VXFORM(vmuloub, 4, 0);
-@@ -790,7 +870,7 @@ static void glue(gen_, name)(DisasContext *ctx)                         \
+ #if !defined(CONFIG_USER_ONLY)
+ /* Software TLB cache */
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index fcac90a4a9..9d715be25c 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -548,8 +548,8 @@ VARITH_DO(muluwm, *, u32)
      {                                                                   \
-         TCGv_ptr rb, rd;                                                \
-         uint8_t uimm = UIMM4(ctx->opcode);                              \
--        TCGv_i32 t0 = tcg_temp_new_i32();                               \
-+        TCGv_i32 t0;                                                    \
-         if (unlikely(!ctx->altivec_enabled)) {                          \
-             gen_exception(ctx, POWERPC_EXCP_VPU);                       \
-             return;                                                     \
-@@ -798,6 +878,7 @@ static void glue(gen_, name)(DisasContext *ctx)                         \
-         if (uimm > splat_max) {                                         \
-             uimm = 0;                                                   \
+         int i;                                                          \
+                                                                         \
+-        for (i = 0; i < ARRAY_SIZE(r->f); i++) {                        \
+-            r->f[i] = func(a->f[i], b->f[i], &env->vec_status);         \
++        for (i = 0; i < ARRAY_SIZE(r->f32); i++) {                      \
++            r->f32[i] = func(a->f32[i], b->f32[i], &env->vec_status);   \
          }                                                               \
-+        t0 = tcg_temp_new_i32();                                        \
-         tcg_gen_movi_i32(t0, uimm);                                     \
-         rb = gen_avr_ptr(rB(ctx->opcode));                              \
-         rd = gen_avr_ptr(rD(ctx->opcode));                              \
+     }
+ VARITHFP(addfp, float32_add)
+@@ -563,9 +563,9 @@ VARITHFP(maxfp, float32_max)
+                            ppc_avr_t *b, ppc_avr_t *c)                  \
+     {                                                                   \
+         int i;                                                          \
+-        for (i = 0; i < ARRAY_SIZE(r->f); i++) {                        \
+-            r->f[i] = float32_muladd(a->f[i], c->f[i], b->f[i],         \
+-                                     type, &env->vec_status);           \
++        for (i = 0; i < ARRAY_SIZE(r->f32); i++) {                      \
++            r->f32[i] = float32_muladd(a->f32[i], c->f32[i], b->f32[i], \
++                                       type, &env->vec_status);         \
+         }                                                               \
+     }
+ VARITHFPFMA(maddfp, 0);
+@@ -670,9 +670,9 @@ VABSDU(w, u32)
+     {                                                                   \
+         int i;                                                          \
+                                                                         \
+-        for (i = 0; i < ARRAY_SIZE(r->f); i++) {                        \
++        for (i = 0; i < ARRAY_SIZE(r->f32); i++) {                      \
+             float32 t = cvt(b->element[i], &env->vec_status);           \
+-            r->f[i] = float32_scalbn(t, -uim, &env->vec_status);        \
++            r->f32[i] = float32_scalbn(t, -uim, &env->vec_status);      \
+         }                                                               \
+     }
+ VCF(ux, uint32_to_float32, u32)
+@@ -782,9 +782,9 @@ VCMPNE(w, u32, uint32_t, 0)
+         uint32_t none = 0;                                              \
+         int i;                                                          \
+                                                                         \
+-        for (i = 0; i < ARRAY_SIZE(r->f); i++) {                        \
++        for (i = 0; i < ARRAY_SIZE(r->f32); i++) {                      \
+             uint32_t result;                                            \
+-            int rel = float32_compare_quiet(a->f[i], b->f[i],           \
++            int rel = float32_compare_quiet(a->f32[i], b->f32[i],       \
+                                             &env->vec_status);          \
+             if (rel == float_relation_unordered) {                      \
+                 result = 0;                                             \
+@@ -816,14 +816,16 @@ static inline void vcmpbfp_internal(CPUPPCState *env, ppc_avr_t *r,
+     int i;
+     int all_in = 0;
+ 
+-    for (i = 0; i < ARRAY_SIZE(r->f); i++) {
+-        int le_rel = float32_compare_quiet(a->f[i], b->f[i], &env->vec_status);
++    for (i = 0; i < ARRAY_SIZE(r->f32); i++) {
++        int le_rel = float32_compare_quiet(a->f32[i], b->f32[i],
++                                           &env->vec_status);
+         if (le_rel == float_relation_unordered) {
+             r->u32[i] = 0xc0000000;
+             all_in = 1;
+         } else {
+-            float32 bneg = float32_chs(b->f[i]);
+-            int ge_rel = float32_compare_quiet(a->f[i], bneg, &env->vec_status);
++            float32 bneg = float32_chs(b->f32[i]);
++            int ge_rel = float32_compare_quiet(a->f32[i], bneg,
++                                               &env->vec_status);
+             int le = le_rel != float_relation_greater;
+             int ge = ge_rel != float_relation_less;
+ 
+@@ -856,11 +858,11 @@ void helper_vcmpbfp_dot(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
+         float_status s = env->vec_status;                               \
+                                                                         \
+         set_float_rounding_mode(float_round_to_zero, &s);               \
+-        for (i = 0; i < ARRAY_SIZE(r->f); i++) {                        \
+-            if (float32_is_any_nan(b->f[i])) {                          \
++        for (i = 0; i < ARRAY_SIZE(r->f32); i++) {                      \
++            if (float32_is_any_nan(b->f32[i])) {                        \
+                 r->element[i] = 0;                                      \
+             } else {                                                    \
+-                float64 t = float32_to_float64(b->f[i], &s);            \
++                float64 t = float32_to_float64(b->f32[i], &s);          \
+                 int64_t j;                                              \
+                                                                         \
+                 t = float64_scalbn(t, uim, &s);                         \
+@@ -1661,8 +1663,8 @@ void helper_vrefp(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *b)
+ {
+     int i;
+ 
+-    for (i = 0; i < ARRAY_SIZE(r->f); i++) {
+-        r->f[i] = float32_div(float32_one, b->f[i], &env->vec_status);
++    for (i = 0; i < ARRAY_SIZE(r->f32); i++) {
++        r->f32[i] = float32_div(float32_one, b->f32[i], &env->vec_status);
+     }
+ }
+ 
+@@ -1674,8 +1676,8 @@ void helper_vrefp(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *b)
+         float_status s = env->vec_status;                       \
+                                                                 \
+         set_float_rounding_mode(rounding, &s);                  \
+-        for (i = 0; i < ARRAY_SIZE(r->f); i++) {                \
+-            r->f[i] = float32_round_to_int (b->f[i], &s);       \
++        for (i = 0; i < ARRAY_SIZE(r->f32); i++) {              \
++            r->f32[i] = float32_round_to_int (b->f32[i], &s);   \
+         }                                                       \
+     }
+ VRFI(n, float_round_nearest_even)
+@@ -1705,10 +1707,10 @@ void helper_vrsqrtefp(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *b)
+ {
+     int i;
+ 
+-    for (i = 0; i < ARRAY_SIZE(r->f); i++) {
+-        float32 t = float32_sqrt(b->f[i], &env->vec_status);
++    for (i = 0; i < ARRAY_SIZE(r->f32); i++) {
++        float32 t = float32_sqrt(b->f32[i], &env->vec_status);
+ 
+-        r->f[i] = float32_div(float32_one, t, &env->vec_status);
++        r->f32[i] = float32_div(float32_one, t, &env->vec_status);
+     }
+ }
+ 
+@@ -1751,8 +1753,8 @@ void helper_vexptefp(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *b)
+ {
+     int i;
+ 
+-    for (i = 0; i < ARRAY_SIZE(r->f); i++) {
+-        r->f[i] = float32_exp2(b->f[i], &env->vec_status);
++    for (i = 0; i < ARRAY_SIZE(r->f32); i++) {
++        r->f32[i] = float32_exp2(b->f32[i], &env->vec_status);
+     }
+ }
+ 
+@@ -1760,8 +1762,8 @@ void helper_vlogefp(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *b)
+ {
+     int i;
+ 
+-    for (i = 0; i < ARRAY_SIZE(r->f); i++) {
+-        r->f[i] = float32_log2(b->f[i], &env->vec_status);
++    for (i = 0; i < ARRAY_SIZE(r->f32); i++) {
++        r->f32[i] = float32_log2(b->f32[i], &env->vec_status);
+     }
+ }
+ 
+diff --git a/target/ppc/internal.h b/target/ppc/internal.h
+index 5d460247e2..bd247f2504 100644
+--- a/target/ppc/internal.h
++++ b/target/ppc/internal.h
+@@ -204,17 +204,6 @@ EXTRACT_HELPER(IMM8, 11, 8);
+ EXTRACT_HELPER(DCMX, 16, 7);
+ EXTRACT_HELPER_SPLIT_3(DCMX_XV, 5, 16, 0, 1, 2, 5, 1, 6, 6);
+ 
+-typedef union _ppc_vsr_t {
+-    uint8_t u8[16];
+-    uint16_t u16[8];
+-    uint32_t u32[4];
+-    uint64_t u64[2];
+-    float32 f32[4];
+-    float64 f64[2];
+-    float128 f128;
+-    Int128  s128;
+-} ppc_vsr_t;
+-
+ #if defined(HOST_WORDS_BIGENDIAN)
+ #define VsrB(i) u8[i]
+ #define VsrH(i) u16[i]
 -- 
 2.11.0
